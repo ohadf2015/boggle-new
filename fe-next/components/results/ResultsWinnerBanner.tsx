@@ -2,41 +2,9 @@ import React, { useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Crown, Trophy, Medal, Hand } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import confetti from 'canvas-confetti';
+import { fireRankConfetti } from '@/utils/confettiUtils';
 import Avatar from '../Avatar';
 import type { PlayerResult } from '@/types/components';
-
-// Confetti colors for each rank
-const RANK_CONFETTI_COLORS: Record<number, string[]> = {
-  1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'], // Gold
-  2: ['#c0c0c0', '#94a3b8', '#e2e8f0', '#cbd5e1'], // Silver
-  3: ['#cd7f32', '#ea580c', '#f97316', '#fb923c'], // Bronze/Orange
-};
-
-// Confetti burst on mount with rank-specific colors
-const fireConfetti = (rank: number = 1): void => {
-  const count = 100;
-  const colors = RANK_CONFETTI_COLORS[rank] || RANK_CONFETTI_COLORS[1];
-  const defaults = {
-    origin: { y: 0.7 },
-    zIndex: 1000,
-    colors,
-  };
-
-  function fire(particleRatio: number, opts: confetti.Options): void {
-    confetti({
-      ...defaults,
-      ...opts,
-      particleCount: Math.floor(count * particleRatio),
-    });
-  }
-
-  fire(0.25, { spread: 26, startVelocity: 55 });
-  fire(0.2, { spread: 60 });
-  fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
-  fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
-  fire(0.1, { spread: 120, startVelocity: 45 });
-};
 
 // Winner data - includes username, score, and optional avatar
 interface WinnerData {
@@ -133,14 +101,14 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
   // Memoize the confetti function for this rank
   const handleConfetti = useCallback(() => {
     if (shouldShowConfetti) {
-      fireConfetti(rank);
+      fireRankConfetti(rank);
     }
   }, [rank, shouldShowConfetti]);
 
   // Fire confetti on mount
   useEffect(() => {
     if (winner && shouldShowConfetti) {
-      const timer = setTimeout(() => fireConfetti(rank), 400);
+      const timer = setTimeout(() => fireRankConfetti(rank), 400);
       return () => clearTimeout(timer);
     }
     return undefined;

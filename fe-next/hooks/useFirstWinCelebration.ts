@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import confetti from 'canvas-confetti';
+import { fireFirstWinConfetti } from '@/utils/confettiUtils';
 import { hapticGameWin } from '@/utils/haptics';
 
 const FIRST_WIN_KEY = 'lexiclash_first_win_celebrated';
@@ -44,59 +44,8 @@ export function useFirstWinCelebration({
     localStorage.setItem(FIRST_WIN_KEY, 'true');
     setShowCelebration(true);
 
-    // Epic confetti burst
-    const duration = 4000;
-    const end = Date.now() + duration;
-
-    // Neo-brutalist color palette
-    const colors = ['#FFE135', '#FF6B35', '#00D9FF', '#FF69B4', '#7C3AED', '#10B981'];
-
-    const frame = () => {
-      // Left side
-      confetti({
-        particleCount: 4,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0, y: 0.6 },
-        colors,
-        startVelocity: 45,
-        gravity: 0.8,
-        ticks: 200,
-      });
-
-      // Right side
-      confetti({
-        particleCount: 4,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1, y: 0.6 },
-        colors,
-        startVelocity: 45,
-        gravity: 0.8,
-        ticks: 200,
-      });
-
-      // Center burst every few frames
-      if (Math.random() > 0.7) {
-        confetti({
-          particleCount: 10,
-          angle: 90,
-          spread: 120,
-          origin: { x: 0.5, y: 0.5 },
-          colors,
-          startVelocity: 30,
-          gravity: 0.6,
-          ticks: 150,
-        });
-      }
-
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
-    };
-
-    // Start the confetti animation
-    frame();
+    // Epic confetti burst using centralized utility
+    fireFirstWinConfetti(4000);
 
     // Trigger haptic feedback
     hapticGameWin();

@@ -3,22 +3,18 @@
 import React, { useCallback, useState } from 'react';
 import { motion } from 'framer-motion';
 import { PartyPopper } from 'lucide-react';
-import confetti from 'canvas-confetti';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-
-// Rank-specific confetti colors (matching Top3Leaderboard)
-const RANK_CONFETTI_COLORS: Record<number, string[]> = {
-  1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'], // Gold
-  2: ['#c0c0c0', '#94a3b8', '#e2e8f0', '#cbd5e1'], // Silver
-  3: ['#cd7f32', '#ea580c', '#f97316', '#fb923c'], // Bronze/Orange
-};
-
-// Default celebration colors
-const DEFAULT_COLORS = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#a855f7'];
-
-// Victory colors (green theme)
-const VICTORY_COLORS = ['#10B981', '#FFE135', '#00D9FF', '#34D399'];
+import {
+  fireConfetti,
+  fireRankConfetti,
+  fireVictoryConfetti,
+  fireStreakConfetti,
+  RANK_COLORS,
+  DEFAULT_COLORS,
+  VICTORY_COLORS,
+  STREAK_COLORS,
+} from '@/utils/confettiUtils';
 
 export type ConfettiVariant = 'default' | 'rank' | 'victory' | 'streak';
 
@@ -54,57 +50,57 @@ const ConfettiRetrigger: React.FC<ConfettiRetriggerProps> = ({
   const { t } = useLanguage();
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Determine confetti colors based on variant
-  const getColors = useCallback(() => {
-    if (customColors && customColors.length > 0) {
-      return customColors;
-    }
-
-    switch (variant) {
-      case 'rank':
-        if (rank && rank >= 1 && rank <= 3) {
-          return RANK_CONFETTI_COLORS[rank];
-        }
-        return DEFAULT_COLORS;
-      case 'victory':
-        return VICTORY_COLORS;
-      case 'streak':
-        return ['#FF6B35', '#FFE135', '#FF1493', '#FF8C00'];
-      default:
-        return DEFAULT_COLORS;
-    }
-  }, [variant, rank, customColors]);
-
-  // Fire confetti celebration
+  // Fire confetti celebration based on variant
   const triggerConfetti = useCallback(() => {
     if (isAnimating) return;
 
     setIsAnimating(true);
-    const colors = getColors();
 
-    // Main burst
-    confetti({
-      particleCount: 80,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors,
-    });
-
-    // Secondary burst for more impact
-    setTimeout(() => {
-      confetti({
-        particleCount: 40,
-        spread: 100,
-        origin: { y: 0.5 },
-        colors,
-      });
-    }, 150);
+    // Use variant-specific confetti or custom colors
+    switch (variant) {
+      case 'rank':
+        if (rank && rank >= 1 && rank <= 3) {
+          fireRankConfetti(rank);
+        } else {
+          // Default burst for non-top-3 ranks
+          fireConfetti({
+            particleCount: 80,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: customColors || DEFAULT_COLORS,
+          });
+        }
+        break;
+      case 'victory':
+        fireVictoryConfetti();
+        break;
+      case 'streak':
+        fireStreakConfetti();
+        break;
+      default:
+        // Main burst
+        fireConfetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: customColors || DEFAULT_COLORS,
+        });
+        // Secondary burst for more impact
+        setTimeout(() => {
+          fireConfetti({
+            particleCount: 40,
+            spread: 100,
+            origin: { y: 0.5 },
+            colors: customColors || DEFAULT_COLORS,
+          });
+        }, 150);
+    }
 
     // Reset animation state
     setTimeout(() => {
       setIsAnimating(false);
     }, 500);
-  }, [getColors, isAnimating]);
+  }, [variant, rank, customColors, isAnimating]);
 
   return (
     <motion.button

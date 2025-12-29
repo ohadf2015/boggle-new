@@ -1656,8 +1656,9 @@ body {
     box-shadow: var(--shadow-md);
   }
 
-  /* Disable confetti and particle effects */
-  canvas[data-confetti] {
+  /* Disable confetti and particle effects for users who prefer reduced motion */
+  /* The data-confetti attribute is added by our confettiUtils.ts wrapper */
+  canvas[data-confetti="true"] {
     display: none !important;
   }
 }

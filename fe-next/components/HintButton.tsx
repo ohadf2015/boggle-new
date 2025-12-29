@@ -52,7 +52,7 @@ const HintButton = memo<HintButtonProps>(({
         onClick={onRequestHint}
         disabled={!isAvailable || isLoading || hintsRemaining <= 0}
         className={`
-          flex items-center gap-2 px-3 py-2
+          flex items-center gap-1.5 px-2 py-1.5 max-w-[120px]
           ${isLoading ? 'animate-pulse' : ''}
           ${hintsRemaining > 0
             ? 'bg-neo-yellow border-neo-black text-neo-black hover:bg-neo-orange hover:shadow-hard-sm'
@@ -60,22 +60,22 @@ const HintButton = memo<HintButtonProps>(({
           border-3 rounded-neo font-bold text-sm transition-all shadow-hard-sm
         `}
       >
-        <Lightbulb className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-        <div className="flex flex-col items-start">
-          <span className="text-xs opacity-80">
+        <Lightbulb className={`w-4 h-4 flex-shrink-0 ${isLoading ? 'animate-spin' : ''}`} />
+        <div className="flex flex-col items-start min-w-0">
+          <span className="text-[10px] opacity-80 whitespace-nowrap overflow-hidden text-ellipsis max-w-[70px]">
             {isLoading
-              ? (t('hints.loading') || 'Getting hint...')
-              : (t('hints.freeHints') || 'Free Hints')
+              ? (t('hints.loading') || '...')
+              : (t('hints.hint') || 'Hint')
             }
           </span>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5">
             {/* Visual star tokens */}
             {[...Array(3)].map((_, i) => (
               <Star
                 key={i}
                 className={`w-3 h-3 ${
                   i < hintsRemaining
-                    ? 'text-neo-orange'
+                    ? 'text-neo-orange fill-neo-orange'
                     : 'text-gray-400 opacity-40'
                 }`}
               />
@@ -84,17 +84,17 @@ const HintButton = memo<HintButtonProps>(({
         </div>
       </Button>
 
-      {/* Hint Display Popup */}
+      {/* Hint Display Popup - pointer-events-none wrapper prevents blocking grid interaction */}
       <AnimatePresence>
         {hint && (
           <motion.div
             initial={{ opacity: 0, y: -10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            className="absolute top-full left-0 mt-2 z-50 w-64 md:w-80"
+            className="absolute top-full left-0 mt-2 z-50 w-64 md:w-80 pointer-events-none"
           >
             <div
-              className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg p-4 shadow-hard-lg"
+              className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg p-4 shadow-hard-lg pointer-events-auto"
               onClick={onClearHint}
             >
               {/* Header */}

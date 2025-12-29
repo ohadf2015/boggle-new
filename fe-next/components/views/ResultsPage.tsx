@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Star, DoorOpen, Check, ArrowRight, Play } from 'lucide-react';
 import ExitRoomButton from '@/components/ExitRoomButton';
-import confetti from 'canvas-confetti';
+import { fireLevelUpConfetti } from '@/utils/confettiUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
@@ -411,12 +411,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       logger.log('[RESULTS] Level up!', data);
       setLevelUpData(data);
       // Celebratory confetti for level up
-      confetti({
-        particleCount: 150,
-        spread: 100,
-        origin: { y: 0.5 },
-        colors: ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#a855f7']
-      });
+      fireLevelUpConfetti();
       // Show level up toast notification
       levelUpToast(data.oldLevel, data.newLevel, {
         title: t('xp.levelUp') || 'Level Up!',

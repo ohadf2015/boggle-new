@@ -3,7 +3,7 @@
  * Shared logic for game lifecycle events
  */
 import { Socket } from 'socket.io-client';
-import confetti from 'canvas-confetti';
+import { fireGameOverConfetti, fireConfetti, DEFAULT_COLORS } from '../../utils/confettiUtils';
 import { neoSuccessToast, neoErrorToast } from '../../components/NeoToast';
 import { clearSessionPreservingUsername } from '../../utils/session';
 import logger from '@/utils/logger';
@@ -18,22 +18,6 @@ export interface StartGameAckData {
   messageId?: string;
   skipAck?: boolean;
 }
-
-// ==================== Constants ====================
-
-/** Confetti configuration for game over celebration */
-export const GAME_OVER_CONFETTI_CONFIG = {
-  particleCount: 150,
-  spread: 80,
-  origin: { y: 0.6 },
-};
-
-/** Confetti configuration for tournament complete celebration */
-export const TOURNAMENT_COMPLETE_CONFETTI_CONFIG = {
-  particleCount: 200,
-  spread: 100,
-  origin: { y: 0.5 },
-};
 
 // ==================== Handlers ====================
 
@@ -118,14 +102,19 @@ export function sendStartGameAck(
  * Trigger game over celebration with confetti
  */
 export function triggerGameOverCelebration(): void {
-  confetti(GAME_OVER_CONFETTI_CONFIG);
+  fireGameOverConfetti();
 }
 
 /**
  * Trigger tournament complete celebration with confetti
  */
 export function triggerTournamentCompleteCelebration(): void {
-  confetti(TOURNAMENT_COMPLETE_CONFETTI_CONFIG);
+  fireConfetti({
+    particleCount: 200,
+    spread: 100,
+    origin: { y: 0.5 },
+    colors: DEFAULT_COLORS,
+  });
 }
 
 /**

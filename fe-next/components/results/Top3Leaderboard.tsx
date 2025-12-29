@@ -3,45 +3,50 @@
 import React, { useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Crown, Medal, Bot } from 'lucide-react';
-import confetti from 'canvas-confetti';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import Avatar from '../Avatar';
 import type { Player } from './types';
+import { fireConfetti, RANK_COLORS } from '@/utils/confettiUtils';
 
-// Confetti colors for each rank (matching ResultsWinnerBanner)
-const RANK_CONFETTI_COLORS: Record<number, string[]> = {
-  1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'], // Gold
-  2: ['#c0c0c0', '#94a3b8', '#e2e8f0', '#cbd5e1'], // Silver
-  3: ['#cd7f32', '#ea580c', '#f97316', '#fb923c'], // Bronze/Orange
-};
-
-// Fire confetti burst for a specific rank
+// Fire confetti burst for a specific rank with custom origin
 const fireConfettiForRank = (rank: number, intensity: number = 1): void => {
   const count = Math.floor(80 * intensity);
-  const colors = RANK_CONFETTI_COLORS[rank] || RANK_CONFETTI_COLORS[1];
+  const colors = RANK_COLORS[rank] || RANK_COLORS[1];
 
   // Different origin positions for each rank (left, center, right)
   const originX = rank === 1 ? 0.5 : rank === 2 ? 0.25 : 0.75;
 
-  const defaults = {
+  fireConfetti({
+    particleCount: Math.floor(count * 0.25),
+    spread: 26,
+    startVelocity: 45,
     origin: { x: originX, y: 0.6 },
-    zIndex: 1000,
     colors,
-  };
-
-  function fire(particleRatio: number, opts: confetti.Options): void {
-    confetti({
-      ...defaults,
-      ...opts,
-      particleCount: Math.floor(count * particleRatio),
-    });
-  }
-
-  fire(0.25, { spread: 26, startVelocity: 45 });
-  fire(0.2, { spread: 50 });
-  fire(0.35, { spread: 80, decay: 0.91, scalar: 0.8 });
-  fire(0.2, { spread: 100, startVelocity: 25, decay: 0.92, scalar: 1.1 });
+  });
+  fireConfetti({
+    particleCount: Math.floor(count * 0.2),
+    spread: 50,
+    origin: { x: originX, y: 0.6 },
+    colors,
+  });
+  fireConfetti({
+    particleCount: Math.floor(count * 0.35),
+    spread: 80,
+    decay: 0.91,
+    scalar: 0.8,
+    origin: { x: originX, y: 0.6 },
+    colors,
+  });
+  fireConfetti({
+    particleCount: Math.floor(count * 0.2),
+    spread: 100,
+    startVelocity: 25,
+    decay: 0.92,
+    scalar: 1.1,
+    origin: { x: originX, y: 0.6 },
+    colors,
+  });
 };
 
 /**
