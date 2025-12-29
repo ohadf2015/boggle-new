@@ -297,15 +297,32 @@ export function isWordCommunityValid(word: string, language: string): boolean {
 
 /**
  * Add a word to the community-valid cache (when it crosses the PROMINENT_THRESHOLD)
+ * Also persists the word to the approved dictionary file
  */
-export function addToCommunityCache(word: string, language: string): void {
+export async function addToCommunityCache(word: string, language: string): Promise<void> {
   const lang = (language || 'en') as LanguageCode;
   const set = communityValidWords[lang];
   if (!set) return;
 
   const normalized = normalizeWord(word, lang);
+
+  // Check if already in cache to avoid duplicate file writes
+  if (set.has(normalized)) {
+    return;
+  }
+
   set.add(normalized);
   logger.debug('CommunityWords', `Word "${word}" (${lang}) added to community cache`);
+
+  // Persist to approved dictionary file
+  try {
+    const { addApprovedWord } = require('../dictionary');
+    await addApprovedWord(normalized, lang);
+    logger.info('CommunityWords', `Word "${word}" (${lang}) persisted to approved dictionary file`);
+  } catch (err) {
+    logger.error('CommunityWords', `Failed to persist word to dictionary: ${err}`);
+    // Continue - word is still in memory cache
+  }
 }
 
 /**
@@ -381,7 +398,7 @@ export async function recordVote({
 
     // If word just became prominently valid, add to cache
     if (isNowValid && !communityValidWords[lang]?.has(normalizedWord)) {
-      addToCommunityCache(normalizedWord, lang);
+      await addToCommunityCache(normalizedWord, lang);
       logger.info('CommunityWords', `Word "${word}" (${lang}) reached ${PROMINENT_THRESHOLD}+ votes! Now prominently valid.`);
     }
 
@@ -467,7 +484,7 @@ export async function recordAIVote({
 
     // If word crossed the prominent threshold, add to cache
     if (isProminentlyValid && !communityValidWords[lang]?.has(normalizedWord)) {
-      addToCommunityCache(normalizedWord, lang);
+      await addToCommunityCache(normalizedWord, lang);
       logger.info('CommunityWords', `Word "${word}" (${lang}) reached ${PROMINENT_THRESHOLD}+ via AI vote! Now prominently valid.`);
     }
 
@@ -769,7 +786,10 @@ export function updatePendingCache(
   // If word crossed the prominent threshold, remove from pending and add to valid cache
   if (existing.netScore >= PROMINENT_THRESHOLD) {
     cache.delete(normalized);
-    addToCommunityCache(word, lang);
+    // Fire and forget - persist to dictionary in background
+    addToCommunityCache(word, lang).catch((err) => {
+      logger.error('CommunityWords', `Failed to persist word via cache update: ${err}`);
+    });
     logger.info('CommunityWords', `Word "${word}" (${lang}) crossed prominent threshold (${PROMINENT_THRESHOLD}) via cache update`);
   }
 }

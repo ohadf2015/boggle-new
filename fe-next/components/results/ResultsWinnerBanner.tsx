@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Crown, Trophy, Medal, Hand } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -98,6 +98,9 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
     ? (rank <= 3 ? rank : 4)
     : (variant === 'completion' ? 4 : 1);
 
+  // Track if confetti has been fired to prevent duplicate firings
+  const confettiFiredRef = useRef(false);
+
   // Memoize the confetti function for this rank
   const handleConfetti = useCallback(() => {
     if (shouldShowConfetti) {
@@ -105,10 +108,13 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
     }
   }, [rank, shouldShowConfetti]);
 
-  // Fire confetti on mount
+  // Fire confetti on mount - only once
   useEffect(() => {
-    if (winner && shouldShowConfetti) {
-      const timer = setTimeout(() => fireRankConfetti(rank), 400);
+    if (winner && shouldShowConfetti && !confettiFiredRef.current) {
+      confettiFiredRef.current = true;
+      const timer = setTimeout(() => {
+        fireRankConfetti(rank);
+      }, 400);
       return () => clearTimeout(timer);
     }
     return undefined;
