@@ -322,7 +322,7 @@ export const DailyWordSchedule: React.FC = () => {
 
   // Quick set today's word - the main action for admins
   const handleSetTodayWord = async () => {
-    if (!todayWordValue.trim() || todayWordValue.length !== 4) return;
+    if (!todayWordValue.trim() || todayWordValue.length < 2) return;
 
     setSaving(true);
     try {
@@ -380,7 +380,7 @@ export const DailyWordSchedule: React.FC = () => {
 
   // Add a new word for a specific date
   const handleAddNewWord = async () => {
-    if (!newWordDate || !newWordValue.trim() || newWordValue.length !== 4) return;
+    if (!newWordDate || !newWordValue.trim() || newWordValue.length < 2) return;
 
     setSaving(true);
     try {
@@ -594,7 +594,7 @@ export const DailyWordSchedule: React.FC = () => {
 
   // Quick save for inline editing
   const handleQuickSave = async (word: ScheduledWord) => {
-    if (!quickEditValue.trim() || quickEditValue.length !== 4) return;
+    if (!quickEditValue.trim() || quickEditValue.length < 2) return;
 
     setSaving(true);
     try {
@@ -999,11 +999,11 @@ export const DailyWordSchedule: React.FC = () => {
                               type="text"
                               value={quickEditValue}
                               onChange={(e) => setQuickEditValue(e.target.value.toUpperCase())}
-                              maxLength={4}
-                              className="px-3 py-2 border-3 border-neo-black rounded-neo font-mono text-2xl w-28 uppercase text-center"
+                              maxLength={15}
+                              className="px-3 py-2 border-3 border-neo-black rounded-neo font-mono text-2xl w-40 uppercase text-center"
                               autoFocus
                               onKeyDown={(e) => {
-                                if (e.key === 'Enter' && quickEditValue.length === 4) {
+                                if (e.key === 'Enter' && quickEditValue.length >= 2) {
                                   handleQuickSave(word);
                                 } else if (e.key === 'Escape') {
                                   setQuickEditWord(null);
@@ -1013,7 +1013,7 @@ export const DailyWordSchedule: React.FC = () => {
                             />
                             <Button
                               onClick={() => handleQuickSave(word)}
-                              disabled={saving || quickEditValue.length !== 4}
+                              disabled={saving || quickEditValue.length < 2}
                               size="sm"
                               className="bg-green-500 hover:bg-green-600 text-white"
                             >
@@ -1344,12 +1344,12 @@ export const DailyWordSchedule: React.FC = () => {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-bold mb-1">New Word (4 letters)</label>
+                  <label className="block text-sm font-bold mb-1">New Word (2+ letters)</label>
                   <input
                     type="text"
                     value={replaceWord}
                     onChange={(e) => setReplaceWord(e.target.value.toUpperCase())}
-                    maxLength={4}
+                    maxLength={15}
                     className="w-full px-4 py-3 border-2 border-neo-black rounded-neo font-mono text-2xl uppercase text-center"
                     placeholder="WORD"
                   />
@@ -1380,7 +1380,7 @@ export const DailyWordSchedule: React.FC = () => {
                   </Button>
                   <Button
                     onClick={handleReplaceWord}
-                    disabled={saving || replaceWord.length !== 4}
+                    disabled={saving || replaceWord.length < 2}
                     className="flex-1 bg-red-500 hover:bg-red-600 text-white"
                   >
                     {saving ? (
@@ -1431,12 +1431,12 @@ export const DailyWordSchedule: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold mb-1">Word (4 letters)</label>
+                  <label className="block text-sm font-bold mb-1">Word (2+ letters)</label>
                   <input
                     type="text"
                     value={newWordValue}
                     onChange={(e) => setNewWordValue(e.target.value.toUpperCase())}
-                    maxLength={4}
+                    maxLength={15}
                     className="w-full px-4 py-3 border-2 border-neo-black rounded-neo font-mono text-2xl uppercase text-center"
                     placeholder="WORD"
                   />
@@ -1465,7 +1465,7 @@ export const DailyWordSchedule: React.FC = () => {
                   </Button>
                   <Button
                     onClick={handleAddNewWord}
-                    disabled={saving || newWordValue.length !== 4 || !newWordDate}
+                    disabled={saving || newWordValue.length < 2 || !newWordDate}
                     className="flex-1 bg-green-500 hover:bg-green-600 text-white"
                   >
                     {saving ? (
@@ -1520,17 +1520,17 @@ export const DailyWordSchedule: React.FC = () => {
                 )}
 
                 <div>
-                  <label className="block text-sm font-bold mb-2">New Word (4 letters)</label>
+                  <label className="block text-sm font-bold mb-2">New Word (2+ letters)</label>
                   <input
                     type="text"
                     value={todayWordValue}
                     onChange={(e) => setTodayWordValue(e.target.value.toUpperCase())}
-                    maxLength={4}
+                    maxLength={15}
                     autoFocus
                     className="w-full px-4 py-4 border-4 border-neo-black rounded-neo font-mono text-3xl uppercase text-center tracking-widest"
                     placeholder="WORD"
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' && todayWordValue.length === 4) {
+                      if (e.key === 'Enter' && todayWordValue.length >= 2) {
                         handleSetTodayWord();
                       } else if (e.key === 'Escape') {
                         setSetTodayModalOpen(false);
@@ -1573,7 +1573,7 @@ export const DailyWordSchedule: React.FC = () => {
                   </Button>
                   <Button
                     onClick={handleSetTodayWord}
-                    disabled={saving || todayWordValue.length !== 4}
+                    disabled={saving || todayWordValue.length < 2}
                     className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold text-lg py-3"
                   >
                     {saving ? (

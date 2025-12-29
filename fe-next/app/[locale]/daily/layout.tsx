@@ -15,10 +15,9 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
   const baseSeo = translations[validLocale]?.seo || translations.en.seo;
 
   const localePath = `/${locale}`;
-  const ogImage = locale === 'he'
-    ? 'https://www.lexiclash.live/og-image-he.jpg'
-    : 'https://www.lexiclash.live/og-image-en.jpg';
 
+  // NOTE: OG images are handled dynamically in page.tsx based on share params (wh, share)
+  // Do NOT add images here or they will override the dynamic images
   return {
     title: seo.title,
     description: seo.description,
@@ -29,20 +28,13 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
       title: seo.ogTitle,
       description: seo.ogDescription,
       siteName: 'LexiClash',
-      images: [
-        {
-          url: ogImage,
-          width: 1200,
-          height: 630,
-          alt: 'LexiClash - Daily Word Challenge',
-        },
-      ],
+      // images are set dynamically in page.tsx
     },
     twitter: {
       card: 'summary_large_image',
       title: seo.ogTitle,
       description: seo.ogDescription,
-      images: [ogImage],
+      // images are set dynamically in page.tsx
     },
     alternates: {
       canonical: `https://www.lexiclash.live${localePath}/daily`,
