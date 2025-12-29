@@ -43,6 +43,8 @@ interface GridComponentProps {
   hideComboIndicator?: boolean;
   /** External highlighted path for revealed words */
   highlightedPath?: HighlightedCell[];
+  /** Letters that have been eliminated (not in target word) - shown dimmed on board */
+  eliminatedLetters?: Set<string>;
 }
 
 /**
@@ -70,6 +72,7 @@ const GridComponent = memo<GridComponentProps>(({
   hideWordPreview = false,
   hideComboIndicator = false,
   highlightedPath = [],
+  eliminatedLetters,
 }) => {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
@@ -407,6 +410,7 @@ const GridComponent = memo<GridComponentProps>(({
               const glowColorIndex = cellColorIndices.get(cellKey) ?? 0;
               const glowColor = RAINBOW_COLORS[glowColorIndex];
               const isHighlighted = highlightedCellsSet.has(cellKey);
+              const isEliminated = eliminatedLetters?.has(cell.toUpperCase()) ?? false;
 
               // Use stable shake offsets from ref
               const shakeOffset = earthquakeShaking
@@ -467,9 +471,11 @@ const GridComponent = memo<GridComponentProps>(({
                         : `${comboColors.bg} ${comboColors.textColor || 'text-neo-black'} border-3 ${comboColors.border} z-10 ${comboColors.shadow}`
                       : isHighlighted
                         ? "bg-neo-purple text-white border-3 border-neo-purple z-10"
-                        : "bg-neo-white text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed",
+                        : isEliminated
+                          ? "bg-gray-400/60 text-gray-500/50 border-3 border-gray-400/40 shadow-none cursor-not-allowed"
+                          : "bg-neo-white text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed",
                     // Adjacent cell hint - subtle glow indicating valid next selection
-                    isAdjacentHint && !isSelected && !isHighlighted && "ring-2 ring-neo-yellow/70 ring-offset-1 ring-offset-neo-cream",
+                    isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-2 ring-neo-yellow/70 ring-offset-1 ring-offset-neo-cream",
                     // Keyboard focus indicator
                     isFocused && !isSelected && "ring-4 ring-neo-cyan ring-offset-2 ring-offset-neo-cream z-20",
                     // Highlighted path for revealed words - pulsing glow effect

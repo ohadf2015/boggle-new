@@ -43,7 +43,7 @@ const LandingView: React.FC = () => {
     }
   }, [language, router]);
 
-  // Show onboarding modal for first-time visitors
+  // Show onboarding modal for first-time visitors (delayed for better UX)
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -51,10 +51,17 @@ const LandingView: React.FC = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const hasRoom = urlParams.get('room');
 
-    // Skip onboarding if user is authenticated
-    if (!hasRoom && !isAuthenticated && !hasCompletedOnboarding()) {
-      setShowOnboarding(true);
+    // Skip onboarding if user is authenticated or already completed
+    if (hasRoom || isAuthenticated || hasCompletedOnboarding()) {
+      return;
     }
+
+    // Delay onboarding by 3 seconds to let users explore first
+    const timer = setTimeout(() => {
+      setShowOnboarding(true);
+    }, 3000);
+
+    return () => clearTimeout(timer);
   }, [isAuthenticated]);
 
   // Play lobby music on landing page (same as multiplayer lobby)

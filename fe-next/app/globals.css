@@ -452,12 +452,9 @@ body {
     border-radius: var(--radius-lg);
     /* No rotation - keep grid perfectly straight */
     padding: 10px;
-    /* Use viewport units directly - don't rely on parent percentage */
-    /* min with vw ensures it doesn't overflow horizontally on narrow screens */
-    width: min(80vh, calc(100vw - 32px));
-    height: min(80vh, calc(100vw - 32px));
-    max-width: min(80vh, calc(100vw - 32px));
-    max-height: min(80vh, calc(100vw - 32px));
+    /* Simplified sizing using vmin to prevent layout shift on orientation change */
+    width: min(80vmin, calc(100vw - 32px));
+    height: min(80vmin, calc(100vw - 32px));
     aspect-ratio: 1 / 1;
     /* Center within parent */
     margin: 0 auto;
@@ -466,10 +463,8 @@ body {
   /* On desktop screens, make the board a bit smaller */
   @media (min-width: 769px) {
     .game-board-frame {
-      width: min(65vh, calc(100vw - 400px));
-      height: min(65vh, calc(100vw - 400px));
-      max-width: min(65vh, calc(100vw - 400px));
-      max-height: min(65vh, calc(100vw - 400px));
+      width: min(65vmin, calc(100vw - 400px));
+      height: min(65vmin, calc(100vw - 400px));
     }
   }
 
@@ -477,12 +472,9 @@ body {
   @media (max-width: 768px) {
     .game-board-frame {
       padding: 4px;
-      /* On mobile, maintain square aspect ratio by using the smaller of width or height */
-      /* This ensures the grid is always square regardless of screen orientation */
-      width: min(calc(100vw - 16px), 75vh, 75dvh);
-      max-width: min(calc(100vw - 16px), 75vh, 75dvh);
-      height: min(calc(100vw - 16px), 75vh, 75dvh);
-      max-height: min(calc(100vw - 16px), 75vh, 75dvh);
+      /* On mobile, maintain square aspect ratio using vmin for stability */
+      width: min(85vmin, calc(100vw - 16px));
+      height: min(85vmin, calc(100vw - 16px));
     }
   }
 
@@ -670,12 +662,18 @@ body {
   /* Input field styling */
   .input-neo {
     @apply w-full px-4 py-3 bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm;
-    @apply placeholder:text-neo-gray focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2;
+    @apply placeholder:text-neo-gray placeholder:opacity-75 focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2;
     @apply transition-all duration-100;
   }
 
   .input-neo:focus {
     @apply translate-x-[-1px] translate-y-[-1px] shadow-hard;
+  }
+
+  /* Global placeholder styling for WCAG AA compliance */
+  input::placeholder,
+  textarea::placeholder {
+    opacity: 0.75;
   }
 
   /* Particle effects for combo animations */
@@ -2193,6 +2191,33 @@ body {
     height: min(70vh, calc(100vw - 400px));
     max-height: min(70vh, calc(100vw - 400px));
   }
+}
+
+/* Accessibility: Larger text mode */
+html.larger-text {
+  font-size: 125%;
+}
+
+/* Accessibility: High contrast mode (user-enabled) */
+html.high-contrast .border-neo,
+html.high-contrast [class*="border-"] {
+  border-width: 5px !important;
+}
+
+html.high-contrast .shadow-hard,
+html.high-contrast .shadow-hard-sm,
+html.high-contrast .shadow-hard-lg {
+  box-shadow: 8px 8px 0px rgb(var(--neo-black)) !important;
+}
+
+/* Accessibility: Reduce motion mode (user-enabled) */
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }
 
 /* High contrast mode support */

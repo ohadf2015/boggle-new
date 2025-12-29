@@ -155,7 +155,9 @@ const ja = {
     "all": "すべて",
     "valid": "有効",
     "invalid": "無効",
-    "validating": "検証中..."
+    "validating": "検証中...",
+    "later": "後で",
+    "skip": "スキップ"
   },
   "theme": {
     "sundayFunday": "楽しい日曜日",
@@ -365,7 +367,11 @@ const ja = {
     "wordRequired": "単語が必要です",
     "wordTooLong": "単語が長すぎます",
     "wordInvalidChars": "単語に無効な文字が含まれています",
-    "gameCodeHint": "ホストが共有したゲームコードを入力してください"
+    "gameCodeHint": "ホストが共有したゲームコードを入力してください",
+    "invalidEmail": "有効なメールアドレスを入力してください"
+  },
+  "error": {
+    "subscriptionFailed": "登録に失敗しました。もう一度お試しください。"
   },
   "difficulty": {
     "easy": "簡単",
@@ -1668,6 +1674,35 @@ const ja = {
       },
       "statsTeaser": "${games}ゲームをプレイして${score}ポイントを獲得しました！",
       "maybeLater": "また今度"
+    },
+    "dailyChallenge": {
+      "streakAtRisk": {
+        "title": "{days}日連続記録を守ろう！",
+        "subtitle": "登録してすべてのデバイスで連続記録を保護"
+      },
+      "topPercentile": {
+        "title": "今日のトップ{percentile}%！",
+        "subtitle": "この素晴らしい結果をプロフィールに保存"
+      },
+      "quickSolve": {
+        "title": "{attempts}回で解決！",
+        "subtitle": "すごい！プロフィールに保存しましょう"
+      },
+      "firstCompletion": {
+        "title": "初めてのデイリーチャレンジおめでとう！",
+        "subtitle": "アカウントを作成して毎日の進捗を追跡"
+      },
+      "dayStreak": "日連続",
+      "atRiskWarning": "アカウントがないと連続記録を失う可能性があります！",
+      "benefitsTitle": "登録すると：",
+      "benefits": {
+        "protectStreak": "すべてのデバイスで連続記録を保護",
+        "syncDevices": "すべてのデバイスで進捗を同期",
+        "trackStats": "デイリーチャレンジの統計を追跡",
+        "allTimeLeaderboard": "総合ランキングに表示される"
+      },
+      "autoSaveNote": "登録後、結果は自動的に保存されます",
+      "maybeLater": "また今度"
     }
   },
   "profile": {
@@ -2300,7 +2335,8 @@ const ja = {
       "attemptsLabel": "試行",
       "triesLeft": "回残り",
       "findOnBoard": "この単語をボード上で見つけてください！",
-      "traceLetters": "グリッド上の文字をなぞってスペルを作ろう"
+      "traceLetters": "グリッド上の文字をなぞってスペルを作ろう",
+      "needHelp": "ヘルプが必要？ヒントを試そう！"
     },
     "results": {
       "targetWord": "目標単語",
@@ -2415,6 +2451,49 @@ const ja = {
     "earned": "獲得コイン",
     "winBonus": "勝利ボーナス",
     "topThreeBonus": "トップ3ボーナス"
+  },
+  "accessibility": {
+    "title": "アクセシビリティ",
+    "subtitle": "あなたのニーズに合わせて体験をカスタマイズしましょう。これらの設定はローカルに保存されます。",
+    "footer": "これらの設定はデバイスにローカル保存されます。追加のシステムレベルのアクセシビリティ機能については、デバイスの設定を確認してください。",
+    "fireRoundLights": {
+      "title": "ファイアラウンドライトを無効化",
+      "description": "ファイアラウンド中の虹色に光るセルをオフにして、視覚的な気を散らすものを減らします。"
+    },
+    "reduceMotion": {
+      "title": "アニメーションを軽減",
+      "description": "より穏やかな体験のためにアニメーションとトランジションを最小限に。前庭障害やモーション過敏症に役立ちます。"
+    },
+    "disableSounds": {
+      "title": "効果音を無効化",
+      "description": "すべての効果音をオフにします。音楽コントロールはヘッダーから引き続き利用可能です。"
+    },
+    "highContrast": {
+      "title": "ハイコントラストモード",
+      "description": "視認性を向上させるために、ボーダー幅と色のコントラストを増加させます。"
+    },
+    "largerText": {
+      "title": "大きなテキスト",
+      "description": "読みやすさのためにベースフォントサイズを125%増加させます。"
+    }
+  },
+  "email": {
+    "title": "デイリーチャレンジを受け取ろう！",
+    "description": "受信トレイに届く毎日の単語チャレンジでシャープさを保ちましょう。さらに、進捗を失わないためのストリークリマインダーも！",
+    "placeholder": "your@email.com",
+    "submit": "登録",
+    "submitting": "登録中...",
+    "successTitle": "準備完了！",
+    "successMessage": "毎日のチャレンジとストリークリマインダーをお送りします。受信トレイをチェック！",
+    "privacy": "プライバシーを尊重します。いつでも配信停止可能。スパムは送りません、約束します。",
+    "benefit1": "毎日厳選された単語チャレンジ",
+    "benefit2": "ストリーク保護リマインダー",
+    "benefit3": "限定ヒントと戦略"
+  },
+  "pwa": {
+    "installTitle": "LexiClashをインストール",
+    "installDescription": "より速いアクセス、オフラインプレイ、より良い体験のためにアプリをインストール！",
+    "installButton": "今すぐインストール"
   }
 };
 

@@ -4,6 +4,10 @@ import { translations } from '@/translations';
 import { Providers } from '../providers';
 import Footer from '@/components/Footer';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
+import SocialMediaPixels from '@/components/SocialMediaPixels';
+import WebVitalsReporter from '@/components/WebVitalsReporter';
+import PWAInstallPrompt from '@/components/PWAInstallPrompt';
+import EmailCaptureModal from '@/components/EmailCaptureModal';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import { fredoka, rubik } from '../fonts';
 
@@ -480,12 +484,16 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     {validLocale === 'he' ? 'דלג לתוכן הראשי' : validLocale === 'sv' ? 'Hoppa till huvudinnehåll' : validLocale === 'ja' ? 'メインコンテンツへスキップ' : validLocale === 'es' ? 'Saltar al contenido principal' : 'Skip to main content'}
                 </a>
                 <GoogleAnalytics />
+                <SocialMediaPixels />
+                <WebVitalsReporter />
                 <ServiceWorkerRegistration />
                 <Providers lang={validLocale}>
                     <main id="main-content" className="flex-grow" tabIndex={-1}>
                         {children}
                     </main>
                     <Footer />
+                    <PWAInstallPrompt />
+                    <EmailCaptureModal />
                 </Providers>
             </body>
         </html>

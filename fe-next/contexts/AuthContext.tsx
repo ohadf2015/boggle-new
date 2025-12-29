@@ -13,6 +13,7 @@ import {
 } from '../lib/supabase';
 import { getGuestSessionId, clearGuestData, hashToken } from '../utils/guestManager';
 import { getUtmDataForProfile } from '../utils/utmCapture';
+import { getPendingDailyResult, clearPendingDailyResult, getGuestDailyPlayer } from '../utils/dailyChallenge';
 import logger from '@/utils/logger';
 import { setSentryUser, clearSentryUser } from '@/utils/sentry';
 import type { User } from '@supabase/supabase-js';
@@ -46,6 +47,71 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [rankedProgress, setRankedProgress] = useState<RankedProgress | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [isSupabaseEnabled, setIsSupabaseEnabled] = useState<boolean>(false);
+
+  /**
+   * Submit any pending daily challenge result after OAuth signup
+   * This auto-saves the result the user got before signing up
+   */
+  const submitPendingDailyResult = useCallback(async (userId: string, userProfile: ProfileData) => {
+    try {
+      const pending = getPendingDailyResult();
+      if (!pending) return;
+
+      logger.info('Found pending daily result, submitting for new user:', userId);
+
+      // Get guest player info for fallback
+      const guestPlayer = await getGuestDailyPlayer();
+
+      const bodyData: Record<string, unknown> = {
+        puzzleDate: pending.puzzleDate,
+        puzzleNumber: pending.puzzleNumber,
+        language: pending.language,
+        playerId: userId,
+        guestFingerprint: null, // Now authenticated, use player ID
+        displayName: userProfile.display_name || userProfile.username,
+        avatarEmoji: userProfile.avatar_emoji || guestPlayer?.avatarEmoji || '🎯',
+        avatarColor: userProfile.avatar_color || guestPlayer?.avatarColor || '#6366f1',
+        solved: pending.result.solved,
+        attemptsUsed: pending.result.attemptsUsed,
+        targetWord: pending.result.targetWord,
+        attemptWords: pending.result.attempts.map(a => ({
+          word: a.word,
+          feedback: a.feedback.map(f => ({
+            letter: f.letter,
+            feedback: f.feedback,
+            position: f.position,
+          })),
+          timestamp: a.timestamp,
+        })),
+      };
+
+      // Add survival mode fields if present
+      if (pending.result.wordsDiscovered) bodyData.wordsDiscovered = pending.result.wordsDiscovered;
+      if (pending.result.lifeRemaining !== undefined) bodyData.lifeRemaining = pending.result.lifeRemaining;
+      if (pending.result.clueTokensEarned !== undefined) bodyData.clueTokensEarned = pending.result.clueTokensEarned;
+      if (pending.result.clueTokensSpent !== undefined) bodyData.clueTokensSpent = pending.result.clueTokensSpent;
+      if (pending.result.hintsUnlocked !== undefined) bodyData.hintsUnlocked = pending.result.hintsUnlocked;
+      if (pending.result.efficiencyScore !== undefined) bodyData.efficiencyScore = pending.result.efficiencyScore;
+
+      const response = await fetch('/api/daily-challenge/word-hunt/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyData),
+      });
+
+      if (response.ok) {
+        logger.info('Successfully submitted pending daily result for new user');
+      } else {
+        const errorText = await response.text();
+        logger.warn('Failed to submit pending daily result:', errorText);
+      }
+    } catch (err) {
+      logger.warn('Error submitting pending daily result:', err);
+    } finally {
+      // Always clear the pending result regardless of success/failure
+      clearPendingDailyResult();
+    }
+  }, []);
 
   // Define fetchUserData before useEffect to fix "variable used before declaration" error
   const fetchUserData = useCallback(async (userId: string, userMetadata?: Record<string, unknown>) => {
@@ -114,6 +180,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         logger.info('Created minimal profile for user:', userId);
         setProfile(newProfile);
 
+        // Submit any pending daily challenge result (from pre-signup)
+        submitPendingDailyResult(userId, newProfile);
+
         // Fetch geolocation and update in background
         fetchGeolocation().then(async (geoData) => {
           if (geoData.countryCode) {
@@ -140,6 +209,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (profileData) {
       setProfile(profileData);
 
+      // Submit any pending daily challenge result (from pre-signup or returning user)
+      submitPendingDailyResult(userId, profileData);
+
       // If user doesn't have country_code yet, fetch and update it
       if (!profileData.country_code) {
         fetchGeolocation().then(async (geoData) => {
@@ -162,7 +234,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (rankedData) {
       setRankedProgress(rankedData);
     }
-  }, []);
+  }, [submitPendingDailyResult]);
 
   // Helper to clear auth state and sign out
   const clearAuthState = useCallback(async (reason: string) => {

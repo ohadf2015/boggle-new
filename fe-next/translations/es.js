@@ -155,7 +155,9 @@ const es = {
     "all": "Todo",
     "valid": "Válido",
     "invalid": "Inválido",
-    "validating": "Validando..."
+    "validating": "Validando...",
+    "later": "Más tarde",
+    "skip": "Omitir"
   },
   "theme": {
     "sundayFunday": "Domingo Divertido",
@@ -365,7 +367,11 @@ const es = {
     "wordRequired": "Se requiere palabra",
     "wordTooLong": "La palabra es demasiado larga",
     "wordInvalidChars": "La palabra contiene caracteres inválidos",
-    "gameCodeHint": "Ingresa el código de juego compartido por el anfitrión"
+    "gameCodeHint": "Ingresa el código de juego compartido por el anfitrión",
+    "invalidEmail": "Por favor ingresa un correo electrónico válido"
+  },
+  "error": {
+    "subscriptionFailed": "La suscripción falló. Por favor intenta de nuevo."
   },
   "difficulty": {
     "easy": "Fácil",
@@ -1458,6 +1464,35 @@ const es = {
       },
       "statsTeaser": "¡Has jugado ${games} juego(s) y anotado ${score} puntos!",
       "maybeLater": "Quizás después"
+    },
+    "dailyChallenge": {
+      "streakAtRisk": {
+        "title": "¡Protege tu racha de {days} días!",
+        "subtitle": "Regístrate para mantener tu racha segura en todos los dispositivos"
+      },
+      "topPercentile": {
+        "title": "¡Top {percentile}% hoy!",
+        "subtitle": "Guarda tu increíble resultado en tu perfil"
+      },
+      "quickSolve": {
+        "title": "¡Resuelto en {attempts} intentos!",
+        "subtitle": "¡Impresionante! Guárdalo en tu perfil"
+      },
+      "firstCompletion": {
+        "title": "¡Buen trabajo en tu primer desafío diario!",
+        "subtitle": "Crea una cuenta para seguir tu progreso diario"
+      },
+      "dayStreak": "Días de racha",
+      "atRiskWarning": "¡Sin una cuenta, podrías perder tu racha!",
+      "benefitsTitle": "Regístrate para:",
+      "benefits": {
+        "protectStreak": "Mantener tu racha segura en todos los dispositivos",
+        "syncDevices": "Sincronizar progreso en todos tus dispositivos",
+        "trackStats": "Seguir las estadísticas de tus desafíos diarios",
+        "allTimeLeaderboard": "Aparecer en la clasificación de todos los tiempos"
+      },
+      "autoSaveNote": "Tu resultado se guardará automáticamente después de registrarte",
+      "maybeLater": "Quizás después"
     }
   },
   "legal": {
@@ -2298,7 +2333,8 @@ const es = {
       "attemptsLabel": "Intentos",
       "triesLeft": "intentos restantes",
       "findOnBoard": "¡Encuentra esta palabra en el tablero!",
-      "traceLetters": "Traza las letras en la cuadrícula para deletrearla"
+      "traceLetters": "Traza las letras en la cuadrícula para deletrearla",
+      "needHelp": "¿Necesitas ayuda? ¡Prueba una pista!"
     },
     "results": {
       "targetWord": "Palabra Objetivo",
@@ -2413,6 +2449,49 @@ const es = {
     "earned": "Monedas ganadas",
     "winBonus": "Bono por victoria",
     "topThreeBonus": "Bono por top 3"
+  },
+  "accessibility": {
+    "title": "Accesibilidad",
+    "subtitle": "Personaliza tu experiencia según tus necesidades. Estas configuraciones se guardan localmente.",
+    "footer": "Estas configuraciones se almacenan localmente en tu dispositivo. Para funciones de accesibilidad adicionales a nivel de sistema, revisa la configuración de tu dispositivo.",
+    "fireRoundLights": {
+      "title": "Desactivar luces de ronda de fuego",
+      "description": "Apaga las celdas brillantes del arcoíris durante las rondas de fuego para reducir las distracciones visuales."
+    },
+    "reduceMotion": {
+      "title": "Reducir animaciones",
+      "description": "Minimiza las animaciones y transiciones para una experiencia más tranquila. Útil para trastornos vestibulares o sensibilidad al movimiento."
+    },
+    "disableSounds": {
+      "title": "Desactivar efectos de sonido",
+      "description": "Apaga todos los efectos de sonido. Los controles de música siguen disponibles en el encabezado."
+    },
+    "highContrast": {
+      "title": "Modo de alto contraste",
+      "description": "Aumenta el ancho de los bordes y el contraste de color para mejor visibilidad."
+    },
+    "largerText": {
+      "title": "Texto más grande",
+      "description": "Aumenta el tamaño de fuente base un 125% para mejor legibilidad."
+    }
+  },
+  "email": {
+    "title": "¡Recibe desafíos diarios!",
+    "description": "Mantente activo con desafíos de palabras diarios entregados a tu bandeja de entrada. ¡Además, recordatorios de racha para que nunca pierdas tu progreso!",
+    "placeholder": "tu@correo.com",
+    "submit": "Suscribirse",
+    "submitting": "Suscribiendo...",
+    "successTitle": "¡Todo listo!",
+    "successMessage": "Te enviaremos desafíos diarios y recordatorios de racha. ¡Revisa tu bandeja de entrada!",
+    "privacy": "Respetamos tu privacidad. Cancela cuando quieras. Sin spam, lo prometemos.",
+    "benefit1": "Desafíos de palabras diarios curados",
+    "benefit2": "Recordatorios de protección de racha",
+    "benefit3": "Consejos y estrategias exclusivas"
+  },
+  "pwa": {
+    "installTitle": "Instalar LexiClash",
+    "installDescription": "¡Instala nuestra app para acceso más rápido, juego sin conexión y una mejor experiencia!",
+    "installButton": "Instalar ahora"
   }
 };
 

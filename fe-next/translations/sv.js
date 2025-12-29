@@ -155,7 +155,9 @@ const sv = {
     "all": "Alla",
     "valid": "Giltig",
     "invalid": "Ogiltig",
-    "validating": "Validerar..."
+    "validating": "Validerar...",
+    "later": "Senare",
+    "skip": "Hoppa över"
   },
   "theme": {
     "sundayFunday": "Kul Söndag",
@@ -365,7 +367,11 @@ const sv = {
     "wordRequired": "Ord krävs",
     "wordTooLong": "Ordet är för långt",
     "wordInvalidChars": "Ordet innehåller ogiltiga tecken",
-    "gameCodeHint": "Ange spelkoden som delades av värden"
+    "gameCodeHint": "Ange spelkoden som delades av värden",
+    "invalidEmail": "Ange en giltig e-postadress"
+  },
+  "error": {
+    "subscriptionFailed": "Prenumerationen misslyckades. Försök igen."
   },
   "difficulty": {
     "easy": "Lätt",
@@ -1669,6 +1675,35 @@ const sv = {
       },
       "statsTeaser": "Du har spelat ${games} spel och fått ${score} poäng!",
       "maybeLater": "Kanske senare"
+    },
+    "dailyChallenge": {
+      "streakAtRisk": {
+        "title": "Skydda din {days}-dagars svit!",
+        "subtitle": "Registrera dig för att hålla din svit säker på alla enheter"
+      },
+      "topPercentile": {
+        "title": "Topp {percentile}% idag!",
+        "subtitle": "Spara ditt fantastiska resultat till din profil"
+      },
+      "quickSolve": {
+        "title": "Löst på {attempts} försök!",
+        "subtitle": "Det är imponerande! Spara det till din profil"
+      },
+      "firstCompletion": {
+        "title": "Bra jobbat med din första dagliga!",
+        "subtitle": "Skapa ett konto för att följa din dagliga framsteg"
+      },
+      "dayStreak": "Dagars svit",
+      "atRiskWarning": "Utan ett konto kan du förlora din svit!",
+      "benefitsTitle": "Registrera dig för att:",
+      "benefits": {
+        "protectStreak": "Hålla din svit säker på alla enheter",
+        "syncDevices": "Synkronisera framsteg på alla dina enheter",
+        "trackStats": "Följa din dagliga utmaningsstatistik",
+        "allTimeLeaderboard": "Visas på den allra bästa topplistan"
+      },
+      "autoSaveNote": "Ditt resultat sparas automatiskt efter registrering",
+      "maybeLater": "Kanske senare"
     }
   },
   "profile": {
@@ -2301,7 +2336,8 @@ const sv = {
       "attemptsLabel": "Försök",
       "triesLeft": "försök kvar",
       "findOnBoard": "Hitta detta ord på brädet!",
-      "traceLetters": "Följ bokstäverna på rutnätet för att stava det"
+      "traceLetters": "Följ bokstäverna på rutnätet för att stava det",
+      "needHelp": "Behöver du hjälp? Prova en ledtråd!"
     },
     "results": {
       "targetWord": "Målordet",
@@ -2416,6 +2452,49 @@ const sv = {
     "earned": "Mynt intjänade",
     "winBonus": "Vinnarbonus",
     "topThreeBonus": "Topp 3 bonus"
+  },
+  "accessibility": {
+    "title": "Tillgänglighet",
+    "subtitle": "Anpassa din upplevelse efter dina behov. Dessa inställningar sparas lokalt.",
+    "footer": "Dessa inställningar lagras lokalt på din enhet. För ytterligare systemnivå tillgänglighetsfunktioner, kontrollera enhetsinställningarna.",
+    "fireRoundLights": {
+      "title": "Inaktivera eldrundebelysning",
+      "description": "Stäng av regnbågslysande celler under eldrundar för att minska visuella störningar."
+    },
+    "reduceMotion": {
+      "title": "Minska animationer",
+      "description": "Minimera animationer och övergångar för en lugnare upplevelse. Användbart för vestibulära störningar eller rörelsekänslighet."
+    },
+    "disableSounds": {
+      "title": "Inaktivera ljudeffekter",
+      "description": "Stäng av alla ljudeffekter. Musikkontroller är fortfarande tillgängliga i sidhuvudet."
+    },
+    "highContrast": {
+      "title": "Högkontrastläge",
+      "description": "Öka kantbredder och färgkontrast för bättre synlighet."
+    },
+    "largerText": {
+      "title": "Större text",
+      "description": "Öka bastextstorlek med 125% för bättre läsbarhet."
+    }
+  },
+  "email": {
+    "title": "Få dagliga utmaningar!",
+    "description": "Håll dig skarp med dagliga ordutmaningar levererade till din inkorg. Plus, svitpåminnelser så att du aldrig förlorar din framgång!",
+    "placeholder": "din@email.com",
+    "submit": "Prenumerera",
+    "submitting": "Prenumererar...",
+    "successTitle": "Allt är klart!",
+    "successMessage": "Vi skickar dig dagliga utmaningar och svitpåminnelser. Kolla din inkorg!",
+    "privacy": "Vi respekterar din integritet. Avsluta prenumeration när som helst. Inget spam, vi lovar.",
+    "benefit1": "Dagliga curaterade ordutmaningar",
+    "benefit2": "Svitskyddspåminnelser",
+    "benefit3": "Exklusiva tips och strategier"
+  },
+  "pwa": {
+    "installTitle": "Installera LexiClash",
+    "installDescription": "Installera vår app för snabbare åtkomst, offlinespel och en bättre upplevelse!",
+    "installButton": "Installera nu"
   }
 };
 

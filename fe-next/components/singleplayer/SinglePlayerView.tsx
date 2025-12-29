@@ -19,7 +19,7 @@ import {
   getSecondsUntilNextDaily,
   formatCountdown,
 } from '@/utils/dailyChallenge';
-import type { PresetConfig } from './presetConfig';
+import { getMinWordLength, type PresetConfig } from './presetConfig';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 
 export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge' | 'daily';
@@ -215,6 +215,10 @@ const SinglePlayerView: React.FC = () => {
       : [];
 
     // Set game state and start immediately
+    // Calculate minWordLength based on language and difficulty
+    // Japanese: always 2+, Other languages: Hard = 3+, Easy/Medium = 2+
+    const minWordLength = getMinWordLength(uiLanguage, preset.settings.difficulty);
+
     setGameState(prev => ({
       ...prev,
       mode,
@@ -223,7 +227,7 @@ const SinglePlayerView: React.FC = () => {
       bots,
       language: uiLanguage as Language,
       grid: null,
-      minWordLength: preset.settings.minWordLength ?? 3, // Use preset's minWordLength or default to 3
+      minWordLength,
     }));
     setPhase('playing');
   }, [uiLanguage, router, generateBots]);

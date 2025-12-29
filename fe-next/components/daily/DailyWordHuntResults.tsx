@@ -28,10 +28,15 @@ import {
   getStreakMilestoneMessage,
   findRarestWord,
   hasPlayedWordHuntToday,
+  getConversionTrigger,
+  recordSignupModalDismissed,
   type WordHuntResult,
   type GuestDailyPlayer,
+  type ConversionTrigger,
 } from '@/utils/dailyChallenge';
+import DailyChallengeSignupModal from '@/components/auth/DailyChallengeSignupModal';
 import StreakMilestoneCelebration from './StreakMilestoneCelebration';
+import DailyLeaderboard from './DailyLeaderboard';
 import { feedbackToEmoji, type LetterFeedback } from '@/utils/wordHuntFeedback';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -155,6 +160,9 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   } | null>(null);
   const [targetWordRevealed, setTargetWordRevealed] = useState(false);
   const [currentCoins, setCurrentCoins] = useState(() => getCoins());
+  const [showSignupModal, setShowSignupModal] = useState(false);
+  const [signupTrigger, setSignupTrigger] = useState<ConversionTrigger | null>(null);
+  const [leaderboardKey, setLeaderboardKey] = useState(0);
   const { profile, isAuthenticated } = useAuth();
 
   // Check for streak milestone
@@ -275,7 +283,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             playerType: bodyData.playerId ? 'authenticated' : 'guest',
           });
 
-          // Fetch stats
+          // Refresh the leaderboard and fetch stats after successful submission
+          setLeaderboardKey(prev => prev + 1);
           fetchStats();
         } catch (err) {
           console.error('Failed to submit Word Hunt result:', err);
@@ -357,6 +366,33 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       }
     }
   }, [isNewCompletion, puzzleDate, language, result.solved, result.efficiencyScore, result.streakDays]);
+
+  // Show signup modal for unauthenticated users based on smart triggers
+  useEffect(() => {
+    // Only show for new completions and unauthenticated users
+    if (!isNewCompletion || isAuthenticated) {
+      return;
+    }
+
+    // Delay to let celebration animations play first
+    const timer = setTimeout(() => {
+      const percentile = stats?.yourStats?.percentile;
+      const trigger = getConversionTrigger(result, percentile);
+
+      if (trigger) {
+        setSignupTrigger(trigger);
+        setShowSignupModal(true);
+      }
+    }, 3000); // 3 second delay for better UX
+
+    return () => clearTimeout(timer);
+  }, [isNewCompletion, isAuthenticated, result, stats?.yourStats?.percentile]);
+
+  // Handle signup modal dismiss
+  const handleSignupModalClose = useCallback(() => {
+    setShowSignupModal(false);
+    recordSignupModalDismissed();
+  }, []);
 
   // Generate shareable text (use streak from result, which is now properly tracked)
   const shareText = generateWordHuntShareableResult({
@@ -1034,11 +1070,30 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           </motion.div>
         )}
 
+        {/* Today's Leaderboard */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.85 }}
+          className="mt-6"
+        >
+          <DailyLeaderboard
+            key={leaderboardKey}
+            puzzleDate={puzzleDate}
+            language={language}
+            currentPlayerId={isAuthenticated && profile ? profile.id : null}
+            currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
+            maxVisible={10}
+            t={t}
+            gameType="wordHunt"
+          />
+        </motion.div>
+
         {/* Next puzzle countdown */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: 0.9 }}
           className="pt-4 border-t border-gray-200 dark:border-gray-700"
         >
           <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -1136,6 +1191,25 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           emoji={milestoneMessage.emoji}
           title={milestoneMessage.title}
           subtitle={milestoneMessage.subtitle}
+        />
+      )}
+
+      {/* Daily Challenge Signup Conversion Modal */}
+      {signupTrigger && (
+        <DailyChallengeSignupModal
+          isOpen={showSignupModal}
+          onClose={handleSignupModalClose}
+          trigger={signupTrigger}
+          streakDays={result.streakDays}
+          percentile={stats?.yourStats?.percentile}
+          attemptsUsed={result.attemptsUsed}
+          solved={result.solved}
+          pendingResult={{
+            result,
+            puzzleNumber,
+            puzzleDate,
+            language,
+          }}
         />
       )}
     </motion.div>

@@ -298,3 +298,23 @@ export function getPresetById(id: string): PresetConfig | undefined {
   }
   return undefined;
 }
+
+/**
+ * Get the minimum word length based on language and difficulty
+ * - Japanese: Always 2+ letters (all difficulties)
+ * - Other languages: Hard difficulty = 3+ letters, others = 2+ letters
+ */
+export function getMinWordLength(language: string, difficulty: DifficultyLevel): number {
+  // Japanese always allows 2-letter words (important for the language)
+  if (language === 'ja') {
+    return 2;
+  }
+
+  // For other languages: Hard difficulty requires 3+ letters
+  if (difficulty === 'HARD') {
+    return 3;
+  }
+
+  // Easy and Medium allow 2+ letters
+  return 2;
+}

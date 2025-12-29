@@ -1967,3 +1967,183 @@ export function getTodaysTargetWord(grid: LetterGrid, language: Language): Daily
   const date = getDailyChallengeDate();
   return selectDailyTargetWord(grid, date, language);
 }
+
+// ==========================================
+// Signup Conversion Utilities
+// ==========================================
+
+/**
+ * Conversion trigger types for daily challenge signup prompts
+ */
+export type ConversionTrigger =
+  | 'firstCompletion'   // First time completing a daily challenge
+  | 'streakAtRisk'      // Streak of 3+ days (loss aversion)
+  | 'topPercentile'     // Scored in top 10%
+  | 'quickSolve';       // Solved in 3 or fewer attempts
+
+const SIGNUP_MODAL_DISMISSED_KEY = 'lexiclash_signup_dismissed';
+const PENDING_DAILY_RESULT_KEY = 'lexiclash_pending_daily_result';
+const FIRST_COMPLETION_KEY = 'lexiclash_first_daily_completion';
+
+/**
+ * Check if the signup modal has been dismissed recently
+ * Returns true if dismissed within the last 3 days (avoid spamming)
+ */
+export function wasSignupModalDismissedRecently(): boolean {
+  if (typeof window === 'undefined') return false;
+
+  try {
+    const dismissed = localStorage.getItem(SIGNUP_MODAL_DISMISSED_KEY);
+    if (!dismissed) return false;
+
+    const dismissedAt = parseInt(dismissed, 10);
+    const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
+    return Date.now() - dismissedAt < threeDaysMs;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Record that the signup modal was dismissed
+ */
+export function recordSignupModalDismissed(): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    localStorage.setItem(SIGNUP_MODAL_DISMISSED_KEY, String(Date.now()));
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+/**
+ * Check if this is the user's first daily challenge completion
+ */
+export function isFirstDailyCompletion(): boolean {
+  if (typeof window === 'undefined') return true;
+
+  try {
+    return !localStorage.getItem(FIRST_COMPLETION_KEY);
+  } catch {
+    return true;
+  }
+}
+
+/**
+ * Mark that the user has completed at least one daily challenge
+ */
+export function markFirstDailyCompletion(): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    localStorage.setItem(FIRST_COMPLETION_KEY, 'true');
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+/**
+ * Determine the appropriate conversion trigger based on result
+ * Returns null if no trigger should fire (e.g., recently dismissed)
+ */
+export function getConversionTrigger(
+  result: WordHuntResult,
+  percentile?: number
+): ConversionTrigger | null {
+  // Don't show if recently dismissed
+  if (wasSignupModalDismissedRecently()) {
+    return null;
+  }
+
+  // Priority 1: First completion (onboarding moment)
+  if (isFirstDailyCompletion()) {
+    markFirstDailyCompletion();
+    return 'firstCompletion';
+  }
+
+  // Priority 2: Streak at risk (loss aversion - strongest motivator)
+  if (result.streakDays >= 3) {
+    return 'streakAtRisk';
+  }
+
+  // Priority 3: Top percentile (competitive pride)
+  if (result.solved && percentile !== undefined && percentile <= 10) {
+    return 'topPercentile';
+  }
+
+  // Priority 4: Quick solve (skill pride)
+  if (result.solved && result.attemptsUsed <= 3) {
+    return 'quickSolve';
+  }
+
+  return null;
+}
+
+/**
+ * Pending result structure for auto-save after OAuth
+ */
+export interface PendingDailyResult {
+  result: WordHuntResult;
+  puzzleNumber: number;
+  puzzleDate: string;
+  language: Language;
+  savedAt: number;
+}
+
+/**
+ * Store the pending result before OAuth redirect
+ * This will be retrieved after successful signup to auto-save
+ */
+export function setPendingDailyResult(data: Omit<PendingDailyResult, 'savedAt'>): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    const pending: PendingDailyResult = {
+      ...data,
+      savedAt: Date.now(),
+    };
+    localStorage.setItem(PENDING_DAILY_RESULT_KEY, JSON.stringify(pending));
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+/**
+ * Get the pending result after OAuth callback
+ * Returns null if no pending result or if expired (> 1 hour)
+ */
+export function getPendingDailyResult(): PendingDailyResult | null {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const stored = localStorage.getItem(PENDING_DAILY_RESULT_KEY);
+    if (!stored) return null;
+
+    const pending = JSON.parse(stored) as PendingDailyResult;
+
+    // Expire after 1 hour (OAuth should complete quickly)
+    const oneHourMs = 60 * 60 * 1000;
+    if (Date.now() - pending.savedAt > oneHourMs) {
+      clearPendingDailyResult();
+      return null;
+    }
+
+    return pending;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Clear the pending result (after successful save or on error)
+ */
+export function clearPendingDailyResult(): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    localStorage.removeItem(PENDING_DAILY_RESULT_KEY);
+  } catch {
+    // Ignore storage errors
+  }
+}

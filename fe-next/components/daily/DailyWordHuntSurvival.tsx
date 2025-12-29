@@ -134,6 +134,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const [showShop, setShowShop] = useState(false);
   const [tokensSpent, setTokensSpent] = useState(0);
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
+  const [showShopHint, setShowShopHint] = useState(false);
+  const shopHintShownRef = useRef(false);
 
   // Refs for life drain
   const lifeIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -223,6 +225,24 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       }
     };
   }, [isGameOver]);
+
+  // Show shop hint when life is low and tokens are available (non-intrusive suggestion)
+  useEffect(() => {
+    const LOW_LIFE_THRESHOLD = 40; // Show hint when life drops below 40%
+    const MIN_TOKENS_FOR_HINT = 60; // Minimum cost of cheapest item
+
+    if (
+      !shopHintShownRef.current &&
+      !isGameOver &&
+      lifePoints <= LOW_LIFE_THRESHOLD &&
+      clueTokens >= MIN_TOKENS_FOR_HINT
+    ) {
+      shopHintShownRef.current = true;
+      setShowShopHint(true);
+      // Auto-dismiss after 5 seconds
+      setTimeout(() => setShowShopHint(false), 5000);
+    }
+  }, [lifePoints, clueTokens, isGameOver]);
 
   // Cleanup feedback timeout on unmount
   useEffect(() => {
@@ -678,18 +698,44 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         </div>
 
         {/* Shop button - subtle indicator when tokens available */}
-        <Button
-          size="sm"
-          onClick={() => setShowShop(!showShop)}
-          className="bg-neo-purple text-white relative hover:bg-neo-purple/80"
-        >
-          <Store className="w-4 h-4" />
-          {clueTokens > 0 && (
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-neo-yellow text-neo-black text-xs font-bold rounded-full flex items-center justify-center border border-neo-black">
-              !
-            </span>
-          )}
-        </Button>
+        <div className="relative">
+          <Button
+            size="sm"
+            onClick={() => {
+              setShowShop(!showShop);
+              setShowShopHint(false);
+            }}
+            className={cn(
+              "bg-neo-purple text-white relative hover:bg-neo-purple/80",
+              showShopHint && "animate-pulse ring-2 ring-neo-yellow ring-offset-1"
+            )}
+          >
+            <Store className="w-4 h-4" />
+            {clueTokens > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-neo-yellow text-neo-black text-xs font-bold rounded-full flex items-center justify-center border border-neo-black">
+                !
+              </span>
+            )}
+          </Button>
+
+          {/* Non-intrusive hint tooltip */}
+          <AnimatePresence>
+            {showShopHint && (
+              <motion.div
+                initial={{ opacity: 0, y: 5, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 5, scale: 0.95 }}
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50"
+              >
+                <div className="bg-neo-yellow text-neo-black text-xs font-bold px-3 py-1.5 rounded-neo border-2 border-neo-black whitespace-nowrap shadow-hard-sm">
+                  <Lightbulb className="w-3 h-3 inline mr-1" />
+                  {t('wordHunt.survival.needHelp') || 'Need help? Try a clue!'}
+                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-transparent border-b-neo-black" />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* Target word black boxes - always visible */}
@@ -982,20 +1028,22 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         </div>
       </motion.div>
 
-      {/* Feedback */}
-      <AnimatePresence mode="wait">
-        {currentFeedback && (
-          <motion.div
-            key={currentFeedback}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="text-center mb-2 text-sm font-medium"
-          >
-            {currentFeedback}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Feedback - fixed height container to prevent layout shift */}
+      <div className="h-6 flex items-center justify-center mb-1">
+        <AnimatePresence mode="wait">
+          {currentFeedback && (
+            <motion.div
+              key={currentFeedback}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="text-center text-sm font-medium"
+            >
+              {currentFeedback}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* Game Grid */}
       <div className="flex-1 flex items-center justify-center">
@@ -1007,6 +1055,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           hideWordPreview
           hideComboIndicator
           comboLevel={0}
+          eliminatedLetters={eliminatedLetters}
         />
       </div>
 

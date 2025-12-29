@@ -156,7 +156,9 @@ const en = {
     "all": "All",
     "valid": "Valid",
     "invalid": "Invalid",
-    "validating": "Validating..."
+    "validating": "Validating...",
+    "later": "Later",
+    "skip": "Skip"
   },
   "theme": {
     "sundayFunday": "Sunday Funday",
@@ -366,7 +368,11 @@ const en = {
     "wordRequired": "Word is required",
     "wordTooLong": "Word is too long",
     "wordInvalidChars": "Word contains invalid characters",
-    "gameCodeHint": "Enter the game code shared by the host"
+    "gameCodeHint": "Enter the game code shared by the host",
+    "invalidEmail": "Please enter a valid email address"
+  },
+  "error": {
+    "subscriptionFailed": "Subscription failed. Please try again."
   },
   "difficulty": {
     "easy": "Easy",
@@ -1675,6 +1681,35 @@ const en = {
       },
       "statsTeaser": "You've played ${games} game(s) and scored ${score} points!",
       "maybeLater": "Maybe later"
+    },
+    "dailyChallenge": {
+      "streakAtRisk": {
+        "title": "Protect Your {days}-Day Streak!",
+        "subtitle": "Sign up to keep your streak safe across devices"
+      },
+      "topPercentile": {
+        "title": "Top {percentile}% Today!",
+        "subtitle": "Save your amazing result to your profile"
+      },
+      "quickSolve": {
+        "title": "Solved in {attempts} Attempts!",
+        "subtitle": "That's impressive! Save it to your profile"
+      },
+      "firstCompletion": {
+        "title": "Great Job on Your First Daily!",
+        "subtitle": "Create an account to track your daily progress"
+      },
+      "dayStreak": "Day Streak",
+      "atRiskWarning": "Without an account, you may lose your streak!",
+      "benefitsTitle": "Sign up to:",
+      "benefits": {
+        "protectStreak": "Keep your streak safe across devices",
+        "syncDevices": "Sync progress across all your devices",
+        "trackStats": "Track your daily challenge statistics",
+        "allTimeLeaderboard": "Appear on the all-time leaderboard"
+      },
+      "autoSaveNote": "Your result will be saved automatically after signup",
+      "maybeLater": "Maybe later"
     }
   },
   "legal": {
@@ -2307,7 +2342,8 @@ const en = {
       "attemptsLabel": "Attempts",
       "triesLeft": "tries left",
       "findOnBoard": "Find this word on the board!",
-      "traceLetters": "Trace the letters on the grid to spell it"
+      "traceLetters": "Trace the letters on the grid to spell it",
+      "needHelp": "Need help? Try a clue!"
     },
     "results": {
       "targetWord": "Target Word",
@@ -2422,6 +2458,49 @@ const en = {
     "earned": "Coins Earned",
     "winBonus": "Win Bonus",
     "topThreeBonus": "Top 3 Bonus"
+  },
+  "accessibility": {
+    "title": "Accessibility",
+    "subtitle": "Customize your experience to meet your needs. These settings are saved locally.",
+    "footer": "These settings are stored locally on your device. For additional system-level accessibility features, check your device settings.",
+    "fireRoundLights": {
+      "title": "Disable Fire Round Lights",
+      "description": "Turn off the rainbow glowing cells during fire rounds to reduce visual distractions."
+    },
+    "reduceMotion": {
+      "title": "Reduce Animations",
+      "description": "Minimize animations and transitions for a calmer experience. Useful for vestibular disorders or motion sensitivity."
+    },
+    "disableSounds": {
+      "title": "Disable Sound Effects",
+      "description": "Turn off all sound effects. Music controls are still available in the header."
+    },
+    "highContrast": {
+      "title": "High Contrast Mode",
+      "description": "Increase border widths and color contrast for better visibility."
+    },
+    "largerText": {
+      "title": "Larger Text",
+      "description": "Increase base font size by 125% for better readability."
+    }
+  },
+  "email": {
+    "title": "Get Daily Challenges!",
+    "description": "Stay sharp with daily word challenges delivered to your inbox. Plus, streak reminders so you never lose your progress!",
+    "placeholder": "your@email.com",
+    "submit": "Subscribe",
+    "submitting": "Subscribing...",
+    "successTitle": "You're all set!",
+    "successMessage": "We'll send you daily challenges and streak reminders. Check your inbox!",
+    "privacy": "We respect your privacy. Unsubscribe anytime. No spam, we promise.",
+    "benefit1": "Daily curated word challenges",
+    "benefit2": "Streak protection reminders",
+    "benefit3": "Exclusive tips & strategies"
+  },
+  "pwa": {
+    "installTitle": "Install LexiClash",
+    "installDescription": "Install our app for faster access, offline play, and a better experience!",
+    "installButton": "Install Now"
   }
 };
 
