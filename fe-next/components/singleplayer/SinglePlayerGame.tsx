@@ -12,7 +12,7 @@ import GridComponent from '@/components/GridComponent';
 import CircularTimer from '@/components/CircularTimer';
 import { EarthquakeWarning, FireRoundIndicator } from '@/components/earthquake';
 import ThemeIndicator from '@/components/game/ThemeIndicator';
-import { WordsRemaining } from '@/player/components/in-game/WordsRemaining';
+import { WordsProgress } from '@/player/components/in-game/WordsProgress';
 import HintButton from '@/components/HintButton';
 import RevealButton from '@/components/singleplayer/RevealButton';
 import { AchievementProgressTracker } from '@/components/achievements/AchievementProgressTracker';
@@ -481,8 +481,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     botUsedWordsRef.current = initialBotUsedWords;
   }, [settings.difficulty, settings.language, settings.bots]);
 
-  // Fetch valid words from grid for bots, hints, and WordsRemaining
-  // Runs for ALL modes to support WordsRemaining and hints, not just solo-bots
+  // Fetch valid words from grid for bots, hints, and word progress tracking
+  // Runs for ALL modes to support WordsProgress and hints, not just solo-bots
   useEffect(() => {
     if (!grid) return;
 
@@ -1121,6 +1121,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   }, [availableWords, foundWords, grid, settings.language]);
 
   // Handle reveal word - find a random 5+ letter word and highlight its path
+  // NOTE: This only shows the word on the board - player must trace it themselves to get points
   const handleReveal = useCallback(async () => {
     if (revealState.isLoading || !availableWords || !grid) return null;
 
@@ -1134,29 +1135,10 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       return null;
     }
 
-    const { word, path } = result;
+    const { path } = result;
 
-    // Calculate score for the revealed word
-    const baseScore = Math.max(word.length - 1, 1);
-    const multiplier = getScoreMultiplier();
-    const finalScore = Math.floor(baseScore * multiplier);
-
-    // Add the revealed word to found words
-    const newWord: FoundWord = {
-      word,
-      score: finalScore,
-      timestamp: Date.now(),
-      timeSinceStart: (Date.now() - gameStartTimeRef.current) / 1000,
-      isValid: true,
-      comboBonus: 0,
-      fireRoundBonus: fireRoundActive ? Math.floor(baseScore) : 0,
-    };
-
-    setFoundWords(prev => [...prev, newWord]);
-    foundWordsSetRef.current.add(word.toLowerCase());
-    setScore(prev => prev + finalScore);
-
-    // Highlight the path on the grid
+    // Only highlight the path on the grid - don't add the word to found words
+    // Player must trace the word themselves to get the points
     setRevealState(prev => ({
       ...prev,
       revealsUsed: prev.revealsUsed + 1,
@@ -1164,16 +1146,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       highlightedPath: path.map(p => ({ row: p.row, col: p.col })),
     }));
 
-    // Play word accepted sound
-    playWordAcceptedSound();
-
-    // Clear highlight after 2 seconds
+    // Clear highlight after 4 seconds (longer to give player time to trace it)
     setTimeout(() => {
       setRevealState(prev => ({ ...prev, highlightedPath: [] }));
-    }, 2000);
+    }, 4000);
 
     return result;
-  }, [revealState.isLoading, availableWords, grid, foundWords, settings.language, getScoreMultiplier, fireRoundActive, playWordAcceptedSound]);
+  }, [revealState.isLoading, availableWords, grid, foundWords, settings.language]);
 
   if (!grid) {
     return (
@@ -1194,7 +1173,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   // Landscape mode layout - maximized grid with minimal chrome
   if (isLandscape) {
     const validWordCount = foundWords.filter(fw => fw.isValid === true).length;
-    // Count only 5+ letter words for WordsRemaining (matches totalBoardWords filter)
+    // Count only 5+ letter words for WordsProgress (matches totalBoardWords filter)
     const longWordCount = foundWords.filter(fw => fw.isValid === true && fw.word.length >= MIN_TRACKED_WORD_LENGTH).length;
 
     return (
@@ -1255,12 +1234,12 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             </div>
           </div>
           {totalBoardWords !== null && totalBoardWords > 0 && (
-            <WordsRemaining
+            <WordsProgress
               totalWords={totalBoardWords}
               foundWordsCount={longWordCount}
               t={t}
-              compact
               minLength={MIN_TRACKED_WORD_LENGTH}
+              compact
             />
           )}
           <ComboDisplay comboLevel={combo.comboLevel} compact />
@@ -1655,14 +1634,16 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         </div>
       )}
 
-      {/* Words Remaining Indicator (above found words) - only 5+ letter words */}
+      {/* Words Progress - compact, motivating progress indicator for 5+ letter words */}
       {totalBoardWords !== null && totalBoardWords > 0 && (
-        <WordsRemaining
-          totalWords={totalBoardWords}
-          foundWordsCount={foundWords.filter(fw => fw.isValid === true && fw.word.length >= MIN_TRACKED_WORD_LENGTH).length}
-          t={t}
-          minLength={MIN_TRACKED_WORD_LENGTH}
-        />
+        <div className="flex justify-center">
+          <WordsProgress
+            totalWords={totalBoardWords}
+            foundWordsCount={foundWords.filter(fw => fw.isValid === true && fw.word.length >= MIN_TRACKED_WORD_LENGTH).length}
+            t={t}
+            minLength={MIN_TRACKED_WORD_LENGTH}
+          />
+        </div>
       )}
 
       {/* Hint & Reveal Buttons - Single Player Mode (portrait) */}

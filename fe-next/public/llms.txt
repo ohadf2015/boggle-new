@@ -60,11 +60,12 @@ LexiClash supports multiple languages with full localization:
 - Hebrew (he): https://www.lexiclash.live/he (RTL support)
 - Swedish (sv): https://www.lexiclash.live/sv
 - Japanese (ja): https://www.lexiclash.live/ja
+- Spanish (es): https://www.lexiclash.live/es
 
 ## Key Features
 
 - Real-time multiplayer gameplay via WebSocket
-- Support for 4 languages with full localization
+- Support for 5 languages with full localization
 - No download or installation required
 - Mobile-friendly responsive design
 - QR code and link sharing for easy invitations

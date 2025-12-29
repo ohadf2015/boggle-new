@@ -124,22 +124,21 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
   const [timerMinutes, setTimerMinutes] = useState(Math.floor(initialSettings.timerSeconds / 60) || 2);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  // Wizard step state for step-by-step configuration
+  // Wizard step state - 3 simple steps: Mode → Settings → Start
   const [wizardStep, setWizardStep] = useState<WizardStep>(1);
   const [useWizard, setUseWizard] = useState(true);
 
-  // Wizard step validation
+  // Wizard step validation - simplified to 3 steps
   const canAdvanceFromStep = useCallback((step: WizardStep): boolean => {
     switch (step) {
       case 1: return mode !== null;
-      case 2: return difficulty !== null;
-      case 3: return mode !== 'solo-bots' || bots.length > 0;
-      case 4: return true;
+      case 2: return difficulty !== null && (mode !== 'solo-bots' || bots.length > 0);
+      case 3: return true;
     }
   }, [mode, difficulty, bots.length]);
 
   const handleWizardNext = useCallback(() => {
-    if (wizardStep < 4 && canAdvanceFromStep(wizardStep)) {
+    if (wizardStep < 3 && canAdvanceFromStep(wizardStep)) {
       setWizardStep((prev) => (prev + 1) as WizardStep);
     }
   }, [wizardStep, canAdvanceFromStep]);
@@ -547,17 +546,21 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
         </>
       )}
 
-      {/* Step 2: Difficulty Selection */}
+      {/* Step 2: Settings (Difficulty + Options combined) */}
       {(!useWizard || wizardStep === 2) && mode !== 'daily' && (
         <>
         <div className="text-center mb-2">
           <h2 className="text-lg font-bold text-neo-black dark:text-neo-white">
-            {t('wizard.chooseDifficulty') || 'Choose Difficulty'}
+            {t('wizard.gameSettings') || 'Game Settings'}
           </h2>
         </div>
         <Card className="border-3 border-neo-black dark:border-slate-600 shadow-hard">
-          <CardContent className="p-3 sm:p-4">
-            <div className="space-y-3">
+          <CardContent className="p-3 sm:p-4 space-y-4">
+            {/* Difficulty Selection */}
+            <div>
+              <label className="text-sm font-bold uppercase tracking-wide text-neo-black/70 dark:text-neo-white/70 mb-2 block">
+                {t('wizard.chooseDifficulty') || 'Difficulty'}
+              </label>
               <div className="grid grid-cols-3 gap-2">
                 {(['EASY', 'MEDIUM', 'HARD'] as DifficultyLevel[]).map(level => {
                   const config = DIFFICULTIES[level];
@@ -567,43 +570,26 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                       key={level}
                       onClick={() => setDifficulty(level)}
                       className={cn(
-                        'p-3 sm:p-4 rounded-neo-lg border-4 border-neo-black dark:border-slate-500 transition-all text-center',
+                        'p-2 sm:p-3 rounded-neo-lg border-3 border-neo-black dark:border-slate-500 transition-all text-center',
                         isSelected
-                          ? level === 'EASY' ? 'bg-neo-lime shadow-hard-pressed translate-x-[2px] translate-y-[2px] text-neo-black'
-                          : level === 'MEDIUM' ? 'bg-neo-yellow shadow-hard-pressed translate-x-[2px] translate-y-[2px] text-neo-black'
-                          : 'bg-neo-red shadow-hard-pressed translate-x-[2px] translate-y-[2px] text-white'
+                          ? level === 'EASY' ? 'bg-neo-lime shadow-hard-pressed translate-x-[1px] translate-y-[1px] text-neo-black'
+                          : level === 'MEDIUM' ? 'bg-neo-yellow shadow-hard-pressed translate-x-[1px] translate-y-[1px] text-neo-black'
+                          : 'bg-neo-red shadow-hard-pressed translate-x-[1px] translate-y-[1px] text-white'
                           : 'bg-white dark:bg-slate-600 shadow-hard hover:shadow-hard-lg text-neo-black dark:text-neo-white'
                       )}
                     >
-                      <div className="font-black uppercase text-sm sm:text-base">
+                      <div className="font-black uppercase text-xs sm:text-sm">
                         {t(`difficulty.${level.toLowerCase()}`) || level}
                       </div>
-                      <div className="text-xs sm:text-sm opacity-75 font-bold">
+                      <div className="text-[10px] sm:text-xs opacity-75 font-bold">
                         {config.rows}x{config.cols}
                       </div>
                     </button>
                   );
                 })}
               </div>
-              <div className="text-center text-sm text-neo-black/70 dark:text-neo-white/70">
-                <span className="font-bold">{difficultyConfig.rows}x{difficultyConfig.cols}</span> {t('wizard.gridPreview') || 'grid'}
-              </div>
             </div>
-          </CardContent>
-        </Card>
-        </>
-      )}
 
-      {/* Step 3: Game Options */}
-      {(!useWizard || wizardStep === 3) && mode !== 'daily' && (
-        <>
-        <div className="text-center mb-2">
-          <h2 className="text-lg font-bold text-neo-black dark:text-neo-white">
-            {t('wizard.configureOptions') || 'Game Options'}
-          </h2>
-        </div>
-        <Card className="border-3 border-neo-black dark:border-slate-600 shadow-hard">
-          <CardContent className="p-3 sm:p-4 space-y-4">
             {/* Timer for timed modes */}
             {mode !== 'practice' && (
               <div>
@@ -616,7 +602,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                       key={min}
                       onClick={() => setTimerMinutes(min)}
                       className={cn(
-                        'flex-1 py-3 rounded-neo border-3 border-neo-black text-sm font-bold shadow-hard hover:shadow-hard-lg transition-all text-neo-black',
+                        'flex-1 py-2 rounded-neo border-3 border-neo-black text-sm font-bold shadow-hard hover:shadow-hard-lg transition-all text-neo-black',
                         timerMinutes === min ? 'bg-neo-cyan' : 'bg-neo-cream dark:bg-slate-600 dark:text-neo-white'
                       )}
                     >
@@ -708,8 +694,8 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
         </>
       )}
 
-      {/* Step 4: Review & Start */}
-      {(!useWizard || wizardStep === 4) && (
+      {/* Step 3: Review & Start */}
+      {(!useWizard || wizardStep === 3) && (
         <>
         <div className="text-center mb-2">
           <h2 className="text-lg font-bold text-neo-black dark:text-neo-white">
@@ -811,151 +797,63 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
             )}
           </div>
 
-          {/* Daily Challenge Info Panel */}
+          {/* Daily Challenge Info Panel - Simplified */}
           {mode === 'daily' && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="mb-2 sm:mb-3"
-            >
-              <div className="p-3 sm:p-4 bg-gradient-to-br from-neo-orange via-neo-yellow to-neo-pink rounded-neo-lg border-4 border-neo-black shadow-hard relative overflow-hidden">
-                {/* Background decoration */}
-                <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
-                <div className="absolute -left-8 -bottom-8 w-24 h-24 bg-white/10 rounded-full blur-2xl" />
-
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <Target className="w-5 h-5 text-neo-black" />
-                      <span className="font-black uppercase text-sm text-neo-black">
-                        {t('daily.puzzleNumber')?.replace('{number}', String(dailyPuzzleNumber)) || `Puzzle #${dailyPuzzleNumber}`}
-                      </span>
-                    </div>
-                    {dailyStreak > 0 && (
-                      <Badge className="bg-neo-black text-neo-orange border-0 font-black flex items-center gap-1">
-                        <Flame className="w-3 h-3" />
-                        {dailyStreak} {t('daily.dayStreak') || 'day streak'}
-                      </Badge>
-                    )}
-                  </div>
-
-                  {hasPlayedDaily ? (
-                    <div className="text-center py-2">
-                      <div className="flex items-center justify-center gap-2 text-xl font-black text-neo-black mb-1">
-                        <Check className="w-6 h-6" />
-                        {t('daily.completed') || 'Completed!'}
-                      </div>
-                      <p className="text-sm text-neo-black/75">
-                        {t('daily.nextPuzzleIn') || 'Next puzzle in'}: <span className="font-bold">{dailyCountdown}</span>
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="text-center py-1">
-                      <p className="text-sm text-neo-black/80">
-                        {t('daily.oneAttempt') || 'One attempt per day - same puzzle for everyone!'}
-                      </p>
-                    </div>
+            <div className="mb-2 sm:mb-3 p-3 bg-gradient-to-r from-neo-orange via-neo-yellow to-neo-pink rounded-neo-lg border-3 border-neo-black shadow-hard">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Target className="w-5 h-5 text-neo-black" />
+                  <span className="font-black text-neo-black">
+                    #{dailyPuzzleNumber}
+                  </span>
+                  {dailyStreak > 0 && (
+                    <span className="flex items-center gap-1 text-sm font-bold text-neo-black/80">
+                      <Flame className="w-4 h-4 text-neo-orange" />
+                      {dailyStreak}
+                    </span>
                   )}
                 </div>
+                {hasPlayedDaily ? (
+                  <span className="flex items-center gap-1 font-bold text-neo-black">
+                    <Check className="w-4 h-4" />
+                    {t('daily.completed') || 'Done'}
+                  </span>
+                ) : (
+                  <span className="text-sm font-bold text-neo-black/80">
+                    {dailyCountdown}
+                  </span>
+                )}
               </div>
-            </motion.div>
+            </div>
           )}
 
-          {/* Challenge Mode High Score Display */}
+          {/* Challenge Mode High Score Display - Simplified */}
           {mode === 'challenge' && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="mb-2 sm:mb-3"
-            >
+            <div className="mb-2 sm:mb-3">
               {currentHighScore ? (
-                <div className="p-3 sm:p-4 bg-gradient-to-br from-neo-yellow via-yellow-300 to-neo-orange rounded-neo-lg border-4 border-neo-black shadow-hard relative overflow-hidden texture-halftone-comic">
-                  {/* Comic-style halftone dots */}
-                  <div
-                    className="absolute inset-0 pointer-events-none opacity-[0.05]"
-                    style={{
-                      backgroundImage: `radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px)`,
-                      backgroundSize: '12px 12px',
-                    }}
-                  />
-                  {/* Trophy background decoration */}
-                  <div className="absolute -right-4 -top-4 opacity-10">
-                    <Trophy className="w-24 h-24 text-neo-black" />
-                  </div>
-                  <div className="relative z-10">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <Crown className="text-neo-black text-xl" />
-                        <span className="font-black uppercase text-sm text-neo-black">
-                          {t('challenge.yourRecord') || 'Your Record'}
-                        </span>
-                      </div>
-                      <Badge className="bg-neo-black text-neo-yellow border-0 font-black">
-                        {difficultyConfig.rows}x{difficultyConfig.cols} • {timerMinutes}m
-                      </Badge>
+                <div className="p-3 bg-neo-yellow rounded-neo-lg border-3 border-neo-black shadow-hard">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Crown className="text-neo-black w-5 h-5" />
+                      <span className="font-black text-neo-black">
+                        {currentHighScore.score} {t('common.points') || 'pts'}
+                      </span>
                     </div>
-                    <div className="flex items-end gap-2 sm:gap-4">
-                      <div>
-                        <div className="text-3xl sm:text-4xl md:text-5xl font-black text-neo-black" style={{ textShadow: '2px 2px 0 rgba(255,255,255,0.3)' }}>
-                          {currentHighScore.score}
-                        </div>
-                        <div className="text-xs font-bold text-neo-black/70 uppercase">
-                          {t('common.points') || 'points'}
-                        </div>
-                      </div>
-                      <div className="flex-1 grid grid-cols-2 gap-1 sm:gap-2 text-center">
-                        <div className="bg-white/30 rounded-neo px-1.5 sm:px-2 py-1 border-2 border-neo-black/20">
-                          <div className="text-sm sm:text-base md:text-lg font-black text-neo-black">{currentHighScore.wordCount}</div>
-                          <div className="text-[9px] sm:text-[10px] font-bold text-neo-black/75 uppercase">{t('common.words') || 'words'}</div>
-                        </div>
-                        <div className="bg-white/30 rounded-neo px-1.5 sm:px-2 py-1 border-2 border-neo-black/20">
-                          <div className="text-xs sm:text-sm font-black text-neo-black uppercase truncate">{currentHighScore.longestWord}</div>
-                          <div className="text-[9px] sm:text-[10px] font-bold text-neo-black/75 uppercase">{t('challenge.longest') || 'longest'}</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="mt-2 sm:mt-3 pt-2 border-t border-neo-black/20 flex items-center justify-center gap-2 text-xs font-bold text-neo-black/70">
-                      <Target className="w-3 h-3" />
-                      <span>{t('challenge.beatIt') || 'Can you beat it?'}</span>
-                    </div>
+                    <span className="text-sm font-bold text-neo-black/70">
+                      {currentHighScore.wordCount} {t('common.words') || 'words'}
+                    </span>
                   </div>
                 </div>
               ) : (
-                <div className="p-4 bg-gradient-to-br from-neo-cyan/30 to-cyan-200/30 dark:from-neo-cyan/20 dark:to-cyan-600/20 rounded-neo-lg border-3 border-dashed border-neo-cyan dark:border-neo-cyan/50 text-center">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <Zap className="w-5 h-5 text-neo-cyan" />
-                    <span className="font-black uppercase text-sm text-neo-black dark:text-neo-white">
-                      {t('challenge.noRecord') || 'No Record Yet'}
-                    </span>
-                  </div>
-                  <p className="text-sm text-neo-black/75 dark:text-neo-white/75">
-                    {t('challenge.setFirst') || 'Set your first high score and start competing against yourself!'}
-                  </p>
-                </div>
-              )}
-
-              {/* Progress Stats */}
-              {progressStats.totalGames > 0 && (
-                <div className="mt-3 flex items-center justify-center gap-4 text-xs text-neo-black/75 dark:text-neo-white/75">
-                  <span className="flex items-center gap-1">
-                    <Flame className="text-neo-orange" />
-                    {progressStats.highScoreBeats} {t('challenge.recordsSet') || 'records set'}
-                  </span>
-                  <span>•</span>
-                  <span>{progressStats.totalGames} {t('challenge.gamesPlayed') || 'games played'}</span>
-                </div>
-              )}
-
-              {/* All-Time Best (if different from current config) */}
-              {allTimeBest && currentHighScore && allTimeBest.score > currentHighScore.score && (
-                <div className="mt-2 text-center text-xs text-neo-black/70 dark:text-neo-white/70">
-                  <span className="flex items-center justify-center gap-1">
-                    <Crown className="text-neo-yellow text-sm" />
-                    {t('challenge.allTimeBest') || 'All-time best'}: <span className="font-black">{allTimeBest.score}</span>
+                <div className="p-3 bg-neo-cyan/20 rounded-neo-lg border-2 border-dashed border-neo-cyan text-center">
+                  <span className="text-sm font-bold text-neo-black dark:text-neo-white">
+                    {t('challenge.noRecord') || 'No high score yet'}
                   </span>
                 </div>
               )}
-            </motion.div>
+
+              {/* Removed: Progress Stats and All-Time Best - less clutter */}
+            </div>
           )}
 
           {/* Bot config for solo-bots mode - Purple themed */}

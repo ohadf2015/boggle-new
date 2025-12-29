@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import confetti from 'canvas-confetti';
+import { fireConfetti } from '@/utils/confettiUtils';
 import { Share } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
@@ -102,12 +102,11 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
     playAchievementSound();
 
     // Fire confetti with Neo-Brutalist colors (smaller burst)
-    confetti({
+    fireConfetti({
       particleCount: 50,
       spread: 60,
       origin: { y: 0.2 },
       colors: ['#FFE135', '#FF6B35', '#FF1493', '#00FFFF', '#BFFF00'],
-      zIndex: 9999,
     });
 
     // Animate progress bar

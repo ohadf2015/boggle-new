@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Target, RotateCw, Home, Share2, Crown, TrendingUp, TrendingDown, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import confetti from 'canvas-confetti';
+import { fireConfetti } from '@/utils/confettiUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
@@ -47,14 +47,14 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
       const end = Date.now() + duration;
 
       const frame = () => {
-        confetti({
+        fireConfetti({
           particleCount: 3,
           angle: 60,
           spread: 55,
           origin: { x: 0 },
           colors: ['#FFD700', '#FFA500', '#FF6B6B', '#4ECDC4'],
         });
-        confetti({
+        fireConfetti({
           particleCount: 3,
           angle: 120,
           spread: 55,

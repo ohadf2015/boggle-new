@@ -85,10 +85,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     }, []);
 
     return (
-        <motion.header
-            initial={{ y: -20, opacity: 0, rotate: -1 }}
-            animate={{ y: 0, opacity: 1, rotate: 0 }}
-            transition={{ duration: 0.4, ease: [0.68, -0.55, 0.265, 1.55] }}
+        <header
             className={cn(
                 "w-full mb-2 sm:mb-4 lg:mb-6 xl:mb-8 px-2 xs:px-3 sm:px-4 lg:px-8 xl:px-12 pt-3 sm:pt-4 lg:pt-6 xl:pt-8 pb-2 lg:pb-4 sticky top-0 z-50 landscape:static bg-slate-50 dark:bg-slate-900",
                 className
@@ -129,17 +126,10 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         >
                             {t('logo.lexi')}
                         </span>
-                        {/* Lightning bolt */}
-                        <motion.span
-                            animate={{
-                                rotate: [0, -15, 15, -15, 15, 0],
-                                scale: [1, 1.3, 1]
-                            }}
-                            transition={{ type: 'tween', duration: 0.4, delay: 1, repeat: 3, repeatDelay: 5 }}
-                            className="text-base xs:text-xl sm:text-3xl lg:text-4xl xl:text-5xl"
-                        >
+                        {/* Lightning bolt - static for cleaner UX */}
+                        <span className="text-base xs:text-xl sm:text-3xl lg:text-4xl xl:text-5xl">
                             ⚡
-                        </motion.span>
+                        </span>
                         {/* CLASH - Neo-Brutalist white italic skewed with black shadow */}
                         <span
                             className="text-white italic"
@@ -350,7 +340,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 <div className="flex flex-col gap-4 p-4">
                                     {/* Daily Challenge - TOP PRIORITY */}
                                     <div className="flex flex-col gap-2">
-                                        <span className="text-xs font-bold text-neo-black/60 dark:text-slate-400 uppercase tracking-wide">
+                                        <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
                                             {t('daily.badge') || 'Daily Challenge'}
                                         </span>
                                         <DailyQuickLink inline onClick={() => setShowMobileMenu(false)} />
@@ -361,7 +351,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
 
                                     {/* Account Section */}
                                     <div className="flex flex-col gap-2">
-                                        <span className="text-xs font-bold text-neo-black/60 dark:text-slate-400 uppercase tracking-wide">
+                                        <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
                                             {t('common.account') || 'Account'}
                                         </span>
                                         <AuthButton inline onClose={() => setShowMobileMenu(false)} />
@@ -372,7 +362,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
 
                                     {/* Language Section */}
                                     <div className="flex flex-col gap-2">
-                                        <span className="text-xs font-bold text-neo-black/60 dark:text-slate-400 uppercase tracking-wide">
+                                        <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
                                             {t('common.language') || 'Language'}
                                         </span>
                                         <div className="flex flex-col gap-1.5">
@@ -403,7 +393,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                             <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
 
                                             <div className="flex flex-col gap-3">
-                                                <span className="text-xs font-bold text-neo-black/60 dark:text-slate-400 uppercase tracking-wide">
+                                                <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
                                                     {t('common.admin') || 'Admin'}
                                                 </span>
 
@@ -432,7 +422,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     )}
                 </AnimatePresence>
             </div>
-        </motion.header>
+        </header>
     );
 });
 

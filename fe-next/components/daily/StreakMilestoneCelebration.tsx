@@ -2,7 +2,7 @@
 
 import React, { useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import confetti from 'canvas-confetti';
+import { fireConfetti } from '@/utils/confettiUtils';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -28,7 +28,7 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
   subtitle,
 }) => {
   // Fire confetti celebration
-  const fireConfetti = useCallback(() => {
+  const triggerCelebration = useCallback(() => {
     // Massive celebration burst
     const duration = 3000;
     const end = Date.now() + duration;
@@ -41,14 +41,14 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
         : ['#10B981', '#34D399', '#6EE7B7', '#A7F3D0']; // Green for 7+
 
     const frame = () => {
-      confetti({
+      fireConfetti({
         particleCount: 5,
         angle: 60,
         spread: 70,
         origin: { x: 0 },
         colors,
       });
-      confetti({
+      fireConfetti({
         particleCount: 5,
         angle: 120,
         spread: 70,
@@ -64,7 +64,7 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
 
     // Extra celebration bursts
     setTimeout(() => {
-      confetti({
+      fireConfetti({
         particleCount: 150,
         spread: 180,
         origin: { y: 0.6, x: 0.5 },
@@ -74,7 +74,7 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
 
     if (streak >= 30) {
       setTimeout(() => {
-        confetti({
+        fireConfetti({
           particleCount: 200,
           spread: 200,
           origin: { y: 0.5, x: 0.5 },
@@ -85,7 +85,7 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
 
     if (streak >= 100) {
       setTimeout(() => {
-        confetti({
+        fireConfetti({
           particleCount: 300,
           spread: 360,
           origin: { y: 0.5, x: 0.5 },
@@ -98,11 +98,11 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
   useEffect(() => {
     if (isOpen) {
       // Slight delay to ensure modal is visible
-      const timer = setTimeout(fireConfetti, 100);
+      const timer = setTimeout(triggerCelebration, 100);
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [isOpen, fireConfetti]);
+  }, [isOpen, triggerCelebration]);
 
   return (
     <AnimatePresence>

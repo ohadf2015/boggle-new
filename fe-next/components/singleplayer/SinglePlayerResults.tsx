@@ -18,7 +18,7 @@ import MissedWords from '@/components/results/MissedWords';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import confetti from 'canvas-confetti';
+import { fireConfetti } from '@/utils/confettiUtils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { updateGuestStatsAfterGame, getGuestStats } from '@/utils/guestManager';
 import { logGameStart, logGameEnd, formatWordsForLogging } from '@/utils/gameLogger';
@@ -118,7 +118,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         ? RANK_CONFETTI_COLORS[playerRank]
         : ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#a855f7']; // Default celebration colors
 
-      confetti({
+      fireConfetti({
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },

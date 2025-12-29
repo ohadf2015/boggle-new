@@ -9,12 +9,12 @@ const sv = {
   },
   "seo": {
     "title": "LexiClash - Snabbt Multiplayer Ordspel | Tävla i Realtid",
-    "description": "Tävla mot vänner i spännande ordstrider i realtid! LexiClash är ett snabbt multiplayer-ordspel där varje sekund räknas. Hitta ord, överträffa motståndarna och klättra på topplistan. Perfekt för fester, spelkvällar och vänskaplig tävling. Också bra för att bygga ordförråd medan du har kul! Spela gratis på 4 språk - ingen nedladdning krävs.",
+    "description": "Tävla mot vänner i spännande ordstrider i realtid! LexiClash är ett snabbt multiplayer-ordspel där varje sekund räknas. Hitta ord, överträffa motståndarna och klättra på topplistan. Perfekt för fester, spelkvällar och vänskaplig tävling. Också bra för att bygga ordförråd medan du har kul! Spela gratis på 5 språk - ingen nedladdning krävs.",
     "keywords": "multiplayer ordspel, realtids ordspel, online ordstrid, festspel, tävlings ordspel, snabbt ordspel, ordpussel multiplayer, alias spel, kahoot alternativ, familjespelkväll, festspel, teambuilding, ordtävling, live ordspel, ordrace, ordförrådsspel, gratis onlinespel",
     "ogTitle": "LexiClash - Snabbt Multiplayer Ordspel | Tävla i Realtid",
-    "ogDescription": "Tävla mot vänner i spännande ordstrider i realtid! Hitta ord snabbt, överträffa motståndarna, klättra på topplistan. Perfekt för fester och spelkvällar. Spela gratis på 4 språk!",
+    "ogDescription": "Tävla mot vänner i spännande ordstrider i realtid! Hitta ord snabbt, överträffa motståndarna, klättra på topplistan. Perfekt för fester och spelkvällar. Spela gratis på 5 språk!",
     "twitterTitle": "LexiClash - Snabbt Multiplayer Ordspel | Tävla i Realtid",
-    "twitterDescription": "Tävla mot vänner i spännande ordstrider i realtid! Hitta ord snabbt, överträffa motståndarna, klättra på topplistan. Perfekt för fester och spelkvällar. Spela gratis på 4 språk!",
+    "twitterDescription": "Tävla mot vänner i spännande ordstrider i realtid! Hitta ord snabbt, överträffa motståndarna, klättra på topplistan. Perfekt för fester och spelkvällar. Spela gratis på 5 språk!",
     "locale": "sv_SE",
     "language": "Swedish",
     "leaderboard": {
@@ -745,7 +745,16 @@ const sv = {
     "pendingValidation": "Väntar på validering",
     "longWordsLabel": "${min}+ bokstäver",
     "longWordsOnBoard": "${min}+ bokstävers ord",
-    "longWordsRemaining": "${min}+ bokstävers ord kvar"
+    "longWordsRemaining": "${min}+ bokstävers ord kvar",
+    "letterWords": "bokstavsord",
+    "maxTier": "Legend!",
+    "tierstarter": "Startad",
+    "tierbronze": "Brons",
+    "tiersilver": "Silver",
+    "tiergold": "Guld",
+    "tierstar": "Stjärna",
+    "tierfire": "I Elden",
+    "tierlegend": "Legend"
   },
   "lateJoiner": {
     "welcomeTitle": "Spelet pågår!",
@@ -875,6 +884,15 @@ const sv = {
     "foundByOpponents": "Hittades av motståndare",
     "foundByOpponentsHint": "Ord som motståndarna upptäckte först",
     "foundByOpponentsMotivation": "Lär dig dessa till nästa gång!",
+    "topMissed": "Toppord att lära sig",
+    "bonusWordsForNextTime": "Bonusord för nästa gång",
+    "almostPerfect": "Nästan perfekt!",
+    "greatJob": "Bra jobbat!",
+    "strongGame": "Starkt spel!",
+    "treasureAwaits": "Skatter väntar!",
+    "topGems": "Topp:",
+    "more": "mer",
+    "tapToSeeOnGrid": "Tryck på ord för att se dem på brädet!",
     "showMoreWords": "Visa {count} till",
     "players": "spelare",
     "everyoneReady": "Alla redo!",
@@ -2439,7 +2457,8 @@ const sv = {
     "stepDifficulty": "Svårighetsgrad",
     "stepOf": "Steg {current} av {total}",
     "stepOptions": "Alternativ",
-    "stepReview": "Granska"
+    "stepReview": "Granska",
+    "gameSettings": "Spelinställningar"
   },
   "home": {
     "singlePlayer": "Enspelare",

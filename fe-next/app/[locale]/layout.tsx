@@ -174,7 +174,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             aggregateRating: {
                 '@type': 'AggregateRating',
                 ratingValue: '4.8',
-                ratingCount: '150',
+                ratingCount: '500',
                 bestRating: '5',
                 worstRating: '1',
             },

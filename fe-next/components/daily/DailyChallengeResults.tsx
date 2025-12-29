@@ -18,7 +18,7 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 import { Button } from '@/components/ui/button';
-import confetti from 'canvas-confetti';
+import { fireConfetti } from '@/utils/confettiUtils';
 import {
   generateShareableResult,
   getGuestFingerprint,
@@ -83,28 +83,27 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   };
 
   // Fire confetti burst for a specific rank (top 3 celebration)
-  const fireRankConfetti = useCallback((rank: number): void => {
+  const fireRankConfettiLocal = useCallback((rank: number): void => {
     const count = Math.floor(100 * (1.2 - rank * 0.15)); // 1st = 100, 2nd = 85, 3rd = 70
     const colors = RANK_CONFETTI_COLORS[rank] || RANK_CONFETTI_COLORS[1];
 
     const defaults = {
       origin: { y: 0.6 },
-      zIndex: 1000,
       colors,
     };
 
-    confetti({
+    fireConfetti({
       ...defaults,
       particleCount: Math.floor(count * 0.35),
       spread: 26,
       startVelocity: 55,
     });
-    confetti({
+    fireConfetti({
       ...defaults,
       particleCount: Math.floor(count * 0.25),
       spread: 60,
     });
-    confetti({
+    fireConfetti({
       ...defaults,
       particleCount: Math.floor(count * 0.4),
       spread: 100,
@@ -119,9 +118,9 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
     // Fire rank-specific confetti for top 3 on new completion
     if (isNewCompletion && rank !== null && rank <= 3) {
       // Delay to let initial confetti finish
-      setTimeout(() => fireRankConfetti(rank), 2500);
+      setTimeout(() => fireRankConfettiLocal(rank), 2500);
     }
-  }, [isNewCompletion, fireRankConfetti]);
+  }, [isNewCompletion, fireRankConfettiLocal]);
 
   // Get guest fingerprint and player info on mount
   useEffect(() => {
@@ -205,14 +204,14 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       const end = Date.now() + duration;
 
       const frame = () => {
-        confetti({
+        fireConfetti({
           particleCount: 3,
           angle: 60,
           spread: 55,
           origin: { x: 0 },
           colors: ['#FFE135', '#FF6B35', '#00D9FF'],
         });
-        confetti({
+        fireConfetti({
           particleCount: 3,
           angle: 120,
           spread: 55,
@@ -229,7 +228,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       // Extra burst for streak milestones
       if (streakMilestone) {
         setTimeout(() => {
-          confetti({
+          fireConfetti({
             particleCount: 100,
             spread: 100,
             origin: { y: 0.6 },

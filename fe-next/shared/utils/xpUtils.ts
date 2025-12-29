@@ -2,7 +2,7 @@
  * XP and Level Up Utilities
  * Shared logic for XP gained and level up event handling
  */
-import confetti from 'canvas-confetti';
+import { fireConfetti } from '../../utils/confettiUtils';
 import { neoSuccessToast } from '../../components/NeoToast';
 import logger from '@/utils/logger';
 import type { XpGainedPayload, LevelUpPayload } from '@/shared/types/socket';
@@ -52,7 +52,7 @@ export function createLevelUpHandler(
     setLevelUpData(data);
 
     // Celebratory confetti
-    confetti(LEVEL_UP_CONFETTI_CONFIG);
+    fireConfetti(LEVEL_UP_CONFETTI_CONFIG);
 
     neoSuccessToast(
       `${t('results.levelUp') || 'Level Up!'} ${data.oldLevel} → ${data.newLevel}`,
@@ -68,5 +68,5 @@ export function createLevelUpHandler(
  * Trigger level up celebration with confetti
  */
 export function triggerLevelUpCelebration(): void {
-  confetti(LEVEL_UP_CONFETTI_CONFIG);
+  fireConfetti(LEVEL_UP_CONFETTI_CONFIG);
 }

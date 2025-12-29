@@ -9,12 +9,12 @@ const ja = {
   },
   "seo": {
     "title": "LexiClash - スリル満点のマルチプレイヤーワードゲーム | リアルタイム対戦",
-    "description": "友達とスリリングなリアルタイムワードバトルで競い合おう！LexiClashは一秒一秒が勝負の速いマルチプレイヤーワードゲーム。単語を見つけ、相手を出し抜き、リーダーボードを駆け上がれ。パーティー、ゲームナイト、友達との対戦に最適。楽しみながら語彙力も鍛えられる！4言語対応で無料プレイ - ダウンロード不要！",
+    "description": "友達とスリリングなリアルタイムワードバトルで競い合おう！LexiClashは一秒一秒が勝負の速いマルチプレイヤーワードゲーム。単語を見つけ、相手を出し抜き、リーダーボードを駆け上がれ。パーティー、ゲームナイト、友達との対戦に最適。楽しみながら語彙力も鍛えられる！5言語対応で無料プレイ - ダウンロード不要！",
     "keywords": "マルチプレイヤーワードゲーム, リアルタイムワードゲーム, オンラインワードバトル, パーティーゲーム, 対戦ワードゲーム, 速いワードゲーム, ワードパズルマルチプレイヤー, Alias, Kahoot, ファミリーゲームナイト, チームビルディング, 単語対戦, ライブワードゲーム, ワードレース, 語彙ゲーム, 無料オンラインゲーム",
     "ogTitle": "LexiClash - スリル満点のマルチプレイヤーワードゲーム | リアルタイム対戦",
-    "ogDescription": "友達とスリリングなリアルタイムワードバトルで競い合おう！素早く単語を見つけ、相手を出し抜き、ランキング上位を目指せ。パーティーやゲームナイトに最適。4言語対応で無料プレイ！",
+    "ogDescription": "友達とスリリングなリアルタイムワードバトルで競い合おう！素早く単語を見つけ、相手を出し抜き、ランキング上位を目指せ。パーティーやゲームナイトに最適。5言語対応で無料プレイ！",
     "twitterTitle": "LexiClash - スリル満点のマルチプレイヤーワードゲーム | リアルタイム対戦",
-    "twitterDescription": "友達とスリリングなリアルタイムワードバトルで競い合おう！素早く単語を見つけ、相手を出し抜き、ランキング上位を目指せ。パーティーやゲームナイトに最適。4言語対応で無料プレイ！",
+    "twitterDescription": "友達とスリリングなリアルタイムワードバトルで競い合おう！素早く単語を見つけ、相手を出し抜き、ランキング上位を目指せ。パーティーやゲームナイトに最適。5言語対応で無料プレイ！",
     "locale": "ja_JP",
     "language": "Japanese",
     "leaderboard": {
@@ -745,7 +745,16 @@ const ja = {
     "pendingValidation": "検証待ち",
     "longWordsLabel": "${min}文字以上",
     "longWordsOnBoard": "${min}文字以上の単語",
-    "longWordsRemaining": "${min}文字以上の単語が残り"
+    "longWordsRemaining": "${min}文字以上の単語が残り",
+    "letterWords": "文字の単語",
+    "maxTier": "レジェンド！",
+    "tierstarter": "スタート",
+    "tierbronze": "ブロンズ",
+    "tiersilver": "シルバー",
+    "tiergold": "ゴールド",
+    "tierstar": "スター",
+    "tierfire": "オンファイア",
+    "tierlegend": "レジェンド"
   },
   "lateJoiner": {
     "welcomeTitle": "ゲーム進行中！",
@@ -874,6 +883,15 @@ const ja = {
     "foundByOpponents": "対戦相手が発見",
     "foundByOpponentsHint": "対戦相手が先に見つけた単語",
     "foundByOpponentsMotivation": "次回のために覚えておこう！",
+    "topMissed": "覚えるべき単語",
+    "bonusWordsForNextTime": "次回のボーナス単語",
+    "almostPerfect": "惜しい！",
+    "greatJob": "素晴らしい！",
+    "strongGame": "強いプレイ！",
+    "treasureAwaits": "宝が待っている！",
+    "topGems": "トップ:",
+    "more": "もっと",
+    "tapToSeeOnGrid": "タップしてグリッドで確認！",
     "showMoreWords": "さらに{count}個を表示",
     "players": "人",
     "everyoneReady": "全員準備完了！",
@@ -2438,7 +2456,8 @@ const ja = {
     "stepDifficulty": "難易度",
     "stepOf": "ステップ {current} / {total}",
     "stepOptions": "オプション",
-    "stepReview": "確認"
+    "stepReview": "確認",
+    "gameSettings": "ゲーム設定"
   },
   "home": {
     "singlePlayer": "シングルプレイヤー",

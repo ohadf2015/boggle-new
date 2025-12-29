@@ -6,7 +6,7 @@ import { ArrowLeft, ArrowRight, Play, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-export type WizardStep = 1 | 2 | 3 | 4;
+export type WizardStep = 1 | 2 | 3;
 
 interface StepInfo {
   number: WizardStep;
@@ -14,11 +14,11 @@ interface StepInfo {
   icon?: React.ReactNode;
 }
 
+// Simplified to 3 steps: Mode → Settings → Start
 const STEPS: StepInfo[] = [
   { number: 1, labelKey: 'wizard.stepMode' },
-  { number: 2, labelKey: 'wizard.stepDifficulty' },
-  { number: 3, labelKey: 'wizard.stepOptions' },
-  { number: 4, labelKey: 'wizard.stepReview' },
+  { number: 2, labelKey: 'wizard.stepSettings' },
+  { number: 3, labelKey: 'wizard.stepStart' },
 ];
 
 interface ConfigWizardNavProps {
@@ -45,9 +45,9 @@ export const ConfigWizardNav: React.FC<ConfigWizardNavProps> = ({
   };
 
   const handleNext = () => {
-    if (currentStep < 4 && canAdvance) {
+    if (currentStep < 3 && canAdvance) {
       onStepChange((currentStep + 1) as WizardStep);
-    } else if (currentStep === 4 && onStart) {
+    } else if (currentStep === 3 && onStart) {
       onStart();
     }
   };
@@ -120,7 +120,7 @@ export const ConfigWizardNav: React.FC<ConfigWizardNavProps> = ({
       {/* Current Step Label (mobile) */}
       <div className="sm:hidden text-center">
         <span className="text-xs font-bold uppercase text-neo-black/70 dark:text-neo-white/70">
-          {t('wizard.stepOf')?.replace('{current}', String(currentStep)).replace('{total}', '4') || `Step ${currentStep} of 4`}
+          {t('wizard.stepOf')?.replace('{current}', String(currentStep)).replace('{total}', '3') || `Step ${currentStep} of 3`}
         </span>
       </div>
     </div>
@@ -165,7 +165,7 @@ export const WizardNavigationButtons: React.FC<WizardNavigationButtonsProps> = (
       {currentStep === 1 && <div className="flex-1 sm:hidden" />}
 
       {/* Next/Start Button */}
-      {currentStep < 4 ? (
+      {currentStep < 3 ? (
         <Button
           type="button"
           variant="default"

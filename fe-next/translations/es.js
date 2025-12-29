@@ -742,7 +742,16 @@ const es = {
     "pendingValidation": "Validación pendiente",
     "longWordsLabel": "${min}+ letras",
     "longWordsOnBoard": "Palabras de ${min}+ letras",
-    "longWordsRemaining": "${min}+ letras restantes"
+    "longWordsRemaining": "${min}+ letras restantes",
+    "letterWords": "letras palabras",
+    "maxTier": "¡Leyenda!",
+    "tierstarter": "Iniciado",
+    "tierbronze": "Bronce",
+    "tiersilver": "Plata",
+    "tiergold": "Oro",
+    "tierstar": "Estrella",
+    "tierfire": "En Llamas",
+    "tierlegend": "Leyenda"
   },
   "hints": {
     "hint": "Pista",
@@ -872,6 +881,15 @@ const es = {
     "foundByOpponents": "Encontradas por oponentes",
     "foundByOpponentsHint": "Palabras que los oponentes descubrieron primero",
     "foundByOpponentsMotivation": "¡Apréndelas para la próxima!",
+    "topMissed": "Palabras para aprender",
+    "bonusWordsForNextTime": "Palabras extra para la próxima",
+    "almostPerfect": "¡Casi perfecto!",
+    "greatJob": "¡Gran trabajo!",
+    "strongGame": "¡Buen juego!",
+    "treasureAwaits": "¡Te esperan tesoros!",
+    "topGems": "Top:",
+    "more": "más",
+    "tapToSeeOnGrid": "¡Toca las palabras para verlas en el tablero!",
     "showMoreWords": "Mostrar {count} Más",
     "players": "jugadores",
     "everyoneReady": "¡Todos listos!",
@@ -2436,7 +2454,8 @@ const es = {
     "stepDifficulty": "Dificultad",
     "stepOf": "Paso {current} de {total}",
     "stepOptions": "Opciones",
-    "stepReview": "Revisar"
+    "stepReview": "Revisar",
+    "gameSettings": "Configuración del Juego"
   },
   "home": {
     "singlePlayer": "Un Jugador",

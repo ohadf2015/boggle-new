@@ -29,12 +29,10 @@ const Top3Leaderboard = dynamic(() => import('@/components/results/Top3Leaderboa
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
 const ShareWinPrompt = dynamic(() => import('@/components/results/ShareWinPrompt'), { ssr: false });
-const WinStreakDisplay = dynamic(() => import('@/components/results/WinStreakDisplay'), { ssr: false });
 const WordFeedbackModal = dynamic(() => import('@/components/voting/WordFeedbackModal'), { ssr: false });
-const MissedWords = dynamic(() => import('@/components/results/MissedWords'), { ssr: false });
 const PlayersReadyIndicator = dynamic(() => import('@/components/results/PlayersReadyIndicator'), { ssr: false });
+const MissedWords = dynamic(() => import('@/components/results/MissedWords'), { ssr: false });
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
-// AutoRejoinTimer removed - players now actively confirm readiness
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import { Users } from 'lucide-react';
 import { addGameToHistory } from '@/utils/gameHistoryManager';
@@ -771,17 +769,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             />
           )}
 
-          {/* Performance Chart - Shows improvement over recent games */}
+          {/* Performance Chart - Shows improvement over recent games - MORE VISIBLE */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25, duration: 0.3 }}
-            className="mt-2"
+            transition={{ delay: 0.2, duration: 0.3 }}
+            className="mt-4 mb-4"
           >
             <PerformanceChart currentScore={currentPlayerData?.score} gamesLimit={10} />
           </motion.div>
 
-          {/* Missed Words - Educational feedback on high-value words you missed (placed near your card) */}
+          {/* Missed Words - Educational feedback on high-value words you missed */}
           {missedWords.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -863,26 +861,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           </div>
         )}
 
-        {/* Growth Features Section - Appears smoothly on scroll */}
+        {/* Growth Features Section */}
         <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 mt-3 space-y-2">
-          {/* Win Streak Display - Only show when NOT showing victory card (ShareWinPrompt already has streak badge) */}
-          {isCurrentUserWinner && currentStreak > 0 && !(currentPlayerData && gameCode) && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="flex justify-center"
-            >
-              <WinStreakDisplay
-                currentStreak={currentStreak}
-                bestStreak={bestStreak}
-                isNewMilestone={[3, 7, 14, 30].includes(currentStreak)}
-                previousStreak={previousStreak}
-                compact={currentStreak < 3 && !([3, 7, 14, 30].includes(currentStreak))}
-              />
-            </motion.div>
-          )}
+          {/* Removed: WinStreakDisplay - streak info is shown in ShareWinPrompt badge */}
 
           {/* Share Prompt - Compact inline for non-winners, full for winners */}
           {/* Show for winners OR anyone with 30+ score to increase viral reach */}

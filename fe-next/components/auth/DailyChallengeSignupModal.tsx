@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Flame, Trophy, BarChart3, Smartphone, Shield } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
-import confetti from 'canvas-confetti';
+import { fireConfetti } from '@/utils/confettiUtils';
 import { Button as ButtonComponent } from '../ui/button';
 
 // Type assertion for JSX Button component
@@ -123,7 +123,7 @@ const DailyChallengeSignupModal: React.FC<DailyChallengeSignupModalProps> = ({
   useEffect(() => {
     if (isOpen && solved && (trigger === 'topPercentile' || trigger === 'quickSolve')) {
       const timer = setTimeout(() => {
-        confetti({
+        fireConfetti({
           particleCount: 100,
           spread: 70,
           origin: { y: 0.4 },

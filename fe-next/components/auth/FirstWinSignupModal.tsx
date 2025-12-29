@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Trophy, TrendingUp, Medal, Users } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
-import confetti from 'canvas-confetti';
+import { fireConfetti } from '@/utils/confettiUtils';
 import { Button as ButtonComponent } from '../ui/button';
 
 // Type assertion for JSX Button component
@@ -72,7 +72,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({ isOpen, onClo
     if (isOpen && !isMultiGamesVariant) {
       // Delay confetti slightly for better effect
       const timer = setTimeout(() => {
-        confetti({
+        fireConfetti({
           particleCount: 150,
           spread: 100,
           origin: { y: 0.4 },

@@ -400,7 +400,7 @@ export async function GET(request: NextRequest) {
                     justifyContent: 'center',
                   }}
                 >
-                  {['🎮 Multiplayer', '⚡ Real-time', '🌍 4 Languages'].map((feature, i) => (
+                  {['🎮 Multiplayer', '⚡ Real-time', '🌍 5 Languages'].map((feature, i) => (
                     <div
                       key={i}
                       style={{

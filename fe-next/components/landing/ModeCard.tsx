@@ -97,8 +97,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
           'active:shadow-hard-pressed',
           className
         )}
-        whileHover={{ scale: 1.005 }}
-        whileTap={{ scale: 0.99 }}
+        // Removed micro-animations for cleaner UX
       >
         {/* Header with icon and arrow */}
         <div className="flex items-start justify-between mb-2 lg:mb-4">
@@ -153,10 +152,6 @@ const ModeCard: React.FC<ModeCardProps> = ({
             )}
             {liveBadge.totalPlayers > 0 && (
               <span className="inline-flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-1 lg:py-1.5 bg-neo-lime/90 text-neo-black text-xs lg:text-sm font-bold rounded-neo border-2 border-neo-black shadow-hard-sm">
-                <span className="relative flex h-1.5 w-1.5 lg:h-2 lg:w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-black text-neo-white opacity-75" />
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 lg:h-2 lg:w-2 bg-neo-black text-neo-white" />
-                </span>
                 <Users className="w-3 h-3 lg:w-4 lg:h-4" />
                 {liveBadge.totalPlayers} {liveBadge.playersLabel}
               </span>
@@ -164,35 +159,26 @@ const ModeCard: React.FC<ModeCardProps> = ({
           </div>
         )}
 
-        {/* Features as icon row with tooltips */}
+        {/* Features as icon row - simplified without tooltips */}
         <div className="flex gap-1 lg:gap-2">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="relative group/tooltip"
+              className={cn(
+                'w-6 h-6 sm:w-7 sm:h-7 lg:w-10 lg:h-10 xl:w-12 xl:h-12',
+                'rounded-neo border-2 lg:border-3 border-neo-black/30',
+                'flex items-center justify-center',
+                'text-xs sm:text-sm lg:text-base xl:text-lg',
+                styles.badgeBg,
+                styles.badgeText
+              )}
+              title={feature.label}
             >
-              <div
-                className={cn(
-                  'w-6 h-6 sm:w-7 sm:h-7 lg:w-10 lg:h-10 xl:w-12 xl:h-12',
-                  'rounded-neo border-2 lg:border-3 border-neo-black/30',
-                  'flex items-center justify-center',
-                  'text-xs sm:text-sm lg:text-base xl:text-lg',
-                  styles.badgeBg,
-                  styles.badgeText
-                )}
-              >
-                {feature.icon}
-              </div>
-              {/* Tooltip */}
-              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 lg:mb-2 px-1.5 lg:px-2 py-0.5 lg:py-1 text-[10px] lg:text-xs font-medium text-neo-white bg-neo-black rounded whitespace-nowrap opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-10">
-                {feature.label}
-              </span>
+              {feature.icon}
             </div>
           ))}
         </div>
-
-        {/* Decorative element */}
-        <div className="absolute -bottom-6 -right-6 w-24 h-24 rounded-full bg-neo-black/5 blur-2xl" />
+        {/* Removed decorative blur element */}
       </motion.div>
     </Link>
   );

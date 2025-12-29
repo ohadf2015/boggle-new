@@ -6,7 +6,7 @@ import { Flame, Zap, Crown, Gem, Star } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../utils/ThemeContext';
 import { cn } from '../../lib/utils';
-import confetti from 'canvas-confetti';
+import { fireConfetti } from '@/utils/confettiUtils';
 
 interface WinStreakDisplayProps {
   currentStreak: number;
@@ -17,11 +17,11 @@ interface WinStreakDisplayProps {
 }
 
 const STREAK_TIERS = [
-  { min: 1, emoji: '✨', icon: Star, color: 'yellow', name: 'Starting' },
-  { min: 3, emoji: '⚡', icon: Zap, color: 'blue', name: 'Hot' },
-  { min: 7, emoji: '🔥', icon: Flame, color: 'orange', name: 'On Fire' },
-  { min: 14, emoji: '💎', icon: Gem, color: 'purple', name: 'Epic' },
-  { min: 30, emoji: '👑', icon: Crown, color: 'gold', name: 'Legendary' },
+  { min: 1, emoji: '✨', icon: Star, bg: 'bg-neo-yellow', text: 'text-neo-black', bar: 'bg-neo-yellow', name: 'Starting' },
+  { min: 3, emoji: '⚡', icon: Zap, bg: 'bg-neo-cyan', text: 'text-neo-black', bar: 'bg-neo-cyan', name: 'Hot' },
+  { min: 7, emoji: '🔥', icon: Flame, bg: 'bg-neo-orange', text: 'text-neo-black', bar: 'bg-neo-orange', name: 'On Fire' },
+  { min: 14, emoji: '💎', icon: Gem, bg: 'bg-neo-purple', text: 'text-neo-cream', bar: 'bg-neo-purple', name: 'Epic' },
+  { min: 30, emoji: '👑', icon: Crown, bg: 'bg-tier-gold', text: 'text-neo-black', bar: 'bg-tier-gold', name: 'Legendary' },
 ];
 
 const getStreakTier = (streak: number) => {
@@ -70,7 +70,7 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
       setShowMilestone(true);
 
       // Trigger celebration confetti
-      confetti({
+      fireConfetti({
         particleCount: 50,
         spread: 60,
         origin: { y: 0.7 },
@@ -87,61 +87,26 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
 
   const Icon = tier?.icon || Star;
 
-  // Compact inline badge version
+  // Compact inline badge version - neo-brutalist style
   if (compact) {
     return (
       <motion.div
         initial={{ opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
         className={cn(
-          'inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium',
-          isDarkMode
-            ? 'bg-orange-900/30 text-orange-400 border border-orange-500/30'
-            : 'bg-orange-50 text-orange-600 border border-orange-200'
+          'inline-flex items-center gap-2 px-3 py-1.5 rounded-neo-pill',
+          'border-2 border-neo-black shadow-hard-sm',
+          'text-sm font-bold',
+          isDarkMode ? 'bg-neo-orange text-neo-black' : 'bg-neo-orange text-neo-black'
         )}
       >
-        <Icon className="text-base" />
-        <span className="font-bold">{currentStreak}</span>
-        <span className="opacity-75">{t('growth.dayStreak') || 'day streak'}</span>
+        <Icon className="w-4 h-4" />
+        <span className="font-black">{currentStreak}</span>
+        <span className="opacity-80">{t('growth.dayStreak') || 'day streak'}</span>
         {tier && <span>{tier.emoji}</span>}
       </motion.div>
     );
   }
-
-  const colorClasses = {
-    yellow: {
-      bg: isDarkMode ? 'bg-yellow-900/30' : 'bg-yellow-50',
-      border: 'border-yellow-500/40',
-      text: isDarkMode ? 'text-yellow-400' : 'text-yellow-600',
-      glow: 'shadow-yellow-500/20',
-    },
-    blue: {
-      bg: isDarkMode ? 'bg-blue-900/30' : 'bg-blue-50',
-      border: 'border-blue-500/40',
-      text: isDarkMode ? 'text-blue-400' : 'text-blue-600',
-      glow: 'shadow-blue-500/20',
-    },
-    orange: {
-      bg: isDarkMode ? 'bg-orange-900/30' : 'bg-orange-50',
-      border: 'border-orange-500/40',
-      text: isDarkMode ? 'text-orange-400' : 'text-orange-600',
-      glow: 'shadow-orange-500/30',
-    },
-    purple: {
-      bg: isDarkMode ? 'bg-purple-900/30' : 'bg-purple-50',
-      border: 'border-purple-500/40',
-      text: isDarkMode ? 'text-purple-400' : 'text-purple-600',
-      glow: 'shadow-purple-500/30',
-    },
-    gold: {
-      bg: isDarkMode ? 'bg-amber-900/30' : 'bg-amber-50',
-      border: 'border-amber-500/40',
-      text: isDarkMode ? 'text-amber-400' : 'text-amber-600',
-      glow: 'shadow-amber-500/30',
-    },
-  };
-
-  const colors = colorClasses[tier?.color as keyof typeof colorClasses] || colorClasses.yellow;
 
   return (
     <motion.div
@@ -149,36 +114,27 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{ type: 'spring', damping: 15, stiffness: 200 }}
       className={cn(
-        'relative p-4 rounded-xl border-2 overflow-hidden texture-halftone-comic-light',
-        colors.bg,
-        colors.border,
-        showMilestone && `shadow-lg ${colors.glow}`
+        'relative p-4 rounded-neo-lg border-3 border-neo-black overflow-hidden',
+        'shadow-hard texture-halftone-comic-light',
+        isDarkMode ? 'bg-slate-800' : 'bg-neo-cream'
       )}
     >
-      {/* Comic-style halftone dots */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.03]"
-        style={{
-          backgroundImage: `radial-gradient(circle, ${isDarkMode ? 'rgba(255,255,255,0.3)' : 'rgb(var(--neo-black))'} 1px, transparent 1px)`,
-          backgroundSize: '12px 12px',
-        }}
-      />
-      {/* Background glow for milestones */}
+      {/* Background pulse for milestones */}
       <AnimatePresence>
         {showMilestone && (
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            animate={{ opacity: 0.15 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse pointer-events-none"
+            className={cn('absolute inset-0 pointer-events-none', tier?.bg)}
           />
         )}
       </AnimatePresence>
 
-      <div className="flex items-center justify-between gap-4">
+      <div className="relative z-10 flex items-center justify-between gap-4">
         {/* Streak info */}
         <div className="flex items-center gap-3">
-          {/* Animated icon */}
+          {/* Animated icon with neo-brutalist badge */}
           <motion.div
             animate={
               showMilestone
@@ -190,25 +146,39 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
               repeat: showMilestone ? 2 : Infinity,
               repeatDelay: showMilestone ? 0 : 1,
             }}
+            className={cn(
+              'p-2 rounded-neo border-2 border-neo-black shadow-hard-sm',
+              tier?.bg || 'bg-neo-yellow'
+            )}
           >
-            <Icon className={cn('text-3xl', colors.text)} />
+            <Icon className={cn('w-6 h-6', tier?.text || 'text-neo-black')} />
           </motion.div>
 
           <div>
             <div className="flex items-center gap-2">
-              <span className={cn('text-2xl font-black', colors.text)}>
+              <span className={cn(
+                'text-2xl font-black',
+                isDarkMode ? 'text-neo-white' : 'text-neo-black'
+              )}>
                 {currentStreak}
               </span>
-              <span className={cn('text-sm font-medium', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
+              <span className={cn(
+                'text-sm font-medium',
+                isDarkMode ? 'text-gray-300' : 'text-neo-black/70'
+              )}>
                 {t('growth.dayStreak') || 'day streak'}
               </span>
             </div>
 
             {tier && (
-              <div className={cn('text-xs font-medium', colors.text)}>
-                {tier.emoji} {tier.name}
+              <div className={cn(
+                'text-xs font-bold flex items-center gap-1',
+                isDarkMode ? 'text-gray-300' : 'text-neo-black/80'
+              )}>
+                <span>{tier.emoji}</span>
+                <span className="uppercase tracking-wide">{tier.name}</span>
                 {isNewBest && (
-                  <span className="ml-2 px-1.5 py-0.5 bg-yellow-400 text-yellow-900 rounded text-[10px] uppercase font-bold">
+                  <span className="ml-1 px-1.5 py-0.5 bg-neo-yellow text-neo-black border border-neo-black rounded-neo text-[10px] uppercase font-black">
                     {t('growth.newBest') || 'New Best!'}
                   </span>
                 )}
@@ -220,12 +190,18 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
         {/* Progress to next tier */}
         {nextTier && (
           <div className="text-right">
-            <div className={cn('text-xs', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
+            <div className={cn(
+              'text-xs font-medium',
+              isDarkMode ? 'text-gray-400' : 'text-neo-black/60'
+            )}>
               {t('growth.nextTier') || 'Next tier'}
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center justify-end gap-1.5">
               <span className="text-lg">{nextTier.emoji}</span>
-              <span className={cn('text-sm font-medium', isDarkMode ? 'text-gray-200' : 'text-gray-700')}>
+              <span className={cn(
+                'text-sm font-bold',
+                isDarkMode ? 'text-gray-200' : 'text-neo-black'
+              )}>
                 {nextTier.min - currentStreak} {t('growth.winsAway') || 'wins away'}
               </span>
             </div>
@@ -233,46 +209,49 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
         )}
       </div>
 
-      {/* Progress bar to next tier */}
+      {/* Neo-brutalist progress bar */}
       {nextTier && tier && (
-        <div className="mt-3">
-          <div className={cn('h-1.5 rounded-full overflow-hidden', isDarkMode ? 'bg-gray-700' : 'bg-gray-200')}>
+        <div className="relative z-10 mt-3">
+          <div className={cn(
+            'h-3 rounded-neo-pill border-2 border-neo-black overflow-hidden',
+            isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+          )}>
             <motion.div
               initial={{ width: 0 }}
               animate={{
                 width: `${((currentStreak - tier.min) / (nextTier.min - tier.min)) * 100}%`,
               }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
-              className={cn('h-full rounded-full', {
-                'bg-yellow-500': tier.color === 'yellow',
-                'bg-blue-500': tier.color === 'blue',
-                'bg-orange-500': tier.color === 'orange',
-                'bg-purple-500': tier.color === 'purple',
-                'bg-amber-500': tier.color === 'gold',
-              })}
+              className={cn('h-full', tier.bar)}
             />
           </div>
         </div>
       )}
 
-      {/* Milestone celebration overlay */}
+      {/* Milestone celebration overlay - neo-brutalist */}
       <AnimatePresence>
         {showMilestone && (tierChanged || isNewBest) && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm rounded-xl"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className={cn(
+              'absolute inset-0 flex items-center justify-center rounded-neo-lg z-20',
+              'bg-neo-navy/95'
+            )}
           >
             <div className="text-center">
               <motion.div
-                animate={{ scale: [0.8, 1.2, 1] }}
+                animate={{ scale: [0.8, 1.2, 1], rotate: [0, -5, 5, 0] }}
                 transition={{ duration: 0.4 }}
-                className="text-4xl mb-2"
+                className={cn(
+                  'inline-block text-4xl mb-2 p-3 rounded-neo-lg border-3 border-neo-black shadow-hard',
+                  isNewBest ? 'bg-neo-yellow' : tier?.bg
+                )}
               >
                 {isNewBest ? '🏆' : tier?.emoji}
               </motion.div>
-              <div className="text-white font-bold text-lg">
+              <div className="text-neo-white font-black text-lg uppercase tracking-wide">
                 {isNewBest
                   ? t('growth.newPersonalBest') || 'New Personal Best!'
                   : `${tier?.name} ${t('growth.streakUnlocked') || 'Streak Unlocked!'}`}
