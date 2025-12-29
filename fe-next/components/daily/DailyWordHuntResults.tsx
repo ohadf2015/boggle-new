@@ -142,6 +142,13 @@ const TryAnotherLanguage: React.FC<{ currentLanguage: Language }> = ({ currentLa
 /**
  * DailyWordHuntResults - Results screen for Word Hunt with Wordle-style sharing
  */
+// Confetti colors for each rank (matching Top3Leaderboard)
+const RANK_CONFETTI_COLORS: Record<number, string[]> = {
+  1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'], // Gold
+  2: ['#c0c0c0', '#94a3b8', '#e2e8f0', '#cbd5e1'], // Silver
+  3: ['#cd7f32', '#ea580c', '#f97316', '#fb923c'], // Bronze/Orange
+};
+
 const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   result,
   puzzleNumber,
@@ -255,6 +262,19 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           const avatarColor = isAuthenticated && profile
             ? profile.avatar_color
             : guestPlayer?.avatarColor || '#6366f1';
+
+          // Fetch country code from geolocation API (works for all languages)
+          let countryCode: string | null = null;
+          try {
+            const geoResponse = await fetch('/api/geolocation');
+            if (geoResponse.ok) {
+              const geoData = await geoResponse.json();
+              countryCode = geoData.countryCode || null;
+            }
+          } catch (geoError) {
+            console.warn('Failed to fetch country code:', geoError);
+            // Continue without country code - it's optional
+          }
 
           const bodyData: Record<string, unknown> = {
             puzzleDate,
@@ -377,13 +397,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     }
   }, [isNewCompletion, result.solved, result.attemptsUsed]);
 
-  // Confetti colors for each rank (matching Top3Leaderboard)
-  const RANK_CONFETTI_COLORS: Record<number, string[]> = {
-    1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'], // Gold
-    2: ['#c0c0c0', '#94a3b8', '#e2e8f0', '#cbd5e1'], // Silver
-    3: ['#cd7f32', '#ea580c', '#f97316', '#fb923c'], // Bronze/Orange
-  };
-
   // Fire confetti burst for a specific rank (top 3 celebration)
   const fireRankConfettiLocal = useCallback((rank: number): void => {
     const count = Math.floor(100 * (1.2 - rank * 0.15)); // 1st = 100, 2nd = 85, 3rd = 70
@@ -424,7 +437,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [isNewCompletion, stats?.yourStats?.solved, stats?.yourStats?.rank, fireRankConfettiLocal]);
+  }, [isNewCompletion, stats?.yourStats, fireRankConfettiLocal]);
 
   // Show streak milestone celebration for new completions
   useEffect(() => {
