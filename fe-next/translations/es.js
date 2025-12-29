@@ -2242,6 +2242,7 @@ const es = {
     "playerSingular": "jugador",
     "playersPlural": "jugadores",
     "yourRank": "Tu posición",
+    "yourPosition": "Tu puesto",
     "showMore": "Mostrar más",
     "showLess": "Mostrar menos",
     "more": "más",

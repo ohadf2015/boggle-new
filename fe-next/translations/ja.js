@@ -2244,6 +2244,7 @@ const ja = {
     "playerSingular": "プレイヤー",
     "playersPlural": "プレイヤー",
     "yourRank": "あなたの順位",
+    "yourPosition": "あなたの順位",
     "showMore": "もっと見る",
     "showLess": "閉じる",
     "more": "人",

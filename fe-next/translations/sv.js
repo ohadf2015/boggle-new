@@ -2245,6 +2245,7 @@ const sv = {
     "playerSingular": "spelare",
     "playersPlural": "spelare",
     "yourRank": "Din placering",
+    "yourPosition": "Din position",
     "showMore": "Visa mer",
     "showLess": "Visa mindre",
     "more": "mer",

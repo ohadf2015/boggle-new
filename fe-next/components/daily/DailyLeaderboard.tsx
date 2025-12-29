@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Trophy, Clock, ChevronDown, ChevronUp, Sparkles, Share2, Check, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getRankDisplay, getRankBgColor } from '@/utils/rankingStyles';
+import { getRankDisplay } from '@/utils/rankingStyles';
 import { getPuzzleNumber } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 
@@ -33,6 +33,7 @@ export interface DailyParticipant {
   display_name: string;
   avatar_emoji: string;
   avatar_color: string;
+  country_code?: string | null;
   score: number;
   word_count: number;
   time_seconds: number;
@@ -42,6 +43,16 @@ export interface DailyParticipant {
   solved?: boolean;
   attempts_used?: number;
   efficiency_score?: number;
+}
+
+// Country code to flag emoji converter
+function getCountryFlag(countryCode: string | null | undefined): string {
+  if (!countryCode || countryCode.length !== 2) return '';
+  const codePoints = countryCode
+    .toUpperCase()
+    .split('')
+    .map(char => 127397 + char.charCodeAt(0));
+  return String.fromCodePoint(...codePoints);
 }
 
 interface DailyLeaderboardProps {
@@ -72,9 +83,35 @@ const ParticipantRow = memo<{
 }>(({ participant, index, isCurrentUser, compact, gameType, t }) => {
   const rank = participant.rank_position;
   const isTopThree = rank <= 3;
+  const countryFlag = getCountryFlag(participant.country_code);
 
   // Format time since completion
   const timeAgo = formatDistanceToNow(participant.completed_at, t);
+
+  // Enhanced rank colors for better contrast
+  const getRankColors = () => {
+    if (isCurrentUser) {
+      return 'bg-gradient-to-r from-neo-cyan/40 to-neo-cyan/20 border-neo-cyan shadow-[0_0_12px_rgba(0,255,255,0.3)] ring-2 ring-neo-cyan/60';
+    }
+    if (rank === 1) {
+      return 'bg-gradient-to-r from-amber-100 to-yellow-50 dark:from-amber-900/40 dark:to-yellow-900/20 border-amber-400 dark:border-amber-500';
+    }
+    if (rank === 2) {
+      return 'bg-gradient-to-r from-slate-100 to-gray-50 dark:from-slate-700/60 dark:to-slate-800/40 border-slate-400 dark:border-slate-400';
+    }
+    if (rank === 3) {
+      return 'bg-gradient-to-r from-orange-100 to-amber-50 dark:from-orange-900/40 dark:to-amber-900/20 border-orange-400 dark:border-orange-500';
+    }
+    return 'bg-white/90 dark:bg-slate-800/90 border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500';
+  };
+
+  // Rank badge colors
+  const getRankBadgeColors = () => {
+    if (rank === 1) return 'bg-gradient-to-br from-amber-400 to-yellow-500 text-amber-900 border-amber-600';
+    if (rank === 2) return 'bg-gradient-to-br from-slate-300 to-gray-400 text-slate-800 border-slate-500';
+    if (rank === 3) return 'bg-gradient-to-br from-orange-400 to-amber-500 text-orange-900 border-orange-600';
+    return 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-500';
+  };
 
   return (
     <motion.div
@@ -82,67 +119,72 @@ const ParticipantRow = memo<{
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
       className={`
-        flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-neo border-2 sm:border-3 transition-all
-        ${isCurrentUser
-          ? 'bg-neo-cyan/30 border-neo-cyan shadow-hard-sm ring-2 ring-neo-cyan/50'
-          : isTopThree
-            ? getRankBgColor(rank, false)
-            : 'bg-white/80 dark:bg-slate-700/80 border-neo-black/20 dark:border-slate-500'
-        }
-        ${compact ? 'py-1.5' : ''}
+        flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 transition-all duration-200
+        ${getRankColors()}
+        ${compact ? 'py-2' : ''}
+        ${isCurrentUser ? 'scale-[1.02]' : 'hover:scale-[1.01]'}
       `}
     >
-      {/* Rank */}
+      {/* Rank Badge */}
       <div
         className={`
-          w-8 h-8 sm:w-10 sm:h-10 rounded-neo flex items-center justify-center font-black text-sm sm:text-base
-          ${isTopThree
-            ? 'bg-neo-black text-white'
-            : 'bg-gray-200 dark:bg-slate-600 text-gray-700 dark:text-gray-200'
-          }
-          border-2 border-neo-black dark:border-slate-500
+          w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center font-black text-sm sm:text-base
+          ${getRankBadgeColors()}
+          border-2 shadow-sm
         `}
       >
         {getRankDisplay(rank)}
       </div>
 
-      {/* Avatar */}
-      <div
-        className="w-8 h-8 sm:w-10 sm:h-10 rounded-neo flex items-center justify-center text-lg sm:text-xl border-2 border-neo-black"
-        style={{ backgroundColor: participant.avatar_color || '#FFE135' }}
-      >
-        {participant.avatar_emoji || '🎯'}
+      {/* Avatar with Country Flag */}
+      <div className="relative">
+        <div
+          className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-lg sm:text-xl border-2 border-neo-black/80 shadow-sm"
+          style={{ backgroundColor: participant.avatar_color || '#FFE135' }}
+        >
+          {participant.avatar_emoji || '🎯'}
+        </div>
+        {/* Country Flag Badge */}
+        {countryFlag && (
+          <div className="absolute -bottom-1 -right-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>
+            {countryFlag}
+          </div>
+        )}
       </div>
 
       {/* Name & Score */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
-          <span className={`font-bold truncate text-sm sm:text-base text-neo-black dark:text-white ${isCurrentUser ? 'text-neo-cyan dark:text-neo-cyan' : ''}`}>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className={`font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan dark:text-neo-cyan' : 'text-slate-800 dark:text-white'}`}>
             {participant.display_name || 'Player'}
           </span>
           {isCurrentUser && (
-            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-1.5 py-0.5 rounded font-bold shrink-0">
+            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-sm animate-pulse">
               YOU
             </span>
           )}
           {rank === 1 && (
-            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-neo-yellow shrink-0" />
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0 animate-pulse" />
           )}
         </div>
-        <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-200 flex items-center gap-2">
+        <div className="text-xs sm:text-sm flex items-center gap-2 mt-0.5">
           {gameType === 'wordHunt' ? (
             <>
-              <span className={`font-bold ${participant.solved ? 'text-green-600 dark:text-green-400' : 'text-gray-500'}`}>
+              <span className={`font-bold ${participant.solved ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
                 {participant.solved ? `✓ ${t('wordHunt.leaderboard.solved')}` : `✗ ${t('wordHunt.leaderboard.failed')}`}
               </span>
-              <span className="text-gray-500 dark:text-gray-400">|</span>
-              <span>{participant.attempts_used}/10 {t('wordHunt.leaderboard.attempts')}</span>
+              {participant.solved && (
+                <>
+                  <span className="text-slate-400 dark:text-slate-500">•</span>
+                  <span className="text-slate-600 dark:text-slate-300 font-medium">{participant.attempts_used} {t('wordHunt.leaderboard.attempts')}</span>
+                </>
+              )}
             </>
           ) : (
             <>
-              <span className="font-bold">{participant.score} {t('wordHunt.leaderboard.pts')}</span>
-              <span className="text-gray-500 dark:text-gray-400">|</span>
-              <span>{participant.word_count} {t('wordHunt.leaderboard.words')}</span>
+              <span className="font-bold text-indigo-600 dark:text-indigo-400">{participant.score} {t('wordHunt.leaderboard.pts')}</span>
+              <span className="text-slate-400 dark:text-slate-500">•</span>
+              <span className="text-slate-600 dark:text-slate-300 font-medium">{participant.word_count} {t('wordHunt.leaderboard.words')}</span>
             </>
           )}
         </div>
@@ -150,8 +192,8 @@ const ParticipantRow = memo<{
 
       {/* Time */}
       {!compact && (
-        <div className="hidden sm:flex items-center gap-1 text-xs text-gray-600 dark:text-gray-300">
-          <Clock className="w-3 h-3" />
+        <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-100/50 dark:bg-slate-700/50 px-2 py-1 rounded-lg">
+          <Clock className="w-3.5 h-3.5" />
           <span>{timeAgo}</span>
         </div>
       )}
@@ -304,22 +346,23 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         className={`
-          bg-white/90 dark:bg-neo-navy-light/90 rounded-neo border-3 border-neo-black dark:border-white/20
+          bg-gradient-to-br from-white/95 to-slate-50/95 dark:from-slate-800/95 dark:to-slate-900/95
+          rounded-2xl border-2 border-slate-200 dark:border-slate-700
           ${compact ? 'p-3' : 'p-4 sm:p-5'}
-          shadow-hard-sm
+          shadow-lg backdrop-blur-sm
         `}
       >
-        <div className="flex items-center gap-2 mb-4">
-          <div className="p-1.5 sm:p-2 bg-neo-purple text-white rounded-neo border-2 border-neo-black">
-            <Users className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 sm:p-2.5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl border-2 border-indigo-600 shadow-md">
+            <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
-          <h3 className="font-black text-sm sm:text-base uppercase tracking-wide text-slate-800">
+          <h3 className="font-black text-base sm:text-lg uppercase tracking-wide text-slate-800 dark:text-white">
             {t('daily.todaysPlayers')}
           </h3>
         </div>
-        <div className="text-center py-6">
-          <div className="text-3xl mb-2">🏆</div>
-          <p className="text-slate-700 font-bold text-sm sm:text-base">
+        <div className="text-center py-8">
+          <div className="text-4xl mb-3">🏆</div>
+          <p className="text-slate-700 dark:text-slate-300 font-bold text-sm sm:text-base">
             {t('daily.beFirstToPlay')}
           </p>
         </div>
@@ -332,58 +375,97 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className={`
-        bg-white/90 dark:bg-neo-navy-light/90 rounded-neo border-3 border-neo-black dark:border-white/20
+        bg-gradient-to-br from-white/95 to-slate-50/95 dark:from-slate-800/95 dark:to-slate-900/95
+        rounded-2xl border-2 border-slate-200 dark:border-slate-700
         ${compact ? 'p-3' : 'p-4 sm:p-5'}
-        shadow-hard-sm
+        shadow-lg backdrop-blur-sm
       `}
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-3 sm:mb-4">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 sm:p-2 bg-neo-purple text-white rounded-neo border-2 border-neo-black">
-            <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-neo-yellow" />
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 sm:p-2.5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl border-2 border-indigo-600 shadow-md">
+            <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-amber-300" />
           </div>
           <div>
-            <h3 className="font-black text-sm sm:text-base uppercase tracking-wide text-neo-black dark:text-white">
+            <h3 className="font-black text-base sm:text-lg uppercase tracking-wide text-slate-800 dark:text-white">
               {t('daily.todaysPlayers')}
             </h3>
-            <p className="text-xs text-gray-700 dark:text-gray-300">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
               {totalCount} {totalCount === 1 ? t('daily.playerSingular') : t('daily.playersPlural')}
             </p>
           </div>
         </div>
 
-        {/* Current user's rank badge and share button */}
+        {/* Share Rank Button */}
         {currentUserData && (
-          <div className="flex items-center gap-2">
-            {currentUserIndex >= maxVisible && !expanded && (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="flex items-center gap-1.5 px-2 py-1 bg-neo-cyan/20 border-2 border-neo-cyan rounded-neo"
-              >
-                <span className="text-xs font-bold text-neo-cyan">
-                  {t('daily.yourRank')}: #{currentUserIndex + 1}
-                </span>
-              </motion.div>
+          <Button
+            onClick={handleShareRank}
+            size="sm"
+            className="px-3 py-1 h-8 bg-neo-purple hover:bg-neo-purple/90 text-white border-2 border-neo-black rounded-xl shadow-sm hover:-translate-y-0.5 transition-all"
+            aria-label="Share your rank"
+          >
+            {copied ? (
+              <Check className="w-3.5 h-3.5" />
+            ) : (
+              <Share2 className="w-3.5 h-3.5" />
             )}
-
-            {/* Share Rank Button */}
-            <Button
-              onClick={handleShareRank}
-              size="sm"
-              className="px-2 py-1 h-8 bg-neo-purple hover:bg-neo-purple/90 text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
-              aria-label="Share your rank"
-            >
-              {copied ? (
-                <Check className="w-3 h-3" />
-              ) : (
-                <Share2 className="w-3 h-3" />
-              )}
-            </Button>
-          </div>
+          </Button>
         )}
       </div>
+
+      {/* Current User Position Card - Shows when user is not in visible list */}
+      {currentUserData && currentUserIndex >= maxVisible && !expanded && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-3 p-3 rounded-xl bg-gradient-to-r from-neo-cyan/30 to-neo-cyan/10 border-2 border-neo-cyan shadow-[0_0_15px_rgba(0,255,255,0.2)]"
+        >
+          <div className="flex items-center gap-3">
+            {/* Your Rank Badge */}
+            <div className="w-12 h-12 rounded-xl bg-neo-cyan/30 border-2 border-neo-cyan flex items-center justify-center">
+              <span className="font-black text-lg text-neo-cyan">#{currentUserData.rank_position}</span>
+            </div>
+
+            {/* Your Info */}
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-neo-cyan uppercase tracking-wider">{t('daily.yourPosition')}</span>
+                <span className="text-[10px] bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black animate-pulse">
+                  YOU
+                </span>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <div
+                  className="w-6 h-6 rounded-lg flex items-center justify-center text-sm border border-neo-black/50"
+                  style={{ backgroundColor: currentUserData.avatar_color || '#FFE135' }}
+                >
+                  {currentUserData.avatar_emoji || '🎯'}
+                </div>
+                <span className="font-bold text-slate-800 dark:text-white text-sm truncate">
+                  {currentUserData.display_name || 'Player'}
+                </span>
+                {currentUserData.country_code && (
+                  <span className="text-sm">{getCountryFlag(currentUserData.country_code)}</span>
+                )}
+              </div>
+            </div>
+
+            {/* Score/Status */}
+            <div className="text-right">
+              {gameType === 'wordHunt' ? (
+                <div className={`font-bold text-sm ${currentUserData.solved ? 'text-emerald-600' : 'text-rose-500'}`}>
+                  {currentUserData.solved ? '✓ Solved' : '✗ Failed'}
+                </div>
+              ) : (
+                <div className="font-bold text-sm text-indigo-600 dark:text-indigo-400">
+                  {currentUserData.score} pts
+                </div>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      )}
 
       {/* Loading state */}
       {loading && participants.length === 0 && (
@@ -428,7 +510,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               onClick={() => setExpanded(!expanded)}
-              className="w-full py-2 text-sm font-bold text-neo-purple hover:text-neo-purple/80 flex items-center justify-center gap-1 transition-colors"
+              className="w-full mt-2 py-2.5 text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center justify-center gap-1.5 transition-colors rounded-xl bg-indigo-50/50 dark:bg-indigo-900/20 hover:bg-indigo-100/70 dark:hover:bg-indigo-900/30 border border-indigo-200/50 dark:border-indigo-700/30"
             >
               {expanded ? (
                 <>

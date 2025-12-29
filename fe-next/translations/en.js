@@ -2251,6 +2251,7 @@ const en = {
     "playerSingular": "player",
     "playersPlural": "players",
     "yourRank": "Your rank",
+    "yourPosition": "Your Position",
     "showMore": "Show more",
     "showLess": "Show less",
     "more": "more",

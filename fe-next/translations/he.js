@@ -2246,6 +2246,7 @@ const he = {
     "playerSingular": "שחקן",
     "playersPlural": "שחקנים",
     "yourRank": "הדירוג שלך",
+    "yourPosition": "המיקום שלך",
     "showMore": "הצג עוד",
     "showLess": "הצג פחות",
     "more": "עוד",

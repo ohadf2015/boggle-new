@@ -54,6 +54,7 @@ interface SubmitRequest extends Request {
     displayName?: string;
     avatarEmoji?: string;
     avatarColor?: string;
+    countryCode?: string;
     score?: number;
     wordCount?: number;
     wordsByLength?: Record<string, number>;
@@ -103,6 +104,7 @@ interface AttemptInsertData {
   display_name: string;
   avatar_emoji: string;
   avatar_color: string;
+  country_code?: string;
   player_id?: string;
   guest_fingerprint?: string;
 }
@@ -265,6 +267,7 @@ router.post('/submit', async (req: SubmitRequest, res: Response): Promise<void> 
       displayName,
       avatarEmoji,
       avatarColor,
+      countryCode,
       score,
       wordCount,
       wordsByLength,
@@ -321,7 +324,8 @@ router.post('/submit', async (req: SubmitRequest, res: Response): Promise<void> 
       completed_at: new Date().toISOString(),
       display_name: displayName || 'Anonymous',
       avatar_emoji: avatarEmoji || '🎯',
-      avatar_color: avatarColor || '#6366f1'
+      avatar_color: avatarColor || '#6366f1',
+      country_code: countryCode || undefined
     };
 
     if (playerId) {
@@ -424,6 +428,7 @@ interface WordHuntSubmitRequest extends Request {
     displayName?: string;
     avatarEmoji?: string;
     avatarColor?: string;
+    countryCode?: string;
     solved?: boolean;
     attemptsUsed?: number;
     targetWord?: string;
@@ -496,6 +501,7 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
       displayName,
       avatarEmoji,
       avatarColor,
+      countryCode,
       solved,
       attemptsUsed,
       targetWord,
@@ -600,7 +606,8 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
       completed_at: new Date().toISOString(),
       display_name: displayName || 'Anonymous',
       avatar_emoji: avatarEmoji || '🎯',
-      avatar_color: avatarColor || '#6366f1'
+      avatar_color: avatarColor || '#6366f1',
+      country_code: countryCode || undefined
     };
 
     // Add survival mode fields if present
