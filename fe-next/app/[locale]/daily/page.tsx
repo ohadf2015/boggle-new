@@ -7,7 +7,7 @@ type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 interface PageParams {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ share?: string }>;
+  searchParams: Promise<{ share?: string; wh?: string }>;
 }
 
 // Dynamic import for code splitting (client component)
@@ -31,14 +31,98 @@ export const dynamic = 'force-dynamic';
 /**
  * Generate metadata - supports dynamic OG images for shared leaderboard positions
  */
+// Localized performance messages for Word Hunt OG titles
+const WH_MESSAGES: Record<string, { perfect: string; great: string; good: string; close: string; barely: string; failed: string }> = {
+  en: { perfect: 'Word Wizard!', great: 'Crushed it!', good: 'I survived!', close: 'That was close!', barely: 'Phew! Made it!', failed: 'This one got me...' },
+  he: { perfect: 'אלוף המילים!', great: 'מחצתי את זה!', good: 'שרדתי!', close: 'זה היה צמוד!', barely: 'פיו! הצלחתי!', failed: 'הפעם נכשלתי...' },
+  sv: { perfect: 'Ordmästare!', great: 'Krossade det!', good: 'Jag överlevde!', close: 'Det var nära!', barely: 'Puh! Klarade det!', failed: 'Den fick mig...' },
+  ja: { perfect: '言葉の達人!', great: '完璧!', good: '生き残った!', close: 'ギリギリ!', barely: 'ふぅ!セーフ!', failed: 'やられた...' },
+  es: { perfect: 'Mago de palabras!', great: 'Lo aplasté!', good: 'Sobreviví!', close: 'Estuvo cerca!', barely: 'Uf! Lo logré!', failed: 'Esta me ganó...' },
+};
+
+function getWhPerformanceMessage(solved: boolean, attempts: number, locale: string): string {
+  const msgs = WH_MESSAGES[locale] || WH_MESSAGES.en;
+  if (!solved) return msgs.failed;
+  if (attempts <= 2) return msgs.perfect;
+  if (attempts <= 4) return msgs.great;
+  if (attempts <= 6) return msgs.good;
+  if (attempts <= 8) return msgs.close;
+  return msgs.barely;
+}
+
 export async function generateMetadata({ params, searchParams }: PageParams): Promise<Metadata> {
   const { locale } = await params;
-  const { share } = await searchParams;
+  const { share, wh } = await searchParams;
   const validLocale = (locale as Locale) || 'en';
   const seo = translations[validLocale]?.seo?.daily || translations.en.seo.daily;
 
   const localePath = `/${locale}`;
   const baseUrl = 'https://www.lexiclash.live';
+
+  // Check if this is a Word Hunt share
+  if (wh) {
+    try {
+      const whParams = new URLSearchParams(wh);
+      const solved = whParams.get('solved') === 'true';
+      const attempts = parseInt(whParams.get('attempts') || '0');
+      const streak = parseInt(whParams.get('streak') || '0');
+      const puzzleNumber = whParams.get('puzzleNumber');
+      const displayName = whParams.get('displayName') || 'Player';
+      const avatarEmoji = whParams.get('avatarEmoji') || '🎯';
+      const emojiGrid = whParams.get('emojiGrid') || '';
+
+      if (puzzleNumber) {
+        // Build OG image URL with all params
+        const ogParams = new URLSearchParams({
+          solved: String(solved),
+          attempts: String(attempts),
+          streak: String(streak),
+          puzzleNumber,
+          displayName,
+          avatarEmoji,
+          locale: validLocale,
+          ...(emojiGrid && { emojiGrid }),
+        });
+        const ogImageUrl = `${baseUrl}/api/og/word-hunt?${ogParams.toString()}`;
+
+        const performanceMsg = getWhPerformanceMessage(solved, attempts, validLocale);
+        const attemptText = solved ? `${attempts}/10` : 'X/10';
+        const streakText = streak > 1 ? ` | 🔥 ${streak} day streak` : '';
+
+        const title = `${displayName}: ${performanceMsg} Word Hunt #${puzzleNumber}`;
+        const description = `${attemptText}${streakText} - Can you beat this?`;
+
+        return {
+          title,
+          description,
+          openGraph: {
+            type: 'website',
+            url: `${baseUrl}${localePath}/daily`,
+            title,
+            description,
+            siteName: 'LexiClash',
+            images: [
+              {
+                url: ogImageUrl,
+                width: 1200,
+                height: 630,
+                alt: `${displayName} - Word Hunt #${puzzleNumber}`,
+              },
+            ],
+          },
+          twitter: {
+            card: 'summary_large_image',
+            title,
+            description,
+            images: [ogImageUrl],
+          },
+        };
+      }
+    } catch (error) {
+      console.error('Error parsing Word Hunt share params:', error);
+      // Fall through to default metadata
+    }
+  }
 
   // Check if this is a shared leaderboard position
   if (share) {

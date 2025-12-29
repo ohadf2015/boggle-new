@@ -447,30 +447,93 @@ router.get('/stats', async (_req: AdminRequest, res: Response): Promise<void> =>
 
 /**
  * GET /api/admin/players/countries
- * Get player distribution by country
+ * Get player distribution by country (includes both authenticated and guest players)
  */
 router.get('/players/countries', async (_req: AdminRequest, res: Response): Promise<void> => {
   try {
     const supabase = getSupabase();
-    const { data, error } = await supabase
+
+    // Get authenticated user countries from profiles
+    const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('country_code')
       .not('country_code', 'is', null);
 
-    if (error) throw error;
+    if (profileError) throw profileError;
 
-    const countryCounts: Record<string, number> = {};
-    data?.forEach((p: { country_code?: string }) => {
+    const registeredCounts: Record<string, number> = {};
+    profileData?.forEach((p: { country_code?: string }) => {
       const country = p.country_code || 'Unknown';
-      countryCounts[country] = (countryCounts[country] || 0) + 1;
+      registeredCounts[country] = (registeredCounts[country] || 0) + 1;
     });
 
-    // Sort by count descending
-    const sorted: CountryData[] = Object.entries(countryCounts)
-      .sort((a, b) => b[1] - a[1])
-      .map(([country, count]) => ({ country, count }));
+    // Get guest countries from game_sessions (unique guest sessions per country)
+    const guestCounts: Record<string, number> = {};
+    try {
+      const { data: guestData } = await supabase
+        .from('game_sessions')
+        .select('guest_session_id, country')
+        .is('user_id', null)
+        .not('guest_session_id', 'is', null)
+        .not('country', 'is', null);
 
-    res.json({ countries: sorted });
+      // Count unique guest sessions per country
+      const guestsByCountry: Record<string, Set<string>> = {};
+      guestData?.forEach((s: { guest_session_id: string; country: string }) => {
+        if (s.country && s.guest_session_id) {
+          if (!guestsByCountry[s.country]) {
+            guestsByCountry[s.country] = new Set();
+          }
+          guestsByCountry[s.country].add(s.guest_session_id);
+        }
+      });
+
+      Object.entries(guestsByCountry).forEach(([country, sessions]) => {
+        guestCounts[country] = sessions.size;
+      });
+    } catch {
+      // game_sessions might not have country data yet, skip
+      logger.debug('ADMIN_API', 'Guest country data unavailable');
+    }
+
+    // Combine counts
+    const combinedCounts: Record<string, { registered: number; guests: number; total: number }> = {};
+
+    // Add registered users
+    Object.entries(registeredCounts).forEach(([country, count]) => {
+      if (!combinedCounts[country]) {
+        combinedCounts[country] = { registered: 0, guests: 0, total: 0 };
+      }
+      combinedCounts[country].registered = count;
+      combinedCounts[country].total += count;
+    });
+
+    // Add guests
+    Object.entries(guestCounts).forEach(([country, count]) => {
+      if (!combinedCounts[country]) {
+        combinedCounts[country] = { registered: 0, guests: 0, total: 0 };
+      }
+      combinedCounts[country].guests = count;
+      combinedCounts[country].total += count;
+    });
+
+    // Sort by total count descending
+    const sorted = Object.entries(combinedCounts)
+      .sort((a, b) => b[1].total - a[1].total)
+      .map(([country, counts]) => ({
+        country,
+        count: counts.total,
+        registered: counts.registered,
+        guests: counts.guests,
+      }));
+
+    res.json({
+      countries: sorted,
+      totals: {
+        registeredUsers: Object.values(registeredCounts).reduce((a, b) => a + b, 0),
+        guestPlayers: Object.values(guestCounts).reduce((a, b) => a + b, 0),
+      },
+    });
   } catch (error) {
     const err = error as Error;
     logger.error('ADMIN_API', `Countries error: ${err.message}`);
@@ -702,7 +765,7 @@ router.get('/games/history', async (req: AdminRequest, res: Response): Promise<v
 
 /**
  * GET /api/admin/activity/daily
- * Get daily activity for charts
+ * Get daily activity for charts (includes both authenticated and guest games)
  */
 router.get('/activity/daily', async (req: AdminRequest, res: Response): Promise<void> => {
   try {
@@ -712,12 +775,30 @@ router.get('/activity/daily', async (req: AdminRequest, res: Response): Promise<
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
+    // Get authenticated user games from game_results
     const { data: gamesData, error: gamesError } = await supabase
       .from('game_results')
       .select('created_at, player_id')
       .gte('created_at', startDate.toISOString());
 
     if (gamesError) throw gamesError;
+
+    // Get guest games from game_sessions
+    let guestGamesData: { started_at: string; guest_session_id: string }[] = [];
+    try {
+      const { data: guestData } = await supabase
+        .from('game_sessions')
+        .select('started_at, guest_session_id')
+        .is('user_id', null)
+        .not('guest_session_id', 'is', null)
+        .eq('completed', true)
+        .gte('started_at', startDate.toISOString());
+
+      guestGamesData = guestData || [];
+    } catch {
+      // game_sessions table might not exist or have different structure
+      logger.debug('ADMIN_API', 'Guest game sessions unavailable for daily activity');
+    }
 
     const { data: signupsData, error: signupsError } = await supabase
       .from('profiles')
@@ -728,7 +809,9 @@ router.get('/activity/daily', async (req: AdminRequest, res: Response): Promise<
 
     interface DailyDataEntry {
       games: number;
+      guestGames: number;
       uniquePlayers: Set<string>;
+      uniqueGuests: Set<string>;
       signups: number;
     }
 
@@ -738,14 +821,24 @@ router.get('/activity/daily', async (req: AdminRequest, res: Response): Promise<
       const date = new Date();
       date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().split('T')[0];
-      dailyData[dateStr] = { games: 0, uniquePlayers: new Set(), signups: 0 };
+      dailyData[dateStr] = { games: 0, guestGames: 0, uniquePlayers: new Set(), uniqueGuests: new Set(), signups: 0 };
     }
 
+    // Add authenticated games
     gamesData?.forEach((game: { created_at: string; player_id: string }) => {
       const dateStr = game.created_at.split('T')[0];
       if (dailyData[dateStr]) {
         dailyData[dateStr].games++;
         dailyData[dateStr].uniquePlayers.add(game.player_id);
+      }
+    });
+
+    // Add guest games
+    guestGamesData.forEach((game: { started_at: string; guest_session_id: string }) => {
+      const dateStr = game.started_at.split('T')[0];
+      if (dailyData[dateStr]) {
+        dailyData[dateStr].guestGames++;
+        dailyData[dateStr].uniqueGuests.add(game.guest_session_id);
       }
     });
 
@@ -760,7 +853,11 @@ router.get('/activity/daily', async (req: AdminRequest, res: Response): Promise<
       .map(([date, data]) => ({
         date,
         games: data.games,
+        guestGames: data.guestGames,
+        totalGames: data.games + data.guestGames,
         uniquePlayers: data.uniquePlayers.size,
+        uniqueGuests: data.uniqueGuests.size,
+        totalUniquePlayers: data.uniquePlayers.size + data.uniqueGuests.size,
         signups: data.signups,
       }))
       .sort((a, b) => a.date.localeCompare(b.date));

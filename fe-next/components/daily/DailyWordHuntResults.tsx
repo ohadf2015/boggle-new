@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Share2, Trophy, Target, X, TrendingUp, ArrowLeft, Copy, Check, Send, Coins, RotateCcw } from 'lucide-react';
 
@@ -248,6 +248,18 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     // Wait for country code to be fetched (with timeout fallback)
     const canSubmit = isNewCompletion && result && guestFingerprint && countryCodeReady && (isAuthenticated ? !!profile : true);
 
+    // Debug logging for submission conditions
+    console.log('[WordHunt Submit Check]', {
+      isNewCompletion,
+      hasResult: !!result,
+      guestFingerprint: guestFingerprint ? guestFingerprint.substring(0, 8) + '...' : 'null',
+      countryCodeReady,
+      isAuthenticated,
+      hasProfile: !!profile,
+      canSubmit,
+      alreadySubmitted: hasSubmittedRef.current,
+    });
+
     // Prevent double submission
     if (canSubmit && !hasSubmittedRef.current) {
       hasSubmittedRef.current = true;
@@ -494,6 +506,33 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     recordSignupModalDismissed();
   }, []);
 
+  // Get display info for sharing
+  const displayName = isAuthenticated && profile
+    ? profile.display_name || profile.username || 'Player'
+    : guestPlayer?.displayName || 'Player';
+  const avatarEmoji = isAuthenticated && profile
+    ? profile.avatar_emoji || '🎯'
+    : guestPlayer?.avatarEmoji || '🎯';
+
+  // Generate emoji grid from attempts for OG image
+  const emojiGridRows = result.attempts.map(attempt => feedbackToEmoji(attempt.feedback));
+  const emojiGridEncoded = encodeURIComponent(emojiGridRows.join('|'));
+
+  // Build share URL with OG parameters for rich previews on WhatsApp/social
+  const shareUrl = useMemo(() => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://lexiclash.live';
+    const whParams = new URLSearchParams({
+      solved: String(result.solved),
+      attempts: String(result.attemptsUsed),
+      streak: String(result.streakDays || 0),
+      puzzleNumber: String(puzzleNumber),
+      displayName,
+      avatarEmoji,
+      emojiGrid: emojiGridEncoded,
+    });
+    return `${origin}/${language}/daily?wh=${encodeURIComponent(whParams.toString())}`;
+  }, [result.solved, result.attemptsUsed, result.streakDays, puzzleNumber, displayName, avatarEmoji, emojiGridEncoded, language]);
+
   // Generate shareable text (use streak from result, which is now properly tracked)
   const shareText = generateWordHuntShareableResult({
     ...result,
@@ -504,41 +543,54 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     completedAt: result.completedAt || new Date().toISOString(),
   });
 
+  // Combine share text with share URL for rich previews
+  const shareTextWithUrl = useMemo(() => {
+    // Replace the simple URL at the end with the OG-enabled share URL
+    const lines = shareText.split('\n');
+    // Find and replace the last line (URL) with our OG-enabled URL
+    const lastLineIndex = lines.length - 1;
+    if (lines[lastLineIndex].includes('lexiclash.live')) {
+      lines[lastLineIndex] = shareUrl;
+    }
+    return lines.join('\n');
+  }, [shareText, shareUrl]);
+
   // Handle copy to clipboard
   const handleCopy = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(shareText);
+      await navigator.clipboard.writeText(shareTextWithUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
     }
-  }, [shareText]);
+  }, [shareTextWithUrl]);
 
-  // Handle share to WhatsApp
+  // Handle share to WhatsApp - includes OG-enabled URL for rich preview
   const handleWhatsApp = useCallback(() => {
-    const url = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+    const url = `https://wa.me/?text=${encodeURIComponent(shareTextWithUrl)}`;
     window.open(url, '_blank');
-  }, [shareText]);
+  }, [shareTextWithUrl]);
 
   // Handle share to Twitter/X
   const handleTwitter = useCallback(() => {
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTextWithUrl)}`;
     window.open(url, '_blank');
-  }, [shareText]);
+  }, [shareTextWithUrl]);
 
   // Handle share to Telegram
   const handleTelegram = useCallback(() => {
-    const url = `https://t.me/share/url?url=${encodeURIComponent(`https://lexiclash.live/${language}/daily`)}&text=${encodeURIComponent(shareText)}`;
+    const url = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
     window.open(url, '_blank');
-  }, [shareText, language]);
+  }, [shareText, shareUrl]);
 
-  // Handle native share
+  // Handle native share - includes OG-enabled URL for rich preview
   const handleNativeShare = useCallback(async () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          text: shareText,
+          text: shareTextWithUrl,
+          url: shareUrl,
         });
       } catch (err) {
         console.error('Share failed:', err);
@@ -546,7 +598,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     } else {
       setShowSharePanel(true);
     }
-  }, [shareText]);
+  }, [shareTextWithUrl, shareUrl]);
 
   // Handle reveal target word (costs coins)
   const handleRevealTargetWord = useCallback(() => {

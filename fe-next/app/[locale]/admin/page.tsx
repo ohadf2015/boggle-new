@@ -65,6 +65,11 @@ interface Stats {
     signupsWeek: number;
   };
   languages: Record<string, number>;
+  guests?: {
+    totalGuestGames: number;
+    guestGamesToday: number;
+    uniqueGuestSessions: number;
+  };
 }
 
 interface RealtimeStats {
@@ -141,13 +146,16 @@ interface CommunityWordsStats {
 
 interface GameLog {
   id: string;
-  player_id: string;
+  player_id: string | null;
+  guest_session_id?: string | null;
   game_code: string;
   score: number;
   word_count: number;
   longest_word: string | null;
   placement: number | null;
   is_ranked: boolean;
+  is_guest?: boolean;
+  mode?: string;
   language: string;
   time_played: number;
   created_at: string;
@@ -301,6 +309,12 @@ export default function AdminDashboard() {
     toast.success('Dashboard refreshed');
   };
 
+  // Helper to get word key for tracking processing state
+  const getWordKey = (word: string, language: string) => `${word}-${language}`;
+
+  // Track which bot words are being processed
+  const [processingBotWords, setProcessingBotWords] = useState<Set<string>>(new Set());
+
   // Handle bot word approval
   const handleApprove = async (word: BotWord) => {
     const token = await getAuthToken();
@@ -308,6 +322,9 @@ export default function AdminDashboard() {
       toast.error('Authentication required');
       return;
     }
+
+    const wordKey = getWordKey(word.word, word.language);
+    setProcessingBotWords(prev => new Set(prev).add(wordKey));
 
     try {
       const res = await fetch('/api/admin/bot-words/approve', {
@@ -321,7 +338,8 @@ export default function AdminDashboard() {
 
       if (res.ok) {
         toast.success(`Approved: ${word.word}`);
-        fetchAdminData(); // Refresh data
+        // Optimistic update: remove the word from the list (it's now approved)
+        setBotWords(prev => prev.filter(w => !(w.word === word.word && w.language === word.language)));
       } else {
         const error = await res.json();
         toast.error(error.error || 'Failed to approve word');
@@ -329,6 +347,12 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Failed to approve word:', error);
       toast.error('Failed to approve word');
+    } finally {
+      setProcessingBotWords(prev => {
+        const next = new Set(prev);
+        next.delete(wordKey);
+        return next;
+      });
     }
   };
 
@@ -339,6 +363,9 @@ export default function AdminDashboard() {
       toast.error('Authentication required');
       return;
     }
+
+    const wordKey = getWordKey(word.word, word.language);
+    setProcessingBotWords(prev => new Set(prev).add(wordKey));
 
     try {
       const res = await fetch('/api/admin/bot-words/disapprove', {
@@ -356,7 +383,8 @@ export default function AdminDashboard() {
 
       if (res.ok) {
         toast.success(`Disapproved: ${word.word}`);
-        fetchAdminData(); // Refresh data
+        // Optimistic update: remove the word from the list (it's now blacklisted)
+        setBotWords(prev => prev.filter(w => !(w.word === word.word && w.language === word.language)));
       } else {
         const error = await res.json();
         toast.error(error.error || 'Failed to disapprove word');
@@ -364,6 +392,12 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Failed to disapprove word:', error);
       toast.error('Failed to disapprove word');
+    } finally {
+      setProcessingBotWords(prev => {
+        const next = new Set(prev);
+        next.delete(wordKey);
+        return next;
+      });
     }
   };
 
@@ -435,6 +469,25 @@ export default function AdminDashboard() {
     }
   }, [getAuthToken, gameLogsLanguage, gameLogsRanked, gameLogsStartDate, gameLogsEndDate]);
 
+  // Track which community words are being processed
+  const [processingWords, setProcessingWords] = useState<Set<string>>(new Set());
+
+  // Helper to determine word status from net_score
+  const getStatusFromScore = (netScore: number): CommunityWord['status'] => {
+    if (netScore >= 10) return 'validated';
+    if (netScore >= 3) return 'pending_review';
+    if (netScore < 0) return 'rejected';
+    return 'pending';
+  };
+
+  // Helper to check if word matches current filter
+  const wordMatchesFilter = (word: CommunityWord): boolean => {
+    if (communityWordStatus !== 'all' && word.status !== communityWordStatus) return false;
+    if (communityWordLanguage !== 'all' && word.language !== communityWordLanguage) return false;
+    if (communityWordSearch && !word.word.toLowerCase().includes(communityWordSearch.toLowerCase())) return false;
+    return true;
+  };
+
   // Handle community word approval
   const handleCommunityApprove = async (word: CommunityWord, addToDictionary: boolean = false) => {
     const token = await getAuthToken();
@@ -442,6 +495,9 @@ export default function AdminDashboard() {
       toast.error('Authentication required');
       return;
     }
+
+    const wordKey = getWordKey(word.word, word.language);
+    setProcessingWords(prev => new Set(prev).add(wordKey));
 
     try {
       const res = await fetch('/api/admin/community-words/approve', {
@@ -460,7 +516,53 @@ export default function AdminDashboard() {
       if (res.ok) {
         const data = await res.json();
         toast.success(`Approved "${word.word}" (+${data.votesAdded} votes)`);
-        fetchCommunityWords(communityWordSearch, communityWordStatus, communityWordLanguage);
+
+        // Optimistic update: update the word in local state
+        setCommunityWords(prev => {
+          const updated = prev.map(w => {
+            if (w.word === word.word && w.language === word.language) {
+              const newLikes = w.likes_count + (data.votesAdded || 5);
+              const newNetScore = newLikes - w.dislikes_count;
+              const newStatus = getStatusFromScore(newNetScore);
+              return {
+                ...w,
+                likes_count: newLikes,
+                net_score: newNetScore,
+                status: newStatus,
+                is_potentially_valid: newNetScore >= 6
+              };
+            }
+            return w;
+          });
+
+          // Filter out words that no longer match the current filter
+          return updated.filter(wordMatchesFilter);
+        });
+
+        // Update stats
+        if (communityWordsStats) {
+          const oldStatus = word.status;
+          const newNetScore = word.likes_count + (data.votesAdded || 5) - word.dislikes_count;
+          const newStatus = getStatusFromScore(newNetScore);
+
+          if (oldStatus !== newStatus) {
+            setCommunityWordsStats(prev => {
+              if (!prev) return prev;
+              const updated = { ...prev };
+              // Decrement old status count
+              if (oldStatus === 'validated') updated.validated--;
+              else if (oldStatus === 'pending_review') updated.pendingReview--;
+              else if (oldStatus === 'rejected') updated.rejected--;
+              else if (oldStatus === 'pending') updated.pending--;
+              // Increment new status count
+              if (newStatus === 'validated') updated.validated++;
+              else if (newStatus === 'pending_review') updated.pendingReview++;
+              else if (newStatus === 'rejected') updated.rejected++;
+              else if (newStatus === 'pending') updated.pending++;
+              return updated;
+            });
+          }
+        }
       } else {
         const error = await res.json();
         toast.error(error.error || 'Failed to approve word');
@@ -468,6 +570,12 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Failed to approve word:', error);
       toast.error('Failed to approve word');
+    } finally {
+      setProcessingWords(prev => {
+        const next = new Set(prev);
+        next.delete(wordKey);
+        return next;
+      });
     }
   };
 
@@ -478,6 +586,9 @@ export default function AdminDashboard() {
       toast.error('Authentication required');
       return;
     }
+
+    const wordKey = getWordKey(word.word, word.language);
+    setProcessingWords(prev => new Set(prev).add(wordKey));
 
     try {
       const res = await fetch('/api/admin/community-words/disapprove', {
@@ -495,8 +606,55 @@ export default function AdminDashboard() {
       });
 
       if (res.ok) {
-        toast.success(`Disapproved "${word.word}"`);
-        fetchCommunityWords(communityWordSearch, communityWordStatus, communityWordLanguage);
+        toast.success(`Disapproved "${word.word}"${addToBlacklist ? ' (blacklisted)' : ''}`);
+
+        // Optimistic update: update the word in local state
+        setCommunityWords(prev => {
+          const votesAdded = 10; // Admin disapproval adds 10 negative votes
+          const updated = prev.map(w => {
+            if (w.word === word.word && w.language === word.language) {
+              const newDislikes = w.dislikes_count + votesAdded;
+              const newNetScore = w.likes_count - newDislikes;
+              const newStatus = getStatusFromScore(newNetScore);
+              return {
+                ...w,
+                dislikes_count: newDislikes,
+                net_score: newNetScore,
+                status: newStatus,
+                is_potentially_valid: newNetScore >= 6
+              };
+            }
+            return w;
+          });
+
+          // Filter out words that no longer match the current filter
+          return updated.filter(wordMatchesFilter);
+        });
+
+        // Update stats
+        if (communityWordsStats) {
+          const oldStatus = word.status;
+          const newNetScore = word.likes_count - (word.dislikes_count + 10);
+          const newStatus = getStatusFromScore(newNetScore);
+
+          if (oldStatus !== newStatus) {
+            setCommunityWordsStats(prev => {
+              if (!prev) return prev;
+              const updated = { ...prev };
+              // Decrement old status count
+              if (oldStatus === 'validated') updated.validated--;
+              else if (oldStatus === 'pending_review') updated.pendingReview--;
+              else if (oldStatus === 'rejected') updated.rejected--;
+              else if (oldStatus === 'pending') updated.pending--;
+              // Increment new status count
+              if (newStatus === 'validated') updated.validated++;
+              else if (newStatus === 'pending_review') updated.pendingReview++;
+              else if (newStatus === 'rejected') updated.rejected++;
+              else if (newStatus === 'pending') updated.pending++;
+              return updated;
+            });
+          }
+        }
       } else {
         const error = await res.json();
         toast.error(error.error || 'Failed to disapprove word');
@@ -504,6 +662,12 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Failed to disapprove word:', error);
       toast.error('Failed to disapprove word');
+    } finally {
+      setProcessingWords(prev => {
+        const next = new Set(prev);
+        next.delete(wordKey);
+        return next;
+      });
     }
   };
 
@@ -781,6 +945,82 @@ export default function AdminDashboard() {
                 isDarkMode={isDarkMode}
               />
             </div>
+
+            {/* Guest Player Stats - Only show if guest data exists */}
+            {stats.guests && (stats.guests.totalGuestGames > 0 || stats.guests.uniqueGuestSessions > 0) && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+                className={cn(
+                  'rounded-xl p-4 sm:p-6 border',
+                  isDarkMode
+                    ? 'bg-gradient-to-r from-amber-900/20 to-orange-900/20 border-amber-500/30'
+                    : 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200'
+                )}
+              >
+                <h3 className={cn(
+                  'text-base sm:text-lg font-bold mb-4 flex items-center gap-2',
+                  isDarkMode ? 'text-amber-400' : 'text-amber-700'
+                )}>
+                  <User className="w-5 h-5" />
+                  Guest Players (Non-Authenticated)
+                </h3>
+                <div className="grid grid-cols-3 gap-3 sm:gap-4">
+                  <div className={cn(
+                    'p-3 sm:p-4 rounded-lg text-center',
+                    isDarkMode ? 'bg-slate-800/50' : 'bg-white/80'
+                  )}>
+                    <div className={cn(
+                      'text-xl sm:text-2xl font-bold',
+                      isDarkMode ? 'text-amber-400' : 'text-amber-600'
+                    )}>
+                      {stats.guests.uniqueGuestSessions.toLocaleString()}
+                    </div>
+                    <div className={cn(
+                      'text-xs sm:text-sm',
+                      isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                    )}>
+                      Unique Guests
+                    </div>
+                  </div>
+                  <div className={cn(
+                    'p-3 sm:p-4 rounded-lg text-center',
+                    isDarkMode ? 'bg-slate-800/50' : 'bg-white/80'
+                  )}>
+                    <div className={cn(
+                      'text-xl sm:text-2xl font-bold',
+                      isDarkMode ? 'text-amber-400' : 'text-amber-600'
+                    )}>
+                      {stats.guests.totalGuestGames.toLocaleString()}
+                    </div>
+                    <div className={cn(
+                      'text-xs sm:text-sm',
+                      isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                    )}>
+                      Total Guest Games
+                    </div>
+                  </div>
+                  <div className={cn(
+                    'p-3 sm:p-4 rounded-lg text-center',
+                    isDarkMode ? 'bg-slate-800/50' : 'bg-white/80'
+                  )}>
+                    <div className={cn(
+                      'text-xl sm:text-2xl font-bold',
+                      isDarkMode ? 'text-amber-400' : 'text-amber-600'
+                    )}>
+                      {stats.guests.guestGamesToday.toLocaleString()}
+                    </div>
+                    <div className={cn(
+                      'text-xs sm:text-sm',
+                      isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                    )}>
+                      Guest Games Today
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
             {/* Languages & Countries Row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -1311,18 +1551,44 @@ export default function AdminDashboard() {
                         )}>
                           <td className="py-3 px-2">
                             <div className="flex items-center gap-2">
-                              <div
-                                className="w-7 h-7 rounded-full flex items-center justify-center text-xs flex-shrink-0"
-                                style={{ backgroundColor: game.profiles?.avatar_color || '#6366f1' }}
-                              >
-                                {game.profiles?.avatar_emoji || '😀'}
-                              </div>
-                              <span className={cn(
-                                'truncate max-w-[100px] sm:max-w-[150px]',
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                              )}>
-                                {game.profiles?.display_name || game.profiles?.username || 'Unknown'}
-                              </span>
+                              {game.is_guest ? (
+                                <>
+                                  <div
+                                    className="w-7 h-7 rounded-full flex items-center justify-center text-xs flex-shrink-0 bg-amber-500/20 border border-amber-500/30"
+                                  >
+                                    👤
+                                  </div>
+                                  <div className="flex flex-col">
+                                    <span className={cn(
+                                      'text-xs font-medium px-1.5 py-0.5 rounded',
+                                      isDarkMode ? 'bg-amber-900/40 text-amber-400' : 'bg-amber-100 text-amber-700'
+                                    )}>
+                                      Guest
+                                    </span>
+                                    <span className={cn(
+                                      'text-[10px] font-mono truncate max-w-[80px]',
+                                      isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                                    )}>
+                                      {game.guest_session_id?.slice(0, 8) || ''}
+                                    </span>
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  <div
+                                    className="w-7 h-7 rounded-full flex items-center justify-center text-xs flex-shrink-0"
+                                    style={{ backgroundColor: game.profiles?.avatar_color || '#6366f1' }}
+                                  >
+                                    {game.profiles?.avatar_emoji || '😀'}
+                                  </div>
+                                  <span className={cn(
+                                    'truncate max-w-[100px] sm:max-w-[150px]',
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                  )}>
+                                    {game.profiles?.display_name || game.profiles?.username || 'Unknown'}
+                                  </span>
+                                </>
+                              )}
                             </div>
                           </td>
                           <td className={cn('py-3 px-2 font-mono text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
@@ -1359,14 +1625,26 @@ export default function AdminDashboard() {
                             {LANGUAGE_NAMES[game.language] || game.language}
                           </td>
                           <td className="py-3 px-2 hidden lg:table-cell">
-                            <span className={cn(
-                              'px-2 py-0.5 rounded text-xs',
-                              game.is_ranked
-                                ? 'bg-purple-900/30 text-purple-400'
-                                : isDarkMode ? 'bg-slate-700 text-gray-400' : 'bg-gray-100 text-gray-600'
-                            )}>
-                              {game.is_ranked ? 'Ranked' : 'Casual'}
-                            </span>
+                            <div className="flex flex-col gap-0.5">
+                              <span className={cn(
+                                'px-2 py-0.5 rounded text-xs inline-block w-fit',
+                                game.is_ranked
+                                  ? 'bg-purple-900/30 text-purple-400'
+                                  : game.is_guest
+                                    ? isDarkMode ? 'bg-amber-900/30 text-amber-400' : 'bg-amber-100 text-amber-600'
+                                    : isDarkMode ? 'bg-slate-700 text-gray-400' : 'bg-gray-100 text-gray-600'
+                              )}>
+                                {game.is_ranked ? 'Ranked' : game.is_guest ? 'Guest' : 'Casual'}
+                              </span>
+                              {game.mode && game.mode !== 'casual' && game.mode !== 'ranked' && (
+                                <span className={cn(
+                                  'text-[10px] capitalize',
+                                  isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                                )}>
+                                  {game.mode.replace('_', ' ')}
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td className={cn('py-3 px-2 text-right hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
                             {formatTime(game.time_played || 0)}
@@ -1671,36 +1949,52 @@ export default function AdminDashboard() {
                             )}
                           </td>
                           <td className="py-3 px-2">
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => handleCommunityApprove(word, false)}
-                                className="px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-500 transition-colors"
-                                title="Approve (add votes to validate)"
-                              >
-                                Approve
-                              </button>
-                              <button
-                                onClick={() => handleCommunityApprove(word, true)}
-                                className="px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded hover:bg-blue-500 transition-colors"
-                                title="Approve and add to permanent dictionary"
-                              >
-                                + Dict
-                              </button>
-                              <button
-                                onClick={() => handleCommunityDisapprove(word, false)}
-                                className="px-3 py-1.5 text-xs font-medium bg-red-600 text-white rounded hover:bg-red-500 transition-colors"
-                                title="Disapprove (add negative votes)"
-                              >
-                                Reject
-                              </button>
-                              <button
-                                onClick={() => handleCommunityDisapprove(word, true)}
-                                className="px-3 py-1.5 text-xs font-medium bg-red-800 text-white rounded hover:bg-red-700 transition-colors"
-                                title="Reject and blacklist"
-                              >
-                                Ban
-                              </button>
-                            </div>
+                            {(() => {
+                              const isProcessing = processingWords.has(getWordKey(word.word, word.language));
+                              return (
+                                <div className="flex gap-2">
+                                  {isProcessing ? (
+                                    <div className="flex items-center gap-2 px-3 py-1.5">
+                                      <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+                                      <span className={cn('text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                                        Processing...
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <>
+                                      <button
+                                        onClick={() => handleCommunityApprove(word, false)}
+                                        className="px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-500 transition-colors"
+                                        title="Approve (add votes to validate)"
+                                      >
+                                        Approve
+                                      </button>
+                                      <button
+                                        onClick={() => handleCommunityApprove(word, true)}
+                                        className="px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded hover:bg-blue-500 transition-colors"
+                                        title="Approve and add to permanent dictionary"
+                                      >
+                                        + Dict
+                                      </button>
+                                      <button
+                                        onClick={() => handleCommunityDisapprove(word, false)}
+                                        className="px-3 py-1.5 text-xs font-medium bg-red-600 text-white rounded hover:bg-red-500 transition-colors"
+                                        title="Disapprove (add negative votes)"
+                                      >
+                                        Reject
+                                      </button>
+                                      <button
+                                        onClick={() => handleCommunityDisapprove(word, true)}
+                                        className="px-3 py-1.5 text-xs font-medium bg-red-800 text-white rounded hover:bg-red-700 transition-colors"
+                                        title="Reject and blacklist"
+                                      >
+                                        Ban
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              );
+                            })()}
                           </td>
                         </tr>
                       ))
@@ -1813,20 +2107,36 @@ export default function AdminDashboard() {
                           )}
                         </td>
                         <td className="py-3 px-2">
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleApprove(word)}
-                              className="px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-500 transition-colors"
-                            >
-                              Approve
-                            </button>
-                            <button
-                              onClick={() => handleDisapprove(word)}
-                              className="px-3 py-1.5 text-xs font-medium bg-red-600 text-white rounded hover:bg-red-500 transition-colors"
-                            >
-                              Disapprove
-                            </button>
-                          </div>
+                          {(() => {
+                            const isProcessing = processingBotWords.has(getWordKey(word.word, word.language));
+                            return (
+                              <div className="flex gap-2">
+                                {isProcessing ? (
+                                  <div className="flex items-center gap-2 px-3 py-1.5">
+                                    <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+                                    <span className={cn('text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                                      Processing...
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <button
+                                      onClick={() => handleApprove(word)}
+                                      className="px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-500 transition-colors"
+                                    >
+                                      Approve
+                                    </button>
+                                    <button
+                                      onClick={() => handleDisapprove(word)}
+                                      className="px-3 py-1.5 text-xs font-medium bg-red-600 text-white rounded hover:bg-red-500 transition-colors"
+                                    >
+                                      Disapprove
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            );
+                          })()}
                         </td>
                       </tr>
                     ))}

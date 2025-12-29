@@ -1619,27 +1619,74 @@ export function updateGuestDailyPlayer(updates: Partial<GuestDailyPlayer>): Gues
 // Browser Fingerprint (for guest tracking)
 // ==========================================
 
+const GUEST_FINGERPRINT_KEY = 'lexiclash_guest_fingerprint';
+
 /**
- * Generate a simple browser fingerprint for guest tracking
+ * Generate or retrieve a stable guest fingerprint for tracking
+ * Uses browser fingerprinting with UUID fallback to ensure we always have a valid ID
  * This is NOT for security - just to identify repeat guest plays
  */
 export async function getGuestFingerprint(): Promise<string> {
   if (typeof window === 'undefined') return '';
 
-  const components = [
-    navigator.userAgent,
-    navigator.language,
-    screen.width.toString(),
-    screen.height.toString(),
-    screen.colorDepth.toString(),
-    new Date().getTimezoneOffset().toString(),
-    navigator.hardwareConcurrency?.toString() || '',
-    // Canvas fingerprint (simple version)
-    await getCanvasFingerprint(),
-  ];
+  try {
+    // First, check if we already have a stored fingerprint (for consistency across sessions)
+    const storedFingerprint = localStorage.getItem(GUEST_FINGERPRINT_KEY);
+    if (storedFingerprint && storedFingerprint.length > 0) {
+      return storedFingerprint;
+    }
 
-  const fingerprint = components.filter(Boolean).join('|');
-  return hashString(fingerprint).toString(36);
+    // Generate new fingerprint from browser components
+    const components = [
+      navigator.userAgent,
+      navigator.language,
+      screen.width.toString(),
+      screen.height.toString(),
+      screen.colorDepth.toString(),
+      new Date().getTimezoneOffset().toString(),
+      navigator.hardwareConcurrency?.toString() || '',
+      // Canvas fingerprint (simple version)
+      await getCanvasFingerprint(),
+    ];
+
+    const fingerprintData = components.filter(Boolean).join('|');
+    let fingerprint = hashString(fingerprintData).toString(36);
+
+    // Ensure fingerprint is always valid (fallback to UUID if empty/falsy)
+    if (!fingerprint || fingerprint === '0') {
+      fingerprint = generateGuestUUID();
+    }
+
+    // Store for consistency
+    localStorage.setItem(GUEST_FINGERPRINT_KEY, fingerprint);
+    console.log('[GuestFingerprint] Generated new fingerprint:', fingerprint.substring(0, 8) + '...');
+
+    return fingerprint;
+  } catch (error) {
+    console.warn('[GuestFingerprint] Error generating fingerprint, using fallback UUID:', error);
+    // Fallback to UUID if anything fails
+    const fallbackId = generateGuestUUID();
+    try {
+      localStorage.setItem(GUEST_FINGERPRINT_KEY, fallbackId);
+    } catch {
+      // localStorage might be disabled - that's ok, just return the UUID
+    }
+    return fallbackId;
+  }
+}
+
+/**
+ * Generate a simple UUID v4 for guest identification fallback
+ */
+function generateGuestUUID(): string {
+  // Use crypto.randomUUID if available
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID().replace(/-/g, '').substring(0, 16);
+  }
+  // Fallback for older browsers
+  return 'xxxxxxxxxxxxxxxx'.replace(/x/g, () => {
+    return Math.floor(Math.random() * 16).toString(16);
+  });
 }
 
 /**

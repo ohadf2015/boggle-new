@@ -66,12 +66,22 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
     const localePath = getLocalePath(validLocale);
 
     // Use locale-specific OG image
-    const ogImage = locale === 'he'
-        ? 'https://www.lexiclash.live/og-image-he.jpg'
-        : 'https://www.lexiclash.live/og-image-en.jpg';
-    const ogImageAlt = locale === 'he'
-        ? 'לקסי קלאש - משחק מילים מרובה משתתפים'
-        : 'LexiClash - Multiplayer Word Game';
+    const ogImageMap: Record<string, string> = {
+        he: 'https://www.lexiclash.live/og-image-he.jpg',
+        en: 'https://www.lexiclash.live/og-image-en.jpg',
+        sv: 'https://www.lexiclash.live/og-image-sv.jpg',
+        ja: 'https://www.lexiclash.live/og-image-ja.jpg',
+        es: 'https://www.lexiclash.live/og-image-es.jpg',
+    };
+    const ogImageAltMap: Record<string, string> = {
+        he: 'לקסי קלאש - משחק מילים מרובה משתתפים',
+        en: 'LexiClash - Multiplayer Word Game',
+        sv: 'LexiClash - Snabbt Multiplayer Ordspel',
+        ja: 'LexiClash - マルチプレイヤーワードゲーム',
+        es: 'LexiClash - Juego de Palabras Multijugador',
+    };
+    const ogImage = ogImageMap[locale] || ogImageMap.en;
+    const ogImageAlt = ogImageAltMap[locale] || ogImageAltMap.en;
 
     return {
         title: seo.title,

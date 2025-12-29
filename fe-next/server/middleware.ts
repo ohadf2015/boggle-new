@@ -54,6 +54,7 @@ export function securityHeaders(isDev: boolean): RequestHandler {
     "img-src 'self' data: https: blob:; " +
     "font-src 'self' data: https://fonts.gstatic.com; " +
     "connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com ws: wss:; " +
+    "worker-src 'self' blob:; " +
     "frame-ancestors 'none';";
 
   const cspProd = "default-src 'self'; " +
@@ -62,6 +63,7 @@ export function securityHeaders(isDev: boolean): RequestHandler {
     "img-src 'self' data: https: blob:; " +
     "font-src 'self' data: https://fonts.gstatic.com; " +
     "connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com ws: wss:; " +
+    "worker-src 'self' blob:; " +
     "frame-ancestors 'none';";
 
   return (req: Request, res: Response, next: NextFunction): void => {

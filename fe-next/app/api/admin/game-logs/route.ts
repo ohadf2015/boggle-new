@@ -66,6 +66,7 @@ async function isAdminRequest(request: NextRequest): Promise<{ isAdmin: boolean;
 
 /**
  * GET - Fetch game logs with filters and pagination
+ * Includes both authenticated player games (from game_results) and guest games (from game_sessions)
  */
 export async function GET(request: NextRequest) {
   try {
@@ -90,12 +91,13 @@ export async function GET(request: NextRequest) {
     const endDate = searchParams.get('endDate');
     const sortBy = searchParams.get('sortBy') || 'created_at';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
+    const includeGuests = searchParams.get('includeGuests') !== 'false'; // Include guests by default
 
     // Calculate offset
     const offset = (page - 1) * pageSize;
 
-    // Build query for game results with player profiles
-    let query = supabase
+    // Build query for game results with player profiles (authenticated users)
+    let authQuery = supabase
       .from('game_results')
       .select(`
         id,
@@ -117,47 +119,141 @@ export async function GET(request: NextRequest) {
         )
       `, { count: 'exact' });
 
-    // Apply filters
+    // Apply filters to auth query
     if (language && language !== 'all') {
-      query = query.eq('language', language);
+      authQuery = authQuery.eq('language', language);
     }
 
     if (isRanked !== null && isRanked !== 'all') {
-      query = query.eq('is_ranked', isRanked === 'true');
+      authQuery = authQuery.eq('is_ranked', isRanked === 'true');
     }
 
     if (startDate) {
-      query = query.gte('created_at', startDate);
+      authQuery = authQuery.gte('created_at', startDate);
     }
 
     if (endDate) {
-      // Add time to include full end day
-      query = query.lte('created_at', `${endDate}T23:59:59.999Z`);
+      authQuery = authQuery.lte('created_at', `${endDate}T23:59:59.999Z`);
     }
 
     // Apply sorting
     const ascending = sortOrder === 'asc';
-    query = query.order(sortBy, { ascending });
+    authQuery = authQuery.order(sortBy, { ascending });
 
-    // Apply pagination
-    query = query.range(offset, offset + pageSize - 1);
+    // Fetch authenticated games
+    const { data: authData, error: authError, count: authCount } = await authQuery;
 
-    const { data, error, count } = await query;
-
-    if (error) {
-      console.error('[admin/game-logs] Query error:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (authError) {
+      console.error('[admin/game-logs] Auth query error:', authError);
+      return NextResponse.json({ error: authError.message }, { status: 500 });
     }
 
+    // Transform authenticated games
+    const authGames = (authData || []).map((game: any) => ({
+      ...game,
+      is_guest: false,
+      mode: game.is_ranked ? 'ranked' : 'casual',
+    }));
+
+    // Fetch guest games from game_sessions if includeGuests is true
+    let guestGames: any[] = [];
+    let guestCount = 0;
+
+    if (includeGuests) {
+      let guestQuery = supabase
+        .from('game_sessions')
+        .select(`
+          id,
+          guest_session_id,
+          mode,
+          language,
+          score,
+          words_found,
+          room_code,
+          final_rank,
+          duration_seconds,
+          started_at,
+          completed
+        `, { count: 'exact' })
+        .is('user_id', null)
+        .not('guest_session_id', 'is', null)
+        .eq('completed', true);
+
+      // Apply filters to guest query
+      if (language && language !== 'all') {
+        guestQuery = guestQuery.eq('language', language);
+      }
+
+      // Guest games are never ranked
+      if (isRanked === 'true') {
+        // If filtering for ranked only, don't include guests
+        guestGames = [];
+        guestCount = 0;
+      } else {
+        if (startDate) {
+          guestQuery = guestQuery.gte('started_at', startDate);
+        }
+
+        if (endDate) {
+          guestQuery = guestQuery.lte('started_at', `${endDate}T23:59:59.999Z`);
+        }
+
+        guestQuery = guestQuery.order('started_at', { ascending });
+
+        const { data: guestData, error: guestError, count: gCount } = await guestQuery;
+
+        if (guestError) {
+          console.error('[admin/game-logs] Guest query error:', guestError);
+          // Don't fail the whole request if guest query fails
+        } else {
+          guestCount = gCount || 0;
+          // Transform guest games to match the expected format
+          guestGames = (guestData || []).map((session: any) => ({
+            id: session.id,
+            player_id: null,
+            guest_session_id: session.guest_session_id,
+            game_code: session.room_code || 'solo',
+            score: session.score || 0,
+            word_count: Array.isArray(session.words_found) ? session.words_found.length : 0,
+            longest_word: Array.isArray(session.words_found) && session.words_found.length > 0
+              ? session.words_found.reduce((longest: any, w: any) =>
+                  (w.word?.length || 0) > (longest?.length || 0) ? w.word : longest, ''
+                )
+              : null,
+            placement: session.final_rank,
+            is_ranked: false,
+            is_guest: true,
+            mode: session.mode,
+            language: session.language,
+            time_played: session.duration_seconds || 0,
+            created_at: session.started_at,
+            profiles: null,
+          }));
+        }
+      }
+    }
+
+    // Combine and sort all games
+    const allGames = [...authGames, ...guestGames].sort((a, b) => {
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
+      return ascending ? dateA - dateB : dateB - dateA;
+    });
+
+    // Calculate total count
+    const totalCount = (authCount || 0) + guestCount;
+
+    // Apply pagination to combined results
+    const paginatedGames = allGames.slice(offset, offset + pageSize);
+
     // Calculate pagination info
-    const totalCount = count || 0;
     const totalPages = Math.ceil(totalCount / pageSize);
     const hasNextPage = page < totalPages;
     const hasPrevPage = page > 1;
 
     return NextResponse.json({
       success: true,
-      games: data || [],
+      games: paginatedGames,
       pagination: {
         page,
         pageSize,
@@ -165,6 +261,10 @@ export async function GET(request: NextRequest) {
         totalPages,
         hasNextPage,
         hasPrevPage,
+      },
+      breakdown: {
+        authenticatedGames: authCount || 0,
+        guestGames: guestCount,
       },
     });
   } catch (error) {
