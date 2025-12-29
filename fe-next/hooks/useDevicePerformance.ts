@@ -46,14 +46,16 @@ export interface DevicePerformanceConfig {
 
 // Detect reduced motion preference
 function getReducedMotionPreference(): boolean {
-  if (typeof window === 'undefined') return false;
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+  const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  return mediaQuery?.matches ?? false;
 }
 
 // Subscribe to reduced motion changes
 function subscribeToReducedMotion(callback: () => void): () => void {
-  if (typeof window === 'undefined') return () => {};
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return () => {};
   const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (!mediaQuery) return () => {};
   mediaQuery.addEventListener('change', callback);
   return () => mediaQuery.removeEventListener('change', callback);
 }
