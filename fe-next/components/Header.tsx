@@ -94,27 +94,27 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
             {/* NEO-BRUTALIST Header Bar */}
             <div
                 className={cn(
-                    "max-w-6xl lg:max-w-7xl mx-auto",
+                    "max-w-6xl lg:max-w-7xl 2xl:max-w-[1800px] mx-auto",
                     "flex items-center justify-between",
-                    "px-1 xs:px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 py-2 xs:py-3 sm:py-4 lg:py-5 xl:py-6",
+                    "px-1 xs:px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-14 py-2 xs:py-3 sm:py-4 lg:py-5 xl:py-6 2xl:py-8",
                     "bg-neo-cyan-muted",
-                    "border-4 lg:border-[5px] xl:border-[6px] border-neo-black",
-                    "shadow-hard-lg xl:shadow-hard-xl",
-                    "rounded-neo-lg xl:rounded-neo-xl",
+                    "border-4 lg:border-[5px] xl:border-[6px] 2xl:border-[7px] border-neo-black",
+                    "shadow-hard-lg xl:shadow-hard-xl 2xl:shadow-hard-2xl",
+                    "rounded-neo-lg xl:rounded-neo-xl 2xl:rounded-neo-xl",
                     "transition-all duration-100",
                     "min-w-0"
                 )}
             >
                 {/* Logo */}
                 <motion.button
-                    className="flex items-center gap-1 xs:gap-2 sm:gap-3 lg:gap-4 cursor-pointer bg-transparent border-none p-0 flex-shrink-0"
+                    className="flex items-center gap-1 xs:gap-2 sm:gap-3 lg:gap-4 2xl:gap-5 cursor-pointer bg-transparent border-none p-0 flex-shrink-0"
                     onClick={handleLogoClick}
                     whileHover={{ x: -2, y: -2 }}
                     whileTap={{ x: 2, y: 2 }}
                     aria-label={t('common.goToHome') || 'Go to home page'}
                 >
                     <h1
-                        className="text-lg xs:text-xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-black uppercase tracking-tight flex items-center gap-0.5 xs:gap-1 lg:gap-2 flex-shrink min-w-0 landscape:text-base landscape:xs:text-lg landscape:sm:text-xl"
+                        className="text-lg xs:text-xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-black uppercase tracking-tight flex items-center gap-0.5 xs:gap-1 lg:gap-2 2xl:gap-3 flex-shrink min-w-0 landscape:text-base landscape:xs:text-lg landscape:sm:text-xl"
                         style={{ fontFamily }}
                     >
                         {/* LEXI - Neo-Brutalist white with black shadow */}
@@ -127,7 +127,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             {t('logo.lexi')}
                         </span>
                         {/* Lightning bolt - static for cleaner UX */}
-                        <span className="text-base xs:text-xl sm:text-3xl lg:text-4xl xl:text-5xl">
+                        <span className="text-base xs:text-xl sm:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl">
                             ⚡
                         </span>
                         {/* CLASH - Neo-Brutalist white italic skewed with black shadow */}
@@ -144,7 +144,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 </motion.button>
 
                 {/* Desktop Controls: visible on sm+ */}
-                <div className="hidden sm:flex items-center gap-3 md:gap-4 lg:gap-5 xl:gap-6 flex-shrink-0">
+                <div className="hidden sm:flex items-center gap-3 md:gap-4 lg:gap-5 xl:gap-6 2xl:gap-8 flex-shrink-0">
                     {/* Daily Challenge Quick Link */}
                     <DailyQuickLink />
 
@@ -158,10 +158,10 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             onClick={() => setShowLangDropdown(!showLangDropdown)}
                             className={cn(
                                 "flex items-center justify-center gap-1",
-                                "min-w-[44px] min-h-[44px] w-11 h-11 lg:w-14 lg:h-14 xl:w-16 xl:h-16",
+                                "min-w-[44px] min-h-[44px] w-11 h-11 lg:w-14 lg:h-14 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20",
                                 "bg-neo-cream text-neo-black",
-                                "border-3 lg:border-4 border-neo-black",
-                                "rounded-neo lg:rounded-neo-lg shadow-hard lg:shadow-hard-lg",
+                                "border-3 lg:border-4 2xl:border-[5px] border-neo-black",
+                                "rounded-neo lg:rounded-neo-lg shadow-hard lg:shadow-hard-lg 2xl:shadow-hard-xl",
                                 "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg",
                                 "active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm",
                                 "transition-all duration-100"
@@ -170,7 +170,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             aria-expanded={showLangDropdown}
                             aria-haspopup="listbox"
                         >
-                            <span className="text-xl lg:text-2xl xl:text-3xl">{currentFlag}</span>
+                            <span className="text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl">{currentFlag}</span>
                         </button>
 
                         <AnimatePresence>
@@ -214,18 +214,18 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             href={`/${language}/admin`}
                             className="
                                 flex items-center justify-center
-                                min-w-[44px] min-h-[44px] w-11 h-11 lg:w-14 lg:h-14 xl:w-16 xl:h-16
+                                min-w-[44px] min-h-[44px] w-11 h-11 lg:w-14 lg:h-14 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20
                                 bg-neo-purple text-white
-                                border-3 lg:border-4 border-neo-black
+                                border-3 lg:border-4 2xl:border-[5px] border-neo-black
                                 rounded-neo lg:rounded-neo-lg
-                                shadow-hard lg:shadow-hard-lg
+                                shadow-hard lg:shadow-hard-lg 2xl:shadow-hard-xl
                                 hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
                                 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
                                 transition-all duration-100
                             "
                             aria-label={t('common.adminDashboard') || 'Admin Dashboard'}
                         >
-                            <BarChart3 className="text-base lg:text-lg xl:text-xl" size={16} aria-hidden="true" />
+                            <BarChart3 className="text-base lg:text-lg xl:text-xl 2xl:text-2xl" size={16} aria-hidden="true" />
                         </Link>
                     )}
                     <MusicControls />
