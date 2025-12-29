@@ -14,9 +14,9 @@ export interface GameBase {
   users: Record<string, GameUser>;
   playerScores: Record<string, number>;
   playerWords: Record<string, string[]>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   playerAchievements: Record<string, any[]>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   playerWordDetails?: Record<string, any[]>;
   lastActivity: number;
   hostSocketId?: string | null;

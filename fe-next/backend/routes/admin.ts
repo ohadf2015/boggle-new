@@ -11,11 +11,11 @@
 
 import express, { Request, Response, Router, NextFunction } from 'express';
 import { z } from 'zod';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const { getAllGames } = require('../modules/gameStateManager');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const { isInProgress } = require('../utils/gameStateMachine');
 import { getActiveSinglePlayerCount } from './singlePlayer';
 import logger from '../utils/logger';
@@ -1535,7 +1535,7 @@ router.post('/community-words/approve', async (req: AdminRequest, res: Response)
     // Optionally add to permanent dictionary file
     if (addToDictionary) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
+         
         const dictionary = require('../../backend/dictionary');
         await dictionary.addApprovedWord(normalizedWord, language);
         auditLog(req.adminUser, 'COMMUNITY_WORD_ADD_TO_DICTIONARY', { word: normalizedWord, language });

@@ -81,3 +81,101 @@ export function useLocalStorageState<T>(
 
   return [value, setValue];
 }
+
+/**
+ * Hook for managing a "dismissed" or "has seen" flag in localStorage.
+ * Common pattern for tutorials, welcome messages, and one-time notifications.
+ *
+ * @param key - The localStorage key for this flag
+ * @returns Object with isDismissed state and dismiss function
+ *
+ * @example
+ * const { isDismissed, dismiss } = useDismissedFlag('welcome_message');
+ *
+ * if (!isDismissed) {
+ *   return <WelcomeModal onDismiss={dismiss} />;
+ * }
+ */
+export function useDismissedFlag(key: string): {
+  isDismissed: boolean;
+  dismiss: () => void;
+} {
+  const [isDismissed, setIsDismissed] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return localStorage.getItem(key) === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const dismiss = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(key, 'true');
+      setIsDismissed(true);
+    } catch (e) {
+      console.warn(`Failed to save ${key} to localStorage:`, e);
+    }
+  }, [key]);
+
+  return { isDismissed, dismiss };
+}
+
+/**
+ * Utility functions for direct localStorage access (for use outside React components).
+ * Prefer the hooks for React components.
+ */
+export const localStorageUtils = {
+  /**
+   * Check if a flag has been set
+   */
+  isDismissed: (key: string): boolean => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return localStorage.getItem(key) === 'true';
+    } catch {
+      return false;
+    }
+  },
+
+  /**
+   * Set a flag to dismissed
+   */
+  dismiss: (key: string): void => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(key, 'true');
+    } catch (e) {
+      console.warn(`Failed to save ${key} to localStorage:`, e);
+    }
+  },
+
+  /**
+   * Get a value from localStorage with JSON parsing
+   */
+  get: <T>(key: string, defaultValue: T): T => {
+    if (typeof window === 'undefined') return defaultValue;
+    try {
+      const stored = localStorage.getItem(key);
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch {
+      // Ignore parse errors
+    }
+    return defaultValue;
+  },
+
+  /**
+   * Set a value in localStorage with JSON serialization
+   */
+  set: <T>(key: string, value: T): void => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+      console.warn(`Failed to save ${key} to localStorage:`, e);
+    }
+  },
+};

@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect, memo, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Volume2, VolumeX, Volume1, Music } from 'lucide-react';
+import { Volume2, VolumeX, Volume1, Music, Smartphone } from 'lucide-react';
 import { useMusic } from '../contexts/MusicContext';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from './ui/button';
+import { isHapticsEnabled, setHapticsEnabled } from '../utils/haptics';
 
 /**
  * MusicControls - Neo-Brutalist styled volume controls with separate music and SFX sliders
@@ -18,11 +19,25 @@ const MusicControls: React.FC = memo(() => {
   const { t } = useLanguage();
   const [showSlider, setShowSlider] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
+  const [hapticsEnabled, setHapticsEnabledState] = useState(true);
 
   // Prevent hydration mismatch by only rendering dynamic icon after mount
   useEffect(() => {
     setHasMounted(true);
+    // Load haptics preference after mount
+    setHapticsEnabledState(isHapticsEnabled());
   }, []);
+
+  // Toggle haptics and persist
+  const handleToggleHaptics = useCallback(() => {
+    const newValue = !hapticsEnabled;
+    setHapticsEnabledState(newValue);
+    setHapticsEnabled(newValue);
+    // Give tactile feedback when enabling
+    if (newValue && 'vibrate' in navigator) {
+      navigator.vibrate(15);
+    }
+  }, [hapticsEnabled]);
 
   // Memoized volume icon
   const volumeIcon = useMemo(() => {
@@ -173,6 +188,34 @@ const MusicControls: React.FC = memo(() => {
                   />
                 </div>
               </div>
+
+              {/* Haptic Feedback Toggle */}
+              {hasMounted && 'vibrate' in navigator && (
+                <div className="flex items-center justify-between gap-2 pt-1 border-t border-neo-black/20">
+                  <div className="flex items-center gap-2">
+                    <Smartphone size={14} className="text-neo-cyan" aria-hidden="true" />
+                    <span className="text-xs font-black uppercase tracking-wide text-neo-black/70">
+                      {t('music.haptics') || 'Haptics'}
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleToggleHaptics}
+                    className={`
+                      relative w-10 h-5 rounded-full border-2 border-neo-black transition-colors
+                      ${hapticsEnabled ? 'bg-neo-cyan' : 'bg-neo-navy/20'}
+                    `}
+                    role="switch"
+                    aria-checked={hapticsEnabled}
+                    aria-label={t('music.toggleHaptics') || 'Toggle haptic feedback'}
+                  >
+                    <motion.div
+                      className="absolute top-0.5 w-3.5 h-3.5 rounded-full bg-neo-cream border border-neo-black"
+                      animate={{ left: hapticsEnabled ? '20px' : '2px' }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    />
+                  </button>
+                </div>
+              )}
 
               {!audioUnlocked && (
                 <span className="text-xs font-bold text-neo-orange">

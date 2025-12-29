@@ -66,7 +66,7 @@ let compiledSchemas: CompiledSchemas | null = null;
 
 // Try to load compiled schemas, fall back to inline if not available
 try {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
+   
   compiledSchemas = require('../dist/backend/utils/schemas') as CompiledSchemas;
 } catch {
   // Compiled schemas not available - this is expected during initial setup

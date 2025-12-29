@@ -151,7 +151,11 @@ const sv = {
     "openMenu": "Öppna meny",
     "language": "Språk",
     "controls": "Kontroller",
-    "account": "Konto"
+    "account": "Konto",
+    "all": "Alla",
+    "valid": "Giltig",
+    "invalid": "Ogiltig",
+    "validating": "Validerar..."
   },
   "theme": {
     "sundayFunday": "Kul Söndag",
@@ -286,7 +290,16 @@ const sv = {
     "clickToEnable": "Klicka för att aktivera musik",
     "controls": "Musikkontroller",
     "musicVolumeSlider": "Musikvolymreglage",
-    "sfxVolumeSlider": "Ljudeffektvolymreglage"
+    "sfxVolumeSlider": "Ljudeffektvolymreglage",
+    "haptics": "Haptik",
+    "toggleHaptics": "Växla haptisk feedback"
+  },
+  "settings": {
+    "lightMode": "Byt till ljust läge",
+    "darkMode": "Byt till mörkt läge",
+    "theme": "Tema",
+    "dark": "Mörkt",
+    "light": "Ljust"
   },
   "share": {
     "linkCopied": "Länk kopierad! 📋",
@@ -1229,6 +1242,79 @@ const sv = {
     },
     "skipHint": "Tryck ESC eller klicka Hoppa över för att hoppa direkt till spelet 🎮"
   },
+  "tutorial": {
+    "stepLabel": "Steg {current} av {total}",
+    "skip": "Hoppa över",
+    "prev": "Tillbaka",
+    "next": "Nästa",
+    "finish": "Förstått!",
+    "tapToContinue": "Tryck var som helst för att fortsätta",
+    "welcome": {
+      "title": "Välkommen till LexiClash!",
+      "description": "Låt oss lära oss hur man spelar i några enkla steg. Denna snabba guide visar dig allt du behöver för att dominera ordspelet!"
+    },
+    "grid": {
+      "title": "Bokstavsrutnätet",
+      "description": "Det här är din slagfält! Bokstäver är arrangerade i ett rutnät. Ditt mål är att hitta så många ord som möjligt genom att koppla ihop intilliggande bokstäver."
+    },
+    "swipe": {
+      "title": "Bilda ord genom att svepa",
+      "description": "Svep eller dra genom intilliggande bokstäver (inklusive diagonaler) för att bilda ord. Släpp för att skicka. Ju längre ord, desto fler poäng!"
+    },
+    "combo": {
+      "title": "Bygg kombos",
+      "description": "Hitta ord snabbt för att bygga kombomultiplikatorer! Varje efterföljande ord ökar din kombo och multiplicerar din poäng. Håll serien vid liv!"
+    },
+    "timer": {
+      "title": "Håll koll på timern",
+      "description": "Du har begränsad tid att hitta ord. Timern visar hur mycket tid som återstår. När den blir röd, skynda dig!"
+    },
+    "leaderboard": {
+      "title": "Följ din ranking",
+      "description": "Se hur du står dig mot andra spelare i realtid. Klättra på topplistan genom att hitta fler och längre ord!"
+    },
+    "ready": {
+      "title": "Du är redo!",
+      "description": "Det är allt du behöver veta! Hitta några ord och visa alla vem som är ordmästaren!"
+    },
+    "wordHunt": {
+      "welcome": {
+        "title": "Daglig ordjakt",
+        "description": "Hitta det dolda ordet! Du har 10 försök.",
+        "next": "Nästa"
+      },
+      "colorFeedback": {
+        "title": "Lär dig färgerna",
+        "tryGuessing": "Efter varje gissning visar färgerna hur nära du är:",
+        "green": "Grön = Rätt position",
+        "yellow": "Gul = I ordet, fel plats",
+        "gray": "Grå = Inte i ordet",
+        "next": "Nästa"
+      },
+      "lifeSystem": {
+        "title": "Liv & ordupptäckt",
+        "description": "Hitta ord på brädet för att få liv & ledtrådspoletter!",
+        "swipeToGain": "Svep ord för att få",
+        "tryIt": "Jag förstår!"
+      },
+      "minLength": {
+        "title": "⚠️ VIKTIG REGEL",
+        "description": "Ord måste vara minst 3 BOKSTÄVER långa",
+        "example1": "3 bokstäver ✓",
+        "example2": "2 bokstäver - för kort!",
+        "gotIt": "Jag förstår!"
+      },
+      "complete": {
+        "title": "Du är redo!",
+        "remember": "Kom ihåg:",
+        "rule1": "10 försök att hitta målordet",
+        "rule2": "Hitta andra ord för liv",
+        "rule3": "Minimum 3 bokstäver",
+        "rule4": "Samma pussel världen över",
+        "start": "Starta daglig utmaning"
+      }
+    }
+  },
   "achievements": {
     "FIRST_BLOOD": {
       "name": "Första Blodet",
@@ -2109,7 +2195,9 @@ const sv = {
     "showLess": "Visa mindre",
     "more": "mer",
     "maxAttempts": "Max Försök",
-    "huntDescription": "Jaga det dolda ordet med färgkodad feedback!"
+    "huntDescription": "Jaga det dolda ordet med färgkodad feedback!",
+    "shareImage": "Dela som bild",
+    "download": "Ladda ner"
   },
   "wordHunt": {
     "title": "Ordjakt",
@@ -2244,45 +2332,6 @@ const sv = {
       "hoursAgo": "{count}h sedan"
     }
   },
-  "tutorial": {
-    "wordHunt": {
-      "welcome": {
-        "title": "Daglig ordjakt",
-        "description": "Hitta det dolda ordet! Du har 10 försök.",
-        "next": "Nästa"
-      },
-      "colorFeedback": {
-        "title": "Lär dig färgerna",
-        "tryGuessing": "Efter varje gissning visar färgerna hur nära du är:",
-        "green": "Grön = Rätt position",
-        "yellow": "Gul = I ordet, fel plats",
-        "gray": "Grå = Inte i ordet",
-        "next": "Nästa"
-      },
-      "lifeSystem": {
-        "title": "Liv & ordupptäckt",
-        "description": "Hitta ord på brädet för att få liv & ledtrådspoletter!",
-        "swipeToGain": "Svep ord för att få",
-        "tryIt": "Jag förstår!"
-      },
-      "minLength": {
-        "title": "⚠️ VIKTIG REGEL",
-        "description": "Ord måste vara minst 3 BOKSTÄVER långa",
-        "example1": "3 bokstäver ✓",
-        "example2": "2 bokstäver - för kort!",
-        "gotIt": "Jag förstår!"
-      },
-      "complete": {
-        "title": "Du är redo!",
-        "remember": "Kom ihåg:",
-        "rule1": "10 försök att hitta målordet",
-        "rule2": "Hitta andra ord för liv",
-        "rule3": "Minimum 3 bokstäver",
-        "rule4": "Samma pussel världen över",
-        "start": "Starta daglig utmaning"
-      }
-    }
-  },
   "guidance": {
     "combo": {
       "title": "Kombobonus!",
@@ -2317,6 +2366,9 @@ const sv = {
   "home": {
     "singlePlayer": "Enspelare",
     "multiplayer": "Flerspelare"
+  },
+  "friends": {
+    "title": "Vänner"
   },
   "reveal": {
     "revealWord": "Avslöja",

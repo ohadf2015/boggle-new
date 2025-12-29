@@ -122,15 +122,32 @@ export const copyGameCode = async (gameCode: string, t: TranslationFunction | nu
 };
 
 /**
+ * Player archetype for enhanced share cards
+ */
+export interface ShareArchetype {
+  id: string;
+  name: string;
+  emoji: string;
+}
+
+/**
  * Game result data for personalized sharing
  */
 export interface GameResultForShare {
   score: number;
   wordCount: number;
   isWinner: boolean;
-  achievements?: Array<{ id: string; icon?: string }>;
+  achievements?: Array<{ id: string; icon?: string; name?: string }>;
   longestWord?: string;
   streakDays?: number;
+  /** Max combo level achieved during the game */
+  maxCombo?: number;
+  /** Player archetype based on playstyle */
+  archetype?: ShareArchetype;
+  /** Placement in the game (1st, 2nd, etc.) */
+  placement?: number;
+  /** Total players in the game */
+  totalPlayers?: number;
 }
 
 /**

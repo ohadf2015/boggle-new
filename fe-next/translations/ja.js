@@ -151,7 +151,11 @@ const ja = {
     "openMenu": "メニューを開く",
     "language": "言語",
     "controls": "コントロール",
-    "account": "アカウント"
+    "account": "アカウント",
+    "all": "すべて",
+    "valid": "有効",
+    "invalid": "無効",
+    "validating": "検証中..."
   },
   "theme": {
     "sundayFunday": "楽しい日曜日",
@@ -286,7 +290,16 @@ const ja = {
     "clickToEnable": "クリックして音楽を有効にする",
     "controls": "音楽コントロール",
     "musicVolumeSlider": "音楽ボリュームスライダー",
-    "sfxVolumeSlider": "効果音ボリュームスライダー"
+    "sfxVolumeSlider": "効果音ボリュームスライダー",
+    "haptics": "触覚",
+    "toggleHaptics": "触覚フィードバックを切り替え"
+  },
+  "settings": {
+    "lightMode": "ライトモードに切り替え",
+    "darkMode": "ダークモードに切り替え",
+    "theme": "テーマ",
+    "dark": "ダーク",
+    "light": "ライト"
   },
   "share": {
     "linkCopied": "リンクをコピーしました！📋",
@@ -1228,6 +1241,79 @@ const ja = {
     },
     "skipHint": "ESCキーを押すか、スキップをクリックしてゲームに直接ジャンプ 🎮"
   },
+  "tutorial": {
+    "stepLabel": "ステップ {current}/{total}",
+    "skip": "チュートリアルをスキップ",
+    "prev": "戻る",
+    "next": "次へ",
+    "finish": "わかった！",
+    "tapToContinue": "どこかをタップして続ける",
+    "welcome": {
+      "title": "LexiClashへようこそ！",
+      "description": "簡単なステップで遊び方を学びましょう。このクイックチュートリアルで、ワードゲームを制覇するために必要なすべてを紹介します！"
+    },
+    "grid": {
+      "title": "文字グリッド",
+      "description": "これがあなたの戦場です！文字がグリッドに配置されています。隣接する文字をつなげて、できるだけ多くの単語を見つけることが目標です。"
+    },
+    "swipe": {
+      "title": "スワイプして単語を作る",
+      "description": "隣接する文字（斜めも含む）をスワイプまたはドラッグして単語を作ります。離すと送信されます。単語が長いほど、より多くのポイントを獲得！"
+    },
+    "combo": {
+      "title": "コンボを積み上げる",
+      "description": "素早く単語を見つけてコンボマルチプライヤーを構築！連続する各単語でコンボが増加し、スコアが倍増します。ストリークを維持しましょう！"
+    },
+    "timer": {
+      "title": "タイマーに注意",
+      "description": "単語を見つける時間には制限があります。タイマーで残り時間を確認できます。赤くなったら急いで！"
+    },
+    "leaderboard": {
+      "title": "ランキングを追跡",
+      "description": "他のプレイヤーとリアルタイムで競い合えます。より多くの長い単語を見つけて、リーダーボードを駆け上がろう！"
+    },
+    "ready": {
+      "title": "準備完了！",
+      "description": "これが知るべきすべてです！単語を見つけて、誰がワードマスターかを示しましょう！"
+    },
+    "wordHunt": {
+      "welcome": {
+        "title": "デイリーワードハント",
+        "description": "隠された単語を見つけよう！10回の試行があります。",
+        "next": "次へ"
+      },
+      "colorFeedback": {
+        "title": "色を学ぶ",
+        "tryGuessing": "各推測の後、色であなたの近さを示します：",
+        "green": "緑 = 正しい位置",
+        "yellow": "黄 = 単語にあるが位置が違う",
+        "gray": "灰 = 単語にない",
+        "next": "次へ"
+      },
+      "lifeSystem": {
+        "title": "ライフと単語発見",
+        "description": "ボード上の単語を見つけてライフとヒントトークンを獲得！",
+        "swipeToGain": "単語をスワイプして獲得",
+        "tryIt": "わかりました！"
+      },
+      "minLength": {
+        "title": "⚠️ 重要なルール",
+        "description": "単語は最低3文字必要です",
+        "example1": "3文字 ✓",
+        "example2": "2文字 - 短すぎます！",
+        "gotIt": "わかりました！"
+      },
+      "complete": {
+        "title": "準備完了！",
+        "remember": "覚えておいて：",
+        "rule1": "目標を見つけるための10回の試行",
+        "rule2": "ライフのために他の単語を見つける",
+        "rule3": "最低3文字",
+        "rule4": "世界中で同じパズル",
+        "start": "デイリーチャレンジを開始"
+      }
+    }
+  },
   "achievements": {
     "FIRST_BLOOD": {
       "name": "ファーストブラッド",
@@ -2108,7 +2194,9 @@ const ja = {
     "showLess": "閉じる",
     "more": "人",
     "maxAttempts": "最大試行回数",
-    "huntDescription": "色分けされたフィードバックで隠された単語を探そう！"
+    "huntDescription": "色分けされたフィードバックで隠された単語を探そう！",
+    "shareImage": "画像として共有",
+    "download": "ダウンロード"
   },
   "wordHunt": {
     "title": "ワードハント",
@@ -2243,45 +2331,6 @@ const ja = {
       "hoursAgo": "{count}時間前"
     }
   },
-  "tutorial": {
-    "wordHunt": {
-      "welcome": {
-        "title": "デイリーワードハント",
-        "description": "隠された単語を見つけよう！10回の試行があります。",
-        "next": "次へ"
-      },
-      "colorFeedback": {
-        "title": "色を学ぶ",
-        "tryGuessing": "各推測の後、色であなたの近さを示します：",
-        "green": "緑 = 正しい位置",
-        "yellow": "黄 = 単語にあるが位置が違う",
-        "gray": "灰 = 単語にない",
-        "next": "次へ"
-      },
-      "lifeSystem": {
-        "title": "ライフと単語発見",
-        "description": "ボード上の単語を見つけてライフとヒントトークンを獲得！",
-        "swipeToGain": "単語をスワイプして獲得",
-        "tryIt": "わかりました！"
-      },
-      "minLength": {
-        "title": "⚠️ 重要なルール",
-        "description": "単語は最低3文字必要です",
-        "example1": "3文字 ✓",
-        "example2": "2文字 - 短すぎます！",
-        "gotIt": "わかりました！"
-      },
-      "complete": {
-        "title": "準備完了！",
-        "remember": "覚えておいて：",
-        "rule1": "目標を見つけるための10回の試行",
-        "rule2": "ライフのために他の単語を見つける",
-        "rule3": "最低3文字",
-        "rule4": "世界中で同じパズル",
-        "start": "デイリーチャレンジを開始"
-      }
-    }
-  },
   "guidance": {
     "combo": {
       "title": "コンボボーナス！",
@@ -2316,6 +2365,9 @@ const ja = {
   "home": {
     "singlePlayer": "シングルプレイヤー",
     "multiplayer": "マルチプレイヤー"
+  },
+  "friends": {
+    "title": "フレンド"
   },
   "reveal": {
     "revealWord": "表示",

@@ -4,7 +4,7 @@
  * Fire-and-forget design - never blocks game flow
  */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const logger = require('../utils/logger');
 
 // Interfaces

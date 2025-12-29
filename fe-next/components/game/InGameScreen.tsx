@@ -45,6 +45,7 @@ import {
   useFireRoundGuidanceTrigger,
 } from '@/hooks/useContextualGuidance';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
+import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 
 // ==================== Types ====================
 
@@ -494,6 +495,15 @@ const InGameScreen = memo<InGameScreenProps>(({
     announceWordResult,
   ]); // Optimized: removed effectiveComboLevelRef and fireRoundActive from deps (using refs)
 
+  // Keyboard word input - allows typing words directly instead of swiping
+  const keyboardInput = useKeyboardWordInput({
+    grid: letterGrid,
+    language: gameLanguage || 'en',
+    enabled: isPlaying && gameActive && !showStartAnimation,
+    onWordSubmit: handleGridWordSubmit,
+    minWordLength,
+  });
+
   // Memoize leaderboard items with centralized ranking utilities (using deferred value)
   const memoizedLeaderboard = useMemo(() => deferredLeaderboard.map((player, index) => ({
     ...player,
@@ -684,10 +694,11 @@ const InGameScreen = memo<InGameScreenProps>(({
           {/* Center: Word Forming Area + Notification + Grid */}
           <div className={`flex flex-col items-center justify-center w-full h-full ${isVeryShortLandscape ? 'px-4' : 'px-3'} py-0.5 landscape-grid-container`}>
             {/* Word Forming Area with integrated feedback - flex-shrink-0 prevents squishing, z-50 keeps it visible */}
+            {/* Shows typed word when in keyboard mode, otherwise shows swiped word */}
             {isPlaying && (
               <WordFormingArea
-                word={formedWord}
-                letterCount={letterCount}
+                word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
+                letterCount={keyboardInput.isTypingMode ? keyboardInput.typedWord.length : letterCount}
                 feedback={currentFeedback}
                 compact
                 className="mb-1 flex-shrink-0 z-50"
@@ -708,6 +719,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                 largeText
                 fireRoundActive={fireRoundActive}
                 earthquakeShaking={earthquakeState === 'shaking'}
+                highlightedPath={keyboardInput.isTypingMode ? keyboardInput.highlightedCells : []}
               />
             </div>
           </div>
@@ -912,11 +924,12 @@ const InGameScreen = memo<InGameScreenProps>(({
         )}
 
         {/* Word Forming Area with feedback - centered below timer */}
+        {/* Shows typed word when in keyboard mode, otherwise shows swiped word */}
         {isPlaying && (
           <div className="flex items-center justify-center mb-1">
             <WordFormingArea
-              word={formedWord}
-              letterCount={letterCount}
+              word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
+              letterCount={keyboardInput.isTypingMode ? keyboardInput.typedWord.length : letterCount}
               feedback={currentFeedback}
               compact
             />
@@ -968,6 +981,7 @@ const InGameScreen = memo<InGameScreenProps>(({
               hideWordPreview={true}
               fireRoundActive={fireRoundActive}
               earthquakeShaking={earthquakeState === 'shaking'}
+              highlightedPath={keyboardInput.isTypingMode ? keyboardInput.highlightedCells : []}
             />
         </div>
 

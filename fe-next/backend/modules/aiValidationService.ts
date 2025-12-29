@@ -6,11 +6,11 @@
  * AI votes count as 4 points toward the validation threshold (10 points for prominent validation)
  */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const logger = require('../utils/logger');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const { gameAIService } = require('./gameAIService');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const { recordAIVote, AI_VOTE_POINTS } = require('./communityWordManager');
 
 // Interfaces

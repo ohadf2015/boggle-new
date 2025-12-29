@@ -7,11 +7,11 @@
  */
 
 import express, { Request, Response, Router } from 'express';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const { getCachedLeaderboardTop100, cacheLeaderboardTop100, getCachedUserRank, cacheUserRank } = require('../redisClient');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const { coalesce } = require('../utils/requestCoalescing');
 import logger from '../utils/logger';
 

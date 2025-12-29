@@ -4,11 +4,11 @@
  */
 
 import express, { Request, Response, Router } from 'express';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const { isRedisAvailable, getRedisMetrics } = require('../redisClient');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const { getAllGames } = require('../modules/gameStateManager');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const { getMetrics, getRoomMetrics, resetAll } = require('../utils/metrics');
 
 const router: Router = express.Router();

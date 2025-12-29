@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Trophy, Flame, Target, Clock, BookOpen, ArrowLeft, MessageCircle, Copy, Check } from 'lucide-react';
+import { Share2, Trophy, Flame, Target, Clock, BookOpen, ArrowLeft, MessageCircle, Copy, Check, Image as ImageIcon, Download } from 'lucide-react';
 
 // X/Twitter icon (no lucide equivalent)
 const XTwitterIcon = ({ className }: { className?: string }) => (
@@ -22,6 +22,12 @@ import {
 } from '@/utils/dailyChallenge';
 import DailyLeaderboard from './DailyLeaderboard';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  generateShareImage,
+  shareImageWithNativeShare,
+  downloadShareImage,
+  type ShareImageResult,
+} from '@/utils/shareImageGenerator';
 
 interface DailyChallengeResultsProps {
   result: DailyChallengeResult;
@@ -54,6 +60,9 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
   const [guestPlayer, setGuestPlayer] = useState<GuestDailyPlayer | null>(null);
   const [leaderboardKey, setLeaderboardKey] = useState(0);
+  const [shareImage, setShareImage] = useState<ShareImageResult | null>(null);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [showImagePreview, setShowImagePreview] = useState(false);
   const { profile, isAuthenticated } = useAuth();
 
   // Get guest fingerprint and player info on mount
@@ -215,6 +224,52 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
     }
   }, [shareText]);
 
+  // Generate share image
+  const handleGenerateImage = useCallback(async () => {
+    if (isGeneratingImage) return;
+
+    setIsGeneratingImage(true);
+    try {
+      const imageResult = await generateShareImage({
+        result,
+        streak,
+        longestWord,
+        size: 'og',
+      });
+      setShareImage(imageResult);
+      setShowImagePreview(true);
+    } catch (err) {
+      console.error('Failed to generate share image:', err);
+    } finally {
+      setIsGeneratingImage(false);
+    }
+  }, [result, streak, longestWord, isGeneratingImage]);
+
+  // Share image via native share
+  const handleShareImage = useCallback(async () => {
+    if (!shareImage) {
+      await handleGenerateImage();
+      return;
+    }
+
+    const success = await shareImageWithNativeShare(
+      shareImage,
+      shareText + '\n\nCan you beat my score?'
+    );
+
+    if (!success) {
+      // Fallback: show image preview for manual download/share
+      setShowImagePreview(true);
+    }
+  }, [shareImage, shareText, handleGenerateImage]);
+
+  // Download share image
+  const handleDownloadImage = useCallback(() => {
+    if (shareImage) {
+      downloadShareImage(shareImage, `lexiclash-daily-${result.puzzleNumber}.png`);
+    }
+  }, [shareImage, result.puzzleNumber]);
+
   return (
     <motion.div
       key="results"
@@ -363,7 +418,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           </Button>
 
           {/* Platform-specific buttons */}
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-4 gap-2">
             <Button
               onClick={handleWhatsApp}
               aria-label="Share on WhatsApp"
@@ -378,6 +433,19 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               className="py-3 min-h-[44px] bg-black text-white border-3 border-gray-700 rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2"
             >
               <XTwitterIcon className="w-5 h-5" />
+            </Button>
+
+            <Button
+              onClick={handleGenerateImage}
+              disabled={isGeneratingImage}
+              aria-label={t('daily.shareImage') || 'Share as Image'}
+              className="py-3 min-h-[44px] bg-neo-purple text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all focus:ring-2 focus:ring-neo-pink focus:ring-offset-2 disabled:opacity-50"
+            >
+              {isGeneratingImage ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <ImageIcon className="w-5 h-5" />
+              )}
             </Button>
 
             <Button
@@ -521,6 +589,69 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                 onClick={() => setShowSharePanel(false)}
                 variant="ghost"
                 className="w-full mt-4"
+              >
+                {t('daily.close')}
+              </Button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Image preview modal */}
+      <AnimatePresence>
+        {showImagePreview && shareImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowImagePreview(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-neo-navy rounded-neo border-4 border-neo-black p-4 max-w-2xl w-full"
+              onClick={e => e.stopPropagation()}
+            >
+              <h3 className="text-xl font-black mb-4 text-white text-center">
+                {t('daily.shareImage') || 'Share Image'}
+              </h3>
+
+              {/* Image preview - using <img> intentionally for data URL which Next.js Image doesn't optimize */}
+              <div className="relative rounded-neo overflow-hidden border-3 border-neo-black mb-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={shareImage.dataUrl}
+                  alt={`LexiClash Daily Challenge #${result.puzzleNumber} - Score: ${result.score}`}
+                  className="w-full h-auto"
+                  style={{ maxHeight: '60vh', objectFit: 'contain' }}
+                />
+              </div>
+
+              {/* Action buttons */}
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  onClick={handleShareImage}
+                  className="py-3 bg-gradient-to-r from-neo-yellow to-neo-orange text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm font-bold"
+                >
+                  <Share2 className="mr-2 w-5 h-5" />
+                  {t('daily.shareScore')}
+                </Button>
+
+                <Button
+                  onClick={handleDownloadImage}
+                  className="py-3 bg-neo-cyan text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm font-bold"
+                >
+                  <Download className="mr-2 w-5 h-5" />
+                  {t('daily.download') || 'Download'}
+                </Button>
+              </div>
+
+              <Button
+                onClick={() => setShowImagePreview(false)}
+                variant="ghost"
+                className="w-full mt-3 text-gray-400 hover:text-white"
               >
                 {t('daily.close')}
               </Button>

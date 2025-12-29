@@ -4,9 +4,9 @@
  */
 
 import express, { Request, Response, Router, NextFunction } from 'express';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const { load: loadDictionary } = require('../dictionary');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const { findWordsForBots } = require('../modules/boggleSolver');
 import logger from '../utils/logger';
 

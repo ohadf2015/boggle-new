@@ -13,7 +13,7 @@
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { Bot, WordSubmissionData } from './botBehavior';
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const botConfig = require('./botConfig');
 export const BOT_CONFIG = botConfig.BOT_CONFIG;
 

@@ -168,7 +168,7 @@ export async function recordLogin(playerId: string): Promise<LoginResult> {
   // Get or create engagement record
   let { data: engagement } = await supabase
     .from('player_engagement')
-    .select('*')
+    .select('player_id, current_streak, longest_streak, last_login_date, streak_protected_until, streak_freezes_available, calendar_month, calendar_year, calendar_days_claimed, last_played_at, comeback_bonus_claimed, comeback_bonus_expires_at, comeback_xp_multiplier, total_sessions, avg_session_length, games_today, last_session_date')
     .eq('player_id', playerId)
     .single();
 
@@ -903,7 +903,7 @@ export async function getEngagementStatus(playerId: string): Promise<EngagementS
 
   const { data: engagement } = await supabase
     .from('player_engagement')
-    .select('*')
+    .select('current_streak, longest_streak, streak_freezes_available, calendar_month, calendar_year, calendar_days_claimed, last_played_at, comeback_bonus_claimed, comeback_bonus_expires_at, comeback_xp_multiplier, games_today')
     .eq('player_id', playerId)
     .single();
 

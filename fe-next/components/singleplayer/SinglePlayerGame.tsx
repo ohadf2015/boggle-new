@@ -1277,7 +1277,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           comboLevel={combo.comboLevel}
           maxCombo={combo.maxCombo}
           wordLengths={foundWords.filter(fw => fw.isValid === true).map(fw => fw.word.length)}
-          timeSinceStart={(Date.now() - gameStartTimeRef.current) / 1000}
+          timeSinceStart={settings.timerSeconds - timer.remainingTime}
           gameDuration={settings.timerSeconds}
           earnedAchievements={[]}
           isGameOver={isGameOver}
@@ -1539,7 +1539,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         comboLevel={combo.comboLevel}
         maxCombo={combo.maxCombo}
         wordLengths={foundWords.filter(fw => fw.isValid === true).map(fw => fw.word.length)}
-        timeSinceStart={(Date.now() - gameStartTimeRef.current) / 1000}
+        timeSinceStart={settings.timerSeconds - timer.remainingTime}
         gameDuration={settings.timerSeconds}
         earnedAchievements={[]}
         isGameOver={isGameOver}

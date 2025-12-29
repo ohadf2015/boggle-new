@@ -819,7 +819,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                       transition={{ duration: 0.2 }}
                       className="overflow-hidden"
                     >
-                      <div className="p-2 bg-white dark:bg-slate-800 border-t border-neo-black/10 dark:border-slate-600">
+                      <div className="p-2 bg-white dark:bg-slate-800 border-t border-neo-black/10 dark:border-slate-600 text-neo-black dark:text-white">
                         {bot.words && bot.words.length > 0 && (
                           <div className="flex flex-wrap gap-1">
                             {bot.words.map((word, i) => {

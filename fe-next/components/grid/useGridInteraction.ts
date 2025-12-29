@@ -24,6 +24,10 @@ interface UseGridInteractionReturn {
   selectedCells: SelectedCell[];
   fadingCells: GridPosition[];
   focusedCell: GridPosition | null;
+  /** Adjacent cells that can be selected next (for visual hints) */
+  adjacentCells: GridPosition[];
+  /** Swipe velocity for animation intensity */
+  swipeVelocity: number;
   handleTouchStart: (rowIndex: number, colIndex: number, letter: string, event: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>) => void;
   handleTouchMove: (e: TouchEvent | MouseEvent) => void;
   handleTouchEnd: () => void;
@@ -36,6 +40,10 @@ interface UseGridInteractionReturn {
 
 // Selection threshold - must be within this % of cell center to select
 const CELL_SELECTION_THRESHOLD = 0.85;
+// Diagonal selection threshold - slightly more lenient for diagonal movement
+const DIAGONAL_SELECTION_THRESHOLD = 0.95;
+// Velocity calculation - samples to average
+const VELOCITY_SAMPLES = 3;
 
 const noOp = () => {};
 
@@ -53,6 +61,8 @@ export function useGridInteraction({
   const [fadingCells, setFadingCells] = useState<GridPosition[]>([]);
   const [focusedCell, setFocusedCell] = useState<GridPosition | null>(null);
   const [isKeyboardMode, setIsKeyboardMode] = useState<boolean>(false);
+  const [adjacentCells, setAdjacentCells] = useState<GridPosition[]>([]);
+  const [swipeVelocity, setSwipeVelocity] = useState<number>(0);
 
   const isTouchingRef = useRef<boolean>(false);
   const startPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -60,6 +70,9 @@ export function useGridInteraction({
   const autoSubmitTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const startCellRef = useRef<SelectedCell | null>(null);
   const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // For velocity calculation
+  const touchHistoryRef = useRef<Array<{ x: number; y: number; time: number }>>([]);
+  const lastDirectionRef = useRef<{ dx: number; dy: number } | null>(null);
 
   // Use external control if provided, otherwise internal state
   const selectedCells = externalSelectedCells || internalSelectedCells;
@@ -71,6 +84,67 @@ export function useGridInteraction({
     const colDiff = Math.abs(cell1.col - cell2.col);
     return rowDiff <= 1 && colDiff <= 1 && (rowDiff > 0 || colDiff > 0);
   }, []);
+
+  // Check if movement to a cell is diagonal
+  const isDiagonalMove = useCallback((cell1: GridPosition, cell2: GridPosition): boolean => {
+    const rowDiff = Math.abs(cell1.row - cell2.row);
+    const colDiff = Math.abs(cell1.col - cell2.col);
+    return rowDiff === 1 && colDiff === 1;
+  }, []);
+
+  // Get all adjacent cells that can be selected (not already selected)
+  const getAdjacentCells = useCallback((lastCell: GridPosition | null): GridPosition[] => {
+    if (!lastCell) return [];
+    const rows = grid.length;
+    const cols = grid[0]?.length || 4;
+    const adjacent: GridPosition[] = [];
+
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        if (dr === 0 && dc === 0) continue;
+        const newRow = lastCell.row + dr;
+        const newCol = lastCell.col + dc;
+        if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
+          // Check if not already selected
+          const isSelected = selectedCells.some(c => c.row === newRow && c.col === newCol);
+          if (!isSelected) {
+            adjacent.push({ row: newRow, col: newCol });
+          }
+        }
+      }
+    }
+    return adjacent;
+  }, [grid, selectedCells]);
+
+  // Calculate swipe velocity from touch history
+  const calculateVelocity = useCallback((): number => {
+    const history = touchHistoryRef.current;
+    if (history.length < 2) return 0;
+
+    const recent = history.slice(-VELOCITY_SAMPLES);
+    if (recent.length < 2) return 0;
+
+    const first = recent[0];
+    const last = recent[recent.length - 1];
+    const timeDiff = last.time - first.time;
+    if (timeDiff === 0) return 0;
+
+    const distance = Math.sqrt(
+      Math.pow(last.x - first.x, 2) + Math.pow(last.y - first.y, 2)
+    );
+    // Pixels per millisecond, normalized to a 0-1 scale (0.5+ is fast)
+    return Math.min(1, distance / timeDiff / 2);
+  }, []);
+
+  // Update adjacent cells when selection changes
+  useEffect(() => {
+    const lastCell = selectedCells[selectedCells.length - 1];
+    if (lastCell && isTouchingRef.current) {
+      setAdjacentCells(getAdjacentCells(lastCell));
+    } else {
+      setAdjacentCells([]);
+    }
+  }, [selectedCells, getAdjacentCells]);
 
   // Get cell at touch position with cell center distance info
   const getCellAtPosition = useCallback((touchX: number, touchY: number): CellPosition | null => {
@@ -235,6 +309,11 @@ export function useGridInteraction({
     if (!touch) return;
     startPosRef.current = { x: touch.clientX, y: touch.clientY };
 
+    // Clear touch history for fresh velocity tracking
+    touchHistoryRef.current = [{ x: touch.clientX, y: touch.clientY, time: Date.now() }];
+    lastDirectionRef.current = null;
+    setSwipeVelocity(0);
+
     // Store start cell
     startCellRef.current = { row: rowIndex, col: colIndex, letter };
 
@@ -255,6 +334,17 @@ export function useGridInteraction({
     if (!touch) return;
     const touchX = touch.clientX;
     const touchY = touch.clientY;
+    const now = Date.now();
+
+    // Track touch history for velocity calculation
+    touchHistoryRef.current.push({ x: touchX, y: touchY, time: now });
+    if (touchHistoryRef.current.length > VELOCITY_SAMPLES * 2) {
+      touchHistoryRef.current = touchHistoryRef.current.slice(-VELOCITY_SAMPLES);
+    }
+
+    // Update swipe velocity
+    const velocity = calculateVelocity();
+    setSwipeVelocity(velocity);
 
     // Deadzone check
     const deltaX = touchX - startPosRef.current.x;
@@ -277,11 +367,22 @@ export function useGridInteraction({
       return;
     }
 
+    // Check if this is a diagonal move - use more lenient threshold
+    const isDiagonal = isDiagonalMove(lastCell, currentCell);
+    const threshold = isDiagonal ? DIAGONAL_SELECTION_THRESHOLD : CELL_SELECTION_THRESHOLD;
+    const selectionThreshold = currentCell.cellRadius * threshold;
+
     // Anti-accident: must be close enough to cell center
-    const selectionThreshold = currentCell.cellRadius * CELL_SELECTION_THRESHOLD;
-    if (currentCell.distanceFromCenter > selectionThreshold) {
+    // Fast swipes get more lenient threshold
+    const velocityBonus = velocity > 0.3 ? 0.1 : 0;
+    if (currentCell.distanceFromCenter > selectionThreshold * (1 + velocityBonus)) {
       return;
     }
+
+    // Track direction for predictive selection hints
+    const dx = currentCell.col - lastCell.col;
+    const dy = currentCell.row - lastCell.row;
+    lastDirectionRef.current = { dx, dy };
 
     // Backtracking
     const existingIndex = selectedCells.findIndex(
@@ -316,6 +417,12 @@ export function useGridInteraction({
       clearTimeout(autoSubmitTimeoutRef.current);
       autoSubmitTimeoutRef.current = null;
     }
+
+    // Clear gesture tracking state
+    setAdjacentCells([]);
+    setSwipeVelocity(0);
+    touchHistoryRef.current = [];
+    lastDirectionRef.current = null;
 
     resetSelectionState();
 
@@ -563,6 +670,8 @@ export function useGridInteraction({
     selectedCells,
     fadingCells,
     focusedCell,
+    adjacentCells,
+    swipeVelocity,
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,

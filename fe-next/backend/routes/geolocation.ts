@@ -4,7 +4,7 @@
  */
 
 import express, { Request, Response, Router } from 'express';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const { getCountryFromRequest } = require('../utils/geolocation');
 import logger from '../utils/logger';
 

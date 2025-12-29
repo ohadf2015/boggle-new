@@ -3,9 +3,9 @@
  * Manages tournament state, player tracking, and round progression
  */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const { saveTournamentState, deleteTournamentState } = require('../redisClient');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const logger = require('../utils/logger');
 
 // Interfaces
@@ -464,7 +464,7 @@ export function linkGameToTournament(gameCode: string, tournamentId: string): bo
  * Restore tournaments from Redis on server start
  */
 export async function restoreTournamentsFromRedis(): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+   
   const { getAllTournamentIds, getTournamentState } = require('../redisClient');
 
   try {

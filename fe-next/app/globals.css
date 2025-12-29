@@ -98,6 +98,45 @@
   --avatar-15: #FF6F61;
 }
 
+/* Light Mode Variables */
+.light {
+  /* Inverted semantic color mappings for light mode */
+  --background: #f8fafc;
+  --foreground: rgb(var(--neo-black));
+  --card: #ffffff;
+  --card-foreground: rgb(var(--neo-black));
+  --popover: #ffffff;
+  --popover-foreground: rgb(var(--neo-black));
+  --primary: var(--neo-yellow);
+  --primary-foreground: rgb(var(--neo-black));
+  --secondary: var(--neo-orange);
+  --secondary-foreground: rgb(var(--neo-black));
+  --muted: #e2e8f0;
+  --muted-foreground: #64748b;
+  --accent: var(--neo-pink);
+  --accent-foreground: rgb(var(--neo-white));
+  --destructive: var(--neo-red);
+  --destructive-foreground: rgb(var(--neo-white));
+  --border: rgb(var(--neo-black));
+  --input: #e2e8f0;
+  --ring: var(--neo-cyan);
+
+  /* Light mode specific overrides */
+  --neo-navy: #f1f5f9;
+  --neo-navy-light: #e2e8f0;
+  --neo-gray: #f8fafc;
+
+  /* Lighter halftone pattern for light mode */
+  --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1.5' fill='%23000000' fill-opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* Light mode body background */
+.light body,
+html.light body {
+  background-color: #f8fafc;
+  color: rgb(var(--neo-black));
+}
+
 html {
   overflow-x: hidden;
 }
@@ -119,9 +158,14 @@ body {
 }
 
 @layer base {
-  /* Force dark mode - Neo-Brutalism works best dark */
+  /* Default to dark mode - Neo-Brutalism works best dark */
   html {
     color-scheme: dark;
+  }
+
+  /* Light mode color scheme */
+  html.light {
+    color-scheme: light;
   }
 }
 

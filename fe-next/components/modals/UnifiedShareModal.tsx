@@ -3,16 +3,25 @@
 import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
-import { Copy, MessageCircle, Trophy, Flame, Check, Loader2 } from 'lucide-react';
+import { Copy, MessageCircle, Trophy, Flame, Check, Loader2, Target } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { cn } from '@/lib/utils';
 import { getJoinUrl, copyJoinUrl, shareViaWhatsApp, generatePersonalizedShareMessage, type GameResultForShare } from '@/utils/share';
 import { useNativeShare } from '@/hooks/useNativeShare';
+import { createChallenge, getChallengeUrl, generateChallengeShareMessage, type ChallengeCreatorData, type ChallengeGameConfig, type ChallengePerformance } from '@/utils/challenges';
+import toast from 'react-hot-toast';
 
 /**
  * Share context determines the modal's appearance and behavior
  */
 type ShareContext = 'pre-game' | 'post-game';
+
+/** Challenge data for creating "Beat My Score" challenges */
+interface ChallengeData {
+  creator: ChallengeCreatorData;
+  gameConfig: ChallengeGameConfig;
+  performance: ChallengePerformance;
+}
 
 interface UnifiedShareModalProps {
   isOpen: boolean;
@@ -28,6 +37,8 @@ interface UnifiedShareModalProps {
   language?: string;
   /** Witty message to display (optional, auto-generated if not provided) */
   wittyMessage?: string;
+  /** Challenge data for creating "Beat My Score" challenges (post-game only) */
+  challengeData?: ChallengeData;
 }
 
 /**
@@ -48,12 +59,15 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
   gameResult,
   language = 'en',
   wittyMessage,
+  challengeData,
 }) => {
   const { canNativeShare, nativeShare } = useNativeShare();
   const isPostGame = context === 'post-game';
   const joinUrl = getJoinUrl(gameCode, isPostGame ? 'share-win' : 'modal-share');
   const [copied, setCopied] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCreatingChallenge, setIsCreatingChallenge] = useState(false);
+  const [challengeCreated, setChallengeCreated] = useState(false);
 
   // Keyboard shortcut: Cmd/Ctrl+C to copy link when modal is open
   useEffect(() => {
@@ -114,6 +128,40 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
     }
   }, [nativeShare, joinUrl, shareMessage, isPostGame, t, onClose]);
 
+  // Handle creating a challenge
+  const handleCreateChallenge = useCallback(async () => {
+    if (!challengeData) return;
+
+    setIsCreatingChallenge(true);
+    try {
+      const challenge = await createChallenge(challengeData);
+      if (challenge) {
+        // Copy the challenge link
+        const challengeUrl = getChallengeUrl(challenge.challengeCode, 'share-modal');
+        await navigator.clipboard.writeText(challengeUrl);
+        setChallengeCreated(true);
+        toast.success(
+          language === 'he' ? 'קישור האתגר הועתק!' : 'Challenge link copied!',
+          { icon: '🎯', duration: 3000 }
+        );
+        setTimeout(() => setChallengeCreated(false), 3000);
+      } else {
+        toast.error(
+          language === 'he' ? 'שגיאה ביצירת האתגר' : 'Error creating challenge',
+          { duration: 3000 }
+        );
+      }
+    } catch (error) {
+      console.error('Error creating challenge:', error);
+      toast.error(
+        language === 'he' ? 'שגיאה ביצירת האתגר' : 'Error creating challenge',
+        { duration: 3000 }
+      );
+    } finally {
+      setIsCreatingChallenge(false);
+    }
+  }, [challengeData, language]);
+
   // Determine header color based on context
   const headerColor = isPostGame ? 'bg-neo-yellow' : 'bg-neo-pink';
   const headerTextColor = 'text-neo-black';
@@ -134,7 +182,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
 
         {/* Content */}
         <div className="p-4 space-y-4">
-          {/* Post-game Stats Display */}
+          {/* Post-game Stats Display - Enhanced Share Card */}
           {isPostGame && gameResult && (
             <motion.div
               initial={{ y: -10, opacity: 0 }}
@@ -148,7 +196,22 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 </p>
               )}
 
-              {/* Stats Row */}
+              {/* Player Archetype Badge */}
+              {gameResult.archetype && (
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.1 }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-cyan/50 bg-neo-cyan/20"
+                >
+                  <span className="text-xl">{gameResult.archetype.emoji}</span>
+                  <span className="text-sm font-bold text-neo-cyan">
+                    {gameResult.archetype.name}
+                  </span>
+                </motion.div>
+              )}
+
+              {/* Main Stats Row */}
               <div className="flex items-center justify-center gap-4 p-3 rounded-neo border-2 border-white/20 bg-black/30">
                 <div className="text-center px-3">
                   <div className="text-2xl font-black text-neo-yellow">
@@ -167,6 +230,19 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     {language === 'he' ? 'מילים' : 'words'}
                   </div>
                 </div>
+                {gameResult.maxCombo && gameResult.maxCombo > 1 && (
+                  <>
+                    <div className="w-0.5 h-10 rounded-full bg-white/20" />
+                    <div className="text-center px-3">
+                      <div className="text-2xl font-black text-neo-pink">
+                        {gameResult.maxCombo}x
+                      </div>
+                      <div className="text-xs font-bold uppercase tracking-wide text-gray-300">
+                        {language === 'he' ? 'קומבו' : 'combo'}
+                      </div>
+                    </div>
+                  </>
+                )}
                 {gameResult.streakDays && gameResult.streakDays > 1 && (
                   <>
                     <div className="w-0.5 h-10 rounded-full bg-white/20" />
@@ -181,6 +257,75 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                   </>
                 )}
               </div>
+
+              {/* Longest Word & Achievements Row */}
+              {(gameResult.longestWord || (gameResult.achievements && gameResult.achievements.length > 0)) && (
+                <div className="flex items-center justify-center gap-3 flex-wrap">
+                  {/* Longest Word */}
+                  {gameResult.longestWord && (
+                    <motion.div
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.15 }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 border-purple-500/50 bg-purple-500/20"
+                    >
+                      <span className="text-purple-300 text-xs font-bold uppercase">
+                        {language === 'he' ? 'הכי ארוכה:' : 'Longest:'}
+                      </span>
+                      <span className="text-white font-black text-sm uppercase">
+                        {gameResult.longestWord}
+                      </span>
+                    </motion.div>
+                  )}
+                  {/* Achievements */}
+                  {gameResult.achievements && gameResult.achievements.length > 0 && (
+                    <motion.div
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-neo border-2 border-neo-yellow/50 bg-neo-yellow/20"
+                    >
+                      <span className="text-lg">
+                        {gameResult.achievements.slice(0, 3).map(a => a.icon || '🏆').join('')}
+                      </span>
+                      {gameResult.achievements.length > 3 && (
+                        <span className="text-neo-yellow text-xs font-bold">
+                          +{gameResult.achievements.length - 3}
+                        </span>
+                      )}
+                    </motion.div>
+                  )}
+                </div>
+              )}
+
+              {/* Placement Badge */}
+              {gameResult.placement && gameResult.totalPlayers && gameResult.totalPlayers > 1 && (
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.25 }}
+                  className={cn(
+                    'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2',
+                    gameResult.placement === 1 ? 'border-yellow-500/50 bg-yellow-500/20' :
+                    gameResult.placement === 2 ? 'border-gray-400/50 bg-gray-400/20' :
+                    gameResult.placement === 3 ? 'border-orange-600/50 bg-orange-600/20' :
+                    'border-white/30 bg-white/10'
+                  )}
+                >
+                  <span className={cn(
+                    'font-black',
+                    gameResult.placement === 1 ? 'text-yellow-400' :
+                    gameResult.placement === 2 ? 'text-gray-300' :
+                    gameResult.placement === 3 ? 'text-orange-400' :
+                    'text-white'
+                  )}>
+                    #{gameResult.placement}
+                  </span>
+                  <span className="text-gray-400 text-xs">
+                    / {gameResult.totalPlayers}
+                  </span>
+                </motion.div>
+              )}
             </motion.div>
           )}
 
@@ -289,6 +434,41 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
               <MessageCircle className="w-5 h-5" />
               <span>{t('share.whatsapp')}</span>
             </motion.button>
+
+            {/* Challenge a Friend (Post-game only, when challenge data is available) */}
+            {isPostGame && challengeData && (
+              <motion.button
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.42 }}
+                onClick={handleCreateChallenge}
+                disabled={isCreatingChallenge}
+                aria-label={language === 'he' ? 'אתגר חבר' : 'Challenge a Friend'}
+                className={cn(
+                  'w-full flex items-center justify-center gap-2 p-3 rounded-neo',
+                  'border-2 border-neo-black shadow-hard-sm',
+                  'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
+                  'transition-all duration-150',
+                  'font-bold text-sm uppercase tracking-wide',
+                  challengeCreated ? 'bg-neo-lime text-neo-black' : 'bg-neo-cyan text-neo-black',
+                  'focus:outline-none focus:ring-2 focus:ring-neo-yellow focus:ring-offset-2',
+                  'disabled:opacity-70 disabled:cursor-not-allowed'
+                )}
+              >
+                {isCreatingChallenge ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : challengeCreated ? (
+                  <Check className="w-5 h-5" />
+                ) : (
+                  <Target className="w-5 h-5" />
+                )}
+                <span>
+                  {challengeCreated
+                    ? (language === 'he' ? 'קישור הועתק!' : 'Link Copied!')
+                    : (language === 'he' ? 'אתגר חבר' : 'Challenge a Friend')}
+                </span>
+              </motion.button>
+            )}
 
             {/* Native Share (Mobile Only) */}
             {canNativeShare && (

@@ -12,6 +12,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { shouldShowUpgradePrompt, getGuestStatsSummary, updateGuestStatsAfterGame, isFirstWin } from '@/utils/guestManager';
 import { useWinStreak } from '@/hooks/useWinStreak';
+import { useFirstWinCelebration } from '@/hooks/useFirstWinCelebration';
 import { trackGameCompletion, trackStreakMilestone } from '@/utils/growthTracking';
 import logger from '@/utils/logger';
 import { levelUpToast } from '@/components/NeoToast';
@@ -86,6 +87,16 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
   const winner = sortedScores[0];
   const isCurrentUserWinner = winner?.username === username;
+
+  // Get games played for first win detection
+  const guestStats = useMemo(() => getGuestStatsSummary(), []);
+
+  // First win celebration (epic confetti on first multiplayer win)
+  useFirstWinCelebration({
+    isWinner: isCurrentUserWinner,
+    gamesPlayed: guestStats.gamesPlayed,
+    isMultiplayer: true,
+  });
 
   // Calculate current player's rank (1-based: 1st, 2nd, 3rd, etc.)
   const currentPlayerRank = useMemo(() => {
@@ -313,6 +324,27 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     if (!username) return null;
     return playerArchetypes.get(username) || null;
   }, [playerArchetypes, username]);
+
+  // Calculate max combo and longest word for sharing
+  const shareCardStats = useMemo(() => {
+    if (!currentPlayerData) return { maxCombo: undefined, longestWord: undefined };
+
+    const validWords = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0) || [];
+
+    // Find max combo from combo bonuses (combo bonus > 0 means they had a combo)
+    const maxCombo = validWords.reduce((max, w) => {
+      const comboLevel = (w as { comboBonus?: number }).comboBonus;
+      return comboLevel && comboLevel > max ? comboLevel : max;
+    }, 0);
+
+    // Find longest word
+    const longestWord = validWords.reduce<string | undefined>(
+      (longest, w) => w.word.length > (longest?.length || 0) ? w.word : longest,
+      undefined
+    );
+
+    return { maxCombo: maxCombo > 0 ? maxCombo : undefined, longestWord };
+  }, [currentPlayerData]);
 
   // Calculate missed words for current player (high-value words others found)
   const missedWords = useMemo(() => {
@@ -864,6 +896,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                 gameCode={gameCode}
                 streakDays={isCurrentUserWinner ? currentStreak : 0}
                 compact={!isCurrentUserWinner}
+                maxCombo={shareCardStats.maxCombo}
+                archetype={currentPlayerArchetype}
+                placement={currentPlayerRank}
+                totalPlayers={sortedScores.length}
+                longestWord={shareCardStats.longestWord}
               />
             </motion.div>
           )}

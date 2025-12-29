@@ -215,7 +215,7 @@ export class WordValidatorPool {
    */
   private async _runSync(action: string, data: Record<string, unknown>): Promise<unknown> {
     // Import the synchronous validator
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+     
     const validator = require('./wordValidator');
 
     switch (action) {
@@ -250,7 +250,7 @@ export class WordValidatorPool {
       // Fall back to sync on error
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.warn('[WORKER POOL] Falling back to sync:', errorMessage);
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
+       
       const validator = require('./wordValidator');
       return validator.isWordOnBoard(word, board, positions);
     }
@@ -275,7 +275,7 @@ export class WordValidatorPool {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.warn('[WORKER POOL] Falling back to sync:', errorMessage);
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
+       
       const validator = require('./wordValidator');
       return validator.getWordPath(word, board, positions);
     }
@@ -293,7 +293,7 @@ export class WordValidatorPool {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.warn('[WORKER POOL] Falling back to sync:', errorMessage);
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
+       
       const validator = require('./wordValidator');
       return validator.makePositionsMap(board);
     }

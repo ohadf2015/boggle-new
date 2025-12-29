@@ -319,6 +319,14 @@ export function setGuestName(name: string): void {
 }
 
 /**
+ * Get a fingerprint for the guest user (uses session ID)
+ * Used for identifying unique guests in challenges
+ */
+export function getGuestFingerprint(): string | null {
+  return getGuestSessionId();
+}
+
+/**
  * Get stored guest player name
  */
 export function getGuestName(): string | null {

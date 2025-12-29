@@ -8,11 +8,11 @@
  * - Grid-based result caching to avoid re-solving same boards
  */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const { isDictionaryWord, normalizeWord, dictionary } = require('../dictionary');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const { normalizeHebrewLetter, normalizeSpanishLetter } = require('./wordValidator');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const logger = require('../utils/logger');
 
 // Interfaces

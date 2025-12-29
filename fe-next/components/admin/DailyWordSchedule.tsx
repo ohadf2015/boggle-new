@@ -95,7 +95,15 @@ export const DailyWordSchedule: React.FC = () => {
   const [quickEditWord, setQuickEditWord] = useState<string | null>(null);
   const [quickEditValue, setQuickEditValue] = useState('');
 
+  // Quick set today's word state
+  const [setTodayModalOpen, setSetTodayModalOpen] = useState(false);
+  const [todayWordValue, setTodayWordValue] = useState('');
+  const [resetTodayAttempts, setResetTodayAttempts] = useState(false);
+
   const supabase = createClient();
+
+  // Get today's date string
+  const getTodayDateString = () => new Date().toISOString().split('T')[0];
 
   // Fetch scheduled words for the configured date range
   const fetchScheduledWords = useCallback(async () => {
@@ -304,6 +312,70 @@ export const DailyWordSchedule: React.FC = () => {
     } finally {
       setTriggerLoading(false);
     }
+  };
+
+  // Get today's word if exists
+  const getTodayWord = () => {
+    const today = getTodayDateString();
+    return scheduledWords.find(w => w.puzzle_date === today);
+  };
+
+  // Quick set today's word - the main action for admins
+  const handleSetTodayWord = async () => {
+    if (!todayWordValue.trim() || todayWordValue.length !== 4) return;
+
+    setSaving(true);
+    try {
+      const today = getTodayDateString();
+      const response = await fetch('/api/admin/daily-word/replace', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          puzzleDate: today,
+          language: selectedLang,
+          newWord: todayWordValue.toUpperCase().trim(),
+          resetAllAttempts: resetTodayAttempts,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to set word');
+      }
+
+      const result = await response.json();
+      let message = `Today's word set to "${todayWordValue.toUpperCase()}"`;
+      if (result.reset?.deleted) {
+        message += ` (${result.reset.deleted} attempts reset)`;
+      }
+      setSuccessMessage(message);
+      setTimeout(() => setSuccessMessage(null), 5000);
+
+      // Refresh data
+      await fetchScheduledWords();
+
+      // Close modal and reset state
+      setSetTodayModalOpen(false);
+      setTodayWordValue('');
+      setResetTodayAttempts(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to set word');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Open the "Set Today's Word" modal with current word pre-filled
+  const openSetTodayModal = () => {
+    const todayWord = getTodayWord();
+    if (todayWord) {
+      setTodayWordValue(getEffectiveWord(todayWord));
+    } else {
+      setTodayWordValue('');
+    }
+    setResetTodayAttempts(false);
+    setSetTodayModalOpen(true);
   };
 
   // Add a new word for a specific date
@@ -626,16 +698,26 @@ export const DailyWordSchedule: React.FC = () => {
             </button>
           </div>
 
+          {/* Primary action: Set Today's Word */}
+          <Button
+            onClick={openSetTodayModal}
+            className="bg-red-500 hover:bg-red-600 text-white font-bold shadow-hard animate-pulse hover:animate-none"
+          >
+            <Calendar className="w-4 h-4 mr-2" />
+            Set Today's Word
+          </Button>
+
           <Button
             onClick={() => {
               const today = new Date().toISOString().split('T')[0];
               setNewWordDate(today);
               setAddWordModalOpen(true);
             }}
-            className="bg-green-500 hover:bg-green-600 text-white"
+            variant="outline"
+            className="border-2 border-neo-black"
           >
             <Edit2 className="w-4 h-4 mr-2" />
-            Add Word
+            Add Other Date
           </Button>
           <Button
             onClick={handleTriggerGeneration}
@@ -841,7 +923,7 @@ export const DailyWordSchedule: React.FC = () => {
                 )}
 
                 {/* Hover Actions */}
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-neo flex items-center justify-center gap-2">
+                <div className="absolute inset-0 bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity rounded-neo flex items-center justify-center gap-2">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -1389,6 +1471,114 @@ export const DailyWordSchedule: React.FC = () => {
                       <Check className="w-4 h-4 mr-2" />
                     )}
                     Add Word
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Set Today's Word Modal - Quick access for admins */}
+      <AnimatePresence>
+        {setTodayModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => setSetTodayModalOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white dark:bg-gray-800 rounded-neo border-4 border-red-500 p-6 max-w-md w-full shadow-2xl"
+            >
+              <h3 className="text-2xl font-black mb-2 flex items-center gap-2 text-red-600">
+                <Calendar className="w-6 h-6" />
+                Set Today's Word
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                {LANGUAGES.find(l => l.code === selectedLang)?.flag} {LANGUAGES.find(l => l.code === selectedLang)?.name} - {formatDate(getTodayDateString())}
+              </p>
+
+              <div className="space-y-4">
+                {/* Current word info */}
+                {getTodayWord() && (
+                  <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-neo border-2 border-amber-300">
+                    <p className="text-sm text-amber-700 dark:text-amber-300">
+                      <strong>Current word:</strong>{' '}
+                      <span className="font-mono font-bold">{getEffectiveWord(getTodayWord()!)}</span>
+                      {getTodayWord()?.override_word ? ' (Override)' : getTodayWord()?.ai_selected ? ' (AI)' : ''}
+                    </p>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-bold mb-2">New Word (4 letters)</label>
+                  <input
+                    type="text"
+                    value={todayWordValue}
+                    onChange={(e) => setTodayWordValue(e.target.value.toUpperCase())}
+                    maxLength={4}
+                    autoFocus
+                    className="w-full px-4 py-4 border-4 border-neo-black rounded-neo font-mono text-3xl uppercase text-center tracking-widest"
+                    placeholder="WORD"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && todayWordValue.length === 4) {
+                        handleSetTodayWord();
+                      } else if (e.key === 'Escape') {
+                        setSetTodayModalOpen(false);
+                      }
+                    }}
+                  />
+                  <p className="text-xs text-gray-500 mt-1 text-center">
+                    Press Enter to save, Escape to cancel
+                  </p>
+                </div>
+
+                {getTodayWord() && (
+                  <label className="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-neo border-2 border-red-300 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={resetTodayAttempts}
+                      onChange={(e) => setResetTodayAttempts(e.target.checked)}
+                      className="w-5 h-5 rounded"
+                    />
+                    <div>
+                      <p className="font-bold text-red-700 dark:text-red-300">Reset all player attempts</p>
+                      <p className="text-sm text-red-600 dark:text-red-400">
+                        Let everyone play again with the new word
+                      </p>
+                    </div>
+                  </label>
+                )}
+
+                <div className="flex gap-3 pt-2">
+                  <Button
+                    onClick={() => {
+                      setSetTodayModalOpen(false);
+                      setTodayWordValue('');
+                      setResetTodayAttempts(false);
+                    }}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleSetTodayWord}
+                    disabled={saving || todayWordValue.length !== 4}
+                    className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold text-lg py-3"
+                  >
+                    {saving ? (
+                      <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
+                    ) : (
+                      <Check className="w-5 h-5 mr-2" />
+                    )}
+                    Set Word
                   </Button>
                 </div>
               </div>

@@ -50,7 +50,7 @@ interface AdaptiveMotionProps extends MotionProps {
   style?: React.CSSProperties;
   children?: ReactNode;
   onClick?: React.MouseEventHandler;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   [key: string]: any;
 }
 
@@ -62,7 +62,7 @@ type AdaptiveMotionComponent = React.FC<AdaptiveMotionProps>;
  */
 function createAdaptiveComponent(
   element: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   MotionComponent: any
 ): AdaptiveMotionComponent {
   const AdaptiveComponent: AdaptiveMotionComponent = memo((props: AdaptiveMotionProps) => {
@@ -87,13 +87,13 @@ function createAdaptiveComponent(
     // If animations should be skipped, render static element
     if (shouldSkip || skipAnimation) {
       // Extract only valid HTML attributes for static element
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const Element = element as any;
       return <Element {...restProps} />;
     }
 
     // Render full motion component
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const Component = MotionComponent as any;
     return (
       <Component

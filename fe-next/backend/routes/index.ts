@@ -11,7 +11,7 @@ import geolocationRoutes from './geolocation';
 import healthRoutes from './health';
 import dailyChallengeRoutes from './dailyChallenge';
 import dictionaryRoutes from './dictionary';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const {
   apiRateLimiter,
   strictRateLimiter,

@@ -8,7 +8,7 @@
  * - COOLDOWN (10 invalid): 3-second block + combo reset
  */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const logger = require('../utils/logger');
 
 // Interfaces

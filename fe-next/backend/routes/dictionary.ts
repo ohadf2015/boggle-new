@@ -6,13 +6,13 @@
 
 import express, { Request, Response, Router, NextFunction } from 'express';
 import logger from '../utils/logger';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const { createEndpointLimiter } = require('../utils/apiRateLimiter');
 
 // Import the same dictionary used by multiplayer
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const { isDictionaryWord, dictionary } = require('../dictionary');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const { isWordCommunityValid, isWordValidForScoring } = require('../modules/communityWordManager');
 
 const router: Router = express.Router();

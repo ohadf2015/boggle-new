@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, LogOut, Trophy, ChevronDown, Sun, Moon, Settings } from 'lucide-react';
+import { User, LogOut, Trophy, ChevronDown, Sun, Moon, Settings, Users } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useTheme } from '../../utils/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -118,6 +118,21 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
           >
             <Trophy size={14} className="text-neo-black" />
             <span className="text-neo-black">{t('leaderboard.title') || 'Leaderboard'}</span>
+          </button>
+
+          {/* Friends Link */}
+          <button
+            onClick={() => {
+              router.push(`/${language}/friends`);
+              onClose?.();
+            }}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
+              "bg-white hover:bg-neo-cyan/50"
+            )}
+          >
+            <Users size={14} className="text-neo-black" />
+            <span className="text-neo-black">{t('friends.title') || 'Friends'}</span>
           </button>
 
           {/* Theme Toggle */}
@@ -237,6 +252,24 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
               >
                 <Trophy size={14} />
                 <span>{t('leaderboard.title') || 'Leaderboard'}</span>
+              </Button>
+
+              {/* Friends Link */}
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  router.push(`/${language}/friends`);
+                  setShowUserMenu(false);
+                }}
+                className={cn(
+                  'w-full justify-start gap-3',
+                  isDarkMode
+                    ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
+                )}
+              >
+                <Users size={14} />
+                <span>{t('friends.title') || 'Friends'}</span>
               </Button>
 
               {/* Divider */}

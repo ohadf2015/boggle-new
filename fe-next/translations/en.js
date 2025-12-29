@@ -152,7 +152,11 @@ const en = {
     "openMenu": "Open menu",
     "language": "Language",
     "controls": "Controls",
-    "account": "Account"
+    "account": "Account",
+    "all": "All",
+    "valid": "Valid",
+    "invalid": "Invalid",
+    "validating": "Validating..."
   },
   "theme": {
     "sundayFunday": "Sunday Funday",
@@ -287,7 +291,16 @@ const en = {
     "clickToEnable": "Click anywhere to enable music",
     "controls": "Music Controls",
     "musicVolumeSlider": "Music volume slider",
-    "sfxVolumeSlider": "Sound effects volume slider"
+    "sfxVolumeSlider": "Sound effects volume slider",
+    "haptics": "Haptics",
+    "toggleHaptics": "Toggle haptic feedback"
+  },
+  "settings": {
+    "lightMode": "Switch to light mode",
+    "darkMode": "Switch to dark mode",
+    "theme": "Theme",
+    "dark": "Dark",
+    "light": "Light"
   },
   "share": {
     "linkCopied": "Link copied! 📋",
@@ -1235,6 +1248,79 @@ const en = {
     },
     "skipHint": "Press ESC or click Skip to jump straight to the game 🎮"
   },
+  "tutorial": {
+    "stepLabel": "Step {current} of {total}",
+    "skip": "Skip Tutorial",
+    "prev": "Back",
+    "next": "Next",
+    "finish": "Got It!",
+    "tapToContinue": "Tap anywhere to continue",
+    "welcome": {
+      "title": "Welcome to LexiClash!",
+      "description": "Let's learn how to play in just a few steps. This quick tutorial will show you everything you need to dominate the word game!"
+    },
+    "grid": {
+      "title": "The Letter Grid",
+      "description": "This is your battlefield! Letters are arranged in a grid. Your goal is to find as many words as possible by connecting adjacent letters."
+    },
+    "swipe": {
+      "title": "Form Words by Swiping",
+      "description": "Swipe or drag through adjacent letters (including diagonals) to form words. Release to submit. The longer the word, the more points you earn!"
+    },
+    "combo": {
+      "title": "Build Combos",
+      "description": "Find words quickly to build combo multipliers! Each consecutive word increases your combo, multiplying your score. Keep the streak alive!"
+    },
+    "timer": {
+      "title": "Watch the Timer",
+      "description": "You have limited time to find words. The timer shows how much time is left. When it turns red, hurry up!"
+    },
+    "leaderboard": {
+      "title": "Track Your Ranking",
+      "description": "See how you stack up against other players in real-time. Climb the leaderboard by finding more and longer words!"
+    },
+    "ready": {
+      "title": "You're Ready!",
+      "description": "That's everything you need to know! Go find some words and show everyone who's the word master!"
+    },
+    "wordHunt": {
+      "welcome": {
+        "title": "Daily Word Hunt",
+        "description": "Find the hidden word! You have 10 attempts.",
+        "next": "Next"
+      },
+      "colorFeedback": {
+        "title": "Learn the Colors",
+        "tryGuessing": "After each guess, colors show how close you are:",
+        "green": "Green = Correct position",
+        "yellow": "Yellow = In word, wrong spot",
+        "gray": "Gray = Not in word",
+        "next": "Next"
+      },
+      "lifeSystem": {
+        "title": "Life & Word Discovery",
+        "description": "Find words on the board to gain life & clue tokens!",
+        "swipeToGain": "Swipe words to gain",
+        "tryIt": "Got it!"
+      },
+      "minLength": {
+        "title": "⚠️ IMPORTANT RULE",
+        "description": "Words must be at least 3 LETTERS long",
+        "example1": "3 letters ✓",
+        "example2": "2 letters - too short!",
+        "gotIt": "Got it!"
+      },
+      "complete": {
+        "title": "You're ready!",
+        "remember": "Remember:",
+        "rule1": "10 attempts to find target",
+        "rule2": "Find other words for life",
+        "rule3": "3+ letters minimum",
+        "rule4": "Same puzzle worldwide",
+        "start": "Start Daily Challenge"
+      }
+    }
+  },
   "achievements": {
     "FIRST_BLOOD": {
       "name": "First Blood",
@@ -2115,7 +2201,9 @@ const en = {
     "showLess": "Show less",
     "more": "more",
     "maxAttempts": "Max Attempts",
-    "huntDescription": "Hunt for the hidden word using color-coded feedback!"
+    "huntDescription": "Hunt for the hidden word using color-coded feedback!",
+    "shareImage": "Share as Image",
+    "download": "Download"
   },
   "wordHunt": {
     "title": "Word Hunt",
@@ -2250,45 +2338,6 @@ const en = {
       "hoursAgo": "{count}h ago"
     }
   },
-  "tutorial": {
-    "wordHunt": {
-      "welcome": {
-        "title": "Daily Word Hunt",
-        "description": "Find the hidden word! You have 10 attempts.",
-        "next": "Next"
-      },
-      "colorFeedback": {
-        "title": "Learn the Colors",
-        "tryGuessing": "After each guess, colors show how close you are:",
-        "green": "Green = Correct position",
-        "yellow": "Yellow = In word, wrong spot",
-        "gray": "Gray = Not in word",
-        "next": "Next"
-      },
-      "lifeSystem": {
-        "title": "Life & Word Discovery",
-        "description": "Find words on the board to gain life & clue tokens!",
-        "swipeToGain": "Swipe words to gain",
-        "tryIt": "Got it!"
-      },
-      "minLength": {
-        "title": "⚠️ IMPORTANT RULE",
-        "description": "Words must be at least 3 LETTERS long",
-        "example1": "3 letters ✓",
-        "example2": "2 letters - too short!",
-        "gotIt": "Got it!"
-      },
-      "complete": {
-        "title": "You're ready!",
-        "remember": "Remember:",
-        "rule1": "10 attempts to find target",
-        "rule2": "Find other words for life",
-        "rule3": "3+ letters minimum",
-        "rule4": "Same puzzle worldwide",
-        "start": "Start Daily Challenge"
-      }
-    }
-  },
   "guidance": {
     "combo": {
       "title": "Combo Bonus!",
@@ -2323,6 +2372,9 @@ const en = {
   "home": {
     "singlePlayer": "Single Player",
     "multiplayer": "Multiplayer"
+  },
+  "friends": {
+    "title": "Friends"
   },
   "reveal": {
     "revealWord": "Reveal",

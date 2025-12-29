@@ -151,7 +151,11 @@ const es = {
     "openMenu": "Abrir menú",
     "language": "Idioma",
     "controls": "Controles",
-    "account": "Cuenta"
+    "account": "Cuenta",
+    "all": "Todo",
+    "valid": "Válido",
+    "invalid": "Inválido",
+    "validating": "Validando..."
   },
   "theme": {
     "sundayFunday": "Domingo Divertido",
@@ -286,7 +290,16 @@ const es = {
     "clickToEnable": "Haz clic en cualquier lugar para activar la música",
     "controls": "Controles de Música",
     "musicVolumeSlider": "Control de volumen de música",
-    "sfxVolumeSlider": "Control de volumen de efectos de sonido"
+    "sfxVolumeSlider": "Control de volumen de efectos de sonido",
+    "haptics": "Hápticos",
+    "toggleHaptics": "Activar/desactivar retroalimentación háptica"
+  },
+  "settings": {
+    "lightMode": "Cambiar a modo claro",
+    "darkMode": "Cambiar a modo oscuro",
+    "theme": "Tema",
+    "dark": "Oscuro",
+    "light": "Claro"
   },
   "share": {
     "linkCopied": "¡Enlace copiado! 📋",
@@ -1739,6 +1752,79 @@ const es = {
     },
     "skipHint": "Presiona ESC o haz clic en Saltar para ir directamente al juego 🎮"
   },
+  "tutorial": {
+    "stepLabel": "Paso {current} de {total}",
+    "skip": "Saltar Tutorial",
+    "prev": "Atrás",
+    "next": "Siguiente",
+    "finish": "¡Entendido!",
+    "tapToContinue": "Toca en cualquier lugar para continuar",
+    "welcome": {
+      "title": "¡Bienvenido a LexiClash!",
+      "description": "Aprendamos a jugar en unos simples pasos. ¡Este tutorial rápido te mostrará todo lo que necesitas para dominar el juego de palabras!"
+    },
+    "grid": {
+      "title": "La Cuadrícula de Letras",
+      "description": "¡Este es tu campo de batalla! Las letras están dispuestas en una cuadrícula. Tu objetivo es encontrar tantas palabras como sea posible conectando letras adyacentes."
+    },
+    "swipe": {
+      "title": "Forma Palabras Deslizando",
+      "description": "Desliza o arrastra a través de letras adyacentes (incluyendo diagonales) para formar palabras. Suelta para enviar. ¡Cuanto más larga sea la palabra, más puntos ganas!"
+    },
+    "combo": {
+      "title": "Construye Combos",
+      "description": "¡Encuentra palabras rápidamente para construir multiplicadores de combo! Cada palabra consecutiva aumenta tu combo, multiplicando tu puntuación. ¡Mantén la racha viva!"
+    },
+    "timer": {
+      "title": "Vigila el Temporizador",
+      "description": "Tienes tiempo limitado para encontrar palabras. El temporizador muestra cuánto tiempo queda. ¡Cuando se ponga rojo, date prisa!"
+    },
+    "leaderboard": {
+      "title": "Sigue Tu Ranking",
+      "description": "Mira cómo te comparas con otros jugadores en tiempo real. ¡Sube en la clasificación encontrando más palabras y más largas!"
+    },
+    "ready": {
+      "title": "¡Estás Listo!",
+      "description": "¡Eso es todo lo que necesitas saber! ¡Ve a encontrar palabras y muestra a todos quién es el maestro de las palabras!"
+    },
+    "wordHunt": {
+      "welcome": {
+        "title": "Caza de Palabras Diaria",
+        "description": "¡Encuentra la palabra oculta! Tienes 10 intentos.",
+        "next": "Siguiente"
+      },
+      "colorFeedback": {
+        "title": "Aprende los Colores",
+        "tryGuessing": "Después de cada intento, los colores muestran qué tan cerca estás:",
+        "green": "Verde = Posición correcta",
+        "yellow": "Amarillo = En la palabra, lugar equivocado",
+        "gray": "Gris = No está en la palabra",
+        "next": "Siguiente"
+      },
+      "lifeSystem": {
+        "title": "Vida y Descubrimiento de Palabras",
+        "description": "¡Encuentra palabras en el tablero para ganar vida y fichas de pista!",
+        "swipeToGain": "Desliza palabras para ganar",
+        "tryIt": "¡Entendido!"
+      },
+      "minLength": {
+        "title": "⚠️ REGLA IMPORTANTE",
+        "description": "Las palabras deben tener al menos 3 LETRAS",
+        "example1": "3 letras ✓",
+        "example2": "2 letras - ¡muy corto!",
+        "gotIt": "¡Entendido!"
+      },
+      "complete": {
+        "title": "¡Estás listo!",
+        "remember": "Recuerda:",
+        "rule1": "10 intentos para encontrar el objetivo",
+        "rule2": "Encuentra otras palabras para vida",
+        "rule3": "Mínimo 3 letras",
+        "rule4": "Mismo puzzle en todo el mundo",
+        "start": "Comenzar Desafío Diario"
+      }
+    }
+  },
   "leaderboard": {
     "title": "Clasificación",
     "allTime": "Histórico",
@@ -2106,7 +2192,9 @@ const es = {
     "showLess": "Mostrar menos",
     "more": "más",
     "maxAttempts": "Intentos Máximos",
-    "huntDescription": "¡Caza la palabra oculta usando retroalimentación de colores!"
+    "huntDescription": "¡Caza la palabra oculta usando retroalimentación de colores!",
+    "shareImage": "Compartir como imagen",
+    "download": "Descargar"
   },
   "wordHunt": {
     "title": "Caza de Palabras",
@@ -2241,45 +2329,6 @@ const es = {
       "hoursAgo": "hace {count}h"
     }
   },
-  "tutorial": {
-    "wordHunt": {
-      "welcome": {
-        "title": "Caza de Palabras Diaria",
-        "description": "¡Encuentra la palabra oculta! Tienes 10 intentos.",
-        "next": "Siguiente"
-      },
-      "colorFeedback": {
-        "title": "Aprende los Colores",
-        "tryGuessing": "Después de cada intento, los colores muestran qué tan cerca estás:",
-        "green": "Verde = Posición correcta",
-        "yellow": "Amarillo = En la palabra, lugar equivocado",
-        "gray": "Gris = No está en la palabra",
-        "next": "Siguiente"
-      },
-      "lifeSystem": {
-        "title": "Vida y Descubrimiento de Palabras",
-        "description": "¡Encuentra palabras en el tablero para ganar vida y fichas de pista!",
-        "swipeToGain": "Desliza palabras para ganar",
-        "tryIt": "¡Entendido!"
-      },
-      "minLength": {
-        "title": "⚠️ REGLA IMPORTANTE",
-        "description": "Las palabras deben tener al menos 3 LETRAS",
-        "example1": "3 letras ✓",
-        "example2": "2 letras - ¡muy corto!",
-        "gotIt": "¡Entendido!"
-      },
-      "complete": {
-        "title": "¡Estás listo!",
-        "remember": "Recuerda:",
-        "rule1": "10 intentos para encontrar el objetivo",
-        "rule2": "Encuentra otras palabras para vida",
-        "rule3": "Mínimo 3 letras",
-        "rule4": "Mismo puzzle en todo el mundo",
-        "start": "Comenzar Desafío Diario"
-      }
-    }
-  },
   "guidance": {
     "combo": {
       "title": "¡Bono de Combo!",
@@ -2314,6 +2363,9 @@ const es = {
   "home": {
     "singlePlayer": "Un Jugador",
     "multiplayer": "Multijugador"
+  },
+  "friends": {
+    "title": "Amigos"
   },
   "reveal": {
     "revealWord": "Revelar",

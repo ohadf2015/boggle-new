@@ -7,12 +7,12 @@
 import type { AiApprovedWord, WordDetail } from '@/shared/types/game';
 
 // Base game interface for peerValidationManager - compatible with both Game and GameState
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export interface PeerValidationGameBase {
   aiApprovedWords?: AiApprovedWord[];
   peerValidationWord?: AiApprovedWord | null;
   peerValidationVotes?: Record<string, 'valid' | 'invalid'>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   playerWordDetails?: Record<string, any[]>;
   playerScores?: Record<string, number>;
 }

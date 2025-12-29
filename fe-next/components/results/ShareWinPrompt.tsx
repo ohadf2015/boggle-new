@@ -27,6 +27,12 @@ interface ShareWinPromptProps {
   streakDays?: number;
   onClose?: () => void;
   compact?: boolean;
+  // Enhanced share card data
+  maxCombo?: number;
+  archetype?: { id: string; name: string; emoji: string } | null;
+  placement?: number;
+  totalPlayers?: number;
+  longestWord?: string;
 }
 
 // Witty messages by score tier and language
@@ -127,6 +133,11 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
   streakDays = 0,
   onClose,
   compact = false,
+  maxCombo,
+  archetype,
+  placement,
+  totalPlayers,
+  longestWord,
 }) => {
   const { t, language } = useLanguage();
   const { theme } = useTheme();
@@ -154,7 +165,16 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
     isWinner,
     achievements: achievements.map(a => ({ id: a.id || a.key || '', icon: a.icon })),
     streakDays,
-  }), [score, wordCount, isWinner, achievements, streakDays]);
+    maxCombo,
+    archetype: archetype ? {
+      id: archetype.id,
+      name: archetype.name,
+      emoji: archetype.emoji,
+    } : undefined,
+    placement,
+    totalPlayers,
+    longestWord,
+  }), [score, wordCount, isWinner, achievements, streakDays, maxCombo, archetype, placement, totalPlayers, longestWord]);
 
   // Native share support
   const { canNativeShare, nativeShare } = useNativeShare();

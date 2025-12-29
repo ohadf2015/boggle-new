@@ -7,14 +7,14 @@
 import type { Avatar, WordDetail, LeaderboardEntry, GameUser, FirstFinderEntry } from '@/shared/types/game';
 
 // Base game interface for scoreManager - compatible with both Game and GameState
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export interface ScoreGameBase {
   users: Record<string, GameUser>;
   playerScores: Record<string, number>;
   playerWords: Record<string, string[]>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   playerWordDetails?: Record<string, any[]>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   playerAchievements?: Record<string, any[]>;
   playerCombos?: Record<string, number>;
   firstWordFound?: boolean;

@@ -4,7 +4,7 @@
  */
 
 import express, { Request, Response, Router } from 'express';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
+ 
 const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
 import logger from '../utils/logger';
 import { generateDailyPuzzle, generateDailyPuzzleAsync, getPuzzleNumber } from '../../utils/dailyChallenge';

@@ -16,11 +16,11 @@
  * - Multi-word voting queue: Increase vote collection per game
  */
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const { getSupabase, isSupabaseConfigured } = require('./supabaseServer');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const { normalizeWord } = require('../dictionary');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 const logger = require('../utils/logger');
 
 import type { SupabaseClient } from '@supabase/supabase-js';
