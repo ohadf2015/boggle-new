@@ -62,7 +62,15 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
   // Check if this is a Word Hunt share
   if (wh) {
     try {
-      const whParams = new URLSearchParams(wh);
+      // Try to decode in case the value wasn't URL-decoded by the server/crawler
+      // If already decoded or invalid encoding, use original value
+      let decodedWh = wh;
+      try {
+        decodedWh = decodeURIComponent(wh);
+      } catch {
+        // Already decoded or invalid encoding, use as-is
+      }
+      const whParams = new URLSearchParams(decodedWh);
       const solved = whParams.get('solved') === 'true';
       const attempts = parseInt(whParams.get('attempts') || '0');
       const streak = parseInt(whParams.get('streak') || '0');
