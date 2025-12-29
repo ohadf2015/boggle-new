@@ -236,6 +236,11 @@ export async function updatePlayerStats(
     }
   }
 
+  // Safety check - profile should always exist at this point
+  if (!profile) {
+    return { data: null, error: { message: 'Profile not available' } };
+  }
+
   // Calculate updated stats
   const updates: Record<string, unknown> = {
     total_games: (profile.total_games || 0) + 1,

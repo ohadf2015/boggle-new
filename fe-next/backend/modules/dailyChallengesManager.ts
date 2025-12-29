@@ -346,7 +346,7 @@ export async function claimChallengeReward(playerId: string, challengeId: string
   // Get the challenge
   const { data: challenge, error: fetchError } = await supabase
     .from('daily_challenges')
-    .select('id, player_id, challenge_type, challenge_tier, xp_reward, bonus_reward, completed, claimed')
+    .select('id, player_id, challenge_type, challenge_tier, title, xp_reward, bonus_reward, completed, claimed')
     .eq('id', challengeId)
     .eq('player_id', playerId)
     .single();
