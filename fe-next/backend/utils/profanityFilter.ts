@@ -10,7 +10,8 @@ import Filter from 'bad-words';
 const badWordsFilter = new Filter({ placeHolder: '*' });
 
 // Get the list of bad words for exact matching
-const badWordsList = new Set<string>(badWordsFilter.list.map((w: string) => w.toLowerCase()));
+// Note: The 'list' property exists at runtime but isn't in the type definitions
+const badWordsList = new Set<string>((badWordsFilter as unknown as { list: string[] }).list.map((w: string) => w.toLowerCase()));
 
 /**
  * Check if text contains profanity using exact word matching
