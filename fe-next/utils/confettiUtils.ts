@@ -3,9 +3,8 @@
  *
  * This module provides a wrapper around canvas-confetti that:
  * 1. Creates a dedicated canvas with data-confetti attribute for CSS targeting
- * 2. Respects user's prefers-reduced-motion preference
- * 3. Provides consistent confetti configurations for the app
- * 4. Handles errors gracefully
+ * 2. Provides consistent confetti configurations for the app
+ * 3. Handles errors gracefully
  */
 
 import confettiLib from 'canvas-confetti';
@@ -47,24 +46,9 @@ function getConfettiCanvas(): HTMLCanvasElement | null {
 }
 
 /**
- * Check if user prefers reduced motion
- */
-function prefersReducedMotion(): boolean {
-  if (typeof window === 'undefined') return false;
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
-/**
  * Fire confetti with the centralized canvas
- * Automatically respects prefers-reduced-motion
  */
 export function fireConfetti(options: Options = {}): Promise<null> | null {
-  // Skip if user prefers reduced motion
-  if (prefersReducedMotion()) {
-    console.log('[Confetti] Skipped due to prefers-reduced-motion');
-    return null;
-  }
-
   // Ensure canvas exists
   getConfettiCanvas();
 
@@ -208,8 +192,6 @@ export function fireStreakConfetti(): void {
  * Fire first win epic celebration (cascading confetti)
  */
 export function fireFirstWinConfetti(durationMs: number = 4000): void {
-  if (prefersReducedMotion()) return;
-
   const colors = ['#FFE135', '#FF6B35', '#00D9FF', '#FF69B4', '#7C3AED', '#10B981'];
   const end = Date.now() + durationMs;
 
