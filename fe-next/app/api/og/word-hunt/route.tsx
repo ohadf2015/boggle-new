@@ -10,11 +10,36 @@ export const runtime = 'edge';
 
 const CHALLENGE: Record<string, string> = {
   en: 'Beat my score?',
-  he: 'תנצח אותי?',
+  he: '?יתוא חצנת', // Reversed for Satori RTL rendering
   sv: 'Slå mitt resultat?',
   ja: '挑戦する？',
   es: '¿Puedes superarlo?',
 };
+
+const SOLVED_IN: Record<string, string> = {
+  en: 'Solved in',
+  he: '!תונויסינ', // "נסיונות!" reversed
+  sv: 'Löst på',
+  ja: '回で解決',
+  es: 'Resuelto en',
+};
+
+const FAILED: Record<string, string> = {
+  en: 'This one got me!',
+  he: '!יתוא הספת הז', // "זה תפס אותי!" reversed
+  sv: 'Den tog mig!',
+  ja: 'やられた！',
+  es: '¡Me atrapó!',
+};
+
+// Check if string contains Hebrew characters and reverse it for Satori
+function reverseIfHebrew(text: string): string {
+  const hebrewRegex = /[\u0590-\u05FF]/;
+  if (hebrewRegex.test(text)) {
+    return text.split('').reverse().join('');
+  }
+  return text;
+}
 
 function getAccentColor(solved: boolean, attempts: number): string {
   if (!solved) return '#ef4444';
@@ -35,9 +60,11 @@ export async function GET(request: NextRequest) {
     const avatarEmoji = searchParams.get('avatarEmoji') || '🎯';
     const locale = searchParams.get('locale') || 'en';
 
-    const isRTL = locale === 'he';
     const challenge = CHALLENGE[locale] || CHALLENGE.en;
+    const solvedInText = SOLVED_IN[locale] || SOLVED_IN.en;
+    const failedText = FAILED[locale] || FAILED.en;
     const accent = getAccentColor(solved, attempts);
+    const isRTL = locale === 'he';
 
     return new ImageResponse(
       (
@@ -86,29 +113,52 @@ export async function GET(request: NextRequest) {
               }}
             >
               <span style={{ fontSize: '56px' }}>{avatarEmoji}</span>
-              <span style={{ fontSize: '48px', fontWeight: 900, color: '#fff', letterSpacing: '-1px' }}>{displayName}</span>
+              <span style={{ fontSize: '48px', fontWeight: 900, color: '#fff' }}>{reverseIfHebrew(displayName)}</span>
             </div>
 
             {/* Score */}
             <div
               style={{
                 display: 'flex',
-                alignItems: 'baseline',
+                flexDirection: 'column',
+                alignItems: 'center',
                 gap: '8px',
               }}
             >
-              <span
-                style={{
-                  fontSize: '180px',
-                  fontWeight: 900,
-                  color: accent,
-                  lineHeight: 1,
-                  letterSpacing: '-10px',
-                }}
-              >
-                {solved ? attempts : 'X'}
-              </span>
-              <span style={{ fontSize: '72px', fontWeight: 900, color: '#4a4a5a', letterSpacing: '-2px' }}>/10</span>
+              {solved ? (
+                <>
+                  <span style={{ fontSize: '36px', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase' }}>
+                    {solvedInText}
+                  </span>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                    <span
+                      style={{
+                        fontSize: '180px',
+                        fontWeight: 900,
+                        color: accent,
+                        lineHeight: 1,
+                        letterSpacing: '-10px',
+                      }}
+                    >
+                      {attempts}
+                    </span>
+                    <span style={{ fontSize: '48px', fontWeight: 900, color: '#9ca3af' }}>
+                      {attempts === 1 ? '🎯' : '✨'}
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <span
+                  style={{
+                    fontSize: '72px',
+                    fontWeight: 900,
+                    color: accent,
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {failedText}
+                </span>
+              )}
             </div>
           </div>
 
@@ -120,10 +170,9 @@ export async function GET(request: NextRequest) {
               marginTop: '32px',
               padding: '16px 40px',
               background: accent,
-              direction: isRTL ? 'rtl' : 'ltr',
             }}
           >
-            <span style={{ fontSize: '28px', fontWeight: 900, color: '#000', letterSpacing: '2px' }}>{challenge}</span>
+            <span style={{ fontSize: '28px', fontWeight: 900, color: '#000', letterSpacing: isRTL ? '0' : '2px', direction: isRTL ? 'rtl' : 'ltr' }}>{challenge}</span>
           </div>
         </div>
       ),
