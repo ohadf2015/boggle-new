@@ -616,22 +616,12 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           className="flex items-center justify-center gap-3"
         >
           {result.solved ? (
-            <>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-neo border-3 border-neo-black shadow-hard">
-                <Trophy className="w-5 h-5 text-white" />
-                <span className="font-black text-white uppercase">
-                  {t('wordHunt.victory')}
-                </span>
-              </div>
-              {/* Confetti retrigger button for victory */}
-              {isNewCompletion && (
-                <ConfettiRetrigger
-                  variant={stats?.yourStats?.rank && stats.yourStats.rank <= 3 ? 'rank' : 'victory'}
-                  rank={stats?.yourStats?.rank}
-                  compact
-                />
-              )}
-            </>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-neo border-3 border-neo-black shadow-hard">
+              <Trophy className="w-5 h-5 text-white" />
+              <span className="font-black text-white uppercase">
+                {t('wordHunt.victory')}
+              </span>
+            </div>
           ) : (
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-400 to-gray-500 rounded-neo border-3 border-neo-black shadow-hard">
               <X className="w-5 h-5 text-white" />
@@ -639,6 +629,14 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 {t('wordHunt.stats.youFailed')}
               </span>
             </div>
+          )}
+          {/* Confetti retrigger button - show for all winners (solved) */}
+          {result.solved && (
+            <ConfettiRetrigger
+              variant={stats?.yourStats?.rank && stats.yourStats.rank <= 3 ? 'rank' : 'victory'}
+              rank={stats?.yourStats?.rank}
+              compact
+            />
           )}
         </motion.div>
 

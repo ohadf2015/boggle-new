@@ -379,20 +379,12 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           className="flex items-center justify-center gap-3"
         >
           {isNewCompletion ? (
-            <>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-neo-lime to-neo-cyan rounded-neo border-3 border-neo-black shadow-hard">
-                <Trophy className="w-5 h-5 text-neo-black" />
-                <span className="font-black text-neo-black uppercase">
-                  {t('daily.completed')}
-                </span>
-              </div>
-              {/* Confetti retrigger button */}
-              <ConfettiRetrigger
-                variant={currentUserRank && currentUserRank <= 3 ? 'rank' : 'default'}
-                rank={currentUserRank || undefined}
-                compact
-              />
-            </>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-neo-lime to-neo-cyan rounded-neo border-3 border-neo-black shadow-hard">
+              <Trophy className="w-5 h-5 text-neo-black" />
+              <span className="font-black text-neo-black uppercase">
+                {t('daily.completed')}
+              </span>
+            </div>
           ) : (
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-neo border-3 border-neo-black dark:border-gray-600">
               <Target className="w-5 h-5" />
@@ -400,6 +392,14 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                 {t('daily.alreadyPlayed')}
               </span>
             </div>
+          )}
+          {/* Confetti retrigger button - show for all completions with score > 0 */}
+          {result.score > 0 && (
+            <ConfettiRetrigger
+              variant={currentUserRank && currentUserRank <= 3 ? 'rank' : 'default'}
+              rank={currentUserRank || undefined}
+              compact
+            />
           )}
         </motion.div>
 

@@ -535,7 +535,7 @@ export default function ProfilePage(): React.ReactNode {
           <StatCard
             icon={<Trophy />}
             label={t('profile.wins')}
-            value={profile?.ranked_wins || 0}
+            value={(profile?.ranked_wins || 0) + (profile?.casual_wins || 0)}
             isDarkMode={isDarkMode}
           />
           <StatCard

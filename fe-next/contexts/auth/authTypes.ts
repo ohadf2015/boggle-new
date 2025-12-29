@@ -24,7 +24,10 @@ export interface ProfileData {
   achievement_counts?: Record<string, number>;
   current_level?: number;
   ranked_wins?: number;
+  casual_wins?: number;
+  ranked_games?: number;
   ranked_mmr?: number;
+  peak_mmr?: number;
   casual_games?: number;
   is_admin?: boolean;
   country_code?: string | null;

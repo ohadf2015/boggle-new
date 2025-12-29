@@ -489,7 +489,28 @@ async function recordGameResultsToSupabase(io: Server, gameCode: string, scoresA
       timePlayed: game.timerSeconds || 0
     };
 
-    const results: GameResults = await processGameResults(gameCode, scoresArray, gameInfo, userAuthMap);
+    // Sort scores to calculate placements for stats recording
+    const sortedForStats = [...scoresArray].sort((a, b) => b.totalScore - a.totalScore);
+    const totalPlayersInGame = scoresArray.length;
+
+    // Map PlayerResult[] to PlayerScore[] format expected by processGameResults
+    const mappedScores = scoresArray.map(playerResult => {
+      const placement = sortedForStats.findIndex(p => p.username === playerResult.username) + 1;
+      const longestWord = playerResult.wordDetails?.reduce((max: string, w: WordDetail) =>
+        (w.word?.length || 0) > (max?.length || 0) ? w.word : max, '') || '';
+
+      return {
+        username: playerResult.username,
+        score: playerResult.totalScore || 0,
+        wordCount: playerResult.wordDetails?.length || 0,
+        longestWord,
+        placement,
+        achievements: playerResult.achievements?.map(a => a.key) || [],
+        totalPlayers: totalPlayersInGame
+      };
+    });
+
+    const results: GameResults = await processGameResults(gameCode, mappedScores, gameInfo, userAuthMap);
     logger.info('SUPABASE', `Game ${gameCode} results recorded`);
 
     // Emit XP events to each player
