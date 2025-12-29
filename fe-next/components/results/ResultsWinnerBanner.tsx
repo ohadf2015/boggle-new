@@ -111,8 +111,8 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
   // Fire confetti on mount - only once
   useEffect(() => {
     if (winner && shouldShowConfetti && !confettiFiredRef.current) {
-      confettiFiredRef.current = true;
       const timer = setTimeout(() => {
+        confettiFiredRef.current = true;
         fireRankConfetti(rank);
       }, 400);
       return () => clearTimeout(timer);
