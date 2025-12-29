@@ -209,7 +209,8 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     };
 
     onComplete(gameResult);
-  }, [duration, onComplete, language, wordSubmission.foundWords, timer.remainingTimeRef]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [duration, onComplete, language, wordSubmission.foundWords]);
 
   // Keep handleGameEnd ref in sync for stable timer callback
   useEffect(() => {
@@ -233,7 +234,8 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       longestWord: '',
     };
     onComplete(result);
-  }, [duration, onComplete, timer.remainingTimeRef]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [duration, onComplete]);
 
   // Handle word forming changes from GridComponent
   const handleWordChange = useCallback((word: string, count: number) => {

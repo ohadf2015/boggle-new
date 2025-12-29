@@ -97,7 +97,8 @@ const TryAnotherLanguage: React.FC<{ currentLanguage: Language }> = ({ currentLa
   const handleLanguageClick = (langCode: Language) => {
     setLanguage(langCode);
     // Force reload to start fresh with new language
-    window.location.href = `/${langCode}/daily`;
+    // Using assign() method to avoid React Compiler issues with property assignment
+    window.location.assign(`/${langCode}/daily`);
   };
 
   return (
@@ -170,6 +171,29 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       getGuestDailyPlayer().then(setGuestPlayer);
     }
   }, [isAuthenticated]);
+
+  // Fetch aggregate stats - declared before the submit effect that uses it
+  const fetchStats = useCallback(async () => {
+    try {
+      const params = new URLSearchParams();
+      if (isAuthenticated && profile) {
+        params.append('playerId', profile.id);
+      } else if (guestFingerprint) {
+        params.append('guestFingerprint', guestFingerprint);
+      }
+
+      const response = await fetch(
+        `/api/daily-challenge/word-hunt/stats/${puzzleDate}/${language}?${params.toString()}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch Word Hunt stats:', err);
+    }
+  }, [puzzleDate, language, isAuthenticated, profile, guestFingerprint]);
 
   // Submit result to backend when completing a new challenge
   useEffect(() => {
@@ -262,30 +286,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       // Even if not new completion, fetch stats to show
       fetchStats();
     }
-  }, [isNewCompletion, result, guestFingerprint, puzzleDate, puzzleNumber, language, isAuthenticated, profile, guestPlayer]);
-
-  // Fetch aggregate stats
-  const fetchStats = useCallback(async () => {
-    try {
-      const params = new URLSearchParams();
-      if (isAuthenticated && profile) {
-        params.append('playerId', profile.id);
-      } else if (guestFingerprint) {
-        params.append('guestFingerprint', guestFingerprint);
-      }
-
-      const response = await fetch(
-        `/api/daily-challenge/word-hunt/stats/${puzzleDate}/${language}?${params.toString()}`
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data);
-      }
-    } catch (err) {
-      console.error('Failed to fetch Word Hunt stats:', err);
-    }
-  }, [puzzleDate, language, isAuthenticated, profile, guestFingerprint]);
+  }, [isNewCompletion, result, guestFingerprint, puzzleDate, puzzleNumber, language, isAuthenticated, profile, guestPlayer, fetchStats]);
 
   // Fire confetti on victory
   useEffect(() => {

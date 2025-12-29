@@ -8,16 +8,59 @@
 
 import { z } from 'zod';
 
+// ==================== Security Configuration ====================
+
+// Allowed domains for profile picture URLs (prevent SSRF attacks)
+export const ALLOWED_IMAGE_DOMAINS: string[] = [
+  'i.imgur.com',
+  'cdn.discordapp.com',
+  'lh3.googleusercontent.com',
+  'avatars.githubusercontent.com',
+  'cdn.cloudflare.com',
+  'res.cloudinary.com',
+  'storage.googleapis.com',
+  'firebasestorage.googleapis.com',
+];
+
 // ==================== Base Schemas ====================
 // These are the building blocks reused across event schemas
 
 export const LanguageSchema = z.enum(['he', 'en', 'sv', 'ja', 'es', 'fr', 'de']);
 
 export const AvatarSchema = z.object({
-  emoji: z.string().max(10),
+  emoji: z.string()
+    .min(1)
+    .max(10)
+    // SECURITY: Prevent emoji bombs and excessive zero-width joiners
+    .refine((val) => {
+      // Count actual characters (emoji with modifiers can be multiple code points)
+      const chars = Array.from(val);
+      if (chars.length > 4) return false;
+      // Check for excessive zero-width joiners
+      const zwjCount = (val.match(/\u200D/g) || []).length;
+      return zwjCount <= 3;
+    }, 'Invalid emoji format'),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
   avatarImage: z.string().max(100).regex(/^[a-z0-9_\-\/]+$/i).optional().nullable(),
-  profilePictureUrl: z.string().url().nullable().optional(),
+  profilePictureUrl: z.string()
+    .url()
+    .nullable()
+    .optional()
+    // SECURITY: HTTPS-only and domain whitelist to prevent SSRF/XSS
+    .refine((url) => {
+      if (!url) return true; // null/undefined is allowed
+      try {
+        const parsed = new URL(url);
+        // Only allow HTTPS (prevent data:, javascript:, file:, http: schemes)
+        if (parsed.protocol !== 'https:') return false;
+        // Check against whitelist
+        return ALLOWED_IMAGE_DOMAINS.some(domain =>
+          parsed.hostname === domain || parsed.hostname.endsWith('.' + domain)
+        );
+      } catch {
+        return false;
+      }
+    }, 'Profile picture URL must be from an allowed domain (HTTPS only)'),
 });
 
 export const GameCodeSchema = z.string()
@@ -29,7 +72,9 @@ export const UsernameSchema = z.string()
   .min(1, 'Username is required')
   .max(30, 'Username must be at most 30 characters')
   .regex(/^[a-zA-Z0-9_\-\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\s]+$/)
-  .transform(s => s.trim());
+  .transform(s => s.trim())
+  // SECURITY: Reject control characters, zero-width characters, and BOM
+  .refine((val) => !/[\u0000-\u001F\u007F-\u009F\u200B-\u200D\uFEFF]/.test(val), 'Username contains invalid characters');
 
 export const WordSchema = z.string()
   .min(1, 'Word is required')
@@ -63,7 +108,22 @@ export const CreateGameSchema = z.object({
   authUserId: z.string().uuid().optional().nullable(),
   guestTokenHash: z.string().max(128).optional().nullable(),
   isRanked: z.boolean().optional().default(false),
-  profilePictureUrl: z.string().url().optional().nullable(),
+  profilePictureUrl: z.string()
+    .url()
+    .optional()
+    .nullable()
+    .refine((url) => {
+      if (!url) return true;
+      try {
+        const parsed = new URL(url);
+        if (parsed.protocol !== 'https:') return false;
+        return ALLOWED_IMAGE_DOMAINS.some(domain =>
+          parsed.hostname === domain || parsed.hostname.endsWith('.' + domain)
+        );
+      } catch {
+        return false;
+      }
+    }, 'Profile picture URL must be from an allowed domain (HTTPS only)'),
 });
 
 /**
@@ -76,7 +136,22 @@ export const JoinGameSchema = z.object({
   avatar: AvatarSchema.optional(),
   authUserId: z.string().uuid().optional().nullable(),
   guestTokenHash: z.string().max(128).optional().nullable(),
-  profilePictureUrl: z.string().url().optional().nullable(),
+  profilePictureUrl: z.string()
+    .url()
+    .optional()
+    .nullable()
+    .refine((url) => {
+      if (!url) return true;
+      try {
+        const parsed = new URL(url);
+        if (parsed.protocol !== 'https:') return false;
+        return ALLOWED_IMAGE_DOMAINS.some(domain =>
+          parsed.hostname === domain || parsed.hostname.endsWith('.' + domain)
+        );
+      } catch {
+        return false;
+      }
+    }, 'Profile picture URL must be from an allowed domain (HTTPS only)'),
 });
 
 /**

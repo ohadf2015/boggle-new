@@ -16,11 +16,11 @@ let linkGuestSessionToUser: any;
 
 async function getTrackers() {
   if (!getOrCreateGuestSession || !updateGuestSession || !getGuestSession || !linkGuestSessionToUser) {
-    const module = await import('@/backend/modules/guestTracker');
-    getOrCreateGuestSession = module.getOrCreateGuestSession;
-    updateGuestSession = module.updateGuestSession;
-    getGuestSession = module.getGuestSession;
-    linkGuestSessionToUser = module.linkGuestSessionToUser;
+    const guestModule = await import('@/backend/modules/guestTracker');
+    getOrCreateGuestSession = guestModule.getOrCreateGuestSession;
+    updateGuestSession = guestModule.updateGuestSession;
+    getGuestSession = guestModule.getGuestSession;
+    linkGuestSessionToUser = guestModule.linkGuestSessionToUser;
   }
   return { getOrCreateGuestSession, updateGuestSession, getGuestSession, linkGuestSessionToUser };
 }

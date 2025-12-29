@@ -996,7 +996,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           timestamp: Date.now(),
         });
       });
-  }, [settings.language, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getScoreMultiplier, fireRoundActive, calculateWordScore]);
+  }, [settings.language, settings.minWordLength, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getComboBonus, getScoreMultiplier, fireRoundActive, calculateWordScore]);
 
   const handleFinishPractice = useCallback(() => {
     setIsGameOver(true);

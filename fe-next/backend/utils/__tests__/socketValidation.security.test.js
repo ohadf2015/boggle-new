@@ -59,11 +59,10 @@ describe('Security - Input Validation', () => {
       });
     });
 
-    // TODO: SECURITY - BOM character (\uFEFF) is matched by \s in regex
-    // Consider adding explicit check to reject it
-    it('should accept BOM character due to \\s in regex (TODO: add rejection)', () => {
+    // SECURITY: BOM character (\uFEFF) is now explicitly rejected
+    it('should reject BOM character', () => {
       const result = usernameSchema.safeParse('user\uFEFFname');
-      expect(result.success).toBe(true); // TODO: should be false
+      expect(result.success).toBe(false);
     });
 
     it('should enforce max length of 30 characters', () => {
@@ -120,57 +119,48 @@ describe('Security - Input Validation', () => {
       });
     });
 
-    // TODO: SECURITY - HTTP URLs should be rejected, require HTTPS only
-    // Inline fallback schema checks protocol, but shared compiled schema doesn't
-    it('should accept HTTP URLs (TODO: require HTTPS only)', () => {
+    // SECURITY: HTTP URLs are now rejected (HTTPS required)
+    it('should reject HTTP URLs (require HTTPS only)', () => {
       const result = avatarSchema.safeParse({
         emoji: '😀',
         color: '#FF5733',
         profilePictureUrl: 'http://i.imgur.com/abc123.jpg'
       });
-      expect(result.success).toBe(true); // TODO: should be false after adding HTTPS check
+      expect(result.success).toBe(false);
     });
 
-    // TODO: SECURITY - javascript: URLs should be rejected
-    // Current z.url() accepts them. Add protocol check to shared schema.
-    it('should accept javascript: URLs (TODO: add XSS prevention)', () => {
+    // SECURITY: javascript: URLs are now rejected (XSS prevention)
+    it('should reject javascript: URLs (XSS prevention)', () => {
       const result = avatarSchema.safeParse({
         emoji: '😀',
         color: '#FF5733',
         profilePictureUrl: 'javascript:alert(1)'
       });
-      expect(result.success).toBe(true); // TODO: should be false after adding protocol check
+      expect(result.success).toBe(false);
     });
 
-    // TODO: SECURITY - The shared socketSchemas.ts doesn't have SSRF protection.
-    // The inline fallback in socketValidation.ts has domain whitelisting and
-    // protocol checks, but compiled schemas override it. Consider adding
-    // SSRF protection to the shared schema.
-    it('should accept data: URLs (TODO: add SSRF protection)', () => {
-      // Current behavior: accepts any valid URL
-      // Desired behavior: reject data: URLs to prevent SSRF
+    // SECURITY: data: URLs are now rejected (SSRF protection)
+    it('should reject data: URLs (SSRF protection)', () => {
       const result = avatarSchema.safeParse({
         emoji: '😀',
         color: '#FF5733',
         profilePictureUrl: 'data:text/html,<script>alert(1)</script>'
       });
-      expect(result.success).toBe(true); // TODO: should be false after adding SSRF protection
+      expect(result.success).toBe(false);
     });
 
-    // TODO: SECURITY - file: URLs should be rejected
-    // Current z.url() accepts them. Add protocol check to shared schema.
-    it('should accept file: URLs (TODO: add local file access prevention)', () => {
+    // SECURITY: file: URLs are now rejected (local file access prevention)
+    it('should reject file: URLs (local file access prevention)', () => {
       const result = avatarSchema.safeParse({
         emoji: '😀',
         color: '#FF5733',
         profilePictureUrl: 'file:///etc/passwd'
       });
-      expect(result.success).toBe(true); // TODO: should be false after adding protocol check
+      expect(result.success).toBe(false);
     });
 
-    it('should accept URLs from any domain (TODO: add domain whitelist)', () => {
-      // Current behavior: accepts any valid HTTPS URL
-      // Desired behavior: only allow whitelisted domains
+    // SECURITY: Non-whitelisted domains are now rejected
+    it('should reject URLs from non-whitelisted domains', () => {
       const urls = [
         'https://evil.com/image.jpg',
         'https://attacker.net/photo.png'
@@ -182,7 +172,7 @@ describe('Security - Input Validation', () => {
           color: '#FF5733',
           profilePictureUrl: url
         });
-        expect(result.success).toBe(true); // TODO: should be false after adding whitelist
+        expect(result.success).toBe(false);
       });
     });
 
@@ -204,14 +194,28 @@ describe('Security - Input Validation', () => {
       expect(result.success).toBe(false);
     });
 
-    it('should accept valid emojis with reasonable ZWJ sequences', () => {
-      const validEmojis = ['😀', '👨‍👩‍👧', '🏳️‍🌈', '👍🏻'];
+    it('should accept simple emojis and emojis with skin tone modifiers', () => {
+      // Only emojis with max 4 codepoints are accepted
+      // Complex family emojis (👨‍👩‍👧) have 5+ codepoints and are rejected to prevent emoji bombs
+      const validEmojis = ['😀', '👍', '👍🏻', '🎮'];
       validEmojis.forEach(emoji => {
         const result = avatarSchema.safeParse({
           emoji,
           color: '#FF5733'
         });
         expect(result.success).toBe(true);
+      });
+    });
+
+    it('should reject complex ZWJ sequences to prevent emoji bombs', () => {
+      // These emojis have 5+ codepoints and are intentionally rejected
+      const complexEmojis = ['👨‍👩‍👧', '👨‍👩‍👧‍👦'];
+      complexEmojis.forEach(emoji => {
+        const result = avatarSchema.safeParse({
+          emoji,
+          color: '#FF5733'
+        });
+        expect(result.success).toBe(false);
       });
     });
   });

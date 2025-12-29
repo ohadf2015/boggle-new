@@ -141,7 +141,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
   // Session tracking
   const [gameSessionId, setGameSessionId] = useState<string | null>(null);
-  const gameStartTimeRef = useRef<number>(Date.now());
+  const gameStartTimeRef = useRef<number>(0);
+
+  // Refs for callbacks that need to be accessed before declaration
+  const handleGameOverRef = useRef<((won: boolean, finalAttempts?: TargetAttempt[]) => void) | null>(null);
+  const handleTargetAttemptRef = useRef<((word: string, target: string) => void) | null>(null);
+  const handleWordDiscoveryRef = useRef<((word: string) => void) | null>(null);
 
   // Load AI hints on mount
   useEffect(() => {
@@ -159,6 +164,11 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     loadHints();
   }, [targetWord, language]);
 
+  // Initialize game start time on mount (separate from Date.now in render for React Compiler)
+  useEffect(() => {
+    gameStartTimeRef.current = Date.now();
+  }, []);
+
   // Log game session start
   useEffect(() => {
     async function initGameSession() {
@@ -174,6 +184,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       }
     }
     initGameSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run once on mount
 
   // Start fire round music on mount
@@ -200,7 +211,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       setLifePoints(prev => {
         const newLife = Math.max(0, prev - LIFE_DRAIN_RATE);
         if (newLife === 0 && !gameOverRef.current) {
-          handleGameOver(false); // Died
+          handleGameOverRef.current?.(false); // Died - use ref to avoid declaration order issues
         }
         return newLife;
       });
@@ -267,7 +278,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
     // Check if attempting target word (exact match only)
     if (normalizedWord === normalizedTarget) {
-      handleTargetAttempt(normalizedWord, normalizedTarget);
+      handleTargetAttemptRef.current?.(normalizedWord, normalizedTarget);
     } else if (normalizedWord.length === normalizedTarget.length) {
       // Same length as target - could be a target guess attempt
       // First check if it's already been attempted
@@ -278,19 +289,19 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       // Check if it's a valid word on the board - if so, treat as word discovery AND target attempt
       if (isWordOnBoard(normalizedWord, grid, language)) {
         // It's a valid word, give discovery rewards AND record as target attempt
-        handleWordDiscovery(normalizedWord);
-        handleTargetAttempt(normalizedWord, normalizedTarget);
+        handleWordDiscoveryRef.current?.(normalizedWord);
+        handleTargetAttemptRef.current?.(normalizedWord, normalizedTarget);
       } else {
         // Not a valid word path on board - penalize and record as target attempt
         setLifePoints(prev => Math.max(0, prev - INVALID_WORD_PENALTY));
         showToast('not-on-board', t('wordHunt.feedback.notFormablePenalty') || `⚠️ Not on board -${INVALID_WORD_PENALTY} ❤️`);
-        handleTargetAttempt(normalizedWord, normalizedTarget);
+        handleTargetAttemptRef.current?.(normalizedWord, normalizedTarget);
       }
     } else {
       // Different length - it's only a grid word discovery
-      handleWordDiscovery(normalizedWord);
+      handleWordDiscoveryRef.current?.(normalizedWord);
     }
-  }, [isGameOver, targetWord, discoveredWords, attempts, grid, language, showToast, t]);
+  }, [isGameOver, targetWord, attempts, grid, language, showToast, t]);
 
   // Handle target word attempt
   const handleTargetAttempt = useCallback((word: string, target: string) => {
@@ -331,7 +342,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       if (feedbackTimeoutRef.current) {
         clearTimeout(feedbackTimeoutRef.current);
       }
-      handleGameOver(true, newAttempts); // Victory - pass the updated attempts array
+      handleGameOverRef.current?.(true, newAttempts); // Victory - pass the updated attempts array
       return;
     }
 
@@ -344,7 +355,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       if (feedbackTimeoutRef.current) {
         clearTimeout(feedbackTimeoutRef.current);
       }
-      handleGameOver(false, newAttempts); // Failed - pass the updated attempts array
+      handleGameOverRef.current?.(false, newAttempts); // Failed - pass the updated attempts array
       return;
     }
 
@@ -463,6 +474,19 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
     onComplete(result);
   }, [attempts, discoveredWords, lifePoints, clueTokens, tokensSpent, currentHint, targetWord, onComplete, gameSessionId, gameStartTimeRef, fadeToTrack, TRACKS]);
+
+  // Keep callback refs in sync
+  useEffect(() => {
+    handleGameOverRef.current = handleGameOver;
+  }, [handleGameOver]);
+
+  useEffect(() => {
+    handleTargetAttemptRef.current = handleTargetAttempt;
+  }, [handleTargetAttempt]);
+
+  useEffect(() => {
+    handleWordDiscoveryRef.current = handleWordDiscovery;
+  }, [handleWordDiscovery]);
 
   // Handle clue shop purchases
   const handlePurchase = useCallback((item: ClueShopItem) => {

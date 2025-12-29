@@ -13,9 +13,9 @@ let updateGameSession: any;
 
 async function getLoggers() {
   if (!logGameSession || !updateGameSession) {
-    const module = await import('@/backend/modules/gameSessionLogger');
-    logGameSession = module.logGameSession;
-    updateGameSession = module.updateGameSession;
+    const loggerModule = await import('@/backend/modules/gameSessionLogger');
+    logGameSession = loggerModule.logGameSession;
+    updateGameSession = loggerModule.updateGameSession;
   }
   return { logGameSession, updateGameSession };
 }

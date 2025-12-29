@@ -707,7 +707,7 @@ export const DailyWordSchedule: React.FC = () => {
             )}
           >
             <Calendar className="w-4 h-4 mr-2" />
-            Set Today's Word
+            Set Today&apos;s Word
           </Button>
 
           <Button
@@ -1501,7 +1501,7 @@ export const DailyWordSchedule: React.FC = () => {
             >
               <h3 className="text-2xl font-black mb-2 flex items-center gap-2 text-red-600">
                 <Calendar className="w-6 h-6" />
-                Set Today's Word
+                Set Today&apos;s Word
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 {LANGUAGES.find(l => l.code === selectedLang)?.flag} {LANGUAGES.find(l => l.code === selectedLang)?.name} - {formatDate(getTodayDateString())}

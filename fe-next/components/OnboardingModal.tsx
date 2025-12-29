@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowLeft, ArrowRight } from 'lucide-react';
@@ -66,6 +66,11 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
     }
   }, [isOpen, audioUnlocked, fadeToTrack, TRACKS]);
 
+  const handleSkip = useCallback(() => {
+    markOnboardingSkipped();
+    onClose();
+  }, [onClose]);
+
   // Add ESC key support for easy dismissal
   useEffect(() => {
     if (!isOpen) return;
@@ -78,12 +83,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
 
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
-  }, [isOpen]);
-
-  const handleSkip = () => {
-    markOnboardingSkipped();
-    onClose();
-  };
+  }, [isOpen, handleSkip]);
 
   // Handle dialog close via X button or clicking outside
   // This ensures onboarding is marked as skipped even if user doesn't use the Skip button
