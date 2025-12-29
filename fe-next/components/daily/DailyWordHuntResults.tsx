@@ -225,6 +225,19 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             ? profile.avatar_color
             : guestPlayer?.avatarColor || '#6366f1';
 
+          // Fetch country code from geolocation API (works for all languages)
+          let countryCode: string | null = null;
+          try {
+            const geoResponse = await fetch('/api/geolocation');
+            if (geoResponse.ok) {
+              const geoData = await geoResponse.json();
+              countryCode = geoData.countryCode || null;
+            }
+          } catch (geoError) {
+            console.warn('Failed to fetch country code:', geoError);
+            // Continue without country code - it's optional
+          }
+
           const bodyData: Record<string, unknown> = {
             puzzleDate,
             puzzleNumber,
@@ -234,6 +247,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             displayName,
             avatarEmoji,
             avatarColor,
+            countryCode,
             solved: result.solved,
             attemptsUsed: result.attemptsUsed,
             targetWord: result.targetWord,

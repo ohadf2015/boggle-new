@@ -151,6 +151,19 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             ? profile.avatar_color
             : guestPlayer?.avatarColor || '#6366f1';
 
+          // Fetch country code from geolocation API (works for all languages)
+          let countryCode: string | null = null;
+          try {
+            const geoResponse = await fetch('/api/geolocation');
+            if (geoResponse.ok) {
+              const geoData = await geoResponse.json();
+              countryCode = geoData.countryCode || null;
+            }
+          } catch (geoError) {
+            console.warn('Failed to fetch country code:', geoError);
+            // Continue without country code - it's optional
+          }
+
           const response = await fetch('/api/daily-challenge/submit', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -163,6 +176,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               displayName,
               avatarEmoji,
               avatarColor,
+              countryCode,
               score: result.score,
               wordCount: result.wordCount,
               wordsByLength: result.wordsByLength,
