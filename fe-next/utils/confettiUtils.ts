@@ -19,11 +19,18 @@ let myConfetti: CreateTypes | null = null;
  */
 function getConfettiCanvas(): HTMLCanvasElement | null {
   if (typeof document === 'undefined') return null;
+  if (typeof window === 'undefined') return null;
 
   if (!confettiCanvas) {
     // Create a new canvas
     confettiCanvas = document.createElement('canvas');
     confettiCanvas.setAttribute('data-confetti', 'true');
+
+    // Set explicit pixel dimensions for the canvas drawing surface
+    // This is critical - CSS dimensions alone don't set the drawing surface size
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+
     confettiCanvas.style.cssText = `
       position: fixed;
       top: 0;
@@ -36,9 +43,18 @@ function getConfettiCanvas(): HTMLCanvasElement | null {
     document.body.appendChild(confettiCanvas);
 
     // Create confetti instance bound to this canvas
+    // Note: useWorker can cause issues in some environments, disabled for reliability
     myConfetti = confettiLib.create(confettiCanvas, {
       resize: true,
-      useWorker: true,
+      useWorker: false,
+    });
+
+    // Handle window resize to update canvas dimensions
+    window.addEventListener('resize', () => {
+      if (confettiCanvas) {
+        confettiCanvas.width = window.innerWidth;
+        confettiCanvas.height = window.innerHeight;
+      }
     });
   }
 

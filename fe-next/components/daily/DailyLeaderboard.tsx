@@ -261,13 +261,45 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
     }
   }, [puzzleDate, language, onParticipantCountChange, gameType]);
 
-  // Initial fetch and polling
+  // Initial fetch and polling - pause when tab is not visible
   useEffect(() => {
     fetchLeaderboard();
 
-    // Poll every 30 seconds for updates
-    const interval = setInterval(fetchLeaderboard, 30000);
-    return () => clearInterval(interval);
+    let interval: NodeJS.Timeout | null = null;
+
+    const startPolling = () => {
+      if (interval) clearInterval(interval);
+      // Poll every 30 seconds for updates
+      interval = setInterval(fetchLeaderboard, 30000);
+    };
+
+    const stopPolling = () => {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopPolling();
+      } else {
+        // Refresh data when tab becomes visible again
+        fetchLeaderboard();
+        startPolling();
+      }
+    };
+
+    // Start polling initially
+    startPolling();
+
+    // Listen for visibility changes
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stopPolling();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [fetchLeaderboard]);
 
   // Check if current user is in the list

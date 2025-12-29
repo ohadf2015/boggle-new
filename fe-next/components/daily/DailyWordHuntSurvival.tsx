@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Zap, Store, X, Heart, Coins, Lightbulb } from 'lucide-react';
 import GridComponent from '@/components/GridComponent';
@@ -12,6 +12,7 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { cn } from '@/lib/utils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import type { LetterGrid, Language } from '@/types';
 import {
   getLetterFeedback,
@@ -90,6 +91,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const { fadeToTrack, stopMusic, TRACKS } = useMusic();
   const isLandscape = useMobileLandscape();
   const { user } = useAuth();
+
+  // Performance optimization for low-end devices
+  const { isLowEnd, enableComplexAnimations } = useDevicePerformance();
+  const skipAnimations = useMemo(() => isLowEnd || !enableComplexAnimations, [isLowEnd, enableComplexAnimations]);
 
   // Survival state
   const [lifePoints, setLifePoints] = useState(INITIAL_LIFE);
@@ -648,16 +653,16 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
             transition={{ duration: 0.3 }}
           >
             <motion.div
-              animate={lifePoints <= 20 && !isGameOver ? { scale: [1, 1.2, 1] } : {}}
-              transition={{ duration: 0.5, repeat: lifePoints <= 20 ? Infinity : 0 }}
+              animate={!skipAnimations && lifePoints <= 20 && !isGameOver ? { scale: [1, 1.2, 1] } : {}}
+              transition={{ duration: 0.5, repeat: !skipAnimations && lifePoints <= 20 ? Infinity : 0 }}
             >
               <Heart className="w-3 h-3 mr-1 fill-current" />
             </motion.div>
             {lifePoints}/100
           </motion.div>
 
-          {/* Life drain particles effect when low on life */}
-          {lifePoints <= 33 && lifePoints > 0 && !isGameOver && (
+          {/* Life drain particles effect when low on life - disabled on low-end devices */}
+          {!skipAnimations && lifePoints <= 33 && lifePoints > 0 && !isGameOver && (
             <motion.div
               className="absolute inset-0 pointer-events-none overflow-hidden"
               initial={{ opacity: 0 }}
@@ -771,9 +776,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                     return (
                       <motion.div
                         key={idx}
-                        initial={{ rotateX: 90, opacity: 0 }}
-                        animate={{ rotateX: 0, opacity: 1 }}
-                        transition={{
+                        initial={skipAnimations ? { opacity: 0 } : { rotateX: 90, opacity: 0 }}
+                        animate={skipAnimations ? { opacity: 1 } : { rotateX: 0, opacity: 1 }}
+                        transition={skipAnimations ? {
+                          delay: idx * 0.03,
+                          duration: 0.15
+                        } : {
                           delay: idx * 0.1,
                           type: "spring",
                           stiffness: 300,

@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Crown, Trophy, Medal, Hand } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -98,6 +98,10 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
     ? (rank <= 3 ? rank : 4)
     : (variant === 'completion' ? 4 : 1);
 
+  // Track if confetti has already been fired to prevent duplicate firings
+  const hasFiredConfettiRef = useRef(false);
+  const confettiTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Memoize the confetti function for this rank
   const handleConfetti = useCallback(() => {
     if (shouldShowConfetti) {
@@ -105,14 +109,25 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
     }
   }, [rank, shouldShowConfetti]);
 
-  // Fire confetti on mount
+  // Fire confetti on mount - using refs to prevent cleanup issues when deps change
   useEffect(() => {
-    if (winner && shouldShowConfetti) {
-      const timer = setTimeout(() => fireRankConfetti(rank), 400);
-      return () => clearTimeout(timer);
+    if (winner && shouldShowConfetti && !hasFiredConfettiRef.current) {
+      hasFiredConfettiRef.current = true;
+      confettiTimeoutRef.current = setTimeout(() => {
+        fireRankConfetti(rank);
+        confettiTimeoutRef.current = null;
+      }, 400);
     }
-    return undefined;
-  }, [winner, rank, shouldShowConfetti]);
+  }, [winner, shouldShowConfetti, rank]);
+
+  // Separate cleanup effect - only runs on unmount
+  useEffect(() => {
+    return () => {
+      if (confettiTimeoutRef.current) {
+        clearTimeout(confettiTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Get styles for this rank (4+ use the same purple style)
   const styles = RANK_STYLES[styleRank] || RANK_STYLES[4];

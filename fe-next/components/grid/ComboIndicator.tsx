@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { cn } from '../../lib/utils';
 import { getComboColors } from './comboColors';
 import { useReducedMotion } from '../../utils/accessibility';
+import { useDevicePerformance } from '../../hooks/useDevicePerformance';
 
 interface ComboIndicatorProps {
   comboLevel: number;
@@ -122,7 +123,11 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
 }) => {
   // Use system preference, but allow prop override
   const systemReducedMotion = useReducedMotion();
-  const reduceMotion = reduceMotionProp ?? systemReducedMotion;
+  const { isLowEnd, enableComplexAnimations } = useDevicePerformance();
+
+  // Disable effects on low-end devices or when reduced motion is preferred
+  const reduceMotion = reduceMotionProp ?? systemReducedMotion ?? isLowEnd;
+  const skipParticles = isLowEnd || !enableComplexAnimations || reduceMotion;
 
   const comboColors = getComboColors(comboLevel);
   const controls = useAnimation();
@@ -134,15 +139,15 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
   useEffect(() => {
     const isHighCombo = comboLevel >= 5;
     const isExtremeCombo = comboLevel >= 15;
-    // Reduce sparkles at extreme levels to prevent performance issues
-    // Also reduce if motion is disabled for accessibility and performance
-    const count = reduceMotion ? 0 : isExtremeCombo ? 6 : isHighCombo ? 10 : 5;
+    // Skip sparkles entirely on low-end devices or when motion is reduced
+    // Also reduce at extreme levels to prevent performance issues
+    const count = skipParticles ? 0 : isExtremeCombo ? 4 : isHighCombo ? 6 : 4;
     const data = [...Array(count)].map((_, i) => ({
       angle: (i * (360 / count) + (Math.random() - 0.5) * 30) * (Math.PI / 180),
       distance: 50 + Math.random() * 30,
     }));
     setSparkleData(data);
-  }, [comboLevel, animationKey, reduceMotion]);
+  }, [comboLevel, animationKey, skipParticles]);
 
   // Show combo indicator and auto-dismiss
   useEffect(() => {
@@ -192,11 +197,10 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
   const confettiColors = ['#FF3366', '#00FFFF', '#FFE135', '#BFFF00', '#FF6B35', '#FF1493'];
 
   // Scale effects with combo level, but cap aggressively at very high levels for performance
-  // Cap confetti at 12 for extreme combos to prevent performance issues
-  // Disable confetti entirely if motion is reduced
-  const confettiCount = reduceMotion ? 0 : isExtremeCombo
-    ? 12
-    : Math.min(6 + (visibleCombo - 5) * 2, 18); // 6 at level 5, up to 18
+  // Skip confetti entirely on low-end devices or when motion is reduced
+  const confettiCount = skipParticles ? 0 : isExtremeCombo
+    ? 8
+    : Math.min(4 + (visibleCombo - 5) * 1, 12); // Reduced counts for better performance
 
   return (
     <AnimatePresence mode="wait">
@@ -208,19 +212,17 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
         animate={controls}
         exit={{ opacity: 0 }}
       >
-        {/* Glow rings - scale with combo level, reduce at extreme levels for performance */}
-        {!reduceMotion && (
+        {/* Glow rings - skip on low-end devices for performance */}
+        {!skipParticles && (
           <>
             <GlowRing delay={0} color={isRainbow ? '#FF1493' : '#FF6B35'} scale={2} />
             <GlowRing delay={0.08} color={isRainbow ? '#00FFFF' : '#FFD700'} scale={2.5} />
-            {isHighCombo && <GlowRing delay={0.15} color="#FFFFFF" scale={3} />}
-            {isVeryHighCombo && !isExtremeCombo && <GlowRing delay={0.2} color="#FF3366" scale={3.5} />}
-            {isInsaneCombo && !isExtremeCombo && <GlowRing delay={0.25} color="#00FFFF" scale={4} />}
+            {isHighCombo && !isExtremeCombo && <GlowRing delay={0.15} color="#FFFFFF" scale={3} />}
           </>
         )}
 
-        {/* Sparkle particles */}
-        {!reduceMotion && (
+        {/* Sparkle particles - skip on low-end devices */}
+        {!skipParticles && sparkleData.length > 0 && (
           <>
             {sparkleData.map((data, i) => (
               <Sparkle
@@ -235,8 +237,8 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
           </>
         )}
 
-        {/* Confetti for high combos - scales with level */}
-        {!reduceMotion && isHighCombo && (
+        {/* Confetti for high combos - skip on low-end devices */}
+        {!skipParticles && isHighCombo && confettiCount > 0 && (
           <>
             {[...Array(confettiCount)].map((_, i) => (
               <Confetti
@@ -292,8 +294,8 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
               }),
             }}
           >
-            {/* Shimmer overlay - disable at extreme levels for performance */}
-            {!reduceMotion && !isExtremeCombo && (
+            {/* Shimmer overlay - skip on low-end devices for performance */}
+            {!skipParticles && !isExtremeCombo && (
               <motion.div
                 className="absolute inset-0 rounded-full pointer-events-none overflow-hidden"
                 style={{ zIndex: 5 }}

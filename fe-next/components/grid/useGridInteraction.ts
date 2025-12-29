@@ -3,10 +3,25 @@
  * Handles touch/mouse interaction logic for the grid component
  */
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { getDeadzoneThreshold } from '@/utils/consts';
 import type { LetterGrid, GridPosition } from '@/types';
 import type { CellPosition, SelectedCell } from './types';
+import { getPerformanceConfig } from './performanceUtils';
+
+// Cached grid measurements to avoid layout thrashing on every touch move
+interface GridMeasurements {
+  gridRect: DOMRect;
+  cellWidth: number;
+  cellHeight: number;
+  gridPaddingLeft: number;
+  gridPaddingTop: number;
+  gapX: number;
+  gapY: number;
+  cellWithGapWidth: number;
+  cellWithGapHeight: number;
+  timestamp: number;
+}
 
 interface UseGridInteractionProps {
   grid: LetterGrid;
@@ -73,6 +88,15 @@ export function useGridInteraction({
   // For velocity calculation
   const touchHistoryRef = useRef<Array<{ x: number; y: number; time: number }>>([]);
   const lastDirectionRef = useRef<{ dx: number; dy: number } | null>(null);
+
+  // Grid measurement cache for performance optimization (avoids layout thrashing)
+  const gridMeasurementsRef = useRef<GridMeasurements | null>(null);
+  // RAF throttling for touch moves on low-end devices
+  const pendingTouchRef = useRef<{ x: number; y: number } | null>(null);
+  const rafIdRef = useRef<number | null>(null);
+
+  // Get performance config once (cached)
+  const performanceConfig = useMemo(() => getPerformanceConfig(), []);
 
   // Use external control if provided, otherwise internal state
   const selectedCells = externalSelectedCells || internalSelectedCells;
@@ -146,8 +170,8 @@ export function useGridInteraction({
     }
   }, [selectedCells, getAdjacentCells]);
 
-  // Get cell at touch position with cell center distance info
-  const getCellAtPosition = useCallback((touchX: number, touchY: number): CellPosition | null => {
+  // Measure grid layout and cache it (expensive operation - avoid calling frequently)
+  const measureGrid = useCallback((): GridMeasurements | null => {
     if (!gridRef.current) return null;
 
     const gridRect = gridRef.current.getBoundingClientRect();
@@ -175,8 +199,48 @@ export function useGridInteraction({
       ? (firstCellInSecondRow.getBoundingClientRect().top - firstCellRect.top - cellHeight)
       : gapX;
 
-    const cellWithGapWidth = cellWidth + gapX;
-    const cellWithGapHeight = cellHeight + gapY;
+    const measurements: GridMeasurements = {
+      gridRect,
+      cellWidth,
+      cellHeight,
+      gridPaddingLeft,
+      gridPaddingTop,
+      gapX,
+      gapY,
+      cellWithGapWidth: cellWidth + gapX,
+      cellWithGapHeight: cellHeight + gapY,
+      timestamp: performance.now(),
+    };
+
+    gridMeasurementsRef.current = measurements;
+    return measurements;
+  }, [grid, gridRef]);
+
+  // Get cell at touch position with cell center distance info (uses cached measurements)
+  const getCellAtPosition = useCallback((touchX: number, touchY: number): CellPosition | null => {
+    if (!gridRef.current) return null;
+
+    const cols = grid[0]?.length || 4;
+    const rows = grid.length;
+
+    // Use cached measurements or measure if cache is stale/missing
+    // Cache is valid for 100ms to handle rapid touch events efficiently
+    let measurements = gridMeasurementsRef.current;
+    const now = performance.now();
+    if (!measurements || now - measurements.timestamp > 100) {
+      measurements = measureGrid();
+      if (!measurements) return null;
+    }
+
+    const {
+      gridRect,
+      cellWidth,
+      cellHeight,
+      gridPaddingLeft,
+      gridPaddingTop,
+      cellWithGapWidth,
+      cellWithGapHeight,
+    } = measurements;
 
     const adjustedX = touchX - gridRect.left - gridPaddingLeft;
     const adjustedY = touchY - gridRect.top - gridPaddingTop;
@@ -205,7 +269,7 @@ export function useGridInteraction({
       distanceFromCenter,
       cellRadius: Math.min(cellWidth, cellHeight) / 2
     };
-  }, [grid, gridRef]);
+  }, [grid, gridRef, measureGrid]);
 
   // Reset selection state
   const resetSelectionState = useCallback(() => {
@@ -326,14 +390,8 @@ export function useGridInteraction({
     }
   };
 
-  const handleTouchMove = (e: TouchEvent | MouseEvent) => {
-    if (!interactive || !isTouchingRef.current) return;
-    if ('cancelable' in e && e.cancelable) e.preventDefault();
-
-    const touch = 'touches' in e ? e.touches[0] : e;
-    if (!touch) return;
-    const touchX = touch.clientX;
-    const touchY = touch.clientY;
+  // Core touch move processing logic (extracted for RAF throttling)
+  const processTouchMove = useCallback((touchX: number, touchY: number) => {
     const now = Date.now();
 
     // Track touch history for velocity calculation
@@ -407,7 +465,40 @@ export function useGridInteraction({
         window.navigator.vibrate(fireRoundActive ? 12 : 6);
       }
     }
-  };
+  }, [selectedCells, setSelectedCells, fireRoundActive, getCellAtPosition, calculateVelocity, isAdjacentCell, isDiagonalMove]);
+
+  // Main touch move handler with RAF throttling for low-end devices
+  const handleTouchMove = useCallback((e: TouchEvent | MouseEvent) => {
+    if (!interactive || !isTouchingRef.current) return;
+    if ('cancelable' in e && e.cancelable) e.preventDefault();
+
+    const touch = 'touches' in e ? e.touches[0] : e;
+    if (!touch) return;
+    const touchX = touch.clientX;
+    const touchY = touch.clientY;
+
+    // On low-end devices, use RAF throttling to limit processing to ~30fps
+    // This prevents layout thrashing and keeps the UI responsive
+    if (performanceConfig.isLowEnd) {
+      // Store pending touch position
+      pendingTouchRef.current = { x: touchX, y: touchY };
+
+      // Schedule processing on next animation frame (if not already scheduled)
+      if (rafIdRef.current === null) {
+        rafIdRef.current = requestAnimationFrame(() => {
+          rafIdRef.current = null;
+          const pending = pendingTouchRef.current;
+          if (pending && isTouchingRef.current) {
+            processTouchMove(pending.x, pending.y);
+          }
+          pendingTouchRef.current = null;
+        });
+      }
+    } else {
+      // Capable devices: process immediately for best responsiveness
+      processTouchMove(touchX, touchY);
+    }
+  }, [interactive, performanceConfig.isLowEnd, processTouchMove]);
 
   const handleTouchEnd = () => {
     if (!interactive || !isTouchingRef.current) return;
@@ -655,6 +746,42 @@ export function useGridInteraction({
       element.removeEventListener('touchmove', handleTouchMove);
     };
   }, [handleTouchMove]);
+
+  // Cleanup RAF on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
+    };
+  }, []);
+
+  // Invalidate grid measurement cache on resize/orientation change
+  useEffect(() => {
+    const element = gridRef.current;
+    if (!element) return;
+
+    const invalidateCache = () => {
+      gridMeasurementsRef.current = null;
+    };
+
+    // Use ResizeObserver for efficient resize detection
+    const resizeObserver = new ResizeObserver(() => {
+      invalidateCache();
+    });
+    resizeObserver.observe(element);
+
+    // Also invalidate on orientation change and window resize
+    window.addEventListener('orientationchange', invalidateCache);
+    window.addEventListener('resize', invalidateCache);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('orientationchange', invalidateCache);
+      window.removeEventListener('resize', invalidateCache);
+    };
+  }, [gridRef]);
 
   // Undo last selected cell - can be called from button or keyboard
   const undoLastCell = useCallback(() => {

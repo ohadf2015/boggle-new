@@ -310,6 +310,17 @@ const GridComponent = memo<GridComponentProps>(({
     setPerformanceMode(getPerformanceMode());
   }, []);
 
+  // Consolidated render mode for conditional animations
+  // 'minimal': No particles, ripples, or complex animations (low-end devices)
+  // 'reduced': Simple transitions, limited effects (mid-range devices)
+  // 'full': All effects enabled (high-end devices)
+  const renderMode: PerformanceMode = useMemo(() => {
+    if (isLowEnd || prefersReducedMotion) return 'minimal';
+    if (performanceMode === 'minimal') return 'minimal';
+    if (performanceMode === 'reduced') return 'reduced';
+    return 'full';
+  }, [isLowEnd, prefersReducedMotion, performanceMode]);
+
   const isLargeGrid = useMemo(() => (grid[0]?.length || 0) > 8, [grid]);
   const comboColors = useMemo(() => getComboColors(comboLevel), [comboLevel]);
 
@@ -429,39 +440,45 @@ const GridComponent = memo<GridComponentProps>(({
                   tabIndex={interactive ? 0 : -1}
                   onTouchStart={(e) => handleTouchStart(i, j, cell, e)}
                   onMouseDown={(e) => handleMouseDown(i, j, cell, e)}
-                  initial={animateOnMount
+                  initial={renderMode === 'minimal' ? false : (animateOnMount
                     ? { scale: 0, opacity: 0, rotateX: -90, y: -20 }
                     : false
+                  )}
+                  animate={renderMode === 'minimal'
+                    ? { opacity: 1 } // Minimal mode: no complex animations
+                    : earthquakeShaking ? {
+                        // Brutal shake: letters fly in random directions
+                        x: shakeOffset.x,
+                        y: shakeOffset.y,
+                        rotate: shakeOffset.rotate,
+                        scale: shakeOffset.scale,
+                        opacity: 0.7,
+                      } : {
+                        scale: isSelected ? 1.05 : (isFading ? 1.02 : 1),
+                        opacity: 1,
+                        rotate: 0,
+                        rotateX: 0,
+                        y: isSelected ? -2 : 0,
+                        x: 0,
+                      }
                   }
-                  animate={earthquakeShaking ? {
-                    // Brutal shake: letters fly in random directions
-                    x: shakeOffset.x,
-                    y: shakeOffset.y,
-                    rotate: shakeOffset.rotate,
-                    scale: shakeOffset.scale,
-                    opacity: 0.7,
-                  } : {
-                    scale: isSelected ? 1.05 : (isFading ? 1.02 : 1),
-                    opacity: 1,
-                    rotate: 0,
-                    rotateX: 0,
-                    y: isSelected ? -2 : 0,
-                    x: 0,
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={earthquakeShaking ? {
-                    // Chaotic flying motion during shake
-                    type: 'spring',
-                    stiffness: 50,
-                    damping: 8,
-                    mass: 0.5,
-                  } : {
-                    // Elastic snap-back after shake or normal animation
-                    type: 'spring',
-                    stiffness: 200,
-                    damping: 15,
-                    delay: reduceMotion ? 0 : (animateOnMount ? (i + j) * 0.03 : 0),
-                  }}
+                  whileTap={renderMode === 'minimal' ? undefined : { scale: 0.95 }}
+                  transition={renderMode === 'minimal'
+                    ? { duration: 0 } // Instant transitions for low-end devices
+                    : earthquakeShaking ? {
+                        // Chaotic flying motion during shake
+                        type: 'spring',
+                        stiffness: 50,
+                        damping: 8,
+                        mass: 0.5,
+                      } : {
+                        // Elastic snap-back after shake or normal animation
+                        type: 'spring',
+                        stiffness: 200,
+                        damping: 15,
+                        delay: reduceMotion ? 0 : (animateOnMount ? (i + j) * 0.03 : 0),
+                      }
+                  }
                   className={cn(
                     "aspect-square flex items-center justify-center font-black cursor-pointer relative overflow-hidden",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan",
@@ -524,10 +541,10 @@ const GridComponent = memo<GridComponentProps>(({
                     } : {})
                   }}
                 >
-                  {/* Ripple effect on selection */}
-                  {isSelected && (
+                  {/* Ripple effect on selection - disabled on minimal mode for performance */}
+                  {isSelected && renderMode !== 'minimal' && (
                     <>
-                      {/* Primary ripple */}
+                      {/* Primary ripple - shown in reduced and full modes */}
                       <motion.div
                         className="absolute inset-0"
                         style={{
@@ -540,21 +557,23 @@ const GridComponent = memo<GridComponentProps>(({
                         animate={{ scale: 2.5, opacity: 0 }}
                         transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
                       />
-                      {/* Secondary glow pulse */}
-                      <motion.div
-                        className="absolute inset-0 pointer-events-none"
-                        style={{
-                          background: comboColors.isRainbow
-                            ? 'radial-gradient(circle at center, rgba(255, 51, 102, 0.8), rgba(0, 255, 255, 0.4) 50%, transparent 70%)'
-                            : 'radial-gradient(circle at center, rgba(255, 255, 255, 0.9), transparent 60%)',
-                          filter: 'blur(3px)',
-                          borderRadius: '6px'
-                        }}
-                        initial={{ scale: 0, opacity: 1 }}
-                        animate={{ scale: [0, 1.3, 1.5], opacity: [1, 0.6, 0] }}
-                        transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-                      />
-                      {/* Combo level glow ring */}
+                      {/* Secondary glow pulse - only in full mode */}
+                      {renderMode === 'full' && (
+                        <motion.div
+                          className="absolute inset-0 pointer-events-none"
+                          style={{
+                            background: comboColors.isRainbow
+                              ? 'radial-gradient(circle at center, rgba(255, 51, 102, 0.8), rgba(0, 255, 255, 0.4) 50%, transparent 70%)'
+                              : 'radial-gradient(circle at center, rgba(255, 255, 255, 0.9), transparent 60%)',
+                            filter: 'blur(3px)',
+                            borderRadius: '6px'
+                          }}
+                          initial={{ scale: 0, opacity: 1 }}
+                          animate={{ scale: [0, 1.3, 1.5], opacity: [1, 0.6, 0] }}
+                          transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        />
+                      )}
+                      {/* Combo level glow ring - reduced and full modes (already inside renderMode !== 'minimal' check) */}
                       {comboLevel >= 3 && !reduceMotion && (
                         <motion.div
                           className="absolute inset-[-4px] pointer-events-none"
@@ -573,8 +592,8 @@ const GridComponent = memo<GridComponentProps>(({
                         />
                       )}
 
-                      {/* Sparkle burst - first letter gets extra flair (reduced particle count for performance) */}
-                      {isFirstSelected && !reduceMotion && performanceMode === 'full' && (
+                      {/* Sparkle burst - first letter gets extra flair (full mode only) */}
+                      {isFirstSelected && !reduceMotion && renderMode === 'full' && (
                         <>
                           {[...Array(4)].map((_, idx) => {
                             const angle = (idx * 90) * (Math.PI / 180);
@@ -612,8 +631,8 @@ const GridComponent = memo<GridComponentProps>(({
                         </>
                       )}
 
-                      {/* Center burst particles - simplified for performance */}
-                      {!reduceMotion && performanceMode === 'full' && comboLevel >= 2 && (
+                      {/* Center burst particles - full mode only */}
+                      {!reduceMotion && renderMode === 'full' && comboLevel >= 2 && (
                         <>
                           {[...Array(4)].map((_, idx) => {
                             const angle = (idx * 90 + 45) * (Math.PI / 180);

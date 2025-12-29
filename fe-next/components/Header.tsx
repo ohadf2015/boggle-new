@@ -87,7 +87,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     return (
         <header
             className={cn(
-                "w-full mb-2 sm:mb-4 lg:mb-6 xl:mb-8 px-2 xs:px-3 sm:px-4 lg:px-8 xl:px-12 pt-3 sm:pt-4 lg:pt-6 xl:pt-8 pb-2 lg:pb-4 sticky top-0 z-50 landscape:static bg-slate-50 dark:bg-slate-900",
+                "w-full mb-2 sm:mb-4 lg:mb-6 xl:mb-8 px-2 xs:px-3 sm:px-4 lg:px-8 xl:px-12 pt-3 sm:pt-4 lg:pt-6 xl:pt-8 pb-2 lg:pb-4 z-50 landscape:sticky landscape:top-0 bg-slate-100/95 dark:bg-slate-800/95 backdrop-blur-sm",
                 className
             )}
         >

@@ -2233,3 +2233,78 @@ html.reduce-motion *::after {
     outline-width: 4px;
   }
 }
+
+/* ====================================
+   LOW-END DEVICE OPTIMIZATIONS
+   Applied automatically via performanceUtils.ts
+   ==================================== */
+.low-end-device {
+  /* Disable will-change hints - let browser decide what to optimize */
+  --disable-will-change: true;
+}
+
+.low-end-device * {
+  will-change: auto !important;
+}
+
+/* Disable particle and confetti animations on low-end devices */
+.low-end-device .combo-sparkle,
+.low-end-device .combo-confetti,
+.low-end-device .combo-particles,
+.low-end-device .particle-yellow,
+.low-end-device .particle-cyan,
+.low-end-device .particle-pink,
+.low-end-device .particle-rainbow {
+  display: none !important;
+}
+
+/* Simplify shadows to reduce paint operations */
+.low-end-device .shadow-hard,
+.low-end-device .shadow-hard-sm,
+.low-end-device .shadow-hard-lg,
+.low-end-device .shadow-hard-xl {
+  box-shadow: 2px 2px 0 rgb(var(--neo-black)) !important;
+}
+
+/* Disable filter effects (blur, glow) which are expensive */
+.low-end-device .combo-glow-rainbow,
+.low-end-device .combo-glow-normal,
+.low-end-device .combo-glow-subtle {
+  filter: none !important;
+}
+
+/* Disable halftone patterns to reduce paint operations */
+.low-end-device .texture-halftone::before,
+.low-end-device .texture-halftone-lg::before,
+.low-end-device .texture-halftone-comic::before {
+  display: none !important;
+}
+
+/* Disable complex animations for combo system */
+.low-end-device .combo-badge,
+.low-end-device .combo-container {
+  animation: none !important;
+}
+
+/* Simplify grid cell rendering - use CSS transitions instead of JS animations */
+.low-end-device .game-board-frame [role="gridcell"] {
+  transition: transform 50ms ease-out, background-color 50ms ease-out !important;
+  animation: none !important;
+}
+
+/* CSS-based selection state for grid cells */
+.low-end-device .game-board-frame [role="gridcell"][aria-selected="true"] {
+  transform: scale(1.02) !important;
+}
+
+/* Force GPU compositing for essential elements only */
+.low-end-device .game-board-frame {
+  transform: translateZ(0);
+  contain: layout paint;
+}
+
+/* Instant active feedback for touch responsiveness */
+.low-end-device .game-board-frame [role="gridcell"]:active {
+  transform: scale(0.98) !important;
+  transition: none !important;
+}

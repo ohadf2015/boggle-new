@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Share2, Trophy, Flame, Target, Clock, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, Download } from 'lucide-react';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 // X/Twitter icon (no lucide equivalent)
 const XTwitterIcon = ({ className }: { className?: string }) => (
@@ -75,6 +76,10 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   const [showFullShareText, setShowFullShareText] = useState(false);
   const { profile, isAuthenticated } = useAuth();
 
+  // Performance optimization for low-end devices
+  const { isLowEnd, enableComplexAnimations } = useDevicePerformance();
+  const skipConfetti = useMemo(() => isLowEnd || !enableComplexAnimations, [isLowEnd, enableComplexAnimations]);
+
   // Confetti colors for each rank (matching Top3Leaderboard)
   const RANK_CONFETTI_COLORS: Record<number, string[]> = {
     1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'], // Gold
@@ -82,9 +87,11 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
     3: ['#cd7f32', '#ea580c', '#f97316', '#fb923c'], // Bronze/Orange
   };
 
-  // Fire confetti burst for a specific rank (top 3 celebration)
+  // Fire confetti burst for a specific rank (top 3 celebration) - skip on low-end devices
   const fireRankConfettiLocal = useCallback((rank: number): void => {
-    const count = Math.floor(100 * (1.2 - rank * 0.15)); // 1st = 100, 2nd = 85, 3rd = 70
+    if (skipConfetti) return;
+
+    const count = Math.floor(60 * (1.2 - rank * 0.15)); // Reduced: 1st = 60, 2nd = 51, 3rd = 42
     const colors = RANK_CONFETTI_COLORS[rank] || RANK_CONFETTI_COLORS[1];
 
     const defaults = {
@@ -110,7 +117,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       decay: 0.91,
       scalar: 0.9,
     });
-  }, []);
+  }, [skipConfetti]);
 
   // Handle rank change from leaderboard and fire top 3 confetti
   const handleCurrentUserRankChange = useCallback((rank: number | null) => {
@@ -197,47 +204,47 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
     }
   }, [isNewCompletion, result, guestFingerprint, longestWord, isAuthenticated, profile, guestPlayer]);
 
-  // Fire confetti on new completion
+  // Fire confetti on new completion - skip on low-end devices
   useEffect(() => {
-    if (isNewCompletion && result.score > 0) {
-      const duration = 2000;
-      const end = Date.now() + duration;
+    if (skipConfetti || !isNewCompletion || result.score <= 0) return;
 
-      const frame = () => {
-        fireConfetti({
-          particleCount: 3,
-          angle: 60,
-          spread: 55,
-          origin: { x: 0 },
-          colors: ['#FFE135', '#FF6B35', '#00D9FF'],
-        });
-        fireConfetti({
-          particleCount: 3,
-          angle: 120,
-          spread: 55,
-          origin: { x: 1 },
-          colors: ['#FFE135', '#FF6B35', '#00D9FF'],
-        });
+    const duration = 1500; // Reduced from 2000 for better performance
+    const end = Date.now() + duration;
 
-        if (Date.now() < end) {
-          requestAnimationFrame(frame);
-        }
-      };
-      frame();
+    const frame = () => {
+      fireConfetti({
+        particleCount: 2, // Reduced from 3
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: ['#FFE135', '#FF6B35', '#00D9FF'],
+      });
+      fireConfetti({
+        particleCount: 2, // Reduced from 3
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: ['#FFE135', '#FF6B35', '#00D9FF'],
+      });
 
-      // Extra burst for streak milestones
-      if (streakMilestone) {
-        setTimeout(() => {
-          fireConfetti({
-            particleCount: 100,
-            spread: 100,
-            origin: { y: 0.6 },
-            colors: ['#FF6B35', '#FFE135', '#FF1493'],
-          });
-        }, 500);
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
       }
+    };
+    frame();
+
+    // Extra burst for streak milestones (reduced particle count)
+    if (streakMilestone) {
+      setTimeout(() => {
+        fireConfetti({
+          particleCount: 60, // Reduced from 100
+          spread: 100,
+          origin: { y: 0.6 },
+          colors: ['#FF6B35', '#FFE135', '#FF1493'],
+        });
+      }, 500);
     }
-  }, [isNewCompletion, result.score, streakMilestone]);
+  }, [isNewCompletion, result.score, streakMilestone, skipConfetti]);
 
   // Generate shareable text
   const shareText = generateShareableResult(result);

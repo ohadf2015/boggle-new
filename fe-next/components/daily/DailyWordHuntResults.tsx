@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Share2, Trophy, Target, X, TrendingUp, ArrowLeft, Copy, Check, Send, Coins, RotateCcw } from 'lucide-react';
 
@@ -40,6 +40,7 @@ import ConfettiRetrigger from '@/components/results/ConfettiRetrigger';
 import DailyLeaderboard from './DailyLeaderboard';
 import { feedbackToEmoji, type LetterFeedback } from '@/utils/wordHuntFeedback';
 import { useAuth } from '@/contexts/AuthContext';
+import { fetchGeolocation } from '@/contexts/auth/authUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { awardDailyCoins, spendCoins, canAfford, getCoins, COIN_COSTS } from '@/utils/coinManager';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
@@ -168,6 +169,9 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [signupTrigger, setSignupTrigger] = useState<ConversionTrigger | null>(null);
   const [leaderboardKey, setLeaderboardKey] = useState(0);
   const [showFullShareText, setShowFullShareText] = useState(false);
+  const [countryCode, setCountryCode] = useState<string | null>(null);
+  const [countryCodeReady, setCountryCodeReady] = useState(false);
+  const hasSubmittedRef = useRef(false);
   const { profile, isAuthenticated } = useAuth();
 
   // Check for streak milestone
@@ -184,6 +188,30 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       getGuestDailyPlayer().then(setGuestPlayer);
     }
   }, [isAuthenticated]);
+
+  // Fetch country code on mount for leaderboard display
+  useEffect(() => {
+    // For authenticated users, use profile country_code if available
+    if (isAuthenticated && profile?.country_code) {
+      setCountryCode(profile.country_code);
+      setCountryCodeReady(true);
+      return;
+    }
+
+    // Fetch from geolocation API for guests or users without country_code
+    fetchGeolocation()
+      .then((geo) => {
+        setCountryCode(geo.countryCode || null);
+        setCountryCodeReady(true);
+      })
+      .catch(() => {
+        setCountryCodeReady(true); // Mark ready even on failure
+      });
+
+    // Timeout fallback - don't block submission forever if geolocation is slow
+    const timeout = setTimeout(() => setCountryCodeReady(true), 2000);
+    return () => clearTimeout(timeout);
+  }, [isAuthenticated, profile?.country_code]);
 
   // Fetch aggregate stats - declared before the submit effect that uses it
   const fetchStats = useCallback(async () => {
@@ -210,9 +238,12 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
   // Submit result to backend when completing a new challenge
   useEffect(() => {
-    const canSubmit = isNewCompletion && result && guestFingerprint && (isAuthenticated ? !!profile : true);
+    // Wait for country code to be fetched (with timeout fallback)
+    const canSubmit = isNewCompletion && result && guestFingerprint && countryCodeReady && (isAuthenticated ? !!profile : true);
 
-    if (canSubmit) {
+    // Prevent double submission
+    if (canSubmit && !hasSubmittedRef.current) {
+      hasSubmittedRef.current = true;
       const submitResult = async () => {
         try {
           const displayName = isAuthenticated && profile
@@ -234,6 +265,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             displayName,
             avatarEmoji,
             avatarColor,
+            countryCode: countryCode || null,
             solved: result.solved,
             attemptsUsed: result.attemptsUsed,
             targetWord: result.targetWord,
@@ -256,6 +288,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             guestFingerprint: bodyData.guestFingerprint,
             displayName: bodyData.displayName,
             avatarEmoji: bodyData.avatarEmoji,
+            countryCode: bodyData.countryCode,
             solved: bodyData.solved,
             attemptsUsed: bodyData.attemptsUsed,
           });
@@ -300,7 +333,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       // Even if not new completion, fetch stats to show
       fetchStats();
     }
-  }, [isNewCompletion, result, guestFingerprint, puzzleDate, puzzleNumber, language, isAuthenticated, profile, guestPlayer, fetchStats]);
+  }, [isNewCompletion, result, guestFingerprint, puzzleDate, puzzleNumber, language, isAuthenticated, profile, guestPlayer, countryCode, countryCodeReady, fetchStats]);
 
   // Fire confetti on victory
   useEffect(() => {

@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 interface StreakMilestoneCelebrationProps {
   isOpen: boolean;
@@ -27,10 +28,17 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
   title,
   subtitle,
 }) => {
+  // Performance optimization for low-end devices
+  const { isLowEnd, enableComplexAnimations } = useDevicePerformance();
+  const skipConfetti = useMemo(() => isLowEnd || !enableComplexAnimations, [isLowEnd, enableComplexAnimations]);
+
   // Fire confetti celebration
   const triggerCelebration = useCallback(() => {
-    // Massive celebration burst
-    const duration = 3000;
+    // Skip confetti entirely on low-end devices
+    if (skipConfetti) return;
+
+    // Reduced duration and particle counts for performance
+    const duration = 2000; // Reduced from 3000
     const end = Date.now() + duration;
 
     // Color schemes based on milestone
@@ -42,14 +50,14 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
 
     const frame = () => {
       fireConfetti({
-        particleCount: 5,
+        particleCount: 3, // Reduced from 5
         angle: 60,
         spread: 70,
         origin: { x: 0 },
         colors,
       });
       fireConfetti({
-        particleCount: 5,
+        particleCount: 3, // Reduced from 5
         angle: 120,
         spread: 70,
         origin: { x: 1 },
@@ -62,10 +70,10 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
     };
     frame();
 
-    // Extra celebration bursts
+    // Extra celebration bursts (reduced particle counts)
     setTimeout(() => {
       fireConfetti({
-        particleCount: 150,
+        particleCount: 80, // Reduced from 150
         spread: 180,
         origin: { y: 0.6, x: 0.5 },
         colors,
@@ -75,7 +83,7 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
     if (streak >= 30) {
       setTimeout(() => {
         fireConfetti({
-          particleCount: 200,
+          particleCount: 100, // Reduced from 200
           spread: 200,
           origin: { y: 0.5, x: 0.5 },
           colors,
@@ -86,14 +94,14 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
     if (streak >= 100) {
       setTimeout(() => {
         fireConfetti({
-          particleCount: 300,
+          particleCount: 150, // Reduced from 300
           spread: 360,
           origin: { y: 0.5, x: 0.5 },
           colors,
         });
       }, 1500);
     }
-  }, [streak]);
+  }, [streak, skipConfetti]);
 
   useEffect(() => {
     if (isOpen) {
