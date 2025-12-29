@@ -30,17 +30,17 @@ export const WordsProgress = memo<WordsProgressProps>(({
   minLength = 5,
   compact = false,
 }) => {
-  // Don't render if we don't have total words yet
-  if (totalWords === null || totalWords === 0) {
-    return null;
-  }
-
-  // Find next milestone
+  // Find next milestone - must be before any early returns (rules of hooks)
   const { nextMilestone, milestonesReached } = useMemo(() => {
     const reached = MILESTONES.filter(m => foundWordsCount >= m).length;
     const next = MILESTONES.find(m => foundWordsCount < m) || null;
     return { nextMilestone: next, milestonesReached: reached };
   }, [foundWordsCount]);
+
+  // Don't render if we don't have total words yet
+  if (totalWords === null || totalWords === 0) {
+    return null;
+  }
 
   // Ultra-compact mode for landscape sidebar - just count + dots
   if (compact) {
@@ -64,7 +64,7 @@ export const WordsProgress = memo<WordsProgressProps>(({
                 'w-1.5 h-1.5 rounded-full transition-all duration-300',
                 foundWordsCount >= m
                   ? 'bg-neo-cyan scale-100'
-                  : 'bg-neo-black/30 scale-75'
+                  : 'bg-neo-cream/40 scale-75'
               )}
             />
           ))}
@@ -103,8 +103,8 @@ export const WordsProgress = memo<WordsProgressProps>(({
               foundWordsCount >= m
                 ? 'bg-neo-cyan'
                 : foundWordsCount >= m - 2 // Almost there - subtle hint
-                  ? 'bg-neo-cream/30'
-                  : 'bg-neo-black/20'
+                  ? 'bg-neo-cream/50'
+                  : 'bg-neo-cream/30'
             )}
             title={`${m} words`}
           />

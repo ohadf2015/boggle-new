@@ -61,6 +61,10 @@ export async function logGameStart(params: GameStartParams): Promise<string | nu
 
     if (!userId) {
       guestSessionId = getGuestSessionId();
+      // Skip logging if no session ID available (SSR, localStorage unavailable, etc.)
+      if (!guestSessionId) {
+        return null;
+      }
     }
 
     const response = await fetch('/api/analytics/log-session', {
@@ -87,7 +91,8 @@ export async function logGameStart(params: GameStartParams): Promise<string | nu
     });
 
     if (!response.ok) {
-      console.error('Failed to log game start');
+      const errorData = await response.json().catch(() => null);
+      console.error('Failed to log game start:', response.status, errorData?.error || 'Unknown error');
       return null;
     }
 
@@ -132,7 +137,8 @@ export async function logGameEnd(
     });
 
     if (!response.ok) {
-      console.error('Failed to log game end');
+      const errorData = await response.json().catch(() => null);
+      console.error('Failed to log game end:', response.status, errorData?.error || 'Unknown error');
       return false;
     }
 
@@ -164,7 +170,8 @@ export async function updateGameSession(
     });
 
     if (!response.ok) {
-      console.error('Failed to update game session');
+      const errorData = await response.json().catch(() => null);
+      console.error('Failed to update game session:', response.status, errorData?.error || 'Unknown error');
       return false;
     }
 

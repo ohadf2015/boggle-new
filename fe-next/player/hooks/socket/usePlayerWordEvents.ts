@@ -7,7 +7,6 @@
  */
 import { useEffect, useCallback, MutableRefObject, RefObject } from 'react';
 import { Socket } from 'socket.io-client';
-import gsap from 'gsap';
 import toast from 'react-hot-toast';
 import {
   wordAIValidatingToast,
@@ -108,11 +107,18 @@ export function usePlayerWordEvents({
       // Dismiss any AI validation toast
       toast.dismiss(`ai-validating-${data.word.toLowerCase()}`);
 
+      // Animate input on word accepted using CSS transitions
       if (inputRef.current) {
-        gsap.fromTo(inputRef.current,
-          { scale: 1.1, borderColor: '#4ade80' },
-          { scale: 1, borderColor: '', duration: 0.3 }
-        );
+        const input = inputRef.current;
+        input.style.transform = 'scale(1.1)';
+        input.style.borderColor = '#4ade80';
+        input.style.transition = 'transform 0.3s ease-out, border-color 0.3s ease-out';
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            input.style.transform = 'scale(1)';
+            input.style.borderColor = '';
+          }, 50);
+        });
       }
 
       // Update found words - mark as valid and store score/bonus data from server

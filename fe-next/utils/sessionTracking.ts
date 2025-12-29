@@ -114,14 +114,22 @@ export function getDeviceInfo(): {
 /**
  * Initialize session tracking
  * Creates or updates guest session in the backend
+ * Note: This is non-critical analytics - failures are silently ignored
  */
 export async function initSessionTracking(): Promise<void> {
   if (typeof window === 'undefined') return;
+
+  // Delay slightly to ensure hydration is complete and avoid race conditions
+  await new Promise((resolve) => setTimeout(resolve, 100));
 
   try {
     const sessionId = getGuestSessionId();
     const deviceInfo = getDeviceInfo();
     const utmParams = getUTMParams();
+
+    // Use AbortController with timeout to prevent hanging requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
 
     // Call API to create/update guest session
     const response = await fetch('/api/analytics/guest-session', {
@@ -140,19 +148,28 @@ export async function initSessionTracking(): Promise<void> {
         utmCampaign: utmParams.campaign,
         referrer: utmParams.referrer,
       }),
+      signal: controller.signal,
     });
 
-    if (!response.ok) {
-      console.error('Failed to initialize session tracking');
+    clearTimeout(timeoutId);
+
+    // Silently ignore non-ok responses for analytics
+    if (!response.ok && process.env.NODE_ENV === 'development') {
+      console.debug('Session tracking: API returned non-ok status');
     }
-  } catch (error) {
-    console.error('Error initializing session tracking:', error);
+  } catch {
+    // Silently ignore errors for non-critical analytics tracking
+    // This prevents console noise from network failures, adblockers, etc.
+    if (process.env.NODE_ENV === 'development') {
+      console.debug('Session tracking: Network request failed (non-critical)');
+    }
   }
 }
 
 /**
  * Link guest session to user account
  * Should be called after successful signup/login
+ * Note: This is non-critical analytics - failures are silently ignored
  */
 export async function linkSessionToUser(userId: string): Promise<void> {
   if (typeof window === 'undefined') return;
@@ -161,6 +178,10 @@ export async function linkSessionToUser(userId: string): Promise<void> {
     const sessionId = getGuestSessionId();
 
     if (!sessionId) return;
+
+    // Use AbortController with timeout to prevent hanging requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
 
     // Call API to link session
     const response = await fetch('/api/analytics/guest-session', {
@@ -173,16 +194,22 @@ export async function linkSessionToUser(userId: string): Promise<void> {
         sessionId,
         userId,
       }),
+      signal: controller.signal,
     });
 
-    if (!response.ok) {
-      console.error('Failed to link session to user');
-    } else {
+    clearTimeout(timeoutId);
+
+    if (response.ok) {
       // Clear guest session after successful linking
       clearGuestSession();
+    } else if (process.env.NODE_ENV === 'development') {
+      console.debug('Session linking: API returned non-ok status');
     }
-  } catch (error) {
-    console.error('Error linking session to user:', error);
+  } catch {
+    // Silently ignore errors for non-critical analytics tracking
+    if (process.env.NODE_ENV === 'development') {
+      console.debug('Session linking: Network request failed (non-critical)');
+    }
   }
 }
 

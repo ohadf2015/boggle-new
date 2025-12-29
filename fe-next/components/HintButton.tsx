@@ -91,7 +91,7 @@ const HintButton = memo<HintButtonProps>(({
             initial={{ opacity: 0, y: -10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            className="absolute top-full left-0 mt-2 z-50 w-64 md:w-80 pointer-events-none"
+            className="absolute top-full right-0 mt-2 z-50 max-w-[calc(100vw-1rem)] w-64 md:w-80 pointer-events-none"
           >
             <div
               className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg p-4 shadow-hard-lg pointer-events-auto"
@@ -143,7 +143,7 @@ const HintButton = memo<HintButtonProps>(({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute top-full left-0 mt-2 z-50"
+            className="absolute top-full right-0 mt-2 z-50 max-w-[calc(100vw-1rem)]"
           >
             <div className="bg-neo-red text-white px-3 py-2 rounded-neo border-2 border-neo-black text-sm font-medium shadow-hard-sm">
               {error}

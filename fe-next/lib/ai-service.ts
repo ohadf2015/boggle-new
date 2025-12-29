@@ -632,17 +632,51 @@ Respond with ONLY valid JSON (no markdown):
     try {
       const result = await this.model.generateContent(prompt);
       const response = result.response;
-      const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      let text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-      // Extract JSON from response (handle potential markdown code blocks)
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      // Strip markdown code blocks if present (```json ... ``` or ``` ... ```)
+      text = text.replace(/```(?:json)?\s*/gi, '').replace(/```\s*/g, '').trim();
+
+      // Extract JSON from response
+      let jsonMatch = text.match(/\{[\s\S]*\}/);
+
+      // If no complete JSON found, try to recover from incomplete response
       if (!jsonMatch) {
-        console.warn('[GameAIService] Could not extract JSON from AI response:', text);
+        // Try to complete partial JSON like {"isValid": true or {"isValid": false
+        const partialMatch = text.match(/\{\s*"isValid"\s*:\s*(true|false)/i);
+        if (partialMatch) {
+          const isValid = partialMatch[1].toLowerCase() === 'true';
+          console.log(`[GameAIService] Recovered partial AI response: isValid=${isValid}`);
+          return {
+            isValid,
+            reason: isValid ? 'Word accepted' : 'Word not recognized',
+            confidence: isValid ? 75 : 60
+          };
+        }
+
+        console.warn('[GameAIService] Could not extract JSON from AI response:', text.substring(0, 100));
         return { isValid: false, reason: 'Failed to parse AI response', confidence: 0 };
       }
 
       // Parse and validate with zod
-      const parsed = JSON.parse(jsonMatch[0]);
+      let parsed;
+      try {
+        parsed = JSON.parse(jsonMatch[0]);
+      } catch (parseError) {
+        // JSON was incomplete (e.g., missing closing brace) - try to recover
+        const incompleteMatch = text.match(/"isValid"\s*:\s*(true|false)/i);
+        if (incompleteMatch) {
+          const isValid = incompleteMatch[1].toLowerCase() === 'true';
+          console.log(`[GameAIService] Recovered from malformed JSON: isValid=${isValid}`);
+          return {
+            isValid,
+            reason: isValid ? 'Word accepted' : 'Word not recognized',
+            confidence: isValid ? 75 : 60
+          };
+        }
+        throw parseError;
+      }
+
       const validated = WordValidationResponseSchema.parse(parsed);
 
       // Apply confidence threshold - only approve if confidence >= 85%

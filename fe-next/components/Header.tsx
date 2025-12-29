@@ -87,7 +87,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     return (
         <header
             className={cn(
-                "w-full mb-2 sm:mb-4 lg:mb-6 xl:mb-8 px-2 xs:px-3 sm:px-4 lg:px-8 xl:px-12 pt-3 sm:pt-4 lg:pt-6 xl:pt-8 pb-2 lg:pb-4 z-50 landscape:sticky landscape:top-0 bg-slate-100/95 dark:bg-slate-800/95 backdrop-blur-sm",
+                "w-full mb-2 sm:mb-4 lg:mb-6 xl:mb-8 px-2 xs:px-3 sm:px-4 lg:px-8 xl:px-12 pt-3 sm:pt-4 lg:pt-6 xl:pt-8 pb-2 lg:pb-4 sticky top-0 z-50 landscape:static bg-slate-50 dark:bg-slate-900",
                 className
             )}
         >
@@ -286,142 +286,143 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     </button>
                 </div>
 
-                {/* Mobile Menu Slide-out Pane */}
-                <AnimatePresence>
-                    {showMobileMenu && (
-                        <>
-                            {/* Backdrop overlay */}
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.2 }}
-                                className="fixed inset-0 bg-neo-black/50 z-[150] sm:hidden"
-                                onClick={() => setShowMobileMenu(false)}
-                            />
-                            {/* Slide-out pane - slides from right in LTR, left in RTL */}
-                            <motion.div
-                                ref={mobileMenuRef}
-                                initial={{ x: language === 'he' ? '-100%' : '100%' }}
-                                animate={{ x: 0 }}
-                                exit={{ x: language === 'he' ? '-100%' : '100%' }}
-                                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                                className={cn(
-                                    "fixed top-0 bottom-0 w-[280px] max-w-[85vw] z-[200] sm:hidden",
-                                    "bg-neo-cream dark:bg-slate-800 border-neo-black dark:border-slate-600",
-                                    "shadow-hard-xl overflow-y-auto",
-                                    language === 'he'
-                                        ? "left-0 border-r-4 rounded-r-neo-lg"
-                                        : "right-0 border-l-4 rounded-l-neo-lg"
-                                )}
-                            >
-                                {/* Pane Header with close button */}
-                                <div className="flex items-center justify-between p-4 border-b-3 border-neo-black/20 dark:border-slate-600">
-                                    <span className="text-lg font-bold text-neo-black dark:text-white">
-                                        {t('common.menu') || 'Menu'}
-                                    </span>
-                                    <button
-                                        onClick={() => setShowMobileMenu(false)}
-                                        className={cn(
-                                            "flex items-center justify-center",
-                                            "w-10 h-10",
-                                            "bg-white dark:bg-slate-700 text-neo-black dark:text-white",
-                                            "border-2 border-neo-black dark:border-slate-500",
-                                            "rounded-neo shadow-hard-sm",
-                                            "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
-                                            "transition-all duration-100"
-                                        )}
-                                        aria-label={t('common.closeMenu') || 'Close menu'}
-                                    >
-                                        <X className="text-xl" size={20} />
-                                    </button>
-                                </div>
+</div>
 
-                                <div className="flex flex-col gap-4 p-4">
-                                    {/* Daily Challenge - TOP PRIORITY */}
-                                    <div className="flex flex-col gap-2">
-                                        <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
-                                            {t('daily.badge') || 'Daily Challenge'}
-                                        </span>
-                                        <DailyQuickLink inline onClick={() => setShowMobileMenu(false)} />
-                                    </div>
-
-                                    {/* Divider */}
-                                    <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
-
-                                    {/* Account Section */}
-                                    <div className="flex flex-col gap-2">
-                                        <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
-                                            {t('common.account') || 'Account'}
-                                        </span>
-                                        <AuthButton inline onClose={() => setShowMobileMenu(false)} />
-                                    </div>
-
-                                    {/* Divider */}
-                                    <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
-
-                                    {/* Language Section */}
-                                    <div className="flex flex-col gap-2">
-                                        <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
-                                            {t('common.language') || 'Language'}
-                                        </span>
-                                        <div className="flex flex-col gap-1.5">
-                                            {LANGUAGE_OPTIONS.map((option) => (
-                                                <button
-                                                    key={option.code}
-                                                    onClick={() => {
-                                                        setLanguage(option.code);
-                                                    }}
-                                                    className={cn(
-                                                        "flex items-center gap-2 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
-                                                        language === option.code
-                                                            ? "bg-neo-cyan shadow-hard-sm text-neo-black"
-                                                            : "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600 text-neo-black dark:text-white"
-                                                    )}
-                                                >
-                                                    <span className="text-lg">{option.flag}</span>
-                                                    <span>{option.name}</span>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Admin Controls Section - only shown for admin users */}
-                                    {isAdmin && (
-                                        <>
-                                            {/* Divider */}
-                                            <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
-
-                                            <div className="flex flex-col gap-3">
-                                                <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
-                                                    {t('common.admin') || 'Admin'}
-                                                </span>
-
-                                                <Link
-                                                    href={`/${language}/admin`}
-                                                    onClick={() => setShowMobileMenu(false)}
-                                                    className="
-                                                        flex items-center justify-center
-                                                        min-w-[44px] min-h-[44px] w-11 h-11
-                                                        bg-neo-purple text-white
-                                                        border-2 border-neo-black
-                                                        rounded-neo shadow-hard-sm
-                                                        active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
-                                                        transition-all duration-100
-                                                    "
-                                                    aria-label={t('common.adminDashboard') || 'Admin Dashboard'}
-                                                >
-                                                    <BarChart3 className="text-base" size={16} aria-hidden="true" />
-                                                </Link>
-                                            </div>
-                                        </>
+            {/* Mobile Menu Slide-out Pane - Rendered outside header bar to avoid stacking context issues */}
+            <AnimatePresence>
+                {showMobileMenu && (
+                    <>
+                        {/* Backdrop overlay */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="fixed inset-0 bg-neo-black/50 z-[9998] sm:hidden"
+                            onClick={() => setShowMobileMenu(false)}
+                        />
+                        {/* Slide-out pane - slides from right in LTR, left in RTL */}
+                        <motion.div
+                            ref={mobileMenuRef}
+                            initial={{ x: language === 'he' ? '-100%' : '100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: language === 'he' ? '-100%' : '100%' }}
+                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                            className={cn(
+                                "fixed top-0 bottom-0 w-[280px] max-w-[85vw] z-[9999] sm:hidden",
+                                "bg-neo-cream dark:bg-slate-800 border-neo-black dark:border-slate-600",
+                                "shadow-hard-xl overflow-y-auto",
+                                language === 'he'
+                                    ? "left-0 border-r-4 rounded-r-neo-lg"
+                                    : "right-0 border-l-4 rounded-l-neo-lg"
+                            )}
+                        >
+                            {/* Pane Header with close button */}
+                            <div className="flex items-center justify-between p-4 border-b-3 border-neo-black/20 dark:border-slate-600">
+                                <span className="text-lg font-bold text-neo-black dark:text-white">
+                                    {t('common.menu') || 'Menu'}
+                                </span>
+                                <button
+                                    onClick={() => setShowMobileMenu(false)}
+                                    className={cn(
+                                        "flex items-center justify-center",
+                                        "w-10 h-10",
+                                        "bg-white dark:bg-slate-700 text-neo-black dark:text-white",
+                                        "border-2 border-neo-black dark:border-slate-500",
+                                        "rounded-neo shadow-hard-sm",
+                                        "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+                                        "transition-all duration-100"
                                     )}
+                                    aria-label={t('common.closeMenu') || 'Close menu'}
+                                >
+                                    <X className="text-xl" size={20} />
+                                </button>
+                            </div>
+
+                            <div className="flex flex-col gap-4 p-4">
+                                {/* Daily Challenge - TOP PRIORITY */}
+                                <div className="flex flex-col gap-2">
+                                    <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
+                                        {t('daily.badge') || 'Daily Challenge'}
+                                    </span>
+                                    <DailyQuickLink inline onClick={() => setShowMobileMenu(false)} />
                                 </div>
-                            </motion.div>
-                        </>
-                    )}
-                </AnimatePresence>
-            </div>
+
+                                {/* Divider */}
+                                <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
+
+                                {/* Account Section */}
+                                <div className="flex flex-col gap-2">
+                                    <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
+                                        {t('common.account') || 'Account'}
+                                    </span>
+                                    <AuthButton inline onClose={() => setShowMobileMenu(false)} />
+                                </div>
+
+                                {/* Divider */}
+                                <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
+
+                                {/* Language Section */}
+                                <div className="flex flex-col gap-2">
+                                    <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
+                                        {t('common.language') || 'Language'}
+                                    </span>
+                                    <div className="flex flex-col gap-1.5">
+                                        {LANGUAGE_OPTIONS.map((option) => (
+                                            <button
+                                                key={option.code}
+                                                onClick={() => {
+                                                    setLanguage(option.code);
+                                                }}
+                                                className={cn(
+                                                    "flex items-center gap-2 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                    language === option.code
+                                                        ? "bg-neo-cyan shadow-hard-sm text-neo-black"
+                                                        : "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600 text-neo-black dark:text-white"
+                                                )}
+                                            >
+                                                <span className="text-lg">{option.flag}</span>
+                                                <span>{option.name}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Admin Controls Section - only shown for admin users */}
+                                {isAdmin && (
+                                    <>
+                                        {/* Divider */}
+                                        <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
+
+                                        <div className="flex flex-col gap-3">
+                                            <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
+                                                {t('common.admin') || 'Admin'}
+                                            </span>
+
+                                            <Link
+                                                href={`/${language}/admin`}
+                                                onClick={() => setShowMobileMenu(false)}
+                                                className="
+                                                    flex items-center justify-center
+                                                    min-w-[44px] min-h-[44px] w-11 h-11
+                                                    bg-neo-purple text-white
+                                                    border-2 border-neo-black
+                                                    rounded-neo shadow-hard-sm
+                                                    active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
+                                                    transition-all duration-100
+                                                "
+                                                aria-label={t('common.adminDashboard') || 'Admin Dashboard'}
+                                            >
+                                                <BarChart3 className="text-base" size={16} aria-hidden="true" />
+                                            </Link>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
         </header>
     );
 });

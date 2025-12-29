@@ -27,6 +27,15 @@ function getGameSessionLogger() {
   return _logGameSession;
 }
 
+// Lazy import for Redis cache invalidation
+let _invalidateLeaderboardCaches: (() => Promise<void>) | null = null;
+function getLeaderboardCacheInvalidator() {
+  if (!_invalidateLeaderboardCaches) {
+    _invalidateLeaderboardCaches = require('../redisClient').invalidateLeaderboardCaches;
+  }
+  return _invalidateLeaderboardCaches;
+}
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -518,7 +527,123 @@ export async function updateGuestStats(tokenHash: string, gameStats: GameStats):
 }
 
 /**
+ * Process a single player's game results
+ * Returns XP info for authenticated users
+ */
+async function processPlayerResult(
+  playerScore: PlayerScore,
+  gameCode: string,
+  gameInfo: GameInfo,
+  authInfo: UserAuthInfo,
+  totalPlayers: number
+): Promise<{ username: string; xpResult: XpResultWithSocket | null }> {
+  const gameStats: GameStats = {
+    score: playerScore.score,
+    wordCount: playerScore.wordCount || 0,
+    longestWord: playerScore.longestWord,
+    placement: playerScore.placement,
+    achievements: playerScore.achievements || [],
+    isRanked: gameInfo.isRanked || false,
+    totalPlayers,
+    timePlayed: gameInfo.timePlayed || 0
+  };
+
+  let xpResult: XpResultWithSocket | null = null;
+
+  try {
+    if (authInfo.authUserId) {
+      // Authenticated user - run operations in parallel where possible
+      logger.debug('SUPABASE', `Recording result for authenticated user: ${playerScore.username}`);
+
+      // Phase 1: Record game result and update profile stats in parallel
+      // These are independent operations
+      const [gameResultRes, statsRes] = await Promise.all([
+        recordGameResult({
+          playerId: authInfo.authUserId,
+          gameCode,
+          ...gameStats,
+          language: gameInfo.language
+        }),
+        updatePlayerStats(authInfo.authUserId, gameStats)
+      ]);
+
+      if (gameResultRes.error) {
+        logger.error('SUPABASE', `recordGameResult error for ${playerScore.username}`, gameResultRes.error.message);
+      }
+      if (statsRes.error) {
+        logger.error('SUPABASE', `updatePlayerStats error for ${playerScore.username}`, statsRes.error.message);
+      }
+
+      // Store XP info for socket emission
+      if (statsRes.xpInfo) {
+        xpResult = {
+          ...statsRes.xpInfo,
+          socketId: authInfo.socketId,
+        };
+        logger.debug('XP', `${playerScore.username} earned ${statsRes.xpInfo.xpEarned} XP`);
+      }
+
+      // Phase 2: Update leaderboard and ranked progress in parallel
+      // These fetch fresh profile data and can run simultaneously
+      const secondaryOps: Promise<{ data: unknown; error: { message: string } | null }>[] = [
+        updateLeaderboardEntry(authInfo.authUserId)
+      ];
+
+      if (!gameInfo.isRanked) {
+        secondaryOps.push(updateRankedProgress(authInfo.authUserId));
+      }
+
+      const secondaryResults = await Promise.all(secondaryOps);
+
+      if (secondaryResults[0]?.error) {
+        logger.error('SUPABASE', `updateLeaderboardEntry error for ${playerScore.username}`, secondaryResults[0].error.message);
+      }
+      if (secondaryResults[1]?.error) {
+        logger.error('SUPABASE', `updateRankedProgress error for ${playerScore.username}`, secondaryResults[1].error.message);
+      }
+
+    } else if (authInfo.guestTokenHash) {
+      // Guest user - update guest token stats
+      logger.debug('SUPABASE', `Recording result for guest: ${playerScore.username}`);
+      await updateGuestStats(authInfo.guestTokenHash, gameStats);
+    }
+
+    // Log game session for ALL players (authenticated and guests) for admin analytics
+    if (authInfo.authUserId || authInfo.guestSessionId) {
+      try {
+        const logGameSession = getGameSessionLogger();
+        if (logGameSession) {
+          await logGameSession({
+            userId: authInfo.authUserId || null,
+            guestSessionId: authInfo.guestSessionId || null,
+            mode: 'multiplayer',
+            language: gameInfo.language || 'en',
+            score: gameStats.score || 0,
+            wordsFound: [],
+            durationSeconds: gameStats.timePlayed || 0,
+            completed: true,
+            roomCode: gameCode,
+            playerCount: totalPlayers,
+            finalRank: gameStats.placement || null,
+            startedAt: new Date(),
+            completedAt: new Date(),
+          });
+          logger.debug('SUPABASE', `Logged game session for ${playerScore.username}`);
+        }
+      } catch (sessionError) {
+        logger.error('SUPABASE', `Failed to log game session for ${playerScore.username}`, sessionError);
+      }
+    }
+  } catch (error) {
+    logger.error('SUPABASE', `Error processing result for ${playerScore.username}`, error);
+  }
+
+  return { username: playerScore.username, xpResult };
+}
+
+/**
  * Process game results for all players after a game ends
+ * Uses parallel processing to reduce database round-trips
  */
 export async function processGameResults(
   gameCode: string,
@@ -533,104 +658,40 @@ export async function processGameResults(
     return { xpResults };
   }
 
-  logger.info('SUPABASE', `Processing game results for ${gameCode}, ${scores.length} players`);
+  logger.info('SUPABASE', `Processing game results for ${gameCode}, ${scores.length} players (parallel)`);
 
-  for (const playerScore of scores) {
-    const authInfo = userAuthMap[playerScore.username];
-    if (!authInfo) continue;
+  // Filter players with auth info and process all in parallel
+  const playerPromises = scores
+    .filter(playerScore => userAuthMap[playerScore.username])
+    .map(playerScore =>
+      processPlayerResult(
+        playerScore,
+        gameCode,
+        gameInfo,
+        userAuthMap[playerScore.username],
+        scores.length
+      )
+    );
 
-    const gameStats: GameStats = {
-      score: playerScore.score,
-      wordCount: playerScore.wordCount || 0,
-      longestWord: playerScore.longestWord,
-      placement: playerScore.placement,
-      achievements: playerScore.achievements || [],
-      isRanked: gameInfo.isRanked || false,
-      totalPlayers: scores.length,
-      timePlayed: gameInfo.timePlayed || 0
-    };
+  // Wait for all players to be processed in parallel
+  const results = await Promise.all(playerPromises);
 
-    try {
-      if (authInfo.authUserId) {
-        // Authenticated user - update all tables
-        logger.debug('SUPABASE', `Recording result for authenticated user: ${playerScore.username}`);
-
-        // Record game result
-        const gameResultRes = await recordGameResult({
-          playerId: authInfo.authUserId,
-          gameCode,
-          ...gameStats,
-          language: gameInfo.language
-        });
-        if (gameResultRes.error) {
-          logger.error('SUPABASE', `recordGameResult error for ${playerScore.username}`, gameResultRes.error.message);
-        }
-
-        // Update profile stats (includes XP calculation)
-        const statsRes = await updatePlayerStats(authInfo.authUserId, gameStats);
-        if (statsRes.error) {
-          logger.error('SUPABASE', `updatePlayerStats error for ${playerScore.username}`, statsRes.error.message);
-        }
-
-        // Store XP info for socket emission
-        if (statsRes.xpInfo) {
-          xpResults[playerScore.username] = {
-            ...statsRes.xpInfo,
-            socketId: authInfo.socketId,
-          };
-          logger.debug('XP', `${playerScore.username} earned ${statsRes.xpInfo.xpEarned} XP`);
-        }
-
-        // Update leaderboard
-        const leaderboardRes = await updateLeaderboardEntry(authInfo.authUserId);
-        if (leaderboardRes.error) {
-          logger.error('SUPABASE', `updateLeaderboardEntry error for ${playerScore.username}`, leaderboardRes.error.message);
-        }
-
-        // Update ranked progress (if casual game)
-        if (!gameInfo.isRanked) {
-          const rankedRes = await updateRankedProgress(authInfo.authUserId);
-          if (rankedRes?.error) {
-            logger.error('SUPABASE', `updateRankedProgress error for ${playerScore.username}`, rankedRes.error.message);
-          }
-        }
-
-      } else if (authInfo.guestTokenHash) {
-        // Guest user - update guest token stats
-        logger.debug('SUPABASE', `Recording result for guest: ${playerScore.username}`);
-        await updateGuestStats(authInfo.guestTokenHash, gameStats);
-      }
-
-      // Log game session for ALL players (authenticated and guests) for admin analytics
-      // Only log if we have a valid identifier (authUserId or guestSessionId)
-      if (authInfo.authUserId || authInfo.guestSessionId) {
-        try {
-          const logGameSession = getGameSessionLogger();
-          if (logGameSession) {
-            await logGameSession({
-              userId: authInfo.authUserId || null,
-              guestSessionId: authInfo.guestSessionId || null,
-              mode: 'multiplayer',
-              language: gameInfo.language || 'en',
-              score: gameStats.score || 0,
-              wordsFound: [], // Not tracking individual words for multiplayer
-              durationSeconds: gameStats.timePlayed || 0,
-              completed: true,
-              roomCode: gameCode,
-              playerCount: scores.length,
-              finalRank: gameStats.placement || null,
-              startedAt: new Date(),
-              completedAt: new Date(),
-            });
-            logger.debug('SUPABASE', `Logged game session for ${playerScore.username}`);
-          }
-        } catch (sessionError) {
-          logger.error('SUPABASE', `Failed to log game session for ${playerScore.username}`, sessionError);
-        }
-      }
-    } catch (error) {
-      logger.error('SUPABASE', `Error processing result for ${playerScore.username}`, error);
+  // Collect XP results
+  for (const result of results) {
+    if (result.xpResult) {
+      xpResults[result.username] = result.xpResult;
     }
+  }
+
+  // Invalidate leaderboard caches after all updates to ensure fresh data
+  try {
+    const invalidateLeaderboardCaches = getLeaderboardCacheInvalidator();
+    if (invalidateLeaderboardCaches) {
+      await invalidateLeaderboardCaches();
+      logger.debug('SUPABASE', 'Leaderboard caches invalidated after game results');
+    }
+  } catch (cacheError) {
+    logger.warn('SUPABASE', 'Failed to invalidate leaderboard caches', cacheError);
   }
 
   return { xpResults };
