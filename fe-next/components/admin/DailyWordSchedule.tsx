@@ -675,14 +675,16 @@ export const DailyWordSchedule: React.FC = () => {
   const wordsByDate = new Map(scheduledWords.map(w => [w.puzzle_date, w]));
 
   return (
-    <div className="bg-white dark:bg-neo-navy-light rounded-neo border-4 border-neo-black p-6 text-neo-black dark:text-neo-cream">
+    <div className="bg-white dark:bg-neo-navy-light rounded-neo border-3 sm:border-4 border-neo-black p-3 sm:p-6 text-neo-black dark:text-neo-cream">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
         <div className="flex items-center gap-3">
-          <Calendar className="w-6 h-6 text-neo-purple" />
-          <h2 className="text-2xl font-black">Daily Word Schedule</h2>
+          <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-neo-purple" />
+          <h2 className="text-xl sm:text-2xl font-black">Daily Word Schedule</h2>
         </div>
-        <div className="flex items-center gap-2">
+
+        {/* Actions - Primary row */}
+        <div className="flex flex-wrap items-center gap-2">
           {/* View Mode Toggle */}
           <div className="flex items-center border-2 border-neo-black rounded-neo overflow-hidden">
             <button
@@ -714,13 +716,14 @@ export const DailyWordSchedule: React.FC = () => {
           {/* Primary action: Set Today's Word */}
           <Button
             onClick={openSetTodayModal}
+            size="sm"
             className={cn(
               "bg-red-500 hover:bg-red-600 text-white font-bold shadow-hard",
               !getTodayWord() && "animate-pulse hover:animate-none"
             )}
           >
-            <Calendar className="w-4 h-4 mr-2" />
-            Set Today&apos;s Word
+            <Calendar className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Set Today&apos;s Word</span>
           </Button>
 
           <Button
@@ -730,62 +733,64 @@ export const DailyWordSchedule: React.FC = () => {
               setAddWordModalOpen(true);
             }}
             variant="outline"
+            size="sm"
             className="border-2 border-neo-black"
           >
-            <Edit2 className="w-4 h-4 mr-2" />
-            Add Other Date
+            <Edit2 className="w-4 h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Add Other Date</span>
           </Button>
           <Button
             onClick={handleTriggerGeneration}
             disabled={triggerLoading}
+            size="sm"
             className="bg-neo-purple hover:bg-neo-purple/90 text-white"
           >
             {triggerLoading ? (
-              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+              <RefreshCw className="w-4 h-4 sm:mr-2 animate-spin" />
             ) : (
-              <Sparkles className="w-4 h-4 mr-2" />
+              <Sparkles className="w-4 h-4 sm:mr-2" />
             )}
-            Generate Words (AI)
+            <span className="hidden sm:inline">Generate (AI)</span>
           </Button>
         </div>
       </div>
 
       {/* Date Range Navigation */}
-      <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-neo border-2 border-gray-200 dark:border-gray-700">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between mb-4 p-2 sm:p-3 bg-gray-50 dark:bg-gray-800 rounded-neo border-2 border-gray-200 dark:border-gray-700 gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <button
             onClick={() => setDateOffset(prev => prev - 7)}
-            className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
+            className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600 rounded min-w-[32px] min-h-[32px] flex items-center justify-center"
             title="Previous week"
           >
-            <ChevronLeft className="w-5 h-5 rtl:rotate-180" />
+            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 rtl:rotate-180" />
           </button>
-          <span className="font-bold text-sm">
+          <span className="font-bold text-xs sm:text-sm whitespace-nowrap">
             {dateRange.start} - {dateRange.end}
           </span>
           <button
             onClick={() => setDateOffset(prev => Math.min(prev + 7, 0))}
-            className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
+            className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600 rounded min-w-[32px] min-h-[32px] flex items-center justify-center"
             title="Next week"
             disabled={dateOffset >= 0}
           >
-            <ChevronRight className={cn("w-5 h-5 rtl:rotate-180", dateOffset >= 0 && "opacity-30")} />
+            <ChevronRight className={cn("w-4 h-4 sm:w-5 sm:h-5 rtl:rotate-180", dateOffset >= 0 && "opacity-30")} />
           </button>
           {dateOffset !== 0 && (
             <button
               onClick={() => setDateOffset(0)}
-              className="ml-2 text-xs text-neo-purple hover:underline font-bold"
+              className="ml-1 sm:ml-2 text-xs text-neo-purple hover:underline font-bold whitespace-nowrap"
             >
-              Back to Today
+              Today
             </button>
           )}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500">Show:</span>
+          <span className="text-xs sm:text-sm text-gray-500 hidden xs:inline">Show:</span>
           <select
             value={daysToShow}
             onChange={(e) => setDaysToShow(Number(e.target.value))}
-            className="text-sm border-2 border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700"
+            className="text-xs sm:text-sm border-2 border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 min-h-[32px]"
           >
             <option value={7}>7 days</option>
             <option value={14}>14 days</option>
@@ -824,19 +829,21 @@ export const DailyWordSchedule: React.FC = () => {
       )}
 
       {/* Language Selector */}
-      <div className="flex flex-wrap gap-2 mb-6">
+      <div className="flex gap-1.5 sm:gap-2 mb-4 sm:mb-6 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-hide">
         {LANGUAGES.map((lang) => (
           <button
             key={lang.code}
             onClick={() => setSelectedLang(lang.code)}
             className={cn(
-              'px-4 py-2 rounded-neo border-2 border-neo-black font-bold transition-all',
+              'px-2.5 sm:px-4 py-2 rounded-neo border-2 border-neo-black font-bold transition-all flex-shrink-0 text-xs sm:text-sm min-h-[40px]',
               selectedLang === lang.code
                 ? 'bg-neo-purple text-white shadow-hard'
                 : 'bg-white dark:bg-gray-700 hover:shadow-hard'
             )}
           >
-            {lang.flag} {lang.name}
+            <span className="mr-1">{lang.flag}</span>
+            <span className="hidden xs:inline">{lang.name}</span>
+            <span className="xs:hidden">{lang.code.toUpperCase()}</span>
           </button>
         ))}
       </div>
@@ -992,28 +999,29 @@ export const DailyWordSchedule: React.FC = () => {
                 )}
               >
                 {/* Word Row */}
-                <div className="p-4">
-                  <div className="flex items-center justify-between gap-4">
-                    {/* Left: Date and Word */}
-                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                <div className="p-2 sm:p-4">
+                  {/* Mobile: Stacked layout, Desktop: Horizontal */}
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                    {/* Top row on mobile: Date + Word + Tags */}
+                    <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
                       {/* Date Section */}
-                      <div className="flex-shrink-0 w-24">
-                        <div className="font-bold text-lg">{formatDate(dateStr)}</div>
+                      <div className="flex-shrink-0">
+                        <div className="font-bold text-sm sm:text-lg">{formatDate(dateStr)}</div>
                         {word && (
                           <div className="text-xs text-gray-500">#{word.puzzle_number}</div>
                         )}
                       </div>
 
-                      {/* Word Section - Now more prominent */}
+                      {/* Word Section */}
                       {word ? (
                         quickEditWord === word.id ? (
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1 sm:gap-2 flex-1">
                             <input
                               type="text"
                               value={quickEditValue}
                               onChange={(e) => setQuickEditValue(e.target.value.toUpperCase())}
                               maxLength={15}
-                              className="px-3 py-2 border-3 border-neo-black rounded-neo font-mono text-2xl w-40 uppercase text-center"
+                              className="px-2 sm:px-3 py-1.5 sm:py-2 border-2 sm:border-3 border-neo-black rounded-neo font-mono text-lg sm:text-2xl w-24 sm:w-40 uppercase text-center"
                               autoFocus
                               onKeyDown={(e) => {
                                 if (e.key === 'Enter' && quickEditValue.length >= 2) {
@@ -1028,7 +1036,7 @@ export const DailyWordSchedule: React.FC = () => {
                               onClick={() => handleQuickSave(word)}
                               disabled={saving || quickEditValue.length < 2}
                               size="sm"
-                              className="bg-green-500 hover:bg-green-600 text-white"
+                              className="bg-green-500 hover:bg-green-600 text-white p-2"
                             >
                               <Save className="w-4 h-4" />
                             </Button>
@@ -1039,13 +1047,14 @@ export const DailyWordSchedule: React.FC = () => {
                               }}
                               size="sm"
                               variant="outline"
+                              className="p-2"
                             >
                               <X className="w-4 h-4" />
                             </Button>
                           </div>
                         ) : (
                           <div
-                            className="flex items-center gap-3 cursor-pointer group"
+                            className="flex items-center gap-1 sm:gap-3 cursor-pointer group flex-1 min-w-0"
                             onClick={() => {
                               setQuickEditWord(word.id);
                               setQuickEditValue(getEffectiveWord(word));
@@ -1053,7 +1062,7 @@ export const DailyWordSchedule: React.FC = () => {
                             title="Click to edit"
                           >
                             <span className={cn(
-                              "font-mono text-3xl font-black tracking-wider px-4 py-2 rounded-neo border-2 border-transparent group-hover:border-neo-black group-hover:bg-white dark:group-hover:bg-gray-700 transition-all",
+                              "font-mono text-xl sm:text-3xl font-black tracking-wider px-2 sm:px-4 py-1 sm:py-2 rounded-neo border-2 border-transparent group-hover:border-neo-black group-hover:bg-white dark:group-hover:bg-gray-700 transition-all truncate",
                               status === 'live' && 'text-red-600 dark:text-red-400',
                               status === 'past' && 'text-gray-500'
                             )}>
@@ -1064,10 +1073,10 @@ export const DailyWordSchedule: React.FC = () => {
                                 e.stopPropagation();
                                 copyWord(getEffectiveWord(word));
                               }}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded"
+                              className="opacity-0 group-hover:opacity-100 sm:transition-opacity p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded flex-shrink-0"
                               title="Copy word"
                             >
-                              <Copy className="w-4 h-4" />
+                              <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
                             </button>
                           </div>
                         )
@@ -1077,58 +1086,58 @@ export const DailyWordSchedule: React.FC = () => {
                             setNewWordDate(dateStr);
                             setAddWordModalOpen(true);
                           }}
-                          className="font-mono text-2xl text-gray-400 hover:text-neo-purple transition-colors flex items-center gap-2"
+                          className="font-mono text-lg sm:text-2xl text-gray-400 hover:text-neo-purple transition-colors flex items-center gap-1 sm:gap-2"
                         >
-                          <span className="px-4 py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-neo">
+                          <span className="px-2 sm:px-4 py-1 sm:py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-neo">
                             ----
                           </span>
-                          <span className="text-sm font-sans">+ Add word</span>
+                          <span className="text-xs sm:text-sm font-sans">+ Add</span>
                         </button>
                       )}
 
-                      {/* Tags */}
-                      <div className="flex items-center gap-2 flex-shrink-0">
+                      {/* Tags - Show LIVE always, others only on larger screens */}
+                      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                         {status === 'live' && (
-                          <span className="px-2 py-1 bg-red-500 text-white text-xs rounded-full font-bold animate-pulse">
-                            LIVE NOW
+                          <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-red-500 text-white text-[10px] sm:text-xs rounded-full font-bold animate-pulse">
+                            LIVE
                           </span>
                         )}
                         {word?.override_word && (
-                          <span className="flex items-center gap-1 text-xs text-amber-600 bg-amber-100 dark:bg-amber-900/30 px-2 py-1 rounded-full">
+                          <span className="hidden sm:flex items-center gap-1 text-xs text-amber-600 bg-amber-100 dark:bg-amber-900/30 px-2 py-1 rounded-full">
                             <Edit2 className="w-3 h-3" /> Override
                           </span>
                         )}
                         {word?.ai_selected && !word.override_word && (
-                          <span className="flex items-center gap-1 text-xs text-green-600 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">
+                          <span className="hidden sm:flex items-center gap-1 text-xs text-green-600 bg-green-100 dark:bg-green-900/30 px-2 py-1 rounded-full">
                             <Sparkles className="w-3 h-3" /> AI
                           </span>
                         )}
                         {word?.theme_context && (
-                          <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs rounded-full">
+                          <span className="hidden md:inline px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs rounded-full">
                             {word.theme_context}
                           </span>
                         )}
                       </div>
                     </div>
 
-                    {/* Right: Stats and Actions */}
-                    <div className="flex items-center gap-4 flex-shrink-0">
-                      {/* Attempt Summary - Always visible */}
+                    {/* Bottom row on mobile: Stats + Actions */}
+                    <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-4 flex-shrink-0">
+                      {/* Attempt Summary - Compact on mobile */}
                       {summary && (
                         <div className={cn(
-                          "flex items-center gap-3 px-3 py-2 rounded-neo border-2",
+                          "flex items-center gap-1 sm:gap-3 px-2 sm:px-3 py-1 sm:py-2 rounded-neo border-2 text-xs sm:text-sm",
                           summary.total > 0
                             ? "border-gray-300 bg-white dark:bg-gray-700"
                             : "border-gray-200 bg-gray-50 dark:bg-gray-800"
                         )}>
-                          <div className="flex items-center gap-1 text-sm">
-                            <Users className="w-4 h-4 text-gray-500" />
+                          <div className="flex items-center gap-1">
+                            <Users className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
                             <span className="font-bold">{summary.total}</span>
                           </div>
                           {summary.total > 0 && (
                             <>
-                              <div className="w-px h-4 bg-gray-300" />
-                              <div className="flex items-center gap-2 text-sm">
+                              <div className="w-px h-3 sm:h-4 bg-gray-300" />
+                              <div className="flex items-center gap-1 sm:gap-2">
                                 <span className="text-green-600 font-bold">{summary.solved}</span>
                                 <span className="text-gray-400">/</span>
                                 <span className="text-red-500 font-bold">{summary.failed}</span>
@@ -1138,9 +1147,9 @@ export const DailyWordSchedule: React.FC = () => {
                         </div>
                       )}
 
-                      {/* Action Buttons */}
+                      {/* Action Buttons - Icon only on mobile */}
                       {word && (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 sm:gap-2">
                           <Button
                             onClick={() => {
                               setReplaceDate(dateStr);
@@ -1149,28 +1158,28 @@ export const DailyWordSchedule: React.FC = () => {
                             }}
                             size="sm"
                             className={cn(
-                              "text-white",
+                              "text-white p-2 sm:px-3",
                               status === 'live'
                                 ? "bg-red-500 hover:bg-red-600"
                                 : "bg-amber-500 hover:bg-amber-600"
                             )}
                             title="Replace word and optionally reset attempts"
                           >
-                            <RotateCcw className="w-4 h-4 mr-1" />
-                            Replace
+                            <RotateCcw className="w-4 h-4 sm:mr-1" />
+                            <span className="hidden sm:inline">Replace</span>
                           </Button>
 
                           <Button
                             onClick={() => toggleExpanded(dateStr)}
                             size="sm"
                             variant="outline"
-                            className="flex items-center gap-1"
+                            className="flex items-center gap-0.5 sm:gap-1 p-2 sm:px-3"
                           >
                             <Users className="w-4 h-4" />
                             {expandedDate === dateStr ? (
-                              <ChevronUp className="w-4 h-4" />
+                              <ChevronUp className="w-3 h-3 sm:w-4 sm:h-4" />
                             ) : (
-                              <ChevronDown className="w-4 h-4" />
+                              <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4" />
                             )}
                           </Button>
 
@@ -1179,7 +1188,7 @@ export const DailyWordSchedule: React.FC = () => {
                               onClick={() => handleClearOverride(word)}
                               size="sm"
                               variant="outline"
-                              className="text-red-600 hover:text-red-700"
+                              className="text-red-600 hover:text-red-700 p-2"
                               title="Clear override"
                             >
                               <X className="w-4 h-4" />
@@ -1192,7 +1201,7 @@ export const DailyWordSchedule: React.FC = () => {
 
                   {/* AI Reason - Collapsed by default */}
                   {word?.ai_reason && (
-                    <p className="text-sm text-gray-500 mt-2 ml-28 italic">
+                    <p className="text-xs sm:text-sm text-gray-500 mt-2 sm:ml-20 italic truncate">
                       &quot;{word.ai_reason}&quot;
                     </p>
                   )}
@@ -1248,32 +1257,32 @@ export const DailyWordSchedule: React.FC = () => {
 
                       {/* Attempts List */}
                       {attemptsLoading ? (
-                        <div className="flex justify-center py-8">
-                          <RefreshCw className="w-6 h-6 animate-spin text-neo-purple" />
+                        <div className="flex justify-center py-6 sm:py-8">
+                          <RefreshCw className="w-5 h-5 sm:w-6 sm:h-6 animate-spin text-neo-purple" />
                         </div>
                       ) : filteredAttempts.length === 0 ? (
-                        <div className="text-center py-8 text-gray-500">
-                          <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                          <p>No attempts found</p>
+                        <div className="text-center py-6 sm:py-8 text-gray-500">
+                          <Users className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 opacity-50" />
+                          <p className="text-sm">No attempts found</p>
                         </div>
                       ) : (
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-sm">
+                        <div className="overflow-x-auto -mx-2 sm:mx-0">
+                          <table className="w-full text-xs sm:text-sm min-w-[320px]">
                             <thead>
                               <tr className="border-b border-gray-200 dark:border-gray-700">
-                                <th className="py-2 px-2 text-left">
+                                <th className="py-1.5 sm:py-2 px-1.5 sm:px-2 text-left w-8">
                                   <input
                                     type="checkbox"
                                     checked={selectedAttempts.size === filteredAttempts.length && filteredAttempts.length > 0}
                                     onChange={selectAllAttempts}
-                                    className="rounded"
+                                    className="rounded w-4 h-4"
                                   />
                                 </th>
-                                <th className="py-2 px-2 text-left">Player</th>
-                                <th className="py-2 px-2 text-center">Solved</th>
-                                <th className="py-2 px-2 text-center">Attempts</th>
-                                <th className="py-2 px-2 text-center">Score</th>
-                                <th className="py-2 px-2 text-left">Type</th>
+                                <th className="py-1.5 sm:py-2 px-1.5 sm:px-2 text-left">Player</th>
+                                <th className="py-1.5 sm:py-2 px-1 sm:px-2 text-center w-10 sm:w-14">✓</th>
+                                <th className="py-1.5 sm:py-2 px-1 sm:px-2 text-center w-12 sm:w-16">Tries</th>
+                                <th className="py-1.5 sm:py-2 px-1 sm:px-2 text-center w-10 sm:w-14 hidden xs:table-cell">Pts</th>
+                                <th className="py-1.5 sm:py-2 px-1 sm:px-2 text-left w-12 sm:w-14 hidden sm:table-cell">Type</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -1285,48 +1294,48 @@ export const DailyWordSchedule: React.FC = () => {
                                     selectedAttempts.has(attempt.id) && 'bg-blue-50 dark:bg-blue-900/20'
                                   )}
                                 >
-                                  <td className="py-2 px-2">
+                                  <td className="py-1.5 sm:py-2 px-1.5 sm:px-2">
                                     <input
                                       type="checkbox"
                                       checked={selectedAttempts.has(attempt.id)}
                                       onChange={() => toggleAttemptSelection(attempt.id)}
-                                      className="rounded"
+                                      className="rounded w-4 h-4"
                                     />
                                   </td>
-                                  <td className="py-2 px-2">
-                                    <div className="flex items-center gap-2">
+                                  <td className="py-1.5 sm:py-2 px-1.5 sm:px-2">
+                                    <div className="flex items-center gap-1.5 sm:gap-2">
                                       <span
-                                        className="w-6 h-6 rounded-full flex items-center justify-center text-xs"
+                                        className="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] sm:text-xs flex-shrink-0"
                                         style={{ backgroundColor: attempt.avatar_color || '#6366f1' }}
                                       >
                                         {attempt.avatar_emoji || '🎯'}
                                       </span>
-                                      <span className="font-medium truncate max-w-[150px]">
+                                      <span className="font-medium truncate max-w-[80px] sm:max-w-[150px]">
                                         {attempt.display_name}
                                       </span>
                                     </div>
                                   </td>
-                                  <td className="py-2 px-2 text-center">
+                                  <td className="py-1.5 sm:py-2 px-1 sm:px-2 text-center">
                                     {attempt.solved ? (
-                                      <span className="text-green-600">Yes</span>
+                                      <span className="text-green-600">✓</span>
                                     ) : (
-                                      <span className="text-red-500">No</span>
+                                      <span className="text-red-500">✗</span>
                                     )}
                                   </td>
-                                  <td className="py-2 px-2 text-center font-mono">
+                                  <td className="py-1.5 sm:py-2 px-1 sm:px-2 text-center font-mono">
                                     {attempt.attempts_used}/10
                                   </td>
-                                  <td className="py-2 px-2 text-center font-mono">
+                                  <td className="py-1.5 sm:py-2 px-1 sm:px-2 text-center font-mono hidden xs:table-cell">
                                     {attempt.efficiency_score}
                                   </td>
-                                  <td className="py-2 px-2">
+                                  <td className="py-1.5 sm:py-2 px-1 sm:px-2 hidden sm:table-cell">
                                     <span className={cn(
-                                      'px-2 py-0.5 rounded text-xs',
+                                      'px-1.5 py-0.5 rounded text-[10px] sm:text-xs',
                                       attempt.player_id
                                         ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
                                         : 'bg-gray-100 dark:bg-gray-800 text-gray-600'
                                     )}>
-                                      {attempt.player_id ? 'User' : 'Guest'}
+                                      {attempt.player_id ? 'U' : 'G'}
                                     </span>
                                   </td>
                                 </tr>
@@ -1352,7 +1361,7 @@ export const DailyWordSchedule: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4"
             onClick={() => setReplaceModalOpen(false)}
           >
             <motion.div
@@ -1360,60 +1369,63 @@ export const DailyWordSchedule: React.FC = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white dark:bg-gray-800 rounded-neo border-4 border-neo-black p-6 max-w-md w-full"
+              className="bg-white dark:bg-gray-800 rounded-neo border-3 sm:border-4 border-neo-black p-4 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto"
             >
-              <h3 className="text-xl font-black mb-4 flex items-center gap-2">
-                <RotateCcw className="w-5 h-5 text-red-500" />
-                Replace Word for {replaceDate ? formatDate(replaceDate) : 'Selected Date'}
+              <h3 className="text-lg sm:text-xl font-black mb-3 sm:mb-4 flex items-center gap-2">
+                <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 flex-shrink-0" />
+                <span className="truncate">Replace: {replaceDate ? formatDate(replaceDate) : 'Date'}</span>
               </h3>
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <label className="block text-sm font-bold mb-1">New Word (2+ letters)</label>
+                  <label className="block text-xs sm:text-sm font-bold mb-1">New Word (2+ letters)</label>
                   <input
                     type="text"
                     value={replaceWord}
                     onChange={(e) => setReplaceWord(e.target.value.toUpperCase())}
                     maxLength={15}
-                    className="w-full px-4 py-3 border-2 border-neo-black rounded-neo font-mono text-2xl uppercase text-center"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-neo-black rounded-neo font-mono text-xl sm:text-2xl uppercase text-center"
                     placeholder="WORD"
                   />
                 </div>
 
-                <label className="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-neo border-2 border-red-300 cursor-pointer">
+                <label className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-red-50 dark:bg-red-900/20 rounded-neo border-2 border-red-300 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={resetAllOnReplace}
                     onChange={(e) => setResetAllOnReplace(e.target.checked)}
-                    className="w-5 h-5 rounded"
+                    className="w-5 h-5 rounded flex-shrink-0 mt-0.5"
                   />
                   <div>
-                    <p className="font-bold text-red-700 dark:text-red-300">Reset all attempts</p>
-                    <p className="text-sm text-red-600 dark:text-red-400">
-                      Delete all player attempts so they can replay with the new word
+                    <p className="font-bold text-red-700 dark:text-red-300 text-sm sm:text-base">Reset all attempts</p>
+                    <p className="text-xs sm:text-sm text-red-600 dark:text-red-400">
+                      Delete attempts so players can replay
                     </p>
                   </div>
                 </label>
 
-                <div className="flex gap-3 pt-4">
+                <div className="flex gap-2 sm:gap-3 pt-2 sm:pt-4">
                   <Button
                     onClick={() => setReplaceModalOpen(false)}
                     variant="outline"
-                    className="flex-1"
+                    size="sm"
+                    className="flex-1 sm:text-base"
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleReplaceWord}
                     disabled={saving || replaceWord.length < 2}
-                    className="flex-1 bg-red-500 hover:bg-red-600 text-white"
+                    size="sm"
+                    className="flex-1 bg-red-500 hover:bg-red-600 text-white sm:text-base"
                   >
                     {saving ? (
-                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      <RefreshCw className="w-4 h-4 sm:mr-2 animate-spin" />
                     ) : (
-                      <RotateCcw className="w-4 h-4 mr-2" />
+                      <RotateCcw className="w-4 h-4 sm:mr-2" />
                     )}
-                    Replace Word
+                    <span className="hidden sm:inline">Replace Word</span>
+                    <span className="sm:hidden">Replace</span>
                   </Button>
                 </div>
               </div>
@@ -1429,7 +1441,7 @@ export const DailyWordSchedule: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4"
             onClick={() => setAddWordModalOpen(false)}
           >
             <motion.div
@@ -1437,46 +1449,46 @@ export const DailyWordSchedule: React.FC = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white dark:bg-gray-800 rounded-neo border-4 border-neo-black p-6 max-w-md w-full"
+              className="bg-white dark:bg-gray-800 rounded-neo border-3 sm:border-4 border-neo-black p-4 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto"
             >
-              <h3 className="text-xl font-black mb-4 flex items-center gap-2">
-                <Edit2 className="w-5 h-5 text-green-500" />
+              <h3 className="text-lg sm:text-xl font-black mb-3 sm:mb-4 flex items-center gap-2">
+                <Edit2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
                 Add Word of the Day
               </h3>
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <label className="block text-sm font-bold mb-1">Date</label>
+                  <label className="block text-xs sm:text-sm font-bold mb-1">Date</label>
                   <input
                     type="date"
                     value={newWordDate}
                     onChange={(e) => setNewWordDate(e.target.value)}
-                    className="w-full px-4 py-2 border-2 border-neo-black rounded-neo"
+                    className="w-full px-3 sm:px-4 py-2 border-2 border-neo-black rounded-neo text-sm sm:text-base"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold mb-1">Word (2+ letters)</label>
+                  <label className="block text-xs sm:text-sm font-bold mb-1">Word (2+ letters)</label>
                   <input
                     type="text"
                     value={newWordValue}
                     onChange={(e) => setNewWordValue(e.target.value.toUpperCase())}
                     maxLength={15}
-                    className="w-full px-4 py-3 border-2 border-neo-black rounded-neo font-mono text-2xl uppercase text-center"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-neo-black rounded-neo font-mono text-xl sm:text-2xl uppercase text-center"
                     placeholder="WORD"
                   />
                 </div>
 
-                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-neo border-2 border-blue-300">
-                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                <div className="p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/20 rounded-neo border-2 border-blue-300">
+                  <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-300">
                     <strong>Language:</strong> {LANGUAGES.find(l => l.code === selectedLang)?.flag} {LANGUAGES.find(l => l.code === selectedLang)?.name}
                   </p>
-                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                    This will set the word for the selected language. Change the language selector above to add words for other languages.
+                  <p className="text-[10px] sm:text-xs text-blue-600 dark:text-blue-400 mt-1">
+                    Change language selector above for other languages.
                   </p>
                 </div>
 
-                <div className="flex gap-3 pt-4">
+                <div className="flex gap-2 sm:gap-3 pt-2 sm:pt-4">
                   <Button
                     onClick={() => {
                       setAddWordModalOpen(false);
@@ -1484,21 +1496,24 @@ export const DailyWordSchedule: React.FC = () => {
                       setNewWordDate('');
                     }}
                     variant="outline"
-                    className="flex-1"
+                    size="sm"
+                    className="flex-1 sm:text-base"
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleAddNewWord}
                     disabled={saving || newWordValue.length < 2 || !newWordDate}
-                    className="flex-1 bg-green-500 hover:bg-green-600 text-white"
+                    size="sm"
+                    className="flex-1 bg-green-500 hover:bg-green-600 text-white sm:text-base"
                   >
                     {saving ? (
-                      <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                      <RefreshCw className="w-4 h-4 sm:mr-2 animate-spin" />
                     ) : (
-                      <Check className="w-4 h-4 mr-2" />
+                      <Check className="w-4 h-4 sm:mr-2" />
                     )}
-                    Add Word
+                    <span className="hidden sm:inline">Add Word</span>
+                    <span className="sm:hidden">Add</span>
                   </Button>
                 </div>
               </div>
@@ -1514,7 +1529,7 @@ export const DailyWordSchedule: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4"
             onClick={() => setSetTodayModalOpen(false)}
           >
             <motion.div
@@ -1522,22 +1537,22 @@ export const DailyWordSchedule: React.FC = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white dark:bg-gray-800 rounded-neo border-4 border-red-500 p-6 max-w-md w-full shadow-2xl"
+              className="bg-white dark:bg-gray-800 rounded-neo border-3 sm:border-4 border-red-500 p-4 sm:p-6 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto"
             >
-              <h3 className="text-2xl font-black mb-2 flex items-center gap-2 text-red-600">
-                <Calendar className="w-6 h-6" />
+              <h3 className="text-xl sm:text-2xl font-black mb-1 sm:mb-2 flex items-center gap-2 text-red-600">
+                <Calendar className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" />
                 Set Today&apos;s Word
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-3 sm:mb-4">
                 {LANGUAGES.find(l => l.code === selectedLang)?.flag} {LANGUAGES.find(l => l.code === selectedLang)?.name} - {formatDate(getTodayDateString())}
               </p>
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {/* Current word info */}
                 {getTodayWord() && (
-                  <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-neo border-2 border-amber-300">
-                    <p className="text-sm text-amber-700 dark:text-amber-300">
-                      <strong>Current word:</strong>{' '}
+                  <div className="p-2 sm:p-3 bg-amber-50 dark:bg-amber-900/20 rounded-neo border-2 border-amber-300">
+                    <p className="text-xs sm:text-sm text-amber-700 dark:text-amber-300">
+                      <strong>Current:</strong>{' '}
                       <span className="font-mono font-bold">{getEffectiveWord(getTodayWord()!)}</span>
                       {getTodayWord()?.override_word ? ' (Override)' : getTodayWord()?.ai_selected ? ' (AI)' : ''}
                     </p>
@@ -1545,14 +1560,14 @@ export const DailyWordSchedule: React.FC = () => {
                 )}
 
                 <div>
-                  <label className="block text-sm font-bold mb-2">New Word (2+ letters)</label>
+                  <label className="block text-xs sm:text-sm font-bold mb-1 sm:mb-2">New Word (2+ letters)</label>
                   <input
                     type="text"
                     value={todayWordValue}
                     onChange={(e) => setTodayWordValue(e.target.value.toUpperCase())}
                     maxLength={15}
                     autoFocus
-                    className="w-full px-4 py-4 border-4 border-neo-black rounded-neo font-mono text-3xl uppercase text-center tracking-widest"
+                    className="w-full px-3 sm:px-4 py-3 sm:py-4 border-3 sm:border-4 border-neo-black rounded-neo font-mono text-2xl sm:text-3xl uppercase text-center tracking-widest"
                     placeholder="WORD"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && todayWordValue.length >= 2) {
@@ -1562,29 +1577,29 @@ export const DailyWordSchedule: React.FC = () => {
                       }
                     }}
                   />
-                  <p className="text-xs text-gray-500 mt-1 text-center">
-                    Press Enter to save, Escape to cancel
+                  <p className="text-[10px] sm:text-xs text-gray-500 mt-1 text-center">
+                    Enter to save, Escape to cancel
                   </p>
                 </div>
 
                 {getTodayWord() && (
-                  <label className="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-neo border-2 border-red-300 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
+                  <label className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 bg-red-50 dark:bg-red-900/20 rounded-neo border-2 border-red-300 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
                     <input
                       type="checkbox"
                       checked={resetTodayAttempts}
                       onChange={(e) => setResetTodayAttempts(e.target.checked)}
-                      className="w-5 h-5 rounded"
+                      className="w-5 h-5 rounded flex-shrink-0 mt-0.5"
                     />
                     <div>
-                      <p className="font-bold text-red-700 dark:text-red-300">Reset all player attempts</p>
-                      <p className="text-sm text-red-600 dark:text-red-400">
-                        Let everyone play again with the new word
+                      <p className="font-bold text-red-700 dark:text-red-300 text-sm sm:text-base">Reset all attempts</p>
+                      <p className="text-xs sm:text-sm text-red-600 dark:text-red-400">
+                        Let everyone replay
                       </p>
                     </div>
                   </label>
                 )}
 
-                <div className="flex gap-3 pt-2">
+                <div className="flex gap-2 sm:gap-3 pt-2">
                   <Button
                     onClick={() => {
                       setSetTodayModalOpen(false);
@@ -1592,21 +1607,24 @@ export const DailyWordSchedule: React.FC = () => {
                       setResetTodayAttempts(false);
                     }}
                     variant="outline"
-                    className="flex-1"
+                    size="sm"
+                    className="flex-1 sm:text-base"
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={handleSetTodayWord}
                     disabled={saving || todayWordValue.length < 2}
-                    className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold text-lg py-3"
+                    size="sm"
+                    className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold sm:text-lg py-2 sm:py-3"
                   >
                     {saving ? (
-                      <RefreshCw className="w-5 h-5 mr-2 animate-spin" />
+                      <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-2 animate-spin" />
                     ) : (
-                      <Check className="w-5 h-5 mr-2" />
+                      <Check className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-2" />
                     )}
-                    Set Word
+                    <span className="hidden sm:inline">Set Word</span>
+                    <span className="sm:hidden">Set</span>
                   </Button>
                 </div>
               </div>

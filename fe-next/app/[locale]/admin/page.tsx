@@ -212,6 +212,13 @@ export default function AdminDashboard() {
   const [gameLogsStartDate, setGameLogsStartDate] = useState<string>('');
   const [gameLogsEndDate, setGameLogsEndDate] = useState<string>('');
 
+  // Retry link state
+  const [retryLinkModalOpen, setRetryLinkModalOpen] = useState(false);
+  const [generatedRetryLink, setGeneratedRetryLink] = useState<string | null>(null);
+  const [retryLinkLoading, setRetryLinkLoading] = useState(false);
+  const [retryLinkExpiry, setRetryLinkExpiry] = useState<string | null>(null);
+  const [retryLinkLanguage, setRetryLinkLanguage] = useState<string>('en');
+
   // Get auth token for API calls
   const getAuthToken = useCallback(async () => {
     if (!supabase) return null;
@@ -307,6 +314,51 @@ export default function AdminDashboard() {
     await fetchAdminData();
     setRefreshing(false);
     toast.success('Dashboard refreshed');
+  };
+
+  // Generate a retry link for the daily challenge
+  const generateRetryLink = async () => {
+    setRetryLinkLoading(true);
+    setGeneratedRetryLink(null);
+    setRetryLinkExpiry(null);
+
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const response = await fetch('/api/admin/daily-word/generate-retry-link', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          puzzleDate: today,
+          language: retryLinkLanguage,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to generate retry link');
+      }
+
+      const result = await response.json();
+      setGeneratedRetryLink(result.retryUrl);
+      setRetryLinkExpiry(result.expiresAt);
+      setRetryLinkModalOpen(true);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to generate retry link');
+    } finally {
+      setRetryLinkLoading(false);
+    }
+  };
+
+  // Copy generated retry link to clipboard
+  const copyRetryLink = async () => {
+    if (!generatedRetryLink) return;
+    try {
+      await navigator.clipboard.writeText(generatedRetryLink);
+      toast.success('Retry link copied to clipboard!');
+    } catch {
+      toast.error('Failed to copy retry link');
+    }
   };
 
   // Helper to get word key for tracking processing state
@@ -835,6 +887,73 @@ export default function AdminDashboard() {
             </div>
           </motion.div>
         )}
+
+        {/* Quick Actions - Prominent admin tools */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={cn(
+            'rounded-xl p-3 sm:p-4 mb-4 sm:mb-6 border',
+            isDarkMode
+              ? 'bg-gradient-to-r from-purple-900/30 to-indigo-900/30 border-purple-500/30'
+              : 'bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-200'
+          )}
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <Link className={cn('w-4 h-4', isDarkMode ? 'text-purple-400' : 'text-purple-600')} />
+            <span className={cn(
+              'text-sm font-bold',
+              isDarkMode ? 'text-purple-300' : 'text-purple-700'
+            )}>
+              Quick Actions
+            </span>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Language selector for retry link */}
+            <select
+              value={retryLinkLanguage}
+              onChange={(e) => setRetryLinkLanguage(e.target.value)}
+              className={cn(
+                'px-3 py-2 rounded-lg border text-sm font-medium min-h-[40px]',
+                isDarkMode
+                  ? 'bg-slate-700 border-slate-600 text-white'
+                  : 'bg-white border-gray-300 text-gray-700'
+              )}
+            >
+              <option value="en">🇺🇸 English</option>
+              <option value="he">🇮🇱 Hebrew</option>
+              <option value="sv">🇸🇪 Swedish</option>
+              <option value="ja">🇯🇵 Japanese</option>
+              <option value="es">🇪🇸 Spanish</option>
+            </select>
+
+            {/* Generate Retry Link button */}
+            <Button
+              onClick={generateRetryLink}
+              disabled={retryLinkLoading}
+              className={cn(
+                'px-4 py-2 rounded-lg font-bold shadow-md min-h-[40px]',
+                isDarkMode
+                  ? 'bg-purple-600 hover:bg-purple-500 text-white'
+                  : 'bg-purple-500 hover:bg-purple-600 text-white'
+              )}
+            >
+              {retryLinkLoading ? (
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Link className="w-4 h-4 mr-2" />
+              )}
+              Generate Retry Link
+            </Button>
+
+            <span className={cn(
+              'text-xs',
+              isDarkMode ? 'text-gray-400' : 'text-gray-500'
+            )}>
+              Share with players to let them replay today&apos;s puzzle
+            </span>
+          </div>
+        </motion.div>
 
         {/* Tab Navigation - Scrollable on mobile */}
         <div className="relative mb-4 sm:mb-6">
@@ -2144,6 +2263,124 @@ export default function AdminDashboard() {
               </table>
             </div>
           </motion.div>
+        )}
+
+        {/* Retry Link Modal */}
+        {retryLinkModalOpen && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className={cn(
+                'rounded-xl p-6 max-w-lg w-full shadow-2xl border-2',
+                isDarkMode
+                  ? 'bg-slate-800 border-purple-500'
+                  : 'bg-white border-purple-400'
+              )}
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <Link className={cn('w-6 h-6', isDarkMode ? 'text-purple-400' : 'text-purple-600')} />
+                <h3 className={cn(
+                  'text-xl font-bold',
+                  isDarkMode ? 'text-white' : 'text-gray-900'
+                )}>
+                  Retry Link Generated
+                </h3>
+              </div>
+
+              <p className={cn(
+                'text-sm mb-4',
+                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+              )}>
+                Share this link with players to let them replay today&apos;s puzzle.
+              </p>
+
+              {/* Link display */}
+              <div className={cn(
+                'p-4 rounded-lg mb-4',
+                isDarkMode ? 'bg-slate-900' : 'bg-gray-100'
+              )}>
+                <label className={cn(
+                  'block text-xs font-bold uppercase mb-2',
+                  isDarkMode ? 'text-gray-500' : 'text-gray-500'
+                )}>
+                  Retry Link
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={generatedRetryLink || ''}
+                    readOnly
+                    className={cn(
+                      'flex-1 px-3 py-2 rounded-lg border font-mono text-sm',
+                      isDarkMode
+                        ? 'bg-slate-700 border-slate-600 text-white'
+                        : 'bg-white border-gray-300 text-gray-900'
+                    )}
+                    onClick={(e) => (e.target as HTMLInputElement).select()}
+                  />
+                  <Button
+                    onClick={copyRetryLink}
+                    className={cn(
+                      'px-3 py-2',
+                      isDarkMode
+                        ? 'bg-purple-600 hover:bg-purple-500'
+                        : 'bg-purple-500 hover:bg-purple-600'
+                    )}
+                  >
+                    Copy
+                  </Button>
+                </div>
+              </div>
+
+              {/* Expiry info */}
+              {retryLinkExpiry && (
+                <div className={cn(
+                  'p-3 rounded-lg mb-4 text-sm',
+                  isDarkMode
+                    ? 'bg-amber-900/30 text-amber-300'
+                    : 'bg-amber-50 text-amber-700'
+                )}>
+                  <strong>Expires:</strong> {new Date(retryLinkExpiry).toLocaleString()}
+                </div>
+              )}
+
+              {/* Info */}
+              <div className={cn(
+                'p-3 rounded-lg mb-4 text-sm',
+                isDarkMode
+                  ? 'bg-blue-900/30 text-blue-300'
+                  : 'bg-blue-50 text-blue-700'
+              )}>
+                <strong>How it works:</strong> Players who click this link can replay today&apos;s puzzle,
+                even if they&apos;ve already completed it. Each token can be used multiple times.
+              </div>
+
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => setRetryLinkModalOpen(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Close
+                </Button>
+                <Button
+                  onClick={() => {
+                    copyRetryLink();
+                    setRetryLinkModalOpen(false);
+                  }}
+                  className={cn(
+                    'flex-1',
+                    isDarkMode
+                      ? 'bg-purple-600 hover:bg-purple-500'
+                      : 'bg-purple-500 hover:bg-purple-600'
+                  )}
+                >
+                  Copy &amp; Close
+                </Button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </div>
     </div>
