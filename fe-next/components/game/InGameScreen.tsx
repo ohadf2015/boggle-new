@@ -876,6 +876,7 @@ const InGameScreen = memo<InGameScreenProps>(({
 
             {/* Timer (center - always visible and prominent) */}
             <motion.div
+              data-tutorial="timer"
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="relative z-20"
