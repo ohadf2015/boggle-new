@@ -25,6 +25,7 @@ import {
   getDailyStreak,
   parseChallengeParam,
   clearWordHuntResultForRetry,
+  getGuestFingerprint,
   type WordHuntResult,
   type StoredWordHuntResult,
 } from '@/utils/dailyChallenge';
@@ -50,7 +51,7 @@ interface ChallengeData {
 
 const DailyChallenge: React.FC = () => {
   const { t, language, setLanguage } = useLanguage();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, profile } = useAuth();
   const searchParams = useSearchParams();
 
   // Get current language flag
@@ -89,6 +90,14 @@ const DailyChallenge: React.FC = () => {
 
   // State to track if we just reset
   const [wasReset, setWasReset] = useState(false);
+
+  // Guest fingerprint for leaderboard
+  const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
+
+  // Fetch guest fingerprint on mount
+  useEffect(() => {
+    getGuestFingerprint().then(setGuestFingerprint);
+  }, []);
 
   // Parse challenge parameter and handle admin reset from URL
   useEffect(() => {
@@ -306,6 +315,8 @@ const DailyChallenge: React.FC = () => {
             challengeData={challengeData}
             isAuthenticated={isAuthenticated}
             targetWordLength={targetWord?.length || 0}
+            currentPlayerId={isAuthenticated && profile ? profile.id : null}
+            guestFingerprint={!isAuthenticated ? guestFingerprint : null}
             onLanguageChange={(lang) => setLanguage(lang)}
             onStart={handleStartGame}
             onBack={handleBack}
@@ -372,11 +383,13 @@ interface DailyReadyScreenProps {
   challengeData: ChallengeData | null;
   isAuthenticated: boolean;
   targetWordLength: number;
+  currentPlayerId: string | null;
+  guestFingerprint: string | null;
   onLanguageChange: (lang: Language) => void;
   onStart: () => void;
   onBack: () => void;
   onShowTutorial: () => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
@@ -388,6 +401,8 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
   challengeData,
   isAuthenticated,
   targetWordLength,
+  currentPlayerId,
+  guestFingerprint,
   onLanguageChange,
   onStart,
   onBack,
@@ -609,7 +624,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
               ))}
             </div>
             <div className="text-[11px] text-neo-purple dark:text-neo-purple font-bold">
-              {t('daily.onlyMatchingLength') || `Only ${targetWordLength}-letter words use your tries!`}
+              {t('daily.onlyMatchingLength', { length: targetWordLength }) || `Only ${targetWordLength}-letter words use your tries!`}
             </div>
           </motion.div>
         )}
@@ -663,9 +678,12 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
               <DailyLeaderboard
                 puzzleDate={puzzleDate}
                 language={language}
+                currentPlayerId={currentPlayerId}
+                currentGuestFingerprint={guestFingerprint}
                 maxVisible={3}
                 compact
                 t={t}
+                gameType="wordHunt"
               />
             </motion.div>
           )}

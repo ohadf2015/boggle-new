@@ -336,18 +336,29 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
     const puzzleNumber = getPuzzleNumber(puzzleDate);
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
 
-    // Generate OG image URL
+    // Generate OG image URL - handle both puzzle mode (score/words) and Word Hunt mode (solved/attempts)
     const ogParams = new URLSearchParams({
-      rank: currentUserData.rank_position.toString(),
-      displayName: currentUserData.display_name,
-      avatarEmoji: currentUserData.avatar_emoji,
-      score: currentUserData.score.toString(),
-      wordCount: currentUserData.word_count.toString(),
-      puzzleNumber: puzzleNumber.toString(),
+      rank: String(currentUserData.rank_position ?? 0),
+      displayName: currentUserData.display_name || 'Player',
+      avatarEmoji: currentUserData.avatar_emoji || '🎯',
+      puzzleNumber: String(puzzleNumber),
     });
 
+    // Add game-type specific fields
+    if (gameType === 'wordHunt') {
+      ogParams.set('solved', String(currentUserData.solved ?? false));
+      ogParams.set('attemptsUsed', String(currentUserData.attempts_used ?? 0));
+    } else {
+      ogParams.set('score', String(currentUserData.score ?? 0));
+      ogParams.set('wordCount', String(currentUserData.word_count ?? 0));
+    }
+
     const shareUrl = `${origin}/${language}/daily?share=${encodeURIComponent(ogParams.toString())}`;
-    const shareText = `🎯 I ranked #${currentUserData.rank_position} on LexiClash Daily #${puzzleNumber}! ${currentUserData.score} pts | ${currentUserData.word_count} words\n\n`;
+
+    // Build share text based on game type
+    const shareText = gameType === 'wordHunt'
+      ? `🎯 I ranked #${currentUserData.rank_position} on LexiClash Word Hunt #${puzzleNumber}! ${currentUserData.solved ? `Solved in ${currentUserData.attempts_used}/10` : 'X/10'}\n\n`
+      : `🎯 I ranked #${currentUserData.rank_position} on LexiClash Daily #${puzzleNumber}! ${currentUserData.score ?? 0} pts | ${currentUserData.word_count ?? 0} words\n\n`;
 
     // Try native share first
     if (navigator.share) {

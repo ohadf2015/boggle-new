@@ -1048,11 +1048,11 @@ export function generateWordHuntShareableResult(result: WordHuntResult, siteUrl?
 
   // Fun performance messages with variety based on attempts
   const performanceMessages = {
-    genius: ['🧠 Big brain energy!', '🔥 Word Wizard!', '⚡ Absolute legend!', '👑 Bow down!'],
-    great: ['⚡ Crushed it!', '💥 Nailed it!', '🎯 Sharp as ever!', '✨ Too easy!'],
-    good: ['✨ Nice one!', '💫 Got there!', '🙌 Well played!', '👏 Solid solve!'],
-    close: ['😅 That was close!', '💫 Made it work!', '🎉 Scraped through!', '😮‍💨 Phew!'],
-    fail: ['💪 Next time!', '🔄 Tomorrow is mine!', '😤 The word won today', '🎲 Bad luck!'],
+    genius: ['🧠 Too easy!', '🔥 Didn\'t even break a sweat', '⚡ Is this thing on easy mode?', '👑 Bow down, peasants!'],
+    great: ['⚡ Crushed it!', '💥 That was satisfying', '🎯 On point today!', '✨ Feeling sharp!'],
+    good: ['✨ Got there!', '💫 Brain still works!', '🙌 Not bad!', '👏 That\'ll do!'],
+    close: ['😅 That was TOO close!', '💫 Squeaked through!', '🎉 Survival mode: activated!', '😮‍💨 Phew!'],
+    fail: ['💪 Next time!', '🔄 Tomorrow\'s mine!', '😤 This word was unfair!', '🎲 Bad board!'],
   };
 
   let performanceMsg = '';
@@ -1080,12 +1080,22 @@ export function generateWordHuntShareableResult(result: WordHuntResult, siteUrl?
     streakText = `🔥 ${result.streakDays} day streak!\n`;
   }
 
+  // Pick a random competitive CTA for variety
+  const competitiveCTAs = [
+    'Think you can do better?',
+    'Your turn.',
+    'Beat that.',
+    'I dare you to try.',
+    'Good luck topping this!',
+  ];
+  const cta = competitiveCTAs[Math.floor(Math.random() * competitiveCTAs.length)];
+
   // Build the shareable text - simple and engaging
   return `${resultEmoji} LexiClash Word Hunt #${result.puzzleNumber}
 
 ${resultText} ${performanceMsg}
 ${streakText}
-Can you beat me? 🎮
+${cta} 🎮
 ${challengeUrl}`;
 }
 
