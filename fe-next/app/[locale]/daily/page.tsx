@@ -100,12 +100,15 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
         const title = `${displayName}: ${performanceMsg} Word Hunt #${puzzleNumber}`;
         const description = `${attemptText}${streakText} - Can you beat this?`;
 
+        // Include wh parameter in og:url so Facebook/WhatsApp don't re-fetch without it
+        const shareUrl = `${baseUrl}${localePath}/daily?wh=${encodeURIComponent(wh)}`;
+
         return {
           title,
           description,
           openGraph: {
             type: 'website',
-            url: `${baseUrl}${localePath}/daily`,
+            url: shareUrl,
             title,
             description,
             siteName: 'LexiClash',
