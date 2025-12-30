@@ -149,6 +149,7 @@ const sv = {
     "join": "Gå med",
     "showLess": "Visa mindre",
     "showMore": "Visa mer",
+    "moreOptions": "Fler alternativ",
     "or": "eller",
     "closeMenu": "Stäng meny",
     "openMenu": "Öppna meny",
@@ -2436,7 +2437,9 @@ const sv = {
       "firstToSolve": "🌟 Först att lösa idag!",
       "youSolved": "Du löste det!",
       "youFailed": "Du löste det inte den här gången",
-      "attemptsUsed": "Försök använda: {count}"
+      "attemptsUsed": "Försök använda: {count}",
+      "top": "Topp",
+      "solved": "löste"
     },
     "survival": {
       "lifePoints": "Liv",

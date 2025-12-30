@@ -150,6 +150,7 @@ const en = {
     "join": "Join",
     "showLess": "Show less",
     "showMore": "Show more",
+    "moreOptions": "More options",
     "or": "or",
     "closeMenu": "Close menu",
     "openMenu": "Open menu",
@@ -2444,7 +2445,9 @@ const en = {
       "firstToSolve": "🌟 First to solve today!",
       "youSolved": "You solved it!",
       "youFailed": "You didn't solve it this time",
-      "attemptsUsed": "Attempts used: {count}"
+      "attemptsUsed": "Attempts used: {count}",
+      "top": "Top",
+      "solved": "solved"
     },
     "survival": {
       "lifePoints": "Life",

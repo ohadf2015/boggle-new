@@ -4,7 +4,7 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Bot, Plus, X, Book, Trophy, Settings, ChevronDown, ArrowLeft, Crown, Flame, CalendarDays, Target, Zap, Check } from 'lucide-react';
+import { Play, Bot, Plus, X, Book, Trophy, Settings, ChevronDown, ArrowLeft, Crown, Flame, CalendarDays, Target, Zap, Check, Sparkles, Skull, Grid3X3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -75,6 +75,17 @@ const BOT_DIFFICULTY_CONFIG: Record<BotDifficulty, { labelKey: string; color: st
   easy: { labelKey: 'bots.easy', color: 'bg-sky-400', icon: '🤖' },
   medium: { labelKey: 'bots.medium', color: 'bg-violet-400', icon: '⚙️' },
   hard: { labelKey: 'bots.hard', color: 'bg-fuchsia-500 text-white', icon: '💀' },
+};
+
+// Difficulty configuration with icons for simplified UI
+const DIFFICULTY_ICON_CONFIG: Record<DifficultyLevel, {
+  Icon: typeof Sparkles;
+  bgColor: string;
+  selectedColor: string;
+}> = {
+  EASY: { Icon: Sparkles, bgColor: 'bg-neo-lime', selectedColor: 'bg-neo-lime text-neo-black' },
+  MEDIUM: { Icon: Zap, bgColor: 'bg-neo-yellow', selectedColor: 'bg-neo-yellow text-neo-black' },
+  HARD: { Icon: Skull, bgColor: 'bg-neo-red', selectedColor: 'bg-neo-red text-white' },
 };
 
 /**
@@ -297,33 +308,31 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
               </div>
             )}
 
-            {/* Difficulty - Not for daily mode */}
+            {/* Difficulty - Not for daily mode - Icon-based compact selector */}
             {mode !== 'daily' && (
               <div>
                 <label className="text-sm font-bold uppercase text-neo-white mb-2 block">{t('singlePlayer.difficulty') || 'Difficulty'}</label>
                 <div className="flex gap-2">
-                  {(['EASY', 'MEDIUM', 'HARD'] as DifficultyLevel[]).map(diff => (
-                    <button
-                      key={diff}
-                      onClick={() => setDifficulty(diff)}
-                      className={cn(
-                        'flex-1 py-3 rounded-neo border-3 border-neo-black text-sm font-bold uppercase shadow-hard hover:shadow-hard-lg transition-all',
-                        difficulty === diff
-                          ? diff === 'EASY' ? 'bg-neo-lime text-neo-black' : diff === 'MEDIUM' ? 'bg-neo-yellow text-neo-black' : 'bg-neo-red text-white'
-                          : 'bg-neo-cream text-neo-black'
-                      )}
-                    >
-                      {t(`difficulty.${diff.toLowerCase()}`) || diff}
-                    </button>
-                  ))}
+                  {(['EASY', 'MEDIUM', 'HARD'] as DifficultyLevel[]).map(diff => {
+                    const config = DIFFICULTY_ICON_CONFIG[diff];
+                    const diffConfig = DIFFICULTIES[diff];
+                    const IconComponent = config.Icon;
+                    const isSelected = difficulty === diff;
+                    return (
+                      <button
+                        key={diff}
+                        onClick={() => setDifficulty(diff)}
+                        className={cn(
+                          'flex-1 py-2 px-2 rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-lg transition-all flex flex-col items-center gap-1',
+                          isSelected ? config.selectedColor : 'bg-neo-cream text-neo-black'
+                        )}
+                      >
+                        <IconComponent className="w-5 h-5" />
+                        <span className="text-xs font-black">{diffConfig.rows}×{diffConfig.cols}</span>
+                      </button>
+                    );
+                  })}
                 </div>
-              </div>
-            )}
-
-            {/* Grid size info - Not for daily mode */}
-            {mode !== 'daily' && (
-              <div className="text-sm text-neo-white/70 text-center font-bold">
-                {difficultyConfig.rows}x{difficultyConfig.cols} grid
               </div>
             )}
 
@@ -556,33 +565,31 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
         </div>
         <Card className="border-3 border-neo-black dark:border-slate-600 shadow-hard">
           <CardContent className="p-3 sm:p-4 space-y-4">
-            {/* Difficulty Selection */}
+            {/* Difficulty Selection - Icon-based compact selector */}
             <div>
               <label className="text-sm font-bold uppercase tracking-wide text-neo-black/70 dark:text-neo-white/70 mb-2 block">
                 {t('wizard.chooseDifficulty') || 'Difficulty'}
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {(['EASY', 'MEDIUM', 'HARD'] as DifficultyLevel[]).map(level => {
-                  const config = DIFFICULTIES[level];
+                  const diffConfig = DIFFICULTIES[level];
+                  const iconConfig = DIFFICULTY_ICON_CONFIG[level];
+                  const IconComponent = iconConfig.Icon;
                   const isSelected = difficulty === level;
                   return (
                     <button
                       key={level}
                       onClick={() => setDifficulty(level)}
                       className={cn(
-                        'p-2 sm:p-3 rounded-neo-lg border-3 border-neo-black dark:border-slate-500 transition-all text-center',
+                        'p-2 sm:p-3 rounded-neo-lg border-3 border-neo-black dark:border-slate-500 transition-all flex flex-col items-center gap-1',
                         isSelected
-                          ? level === 'EASY' ? 'bg-neo-lime shadow-hard-pressed translate-x-[1px] translate-y-[1px] text-neo-black'
-                          : level === 'MEDIUM' ? 'bg-neo-yellow shadow-hard-pressed translate-x-[1px] translate-y-[1px] text-neo-black'
-                          : 'bg-neo-red shadow-hard-pressed translate-x-[1px] translate-y-[1px] text-white'
+                          ? `${iconConfig.selectedColor} shadow-hard-pressed translate-x-[1px] translate-y-[1px]`
                           : 'bg-white dark:bg-slate-600 shadow-hard hover:shadow-hard-lg text-neo-black dark:text-neo-white'
                       )}
                     >
-                      <div className="font-black uppercase text-xs sm:text-sm">
-                        {t(`difficulty.${level.toLowerCase()}`) || level}
-                      </div>
-                      <div className="text-[10px] sm:text-xs opacity-75 font-bold">
-                        {config.rows}x{config.cols}
+                      <IconComponent className="w-5 h-5 sm:w-6 sm:h-6" />
+                      <div className="font-black text-sm sm:text-base">
+                        {diffConfig.rows}×{diffConfig.cols}
                       </div>
                     </button>
                   );
@@ -714,12 +721,13 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                 </span>
               </div>
 
-              {/* Difficulty summary */}
+              {/* Difficulty summary - icon-based */}
               {mode !== 'daily' && (
                 <div className="flex items-center justify-between p-2 bg-slate-100 dark:bg-slate-700 rounded-neo">
                   <span className="text-sm font-bold text-neo-black/70 dark:text-neo-white/70">{t('wizard.stepDifficulty') || 'Difficulty'}</span>
-                  <span className="font-bold text-neo-black dark:text-neo-white">
-                    {t(`difficulty.${difficulty.toLowerCase()}`) || difficulty} ({difficultyConfig.rows}x{difficultyConfig.cols})
+                  <span className="font-bold text-neo-black dark:text-neo-white flex items-center gap-2">
+                    {React.createElement(DIFFICULTY_ICON_CONFIG[difficulty].Icon, { className: 'w-4 h-4' })}
+                    {difficultyConfig.rows}×{difficultyConfig.cols}
                   </span>
                 </div>
               )}
@@ -983,31 +991,31 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                 className="overflow-hidden"
               >
                 <div className="pt-4 space-y-4 border-t border-neo-black/10 dark:border-slate-600 mt-2">
-                  {/* Difficulty/Grid Size Selection */}
+                  {/* Difficulty/Grid Size Selection - Icon-based */}
                   <div className="space-y-2">
                     <label className="text-sm font-bold uppercase tracking-wide text-neo-black/70 dark:text-neo-white/70">
                       {t('singlePlayer.selectDifficulty') || 'Grid Size'}
                     </label>
                     <div className="grid grid-cols-3 gap-2">
                       {(['EASY', 'MEDIUM', 'HARD'] as DifficultyLevel[]).map(level => {
-                        const config = DIFFICULTIES[level];
+                        const diffConfig = DIFFICULTIES[level];
+                        const iconConfig = DIFFICULTY_ICON_CONFIG[level];
+                        const IconComponent = iconConfig.Icon;
                         const isSelected = difficulty === level;
                         return (
                           <button
                             key={level}
                             onClick={() => setDifficulty(level)}
                             className={cn(
-                              'p-2 rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all text-center',
+                              'p-2 rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all flex flex-col items-center gap-1',
                               isSelected
-                                ? 'bg-neo-yellow shadow-hard-pressed translate-x-[1px] translate-y-[1px] text-neo-black'
+                                ? `${iconConfig.selectedColor} shadow-hard-pressed translate-x-[1px] translate-y-[1px]`
                                 : 'bg-white dark:bg-slate-600 shadow-hard hover:shadow-hard-lg text-neo-black dark:text-neo-white'
                             )}
                           >
-                            <div className="font-bold uppercase text-xs">
-                              {t(config.nameKey) || level}
-                            </div>
-                            <div className="text-xs text-neo-black/75 dark:text-neo-white/75">
-                              {config.rows}x{config.cols}
+                            <IconComponent className="w-4 h-4" />
+                            <div className="text-xs font-black">
+                              {diffConfig.rows}×{diffConfig.cols}
                             </div>
                           </button>
                         );

@@ -149,6 +149,7 @@ const es = {
     "join": "Unirse",
     "showLess": "Mostrar menos",
     "showMore": "Mostrar más",
+    "moreOptions": "Más opciones",
     "or": "o",
     "closeMenu": "Cerrar menú",
     "openMenu": "Abrir menú",
@@ -2435,7 +2436,9 @@ const es = {
       "firstToSolve": "🌟 ¡El primero en resolver hoy!",
       "youSolved": "¡Lo resolviste!",
       "youFailed": "No lo resolviste esta vez",
-      "attemptsUsed": "Intentos usados: {count}"
+      "attemptsUsed": "Intentos usados: {count}",
+      "top": "Top",
+      "solved": "resuelto"
     },
     "survival": {
       "lifePoints": "Vida",

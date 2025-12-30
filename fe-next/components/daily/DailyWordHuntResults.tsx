@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Trophy, Target, X, TrendingUp, ArrowLeft, Copy, Check, Send, Coins, RotateCcw, ImageDown } from 'lucide-react';
+import { Share2, Trophy, Target, X, ArrowLeft, Copy, Check, Send, Coins, RotateCcw, ImageDown, ChevronDown, Settings } from 'lucide-react';
 
 // X/Twitter icon (no lucide equivalent)
 const XTwitterIcon = ({ className }: { className?: string }) => (
@@ -115,12 +115,7 @@ const TryAnotherLanguage: React.FC<{ currentLanguage: Language }> = ({ currentLa
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.9 }}
-      className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700"
-    >
+    <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
       <h3 className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase mb-2 flex items-center gap-1.5">
         🌍 {t('wordHunt.results.tryAnotherLanguage')}
       </h3>
@@ -129,17 +124,17 @@ const TryAnotherLanguage: React.FC<{ currentLanguage: Language }> = ({ currentLa
           <Button
             key={option.code}
             onClick={() => handleLanguageClick(option.code)}
-            className="px-4 py-2 bg-gradient-to-r from-neo-cyan to-neo-blue text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard transition-all flex items-center gap-2"
+            className="px-3 py-2 bg-gradient-to-r from-neo-cyan to-neo-blue text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all flex items-center gap-1.5"
           >
-            <span className="text-lg">{option.flag}</span>
-            <span className="font-bold text-sm">{option.name}</span>
+            <span className="text-base">{option.flag}</span>
+            <span className="font-bold text-xs">{option.name}</span>
           </Button>
         ))}
       </div>
-      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+      <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-2 text-center">
         {t('wordHunt.results.playDifferentLanguage')}
       </p>
-    </motion.div>
+    </div>
   );
 };
 
@@ -180,6 +175,10 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [signupTrigger, setSignupTrigger] = useState<ConversionTrigger | null>(null);
   const [leaderboardKey, setLeaderboardKey] = useState(0);
   const [showFullShareText, setShowFullShareText] = useState(false);
+  const [showSharePlatforms, setShowSharePlatforms] = useState(false);
+  const [statsExpanded, setStatsExpanded] = useState(false);
+  const [attemptsExpanded, setAttemptsExpanded] = useState(false);
+  const [secondaryActionsExpanded, setSecondaryActionsExpanded] = useState(false);
   const [shareImage, setShareImage] = useState<ShareImageResult | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [countryCode, setCountryCode] = useState<string | null>(null);
@@ -737,7 +736,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           {/* Success: Show attempts used */}
           {result.solved ? (
             <>
-              <div className="text-6xl md:text-7xl font-black mt-2 text-green-500">
+              <div className="text-4xl md:text-5xl font-black mt-2 text-green-500">
                 {result.attemptsUsed}/10
               </div>
               <div className="text-gray-600 dark:text-gray-300">
@@ -904,50 +903,21 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           )}
         </motion.div>
 
-        {/* Ranking badges */}
-        {stats?.yourStats && stats.yourStats.solved && (
-          <div className="space-y-2">
-            {/* Rank position */}
-            {stats.yourStats.rank !== undefined && (
-              <motion.div
-                initial={{ scale: 0, rotate: -10 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: 'spring', delay: 0.3 }}
-                className="inline-block px-4 py-2 bg-gradient-to-r from-neo-orange to-neo-yellow rounded-neo border-2 border-neo-black shadow-hard-sm"
-              >
-                <div className="flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-neo-black" />
-                  <span className="font-black text-neo-black text-sm">
-                    {t('wordHunt.results.rankOutOf').replace('{rank}', String(stats.yourStats.rank)).replace('{total}', String(stats.totalPlayers))}
-                  </span>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Percentile badge - show "First to solve!" when only player, otherwise show percentile */}
-            {stats.yourStats.percentile !== undefined && (
-              <motion.div
-                initial={{ scale: 0, rotate: -10 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: 'spring', delay: 0.35 }}
-                className="inline-block px-4 py-2 bg-gradient-to-r from-neo-purple to-neo-blue rounded-neo border-2 border-neo-black shadow-hard-sm"
-              >
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-white" />
-                  <span className="font-bold text-white text-sm">
-                    {stats.totalPlayers <= 1
-                      ? t('wordHunt.stats.firstToSolve')
-                      : t('wordHunt.stats.yourPercentile').replace('{percentile}', String(stats.yourStats.percentile))}
-                  </span>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Language note */}
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-              {t('wordHunt.results.rankingsFor').replace('{language}', language.toUpperCase())}
+        {/* Rank badge - Single consolidated badge (percentile shown in stats section) */}
+        {stats?.yourStats && stats.yourStats.solved && stats.yourStats.rank !== undefined && (
+          <motion.div
+            initial={{ scale: 0, rotate: -10 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: 'spring', delay: 0.3 }}
+            className="inline-block px-4 py-2 bg-gradient-to-r from-neo-orange to-neo-yellow rounded-neo border-2 border-neo-black shadow-hard-sm"
+          >
+            <div className="flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-neo-black" />
+              <span className="font-black text-neo-black text-sm">
+                {t('wordHunt.results.rankOutOf').replace('{rank}', String(stats.yourStats.rank)).replace('{total}', String(stats.totalPlayers))}
+              </span>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Share Section - Moved above statistics */}
@@ -958,53 +928,14 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           className="space-y-3"
         >
           {/* Shareable result preview - Enhanced UI */}
+          {/* Simplified share preview - clean design without decorative elements */}
           <div className={cn(
-            "relative rounded-neo border-3 overflow-hidden",
+            "rounded-neo border-2 overflow-hidden",
             result.solved
-              ? "bg-gradient-to-br from-gray-900 via-emerald-950 to-gray-900 border-emerald-600"
-              : "bg-gradient-to-br from-gray-900 via-slate-800 to-gray-900 border-gray-600"
+              ? "bg-gray-900 border-emerald-600/50"
+              : "bg-gray-900 border-gray-600/50"
           )}>
-            {/* Decorative corner accents */}
-            <div className={cn(
-              "absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 rounded-tl",
-              result.solved ? "border-emerald-400/50" : "border-gray-500/50"
-            )} />
-            <div className={cn(
-              "absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 rounded-tr",
-              result.solved ? "border-emerald-400/50" : "border-gray-500/50"
-            )} />
-            <div className={cn(
-              "absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 rounded-bl",
-              result.solved ? "border-emerald-400/50" : "border-gray-500/50"
-            )} />
-            <div className={cn(
-              "absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 rounded-br",
-              result.solved ? "border-emerald-400/50" : "border-gray-500/50"
-            )} />
-
-            {/* Header bar */}
-            <div className={cn(
-              "px-4 py-2 flex items-center justify-between border-b",
-              result.solved
-                ? "bg-emerald-900/50 border-emerald-700/50"
-                : "bg-gray-800/50 border-gray-700/50"
-            )}>
-              <div className="flex items-center gap-2">
-                <Share2 className={cn(
-                  "w-4 h-4",
-                  result.solved ? "text-emerald-400" : "text-gray-400"
-                )} />
-                <span className={cn(
-                  "text-xs font-bold uppercase tracking-wider",
-                  result.solved ? "text-emerald-400" : "text-gray-400"
-                )}>
-                  {t('wordHunt.shareResult')}
-                </span>
-              </div>
-              <span className="text-lg">{result.solved ? '✨' : '💪'}</span>
-            </div>
-
-            {/* Share text content - truncated with ellipsis */}
+            {/* Share text content - compact */}
             <div className="p-3">
               <pre className={cn(
                 "text-white text-xs font-mono whitespace-pre-wrap leading-relaxed break-words overflow-hidden max-w-full",
@@ -1031,8 +962,9 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             </div>
           </div>
 
-          {/* Share buttons */}
+          {/* Share buttons - Progressive disclosure */}
           <div className="space-y-2">
+            {/* Primary share button */}
             <Button
               onClick={handleNativeShare}
               className={cn(
@@ -1046,59 +978,93 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               {result.solved ? t('wordHunt.shareResult') : t('wordHunt.shareAttempt')}
             </Button>
 
-            <div className="grid grid-cols-5 gap-2">
-              <Button
-                onClick={handleWhatsApp}
-                aria-label="Share on WhatsApp"
-                className="py-3 min-h-[44px] bg-[#25D366] text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
+            {/* Toggle for more share options */}
+            <button
+              onClick={() => setShowSharePlatforms(!showSharePlatforms)}
+              className="w-full flex items-center justify-center gap-1 py-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+            >
+              <span>{showSharePlatforms ? t('common.showLess') : t('common.moreOptions')}</span>
+              <motion.div
+                animate={{ rotate: showSharePlatforms ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
               >
-                <WhatsAppIcon className="w-5 h-5" />
-              </Button>
+                <ChevronDown className="w-4 h-4" />
+              </motion.div>
+            </button>
 
-              <Button
-                onClick={handleTwitter}
-                aria-label="Share on X (Twitter)"
-                className="py-3 min-h-[44px] bg-black text-white border-3 border-gray-700 rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
-              >
-                <XTwitterIcon className="w-5 h-5" />
-              </Button>
+            {/* Platform buttons - revealed on demand */}
+            <AnimatePresence>
+              {showSharePlatforms && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <Button
+                      onClick={handleWhatsApp}
+                      className="py-2.5 min-h-[44px] bg-[#25D366] text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                    >
+                      <WhatsAppIcon className="w-4 h-4" />
+                      <span className="text-sm font-bold">WhatsApp</span>
+                    </Button>
 
-              <Button
-                onClick={handleTelegram}
-                aria-label="Share on Telegram"
-                className="py-3 min-h-[44px] bg-[#0088cc] text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
-              >
-                <Send className="w-5 h-5" />
-              </Button>
+                    <Button
+                      onClick={handleTwitter}
+                      className="py-2.5 min-h-[44px] bg-black text-white border-2 border-gray-700 rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                    >
+                      <XTwitterIcon className="w-4 h-4" />
+                      <span className="text-sm font-bold">X / Twitter</span>
+                    </Button>
 
-              <Button
-                onClick={handleDownloadShareImage}
-                disabled={isGeneratingImage}
-                title={t('daily.downloadImage') || 'Save Share Image'}
-                aria-label={t('daily.downloadImage') || 'Save Share Image'}
-                className="py-3 min-h-[44px] bg-neo-purple text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all disabled:opacity-50"
-              >
-                {isGeneratingImage ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <ImageDown className="w-5 h-5" />
-                )}
-              </Button>
+                    <Button
+                      onClick={handleTelegram}
+                      className="py-2.5 min-h-[44px] bg-[#0088cc] text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                    >
+                      <Send className="w-4 h-4" />
+                      <span className="text-sm font-bold">Telegram</span>
+                    </Button>
 
-              <Button
-                onClick={handleCopy}
-                aria-label={copied ? t('common.copied') : t('daily.copyToClipboard')}
-                className="py-3 min-h-[44px] bg-gray-600 text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
-              >
-                {copied ? (
-                  <Check className="w-5 h-5 text-neo-lime" />
-                ) : (
-                  <Copy className="w-5 h-5" />
-                )}
-              </Button>
-            </div>
+                    <Button
+                      onClick={handleCopy}
+                      className="py-2.5 min-h-[44px] bg-gray-600 text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+                    >
+                      {copied ? (
+                        <>
+                          <Check className="w-4 h-4 text-neo-lime" />
+                          <span className="text-sm font-bold">{t('common.copied')}</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          <span className="text-sm font-bold">{t('daily.copyToClipboard')}</span>
+                        </>
+                      )}
+                    </Button>
+                  </div>
 
-            {copied && (
+                  {/* Download image button - full width */}
+                  <Button
+                    onClick={handleDownloadShareImage}
+                    disabled={isGeneratingImage}
+                    className="w-full mt-2 py-2 min-h-[44px] bg-neo-purple text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {isGeneratingImage ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <ImageDown className="w-4 h-4" />
+                        <span className="text-sm font-bold">{t('daily.downloadImage')}</span>
+                      </>
+                    )}
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {copied && !showSharePlatforms && (
               <motion.p
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1110,210 +1076,247 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           </div>
         </motion.div>
 
-        {/* Attempt history with feedback */}
+        {/* Attempt history - Collapsible */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="space-y-1.5"
+          className="rounded-neo border-2 border-neo-black overflow-hidden"
         >
-          <h3 className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
-            {t('wordHunt.title')} - {t('common.attempts')}
-          </h3>
-          <div className="space-y-0.5">
-            {result.attempts.map((attempt, idx) => (
-              <div key={idx} className="flex items-center justify-center gap-1.5">
-                <span className="text-[10px] text-gray-500 dark:text-gray-400 w-5">
-                  {idx + 1}.
-                </span>
-                <div className="flex gap-0.5">
-                  {attempt.feedback.map((letterFb, letterIdx) => (
-                    <div
-                      key={letterIdx}
-                      className={cn(
-                        "w-7 h-7 flex items-center justify-center font-bold text-white rounded border border-neo-black text-sm",
-                        letterFb.feedback === 'green' && "bg-green-500",
-                        letterFb.feedback === 'yellow' && "bg-yellow-500",
-                        letterFb.feedback === 'gray' && "bg-gray-400"
-                      )}
-                    >
-                      {letterFb.letter}
+          {/* Collapsible header */}
+          <button
+            onClick={() => setAttemptsExpanded(!attemptsExpanded)}
+            className="w-full flex items-center justify-between p-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
+                {t('wordHunt.title')} - {result.attemptsUsed} {t('common.attempts')}
+              </span>
+            </div>
+            <motion.div
+              animate={{ rotate: attemptsExpanded ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ChevronDown className="w-4 h-4 text-gray-500" />
+            </motion.div>
+          </button>
+
+          {/* Collapsible content */}
+          <AnimatePresence>
+            {attemptsExpanded && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <div className="p-2.5 space-y-0.5 bg-white dark:bg-slate-800">
+                  {result.attempts.map((attempt, idx) => (
+                    <div key={idx} className="flex items-center justify-center gap-1.5">
+                      <span className="text-[10px] text-gray-500 dark:text-gray-400 w-5">
+                        {idx + 1}.
+                      </span>
+                      <div className="flex gap-0.5">
+                        {attempt.feedback.map((letterFb, letterIdx) => (
+                          <div
+                            key={letterIdx}
+                            className={cn(
+                              "w-7 h-7 flex items-center justify-center font-bold text-white rounded border border-neo-black text-sm",
+                              letterFb.feedback === 'green' && "bg-green-500",
+                              letterFb.feedback === 'yellow' && "bg-yellow-500",
+                              letterFb.feedback === 'gray' && "bg-gray-400"
+                            )}
+                          >
+                            {letterFb.letter}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>
-              </div>
-            ))}
-          </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
-        {/* Stats grid */}
+        {/* Stats grid - Collapsible */}
         {stats && (
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="bg-white dark:bg-neo-navy-light rounded-neo border-3 border-neo-black p-4 space-y-4"
+            className="rounded-neo border-2 border-neo-black overflow-hidden"
           >
-            <h3 className="text-sm font-bold text-gray-600 dark:text-gray-300 uppercase flex items-center gap-2">
-              📊 {t('wordHunt.stats.title')}
-            </h3>
-
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.6 }}
-                className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 border-2 border-blue-200 dark:border-blue-800"
-              >
-                <div className="text-lg mb-1">👥</div>
-                <div className="text-2xl font-black text-blue-600 dark:text-blue-400">
-                  {stats.totalPlayers}
-                </div>
-                <div className="text-[10px] text-gray-600 dark:text-gray-400">
-                  {t('wordHunt.stats.totalPlayers')}
-                </div>
-              </motion.div>
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.7 }}
-                className="bg-green-50 dark:bg-green-900/20 rounded-lg p-1.5 border border-green-200 dark:border-green-800"
-              >
-                <div className="text-sm mb-0.5">✅</div>
-                <div className="text-lg font-black text-green-600 dark:text-green-400">
-                  {stats.solveRate}%
-                </div>
-                <div className="text-[10px] text-gray-600 dark:text-gray-400">
-                  {t('wordHunt.stats.solveRate')}
-                </div>
-              </motion.div>
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.8 }}
-                className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-1.5 border border-purple-200 dark:border-purple-800"
-              >
-                <div className="text-sm mb-0.5">🎯</div>
-                <div className="text-lg font-black text-purple-600 dark:text-purple-400">
-                  {stats.avgAttemptsSolved?.toFixed(1) ?? 'N/A'}
-                </div>
-                <div className="text-[10px] text-gray-600 dark:text-gray-400">
-                  {t('wordHunt.stats.avgAttempts')}
-                </div>
-              </motion.div>
-            </div>
-
-            {/* Attempt distribution histogram */}
-            <div className="space-y-0.5">
-              <div className="text-[10px] font-bold text-gray-600 dark:text-gray-300 uppercase mb-1">
-                📈 {t('wordHunt.stats.distribution')}
+            {/* Collapsible header with summary */}
+            <button
+              onClick={() => setStatsExpanded(!statsExpanded)}
+              className="w-full flex items-center justify-between p-3 bg-white dark:bg-neo-navy-light hover:bg-gray-50 dark:hover:bg-neo-navy transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-sm">📊</span>
+                <span className="text-sm font-bold text-gray-700 dark:text-gray-200">
+                  {t('wordHunt.stats.title')}
+                </span>
               </div>
-              {[...Array(10)].map((_, i) => {
-                const attemptNum = i + 1;
-                const count = stats.attemptDistribution[attemptNum] || 0;
-                const maxCount = Math.max(...Object.values(stats.attemptDistribution));
-                const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
-                const isYourAttempt = result.solved && result.attemptsUsed === attemptNum;
-
-                return (
-                  <motion.div
-                    key={attemptNum}
-                    initial={{ x: -20, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ delay: 0.5 + i * 0.05 }}
-                    className="flex items-center gap-1.5"
-                  >
-                    <span className={cn(
-                      "text-[10px] font-bold w-4",
-                      isYourAttempt ? "text-neo-yellow" : "text-gray-600 dark:text-gray-400"
-                    )}>
-                      {attemptNum}
+              <div className="flex items-center gap-3">
+                {/* Summary badges shown when collapsed */}
+                <div className="flex items-center gap-2 text-xs">
+                  {stats.yourStats?.solved && stats.yourStats.percentile !== undefined && (
+                    <span className="px-2 py-0.5 bg-neo-purple/20 text-neo-purple dark:text-purple-300 rounded-full font-bold">
+                      {t('wordHunt.stats.top')} {stats.yourStats.percentile}%
                     </span>
-                    <div className="flex-1 h-4 bg-gray-200 dark:bg-gray-700 rounded-sm overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${percentage}%` }}
-                        transition={{ duration: 0.5, delay: 0.5 + i * 0.05 }}
-                        className={cn(
-                          "h-full flex items-center justify-end px-1 text-[10px] font-bold text-white",
-                          isYourAttempt
-                            ? "bg-gradient-to-r from-neo-yellow to-neo-orange"
-                            : "bg-gradient-to-r from-green-500 to-emerald-500"
-                        )}
-                      >
-                        {count > 0 && <span>{count}</span>}
-                      </motion.div>
-                    </div>
-                    {isYourAttempt && (
-                      <span className="text-[10px] font-bold text-neo-yellow">{t('common.you').toUpperCase()}</span>
-                    )}
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            {/* Survival mode stats - show when available */}
-            {(stats.avgLifeRemaining != null || stats.avgEfficiencyScore != null || stats.avgWordsDiscovered != null) && (
-              <div className="mt-4 pt-4 border-t-2 border-gray-200 dark:border-gray-700 space-y-2">
-                <div className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
-                  {t('wordHunt.results.survivalMetrics')}
+                  )}
+                  <span className="px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full font-bold">
+                    {stats.solveRate}% {t('wordHunt.stats.solved')}
+                  </span>
                 </div>
-                <div className="grid grid-cols-2 gap-3 text-center">
-                  {stats.avgLifeRemaining != null && (
-                    <div>
-                      <div className="text-xl font-black text-red-500">
-                        {stats.avgLifeRemaining.toFixed(0)}
-                      </div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">
-                        {t('wordHunt.results.avgLifeLeft')}
-                      </div>
-                    </div>
-                  )}
-                  {stats.avgWordsDiscovered != null && (
-                    <div>
-                      <div className="text-xl font-black text-blue-500">
-                        {stats.avgWordsDiscovered.toFixed(1)}
-                      </div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">
-                        {t('wordHunt.results.avgWordsFound')}
-                      </div>
-                    </div>
-                  )}
-                  {stats.avgEfficiencyScore != null && (
-                    <div>
-                      <div className="text-xl font-black text-purple-500">
-                        {stats.avgEfficiencyScore.toFixed(0)}
-                      </div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">
-                        {t('wordHunt.results.avgEfficiency')}
-                      </div>
-                    </div>
-                  )}
-                  {stats.maxEfficiencyScore != null && (
-                    <div>
-                      <div className="text-xl font-black text-yellow-500">
-                        {stats.maxEfficiencyScore}
-                      </div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">
-                        {t('wordHunt.results.bestEfficiency')}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Your efficiency percentile */}
-                {stats.yourStats?.efficiencyScore !== undefined && stats.yourStats?.efficiencyPercentile !== undefined && (
-                  <div className="mt-2 p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg border-2 border-purple-200 dark:border-purple-700">
-                    <div className="text-xs font-bold text-purple-700 dark:text-purple-300">
-                      {t('wordHunt.results.yourEfficiency').replace('{score}', String(stats.yourStats.efficiencyScore))}
-                    </div>
-                    <div className="text-xs text-purple-600 dark:text-purple-400">
-                      {t('wordHunt.results.efficiencyPercentile').replace('{percentile}', String(stats.yourStats.efficiencyPercentile))} 🎯
-                    </div>
-                  </div>
-                )}
+                <motion.div
+                  animate={{ rotate: statsExpanded ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ChevronDown className="w-5 h-5 text-gray-500" />
+                </motion.div>
               </div>
-            )}
+            </button>
+
+            {/* Collapsible content */}
+            <AnimatePresence>
+              {statsExpanded && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-4 pt-2 bg-white dark:bg-neo-navy-light border-t border-gray-200 dark:border-gray-700 space-y-4">
+                    {/* Stats summary grid */}
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 border border-blue-200 dark:border-blue-800">
+                        <div className="text-lg font-black text-blue-600 dark:text-blue-400">
+                          {stats.totalPlayers}
+                        </div>
+                        <div className="text-[10px] text-gray-600 dark:text-gray-400">
+                          {t('wordHunt.stats.totalPlayers')}
+                        </div>
+                      </div>
+                      <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-2 border border-green-200 dark:border-green-800">
+                        <div className="text-lg font-black text-green-600 dark:text-green-400">
+                          {stats.solveRate}%
+                        </div>
+                        <div className="text-[10px] text-gray-600 dark:text-gray-400">
+                          {t('wordHunt.stats.solveRate')}
+                        </div>
+                      </div>
+                      <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-2 border border-purple-200 dark:border-purple-800">
+                        <div className="text-lg font-black text-purple-600 dark:text-purple-400">
+                          {stats.avgAttemptsSolved?.toFixed(1) ?? 'N/A'}
+                        </div>
+                        <div className="text-[10px] text-gray-600 dark:text-gray-400">
+                          {t('wordHunt.stats.avgAttempts')}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Attempt distribution histogram */}
+                    <div className="space-y-0.5">
+                      <div className="text-[10px] font-bold text-gray-600 dark:text-gray-300 uppercase mb-1">
+                        📈 {t('wordHunt.stats.distribution')}
+                      </div>
+                      {[...Array(10)].map((_, i) => {
+                        const attemptNum = i + 1;
+                        const count = stats.attemptDistribution[attemptNum] || 0;
+                        const maxCount = Math.max(...Object.values(stats.attemptDistribution));
+                        const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
+                        const isYourAttempt = result.solved && result.attemptsUsed === attemptNum;
+
+                        return (
+                          <div
+                            key={attemptNum}
+                            className="flex items-center gap-1.5"
+                          >
+                            <span className={cn(
+                              "text-[10px] font-bold w-4",
+                              isYourAttempt ? "text-neo-yellow" : "text-gray-600 dark:text-gray-400"
+                            )}>
+                              {attemptNum}
+                            </span>
+                            <div className="flex-1 h-4 bg-gray-200 dark:bg-gray-700 rounded-sm overflow-hidden">
+                              <div
+                                style={{ width: `${percentage}%` }}
+                                className={cn(
+                                  "h-full flex items-center justify-end px-1 text-[10px] font-bold text-white transition-all duration-300",
+                                  isYourAttempt
+                                    ? "bg-gradient-to-r from-neo-yellow to-neo-orange"
+                                    : "bg-gradient-to-r from-green-500 to-emerald-500"
+                                )}
+                              >
+                                {count > 0 && <span>{count}</span>}
+                              </div>
+                            </div>
+                            {isYourAttempt && (
+                              <span className="text-[10px] font-bold text-neo-yellow">{t('common.you').toUpperCase()}</span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Survival mode stats - show when available */}
+                    {(stats.avgLifeRemaining != null || stats.avgEfficiencyScore != null || stats.avgWordsDiscovered != null) && (
+                      <div className="pt-3 border-t border-gray-200 dark:border-gray-700 space-y-2">
+                        <div className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
+                          {t('wordHunt.results.survivalMetrics')}
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-center">
+                          {stats.avgLifeRemaining != null && (
+                            <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                              <div className="text-lg font-black text-red-500">
+                                {stats.avgLifeRemaining.toFixed(0)}
+                              </div>
+                              <div className="text-[10px] text-gray-600 dark:text-gray-400">
+                                {t('wordHunt.results.avgLifeLeft')}
+                              </div>
+                            </div>
+                          )}
+                          {stats.avgWordsDiscovered != null && (
+                            <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                              <div className="text-lg font-black text-blue-500">
+                                {stats.avgWordsDiscovered.toFixed(1)}
+                              </div>
+                              <div className="text-[10px] text-gray-600 dark:text-gray-400">
+                                {t('wordHunt.results.avgWordsFound')}
+                              </div>
+                            </div>
+                          )}
+                          {stats.avgEfficiencyScore != null && (
+                            <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                              <div className="text-lg font-black text-purple-500">
+                                {stats.avgEfficiencyScore.toFixed(0)}
+                              </div>
+                              <div className="text-[10px] text-gray-600 dark:text-gray-400">
+                                {t('wordHunt.results.avgEfficiency')}
+                              </div>
+                            </div>
+                          )}
+                          {stats.maxEfficiencyScore != null && (
+                            <div className="p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                              <div className="text-lg font-black text-yellow-500">
+                                {stats.maxEfficiencyScore}
+                              </div>
+                              <div className="text-[10px] text-gray-600 dark:text-gray-400">
+                                {t('wordHunt.results.bestEfficiency')}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
 
@@ -1330,7 +1333,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             language={language}
             currentPlayerId={isAuthenticated && profile ? profile.id : null}
             currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
-            maxVisible={10}
+            maxVisible={5}
             t={t}
             gameType="wordHunt"
           />
@@ -1351,52 +1354,84 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           </p>
         </motion.div>
 
-        {/* Retry Challenge Section */}
+        {/* Secondary Actions - Collapsible */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.95 }}
-          className="pt-4 border-t border-gray-200 dark:border-gray-700"
+          transition={{ delay: 0.7 }}
+          className="rounded-neo border-2 border-gray-300 dark:border-gray-600 overflow-hidden"
         >
-          <div className="space-y-2">
-            <p className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center justify-center gap-2">
-              <RotateCcw className="w-4 h-4" />
-              {t('wordHunt.results.wantToRetry')}
-            </p>
-            <Button
-              onClick={handleRetryChallenge}
-              disabled={!canAfford(COIN_COSTS.DAILY_RETRY)}
-              className={cn(
-                "px-6 py-3 font-bold border-3 border-neo-black rounded-neo shadow-hard transition-all",
-                canAfford(COIN_COSTS.DAILY_RETRY)
-                  ? "bg-gradient-to-r from-neo-orange to-neo-yellow text-neo-black hover:-translate-y-0.5 hover:shadow-hard-lg"
-                  : "bg-gray-300 text-gray-600 cursor-not-allowed"
-              )}
-            >
-              <RotateCcw className="w-4 h-4 mr-2" />
-              {t('wordHunt.results.retryChallenge')}
-              <span className="ml-2 px-2 py-0.5 bg-neo-black/20 text-xs rounded-full font-black flex items-center gap-1">
-                <Coins className="w-3 h-3" />
-                {COIN_COSTS.DAILY_RETRY}
+          {/* Collapsible header */}
+          <button
+            onClick={() => setSecondaryActionsExpanded(!secondaryActionsExpanded)}
+            className="w-full flex items-center justify-between p-2.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <Settings className="w-4 h-4 text-gray-500" />
+              <span className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
+                {t('common.moreOptions')}
               </span>
-            </Button>
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-              {t('wordHunt.results.yourCoins')}{' '}
-              <span className="font-bold text-neo-yellow">{currentCoins}</span>
-              {!canAfford(COIN_COSTS.DAILY_RETRY) && (
-                <span className="text-red-500 ml-2">
-                  ({t('wordHunt.results.needMoreCoins').replace('{amount}', String(COIN_COSTS.DAILY_RETRY - currentCoins))})
-                </span>
-              )}
             </div>
-            <p className="text-[10px] text-gray-500 dark:text-gray-400">
-              {t('wordHunt.results.retryExplanation')}
-            </p>
-          </div>
-        </motion.div>
+            <motion.div
+              animate={{ rotate: secondaryActionsExpanded ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ChevronDown className="w-4 h-4 text-gray-500" />
+            </motion.div>
+          </button>
 
-        {/* Try Another Language Section */}
-        <TryAnotherLanguage currentLanguage={language} />
+          {/* Collapsible content */}
+          <AnimatePresence>
+            {secondaryActionsExpanded && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <div className="p-3 bg-white dark:bg-gray-900 space-y-4">
+                  {/* Retry Challenge */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                      <RotateCcw className="w-4 h-4" />
+                      {t('wordHunt.results.wantToRetry')}
+                    </p>
+                    <Button
+                      onClick={handleRetryChallenge}
+                      disabled={!canAfford(COIN_COSTS.DAILY_RETRY)}
+                      className={cn(
+                        "w-full px-4 py-2.5 font-bold border-2 border-neo-black rounded-neo shadow-hard-sm transition-all text-sm",
+                        canAfford(COIN_COSTS.DAILY_RETRY)
+                          ? "bg-gradient-to-r from-neo-orange to-neo-yellow text-neo-black hover:-translate-y-0.5"
+                          : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                      )}
+                    >
+                      <RotateCcw className="w-4 h-4 mr-2" />
+                      {t('wordHunt.results.retryChallenge')}
+                      <span className="ml-2 px-2 py-0.5 bg-neo-black/20 text-xs rounded-full font-black flex items-center gap-1">
+                        <Coins className="w-3 h-3" />
+                        {COIN_COSTS.DAILY_RETRY}
+                      </span>
+                    </Button>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                      {t('wordHunt.results.yourCoins')}{' '}
+                      <span className="font-bold text-neo-yellow">{currentCoins}</span>
+                      {!canAfford(COIN_COSTS.DAILY_RETRY) && (
+                        <span className="text-red-500 ml-1">
+                          ({t('wordHunt.results.needMoreCoins').replace('{amount}', String(COIN_COSTS.DAILY_RETRY - currentCoins))})
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Try Another Language - inline version */}
+                  <TryAnotherLanguage currentLanguage={language} />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </div>
 
       {/* Share panel for browsers without native share */}

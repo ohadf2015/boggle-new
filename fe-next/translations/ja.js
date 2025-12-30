@@ -149,6 +149,7 @@ const ja = {
     "join": "参加",
     "showLess": "表示を減らす",
     "showMore": "もっと見る",
+    "moreOptions": "その他のオプション",
     "or": "または",
     "closeMenu": "メニューを閉じる",
     "openMenu": "メニューを開く",
@@ -2435,7 +2436,9 @@ const ja = {
       "firstToSolve": "🌟 今日最初のクリア！",
       "youSolved": "解決しました！",
       "youFailed": "今回は解決できませんでした",
-      "attemptsUsed": "使用した試行回数：{count}"
+      "attemptsUsed": "使用した試行回数：{count}",
+      "top": "トップ",
+      "solved": "解決"
     },
     "survival": {
       "lifePoints": "ライフ",

@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Settings, Play, Crown, Flame, Bot, Book, Trophy, Calendar, Target, Check } from 'lucide-react';
+import { ArrowLeft, Settings, Play, Crown, Flame, Bot, Book, Trophy, Calendar, Target, Check, Sparkles, Zap, Skull } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,8 +14,18 @@ import { PRESETS, type PresetConfig, getPresetsForMode, getMinWordLength } from 
 import { getHighScoreForPreset } from './highScoreManager';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import LandscapeIndicator from '@/components/LandscapeIndicator';
-import type { Language } from '@/shared/types/game';
+import type { Language, DifficultyLevel } from '@/shared/types/game';
 import type { SinglePlayerMode } from './SinglePlayerView';
+
+// Difficulty icon configuration for compact visual representation
+const DIFFICULTY_ICON_CONFIG: Record<DifficultyLevel, {
+  Icon: typeof Sparkles;
+  bgColor: string;
+}> = {
+  EASY: { Icon: Sparkles, bgColor: 'bg-neo-lime' },
+  MEDIUM: { Icon: Zap, bgColor: 'bg-neo-yellow' },
+  HARD: { Icon: Skull, bgColor: 'bg-neo-red' },
+};
 
 interface DailyInfo {
   puzzleNumber: number;
@@ -208,10 +218,15 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           </div>
         )}
 
-        {/* Grid Size (PROMINENT) */}
+        {/* Grid Size with Difficulty Icon (PROMINENT) */}
         {!isDaily && (
-          <div className="text-xl sm:text-2xl font-black text-neo-black dark:text-neo-white mb-0.5">
-            {difficultyConfig.rows}×{difficultyConfig.cols}
+          <div className="flex flex-col items-center gap-0.5 mb-0.5">
+            {React.createElement(DIFFICULTY_ICON_CONFIG[preset.settings.difficulty].Icon, {
+              className: 'w-5 h-5 sm:w-6 sm:h-6 text-neo-black dark:text-neo-white'
+            })}
+            <div className="text-lg sm:text-xl font-black text-neo-black dark:text-neo-white">
+              {difficultyConfig.rows}×{difficultyConfig.cols}
+            </div>
           </div>
         )}
 
@@ -220,13 +235,6 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center mb-0.5">
             <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-neo-black" />
           </div>
-        )}
-
-        {/* Difficulty Name */}
-        {!isDaily && (
-          <h3 className="text-xs sm:text-sm font-bold uppercase text-neo-black dark:text-neo-white leading-tight">
-            {t(difficultyConfig.nameKey) || preset.settings.difficulty}
-          </h3>
         )}
 
         {/* Daily Name */}

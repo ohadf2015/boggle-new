@@ -149,6 +149,7 @@ const he = {
     "join": "הצטרף",
     "showLess": "הצג פחות",
     "showMore": "הצג עוד",
+    "moreOptions": "אפשרויות נוספות",
     "or": "או",
     "closeMenu": "סגור תפריט",
     "openMenu": "פתח תפריט",
@@ -2437,7 +2438,9 @@ const he = {
       "firstToSolve": "🌟 הראשונים לפתור היום!",
       "youSolved": "פתרתם את החידה!",
       "youFailed": "לא הצלחתם לפתור הפעם",
-      "attemptsUsed": "ניסיונות שהושקעו: {count}"
+      "attemptsUsed": "ניסיונות שהושקעו: {count}",
+      "top": "טופ",
+      "solved": "פתרו"
     },
     "survival": {
       "lifePoints": "חיים",
