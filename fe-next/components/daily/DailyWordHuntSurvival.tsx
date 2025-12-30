@@ -295,8 +295,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     setFormedWord(word);
     setLetterCount(count);
     setCurrentFeedback('');
-    closeToast();
-  }, [closeToast]);
+    // Don't close toast here - let it display for full duration even while forming next word
+  }, []);
 
   // Handle word submission (could be target attempt OR grid word discovery)
   const handleWordSubmit = useCallback((word: string) => {
@@ -395,10 +395,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     setLatestAttemptFeedback(feedback);
     setShowFeedbackOverlay(true);
 
-    // Hide feedback overlay after 5 seconds (return to hint display)
+    // Hide feedback overlay after 3 seconds (return to hint display)
     feedbackTimeoutRef.current = setTimeout(() => {
       setShowFeedbackOverlay(false);
-    }, 5000);
+    }, 3000);
 
     // Check if correct
     const won = isTargetWordFound(feedback);
