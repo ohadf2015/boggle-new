@@ -36,7 +36,7 @@ import { logGameStart, logGameEnd, formatWordsForLogging } from '@/utils/gameLog
 
 const MAX_ATTEMPTS = 10;
 const INITIAL_LIFE = 100;
-const LIFE_DRAIN_RATE = 1; // points per second (slower drain for better gameplay)
+const LIFE_DRAIN_RATE = 2; // points per second
 const INVALID_WORD_PENALTY = 5; // life points lost for invalid submissions
 
 interface DailyWordHuntSurvivalProps {
