@@ -329,6 +329,7 @@ export default function AdminDashboard() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           puzzleDate: today,
           language: retryLinkLanguage,

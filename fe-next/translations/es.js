@@ -2432,6 +2432,7 @@ const es = {
       "notOnBoard": "⚠️ No se puede formar en el tablero",
       "notOnBoardPenalty": "⚠️ No en el tablero -5 ❤️",
       "notFormablePenalty": "⚠️ No en el tablero -5 ❤️",
+      "notInDictionary": "📖 No es una palabra -4 ❤️",
       "invalidWord": "❌ No es una palabra válida",
       "validWord": "✓ ¡Palabra encontrada!",
       "targetAttempt": "🎯 ¡Sigue intentando!",

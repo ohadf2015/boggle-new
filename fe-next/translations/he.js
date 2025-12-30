@@ -2436,6 +2436,7 @@ const he = {
       "notOnBoard": "⚠️ לא ניתן לבנות את זה על הלוח",
       "notOnBoardPenalty": "⚠️ לא על הלוח -5 ❤️",
       "notFormablePenalty": "⚠️ לא על הלוח -5 ❤️",
+      "notInDictionary": "📖 לא מילה -4 ❤️",
       "invalidWord": "❌ מילה לא תקינה",
       "validWord": "✓ מילה נמצאה!",
       "targetAttempt": "🎯 המשיכו!",

@@ -2434,6 +2434,7 @@ const ja = {
       "notOnBoard": "⚠️ ボード上でこれを作成できません",
       "notOnBoardPenalty": "⚠️ ボードにない -5 ❤️",
       "notFormablePenalty": "⚠️ ボードにない -5 ❤️",
+      "notInDictionary": "📖 単語ではない -4 ❤️",
       "invalidWord": "❌ 有効な単語ではありません",
       "validWord": "✓ 単語が見つかりました！",
       "targetAttempt": "🎯 頑張って！",

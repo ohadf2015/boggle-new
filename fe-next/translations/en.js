@@ -2441,6 +2441,7 @@ const en = {
       "notOnBoard": "⚠️ Can't form this on the board",
       "notOnBoardPenalty": "⚠️ Not on board -5 ❤️",
       "notFormablePenalty": "⚠️ Not on board -5 ❤️",
+      "notInDictionary": "📖 Not a word -4 ❤️",
       "invalidWord": "❌ Not a valid word",
       "validWord": "✓ Word found!",
       "targetAttempt": "🎯 Keep going!",

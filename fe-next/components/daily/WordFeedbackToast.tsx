@@ -6,13 +6,14 @@ import { Check, X, AlertTriangle, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type FeedbackType =
-  | 'valid-word'      // Green - word found on board
-  | 'invalid-word'    // Red - not a valid word
-  | 'not-on-board'    // Orange - valid but not on this board
-  | 'too-short'       // Orange - below minimum length
-  | 'duplicate'       // Yellow - already found
-  | 'target-attempt'  // Blue - attempted target word
-  | 'target-found';   // Rainbow - found the target!
+  | 'valid-word'        // Green - word found on board
+  | 'invalid-word'      // Red - not a valid word
+  | 'not-on-board'      // Orange - valid but not on this board
+  | 'not-in-dictionary' // Red - on board but not in dictionary
+  | 'too-short'         // Orange - below minimum length
+  | 'duplicate'         // Yellow - already found
+  | 'target-attempt'    // Blue - attempted target word
+  | 'target-found';     // Rainbow - found the target!
 
 export interface WordFeedbackToastProps {
   type: FeedbackType | null;
@@ -48,6 +49,13 @@ const FEEDBACK_STYLES: Record<FeedbackType, {
     border: 'border-orange-700',
     icon: <AlertTriangle className="w-5 h-5" />,
     animation: 'animate-neo-wiggle',
+  },
+  'not-in-dictionary': {
+    bg: 'bg-red-500',
+    text: 'text-white',
+    border: 'border-red-700',
+    icon: <X className="w-5 h-5" />,
+    animation: 'animate-neo-shake',
   },
   'too-short': {
     bg: 'bg-orange-500',

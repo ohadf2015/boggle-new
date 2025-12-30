@@ -4,11 +4,34 @@
  */
 
 import express, { Request, Response, Router } from 'express';
- 
+
 const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
 import logger from '../utils/logger';
 import { generateDailyPuzzle, generateDailyPuzzleAsync, getPuzzleNumber } from '../../utils/dailyChallenge';
+import { isDictionaryWord } from '../dictionary';
+import { isWordCommunityValid } from '../modules/communityWordManager';
 import type { Language } from '../../types';
+
+/**
+ * Check if a word is valid for daily challenge submission.
+ * Valid means: in dictionary OR community-validated (6+ net votes).
+ * Pending words (awaiting community validation) are NOT valid.
+ */
+function isWordValidForDailyChallenge(word: string, language: Language): boolean {
+  // Check static dictionary first
+  const inDictionary = isDictionaryWord(word, language);
+  if (inDictionary === true) {
+    return true;
+  }
+
+  // Check community-validated words (6+ net votes)
+  if (isWordCommunityValid(word, language)) {
+    return true;
+  }
+
+  // Pending words and unknown words are NOT valid
+  return false;
+}
 
 const router: Router = express.Router();
 
@@ -568,6 +591,33 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
         if (lastAttempt.word.toUpperCase() !== expectedTargetWord) {
           logger.warn('API', `Word Hunt validation failed: solved=true but last attempt "${lastAttempt.word}" doesn't match target "${expectedTargetWord}"`);
           res.status(400).json({ error: 'Invalid solve claim' });
+          return;
+        }
+      }
+
+      // Validate target word is in dictionary or community-validated
+      if (!isWordValidForDailyChallenge(expectedTargetWord, language as Language)) {
+        logger.warn('API', `Word Hunt validation failed: target word "${expectedTargetWord}" is not valid for language ${language}`);
+        res.status(400).json({ error: 'Invalid target word - not in dictionary' });
+        return;
+      }
+
+      // Validate all attempt words are in dictionary or community-validated
+      // Pending words (awaiting validation) are rejected
+      if (attemptWords && attemptWords.length > 0) {
+        const invalidWords: string[] = [];
+        for (const attempt of attemptWords) {
+          const wordUpper = attempt.word.toUpperCase();
+          if (!isWordValidForDailyChallenge(wordUpper, language as Language)) {
+            invalidWords.push(wordUpper);
+          }
+        }
+        if (invalidWords.length > 0) {
+          logger.warn('API', `Word Hunt validation failed: invalid words submitted: ${invalidWords.join(', ')} for language ${language}`);
+          res.status(400).json({
+            error: 'Invalid words submitted - not in dictionary',
+            invalidWords
+          });
           return;
         }
       }

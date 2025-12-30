@@ -38,6 +38,7 @@ const MAX_ATTEMPTS = 10;
 const INITIAL_LIFE = 100;
 const LIFE_DRAIN_RATE = 2; // points per second
 const INVALID_WORD_PENALTY = 5; // life points lost for invalid submissions
+const NOT_IN_DICTIONARY_PENALTY = 4; // life points lost for words not in dictionary
 
 interface DailyWordHuntSurvivalProps {
   grid: LetterGrid;
@@ -259,6 +260,24 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   }, []);
 
 
+  // Validate word against dictionary API
+  const validateWordInDictionary = useCallback(async (word: string): Promise<boolean> => {
+    try {
+      const response = await fetch('/api/dictionary/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ word: word.toLowerCase(), language }),
+      });
+      const data = await response.json();
+      // Valid if source is dictionary, community, or community_positive
+      return data.isValid === true;
+    } catch (error) {
+      console.error('Dictionary validation error:', error);
+      // On error, allow the word (fail open for better UX)
+      return true;
+    }
+  }, [language]);
+
   // Show toast feedback
   const showToast = useCallback((type: FeedbackType, message: string) => {
     setFeedbackType(type);
@@ -409,7 +428,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   }, [attempts, playWordAcceptedSound, t]);
 
   // Handle grid word discovery
-  const handleWordDiscovery = useCallback((word: string) => {
+  const handleWordDiscovery = useCallback(async (word: string) => {
     // Check minimum length (2+ letters - Japanese uses 2-character kanji compounds)
     if (word.length < 2) {
       showToast('too-short', t('wordHunt.feedback.tooShort') || '📏 Minimum 2 letters');
@@ -427,6 +446,15 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       // Penalize for invalid word submission
       setLifePoints(prev => Math.max(0, prev - INVALID_WORD_PENALTY));
       showToast('not-on-board', t('wordHunt.feedback.notOnBoardPenalty') || `⚠️ Not on board -${INVALID_WORD_PENALTY} ❤️`);
+      return;
+    }
+
+    // Validate word against dictionary - only valid dictionary words give rewards
+    const isValidWord = await validateWordInDictionary(word);
+    if (!isValidWord) {
+      // Word is on board but not in dictionary - penalize
+      setLifePoints(prev => Math.max(0, prev - NOT_IN_DICTIONARY_PENALTY));
+      showToast('not-in-dictionary', t('wordHunt.feedback.notInDictionary') || `📖 Not a word -${NOT_IN_DICTIONARY_PENALTY} ❤️`);
       return;
     }
 
@@ -453,7 +481,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     // Show success feedback
     showToast('valid-word', `+${lifeGained} ❤️ ${tokensGained > 0 ? `+${tokensGained} 🪙` : ''}`);
     setCurrentFeedback(`+${lifeGained} ❤️ ${tokensGained > 0 ? `+${tokensGained} 🪙` : ''}`);
-  }, [discoveredWords, grid, language, playWordAcceptedSound, showToast, t]);
+  }, [discoveredWords, grid, language, playWordAcceptedSound, showToast, t, validateWordInDictionary]);
 
   // Handle game over
   const handleGameOver = useCallback(async (won: boolean, finalAttempts?: TargetAttempt[]) => {

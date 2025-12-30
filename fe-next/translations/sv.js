@@ -2435,6 +2435,7 @@ const sv = {
       "notOnBoard": "⚠️ Kan inte bilda detta på brädet",
       "notOnBoardPenalty": "⚠️ Inte på brädet -5 ❤️",
       "notFormablePenalty": "⚠️ Inte på brädet -5 ❤️",
+      "notInDictionary": "📖 Inte ett ord -4 ❤️",
       "invalidWord": "❌ Inte ett giltigt ord",
       "validWord": "✓ Ord hittades!",
       "targetAttempt": "🎯 Fortsätt!",
