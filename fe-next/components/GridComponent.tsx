@@ -385,6 +385,7 @@ const GridComponent = memo<GridComponentProps>(({
         <div
           ref={gridRef}
           dir="ltr"
+          data-tutorial="grid"
           className={cn(
             "grid touch-none select-none absolute rounded-neo",
             gridDimensions.gap,

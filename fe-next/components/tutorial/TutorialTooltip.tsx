@@ -126,7 +126,7 @@ const TutorialTooltip: React.FC<TutorialTooltipProps> = ({
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9, y: 20 }}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-      className="fixed z-[10001] w-[320px] max-w-[90vw]"
+      className="fixed z-[10001] w-[320px] max-w-[90vw] pointer-events-auto"
       style={tooltipStyle}
       onClick={(e) => e.stopPropagation()}
     >
