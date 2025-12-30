@@ -476,6 +476,7 @@ interface WordHuntStatsResponse {
     solved: boolean;
     attemptsUsed: number;
     percentile: number;
+    rank?: number;
     efficiencyScore?: number;
     efficiencyPercentile?: number;
   };
@@ -809,45 +810,59 @@ router.get('/word-hunt/stats/:date/:language', async (req: Request<WordHuntStats
       const { data: yourAttempt } = await yourAttemptQuery.single();
 
       if (yourAttempt && yourAttempt.solved && stats) {
-        // Calculate percentile (better than X% of players)
-        let betterThan = 0;
-        const totalSolved = stats.solved_count;
+        // Get player's rank from leaderboard
+        let rankQuery = supabase
+          .from('daily_word_hunt_leaderboard')
+          .select('rank_position')
+          .eq('puzzle_date', date)
+          .eq('language', language);
 
-        if (totalSolved > 0) {
-          // Count how many players used more attempts
-          for (let i = yourAttempt.attempts_used + 1; i <= 10; i++) {
-            betterThan += stats[`solved_in_${i}`] || 0;
-          }
-          // Add failed attempts
-          betterThan += stats.failed_count || 0;
-
-          const percentile = Math.round((betterThan / stats.total_players) * 100);
-
-          // Calculate efficiency percentile if efficiency_score exists
-          let efficiencyPercentile: number | undefined;
-          if (yourAttempt.efficiency_score !== undefined && yourAttempt.efficiency_score !== null) {
-            // Count how many solved players have lower efficiency score
-            const { count: worseEfficiency } = await supabase
-              .from('daily_word_hunt_attempts')
-              .select('*', { count: 'exact', head: true })
-              .eq('puzzle_date', date)
-              .eq('language', language)
-              .eq('solved', true)
-              .lt('efficiency_score', yourAttempt.efficiency_score);
-
-            if (worseEfficiency !== null && totalSolved > 0) {
-              efficiencyPercentile = Math.round((worseEfficiency / totalSolved) * 100);
-            }
-          }
-
-          response.yourStats = {
-            solved: yourAttempt.solved,
-            attemptsUsed: yourAttempt.attempts_used,
-            percentile,
-            efficiencyScore: yourAttempt.efficiency_score,
-            efficiencyPercentile
-          };
+        if (playerId) {
+          rankQuery = rankQuery.eq('player_id', playerId);
+        } else {
+          rankQuery = rankQuery.eq('guest_fingerprint', guestFingerprint);
         }
+
+        const { data: rankData } = await rankQuery.single();
+        const rank = rankData?.rank_position;
+
+        // Calculate percentile based on rank position
+        // Rank 1 of 10 players = better than 90% (9/10)
+        // Rank 10 of 10 players = better than 0% (0/10)
+        let percentile = 0;
+        if (rank && stats.total_players > 0) {
+          // Players beaten = total players - your rank
+          // (rank 1 beats total-1 players, rank 2 beats total-2, etc.)
+          const playersBehindYou = stats.total_players - rank;
+          percentile = Math.round((playersBehindYou / stats.total_players) * 100);
+        }
+
+        // Calculate efficiency percentile if efficiency_score exists
+        let efficiencyPercentile: number | undefined;
+        const totalSolved = stats.solved_count;
+        if (yourAttempt.efficiency_score !== undefined && yourAttempt.efficiency_score !== null) {
+          // Count how many solved players have lower efficiency score
+          const { count: worseEfficiency } = await supabase
+            .from('daily_word_hunt_attempts')
+            .select('*', { count: 'exact', head: true })
+            .eq('puzzle_date', date)
+            .eq('language', language)
+            .eq('solved', true)
+            .lt('efficiency_score', yourAttempt.efficiency_score);
+
+          if (worseEfficiency !== null && totalSolved > 0) {
+            efficiencyPercentile = Math.round((worseEfficiency / totalSolved) * 100);
+          }
+        }
+
+        response.yourStats = {
+          solved: yourAttempt.solved,
+          attemptsUsed: yourAttempt.attempts_used,
+          percentile,
+          rank,
+          efficiencyScore: yourAttempt.efficiency_score,
+          efficiencyPercentile
+        };
       } else if (yourAttempt) {
         response.yourStats = {
           solved: yourAttempt.solved,
