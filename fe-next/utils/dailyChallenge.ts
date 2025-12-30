@@ -1014,37 +1014,39 @@ ${dailyUrl}`;
 }
 
 /**
- * Generate Word Hunt share text (Wordle-style emoji grid)
- * Shows attempt feedback patterns without spoiling the target word
- * Clean, minimal design with single link for social sharing
+ * Generate Word Hunt share text
+ * Clean, simple, and engaging - no emoji grid, just the result
  */
 export function generateWordHuntShareableResult(result: WordHuntResult, siteUrl?: string): string {
-  // Import feedback emoji function
-  const { feedbackToEmoji } = require('./wordHuntFeedback');
-
-  // Build emoji grid - one row per attempt
-  const emojiGrid = result.attempts
-    .map(attempt => feedbackToEmoji(attempt.feedback))
-    .join('\n');
-
-  // Format result line (clean, no emojis)
-  const resultLine = result.solved
-    ? `${result.attemptsUsed}/10`
-    : `X/10`;
-
-  // Format streak if > 1 (no emoji, clean text)
-  const streakText = result.streakDays > 1 ? `${result.streakDays} day streak\n` : '';
-
   // Build simple challenge URL - single link to the daily page
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://lexiclash.live';
   const challengeUrl = `${baseUrl}/${result.language}/daily`;
 
-  // Build the shareable text - clean and minimal
-  return `LexiClash Word Hunt #${result.puzzleNumber}
+  // Format the main result message
+  const resultEmoji = result.solved ? '🎯' : '💪';
+  const resultText = result.solved
+    ? `Solved in ${result.attemptsUsed}/10 attempts!`
+    : `Tried my best! X/10`;
 
-${emojiGrid}
-${resultLine}
+  // Fun performance message based on attempts
+  let performanceMsg = '';
+  if (result.solved) {
+    if (result.attemptsUsed <= 2) performanceMsg = '🔥 Word Wizard!';
+    else if (result.attemptsUsed <= 4) performanceMsg = '⚡ Crushed it!';
+    else if (result.attemptsUsed <= 6) performanceMsg = '✨ Nice one!';
+    else if (result.attemptsUsed <= 8) performanceMsg = '💫 Made it!';
+    else performanceMsg = '🎉 Phew!';
+  }
+
+  // Format streak if > 1
+  const streakText = result.streakDays > 1 ? `🔥 ${result.streakDays} day streak!\n` : '';
+
+  // Build the shareable text - simple and engaging
+  return `${resultEmoji} LexiClash Word Hunt #${result.puzzleNumber}
+
+${resultText}${performanceMsg ? ` ${performanceMsg}` : ''}
 ${streakText}
+Can you beat me? 🎮
 ${challengeUrl}`;
 }
 

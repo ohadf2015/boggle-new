@@ -5,31 +5,23 @@ export const runtime = 'edge';
 
 /**
  * Dynamic OG Image for Word Hunt Daily Challenge
- * Dark neo-brutalist style
+ * Full-bleed dark design with large, visible text
  */
 
 const CHALLENGE: Record<string, string> = {
-  en: 'Beat my score?',
-  he: '?יתוא חצנת', // Reversed for Satori RTL rendering
-  sv: 'Slå mitt resultat?',
-  ja: '挑戦する？',
-  es: '¿Puedes superarlo?',
+  en: 'Can you beat me?',
+  he: '?יתוא חצנל לוכי', // "יכול לנצח אותי?" reversed for Satori
+  sv: 'Kan du slå mig?',
+  ja: '勝てる？',
+  es: '¿Puedes ganarme?',
 };
 
-const SOLVED_IN: Record<string, string> = {
-  en: 'Solved in',
-  he: '!תונויסינ', // "נסיונות!" reversed
-  sv: 'Löst på',
-  ja: '回で解決',
-  es: 'Resuelto en',
-};
-
-const FAILED: Record<string, string> = {
-  en: 'This one got me!',
-  he: '!יתוא ספת הז', // "זה תפס אותי!" reversed
-  sv: 'Den tog mig!',
-  ja: 'やられた！',
-  es: '¡Me atrapó!',
+const PERFORMANCE_MSG: Record<string, Record<string, string>> = {
+  en: { wizard: 'Word Wizard!', crushed: 'Crushed it!', nice: 'Nice one!', made: 'Made it!', phew: 'Phew!', failed: 'This one got me!' },
+  he: { wizard: '!םילימ ףשא', crushed: '!הז תא יתצרמ', nice: '!הפי', made: '!יתחלצה', phew: '!ואופ', failed: '!יתוא ספת הז' },
+  sv: { wizard: 'Ordmästare!', crushed: 'Krossade det!', nice: 'Snyggt!', made: 'Klarade det!', phew: 'Puh!', failed: 'Den tog mig!' },
+  ja: { wizard: '言葉の達人!', crushed: '完璧!', nice: 'いいね!', made: 'セーフ!', phew: 'ふぅ!', failed: 'やられた!' },
+  es: { wizard: '¡Mago de palabras!', crushed: '¡Lo aplasté!', nice: '¡Bien hecho!', made: '¡Lo logré!', phew: '¡Uf!', failed: '¡Esta me ganó!' },
 };
 
 // Check if string contains Hebrew characters and reverse it for Satori
@@ -50,6 +42,24 @@ function getAccentColor(solved: boolean, attempts: number): string {
   return '#ec4899';
 }
 
+function getPerformanceKey(solved: boolean, attempts: number): string {
+  if (!solved) return 'failed';
+  if (attempts <= 2) return 'wizard';
+  if (attempts <= 4) return 'crushed';
+  if (attempts <= 6) return 'nice';
+  if (attempts <= 8) return 'made';
+  return 'phew';
+}
+
+function getPerformanceEmoji(solved: boolean, attempts: number): string {
+  if (!solved) return '💪';
+  if (attempts <= 2) return '🔥';
+  if (attempts <= 4) return '⚡';
+  if (attempts <= 6) return '✨';
+  if (attempts <= 8) return '💫';
+  return '🎉';
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -58,11 +68,13 @@ export async function GET(request: NextRequest) {
     const attempts = parseInt(searchParams.get('attempts') || '0');
     const displayName = searchParams.get('displayName') || 'Player';
     const avatarEmoji = searchParams.get('avatarEmoji') || '🎯';
+    const puzzleNumber = searchParams.get('puzzleNumber') || '';
     const locale = searchParams.get('locale') || 'en';
 
     const challenge = CHALLENGE[locale] || CHALLENGE.en;
-    const solvedInText = SOLVED_IN[locale] || SOLVED_IN.en;
-    const failedText = FAILED[locale] || FAILED.en;
+    const performanceKey = getPerformanceKey(solved, attempts);
+    const performanceMsg = (PERFORMANCE_MSG[locale] || PERFORMANCE_MSG.en)[performanceKey];
+    const performanceEmoji = getPerformanceEmoji(solved, attempts);
     const accent = getAccentColor(solved, attempts);
     const isRTL = locale === 'he';
 
@@ -76,103 +88,135 @@ export async function GET(request: NextRequest) {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            background: '#0f0f14',
+            background: `linear-gradient(135deg, #0f0f14 0%, #1a1a2e 50%, #0f0f14 100%)`,
             fontFamily: 'system-ui, -apple-system, sans-serif',
+            padding: '40px',
           }}
         >
-          {/* Main card */}
+          {/* Top: Brand + Puzzle Number */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '16px',
+              marginBottom: '20px',
+            }}
+          >
+            <span style={{ fontSize: '40px' }}>🎮</span>
+            <span style={{ fontSize: '36px', fontWeight: 900, color: '#fff', letterSpacing: '3px' }}>
+              LEXICLASH
+            </span>
+            {puzzleNumber && (
+              <span style={{ fontSize: '28px', fontWeight: 700, color: '#6b7280' }}>
+                #{puzzleNumber}
+              </span>
+            )}
+          </div>
+
+          {/* Player info - large and prominent */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '24px',
+              marginBottom: '24px',
+            }}
+          >
+            <span style={{ fontSize: '80px' }}>{avatarEmoji}</span>
+            <span style={{
+              fontSize: '64px',
+              fontWeight: 900,
+              color: '#fff',
+              maxWidth: '600px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}>
+              {reverseIfHebrew(displayName)}
+            </span>
+          </div>
+
+          {/* Main result - HUGE and prominent */}
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              background: '#1a1a24',
-              padding: '48px 80px',
-              border: `6px solid ${accent}`,
-              boxShadow: `12px 12px 0px ${accent}`,
+              justifyContent: 'center',
+              background: `linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%)`,
+              borderRadius: '24px',
+              padding: '32px 80px',
+              marginBottom: '24px',
             }}
           >
-            {/* Brand */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                marginBottom: '32px',
-              }}
-            >
-              <span style={{ fontSize: '24px', fontWeight: 900, color: '#fff', letterSpacing: '2px' }}>LEXICLASH</span>
-            </div>
-
-            {/* Player */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '20px',
-                marginBottom: '32px',
-              }}
-            >
-              <span style={{ fontSize: '56px' }}>{avatarEmoji}</span>
-              <span style={{ fontSize: '48px', fontWeight: 900, color: '#fff' }}>{reverseIfHebrew(displayName)}</span>
-            </div>
-
-            {/* Score */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '8px',
-              }}
-            >
-              {solved ? (
-                <>
-                  <span style={{ fontSize: '36px', fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase' }}>
-                    {solvedInText}
+            {solved ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {/* Big attempt number */}
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '16px' }}>
+                  <span
+                    style={{
+                      fontSize: '220px',
+                      fontWeight: 900,
+                      color: accent,
+                      lineHeight: 0.9,
+                      letterSpacing: '-12px',
+                    }}
+                  >
+                    {attempts}
                   </span>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                    <span
-                      style={{
-                        fontSize: '180px',
-                        fontWeight: 900,
-                        color: accent,
-                        lineHeight: 1,
-                        letterSpacing: '-10px',
-                      }}
-                    >
-                      {attempts}
-                    </span>
-                    <span style={{ fontSize: '48px', fontWeight: 900, color: '#9ca3af' }}>
-                      {attempts === 1 ? '🎯' : '✨'}
-                    </span>
-                  </div>
-                </>
-              ) : (
+                  <span style={{ fontSize: '80px', fontWeight: 900, color: '#4b5563' }}>/10</span>
+                </div>
+                {/* Performance message with emoji */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: '8px' }}>
+                  <span style={{ fontSize: '56px' }}>{performanceEmoji}</span>
+                  <span style={{ fontSize: '48px', fontWeight: 800, color: accent }}>
+                    {performanceMsg}
+                  </span>
+                  <span style={{ fontSize: '56px' }}>{performanceEmoji}</span>
+                </div>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <span style={{ fontSize: '160px' }}>💪</span>
                 <span
                   style={{
-                    fontSize: '72px',
+                    fontSize: '56px',
                     fontWeight: 900,
                     color: accent,
-                    textTransform: 'uppercase',
+                    marginTop: '16px',
                   }}
                 >
-                  {failedText}
+                  {performanceMsg}
                 </span>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
-          {/* Bottom CTA */}
+          {/* Bottom CTA - full width bar */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
-              marginTop: '32px',
-              padding: '16px 40px',
+              justifyContent: 'center',
+              gap: '16px',
+              padding: '20px 60px',
               background: accent,
+              borderRadius: '16px',
             }}
           >
-            <span style={{ fontSize: '28px', fontWeight: 900, color: '#000', letterSpacing: isRTL ? '0' : '2px', direction: isRTL ? 'rtl' : 'ltr' }}>{challenge}</span>
+            <span style={{ fontSize: '48px' }}>🎯</span>
+            <span style={{
+              fontSize: '40px',
+              fontWeight: 900,
+              color: '#000',
+              letterSpacing: isRTL ? '0' : '2px',
+              direction: isRTL ? 'rtl' : 'ltr'
+            }}>
+              {challenge}
+            </span>
+            <span style={{ fontSize: '48px' }}>🎯</span>
           </div>
         </div>
       ),
