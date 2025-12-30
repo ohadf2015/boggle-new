@@ -318,12 +318,6 @@ export default function AdminDashboard() {
 
   // Generate a retry link for the daily challenge
   const generateRetryLink = async () => {
-    const token = await getAuthToken();
-    if (!token) {
-      toast.error('Authentication required');
-      return;
-    }
-
     setRetryLinkLoading(true);
     setGeneratedRetryLink(null);
     setRetryLinkExpiry(null);
@@ -334,7 +328,6 @@ export default function AdminDashboard() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           puzzleDate: today,
