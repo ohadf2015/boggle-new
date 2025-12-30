@@ -55,17 +55,20 @@ const MusicControls: React.FC = memo(() => {
     }
   }, [hapticsEnabled]);
 
+  // Responsive icon class for consistent sizing with button
+  const iconClass = "w-5 h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7 2xl:w-8 2xl:h-8";
+
   // Memoized volume icon
   const volumeIcon = useMemo(() => {
     // Return consistent icon during SSR to prevent hydration mismatch
-    if (!hasMounted) return <Volume2 size={20} strokeWidth={2.5} aria-hidden="true" />;
+    if (!hasMounted) return <Volume2 className={iconClass} strokeWidth={2.5} aria-hidden="true" />;
 
     // Show muted if both are muted
-    if ((isMuted || volume === 0) && (sfxMuted || sfxVolume === 0)) return <VolumeX size={20} strokeWidth={2.5} aria-hidden="true" />;
+    if ((isMuted || volume === 0) && (sfxMuted || sfxVolume === 0)) return <VolumeX className={iconClass} strokeWidth={2.5} aria-hidden="true" />;
     // Show low volume if average is low
     const avgVolume = ((isMuted ? 0 : volume) + (sfxMuted ? 0 : sfxVolume)) / 2;
-    if (avgVolume < 0.5) return <Volume1 size={20} strokeWidth={2.5} aria-hidden="true" />;
-    return <Volume2 size={20} strokeWidth={2.5} aria-hidden="true" />;
+    if (avgVolume < 0.5) return <Volume1 className={iconClass} strokeWidth={2.5} aria-hidden="true" />;
+    return <Volume2 className={iconClass} strokeWidth={2.5} aria-hidden="true" />;
   }, [hasMounted, isMuted, volume, sfxMuted, sfxVolume]);
 
   const handleMusicVolumeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,7 +112,7 @@ const MusicControls: React.FC = memo(() => {
         variant="outline"
         size="icon"
         onClick={handleClick}
-        className="relative bg-neo-cream text-neo-black min-w-[44px] min-h-[44px] w-11 h-11 xs:w-12 xs:h-12 sm:w-11 sm:h-11"
+        className="relative bg-neo-cream text-neo-black min-w-[44px] min-h-[44px] w-11 h-11 lg:w-14 lg:h-14 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20 border-3 lg:border-4 2xl:border-[5px] rounded-neo lg:rounded-neo-lg shadow-hard lg:shadow-hard-lg 2xl:shadow-hard-xl"
         aria-label={isMuted ? (t('music.unmute') || 'Unmute') : (t('music.mute') || 'Mute')}
         aria-pressed={!isMuted}
       >

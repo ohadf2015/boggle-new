@@ -2314,6 +2314,7 @@ const es = {
       "avgAttempts": "Intentos Promedio",
       "distribution": "Distribución de Intentos",
       "yourPercentile": "¡Lo hiciste mejor que el {percentile}% de los jugadores!",
+      "firstToSolve": "🌟 ¡El primero en resolver hoy!",
       "youSolved": "¡Lo resolviste!",
       "youFailed": "No lo resolviste esta vez",
       "attemptsUsed": "Intentos usados: {count}"

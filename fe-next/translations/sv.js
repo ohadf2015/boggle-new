@@ -2317,6 +2317,7 @@ const sv = {
       "avgAttempts": "Genomsnittliga försök",
       "distribution": "Fördelning av försök",
       "yourPercentile": "Du gjorde det bättre än {percentile}% av spelarna!",
+      "firstToSolve": "🌟 Först att lösa idag!",
       "youSolved": "Du löste det!",
       "youFailed": "Du löste det inte den här gången",
       "attemptsUsed": "Försök använda: {count}"

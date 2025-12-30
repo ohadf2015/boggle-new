@@ -2323,6 +2323,7 @@ const en = {
       "avgAttempts": "Average Attempts",
       "distribution": "Attempt Distribution",
       "yourPercentile": "You did better than {percentile}% of players!",
+      "firstToSolve": "🌟 First to solve today!",
       "youSolved": "You solved it!",
       "youFailed": "You didn't solve it this time",
       "attemptsUsed": "Attempts used: {count}"

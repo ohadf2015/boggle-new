@@ -2318,6 +2318,7 @@ const he = {
       "avgAttempts": "ממוצע ניסיונות",
       "distribution": "התפלגות ניסיונות",
       "yourPercentile": "עשיתם טוב יותר מ-{percentile}% מהשחקנים!",
+      "firstToSolve": "🌟 הראשונים לפתור היום!",
       "youSolved": "פתרתם את החידה!",
       "youFailed": "לא הצלחתם לפתור הפעם",
       "attemptsUsed": "ניסיונות שהושקעו: {count}"

@@ -33,6 +33,7 @@ export interface DailyParticipant {
   display_name: string;
   avatar_emoji: string;
   avatar_color: string;
+  profile_picture_url?: string | null;
   country_code?: string | null;
   score: number;
   word_count: number;
@@ -138,12 +139,20 @@ const ParticipantRow = memo<{
 
       {/* Avatar with Country Flag */}
       <div className="relative">
-        <div
-          className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-lg sm:text-xl border-2 border-neo-black/80 shadow-sm"
-          style={{ backgroundColor: participant.avatar_color || '#FFE135' }}
-        >
-          {participant.avatar_emoji || '🎯'}
-        </div>
+        {participant.profile_picture_url ? (
+          <img
+            src={participant.profile_picture_url}
+            alt={participant.display_name || 'Player'}
+            className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl object-cover border-2 border-neo-black/80 shadow-sm"
+          />
+        ) : (
+          <div
+            className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-lg sm:text-xl border-2 border-neo-black/80 shadow-sm"
+            style={{ backgroundColor: participant.avatar_color || '#FFE135' }}
+          >
+            {participant.avatar_emoji || '🎯'}
+          </div>
+        )}
         {/* Country Flag Badge */}
         {countryFlag && (
           <div className="absolute -bottom-1 -right-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>
@@ -468,12 +477,20 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
                 </span>
               </div>
               <div className="flex items-center gap-2 mt-1">
-                <div
-                  className="w-6 h-6 rounded-lg flex items-center justify-center text-sm border border-neo-black/50"
-                  style={{ backgroundColor: currentUserData.avatar_color || '#FFE135' }}
-                >
-                  {currentUserData.avatar_emoji || '🎯'}
-                </div>
+                {currentUserData.profile_picture_url ? (
+                  <img
+                    src={currentUserData.profile_picture_url}
+                    alt={currentUserData.display_name || 'Player'}
+                    className="w-6 h-6 rounded-lg object-cover border border-neo-black/50"
+                  />
+                ) : (
+                  <div
+                    className="w-6 h-6 rounded-lg flex items-center justify-center text-sm border border-neo-black/50"
+                    style={{ backgroundColor: currentUserData.avatar_color || '#FFE135' }}
+                  >
+                    {currentUserData.avatar_emoji || '🎯'}
+                  </div>
+                )}
                 <span className="font-bold text-slate-800 dark:text-white text-sm truncate">
                   {currentUserData.display_name || 'Player'}
                 </span>

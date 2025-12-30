@@ -186,10 +186,15 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
     }
   }
 
-  // Default metadata (no share parameter)
-  const ogImage = locale === 'he'
-    ? `${baseUrl}/og-image-he.jpg`
-    : `${baseUrl}/og-image-en.jpg`;
+  // Default metadata (no share parameter) - use locale-specific static OG images
+  const ogImageMap: Record<string, string> = {
+    he: `${baseUrl}/og-image-he.jpg`,
+    en: `${baseUrl}/og-image-en.jpg`,
+    sv: `${baseUrl}/og-image-sv.jpg`,
+    ja: `${baseUrl}/og-image-ja.jpg`,
+    es: `${baseUrl}/og-image-es.jpg`,
+  };
+  const ogImage = ogImageMap[validLocale] || ogImageMap.en;
 
   return {
     title: seo.title,

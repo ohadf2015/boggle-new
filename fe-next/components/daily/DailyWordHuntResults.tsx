@@ -516,7 +516,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   // Build share URL with OG parameters for rich previews on WhatsApp/social
   // The wh value must be URL-encoded so & becomes %26 (otherwise they're parsed as separate params)
   const shareUrl = useMemo(() => {
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://lexiclash.live';
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.lexiclash.live';
     const whParams = new URLSearchParams({
       solved: String(result.solved),
       attempts: String(result.attemptsUsed),
@@ -889,7 +889,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               </motion.div>
             )}
 
-            {/* Percentile badge */}
+            {/* Percentile badge - show "First to solve!" when only player, otherwise show percentile */}
             {stats.yourStats.percentile !== undefined && (
               <motion.div
                 initial={{ scale: 0, rotate: -10 }}
@@ -900,7 +900,9 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-white" />
                   <span className="font-bold text-white text-sm">
-                    {t('wordHunt.stats.yourPercentile').replace('{percentile}', String(stats.yourStats.percentile))}
+                    {stats.totalPlayers <= 1
+                      ? t('wordHunt.stats.firstToSolve')
+                      : t('wordHunt.stats.yourPercentile').replace('{percentile}', String(stats.yourStats.percentile))}
                   </span>
                 </div>
               </motion.div>

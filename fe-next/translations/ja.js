@@ -2316,6 +2316,7 @@ const ja = {
       "avgAttempts": "平均試行回数",
       "distribution": "試行回数の分布",
       "yourPercentile": "プレイヤーの{percentile}%より良い成績です！",
+      "firstToSolve": "🌟 今日最初のクリア！",
       "youSolved": "解決しました！",
       "youFailed": "今回は解決できませんでした",
       "attemptsUsed": "使用した試行回数：{count}"
