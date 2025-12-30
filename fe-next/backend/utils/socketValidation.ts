@@ -89,6 +89,7 @@ export const ALLOWED_IMAGE_DOMAINS: string[] = [
   'res.cloudinary.com',
   'storage.googleapis.com',
   'firebasestorage.googleapis.com',
+  'supabase.co', // Supabase storage (e.g., [project-ref].supabase.co)
 ];
 
 export const avatarSchema = compiledSchemas?.avatarSchema || z.object({

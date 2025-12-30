@@ -106,7 +106,8 @@ describe('Security - Input Validation', () => {
         'https://i.imgur.com/abc123.jpg',
         'https://cdn.discordapp.com/avatars/123.png',
         'https://lh3.googleusercontent.com/photo.jpg',
-        'https://avatars.githubusercontent.com/u/123'
+        'https://avatars.githubusercontent.com/u/123',
+        'https://abcdefg.supabase.co/storage/v1/object/public/profile_pictures/user123/profile.jpg'
       ];
 
       validUrls.forEach(url => {
@@ -296,7 +297,8 @@ describe('Security - ALLOWED_IMAGE_DOMAINS Configuration', () => {
       'i.imgur.com',
       'cdn.discordapp.com',
       'lh3.googleusercontent.com',
-      'avatars.githubusercontent.com'
+      'avatars.githubusercontent.com',
+      'supabase.co'
     ];
 
     expectedDomains.forEach(domain => {
