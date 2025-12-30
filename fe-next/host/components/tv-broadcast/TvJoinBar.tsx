@@ -1,0 +1,113 @@
+'use client';
+
+import React, { memo, useMemo } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
+import { Users } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+interface TvJoinBarProps {
+  gameCode: string;
+  roomName?: string;
+  playerCount: number;
+  baseUrl?: string;
+}
+
+/**
+ * TvJoinBar - Kahoot-style join bar for TV broadcast mode
+ * Displays QR code, room code, and room name prominently
+ */
+const TvJoinBar = memo<TvJoinBarProps>(({
+  gameCode,
+  roomName,
+  playerCount,
+  baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://lexiclash.com',
+}) => {
+  // Generate join URL
+  const joinUrl = useMemo(() => {
+    return `${baseUrl}/join?code=${gameCode}`;
+  }, [baseUrl, gameCode]);
+
+  return (
+    <motion.div
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      className="w-full bg-neo-purple border-b-4 border-neo-black"
+    >
+      <div className="max-w-7xl mx-auto px-4 py-3">
+        {/* Main row: Join info + Code + QR */}
+        <div className="flex items-center justify-between gap-4">
+          {/* Left: Join URL */}
+          <div className="flex-1">
+            <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1">
+              Join at
+            </p>
+            <p className="text-neo-cream text-2xl md:text-3xl font-black uppercase tracking-wide">
+              lexiclash.com
+            </p>
+          </div>
+
+          {/* Center: Game Code (HUGE) */}
+          <div className="flex-shrink-0 text-center px-6">
+            <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1">
+              Game Code
+            </p>
+            <motion.div
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+              className="bg-neo-cream text-neo-purple px-6 py-2 rounded-neo border-4 border-neo-black shadow-hard"
+            >
+              <span className="text-5xl md:text-6xl lg:text-7xl font-black tracking-[0.15em] uppercase">
+                {gameCode}
+              </span>
+            </motion.div>
+          </div>
+
+          {/* Right: QR Code */}
+          <div className="flex-1 flex justify-end items-center gap-4">
+            {/* Player Count */}
+            <div className="text-right hidden md:block">
+              <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1">
+                Players
+              </p>
+              <div className="flex items-center gap-2 text-neo-cream">
+                <Users className="w-6 h-6" />
+                <span className="text-3xl font-black">{playerCount}</span>
+              </div>
+            </div>
+
+            {/* QR Code */}
+            <motion.div
+              initial={{ rotate: -10, scale: 0.8 }}
+              animate={{ rotate: 0, scale: 1 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              className="bg-white p-2 rounded-lg border-3 border-neo-black shadow-hard-sm"
+            >
+              <QRCodeSVG
+                value={joinUrl}
+                size={80}
+                level="M"
+                bgColor="#ffffff"
+                fgColor="#000000"
+              />
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Room name subtitle (if provided) */}
+        {roomName && (
+          <div className="text-center mt-2">
+            <p className="text-neo-cream/90 text-lg font-bold">
+              &ldquo;{roomName}&rdquo;
+            </p>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+});
+
+TvJoinBar.displayName = 'TvJoinBar';
+
+export default TvJoinBar;

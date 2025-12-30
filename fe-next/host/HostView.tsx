@@ -17,6 +17,7 @@ import type { Language, PlayerResult } from '@/types';
 // Extracted components
 import HostPreGameView from './components/HostPreGameView';
 import HostInGameView from './components/HostInGameView';
+import TvBroadcastView from './components/TvBroadcastView';
 import PlayerWaitingResultsView from '../player/components/PlayerWaitingResultsView';
 import {
   QRCodeDialog,
@@ -392,8 +393,8 @@ const HostView: React.FC<HostViewProps> = memo(({
         />
       )}
 
-      {/* In-Game View */}
-      {((runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults) && (
+      {/* In-Game View - Host Playing */}
+      {((runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults && settings.hostPlaying) && (
         <HostInGameView
           gameCode={gameCode}
           username={username}
@@ -418,6 +419,26 @@ const HostView: React.FC<HostViewProps> = memo(({
           fireRoundActive={fireRoundActive}
           fireRoundRemaining={fireRoundRemaining}
           boardTheme={state.boardTheme}
+        />
+      )}
+
+      {/* TV Broadcast View - Host NOT Playing (Spectator Mode) */}
+      {((runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults && !settings.hostPlaying) && (
+        <TvBroadcastView
+          gameCode={gameCode}
+          username={username}
+          roomLanguage={state.roomLanguage}
+          t={t}
+          tableData={runtime.tableData}
+          remainingTime={runtime.remainingTime}
+          timerValue={settings.timerValue}
+          playersReady={players.playersReady as any}
+          playerScores={players.playerScores}
+          playerWordCounts={players.playerWordCounts}
+          socket={socket}
+          earthquakeState={earthquakeState}
+          fireRoundActive={fireRoundActive}
+          fireRoundRemaining={fireRoundRemaining}
         />
       )}
     </div>

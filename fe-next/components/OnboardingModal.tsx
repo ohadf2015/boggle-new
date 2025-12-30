@@ -121,11 +121,11 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
   };
 
   const handleComplete = async () => {
-    // Save to localStorage
+    // Save to localStorage - always set to single/training mode
     markOnboardingComplete({
       avatarId: formData.avatarId,
       displayName: formData.displayName,
-      selectedMode: formData.selectedMode,
+      selectedMode: 'single', // Always training mode
     });
 
     // Save to profile if authenticated
@@ -136,14 +136,8 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
       });
     }
 
-    // Navigate to selected mode
-    if (formData.selectedMode === 'single') {
-      router.push(`/${language}/singleplayer`);
-    } else if (formData.selectedMode === 'multi') {
-      router.push(`/${language}/multiplayer`);
-    } else if (formData.selectedMode === 'daily') {
-      router.push(`/${language}/daily`);
-    }
+    // Always navigate to singleplayer (training mode)
+    router.push(`/${language}/singleplayer`);
 
     onClose();
   };
@@ -190,7 +184,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
   const canAdvance = () => {
     if (currentStep === 0 && !demoCompleted) return false;
     if (currentStep === 1 && !formData.displayName.trim()) return false;
-    if (currentStep === 2 && !formData.selectedMode) return false;
+    // Step 2 no longer requires mode selection - we auto-select training mode
     return true;
   };
 
@@ -234,7 +228,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
               onClick={handleSkip}
               className="bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-bold text-sm sm:text-base border-3 border-neo-black shadow-hard-sm"
             >
-              <X className={dir === 'rtl' ? 'ml-2' : 'mr-2'} />
+              <X className="me-2" />
               {t('onboarding.navigation.skip')}
             </Button>
           )}
@@ -246,11 +240,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
               onClick={handleBack}
               className="bg-neo-cream text-sm sm:text-base"
             >
-              {dir === 'rtl' ? (
-                <ArrowRight className="ml-2" />
-              ) : (
-                <ArrowLeft className="mr-2" />
-              )}
+              <ArrowLeft className="me-2 rtl:rotate-180" />
               {t('onboarding.navigation.back')}
             </Button>
           )}
@@ -265,11 +255,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
             }`}
           >
             {isLastStep ? t('onboarding.navigation.letsPlay') : t('onboarding.navigation.next')}
-            {!isLastStep && (dir === 'rtl' ? (
-              <ArrowLeft className="mr-2" />
-            ) : (
-              <ArrowRight className="ml-2" />
-            ))}
+            {!isLastStep && (
+              <ArrowRight className="ms-2 rtl:rotate-180" />
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

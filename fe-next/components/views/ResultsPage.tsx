@@ -982,7 +982,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                       onClick={onReturnToRoom}
                       className="bg-white text-neo-black font-black text-base px-6 py-3 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
                     >
-                      <ArrowRight className="w-5 h-5" />
+                      <ArrowRight className="w-5 h-5 rtl:rotate-180" />
                       {t('results.goToLobby')}
                     </motion.button>
                     <motion.button

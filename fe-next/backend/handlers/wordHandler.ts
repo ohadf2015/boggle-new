@@ -496,6 +496,18 @@ function handleValidatedWord(io: Server, socket: Socket, game: Game, gameCode: s
     autoValidated: true
   });
 
+  // Broadcast playerFoundWord to room for TV broadcast mode
+  // Includes combo level and word for exciting notifications
+  const totalScore = (game.playerScores?.[username] || 0) + wordScore;
+  const playerWordCount = (game.playerWords?.[username]?.length || 0) + 1;
+  broadcastToRoom(io, getGameRoom(gameCode), 'playerFoundWord', {
+    username: username,
+    word: normalizedWord,
+    wordCount: playerWordCount,
+    score: totalScore,
+    comboLevel: safeComboLevel,
+  });
+
   // Check achievements
   const achievements: Achievement[] = checkAndAwardAchievements(gameCode, username, normalizedWord);
   if (achievements.length > 0) {

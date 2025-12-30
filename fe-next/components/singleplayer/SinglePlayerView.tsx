@@ -19,6 +19,7 @@ import {
   getSecondsUntilNextDaily,
   formatCountdown,
 } from '@/utils/dailyChallenge';
+import { incrementTrainingGames } from '@/utils/playerProgressStorage';
 import { getMinWordLength, type PresetConfig } from './presetConfig';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 
@@ -243,6 +244,10 @@ const SinglePlayerView: React.FC = () => {
   };
 
   const handleGameEnd = (results: SinglePlayerResultsData) => {
+    // Track training game completion for progressive mode discovery
+    // Count all single player modes as "training" games
+    incrementTrainingGames();
+
     // Record high score for challenge mode
     if (gameState.mode === 'challenge') {
       const longestWord = results.playerWords.reduce(

@@ -37,8 +37,8 @@ export default function AdminWordsPage() {
             )}
             aria-label="Back to admin dashboard"
           >
-            <ArrowLeft className="h-5 w-5" />
-            <span className="hidden sm:inline ml-2">Back</span>
+            <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
+            <span className="hidden sm:inline ms-2">Back</span>
           </Button>
 
           <div className="flex-1 min-w-0">

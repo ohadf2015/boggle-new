@@ -822,8 +822,8 @@ export default function AdminDashboard() {
             )}
             aria-label="Back to home"
           >
-            <ArrowLeft className="h-5 w-5" />
-            <span className="hidden sm:inline ml-2">Back</span>
+            <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
+            <span className="hidden sm:inline ms-2">Back</span>
           </Button>
 
           {/* Title - Centered on mobile */}
@@ -1813,7 +1813,7 @@ export default function AdminDashboard() {
                           : 'border-gray-200 text-gray-400 cursor-not-allowed'
                     )}
                   >
-                    <ChevronLeft size={16} />
+                    <ChevronLeft size={16} className="rtl:rotate-180" />
                     Prev
                   </button>
 
@@ -1867,7 +1867,7 @@ export default function AdminDashboard() {
                     )}
                   >
                     Next
-                    <ChevronRight size={16} />
+                    <ChevronRight size={16} className="rtl:rotate-180" />
                   </button>
                 </div>
               </div>

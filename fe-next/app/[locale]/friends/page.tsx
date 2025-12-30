@@ -48,7 +48,7 @@ export default function FriendsPage(): React.JSX.Element {
               isDark ? 'bg-slate-700 text-white' : 'bg-white text-gray-900'
             )}
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
           </button>
           <h1 className={cn(
             'text-xl font-black uppercase tracking-wide',

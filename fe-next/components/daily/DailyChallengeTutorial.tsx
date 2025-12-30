@@ -114,7 +114,7 @@ const Step1Welcome: React.FC<{ onNext: () => void }> = ({ onNext }) => {
         {t('tutorial.wordHunt.welcome.description') || 'Find the hidden word! You have 10 attempts.'}
       </p>
       <Button onClick={onNext} className="w-full bg-neo-purple text-white">
-        {t('tutorial.wordHunt.welcome.next') || 'Next'} <ArrowRight className="w-4 h-4 ml-2" />
+        {t('tutorial.wordHunt.welcome.next') || 'Next'} <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
       </Button>
     </div>
   );
@@ -169,7 +169,7 @@ const Step2WordDiscovery: React.FC<{ onNext: () => void; onPrev: () => void }> =
           ← {t('common.back') || 'Back'}
         </Button>
         <Button onClick={onNext} className="flex-1 bg-neo-purple text-white">
-          {t('tutorial.wordHunt.lifeSystem.tryIt') || 'Got it!'} <ArrowRight className="w-4 h-4 ml-2" />
+          {t('tutorial.wordHunt.lifeSystem.tryIt') || 'Got it!'} <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
         </Button>
       </div>
     </div>
@@ -215,7 +215,7 @@ const Step3LetterFeedback: React.FC<{ onNext: () => void; onPrev: () => void }> 
           ← {t('common.back') || 'Back'}
         </Button>
         <Button onClick={onNext} className="flex-1 bg-neo-purple text-white">
-          {t('tutorial.wordHunt.letterFeedback.gotIt') || 'Got it!'} <ArrowRight className="w-4 h-4 ml-2" />
+          {t('tutorial.wordHunt.letterFeedback.gotIt') || 'Got it!'} <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
         </Button>
       </div>
     </div>
@@ -296,7 +296,7 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
           ← {t('common.back') || 'Back'}
         </Button>
         <Button onClick={onNext} className="flex-1 bg-neo-purple text-white">
-          {t('tutorial.wordHunt.triesRule.gotIt') || 'Got it!'} <ArrowRight className="w-4 h-4 ml-2" />
+          {t('tutorial.wordHunt.triesRule.gotIt') || 'Got it!'} <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
         </Button>
       </div>
     </div>

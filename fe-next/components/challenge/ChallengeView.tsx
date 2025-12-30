@@ -204,7 +204,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
               isDark ? 'text-gray-300' : 'text-gray-600'
             )}
           >
-            <ArrowLeft size={16} />
+            <ArrowLeft size={16} className="rtl:rotate-180" />
             {language === 'he' ? 'חזרה' : 'Back'}
           </button>
 

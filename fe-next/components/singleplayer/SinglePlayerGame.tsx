@@ -1314,7 +1314,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             aria-label={t('common.quit') || 'Quit game'}
             className="w-12 h-12 p-0 bg-neo-red hover:brightness-110 border-2 border-neo-black rounded-neo flex items-center justify-center shadow-hard-sm"
           >
-            <ArrowLeft className="text-lg text-neo-cream" />
+            <ArrowLeft className="text-lg text-neo-cream rtl:rotate-180" />
           </Button>
         </div>
 
@@ -1392,7 +1392,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-neo-red border-2 border-neo-black rounded-neo flex items-center justify-center">
-                      <ArrowLeft className="text-neo-cream" />
+                      <ArrowLeft className="text-neo-cream rtl:rotate-180" />
                     </div>
                     <span>{t('landscape.tutorialQuit') || 'Bottom-right: Quit game'}</span>
                   </div>
