@@ -148,17 +148,10 @@ const TutorialOverlay: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isActive, nextStep, prevStep, skipTutorial]);
 
-  // Handle click on overlay to advance
-  const handleOverlayClick = useCallback(
-    (e: React.MouseEvent) => {
-      // Don't advance if clicking on the tooltip itself
-      if ((e.target as HTMLElement).closest('[data-tutorial-tooltip]')) {
-        return;
-      }
-      nextStep();
-    },
-    [nextStep]
-  );
+  // Handle click on dark overlay to advance (not used on spotlight area)
+  const handleDarkOverlayClick = useCallback(() => {
+    nextStep();
+  }, [nextStep]);
 
   if (!isActive || !currentStep) {
     return null;
@@ -174,8 +167,7 @@ const TutorialOverlay: React.FC = () => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-[9999] cursor-pointer touch-pan-y"
-          onClick={handleOverlayClick}
+          className="fixed inset-0 z-[9999] pointer-events-none"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
           role="dialog"
@@ -184,8 +176,9 @@ const TutorialOverlay: React.FC = () => {
         >
           {/* Dark overlay with spotlight cutout */}
           <svg
-            className="absolute inset-0 w-full h-full"
-            style={{ pointerEvents: 'none' }}
+            className="absolute inset-0 w-full h-full cursor-pointer"
+            style={{ pointerEvents: 'auto' }}
+            onClick={handleDarkOverlayClick}
           >
             <defs>
               <mask id="spotlight-mask">
@@ -252,7 +245,7 @@ const TutorialOverlay: React.FC = () => {
           />
 
           {/* Progress dots */}
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-[10000]">
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-[10000] pointer-events-auto">
             {Array.from({ length: totalSteps }).map((_, index) => (
               <motion.div
                 key={index}

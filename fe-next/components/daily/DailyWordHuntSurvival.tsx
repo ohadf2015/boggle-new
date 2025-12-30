@@ -295,8 +295,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     setFormedWord(word);
     setLetterCount(count);
     setCurrentFeedback('');
-    closeToast();
-  }, [closeToast]);
+    // Don't close toast here - let it display for full duration even while forming next word
+  }, []);
 
   // Handle word submission (could be target attempt OR grid word discovery)
   const handleWordSubmit = useCallback((word: string) => {
@@ -797,7 +797,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-1 mx-auto max-w-3xl w-full px-1"
+          className="mb-0.5 mx-auto max-w-3xl w-full px-1"
         >
           {/* Black boxes for target word OR Letter Feedback Overlay */}
           <div className="flex justify-center flex-wrap gap-1 sm:gap-1.5 px-2">
@@ -989,12 +989,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
       {/* Category and example (if unlocked) */}
       {showCategory && (
-        <div className="text-[11px] bg-purple-50 dark:bg-purple-900/20 border border-purple-300 rounded px-2 py-1 mb-1 max-w-3xl mx-auto w-full">
+        <div className="text-[11px] bg-purple-50 dark:bg-purple-900/20 border border-purple-300 rounded px-2 py-0.5 mb-0.5 max-w-3xl mx-auto w-full">
           <span className="font-bold">{t('wordHunt.survival.category')?.replace('{category}', category) || `Category: ${category}`}</span>
         </div>
       )}
       {showExample && (
-        <div className="text-[11px] bg-green-50 dark:bg-green-900/20 border border-green-300 rounded px-2 py-1 mb-1 max-w-3xl mx-auto w-full">
+        <div className="text-[11px] bg-green-50 dark:bg-green-900/20 border border-green-300 rounded px-2 py-0.5 mb-0.5 max-w-3xl mx-auto w-full">
           <span className="font-bold">{t('wordHunt.survival.exampleSentence') || 'Example:'}</span> {exampleSentence.replace(new RegExp(targetWord, 'gi'), '____')}
         </div>
       )}
@@ -1003,7 +1003,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       {/* Prominent Attempts Counter */}
       <motion.div
         className={cn(
-          "flex flex-col gap-0.5 rounded-neo border-2 mb-1 mx-auto max-w-3xl w-full",
+          "flex flex-col gap-0.5 rounded-neo border-2 mb-0.5 mx-auto max-w-3xl w-full",
           MAX_ATTEMPTS - attempts.length <= 2
             ? "bg-red-100 dark:bg-red-900/30 border-red-500"
             : MAX_ATTEMPTS - attempts.length <= 4
@@ -1016,7 +1016,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         transition={{ duration: 0.5, repeat: MAX_ATTEMPTS - attempts.length <= 2 ? Infinity : 0 }}
       >
         {/* Main row */}
-        <div className="flex items-center justify-between gap-2 sm:gap-3 px-2 sm:px-3 py-1 sm:py-1.5">
+        <div className="flex items-center justify-between gap-2 sm:gap-3 px-2 py-0.5 sm:py-1">
           {/* Attempts dots indicator */}
           <div className="flex items-center gap-0.5 sm:gap-1">
             {[...Array(MAX_ATTEMPTS)].map((_, i) => (
@@ -1060,13 +1060,13 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         </div>
 
         {/* Hint: Only matching length words count as tries */}
-        <div className="text-[9px] sm:text-[10px] text-center text-gray-500 dark:text-gray-400 pb-1 px-2">
+        <div className="text-[9px] sm:text-[10px] text-center text-gray-500 dark:text-gray-400 pb-0.5 px-2">
           {t('wordHunt.survival.onlyMatchingLengthHint')?.replace('{length}', String(targetWord.length)) || `Only ${targetWord.length}-letter words use tries`}
         </div>
       </motion.div>
 
       {/* Feedback - fixed height container to prevent layout shift */}
-      <div className="h-5 flex items-center justify-center max-w-3xl mx-auto w-full">
+      <div className="h-3 flex items-center justify-center max-w-3xl mx-auto w-full">
         <AnimatePresence mode="wait">
           {currentFeedback && (
             <motion.div

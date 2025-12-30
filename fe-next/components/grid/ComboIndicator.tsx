@@ -207,6 +207,7 @@ const ComboIndicator: React.FC<ComboIndicatorProps> = ({
       <motion.div
         key={`combo-${animationKey}`}
         className="fixed top-28 left-1/2 -translate-x-1/2 z-[80] pointer-events-none combo-indicator-container flex items-center justify-center"
+        data-tutorial="combo"
         data-extreme={isExtremeCombo}
         initial={{ opacity: 1 }}
         animate={controls}
