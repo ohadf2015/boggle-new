@@ -90,7 +90,7 @@ const FEEDBACK_STYLES: Record<FeedbackType, {
 export const WordFeedbackToast: React.FC<WordFeedbackToastProps> = ({
   type,
   message,
-  duration = 2000,
+  duration = 4000,
   onClose,
 }) => {
   useEffect(() => {
