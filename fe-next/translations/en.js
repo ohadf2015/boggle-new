@@ -1906,6 +1906,114 @@ const en = {
     "yourReferrals": "Your Referrals",
     "noReferralsYet": "No referrals yet. Start sharing!"
   },
+  "coins": {
+    "title": "Coins & Rewards",
+    "description": "Earn coins by playing games, winning matches, and unlocking achievements. Use them to collect special items!",
+    "balance": "Balance",
+    "perGame": "Per Game",
+    "winBonus": "Win Bonus",
+    "achievement": "Achievement",
+    "levelUp": "Level Up",
+    "lifetimeEarned": "Lifetime coins earned",
+    "earned": "Earned",
+    "spent": "Spent",
+    "earnMore": "Play games to earn more coins!",
+    "reward": {
+      "GAME_COMPLETED": "Game completed",
+      "GAME_WON": "Victory bonus",
+      "ACHIEVEMENT": "Achievement unlocked",
+      "LEVEL_UP": "Level up bonus"
+    },
+    "score": "Score",
+    "placement": "Placement",
+    "topThreeBonus": "Top 3 Bonus"
+  },
+  "collectibles": {
+    "title": "My Collection",
+    "items": "items",
+    "emptyCollection": "No collectibles yet!",
+    "earnByPlaying": "Earn coins by playing games",
+    "shopComingSoon": "Shop coming soon! Collect special avatars, badges, and titles.",
+    "owned": "Owned",
+    "locked": "Locked",
+    "unlocked": "Unlocked",
+    "equipped": "Equipped",
+    "equip": "Equip",
+    "unequip": "Unequip",
+    "category": {
+      "avatar": "Avatars",
+      "badge": "Badges",
+      "title": "Titles",
+      "effect": "Effects"
+    },
+    "rarity": {
+      "common": "Common",
+      "uncommon": "Uncommon",
+      "rare": "Rare",
+      "epic": "Epic",
+      "legendary": "Legendary"
+    },
+    "avatar_fire": {
+      "name": "Fire Spirit",
+      "description": "Show your fiery passion for words!"
+    },
+    "avatar_star": {
+      "name": "Star Player",
+      "description": "Shine bright like a star!"
+    },
+    "avatar_rocket": {
+      "name": "Rocket",
+      "description": "Blast off to victory!"
+    },
+    "avatar_diamond": {
+      "name": "Diamond",
+      "description": "A gem of a player!"
+    },
+    "avatar_crown": {
+      "name": "Royal Crown",
+      "description": "Rule the word game kingdom!"
+    },
+    "avatar_dragon": {
+      "name": "Dragon",
+      "description": "Legendary word master!"
+    },
+    "badge_first_win": {
+      "name": "First Victory",
+      "description": "Commemorate your first win!"
+    },
+    "badge_word_master": {
+      "name": "Word Master",
+      "description": "For those who master words!"
+    },
+    "badge_speed_demon": {
+      "name": "Speed Demon",
+      "description": "Lightning fast word finder!"
+    },
+    "badge_champion": {
+      "name": "Champion",
+      "description": "A true champion of words!"
+    },
+    "badge_legend": {
+      "name": "Legend",
+      "description": "A legendary player!"
+    },
+    "title_rookie": {
+      "name": "Rookie",
+      "description": "Just getting started!"
+    },
+    "title_warrior": {
+      "name": "Word Warrior",
+      "description": "Battle-tested word fighter!"
+    },
+    "title_master": {
+      "name": "Word Master",
+      "description": "Master of the lexicon!"
+    },
+    "title_grandmaster": {
+      "name": "Grandmaster",
+      "description": "Supreme word master!"
+    }
+  },
   "leaderboard": {
     "title": "Leaderboard",
     "allTime": "All-Time",
@@ -2485,13 +2593,6 @@ const en = {
     "efficiency": "Efficiency",
     "streak": "Streak",
     "usedForReveals": "Use coins to reveal words in single player games!"
-  },
-  "coins": {
-    "score": "Score",
-    "placement": "Placement",
-    "earned": "Coins Earned",
-    "winBonus": "Win Bonus",
-    "topThreeBonus": "Top 3 Bonus"
   },
   "accessibility": {
     "title": "Accessibility",

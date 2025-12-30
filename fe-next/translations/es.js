@@ -1722,6 +1722,114 @@ const es = {
     "yourReferrals": "Tus referencias",
     "noReferralsYet": "No hay referencias aún. ¡Empieza a compartir!"
   },
+  "coins": {
+    "title": "Monedas y Recompensas",
+    "description": "Gana monedas jugando, ganando partidas y desbloqueando logros. ¡Úsalas para coleccionar artículos especiales!",
+    "balance": "Saldo",
+    "perGame": "Por partida",
+    "winBonus": "Bonus victoria",
+    "achievement": "Logro",
+    "levelUp": "Subir nivel",
+    "lifetimeEarned": "Monedas ganadas en total",
+    "earned": "Ganado",
+    "spent": "Gastado",
+    "earnMore": "¡Juega partidas para ganar más monedas!",
+    "reward": {
+      "GAME_COMPLETED": "Partida completada",
+      "GAME_WON": "Bonus de victoria",
+      "ACHIEVEMENT": "Logro desbloqueado",
+      "LEVEL_UP": "Bonus de nivel"
+    },
+    "score": "Puntuación",
+    "placement": "Posición",
+    "topThreeBonus": "Bono por top 3"
+  },
+  "collectibles": {
+    "title": "Mi Colección",
+    "items": "artículos",
+    "emptyCollection": "¡Aún no hay coleccionables!",
+    "earnByPlaying": "Gana monedas jugando",
+    "shopComingSoon": "¡Tienda próximamente! Colecciona avatares, insignias y títulos especiales.",
+    "owned": "Poseído",
+    "locked": "Bloqueado",
+    "unlocked": "Desbloqueado",
+    "equipped": "Equipado",
+    "equip": "Equipar",
+    "unequip": "Desequipar",
+    "category": {
+      "avatar": "Avatares",
+      "badge": "Insignias",
+      "title": "Títulos",
+      "effect": "Efectos"
+    },
+    "rarity": {
+      "common": "Común",
+      "uncommon": "Poco común",
+      "rare": "Raro",
+      "epic": "Épico",
+      "legendary": "Legendario"
+    },
+    "avatar_fire": {
+      "name": "Espíritu de Fuego",
+      "description": "¡Muestra tu ardiente pasión por las palabras!"
+    },
+    "avatar_star": {
+      "name": "Jugador Estrella",
+      "description": "¡Brilla como una estrella!"
+    },
+    "avatar_rocket": {
+      "name": "Cohete",
+      "description": "¡Despega hacia la victoria!"
+    },
+    "avatar_diamond": {
+      "name": "Diamante",
+      "description": "¡Una joya de jugador!"
+    },
+    "avatar_crown": {
+      "name": "Corona Real",
+      "description": "¡Gobierna el reino del juego de palabras!"
+    },
+    "avatar_dragon": {
+      "name": "Dragón",
+      "description": "¡Maestro legendario de palabras!"
+    },
+    "badge_first_win": {
+      "name": "Primera Victoria",
+      "description": "¡Conmemora tu primera victoria!"
+    },
+    "badge_word_master": {
+      "name": "Maestro de Palabras",
+      "description": "¡Para quienes dominan las palabras!"
+    },
+    "badge_speed_demon": {
+      "name": "Demonio Veloz",
+      "description": "¡Buscador de palabras ultrarrápido!"
+    },
+    "badge_champion": {
+      "name": "Campeón",
+      "description": "¡Un verdadero campeón de palabras!"
+    },
+    "badge_legend": {
+      "name": "Leyenda",
+      "description": "¡Un jugador legendario!"
+    },
+    "title_rookie": {
+      "name": "Novato",
+      "description": "¡Recién comenzando!"
+    },
+    "title_warrior": {
+      "name": "Guerrero de Palabras",
+      "description": "¡Luchador de palabras experimentado!"
+    },
+    "title_master": {
+      "name": "Maestro de Palabras",
+      "description": "¡Dominas el léxico!"
+    },
+    "title_grandmaster": {
+      "name": "Gran Maestro",
+      "description": "¡Supremo maestro de palabras!"
+    }
+  },
   "onboarding": {
     "welcome": {
       "title": "¡Bienvenido a LexiClash!",
@@ -2476,13 +2584,6 @@ const es = {
     "efficiency": "Eficiencia",
     "streak": "Racha",
     "usedForReveals": "¡Usa monedas para revelar palabras en juegos de un jugador!"
-  },
-  "coins": {
-    "score": "Puntuación",
-    "placement": "Posición",
-    "earned": "Monedas ganadas",
-    "winBonus": "Bono por victoria",
-    "topThreeBonus": "Bono por top 3"
   },
   "accessibility": {
     "title": "Accesibilidad",

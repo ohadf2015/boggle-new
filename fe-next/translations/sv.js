@@ -1772,6 +1772,114 @@ const sv = {
     "yourReferrals": "Dina remisser",
     "noReferralsYet": "Inga remisser än. Börja dela!"
   },
+  "coins": {
+    "title": "Mynt & Belöningar",
+    "description": "Tjäna mynt genom att spela, vinna och låsa upp prestationer. Använd dem för att samla speciella föremål!",
+    "balance": "Saldo",
+    "perGame": "Per spel",
+    "winBonus": "Vinstbonus",
+    "achievement": "Prestation",
+    "levelUp": "Nivå upp",
+    "lifetimeEarned": "Totalt intjänade mynt",
+    "earned": "Intjänat",
+    "spent": "Spenderat",
+    "earnMore": "Spela spel för att tjäna fler mynt!",
+    "reward": {
+      "GAME_COMPLETED": "Spel slutfört",
+      "GAME_WON": "Vinstbonus",
+      "ACHIEVEMENT": "Prestation upplåst",
+      "LEVEL_UP": "Nivåbonus"
+    },
+    "score": "Poäng",
+    "placement": "Placering",
+    "topThreeBonus": "Topp 3 bonus"
+  },
+  "collectibles": {
+    "title": "Min samling",
+    "items": "föremål",
+    "emptyCollection": "Inga samlarföremål än!",
+    "earnByPlaying": "Tjäna mynt genom att spela",
+    "shopComingSoon": "Butik kommer snart! Samla speciella avatarer, märken och titlar.",
+    "owned": "Ägs",
+    "locked": "Låst",
+    "unlocked": "Upplåst",
+    "equipped": "Utrustad",
+    "equip": "Utrusta",
+    "unequip": "Ta av",
+    "category": {
+      "avatar": "Avatarer",
+      "badge": "Märken",
+      "title": "Titlar",
+      "effect": "Effekter"
+    },
+    "rarity": {
+      "common": "Vanlig",
+      "uncommon": "Ovanlig",
+      "rare": "Sällsynt",
+      "epic": "Episk",
+      "legendary": "Legendarisk"
+    },
+    "avatar_fire": {
+      "name": "Eldande",
+      "description": "Visa din brinnande passion för ord!"
+    },
+    "avatar_star": {
+      "name": "Stjärnspelare",
+      "description": "Skina starkt som en stjärna!"
+    },
+    "avatar_rocket": {
+      "name": "Raket",
+      "description": "Skjut iväg mot seger!"
+    },
+    "avatar_diamond": {
+      "name": "Diamant",
+      "description": "En ädelsten bland spelare!"
+    },
+    "avatar_crown": {
+      "name": "Kunglig krona",
+      "description": "Regera över ordspelets kungarike!"
+    },
+    "avatar_dragon": {
+      "name": "Drake",
+      "description": "Legendarisk ordmästare!"
+    },
+    "badge_first_win": {
+      "name": "Första vinsten",
+      "description": "Fira din första vinst!"
+    },
+    "badge_word_master": {
+      "name": "Ordmästare",
+      "description": "För dem som behärskar ord!"
+    },
+    "badge_speed_demon": {
+      "name": "Snabbis",
+      "description": "Blixtsnabb ordhittare!"
+    },
+    "badge_champion": {
+      "name": "Mästare",
+      "description": "En sann ordmästare!"
+    },
+    "badge_legend": {
+      "name": "Legend",
+      "description": "En legendarisk spelare!"
+    },
+    "title_rookie": {
+      "name": "Nybörjare",
+      "description": "Precis börjat!"
+    },
+    "title_warrior": {
+      "name": "Ordkrigare",
+      "description": "Stridsbeprövad ordkämpe!"
+    },
+    "title_master": {
+      "name": "Ordmästare",
+      "description": "Behärskar lexikonet!"
+    },
+    "title_grandmaster": {
+      "name": "Stormästare",
+      "description": "Överlägsen ordmästare!"
+    }
+  },
   "leaderboard": {
     "title": "Topplista",
     "allTime": "Alla tider",
@@ -2479,13 +2587,6 @@ const sv = {
     "efficiency": "Effektivitet",
     "streak": "Svit",
     "usedForReveals": "Använd mynt för att avslöja ord i enspelarspel!"
-  },
-  "coins": {
-    "score": "Poäng",
-    "placement": "Placering",
-    "earned": "Mynt intjänade",
-    "winBonus": "Vinnarbonus",
-    "topThreeBonus": "Topp 3 bonus"
   },
   "accessibility": {
     "title": "Tillgänglighet",

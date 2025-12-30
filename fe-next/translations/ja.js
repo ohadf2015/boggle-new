@@ -1771,6 +1771,114 @@ const ja = {
     "yourReferrals": "あなたの紹介",
     "noReferralsYet": "まだ紹介はありません。シェアを始めましょう！"
   },
+  "coins": {
+    "title": "コイン＆報酬",
+    "description": "ゲームをプレイし、勝利し、実績をアンロックしてコインを獲得。特別なアイテムを集めよう！",
+    "balance": "残高",
+    "perGame": "ゲームごと",
+    "winBonus": "勝利ボーナス",
+    "achievement": "実績",
+    "levelUp": "レベルアップ",
+    "lifetimeEarned": "累計獲得コイン",
+    "earned": "獲得",
+    "spent": "使用",
+    "earnMore": "ゲームをプレイしてコインを獲得しよう！",
+    "reward": {
+      "GAME_COMPLETED": "ゲーム完了",
+      "GAME_WON": "勝利ボーナス",
+      "ACHIEVEMENT": "実績アンロック",
+      "LEVEL_UP": "レベルアップボーナス"
+    },
+    "score": "スコア",
+    "placement": "順位",
+    "topThreeBonus": "トップ3ボーナス"
+  },
+  "collectibles": {
+    "title": "マイコレクション",
+    "items": "アイテム",
+    "emptyCollection": "まだコレクションがありません！",
+    "earnByPlaying": "ゲームをプレイしてコインを獲得",
+    "shopComingSoon": "ショップ近日公開！特別なアバター、バッジ、称号を集めよう。",
+    "owned": "所持",
+    "locked": "ロック中",
+    "unlocked": "アンロック済",
+    "equipped": "装備中",
+    "equip": "装備",
+    "unequip": "外す",
+    "category": {
+      "avatar": "アバター",
+      "badge": "バッジ",
+      "title": "称号",
+      "effect": "エフェクト"
+    },
+    "rarity": {
+      "common": "コモン",
+      "uncommon": "アンコモン",
+      "rare": "レア",
+      "epic": "エピック",
+      "legendary": "レジェンダリー"
+    },
+    "avatar_fire": {
+      "name": "炎の精霊",
+      "description": "言葉への情熱を燃やせ！"
+    },
+    "avatar_star": {
+      "name": "スタープレイヤー",
+      "description": "星のように輝け！"
+    },
+    "avatar_rocket": {
+      "name": "ロケット",
+      "description": "勝利に向かって発射！"
+    },
+    "avatar_diamond": {
+      "name": "ダイヤモンド",
+      "description": "輝くプレイヤー！"
+    },
+    "avatar_crown": {
+      "name": "王冠",
+      "description": "ワードゲームの王国を支配せよ！"
+    },
+    "avatar_dragon": {
+      "name": "ドラゴン",
+      "description": "伝説のワードマスター！"
+    },
+    "badge_first_win": {
+      "name": "初勝利",
+      "description": "最初の勝利を記念！"
+    },
+    "badge_word_master": {
+      "name": "ワードマスター",
+      "description": "言葉を極めた者に！"
+    },
+    "badge_speed_demon": {
+      "name": "スピードデーモン",
+      "description": "電光石火の単語発見者！"
+    },
+    "badge_champion": {
+      "name": "チャンピオン",
+      "description": "真のワードチャンピオン！"
+    },
+    "badge_legend": {
+      "name": "レジェンド",
+      "description": "伝説のプレイヤー！"
+    },
+    "title_rookie": {
+      "name": "ルーキー",
+      "description": "始めたばかり！"
+    },
+    "title_warrior": {
+      "name": "ワード戦士",
+      "description": "戦いで鍛えられた戦士！"
+    },
+    "title_master": {
+      "name": "ワードマスター",
+      "description": "語彙の達人！"
+    },
+    "title_grandmaster": {
+      "name": "グランドマスター",
+      "description": "最高のワードマスター！"
+    }
+  },
   "leaderboard": {
     "title": "リーダーボード",
     "allTime": "全期間",
@@ -2478,13 +2586,6 @@ const ja = {
     "efficiency": "効率",
     "streak": "連続",
     "usedForReveals": "コインを使ってシングルプレイヤーゲームで単語を表示しましょう！"
-  },
-  "coins": {
-    "score": "スコア",
-    "placement": "順位",
-    "earned": "獲得コイン",
-    "winBonus": "勝利ボーナス",
-    "topThreeBonus": "トップ3ボーナス"
   },
   "accessibility": {
     "title": "アクセシビリティ",

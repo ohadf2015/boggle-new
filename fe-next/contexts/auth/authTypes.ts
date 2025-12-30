@@ -37,6 +37,38 @@ export interface ProfileData {
   referrer?: string | null;
   created_at?: string;
   updated_at?: string;
+  // Coins & Collectibles
+  total_coins?: number;
+  lifetime_coins_earned?: number;
+}
+
+// Collectible item from the catalog
+export interface CollectibleItem {
+  id: string;
+  name_key: string;
+  description_key: string;
+  icon: string;
+  image_url?: string | null; // Optional image URL for the collectible
+  category: 'avatar' | 'badge' | 'effect' | 'title';
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+  cost: number;
+  unlock_requirement?: {
+    type: 'level' | 'achievement';
+    value: number | string;
+  } | null;
+  sort_order: number;
+  is_active: boolean;
+}
+
+// Player's owned collectible
+export interface PlayerCollectible {
+  id: string;
+  collectible_id: string;
+  acquired_at: string;
+  is_equipped: boolean;
+  equipped_slot?: string | null;
+  // Joined from collectible_items
+  collectible?: CollectibleItem;
 }
 
 export interface RankedProgress {

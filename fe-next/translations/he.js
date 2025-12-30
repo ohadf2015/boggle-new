@@ -1901,6 +1901,114 @@ const he = {
     "yourReferrals": "ההפניות שלך",
     "noReferralsYet": "אין הפניות עדיין. התחל לשתף!"
   },
+  "coins": {
+    "title": "מטבעות ופרסים",
+    "description": "צבור מטבעות במשחקים, ניצחונות והישגים. השתמש בהם לאיסוף פריטים מיוחדים!",
+    "balance": "יתרה",
+    "perGame": "למשחק",
+    "winBonus": "בונוס ניצחון",
+    "achievement": "הישג",
+    "levelUp": "עליית רמה",
+    "lifetimeEarned": "סה\"כ מטבעות שנצברו",
+    "earned": "נצבר",
+    "spent": "הוצא",
+    "earnMore": "שחק משחקים כדי לצבור עוד מטבעות!",
+    "reward": {
+      "GAME_COMPLETED": "משחק הושלם",
+      "GAME_WON": "בונוס ניצחון",
+      "ACHIEVEMENT": "הישג נפתח",
+      "LEVEL_UP": "בונוס עליית רמה"
+    },
+    "score": "ניקוד",
+    "placement": "מיקום",
+    "topThreeBonus": "בונוס טופ 3"
+  },
+  "collectibles": {
+    "title": "האוסף שלי",
+    "items": "פריטים",
+    "emptyCollection": "עדיין אין פריטים באוסף!",
+    "earnByPlaying": "צבור מטבעות במשחקים",
+    "shopComingSoon": "החנות בקרוב! אסוף אווטרים, תגים ותארים מיוחדים.",
+    "owned": "בבעלות",
+    "locked": "נעול",
+    "unlocked": "פתוח",
+    "equipped": "מצויד",
+    "equip": "הצייד",
+    "unequip": "הסר",
+    "category": {
+      "avatar": "אווטרים",
+      "badge": "תגים",
+      "title": "תארים",
+      "effect": "אפקטים"
+    },
+    "rarity": {
+      "common": "נפוץ",
+      "uncommon": "לא שכיח",
+      "rare": "נדיר",
+      "epic": "אפי",
+      "legendary": "אגדי"
+    },
+    "avatar_fire": {
+      "name": "רוח אש",
+      "description": "הראה את התשוקה הלוהטת שלך למילים!"
+    },
+    "avatar_star": {
+      "name": "שחקן כוכב",
+      "description": "זרח בהיר כמו כוכב!"
+    },
+    "avatar_rocket": {
+      "name": "רקטה",
+      "description": "שגר את עצמך לניצחון!"
+    },
+    "avatar_diamond": {
+      "name": "יהלום",
+      "description": "שחקן יקר ערך!"
+    },
+    "avatar_crown": {
+      "name": "כתר מלכותי",
+      "description": "שלוט בממלכת משחקי המילים!"
+    },
+    "avatar_dragon": {
+      "name": "דרקון",
+      "description": "אמן מילים אגדי!"
+    },
+    "badge_first_win": {
+      "name": "ניצחון ראשון",
+      "description": "הנצח את הניצחון הראשון שלך!"
+    },
+    "badge_word_master": {
+      "name": "אמן מילים",
+      "description": "לשולטים במילים!"
+    },
+    "badge_speed_demon": {
+      "name": "שד מהירות",
+      "description": "מוצא מילים במהירות הבזק!"
+    },
+    "badge_champion": {
+      "name": "אלוף",
+      "description": "אלוף אמיתי של מילים!"
+    },
+    "badge_legend": {
+      "name": "אגדה",
+      "description": "שחקן אגדי!"
+    },
+    "title_rookie": {
+      "name": "טירון",
+      "description": "רק מתחיל!"
+    },
+    "title_warrior": {
+      "name": "לוחם מילים",
+      "description": "לוחם מילים מנוסה!"
+    },
+    "title_master": {
+      "name": "אמן מילים",
+      "description": "שולט בלקסיקון!"
+    },
+    "title_grandmaster": {
+      "name": "גרנדמאסטר",
+      "description": "אמן מילים עליון!"
+    }
+  },
   "leaderboard": {
     "title": "טבלת מובילים",
     "allTime": "כל הזמנים",
@@ -2480,13 +2588,6 @@ const he = {
     "efficiency": "יעילות",
     "streak": "רצף",
     "usedForReveals": "השתמשו במטבעות כדי לחשוף מילים במשחקי יחיד!"
-  },
-  "coins": {
-    "score": "ניקוד",
-    "placement": "מיקום",
-    "earned": "מטבעות שנצברו",
-    "winBonus": "בונוס ניצחון",
-    "topThreeBonus": "בונוס טופ 3"
   },
   "accessibility": {
     "title": "נגישות",

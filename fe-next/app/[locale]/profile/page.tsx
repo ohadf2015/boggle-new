@@ -2,9 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, ArrowLeft, Edit, Gamepad2, Trophy, Star, Camera, X, Check, Clock, Play } from 'lucide-react';
+import { User, ArrowLeft, Edit, Gamepad2, Trophy, Star, Camera, X, Check, Clock, Play, Gift } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/Header';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,12 +16,15 @@ import EmojiAvatarPicker from '@/components/EmojiAvatarPicker';
 import { AchievementBadge } from '@/components/AchievementBadge';
 import LevelBadge from '@/components/LevelBadge';
 import XpProgressBar from '@/components/XpProgressBar';
+import { CoinBalance } from '@/components/CoinBalance';
+import { CollectionGrid } from '@/components/CollectionGrid';
 import { uploadProfilePicture, removeProfilePicture } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
-import logger from '@/utils/logger';
 import { getSession } from '@/utils/session';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import type { PlayerCollectible, CollectibleItem } from '@/contexts/auth/authTypes';
 
 interface Achievement {
   icon: string;
@@ -132,6 +134,8 @@ export default function ProfilePage(): React.ReactNode {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [activeGameSession, setActiveGameSession] = useState<GameSession | null>(null);
+  const [playerCollectibles, setPlayerCollectibles] = useState<PlayerCollectible[]>([]);
+  const [isLoadingCollectibles, setIsLoadingCollectibles] = useState<boolean>(false);
 
   // Check for active game session on mount
   useEffect(() => {
@@ -140,6 +144,61 @@ export default function ProfilePage(): React.ReactNode {
       setActiveGameSession(session);
     }
   }, []);
+
+  // Fetch player's collectibles
+  useEffect(() => {
+    async function fetchCollectibles() {
+      if (!user?.id || !supabase) return;
+
+      setIsLoadingCollectibles(true);
+      try {
+        const { data, error } = await supabase
+          .from('player_collectibles')
+          .select(`
+            id,
+            collectible_id,
+            acquired_at,
+            is_equipped,
+            equipped_slot,
+            collectible:collectible_items (
+              id,
+              name_key,
+              description_key,
+              icon,
+              category,
+              rarity,
+              cost,
+              unlock_requirement,
+              sort_order,
+              is_active
+            )
+          `)
+          .eq('player_id', user.id)
+          .order('acquired_at', { ascending: false });
+
+        if (error) {
+          console.error('Error fetching collectibles:', error);
+        } else if (data) {
+          // Transform the data to match our type
+          const collectibles: PlayerCollectible[] = data.map((item: Record<string, unknown>) => ({
+            id: item.id as string,
+            collectible_id: item.collectible_id as string,
+            acquired_at: item.acquired_at as string,
+            is_equipped: item.is_equipped as boolean,
+            equipped_slot: item.equipped_slot as string | null,
+            collectible: item.collectible as CollectibleItem | undefined
+          }));
+          setPlayerCollectibles(collectibles);
+        }
+      } catch (err) {
+        console.error('Error fetching collectibles:', err);
+      } finally {
+        setIsLoadingCollectibles(false);
+      }
+    }
+
+    fetchCollectibles();
+  }, [user?.id]);
 
   // Handle profile picture upload
   const handleProfilePictureUpload = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
@@ -519,6 +578,83 @@ export default function ProfilePage(): React.ReactNode {
           )}
         </motion.div>
 
+        {/* Coins & Rewards Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.08 }}
+          className={cn(
+            'rounded-2xl p-4 sm:p-6 mb-6',
+            isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+          )}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h2 className={cn(
+              'text-lg font-bold flex items-center gap-2',
+              isDarkMode ? 'text-white' : 'text-gray-900'
+            )}>
+              <span className="text-xl">💰</span>
+              {t('coins.title') || 'Coins & Rewards'}
+            </h2>
+            <CoinBalance coins={profile?.total_coins || 0} size="md" />
+          </div>
+
+          <p className={cn(
+            'text-sm mb-4',
+            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+          )}>
+            {t('coins.description') || 'Earn coins by playing games, winning matches, and unlocking achievements. Use them to collect special items!'}
+          </p>
+
+          {/* Coin earning breakdown */}
+          <div className={cn(
+            'grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-xl',
+            isDarkMode ? 'bg-slate-900/50' : 'bg-gray-50'
+          )}>
+            <div className="text-center">
+              <span className="text-lg">🎮</span>
+              <p className={cn('text-xs font-medium mt-1', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+                {t('coins.perGame') || 'Per Game'}
+              </p>
+              <p className="font-bold text-neo-yellow">+10</p>
+            </div>
+            <div className="text-center">
+              <span className="text-lg">🏆</span>
+              <p className={cn('text-xs font-medium mt-1', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+                {t('coins.winBonus') || 'Win Bonus'}
+              </p>
+              <p className="font-bold text-neo-yellow">+20</p>
+            </div>
+            <div className="text-center">
+              <span className="text-lg">🏅</span>
+              <p className={cn('text-xs font-medium mt-1', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+                {t('coins.achievement') || 'Achievement'}
+              </p>
+              <p className="font-bold text-neo-yellow">+50</p>
+            </div>
+            <div className="text-center">
+              <span className="text-lg">⬆️</span>
+              <p className={cn('text-xs font-medium mt-1', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+                {t('coins.levelUp') || 'Level Up'}
+              </p>
+              <p className="font-bold text-neo-yellow">+100</p>
+            </div>
+          </div>
+
+          {/* Lifetime stats */}
+          <div className={cn(
+            'mt-4 pt-4 border-t flex items-center justify-between',
+            isDarkMode ? 'border-slate-700' : 'border-gray-200'
+          )}>
+            <p className={cn('text-sm', isDarkMode ? 'text-gray-500' : 'text-gray-500')}>
+              {t('coins.lifetimeEarned') || 'Lifetime coins earned'}:
+            </p>
+            <span className="font-bold text-neo-orange">
+              {(profile?.lifetime_coins_earned || 0).toLocaleString()} 💰
+            </span>
+          </div>
+        </motion.div>
+
         {/* Stats Grid */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -687,6 +823,53 @@ export default function ProfilePage(): React.ReactNode {
                 );
               });
             })()}
+          </div>
+        </motion.div>
+
+        {/* My Collection Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className={cn(
+            'rounded-2xl p-6 mb-6 mt-6',
+            isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+          )}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h2 className={cn(
+              'text-lg font-bold flex items-center gap-2',
+              isDarkMode ? 'text-white' : 'text-gray-900'
+            )}>
+              <Gift className="text-neo-purple" />
+              {t('collectibles.title') || 'My Collection'}
+            </h2>
+            {playerCollectibles.length > 0 && (
+              <span className={cn(
+                'text-sm px-2 py-1 rounded-full',
+                isDarkMode ? 'bg-slate-700 text-gray-300' : 'bg-gray-100 text-gray-600'
+              )}>
+                {playerCollectibles.length} {t('collectibles.items') || 'items'}
+              </span>
+            )}
+          </div>
+
+          {isLoadingCollectibles ? (
+            <div className="flex justify-center py-8">
+              <div className="w-6 h-6 border-3 border-neo-purple border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : (
+            <CollectionGrid collectibles={playerCollectibles} />
+          )}
+
+          {/* Info about collecting */}
+          <div className={cn(
+            'mt-4 pt-4 border-t text-center',
+            isDarkMode ? 'border-slate-700' : 'border-gray-200'
+          )}>
+            <p className={cn('text-sm', isDarkMode ? 'text-gray-500' : 'text-gray-500')}>
+              {t('collectibles.shopComingSoon') || 'Shop coming soon! Collect special avatars, badges, and titles.'}
+            </p>
           </div>
         </motion.div>
 
