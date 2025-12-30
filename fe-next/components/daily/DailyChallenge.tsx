@@ -29,10 +29,19 @@ import {
   type WordHuntResult,
   type StoredWordHuntResult,
 } from '@/utils/dailyChallenge';
-import { neoSuccessToast } from '@/components/NeoToast';
+import { neoSuccessToast, neoErrorToast } from '@/components/NeoToast';
 import { useSearchParams } from 'next/navigation';
 import type { LetterGrid, Language } from '@/types';
 import type { SurvivalGameResult } from './DailyWordHuntSurvival';
+
+// Retry token validation response type
+interface RetryTokenValidation {
+  valid: boolean;
+  reason?: string;
+  puzzleDate?: string;
+  language?: string;
+  todayDate?: string;
+}
 
 export type DailyChallengePhase = 'loading' | 'ready' | 'playing' | 'completed' | 'already-played';
 
@@ -124,7 +133,59 @@ const DailyChallenge: React.FC = () => {
         window.history.replaceState({}, '', url.toString());
       }
     }
-  }, [searchParams, language]);
+
+    // Handle retry token: ?retryToken={token} validates and clears localStorage
+    const retryToken = searchParams.get('retryToken');
+    if (retryToken && typeof window !== 'undefined') {
+      // Validate the token via API
+      const validateRetryToken = async () => {
+        try {
+          const response = await fetch(`/api/daily/validate-retry-token?token=${encodeURIComponent(retryToken)}`);
+          const data: RetryTokenValidation = await response.json();
+
+          if (data.valid) {
+            // Token is valid - clear localStorage and allow replay
+            const cleared = clearWordHuntResultForRetry(language as Language);
+            if (cleared) {
+              setWasReset(true);
+              neoSuccessToast(t('daily.retryLinkUsed'), { icon: '🔓', duration: 4000 });
+            } else {
+              // No previous attempt to clear, but still allow playing
+              neoSuccessToast(t('daily.retryLinkReady'), { icon: '🎯', duration: 3000 });
+            }
+
+            // Record token usage
+            fetch('/api/daily/validate-retry-token', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ token: retryToken }),
+            }).catch(() => {
+              // Ignore errors - token usage tracking is non-critical
+            });
+          } else {
+            // Token is invalid - show appropriate error message
+            if (data.reason === 'expired') {
+              neoErrorToast(t('daily.retryLinkExpired'), { icon: '⏰', duration: 5000 });
+            } else if (data.reason === 'wrong_date') {
+              neoErrorToast(t('daily.retryLinkWrongDate'), { icon: '📅', duration: 5000 });
+            } else {
+              neoErrorToast(t('daily.retryLinkInvalid'), { icon: '❌', duration: 5000 });
+            }
+          }
+        } catch (error) {
+          console.error('Failed to validate retry token:', error);
+          neoErrorToast(t('daily.retryLinkError'), { icon: '⚠️', duration: 5000 });
+        }
+
+        // Clean up URL by removing the retryToken parameter
+        const url = new URL(window.location.href);
+        url.searchParams.delete('retryToken');
+        window.history.replaceState({}, '', url.toString());
+      };
+
+      validateRetryToken();
+    }
+  }, [searchParams, language, t]);
 
   // Initialize Word Hunt daily challenge
   useEffect(() => {
