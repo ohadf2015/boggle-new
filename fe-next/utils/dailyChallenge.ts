@@ -1034,12 +1034,9 @@ ${dailyUrl}`;
 /**
  * Generate Word Hunt share text
  * Clean, simple, and engaging - no emoji grid, just the result
+ * NOTE: URL is NOT included here - it's added by the share mechanisms to avoid duplication
  */
 export function generateWordHuntShareableResult(result: WordHuntResult, siteUrl?: string): string {
-  // Build simple challenge URL - single link to the daily page
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://lexiclash.live';
-  const challengeUrl = `${baseUrl}/${result.language}/daily`;
-
   // Format the main result message
   const resultEmoji = result.solved ? '🎯' : '💪';
   const resultText = result.solved
@@ -1070,16 +1067,6 @@ export function generateWordHuntShareableResult(result: WordHuntResult, siteUrl?
     performanceMsg = messages[Math.floor(Math.random() * messages.length)];
   }
 
-  // Format streak with milestone callouts
-  let streakText = '';
-  if (result.streakDays >= 30) {
-    streakText = `🔥 ${result.streakDays} day streak! 🏆\n`;
-  } else if (result.streakDays >= 7) {
-    streakText = `🔥 ${result.streakDays} day streak! 💪\n`;
-  } else if (result.streakDays > 1) {
-    streakText = `🔥 ${result.streakDays} day streak!\n`;
-  }
-
   // Pick a random competitive CTA for variety
   const competitiveCTAs = [
     'Think you can do better?',
@@ -1090,13 +1077,12 @@ export function generateWordHuntShareableResult(result: WordHuntResult, siteUrl?
   ];
   const cta = competitiveCTAs[Math.floor(Math.random() * competitiveCTAs.length)];
 
-  // Build the shareable text - simple and engaging
+  // Build the shareable text - simple and engaging (URL added separately by share mechanisms)
   return `${resultEmoji} LexiClash Word Hunt #${result.puzzleNumber}
 
 ${resultText} ${performanceMsg}
-${streakText}
-${cta} 🎮
-${challengeUrl}`;
+
+${cta} 🎮`;
 }
 
 /**

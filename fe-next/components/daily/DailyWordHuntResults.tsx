@@ -545,14 +545,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
   // Combine share text with share URL for rich previews
   const shareTextWithUrl = useMemo(() => {
-    // Replace the simple URL at the end with the OG-enabled share URL
-    const lines = shareText.split('\n');
-    // Find and replace the last line (URL) with our OG-enabled URL
-    const lastLineIndex = lines.length - 1;
-    if (lines[lastLineIndex].includes('lexiclash.live')) {
-      lines[lastLineIndex] = shareUrl;
-    }
-    return lines.join('\n');
+    // Simply append the URL to the share text (URL is no longer included in shareText)
+    return `${shareText}\n${shareUrl}`;
   }, [shareText, shareUrl]);
 
   // Handle copy to clipboard
@@ -584,13 +578,12 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     window.open(url, '_blank');
   }, [shareText, shareUrl]);
 
-  // Handle native share - includes OG-enabled URL for rich preview
+  // Handle native share - URL is included in text to avoid duplication
   const handleNativeShare = useCallback(async () => {
     if (navigator.share) {
       try {
         await navigator.share({
           text: shareTextWithUrl,
-          url: shareUrl,
         });
       } catch (err) {
         console.error('Share failed:', err);
@@ -598,7 +591,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     } else {
       setShowSharePanel(true);
     }
-  }, [shareTextWithUrl, shareUrl]);
+  }, [shareTextWithUrl]);
 
   // Handle download personalized share image
   const handleDownloadShareImage = useCallback(async () => {
