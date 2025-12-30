@@ -797,7 +797,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-0.5 mx-auto max-w-3xl w-full px-1"
+          className="mx-auto max-w-3xl w-full px-1"
         >
           {/* Black boxes for target word OR Letter Feedback Overlay */}
           <div className="flex justify-center flex-wrap gap-1 sm:gap-1.5 px-2">
@@ -952,7 +952,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
           {/* Hint level indicator below boxes - hide when showing feedback */}
           {!showFeedbackOverlay && (
-            <div className="flex flex-col items-center gap-1 mt-1">
+            <div className="flex flex-col items-center gap-0.5 mt-0.5">
               <div className="flex items-center gap-1">
                 <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
                 <span className="text-[10px] sm:text-xs font-bold text-gray-500">
@@ -989,12 +989,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
       {/* Category and example (if unlocked) */}
       {showCategory && (
-        <div className="text-[11px] bg-purple-50 dark:bg-purple-900/20 border border-purple-300 rounded px-2 py-0.5 mb-0.5 max-w-3xl mx-auto w-full">
+        <div className="text-[11px] bg-purple-50 dark:bg-purple-900/20 border border-purple-300 rounded px-2 py-0.5 max-w-3xl mx-auto w-full">
           <span className="font-bold">{t('wordHunt.survival.category')?.replace('{category}', category) || `Category: ${category}`}</span>
         </div>
       )}
       {showExample && (
-        <div className="text-[11px] bg-green-50 dark:bg-green-900/20 border border-green-300 rounded px-2 py-0.5 mb-0.5 max-w-3xl mx-auto w-full">
+        <div className="text-[11px] bg-green-50 dark:bg-green-900/20 border border-green-300 rounded px-2 py-0.5 max-w-3xl mx-auto w-full">
           <span className="font-bold">{t('wordHunt.survival.exampleSentence') || 'Example:'}</span> {exampleSentence.replace(new RegExp(targetWord, 'gi'), '____')}
         </div>
       )}
@@ -1003,7 +1003,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       {/* Prominent Attempts Counter */}
       <motion.div
         className={cn(
-          "flex flex-col gap-0.5 rounded-neo border-2 mb-0.5 mx-auto max-w-3xl w-full",
+          "flex flex-col gap-0.5 rounded-neo border-2 mx-auto max-w-3xl w-full",
           MAX_ATTEMPTS - attempts.length <= 2
             ? "bg-red-100 dark:bg-red-900/30 border-red-500"
             : MAX_ATTEMPTS - attempts.length <= 4
@@ -1065,22 +1065,20 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         </div>
       </motion.div>
 
-      {/* Feedback - fixed height container to prevent layout shift */}
-      <div className="h-3 flex items-center justify-center max-w-3xl mx-auto w-full">
-        <AnimatePresence mode="wait">
-          {currentFeedback && (
-            <motion.div
-              key={currentFeedback}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="text-center text-sm font-medium"
-            >
-              {currentFeedback}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+      {/* Feedback - only render when there's feedback to show */}
+      <AnimatePresence mode="wait">
+        {currentFeedback && (
+          <motion.div
+            key={currentFeedback}
+            initial={{ opacity: 0, scale: 0.9, height: 0 }}
+            animate={{ opacity: 1, scale: 1, height: 'auto' }}
+            exit={{ opacity: 0, scale: 0.9, height: 0 }}
+            className="text-center text-xs font-medium max-w-3xl mx-auto w-full overflow-hidden"
+          >
+            {currentFeedback}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Game Grid */}
       <div className="flex-1 flex items-center justify-center">

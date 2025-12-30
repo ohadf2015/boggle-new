@@ -33,56 +33,56 @@ const FEEDBACK_STYLES: Record<FeedbackType, {
     bg: 'bg-green-500',
     text: 'text-white',
     border: 'border-green-700',
-    icon: <Check className="w-5 h-5" />,
+    icon: <Check className="w-4 h-4" />,
     animation: 'animate-neo-pop',
   },
   'invalid-word': {
     bg: 'bg-red-500',
     text: 'text-white',
     border: 'border-red-700',
-    icon: <X className="w-5 h-5" />,
+    icon: <X className="w-4 h-4" />,
     animation: 'animate-neo-shake',
   },
   'not-on-board': {
     bg: 'bg-orange-500',
     text: 'text-white',
     border: 'border-orange-700',
-    icon: <AlertTriangle className="w-5 h-5" />,
+    icon: <AlertTriangle className="w-4 h-4" />,
     animation: 'animate-neo-wiggle',
   },
   'not-in-dictionary': {
     bg: 'bg-red-500',
     text: 'text-white',
     border: 'border-red-700',
-    icon: <X className="w-5 h-5" />,
+    icon: <X className="w-4 h-4" />,
     animation: 'animate-neo-shake',
   },
   'too-short': {
     bg: 'bg-orange-500',
     text: 'text-white',
     border: 'border-orange-700',
-    icon: <AlertTriangle className="w-5 h-5" />,
+    icon: <AlertTriangle className="w-4 h-4" />,
     animation: 'animate-bounce',
   },
   'duplicate': {
     bg: 'bg-yellow-500',
     text: 'text-black',
     border: 'border-yellow-700',
-    icon: <RefreshCw className="w-5 h-5" />,
+    icon: <RefreshCw className="w-4 h-4" />,
     animation: 'animate-pulse',
   },
   'target-attempt': {
     bg: 'bg-blue-500',
     text: 'text-white',
     border: 'border-blue-700',
-    icon: <div className="text-xl">🎯</div>,
+    icon: <div className="text-base">🎯</div>,
     animation: 'animate-neo-pop',
   },
   'target-found': {
     bg: 'bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500',
     text: 'text-white',
     border: 'border-purple-700',
-    icon: <div className="text-xl">🎉</div>,
+    icon: <div className="text-base">🎉</div>,
     animation: 'animate-neo-explosion',
   },
 };
@@ -90,7 +90,7 @@ const FEEDBACK_STYLES: Record<FeedbackType, {
 export const WordFeedbackToast: React.FC<WordFeedbackToastProps> = ({
   type,
   message,
-  duration = 4000,
+  duration = 2000,
   onClose,
 }) => {
   useEffect(() => {
@@ -116,9 +116,9 @@ export const WordFeedbackToast: React.FC<WordFeedbackToastProps> = ({
           exit={{ opacity: 0, y: -20, scale: 0.9 }}
           transition={{ duration: 0.2 }}
           className={cn(
-            'fixed top-24 left-1/2 -translate-x-1/2 z-50',
-            'flex items-center gap-3 px-6 py-4 rounded-lg',
-            'border-4 shadow-neo-brutalist',
+            'fixed bottom-24 left-1/2 -translate-x-1/2 z-40',
+            'flex items-center gap-2 px-3 py-2 rounded-lg',
+            'border-2 shadow-neo-brutalist',
             style.bg,
             style.text,
             style.border,
@@ -128,7 +128,7 @@ export const WordFeedbackToast: React.FC<WordFeedbackToastProps> = ({
           <div className="flex-shrink-0">
             {style.icon}
           </div>
-          <div className="font-bold text-lg">
+          <div className="font-bold text-sm">
             {message}
           </div>
         </motion.div>
