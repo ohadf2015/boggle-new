@@ -99,9 +99,9 @@ const DailyQuickLink: React.FC<DailyQuickLinkProps> = ({
       onClick={onClick}
       className={cn(
         "relative flex items-center justify-center",
-        "min-w-[44px] min-h-[44px] w-11 h-11 lg:w-14 lg:h-14 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20",
-        "border-3 lg:border-4 2xl:border-[5px] border-neo-black",
-        "rounded-neo lg:rounded-neo-lg shadow-hard lg:shadow-hard-lg 2xl:shadow-hard-xl",
+        "min-w-[44px] min-h-[44px] w-11 h-11 lg:w-12 lg:h-12 xl:w-12 xl:h-12 2xl:w-14 2xl:h-14",
+        "border-3 lg:border-3 2xl:border-3 border-neo-black",
+        "rounded-neo lg:rounded-neo shadow-hard lg:shadow-hard 2xl:shadow-hard-lg",
         "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg",
         "active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm",
         "transition-all duration-100",
@@ -113,13 +113,13 @@ const DailyQuickLink: React.FC<DailyQuickLinkProps> = ({
       aria-label={`${t('daily.badge') || 'Daily Challenge'}${streak > 0 ? ` - ${streak} ${t('daily.streak') || 'streak'}` : ''}`}
     >
       {hasPlayed ? (
-        <Check className="w-5 h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7 2xl:w-8 2xl:h-8 text-neo-black" strokeWidth={3} />
+        <Check className="w-5 h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-6 2xl:h-6 text-neo-black" strokeWidth={3} />
       ) : (
         <motion.div
           animate={!hasPlayed ? { scale: [1, 1.1, 1] } : {}}
           transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
         >
-          <Target className="w-5 h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7 2xl:w-8 2xl:h-8 text-neo-black" />
+          <Target className="w-5 h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-6 2xl:h-6 text-neo-black" />
         </motion.div>
       )}
 

@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Trophy, Target, X, TrendingUp, ArrowLeft, Copy, Check, Send, Coins, RotateCcw, Download } from 'lucide-react';
+import { Share2, Trophy, Target, X, TrendingUp, ArrowLeft, Copy, Check, Send, Coins, RotateCcw, ImageDown } from 'lucide-react';
 
 // X/Twitter icon (no lucide equivalent)
 const XTwitterIcon = ({ className }: { className?: string }) => (
@@ -1074,13 +1074,14 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               <Button
                 onClick={handleDownloadShareImage}
                 disabled={isGeneratingImage}
-                aria-label={t('daily.downloadImage') || 'Download Image'}
+                title={t('daily.downloadImage') || 'Save Share Image'}
+                aria-label={t('daily.downloadImage') || 'Save Share Image'}
                 className="py-3 min-h-[44px] bg-neo-purple text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all disabled:opacity-50"
               >
                 {isGeneratingImage ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
-                  <Download className="w-5 h-5" />
+                  <ImageDown className="w-5 h-5" />
                 )}
               </Button>
 

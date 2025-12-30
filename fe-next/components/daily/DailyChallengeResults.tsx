@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Trophy, Flame, Target, Clock, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, Download } from 'lucide-react';
+import { Share2, Trophy, Flame, Target, Clock, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ImageDown } from 'lucide-react';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 // X/Twitter icon (no lucide equivalent)
@@ -761,8 +761,8 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                   onClick={handleDownloadImage}
                   className="py-3 bg-neo-cyan text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm font-bold"
                 >
-                  <Download className="mr-2 w-5 h-5" />
-                  {t('daily.download') || 'Download'}
+                  <ImageDown className="mr-2 w-5 h-5" />
+                  {t('daily.download') || 'Save as Image'}
                 </Button>
               </div>
 

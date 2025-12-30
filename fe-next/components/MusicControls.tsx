@@ -56,7 +56,7 @@ const MusicControls: React.FC = memo(() => {
   }, [hapticsEnabled]);
 
   // Responsive icon class for consistent sizing with button
-  const iconClass = "w-5 h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7 2xl:w-8 2xl:h-8";
+  const iconClass = "w-5 h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-6 2xl:h-6";
 
   // Memoized volume icon
   const volumeIcon = useMemo(() => {
@@ -112,7 +112,7 @@ const MusicControls: React.FC = memo(() => {
         variant="outline"
         size="icon"
         onClick={handleClick}
-        className="relative bg-neo-cream text-neo-black min-w-[44px] min-h-[44px] w-11 h-11 lg:w-14 lg:h-14 xl:w-16 xl:h-16 2xl:w-20 2xl:h-20 border-3 lg:border-4 2xl:border-[5px] rounded-neo lg:rounded-neo-lg shadow-hard lg:shadow-hard-lg 2xl:shadow-hard-xl"
+        className="relative bg-neo-cream text-neo-black min-w-[44px] min-h-[44px] w-11 h-11 lg:w-12 lg:h-12 xl:w-12 xl:h-12 2xl:w-14 2xl:h-14 border-3 lg:border-3 2xl:border-3 rounded-neo lg:rounded-neo shadow-hard lg:shadow-hard 2xl:shadow-hard-lg"
         aria-label={isMuted ? (t('music.unmute') || 'Unmute') : (t('music.mute') || 'Mute')}
         aria-pressed={!isMuted}
       >
