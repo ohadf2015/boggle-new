@@ -2,8 +2,6 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
 import { hebrewLetters, englishLetters, swedishLetters, spanishLetters, japaneseLetters } from '../utils/consts';
-import AchievementPopup from './achievements/AchievementPopup';
-import type { Achievement } from '@/types';
 
 /**
  * MenuAnimation - Flying letters animation for the menu/join view
@@ -150,8 +148,6 @@ const MenuAnimation: React.FC<MenuAnimationProps> = ({ className = '' }) => {
   const [explosions, setExplosions] = useState<Explosion[]>([]);
   const explosionCounterRef = useRef(0);
   const [, setPoppedCount] = useState(0);
-  const [showAchievement, setShowAchievement] = useState<Achievement | null>(null);
-  const achievementShownRef = useRef(false);
   const [mounted, setMounted] = useState(false);
 
   // Get letter set based on language
@@ -236,33 +232,6 @@ const MenuAnimation: React.FC<MenuAnimationProps> = ({ className = '' }) => {
     // Track popped letters count
     setPoppedCount(prevCount => {
       const newCount = prevCount + 1;
-
-      // Check for achievement unlock (10+ letters popped)
-      if (newCount >= 10 && !achievementShownRef.current) {
-        // Check if already unlocked in localStorage
-        const hasUnlocked = typeof window !== 'undefined' &&
-          localStorage.getItem('achievement_LETTER_POPPER') === 'true';
-
-        if (!hasUnlocked) {
-          // Mark as unlocked
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('achievement_LETTER_POPPER', 'true');
-          }
-          achievementShownRef.current = true;
-
-          // Show achievement popup
-          const achievement: Achievement = {
-            id: 'LETTER_POPPER',
-            name: t('achievements.LETTER_POPPER.name'),
-            description: t('achievements.LETTER_POPPER.description'),
-            icon: '🎈',
-            unlockedAt: new Date().toISOString(),
-            tier: 'bronze',
-          };
-          setShowAchievement(achievement);
-        }
-      }
-
       return newCount;
     });
   }, [generateLetter, t]);
@@ -358,14 +327,6 @@ const MenuAnimation: React.FC<MenuAnimationProps> = ({ className = '' }) => {
           onComplete={() => handleExplosionComplete(explosion.id)}
         />
       ))}
-
-      {/* Achievement Popup */}
-      {showAchievement && (
-        <AchievementPopup
-          achievement={showAchievement}
-          onComplete={() => setShowAchievement(null)}
-        />
-      )}
     </div>
   );
 };

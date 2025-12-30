@@ -263,7 +263,7 @@ const Step3LetterFeedback: React.FC<{ onNext: () => void; onPrev: () => void }> 
   );
 };
 
-// Step 4: Minimum Length Rule
+// Step 4: What Counts as a Try
 const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
   onNext,
   onPrev,
@@ -273,45 +273,62 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
   return (
     <div>
       <div className="text-center mb-4">
-        <motion.div
-          className="text-8xl font-black text-neo-purple inline-block"
-          animate={{ scale: [1, 1.2, 1] }}
-          transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 1 }}
-        >
-          3
-        </motion.div>
+        <div className="text-5xl mb-2">🎯</div>
+        <h2 className="text-2xl font-black mb-2">
+          {t('tutorial.wordHunt.triesRule.title') || 'What Counts as a Try?'}
+        </h2>
       </div>
 
-      <h2 className="text-2xl font-black mb-4 text-center">
-        {t('tutorial.wordHunt.minLength.title') || '⚠️ IMPORTANT RULE'}
-      </h2>
-      <p className="text-lg mb-6 text-center font-bold">
-        {t('tutorial.wordHunt.minLength.description') || 'Words must be at least 3 LETTERS long'}
+      <p className="text-sm mb-4 text-center text-gray-600 dark:text-gray-300">
+        {t('tutorial.wordHunt.triesRule.description') || 'Only words matching the target length use your 10 tries!'}
       </p>
 
-      <div className="bg-gray-100 dark:bg-gray-800 rounded-neo border-2 border-neo-black p-4 mb-6 space-y-3">
+      <div className="bg-gray-100 dark:bg-gray-800 rounded-neo border-2 border-neo-black p-4 mb-4 space-y-3">
+        {/* Example: 5-letter target word */}
+        <div className="text-center mb-3">
+          <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+            {t('tutorial.wordHunt.triesRule.exampleTarget') || 'Example: Target word has 5 letters'}
+          </div>
+          <div className="flex justify-center gap-1">
+            {['?', '?', '?', '?', '?'].map((char, idx) => (
+              <div key={idx} className="w-8 h-8 bg-neo-black rounded border-2 border-neo-black flex items-center justify-center text-white font-bold text-sm">
+                {char}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Uses a try */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-            <Check className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 bg-neo-purple rounded-full flex items-center justify-center">
+            <span className="text-white font-bold text-xs">-1</span>
           </div>
           <div>
-            <div className="font-bold">CAT</div>
+            <div className="font-bold text-neo-purple">BEACH</div>
             <div className="text-xs text-gray-600 dark:text-gray-400">
-              {t('tutorial.wordHunt.minLength.example1') || '3 letters ✓'}
+              {t('tutorial.wordHunt.triesRule.usesAttempt') || '5 letters = uses a try'}
             </div>
           </div>
         </div>
 
+        {/* Doesn't use a try */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-            <X className="w-5 h-5 text-white" />
+          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+            <Heart className="w-4 h-4 text-white fill-current" />
           </div>
           <div>
-            <div className="font-bold line-through">AT</div>
+            <div className="font-bold text-green-600">CAT</div>
             <div className="text-xs text-gray-600 dark:text-gray-400">
-              {t('tutorial.wordHunt.minLength.example2') || '2 letters - too short!'}
+              {t('tutorial.wordHunt.triesRule.noAttempt') || '3 letters = NO try used, just gains life!'}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Key insight box */}
+      <div className="bg-gradient-to-r from-neo-yellow/30 to-neo-orange/30 rounded-neo border-2 border-neo-black p-3 mb-4">
+        <div className="text-sm font-bold text-center">
+          {t('tutorial.wordHunt.triesRule.keyInsight') || '💡 Find shorter words freely to gain life without using tries!'}
         </div>
       </div>
 
@@ -320,7 +337,7 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
           ← {t('common.back') || 'Back'}
         </Button>
         <Button onClick={onNext} className="flex-1 bg-neo-purple text-white">
-          {t('tutorial.wordHunt.minLength.gotIt') || 'Got it!'} <ArrowRight className="w-4 h-4 ml-2" />
+          {t('tutorial.wordHunt.triesRule.gotIt') || 'Got it!'} <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
       </div>
     </div>
@@ -354,7 +371,7 @@ const Step5Summary: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
           </li>
           <li className="flex items-start gap-2">
             <span className="text-neo-purple font-bold">•</span>
-            <span>{t('tutorial.wordHunt.complete.rule3') || '3+ letters minimum'}</span>
+            <span>{t('tutorial.wordHunt.complete.rule3') || 'Only same-length words use tries'}</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="text-neo-purple font-bold">•</span>

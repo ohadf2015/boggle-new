@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Trophy, Target, X, TrendingUp, ArrowLeft, Copy, Check, Send, Coins, RotateCcw } from 'lucide-react';
+import { Share2, Trophy, Target, X, TrendingUp, ArrowLeft, Copy, Check, Send, Coins, RotateCcw, Download } from 'lucide-react';
 
 // X/Twitter icon (no lucide equivalent)
 const XTwitterIcon = ({ className }: { className?: string }) => (
@@ -43,6 +43,11 @@ import { fetchGeolocation } from '@/contexts/auth/authUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { awardDailyCoins, spendCoins, canAfford, getCoins, COIN_COSTS } from '@/utils/coinManager';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
+import {
+  generateDailyShareImage,
+  downloadDailyShareImage,
+  type ShareImageResult,
+} from '@/utils/dailyShareImage';
 import type { Language } from '@/types';
 
 interface WordHuntStats {
@@ -175,6 +180,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [signupTrigger, setSignupTrigger] = useState<ConversionTrigger | null>(null);
   const [leaderboardKey, setLeaderboardKey] = useState(0);
   const [showFullShareText, setShowFullShareText] = useState(false);
+  const [shareImage, setShareImage] = useState<ShareImageResult | null>(null);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [countryCode, setCountryCode] = useState<string | null>(null);
   const [countryCodeReady, setCountryCodeReady] = useState(false);
   const hasSubmittedRef = useRef(false);
@@ -594,6 +601,37 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     }
   }, [shareTextWithUrl, shareUrl]);
 
+  // Handle download personalized share image
+  const handleDownloadShareImage = useCallback(async () => {
+    if (isGeneratingImage) return;
+
+    setIsGeneratingImage(true);
+    try {
+      const imageResult = await generateDailyShareImage({
+        gameType: 'wordHunt',
+        rank: stats?.yourStats?.rank || null,
+        totalPlayers: stats?.totalPlayers || 0,
+        puzzleNumber,
+        language,
+        solved: result.solved,
+        attemptsUsed: result.attemptsUsed,
+        displayName: isAuthenticated && profile
+          ? profile.display_name || profile.username
+          : guestPlayer?.displayName,
+        avatarEmoji: isAuthenticated && profile
+          ? profile.avatar_emoji
+          : guestPlayer?.avatarEmoji,
+      });
+
+      setShareImage(imageResult);
+      downloadDailyShareImage(imageResult, 'wordHunt', puzzleNumber);
+    } catch (err) {
+      console.error('Failed to generate share image:', err);
+    } finally {
+      setIsGeneratingImage(false);
+    }
+  }, [isGeneratingImage, stats, puzzleNumber, language, result.solved, result.attemptsUsed, isAuthenticated, profile, guestPlayer]);
+
   // Handle reveal target word (costs coins)
   const handleRevealTargetWord = useCallback(() => {
     const cost = COIN_COSTS.REVEAL_TARGET_WORD;
@@ -738,21 +776,21 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                   <div className="flex items-center justify-center gap-1.5 mb-0.5">
                     <Coins className="w-4 h-4 text-neo-black" />
                     <span className="font-black text-lg text-neo-black">+{coinReward.awarded}</span>
-                    <span className="text-xs font-bold text-neo-black/70">{t('reveal.coins') || 'Coins'}</span>
+                    <span className="text-xs font-bold text-neo-black/70">{t('reveal.coins')}</span>
                   </div>
                   <div className="flex items-center justify-center gap-2 text-[10px] text-neo-black/70 font-medium">
                     {coinReward.breakdown.base > 0 && (
-                      <span>{t('reveal.base') || 'Base'}: +{coinReward.breakdown.base}</span>
+                      <span>{t('reveal.base')}: +{coinReward.breakdown.base}</span>
                     )}
                     {coinReward.breakdown.efficiency > 0 && (
-                      <span>{t('reveal.efficiency') || 'Efficiency'}: +{coinReward.breakdown.efficiency}</span>
+                      <span>{t('reveal.efficiency')}: +{coinReward.breakdown.efficiency}</span>
                     )}
                     {coinReward.breakdown.streak > 0 && (
-                      <span>🔥 {t('reveal.streak') || 'Streak'}: +{coinReward.breakdown.streak}</span>
+                      <span>🔥 {t('reveal.streak')}: +{coinReward.breakdown.streak}</span>
                     )}
                   </div>
                   <p className="text-[10px] text-neo-black/60 mt-0.5">
-                    {t('reveal.usedForReveals') || 'Use coins to reveal words in single player games!'}
+                    {t('reveal.usedForReveals')}
                   </p>
                 </motion.div>
               )}
@@ -789,7 +827,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                   // Show the revealed target word
                   <div className="space-y-2">
                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {t('wordHunt.results.theTargetWordWas') || 'The target word was:'}
+                      {t('wordHunt.results.theTargetWordWas')}
                     </div>
                     <div className="text-3xl font-black text-neo-yellow tracking-wider">
                       {language === 'he' ? applyHebrewFinalLetters(result.targetWord) : result.targetWord.toUpperCase()}
@@ -809,17 +847,17 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                       )}
                     >
                       <Coins className="w-4 h-4 mr-2" />
-                      {t('wordHunt.results.revealTargetWord') || 'Reveal Target Word'}
+                      {t('wordHunt.results.revealTargetWord')}
                       <span className="ml-2 px-2 py-0.5 bg-neo-yellow text-neo-black text-xs rounded-full font-black">
                         {COIN_COSTS.REVEAL_TARGET_WORD}
                       </span>
                     </Button>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {t('wordHunt.results.yourCoins') || 'Your coins:'}{' '}
+                      {t('wordHunt.results.yourCoins')}{' '}
                       <span className="font-bold text-neo-yellow">{currentCoins}</span>
                       {!canAfford(COIN_COSTS.REVEAL_TARGET_WORD) && (
                         <span className="text-red-500 ml-2">
-                          ({t('wordHunt.results.notEnoughCoins') || 'not enough coins'})
+                          ({t('wordHunt.results.notEnoughCoins')})
                         </span>
                       )}
                     </div>
@@ -857,7 +895,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             >
               <div className="flex items-center gap-2">
                 <span className="text-xl">{rarestWord.emoji}</span>
-                <span className="font-black text-white text-sm uppercase">{rarestWord.label} FIND</span>
+                <span className="font-black text-white text-sm uppercase">{rarestWord.label} {t('wordHunt.results.find')}</span>
               </div>
               <span className="font-black text-white text-xl tracking-wider">
                 {rarestWord.word.toUpperCase()}
@@ -979,7 +1017,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                   onClick={() => setShowFullShareText(true)}
                   className="text-xs text-emerald-400 hover:text-emerald-300 mt-1 font-medium"
                 >
-                  {t('common.showMore') || '... show more'}
+                  {t('common.showMore')}
                 </button>
               )}
               {showFullShareText && (
@@ -987,7 +1025,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                   onClick={() => setShowFullShareText(false)}
                   className="text-xs text-gray-400 hover:text-gray-300 mt-1 font-medium"
                 >
-                  {t('common.showLess') || 'show less'}
+                  {t('common.showLess')}
                 </button>
               )}
             </div>
@@ -1008,7 +1046,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               {result.solved ? t('wordHunt.shareResult') : t('wordHunt.shareAttempt')}
             </Button>
 
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-5 gap-2">
               <Button
                 onClick={handleWhatsApp}
                 aria-label="Share on WhatsApp"
@@ -1031,6 +1069,19 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 className="py-3 min-h-[44px] bg-[#0088cc] text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
               >
                 <Send className="w-5 h-5" />
+              </Button>
+
+              <Button
+                onClick={handleDownloadShareImage}
+                disabled={isGeneratingImage}
+                aria-label={t('daily.downloadImage') || 'Download Image'}
+                className="py-3 min-h-[44px] bg-neo-purple text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all disabled:opacity-50"
+              >
+                {isGeneratingImage ? (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Download className="w-5 h-5" />
+                )}
               </Button>
 
               <Button
@@ -1193,7 +1244,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                       </motion.div>
                     </div>
                     {isYourAttempt && (
-                      <span className="text-[10px] font-bold text-neo-yellow">YOU</span>
+                      <span className="text-[10px] font-bold text-neo-yellow">{t('common.you').toUpperCase()}</span>
                     )}
                   </motion.div>
                 );
@@ -1309,7 +1360,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           <div className="space-y-2">
             <p className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center justify-center gap-2">
               <RotateCcw className="w-4 h-4" />
-              {t('wordHunt.results.wantToRetry') || "Want another try?"}
+              {t('wordHunt.results.wantToRetry')}
             </p>
             <Button
               onClick={handleRetryChallenge}
@@ -1322,23 +1373,23 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               )}
             >
               <RotateCcw className="w-4 h-4 mr-2" />
-              {t('wordHunt.results.retryChallenge') || 'Retry Challenge'}
+              {t('wordHunt.results.retryChallenge')}
               <span className="ml-2 px-2 py-0.5 bg-neo-black/20 text-xs rounded-full font-black flex items-center gap-1">
                 <Coins className="w-3 h-3" />
                 {COIN_COSTS.DAILY_RETRY}
               </span>
             </Button>
             <div className="text-xs text-gray-500 dark:text-gray-400">
-              {t('wordHunt.results.yourCoins') || 'Your coins:'}{' '}
+              {t('wordHunt.results.yourCoins')}{' '}
               <span className="font-bold text-neo-yellow">{currentCoins}</span>
               {!canAfford(COIN_COSTS.DAILY_RETRY) && (
                 <span className="text-red-500 ml-2">
-                  ({t('wordHunt.results.needMoreCoins')?.replace('{amount}', String(COIN_COSTS.DAILY_RETRY - currentCoins)) || `need ${COIN_COSTS.DAILY_RETRY - currentCoins} more`})
+                  ({t('wordHunt.results.needMoreCoins').replace('{amount}', String(COIN_COSTS.DAILY_RETRY - currentCoins))})
                 </span>
               )}
             </div>
             <p className="text-[10px] text-gray-500 dark:text-gray-400">
-              {t('wordHunt.results.retryExplanation') || 'Full reset - start fresh with new attempts'}
+              {t('wordHunt.results.retryExplanation')}
             </p>
           </div>
         </motion.div>

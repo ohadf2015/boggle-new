@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Calendar, Sparkles, Edit2, Save, X, RefreshCw, AlertCircle, Check,
   Users, Trash2, RotateCcw, Search, ChevronDown, ChevronUp, Eye, Grid, List,
-  ChevronLeft, ChevronRight, Copy, AlertTriangle
+  ChevronLeft, ChevronRight, Copy, AlertTriangle, Link
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -589,6 +589,19 @@ export const DailyWordSchedule: React.FC = () => {
       setTimeout(() => setSuccessMessage(null), 2000);
     } catch {
       setError('Failed to copy to clipboard');
+    }
+  };
+
+  // Copy reset link to clipboard - allows player to replay after admin resets their attempt
+  const copyResetLink = async () => {
+    try {
+      const origin = typeof window !== 'undefined' ? window.location.origin : '';
+      const resetLink = `${origin}/${selectedLang}/daily?reset=true`;
+      await navigator.clipboard.writeText(resetLink);
+      setSuccessMessage('Reset link copied! Share this with the player to let them replay.');
+      setTimeout(() => setSuccessMessage(null), 4000);
+    } catch {
+      setError('Failed to copy reset link');
     }
   };
 
@@ -1209,15 +1222,27 @@ export const DailyWordSchedule: React.FC = () => {
                           </div>
 
                           {selectedAttempts.size > 0 && (
-                            <Button
-                              onClick={handleResetSelectedAttempts}
-                              disabled={saving}
-                              size="sm"
-                              className="bg-red-500 hover:bg-red-600 text-white"
-                            >
-                              <Trash2 className="w-4 h-4 mr-1" />
-                              Reset {selectedAttempts.size} Selected
-                            </Button>
+                            <>
+                              <Button
+                                onClick={handleResetSelectedAttempts}
+                                disabled={saving}
+                                size="sm"
+                                className="bg-red-500 hover:bg-red-600 text-white"
+                              >
+                                <Trash2 className="w-4 h-4 mr-1" />
+                                Reset {selectedAttempts.size} Selected
+                              </Button>
+                              <Button
+                                onClick={copyResetLink}
+                                size="sm"
+                                variant="outline"
+                                className="border-2 border-neo-purple text-neo-purple hover:bg-neo-purple hover:text-white"
+                                title="Copy reset link to share with player"
+                              >
+                                <Link className="w-4 h-4 mr-1" />
+                                Copy Reset Link
+                              </Button>
+                            </>
                           )}
                         </div>
 

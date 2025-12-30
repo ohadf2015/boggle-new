@@ -5,20 +5,13 @@ export const runtime = 'edge';
 
 /**
  * Dynamic OG Image for Daily Challenge Leaderboard Position
+ * Full-bleed dark design with large, visible text
  *
  * Generates a shareable image showing:
  * - Player's rank (with medal emoji for top 3)
  * - Player name and avatar
  * - Score and word count
  * - Puzzle number
- *
- * Query params:
- * - rank: Player's rank (1, 2, 3, etc.)
- * - displayName: Player's display name
- * - avatarEmoji: Player's avatar emoji
- * - score: Player's score
- * - wordCount: Number of words found
- * - puzzleNumber: Daily puzzle number
  */
 export async function GET(request: NextRequest) {
   try {
@@ -33,20 +26,23 @@ export async function GET(request: NextRequest) {
     const puzzleNumber = parseInt(searchParams.get('puzzleNumber') || '0');
 
     // Get rank display (medal for top 3, number otherwise)
-    const getRankDisplay = (r: number): string => {
-      if (r === 1) return '🥇';
-      if (r === 2) return '🥈';
-      if (r === 3) return '🥉';
-      return `#${r}`;
+    const getRankDisplay = (r: number): { emoji: string; text: string } => {
+      if (r === 1) return { emoji: '🥇', text: '1st' };
+      if (r === 2) return { emoji: '🥈', text: '2nd' };
+      if (r === 3) return { emoji: '🥉', text: '3rd' };
+      return { emoji: '🏆', text: `#${r}` };
     };
 
-    // Get background gradient based on rank
-    const getBgGradient = (r: number): string => {
-      if (r === 1) return 'linear-gradient(135deg, #FFE135 0%, #FFA500 100%)'; // Gold
-      if (r === 2) return 'linear-gradient(135deg, #C0C0C0 0%, #E8E8E8 100%)'; // Silver
-      if (r === 3) return 'linear-gradient(135deg, #CD7F32 0%, #E59866 100%)'; // Bronze
-      return 'linear-gradient(135deg, #00D9FF 0%, #6366f1 100%)'; // Cyan-Purple
+    // Get accent color based on rank
+    const getAccentColor = (r: number): string => {
+      if (r === 1) return '#fbbf24'; // Gold
+      if (r === 2) return '#9ca3af'; // Silver
+      if (r === 3) return '#d97706'; // Bronze
+      return '#06b6d4'; // Cyan for others
     };
+
+    const rankInfo = getRankDisplay(rank);
+    const accent = getAccentColor(rank);
 
     return new ImageResponse(
       (
@@ -58,188 +54,191 @@ export async function GET(request: NextRequest) {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            background: getBgGradient(rank),
-            fontFamily: 'system-ui, sans-serif',
-            position: 'relative',
+            background: `linear-gradient(135deg, #0f0f14 0%, #1a1a2e 50%, #0f0f14 100%)`,
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            padding: '32px',
           }}
         >
-          {/* Header */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '16px',
-              marginBottom: '24px',
-            }}
-          >
-            <div
-              style={{
-                fontSize: '48px',
-                fontWeight: 900,
-                color: '#000',
-                background: '#fff',
-                padding: '12px 24px',
-                borderRadius: '12px',
-                border: '4px solid #000',
-                boxShadow: '4px 4px 0px #000',
-              }}
-            >
-              🎯 LexiClash Daily
-            </div>
-          </div>
-
-          {/* Puzzle Number */}
-          <div
-            style={{
-              fontSize: '24px',
-              fontWeight: 700,
-              color: '#000',
-              marginBottom: '32px',
-              opacity: 0.8,
-            }}
-          >
-            Puzzle #{puzzleNumber}
-          </div>
-
-          {/* Rank Badge */}
+          {/* Top: Brand + Puzzle Number */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '120px',
-              marginBottom: '24px',
-              textShadow: '4px 4px 0px rgba(0,0,0,0.2)',
+              gap: '12px',
+              marginBottom: '12px',
             }}
           >
-            {getRankDisplay(rank)}
+            <span style={{ fontSize: '32px' }}>🎯</span>
+            <span style={{ fontSize: '28px', fontWeight: 900, color: '#fff', letterSpacing: '2px' }}>
+              LEXICLASH DAILY
+            </span>
+            {puzzleNumber > 0 && (
+              <span style={{ fontSize: '22px', fontWeight: 700, color: '#6b7280' }}>
+                #{puzzleNumber}
+              </span>
+            )}
           </div>
 
-          {/* Player Card */}
+          {/* Player info - large and prominent */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '20px',
+              marginBottom: '16px',
+            }}
+          >
+            <span style={{ fontSize: '72px' }}>{avatarEmoji}</span>
+            <span style={{
+              fontSize: '56px',
+              fontWeight: 900,
+              color: '#fff',
+              maxWidth: '600px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}>
+              {displayName}
+            </span>
+          </div>
+
+          {/* Main result - HUGE rank display */}
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              background: '#fff',
-              padding: '32px 48px',
+              justifyContent: 'center',
+              background: `linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%)`,
               borderRadius: '24px',
-              border: '6px solid #000',
-              boxShadow: '8px 8px 0px #000',
-              marginBottom: '32px',
+              padding: '16px 80px',
+              marginBottom: '16px',
             }}
           >
-            {/* Avatar */}
-            <div
-              style={{
-                fontSize: '80px',
-                marginBottom: '16px',
-              }}
-            >
-              {avatarEmoji}
-            </div>
-
-            {/* Display Name */}
-            <div
-              style={{
-                fontSize: '48px',
-                fontWeight: 900,
-                color: '#000',
-                marginBottom: '24px',
-                textAlign: 'center',
-              }}
-            >
-              {displayName}
-            </div>
-
-            {/* Stats */}
-            <div
-              style={{
-                display: 'flex',
-                gap: '48px',
-                alignItems: 'center',
-              }}
-            >
-              {/* Score */}
-              <div
+            {/* Big rank display */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <span style={{ fontSize: '140px' }}>{rankInfo.emoji}</span>
+              <span
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
+                  fontSize: '140px',
+                  fontWeight: 900,
+                  color: accent,
+                  lineHeight: 0.9,
+                  letterSpacing: '-5px',
                 }}
               >
-                <div
-                  style={{
-                    fontSize: '64px',
-                    fontWeight: 900,
-                    color: '#6366f1',
-                  }}
-                >
-                  {score}
-                </div>
-                <div
-                  style={{
-                    fontSize: '20px',
-                    fontWeight: 700,
-                    color: '#666',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  Points
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div
-                style={{
-                  width: '4px',
-                  height: '80px',
-                  background: '#e5e5e5',
-                  borderRadius: '2px',
-                }}
-              />
-
-              {/* Word Count */}
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: '64px',
-                    fontWeight: 900,
-                    color: '#10b981',
-                  }}
-                >
-                  {wordCount}
-                </div>
-                <div
-                  style={{
-                    fontSize: '20px',
-                    fontWeight: 700,
-                    color: '#666',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  Words
-                </div>
-              </div>
+                {rankInfo.text}
+              </span>
             </div>
           </div>
 
-          {/* Footer */}
+          {/* Stats row - score and words side by side */}
           <div
             style={{
-              fontSize: '20px',
-              fontWeight: 700,
-              color: '#000',
-              opacity: 0.7,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '60px',
+              marginBottom: '20px',
             }}
           >
-            Can you beat this score? 🎮
+            {/* Score */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <span
+                style={{
+                  fontSize: '80px',
+                  fontWeight: 900,
+                  color: '#a78bfa',
+                  lineHeight: 1,
+                }}
+              >
+                {score}
+              </span>
+              <span
+                style={{
+                  fontSize: '24px',
+                  fontWeight: 700,
+                  color: '#6b7280',
+                  textTransform: 'uppercase',
+                  letterSpacing: '2px',
+                }}
+              >
+                Points
+              </span>
+            </div>
+
+            {/* Divider */}
+            <div
+              style={{
+                width: '4px',
+                height: '100px',
+                background: 'rgba(255,255,255,0.2)',
+                borderRadius: '2px',
+              }}
+            />
+
+            {/* Word Count */}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            >
+              <span
+                style={{
+                  fontSize: '80px',
+                  fontWeight: 900,
+                  color: '#34d399',
+                  lineHeight: 1,
+                }}
+              >
+                {wordCount}
+              </span>
+              <span
+                style={{
+                  fontSize: '24px',
+                  fontWeight: 700,
+                  color: '#6b7280',
+                  textTransform: 'uppercase',
+                  letterSpacing: '2px',
+                }}
+              >
+                Words
+              </span>
+            </div>
+          </div>
+
+          {/* Bottom CTA - full width bar */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '12px',
+              padding: '16px 48px',
+              background: accent,
+              borderRadius: '14px',
+            }}
+          >
+            <span style={{ fontSize: '40px' }}>🎮</span>
+            <span style={{
+              fontSize: '32px',
+              fontWeight: 900,
+              color: '#000',
+              letterSpacing: '1px',
+            }}>
+              Can you beat this score?
+            </span>
+            <span style={{ fontSize: '40px' }}>🎮</span>
           </div>
         </div>
       ),

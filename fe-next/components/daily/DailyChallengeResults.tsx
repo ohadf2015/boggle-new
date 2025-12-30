@@ -32,11 +32,13 @@ import DailyLeaderboard from './DailyLeaderboard';
 import ConfettiRetrigger from '@/components/results/ConfettiRetrigger';
 import { useAuth } from '@/contexts/AuthContext';
 import {
-  generateShareImage,
   shareImageWithNativeShare,
-  downloadShareImage,
   type ShareImageResult,
 } from '@/utils/shareImageGenerator';
+import {
+  generateDailyShareImage,
+  downloadDailyShareImage,
+} from '@/utils/dailyShareImage';
 
 interface DailyChallengeResultsProps {
   result: DailyChallengeResult;
@@ -73,6 +75,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [showImagePreview, setShowImagePreview] = useState(false);
   const [currentUserRank, setCurrentUserRank] = useState<number | null>(null);
+  const [totalPlayers, setTotalPlayers] = useState(0);
   const [showFullShareText, setShowFullShareText] = useState(false);
   const { profile, isAuthenticated } = useAuth();
 
@@ -276,9 +279,9 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
 
   // Handle share to WhatsApp
   const handleWhatsApp = useCallback(() => {
-    const url = `https://wa.me/?text=${encodeURIComponent(shareText + '\n\nCan you beat my score?')}`;
+    const url = `https://wa.me/?text=${encodeURIComponent(shareText + '\n\n' + t('daily.canYouBeatMyScore'))}`;
     window.open(url, '_blank');
-  }, [shareText]);
+  }, [shareText, t]);
 
   // Handle share to Twitter/X
   const handleTwitter = useCallback(() => {
@@ -291,7 +294,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
     if (navigator.share) {
       try {
         await navigator.share({
-          text: shareText + '\n\nCan you beat my score?',
+          text: shareText + '\n\n' + t('daily.canYouBeatMyScore'),
         });
       } catch (err) {
         // User cancelled or error
@@ -300,19 +303,28 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
     } else {
       setShowSharePanel(true);
     }
-  }, [shareText]);
+  }, [shareText, t]);
 
-  // Generate share image
+  // Generate personalized share image with funny sentences
   const handleGenerateImage = useCallback(async () => {
     if (isGeneratingImage) return;
 
     setIsGeneratingImage(true);
     try {
-      const imageResult = await generateShareImage({
-        result,
-        streak,
-        longestWord,
-        size: 'og',
+      const imageResult = await generateDailyShareImage({
+        gameType: 'puzzle',
+        rank: currentUserRank,
+        totalPlayers,
+        puzzleNumber: result.puzzleNumber,
+        language: result.language,
+        score: result.score,
+        wordCount: result.wordCount,
+        displayName: isAuthenticated && profile
+          ? profile.display_name || profile.username
+          : guestPlayer?.displayName,
+        avatarEmoji: isAuthenticated && profile
+          ? profile.avatar_emoji
+          : guestPlayer?.avatarEmoji,
       });
       setShareImage(imageResult);
       setShowImagePreview(true);
@@ -321,7 +333,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
     } finally {
       setIsGeneratingImage(false);
     }
-  }, [result, streak, longestWord, isGeneratingImage]);
+  }, [result, currentUserRank, totalPlayers, isAuthenticated, profile, guestPlayer, isGeneratingImage]);
 
   // Share image via native share
   const handleShareImage = useCallback(async () => {
@@ -332,19 +344,19 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
 
     const success = await shareImageWithNativeShare(
       shareImage,
-      shareText + '\n\nCan you beat my score?'
+      shareText + '\n\n' + t('daily.canYouBeatMyScore')
     );
 
     if (!success) {
       // Fallback: show image preview for manual download/share
       setShowImagePreview(true);
     }
-  }, [shareImage, shareText, handleGenerateImage]);
+  }, [shareImage, shareText, handleGenerateImage, t]);
 
   // Download share image
   const handleDownloadImage = useCallback(() => {
     if (shareImage) {
-      downloadShareImage(shareImage, `lexiclash-daily-${result.puzzleNumber}.png`);
+      downloadDailyShareImage(shareImage, 'puzzle', result.puzzleNumber);
     }
   }, [shareImage, result.puzzleNumber]);
 
@@ -491,7 +503,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               onClick={() => setShowFullShareText(true)}
               className="text-xs text-neo-cyan hover:text-neo-lime mt-1 font-medium"
             >
-              {t('common.showMore') || '... show more'}
+              {t('common.showMore')}
             </button>
           )}
           {showFullShareText && (
@@ -499,7 +511,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               onClick={() => setShowFullShareText(false)}
               className="text-xs text-gray-400 hover:text-gray-300 mt-1 font-medium"
             >
-              {t('common.showLess') || 'show less'}
+              {t('common.showLess')}
             </button>
           )}
         </motion.div>
@@ -629,6 +641,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             currentPlayerId={isAuthenticated && profile ? profile.id : null}
             currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
             onCurrentUserRankChange={handleCurrentUserRankChange}
+            onParticipantCountChange={setTotalPlayers}
             maxVisible={10}
             t={t}
             gameType="puzzle"

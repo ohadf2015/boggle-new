@@ -342,39 +342,43 @@ const generateVariants = (
   utmSource: string
 ): ShareVariant[] => {
   const url = getJoinUrl(gameCode, utmSource);
-  const { score, wordCount, isWinner, longestWord } = result;
+  const { score, wordCount, isWinner, longestWord, maxCombo } = result;
+
+  // Score tier for message selection
+  const isLegendary = score > 150;
+  const isAmazing = score > 100;
 
   // Language-specific variants with different tones
   const variants: Record<string, ShareVariant[]> = {
     en: [
-      { id: 'en_challenge', tone: 'challenge', message: `🎮 Just found ${wordCount} words in LexiClash! Can you beat that?\n${url}` },
-      { id: 'en_achievement', tone: 'achievement', message: `🏆 ${score} points in LexiClash${longestWord ? ` (longest: ${longestWord})` : ''}!\n${url}` },
-      { id: 'en_social', tone: 'social', message: `⚡ Playing LexiClash - it's addictive! Join me:\n${url}` },
-      { id: 'en_competitive', tone: 'competitive', message: `📚 Word ${isWinner ? 'champion' : 'master'} here! Think you can beat ${score} points?\n${url}` },
+      { id: 'en_challenge', tone: 'challenge', message: `🎮 ${wordCount} words. ${score} points. Think you can beat that?\n${url}` },
+      { id: 'en_achievement', tone: 'achievement', message: `${isLegendary ? '🔥' : '🏆'} ${score} points in LexiClash!${longestWord ? ` Found "${longestWord}" 💎` : ''}${maxCombo && maxCombo >= 10 ? ` ${maxCombo}x combo! ⚡` : ''}\n${url}` },
+      { id: 'en_social', tone: 'social', message: `Word battle happening NOW! ${isWinner ? 'Come challenge the champ' : 'Join the fight'} 🎮\n${url}` },
+      { id: 'en_competitive', tone: 'competitive', message: `${isAmazing ? 'The letters feared me today. ' : ''}${score} points${isWinner ? ' and the W' : ''}. Your turn.\n${url}` },
     ],
     he: [
-      { id: 'he_challenge', tone: 'challenge', message: `🎮 מצאתי ${wordCount} מילים ב-LexiClash! תצליחו יותר?\n${url}` },
-      { id: 'he_achievement', tone: 'achievement', message: `🏆 השגתי ${score} נקודות${longestWord ? ` (הכי ארוכה: ${longestWord})` : ''}!\n${url}` },
-      { id: 'he_social', tone: 'social', message: `⚡ משחק ממכר! הצטרפו ל-LexiClash:\n${url}` },
-      { id: 'he_competitive', tone: 'competitive', message: `📚 ${isWinner ? 'אלוף' : 'שחקן'} מילים! מי ינצח ${score} נקודות?\n${url}` },
+      { id: 'he_challenge', tone: 'challenge', message: `${wordCount} מילים. ${score} נקודות. תצליחו יותר? 🎮\n${url}` },
+      { id: 'he_achievement', tone: 'achievement', message: `${isLegendary ? '🔥' : '🏆'} ${score} נקודות ב-LexiClash!${longestWord ? ` מצאתי "${longestWord}" 💎` : ''}${maxCombo && maxCombo >= 10 ? ` קומבו ${maxCombo}x! ⚡` : ''}\n${url}` },
+      { id: 'he_social', tone: 'social', message: `קרב מילים עכשיו! ${isWinner ? 'בואו לאתגר את האלוף' : 'הצטרפו לקרב'} 🎮\n${url}` },
+      { id: 'he_competitive', tone: 'competitive', message: `${isAmazing ? 'האותיות פחדו ממני היום. ' : ''}${score} נקודות${isWinner ? ' וניצחון' : ''}. תורכם.\n${url}` },
     ],
     sv: [
-      { id: 'sv_challenge', tone: 'challenge', message: `🎮 Hittade ${wordCount} ord i LexiClash! Kan du slå det?\n${url}` },
-      { id: 'sv_achievement', tone: 'achievement', message: `🏆 ${score} poäng i LexiClash!\n${url}` },
-      { id: 'sv_social', tone: 'social', message: `⚡ Spelar LexiClash - det är beroendeframkallande! Gå med:\n${url}` },
-      { id: 'sv_competitive', tone: 'competitive', message: `📚 Ord${isWinner ? 'mästare' : 'entusiast'} här! Slå ${score} poäng?\n${url}` },
+      { id: 'sv_challenge', tone: 'challenge', message: `${wordCount} ord. ${score} poäng. Slår du det? 🎮\n${url}` },
+      { id: 'sv_achievement', tone: 'achievement', message: `${isLegendary ? '🔥' : '🏆'} ${score} poäng i LexiClash!${longestWord ? ` Hittade "${longestWord}" 💎` : ''}\n${url}` },
+      { id: 'sv_social', tone: 'social', message: `Ordstrid pågår! ${isWinner ? 'Utmana mästaren' : 'Gå med i kampen'} 🎮\n${url}` },
+      { id: 'sv_competitive', tone: 'competitive', message: `${isAmazing ? 'Bokstäverna fruktade mig idag. ' : ''}${score} poäng${isWinner ? ' och vinst' : ''}. Din tur.\n${url}` },
     ],
     ja: [
-      { id: 'ja_challenge', tone: 'challenge', message: `🎮 LexiClashで${wordCount}語見つけた！勝てる？\n${url}` },
-      { id: 'ja_achievement', tone: 'achievement', message: `🏆 LexiClashで${score}ポイント獲得！\n${url}` },
-      { id: 'ja_social', tone: 'social', message: `⚡ LexiClash面白い！一緒に遊ぼう：\n${url}` },
-      { id: 'ja_competitive', tone: 'competitive', message: `📚 ${isWinner ? 'チャンピオン' : '挑戦者'}！${score}ポイント超えられる？\n${url}` },
+      { id: 'ja_challenge', tone: 'challenge', message: `${wordCount}語。${score}ポイント。勝てる？🎮\n${url}` },
+      { id: 'ja_achievement', tone: 'achievement', message: `${isLegendary ? '🔥' : '🏆'} LexiClashで${score}ポイント！${longestWord ? `「${longestWord}」発見 💎` : ''}\n${url}` },
+      { id: 'ja_social', tone: 'social', message: `単語バトル開催中！${isWinner ? 'チャンプに挑戦して' : '参加しよう'} 🎮\n${url}` },
+      { id: 'ja_competitive', tone: 'competitive', message: `${isAmazing ? '文字たちは怯えていた。' : ''}${score}ポイント${isWinner ? 'で勝利' : ''}。君の番だ。\n${url}` },
     ],
     es: [
-      { id: 'es_challenge', tone: 'challenge', message: `🎮 ¡Encontré ${wordCount} palabras en LexiClash! ¿Puedes superarlo?\n${url}` },
-      { id: 'es_achievement', tone: 'achievement', message: `🏆 ¡${score} puntos en LexiClash${longestWord ? ` (más larga: ${longestWord})` : ''}!\n${url}` },
-      { id: 'es_social', tone: 'social', message: `⚡ ¡LexiClash es adictivo! Únete:\n${url}` },
-      { id: 'es_competitive', tone: 'competitive', message: `📚 ¡${isWinner ? 'Campeón' : 'Maestro'} de palabras! ¿Puedes superar ${score} puntos?\n${url}` },
+      { id: 'es_challenge', tone: 'challenge', message: `${wordCount} palabras. ${score} puntos. ¿Puedes superarlo? 🎮\n${url}` },
+      { id: 'es_achievement', tone: 'achievement', message: `${isLegendary ? '🔥' : '🏆'} ¡${score} puntos en LexiClash!${longestWord ? ` Encontré "${longestWord}" 💎` : ''}${maxCombo && maxCombo >= 10 ? ` ¡Combo ${maxCombo}x! ⚡` : ''}\n${url}` },
+      { id: 'es_social', tone: 'social', message: `¡Batalla de palabras EN VIVO! ${isWinner ? 'Desafía al campeón' : 'Únete a la lucha'} 🎮\n${url}` },
+      { id: 'es_competitive', tone: 'competitive', message: `${isAmazing ? 'Las letras me temían hoy. ' : ''}${score} puntos${isWinner ? ' y victoria' : ''}. Tu turno.\n${url}` },
     ],
   };
 

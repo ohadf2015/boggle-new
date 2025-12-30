@@ -35,7 +35,9 @@ const RANDOM_DELAYS = (() => {
   return delays;
 })();
 
-type AnimationPattern = 'cascade' | 'random' | 'columns' | 'rows' | 'spiral' | 'center-out';
+// Simplified animation patterns - removed spiral and center-out as they add complexity
+// with minimal visual benefit and are rarely distinguishable to users
+type AnimationPattern = 'cascade' | 'random' | 'columns' | 'rows';
 
 interface SlotMachineGridProps {
   grid: LetterGrid;
@@ -83,23 +85,6 @@ const SlotMachineGrid: React.FC<SlotMachineGridProps> = ({
       case 'random':
         // Use pre-computed random delays
         return RANDOM_DELAYS[rowIndex]?.[colIndex] ?? 0;
-
-      case 'spiral': {
-        // Spiral from outside to center
-        const centerRow = Math.floor(totalRows / 2);
-        const centerCol = Math.floor(totalCols / 2);
-        const distance = Math.max(Math.abs(rowIndex - centerRow), Math.abs(colIndex - centerCol));
-        const maxDistance = Math.max(centerRow, centerCol);
-        return (maxDistance - distance) * staggerDelay * 2;
-      }
-
-      case 'center-out': {
-        // From center outward
-        const cRow = Math.floor(totalRows / 2);
-        const cCol = Math.floor(totalCols / 2);
-        const dist = Math.abs(rowIndex - cRow) + Math.abs(colIndex - cCol);
-        return dist * staggerDelay;
-      }
 
       default:
         return (rowIndex + colIndex) * staggerDelay;

@@ -982,7 +982,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       {/* Prominent Attempts Counter */}
       <motion.div
         className={cn(
-          "flex items-center justify-between gap-2 sm:gap-3 px-2 sm:px-3 py-1 sm:py-1.5 rounded-neo border-2 mb-1 mx-auto max-w-3xl w-full",
+          "flex flex-col gap-0.5 rounded-neo border-2 mb-1 mx-auto max-w-3xl w-full",
           MAX_ATTEMPTS - attempts.length <= 2
             ? "bg-red-100 dark:bg-red-900/30 border-red-500"
             : MAX_ATTEMPTS - attempts.length <= 4
@@ -994,45 +994,53 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         } : {}}
         transition={{ duration: 0.5, repeat: MAX_ATTEMPTS - attempts.length <= 2 ? Infinity : 0 }}
       >
-        {/* Attempts dots indicator */}
-        <div className="flex items-center gap-0.5 sm:gap-1">
-          {[...Array(MAX_ATTEMPTS)].map((_, i) => (
-            <motion.div
-              key={i}
-              className={cn(
-                "w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full border border-neo-black/50",
-                i < attempts.length
-                  ? "bg-gray-400 dark:bg-gray-600" // Used attempt
-                  : MAX_ATTEMPTS - attempts.length <= 2
-                    ? "bg-red-500" // Critical - remaining
-                    : MAX_ATTEMPTS - attempts.length <= 4
-                      ? "bg-yellow-500" // Warning - remaining
-                      : "bg-green-500" // Safe - remaining
-              )}
-              initial={false}
-              animate={i === attempts.length - 1 && attempts.length > 0 ? {
-                scale: [1, 0.5, 1]
-              } : {}}
-              transition={{ duration: 0.3 }}
-            />
-          ))}
+        {/* Main row */}
+        <div className="flex items-center justify-between gap-2 sm:gap-3 px-2 sm:px-3 py-1 sm:py-1.5">
+          {/* Attempts dots indicator */}
+          <div className="flex items-center gap-0.5 sm:gap-1">
+            {[...Array(MAX_ATTEMPTS)].map((_, i) => (
+              <motion.div
+                key={i}
+                className={cn(
+                  "w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full border border-neo-black/50",
+                  i < attempts.length
+                    ? "bg-gray-400 dark:bg-gray-600" // Used attempt
+                    : MAX_ATTEMPTS - attempts.length <= 2
+                      ? "bg-red-500" // Critical - remaining
+                      : MAX_ATTEMPTS - attempts.length <= 4
+                        ? "bg-yellow-500" // Warning - remaining
+                        : "bg-green-500" // Safe - remaining
+                )}
+                initial={false}
+                animate={i === attempts.length - 1 && attempts.length > 0 ? {
+                  scale: [1, 0.5, 1]
+                } : {}}
+                transition={{ duration: 0.3 }}
+              />
+            ))}
+          </div>
+
+          {/* Text indicator */}
+          <div className={cn(
+            "text-xs sm:text-sm font-black",
+            MAX_ATTEMPTS - attempts.length <= 2
+              ? "text-red-600 dark:text-red-400"
+              : MAX_ATTEMPTS - attempts.length <= 4
+                ? "text-yellow-600 dark:text-yellow-400"
+                : "text-green-600 dark:text-green-400"
+          )}>
+            {MAX_ATTEMPTS - attempts.length} {t('wordHunt.survival.triesLeft') || 'left'}
+          </div>
+
+          {/* Words discovered - integrated */}
+          <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
+            📖 {discoveredWords.length}
+          </div>
         </div>
 
-        {/* Text indicator */}
-        <div className={cn(
-          "text-xs sm:text-sm font-black",
-          MAX_ATTEMPTS - attempts.length <= 2
-            ? "text-red-600 dark:text-red-400"
-            : MAX_ATTEMPTS - attempts.length <= 4
-              ? "text-yellow-600 dark:text-yellow-400"
-              : "text-green-600 dark:text-green-400"
-        )}>
-          {MAX_ATTEMPTS - attempts.length} {t('wordHunt.survival.triesLeft') || 'left'}
-        </div>
-
-        {/* Words discovered - integrated */}
-        <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
-          📖 {discoveredWords.length}
+        {/* Hint: Only matching length words count as tries */}
+        <div className="text-[9px] sm:text-[10px] text-center text-gray-500 dark:text-gray-400 pb-1 px-2">
+          {t('wordHunt.survival.onlyMatchingLengthHint')?.replace('{length}', String(targetWord.length)) || `Only ${targetWord.length}-letter words use tries`}
         </div>
       </motion.div>
 

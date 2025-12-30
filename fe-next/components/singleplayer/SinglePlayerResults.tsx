@@ -60,7 +60,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   onBackToLobby,
 }) => {
   const { t, language } = useLanguage();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, profile, updateProfile } = useAuth();
   const isLandscape = useMobileLandscape();
   const [expandedBot, setExpandedBot] = useState<string | null>(null);
   const [showSignupModal, setShowSignupModal] = useState(false);
@@ -77,6 +77,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const hasAddedToHistoryRef = useRef(false);
   const hasLoggedGameSessionRef = useRef(false);
   const hasAwardedCoinsRef = useRef(false);
+  const hasSavedAchievementsRef = useRef(false);
   const actionButtonsRef = useRef<HTMLDivElement>(null);
 
   // Coin reward state
@@ -158,6 +159,38 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
     hasUpdatedStatsRef.current = true;
   }, [isAuthenticated, results, isWinner, totalComboBonus, totalFireRoundBonus, playerArchetype]);
+
+  // Save achievements to profile for authenticated users
+  useEffect(() => {
+    if (!isAuthenticated || !profile || hasSavedAchievementsRef.current) return;
+
+    const achievements = results.achievements?.map(a => a.key) || [];
+    if (achievements.length === 0) return;
+
+    async function saveAchievements() {
+      try {
+        // Merge new achievements with existing counts
+        const currentCounts = profile?.achievement_counts || {};
+        const updatedCounts = { ...currentCounts };
+
+        for (const achievement of achievements) {
+          updatedCounts[achievement] = (updatedCounts[achievement] || 0) + 1;
+        }
+
+        // Update profile with new achievement counts
+        await updateProfile({
+          achievement_counts: updatedCounts,
+        });
+
+        console.log('[SinglePlayerResults] Saved achievements to profile:', achievements);
+      } catch (error) {
+        console.error('[SinglePlayerResults] Failed to save achievements:', error);
+      }
+    }
+
+    saveAchievements();
+    hasSavedAchievementsRef.current = true;
+  }, [isAuthenticated, profile, results.achievements, updateProfile]);
 
   // Log game session to database for admin analytics (runs for all users)
   useEffect(() => {

@@ -1,7 +1,8 @@
 /**
  * Single Player Achievement Calculator
  * Client-side achievement logic for single player mode
- * Note: These achievements are NOT saved to the profile - only multiplayer achievements are saved
+ * Note: These achievements ARE now saved to the profile for authenticated users
+ * (see SinglePlayerResults.tsx for the saving logic)
  */
 
 // Achievement icons (same as backend)
@@ -14,7 +15,6 @@ export const ACHIEVEMENT_ICONS: Record<string, string> = {
   LEXICON: '🏆',
   WORDSMITH: '🎓',
   QUICK_THINKER: '💨',
-  LONG_HAULER: '🏃',
   DIVERSE_VOCABULARY: '🌈',
   DOUBLE_TROUBLE: '⚡⚡',
   TREASURE_HUNTER: '💎',

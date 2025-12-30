@@ -28,6 +28,7 @@ import {
   type WordHuntResult,
   type StoredWordHuntResult,
 } from '@/utils/dailyChallenge';
+import { neoSuccessToast } from '@/components/NeoToast';
 import { useSearchParams } from 'next/navigation';
 import type { LetterGrid, Language } from '@/types';
 import type { SurvivalGameResult } from './DailyWordHuntSurvival';
@@ -86,7 +87,10 @@ const DailyChallenge: React.FC = () => {
   const [storedResult, setStoredResult] = useState<StoredWordHuntResult | null>(null);
   const [gameResult, setGameResult] = useState<SurvivalGameResult | null>(null);
 
-  // Parse challenge parameter from URL
+  // State to track if we just reset
+  const [wasReset, setWasReset] = useState(false);
+
+  // Parse challenge parameter and handle admin reset from URL
   useEffect(() => {
     const challengeParam = searchParams.get('challenge');
     if (challengeParam) {
@@ -95,7 +99,23 @@ const DailyChallenge: React.FC = () => {
         setChallengeData(parsed);
       }
     }
-  }, [searchParams]);
+
+    // Handle admin reset: ?reset=true clears localStorage so player can replay
+    const resetParam = searchParams.get('reset');
+    if (resetParam === 'true' && typeof window !== 'undefined') {
+      // Clear the localStorage for this language
+      const cleared = clearWordHuntResultForRetry(language as Language);
+      if (cleared) {
+        setWasReset(true);
+        // Show success toast
+        neoSuccessToast(t('daily.attemptReset'), { icon: '🔄', duration: 4000 });
+        // Clean up URL by removing the reset parameter
+        const url = new URL(window.location.href);
+        url.searchParams.delete('reset');
+        window.history.replaceState({}, '', url.toString());
+      }
+    }
+  }, [searchParams, language]);
 
   // Initialize Word Hunt daily challenge
   useEffect(() => {
@@ -149,7 +169,7 @@ const DailyChallenge: React.FC = () => {
     };
 
     initializePuzzle();
-  }, [language]);
+  }, [language, wasReset]); // Re-initialize when language changes or admin reset clears localStorage
 
   // Update countdown timer
   useEffect(() => {
@@ -285,6 +305,7 @@ const DailyChallenge: React.FC = () => {
             currentFlag={getCurrentFlag(language as Language)}
             challengeData={challengeData}
             isAuthenticated={isAuthenticated}
+            targetWordLength={targetWord?.length || 0}
             onLanguageChange={(lang) => setLanguage(lang)}
             onStart={handleStartGame}
             onBack={handleBack}
@@ -350,6 +371,7 @@ interface DailyReadyScreenProps {
   currentFlag: string;
   challengeData: ChallengeData | null;
   isAuthenticated: boolean;
+  targetWordLength: number;
   onLanguageChange: (lang: Language) => void;
   onStart: () => void;
   onBack: () => void;
@@ -365,6 +387,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
   currentFlag,
   challengeData,
   isAuthenticated,
+  targetWordLength,
   onLanguageChange,
   onStart,
   onBack,
@@ -553,13 +576,43 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
         >
           <div className="flex items-center gap-2 px-3 py-2 bg-neo-cream dark:bg-slate-700 rounded-neo border-2 border-neo-black dark:border-slate-500 text-neo-black dark:text-white">
             <Target className="w-4 h-4 text-green-600 dark:text-green-400" />
-            <span className="font-bold text-neo-black dark:text-white">10 {t('daily.maxAttempts') || 'attempts'}</span>
+            <span className="font-bold text-neo-black dark:text-white">10 {t('daily.maxAttempts')}</span>
           </div>
           <div className="flex items-center gap-2 px-3 py-2 bg-neo-cream dark:bg-slate-700 rounded-neo border-2 border-neo-black dark:border-slate-500 text-neo-black dark:text-white">
             <Timer className="w-4 h-4 text-neo-orange" />
             <span className="font-bold text-neo-black dark:text-white">{countdown}</span>
           </div>
         </motion.div>
+
+        {/* Target Word Length Visual Hint */}
+        {targetWordLength > 0 && (
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.25 }}
+            className="text-center space-y-2"
+          >
+            <div className="text-xs font-bold text-gray-600 dark:text-gray-400">
+              {t('daily.targetWordLength') || 'Find the hidden word:'}
+            </div>
+            <div className="flex justify-center gap-1.5">
+              {Array.from({ length: targetWordLength }).map((_, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.25 + idx * 0.05, type: 'spring', stiffness: 300 }}
+                  className="w-8 h-8 sm:w-10 sm:h-10 bg-neo-black rounded-lg border-2 border-neo-black flex items-center justify-center text-white font-bold text-lg"
+                >
+                  ?
+                </motion.div>
+              ))}
+            </div>
+            <div className="text-[11px] text-neo-purple dark:text-neo-purple font-bold">
+              {t('daily.onlyMatchingLength') || `Only ${targetWordLength}-letter words use your tries!`}
+            </div>
+          </motion.div>
+        )}
 
         {/* START BUTTON - PROMINENT */}
         <motion.div
@@ -586,14 +639,14 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
             onClick={onShowTutorial}
             className="text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors flex items-center gap-1"
           >
-            <span>?</span> {t('joinView.howToPlay') || 'How to Play'}
+            <span>?</span> {t('daily.howToPlay')}
           </button>
           <span className="text-gray-300 dark:text-gray-600">|</span>
           <button
             onClick={() => setShowLeaderboard(!showLeaderboard)}
             className="text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors flex items-center gap-1"
           >
-            <Trophy className="w-3 h-3" /> {t('daily.todaysPlayers') || 'Leaderboard'}
+            <Trophy className="w-3 h-3" /> {t('daily.todaysPlayers')}
           </button>
         </motion.div>
 

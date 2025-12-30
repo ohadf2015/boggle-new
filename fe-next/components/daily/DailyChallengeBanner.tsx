@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Target, Flame, Check, Play, ChevronRight, Clock } from 'lucide-react';
+import { Target, Flame, Check, Play, ChevronRight, Clock, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import {
@@ -13,6 +13,7 @@ import {
   formatCountdown,
   hasPlayedWordHuntToday,
   getDailyStreak,
+  isStreakAtRisk,
 } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 
@@ -36,6 +37,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   const [streak, setStreak] = useState<number>(0);
   const [puzzleNumber, setPuzzleNumber] = useState<number>(0);
   const [isClient, setIsClient] = useState(false);
+  const [streakRisk, setStreakRisk] = useState<{ atRisk: boolean; hoursRemaining: number }>({ atRisk: false, hoursRemaining: 0 });
 
   // Initialize state on client
   useEffect(() => {
@@ -44,6 +46,10 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
     setPuzzleNumber(getPuzzleNumber(date));
     setHasPlayed(hasPlayedWordHuntToday(language as Language));
     setStreak(getDailyStreak().currentStreak);
+
+    // Check if streak is at risk
+    const risk = isStreakAtRisk();
+    setStreakRisk({ atRisk: risk.atRisk, hoursRemaining: risk.hoursRemaining });
   }, [language]);
 
   // Update countdown timer
@@ -66,6 +72,10 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
     if (!isClient) return;
     setHasPlayed(hasPlayedWordHuntToday(language as Language));
     setStreak(getDailyStreak().currentStreak);
+
+    // Refresh streak risk status
+    const risk = isStreakAtRisk();
+    setStreakRisk({ atRisk: risk.atRisk, hoursRemaining: risk.hoursRemaining });
   }, [language, isClient]);
 
   if (!isClient) {
@@ -140,22 +150,41 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
                 #{puzzleNumber}
               </span>
               {streak > 0 && (
-                <span className="flex items-center gap-0.5 lg:gap-1 px-1.5 lg:px-2.5 py-0.5 lg:py-1 bg-neo-black/20 rounded-full">
-                  <Flame className="w-3 h-3 lg:w-5 lg:h-5 text-neo-orange" />
-                  <span className="text-xs lg:text-sm xl:text-base font-bold text-neo-black">
+                <span className={cn(
+                  "flex items-center gap-0.5 lg:gap-1 px-1.5 lg:px-2.5 py-0.5 lg:py-1 rounded-full",
+                  streakRisk.atRisk ? "bg-neo-red/30 animate-pulse" : "bg-neo-black/20"
+                )}>
+                  {streakRisk.atRisk ? (
+                    <AlertTriangle className="w-3 h-3 lg:w-5 lg:h-5 text-neo-red" />
+                  ) : (
+                    <Flame className="w-3 h-3 lg:w-5 lg:h-5 text-neo-orange" />
+                  )}
+                  <span className={cn(
+                    "text-xs lg:text-sm xl:text-base font-bold",
+                    streakRisk.atRisk ? "text-neo-red" : "text-neo-black"
+                  )}>
                     {streak}
                   </span>
                 </span>
               )}
             </div>
             <div className="flex items-center gap-1.5 lg:gap-2 text-xs lg:text-sm xl:text-base text-neo-black/80 font-medium lg:mt-1">
-              <Clock className="w-3 h-3 lg:w-4 lg:h-4" />
-              <span>
-                {hasPlayed
-                  ? `${t('daily.nextPuzzleIn') || 'Next'}: ${countdown}`
-                  : countdown
-                }
-              </span>
+              {streakRisk.atRisk && !hasPlayed ? (
+                <span className="text-neo-red font-bold flex items-center gap-1">
+                  <AlertTriangle className="w-3 h-3 lg:w-4 lg:h-4" />
+                  {t('daily.streakAtRisk') || `Play today to save your ${streak}-day streak!`}
+                </span>
+              ) : (
+                <>
+                  <Clock className="w-3 h-3 lg:w-4 lg:h-4" />
+                  <span>
+                    {hasPlayed
+                      ? `${t('daily.nextPuzzleIn') || 'Next'}: ${countdown}`
+                      : countdown
+                    }
+                  </span>
+                </>
+              )}
             </div>
           </div>
 

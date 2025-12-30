@@ -235,24 +235,24 @@ const ja = {
     "disableFireRoundLightsDescription": "ファイアラウンド中のグリッドセルの点滅ライトをオフにする"
   },
   "combo": {
-    "shieldUsed": "🛡️ コンボシールド使用！",
-    "shieldEarned": "🛡️ シールド獲得！",
-    "explanationTitle": "🔥 コンボパワー！",
-    "explanationText": "素早く単語を見つけてコンボを築こう！コンボが高いほどスコア倍率アップ。連続を維持しよう！"
+    "shieldUsed": "シールドがストリークを守った！",
+    "shieldEarned": "シールド解放！",
+    "explanationTitle": "コンボパワー！",
+    "explanationText": "素早く単語をつなげてコンボを作ろう。高コンボ = 高倍率。途切れさせるな！"
   },
   "earthquake": {
     "warning": "地震！",
-    "brace": "準備して！",
-    "photosensitivity": "点滅するライトが前方に！敏感な場合は設定で無効にしてください",
+    "brace": "来るぞ！",
+    "photosensitivity": "点滅注意！設定で無効化できます",
     "fireRound": "ファイアラウンド",
-    "multiplier": "2倍マルチプライヤー"
+    "multiplier": "2倍ポイント"
   },
   "spam": {
-    "warning": "スローダウン！無効な単語が多すぎます",
-    "penalty": "ポイント減少: -${points}",
-    "cooldown": "${seconds}秒間ブロック - ゆっくり！",
-    "cooldownEnd": "単語を送信できます",
-    "blockedWord": "送信まで${seconds}秒お待ちください"
+    "warning": "落ち着いて！ミスが多すぎ",
+    "penalty": "-${points}pt",
+    "cooldown": "タイムアウト: ${seconds}秒",
+    "cooldownEnd": "復活！",
+    "blockedWord": "${seconds}秒待って..."
   },
   "bots": {
     "title": "AIボット",
@@ -307,31 +307,34 @@ const ja = {
     "light": "ライト"
   },
   "share": {
-    "linkCopied": "リンクをコピーしました！📋",
-    "copyError": "リンクのコピーエラー",
-    "inviteMessage": "私と一緒にLexiClashをプレイしましょう！",
+    "linkCopied": "リンクをコピー！📋",
+    "copyError": "コピーできなかった - もう一度",
+    "inviteMessage": "ワードバトル中 - 参加して！",
     "room": "ルーム",
     "code": "コード",
-    "joinViaLink": "このリンクから参加",
+    "joinViaLink": "このリンクから飛び込もう",
     "copyLinkButton": "リンクをコピー",
-    "whatsappButton": "WhatsAppで共有",
-    "qrCodeButton": "QRコードを表示",
+    "whatsappButton": "WhatsApp",
+    "qrCodeButton": "QRコード",
     "qrCodeTitle": "スキャンして参加",
-    "shareTitle": "プレイヤーを招待",
-    "codeCopied": "コードをコピーしました！🎯",
-    "codeCopyError": "コードのコピーエラー",
-    "buttonLabel": "ゲームをシェア",
-    "modalTitle": "プレイヤーを招待",
-    "scanQR": "スマホでスキャンして参加",
+    "shareTitle": "友達を呼ぼう",
+    "codeCopied": "コードをコピー！🎯",
+    "codeCopyError": "コードをコピーできなかった",
+    "buttonLabel": "友達を招待",
+    "modalTitle": "友達に挑戦",
+    "scanQR": "スキャンして飛び込もう",
     "orShareVia": "または共有:",
     "copyLink": "リンクをコピー",
     "whatsapp": "WhatsApp",
     "telegram": "Telegram",
     "more": "その他...",
-    "inviteTitle": "私のLexiClashゲームに参加！",
-    "copied": "コピーしました！",
-    "shareVictory": "勝利をシェアしよう！",
-    "scanToJoin": "スキャンして参加"
+    "inviteTitle": "ワードバトル進行中！",
+    "copied": "コピー完了！",
+    "shareVictory": "自慢しよう！",
+    "scanToJoin": "スキャンしてバトル",
+    "challengeFriends": "友達に挑戦しよう 😈",
+    "beatMyScore": "これ超えられる？",
+    "canYouBeatMe": "俺に勝てる？"
   },
   "errors": {
     "unstableConnection": "インターネット接続が不安定です - ゲーム中に問題が発生する可能性があります",
@@ -817,35 +820,35 @@ const ja = {
   },
   "results": {
     "topPlayers": "トッププレイヤー",
-    "yourPerformance": "あなたの成績",
-    "viewDetails": "詳細を表示",
-    "viewAllWords": "すべての単語を表示",
-    "viewXpBreakdown": "XP内訳を表示",
-    "gameOver": "ゲームオーバー",
+    "yourPerformance": "あなたのゲーム",
+    "viewDetails": "詳細を見る",
+    "viewAllWords": "すべての単語",
+    "viewXpBreakdown": "XP内訳",
+    "gameOver": "タイムアップ！",
     "winner": "勝者",
     "winnerAnnouncement": "勝者",
-    "youWon": "あなたの勝ち！",
-    "secondPlace": "2位！",
-    "thirdPlace": "3位！",
+    "youWon": "勝利！",
+    "secondPlace": "準優勝！",
+    "thirdPlace": "銅！",
     "silverMedalist": "銀メダル",
     "bronzeMedalist": "銅メダル",
-    "points": "ポイント",
-    "pointWords": "${points}ポイントの単語",
+    "points": "pt",
+    "pointWords": "${points}ptの単語",
     "invalid": "無効",
-    "exitRoom": "ルームを退出",
-    "exitWarning": "本当に退出しますか？留まって新しいゲームの開始を待つことができます。",
-    "playAgain": "もう一度プレイ",
-    "celebrate": "お祝い",
-    "celebrateAgain": "もう一度お祝い",
+    "exitRoom": "退出",
+    "exitWarning": "退出する？次のラウンドに残れるよ。",
+    "playAgain": "もう一回",
+    "celebrate": "祝う",
+    "celebrateAgain": "もう一回！",
     "finalScores": "最終スコア",
-    "returnToRoom": "アクティブルームに戻る",
-    "cancelAutoReturn": "自動復帰をキャンセル",
+    "returnToRoom": "ルームへ戻る",
+    "cancelAutoReturn": "キャンセル",
     "valid": "有効",
     "validWords": "有効な単語",
-    "playAgainQuestion": "🎮 もう一度プレイしますか？",
-    "playAgainDescription": "ルームに留まり、ホストが新しいゲームを開始するのを待ちます",
-    "stayInRoom": "はい、ルームに留まる",
-    "leaveRoom": "いいえ、ルームを退出",
+    "playAgainQuestion": "もっと？",
+    "playAgainDescription": "次のラウンドに残ろう",
+    "stayInRoom": "残る",
+    "leaveRoom": "退出",
     "shared": "共有",
     "comboBonus": "コンボボーナス",
     "basePoints": "ベース",
@@ -1185,175 +1188,184 @@ const ja = {
   "onboarding": {
     "welcome": {
       "title": "LexiClashへようこそ！",
-      "subtitle": "文字をつなげて単語を見つけよう",
-      "demoInstruction": "やってみよう！この単語を見つけて:",
+      "subtitle": "文字をスワイプ。単語を作る。制覇する。",
+      "demoInstruction": "やってみよう！スワイプで綴ろう:",
       "demoWord": "CAT",
-      "demoHint": "隣接する文字をスワイプまたはタップ",
-      "demoSuccess": "完璧！できました！",
-      "clickNext": "次へをクリックして続ける"
+      "demoHint": "隣接する文字をつなげよう",
+      "demoSuccess": "完璧！",
+      "clickNext": "次へ →"
     },
     "combo": {
-      "title": "コンボシステム",
-      "subtitle": "素早く単語を見つけてコンボを作ろう",
-      "explanation": "見つけた単語ごとにコンボ倍率が上がります。速く見つけるほどスコアが高くなります！",
-      "tip": "単語を見つけ続けてコンボを維持しよう！",
+      "title": "コンボパワー",
+      "subtitle": "単語をつなげて巨大な倍率に",
+      "explanation": "素早く見つけてコンボを作ろう。高コンボ = 高スコア。途切れたら？リセット！",
+      "tip": "連鎖を維持せよ！",
       "example1": "最初の単語",
-      "example2": "2xコンボ！",
-      "example3": "3xコンボ！"
+      "example2": "2x！",
+      "example3": "3x！"
     },
     "specialRounds": {
-      "title": "スペシャルラウンド",
-      "subtitle": "カオスがチャンスに！",
+      "title": "カオスラウンド",
+      "subtitle": "ゲームが荒れる時",
       "earthquake": {
         "title": "地震",
-        "description": "文字が揺れてシャッフルされる - 素早く適応！",
-        "tip": "落ち着いて新しいパターンを探そう"
+        "description": "ゲーム中に文字がシャッフル。素早く適応！",
+        "tip": "新しいボード、新しいチャンス"
       },
       "fireRound": {
         "title": "ファイアラウンド",
-        "description": "すべてのスコアが2倍 - 全力で！",
-        "tip": "ポイントを稼ぐチャンスです"
+        "description": "ポイント2倍。全力で！",
+        "tip": "これが君の瞬間"
       }
     },
     "avatar": {
-      "title": "アバターを選択",
-      "subtitle": "あなたを表すものを選んで",
+      "title": "ルックを選ぼう",
+      "subtitle": "スタイルを見せろ",
       "selected": "選択済み"
     },
     "name": {
-      "title": "お名前は？",
-      "subtitle": "表示名を入力してください",
+      "title": "何て呼ぶ？",
+      "subtitle": "バトル名",
       "placeholder": "名前を入力",
-      "errorInvalid": "文字、数字、スペースのみ使用可能です",
-      "errorTooShort": "名前は2文字以上必要です",
-      "errorTooLong": "名前は20文字以内にしてください",
+      "errorInvalid": "文字、数字、スペースのみ",
+      "errorTooShort": "短すぎ！2文字以上",
+      "errorTooLong": "長すぎ！20文字まで",
       "characterCount": "文字",
-      "proTip": "相手を怖がらせる名前を選ぼう。または笑わせる名前でも。どちらでも効果あり！"
+      "proTip": "ランキングで映える名前を選ぼう"
     },
     "profile": {
-      "title": "プロフィール設定",
-      "subtitle": "アバターを選んで名前を入力"
+      "title": "プロフィールを作成",
+      "subtitle": "アバター + 名前 = バトル準備完了"
     },
     "quickTips": {
-      "title": "クイックヒント",
-      "subtitle": "プレイしながら学べます！",
+      "title": "プロのヒント",
+      "subtitle": "残りはプレイしながら学ぼう",
       "tip1Title": "スワイプで接続",
-      "tip1Text": "隣接する文字をドラッグして単語を作る",
-      "tip2Title": "長いほど良い",
-      "tip2Text": "文字が多いほどポイントが高い",
-      "tip3Title": "注目",
-      "tip3Text": "スペシャルラウンドでボーナスポイント！"
+      "tip1Text": "文字をドラッグして単語を作ろう",
+      "tip2Title": "長い単語 = 大きなポイント",
+      "tip2Text": "6文字以上は狙う価値あり",
+      "tip3Title": "ボーナスラウンドに注目",
+      "tip3Text": "炎が来たらポイント2倍！"
     },
     "mode": {
-      "title": "モードを選択",
-      "subtitle": "どのようにプレイしますか？",
+      "title": "どうプレイする？",
+      "subtitle": "バトルフィールドを選べ",
       "singlePlayer": {
-        "title": "シングルプレイヤー",
-        "description": "練習するか、AIの対戦相手に挑戦"
+        "title": "ソロモード",
+        "description": "ボットと練習か自己記録を更新"
       },
       "multiPlayer": {
         "title": "マルチプレイヤー",
-        "description": "友達とリアルタイムバトルで競争"
+        "description": "友達とリアルタイムワードバトル"
       },
       "dailyPlayer": {
         "title": "デイリーチャレンジ",
-        "description": "毎日世界中で同じパズルに挑戦"
+        "description": "世界共通パズル。1日1回のチャンス。"
       },
-      "encouragement": "素晴らしい選択！「プレイしよう」をクリックして冒険を始めよう！"
+      "encouragement": "行くぞ！ワードの旅が今始まる。"
     },
     "navigation": {
       "skip": "スキップ",
       "back": "戻る",
       "next": "次へ",
-      "letsPlay": "プレイしよう！",
-      "title": "プレイヤーようこそ"
+      "letsPlay": "行くぞ！",
+      "title": "ようこそ"
     },
-    "skipHint": "ESCキーを押すか、スキップをクリックしてゲームに直接ジャンプ 🎮"
+    "skipHint": "ESCかスキップでゲームへ 🎮"
   },
   "tutorial": {
-    "stepLabel": "ステップ {current}/{total}",
-    "skip": "チュートリアルをスキップ",
+    "stepLabel": "{current}/{total}",
+    "skip": "スキップ",
     "prev": "戻る",
     "next": "次へ",
     "finish": "わかった！",
-    "tapToContinue": "どこかをタップして続ける",
+    "tapToContinue": "タップして続行",
     "welcome": {
-      "title": "LexiClashへようこそ！",
-      "description": "簡単なステップで遊び方を学びましょう。このクイックチュートリアルで、ワードゲームを制覇するために必要なすべてを紹介します！"
+      "title": "行くぞ！",
+      "description": "30秒チュートリアル - すぐに制覇できる。"
     },
     "grid": {
-      "title": "文字グリッド",
-      "description": "これがあなたの戦場です！文字がグリッドに配置されています。隣接する文字をつなげて、できるだけ多くの単語を見つけることが目標です。"
+      "title": "バトルフィールド",
+      "description": "ミッション：隣接文字をつなげて単語を見つけろ。多いほど高得点。"
     },
     "swipe": {
-      "title": "スワイプして単語を作る",
-      "description": "隣接する文字（斜めも含む）をスワイプまたはドラッグして単語を作ります。離すと送信されます。単語が長いほど、より多くのポイントを獲得！"
+      "title": "スワイプで勝利",
+      "description": "文字をドラッグ（斜めもOK）。離して送信。長いほど高得点。"
     },
     "combo": {
-      "title": "コンボを積み上げる",
-      "description": "素早く単語を見つけてコンボマルチプライヤーを構築！連続する各単語でコンボが増加し、スコアが倍増します。ストリークを維持しましょう！"
+      "title": "コンボマルチプライヤー",
+      "description": "素早く単語をつなげてコンボボーナス。各単語で倍率アップ。ストリークを切るな！"
     },
     "timer": {
-      "title": "タイマーに注意",
-      "description": "単語を見つける時間には制限があります。タイマーで残り時間を確認できます。赤くなったら急いで！"
+      "title": "時間との戦い",
+      "description": "時間は刻々と減る。赤くなったらクランチタイム。1秒も無駄にするな！"
     },
     "leaderboard": {
-      "title": "ランキングを追跡",
-      "description": "他のプレイヤーとリアルタイムで競い合えます。より多くの長い単語を見つけて、リーダーボードを駆け上がろう！"
+      "title": "ランクを上げろ",
+      "description": "リアルタイムで順位を確認。長い単語で一気に上昇。"
     },
     "ready": {
       "title": "準備完了！",
-      "description": "これが知るべきすべてです！単語を見つけて、誰がワードマスターかを示しましょう！"
+      "description": "以上！さあ、誰がボスか見せてやれ。"
     },
     "wordHunt": {
       "welcome": {
-        "title": "デイリーワードハント",
-        "description": "隠された単語を見つけよう！10回の試行があります。",
+        "title": "Word Hunt",
+        "description": "隠された単語を10回以内で解読せよ。",
         "next": "次へ"
       },
       "colorFeedback": {
-        "title": "色を学ぶ",
-        "tryGuessing": "各推測の後、色であなたの近さを示します：",
-        "green": "緑 = 正しい位置",
-        "yellow": "黄 = 単語にあるが位置が違う",
+        "title": "カラーコード",
+        "tryGuessing": "各推測でヒントが明らかに：",
+        "green": "緑 = 的中！（正しい位置）",
+        "yellow": "黄 = 惜しい（位置違い）",
         "gray": "灰 = 単語にない",
         "next": "次へ"
       },
       "lifeSystem": {
-        "title": "ライフと単語発見",
-        "description": "ボード上の単語を見つけてライフとヒントトークンを獲得！",
-        "swipeToGain": "単語をスワイプして獲得",
-        "tryIt": "わかりました！"
+        "title": "ライフシステム",
+        "description": "ボーナス単語を見つけて追加ライフを獲得！",
+        "swipeToGain": "スワイプで獲得",
+        "tryIt": "わかった！"
       },
       "minLength": {
-        "title": "⚠️ 重要なルール",
-        "description": "単語は最低3文字必要です",
+        "title": "3文字以上のみ",
+        "description": "単語は最低3文字必要",
         "example1": "3文字 ✓",
-        "example2": "2文字 - 短すぎます！",
-        "gotIt": "わかりました！"
+        "example2": "2文字 ✗",
+        "gotIt": "わかった！"
+      },
+      "triesRule": {
+        "title": "何が試行にカウント？",
+        "description": "正しい長さの単語だけが10回の試行を消費！",
+        "exampleTarget": "例：目標単語が5文字の場合",
+        "usesAttempt": "5文字 = 試行を消費",
+        "noAttempt": "3文字 = 試行なし、ライフだけ！",
+        "keyInsight": "💡 短い単語を自由に見つけて、試行を使わずにライフを獲得！",
+        "gotIt": "わかった！"
       },
       "letterFeedback": {
-        "title": "文字フィードバック",
-        "description": "目標の単語を推測すると、各文字がどれだけ近いかを示します：",
+        "title": "ヒントを読む",
+        "description": "各文字が何かを教えてくれる：",
         "green": "緑",
-        "greenDesc": "正しい位置の正しい文字",
+        "greenDesc": "正しい文字、正しい位置",
         "yellow": "黄色",
-        "yellowDesc": "文字は存在しますが位置が違います",
+        "yellowDesc": "正しい文字、位置違い",
         "gray": "灰色",
-        "grayDesc": "文字は目標の単語にありません",
+        "grayDesc": "単語にない",
         "example": "例：目標は「BEACH」",
-        "exampleDesc": "「E」は正解、「A」は単語内にあるが位置が違う",
-        "gotIt": "わかりました！"
+        "exampleDesc": "Eは緑（正解）、Aは黄（位置違い）",
+        "gotIt": "わかった！"
       },
       "complete": {
-        "title": "準備完了！",
-        "remember": "覚えておいて：",
-        "rule1": "目標を見つけるための10回の試行",
-        "rule2": "ライフのために他の単語を見つける",
+        "title": "ハントの準備完了！",
+        "remember": "クイックルール：",
+        "rule1": "目標を見つけるまで10回",
+        "rule2": "他の単語でライフ獲得",
         "rule3": "最低3文字",
         "ruleColors": "🟩 = 正解、🟨 = 位置違い、⬜ = 単語にない",
-        "rule4": "世界中で同じパズル",
-        "start": "デイリーチャレンジを開始"
+        "rule4": "世界共通パズル",
+        "start": "スタート！"
       }
     }
   },
@@ -1389,10 +1401,6 @@ const ja = {
     "QUICK_THINKER": {
       "name": "クイックシンカー",
       "description": "3秒以内に単語を見つけた"
-    },
-    "LONG_HAULER": {
-      "name": "マラソンランナー",
-      "description": "最後の1分で単語を見つけた"
     },
     "DIVERSE_VOCABULARY": {
       "name": "多様なボキャブラリー",
@@ -1442,10 +1450,6 @@ const ja = {
       "name": "アナグラムアーティスト",
       "description": "連続でアナグラム単語を見つけた"
     },
-    "LETTER_POPPER": {
-      "name": "バルーンポッパー",
-      "description": "メインメニューで10以上の文字をポップした"
-    },
     "WORD_ARCHITECT": {
       "name": "ワードアーキテクト",
       "description": "7文字以上の単語を3つ見つけた"
@@ -1481,10 +1485,6 @@ const ja = {
     "PHOTO_FINISH": {
       "name": "フォトフィニッシュ",
       "description": "5ポイント未満の差で勝利"
-    },
-    "UNDERDOG": {
-      "name": "アンダードッグ",
-      "description": "後れを取っていたが逆転勝利"
     },
     "CLUTCH_PLAYER": {
       "name": "クラッチプレイヤー",
@@ -1597,39 +1597,39 @@ const ja = {
     }
   },
   "noWords": {
-    "noWordsThisRound": "今ラウンドは単語なし",
-    "keepGoing": "頑張って！",
-    "nextRoundIsYours": "次のラウンドはあなたの番！",
-    "funFact": "豆知識：平均的なプレイヤーは可能な単語の70%を見逃します！",
+    "noWordsThisRound": "空白ラウンド",
+    "keepGoing": "切り替えよう！",
+    "nextRoundIsYours": "次はあなたの番",
+    "funFact": "豆知識: プレイヤーは70%の単語を見逃す！",
     "otherPlayer": {
       "headline": "厳しいラウンド",
       "message": "今回は文字が味方しなかった。"
     },
     "encourage": {
       "rookie": {
-        "headline": "初めての緊張？",
-        "message": "最高のワードハンターも最初はここから。ボードが難しかった！",
-        "tip": "ヒント：3文字の単語から始めて、そこから広げましょう。"
+        "headline": "難しいボード！",
+        "message": "プロでも詰まる。このボードは鬼だった！",
+        "tip": "3文字から始めてチェーンしよう。"
       },
       "unlucky": {
-        "headline": "難しい文字！",
-        "message": "サイコロが味方しないこともある。誰にでもあること！",
-        "tip": "ヒント：-ING、-ED、-ERなどの一般的なパターンを探そう。"
+        "headline": "運が悪い！",
+        "message": "難しい文字だった。誰でもあること！",
+        "tip": "パターンを探せ: -ING, -ED, -ER, -LY。"
       },
       "thinking": {
-        "headline": "戦略的沈黙",
-        "message": "質より量の考え方...今回は質にこだわりすぎたかも！",
-        "tip": "ヒント：見つけたらすぐに送信 - 試すことにペナルティなし！"
+        "headline": "完璧主義の罠",
+        "message": "時には良いで十分。送信しよう！",
+        "tip": "まず送信、後で考える。ペナルティなし！"
       },
       "warmup": {
-        "headline": "ウォームアップラウンド",
-        "message": "練習だと思って。脳がまだ始まったばかり！",
-        "tip": "ヒント：ボードを素早くスキャンし、高得点のコーナーに集中。"
+        "headline": "ウォームアップ",
+        "message": "練習だ。脳がまだ起きてるところ！",
+        "tip": "素早くスキャン、コーナーに集中。"
       },
       "comeback": {
         "headline": "カムバック準備中...",
-        "message": "最高のプレイヤーにもオフラウンドがある。次のゲームはあなたの番！",
-        "tip": "ヒント：文字を声に出して言うと、単語の連想が生まれます。"
+        "message": "最高のプレイヤーも悪いラウンドがある。次は君の番！",
+        "tip": "文字を声に出すと連想が生まれる。"
       }
     }
   },
@@ -1737,6 +1737,8 @@ const ja = {
     "totalScore": "合計スコア",
     "timePlayed": "プレイ時間",
     "achievements": "実績",
+    "hallOfFame": "殿堂入り",
+    "hallOfFameDescription": "卓越したスキルや献身が必要なエリート実績",
     "editProfile": "プロフィール編集",
     "changeAvatar": "アバター変更",
     "username": "ユーザー名",
@@ -2378,10 +2380,15 @@ const ja = {
     "huntDescription": "色分けされたフィードバックで隠された単語を探そう！",
     "shareImage": "画像として共有",
     "download": "ダウンロード",
+    "downloadImage": "画像をダウンロード",
     "playingAs": "プレイヤー名",
     "guestPlayer": "ゲストプレイヤー",
     "enterName": "名前を入力",
-    "characters": "文字"
+    "characters": "文字",
+    "streakAtRisk": "連続記録を守るために今日プレイしましょう！",
+    "attemptReset": "リセットしました！もう一度プレイできます",
+    "howToPlay": "遊び方",
+    "canYouBeatMyScore": "私のスコアを超えられますか？"
   },
   "wordHunt": {
     "title": "ワードハント",
@@ -2508,7 +2515,8 @@ const ja = {
       "wantToRetry": "もう一度挑戦しますか？",
       "retryChallenge": "再挑戦",
       "needMoreCoins": "あと{amount}必要",
-      "retryExplanation": "完全リセット - 新しい試行で最初からやり直し"
+      "retryExplanation": "完全リセット - 新しい試行で最初からやり直し",
+      "find": "発見"
     },
     "shareCTA": {
       "canYouSolve": "解けますか？",

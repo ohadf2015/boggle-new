@@ -200,9 +200,9 @@ const es = {
   },
   "game": {
     "swipeToForm": "Desliza letras",
-    "wordAlreadyFound": "¡Ya encontrada!",
-    "wordNotOnBoard": "¡No está en el tablero!",
-    "wordTooShort": "¡Muy corta!",
+    "wordAlreadyFound": "¡Ya la tienes!",
+    "wordNotOnBoard": "No está en el tablero",
+    "wordTooShort": "Mínimo 3 letras",
     "boardTheme": "Tema del tablero"
   },
   "help": {
@@ -235,24 +235,24 @@ const es = {
     "disableFireRoundLightsDescription": "Apaga las luces parpadeantes en las celdas de la cuadrícula durante la ronda de fuego"
   },
   "combo": {
-    "shieldUsed": "🛡️ ¡Escudo de Combo Usado!",
-    "shieldEarned": "🛡️ ¡Escudo Ganado!",
-    "explanationTitle": "Explicación de combos",
-    "explanationText": "Los combos aumentan cuando encuentras múltiples palabras seguidas sin pausas. ¡Cuanto mayor sea tu combo, más XP ganarás!"
+    "shieldUsed": "¡El escudo salvó tu racha!",
+    "shieldEarned": "¡Escudo desbloqueado!",
+    "explanationTitle": "¡Poder Combo!",
+    "explanationText": "Encadena palabras rápido para crear combos. Mayor combo = mayores multiplicadores. ¡No lo dejes caer!"
   },
   "earthquake": {
     "warning": "¡Terremoto!",
-    "brace": "¡Prepárate!",
-    "photosensitivity": "¡Luces parpadeantes adelante! Desactivar en Configuración si es sensible",
-    "fireRound": "Ronda de Fuego",
-    "multiplier": "Multiplicador ×2"
+    "brace": "¡Ahí viene!",
+    "photosensitivity": "¡Luces parpadeantes! Desactiva en Ajustes si eres sensible",
+    "fireRound": "RONDA DE FUEGO",
+    "multiplier": "2× PUNTOS"
   },
   "spam": {
-    "warning": "¡Más despacio! Demasiadas palabras inválidas",
-    "penalty": "Puntos deducidos: -${points}",
-    "cooldown": "Bloqueado por ${seconds}s - ¡más despacio!",
-    "cooldownEnd": "Puedes enviar palabras de nuevo",
-    "blockedWord": "Espera ${seconds}s antes de enviar"
+    "warning": "¡Tranquilo! Muchos fallos",
+    "penalty": "-${points} pts",
+    "cooldown": "Pausa: ${seconds}s",
+    "cooldownEnd": "¡De vuelta!",
+    "blockedWord": "Espera ${seconds}s..."
   },
   "bots": {
     "title": "Bots de IA",
@@ -308,30 +308,33 @@ const es = {
   },
   "share": {
     "linkCopied": "¡Enlace copiado! 📋",
-    "copyError": "Error al copiar enlace",
-    "inviteMessage": "¡Únete a jugar LexiClash conmigo!",
+    "copyError": "No se pudo copiar - intenta de nuevo",
+    "inviteMessage": "Estoy en una batalla de palabras - ¡únete!",
     "room": "Sala",
     "code": "Código",
-    "joinViaLink": "Únete a través de este enlace",
+    "joinViaLink": "Entra por este enlace",
     "copyLinkButton": "Copiar Enlace",
-    "whatsappButton": "Compartir en WhatsApp",
-    "qrCodeButton": "Mostrar Código QR",
-    "qrCodeTitle": "Escanea para Unirte",
-    "shareTitle": "Invitar Jugadores",
+    "whatsappButton": "WhatsApp",
+    "qrCodeButton": "Código QR",
+    "qrCodeTitle": "Escanea para Entrar",
+    "shareTitle": "Trae Amigos",
     "codeCopied": "¡Código copiado! 🎯",
-    "codeCopyError": "Error al copiar código",
-    "buttonLabel": "Compartir Juego",
-    "modalTitle": "Invitar Jugadores",
-    "scanQR": "Escanea con el teléfono para unirte",
+    "codeCopyError": "No se pudo copiar el código",
+    "buttonLabel": "Invitar Amigos",
+    "modalTitle": "Reta a Amigos",
+    "scanQR": "Escanea para entrar",
     "orShareVia": "O comparte vía:",
     "copyLink": "Copiar Enlace",
     "whatsapp": "WhatsApp",
     "telegram": "Telegram",
     "more": "Más...",
-    "inviteTitle": "¡Únete a mi juego de LexiClash!",
+    "inviteTitle": "¡Batalla de palabras en curso!",
     "copied": "¡Copiado!",
-    "shareVictory": "¡Comparte tu victoria!",
-    "scanToJoin": "Escanea para unirte"
+    "shareVictory": "¡Presume!",
+    "scanToJoin": "Escanea para batallar",
+    "challengeFriends": "Reta a tus amigos 😈",
+    "beatMyScore": "¿Crees que puedes superarme?",
+    "canYouBeatMe": "¿Me puedes ganar?"
   },
   "errors": {
     "unstableConnection": "La conexión a internet es inestable - podrías experimentar problemas durante el juego",
@@ -813,37 +816,37 @@ const es = {
     "newMessages": "Nuevos mensajes de chat"
   },
   "results": {
-    "topPlayers": "Mejores Jugadores",
+    "topPlayers": "Top Jugadores",
     "otherPlayers": "Otros Jugadores",
-    "yourPerformance": "Tu Rendimiento",
-    "viewDetails": "Ver Detalles del Rendimiento",
-    "viewAllWords": "Ver Todas las Palabras",
-    "viewXpBreakdown": "Ver Desglose de XP",
-    "gameOver": "Juego Terminado",
+    "yourPerformance": "Tu Juego",
+    "viewDetails": "Ver desglose",
+    "viewAllWords": "Todas las Palabras",
+    "viewXpBreakdown": "Desglose XP",
+    "gameOver": "¡Se acabó el tiempo!",
     "winner": "Ganador",
     "winnerAnnouncement": "Ganador",
-    "youWon": "¡Ganaste!",
-    "secondPlace": "¡2do Lugar!",
-    "thirdPlace": "¡3er Lugar!",
+    "youWon": "¡VICTORIA!",
+    "secondPlace": "¡Subcampeón!",
+    "thirdPlace": "¡Bronce!",
     "silverMedalist": "Medallista de Plata",
     "bronzeMedalist": "Medallista de Bronce",
-    "points": "puntos",
-    "pointWords": "Palabras de ${points} Puntos",
+    "points": "pts",
+    "pointWords": "Palabras de ${points} pts",
     "invalid": "Inválido",
-    "exitRoom": "Salir de la Sala",
-    "exitWarning": "¿Seguro que quieres irte? Puedes quedarte y esperar un nuevo juego.",
-    "playAgain": "Jugar de Nuevo",
+    "exitRoom": "Salir",
+    "exitWarning": "¿Te vas? Puedes quedarte para la próxima ronda.",
+    "playAgain": "Otra vez",
     "celebrate": "Celebrar",
-    "celebrateAgain": "Celebrar de nuevo",
+    "celebrateAgain": "¡Otra vez!",
     "finalScores": "Puntuaciones Finales",
-    "returnToRoom": "Volver a la Sala Activa",
-    "cancelAutoReturn": "Cancelar Auto Retorno",
+    "returnToRoom": "Volver a Sala",
+    "cancelAutoReturn": "Cancelar",
     "valid": "válido",
     "validWords": "Palabras Válidas",
-    "playAgainQuestion": "🎮 ¿Listo para Otra Ronda?",
-    "playAgainDescription": "Quédate en la sala y espera que el anfitrión inicie un nuevo juego",
-    "stayInRoom": "Sí, Quedarme",
-    "leaveRoom": "No, Irme",
+    "playAgainQuestion": "¿Más?",
+    "playAgainDescription": "Quédate para la próxima ronda",
+    "stayInRoom": "Quedarme",
+    "leaveRoom": "Salir",
     "shared": "Compartido",
     "comboBonus": "Bonus de Combo",
     "basePoints": "Base",
@@ -1180,10 +1183,6 @@ const es = {
       "name": "Pensador Rápido",
       "description": "Encontró una palabra en menos de 3 segundos"
     },
-    "LONG_HAULER": {
-      "name": "Corredor de Maratón",
-      "description": "Encontró una palabra en el último minuto"
-    },
     "DIVERSE_VOCABULARY": {
       "name": "Vocabulario Diverso",
       "description": "Encontró palabras de 5+ longitudes diferentes"
@@ -1232,10 +1231,6 @@ const es = {
       "name": "Artista del Anagrama",
       "description": "Encontró 2 palabras anagrama consecutivas"
     },
-    "LETTER_POPPER": {
-      "name": "Explotador de Globos",
-      "description": "Explotó 10+ letras en el menú principal"
-    },
     "WORD_ARCHITECT": {
       "name": "Arquitecto de Palabras",
       "description": "Encontró 3 palabras con 7+ letras"
@@ -1271,10 +1266,6 @@ const es = {
     "PHOTO_FINISH": {
       "name": "Final de Foto",
       "description": "Ganó por menos de 5 puntos"
-    },
-    "UNDERDOG": {
-      "name": "Desvalido",
-      "description": "Remontó desde atrás para ganar"
     },
     "CLUTCH_PLAYER": {
       "name": "Jugador Decisivo",
@@ -1387,39 +1378,39 @@ const es = {
     }
   },
   "noWords": {
-    "noWordsThisRound": "Sin palabras esta ronda",
-    "keepGoing": "¡Sigue adelante!",
-    "nextRoundIsYours": "¡La siguiente ronda es tuya!",
-    "funFact": "Dato curioso: ¡El jugador promedio pierde el 70% de las palabras posibles!",
+    "noWordsThisRound": "Ronda en blanco",
+    "keepGoing": "¡Sacúdetelo!",
+    "nextRoundIsYours": "La próxima es tuya",
+    "funFact": "Dato: ¡Los jugadores pierden el 70% de las palabras!",
     "otherPlayer": {
-      "headline": "Ronda Difícil",
+      "headline": "Ronda Dura",
       "message": "Las letras no fueron amables esta vez."
     },
     "encourage": {
       "rookie": {
-        "headline": "¿Nervios de Principiante?",
-        "message": "Hasta los mejores cazadores de palabras empiezan en algún lugar. ¡El tablero estaba difícil!",
-        "tip": "Consejo: Empieza con palabras de 3 letras y construye desde ahí."
+        "headline": "¡Tablero Difícil!",
+        "message": "Hasta los pros se atascan. ¡Ese tablero era brutal!",
+        "tip": "Empieza con 3 letras y encadena desde ahí."
       },
       "unlucky": {
-        "headline": "¡Letras Difíciles!",
-        "message": "A veces los dados simplemente no caen a tu favor. ¡Le pasa a todos!",
-        "tip": "Consejo: Busca patrones comunes como -CIÓN, -MENTE, -ANDO."
+        "headline": "¡Mala Suerte!",
+        "message": "Letras difíciles. ¡Le pasa a todos!",
+        "tip": "Busca patrones: -CIÓN, -ANDO, -MENTE."
       },
       "thinking": {
-        "headline": "Silencio Estratégico",
-        "message": "Mentalidad de calidad sobre cantidad... ¡quizás demasiada calidad esta vez!",
-        "tip": "Consejo: Envía palabras mientras las encuentras - ¡no hay penalización por intentar!"
+        "headline": "Trampa del Perfeccionista",
+        "message": "A veces bueno basta. ¡Solo envía!",
+        "tip": "Envía primero, piensa después. ¡Sin penalización!"
       },
       "warmup": {
-        "headline": "Ronda de Calentamiento",
-        "message": "Considera esto una práctica. ¡Tu cerebro apenas está empezando!",
-        "tip": "Consejo: Escanea el tablero rápidamente, luego enfócate en las esquinas de alto valor."
+        "headline": "Solo Calentamiento",
+        "message": "Práctica. ¡Tu cerebro está arrancando!",
+        "tip": "Escanea rápido, enfócate en las esquinas."
       },
       "comeback": {
         "headline": "Remontada en Camino...",
-        "message": "Los mejores jugadores tienen rondas malas. ¡El siguiente juego es TU juego!",
-        "tip": "Consejo: Intenta decir las letras en voz alta para activar asociaciones de palabras."
+        "message": "Los mejores tienen rondas malas. ¡La próxima es TUYA!",
+        "tip": "Di las letras en voz alta para activar asociaciones."
       }
     }
   },
@@ -1688,6 +1679,8 @@ const es = {
     "totalScore": "Puntuación Total",
     "timePlayed": "Tiempo Jugado",
     "achievements": "Logros",
+    "hallOfFame": "Salón de la Fama",
+    "hallOfFameDescription": "Logros de élite que requieren habilidad excepcional o dedicación",
     "editProfile": "Editar Perfil",
     "changeAvatar": "Cambiar Avatar",
     "username": "Nombre de Usuario",
@@ -1833,175 +1826,184 @@ const es = {
   "onboarding": {
     "welcome": {
       "title": "¡Bienvenido a LexiClash!",
-      "subtitle": "Encuentra palabras conectando letras",
-      "demoInstruction": "¡Inténtalo! Encuentra la palabra:",
+      "subtitle": "Desliza letras. Forma palabras. Domina.",
+      "demoInstruction": "¡Prueba! Desliza para escribir:",
       "demoWord": "CAT",
-      "demoHint": "Desliza o toca letras adyacentes",
-      "demoSuccess": "¡Perfecto! ¡Lo lograste!",
-      "clickNext": "Haz clic en Siguiente para continuar"
+      "demoHint": "Conecta letras adyacentes",
+      "demoSuccess": "¡Genial!",
+      "clickNext": "Siguiente →"
     },
     "combo": {
-      "title": "Sistema de Combos",
-      "subtitle": "Encuentra palabras rápido para crear combos",
-      "explanation": "¡Cada palabra que encuentras aumenta tu multiplicador de combo. Mientras más rápido encuentres palabras, mayor será tu puntuación!",
-      "tip": "¡Sigue encontrando palabras para mantener tu racha de combos!",
+      "title": "Poder Combo",
+      "subtitle": "Encadena palabras para multiplicadores masivos",
+      "explanation": "Encuentra rápido para crear combos. Mayor combo = mayor puntuación. ¿Se rompe? ¡Combo reiniciado!",
+      "tip": "¡Mantén la racha viva!",
       "example1": "Primera palabra",
-      "example2": "¡Combo x2!",
-      "example3": "¡Combo x3!"
+      "example2": "¡2x!",
+      "example3": "¡3x!"
     },
     "specialRounds": {
-      "title": "Rondas Especiales",
-      "subtitle": "¡El caos se encuentra con la oportunidad!",
+      "title": "Rondas Caóticas",
+      "subtitle": "Cuando el juego se vuelve loco",
       "earthquake": {
         "title": "Terremoto",
-        "description": "Las letras se agitan y se mezclan - ¡adáptate rápido!",
-        "tip": "Mantén la calma y busca nuevos patrones"
+        "description": "Las letras se mezclan a mitad del juego. ¡Adáptate rápido!",
+        "tip": "Nuevo tablero, nuevas oportunidades"
       },
       "fireRound": {
         "title": "Ronda de Fuego",
-        "description": "¡Todas las puntuaciones se duplican - a por todas!",
-        "tip": "Esta es tu oportunidad para acumular puntos"
+        "description": "PUNTOS DOBLES. ¡A por todas!",
+        "tip": "Este es tu momento"
       }
     },
     "avatar": {
-      "title": "Elige tu Avatar",
-      "subtitle": "Selecciona uno que te represente",
+      "title": "Elige tu Look",
+      "subtitle": "Muestra tu estilo",
       "selected": "Seleccionado"
     },
     "name": {
-      "title": "¿Cuál es tu nombre?",
-      "subtitle": "Ingresa tu nombre de visualización",
+      "title": "¿Cómo te Llamamos?",
+      "subtitle": "Tu nombre de batalla",
       "placeholder": "Ingresa tu nombre",
-      "errorInvalid": "Solo se permiten letras, números y espacios",
-      "errorTooShort": "El nombre debe tener al menos 2 caracteres",
-      "errorTooLong": "El nombre no puede tener más de 20 caracteres",
+      "errorInvalid": "Solo letras, números y espacios",
+      "errorTooShort": "¡Muy corto! 2+ caracteres",
+      "errorTooLong": "¡Muy largo! 20 máx",
       "characterCount": "caracteres",
-      "proTip": "Elige un nombre que asuste a tus oponentes. O que los haga reír. ¡Ambos funcionan!"
+      "proTip": "Elige un nombre que luzca bien en el ranking"
     },
     "profile": {
-      "title": "Configura tu Perfil",
-      "subtitle": "Elige un avatar e ingresa tu nombre"
+      "title": "Crea tu Perfil",
+      "subtitle": "Avatar + nombre = listo para batallar"
     },
     "quickTips": {
-      "title": "Consejos Rápidos",
-      "subtitle": "¡Aprenderás más mientras juegas!",
-      "tip1Title": "Desliza para conectar",
-      "tip1Text": "Arrastra a través de letras adyacentes para formar palabras",
-      "tip2Title": "Más largo = Mejor",
-      "tip2Text": "Más letras significa más puntos",
-      "tip3Title": "Presta atención",
-      "tip3Text": "¡Las rondas especiales aparecen con puntos de bonificación!"
+      "title": "Tips Pro",
+      "subtitle": "El resto lo aprenderás jugando",
+      "tip1Title": "Desliza para Conectar",
+      "tip1Text": "Arrastra letras para formar palabras",
+      "tip2Title": "Palabras Largas = Más Puntos",
+      "tip2Text": "Palabras de 6+ letras valen la pena",
+      "tip3Title": "Atento a las Rondas Bonus",
+      "tip3Text": "¡Puntos dobles cuando llega el fuego!"
     },
     "mode": {
-      "title": "Elige tu Modo",
-      "subtitle": "¿Cómo quieres jugar?",
+      "title": "¿Cómo Quieres Jugar?",
+      "subtitle": "Elige tu campo de batalla",
       "singlePlayer": {
-        "title": "Un Jugador",
-        "description": "Practica o desafíate con oponentes IA"
+        "title": "Modo Solo",
+        "description": "Practica contra bots o supera tus récords"
       },
       "multiPlayer": {
         "title": "Multijugador",
-        "description": "Compite con amigos en batallas en tiempo real"
+        "description": "Batallas de palabras en tiempo real con amigos"
       },
       "dailyPlayer": {
         "title": "Desafío Diario",
-        "description": "Mismo puzzle en todo el mundo, comparte tus resultados"
+        "description": "Mismo puzzle mundial. Una oportunidad al día."
       },
-      "encouragement": "¡Excelente elección! Haz clic en \"¡A Jugar!\" para comenzar tu aventura de palabras!"
+      "encouragement": "¡Vamos! Tu aventura de palabras empieza ahora."
     },
     "navigation": {
       "skip": "Saltar",
       "back": "Atrás",
       "next": "Siguiente",
       "letsPlay": "¡A Jugar!",
-      "title": "Bienvenida del Jugador"
+      "title": "Bienvenida"
     },
-    "skipHint": "Presiona ESC o haz clic en Saltar para ir directamente al juego 🎮"
+    "skipHint": "ESC o Saltar para ir al juego 🎮"
   },
   "tutorial": {
-    "stepLabel": "Paso {current} de {total}",
-    "skip": "Saltar Tutorial",
+    "stepLabel": "{current}/{total}",
+    "skip": "Saltar",
     "prev": "Atrás",
     "next": "Siguiente",
     "finish": "¡Entendido!",
-    "tapToContinue": "Toca en cualquier lugar para continuar",
+    "tapToContinue": "Toca para continuar",
     "welcome": {
-      "title": "¡Bienvenido a LexiClash!",
-      "description": "Aprendamos a jugar en unos simples pasos. ¡Este tutorial rápido te mostrará todo lo que necesitas para dominar el juego de palabras!"
+      "title": "¡Vamos!",
+      "description": "Tutorial rápido - 30 segundos y listo para dominar."
     },
     "grid": {
-      "title": "La Cuadrícula de Letras",
-      "description": "¡Este es tu campo de batalla! Las letras están dispuestas en una cuadrícula. Tu objetivo es encontrar tantas palabras como sea posible conectando letras adyacentes."
+      "title": "El Campo de Batalla",
+      "description": "Tu misión: encuentra palabras conectando letras adyacentes. Más palabras = más puntos."
     },
     "swipe": {
-      "title": "Forma Palabras Deslizando",
-      "description": "Desliza o arrastra a través de letras adyacentes (incluyendo diagonales) para formar palabras. Suelta para enviar. ¡Cuanto más larga sea la palabra, más puntos ganas!"
+      "title": "Desliza para Ganar",
+      "description": "Desliza por las letras (diagonales incluidas). Suelta para enviar. Más largo = más puntos."
     },
     "combo": {
-      "title": "Construye Combos",
-      "description": "¡Encuentra palabras rápidamente para construir multiplicadores de combo! Cada palabra consecutiva aumenta tu combo, multiplicando tu puntuación. ¡Mantén la racha viva!"
+      "title": "Multiplicadores de Combo",
+      "description": "Encadena palabras rápido para combos. Cada palabra aumenta tu multiplicador. ¡No rompas la racha!"
     },
     "timer": {
-      "title": "Vigila el Temporizador",
-      "description": "Tienes tiempo limitado para encontrar palabras. El temporizador muestra cuánto tiempo queda. ¡Cuando se ponga rojo, date prisa!"
+      "title": "Contra Reloj",
+      "description": "El tiempo corre. Cuando se ponga rojo, es hora crítica. ¡Cada segundo cuenta!"
     },
     "leaderboard": {
-      "title": "Sigue Tu Ranking",
-      "description": "Mira cómo te comparas con otros jugadores en tiempo real. ¡Sube en la clasificación encontrando más palabras y más largas!"
+      "title": "Escala Posiciones",
+      "description": "Observa tu posición en tiempo real. Palabras más largas = escalar más rápido."
     },
     "ready": {
-      "title": "¡Estás Listo!",
-      "description": "¡Eso es todo lo que necesitas saber! ¡Ve a encontrar palabras y muestra a todos quién es el maestro de las palabras!"
+      "title": "¡Listo!",
+      "description": "¡Eso es todo! Ahora ve y muestra quién manda."
     },
     "wordHunt": {
       "welcome": {
-        "title": "Caza de Palabras Diaria",
-        "description": "¡Encuentra la palabra oculta! Tienes 10 intentos.",
+        "title": "Word Hunt",
+        "description": "Descifra la palabra oculta en 10 intentos o menos.",
         "next": "Siguiente"
       },
       "colorFeedback": {
-        "title": "Aprende los Colores",
-        "tryGuessing": "Después de cada intento, los colores muestran qué tan cerca estás:",
-        "green": "Verde = Posición correcta",
-        "yellow": "Amarillo = En la palabra, lugar equivocado",
-        "gray": "Gris = No está en la palabra",
+        "title": "Códigos de Color",
+        "tryGuessing": "Cada intento revela pistas:",
+        "green": "Verde = ¡Clavado! (lugar correcto)",
+        "yellow": "Amarillo = Cerca (lugar incorrecto)",
+        "gray": "Gris = No está",
         "next": "Siguiente"
       },
       "lifeSystem": {
-        "title": "Vida y Descubrimiento de Palabras",
-        "description": "¡Encuentra palabras en el tablero para ganar vida y fichas de pista!",
-        "swipeToGain": "Desliza palabras para ganar",
+        "title": "Sistema de Vidas",
+        "description": "¡Encuentra palabras bonus en el tablero para vida extra!",
+        "swipeToGain": "Desliza para ganar",
         "tryIt": "¡Entendido!"
       },
       "minLength": {
-        "title": "⚠️ REGLA IMPORTANTE",
-        "description": "Las palabras deben tener al menos 3 LETRAS",
+        "title": "SOLO 3+ LETRAS",
+        "description": "Las palabras necesitan mínimo 3 letras",
         "example1": "3 letras ✓",
-        "example2": "2 letras - ¡muy corto!",
+        "example2": "2 letras ✗",
+        "gotIt": "¡Entendido!"
+      },
+      "triesRule": {
+        "title": "¿Qué Cuenta Como Intento?",
+        "description": "¡Solo palabras con la longitud exacta usan tus 10 intentos!",
+        "exampleTarget": "Ejemplo: Palabra objetivo de 5 letras",
+        "usesAttempt": "5 letras = usa un intento",
+        "noAttempt": "3 letras = NO usa intento, ¡solo gana vida!",
+        "keyInsight": "💡 ¡Encuentra palabras cortas libremente para ganar vida sin gastar intentos!",
         "gotIt": "¡Entendido!"
       },
       "letterFeedback": {
-        "title": "Retroalimentación de Letras",
-        "description": "Cuando adivinas la palabra objetivo, cada letra muestra qué tan cerca estás:",
+        "title": "Leyendo las Pistas",
+        "description": "Cada letra te dice algo:",
         "green": "Verde",
-        "greenDesc": "Letra correcta en la posición correcta",
+        "greenDesc": "Letra correcta, lugar correcto",
         "yellow": "Amarillo",
-        "yellowDesc": "La letra existe pero en posición incorrecta",
+        "yellowDesc": "Letra correcta, lugar incorrecto",
         "gray": "Gris",
-        "grayDesc": "La letra no está en la palabra objetivo",
-        "example": "Ejemplo: El objetivo es \"BEACH\"",
-        "exampleDesc": "\"E\" es correcta, \"A\" está en la palabra pero en lugar incorrecto",
+        "grayDesc": "No está en la palabra",
+        "example": "Ejemplo: Objetivo es \"BEACH\"",
+        "exampleDesc": "E es verde (correcto), A es amarillo (lugar incorrecto)",
         "gotIt": "¡Entendido!"
       },
       "complete": {
-        "title": "¡Estás listo!",
-        "remember": "Recuerda:",
+        "title": "¡Listo para Cazar!",
+        "remember": "Reglas rápidas:",
         "rule1": "10 intentos para encontrar el objetivo",
         "rule2": "Encuentra otras palabras para vida",
         "rule3": "Mínimo 3 letras",
         "ruleColors": "🟩 = correcto, 🟨 = lugar incorrecto, ⬜ = no en palabra",
         "rule4": "Mismo puzzle en todo el mundo",
-        "start": "Comenzar Desafío Diario"
+        "start": "¡Empezar!"
       }
     }
   },
@@ -2376,10 +2378,15 @@ const es = {
     "huntDescription": "¡Caza la palabra oculta usando retroalimentación de colores!",
     "shareImage": "Compartir como imagen",
     "download": "Descargar",
+    "downloadImage": "Descargar imagen",
     "playingAs": "Jugando como",
     "guestPlayer": "Jugador invitado",
     "enterName": "Ingresa tu nombre",
-    "characters": "caracteres"
+    "characters": "caracteres",
+    "streakAtRisk": "¡Juega hoy para mantener tu racha!",
+    "attemptReset": "¡Intento reiniciado! Puedes jugar de nuevo",
+    "howToPlay": "Cómo Jugar",
+    "canYouBeatMyScore": "¿Puedes superar mi puntuación?"
   },
   "wordHunt": {
     "title": "Caza de Palabras",
@@ -2506,7 +2513,8 @@ const es = {
       "wantToRetry": "¿Quieres intentarlo de nuevo?",
       "retryChallenge": "Reintentar desafío",
       "needMoreCoins": "necesitas {amount} más",
-      "retryExplanation": "Reinicio completo - empieza de nuevo con nuevos intentos"
+      "retryExplanation": "Reinicio completo - empieza de nuevo con nuevos intentos",
+      "find": "HALLAZGO"
     },
     "shareCTA": {
       "canYouSolve": "¿Puedes resolverlo?",

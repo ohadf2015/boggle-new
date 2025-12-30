@@ -14,6 +14,7 @@ import AuthModal from '@/components/auth/AuthModal';
 import Avatar from '@/components/Avatar';
 import EmojiAvatarPicker from '@/components/EmojiAvatarPicker';
 import { AchievementBadge } from '@/components/AchievementBadge';
+import { isHallOfFameAchievement } from '@/utils/achievementTiers';
 import LevelBadge from '@/components/LevelBadge';
 import XpProgressBar from '@/components/XpProgressBar';
 import { CoinBalance } from '@/components/CoinBalance';
@@ -56,7 +57,6 @@ const ACHIEVEMENT_ICONS: Record<string, string> = {
   LEXICON: '🏆',
   WORDSMITH: '🎓',
   QUICK_THINKER: '💨',
-  LONG_HAULER: '🏃',
   DIVERSE_VOCABULARY: '🌈',
   DOUBLE_TROUBLE: '⚡⚡',
   TREASURE_HUNTER: '💎',
@@ -71,7 +71,6 @@ const ACHIEVEMENT_ICONS: Record<string, string> = {
   EXPLORER: '🧭',
   STREAK_MASTER: '🔥',
   ANAGRAM_ARTIST: '🔀',
-  LETTER_POPPER: '🎈',
 
   // New elite achievements
   WORD_ARCHITECT: '🏛️',
@@ -85,7 +84,6 @@ const ACHIEVEMENT_ICONS: Record<string, string> = {
   MINIMALIST: '🎯',
   WORD_SNIPER: '🔫',
   PHOTO_FINISH: '📸',
-  UNDERDOG: '🐕',
   CLUTCH_PLAYER: '💪',
 
   // Lifetime/career achievements (tracked across all games)
@@ -770,61 +768,102 @@ export default function ProfilePage(): React.ReactNode {
         </motion.div>
 
         {/* Achievement Counts with Tier Display - showing ALL achievements (earned + locked) */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className={cn(
-            'rounded-2xl p-6',
-            isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
-          )}
-        >
-          <h2 className={cn(
-            'text-lg font-bold mb-4',
-            isDarkMode ? 'text-white' : 'text-gray-900'
-          )}>
-            {t('profile.achievements')}
-          </h2>
-          <div className="flex flex-wrap gap-3">
-            {(() => {
-              const earnedCounts = profile?.achievement_counts || {};
-              const allAchievementKeys = Object.keys(ACHIEVEMENT_ICONS);
+        {/* Split into Hall of Fame (elite) and Regular achievements */}
+        {(() => {
+          const earnedCounts = profile?.achievement_counts || {};
+          const allAchievementKeys = Object.keys(ACHIEVEMENT_ICONS);
 
-              // Separate earned and locked achievements
-              const earnedAchievements = Object.entries(earnedCounts)
-                .sort((a, b) => b[1] - a[1]); // Sort by count descending
+          // Separate earned and locked achievements
+          const earnedAchievements = Object.entries(earnedCounts)
+            .sort((a, b) => b[1] - a[1]); // Sort by count descending
 
-              const lockedAchievements = allAchievementKeys
-                .filter(key => !earnedCounts[key])
-                .sort(); // Sort alphabetically
+          const lockedAchievements = allAchievementKeys
+            .filter(key => !earnedCounts[key])
+            .sort(); // Sort alphabetically
 
-              // Combine: earned first, then locked
-              const allAchievements = [
-                ...earnedAchievements.map(([key, count]) => ({ key, count, locked: false })),
-                ...lockedAchievements.map(key => ({ key, count: 0, locked: true }))
-              ];
+          // Combine: earned first, then locked
+          const allAchievements = [
+            ...earnedAchievements.map(([key, count]) => ({ key, count, locked: false })),
+            ...lockedAchievements.map(key => ({ key, count: 0, locked: true }))
+          ];
 
-              return allAchievements.map(({ key, count, locked }, index) => {
-                // Get achievement info from translations
-                const achievementData: Achievement = {
-                  icon: getAchievementIcon(key),
-                  name: t(`achievements.${key}.name`) || key,
-                  description: t(`achievements.${key}.description`) || '',
-                };
-                return (
-                  <AchievementBadge
-                    key={key}
-                    achievement={achievementData}
-                    index={index}
-                    count={count}
-                    showTier={true}
-                    locked={locked}
-                  />
-                );
-              });
-            })()}
-          </div>
-        </motion.div>
+          // Split into Hall of Fame and Regular
+          const hallOfFameAchievements = allAchievements.filter(a => isHallOfFameAchievement(a.key));
+          const regularAchievements = allAchievements.filter(a => !isHallOfFameAchievement(a.key));
+
+          const renderAchievementBadge = ({ key, count, locked }: { key: string; count: number; locked: boolean }, index: number) => {
+            const achievementData: Achievement = {
+              icon: getAchievementIcon(key),
+              name: t(`achievements.${key}.name`) || key,
+              description: t(`achievements.${key}.description`) || '',
+            };
+            return (
+              <AchievementBadge
+                key={key}
+                achievement={achievementData}
+                index={index}
+                count={count}
+                showTier={true}
+                locked={locked}
+              />
+            );
+          };
+
+          return (
+            <>
+              {/* Hall of Fame Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className={cn(
+                  'rounded-2xl p-6 mb-6',
+                  isDarkMode
+                    ? 'bg-gradient-to-br from-amber-900/20 via-slate-800/50 to-yellow-900/20 border border-amber-500/30'
+                    : 'bg-gradient-to-br from-amber-50 via-white to-yellow-50 border border-amber-200 shadow-lg'
+                )}
+              >
+                <h2 className={cn(
+                  'text-lg font-bold mb-2 flex items-center gap-2',
+                  isDarkMode ? 'text-amber-400' : 'text-amber-700'
+                )}>
+                  <span className="text-xl">🏆</span>
+                  {t('profile.hallOfFame') || 'Hall of Fame'}
+                </h2>
+                <p className={cn(
+                  'text-sm mb-4',
+                  isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                )}>
+                  {t('profile.hallOfFameDescription') || 'Elite achievements that require exceptional skill or dedication'}
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {hallOfFameAchievements.map((achievement, index) => renderAchievementBadge(achievement, index))}
+                </div>
+              </motion.div>
+
+              {/* Regular Achievements Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35 }}
+                className={cn(
+                  'rounded-2xl p-6',
+                  isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+                )}
+              >
+                <h2 className={cn(
+                  'text-lg font-bold mb-4',
+                  isDarkMode ? 'text-white' : 'text-gray-900'
+                )}>
+                  {t('profile.achievements')}
+                </h2>
+                <div className="flex flex-wrap gap-3">
+                  {regularAchievements.map((achievement, index) => renderAchievementBadge(achievement, index))}
+                </div>
+              </motion.div>
+            </>
+          );
+        })()}
 
         {/* My Collection Section */}
         <motion.div

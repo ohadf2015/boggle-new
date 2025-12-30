@@ -17,7 +17,6 @@ export const ACHIEVEMENT_ICONS: Record<string, string> = {
   LEXICON: '🏆',
   WORDSMITH: '🎓',
   QUICK_THINKER: '💨',
-  LONG_HAULER: '🏃',
   DIVERSE_VOCABULARY: '🌈',
   DOUBLE_TROUBLE: '⚡⚡',
   TREASURE_HUNTER: '💎',
@@ -31,7 +30,6 @@ export const ACHIEVEMENT_ICONS: Record<string, string> = {
   EXPLORER: '🧭',
   STREAK_MASTER: '🔥',
   ANAGRAM_ARTIST: '🔀',
-  LETTER_POPPER: '🎈',
   // New elite achievements
   WORD_ARCHITECT: '🏛️',      // Find 5 words of 7+ letters
   SPEED_LEGEND: '🏎️',        // 30 words in 90 seconds
@@ -44,7 +42,6 @@ export const ACHIEVEMENT_ICONS: Record<string, string> = {
   MINIMALIST: '🎯',           // Win with only 4+ letter words (no 2-3 letter words)
   WORD_SNIPER: '🔫',          // Find 5+ unique words no other player found
   PHOTO_FINISH: '📸',         // Win by less than 5 points in multiplayer
-  UNDERDOG: '🐕',             // Come from behind to win (was trailing at halftime)
   CLUTCH_PLAYER: '💪',        // Find 3+ valid words in the last 10 seconds
 
   // LIFETIME/CAREER ACHIEVEMENTS (tracked across all games)

@@ -3,6 +3,36 @@
  * Transforms flat achievement counts into tiered progression (Bronze → Silver → Gold → Platinum)
  */
 
+/**
+ * Hall of Fame achievements - elite achievements that require exceptional skill or dedication
+ * These are displayed separately from regular achievements on the profile page
+ */
+export const HALL_OF_FAME_ACHIEVEMENTS = new Set([
+  // Elite gameplay achievements (very difficult to earn)
+  'RARE_GEM',           // 9+ letter word (extremely rare)
+  'COMBO_GOD',          // 35+ combo streak (insanely hard)
+  'VOCABULARY_TITAN',   // 85+ valid words in a game
+  'WORD_ARCHITECT',     // 7 words of 7+ letters in a game
+  'SPEED_LEGEND',       // 50 words in first half of game
+  'LONG_WORD_CHAIN',    // 4 consecutive 6+ letter words
+  'PRECISION_MASTER',   // 45+ words with 100% accuracy
+  'ANAGRAM_ARTIST',     // 2 consecutive anagram words (luck + skill)
+
+  // Top-tier lifetime achievements (require significant dedication)
+  'LEGEND',             // 100 wins total
+  'CENTURION',          // 100 games played
+  'WORD_HOARDER',       // 5000 total words found
+  'POINT_KING',         // 50,000 total points
+  'LOYAL_PLAYER',       // Played on 30 different days
+]);
+
+/**
+ * Check if an achievement is a Hall of Fame achievement
+ */
+export function isHallOfFameAchievement(achievementKey: string): boolean {
+  return HALL_OF_FAME_ACHIEVEMENTS.has(achievementKey);
+}
+
 // Tier thresholds - number of times achievement must be earned to reach tier
 export const TIER_THRESHOLDS = {
   BRONZE: 1,

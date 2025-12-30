@@ -201,9 +201,9 @@ const en = {
   },
   "game": {
     "swipeToForm": "Swipe letters",
-    "wordAlreadyFound": "Already found!",
-    "wordNotOnBoard": "Not on board!",
-    "wordTooShort": "Too short!",
+    "wordAlreadyFound": "Got that one!",
+    "wordNotOnBoard": "Not on the board",
+    "wordTooShort": "Need 3+ letters",
     "boardTheme": "Board Theme"
   },
   "help": {
@@ -236,24 +236,24 @@ const en = {
     "disableFireRoundLightsDescription": "Turn off the flashing lights on grid cells during fire round"
   },
   "combo": {
-    "shieldUsed": "🛡️ Combo Shield Used!",
-    "shieldEarned": "🛡️ Shield Earned!",
-    "explanationTitle": "🔥 Combo Power!",
-    "explanationText": "Find words quickly to build combos! Higher combos = bigger score multipliers. Keep the streak going!"
+    "shieldUsed": "Shield saved your streak!",
+    "shieldEarned": "Shield unlocked!",
+    "explanationTitle": "Combo Power!",
+    "explanationText": "Chain words fast to build combos. Higher combos = bigger multipliers. Don't let it drop!"
   },
   "earthquake": {
     "warning": "Earthquake!",
-    "brace": "Brace yourself!",
+    "brace": "Here it comes!",
     "photosensitivity": "Flashing lights ahead! Disable in Settings if sensitive",
-    "fireRound": "Fire Round",
-    "multiplier": "2× Multiplier"
+    "fireRound": "FIRE ROUND",
+    "multiplier": "2× POINTS"
   },
   "spam": {
-    "warning": "Slow down! Too many invalid words",
-    "penalty": "Points deducted: -${points}",
-    "cooldown": "Blocked for ${seconds}s - slow down!",
-    "cooldownEnd": "You can submit words again",
-    "blockedWord": "Wait ${seconds}s before submitting"
+    "warning": "Easy there! Too many misses",
+    "penalty": "-${points} pts",
+    "cooldown": "Timeout: ${seconds}s",
+    "cooldownEnd": "Back in action!",
+    "blockedWord": "Wait ${seconds}s..."
   },
   "bots": {
     "title": "AI Bots",
@@ -309,30 +309,33 @@ const en = {
   },
   "share": {
     "linkCopied": "Link copied! 📋",
-    "copyError": "Error copying link",
-    "inviteMessage": "Join me to play LexiClash!",
+    "copyError": "Couldn't copy - try again",
+    "inviteMessage": "I'm in a word battle - join me!",
     "room": "Room",
     "code": "Code",
-    "joinViaLink": "Join via this link",
+    "joinViaLink": "Jump in via this link",
     "copyLinkButton": "Copy Link",
     "whatsappButton": "Share on WhatsApp",
     "qrCodeButton": "Show QR Code",
     "qrCodeTitle": "Scan to Join",
-    "shareTitle": "Invite Players",
+    "shareTitle": "Bring Friends",
     "codeCopied": "Code copied! 🎯",
-    "codeCopyError": "Error copying code",
-    "buttonLabel": "Share Game",
-    "modalTitle": "Invite Players",
-    "scanQR": "Scan with phone to join",
+    "codeCopyError": "Couldn't copy code",
+    "buttonLabel": "Invite Friends",
+    "modalTitle": "Challenge Friends",
+    "scanQR": "Scan to jump in",
     "orShareVia": "Or share via:",
     "copyLink": "Copy Link",
     "whatsapp": "WhatsApp",
     "telegram": "Telegram",
     "more": "More...",
-    "inviteTitle": "Join my LexiClash game!",
+    "inviteTitle": "Word battle in progress!",
     "copied": "Copied!",
-    "shareVictory": "Share Your Victory!",
-    "scanToJoin": "Scan to join"
+    "shareVictory": "Brag About It!",
+    "scanToJoin": "Scan to battle",
+    "challengeFriends": "Challenge your friends 😈",
+    "beatMyScore": "Think you can beat this?",
+    "canYouBeatMe": "Can you beat me?"
   },
   "errors": {
     "unstableConnection": "Internet connection is unstable - you may experience issues during the game",
@@ -824,35 +827,35 @@ const en = {
   "results": {
     "topPlayers": "Top Players",
     "otherPlayers": "Other Players",
-    "yourPerformance": "Your Performance",
-    "viewDetails": "View Performance Details",
-    "viewAllWords": "View All Words",
-    "viewXpBreakdown": "View XP Breakdown",
-    "gameOver": "Game Over",
+    "yourPerformance": "Your Game",
+    "viewDetails": "See the breakdown",
+    "viewAllWords": "All Words",
+    "viewXpBreakdown": "XP Breakdown",
+    "gameOver": "Time's Up!",
     "winner": "Winner",
     "winnerAnnouncement": "Winner",
-    "youWon": "You Won!",
-    "secondPlace": "2nd Place!",
-    "thirdPlace": "3rd Place!",
+    "youWon": "VICTORY!",
+    "secondPlace": "Runner Up!",
+    "thirdPlace": "Bronze!",
     "silverMedalist": "Silver Medalist",
     "bronzeMedalist": "Bronze Medalist",
-    "points": "points",
-    "pointWords": "${points} Point Words",
+    "points": "pts",
+    "pointWords": "${points}-pt Words",
     "invalid": "Invalid",
-    "exitRoom": "Exit Room",
-    "exitWarning": "Are you sure you want to leave? You can stay and wait for a new game to start.",
+    "exitRoom": "Leave",
+    "exitWarning": "Leave now? You can stay for the next round.",
     "playAgain": "Play Again",
     "celebrate": "Celebrate",
-    "celebrateAgain": "Celebrate again",
+    "celebrateAgain": "Again!",
     "finalScores": "Final Scores",
-    "returnToRoom": "Return to Active Room",
-    "cancelAutoReturn": "Cancel Auto Return",
+    "returnToRoom": "Back to Room",
+    "cancelAutoReturn": "Cancel",
     "valid": "valid",
     "validWords": "Valid Words",
-    "playAgainQuestion": "🎮 Ready for Another Round?",
-    "playAgainDescription": "Stay in the room and wait for the host to start a new game",
-    "stayInRoom": "Yes, Stay in Room",
-    "leaveRoom": "No, Leave Room",
+    "playAgainQuestion": "Ready for more?",
+    "playAgainDescription": "Stick around for the next round",
+    "stayInRoom": "Stay",
+    "leaveRoom": "Leave",
     "shared": "Shared",
     "comboBonus": "Combo Bonus",
     "basePoints": "Base",
@@ -884,18 +887,18 @@ const en = {
     "words": "Words",
     "bestWord": "Best",
     "pointsFromFirst": "Just {points} points from 1st place!",
-    "missedWords": "Words You Missed",
-    "missedWordsHint": "High-value words found by others",
-    "missedWordsMotivation": "Learn these for next time!",
-    "topMissed": "Top Words to Learn",
-    "foundByOpponents": "Found by Opponents",
-    "foundByOpponentsHint": "Words opponents discovered first",
-    "foundByOpponentsMotivation": "Learn these for next time!",
+    "missedWords": "Hidden Gems",
+    "missedWordsHint": "High-value words you missed",
+    "missedWordsMotivation": "Next time these are yours!",
+    "topMissed": "Words to Add to Your Arsenal",
+    "foundByOpponents": "Opponent Finds",
+    "foundByOpponentsHint": "Words they got first",
+    "foundByOpponentsMotivation": "Study up for revenge!",
     "bonusWordsForNextTime": "Bonus Words for Next Time",
-    "almostPerfect": "Almost perfect!",
-    "greatJob": "Great hunting!",
-    "strongGame": "Strong game!",
-    "treasureAwaits": "Treasure awaits!",
+    "almostPerfect": "So close to perfection!",
+    "greatJob": "Solid hunting!",
+    "strongGame": "Strong showing!",
+    "treasureAwaits": "Gems await!",
     "topGems": "Top:",
     "more": "more",
     "tapToSeeOnGrid": "Tap words to see them on the grid!",
@@ -1192,350 +1195,347 @@ const en = {
   "onboarding": {
     "welcome": {
       "title": "Welcome to LexiClash!",
-      "subtitle": "Find words by connecting letters",
-      "demoInstruction": "Try it! Find the word:",
+      "subtitle": "Swipe letters. Form words. Dominate.",
+      "demoInstruction": "Try it! Swipe to spell:",
       "demoWord": "CAT",
-      "demoHint": "Swipe or tap adjacent letters",
-      "demoSuccess": "Perfect! You got it!",
-      "clickNext": "Click Next to continue"
+      "demoHint": "Connect adjacent letters",
+      "demoSuccess": "Nailed it!",
+      "clickNext": "Next →"
     },
     "combo": {
-      "title": "Combo System",
-      "subtitle": "Find words quickly to build combos",
-      "explanation": "Each word you find increases your combo multiplier. The faster you find words, the higher your score!",
-      "tip": "Keep finding words to maintain your combo streak!",
+      "title": "Combo Power",
+      "subtitle": "Chain words for massive multipliers",
+      "explanation": "Find words fast to build combos. Higher combos = bigger scores. Miss a beat? Combo resets!",
+      "tip": "Keep the streak alive!",
       "example1": "First word",
-      "example2": "2x combo!",
-      "example3": "3x combo!"
+      "example2": "2x!",
+      "example3": "3x!"
     },
     "specialRounds": {
-      "title": "Special Rounds",
-      "subtitle": "Chaos meets opportunity!",
+      "title": "Chaos Rounds",
+      "subtitle": "When the game gets wild",
       "earthquake": {
         "title": "Earthquake",
-        "description": "Letters shake and scramble - adapt fast!",
-        "tip": "Stay calm and look for new patterns"
+        "description": "Letters scramble mid-game. Adapt fast!",
+        "tip": "New board, new opportunities"
       },
       "fireRound": {
         "title": "Fire Round",
-        "description": "All scores doubled - go wild!",
-        "tip": "This is your chance to rack up points"
+        "description": "DOUBLE POINTS. Go all out!",
+        "tip": "This is your moment"
       }
     },
     "avatar": {
-      "title": "Choose Your Avatar",
-      "subtitle": "Pick one that represents you",
+      "title": "Pick Your Look",
+      "subtitle": "Show your style",
       "selected": "Selected"
     },
     "name": {
-      "title": "What's Your Name?",
-      "subtitle": "Enter your display name",
+      "title": "What Do We Call You?",
+      "subtitle": "Your battle name",
       "placeholder": "Enter your name",
-      "errorInvalid": "Only letters, numbers, and spaces allowed",
-      "errorTooShort": "Name must be at least 2 characters",
-      "errorTooLong": "Name can't be more than 20 characters",
-      "characterCount": "characters",
-      "proTip": "Pick a name that strikes fear into your opponents. Or makes them laugh. Both work!"
+      "errorInvalid": "Letters, numbers, and spaces only",
+      "errorTooShort": "Too short! 2+ characters",
+      "errorTooLong": "Too long! 20 max",
+      "characterCount": "chars",
+      "proTip": "Pick a name that'll look good on a leaderboard"
     },
     "profile": {
-      "title": "Set Up Your Profile",
-      "subtitle": "Choose an avatar and enter your name"
+      "title": "Create Your Profile",
+      "subtitle": "Avatar + name = ready to battle"
     },
     "quickTips": {
-      "title": "Quick Tips",
-      "subtitle": "You'll learn more as you play!",
+      "title": "Pro Tips",
+      "subtitle": "The rest you'll learn by playing",
       "tip1Title": "Swipe to Connect",
-      "tip1Text": "Drag through adjacent letters to form words",
-      "tip2Title": "Longer = Better",
-      "tip2Text": "More letters means more points",
-      "tip3Title": "Stay Alert",
-      "tip3Text": "Special rounds appear with bonus points!"
+      "tip1Text": "Drag through letters to form words",
+      "tip2Title": "Long Words = Big Points",
+      "tip2Text": "6+ letter words are worth the hunt",
+      "tip3Title": "Watch for Bonus Rounds",
+      "tip3Text": "Double points when the fire hits!"
     },
     "mode": {
-      "title": "Choose Your Mode",
-      "subtitle": "How do you want to play?",
+      "title": "How Do You Want to Play?",
+      "subtitle": "Pick your battlefield",
       "singlePlayer": {
-        "title": "Single Player",
-        "description": "Practice or challenge yourself with AI opponents"
+        "title": "Solo Mode",
+        "description": "Practice against bots or beat your own records"
       },
       "multiPlayer": {
         "title": "Multiplayer",
-        "description": "Compete with friends in real-time battles"
+        "description": "Real-time word battles with friends"
       },
       "dailyPlayer": {
         "title": "Daily Challenge",
-        "description": "Same puzzle for everyone worldwide each day"
+        "description": "Same puzzle worldwide. One chance per day."
       },
-      "encouragement": "Great choice! Click \"Let's Play\" to start your word adventure!"
+      "encouragement": "Let's go! Your word journey starts now."
     },
     "navigation": {
       "skip": "Skip",
       "back": "Back",
       "next": "Next",
-      "letsPlay": "Let's Play!",
-      "title": "Player Welcome"
+      "letsPlay": "Let's Go!",
+      "title": "Welcome"
     },
-    "skipHint": "Press ESC or click Skip to jump straight to the game 🎮"
+    "skipHint": "ESC or Skip to jump in"
   },
   "tutorial": {
-    "stepLabel": "Step {current} of {total}",
-    "skip": "Skip Tutorial",
+    "stepLabel": "{current}/{total}",
+    "skip": "Skip",
     "prev": "Back",
     "next": "Next",
     "finish": "Got It!",
-    "tapToContinue": "Tap anywhere to continue",
+    "tapToContinue": "Tap to continue",
     "welcome": {
-      "title": "Welcome to LexiClash!",
-      "description": "Let's learn how to play in just a few steps. This quick tutorial will show you everything you need to dominate the word game!"
+      "title": "Let's Go!",
+      "description": "Quick tutorial - 30 seconds and you're ready to dominate."
     },
     "grid": {
-      "title": "The Letter Grid",
-      "description": "This is your battlefield! Letters are arranged in a grid. Your goal is to find as many words as possible by connecting adjacent letters."
+      "title": "The Battlefield",
+      "description": "Your mission: find words by connecting adjacent letters. More words = more points."
     },
     "swipe": {
-      "title": "Form Words by Swiping",
-      "description": "Swipe or drag through adjacent letters (including diagonals) to form words. Release to submit. The longer the word, the more points you earn!"
+      "title": "Swipe to Win",
+      "description": "Drag through letters (diagonals work too). Release to submit. Longer words = bigger scores."
     },
     "combo": {
-      "title": "Build Combos",
-      "description": "Find words quickly to build combo multipliers! Each consecutive word increases your combo, multiplying your score. Keep the streak alive!"
+      "title": "Combo Multipliers",
+      "description": "Chain words fast for combo boosts. Each word increases your multiplier. Don't break the streak!"
     },
     "timer": {
-      "title": "Watch the Timer",
-      "description": "You have limited time to find words. The timer shows how much time is left. When it turns red, hurry up!"
+      "title": "Beat the Clock",
+      "description": "Time is ticking. When it goes red, you're in crunch time. Make every second count."
     },
     "leaderboard": {
-      "title": "Track Your Ranking",
-      "description": "See how you stack up against other players in real-time. Climb the leaderboard by finding more and longer words!"
+      "title": "Climb the Ranks",
+      "description": "Watch your position in real-time. Find longer words to jump ahead."
     },
     "ready": {
       "title": "You're Ready!",
-      "description": "That's everything you need to know! Go find some words and show everyone who's the word master!"
+      "description": "That's it! Now go show them who's boss."
     },
     "wordHunt": {
       "welcome": {
-        "title": "Daily Word Hunt",
-        "description": "Find the hidden word! You have 10 attempts.",
+        "title": "Word Hunt",
+        "description": "Crack the hidden word in 10 tries or less.",
         "next": "Next"
       },
       "colorFeedback": {
-        "title": "Learn the Colors",
-        "tryGuessing": "After each guess, colors show how close you are:",
-        "green": "Green = Correct position",
-        "yellow": "Yellow = In word, wrong spot",
+        "title": "Color Codes",
+        "tryGuessing": "Each guess reveals clues:",
+        "green": "Green = Nailed it (right spot)",
+        "yellow": "Yellow = Close (wrong spot)",
         "gray": "Gray = Not in word",
         "next": "Next"
       },
       "lifeSystem": {
-        "title": "Life & Word Discovery",
-        "description": "Find words on the board to gain life & clue tokens!",
-        "swipeToGain": "Swipe words to gain",
+        "title": "Life System",
+        "description": "Find bonus words on the board for extra life!",
+        "swipeToGain": "Swipe to earn",
         "tryIt": "Got it!"
       },
       "minLength": {
-        "title": "⚠️ IMPORTANT RULE",
-        "description": "Words must be at least 3 LETTERS long",
+        "title": "3+ LETTERS ONLY",
+        "description": "Words need at least 3 letters",
         "example1": "3 letters ✓",
-        "example2": "2 letters - too short!",
+        "example2": "2 letters ✗",
+        "gotIt": "Got it!"
+      },
+      "triesRule": {
+        "title": "What Counts as a Try?",
+        "description": "Only words matching the target length use your 10 tries!",
+        "exampleTarget": "Example: Target word has 5 letters",
+        "usesAttempt": "5 letters = uses a try",
+        "noAttempt": "3 letters = NO try used, just gains life!",
+        "keyInsight": "💡 Find shorter words freely to gain life without using tries!",
         "gotIt": "Got it!"
       },
       "letterFeedback": {
-        "title": "Letter Feedback",
-        "description": "When you guess the target word, each letter shows you how close you are:",
+        "title": "Reading the Clues",
+        "description": "Each letter tells you something:",
         "green": "Green",
-        "greenDesc": "Correct letter in the correct position",
+        "greenDesc": "Right letter, right spot",
         "yellow": "Yellow",
-        "yellowDesc": "Letter exists but in wrong position",
+        "yellowDesc": "Right letter, wrong spot",
         "gray": "Gray",
-        "grayDesc": "Letter is not in the target word",
+        "grayDesc": "Not in the word",
         "example": "Example: Target is \"BEACH\"",
-        "exampleDesc": "\"E\" is correct, \"A\" is in the word but wrong spot",
+        "exampleDesc": "E is green (correct), A is yellow (wrong spot)",
         "gotIt": "Got it!"
       },
       "complete": {
-        "title": "You're ready!",
-        "remember": "Remember:",
-        "rule1": "10 attempts to find target",
-        "rule2": "Find other words for life",
-        "rule3": "3+ letters minimum",
-        "ruleColors": "🟩 = right, 🟨 = wrong place, ⬜ = not in word",
+        "title": "Ready to Hunt!",
+        "remember": "Quick rules:",
+        "rule1": "10 attempts max",
+        "rule2": "Find words = gain life",
+        "rule3": "Only same-length words use tries",
+        "ruleColors": "🟩 right • 🟨 close • ⬜ nope",
         "rule4": "Same puzzle worldwide",
-        "start": "Start Daily Challenge"
+        "start": "Start Hunt"
       }
     }
   },
   "achievements": {
     "FIRST_BLOOD": {
       "name": "First Blood",
-      "description": "First to find a word"
+      "description": "Drew first word"
     },
     "SPEED_DEMON": {
       "name": "Speed Demon",
-      "description": "Found 20 words in 90 seconds"
+      "description": "20 words before halftime"
     },
     "WORD_MASTER": {
       "name": "Word Master",
-      "description": "Found a word with 7+ letters"
+      "description": "Found a 7+ letter beast"
     },
     "COMBO_KING": {
       "name": "Combo King",
-      "description": "Reached a 10+ combo streak"
+      "description": "Hit a 10x streak"
     },
     "PERFECTIONIST": {
       "name": "Perfectionist",
-      "description": "15+ words, all valid"
+      "description": "15+ words, zero misses"
     },
     "LEXICON": {
-      "name": "Lexicon",
-      "description": "Found 35+ words"
+      "name": "Living Lexicon",
+      "description": "Unleashed 35+ words"
     },
     "WORDSMITH": {
       "name": "Wordsmith",
-      "description": "Found 25 valid words"
+      "description": "Crafted 25 valid words"
     },
     "QUICK_THINKER": {
-      "name": "Quick Thinker",
-      "description": "Found a word within 3 seconds"
-    },
-    "LONG_HAULER": {
-      "name": "Marathon Runner",
-      "description": "Found a word in the last minute"
+      "name": "Quick Draw",
+      "description": "Word in under 3 seconds"
     },
     "DIVERSE_VOCABULARY": {
-      "name": "Diverse Vocabulary",
-      "description": "Found words of 5+ different lengths"
+      "name": "Variety Show",
+      "description": "5+ different word lengths"
     },
     "DOUBLE_TROUBLE": {
-      "name": "Winning Duo",
-      "description": "Found 2 words within 1.5 seconds"
+      "name": "Double Tap",
+      "description": "2 words in 1.5 seconds"
     },
     "TREASURE_HUNTER": {
       "name": "Treasure Hunter",
-      "description": "Found a rare word (8+ letters)"
+      "description": "Unearthed an 8-letter gem"
     },
     "TRIPLE_THREAT": {
       "name": "Triple Threat",
-      "description": "Found 3 words within 4 seconds"
+      "description": "3 words in 4 seconds flat"
     },
     "UNSTOPPABLE": {
       "name": "Unstoppable",
-      "description": "Found 45+ words"
+      "description": "45+ word rampage"
     },
     "COMEBACK_KID": {
-      "name": "Comeback Kid",
-      "description": "Found a word in the last 3 seconds"
+      "name": "Buzzer Beater",
+      "description": "Clutch word in final seconds"
     },
     "DICTIONARY_DIVER": {
-      "name": "Dictionary Diver",
-      "description": "Found 40+ valid words"
+      "name": "Deep Diver",
+      "description": "Surfaced with 40+ words"
     },
     "LIGHTNING_ROUND": {
-      "name": "Lightning Round",
-      "description": "Found 10 words in the first 30 seconds"
+      "name": "Lightning Start",
+      "description": "10 words in the first 30s"
     },
     "RARE_GEM": {
       "name": "Rare Gem",
-      "description": "Found an ultra-rare word (9+ letters)"
+      "description": "Found a 9+ letter unicorn"
     },
     "EXPLORER": {
       "name": "Explorer",
-      "description": "Found words of 6+ different lengths"
+      "description": "6+ different word lengths"
     },
     "STREAK_MASTER": {
       "name": "Streak Master",
-      "description": "Reached an 18+ combo streak"
+      "description": "18x combo unlocked"
     },
     "ANAGRAM_ARTIST": {
       "name": "Anagram Artist",
-      "description": "Found 2 consecutive anagram words"
-    },
-    "LETTER_POPPER": {
-      "name": "Balloon Popper",
-      "description": "Popped 10+ letters in the main menu"
+      "description": "Back-to-back anagrams"
     },
     "WORD_ARCHITECT": {
       "name": "Word Architect",
-      "description": "Found 3 words with 7+ letters"
+      "description": "Built 3 seven-letter towers"
     },
     "SPEED_LEGEND": {
       "name": "Speed Legend",
-      "description": "Found 25 words in 90 seconds"
+      "description": "25 words before halftime"
     },
     "COMBO_GOD": {
       "name": "Combo God",
-      "description": "Reached a 20+ combo streak"
+      "description": "Ascended to 20x"
     },
     "VOCABULARY_TITAN": {
       "name": "Vocabulary Titan",
-      "description": "Found 50+ valid words"
+      "description": "50+ word domination"
     },
     "PRECISION_MASTER": {
-      "name": "Precision Master",
-      "description": "25+ words with 100% accuracy"
+      "name": "Surgical Precision",
+      "description": "25+ words, 100% accuracy"
     },
     "LONG_WORD_CHAIN": {
-      "name": "Long Word Chain",
-      "description": "4 consecutive words of 6+ letters"
+      "name": "Chain Reaction",
+      "description": "4 long words in a row"
     },
     "MINIMALIST": {
-      "name": "Minimalist",
-      "description": "Won with only 4+ letter words (15+ words)"
+      "name": "No Shortcuts",
+      "description": "Only 4+ letter words"
     },
     "WORD_SNIPER": {
       "name": "Word Sniper",
-      "description": "Found 5+ unique words no one else found"
+      "description": "5+ words nobody else found"
     },
     "PHOTO_FINISH": {
       "name": "Photo Finish",
-      "description": "Won by less than 5 points"
-    },
-    "UNDERDOG": {
-      "name": "Underdog",
-      "description": "Came from behind to win"
+      "description": "Won by a hair"
     },
     "CLUTCH_PLAYER": {
-      "name": "Clutch Player",
-      "description": "Found 3+ words in the last 10 seconds"
+      "name": "Clutch Gene",
+      "description": "3+ words in crunch time"
     },
     "VETERAN": {
       "name": "Veteran",
-      "description": "Played 50 games total"
+      "description": "50 games in the books"
     },
     "CENTURION": {
       "name": "Centurion",
-      "description": "Played 100 games total"
+      "description": "100 games strong"
     },
     "WORD_COLLECTOR": {
       "name": "Word Collector",
-      "description": "Found 1000 total valid words"
+      "description": "1,000 lifetime words"
     },
     "WORD_HOARDER": {
       "name": "Word Hoarder",
-      "description": "Found 5000 total valid words"
+      "description": "5,000 lifetime words"
     },
     "CHAMPION": {
       "name": "Champion",
-      "description": "Won 25 games total"
+      "description": "25 victories under your belt"
     },
     "LEGEND": {
       "name": "Legend",
-      "description": "Won 100 games total"
+      "description": "100 wins. Legendary."
     },
     "POINT_MASTER": {
       "name": "Point Master",
-      "description": "Accumulated 10,000 total points"
+      "description": "10K lifetime points"
     },
     "POINT_KING": {
       "name": "Point King",
-      "description": "Accumulated 50,000 total points"
+      "description": "50K lifetime points"
     },
     "DEDICATION": {
-      "name": "Dedication",
-      "description": "Played on 7 different days"
+      "name": "Dedicated",
+      "description": "7-day player"
     },
     "LOYAL_PLAYER": {
-      "name": "Loyal Player",
-      "description": "Played on 30 different days"
+      "name": "Loyalist",
+      "description": "30-day warrior"
     }
   },
   "achievementTiers": {
@@ -1543,8 +1543,8 @@ const en = {
     "silver": "Silver",
     "gold": "Gold",
     "platinum": "Platinum",
-    "earned": "Earned",
-    "maxTier": "Max Tier Reached!"
+    "earned": "Unlocked",
+    "maxTier": "MAXED OUT!"
   },
   "insights": {
     "yourPerformance": "Your Performance",
@@ -1604,39 +1604,39 @@ const en = {
     }
   },
   "noWords": {
-    "noWordsThisRound": "No words this round",
-    "keepGoing": "Keep going!",
-    "nextRoundIsYours": "Next round is yours!",
-    "funFact": "Fun fact: The average player misses 70% of possible words!",
+    "noWordsThisRound": "Blank round",
+    "keepGoing": "Shake it off!",
+    "nextRoundIsYours": "Next round is yours",
+    "funFact": "Fun fact: Players miss 70% of possible words!",
     "otherPlayer": {
       "headline": "Tough Round",
       "message": "The letters weren't kind this time."
     },
     "encourage": {
       "rookie": {
-        "headline": "First Time Jitters?",
-        "message": "Even the best word hunters start somewhere. The board was tricky!",
-        "tip": "Tip: Start with 3-letter words and build from there."
+        "headline": "Tricky Board!",
+        "message": "Even pros get stumped. That board was brutal!",
+        "tip": "Start with 3-letter words and chain from there."
       },
       "unlucky": {
-        "headline": "Tough Letters!",
-        "message": "Sometimes the dice just don't roll your way. It happens to everyone!",
-        "tip": "Tip: Look for common patterns like -ING, -ED, -ER."
+        "headline": "Bad Draw!",
+        "message": "Those letters were rough. Happens to everyone!",
+        "tip": "Look for patterns: -ING, -ED, -ER, -LY."
       },
       "thinking": {
-        "headline": "Strategic Silence",
-        "message": "Quality over quantity mindset... maybe too much quality this time!",
-        "tip": "Tip: Submit words as you find them - no penalty for trying!"
+        "headline": "Perfectionist Trap",
+        "message": "Sometimes good enough beats perfect. Just submit!",
+        "tip": "Submit first, think later. No penalty for trying!"
       },
       "warmup": {
-        "headline": "Warm-up Round",
-        "message": "Consider this a practice run. Your brain is just getting started!",
-        "tip": "Tip: Scan the board quickly, then focus on high-value corners."
+        "headline": "Warm-up Complete",
+        "message": "Consider this a practice run. Brain is loading...",
+        "tip": "Scan fast, focus on corners."
       },
       "comeback": {
-        "headline": "Comeback Loading...",
-        "message": "The greatest players have off rounds. Next game is YOUR game!",
-        "tip": "Tip: Try saying letters out loud to trigger word associations."
+        "headline": "Comeback Arc",
+        "message": "Legends have off rounds. Your moment is next!",
+        "tip": "Say letters out loud to trigger word associations."
       }
     }
   },
@@ -1872,6 +1872,8 @@ const en = {
     "totalScore": "Total Score",
     "timePlayed": "Time Played",
     "achievements": "Achievements",
+    "hallOfFame": "Hall of Fame",
+    "hallOfFameDescription": "Elite achievements that require exceptional skill or dedication",
     "editProfile": "Edit Profile",
     "changeAvatar": "Change Avatar",
     "username": "Username",
@@ -2385,10 +2387,17 @@ const en = {
     "huntDescription": "Hunt for the hidden word using color-coded feedback!",
     "shareImage": "Share as Image",
     "download": "Download",
+    "downloadImage": "Download Image",
     "playingAs": "Playing as",
     "guestPlayer": "Guest Player",
     "enterName": "Enter your name",
-    "characters": "characters"
+    "characters": "characters",
+    "streakAtRisk": "Play today to save your streak!",
+    "attemptReset": "Attempt reset! You can play again",
+    "howToPlay": "How to Play",
+    "canYouBeatMyScore": "Can you beat my score?",
+    "targetWordLength": "Find the hidden word:",
+    "onlyMatchingLength": "Only {length}-letter words use your tries!"
   },
   "wordHunt": {
     "title": "Word Hunt",
@@ -2478,6 +2487,7 @@ const en = {
       "wordsLabel": "Words",
       "attemptsLabel": "Attempts",
       "triesLeft": "tries left",
+      "onlyMatchingLengthHint": "Only {length}-letter words use tries",
       "findOnBoard": "Find this word on the board!",
       "traceLetters": "Trace the letters on the grid to spell it",
       "needHelp": "Need help? Try a clue!"
@@ -2515,7 +2525,8 @@ const en = {
       "wantToRetry": "Want another try?",
       "retryChallenge": "Retry Challenge",
       "needMoreCoins": "need {amount} more",
-      "retryExplanation": "Full reset - start fresh with new attempts"
+      "retryExplanation": "Full reset - start fresh with new attempts",
+      "find": "FIND"
     },
     "shareCTA": {
       "canYouSolve": "Can you solve it?",

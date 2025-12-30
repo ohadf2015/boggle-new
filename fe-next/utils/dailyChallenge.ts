@@ -990,8 +990,15 @@ export function generateShareableResult(result: DailyChallengeResult, siteUrl?: 
     })
     .join('\n');
 
-  // Format streak if > 1
-  const streakText = result.streakDays > 1 ? `🔥 ${result.streakDays} day streak!\n` : '';
+  // Format streak with milestone callouts
+  let streakText = '';
+  if (result.streakDays >= 30) {
+    streakText = `🔥 ${result.streakDays} day streak! 🏆\n`;
+  } else if (result.streakDays >= 7) {
+    streakText = `🔥 ${result.streakDays} day streak! 💪\n`;
+  } else if (result.streakDays > 1) {
+    streakText = `🔥 ${result.streakDays} day streak!\n`;
+  }
 
   // Build URL with current origin and language
   let dailyUrl = 'lexiclash.live/daily';
@@ -1003,13 +1010,24 @@ export function generateShareableResult(result: DailyChallengeResult, siteUrl?: 
     dailyUrl = `${siteUrl}/${result.language}/daily`;
   }
 
-  // Build the shareable text
+  // Score-based brag line
+  let bragLine = '';
+  if (result.score >= 500) {
+    bragLine = 'Absolute word domination 👑';
+  } else if (result.score >= 300) {
+    bragLine = 'The board never stood a chance';
+  } else if (result.score >= 150) {
+    bragLine = 'Solid word hunting today';
+  }
+
+  // Build the shareable text with competitive CTA
   return `🎯 LexiClash Daily #${result.puzzleNumber}
 
 ${wordBars}
 
-📊 ${result.score} pts | ${result.wordCount} words
+📊 ${result.score} pts | ${result.wordCount} words${bragLine ? `\n${bragLine}` : ''}
 ${streakText}
+Think you can beat this? 🎮
 ${dailyUrl}`;
 }
 
@@ -1025,26 +1043,47 @@ export function generateWordHuntShareableResult(result: WordHuntResult, siteUrl?
   // Format the main result message
   const resultEmoji = result.solved ? '🎯' : '💪';
   const resultText = result.solved
-    ? `Solved in ${result.attemptsUsed}/10 attempts!`
-    : `Tried my best! X/10`;
+    ? `Solved in ${result.attemptsUsed}/10`
+    : `X/10 - so close!`;
 
-  // Fun performance message based on attempts
+  // Fun performance messages with variety based on attempts
+  const performanceMessages = {
+    genius: ['🧠 Big brain energy!', '🔥 Word Wizard!', '⚡ Absolute legend!', '👑 Bow down!'],
+    great: ['⚡ Crushed it!', '💥 Nailed it!', '🎯 Sharp as ever!', '✨ Too easy!'],
+    good: ['✨ Nice one!', '💫 Got there!', '🙌 Well played!', '👏 Solid solve!'],
+    close: ['😅 That was close!', '💫 Made it work!', '🎉 Scraped through!', '😮‍💨 Phew!'],
+    fail: ['💪 Next time!', '🔄 Tomorrow is mine!', '😤 The word won today', '🎲 Bad luck!'],
+  };
+
   let performanceMsg = '';
   if (result.solved) {
-    if (result.attemptsUsed <= 2) performanceMsg = '🔥 Word Wizard!';
-    else if (result.attemptsUsed <= 4) performanceMsg = '⚡ Crushed it!';
-    else if (result.attemptsUsed <= 6) performanceMsg = '✨ Nice one!';
-    else if (result.attemptsUsed <= 8) performanceMsg = '💫 Made it!';
-    else performanceMsg = '🎉 Phew!';
+    let tier: keyof typeof performanceMessages;
+    if (result.attemptsUsed <= 2) tier = 'genius';
+    else if (result.attemptsUsed <= 4) tier = 'great';
+    else if (result.attemptsUsed <= 6) tier = 'good';
+    else tier = 'close';
+
+    const messages = performanceMessages[tier];
+    performanceMsg = messages[Math.floor(Math.random() * messages.length)];
+  } else {
+    const messages = performanceMessages.fail;
+    performanceMsg = messages[Math.floor(Math.random() * messages.length)];
   }
 
-  // Format streak if > 1
-  const streakText = result.streakDays > 1 ? `🔥 ${result.streakDays} day streak!\n` : '';
+  // Format streak with milestone callouts
+  let streakText = '';
+  if (result.streakDays >= 30) {
+    streakText = `🔥 ${result.streakDays} day streak! 🏆\n`;
+  } else if (result.streakDays >= 7) {
+    streakText = `🔥 ${result.streakDays} day streak! 💪\n`;
+  } else if (result.streakDays > 1) {
+    streakText = `🔥 ${result.streakDays} day streak!\n`;
+  }
 
   // Build the shareable text - simple and engaging
   return `${resultEmoji} LexiClash Word Hunt #${result.puzzleNumber}
 
-${resultText}${performanceMsg ? ` ${performanceMsg}` : ''}
+${resultText} ${performanceMsg}
 ${streakText}
 Can you beat me? 🎮
 ${challengeUrl}`;
@@ -1384,6 +1423,46 @@ function getYesterdayDate(): string {
 export function getStreakMilestone(streak: number): number | null {
   const milestones = [7, 14, 30, 50, 100, 365];
   return milestones.find(m => m === streak) || null;
+}
+
+/**
+ * Check if the player's streak is at risk (hasn't played today but has an active streak)
+ * Returns the hours remaining until streak expires, or null if no active streak at risk
+ */
+export function isStreakAtRisk(): { atRisk: boolean; hoursRemaining: number; currentStreak: number } {
+  if (typeof window === 'undefined') {
+    return { atRisk: false, hoursRemaining: 0, currentStreak: 0 };
+  }
+
+  const streak = getDailyStreak();
+  const today = getDailyChallengeDate();
+
+  // No streak or already played today - not at risk
+  if (streak.currentStreak < 2 || streak.lastPlayedDate === today) {
+    return { atRisk: false, hoursRemaining: 0, currentStreak: streak.currentStreak };
+  }
+
+  // Check if they played yesterday (streak is still valid but at risk today)
+  const yesterday = new Date();
+  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+  const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+  if (streak.lastPlayedDate === yesterdayStr) {
+    // Calculate hours until midnight UTC (when streak expires)
+    const now = new Date();
+    const nextMidnight = new Date(Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate() + 1,
+      0, 0, 0, 0
+    ));
+    const hoursRemaining = Math.max(0, Math.floor((nextMidnight.getTime() - now.getTime()) / (1000 * 60 * 60)));
+
+    return { atRisk: true, hoursRemaining, currentStreak: streak.currentStreak };
+  }
+
+  // Streak already broken (missed yesterday)
+  return { atRisk: false, hoursRemaining: 0, currentStreak: 0 };
 }
 
 /**

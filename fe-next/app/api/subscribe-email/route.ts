@@ -1,26 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
 /**
  * Email Subscription API Endpoint
  *
  * Handles email capture for daily challenges and streak reminders.
- * Integrates with email service provider (Mailchimp, SendGrid, etc.)
+ * Stores emails in Supabase and optionally integrates with email providers.
  *
  * To integrate with your email service:
  * 1. Add MAILCHIMP_API_KEY and MAILCHIMP_LIST_ID to .env
  * OR
  * 2. Add SENDGRID_API_KEY and SENDGRID_LIST_ID to .env
- * OR
- * 3. Use the simple database storage below
+ *
+ * Emails are always stored in the database regardless of email provider.
  */
 
 /**
- * Check if email subscription is enabled (any email provider configured)
+ * Get Supabase admin client for database operations
+ */
+function getSupabaseAdmin() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    return null;
+  }
+
+  return createClient(supabaseUrl, supabaseServiceKey, {
+    auth: { persistSession: false },
+  });
+}
+
+/**
+ * Check if email subscription is enabled
+ * Always enabled now that we have database storage
  */
 function isEmailSubscriptionEnabled(): boolean {
-  const hasMailchimp = !!(process.env.MAILCHIMP_API_KEY && process.env.MAILCHIMP_LIST_ID);
-  const hasSendgrid = !!process.env.SENDGRID_API_KEY;
-  return hasMailchimp || hasSendgrid;
+  // Always enabled - we store in database even without email provider
+  return true;
 }
 
 /**
@@ -99,23 +116,41 @@ export async function POST(request: NextRequest) {
         throw new Error('SendGrid subscription failed');
       }
     }
-    // Option 3: Database Storage (fallback)
-    else {
-      // Store in your database (Supabase, PostgreSQL, etc.)
-      // For now, just log it (you should replace this with actual DB storage)
-      console.log('[Email Subscription]', {
-        email,
-        source,
-        timestamp,
-        subscribed_at: new Date().toISOString(),
-      });
+    // Option 3: Database Storage (always used as primary storage)
+    // Store in Supabase regardless of email provider
+    const supabase = getSupabaseAdmin();
+    if (supabase) {
+      const { error: dbError } = await supabase
+        .from('email_subscribers')
+        .upsert(
+          {
+            email,
+            source: source || 'unknown',
+            language: body.language || 'en',
+            subscribed_at: new Date().toISOString(),
+            is_active: true,
+            utm_source: body.utm_source,
+            utm_medium: body.utm_medium,
+            utm_campaign: body.utm_campaign,
+            updated_at: new Date().toISOString(),
+          },
+          {
+            onConflict: 'email',
+            ignoreDuplicates: false, // Update existing record
+          }
+        );
 
-      // TODO: Add database storage
-      // await supabase.from('email_subscribers').insert({
-      //   email,
-      //   source,
-      //   subscribed_at: new Date().toISOString(),
-      // });
+      if (dbError) {
+        console.error('[Email Subscription DB Error]', dbError);
+        // Don't fail the request if DB storage fails but email provider succeeded
+        if (!process.env.MAILCHIMP_API_KEY && !process.env.SENDGRID_API_KEY) {
+          throw new Error('Failed to save email subscription');
+        }
+      } else {
+        console.log('[Email Subscription] Saved to database:', email);
+      }
+    } else {
+      console.warn('[Email Subscription] No Supabase admin client available');
     }
 
     return NextResponse.json({

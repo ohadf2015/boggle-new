@@ -56,10 +56,10 @@ const LandingView: React.FC = () => {
       return;
     }
 
-    // Delay onboarding by 3 seconds to let users explore first
+    // Show onboarding quickly after page renders (300ms feels responsive, not jarring)
     const timer = setTimeout(() => {
       setShowOnboarding(true);
-    }, 3000);
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [isAuthenticated]);
