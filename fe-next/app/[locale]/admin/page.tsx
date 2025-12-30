@@ -318,6 +318,12 @@ export default function AdminDashboard() {
 
   // Generate a retry link for the daily challenge
   const generateRetryLink = async () => {
+    const token = await getAuthToken();
+    if (!token) {
+      toast.error('Authentication required');
+      return;
+    }
+
     setRetryLinkLoading(true);
     setGeneratedRetryLink(null);
     setRetryLinkExpiry(null);
@@ -326,8 +332,10 @@ export default function AdminDashboard() {
       const today = new Date().toISOString().split('T')[0];
       const response = await fetch('/api/admin/daily-word/generate-retry-link', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
         body: JSON.stringify({
           puzzleDate: today,
           language: retryLinkLanguage,
