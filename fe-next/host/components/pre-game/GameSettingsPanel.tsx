@@ -311,12 +311,12 @@ export const GameSettingsPanel = memo<GameSettingsPanelProps>(({
                   </div>
                 </div>
 
-                {/* Host Play Option - Compact */}
+                {/* Broadcast Mode Option - Compact */}
                 <div className="flex items-center gap-2 pt-1">
                   <Checkbox
                     id="hostPlays"
-                    checked={hostPlaying}
-                    onCheckedChange={(checked) => setHostPlaying(checked === true)}
+                    checked={!hostPlaying}
+                    onCheckedChange={(checked) => setHostPlaying(checked !== true)}
                   />
                   <label htmlFor="hostPlays" className="text-xs font-bold text-neo-cream cursor-pointer">
                     {t('hostView.hostPlays')}

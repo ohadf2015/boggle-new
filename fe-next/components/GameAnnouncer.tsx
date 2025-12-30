@@ -21,24 +21,39 @@ interface AnnouncerContextType {
   announceLeaderboard: (playerName: string, position: number, score: number) => void;
   announcePlayerJoin: (playerName: string) => void;
   announcePlayerLeave: (playerName: string) => void;
+  announceTimer: (secondsRemaining: number) => void;
+  announceScoreUpdate: (newScore: number, delta: number) => void;
+  announceRoundStart: (roundNumber: number, totalRounds: number) => void;
+  announceRoundEnd: (roundNumber: number, playerRank: number) => void;
+  announceFireRound: (isStart: boolean) => void;
+  announceEarthquake: (phase: 'warning' | 'shaking' | 'complete') => void;
 }
 
 const AnnouncerContext = createContext<AnnouncerContextType | null>(null);
 
-export const useAnnouncer = () => {
+// No-op fallback for when hook is used outside provider
+const noopAnnouncer: AnnouncerContextType = {
+  announce: () => {},
+  announceWordResult: () => {},
+  announceCombo: () => {},
+  announceGameState: () => {},
+  announceConnection: () => {},
+  announceLeaderboard: () => {},
+  announcePlayerJoin: () => {},
+  announcePlayerLeave: () => {},
+  announceTimer: () => {},
+  announceScoreUpdate: () => {},
+  announceRoundStart: () => {},
+  announceRoundEnd: () => {},
+  announceFireRound: () => {},
+  announceEarthquake: () => {},
+};
+
+export const useAnnouncer = (): AnnouncerContextType => {
   const context = useContext(AnnouncerContext);
   if (!context) {
     // Return no-op functions if not within provider
-    return {
-      announce: () => {},
-      announceWordResult: () => {},
-      announceCombo: () => {},
-      announceGameState: () => {},
-      announceConnection: () => {},
-      announceLeaderboard: () => {},
-      announcePlayerJoin: () => {},
-      announcePlayerLeave: () => {},
-    };
+    return noopAnnouncer;
   }
   return context;
 };
@@ -142,6 +157,46 @@ export const GameAnnouncerProvider: React.FC<GameAnnouncerProviderProps> = ({ ch
     announce(`${playerName} left the game`);
   }, [announce]);
 
+  const announceTimer = useCallback((secondsRemaining: number) => {
+    // Only announce at key intervals: 60, 30, 10, 5, 3, 2, 1
+    const urgentTimes = [60, 30, 10, 5, 3, 2, 1];
+    if (urgentTimes.includes(secondsRemaining)) {
+      const priority = secondsRemaining <= 10 ? 'assertive' : 'polite';
+      announce(`${secondsRemaining} seconds remaining`, priority);
+    }
+  }, [announce]);
+
+  const announceScoreUpdate = useCallback((newScore: number, delta: number) => {
+    if (delta > 0) {
+      announce(`Plus ${delta} points. Total: ${newScore}`);
+    }
+  }, [announce]);
+
+  const announceRoundStart = useCallback((roundNumber: number, totalRounds: number) => {
+    announce(`Round ${roundNumber} of ${totalRounds} starting`, 'assertive');
+  }, [announce]);
+
+  const announceRoundEnd = useCallback((roundNumber: number, playerRank: number) => {
+    announce(`Round ${roundNumber} complete. You finished in position ${playerRank}`);
+  }, [announce]);
+
+  const announceFireRound = useCallback((isStart: boolean) => {
+    if (isStart) {
+      announce('Fire round! Double points for 15 seconds!', 'assertive');
+    } else {
+      announce('Fire round ended');
+    }
+  }, [announce]);
+
+  const announceEarthquake = useCallback((phase: 'warning' | 'shaking' | 'complete') => {
+    const messages = {
+      warning: 'Earthquake warning! Grid will shuffle in 3 seconds',
+      shaking: 'Earthquake! Grid shuffling now',
+      complete: 'Earthquake complete. New grid available',
+    };
+    announce(messages[phase], phase === 'warning' ? 'assertive' : 'polite');
+  }, [announce]);
+
   const contextValue: AnnouncerContextType = {
     announce,
     announceWordResult,
@@ -151,6 +206,12 @@ export const GameAnnouncerProvider: React.FC<GameAnnouncerProviderProps> = ({ ch
     announceLeaderboard,
     announcePlayerJoin,
     announcePlayerLeave,
+    announceTimer,
+    announceScoreUpdate,
+    announceRoundStart,
+    announceRoundEnd,
+    announceFireRound,
+    announceEarthquake,
   };
 
   return (

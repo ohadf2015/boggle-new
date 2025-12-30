@@ -1,19 +1,16 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogBody, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useMusic } from '../contexts/MusicContext';
 import { useAuth } from '../contexts/AuthContext';
 import OnboardingProgress from './onboarding/OnboardingProgress';
-import {
-  markOnboardingComplete,
-  markOnboardingSkipped,
-} from '../utils/onboardingStorage';
+import { markOnboardingComplete } from '../utils/onboardingStorage';
 import { AVATARS } from '../utils/avatarConfig';
 
 // Step components - Streamlined 3-step onboarding
@@ -52,10 +49,13 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
     selectedMode: null,
   });
 
+  // Set random avatar and its name as default on mount
   useEffect(() => {
+    const randomAvatar = AVATARS[Math.floor(Math.random() * AVATARS.length)];
     setFormData((prev) => ({
       ...prev,
-      avatarId: AVATARS[Math.floor(Math.random() * AVATARS.length)].id,
+      avatarId: randomAvatar.id,
+      displayName: prev.displayName || randomAvatar.name,
     }));
   }, []);
 
@@ -66,32 +66,11 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
     }
   }, [isOpen, audioUnlocked, fadeToTrack, TRACKS]);
 
-  const handleSkip = useCallback(() => {
-    markOnboardingSkipped();
-    onClose();
-  }, [onClose]);
-
-  // Add ESC key support for easy dismissal
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        handleSkip();
-      }
-    };
-
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [isOpen, handleSkip]);
-
-  // Handle dialog close via X button or clicking outside
-  // This ensures onboarding is marked as skipped even if user doesn't use the Skip button
+  // Handle dialog state changes - prevent closing without completing
   const handleOpenChange = (open: boolean) => {
+    // Don't allow closing the modal - user must complete onboarding
     if (!open) {
-      // User is closing the dialog - mark as skipped so it doesn't show again
-      markOnboardingSkipped();
-      onClose();
+      return;
     }
   };
 
@@ -196,11 +175,8 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
         {/* Visually hidden title for accessibility */}
         <DialogTitle className="sr-only">{t('onboarding.navigation.title') || 'Player Onboarding'}</DialogTitle>
 
-        {/* Helper text for easy dismissal */}
+        {/* Progress indicator */}
         <div className="px-3 sm:px-6 pt-3 sm:pt-4">
-          <p className="text-xs sm:text-sm text-neo-black/70 text-center mb-2">
-            {t('onboarding.skipHint') || 'Press ESC or click Skip to jump straight to the game 🎮'}
-          </p>
           <OnboardingProgress currentStep={currentStep} totalSteps={TOTAL_STEPS} />
         </div>
 
@@ -221,18 +197,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
 
         {/* Navigation buttons */}
         <DialogFooter className="flex-col sm:flex-row gap-2 px-3 sm:px-6 pb-3 sm:pb-6">
-          {/* Skip button - NOW ALWAYS VISIBLE (even on first step for easy dismissal) */}
-          {!isLastStep && (
-            <Button
-              variant="outline"
-              onClick={handleSkip}
-              className="bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-bold text-sm sm:text-base border-3 border-neo-black shadow-hard-sm"
-            >
-              <X className="me-2" />
-              {t('onboarding.navigation.skip')}
-            </Button>
-          )}
-
           {/* Back button (except first step) */}
           {currentStep > 0 && (
             <Button

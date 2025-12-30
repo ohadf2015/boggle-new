@@ -11,6 +11,7 @@ interface TvGameHeaderProps {
   fireRoundActive?: boolean;
   fireRoundRemaining?: number;
   earthquakeState?: 'idle' | 'warning' | 'shaking' | 'fire-round';
+  t: (path: string, params?: Record<string, string | number>) => string;
 }
 
 /**
@@ -23,6 +24,7 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
   fireRoundActive = false,
   fireRoundRemaining = 0,
   earthquakeState = 'idle',
+  t,
 }) => {
   const totalTimeSeconds = timerValue * 60;
 
@@ -41,7 +43,7 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
             className="flex items-center gap-2 bg-neo-red text-neo-cream px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm"
           >
             <Radio className="w-5 h-5" />
-            <span className="font-black text-lg uppercase tracking-wider">LIVE</span>
+            <span className="font-black text-lg uppercase tracking-wider">{t('tvBroadcast.live')}</span>
           </motion.div>
         </motion.div>
 
@@ -72,7 +74,7 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
                   transition={{ duration: 0.1, repeat: Infinity }}
                   className="font-black text-lg uppercase"
                 >
-                  EARTHQUAKE!
+                  {t('tvBroadcast.earthquake')}
                 </motion.span>
               </motion.div>
             )}
@@ -92,8 +94,8 @@ const TvGameHeader = memo<TvGameHeaderProps>(({
               >
                 <Flame className="w-6 h-6 animate-bounce" />
                 <div className="text-center">
-                  <span className="font-black text-lg uppercase block">FIRE ROUND</span>
-                  <span className="text-xs font-bold">2X POINTS • {fireRoundRemaining}s</span>
+                  <span className="font-black text-lg uppercase block">{t('tvBroadcast.fireRound')}</span>
+                  <span className="text-xs font-bold">{t('tvBroadcast.twoXPoints')} • {fireRoundRemaining}s</span>
                 </div>
                 <Flame className="w-6 h-6 animate-bounce" />
               </motion.div>

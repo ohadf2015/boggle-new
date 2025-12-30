@@ -175,6 +175,9 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
           size="sm"
           onClick={() => setShowUserMenu(!showUserMenu)}
           onBlur={() => setTimeout(() => { setShowUserMenu(false); setIsLanguageExpanded(false); }, 200)}
+          aria-haspopup="menu"
+          aria-expanded={showUserMenu}
+          aria-label={t('auth.userMenu') || 'User menu'}
           className={cn(
             'flex items-center gap-1 sm:gap-2 rounded-full transition-all duration-300 px-2 sm:px-3 min-h-[44px]',
             isDarkMode
@@ -198,7 +201,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
               animate={false}
             />
           )}
-          <ChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} />
+          <ChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} aria-hidden="true" />
         </Button>
 
         {/* User Dropdown */}
@@ -210,6 +213,8 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.2 }}
               onMouseDown={(e) => e.preventDefault()}
+              role="menu"
+              aria-label={t('auth.userMenu') || 'User menu'}
               className={cn(
                 'absolute top-full mt-2 min-w-[180px] rounded-lg shadow-xl z-[100]',
                 isRTL ? 'left-0' : 'right-0',
@@ -220,6 +225,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
             >
               {/* Profile Link */}
               <Button
+                role="menuitem"
                 variant="ghost"
                 onClick={() => {
                   router.push(`/${language}/profile`);
@@ -238,6 +244,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
 
               {/* Leaderboard Link */}
               <Button
+                role="menuitem"
                 variant="ghost"
                 onClick={() => {
                   router.push(`/${language}/leaderboard`);
@@ -250,12 +257,13 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                     : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
                 )}
               >
-                <Trophy size={14} />
+                <Trophy size={14} aria-hidden="true" />
                 <span>{t('leaderboard.title') || 'Leaderboard'}</span>
               </Button>
 
               {/* Friends Link */}
               <Button
+                role="menuitem"
                 variant="ghost"
                 onClick={() => {
                   router.push(`/${language}/friends`);
@@ -268,7 +276,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                     : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
                 )}
               >
-                <Users size={14} />
+                <Users size={14} aria-hidden="true" />
                 <span>{t('friends.title') || 'Friends'}</span>
               </Button>
 
@@ -281,6 +289,9 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
               {/* Language Section - Collapsible */}
               <div>
                 <Button
+                  role="menuitem"
+                  aria-expanded={isLanguageExpanded}
+                  aria-haspopup="true"
                   variant="ghost"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -294,12 +305,13 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-lg">{currentLang.flag}</span>
+                    <span className="text-lg" aria-hidden="true">{currentLang.flag}</span>
                     <span>{currentLang.name}</span>
                   </div>
                   <ChevronDown
                     size={10}
                     className={cn('transition-transform duration-200', isLanguageExpanded && 'rotate-180')}
+                    aria-hidden="true"
                   />
                 </Button>
 
@@ -346,6 +358,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
 
               {/* Theme Toggle */}
               <Button
+                role="menuitem"
                 variant="ghost"
                 onClick={toggleTheme}
                 className={cn(
@@ -355,7 +368,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                     : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
                 )}
               >
-                {isDarkMode ? <Sun size={14} className="text-yellow-400" /> : <Moon size={14} className="text-slate-600" />}
+                {isDarkMode ? <Sun size={14} className="text-yellow-400" aria-hidden="true" /> : <Moon size={14} className="text-slate-600" aria-hidden="true" />}
                 <span>{isDarkMode ? (t('common.lightMode') || 'Light Mode') : (t('common.darkMode') || 'Dark Mode')}</span>
               </Button>
 
@@ -363,10 +376,11 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
               <div className={cn(
                 'my-1 h-px',
                 isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
-              )} />
+              )} aria-hidden="true" />
 
               {/* Sign Out */}
               <Button
+                role="menuitem"
                 variant="ghost"
                 onClick={handleSignOut}
                 disabled={isSigningOut}
@@ -378,9 +392,9 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                 )}
               >
                 {isSigningOut ? (
-                  <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" aria-label={t('common.loading') || 'Loading'} />
                 ) : (
-                  <LogOut size={14} />
+                  <LogOut size={14} aria-hidden="true" />
                 )}
                 <span>{t('auth.signOut') || 'Sign Out'}</span>
               </Button>
@@ -472,6 +486,9 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
             size="sm"
             onClick={() => setShowUserMenu(!showUserMenu)}
             onBlur={() => setTimeout(() => { setShowUserMenu(false); setIsLanguageExpanded(false); }, 200)}
+            aria-haspopup="menu"
+            aria-expanded={showUserMenu}
+            aria-label={t('common.settings') || 'Settings'}
             className={cn(
               'flex items-center gap-2 rounded-full transition-all duration-300 min-h-[44px]',
               isDarkMode
@@ -479,8 +496,8 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                 : 'bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200'
             )}
           >
-            <Settings size={16} />
-            <ChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} />
+            <Settings size={16} aria-hidden="true" />
+            <ChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} aria-hidden="true" />
           </Button>
 
         {/* Guest Dropdown */}
@@ -492,6 +509,8 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.2 }}
               onMouseDown={(e) => e.preventDefault()}
+              role="menu"
+              aria-label={t('common.settings') || 'Settings'}
               className={cn(
                 'absolute top-full mt-2 min-w-[180px] rounded-lg shadow-xl z-[100]',
                 isRTL ? 'left-0' : 'right-0',
@@ -503,6 +522,9 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
               {/* Language Section - Collapsible */}
               <div>
                 <Button
+                  role="menuitem"
+                  aria-expanded={isLanguageExpanded}
+                  aria-haspopup="true"
                   variant="ghost"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -516,12 +538,13 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-lg">{currentLang.flag}</span>
+                    <span className="text-lg" aria-hidden="true">{currentLang.flag}</span>
                     <span>{currentLang.name}</span>
                   </div>
                   <ChevronDown
                     size={10}
                     className={cn('transition-transform duration-200', isLanguageExpanded && 'rotate-180')}
+                    aria-hidden="true"
                   />
                 </Button>
 
@@ -568,6 +591,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
 
               {/* Theme Toggle */}
               <Button
+                role="menuitem"
                 variant="ghost"
                 onClick={toggleTheme}
                 className={cn(
@@ -577,7 +601,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                     : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
                 )}
               >
-                {isDarkMode ? <Sun size={14} className="text-yellow-400" /> : <Moon size={14} className="text-slate-600" />}
+                {isDarkMode ? <Sun size={14} className="text-yellow-400" aria-hidden="true" /> : <Moon size={14} className="text-slate-600" aria-hidden="true" />}
                 <span>{isDarkMode ? (t('common.lightMode') || 'Light Mode') : (t('common.darkMode') || 'Dark Mode')}</span>
               </Button>
 
@@ -585,10 +609,11 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
               <div className={cn(
                 'my-1 h-px',
                 isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
-              )} />
+              )} aria-hidden="true" />
 
               {/* Leaderboard Link - Now the last item */}
               <Button
+                role="menuitem"
                 variant="ghost"
                 onClick={() => {
                   router.push(`/${language}/leaderboard`);
@@ -601,7 +626,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                     : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
                 )}
               >
-                <Trophy size={14} />
+                <Trophy size={14} aria-hidden="true" />
                 <span>{t('leaderboard.title') || 'Leaderboard'}</span>
               </Button>
             </motion.div>

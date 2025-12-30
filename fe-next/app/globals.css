@@ -187,6 +187,18 @@ body {
     border-width: 0;
   }
 
+  /* BiDi text isolation - prevents punctuation from appearing at wrong position
+     when LTR text is displayed in an RTL context (or vice versa) */
+  .text-bidi-isolate {
+    unicode-bidi: isolate;
+  }
+
+  /* Auto-detect text direction based on content */
+  .text-dir-auto {
+    direction: inherit;
+    unicode-bidi: plaintext;
+  }
+
   /* Focus visible styles for keyboard navigation - Neo-Brutalist style */
   .focus-visible-ring:focus-visible {
     outline: 3px solid var(--neo-cyan);
@@ -2307,4 +2319,21 @@ html.reduce-motion *::after {
 .low-end-device .game-board-frame [role="gridcell"]:active {
   transform: scale(0.98) !important;
   transition: none !important;
+}
+
+/* ==================== TV Broadcast Mode Grid ==================== */
+/* Override game-board-frame sizing when inside TV broadcast container */
+.tv-grid-container {
+  /* Container that fills available space */
+  container-type: size;
+}
+
+.tv-grid-container .game-board-frame {
+  /* Override the vmin-based sizing with container-relative sizing */
+  width: 100% !important;
+  height: 100% !important;
+  max-width: min(100%, 100cqh) !important;
+  max-height: min(100%, 100cqw) !important;
+  aspect-ratio: 1 / 1 !important;
+  margin: 0 auto;
 }

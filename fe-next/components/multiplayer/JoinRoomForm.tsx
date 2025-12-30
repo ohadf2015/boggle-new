@@ -268,11 +268,11 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                                 <p className="font-bold text-sm text-neo-black dark:text-neo-white truncate">
                                   {room.roomName || room.gameCode}
                                 </p>
-                                <p className="text-xs text-neo-black/60 dark:text-neo-cream/60">
+                                <p className="text-xs text-neo-black/70 dark:text-slate-300">
                                   {room.playerCount || 0} {t('joinView.players') || 'players'}
                                 </p>
                               </div>
-                              <span className="px-2 py-1 rounded text-xs font-bold bg-neo-cyan text-neo-black opacity-0 group-hover:opacity-100 transition-opacity">
+                              <span className="px-3 py-1.5 rounded-neo text-xs font-bold bg-neo-cyan text-neo-black border-2 border-neo-black shadow-hard-sm group-hover:shadow-hard group-hover:translate-x-[-1px] group-hover:translate-y-[-1px] transition-all">
                                 {t('common.join') || 'Join'}
                               </span>
                             </button>

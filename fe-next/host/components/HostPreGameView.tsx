@@ -414,12 +414,12 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                     </div>
                   </div>
 
-                  {/* Host Play Option */}
+                  {/* Broadcast Mode Option */}
                   <div className="flex items-center gap-3">
                     <Checkbox
                       id="hostPlays"
-                      checked={hostPlaying}
-                      onCheckedChange={(checked) => setHostPlaying(checked === true)}
+                      checked={!hostPlaying}
+                      onCheckedChange={(checked) => setHostPlaying(checked !== true)}
                     />
                     <label htmlFor="hostPlays" className="text-sm font-bold text-neo-cream cursor-pointer">
                       {t('hostView.hostPlays')}

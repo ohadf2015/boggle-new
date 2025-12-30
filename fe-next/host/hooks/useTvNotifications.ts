@@ -33,6 +33,7 @@ interface UseTvNotificationsOptions {
   socket: Socket | null;
   enabled?: boolean;
   onNotification?: (notification: TvNotificationData) => void;
+  t?: (path: string, params?: Record<string, string | number>) => string;
 }
 
 interface UseTvNotificationsResult {
@@ -55,6 +56,7 @@ export function useTvNotifications({
   socket,
   enabled = true,
   onNotification,
+  t = (path) => path, // Default fallback returns the path itself
 }: UseTvNotificationsOptions): UseTvNotificationsResult {
   const [notifications, setNotifications] = useState<TvNotificationData[]>([]);
   const previousRankingsRef = useRef<Record<string, number>>({});
@@ -151,25 +153,25 @@ export function useTvNotifications({
       // First blood detection
       if (!firstWordFoundRef.current && gameStartedRef.current) {
         firstWordFoundRef.current = true;
-        addNotification('first_blood', 'medium', 'FIRST BLOOD!', `${username} draws first`, username);
+        addNotification('first_blood', 'medium', t('tvBroadcast.notifications.firstBlood'), `${username} ${t('tvBroadcast.notifications.drawsFirst')}`, username);
       }
 
       // Long word detection
       if (word) {
         const wordLength = word.length;
         if (wordLength >= 8) {
-          addNotification('rare_word', 'mega', 'LEGENDARY FIND!', `"${word.toUpperCase()}"`, username);
+          addNotification('rare_word', 'mega', t('tvBroadcast.notifications.rareWord'), `"${word.toUpperCase()}"`, username);
         } else if (wordLength >= 7) {
-          addNotification('epic_word', 'medium', 'MONSTER WORD!', `"${word.toUpperCase()}"`, username);
+          addNotification('epic_word', 'medium', t('tvBroadcast.notifications.epicWord'), `"${word.toUpperCase()}"`, username);
         } else if (wordLength >= 5) {
-          addNotification('long_word', 'subtle', 'WORD POWER!', `"${word.toUpperCase()}"`, username);
+          addNotification('long_word', 'subtle', t('tvBroadcast.notifications.longWord'), `"${word.toUpperCase()}"`, username);
         }
 
         // Word snipe detection (same word within 2 seconds)
         const now = Date.now();
         for (const [player, wordData] of Object.entries(lastWordPerPlayerRef.current)) {
           if (player !== username && wordData.word.toLowerCase() === word.toLowerCase() && now - wordData.time < 2000) {
-            addNotification('word_snipe', 'medium', 'DOUBLE TAKE!', `Both found "${word.toUpperCase()}"`, `${username} & ${player}`);
+            addNotification('word_snipe', 'medium', t('tvBroadcast.notifications.wordSnipe'), `${t('tvBroadcast.notifications.bothFound')} "${word.toUpperCase()}"`, `${username} & ${player}`);
           }
         }
         lastWordPerPlayerRef.current[username] = { word, time: now };
@@ -181,18 +183,18 @@ export function useTvNotifications({
 
         // Detect combo milestones (only announce once per milestone)
         if (comboLevel >= 20 && previousCombo < 20) {
-          addNotification('combo_20x', 'mega', 'COMBO ROYALTY!', `${comboLevel}x streak`, username);
+          addNotification('combo_20x', 'mega', t('tvBroadcast.notifications.combo20x'), `${comboLevel}x ${t('tvBroadcast.notifications.streak')}`, username);
         } else if (comboLevel >= 15 && previousCombo < 15) {
-          addNotification('combo_15x', 'mega', 'ABSOLUTE BEAST!', `${comboLevel}x combo`, username);
+          addNotification('combo_15x', 'mega', t('tvBroadcast.notifications.combo15x'), `${comboLevel}x ${t('tvBroadcast.notifications.combo')}`, username);
         } else if (comboLevel >= 10 && previousCombo < 10) {
-          addNotification('combo_10x', 'medium', 'UNSTOPPABLE!', `${comboLevel}x combo`, username);
+          addNotification('combo_10x', 'medium', t('tvBroadcast.notifications.combo10x'), `${comboLevel}x ${t('tvBroadcast.notifications.combo')}`, username);
         } else if (comboLevel >= 5 && previousCombo < 5) {
-          addNotification('combo_5x', 'subtle', 'HEATING UP!', `${comboLevel}x combo`, username);
+          addNotification('combo_5x', 'subtle', t('tvBroadcast.notifications.combo5x'), `${comboLevel}x ${t('tvBroadcast.notifications.combo')}`, username);
         }
 
         // Combo broken detection (high combo lost)
         if (comboLevel === 0 && previousCombo >= 5) {
-          addNotification('combo_broken', 'medium', 'STREAK SHATTERED!', `${previousCombo}x combo down`, username);
+          addNotification('combo_broken', 'medium', t('tvBroadcast.notifications.comboBroken'), `${previousCombo}x ${t('tvBroadcast.notifications.comboDown')}`, username);
         }
 
         previousCombosRef.current[username] = comboLevel;
@@ -204,7 +206,7 @@ export function useTvNotifications({
     return () => {
       socket.off('playerFoundWord', handlePlayerFoundWord);
     };
-  }, [socket, enabled, addNotification]);
+  }, [socket, enabled, addNotification, t]);
 
   // Listen for leaderboard updates (overtakes, comebacks, photo finish)
   useEffect(() => {
@@ -225,12 +227,12 @@ export function useTvNotifications({
           // Overtake detection
           if (newRank < oldRank && oldRank <= 5) {
             // Only announce overtakes in top 5
-            addNotification('overtake', 'subtle', 'MOVING UP!', `Now #${newRank + 1}`, entry.username);
+            addNotification('overtake', 'subtle', t('tvBroadcast.notifications.overtake'), `${t('tvBroadcast.notifications.nowRank')}${newRank + 1}`, entry.username);
           }
 
           // Comeback detection (bottom half to top 3)
           if (oldRank >= halfwayPoint && newRank < 3 && totalPlayers >= 4) {
-            addNotification('comeback', 'mega', 'FROM THE ASHES!', `#${oldRank + 1} to #${newRank + 1}`, entry.username);
+            addNotification('comeback', 'mega', t('tvBroadcast.notifications.comeback'), `#${oldRank + 1} ${t('tvBroadcast.notifications.toRank')}${newRank + 1}`, entry.username);
           }
         }
       });
@@ -240,7 +242,7 @@ export function useTvNotifications({
         const [first, second] = leaderboard;
         if (first && second && Math.abs(first.score - second.score) <= 5 && first.score > 0) {
           // Only show if we haven't shown recently (throttle)
-          addNotification('photo_finish', 'mega', 'NECK AND NECK!', `Only ${Math.abs(first.score - second.score)} pts apart`, `${first.username} vs ${second.username}`);
+          addNotification('photo_finish', 'mega', t('tvBroadcast.notifications.photoFinish'), `${Math.abs(first.score - second.score)} ${t('tvBroadcast.notifications.ptsApart')}`, `${first.username} vs ${second.username}`);
         }
       }
 
@@ -255,7 +257,7 @@ export function useTvNotifications({
     return () => {
       socket.off('updateLeaderboard', handleLeaderboardUpdate);
     };
-  }, [socket, enabled, addNotification]);
+  }, [socket, enabled, addNotification, t]);
 
   // Listen for achievements
   useEffect(() => {
@@ -263,7 +265,7 @@ export function useTvNotifications({
 
     const handleAchievement = (data: { achievements: AchievementPayload[] }) => {
       data.achievements?.forEach(({ username, achievement }) => {
-        addNotification('achievement', 'medium', 'ACHIEVEMENT!', achievement.name, username);
+        addNotification('achievement', 'medium', t('tvBroadcast.notifications.achievement'), achievement.name, username);
       });
     };
 
@@ -272,14 +274,14 @@ export function useTvNotifications({
     return () => {
       socket.off('liveAchievementUnlocked', handleAchievement);
     };
-  }, [socket, enabled, addNotification]);
+  }, [socket, enabled, addNotification, t]);
 
   // Listen for level ups
   useEffect(() => {
     if (!socket || !enabled) return;
 
     const handleLevelUp = (data: LevelUpPayload) => {
-      addNotification('level_up', 'subtle', 'LEVEL UP!', `Level ${data.level}`, data.username);
+      addNotification('level_up', 'subtle', t('tvBroadcast.notifications.levelUp'), `Level ${data.level}`, data.username);
     };
 
     socket.on('levelUp', handleLevelUp);
@@ -287,18 +289,18 @@ export function useTvNotifications({
     return () => {
       socket.off('levelUp', handleLevelUp);
     };
-  }, [socket, enabled, addNotification]);
+  }, [socket, enabled, addNotification, t]);
 
   // Listen for fire round events
   useEffect(() => {
     if (!socket || !enabled) return;
 
     const handleFireRoundStart = () => {
-      addNotification('fire_round_start', 'mega', 'FIRE ROUND!', 'Everything is 2X!');
+      addNotification('fire_round_start', 'mega', t('tvBroadcast.notifications.fireRoundStart'), t('tvBroadcast.notifications.everythingDouble'));
     };
 
     const handleFireRoundEnd = () => {
-      addNotification('fire_round_end', 'subtle', 'FIRE OUT!', 'Back to normal');
+      addNotification('fire_round_end', 'subtle', t('tvBroadcast.notifications.fireRoundEnd'), t('tvBroadcast.notifications.backToNormal'));
     };
 
     socket.on('fireRoundStart', handleFireRoundStart);
@@ -308,14 +310,14 @@ export function useTvNotifications({
       socket.off('fireRoundStart', handleFireRoundStart);
       socket.off('fireRoundEnd', handleFireRoundEnd);
     };
-  }, [socket, enabled, addNotification]);
+  }, [socket, enabled, addNotification, t]);
 
   // Listen for earthquake events
   useEffect(() => {
     if (!socket || !enabled) return;
 
     const handleEarthquake = () => {
-      addNotification('earthquake', 'mega', 'BRACE YOURSELVES!', 'Grid shuffle incoming!');
+      addNotification('earthquake', 'mega', t('tvBroadcast.notifications.earthquake'), t('tvBroadcast.notifications.gridShuffle'));
     };
 
     socket.on('earthquakeWarning', handleEarthquake);
@@ -323,7 +325,7 @@ export function useTvNotifications({
     return () => {
       socket.off('earthquakeWarning', handleEarthquake);
     };
-  }, [socket, enabled, addNotification]);
+  }, [socket, enabled, addNotification, t]);
 
   // Listen for time warnings
   useEffect(() => {
@@ -331,7 +333,7 @@ export function useTvNotifications({
 
     const handleTimeUpdate = (data: { remainingTime: number }) => {
       if (data.remainingTime === 30) {
-        addNotification('final_warning', 'mega', 'FINAL STRETCH!', '30 seconds left!');
+        addNotification('final_warning', 'mega', t('tvBroadcast.notifications.finalWarning'), `30 ${t('tvBroadcast.notifications.secondsLeft')}`);
       }
     };
 
@@ -340,7 +342,7 @@ export function useTvNotifications({
     return () => {
       socket.off('timeUpdate', handleTimeUpdate);
     };
-  }, [socket, enabled, addNotification]);
+  }, [socket, enabled, addNotification, t]);
 
   return {
     notifications,

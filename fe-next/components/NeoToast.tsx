@@ -132,7 +132,7 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
             >
               ✓
             </motion.span>
-            <span className="font-black uppercase tracking-wide text-neo-black">
+            <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
               {applyHebrewFinalLetters(word)}
             </span>
             {/* Show score if provided and greater than 0 */}
@@ -200,10 +200,10 @@ export const wordNeedsValidationToast = (word: string, options: WordNeedsValidat
             >
               ⏳
             </motion.span>
-            <span className="font-black uppercase tracking-wide text-neo-black">
+            <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
               {applyHebrewFinalLetters(word)}
             </span>
-            <span className="text-xs font-bold text-neo-black/70 uppercase">
+            <span dir="auto" className="text-xs font-bold text-neo-black/70 uppercase">
               {options.pendingLabel || 'Pending'}
             </span>
           </motion.div>
@@ -239,10 +239,10 @@ export const wordAIValidatingToast = (word: string, options: WordAIValidatingOpt
               <Bot className="text-neo-cream" />
             </motion.span>
             <div className="flex flex-col">
-              <span className="font-black uppercase tracking-wide text-neo-cream">
+              <span dir="auto" className="font-black uppercase tracking-wide text-neo-cream">
                 {applyHebrewFinalLetters(word)}
               </span>
-              <span className="text-xs font-bold text-neo-cream/80 uppercase">
+              <span dir="auto" className="text-xs font-bold text-neo-cream/80 uppercase">
                 {options.aiValidatingLabel || 'AI checking...'}
               </span>
             </div>
@@ -305,10 +305,10 @@ export const wordRejectedToast = (word: string, options: WordRejectedOptions = {
               {rejectionInfo.icon}
             </motion.span>
             <div className="flex flex-col gap-0.5">
-              <span className="font-black uppercase tracking-wide text-neo-white">
+              <span dir="auto" className="font-black uppercase tracking-wide text-neo-white">
                 {applyHebrewFinalLetters(word)}
               </span>
-              <span className="text-xs font-bold text-neo-white/80 uppercase">
+              <span dir="auto" className="text-xs font-bold text-neo-white/80 uppercase">
                 {displayMessage}
               </span>
             </div>
@@ -363,7 +363,7 @@ export const wordErrorToast = (message: string, options: WordErrorOptions = {}):
             >
               ✗
             </motion.span>
-            <span className="font-black uppercase tracking-wide text-neo-white">
+            <span dir="auto" className="font-black uppercase tracking-wide text-neo-white">
               {message}
             </span>
           </motion.div>
@@ -401,7 +401,7 @@ export const neoSuccessToast = (message: string, options: NeoToastOptions = {}):
                 {options.icon}
               </motion.span>
             )}
-            <span className="font-black uppercase tracking-wide text-neo-black">
+            <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
               {message}
             </span>
           </motion.div>
@@ -450,7 +450,7 @@ export const neoErrorToast = (message: string, options: NeoToastOptions = {}): s
                 {options.icon}
               </motion.span>
             )}
-            <span className="font-black uppercase tracking-wide text-neo-white">
+            <span dir="auto" className="font-black uppercase tracking-wide text-neo-white">
               {message}
             </span>
           </motion.div>
@@ -564,7 +564,7 @@ export const neoInfoToast = (message: string, options: NeoToastOptions = {}): st
                 {options.icon}
               </motion.span>
             )}
-            <span className="font-black uppercase tracking-wide text-neo-black">
+            <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
               {message}
             </span>
           </motion.div>
@@ -612,7 +612,7 @@ export const neoWarningToast = (message: string, options: NeoToastOptions = {}):
                 {options.icon}
               </motion.span>
             )}
-            <span className="font-black uppercase tracking-wide text-neo-black">
+            <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
               {message}
             </span>
           </motion.div>

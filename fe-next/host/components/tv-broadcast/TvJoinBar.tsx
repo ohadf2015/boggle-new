@@ -10,6 +10,7 @@ interface TvJoinBarProps {
   roomName?: string;
   playerCount: number;
   baseUrl?: string;
+  t: (path: string, params?: Record<string, string | number>) => string;
 }
 
 /**
@@ -20,7 +21,8 @@ const TvJoinBar = memo<TvJoinBarProps>(({
   gameCode,
   roomName,
   playerCount,
-  baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://lexiclash.com',
+  baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://www.lexiclash.live',
+  t,
 }) => {
   // Generate join URL
   const joinUrl = useMemo(() => {
@@ -40,17 +42,17 @@ const TvJoinBar = memo<TvJoinBarProps>(({
           {/* Left: Join URL */}
           <div className="flex-1">
             <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1">
-              Join at
+              {t('tvBroadcast.joinAt')}
             </p>
             <p className="text-neo-cream text-2xl md:text-3xl font-black uppercase tracking-wide">
-              lexiclash.com
+              lexiclash.live
             </p>
           </div>
 
           {/* Center: Game Code (HUGE) */}
           <div className="flex-shrink-0 text-center px-6">
             <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1">
-              Game Code
+              {t('tvBroadcast.gameCode')}
             </p>
             <motion.div
               initial={{ scale: 0.8 }}
@@ -69,7 +71,7 @@ const TvJoinBar = memo<TvJoinBarProps>(({
             {/* Player Count */}
             <div className="text-right hidden md:block">
               <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1">
-                Players
+                {t('tvBroadcast.players')}
               </p>
               <div className="flex items-center gap-2 text-neo-cream">
                 <Users className="w-6 h-6" />

@@ -135,12 +135,14 @@ const DialogFooter = ({
 DialogFooter.displayName = "DialogFooter";
 
 // Neo-Brutalist Title: Bold uppercase
+// dir="auto" ensures proper punctuation placement in mixed RTL/LTR contexts
 const DialogTitle = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
+    dir="auto"
     className={cn(
       "text-xl sm:text-2xl font-black uppercase tracking-tight",
       "text-neo-black",
@@ -152,12 +154,14 @@ const DialogTitle = React.forwardRef<
 DialogTitle.displayName = DialogPrimitive.Title.displayName;
 
 // Neo-Brutalist Description
+// dir="auto" ensures proper punctuation placement in mixed RTL/LTR contexts
 const DialogDescription = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Description>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
+    dir="auto"
     className={cn(
       "text-sm font-medium text-neo-black/70",
       className

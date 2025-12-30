@@ -19,6 +19,7 @@ import HostPreGameView from './components/HostPreGameView';
 import HostInGameView from './components/HostInGameView';
 import TvBroadcastView from './components/TvBroadcastView';
 import PlayerWaitingResultsView from '../player/components/PlayerWaitingResultsView';
+import { TvResultsView } from './components/tv-results';
 import {
   QRCodeDialog,
   FinalScoresModal,
@@ -289,7 +290,16 @@ const HostView: React.FC<HostViewProps> = memo(({
         score: state.players.playerScores[name] || 0,
         wordCount: state.players.playerWordCounts[name] || 0,
         avatar: typeof player === 'object' ? player.avatar : undefined,
+        isHost: typeof player === 'object' ? (player as any).isHost : false,
       };
+    })
+    .filter(p => {
+      // Filter out Host if they have 0 words (Broadcast Mode)
+      // We check if the username matches the current host specific username or the isHost flag
+      if ((p.username === username || p.isHost) && p.wordCount === 0) {
+        return false;
+      }
+      return true;
     })
     .sort((a, b) => b.score - a.score);
 
@@ -304,8 +314,31 @@ const HostView: React.FC<HostViewProps> = memo(({
       )}
 
       {/* Dialogs */}
+      {/* TV Results View - Full screen for broadcast mode (host NOT playing) */}
+      {!!tournament.finalScores && !settings.hostPlaying && (
+        <TvResultsView
+          finalScores={(tournament.finalScores?.players ?? []) as unknown as PlayerResult[]}
+          tournamentData={tournament.tournamentData as Parameters<typeof FinalScoresModal>[0]['tournamentData']}
+          username={username}
+          playersReady={playersReadyData}
+          gameDuration={settings.timerValue * 60}
+          onStartNewGame={() => {
+            state.setFinalScores(null);
+            actions.handleStartNewGame();
+          }}
+          onNextRound={() => {
+            state.setFinalScores(null);
+            actions.handleNextRound();
+          }}
+          onShowQR={() => state.setShowQR(true)}
+          onClose={() => state.setFinalScores(null)}
+          t={t}
+        />
+      )}
+
+      {/* Standard Results Modal - for when host IS playing */}
       <FinalScoresModal
-        open={!!tournament.finalScores}
+        open={!!tournament.finalScores && settings.hostPlaying}
         onOpenChange={(open) => {
           if (!open) state.setFinalScores(null);
         }}

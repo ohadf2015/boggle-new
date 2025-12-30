@@ -23,6 +23,7 @@ interface TvLeaderboardProps {
   players: LeaderboardEntry[];
   playerCombos?: Record<string, PlayerComboData>;
   hostUsername?: string;
+  t: (path: string, params?: Record<string, string | number>) => string;
 }
 
 // Virtual item height for performance
@@ -37,6 +38,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
   players,
   playerCombos = {},
   hostUsername,
+  t,
 }) => {
   const parentRef = useRef<HTMLDivElement>(null);
 
@@ -65,7 +67,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
   if (sortedPlayers.length === 0) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-neo-black/50 font-bold text-lg">No players yet</p>
+        <p className="text-neo-black/50 font-bold text-lg">{t('tvBroadcast.noPlayersYet')}</p>
       </div>
     );
   }
@@ -79,7 +81,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
         className="h-full overflow-y-auto p-4 space-y-2"
       >
         <h3 className="text-xl font-black uppercase text-neo-black mb-4 text-center border-b-2 border-neo-black pb-2">
-          Leaderboard
+          {t('tvBroadcast.leaderboard')}
         </h3>
         {sortedPlayers.map((player, index) => (
           <TvPlayerCard
@@ -102,7 +104,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
   return (
     <div className="h-full flex flex-col p-4">
       <h3 className="text-xl font-black uppercase text-neo-black mb-4 text-center border-b-2 border-neo-black pb-2 flex-shrink-0">
-        Leaderboard ({sortedPlayers.length})
+        {t('tvBroadcast.leaderboard')} ({sortedPlayers.length})
       </h3>
       <div
         ref={parentRef}

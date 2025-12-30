@@ -34,6 +34,8 @@ interface ShareButtonProps {
   fullWidth?: boolean;
   /** Size variant */
   size?: 'sm' | 'md' | 'lg';
+  /** Accessible label for screen readers (defaults to tooltip or children text) */
+  'aria-label'?: string;
 }
 
 const ShareButton: React.FC<ShareButtonProps> = ({
@@ -45,6 +47,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({
   tooltip,
   fullWidth = false,
   size = 'md',
+  'aria-label': ariaLabel,
 }) => {
   // Neo-brutalist styling - hard shadows, no glow effects
   const variantStyles: Record<ShareButtonVariant, VariantStyle> = {
@@ -71,13 +74,19 @@ const ShareButton: React.FC<ShareButtonProps> = ({
 
   const selectedVariant = variantStyles[variant] || variantStyles.primary;
 
+  // Derive accessible label from props
+  const accessibleLabel = ariaLabel || tooltip || (typeof children === 'string' ? children : undefined);
+
   const button = (
     <button
       onClick={onClick}
+      aria-label={accessibleLabel}
       className={cn(
         // Base styles - neo-brutalist
         'inline-flex items-center justify-center font-bold rounded-neo',
         'border-2 shadow-hard-sm transition-all duration-150',
+        // Focus styles for accessibility
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
         // Size
         sizeStyles[size],
         // Width
@@ -88,7 +97,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({
         className
       )}
     >
-      {icon && <span className="flex-shrink-0">{icon}</span>}
+      {icon && <span className="flex-shrink-0" aria-hidden="true">{icon}</span>}
       <span>{children}</span>
     </button>
   );

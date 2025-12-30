@@ -7,14 +7,14 @@
 import type { Avatar, WordDetail, LeaderboardEntry, GameUser, FirstFinderEntry } from '@/shared/types/game';
 
 // Base game interface for scoreManager - compatible with both Game and GameState
- 
+
 export interface ScoreGameBase {
   users: Record<string, GameUser>;
   playerScores: Record<string, number>;
   playerWords: Record<string, string[]>;
-   
+
   playerWordDetails?: Record<string, any[]>;
-   
+
   playerAchievements?: Record<string, any[]>;
   playerCombos?: Record<string, number>;
   firstWordFound?: boolean;
@@ -173,6 +173,14 @@ export function getLeaderboard(game: ScoreGameBase | null): LeaderboardPlayer[] 
       isHost: game.users[username]?.isHost || false,
       isBot: game.users[username]?.isBot || false
     }))
+    .filter(player => {
+      // Filter out Host from leaderboard if they haven't found any words
+      // This supports "Broadcast Mode" where the host manages the game but doesn't play
+      if (player.isHost && player.wordCount === 0) {
+        return false;
+      }
+      return true;
+    })
     .sort((a, b) => b.score - a.score);
 }
 

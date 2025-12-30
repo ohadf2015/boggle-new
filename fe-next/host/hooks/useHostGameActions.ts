@@ -240,11 +240,42 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
       if (response?.success) {
         setFinalScores(null);
         setGameType('regular');
-        neoSuccessToast(t('common.newGameReady'), {
-          icon: '🔄',
-          duration: 2000,
-        });
         logger.log('[HOST] Game reset confirmed by server, state:', response.gameState);
+
+        // Immediately start a new game - skip the waiting room
+        // This includes all current players and any waiting room players
+        const difficultyConfig = DIFFICULTIES[difficulty];
+        const embedWords = roomLanguage !== 'ja' ? wordsForBoard : [];
+        const newTable = generateRandomTable(
+          difficultyConfig.rows,
+          difficultyConfig.cols,
+          roomLanguage,
+          embedWords
+        );
+
+        setTableData(newTable);
+        const seconds = timerValue * 60;
+        setRemainingTime(seconds);
+        setShowStartAnimation(true);
+        setPlayerWordCounts({});
+        setPlayerScores({});
+        setHostFoundWords([]);
+        setHostAchievements([]);
+
+        socket?.emit('startGame', {
+          letterGrid: newTable,
+          timerSeconds: seconds,
+          language: roomLanguage,
+          hostPlaying: hostPlaying,
+          minWordLength: minWordLength,
+          difficulty: difficulty,
+          boardTheme: boardTheme,
+        });
+
+        neoSuccessToast(t('common.gameStarted'), {
+          icon: '🎮',
+          duration: 3000,
+        });
       } else {
         neoErrorToast(t('hostView.resetFailed') || 'Failed to reset game', {
           icon: '❌',
@@ -253,7 +284,12 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
         logger.error('[HOST] Game reset failed:', response?.error);
       }
     });
-  }, [socket, t, setFinalScores, setGameType]);
+  }, [
+    socket, t, setFinalScores, setGameType, difficulty, timerValue, roomLanguage,
+    wordsForBoard, hostPlaying, minWordLength, boardTheme,
+    setTableData, setRemainingTime, setShowStartAnimation,
+    setPlayerWordCounts, setPlayerScores, setHostFoundWords, setHostAchievements
+  ]);
 
   const handleNextRound = useCallback(() => {
     setFinalScores(null);

@@ -181,8 +181,15 @@ const InGameScreen = memo<InGameScreenProps>(({
     startFireCrackleLoop,
     stopFireCrackleLoop,
   } = useSoundEffects();
-  const { announceWordResult } = useAnnouncer();
+  const { announceWordResult, announceTimer } = useAnnouncer();
   const isLandscape = useMobileLandscape();
+
+  // Announce timer at key intervals for screen reader users
+  useEffect(() => {
+    if (remainingTime !== null && gameActive) {
+      announceTimer(remainingTime);
+    }
+  }, [remainingTime, gameActive, announceTimer]);
 
   // Help panel state for discoverability
   const [showHelpPanel, setShowHelpPanel] = useState(false);

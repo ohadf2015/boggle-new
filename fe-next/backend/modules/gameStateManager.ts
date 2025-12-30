@@ -46,9 +46,9 @@ function getRedisClient(): RedisClient {
     } catch (e) {
       // Redis not available, persistence disabled
       redisClient = {
-        saveGameState: async () => {},
+        saveGameState: async () => { },
         getGameState: async () => null,
-        deleteGameState: async () => {}
+        deleteGameState: async () => { }
       };
     }
   }
@@ -1034,13 +1034,19 @@ function markPlayerReadyForNextGame(gameCode: string, username: string): { ready
   const game = games[gameCode];
   if (!game) return null;
 
+  // Host should not be in the ready list - they click "Start Game" instead
+  const user = game.users[username];
+  if (user?.isHost) {
+    return null;
+  }
+
   game.playersReadyForNextGame[username] = true;
   game.lastActivity = Date.now();
   persistGameState(gameCode);
 
   const readyCount = Object.keys(game.playersReadyForNextGame).length;
-  // Count non-bot users
-  const totalPlayers = Object.values(game.users).filter(u => !u.isBot).length;
+  // Count non-bot, non-host users who are currently connected (host clicks Start, not Ready)
+  const totalPlayers = Object.values(game.users).filter(u => !u.isBot && !u.disconnected && !u.isHost).length;
 
   return { readyCount, totalPlayers };
 }
@@ -1056,7 +1062,8 @@ function getPlayersReadyCount(gameCode: string): { readyCount: number; totalPlay
 
   const readyUsernames = Object.keys(game.playersReadyForNextGame);
   const readyCount = readyUsernames.length;
-  const totalPlayers = Object.values(game.users).filter(u => !u.isBot).length;
+  // Count non-bot, non-host users who are currently connected (host clicks Start, not Ready)
+  const totalPlayers = Object.values(game.users).filter(u => !u.isBot && !u.disconnected && !u.isHost).length;
 
   return { readyCount, totalPlayers, readyUsernames };
 }

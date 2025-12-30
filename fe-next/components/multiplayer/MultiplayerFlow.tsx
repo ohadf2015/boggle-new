@@ -225,6 +225,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
           profile={profile!}
           defaultLanguage={defaultLanguage}
           isSubmitting={isJoining}
+          profilePictureUrl={profilePictureUrl}
           onSubmit={handleCreateSubmit}
           onBack={handleBackToProfile}
         />

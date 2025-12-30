@@ -1,0 +1,315 @@
+'use client';
+
+import React, { memo, useMemo, useCallback, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import TvResultsWinnersPodium from './TvResultsWinnersPodium';
+import TvResultsStatsGrid from './TvResultsStatsGrid';
+import TvResultsAwards from './TvResultsAwards';
+import TvResultsLeaderboard from './TvResultsLeaderboard';
+import TvResultsControls from './TvResultsControls';
+import TournamentStandings from '../../../components/TournamentStandings';
+import { useTvResultsAnimation, type SoundType } from './useTvResultsAnimation';
+import { cn } from '../../../lib/utils';
+import type { PlayerResult } from '@/types/components';
+import type { TournamentStanding } from '@/shared/types/game';
+
+// Sound paths for results
+const RESULTS_SOUNDS: Record<SoundType, string> = {
+  whoosh: '/sounds/whoosh.mp3',
+  pop: '/sounds/word-accepted.wav',
+  fanfare: '/sounds/achievment.mp3',
+  victory: '/sounds/fire-round-start.wav',
+  ding: '/sounds/achievment.mp3',
+  ready: '/sounds/word-accepted.wav',
+};
+
+interface TournamentData {
+  currentRound: number;
+  totalRounds: number;
+  isComplete: boolean;
+  standings?: TournamentStanding[];
+}
+
+interface PlayersReadyData {
+  readyCount: number;
+  totalPlayers: number;
+}
+
+interface TvResultsViewProps {
+  finalScores: PlayerResult[];
+  tournamentData: TournamentData | null;
+  username: string; // Host username - to filter out
+  playersReady?: PlayersReadyData | null;
+  gameDuration?: number; // in seconds
+  onStartNewGame: () => void;
+  onNextRound: () => void;
+  onShowQR: () => void;
+  onClose?: () => void;
+  t: (path: string, params?: Record<string, string | number>) => string;
+}
+
+/**
+ * TvResultsView - Main TV broadcast results orchestrator
+ * Full-screen Kahoot-style celebration view for host broadcast mode
+ * Auto-advances through phases with sound effects
+ */
+const TvResultsView = memo<TvResultsViewProps>(({
+  finalScores,
+  tournamentData,
+  username,
+  playersReady,
+  gameDuration = 180,
+  onStartNewGame,
+  onNextRound,
+  onShowQR,
+  onClose,
+  t,
+}) => {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Filter out host from results (they're not playing in broadcast mode)
+  const filteredScores = useMemo(() => {
+    if (!finalScores) return [];
+
+    return finalScores
+      .filter(p => {
+        const isHostUser = p.username === username || p.isHost;
+        const wordCount = p.wordsFoundCount ?? p.allWords?.length ?? 0;
+
+        // Filter out host if they have 0 words and there are other players
+        if (isHostUser && wordCount === 0 && finalScores.length > 1) {
+          return false;
+        }
+        return true;
+      })
+      .sort((a, b) => b.score - a.score)
+      .map((player, index) => ({
+        ...player,
+        rank: index + 1,
+      }));
+  }, [finalScores, username]);
+
+  // Play sound effect
+  const playSound = useCallback((sound: SoundType) => {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const path = RESULTS_SOUNDS[sound];
+      if (!path) return;
+
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+
+      audioRef.current = new Audio(path);
+      audioRef.current.volume = 0.7;
+      audioRef.current.play().catch(() => {
+        // Silently fail if autoplay is blocked
+      });
+    } catch (error) {
+      // Silently fail
+    }
+  }, []);
+
+  // Animation orchestration
+  const {
+    currentPhase,
+    isComplete,
+    isAnimating,
+    skipToEnd,
+    getPhaseVisibility,
+  } = useTvResultsAnimation({
+    enabled: true,
+    autoAdvance: true,
+    isTournament: !!tournamentData,
+    playerCount: filteredScores.length,
+    onSound: playSound,
+  });
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  // Prepare data for sub-components
+  const podiumPlayers = useMemo(() => {
+    return filteredScores.slice(0, 3).map(p => ({
+      username: p.username,
+      score: p.score,
+      avatar: p.avatar,
+      wordCount: p.wordsFoundCount ?? p.allWords?.length ?? 0,
+    }));
+  }, [filteredScores]);
+
+  const playerData = useMemo(() => {
+    return filteredScores.map(p => ({
+      username: p.username,
+      score: p.score,
+      avatar: p.avatar,
+      allWords: p.allWords,
+    }));
+  }, [filteredScores]);
+
+  const leaderboardPlayers = useMemo(() => {
+    return filteredScores.map(p => ({
+      username: p.username,
+      score: p.score,
+      avatar: p.avatar,
+      wordCount: p.wordsFoundCount ?? p.allWords?.length ?? 0,
+      rank: p.rank || 0,
+    }));
+  }, [filteredScores]);
+
+  const isTournament = !!tournamentData;
+  const isLastRound = tournamentData?.isComplete ?? true;
+  const showTournamentStandings = currentPhase === 'tournament-standings';
+
+  return (
+    <div className="fixed inset-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 z-50 overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 bg-[url('/halftone-pattern.svg')] opacity-5 pointer-events-none" />
+
+      {/* Main Content */}
+      <div className="relative h-full flex flex-col">
+        {/* Header */}
+        <AnimatePresence>
+          {getPhaseVisibility('header') && (
+            <motion.header
+              initial={{ y: -50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -50, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              className="flex-shrink-0 py-6 px-8 text-center"
+            >
+              <motion.h1
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 400 }}
+                className={cn(
+                  'font-black text-4xl md:text-5xl lg:text-6xl uppercase tracking-wide',
+                  'text-transparent bg-clip-text',
+                  'bg-gradient-to-r from-neo-yellow via-neo-orange to-neo-pink'
+                )}
+              >
+                {showTournamentStandings
+                  ? `${t('tvResults.tournamentStandings') || 'Tournament Standings'}`
+                  : t('tvResults.title') || 'THE RESULTS ARE IN!'}
+              </motion.h1>
+
+              {isTournament && !showTournamentStandings && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-neo-cream/70 font-bold mt-2"
+                >
+                  Round {tournamentData.currentRound} of {tournamentData.totalRounds}
+                </motion.p>
+              )}
+            </motion.header>
+          )}
+        </AnimatePresence>
+
+        {/* Main Content Area */}
+        <div className="flex-1 overflow-hidden px-6 pb-24">
+          {showTournamentStandings ? (
+            // Tournament Standings View
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="h-full flex items-center justify-center"
+            >
+              <div className="w-full max-w-3xl">
+                {tournamentData?.standings && (
+                  <TournamentStandings
+                    standings={tournamentData.standings}
+                    currentRound={tournamentData.currentRound}
+                    totalRounds={tournamentData.totalRounds}
+                    isComplete={tournamentData.isComplete}
+                  />
+                )}
+              </div>
+            </motion.div>
+          ) : (
+            // Regular Results View
+            <div className="h-full grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+              {/* Left Column: Podium & Awards */}
+              <div className="lg:col-span-2 flex flex-col gap-6">
+                {/* Winners Podium */}
+                <div className="flex-shrink-0">
+                  <TvResultsWinnersPodium
+                    players={podiumPlayers}
+                    show3rd={getPhaseVisibility('podium-3rd')}
+                    show2nd={getPhaseVisibility('podium-2nd')}
+                    show1st={getPhaseVisibility('podium-1st')}
+                    showConfetti={getPhaseVisibility('confetti')}
+                    t={t}
+                  />
+                </div>
+
+                {/* Awards */}
+                <div className="flex-1 overflow-hidden">
+                  <TvResultsAwards
+                    players={playerData}
+                    visible={getPhaseVisibility('awards')}
+                    gameDuration={gameDuration}
+                    t={t}
+                  />
+                </div>
+              </div>
+
+              {/* Right Column: Stats & Leaderboard */}
+              <div className="flex flex-col gap-6">
+                {/* Game Stats */}
+                <div className="flex-shrink-0">
+                  <TvResultsStatsGrid
+                    players={playerData}
+                    visible={getPhaseVisibility('stats')}
+                    t={t}
+                  />
+                </div>
+
+                {/* Full Leaderboard (4th place and below) */}
+                {filteredScores.length > 3 && (
+                  <div className="flex-1 overflow-hidden">
+                    <TvResultsLeaderboard
+                      players={leaderboardPlayers}
+                      visible={getPhaseVisibility('leaderboard')}
+                      startRank={4}
+                      maxVisible={10}
+                      t={t}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Controls Bar */}
+        <TvResultsControls
+          visible={getPhaseVisibility('controls') || isComplete}
+          isAnimating={isAnimating}
+          isTournament={isTournament}
+          isLastRound={isLastRound}
+          playersReadyCount={playersReady?.readyCount ?? 0}
+          totalPlayers={playersReady?.totalPlayers ?? 0}
+          onSkip={skipToEnd}
+          onStartNewGame={onStartNewGame}
+          onNextRound={onNextRound}
+          onShowQR={onShowQR}
+          t={t}
+        />
+      </div>
+    </div>
+  );
+});
+
+TvResultsView.displayName = 'TvResultsView';
+
+export default TvResultsView;

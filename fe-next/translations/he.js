@@ -519,6 +519,8 @@ const he = {
       "usernamePlaceholder": "שם",
       "usernameHint": "2-20 תווים",
       "avatarLabel": "אווטאר",
+      "avatarHint": "בחר אווטאר שייצג אותך",
+      "avatarRequired": "יש לבחור אווטאר כדי להמשיך",
       "usingProfileAvatar": "אווטאר פרופיל",
       "usingGameAvatar": "אווטאר משחק",
       "tapToChange": "לחץ לשינוי",
@@ -601,7 +603,7 @@ const he = {
     "autoValidated": "אומתה אוטומטית",
     "clickToShow": "לחץ להצגה",
     "clickToHide": "לחץ להסתרה",
-    "hostPlays": "אני רוצה לשחק",
+    "hostPlays": "אני רוצה לשדר",
     "spectatorMode": "מצב שידור - הצג על מסך/מקרן",
     "advancedSettings": "הגדרות מתקדמות",
     "autoValidatedCount": "מילים אומתו אוטומטית",
@@ -672,6 +674,9 @@ const he = {
     "live": "שידור חי",
     "waitingForGame": "ממתין למשחק...",
     "noPlayersYet": "אין שחקנים עדיין",
+    "earthquake": "!רעידת אדמה",
+    "fireRound": "סיבוב אש",
+    "twoXPoints": "נקודות X2",
     "notifications": {
       "longWord": "!כוח מילים",
       "epicWord": "!מילה ענקית",
@@ -705,6 +710,49 @@ const he = {
       "secondsLeft": "!שניות נותרו",
       "gridShuffle": "!הלוח מתערבב"
     }
+  },
+  "tvResults": {
+    "title": "!התוצאות הגיעו",
+    "champion": "!אלוף",
+    "runnerUp": "מקום שני",
+    "bronze": "מקום שלישי",
+    "wordsFound": "מילים שנמצאו",
+    "longestWord": "המילה הארוכה ביותר",
+    "firstStrike": "פתיחה מהירה",
+    "bestCombo": "קומבו הכי טוב",
+    "photoFinish": "!צמוד עד הסוף",
+    "fireRoundHero": "גיבור סיבוב האש",
+    "lightningFingers": "אצבעות ברק",
+    "sharpShooter": "צלף מדויק",
+    "wordWizard": "קוסם מילים",
+    "comboKing": "מלך הקומבו",
+    "loneWolf": "זאב בודד",
+    "clutchPlayer": "שחקן לחץ",
+    "playersReady": "מוכנים",
+    "startNewGame": "משחק חדש",
+    "nextRound": "סיבוב הבא",
+    "tournamentStandings": "דירוג הטורניר",
+    "skip": "דלג",
+    "qrCode": "קוד QR",
+    "fullRankings": "דירוג מלא",
+    "specialAwards": "פרסים מיוחדים",
+    "words": "מילים",
+    "pts": "נק׳",
+    "andMore": "...ועוד {{count}} שחקן",
+    "andMorePlural": "...ועוד {{count}} שחקנים",
+    "letters": "אותיות",
+    "legendary": "!אגדי",
+    "amazing": "!מדהים",
+    "onFire": "!בוער",
+    "pointsApart": "!נקודות הפרש",
+    "bonusPts": "נק׳ בונוס",
+    "fastestFirstWord": "מילה ראשונה מהירה",
+    "highestAccuracy": "דיוק גבוה",
+    "mostLongWords": "הכי הרבה מילים של 6+ אותיות",
+    "bestComboStreak": "רצף קומבו הכי טוב",
+    "mostUniqueFinds": "הכי הרבה מציאות ייחודיות",
+    "strongFinisher": "סיום חזק",
+    "roundOf": "סיבוב {{current}} מתוך {{total}}"
   },
   "playerView": {
     "waitingForHost": "ממתין למארח שיתחיל...",
@@ -833,6 +881,8 @@ const he = {
     "freeHints": "רמזים חינמיים",
     "loading": "מקבל רמז...",
     "noHints": "אין רמזים נותרים",
+    "noHintsLeft": "אין רמזים נותרים",
+    "requestHint": "בקש רמז, נותרו {remaining}",
     "noWordsLeft": "!אין עוד מילים למצוא",
     "noLongWordsLeft": "!אין עוד מילים של 5+ אותיות למצוא",
     "lookFor": "חפש מילה בת",
@@ -840,6 +890,7 @@ const he = {
     "letters": "אותיות",
     "startsWith": "מתחילה ב",
     "tapToDismiss": "הקש לסגירה",
+    "tapOrEscToDismiss": "הקש או לחץ Escape לסגירה",
     "with": "עם",
     "inMiddle": "באמצע",
     "vowels": "תנועות",
@@ -1235,7 +1286,7 @@ const he = {
       "title": "ברוכים הבאים ל-LexiClash!",
       "subtitle": "החליקו אותיות. צרו מילים. שלטו.",
       "demoInstruction": "נסו! החליקו לכתוב:",
-      "demoWord": "CAT",
+      "demoWord": "שמש",
       "demoHint": "חברו אותיות סמוכות",
       "demoSuccess": "מצוין!",
       "clickNext": "הבא ←"
@@ -1291,6 +1342,12 @@ const he = {
       "tip2Text": "מילים של 6+ אותיות שוות את המאמץ",
       "tip3Title": "שימו לב לסבבי בונוס",
       "tip3Text": "נקודות כפולות כשהאש מגיעה!"
+    },
+    "training": {
+      "title": "מצב אימון",
+      "description": "תרגלו בקצב שלכם בלי לחץ. מושלם למתחילים! 💪",
+      "ready": "מוכנים לשחק!",
+      "hint": "מצבי משחק נוספים ייפתחו ככל שתשחקו יותר! 🎮"
     },
     "mode": {
       "title": "איך תרצו לשחק?",
@@ -1714,6 +1771,7 @@ const he = {
   "auth": {
     "signIn": "התחברות",
     "signOut": "התנתקות",
+    "userMenu": "תפריט משתמש",
     "signInWith": "המשך עם ${provider}",
     "continueAsGuest": "המשך כאורח",
     "saveProgress": "שמור את ההתקדמות שלך",
@@ -2189,6 +2247,19 @@ const he = {
     "openRooms": "חדרים פתוחים",
     "playersLive": "משחקים עכשיו"
   },
+  "modeDiscovery": {
+    "title": "מוכנים לעוד? 🚀",
+    "description": "כל הכבוד על האימונים! עכשיו נסו את המצבים המרגשים האלה:",
+    "daily": {
+      "title": "אתגר יומי",
+      "description": "פאזל חדש כל יום!"
+    },
+    "bots": {
+      "title": "שחק נגד בוטים",
+      "description": "בדוק את הכישורים שלך!"
+    },
+    "maybeLater": "אולי אחר כך"
+  },
   "singlePlayer": {
     "title": "שחקן יחיד",
     "quickPlay": "משחק מהיר",
@@ -2659,6 +2730,8 @@ const he = {
   "reveal": {
     "revealWord": "חשוף",
     "finding": "מחפש...",
+    "revealFree": "חשוף מילה, נותרו {remaining} חשיפות חינם",
+    "revealCost": "חשוף מילה תמורת {cost} מטבעות",
     "noWordsLeft": "לא נשארו מילים של 5+ אותיות לחשוף",
     "notEnoughCoins": "צריך {cost} מטבעות (יש לך {balance})",
     "gameNotActive": "המשחק לא פעיל",

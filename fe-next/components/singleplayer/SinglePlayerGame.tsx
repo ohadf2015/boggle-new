@@ -77,7 +77,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     startFireCrackleLoop,
     stopFireCrackleLoop,
   } = useSoundEffects();
-  const { announceWordResult, announceCombo } = useAnnouncer();
+  const { announceWordResult, announceCombo, announceTimer } = useAnnouncer();
   // Use shared hook for consistent landscape detection across multiplayer and single player
   // Only triggers on mobile devices (height <= 600px) to prevent desktop from using landscape layout
   const isLandscape = useMobileLandscape();
@@ -199,6 +199,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     gameActive,
     isLandscape,
   });
+
+  // Announce timer at key intervals for screen reader users
+  useEffect(() => {
+    if (gameActive) {
+      announceTimer(timer.remainingTime);
+    }
+  }, [timer.remainingTime, gameActive, announceTimer]);
 
   // Remaining refs (not replaced by hooks)
   const botIntervalsRef = useRef<NodeJS.Timeout[]>([]);

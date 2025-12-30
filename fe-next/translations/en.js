@@ -76,6 +76,10 @@ const en = {
     "cancel": "Cancel",
     "or": "or",
     "dismiss": "Dismiss",
+    "settings": "Settings",
+    "validating": "Validating...",
+    "valid": "Valid",
+    "invalid": "Invalid",
     "selectUILanguage": "Interface Language",
     "close": "Close",
     "changeLanguage": "Change Language",
@@ -522,6 +526,8 @@ const en = {
       "usernamePlaceholder": "Name",
       "usernameHint": "2-20 characters",
       "avatarLabel": "Avatar",
+      "avatarHint": "Pick an avatar to represent you",
+      "avatarRequired": "Please select an avatar to continue",
       "usingProfileAvatar": "Profile avatar",
       "usingGameAvatar": "Game avatar",
       "tapToChange": "Tap to change",
@@ -605,7 +611,7 @@ const en = {
     "autoValidated": "Auto-validated",
     "clickToShow": "Click to show",
     "clickToHide": "Click to hide",
-    "hostPlays": "I want to play",
+    "hostPlays": "I want to broadcast",
     "spectatorMode": "Broadcast Mode - display on TV/projector",
     "advancedSettings": "Advanced Settings",
     "autoValidatedCount": "words auto-validated",
@@ -676,6 +682,9 @@ const en = {
     "live": "LIVE",
     "waitingForGame": "Waiting for game...",
     "noPlayersYet": "No players yet",
+    "earthquake": "EARTHQUAKE!",
+    "fireRound": "FIRE ROUND",
+    "twoXPoints": "2X POINTS",
     "notifications": {
       "longWord": "WORD POWER!",
       "epicWord": "MONSTER WORD!",
@@ -709,6 +718,49 @@ const en = {
       "secondsLeft": "seconds left!",
       "gridShuffle": "Grid shuffle incoming!"
     }
+  },
+  "tvResults": {
+    "title": "THE RESULTS ARE IN!",
+    "champion": "CHAMPION!",
+    "runnerUp": "RUNNER UP",
+    "bronze": "BRONZE MEDAL",
+    "wordsFound": "Words Found",
+    "longestWord": "Longest Word",
+    "firstStrike": "First Strike",
+    "bestCombo": "Best Combo",
+    "photoFinish": "PHOTO FINISH!",
+    "fireRoundHero": "Fire Round Hero",
+    "lightningFingers": "LIGHTNING FINGERS",
+    "sharpShooter": "SHARP SHOOTER",
+    "wordWizard": "WORD WIZARD",
+    "comboKing": "COMBO KING",
+    "loneWolf": "LONE WOLF",
+    "clutchPlayer": "CLUTCH PLAYER",
+    "playersReady": "Ready",
+    "startNewGame": "START NEW GAME",
+    "nextRound": "NEXT ROUND",
+    "tournamentStandings": "Tournament Standings",
+    "skip": "Skip",
+    "qrCode": "QR Code",
+    "fullRankings": "Full Rankings",
+    "specialAwards": "Special Awards",
+    "words": "words",
+    "pts": "pts",
+    "andMore": "...and {{count}} more player",
+    "andMorePlural": "...and {{count}} more players",
+    "letters": "letters",
+    "legendary": "LEGENDARY!",
+    "amazing": "AMAZING!",
+    "onFire": "ON FIRE!",
+    "pointsApart": "points apart!",
+    "bonusPts": "bonus pts",
+    "fastestFirstWord": "Fastest first word",
+    "highestAccuracy": "Highest accuracy",
+    "mostLongWords": "Most 6+ letter words",
+    "bestComboStreak": "Best combo streak",
+    "mostUniqueFinds": "Most unique finds",
+    "strongFinisher": "Strong finisher",
+    "roundOf": "Round {{current}} of {{total}}"
   },
   "playerView": {
     "waitingForHost": "Waiting for host to start...",
@@ -838,6 +890,8 @@ const en = {
     "freeHints": "Free Hints",
     "loading": "Getting hint...",
     "noHints": "No hints left",
+    "noHintsLeft": "No hints remaining",
+    "requestHint": "Request hint, {remaining} remaining",
     "noWordsLeft": "No more words to find!",
     "noLongWordsLeft": "No more 5+ letter words to find!",
     "lookFor": "Look for a",
@@ -845,6 +899,7 @@ const en = {
     "letters": "letters",
     "startsWith": "starts with",
     "tapToDismiss": "Tap to dismiss",
+    "tapOrEscToDismiss": "Tap or press Escape to dismiss",
     "with": "with",
     "inMiddle": "in the middle",
     "vowels": "vowels",
@@ -1297,6 +1352,12 @@ const en = {
       "tip3Title": "Fire Round",
       "tip3Text": "2X points when fire hits!"
     },
+    "training": {
+      "title": "Training Mode",
+      "description": "Practice at your own pace with no pressure. Perfect for beginners!",
+      "ready": "You're ready to play!",
+      "hint": "More game modes will unlock as you play!"
+    },
     "mode": {
       "title": "How Will You Play?",
       "subtitle": "Choose your battlefield",
@@ -1719,6 +1780,7 @@ const en = {
   "auth": {
     "signIn": "Sign In",
     "signOut": "Sign Out",
+    "userMenu": "User menu",
     "signInWith": "Continue with ${provider}",
     "continueAsGuest": "Play as Guest",
     "saveProgress": "Save Progress",
@@ -2194,6 +2256,19 @@ const en = {
     "openRooms": "rooms",
     "playersLive": "live"
   },
+  "modeDiscovery": {
+    "title": "Ready for More?",
+    "description": "Great job on your training! Now try these exciting modes:",
+    "daily": {
+      "title": "Daily Challenge",
+      "description": "New puzzle every day!"
+    },
+    "bots": {
+      "title": "Play vs Bots",
+      "description": "Test your skills!"
+    },
+    "maybeLater": "Maybe later"
+  },
   "singlePlayer": {
     "title": "Solo",
     "quickPlay": "Quick Play",
@@ -2664,6 +2739,8 @@ const en = {
   "reveal": {
     "revealWord": "Reveal",
     "finding": "Finding...",
+    "revealFree": "Reveal a word, {remaining} free reveals left",
+    "revealCost": "Reveal a word for {cost} coins",
     "noWordsLeft": "No 5+ letter words left to reveal",
     "notEnoughCoins": "Need {cost} coins (have {balance})",
     "gameNotActive": "Game not active",

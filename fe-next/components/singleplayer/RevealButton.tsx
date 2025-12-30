@@ -5,7 +5,7 @@
  * - Additional reveals cost 15 coins
  */
 
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, Star, Coins } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -64,6 +64,37 @@ const RevealButton = memo<RevealButtonProps>(({
     return null;
   }
 
+  // Escape key handler to dismiss tooltip
+  useEffect(() => {
+    if (!showTooltip) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowTooltip(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [showTooltip]);
+
+  // Build accessible label
+  const getAriaLabel = useCallback(() => {
+    if (isLoading) {
+      return t('reveal.finding') || 'Finding word...';
+    }
+    if (!hasWordsToReveal) {
+      return t('reveal.noWordsLeft') || 'No 5+ letter words left to reveal';
+    }
+    if (!canAffordReveal) {
+      return t('reveal.notEnoughCoins') || `Need ${revealCost} coins to reveal`;
+    }
+    if (isFreeReveal) {
+      return t('reveal.revealFree', { remaining: freeRevealsRemaining }) || `Reveal a word, ${freeRevealsRemaining} free reveals left`;
+    }
+    return t('reveal.revealCost', { cost: revealCost }) || `Reveal a word for ${revealCost} coins`;
+  }, [isLoading, hasWordsToReveal, canAffordReveal, isFreeReveal, freeRevealsRemaining, revealCost, t]);
+
   return (
     <div
       className="relative"
@@ -76,6 +107,10 @@ const RevealButton = memo<RevealButtonProps>(({
         size="sm"
         onClick={handleClick}
         disabled={isDisabled}
+        aria-label={getAriaLabel()}
+        aria-describedby={showTooltip && isDisabled ? 'reveal-tooltip' : undefined}
+        onFocus={() => setShowTooltip(true)}
+        onBlur={() => setShowTooltip(false)}
         className={`
           flex items-center gap-2 px-3 py-2
           ${isLoading ? 'animate-pulse' : ''}
@@ -85,8 +120,8 @@ const RevealButton = memo<RevealButtonProps>(({
           border-3 rounded-neo font-bold text-sm transition-all shadow-hard-sm
         `}
       >
-        <Eye className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-        <div className="flex flex-col items-start">
+        <Eye className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} aria-hidden="true" />
+        <div className="flex flex-col items-start" aria-hidden="true">
           <span className="text-xs opacity-80">
             {isLoading
               ? (t('reveal.finding') || 'Finding...')
@@ -126,7 +161,11 @@ const RevealButton = memo<RevealButtonProps>(({
             exit={{ opacity: 0, y: -5 }}
             className="absolute top-full right-0 mt-2 z-50 max-w-[calc(100vw-1rem)] w-48"
           >
-            <div className="bg-neo-navy text-white px-3 py-2 rounded-neo border-2 border-neo-black text-xs font-medium shadow-hard-sm">
+            <div
+              id="reveal-tooltip"
+              role="tooltip"
+              className="bg-neo-navy text-white px-3 py-2 rounded-neo border-2 border-neo-black text-xs font-medium shadow-hard-sm"
+            >
               {!hasWordsToReveal
                 ? (t('reveal.noWordsLeft') || 'No 5+ letter words left')
                 : !canAffordReveal

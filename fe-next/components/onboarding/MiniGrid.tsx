@@ -236,9 +236,10 @@ const MiniGrid: React.FC<MiniGridProps> = ({
 
   return (
     <div className={cn('relative', className)}>
-      {/* Grid */}
+      {/* Grid - always LTR to ensure consistent touch coordinates */}
       <div
         ref={gridRef}
+        dir="ltr"
         className={cn(
           'grid gap-2 sm:gap-3 mx-auto relative',
           size === 3 ? 'grid-cols-3 max-w-[260px] sm:max-w-[320px]' : 'grid-cols-4 max-w-[320px] sm:max-w-[380px]'
@@ -338,9 +339,10 @@ const MiniGrid: React.FC<MiniGridProps> = ({
         )}
       </div>
 
-      {/* Word preview - shows current progress */}
+      {/* Word preview - shows current progress, always LTR for English letters */}
       <motion.div
         className="mt-4 sm:mt-6 text-center"
+        dir="ltr"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
       >

@@ -10,7 +10,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { validateUsername, sanitizeInput } from '@/utils/validation';
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
-import AvatarSelectorButton from '@/components/join/AvatarSelectorButton';
 import EmojiAvatarPicker, { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
 import { AVATARS, getAvatarById, getAvatarPath, type AvatarConfig } from '@/utils/avatarConfig';
 import LandscapeIndicator from '@/components/LandscapeIndicator';
@@ -60,6 +59,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
     return initialAvatarId;
   });
   const [usernameError, setUsernameError] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
   const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
 
   // Load from localStorage on mount (only for guests)
@@ -104,6 +104,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
   // Handle avatar selection
   const handleAvatarSelect = (avatar: AvatarConfig) => {
     setSelectedAvatarId(avatar.id);
+    setAvatarError(false); // Clear error when avatar is selected
     if (typeof window !== 'undefined') {
       localStorage.setItem('boggle_avatar_id', avatar.id);
     }
@@ -130,7 +131,12 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
   // Handle continue
   const handleContinue = () => {
     if (!isValid) {
-      setUsernameError(true);
+      if (username.trim().length < 2) {
+        setUsernameError(true);
+      }
+      if (!selectedAvatarId && !hasAuthenticatedAvatar) {
+        setAvatarError(true);
+      }
       return;
     }
 
@@ -155,9 +161,6 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
       roomName,
     });
   };
-
-  // Quick avatar selection (first 5 avatars)
-  const quickAvatars = AVATARS.slice(0, 5);
 
   return (
     <>
@@ -284,12 +287,18 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                   <div className="space-y-3">
                     <Label className="text-sm font-bold uppercase text-slate-600 dark:text-slate-400">
                       {t('multiplayerFlow.profileSetup.avatarLabel') || 'Choose your avatar'}
+                      <span className="text-red-500 ms-1">*</span>
                     </Label>
 
-                    {/* Scrollable avatar grid */}
-                    <div className="max-h-32 overflow-y-auto rounded-lg border-2 border-slate-200 dark:border-slate-600 p-2 bg-white/50 dark:bg-slate-700/50">
-                      <div className="grid grid-cols-6 sm:grid-cols-8 gap-2">
-                        {quickAvatars.map((avatar) => {
+                    {/* Scrollable avatar grid - shows all avatars */}
+                    <div className={cn(
+                      "max-h-48 overflow-y-auto rounded-lg border-2 p-3 bg-white/50 dark:bg-slate-700/50 transition-colors",
+                      avatarError
+                        ? "border-red-500 bg-red-50 dark:bg-red-900/20"
+                        : "border-slate-200 dark:border-slate-600"
+                    )}>
+                      <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
+                        {AVATARS.map((avatar) => {
                           const isSelected = selectedAvatarId === avatar.id;
                           const avatarConfig = getAvatarById(avatar.id);
 
@@ -299,9 +308,9 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                             type="button"
                             onClick={() => handleAvatarSelect(avatar)}
                             className={cn(
-                              "w-14 h-14 rounded-full border-3 shadow-hard-sm transition-all overflow-hidden",
+                              "aspect-square rounded-full border-3 shadow-hard-sm transition-all overflow-hidden",
                               isSelected
-                                ? "border-neo-cyan scale-110 shadow-hard"
+                                ? "border-neo-cyan scale-110 shadow-hard ring-2 ring-neo-cyan ring-offset-1"
                                 : "border-neo-black hover:scale-105"
                             )}
                             aria-label={`Select ${avatar.name} avatar`}
@@ -317,17 +326,18 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                           </button>
                         );
                       })}
-
-                      {/* More avatars button */}
-                      <AvatarSelectorButton
-                        selectedAvatarId={selectedAvatarId}
-                        onAvatarSelect={handleAvatarSelect}
-                        t={t}
-                        size="lg"
-                        className="!w-14 !h-14"
-                      />
                     </div>
                     </div>
+                    {/* Hint or error message */}
+                    {avatarError ? (
+                      <p className="text-xs text-red-500 font-medium" role="alert">
+                        {t('multiplayerFlow.profileSetup.avatarRequired') || 'Please select an avatar to continue'}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {t('multiplayerFlow.profileSetup.avatarHint') || 'Pick an avatar to represent you'}
+                      </p>
+                    )}
                   </div>
                 )}
 

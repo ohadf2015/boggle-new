@@ -1,10 +1,91 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Pointer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import MiniGrid from './MiniGrid';
+import MiniGrid, { GridPosition } from './MiniGrid';
+
+interface DemoConfig {
+  letters: string[][];
+  path: GridPosition[];
+  word: string;
+}
+
+// Language-specific demo configurations
+// Each language has a localized word that makes sense in that language
+const demoConfigs: Record<string, DemoConfig> = {
+  // English: CAT
+  en: {
+    letters: [
+      ['C', 'A', 'P'],
+      ['D', 'T', 'O'],
+      ['E', 'R', 'S'],
+    ],
+    path: [
+      { row: 0, col: 0 }, // C
+      { row: 0, col: 1 }, // A
+      { row: 1, col: 1 }, // T
+    ],
+    word: 'CAT',
+  },
+  // Spanish: SOL (sun) - common 3-letter word
+  es: {
+    letters: [
+      ['S', 'O', 'P'],
+      ['D', 'L', 'I'],
+      ['E', 'R', 'N'],
+    ],
+    path: [
+      { row: 0, col: 0 }, // S
+      { row: 0, col: 1 }, // O
+      { row: 1, col: 1 }, // L
+    ],
+    word: 'SOL',
+  },
+  // Swedish: SOL (sun) - same word works in Swedish
+  sv: {
+    letters: [
+      ['S', 'O', 'P'],
+      ['D', 'L', 'I'],
+      ['E', 'R', 'N'],
+    ],
+    path: [
+      { row: 0, col: 0 }, // S
+      { row: 0, col: 1 }, // O
+      { row: 1, col: 1 }, // L
+    ],
+    word: 'SOL',
+  },
+  // Hebrew: שמש (sun) - using Hebrew letters for native experience
+  he: {
+    letters: [
+      ['ש', 'מ', 'ל'],
+      ['ד', 'ש', 'ו'],
+      ['ת', 'ר', 'ס'],
+    ],
+    path: [
+      { row: 0, col: 0 }, // ש
+      { row: 0, col: 1 }, // מ
+      { row: 1, col: 1 }, // ש
+    ],
+    word: 'שמש',
+  },
+  // Japanese: Uses CAT with English letters (game uses romaji/English)
+  ja: {
+    letters: [
+      ['C', 'A', 'P'],
+      ['D', 'T', 'O'],
+      ['E', 'R', 'S'],
+    ],
+    path: [
+      { row: 0, col: 0 }, // C
+      { row: 0, col: 1 }, // A
+      { row: 1, col: 1 }, // T
+    ],
+    word: 'CAT',
+  },
+};
 
 interface WelcomeDemoStepProps {
   onDemoComplete: () => void;
@@ -19,21 +100,12 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
   onDemoComplete,
   demoCompleted,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
-  // Demo grid configuration - Letters arranged to form "CAT"
-  const demoLetters = [
-    ['C', 'A', 'P'],
-    ['D', 'T', 'O'],
-    ['E', 'R', 'S'],
-  ];
-
-  // Correct path to form "CAT"
-  const demoPath = [
-    { row: 0, col: 0 }, // C
-    { row: 0, col: 1 }, // A
-    { row: 1, col: 1 }, // T
-  ];
+  // Get the demo configuration for the current language, fallback to English
+  const demoConfig = useMemo(() => {
+    return demoConfigs[language] || demoConfigs.en;
+  }, [language]);
 
   return (
     <div className="flex flex-col items-center space-y-3 sm:space-y-5">
@@ -84,9 +156,9 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
       >
         <MiniGrid
           size={3}
-          letters={demoLetters}
-          demoWord="CAT"
-          demoPath={demoPath}
+          letters={demoConfig.letters}
+          demoWord={demoConfig.word}
+          demoPath={demoConfig.path}
           onDemoComplete={onDemoComplete}
           showHints={true}
         />

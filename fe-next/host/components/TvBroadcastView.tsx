@@ -64,6 +64,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   gameCode,
   username,
   roomName,
+  t,
 
   // Game state
   tableData,
@@ -102,6 +103,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
     onNotification: (notification) => {
       playSound(notification.tier);
     },
+    t,
   });
 
   // Build leaderboard data
@@ -118,18 +120,27 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         avatar: avatar || undefined,
         isHost: isHost || playerUsername === username,
       };
-    });
+    })
+      .filter(p => {
+        // Filter out Host from TV leaderboard if they haven't found any words
+        // This is crucial for "Broadcast Mode" where host is just managing
+        if (p.isHost && p.wordCount === 0) {
+          return false;
+        }
+        return true;
+      });
   }, [playersReady, playerScores, playerWordCounts, username]);
 
   const isEarthquakeShaking = earthquakeState === 'shaking';
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-100 via-slate-50 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col">
+    <div className="h-screen bg-gradient-to-b from-slate-100 via-slate-50 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col overflow-hidden">
       {/* Join Bar (Kahoot-style) */}
       <TvJoinBar
         gameCode={gameCode}
         roomName={roomName}
         playerCount={playersReady.length}
+        t={t}
       />
 
       {/* Game Header with Timer */}
@@ -139,12 +150,13 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         fireRoundActive={fireRoundActive}
         fireRoundRemaining={fireRoundRemaining}
         earthquakeState={earthquakeState}
+        t={t}
       />
 
       {/* Main Content: Grid + Leaderboard (50/50) */}
-      <div className="flex-1 flex flex-col md:flex-row gap-4 p-4 max-w-7xl mx-auto w-full">
-        {/* Left: Grid */}
-        <div className="flex-1 bg-neo-cream rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden">
+      <div className="flex-1 min-h-0 flex flex-col md:flex-row gap-4 p-4 max-w-7xl mx-auto w-full">
+        {/* Left: Grid - aspect-square ensures square cells */}
+        <div className="flex-1 min-h-0 flex items-center justify-center bg-neo-cream rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden">
           {tableData && tableData.length > 0 ? (
             <TvGrid
               grid={tableData}
@@ -153,17 +165,18 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
             />
           ) : (
             <div className="h-full flex items-center justify-center">
-              <p className="text-neo-black/50 font-bold text-xl">Waiting for game...</p>
+              <p className="text-neo-black/50 font-bold text-xl">{t('tvBroadcast.waitingForGame')}</p>
             </div>
           )}
         </div>
 
         {/* Right: Leaderboard */}
-        <div className="flex-1 bg-neo-cream rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden">
+        <div className="flex-1 min-h-0 bg-neo-cream rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden">
           <TvLeaderboard
             players={leaderboardData}
             playerCombos={playerCombos}
             hostUsername={username}
+            t={t}
           />
         </div>
       </div>

@@ -22,6 +22,7 @@ interface CreateRoomFormProps {
   profile: ProfileData;
   defaultLanguage: Language;
   isSubmitting: boolean;
+  profilePictureUrl?: string | null; // Profile picture URL for authenticated users
   onSubmit: (config: {
     gameCode: string;
     roomName: string;
@@ -40,6 +41,7 @@ const CreateRoomForm: React.FC<CreateRoomFormProps> = ({
   profile,
   defaultLanguage,
   isSubmitting,
+  profilePictureUrl,
   onSubmit,
   onBack,
 }) => {
@@ -135,6 +137,7 @@ const CreateRoomForm: React.FC<CreateRoomFormProps> = ({
                     <div className="flex items-center gap-3 p-3 rounded-neo bg-neo-cyan/10 dark:bg-neo-cyan/5 text-neo-black dark:text-white border-2 border-neo-cyan/30">
                       <Avatar
                         avatarImage={profile.avatarId}
+                        profilePictureUrl={profilePictureUrl || undefined}
                         size="lg"
                         className="border-2 border-neo-black"
                       />

@@ -3,7 +3,7 @@
  * Shows AI hint button for single-player mode with hint display
  */
 
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lightbulb, Star } from 'lucide-react';
 import { Button } from './ui/button';
@@ -43,6 +43,31 @@ const HintButton = memo<HintButtonProps>(({
     return null;
   }
 
+  // Escape key handler to dismiss hint
+  useEffect(() => {
+    if (!hint) return;
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClearHint();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [hint, onClearHint]);
+
+  // Build accessible label
+  const getAriaLabel = () => {
+    if (isLoading) {
+      return t('hints.loading') || 'Loading hint...';
+    }
+    if (hintsRemaining <= 0) {
+      return t('hints.noHintsLeft') || 'No hints remaining';
+    }
+    return t('hints.requestHint', { remaining: hintsRemaining }) || `Request hint, ${hintsRemaining} remaining`;
+  };
+
   return (
     <div className="relative">
       {/* Hint Button */}
@@ -51,6 +76,9 @@ const HintButton = memo<HintButtonProps>(({
         size="sm"
         onClick={onRequestHint}
         disabled={!isAvailable || isLoading || hintsRemaining <= 0}
+        aria-label={getAriaLabel()}
+        aria-expanded={!!hint}
+        aria-describedby={hint ? 'hint-content' : undefined}
         className={`
           flex items-center gap-1.5 px-2 py-1.5 max-w-[120px]
           ${isLoading ? 'animate-pulse' : ''}
@@ -60,15 +88,15 @@ const HintButton = memo<HintButtonProps>(({
           border-3 rounded-neo font-bold text-sm transition-all shadow-hard-sm
         `}
       >
-        <Lightbulb className={`w-4 h-4 flex-shrink-0 ${isLoading ? 'animate-spin' : ''}`} />
+        <Lightbulb className={`w-4 h-4 flex-shrink-0 ${isLoading ? 'animate-spin' : ''}`} aria-hidden="true" />
         <div className="flex flex-col items-start min-w-0">
-          <span className="text-[10px] opacity-80 whitespace-nowrap overflow-hidden text-ellipsis max-w-[70px]">
+          <span className="text-[10px] opacity-80 whitespace-nowrap overflow-hidden text-ellipsis max-w-[70px]" aria-hidden="true">
             {isLoading
               ? (t('hints.loading') || '...')
               : (t('hints.hint') || 'Hint')
             }
           </span>
-          <div className="flex items-center gap-0.5">
+          <div className="flex items-center gap-0.5" aria-hidden="true">
             {/* Visual star tokens */}
             {[...Array(3)].map((_, i) => (
               <Star
@@ -94,6 +122,8 @@ const HintButton = memo<HintButtonProps>(({
             className="absolute top-full right-0 mt-2 z-50 max-w-[calc(100vw-1rem)] w-64 md:w-80 pointer-events-none"
           >
             <div
+              id="hint-content"
+              role="tooltip"
               className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg p-4 shadow-hard-lg pointer-events-auto"
               onClick={onClearHint}
             >
@@ -129,7 +159,7 @@ const HintButton = memo<HintButtonProps>(({
 
               {/* Tap to dismiss */}
               <div className="mt-2 text-xs text-neo-black/70 text-center">
-                {t('hints.tapToDismiss') || 'Tap to dismiss'}
+                {t('hints.tapOrEscToDismiss') || 'Tap or press Escape to dismiss'}
               </div>
             </div>
           </motion.div>

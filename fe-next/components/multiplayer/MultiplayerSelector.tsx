@@ -104,11 +104,11 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
                       <p className="font-bold text-sm lg:text-base xl:text-lg text-neo-white truncate">
                         {room.roomName || room.gameCode}
                       </p>
-                      <p className="text-xs lg:text-sm text-neo-cream/60">
+                      <p className="text-xs lg:text-sm text-slate-300">
                         {room.playerCount || 0} {t('joinView.players') || 'players'}
                       </p>
                     </div>
-                    <span className="text-xs lg:text-sm font-bold text-neo-cyan opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="px-3 py-1 lg:px-4 lg:py-1.5 text-xs lg:text-sm font-bold text-neo-black bg-neo-cyan rounded-neo border-2 border-neo-black shadow-hard-sm group-hover:shadow-hard group-hover:translate-x-[-1px] group-hover:translate-y-[-1px] transition-all">
                       {t('common.join') || 'Join'}
                     </span>
                   </button>
