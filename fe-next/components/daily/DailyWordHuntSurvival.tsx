@@ -608,7 +608,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       )}
     >
       {/* Top bar */}
-      <div className="flex items-center justify-between mb-1 px-2">
+      <div className="flex items-center justify-between mb-1 px-2 max-w-3xl mx-auto w-full">
         <Button
           variant="ghost"
           size="sm"
@@ -624,7 +624,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       </div>
 
       {/* Life bar + Clue tokens */}
-      <div className="flex items-center gap-2 mb-1">
+      <div className="flex items-center gap-2 mb-1 max-w-3xl mx-auto w-full">
         {/* Life bar */}
         <motion.div
           className={cn(
@@ -748,7 +748,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-1 mx-1"
+          className="mb-1 mx-auto max-w-3xl w-full px-1"
         >
           {/* Black boxes for target word OR Letter Feedback Overlay */}
           <div className="flex justify-center flex-wrap gap-1 sm:gap-1.5 px-2">
@@ -933,7 +933,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="mb-1 px-2 flex items-center gap-2"
+              className="mb-1 px-2 flex items-center gap-2 max-w-3xl mx-auto w-full"
             >
               <span className="text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">
                 {t('wordHunt.survival.nextHint') || 'Next'} Lvl {nextHint.level}:
@@ -957,7 +957,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="text-center text-[10px] sm:text-xs text-green-600 dark:text-green-400 mb-1 font-bold"
+              className="text-center text-[10px] sm:text-xs text-green-600 dark:text-green-400 mb-1 font-bold max-w-3xl mx-auto w-full"
             >
               ✅ {t('wordHunt.survival.allHintsUnlocked') || 'All hints unlocked!'}
             </motion.div>
@@ -968,12 +968,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
       {/* Category and example (if unlocked) */}
       {showCategory && (
-        <div className="text-[11px] bg-purple-50 dark:bg-purple-900/20 border border-purple-300 rounded px-2 py-1 mb-1">
+        <div className="text-[11px] bg-purple-50 dark:bg-purple-900/20 border border-purple-300 rounded px-2 py-1 mb-1 max-w-3xl mx-auto w-full">
           <span className="font-bold">{t('wordHunt.survival.category')?.replace('{category}', category) || `Category: ${category}`}</span>
         </div>
       )}
       {showExample && (
-        <div className="text-[11px] bg-green-50 dark:bg-green-900/20 border border-green-300 rounded px-2 py-1 mb-1">
+        <div className="text-[11px] bg-green-50 dark:bg-green-900/20 border border-green-300 rounded px-2 py-1 mb-1 max-w-3xl mx-auto w-full">
           <span className="font-bold">{t('wordHunt.survival.exampleSentence') || 'Example:'}</span> {exampleSentence.replace(new RegExp(targetWord, 'gi'), '____')}
         </div>
       )}
@@ -982,7 +982,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       {/* Prominent Attempts Counter */}
       <motion.div
         className={cn(
-          "flex items-center justify-between gap-2 sm:gap-3 px-2 sm:px-3 py-1 sm:py-1.5 rounded-neo border-2 mb-1 mx-2",
+          "flex items-center justify-between gap-2 sm:gap-3 px-2 sm:px-3 py-1 sm:py-1.5 rounded-neo border-2 mb-1 mx-auto max-w-3xl w-full",
           MAX_ATTEMPTS - attempts.length <= 2
             ? "bg-red-100 dark:bg-red-900/30 border-red-500"
             : MAX_ATTEMPTS - attempts.length <= 4
@@ -1037,7 +1037,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       </motion.div>
 
       {/* Feedback - fixed height container to prevent layout shift */}
-      <div className="h-5 flex items-center justify-center">
+      <div className="h-5 flex items-center justify-center max-w-3xl mx-auto w-full">
         <AnimatePresence mode="wait">
           {currentFeedback && (
             <motion.div

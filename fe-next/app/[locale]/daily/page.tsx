@@ -7,7 +7,17 @@ type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 interface PageParams {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ share?: string; wh?: string }>;
+  searchParams: Promise<{
+    share?: string;
+    wh?: string;
+    // Simple query params for WhatsApp compatibility
+    whSolved?: string;
+    whAttempts?: string;
+    whPuzzle?: string;
+    whName?: string;
+    whEmoji?: string;
+    whStreak?: string;
+  }>;
 }
 
 // Dynamic import for code splitting (client component)
@@ -52,32 +62,51 @@ function getWhPerformanceMessage(solved: boolean, attempts: number, locale: stri
 
 export async function generateMetadata({ params, searchParams }: PageParams): Promise<Metadata> {
   const { locale } = await params;
-  const { share, wh } = await searchParams;
+  const { share, wh, whSolved, whAttempts, whPuzzle, whName, whEmoji, whStreak } = await searchParams;
   const validLocale = (locale as Locale) || 'en';
   const seo = translations[validLocale]?.seo?.daily || translations.en.seo.daily;
 
   const localePath = `/${locale}`;
   const baseUrl = 'https://www.lexiclash.live';
 
-  // Check if this is a Word Hunt share
-  if (wh) {
+  // Check if this is a Word Hunt share - support both old wh param and new simple params
+  // New simple params take priority (better WhatsApp compatibility)
+  if (whSolved || whPuzzle || wh) {
     try {
-      // Try to decode in case the value wasn't URL-decoded by the server/crawler
-      // If already decoded or invalid encoding, use original value
-      let decodedWh = wh;
-      try {
-        decodedWh = decodeURIComponent(wh);
-      } catch {
-        // Already decoded or invalid encoding, use as-is
+      let solved: boolean;
+      let attempts: number;
+      let streak: number;
+      let puzzleNumber: string | null;
+      let displayName: string;
+      let avatarEmoji: string;
+      let emojiGrid: string;
+
+      // Check for new simple params first (WhatsApp-friendly)
+      if (whSolved || whPuzzle) {
+        solved = whSolved === 'true';
+        attempts = parseInt(whAttempts || '0');
+        streak = parseInt(whStreak || '0');
+        puzzleNumber = whPuzzle || null;
+        displayName = whName || 'Player';
+        avatarEmoji = whEmoji || '🎯';
+        emojiGrid = '';
+      } else {
+        // Fall back to old wh param format
+        let decodedWh = wh!;
+        try {
+          decodedWh = decodeURIComponent(wh!);
+        } catch {
+          // Already decoded or invalid encoding, use as-is
+        }
+        const whParams = new URLSearchParams(decodedWh);
+        solved = whParams.get('solved') === 'true';
+        attempts = parseInt(whParams.get('attempts') || '0');
+        streak = parseInt(whParams.get('streak') || '0');
+        puzzleNumber = whParams.get('puzzleNumber');
+        displayName = whParams.get('displayName') || 'Player';
+        avatarEmoji = whParams.get('avatarEmoji') || '🎯';
+        emojiGrid = whParams.get('emojiGrid') || '';
       }
-      const whParams = new URLSearchParams(decodedWh);
-      const solved = whParams.get('solved') === 'true';
-      const attempts = parseInt(whParams.get('attempts') || '0');
-      const streak = parseInt(whParams.get('streak') || '0');
-      const puzzleNumber = whParams.get('puzzleNumber');
-      const displayName = whParams.get('displayName') || 'Player';
-      const avatarEmoji = whParams.get('avatarEmoji') || '🎯';
-      const emojiGrid = whParams.get('emojiGrid') || '';
 
       if (puzzleNumber) {
         // Build OG image URL with all params
@@ -100,8 +129,17 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
         const title = `${displayName}: ${performanceMsg} Word Hunt #${puzzleNumber}`;
         const description = `${attemptText}${streakText} - Can you beat this?`;
 
-        // Include wh parameter in og:url so Facebook/WhatsApp don't re-fetch without it
-        const shareUrl = `${baseUrl}${localePath}/daily?wh=${encodeURIComponent(wh)}`;
+        // Include params in og:url so Facebook/WhatsApp don't re-fetch without them
+        // Use simple params format for better WhatsApp compatibility
+        const shareParams = new URLSearchParams({
+          whSolved: String(solved),
+          whAttempts: String(attempts),
+          whPuzzle: puzzleNumber,
+          whName: displayName,
+          whEmoji: avatarEmoji,
+          ...(streak > 0 && { whStreak: String(streak) }),
+        });
+        const shareUrl = `${baseUrl}${localePath}/daily?${shareParams.toString()}`;
 
         return {
           title,

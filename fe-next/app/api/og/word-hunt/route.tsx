@@ -26,7 +26,7 @@ const SOLVED_IN: Record<string, string> = {
 
 const FAILED: Record<string, string> = {
   en: 'This one got me!',
-  he: '!יתוא הספת הז', // "זה תפס אותי!" reversed
+  he: '!יתוא ספת הז', // "זה תפס אותי!" reversed
   sv: 'Den tog mig!',
   ja: 'やられた！',
   es: '¡Me atrapó!',

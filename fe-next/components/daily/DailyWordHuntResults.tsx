@@ -514,20 +514,17 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     : guestPlayer?.avatarEmoji || '🎯';
 
   // Build share URL with OG parameters for rich previews on WhatsApp/social
-  // The wh value must be URL-encoded so & becomes %26 (otherwise they're parsed as separate params)
+  // Using simple query params for better WhatsApp compatibility
   const shareUrl = useMemo(() => {
     const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.lexiclash.live';
-    const whParams = new URLSearchParams({
-      solved: String(result.solved),
-      attempts: String(result.attemptsUsed),
-      puzzleNumber: String(puzzleNumber),
-      displayName,
-      avatarEmoji,
+    const params = new URLSearchParams({
+      whSolved: String(result.solved),
+      whAttempts: String(result.attemptsUsed),
+      whPuzzle: String(puzzleNumber),
+      whName: displayName,
+      whEmoji: avatarEmoji,
     });
-    // encodeURIComponent ensures the entire whParams string is the wh value
-    // Without this: ?wh=solved=true&attempts=2 (attempts is a separate param!)
-    // With this:    ?wh=solved%3Dtrue%26attempts%3D2 (all inside wh)
-    return `${origin}/${language}/daily?wh=${encodeURIComponent(whParams.toString())}`;
+    return `${origin}/${language}/daily?${params.toString()}`;
   }, [result.solved, result.attemptsUsed, puzzleNumber, displayName, avatarEmoji, language]);
 
   // Generate shareable text (use streak from result, which is now properly tracked)
