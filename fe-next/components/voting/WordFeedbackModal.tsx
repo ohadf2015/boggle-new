@@ -341,7 +341,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                 {applyHebrewFinalLetters(currentWord.word)}
               </p>
 
-              {/* Vote Progress Bar - Shows how close word is to being approved */}
+              {/* Vote Progress Bar - Simplified */}
               {wordVoteInfo && (
                 <div className="mt-4 space-y-1">
                   <div className="h-2 bg-neo-black/20 text-white rounded-full overflow-hidden">
@@ -352,28 +352,11 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                       transition={{ duration: 0.5 }}
                     />
                   </div>
-                  <p className="text-xs font-semibold text-neo-black/70">
-                    {isValidForScoring ? (
-                      <>
-                        <CheckCircle className="inline w-4 h-4 mr-1 text-neo-cyan" />
-                        {t('wordFeedback.validForScoring') || 'Counts as valid! Help add it to dictionary.'}
-                        {votesNeeded > 0 && (
-                          <span className="text-neo-black/70 ml-1">
-                            ({votesNeeded} {t('wordFeedback.moreForDictionary') || 'more for dictionary'})
-                          </span>
-                        )}
-                      </>
-                    ) : votesNeeded > 0 ? (
-                      <>
-                        <CheckCircle className="inline w-4 h-4 mr-1 text-neo-lime" />
-                        {t('wordFeedback.votesNeeded', { count: String(votesNeeded) }) || `${votesNeeded} more votes to approve`}
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle className="inline w-4 h-4 mr-1 text-neo-lime" />
-                        {t('wordFeedback.almostApproved') || 'Almost approved!'}
-                      </>
-                    )}
+                  <p className="text-xs font-semibold text-neo-black/70 flex items-center justify-center gap-1">
+                    <CheckCircle className={`w-3 h-3 ${isValidForScoring ? 'text-neo-cyan' : 'text-neo-lime'}`} />
+                    {votesNeeded > 0
+                      ? `${votesNeeded} ${t('wordFeedback.votesNeededShort') || 'more votes'}`
+                      : (t('wordFeedback.almostApproved') || 'Almost there!')}
                   </p>
                 </div>
               )}

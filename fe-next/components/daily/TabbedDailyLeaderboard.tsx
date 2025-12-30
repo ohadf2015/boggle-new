@@ -1,0 +1,691 @@
+'use client';
+
+import React, { useState, useEffect, useCallback, memo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Users, Trophy, Clock, ChevronDown, ChevronUp, Sparkles, Crown, Calendar } from 'lucide-react';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { getRankDisplay } from '@/utils/rankingStyles';
+import { getPuzzleNumber } from '@/utils/dailyChallenge';
+import type { Language } from '@/types';
+
+// ==========================================
+// Types
+// ==========================================
+
+export interface DailyParticipant {
+  player_id: string | null;
+  guest_fingerprint: string | null;
+  display_name: string;
+  avatar_emoji: string;
+  avatar_color: string;
+  profile_picture_url?: string | null;
+  country_code?: string | null;
+  score: number;
+  word_count: number;
+  time_seconds: number;
+  completed_at: string;
+  rank_position: number;
+  // Word Hunt specific fields
+  solved?: boolean;
+  attempts_used?: number;
+  efficiency_score?: number;
+}
+
+export interface AllTimeParticipant {
+  player_id: string | null;
+  guest_fingerprint: string | null;
+  player_identifier: string;
+  display_name: string;
+  avatar_emoji: string;
+  avatar_color: string;
+  profile_picture_url?: string | null;
+  country_code?: string | null;
+  total_efficiency_score: number;
+  puzzles_played: number;
+  puzzles_solved: number;
+  avg_attempts: number | null;
+  best_efficiency_score: number;
+  last_played_at: string;
+  rank_position: number;
+}
+
+type LeaderboardTab = 'today' | 'alltime';
+
+// Simple relative time formatter with translation support
+function formatDistanceToNow(dateString: string, t: (key: string) => string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffSecs = Math.floor(diffMs / 1000);
+  const diffMins = Math.floor(diffSecs / 60);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffSecs < 60) return t('wordHunt.leaderboard.justNow');
+  if (diffMins < 60) return t('wordHunt.leaderboard.minutesAgo').replace('{count}', String(diffMins));
+  if (diffHours < 24) return t('wordHunt.leaderboard.hoursAgo').replace('{count}', String(diffHours));
+  if (diffDays < 7) return t('wordHunt.leaderboard.daysAgo').replace('{count}', String(diffDays));
+  return date.toLocaleDateString();
+}
+
+// Country code to flag emoji converter
+function getCountryFlag(countryCode: string | null | undefined): string {
+  if (!countryCode || countryCode.length !== 2) return '';
+  const codePoints = countryCode
+    .toUpperCase()
+    .split('')
+    .map(char => 127397 + char.charCodeAt(0));
+  return String.fromCodePoint(...codePoints);
+}
+
+interface TabbedDailyLeaderboardProps {
+  puzzleDate: string;
+  language: Language;
+  currentPlayerId?: string | null;
+  currentGuestFingerprint?: string | null;
+  onParticipantCountChange?: (count: number) => void;
+  onCurrentUserRankChange?: (rank: number | null) => void;
+  compact?: boolean;
+  maxVisible?: number;
+  t: (key: string) => string;
+  defaultTab?: LeaderboardTab;
+}
+
+// ==========================================
+// Today's Participant Row
+// ==========================================
+
+const TodayParticipantRow = memo<{
+  participant: DailyParticipant;
+  index: number;
+  isCurrentUser: boolean;
+  compact: boolean;
+  t: (key: string) => string;
+}>(({ participant, index, isCurrentUser, compact, t }) => {
+  const rank = participant.rank_position;
+  const countryFlag = getCountryFlag(participant.country_code);
+
+  // Format time since completion
+  const timeAgo = formatDistanceToNow(participant.completed_at, t);
+
+  // Enhanced rank colors for better contrast
+  const getRankColors = () => {
+    if (isCurrentUser) {
+      return 'bg-gradient-to-r from-neo-cyan/40 to-neo-cyan/20 border-neo-cyan shadow-[0_0_12px_rgba(0,255,255,0.3)] ring-2 ring-neo-cyan/60';
+    }
+    if (rank === 1) {
+      return 'bg-gradient-to-r from-amber-100 to-yellow-50 dark:from-amber-900/40 dark:to-yellow-900/20 border-amber-400 dark:border-amber-500';
+    }
+    if (rank === 2) {
+      return 'bg-gradient-to-r from-slate-100 to-gray-50 dark:from-slate-700/60 dark:to-slate-800/40 border-slate-400 dark:border-slate-400';
+    }
+    if (rank === 3) {
+      return 'bg-gradient-to-r from-orange-100 to-amber-50 dark:from-orange-900/40 dark:to-amber-900/20 border-orange-400 dark:border-orange-500';
+    }
+    return 'bg-white/90 dark:bg-slate-800/90 border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500';
+  };
+
+  // Rank badge colors
+  const getRankBadgeColors = () => {
+    if (rank === 1) return 'bg-gradient-to-br from-amber-400 to-yellow-500 text-amber-900 border-amber-600';
+    if (rank === 2) return 'bg-gradient-to-br from-slate-300 to-gray-400 text-slate-800 border-slate-500';
+    if (rank === 3) return 'bg-gradient-to-br from-orange-400 to-amber-500 text-orange-900 border-orange-600';
+    return 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-500';
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.05, duration: 0.3 }}
+      className={`
+        flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 transition-all duration-200
+        ${getRankColors()}
+        ${compact ? 'py-2' : ''}
+        ${isCurrentUser ? 'scale-[1.02]' : 'hover:scale-[1.01]'}
+      `}
+    >
+      {/* Rank Badge */}
+      <div
+        className={`
+          w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center font-black text-sm sm:text-base
+          ${getRankBadgeColors()}
+          border-2 shadow-sm
+        `}
+      >
+        {getRankDisplay(rank)}
+      </div>
+
+      {/* Avatar with Country Flag */}
+      <div className="relative">
+        {participant.profile_picture_url ? (
+          <img
+            src={participant.profile_picture_url}
+            alt={participant.display_name || 'Player'}
+            className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl object-cover border-2 border-neo-black/80 shadow-sm"
+          />
+        ) : (
+          <div
+            className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-lg sm:text-xl border-2 border-neo-black/80 shadow-sm"
+            style={{ backgroundColor: participant.avatar_color || '#FFE135' }}
+          >
+            {participant.avatar_emoji || '🎯'}
+          </div>
+        )}
+        {/* Country Flag Badge */}
+        {countryFlag && (
+          <div className="absolute -bottom-1 -right-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>
+            {countryFlag}
+          </div>
+        )}
+      </div>
+
+      {/* Name & Stats */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className={`font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan dark:text-neo-cyan' : 'text-slate-800 dark:text-white'}`}>
+            {participant.display_name || 'Player'}
+          </span>
+          {isCurrentUser && (
+            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-sm animate-pulse">
+              YOU
+            </span>
+          )}
+          {rank === 1 && (
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0 animate-pulse" />
+          )}
+        </div>
+        <div className="text-xs sm:text-sm flex items-center gap-2 mt-0.5">
+          <span className={`font-bold ${participant.solved ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
+            {participant.solved ? `✓ ${participant.attempts_used}/10` : `✗ X/10`}
+          </span>
+          {/* Show efficiency score */}
+          {participant.efficiency_score !== undefined && participant.efficiency_score > 0 && (
+            <>
+              <span className="text-slate-400 dark:text-slate-500">•</span>
+              <span className="text-purple-600 dark:text-purple-400 font-bold">
+                {participant.efficiency_score} {t('wordHunt.leaderboard.pts')}
+              </span>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Time */}
+      {!compact && (
+        <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-100/50 dark:bg-slate-700/50 px-2 py-1 rounded-lg">
+          <Clock className="w-3.5 h-3.5" />
+          <span>{timeAgo}</span>
+        </div>
+      )}
+    </motion.div>
+  );
+});
+
+TodayParticipantRow.displayName = 'TodayParticipantRow';
+
+// ==========================================
+// All-Time Participant Row
+// ==========================================
+
+const AllTimeParticipantRow = memo<{
+  participant: AllTimeParticipant;
+  index: number;
+  isCurrentUser: boolean;
+  compact: boolean;
+  t: (key: string) => string;
+}>(({ participant, index, isCurrentUser, compact, t }) => {
+  const rank = participant.rank_position;
+  const countryFlag = getCountryFlag(participant.country_code);
+
+  // Enhanced rank colors
+  const getRankColors = () => {
+    if (isCurrentUser) {
+      return 'bg-gradient-to-r from-neo-cyan/40 to-neo-cyan/20 border-neo-cyan shadow-[0_0_12px_rgba(0,255,255,0.3)] ring-2 ring-neo-cyan/60';
+    }
+    if (rank === 1) {
+      return 'bg-gradient-to-r from-amber-100 to-yellow-50 dark:from-amber-900/40 dark:to-yellow-900/20 border-amber-400 dark:border-amber-500';
+    }
+    if (rank === 2) {
+      return 'bg-gradient-to-r from-slate-100 to-gray-50 dark:from-slate-700/60 dark:to-slate-800/40 border-slate-400 dark:border-slate-400';
+    }
+    if (rank === 3) {
+      return 'bg-gradient-to-r from-orange-100 to-amber-50 dark:from-orange-900/40 dark:to-amber-900/20 border-orange-400 dark:border-orange-500';
+    }
+    return 'bg-white/90 dark:bg-slate-800/90 border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500';
+  };
+
+  // Rank badge colors
+  const getRankBadgeColors = () => {
+    if (rank === 1) return 'bg-gradient-to-br from-amber-400 to-yellow-500 text-amber-900 border-amber-600';
+    if (rank === 2) return 'bg-gradient-to-br from-slate-300 to-gray-400 text-slate-800 border-slate-500';
+    if (rank === 3) return 'bg-gradient-to-br from-orange-400 to-amber-500 text-orange-900 border-orange-600';
+    return 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-500';
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.05, duration: 0.3 }}
+      className={`
+        flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 transition-all duration-200
+        ${getRankColors()}
+        ${compact ? 'py-2' : ''}
+        ${isCurrentUser ? 'scale-[1.02]' : 'hover:scale-[1.01]'}
+      `}
+    >
+      {/* Rank Badge */}
+      <div
+        className={`
+          w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center font-black text-sm sm:text-base
+          ${getRankBadgeColors()}
+          border-2 shadow-sm
+        `}
+      >
+        {getRankDisplay(rank)}
+      </div>
+
+      {/* Avatar with Country Flag */}
+      <div className="relative">
+        {participant.profile_picture_url ? (
+          <img
+            src={participant.profile_picture_url}
+            alt={participant.display_name || 'Player'}
+            className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl object-cover border-2 border-neo-black/80 shadow-sm"
+          />
+        ) : (
+          <div
+            className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-lg sm:text-xl border-2 border-neo-black/80 shadow-sm"
+            style={{ backgroundColor: participant.avatar_color || '#FFE135' }}
+          >
+            {participant.avatar_emoji || '🎯'}
+          </div>
+        )}
+        {/* Country Flag Badge */}
+        {countryFlag && (
+          <div className="absolute -bottom-1 -right-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>
+            {countryFlag}
+          </div>
+        )}
+      </div>
+
+      {/* Name & Stats */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className={`font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan dark:text-neo-cyan' : 'text-slate-800 dark:text-white'}`}>
+            {participant.display_name || 'Player'}
+          </span>
+          {isCurrentUser && (
+            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-sm animate-pulse">
+              YOU
+            </span>
+          )}
+          {rank === 1 && (
+            <Crown className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0" />
+          )}
+        </div>
+        <div className="text-xs sm:text-sm flex items-center gap-2 mt-0.5">
+          {/* Total efficiency score - primary stat */}
+          <span className="font-black text-purple-600 dark:text-purple-400">
+            {participant.total_efficiency_score} {t('wordHunt.leaderboard.pts')}
+          </span>
+          <span className="text-slate-400 dark:text-slate-500">•</span>
+          {/* Puzzles solved */}
+          <span className="text-slate-600 dark:text-slate-300 font-medium">
+            {participant.puzzles_solved}/{participant.puzzles_played} {t('wordHunt.leaderboard.solved')}
+          </span>
+        </div>
+      </div>
+
+      {/* Best Score Badge */}
+      {!compact && (
+        <div className="hidden sm:flex flex-col items-end text-xs">
+          <div className="text-slate-500 dark:text-slate-400">{t('wordHunt.leaderboard.best')}</div>
+          <div className="font-bold text-purple-600 dark:text-purple-400">{participant.best_efficiency_score}</div>
+        </div>
+      )}
+    </motion.div>
+  );
+});
+
+AllTimeParticipantRow.displayName = 'AllTimeParticipantRow';
+
+// ==========================================
+// Main Component
+// ==========================================
+
+const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
+  puzzleDate,
+  language,
+  currentPlayerId,
+  currentGuestFingerprint,
+  onParticipantCountChange,
+  onCurrentUserRankChange,
+  compact = false,
+  maxVisible = 10,
+  t,
+  defaultTab = 'today',
+}) => {
+  const [activeTab, setActiveTab] = useState<LeaderboardTab>(defaultTab);
+
+  // Today's leaderboard state
+  const [todayParticipants, setTodayParticipants] = useState<DailyParticipant[]>([]);
+  const [todayTotalCount, setTodayTotalCount] = useState(0);
+  const [todayLoading, setTodayLoading] = useState(true);
+  const [todayError, setTodayError] = useState<string | null>(null);
+
+  // All-time leaderboard state
+  const [allTimeParticipants, setAllTimeParticipants] = useState<AllTimeParticipant[]>([]);
+  const [allTimeTotalCount, setAllTimeTotalCount] = useState(0);
+  const [allTimeLoading, setAllTimeLoading] = useState(true);
+  const [allTimeError, setAllTimeError] = useState<string | null>(null);
+
+  const [expanded, setExpanded] = useState(false);
+
+  // Fetch today's leaderboard
+  const fetchTodayLeaderboard = useCallback(async () => {
+    try {
+      setTodayLoading(true);
+      setTodayError(null);
+
+      const url = `/api/daily-challenge/word-hunt/leaderboard/${puzzleDate}/${language}?limit=50`;
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch leaderboard');
+      }
+
+      const data = await response.json();
+      setTodayParticipants(data.data || []);
+      setTodayTotalCount(data.totalParticipants || 0);
+
+      if (onParticipantCountChange && activeTab === 'today') {
+        onParticipantCountChange(data.totalParticipants || 0);
+      }
+    } catch (err) {
+      console.error('Failed to fetch today leaderboard:', err);
+      setTodayError('Failed to load leaderboard');
+    } finally {
+      setTodayLoading(false);
+    }
+  }, [puzzleDate, language, onParticipantCountChange, activeTab]);
+
+  // Fetch all-time leaderboard
+  const fetchAllTimeLeaderboard = useCallback(async () => {
+    try {
+      setAllTimeLoading(true);
+      setAllTimeError(null);
+
+      const url = `/api/daily-challenge/word-hunt/alltime-leaderboard/${language}?limit=50`;
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch all-time leaderboard');
+      }
+
+      const data = await response.json();
+      setAllTimeParticipants(data.data || []);
+      setAllTimeTotalCount(data.totalParticipants || 0);
+
+      if (onParticipantCountChange && activeTab === 'alltime') {
+        onParticipantCountChange(data.totalParticipants || 0);
+      }
+    } catch (err) {
+      console.error('Failed to fetch all-time leaderboard:', err);
+      setAllTimeError('Failed to load leaderboard');
+    } finally {
+      setAllTimeLoading(false);
+    }
+  }, [language, onParticipantCountChange, activeTab]);
+
+  // Initial fetch and polling
+  useEffect(() => {
+    fetchTodayLeaderboard();
+    fetchAllTimeLeaderboard();
+
+    let interval: NodeJS.Timeout | null = null;
+
+    const startPolling = () => {
+      if (interval) clearInterval(interval);
+      interval = setInterval(() => {
+        fetchTodayLeaderboard();
+        fetchAllTimeLeaderboard();
+      }, 30000);
+    };
+
+    const stopPolling = () => {
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopPolling();
+      } else {
+        fetchTodayLeaderboard();
+        fetchAllTimeLeaderboard();
+        startPolling();
+      }
+    };
+
+    startPolling();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stopPolling();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [fetchTodayLeaderboard, fetchAllTimeLeaderboard]);
+
+  // Check if current user is in today's list
+  const isCurrentUserToday = (participant: DailyParticipant) => {
+    if (currentPlayerId && participant.player_id === currentPlayerId) return true;
+    if (currentGuestFingerprint && participant.guest_fingerprint === currentGuestFingerprint) return true;
+    return false;
+  };
+
+  // Check if current user is in all-time list
+  const isCurrentUserAllTime = (participant: AllTimeParticipant) => {
+    if (currentPlayerId && participant.player_id === currentPlayerId) return true;
+    if (currentGuestFingerprint && participant.guest_fingerprint === currentGuestFingerprint) return true;
+    return false;
+  };
+
+  // Find current user's position in today's list
+  const currentUserTodayIndex = todayParticipants.findIndex(isCurrentUserToday);
+  const currentUserTodayData = currentUserTodayIndex >= 0 ? todayParticipants[currentUserTodayIndex] : null;
+
+  // Report current user's rank to parent
+  useEffect(() => {
+    if (onCurrentUserRankChange && activeTab === 'today') {
+      onCurrentUserRankChange(currentUserTodayData?.rank_position ?? null);
+    }
+  }, [currentUserTodayData?.rank_position, onCurrentUserRankChange, activeTab]);
+
+  // Get current data based on active tab
+  const participants = activeTab === 'today' ? todayParticipants : allTimeParticipants;
+  const totalCount = activeTab === 'today' ? todayTotalCount : allTimeTotalCount;
+  const loading = activeTab === 'today' ? todayLoading : allTimeLoading;
+  const error = activeTab === 'today' ? todayError : allTimeError;
+
+  // Determine which participants to show
+  const visibleParticipants = expanded
+    ? participants
+    : participants.slice(0, maxVisible);
+
+  const hasMore = participants.length > maxVisible;
+
+  // Empty state
+  if (!loading && participants.length === 0) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`
+          bg-gradient-to-br from-white/95 to-slate-50/95 dark:from-slate-800/95 dark:to-slate-900/95
+          rounded-2xl border-2 border-slate-200 dark:border-slate-700
+          ${compact ? 'p-3' : 'p-4 sm:p-5'}
+          shadow-lg backdrop-blur-sm
+        `}
+      >
+        {/* Tabs */}
+        <div className="flex items-center justify-center mb-4">
+          <ToggleGroup
+            type="single"
+            value={activeTab}
+            onValueChange={(value) => value && setActiveTab(value as LeaderboardTab)}
+            className="bg-slate-100 dark:bg-slate-800 p-1 rounded-neo border-2 border-neo-black"
+          >
+            <ToggleGroupItem value="today" size="sm" className="text-xs">
+              <Calendar className="w-3 h-3 mr-1" />
+              {t('wordHunt.leaderboard.today')}
+            </ToggleGroupItem>
+            <ToggleGroupItem value="alltime" size="sm" className="text-xs">
+              <Crown className="w-3 h-3 mr-1" />
+              {t('wordHunt.leaderboard.allTime')}
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+
+        <div className="text-center py-8">
+          <div className="text-4xl mb-3">🏆</div>
+          <p className="text-slate-700 dark:text-slate-300 font-bold text-sm sm:text-base">
+            {activeTab === 'today' ? t('daily.beFirstToPlay') : t('wordHunt.leaderboard.noPlayersYet')}
+          </p>
+        </div>
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={`
+        bg-gradient-to-br from-white/95 to-slate-50/95 dark:from-slate-800/95 dark:to-slate-900/95
+        rounded-2xl border-2 border-slate-200 dark:border-slate-700
+        ${compact ? 'p-3' : 'p-4 sm:p-5'}
+        shadow-lg backdrop-blur-sm
+      `}
+    >
+      {/* Header with Tabs */}
+      <div className="flex flex-col gap-3 mb-4">
+        {/* Title row */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 sm:p-2.5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl border-2 border-indigo-600 shadow-md">
+              <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-amber-300" />
+            </div>
+            <div>
+              <h3 className="font-black text-base sm:text-lg uppercase tracking-wide text-slate-800 dark:text-white">
+                {t('wordHunt.leaderboard.title')}
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
+                {totalCount} {totalCount === 1 ? t('daily.playerSingular') : t('daily.playersPlural')}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex justify-center">
+          <ToggleGroup
+            type="single"
+            value={activeTab}
+            onValueChange={(value) => value && setActiveTab(value as LeaderboardTab)}
+            className="bg-slate-100 dark:bg-slate-800 p-1 rounded-neo border-2 border-neo-black"
+          >
+            <ToggleGroupItem value="today" size="sm" className="text-xs px-3">
+              <Calendar className="w-3.5 h-3.5 mr-1.5" />
+              {t('wordHunt.leaderboard.today')}
+            </ToggleGroupItem>
+            <ToggleGroupItem value="alltime" size="sm" className="text-xs px-3">
+              <Crown className="w-3.5 h-3.5 mr-1.5" />
+              {t('wordHunt.leaderboard.allTime')}
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+      </div>
+
+      {/* Loading state */}
+      {loading && participants.length === 0 && (
+        <div className="flex items-center justify-center py-8">
+          <div className="w-8 h-8 border-3 border-neo-purple border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
+
+      {/* Error state */}
+      {error && (
+        <div className="text-center text-red-500 py-4 text-sm">
+          {error}
+          <button
+            onClick={activeTab === 'today' ? fetchTodayLeaderboard : fetchAllTimeLeaderboard}
+            className="block mx-auto mt-2 text-neo-cyan underline"
+          >
+            {t('common.retry')}
+          </button>
+        </div>
+      )}
+
+      {/* Participants list */}
+      {!error && (
+        <div className="space-y-2">
+          <AnimatePresence mode="popLayout">
+            {activeTab === 'today' ? (
+              // Today's leaderboard
+              (visibleParticipants as DailyParticipant[]).map((participant, index) => (
+                <TodayParticipantRow
+                  key={participant.player_id || participant.guest_fingerprint || index}
+                  participant={participant}
+                  index={index}
+                  isCurrentUser={isCurrentUserToday(participant)}
+                  compact={compact}
+                  t={t}
+                />
+              ))
+            ) : (
+              // All-time leaderboard
+              (visibleParticipants as AllTimeParticipant[]).map((participant, index) => (
+                <AllTimeParticipantRow
+                  key={participant.player_identifier || index}
+                  participant={participant}
+                  index={index}
+                  isCurrentUser={isCurrentUserAllTime(participant)}
+                  compact={compact}
+                  t={t}
+                />
+              ))
+            )}
+          </AnimatePresence>
+
+          {/* Show more/less button */}
+          {hasMore && (
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              onClick={() => setExpanded(!expanded)}
+              className="w-full mt-2 py-2.5 text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center justify-center gap-1.5 transition-colors rounded-xl bg-indigo-50/50 dark:bg-indigo-900/20 hover:bg-indigo-100/70 dark:hover:bg-indigo-900/30 border border-indigo-200/50 dark:border-indigo-700/30"
+            >
+              {expanded ? (
+                <>
+                  <ChevronUp className="w-4 h-4" />
+                  {t('daily.showLess')}
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="w-4 h-4" />
+                  {t('daily.showMore')} ({participants.length - maxVisible} {t('daily.more')})
+                </>
+              )}
+            </motion.button>
+          )}
+        </div>
+      )}
+    </motion.div>
+  );
+};
+
+export default memo(TabbedDailyLeaderboard);

@@ -37,7 +37,7 @@ import {
 import DailyChallengeSignupModal from '@/components/auth/DailyChallengeSignupModal';
 import StreakMilestoneCelebration from './StreakMilestoneCelebration';
 import ConfettiRetrigger from '@/components/results/ConfettiRetrigger';
-import DailyLeaderboard from './DailyLeaderboard';
+import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchGeolocation } from '@/contexts/auth/authUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -124,7 +124,7 @@ const TryAnotherLanguage: React.FC<{ currentLanguage: Language }> = ({ currentLa
           <Button
             key={option.code}
             onClick={() => handleLanguageClick(option.code)}
-            className="px-3 py-2 bg-gradient-to-r from-neo-cyan to-neo-blue text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all flex items-center gap-1.5"
+            className="px-3 py-2 bg-slate-600 text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all flex items-center gap-1.5"
           >
             <span className="text-base">{option.flag}</span>
             <span className="font-bold text-xs">{option.name}</span>
@@ -692,7 +692,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           className="flex items-center justify-center gap-3"
         >
           {result.solved ? (
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-400 to-emerald-500 rounded-neo border-3 border-neo-black shadow-hard">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 rounded-neo border-3 border-neo-black shadow-hard">
               <Trophy className="w-5 h-5 text-white" />
               <span className="font-black text-white uppercase">
                 {t('wordHunt.victory')}
@@ -763,7 +763,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.5, type: 'spring' }}
-                  className="mt-2 px-3 py-2 bg-gradient-to-r from-neo-yellow to-amber-400 rounded-neo border-2 border-neo-black shadow-hard-sm"
+                  className="mt-2 px-3 py-2 bg-amber-400 rounded-neo border-2 border-neo-black shadow-hard-sm"
                 >
                   <div className="flex items-center justify-center gap-1.5 mb-0.5">
                     <Coins className="w-4 h-4 text-neo-black" />
@@ -795,7 +795,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               </div>
 
               {/* Next challenge countdown - prominent for failed players */}
-              <div className="inline-block px-6 py-4 bg-gradient-to-r from-neo-cyan to-neo-blue rounded-neo border-3 border-neo-black shadow-hard">
+              <div className="inline-block px-6 py-4 bg-slate-600 rounded-neo border-3 border-neo-black shadow-hard">
                 <div className="text-sm text-white/80 uppercase font-bold mb-1">
                   {t('wordHunt.results.nextChallengeIn')}
                 </div>
@@ -865,7 +865,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', delay: 0.25 }}
-              className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-orange-400 to-red-500 rounded-neo border-2 border-neo-black shadow-hard-sm"
+              className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-500 rounded-neo border-2 border-neo-black shadow-hard-sm"
             >
               <span className="text-2xl">🔥</span>
               <span className="font-black text-white">
@@ -883,7 +883,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: 'spring', delay: 0.3 }}
-              className="mt-2 inline-flex flex-col items-center gap-0.5 px-3 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-neo border-2 border-neo-black shadow-hard-sm"
+              className="mt-2 inline-flex flex-col items-center gap-0.5 px-3 py-2 bg-indigo-600 rounded-neo border-2 border-neo-black shadow-hard-sm"
             >
               <div className="flex items-center gap-2">
                 <span className="text-xl">{rarestWord.emoji}</span>
@@ -902,7 +902,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             initial={{ scale: 0, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', delay: 0.3 }}
-            className="inline-block px-4 py-2 bg-gradient-to-r from-neo-orange to-neo-yellow rounded-neo border-2 border-neo-black shadow-hard-sm"
+            className="inline-block px-4 py-2 bg-amber-400 rounded-neo border-2 border-neo-black shadow-hard-sm"
           >
             <div className="flex items-center gap-2">
               <Trophy className="w-5 h-5 text-neo-black" />
@@ -963,8 +963,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               className={cn(
                 "w-full py-3 text-base font-black uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all",
                 result.solved
-                  ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white"
-                  : "bg-gradient-to-r from-neo-cyan to-neo-blue text-white"
+                  ? "bg-emerald-500 text-white"
+                  : "bg-slate-600 text-white"
               )}
             >
               <Share2 className="mr-2 w-5 h-5" />
@@ -1241,8 +1241,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                                 className={cn(
                                   "h-full flex items-center justify-end px-1 text-[10px] font-bold text-white transition-all duration-300",
                                   isYourAttempt
-                                    ? "bg-gradient-to-r from-neo-yellow to-neo-orange"
-                                    : "bg-gradient-to-r from-green-500 to-emerald-500"
+                                    ? "bg-amber-500"
+                                    : "bg-emerald-500"
                                 )}
                               >
                                 {count > 0 && <span>{count}</span>}
@@ -1320,7 +1320,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           transition={{ delay: 0.85 }}
           className="mt-4"
         >
-          <DailyLeaderboard
+          <TabbedDailyLeaderboard
             key={leaderboardKey}
             puzzleDate={puzzleDate}
             language={language}
@@ -1328,7 +1328,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
             maxVisible={5}
             t={t}
-            gameType="wordHunt"
+            defaultTab="today"
           />
         </motion.div>
 
@@ -1396,7 +1396,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                       className={cn(
                         "w-full px-4 py-2.5 font-bold border-2 border-neo-black rounded-neo shadow-hard-sm transition-all text-sm",
                         canAfford(COIN_COSTS.DAILY_RETRY)
-                          ? "bg-gradient-to-r from-neo-orange to-neo-yellow text-neo-black hover:-translate-y-0.5"
+                          ? "bg-amber-400 text-neo-black hover:-translate-y-0.5"
                           : "bg-gray-300 text-gray-600 cursor-not-allowed"
                       )}
                     >

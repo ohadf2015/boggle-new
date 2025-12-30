@@ -1,4 +1,4 @@
-Run the translation analysis script and add all missing translations:
+Run the translation analysis script and add all missing translations using the ux-writer skill for high-quality, on-brand copy:
 
 1. First, run the analysis script:
    cd fe-next && node scripts/find-missing-translations.js
@@ -9,24 +9,37 @@ Run the translation analysis script and add all missing translations:
    - Files where these keys are used
    - Detailed JSON report at fe-next/scripts/translation-report.json
 
-3. Add ALL missing translations to fe-next/translations/index.js:
-   - For keys completely missing: add them to ALL languages (en, he, sv, ja, es)
-   - For language-specific gaps: add missing keys to those specific language sections
+3. Use the **ux-writer** skill to write translations:
+   - Invoke the ux-writer skill: `/ux-writer`
+   - Reference the style guide: .claude/skills/ux-writer/references/style-guide.md
+   - Reference the translation glossary: .claude/skills/ux-writer/references/translation-glossary.md
+
+4. Add ALL missing translations to fe-next/translations/ files:
+   - For keys completely missing: add them to ALL languages (en.js, he.js, sv.js, ja.js, es.js)
+   - For language-specific gaps: add missing keys to those specific language files
    - Use the file locations in the report to understand the context of each key
 
-4. Guidelines for translations:
-   - Infer the English text from context (file usage, key name, surrounding code)
-   - Keep translations concise and consistent with existing style in the translation file
-   - Match the nested structure in the translations file (e.g., common.*, errors.*, etc.)
-   - For non-English languages, provide appropriate translations or clearly mark if human translation is needed
-   - Look at how the key is used in the code to determine appropriate tone and length
+5. UX Writing Guidelines (from ux-writer skill):
+   - **Playful & Energetic** - LexiClash is a game, not a corporate app
+   - **Concise** - Short, punchy phrases. Most UI text under 5 words
+   - **Action-oriented** - Use active verbs: "Find", "Beat", "Share", "Unlock"
+   - **Competitive** - Encourage friendly rivalry: "Can you beat this?"
 
-5. After adding translations:
+6. Translation Guidelines by Language:
+   - English (en) - Primary source, establish the tone first
+   - Spanish (es) - Latin American casual tone
+   - Hebrew (he) - RTL aware, informal register, emoji at end of text
+   - Japanese (ja) - Energetic with appropriate particles
+   - Swedish (sv) - Casual Nordic tone
+
+7. Translation Workflow:
+   - Write English copy first with the correct playful tone
+   - Translate to each language preserving energy (don't just literally translate)
+   - Adapt idioms to cultural equivalents
+   - Match UI space constraints (keep length similar)
+
+8. After adding translations:
    - Run the script again to verify all keys are now present
    - Test the affected components to ensure translations display correctly
-
-6. Optional - Add to CI/CD:
-   Consider adding this check to prevent future missing translations:
-   node scripts/find-missing-translations.js && exit 0 || exit 1
 
 The script analyzes both code usage and translation definitions to find gaps.

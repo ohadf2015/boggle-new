@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Globe, ChevronDown, Trophy, Timer, Flame, Target, Check } from 'lucide-react';
+import { ArrowLeft, Globe, ChevronDown, Trophy, Target, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import DailyWordHuntSurvival from './DailyWordHuntSurvival';
 import DailyWordHuntResults from './DailyWordHuntResults';
-import DailyLeaderboard from './DailyLeaderboard';
+import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import GuestNameEditor from './GuestNameEditor';
 import { DailyChallengeTutorial } from './DailyChallengeTutorial';
 import { useAuth } from '@/contexts/AuthContext';
@@ -309,7 +309,6 @@ const DailyChallenge: React.FC = () => {
           <DailyReadyScreen
             puzzleNumber={puzzleNumber}
             puzzleDate={puzzleDate}
-            countdown={countdown}
             language={language as Language}
             currentFlag={getCurrentFlag(language as Language)}
             challengeData={challengeData}
@@ -377,7 +376,6 @@ const LANGUAGE_OPTIONS: { code: Language; flag: string; name: string }[] = [
 interface DailyReadyScreenProps {
   puzzleNumber: number;
   puzzleDate: string;
-  countdown: string;
   language: Language;
   currentFlag: string;
   challengeData: ChallengeData | null;
@@ -395,7 +393,6 @@ interface DailyReadyScreenProps {
 const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
   puzzleNumber,
   puzzleDate,
-  countdown,
   language,
   currentFlag,
   challengeData,
@@ -517,7 +514,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
             initial={{ scale: 0.8, opacity: 0, y: -20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             transition={{ delay: 0.05, type: 'spring' }}
-            className="w-full max-w-sm mx-auto bg-gradient-to-r from-purple-500 to-indigo-600 rounded-neo border-3 border-neo-black shadow-hard p-4"
+            className="w-full max-w-sm mx-auto bg-indigo-600 rounded-neo border-3 border-neo-black shadow-hard p-4"
           >
             <div className="flex items-center justify-center gap-2 mb-2">
               <span className="text-2xl">🎯</span>
@@ -555,7 +552,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.05, type: 'spring' }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-neo-yellow to-neo-orange rounded-neo border-3 border-neo-black shadow-hard"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-amber-400 rounded-neo border-3 border-neo-black shadow-hard"
           >
             <Target className="w-5 h-5 text-neo-black" />
             <span className="font-black text-neo-black uppercase tracking-wide">
@@ -592,10 +589,6 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           <div className="flex items-center gap-2 px-3 py-2 bg-neo-cream dark:bg-slate-700 rounded-neo border-2 border-neo-black dark:border-slate-500 text-neo-black dark:text-white">
             <Target className="w-4 h-4 text-green-600 dark:text-green-400" />
             <span className="font-bold text-neo-black dark:text-white">10 {t('daily.maxAttempts')}</span>
-          </div>
-          <div className="flex items-center gap-2 px-3 py-2 bg-neo-cream dark:bg-slate-700 rounded-neo border-2 border-neo-black dark:border-slate-500 text-neo-black dark:text-white">
-            <Timer className="w-4 h-4 text-neo-orange" />
-            <span className="font-bold text-neo-black dark:text-white">{countdown}</span>
           </div>
         </motion.div>
 
@@ -637,7 +630,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
         >
           <Button
             onClick={onStart}
-            className="w-full py-7 text-2xl font-black uppercase bg-gradient-to-r from-neo-lime to-neo-cyan text-neo-black border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm transition-all"
+            className="w-full py-7 text-2xl font-black uppercase bg-emerald-500 text-white border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm transition-all"
           >
             {t('daily.playButton')}
           </Button>
@@ -675,15 +668,15 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
               transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <DailyLeaderboard
+              <TabbedDailyLeaderboard
                 puzzleDate={puzzleDate}
                 language={language}
                 currentPlayerId={currentPlayerId}
                 currentGuestFingerprint={guestFingerprint}
-                maxVisible={3}
+                maxVisible={5}
                 compact
                 t={t}
-                gameType="wordHunt"
+                defaultTab="today"
               />
             </motion.div>
           )}

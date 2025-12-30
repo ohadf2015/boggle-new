@@ -234,9 +234,14 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       logger.warn('API', `Daily leaderboard count error: ${countError.message}`);
     }
 
+    // Calculate participant count - ensure we show at least as many as we have data rows
+    const dataLength = data?.length || 0;
+    const queryCount = count ?? 0;
+    const totalParticipants = Math.max(queryCount, dataLength);
+
     res.json({
       data: data || [],
-      totalParticipants: count || data?.length || 0,
+      totalParticipants,
       date,
       language
     } as LeaderboardResponse);
@@ -723,14 +728,19 @@ router.get('/word-hunt/leaderboard/:date/:language', async (req: Request<Leaderb
       logger.warn('API', `Word Hunt leaderboard count error: ${countError.message}`);
     }
 
+    // Calculate participant count - ensure we show at least as many as we have data rows
+    const dataLength = data?.length || 0;
+    const queryCount = count ?? 0;
+    const totalParticipants = Math.max(queryCount, dataLength);
+
     // Debug: Log leaderboard fetch results
     const guestCount = (data || []).filter((p: Record<string, unknown>) => p.guest_fingerprint && !p.player_id).length;
     const authCount = (data || []).filter((p: Record<string, unknown>) => p.player_id).length;
-    logger.info('API', `[WordHunt Leaderboard] ${date}/${language}: total=${count}, guests=${guestCount}, authenticated=${authCount}`);
+    logger.info('API', `[WordHunt Leaderboard] ${date}/${language}: total=${totalParticipants}, queryCount=${queryCount}, dataLength=${dataLength}, guests=${guestCount}, authenticated=${authCount}`);
 
     res.json({
       data: data || [],
-      totalParticipants: count || data?.length || 0,
+      totalParticipants,
       date,
       language
     });
@@ -877,6 +887,65 @@ router.get('/word-hunt/stats/:date/:language', async (req: Request<WordHuntStats
   } catch (error) {
     const err = error as Error;
     logger.error('API', `Word Hunt stats error: ${err.message}`);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * GET /api/daily-challenge/word-hunt/alltime-leaderboard/:language
+ * Get all-time Word Hunt leaderboard for a specific language
+ * Ranked by total efficiency score across all puzzles
+ */
+router.get('/word-hunt/alltime-leaderboard/:language', async (req: Request<{ language: string }, unknown, unknown, LeaderboardQuery>, res: Response): Promise<void> => {
+  try {
+    if (!isSupabaseConfigured()) {
+      res.status(503).json({ error: 'Leaderboard service not available' });
+      return;
+    }
+
+    const { language } = req.params;
+    const limit = Math.min(parseInt(req.query.limit || '50') || 50, 100);
+
+    // Validate language
+    if (!VALID_LANGUAGES.includes(language as ValidLanguage)) {
+      res.status(400).json({ error: 'Invalid language code' });
+      return;
+    }
+
+    const supabase = getSupabase();
+
+    // Fetch all-time leaderboard from the view
+    const { data, error } = await supabase
+      .from('word_hunt_alltime_leaderboard')
+      .select('*')
+      .eq('language', language)
+      .order('rank_position', { ascending: true })
+      .limit(limit);
+
+    if (error) {
+      logger.error('API', `Word Hunt all-time leaderboard error: ${error.message}`);
+      res.status(500).json({ error: 'Failed to fetch leaderboard' });
+      return;
+    }
+
+    // Get total participant count for this language
+    const { count, error: countError } = await supabase
+      .from('word_hunt_alltime_leaderboard')
+      .select('*', { count: 'exact', head: true })
+      .eq('language', language);
+
+    if (countError) {
+      logger.warn('API', `Word Hunt all-time leaderboard count error: ${countError.message}`);
+    }
+
+    res.json({
+      data: data || [],
+      totalParticipants: count || data?.length || 0,
+      language
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('API', `Word Hunt all-time leaderboard error: ${err.message}`);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

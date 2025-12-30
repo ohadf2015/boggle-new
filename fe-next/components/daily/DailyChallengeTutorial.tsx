@@ -155,12 +155,13 @@ const Step2WordDiscovery: React.FC<{ onNext: () => void; onPrev: () => void }> =
           </div>
         </div>
 
-        <div className="bg-green-50 dark:bg-green-900/20 border-2 border-green-500 rounded p-3">
+        <div className="bg-green-50 dark:bg-green-900/20 border-2 border-green-500 rounded p-3 mb-3">
           <div className="text-sm font-bold mb-1">✓ Word found!</div>
           <div className="text-xs text-gray-600 dark:text-gray-400">
             {t('tutorial.wordHunt.lifeSystem.swipeToGain') || 'Swipe words to gain'} +15 ❤️ +2 🪙
           </div>
         </div>
+
       </div>
 
       <div className="flex gap-2">
@@ -175,7 +176,7 @@ const Step2WordDiscovery: React.FC<{ onNext: () => void; onPrev: () => void }> =
   );
 };
 
-// Step 3: Letter Feedback (Wordle-style colors)
+// Step 3: Letter Feedback (Wordle-style colors) - Simplified visual-first approach
 const Step3LetterFeedback: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
   onNext,
   onPrev,
@@ -189,65 +190,23 @@ const Step3LetterFeedback: React.FC<{ onNext: () => void; onPrev: () => void }> 
         <h2 className="text-2xl font-black mb-2">{t('tutorial.wordHunt.letterFeedback.title') || 'Letter Feedback'}</h2>
       </div>
 
-      <p className="text-sm mb-4 text-center text-gray-600 dark:text-gray-300">
-        {t('tutorial.wordHunt.letterFeedback.description') || 'When you guess the target word, each letter shows you how close you are:'}
-      </p>
-
-      <div className="bg-gray-100 dark:bg-gray-800 rounded-neo border-2 border-neo-black p-4 mb-4 space-y-3">
-        {/* Green example */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-green-500 rounded-lg border-2 border-green-700 flex items-center justify-center text-white font-black text-lg shadow-hard-sm">
-            A
-          </div>
-          <div>
-            <div className="font-bold text-green-600 dark:text-green-400">🟩 {t('tutorial.wordHunt.letterFeedback.green') || 'Green'}</div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">
-              {t('tutorial.wordHunt.letterFeedback.greenDesc') || 'Correct letter in the correct position'}
-            </div>
-          </div>
-        </div>
-
-        {/* Yellow example */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-yellow-500 rounded-lg border-2 border-yellow-600 flex items-center justify-center text-neo-black font-black text-lg shadow-hard-sm">
-            B
-          </div>
-          <div>
-            <div className="font-bold text-yellow-600 dark:text-yellow-400">🟨 {t('tutorial.wordHunt.letterFeedback.yellow') || 'Yellow'}</div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">
-              {t('tutorial.wordHunt.letterFeedback.yellowDesc') || 'Letter exists but in wrong position'}
-            </div>
-          </div>
-        </div>
-
-        {/* Gray example */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gray-400 rounded-lg border-2 border-gray-500 flex items-center justify-center text-white font-black text-lg shadow-hard-sm">
-            C
-          </div>
-          <div>
-            <div className="font-bold text-gray-600 dark:text-gray-400">⬜ {t('tutorial.wordHunt.letterFeedback.gray') || 'Gray'}</div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">
-              {t('tutorial.wordHunt.letterFeedback.grayDesc') || 'Letter is not in the target word'}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Example visual */}
-      <div className="bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-neo border-2 border-purple-300 dark:border-purple-700 p-3 mb-4">
-        <div className="text-xs text-center text-purple-700 dark:text-purple-300 font-bold mb-2">
+      {/* Example visual - self-explanatory */}
+      <div className="bg-slate-100 dark:bg-slate-800 rounded-neo border-2 border-slate-300 dark:border-slate-600 p-4 mb-4">
+        <div className="text-sm text-center text-slate-700 dark:text-slate-300 font-bold mb-3">
           {t('tutorial.wordHunt.letterFeedback.example') || 'Example: Target is "BEACH"'}
         </div>
-        <div className="flex justify-center gap-1">
-          <div className="w-8 h-8 bg-gray-400 rounded border-2 border-gray-500 flex items-center justify-center text-white font-bold text-sm">S</div>
-          <div className="w-8 h-8 bg-green-500 rounded border-2 border-green-700 flex items-center justify-center text-white font-bold text-sm">E</div>
-          <div className="w-8 h-8 bg-yellow-500 rounded border-2 border-yellow-600 flex items-center justify-center text-neo-black font-bold text-sm">A</div>
-          <div className="w-8 h-8 bg-gray-400 rounded border-2 border-gray-500 flex items-center justify-center text-white font-bold text-sm">R</div>
-          <div className="w-8 h-8 bg-gray-400 rounded border-2 border-gray-500 flex items-center justify-center text-white font-bold text-sm">S</div>
+        <div className="flex justify-center gap-1.5 mb-3">
+          <div className="w-10 h-10 bg-gray-400 rounded-lg border-2 border-gray-500 flex items-center justify-center text-white font-black text-lg shadow-hard-sm">S</div>
+          <div className="w-10 h-10 bg-green-500 rounded-lg border-2 border-green-700 flex items-center justify-center text-white font-black text-lg shadow-hard-sm">E</div>
+          <div className="w-10 h-10 bg-yellow-500 rounded-lg border-2 border-yellow-600 flex items-center justify-center text-neo-black font-black text-lg shadow-hard-sm">A</div>
+          <div className="w-10 h-10 bg-gray-400 rounded-lg border-2 border-gray-500 flex items-center justify-center text-white font-black text-lg shadow-hard-sm">R</div>
+          <div className="w-10 h-10 bg-gray-400 rounded-lg border-2 border-gray-500 flex items-center justify-center text-white font-black text-lg shadow-hard-sm">S</div>
         </div>
-        <div className="text-[10px] text-center text-purple-600 dark:text-purple-400 mt-1">
-          {t('tutorial.wordHunt.letterFeedback.exampleDesc') || '"E" is correct, "A" is in the word but wrong spot'}
+        {/* Compact legend */}
+        <div className="flex justify-center gap-4 text-xs font-bold">
+          <span className="text-green-600 dark:text-green-400">🟩 Right spot</span>
+          <span className="text-yellow-600 dark:text-yellow-400">🟨 Wrong spot</span>
+          <span className="text-gray-500">⬜ Not in word</span>
         </div>
       </div>
 
@@ -326,7 +285,7 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
       </div>
 
       {/* Key insight box */}
-      <div className="bg-gradient-to-r from-neo-yellow/30 to-neo-orange/30 rounded-neo border-2 border-neo-black p-3 mb-4">
+      <div className="bg-amber-50 dark:bg-amber-900/20 rounded-neo border-2 border-amber-300 dark:border-amber-700 p-3 mb-4">
         <div className="text-sm font-bold text-center">
           {t('tutorial.wordHunt.triesRule.keyInsight') || '💡 Find shorter words freely to gain life without using tries!'}
         </div>
@@ -358,30 +317,10 @@ const Step5Summary: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
         <h2 className="text-3xl font-black mb-4">{t('tutorial.wordHunt.complete.title') || 'You\'re ready!'}</h2>
       </div>
 
-      <div className="bg-gray-100 dark:bg-gray-800 rounded-neo border-2 border-neo-black p-4 mb-6">
-        <div className="font-bold mb-3">{t('tutorial.wordHunt.complete.remember') || 'Remember:'}</div>
-        <ul className="space-y-2 text-sm">
-          <li className="flex items-start gap-2">
-            <span className="text-neo-purple font-bold">•</span>
-            <span>{t('tutorial.wordHunt.complete.rule1') || '10 attempts to find target'}</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-neo-purple font-bold">•</span>
-            <span>{t('tutorial.wordHunt.complete.rule2') || 'Find other words for life'}</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-neo-purple font-bold">•</span>
-            <span>{t('tutorial.wordHunt.complete.rule3') || 'Only same-length words use tries'}</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-neo-purple font-bold">•</span>
-            <span>{t('tutorial.wordHunt.complete.ruleColors') || '🟩 = right, 🟨 = wrong place, ⬜ = not in word'}</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-neo-purple font-bold">•</span>
-            <span>{t('tutorial.wordHunt.complete.rule4') || 'Same puzzle worldwide'}</span>
-          </li>
-        </ul>
+      <div className="bg-slate-100 dark:bg-slate-800 rounded-neo border-2 border-slate-300 dark:border-slate-600 p-4 mb-6 text-center">
+        <div className="text-sm text-gray-600 dark:text-gray-300">
+          {t('tutorial.wordHunt.complete.sameChallenge') || 'Same puzzle for everyone worldwide - compare your score!'}
+        </div>
       </div>
 
       <div className="flex flex-col gap-2">

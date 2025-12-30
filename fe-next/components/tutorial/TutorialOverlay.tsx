@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTutorial } from './useTutorial';
 import TutorialTooltip from './TutorialTooltip';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface TargetRect {
   top: number;
@@ -19,8 +20,54 @@ interface TargetRect {
 const TutorialOverlay: React.FC = () => {
   const { isActive, currentStep, nextStep, prevStep, skipTutorial, currentStepIndex, totalSteps } =
     useTutorial();
+  const { dir } = useLanguage();
+  const isRtl = dir === 'rtl';
   const [targetRect, setTargetRect] = useState<TargetRect | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+
+  // Touch/swipe gesture handling
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const SWIPE_THRESHOLD = 50; // Minimum distance for a swipe
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  }, []);
+
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      if (!touchStartRef.current) return;
+
+      const touch = e.changedTouches[0];
+      const deltaX = touch.clientX - touchStartRef.current.x;
+      const deltaY = touch.clientY - touchStartRef.current.y;
+
+      // Only register horizontal swipes (ignore vertical scrolling gestures)
+      if (Math.abs(deltaX) > SWIPE_THRESHOLD && Math.abs(deltaX) > Math.abs(deltaY)) {
+        // For RTL, swipe directions are reversed
+        const isSwipeLeft = deltaX < 0;
+
+        if (isRtl) {
+          // RTL: swipe left = prev, swipe right = next
+          if (isSwipeLeft) {
+            prevStep();
+          } else {
+            nextStep();
+          }
+        } else {
+          // LTR: swipe left = next, swipe right = prev
+          if (isSwipeLeft) {
+            nextStep();
+          } else {
+            prevStep();
+          }
+        }
+      }
+
+      touchStartRef.current = null;
+    },
+    [nextStep, prevStep, isRtl]
+  );
 
   // Extract target for dependency tracking
   const currentTarget = currentStep?.target;
@@ -127,8 +174,10 @@ const TutorialOverlay: React.FC = () => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-[9999] cursor-pointer"
+          className="fixed inset-0 z-[9999] cursor-pointer touch-pan-y"
           onClick={handleOverlayClick}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
           role="dialog"
           aria-modal="true"
           aria-label="Game tutorial"
@@ -183,10 +232,9 @@ const TutorialOverlay: React.FC = () => {
               }}
             >
               <div
-                className="w-full h-full rounded-neo border-3 border-neo-yellow shadow-hard animate-pulse"
+                className="w-full h-full rounded-neo border-3 border-amber-400 shadow-hard"
                 style={{
-                  boxShadow:
-                    '0 0 20px rgba(255, 225, 53, 0.5), 0 0 40px rgba(255, 225, 53, 0.3), 4px 4px 0 #000',
+                  boxShadow: '4px 4px 0 #000',
                 }}
               />
             </motion.div>
@@ -213,10 +261,10 @@ const TutorialOverlay: React.FC = () => {
                 transition={{ delay: index * 0.05 }}
                 className={`w-2 h-2 rounded-full border-2 border-neo-black transition-all ${
                   index === currentStepIndex
-                    ? 'bg-neo-yellow scale-125'
+                    ? 'bg-amber-400 scale-125'
                     : index < currentStepIndex
-                    ? 'bg-neo-lime'
-                    : 'bg-neo-white/50'
+                    ? 'bg-slate-400'
+                    : 'bg-slate-300/50'
                 }`}
               />
             ))}

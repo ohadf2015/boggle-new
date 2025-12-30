@@ -9,7 +9,7 @@ import { Card } from '../../../components/ui/card';
 import { Checkbox } from '../../../components/ui/checkbox';
 import { Switch } from '../../../components/ui/switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../components/ui/tooltip';
-import GameTypeSelector from '../../../components/GameTypeSelector';
+// GameTypeSelector removed - Tournament mode is locked, so no need to show selector
 import BotControls from '../../../components/BotControls';
 import { useAutoFillBots } from '../../../hooks/useAutoFillBots';
 import { DIFFICULTIES, MIN_WORD_LENGTH_OPTIONS, getRecommendedTimer } from '../../../utils/consts';
@@ -149,14 +149,6 @@ export const GameSettingsPanel = memo<GameSettingsPanelProps>(({
         {t('hostView.gameSettings')}
       </h3>
       <div className="w-full space-y-3">
-        {/* Game Type Selector - First for logical flow */}
-        <GameTypeSelector
-          gameType={gameType}
-          setGameType={setGameType}
-          tournamentRounds={tournamentRounds}
-          setTournamentRounds={setTournamentRounds}
-        />
-
         {/* Timer Input - Compact */}
         <div className="space-y-1.5">
           <label className="text-xs font-bold uppercase text-neo-cream/80 flex items-center gap-1.5">

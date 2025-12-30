@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { DIFFICULTIES } from '@/utils/consts';
-import { PRESETS, type PresetConfig, getPresetsForMode, getMinWordLength } from './presetConfig';
+import { PRESETS, type PresetConfig, getPresetsForMode, getMinWordLength, getDefaultPreset } from './presetConfig';
 import { getHighScoreForPreset } from './highScoreManager';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import LandscapeIndicator from '@/components/LandscapeIndicator';
@@ -319,6 +319,31 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
               </h1>
             </div>
 
+            {/* Quick Play Button - Primary CTA */}
+            <button
+              onClick={() => {
+                const quickPreset = getDefaultPreset('solo-bots');
+                if (quickPreset) onSelectPreset(quickPreset);
+              }}
+              className={cn(
+                'p-3 rounded-neo border-4 border-neo-black transition-all',
+                'flex items-center gap-3',
+                'shadow-hard-lg hover:shadow-hard-xl hover:translate-x-[-2px] hover:translate-y-[-2px]',
+                'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
+                'bg-gradient-to-r from-neo-lime via-neo-cyan to-neo-lime'
+              )}
+            >
+              <Play className="w-6 h-6 text-neo-black" fill="currentColor" />
+              <div className="flex-1 text-left">
+                <h4 className="text-sm font-black uppercase text-neo-black">
+                  {t('singlePlayer.quickPlay') || 'Quick Play'}
+                </h4>
+                <p className="text-[10px] font-bold text-neo-black/70">
+                  {t('singlePlayer.quickPlayDesc') || '7×7 • 2 min • vs Bot'}
+                </p>
+              </div>
+            </button>
+
             {/* Mode Selector */}
             <div className="space-y-2">
               <h3 className="text-xs font-bold uppercase text-neo-white/70">
@@ -449,6 +474,35 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
             {t('landing.singlePlayer') || 'Single Player'}
           </h1>
         </div>
+
+        {/* QUICK PLAY - Primary CTA for new players */}
+        <motion.button
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.05 }}
+          onClick={() => {
+            const quickPreset = getDefaultPreset('solo-bots');
+            if (quickPreset) onSelectPreset(quickPreset);
+          }}
+          className={cn(
+            'group relative p-4 sm:p-5 rounded-neo-lg border-4 border-neo-black transition-all w-full',
+            'flex items-center justify-center gap-3',
+            'shadow-hard-lg hover:shadow-hard-xl hover:translate-x-[-4px] hover:translate-y-[-4px]',
+            'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
+            'bg-gradient-to-r from-neo-lime via-neo-cyan to-neo-lime'
+          )}
+          aria-label={t('singlePlayer.quickPlay') || 'Quick Play'}
+        >
+          <Play className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" fill="currentColor" />
+          <div className="text-left">
+            <h2 className="text-xl sm:text-2xl font-black uppercase text-neo-black">
+              {t('singlePlayer.quickPlay') || 'Quick Play'}
+            </h2>
+            <p className="text-xs sm:text-sm font-bold text-neo-black/70">
+              {t('singlePlayer.quickPlayDesc') || '7×7 board • 2 min • vs Bot'}
+            </p>
+          </div>
+        </motion.button>
 
         {/* Daily Challenge Card - FEATURED at TOP */}
         {dailyPreset && (

@@ -21,7 +21,6 @@ import {
 } from '@/utils/wordHuntFeedback';
 import {
   generateProgressiveHints,
-  getNextHint,
   calculateLifeReward,
   calculateTokenReward,
   calculateEfficiencyScore,
@@ -122,15 +121,17 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const [lifeGainAmount, setLifeGainAmount] = useState<number | null>(null);
 
   // Hint system
-  const [availableHints, setAvailableHints] = useState<HintLevel[]>([]);
   const [currentHint, setCurrentHint] = useState<HintLevel | null>(null);
   const [category, setCategory] = useState<string>('');
   const [exampleSentence, setExampleSentence] = useState<string>('');
   const [revealedLetters, setRevealedLetters] = useState<Set<number>>(new Set());
   const [eliminatedLetters, setEliminatedLetters] = useState<Set<string>>(new Set());
+  const [knownLetters, setKnownLetters] = useState<Set<string>>(new Set()); // Yellow letters - in word but position unknown
+  // Accumulated clues from guesses: position → { letter, type: 'green' | 'yellow' }
+  // Green = correct position (permanently revealed), Yellow = wrong position (shows letter but needs repositioning)
+  const [accumulatedClues, setAccumulatedClues] = useState<Map<number, { letter: string; type: 'green' | 'yellow' }>>(new Map());
   const [showCategory, setShowCategory] = useState(false);
   const [showExample, setShowExample] = useState(false);
-  const [hintUnlockAnimation, setHintUnlockAnimation] = useState(false);
 
   // UI state
   const [formedWord, setFormedWord] = useState('');
@@ -159,11 +160,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   useEffect(() => {
     async function loadHints() {
       const hints = await generateProgressiveHints(targetWord, language);
-      setAvailableHints(hints.hints);
       setCategory(hints.category);
       setExampleSentence(hints.exampleSentence);
 
-      // Show first hint immediately
+      // Show first hint immediately (hints no longer progress based on word discovery)
       if (hints.hints.length > 0) {
         setCurrentHint(hints.hints[0]);
       }
@@ -258,21 +258,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     };
   }, []);
 
-  // Update hints when words discovered
-  useEffect(() => {
-    const nextHint = getNextHint(availableHints, discoveredWords.length);
-    if (nextHint && (!currentHint || nextHint.level > currentHint.level)) {
-      // Trigger unlock animation when upgrading hint level (not on initial load)
-      if (currentHint && nextHint.level > currentHint.level) {
-        setHintUnlockAnimation(true);
-        // Play sound effect for hint unlock
-        playWordAcceptedSound?.();
-        // Reset animation after delay
-        setTimeout(() => setHintUnlockAnimation(false), 1500);
-      }
-      setCurrentHint(nextHint);
-    }
-  }, [discoveredWords.length, availableHints, currentHint, playWordAcceptedSound]);
 
   // Show toast feedback
   const showToast = useCallback((type: FeedbackType, message: string) => {
@@ -347,6 +332,42 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     const newAttempts = [...attempts, newAttempt];
     setAttempts(newAttempts);
     playWordAcceptedSound?.();
+
+    // Accumulate clue information from this guess
+    // Green letters = correct position (permanently revealed)
+    // Yellow letters = in word but wrong position (shown but marked yellow)
+    // Green always takes priority over yellow at same position
+    setAccumulatedClues(prev => {
+      const updated = new Map(prev);
+      feedback.forEach((fb) => {
+        if (fb.feedback === 'green') {
+          // Green always wins - overwrite any existing clue at this position
+          updated.set(fb.position, { letter: fb.letter.toUpperCase(), type: 'green' });
+        } else if (fb.feedback === 'yellow') {
+          // Yellow only if no green exists at this position
+          const existing = updated.get(fb.position);
+          if (!existing || existing.type !== 'green') {
+            updated.set(fb.position, { letter: fb.letter.toUpperCase(), type: 'yellow' });
+          }
+        }
+      });
+      return updated;
+    });
+
+    // Also update knownLetters for the "Contains:" display
+    const newKnownLetters: string[] = [];
+    feedback.forEach((fb) => {
+      if (fb.feedback === 'yellow') {
+        newKnownLetters.push(fb.letter.toUpperCase());
+      }
+    });
+    if (newKnownLetters.length > 0) {
+      setKnownLetters(prev => {
+        const updated = new Set(prev);
+        newKnownLetters.forEach(letter => updated.add(letter));
+        return updated;
+      });
+    }
 
     // Show letter feedback overlay on hint boxes
     if (feedbackTimeoutRef.current) {
@@ -824,28 +845,45 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                           : "w-6 h-6 sm:w-8 sm:h-8 text-xs sm:text-sm";
 
                     return hintChars.map((char, idx) => {
+                      // Check accumulated clues from guesses first (green/yellow)
+                      const accumulatedClue = accumulatedClues.get(idx);
                       // Check if revealed by hint OR by shop purchase
                       const isHintRevealed = char !== '_';
                       const isShopRevealed = revealedLetters.has(idx);
-                      const isRevealed = isHintRevealed || isShopRevealed;
-                      const displayChar = isShopRevealed ? targetWord[idx]?.toUpperCase() : (isHintRevealed ? char : '?');
+
+                      // Determine display character and color
+                      let displayChar: string;
+                      let bgClass: string;
+
+                      if (accumulatedClue) {
+                        // Accumulated clue takes priority - show letter with appropriate color
+                        displayChar = accumulatedClue.letter;
+                        bgClass = accumulatedClue.type === 'green'
+                          ? "bg-green-500 border-green-700 text-neo-black"
+                          : "bg-yellow-500 border-yellow-600 text-neo-black";
+                      } else if (isShopRevealed) {
+                        displayChar = targetWord[idx]?.toUpperCase() || '?';
+                        bgClass = "bg-green-500 border-green-700 text-neo-black";
+                      } else if (isHintRevealed) {
+                        displayChar = char;
+                        bgClass = "bg-green-500 border-green-700 text-neo-black";
+                      } else {
+                        displayChar = '?';
+                        bgClass = "bg-neo-black border-neo-black text-white";
+                      }
+
+                      const isRevealed = !!accumulatedClue || isHintRevealed || isShopRevealed;
 
                       return (
                         <motion.div
                           key={idx}
                           initial={{ scale: 0, opacity: 0 }}
-                          animate={{
-                            scale: 1,
-                            opacity: 1,
-                            ...(hintUnlockAnimation && isRevealed ? { scale: [1, 1.2, 1] } : {})
-                          }}
+                          animate={{ scale: 1, opacity: 1 }}
                           transition={{ delay: idx * 0.03, type: "spring", stiffness: 300 }}
                           className={cn(
                             "flex items-center justify-center border-3 rounded-lg font-black shadow-hard",
                             sizeClass,
-                            isRevealed
-                              ? "bg-neo-yellow border-neo-black text-neo-black"
-                              : "bg-neo-black border-neo-black text-white"
+                            bgClass
                           )}
                         >
                           {displayChar}
@@ -886,85 +924,40 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
           {/* Hint level indicator below boxes - hide when showing feedback */}
           {!showFeedbackOverlay && (
-            <div className="flex items-center justify-center gap-1 mt-1">
-              <motion.div
-                animate={hintUnlockAnimation ? { rotate: [0, -15, 15, 0], scale: [1, 1.3, 1] } : {}}
-                transition={{ duration: 0.5 }}
-              >
-                <Lightbulb className={cn(
-                  "w-3 h-3 sm:w-4 sm:h-4",
-                  hintUnlockAnimation ? "text-yellow-500" : "text-gray-500"
-                )} />
-              </motion.div>
-              <span className={cn(
-                "text-[10px] sm:text-xs font-bold",
-                hintUnlockAnimation ? "text-yellow-600 dark:text-yellow-400" : "text-gray-500"
-              )}>
-                {hintUnlockAnimation
-                  ? (t('wordHunt.survival.hintUnlocked') || '🎉 New hint!')
-                  : (t('wordHunt.survival.hintLevel')?.replace('{level}', String(currentHint.level)) || `Hint Lvl ${currentHint.level}`)
-                }
-              </span>
-              {/* Unlock animation sparkles */}
-              {hintUnlockAnimation && (
-                <motion.span
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: [0, 1, 0], scale: [0.5, 1.2, 0.5] }}
-                  transition={{ duration: 1 }}
+            <div className="flex flex-col items-center gap-1 mt-1">
+              <div className="flex items-center gap-1">
+                <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
+                <span className="text-[10px] sm:text-xs font-bold text-gray-500">
+                  {t('wordHunt.survival.hintLevel')?.replace('{level}', String(currentHint.level)) || `Hint Lvl ${currentHint.level}`}
+                </span>
+              </div>
+              {/* Known letters (yellow) display */}
+              {knownLetters.size > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-1 text-[10px] sm:text-xs"
                 >
-                  ✨
-                </motion.span>
+                  <span className="text-yellow-600 dark:text-yellow-400 font-medium">
+                    {t('wordHunt.survival.knownLetters') || 'Contains:'}
+                  </span>
+                  <div className="flex gap-0.5">
+                    {Array.from(knownLetters).map((letter) => (
+                      <span
+                        key={letter}
+                        className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center bg-yellow-500 border border-yellow-600 rounded text-neo-black font-bold text-xs"
+                      >
+                        {letter}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
               )}
             </div>
           )}
         </motion.div>
       )}
 
-      {/* Next hint progress - compact inline design */}
-      {(() => {
-        const nextHint = availableHints.find(h => h.unlockCost > discoveredWords.length);
-        if (nextHint && currentHint) {
-          const wordsNeeded = nextHint.unlockCost - discoveredWords.length;
-          const progress = discoveredWords.length - (currentHint.unlockCost || 0);
-          const total = nextHint.unlockCost - (currentHint.unlockCost || 0);
-          const progressPercent = total > 0 ? Math.min(100, (progress / total) * 100) : 0;
-
-          return (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="mb-1 px-2 flex items-center gap-2 max-w-3xl mx-auto w-full"
-            >
-              <span className="text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">
-                {t('wordHunt.survival.nextHint') || 'Next'} Lvl {nextHint.level}:
-              </span>
-              <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
-                <motion.div
-                  className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progressPercent}%` }}
-                  transition={{ duration: 0.3 }}
-                />
-              </div>
-              <span className="text-[10px] sm:text-xs font-bold text-gray-500 whitespace-nowrap">
-                {wordsNeeded} more
-              </span>
-            </motion.div>
-          );
-        } else if (currentHint?.level === 5) {
-          // All hints unlocked
-          return (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center text-[10px] sm:text-xs text-green-600 dark:text-green-400 mb-1 font-bold max-w-3xl mx-auto w-full"
-            >
-              ✅ {t('wordHunt.survival.allHintsUnlocked') || 'All hints unlocked!'}
-            </motion.div>
-          );
-        }
-        return null;
-      })()}
 
       {/* Category and example (if unlocked) */}
       {showCategory && (

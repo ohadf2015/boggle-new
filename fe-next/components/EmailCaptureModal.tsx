@@ -194,27 +194,14 @@ export function EmailCaptureModal() {
                     <Calendar size={32} className="text-neo-black" />
                   </div>
                 </div>
-                <h3 className="font-black text-neo-cream text-2xl md:text-3xl mb-3">
+                <h3 className="font-black text-neo-cream text-2xl md:text-3xl mb-2">
                   {t('email.title') || 'Get Daily Challenges!'}
                 </h3>
-                <p className="text-neo-cream opacity-90 text-sm md:text-base">
-                  {t('email.description') ||
-                    'Stay sharp with daily word challenges delivered to your inbox. Plus, streak reminders so you never lose your progress!'}
-                </p>
-              </div>
-
-              {/* Benefits List */}
-              <div className="mb-6 space-y-2">
-                {[
-                  t('email.benefit1') || '✨ Daily curated word challenges',
-                  t('email.benefit2') || '🔥 Streak protection reminders',
-                  t('email.benefit3') || '🎯 Exclusive tips & strategies',
-                ].map((benefit, index) => (
-                  <div key={index} className="flex items-center gap-2 text-neo-cream text-sm">
-                    <div className="w-1.5 h-1.5 bg-neo-yellow rounded-full" />
-                    {benefit}
-                  </div>
-                ))}
+                {/* Compact benefits inline */}
+                <div className="flex justify-center gap-4 text-neo-cream/80 text-sm">
+                  <span>🔥 {t('email.benefitShort1') || 'Streak reminders'}</span>
+                  <span>🎯 {t('email.benefitShort2') || 'Daily puzzles'}</span>
+                </div>
               </div>
 
               {/* Email Form */}
