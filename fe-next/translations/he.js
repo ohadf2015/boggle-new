@@ -2355,7 +2355,7 @@ const he = {
     "timeLimit": "מגבלת זמן",
     "attempt": "ניסיון",
     "playButton": "שחקו את החידה של היום",
-    "nextPuzzleIn": "החידה הבאה בעוד:",
+    "nextPuzzleIn": "החידה הבאה בעוד",
     "samePuzzle": "אותה חידה לכולם בעולם. שתפו את התוצאות שלכם לאתגר חברים!",
     "alreadyPlayed": "כבר שיחקתם היום",
     "yourScore": "הניקוד שלכם",
