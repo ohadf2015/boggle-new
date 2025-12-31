@@ -40,7 +40,6 @@ const JoinViewDialogs: React.FC<JoinViewDialogsProps> = React.memo(({
       <NewPlayerWelcome
         isOpen={showNewPlayerWelcome}
         onClose={onCloseNewPlayerWelcome}
-        rulesPageUrl={`/${language}/rules`}
       />
 
       {/* QR Code Dialog */}

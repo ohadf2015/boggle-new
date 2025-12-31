@@ -1,6 +1,6 @@
 import { memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BarChart3, Menu, X, ChevronDown } from 'lucide-react';
+import { BarChart3, Menu, X, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -9,7 +9,6 @@ import AuthButton from './auth/AuthButton';
 import MusicControls from './MusicControls';
 import DailyQuickLink from './daily/DailyQuickLink';
 import Avatar from './Avatar';
-import type { Language } from '../shared/types/game';
 
 /**
  * Header Props
@@ -18,23 +17,13 @@ interface HeaderProps {
   className?: string;
 }
 
-// Language options for the switcher
-const LANGUAGE_OPTIONS: { code: Language; flag: string; name: string }[] = [
-  { code: 'en', flag: '🇺🇸', name: 'English' },
-  { code: 'he', flag: '🇮🇱', name: 'עברית' },
-  { code: 'sv', flag: '🇸🇪', name: 'Svenska' },
-  { code: 'ja', flag: '🇯🇵', name: '日本語' },
-  { code: 'es', flag: '🇪🇸', name: 'Español' },
-];
-
 /**
  * Header - Neo-Brutalist styled main site header
  * Memoized to prevent unnecessary re-renders
  */
 const Header = memo<HeaderProps>(({ className = '' }) => {
-    const { t, language, setLanguage, currentFlag } = useLanguage();
+    const { t, language, currentFlag } = useLanguage();
     const { isAuthenticated, isAdmin, profile } = useAuth();
-    const [showLangDropdown, setShowLangDropdown] = useState(false);
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
 
@@ -148,69 +137,23 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     {/* Daily Challenge Quick Link */}
                     <DailyQuickLink />
 
-                    {/* Language Switcher */}
-                    <div
-                        className="relative"
-                        onMouseEnter={() => setShowLangDropdown(true)}
-                        onMouseLeave={() => setShowLangDropdown(false)}
+                    {/* Settings Link - replaces language dropdown */}
+                    <Link
+                        href={`/${language}/settings`}
+                        className={cn(
+                            "flex items-center justify-center gap-1",
+                            "min-w-[44px] min-h-[44px] w-11 h-11 lg:w-12 lg:h-12 xl:w-12 xl:h-12 2xl:w-14 2xl:h-14",
+                            "bg-neo-cream text-neo-black",
+                            "border-3 lg:border-3 2xl:border-3 border-neo-black",
+                            "rounded-neo lg:rounded-neo shadow-hard lg:shadow-hard 2xl:shadow-hard-lg",
+                            "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg",
+                            "active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm",
+                            "transition-all duration-100"
+                        )}
+                        aria-label={t('settings.title') || 'Settings'}
                     >
-                        <button
-                            onClick={() => setShowLangDropdown(!showLangDropdown)}
-                            className={cn(
-                                "flex items-center justify-center gap-1",
-                                "min-w-[44px] min-h-[44px] w-11 h-11 lg:w-12 lg:h-12 xl:w-12 xl:h-12 2xl:w-14 2xl:h-14",
-                                "bg-neo-cream text-neo-black",
-                                "border-3 lg:border-3 2xl:border-3 border-neo-black",
-                                "rounded-neo lg:rounded-neo shadow-hard lg:shadow-hard 2xl:shadow-hard-lg",
-                                "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg",
-                                "active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm",
-                                "transition-all duration-100"
-                            )}
-                            aria-label={t('common.changeLanguage') || 'Change language'}
-                            aria-expanded={showLangDropdown}
-                            aria-haspopup="listbox"
-                        >
-                            <span className="text-xl lg:text-xl xl:text-2xl 2xl:text-2xl">{currentFlag}</span>
-                            <ChevronDown className={cn(
-                                "w-3 h-3 transition-transform",
-                                showLangDropdown && "rotate-180"
-                            )} />
-                        </button>
-
-                        <AnimatePresence>
-                            {showLangDropdown && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: -5, scale: 0.95 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, y: -5, scale: 0.95 }}
-                                    transition={{ duration: 0.15 }}
-                                    className="absolute top-full end-0 mt-2 z-[100] bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg overflow-hidden min-w-[120px]"
-                                    role="listbox"
-                                    aria-label={t('common.selectLanguage') || 'Select language'}
-                                >
-                                    {LANGUAGE_OPTIONS.map((option) => (
-                                        <button
-                                            key={option.code}
-                                            onClick={() => {
-                                                setLanguage(option.code);
-                                                setShowLangDropdown(false);
-                                            }}
-                                            className={cn(
-                                                "w-full flex items-center gap-2 px-3 py-2 text-sm font-bold",
-                                                "hover:bg-neo-cyan transition-colors",
-                                                language === option.code && "bg-neo-cyan"
-                                            )}
-                                            role="option"
-                                            aria-selected={language === option.code}
-                                        >
-                                            <span>{option.flag}</span>
-                                            <span className="text-neo-black">{option.name}</span>
-                                        </button>
-                                    ))}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
+                        <Settings className="w-5 h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6" />
+                    </Link>
 
                     {/* Admin Dashboard Link - only shown for admin users */}
                     {isAdmin && (
@@ -366,30 +309,24 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 {/* Divider */}
                                 <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
 
-                                {/* Language Section */}
+                                {/* Settings Link - consolidated settings (language, theme, sound) */}
                                 <div className="flex flex-col gap-2">
                                     <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
-                                        {t('common.language') || 'Language'}
+                                        {t('settings.title') || 'Settings'}
                                     </span>
-                                    <div className="flex flex-col gap-1.5">
-                                        {LANGUAGE_OPTIONS.map((option) => (
-                                            <button
-                                                key={option.code}
-                                                onClick={() => {
-                                                    setLanguage(option.code);
-                                                }}
-                                                className={cn(
-                                                    "flex items-center gap-2 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
-                                                    language === option.code
-                                                        ? "bg-neo-cyan shadow-hard-sm text-neo-black"
-                                                        : "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600 text-neo-black dark:text-white"
-                                                )}
-                                            >
-                                                <span className="text-lg">{option.flag}</span>
-                                                <span>{option.name}</span>
-                                            </button>
-                                        ))}
-                                    </div>
+                                    <Link
+                                        href={`/${language}/settings`}
+                                        onClick={() => setShowMobileMenu(false)}
+                                        className={cn(
+                                            "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                            "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
+                                            "shadow-hard-sm hover:shadow-hard"
+                                        )}
+                                    >
+                                        <Settings className="w-5 h-5" />
+                                        <span>{t('settings.languageThemeSound') || 'Language, Theme & Sound'}</span>
+                                        <span className="ms-auto text-lg">{currentFlag}</span>
+                                    </Link>
                                 </div>
 
                                 {/* Admin Controls Section - only shown for admin users */}

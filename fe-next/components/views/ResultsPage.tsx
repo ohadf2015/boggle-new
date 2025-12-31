@@ -774,27 +774,38 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             />
           )}
 
-          {/* Performance Chart - Shows improvement over recent games - MORE VISIBLE */}
+          {/* Performance Chart & Missed Words - Collapsed by default for cleaner initial view */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.3 }}
-            className="mt-4 mb-4"
+            className="mt-4 space-y-2"
           >
-            <PerformanceChart currentScore={currentPlayerData?.score} gamesLimit={10} />
-          </motion.div>
-
-          {/* Missed Words - Educational feedback on high-value words you missed */}
-          {missedWords.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.3 }}
-              className="mt-2"
+            {/* Performance Chart - Hidden behind toggle */}
+            <CollapsibleSection
+              title={t('results.yourProgress') || 'Your Progress'}
+              icon={<Trophy className="w-4 h-4" />}
+              defaultExpanded={false}
+              variant="tertiary"
+              className="shadow-hard"
             >
-              <MissedWords missedWords={missedWords} maxDisplay={5} />
-            </motion.div>
-          )}
+              <PerformanceChart currentScore={currentPlayerData?.score} gamesLimit={10} />
+            </CollapsibleSection>
+
+            {/* Missed Words - Only show if there are words, and collapsed */}
+            {missedWords.length > 0 && (
+              <CollapsibleSection
+                title={t('results.missedWords') || 'Words You Missed'}
+                icon={<Star className="w-4 h-4" />}
+                badge={missedWords.length}
+                defaultExpanded={false}
+                variant="tertiary"
+                className="shadow-hard"
+              >
+                <MissedWords missedWords={missedWords} maxDisplay={5} />
+              </CollapsibleSection>
+            )}
+          </motion.div>
 
           {/* Compact Top 3 Leaderboard */}
           {sortedScores.length > 1 && (
@@ -916,14 +927,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                   backgroundSize: '16px 16px',
                 }} />
                 <div className="text-center space-y-5 relative z-10">
-                  <motion.div
-                    animate={{ rotate: [0, -3, 3, 0] }}
-                    transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
-                  >
+                  <div>
                     <h3 className="text-2xl sm:text-3xl font-black uppercase" style={{ textShadow: '3px 3px 0px var(--neo-cyan)' }}>
                       {t('results.readyForNextRound') || 'Ready for Next Round?'}
                     </h3>
-                  </motion.div>
+                  </div>
                   <p className="text-neo-black/80 text-base font-bold max-w-md mx-auto">
                     {t('results.hostStartDescription') || 'Start a new game when everyone is ready!'}
                   </p>
@@ -931,10 +939,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                   {/* HUGE Start Game Button for Host */}
                   <motion.button
                     onClick={handleStartGame}
-                    animate={{ scale: [1, 1.03, 1] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                    whileHover={{ scale: 1.05, x: -3, y: -3 }}
-                    whileTap={{ scale: 0.98, x: 3, y: 3 }}
+                    whileHover={{ scale: 1.02, x: -2, y: -2 }}
+                    whileTap={{ scale: 0.98, x: 2, y: 2 }}
                     className="w-full sm:w-auto bg-emerald-500 text-white font-black text-xl sm:text-2xl px-12 py-5 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl transition-all flex items-center justify-center gap-3 mx-auto"
                   >
                     <Play className="w-7 h-7" />
@@ -967,13 +973,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                     transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                     className="flex items-center justify-center gap-4"
                   >
-                    <motion.div
-                      animate={{ scale: [1, 1.15, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                      className="w-16 h-16 bg-white rounded-full flex items-center justify-center border-4 border-neo-black shadow-hard"
-                    >
+                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center border-4 border-neo-black shadow-hard">
                       <Check className="w-8 h-8 text-emerald-600" />
-                    </motion.div>
+                    </div>
                   </motion.div>
                   <h3 className="text-2xl sm:text-3xl font-black uppercase" style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.3)' }}>
                     {t('results.youAreReady')}
@@ -1012,14 +1014,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                   backgroundSize: '16px 16px',
                 }} />
                 <div className="text-center space-y-5 relative z-10">
-                  <motion.div
-                    animate={{ rotate: [0, -3, 3, 0] }}
-                    transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
-                  >
+                  <div>
                     <h3 className="text-2xl sm:text-3xl font-black uppercase" style={{ textShadow: '3px 3px 0px var(--neo-pink)' }}>
                       {t('results.playAgainQuestion')}
                     </h3>
-                  </motion.div>
+                  </div>
                   <p className="text-neo-black/80 text-base font-bold max-w-md mx-auto">
                     {t('results.markReadyDescription') || 'Click below to let the host know you\'re ready for the next round'}
                   </p>
@@ -1027,10 +1026,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                   {/* HUGE I'm Ready Button */}
                   <motion.button
                     onClick={handleMarkReady}
-                    animate={{ scale: [1, 1.03, 1] }}
-                    transition={{ duration: 1.5, repeat: Infinity }}
-                    whileHover={{ scale: 1.05, x: -3, y: -3 }}
-                    whileTap={{ scale: 0.98, x: 3, y: 3 }}
+                    whileHover={{ scale: 1.02, x: -2, y: -2 }}
+                    whileTap={{ scale: 0.98, x: 2, y: 2 }}
                     className="w-full sm:w-auto bg-neo-lime text-neo-black font-black text-xl sm:text-2xl px-12 py-5 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl transition-all flex items-center justify-center gap-3 mx-auto"
                   >
                     <Star className="w-7 h-7" />

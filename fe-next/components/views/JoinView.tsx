@@ -581,7 +581,6 @@ const JoinView: React.FC<JoinViewProps> = ({
       <NewPlayerWelcome
         isOpen={showNewPlayerWelcome}
         onClose={handleCloseNewPlayerWelcome}
-        rulesPageUrl={`/${language}/rules`}
       />
 
       {/* QR Code Dialog */}

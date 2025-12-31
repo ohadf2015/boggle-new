@@ -12,7 +12,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import ModeCard from './ModeCard';
-import ModeDiscoveryBanner from './ModeDiscoveryBanner';
 import Header from '@/components/Header';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
@@ -158,9 +157,6 @@ const LandingView: React.FC = () => {
             {t('landing.subtitleSimple') || 'Practice solo or challenge friends'}
           </p>
         </motion.div>
-
-        {/* Mode Discovery Banner - Shows after 2 training games */}
-        <ModeDiscoveryBanner />
 
         {/* Daily Challenge Banner - Compact inline placement */}
         <motion.div

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Gamepad2, Play, X, Star, Flame, Trophy } from 'lucide-react';
+import { Gamepad2, Play, Star, Zap, Trophy } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -27,7 +26,6 @@ export const markTutorialSeen = (): void => {
 interface NewPlayerWelcomeProps {
   isOpen: boolean;
   onClose: () => void;
-  rulesPageUrl: string;
 }
 
 interface FeatureItem {
@@ -43,135 +41,77 @@ interface FeatureItem {
 const NewPlayerWelcome: React.FC<NewPlayerWelcomeProps> = ({
   isOpen,
   onClose,
-  rulesPageUrl,
 }): React.ReactElement => {
   const { t, dir } = useLanguage();
   const [dontShowAgain, setDontShowAgain] = useState<boolean>(false);
 
-  const handleSkip = (): void => {
-    markTutorialSeen();
-    onClose();
-  };
-
-  const handleShowTutorial = (): void => {
+  const handlePlay = (): void => {
     if (dontShowAgain) {
       markTutorialSeen();
     }
     onClose();
   };
 
-  const features: FeatureItem[] = [
-    { icon: Star, label: t('howToPlay.steps.scoring.title'), color: 'bg-neo-yellow' },
-    { icon: Flame, label: t('howToPlay.steps.combo.title'), color: 'bg-neo-orange' },
-    { icon: Trophy, label: t('howToPlay.steps.achievements.title'), color: 'bg-neo-pink' },
+  // Simplified 3-point quick intro
+  const quickTips: FeatureItem[] = [
+    { icon: Star, label: t('howToPlay.quickTip.findWords') || 'Find words in the grid', color: 'bg-neo-yellow' },
+    { icon: Zap, label: t('howToPlay.quickTip.chainWords') || 'Chain words for combos', color: 'bg-neo-orange' },
+    { icon: Trophy, label: t('howToPlay.quickTip.beatOpponents') || 'Beat your opponents!', color: 'bg-neo-pink' },
   ];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md" dir={dir}>
+      <DialogContent className="max-w-sm" dir={dir}>
         <DialogHeader className="bg-neo-cyan text-neo-black p-3 sm:p-4">
-          <DialogTitle className="flex items-center justify-center gap-2 sm:gap-3 text-base sm:text-xl">
-            <motion.div
-              animate={{ rotate: [0, -10, 10, -10, 0] }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              <Gamepad2 className="text-2xl sm:text-3xl" />
-            </motion.div>
-            {t('howToPlay.newPlayer.welcomeTitle')}
+          <DialogTitle className="flex items-center justify-center gap-2 text-lg sm:text-xl">
+            <Gamepad2 className="text-xl sm:text-2xl" />
+            {t('howToPlay.newPlayer.welcomeTitle') || 'Welcome!'}
           </DialogTitle>
         </DialogHeader>
 
-        <DialogBody className="space-y-3 sm:space-y-4 px-3 sm:px-6">
-          {/* Welcome Animation - LexiClash logo always LTR */}
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-center"
-          >
-            {/* Force LTR for brand name */}
-            <div className="flex justify-center gap-1 sm:gap-2 mb-3 sm:mb-4" dir="ltr">
-              {['L', 'E', 'X', 'I'].map((letter, i) => (
-                <motion.div
-                  key={letter}
-                  initial={{ y: -20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.1 * i + 0.3 }}
-                  className="w-8 h-8 sm:w-10 sm:h-10 bg-neo-yellow rounded-neo border-2 border-neo-black flex items-center justify-center font-black text-lg sm:text-xl shadow-hard-sm"
-                >
-                  {letter}
-                </motion.div>
-              ))}
-              {['C', 'L', 'A', 'S', 'H'].map((letter, i) => (
-                <motion.div
-                  key={`clash-${letter}`}
-                  initial={{ y: -20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.1 * i + 0.7 }}
-                  className="w-8 h-8 sm:w-10 sm:h-10 bg-neo-pink rounded-neo border-2 border-neo-black flex items-center justify-center font-black text-lg sm:text-xl shadow-hard-sm"
-                >
-                  {letter}
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          <p className="text-neo-black text-center leading-relaxed text-sm sm:text-base">
-            {t('howToPlay.newPlayer.welcomeMessage')}
-          </p>
-
-          {/* Feature Preview */}
-          <div className="flex justify-center gap-2 sm:gap-3">
-            {features.map((feature, index) => (
+        <DialogBody className="space-y-4 px-4 sm:px-5 py-3">
+          {/* Quick 3-step intro - no excessive animations */}
+          <div className="space-y-3">
+            {quickTips.map((tip, index) => (
               <motion.div
                 key={index}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.5 + index * 0.1 }}
-                className="flex flex-col items-center"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="flex items-center gap-3"
               >
-                <div className={`w-10 h-10 sm:w-12 sm:h-12 ${feature.color} rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm`}>
-                  <feature.icon className="text-neo-black text-lg sm:text-xl" />
+                <div className={`w-10 h-10 ${tip.color} rounded-lg border-2 border-neo-black flex items-center justify-center shadow-hard-sm flex-shrink-0`}>
+                  <tip.icon className="w-5 h-5 text-neo-black" />
                 </div>
-                <span className="text-[10px] sm:text-xs font-bold mt-1 text-neo-black/70 text-center max-w-[50px] sm:max-w-[60px]">
-                  {feature.label}
+                <span className="text-sm font-medium text-neo-black">
+                  {tip.label}
                 </span>
               </motion.div>
             ))}
           </div>
 
-          {/* Don't show again checkbox */}
-          <label className="flex items-center justify-center gap-2 cursor-pointer">
+          {/* Don't show again */}
+          <label className="flex items-center justify-center gap-2 cursor-pointer pt-2">
             <input
               type="checkbox"
               checked={dontShowAgain}
               onChange={(e) => setDontShowAgain(e.target.checked)}
               className="w-4 h-4 rounded border-2 border-neo-black accent-neo-pink"
             />
-            <span className="text-xs sm:text-sm text-neo-black/75">
-              {t('howToPlay.newPlayer.dontShowAgain')}
+            <span className="text-xs text-neo-black/70">
+              {t('howToPlay.newPlayer.dontShowAgain') || "Don't show again"}
             </span>
           </label>
         </DialogBody>
 
-        <DialogFooter className="flex-col sm:flex-row gap-2 px-3 sm:px-6 pb-3 sm:pb-6">
+        <DialogFooter className="px-4 sm:px-5 pb-4">
           <Button
-            variant="outline"
-            onClick={handleSkip}
-            className="bg-neo-cream flex-1 text-sm sm:text-base"
+            onClick={handlePlay}
+            className="w-full bg-neo-lime hover:bg-neo-lime/90 text-neo-black font-bold border-3 border-neo-black shadow-hard"
           >
-            <X className={`${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
-            {t('howToPlay.newPlayer.skipTutorial')}
+            <Play className="w-5 h-5 me-2" />
+            {t('howToPlay.newPlayer.letsPlay') || "Let's Play!"}
           </Button>
-          <Link href={rulesPageUrl} onClick={handleShowTutorial} className="flex-1">
-            <Button
-              variant="outline"
-              className="bg-neo-lime w-full text-sm sm:text-base"
-            >
-              <Play className={`${dir === 'rtl' ? 'ml-2' : 'mr-2'}`} />
-              {t('howToPlay.newPlayer.showTutorial')}
-            </Button>
-          </Link>
         </DialogFooter>
       </DialogContent>
     </Dialog>

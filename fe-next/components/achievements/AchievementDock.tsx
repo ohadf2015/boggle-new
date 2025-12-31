@@ -109,7 +109,7 @@ const AchievementDock = ({ achievements = [], className }: AchievementDockProps)
           scale: [1, 1.15, 1],
           rotate: [0, 5, -5, 0],
         } : {}}
-        transition={{ duration: 0.4, ease: 'easeInOut', repeat: hasNewAchievement ? Infinity : 0 }}
+        transition={{ duration: 0.4, ease: 'easeInOut' }}
         className={cn(
           'relative w-14 h-14 rounded-lg flex items-center justify-center',
           'bg-neo-yellow border-4 border-neo-black',
@@ -138,13 +138,13 @@ const AchievementDock = ({ achievements = [], className }: AchievementDockProps)
           {achievements.length}
         </motion.span>
 
-        {/* Pulse ring for new achievement */}
+        {/* Pulse ring for new achievement - single pulse, not infinite */}
         {hasNewAchievement && (
           <motion.span
             className="absolute inset-0 rounded-lg bg-neo-lime border-4 border-neo-black"
             initial={{ scale: 1, opacity: 0.8 }}
             animate={{ scale: 1.5, opacity: 0 }}
-            transition={{ duration: 0.8, repeat: Infinity }}
+            transition={{ duration: 0.8 }}
           />
         )}
       </motion.button>

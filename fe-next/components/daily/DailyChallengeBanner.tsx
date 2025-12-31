@@ -107,18 +107,9 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
         whileHover={{ scale: 1.005 }}
         whileTap={{ scale: 0.995 }}
       >
-        {/* Animated background shimmer */}
+        {/* Subtle gradient overlay for unplayed state - no animation */}
         {!hasPlayed && (
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full"
-            animate={{ translateX: ['100%', '-100%'] }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              repeatDelay: 1,
-              ease: 'easeInOut',
-            }}
-          />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
         )}
 
         <div className="relative flex items-center gap-2 sm:gap-3 lg:gap-4 xl:gap-5">
@@ -199,13 +190,9 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
                 <Check className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 xl:w-8 xl:h-8 text-neo-black" strokeWidth={3} />
               </motion.div>
             ) : (
-              <motion.div
-                className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 lg:w-12 lg:h-12 xl:w-14 xl:h-14 bg-neo-black rounded-full"
-                animate={{ x: [0, 2, 0] }}
-                transition={{ duration: 1, repeat: Infinity, repeatDelay: 2 }}
-              >
+              <div className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 lg:w-12 lg:h-12 xl:w-14 xl:h-14 bg-neo-black rounded-full group-hover:scale-105 transition-transform">
                 <Play className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 xl:w-8 xl:h-8 text-neo-yellow" fill="currentColor" />
-              </motion.div>
+              </div>
             )}
           </div>
 
