@@ -119,6 +119,7 @@ export function Providers({ children, lang }: ProvidersProps) {
                                     <AudioProviders>
                                         <GameProviders>
                                             {children}
+                                            <WinnerOnboardingWrapper />
                                         </GameProviders>
                                     </AudioProviders>
                                 </SocketEventBusProvider>
@@ -140,7 +141,6 @@ export function Providers({ children, lang }: ProvidersProps) {
                         },
                     }}
                 />
-                <WinnerOnboardingWrapper />
             </>
         </ErrorBoundary>
     );
