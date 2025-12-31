@@ -219,7 +219,7 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ delay: 0.3, type: 'spring', damping: 12 }}
                 >
-                  <span className="text-5xl font-black">{newYearState.nextYear}</span>
+                  <span className="text-5xl font-black">{newYearState.celebrationYear}</span>
                 </motion.div>
               </div>
 
