@@ -1900,6 +1900,29 @@ const ja = {
       "maybeLater": "また今度",
       "continueAsGuest": "ゲストとして続ける"
     },
+    "winnerOnboarding": {
+      "topPercentile": {
+        "title": "あなたはトッププレイヤーです！",
+        "subtitle": "リーダーボードであなたの成果を見せましょう"
+      },
+      "quickSolve": {
+        "title": "電光石火！",
+        "subtitle": "あなたの素晴らしいスキルをみんなに見せましょう"
+      },
+      "streakAtRisk": {
+        "title": "連続記録を保護しました！",
+        "subtitle": "リーダーボードであなたの場所を確保しましょう"
+      },
+      "default": {
+        "title": "ようこそチャンピオン！",
+        "subtitle": "プロフィールをカスタマイズしてリーダーボードで輝きましょう"
+      },
+      "chooseAvatar": "アバターを選択",
+      "displayName": "表示名",
+      "namePlaceholder": "名前を入力...",
+      "saving": "保存中...",
+      "showMeLeaderboard": "リーダーボードで私を見せて！"
+    },
     "inlineSignup": {
       "title": "リーダーボードに登場しよう",
       "subtitle": "結果を保存してグローバルで競争",

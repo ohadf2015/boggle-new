@@ -1901,6 +1901,29 @@ const sv = {
       "maybeLater": "Kanske senare",
       "continueAsGuest": "Fortsätt som gäst"
     },
+    "winnerOnboarding": {
+      "topPercentile": {
+        "title": "Du är en toppspelare!",
+        "subtitle": "Visa upp din prestation på topplistan"
+      },
+      "quickSolve": {
+        "title": "Blixtsnabbt!",
+        "subtitle": "Låt alla se dina imponerande färdigheter"
+      },
+      "streakAtRisk": {
+        "title": "Sviten skyddad!",
+        "subtitle": "Ta din plats på topplistan"
+      },
+      "default": {
+        "title": "Välkommen mästare!",
+        "subtitle": "Anpassa din profil för att sticka ut på topplistan"
+      },
+      "chooseAvatar": "Välj din avatar",
+      "displayName": "Ditt visningsnamn",
+      "namePlaceholder": "Ange ditt namn...",
+      "saving": "Sparar...",
+      "showMeLeaderboard": "Visa mig på topplistan!"
+    },
     "inlineSignup": {
       "title": "Registrera dig för att synas på topplistan",
       "subtitle": "Spara ditt resultat och tävla globalt",
