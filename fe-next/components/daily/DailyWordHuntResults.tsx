@@ -989,6 +989,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
         {/* Share Section - Moved above statistics */}
         <motion.div
+          layout
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
@@ -1032,18 +1033,20 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           {/* Share buttons - Progressive disclosure */}
           <div className="space-y-2">
             {/* Primary share button - Eye-catching CTA */}
-            <Button
-              onClick={handleNativeShare}
-              className={cn(
-                "w-full py-4 text-lg font-black uppercase border-3 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1.5 transition-all group",
-                result.solved
-                  ? "bg-gradient-to-r from-neo-yellow via-neo-orange to-neo-pink text-neo-black animate-pulse-subtle"
-                  : "bg-gradient-to-r from-neo-cyan via-neo-purple to-neo-pink text-white hover:brightness-110"
-              )}
-            >
-              <Share2 className="mr-2 w-6 h-6 group-hover:scale-110 transition-transform" />
-              {result.solved ? t('wordHunt.shareResult') : t('wordHunt.shareChallengeFriends')}
-            </Button>
+            <motion.div layout="position" layoutId="primary-share-button">
+              <Button
+                onClick={handleNativeShare}
+                className={cn(
+                  "w-full py-4 text-lg font-black uppercase border-3 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1.5 transition-all group",
+                  result.solved
+                    ? "bg-gradient-to-r from-neo-yellow via-neo-orange to-neo-pink text-neo-black animate-pulse-subtle"
+                    : "bg-gradient-to-r from-neo-cyan via-neo-purple to-neo-pink text-white hover:brightness-110"
+                )}
+              >
+                <Share2 className="mr-2 w-6 h-6 group-hover:scale-110 transition-transform" />
+                {result.solved ? t('wordHunt.shareResult') : t('wordHunt.shareChallengeFriends')}
+              </Button>
+            </motion.div>
 
             {/* Toggle for more share options - Clear labeling */}
             <button

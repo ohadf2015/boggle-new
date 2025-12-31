@@ -6,6 +6,7 @@ import { Users, Trophy, Clock, ChevronDown, ChevronUp, Sparkles, Share2, Check, 
 import { Button } from '@/components/ui/button';
 import { getRankDisplay } from '@/utils/rankingStyles';
 import { getPuzzleNumber } from '@/utils/dailyChallenge';
+import Avatar from '@/components/Avatar';
 import type { Language } from '@/types';
 
 // Simple relative time formatter with translation support
@@ -33,6 +34,7 @@ export interface DailyParticipant {
   display_name: string;
   avatar_emoji: string;
   avatar_color: string;
+  avatar_image?: string | null;
   profile_picture_url?: string | null;
   country_code?: string | null;
   score: number;
@@ -139,20 +141,16 @@ const ParticipantRow = memo<{
 
       {/* Avatar with Country Flag */}
       <div className="relative">
-        {participant.profile_picture_url ? (
-          <img
-            src={participant.profile_picture_url}
-            alt={participant.display_name || 'Player'}
-            className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl object-cover border-2 border-neo-black/80 shadow-sm"
+        <div className="w-9 h-9 sm:w-11 sm:h-11 border-2 border-neo-black/80 shadow-sm rounded-xl overflow-hidden">
+          <Avatar
+            profilePictureUrl={participant.profile_picture_url ?? undefined}
+            avatarImage={participant.avatar_image ?? undefined}
+            avatarEmoji={participant.avatar_emoji}
+            avatarColor={participant.avatar_color}
+            size="md"
+            className="w-full h-full"
           />
-        ) : (
-          <div
-            className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-lg sm:text-xl border-2 border-neo-black/80 shadow-sm"
-            style={{ backgroundColor: participant.avatar_color || '#FFE135' }}
-          >
-            {participant.avatar_emoji || '🎯'}
-          </div>
-        )}
+        </div>
         {/* Country Flag Badge */}
         {countryFlag && (
           <div className="absolute -bottom-1 -right-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>
@@ -230,6 +228,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
 }) => {
   const [participants, setParticipants] = useState<DailyParticipant[]>([]);
   const [totalCount, setTotalCount] = useState(0);
+  const [totalAttempts, setTotalAttempts] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
@@ -255,9 +254,10 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       }
 
       const data = await response.json();
-      console.log('Leaderboard data:', { url, date: puzzleDate, language, gameType, participants: data.data?.length, total: data.totalParticipants });
+      console.log('Leaderboard data:', { url, date: puzzleDate, language, gameType, participants: data.data?.length, total: data.totalParticipants, totalAttempts: data.totalAttempts });
       setParticipants(data.data || []);
       setTotalCount(data.totalParticipants || 0);
+      setTotalAttempts(data.totalAttempts || 0);
 
       if (onParticipantCountChange) {
         onParticipantCountChange(data.totalParticipants || 0);
@@ -385,7 +385,12 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
   }, [currentUserData, puzzleDate, language]);
 
   // Filter out guests - only show authenticated users on leaderboard
-  const authenticatedParticipants = participants.filter(p => p.player_id !== null);
+  // For Word Hunt, also filter out failed attempts (only show solved)
+  const authenticatedParticipants = participants.filter(p => {
+    if (p.player_id === null) return false; // Filter out guests
+    if (gameType === 'wordHunt' && !p.solved) return false; // Filter out failed attempts in Word Hunt
+    return true;
+  });
 
   // Determine which participants to show
   const visibleParticipants = expanded
@@ -415,9 +420,9 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
             <h3 className="font-black text-base sm:text-lg uppercase tracking-wide text-slate-800 dark:text-white">
               {t('daily.todaysPlayers')}
             </h3>
-            {totalCount > 0 && (
+            {totalAttempts > 0 && (
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
-                {totalCount} {totalCount === 1 ? t('daily.playerSingular') : t('daily.playersPlural')} {t('daily.tookChallenge') || 'took the challenge'}
+                {totalAttempts} {totalAttempts === 1 ? t('daily.playerSingular') : t('daily.playersPlural')} {t('daily.tookChallenge') || 'took the challenge'}
               </p>
             )}
           </div>
@@ -425,7 +430,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
         <div className="text-center py-6">
           <div className="text-4xl mb-3">🏆</div>
           <p className="text-slate-700 dark:text-slate-300 font-bold text-sm sm:text-base">
-            {totalCount > 0
+            {totalAttempts > 0
               ? (t('daily.signUpToAppear') || 'Sign up to appear on the leaderboard!')
               : t('daily.beFirstToPlay')}
           </p>
@@ -457,6 +462,11 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
             </h3>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
               {totalCount} {totalCount === 1 ? t('daily.playerSingular') : t('daily.playersPlural')}
+              {totalAttempts > totalCount && (
+                <span className="text-slate-500 dark:text-slate-500">
+                  {' '}• {totalAttempts} {t('daily.totalAttempts') || 'total attempts'}
+                </span>
+              )}
             </p>
           </div>
         </div>
@@ -500,20 +510,16 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
                 </span>
               </div>
               <div className="flex items-center gap-2 mt-1">
-                {currentUserData.profile_picture_url ? (
-                  <img
-                    src={currentUserData.profile_picture_url}
-                    alt={currentUserData.display_name || 'Player'}
-                    className="w-6 h-6 rounded-lg object-cover border border-neo-black/50"
+                <div className="w-6 h-6 rounded-lg border border-neo-black/50 overflow-hidden">
+                  <Avatar
+                    profilePictureUrl={currentUserData.profile_picture_url ?? undefined}
+                    avatarImage={currentUserData.avatar_image ?? undefined}
+                    avatarEmoji={currentUserData.avatar_emoji}
+                    avatarColor={currentUserData.avatar_color}
+                    size="sm"
+                    className="w-full h-full"
                   />
-                ) : (
-                  <div
-                    className="w-6 h-6 rounded-lg flex items-center justify-center text-sm border border-neo-black/50"
-                    style={{ backgroundColor: currentUserData.avatar_color || '#FFE135' }}
-                  >
-                    {currentUserData.avatar_emoji || '🎯'}
-                  </div>
-                )}
+                </div>
                 <span className="font-bold text-slate-800 dark:text-white text-sm truncate">
                   {currentUserData.display_name || 'Player'}
                 </span>

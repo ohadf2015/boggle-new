@@ -24,7 +24,7 @@ const logger = require('../utils/logger');
 
 // Configuration
 const HINTS_PER_GAME = 3;
-const HINT_COOLDOWN_MS = 10000; // 10 seconds between hints
+const HINT_COOLDOWN_MS = 30000; // 30 seconds between hints
 
 // Types
 interface HintState {

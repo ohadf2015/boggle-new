@@ -8,6 +8,8 @@ export interface NewYearState {
   secondsUntilMidnight: number;
   currentYear: number;
   nextYear: number;
+  /** The year to display in celebrations (current year on Jan 1, next year on Dec 31) */
+  celebrationYear: number;
 }
 
 interface UseNewYearDetectionOptions {
@@ -42,14 +44,16 @@ export function useNewYearDetection(options: UseNewYearDetectionOptions = {}): N
 
   const updateState = useCallback(() => {
     if (!enabled) {
+      const year = new Date().getFullYear();
       setState({
         isNewYearsEve: false,
         isNewYearsDay: false,
         isCountdownTime: false,
         isCelebrationTime: false,
         secondsUntilMidnight: 0,
-        currentYear: new Date().getFullYear(),
-        nextYear: new Date().getFullYear() + 1,
+        currentYear: year,
+        nextYear: year + 1,
+        celebrationYear: year + 1,
       });
       return;
     }
@@ -111,6 +115,9 @@ function calculateNewYearState(
   const secondsSinceMidnight = (now.getHours() * 3600) + (now.getMinutes() * 60) + now.getSeconds();
   const isCelebrationTime = isInCelebrationWindow && secondsSinceMidnight <= celebrationDurationSeconds;
 
+  // Celebration year: if we're on New Year's Day, show current year; if on New Year's Eve, show next year
+  const celebrationYear = isNewYearsDay ? currentYear : nextYear;
+
   return {
     isNewYearsEve,
     isNewYearsDay,
@@ -119,6 +126,7 @@ function calculateNewYearState(
     secondsUntilMidnight,
     currentYear,
     nextYear,
+    celebrationYear,
   };
 }
 

@@ -10,11 +10,13 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { AVATARS, getAvatarPath, getAvatarById, getRandomAvatar } from '@/utils/avatarConfig';
 import { cn } from '@/lib/utils';
+import { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
 
 interface ProfileCustomizationModalProps {
   isOpen: boolean;
   onClose: () => void;
   defaultName: string;
+  profilePictureUrl?: string;
   onSave: (name: string, avatarId: string) => Promise<void>;
 }
 
@@ -26,14 +28,17 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
   isOpen,
   onClose,
   defaultName,
+  profilePictureUrl,
   onSave,
 }) => {
   const { t, dir } = useLanguage();
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
 
-  // Pre-select a random avatar
-  const [selectedAvatarId, setSelectedAvatarId] = useState<string>(() => getRandomAvatar().id);
+  // Pre-select profile picture if available, otherwise random avatar
+  const [selectedAvatarId, setSelectedAvatarId] = useState<string>(() =>
+    profilePictureUrl ? PROFILE_AVATAR_ID : getRandomAvatar().id
+  );
   const [displayName, setDisplayName] = useState(defaultName);
   const [isSaving, setIsSaving] = useState(false);
   const [nameTouched, setNameTouched] = useState(false);
@@ -42,10 +47,10 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       setDisplayName(defaultName);
-      setSelectedAvatarId(getRandomAvatar().id);
+      setSelectedAvatarId(profilePictureUrl ? PROFILE_AVATAR_ID : getRandomAvatar().id);
       setNameTouched(false);
     }
-  }, [isOpen, defaultName]);
+  }, [isOpen, defaultName, profilePictureUrl]);
 
   // Name validation
   const minLength = 2;
@@ -90,6 +95,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
   };
 
   const selectedAvatar = getAvatarById(selectedAvatarId) || AVATARS[0];
+  const isUsingProfilePicture = selectedAvatarId === PROFILE_AVATAR_ID;
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
@@ -116,8 +122,55 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
               {t('profileCustomization.avatarLabel') || 'Pick your character'}
             </label>
             <div className="grid grid-cols-6 gap-1.5 sm:gap-2">
+              {/* Profile Picture Option (if available) */}
+              {profilePictureUrl && (
+                <motion.button
+                  onClick={() => setSelectedAvatarId(PROFILE_AVATAR_ID)}
+                  className={cn(
+                    'relative aspect-square rounded-neo border-2 overflow-hidden',
+                    'transition-all hover:scale-105 active:scale-95',
+                    'min-h-[40px] min-w-[40px]',
+                    isUsingProfilePicture
+                      ? 'border-neo-cyan shadow-hard-sm scale-105 ring-2 ring-neo-pink'
+                      : 'border-neo-black shadow-hard-sm hover:shadow-hard-md'
+                  )}
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.05 }}
+                  whileHover={{ scale: isUsingProfilePicture ? 1.05 : 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Image
+                    src={profilePictureUrl}
+                    alt="Your Profile"
+                    fill
+                    className="object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+
+                  {/* Selected indicator */}
+                  {isUsingProfilePicture && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute inset-0 bg-neo-cyan/20 flex items-center justify-center"
+                    >
+                      <div className="bg-neo-pink text-white border-2 border-neo-black rounded-full w-5 h-5 flex items-center justify-center font-black text-[10px] shadow-hard-sm">
+                        ✓
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Label */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-neo-black/80 text-white text-[8px] font-bold text-center py-0.5">
+                    YOU
+                  </div>
+                </motion.button>
+              )}
+
+              {/* Regular Character Avatars */}
               {AVATARS.map((avatar, index) => {
-                const isSelected = avatar.id === selectedAvatarId;
+                const isSelected = !isUsingProfilePicture && avatar.id === selectedAvatarId;
 
                 return (
                   <motion.button
@@ -168,15 +221,25 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
               {/* Avatar preview */}
               <div className="flex flex-col items-center gap-1 shrink-0">
                 <div className="relative w-14 h-14 rounded-full overflow-hidden border-3 border-neo-black dark:border-slate-500 shadow-hard-sm">
-                  <Image
-                    src={getAvatarPath(selectedAvatar)}
-                    alt={selectedAvatar.name}
-                    fill
-                    className="object-cover"
-                  />
+                  {isUsingProfilePicture && profilePictureUrl ? (
+                    <Image
+                      src={profilePictureUrl}
+                      alt="Your Profile"
+                      fill
+                      className="object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <Image
+                      src={getAvatarPath(selectedAvatar)}
+                      alt={selectedAvatar.name}
+                      fill
+                      className="object-cover"
+                    />
+                  )}
                 </div>
                 <div className="text-[10px] text-neo-black/60 dark:text-gray-400 text-center max-w-[60px] truncate">
-                  {selectedAvatar.name}
+                  {isUsingProfilePicture ? 'Your Profile' : selectedAvatar.name}
                 </div>
               </div>
 

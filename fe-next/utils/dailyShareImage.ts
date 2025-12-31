@@ -36,6 +36,7 @@ export interface DailyShareImageOptions {
   // Player info (optional)
   displayName?: string;
   avatarEmoji?: string;
+  avatarImage?: string | null;
 }
 
 export interface ShareImageResult {

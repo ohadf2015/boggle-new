@@ -1902,6 +1902,29 @@ const he = {
       "maybeLater": "אולי אחר כך",
       "continueAsGuest": "המשך כאורח"
     },
+    "winnerOnboarding": {
+      "topPercentile": {
+        "title": "אתה בין השחקנים המובילים!",
+        "subtitle": "הצג את ההישג שלך בטבלת המובילים"
+      },
+      "quickSolve": {
+        "title": "מהיר כברק!",
+        "subtitle": "תן לכולם לראות את הכישורים המרשימים שלך"
+      },
+      "streakAtRisk": {
+        "title": "הרצף מוגן!",
+        "subtitle": "תפוס את מקומך בטבלת המובילים"
+      },
+      "default": {
+        "title": "ברוך הבא אלוף!",
+        "subtitle": "התאם אישית את הפרופיל שלך כדי להאיר בטבלת המובילים"
+      },
+      "chooseAvatar": "בחר את הדמות שלך",
+      "displayName": "שם התצוגה שלך",
+      "namePlaceholder": "הזן את שמך...",
+      "saving": "שומר...",
+      "showMeLeaderboard": "הראה אותי בטבלת המובילים!"
+    },
     "inlineSignup": {
       "title": "הירשם כדי להופיע בטבלה",
       "subtitle": "שמור את התוצאה שלך והתחרה גלובלית",

@@ -160,6 +160,12 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           const avatarColor = isAuthenticated && profile
             ? profile.avatar_color
             : guestPlayer?.avatarColor || '#6366f1';
+          const avatarImage = isAuthenticated && profile
+            ? profile.avatar_image
+            : undefined;
+          const profilePictureUrl = isAuthenticated && profile
+            ? profile.profile_picture_url
+            : undefined;
 
           // Fetch country code from geolocation API (works for all languages)
           let countryCode: string | null = null;
@@ -186,6 +192,8 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               displayName,
               avatarEmoji,
               avatarColor,
+              avatarImage,
+              profilePictureUrl,
               countryCode,
               score: result.score,
               wordCount: result.wordCount,
@@ -325,6 +333,9 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
         avatarEmoji: isAuthenticated && profile
           ? profile.avatar_emoji
           : guestPlayer?.avatarEmoji,
+        avatarImage: isAuthenticated && profile
+          ? profile.avatar_image
+          : undefined,
       });
       setShareImage(imageResult);
       setShowImagePreview(true);
@@ -526,7 +537,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           {/* Main share button */}
           <Button
             onClick={handleNativeShare}
-            className="w-full py-3 text-base font-black uppercase bg-gradient-to-r from-neo-yellow to-neo-orange text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all"
+            className="w-full py-3 text-base font-black uppercase bg-gradient-to-r from-neo-yellow to-neo-orange text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all duration-150"
           >
             <Share2 className="mr-2 w-5 h-5" />
             {t('daily.shareScore')}
@@ -537,7 +548,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             <Button
               onClick={handleWhatsApp}
               aria-label="Share on WhatsApp"
-              className="py-3 min-h-[44px] bg-[#25D366] text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all focus:ring-2 focus:ring-neo-yellow focus:ring-offset-2"
+              className="py-3 min-h-[44px] bg-[#25D366] text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all duration-150 focus:ring-2 focus:ring-neo-yellow focus:ring-offset-2"
             >
               <WhatsAppIcon className="w-5 h-5" />
             </Button>
@@ -545,7 +556,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             <Button
               onClick={handleTwitter}
               aria-label="Share on X (Twitter)"
-              className="py-3 min-h-[44px] bg-black text-white border-3 border-gray-700 rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2"
+              className="py-3 min-h-[44px] bg-black text-white border-3 border-gray-700 rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all duration-150 focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2"
             >
               <XTwitterIcon className="w-5 h-5" />
             </Button>
@@ -554,7 +565,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               onClick={handleGenerateImage}
               disabled={isGeneratingImage}
               aria-label={t('daily.shareImage') || 'Share as Image'}
-              className="py-3 min-h-[44px] bg-neo-purple text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all focus:ring-2 focus:ring-neo-pink focus:ring-offset-2 disabled:opacity-50"
+              className="py-3 min-h-[44px] bg-neo-purple text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all duration-150 focus:ring-2 focus:ring-neo-pink focus:ring-offset-2 disabled:opacity-50"
             >
               {isGeneratingImage ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -566,7 +577,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             <Button
               onClick={handleCopy}
               aria-label={copied ? t('common.copied') : t('daily.copyToClipboard')}
-              className="py-3 min-h-[44px] bg-gray-600 text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2"
+              className="py-3 min-h-[44px] bg-gray-600 text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all duration-150 focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2"
             >
               {copied ? (
                 <Check className="w-5 h-5 text-neo-lime" />

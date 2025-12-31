@@ -13,7 +13,7 @@ import {
 } from '../lib/supabase';
 import { getGuestSessionId, clearGuestData, hashToken } from '../utils/guestManager';
 import { getUtmDataForProfile } from '../utils/utmCapture';
-import { getPendingDailyResult, clearPendingDailyResult, getGuestDailyPlayer } from '../utils/dailyChallenge';
+import { getPendingDailyResult, clearPendingDailyResult, getGuestDailyPlayer, setWinnerOnboarding } from '../utils/dailyChallenge';
 import logger from '@/utils/logger';
 import { setSentryUser, clearSentryUser } from '@/utils/sentry';
 import type { User } from '@supabase/supabase-js';
@@ -59,14 +59,32 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   /**
    * Submit any pending daily challenge result after OAuth signup
-   * This auto-saves the result the user got before signing up
+   * For new users: triggers winner onboarding flow first
+   * For returning users: auto-saves immediately
    */
   const submitPendingDailyResult = useCallback(async (userId: string, userProfile: ProfileData) => {
     try {
       const pending = getPendingDailyResult();
       if (!pending) return;
 
-      logger.info('Found pending daily result, submitting for new user:', userId);
+      logger.info('Found pending daily result for user:', userId);
+
+      // Check if this is a brand new user who hasn't customized their profile yet
+      // If so, trigger the winner onboarding flow instead of immediate submission
+      if (userProfile.has_customized_profile === false && pending.trigger) {
+        logger.info('New user with pending result - triggering winner onboarding flow');
+        setWinnerOnboarding({
+          needsOnboarding: true,
+          trigger: pending.trigger,
+          initialName: userProfile.display_name || userProfile.username || '',
+          initialAvatarId: userProfile.avatar_image || '',
+        });
+        // DON'T clear the pending result yet - it will be submitted after onboarding
+        return;
+      }
+
+      // Returning user or no trigger - submit immediately as before
+      logger.info('Submitting pending daily result immediately');
 
       // Get guest player info for fallback
       const guestPlayer = await getGuestDailyPlayer();
@@ -80,6 +98,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         displayName: userProfile.display_name || userProfile.username,
         avatarEmoji: userProfile.avatar_emoji || guestPlayer?.avatarEmoji || '🎯',
         avatarColor: userProfile.avatar_color || guestPlayer?.avatarColor || '#6366f1',
+        avatarImage: userProfile.avatar_image || undefined,
+        profilePictureUrl: userProfile.profile_picture_url || undefined,
         solved: pending.result.solved,
         attemptsUsed: pending.result.attemptsUsed,
         targetWord: pending.result.targetWord,
@@ -189,13 +209,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         avatarColor = randomData.avatar.color;
       }
 
+      // Determine the avatar_image: use PROFILE_AVATAR_ID if we have a profile picture,
+      // otherwise use the random character avatar
+      const finalAvatarImage = profilePictureUrl ? '__profile_avatar__' : avatarImage;
+
       const { data: newProfile, error: createError } = await createProfile({
         id: userId,
         username,
         display_name: displayName,
         avatar_emoji: avatarEmoji,
         avatar_color: avatarColor,
-        avatar_image: avatarImage, // Character avatar from our avatar options
+        avatar_image: finalAvatarImage, // Use profile picture if available, otherwise character avatar
         profile_picture_url: profilePictureUrl,
         profile_picture_provider: profilePictureProvider,
         has_customized_profile: false, // Will prompt user to customize after sign-in

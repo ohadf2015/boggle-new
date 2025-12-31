@@ -38,7 +38,7 @@ import { logGameStart, logGameEnd, formatWordsForLogging } from '@/utils/gameLog
 
 const MAX_ATTEMPTS = 10;
 const INITIAL_LIFE = 100;
-const LIFE_DRAIN_RATE = 2; // points per second
+const LIFE_DRAIN_RATE = 1.25; // points per second (gives 80 seconds total)
 const INVALID_WORD_PENALTY = 5; // life points lost for invalid submissions
 const NOT_IN_DICTIONARY_PENALTY = 4; // life points lost for words not in dictionary
 

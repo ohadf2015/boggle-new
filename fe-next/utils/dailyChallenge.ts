@@ -2158,6 +2158,7 @@ export type ConversionTrigger =
 const SIGNUP_MODAL_DISMISSED_KEY = 'lexiclash_signup_dismissed';
 const PENDING_DAILY_RESULT_KEY = 'lexiclash_pending_daily_result';
 const FIRST_COMPLETION_KEY = 'lexiclash_first_daily_completion';
+const WINNER_ONBOARDING_KEY = 'lexiclash_winner_onboarding';
 
 /**
  * Check if the signup modal has been dismissed recently
@@ -2262,6 +2263,7 @@ export interface PendingDailyResult {
   puzzleNumber: number;
   puzzleDate: string;
   language: Language;
+  trigger?: ConversionTrigger; // What prompted the signup (for onboarding UX)
   savedAt: number;
 }
 
@@ -2317,6 +2319,74 @@ export function clearPendingDailyResult(): void {
 
   try {
     localStorage.removeItem(PENDING_DAILY_RESULT_KEY);
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+/**
+ * Winner onboarding data stored after signup with pending result
+ */
+export interface WinnerOnboardingData {
+  needsOnboarding: boolean;
+  trigger: ConversionTrigger;
+  initialName: string;
+  initialAvatarId: string;
+  savedAt: number;
+}
+
+/**
+ * Set the winner onboarding flag after successful OAuth signup
+ * This indicates the user needs to complete avatar/name selection
+ */
+export function setWinnerOnboarding(data: Omit<WinnerOnboardingData, 'savedAt'>): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    const onboardingData: WinnerOnboardingData = {
+      ...data,
+      savedAt: Date.now(),
+    };
+    localStorage.setItem(WINNER_ONBOARDING_KEY, JSON.stringify(onboardingData));
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+/**
+ * Get the winner onboarding data
+ * Returns null if no onboarding needed or if expired (> 1 hour)
+ */
+export function getWinnerOnboarding(): WinnerOnboardingData | null {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const stored = localStorage.getItem(WINNER_ONBOARDING_KEY);
+    if (!stored) return null;
+
+    const data = JSON.parse(stored) as WinnerOnboardingData;
+
+    // Expire after 1 hour (should complete onboarding quickly)
+    const oneHourMs = 60 * 60 * 1000;
+    if (Date.now() - data.savedAt > oneHourMs) {
+      clearWinnerOnboarding();
+      return null;
+    }
+
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Clear the winner onboarding flag (after completion or expiry)
+ */
+export function clearWinnerOnboarding(): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    localStorage.removeItem(WINNER_ONBOARDING_KEY);
   } catch {
     // Ignore storage errors
   }
