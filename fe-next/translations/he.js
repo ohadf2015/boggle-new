@@ -1476,7 +1476,10 @@ const he = {
         "clueMerge": "הרמזים נצברים!",
         "clueMergeDesc": "כל ניחוש חושף עוד אותיות",
         "greenReveal": "מקום נכון = נשאר ירוק 🟩",
-        "yellowKnown": "מקום לא נכון = נשאר צהוב 🟨"
+        "yellowKnown": "מקום לא נכון = נשאר צהוב 🟨",
+        "lifeBarLabel": "מד חיים",
+        "clueTokensLabel": "אסימוני רמז",
+        "wordFound": "מילה נמצאה!"
       },
       "minLength": {
         "title": "רק 3+ אותיות",
@@ -1505,7 +1508,10 @@ const he = {
         "grayDesc": "לא במילה",
         "example": "דוגמה: היעד הוא \"BEACH\"",
         "exampleDesc": "E ירוק (נכון), A צהוב (מקום לא נכון)",
-        "gotIt": "הבנתי!"
+        "gotIt": "הבנתי!",
+        "legendGreen": "מקום נכון",
+        "legendYellow": "מקום לא נכון",
+        "legendGray": "לא במילה"
       },
       "complete": {
         "title": "מוכן לציד!",
@@ -2343,6 +2349,7 @@ const he = {
     "noWordsYet": "עדיין לא נמצאו מילים. התחל להחליק!",
     "victory": "ניצחון!",
     "gameOver": "המשחק נגמר",
+    "verifyingWords": "מאמת מילים...",
     "practiceComplete": "האימון הושלם!",
     "newHighScore": "שיא חדש!",
     "challengeComplete": "האתגר הושלם",

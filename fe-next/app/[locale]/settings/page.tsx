@@ -83,8 +83,8 @@ function ToggleButton({ isOn, onToggle, isDarkMode, onLabel = 'On', offLabel = '
     >
       <div
         className={cn(
-          "absolute top-0.5 w-7 h-7 bg-white rounded-full border-2 border-neo-black shadow-sm transition-all duration-200",
-          isOn ? "inset-inline-start-[28px]" : "inset-inline-start-[2px]"
+          "absolute top-0.5 start-0.5 w-7 h-7 bg-white rounded-full border-2 border-neo-black shadow-sm transition-transform duration-200",
+          isOn ? "translate-x-[26px] rtl:-translate-x-[26px]" : "translate-x-0"
         )}
       />
     </button>

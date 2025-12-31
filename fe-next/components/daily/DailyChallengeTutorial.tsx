@@ -157,7 +157,7 @@ const Step2WordDiscovery: React.FC<{ onNext: () => void; onPrev: () => void }> =
       <div className="bg-gray-100 dark:bg-gray-800 rounded-neo border-2 border-neo-black p-4 mb-4">
         {/* Life bar example */}
         <div className="mb-3">
-          <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">Life Bar</div>
+          <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">{t('tutorial.wordHunt.lifeSystem.lifeBarLabel') || 'Life Bar'}</div>
           <div className="bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden border-2 border-neo-black">
             <div className="h-full bg-green-500 flex items-center justify-center text-xs font-bold text-white" style={{ width: '85%' }}>
               <Heart className="w-3 h-3 mr-1 fill-current" />
@@ -168,7 +168,7 @@ const Step2WordDiscovery: React.FC<{ onNext: () => void; onPrev: () => void }> =
 
         {/* Tokens example */}
         <div className="mb-3">
-          <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">Clue Tokens</div>
+          <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">{t('tutorial.wordHunt.lifeSystem.clueTokensLabel') || 'Clue Tokens'}</div>
           <div className="flex items-center gap-1 px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 border-2 border-neo-black rounded-neo inline-flex">
             <Coins className="w-4 h-4 text-yellow-600" />
             <span className="font-bold text-sm">12</span>
@@ -176,7 +176,7 @@ const Step2WordDiscovery: React.FC<{ onNext: () => void; onPrev: () => void }> =
         </div>
 
         <div className="bg-green-50 dark:bg-green-900/20 border-2 border-green-500 rounded p-3 mb-3">
-          <div className="text-sm font-bold mb-1">✓ Word found!</div>
+          <div className="text-sm font-bold mb-1">✓ {t('tutorial.wordHunt.lifeSystem.wordFound') || 'Word found!'}</div>
           <div className="text-xs text-gray-600 dark:text-gray-400">
             {t('tutorial.wordHunt.lifeSystem.swipeToGain') || 'Swipe words to gain'} +15 ❤️ +2 🪙
           </div>
@@ -224,9 +224,9 @@ const Step3LetterFeedback: React.FC<{ onNext: () => void; onPrev: () => void }> 
         </div>
         {/* Compact legend */}
         <div className="flex justify-center gap-4 text-xs font-bold">
-          <span className="text-green-600 dark:text-green-400">🟩 Right spot</span>
-          <span className="text-yellow-600 dark:text-yellow-400">🟨 Wrong spot</span>
-          <span className="text-gray-500">⬜ Not in word</span>
+          <span className="text-green-600 dark:text-green-400">🟩 {t('tutorial.wordHunt.letterFeedback.legendGreen') || 'Right spot'}</span>
+          <span className="text-yellow-600 dark:text-yellow-400">🟨 {t('tutorial.wordHunt.letterFeedback.legendYellow') || 'Wrong spot'}</span>
+          <span className="text-gray-500">⬜ {t('tutorial.wordHunt.letterFeedback.legendGray') || 'Not in word'}</span>
         </div>
       </div>
 

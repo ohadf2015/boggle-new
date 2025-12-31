@@ -1474,7 +1474,10 @@ const ja = {
         "clueMerge": "ヒントが積み重なる！",
         "clueMergeDesc": "推測するたびに文字が明らかに",
         "greenReveal": "🟩 正解位置 = 緑のまま",
-        "yellowKnown": "🟨 位置違い = 黄色のまま"
+        "yellowKnown": "🟨 位置違い = 黄色のまま",
+        "lifeBarLabel": "ライフバー",
+        "clueTokensLabel": "ヒントトークン",
+        "wordFound": "単語発見！"
       },
       "minLength": {
         "title": "3文字以上のみ",
@@ -1503,7 +1506,10 @@ const ja = {
         "grayDesc": "単語にない",
         "example": "例：目標は「BEACH」",
         "exampleDesc": "Eは緑（正解）、Aは黄（位置違い）",
-        "gotIt": "わかった！"
+        "gotIt": "わかった！",
+        "legendGreen": "正解位置",
+        "legendYellow": "位置違い",
+        "legendGray": "単語にない"
       },
       "complete": {
         "title": "ハントの準備完了！",
@@ -2341,6 +2347,7 @@ const ja = {
     "noWordsYet": "まだ単語が見つかっていません。スワイプ開始！",
     "victory": "勝利！",
     "gameOver": "ゲームオーバー",
+    "verifyingWords": "単語を確認中...",
     "practiceComplete": "練習完了！",
     "newHighScore": "新記録！",
     "challengeComplete": "チャレンジ完了",

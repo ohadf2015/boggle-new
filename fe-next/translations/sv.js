@@ -1475,7 +1475,10 @@ const sv = {
         "clueMerge": "Ledtrådar staplas!",
         "clueMergeDesc": "Varje gissning avslöjar fler bokstäver",
         "greenReveal": "🟩 Rätt plats = förblir grön",
-        "yellowKnown": "🟨 Fel plats = förblir gul"
+        "yellowKnown": "🟨 Fel plats = förblir gul",
+        "lifeBarLabel": "Livstake",
+        "clueTokensLabel": "Ledtrådspoletter",
+        "wordFound": "Ord hittat!"
       },
       "minLength": {
         "title": "ENDAST 3+ BOKSTÄVER",
@@ -1504,7 +1507,10 @@ const sv = {
         "grayDesc": "Inte i ordet",
         "example": "Exempel: Målet är \"BEACH\"",
         "exampleDesc": "E är grön (korrekt), A är gul (fel plats)",
-        "gotIt": "Fattar!"
+        "gotIt": "Fattar!",
+        "legendGreen": "Rätt plats",
+        "legendYellow": "Fel plats",
+        "legendGray": "Inte i ordet"
       },
       "complete": {
         "title": "Redo att Jaga!",
@@ -2342,6 +2348,7 @@ const sv = {
     "noWordsYet": "Inga ord hittade än. Börja svep!",
     "victory": "Seger!",
     "gameOver": "Spelet slut",
+    "verifyingWords": "Verifierar ord...",
     "practiceComplete": "Övning slutförd!",
     "newHighScore": "Nytt rekord!",
     "challengeComplete": "Utmaning slutförd",

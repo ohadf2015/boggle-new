@@ -89,6 +89,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const [botScores, setBotScores] = useState<Record<string, number>>({});
   const [botWords, setBotWords] = useState<Record<string, string[]>>({});
   const [isGameOver, setIsGameOver] = useState(false);
+  const [isValidatingWords, setIsValidatingWords] = useState(false);
   const [boardTheme, setBoardTheme] = useState<BoardTheme | null>(null);
   // Available words from grid solver for bots to use
   const [availableWords, setAvailableWords] = useState<{
@@ -546,8 +547,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     const finalizeAndEndGame = async () => {
       const currentWords = foundWordsRef.current;
 
+      // Show loading indicator while validating
+      setIsValidatingWords(true);
+
       // Use shared utility for batch word validation
       const finalWords = await finalizeWordValidation(currentWords, settings.language, 3);
+
+      // Validation complete
+      setIsValidatingWords(false);
 
       // Calculate final score from validated words only
       const validWords = finalWords.filter(w => w.isValid === true);
@@ -1071,6 +1078,28 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           remainingSeconds={fireRoundRemaining}
         />
 
+        {/* Word Validation Loading Overlay */}
+        <AdaptiveAnimatePresence>
+          {isValidatingWords && (
+            <AdaptiveMotion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-50 flex items-center justify-center bg-neo-navy/90 backdrop-blur-sm"
+            >
+              <div className="flex flex-col items-center gap-4 p-6 bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard-lg">
+                <div className="relative w-12 h-12">
+                  <div className="absolute inset-0 border-4 border-neo-cyan/30 rounded-full" />
+                  <div className="absolute inset-0 border-4 border-transparent border-t-neo-cyan rounded-full animate-spin" />
+                </div>
+                <p className="text-neo-black font-bold text-lg">
+                  {t('singlePlayer.verifyingWords') || 'Verifying words...'}
+                </p>
+              </div>
+            </AdaptiveMotion.div>
+          )}
+        </AdaptiveAnimatePresence>
+
         {/* Achievement Progress Tracker - shows near-completion achievements, auto-dismisses 2s after game ends */}
         <AchievementProgressTracker
           validWordCount={validWordCount}
@@ -1301,7 +1330,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="relative space-y-2">
       {/* Earthquake Warning Overlay */}
       <EarthquakeWarning
         isVisible={earthquakeState === 'warning'}
@@ -1312,6 +1341,28 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         isActive={fireRoundActive}
         remainingSeconds={fireRoundRemaining}
       />
+
+      {/* Word Validation Loading Overlay */}
+      <AdaptiveAnimatePresence>
+        {isValidatingWords && (
+          <AdaptiveMotion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/90 backdrop-blur-sm"
+          >
+            <div className="flex flex-col items-center gap-4 p-6 bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard-lg">
+              <div className="relative w-12 h-12">
+                <div className="absolute inset-0 border-4 border-neo-cyan/30 rounded-full" />
+                <div className="absolute inset-0 border-4 border-transparent border-t-neo-cyan rounded-full animate-spin" />
+              </div>
+              <p className="text-neo-black font-bold text-lg">
+                {t('singlePlayer.verifyingWords') || 'Verifying words...'}
+              </p>
+            </div>
+          </AdaptiveMotion.div>
+        )}
+      </AdaptiveAnimatePresence>
 
       {/* Achievement Progress Tracker - shows near-completion achievements, auto-dismisses 2s after game ends */}
       <AchievementProgressTracker

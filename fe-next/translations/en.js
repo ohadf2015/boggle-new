@@ -1485,7 +1485,10 @@ const en = {
         "clueMerge": "Clues Stack Up!",
         "clueMergeDesc": "Every guess reveals more letters",
         "greenReveal": "🟩 Right spot = stays green",
-        "yellowKnown": "🟨 Wrong spot = stays yellow"
+        "yellowKnown": "🟨 Wrong spot = stays yellow",
+        "lifeBarLabel": "Life Bar",
+        "clueTokensLabel": "Clue Tokens",
+        "wordFound": "Word found!"
       },
       "minLength": {
         "title": "3+ LETTERS ONLY",
@@ -1514,7 +1517,10 @@ const en = {
         "grayDesc": "Not in the word",
         "example": "Example: Target is \"BEACH\"",
         "exampleDesc": "E is green (correct), A is yellow (wrong spot)",
-        "gotIt": "Got it!"
+        "gotIt": "Got it!",
+        "legendGreen": "Right spot",
+        "legendYellow": "Wrong spot",
+        "legendGray": "Not in word"
       },
       "complete": {
         "title": "Ready to Hunt!",
@@ -2352,6 +2358,7 @@ const en = {
     "noWordsYet": "Start swiping!",
     "victory": "Victory!",
     "gameOver": "Game Over",
+    "verifyingWords": "Verifying words...",
     "practiceComplete": "Practice Done!",
     "newHighScore": "New Record!",
     "challengeComplete": "Complete!",

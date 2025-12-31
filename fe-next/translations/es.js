@@ -2119,7 +2119,10 @@ const es = {
         "clueMerge": "¡Las Pistas se Acumulan!",
         "clueMergeDesc": "Cada intento revela más letras",
         "greenReveal": "🟩 Lugar correcto = verde fijo",
-        "yellowKnown": "🟨 Lugar incorrecto = amarillo fijo"
+        "yellowKnown": "🟨 Lugar incorrecto = amarillo fijo",
+        "lifeBarLabel": "Barra de Vida",
+        "clueTokensLabel": "Fichas de Pista",
+        "wordFound": "¡Palabra encontrada!"
       },
       "minLength": {
         "title": "SOLO 3+ LETRAS",
@@ -2148,7 +2151,10 @@ const es = {
         "grayDesc": "No está en la palabra",
         "example": "Ejemplo: Objetivo es \"BEACH\"",
         "exampleDesc": "E es verde (correcto), A es amarillo (lugar incorrecto)",
-        "gotIt": "¡Entendido!"
+        "gotIt": "¡Entendido!",
+        "legendGreen": "Lugar correcto",
+        "legendYellow": "Lugar incorrecto",
+        "legendGray": "No está"
       },
       "complete": {
         "title": "¡Listo para Cazar!",
@@ -2339,6 +2345,7 @@ const es = {
     "noWordsYet": "Aún no hay palabras. ¡Empieza a deslizar!",
     "victory": "¡Victoria!",
     "gameOver": "Juego Terminado",
+    "verifyingWords": "Verificando palabras...",
     "practiceComplete": "¡Práctica Completa!",
     "newHighScore": "¡Nuevo Récord!",
     "challengeComplete": "Desafío Completo",
