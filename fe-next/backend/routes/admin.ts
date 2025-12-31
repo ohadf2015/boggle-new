@@ -1809,6 +1809,79 @@ router.post('/daily-word/generate-retry-link', async (req: AdminRequest, res: Re
 });
 
 /**
+ * POST /api/admin/send-test-email
+ * Send a test daily challenge email to a specified address
+ */
+router.post('/send-test-email', async (req: AdminRequest, res: Response): Promise<void> => {
+  const startTime = Date.now();
+  logger.info('ADMIN_API', '====== Send test email request START ======');
+
+  try {
+    // Dynamic import to avoid issues with ES modules
+    const { sendTestEmail, isEmailServiceConfigured } = await import('../../lib/email');
+
+    // Check if email service is configured
+    if (!isEmailServiceConfigured()) {
+      logger.warn('ADMIN_API', 'Email service not configured');
+      res.status(503).json({
+        error: 'Email service not configured. Set RESEND_API_KEY and RESEND_FROM_EMAIL in your environment variables.',
+        details: {
+          hasApiKey: !!process.env.RESEND_API_KEY,
+          hasFromEmail: !!process.env.RESEND_FROM_EMAIL,
+        }
+      });
+      return;
+    }
+
+    // Get admin info from the request (already authenticated by middleware)
+    const supabase = getSupabase();
+    const { data: { user } } = await supabase.auth.getUser(req.headers.authorization?.substring(7));
+
+    if (!user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    // Parse request body
+    const { email, recipientName } = req.body || {};
+
+    // Use provided email or default to admin's email
+    const targetEmail = email || user.email;
+    if (!targetEmail) {
+      res.status(400).json({ error: 'No email address provided and admin has no email' });
+      return;
+    }
+
+    // Use provided name or default
+    const name = recipientName || req.adminUser?.username || 'Test User';
+
+    logger.info('ADMIN_API', `Sending test email to ${targetEmail}`);
+
+    // Send the test email
+    const result = await sendTestEmail(targetEmail, name);
+
+    if (!result.success) {
+      logger.warn('ADMIN_API', `Send failed: ${result.error}`);
+      res.status(500).json({ error: result.error || 'Failed to send test email' });
+      return;
+    }
+
+    logger.info('ADMIN_API', `====== SUCCESS - Total time: ${Date.now() - startTime}ms ======`);
+    auditLog(req.adminUser, 'SEND_TEST_EMAIL', { targetEmail });
+
+    res.json({
+      success: true,
+      message: `Test email sent to ${targetEmail}`,
+      sentTo: targetEmail,
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Send test email error: ${err.message}`);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
+/**
  * GET /api/admin/community-words/stats
  * Get community words statistics by language
  */
