@@ -12,16 +12,19 @@ interface UseContextualGuidanceReturn {
   showComboTip: boolean;
   showEarthquakeTip: boolean;
   showFireRoundTip: boolean;
+  showSwipeTip: boolean;
 
   // Dismiss functions
   dismissComboTip: () => void;
   dismissEarthquakeTip: () => void;
   dismissFireRoundTip: () => void;
+  dismissSwipeTip: () => void;
 
   // Trigger functions (call when event occurs)
   triggerComboGuidance: () => void;
   triggerEarthquakeGuidance: () => void;
   triggerFireRoundGuidance: () => void;
+  triggerSwipeTipGuidance: () => void;
 }
 
 /**
@@ -38,6 +41,7 @@ export function useContextualGuidance(): UseContextualGuidanceReturn {
   const [showComboTip, setShowComboTip] = useState(false);
   const [showEarthquakeTip, setShowEarthquakeTip] = useState(false);
   const [showFireRoundTip, setShowFireRoundTip] = useState(false);
+  const [showSwipeTip, setShowSwipeTip] = useState(false);
 
   // Track if we've already triggered during this session to prevent re-triggers
   const triggeredRef = useRef<Record<keyof GuidanceState, boolean>>({
@@ -45,6 +49,7 @@ export function useContextualGuidance(): UseContextualGuidanceReturn {
     earthquakeShown: false,
     fireRoundShown: false,
     directionPatternShown: false,
+    swipeTipShown: false,
   });
 
   // Trigger combo guidance - called when combo reaches 2 or higher
@@ -81,6 +86,17 @@ export function useContextualGuidance(): UseContextualGuidanceReturn {
     }
   }, []);
 
+  // Trigger swipe tip guidance - called when player hasn't submitted words after delay
+  const triggerSwipeTipGuidance = useCallback(() => {
+    if (triggeredRef.current.swipeTipShown) return;
+
+    if (shouldShowGuidance('swipeTipShown')) {
+      triggeredRef.current.swipeTipShown = true;
+      markGuidanceShown('swipeTipShown');
+      setShowSwipeTip(true);
+    }
+  }, []);
+
   // Dismiss functions
   const dismissComboTip = useCallback(() => {
     setShowComboTip(false);
@@ -94,16 +110,23 @@ export function useContextualGuidance(): UseContextualGuidanceReturn {
     setShowFireRoundTip(false);
   }, []);
 
+  const dismissSwipeTip = useCallback(() => {
+    setShowSwipeTip(false);
+  }, []);
+
   return {
     showComboTip,
     showEarthquakeTip,
     showFireRoundTip,
+    showSwipeTip,
     dismissComboTip,
     dismissEarthquakeTip,
     dismissFireRoundTip,
+    dismissSwipeTip,
     triggerComboGuidance,
     triggerEarthquakeGuidance,
     triggerFireRoundGuidance,
+    triggerSwipeTipGuidance,
   };
 }
 
@@ -158,4 +181,51 @@ export function useFireRoundGuidanceTrigger(
       triggerGuidance();
     }
   }, [isFireRoundActive, triggerGuidance]);
+}
+
+/**
+ * useSwipeTipGuidanceTrigger - Auto-triggers swipe tip when player hasn't submitted words
+ * Shows after delaySeconds if wordCount is still 0
+ */
+export function useSwipeTipGuidanceTrigger(
+  wordCount: number,
+  triggerGuidance: () => void,
+  isGameActive: boolean,
+  delaySeconds: number = 15
+): void {
+  const triggeredRef = useRef(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    // Clear any existing timer
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
+    // If already triggered or game not active, don't set new timer
+    if (triggeredRef.current || !isGameActive) {
+      return;
+    }
+
+    // If player has submitted words, mark as triggered (no need to show tip)
+    if (wordCount > 0) {
+      triggeredRef.current = true;
+      return;
+    }
+
+    // Set timer to show tip after delay if no words submitted
+    timerRef.current = setTimeout(() => {
+      if (wordCount === 0 && !triggeredRef.current) {
+        triggeredRef.current = true;
+        triggerGuidance();
+      }
+    }, delaySeconds * 1000);
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, [wordCount, triggerGuidance, isGameActive, delaySeconds]);
 }

@@ -2,6 +2,7 @@ import { createBrowserClient } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import logger from '@/utils/logger';
 import type { ProfileData, RankedProgress } from '@/contexts/auth/authTypes';
+import { broadcastSignedOut } from '@/utils/crossTabAuthSync';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -70,7 +71,13 @@ export async function signInWithDiscord() {
 
 export async function signOut() {
   if (!supabase) return { error: { message: 'Supabase not configured' } };
-  return supabase.auth.signOut();
+
+  // Broadcast sign out to other tabs before signing out
+  // This ensures other tabs clear their state immediately
+  broadcastSignedOut();
+
+  // Use global scope to sign out from all tabs/sessions
+  return supabase.auth.signOut({ scope: 'global' });
 }
 
 export async function getSession() {
@@ -90,7 +97,7 @@ export async function getProfile(userId: string): Promise<ProfileResult> {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
   const result = await supabase
     .from('profiles')
-    .select('id, username, display_name, avatar_emoji, avatar_color, profile_picture_url, profile_picture_provider, total_games, total_score, total_words, casual_games, casual_wins, ranked_games, ranked_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_xp, current_level, player_title, is_admin, total_hints_used, free_hints_available, country_code, created_at, updated_at, achievement_counts, total_time_played')
+    .select('id, username, display_name, avatar_emoji, avatar_color, profile_picture_url, profile_picture_provider, total_games, total_score, total_words, casual_games, casual_wins, ranked_games, ranked_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_xp, current_level, player_title, is_admin, total_hints_used, free_hints_available, country_code, created_at, updated_at, achievement_counts, total_time_played, total_coins, lifetime_coins_earned')
     .eq('id', userId)
     .single();
   return { data: result.data as ProfileData | null, error: result.error ? { message: result.error.message } : null };
@@ -245,4 +252,159 @@ export async function removeProfilePicture(userId: string) {
     .remove(filesToRemove);
 
   return { error };
+}
+
+// Coin management functions
+export interface CoinSyncResult {
+  success: boolean;
+  newBalance?: number;
+  error?: string;
+}
+
+/**
+ * Sync coins to the database (add coins to user's balance)
+ * This should be called after awarding coins locally to persist them
+ */
+export async function syncCoinsToDatabase(
+  userId: string,
+  amount: number,
+  reason: string,
+  metadata?: Record<string, string | number>
+): Promise<CoinSyncResult> {
+  if (!supabase) return { success: false, error: 'Supabase not configured' };
+  if (amount <= 0) return { success: false, error: 'Amount must be positive' };
+
+  try {
+    // Get current balance
+    const { data: profile, error: fetchError } = await supabase
+      .from('profiles')
+      .select('total_coins, lifetime_coins_earned')
+      .eq('id', userId)
+      .single();
+
+    if (fetchError) {
+      logger.error('Failed to fetch profile for coin sync:', fetchError);
+      return { success: false, error: fetchError.message };
+    }
+
+    const currentCoins = profile?.total_coins || 0;
+    const lifetimeCoins = profile?.lifetime_coins_earned || 0;
+    const newBalance = currentCoins + amount;
+    const newLifetime = lifetimeCoins + amount;
+
+    // Update profile with new coin balance
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({
+        total_coins: newBalance,
+        lifetime_coins_earned: newLifetime
+      })
+      .eq('id', userId);
+
+    if (updateError) {
+      logger.error('Failed to update coin balance:', updateError);
+      return { success: false, error: updateError.message };
+    }
+
+    // Log the transaction
+    await supabase
+      .from('coin_transactions')
+      .insert({
+        player_id: userId,
+        amount: amount,
+        balance_after: newBalance,
+        reason: reason,
+        metadata: metadata || {}
+      });
+
+    return { success: true, newBalance };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Unknown error';
+    logger.error('Coin sync error:', error);
+    return { success: false, error };
+  }
+}
+
+/**
+ * Spend coins from user's balance (deduct coins)
+ * Returns success if user has enough coins, false otherwise
+ */
+export async function spendCoinsFromDatabase(
+  userId: string,
+  amount: number,
+  reason: string,
+  metadata?: Record<string, string | number>
+): Promise<CoinSyncResult> {
+  if (!supabase) return { success: false, error: 'Supabase not configured' };
+  if (amount <= 0) return { success: false, error: 'Amount must be positive' };
+
+  try {
+    // Get current balance
+    const { data: profile, error: fetchError } = await supabase
+      .from('profiles')
+      .select('total_coins')
+      .eq('id', userId)
+      .single();
+
+    if (fetchError) {
+      return { success: false, error: fetchError.message };
+    }
+
+    const currentCoins = profile?.total_coins || 0;
+    if (currentCoins < amount) {
+      return { success: false, error: 'Insufficient coins' };
+    }
+
+    const newBalance = currentCoins - amount;
+
+    // Update profile with new coin balance
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ total_coins: newBalance })
+      .eq('id', userId);
+
+    if (updateError) {
+      return { success: false, error: updateError.message };
+    }
+
+    // Log the transaction (negative amount for spend)
+    await supabase
+      .from('coin_transactions')
+      .insert({
+        player_id: userId,
+        amount: -amount,
+        balance_after: newBalance,
+        reason: reason,
+        metadata: metadata || {}
+      });
+
+    return { success: true, newBalance };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : 'Unknown error';
+    return { success: false, error };
+  }
+}
+
+/**
+ * Get user's coin balance from database
+ */
+export async function getDatabaseCoinBalance(userId: string): Promise<{ coins: number; lifetime: number } | null> {
+  if (!supabase) return null;
+
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('total_coins, lifetime_coins_earned')
+      .eq('id', userId)
+      .single();
+
+    if (error || !data) return null;
+
+    return {
+      coins: data.total_coins || 0,
+      lifetime: data.lifetime_coins_earned || 0
+    };
+  } catch {
+    return null;
+  }
 }

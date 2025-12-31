@@ -42,6 +42,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { fetchGeolocation } from '@/contexts/auth/authUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { awardDailyCoins, spendCoins, canAfford, getCoins, COIN_COSTS } from '@/utils/coinManager';
+import { syncCoinsToDatabase } from '@/lib/supabase';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import {
   generateDailyShareImage,
@@ -184,7 +185,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [countryCode, setCountryCode] = useState<string | null>(null);
   const [countryCodeReady, setCountryCodeReady] = useState(false);
   const hasSubmittedRef = useRef(false);
-  const { profile, isAuthenticated } = useAuth();
+  const { user, profile, isAuthenticated } = useAuth();
 
   // Check for streak milestone
   const streakMilestone = getStreakMilestone(result.streakDays);
@@ -480,9 +481,25 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       );
       if (reward) {
         setCoinReward(reward);
+
+        // Sync coins to database for authenticated users
+        if (user?.id && reward.awarded > 0) {
+          syncCoinsToDatabase(
+            user.id,
+            reward.awarded,
+            'Daily Challenge',
+            {
+              puzzleDate,
+              language,
+              solved: result.solved ? 1 : 0,
+              efficiencyScore: result.efficiencyScore || 0,
+              streakDays: result.streakDays || 0
+            }
+          );
+        }
       }
     }
-  }, [isNewCompletion, puzzleDate, language, result.solved, result.efficiencyScore, result.streakDays]);
+  }, [isNewCompletion, puzzleDate, language, result.solved, result.efficiencyScore, result.streakDays, user?.id]);
 
   // Show signup modal for unauthenticated users based on smart triggers
   useEffect(() => {
@@ -534,14 +551,18 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   }, [result.solved, result.attemptsUsed, puzzleNumber, displayName, avatarEmoji, language]);
 
   // Generate shareable text (use streak from result, which is now properly tracked)
-  const shareText = generateWordHuntShareableResult({
-    ...result,
-    puzzleNumber,
-    puzzleDate,
-    language,
-    streakDays: result.streakDays || 0,
-    completedAt: result.completedAt || new Date().toISOString(),
-  });
+  // Pass the translation function so the share message is in the current language
+  const shareText = generateWordHuntShareableResult(
+    {
+      ...result,
+      puzzleNumber,
+      puzzleDate,
+      language,
+      streakDays: result.streakDays || 0,
+      completedAt: result.completedAt || new Date().toISOString(),
+    },
+    t
+  );
 
   // Combine share text with share URL for rich previews
   const shareTextWithUrl = useMemo(() => {

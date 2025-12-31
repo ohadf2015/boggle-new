@@ -19,7 +19,9 @@ import { useComboSystem } from '@/hooks/useComboSystem';
 import { useGameTimer } from '@/hooks/useGameTimer';
 import { useWordSubmission } from '@/hooks/useWordSubmission';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
+import { useContextualGuidance, useSwipeTipGuidanceTrigger } from '@/hooks/useContextualGuidance';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
+import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
 import { cn } from '@/lib/utils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { finalizeWordValidation } from '@/utils/wordValidationAPI';
@@ -114,6 +116,9 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   // Direction pattern guidance - shows when player only uses straight-line directions
   const directionGuidance = useDirectionPatternGuidance();
 
+  // Contextual guidance - manages all guidance tooltips
+  const contextualGuidance = useContextualGuidance();
+
   // Game timer - handles countdown with callbacks
   // Uses stableOnTimeUp to prevent timer restart on re-renders
   const timer = useGameTimer({
@@ -160,6 +165,16 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     isPaused: isGameOver,
     enabled: true,
   });
+
+  // Swipe tip guidance - shows after 15 seconds if player hasn't submitted any words
+  // Helps new players understand they need to swipe to form words
+  const isGameActive = !isGameOver && timer.remainingTime > 0;
+  useSwipeTipGuidanceTrigger(
+    wordSubmission.validWordCount + wordSubmission.foundWords.filter(w => w.isValid === null).length,
+    contextualGuidance.triggerSwipeTipGuidance,
+    isGameActive,
+    15 // 15 seconds delay
+  );
 
   // Stop music on unmount
   useEffect(() => {
@@ -415,6 +430,13 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       <DirectionGuidanceTooltip
         isVisible={directionGuidance.showDirectionGuidance}
         onDismiss={directionGuidance.dismissDirectionGuidance}
+        t={t}
+      />
+
+      {/* Swipe Tip Tooltip - shows after 15 seconds if player hasn't submitted any words */}
+      <SwipeTipTooltip
+        isVisible={contextualGuidance.showSwipeTip}
+        onDismiss={contextualGuidance.dismissSwipeTip}
         t={t}
       />
 

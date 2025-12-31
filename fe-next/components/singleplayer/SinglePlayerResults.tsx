@@ -30,6 +30,7 @@ import { applyHebrewFinalLetters } from '@/utils/utils';
 import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
 import { useResultsData } from './results';
 import { awardGameCoins } from '@/utils/coinManager';
+import { syncCoinsToDatabase } from '@/lib/supabase';
 
 // Dynamic import for PerformanceChart (heavy component)
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
@@ -60,7 +61,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   onBackToLobby,
 }) => {
   const { t, language } = useLanguage();
-  const { isAuthenticated, profile, updateProfile } = useAuth();
+  const { user, isAuthenticated, profile, updateProfile } = useAuth();
   const isLandscape = useMobileLandscape();
   const [expandedBot, setExpandedBot] = useState<string | null>(null);
   const [showSignupModal, setShowSignupModal] = useState(false);
@@ -282,10 +283,25 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
     if (reward) {
       setCoinReward(reward);
+
+      // Sync coins to database for authenticated users
+      if (user?.id && reward.awarded > 0) {
+        syncCoinsToDatabase(
+          user.id,
+          reward.awarded,
+          'Single Player Game',
+          {
+            sessionId,
+            score: results.playerScore,
+            rank: playerRank,
+            totalPlayers: allParticipants.length
+          }
+        );
+      }
     }
 
     hasAwardedCoinsRef.current = true;
-  }, [results.playerScore, results.gameSessionId, playerRank, allParticipants.length]);
+  }, [results.playerScore, results.gameSessionId, playerRank, allParticipants.length, user?.id]);
 
   // Show signup prompt for guests who have played 2+ games
   useEffect(() => {

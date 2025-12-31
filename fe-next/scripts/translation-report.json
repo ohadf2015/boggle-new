@@ -1,16 +1,51 @@
 {
   "summary": {
-    "totalKeysInCode": 1322,
+    "totalKeysInCode": 1327,
     "keyCountByLanguage": {
-      "en": 2279,
-      "he": 2279,
-      "sv": 2279,
-      "ja": 2279,
-      "es": 2279
+      "en": 2309,
+      "he": 2309,
+      "sv": 2309,
+      "ja": 2309,
+      "es": 2309
     },
-    "missingFromEnglish": 0
+    "missingFromEnglish": 2
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "coins.dailyChallenge",
+      "usages": [
+        {
+          "file": "app/[locale]/profile/page.tsx",
+          "line": 636
+        },
+        {
+          "file": "app/[locale]/profile/page.tsx",
+          "line": 636
+        },
+        {
+          "file": "app/[locale]/profile/page.tsx",
+          "line": 636
+        }
+      ]
+    },
+    {
+      "key": "coins.scoreBonus",
+      "usages": [
+        {
+          "file": "app/[locale]/profile/page.tsx",
+          "line": 629
+        },
+        {
+          "file": "app/[locale]/profile/page.tsx",
+          "line": 629
+        },
+        {
+          "file": "app/[locale]/profile/page.tsx",
+          "line": 629
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [],
     "sv": [],

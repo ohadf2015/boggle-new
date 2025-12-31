@@ -36,6 +36,8 @@ const PerformanceChart = dynamic(() => import('@/components/results/PerformanceC
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import { Users } from 'lucide-react';
 import { addGameToHistory } from '@/utils/gameHistoryManager';
+import { awardGameCoins } from '@/utils/coinManager';
+import { syncCoinsToDatabase } from '@/lib/supabase';
 import RoomChat from '@/components/RoomChat';
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
@@ -43,7 +45,7 @@ import { DIFFICULTIES } from '@/utils/consts';
 
 const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount, isHost = false, roomLanguage = 'en' }) => {
   const { t } = useLanguage();
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const isLandscape = useMobileLandscape();
   const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
@@ -54,6 +56,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   const hasUpdatedStatsRef = useRef<boolean>(false);
   const hasTrackedGameRef = useRef<boolean>(false);
   const hasAddedToHistoryRef = useRef<boolean>(false);
+  const hasAwardedCoinsRef = useRef<boolean>(false);
   // previousStreak needs to be state since it's used in render
   const [previousStreak, setPreviousStreak] = useState<number>(0);
 
@@ -149,6 +152,42 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       }
     }
   }, [isAuthenticated, finalScores, username, isCurrentUserWinner, achievements]);
+
+  // Award coins for multiplayer game completion
+  useEffect(() => {
+    if (hasAwardedCoinsRef.current || !currentPlayerData || !gameCode) return;
+
+    // Generate a session ID for this game
+    const sessionId = `mp_${gameCode}_${Date.now()}`;
+    const totalPlayers = sortedScores.length;
+
+    const reward = awardGameCoins(
+      sessionId,
+      'multiplayer',
+      currentPlayerData.score || 0,
+      currentPlayerRank,
+      totalPlayers
+    );
+
+    if (reward && reward.awarded > 0) {
+      // Sync coins to database for authenticated users
+      if (user?.id) {
+        syncCoinsToDatabase(
+          user.id,
+          reward.awarded,
+          'Multiplayer Game',
+          {
+            gameCode,
+            score: currentPlayerData.score || 0,
+            rank: currentPlayerRank,
+            totalPlayers
+          }
+        );
+      }
+    }
+
+    hasAwardedCoinsRef.current = true;
+  }, [currentPlayerData, currentPlayerRank, sortedScores.length, gameCode, user?.id]);
 
   // Track game completion and record win streak (only once)
   useEffect(() => {

@@ -2759,6 +2759,36 @@ const sv = {
       "justNow": "just nu",
       "minutesAgo": "{count}m sedan",
       "hoursAgo": "{count}h sedan"
+    },
+    "shareMessage": {
+      "header": "LexiClash Ordjakt #{number}",
+      "solvedIn": "Löst på {attempts}/10",
+      "failedAttempt": "X/10 - så nära!",
+      "genius1": "🧠 För lätt!",
+      "genius2": "🔥 Svettades inte ens",
+      "genius3": "⚡ Finns det ett lättläge?",
+      "genius4": "👑 Buga er, dödliga!",
+      "great1": "⚡ Krossade det!",
+      "great2": "💥 Det var tillfredsställande",
+      "great3": "🎯 Träff idag!",
+      "great4": "✨ Känner mig vass!",
+      "good1": "✨ Fixade det!",
+      "good2": "💫 Hjärnan fungerar fortfarande!",
+      "good3": "🙌 Inte illa!",
+      "good4": "👏 Det duger!",
+      "close1": "😅 Det var FÖR nära!",
+      "close2": "💫 Klarade det knappt!",
+      "close3": "🎉 Överlevnadsläge: aktiverat!",
+      "close4": "😮‍💨 Puh!",
+      "fail1": "💪 Nästa gång!",
+      "fail2": "🔄 Imorgon är min!",
+      "fail3": "😤 Det ordet var orättvist!",
+      "fail4": "🎲 Dåligt bräde!",
+      "cta1": "Tror du att du kan bättre?",
+      "cta2": "Din tur.",
+      "cta3": "Slå det.",
+      "cta4": "Jag utmanar dig att försöka.",
+      "cta5": "Lycka till med att slå det!"
     }
   },
   "guidance": {
@@ -2777,6 +2807,10 @@ const sv = {
     "directionPattern": {
       "title": "Prova V & L-former!",
       "text": "Dra V-former, L-former eller sicksack! Din väg kan byta riktning när som helst - gå höger, sedan ner, sedan diagonalt, allt i ett ord."
+    },
+    "swipeTip": {
+      "title": "Svep för att bilda ord!",
+      "text": "Dra fingret över bokstäverna för att bilda ord. Koppla ihop angränsande bokstäver i valfri riktning!"
     },
     "dismiss": "Förstått!"
   },

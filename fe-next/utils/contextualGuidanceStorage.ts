@@ -12,6 +12,7 @@ export interface GuidanceState {
   earthquakeShown: boolean;
   fireRoundShown: boolean;
   directionPatternShown: boolean;
+  swipeTipShown: boolean;
 }
 
 const DEFAULT_STATE: GuidanceState = {
@@ -19,6 +20,7 @@ const DEFAULT_STATE: GuidanceState = {
   earthquakeShown: false,
   fireRoundShown: false,
   directionPatternShown: false,
+  swipeTipShown: false,
 };
 
 /**
@@ -75,6 +77,7 @@ export function hasCompletedAllGuidance(): boolean {
     state.comboShown &&
     state.earthquakeShown &&
     state.fireRoundShown &&
-    state.directionPatternShown
+    state.directionPatternShown &&
+    state.swipeTipShown
   );
 }

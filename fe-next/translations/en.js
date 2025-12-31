@@ -2769,6 +2769,36 @@ const en = {
       "justNow": "just now",
       "minutesAgo": "{count}m ago",
       "hoursAgo": "{count}h ago"
+    },
+    "shareMessage": {
+      "header": "LexiClash Word Hunt #{number}",
+      "solvedIn": "Solved in {attempts}/10",
+      "failedAttempt": "X/10 - so close!",
+      "genius1": "🧠 Too easy!",
+      "genius2": "🔥 Didn't even break a sweat",
+      "genius3": "⚡ Is this thing on easy mode?",
+      "genius4": "👑 Bow down, peasants!",
+      "great1": "⚡ Crushed it!",
+      "great2": "💥 That was satisfying",
+      "great3": "🎯 On point today!",
+      "great4": "✨ Feeling sharp!",
+      "good1": "✨ Got there!",
+      "good2": "💫 Brain still works!",
+      "good3": "🙌 Not bad!",
+      "good4": "👏 That'll do!",
+      "close1": "😅 That was TOO close!",
+      "close2": "💫 Squeaked through!",
+      "close3": "🎉 Survival mode: activated!",
+      "close4": "😮‍💨 Phew!",
+      "fail1": "💪 Next time!",
+      "fail2": "🔄 Tomorrow's mine!",
+      "fail3": "😤 This word was unfair!",
+      "fail4": "🎲 Bad board!",
+      "cta1": "Think you can do better?",
+      "cta2": "Your turn.",
+      "cta3": "Beat that.",
+      "cta4": "I dare you to try.",
+      "cta5": "Good luck topping this!"
     }
   },
   "guidance": {
@@ -2787,6 +2817,10 @@ const en = {
     "directionPattern": {
       "title": "Try V & L Shapes!",
       "text": "Trace V-shapes, L-shapes, or zigzags! Your path can change direction at any point - go right, then down, then diagonal all in one word."
+    },
+    "swipeTip": {
+      "title": "Swipe to Form Words!",
+      "text": "Drag your finger across letters to form words. Connect adjacent letters in any direction!"
     },
     "dismiss": "Got it!"
   },

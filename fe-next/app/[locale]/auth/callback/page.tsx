@@ -6,6 +6,16 @@ import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { defaultLocale } from '@/lib/i18n';
 import { isRecoverableError, isRefreshTokenError, getAuthErrorMessage, type SupabaseAuthError } from '@/contexts/auth';
+import {
+  tryAcquireCodeLock,
+  isCodeLockedByOther,
+  releaseCodeLock,
+  broadcastAuthSuccess,
+  broadcastAuthFailed,
+  subscribeToAuthSync,
+  initCrossTabAuthSync,
+  type AuthSyncMessage,
+} from '@/utils/crossTabAuthSync';
 
 // Loading UI component
 function LoadingUI(): React.ReactNode {
@@ -19,9 +29,7 @@ function LoadingUI(): React.ReactNode {
   );
 }
 
-// Cross-tab coordination keys
-const AUTH_CODE_LOCK_KEY = 'boggle_auth_code_lock';
-const AUTH_CODE_LOCK_TIMEOUT = 15000; // 15 seconds max lock time
+// Timeout for code exchange
 const CODE_EXCHANGE_TIMEOUT = 15000; // 15 seconds timeout for code exchange
 
 // Helper to wrap a promise with a timeout
@@ -38,7 +46,7 @@ function AuthCallbackContent(): React.ReactNode {
   const searchParams = useSearchParams();
   const params = useParams();
   const hasHandledCallback = useRef<boolean>(false);
-  const storageListenerCleanup = useRef<(() => void) | null>(null);
+  const cleanupFunctions = useRef<(() => void)[]>([]);
 
   // Get locale from URL params, fallback to default
   const locale = (params?.locale as string) || defaultLocale;
@@ -57,62 +65,15 @@ function AuthCallbackContent(): React.ReactNode {
 
   // Helper to safely redirect (clears URL params and navigates)
   const safeRedirect = useCallback((url: string) => {
-    // Clean up any storage listeners
-    if (storageListenerCleanup.current) {
-      storageListenerCleanup.current();
-      storageListenerCleanup.current = null;
-    }
+    // Clean up all listeners
+    cleanupFunctions.current.forEach(fn => fn());
+    cleanupFunctions.current = [];
     // Clear URL params to prevent reprocessing on back navigation
     window.history.replaceState(null, '', window.location.pathname);
     router.replace(url);
   }, [router]);
 
-  // Check if another tab has locked this code
-  const isCodeLocked = useCallback((code: string): boolean => {
-    try {
-      const lockData = localStorage.getItem(AUTH_CODE_LOCK_KEY);
-      if (!lockData) return false;
-
-      const lock = JSON.parse(lockData);
-      // Check if lock is for this code and still valid
-      if (lock.code === code && Date.now() - lock.timestamp < AUTH_CODE_LOCK_TIMEOUT) {
-        return true;
-      }
-      // Clear stale lock
-      localStorage.removeItem(AUTH_CODE_LOCK_KEY);
-      return false;
-    } catch {
-      return false;
-    }
-  }, []);
-
-  // Lock the code for this tab
-  const lockCode = useCallback((code: string): boolean => {
-    try {
-      // Double-check lock before acquiring
-      if (isCodeLocked(code)) {
-        return false;
-      }
-      localStorage.setItem(AUTH_CODE_LOCK_KEY, JSON.stringify({
-        code,
-        timestamp: Date.now()
-      }));
-      return true;
-    } catch {
-      return true; // Proceed if localStorage fails
-    }
-  }, [isCodeLocked]);
-
-  // Release the code lock
-  const releaseLock = useCallback(() => {
-    try {
-      localStorage.removeItem(AUTH_CODE_LOCK_KEY);
-    } catch {
-      // Ignore errors
-    }
-  }, []);
-
-  // Poll for session when another tab is handling the code
+  // Wait for session from another tab using BroadcastChannel + polling
   const waitForSessionFromOtherTab = useCallback(async (next: string, maxWaitMs = 10000): Promise<boolean> => {
     if (!supabase) return false;
 
@@ -120,22 +81,35 @@ function AuthCallbackContent(): React.ReactNode {
     const pollInterval = 500; // Check every 500ms
 
     return new Promise((resolve) => {
-      // Listen for storage events (session changes from other tabs)
-      const storageHandler = async () => {
-        if (!supabase) return;
-        const { data } = await supabase.auth.getSession();
-        if (data?.session) {
-          logger.log('Auth callback: Session detected from other tab via storage event');
+      let resolved = false;
+
+      // Subscribe to cross-tab auth messages
+      const unsubscribe = subscribeToAuthSync((message: AuthSyncMessage) => {
+        if (resolved) return;
+
+        if (message.type === 'AUTH_SUCCESS') {
+          logger.log('Auth callback: Received AUTH_SUCCESS from other tab');
+          resolved = true;
           cleanup();
-          safeRedirect(next);
-          resolve(true);
+          // Give a moment for session to sync via cookies
+          setTimeout(async () => {
+            if (!supabase) return;
+            const { data } = await supabase.auth.getSession();
+            if (data?.session) {
+              safeRedirect(next);
+              resolve(true);
+            } else {
+              // Session not synced yet, keep polling
+              resolved = false;
+            }
+          }, 200);
         }
-      };
+      });
 
-      window.addEventListener('storage', storageHandler);
-
-      // Also poll periodically in case storage events are missed
+      // Also poll periodically in case BroadcastChannel events are missed
       const pollTimer = setInterval(async () => {
+        if (resolved) return;
+
         if (Date.now() - startTime >= maxWaitMs) {
           cleanup();
           resolve(false);
@@ -146,6 +120,7 @@ function AuthCallbackContent(): React.ReactNode {
         const { data } = await supabase.auth.getSession();
         if (data?.session) {
           logger.log('Auth callback: Session detected from other tab via polling');
+          resolved = true;
           cleanup();
           safeRedirect(next);
           resolve(true);
@@ -154,18 +129,20 @@ function AuthCallbackContent(): React.ReactNode {
 
       // Also set a timeout as a final fallback
       const timeoutTimer = setTimeout(() => {
-        cleanup();
-        resolve(false);
+        if (!resolved) {
+          cleanup();
+          resolve(false);
+        }
       }, maxWaitMs);
 
       const cleanup = () => {
-        window.removeEventListener('storage', storageHandler);
+        unsubscribe();
         clearInterval(pollTimer);
         clearTimeout(timeoutTimer);
       };
 
       // Store cleanup function for component unmount
-      storageListenerCleanup.current = cleanup;
+      cleanupFunctions.current.push(cleanup);
     });
   }, [safeRedirect]);
 
@@ -174,12 +151,16 @@ function AuthCallbackContent(): React.ReactNode {
     if (hasHandledCallback.current) return;
     hasHandledCallback.current = true;
 
+    // Initialize cross-tab sync
+    initCrossTabAuthSync();
+
     const handleCallback = async (): Promise<void> => {
       const next = getRedirectUrl();
 
       try {
         if (!supabase) {
           logger.error('Supabase not configured');
+          broadcastAuthFailed('Supabase not configured');
           safeRedirect(`/${locale}?auth_error=true`);
           return;
         }
@@ -205,7 +186,7 @@ function AuthCallbackContent(): React.ReactNode {
 
         if (code) {
           // CROSS-TAB COORDINATION: Check if another tab is handling this code
-          if (isCodeLocked(code)) {
+          if (isCodeLockedByOther(code)) {
             logger.log('Auth callback: Code is being handled by another tab, waiting for session');
             const gotSession = await waitForSessionFromOtherTab(next);
             if (!gotSession) {
@@ -222,8 +203,8 @@ function AuthCallbackContent(): React.ReactNode {
             return;
           }
 
-          // Try to acquire lock for this code
-          const gotLock = lockCode(code);
+          // Try to acquire lock for this code using atomic pattern
+          const gotLock = tryAcquireCodeLock(code);
           if (!gotLock) {
             // Another tab just acquired the lock
             logger.log('Auth callback: Another tab just acquired lock, waiting for session');
@@ -234,6 +215,7 @@ function AuthCallbackContent(): React.ReactNode {
                 safeRedirect(next);
                 return;
               }
+              broadcastAuthFailed('Timed out waiting for other tab');
               safeRedirect(`/${locale}?auth_error=true`);
             }
             return;
@@ -250,7 +232,7 @@ function AuthCallbackContent(): React.ReactNode {
           );
 
           // Release lock after exchange attempt
-          releaseLock();
+          releaseCodeLock();
 
           if (error) {
             const authError = error as SupabaseAuthError;
@@ -267,11 +249,14 @@ function AuthCallbackContent(): React.ReactNode {
               const { data: retrySession } = await supabase.auth.getSession();
               if (retrySession?.session) {
                 logger.log('Auth callback: Found session after failed exchange');
+                // Broadcast success since we have a valid session
+                broadcastAuthSuccess(retrySession.session.user.id);
                 safeRedirect(next);
                 return;
               }
             }
             logger.error('Auth callback: Code exchange error:', getAuthErrorMessage(authError));
+            broadcastAuthFailed(getAuthErrorMessage(authError));
             safeRedirect(`/${locale}?auth_error=true`);
             return;
           }
@@ -280,6 +265,8 @@ function AuthCallbackContent(): React.ReactNode {
           // This avoids timing issues where getSession() might not immediately return the new session
           if (data?.session) {
             logger.log('Auth callback: Session established successfully from code exchange');
+            // Broadcast success to other tabs
+            broadcastAuthSuccess(data.session.user.id);
             safeRedirect(next);
             return;
           }
@@ -288,6 +275,7 @@ function AuthCallbackContent(): React.ReactNode {
           const { data: sessionData } = await supabase.auth.getSession();
           if (sessionData?.session) {
             logger.log('Auth callback: Session found in fallback getSession()');
+            broadcastAuthSuccess(sessionData.session.user.id);
             safeRedirect(next);
             return;
           }
@@ -312,12 +300,14 @@ function AuthCallbackContent(): React.ReactNode {
           if (sessionError) {
             const authError = sessionError as SupabaseAuthError;
             logger.error('Auth callback: Error setting session from hash tokens:', getAuthErrorMessage(authError));
+            broadcastAuthFailed(getAuthErrorMessage(authError));
             safeRedirect(`/${locale}?auth_error=true`);
             return;
           }
 
           if (sessionData?.session) {
             logger.log('Auth callback: Session established from hash tokens');
+            broadcastAuthSuccess(sessionData.session.user.id);
             safeRedirect(next);
             return;
           }
@@ -329,27 +319,31 @@ function AuthCallbackContent(): React.ReactNode {
         const { data: finalCheck } = await supabase.auth.getSession();
         if (finalCheck?.session) {
           logger.log('Auth callback: Session found in final check');
+          broadcastAuthSuccess(finalCheck.session.user.id);
           safeRedirect(next);
           return;
         }
 
         // Fallback: redirect to home with error
         logger.warn('Auth callback: No session found, redirecting with error');
+        broadcastAuthFailed('No session found');
         safeRedirect(`/${locale}?auth_error=true`);
       } catch (err) {
         logger.error('Auth callback exception:', err);
-        releaseLock();
+        releaseCodeLock();
 
         // Before giving up, check if another tab succeeded (timeout case)
         if (supabase) {
           const { data: recoverySession } = await supabase.auth.getSession();
           if (recoverySession?.session) {
             logger.log('Auth callback: Found session after exception, redirecting');
+            broadcastAuthSuccess(recoverySession.session.user.id);
             safeRedirect(getRedirectUrl());
             return;
           }
         }
 
+        broadcastAuthFailed(err instanceof Error ? err.message : 'Unknown error');
         safeRedirect(`/${locale}?auth_error=true`);
       }
     };
@@ -358,11 +352,10 @@ function AuthCallbackContent(): React.ReactNode {
 
     // Cleanup on unmount
     return () => {
-      if (storageListenerCleanup.current) {
-        storageListenerCleanup.current();
-      }
+      cleanupFunctions.current.forEach(fn => fn());
+      cleanupFunctions.current = [];
     };
-  }, [router, searchParams, locale, getRedirectUrl, safeRedirect, isCodeLocked, lockCode, releaseLock, waitForSessionFromOtherTab]);
+  }, [router, searchParams, locale, getRedirectUrl, safeRedirect, waitForSessionFromOtherTab]);
 
   return <LoadingUI />;
 }

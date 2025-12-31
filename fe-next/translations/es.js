@@ -2756,6 +2756,36 @@ const es = {
       "justNow": "ahora mismo",
       "minutesAgo": "hace {count}m",
       "hoursAgo": "hace {count}h"
+    },
+    "shareMessage": {
+      "header": "LexiClash Caza de Palabras #{number}",
+      "solvedIn": "Resuelto en {attempts}/10",
+      "failedAttempt": "X/10 - ¡tan cerca!",
+      "genius1": "🧠 ¡Demasiado fácil!",
+      "genius2": "🔥 Ni siquiera sudé",
+      "genius3": "⚡ ¿Hay un modo fácil?",
+      "genius4": "👑 ¡Arrodíllense, mortales!",
+      "great1": "⚡ ¡Lo aplasté!",
+      "great2": "💥 Eso fue satisfactorio",
+      "great3": "🎯 ¡En el blanco hoy!",
+      "great4": "✨ ¡Me siento afilado!",
+      "good1": "✨ ¡Lo logré!",
+      "good2": "💫 ¡El cerebro aún funciona!",
+      "good3": "🙌 ¡No está mal!",
+      "good4": "👏 ¡Eso servirá!",
+      "close1": "😅 ¡Eso fue MUY cerca!",
+      "close2": "💫 ¡Por los pelos!",
+      "close3": "🎉 ¡Modo supervivencia: activado!",
+      "close4": "😮‍💨 ¡Uf!",
+      "fail1": "💪 ¡La próxima!",
+      "fail2": "🔄 ¡Mañana es mío!",
+      "fail3": "😤 ¡Esta palabra era injusta!",
+      "fail4": "🎲 ¡Mal tablero!",
+      "cta1": "¿Crees que puedes hacerlo mejor?",
+      "cta2": "Tu turno.",
+      "cta3": "Supera eso.",
+      "cta4": "Te reto a intentarlo.",
+      "cta5": "¡Buena suerte superando esto!"
     }
   },
   "guidance": {
@@ -2774,6 +2804,10 @@ const es = {
     "directionPattern": {
       "title": "¡Prueba Formas V y L!",
       "text": "¡Traza formas de V, L o zigzag! Tu trazo puede cambiar de dirección en cualquier punto - ve a la derecha, luego abajo, luego en diagonal, todo en una palabra."
+    },
+    "swipeTip": {
+      "title": "¡Desliza para formar palabras!",
+      "text": "Arrastra el dedo sobre las letras para formar palabras. ¡Conecta letras adyacentes en cualquier dirección!"
     },
     "dismiss": "¡Entendido!"
   },

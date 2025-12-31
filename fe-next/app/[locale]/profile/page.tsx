@@ -604,7 +604,7 @@ export default function ProfilePage(): React.ReactNode {
             {t('coins.description') || 'Earn coins by playing games, winning matches, and unlocking achievements. Use them to collect special items!'}
           </p>
 
-          {/* Coin earning breakdown */}
+          {/* Coin earning breakdown - values match coinManager.ts */}
           <div className={cn(
             'grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-xl',
             isDarkMode ? 'bg-slate-900/50' : 'bg-gray-50'
@@ -614,28 +614,28 @@ export default function ProfilePage(): React.ReactNode {
               <p className={cn('text-xs font-medium mt-1', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
                 {t('coins.perGame') || 'Per Game'}
               </p>
-              <p className="font-bold text-neo-yellow">+10</p>
+              <p className="font-bold text-neo-yellow">+10-15</p>
             </div>
             <div className="text-center">
               <span className="text-lg">🏆</span>
               <p className={cn('text-xs font-medium mt-1', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
                 {t('coins.winBonus') || 'Win Bonus'}
               </p>
-              <p className="font-bold text-neo-yellow">+20</p>
+              <p className="font-bold text-neo-yellow">+25</p>
             </div>
             <div className="text-center">
-              <span className="text-lg">🏅</span>
+              <span className="text-lg">📊</span>
               <p className={cn('text-xs font-medium mt-1', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-                {t('coins.achievement') || 'Achievement'}
+                {t('coins.scoreBonus') || 'Score Bonus'}
               </p>
-              <p className="font-bold text-neo-yellow">+50</p>
+              <p className="font-bold text-neo-yellow">+score/10</p>
             </div>
             <div className="text-center">
-              <span className="text-lg">⬆️</span>
+              <span className="text-lg">🎯</span>
               <p className={cn('text-xs font-medium mt-1', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-                {t('coins.levelUp') || 'Level Up'}
+                {t('coins.dailyChallenge') || 'Daily'}
               </p>
-              <p className="font-bold text-neo-yellow">+100</p>
+              <p className="font-bold text-neo-yellow">+25-95</p>
             </div>
           </div>
 

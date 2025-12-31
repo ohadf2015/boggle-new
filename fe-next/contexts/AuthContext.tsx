@@ -19,6 +19,14 @@ import { setSentryUser, clearSentryUser } from '@/utils/sentry';
 import type { User } from '@supabase/supabase-js';
 import { linkSessionToUser } from '@/utils/sessionTracking';
 import { getRandomAvatar } from '@/utils/avatarConfig';
+import {
+  initCrossTabAuthSync,
+  destroyCrossTabAuthSync,
+  subscribeToAuthSync,
+  broadcastSignedOut,
+  broadcastAuthSuccess,
+  type AuthSyncMessage,
+} from '@/utils/crossTabAuthSync';
 
 // Import types and utils from auth module
 import type { ProfileData, RankedProgress, AuthContextValue } from './auth';
@@ -276,7 +284,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   // Initialize and check auth state
   useEffect(() => {
     let subscription: { unsubscribe: () => void } | null = null;
+    let crossTabUnsubscribe: (() => void) | null = null;
     let isMounted = true;
+
+    // Initialize cross-tab auth sync
+    initCrossTabAuthSync();
 
     const initAuth = async () => {
       const configured = await isSupabaseConfigured();
@@ -401,6 +413,56 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }
       );
       subscription = data.subscription;
+
+      // Subscribe to cross-tab auth sync messages
+      crossTabUnsubscribe = subscribeToAuthSync(async (message: AuthSyncMessage) => {
+        if (!isMounted || !supabase) return;
+
+        logger.debug(`AuthContext: Received cross-tab message: ${message.type}`);
+
+        switch (message.type) {
+          case 'AUTH_SUCCESS':
+            // Another tab successfully authenticated - check for session
+            logger.log('AuthContext: Another tab authenticated, checking for session');
+            try {
+              const { data: sessionData } = await supabase.auth.getSession();
+              if (sessionData?.session?.user && isMounted) {
+                // Session synced from other tab - update state
+                setUser(sessionData.session.user);
+                await fetchUserData(sessionData.session.user.id, sessionData.session.user.user_metadata);
+                setLoading(false);
+              }
+            } catch (err) {
+              logger.warn('AuthContext: Error handling cross-tab auth success:', err);
+            }
+            break;
+
+          case 'SIGNED_OUT':
+            // Another tab signed out - clear our state too
+            logger.log('AuthContext: Another tab signed out, clearing state');
+            setUser(null);
+            setProfile(null);
+            setRankedProgress(null);
+            setLoading(false);
+            break;
+
+          case 'SESSION_REFRESHED':
+            // Another tab refreshed the session - ensure we have fresh state
+            try {
+              const { data: sessionData } = await supabase.auth.getSession();
+              if (sessionData?.session?.user && isMounted) {
+                setUser(sessionData.session.user);
+              }
+            } catch (err) {
+              logger.warn('AuthContext: Error handling cross-tab session refresh:', err);
+            }
+            break;
+
+          default:
+            // Ignore other message types (CODE_LOCK_ACQUIRED, CODE_LOCK_RELEASED)
+            break;
+        }
+      });
     };
 
     // Listen for auth errors from API calls
@@ -465,6 +527,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       if (subscription) {
         subscription.unsubscribe();
       }
+      if (crossTabUnsubscribe) {
+        crossTabUnsubscribe();
+      }
+      destroyCrossTabAuthSync();
       window.removeEventListener('supabase-auth-error', handleAuthError as EventListener);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };

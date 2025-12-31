@@ -1062,19 +1062,48 @@ ${dailyUrl}`;
 }
 
 /**
+ * Translation function type for share messages
+ */
+type ShareTranslationFn = (key: string) => string;
+
+/**
  * Generate Word Hunt share text
  * Clean, simple, and engaging - no emoji grid, just the result
  * NOTE: URL is NOT included here - it's added by the share mechanisms to avoid duplication
+ *
+ * @param result - The word hunt result
+ * @param t - Optional translation function. If provided, uses translated messages.
+ * @param siteUrl - Optional site URL (deprecated, kept for backward compatibility)
  */
-export function generateWordHuntShareableResult(result: WordHuntResult, siteUrl?: string): string {
+export function generateWordHuntShareableResult(
+  result: WordHuntResult,
+  t?: ShareTranslationFn,
+  siteUrl?: string
+): string {
   // Format the main result message
   const resultEmoji = result.solved ? '🎯' : '💪';
-  const resultText = result.solved
-    ? `Solved in ${result.attemptsUsed}/10`
-    : `X/10 - so close!`;
 
-  // Fun performance messages with variety based on attempts
-  const performanceMessages = {
+  // Get translated result text
+  const resultText = result.solved
+    ? (t ? t('wordHunt.shareMessage.solvedIn').replace('{attempts}', String(result.attemptsUsed)) : `Solved in ${result.attemptsUsed}/10`)
+    : (t ? t('wordHunt.shareMessage.failedAttempt') : `X/10 - so close!`);
+
+  // Get translated header
+  const header = t
+    ? t('wordHunt.shareMessage.header').replace('{number}', String(result.puzzleNumber))
+    : `LexiClash Word Hunt #${result.puzzleNumber}`;
+
+  // Performance message tiers with translation keys
+  const performanceTiers = {
+    genius: ['genius1', 'genius2', 'genius3', 'genius4'],
+    great: ['great1', 'great2', 'great3', 'great4'],
+    good: ['good1', 'good2', 'good3', 'good4'],
+    close: ['close1', 'close2', 'close3', 'close4'],
+    fail: ['fail1', 'fail2', 'fail3', 'fail4'],
+  };
+
+  // Fallback English messages for when no translation function is provided
+  const fallbackMessages = {
     genius: ['🧠 Too easy!', '🔥 Didn\'t even break a sweat', '⚡ Is this thing on easy mode?', '👑 Bow down, peasants!'],
     great: ['⚡ Crushed it!', '💥 That was satisfying', '🎯 On point today!', '✨ Feeling sharp!'],
     good: ['✨ Got there!', '💫 Brain still works!', '🙌 Not bad!', '👏 That\'ll do!'],
@@ -1084,31 +1113,41 @@ export function generateWordHuntShareableResult(result: WordHuntResult, siteUrl?
 
   let performanceMsg = '';
   if (result.solved) {
-    let tier: keyof typeof performanceMessages;
+    let tier: keyof typeof performanceTiers;
     if (result.attemptsUsed <= 2) tier = 'genius';
     else if (result.attemptsUsed <= 4) tier = 'great';
     else if (result.attemptsUsed <= 6) tier = 'good';
     else tier = 'close';
 
-    const messages = performanceMessages[tier];
-    performanceMsg = messages[Math.floor(Math.random() * messages.length)];
+    const keys = performanceTiers[tier];
+    const randomIdx = Math.floor(Math.random() * keys.length);
+    performanceMsg = t
+      ? t(`wordHunt.shareMessage.${keys[randomIdx]}`)
+      : fallbackMessages[tier][randomIdx];
   } else {
-    const messages = performanceMessages.fail;
-    performanceMsg = messages[Math.floor(Math.random() * messages.length)];
+    const keys = performanceTiers.fail;
+    const randomIdx = Math.floor(Math.random() * keys.length);
+    performanceMsg = t
+      ? t(`wordHunt.shareMessage.${keys[randomIdx]}`)
+      : fallbackMessages.fail[randomIdx];
   }
 
   // Pick a random competitive CTA for variety
-  const competitiveCTAs = [
+  const ctaKeys = ['cta1', 'cta2', 'cta3', 'cta4', 'cta5'];
+  const fallbackCTAs = [
     'Think you can do better?',
     'Your turn.',
     'Beat that.',
     'I dare you to try.',
     'Good luck topping this!',
   ];
-  const cta = competitiveCTAs[Math.floor(Math.random() * competitiveCTAs.length)];
+  const ctaRandomIdx = Math.floor(Math.random() * ctaKeys.length);
+  const cta = t
+    ? t(`wordHunt.shareMessage.${ctaKeys[ctaRandomIdx]}`)
+    : fallbackCTAs[ctaRandomIdx];
 
   // Build the shareable text - simple and engaging (URL added separately by share mechanisms)
-  return `${resultEmoji} LexiClash Word Hunt #${result.puzzleNumber}
+  return `${resultEmoji} ${header}
 
 ${resultText} ${performanceMsg}
 
@@ -1122,10 +1161,11 @@ ${cta} 🎮`;
 export function getWordHuntShareTextForPlatform(
   result: WordHuntResult,
   platform: 'whatsapp' | 'twitter' | 'telegram' | 'copy',
+  t?: ShareTranslationFn,
   siteUrl = 'lexiclash.live'
 ): string {
   // Same clean text for all platforms - no extra messages to avoid duplicate links
-  return generateWordHuntShareableResult(result, siteUrl);
+  return generateWordHuntShareableResult(result, t, siteUrl);
 }
 
 /**
