@@ -150,6 +150,7 @@ const es = {
     "showLess": "Menos",
     "showMore": "Más",
     "moreOptions": "Más",
+    "moreShareOptions": "Más opciones para compartir",
     "or": "o",
     "closeMenu": "Cerrar",
     "openMenu": "Menú",
@@ -405,7 +406,9 @@ const es = {
     "skipButton": "Saltar"
   },
   "error": {
-    "subscriptionFailed": "La suscripción falló. Por favor intenta de nuevo."
+    "subscriptionFailed": "La suscripción falló. Por favor intenta de nuevo.",
+    "generic": "Algo salió mal",
+    "notAuthenticated": "Inicia sesión para continuar"
   },
   "difficulty": {
     "easy": "Fácil",
@@ -1650,7 +1653,30 @@ const es = {
         "allTimeLeaderboard": "Aparecer en la clasificación de todos los tiempos"
       },
       "autoSaveNote": "Tu resultado se guardará automáticamente después de registrarte",
-      "maybeLater": "Quizás después"
+      "maybeLater": "Quizás después",
+      "continueAsGuest": "Continuar como invitado"
+    },
+    "inlineSignup": {
+      "title": "Regístrate para aparecer en la clasificación",
+      "subtitle": "Guarda tu resultado y compite globalmente",
+      "orContinueWith": "o continúa con email",
+      "emailPlaceholder": "Dirección de email",
+      "passwordPlaceholder": "Contraseña (8+ caracteres)",
+      "signUpButton": "Crear cuenta",
+      "signingUp": "Creando...",
+      "checkEmail": "¡Revisa tu email para verificar tu cuenta!",
+      "emailInUse": "Este email ya está registrado",
+      "weakPassword": "La contraseña debe tener al menos 8 caracteres",
+      "invalidEmail": "Por favor ingresa un email válido",
+      "emailRequired": "Email requerido",
+      "passwordRequired": "Contraseña requerida",
+      "passwordTooShort": "Contraseña muy corta",
+      "benefits": {
+        "leaderboard": "Reclama tu lugar en la tabla",
+        "syncDevices": "Sincroniza tu progreso",
+        "protectStreak": "Protege tu racha",
+        "trackStats": "Sigue tus estadísticas"
+      }
     }
   },
   "legal": {
@@ -2064,6 +2090,12 @@ const es = {
     "skipHint": "ESC o Saltar para ir al juego 🎮",
     "swipeHint": "← Desliza para navegar →"
   },
+  "tutorialPrompt": {
+    "title": "¿Primera vez aquí?",
+    "subtitle": "Aprende lo básico en 30 segundos",
+    "start": "Empezar",
+    "later": "Después"
+  },
   "tutorial": {
     "stepLabel": "{current}/{total}",
     "skip": "Saltar",
@@ -2274,7 +2306,7 @@ const es = {
     "moreForDictionary": "más para el diccionario"
   },
   "footer": {
-    "howToPlay": "Cómo Jugar",
+    "aboutGame": "Sobre el Juego",
     "leaderboard": "Clasificación",
     "interactiveTutorial": "Tutorial Interactivo"
   },
@@ -2302,7 +2334,8 @@ const es = {
     },
     "hint": "¿Nuevo en el juego? ¡Empieza con Un Jugador para aprender!",
     "openRooms": "salas abiertas",
-    "playersLive": "jugando ahora"
+    "playersLive": "jugando ahora",
+    "tutorial": "Tutorial"
   },
   "modeDiscovery": {
     "title": "¿Listo para más?",
@@ -2583,6 +2616,23 @@ const es = {
     "canYouBeatMyScore": "¿Puedes superar mi puntuación?",
     "targetWordLength": "Encuentra la palabra oculta:",
     "onlyMatchingLength": "¡Solo las palabras de {length} letras usan tus intentos!",
+    "tookChallenge": "aceptaron el desafío",
+    "signUpToAppear": "¡Regístrate para aparecer en la clasificación!",
+    "carousel": {
+      "step1Title": "Desliza para formar palabras",
+      "step1Desc": "Conecta letras en cualquier dirección",
+      "step1Grid": "C,A,O,G,T,E,D,S,R",
+      "step1Highlighted": "0,1,4,7",
+      "step2Title": "Pistas de color",
+      "step2Green": "Lugar correcto",
+      "step2Yellow": "Lugar incorrecto",
+      "step2Gray": "No está",
+      "step2Letters": "G,A,M,E",
+      "step2Colors": "green,yellow,gray,green",
+      "step3Title": "Encuentra la palabra oculta",
+      "step3Desc": "10 intentos para descifrar",
+      "step3Hint": "Adivina palabras de {length} letras para ver pistas"
+    },
     "share": {
       "header": "LexiClash Daily #{number}",
       "stats": "{score} pts | {words} palabras",
@@ -2612,6 +2662,7 @@ const es = {
     "howToPlay": "¡Caza la palabra oculta de {length} letras usando pistas de retroalimentación! Tienes {max} intentos para encontrarla.",
     "shareResult": "Compartir Resultado",
     "shareAttempt": "Compartir Intento",
+    "shareChallengeFriends": "Desafía a tus amigos",
     "playAgainTomorrow": "¡Vuelve mañana para un nuevo puzzle!",
     "tryAnotherLanguage": "Prueba Otro Idioma",
     "playDifferentLanguage": "¡Desafíate en un idioma diferente!",
@@ -2724,6 +2775,8 @@ const es = {
       "revealTargetWord": "Revelar palabra objetivo",
       "yourCoins": "Tus monedas:",
       "notEnoughCoins": "no tienes suficientes monedas",
+      "seeTheAnswer": "Ver la respuesta correcta",
+      "earnMoreHint": "¡Gana desafíos para conseguir más monedas!",
       "wantToRetry": "¿Quieres intentarlo de nuevo?",
       "retryChallenge": "Reintentar desafío",
       "needMoreCoins": "necesitas {amount} más",

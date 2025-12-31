@@ -827,7 +827,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               </>
             )}
 
-            {/* Collapsible: Words */}
+            {/* Collapsible: Words (only show if there are words) */}
+            {results.playerWordData && results.playerWordData.length > 0 && (
+            <>
             <button
               onClick={() => setShowWords(!showWords)}
               aria-expanded={showWords}
@@ -835,14 +837,14 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             >
               <span className="flex items-center gap-2">
                 <Hash className="w-4 h-4" />
-                {t('results.viewAllWords') || 'View All Words'} ({results.playerWordData?.length || 0})
+                {t('results.viewAllWords') || 'View All Words'} ({results.playerWordData.length})
               </span>
               <motion.div animate={{ rotate: showWords ? 180 : 0 }} transition={{ duration: 0.2 }}>
                 <ChevronDown className="w-5 h-5" />
               </motion.div>
             </button>
             <AnimatePresence>
-              {showWords && results.playerWordData && results.playerWordData.length > 0 && (
+              {showWords && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
@@ -866,6 +868,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 </motion.div>
               )}
             </AnimatePresence>
+            </>
+            )}
 
             {/* Collapsible: Achievements */}
             {results.achievements && results.achievements.length > 0 && (

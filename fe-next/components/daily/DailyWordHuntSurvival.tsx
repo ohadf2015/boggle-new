@@ -753,9 +753,51 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           <X className="w-4 h-4 mr-1" />
           {t('common.quit') || 'Quit'}
         </Button>
-        <span className="px-2 py-0.5 bg-neo-purple/20 text-neo-black dark:text-neo-purple text-xs font-bold rounded-full">
-          🎯 #{puzzleNumber}
-        </span>
+
+        {/* Coins + Shop in corner */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 border-2 border-neo-black rounded-neo">
+            <Coins className="w-4 h-4 text-yellow-600" />
+            <span className="font-bold text-sm">{clueTokens}</span>
+          </div>
+          <div className="relative">
+            <Button
+              size="sm"
+              onClick={() => {
+                setShowShop(!showShop);
+                setShowShopHint(false);
+              }}
+              className={cn(
+                "bg-neo-purple text-white relative hover:bg-neo-purple/80",
+                showShopHint && "animate-pulse ring-2 ring-neo-yellow ring-offset-1"
+              )}
+            >
+              <Store className="w-4 h-4" />
+              {clueTokens > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-neo-yellow text-neo-black text-xs font-bold rounded-full flex items-center justify-center border border-neo-black">
+                  !
+                </span>
+              )}
+            </Button>
+
+            {/* Non-intrusive hint tooltip */}
+            <AnimatePresence>
+              {showShopHint && (
+                <motion.div
+                  initial={{ opacity: 0, y: 5, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 5, scale: 0.95 }}
+                  className="absolute top-full right-0 mt-2 z-50"
+                >
+                  <div className="bg-neo-yellow text-neo-black text-xs font-bold px-3 py-1.5 rounded-neo border-2 border-neo-black whitespace-nowrap shadow-hard-sm">
+                    <Lightbulb className="w-3 h-3 inline mr-1" />
+                    {t('wordHunt.survival.needHelp') || 'Need help? Try a clue!'}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
 
       {/* Target word black boxes - always visible */}
@@ -774,7 +816,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           )}
         >
           {/* Label for the clue area */}
-          <div className="flex justify-center mb-2">
+          <div className="flex justify-center mb-1">
             <span className={cn(
               "text-xs font-bold uppercase tracking-wider px-3 py-0.5 rounded-full transition-colors",
               showFeedbackOverlay
@@ -787,6 +829,21 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
               }
             </span>
           </div>
+
+          {/* Tries counter - big and prominent */}
+          <div className="text-center mb-2">
+            <span className={cn(
+              "text-xl sm:text-2xl font-black",
+              MAX_ATTEMPTS - attempts.length <= 2
+                ? "text-red-600 dark:text-red-400"
+                : MAX_ATTEMPTS - attempts.length <= 4
+                  ? "text-yellow-600 dark:text-yellow-400"
+                  : "text-gray-700 dark:text-gray-300"
+            )}>
+              {MAX_ATTEMPTS - attempts.length}/{MAX_ATTEMPTS} {t('wordHunt.survival.triesLeft') || 'tries left'}
+            </span>
+          </div>
+
           {/* Black boxes for target word OR Letter Feedback Overlay */}
           <div className="flex justify-center flex-wrap gap-1.5 sm:gap-2 px-2">
             <AnimatePresence mode="wait">
@@ -992,73 +1049,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       )}
 
 
-      {/* Prominent Attempts Counter */}
-      <motion.div
-        className={cn(
-          "flex flex-col gap-0.5 rounded-neo border-2 mx-auto max-w-3xl w-full mb-0.5",
-          MAX_ATTEMPTS - attempts.length <= 2
-            ? "bg-red-100 dark:bg-red-900/30 border-red-500"
-            : MAX_ATTEMPTS - attempts.length <= 4
-              ? "bg-yellow-100 dark:bg-yellow-900/30 border-yellow-500"
-              : "bg-green-100 dark:bg-green-900/30 border-green-500"
-        )}
-        animate={MAX_ATTEMPTS - attempts.length <= 2 && !isGameOver ? {
-          scale: [1, 1.02, 1],
-        } : {}}
-        transition={{ duration: 0.5, repeat: MAX_ATTEMPTS - attempts.length <= 2 ? Infinity : 0 }}
-      >
-        {/* Main row */}
-        <div className="flex items-center justify-between gap-2 sm:gap-3 px-2 py-0.5 sm:py-1">
-          {/* Attempts dots indicator */}
-          <div className="flex items-center gap-0.5 sm:gap-1">
-            {[...Array(MAX_ATTEMPTS)].map((_, i) => (
-              <motion.div
-                key={i}
-                className={cn(
-                  "w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full border border-neo-black/50",
-                  i < attempts.length
-                    ? "bg-gray-400 dark:bg-gray-600" // Used attempt
-                    : MAX_ATTEMPTS - attempts.length <= 2
-                      ? "bg-red-500" // Critical - remaining
-                      : MAX_ATTEMPTS - attempts.length <= 4
-                        ? "bg-yellow-500" // Warning - remaining
-                        : "bg-green-500" // Safe - remaining
-                )}
-                initial={false}
-                animate={i === attempts.length - 1 && attempts.length > 0 ? {
-                  scale: [1, 0.5, 1]
-                } : {}}
-                transition={{ duration: 0.3 }}
-              />
-            ))}
-          </div>
-
-          {/* Text indicator */}
-          <div className={cn(
-            "text-xs sm:text-sm font-black",
-            MAX_ATTEMPTS - attempts.length <= 2
-              ? "text-red-600 dark:text-red-400"
-              : MAX_ATTEMPTS - attempts.length <= 4
-                ? "text-yellow-600 dark:text-yellow-400"
-                : "text-green-600 dark:text-green-400"
-          )}>
-            {MAX_ATTEMPTS - attempts.length} {t('wordHunt.survival.triesLeft') || 'left'}
-          </div>
-
-          {/* Words discovered - integrated */}
-          <div className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
-            📖 {discoveredWords.length}
-          </div>
-        </div>
-
-        {/* Hint: Only matching length words count as tries */}
-        <div className="text-[9px] sm:text-[10px] text-center text-gray-500 dark:text-gray-400 pb-0.5 px-2">
-          {t('wordHunt.survival.onlyMatchingLengthHint')?.replace('{length}', String(targetWord.length)) || `Only ${targetWord.length}-letter words use tries`}
-        </div>
-      </motion.div>
-
-
-      {/* Life bar + Clue tokens - positioned directly above board */}
+      {/* Life bar - positioned directly above board */}
       <div className="flex items-center gap-2 mb-1 max-w-3xl mx-auto w-full relative">
         {/* Life gain animation - positioned above the life bar section, outside overflow-hidden */}
         <LifeGainAnimation
@@ -1149,52 +1140,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           )}
 
         </motion.div>
-
-        {/* Clue tokens */}
-        <div className="flex items-center gap-1 px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 border-2 border-neo-black rounded-neo">
-          <Coins className="w-4 h-4 text-yellow-600" />
-          <span className="font-bold text-sm">{clueTokens}</span>
-        </div>
-
-        {/* Shop button - subtle indicator when tokens available */}
-        <div className="relative">
-          <Button
-            size="sm"
-            onClick={() => {
-              setShowShop(!showShop);
-              setShowShopHint(false);
-            }}
-            className={cn(
-              "bg-neo-purple text-white relative hover:bg-neo-purple/80",
-              showShopHint && "animate-pulse ring-2 ring-neo-yellow ring-offset-1"
-            )}
-          >
-            <Store className="w-4 h-4" />
-            {clueTokens > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-neo-yellow text-neo-black text-xs font-bold rounded-full flex items-center justify-center border border-neo-black">
-                !
-              </span>
-            )}
-          </Button>
-
-          {/* Non-intrusive hint tooltip */}
-          <AnimatePresence>
-            {showShopHint && (
-              <motion.div
-                initial={{ opacity: 0, y: 5, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 5, scale: 0.95 }}
-                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50"
-              >
-                <div className="bg-neo-yellow text-neo-black text-xs font-bold px-3 py-1.5 rounded-neo border-2 border-neo-black whitespace-nowrap shadow-hard-sm">
-                  <Lightbulb className="w-3 h-3 inline mr-1" />
-                  {t('wordHunt.survival.needHelp') || 'Need help? Try a clue!'}
-                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-transparent border-b-neo-black" />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
       </div>
 
       {/* Game Grid */}

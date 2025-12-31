@@ -150,6 +150,7 @@ const he = {
     "showLess": "פחות",
     "showMore": "עוד",
     "moreOptions": "עוד",
+    "moreShareOptions": "עוד אפשרויות שיתוף",
     "or": "או",
     "closeMenu": "סגור תפריט",
     "openMenu": "פתח תפריט",
@@ -405,7 +406,9 @@ const he = {
     "skipButton": "דלג"
   },
   "error": {
-    "subscriptionFailed": "ההרשמה נכשלה. אנא נסה שוב."
+    "subscriptionFailed": "ההרשמה נכשלה. אנא נסה שוב.",
+    "generic": "משהו השתבש",
+    "notAuthenticated": "התחבר כדי להמשיך"
   },
   "difficulty": {
     "easy": "קל",
@@ -1419,6 +1422,12 @@ const he = {
     "skipHint": "ESC או דלג לקפוץ למשחק 🎮",
     "swipeHint": "החלק לניווט → ←"
   },
+  "tutorialPrompt": {
+    "title": "פעם ראשונה?",
+    "subtitle": "למדו את הבסיס ב-30 שניות",
+    "start": "התחל",
+    "later": "אחר כך"
+  },
   "tutorial": {
     "stepLabel": "{current}/{total}",
     "skip": "דלג",
@@ -1890,7 +1899,30 @@ const he = {
         "allTimeLeaderboard": "להופיע בטבלת המובילים הכללית"
       },
       "autoSaveNote": "התוצאה שלך תישמר אוטומטית לאחר ההרשמה",
-      "maybeLater": "אולי אחר כך"
+      "maybeLater": "אולי אחר כך",
+      "continueAsGuest": "המשך כאורח"
+    },
+    "inlineSignup": {
+      "title": "הירשם כדי להופיע בטבלה",
+      "subtitle": "שמור את התוצאה שלך והתחרה גלובלית",
+      "orContinueWith": "או המשך עם אימייל",
+      "emailPlaceholder": "כתובת אימייל",
+      "passwordPlaceholder": "סיסמה (8+ תווים)",
+      "signUpButton": "צור חשבון",
+      "signingUp": "יוצר...",
+      "checkEmail": "בדוק את האימייל שלך לאימות החשבון!",
+      "emailInUse": "כתובת האימייל הזו כבר רשומה",
+      "weakPassword": "הסיסמה צריכה להכיל לפחות 8 תווים",
+      "invalidEmail": "אנא הזן כתובת אימייל תקינה",
+      "emailRequired": "נדרש אימייל",
+      "passwordRequired": "נדרשת סיסמה",
+      "passwordTooShort": "סיסמה קצרה מדי",
+      "benefits": {
+        "leaderboard": "תפוס מקום בטבלת המובילים",
+        "syncDevices": "סנכרן בין מכשירים",
+        "protectStreak": "הגן על הרצף שלך 🔥",
+        "trackStats": "עקוב אחר הדירוגים"
+      }
     }
   },
   "legal": {
@@ -2278,7 +2310,7 @@ const he = {
     "moreForDictionary": "עוד להוספה למילון"
   },
   "footer": {
-    "howToPlay": "איך משחקים",
+    "aboutGame": "על המשחק",
     "leaderboard": "טבלת מובילים",
     "interactiveTutorial": "מדריך אינטראקטיבי"
   },
@@ -2306,7 +2338,8 @@ const he = {
     },
     "hint": "חדש במשחק? התחל עם שחקן יחיד כדי ללמוד את הכללים!",
     "openRooms": "חדרים פתוחים",
-    "playersLive": "משחקים עכשיו"
+    "playersLive": "משחקים עכשיו",
+    "tutorial": "מדריך"
   },
   "modeDiscovery": {
     "title": "מוכנים לעוד? 🚀",
@@ -2587,6 +2620,23 @@ const he = {
     "canYouBeatMyScore": "תוכלו לנצח את הניקוד שלי?",
     "targetWordLength": "מצאו את המילה המוסתרת:",
     "onlyMatchingLength": "רק מילים בנות {length} אותיות משתמשות בניסיונות!",
+    "tookChallenge": "קיבלו את האתגר",
+    "signUpToAppear": "הירשמו כדי להופיע בטבלה!",
+    "carousel": {
+      "step1Title": "החליקו למילים",
+      "step1Desc": "חברו אותיות בכל כיוון",
+      "step1Grid": "C,A,O,G,T,E,D,S,R",
+      "step1Highlighted": "0,1,4,7",
+      "step2Title": "רמזי צבע",
+      "step2Green": "מקום נכון",
+      "step2Yellow": "מקום שגוי",
+      "step2Gray": "לא במילה",
+      "step2Letters": "G,A,M,E",
+      "step2Colors": "green,yellow,gray,green",
+      "step3Title": "מצאו את המילה",
+      "step3Desc": "10 ניסיונות לפצח את הקוד",
+      "step3Hint": "נחשו מילים בנות {length} אותיות לגילוי רמזים"
+    },
     "share": {
       "header": "אתגר יומי #{number} LexiClash",
       "stats": "{score} נק' | {words} מילים",
@@ -2616,6 +2666,7 @@ const he = {
     "howToPlay": "חפשו את המילה המוסתרת בת {length} אותיות באמצעות רמזים! יש לכם {max} ניסיונות למצוא אותה.",
     "shareResult": "שתפו תוצאה",
     "shareAttempt": "שתפו ניסיון",
+    "shareChallengeFriends": "אתגרו את החברים",
     "playAgainTomorrow": "חזרו מחר לפאזל חדש!",
     "tryAnotherLanguage": "נסו שפה אחרת",
     "playDifferentLanguage": "אתגרו את עצמכם בשפה אחרת!",
@@ -2728,6 +2779,8 @@ const he = {
       "revealTargetWord": "חשוף מילת יעד",
       "yourCoins": "המטבעות שלך:",
       "notEnoughCoins": "אין מספיק מטבעות",
+      "seeTheAnswer": "ראו מה חיפשתם",
+      "earnMoreHint": "נצחו באתגרים כדי להרוויח עוד מטבעות!",
       "wantToRetry": "רוצים לנסות שוב?",
       "retryChallenge": "נסה שוב",
       "needMoreCoins": "חסרים {amount}",

@@ -58,7 +58,7 @@ export function generateUnsubscribeToken(): string {
  * Get the current puzzle number (days since launch)
  */
 function getPuzzleNumber(): number {
-  const launchDate = new Date('2024-12-01'); // Adjust to your actual launch date
+  const launchDate = new Date('2025-12-30'); // Puzzle #1 = 2025-12-30, Puzzle #2 = 2025-12-31
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const diffTime = today.getTime() - launchDate.getTime();
@@ -214,9 +214,11 @@ function generateDailyChallengeEmail(
   puzzleNumber: number,
   unsubscribeUrl: string,
   playUrl: string,
+  baseUrl: string,
   language: string = 'en'
 ): { subject: string; html: string; text: string } {
   const subject = getSubjectLine(puzzleNumber);
+  const logoUrl = `${baseUrl}/logos/lexiclash_logo_english-min.png`;
 
   const html = `
 <!DOCTYPE html>
@@ -230,61 +232,63 @@ function generateDailyChallengeEmail(
   <table role="presentation" style="width: 100%; border-collapse: collapse;">
     <tr>
       <td align="center" style="padding: 40px 20px;">
-        <table role="presentation" style="max-width: 500px; width: 100%; border-collapse: collapse;">
+        <table role="presentation" style="max-width: 480px; width: 100%; border-collapse: collapse;">
           <!-- Logo -->
           <tr>
-            <td align="center" style="padding-bottom: 30px;">
-              <h1 style="margin: 0; font-size: 32px; font-weight: 900;">
-                <span style="color: #FFE135;">Lexi</span><span style="color: #FF6B35;">Clash</span>
-              </h1>
+            <td align="center" style="padding-bottom: 24px;">
+              <a href="${baseUrl}" style="text-decoration: none;">
+                <img src="${logoUrl}" alt="LexiClash" width="180" style="display: block; max-width: 180px; height: auto;" />
+              </a>
             </td>
           </tr>
 
           <!-- Main Card -->
           <tr>
-            <td style="background-color: #2a2a4e; border: 4px solid #000; border-radius: 8px; padding: 32px; box-shadow: 6px 6px 0px #000;">
+            <td style="background: linear-gradient(180deg, #2a2a4e 0%, #1f1f3a 100%); border: 4px solid #000; border-radius: 12px; padding: 28px 24px; box-shadow: 8px 8px 0px #000;">
+              <!-- Daily Number Badge -->
+              <table role="presentation" style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+                <tr>
+                  <td align="center">
+                    <span style="display: inline-block; background-color: #FFE135; color: #000; font-size: 14px; font-weight: 900; padding: 6px 16px; border: 3px solid #000; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
+                      Daily #${puzzleNumber}
+                    </span>
+                  </td>
+                </tr>
+              </table>
+
               <!-- Greeting -->
-              <p style="color: #ffffff; font-size: 20px; margin: 0 0 16px 0; font-weight: 600;">
-                ${recipientName}, your daily is here! 🎯
+              <h1 style="color: #ffffff; font-size: 24px; margin: 0 0 12px 0; font-weight: 800; text-align: center; line-height: 1.3;">
+                ${recipientName}, it's go time! ⚡
+              </h1>
+
+              <!-- Short Punchy Message -->
+              <p style="color: #00FFFF; font-size: 16px; line-height: 1.5; margin: 0 0 24px 0; text-align: center; font-weight: 600;">
+                One grid. One shot. Beat the world.
               </p>
 
-              <!-- Main Message -->
-              <h2 style="color: #FFE135; font-size: 28px; font-weight: 900; margin: 0 0 16px 0;">
-                Daily #${puzzleNumber}
-              </h2>
-
-              <p style="color: #e0e0e0; font-size: 16px; line-height: 1.6; margin: 0 0 8px 0;">
-                Same grid. Same target word. <strong style="color: #00FFFF;">One shot to prove you're the best.</strong>
-              </p>
-
-              <p style="color: #a0a0a0; font-size: 14px; line-height: 1.5; margin: 0 0 24px 0;">
-                Find the hidden word before your lives run out. Compare scores with friends and the world.
-              </p>
-
-              <!-- CTA Button -->
+              <!-- CTA Button - Large and Bold -->
               <table role="presentation" style="width: 100%; border-collapse: collapse;">
                 <tr>
                   <td align="center">
-                    <a href="${playUrl}" style="display: inline-block; background-color: #FFE135; color: #000; font-size: 18px; font-weight: 900; text-decoration: none; padding: 16px 40px; border: 4px solid #000; border-radius: 8px; box-shadow: 4px 4px 0px #000; text-transform: uppercase; letter-spacing: 1px;">
-                      ⚡ Hunt Now
+                    <a href="${playUrl}" style="display: block; width: 100%; max-width: 280px; background-color: #FFE135; color: #000; font-size: 22px; font-weight: 900; text-decoration: none; padding: 18px 32px; border: 4px solid #000; border-radius: 12px; box-shadow: 6px 6px 0px #000; text-transform: uppercase; letter-spacing: 2px; text-align: center;">
+                      🎯 PLAY NOW
                     </a>
                   </td>
                 </tr>
               </table>
 
               <!-- Streak Reminder -->
-              <p style="color: #00FFFF; font-size: 14px; margin: 24px 0 0 0; text-align: center; font-weight: 600;">
-                🔥 Keep your streak alive!
+              <p style="color: #FF6B35; font-size: 15px; margin: 20px 0 0 0; text-align: center; font-weight: 700;">
+                🔥 Don't break your streak!
               </p>
             </td>
           </tr>
 
           <!-- Footer -->
           <tr>
-            <td style="padding-top: 24px; text-align: center;">
-              <p style="color: #888; font-size: 12px; margin: 0;">
-                You're getting this because you're a LexiClash player.<br>
-                <a href="${unsubscribeUrl}" style="color: #888; text-decoration: underline;">Unsubscribe</a> anytime.
+            <td style="padding-top: 20px; text-align: center;">
+              <p style="color: #666; font-size: 11px; margin: 0; line-height: 1.6;">
+                <a href="${unsubscribeUrl}" style="color: #888; text-decoration: underline;">Unsubscribe</a>
               </p>
             </td>
           </tr>
@@ -297,20 +301,17 @@ function generateDailyChallengeEmail(
 `;
 
   const text = `
-${recipientName}, your daily is here!
+${recipientName}, it's go time!
 
 DAILY #${puzzleNumber}
 
-Same grid. Same target word. One shot to prove you're the best.
+One grid. One shot. Beat the world.
 
-Find the hidden word before your lives run out. Compare scores with friends and the world.
+🎯 PLAY NOW: ${playUrl}
 
-Play now: ${playUrl}
-
-Keep your streak alive!
+🔥 Don't break your streak!
 
 ---
-You're getting this because you're a LexiClash player.
 Unsubscribe: ${unsubscribeUrl}
 `;
 
@@ -349,7 +350,7 @@ export async function sendDailyChallengeEmail(
   }
 
   const puzzleNumber = getPuzzleNumber();
-  const unsubscribeUrl = `${baseUrl}/unsubscribe?token=${unsubscribeToken}`;
+  const unsubscribeUrl = `${baseUrl}/api/email/unsubscribe?token=${unsubscribeToken}`;
   const playUrl = `${baseUrl}/en/daily`; // TODO: Use user's preferred language
   const recipientName = recipient.display_name || recipient.username || 'Word Hunter';
 
@@ -357,7 +358,8 @@ export async function sendDailyChallengeEmail(
     recipientName,
     puzzleNumber,
     unsubscribeUrl,
-    playUrl
+    playUrl,
+    baseUrl
   );
 
   try {
@@ -448,14 +450,15 @@ export async function sendTestEmail(
 
   const puzzleNumber = getPuzzleNumber();
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.com';
-  const unsubscribeUrl = `${baseUrl}/unsubscribe?token=test-token-preview`;
+  const unsubscribeUrl = `${baseUrl}/api/email/unsubscribe?token=test-token-preview`;
   const playUrl = `${baseUrl}/en/daily`;
 
   const { subject, html, text } = generateDailyChallengeEmail(
     recipientName,
     puzzleNumber,
     unsubscribeUrl,
-    playUrl
+    playUrl,
+    baseUrl
   );
 
   console.warn('[Email] Sending via Resend...', { subject });

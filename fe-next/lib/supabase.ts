@@ -69,6 +69,34 @@ export async function signInWithDiscord() {
   });
 }
 
+export async function signUpWithEmail(email: string, password: string) {
+  if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
+
+  // Include current locale in the callback URL so we can redirect back correctly
+  const currentLocale = getCurrentLocale();
+  const redirectUrl = new URL('/auth/callback', window.location.origin);
+  if (currentLocale) {
+    redirectUrl.searchParams.set('locale', currentLocale);
+  }
+
+  return supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: redirectUrl.toString(),
+    },
+  });
+}
+
+export async function signInWithEmail(email: string, password: string) {
+  if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
+
+  return supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+}
+
 export async function signOut() {
   if (!supabase) return { error: { message: 'Supabase not configured' } };
 

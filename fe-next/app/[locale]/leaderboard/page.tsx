@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLeaderboard, useUserRank } from '@/hooks/useSupabaseRealtime';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { cn } from '@/lib/utils';
+import Avatar from '@/components/Avatar';
 
 interface LeaderboardEntry {
   player_id: string;
@@ -20,6 +21,8 @@ interface LeaderboardEntry {
   username?: string;
   avatar_emoji?: string;
   avatar_color?: string;
+  avatar_image?: string;
+  profile_picture_url?: string;
   total_score?: number;
   games_played?: number;
 }
@@ -167,12 +170,13 @@ export default function LeaderboardPage(): React.ReactNode {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <span
-                  className="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
-                  style={{ backgroundColor: profile.avatar_color || '#4ECDC4' }}
-                >
-                  {profile.avatar_emoji || '🐶'}
-                </span>
+                <Avatar
+                  profilePictureUrl={profile.profile_picture_url ?? undefined}
+                  avatarImage={profile.avatar_image ?? undefined}
+                  avatarEmoji={profile.avatar_emoji ?? undefined}
+                  avatarColor={profile.avatar_color ?? undefined}
+                  size="lg"
+                />
                 <div>
                   <p className={cn(
                     'text-sm',
@@ -282,12 +286,13 @@ export default function LeaderboardPage(): React.ReactNode {
                         {getRankIcon(rank)}
                       </div>
                       <div className="col-span-5 flex items-center gap-3">
-                        <span
-                          className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
-                          style={{ backgroundColor: entry.avatar_color || '#4ECDC4' }}
-                        >
-                          {entry.avatar_emoji || '🐶'}
-                        </span>
+                        <Avatar
+                          profilePictureUrl={entry.profile_picture_url ?? undefined}
+                          avatarImage={entry.avatar_image ?? undefined}
+                          avatarEmoji={entry.avatar_emoji ?? undefined}
+                          avatarColor={entry.avatar_color ?? undefined}
+                          size="md"
+                        />
                         <span className={cn(
                           'font-medium truncate',
                           isCurrentUser

@@ -5,16 +5,17 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { User, Users, Bot, Trophy, LayoutGrid, Crown, CircleHelp } from 'lucide-react';
+import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import ModeCard from './ModeCard';
+import TutorialPrompt from './TutorialPrompt';
 import Header from '@/components/Header';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
-import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
+import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
 
 // Dynamic import for OnboardingModal (not needed on initial page load)
 const OnboardingModal = dynamic(() => import('@/components/OnboardingModal'), {
@@ -38,7 +39,10 @@ const LandingView: React.FC = () => {
   const isLandscape = useMobileLandscape();
   const liveRoomStats = useLiveRoomStats();
 
-  // Onboarding state
+  // Tutorial prompt state (non-intrusive banner for first-time visitors)
+  const [showTutorialPrompt, setShowTutorialPrompt] = useState(false);
+
+  // Onboarding modal state (opened when user clicks to start tutorial)
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Profile customization state (for authenticated users who haven't customized)
@@ -56,7 +60,7 @@ const LandingView: React.FC = () => {
     }
   }, [language, router]);
 
-  // Show onboarding modal for first-time visitors (delayed for better UX)
+  // Show tutorial prompt for first-time visitors (non-intrusive approach)
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -64,18 +68,34 @@ const LandingView: React.FC = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const hasRoom = urlParams.get('room');
 
-    // Skip onboarding if user is authenticated or already completed
+    // Skip tutorial prompt if user is authenticated or already completed onboarding
     if (hasRoom || isAuthenticated || hasCompletedOnboarding()) {
       return;
     }
 
-    // Show onboarding quickly after page renders (300ms feels responsive, not jarring)
+    // Show prompt after a brief delay (lets the page settle)
     const timer = setTimeout(() => {
-      setShowOnboarding(true);
-    }, 300);
+      setShowTutorialPrompt(true);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [isAuthenticated]);
+
+  // Handle tutorial prompt actions
+  const handleStartTutorial = () => {
+    setShowTutorialPrompt(false);
+    setShowOnboarding(true);
+  };
+
+  const handleDismissTutorialPrompt = () => {
+    setShowTutorialPrompt(false);
+    markOnboardingSkipped(); // Mark as skipped so prompt won't show again
+  };
+
+  // Re-open tutorial (for the "Tutorial" button)
+  const handleOpenTutorial = () => {
+    setShowOnboarding(true);
+  };
 
   // Show profile customization modal for authenticated users who haven't customized
   useEffect(() => {
@@ -149,16 +169,6 @@ const LandingView: React.FC = () => {
             </div>
           </Link>
         </div>
-
-        {/* How to Play - compact, always visible */}
-        <Link
-          href={`/${language}/rules`}
-          className="absolute bottom-4 right-4 flex items-center gap-2 px-4 py-3 bg-neo-yellow text-neo-black font-bold text-lg border-3 border-neo-black rounded-neo min-h-[48px] shadow-hard hover:shadow-hard-lg hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm transition-all z-10"
-          aria-label={t('joinView.howToPlay') || 'How to Play'}
-        >
-          <CircleHelp className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
-          <span className="hidden sm:inline">{t('joinView.howToPlay') || 'How to Play'}</span>
-        </Link>
       </main>
     );
   }
@@ -195,6 +205,13 @@ const LandingView: React.FC = () => {
             {t('landing.subtitleSimple') || 'Practice solo or challenge friends'}
           </p>
         </motion.div>
+
+        {/* Tutorial Prompt - Non-intrusive banner for first-time visitors */}
+        <TutorialPrompt
+          isVisible={showTutorialPrompt}
+          onStartTutorial={handleStartTutorial}
+          onDismiss={handleDismissTutorialPrompt}
+        />
 
         {/* Daily Challenge Banner - Compact inline placement */}
         <motion.div
@@ -238,19 +255,19 @@ const LandingView: React.FC = () => {
           />
         </motion.div>
 
-        {/* How to Play Button */}
+        {/* Tutorial Button */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.15 }}
           className="flex justify-center mt-2 sm:mt-3 lg:mt-8 xl:mt-10"
         >
-          <Link
-            href={`/${language}/rules`}
+          <button
+            onClick={handleOpenTutorial}
             className="
               inline-flex items-center gap-1.5 sm:gap-2 lg:gap-3
               px-3 sm:px-4 lg:px-6 xl:px-8 py-1.5 sm:py-2 lg:py-3 xl:py-4
-              bg-neo-yellow text-neo-black
+              bg-neo-purple text-neo-white
               font-bold text-sm sm:text-base lg:text-lg xl:text-xl
               border-2 lg:border-3 border-neo-black
               rounded-neo shadow-hard lg:shadow-hard-lg
@@ -259,9 +276,9 @@ const LandingView: React.FC = () => {
               transition-all duration-100
             "
           >
-            <CircleHelp className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7" />
-            {t('joinView.howToPlay') || 'How to Play?'}
-          </Link>
+            <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7" />
+            {t('landing.tutorial') || 'Tutorial'}
+          </button>
         </motion.div>
       </main>
     </div>

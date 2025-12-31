@@ -95,8 +95,8 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
             ? 'active:translate-x-[-1px] active:translate-y-[1px]'
             : 'active:translate-x-[1px] active:translate-y-[1px]',
           'active:shadow-hard-pressed',
-          // Subtle yellow gradient with golden glow for emphasis
-          "bg-gradient-to-r from-neo-yellow to-amber-300",
+          // Solid neo-yellow for clean neo-brutalist look
+          "bg-neo-yellow",
           // Subtle glow effect for visual distinction
           !hasPlayed && "ring-2 ring-neo-orange/40 ring-offset-2 ring-offset-transparent",
           compact ? "p-2" : "p-3 sm:p-4",

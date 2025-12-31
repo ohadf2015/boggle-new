@@ -46,6 +46,33 @@ export interface GameEndParams {
   finalRank?: number;
 }
 
+// Timeout for analytics requests (fail fast to not block gameplay)
+const ANALYTICS_TIMEOUT_MS = 5000;
+
+/**
+ * Fetch with timeout - aborts if request takes too long
+ */
+async function fetchWithTimeout(
+  url: string,
+  options: RequestInit,
+  timeoutMs: number
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
+  }
+}
+
 /**
  * Log game start
  * Returns the session ID for later updates
@@ -67,39 +94,48 @@ export async function logGameStart(params: GameStartParams): Promise<string | nu
       }
     }
 
-    const response = await fetch('/api/analytics/log-session', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await fetchWithTimeout(
+      '/api/analytics/log-session',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'start',
+          userId,
+          guestSessionId,
+          mode: params.mode,
+          language: params.language,
+          difficulty: params.difficulty || null,
+          dailyPuzzleNumber: params.dailyPuzzleNumber || null,
+          targetWord: params.targetWord || null,
+          roomCode: params.roomCode || null,
+          playerCount: params.playerCount || null,
+          deviceType: deviceInfo.deviceType,
+          browser: deviceInfo.browser,
+          isFirstGame: isFirst,
+          startedAt: new Date().toISOString(),
+        }),
       },
-      body: JSON.stringify({
-        action: 'start',
-        userId,
-        guestSessionId,
-        mode: params.mode,
-        language: params.language,
-        difficulty: params.difficulty || null,
-        dailyPuzzleNumber: params.dailyPuzzleNumber || null,
-        targetWord: params.targetWord || null,
-        roomCode: params.roomCode || null,
-        playerCount: params.playerCount || null,
-        deviceType: deviceInfo.deviceType,
-        browser: deviceInfo.browser,
-        isFirstGame: isFirst,
-        startedAt: new Date().toISOString(),
-      }),
-    });
+      ANALYTICS_TIMEOUT_MS
+    );
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
-      console.error('Failed to log game start:', response.status, errorData?.error || 'Unknown error');
+      console.warn('Failed to log game start:', response.status, errorData?.error || 'Unknown error');
       return null;
     }
 
     const data = await response.json();
     return data.sessionId;
   } catch (error) {
-    console.error('Error logging game start:', error);
+    // AbortError means timeout - this is expected and shouldn't spam console
+    if (error instanceof Error && error.name === 'AbortError') {
+      console.warn('Game start logging timed out (analytics non-critical)');
+    } else {
+      console.warn('Error logging game start:', error);
+    }
     return null;
   }
 }
@@ -112,39 +148,47 @@ export async function logGameEnd(
   params: GameEndParams
 ): Promise<boolean> {
   try {
-    const response = await fetch('/api/analytics/log-session', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await fetchWithTimeout(
+      '/api/analytics/log-session',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'update',
+          sessionId,
+          score: params.score,
+          wordsFound: params.wordsFound,
+          durationSeconds: params.durationSeconds,
+          completed: params.completed,
+          targetFound: params.targetFound,
+          attemptsUsed: params.attemptsUsed,
+          lifeRemaining: params.lifeRemaining,
+          lifeGained: params.lifeGained,
+          tokensEarned: params.tokensEarned,
+          tokensSpent: params.tokensSpent,
+          cluesUsed: params.cluesUsed,
+          finalRank: params.finalRank,
+          completedAt: new Date().toISOString(),
+        }),
       },
-      body: JSON.stringify({
-        action: 'update',
-        sessionId,
-        score: params.score,
-        wordsFound: params.wordsFound,
-        durationSeconds: params.durationSeconds,
-        completed: params.completed,
-        targetFound: params.targetFound,
-        attemptsUsed: params.attemptsUsed,
-        lifeRemaining: params.lifeRemaining,
-        lifeGained: params.lifeGained,
-        tokensEarned: params.tokensEarned,
-        tokensSpent: params.tokensSpent,
-        cluesUsed: params.cluesUsed,
-        finalRank: params.finalRank,
-        completedAt: new Date().toISOString(),
-      }),
-    });
+      ANALYTICS_TIMEOUT_MS
+    );
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
-      console.error('Failed to log game end:', response.status, errorData?.error || 'Unknown error');
+      console.warn('Failed to log game end:', response.status, errorData?.error || 'Unknown error');
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error('Error logging game end:', error);
+    if (error instanceof Error && error.name === 'AbortError') {
+      console.warn('Game end logging timed out (analytics non-critical)');
+    } else {
+      console.warn('Error logging game end:', error);
+    }
     return false;
   }
 }
@@ -157,27 +201,35 @@ export async function updateGameSession(
   updates: Partial<GameEndParams>
 ): Promise<boolean> {
   try {
-    const response = await fetch('/api/analytics/log-session', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await fetchWithTimeout(
+      '/api/analytics/log-session',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'update',
+          sessionId,
+          ...updates,
+        }),
       },
-      body: JSON.stringify({
-        action: 'update',
-        sessionId,
-        ...updates,
-      }),
-    });
+      ANALYTICS_TIMEOUT_MS
+    );
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
-      console.error('Failed to update game session:', response.status, errorData?.error || 'Unknown error');
+      console.warn('Failed to update game session:', response.status, errorData?.error || 'Unknown error');
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error('Error updating game session:', error);
+    if (error instanceof Error && error.name === 'AbortError') {
+      console.warn('Game session update timed out (analytics non-critical)');
+    } else {
+      console.warn('Error updating game session:', error);
+    }
     return false;
   }
 }

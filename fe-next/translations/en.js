@@ -155,6 +155,7 @@ const en = {
     "showLess": "Less",
     "showMore": "More",
     "moreOptions": "More",
+    "moreShareOptions": "More share options",
     "or": "or",
     "closeMenu": "Close",
     "openMenu": "Menu",
@@ -410,7 +411,9 @@ const en = {
     "skipButton": "Skip"
   },
   "error": {
-    "subscriptionFailed": "Subscription failed. Please try again."
+    "subscriptionFailed": "Subscription failed. Please try again.",
+    "generic": "Something went wrong",
+    "notAuthenticated": "Please sign in to continue"
   },
   "difficulty": {
     "easy": "Easy",
@@ -1428,6 +1431,12 @@ const en = {
     "skipHint": "Press ESC to skip",
     "swipeHint": "← Swipe to navigate →"
   },
+  "tutorialPrompt": {
+    "title": "First time here?",
+    "subtitle": "Learn the basics in 30 seconds",
+    "start": "Start",
+    "later": "Later"
+  },
   "tutorial": {
     "stepLabel": "{current}/{total}",
     "skip": "Skip",
@@ -1899,7 +1908,30 @@ const en = {
         "allTimeLeaderboard": "All-time leaderboard access"
       },
       "autoSaveNote": "Auto-saved after signup",
-      "maybeLater": "Later"
+      "maybeLater": "Later",
+      "continueAsGuest": "Continue as guest"
+    },
+    "inlineSignup": {
+      "title": "Sign up to appear on the leaderboard",
+      "subtitle": "Save your result and compete globally",
+      "orContinueWith": "or continue with email",
+      "emailPlaceholder": "Email address",
+      "passwordPlaceholder": "Password (8+ characters)",
+      "signUpButton": "Create Account",
+      "signingUp": "Creating...",
+      "checkEmail": "Check your email to verify your account!",
+      "emailInUse": "This email is already registered",
+      "weakPassword": "Password must be at least 8 characters",
+      "invalidEmail": "Please enter a valid email address",
+      "emailRequired": "Email required",
+      "passwordRequired": "Password required",
+      "passwordTooShort": "Password too short",
+      "benefits": {
+        "leaderboard": "Claim your spot on the leaderboard",
+        "syncDevices": "Sync progress across devices",
+        "protectStreak": "Protect your streak",
+        "trackStats": "Track stats & rankings"
+      }
     }
   },
   "legal": {
@@ -2287,7 +2319,7 @@ const en = {
     "moreForDictionary": "more for dictionary"
   },
   "footer": {
-    "howToPlay": "How to Play",
+    "aboutGame": "About the Game",
     "leaderboard": "Leaderboard",
     "interactiveTutorial": "Interactive Tutorial"
   },
@@ -2315,7 +2347,8 @@ const en = {
     },
     "hint": "First time? Try solo mode first!",
     "openRooms": "rooms",
-    "playersLive": "live"
+    "playersLive": "live",
+    "tutorial": "Tutorial"
   },
   "modeDiscovery": {
     "title": "Ready for More?",
@@ -2596,6 +2629,23 @@ const en = {
     "canYouBeatMyScore": "Beat my score?",
     "targetWordLength": "Find the hidden word:",
     "onlyMatchingLength": "Only {length}-letter words use tries!",
+    "tookChallenge": "took the challenge",
+    "signUpToAppear": "Sign up to appear on the leaderboard!",
+    "carousel": {
+      "step1Title": "Swipe to Find Words",
+      "step1Desc": "Connect letters in any direction",
+      "step1Grid": "C,A,O,G,T,E,D,S,R",
+      "step1Highlighted": "0,1,4,7",
+      "step2Title": "Color Clues",
+      "step2Green": "Right spot",
+      "step2Yellow": "Wrong spot",
+      "step2Gray": "Not in word",
+      "step2Letters": "G,A,M,E",
+      "step2Colors": "green,yellow,gray,green",
+      "step3Title": "Find the Hidden Word",
+      "step3Desc": "10 tries to crack the code",
+      "step3Hint": "Guess {length}-letter words to unlock clues"
+    },
     "share": {
       "header": "LexiClash Daily #{number}",
       "stats": "{score} pts | {words} words",
@@ -2625,6 +2675,7 @@ const en = {
     "howToPlay": "Find the {length}-letter word in {max} tries!",
     "shareResult": "Share",
     "shareAttempt": "Share",
+    "shareChallengeFriends": "Challenge Your Friends",
     "playAgainTomorrow": "New puzzle tomorrow!",
     "tryAnotherLanguage": "Try Another Language",
     "playDifferentLanguage": "Test your skills in another language!",
@@ -2737,6 +2788,8 @@ const en = {
       "revealTargetWord": "Reveal Target Word",
       "yourCoins": "Your coins:",
       "notEnoughCoins": "not enough coins",
+      "seeTheAnswer": "See what you were looking for",
+      "earnMoreHint": "Win challenges to earn more coins!",
       "wantToRetry": "Want another try?",
       "retryChallenge": "Retry Challenge",
       "needMoreCoins": "need {amount} more",

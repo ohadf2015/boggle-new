@@ -150,6 +150,7 @@ const sv = {
     "showLess": "Mindre",
     "showMore": "Mer",
     "moreOptions": "Mer",
+    "moreShareOptions": "Fler delningsalternativ",
     "or": "eller",
     "closeMenu": "Stäng",
     "openMenu": "Meny",
@@ -405,7 +406,9 @@ const sv = {
     "skipButton": "Hoppa över"
   },
   "error": {
-    "subscriptionFailed": "Prenumerationen misslyckades. Försök igen."
+    "subscriptionFailed": "Prenumerationen misslyckades. Försök igen.",
+    "generic": "Något gick fel",
+    "notAuthenticated": "Logga in för att fortsätta"
   },
   "difficulty": {
     "easy": "Lätt",
@@ -1418,6 +1421,12 @@ const sv = {
     "skipHint": "ESC eller Hoppa över för att komma till spelet 🎮",
     "swipeHint": "← Svep för att navigera →"
   },
+  "tutorialPrompt": {
+    "title": "Första gången här?",
+    "subtitle": "Lär dig grunderna på 30 sekunder",
+    "start": "Starta",
+    "later": "Senare"
+  },
   "tutorial": {
     "stepLabel": "{current}/{total}",
     "skip": "Hoppa över",
@@ -1889,7 +1898,30 @@ const sv = {
         "allTimeLeaderboard": "Visas på den allra bästa topplistan"
       },
       "autoSaveNote": "Ditt resultat sparas automatiskt efter registrering",
-      "maybeLater": "Kanske senare"
+      "maybeLater": "Kanske senare",
+      "continueAsGuest": "Fortsätt som gäst"
+    },
+    "inlineSignup": {
+      "title": "Registrera dig för att synas på topplistan",
+      "subtitle": "Spara ditt resultat och tävla globalt",
+      "orContinueWith": "eller fortsätt med e-post",
+      "emailPlaceholder": "E-postadress",
+      "passwordPlaceholder": "Lösenord (minst 8 tecken)",
+      "signUpButton": "Skapa konto",
+      "signingUp": "Skapar...",
+      "checkEmail": "Kolla din e-post för att verifiera ditt konto!",
+      "emailInUse": "Denna e-post är redan registrerad",
+      "weakPassword": "Lösenordet måste innehålla minst 8 tecken",
+      "invalidEmail": "Ange en giltig e-postadress",
+      "emailRequired": "E-post krävs",
+      "passwordRequired": "Lösenord krävs",
+      "passwordTooShort": "Lösenord för kort",
+      "benefits": {
+        "leaderboard": "Ta din plats på topplistan",
+        "syncDevices": "Synka mellan enheter",
+        "protectStreak": "Skydda din svit",
+        "trackStats": "Följ statistik & rankning"
+      }
     }
   },
   "profile": {
@@ -2277,7 +2309,7 @@ const sv = {
     "moreForDictionary": "mer till ordbok"
   },
   "footer": {
-    "howToPlay": "Hur man spelar",
+    "aboutGame": "Om Spelet",
     "leaderboard": "Topplista",
     "interactiveTutorial": "Interaktiv handledning"
   },
@@ -2305,7 +2337,8 @@ const sv = {
     },
     "hint": "Ny i spelet? Börja med enspelarläge för att lära dig!",
     "openRooms": "öppna rum",
-    "playersLive": "spelar nu"
+    "playersLive": "spelar nu",
+    "tutorial": "Handledning"
   },
   "modeDiscovery": {
     "title": "Redo för mer?",
@@ -2586,6 +2619,23 @@ const sv = {
     "canYouBeatMyScore": "Kan du slå mitt resultat?",
     "targetWordLength": "Hitta det dolda ordet:",
     "onlyMatchingLength": "Endast ord med {length} bokstäver använder dina försök!",
+    "tookChallenge": "tog utmaningen",
+    "signUpToAppear": "Registrera dig för att synas på topplistan!",
+    "carousel": {
+      "step1Title": "Svep för att hitta ord",
+      "step1Desc": "Koppla bokstäver i alla riktningar",
+      "step1Grid": "C,A,O,G,T,E,D,S,R",
+      "step1Highlighted": "0,1,4,7",
+      "step2Title": "Färgledtrådar",
+      "step2Green": "Rätt plats",
+      "step2Yellow": "Fel plats",
+      "step2Gray": "Inte i ordet",
+      "step2Letters": "G,A,M,E",
+      "step2Colors": "green,yellow,gray,green",
+      "step3Title": "Hitta det gömda ordet",
+      "step3Desc": "10 försök att knäcka koden",
+      "step3Hint": "Gissa ord med {length} bokstäver för ledtrådar"
+    },
     "share": {
       "header": "LexiClash Daily #{number}",
       "stats": "{score} poäng | {words} ord",
@@ -2615,6 +2665,7 @@ const sv = {
     "howToPlay": "Jaga det dolda {length}-bokstavs ordet med hjälp av feedback! Du har {max} försök att hitta det.",
     "shareResult": "Dela resultat",
     "shareAttempt": "Dela försök",
+    "shareChallengeFriends": "Utmana dina vänner",
     "playAgainTomorrow": "Kom tillbaka imorgon för ett nytt pussel!",
     "tryAnotherLanguage": "Prova ett annat språk",
     "playDifferentLanguage": "Utmana dig själv på ett annat språk!",
@@ -2727,6 +2778,8 @@ const sv = {
       "revealTargetWord": "Avslöja målord",
       "yourCoins": "Dina mynt:",
       "notEnoughCoins": "inte tillräckligt med mynt",
+      "seeTheAnswer": "Se vad du letade efter",
+      "earnMoreHint": "Vinn utmaningar för att tjäna fler mynt!",
       "wantToRetry": "Vill du försöka igen?",
       "retryChallenge": "Försök igen",
       "needMoreCoins": "behöver {amount} till",

@@ -480,13 +480,15 @@ body {
     }
   }
 
-  /* On smaller screens, reduce padding to maximize board size */
+  /* On smaller screens, maximize board size with minimal margins */
   @media (max-width: 768px) {
     .game-board-frame {
-      padding: 4px;
-      /* On mobile, maintain square aspect ratio using vmin for stability */
-      width: min(85vmin, calc(100vw - 16px));
-      height: min(85vmin, calc(100vw - 16px));
+      padding: 3px;
+      /* Maximize width: full screen minus tiny 8px total margin (4px each side) */
+      width: calc(100vw - 8px);
+      /* Height: square but capped to leave room for header/UI */
+      height: min(calc(100vw - 8px), calc(100dvh - 160px));
+      max-width: calc(100vw - 8px);
     }
   }
 

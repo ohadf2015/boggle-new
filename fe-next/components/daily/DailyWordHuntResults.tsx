@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Trophy, Target, X, ArrowLeft, Copy, Check, Send, Coins, RotateCcw, ImageDown, ChevronDown, Settings } from 'lucide-react';
+import { Share2, Trophy, Target, X, ArrowLeft, Copy, Check, Send, Coins, RotateCcw, ImageDown, ChevronDown, Settings, Eye } from 'lucide-react';
 
 // X/Twitter icon (no lucide equivalent)
 const XTwitterIcon = ({ className }: { className?: string }) => (
@@ -35,6 +35,7 @@ import {
   type ConversionTrigger,
 } from '@/utils/dailyChallenge';
 import DailyChallengeSignupModal from '@/components/auth/DailyChallengeSignupModal';
+import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
 import StreakMilestoneCelebration from './StreakMilestoneCelebration';
 import ConfettiRetrigger from '@/components/results/ConfettiRetrigger';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
@@ -184,6 +185,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [countryCode, setCountryCode] = useState<string | null>(null);
   const [countryCodeReady, setCountryCodeReady] = useState(false);
+  const [inlineSignupDismissed, setInlineSignupDismissed] = useState(false);
   const hasSubmittedRef = useRef(false);
   const { user, profile, isAuthenticated } = useAuth();
 
@@ -501,10 +503,10 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     }
   }, [isNewCompletion, puzzleDate, language, result.solved, result.efficiencyScore, result.streakDays, user?.id]);
 
-  // Show signup modal for unauthenticated users based on smart triggers
+  // Show signup modal for unauthenticated users who FAILED (winners get inline signup instead)
   useEffect(() => {
-    // Only show for new completions and unauthenticated users
-    if (!isNewCompletion || isAuthenticated) {
+    // Only show modal for guests who failed - winners get inline signup on page
+    if (!isNewCompletion || isAuthenticated || result.solved) {
       return;
     }
 
@@ -847,33 +849,84 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                     </div>
                   </div>
                 ) : (
-                  // Show the reveal button
-                  <div className="space-y-2">
-                    <Button
-                      onClick={handleRevealTargetWord}
-                      disabled={!canAfford(COIN_COSTS.REVEAL_TARGET_WORD)}
+                  // Show the reveal button - premium unlock card design
+                  <div className="max-w-xs mx-auto">
+                    <motion.div
+                      whileHover={canAfford(COIN_COSTS.REVEAL_TARGET_WORD) ? { scale: 1.02, y: -2 } : {}}
+                      whileTap={canAfford(COIN_COSTS.REVEAL_TARGET_WORD) ? { scale: 0.98 } : {}}
                       className={cn(
-                        "px-6 py-3 font-bold border-3 border-neo-black rounded-neo shadow-hard transition-all",
+                        "relative overflow-hidden rounded-neo-lg border-3 border-neo-black shadow-hard transition-all",
                         canAfford(COIN_COSTS.REVEAL_TARGET_WORD)
-                          ? "bg-neo-purple hover:bg-neo-pink text-white hover:-translate-y-0.5"
-                          : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                          ? "bg-gradient-to-br from-neo-purple to-neo-pink cursor-pointer hover:shadow-hard-lg"
+                          : "bg-gradient-to-br from-slate-600 to-slate-700"
                       )}
+                      onClick={canAfford(COIN_COSTS.REVEAL_TARGET_WORD) ? handleRevealTargetWord : undefined}
                     >
-                      <Coins className="w-4 h-4 mr-2" />
-                      {t('wordHunt.results.revealTargetWord')}
-                      <span className="ml-2 px-2 py-0.5 bg-neo-yellow text-neo-black text-xs rounded-full font-black">
-                        {COIN_COSTS.REVEAL_TARGET_WORD}
-                      </span>
-                    </Button>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {t('wordHunt.results.yourCoins')}{' '}
-                      <span className="font-bold text-neo-yellow">{currentCoins}</span>
-                      {!canAfford(COIN_COSTS.REVEAL_TARGET_WORD) && (
-                        <span className="text-red-500 ml-2">
-                          ({t('wordHunt.results.notEnoughCoins')})
-                        </span>
-                      )}
-                    </div>
+                      {/* Cost badge - top corner */}
+                      <div className="absolute top-2 end-2 flex items-center gap-1 px-2.5 py-1 bg-neo-yellow rounded-full border-2 border-neo-black shadow-hard-sm">
+                        <Coins className="w-4 h-4 text-neo-black" />
+                        <span className="font-black text-sm text-neo-black">{COIN_COSTS.REVEAL_TARGET_WORD}</span>
+                      </div>
+
+                      {/* Main content */}
+                      <div className="px-4 py-4 pt-3">
+                        <div className="flex items-center gap-3">
+                          <div className={cn(
+                            "flex-shrink-0 w-12 h-12 rounded-neo flex items-center justify-center border-2 border-neo-black",
+                            canAfford(COIN_COSTS.REVEAL_TARGET_WORD)
+                              ? "bg-white/20"
+                              : "bg-white/10"
+                          )}>
+                            <Eye className="w-6 h-6 text-white" />
+                          </div>
+                          <div className="flex-1 text-start">
+                            <div className="font-black text-white text-sm uppercase tracking-wide">
+                              {t('wordHunt.results.revealTargetWord')}
+                            </div>
+                            <div className="text-xs text-white/70 mt-0.5">
+                              {t('wordHunt.results.seeTheAnswer') || 'See what you were looking for'}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Progress section */}
+                        <div className="mt-3 pt-3 border-t border-white/20">
+                          <div className="flex items-center justify-between text-xs mb-1.5">
+                            <span className="text-white/80 font-medium">
+                              {t('wordHunt.results.yourCoins')}
+                            </span>
+                            <span className={cn(
+                              "font-black",
+                              canAfford(COIN_COSTS.REVEAL_TARGET_WORD)
+                                ? "text-neo-yellow"
+                                : "text-white"
+                            )}>
+                              {currentCoins} / {COIN_COSTS.REVEAL_TARGET_WORD}
+                            </span>
+                          </div>
+                          {/* Progress bar */}
+                          <div className="h-2.5 bg-black/30 rounded-full overflow-hidden border border-white/20">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${Math.min((currentCoins / COIN_COSTS.REVEAL_TARGET_WORD) * 100, 100)}%` }}
+                              transition={{ duration: 0.5, ease: "easeOut" }}
+                              className={cn(
+                                "h-full rounded-full",
+                                canAfford(COIN_COSTS.REVEAL_TARGET_WORD)
+                                  ? "bg-neo-yellow"
+                                  : "bg-gradient-to-r from-neo-yellow/70 to-neo-orange/70"
+                              )}
+                            />
+                          </div>
+                          {/* Helpful hint when can't afford */}
+                          {!canAfford(COIN_COSTS.REVEAL_TARGET_WORD) && (
+                            <div className="mt-2 text-[10px] text-white/60 text-center">
+                              {t('wordHunt.results.earnMoreHint') || 'Win challenges to earn more coins!'}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
                   </div>
                 )}
               </motion.div>
@@ -978,26 +1031,29 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
           {/* Share buttons - Progressive disclosure */}
           <div className="space-y-2">
-            {/* Primary share button */}
+            {/* Primary share button - Eye-catching CTA */}
             <Button
               onClick={handleNativeShare}
               className={cn(
-                "w-full py-3 text-base font-black uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all",
+                "w-full py-4 text-lg font-black uppercase border-3 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1.5 transition-all group",
                 result.solved
-                  ? "bg-emerald-500 text-white"
-                  : "bg-slate-600 text-white"
+                  ? "bg-gradient-to-r from-neo-yellow via-neo-orange to-neo-pink text-neo-black animate-pulse-subtle"
+                  : "bg-gradient-to-r from-neo-cyan via-neo-purple to-neo-pink text-white hover:brightness-110"
               )}
             >
-              <Share2 className="mr-2 w-5 h-5" />
-              {result.solved ? t('wordHunt.shareResult') : t('wordHunt.shareAttempt')}
+              <Share2 className="mr-2 w-6 h-6 group-hover:scale-110 transition-transform" />
+              {result.solved ? t('wordHunt.shareResult') : t('wordHunt.shareChallengeFriends')}
             </Button>
 
-            {/* Toggle for more share options */}
+            {/* Toggle for more share options - Clear labeling */}
             <button
               onClick={() => setShowSharePlatforms(!showSharePlatforms)}
-              className="w-full flex items-center justify-center gap-1 py-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+              className="w-full flex items-center justify-center gap-2 py-2 text-sm text-gray-400 hover:text-neo-cyan transition-colors group"
             >
-              <span>{showSharePlatforms ? t('common.showLess') : t('common.moreOptions')}</span>
+              <Share2 className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100" />
+              <span className="underline underline-offset-2 decoration-dotted group-hover:decoration-solid">
+                {showSharePlatforms ? t('common.showLess') : t('common.moreShareOptions')}
+              </span>
               <motion.div
                 animate={{ rotate: showSharePlatforms ? 180 : 0 }}
                 transition={{ duration: 0.2 }}
@@ -1090,7 +1146,27 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           </div>
         </motion.div>
 
-        {/* Attempt history - Collapsible */}
+        {/* Inline Signup for Guest Winners */}
+        {!isAuthenticated && result.solved && !inlineSignupDismissed && (
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.45 }}
+          >
+            <DailyChallengeInlineSignup
+              pendingResult={{
+                result,
+                puzzleNumber,
+                puzzleDate,
+                language,
+              }}
+              onDismiss={() => setInlineSignupDismissed(true)}
+            />
+          </motion.div>
+        )}
+
+        {/* Attempt history - Collapsible (only show if there are attempts) */}
+        {result.attempts.length > 0 && (
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -1153,6 +1229,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             )}
           </AnimatePresence>
         </motion.div>
+        )}
 
         {/* Stats grid - Collapsible */}
         {stats && (
@@ -1353,21 +1430,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           />
         </motion.div>
 
-        {/* Next puzzle countdown */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9 }}
-          className="pt-3 border-t border-gray-200 dark:border-gray-700"
-        >
-          <p className="text-xs text-gray-600 dark:text-gray-300">
-            {t('daily.nextPuzzleIn')} <span className="font-bold text-neo-cyan">{countdown}</span>
-          </p>
-          <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
-            {t('wordHunt.playAgainTomorrow')}
-          </p>
-        </motion.div>
-
         {/* Secondary Actions - Collapsible */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -1405,39 +1467,98 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 className="overflow-hidden"
               >
                 <div className="p-3 bg-white dark:bg-gray-900 text-gray-900 dark:text-white space-y-4">
-                  {/* Retry Challenge */}
-                  <div className="space-y-2">
-                    <p className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                      <RotateCcw className="w-4 h-4" />
-                      {t('wordHunt.results.wantToRetry')}
-                    </p>
-                    <Button
-                      onClick={handleRetryChallenge}
-                      disabled={!canAfford(COIN_COSTS.DAILY_RETRY)}
-                      className={cn(
-                        "w-full px-4 py-2.5 font-bold border-2 border-neo-black rounded-neo shadow-hard-sm transition-all text-sm",
-                        canAfford(COIN_COSTS.DAILY_RETRY)
-                          ? "bg-amber-400 text-neo-black hover:-translate-y-0.5"
-                          : "bg-gray-300 text-gray-600 cursor-not-allowed"
-                      )}
-                    >
-                      <RotateCcw className="w-4 h-4 mr-2" />
-                      {t('wordHunt.results.retryChallenge')}
-                      <span className="ml-2 px-2 py-0.5 bg-neo-black/20 text-xs rounded-full font-black flex items-center gap-1">
-                        <Coins className="w-3 h-3" />
-                        {COIN_COSTS.DAILY_RETRY}
-                      </span>
-                    </Button>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                      {t('wordHunt.results.yourCoins')}{' '}
-                      <span className="font-bold text-neo-yellow">{currentCoins}</span>
-                      {!canAfford(COIN_COSTS.DAILY_RETRY) && (
-                        <span className="text-red-500 ml-1">
-                          ({t('wordHunt.results.needMoreCoins').replace('{amount}', String(COIN_COSTS.DAILY_RETRY - currentCoins))})
-                        </span>
-                      )}
+                  {/* Retry Challenge - premium unlock card design */}
+                  <motion.div
+                    whileHover={canAfford(COIN_COSTS.DAILY_RETRY) ? { scale: 1.02, y: -2 } : {}}
+                    whileTap={canAfford(COIN_COSTS.DAILY_RETRY) ? { scale: 0.98 } : {}}
+                    className={cn(
+                      "relative overflow-hidden rounded-neo-lg border-3 border-neo-black shadow-hard transition-all",
+                      canAfford(COIN_COSTS.DAILY_RETRY)
+                        ? "bg-gradient-to-br from-amber-400 to-orange-500 cursor-pointer hover:shadow-hard-lg"
+                        : "bg-gradient-to-br from-slate-600 to-slate-700"
+                    )}
+                    onClick={canAfford(COIN_COSTS.DAILY_RETRY) ? handleRetryChallenge : undefined}
+                  >
+                    {/* Cost badge - top corner */}
+                    <div className="absolute top-2 end-2 flex items-center gap-1 px-2.5 py-1 bg-neo-yellow rounded-full border-2 border-neo-black shadow-hard-sm">
+                      <Coins className="w-4 h-4 text-neo-black" />
+                      <span className="font-black text-sm text-neo-black">{COIN_COSTS.DAILY_RETRY}</span>
                     </div>
-                  </div>
+
+                    {/* Main content */}
+                    <div className="px-4 py-4 pt-3">
+                      <div className="flex items-center gap-3">
+                        <div className={cn(
+                          "flex-shrink-0 w-12 h-12 rounded-neo flex items-center justify-center border-2 border-neo-black",
+                          canAfford(COIN_COSTS.DAILY_RETRY)
+                            ? "bg-white/20"
+                            : "bg-white/10"
+                        )}>
+                          <RotateCcw className={cn(
+                            "w-6 h-6",
+                            canAfford(COIN_COSTS.DAILY_RETRY) ? "text-neo-black" : "text-white"
+                          )} />
+                        </div>
+                        <div className="flex-1 text-start">
+                          <div className={cn(
+                            "font-black text-sm uppercase tracking-wide",
+                            canAfford(COIN_COSTS.DAILY_RETRY) ? "text-neo-black" : "text-white"
+                          )}>
+                            {t('wordHunt.results.retryChallenge')}
+                          </div>
+                          <div className={cn(
+                            "text-xs mt-0.5",
+                            canAfford(COIN_COSTS.DAILY_RETRY) ? "text-neo-black/70" : "text-white/70"
+                          )}>
+                            {t('wordHunt.results.retryExplanation')}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Progress section */}
+                      <div className={cn(
+                        "mt-3 pt-3 border-t",
+                        canAfford(COIN_COSTS.DAILY_RETRY) ? "border-neo-black/20" : "border-white/20"
+                      )}>
+                        <div className="flex items-center justify-between text-xs mb-1.5">
+                          <span className={cn(
+                            "font-medium",
+                            canAfford(COIN_COSTS.DAILY_RETRY) ? "text-neo-black/80" : "text-white/80"
+                          )}>
+                            {t('wordHunt.results.yourCoins')}
+                          </span>
+                          <span className={cn(
+                            "font-black",
+                            canAfford(COIN_COSTS.DAILY_RETRY)
+                              ? "text-neo-black"
+                              : "text-white"
+                          )}>
+                            {currentCoins} / {COIN_COSTS.DAILY_RETRY}
+                          </span>
+                        </div>
+                        {/* Progress bar */}
+                        <div className="h-2.5 bg-black/30 rounded-full overflow-hidden border border-white/20">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${Math.min((currentCoins / COIN_COSTS.DAILY_RETRY) * 100, 100)}%` }}
+                            transition={{ duration: 0.5, ease: "easeOut" }}
+                            className={cn(
+                              "h-full rounded-full",
+                              canAfford(COIN_COSTS.DAILY_RETRY)
+                                ? "bg-neo-black/50"
+                                : "bg-gradient-to-r from-neo-yellow/70 to-neo-orange/70"
+                            )}
+                          />
+                        </div>
+                        {/* Helpful hint when can't afford */}
+                        {!canAfford(COIN_COSTS.DAILY_RETRY) && (
+                          <div className="mt-2 text-[10px] text-white/60 text-center">
+                            {t('wordHunt.results.earnMoreHint')}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
 
                   {/* Try Another Language - inline version */}
                   <TryAnotherLanguage currentLanguage={language} />

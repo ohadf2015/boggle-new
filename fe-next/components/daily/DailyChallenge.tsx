@@ -10,6 +10,7 @@ import DailyWordHuntResults from './DailyWordHuntResults';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import GuestNameEditor from './GuestNameEditor';
 import { DailyChallengeTutorial } from './DailyChallengeTutorial';
+import DailyIntroCarousel from './DailyIntroCarousel';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
@@ -425,7 +426,7 @@ const DailyChallenge: React.FC = () => {
           />
         )}
 
-        {(phase === 'completed' || phase === 'already-played') && storedResult && (
+        {(phase === 'completed' || phase === 'already-played') && storedResult && puzzleDate && (
           <DailyWordHuntResults
             result={storedResult.result}
             puzzleNumber={puzzleNumber}
@@ -637,65 +638,35 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           transition={{ delay: 0.1 }}
           className="space-y-2"
         >
-          {/* Daily Badge */}
+          {/* Daily Badge - Simple text, no box */}
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.05, type: 'spring' }}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-amber-400 rounded-neo border-3 border-neo-black shadow-hard"
+            className="inline-flex items-center gap-2"
           >
-            <Target className="w-5 h-5 text-neo-black" />
-            <span className="font-black text-neo-black uppercase tracking-wide">
+            <Target className="w-6 h-6 text-amber-500" />
+            <span className="text-2xl font-black text-neo-black dark:text-white uppercase tracking-wide">
               {t('daily.badge')}
             </span>
           </motion.div>
 
-          <h1 className="text-7xl md:text-8xl font-black text-neo-black dark:text-white">
-            #{puzzleNumber}
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300">
-            {formattedDate}
-          </p>
+          {/* Challenge number and date - subtle styling */}
+          <div className="flex items-center justify-center gap-2 text-gray-400 dark:text-gray-500">
+            <span className="text-lg font-bold">#{puzzleNumber}</span>
+            <span className="text-gray-300 dark:text-gray-600">•</span>
+            <span className="text-sm">{formattedDate}</span>
+          </div>
         </motion.div>
 
-        {/* Guest Name Editor - Show for unauthenticated users */}
-        {!isAuthenticated && (
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.15 }}
-          >
-            <GuestNameEditor t={t} compact />
-          </motion.div>
-        )}
-
-        {/* Target Word Length Visual Hint */}
+        {/* Animated Tutorial Carousel */}
         {targetWordLength > 0 && (
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.25 }}
-            className="text-center space-y-2"
+            transition={{ delay: 0.2 }}
           >
-            <div className="text-xs font-bold text-gray-600 dark:text-gray-400">
-              {t('daily.targetWordLength') || 'Find the hidden word:'}
-            </div>
-            <div className="flex justify-center gap-1.5">
-              {Array.from({ length: targetWordLength }).map((_, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.25 + idx * 0.05, type: 'spring', stiffness: 300 }}
-                  className="w-8 h-8 sm:w-10 sm:h-10 bg-neo-black rounded-lg border-2 border-neo-black flex items-center justify-center text-white font-bold text-lg"
-                >
-                  ?
-                </motion.div>
-              ))}
-            </div>
-            <div className="text-[11px] text-neo-purple dark:text-neo-purple font-bold">
-              {t('daily.onlyMatchingLength', { length: targetWordLength }) || `Only ${targetWordLength}-letter words use your tries!`}
-            </div>
+            <DailyIntroCarousel targetWordLength={targetWordLength} />
           </motion.div>
         )}
 

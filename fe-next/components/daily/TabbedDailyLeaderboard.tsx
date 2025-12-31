@@ -385,6 +385,11 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
 
   // Fetch today's leaderboard
   const fetchTodayLeaderboard = useCallback(async () => {
+    // Guard against empty puzzleDate
+    if (!puzzleDate) {
+      return;
+    }
+
     try {
       setTodayLoading(true);
       setTodayError(null);

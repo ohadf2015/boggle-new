@@ -42,7 +42,7 @@ export default function Footer(): React.ReactElement {
                 hover:underline underline-offset-4 decoration-2
               "
             >
-              {t('footer.howToPlay') || 'How to Play'}
+              {t('footer.aboutGame') || 'About the Game'}
             </Link>
             <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
             <Link

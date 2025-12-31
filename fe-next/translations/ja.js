@@ -150,6 +150,7 @@ const ja = {
     "showLess": "少なく",
     "showMore": "もっと",
     "moreOptions": "その他",
+    "moreShareOptions": "他の共有オプション",
     "or": "または",
     "closeMenu": "閉じる",
     "openMenu": "メニュー",
@@ -405,7 +406,9 @@ const ja = {
     "skipButton": "スキップ"
   },
   "error": {
-    "subscriptionFailed": "登録に失敗しました。もう一度お試しください。"
+    "subscriptionFailed": "登録に失敗しました。もう一度お試しください。",
+    "generic": "問題が発生しました",
+    "notAuthenticated": "続けるにはログインしてください"
   },
   "difficulty": {
     "easy": "簡単",
@@ -1417,6 +1420,12 @@ const ja = {
     "skipHint": "ESCかスキップでゲームへ 🎮",
     "swipeHint": "← スワイプで移動 →"
   },
+  "tutorialPrompt": {
+    "title": "初めてですか？",
+    "subtitle": "30秒で基本を学ぼう",
+    "start": "始める",
+    "later": "後で"
+  },
   "tutorial": {
     "stepLabel": "{current}/{total}",
     "skip": "スキップ",
@@ -1888,7 +1897,30 @@ const ja = {
         "allTimeLeaderboard": "総合ランキングに表示される"
       },
       "autoSaveNote": "登録後、結果は自動的に保存されます",
-      "maybeLater": "また今度"
+      "maybeLater": "また今度",
+      "continueAsGuest": "ゲストとして続ける"
+    },
+    "inlineSignup": {
+      "title": "リーダーボードに登場しよう",
+      "subtitle": "結果を保存してグローバルで競争",
+      "orContinueWith": "またはメールで続ける",
+      "emailPlaceholder": "メールアドレス",
+      "passwordPlaceholder": "パスワード（8文字以上）",
+      "signUpButton": "アカウント作成",
+      "signingUp": "作成中...",
+      "checkEmail": "確認メールをチェックしてください！",
+      "emailInUse": "このメールアドレスは既に登録されています",
+      "weakPassword": "パスワードは8文字以上必要です",
+      "invalidEmail": "有効なメールアドレスを入力してください",
+      "emailRequired": "メールアドレスを入力してください",
+      "passwordRequired": "パスワードを入力してください",
+      "passwordTooShort": "パスワードは8文字以上必要です",
+      "benefits": {
+        "leaderboard": "リーダーボードに結果を表示",
+        "syncDevices": "デバイス間で進捗を同期",
+        "protectStreak": "連続記録を保護",
+        "trackStats": "統計とランキングを追跡"
+      }
     }
   },
   "profile": {
@@ -2276,7 +2308,7 @@ const ja = {
     "moreForDictionary": "あと辞書に追加まで"
   },
   "footer": {
-    "howToPlay": "遊び方",
+    "aboutGame": "ゲームについて",
     "leaderboard": "ランキング",
     "interactiveTutorial": "インタラクティブチュートリアル"
   },
@@ -2304,7 +2336,8 @@ const ja = {
     },
     "hint": "初めて？シングルプレイヤーで基本を学ぼう！",
     "openRooms": "部屋が開放中",
-    "playersLive": "プレイ中"
+    "playersLive": "プレイ中",
+    "tutorial": "チュートリアル"
   },
   "modeDiscovery": {
     "title": "もっと遊ぼう！",
@@ -2585,6 +2618,23 @@ const ja = {
     "canYouBeatMyScore": "私のスコアを超えられますか？",
     "targetWordLength": "隠された単語を見つけて：",
     "onlyMatchingLength": "{length}文字の単語のみが試行回数を消費します！",
+    "tookChallenge": "{count}人がチャレンジしました",
+    "signUpToAppear": "リーダーボードに表示されるには登録してください",
+    "carousel": {
+      "step1Title": "スワイプで単語を作ろう",
+      "step1Desc": "どの方向でも文字を繋げよう",
+      "step1Grid": "C,A,O,G,T,E,D,S,R",
+      "step1Highlighted": "0,1,4,7",
+      "step2Title": "色のヒント",
+      "step2Green": "正しい位置",
+      "step2Yellow": "違う位置",
+      "step2Gray": "単語にない",
+      "step2Letters": "G,A,M,E",
+      "step2Colors": "green,yellow,gray,green",
+      "step3Title": "隠された単語を見つけよう",
+      "step3Desc": "10回でコードを解読",
+      "step3Hint": "{length}文字の単語を当ててヒントをゲット"
+    },
     "share": {
       "header": "LexiClash Daily #{number}",
       "stats": "{score}ポイント | {words}語",
@@ -2614,6 +2664,7 @@ const ja = {
     "howToPlay": "フィードバックのヒントを使って隠された{length}文字の単語を探そう！{max}回の試行があります。",
     "shareResult": "結果をシェア",
     "shareAttempt": "挑戦をシェア",
+    "shareChallengeFriends": "友達に挑戦",
     "playAgainTomorrow": "明日また新しいパズルに挑戦してください！",
     "tryAnotherLanguage": "別の言語に挑戦",
     "playDifferentLanguage": "違う言語でチャレンジしよう！",
@@ -2726,6 +2777,8 @@ const ja = {
       "revealTargetWord": "正解を表示",
       "yourCoins": "あなたのコイン:",
       "notEnoughCoins": "コインが足りません",
+      "seeTheAnswer": "正解を確認する",
+      "earnMoreHint": "チャレンジに勝ってコインを獲得しよう！",
       "wantToRetry": "もう一度挑戦しますか？",
       "retryChallenge": "再挑戦",
       "needMoreCoins": "あと{amount}必要",

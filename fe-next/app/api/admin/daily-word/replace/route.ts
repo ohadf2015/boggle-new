@@ -147,7 +147,7 @@ export async function POST(request: Request) {
 
 // Calculate puzzle number from date
 function getPuzzleNumber(dateString: string): number {
-  const DAILY_CHALLENGE_EPOCH = new Date('2024-01-01T00:00:00Z');
+  const DAILY_CHALLENGE_EPOCH = new Date('2025-12-30T00:00:00Z');
   const date = new Date(dateString + 'T00:00:00Z');
   const daysSinceEpoch = Math.floor((date.getTime() - DAILY_CHALLENGE_EPOCH.getTime()) / (24 * 60 * 60 * 1000));
   return daysSinceEpoch + 1;

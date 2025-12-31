@@ -14,8 +14,8 @@ import type { LetterFeedback } from './wordHuntFeedback';
 // ==========================================
 
 // Epoch date for puzzle numbering (first daily challenge)
-// Puzzle #1 = 2024-01-01
-const DAILY_CHALLENGE_EPOCH = new Date('2024-01-01T00:00:00Z');
+// Puzzle #1 = 2025-12-30, Puzzle #2 = 2025-12-31
+const DAILY_CHALLENGE_EPOCH = new Date('2025-12-30T00:00:00Z');
 
 // Hebrew final letters mapping to regular forms
 // Final letters should not appear on the grid - only regular forms

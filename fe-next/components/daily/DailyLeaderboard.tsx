@@ -384,15 +384,18 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
     }
   }, [currentUserData, puzzleDate, language]);
 
+  // Filter out guests - only show authenticated users on leaderboard
+  const authenticatedParticipants = participants.filter(p => p.player_id !== null);
+
   // Determine which participants to show
   const visibleParticipants = expanded
-    ? participants
-    : participants.slice(0, maxVisible);
+    ? authenticatedParticipants
+    : authenticatedParticipants.slice(0, maxVisible);
 
-  const hasMore = participants.length > maxVisible;
+  const hasMore = authenticatedParticipants.length > maxVisible;
 
-  // Empty state
-  if (!loading && participants.length === 0) {
+  // Empty state - no authenticated players on leaderboard (may have guests)
+  if (!loading && authenticatedParticipants.length === 0) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -408,14 +411,23 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
           <div className="p-2 sm:p-2.5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl border-2 border-indigo-600 shadow-md">
             <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
-          <h3 className="font-black text-base sm:text-lg uppercase tracking-wide text-slate-800 dark:text-white">
-            {t('daily.todaysPlayers')}
-          </h3>
+          <div>
+            <h3 className="font-black text-base sm:text-lg uppercase tracking-wide text-slate-800 dark:text-white">
+              {t('daily.todaysPlayers')}
+            </h3>
+            {totalCount > 0 && (
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
+                {totalCount} {totalCount === 1 ? t('daily.playerSingular') : t('daily.playersPlural')} {t('daily.tookChallenge') || 'took the challenge'}
+              </p>
+            )}
+          </div>
         </div>
-        <div className="text-center py-8">
+        <div className="text-center py-6">
           <div className="text-4xl mb-3">🏆</div>
           <p className="text-slate-700 dark:text-slate-300 font-bold text-sm sm:text-base">
-            {t('daily.beFirstToPlay')}
+            {totalCount > 0
+              ? (t('daily.signUpToAppear') || 'Sign up to appear on the leaderboard!')
+              : t('daily.beFirstToPlay')}
           </p>
         </div>
       </motion.div>
@@ -580,7 +592,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
               ) : (
                 <>
                   <ChevronDown className="w-4 h-4" />
-                  {t('daily.showMore')} ({participants.length - maxVisible} {t('daily.more')})
+                  {t('daily.showMore')} ({authenticatedParticipants.length - maxVisible} {t('daily.more')})
                 </>
               )}
             </motion.button>
