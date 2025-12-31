@@ -430,20 +430,21 @@ export async function sendTestEmail(
   toEmail: string,
   recipientName: string = 'Test User'
 ): Promise<{ success: boolean; error?: string }> {
-  console.log('[Email] sendTestEmail called', { toEmail, recipientName });
+  // Using console.warn because console.log is stripped in production
+  console.warn('[Email] sendTestEmail called', { toEmail, recipientName });
 
   if (!resend) {
-    console.log('[Email] Resend client not initialized');
+    console.warn('[Email] Resend client not initialized');
     return { success: false, error: 'Resend not configured - RESEND_API_KEY missing' };
   }
 
   const fromEmail = process.env.RESEND_FROM_EMAIL;
   if (!fromEmail) {
-    console.log('[Email] RESEND_FROM_EMAIL not set');
+    console.warn('[Email] RESEND_FROM_EMAIL not set');
     return { success: false, error: 'RESEND_FROM_EMAIL not configured' };
   }
 
-  console.log('[Email] Config OK, preparing email', { fromEmail, toEmail });
+  console.warn('[Email] Config OK, preparing email', { fromEmail, toEmail });
 
   const puzzleNumber = getPuzzleNumber();
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.com';
@@ -457,7 +458,7 @@ export async function sendTestEmail(
     playUrl
   );
 
-  console.log('[Email] Sending via Resend...', { subject });
+  console.warn('[Email] Sending via Resend...', { subject });
 
   try {
     // Add 10-second timeout to prevent hanging
@@ -478,11 +479,11 @@ export async function sendTestEmail(
       return { success: false, error: result.error.message };
     }
 
-    console.log(`[Email] Test email sent successfully to ${toEmail}`, { id: result.data?.id });
+    console.warn(`[Email] Test email sent successfully to ${toEmail}`, { id: result.data?.id });
     return { success: true };
   } catch (err) {
     const error = err as Error;
-    console.error(`[Email] Error sending test email:`, error.message);
+    console.error('[Email] Error sending test email:', error.message);
     return { success: false, error: error.message };
   }
 }
