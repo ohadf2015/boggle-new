@@ -1944,6 +1944,8 @@ const ja = {
     "winBonus": "勝利ボーナス",
     "achievement": "実績",
     "levelUp": "レベルアップ",
+    "scoreBonus": "スコアボーナス",
+    "dailyChallenge": "デイリー",
     "lifetimeEarned": "累計獲得コイン",
     "earned": "獲得",
     "spent": "使用",
@@ -2690,7 +2692,9 @@ const ja = {
       "knownLetters": "含む文字:",
       "findOnBoard": "この単語をボード上で見つけてください！",
       "traceLetters": "グリッド上の文字をなぞってスペルを作ろう",
-      "needHelp": "ヘルプが必要？ヒントを試そう！"
+      "needHelp": "ヘルプが必要？ヒントを試そう！",
+      "yourGuess": "あなたの回答",
+      "targetWord": "この単語を探せ"
     },
     "results": {
       "targetWord": "目標単語",

@@ -2083,6 +2083,8 @@ const en = {
     "winBonus": "Win Bonus",
     "achievement": "Achievement",
     "levelUp": "Level Up",
+    "scoreBonus": "Score Bonus",
+    "dailyChallenge": "Daily Bonus",
     "lifetimeEarned": "Lifetime coins earned",
     "earned": "Earned",
     "spent": "Spent",
@@ -2701,7 +2703,9 @@ const en = {
       "knownLetters": "Contains:",
       "findOnBoard": "Find this word on the board!",
       "traceLetters": "Trace the letters on the grid to spell it",
-      "needHelp": "Need help? Try a clue!"
+      "needHelp": "Need help? Try a clue!",
+      "yourGuess": "Your Guess",
+      "targetWord": "Find This Word"
     },
     "results": {
       "targetWord": "Target Word",

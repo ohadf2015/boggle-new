@@ -1867,6 +1867,8 @@ const es = {
     "winBonus": "Bonus victoria",
     "achievement": "Logro",
     "levelUp": "Subir nivel",
+    "scoreBonus": "Bonus Puntos",
+    "dailyChallenge": "Bono Diario",
     "lifetimeEarned": "Monedas ganadas en total",
     "earned": "Ganado",
     "spent": "Gastado",
@@ -2688,7 +2690,9 @@ const es = {
       "knownLetters": "Contiene:",
       "findOnBoard": "¡Encuentra esta palabra en el tablero!",
       "traceLetters": "Traza las letras en la cuadrícula para deletrearla",
-      "needHelp": "¿Necesitas ayuda? ¡Prueba una pista!"
+      "needHelp": "¿Necesitas ayuda? ¡Prueba una pista!",
+      "yourGuess": "Tu intento",
+      "targetWord": "Encuentra esta palabra"
     },
     "results": {
       "targetWord": "Palabra Objetivo",

@@ -2074,6 +2074,8 @@ const he = {
     "winBonus": "בונוס ניצחון",
     "achievement": "הישג",
     "levelUp": "עליית רמה",
+    "scoreBonus": "בונוס ניקוד",
+    "dailyChallenge": "בונוס יומי",
     "lifetimeEarned": "סה\"כ מטבעות שנצברו",
     "earned": "נצבר",
     "spent": "הוצא",
@@ -2692,7 +2694,9 @@ const he = {
       "knownLetters": "מכיל:",
       "findOnBoard": "מצאו את המילה הזו על הלוח!",
       "traceLetters": "עקבו אחרי האותיות על הלוח כדי לאיית אותה",
-      "needHelp": "צריך עזרה? נסה רמז!"
+      "needHelp": "צריך עזרה? נסה רמז!",
+      "yourGuess": "הניחוש שלך",
+      "targetWord": "מצא את המילה"
     },
     "results": {
       "targetWord": "מילת היעד",

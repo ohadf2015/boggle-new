@@ -1945,6 +1945,8 @@ const sv = {
     "winBonus": "Vinstbonus",
     "achievement": "Prestation",
     "levelUp": "Nivå upp",
+    "scoreBonus": "Poängbonus",
+    "dailyChallenge": "Daglig bonus",
     "lifetimeEarned": "Totalt intjänade mynt",
     "earned": "Intjänat",
     "spent": "Spenderat",
@@ -2691,7 +2693,9 @@ const sv = {
       "knownLetters": "Innehåller:",
       "findOnBoard": "Hitta detta ord på brädet!",
       "traceLetters": "Följ bokstäverna på rutnätet för att stava det",
-      "needHelp": "Behöver du hjälp? Prova en ledtråd!"
+      "needHelp": "Behöver du hjälp? Prova en ledtråd!",
+      "yourGuess": "Ditt svar",
+      "targetWord": "Hitta detta ord"
     },
     "results": {
       "targetWord": "Målordet",
