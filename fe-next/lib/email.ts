@@ -14,6 +14,18 @@ const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
 
+/**
+ * Helper to add timeout to any promise
+ */
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, errorMessage: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(errorMessage)), timeoutMs)
+    ),
+  ]);
+}
+
 // Get Supabase admin client for database operations
 function getSupabaseAdmin() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -349,21 +361,26 @@ export async function sendDailyChallengeEmail(
   );
 
   try {
-    const { error } = await resend.emails.send({
-      from: fromEmail,
-      to: recipient.email,
-      subject,
-      html,
-      text,
-      headers: {
-        'List-Unsubscribe': `<${unsubscribeUrl}>`,
-        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
-      },
-    });
+    // Add 10-second timeout to prevent hanging
+    const result = await withTimeout(
+      resend.emails.send({
+        from: fromEmail,
+        to: recipient.email,
+        subject,
+        html,
+        text,
+        headers: {
+          'List-Unsubscribe': `<${unsubscribeUrl}>`,
+          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        },
+      }),
+      10000,
+      'Resend API timed out after 10 seconds'
+    );
 
-    if (error) {
-      console.error(`[Email] Failed to send to ${recipient.email}:`, error);
-      return { success: false, error: error.message };
+    if (result.error) {
+      console.error(`[Email] Failed to send to ${recipient.email}:`, result.error);
+      return { success: false, error: result.error.message };
     }
 
     // Update last sent timestamp
@@ -413,14 +430,20 @@ export async function sendTestEmail(
   toEmail: string,
   recipientName: string = 'Test User'
 ): Promise<{ success: boolean; error?: string }> {
+  console.log('[Email] sendTestEmail called', { toEmail, recipientName });
+
   if (!resend) {
-    return { success: false, error: 'Resend not configured' };
+    console.log('[Email] Resend client not initialized');
+    return { success: false, error: 'Resend not configured - RESEND_API_KEY missing' };
   }
 
   const fromEmail = process.env.RESEND_FROM_EMAIL;
   if (!fromEmail) {
+    console.log('[Email] RESEND_FROM_EMAIL not set');
     return { success: false, error: 'RESEND_FROM_EMAIL not configured' };
   }
+
+  console.log('[Email] Config OK, preparing email', { fromEmail, toEmail });
 
   const puzzleNumber = getPuzzleNumber();
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.com';
@@ -434,25 +457,32 @@ export async function sendTestEmail(
     playUrl
   );
 
-  try {
-    const { error } = await resend.emails.send({
-      from: fromEmail,
-      to: toEmail,
-      subject: `[TEST] ${subject}`,
-      html,
-      text,
-    });
+  console.log('[Email] Sending via Resend...', { subject });
 
-    if (error) {
-      console.error(`[Email] Failed to send test email to ${toEmail}:`, error);
-      return { success: false, error: error.message };
+  try {
+    // Add 10-second timeout to prevent hanging
+    const result = await withTimeout(
+      resend.emails.send({
+        from: fromEmail,
+        to: toEmail,
+        subject: `[TEST] ${subject}`,
+        html,
+        text,
+      }),
+      10000,
+      'Resend API timed out after 10 seconds'
+    );
+
+    if (result.error) {
+      console.error(`[Email] Resend returned error:`, result.error);
+      return { success: false, error: result.error.message };
     }
 
-    console.log(`[Email] Test email sent to ${toEmail}`);
+    console.log(`[Email] Test email sent successfully to ${toEmail}`, { id: result.data?.id });
     return { success: true };
   } catch (err) {
     const error = err as Error;
-    console.error(`[Email] Error sending test email:`, error);
+    console.error(`[Email] Error sending test email:`, error.message);
     return { success: false, error: error.message };
   }
 }

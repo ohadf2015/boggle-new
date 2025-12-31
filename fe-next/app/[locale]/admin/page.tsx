@@ -221,6 +221,7 @@ export default function AdminDashboard() {
 
   // Test email state
   const [testEmailLoading, setTestEmailLoading] = useState(false);
+  const [testEmailAddress, setTestEmailAddress] = useState('');
 
   // Get auth token for API calls
   const getAuthToken = useCallback(async () => {
@@ -362,7 +363,7 @@ export default function AdminDashboard() {
     }
   };
 
-  // Send test email to admin
+  // Send test email to admin or specified address
   const sendTestEmail = async () => {
     setTestEmailLoading(true);
 
@@ -374,12 +375,18 @@ export default function AdminDashboard() {
         return;
       }
 
+      const body: { email?: string } = {};
+      if (testEmailAddress.trim()) {
+        body.email = testEmailAddress.trim();
+      }
+
       const response = await fetch('/api/admin/send-test-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
+        body: JSON.stringify(body),
       });
 
       if (!response.ok) {
@@ -1005,30 +1012,44 @@ export default function AdminDashboard() {
               isDarkMode ? 'bg-slate-600' : 'bg-gray-300'
             )} />
 
-            {/* Send Test Email button */}
-            <Button
-              onClick={sendTestEmail}
-              disabled={testEmailLoading}
-              className={cn(
-                'px-4 py-2 rounded-lg font-bold shadow-md min-h-[40px]',
-                isDarkMode
-                  ? 'bg-cyan-600 hover:bg-cyan-500 text-white'
-                  : 'bg-cyan-500 hover:bg-cyan-600 text-white'
-              )}
-            >
-              {testEmailLoading ? (
-                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-              ) : (
-                <Mail className="w-4 h-4 mr-2" />
-              )}
-              Send Test Email
-            </Button>
+            {/* Send Test Email */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+              <input
+                type="email"
+                placeholder="test@example.com"
+                value={testEmailAddress}
+                onChange={(e) => setTestEmailAddress(e.target.value)}
+                className={cn(
+                  'px-3 py-2 rounded-lg text-sm min-w-[180px] min-h-[40px]',
+                  isDarkMode
+                    ? 'bg-slate-700 text-white border border-slate-600 placeholder-gray-400'
+                    : 'bg-white text-gray-900 border border-gray-300 placeholder-gray-500'
+                )}
+              />
+              <Button
+                onClick={sendTestEmail}
+                disabled={testEmailLoading}
+                className={cn(
+                  'px-4 py-2 rounded-lg font-bold shadow-md min-h-[40px]',
+                  isDarkMode
+                    ? 'bg-cyan-600 hover:bg-cyan-500 text-white'
+                    : 'bg-cyan-500 hover:bg-cyan-600 text-white'
+                )}
+              >
+                {testEmailLoading ? (
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Mail className="w-4 h-4 mr-2" />
+                )}
+                Send Test Email
+              </Button>
+            </div>
 
             <span className={cn(
               'text-xs',
               isDarkMode ? 'text-gray-400' : 'text-gray-500'
             )}>
-              Preview daily challenge email
+              Leave empty to send to your email
             </span>
           </div>
         </motion.div>
