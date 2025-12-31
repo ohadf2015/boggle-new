@@ -204,8 +204,8 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
             <motion.div
               initial={{ scale: 0, rotate: -15 }}
               animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.3, type: 'spring', stiffness: 150 }}
-              whileHover={{ scale: 1.1 }}
+              transition={{ delay: 0.3, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+              whileHover={{ scale: 1.1, transition: { duration: 0.2 } }}
               className="cursor-pointer flex-shrink-0"
               onClick={handleConfetti}
             >
@@ -232,7 +232,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
+                  transition={{ delay: 0.5, duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
                   className="border-3 border-neo-black rounded-full shadow-hard-sm bg-neo-cream p-0.5 flex-shrink-0"
                 >
                   <Avatar
@@ -249,7 +249,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
                 <motion.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  transition={{ delay: 0.45, type: 'spring', stiffness: 200 }}
+                  transition={{ delay: 0.45, duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
                   className={`inline-block ${styles.messageBgClass} ${styles.messageTextClass} text-xs sm:text-sm font-black uppercase px-2 py-0.5 border-2 border-neo-black rounded-neo shadow-hard-sm mb-1`}
                 >
                   {getRankMessage()}
@@ -274,7 +274,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
-              transition={{ delay: 0.5, type: 'spring', stiffness: 150 }}
+              transition={{ delay: 0.5, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
               className="flex items-center gap-2 flex-shrink-0"
             >
               <Trophy
