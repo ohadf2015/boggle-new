@@ -14,6 +14,7 @@ import {
   type WinnerOnboardingData,
 } from '@/utils/dailyChallenge';
 import { updateProfile } from '@/lib/supabase';
+import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
 
 /**
  * Hook to manage winner onboarding flow after daily challenge signup
@@ -71,10 +72,15 @@ export function useWinnerOnboarding() {
     try {
       logger.info('Completing winner onboarding with:', { displayName, avatarId });
 
+      // Get emoji and color representation for the avatar
+      const { emoji, color } = getAvatarEmojiAndColor(avatarId);
+
       // 1. Update the user's profile with chosen avatar and name
       const { data: updatedProfile, error: updateError } = await updateProfile(user.id, {
         display_name: displayName,
         avatar_image: avatarId,
+        avatar_emoji: emoji,
+        avatar_color: color,
         has_customized_profile: true, // Mark as customized
       });
 
@@ -82,13 +88,11 @@ export function useWinnerOnboarding() {
         throw new Error(updateError.message);
       }
 
-      logger.info('Profile updated successfully');
+      logger.info('Profile updated successfully with avatar:', { avatarId, emoji, color });
 
       // 2. Submit the pending daily challenge result with the NEW avatar/name
       const pending = getPendingDailyResult();
       if (pending) {
-        const guestPlayer = await getGuestDailyPlayer();
-
         const bodyData: Record<string, unknown> = {
           puzzleDate: pending.puzzleDate,
           puzzleNumber: pending.puzzleNumber,
@@ -96,8 +100,8 @@ export function useWinnerOnboarding() {
           playerId: user.id,
           guestFingerprint: null, // Now authenticated
           displayName: displayName, // Use the chosen name
-          avatarEmoji: updatedProfile?.avatar_emoji || guestPlayer?.avatarEmoji || '🎯',
-          avatarColor: updatedProfile?.avatar_color || guestPlayer?.avatarColor || '#6366f1',
+          avatarEmoji: emoji, // Use the emoji from avatar mapping
+          avatarColor: color, // Use the color from avatar mapping
           solved: pending.result.solved,
           attemptsUsed: pending.result.attemptsUsed,
           targetWord: pending.result.targetWord,

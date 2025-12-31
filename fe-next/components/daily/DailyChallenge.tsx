@@ -497,8 +497,23 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
   onShowTutorial,
   t,
 }) => {
+  const searchParams = useSearchParams();
   const [showLangDropdown, setShowLangDropdown] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+
+  // Auto-open leaderboard if showLeaderboard query param is present
+  useEffect(() => {
+    const shouldShowLeaderboard = searchParams.get('showLeaderboard');
+    if (shouldShowLeaderboard === 'true') {
+      setShowLeaderboard(true);
+      // Clean up URL by removing the query parameter after opening
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('showLeaderboard');
+        window.history.replaceState({}, '', url.toString());
+      }
+    }
+  }, [searchParams]);
 
   // Check if this is a valid challenge (same puzzle number)
   const isValidChallenge = challengeData && challengeData.puzzleNumber === puzzleNumber;
