@@ -2915,6 +2915,25 @@ const sv = {
     "type": "Skriv",
     "clear": "för att rensa",
     "gotIt": "Fattat!"
+  },
+  "emailPreferences": {
+    "title": "Dagliga pusselaviseringar",
+    "sendingTo": "Skickas till",
+    "dailyChallenge": "Morgon-ordjakten",
+    "dailyChallengeDesc": "Få ditt morgonpussel - missa aldrig en daglig utmaning igen",
+    "timezone": "Din tidszon",
+    "timezoneDesc": "Vi pingar dig kl. 8 - kaffe ingår ej",
+    "saved": "Inställningar sparade!",
+    "unsubscribeInfo": "Du kan alltid avprenumerera via länken i våra mail"
+  },
+  "unsubscribe": {
+    "processing": "Bearbetar...",
+    "successTitle": "Du är borta från listan",
+    "successMessage": "Inga fler dagliga mail. Men pusslen kommer sakna dig! Kom tillbaka när som helst.",
+    "errorTitle": "Oops, något gick sönder",
+    "errorMessage": "Länken funkade inte. Den kanske har gått ut eller redan använts. Prova igen från ett nytt mail!",
+    "backToGame": "Tillbaka till spelet",
+    "resubscribe": "Ångrat dig?"
   }
 };
 

@@ -41,6 +41,11 @@ export interface ProfileData {
   // Coins & Collectibles
   total_coins?: number;
   lifetime_coins_earned?: number;
+  // Email Preferences
+  daily_email_subscribed?: boolean;
+  timezone?: string | null;
+  email_unsubscribe_token?: string | null;
+  last_daily_email_sent_at?: string | null;
 }
 
 // Collectible item from the catalog

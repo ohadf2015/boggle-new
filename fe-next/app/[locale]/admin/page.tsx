@@ -6,7 +6,7 @@ import {
   Users, Gamepad2, Clock, Globe, TrendingUp,
   ArrowLeft, RefreshCw, UserPlus, Languages, Link,
   Trophy, CalendarDays, CalendarRange, Server, User, Bot,
-  Book, Settings, History, ChevronLeft, ChevronRight
+  Book, Settings, History, ChevronLeft, ChevronRight, Mail
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
@@ -219,6 +219,9 @@ export default function AdminDashboard() {
   const [retryLinkExpiry, setRetryLinkExpiry] = useState<string | null>(null);
   const [retryLinkLanguage, setRetryLinkLanguage] = useState<string>('en');
 
+  // Test email state
+  const [testEmailLoading, setTestEmailLoading] = useState(false);
+
   // Get auth token for API calls
   const getAuthToken = useCallback(async () => {
     if (!supabase) return null;
@@ -356,6 +359,40 @@ export default function AdminDashboard() {
       toast.error(err instanceof Error ? err.message : 'Failed to generate retry link');
     } finally {
       setRetryLinkLoading(false);
+    }
+  };
+
+  // Send test email to admin
+  const sendTestEmail = async () => {
+    setTestEmailLoading(true);
+
+    try {
+      const token = await getAuthToken();
+      if (!token) {
+        toast.error('Authentication required');
+        setTestEmailLoading(false);
+        return;
+      }
+
+      const response = await fetch('/api/admin/send-test-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to send test email');
+      }
+
+      const result = await response.json();
+      toast.success(`Test email sent to ${result.sentTo}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to send test email');
+    } finally {
+      setTestEmailLoading(false);
     }
   };
 
@@ -960,6 +997,38 @@ export default function AdminDashboard() {
               isDarkMode ? 'text-gray-400' : 'text-gray-500'
             )}>
               Share with players to let them replay today&apos;s puzzle
+            </span>
+
+            {/* Divider */}
+            <div className={cn(
+              'hidden sm:block w-px h-8 mx-2',
+              isDarkMode ? 'bg-slate-600' : 'bg-gray-300'
+            )} />
+
+            {/* Send Test Email button */}
+            <Button
+              onClick={sendTestEmail}
+              disabled={testEmailLoading}
+              className={cn(
+                'px-4 py-2 rounded-lg font-bold shadow-md min-h-[40px]',
+                isDarkMode
+                  ? 'bg-cyan-600 hover:bg-cyan-500 text-white'
+                  : 'bg-cyan-500 hover:bg-cyan-600 text-white'
+              )}
+            >
+              {testEmailLoading ? (
+                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Mail className="w-4 h-4 mr-2" />
+              )}
+              Send Test Email
+            </Button>
+
+            <span className={cn(
+              'text-xs',
+              isDarkMode ? 'text-gray-400' : 'text-gray-500'
+            )}>
+              Preview daily challenge email
             </span>
           </div>
         </motion.div>

@@ -2912,6 +2912,25 @@ const es = {
     "type": "Escribe",
     "clear": "para borrar",
     "gotIt": "¡Entendido!"
+  },
+  "emailPreferences": {
+    "title": "Alertas del Puzzle Diario",
+    "sendingTo": "Enviando a",
+    "dailyChallenge": "Despertador de Palabras",
+    "dailyChallengeDesc": "Recibe tu puzzle mañanero - nunca más te pierdas un diario",
+    "timezone": "Tu zona horaria",
+    "timezoneDesc": "Te avisamos a las 8 AM - el café lo pones tú",
+    "saved": "¡Preferencias guardadas!",
+    "unsubscribeInfo": "Puedes cancelar en cualquier momento desde nuestros correos"
+  },
+  "unsubscribe": {
+    "processing": "Procesando...",
+    "successTitle": "Ya no estás en la lista",
+    "successMessage": "No más correos diarios. ¡Pero los puzzles te van a extrañar! Vuelve cuando quieras.",
+    "errorTitle": "Ups, algo falló",
+    "errorMessage": "El enlace no funcionó. Puede que haya expirado o ya se usó. ¡Prueba desde un correo reciente!",
+    "backToGame": "Volver al juego",
+    "resubscribe": "¿Cambiaste de opinión?"
   }
 };
 

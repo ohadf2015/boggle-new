@@ -19,6 +19,7 @@ import LevelBadge from '@/components/LevelBadge';
 import XpProgressBar from '@/components/XpProgressBar';
 import { CoinBalance } from '@/components/CoinBalance';
 import { CollectionGrid } from '@/components/CollectionGrid';
+import { EmailPreferences } from '@/components/settings/EmailPreferences';
 import { uploadProfilePicture, removeProfilePicture } from '@/lib/supabase';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -911,6 +912,17 @@ export default function ProfilePage(): React.ReactNode {
             </p>
           </div>
         </motion.div>
+
+        {/* Email Preferences Section - Only for authenticated users */}
+        {user && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <EmailPreferences isDarkMode={isDarkMode} />
+          </motion.div>
+        )}
 
         {/* Back Buttons - Neo-Brutalist styled */}
         <motion.div

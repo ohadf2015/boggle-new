@@ -97,7 +97,7 @@ export async function getProfile(userId: string): Promise<ProfileResult> {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
   const result = await supabase
     .from('profiles')
-    .select('id, username, display_name, avatar_emoji, avatar_color, profile_picture_url, profile_picture_provider, total_games, total_score, total_words, casual_games, casual_wins, ranked_games, ranked_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_xp, current_level, player_title, is_admin, total_hints_used, free_hints_available, country_code, created_at, updated_at, achievement_counts, total_time_played, total_coins, lifetime_coins_earned')
+    .select('id, username, display_name, avatar_emoji, avatar_color, profile_picture_url, profile_picture_provider, total_games, total_score, total_words, casual_games, casual_wins, ranked_games, ranked_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_xp, current_level, player_title, is_admin, total_hints_used, free_hints_available, country_code, created_at, updated_at, achievement_counts, total_time_played, total_coins, lifetime_coins_earned, daily_email_subscribed, timezone')
     .eq('id', userId)
     .single();
   return { data: result.data as ProfileData | null, error: result.error ? { message: result.error.message } : null };

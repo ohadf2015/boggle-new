@@ -802,14 +802,14 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                 >
                   {latestAttemptFeedback.map((letterFb, idx) => {
                     const wordLength = latestAttemptFeedback.length;
-                    // Larger boxes for better visibility - increased by ~20%
+                    // Compact but visible boxes
                     const sizeClass = wordLength <= 4
-                      ? "w-12 h-12 sm:w-14 sm:h-14 text-xl sm:text-2xl"
+                      ? "w-9 h-9 sm:w-10 sm:h-10 text-base sm:text-lg"
                       : wordLength <= 6
-                        ? "w-10 h-10 sm:w-12 sm:h-12 text-lg sm:text-xl"
+                        ? "w-8 h-8 sm:w-9 sm:h-9 text-sm sm:text-base"
                         : wordLength <= 8
-                          ? "w-9 h-9 sm:w-11 sm:h-11 text-base sm:text-lg"
-                          : "w-8 h-8 sm:w-10 sm:h-10 text-sm sm:text-base";
+                          ? "w-7 h-7 sm:w-8 sm:h-8 text-xs sm:text-sm"
+                          : "w-6 h-6 sm:w-7 sm:h-7 text-[10px] sm:text-xs";
 
                     return (
                       <motion.div
@@ -826,10 +826,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                           damping: 20
                         }}
                         className={cn(
-                          "flex items-center justify-center border-4 rounded-neo-lg font-black shadow-hard-lg text-white",
+                          "flex items-center justify-center border-2 rounded-neo font-bold shadow-hard text-white",
                           sizeClass,
-                          letterFb.feedback === 'green' && "bg-green-500 border-green-700 ring-2 ring-green-300/50",
-                          letterFb.feedback === 'yellow' && "bg-yellow-500 border-yellow-600 text-neo-black ring-2 ring-yellow-300/50",
+                          letterFb.feedback === 'green' && "bg-green-500 border-green-700 ring-1 ring-green-300/50",
+                          letterFb.feedback === 'yellow' && "bg-yellow-500 border-yellow-600 text-neo-black ring-1 ring-yellow-300/50",
                           letterFb.feedback === 'gray' && "bg-gray-400 border-gray-500"
                         )}
                       >
@@ -852,14 +852,14 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                     // Parse hint to understand revealed letters
                     const hintChars = currentHint.hint.split(' ').filter(c => c !== '');
                     const wordLength = hintChars.length;
-                    // Dynamically size based on word length - larger for visibility
+                    // Compact but visible boxes
                     const sizeClass = wordLength <= 4
-                      ? "w-12 h-12 sm:w-14 sm:h-14 text-xl sm:text-2xl"
+                      ? "w-9 h-9 sm:w-10 sm:h-10 text-base sm:text-lg"
                       : wordLength <= 6
-                        ? "w-10 h-10 sm:w-12 sm:h-12 text-lg sm:text-xl"
+                        ? "w-8 h-8 sm:w-9 sm:h-9 text-sm sm:text-base"
                         : wordLength <= 8
-                          ? "w-9 h-9 sm:w-11 sm:h-11 text-base sm:text-lg"
-                          : "w-8 h-8 sm:w-10 sm:h-10 text-sm sm:text-base";
+                          ? "w-7 h-7 sm:w-8 sm:h-8 text-xs sm:text-sm"
+                          : "w-6 h-6 sm:w-7 sm:h-7 text-[10px] sm:text-xs";
 
                     return hintChars.map((char, idx) => {
                       // Check accumulated clues from guesses first (green/yellow)
@@ -898,12 +898,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                           animate={{ scale: 1, opacity: 1 }}
                           transition={{ delay: idx * 0.03, type: "spring", stiffness: 300 }}
                           className={cn(
-                            "flex items-center justify-center border-4 rounded-neo-lg font-black shadow-hard-lg",
+                            "flex items-center justify-center border-2 rounded-neo font-bold shadow-hard",
                             sizeClass,
                             bgClass,
                             // Add subtle glow for revealed letters
-                            isRevealed && accumulatedClue?.type === 'green' && "ring-2 ring-green-300/50",
-                            isRevealed && accumulatedClue?.type === 'yellow' && "ring-2 ring-yellow-300/50"
+                            isRevealed && accumulatedClue?.type === 'green' && "ring-1 ring-green-300/50",
+                            isRevealed && accumulatedClue?.type === 'yellow' && "ring-1 ring-yellow-300/50"
                           )}
                         >
                           {displayChar}
@@ -1089,7 +1089,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
         {/* Life bar - taller and more prominent */}
         <motion.div
-          key={`life-meter-${isLifeGaining ? 'flash' : 'normal'}`}
           className={cn(
             "flex-1 bg-gray-200 dark:bg-gray-700 rounded-neo h-8 sm:h-9 overflow-hidden border-3 shadow-hard relative",
             lifePoints <= 20 ? "border-red-500" : "border-neo-black",
@@ -1107,14 +1106,14 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         >
           <motion.div
             className={cn(
-              "h-full flex items-center justify-center text-sm sm:text-base font-black text-white transition-all",
+              "h-full flex items-center justify-center text-sm sm:text-base font-black text-white",
               getLifeColor(),
               lifePoints <= 20 && !isLifeGaining && "animate-pulse"
             )}
             animate={{
               width: `${Math.max(lifePoints, 15)}%`, // Minimum width to show text
             }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
           >
             <span className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
               {lifePoints}/100

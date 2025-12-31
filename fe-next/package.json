@@ -67,6 +67,7 @@
     "react-dom": "19.2.0",
     "react-hot-toast": "^2.6.0",
     "recharts": "^3.6.0",
+    "resend": "^6.6.0",
     "sass": "^1.94.2",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",

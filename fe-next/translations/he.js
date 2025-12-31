@@ -2916,6 +2916,25 @@ const he = {
     "type": "הקלד",
     "clear": "למחיקה",
     "gotIt": "הבנתי!"
+  },
+  "emailPreferences": {
+    "title": "התראות פאזל יומי",
+    "sendingTo": "נשלח אל",
+    "dailyChallenge": "השכמת ציידי מילים",
+    "dailyChallengeDesc": "קבל את הפאזל הבוקרי שלך - לעולם לא תפספס אתגר יומי",
+    "timezone": "אזור הזמן שלך",
+    "timezoneDesc": "נעיר אותך ב-8 בבוקר - קפה לא כלול",
+    "saved": "ההעדפות נשמרו!",
+    "unsubscribeInfo": "תמיד אפשר לבטל דרך כל מייל שנשלח"
+  },
+  "unsubscribe": {
+    "processing": "מעבד...",
+    "successTitle": "יצאת מהרשימה",
+    "successMessage": "לא עוד מיילים יומיים. אבל הפאזלים יתגעגעו אליך! תמיד אפשר לחזור.",
+    "errorTitle": "אופס, משהו נשבר",
+    "errorMessage": "הקישור לא עבד. אולי פג תוקף או כבר נוצל. נסה שוב ממייל אחרון!",
+    "backToGame": "חזרה למשחק",
+    "resubscribe": "התחרטת?"
   }
 };
 

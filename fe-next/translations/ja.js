@@ -2914,6 +2914,25 @@ const ja = {
     "type": "入力",
     "clear": "クリア",
     "gotIt": "了解！"
+  },
+  "emailPreferences": {
+    "title": "デイリーパズル通知",
+    "sendingTo": "送信先",
+    "dailyChallenge": "朝のワードハント",
+    "dailyChallengeDesc": "毎朝新パズルをお届け - デイリーを逃さない！",
+    "timezone": "タイムゾーン",
+    "timezoneDesc": "朝8時にお届け - コーヒーは各自で",
+    "saved": "設定完了！",
+    "unsubscribeInfo": "いつでもメール内のリンクから配信停止できます"
+  },
+  "unsubscribe": {
+    "processing": "処理中...",
+    "successTitle": "リストから削除されました",
+    "successMessage": "デイリーメールは届かなくなります。でもパズルは寂しがってるよ！いつでも戻ってきてね。",
+    "errorTitle": "おっと、エラーです",
+    "errorMessage": "リンクが使えませんでした。期限切れか使用済みかも。最新のメールから試してみて！",
+    "backToGame": "ゲームに戻る",
+    "resubscribe": "やっぱり登録する？"
   }
 };
 

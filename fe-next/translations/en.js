@@ -2932,6 +2932,25 @@ const en = {
     "type": "Type",
     "clear": "to clear",
     "gotIt": "Got it!"
+  },
+  "emailPreferences": {
+    "title": "Daily Puzzle Alerts",
+    "sendingTo": "Sending to",
+    "dailyChallenge": "Wake-Up Word Hunt",
+    "dailyChallengeDesc": "Get your morning puzzle drop - never miss a daily again",
+    "timezone": "Your Timezone",
+    "timezoneDesc": "We'll ping you at 8 AM your time - coffee not included",
+    "saved": "Preferences locked in!",
+    "unsubscribeInfo": "You can always opt out via any email we send"
+  },
+  "unsubscribe": {
+    "processing": "Processing...",
+    "successTitle": "You're off the list",
+    "successMessage": "No more daily emails from us. But the puzzles will miss you! Come back anytime.",
+    "errorTitle": "Oops, something broke",
+    "errorMessage": "That link didn't work. It might be expired or already used. Try again from a recent email!",
+    "backToGame": "Back to Game",
+    "resubscribe": "Changed Your Mind?"
   }
 };
 
