@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useWinnerOnboarding } from '@/hooks/useWinnerOnboarding';
+import { useAuth } from '@/contexts/AuthContext';
 import WinnerOnboarding from '@/components/auth/WinnerOnboarding';
 
 /**
@@ -10,6 +11,7 @@ import WinnerOnboarding from '@/components/auth/WinnerOnboarding';
  */
 export default function WinnerOnboardingWrapper() {
   const { isOpen, onboardingData, isProcessing, completeOnboarding } = useWinnerOnboarding();
+  const { profile } = useAuth();
 
   if (!onboardingData) {
     return null;
@@ -21,6 +23,7 @@ export default function WinnerOnboardingWrapper() {
       onComplete={completeOnboarding}
       initialName={onboardingData.initialName}
       initialAvatarId={onboardingData.initialAvatarId}
+      profilePictureUrl={profile?.profile_picture_url ?? undefined}
       trigger={onboardingData.trigger}
     />
   );

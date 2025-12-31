@@ -207,13 +207,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         avatarColor = randomData.avatar.color;
       }
 
+      // Determine the avatar_image: use PROFILE_AVATAR_ID if we have a profile picture,
+      // otherwise use the random character avatar
+      const finalAvatarImage = profilePictureUrl ? '__profile_avatar__' : avatarImage;
+
       const { data: newProfile, error: createError } = await createProfile({
         id: userId,
         username,
         display_name: displayName,
         avatar_emoji: avatarEmoji,
         avatar_color: avatarColor,
-        avatar_image: avatarImage, // Character avatar from our avatar options
+        avatar_image: finalAvatarImage, // Use profile picture if available, otherwise character avatar
         profile_picture_url: profilePictureUrl,
         profile_picture_provider: profilePictureProvider,
         has_customized_profile: false, // Will prompt user to customize after sign-in

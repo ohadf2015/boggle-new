@@ -183,6 +183,7 @@ const LandingView: React.FC = () => {
         isOpen={showProfileCustomization}
         onClose={() => setShowProfileCustomization(false)}
         defaultName={profile?.display_name || profile?.username || ''}
+        profilePictureUrl={profile?.profile_picture_url ?? undefined}
         onSave={handleProfileCustomizationSave}
       />
 
