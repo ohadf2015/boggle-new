@@ -77,6 +77,8 @@ interface SubmitRequest extends Request {
     displayName?: string;
     avatarEmoji?: string;
     avatarColor?: string;
+    avatarImage?: string;
+    profilePictureUrl?: string;
     countryCode?: string;
     score?: number;
     wordCount?: number;
