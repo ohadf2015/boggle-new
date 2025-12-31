@@ -2337,3 +2337,234 @@ html.reduce-motion *::after {
   aspect-ratio: 1 / 1 !important;
   margin: 0 auto;
 }
+
+/* ====================================
+   CLUE BOX ATTENTION ANIMATIONS
+   For Daily Challenge Target Word Hints
+   ==================================== */
+
+/* Attention-grabbing pulse for clue container when new feedback appears */
+@keyframes clue-attention-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 225, 53, 0.7),
+                0 0 0 0 rgba(255, 51, 102, 0.5);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px 10px rgba(255, 225, 53, 0.6),
+                0 0 40px 20px rgba(255, 51, 102, 0.3);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 225, 53, 0),
+                0 0 0 0 rgba(255, 51, 102, 0);
+  }
+}
+
+/* Glow ring that expands outward from clue container */
+@keyframes clue-glow-ring {
+  0% {
+    transform: scale(0.95);
+    opacity: 1;
+    box-shadow: inset 0 0 20px rgba(255, 225, 53, 0.8),
+                0 0 30px rgba(255, 225, 53, 0.6);
+  }
+  100% {
+    transform: scale(1.1);
+    opacity: 0;
+    box-shadow: inset 0 0 0 rgba(255, 225, 53, 0),
+                0 0 60px rgba(255, 225, 53, 0);
+  }
+}
+
+/* Bouncy entrance for feedback letters */
+@keyframes clue-letter-bounce {
+  0% {
+    transform: scale(0) rotate(-10deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.3) rotate(5deg);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(0.9) rotate(-2deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Shake animation to grab attention */
+@keyframes clue-shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-4px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(4px);
+  }
+}
+
+/* Border glow effect for active clue container */
+@keyframes clue-border-glow {
+  0%, 100% {
+    border-color: var(--neo-yellow);
+    box-shadow: 0 0 10px rgba(255, 225, 53, 0.5),
+                4px 4px 0 rgb(var(--neo-black));
+  }
+  50% {
+    border-color: var(--neo-pink);
+    box-shadow: 0 0 25px rgba(255, 20, 147, 0.6),
+                0 0 50px rgba(255, 225, 53, 0.3),
+                4px 4px 0 rgb(var(--neo-black));
+  }
+}
+
+/* Flash effect for new clue reveal */
+@keyframes clue-flash {
+  0% {
+    background-color: rgba(255, 225, 53, 0.8);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+/* Utility classes for clue box animations */
+.clue-container-attention {
+  animation: clue-attention-pulse 0.6s ease-out;
+}
+
+.clue-container-glow {
+  animation: clue-border-glow 1.5s ease-in-out infinite;
+}
+
+.clue-letter-entrance {
+  animation: clue-letter-bounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.clue-shake {
+  animation: clue-shake 0.5s ease-in-out;
+}
+
+/* Persistent glow for clue container when showing feedback */
+.clue-feedback-active {
+  background: linear-gradient(135deg,
+    rgba(255, 225, 53, 0.15) 0%,
+    rgba(255, 20, 147, 0.1) 50%,
+    rgba(255, 225, 53, 0.15) 100%);
+  border: 3px solid var(--neo-yellow);
+  box-shadow: 0 0 20px rgba(255, 225, 53, 0.4),
+              0 0 40px rgba(255, 20, 147, 0.2),
+              4px 4px 0 rgb(var(--neo-black));
+}
+
+/* Low-end device fallback - simpler animations */
+.low-end-device .clue-container-attention {
+  animation: none;
+  transform: scale(1.02);
+  transition: transform 0.15s ease-out;
+}
+
+.low-end-device .clue-container-glow {
+  animation: none;
+  border-color: var(--neo-yellow);
+  box-shadow: 0 0 10px rgba(255, 225, 53, 0.5),
+              4px 4px 0 rgb(var(--neo-black));
+}
+
+.low-end-device .clue-letter-entrance {
+  animation: none;
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ====================================
+   LIFE METER ANIMATIONS
+   For Daily Challenge Health Bar
+   ==================================== */
+
+/* Beating heart animation */
+@keyframes heart-beat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  15% {
+    transform: scale(1.3);
+  }
+  30% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.2);
+  }
+  60% {
+    transform: scale(1);
+  }
+}
+
+/* Life gain flash effect on the meter */
+@keyframes life-gain-flash {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.8),
+                inset 0 0 20px rgba(34, 197, 94, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px 15px rgba(34, 197, 94, 0.6),
+                inset 0 0 30px rgba(34, 197, 94, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0),
+                inset 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+
+/* Life meter pulse when gaining life */
+@keyframes life-meter-pulse {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Utility classes for life meter */
+.heart-beating {
+  animation: heart-beat 0.6s ease-in-out;
+}
+
+.heart-continuous-beat {
+  animation: heart-beat 1s ease-in-out infinite;
+}
+
+.life-gain-flash {
+  animation: life-gain-flash 0.6s ease-out;
+}
+
+.life-meter-pulse {
+  animation: life-meter-pulse 0.4s ease-out;
+}
+
+/* Low-end device fallback */
+.low-end-device .heart-beating,
+.low-end-device .heart-continuous-beat {
+  animation: none;
+}
+
+.low-end-device .life-gain-flash {
+  animation: none;
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.5);
+}
+
+.low-end-device .life-meter-pulse {
+  animation: none;
+}

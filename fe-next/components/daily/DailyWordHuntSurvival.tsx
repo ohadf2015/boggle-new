@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Zap, Store, X, Heart, Coins, Lightbulb } from 'lucide-react';
 import GridComponent from '@/components/GridComponent';
 import { HelpPanel, HelpButton } from '@/components/game/HelpPanel';
+import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
+import { useContextualGuidance, useSwipeTipGuidanceTrigger } from '@/hooks/useContextualGuidance';
 import { Button } from '@/components/ui/button';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -119,6 +121,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
   // Life gain animation
   const [lifeGainAmount, setLifeGainAmount] = useState<number | null>(null);
+  const [isLifeGaining, setIsLifeGaining] = useState(false); // Triggers flash/pulse animation on meter
 
   // Hint system
   const [currentHint, setCurrentHint] = useState<HintLevel | null>(null);
@@ -155,6 +158,19 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const handleGameOverRef = useRef<((won: boolean, finalAttempts?: TargetAttempt[]) => void) | null>(null);
   const handleTargetAttemptRef = useRef<((word: string, target: string) => void) | null>(null);
   const handleWordDiscoveryRef = useRef<((word: string) => void) | null>(null);
+
+  // Contextual guidance - helps new players learn to swipe to form words
+  const contextualGuidance = useContextualGuidance();
+
+  // Swipe tip guidance - shows after 15 seconds if player hasn't discovered any words
+  // This helps new players understand they need to swipe on the grid to find words and gain life
+  const isGameActive = !isGameOver && lifePoints > 0;
+  useSwipeTipGuidanceTrigger(
+    discoveredWords.length,
+    contextualGuidance.triggerSwipeTipGuidance,
+    isGameActive,
+    15 // 15 seconds delay
+  );
 
   // Load AI hints on mount
   useEffect(() => {
@@ -545,6 +561,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
     // Trigger life gain animation
     setLifeGainAmount(lifeGained);
+    setIsLifeGaining(true);
+    // Reset animation trigger after animation completes
+    setTimeout(() => setIsLifeGaining(false), 600);
 
     // Show success feedback (toast only - no duplicate inline feedback)
     showToast('valid-word', `+${lifeGained} ❤️ ${tokensGained > 0 ? `+${tokensGained} 🪙` : ''}`);
@@ -742,12 +761,34 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       {/* Target word black boxes - always visible */}
       {currentHint && (
         <motion.div
+          // Key on attempts length to retrigger attention animation on each guess
+          key={`clue-container-${attempts.length}`}
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mx-auto max-w-3xl w-full px-1 mb-0.5"
+          className={cn(
+            "mx-auto max-w-3xl w-full px-3 py-3 mb-1 rounded-neo-lg transition-all duration-300",
+            "bg-neo-navy/30 dark:bg-neo-navy/50 border-2 border-neo-black/20",
+            showFeedbackOverlay
+              ? "clue-feedback-active clue-container-attention"
+              : "clue-container-glow" // Subtle continuous glow when idle
+          )}
         >
+          {/* Label for the clue area */}
+          <div className="flex justify-center mb-2">
+            <span className={cn(
+              "text-xs font-bold uppercase tracking-wider px-3 py-0.5 rounded-full transition-colors",
+              showFeedbackOverlay
+                ? "bg-neo-yellow text-neo-black"
+                : "bg-neo-black/20 text-gray-600 dark:text-gray-400"
+            )}>
+              {showFeedbackOverlay
+                ? (t('wordHunt.survival.yourGuess') || 'Your Guess')
+                : (t('wordHunt.survival.targetWord') || 'Find This Word')
+              }
+            </span>
+          </div>
           {/* Black boxes for target word OR Letter Feedback Overlay */}
-          <div className="flex justify-center flex-wrap gap-1 sm:gap-1.5 px-2">
+          <div className="flex justify-center flex-wrap gap-1.5 sm:gap-2 px-2">
             <AnimatePresence mode="wait">
               {showFeedbackOverlay && latestAttemptFeedback ? (
                 // Show colored letter feedback when overlay is active
@@ -757,17 +798,18 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.3 }}
-                  className="flex justify-center flex-wrap gap-1 sm:gap-1.5"
+                  className="flex justify-center flex-wrap gap-1.5 sm:gap-2"
                 >
                   {latestAttemptFeedback.map((letterFb, idx) => {
                     const wordLength = latestAttemptFeedback.length;
+                    // Larger boxes for better visibility - increased by ~20%
                     const sizeClass = wordLength <= 4
-                      ? "w-10 h-10 sm:w-12 sm:h-12 text-lg sm:text-xl"
+                      ? "w-12 h-12 sm:w-14 sm:h-14 text-xl sm:text-2xl"
                       : wordLength <= 6
-                        ? "w-8 h-8 sm:w-10 sm:h-10 text-base sm:text-lg"
+                        ? "w-10 h-10 sm:w-12 sm:h-12 text-lg sm:text-xl"
                         : wordLength <= 8
-                          ? "w-7 h-7 sm:w-9 sm:h-9 text-sm sm:text-base"
-                          : "w-6 h-6 sm:w-8 sm:h-8 text-xs sm:text-sm";
+                          ? "w-9 h-9 sm:w-11 sm:h-11 text-base sm:text-lg"
+                          : "w-8 h-8 sm:w-10 sm:h-10 text-sm sm:text-base";
 
                     return (
                       <motion.div
@@ -784,10 +826,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                           damping: 20
                         }}
                         className={cn(
-                          "flex items-center justify-center border-3 rounded-lg font-black shadow-hard text-white",
+                          "flex items-center justify-center border-4 rounded-neo-lg font-black shadow-hard-lg text-white",
                           sizeClass,
-                          letterFb.feedback === 'green' && "bg-green-500 border-green-700",
-                          letterFb.feedback === 'yellow' && "bg-yellow-500 border-yellow-600 text-neo-black",
+                          letterFb.feedback === 'green' && "bg-green-500 border-green-700 ring-2 ring-green-300/50",
+                          letterFb.feedback === 'yellow' && "bg-yellow-500 border-yellow-600 text-neo-black ring-2 ring-yellow-300/50",
                           letterFb.feedback === 'gray' && "bg-gray-400 border-gray-500"
                         )}
                       >
@@ -804,20 +846,20 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.3 }}
-                  className="flex justify-center flex-wrap gap-1 sm:gap-1.5"
+                  className="flex justify-center flex-wrap gap-1.5 sm:gap-2"
                 >
                   {(() => {
                     // Parse hint to understand revealed letters
                     const hintChars = currentHint.hint.split(' ').filter(c => c !== '');
                     const wordLength = hintChars.length;
-                    // Dynamically size based on word length
+                    // Dynamically size based on word length - larger for visibility
                     const sizeClass = wordLength <= 4
-                      ? "w-10 h-10 sm:w-12 sm:h-12 text-lg sm:text-xl"
+                      ? "w-12 h-12 sm:w-14 sm:h-14 text-xl sm:text-2xl"
                       : wordLength <= 6
-                        ? "w-8 h-8 sm:w-10 sm:h-10 text-base sm:text-lg"
+                        ? "w-10 h-10 sm:w-12 sm:h-12 text-lg sm:text-xl"
                         : wordLength <= 8
-                          ? "w-7 h-7 sm:w-9 sm:h-9 text-sm sm:text-base"
-                          : "w-6 h-6 sm:w-8 sm:h-8 text-xs sm:text-sm";
+                          ? "w-9 h-9 sm:w-11 sm:h-11 text-base sm:text-lg"
+                          : "w-8 h-8 sm:w-10 sm:h-10 text-sm sm:text-base";
 
                     return hintChars.map((char, idx) => {
                       // Check accumulated clues from guesses first (green/yellow)
@@ -856,9 +898,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                           animate={{ scale: 1, opacity: 1 }}
                           transition={{ delay: idx * 0.03, type: "spring", stiffness: 300 }}
                           className={cn(
-                            "flex items-center justify-center border-3 rounded-lg font-black shadow-hard",
+                            "flex items-center justify-center border-4 rounded-neo-lg font-black shadow-hard-lg",
                             sizeClass,
-                            bgClass
+                            bgClass,
+                            // Add subtle glow for revealed letters
+                            isRevealed && accumulatedClue?.type === 'green' && "ring-2 ring-green-300/50",
+                            isRevealed && accumulatedClue?.type === 'yellow' && "ring-2 ring-yellow-300/50"
                           )}
                         >
                           {displayChar}
@@ -1021,40 +1066,59 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           onComplete={() => setLifeGainAmount(null)}
         />
 
-        {/* Life bar */}
+        {/* Beating heart icon - prominent and animated */}
         <motion.div
+          key={`heart-${isLifeGaining ? 'beating' : 'idle'}`}
           className={cn(
-            "flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden border-2",
-            lifePoints <= 20 ? "border-red-500" : "border-neo-black"
+            "flex-shrink-0 flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full border-3 border-neo-black shadow-hard",
+            lifePoints > 66 ? "bg-green-500" : lifePoints > 33 ? "bg-yellow-500" : "bg-red-500",
+            isLifeGaining && "heart-beating"
           )}
           animate={
-            lifePoints <= 20 && !isGameOver
+            !skipAnimations && lifePoints <= 20 && !isGameOver && !isLifeGaining
+              ? { scale: [1, 1.15, 1] }
+              : {}
+          }
+          transition={{ duration: 0.6, repeat: lifePoints <= 20 && !isLifeGaining ? Infinity : 0 }}
+        >
+          <Heart className={cn(
+            "w-5 h-5 sm:w-6 sm:h-6 text-white fill-white",
+            isLifeGaining && "heart-beating"
+          )} />
+        </motion.div>
+
+        {/* Life bar - taller and more prominent */}
+        <motion.div
+          key={`life-meter-${isLifeGaining ? 'flash' : 'normal'}`}
+          className={cn(
+            "flex-1 bg-gray-200 dark:bg-gray-700 rounded-neo h-8 sm:h-9 overflow-hidden border-3 shadow-hard relative",
+            lifePoints <= 20 ? "border-red-500" : "border-neo-black",
+            isLifeGaining && "life-gain-flash life-meter-pulse"
+          )}
+          animate={
+            lifePoints <= 20 && !isGameOver && !isLifeGaining
               ? {
                   scale: [1, 1.02, 1],
                   borderColor: ['#ef4444', '#dc2626', '#ef4444']
                 }
               : {}
           }
-          transition={{ duration: 0.5, repeat: lifePoints <= 20 ? Infinity : 0 }}
+          transition={{ duration: 0.5, repeat: lifePoints <= 20 && !isLifeGaining ? Infinity : 0 }}
         >
           <motion.div
             className={cn(
-              "h-full flex items-center justify-center text-xs font-bold text-white transition-all",
+              "h-full flex items-center justify-center text-sm sm:text-base font-black text-white transition-all",
               getLifeColor(),
-              lifePoints <= 20 && "animate-pulse"
+              lifePoints <= 20 && !isLifeGaining && "animate-pulse"
             )}
             animate={{
-              width: `${lifePoints}%`,
+              width: `${Math.max(lifePoints, 15)}%`, // Minimum width to show text
             }}
             transition={{ duration: 0.3 }}
           >
-            <motion.div
-              animate={!skipAnimations && lifePoints <= 20 && !isGameOver ? { scale: [1, 1.2, 1] } : {}}
-              transition={{ duration: 0.5, repeat: !skipAnimations && lifePoints <= 20 ? Infinity : 0 }}
-            >
-              <Heart className="w-3 h-3 mr-1 fill-current" />
-            </motion.div>
-            {lifePoints}/100
+            <span className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
+              {lifePoints}/100
+            </span>
           </motion.div>
 
           {/* Life drain particles effect when low on life - disabled on low-end devices */}
@@ -1227,6 +1291,13 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
       {/* Help Panel */}
       <HelpPanel isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+
+      {/* Swipe Tip Tooltip - shows after 15 seconds if player hasn't discovered any words */}
+      <SwipeTipTooltip
+        isVisible={contextualGuidance.showSwipeTip}
+        onDismiss={contextualGuidance.dismissSwipeTip}
+        t={t}
+      />
 
       {/* Word Feedback Toast */}
       <WordFeedbackToast

@@ -173,14 +173,25 @@ const MiniGrid: React.FC<MiniGridProps> = ({
     // Bounds check
     if (row < 0 || row >= rows || col < 0 || col >= cols) return null;
 
-    // Check if touch is within the cell (not in gap)
+    // Calculate position within the cell area (including gap tolerance)
     const cellStartX = col * cellWithGapWidth;
     const cellStartY = row * cellWithGapHeight;
     const xInCell = adjustedX - cellStartX;
     const yInCell = adjustedY - cellStartY;
 
-    // If touch is in the gap area, don't select
-    if (xInCell > cellWidth || yInCell > cellHeight) return null;
+    // Calculate distance from cell center for tolerance-based selection
+    const cellCenterX = cellWidth / 2;
+    const cellCenterY = cellHeight / 2;
+    const distanceFromCenter = Math.sqrt(
+      Math.pow(xInCell - cellCenterX, 2) + Math.pow(yInCell - cellCenterY, 2)
+    );
+
+    // Allow selection if within 90% of cell radius (forgiving threshold)
+    // This makes it MUCH easier to select cells, especially on mobile
+    const cellRadius = Math.min(cellWidth, cellHeight) / 2;
+    const selectionThreshold = cellRadius * 1.3; // 130% tolerance - very forgiving
+
+    if (distanceFromCenter > selectionThreshold) return null;
 
     return { row, col };
   }, [letters, size, measureGrid]);
@@ -366,7 +377,8 @@ const MiniGrid: React.FC<MiniGridProps> = ({
         dir="ltr"
         className={cn(
           'grid gap-2 sm:gap-3 mx-auto relative',
-          size === 3 ? 'grid-cols-3 max-w-[260px] sm:max-w-[320px]' : 'grid-cols-4 max-w-[320px] sm:max-w-[380px]'
+          // Increased container sizes to accommodate larger touch targets
+          size === 3 ? 'grid-cols-3 max-w-[280px] sm:max-w-[340px]' : 'grid-cols-4 max-w-[360px] sm:max-w-[420px]'
         )}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -389,7 +401,8 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                   'relative aspect-square rounded-neo border-3 sm:border-4 border-neo-black',
                   'flex items-center justify-center font-black text-2xl sm:text-3xl',
                   'cursor-pointer select-none touch-none transition-all',
-                  'min-h-[65px] min-w-[65px] sm:min-h-[80px] sm:min-w-[80px]',
+                  // Larger touch targets for better mobile interaction (was 65px/80px)
+                  'min-h-[80px] min-w-[80px] sm:min-h-[95px] sm:min-w-[95px]',
                   isSelected
                     ? 'bg-neo-lime shadow-hard-sm scale-95 text-neo-black'
                     : 'bg-neo-cream shadow-hard-sm sm:shadow-hard',
