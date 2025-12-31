@@ -208,5 +208,5 @@ export const WORD_MIN_LENGTH = 2;
 export const WORD_MAX_LENGTH = 20;
 
 // Pattern for valid username/room name characters
-// Allows: letters, numbers, spaces, Hebrew, Japanese, Chinese, Latin Extended, and special chars ._-
-export const NAME_VALID_PATTERN = /^[a-zA-Z0-9\s\u0590-\u05FF\u3040-\u30FF\u4E00-\u9FFF\u00C0-\u024F._-]+$/;
+// Uses Unicode property escapes to allow any letter or number from any language, plus spaces and ._-
+export const NAME_VALID_PATTERN = /^[\p{L}\p{N}\s._-]+$/u;

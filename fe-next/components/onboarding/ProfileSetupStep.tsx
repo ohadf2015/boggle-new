@@ -29,6 +29,11 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
   const [nameTouched, setNameTouched] = useState(false);
   const [hasManuallyEditedName, setHasManuallyEditedName] = useState(false);
 
+  // Check if current name is a default avatar name
+  const isDefaultAvatarName = (name: string): boolean => {
+    return AVATARS.some(avatar => avatar.name === name);
+  };
+
   // Auto-fill name from avatar on initial load (if name is empty)
   useEffect(() => {
     if (!displayName && selectedAvatarId && !hasManuallyEditedName) {
@@ -39,13 +44,16 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
     }
   }, [selectedAvatarId, displayName, hasManuallyEditedName, onNameChange]);
 
-  // Handle avatar selection - auto-fill name if not manually edited
+  // Handle avatar selection - auto-fill name if not manually edited OR if current name is a default avatar name
   const handleAvatarSelect = (avatarId: string) => {
     onAvatarSelect(avatarId);
-    if (!hasManuallyEditedName) {
+    // Update name if user hasn't manually edited OR if current name is a default avatar name
+    if (!hasManuallyEditedName || isDefaultAvatarName(displayName)) {
       const avatar = getAvatarById(avatarId);
       if (avatar) {
         onNameChange(avatar.name);
+        // Reset manual edit flag since we're using a default name
+        setHasManuallyEditedName(false);
       }
     }
   };

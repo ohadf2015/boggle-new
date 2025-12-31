@@ -560,6 +560,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     if (!isGameOver || gameOverCalledRef.current || !gridRef.current) return;
 
     gameOverCalledRef.current = true;
+    let isMounted = true;
 
     // Clean up bot intervals (timer and combo handled by hooks)
     botIntervalsRef.current.forEach(clearInterval);
@@ -571,6 +572,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
       // Use shared utility for batch word validation
       const finalWords = await finalizeWordValidation(currentWords, settings.language, 3);
+
+      // Check if component unmounted during async validation
+      if (!isMounted) return;
 
       // Calculate final score from validated words only
       const validWords = finalWords.filter(w => w.isValid === true);
@@ -647,11 +651,18 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         language: settings.language,
       };
 
-      onGameEnd(results);
+      // Only call onGameEnd if component is still mounted
+      if (isMounted) {
+        onGameEnd(results);
+      }
     };
 
     finalizeAndEndGame();
-  }, [isGameOver, settings.bots, settings.language, onGameEnd]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isGameOver, settings.bots, settings.language, settings.timerSeconds, onGameEnd, combo.maxCombo]);
 
   // Timer is now handled by useGameTimer hook (lines 126-136)
 

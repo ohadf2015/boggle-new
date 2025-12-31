@@ -77,9 +77,18 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   const gameOverCalledRef = useRef(false);
   const scoreRef = useRef(score);
   const handleGameEndRef = useRef<(() => void) | null>(null);
+  const isMountedRef = useRef(true);
 
   // Keep score ref in sync
   useEffect(() => { scoreRef.current = score; }, [score]);
+
+  // Track component mount state
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   // Stable callback for timer - prevents timer restart on every render
   const stableOnTimeUp = useCallback(() => {
@@ -183,6 +192,9 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     // Use shared utility for batch word validation
     const finalWords = await finalizeWordValidation(currentWords, language, 3);
 
+    // Check if component unmounted during async validation
+    if (!isMountedRef.current) return;
+
     // Calculate final score from validated words only
     const validWords = finalWords.filter(w => w.isValid === true);
     const finalScore = validWords.reduce((sum, w) => sum + w.score, 0);
@@ -208,7 +220,10 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       longestWord,
     };
 
-    onComplete(gameResult);
+    // Only call onComplete if component is still mounted
+    if (isMountedRef.current) {
+      onComplete(gameResult);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duration, onComplete, language, wordSubmission.foundWords]);
 

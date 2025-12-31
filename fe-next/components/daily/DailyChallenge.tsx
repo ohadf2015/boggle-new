@@ -137,11 +137,16 @@ const DailyChallenge: React.FC = () => {
     // Handle retry token: ?retryToken={token} validates and clears localStorage
     const retryToken = searchParams.get('retryToken');
     if (retryToken && typeof window !== 'undefined') {
+      let isMounted = true;
+
       // Validate the token via API
       const validateRetryToken = async () => {
         try {
           const response = await fetch(`/api/daily/validate-retry-token?token=${encodeURIComponent(retryToken)}`);
           const data: RetryTokenValidation = await response.json();
+
+          // Check if component is still mounted before updating state
+          if (!isMounted) return;
 
           if (data.valid) {
             // Token is valid - clear localStorage and allow replay
@@ -174,24 +179,37 @@ const DailyChallenge: React.FC = () => {
           }
         } catch (error) {
           console.error('Failed to validate retry token:', error);
-          neoErrorToast(t('daily.retryLinkError'), { icon: '⚠️', duration: 5000 });
+          if (isMounted) {
+            neoErrorToast(t('daily.retryLinkError'), { icon: '⚠️', duration: 5000 });
+          }
         }
 
-        // Clean up URL by removing the retryToken parameter
-        const url = new URL(window.location.href);
-        url.searchParams.delete('retryToken');
-        window.history.replaceState({}, '', url.toString());
+        // Clean up URL by removing the retryToken parameter (only if mounted)
+        if (isMounted && typeof window !== 'undefined') {
+          const url = new URL(window.location.href);
+          url.searchParams.delete('retryToken');
+          window.history.replaceState({}, '', url.toString());
+        }
       };
 
       validateRetryToken();
+
+      return () => {
+        isMounted = false;
+      };
     }
+    return undefined;
   }, [searchParams, language, t]);
 
   // Initialize Word Hunt daily challenge
   useEffect(() => {
+    let isMounted = true;
+
     const initializePuzzle = async () => {
       const date = getDailyChallengeDate();
       const number = getPuzzleNumber(date);
+
+      if (!isMounted) return;
 
       setPuzzleDate(date);
       setPuzzleNumber(number);
@@ -204,6 +222,7 @@ const DailyChallenge: React.FC = () => {
       // Check if already played today
       if (hasPlayedWordHuntToday(language as Language)) {
         const result = getTodaysWordHuntResult(language as Language);
+        if (!isMounted) return;
         setStoredResult(result);
         setPhase('already-played');
         return;
@@ -212,24 +231,30 @@ const DailyChallenge: React.FC = () => {
       // Try to fetch puzzle from API (includes AI-selected word if available)
       try {
         const response = await fetch(`/api/daily-challenge/puzzle/${date}/${language}`);
+        if (!isMounted) return;
+
         if (response.ok) {
           const puzzleData = await response.json();
+          if (!isMounted) return;
           setGrid(puzzleData.grid);
           setTargetWord(puzzleData.targetWord);
         } else {
           // Fall back to local generation
           const puzzle = generateDailyPuzzle(date, language as Language);
+          if (!isMounted) return;
           setGrid(puzzle.grid);
           setTargetWord(puzzle.targetWord);
         }
       } catch {
         // Fall back to local generation on network error
+        if (!isMounted) return;
         const puzzle = generateDailyPuzzle(date, language as Language);
         setGrid(puzzle.grid);
         setTargetWord(puzzle.targetWord);
       }
 
       // Show tutorial if not completed, otherwise go to ready screen
+      if (!isMounted) return;
       if (!hasCompletedTutorial) {
         setShowTutorial(true);
         setPhase('ready');
@@ -239,6 +264,10 @@ const DailyChallenge: React.FC = () => {
     };
 
     initializePuzzle();
+
+    return () => {
+      isMounted = false;
+    };
   }, [language, wasReset]); // Re-initialize when language changes or admin reset clears localStorage
 
   // Update countdown timer
