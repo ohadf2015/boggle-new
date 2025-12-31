@@ -129,6 +129,8 @@ interface AttemptInsertData {
   display_name: string;
   avatar_emoji: string;
   avatar_color: string;
+  avatar_image?: string;
+  profile_picture_url?: string;
   country_code?: string;
   player_id?: string;
   guest_fingerprint?: string;
