@@ -672,132 +672,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         </span>
       </div>
 
-      {/* Life bar + Clue tokens */}
-      <div className="flex items-center gap-2 mb-1 max-w-3xl mx-auto w-full">
-        {/* Life bar */}
-        <motion.div
-          className={cn(
-            "flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden border-2 relative",
-            lifePoints <= 20 ? "border-red-500" : "border-neo-black"
-          )}
-          animate={
-            lifePoints <= 20 && !isGameOver
-              ? {
-                  scale: [1, 1.02, 1],
-                  borderColor: ['#ef4444', '#dc2626', '#ef4444']
-                }
-              : {}
-          }
-          transition={{ duration: 0.5, repeat: lifePoints <= 20 ? Infinity : 0 }}
-        >
-          <motion.div
-            className={cn(
-              "h-full flex items-center justify-center text-xs font-bold text-white transition-all",
-              getLifeColor(),
-              lifePoints <= 20 && "animate-pulse"
-            )}
-            animate={{
-              width: `${lifePoints}%`,
-            }}
-            transition={{ duration: 0.3 }}
-          >
-            <motion.div
-              animate={!skipAnimations && lifePoints <= 20 && !isGameOver ? { scale: [1, 1.2, 1] } : {}}
-              transition={{ duration: 0.5, repeat: !skipAnimations && lifePoints <= 20 ? Infinity : 0 }}
-            >
-              <Heart className="w-3 h-3 mr-1 fill-current" />
-            </motion.div>
-            {lifePoints}/100
-          </motion.div>
-
-          {/* Life drain particles effect when low on life - disabled on low-end devices */}
-          {!skipAnimations && lifePoints <= 33 && lifePoints > 0 && !isGameOver && (
-            <motion.div
-              className="absolute inset-0 pointer-events-none overflow-hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              {[...Array(3)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-1 h-1 bg-red-500 rounded-full"
-                  initial={{ x: `${lifePoints}%`, y: '50%', opacity: 1 }}
-                  animate={{
-                    x: [`${lifePoints}%`, `${lifePoints + 20}%`],
-                    y: ['50%', `${30 + i * 20}%`],
-                    opacity: [1, 0],
-                  }}
-                  transition={{
-                    duration: 1,
-                    repeat: Infinity,
-                    delay: i * 0.3,
-                    ease: 'easeOut'
-                  }}
-                />
-              ))}
-            </motion.div>
-          )}
-
-          {/* Life gain animation */}
-          <LifeGainAnimation
-            amount={lifeGainAmount}
-            onComplete={() => setLifeGainAmount(null)}
-          />
-        </motion.div>
-
-        {/* Clue tokens */}
-        <div className="flex items-center gap-1 px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 border-2 border-neo-black rounded-neo">
-          <Coins className="w-4 h-4 text-yellow-600" />
-          <span className="font-bold text-sm">{clueTokens}</span>
-        </div>
-
-        {/* Shop button - subtle indicator when tokens available */}
-        <div className="relative">
-          <Button
-            size="sm"
-            onClick={() => {
-              setShowShop(!showShop);
-              setShowShopHint(false);
-            }}
-            className={cn(
-              "bg-neo-purple text-white relative hover:bg-neo-purple/80",
-              showShopHint && "animate-pulse ring-2 ring-neo-yellow ring-offset-1"
-            )}
-          >
-            <Store className="w-4 h-4" />
-            {clueTokens > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-neo-yellow text-neo-black text-xs font-bold rounded-full flex items-center justify-center border border-neo-black">
-                !
-              </span>
-            )}
-          </Button>
-
-          {/* Non-intrusive hint tooltip */}
-          <AnimatePresence>
-            {showShopHint && (
-              <motion.div
-                initial={{ opacity: 0, y: 5, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 5, scale: 0.95 }}
-                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50"
-              >
-                <div className="bg-neo-yellow text-neo-black text-xs font-bold px-3 py-1.5 rounded-neo border-2 border-neo-black whitespace-nowrap shadow-hard-sm">
-                  <Lightbulb className="w-3 h-3 inline mr-1" />
-                  {t('wordHunt.survival.needHelp') || 'Need help? Try a clue!'}
-                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-transparent border-b-neo-black" />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-
       {/* Target word black boxes - always visible */}
       {currentHint && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mx-auto max-w-3xl w-full px-1"
+          className="mx-auto max-w-3xl w-full px-1 mb-0.5"
         >
           {/* Black boxes for target word OR Letter Feedback Overlay */}
           <div className="flex justify-center flex-wrap gap-1 sm:gap-1.5 px-2">
@@ -989,12 +869,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
       {/* Category and example (if unlocked) */}
       {showCategory && (
-        <div className="text-[11px] bg-purple-50 dark:bg-purple-900/20 border border-purple-300 rounded px-2 py-0.5 max-w-3xl mx-auto w-full">
+        <div className="text-[11px] bg-purple-50 dark:bg-purple-900/20 border border-purple-300 rounded px-2 py-0.5 max-w-3xl mx-auto w-full mb-0.5">
           <span className="font-bold">{t('wordHunt.survival.category')?.replace('{category}', category) || `Category: ${category}`}</span>
         </div>
       )}
       {showExample && (
-        <div className="text-[11px] bg-green-50 dark:bg-green-900/20 border border-green-300 rounded px-2 py-0.5 max-w-3xl mx-auto w-full">
+        <div className="text-[11px] bg-green-50 dark:bg-green-900/20 border border-green-300 rounded px-2 py-0.5 max-w-3xl mx-auto w-full mb-0.5">
           <span className="font-bold">{t('wordHunt.survival.exampleSentence') || 'Example:'}</span> {exampleSentence.replace(new RegExp(targetWord, 'gi'), '____')}
         </div>
       )}
@@ -1003,7 +883,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       {/* Prominent Attempts Counter */}
       <motion.div
         className={cn(
-          "flex flex-col gap-0.5 rounded-neo border-2 mx-auto max-w-3xl w-full",
+          "flex flex-col gap-0.5 rounded-neo border-2 mx-auto max-w-3xl w-full mb-0.5",
           MAX_ATTEMPTS - attempts.length <= 2
             ? "bg-red-100 dark:bg-red-900/30 border-red-500"
             : MAX_ATTEMPTS - attempts.length <= 4
@@ -1066,22 +946,142 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       </motion.div>
 
       {/* Feedback - only render when there's feedback to show */}
-      <AnimatePresence mode="wait">
-        {currentFeedback && (
+      {currentFeedback && (
+        <AnimatePresence mode="wait">
           <motion.div
             key={currentFeedback}
-            initial={{ opacity: 0, scale: 0.9, height: 0 }}
-            animate={{ opacity: 1, scale: 1, height: 'auto' }}
-            exit={{ opacity: 0, scale: 0.9, height: 0 }}
-            className="text-center text-xs font-medium max-w-3xl mx-auto w-full overflow-hidden"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="text-center text-xs font-medium max-w-3xl mx-auto w-full mb-0.5"
           >
             {currentFeedback}
           </motion.div>
-        )}
-      </AnimatePresence>
+        </AnimatePresence>
+      )}
+
+      {/* Life bar + Clue tokens - positioned directly above board */}
+      <div className="flex items-center gap-2 mb-1 max-w-3xl mx-auto w-full">
+        {/* Life bar */}
+        <motion.div
+          className={cn(
+            "flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden border-2 relative",
+            lifePoints <= 20 ? "border-red-500" : "border-neo-black"
+          )}
+          animate={
+            lifePoints <= 20 && !isGameOver
+              ? {
+                  scale: [1, 1.02, 1],
+                  borderColor: ['#ef4444', '#dc2626', '#ef4444']
+                }
+              : {}
+          }
+          transition={{ duration: 0.5, repeat: lifePoints <= 20 ? Infinity : 0 }}
+        >
+          <motion.div
+            className={cn(
+              "h-full flex items-center justify-center text-xs font-bold text-white transition-all",
+              getLifeColor(),
+              lifePoints <= 20 && "animate-pulse"
+            )}
+            animate={{
+              width: `${lifePoints}%`,
+            }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div
+              animate={!skipAnimations && lifePoints <= 20 && !isGameOver ? { scale: [1, 1.2, 1] } : {}}
+              transition={{ duration: 0.5, repeat: !skipAnimations && lifePoints <= 20 ? Infinity : 0 }}
+            >
+              <Heart className="w-3 h-3 mr-1 fill-current" />
+            </motion.div>
+            {lifePoints}/100
+          </motion.div>
+
+          {/* Life drain particles effect when low on life - disabled on low-end devices */}
+          {!skipAnimations && lifePoints <= 33 && lifePoints > 0 && !isGameOver && (
+            <motion.div
+              className="absolute inset-0 pointer-events-none overflow-hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              {[...Array(3)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-1 h-1 bg-red-500 rounded-full"
+                  initial={{ x: `${lifePoints}%`, y: '50%', opacity: 1 }}
+                  animate={{
+                    x: [`${lifePoints}%`, `${lifePoints + 20}%`],
+                    y: ['50%', `${30 + i * 20}%`],
+                    opacity: [1, 0],
+                  }}
+                  transition={{
+                    duration: 1,
+                    repeat: Infinity,
+                    delay: i * 0.3,
+                    ease: 'easeOut'
+                  }}
+                />
+              ))}
+            </motion.div>
+          )}
+
+          {/* Life gain animation */}
+          <LifeGainAnimation
+            amount={lifeGainAmount}
+            onComplete={() => setLifeGainAmount(null)}
+          />
+        </motion.div>
+
+        {/* Clue tokens */}
+        <div className="flex items-center gap-1 px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 border-2 border-neo-black rounded-neo">
+          <Coins className="w-4 h-4 text-yellow-600" />
+          <span className="font-bold text-sm">{clueTokens}</span>
+        </div>
+
+        {/* Shop button - subtle indicator when tokens available */}
+        <div className="relative">
+          <Button
+            size="sm"
+            onClick={() => {
+              setShowShop(!showShop);
+              setShowShopHint(false);
+            }}
+            className={cn(
+              "bg-neo-purple text-white relative hover:bg-neo-purple/80",
+              showShopHint && "animate-pulse ring-2 ring-neo-yellow ring-offset-1"
+            )}
+          >
+            <Store className="w-4 h-4" />
+            {clueTokens > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-neo-yellow text-neo-black text-xs font-bold rounded-full flex items-center justify-center border border-neo-black">
+                !
+              </span>
+            )}
+          </Button>
+
+          {/* Non-intrusive hint tooltip */}
+          <AnimatePresence>
+            {showShopHint && (
+              <motion.div
+                initial={{ opacity: 0, y: 5, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 5, scale: 0.95 }}
+                className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50"
+              >
+                <div className="bg-neo-yellow text-neo-black text-xs font-bold px-3 py-1.5 rounded-neo border-2 border-neo-black whitespace-nowrap shadow-hard-sm">
+                  <Lightbulb className="w-3 h-3 inline mr-1" />
+                  {t('wordHunt.survival.needHelp') || 'Need help? Try a clue!'}
+                  <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-transparent border-b-neo-black" />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
 
       {/* Game Grid */}
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex items-center justify-center">
         <GridComponent
           grid={grid}
           interactive={!isGameOver}

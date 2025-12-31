@@ -1281,7 +1281,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         <div className="absolute top-2 right-2 z-30">
           <HelpButton
             onClick={() => setIsHelpOpen(true)}
-            className="w-9 h-9 opacity-70 hover:opacity-100"
+            className="min-w-[44px] min-h-[44px] w-11 h-11 opacity-70 hover:opacity-100"
             aria-label={t('common.help') || 'Help'}
           />
         </div>
@@ -1707,7 +1707,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       {/* Help Button - fixed at bottom right corner, not covering the board */}
       <HelpButton
         onClick={() => setIsHelpOpen(true)}
-        className="fixed bottom-0 right-0 z-40 mb-[max(env(safe-area-inset-bottom),8px)] mr-2 w-10 h-10 opacity-70 hover:opacity-100"
+        className="fixed bottom-0 right-0 z-40 mb-[max(env(safe-area-inset-bottom),8px)] mr-2 min-w-[44px] min-h-[44px] w-11 h-11 opacity-70 hover:opacity-100"
       />
 
       {/* Help Panel - bottom sheet */}

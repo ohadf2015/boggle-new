@@ -2,6 +2,7 @@
 
 import React, { ReactNode, useRef, useEffect, useCallback, useMemo, memo, useState, useTransition, useDeferredValue } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
 import { Trophy, Crown } from 'lucide-react';
 import type { Socket } from 'socket.io-client';
 import { Badge } from '../ui/badge';
@@ -46,6 +47,8 @@ import {
 } from '@/hooks/useContextualGuidance';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
+import KeyboardHintTooltip from './KeyboardHintTooltip';
+import CompactLeaderboard, { type CompactPlayer } from './CompactLeaderboard';
 
 // ==================== Types ====================
 
@@ -526,7 +529,8 @@ const InGameScreen = memo<InGameScreenProps>(({
   }, []);
 
   // Check for very short landscape screens to prevent panel overlap
-  const isVeryShortLandscape = isLandscape && viewportHeight > 0 && viewportHeight < 350;
+  const isVeryShortLandscape = isLandscape && viewportHeight > 0 && viewportHeight < 400;
+  const isExtremelyShortLandscape = isLandscape && viewportHeight > 0 && viewportHeight < 350;
 
   // ==================== Landscape Layout ====================
   // In landscape mobile mode, use a maximized grid layout with stats on sides
@@ -570,11 +574,23 @@ const InGameScreen = memo<InGameScreenProps>(({
           dir={dir}
         />
 
+        {/* Keyboard Input Hint - Desktop only */}
+        {isPlaying && (
+          <KeyboardHintTooltip
+            delaySeconds={10}
+            desktopOnly={true}
+            t={t}
+          />
+        )}
+
         {/* Full-screen landscape container with grid centered - uses full viewport */}
         <div className="relative flex items-center justify-center w-full h-screen overflow-hidden bg-slate-900 text-white landscape-full-height">
 
           {/* Left Side Stats - Consolidated Panel (Timer + Stats) - ENLARGED FOR LANDSCAPE */}
-          <div className="absolute left-2 top-1/2 -translate-y-1/2 z-40 landscape-side-panel">
+          <div className={cn(
+            "absolute left-2 top-1/2 -translate-y-1/2 z-40 landscape-side-panel",
+            isExtremelyShortLandscape && "scale-75 left-1"
+          )}>
             <div className="bg-neo-cream/95 text-neo-black border-4 border-neo-black rounded-neo shadow-hard-lg p-3 flex flex-col items-center gap-3">
               {/* Timer - Larger for better visibility */}
               {remainingTime !== null && (
@@ -624,7 +640,10 @@ const InGameScreen = memo<InGameScreenProps>(({
 
           {/* Right Side Stats - Consolidated Score Panel - ENLARGED FOR LANDSCAPE */}
           {isPlaying && (
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 z-40 landscape-side-panel">
+            <div className={cn(
+              "absolute right-2 top-1/2 -translate-y-1/2 z-40 landscape-side-panel",
+              isExtremelyShortLandscape && "scale-75 right-1"
+            )}>
               <motion.div
                 initial={{ scale: 0, rotate: -2 }}
                 animate={{ scale: 1, rotate: 1 }}
@@ -659,10 +678,10 @@ const InGameScreen = memo<InGameScreenProps>(({
 
 
           {/* Bottom-right corner: Help button (outside game board area) */}
-          <div className="absolute bottom-0 right-0 z-30 pb-[max(env(safe-area-inset-bottom),4px)] pr-1">
+          <div className="absolute bottom-0 right-0 z-30 pb-[max(env(safe-area-inset-bottom),8px)] pr-2">
             <HelpButton
               onClick={() => setShowHelpPanel(true)}
-              className="w-9 h-9 opacity-70 hover:opacity-100"
+              className="w-12 h-12 min-w-[48px] min-h-[48px] opacity-70 hover:opacity-100"
             />
           </div>
 
@@ -699,7 +718,12 @@ const InGameScreen = memo<InGameScreenProps>(({
           )}
 
           {/* Center: Word Forming Area + Notification + Grid */}
-          <div className={`flex flex-col items-center justify-center w-full h-full ${isVeryShortLandscape ? 'px-4' : 'px-3'} py-0.5 landscape-grid-container`}>
+          <div className={cn(
+            "flex flex-col items-center justify-center w-full h-full landscape-grid-container",
+            isExtremelyShortLandscape ? "px-2 gap-0 py-0" :
+            isVeryShortLandscape ? "px-3 gap-0.5 py-0.5" :
+            "px-3 gap-1 py-0.5"
+          )}>
             {/* Word Forming Area with integrated feedback - flex-shrink-0 prevents squishing, z-50 keeps it visible */}
             {/* Shows typed word when in keyboard mode, otherwise shows swiped word */}
             {isPlaying && (
@@ -783,6 +807,15 @@ const InGameScreen = memo<InGameScreenProps>(({
         dir={dir}
       />
 
+      {/* Keyboard Input Hint - Desktop only */}
+      {isPlaying && (
+        <KeyboardHintTooltip
+          delaySeconds={10}
+          desktopOnly={true}
+          t={t}
+        />
+      )}
+
       <div className="flex flex-col lg:flex-row gap-2 md:gap-4 lg:gap-6 flex-grow w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out">
 
       {/* Top Bar - Only on mobile, integrated into parent on desktop */}
@@ -813,7 +846,7 @@ const InGameScreen = memo<InGameScreenProps>(({
 
       {/* Help Button - Fixed at bottom right corner on mobile, outside the game board */}
       <div className="lg:hidden fixed bottom-0 right-0 z-50 pb-[max(env(safe-area-inset-bottom),8px)] pr-2">
-        <HelpButton onClick={() => setShowHelpPanel(true)} className="w-10 h-10 opacity-70 hover:opacity-100" />
+        <HelpButton onClick={() => setShowHelpPanel(true)} className="w-12 h-12 min-w-[48px] min-h-[48px] opacity-70 hover:opacity-100" />
       </div>
 
       {/* Help Panel - Accessible from anywhere */}
@@ -850,7 +883,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                           ${isInvalid
                             ? 'bg-neo-red text-neo-cream shadow-hard-sm line-through opacity-70'
                             : isLatest
-                              ? 'bg-neo-yellow text-neo-black shadow-hard'
+                              ? 'bg-neo-orange text-neo-black shadow-hard'
                               : 'bg-neo-cream text-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard'}`}
                       >
                         {applyHebrewFinalLetters(wordText).toUpperCase()}
@@ -859,7 +892,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                   })}
                 </AnimatePresence>
                 {normalizedFoundWords.length === 0 && (
-                  <p className="text-center text-neo-black/80 py-6 text-sm font-bold">
+                  <p className="text-center text-neo-black py-6 text-sm font-bold">
                     {t('playerView.noWordsYet') || 'No words found yet'}
                   </p>
                 )}
@@ -916,7 +949,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                   >
                     {playerData.score}
                   </motion.div>
-                  <div className="text-[10px] md:text-xs lg:text-sm font-bold uppercase tracking-wider text-neo-black/80">
+                  <div className="text-[10px] md:text-xs lg:text-sm font-bold uppercase tracking-wider text-neo-black">
                     {t('common.score') || 'Score'}
                   </div>
                 </div>
@@ -1012,62 +1045,60 @@ const InGameScreen = memo<InGameScreenProps>(({
           </div>
         )}
 
-        {/* Mobile: Tabbed Words/Leaderboard view (when playing) - reduces scroll */}
-        {isPlaying && !gameplayFocusMode && (
-          <div className="lg:hidden mt-2">
-            {/* Tab buttons */}
-            <div className="flex gap-1 mb-2">
-              <button
-                onClick={() => setMobileActiveTab('words')}
-                className={`flex-1 py-2 px-3 font-black text-sm uppercase border-3 border-neo-black rounded-neo transition-all ${
-                  mobileActiveTab === 'words'
-                    ? 'bg-neo-cyan text-neo-black shadow-none translate-x-[1px] translate-y-[1px]'
-                    : 'bg-neo-cream text-neo-black shadow-hard-sm hover:shadow-hard'
-                }`}
-              >
-                {t('hostView.words') || 'Words'} ({normalizedFoundWords.length})
-              </button>
-              <button
-                onClick={() => setMobileActiveTab('leaderboard')}
-                className={`flex-1 py-2 px-3 font-black text-sm uppercase border-3 border-neo-black rounded-neo transition-all ${
-                  mobileActiveTab === 'leaderboard'
-                    ? 'bg-neo-purple text-neo-cream shadow-none translate-x-[1px] translate-y-[1px]'
-                    : 'bg-neo-cream text-neo-black shadow-hard-sm hover:shadow-hard'
-                }`}
-              >
-                <Trophy className="inline mr-1 w-4 h-4 text-neo-yellow" />
-                {t('playerView.rankings') || 'Rankings'}
-              </button>
-            </div>
+        {/* Mobile: Split-view with compact leaderboard + words (eliminates tab switching) */}
+        {isPlaying && !gameplayFocusMode && leaderboard && leaderboard.length > 0 && (
+          <div className="lg:hidden mt-2 space-y-2">
+            {/* Compact Leaderboard - Always visible */}
+            <CompactLeaderboard
+              players={leaderboard.map(p => ({
+                username: p.username,
+                score: p.score,
+                rank: 0, // Will be calculated in component
+                profilePictureUrl: p.avatar?.profilePictureUrl,
+                avatarEmoji: p.avatar?.emoji,
+                avatarColor: p.avatar?.color,
+              }))}
+              currentUsername={username}
+              t={t}
+            />
 
-            {/* Tab content - compact height with scroll */}
-            <div className="bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard max-h-[180px] overflow-y-auto">
-              {mobileActiveTab === 'words' ? (
-                <div className="p-2 space-y-1">
-                  {normalizedFoundWords.length === 0 ? (
-                    <p className="text-center text-neo-black/70 py-4 text-sm font-bold">
-                      {t('playerView.noWordsYet') || 'No words found yet'}
-                    </p>
-                  ) : (
-                    <div className="flex flex-wrap gap-1">
-                      {normalizedFoundWords.slice().reverse().map((wordObj, index) => (
-                        <span
-                          key={`${wordObj.word}-${index}`}
-                          className={`inline-block px-2 py-1 text-xs font-bold uppercase rounded-neo border-2 border-neo-black ${
-                            wordObj.isValid === false
-                              ? 'bg-neo-red text-neo-cream line-through opacity-70'
-                              : index === 0
-                                ? 'bg-neo-yellow text-neo-black'
-                                : 'bg-white text-neo-black'
-                          }`}
-                        >
-                          {applyHebrewFinalLetters(wordObj.word)}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ) : null}
+            {/* Found Words - Auto-scroll, always visible */}
+            <div className="bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard p-2">
+              <div className="flex items-center justify-between mb-2 px-1">
+                <span className="text-xs font-black uppercase text-neo-black">
+                  {t('hostView.words') || 'Your Words'}
+                </span>
+                <span className="text-xs font-bold text-neo-black/90">
+                  {normalizedFoundWords.length}
+                </span>
+              </div>
+              <div className="max-h-[120px] overflow-y-auto">
+                {normalizedFoundWords.length === 0 ? (
+                  <p className="text-center text-neo-black/90 py-4 text-sm font-bold">
+                    {t('playerView.noWordsYet') || 'No words found yet'}
+                  </p>
+                ) : (
+                  <div className="flex flex-wrap gap-1">
+                    {normalizedFoundWords.slice().reverse().map((wordObj, index) => (
+                      <motion.span
+                        key={`${wordObj.word}-${index}`}
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                        className={`inline-block px-2 py-1 text-xs font-bold uppercase rounded-neo border-2 border-neo-black ${
+                          wordObj.isValid === false
+                            ? 'bg-neo-red text-neo-cream line-through opacity-70'
+                            : index === 0
+                              ? 'bg-neo-orange text-neo-black'
+                              : 'bg-white text-neo-black'
+                        }`}
+                      >
+                        {applyHebrewFinalLetters(wordObj.word)}
+                      </motion.span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -1127,7 +1158,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                         </span>
                       )}
                     </div>
-                    <div className="text-xs font-bold text-neo-black/70">
+                    <div className="text-xs font-bold text-neo-black/90">
                       {player.wordCount || 0} {t('hostView.words') || 'words'}
                     </div>
                   </div>
@@ -1145,13 +1176,13 @@ const InGameScreen = memo<InGameScreenProps>(({
                       <div className="text-lg font-black text-neo-black leading-none">
                         {player.score}
                       </div>
-                      <div className="text-xs font-bold text-neo-black/75 uppercase">pts</div>
+                      <div className="text-xs font-bold text-neo-black/90 uppercase">pts</div>
                     </div>
                   </div>
                 </motion.div>
               ))}
               {leaderboard.length === 0 && (
-                <p className="text-center text-neo-black/75 py-6 text-sm font-bold">
+                <p className="text-center text-neo-black/90 py-6 text-sm font-bold">
                   {t('hostView.waitingForPlayers') || 'Waiting for players...'}
                 </p>
               )}

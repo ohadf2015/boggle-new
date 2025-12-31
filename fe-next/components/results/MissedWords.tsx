@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, memo } from 'react';
 import { motion } from 'framer-motion';
 import { Target, Grid3X3 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -36,7 +36,7 @@ const getWordLengthColor = (length: number): string => {
  * Compact "Top Words You Missed" Section
  * Shows only top 3 high-value words to keep it simple and motivating
  */
-const MissedWords: React.FC<MissedWordsProps> = ({
+const MissedWords = memo<MissedWordsProps>(({
   missedWords,
   maxDisplay = 3,
   className,
@@ -150,6 +150,8 @@ const MissedWords: React.FC<MissedWordsProps> = ({
       </div>
     </motion.div>
   );
-};
+});
+
+MissedWords.displayName = 'MissedWords';
 
 export default MissedWords;

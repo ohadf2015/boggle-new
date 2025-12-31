@@ -8,6 +8,7 @@ import AutoHideHeader from '@/components/AutoHideHeader';
 import ErrorBoundary from '@/app/components/ErrorBoundary';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import { ConnectionDot } from '@/components/ConnectionStatusIndicator';
+import SpectatorBanner from '@/components/SpectatorBanner';
 import { SocketContext, getSharedSocket, releaseSharedSocket, getSharedSocketIfExists, getSocketURL } from '@/utils/SocketContext';
 import { saveSession, getSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -1261,6 +1262,14 @@ export default function MultiplayerPage(): React.JSX.Element {
     <SocketContext.Provider value={socketContextValue}>
       {/* Connection status indicator */}
       <ConnectionDot />
+
+      {/* Spectator status banner */}
+      <SpectatorBanner
+        isSpectating={isSpectator}
+        onRequestUpgrade={handleUpgradeToPlayer}
+        t={t}
+        spectatorCount={spectators.length}
+      />
 
       {showHeader && <AutoHideHeader />}
       <ErrorBoundary>

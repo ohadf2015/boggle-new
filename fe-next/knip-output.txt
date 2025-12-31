@@ -1,0 +1,971 @@
+Unused files (157)
+__tests__/utils/test-utils.tsx                  
+backend/config/index.ts                         
+backend/data/dateThemedWords.js                 
+backend/handlers/botHandler.ts                  
+backend/handlers/connectionHandler.ts           
+backend/handlers/earthquakeHandler.ts           
+backend/handlers/engagementHandler.ts           
+backend/handlers/gameHandler.ts                 
+backend/handlers/gameLifecycleHandler.ts        
+backend/handlers/hintHandler.ts                 
+backend/handlers/hostHandler.ts                 
+backend/handlers/playerJoinHandler.ts           
+backend/handlers/presenceHandler.ts             
+backend/handlers/roomManagementHandler.ts       
+backend/handlers/scorecardHandler.ts            
+backend/handlers/tournamentHandler.ts           
+backend/handlers/wordHandler.ts                 
+backend/modules/achievementManager.ts           
+backend/modules/aiValidationService.ts          
+backend/modules/dailyChallengesManager.ts       
+backend/modules/engagementManager.ts            
+backend/modules/notificationService.ts          
+backend/modules/playerTitlesManager.ts          
+backend/modules/scoringEngine.types.ts          
+backend/modules/wordValidatorWorker.js          
+backend/modules/xpManager.ts                    
+backend/routes/health.ts                        
+backend/routes/index.ts                         
+backend/utils/apiRateLimiter.ts                 
+backend/utils/config.ts                         
+backend/utils/consts.ts                         
+backend/utils/correlationId.ts                  
+backend/utils/gameStartCoordinator.ts           
+backend/utils/gameUtils.ts                      
+backend/utils/playerCleanup.ts                  
+backend/utils/requestCoalescing.ts              
+backend/utils/schemas.ts                        
+backend/utils/socketMiddleware.ts               
+components/daily/DailyChallengeGame.tsx         
+components/daily/DailyChallengeResults.tsx      
+components/daily/DailyLeaderboard.tsx           
+components/ErrorBanner.tsx                      
+components/examples/MobileEnhancementsDemo.tsx  
+components/game/LateJoinerBadge.tsx             
+components/game/MobileLeaderboard.tsx           
+components/game/WaitingScreen.tsx               
+components/GameTypeSelector.tsx                 
+components/how-to-play/AchievementTiers.tsx     
+components/how-to-play/ComboVisualizer.tsx      
+components/how-to-play/index.ts                 
+components/how-to-play/XpExplainer.tsx          
+components/HowToPlay.tsx                        
+components/join-view/ActiveRoomsList.tsx        
+components/join-view/AutoJoiningView.tsx        
+components/join-view/index.ts                   
+components/join-view/JoinViewDialogs.tsx        
+components/join-view/QuickJoinView.tsx          
+components/LateJoinerWelcome.tsx                
+components/layout/CollapsibleSection.tsx        
+components/layout/GamePageWrapper.tsx           
+components/layout/index.ts                      
+components/layout/MobileDrawer.tsx              
+components/layout/MobileTabBar.tsx              
+components/MenuAnimation.tsx                    
+components/multiplayer/index.ts                 
+components/NewPlayerWelcome.tsx                 
+components/onboarding/AvatarStep.tsx            
+components/onboarding/ComboStep.tsx             
+components/onboarding/index.ts                  
+components/onboarding/ModeSelectionStep.tsx     
+components/onboarding/NameStep.tsx              
+components/onboarding/SpecialRoundsStep.tsx     
+components/Particles.tsx                        
+components/profile/ReferralCard.tsx             
+components/results/AutoRejoinTimer.tsx          
+components/results/WinStreakDisplay.tsx         
+components/results/YourQuickStats.tsx           
+components/singleplayer/index.ts                
+components/SlotMachine.css                      
+components/SlotMachineCell.tsx                  
+components/SlotMachineGrid.tsx                  
+components/SlotMachineText.css                  
+components/SocialProof.tsx                      
+components/ThemeToggle.tsx                      
+components/tutorial/index.ts                    
+components/tutorial/TutorialOverlay.tsx         
+components/tutorial/TutorialProvider.tsx        
+components/tutorial/tutorialSteps.ts            
+components/tutorial/TutorialTooltip.tsx         
+components/tutorial/useTutorial.ts              
+components/ui/FormField.tsx                     
+components/ui/progress.tsx                      
+components/ui/PullToRefreshIndicator.tsx        
+components/ui/skeleton.tsx                      
+components/ui/stat-display.tsx                  
+components/ui/ValidatedInput.tsx                
+components/views/index.ts                       
+components/views/JoinView.tsx                   
+fix-leaderboard.js                              
+hooks/useAsyncAction.ts                         
+hooks/useAutoHideControls.ts                    
+hooks/useCollapsible.ts                         
+hooks/useFocusTrap.ts                           
+hooks/useGridWorker.ts                          
+hooks/usePullToRefresh.ts                       
+hooks/useRateLimitedAction.ts                   
+hooks/useScrollDirection.ts                     
+hooks/useSwipeToDismiss.ts                      
+hooks/useWordSubmission.ts                      
+host/components/HostWaitingResultsView.tsx      
+host/components/pre-game/GameSettingsPanel.tsx  
+host/components/pre-game/index.ts               
+host/components/pre-game/PlayersListPanel.tsx   
+host/components/pre-game/RoomCodeSection.tsx    
+host/contexts/HostPreGameContext.tsx            
+host/contexts/index.ts                          
+player/components/in-game/FoundWordsList.tsx    
+player/components/in-game/GameTopBar.tsx        
+player/components/in-game/index.ts              
+player/components/in-game/LiveLeaderboard.tsx   
+player/components/in-game/MobileWordStats.tsx   
+player/contexts/index.ts                        
+player/contexts/PlayerGameContext.tsx           
+player/hooks/index.ts                           
+player/hooks/usePlayerViewState.ts              
+playwright-singleplayer.config.ts               
+playwright-ui-test.config.ts                    
+public/sw.js                                    
+scripts/add-missing-translations.js             
+scripts/check-contrast.js                       
+scripts/check-wcag-contrast.js                  
+scripts/fill-room.js                            
+scripts/fix-contrast.js                         
+scripts/lifecycle-test.js                       
+scripts/seed-admin-data.js                      
+scripts/stability-test.js                       
+scripts/verify-admin-data.js                    
+shared/constants/index.ts                       
+shared/constants/socketEvents.ts                
+shared/index.ts                                 
+shared/schemas/socketSchemas.ts                 
+shared/stateMachines/gameMachine.ts             
+shared/stateMachines/index.ts                   
+shared/utils/index.ts                           
+style/index.scss                                
+supabase/migrations/apply-019.js                
+supabase/migrations/apply-020.js                
+supabase/migrations/apply-021.js                
+supabase/migrations/verify-021.js               
+utils/connectionUtils.ts                        
+utils/index.ts                                  
+utils/mobileAccessibility.ts                    
+utils/shareImageGenerator.ts                    
+utils/supabase/middleware.ts                    
+utils/toastHelpers.ts                           
+utils/wordPath.ts                               
+workers/gridWorker.ts                           
+Unused dependencies (7)
+@anthropic-ai/sdk         package.json:27:6
+@arvidbt/swedish-words    package.json:28:6
+@radix-ui/react-progress  package.json:34:6
+animate.css               package.json:47:6
+date-easter               package.json:55:6
+ws                        package.json:77:6
+xstate                    package.json:78:6
+Unused devDependencies (2)
+@testing-library/user-event  package.json:86:6
+baseline-browser-mapping     package.json:98:6
+Unresolved imports (1)
+identity-obj-proxy  jest.config.js
+Unused exports (573)
+MockSocket                                                        backend/__tests__/helpers/socketTestHelper.js:464:3   
+MockIO                                                            backend/__tests__/helpers/socketTestHelper.js:465:3   
+getAvailableDictionaries           dictionary                     backend/dictionary.ts:618:3                           
+normalizeHebrewWord                dictionary                     backend/dictionary.ts:619:3                           
+normalizeSpanishLetter             dictionary                     backend/dictionary.ts:620:3                           
+normalizeSpanishWord               dictionary                     backend/dictionary.ts:621:3                           
+isValidWord                        dictionary                     backend/dictionary.ts:628:14                          
+isValidEnglishWord                 dictionary                     backend/dictionary.ts:629:14                          
+isValidHebrewWord                  dictionary                     backend/dictionary.ts:630:14                          
+isValidSwedishWord                 dictionary                     backend/dictionary.ts:631:14                          
+isValidJapaneseWord                dictionary                     backend/dictionary.ts:632:14                          
+isValidSpanishWord                 dictionary                     backend/dictionary.ts:633:14                          
+getRandomKanjiCompounds            dictionary                     backend/dictionary.ts:634:14                          
+getRandomLongWords                 dictionary                     backend/dictionary.ts:635:14                          
+getCurrentTheme                    dictionary                     backend/dictionary.ts:637:10                          
+registerGameHandlers                                              backend/handlers/index.ts:90:3                        
+registerWordHandlers                                              backend/handlers/index.ts:91:3                        
+registerChatHandlers                                              backend/handlers/index.ts:92:3                        
+registerBotHandlers                                               backend/handlers/index.ts:93:3                        
+registerTournamentHandlers                                        backend/handlers/index.ts:94:3                        
+registerPresenceHandlers                                          backend/handlers/index.ts:95:3                        
+registerHostHandlers                                              backend/handlers/index.ts:96:3                        
+registerConnectionHandlers                                        backend/handlers/index.ts:97:3                        
+registerHintHandlers                                              backend/handlers/index.ts:98:3                        
+registerEngagementHandlers                                        backend/handlers/index.ts:99:3                        
+registerEarthquakeHandlers                                        backend/handlers/index.ts:100:3                       
+registerScorecardHandlers                                         backend/handlers/index.ts:101:3                       
+processGameEndEngagement                                          backend/handlers/index.ts:102:3                       
+processLongWordEngagement                                         backend/handlers/index.ts:103:3                       
+processAchievementEngagement                                      backend/handlers/index.ts:104:3                       
+startGameTimer                                                    backend/handlers/index.ts:105:3                       
+endGame                                                           backend/handlers/index.ts:106:3                       
+calculateAndBroadcastFinalScores                                  backend/handlers/index.ts:107:3                       
+isSocketMigrating                                                 backend/handlers/index.ts:108:3                       
+clearGameEarthquakeState                                          backend/handlers/index.ts:110:3                       
+recordGameResultsToSupabase                                       backend/handlers/shared.ts:676:3                      
+startBotsForGame                                                  backend/handlers/shared.ts:677:3                      
+handlePeerValidation                                              backend/handlers/shared.ts:679:3                      
+handleTournamentCompletion                                        backend/handlers/shared.ts:680:3                      
+AVATARS                                                           backend/modules/avatarConfig.ts:16:14                 
+getAvatarById                                           function  backend/modules/avatarConfig.ts:39:17                 
+getAvatarPath                                           function  backend/modules/avatarConfig.ts:53:17                 
+mapEmojiToAvatar                                        function  backend/modules/avatarConfig.ts:62:17                 
+getCachedTrie                                           function  backend/modules/boggleSolver.ts:83:17                 
+buildTrie                                               function  backend/modules/boggleSolver.ts:179:17                
+getTrieNode                                             function  backend/modules/boggleSolver.ts:199:17                
+findAllWords                                            function  backend/modules/boggleSolver.ts:211:17                
+shuffleArray                                            function  backend/modules/boggleSolver.ts:417:17                
+isSolidWord                                             function  backend/modules/boggleSolver.ts:430:17                
+getWordPath                                             function  backend/modules/boggleSolver.ts:449:17                
+clearSolverCaches                                       function  backend/modules/boggleSolver.ts:503:17                
+getSolverCacheStats                                     function  backend/modules/boggleSolver.ts:516:17                
+getCachedPlayerWords                                    function  backend/modules/botBehavior.ts:110:23                 
+getCachedBlacklist                                      function  backend/modules/botBehavior.ts:141:23                 
+AI_VOTE_POINTS                                                    backend/modules/communityWordManager.ts:158:14        
+PROMINENT_THRESHOLD                                               backend/modules/communityWordManager.ts:159:14        
+VALID_THRESHOLD                                                   backend/modules/communityWordManager.ts:160:14        
+addToCommunityCache                                     function  backend/modules/communityWordManager.ts:302:23        
+recordVote                                              function  backend/modules/communityWordManager.ts:331:23        
+recordAIVote                                            function  backend/modules/communityWordManager.ts:421:23        
+getWordValidationInfo                                   function  backend/modules/communityWordManager.ts:514:23        
+getWordForPlayer                                        function  backend/modules/communityWordManager.ts:746:17        
+updatePendingCache                                      function  backend/modules/communityWordManager.ts:758:17        
+hasUserVoted                                            function  backend/modules/communityWordManager.ts:800:23        
+getWordStats                                            function  backend/modules/communityWordManager.ts:844:23        
+shouldUseAIValidation                                   function  backend/modules/communityWordManager.ts:897:17        
+recordAIValidationUsed                                  function  backend/modules/communityWordManager.ts:1019:17       
+getRemainingAIValidations                               function  backend/modules/communityWordManager.ts:1028:17       
+getGameCount                       gameStateManager               backend/modules/gameStateManager.ts:1218:3            
+forEachGame                        gameStateManager               backend/modules/gameStateManager.ts:1220:3            
+removeUserBySocketId               gameStateManager               backend/modules/gameStateManager.ts:1225:3            
+getUserBySocketId                  gameStateManager               backend/modules/gameStateManager.ts:1229:3            
+updateUserSocketId                 gameStateManager               backend/modules/gameStateManager.ts:1230:3            
+addSpectatorToGame                 gameStateManager               backend/modules/gameStateManager.ts:1234:3            
+removeSpectatorFromGame            gameStateManager               backend/modules/gameStateManager.ts:1235:3            
+getGameSpectators                  gameStateManager               backend/modules/gameStateManager.ts:1236:3            
+upgradeSpectatorToPlayer           gameStateManager               backend/modules/gameStateManager.ts:1237:3            
+isSpectator                        gameStateManager               backend/modules/gameStateManager.ts:1238:3            
+markPlayerReadyForNextGame         gameStateManager               backend/modules/gameStateManager.ts:1241:3            
+getPlayersReadyCount               gameStateManager               backend/modules/gameStateManager.ts:1242:3            
+isPlayerReadyForNextGame           gameStateManager               backend/modules/gameStateManager.ts:1243:3            
+clearPlayersReadyForNextGame       gameStateManager               backend/modules/gameStateManager.ts:1244:3            
+getEmptyRooms                      gameStateManager               backend/modules/gameStateManager.ts:1249:3            
+isRoomEmpty                        gameStateManager               backend/modules/gameStateManager.ts:1250:3            
+canTransitionGameState             gameStateManager               backend/modules/gameStateManager.ts:1259:3            
+getValidGameEvents                 gameStateManager               backend/modules/gameStateManager.ts:1260:3            
+getLeaderboardThrottled            gameStateManager               backend/modules/gameStateManager.ts:1268:3            
+getFirstFinder                     gameStateManager               backend/modules/gameStateManager.ts:1271:3            
+recordFirstFinder                  gameStateManager               backend/modules/gameStateManager.ts:1272:3            
+isFirstFinder                      gameStateManager               backend/modules/gameStateManager.ts:1273:3            
+trackAiApprovedWord                gameStateManager               backend/modules/gameStateManager.ts:1276:3            
+recordPeerValidationVote           gameStateManager               backend/modules/gameStateManager.ts:1279:3            
+getPeerValidationWord              gameStateManager               backend/modules/gameStateManager.ts:1280:3            
+removePeerRejectedWordScore        gameStateManager               backend/modules/gameStateManager.ts:1281:3            
+checkUserConnectionHealth          gameStateManager               backend/modules/gameStateManager.ts:1292:3            
+markHostActive                     gameStateManager               backend/modules/gameStateManager.ts:1293:3            
+reactivateHost                     gameStateManager               backend/modules/gameStateManager.ts:1294:3            
+getAuthUserConnection              gameStateManager               backend/modules/gameStateManager.ts:1297:3            
+setAuthUserConnection              gameStateManager               backend/modules/gameStateManager.ts:1298:3            
+removeAuthUserConnection           gameStateManager               backend/modules/gameStateManager.ts:1299:3            
+clearSocketMappings                gameStateManager               backend/modules/gameStateManager.ts:1300:3            
+clearSocketMappingsForLeave        gameStateManager               backend/modules/gameStateManager.ts:1301:3            
+setTournamentIdForGame             gameStateManager               backend/modules/gameStateManager.ts:1305:3            
+persistGameState                   gameStateManager               backend/modules/gameStateManager.ts:1308:3            
+restoreGameFromRedis               gameStateManager               backend/modules/gameStateManager.ts:1310:3            
+getAllGameCodesFromRedis           gameStateManager               backend/modules/gameStateManager.ts:1311:3            
+getUserGuestSessions                                    function  backend/modules/guestTracker.ts:218:23                
+deleteOldGuestSessions                                  function  backend/modules/guestTracker.ts:245:23                
+getPeerValidationStats             peerValidationMana…  function  backend/modules/peerValidationManager.ts:247:17       
+getUsersWithPresence               presenceManager      function  backend/modules/presenceManager.ts:224:17             
+isUserDisconnected                 presenceManager      function  backend/modules/presenceManager.ts:245:17             
+recordGameResult                                        function  backend/modules/supabaseServer.ts:164:23              
+updatePlayerStats                                       function  backend/modules/supabaseServer.ts:200:23              
+updateLeaderboardEntry                                  function  backend/modules/supabaseServer.ts:364:23              
+updateRankedProgress                                    function  backend/modules/supabaseServer.ts:403:23              
+getOrCreateGuestToken                                   function  backend/modules/supabaseServer.ts:439:23              
+updateGuestStats                                        function  backend/modules/supabaseServer.ts:469:23              
+saveHostApprovedWord                                    function  backend/modules/supabaseServer.ts:703:23              
+savePlayerWord                                          function  backend/modules/supabaseServer.ts:810:23              
+incrementBotWordUsage                                   function  backend/modules/supabaseServer.ts:926:23              
+updateRankedMmr                                         function  backend/modules/supabaseServer.ts:948:23              
+generateTournamentId                                    function  backend/modules/tournamentManager.ts:79:17            
+createTournament                                        function  backend/modules/tournamentManager.ts:86:17            
+addPlayerToTournament                                   function  backend/modules/tournamentManager.ts:135:17           
+removePlayerFromTournament                              function  backend/modules/tournamentManager.ts:179:17           
+addPlayerMidTournament                                  function  backend/modules/tournamentManager.ts:214:17           
+startTournamentRound                                    function  backend/modules/tournamentManager.ts:262:17           
+completeTournamentRound                                 function  backend/modules/tournamentManager.ts:301:17           
+completeTournament                                      function  backend/modules/tournamentManager.ts:350:17           
+getTournament                                           function  backend/modules/tournamentManager.ts:389:17           
+getTournamentStandings                                  function  backend/modules/tournamentManager.ts:396:17           
+deleteTournament                                        function  backend/modules/tournamentManager.ts:422:17           
+getActiveTournaments                                    function  backend/modules/tournamentManager.ts:440:17           
+linkGameToTournament                                    function  backend/modules/tournamentManager.ts:447:17           
+tournaments                                                       backend/modules/tournamentManager.ts:493:10           
+WordValidatorPool                                       class     backend/modules/wordValidatorPool.ts:56:14            
+isWordOnBoardAsync                                      function  backend/modules/wordValidatorPool.ts:352:17           
+getWordPathAsync                                        function  backend/modules/wordValidatorPool.ts:363:17           
+makePositionsMapAsync                                   function  backend/modules/wordValidatorPool.ts:374:17           
+getPoolStats                                            function  backend/modules/wordValidatorPool.ts:381:17           
+shutdownPool                                            function  backend/modules/wordValidatorPool.ts:388:17           
+saveGameState                                                     backend/redisClient.ts:1323:3                         
+getGameState                                                      backend/redisClient.ts:1324:3                         
+deleteGameState                                                   backend/redisClient.ts:1325:3                         
+getAllGameCodes                                                   backend/redisClient.ts:1326:3                         
+getWordApprovalStatus                                             backend/redisClient.ts:1335:3                         
+getApprovedWords                                                  backend/redisClient.ts:1337:3                         
+healthCheck                                                       backend/redisClient.ts:1347:3                         
+getRedisHealth                                                    backend/redisClient.ts:1348:3                         
+acquireGameLock                                                   backend/redisClient.ts:1352:3                         
+releaseGameLock                                                   backend/redisClient.ts:1353:3                         
+extendGameLock                                                    backend/redisClient.ts:1354:3                         
+withGameLock                                                      backend/redisClient.ts:1355:3                         
+getGameLockHolder                                                 backend/redisClient.ts:1356:3                         
+TTL_CONFIG                                                        backend/redisClient.ts:1359:3                         
+KEYS                                                              backend/redisClient.ts:1360:3                         
+getSinglePlayersByLanguage                                        backend/routes/singlePlayer.ts:179:38                 
+getSinglePlayersByMode                                            backend/routes/singlePlayer.ts:179:66                 
+MAX_PLAYERS_PER_ROOM                                              backend/socketHandlers.ts:84:10                       
+handlers                                                          backend/socketHandlers.ts:85:14                       
+emitAppError                                            function  backend/utils/errorHandler.ts:433:17                  
+wrapSocketHandler                                       function  backend/utils/errorHandler.ts:466:17                  
+GEOLOCATION_CACHE_TTL                                             backend/utils/geolocation.ts:64:14                    
+getClientIP                                             function  backend/utils/geolocation.ts:78:17                    
+isPrivateIP                                             function  backend/utils/geolocation.ts:120:17                   
+lookupIP                                                function  backend/utils/geolocation.ts:203:23                   
+Logger                                                            backend/utils/logger.ts:471:3                         
+LOG_LEVELS                                                        backend/utils/logger.ts:472:3                         
+runWithContext                                                    backend/utils/logger.ts:473:3                         
+getContext                                                        backend/utils/logger.ts:474:3                         
+setContextValue                                                   backend/utils/logger.ts:475:3                         
+requestLoggerMiddleware                                           backend/utils/logger.ts:476:3                         
+wrapSocketEventHandler                                            backend/utils/logger.ts:477:3                         
+asyncContext                                                      backend/utils/logger.ts:478:3                         
+incPerGame                                              function  backend/utils/metrics.ts:61:17                        
+ensureGame                                              function  backend/utils/metrics.ts:114:17                       
+isProfane                                               function  backend/utils/profanityFilter.ts:20:17                
+rateLimiterInstance                                               backend/utils/rateLimiter.ts:359:14                   
+checkRateLimitDetailed                                  function  backend/utils/rateLimiter.ts:391:17                   
+default                                                           backend/utils/rateLimiter.ts:417:8                    
+broadcastToRoomExceptSender                             function  backend/utils/socketHelpers.ts:42:17                  
+getSocketsInRoom                                        function  backend/utils/socketHelpers.ts:57:23                  
+getRoomSize                                             function  backend/utils/socketHelpers.ts:69:23                  
+isInRoom                                                function  backend/utils/socketHelpers.ts:77:17                  
+joinRoom                                                function  backend/utils/socketHelpers.ts:88:17                  
+leaveRoom                                               function  backend/utils/socketHelpers.ts:95:17                  
+leaveAllGameRooms                                       function  backend/utils/socketHelpers.ts:102:17                 
+broadcastToAll                                          function  backend/utils/socketHelpers.ts:124:17                 
+disconnectSocket                                        function  backend/utils/socketHelpers.ts:146:17                 
+wordSchema                                                        backend/utils/socketValidation.ts:178:14              
+gridPositionSchema                                                backend/utils/socketValidation.ts:183:14              
+difficultySchema                                                  backend/utils/socketValidation.ts:189:14              
+botDifficultySchema                                               backend/utils/socketValidation.ts:190:14              
+presenceStatusSchema                                              backend/utils/socketValidation.ts:191:14              
+leaveRoomSchema                                                   backend/utils/socketValidation.ts:264:14              
+startGameSchema                                                   backend/utils/socketValidation.ts:269:14              
+startGameAckSchema                                                backend/utils/socketValidation.ts:278:14              
+submitWordVoteSchema                                              backend/utils/socketValidation.ts:291:14              
+submitPeerValidationVoteSchema                                    backend/utils/socketValidation.ts:301:14              
+addBotSchema                                                      backend/utils/socketValidation.ts:313:14              
+removeBotSchema                                                   backend/utils/socketValidation.ts:318:14              
+heartbeatSchema                                                   backend/utils/socketValidation.ts:325:14              
+presenceUpdateSchema                                              backend/utils/socketValidation.ts:331:14              
+windowFocusChangeSchema                                           backend/utils/socketValidation.ts:339:14              
+kickPlayerSchema                                                  backend/utils/socketValidation.ts:344:14              
+transferHostSchema                                                backend/utils/socketValidation.ts:349:14              
+createTournamentSchema                                            backend/utils/socketValidation.ts:354:14              
+getWordsForBoardSchema                                            backend/utils/socketValidation.ts:365:14              
+resetGameSchema                                                   backend/utils/socketValidation.ts:373:14              
+closeRoomSchema                                                   backend/utils/socketValidation.ts:377:14              
+reconnectSchema                                                   backend/utils/socketValidation.ts:381:14              
+updateGameSettingsSchema                                          backend/utils/socketValidation.ts:388:14              
+broadcastShufflingGridSchema                                      backend/utils/socketValidation.ts:398:14              
+generateScoreCardSchema                                           backend/utils/socketValidation.ts:402:14              
+withValidation                                          function  backend/utils/socketValidation.ts:501:17              
+createValidationMiddleware                              function  backend/utils/socketValidation.ts:516:17              
+default                                                 variable  components/achievements/AchievementDock.tsx:232:8     
+default                                                           …nts/achievements/AchievementProgressTracker.tsx:222:8
+default                                                 variable  components/achievements/AchievementQueue.tsx:82:8     
+AchievementPopup                                                  components/achievements/index.js:1:21                 
+AchievementDock                                                   components/achievements/index.js:2:21                 
+AchievementQueue                                                  components/achievements/index.js:4:14                 
+AutoHideHeader                                          function  components/AutoHideHeader.tsx:17:17                   
+default                                                           components/CoinBalance.tsx:69:8                       
+default                                                           components/CollectionGrid.tsx:179:8                   
+default                                                           components/ConnectionStatusIndicator.tsx:205:8        
+EmailCaptureModal                                       function  components/EmailCaptureModal.tsx:21:17                
+BaseErrorBoundary                                       class     components/ErrorBoundaries.tsx:42:14                  
+default                                                           components/ErrorBoundaries.tsx:187:8                  
+default                                                           components/game/HelpPanel.tsx:263:8                   
+KeyboardHintTooltip                                     function  components/game/KeyboardHintTooltip.tsx:23:17         
+ThemeIndicator                                          function  components/game/ThemeIndicator.tsx:299:17             
+default                                                           components/GameAnnouncer.tsx:244:8                    
+GoogleAnalytics                                         function  components/GoogleAnalytics.tsx:13:17                  
+trackPageView                                           function  components/GoogleAnalytics.tsx:59:17                  
+hasSeenComboExplanation                                           components/grid/ComboExplanationTooltip.tsx:14:14     
+markComboExplanationSeen                                          components/grid/ComboExplanationTooltip.tsx:22:14     
+createAdaptiveThrottle                                  function  components/grid/performanceUtils.ts:129:17            
+prefersReducedMotion                                    function  components/grid/performanceUtils.ts:158:17            
+AutoJoiningState                                                  components/join/AutoJoiningState.tsx:18:14            
+default                                                           components/join/AutoJoiningState.tsx:98:8             
+AutoJoiningState                                                  components/join/index.ts:17:10                        
+QuickJoinForm                                                     components/join/index.ts:18:10                        
+AvatarSelectorButton                                              components/join/index.ts:24:21                        
+default                                                           components/join/LanguageSelector.tsx:74:8             
+default                                                           components/join/ModeSelector.tsx:56:8                 
+QuickJoinForm                                                     components/join/QuickJoinForm.tsx:32:14               
+default                                                           components/join/QuickJoinForm.tsx:247:8               
+default                                                           components/join/RoomList.tsx:234:8                    
+ModeCard                                                          components/landing/index.ts:2:21                      
+useSkipAnimations                                       function  components/motion/AdaptiveMotion.tsx:31:17            
+SkipAnimationsProvider                                  function  components/motion/AdaptiveMotion.tsx:41:17            
+default                                                           components/motion/AdaptiveMotion.tsx:182:8            
+wordAcceptedToast                                                 components/NeoToast.tsx:112:14                        
+wordNeedsValidationToast                                          components/NeoToast.tsx:183:14                        
+wordRejectedToast                                                 components/NeoToast.tsx:272:14                        
+PWAInstallPrompt                                        function  components/PWAInstallPrompt.tsx:22:17                 
+useTrackGameCompletion                                  function  components/PWAInstallPrompt.tsx:155:17                
+default                                                           components/results/useWordCategories.ts:85:8          
+LIFETIME_ACHIEVEMENT_KEYS                                         components/results/utils.ts:7:14                      
+ACHIEVEMENT_WORD_THRESHOLDS                                       components/results/utils.ts:22:14                     
+default                                                 variable  components/results/WordChip.tsx:286:8                 
+default                                                           components/results/WordPointsGroup.tsx:327:8          
+ServiceWorkerRegistration                               function  components/ServiceWorkerRegistration.tsx:11:17        
+default                                                           components/singleplayer/ConfigWizardNav.tsx:198:8     
+getHighScores                                           function  components/singleplayer/highScoreManager.ts:56:17     
+isNewHighScore                                          function  components/singleplayer/highScoreManager.ts:104:17    
+isNewAllTimeBest                                        function  components/singleplayer/highScoreManager.ts:116:17    
+getProgressMessage                                      function  components/singleplayer/highScoreManager.ts:218:17    
+MODE_PRESETS                                                      components/singleplayer/presetConfig.ts:112:14        
+getPresetById                                           function  components/singleplayer/presetConfig.ts:289:17        
+SocialMediaPixels                                       function  components/SocialMediaPixels.tsx:14:17                
+trackFBEvent                                            function  components/SocialMediaPixels.tsx:66:17                
+trackTikTokEvent                                        function  components/SocialMediaPixels.tsx:78:17                
+SpectatorBanner                                         function  components/SpectatorBanner.tsx:27:17                  
+AlertDialogPortal                                                 components/ui/alert-dialog.tsx:133:3                  
+AlertDialogOverlay                                                components/ui/alert-dialog.tsx:134:3                  
+AlertDialogTrigger                                                components/ui/alert-dialog.tsx:135:3                  
+AlertTitle                                                        components/ui/alert.tsx:83:17                         
+badgeVariants                                                     components/ui/badge.tsx:61:17                         
+CardDark                                                          components/ui/card.tsx:109:16                         
+CardFooter                                                        components/ui/card.tsx:109:38                         
+CardDescription                                                   components/ui/card.tsx:109:61                         
+default                                                           components/ui/ConfirmationDialog.tsx:135:8            
+DialogPortal                                                      components/ui/dialog.tsx:191:3                        
+DialogOverlay                                                     components/ui/dialog.tsx:192:3                        
+DialogClose                                                       components/ui/dialog.tsx:193:3                        
+DialogTrigger                                                     components/ui/dialog.tsx:194:3                        
+DialogDescription                                                 components/ui/dialog.tsx:199:3                        
+SelectGroup                                                       components/ui/select.tsx:178:3                        
+SelectLabel                                                       components/ui/select.tsx:182:3                        
+SelectSeparator                                                   components/ui/select.tsx:184:3                        
+SelectScrollUpButton                                              components/ui/select.tsx:185:3                        
+SelectScrollDownButton                                            components/ui/select.tsx:186:3                        
+WebVitalsReporter                                       function  components/WebVitalsReporter.tsx:19:17                
+WEB_VITALS_THRESHOLDS                                             components/WebVitalsReporter.tsx:73:14                
+usePerformanceMetrics                                   function  components/WebVitalsReporter.tsx:103:17               
+getXpProgress                                                     components/XpProgressBar.tsx:167:10                   
+getLevelFromXp                                                    components/XpProgressBar.tsx:167:25                   
+getXpForLevel                                                     components/XpProgressBar.tsx:167:41                   
+GameStateContext                                                  contexts/GameStateContext.tsx:89:10                   
+useSocketEventBus                                       function  contexts/SocketEventBusContext.tsx:190:17             
+useSocketEvent                                          function  contexts/SocketEventBusContext.tsx:231:17             
+SocketEventBusContext                                             contexts/SocketEventBusContext.tsx:249:10             
+gameStateReducer                                                  hooks/gameState/index.ts:26:10                        
+INITIAL_STATE                                                     hooks/gameState/index.ts:26:28                        
+DEFAULT_COMBO_STATE                                               hooks/gameState/index.ts:26:43                        
+DEFAULT_COMBO_STATE                                               hooks/gameState/reducer.ts:12:14                      
+default                                                           hooks/useAutoFillBots.ts:205:8                        
+default                                                           hooks/useAutoScrollOnGameStart.ts:82:8                
+default                                                           hooks/useComboSystem.ts:251:8                         
+createAdaptiveThrottle                                  function  hooks/useDevicePerformance.ts:199:17                  
+default                                                           hooks/useDevicePerformance.ts:223:8                   
+default                                                           hooks/useFirstWinCelebration.ts:68:8                  
+default                                                           hooks/useFriends.ts:247:8                             
+default                                                           hooks/useGameMusic.ts:167:8                           
+default                                                           hooks/useGameTimer.ts:275:8                           
+default                                                           hooks/useKeyboardWordInput.ts:360:8                   
+default                                                           hooks/useLiveRoomStats.ts:74:8                        
+useDismissedFlag                                        function  hooks/useLocalStorageState.ts:99:17                   
+localStorageUtils                                                 hooks/useLocalStorageState.ts:129:14                  
+default                                                           hooks/useNativeShare.ts:97:8                          
+default                                                           hooks/useNavigationGuard.ts:112:8                     
+useSafeSocketEvent                                      function  hooks/useSafeSocketEvent.ts:48:17                     
+useSocketEmit                                           function  hooks/useSafeSocketEvent.ts:190:17                    
+default                                                           hooks/useSafeSocketEvent.ts:235:8                     
+ValidationModal                                                   host/components/HostDialogs.tsx:91:14                 
+TvResultsWinnersPodium                                            host/components/tv-results/index.ts:3:21              
+TvResultsStatsGrid                                                host/components/tv-results/index.ts:4:21              
+TvResultsAwards                                                   host/components/tv-results/index.ts:5:21              
+TvResultsLeaderboard                                              host/components/tv-results/index.ts:6:21              
+TvResultsControls                                                 host/components/tv-results/index.ts:7:21              
+useTvResultsAnimation                                             host/components/tv-results/index.ts:8:10              
+default                                                           …/components/tv-results/useTvResultsAnimation.ts:214:8
+useHostEffects                                          function  host/hooks/useHostEffects.ts:62:17                    
+useHostGameActions                                      function  host/hooks/useHostGameActions.ts:79:17                
+useHostViewState                                        function  host/hooks/useHostViewState.ts:223:17                 
+default                                                           host/hooks/useTvNotifications.ts:356:8                
+default                                                           host/hooks/useTvPlayerCombos.ts:131:8                 
+default                                                           host/hooks/useTvSounds.ts:118:8                       
+GameAIService                                                     lib/ai-service.ts:1235:10                             
+addRateLimitHeaders                                     function  lib/apiRateLimit.ts:186:17                            
+getRateLimitStats                                       function  lib/apiRateLimit.ts:200:17                            
+getUser                                                 function  lib/supabase.ts:81:23                                 
+getLeaderboard                                          function  lib/supabase.ts:122:23                                
+getUserRank                                             function  lib/supabase.ts:131:23                                
+updateGuestStats                                        function  lib/supabase.ts:153:23                                
+withRetry                                               function  lib/supabaseEnhanced.ts:103:23                        
+profileOperations                                                 lib/supabaseEnhanced.ts:169:14                        
+gameResultsOperations                                             lib/supabaseEnhanced.ts:291:14                        
+connectionMonitor                                                 lib/supabaseEnhanced.ts:321:14                        
+requestQueue                                                      lib/supabaseEnhanced.ts:440:14                        
+isRetryableError                                                  lib/supabaseEnhanced.ts:446:3                         
+calculateDelay                                                    lib/supabaseEnhanced.ts:447:3                         
+RETRY_CONFIG                                                      lib/supabaseEnhanced.ts:448:3                         
+subscribeToProfile                                      function  lib/supabaseRealtime.ts:189:17                        
+subscribeToGameResults                                  function  lib/supabaseRealtime.ts:245:17                        
+createGameRoomChannel                                   function  lib/supabaseRealtime.ts:286:17                        
+getActiveSubscriptions                                  function  lib/supabaseRealtime.ts:361:17                        
+cleanupAllSubscriptions                                 function  lib/supabaseRealtime.ts:368:17                        
+getSubscriptionStats                                    function  lib/supabaseRealtime.ts:394:17                        
+default                                                           player/components/in-game/WordsProgress.tsx:131:8     
+default                                                           player/components/in-game/WordsRemaining.tsx:124:8    
+default                                                           player/hooks/useComboSystem.ts:233:8                  
+COUNTRY_TO_LOCALE                                                 server/localeRedirect.ts:21:14                        
+SUPPORTED_LOCALES                                                 server/localeRedirect.ts:32:14                        
+DEFAULT_LOCALE                                                    server/localeRedirect.ts:33:14                        
+isSocialCrawler                                         function  server/localeRedirect.ts:48:17                        
+determineLocale                                         function  server/localeRedirect.ts:59:17                        
+createCorsOptions                                       function  server/middleware.ts:29:17                            
+securityHeaders                                         function  server/middleware.ts:50:17                            
+getCleanupTimers                                        function  server/socketSetup.ts:108:17                          
+DIFFICULTIES                                                      shared/constants/gameConstants.ts:24:14               
+DEFAULT_DIFFICULTY                                                shared/constants/gameConstants.ts:30:14               
+DIFFICULTY_TIMERS                                                 shared/constants/gameConstants.ts:41:14               
+DEFAULT_TIMER                                                     shared/constants/gameConstants.ts:47:14               
+MIN_TIMER                                                         shared/constants/gameConstants.ts:48:14               
+MAX_TIMER                                                         shared/constants/gameConstants.ts:49:14               
+getRecommendedTimer                                     function  shared/constants/gameConstants.ts:54:17               
+MIN_WORD_LENGTH_OPTIONS                                           shared/constants/gameConstants.ts:65:14               
+DEFAULT_MIN_WORD_LENGTH                                           shared/constants/gameConstants.ts:71:14               
+MIN_WORD_LENGTH                                                   shared/constants/gameConstants.ts:72:14               
+MAX_WORD_LENGTH                                                   shared/constants/gameConstants.ts:73:14               
+MAX_PLAYERS_PER_ROOM                                              shared/constants/gameConstants.ts:77:14               
+MAX_ROOM_NAME_LENGTH                                              shared/constants/gameConstants.ts:78:14               
+ROOM_CODE_LENGTH                                                  shared/constants/gameConstants.ts:79:14               
+AVATAR_COLORS                                                     shared/constants/gameConstants.ts:83:14               
+AVATAR_EMOJIS                                                     shared/constants/gameConstants.ts:89:14               
+generateRandomAvatar                                    function  shared/constants/gameConstants.ts:99:17               
+WORD_SCORES                                                       shared/constants/gameConstants.ts:112:14              
+POINT_COLORS                                                      shared/constants/gameConstants.ts:138:14              
+getPointColor                                           function  shared/constants/gameConstants.ts:152:17              
+HEARTBEAT_INTERVAL_MS                                             shared/constants/gameConstants.ts:159:14              
+PRESENCE_TIMEOUT_MS                                               shared/constants/gameConstants.ts:160:14              
+RECONNECTION_TIMEOUT_MS                                           shared/constants/gameConstants.ts:161:14              
+STALE_GAME_TIMEOUT_MS                                             shared/constants/gameConstants.ts:162:14              
+isValidAchievement                                      function  shared/utils/achievementUtils.ts:21:17                
+validateAchievementData                                 function  shared/utils/achievementUtils.ts:28:17                
+createLiveAchievementHandler                            function  shared/utils/achievementUtils.ts:77:17                
+COMBO_BASE_WINDOW_MS                                              shared/utils/comboUtils.ts:10:14                      
+COMBO_LEVEL_BONUS_MS                                              shared/utils/comboUtils.ts:13:14                      
+COMBO_MAX_WINDOW_MS                                               shared/utils/comboUtils.ts:16:14                      
+processComboOnWordAccepted                              function  shared/utils/comboUtils.ts:93:17                      
+createResetComboWithShields                             function  shared/utils/comboUtils.ts:148:17                     
+handlePlayerConnectionStatusChan…                       function  shared/utils/connectionUtils.ts:26:17                 
+handlePlayerDisconnected                                function  shared/utils/connectionUtils.ts:55:17                 
+handlePlayerReconnected                                 function  shared/utils/connectionUtils.ts:73:17                 
+handlePlayerLeft                                        function  shared/utils/connectionUtils.ts:91:17                 
+handleRoomClosed                                        function  shared/utils/gameEventUtils.ts:28:17                  
+updatePlayerPresence                                    function  shared/utils/presenceUtils.ts:23:17                   
+calculateRemainingWaitTime                              function  shared/utils/timingUtils.ts:16:17                     
+normalizeLetter                                         function  shared/utils/wordNormalization.ts:126:17              
+isValidWordCharacters                                   function  shared/utils/wordNormalization.ts:185:17              
+getValidCharacterSet                                    function  shared/utils/wordNormalization.ts:192:17              
+LEVEL_UP_CONFETTI_CONFIG                                          shared/utils/xpUtils.ts:15:14                         
+triggerLevelUpCelebration                               function  shared/utils/xpUtils.ts:70:17                         
+HALL_OF_FAME_ACHIEVEMENTS                                         utils/achievementTiers.ts:10:14                       
+TIER_THRESHOLDS                                                   utils/achievementTiers.ts:37:14                       
+getTierDisplay                                          function  utils/achievementTiers.ts:192:17                      
+getAchievementTiers                                     function  utils/achievementTiers.ts:209:17                      
+HINT_UNLOCK_COSTS                                                 utils/aiHintGenerator.ts:54:14                        
+generateFallbackHints                                   function  utils/aiHintGenerator.ts:446:17                       
+getNextHint                                             function  utils/aiHintGenerator.ts:527:17                       
+getNewlyUnlockedHint                                    function  utils/aiHintGenerator.ts:551:17                       
+getLettersToEliminate                                   function  utils/aiHintGenerator.ts:670:17                       
+getLetterToReveal                                       function  utils/aiHintGenerator.ts:695:17                       
+getRandomAvatar                                         function  utils/avatarConfig.ts:45:17                           
+generateChallengeCode                                   function  utils/challenges.ts:104:17                            
+generateGridSeed                                        function  utils/challenges.ts:117:17                            
+getChallengeLeaderboard                                 function  utils/challenges.ts:267:23                            
+normalizeSpanishLetter                                  function  utils/clientWordValidator.ts:23:17                    
+COIN_EARNING                                                      utils/coinManager.ts:14:14                            
+COIN_EARNING_OTHER                                                utils/coinManager.ts:29:14                            
+getCoinBalance                                          function  utils/coinManager.ts:76:17                            
+addCoins                                                function  utils/coinManager.ts:132:17                           
+calculateDailyReward                                    function  utils/coinManager.ts:193:17                           
+getCoinHistory                                          function  utils/coinManager.ts:259:17                           
+calculateGameReward                                     function  utils/coinManager.ts:274:17                           
+resetConfetti                                           function  utils/confettiUtils.ts:90:17                          
+englishLetters                                                    utils/consts.ts:28:14                                 
+spanishBaseLetters                                                utils/consts.ts:33:14                                 
+spanishAccentedLetters                                            utils/consts.ts:34:14                                 
+DIFFICULTY_TIMERS                                                 utils/consts.ts:123:14                                
+DEFAULT_TIMER                                                     utils/consts.ts:129:14                                
+COMBO_TIMEOUT_MS                                                  utils/consts.ts:187:14                                
+getGuidanceState                                        function  utils/contextualGuidanceStorage.ts:27:17              
+resetGuidance                                           function  utils/contextualGuidanceStorage.ts:64:17              
+hasCompletedAllGuidance                                 function  utils/contextualGuidanceStorage.ts:72:17              
+DAILY_CHALLENGE_DURATION                                          utils/dailyChallenge.ts:46:14                         
+formatDateForDaily                                      function  utils/dailyChallenge.ts:92:17                         
+getDateForPuzzleNumber                                  function  utils/dailyChallenge.ts:109:17                        
+generateDailyGrid                                       function  utils/dailyChallenge.ts:146:17                        
+getTodaysDailyPuzzle                                    function  utils/dailyChallenge.ts:888:17                        
+generateShareableResult                                 function  utils/dailyChallenge.ts:977:17                        
+getWordHuntShareTextForPlatform                         function  utils/dailyChallenge.ts:1092:17                       
+getShareTextForPlatform                                 function  utils/dailyChallenge.ts:1104:17                       
+getTodaysResult                                         function  utils/dailyChallenge.ts:1163:17                       
+saveDailyResult                                         function  utils/dailyChallenge.ts:1182:17                       
+getAllDailyResults                                      function  utils/dailyChallenge.ts:1201:17                       
+getAllWordHuntResults                                   function  utils/dailyChallenge.ts:1311:17                       
+updateDailyStreak                                       function  utils/dailyChallenge.ts:1371:17                       
+generateChallengeUrl                                    function  utils/dailyChallenge.ts:1493:17                       
+getWordRarity                                           function  utils/dailyChallenge.ts:1561:17                       
+getRarityLabel                                          function  utils/dailyChallenge.ts:1570:17                       
+selectDailyTargetWord                                   function  utils/dailyChallenge.ts:1971:17                       
+getTodaysTargetWord                                     function  utils/dailyChallenge.ts:2070:17                       
+wasSignupModalDismissedRecently                         function  utils/dailyChallenge.ts:2096:17                       
+isFirstDailyCompletion                                  function  utils/dailyChallenge.ts:2127:17                       
+markFirstDailyCompletion                                function  utils/dailyChallenge.ts:2140:17                       
+getRandomFunnySentence                                  function  utils/dailyShareImage.ts:115:17                       
+shareDailyImage                                         function  utils/dailyShareImage.ts:577:23                       
+analyzePathDirection                                    function  utils/directionPatternDetector.ts:65:17               
+hasDirectionChange                                      function  utils/directionPatternDetector.ts:113:17              
+getDirectionDescription                                 function  utils/directionPatternDetector.ts:121:17              
+getHeadToHead                                           function  utils/friends.ts:531:23                               
+getAllHeadToHead                                        function  utils/friends.ts:580:23                               
+sendDirectChallenge                                     function  utils/friends.ts:658:23                               
+getUserByUsername                                       function  utils/friends.ts:776:23                               
+getGameHistory                                          function  utils/gameHistoryManager.ts:42:17                     
+getMilestoneLabel                                       function  utils/gameHistoryManager.ts:181:17                    
+clearGameHistory                                        function  utils/gameHistoryManager.ts:224:17                    
+calculateGameInsights                                   function  utils/gameInsights.ts:381:17                          
+updateGameSession                                       function  utils/gameLogger.ts:155:23                            
+getCurrentPlayerSession                                 function  utils/gameLogger.ts:188:17                            
+calculateGameDuration                                   function  utils/gameLogger.ts:233:17                            
+getReferralSource                                                 utils/growthTracking.ts:98:14                         
+trackGrowthEvent                                                  utils/growthTracking.ts:108:14                        
+trackShare                                                        utils/growthTracking.ts:186:14                        
+trackAchievement                                                  utils/growthTracking.ts:208:14                        
+trackSignupFunnel                                                 utils/growthTracking.ts:251:14                        
+getGrowthMetricsSummary                                           utils/growthTracking.ts:265:14                        
+generateReferralCode                                              utils/growthTracking.ts:309:14                        
+getShareUrlWithTracking                                           utils/growthTracking.ts:324:14                        
+trackAnalyticsEvent                                               utils/growthTracking.ts:346:14                        
+trackGuestJoin                                                    utils/growthTracking.ts:385:14                        
+trackGuestGameComplete                                            utils/growthTracking.ts:397:14                        
+trackPageView                                                     utils/growthTracking.ts:415:14                        
+default                                                 variable  utils/growthTracking.ts:442:8                         
+hasGuestSession                                         function  utils/guestManager.ts:116:17                          
+saveGuestStats                                          function  utils/guestManager.ts:157:17                          
+hasWon                                                  function  utils/guestManager.ts:282:17                          
+getGuestWinsCount                                       function  utils/guestManager.ts:290:17                          
+getGuestCasualGamesCount                                function  utils/guestManager.ts:299:17                          
+setGuestName                                            function  utils/guestManager.ts:307:17                          
+getGuestFingerprint                                     function  utils/guestManager.ts:325:17                          
+triggerCustomHaptic                                     function  utils/hapticFeedback.ts:61:17                         
+isHapticSupported                                       function  utils/hapticFeedback.ts:73:17                         
+stopHaptic                                              function  utils/hapticFeedback.ts:80:17                         
+hapticWordAccepted                                                utils/haptics.ts:56:14                                
+hapticComboMilestone                                              utils/haptics.ts:64:14                                
+hapticHighValueWord                                               utils/haptics.ts:72:14                                
+hapticTimerWarning                                                utils/haptics.ts:102:14                               
+default                                                 variable  utils/haptics.ts:157:8                                
+getOnboardingData                                                 utils/onboardingStorage.ts:48:14                      
+clearOnboardingData                                               utils/onboardingStorage.ts:64:14                      
+markOnboardingSkipped                                             utils/onboardingStorage.ts:73:14                      
+ARCHETYPES                                                        utils/playerArchetypes.ts:35:14                       
+DEFAULT_ARCHETYPE                                                 utils/playerArchetypes.ts:120:14                      
+calculatePlayerStats                                    function  utils/playerArchetypes.ts:125:17                      
+determinePlayerArchetype                                function  utils/playerArchetypes.ts:242:17                      
+getPlayerProgress                                                 utils/playerProgressStorage.ts:26:14                  
+getTrainingGamesCount                                             utils/playerProgressStorage.ts:65:14                  
+resetPlayerProgress                                               utils/playerProgressStorage.ts:117:14                 
+isNewPlayer                                                       utils/playerProgressStorage.ts:126:14                 
+getWaitingResultsRankStyle                              function  utils/rankingStyles.ts:112:17                         
+isTopThree                                              function  utils/rankingStyles.ts:134:17                         
+indexToRank                                             function  utils/rankingStyles.ts:143:17                         
+rankToIndex                                             function  utils/rankingStyles.ts:152:17                         
+setGameContext                                          function  utils/sentry.ts:66:17                                 
+clearGuestSession                                       function  utils/sessionTracking.ts:36:17                        
+getDeviceType                                           function  utils/sessionTracking.ts:46:17                        
+getBrowser                                              function  utils/sessionTracking.ts:62:17                        
+getUTMParams                                            function  utils/sessionTracking.ts:79:17                        
+getSessionCreatedAt                                     function  utils/sessionTracking.ts:237:17                       
+shareViaFacebook                                                  utils/share.ts:78:14                                  
+shareViaTelegram                                                  utils/share.ts:91:14                                  
+copyGameCode                                                      utils/share.ts:105:14                                 
+shareResultsViaWhatsApp                                           utils/share.ts:246:14                                 
+getVariantPerformance                                             utils/share.ts:322:14                                 
+getOptimalShareVariant                                            utils/share.ts:397:14                                 
+trackShareVariantClick                                            utils/share.ts:416:14                                 
+trackShareConversion                                              utils/share.ts:424:14                                 
+getShareMessageVariants                                           utils/share.ts:438:14                                 
+ACHIEVEMENT_ICONS                                                 utils/singlePlayerAchievements.ts:9:14                
+checkLiveAchievements                                   function  utils/singlePlayerAchievements.ts:64:17               
+createAchievementState                                  function  utils/singlePlayerAchievements.ts:441:17              
+hasConnectedSharedSocket                                function  utils/SocketContext.tsx:92:17                         
+useSocketOptional                                       function  utils/SocketContext.tsx:243:17                        
+useSocketEvent                                          function  utils/SocketContext.tsx:252:17                        
+useSocketEmit                                           function  utils/SocketContext.tsx:270:17                        
+useGameSocket                                           function  utils/SocketContext.tsx:311:17                        
+debounce                                                function  utils/throttle.ts:88:17                               
+default                                                           utils/throttle.ts:130:8                               
+normalizeHebrewLetter                                             utils/utils.ts:15:3                                   
+normalizeHebrewWord                                               utils/utils.ts:16:3                                   
+isValidHebrewLetter                                               utils/utils.ts:17:3                                   
+filterHebrewWord                                                  utils/utils.ts:18:3                                   
+generateRandomRoomName                                  function  utils/utils.ts:42:17                                  
+generateRandomAvatar                                    function  utils/utils.ts:66:17                                  
+extractUtmFromUrl                                       function  utils/utmCapture.ts:24:17                             
+getReferrerDomain                                       function  utils/utmCapture.ts:42:17                             
+getReferrerUrl                                          function  utils/utmCapture.ts:61:17                             
+captureUtmData                                          function  utils/utmCapture.ts:81:17                             
+clearUtmData                                            function  utils/utmCapture.ts:160:17                            
+getUtmSourceForTracking                                 function  utils/utmCapture.ts:168:17                            
+isWhatsAppReferral                                      function  utils/utmCapture.ts:185:17                            
+default                                                           utils/utmCapture.ts:208:8                             
+feedbackToEmoji                                         function  utils/wordHuntFeedback.ts:111:17                      
+getLetterKnowledge                                      function  utils/wordHuntFeedback.ts:143:17                      
+canFormWordOnBoard                                      function  utils/wordHuntFeedback.ts:176:17                      
+findWordPath                                            function  utils/wordPathFinder.ts:21:17                         
+batchValidateWords                                      function  utils/wordValidationAPI.ts:38:23                      
+calculateValidatedScore                                 function  utils/wordValidationAPI.ts:133:17                     
+Unused exported types (168)
+TrieCacheEntry                                  interface  backend/modules/boggleSolver.ts:42:18              
+GridCacheEntry                                  interface  backend/modules/boggleSolver.ts:47:18              
+BotConfigType                                   interface  backend/modules/botConfig.ts:48:18                 
+Bot                                             type       backend/modules/botManager.ts:33:15                
+WordSubmissionData                              type       backend/modules/botManager.ts:33:20                
+WordScoreRow                                    interface  backend/modules/communityWordManager.ts:29:18      
+PendingWordData                                 interface  backend/modules/communityWordManager.ts:106:18     
+SelfHealingConfig                               interface  backend/modules/communityWordManager.ts:145:18     
+CacheEntry                                      interface  backend/modules/gameAIService.ts:46:18             
+GameState                     gameStateManager  interface  backend/modules/gameStateManager.ts:108:18         
+GameCreationData              gameStateManager  interface  backend/modules/gameStateManager.ts:144:18         
+GameSummary                   gameStateManager  interface  backend/modules/gameStateManager.ts:155:18         
+StateTransitionResult         gameStateManager  interface  backend/modules/gameStateManager.ts:165:18         
+ErrorCode                                       type       backend/utils/errorHandler.ts:117:13               
+GameState                                       type       backend/utils/gameStateMachine.ts:227:15           
+MachineState                                    type       backend/utils/gameStateMachine.ts:227:26           
+EventType                                       type       backend/utils/gameStateMachine.ts:227:40           
+TransitionResult                                type       backend/utils/gameStateMachine.ts:227:51           
+GeoData                                         type       backend/utils/geolocation.ts:407:15                
+CountryResult                                   type       backend/utils/geolocation.ts:407:24                
+GeolocationMiddlewareOptions                    type       backend/utils/geolocation.ts:407:39                
+RequestWithGeoData                              type       backend/utils/geolocation.ts:407:69                
+LogContext                                      type       backend/utils/logger.ts:480:15                     
+LogEntry                                        type       backend/utils/logger.ts:480:27                     
+TimerResult                                     type       backend/utils/logger.ts:480:37                     
+GlobalCounters                                  type       backend/utils/metrics.ts:126:15                    
+RoomMetrics                                     type       backend/utils/metrics.ts:126:31                    
+RoomMetricsEntry                                type       backend/utils/metrics.ts:126:44                    
+MetricName                                      type       backend/utils/metrics.ts:126:62                    
+TimerType                                       type       backend/utils/timerManager.ts:166:15               
+TimerEntry                                      type       backend/utils/timerManager.ts:166:26               
+ConversionTrigger                               type       components/auth/DailyChallengeSignupModal.tsx:38:13
+DailyChallengeTutorialProps                     interface  components/daily/DailyChallengeTutorial.tsx:12:18  
+LifeGainAnimationProps                          interface  components/daily/LifeGainAnimation.tsx:7:18        
+DailyParticipant                                interface  components/daily/TabbedDailyLeaderboard.tsx:15:18  
+AllTimeParticipant                              interface  components/daily/TabbedDailyLeaderboard.tsx:34:18  
+WordFeedbackToastProps                          interface  components/daily/WordFeedbackToast.tsx:18:18       
+GuidanceType                                    type       components/game/ContextualTooltip.tsx:8:13         
+AvatarSelectorButtonProps                       interface  components/join/AvatarSelectorButton.tsx:9:18      
+HostModeFieldsProps                             interface  components/join/HostModeFields.tsx:18:18           
+JoinModeFieldsProps                             type       components/join/index.ts:25:15                     
+HostModeFieldsProps                             type       components/join/index.ts:26:15                     
+AvatarSelectorButtonProps                       type       components/join/index.ts:27:15                     
+JoinModeFieldsProps                             interface  components/join/JoinModeFields.tsx:18:18           
+FeatureItem                                     interface  components/landing/ModeCard.tsx:10:18              
+LiveBadgeProps                                  interface  components/landing/ModeCard.tsx:15:18              
+WordRejectionReason                             type       components/NeoToast.tsx:68:13                      
+WordPointsGroupProps                            interface  components/results/WordPointsGroup.tsx:22:18       
+SharedWordsSectionProps                         interface  components/results/WordPointsGroup.tsx:230:18      
+InvalidWordsSectionProps                        interface  components/results/WordPointsGroup.tsx:272:18      
+BadgeProps                                      interface  components/ui/badge.tsx:51:18                      
+ButtonProps                                     interface  components/ui/button.tsx:76:18                     
+ConfirmationDialogVariant                       type       components/ui/ConfirmationDialog.tsx:15:13         
+InputProps                                      interface  components/ui/input.tsx:5:18                       
+ProfileData                                     type       contexts/AuthContext.tsx:36:15                     
+RankedProgress                                  type       contexts/AuthContext.tsx:36:28                     
+AuthContextValue                                type       contexts/AuthContext.tsx:36:44                     
+EventHandler                                    type       contexts/SocketEventBusContext.tsx:250:15          
+UnsubscribeFn                                   type       contexts/SocketEventBusContext.tsx:250:29          
+SocketEventBusContextValue                      type       contexts/SocketEventBusContext.tsx:250:44          
+ComboState                                      type       hooks/gameState/index.ts:16:3                      
+TournamentData                                  type       hooks/gameState/index.ts:17:3                      
+TournamentStanding                              type       hooks/gameState/index.ts:18:3                      
+GameStateValues                                 type       hooks/gameState/index.ts:19:3                      
+GameStateAction                                 type       hooks/gameState/index.ts:20:3                      
+GameStateActions                                type       hooks/gameState/index.ts:21:3                      
+GameStateActions                                interface  hooks/gameState/types.ts:143:18                    
+ValidationFunction                              type       hooks/useDebouncedValidation.ts:13:13              
+EarthquakeState                                 type       hooks/useGameMusic.ts:7:13                         
+ComboState                                      type       hooks/useGameState.ts:15:3                         
+TournamentData                                  type       hooks/useGameState.ts:16:3                         
+TournamentStanding                              type       hooks/useGameState.ts:17:3                         
+GameStateValues                                 type       hooks/useGameState.ts:18:3                         
+GameStateAction                                 type       hooks/useGameState.ts:19:3                         
+GameStateActions                                type       hooks/useGameState.ts:20:3                         
+AnimationPhase                                  type       host/components/tv-results/index.ts:9:15           
+SoundType                                       type       host/components/tv-results/index.ts:9:31           
+UseHostViewStateReturn                          type       host/hooks/index.ts:9:8                            
+TournamentData                                  type       host/hooks/index.ts:10:8                           
+FinalScoresData                                 type       host/hooks/index.ts:11:8                           
+XpGainedData                                    type       host/hooks/index.ts:12:8                           
+LevelUpData                                     type       host/hooks/index.ts:13:8                           
+GameSettings                                    type       host/hooks/index.ts:14:8                           
+GameRuntimeState                                type       host/hooks/index.ts:15:8                           
+PlayerTrackingState                             type       host/hooks/index.ts:16:8                           
+HostPlayingState                                type       host/hooks/index.ts:17:8                           
+TournamentState                                 type       host/hooks/index.ts:18:8                           
+AnimationState                                  type       host/hooks/index.ts:19:8                           
+HostUIState                                     type       host/hooks/index.ts:20:8                           
+ComboState                                      type       host/hooks/index.ts:21:8                           
+XpState                                         type       host/hooks/index.ts:22:8                           
+UseHostGameActionsReturn                        type       host/hooks/index.ts:26:46                          
+WordValidationResult                            type       lib/ai-service.ts:1232:15                          
+CommunityWord                                   type       lib/ai-service.ts:1232:37                          
+HintResult                                      type       lib/ai-service.ts:1232:52                          
+TokenUsageStats                                 type       lib/ai-service.ts:1232:64                          
+DifficultySettings                              interface  shared/constants/gameConstants.ts:14:18            
+MinWordLengthOption                             interface  shared/constants/gameConstants.ts:60:18            
+FireRoundState                                  interface  shared/types/earthquake.ts:40:18                   
+EarthquakeWarningPayload                        interface  shared/types/earthquake.ts:92:18                   
+EarthquakeShakePayload                          interface  shared/types/earthquake.ts:97:18                   
+FireRoundStartPayload                           interface  shared/types/earthquake.ts:102:18                  
+FireRoundEndPayload                             interface  shared/types/earthquake.ts:109:18                  
+GameFireRoundState                              interface  shared/types/earthquake.ts:121:18                  
+GameStatsForEngagement                          interface  shared/types/engagement.ts:232:18                  
+EngagementSocketEvents                          interface  shared/types/engagement.ts:256:18                  
+BaseUser                                        interface  shared/types/game.ts:54:18                         
+WordSubmission                                  interface  shared/types/game.ts:85:18                         
+PlayerScore                                     interface  shared/types/game.ts:137:18                        
+Tournament                                      interface  shared/types/game.ts:215:18                        
+ChallengeType                                   type       shared/types/index.ts:25:3                         
+ChallengeTier                                   type       shared/types/index.ts:26:3                         
+ChallengeRewardClaim                            type       shared/types/index.ts:27:3                         
+StreakBonus                                     type       shared/types/index.ts:28:3                         
+StreakStatus                                    type       shared/types/index.ts:29:3                         
+CalendarRewardType                              type       shared/types/index.ts:30:3                         
+MysteryBoxRarity                                type       shared/types/index.ts:31:3                         
+CalendarClaimResult                             type       shared/types/index.ts:32:3                         
+AppliedReward                                   type       shared/types/index.ts:33:3                         
+ComebackTier                                    type       shared/types/index.ts:34:3                         
+MysteryRewardTrigger                            type       shared/types/index.ts:35:3                         
+MysteryRewardType                               type       shared/types/index.ts:36:3                         
+RewardRarity                                    type       shared/types/index.ts:37:3                         
+GameStatsForEngagement                          type       shared/types/index.ts:38:3                         
+EngagementSocketEvents                          type       shared/types/index.ts:39:3                         
+ClientToServerEvents                            interface  shared/types/socket.ts:32:18                       
+ServerToClientEvents                            interface  shared/types/socket.ts:107:18                      
+InvalidReason                                   type       shared/types/spam.ts:10:13                         
+SpamStatus                                      interface  shared/types/spam.ts:41:18                         
+ViewPlayer                                      interface  shared/types/view.ts:13:18                         
+ComboState                                      interface  shared/types/view.ts:114:18                        
+ApiResponse                                     interface  types/api.ts:8:18                                  
+PaginatedResponse                               interface  types/api.ts:20:18                                 
+CreateGameResponse                              interface  types/api.ts:29:18                                 
+JoinGameResponse                                interface  types/api.ts:34:18                                 
+GetProfileResponse                              interface  types/api.ts:39:18                                 
+GetLeaderboardResponse                          interface  types/api.ts:43:18                                 
+GetActiveRoomsResponse                          interface  types/api.ts:47:18                                 
+ValidateWordResponse                            interface  types/api.ts:51:18                                 
+JoinViewProps                                   interface  types/components.ts:11:18                          
+AuthUser                                        type       types/index.ts:19:3                                
+GuestUser                                       type       types/index.ts:20:3                                
+UserProfile                                     type       types/index.ts:21:3                                
+UserStats                                       type       types/index.ts:22:3                                
+Achievement                                     type       types/index.ts:23:3                                
+Leaderboard                                     type       types/index.ts:24:3                                
+ApiResponse                                     type       types/index.ts:30:3                                
+ApiError                                        type       types/index.ts:31:3                                
+PaginatedResponse                               type       types/index.ts:32:3                                
+CreateGameResponse                              type       types/index.ts:33:3                                
+JoinGameResponse                                type       types/index.ts:34:3                                
+GetProfileResponse                              type       types/index.ts:35:3                                
+GetLeaderboardResponse                          type       types/index.ts:36:3                                
+GetActiveRoomsResponse                          type       types/index.ts:37:3                                
+ValidateWordResponse                            type       types/index.ts:38:3                                
+JoinViewProps                                   type       types/index.ts:43:3                                
+JoinMode                                        type       types/index.ts:44:3                                
+ResultsPageProps                                type       types/index.ts:45:3                                
+WordToVote                                      type       types/index.ts:47:3                                
+XpGainedData                                    type       types/index.ts:48:3                                
+LevelUpData                                     type       types/index.ts:49:3                                
+User                                            type       types/index.ts:57:27                               
+AuthUser                                        interface  types/user.ts:17:18                                
+GuestUser                                       interface  types/user.ts:26:18                                
+LeaderboardEntry                                type       types/user.ts:69:15                                
+ConfettiOptions                                 type       utils/confettiUtils.ts:262:26                      
+FriendRecord                                    interface  utils/friends.ts:56:18                             
+SpeedPatternAnalysis                            interface  utils/gameInsights.ts:49:18                        
+Duplicate exports (54)
+isWordOnBoard|validateWordOnBoard   backend/modules/wordValidator.ts                      
+rateLimiterInstance|default         backend/utils/rateLimiter.ts                          
+AchievementProgressTracker|default  components/achievements/AchievementProgressTracker.tsx
+AutoHideHeader|default              components/AutoHideHeader.tsx                         
+CoinBalance|default                 components/CoinBalance.tsx                            
+CollectionGrid|default              components/CollectionGrid.tsx                         
+ConnectionStatus|default            components/ConnectionStatusIndicator.tsx              
+EmailCaptureModal|default           components/EmailCaptureModal.tsx                      
+BaseErrorBoundary|default           components/ErrorBoundaries.tsx                        
+HelpPanel|default                   components/game/HelpPanel.tsx                         
+KeyboardHintTooltip|default         components/game/KeyboardHintTooltip.tsx               
+ThemeIndicator|default              components/game/ThemeIndicator.tsx                    
+GameAnnouncerProvider|default       components/GameAnnouncer.tsx                          
+GoogleAnalytics|default             components/GoogleAnalytics.tsx                        
+InteractiveGridDemo|default         components/how-to-play/InteractiveGridDemo.tsx        
+AutoJoiningState|default            components/join/AutoJoiningState.tsx                  
+LanguageSelector|default            components/join/LanguageSelector.tsx                  
+ModeSelector|default                components/join/ModeSelector.tsx                      
+QuickJoinForm|default               components/join/QuickJoinForm.tsx                     
+RoomList|default                    components/join/RoomList.tsx                          
+AdaptiveMotion|default              components/motion/AdaptiveMotion.tsx                  
+PWAInstallPrompt|default            components/PWAInstallPrompt.tsx                       
+useWordCategories|default           components/results/useWordCategories.ts               
+WordPointsGroup|default             components/results/WordPointsGroup.tsx                
+ServiceWorkerRegistration|default   components/ServiceWorkerRegistration.tsx              
+ConfigWizardNav|default             components/singleplayer/ConfigWizardNav.tsx           
+SocialMediaPixels|default           components/SocialMediaPixels.tsx                      
+SpectatorBanner|default             components/SpectatorBanner.tsx                        
+ConfirmationDialog|default          components/ui/ConfirmationDialog.tsx                  
+WebVitalsReporter|default           components/WebVitalsReporter.tsx                      
+useAutoFillBots|default             hooks/useAutoFillBots.ts                              
+useAutoScrollOnGameStart|default    hooks/useAutoScrollOnGameStart.ts                     
+useComboSystem|default              hooks/useComboSystem.ts                               
+useDevicePerformance|default        hooks/useDevicePerformance.ts                         
+useFirstWinCelebration|default      hooks/useFirstWinCelebration.ts                       
+useFriends|default                  hooks/useFriends.ts                                   
+useGameMusic|default                hooks/useGameMusic.ts                                 
+useGameTimer|default                hooks/useGameTimer.ts                                 
+useKeyboardWordInput|default        hooks/useKeyboardWordInput.ts                         
+useLiveRoomStats|default            hooks/useLiveRoomStats.ts                             
+useNativeShare|default              hooks/useNativeShare.ts                               
+useNavigationGuard|default          hooks/useNavigationGuard.ts                           
+useSafeSocketEvent|default          hooks/useSafeSocketEvent.ts                           
+useTvResultsAnimation|default       host/components/tv-results/useTvResultsAnimation.ts   
+useHostEffects|default              host/hooks/useHostEffects.ts                          
+useHostGameActions|default          host/hooks/useHostGameActions.ts                      
+useHostViewState|default            host/hooks/useHostViewState.ts                        
+useTvNotifications|default          host/hooks/useTvNotifications.ts                      
+useTvPlayerCombos|default           host/hooks/useTvPlayerCombos.ts                       
+useTvSounds|default                 host/hooks/useTvSounds.ts                             
+WordsProgress|default               player/components/in-game/WordsProgress.tsx           
+WordsRemaining|default              player/components/in-game/WordsRemaining.tsx          
+useComboSystem|default              player/hooks/useComboSystem.ts                        
+throttle|default                    utils/throttle.ts                                     
+Configuration hints (1)
+. (root)      Create knip.json configuration file, and add entry and/or refine project files (157 unused files)

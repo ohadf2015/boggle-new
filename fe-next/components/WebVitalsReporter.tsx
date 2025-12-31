@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useReportWebVitals } from 'next/web-vitals';
 import { trackEvent } from './GoogleAnalytics';
 
 /**
  * Web Vitals Reporter Component
  *
- * Tracks Core Web Vitals (CWV) and sends them to Google Analytics.
+ * Tracks Core Web Vitals (CWV) and sends them to Google Analytics and Supabase.
  * Metrics tracked:
  * - LCP (Largest Contentful Paint): Loading performance
  * - FID (First Input Delay): Interactivity
@@ -16,7 +16,59 @@ import { trackEvent } from './GoogleAnalytics';
  * - TTFB (Time to First Byte): Server response time
  * - INP (Interaction to Next Paint): Responsiveness (new Core Web Vital)
  */
+
+// Get device type from user agent
+function getDeviceType(): 'mobile' | 'tablet' | 'desktop' {
+  if (typeof window === 'undefined') return 'desktop';
+  const ua = navigator.userAgent;
+  if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
+    return 'tablet';
+  }
+  if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(ua)) {
+    return 'mobile';
+  }
+  return 'desktop';
+}
+
+// Get connection type if available
+function getConnectionType(): string | null {
+  if (typeof window === 'undefined') return null;
+  if ('connection' in navigator) {
+    const conn = (navigator as any).connection;
+    return conn?.effectiveType || null;
+  }
+  return null;
+}
+
+// Get or create session ID (persists for 30 minutes)
+function getSessionId(): string {
+  if (typeof window === 'undefined') return 'server';
+  const SESSION_KEY = 'web_vitals_session';
+  const SESSION_DURATION = 30 * 60 * 1000; // 30 minutes
+
+  const stored = sessionStorage.getItem(SESSION_KEY);
+  if (stored) {
+    try {
+      const { id, timestamp } = JSON.parse(stored);
+      if (Date.now() - timestamp < SESSION_DURATION) {
+        return id;
+      }
+    } catch (e) {
+      // Invalid stored session, create new one
+    }
+  }
+
+  const newSessionId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({
+    id: newSessionId,
+    timestamp: Date.now()
+  }));
+  return newSessionId;
+}
+
 export function WebVitalsReporter() {
+  const reported = useRef<Set<string>>(new Set());
+
   useReportWebVitals((metric) => {
     // Send to Google Analytics
     trackEvent('web_vitals', {
@@ -34,6 +86,42 @@ export function WebVitalsReporter() {
         value: metric.value,
         rating: metric.rating,
         delta: metric.delta,
+        device: getDeviceType(),
+        connection: getConnectionType(),
+      });
+    }
+
+    // Send to Supabase for persistent storage and admin dashboard (only once per metric)
+    const metricKey = `${metric.name}-${metric.id}`;
+    if (!reported.current.has(metricKey)) {
+      reported.current.add(metricKey);
+
+      const data = {
+        metric_name: metric.name,
+        metric_value: metric.value,
+        metric_rating: metric.rating || 'poor',
+        page_url: window.location.href,
+        page_path: window.location.pathname,
+        device_type: getDeviceType(),
+        connection_type: getConnectionType(),
+        navigation_type: metric.navigationType,
+        session_id: getSessionId(),
+        user_agent: navigator.userAgent,
+        metadata: {
+          id: metric.id,
+          navigationType: metric.navigationType,
+          delta: metric.delta
+        }
+      };
+
+      // Fire and forget - don't block user experience
+      fetch('/api/web-vitals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        keepalive: true
+      }).catch(() => {
+        // Silently fail - tracking should never break the app
       });
     }
 

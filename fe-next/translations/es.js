@@ -900,10 +900,14 @@ const es = {
     "joinGame": "Unirse al Juego",
     "slotAvailable": "{{count}} espacio disponible",
     "slotsAvailable": "{{count}} espacios disponibles",
-    "upgraded": "¡Ya puedes jugar!",
-    "youAreSpectating": "Estás viendo este juego",
+    "upgraded": "¡Estás dentro! ¡A jugar!",
+    "youAreSpectating": "¡Viendo la batalla!",
     "watchingGame": "Viendo el juego...",
-    "waitForSlot": "Esperando espacio de jugador..."
+    "waitForSlot": "Esperando espacio de jugador...",
+    "status": "👀 ESPECTANDO",
+    "explanation": "¡La sala está llena! Estás mirando, pero aguanta - puede que se abra un lugar.",
+    "requestToPlay": "Pedir Jugar",
+    "join": "Unirse"
   },
   "chat": {
     "title": "Chat de Sala",
@@ -2136,7 +2140,9 @@ const es = {
     "yourRank": "Tu Puesto",
     "topPercent": "Top ${percent}%",
     "noRankYet": "¡Juega partidas para clasificarte!",
-    "viewLeaderboard": "Ver Clasificación"
+    "viewLeaderboard": "Ver Clasificación",
+    "you": "TÚ",
+    "players": "jugadores"
   },
   "ranked": {
     "title": "Modo Clasificatorio",
@@ -2808,6 +2814,13 @@ const es = {
     "almostThere": "¡Ya casi!",
     "happyNewYear": "¡Feliz Año Nuevo!",
     "celebrationMessage": "¡Te deseamos un año increíble lleno de palabras, victorias y maravillas!"
+  },
+  "keyboardHint": {
+    "title": "⚡ Truco Rápido",
+    "message": "¡Escribe palabras con tu teclado! Solo empieza a teclear y presiona Enter. ¡Mucho más rápido que deslizar!",
+    "type": "Escribe",
+    "clear": "para borrar",
+    "gotIt": "¡Entendido!"
   }
 };
 

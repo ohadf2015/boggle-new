@@ -874,10 +874,14 @@ const he = {
     "joinGame": "הצטרף למשחק",
     "slotAvailable": "מקום {{count}} פנוי",
     "slotsAvailable": "מקומות {{count}} פנויים",
-    "upgraded": "עכשיו אתה יכול לשחק!",
-    "youAreSpectating": "אתה צופה במשחק הזה",
+    "upgraded": "הצטרפת! בוא נשחק!",
+    "youAreSpectating": "צופה בקרב!",
     "watchingGame": "...צופה במשחק",
-    "waitForSlot": "...ממתין למקום שחקן"
+    "waitForSlot": "...ממתין למקום שחקן",
+    "status": "צופה 👀",
+    "explanation": "החדר מלא! אתה צופה, אבל תחכה - אולי ייפתח מקום.",
+    "requestToPlay": "בקש לשחק",
+    "join": "הצטרף"
   },
   "hints": {
     "hint": "רמז",
@@ -2140,7 +2144,9 @@ const he = {
     "yourRank": "הדירוג שלך",
     "topPercent": "${percent}% העליונים",
     "noRankYet": "שחק משחקים כדי להיכנס לדירוג!",
-    "viewLeaderboard": "צפייה בטבלת מובילים"
+    "viewLeaderboard": "צפייה בטבלת מובילים",
+    "you": "אתה",
+    "players": "שחקנים"
   },
   "ranked": {
     "title": "מצב מדורג",
@@ -2812,6 +2818,13 @@ const he = {
     "almostThere": "כמעט שם!",
     "happyNewYear": "שנה טובה!",
     "celebrationMessage": "מאחלים לכם שנה מדהימה מלאה במילים, ניצחונות ופלאים!"
+  },
+  "keyboardHint": {
+    "title": "טיפ מהיר ⚡",
+    "message": "הקלד מילים במקלדת! פשוט תתחיל להקליד ותלחץ Enter. הרבה יותר מהיר מגרירה!",
+    "type": "הקלד",
+    "clear": "למחיקה",
+    "gotIt": "הבנתי!"
   }
 };
 

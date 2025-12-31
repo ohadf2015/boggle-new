@@ -11,6 +11,33 @@ import { z } from 'zod';
 // ==================== Security Configuration ====================
 
 // Allowed domains for profile picture URLs (prevent SSRF attacks)
+// SECURITY: Use specific project domain from environment variable when available
+const getSupabaseDomains = (): string[] => {
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (supabaseUrl) {
+      const url = new URL(supabaseUrl);
+      const domains: string[] = [url.hostname]; // e.g., 'yourproject.supabase.co'
+
+      // Also allow the storage subdomain pattern for direct storage URLs
+      // Pattern: [project-ref].supabase.co -> also allow storage.[project-ref].supabase.co
+      const projectRef = url.hostname.split('.')[0];
+      if (projectRef) {
+        domains.push(`${projectRef}.supabase.co`); // Main domain
+        // Supabase storage uses pattern like: [project-ref].supabase.co/storage/v1/...
+        // The hostname is already the project domain, so we're covered
+      }
+
+      return domains;
+    }
+  } catch {
+    // If parsing fails, return empty array
+  }
+  return [];
+};
+
+const supabaseDomains = getSupabaseDomains();
+
 export const ALLOWED_IMAGE_DOMAINS: string[] = [
   'i.imgur.com',
   'cdn.discordapp.com',
@@ -20,8 +47,10 @@ export const ALLOWED_IMAGE_DOMAINS: string[] = [
   'res.cloudinary.com',
   'storage.googleapis.com',
   'firebasestorage.googleapis.com',
-  'supabase.co', // Supabase storage (e.g., [project-ref].supabase.co)
-];
+  // SECURITY: Only allow OUR specific Supabase project domains, not all *.supabase.co domains
+  // Includes both API domain and storage paths (same domain, different paths)
+  ...supabaseDomains,
+].filter(Boolean);
 
 // ==================== Base Schemas ====================
 // These are the building blocks reused across event schemas

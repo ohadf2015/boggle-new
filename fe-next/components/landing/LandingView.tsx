@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { User, Users, Bot, Target, Trophy, LayoutGrid, Crown, Medal, CircleHelp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -13,9 +14,13 @@ import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import ModeCard from './ModeCard';
 import ModeDiscoveryBanner from './ModeDiscoveryBanner';
 import Header from '@/components/Header';
-import OnboardingModal from '@/components/OnboardingModal';
 import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
+
+// Dynamic import for OnboardingModal (not needed on initial page load)
+const OnboardingModal = dynamic(() => import('@/components/OnboardingModal'), {
+  ssr: false,
+});
 
 /**
  * LandingView - Main landing page with game mode selection

@@ -80,7 +80,8 @@ const DialogContent = React.forwardRef<
           absolute top-3 sm:-top-3
           right-3 sm:-right-3
           rtl:right-auto rtl:left-3 rtl:sm:-left-3
-          w-9 h-9 sm:w-10 sm:h-10
+          w-11 h-11 sm:w-12 sm:h-12
+          min-w-[44px] min-h-[44px]
           flex items-center justify-center
           bg-neo-red text-neo-white
           border-2 sm:border-3 border-neo-black

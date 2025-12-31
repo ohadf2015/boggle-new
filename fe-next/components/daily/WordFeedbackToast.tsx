@@ -90,7 +90,7 @@ const FEEDBACK_STYLES: Record<FeedbackType, {
 export const WordFeedbackToast: React.FC<WordFeedbackToastProps> = ({
   type,
   message,
-  duration = 2000,
+  duration = 3000, // Increased from 2000ms for better readability
   onClose,
 }) => {
   useEffect(() => {
@@ -116,7 +116,7 @@ export const WordFeedbackToast: React.FC<WordFeedbackToastProps> = ({
           exit={{ opacity: 0, y: -20, scale: 0.9 }}
           transition={{ duration: 0.2 }}
           className={cn(
-            'fixed bottom-24 left-1/2 -translate-x-1/2 z-40',
+            'fixed bottom-24 left-1/2 -translate-x-1/2 z-50',
             'flex items-center gap-2 px-3 py-2 rounded-lg',
             'border-2 shadow-neo-brutalist',
             style.bg,

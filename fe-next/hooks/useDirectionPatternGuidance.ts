@@ -9,7 +9,8 @@ import {
 } from '@/utils/contextualGuidanceStorage';
 
 // Number of consecutive simple-direction words needed to trigger guidance
-const SIMPLE_DIRECTION_THRESHOLD = 3;
+// Lowered from 3 to 2 to catch players earlier before they develop bad habits
+const SIMPLE_DIRECTION_THRESHOLD = 2;
 
 interface UseDirectionPatternGuidanceReturn {
   // Whether to show the direction guidance tooltip

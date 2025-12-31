@@ -873,10 +873,14 @@ const sv = {
     "joinGame": "Gå med i spelet",
     "slotAvailable": "{{count}} plats tillgänglig",
     "slotsAvailable": "{{count}} platser tillgängliga",
-    "upgraded": "Du kan nu spela!",
-    "youAreSpectating": "Du tittar på detta spel",
+    "upgraded": "Du är med! Kör!",
+    "youAreSpectating": "Tittar på matchen!",
     "watchingGame": "Tittar på spelet...",
-    "waitForSlot": "Väntar på spelarplats..."
+    "waitForSlot": "Väntar på spelarplats...",
+    "status": "👀 ÅSKÅDAR",
+    "explanation": "Rummet är fullt! Du tittar bara nu, men ett ställe kanske öppnas.",
+    "requestToPlay": "Be om att spela",
+    "join": "Gå med"
   },
   "hints": {
     "hint": "Ledtråd",
@@ -2011,7 +2015,9 @@ const sv = {
     "yourRank": "Din rank",
     "topPercent": "Topp ${percent}%",
     "noRankYet": "Spela för att bli rankad!",
-    "viewLeaderboard": "Visa topplista"
+    "viewLeaderboard": "Visa topplista",
+    "you": "DU",
+    "players": "spelare"
   },
   "ranked": {
     "title": "Rankat läge",
@@ -2811,6 +2817,13 @@ const sv = {
     "almostThere": "Nästan där!",
     "happyNewYear": "Gott Nytt År!",
     "celebrationMessage": "Vi önskar dig ett fantastiskt år fyllt med ord, segrar och under!"
+  },
+  "keyboardHint": {
+    "title": "⚡ Snabbtips",
+    "message": "Skriv ord med tangentbordet! Börja bara skriva och tryck Enter. Mycket snabbare än att svepa!",
+    "type": "Skriv",
+    "clear": "för att rensa",
+    "gotIt": "Fattat!"
   }
 };
 

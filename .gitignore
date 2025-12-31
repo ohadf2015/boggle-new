@@ -31,3 +31,5 @@ coverage/
 **/*.webm
 **/*.mp4
 **/*.mov
+/test-screenshots
+/screenshots

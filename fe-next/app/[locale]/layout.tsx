@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import nextDynamic from 'next/dynamic';
 import { translations } from '@/translations';
 import { Providers } from '../providers';
 import Footer from '@/components/Footer';
@@ -7,10 +8,14 @@ import GoogleAnalytics from '@/components/GoogleAnalytics';
 import SocialMediaPixels from '@/components/SocialMediaPixels';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
 import PWAInstallPrompt from '@/components/PWAInstallPrompt';
-import EmailCaptureModal from '@/components/EmailCaptureModal';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import NewYearCountdown from '@/components/celebration/NewYearCountdown';
 import { fredoka, rubik } from '../fonts';
+
+// Dynamic import for EmailCaptureModal (shown conditionally, not needed immediately)
+const EmailCaptureModal = nextDynamic(() => import('@/components/EmailCaptureModal'), {
+  loading: () => null,
+});
 
 // Force dynamic rendering - prevent static generation
 export const dynamic = 'force-dynamic';

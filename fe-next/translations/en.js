@@ -883,10 +883,14 @@ const en = {
     "joinGame": "Join Game",
     "slotAvailable": "{{count}} slot available",
     "slotsAvailable": "{{count}} slots available",
-    "upgraded": "You can now play!",
-    "youAreSpectating": "You are spectating this game",
+    "upgraded": "You're in! Let's play!",
+    "youAreSpectating": "Watching the battle!",
     "watchingGame": "Watching game...",
-    "waitForSlot": "Waiting for player slot..."
+    "waitForSlot": "Waiting for player slot...",
+    "status": "👀 SPECTATING",
+    "explanation": "Room's packed! You're watching, but hang tight - a spot might open up.",
+    "requestToPlay": "Request to Play",
+    "join": "Join Game"
   },
   "hints": {
     "hint": "Hint",
@@ -2149,7 +2153,9 @@ const en = {
     "yourRank": "Your Rank",
     "topPercent": "Top ${percent}%",
     "noRankYet": "Play games to get ranked!",
-    "viewLeaderboard": "View Leaderboard"
+    "viewLeaderboard": "View Leaderboard",
+    "you": "YOU",
+    "players": "players"
   },
   "ranked": {
     "title": "Ranked Mode",
@@ -2731,6 +2737,13 @@ const en = {
     },
     "dismiss": "Got it!"
   },
+  "keyboardHint": {
+    "title": "Pro Tip",
+    "message": "You can type words on your keyboard! Just start typing and press Enter to submit.",
+    "type": "Type",
+    "clear": "to clear",
+    "gotIt": "Got it!"
+  },
   "wizard": {
     "selectMode": "Select Game Mode",
     "chooseDifficulty": "Choose Difficulty",
@@ -2821,6 +2834,13 @@ const en = {
     "almostThere": "Almost there!",
     "happyNewYear": "Happy New Year!",
     "celebrationMessage": "Wishing you an amazing year ahead filled with words, wins, and wonder!"
+  },
+  "keyboardHint": {
+    "title": "⚡ Speed Tip",
+    "message": "Type words on your keyboard! Just start typing and hit Enter to submit. Way faster than swiping!",
+    "type": "Type",
+    "clear": "to clear",
+    "gotIt": "Got it!"
   }
 };
 

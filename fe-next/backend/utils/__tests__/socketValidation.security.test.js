@@ -106,9 +106,14 @@ describe('Security - Input Validation', () => {
         'https://i.imgur.com/abc123.jpg',
         'https://cdn.discordapp.com/avatars/123.png',
         'https://lh3.googleusercontent.com/photo.jpg',
-        'https://avatars.githubusercontent.com/u/123',
-        'https://abcdefg.supabase.co/storage/v1/object/public/profile_pictures/user123/profile.jpg'
+        'https://avatars.githubusercontent.com/u/123'
       ];
+
+      // Add Supabase URL if environment is configured
+      if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+        const url = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL);
+        validUrls.push(`https://${url.hostname}/storage/v1/object/public/profile_pictures/user123/profile.jpg`);
+      }
 
       validUrls.forEach(url => {
         const result = avatarSchema.safeParse({
@@ -297,8 +302,7 @@ describe('Security - ALLOWED_IMAGE_DOMAINS Configuration', () => {
       'i.imgur.com',
       'cdn.discordapp.com',
       'lh3.googleusercontent.com',
-      'avatars.githubusercontent.com',
-      'supabase.co'
+      'avatars.githubusercontent.com'
     ];
 
     expectedDomains.forEach(domain => {
@@ -309,5 +313,20 @@ describe('Security - ALLOWED_IMAGE_DOMAINS Configuration', () => {
   it('should not include wildcard or overly permissive domains', () => {
     expect(ALLOWED_IMAGE_DOMAINS).not.toContain('*');
     expect(ALLOWED_IMAGE_DOMAINS).not.toContain('*.com');
+  });
+
+  it('should NOT include broad "supabase.co" domain for security', () => {
+    // SECURITY: We should never allow all *.supabase.co domains
+    // Only specific project domains should be whitelisted
+    expect(ALLOWED_IMAGE_DOMAINS).not.toContain('supabase.co');
+  });
+
+  it('should include specific Supabase project domain from environment if configured', () => {
+    // If NEXT_PUBLIC_SUPABASE_URL is set, the specific project domain should be included
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      const url = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL);
+      expect(ALLOWED_IMAGE_DOMAINS).toContain(url.hostname);
+    }
+    // If not set, test passes (domain won't be in list, which is fine)
   });
 });

@@ -78,7 +78,9 @@ class Dictionary {
   japaneseWords: Set<string>;
   spanishWords: Set<string>;
   kanjiCompounds: string[];
-  loaded: boolean;
+  loaded: boolean; // @deprecated - use loadedLanguages instead
+  loadedLanguages: Set<Language>; // Track which languages are loaded
+  loadingPromises: Map<Language, Promise<void>>; // Prevent duplicate loading
 
   constructor() {
     this.englishWords = new Set();
@@ -88,6 +90,8 @@ class Dictionary {
     this.spanishWords = new Set();
     this.kanjiCompounds = []; // Array of valid Kanji compounds for board generation
     this.loaded = false;
+    this.loadedLanguages = new Set();
+    this.loadingPromises = new Map();
   }
 
   async load(): Promise<void> {
@@ -338,9 +342,260 @@ class Dictionary {
     }
   }
 
+  /**
+   * Lazy load a specific language dictionary on demand
+   * Returns immediately if already loaded or loading
+   */
+  async ensureLanguageLoaded(language: Language): Promise<void> {
+    // Already loaded
+    if (this.loadedLanguages.has(language)) {
+      return;
+    }
+
+    // Already loading - return existing promise
+    if (this.loadingPromises.has(language)) {
+      return this.loadingPromises.get(language);
+    }
+
+    // Start loading
+    const loadPromise = this.loadLanguage(language);
+    this.loadingPromises.set(language, loadPromise);
+
+    try {
+      await loadPromise;
+      this.loadedLanguages.add(language);
+    } finally {
+      this.loadingPromises.delete(language);
+    }
+  }
+
+  /**
+   * Load a specific language dictionary
+   */
+  private async loadLanguage(language: Language): Promise<void> {
+    const startTime = Date.now();
+    logger.info('DICT', `Lazy loading ${language} dictionary...`);
+
+    try {
+      const safeReadFile = async (filePath: string): Promise<string> => {
+        try {
+          if (fs.existsSync(filePath)) {
+            return await fsp.readFile(filePath, 'utf-8');
+          }
+        } catch (e: unknown) {
+          const error = e as Error;
+          logger.warn('DICT', `Could not read ${filePath}: ${error.message}`);
+        }
+        return '';
+      };
+
+      switch (language) {
+        case 'en':
+          await this.loadEnglishDictionary(safeReadFile);
+          break;
+        case 'he':
+          await this.loadHebrewDictionary(safeReadFile);
+          break;
+        case 'sv':
+          await this.loadSwedishDictionary(safeReadFile);
+          break;
+        case 'ja':
+          await this.loadJapaneseDictionary(safeReadFile);
+          break;
+        case 'es':
+          await this.loadSpanishDictionary(safeReadFile);
+          break;
+      }
+
+      const loadTime = Date.now() - startTime;
+      logger.info('DICT', `${language} dictionary loaded in ${loadTime}ms`);
+    } catch (error) {
+      logger.error('DICT', `Error loading ${language} dictionary: ${error}`);
+    }
+  }
+
+  private async loadEnglishDictionary(safeReadFile: (path: string) => Promise<string>): Promise<void> {
+    const englishWords: string[] = require('an-array-of-english-words');
+    this.englishWords = new Set(englishWords.map(w => w.toLowerCase()));
+    logger.debug('DICT', `Loaded ${this.englishWords.size} English words from main dictionary`);
+
+    const englishApprovedFilePath = path.join(__dirname, 'english_words_approved.txt');
+    const approvedContent = await safeReadFile(englishApprovedFilePath);
+
+    if (approvedContent) {
+      const approvedWords = approvedContent.split('\n').map(w => w.trim().toLowerCase()).filter(w => w.length > 0);
+      let approvedCount = 0;
+      for (const word of approvedWords) {
+        if (!this.englishWords.has(word)) {
+          this.englishWords.add(word);
+          approvedCount++;
+        }
+      }
+      if (approvedCount > 0) {
+        logger.debug('DICT', `Loaded ${approvedCount} community-approved English words`);
+      }
+    }
+    logger.debug('DICT', `Total English words: ${this.englishWords.size}`);
+  }
+
+  private async loadHebrewDictionary(safeReadFile: (path: string) => Promise<string>): Promise<void> {
+    const hebrewFilePath = path.join(__dirname, 'hebrew_words.txt');
+    const hebrewApprovedFilePath = path.join(__dirname, 'hebrew_words_approved.txt');
+
+    const [hebrewContent, hebrewApprovedContent] = await Promise.all([
+      safeReadFile(hebrewFilePath),
+      safeReadFile(hebrewApprovedFilePath),
+    ]);
+
+    if (hebrewContent) {
+      const hebrewWords = hebrewContent.split('\n').map(w => w.trim()).filter(w => w.length > 0).map(w => normalizeHebrewWord(w));
+      this.hebrewWords = new Set(hebrewWords);
+      logger.debug('DICT', `Loaded ${this.hebrewWords.size} Hebrew words from main dictionary`);
+    }
+
+    if (hebrewApprovedContent) {
+      const approvedWords = hebrewApprovedContent.split('\n').map(w => w.trim()).filter(w => w.length > 0).map(w => normalizeHebrewWord(w));
+      let approvedCount = 0;
+      for (const word of approvedWords) {
+        if (!this.hebrewWords.has(word)) {
+          this.hebrewWords.add(word);
+          approvedCount++;
+        }
+      }
+      if (approvedCount > 0) {
+        logger.debug('DICT', `Loaded ${approvedCount} community-approved Hebrew words`);
+      }
+    }
+    logger.debug('DICT', `Total Hebrew words: ${this.hebrewWords.size}`);
+  }
+
+  private async loadSwedishDictionary(safeReadFile: (path: string) => Promise<string>): Promise<void> {
+    const swedishWordsPath = path.join(__dirname, '../node_modules/@arvidbt/swedish-words/out/index.js');
+    const swedishApprovedFilePath = path.join(__dirname, 'swedish_words_approved.txt');
+
+    const [swedishFileContent, swedishApprovedContent] = await Promise.all([
+      safeReadFile(swedishWordsPath),
+      safeReadFile(swedishApprovedFilePath),
+    ]);
+
+    if (swedishFileContent) {
+      try {
+        const arrayMatch = swedishFileContent.match(/var swedish_words = \[([\s\S]*?)\];/);
+        if (arrayMatch) {
+          const arrayContent = arrayMatch[1];
+          const decodeJsEscapes = (str: string): string | null => {
+            const jsonCompatible = str.replace(/\\x([0-9A-Fa-f]{2})/g, '\\u00$1');
+            try {
+              return JSON.parse(jsonCompatible);
+            } catch {
+              return null;
+            }
+          };
+
+          const validSwedishWordPattern = /^[a-zåäöéàü]+$/i;
+          const words = arrayContent
+            .split(',')
+            .map(line => {
+              const trimmed = line.trim();
+              if (!trimmed.startsWith('"') || !trimmed.endsWith('"')) return null;
+              return decodeJsEscapes(trimmed);
+            })
+            .filter((w): w is string => w !== null && w.length > 1 && validSwedishWordPattern.test(w));
+
+          this.swedishWords = new Set(words.map(w => w.toLowerCase()));
+          logger.debug('DICT', `Loaded ${this.swedishWords.size} Swedish words from main dictionary`);
+
+          if (swedishApprovedContent) {
+            const approvedWords = swedishApprovedContent.split('\n').map(w => w.trim().toLowerCase()).filter(w => w.length > 0);
+            let approvedCount = 0;
+            for (const word of approvedWords) {
+              if (!this.swedishWords.has(word)) {
+                this.swedishWords.add(word);
+                approvedCount++;
+              }
+            }
+            if (approvedCount > 0) {
+              logger.debug('DICT', `Loaded ${approvedCount} community-approved Swedish words`);
+            }
+          }
+          logger.debug('DICT', `Total Swedish words: ${this.swedishWords.size}`);
+        }
+      } catch (error) {
+        logger.error('DICT', `Error processing Swedish dictionary: ${error}`);
+      }
+    }
+  }
+
+  private async loadJapaneseDictionary(safeReadFile: (path: string) => Promise<string>): Promise<void> {
+    const kanjiFilePath = path.join(__dirname, 'kanji_compounds.txt');
+    const japaneseApprovedFilePath = path.join(__dirname, 'japanese_words_approved.txt');
+
+    const [kanjiContent, japaneseApprovedContent] = await Promise.all([
+      safeReadFile(kanjiFilePath),
+      safeReadFile(japaneseApprovedFilePath),
+    ]);
+
+    if (kanjiContent) {
+      try {
+        const kanjiCompounds = kanjiContent.split('\n').map(w => w.trim()).filter(w => w.length > 0);
+        this.japaneseWords = new Set(kanjiCompounds);
+        this.kanjiCompounds = kanjiCompounds;
+        logger.debug('DICT', `Loaded ${this.japaneseWords.size} Japanese Kanji compounds from main dictionary`);
+
+        if (japaneseApprovedContent) {
+          const approvedWords = japaneseApprovedContent.split('\n').map(w => w.trim()).filter(w => w.length > 0);
+          let approvedCount = 0;
+          for (const word of approvedWords) {
+            if (!this.japaneseWords.has(word)) {
+              this.japaneseWords.add(word);
+              approvedCount++;
+            }
+          }
+          if (approvedCount > 0) {
+            logger.debug('DICT', `Loaded ${approvedCount} community-approved Japanese words`);
+          }
+        }
+        logger.debug('DICT', `Total Japanese words: ${this.japaneseWords.size}`);
+      } catch (error) {
+        logger.error('DICT', `Error processing Japanese Kanji compounds: ${error}`);
+      }
+    }
+  }
+
+  private async loadSpanishDictionary(safeReadFile: (path: string) => Promise<string>): Promise<void> {
+    const spanishWords: string[] = require('an-array-of-spanish-words');
+    this.spanishWords = new Set(spanishWords.map(w => w.toLowerCase()));
+    logger.debug('DICT', `Loaded ${this.spanishWords.size} Spanish words from main dictionary`);
+
+    const spanishApprovedFilePath = path.join(__dirname, 'spanish_words_approved.txt');
+    const approvedContent = await safeReadFile(spanishApprovedFilePath);
+
+    if (approvedContent) {
+      const approvedWords = approvedContent.split('\n').map(w => w.trim().toLowerCase()).filter(w => w.length > 0);
+      let approvedCount = 0;
+      for (const word of approvedWords) {
+        if (!this.spanishWords.has(word)) {
+          this.spanishWords.add(word);
+          approvedCount++;
+        }
+      }
+      if (approvedCount > 0) {
+        logger.debug('DICT', `Loaded ${approvedCount} community-approved Spanish words`);
+      }
+    }
+    logger.debug('DICT', `Total Spanish words: ${this.spanishWords.size}`);
+  }
+
   isValidWord(word: string, language: Language): boolean | null {
-    if (!this.loaded) {
-      // If dictionaries aren't loaded, treat all words as unknown (require manual validation)
+    // Check if the specific language dictionary is loaded (new lazy loading approach)
+    if (!this.loadedLanguages.has(language)) {
+      // Language not loaded yet - caller should call ensureLanguageLoaded(language) and retry
+      return null;
+    }
+
+    // Backward compatibility: also check old global loaded flag
+    if (!this.loaded && this.loadedLanguages.size === 0) {
+      // If dictionaries aren't loaded at all, treat all words as unknown (require manual validation)
       return null;
     }
 

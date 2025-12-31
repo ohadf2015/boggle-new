@@ -55,7 +55,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
       iconBg: 'bg-neo-navy',
       iconText: 'text-neo-cyan',
       badgeBg: 'bg-neo-navy/20 backdrop-blur-sm',
-      badgeText: 'text-neo-navy font-semibold',
+      badgeText: 'text-neo-black font-semibold',
       arrow: 'bg-neo-navy text-neo-cyan',
     },
     pink: {
@@ -64,7 +64,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
       iconBg: 'bg-neo-navy',
       iconText: 'text-neo-pink',
       badgeBg: 'bg-neo-navy/20 backdrop-blur-sm',
-      badgeText: 'text-neo-navy font-semibold',
+      badgeText: 'text-neo-black font-semibold',
       arrow: 'bg-neo-navy text-neo-pink',
     },
   };

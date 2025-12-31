@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Target, Hash, Award, TrendingUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -25,7 +25,7 @@ interface YourQuickStatsProps {
  * Neo-Brutalist Quick Stats Card
  * Shows the current player's key performance metrics at a glance
  */
-const YourQuickStats: React.FC<YourQuickStatsProps> = ({
+const YourQuickStats = memo<YourQuickStatsProps>(({
   rank,
   totalPlayers,
   score,
@@ -215,6 +215,8 @@ const YourQuickStats: React.FC<YourQuickStatsProps> = ({
       </div>
     </motion.div>
   );
-};
+});
+
+YourQuickStats.displayName = 'YourQuickStats';
 
 export default YourQuickStats;

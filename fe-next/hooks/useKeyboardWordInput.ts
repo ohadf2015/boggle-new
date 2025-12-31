@@ -339,7 +339,7 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [enabled, minWordLength, submitTypedWord, clearTypedWord, typedWord]);
+  }, [enabled, minWordLength, submitTypedWord, clearTypedWord]);
 
   // Clear typed word when grid changes (new game)
   useEffect(() => {

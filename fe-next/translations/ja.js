@@ -873,10 +873,14 @@ const ja = {
     "joinGame": "ゲームに参加",
     "slotAvailable": "{{count}} 枠利用可能",
     "slotsAvailable": "{{count}} 枠利用可能",
-    "upgraded": "プレイできます！",
-    "youAreSpectating": "このゲームを観戦しています",
+    "upgraded": "参加できるよ！プレイしよう!",
+    "youAreSpectating": "バトルを観戦中！",
     "watchingGame": "ゲーム観戦中...",
-    "waitForSlot": "プレイヤー枠待機中..."
+    "waitForSlot": "プレイヤー枠待機中...",
+    "status": "👀 観戦中",
+    "explanation": "部屋が満員です！今は観戦モードですが、空きが出るかもしれません。",
+    "requestToPlay": "プレイ参加申請",
+    "join": "参加する"
   },
   "hints": {
     "hint": "ヒント",
@@ -2010,7 +2014,9 @@ const ja = {
     "yourRank": "あなたのランク",
     "topPercent": "トップ${percent}%",
     "noRankYet": "ゲームをプレイしてランク入り!",
-    "viewLeaderboard": "リーダーボードを見る"
+    "viewLeaderboard": "リーダーボードを見る",
+    "you": "あなた",
+    "players": "プレイヤー"
   },
   "ranked": {
     "title": "ランクマッチ",
@@ -2810,6 +2816,13 @@ const ja = {
     "almostThere": "もうすぐです！",
     "happyNewYear": "明けましておめでとう！",
     "celebrationMessage": "言葉、勝利、驚きに満ちた素晴らしい一年をお祈りします！"
+  },
+  "keyboardHint": {
+    "title": "⚡ 時短テク",
+    "message": "キーボードで単語を入力！タイピングしてEnterを押すだけ。スワイプより断然速い！",
+    "type": "入力",
+    "clear": "クリア",
+    "gotIt": "了解！"
   }
 };
 

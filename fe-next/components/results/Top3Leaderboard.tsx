@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, memo } from 'react';
 import { motion } from 'framer-motion';
 import { Crown, Medal, Bot } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -114,7 +114,7 @@ const rankConfig = {
  * - Multiplayer mode: Pass `players` prop
  * - Single player mode: Pass `participants` prop (with bots)
  */
-const Top3Leaderboard: React.FC<Top3LeaderboardProps> = ({
+const Top3Leaderboard = memo<Top3LeaderboardProps>(({
   players,
   participants,
   currentUsername,
@@ -271,6 +271,8 @@ const Top3Leaderboard: React.FC<Top3LeaderboardProps> = ({
       </div>
     </motion.div>
   );
-};
+});
+
+Top3Leaderboard.displayName = 'Top3Leaderboard';
 
 export default Top3Leaderboard;

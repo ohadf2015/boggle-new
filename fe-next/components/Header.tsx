@@ -1,6 +1,6 @@
 import { memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BarChart3, Menu, X } from 'lucide-react';
+import { BarChart3, Menu, X, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -114,7 +114,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     aria-label={t('common.goToHome') || 'Go to home page'}
                 >
                     <h1
-                        className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl 2xl:text-4xl font-black uppercase tracking-tight flex items-center gap-0.5 xs:gap-1 lg:gap-1.5 2xl:gap-2 flex-shrink min-w-0 landscape:text-base landscape:xs:text-lg landscape:sm:text-xl"
+                        className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl 2xl:text-4xl font-black uppercase tracking-tight flex items-center gap-0.5 xs:gap-1 lg:gap-1.5 2xl:gap-2 flex-shrink min-w-0 overflow-hidden landscape:text-base landscape:xs:text-lg landscape:sm:text-xl"
                         style={{ fontFamily }}
                     >
                         {/* LEXI - Neo-Brutalist white with black shadow */}
@@ -171,6 +171,10 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             aria-haspopup="listbox"
                         >
                             <span className="text-xl lg:text-xl xl:text-2xl 2xl:text-2xl">{currentFlag}</span>
+                            <ChevronDown className={cn(
+                                "w-3 h-3 transition-transform",
+                                showLangDropdown && "rotate-180"
+                            )} />
                         </button>
 
                         <AnimatePresence>
@@ -326,7 +330,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                     onClick={() => setShowMobileMenu(false)}
                                     className={cn(
                                         "flex items-center justify-center",
-                                        "w-10 h-10",
+                                        "min-w-[44px] min-h-[44px] w-11 h-11",
                                         "bg-white dark:bg-slate-700 text-neo-black dark:text-white",
                                         "border-2 border-neo-black dark:border-slate-500",
                                         "rounded-neo shadow-hard-sm",

@@ -36,11 +36,14 @@ export async function initializeServer(io: Server): Promise<void> {
     console.error('Failed to restore tournaments:', error);
   }
 
-  // Load dictionaries
+  // Load English dictionary on startup (most common language)
+  // Other languages will be lazy-loaded on first use for faster startup
   try {
+    console.log('[STARTUP] Loading dictionary...');
     await dictionary.load();
+    console.log('[STARTUP] Dictionary loaded - ready for all languages');
   } catch (error) {
-    console.error('Failed to load dictionaries:', error);
+    console.error('Failed to load dictionary:', error);
   }
 
   // Warm up worker pool
