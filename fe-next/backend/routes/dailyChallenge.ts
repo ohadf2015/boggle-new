@@ -310,6 +310,8 @@ router.post('/submit', async (req: SubmitRequest, res: Response): Promise<void> 
       displayName,
       avatarEmoji,
       avatarColor,
+      avatarImage,
+      profilePictureUrl,
       countryCode,
       score,
       wordCount,
@@ -368,6 +370,8 @@ router.post('/submit', async (req: SubmitRequest, res: Response): Promise<void> 
       display_name: displayName || 'Anonymous',
       avatar_emoji: avatarEmoji || '🎯',
       avatar_color: avatarColor || '#6366f1',
+      avatar_image: avatarImage || undefined,
+      profile_picture_url: profilePictureUrl || undefined,
       country_code: countryCode || undefined
     };
 

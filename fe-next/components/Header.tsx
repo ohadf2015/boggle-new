@@ -200,6 +200,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         >
                             <Avatar
                                 profilePictureUrl={profile.profile_picture_url ?? undefined}
+                                avatarImage={profile.avatar_image ?? undefined}
                                 avatarEmoji={profile.avatar_emoji}
                                 avatarColor={profile.avatar_color}
                                 size="md"
