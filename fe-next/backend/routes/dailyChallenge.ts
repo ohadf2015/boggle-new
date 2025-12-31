@@ -248,7 +248,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       return;
     }
 
-    // Get total participant count (only authenticated users)
+    // Get total participant count (only authenticated users for leaderboard)
     const { count, error: countError } = await supabase
       .from('daily_puzzle_attempts')
       .select('*', { count: 'exact', head: true })
@@ -260,6 +260,17 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       logger.warn('API', `Daily leaderboard count error: ${countError.message}`);
     }
 
+    // Get total attempts count (including guests and all attempts)
+    const { count: totalCount, error: totalCountError } = await supabase
+      .from('daily_puzzle_attempts')
+      .select('*', { count: 'exact', head: true })
+      .eq('puzzle_date', date)
+      .eq('language', language);
+
+    if (totalCountError) {
+      logger.warn('API', `Daily leaderboard total count error: ${totalCountError.message}`);
+    }
+
     // Calculate participant count - ensure we show at least as many as we have data rows
     const dataLength = data?.length || 0;
     const queryCount = count ?? 0;
@@ -268,6 +279,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
     res.json({
       data: data || [],
       totalParticipants,
+      totalAttempts: totalCount ?? 0,
       date,
       language
     } as LeaderboardResponse);
@@ -819,6 +831,17 @@ router.get('/word-hunt/leaderboard/:date/:language', async (req: Request<Leaderb
       logger.warn('API', `Word Hunt leaderboard count error: ${countError.message}`);
     }
 
+    // Get total attempts count (including guests and failed attempts)
+    const { count: totalCount, error: totalCountError } = await supabase
+      .from('daily_word_hunt_attempts')
+      .select('*', { count: 'exact', head: true })
+      .eq('puzzle_date', date)
+      .eq('language', language);
+
+    if (totalCountError) {
+      logger.warn('API', `Word Hunt leaderboard total count error: ${totalCountError.message}`);
+    }
+
     // Calculate participant count - ensure we show at least as many as we have data rows
     const dataLength = data?.length || 0;
     const queryCount = count ?? 0;
@@ -832,6 +855,7 @@ router.get('/word-hunt/leaderboard/:date/:language', async (req: Request<Leaderb
     res.json({
       data: data || [],
       totalParticipants,
+      totalAttempts: totalCount ?? 0,
       date,
       language
     });
