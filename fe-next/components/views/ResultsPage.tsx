@@ -113,15 +113,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     return winner;
   }, [currentPlayerRank, sortedScores, winner]);
 
-  // Use actual player rank for styling (1st=gold, 2nd=silver, 3rd=bronze, 4+=purple encouraging)
-  const bannerRank = currentPlayerRank >= 1 ? currentPlayerRank : 1;
-  const isCurrentUserInBanner = bannerPlayer?.username === username;
-
   // Get current player data for share prompt
   const currentPlayerData = useMemo(() => {
     if (!finalScores || !username) return null;
     return finalScores.find(p => p.username === username);
   }, [finalScores, username]);
+
+  // Use actual player rank for styling (1st=gold, 2nd=silver, 3rd=bronze, 4+=purple encouraging)
+  // BUT if player has 0 score, treat them as non-winner (rank 4+)
+  const hasZeroScore = currentPlayerData?.score === 0 || (currentPlayerData?.allWords?.filter(w => w.validated && w.score > 0).length || 0) === 0;
+  const bannerRank = hasZeroScore ? 4 : (currentPlayerRank >= 1 ? currentPlayerRank : 1);
+  const isCurrentUserInBanner = bannerPlayer?.username === username;
 
   // Update guest stats when results load (only once)
   useEffect(() => {
@@ -576,13 +578,16 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           {gameCode && sortedScores.length > 1 && (
             <div className="w-full max-w-xs mt-4">
               <PlayersReadyIndicator
-                players={sortedScores.map(p => ({
-                  username: p.username,
-                  avatar: p.avatar,
-                  isBot: p.isBot
-                }))}
+                players={sortedScores
+                  .filter(p => !isHost || p.username !== username)
+                  .map(p => ({
+                    username: p.username,
+                    avatar: p.avatar,
+                    isBot: p.isBot
+                  }))}
                 readyUsernames={readyUsernames}
                 currentUsername={username}
+                isHost={isHost}
               />
             </div>
           )}
@@ -867,7 +872,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
           {/* Share Prompt - Compact inline for non-winners, full for winners */}
           {/* Show for winners OR anyone with 30+ score to increase viral reach */}
-          {currentPlayerData && gameCode && (isCurrentUserWinner || currentPlayerData.score >= 30) && (
+          {/* BUT hide for 0 or very low scores */}
+          {currentPlayerData && gameCode && !hasZeroScore && (currentPlayerData.score || 0) >= 10 && (isCurrentUserWinner || currentPlayerData.score >= 30) && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -1057,13 +1063,16 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             className="mt-4 max-w-2xl mx-auto px-2 sm:px-4"
           >
             <PlayersReadyIndicator
-              players={sortedScores.map(p => ({
-                username: p.username,
-                avatar: p.avatar,
-                isBot: p.isBot
-              }))}
+              players={sortedScores
+                .filter(p => !isHost || p.username !== username)
+                .map(p => ({
+                  username: p.username,
+                  avatar: p.avatar,
+                  isBot: p.isBot
+                }))}
               readyUsernames={readyUsernames}
               currentUsername={username}
+              isHost={isHost}
             />
           </motion.div>
         )}

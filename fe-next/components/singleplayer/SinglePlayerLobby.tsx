@@ -610,7 +610,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                       onClick={() => setTimerMinutes(min)}
                       className={cn(
                         'flex-1 py-2 rounded-neo border-3 border-neo-black text-sm font-bold shadow-hard hover:shadow-hard-lg transition-all text-neo-black',
-                        timerMinutes === min ? 'bg-neo-cyan' : 'bg-neo-cream dark:bg-slate-600 dark:text-neo-white'
+                        timerMinutes === min ? 'bg-neo-cyan text-neo-black' : 'bg-neo-cream dark:bg-slate-600 dark:text-neo-white'
                       )}
                     >
                       {min} {t('common.minutes') || 'min'}
@@ -947,7 +947,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                     className={cn(
                       'px-3 py-1 rounded-full text-xs font-bold border-2 text-neo-black',
                       timerMinutes === min
-                        ? 'bg-neo-cyan border-neo-cyan'
+                        ? 'bg-neo-cyan border-neo-cyan text-neo-black'
                         : 'bg-white dark:bg-slate-600 dark:text-neo-white border-neo-black/20 dark:border-slate-500 hover:bg-neo-cyan/20 dark:hover:bg-neo-cyan/30'
                     )}
                   >

@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Users, Settings, Plus, Minus, Crown, ChevronDown, ChevronUp, Bot, Check } from 'lucide-react';
+import { Clock, Users, Settings, Plus, Minus, Crown, ChevronDown, ChevronUp, Bot, Check, Monitor, Info } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Checkbox } from '../../components/ui/checkbox';
@@ -13,6 +13,7 @@ import GameRoomHeader from '../../components/game/GameRoomHeader';
 import { DIFFICULTIES, MIN_WORD_LENGTH_OPTIONS, getRecommendedTimer } from '../../utils/consts';
 import { cn } from '../../lib/utils';
 import { useSocket } from '../../utils/SocketContext';
+import { neoInfoToast } from '../../components/NeoToast';
 import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus, DifficultyLevel } from '@/shared/types/game';
 
 // ==================== Types ====================
@@ -223,6 +224,21 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
   const [showStickyStart, setShowStickyStart] = useState<boolean>(false);
   const startButtonRef = React.useRef<HTMLDivElement>(null);
 
+  // Track if we've shown the broadcast mode suggestion
+  const hasShownBroadcastSuggestion = useRef<boolean>(false);
+
+  // Show broadcast mode suggestion when room reaches 4+ players (only once per session)
+  useEffect(() => {
+    if (playersReady.length >= 4 && !hasShownBroadcastSuggestion.current && hostPlaying) {
+      hasShownBroadcastSuggestion.current = true;
+      neoInfoToast(t('hostView.broadcastSuggestion'), {
+        icon: '💡',
+        duration: 6000,
+        id: 'broadcast-mode-suggestion',
+      });
+    }
+  }, [playersReady.length, hostPlaying, t]);
+
   // Intersection observer to show sticky button when original is out of view
   React.useEffect(() => {
     if (!startButtonRef.current) return;
@@ -343,6 +359,65 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
               />
             </div>
 
+            {/* Broadcast Mode - Prominent Section */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={cn(
+                "pt-2 border-t border-neo-cream/20",
+                playersReady.length >= 4 && hostPlaying && "animate-pulse-subtle"
+              )}
+            >
+              <div className={cn(
+                "p-3 rounded-neo border-3 transition-all duration-200",
+                !hostPlaying
+                  ? "bg-neo-cyan/20 border-neo-cyan shadow-hard-sm"
+                  : "bg-slate-700/50 border-neo-cream/20"
+              )}>
+                <div className="flex items-start gap-3">
+                  <div className={cn(
+                    "p-2 rounded-neo border-2 border-neo-black transition-colors",
+                    !hostPlaying ? "bg-neo-cyan" : "bg-slate-600"
+                  )}>
+                    <Monitor className={cn(
+                      "w-5 h-5",
+                      !hostPlaying ? "text-neo-black" : "text-neo-cream"
+                    )} />
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Checkbox
+                        id="broadcastMode"
+                        checked={!hostPlaying}
+                        onCheckedChange={(checked) => setHostPlaying(checked !== true)}
+                      />
+                      <label
+                        htmlFor="broadcastMode"
+                        className="text-sm font-black uppercase text-neo-cream cursor-pointer flex-1"
+                      >
+                        {t('hostView.broadcastModeTitle')}
+                      </label>
+                    </div>
+                    <p className="text-xs text-neo-cream/80 font-medium leading-relaxed pl-8">
+                      {t('hostView.broadcastModeDescription')}
+                    </p>
+                    {playersReady.length >= 4 && hostPlaying && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        className="flex items-start gap-2 pl-8 pt-1"
+                      >
+                        <Info className="w-4 h-4 text-neo-cyan flex-shrink-0 mt-0.5" />
+                        <span className="text-xs font-bold text-neo-cyan">
+                          {t('hostView.broadcastModeHint')}
+                        </span>
+                      </motion.div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
             {/* Advanced Settings Toggle with Preview */}
             <button
               type="button"
@@ -355,7 +430,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                 </span>
                 {!showAdvancedSettings && (
                   <span className="text-[10px] text-neo-cream/90">
-                    {timerValue}min • {t(DIFFICULTIES[difficulty].nameKey)} • {minWordLength}+ {t('hostView.letters') || 'letters'} • {hostPlaying ? t('hostView.hostPlaysShort') || 'Host plays' : t('hostView.hostSpectates') || 'Spectating'}
+                    {timerValue}min • {t(DIFFICULTIES[difficulty].nameKey)} • {minWordLength}+ {t('hostView.letters') || 'letters'}
                   </span>
                 )}
               </div>
@@ -414,18 +489,6 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                     </div>
                   </div>
 
-                  {/* Broadcast Mode Option */}
-                  <div className="flex items-center gap-3">
-                    <Checkbox
-                      id="hostPlays"
-                      checked={!hostPlaying}
-                      onCheckedChange={(checked) => setHostPlaying(checked !== true)}
-                    />
-                    <label htmlFor="hostPlays" className="text-sm font-bold text-neo-cream cursor-pointer">
-                      {t('hostView.hostPlays')}
-                    </label>
-                  </div>
-
                   {/* Cancel Tournament Button - Only show if tournament has started */}
                   {tournamentData && (
                     <Button
@@ -445,11 +508,11 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                       {(Object.keys(DIFFICULTIES) as DifficultyLevel[]).map((key) => {
                         const isSelected = difficulty === key;
                         const difficultyColors: Record<string, string> = {
-                          easy: 'bg-neo-lime text-neo-black',
-                          normal: 'bg-neo-yellow text-neo-black',
-                          medium: 'bg-neo-orange text-neo-black',
-                          hard: 'bg-neo-red text-neo-white',
-                          extreme: 'bg-neo-purple text-neo-white'
+                          EASY: 'bg-neo-lime text-neo-black',
+                          NORMAL: 'bg-neo-yellow text-neo-black',
+                          MEDIUM: 'bg-neo-orange text-neo-black',
+                          HARD: 'bg-neo-red text-neo-white',
+                          EXTREME: 'bg-neo-purple text-neo-white'
                         };
                         return (
                           <motion.button
@@ -459,7 +522,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                             className={cn(
                               "px-2 py-1.5 rounded-neo font-bold transition-all duration-100 border-2 border-neo-black text-xs",
                               isSelected
-                                ? `${difficultyColors[key] || 'bg-neo-cyan'} shadow-none translate-x-[1px] translate-y-[1px]`
+                                ? `${difficultyColors[key] || 'bg-neo-cyan text-neo-black'} shadow-none translate-x-[1px] translate-y-[1px]`
                                 : "bg-neo-cream text-neo-black shadow-hard-sm hover:shadow-hard"
                             )}
                           >

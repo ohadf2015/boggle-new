@@ -604,6 +604,10 @@ const sv = {
     "clickToHide": "Klicka för att dölja",
     "hostPlays": "Jag vill spela",
     "spectatorMode": "Åskådarläge - titta på brädet",
+    "broadcastModeTitle": "TV/Projektorläge",
+    "broadcastModeDescription": "Visa spelet på stor skärm medan du tittar på (du spelar inte)",
+    "broadcastModeHint": "Perfekt för 4+ spelare! Aktivera för att visa på TV",
+    "broadcastSuggestion": "Har du 4+ spelare? Prova TV-läge för att visa spelet på stor skärm!",
     "advancedSettings": "Avancerade inställningar",
     "autoValidatedCount": "ord automatiskt validerade",
     "roomClosedInactivity": "Rummet stängt på grund av inaktivitet",
@@ -711,46 +715,46 @@ const sv = {
     }
   },
   "tvResults": {
-    "title": "RESULTATEN ÄR KLARA!",
+    "title": "VI HAR EN VINNARE!",
     "champion": "MÄSTARE!",
-    "runnerUp": "ANDRAPLATSEN",
-    "bronze": "BRONSMEDALJ",
-    "wordsFound": "Ord Hittade",
-    "longestWord": "Längsta Ordet",
+    "runnerUp": "2A PLATS",
+    "bronze": "3E PLATS",
+    "wordsFound": "Totalt Ord",
+    "longestWord": "Största Ordet",
     "firstStrike": "Första Träff",
-    "bestCombo": "Bästa Combo",
+    "bestCombo": "Hetaste Serien",
     "photoFinish": "JÄMNT LOPP!",
-    "fireRoundHero": "Eldrundans Hjälte",
+    "fireRoundHero": "Eldrundans MVP",
     "lightningFingers": "BLIXTFINGRAR",
     "sharpShooter": "PRICKSKYTT",
     "wordWizard": "ORDTROLLKARL",
     "comboKing": "COMBOKUNG",
     "loneWolf": "ENSAMVARG",
     "clutchPlayer": "CLUTCHSPELARE",
-    "playersReady": "Redo",
+    "playersReady": "REDO!",
     "startNewGame": "NYTT SPEL",
     "nextRound": "NÄSTA RUNDA",
-    "tournamentStandings": "Turneringsställning",
+    "tournamentStandings": "TURNERINGSTAVLAN",
     "skip": "Hoppa över",
-    "qrCode": "QR-kod",
-    "fullRankings": "Fullständig Ranking",
-    "specialAwards": "Specialpriser",
+    "qrCode": "Scanna för att Gå Med",
+    "fullRankings": "Komplett Ranking",
+    "specialAwards": "🏆 Specialpriser",
     "words": "ord",
     "pts": "poäng",
     "andMore": "...och {{count}} spelare till",
     "andMorePlural": "...och {{count}} spelare till",
     "letters": "bokstäver",
     "legendary": "LEGENDARISK!",
-    "amazing": "FANTASTISK!",
+    "amazing": "OTROLIGT!",
     "onFire": "PÅ ELD!",
-    "pointsApart": "poäng isär!",
-    "bonusPts": "bonuspoäng",
-    "fastestFirstWord": "Snabbaste första ordet",
-    "highestAccuracy": "Högsta precision",
-    "mostLongWords": "Flest 6+ bokstavsord",
-    "bestComboStreak": "Bästa combosvit",
-    "mostUniqueFinds": "Flest unika fynd",
-    "strongFinisher": "Stark avslutare",
+    "pointsApart": "skillnad!",
+    "bonusPts": "BONUS",
+    "fastestFirstWord": "Första ordet på rekordtid!",
+    "highestAccuracy": "Perfekt precision!",
+    "mostLongWords": "Mästare på långa ord!",
+    "bestComboStreak": "Ostoppbar serie!",
+    "mostUniqueFinds": "Hittade ord ingen annan såg!",
+    "strongFinisher": "Dominerade sista sekunderna!",
     "roundOf": "Omgång {{current}} av {{total}}"
   },
   "playerView": {
@@ -1372,7 +1376,8 @@ const sv = {
       "letsPlay": "Kör!",
       "title": "Välkommen"
     },
-    "skipHint": "ESC eller Hoppa över för att komma till spelet 🎮"
+    "skipHint": "ESC eller Hoppa över för att komma till spelet 🎮",
+    "swipeHint": "← Svep för att navigera →"
   },
   "tutorial": {
     "stepLabel": "{current}/{total}",
@@ -1473,7 +1478,8 @@ const sv = {
         "sameChallenge": "Samma pussel för alla i världen – jämför din poäng!",
         "start": "Kör!"
       }
-    }
+    },
+    "swipeHint": "← Svep för att navigera →"
   },
   "achievements": {
     "FIRST_BLOOD": {
@@ -1699,7 +1705,13 @@ const sv = {
       "solidPerformance": "Solid Prestation",
       "solidPerformanceDesc": "Ett respektabelt resultat. Fortsätt så!",
       "gettingStarted": "Värmer Upp",
-      "gettingStartedDesc": "Varje mästare började någonstans. Nästa runda är din!"
+      "gettingStartedDesc": "Varje mästare började någonstans. Nästa runda är din!",
+      "noWords": "Nästa gång!",
+      "noWordsDesc": "Hittade inga ord den här omgången? Oroa dig inte, varje spel är en chans att lära!",
+      "fewWords": "Komma igång",
+      "fewWordsDesc": "{totalValidWords} {totalValidWords === 1 ? 'ord' : 'ord'} hittade. Fortsätt spela för att bli bättre!",
+      "buildingSkills": "Bygger färdigheter",
+      "buildingSkillsDesc": "{totalValidWords} ord är en bra start. Fokusera på att hitta fler ord nästa runda!"
     }
   },
   "noWords": {
@@ -2293,6 +2305,9 @@ const sv = {
     "newHighScore": "Nytt rekord!",
     "challengeComplete": "Utmaning slutförd",
     "noWordsFound": "Inga ord hittade",
+    "tryAgain": "Försök igen!",
+    "keepPracticing": "Fortsätt öva!",
+    "fewWordsFound": "Hittade {validWordCount} {validWordCount === 1 ? 'ord' : 'ord'}",
     "achievementsNotSaved": "Prestationer i enspelarläge sparas inte till din profil.",
     "botDetails": "Bot-detaljer",
     "difficulty": "Svårighetsgrad",
@@ -2763,6 +2778,10 @@ const sv = {
     "largerText": {
       "title": "Större text",
       "description": "Öka bastextstorlek med 125% för bättre läsbarhet."
+    },
+    "earthquakeEffects": {
+      "title": "Inaktivera jordbävningseffekter",
+      "description": "Stäng av intensiva jordbävningsanimationer inklusive extrem skakning, 3D-tumbling, rörelsoskärpa, skärmskak och partikelskrot."
     }
   },
   "email": {
@@ -2784,6 +2803,14 @@ const sv = {
     "installTitle": "Installera LexiClash",
     "installDescription": "Installera vår app för snabbare åtkomst, offlinespel och en bättre upplevelse!",
     "installButton": "Installera nu"
+  },
+  "newYear": {
+    "comingSoon": "Något speciellt närmar sig...",
+    "countdownTitle": "Nyårsnedräkning",
+    "countdownSubtitle": "Gör dig redo att fira!",
+    "almostThere": "Nästan där!",
+    "happyNewYear": "Gott Nytt År!",
+    "celebrationMessage": "Vi önskar dig ett fantastiskt år fyllt med ord, segrar och under!"
   }
 };
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Volume2, VolumeX, Sparkles, Zap, Type, Contrast } from 'lucide-react';
+import { Eye, EyeOff, Volume2, VolumeX, Sparkles, Zap, Type, Contrast, Waves } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
 import Header from '@/components/Header';
@@ -55,7 +55,7 @@ export default function AccessibilitySettingsPage() {
 
   // Handle toggle changes
   const handleToggle = (
-    setting: 'reduceMotion' | 'disableSounds' | 'highContrast' | 'largerText' | 'fireRoundLights',
+    setting: 'reduceMotion' | 'disableSounds' | 'highContrast' | 'largerText' | 'fireRoundLights' | 'earthquakeEffects',
     value: boolean
   ) => {
     switch (setting) {
@@ -81,6 +81,9 @@ export default function AccessibilitySettingsPage() {
       case 'fireRoundLights':
         updateSetting('disableFireRoundLights', value);
         break;
+      case 'earthquakeEffects':
+        updateSetting('disableEarthquakeEffects', value);
+        break;
     }
   };
 
@@ -94,6 +97,16 @@ export default function AccessibilitySettingsPage() {
         'Turn off the rainbow glowing cells during fire rounds to reduce visual distractions.',
       enabled: settings.disableFireRoundLights,
       iconColor: 'text-neo-purple',
+    },
+    {
+      id: 'earthquakeEffects',
+      icon: Waves,
+      title: t('accessibility.earthquakeEffects.title') || 'Disable Earthquake Effects',
+      description:
+        t('accessibility.earthquakeEffects.description') ||
+        'Turn off intense earthquake animations including extreme shaking, 3D tumbling, motion blur, screen shake, and particle debris.',
+      enabled: settings.disableEarthquakeEffects,
+      iconColor: 'text-neo-red',
     },
     {
       id: 'reduceMotion',

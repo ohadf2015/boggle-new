@@ -954,10 +954,10 @@ export const DailyWordSchedule: React.FC = () => {
                         copyWord(getEffectiveWord(word));
                       }
                     }}
-                    className="p-2 bg-white rounded-full hover:bg-gray-100"
+                    className="p-2 bg-white text-gray-900 rounded-full hover:bg-gray-100"
                     title="Copy word"
                   >
-                    <Copy className="w-4 h-4 text-gray-700" />
+                    <Copy className="w-4 h-4" />
                   </button>
                   <button
                     onClick={(e) => {
@@ -966,10 +966,10 @@ export const DailyWordSchedule: React.FC = () => {
                         toggleExpanded(dateStr);
                       }
                     }}
-                    className="p-2 bg-white rounded-full hover:bg-gray-100"
+                    className="p-2 bg-white text-gray-900 rounded-full hover:bg-gray-100"
                     title="View attempts"
                   >
-                    <Eye className="w-4 h-4 text-gray-700" />
+                    <Eye className="w-4 h-4" />
                   </button>
                 </div>
               </motion.div>

@@ -613,6 +613,10 @@ const en = {
     "clickToHide": "Click to hide",
     "hostPlays": "I want to broadcast",
     "spectatorMode": "Broadcast Mode - display on TV/projector",
+    "broadcastModeTitle": "TV/Projector Mode",
+    "broadcastModeDescription": "Display the game on a big screen while you spectate (you won't play)",
+    "broadcastModeHint": "Perfect for 4+ players! Enable to show the game on a TV",
+    "broadcastSuggestion": "Got 4+ players? Try TV Mode to display the game on a big screen!",
     "advancedSettings": "Advanced Settings",
     "autoValidatedCount": "words auto-validated",
     "roomClosedInactivity": "Room closed due to inactivity",
@@ -720,46 +724,46 @@ const en = {
     }
   },
   "tvResults": {
-    "title": "THE RESULTS ARE IN!",
+    "title": "WE HAVE A WINNER!",
     "champion": "CHAMPION!",
-    "runnerUp": "RUNNER UP",
-    "bronze": "BRONZE MEDAL",
-    "wordsFound": "Words Found",
-    "longestWord": "Longest Word",
+    "runnerUp": "2ND PLACE",
+    "bronze": "3RD PLACE",
+    "wordsFound": "Total Words",
+    "longestWord": "Biggest Word",
     "firstStrike": "First Strike",
-    "bestCombo": "Best Combo",
+    "bestCombo": "Hottest Streak",
     "photoFinish": "PHOTO FINISH!",
-    "fireRoundHero": "Fire Round Hero",
+    "fireRoundHero": "Fire Round MVP",
     "lightningFingers": "LIGHTNING FINGERS",
     "sharpShooter": "SHARP SHOOTER",
     "wordWizard": "WORD WIZARD",
     "comboKing": "COMBO KING",
     "loneWolf": "LONE WOLF",
     "clutchPlayer": "CLUTCH PLAYER",
-    "playersReady": "Ready",
+    "playersReady": "READY!",
     "startNewGame": "START NEW GAME",
     "nextRound": "NEXT ROUND",
-    "tournamentStandings": "Tournament Standings",
+    "tournamentStandings": "TOURNAMENT LEADERBOARD",
     "skip": "Skip",
-    "qrCode": "QR Code",
-    "fullRankings": "Full Rankings",
-    "specialAwards": "Special Awards",
+    "qrCode": "Scan to Join",
+    "fullRankings": "Complete Rankings",
+    "specialAwards": "🏆 Special Awards",
     "words": "words",
     "pts": "pts",
     "andMore": "...and {{count}} more player",
     "andMorePlural": "...and {{count}} more players",
     "letters": "letters",
     "legendary": "LEGENDARY!",
-    "amazing": "AMAZING!",
+    "amazing": "INCREDIBLE!",
     "onFire": "ON FIRE!",
-    "pointsApart": "points apart!",
-    "bonusPts": "bonus pts",
-    "fastestFirstWord": "Fastest first word",
-    "highestAccuracy": "Highest accuracy",
-    "mostLongWords": "Most 6+ letter words",
-    "bestComboStreak": "Best combo streak",
-    "mostUniqueFinds": "Most unique finds",
-    "strongFinisher": "Strong finisher",
+    "pointsApart": "point gap!",
+    "bonusPts": "BONUS",
+    "fastestFirstWord": "First word in record time!",
+    "highestAccuracy": "Perfect precision!",
+    "mostLongWords": "Master of long words!",
+    "bestComboStreak": "Unstoppable streak!",
+    "mostUniqueFinds": "Found words nobody else did!",
+    "strongFinisher": "Dominated the final seconds!",
     "roundOf": "Round {{current}} of {{total}}"
   },
   "playerView": {
@@ -1382,7 +1386,8 @@ const en = {
       "letsPlay": "Let's Go!",
       "title": "Welcome"
     },
-    "skipHint": "Press ESC to skip"
+    "skipHint": "Press ESC to skip",
+    "swipeHint": "← Swipe to navigate →"
   },
   "tutorial": {
     "stepLabel": "{current}/{total}",
@@ -1483,7 +1488,8 @@ const en = {
         "sameChallenge": "Same puzzle for everyone worldwide – compare your score!",
         "start": "Start Hunt"
       }
-    }
+    },
+    "swipeHint": "← Swipe to navigate →"
   },
   "achievements": {
     "FIRST_BLOOD": {
@@ -1709,7 +1715,13 @@ const en = {
       "solidPerformance": "Solid Performance",
       "solidPerformanceDesc": "A respectable showing. Keep at it!",
       "gettingStarted": "Warming Up",
-      "gettingStartedDesc": "Every champion started somewhere. Next round is yours!"
+      "gettingStartedDesc": "Every champion started somewhere. Next round is yours!",
+      "noWords": "Next Time!",
+      "noWordsDesc": "Didn't find any words this round? Don't worry, every game is a chance to learn!",
+      "fewWords": "Getting Started",
+      "fewWordsDesc": "{totalValidWords} {totalValidWords === 1 ? 'word' : 'words'} found. Keep playing to improve!",
+      "buildingSkills": "Building Skills",
+      "buildingSkillsDesc": "{totalValidWords} words is a start. Focus on finding more words next round!"
     }
   },
   "noWords": {
@@ -2303,6 +2315,9 @@ const en = {
     "newHighScore": "New Record!",
     "challengeComplete": "Complete!",
     "noWordsFound": "No words found",
+    "tryAgain": "Try Again!",
+    "keepPracticing": "Keep Practicing!",
+    "fewWordsFound": "Found {validWordCount} {validWordCount === 1 ? 'word' : 'words'}",
     "achievementsNotSaved": "Solo achievements aren't saved to your profile.",
     "botDetails": "Bot Stats",
     "difficulty": "Difficulty",
@@ -2773,6 +2788,10 @@ const en = {
     "largerText": {
       "title": "Larger Text",
       "description": "Increase base font size by 125% for better readability."
+    },
+    "earthquakeEffects": {
+      "title": "Disable Earthquake Effects",
+      "description": "Turn off intense earthquake animations including extreme shaking, 3D tumbling, motion blur, screen shake, and particle debris."
     }
   },
   "email": {
@@ -2794,6 +2813,14 @@ const en = {
     "installTitle": "Get the App",
     "installDescription": "Install LexiClash for faster play and offline access!",
     "installButton": "Install"
+  },
+  "newYear": {
+    "comingSoon": "Something special coming soon...",
+    "countdownTitle": "New Year Countdown",
+    "countdownSubtitle": "Get ready to celebrate!",
+    "almostThere": "Almost there!",
+    "happyNewYear": "Happy New Year!",
+    "celebrationMessage": "Wishing you an amazing year ahead filled with words, wins, and wonder!"
   }
 };
 

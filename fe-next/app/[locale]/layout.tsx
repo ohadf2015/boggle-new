@@ -9,6 +9,7 @@ import WebVitalsReporter from '@/components/WebVitalsReporter';
 import PWAInstallPrompt from '@/components/PWAInstallPrompt';
 import EmailCaptureModal from '@/components/EmailCaptureModal';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
+import NewYearCountdown from '@/components/celebration/NewYearCountdown';
 import { fredoka, rubik } from '../fonts';
 
 // Force dynamic rendering - prevent static generation
@@ -504,6 +505,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     <Footer />
                     <PWAInstallPrompt />
                     <EmailCaptureModal />
+                    <NewYearCountdown />
                 </Providers>
             </body>
         </html>

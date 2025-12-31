@@ -218,7 +218,7 @@ const TvResultsStatsGrid = memo<TvResultsStatsGridProps>(({
               )}
             >
               {/* Icon */}
-              <div className="absolute -top-3 -left-3 w-10 h-10 bg-neo-cream rounded-full border-3 border-neo-black flex items-center justify-center shadow-hard-sm">
+              <div className="absolute -top-3 -left-3 w-10 h-10 bg-neo-cream text-neo-black rounded-full border-3 border-neo-black flex items-center justify-center shadow-hard-sm">
                 <stat.icon className="w-5 h-5 text-neo-black" />
               </div>
 

@@ -1104,10 +1104,10 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden"
               >
-                <div className="p-2.5 space-y-0.5 bg-white dark:bg-slate-800">
+                <div className="p-2.5 space-y-0.5 bg-white dark:bg-slate-800 text-gray-900 dark:text-white">
                   {result.attempts.map((attempt, idx) => (
                     <div key={idx} className="flex items-center justify-center gap-1.5">
-                      <span className="text-[10px] text-gray-500 dark:text-gray-400 w-5">
+                      <span className="text-[10px] text-gray-700 dark:text-gray-400 w-5">
                         {idx + 1}.
                       </span>
                       <div className="flex gap-0.5">
@@ -1183,7 +1183,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                   transition={{ duration: 0.25 }}
                   className="overflow-hidden"
                 >
-                  <div className="p-4 pt-2 bg-white dark:bg-neo-navy-light border-t border-gray-200 dark:border-gray-700 space-y-4">
+                  <div className="p-4 pt-2 bg-white dark:bg-neo-navy-light text-gray-900 dark:text-white border-t border-gray-200 dark:border-gray-700 space-y-4">
                     {/* Stats summary grid */}
                     <div className="grid grid-cols-3 gap-2 text-center">
                       <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 border border-blue-200 dark:border-blue-800">
@@ -1383,7 +1383,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden"
               >
-                <div className="p-3 bg-white dark:bg-gray-900 space-y-4">
+                <div className="p-3 bg-white dark:bg-gray-900 text-gray-900 dark:text-white space-y-4">
                   {/* Retry Challenge */}
                   <div className="space-y-2">
                     <p className="text-sm font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">

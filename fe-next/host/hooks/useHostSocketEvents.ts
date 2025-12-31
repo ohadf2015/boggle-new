@@ -151,6 +151,7 @@ const useHostSocketEvents = ({
     t,
     gameStarted,
     username,
+    hostPlaying,
     setGameStarted,
     setShowStartAnimation,
     setTableData,

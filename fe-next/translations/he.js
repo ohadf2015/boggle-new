@@ -605,6 +605,10 @@ const he = {
     "clickToHide": "לחץ להסתרה",
     "hostPlays": "אני רוצה לשדר",
     "spectatorMode": "מצב שידור - הצג על מסך/מקרן",
+    "broadcastModeTitle": "מצב טלוויזיה/מקרן",
+    "broadcastModeDescription": "הצג את המשחק על מסך גדול בזמן שאתה צופה (לא תשחק)",
+    "broadcastModeHint": "מושלם ל-4+ שחקנים! הפעל כדי להציג על טלוויזיה",
+    "broadcastSuggestion": "יש 4+ שחקנים? נסה מצב טלוויזיה להצגת המשחק על מסך גדול!",
     "advancedSettings": "הגדרות מתקדמות",
     "autoValidatedCount": "מילים אומתו אוטומטית",
     "roomClosedInactivity": "החדר נסגר עקב חוסר פעילות",
@@ -674,30 +678,30 @@ const he = {
     "live": "שידור חי",
     "waitingForGame": "ממתין למשחק...",
     "noPlayersYet": "אין שחקנים עדיין",
-    "earthquake": "!רעידת אדמה",
+    "earthquake": "רעידת אדמה!",
     "fireRound": "סיבוב אש",
     "twoXPoints": "נקודות X2",
     "notifications": {
-      "longWord": "!כוח מילים",
-      "epicWord": "!מילה ענקית",
-      "rareWord": "!מציאה אגדית",
-      "combo5x": "!מתחמם",
-      "combo10x": "!בלתי ניתן לעצירה",
-      "combo15x": "!חיה",
-      "combo20x": "!מלך הקומבו",
-      "comboBroken": "!הרצף נשבר",
-      "firstBlood": "!דם ראשון",
-      "overtake": "!עולה בדירוג",
-      "comeback": "!חזרה מהאפר",
-      "photoFinish": "!ראש בראש",
-      "wordSnipe": "!מוחות גדולים",
-      "fireRoundStart": "!סיבוב אש",
-      "fireRoundEnd": "!האש כבתה",
-      "achievement": "!הישג נפתח",
-      "levelUp": "!עליית דרגה",
-      "finalWarning": "!שניות אחרונות",
-      "earthquake": "!היכונו לרעידה",
-      "everythingDouble": "!הכל כפול",
+      "longWord": "כוח מילים!",
+      "epicWord": "מילה ענקית!",
+      "rareWord": "מציאה אגדית!",
+      "combo5x": "מתחמם!",
+      "combo10x": "בלתי ניתן לעצירה!",
+      "combo15x": "חיה!",
+      "combo20x": "מלך הקומבו!",
+      "comboBroken": "הרצף נשבר!",
+      "firstBlood": "דם ראשון!",
+      "overtake": "עולה בדירוג!",
+      "comeback": "חזרה מהאפר!",
+      "photoFinish": "ראש בראש!",
+      "wordSnipe": "מוחות גדולים!",
+      "fireRoundStart": "סיבוב אש!",
+      "fireRoundEnd": "האש כבתה!",
+      "achievement": "הישג נפתח!",
+      "levelUp": "עליית דרגה!",
+      "finalWarning": "שניות אחרונות!",
+      "earthquake": "היכונו לרעידה!",
+      "everythingDouble": "הכל כפול!",
       "backToNormal": "חזרה לרגיל",
       "drawsFirst": "פותח את הניקוד",
       "combo": "קומבו",
@@ -707,51 +711,51 @@ const he = {
       "toRank": "למקום ",
       "ptsApart": "נקודות הפרש",
       "bothFound": "שניהם מצאו",
-      "secondsLeft": "!שניות נותרו",
-      "gridShuffle": "!הלוח מתערבב"
+      "secondsLeft": "שניות נותרו!",
+      "gridShuffle": "הלוח מתערבב!"
     }
   },
   "tvResults": {
-    "title": "!התוצאות הגיעו",
-    "champion": "!אלוף",
-    "runnerUp": "מקום שני",
-    "bronze": "מקום שלישי",
-    "wordsFound": "מילים שנמצאו",
-    "longestWord": "המילה הארוכה ביותר",
+    "title": "יש לנו מנצח!",
+    "champion": "אלוף!",
+    "runnerUp": "מקום 2",
+    "bronze": "מקום 3",
+    "wordsFound": "סה״כ מילים",
+    "longestWord": "המילה הגדולה ביותר",
     "firstStrike": "פתיחה מהירה",
-    "bestCombo": "קומבו הכי טוב",
-    "photoFinish": "!צמוד עד הסוף",
-    "fireRoundHero": "גיבור סיבוב האש",
+    "bestCombo": "הרצף הכי לוהט",
+    "photoFinish": "צמוד עד הסוף!",
+    "fireRoundHero": "MVP סיבוב האש",
     "lightningFingers": "אצבעות ברק",
     "sharpShooter": "צלף מדויק",
     "wordWizard": "קוסם מילים",
     "comboKing": "מלך הקומבו",
     "loneWolf": "זאב בודד",
     "clutchPlayer": "שחקן לחץ",
-    "playersReady": "מוכנים",
+    "playersReady": "מוכנים!",
     "startNewGame": "משחק חדש",
     "nextRound": "סיבוב הבא",
-    "tournamentStandings": "דירוג הטורניר",
+    "tournamentStandings": "לוח תוצאות הטורניר",
     "skip": "דלג",
-    "qrCode": "קוד QR",
-    "fullRankings": "דירוג מלא",
-    "specialAwards": "פרסים מיוחדים",
+    "qrCode": "סרוק כדי להצטרף",
+    "fullRankings": "דירוג שלם",
+    "specialAwards": "פרסים מיוחדים 🏆",
     "words": "מילים",
     "pts": "נק׳",
     "andMore": "...ועוד {{count}} שחקן",
     "andMorePlural": "...ועוד {{count}} שחקנים",
     "letters": "אותיות",
-    "legendary": "!אגדי",
-    "amazing": "!מדהים",
-    "onFire": "!בוער",
-    "pointsApart": "!נקודות הפרש",
-    "bonusPts": "נק׳ בונוס",
-    "fastestFirstWord": "מילה ראשונה מהירה",
-    "highestAccuracy": "דיוק גבוה",
-    "mostLongWords": "הכי הרבה מילים של 6+ אותיות",
-    "bestComboStreak": "רצף קומבו הכי טוב",
-    "mostUniqueFinds": "הכי הרבה מציאות ייחודיות",
-    "strongFinisher": "סיום חזק",
+    "legendary": "אגדי!",
+    "amazing": "מדהים!",
+    "onFire": "בוער!",
+    "pointsApart": "הפרש!",
+    "bonusPts": "בונוס",
+    "fastestFirstWord": "מילה ראשונה בזמן שיא!",
+    "highestAccuracy": "דיוק מושלם!",
+    "mostLongWords": "אמן מילים ארוכות!",
+    "bestComboStreak": "רצף בלתי נעצר!",
+    "mostUniqueFinds": "מצא מילים שאף אחד לא ראה!",
+    "strongFinisher": "שלט בשניות האחרונות!",
     "roundOf": "סיבוב {{current}} מתוך {{total}}"
   },
   "playerView": {
@@ -852,14 +856,14 @@ const he = {
     "longWordsRemaining": "מילים של ${min}+ אותיות נותרו"
   },
   "lateJoiner": {
-    "welcomeTitle": "!המשחק כבר התחיל",
+    "welcomeTitle": "המשחק כבר התחיל!",
     "welcomeMessage": ":הצטרפת באמצע המשחק. הנה מה שאתה צריך לדעת",
     "timeRemaining": "זמן נותר",
     "currentLeaders": "מובילים נוכחיים",
     "quickTip1": "החלק אותיות סמוכות ליצירת מילים",
     "quickTip2": "הרם את האצבע כדי לשלוח",
-    "quickTip3": "!מילים ארוכות = יותר נקודות",
-    "gotIt": "!הבנתי, בואו נשחק",
+    "quickTip3": "מילים ארוכות = יותר נקודות!",
+    "gotIt": "הבנתי, בואו נשחק!",
     "badge": "הצטרף באיחור",
     "joinedMidGame": "הצטרף באמצע המשחק"
   },
@@ -870,7 +874,7 @@ const he = {
     "joinGame": "הצטרף למשחק",
     "slotAvailable": "מקום {{count}} פנוי",
     "slotsAvailable": "מקומות {{count}} פנויים",
-    "upgraded": "!עכשיו אתה יכול לשחק",
+    "upgraded": "עכשיו אתה יכול לשחק!",
     "youAreSpectating": "אתה צופה במשחק הזה",
     "watchingGame": "...צופה במשחק",
     "waitForSlot": "...ממתין למקום שחקן"
@@ -883,8 +887,8 @@ const he = {
     "noHints": "אין רמזים נותרים",
     "noHintsLeft": "אין רמזים נותרים",
     "requestHint": "בקש רמז, נותרו {remaining}",
-    "noWordsLeft": "!אין עוד מילים למצוא",
-    "noLongWordsLeft": "!אין עוד מילים של 5+ אותיות למצוא",
+    "noWordsLeft": "אין עוד מילים למצוא!",
+    "noLongWordsLeft": "אין עוד מילים של 5+ אותיות למצוא!",
     "lookFor": "חפש מילה בת",
     "letterWord": "אותיות",
     "letters": "אותיות",
@@ -1076,7 +1080,7 @@ const he = {
     "rank": {
       "position": "#{rank} מתוך {total}",
       "percentile": "{percentile}% עליון",
-      "winner": "!מנצח",
+      "winner": "מנצח!",
       "pointsFromWinner": "{points} מהמנצח",
       "pointsFromNext": "{points} מהבא"
     },
@@ -1373,7 +1377,8 @@ const he = {
       "letsPlay": "יאללה!",
       "title": "ברוכים הבאים"
     },
-    "skipHint": "ESC או דלג לקפוץ למשחק 🎮"
+    "skipHint": "ESC או דלג לקפוץ למשחק 🎮",
+    "swipeHint": "החלק לניווט → ←"
   },
   "tutorial": {
     "stepLabel": "{current}/{total}",
@@ -1472,9 +1477,10 @@ const he = {
         "ruleColors": "🟩 = נכון, 🟨 = מקום לא נכון, ⬜ = לא במילה",
         "rule4": "אותו פאזל בכל העולם",
         "sameChallenge": "אותו פאזל לכולם בעולם – השוו ניקוד! 🌍",
-        "start": "!יאללה"
+        "start": "יאללה!"
       }
-    }
+    },
+    "swipeHint": "החלק לניווט → ←"
   },
   "achievements": {
     "FIRST_BLOOD": {
@@ -1700,7 +1706,13 @@ const he = {
       "solidPerformance": "ביצוע מוצק",
       "solidPerformanceDesc": "הופעה מכובדת. המשך כך!",
       "gettingStarted": "מתחממים",
-      "gettingStartedDesc": "כל אלוף התחיל איפשהו. הסיבוב הבא שלך!"
+      "gettingStartedDesc": "כל אלוף התחיל איפשהו. הסיבוב הבא שלך!",
+      "noWords": "בפעם הבאה!",
+      "noWordsDesc": "לא מצאת מילים בסיבוב הזה? אל תדאג, כל משחק זה הזדמנות ללמוד!",
+      "fewWords": "מתחילים",
+      "fewWordsDesc": "{totalValidWords} {totalValidWords === 1 ? 'מילה' : 'מילים'} נמצאו. המשך לשחק כדי להשתפר!",
+      "buildingSkills": "בונים כישורים",
+      "buildingSkillsDesc": "{totalValidWords} מילים זו התחלה. התמקד במציאת יותר מילים בסיבוב הבא!"
     }
   },
   "noWords": {
@@ -2294,6 +2306,9 @@ const he = {
     "newHighScore": "שיא חדש!",
     "challengeComplete": "האתגר הושלם",
     "noWordsFound": "לא נמצאו מילים",
+    "tryAgain": "נסה שוב!",
+    "keepPracticing": "המשך להתאמן!",
+    "fewWordsFound": "מצאת {validWordCount} {validWordCount === 1 ? 'מילה' : 'מילים'}",
     "achievementsNotSaved": "הישגים במצב שחקן יחיד לא נשמרים בפרופיל שלך.",
     "botDetails": "פרטי בוט",
     "difficulty": "קושי",
@@ -2764,6 +2779,10 @@ const he = {
     "largerText": {
       "title": "טקסט גדול יותר",
       "description": "הגדל גודל גופן בסיסי ב-125% לקריאות טובה יותר."
+    },
+    "earthquakeEffects": {
+      "title": "ביטול אפקטי רעידת אדמה",
+      "description": "כבה אנימציות רעידת אדמה אינטנסיביות כולל רעידות קיצוניות, היפוך תלת-ממדי, טשטוש תנועה, רעד מסך ופסולת חלקיקים."
     }
   },
   "email": {
@@ -2785,6 +2804,14 @@ const he = {
     "installTitle": "התקן את לקסיקלאש",
     "installDescription": "התקן את האפליקציה לגישה מהירה יותר, משחק אופליין וחוויה טובה יותר!",
     "installButton": "התקן עכשיו"
+  },
+  "newYear": {
+    "comingSoon": "משהו מיוחד בדרך...",
+    "countdownTitle": "ספירה לאחור לשנה החדשה",
+    "countdownSubtitle": "התכוננו לחגיגה!",
+    "almostThere": "כמעט שם!",
+    "happyNewYear": "שנה טובה!",
+    "celebrationMessage": "מאחלים לכם שנה מדהימה מלאה במילים, ניצחונות ופלאים!"
   }
 };
 

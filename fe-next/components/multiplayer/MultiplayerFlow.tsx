@@ -101,13 +101,57 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   // Handle selector choices
   const handleSelectCreate = useCallback(() => {
     setMode('create');
-    setFlowState('profile-setup');
-  }, []);
+
+    // Check if we already have saved profile data
+    const savedUsername = typeof window !== 'undefined' ? localStorage.getItem('boggle_username') : null;
+    const savedAvatarId = typeof window !== 'undefined' ? localStorage.getItem('boggle_avatar_id') : null;
+
+    // Skip profile setup if we have both avatar and name already
+    if ((savedUsername && savedAvatarId) || (isAuthenticated && displayName && profileAvatarId)) {
+      const effectiveUsername = savedUsername || displayName;
+      const effectiveAvatarId = savedAvatarId || profileAvatarId;
+      const roomName = `${effectiveUsername} Room`;
+
+      // Set profile data and skip to create form
+      setProfile({
+        username: effectiveUsername!,
+        avatarId: effectiveAvatarId!,
+        roomName,
+      });
+      setUsername(effectiveUsername!);
+      setHostUsername(effectiveUsername!);
+      setRoomName(roomName);
+      setFlowState('create-form');
+    } else {
+      // Need to set up profile first
+      setFlowState('profile-setup');
+    }
+  }, [isAuthenticated, displayName, profileAvatarId, setUsername, setHostUsername, setRoomName]);
 
   const handleSelectJoin = useCallback(() => {
     setMode('join');
-    setFlowState('profile-setup');
-  }, []);
+
+    // Check if we already have saved profile data
+    const savedUsername = typeof window !== 'undefined' ? localStorage.getItem('boggle_username') : null;
+    const savedAvatarId = typeof window !== 'undefined' ? localStorage.getItem('boggle_avatar_id') : null;
+
+    // Skip profile setup if we have both avatar and name already
+    if ((savedUsername && savedAvatarId) || (isAuthenticated && displayName && profileAvatarId)) {
+      const effectiveUsername = savedUsername || displayName;
+      const effectiveAvatarId = savedAvatarId || profileAvatarId;
+
+      // Set profile data and skip to join form
+      setProfile({
+        username: effectiveUsername!,
+        avatarId: effectiveAvatarId!,
+      });
+      setUsername(effectiveUsername!);
+      setFlowState('join-form');
+    } else {
+      // Need to set up profile first
+      setFlowState('profile-setup');
+    }
+  }, [isAuthenticated, displayName, profileAvatarId, setUsername]);
 
   // Handle quick join from selector (skip profile if already set)
   const handleQuickJoin = useCallback((roomCode: string) => {

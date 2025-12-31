@@ -17,6 +17,7 @@ import {
 import { useGameStateContext } from '@/contexts/GameStateContext';
 import logger from '@/utils/logger';
 import type { StartGameBroadcast } from '@/shared/types/socket';
+import type { GameTimerReturn } from '@/hooks/useGameTimer';
 
 interface UsePlayerGameEventsProps {
   socket: Socket | null;
@@ -44,6 +45,9 @@ interface UsePlayerGameEventsProps {
 
   // Music ref for tracking total game time
   totalGameTimeRef?: MutableRefObject<number>;
+
+  // Timer for multiplayer sync
+  gameTimer?: GameTimerReturn;
 
   // Callbacks
   onGameStart?: () => void;
@@ -74,6 +78,7 @@ export function usePlayerGameEvents({
   comboShieldsUsedRef,
   intentionalExitRef,
   totalGameTimeRef,
+  gameTimer,
   onGameStart,
 }: UsePlayerGameEventsProps): UsePlayerGameEventsReturn {
   // Get all game state and setters from context (no more massive prop drilling!)
@@ -145,6 +150,11 @@ export function usePlayerGameEvents({
       if (data.timerSeconds) {
         setRemainingTime(data.timerSeconds);
         if (totalGameTimeRef) totalGameTimeRef.current = data.timerSeconds;
+        // Sync timer with game start time
+        if (gameTimer) {
+          gameTimer.reset();
+          gameTimer.setTime(data.timerSeconds);
+        }
       }
       if (data.language) setGameLanguage(data.language);
       if (data.minWordLength) setMinWordLength(data.minWordLength);
@@ -189,6 +199,11 @@ export function usePlayerGameEvents({
         return;
       }
 
+      // CRITICAL: Sync timer with server time to prevent drift
+      // The local timer counts down smoothly, but server updates keep it accurate
+      if (gameTimer && data.remainingTime !== undefined) {
+        gameTimer.setTime(data.remainingTime);
+      }
       setRemainingTime(data.remainingTime);
 
       if (data.letterGrid && !letterGrid) {
@@ -276,6 +291,11 @@ export function usePlayerGameEvents({
       setShufflingGrid(null);
       setShowStartAnimation(false);
       waitingStartTimeRef.current = null;
+
+      // Reset timer for next game
+      if (gameTimer) {
+        gameTimer.reset();
+      }
 
       // Reset combo state using shared utility
       resetComboStateUtil(
@@ -425,6 +445,7 @@ export function usePlayerGameEvents({
     setEarthquakeState,
     setFireRoundActive,
     setFireRoundRemaining,
+    gameTimer,
     handleHostLeftRoomClosing,
     onGameStart,
   ]);

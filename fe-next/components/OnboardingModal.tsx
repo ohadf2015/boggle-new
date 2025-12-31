@@ -12,6 +12,8 @@ import { useAuth } from '../contexts/AuthContext';
 import OnboardingProgress from './onboarding/OnboardingProgress';
 import { markOnboardingComplete } from '../utils/onboardingStorage';
 import { AVATARS } from '../utils/avatarConfig';
+import { useSwipeGesture } from '../hooks/useSwipeGesture';
+import { triggerHaptic } from '../utils/hapticFeedback';
 
 // Step components - Streamlined 3-step onboarding
 import WelcomeDemoStep from './onboarding/WelcomeDemoStep';
@@ -66,16 +68,16 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
     }
   }, [isOpen, audioUnlocked, fadeToTrack, TRACKS]);
 
-  // Handle dialog state changes - prevent closing without completing
+  // Handle dialog state changes - allow closing via X button
   const handleOpenChange = (open: boolean) => {
-    // Don't allow closing the modal - user must complete onboarding
     if (!open) {
-      return;
+      onClose();
     }
   };
 
   const handleBack = () => {
     if (currentStep > 0) {
+      triggerHaptic('swipe');
       setCurrentStep(currentStep - 1);
     }
   };
@@ -84,20 +86,42 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
     // Validation before advancing
     if (currentStep === 0 && !demoCompleted) {
       // User must complete the demo before proceeding
+      triggerHaptic('warning');
       return;
     }
 
     if (currentStep === 1 && !formData.displayName.trim()) {
       // Name is required in profile step
+      triggerHaptic('warning');
       return;
     }
 
+    triggerHaptic('swipe');
     if (currentStep < TOTAL_STEPS - 1) {
       setCurrentStep(currentStep + 1);
     } else {
       handleComplete();
     }
   };
+
+  // Swipe gesture handlers
+  const swipeHandlers = useSwipeGesture({
+    onSwipeLeft: () => {
+      // Swipe left = next (in LTR), prev (in RTL) - handled by hook
+      if (canAdvance()) {
+        handleNext();
+      }
+    },
+    onSwipeRight: () => {
+      // Swipe right = prev (in LTR), next (in RTL) - handled by hook
+      if (currentStep > 0) {
+        handleBack();
+      }
+    },
+    isRtl: dir === 'rtl',
+    enableHaptic: false, // We handle haptic manually for better control
+    threshold: 50,
+  });
 
   const handleComplete = async () => {
     // Save to localStorage - always set to single/training mode
@@ -153,6 +177,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
             onModeSelect={(mode) =>
               setFormData((prev) => ({ ...prev, selectedMode: mode }))
             }
+            onComplete={handleComplete}
           />
         );
       default:
@@ -180,19 +205,24 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
           <OnboardingProgress currentStep={currentStep} totalSteps={TOTAL_STEPS} />
         </div>
 
-        {/* Step content with animation */}
-        <DialogBody className="space-y-3 px-3 sm:px-6">
+        {/* Step content with animation and swipe support */}
+        <DialogBody className="space-y-3 px-3 sm:px-6" {...swipeHandlers}>
           <AnimatePresence mode="wait">
             <motion.div
               key={currentStep}
-              initial={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, x: dir === 'rtl' ? -20 : 20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              exit={{ opacity: 0, x: dir === 'rtl' ? 20 : -20 }}
               transition={{ duration: 0.3 }}
             >
               {renderStep()}
             </motion.div>
           </AnimatePresence>
+
+          {/* Swipe hint indicator - only shown on mobile */}
+          <div className="block sm:hidden text-center text-xs text-gray-400 mt-2">
+            {t('onboarding.swipeHint') || '← Swipe to navigate →'}
+          </div>
         </DialogBody>
 
         {/* Navigation buttons */}

@@ -601,6 +601,10 @@ const es = {
     "clickToHide": "Ocultar",
     "hostPlays": "Jugar",
     "spectatorMode": "Modo espectador",
+    "broadcastModeTitle": "Modo TV/Proyector",
+    "broadcastModeDescription": "Muestra el juego en pantalla grande mientras observas (no jugarás)",
+    "broadcastModeHint": "¡Perfecto para 4+ jugadores! Activa para mostrar en TV",
+    "broadcastSuggestion": "¿4+ jugadores? ¡Prueba el Modo TV para mostrar el juego en pantalla grande!",
     "advancedSettings": "Avanzado",
     "autoValidatedCount": "auto-validadas",
     "roomClosedInactivity": "Cerrada por inactividad",
@@ -708,30 +712,30 @@ const es = {
     }
   },
   "tvResults": {
-    "title": "¡LLEGARON LOS RESULTADOS!",
+    "title": "¡TENEMOS UN GANADOR!",
     "champion": "¡CAMPEÓN!",
-    "runnerUp": "SEGUNDO LUGAR",
-    "bronze": "TERCER LUGAR",
-    "wordsFound": "Palabras Encontradas",
-    "longestWord": "Palabra Más Larga",
+    "runnerUp": "2DO LUGAR",
+    "bronze": "3ER LUGAR",
+    "wordsFound": "Total de Palabras",
+    "longestWord": "Palabra Más Grande",
     "firstStrike": "Primera Jugada",
-    "bestCombo": "Mejor Combo",
+    "bestCombo": "Racha Más Caliente",
     "photoFinish": "¡FINAL CERRADO!",
-    "fireRoundHero": "Héroe de Ronda de Fuego",
+    "fireRoundHero": "MVP Ronda de Fuego",
     "lightningFingers": "DEDOS RELÁMPAGO",
     "sharpShooter": "TIRADOR CERTERO",
     "wordWizard": "MAGO DE PALABRAS",
     "comboKing": "REY DEL COMBO",
     "loneWolf": "LOBO SOLITARIO",
     "clutchPlayer": "JUGADOR CLUTCH",
-    "playersReady": "Listos",
+    "playersReady": "¡LISTOS!",
     "startNewGame": "NUEVO JUEGO",
     "nextRound": "SIGUIENTE RONDA",
-    "tournamentStandings": "Clasificación del Torneo",
+    "tournamentStandings": "TABLA DEL TORNEO",
     "skip": "Saltar",
-    "qrCode": "Código QR",
-    "fullRankings": "Clasificación Completa",
-    "specialAwards": "Premios Especiales",
+    "qrCode": "Escanea para Unirte",
+    "fullRankings": "Clasificación Total",
+    "specialAwards": "🏆 Premios Especiales",
     "words": "palabras",
     "pts": "pts",
     "andMore": "...y {{count}} jugador más",
@@ -740,14 +744,14 @@ const es = {
     "legendary": "¡LEGENDARIO!",
     "amazing": "¡INCREÍBLE!",
     "onFire": "¡EN LLAMAS!",
-    "pointsApart": "¡puntos de diferencia!",
-    "bonusPts": "pts bonus",
-    "fastestFirstWord": "Primera palabra más rápida",
-    "highestAccuracy": "Mayor precisión",
-    "mostLongWords": "Más palabras de 6+ letras",
-    "bestComboStreak": "Mejor racha de combo",
-    "mostUniqueFinds": "Más hallazgos únicos",
-    "strongFinisher": "Fuerte en el final",
+    "pointsApart": "¡de diferencia!",
+    "bonusPts": "BONUS",
+    "fastestFirstWord": "¡Primera palabra en tiempo récord!",
+    "highestAccuracy": "¡Precisión perfecta!",
+    "mostLongWords": "¡Maestro de palabras largas!",
+    "bestComboStreak": "¡Racha imparable!",
+    "mostUniqueFinds": "¡Encontró palabras que nadie más vio!",
+    "strongFinisher": "¡Dominó los segundos finales!",
     "roundOf": "Ronda {{current}} de {{total}}"
   },
   "playerView": {
@@ -1468,7 +1472,13 @@ const es = {
       "solidPerformance": "Rendimiento Sólido",
       "solidPerformanceDesc": "Una actuación respetable. ¡Sigue así!",
       "gettingStarted": "Calentando",
-      "gettingStartedDesc": "Todo campeón empezó en algún lugar. ¡La siguiente ronda es tuya!"
+      "gettingStartedDesc": "Todo campeón empezó en algún lugar. ¡La siguiente ronda es tuya!",
+      "noWords": "¡La Próxima!",
+      "noWordsDesc": "¿No encontraste palabras esta ronda? No te preocupes, ¡cada juego es una oportunidad para aprender!",
+      "fewWords": "Empezando",
+      "fewWordsDesc": "{totalValidWords} {totalValidWords === 1 ? 'palabra' : 'palabras'} encontradas. ¡Sigue jugando para mejorar!",
+      "buildingSkills": "Desarrollando Habilidades",
+      "buildingSkillsDesc": "¡{totalValidWords} palabras es un comienzo. Enfócate en encontrar más palabras la próxima ronda!"
     }
   },
   "noWords": {
@@ -2010,7 +2020,8 @@ const es = {
       "letsPlay": "¡A Jugar!",
       "title": "Bienvenida"
     },
-    "skipHint": "ESC o Saltar para ir al juego 🎮"
+    "skipHint": "ESC o Saltar para ir al juego 🎮",
+    "swipeHint": "← Desliza para navegar →"
   },
   "tutorial": {
     "stepLabel": "{current}/{total}",
@@ -2111,7 +2122,8 @@ const es = {
         "sameChallenge": "¡Mismo puzzle para todos en el mundo – compara tu puntaje!",
         "start": "¡Empezar!"
       }
-    }
+    },
+    "swipeHint": "← Desliza para navegar →"
   },
   "leaderboard": {
     "title": "Clasificación",
@@ -2290,6 +2302,9 @@ const es = {
     "newHighScore": "¡Nuevo Récord!",
     "challengeComplete": "Desafío Completo",
     "noWordsFound": "No se encontraron palabras",
+    "tryAgain": "¡Inténtalo de Nuevo!",
+    "keepPracticing": "¡Sigue Practicando!",
+    "fewWordsFound": "Encontraste {validWordCount} {validWordCount === 1 ? 'palabra' : 'palabras'}",
     "achievementsNotSaved": "Los logros en modo un jugador no se guardan en tu perfil.",
     "botDetails": "Detalles del bot",
     "difficulty": "Dificultad",
@@ -2760,6 +2775,10 @@ const es = {
     "largerText": {
       "title": "Texto más grande",
       "description": "Aumenta el tamaño de fuente base un 125% para mejor legibilidad."
+    },
+    "earthquakeEffects": {
+      "title": "Desactivar Efectos de Terremoto",
+      "description": "Desactiva las animaciones intensas de terremotos, incluidos movimientos extremos, rotación 3D, desenfoque de movimiento, vibración de pantalla y escombros de partículas."
     }
   },
   "email": {
@@ -2781,6 +2800,14 @@ const es = {
     "installTitle": "Instalar LexiClash",
     "installDescription": "¡Instala nuestra app para acceso más rápido, juego sin conexión y una mejor experiencia!",
     "installButton": "Instalar ahora"
+  },
+  "newYear": {
+    "comingSoon": "Algo especial se acerca...",
+    "countdownTitle": "Cuenta Regresiva de Año Nuevo",
+    "countdownSubtitle": "¡Prepárate para celebrar!",
+    "almostThere": "¡Ya casi!",
+    "happyNewYear": "¡Feliz Año Nuevo!",
+    "celebrationMessage": "¡Te deseamos un año increíble lleno de palabras, victorias y maravillas!"
   }
 };
 

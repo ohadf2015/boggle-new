@@ -21,6 +21,7 @@ import {
   usePlayerTournamentEvents,
 } from './socket';
 import type { AchievementPayload } from '@/shared/types/socket';
+import type { GameTimerReturn } from '@/hooks/useGameTimer';
 
 interface UsePlayerSocketEventsProps {
   socket: Socket | null;
@@ -46,6 +47,9 @@ interface UsePlayerSocketEventsProps {
   setLastWordTime: React.Dispatch<React.SetStateAction<number | null>>;
   comboTimeoutRef: MutableRefObject<NodeJS.Timeout | null>;
   comboShieldsUsedRef: MutableRefObject<number>;
+
+  // Timer for multiplayer sync
+  gameTimer?: GameTimerReturn;
 
   // Exit ref
   intentionalExitRef: MutableRefObject<boolean>;
@@ -86,6 +90,9 @@ const usePlayerSocketEvents = ({
   comboTimeoutRef,
   comboShieldsUsedRef,
 
+  // Timer
+  gameTimer,
+
   // Exit ref
   intentionalExitRef,
 
@@ -114,6 +121,7 @@ const usePlayerSocketEvents = ({
     comboShieldsUsedRef,
     intentionalExitRef,
     totalGameTimeRef,
+    gameTimer,
     onGameStart,
   });
 

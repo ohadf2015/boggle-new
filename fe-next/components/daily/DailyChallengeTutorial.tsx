@@ -6,6 +6,8 @@ import { X, ArrowRight, Check, Heart, Coins } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { useSwipeGesture } from '@/hooks/useSwipeGesture';
+import { triggerHaptic } from '@/utils/hapticFeedback';
 
 export interface DailyChallengeTutorialProps {
   onComplete: () => void;
@@ -18,22 +20,34 @@ export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
   onComplete,
   onSkip,
 }) => {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const [currentStep, setCurrentStep] = useState(1);
 
   const nextStep = () => {
+    triggerHaptic('swipe');
     if (currentStep < TOTAL_STEPS) {
       setCurrentStep(currentStep + 1);
     } else {
+      triggerHaptic('success');
       onComplete();
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1) {
+      triggerHaptic('swipe');
       setCurrentStep(currentStep - 1);
     }
   };
+
+  // Swipe gesture handlers
+  const swipeHandlers = useSwipeGesture({
+    onSwipeLeft: nextStep,
+    onSwipeRight: prevStep,
+    isRtl: dir === 'rtl',
+    enableHaptic: false, // We handle haptic manually
+    threshold: 50,
+  });
 
   const renderStep = () => {
     switch (currentStep) {
@@ -53,12 +67,13 @@ export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-4">
+    <div className="fixed inset-0 bg-black/80 text-white flex items-center justify-center z-[100] p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         className="bg-white dark:bg-neo-navy rounded-neo border-4 border-neo-black max-w-lg w-full p-6 shadow-neo-brutalist relative"
+        {...swipeHandlers}
       >
         {/* Close button */}
         <button
@@ -85,18 +100,23 @@ export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
           ))}
         </div>
 
-        {/* Step content */}
+        {/* Step content with swipe support */}
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: dir === 'rtl' ? -20 : 20 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            exit={{ opacity: 0, x: dir === 'rtl' ? 20 : -20 }}
             transition={{ duration: 0.2 }}
           >
             {renderStep()}
           </motion.div>
         </AnimatePresence>
+
+        {/* Swipe hint indicator - only shown on mobile */}
+        <div className="block sm:hidden text-center text-xs text-gray-400 dark:text-gray-500 mt-4">
+          {t('tutorial.swipeHint') || '← Swipe to navigate →'}
+        </div>
       </motion.div>
     </div>
   );
@@ -198,7 +218,7 @@ const Step3LetterFeedback: React.FC<{ onNext: () => void; onPrev: () => void }> 
         <div className="flex justify-center gap-1.5 mb-3">
           <div className="w-10 h-10 bg-gray-400 rounded-lg border-2 border-gray-500 flex items-center justify-center text-white font-black text-lg shadow-hard-sm">S</div>
           <div className="w-10 h-10 bg-green-500 rounded-lg border-2 border-green-700 flex items-center justify-center text-white font-black text-lg shadow-hard-sm">E</div>
-          <div className="w-10 h-10 bg-yellow-500 rounded-lg border-2 border-yellow-600 flex items-center justify-center text-neo-black font-black text-lg shadow-hard-sm">A</div>
+          <div className="w-10 h-10 bg-yellow-500 rounded-lg border-2 border-yellow-600 flex items-center justify-center text-neo-black dark:text-neo-black font-black text-lg shadow-hard-sm">A</div>
           <div className="w-10 h-10 bg-gray-400 rounded-lg border-2 border-gray-500 flex items-center justify-center text-white font-black text-lg shadow-hard-sm">R</div>
           <div className="w-10 h-10 bg-gray-400 rounded-lg border-2 border-gray-500 flex items-center justify-center text-white font-black text-lg shadow-hard-sm">S</div>
         </div>
@@ -259,7 +279,7 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
 
         {/* Uses a try */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-neo-purple rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 bg-neo-purple text-neo-white rounded-full flex items-center justify-center">
             <span className="text-white font-bold text-xs">-1</span>
           </div>
           <div>

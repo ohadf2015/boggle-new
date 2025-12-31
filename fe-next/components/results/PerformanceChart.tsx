@@ -331,7 +331,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
             </div>
 
             {/* Overlay with message */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/60 backdrop-blur-[1px]">
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900/60 text-white backdrop-blur-[1px]">
               <motion.div
                 initial={{ scale: 0.8, rotate: -5 }}
                 animate={{ scale: 1, rotate: 0 }}

@@ -346,7 +346,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <div className="inline-flex items-center gap-1 bg-neo-cream border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard">
+        <div className="inline-flex items-center gap-1 bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo px-4 py-2 shadow-hard">
           {demoWord.split('').map((targetLetter, i) => (
             <motion.span
               key={i}

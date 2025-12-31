@@ -47,6 +47,24 @@ function generatePlayerStory(insights: PlayerInsightsData, t: (key: string) => s
     accuracy = 0
   } = insights;
 
+  // Handle zero or very low performance - no compliments for non-participation
+  if (totalValidWords === 0) {
+    return {
+      emoji: '🎯',
+      headline: t('insights.story.noWords') || 'Next Time!',
+      story: t('insights.story.noWordsDesc') || "Didn't find any words this round? Don't worry, every game is a chance to learn!"
+    };
+  }
+
+  // Very low score (1-2 words) - encouraging but honest
+  if (totalValidWords <= 2) {
+    return {
+      emoji: '🌱',
+      headline: t('insights.story.fewWords') || 'Getting Started',
+      story: t('insights.story.fewWordsDesc') || `${totalValidWords} ${totalValidWords === 1 ? 'word' : 'words'} found. Keep playing to improve!`
+    };
+  }
+
   // Determine player archetype based on stats
   const isSpeedDemon = wordsPerMinute >= 8;
   const isWordsmith = averageWordLength >= 5;
@@ -175,7 +193,7 @@ function generatePlayerStory(insights: PlayerInsightsData, t: (key: string) => s
     };
   }
 
-  // Default fallback - always find something positive
+  // Default fallback - be realistic based on word count
   if (totalValidWords >= 10) {
     return {
       emoji: '💪',
@@ -184,10 +202,20 @@ function generatePlayerStory(insights: PlayerInsightsData, t: (key: string) => s
     };
   }
 
+  // Low word count (3-9 words) - encouraging but realistic
+  if (totalValidWords >= 3) {
+    return {
+      emoji: '📚',
+      headline: t('insights.story.buildingSkills') || 'Building Skills',
+      story: t('insights.story.buildingSkillsDesc') || `${totalValidWords} words is a start. Focus on finding more words next round!`
+    };
+  }
+
+  // Fallback for edge cases (should be covered above but just in case)
   return {
     emoji: '🎮',
-    headline: t('insights.story.gettingStarted') || 'Warming Up',
-    story: t('insights.story.gettingStartedDesc') || `Every champion started somewhere. The next round is yours!`
+    headline: t('insights.story.gettingStarted') || 'Getting Started',
+    story: t('insights.story.gettingStartedDesc') || 'Keep practicing to improve your word-finding skills!'
   };
 }
 

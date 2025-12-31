@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useMemo, useCallback, useEffect, useRef } from 'react';
+import React, { memo, useMemo, useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import TvResultsWinnersPodium from './TvResultsWinnersPodium';
 import TvResultsStatsGrid from './TvResultsStatsGrid';
@@ -8,6 +8,7 @@ import TvResultsAwards from './TvResultsAwards';
 import TvResultsLeaderboard from './TvResultsLeaderboard';
 import TvResultsControls from './TvResultsControls';
 import TournamentStandings from '../../../components/TournamentStandings';
+import PlayersReadyIndicator from '../../../components/results/PlayersReadyIndicator';
 import { useTvResultsAnimation, type SoundType } from './useTvResultsAnimation';
 import { cn } from '../../../lib/utils';
 import type { PlayerResult } from '@/types/components';
@@ -33,6 +34,7 @@ interface TournamentData {
 interface PlayersReadyData {
   readyCount: number;
   totalPlayers: number;
+  readyUsernames?: string[];
 }
 
 interface TvResultsViewProps {
@@ -74,7 +76,8 @@ const TvResultsView = memo<TvResultsViewProps>(({
     return finalScores
       .filter(p => {
         const isHostUser = p.username === username || p.isHost;
-        const wordCount = p.wordsFoundCount ?? p.allWords?.length ?? 0;
+        // Check multiple possible field names for word count (backend compatibility)
+        const wordCount = (p as any).wordCount ?? p.wordsFoundCount ?? p.allWords?.length ?? 0;
 
         // Filter out host if they have 0 words and there are other players
         if (isHostUser && wordCount === 0 && finalScores.length > 1) {
@@ -171,9 +174,6 @@ const TvResultsView = memo<TvResultsViewProps>(({
 
   return (
     <div className="fixed inset-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 z-50 overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 bg-[url('/halftone-pattern.svg')] opacity-5 pointer-events-none" />
-
       {/* Main Content */}
       <div className="relative h-full flex flex-col">
         {/* Header */}
@@ -290,6 +290,26 @@ const TvResultsView = memo<TvResultsViewProps>(({
             </div>
           )}
         </div>
+
+        {/* Players Ready Indicator - Bigger for TV display */}
+        {filteredScores.length > 0 && (
+          <div className="px-8 py-6">
+            <div className="max-w-6xl mx-auto">
+              <div className="transform scale-125 origin-center">
+                <PlayersReadyIndicator
+                  players={filteredScores.map(p => ({
+                    username: p.username,
+                    avatar: p.avatar,
+                    isBot: p.isBot
+                  }))}
+                  readyUsernames={playersReady?.readyUsernames ?? []}
+                  currentUsername=""
+                  isHost={true}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Controls Bar */}
         <TvResultsControls

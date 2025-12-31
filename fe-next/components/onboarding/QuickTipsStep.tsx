@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 interface QuickTipsStepProps {
   selectedMode: 'single' | 'multi' | 'daily' | null;
   onModeSelect: (mode: 'single' | 'multi' | 'daily') => void;
+  onComplete?: () => void;
 }
 
 /**
@@ -18,6 +19,7 @@ interface QuickTipsStepProps {
 const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
   selectedMode,
   onModeSelect,
+  onComplete,
 }) => {
   const { t } = useLanguage();
 
@@ -104,7 +106,10 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
         transition={{ delay: 0.4 }}
         className="w-full"
       >
-        <div className="bg-gradient-to-br from-neo-lime to-lime-300 border-3 border-neo-black rounded-neo p-4 sm:p-5 shadow-hard text-center">
+        <div
+          className="bg-gradient-to-br from-neo-lime to-lime-300 border-3 border-neo-black rounded-neo p-4 sm:p-5 shadow-hard text-center cursor-pointer hover:shadow-hard-lg active:shadow-none active:translate-y-1 transition-all"
+          onClick={onComplete}
+        >
           <div className="flex items-center justify-center gap-2 mb-2">
             <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-neo-black" />
             <h3 className="font-black text-lg sm:text-xl text-neo-black uppercase">

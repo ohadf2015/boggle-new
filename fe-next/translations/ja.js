@@ -604,6 +604,10 @@ const ja = {
     "clickToHide": "クリックして非表示",
     "hostPlays": "プレイしたい",
     "spectatorMode": "観戦モード - ボードを見る",
+    "broadcastModeTitle": "テレビ/プロジェクターモード",
+    "broadcastModeDescription": "大画面でゲームを表示しながら観戦します（プレイしません）",
+    "broadcastModeHint": "4人以上のプレイヤーに最適！テレビに表示するには有効にしてください",
+    "broadcastSuggestion": "4人以上のプレイヤーがいますか？テレビモードで大画面に表示してみましょう！",
     "advancedSettings": "詳細設定",
     "autoValidatedCount": "単語が自動検証されました",
     "roomClosedInactivity": "非アクティブのためルームが閉じられました",
@@ -711,46 +715,46 @@ const ja = {
     }
   },
   "tvResults": {
-    "title": "結果発表!",
+    "title": "勝者誕生!",
     "champion": "チャンピオン!",
-    "runnerUp": "準優勝",
-    "bronze": "3位入賞",
-    "wordsFound": "発見した単語",
-    "longestWord": "最長の単語",
+    "runnerUp": "2位",
+    "bronze": "3位",
+    "wordsFound": "単語総数",
+    "longestWord": "最大単語",
     "firstStrike": "ファーストストライク",
-    "bestCombo": "ベストコンボ",
+    "bestCombo": "最強連続",
     "photoFinish": "接戦!",
-    "fireRoundHero": "ファイアラウンドヒーロー",
+    "fireRoundHero": "ファイアラウンドMVP",
     "lightningFingers": "電光石火",
     "sharpShooter": "シャープシューター",
     "wordWizard": "ワードウィザード",
     "comboKing": "コンボキング",
     "loneWolf": "一匹狼",
     "clutchPlayer": "クラッチプレイヤー",
-    "playersReady": "準備完了",
+    "playersReady": "準備OK!",
     "startNewGame": "新しいゲーム",
     "nextRound": "次のラウンド",
-    "tournamentStandings": "トーナメント順位",
+    "tournamentStandings": "トーナメントリーダーボード",
     "skip": "スキップ",
-    "qrCode": "QRコード",
-    "fullRankings": "完全ランキング",
-    "specialAwards": "特別賞",
+    "qrCode": "スキャンして参加",
+    "fullRankings": "全順位",
+    "specialAwards": "🏆 特別賞",
     "words": "単語",
     "pts": "ポイント",
     "andMore": "...他{{count}}人",
     "andMorePlural": "...他{{count}}人",
     "letters": "文字",
     "legendary": "伝説的!",
-    "amazing": "すごい!",
+    "amazing": "信じられない!",
     "onFire": "絶好調!",
-    "pointsApart": "ポイント差!",
-    "bonusPts": "ボーナスポイント",
-    "fastestFirstWord": "最速の最初の単語",
-    "highestAccuracy": "最高精度",
-    "mostLongWords": "最多6文字以上の単語",
-    "bestComboStreak": "最高コンボ連続",
-    "mostUniqueFinds": "最多ユニーク発見",
-    "strongFinisher": "強力なフィニッシュ",
+    "pointsApart": "差!",
+    "bonusPts": "ボーナス",
+    "fastestFirstWord": "記録的な速さの最初の単語!",
+    "highestAccuracy": "完璧な精度!",
+    "mostLongWords": "長い単語のマスター!",
+    "bestComboStreak": "止められない連続!",
+    "mostUniqueFinds": "誰も見つけられなかった単語を発見!",
+    "strongFinisher": "最後の数秒を制覇!",
     "roundOf": "ラウンド{{current}}/{{total}}"
   },
   "playerView": {
@@ -1371,7 +1375,8 @@ const ja = {
       "letsPlay": "行くぞ！",
       "title": "ようこそ"
     },
-    "skipHint": "ESCかスキップでゲームへ 🎮"
+    "skipHint": "ESCかスキップでゲームへ 🎮",
+    "swipeHint": "← スワイプで移動 →"
   },
   "tutorial": {
     "stepLabel": "{current}/{total}",
@@ -1472,7 +1477,8 @@ const ja = {
         "sameChallenge": "世界中で同じパズル – スコアを比較しよう!",
         "start": "スタート！"
       }
-    }
+    },
+    "swipeHint": "← スワイプで移動 →"
   },
   "achievements": {
     "FIRST_BLOOD": {
@@ -1698,7 +1704,13 @@ const ja = {
       "solidPerformance": "安定したパフォーマンス",
       "solidPerformanceDesc": "立派な結果。この調子で！",
       "gettingStarted": "ウォームアップ中",
-      "gettingStartedDesc": "チャンピオンも最初は初心者。次のラウンドはあなたの番！"
+      "gettingStartedDesc": "チャンピオンも最初は初心者。次のラウンドはあなたの番！",
+      "noWords": "次回頑張ろう！",
+      "noWordsDesc": "今回は単語が見つからなかった？大丈夫、毎回のゲームが学びのチャンスだよ！",
+      "fewWords": "スタート地点",
+      "fewWordsDesc": "{totalValidWords}個の単語を発見。プレイを続けて上達しよう！",
+      "buildingSkills": "スキルアップ中",
+      "buildingSkillsDesc": "{totalValidWords}個の単語は良いスタート。次のラウンドでもっと見つけよう！"
     }
   },
   "noWords": {
@@ -2292,6 +2304,9 @@ const ja = {
     "newHighScore": "新記録！",
     "challengeComplete": "チャレンジ完了",
     "noWordsFound": "単語が見つかりません",
+    "tryAgain": "もう一度！",
+    "keepPracticing": "練習を続けよう！",
+    "fewWordsFound": "{validWordCount}個の単語を発見",
     "achievementsNotSaved": "シングルプレイヤーモードの実績はプロフィールに保存されません。",
     "botDetails": "ボット詳細",
     "difficulty": "難易度",
@@ -2762,6 +2777,10 @@ const ja = {
     "largerText": {
       "title": "大きなテキスト",
       "description": "読みやすさのためにベースフォントサイズを125%増加させます。"
+    },
+    "earthquakeEffects": {
+      "title": "地震エフェクトを無効化",
+      "description": "激しい揺れ、3D回転、モーションブラー、画面の振動、パーティクル破片を含む激しい地震アニメーションをオフにします。"
     }
   },
   "email": {
@@ -2783,6 +2802,14 @@ const ja = {
     "installTitle": "LexiClashをインストール",
     "installDescription": "より速いアクセス、オフラインプレイ、より良い体験のためにアプリをインストール！",
     "installButton": "今すぐインストール"
+  },
+  "newYear": {
+    "comingSoon": "特別なことが近づいています...",
+    "countdownTitle": "年越しカウントダウン",
+    "countdownSubtitle": "お祝いの準備をしよう！",
+    "almostThere": "もうすぐです！",
+    "happyNewYear": "明けましておめでとう！",
+    "celebrationMessage": "言葉、勝利、驚きに満ちた素晴らしい一年をお祈りします！"
   }
 };
 

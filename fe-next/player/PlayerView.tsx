@@ -10,6 +10,7 @@ import { useSoundEffects } from '../contexts/SoundEffectsContext';
 import { useAchievementQueue } from '../components/achievements';
 import { usePresence } from '../hooks/usePresence';
 import { useHints } from '../hooks/useHints';
+import { useGameTimer } from '../hooks/useGameTimer';
 import logger from '@/utils/logger';
 import type { LetterGrid, Language, Avatar, GridPosition, TournamentStanding } from '@/types';
 import type {
@@ -126,10 +127,24 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   const [gameActive, setGameActive] = useState<boolean>(false);
   const [achievements, setAchievements] = useState<string[]>([]);
   // letterGrid now comes from GameStateContext (see above)
-  const [remainingTime, setRemainingTime] = useState<number | null>(null);
   // waitingForResults is now from context (see useGameStateContext above)
   const [showStartAnimation, setShowStartAnimation] = useState<boolean>(false);
   const [minWordLength, setMinWordLength] = useState<number>(2);
+
+  // Multiplayer timer - uses timestamp-based countdown that syncs with server
+  // Initial time will be set when game starts via socket event
+  const gameTimer = useGameTimer({
+    initialTime: 180, // Default, will be updated on game start
+    isPaused: !gameActive, // Pause when game is not active
+    autoStart: false, // Don't auto-start, wait for game to become active
+    onTimeUp: () => {
+      // Time up is handled by server, this is just for local display
+      logger.log('[PLAYER] Local timer reached 0');
+    },
+  });
+
+  // Use timer's remaining time for display
+  const remainingTime = gameActive ? gameTimer.remainingTime : null;
 
   // Player state
   const [playersReady, setPlayersReady] = useState<Player[]>(initialPlayers);
@@ -227,6 +242,8 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     comboShieldsUsedRef,
     intentionalExitRef,
     totalGameTimeRef,
+    // Timer sync for multiplayer
+    gameTimer,
     // Start music immediately when startGame event is received for better synchronization
     onGameStart: handleGameStart,
   });
@@ -288,24 +305,8 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     }
   }, [waitingForResults, fadeToTrack, TRACKS]);
 
-  // Client-side countdown timer
-  useEffect(() => {
-    if (!gameActive) {
-      return;
-    }
-
-    const intervalId = setInterval(() => {
-      setRemainingTime(prev => {
-        if (prev === null || prev <= 0) {
-          clearInterval(intervalId);
-          return prev;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [gameActive]);
+  // Timer is now managed by useGameTimer hook (lines 136-147)
+  // Server time updates will sync via gameTimer.setTime() in socket events
 
   // Keep refs in sync
   useEffect(() => {
@@ -375,8 +376,10 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       // Set game data and start animation
       if (pendingGameStart.letterGrid) setLetterGrid(pendingGameStart.letterGrid);
       if (pendingGameStart.timerSeconds) {
-        setRemainingTime(pendingGameStart.timerSeconds);
         totalGameTimeRef.current = pendingGameStart.timerSeconds;
+        // Sync timer with pending game start
+        gameTimer.reset();
+        gameTimer.setTime(pendingGameStart.timerSeconds);
       }
       if (pendingGameStart.minWordLength) setMinWordLength(pendingGameStart.minWordLength);
       setShowStartAnimation(true);

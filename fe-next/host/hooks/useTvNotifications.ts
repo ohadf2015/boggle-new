@@ -317,7 +317,9 @@ export function useTvNotifications({
     if (!socket || !enabled) return;
 
     const handleEarthquake = () => {
-      addNotification('earthquake', 'mega', t('tvBroadcast.notifications.earthquake'), t('tvBroadcast.notifications.gridShuffle'));
+      // Use 'subtle' tier (3s) so notification disappears right when fire round starts
+      // Timeline: warning appears (t=0s) → shake (t=2s) → fire round (t=3s) → notification gone
+      addNotification('earthquake', 'subtle', t('tvBroadcast.notifications.earthquake'), t('tvBroadcast.notifications.gridShuffle'));
     };
 
     socket.on('earthquakeWarning', handleEarthquake);

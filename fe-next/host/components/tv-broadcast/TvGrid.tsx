@@ -21,14 +21,16 @@ const TvGrid = memo<TvGridProps>(({
 }) => {
   return (
     <div className="tv-grid-container w-full h-full flex items-center justify-center p-4">
-      <GridComponent
-        grid={grid}
-        interactive={false}
-        largeText={true}
-        animateOnMount={true}
-        fireRoundActive={fireRoundActive}
-        earthquakeShaking={earthquakeShaking}
-      />
+      <div className="w-full h-full max-w-[800px] max-h-[800px] aspect-square">
+        <GridComponent
+          grid={grid}
+          interactive={false}
+          largeText={true}
+          animateOnMount={true}
+          fireRoundActive={fireRoundActive}
+          earthquakeShaking={earthquakeShaking}
+        />
+      </div>
     </div>
   );
 });

@@ -103,7 +103,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   } = useResultsData(results, t);
 
   // Celebration effect on mount - top 3 in solo-bots mode, or winner/high score
-  const shouldShowConfetti = (mode === 'solo-bots' && playerRank >= 1 && playerRank <= 3) || isWinner || results.isNewHighScore;
+  // BUT only if player actually scored points (no confetti for 0 score)
+  const hasMinimumScore = results.playerScore > 0;
+  const shouldShowConfetti = hasMinimumScore && ((mode === 'solo-bots' && playerRank >= 1 && playerRank <= 3) || isWinner || results.isNewHighScore);
 
   // Confetti colors for each rank (matching Top3Leaderboard)
   const RANK_CONFETTI_COLORS: Record<number, string[]> = {
@@ -364,12 +366,17 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           {/* Victory/Defeat indicator - compact */}
           <div className={cn(
             'w-full text-center py-2 rounded-neo border-2 border-neo-black',
-            isWinner || results.isNewHighScore
-              ? 'bg-gradient-to-r from-neo-yellow to-yellow-300'
-              : 'bg-neo-cream dark:bg-slate-700'
+            // Don't celebrate 0 score - use neutral colors
+            (results.playerScore === 0 || validWordCount === 0)
+              ? 'bg-neo-cream dark:bg-slate-700'
+              : (isWinner || results.isNewHighScore)
+                ? 'bg-gradient-to-r from-neo-yellow to-yellow-300'
+                : 'bg-neo-cream dark:bg-slate-700'
           )}>
             <div className="flex items-center justify-center gap-2">
-              {isWinner ? (
+              {results.playerScore === 0 || validWordCount === 0 ? (
+                <span className="font-black text-neo-black">🎯</span>
+              ) : isWinner ? (
                 <Trophy className="text-xl text-neo-black" />
               ) : results.isNewHighScore ? (
                 <Crown className="text-xl text-neo-black" />
@@ -377,11 +384,15 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 <span className="font-black text-neo-black">#{playerRank}</span>
               )}
               <span className="font-black text-sm uppercase text-neo-black">
-                {results.isNewHighScore
-                  ? (t('singlePlayer.newHighScore') || 'New High Score!')
-                  : isWinner
-                    ? (t('singlePlayer.victory') || 'Victory!')
-                    : (t('singlePlayer.gameOver') || 'Game Over')}
+                {results.playerScore === 0 || validWordCount === 0
+                  ? (t('singlePlayer.tryAgain') || 'Try Again!')
+                  : validWordCount <= 2
+                    ? (t('singlePlayer.keepPracticing') || 'Keep Practicing!')
+                    : results.isNewHighScore
+                      ? (t('singlePlayer.newHighScore') || 'New High Score!')
+                      : isWinner && results.playerScore > 0
+                        ? (t('singlePlayer.victory') || 'Victory!')
+                        : (t('singlePlayer.gameOver') || 'Game Over')}
               </span>
             </div>
           </div>
@@ -564,19 +575,27 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           isCurrentUserWinner={true}
           rank={mode === 'solo-bots' ? playerRank : 1}
           variant={
+            // If score is 0 or very low, always use 'completion' variant (less celebratory)
+            results.playerScore === 0 || validWordCount === 0 ? 'completion' :
             mode === 'practice' ? 'completion' :
             mode === 'challenge' && results.isNewHighScore ? (results.isNewAllTimeBest ? 'newRecord' : 'highScore') :
             mode === 'challenge' ? 'completion' :
             'ranking'
           }
           customMessage={
-            mode === 'solo-bots' && isWinner ? (t('singlePlayer.victory') || 'Victory!') :
-            mode === 'solo-bots' && playerRank <= 3 ? undefined :
+            // Low/zero score gets appropriate messaging
+            results.playerScore === 0 || validWordCount === 0 ? (t('singlePlayer.tryAgain') || 'Try Again!') :
+            validWordCount <= 2 ? (t('singlePlayer.keepPracticing') || 'Keep Practicing!') :
+            mode === 'solo-bots' && isWinner && results.playerScore > 0 ? (t('singlePlayer.victory') || 'Victory!') :
+            mode === 'solo-bots' && playerRank <= 3 && results.playerScore > 0 ? undefined :
             mode === 'solo-bots' ? (t('singlePlayer.gameOver') || 'Game Over') :
             mode === 'practice' ? (t('singlePlayer.practiceComplete') || 'Practice Complete!') :
             undefined
           }
           customAnnouncement={
+            // Low/zero score gets encouraging but honest message
+            results.playerScore === 0 || validWordCount === 0 ? (t('singlePlayer.noWordsFound') || "Didn't find any words this time") :
+            validWordCount <= 2 ? (t('singlePlayer.fewWordsFound') || `Found ${validWordCount} ${validWordCount === 1 ? 'word' : 'words'}`) :
             mode === 'solo-bots' ? `#${playerRank} ${t('results.of') || 'of'} ${allParticipants.length}` :
             mode === 'challenge' && results.previousHighScore && results.previousHighScore > results.playerScore
               ? (t('challenge.shortOf') || '{diff} points short of your record').replace('{diff}', String(results.previousHighScore - results.playerScore))

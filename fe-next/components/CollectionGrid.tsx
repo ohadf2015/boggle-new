@@ -150,7 +150,7 @@ function CollectibleBadge({ item, index, isDarkMode }: CollectibleBadgeProps) {
             <span className="text-2xl" aria-hidden="true">{collectible.icon}</span>
           )}
           {item.is_equipped && (
-            <span className="absolute -top-1 -right-1 w-4 h-4 bg-neo-lime rounded-full flex items-center justify-center text-[10px] border border-neo-black" aria-hidden="true">
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-neo-lime text-neo-black rounded-full flex items-center justify-center text-[10px] border border-neo-black" aria-hidden="true">
               ✓
             </span>
           )}

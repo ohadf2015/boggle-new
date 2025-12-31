@@ -14,6 +14,7 @@ import { DIFFICULTIES, DEFAULT_DIFFICULTY, DEFAULT_MIN_WORD_LENGTH } from '@/uti
 import type { Language, LetterGrid, DifficultyLevel, Avatar } from '@/types';
 import type { Player } from '@/hooks/useGameState';
 import type { BoardTheme } from '@/shared/types/socket';
+import { useLocalStorageState } from '@/hooks/useLocalStorageState';
 
 // ==========================================
 // Type Definitions
@@ -235,7 +236,7 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
   const [minWordLength, setMinWordLength] = useState<number>(DEFAULT_MIN_WORD_LENGTH);
   const [timerValue, setTimerValue] = useState<number>(1);
   const [timerDirection, setTimerDirection] = useState<number>(0);
-  const [hostPlayingEnabled, setHostPlayingEnabled] = useState<boolean>(true);
+  const [hostPlayingEnabled, setHostPlayingEnabled] = useLocalStorageState<boolean>('host_broadcast_mode_enabled', true);
   const [gameType, setGameType] = useState<'regular' | 'tournament'>('regular');
   const [tournamentRounds, setTournamentRounds] = useState<number>(3);
 

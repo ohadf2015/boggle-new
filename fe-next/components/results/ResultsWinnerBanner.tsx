@@ -137,6 +137,11 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
   const getRankMessage = () => {
     if (customMessage) return customMessage;
 
+    // Handle zero score - special case
+    if (winner && winner.score === 0) {
+      return t('results.noPoints') || 'No Points';
+    }
+
     // Handle single player variants
     if (variant === 'highScore') return t('singlePlayer.newHighScore') || 'New High Score!';
     if (variant === 'newRecord') return t('challenge.allTimeRecord') || 'All-Time Record!';

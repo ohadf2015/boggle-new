@@ -82,7 +82,7 @@ const HostView: React.FC<HostViewProps> = memo(({
   const [fireRoundRemaining, setFireRoundRemaining] = useState(0);
 
   // Players ready for next game state
-  const [playersReadyData, setPlayersReadyData] = useState<{ readyCount: number; totalPlayers: number } | null>(null);
+  const [playersReadyData, setPlayersReadyData] = useState<{ readyCount: number; totalPlayers: number; readyUsernames?: string[] } | null>(null);
 
   // Music ref for earthquake
   const earthquakeMusicActiveRef = useRef<boolean>(false);
@@ -218,7 +218,7 @@ const HostView: React.FC<HostViewProps> = memo(({
   useEffect(() => {
     if (!socket) return;
 
-    const handlePlayersReadyUpdate = (data: { readyCount: number; totalPlayers: number }) => {
+    const handlePlayersReadyUpdate = (data: { readyCount: number; totalPlayers: number; readyUsernames?: string[] }) => {
       setPlayersReadyData(data);
     };
 
@@ -315,7 +315,7 @@ const HostView: React.FC<HostViewProps> = memo(({
 
       {/* Dialogs */}
       {/* TV Results View - Full screen for broadcast mode (host NOT playing) */}
-      {!!tournament.finalScores && !settings.hostPlaying && (
+      {!!tournament.finalScores && !settings.hostPlaying && !runtime.waitingForResults && (
         <TvResultsView
           finalScores={(tournament.finalScores?.players ?? []) as unknown as PlayerResult[]}
           tournamentData={tournament.tournamentData as Parameters<typeof FinalScoresModal>[0]['tournamentData']}

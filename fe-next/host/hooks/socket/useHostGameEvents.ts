@@ -21,6 +21,7 @@ interface UseHostGameEventsProps {
   t: (key: string) => string;
   gameStarted: boolean;
   username: string;
+  hostPlaying: boolean;
 
   // State setters
   setGameStarted: React.Dispatch<React.SetStateAction<boolean>>;
@@ -75,6 +76,7 @@ export function useHostGameEvents({
   t,
   gameStarted,
   username,
+  hostPlaying,
   setGameStarted,
   setShowStartAnimation,
   setTableData,
@@ -222,15 +224,22 @@ export function useHostGameEvents({
 
         showGameCompleteToast(t);
 
-        if (currentOnShowResults) {
+        // Always set final scores (needed for TV broadcast mode)
+        // Wrap in expected structure with players property
+        setFinalScores({
+          players: data.scores,
+          gameCode: ''
+        });
+
+        // Only call onShowResults if host is playing (not in broadcast mode)
+        // In broadcast mode, we want to stay in HostView to show TvResultsView
+        if (hostPlaying && currentOnShowResults) {
           currentOnShowResults({
             scores: data.scores,
             letterGrid: currentTableData,
             duplicateRuleDisabled: data.duplicateRuleDisabled,
             playerCount: data.playerCount,
           });
-        } else {
-          setFinalScores(data.scores);
         }
       };
 

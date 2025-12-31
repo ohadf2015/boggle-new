@@ -154,10 +154,10 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       />
 
       {/* Main Content: Grid + Leaderboard (50/50) */}
-      <div className="flex-1 min-h-0 flex flex-col md:flex-row gap-4 p-4 max-w-7xl mx-auto w-full">
+      <div className="flex-1 min-h-0 flex flex-col md:flex-row gap-4 p-4 max-w-[2000px] mx-auto w-full">
         {/* Left: Grid - aspect-square ensures square cells */}
-        <div className="flex-1 min-h-0 flex items-center justify-center bg-neo-cream rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden">
-          {tableData && tableData.length > 0 ? (
+        <div className="flex-1 min-h-0 flex items-center justify-center bg-neo-cream text-neo-black rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden">
+          {tableData && Array.isArray(tableData) && tableData.length > 0 && tableData[0] && tableData[0].length > 0 ? (
             <TvGrid
               grid={tableData}
               fireRoundActive={fireRoundActive}
@@ -171,7 +171,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         </div>
 
         {/* Right: Leaderboard */}
-        <div className="flex-1 min-h-0 bg-neo-cream rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden">
+        <div className="flex-1 min-h-0 bg-neo-cream text-neo-black rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden">
           <TvLeaderboard
             players={leaderboardData}
             playerCombos={playerCombos}

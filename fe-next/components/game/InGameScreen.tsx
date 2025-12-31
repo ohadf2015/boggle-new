@@ -608,8 +608,8 @@ const InGameScreen = memo<InGameScreenProps>(({
                     </div>
                   </div>
 
-                  {/* Words Remaining - Compact for landscape */}
-                  {totalBoardWords !== null && totalBoardWords > 0 && (
+                  {/* Words Remaining - Compact for landscape (single-player only) */}
+                  {hints?.isSinglePlayer && totalBoardWords !== null && totalBoardWords > 0 && (
                     <WordsRemaining
                       totalWords={totalBoardWords}
                       foundWordsCount={normalizedFoundWords.filter(w => w.isValid !== false).length}
@@ -643,8 +643,8 @@ const InGameScreen = memo<InGameScreenProps>(({
                 {/* Enhanced Combo Display */}
                 <ComboDisplay comboLevel={comboLevel} />
 
-                {/* Words Remaining - 5+ letter words only */}
-                {totalBoardWords !== null && totalBoardWords !== undefined && totalBoardWords > 0 && (
+                {/* Words Remaining - 5+ letter words only (single-player only) */}
+                {hints?.isSinglePlayer && totalBoardWords !== null && totalBoardWords !== undefined && totalBoardWords > 0 && (
                   <WordsRemaining
                     totalWords={totalBoardWords}
                     foundWordsCount={normalizedFoundWords.filter(fw => fw.isValid !== false && fw.word.length >= 5).length}
@@ -1000,8 +1000,8 @@ const InGameScreen = memo<InGameScreenProps>(({
           </div>
         )}
 
-        {/* Words Remaining - 5+ letter words only */}
-        {isPlaying && totalBoardWords !== null && totalBoardWords !== undefined && totalBoardWords > 0 && (
+        {/* Words Remaining - 5+ letter words only (single-player only) */}
+        {hints?.isSinglePlayer && isPlaying && totalBoardWords !== null && totalBoardWords !== undefined && totalBoardWords > 0 && (
           <div className="flex justify-center mt-2">
             <WordsRemaining
               totalWords={totalBoardWords}
