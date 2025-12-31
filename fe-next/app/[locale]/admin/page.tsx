@@ -323,13 +323,20 @@ export default function AdminDashboard() {
     setRetryLinkExpiry(null);
 
     try {
+      const token = await getAuthToken();
+      if (!token) {
+        toast.error('Authentication required');
+        setRetryLinkLoading(false);
+        return;
+      }
+
       const today = new Date().toISOString().split('T')[0];
       const response = await fetch('/api/admin/daily-word/generate-retry-link', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
-        credentials: 'include',
         body: JSON.stringify({
           puzzleDate: today,
           language: retryLinkLanguage,

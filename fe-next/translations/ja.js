@@ -393,7 +393,16 @@ const ja = {
     "wordTooLong": "長すぎ",
     "wordInvalidChars": "無効な文字",
     "gameCodeHint": "友達にコードを聞いて",
-    "invalidEmail": "メールアドレスが正しくない"
+    "invalidEmail": "メールアドレスが正しくない",
+    "invalidCharacters": "無効な文字"
+  },
+  "profileCustomization": {
+    "title": "キミ仕様にしよう！",
+    "subtitle": "アバターと名前を選んでね",
+    "avatarLabel": "キャラクターを選ぶ",
+    "namePlaceholder": "名前を入力",
+    "saveButton": "保存",
+    "skipButton": "スキップ"
   },
   "error": {
     "subscriptionFailed": "登録に失敗しました。もう一度お試しください。"
@@ -2566,7 +2575,18 @@ const ja = {
     "howToPlay": "遊び方",
     "canYouBeatMyScore": "私のスコアを超えられますか？",
     "targetWordLength": "隠された単語を見つけて：",
-    "onlyMatchingLength": "{length}文字の単語のみが試行回数を消費します！"
+    "onlyMatchingLength": "{length}文字の単語のみが試行回数を消費します！",
+    "share": {
+      "header": "LexiClash Daily #{number}",
+      "stats": "{score}ポイント | {words}語",
+      "streak": "{days}日連続!",
+      "streakMilestone7": "{days}日連続! 💪",
+      "streakMilestone30": "{days}日連続! 🏆",
+      "bragDomination": "言葉の完全支配 👑",
+      "bragCrushed": "ボードは相手にならなかった",
+      "bragSolid": "今日は順調な単語狩り",
+      "cta": "これを超えられる? 🎮"
+    }
   },
   "wordHunt": {
     "title": "ワードハント",

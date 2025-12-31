@@ -1728,6 +1728,87 @@ router.post('/community-words/disapprove', async (req: AdminRequest, res: Respon
 });
 
 /**
+ * POST /api/admin/daily-word/generate-retry-link
+ * Generate a retry token that allows any player to replay a specific daily challenge
+ */
+router.post('/daily-word/generate-retry-link', async (req: AdminRequest, res: Response): Promise<void> => {
+  try {
+    const supabase = getSupabase();
+
+    // Parse request body
+    const { puzzleDate, language } = req.body;
+
+    if (!puzzleDate || !language) {
+      res.status(400).json({ error: 'puzzleDate and language are required' });
+      return;
+    }
+
+    // Validate date format (YYYY-MM-DD)
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(puzzleDate)) {
+      res.status(400).json({ error: 'puzzleDate must be in YYYY-MM-DD format' });
+      return;
+    }
+
+    // Validate language
+    const validLanguages = ['en', 'he', 'sv', 'ja', 'es'];
+    if (!validLanguages.includes(language)) {
+      res.status(400).json({ error: `language must be one of: ${validLanguages.join(', ')}` });
+      return;
+    }
+
+    // Generate a secure random token (16 characters, URL-safe)
+    const crypto = require('crypto');
+    const token = crypto.randomBytes(12).toString('base64url');
+
+    // Calculate expiration: end of the puzzle day (midnight UTC of the next day)
+    const puzzleDateObj = new Date(puzzleDate + 'T00:00:00Z');
+    const expiresAt = new Date(puzzleDateObj);
+    expiresAt.setUTCDate(expiresAt.getUTCDate() + 1); // Next day at midnight UTC
+
+    // Insert the token into the database
+    const { data: tokenData, error: insertError } = await supabase
+      .from('daily_retry_tokens')
+      .insert({
+        token,
+        puzzle_date: puzzleDate,
+        language,
+        created_by: req.adminUser!.id,
+        expires_at: expiresAt.toISOString(),
+        use_count: 0,
+      })
+      .select('id, token, expires_at')
+      .single();
+
+    if (insertError) {
+      logger.error('ADMIN_API', `Failed to create retry token: ${insertError.message}`);
+      res.status(500).json({ error: 'Failed to create retry token' });
+      return;
+    }
+
+    // Construct the retry URL using the host from the request
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    const host = req.headers.host || 'www.lexiclash.live';
+    const retryUrl = `${protocol}://${host}/${language}/daily?retryToken=${token}`;
+
+    auditLog(req.adminUser, 'GENERATE_RETRY_LINK', { puzzleDate, language, token: tokenData.token });
+
+    res.json({
+      success: true,
+      token: tokenData.token,
+      retryUrl,
+      puzzleDate,
+      language,
+      expiresAt: tokenData.expires_at,
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Generate retry link error: ${err.message}`);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
+/**
  * GET /api/admin/community-words/stats
  * Get community words statistics by language
  */

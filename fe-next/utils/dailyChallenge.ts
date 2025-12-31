@@ -971,10 +971,22 @@ function getWordLengthEmoji(length: number): string {
 }
 
 /**
+ * Translation function type for share messages
+ */
+type TranslationFn = (key: string, params?: Record<string, string | number>) => string;
+
+/**
  * Generate a shareable result string (Wordle-style)
  * Shows word length distribution as a visual bar chart
+ * @param result - The daily challenge result
+ * @param siteUrl - Optional site URL override
+ * @param t - Optional translation function for localized messages
  */
-export function generateShareableResult(result: DailyChallengeResult, siteUrl?: string): string {
+export function generateShareableResult(
+  result: DailyChallengeResult,
+  siteUrl?: string,
+  t?: TranslationFn
+): string {
   // Build word length distribution display
   // Group by length and show as horizontal bars
   const sortedLengths = Object.entries(result.wordsByLength)
@@ -993,11 +1005,20 @@ export function generateShareableResult(result: DailyChallengeResult, siteUrl?: 
   // Format streak with milestone callouts
   let streakText = '';
   if (result.streakDays >= 30) {
-    streakText = `🔥 ${result.streakDays} day streak! 🏆\n`;
+    const text = t
+      ? t('daily.share.streakMilestone30', { days: result.streakDays })
+      : `${result.streakDays} day streak! 🏆`;
+    streakText = `🔥 ${text}\n`;
   } else if (result.streakDays >= 7) {
-    streakText = `🔥 ${result.streakDays} day streak! 💪\n`;
+    const text = t
+      ? t('daily.share.streakMilestone7', { days: result.streakDays })
+      : `${result.streakDays} day streak! 💪`;
+    streakText = `🔥 ${text}\n`;
   } else if (result.streakDays > 1) {
-    streakText = `🔥 ${result.streakDays} day streak!\n`;
+    const text = t
+      ? t('daily.share.streak', { days: result.streakDays })
+      : `${result.streakDays} day streak!`;
+    streakText = `🔥 ${text}\n`;
   }
 
   // Build URL with current origin and language
@@ -1013,21 +1034,30 @@ export function generateShareableResult(result: DailyChallengeResult, siteUrl?: 
   // Score-based brag line
   let bragLine = '';
   if (result.score >= 500) {
-    bragLine = 'Absolute word domination 👑';
+    bragLine = t ? t('daily.share.bragDomination') : 'Absolute word domination 👑';
   } else if (result.score >= 300) {
-    bragLine = 'The board never stood a chance';
+    bragLine = t ? t('daily.share.bragCrushed') : 'The board never stood a chance';
   } else if (result.score >= 150) {
-    bragLine = 'Solid word hunting today';
+    bragLine = t ? t('daily.share.bragSolid') : 'Solid word hunting today';
   }
 
+  // Get translated strings
+  const header = t
+    ? t('daily.share.header', { number: result.puzzleNumber })
+    : `LexiClash Daily #${result.puzzleNumber}`;
+  const stats = t
+    ? t('daily.share.stats', { score: result.score, words: result.wordCount })
+    : `${result.score} pts | ${result.wordCount} words`;
+  const cta = t ? t('daily.share.cta') : 'Think you can beat this? 🎮';
+
   // Build the shareable text with competitive CTA
-  return `🎯 LexiClash Daily #${result.puzzleNumber}
+  return `🎯 ${header}
 
 ${wordBars}
 
-📊 ${result.score} pts | ${result.wordCount} words${bragLine ? `\n${bragLine}` : ''}
+📊 ${stats}${bragLine ? `\n${bragLine}` : ''}
 ${streakText}
-Think you can beat this? 🎮
+${cta}
 ${dailyUrl}`;
 }
 

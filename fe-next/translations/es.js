@@ -2573,7 +2573,18 @@ const es = {
     "howToPlay": "Cómo Jugar",
     "canYouBeatMyScore": "¿Puedes superar mi puntuación?",
     "targetWordLength": "Encuentra la palabra oculta:",
-    "onlyMatchingLength": "¡Solo las palabras de {length} letras usan tus intentos!"
+    "onlyMatchingLength": "¡Solo las palabras de {length} letras usan tus intentos!",
+    "share": {
+      "header": "LexiClash Daily #{number}",
+      "stats": "{score} pts | {words} palabras",
+      "streak": "¡Racha de {days} días!",
+      "streakMilestone7": "¡Racha de {days} días! 💪",
+      "streakMilestone30": "¡Racha de {days} días! 🏆",
+      "bragDomination": "Dominación total de palabras 👑",
+      "bragCrushed": "El tablero no tuvo oportunidad",
+      "bragSolid": "Buena caza de palabras hoy",
+      "cta": "¿Crees que puedes superarlo? 🎮"
+    }
   },
   "wordHunt": {
     "title": "Caza de Palabras",

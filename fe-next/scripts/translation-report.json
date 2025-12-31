@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 1307,
+    "totalKeysInCode": 1316,
     "keyCountByLanguage": {
-      "en": 2263,
-      "he": 2263,
-      "sv": 2263,
-      "ja": 2256,
-      "es": 2263
+      "en": 2272,
+      "he": 2272,
+      "sv": 2272,
+      "ja": 2272,
+      "es": 2272
     },
     "missingFromEnglish": 0
   },
@@ -14,15 +14,7 @@
   "missingByLanguage": {
     "he": [],
     "sv": [],
-    "ja": [
-      "validation.invalidCharacters",
-      "profileCustomization.title",
-      "profileCustomization.subtitle",
-      "profileCustomization.avatarLabel",
-      "profileCustomization.namePlaceholder",
-      "profileCustomization.saveButton",
-      "profileCustomization.skipButton"
-    ],
+    "ja": [],
     "es": []
   },
   "keysNotInEnglish": {

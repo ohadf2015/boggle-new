@@ -2586,7 +2586,18 @@ const en = {
     "howToPlay": "How to Play",
     "canYouBeatMyScore": "Beat my score?",
     "targetWordLength": "Find the hidden word:",
-    "onlyMatchingLength": "Only {length}-letter words use tries!"
+    "onlyMatchingLength": "Only {length}-letter words use tries!",
+    "share": {
+      "header": "LexiClash Daily #{number}",
+      "stats": "{score} pts | {words} words",
+      "streak": "{days} day streak!",
+      "streakMilestone7": "{days} day streak! 💪",
+      "streakMilestone30": "{days} day streak! 🏆",
+      "bragDomination": "Absolute word domination 👑",
+      "bragCrushed": "The board never stood a chance",
+      "bragSolid": "Solid word hunting today",
+      "cta": "Think you can beat this? 🎮"
+    }
   },
   "wordHunt": {
     "title": "Word Hunt",

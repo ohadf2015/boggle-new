@@ -354,37 +354,107 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     // Green letters = correct position (permanently revealed)
     // Yellow letters = in word but wrong position (shown but marked yellow)
     // Green always takes priority over yellow at same position
+    // IMPORTANT: Only track yellow for a letter if target has more instances than we've found green
+    // (handles case where same letter appears multiple times in target word)
+
+    // Count letter occurrences in target word (for handling duplicates like "ARENA")
+    const targetLetterCounts = new Map<string, number>();
+    target.split('').forEach(letter => {
+      const upper = letter.toUpperCase();
+      targetLetterCounts.set(upper, (targetLetterCounts.get(upper) || 0) + 1);
+    });
+
     setAccumulatedClues(prev => {
       const updated = new Map(prev);
+
+      // First pass: add all GREEN letters (these always win)
       feedback.forEach((fb) => {
         if (fb.feedback === 'green') {
-          // Green always wins - overwrite any existing clue at this position
           updated.set(fb.position, { letter: fb.letter.toUpperCase(), type: 'green' });
-        } else if (fb.feedback === 'yellow') {
-          // Yellow only if no green exists at this position
+        }
+      });
+
+      // Count how many of each letter are GREEN in accumulated clues (after adding new greens)
+      const greenLetterCounts = new Map<string, number>();
+      updated.forEach((clue) => {
+        if (clue.type === 'green') {
+          greenLetterCounts.set(clue.letter, (greenLetterCounts.get(clue.letter) || 0) + 1);
+        }
+      });
+
+      // Second pass: add YELLOW letters only if:
+      // 1. No green at this position already
+      // 2. Target has more of this letter than we've found green (handles duplicates)
+      feedback.forEach((fb) => {
+        if (fb.feedback === 'yellow') {
+          const upperLetter = fb.letter.toUpperCase();
           const existing = updated.get(fb.position);
-          if (!existing || existing.type !== 'green') {
-            updated.set(fb.position, { letter: fb.letter.toUpperCase(), type: 'yellow' });
+          const targetCount = targetLetterCounts.get(upperLetter) || 0;
+          const greenCount = greenLetterCounts.get(upperLetter) || 0;
+
+          // Only add yellow if no green at this position AND target has more of this letter than we've found
+          if ((!existing || existing.type !== 'green') && targetCount > greenCount) {
+            updated.set(fb.position, { letter: upperLetter, type: 'yellow' });
           }
         }
       });
+
+      // Clean up: remove any existing yellow entries for letters now fully accounted for by greens
+      // This handles the case where a letter was yellow before but is now green elsewhere
+      updated.forEach((clue, position) => {
+        if (clue.type === 'yellow') {
+          const targetCount = targetLetterCounts.get(clue.letter) || 0;
+          const greenCount = greenLetterCounts.get(clue.letter) || 0;
+          if (greenCount >= targetCount) {
+            updated.delete(position);
+          }
+        }
+      });
+
       return updated;
     });
 
-    // Also update knownLetters for the "Contains:" display
-    const newKnownLetters: string[] = [];
-    feedback.forEach((fb) => {
-      if (fb.feedback === 'yellow') {
-        newKnownLetters.push(fb.letter.toUpperCase());
-      }
-    });
-    if (newKnownLetters.length > 0) {
-      setKnownLetters(prev => {
-        const updated = new Set(prev);
-        newKnownLetters.forEach(letter => updated.add(letter));
-        return updated;
+    // Update knownLetters for the "Contains:" display
+    // Only show letters as "known" if target has more instances than we've found green
+    // IMPORTANT: Count ALL greens from ALL attempts, not just current feedback
+    setKnownLetters(prev => {
+      const updated = new Set(prev);
+
+      // Count ALL green letters from ALL attempts (including current one)
+      const allGreenCounts = new Map<string, number>();
+      newAttempts.forEach((attempt) => {
+        attempt.feedback.forEach((fb) => {
+          if (fb.feedback === 'green') {
+            const upper = fb.letter.toUpperCase();
+            allGreenCounts.set(upper, (allGreenCounts.get(upper) || 0) + 1);
+          }
+        });
       });
-    }
+
+      // Add yellow letters only if target has more instances than all greens found
+      feedback.forEach((fb) => {
+        if (fb.feedback === 'yellow') {
+          const upperLetter = fb.letter.toUpperCase();
+          const targetCount = targetLetterCounts.get(upperLetter) || 0;
+          const greenCount = allGreenCounts.get(upperLetter) || 0;
+
+          // Only add to known letters if target has more than all found greens
+          if (targetCount > greenCount) {
+            updated.add(upperLetter);
+          }
+        }
+      });
+
+      // Remove letters from knownLetters if they're now fully accounted for by greens
+      allGreenCounts.forEach((greenCount, letter) => {
+        const targetCount = targetLetterCounts.get(letter) || 0;
+        if (greenCount >= targetCount) {
+          updated.delete(letter);
+        }
+      });
+
+      return updated;
+    });
 
     // Show letter feedback overlay on hint boxes
     if (feedbackTimeoutRef.current) {

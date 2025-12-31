@@ -2576,7 +2576,18 @@ const sv = {
     "howToPlay": "Hur man spelar",
     "canYouBeatMyScore": "Kan du slå mitt resultat?",
     "targetWordLength": "Hitta det dolda ordet:",
-    "onlyMatchingLength": "Endast ord med {length} bokstäver använder dina försök!"
+    "onlyMatchingLength": "Endast ord med {length} bokstäver använder dina försök!",
+    "share": {
+      "header": "LexiClash Daily #{number}",
+      "stats": "{score} poäng | {words} ord",
+      "streak": "{days} dagars streak!",
+      "streakMilestone7": "{days} dagars streak! 💪",
+      "streakMilestone30": "{days} dagars streak! 🏆",
+      "bragDomination": "Total orddominans 👑",
+      "bragCrushed": "Brädet hade ingen chans",
+      "bragSolid": "Stabil ordjakt idag",
+      "cta": "Tror du att du kan slå det här? 🎮"
+    }
   },
   "wordHunt": {
     "title": "Ordjakt",

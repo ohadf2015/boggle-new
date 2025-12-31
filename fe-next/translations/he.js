@@ -2577,7 +2577,18 @@ const he = {
     "howToPlay": "איך לשחק",
     "canYouBeatMyScore": "תוכלו לנצח את הניקוד שלי?",
     "targetWordLength": "מצאו את המילה המוסתרת:",
-    "onlyMatchingLength": "רק מילים בנות {length} אותיות משתמשות בניסיונות!"
+    "onlyMatchingLength": "רק מילים בנות {length} אותיות משתמשות בניסיונות!",
+    "share": {
+      "header": "אתגר יומי #{number} LexiClash",
+      "stats": "{score} נק' | {words} מילים",
+      "streak": "רצף של {days} ימים!",
+      "streakMilestone7": "רצף של {days} ימים! 💪",
+      "streakMilestone30": "רצף של {days} ימים! 🏆",
+      "bragDomination": "שליטה מוחלטת במילים 👑",
+      "bragCrushed": "הלוח לא עמד בי",
+      "bragSolid": "ציד מילים מוצלח היום",
+      "cta": "תצליחו לנצח את זה? 🎮"
+    }
   },
   "wordHunt": {
     "title": "ציד מילים",

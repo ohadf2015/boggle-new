@@ -263,8 +263,8 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
     }
   }, [isNewCompletion, result.score, streakMilestone, skipConfetti]);
 
-  // Generate shareable text
-  const shareText = generateShareableResult(result);
+  // Generate shareable text with translations
+  const shareText = generateShareableResult(result, undefined, t);
 
   // Handle copy to clipboard
   const handleCopy = useCallback(async () => {
