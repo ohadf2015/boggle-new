@@ -18,12 +18,11 @@ export const LifeGainAnimation: React.FC<LifeGainAnimationProps> = ({
       {amount !== null && amount > 0 && (
         <motion.div
           initial={{ opacity: 1, y: 0, scale: 1 }}
-          animate={{ opacity: 0, y: -50, scale: 1.2 }}
+          animate={{ opacity: 0, y: -30, scale: 1.2 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 1, ease: 'easeOut' }}
           onAnimationComplete={onComplete}
-          className="absolute left-1/2 -translate-x-1/2 pointer-events-none z-50"
-          style={{ top: '-40px' }}
+          className="absolute left-1/2 -translate-x-1/2 -top-8 pointer-events-none z-50"
         >
           <div className="flex items-center gap-2 text-2xl font-black text-green-500 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
             <span>+{amount}</span>

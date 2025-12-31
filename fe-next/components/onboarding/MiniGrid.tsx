@@ -25,6 +25,18 @@ interface MiniGridProps {
   className?: string;
 }
 
+// Grid measurement cache to avoid layout thrashing during touch
+interface GridMeasurements {
+  gridRect: DOMRect;
+  cellWidth: number;
+  cellHeight: number;
+  gridPaddingLeft: number;
+  gridPaddingTop: number;
+  cellWithGapWidth: number;
+  cellWithGapHeight: number;
+  timestamp: number;
+}
+
 // Get arrow direction from current cell to next cell
 const getArrowDirection = (from: GridPosition | null, to: GridPosition): string => {
   if (!from) return 'point'; // First cell - just point at it
@@ -74,12 +86,104 @@ const MiniGrid: React.FC<MiniGridProps> = ({
   const [isSelecting, setIsSelecting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
+  const gridMeasurementsRef = useRef<GridMeasurements | null>(null);
+  const isSelectingRef = useRef(false); // Ref for use in event handlers
 
-  // Get cell element from row/col
-  const getCellElement = (row: number, col: number): HTMLElement | null => {
+  // Keep isSelectingRef in sync
+  useEffect(() => {
+    isSelectingRef.current = isSelecting;
+  }, [isSelecting]);
+
+  // Measure grid layout and cache it
+  const measureGrid = useCallback((): GridMeasurements | null => {
     if (!gridRef.current) return null;
-    return gridRef.current.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-  };
+
+    const gridRect = gridRef.current.getBoundingClientRect();
+    const cols = letters[0]?.length || size;
+    const rows = letters.length;
+
+    const firstCell = gridRef.current.querySelector('[data-row="0"][data-col="0"]');
+    if (!firstCell) return null;
+
+    const firstCellRect = firstCell.getBoundingClientRect();
+    const cellWidth = firstCellRect.width;
+    const cellHeight = firstCellRect.height;
+    const gridPaddingLeft = firstCellRect.left - gridRect.left;
+    const gridPaddingTop = firstCellRect.top - gridRect.top;
+
+    // Calculate gap between cells
+    const secondCell = gridRef.current.querySelector('[data-row="0"][data-col="1"]');
+    const gapX = secondCell
+      ? secondCell.getBoundingClientRect().left - firstCellRect.right
+      : 8; // Default gap
+
+    const cellInSecondRow = rows > 1 ? gridRef.current.querySelector('[data-row="1"][data-col="0"]') : null;
+    const gapY = cellInSecondRow
+      ? cellInSecondRow.getBoundingClientRect().top - firstCellRect.bottom
+      : gapX;
+
+    const measurements: GridMeasurements = {
+      gridRect,
+      cellWidth,
+      cellHeight,
+      gridPaddingLeft,
+      gridPaddingTop,
+      cellWithGapWidth: cellWidth + gapX,
+      cellWithGapHeight: cellHeight + gapY,
+      timestamp: performance.now(),
+    };
+
+    gridMeasurementsRef.current = measurements;
+    return measurements;
+  }, [letters, size]);
+
+  // Get cell at touch position using math (not elementFromPoint which is RTL-sensitive)
+  const getCellAtPosition = useCallback((touchX: number, touchY: number): { row: number; col: number } | null => {
+    if (!gridRef.current) return null;
+
+    const cols = letters[0]?.length || size;
+    const rows = letters.length;
+
+    // Use cached measurements or measure if stale (cache valid for 100ms)
+    let measurements = gridMeasurementsRef.current;
+    const now = performance.now();
+    if (!measurements || now - measurements.timestamp > 100) {
+      measurements = measureGrid();
+      if (!measurements) return null;
+    }
+
+    const {
+      gridRect,
+      cellWidth,
+      cellHeight,
+      gridPaddingLeft,
+      gridPaddingTop,
+      cellWithGapWidth,
+      cellWithGapHeight,
+    } = measurements;
+
+    // Calculate position relative to grid
+    const adjustedX = touchX - gridRect.left - gridPaddingLeft;
+    const adjustedY = touchY - gridRect.top - gridPaddingTop;
+
+    // Calculate which cell based on position
+    const col = Math.floor(adjustedX / cellWithGapWidth);
+    const row = Math.floor(adjustedY / cellWithGapHeight);
+
+    // Bounds check
+    if (row < 0 || row >= rows || col < 0 || col >= cols) return null;
+
+    // Check if touch is within the cell (not in gap)
+    const cellStartX = col * cellWithGapWidth;
+    const cellStartY = row * cellWithGapHeight;
+    const xInCell = adjustedX - cellStartX;
+    const yInCell = adjustedY - cellStartY;
+
+    // If touch is in the gap area, don't select
+    if (xInCell > cellWidth || yInCell > cellHeight) return null;
+
+    return { row, col };
+  }, [letters, size, measureGrid]);
 
   // Check if a cell is in the selected path
   const isCellSelected = useCallback((row: number, col: number): number | null => {
@@ -158,38 +262,82 @@ const MiniGrid: React.FC<MiniGridProps> = ({
   const handleTouchStart = (e: React.TouchEvent, row: number, col: number) => {
     e.preventDefault();
     setIsSelecting(true);
+    isSelectingRef.current = true;
+    // Invalidate cache on touch start to get fresh measurements
+    gridMeasurementsRef.current = null;
     selectCell(row, col);
   };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isSelecting) return;
-    const touch = e.touches[0];
-    const element = document.elementFromPoint(touch.clientX, touch.clientY);
-    if (element?.hasAttribute('data-row')) {
-      const row = parseInt(element.getAttribute('data-row')!);
-      const col = parseInt(element.getAttribute('data-col')!);
-      selectCell(row, col);
+  // Process touch move using mathematical cell detection
+  const processTouchMove = useCallback((touchX: number, touchY: number) => {
+    if (!isSelectingRef.current) return;
+
+    const cell = getCellAtPosition(touchX, touchY);
+    if (cell) {
+      selectCell(cell.row, cell.col);
     }
-  };
+  }, [getCellAtPosition, selectCell]);
 
   const handleTouchEnd = () => {
     setIsSelecting(false);
+    isSelectingRef.current = false;
   };
 
   const handleMouseDown = (row: number, col: number) => {
     setIsSelecting(true);
+    isSelectingRef.current = true;
+    // Invalidate cache on interaction start
+    gridMeasurementsRef.current = null;
     selectCell(row, col);
   };
 
-  const handleMouseEnter = (row: number, col: number) => {
-    if (isSelecting) {
-      selectCell(row, col);
-    }
-  };
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!isSelectingRef.current) return;
+    processTouchMove(e.clientX, e.clientY);
+  }, [processTouchMove]);
 
   const handleMouseUp = () => {
     setIsSelecting(false);
+    isSelectingRef.current = false;
   };
+
+  // Attach touchmove listener with { passive: false } for proper touch handling
+  // React's synthetic events are passive by default which can cause issues
+  useEffect(() => {
+    const element = gridRef.current;
+    if (!element) return;
+
+    const handleNativeTouchMove = (e: TouchEvent) => {
+      if (!isSelectingRef.current) return;
+      // Prevent scrolling while selecting
+      if (e.cancelable) e.preventDefault();
+
+      const touch = e.touches[0];
+      if (touch) {
+        processTouchMove(touch.clientX, touch.clientY);
+      }
+    };
+
+    element.addEventListener('touchmove', handleNativeTouchMove, { passive: false });
+    return () => {
+      element.removeEventListener('touchmove', handleNativeTouchMove);
+    };
+  }, [processTouchMove]);
+
+  // Invalidate cache on resize/orientation change
+  useEffect(() => {
+    const invalidateCache = () => {
+      gridMeasurementsRef.current = null;
+    };
+
+    window.addEventListener('resize', invalidateCache);
+    window.addEventListener('orientationchange', invalidateCache);
+
+    return () => {
+      window.removeEventListener('resize', invalidateCache);
+      window.removeEventListener('orientationchange', invalidateCache);
+    };
+  }, []);
 
   // Calculate which cells should show hint (next correct cell)
   const nextHintCell = useMemo(() => {
@@ -207,30 +355,6 @@ const MiniGrid: React.FC<MiniGridProps> = ({
   // Word preview
   const formedWord = selectedCells.map((c) => c.letter).join('');
 
-  // Calculate cell positions for connection lines
-  const [cellPositions, setCellPositions] = useState<Map<string, DOMRect>>(new Map());
-
-  useEffect(() => {
-    if (!gridRef.current) return;
-
-    const updatePositions = () => {
-      const positions = new Map<string, DOMRect>();
-      for (let row = 0; row < letters.length; row++) {
-        for (let col = 0; col < letters[row].length; col++) {
-          const cell = gridRef.current?.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-          if (cell) {
-            positions.set(`${row}-${col}`, cell.getBoundingClientRect());
-          }
-        }
-      }
-      setCellPositions(positions);
-    };
-
-    updatePositions();
-    window.addEventListener('resize', updatePositions);
-    return () => window.removeEventListener('resize', updatePositions);
-  }, [letters]);
-
   // Get the arrow component for the current direction
   const ArrowIcon = arrowDirection ? ArrowComponents[arrowDirection] : null;
 
@@ -244,6 +368,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
           'grid gap-2 sm:gap-3 mx-auto relative',
           size === 3 ? 'grid-cols-3 max-w-[260px] sm:max-w-[320px]' : 'grid-cols-4 max-w-[320px] sm:max-w-[380px]'
         )}
+        onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         onTouchEnd={handleTouchEnd}
@@ -272,9 +397,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                   isHint && !isSelected && 'ring-4 ring-neo-lime shadow-[0_0_20px_rgba(132,204,22,0.6),0_0_40px_rgba(132,204,22,0.3)]'
                 )}
                 onTouchStart={(e) => handleTouchStart(e, rowIndex, colIndex)}
-                onTouchMove={handleTouchMove}
                 onMouseDown={() => handleMouseDown(rowIndex, colIndex)}
-                onMouseEnter={() => handleMouseEnter(rowIndex, colIndex)}
                 whileHover={{ scale: isSelected ? 0.95 : 1.08 }}
                 whileTap={{ scale: 0.9 }}
                 // Pulse animation for hint cell

@@ -1083,7 +1083,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           isGameOver={isGameOver}
         />
 
-        {/* Left side: Timer + Score */}
+        {/* Left side: Timer + Score + Reveal */}
         <div className="absolute left-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
           {settings.mode !== 'practice' && (
             <CircularTimer
@@ -1105,6 +1105,15 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               {t('common.score') || 'Score'}
             </div>
           </div>
+          {/* Reveal Button - below score, away from central gameplay area */}
+          <RevealButton
+            revealsUsed={revealState.revealsUsed}
+            revealableWordsCount={revealableWordCount}
+            isLoading={revealState.isLoading}
+            gameActive={!isPaused && !isGameOver && timer.remainingTime > 0}
+            onReveal={handleReveal}
+            t={t}
+          />
         </div>
 
         {/* Right side: Words count + Words Remaining + Combo */}
@@ -1175,24 +1184,15 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           </Button>
         </div>
 
-        {/* Center: Word Forming Area + Reveal Button + Grid - maximized for landscape */}
+        {/* Center: Word Forming Area + Grid - maximized for landscape */}
         <div className="flex flex-col items-center justify-center w-full h-full px-3 py-0.5 landscape-grid-container">
-          {/* Word Forming Area + Reveal Button - Permanent space above grid */}
-          <div className="flex items-center gap-2 mb-0.5">
+          {/* Word Forming Area - Permanent space above grid (keep timer section clear) */}
+          <div className="flex items-center mb-0.5">
             <WordFormingArea
               word={formedWord}
               letterCount={letterCount}
               feedback={currentFeedback}
               compact
-            />
-            {/* Reveal Button - marks letters on board */}
-            <RevealButton
-              revealsUsed={revealState.revealsUsed}
-              revealableWordsCount={revealableWordCount}
-              isLoading={revealState.isLoading}
-              gameActive={!isPaused && !isGameOver && timer.remainingTime > 0}
-              onReveal={handleReveal}
-              t={t}
             />
           </div>
           <div className="flex-1 flex items-center justify-center game-board-frame-landscape" style={{ aspectRatio: '1/1' }}>
@@ -1386,22 +1386,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         </AdaptiveMotion.div>
       </div>
 
-      {/* Word Forming Area with feedback + Reveal Button - centered below timer */}
-      <div className="flex items-center justify-center gap-3 mb-1">
+      {/* Word Forming Area with feedback - centered below timer (keep timer section clean) */}
+      <div className="flex items-center justify-center mb-1">
         <WordFormingArea
           word={formedWord}
           letterCount={letterCount}
           feedback={currentFeedback}
           compact
-        />
-        {/* Reveal Button - marks letters on board */}
-        <RevealButton
-          revealsUsed={revealState.revealsUsed}
-          revealableWordsCount={revealableWordCount}
-          isLoading={revealState.isLoading}
-          gameActive={!isPaused && !isGameOver && timer.remainingTime > 0}
-          onReveal={handleReveal}
-          t={t}
         />
       </div>
 
@@ -1546,6 +1537,18 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           </div>
         </div>
       )}
+
+      {/* Reveal Button - fixed at bottom left corner (away from timer section) */}
+      <div className="fixed bottom-0 left-0 z-40 mb-[max(env(safe-area-inset-bottom),8px)] ml-2">
+        <RevealButton
+          revealsUsed={revealState.revealsUsed}
+          revealableWordsCount={revealableWordCount}
+          isLoading={revealState.isLoading}
+          gameActive={!isPaused && !isGameOver && timer.remainingTime > 0}
+          onReveal={handleReveal}
+          t={t}
+        />
+      </div>
 
       {/* Help Button - fixed at bottom right corner, not covering the board */}
       <HelpButton

@@ -107,7 +107,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
   // Target word attempts
   const [attempts, setAttempts] = useState<TargetAttempt[]>([]);
-  const [currentFeedback, setCurrentFeedback] = useState<string>('');
 
   // Latest attempt feedback display (for animated hint box overlay)
   const [latestAttemptFeedback, setLatestAttemptFeedback] = useState<LetterFeedback[] | null>(null);
@@ -294,7 +293,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const handleWordChange = useCallback((word: string, count: number) => {
     setFormedWord(word);
     setLetterCount(count);
-    setCurrentFeedback('');
     // Don't close toast here - let it display for full duration even while forming next word
   }, []);
 
@@ -336,7 +334,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const handleTargetAttempt = useCallback((word: string, target: string) => {
     // Check if already attempted
     if (attempts.some(a => a.word === word)) {
-      setCurrentFeedback(t('wordHunt.alreadyGuessed'));
+      showToast('duplicate', t('wordHunt.alreadyGuessed') || '🔁 Already guessed!');
       return;
     }
 
@@ -424,8 +422,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       return;
     }
 
-    setCurrentFeedback(t('wordHunt.keepGoing'));
-  }, [attempts, playWordAcceptedSound, t]);
+    // Feedback shown via colored letter boxes overlay
+  }, [attempts, playWordAcceptedSound, t, showToast]);
 
   // Handle grid word discovery
   const handleWordDiscovery = useCallback(async (word: string) => {
@@ -478,9 +476,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     // Trigger life gain animation
     setLifeGainAmount(lifeGained);
 
-    // Show success feedback
+    // Show success feedback (toast only - no duplicate inline feedback)
     showToast('valid-word', `+${lifeGained} ❤️ ${tokensGained > 0 ? `+${tokensGained} 🪙` : ''}`);
-    setCurrentFeedback(`+${lifeGained} ❤️ ${tokensGained > 0 ? `+${tokensGained} 🪙` : ''}`);
   }, [discoveredWords, grid, language, playWordAcceptedSound, showToast, t, validateWordInDictionary]);
 
   // Handle game over
@@ -565,7 +562,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // Handle clue shop purchases
   const handlePurchase = useCallback((item: ClueShopItem) => {
     if (clueTokens < item.cost) {
-      setCurrentFeedback(t('wordHunt.survival.notEnoughTokens') || 'Not enough tokens!');
+      showToast('invalid-word', t('wordHunt.survival.notEnoughTokens') || 'Not enough tokens!');
       return;
     }
 
@@ -585,7 +582,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           // Cannot reveal more - refund and show feedback
           setClueTokens(prev => prev + item.cost);
           setTokensSpent(prev => prev - item.cost);
-          setCurrentFeedback(t('wordHunt.survival.cannotRevealMore') || 'Cannot reveal more letters');
+          showToast('invalid-word', t('wordHunt.survival.cannotRevealMore') || 'Cannot reveal more letters');
         }
         break;
       }
@@ -607,7 +604,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     }
 
     playWordAcceptedSound?.();
-  }, [clueTokens, targetWord, revealedLetters, eliminatedLetters, playWordAcceptedSound]);
+  }, [clueTokens, targetWord, revealedLetters, eliminatedLetters, playWordAcceptedSound, showToast, t]);
 
   // Render target word with revealed letters - responsive sizing
   const renderTargetWord = () => {
@@ -945,27 +942,19 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         </div>
       </motion.div>
 
-      {/* Feedback - only render when there's feedback to show */}
-      {currentFeedback && (
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentFeedback}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="text-center text-xs font-medium max-w-3xl mx-auto w-full mb-0.5"
-          >
-            {currentFeedback}
-          </motion.div>
-        </AnimatePresence>
-      )}
 
       {/* Life bar + Clue tokens - positioned directly above board */}
-      <div className="flex items-center gap-2 mb-1 max-w-3xl mx-auto w-full">
+      <div className="flex items-center gap-2 mb-1 max-w-3xl mx-auto w-full relative">
+        {/* Life gain animation - positioned above the life bar section, outside overflow-hidden */}
+        <LifeGainAnimation
+          amount={lifeGainAmount}
+          onComplete={() => setLifeGainAmount(null)}
+        />
+
         {/* Life bar */}
         <motion.div
           className={cn(
-            "flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden border-2 relative",
+            "flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden border-2",
             lifePoints <= 20 ? "border-red-500" : "border-neo-black"
           )}
           animate={
@@ -1026,11 +1015,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
             </motion.div>
           )}
 
-          {/* Life gain animation */}
-          <LifeGainAnimation
-            amount={lifeGainAmount}
-            onComplete={() => setLifeGainAmount(null)}
-          />
         </motion.div>
 
         {/* Clue tokens */}
