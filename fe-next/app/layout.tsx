@@ -45,19 +45,18 @@ export const metadata: Metadata = {
             'max-video-preview': -1,
         },
     },
-    // Help Google find and display favicon - PNG icons first (Google preferred)
     icons: {
-        icon: [
-            // PNG icons first - Google requires multiples of 48px
-            { url: 'https://www.lexiclash.live/icon-48.png', sizes: '48x48', type: 'image/png' },
-            { url: 'https://www.lexiclash.live/icon-96.png', sizes: '96x96', type: 'image/png' },
-            { url: 'https://www.lexiclash.live/icon-144.png', sizes: '144x144', type: 'image/png' },
-            { url: 'https://www.lexiclash.live/icon-192.png', sizes: '192x192', type: 'image/png' },
-            // SVG for modern browsers (after PNG for Google compatibility)
-            { url: 'https://www.lexiclash.live/favicon.svg', type: 'image/svg+xml' },
+        // Primary icon for Google (48px PNG - Google's preferred format)
+        icon: '/icon-48.png',
+        // Shortcut icon (favicon.ico with 16x16, 32x32, 48x48)
+        shortcut: '/favicon.ico',
+        // Apple touch icon for iOS
+        apple: '/apple-touch-icon.png',
+        // Additional sizes for other contexts
+        other: [
+            { rel: 'icon', url: '/icon-96.png', sizes: '96x96', type: 'image/png' },
+            { rel: 'icon', url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
         ],
-        shortcut: 'https://www.lexiclash.live/icon-48.png',
-        apple: 'https://www.lexiclash.live/apple-touch-icon.png',
     },
 };
 
