@@ -393,7 +393,16 @@ const es = {
     "wordTooLong": "Demasiado larga",
     "wordInvalidChars": "Caracteres inválidos",
     "gameCodeHint": "Pídele el código a tu amigo",
-    "invalidEmail": "Ese email no parece correcto"
+    "invalidEmail": "Ese email no parece correcto",
+    "invalidCharacters": "Caracteres inválidos"
+  },
+  "profileCustomization": {
+    "title": "¡Hazlo tuyo!",
+    "subtitle": "Elige tu avatar y nombre",
+    "avatarLabel": "Elige tu personaje",
+    "namePlaceholder": "Escribe tu nombre",
+    "saveButton": "Guardar",
+    "skipButton": "Saltar"
   },
   "error": {
     "subscriptionFailed": "La suscripción falló. Por favor intenta de nuevo."
@@ -1506,7 +1515,7 @@ const es = {
       "noWords": "¡La Próxima!",
       "noWordsDesc": "¿No encontraste palabras esta ronda? No te preocupes, ¡cada juego es una oportunidad para aprender!",
       "fewWords": "Empezando",
-      "fewWordsDesc": "{totalValidWords} {totalValidWords === 1 ? 'palabra' : 'palabras'} encontradas. ¡Sigue jugando para mejorar!",
+      "fewWordsDesc": "{totalValidWords} palabras encontradas. ¡Sigue jugando para mejorar!",
       "buildingSkills": "Desarrollando Habilidades",
       "buildingSkillsDesc": "¡{totalValidWords} palabras es un comienzo. Enfócate en encontrar más palabras la próxima ronda!"
     }
@@ -2745,8 +2754,8 @@ const es = {
       "text": "Todos los puntos se DUPLICAN durante los próximos 15 segundos - ¡encuentra todas las palabras que puedas!"
     },
     "directionPattern": {
-      "title": "¡Cambia de Dirección!",
-      "text": "¡Puedes cambiar de dirección mientras trazas una palabra! Ve a la derecha, luego abajo, luego en diagonal - todo en una palabra."
+      "title": "¡Prueba Formas V y L!",
+      "text": "¡Traza formas de V, L o zigzag! Tu trazo puede cambiar de dirección en cualquier punto - ve a la derecha, luego abajo, luego en diagonal, todo en una palabra."
     },
     "dismiss": "¡Entendido!"
   },

@@ -35,6 +35,7 @@ export interface ProfileData {
   utm_medium?: string | null;
   utm_campaign?: string | null;
   referrer?: string | null;
+  has_customized_profile?: boolean;
   created_at?: string;
   updated_at?: string;
   // Coins & Collectibles
@@ -93,6 +94,7 @@ export interface AuthContextValue {
   isAdmin: boolean;
   canPlayRanked: boolean;
   gamesUntilRanked: number;
+  needsProfileCustomization: boolean;
 
   // Actions
   setupProfile: (

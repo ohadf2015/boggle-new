@@ -18,6 +18,8 @@ import { useMusic } from '@/contexts/MusicContext';
 import { useComboSystem } from '@/hooks/useComboSystem';
 import { useGameTimer } from '@/hooks/useGameTimer';
 import { useWordSubmission } from '@/hooks/useWordSubmission';
+import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
+import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
 import { cn } from '@/lib/utils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { finalizeWordValidation } from '@/utils/wordValidationAPI';
@@ -108,6 +110,9 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     },
     trackMaxCombo: true,
   });
+
+  // Direction pattern guidance - shows when player only uses straight-line directions
+  const directionGuidance = useDirectionPatternGuidance();
 
   // Game timer - handles countdown with callbacks
   // Uses stableOnTimeUp to prevent timer restart on re-renders
@@ -374,6 +379,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           grid={grid}
           interactive={!isGameOver}
           onWordSubmit={handleWordSubmit}
+          onPathSubmit={directionGuidance.trackWordPath}
           onWordChange={handleWordChange}
           hideWordPreview
           hideComboIndicator={true}
@@ -404,6 +410,13 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
 
       {/* Help Panel */}
       <HelpPanel isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+
+      {/* Direction Guidance Tooltip - shows when player only uses straight-line directions */}
+      <DirectionGuidanceTooltip
+        isVisible={directionGuidance.showDirectionGuidance}
+        onDismiss={directionGuidance.dismissDirectionGuidance}
+        t={t}
+      />
 
       {/* Quit Confirmation Dialog */}
       <ConfirmationDialog

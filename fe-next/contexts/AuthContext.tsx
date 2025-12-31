@@ -18,6 +18,7 @@ import logger from '@/utils/logger';
 import { setSentryUser, clearSentryUser } from '@/utils/sentry';
 import type { User } from '@supabase/supabase-js';
 import { linkSessionToUser } from '@/utils/sessionTracking';
+import { getRandomAvatar } from '@/utils/avatarConfig';
 
 // Import types and utils from auth module
 import type { ProfileData, RankedProgress, AuthContextValue } from './auth';
@@ -135,20 +136,39 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
 
       // Get display name from OAuth provider if available
-      const oauthDisplayName = (userMetadata?.full_name as string) ||
-                               (userMetadata?.name as string);
+      // Extract FIRST NAME only from OAuth (e.g., "Anders Ekdahl" → "Anders")
+      const oauthFullName = (userMetadata?.full_name as string) ||
+                            (userMetadata?.name as string);
 
-      // Generate username and avatar: use OAuth name if available, otherwise get a fun random name
+      // Helper to get first name with proper capitalization
+      const getFirstName = (fullName: string): string => {
+        if (!fullName) return '';
+        const firstName = fullName.split(' ')[0];
+        // Capitalize first letter, lowercase rest for Latin chars: "ANDERS" → "Anders"
+        // For non-Latin (Hebrew, etc.), just return as-is
+        if (/^[A-Z]+$/.test(firstName)) {
+          return firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+        }
+        return firstName;
+      };
+
+      const oauthFirstName = oauthFullName ? getFirstName(oauthFullName) : null;
+
+      // Generate username and avatar: use OAuth first name if available, otherwise get a fun random name
       let username: string;
       let avatarEmoji: string;
       let avatarColor: string;
       let displayName: string;
 
-      if (oauthDisplayName) {
-        // OAuth provided a display name - use it with a generic avatar
+      // Always assign a random character avatar for new users
+      const randomAvatar = getRandomAvatar();
+      const avatarImage = randomAvatar.id;
+
+      if (oauthFirstName) {
+        // OAuth provided a display name - use first name with a generic avatar
         // Generic avatars are neutral and work with any name (unlike themed player names)
-        username = oauthDisplayName;
-        displayName = oauthDisplayName;
+        username = oauthFirstName;
+        displayName = oauthFirstName;
         const genericAvatar = await fetchRandomGenericAvatar();
         avatarEmoji = genericAvatar.emoji;
         avatarColor = genericAvatar.color;
@@ -167,8 +187,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         display_name: displayName,
         avatar_emoji: avatarEmoji,
         avatar_color: avatarColor,
+        avatar_image: avatarImage, // Character avatar from our avatar options
         profile_picture_url: profilePictureUrl,
         profile_picture_provider: profilePictureProvider,
+        has_customized_profile: false, // Will prompt user to customize after sign-in
       });
 
       if (createError) {
@@ -566,6 +588,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const isAuthenticated = useMemo(() => !!user && !!profile, [user, profile]);
   const isGuest = useMemo(() => !user, [user]);
   const isAdmin = useMemo(() => !!profile?.is_admin, [profile?.is_admin]);
+  const needsProfileCustomization = useMemo(
+    () => isAuthenticated && profile?.has_customized_profile === false,
+    [isAuthenticated, profile?.has_customized_profile]
+  );
 
   // Memoize the context value to prevent unnecessary re-renders of all consumers
   // This is critical for performance - without this, every state change causes all
@@ -584,6 +610,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     isAdmin,
     canPlayRanked,
     gamesUntilRanked,
+    needsProfileCustomization,
 
     // Actions
     setupProfile,
@@ -600,6 +627,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     isAdmin,
     canPlayRanked,
     gamesUntilRanked,
+    needsProfileCustomization,
     // Note: setupProfile, updateUserProfile, refreshProfile are stable due to their definitions
     refreshProfile
   ]);

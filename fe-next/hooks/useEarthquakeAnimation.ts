@@ -92,21 +92,21 @@ export function useEarthquakeAnimation({
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
         newOffsets.set(`${i}-${j}`, {
-          // OPTIMIZED: 300-500px instead of 600-1000px (50% reduction)
+          // REDUCED: Much gentler displacement for less jarring effect
           x: useEnhancedMode
-            ? (Math.random() - 0.5) * (600 + Math.random() * 400) // ±300-500px
-            : (Math.random() - 0.5) * 200,
+            ? (Math.random() - 0.5) * (150 + Math.random() * 150) // ±75-150px
+            : (Math.random() - 0.5) * 80,
           y: useEnhancedMode
-            ? (Math.random() - 0.5) * (600 + Math.random() * 400) // ±300-500px
-            : (Math.random() - 0.5) * 200,
-          // OPTIMIZED: 2-4 rotations instead of 4-6
+            ? (Math.random() - 0.5) * (150 + Math.random() * 150) // ±75-150px
+            : (Math.random() - 0.5) * 80,
+          // REDUCED: 0.5-1 rotation instead of 2-3
           rotate: useEnhancedMode
-            ? (Math.random() - 0.5) * (1440 + Math.random() * 720) // ±720-1080deg (2-3 rotations)
-            : (Math.random() - 0.5) * 360,
-          // OPTIMIZED: Tighter scale range
+            ? (Math.random() - 0.5) * (180 + Math.random() * 180) // ±90-180deg
+            : (Math.random() - 0.5) * 90,
+          // REDUCED: Tighter scale range for subtler effect
           scale: useEnhancedMode
-            ? 0.5 + Math.random() * 1.0 // 0.5 to 1.5
-            : 0.7 + Math.random() * 0.4,
+            ? 0.8 + Math.random() * 0.4 // 0.8 to 1.2
+            : 0.85 + Math.random() * 0.3,
           // Stagger animation slightly
           delay: (i + j) * 0.008, // Reduced from 0.01
         });
@@ -122,8 +122,8 @@ export function useEarthquakeAnimation({
       id: i,
       x: 50,
       y: 50,
-      vx: (Math.random() - 0.5) * 150, // Reduced from 200
-      vy: (Math.random() - 0.5) * 150,
+      vx: (Math.random() - 0.5) * 80, // Gentler particle movement
+      vy: (Math.random() - 0.5) * 80,
       rotation: Math.random() * 360,
       size: 5 + Math.random() * 7, // 5-12px
       color: PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)],
@@ -212,11 +212,11 @@ export function useEarthquakeAnimation({
   // Memoized animation config for each phase
   const getPhaseAnimation = useMemo(() => ({
     rumble: {
-      // Phase 1: Warning rumble
+      // Phase 1: Warning rumble (gentler)
       animate: {
-        x: [0, -4, 4, -4, 4, -2, 2, 0],
-        y: [0, -2, 2, -2, 2, -1, 1, 0],
-        rotate: [0, -2, 2, -2, 2, 0],
+        x: [0, -2, 2, -2, 2, -1, 1, 0],
+        y: [0, -1, 1, -1, 1, -0.5, 0.5, 0],
+        rotate: [0, -1, 1, -1, 1, 0],
         scale: 1,
         opacity: 1,
       },

@@ -393,7 +393,16 @@ const sv = {
     "wordTooLong": "Alldeles för långt",
     "wordInvalidChars": "Ogiltiga tecken",
     "gameCodeHint": "Be din vän om koden",
-    "invalidEmail": "Den e-posten ser inte rätt ut"
+    "invalidEmail": "Den e-posten ser inte rätt ut",
+    "invalidCharacters": "Ogiltiga tecken"
+  },
+  "profileCustomization": {
+    "title": "Gör det till ditt!",
+    "subtitle": "Välj avatar och namn",
+    "avatarLabel": "Välj din karaktär",
+    "namePlaceholder": "Ange ditt namn",
+    "saveButton": "Spara",
+    "skipButton": "Hoppa över"
   },
   "error": {
     "subscriptionFailed": "Prenumerationen misslyckades. Försök igen."
@@ -1739,7 +1748,7 @@ const sv = {
       "noWords": "Nästa gång!",
       "noWordsDesc": "Hittade inga ord den här omgången? Oroa dig inte, varje spel är en chans att lära!",
       "fewWords": "Komma igång",
-      "fewWordsDesc": "{totalValidWords} {totalValidWords === 1 ? 'ord' : 'ord'} hittade. Fortsätt spela för att bli bättre!",
+      "fewWordsDesc": "{totalValidWords} ord hittade. Fortsätt spela för att bli bättre!",
       "buildingSkills": "Bygger färdigheter",
       "buildingSkillsDesc": "{totalValidWords} ord är en bra start. Fokusera på att hitta fler ord nästa runda!"
     }
@@ -2748,8 +2757,8 @@ const sv = {
       "text": "Alla poäng DUBBLERAS de nästa 15 sekunderna - hitta så många ord du kan!"
     },
     "directionPattern": {
-      "title": "Byt Riktning!",
-      "text": "Du kan byta riktning medan du drar ett ord! Gå höger, sedan ner, sedan diagonalt - allt i ett ord."
+      "title": "Prova V & L-former!",
+      "text": "Dra V-former, L-former eller sicksack! Din väg kan byta riktning när som helst - gå höger, sedan ner, sedan diagonalt, allt i ett ord."
     },
     "dismiss": "Förstått!"
   },

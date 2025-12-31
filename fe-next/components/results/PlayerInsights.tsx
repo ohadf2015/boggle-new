@@ -61,7 +61,7 @@ function generatePlayerStory(insights: PlayerInsightsData, t: (key: string) => s
     return {
       emoji: '🌱',
       headline: t('insights.story.fewWords') || 'Getting Started',
-      story: t('insights.story.fewWordsDesc') || `${totalValidWords} ${totalValidWords === 1 ? 'word' : 'words'} found. Keep playing to improve!`
+      story: (t('insights.story.fewWordsDesc') || `${totalValidWords} words found. Keep playing to improve!`).replace('{totalValidWords}', String(totalValidWords))
     };
   }
 
@@ -207,7 +207,7 @@ function generatePlayerStory(insights: PlayerInsightsData, t: (key: string) => s
     return {
       emoji: '📚',
       headline: t('insights.story.buildingSkills') || 'Building Skills',
-      story: t('insights.story.buildingSkillsDesc') || `${totalValidWords} words is a start. Focus on finding more words next round!`
+      story: (t('insights.story.buildingSkillsDesc') || `${totalValidWords} words is a start. Focus on finding more words next round!`).replace('{totalValidWords}', String(totalValidWords))
     };
   }
 

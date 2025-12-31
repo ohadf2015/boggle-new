@@ -1247,37 +1247,37 @@ body {
    EARTHQUAKE/FIRE ROUND ANIMATIONS
    ==================================== */
 
-/* Earthquake shake - more violent than combo-shake */
+/* Earthquake shake - gentler screen shake effect */
 @keyframes earthquake-shake {
   0%, 100% {
     transform: translateX(0) translateY(0) rotate(0deg);
   }
   10% {
-    transform: translateX(-8px) translateY(-3px) rotate(-0.8deg);
+    transform: translateX(-3px) translateY(-1px) rotate(-0.3deg);
   }
   20% {
-    transform: translateX(8px) translateY(4px) rotate(0.8deg);
+    transform: translateX(3px) translateY(1.5px) rotate(0.3deg);
   }
   30% {
-    transform: translateX(-6px) translateY(-2px) rotate(-0.5deg);
-  }
-  40% {
-    transform: translateX(6px) translateY(3px) rotate(0.5deg);
-  }
-  50% {
-    transform: translateX(-4px) translateY(-1px) rotate(-0.3deg);
-  }
-  60% {
-    transform: translateX(4px) translateY(2px) rotate(0.3deg);
-  }
-  70% {
     transform: translateX(-2px) translateY(-1px) rotate(-0.2deg);
   }
-  80% {
+  40% {
     transform: translateX(2px) translateY(1px) rotate(0.2deg);
   }
+  50% {
+    transform: translateX(-1.5px) translateY(-0.5px) rotate(-0.15deg);
+  }
+  60% {
+    transform: translateX(1.5px) translateY(0.5px) rotate(0.15deg);
+  }
+  70% {
+    transform: translateX(-1px) translateY(-0.5px) rotate(-0.1deg);
+  }
+  80% {
+    transform: translateX(1px) translateY(0.5px) rotate(0.1deg);
+  }
   90% {
-    transform: translateX(-1px) translateY(0) rotate(-0.1deg);
+    transform: translateX(-0.5px) translateY(0) rotate(-0.05deg);
   }
 }
 

@@ -21,6 +21,11 @@ const OnboardingModal = dynamic(() => import('@/components/OnboardingModal'), {
   ssr: false,
 });
 
+// Dynamic import for ProfileCustomizationModal
+const ProfileCustomizationModal = dynamic(() => import('@/components/ProfileCustomizationModal'), {
+  ssr: false,
+});
+
 /**
  * LandingView - Main landing page with game mode selection
  * Two prominent cards: Single Player and Multiplayer
@@ -29,12 +34,15 @@ const LandingView: React.FC = () => {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { playTrack, TRACKS } = useMusic();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, needsProfileCustomization, profile, updateProfile } = useAuth();
   const isLandscape = useMobileLandscape();
   const liveRoomStats = useLiveRoomStats();
 
   // Onboarding state
   const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Profile customization state (for authenticated users who haven't customized)
+  const [showProfileCustomization, setShowProfileCustomization] = useState(false);
 
   // Check for room parameter and redirect to multiplayer page
   // This handles shared links (WhatsApp, barcode scan, copy link)
@@ -68,6 +76,28 @@ const LandingView: React.FC = () => {
 
     return () => clearTimeout(timer);
   }, [isAuthenticated]);
+
+  // Show profile customization modal for authenticated users who haven't customized
+  useEffect(() => {
+    if (!needsProfileCustomization || showOnboarding) {
+      return;
+    }
+    // Small delay to let the page settle after auth redirect
+    const timer = setTimeout(() => {
+      setShowProfileCustomization(true);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [needsProfileCustomization, showOnboarding]);
+
+  // Handle profile customization save
+  const handleProfileCustomizationSave = async (name: string, avatarId: string) => {
+    await updateProfile({
+      display_name: name,
+      username: name,
+      avatar_image: avatarId,
+      has_customized_profile: true,
+    });
+  };
 
   // Play lobby music on landing page (same as multiplayer lobby)
   // Note: We always call playTrack even if audio isn't unlocked yet
@@ -137,6 +167,14 @@ const LandingView: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
       {/* Onboarding Modal */}
       <OnboardingModal isOpen={showOnboarding} onClose={() => setShowOnboarding(false)} />
+
+      {/* Profile Customization Modal (for authenticated users who haven't customized) */}
+      <ProfileCustomizationModal
+        isOpen={showProfileCustomization}
+        onClose={() => setShowProfileCustomization(false)}
+        defaultName={profile?.display_name || profile?.username || ''}
+        onSave={handleProfileCustomizationSave}
+      />
 
       {/* Header */}
       <Header />

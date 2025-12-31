@@ -243,7 +243,7 @@ const SinglePlayerView: React.FC = () => {
     setPhase('playing');
   };
 
-  const handleGameEnd = (results: SinglePlayerResultsData) => {
+  const handleGameEnd = useCallback((results: SinglePlayerResultsData) => {
     // Track training game completion for progressive mode discovery
     // Count all single player modes as "training" games
     incrementTrainingGames();
@@ -288,7 +288,7 @@ const SinglePlayerView: React.FC = () => {
 
     setResultsData(results);
     setPhase('results');
-  };
+  }, [gameState.mode, gameState.difficulty, gameState.timerSeconds]);
 
   const handlePlayAgain = () => {
     setResultsData(null);

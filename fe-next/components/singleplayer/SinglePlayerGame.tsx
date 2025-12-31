@@ -31,6 +31,8 @@ import { cn } from '@/lib/utils';
 import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
 import { wordErrorToast } from '@/components/NeoToast';
 import { useAnnouncer } from '@/components/GameAnnouncer';
+import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
+import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
 import {
   calculateFinalAchievements,
   type WordData as AchievementWordData,
@@ -157,6 +159,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     trackMaxCombo: true,
   });
 
+  // Direction pattern guidance - shows when player only uses straight-line directions
+  const directionGuidance = useDirectionPatternGuidance();
+
   // Game timer - handles countdown with pause support
   const timer = useGameTimer({
     initialTime: settings.timerSeconds,
@@ -212,6 +217,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const botScoresRef = useRef(botScores);
   const botWordsRef = useRef(botWords);
   const gridRef = useRef(grid);
+  // Ref for onGameEnd callback to prevent race conditions in async effect
+  const onGameEndRef = useRef(onGameEnd);
 
   // Keep refs in sync (consolidated into single effect)
   useEffect(() => {
@@ -221,7 +228,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     botWordsRef.current = botWords;
     gridRef.current = grid;
     availableWordsRef.current = availableWords;
-  }, [score, foundWords, botScores, botWords, grid, availableWords]);
+    onGameEndRef.current = onGameEnd;
+  }, [score, foundWords, botScores, botWords, grid, availableWords, onGameEnd]);
 
 
   // Single player heartbeat for admin visibility
@@ -529,7 +537,6 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     if (!isGameOver || gameOverCalledRef.current || !gridRef.current) return;
 
     gameOverCalledRef.current = true;
-    let isMounted = true;
 
     // Clean up bot intervals (timer and combo handled by hooks)
     botIntervalsRef.current.forEach(clearInterval);
@@ -541,9 +548,6 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
       // Use shared utility for batch word validation
       const finalWords = await finalizeWordValidation(currentWords, settings.language, 3);
-
-      // Check if component unmounted during async validation
-      if (!isMounted) return;
 
       // Calculate final score from validated words only
       const validWords = finalWords.filter(w => w.isValid === true);
@@ -620,18 +624,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         language: settings.language,
       };
 
-      // Only call onGameEnd if component is still mounted
-      if (isMounted) {
-        onGameEnd(results);
-      }
+      // Use ref to call onGameEnd - ensures we always have latest callback
+      // and avoids race conditions with effect cleanup during async operations
+      onGameEndRef.current(results);
     };
 
     finalizeAndEndGame();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [isGameOver, settings.bots, settings.language, settings.timerSeconds, onGameEnd, combo.maxCombo]);
+    // No cleanup needed - we use ref pattern instead of isMounted check
+  }, [isGameOver, settings.bots, settings.language, settings.timerSeconds, combo.maxCombo]);
 
   // Timer is now handled by useGameTimer hook (lines 126-136)
 
@@ -1200,6 +1200,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               grid={grid}
               interactive={!isPaused}
               onWordSubmit={handleWordSubmit}
+              onPathSubmit={directionGuidance.trackWordPath}
               onWordChange={handleWordChange}
               hideWordPreview
               hideComboIndicator={true}
@@ -1216,6 +1217,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         <HelpPanel
           isOpen={isHelpOpen}
           onClose={() => setIsHelpOpen(false)}
+        />
+
+        {/* Direction Guidance Tooltip - shows when player only uses straight-line directions */}
+        <DirectionGuidanceTooltip
+          isVisible={directionGuidance.showDirectionGuidance}
+          onDismiss={directionGuidance.dismissDirectionGuidance}
+          t={t}
         />
 
         {/* Quit Confirmation Dialog */}
@@ -1483,6 +1491,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           grid={grid}
           interactive={!isPaused}
           onWordSubmit={handleWordSubmit}
+          onPathSubmit={directionGuidance.trackWordPath}
           onWordChange={handleWordChange}
           hideWordPreview
           hideComboIndicator={true}
@@ -1560,6 +1569,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       <HelpPanel
         isOpen={isHelpOpen}
         onClose={() => setIsHelpOpen(false)}
+      />
+
+      {/* Direction Guidance Tooltip - shows when player only uses straight-line directions */}
+      <DirectionGuidanceTooltip
+        isVisible={directionGuidance.showDirectionGuidance}
+        onDismiss={directionGuidance.dismissDirectionGuidance}
+        t={t}
       />
 
       {/* Quit Confirmation Dialog */}

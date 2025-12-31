@@ -398,7 +398,16 @@ const en = {
     "wordTooLong": "That's way too long",
     "wordInvalidChars": "Invalid characters",
     "gameCodeHint": "Ask your friend for the code",
-    "invalidEmail": "That email doesn't look right"
+    "invalidEmail": "That email doesn't look right",
+    "invalidCharacters": "Invalid characters"
+  },
+  "profileCustomization": {
+    "title": "Make it yours!",
+    "subtitle": "Choose your avatar and name",
+    "avatarLabel": "Pick your character",
+    "namePlaceholder": "Enter your name",
+    "saveButton": "Save",
+    "skipButton": "Skip"
   },
   "error": {
     "subscriptionFailed": "Subscription failed. Please try again."
@@ -1749,7 +1758,7 @@ const en = {
       "noWords": "Next Time!",
       "noWordsDesc": "Didn't find any words this round? Don't worry, every game is a chance to learn!",
       "fewWords": "Getting Started",
-      "fewWordsDesc": "{totalValidWords} {totalValidWords === 1 ? 'word' : 'words'} found. Keep playing to improve!",
+      "fewWordsDesc": "{totalValidWords} words found. Keep playing to improve!",
       "buildingSkills": "Building Skills",
       "buildingSkillsDesc": "{totalValidWords} words is a start. Focus on finding more words next round!"
     }
@@ -2758,8 +2767,8 @@ const en = {
       "text": "All points are DOUBLED for the next 15 seconds - find as many words as you can!"
     },
     "directionPattern": {
-      "title": "Change Directions!",
-      "text": "You can change directions while tracing a word! Go right, then down, then diagonal - all in one word."
+      "title": "Try V & L Shapes!",
+      "text": "Trace V-shapes, L-shapes, or zigzags! Your path can change direction at any point - go right, then down, then diagonal all in one word."
     },
     "dismiss": "Got it!"
   },

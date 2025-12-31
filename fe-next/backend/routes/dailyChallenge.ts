@@ -713,6 +713,39 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
     // Debug: Log successful insertion
     logger.info('API', `[WordHunt Submit] SUCCESS: id=${data.id}, playerType=${playerId ? 'authenticated' : 'guest'}, displayName=${displayName}, solved=${solved}`);
 
+    // Update leaderboard score for authenticated users who solved the challenge
+    // The efficiency score (0-100) is added to their total_score
+    // The database trigger will automatically sync to the leaderboard table
+    if (playerId && solved && efficiencyScore !== undefined && efficiencyScore > 0) {
+      try {
+        const scoreToAdd = Math.round(efficiencyScore); // Round to integer
+
+        // Fetch current score and update atomically
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('total_score')
+          .eq('id', playerId)
+          .single();
+
+        if (profile) {
+          const newTotalScore = (profile.total_score || 0) + scoreToAdd;
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ total_score: newTotalScore })
+            .eq('id', playerId);
+
+          if (updateError) {
+            logger.error('API', `[WordHunt] Failed to update leaderboard score for ${playerId}: ${updateError.message}`);
+          } else {
+            logger.info('API', `[WordHunt] Updated leaderboard score for ${playerId}: +${scoreToAdd} efficiency points (total: ${newTotalScore})`);
+          }
+        }
+      } catch (scoreError) {
+        // Log but don't fail the request - the daily challenge submission was successful
+        logger.error('API', `[WordHunt] Failed to update leaderboard score for ${playerId}: ${(scoreError as Error).message}`);
+      }
+    }
+
     res.json({
       success: true,
       data

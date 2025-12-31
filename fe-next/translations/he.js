@@ -393,7 +393,16 @@ const he = {
     "wordTooLong": "ארוך מדי",
     "wordInvalidChars": "תווים לא חוקיים",
     "gameCodeHint": "בקשו את הקוד מהחבר",
-    "invalidEmail": "האימייל לא נראה תקין"
+    "invalidEmail": "האימייל לא נראה תקין",
+    "invalidCharacters": "תווים לא חוקיים"
+  },
+  "profileCustomization": {
+    "title": "הפכו את זה לשלכם!",
+    "subtitle": "בחרו אווטאר ושם",
+    "avatarLabel": "בחרו דמות",
+    "namePlaceholder": "הכניסו את שמכם",
+    "saveButton": "שמור",
+    "skipButton": "דלג"
   },
   "error": {
     "subscriptionFailed": "ההרשמה נכשלה. אנא נסה שוב."
@@ -1740,7 +1749,7 @@ const he = {
       "noWords": "בפעם הבאה!",
       "noWordsDesc": "לא מצאת מילים בסיבוב הזה? אל תדאג, כל משחק זה הזדמנות ללמוד!",
       "fewWords": "מתחילים",
-      "fewWordsDesc": "{totalValidWords} {totalValidWords === 1 ? 'מילה' : 'מילים'} נמצאו. המשך לשחק כדי להשתפר!",
+      "fewWordsDesc": "{totalValidWords} מילים נמצאו. המשך לשחק כדי להשתפר!",
       "buildingSkills": "בונים כישורים",
       "buildingSkillsDesc": "{totalValidWords} מילים זו התחלה. התמקד במציאת יותר מילים בסיבוב הבא!"
     }
@@ -2749,8 +2758,8 @@ const he = {
       "text": "כל הנקודות מוכפלות ל-15 שניות הבאות - מצאו כמה שיותר מילים!"
     },
     "directionPattern": {
-      "title": "שנו כיוונים!",
-      "text": "אפשר לשנות כיוון בזמן שרושמים מילה! לכו ימינה, אז למטה, אז באלכסון - הכל במילה אחת."
+      "title": "נסו צורות V ו-L!",
+      "text": "סמנו בצורת V, L או זיגזג! המסלול יכול לשנות כיוון בכל נקודה - לכו ימינה, אז למטה, אז באלכסון, הכל במילה אחת."
     },
     "dismiss": "הבנתי!"
   },
