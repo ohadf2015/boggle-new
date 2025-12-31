@@ -47,9 +47,9 @@ export const ALLOWED_IMAGE_DOMAINS: string[] = [
   'res.cloudinary.com',
   'storage.googleapis.com',
   'firebasestorage.googleapis.com',
-  // SECURITY: Only allow OUR specific Supabase project domains, not all *.supabase.co domains
+  // SECURITY: Use specific project domains when available, fallback to generic supabase.co
   // Includes both API domain and storage paths (same domain, different paths)
-  ...supabaseDomains,
+  ...(supabaseDomains.length > 0 ? supabaseDomains : ['supabase.co']),
 ].filter(Boolean);
 
 // ==================== Base Schemas ====================

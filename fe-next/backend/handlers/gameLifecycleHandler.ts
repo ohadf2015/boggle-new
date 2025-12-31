@@ -44,7 +44,7 @@ const timerManager = require('../utils/timerManager');
 const redisClient = require('../redisClient');
 const { inc, ensureGame } = require('../utils/metrics');
 const { generateRandomAvatar } = require('../utils/gameUtils');
-const { getRandomLongWordsWithTheme } = require('../dictionary');
+const { getRandomLongWordsWithTheme, ensureLanguageLoaded } = require('../dictionary');
 const logger = require('../utils/logger');
 const { startGameTimer, endGame } = require('./shared');
 const { findAllWords, getCachedTrie } = require('../modules/boggleSolver');
@@ -155,6 +155,16 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         allowLateJoin: isRanked ? false : true
       });
 
+      // Preload the language dictionary for this game
+      const gameLang = language || 'en';
+      try {
+        await ensureLanguageLoaded(gameLang);
+        logger.debug('DICT', `Language ${gameLang} preloaded for game ${gameCode}`);
+      } catch (error) {
+        logger.error('DICT', `Failed to preload language ${gameLang} for game ${gameCode}: ${error}`);
+        // Continue anyway - will try again when game starts
+      }
+
       // Add host as first user
       const hostAvatar = avatar || generateRandomAvatar();
       addUserToGame(gameCode, hostUsername || 'Host', socket.id, {
@@ -243,7 +253,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
   });
 
   // Handle game start
-  socket.on('startGame', (data: StartGamePayload) => {
+  socket.on('startGame', async (data: StartGamePayload) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
@@ -295,13 +305,23 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
     const validTimer = Math.max(30, Math.min(600, parseInt(String(timerSeconds), 10) || 180));
 
+    // Ensure the language dictionary is loaded before starting the game
+    const gameLang = language || game.language || 'en';
+    try {
+      await ensureLanguageLoaded(gameLang);
+      logger.debug('DICT', `Language ${gameLang} loaded for game ${gameCode}`);
+    } catch (error) {
+      logger.error('DICT', `Failed to load language ${gameLang} for game ${gameCode}: ${error}`);
+      // Continue anyway - word validation will use community validation as fallback
+    }
+
     // Update game settings first
     updateGame(gameCode, {
       letterGrid,
       timerSeconds: validTimer,
       remainingTime: validTimer,
       gameDuration: validTimer,
-      language: language || game.language,
+      language: gameLang,
       minWordLength: minWordLength || 2,
       difficulty: difficulty || 'MEDIUM',
       gameStartedAt: Date.now(),
@@ -336,7 +356,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     broadcastToRoom(io, getGameRoom(gameCode), 'startGame', {
       letterGrid,
       timerSeconds: validTimer,
-      language: language || game.language,
+      language: gameLang,
       minWordLength: minWordLength || 2,
       messageId,
       gameSessionId: game.gameSessionId,
@@ -344,7 +364,6 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     });
 
     // Calculate and emit total words on board (async, non-blocking)
-    const gameLang = language || game.language;
     setImmediate(() => {
       try {
         const trie = getCachedTrie(gameLang);

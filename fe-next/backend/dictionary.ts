@@ -889,6 +889,7 @@ export const isValidSpanishWord = (word: string): boolean | null => dictionary.i
 export const getRandomKanjiCompounds = (count?: number, minLength?: number, maxLength?: number): string[] => dictionary.getRandomKanjiCompounds(count, minLength, maxLength);
 export const getRandomLongWords = (language: Language, count?: number, minLength?: number, maxLength?: number): string[] => dictionary.getRandomLongWords(language, count, minLength, maxLength);
 export const getRandomLongWordsWithTheme = (language: Language, count?: number, minLength?: number, maxLength?: number): ThemedWordsResult => dictionary.getRandomLongWordsWithTheme(language, count, minLength, maxLength);
+export const ensureLanguageLoaded = (language: Language): Promise<void> => dictionary.ensureLanguageLoaded(language);
 export { getCurrentTheme };
 
 // CommonJS exports for backward compatibility
@@ -912,4 +913,5 @@ module.exports = {
   getRandomLongWords,
   getRandomLongWordsWithTheme,
   getCurrentTheme,
+  ensureLanguageLoaded,
 };

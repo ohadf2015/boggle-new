@@ -53,7 +53,7 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
   // Name validation
   const minLength = 2;
   const maxLength = 20;
-  const isValidFormat = /^[\p{L}\p{N}\s']+$/u.test(displayName) || displayName === '';
+  const isValidFormat = /^[\p{L}\p{N}\s._-]+$/u.test(displayName) || displayName === '';
   const isValidLength = displayName.trim().length >= minLength && displayName.length <= maxLength;
   const isNameValid = isValidFormat && isValidLength;
   const showNameError = nameTouched && displayName.length > 0 && !isNameValid;
