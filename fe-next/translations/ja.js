@@ -301,6 +301,24 @@ const ja = {
     "toggleHaptics": "触覚フィードバックを切り替え"
   },
   "settings": {
+    "title": "設定",
+    "appearance": "外観",
+    "language": "言語",
+    "audio": "オーディオ",
+    "music": "音楽",
+    "soundEffects": "効果音",
+    "accessibility": "アクセシビリティ",
+    "reduceMotion": "視差効果を減らす",
+    "reduceMotionDescription": "アニメーションを制限",
+    "fireRoundLights": "ファイアラウンドライト",
+    "fireRoundLightsDescription": "レインボーグロー効果",
+    "earthquakeEffects": "地震エフェクト",
+    "earthquakeEffectsDescription": "画面揺れとパーティクル",
+    "savedAutomatically": "設定は自動保存されます",
+    "on": "オン",
+    "off": "オフ",
+    "system": "システム",
+    "languageThemeSound": "言語・テーマ・サウンド",
     "lightMode": "ライトモードに切り替え",
     "darkMode": "ダークモードに切り替え",
     "theme": "テーマ",
@@ -921,6 +939,7 @@ const ja = {
     "newMessages": "新しいチャットメッセージ"
   },
   "results": {
+    "yourProgress": "あなたの進捗",
     "topPlayers": "トッププレイヤー",
     "yourPerformance": "あなたのゲーム",
     "viewDetails": "詳細を見る",
@@ -1280,12 +1299,18 @@ const ja = {
       "achievement": "実績をアンロック",
       "unlockTitles": "レベルアップで称号をアンロック"
     },
+    "quickTip": {
+      "findWords": "グリッドで単語を見つけよう",
+      "chainWords": "連鎖でコンボを決めよう",
+      "beatOpponents": "対戦相手に勝とう！"
+    },
     "newPlayer": {
       "welcomeTitle": "LexiClashへようこそ！",
       "welcomeMessage": "初めてのようですね。遊び方のクイックツアーを見ますか？",
       "showTutorial": "遊び方を教えて",
       "skipTutorial": "自分でやってみる",
-      "dontShowAgain": "再表示しない"
+      "dontShowAgain": "再表示しない",
+      "letsPlay": "さあ、プレイしよう！"
     }
   },
   "onboarding": {

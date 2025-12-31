@@ -81,10 +81,11 @@ function ToggleButton({ isOn, onToggle, isDarkMode, onLabel = 'On', offLabel = '
           : isDarkMode ? 'bg-slate-600' : 'bg-gray-300'
       )}
     >
-      <motion.div
-        className="absolute top-0.5 w-7 h-7 bg-white rounded-full border-2 border-neo-black shadow-sm"
-        animate={{ x: isOn ? 28 : 2 }}
-        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+      <div
+        className={cn(
+          "absolute top-0.5 w-7 h-7 bg-white rounded-full border-2 border-neo-black shadow-sm transition-all duration-200",
+          isOn ? "inset-inline-start-[28px]" : "inset-inline-start-[2px]"
+        )}
       />
     </button>
   );

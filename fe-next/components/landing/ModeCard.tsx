@@ -7,11 +7,6 @@ import { ArrowRight, ArrowLeft, Users, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-export interface FeatureItem {
-  icon: React.ReactNode;
-  label: string;
-}
-
 export interface LiveBadgeProps {
   openRooms: number;
   totalPlayers: number;
@@ -22,7 +17,6 @@ export interface LiveBadgeProps {
 interface ModeCardProps {
   title: string;
   description: string;
-  features: FeatureItem[];
   href: string;
   icon: React.ReactNode;
   variant: 'cyan' | 'pink';
@@ -32,12 +26,11 @@ interface ModeCardProps {
 
 /**
  * ModeCard - Large clickable card for game mode selection
- * Modern Neo-Brutalist styling with feature badges
+ * Clean Neo-Brutalist styling with optional live stats
  */
 const ModeCard: React.FC<ModeCardProps> = ({
   title,
   description,
-  features,
   href,
   icon,
   variant,
@@ -54,8 +47,6 @@ const ModeCard: React.FC<ModeCardProps> = ({
       hoverBg: 'hover:from-neo-cyan hover:to-cyan-300',
       iconBg: 'bg-neo-navy',
       iconText: 'text-neo-cyan',
-      badgeBg: 'bg-neo-navy/20 backdrop-blur-sm',
-      badgeText: 'text-neo-black font-semibold',
       arrow: 'bg-neo-navy text-neo-cyan',
     },
     pink: {
@@ -63,8 +54,6 @@ const ModeCard: React.FC<ModeCardProps> = ({
       hoverBg: 'hover:from-neo-pink hover:to-pink-300',
       iconBg: 'bg-neo-navy',
       iconText: 'text-neo-pink',
-      badgeBg: 'bg-neo-navy/20 backdrop-blur-sm',
-      badgeText: 'text-neo-black font-semibold',
       arrow: 'bg-neo-navy text-neo-pink',
     },
   };
@@ -141,16 +130,16 @@ const ModeCard: React.FC<ModeCardProps> = ({
           {description}
         </p>
 
-        {/* Live Badge - shows open rooms and players when available */}
-        {liveBadge && (liveBadge.openRooms > 0 || liveBadge.totalPlayers > 0) && (
-          <div className="flex flex-wrap gap-1 lg:gap-2 mb-2 lg:mb-4">
-            {liveBadge.openRooms > 0 && (
+        {/* Live Badge - shows open rooms and players only when meaningful (> 5) */}
+        {liveBadge && (liveBadge.openRooms > 5 || liveBadge.totalPlayers > 5) && (
+          <div className="flex flex-wrap gap-1 lg:gap-2">
+            {liveBadge.openRooms > 5 && (
               <span className="inline-flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-1 lg:py-1.5 bg-neo-lime/90 text-neo-black text-xs lg:text-sm font-bold rounded-neo border-2 border-neo-black shadow-hard-sm">
                 <LayoutGrid className="w-3 h-3 lg:w-4 lg:h-4" />
                 {liveBadge.openRooms} {liveBadge.roomsLabel}
               </span>
             )}
-            {liveBadge.totalPlayers > 0 && (
+            {liveBadge.totalPlayers > 5 && (
               <span className="inline-flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-1 lg:py-1.5 bg-neo-lime/90 text-neo-black text-xs lg:text-sm font-bold rounded-neo border-2 border-neo-black shadow-hard-sm">
                 <Users className="w-3 h-3 lg:w-4 lg:h-4" />
                 {liveBadge.totalPlayers} {liveBadge.playersLabel}
@@ -158,26 +147,6 @@ const ModeCard: React.FC<ModeCardProps> = ({
             )}
           </div>
         )}
-
-        {/* Features as icon row - simplified without tooltips */}
-        <div className="flex gap-1 lg:gap-2">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className={cn(
-                'w-6 h-6 sm:w-7 sm:h-7 lg:w-10 lg:h-10 xl:w-12 xl:h-12',
-                'rounded-neo border-2 lg:border-3 border-neo-black/30',
-                'flex items-center justify-center',
-                'text-xs sm:text-sm lg:text-base xl:text-lg',
-                styles.badgeBg,
-                styles.badgeText
-              )}
-              title={feature.label}
-            >
-              {feature.icon}
-            </div>
-          ))}
-        </div>
         {/* Removed decorative blur element */}
       </motion.div>
     </Link>

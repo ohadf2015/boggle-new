@@ -306,6 +306,24 @@ const en = {
     "toggleHaptics": "Toggle haptic feedback"
   },
   "settings": {
+    "title": "Settings",
+    "appearance": "Appearance",
+    "language": "Language",
+    "audio": "Audio",
+    "music": "Music",
+    "soundEffects": "Sound Effects",
+    "accessibility": "Accessibility",
+    "reduceMotion": "Reduce Motion",
+    "reduceMotionDescription": "Limit animations",
+    "fireRoundLights": "Fire Round Lights",
+    "fireRoundLightsDescription": "Rainbow glow effects",
+    "earthquakeEffects": "Earthquake Effects",
+    "earthquakeEffectsDescription": "Screen shake & particles",
+    "savedAutomatically": "Settings are saved automatically",
+    "on": "On",
+    "off": "Off",
+    "system": "System",
+    "languageThemeSound": "Language, Theme & Sound",
     "lightMode": "Switch to light mode",
     "darkMode": "Switch to dark mode",
     "theme": "Theme",
@@ -931,6 +949,7 @@ const en = {
     "newMessages": "New chat messages"
   },
   "results": {
+    "yourProgress": "Your Progress",
     "topPlayers": "Podium",
     "otherPlayers": "Others",
     "yourPerformance": "Your Stats",
@@ -1291,12 +1310,18 @@ const en = {
       "achievement": "Unlock achievements",
       "unlockTitles": "Unlock Titles as You Level Up"
     },
+    "quickTip": {
+      "findWords": "Find words in the grid",
+      "chainWords": "Chain words for combos",
+      "beatOpponents": "Beat your opponents!"
+    },
     "newPlayer": {
       "welcomeTitle": "Welcome to LexiClash!",
       "welcomeMessage": "Looks like this is your first time here. Would you like a quick tour of how to play?",
       "showTutorial": "Show Me How",
       "skipTutorial": "I'll Figure It Out",
-      "dontShowAgain": "Don't show this again"
+      "dontShowAgain": "Don't show this again",
+      "letsPlay": "Let's Play!"
     }
   },
   "onboarding": {

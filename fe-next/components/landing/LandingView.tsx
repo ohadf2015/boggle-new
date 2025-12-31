@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
-import { User, Users, Bot, Target, Trophy, LayoutGrid, Crown, Medal, CircleHelp } from 'lucide-react';
+import { User, Users, Bot, Trophy, LayoutGrid, Crown, CircleHelp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -179,11 +179,6 @@ const LandingView: React.FC = () => {
           <ModeCard
             title={t('landing.multiplayer') || 'Multiplayer'}
             description={t('landing.multiplayerDesc') || 'Compete with friends in real-time!'}
-            features={[
-              { icon: <LayoutGrid className="w-4 h-4" />, label: t('landing.feature.joinRooms') || 'Join Rooms' },
-              { icon: <Crown className="w-4 h-4" />, label: t('landing.feature.hostGames') || 'Host Games' },
-              { icon: <Medal className="w-4 h-4" />, label: t('landing.feature.tournaments') || 'Tournaments' },
-            ]}
             href={`/${language}/multiplayer`}
             icon={<Users className="w-6 h-6" />}
             variant="pink"
@@ -199,11 +194,6 @@ const LandingView: React.FC = () => {
           <ModeCard
             title={t('landing.singlePlayer') || 'Single Player'}
             description={t('landing.singlePlayerDesc') || 'Practice at your own pace or challenge yourself!'}
-            features={[
-              { icon: <Bot className="w-4 h-4" />, label: t('landing.feature.soloVsBots') || 'Solo vs Bots' },
-              { icon: <Target className="w-4 h-4" />, label: t('landing.feature.practiceMode') || 'Practice Mode' },
-              { icon: <Trophy className="w-4 h-4" />, label: t('landing.feature.challenges') || 'Challenges & High Scores' },
-            ]}
             href={`/${language}/singleplayer`}
             icon={<User className="w-6 h-6" />}
             variant="cyan"

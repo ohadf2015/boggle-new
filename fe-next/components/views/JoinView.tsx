@@ -4,16 +4,13 @@ import React, { useState, useEffect, useRef, useCallback, FormEvent } from 'reac
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Crown, User, RefreshCw, QrCode, HelpCircle } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
+import { Crown, User, RefreshCw, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
-import { getJoinUrl } from '@/utils/share';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LogRocket from 'logrocket';
 import { validateUsername, validateRoomName, validateGameCode, sanitizeInput } from '@/utils/validation';
@@ -68,7 +65,6 @@ const JoinView: React.FC<JoinViewProps> = ({
   const { t, language, dir } = useLanguage();
   const isLandscape = useMobileLandscape();
   const [mode, setMode] = useState<JoinMode>('join');
-  const [showQR, setShowQR] = useState<boolean>(false);
   const [showNewPlayerWelcome, setShowNewPlayerWelcome] = useState<boolean>(false);
   const [usernameError, setUsernameError] = useState<boolean>(false);
   const [roomNameError, setRoomNameError] = useState<boolean>(false);
@@ -149,7 +145,6 @@ const JoinView: React.FC<JoinViewProps> = ({
   }, [setGameCode, setUsername]);
 
   const handleCloseNewPlayerWelcome = useCallback(() => setShowNewPlayerWelcome(false), []);
-  const handleCloseQR = useCallback(() => setShowQR(false), []);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -582,38 +577,6 @@ const JoinView: React.FC<JoinViewProps> = ({
         isOpen={showNewPlayerWelcome}
         onClose={handleCloseNewPlayerWelcome}
       />
-
-      {/* QR Code Dialog */}
-      <Dialog open={showQR} onOpenChange={setShowQR}>
-        <DialogContent className="sm:max-w-md bg-white text-neo-black dark:bg-slate-800 dark:text-white border-cyan-500/30">
-          <DialogHeader>
-            <DialogTitle className="text-center text-cyan-300 flex items-center justify-center gap-2">
-              <QrCode className="w-4 h-4" />
-              {t('joinView.qrCodeTitle')}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col items-center gap-4 py-4">
-            <div className="p-6 bg-white text-neo-black rounded-lg shadow-md">
-              <QRCodeSVG value={getJoinUrl(gameCode)} size={250} level="H" includeMargin />
-            </div>
-            <h4 className="text-3xl font-bold text-cyan-400">{gameCode}</h4>
-            <p className="text-sm text-center text-slate-600 dark:text-gray-300">
-              {t('joinView.scanToJoin')} {gameCode}
-            </p>
-            <p className="text-xs text-center text-slate-500 dark:text-gray-300 mt-2">
-              {getJoinUrl(gameCode)}
-            </p>
-          </div>
-          <DialogFooter className="sm:justify-center">
-            <Button
-              onClick={handleCloseQR}
-              className="w-full bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)]"
-            >
-              {t('common.close')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Background effects */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">

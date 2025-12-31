@@ -301,6 +301,24 @@ const he = {
     "toggleHaptics": "הפעל/בטל רטט"
   },
   "settings": {
+    "title": "הגדרות",
+    "appearance": "מראה",
+    "language": "שפה",
+    "audio": "שמע",
+    "music": "מוזיקה",
+    "soundEffects": "אפקטים קוליים",
+    "accessibility": "נגישות",
+    "reduceMotion": "הפחתת תנועה",
+    "reduceMotionDescription": "הגבלת אנימציות",
+    "fireRoundLights": "תאורת סיבוב אש",
+    "fireRoundLightsDescription": "אפקטי זוהר צבעוניים",
+    "earthquakeEffects": "אפקטי רעידת אדמה",
+    "earthquakeEffectsDescription": "רעידת מסך וחלקיקים",
+    "savedAutomatically": "ההגדרות נשמרות אוטומטית",
+    "on": "פעיל",
+    "off": "כבוי",
+    "system": "מערכת",
+    "languageThemeSound": "שפה, ערכת נושא וסאונד",
     "lightMode": "עבור למצב בהיר",
     "darkMode": "עבור למצב כהה",
     "theme": "ערכת נושא",
@@ -922,6 +940,7 @@ const he = {
     "newMessages": "הודעות צ'אט חדשות"
   },
   "results": {
+    "yourProgress": "ההתקדמות שלך",
     "topPlayers": "שחקנים מובילים",
     "otherPlayers": "שחקנים אחרים",
     "yourPerformance": "המשחק שלך",
@@ -1282,12 +1301,18 @@ const he = {
       "achievement": "פתיחת הישגים",
       "unlockTitles": "פתחו תארים ככל שתעלו רמה"
     },
+    "quickTip": {
+      "findWords": "מצאו מילים בלוח",
+      "chainWords": "שרשרו מילים לקומבו",
+      "beatOpponents": "נצחו את היריבים!"
+    },
     "newPlayer": {
       "welcomeTitle": "ברוכים הבאים ללקסיקלאש!",
       "welcomeMessage": "נראה שזו הפעם הראשונה שלכם כאן. רוצים סיור מהיר איך לשחק?",
       "showTutorial": "הראה לי איך",
       "skipTutorial": "אני אסתדר",
-      "dontShowAgain": "אל תראה שוב"
+      "dontShowAgain": "אל תראה שוב",
+      "letsPlay": "!בואו נשחק"
     }
   },
   "onboarding": {

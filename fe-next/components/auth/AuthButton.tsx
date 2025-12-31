@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, LogOut, Trophy, ChevronDown, Sun, Moon, Settings, Users } from 'lucide-react';
+import { User, LogOut, Trophy, ChevronDown, Sun, Moon, Users } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useTheme } from '../../utils/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -460,180 +460,23 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
     );
   }
 
-  // Default dropdown variant
+  // Default dropdown variant - just sign in button (settings now in Header)
   return (
     <>
-      <div className="flex items-center gap-2">
-        {/* Prominent Sign In Button - Always Visible */}
-        <Button
-          size="sm"
-          onClick={() => setShowAuthModal(true)}
-          className={cn(
-            'flex items-center gap-2 rounded-full font-bold transition-all duration-300 min-h-[44px]',
-            isDarkMode
-              ? 'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] border-2 border-neo-black'
-              : 'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.4)] border-2 border-neo-black'
-          )}
-        >
-          <User size={14} />
-          <span className="hidden sm:inline">{t('auth.signIn') || 'Sign In'}</span>
-        </Button>
-
-        {/* Settings Dropdown */}
-        <div className="relative">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowUserMenu(!showUserMenu)}
-            onBlur={() => setTimeout(() => { setShowUserMenu(false); setIsLanguageExpanded(false); }, 200)}
-            aria-haspopup="menu"
-            aria-expanded={showUserMenu}
-            aria-label={t('common.settings') || 'Settings'}
-            className={cn(
-              'flex items-center gap-2 rounded-full transition-all duration-300 min-h-[44px]',
-              isDarkMode
-                ? 'bg-slate-800 text-cyan-300 hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] border-slate-700'
-                : 'bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200'
-            )}
-          >
-            <Settings size={16} aria-hidden="true" />
-            <ChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} aria-hidden="true" />
-          </Button>
-
-        {/* Guest Dropdown */}
-        <AnimatePresence>
-          {showUserMenu && (
-            <motion.div
-              initial={{ opacity: 0, y: -10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-              onMouseDown={(e) => e.preventDefault()}
-              role="menu"
-              aria-label={t('common.settings') || 'Settings'}
-              className={cn(
-                'absolute top-full mt-2 min-w-[180px] rounded-lg shadow-xl z-[100]',
-                isRTL ? 'left-0' : 'right-0',
-                isDarkMode
-                  ? 'bg-slate-800 border border-slate-700'
-                  : 'bg-white border border-gray-200'
-              )}
-            >
-              {/* Language Section - Collapsible */}
-              <div>
-                <Button
-                  role="menuitem"
-                  aria-expanded={isLanguageExpanded}
-                  aria-haspopup="true"
-                  variant="ghost"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsLanguageExpanded(!isLanguageExpanded);
-                  }}
-                  className={cn(
-                    'w-full justify-between gap-3 rounded-t-lg',
-                    isDarkMode
-                      ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg" aria-hidden="true">{currentLang.flag}</span>
-                    <span>{currentLang.name}</span>
-                  </div>
-                  <ChevronDown
-                    size={10}
-                    className={cn('transition-transform duration-200', isLanguageExpanded && 'rotate-180')}
-                    aria-hidden="true"
-                  />
-                </Button>
-
-                <AnimatePresence>
-                  {isLanguageExpanded && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="overflow-hidden"
-                    >
-                      {languages
-                        .filter(lang => lang.code !== language)
-                        .map((lang) => (
-                          <Button
-                            key={lang.code}
-                            variant="ghost"
-                            onClick={() => {
-                              setLanguage(lang.code);
-                              setIsLanguageExpanded(false);
-                            }}
-                            className={cn(
-                              'w-full justify-start gap-3 ps-8',
-                              isDarkMode
-                                ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
-                                : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
-                            )}
-                          >
-                            <span className="text-lg">{lang.flag}</span>
-                            <span>{lang.name}</span>
-                          </Button>
-                        ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* Divider between Language and Theme */}
-              <div className={cn(
-                'my-1 h-px',
-                isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
-              )} />
-
-              {/* Theme Toggle */}
-              <Button
-                role="menuitem"
-                variant="ghost"
-                onClick={toggleTheme}
-                className={cn(
-                  'w-full justify-start gap-3',
-                  isDarkMode
-                    ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
-                )}
-              >
-                {isDarkMode ? <Sun size={14} className="text-yellow-400" aria-hidden="true" /> : <Moon size={14} className="text-slate-600" aria-hidden="true" />}
-                <span>{isDarkMode ? (t('common.lightMode') || 'Light Mode') : (t('common.darkMode') || 'Dark Mode')}</span>
-              </Button>
-
-              {/* Divider */}
-              <div className={cn(
-                'my-1 h-px',
-                isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
-              )} aria-hidden="true" />
-
-              {/* Leaderboard Link - Now the last item */}
-              <Button
-                role="menuitem"
-                variant="ghost"
-                onClick={() => {
-                  router.push(`/${language}/leaderboard`);
-                  setShowUserMenu(false);
-                }}
-                className={cn(
-                  'w-full justify-start gap-3 rounded-b-lg',
-                  isDarkMode
-                    ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
-                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
-                )}
-              >
-                <Trophy size={14} aria-hidden="true" />
-                <span>{t('leaderboard.title') || 'Leaderboard'}</span>
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        </div>
-      </div>
+      {/* Prominent Sign In Button */}
+      <Button
+        size="sm"
+        onClick={() => setShowAuthModal(true)}
+        className={cn(
+          'flex items-center gap-2 rounded-full font-bold transition-all duration-300 min-h-[44px]',
+          isDarkMode
+            ? 'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] border-2 border-neo-black'
+            : 'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.4)] border-2 border-neo-black'
+        )}
+      >
+        <User size={14} />
+        <span className="hidden sm:inline">{t('auth.signIn') || 'Sign In'}</span>
+      </Button>
 
       <AuthModal
         isOpen={showAuthModal}

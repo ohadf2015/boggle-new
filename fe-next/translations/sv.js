@@ -301,6 +301,24 @@ const sv = {
     "toggleHaptics": "Växla haptisk feedback"
   },
   "settings": {
+    "title": "Inställningar",
+    "appearance": "Utseende",
+    "language": "Språk",
+    "audio": "Ljud",
+    "music": "Musik",
+    "soundEffects": "Ljudeffekter",
+    "accessibility": "Tillgänglighet",
+    "reduceMotion": "Reducera rörelse",
+    "reduceMotionDescription": "Begränsa animeringar",
+    "fireRoundLights": "Eldrundeljus",
+    "fireRoundLightsDescription": "Regnbågssken effekter",
+    "earthquakeEffects": "Jordbävningseffekter",
+    "earthquakeEffectsDescription": "Skakningar & partiklar",
+    "savedAutomatically": "Inställningar sparas automatiskt",
+    "on": "På",
+    "off": "Av",
+    "system": "System",
+    "languageThemeSound": "Språk, Tema & Ljud",
     "lightMode": "Byt till ljust läge",
     "darkMode": "Byt till mörkt läge",
     "theme": "Tema",
@@ -921,6 +939,7 @@ const sv = {
     "newMessages": "Nya chattmeddelanden"
   },
   "results": {
+    "yourProgress": "Din Utveckling",
     "topPlayers": "Toppspelare",
     "otherPlayers": "Andra spelare",
     "yourPerformance": "Ditt spel",
@@ -1281,12 +1300,18 @@ const sv = {
       "achievement": "Lås upp prestationer",
       "unlockTitles": "Lås upp titlar när du stiger i nivå"
     },
+    "quickTip": {
+      "findWords": "Hitta ord i rutnätet",
+      "chainWords": "Kedja ord för kombos",
+      "beatOpponents": "Besegra dina motståndare!"
+    },
     "newPlayer": {
       "welcomeTitle": "Välkommen till LexiClash!",
       "welcomeMessage": "Det verkar som att det här är din första gång här. Vill du ha en snabb genomgång av hur man spelar?",
       "showTutorial": "Visa mig hur",
       "skipTutorial": "Jag klarar mig",
-      "dontShowAgain": "Visa inte detta igen"
+      "dontShowAgain": "Visa inte detta igen",
+      "letsPlay": "Nu kör vi!"
     }
   },
   "onboarding": {

@@ -301,6 +301,24 @@ const es = {
     "toggleHaptics": "Activar/desactivar retroalimentación háptica"
   },
   "settings": {
+    "title": "Configuración",
+    "appearance": "Apariencia",
+    "language": "Idioma",
+    "audio": "Audio",
+    "music": "Música",
+    "soundEffects": "Efectos de Sonido",
+    "accessibility": "Accesibilidad",
+    "reduceMotion": "Reducir Movimiento",
+    "reduceMotionDescription": "Limitar animaciones",
+    "fireRoundLights": "Luces de Ronda de Fuego",
+    "fireRoundLightsDescription": "Efectos de brillo arcoíris",
+    "earthquakeEffects": "Efectos de Terremoto",
+    "earthquakeEffectsDescription": "Vibración y partículas",
+    "savedAutomatically": "Los ajustes se guardan automáticamente",
+    "on": "Sí",
+    "off": "No",
+    "system": "Sistema",
+    "languageThemeSound": "Idioma, Tema y Sonido",
     "lightMode": "Cambiar a modo claro",
     "darkMode": "Cambiar a modo oscuro",
     "theme": "Tema",
@@ -918,6 +936,7 @@ const es = {
     "newMessages": "Nuevos mensajes de chat"
   },
   "results": {
+    "yourProgress": "Tu Progreso",
     "topPlayers": "Top Jugadores",
     "otherPlayers": "Otros Jugadores",
     "yourPerformance": "Tu Juego",
@@ -1245,12 +1264,18 @@ const es = {
       "achievement": "Desbloquear logros",
       "unlockTitles": "Desbloquea Títulos al Subir de Nivel"
     },
+    "quickTip": {
+      "findWords": "Encuentra palabras en la cuadrícula",
+      "chainWords": "Encadena palabras para combos",
+      "beatOpponents": "¡Vence a tus oponentes!"
+    },
     "newPlayer": {
       "welcomeTitle": "¡Bienvenido a LexiClash!",
       "welcomeMessage": "Parece que es tu primera vez aquí. ¿Te gustaría un tour rápido de cómo jugar?",
       "showTutorial": "Muéstrame Cómo",
       "skipTutorial": "Lo Descubriré Solo",
-      "dontShowAgain": "No mostrar esto de nuevo"
+      "dontShowAgain": "No mostrar esto de nuevo",
+      "letsPlay": "¡A Jugar!"
     }
   },
   "achievements": {
