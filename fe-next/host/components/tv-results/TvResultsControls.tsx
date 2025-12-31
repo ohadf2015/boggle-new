@@ -61,7 +61,7 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
                   <Button
                     onClick={onSkip}
                     variant="outline"
-                    className="border-2 border-neo-cream/50 text-neo-cream hover:bg-neo-cream/10"
+                    className="bg-transparent border-2 border-neo-cream/50 text-neo-cream hover:bg-neo-cream/10"
                   >
                     <SkipForward className="w-5 h-5 mr-2" />
                     {t('tvResults.skip')}
@@ -150,7 +150,7 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
                 <Button
                   onClick={onShowQR}
                   variant="outline"
-                  className="border-2 border-neo-cream/50 text-neo-cream hover:bg-neo-cream/10"
+                  className="bg-transparent border-2 border-neo-cream/50 text-neo-cream hover:bg-neo-cream/10"
                 >
                   <QrCode className="w-5 h-5 mr-2" />
                   {t('tvResults.qrCode')}

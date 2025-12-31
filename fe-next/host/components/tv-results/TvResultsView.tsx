@@ -75,15 +75,9 @@ const TvResultsView = memo<TvResultsViewProps>(({
 
     return finalScores
       .filter(p => {
+        // Always exclude host from broadcast results - host is not a player
         const isHostUser = p.username === username || p.isHost;
-        // Check multiple possible field names for word count (backend compatibility)
-        const wordCount = (p as any).wordCount ?? p.wordsFoundCount ?? p.allWords?.length ?? 0;
-
-        // Filter out host if they have 0 words and there are other players
-        if (isHostUser && wordCount === 0 && finalScores.length > 1) {
-          return false;
-        }
-        return true;
+        return !isHostUser;
       })
       .sort((a, b) => b.score - a.score)
       .map((player, index) => ({

@@ -4,6 +4,18 @@ import { useEffect } from "react";
 import { captureError } from "@/utils/sentry";
 import { translations } from "../translations";
 
+function isChunkLoadError(error: Error): boolean {
+  const message = error.message?.toLowerCase() || "";
+  const name = error.name?.toLowerCase() || "";
+  return (
+    name === "chunkloaderror" ||
+    message.includes("loading chunk") ||
+    message.includes("failed to load chunk") ||
+    message.includes("loading css chunk") ||
+    message.includes("dynamically imported module")
+  );
+}
+
 export default function GlobalError({
   error,
   reset,
@@ -12,6 +24,18 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
+    // Auto-refresh on chunk load errors (stale deployment cache)
+    if (isChunkLoadError(error)) {
+      const hasRefreshed = sessionStorage.getItem("chunk_error_refresh");
+      if (!hasRefreshed) {
+        sessionStorage.setItem("chunk_error_refresh", "true");
+        window.location.reload();
+        return;
+      }
+      // Clear flag after showing error (so future errors can refresh again)
+      sessionStorage.removeItem("chunk_error_refresh");
+    }
+
     captureError(error, {
       errorBoundary: {
         type: "global-error",
