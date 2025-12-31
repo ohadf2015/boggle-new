@@ -142,7 +142,10 @@ const DailyChallengeSignupModal: React.FC<DailyChallengeSignupModalProps> = ({
     try {
       // Store the pending result in localStorage before OAuth redirect
       if (pendingResult) {
-        setPendingDailyResult(pendingResult);
+        setPendingDailyResult({
+          ...pendingResult,
+          trigger, // Include the conversion trigger for onboarding UX
+        });
       }
 
       let result;

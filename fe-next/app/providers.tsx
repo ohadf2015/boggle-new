@@ -18,6 +18,7 @@ import { initUtmCapture } from '@/utils/utmCapture';
 import { composeProviders } from '@/utils/composeProviders';
 import { linkLogRocketSession } from '@/utils/sentry';
 import { initSessionTracking } from '@/utils/sessionTracking';
+import WinnerOnboardingWrapper from './components/WinnerOnboardingWrapper';
 
 import type { Language } from '@/shared/types/game';
 
@@ -139,6 +140,7 @@ export function Providers({ children, lang }: ProvidersProps) {
                         },
                     }}
                 />
+                <WinnerOnboardingWrapper />
             </>
         </ErrorBoundary>
     );
