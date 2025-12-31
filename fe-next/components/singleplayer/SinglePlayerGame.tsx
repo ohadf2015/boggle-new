@@ -13,7 +13,6 @@ import CircularTimer from '@/components/CircularTimer';
 import { EarthquakeWarning, FireRoundIndicator } from '@/components/earthquake';
 import ThemeIndicator from '@/components/game/ThemeIndicator';
 import { WordsProgress } from '@/player/components/in-game/WordsProgress';
-import HintButton from '@/components/HintButton';
 import RevealButton from '@/components/singleplayer/RevealButton';
 import { AchievementProgressTracker } from '@/components/achievements/AchievementProgressTracker';
 import { selectRandomRevealWord, getRevealableWordCount } from '@/utils/wordPathFinder';
@@ -131,24 +130,6 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
   // Earthquake pause state
   const [isEarthquakePaused, setIsEarthquakePaused] = useState(false);
-
-  // Hint system state (local, not socket-based)
-  const MAX_HINTS = 3;
-  const [hintState, setHintState] = useState<{
-    hint: string | null;
-    hintType: 'firstLetter' | 'length' | null;
-    wordLength?: number;
-    firstLetter?: string;
-    hintsRemaining: number;
-    isLoading: boolean;
-    error: string | null;
-  }>({
-    hint: null,
-    hintType: null,
-    hintsRemaining: MAX_HINTS,
-    isLoading: false,
-    error: null,
-  });
 
   // Reveal word system state
   const [revealState, setRevealState] = useState<{
@@ -488,26 +469,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     botUsedWordsRef.current = initialBotUsedWords;
   }, [settings.difficulty, settings.language, settings.bots]);
 
-  // Fetch valid words from grid for bots, hints, and word progress tracking
-  // Runs for ALL modes to support WordsProgress and hints, not just solo-bots
+  // Fetch valid words from grid for bots and word progress tracking
+  // Runs for ALL modes to support WordsProgress, not just solo-bots
   useEffect(() => {
     if (!grid) return;
 
     // Increment grid version to track earthquake regenerations
     gridVersionRef.current += 1;
     const currentVersion = gridVersionRef.current;
-
-    // Reset hint state when grid changes (earthquake regeneration)
-    if (currentVersion > 1) {
-      setHintState(prev => ({
-        ...prev,
-        hint: null,
-        hintType: null,
-        wordLength: undefined,
-        firstLetter: undefined,
-        // Keep hintsRemaining - don't reset on earthquake, only on new game
-      }));
-    }
 
     // Set timeout to ensure we get words even if API is slow/fails
     const timeoutId = setTimeout(() => {
@@ -1026,111 +995,6 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     setLetterCount(count);
   }, []);
 
-  // Request a hint - pick random unfound word from available words
-  const handleRequestHint = useCallback(() => {
-    if (hintState.isLoading || hintState.hintsRemaining <= 0 || !availableWords) return;
-
-    setHintState(prev => ({ ...prev, isLoading: true, error: null }));
-
-    // Get all available words and filter to only 5+ letter words
-    const allWords = [
-      ...availableWords.easy,
-      ...availableWords.medium,
-      ...availableWords.hard,
-    ].filter(word => word.length >= MIN_TRACKED_WORD_LENGTH);
-
-    // Filter out words player already found
-    const foundWordsLower = foundWords
-      .filter(fw => fw.isValid === true)
-      .map(fw => fw.word.toLowerCase());
-
-    const unfoundWords = allWords.filter(
-      word => !foundWordsLower.includes(word.toLowerCase())
-    );
-
-    if (unfoundWords.length === 0) {
-      setHintState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: t('hints.noLongWordsLeft') || 'No more 5+ letter words to find!',
-      }));
-      // Clear error after 3 seconds
-      setTimeout(() => {
-        setHintState(prev => ({ ...prev, error: null }));
-      }, 3000);
-      return;
-    }
-
-    // Pick a random unfound word (prefer longer words = more points)
-    const sortedWords = [...unfoundWords].sort((a, b) => b.length - a.length);
-    const topCandidates = sortedWords.slice(0, Math.min(10, sortedWords.length));
-    const targetWord = topCandidates[Math.floor(Math.random() * topCandidates.length)];
-    const firstLetter = targetWord[0].toUpperCase();
-    const secondLetter = targetWord.length >= 2 ? targetWord[1].toUpperCase() : '';
-    const lastLetter = targetWord[targetWord.length - 1].toUpperCase();
-    const middleLetter = targetWord[Math.floor(targetWord.length / 2)].toUpperCase();
-    const wordLength = targetWord.length;
-
-    // Count vowels for pattern hint
-    const vowels = 'AEIOU';
-    const vowelCount = [...targetWord.toUpperCase()].filter(c => vowels.includes(c)).length;
-    const hasDoubleLetters = /(.)\1/.test(targetWord);
-
-    // Generate more varied and helpful hints
-    const hints = [
-      // Pattern hints
-      `${wordLength} ${t('hints.letters') || 'letters'}: "${firstLetter}" → "${secondLetter}" → ... → "${lastLetter}"`,
-      `${t('hints.lookFor') || 'Look for a'} ${wordLength}-${t('hints.letterWord') || 'letter word'} ${t('hints.with') || 'with'} "${middleLetter}" ${t('hints.inMiddle') || 'in the middle'}`,
-      // Vowel pattern hint
-      `${wordLength} ${t('hints.letters') || 'letters'}, ${vowelCount} ${t('hints.vowels') || 'vowels'} - ${t('hints.startsWith') || 'starts with'} "${firstLetter}"`,
-      // Double letter hint (if applicable)
-      ...(hasDoubleLetters ? [`${wordLength} ${t('hints.letters') || 'letters'} ${t('hints.withDoubles') || 'with double letters'}, ${t('hints.startsWith') || 'starts with'} "${firstLetter}"`] : []),
-      // Length-based hints
-      ...(wordLength >= 6 ? [`${t('hints.longerWord') || 'A longer word'}: ${wordLength} ${t('hints.letters') || 'letters'} "${firstLetter}...${lastLetter}"`] : []),
-      ...(wordLength <= 4 ? [`${t('hints.shortWord') || 'Short word'}: "${firstLetter}${secondLetter}..." (${wordLength} ${t('hints.letters') || 'letters'})`] : []),
-    ];
-    const hint = hints[Math.floor(Math.random() * hints.length)];
-
-    setHintState(prev => ({
-      ...prev,
-      hint,
-      hintType: 'firstLetter',
-      firstLetter,
-      wordLength,
-      hintsRemaining: prev.hintsRemaining - 1,
-      isLoading: false,
-    }));
-
-    // Auto-clear hint after 8 seconds
-    setTimeout(() => {
-      setHintState(prev => ({
-        ...prev,
-        hint: null,
-        hintType: null,
-        wordLength: undefined,
-        firstLetter: undefined,
-      }));
-    }, 8000);
-  }, [hintState.isLoading, hintState.hintsRemaining, availableWords, foundWords, t]);
-
-  // Clear the current hint
-  const handleClearHint = useCallback(() => {
-    setHintState(prev => ({
-      ...prev,
-      hint: null,
-      hintType: null,
-      wordLength: undefined,
-      firstLetter: undefined,
-    }));
-  }, []);
-
-  // Check if hints are available (5+ letter words found, not loading, hints remaining)
-  const hintsAvailable = !hintState.isLoading &&
-    hintState.hintsRemaining > 0 &&
-    availableWords !== null &&
-    [...availableWords.easy, ...availableWords.medium, ...availableWords.hard]
-      .filter(word => word.length >= MIN_TRACKED_WORD_LENGTH).length > 0;
-
   // Calculate revealable word count
   const revealableWordCount = React.useMemo(() => {
     if (!availableWords || !grid) return 0;
@@ -1261,31 +1125,6 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             />
           )}
           <ComboDisplay comboLevel={combo.comboLevel} compact />
-          {/* Hint Button - Single Player Mode */}
-          <HintButton
-            hint={hintState.hint}
-            hintType={hintState.hintType}
-            hintsRemaining={hintState.hintsRemaining}
-            wordLength={hintState.wordLength}
-            firstLetter={hintState.firstLetter}
-            isLoading={hintState.isLoading}
-            error={hintState.error}
-            isAvailable={hintsAvailable}
-            isSinglePlayer={true}
-            gameActive={!isPaused && !isGameOver && timer.remainingTime > 0}
-            onRequestHint={handleRequestHint}
-            onClearHint={handleClearHint}
-            t={t}
-          />
-          {/* Reveal Button - Single Player Mode */}
-          <RevealButton
-            revealsUsed={revealState.revealsUsed}
-            revealableWordsCount={revealableWordCount}
-            isLoading={revealState.isLoading}
-            gameActive={!isPaused && !isGameOver && timer.remainingTime > 0}
-            onReveal={handleReveal}
-            t={t}
-          />
         </div>
 
         {/* Top-right: Help button (moved to avoid covering game board) */}
@@ -1336,16 +1175,26 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           </Button>
         </div>
 
-        {/* Center: Word Forming Area + Notification + Grid - maximized for landscape */}
+        {/* Center: Word Forming Area + Reveal Button + Grid - maximized for landscape */}
         <div className="flex flex-col items-center justify-center w-full h-full px-3 py-0.5 landscape-grid-container">
-          {/* Word Forming Area - Permanent space above grid */}
-          <WordFormingArea
-            word={formedWord}
-            letterCount={letterCount}
-            feedback={currentFeedback}
-            compact
-            className="mb-0.5"
-          />
+          {/* Word Forming Area + Reveal Button - Permanent space above grid */}
+          <div className="flex items-center gap-2 mb-0.5">
+            <WordFormingArea
+              word={formedWord}
+              letterCount={letterCount}
+              feedback={currentFeedback}
+              compact
+            />
+            {/* Reveal Button - marks letters on board */}
+            <RevealButton
+              revealsUsed={revealState.revealsUsed}
+              revealableWordsCount={revealableWordCount}
+              isLoading={revealState.isLoading}
+              gameActive={!isPaused && !isGameOver && timer.remainingTime > 0}
+              onReveal={handleReveal}
+              t={t}
+            />
+          </div>
           <div className="flex-1 flex items-center justify-center game-board-frame-landscape" style={{ aspectRatio: '1/1' }}>
             <GridComponent
               grid={grid}
@@ -1537,13 +1386,22 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         </AdaptiveMotion.div>
       </div>
 
-      {/* Word Forming Area with feedback - centered below timer */}
-      <div className="flex items-center justify-center mb-1">
+      {/* Word Forming Area with feedback + Reveal Button - centered below timer */}
+      <div className="flex items-center justify-center gap-3 mb-1">
         <WordFormingArea
           word={formedWord}
           letterCount={letterCount}
           feedback={currentFeedback}
           compact
+        />
+        {/* Reveal Button - marks letters on board */}
+        <RevealButton
+          revealsUsed={revealState.revealsUsed}
+          revealableWordsCount={revealableWordCount}
+          isLoading={revealState.isLoading}
+          gameActive={!isPaused && !isGameOver && timer.remainingTime > 0}
+          onReveal={handleReveal}
+          t={t}
         />
       </div>
 
@@ -1645,51 +1503,25 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         />
       </div>
 
-      {/* Theme Indicator - subtle, below grid */}
-      {boardTheme && (
-        <div className="flex justify-center mt-1 opacity-70">
-          <ThemeIndicator theme={boardTheme} />
+      {/* Theme Indicator + Words Progress - same row below grid */}
+      {(boardTheme || (totalBoardWords !== null && totalBoardWords > 0)) && (
+        <div className="flex items-center justify-center gap-3 mt-1">
+          {boardTheme && (
+            <div className="opacity-70">
+              <ThemeIndicator theme={boardTheme} />
+            </div>
+          )}
+          {totalBoardWords !== null && totalBoardWords > 0 && (
+            <WordsProgress
+              totalWords={totalBoardWords}
+              foundWordsCount={foundWords.filter(fw => fw.isValid === true && fw.word.length >= MIN_TRACKED_WORD_LENGTH).length}
+              t={t}
+              minLength={MIN_TRACKED_WORD_LENGTH}
+            />
+          )}
         </div>
       )}
 
-      {/* Words Progress - compact, motivating progress indicator for 5+ letter words */}
-      {totalBoardWords !== null && totalBoardWords > 0 && (
-        <div className="flex justify-center">
-          <WordsProgress
-            totalWords={totalBoardWords}
-            foundWordsCount={foundWords.filter(fw => fw.isValid === true && fw.word.length >= MIN_TRACKED_WORD_LENGTH).length}
-            t={t}
-            minLength={MIN_TRACKED_WORD_LENGTH}
-          />
-        </div>
-      )}
-
-      {/* Hint & Reveal Buttons - Single Player Mode (portrait) */}
-      <div className="flex justify-center gap-3 px-4 -mt-1">
-        <HintButton
-          hint={hintState.hint}
-          hintType={hintState.hintType}
-          hintsRemaining={hintState.hintsRemaining}
-          wordLength={hintState.wordLength}
-          firstLetter={hintState.firstLetter}
-          isLoading={hintState.isLoading}
-          error={hintState.error}
-          isAvailable={hintsAvailable}
-          isSinglePlayer={true}
-          gameActive={!isPaused && !isGameOver && timer.remainingTime > 0}
-          onRequestHint={handleRequestHint}
-          onClearHint={handleClearHint}
-          t={t}
-        />
-        <RevealButton
-          revealsUsed={revealState.revealsUsed}
-          revealableWordsCount={revealableWordCount}
-          isLoading={revealState.isLoading}
-          gameActive={!isPaused && !isGameOver && timer.remainingTime > 0}
-          onReveal={handleReveal}
-          t={t}
-        />
-      </div>
 
 
       {/* Bot scores (only in solo-bots mode) */}

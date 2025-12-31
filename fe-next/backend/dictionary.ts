@@ -334,6 +334,12 @@ class Dictionary {
       logger.debug('DICT', `Total Spanish words: ${this.spanishWords.size}`);
 
       this.loaded = true;
+      // Mark all languages as loaded since load() loads all of them
+      this.loadedLanguages.add('en');
+      this.loadedLanguages.add('he');
+      this.loadedLanguages.add('sv');
+      this.loadedLanguages.add('ja');
+      this.loadedLanguages.add('es');
       const loadTime = Date.now() - startTime;
       logger.info('DICT', `All dictionaries loaded in ${loadTime}ms`);
     } catch (error) {

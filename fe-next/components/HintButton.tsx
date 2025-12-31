@@ -38,14 +38,12 @@ const HintButton = memo<HintButtonProps>(({
   onClearHint,
   t,
 }) => {
-  // Only show in single player mode during active game
-  if (!isSinglePlayer || !gameActive) {
-    return null;
-  }
-
   // Escape key handler to dismiss hint
+  // IMPORTANT: This hook must be called unconditionally (before any early returns)
+  // to satisfy React's Rules of Hooks
   useEffect(() => {
-    if (!hint) return;
+    // Only attach listener if component should be active and hint is showing
+    if (!isSinglePlayer || !gameActive || !hint) return;
 
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -55,7 +53,12 @@ const HintButton = memo<HintButtonProps>(({
 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [hint, onClearHint]);
+  }, [hint, onClearHint, isSinglePlayer, gameActive]);
+
+  // Only show in single player mode during active game
+  if (!isSinglePlayer || !gameActive) {
+    return null;
+  }
 
   // Build accessible label
   const getAriaLabel = () => {

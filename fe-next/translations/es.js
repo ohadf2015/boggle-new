@@ -987,6 +987,7 @@ const es = {
     "foundByOpponentsHint": "Palabras que los oponentes descubrieron primero",
     "foundByOpponentsMotivation": "¡Apréndelas para la próxima!",
     "topMissed": "Palabras para aprender",
+    "missedOnBoard": "Palabras que se te escaparon",
     "bonusWordsForNextTime": "Palabras extra para la próxima",
     "almostPerfect": "¡Casi perfecto!",
     "greatJob": "¡Gran trabajo!",

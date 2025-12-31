@@ -60,13 +60,12 @@ const RevealButton = memo<RevealButtonProps>(({
     setCoins(getCoins());
   }, [revealsUsed]);
 
-  if (!gameActive) {
-    return null;
-  }
-
   // Escape key handler to dismiss tooltip
+  // IMPORTANT: This hook must be called unconditionally (before any early returns)
+  // to satisfy React's Rules of Hooks
   useEffect(() => {
-    if (!showTooltip) return;
+    // Only attach listener if component should be active and tooltip is showing
+    if (!gameActive || !showTooltip) return;
 
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -76,9 +75,11 @@ const RevealButton = memo<RevealButtonProps>(({
 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [showTooltip]);
+  }, [showTooltip, gameActive]);
 
   // Build accessible label
+  // IMPORTANT: This hook must be called unconditionally (before any early returns)
+  // to satisfy React's Rules of Hooks
   const getAriaLabel = useCallback(() => {
     if (isLoading) {
       return t('reveal.finding') || 'Finding word...';
@@ -94,6 +95,10 @@ const RevealButton = memo<RevealButtonProps>(({
     }
     return t('reveal.revealCost', { cost: revealCost }) || `Reveal a word for ${revealCost} coins`;
   }, [isLoading, hasWordsToReveal, canAffordReveal, isFreeReveal, freeRevealsRemaining, revealCost, t]);
+
+  if (!gameActive) {
+    return null;
+  }
 
   return (
     <div

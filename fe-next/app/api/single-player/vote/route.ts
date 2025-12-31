@@ -5,7 +5,17 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@supabase/supabase-js';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+// Create a simple Supabase client for anonymous operations (no cookies needed)
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  return createClient(supabaseUrl, supabaseAnonKey);
+}
 
 // Constants from communityWordManager
 const PROMINENT_THRESHOLD = 10;
@@ -71,7 +81,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
+    const supabase = getSupabaseClient();
     const normalizedWord = normalizeWord(word, language);
     const guestId = `sp_${sessionId}`;
     const gameCode = `sp_${sessionId}`;

@@ -997,6 +997,7 @@ const en = {
     "missedWordsHint": "Points you could've had",
     "missedWordsMotivation": "Get them next time!",
     "topMissed": "Hunt These",
+    "missedOnBoard": "Words You Missed on the Board",
     "foundByOpponents": "They Found",
     "foundByOpponentsHint": "Beat them next time",
     "foundByOpponentsMotivation": "Study these!",
@@ -1191,19 +1192,19 @@ const en = {
     "congratulations": "Congratulations"
   },
   "howToPlay": {
-    "title": "How to Play LexiClash?",
-    "description": "LexiClash is a fast-paced word game where you race against time to find as many words as possible on a grid of letters. The longer the word, the more points you earn!",
-    "descriptionNote": "Words must be at least 2 letters long. Names, places, and well-known acronyms are allowed!",
-    "createOrJoinTitle": "Create or Join a Game",
-    "createOrJoinDesc": "The host creates a room and shares the code. Players join using the code.",
-    "hostStartsTitle": "Host Starts the Game",
-    "hostStartsDesc": "Once everyone is ready, the host starts the timer and the letters appear!",
-    "findWordsTitle": "Find Words on the Board",
-    "findWordsDesc": "Connect adjacent letters in ANY direction (horizontal, vertical, diagonal, and even backwards) to form words. Each letter can only be used once per word.",
-    "findWordsNote": "Note: You can't reuse the same letter in a single word!",
-    "earnPointsTitle": "Earn Points and Achievements",
-    "earnPointsDesc": "The longer the word, the more points you get! Plus, unlock special achievements for impressive feats.",
-    "earnPointsNote": "Special achievements can give you a nice points boost!",
+    "title": "How to Play",
+    "description": "Find words on the grid. Longer words = more points. Beat your friends!",
+    "descriptionNote": "2+ letter words. Names and acronyms allowed!",
+    "createOrJoinTitle": "Create or Join",
+    "createOrJoinDesc": "Host creates a room. Share the code. Jump in!",
+    "hostStartsTitle": "Ready, Set, Go!",
+    "hostStartsDesc": "Everyone ready? Host starts. Letters appear. Go!",
+    "findWordsTitle": "Find Words",
+    "findWordsDesc": "Connect adjacent letters in any direction to form words.",
+    "findWordsNote": "Each letter can only be used once per word!",
+    "earnPointsTitle": "Earn Points",
+    "earnPointsDesc": "Longer words = bigger scores! Unlock achievements for bonuses.",
+    "earnPointsNote": "Achievements give bonus points!",
     "scoringSystemTitle": "Scoring System",
     "scoringTable": {
       "letters2": "2 letters: 1 point",
@@ -1225,43 +1226,43 @@ const en = {
       "earlyBird": "🐦 Early Bird - Find 3 words in the first minute",
       "examples": "Example Achievements"
     },
-    "tipsTitle": "Tips for Winning",
-    "gameFeaturesTitle": "Game Features",
+    "tipsTitle": "Pro Tips",
+    "gameFeaturesTitle": "Features",
     "tips": {
-      "tip1": "Start with short words and expand them (e.g., \"cat\" → \"cats\")",
-      "tip2": "Look for common letter combinations (e.g., \"th\", \"ch\", \"ing\")",
-      "tip3": "Scan systematically - don't jump around randomly",
-      "tip4": "Speed matters! Find words quickly to build combos",
-      "tip5": "Remember - only valid words in the selected language count"
+      "tip1": "Start short, then expand: cat → cats",
+      "tip2": "Hunt common combos: -ing, -ed, th-, ch-",
+      "tip3": "Scan systematically, don't jump around",
+      "tip4": "Speed builds combos. Combos build scores!",
+      "tip5": "Only valid words in the selected language count"
     },
-    "readyToPlay": "Ready? Let's start playing!",
-    "funForFamily": "An engaging and fun game for the whole family - completely free!",
+    "readyToPlay": "Ready? Let's go!",
+    "funForFamily": "Fun for the whole family - free!",
     "letters": "letters",
     "pts": "pts",
     "steps": {
       "basics": {
         "title": "Game Basics",
-        "description": "LexiClash is a fast-paced multiplayer word game. Race against friends to find words on a grid of letters!"
+        "description": "Race friends to find words on a letter grid. Fast, fun, competitive!"
       },
       "grid": {
         "title": "Finding Words",
-        "description": "Swipe or click adjacent letters to form words. Letters connect in all 8 directions - horizontal, vertical, and diagonal!"
+        "description": "Swipe adjacent letters to spell words. Connect in all 8 directions!"
       },
       "scoring": {
-        "title": "Scoring System",
-        "description": "Longer words earn more points! Each letter beyond the first adds one point to your score."
+        "title": "Scoring",
+        "description": "Longer words = more points! Each extra letter adds one point."
       },
       "combo": {
-        "title": "Combo System",
-        "description": "Submit words quickly to build combo multipliers! The faster you find words, the bigger your bonus."
+        "title": "Combos",
+        "description": "Find words fast for combo bonuses! Keep the chain alive!"
       },
       "xp": {
         "title": "XP & Levels",
-        "description": "Earn XP from every game to level up and unlock new titles. Win bonuses and achievements boost your XP!"
+        "description": "Play games to earn XP and level up. Wins and achievements boost your XP!"
       },
       "achievements": {
         "title": "Achievements",
-        "description": "Unlock achievements for special feats! Each achievement can be earned multiple times to upgrade its tier."
+        "description": "Unlock achievements for special feats! Earn them multiple times to upgrade tiers."
       }
     },
     "demo": {

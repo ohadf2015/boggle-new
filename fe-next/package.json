@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "tsx server.ts",
+    "dev": "rm -rf .next && tsx server.ts",
     "build": "npm run build:schemas && next build",
     "build:analyze": "ANALYZE=true npm run build",
     "build:schemas": "tsc --project backend/tsconfig.schemas.json",

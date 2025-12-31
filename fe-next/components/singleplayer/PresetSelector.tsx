@@ -1,31 +1,19 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Settings, Play, Crown, Flame, Bot, Book, Trophy, Calendar, Target, Check, Sparkles, Zap, Skull } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Settings, Play, Crown, Flame, Bot, Book, Trophy, Calendar, Target, Check } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { DIFFICULTIES } from '@/utils/consts';
-import { PRESETS, type PresetConfig, getPresetsForMode, getMinWordLength, getDefaultPreset } from './presetConfig';
-import { getHighScoreForPreset } from './highScoreManager';
+import { PRESETS, type PresetConfig, getDefaultPreset } from './presetConfig';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import LandscapeIndicator from '@/components/LandscapeIndicator';
-import type { Language, DifficultyLevel } from '@/shared/types/game';
+import type { Language } from '@/shared/types/game';
 import type { SinglePlayerMode } from './SinglePlayerView';
-
-// Difficulty icon configuration for compact visual representation
-const DIFFICULTY_ICON_CONFIG: Record<DifficultyLevel, {
-  Icon: typeof Sparkles;
-  bgColor: string;
-}> = {
-  EASY: { Icon: Sparkles, bgColor: 'bg-neo-lime' },
-  MEDIUM: { Icon: Zap, bgColor: 'bg-neo-yellow' },
-  HARD: { Icon: Skull, bgColor: 'bg-neo-red' },
-};
 
 interface DailyInfo {
   puzzleNumber: number;
@@ -93,14 +81,13 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
   const { t, dir } = useLanguage();
   const isLandscape = useMobileLandscape();
 
-  // State for selected mode
-  const [selectedMode, setSelectedMode] = useState<Exclude<SinglePlayerMode, 'daily'>>('solo-bots');
-
-  // Get presets for the selected mode
-  const modePresets = useMemo(() =>
-    getPresetsForMode(selectedMode),
-    [selectedMode]
-  );
+  // Get the default (middle) preset for a mode and start game directly
+  const handleModeSelect = (mode: Exclude<SinglePlayerMode, 'daily'>) => {
+    const defaultPreset = getDefaultPreset(mode);
+    if (defaultPreset) {
+      onSelectPreset(defaultPreset);
+    }
+  };
 
   const dailyPreset = useMemo(() =>
     PRESETS.find(p => p.modes.includes('daily')),
@@ -110,7 +97,6 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
   const renderModeCard = (mode: Exclude<SinglePlayerMode, 'daily'>, index: number) => {
     const config = MODE_CONFIG[mode];
     const IconComponent = config.Icon;
-    const isSelected = selectedMode === mode;
 
     return (
       <motion.button
@@ -118,182 +104,31 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: index * 0.05 }}
-        onClick={() => setSelectedMode(mode)}
+        onClick={() => handleModeSelect(mode)}
         className={cn(
           'group relative p-3 sm:p-4 rounded-neo border-4 transition-all',
           'flex flex-col items-center text-center',
-          isSelected
-            ? 'shadow-hard-pressed translate-x-[2px] translate-y-[2px] border-neo-black'
-            : 'shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] border-neo-black/50',
-          isSelected
-            ? `bg-gradient-to-br ${config.color}`
-            : 'bg-neo-cream dark:bg-slate-800'
+          'shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px]',
+          'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
+          'border-neo-black',
+          `bg-gradient-to-br ${config.color}`
         )}
         aria-label={t(config.nameKey) || mode}
-        aria-pressed={isSelected}
       >
         {/* Icon */}
-        <div className={cn(
-          'w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-1',
-          'transition-all',
-          isSelected ? 'text-neo-black' : 'text-neo-black dark:text-neo-white'
-        )}>
+        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-1 text-neo-black">
           <IconComponent className="w-5 h-5 sm:w-6 sm:h-6" />
         </div>
 
         {/* Name */}
-        <h3 className={cn(
-          'text-xs sm:text-sm font-black uppercase leading-tight',
-          isSelected ? 'text-neo-black' : 'text-neo-black dark:text-neo-white'
-        )}>
+        <h3 className="text-xs sm:text-sm font-black uppercase leading-tight text-neo-black">
           {t(config.nameKey) || mode}
         </h3>
 
         {/* Description */}
-        <p className={cn(
-          'text-[9px] sm:text-[10px] font-bold mt-0.5 line-clamp-2',
-          isSelected ? 'text-neo-black/80' : 'text-neo-black/60 dark:text-neo-white/60'
-        )}>
+        <p className="text-[9px] sm:text-[10px] font-bold mt-0.5 line-clamp-2 text-neo-black/80">
           {t(config.descKey) || ''}
         </p>
-      </motion.button>
-    );
-  };
-
-  const renderPresetCard = (preset: PresetConfig, index: number) => {
-    const IconComponent = preset.Icon;
-    const difficultyConfig = DIFFICULTIES[preset.settings.difficulty];
-    const isDaily = preset.id === 'daily';
-
-    // Get high score specific to this preset (for challenge mode)
-    const presetHighScore = selectedMode === 'challenge'
-      ? getHighScoreForPreset(preset.id, preset.settings.difficulty, preset.settings.timerSeconds)
-      : null;
-
-    // Difficulty-based colors for borders
-    const difficultyColor = preset.settings.difficulty === 'EASY' ? 'border-neo-lime'
-      : preset.settings.difficulty === 'MEDIUM' ? 'border-neo-yellow'
-      : 'border-neo-red';
-
-    return (
-      <motion.button
-        key={preset.id}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.05 + 0.1 }}
-        onClick={() => onSelectPreset(preset)}
-        className={cn(
-          'group relative p-2 sm:p-3 rounded-neo-lg border-3 sm:border-4 transition-all',
-          'flex flex-col items-center text-center flex-shrink-0',
-          'w-[100px] min-w-[100px] sm:w-[120px] sm:min-w-[120px]',
-          'shadow-hard hover:shadow-hard-lg hover:translate-x-[-3px] hover:translate-y-[-3px]',
-          'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
-          isDaily
-            ? 'bg-gradient-to-br from-neo-orange via-neo-yellow to-neo-pink border-neo-black'
-            : `bg-neo-cream dark:bg-slate-800 ${difficultyColor}`
-        )}
-        aria-label={`${t(preset.nameKey) || preset.id}: ${t(preset.descKey) || ''}`}
-      >
-        {/* Badge for recommended */}
-        {preset.badge === 'recommended' && (
-          <span className="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 text-[8px] sm:text-[9px] font-black uppercase bg-neo-black text-neo-yellow rounded-full border-2 border-neo-yellow">
-            {t('singlePlayer.preset.recommended') || 'Best'}
-          </span>
-        )}
-
-        {/* Daily specific badges */}
-        {isDaily && (
-          <div className="absolute top-1 right-1 flex items-center gap-1">
-            {dailyInfo.streak > 0 && (
-              <span className="flex items-center gap-0.5 text-[10px] font-bold bg-neo-black/20 px-1.5 py-0.5 rounded-full text-neo-black">
-                <Flame className="w-3 h-3 text-neo-orange" />
-                {dailyInfo.streak}
-              </span>
-            )}
-            {dailyInfo.hasPlayedToday && (
-              <span className="flex items-center justify-center w-5 h-5 bg-neo-lime text-neo-black rounded-full border-2 border-neo-black">
-                <Check className="w-3 h-3 text-neo-black" />
-              </span>
-            )}
-          </div>
-        )}
-
-        {/* Grid Size with Difficulty Icon (PROMINENT) */}
-        {!isDaily && (
-          <div className="flex flex-col items-center gap-0.5 mb-0.5">
-            {React.createElement(DIFFICULTY_ICON_CONFIG[preset.settings.difficulty].Icon, {
-              className: 'w-5 h-5 sm:w-6 sm:h-6 text-neo-black dark:text-neo-white'
-            })}
-            <div className="text-lg sm:text-xl font-black text-neo-black dark:text-neo-white">
-              {difficultyConfig.rows}×{difficultyConfig.cols}
-            </div>
-          </div>
-        )}
-
-        {/* Daily Icon */}
-        {isDaily && (
-          <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center mb-0.5">
-            <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 text-neo-black" />
-          </div>
-        )}
-
-        {/* Daily Name */}
-        {isDaily && (
-          <h3 className="text-[10px] sm:text-xs font-black uppercase text-neo-black leading-tight">
-            {t('daily.badge') || 'Daily'}
-            <span className="block text-[8px] sm:text-[9px] font-bold opacity-80">#{dailyInfo.puzzleNumber}</span>
-          </h3>
-        )}
-
-        {/* Mode-specific details */}
-        {!isDaily && (
-          <div className="text-[9px] sm:text-[10px] font-bold text-neo-black/70 dark:text-neo-white/70 mt-0.5 space-y-0">
-            {/* Minimum word length - prominent indicator */}
-            {(() => {
-              // Calculate actual minWordLength based on language and difficulty
-              // Japanese: always 2+, Other languages: Hard = 3+, Easy/Medium = 2+
-              const actualMinWordLength = getMinWordLength(currentLanguage, preset.settings.difficulty);
-              return (
-                <div className={cn(
-                  'inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] sm:text-[9px] font-black',
-                  actualMinWordLength === 2
-                    ? 'bg-neo-lime/30 text-neo-black dark:text-neo-lime'
-                    : 'bg-neo-cyan/30 text-neo-black dark:text-neo-cyan'
-                )}>
-                  <span>{actualMinWordLength}+</span>
-                  <span>{t('singlePlayer.preset.letters') || 'letters'}</span>
-                </div>
-              );
-            })()}
-            {preset.settings.timerSeconds > 0 && (
-              <div>{preset.settings.timerSeconds / 60}m</div>
-            )}
-            {preset.settings.timerSeconds === 0 && (
-              <div>{t('singlePlayer.mode.noTimer') || 'No timer'}</div>
-            )}
-            {preset.settings.bots > 0 && (
-              <div>{preset.settings.bots} {t('bots.title') || 'bots'}</div>
-            )}
-            {selectedMode === 'challenge' && presetHighScore !== null && (
-              <div className="text-neo-yellow dark:text-neo-yellow font-black">
-                {t('challenge.record') || 'Record'}: {presetHighScore.score}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Daily countdown */}
-        {isDaily && dailyInfo.hasPlayedToday && (
-          <p className="text-[8px] sm:text-[9px] font-bold text-neo-black/70 mt-0.5">
-            {t('daily.nextPuzzleIn') || 'Next'}: {dailyInfo.countdown}
-          </p>
-        )}
-
-        {/* Play indicator */}
-        <div className="mt-1 flex items-center gap-0.5 text-[8px] sm:text-[9px] font-bold text-neo-black/60 dark:text-neo-white/60 group-hover:text-neo-black dark:group-hover:text-neo-white transition-colors">
-          <Play className="w-2 h-2" />
-          <span>{t('singlePlayer.preset.tapToPlay') || 'Play'}</span>
-        </div>
       </motion.button>
     );
   };
@@ -384,34 +219,10 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
             )}
           </div>
 
-          {/* Right column: Quick Start Presets */}
-          <div className="w-[70%] flex flex-col gap-3 overflow-y-auto">
-            {/* Section Header */}
-            <h3 className="text-sm font-bold uppercase text-neo-white/70">
-              {t('singlePlayer.preset.quickStart') || 'Quick Start'} - {t(MODE_CONFIG[selectedMode].nameKey)}
-            </h3>
-
-            {/* Presets horizontal scroll */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={selectedMode}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                className="flex gap-2 overflow-x-auto scrollable-area snap-x snap-mandatory pb-2"
-                style={{ scrollbarWidth: 'thin' }}
-              >
-                {modePresets.map((preset, index) => (
-                  <div key={preset.id} className="snap-start">
-                    {renderPresetCard(preset, index)}
-                  </div>
-                ))}
-              </motion.div>
-            </AnimatePresence>
-
+          {/* Right column: Challenge high score + Custom game */}
+          <div className="w-[70%] flex flex-col gap-3 justify-center">
             {/* Challenge high score preview */}
-            {selectedMode === 'challenge' && challengeInfo.highScore !== null && (
+            {challengeInfo.highScore !== null && (
               <Card className="border-3 border-neo-yellow shadow-hard bg-gradient-to-br from-neo-yellow/20 to-neo-orange/10">
                 <CardContent className="p-4 flex items-center gap-4">
                   <div className="flex items-center gap-2">
@@ -596,35 +407,6 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
               renderModeCard(mode, index)
             )}
           </div>
-        </div>
-
-        {/* Quick Start Presets */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm font-bold uppercase text-neo-black/70 dark:text-neo-white/70">
-            <Play className="w-3 h-3" />
-            <span>
-              {t('singlePlayer.preset.quickStart') || 'Quick Start'} - {t(MODE_CONFIG[selectedMode].nameKey)}
-            </span>
-          </div>
-
-          {/* Preset cards - horizontal scrollable row */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={selectedMode}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="flex gap-2 overflow-x-auto scrollable-area snap-x snap-mandatory pb-2 -mx-2 px-2"
-              style={{ scrollbarWidth: 'thin' }}
-            >
-              {modePresets.map((preset, index) => (
-                <div key={preset.id} className="snap-start">
-                  {renderPresetCard(preset, index)}
-                </div>
-              ))}
-            </motion.div>
-          </AnimatePresence>
         </div>
 
         {/* Challenge high score teaser */}

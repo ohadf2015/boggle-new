@@ -10,7 +10,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useMusic } from '../contexts/MusicContext';
 import { useAuth } from '../contexts/AuthContext';
 import OnboardingProgress from './onboarding/OnboardingProgress';
-import { markOnboardingComplete } from '../utils/onboardingStorage';
+import { markOnboardingComplete, markOnboardingSkipped } from '../utils/onboardingStorage';
 import { AVATARS } from '../utils/avatarConfig';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
 import { triggerHaptic } from '../utils/hapticFeedback';
@@ -52,12 +52,31 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
   });
 
   // Set random avatar and its name as default on mount
+  // Use sessionStorage to prevent re-selection within the same session (avoids "jumping")
   useEffect(() => {
-    const randomAvatar = AVATARS[Math.floor(Math.random() * AVATARS.length)];
+    const sessionKey = 'lexiclash_onboarding_session_avatar';
+    const storedData = sessionStorage.getItem(sessionKey);
+
+    let avatarToUse: typeof AVATARS[0];
+
+    if (storedData) {
+      try {
+        const parsed = JSON.parse(storedData);
+        // Find the stored avatar or fallback to random
+        avatarToUse = AVATARS.find(a => a.id === parsed.avatarId) || AVATARS[Math.floor(Math.random() * AVATARS.length)];
+      } catch {
+        avatarToUse = AVATARS[Math.floor(Math.random() * AVATARS.length)];
+      }
+    } else {
+      // First time in session - pick random and store it
+      avatarToUse = AVATARS[Math.floor(Math.random() * AVATARS.length)];
+      sessionStorage.setItem(sessionKey, JSON.stringify({ avatarId: avatarToUse.id }));
+    }
+
     setFormData((prev) => ({
       ...prev,
-      avatarId: randomAvatar.id,
-      displayName: prev.displayName || randomAvatar.name,
+      avatarId: avatarToUse.id,
+      displayName: prev.displayName || avatarToUse.name,
     }));
   }, []);
 
@@ -69,8 +88,10 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
   }, [isOpen, audioUnlocked, fadeToTrack, TRACKS]);
 
   // Handle dialog state changes - allow closing via X button
+  // Marks onboarding as skipped so it won't show again in this session
   const handleOpenChange = (open: boolean) => {
     if (!open) {
+      markOnboardingSkipped();
       onClose();
     }
   };

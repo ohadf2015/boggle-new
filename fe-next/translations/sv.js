@@ -990,6 +990,7 @@ const sv = {
     "foundByOpponentsHint": "Ord som motståndarna upptäckte först",
     "foundByOpponentsMotivation": "Lär dig dessa till nästa gång!",
     "topMissed": "Toppord att lära sig",
+    "missedOnBoard": "Ord du missade på brädet",
     "bonusWordsForNextTime": "Bonusord för nästa gång",
     "almostPerfect": "Nästan perfekt!",
     "greatJob": "Bra jobbat!",

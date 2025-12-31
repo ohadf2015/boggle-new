@@ -989,6 +989,7 @@ const ja = {
     "foundByOpponentsHint": "対戦相手が先に見つけた単語",
     "foundByOpponentsMotivation": "次回のために覚えておこう！",
     "topMissed": "覚えるべき単語",
+    "missedOnBoard": "見逃した単語",
     "bonusWordsForNextTime": "次回のボーナス単語",
     "almostPerfect": "惜しい！",
     "greatJob": "素晴らしい！",
