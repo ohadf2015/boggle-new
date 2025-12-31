@@ -1911,6 +1911,29 @@ const en = {
       "maybeLater": "Later",
       "continueAsGuest": "Continue as guest"
     },
+    "winnerOnboarding": {
+      "topPercentile": {
+        "title": "You're a Top Player!",
+        "subtitle": "Show off your achievement on the leaderboard"
+      },
+      "quickSolve": {
+        "title": "Lightning Fast!",
+        "subtitle": "Let everyone see your impressive skills"
+      },
+      "streakAtRisk": {
+        "title": "Streak Protected!",
+        "subtitle": "Claim your spot on the leaderboard"
+      },
+      "default": {
+        "title": "Welcome Champion!",
+        "subtitle": "Personalize your profile to shine on the leaderboard"
+      },
+      "chooseAvatar": "Choose Your Avatar",
+      "displayName": "Your Display Name",
+      "namePlaceholder": "Enter your name...",
+      "saving": "Saving...",
+      "showMeLeaderboard": "Show Me On The Leaderboard!"
+    },
     "inlineSignup": {
       "title": "Sign up to appear on the leaderboard",
       "subtitle": "Save your result and compete globally",

@@ -1656,6 +1656,29 @@ const es = {
       "maybeLater": "Quizás después",
       "continueAsGuest": "Continuar como invitado"
     },
+    "winnerOnboarding": {
+      "topPercentile": {
+        "title": "¡Eres un jugador destacado!",
+        "subtitle": "Muestra tu logro en la tabla de clasificación"
+      },
+      "quickSolve": {
+        "title": "¡Rápido como un rayo!",
+        "subtitle": "Deja que todos vean tus habilidades impresionantes"
+      },
+      "streakAtRisk": {
+        "title": "¡Racha protegida!",
+        "subtitle": "Reclama tu lugar en la tabla de clasificación"
+      },
+      "default": {
+        "title": "¡Bienvenido campeón!",
+        "subtitle": "Personaliza tu perfil para destacar en la clasificación"
+      },
+      "chooseAvatar": "Elige tu avatar",
+      "displayName": "Tu nombre de usuario",
+      "namePlaceholder": "Ingresa tu nombre...",
+      "saving": "Guardando...",
+      "showMeLeaderboard": "¡Muéstrame en la tabla!"
+    },
     "inlineSignup": {
       "title": "Regístrate para aparecer en la clasificación",
       "subtitle": "Guarda tu resultado y compite globalmente",
