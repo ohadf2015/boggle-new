@@ -86,7 +86,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     "w-full mx-auto",
                     "flex items-center justify-between",
                     "px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-2.5",
-                    "bg-gradient-to-r from-neo-cyan via-neo-cyan-muted/85 to-neo-lime/90",
+                    "bg-gradient-to-r from-slate-600 via-slate-500 to-slate-600",
                     "border-4 lg:border-4 xl:border-4 2xl:border-4 border-neo-black",
                     "shadow-hard-lg xl:shadow-hard-lg 2xl:shadow-hard-lg",
                     "rounded-neo-lg xl:rounded-neo-lg 2xl:rounded-neo-lg",

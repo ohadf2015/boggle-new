@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 1421,
+    "totalKeysInCode": 1422,
     "keyCountByLanguage": {
-      "en": 2439,
-      "he": 2437,
-      "sv": 2437,
-      "ja": 2437,
-      "es": 2437
+      "en": 2440,
+      "he": 2438,
+      "sv": 2438,
+      "ja": 2438,
+      "es": 2438
     },
     "missingFromEnglish": 1
   },
@@ -16,15 +16,15 @@
       "usages": [
         {
           "file": "components/singleplayer/SinglePlayerResults.tsx",
-          "line": 771
+          "line": 773
         },
         {
           "file": "components/singleplayer/SinglePlayerResults.tsx",
-          "line": 771
+          "line": 773
         },
         {
           "file": "components/singleplayer/SinglePlayerResults.tsx",
-          "line": 771
+          "line": 773
         }
       ]
     }

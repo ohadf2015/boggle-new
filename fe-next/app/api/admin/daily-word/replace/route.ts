@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { regenerateDailyPuzzle } from '@/utils/dailyChallenge';
+import type { Language } from '@/types';
 
 /**
  * POST /api/admin/daily-word/replace
  * Replace the daily word for a specific date and optionally reset all attempts
+ * When the word is replaced, the stored grid is cleared and regenerated
  * Only accessible to admin users
  */
 export async function POST(request: Request) {
@@ -30,7 +33,7 @@ export async function POST(request: Request) {
 
     // Parse request body
     const body = await request.json();
-    const { puzzleDate, language, newWord, resetAllAttempts } = body;
+    const { puzzleDate, language, newWord, resetAllAttempts, regenerateBoard = true } = body;
 
     if (!puzzleDate || !language || !newWord) {
       return NextResponse.json(
@@ -48,6 +51,15 @@ export async function POST(request: Request) {
       );
     }
 
+    // Validate language
+    const validLanguages = ['en', 'he', 'sv', 'ja', 'es'];
+    if (!validLanguages.includes(language)) {
+      return NextResponse.json(
+        { error: 'Invalid language code' },
+        { status: 400 }
+      );
+    }
+
     // Check if entry exists for this date/language
     const { data: existing } = await supabase
       .from('daily_target_words')
@@ -60,12 +72,15 @@ export async function POST(request: Request) {
 
     if (existing) {
       // Update existing entry with override
+      // Clear the stored grid since the word has changed - it will be regenerated
       const { error: updateError } = await supabase
         .from('daily_target_words')
         .update({
           override_word: formattedWord,
           override_by: user.id,
           override_at: new Date().toISOString(),
+          grid: null, // Clear stored grid - will be regenerated on next request
+          grid_generated_at: null,
           updated_at: new Date().toISOString(),
         })
         .eq('id', existing.id);
@@ -98,6 +113,7 @@ export async function POST(request: Request) {
           override_word: formattedWord,
           override_by: user.id,
           override_at: new Date().toISOString(),
+          // grid will be generated on first player request
         });
 
       if (insertError) {
@@ -112,6 +128,27 @@ export async function POST(request: Request) {
         previousWord: null,
         newWord: formattedWord,
       };
+    }
+
+    // Regenerate board immediately if requested (default: true)
+    let boardRegenerateResult = null;
+    if (regenerateBoard) {
+      try {
+        const puzzle = await regenerateDailyPuzzle(puzzleDate, language as Language);
+        boardRegenerateResult = {
+          success: true,
+          gridDimensions: {
+            rows: puzzle.grid.length,
+            cols: puzzle.grid[0]?.length || 0
+          }
+        };
+      } catch (regenerateError) {
+        console.error('Board regeneration error:', regenerateError);
+        boardRegenerateResult = {
+          success: false,
+          error: regenerateError instanceof Error ? regenerateError.message : 'Unknown error'
+        };
+      }
     }
 
     // Optionally reset all attempts for this puzzle
@@ -134,6 +171,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       word: wordUpdateResult,
+      boardRegenerate: boardRegenerateResult,
       reset: resetResult,
     });
   } catch (error) {
