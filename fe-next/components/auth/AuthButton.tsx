@@ -105,21 +105,6 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
             )}
           </button>
 
-          {/* Leaderboard Link */}
-          <button
-            onClick={() => {
-              router.push(`/${language}/leaderboard`);
-              onClose?.();
-            }}
-            className={cn(
-              "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
-              "bg-white hover:bg-neo-cyan/50"
-            )}
-          >
-            <Trophy size={14} className="text-neo-black" />
-            <span className="text-neo-black">{t('leaderboard.title') || 'Leaderboard'}</span>
-          </button>
-
           {/* Friends Link */}
           <button
             onClick={() => {
@@ -421,21 +406,6 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
           >
             <User size={14} className="text-neo-black" />
             <span className="text-neo-black">{t('auth.signIn') || 'Sign In'}</span>
-          </button>
-
-          {/* Leaderboard Link */}
-          <button
-            onClick={() => {
-              router.push(`/${language}/leaderboard`);
-              onClose?.();
-            }}
-            className={cn(
-              "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
-              "bg-white hover:bg-neo-cyan/50"
-            )}
-          >
-            <Trophy size={14} className="text-neo-black" />
-            <span className="text-neo-black">{t('leaderboard.title') || 'Leaderboard'}</span>
           </button>
 
           {/* Theme Toggle */}

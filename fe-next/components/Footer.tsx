@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
 
 // Kofi brand icon SVG component
 const KofiIcon = ({ className }: { className?: string }) => (
@@ -11,14 +12,18 @@ const KofiIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+interface FooterProps {
+  className?: string;
+}
+
 /**
  * Footer - Neo-Brutalist styled footer
  */
-export default function Footer(): React.ReactElement {
+export default function Footer({ className }: FooterProps): React.ReactElement {
   const { t, language } = useLanguage();
 
   return (
-    <footer className="py-6 px-4 mt-auto border-t-4 border-neo-black bg-neo-navy text-white">
+    <footer className={cn('py-4 px-4 mt-auto border-t-4 border-neo-black bg-neo-navy text-white', className)}>
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* Copyright */}

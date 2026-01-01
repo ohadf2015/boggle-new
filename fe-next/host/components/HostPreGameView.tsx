@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Users, Settings, Plus, Minus, Crown, ChevronDown, ChevronUp, Bot, Check, Monitor, Info } from 'lucide-react';
+import { Clock, Users, Settings, Plus, Minus, Crown, ChevronDown, ChevronUp, Bot, Check, Monitor, Info, MessageSquare } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Checkbox } from '../../components/ui/checkbox';
@@ -124,6 +124,9 @@ const GAME_PRESETS = {
 
 type PresetKey = keyof typeof GAME_PRESETS;
 
+// Mobile tab type
+type MobileTab = 'settings' | 'players' | 'chat';
+
 const HostPreGameView: React.FC<HostPreGameViewProps> = ({
   // Core props
   gameCode,
@@ -171,6 +174,10 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
   // Default to 'party' preset (Standard: 2min, MEDIUM difficulty) for balanced gameplay
   const [selectedPreset, setSelectedPreset] = useState<PresetKey>('party');
   const [hasInitialized, setHasInitialized] = useState<boolean>(false);
+  // Mobile tab state
+  const [mobileTab, setMobileTab] = useState<MobileTab>('settings');
+  // Unread chat messages indicator
+  const [hasUnreadMessages, setHasUnreadMessages] = useState<boolean>(false);
 
   // Apply default preset on mount
   React.useEffect(() => {
@@ -220,10 +227,6 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
     setSelectedPreset(presetKey);
   }, [setTimerValue, setDifficulty, setMinWordLength, setTimerDirection]);
 
-  // Sticky start button visibility state
-  const [showStickyStart, setShowStickyStart] = useState<boolean>(false);
-  const startButtonRef = React.useRef<HTMLDivElement>(null);
-
   // Track if we've shown the broadcast mode suggestion
   const hasShownBroadcastSuggestion = useRef<boolean>(false);
 
@@ -239,20 +242,6 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
     }
   }, [playersReady.length, hostPlaying, t]);
 
-  // Intersection observer to show sticky button when original is out of view
-  React.useEffect(() => {
-    if (!startButtonRef.current) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setShowStickyStart(!entry.isIntersecting);
-      },
-      { threshold: 0.5 }
-    );
-
-    observer.observe(startButtonRef.current);
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 w-full max-w-6xl pb-16 lg:pb-0">
@@ -268,11 +257,14 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
         showRoomName={true}
       />
 
-      {/* Row 2: Game Settings + Players List (side by side on desktop) */}
+      {/* Row 2: Game Settings + Players List (side by side on desktop, tabbed on mobile) */}
       <div className="flex flex-col lg:flex-row lg:items-stretch gap-2 sm:gap-3 md:gap-4">
         {/* Game Settings - LEFT - Neo-Brutalist Dark */}
-        <Card className="flex-1 p-2 sm:p-3 md:p-4 bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
-          <h3 className="text-sm font-black uppercase text-neo-cream mb-3 flex items-center gap-2">
+        <Card className={cn(
+          "flex-1 p-2 sm:p-3 md:p-4 bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg",
+          mobileTab !== 'settings' && "hidden lg:block"
+        )}>
+          <h3 className="hidden lg:flex text-sm font-black uppercase text-neo-cream mb-3 items-center gap-2">
             <Settings className="text-neo-cyan text-xs" />
             {t('hostView.gameSettings')}
           </h3>
@@ -286,41 +278,24 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                 {(Object.keys(GAME_PRESETS) as PresetKey[]).map((key) => {
                   const preset = GAME_PRESETS[key];
                   const isSelected = selectedPreset === key;
-                  const presetStyles: Record<PresetKey, { bg: string; ring: string; glow: string }> = {
-                    fast: {
-                      bg: 'bg-neo-yellow',
-                      ring: 'ring-neo-yellow',
-                      glow: 'shadow-[0_0_20px_rgba(255,237,0,0.6)]',
-                    },
-                    easy: {
-                      bg: 'bg-neo-lime',
-                      ring: 'ring-neo-lime',
-                      glow: 'shadow-[0_0_20px_rgba(0,255,127,0.6)]',
-                    },
-                    party: {
-                      bg: 'bg-neo-pink',
-                      ring: 'ring-neo-pink',
-                      glow: 'shadow-[0_0_20px_rgba(255,20,147,0.6)]',
-                    },
-                    challenge: {
-                      bg: 'bg-neo-orange',
-                      ring: 'ring-neo-orange',
-                      glow: 'shadow-[0_0_20px_rgba(255,140,0,0.6)]',
-                    },
-                  };
-                  const style = presetStyles[key];
                   const difficultyName = t(DIFFICULTIES[preset.difficulty].nameKey);
+                  // Colorful backgrounds with glow for each preset when selected
+                  const presetColors: Record<PresetKey, string> = {
+                    fast: 'bg-neo-cyan border-neo-cyan shadow-[0_0_20px_rgba(0,255,255,0.5),0_0_40px_rgba(0,255,255,0.3)]',
+                    easy: 'bg-neo-lime border-neo-lime shadow-[0_0_20px_rgba(192,255,62,0.5),0_0_40px_rgba(192,255,62,0.3)]',
+                    party: 'bg-neo-yellow border-neo-yellow shadow-[0_0_20px_rgba(255,224,102,0.5),0_0_40px_rgba(255,224,102,0.3)]',
+                    challenge: 'bg-neo-pink border-neo-pink shadow-[0_0_20px_rgba(255,20,147,0.5),0_0_40px_rgba(255,20,147,0.3)]',
+                  };
                   return (
                     <motion.button
                       key={key}
                       onClick={() => handleApplyPreset(key)}
                       whileTap={{ scale: 0.95 }}
                       className={cn(
-                        "relative flex-1 min-w-[90px] px-2 py-2 rounded-neo font-bold transition-all duration-150 border-3 border-neo-black",
-                        style.bg,
+                        "relative flex-1 min-w-[90px] px-2 py-2 rounded-neo font-bold transition-all duration-150 border-3",
                         isSelected
-                          ? `ring-4 ${style.ring} ring-offset-2 ring-offset-slate-800 ${style.glow} scale-105 z-10`
-                          : "shadow-hard hover:shadow-hard-lg hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] opacity-80 hover:opacity-100"
+                          ? `${presetColors[key]} ring-2 ring-white/30 ring-offset-2 ring-offset-slate-800 scale-105 z-10`
+                          : "bg-slate-700 border-slate-600 shadow-hard hover:shadow-hard-lg hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] hover:bg-slate-600 hover:border-slate-500"
                       )}
                     >
                       {/* Active indicator checkmark */}
@@ -335,10 +310,16 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                       )}
                       <div className="flex flex-col items-center gap-0.5">
                         <span className="text-xl drop-shadow-sm">{preset.icon}</span>
-                        <span className="font-black text-sm text-neo-black uppercase tracking-wide">
+                        <span className={cn(
+                          "font-black text-sm uppercase tracking-wide",
+                          isSelected ? "text-neo-black" : "text-neo-cream"
+                        )}>
                           {t(preset.nameKey) || key.charAt(0).toUpperCase() + key.slice(1)}
                         </span>
-                        <span className="text-[10px] text-neo-black/90 font-bold">
+                        <span className={cn(
+                          "text-[10px] font-bold",
+                          isSelected ? "text-neo-black/80" : "text-neo-cream/70"
+                        )}>
                           {preset.timer} {t('hostView.min')} • {difficultyName}
                         </span>
                       </div>
@@ -359,30 +340,24 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
               />
             </div>
 
-            {/* Broadcast Mode - Prominent Section */}
+            {/* Broadcast Mode - Subtle Section */}
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className={cn(
-                "pt-2 border-t border-neo-cream/20",
-                playersReady.length >= 4 && hostPlaying && "animate-pulse-subtle"
-              )}
+              className="pt-2 border-t border-neo-cream/20"
             >
               <div className={cn(
-                "p-3 rounded-neo border-3 transition-all duration-200",
+                "p-3 rounded-neo border-2 transition-all duration-200",
                 !hostPlaying
-                  ? "bg-neo-cyan/20 border-neo-cyan shadow-hard-sm"
-                  : "bg-slate-700/50 border-neo-cream/20"
+                  ? "bg-slate-700 border-neo-cream/40"
+                  : "bg-slate-700/50 border-slate-600"
               )}>
                 <div className="flex items-start gap-3">
                   <div className={cn(
-                    "p-2 rounded-neo border-2 border-neo-black transition-colors",
-                    !hostPlaying ? "bg-neo-cyan" : "bg-slate-600"
+                    "p-2 rounded-neo border-2 transition-colors",
+                    !hostPlaying ? "bg-slate-600 border-neo-cream/30" : "bg-slate-600 border-slate-500"
                   )}>
-                    <Monitor className={cn(
-                      "w-5 h-5",
-                      !hostPlaying ? "text-neo-black" : "text-neo-cream"
-                    )} />
+                    <Monitor className="w-5 h-5 text-neo-cream" />
                   </div>
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-2">
@@ -407,8 +382,8 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                         animate={{ opacity: 1, height: 'auto' }}
                         className="flex items-start gap-2 pl-8 pt-1"
                       >
-                        <Info className="w-4 h-4 text-neo-cyan flex-shrink-0 mt-0.5" />
-                        <span className="text-xs font-bold text-neo-cyan">
+                        <Info className="w-4 h-4 text-neo-cream/70 flex-shrink-0 mt-0.5" />
+                        <span className="text-xs font-medium text-neo-cream/70">
                           {t('hostView.broadcastModeHint')}
                         </span>
                       </motion.div>
@@ -566,8 +541,8 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
               )}
             </AnimatePresence>
 
-            {/* Start Game Button - PROMINENT HOST-ONLY ACTION */}
-            <div ref={startButtonRef} className="pt-3 flex justify-center">
+            {/* Start Game Button - Desktop only (inside card) */}
+            <div className="pt-3 hidden lg:flex justify-center">
               <Button
                 onClick={onStartGame}
                 disabled={!timerValue || playersReady.length === 0 || tournamentCreating}
@@ -587,8 +562,11 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
         </Card>
 
         {/* Players List - RIGHT */}
-        <Card className="lg:w-[320px] h-auto p-2 sm:p-3 md:p-4 flex flex-col bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
-          <h3 className="text-sm font-bold uppercase text-neo-cream mb-2 flex items-center gap-2 flex-shrink-0">
+        <Card className={cn(
+          "lg:w-[320px] h-auto p-2 sm:p-3 md:p-4 flex flex-col bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg",
+          mobileTab === 'players' ? "flex" : "hidden lg:flex"
+        )}>
+          <h3 className="hidden lg:flex text-sm font-bold uppercase text-neo-cream mb-2 items-center gap-2 flex-shrink-0">
             <Users className="text-neo-pink" />
             {t('hostView.playersJoined')} ({playersReady.length})
           </h3>
@@ -665,38 +643,102 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
       </div>
 
       {/* Row 3: Chat */}
-      <div className="w-full max-w-2xl mx-auto">
+      <div className={cn(
+        "w-full max-w-2xl mx-auto",
+        mobileTab === 'chat' ? "block" : "hidden lg:block"
+      )}>
         <RoomChat
           username="Host"
           isHost={true}
           gameCode={gameCode}
           className="h-full min-h-[240px] max-h-[280px]"
+          onNewMessage={() => {
+            // Show unread indicator if not on chat tab (mobile only)
+            if (mobileTab !== 'chat') {
+              setHasUnreadMessages(true);
+            }
+          }}
         />
       </div>
 
-      {/* Sticky Start Button - Mobile only, appears when original button is out of view */}
-      <AnimatePresence>
-        {showStickyStart && (
-          <motion.div
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed bottom-0 left-0 right-0 p-3 bg-slate-900/95 backdrop-blur-sm border-t-2 border-neo-black z-50 lg:hidden"
+      {/* Fixed Bottom Bar - Mobile only: Start Button + Tabs */}
+      <div className="fixed bottom-0 left-0 right-0 bg-slate-900/98 backdrop-blur-sm border-t-2 border-neo-black z-50 lg:hidden">
+        {/* Start Button - Above tabs for prominence */}
+        <div className="p-3 pb-2">
+          <Button
+            onClick={onStartGame}
+            disabled={!timerValue || playersReady.length === 0 || tournamentCreating}
+            className="w-full h-12 text-base bg-neo-lime text-neo-black font-black shadow-hard border-2 border-neo-black"
           >
-            <Button
-              onClick={onStartGame}
-              disabled={!timerValue || playersReady.length === 0 || tournamentCreating}
-              className="w-full h-12 text-base bg-neo-lime text-neo-black font-black shadow-hard border-2 border-neo-black"
-            >
-              {tournamentCreating ? t('hostView.creatingTournament') || 'Creating...' : t('hostView.startGame')}
-              {playersReady.length > 0 && (
-                <span className="ml-2 text-sm opacity-75">({playersReady.length} {t('hostView.players')})</span>
-              )}
-            </Button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            {tournamentCreating ? t('hostView.creatingTournament') || 'Creating...' : (
+              <>
+                🎮 {t('hostView.startGame')}
+                {playersReady.length > 0 && (
+                  <span className="ml-2 text-sm opacity-75">({playersReady.length})</span>
+                )}
+              </>
+            )}
+          </Button>
+        </div>
+        {/* Bottom Tabs */}
+        <div className="flex border-t border-slate-700">
+          <button
+            type="button"
+            onClick={() => setMobileTab('settings')}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-1.5 px-2 py-2.5 font-bold text-xs uppercase transition-all duration-150",
+              mobileTab === 'settings'
+                ? "bg-slate-800 text-neo-cream border-t-2 border-neo-lime"
+                : "bg-transparent text-neo-cream/60 hover:text-neo-cream hover:bg-slate-800/50"
+            )}
+          >
+            <Settings size={16} />
+            <span className="hidden xs:inline">{t('hostView.settings') || 'Settings'}</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMobileTab('players')}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-1.5 px-2 py-2.5 font-bold text-xs uppercase transition-all duration-150",
+              mobileTab === 'players'
+                ? "bg-slate-800 text-neo-cream border-t-2 border-neo-pink"
+                : "bg-transparent text-neo-cream/60 hover:text-neo-cream hover:bg-slate-800/50"
+            )}
+          >
+            <Users size={16} />
+            <span className="hidden xs:inline">{t('hostView.players') || 'Players'}</span>
+            {playersReady.length > 0 && (
+              <span className={cn(
+                "min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full text-[10px] font-black",
+                mobileTab === 'players'
+                  ? "bg-neo-pink text-neo-white"
+                  : "bg-neo-lime text-neo-black"
+              )}>
+                {playersReady.length}
+              </span>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setMobileTab('chat');
+              setHasUnreadMessages(false);
+            }}
+            className={cn(
+              "flex-1 flex items-center justify-center gap-1.5 px-2 py-2.5 font-bold text-xs uppercase transition-all duration-150 relative",
+              mobileTab === 'chat'
+                ? "bg-slate-800 text-neo-cream border-t-2 border-neo-cyan"
+                : "bg-transparent text-neo-cream/60 hover:text-neo-cream hover:bg-slate-800/50"
+            )}
+          >
+            <MessageSquare size={16} />
+            <span className="hidden xs:inline">{t('hostView.chat') || 'Chat'}</span>
+            {hasUnreadMessages && mobileTab !== 'chat' && (
+              <span className="absolute top-1 right-2 w-2.5 h-2.5 bg-neo-red rounded-full animate-pulse" />
+            )}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

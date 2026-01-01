@@ -6,7 +6,84 @@
  * from multiple components into reusable utility functions.
  */
 
-import React from 'react';
+import { Crown, Medal } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+
+// Re-export confetti colors for convenience
+export { RANK_COLORS as RANK_CONFETTI_COLORS } from './confettiUtils';
+
+// ============================================================
+// RANK CONFIGURATION - Complete styling for each rank
+// ============================================================
+
+export interface RankConfig {
+  bg: string;
+  border: string;
+  text: string;
+  rankText: string;
+  icon: LucideIcon;
+  iconColor: string;
+}
+
+/**
+ * Complete rank configuration for top 3 places
+ * Used by Top3Leaderboard, ConsolidatedPlayerCard, etc.
+ */
+export const RANK_CONFIG: Record<1 | 2 | 3, RankConfig> = {
+  1: {
+    bg: 'bg-neo-yellow',
+    border: 'border-neo-yellow',
+    text: 'text-neo-black',
+    rankText: 'text-neo-yellow dark:text-neo-yellow',
+    icon: Crown,
+    iconColor: 'text-neo-yellow',
+  },
+  2: {
+    bg: 'bg-slate-300',
+    border: 'border-slate-300',
+    text: 'text-slate-800',
+    rankText: 'text-slate-500 dark:text-slate-300',
+    icon: Medal,
+    iconColor: 'text-slate-400',
+  },
+  3: {
+    bg: 'bg-neo-orange',
+    border: 'border-neo-orange',
+    text: 'text-neo-black',
+    rankText: 'text-neo-orange dark:text-neo-orange',
+    icon: Medal,
+    iconColor: 'text-neo-orange',
+  },
+};
+
+/**
+ * Simplified rank colors for player cards
+ * Used by ConsolidatedPlayerCard, ResultsPlayerCard
+ */
+export const RANK_COLORS_SIMPLE: Record<number, { bg: string; text: string }> = {
+  1: { bg: 'bg-neo-yellow', text: 'text-neo-black' },
+  2: { bg: 'bg-slate-300', text: 'text-slate-800' },
+  3: { bg: 'bg-neo-orange', text: 'text-neo-black' },
+};
+
+/**
+ * Get rank config for a given rank (1-based)
+ * Returns undefined for ranks > 3
+ */
+export function getRankConfig(rank: number): RankConfig | undefined {
+  if (rank >= 1 && rank <= 3) {
+    return RANK_CONFIG[rank as 1 | 2 | 3];
+  }
+  return undefined;
+}
+
+/**
+ * Get simple rank colors for a given rank (1-based)
+ * Returns default colors for ranks > 3
+ */
+export function getRankColors(rank: number): { bg: string; text: string } {
+  return RANK_COLORS_SIMPLE[rank] || { bg: 'bg-neo-cream', text: 'text-neo-black' };
+}
 
 // ============================================================
 // RANK ICONS

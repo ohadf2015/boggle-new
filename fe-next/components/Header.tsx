@@ -1,6 +1,6 @@
 import { memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BarChart3, Menu, X, Settings } from 'lucide-react';
+import { BarChart3, Menu, X, Settings, BookOpen, Trophy, ScrollText, Shield, Coffee } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -76,7 +76,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     return (
         <header
             className={cn(
-                "w-full mb-2 sm:mb-4 lg:mb-6 xl:mb-8 px-2 xs:px-3 sm:px-4 lg:px-8 xl:px-12 pt-3 sm:pt-4 lg:pt-6 xl:pt-8 pb-2 lg:pb-4 sticky top-0 z-50 landscape:static bg-slate-50 dark:bg-slate-900",
+                "w-full mb-2 sm:mb-3 lg:mb-4 xl:mb-6 px-2 xs:px-3 sm:px-4 lg:px-8 xl:px-12 pt-2 sm:pt-3 lg:pt-4 xl:pt-6 pb-2 lg:pb-3 sticky top-0 z-50 landscape:static bg-slate-50 dark:bg-slate-900",
                 className
             )}
         >
@@ -85,7 +85,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 className={cn(
                     "max-w-6xl lg:max-w-7xl 2xl:max-w-[1800px] mx-auto",
                     "flex items-center justify-between",
-                    "px-1 xs:px-2 sm:px-4 md:px-6 lg:px-6 xl:px-8 2xl:px-10 py-2 xs:py-3 sm:py-3 lg:py-3 xl:py-4 2xl:py-4",
+                    "px-1 xs:px-2 sm:px-4 md:px-6 lg:px-6 xl:px-8 2xl:px-10 py-2 xs:py-2 sm:py-2.5 lg:py-3 xl:py-3 2xl:py-3",
                     "bg-neo-cyan-muted",
                     "border-4 lg:border-4 xl:border-4 2xl:border-4 border-neo-black",
                     "shadow-hard-lg xl:shadow-hard-lg 2xl:shadow-hard-lg",
@@ -360,6 +360,90 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                         </div>
                                     </>
                                 )}
+
+                                {/* Divider */}
+                                <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
+
+                                {/* Info Links Section - replaces footer on mobile */}
+                                <div className="flex flex-col gap-2">
+                                    <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
+                                        {t('common.info') || 'Info'}
+                                    </span>
+                                    <div className="flex flex-col gap-2">
+                                        <Link
+                                            href={`/${language}/rules`}
+                                            onClick={() => setShowMobileMenu(false)}
+                                            className={cn(
+                                                "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
+                                                "shadow-hard-sm hover:shadow-hard"
+                                            )}
+                                        >
+                                            <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cyan border-2 border-neo-black">
+                                                <BookOpen className="w-4 h-4 text-neo-black" />
+                                            </span>
+                                            <span>{t('footer.aboutGame') || 'About the Game'}</span>
+                                        </Link>
+                                        <Link
+                                            href={`/${language}/leaderboard`}
+                                            onClick={() => setShowMobileMenu(false)}
+                                            className={cn(
+                                                "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
+                                                "shadow-hard-sm hover:shadow-hard"
+                                            )}
+                                        >
+                                            <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-yellow border-2 border-neo-black">
+                                                <Trophy className="w-4 h-4 text-neo-black" />
+                                            </span>
+                                            <span>{t('footer.leaderboard') || 'Leaderboard'}</span>
+                                        </Link>
+                                        <Link
+                                            href={`/${language}/legal/terms`}
+                                            onClick={() => setShowMobileMenu(false)}
+                                            className={cn(
+                                                "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                "bg-white dark:bg-slate-700 hover:bg-neo-yellow/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
+                                                "shadow-hard-sm hover:shadow-hard"
+                                            )}
+                                        >
+                                            <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cream border-2 border-neo-black">
+                                                <ScrollText className="w-4 h-4 text-neo-black" />
+                                            </span>
+                                            <span>{t('legal.termsOfService')}</span>
+                                        </Link>
+                                        <Link
+                                            href={`/${language}/legal/privacy`}
+                                            onClick={() => setShowMobileMenu(false)}
+                                            className={cn(
+                                                "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                "bg-white dark:bg-slate-700 hover:bg-neo-yellow/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
+                                                "shadow-hard-sm hover:shadow-hard"
+                                            )}
+                                        >
+                                            <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-purple-light border-2 border-neo-black">
+                                                <Shield className="w-4 h-4 text-white" />
+                                            </span>
+                                            <span>{t('legal.privacyPolicy')}</span>
+                                        </Link>
+                                        <a
+                                            href="https://ko-fi.com/lexiclash"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            onClick={() => setShowMobileMenu(false)}
+                                            className={cn(
+                                                "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                "bg-neo-pink/20 dark:bg-slate-700 hover:bg-neo-pink/40 dark:hover:bg-slate-600 text-neo-black dark:text-white",
+                                                "shadow-hard-sm hover:shadow-hard"
+                                            )}
+                                        >
+                                            <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-pink border-2 border-neo-black">
+                                                <Coffee className="w-4 h-4 text-white" />
+                                            </span>
+                                            <span>{t('support.kofiFooter')}</span>
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </motion.div>
                     </>

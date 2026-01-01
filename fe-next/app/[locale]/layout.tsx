@@ -491,7 +491,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
                 <meta name="apple-mobile-web-app-title" content="LexiClash" />
             </head>
-            <body className="antialiased flex flex-col min-h-screen" suppressHydrationWarning>
+            <body className="antialiased screen-fit" suppressHydrationWarning>
                 {/* Skip to main content link for keyboard/screen reader users */}
                 <a
                     href="#main-content"
@@ -504,10 +504,10 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <WebVitalsReporter />
                 <ServiceWorkerRegistration />
                 <Providers lang={validLocale}>
-                    <main id="main-content" className="flex-grow" tabIndex={-1}>
+                    <main id="main-content" className="screen-fit-content" tabIndex={-1}>
                         {children}
                     </main>
-                    <Footer />
+                    <Footer className="hidden md:block" />
                     <PWAInstallPrompt />
                     <EmailCaptureModal />
                     <NewYearCountdown />

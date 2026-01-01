@@ -38,7 +38,7 @@ import { logGameStart, logGameEnd, formatWordsForLogging } from '@/utils/gameLog
 
 const MAX_ATTEMPTS = 10;
 const INITIAL_LIFE = 100;
-const LIFE_DRAIN_RATE = 1.25; // points per second (gives 80 seconds total)
+const LIFE_DRAIN_RATE = 1.0; // points per second (gives 100 seconds total)
 const INVALID_WORD_PENALTY = 5; // life points lost for invalid submissions
 const NOT_IN_DICTIONARY_PENALTY = 4; // life points lost for words not in dictionary
 
@@ -174,6 +174,11 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
   // Load AI hints on mount
   useEffect(() => {
+    // Guard against undefined/empty targetWord
+    if (!targetWord || targetWord.length < 2) {
+      return;
+    }
+
     async function loadHints() {
       const hints = await generateProgressiveHints(targetWord, language);
       setCategory(hints.category);
@@ -247,15 +252,15 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     };
   }, [isGameOver]);
 
-  // Show shop hint when life is low and tokens are available (non-intrusive suggestion)
+  // Show shop hint when life is at half and tokens are available (non-intrusive suggestion)
   useEffect(() => {
-    const LOW_LIFE_THRESHOLD = 40; // Show hint when life drops below 40%
+    const HALF_LIFE_THRESHOLD = 50; // Show hint when life drops to half (50%)
     const MIN_TOKENS_FOR_HINT = 60; // Minimum cost of cheapest item
 
     if (
       !shopHintShownRef.current &&
       !isGameOver &&
-      lifePoints <= LOW_LIFE_THRESHOLD &&
+      lifePoints <= HALF_LIFE_THRESHOLD &&
       clueTokens >= MIN_TOKENS_FOR_HINT
     ) {
       shopHintShownRef.current = true;
@@ -790,8 +795,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                   className="absolute top-full right-0 mt-2 z-50"
                 >
                   <div className="bg-neo-yellow text-neo-black text-xs font-bold px-3 py-1.5 rounded-neo border-2 border-neo-black whitespace-nowrap shadow-hard-sm">
-                    <Lightbulb className="w-3 h-3 inline mr-1" />
-                    {t('wordHunt.survival.needHelp') || 'Need help? Try a clue!'}
+                    <Coins className="w-3 h-3 inline mr-1" />
+                    {t('wordHunt.survival.spendCoinsHint') || 'Spend coins on clues!'}
                   </div>
                 </motion.div>
               )}

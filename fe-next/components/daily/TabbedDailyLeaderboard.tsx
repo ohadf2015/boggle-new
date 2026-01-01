@@ -6,6 +6,7 @@ import { Users, Trophy, Clock, ChevronDown, ChevronUp, Sparkles, Crown, Calendar
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { getRankDisplay } from '@/utils/rankingStyles';
 import { getPuzzleNumber } from '@/utils/dailyChallenge';
+import { supabase } from '@/lib/supabase';
 import type { Language } from '@/types';
 
 // ==========================================
@@ -385,8 +386,8 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
 
   // Fetch today's leaderboard
   const fetchTodayLeaderboard = useCallback(async () => {
-    // Guard against empty puzzleDate
-    if (!puzzleDate) {
+    // Guard against empty puzzleDate or missing Supabase client
+    if (!puzzleDate || !supabase) {
       return;
     }
 
@@ -394,19 +395,40 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       setTodayLoading(true);
       setTodayError(null);
 
-      const url = `/api/daily-challenge/word-hunt/leaderboard/${puzzleDate}/${language}?limit=50`;
-      const response = await fetch(url);
+      // Fetch leaderboard from the Word Hunt leaderboard view
+      // Filter: only show solved attempts from authenticated users
+      const { data, error } = await supabase
+        .from('daily_word_hunt_leaderboard')
+        .select('*')
+        .eq('puzzle_date', puzzleDate)
+        .eq('language', language)
+        .eq('solved', true)
+        .not('player_id', 'is', null)
+        .order('rank_position', { ascending: true })
+        .limit(50);
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch leaderboard');
+      if (error) {
+        throw new Error(error.message);
       }
 
-      const data = await response.json();
-      setTodayParticipants(data.data || []);
-      setTodayTotalCount(data.totalParticipants || 0);
+      // Get total participant count (only solved attempts from authenticated users)
+      const { count } = await supabase
+        .from('daily_word_hunt_attempts')
+        .select('*', { count: 'exact', head: true })
+        .eq('puzzle_date', puzzleDate)
+        .eq('language', language)
+        .eq('solved', true)
+        .not('player_id', 'is', null);
+
+      const dataLength = data?.length || 0;
+      const queryCount = count ?? 0;
+      const totalParticipants = Math.max(queryCount, dataLength);
+
+      setTodayParticipants(data || []);
+      setTodayTotalCount(totalParticipants);
 
       if (onParticipantCountChange && activeTab === 'today') {
-        onParticipantCountChange(data.totalParticipants || 0);
+        onParticipantCountChange(totalParticipants);
       }
     } catch (err) {
       console.error('Failed to fetch today leaderboard:', err);
@@ -418,23 +440,39 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
 
   // Fetch all-time leaderboard
   const fetchAllTimeLeaderboard = useCallback(async () => {
+    if (!supabase) {
+      return;
+    }
+
     try {
       setAllTimeLoading(true);
       setAllTimeError(null);
 
-      const url = `/api/daily-challenge/word-hunt/alltime-leaderboard/${language}?limit=50`;
-      const response = await fetch(url);
+      // Fetch all-time leaderboard from the view
+      const { data, error } = await supabase
+        .from('word_hunt_alltime_leaderboard')
+        .select('*')
+        .eq('language', language)
+        .order('rank_position', { ascending: true })
+        .limit(50);
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch all-time leaderboard');
+      if (error) {
+        throw new Error(error.message);
       }
 
-      const data = await response.json();
-      setAllTimeParticipants(data.data || []);
-      setAllTimeTotalCount(data.totalParticipants || 0);
+      // Get total participant count for this language
+      const { count } = await supabase
+        .from('word_hunt_alltime_leaderboard')
+        .select('*', { count: 'exact', head: true })
+        .eq('language', language);
+
+      const totalParticipants = count || data?.length || 0;
+
+      setAllTimeParticipants(data || []);
+      setAllTimeTotalCount(totalParticipants);
 
       if (onParticipantCountChange && activeTab === 'alltime') {
-        onParticipantCountChange(data.totalParticipants || 0);
+        onParticipantCountChange(totalParticipants);
       }
     } catch (err) {
       console.error('Failed to fetch all-time leaderboard:', err);

@@ -2,14 +2,12 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import MultiplayerSelector from './MultiplayerSelector';
-import ProfileSetup, { type ProfileData } from './ProfileSetup';
-import CreateRoomForm from './CreateRoomForm';
-import JoinRoomForm from './JoinRoomForm';
+import CreateRoomSetup from './CreateRoomSetup';
+import JoinRoomSetup from './JoinRoomSetup';
 import InvitationQuickJoin from './InvitationQuickJoin';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 
-type FlowState = 'selector' | 'profile-setup' | 'create-form' | 'join-form' | 'invitation-quick-join';
-type Mode = 'create' | 'join' | null;
+type FlowState = 'selector' | 'create-setup' | 'join-setup' | 'invitation-quick-join';
 
 interface MultiplayerFlowProps {
   // Callbacks
@@ -37,8 +35,8 @@ interface MultiplayerFlowProps {
 }
 
 /**
- * MultiplayerFlow - Orchestrator for the new multiplayer flow
- * Manages state machine: selector -> profile-setup -> create-form/join-form
+ * MultiplayerFlow - Orchestrator for the multiplayer flow
+ * Simplified state machine: selector -> create-setup/join-setup (single step each)
  */
 const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   handleJoin,
@@ -57,10 +55,8 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   setRoomName,
   setHostUsername,
 }) => {
-  // Flow state
+  // Flow state - simplified to just selector and single-step setup screens
   const [flowState, setFlowState] = useState<FlowState>('selector');
-  const [mode, setMode] = useState<Mode>(null);
-  const [profile, setProfile] = useState<ProfileData | null>(null);
 
   // Saved profile for invitation quick join
   const [savedUsername, setSavedUsername] = useState<string | null>(null);
@@ -82,121 +78,49 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
       setSavedUsername(storedUsername);
       setSavedAvatarId(storedAvatarId);
       setUsername(storedUsername);
-      setMode('join');
       setFlowState('invitation-quick-join');
     } else if (isAuthenticated && displayName && profileAvatarId) {
       // Authenticated user with profile - show quick join
       setSavedUsername(displayName);
       setSavedAvatarId(profileAvatarId);
       setUsername(displayName);
-      setMode('join');
       setFlowState('invitation-quick-join');
     } else {
-      // No saved profile - go to profile setup for joining
-      setMode('join');
-      setFlowState('profile-setup');
+      // No saved profile - go to join setup
+      setFlowState('join-setup');
     }
   }, [prefilledRoom, isAuthenticated, displayName, profileAvatarId, setGameCode, setUsername]);
 
-  // Handle selector choices
+  // Handle selector choices - go directly to single-step setup
   const handleSelectCreate = useCallback(() => {
-    setMode('create');
-
-    // Check if we already have saved profile data
-    const savedUsername = typeof window !== 'undefined' ? localStorage.getItem('boggle_username') : null;
-    const savedAvatarId = typeof window !== 'undefined' ? localStorage.getItem('boggle_avatar_id') : null;
-
-    // Skip profile setup if we have both avatar and name already
-    if ((savedUsername && savedAvatarId) || (isAuthenticated && displayName && profileAvatarId)) {
-      const effectiveUsername = savedUsername || displayName;
-      const effectiveAvatarId = savedAvatarId || profileAvatarId;
-      const roomName = `${effectiveUsername} Room`;
-
-      // Set profile data and skip to create form
-      setProfile({
-        username: effectiveUsername!,
-        avatarId: effectiveAvatarId!,
-        roomName,
-      });
-      setUsername(effectiveUsername!);
-      setHostUsername(effectiveUsername!);
-      setRoomName(roomName);
-      setFlowState('create-form');
-    } else {
-      // Need to set up profile first
-      setFlowState('profile-setup');
-    }
-  }, [isAuthenticated, displayName, profileAvatarId, setUsername, setHostUsername, setRoomName]);
+    setFlowState('create-setup');
+  }, []);
 
   const handleSelectJoin = useCallback(() => {
-    setMode('join');
+    setFlowState('join-setup');
+  }, []);
 
-    // Check if we already have saved profile data
-    const savedUsername = typeof window !== 'undefined' ? localStorage.getItem('boggle_username') : null;
-    const savedAvatarId = typeof window !== 'undefined' ? localStorage.getItem('boggle_avatar_id') : null;
-
-    // Skip profile setup if we have both avatar and name already
-    if ((savedUsername && savedAvatarId) || (isAuthenticated && displayName && profileAvatarId)) {
-      const effectiveUsername = savedUsername || displayName;
-      const effectiveAvatarId = savedAvatarId || profileAvatarId;
-
-      // Set profile data and skip to join form
-      setProfile({
-        username: effectiveUsername!,
-        avatarId: effectiveAvatarId!,
-      });
-      setUsername(effectiveUsername!);
-      setFlowState('join-form');
-    } else {
-      // Need to set up profile first
-      setFlowState('profile-setup');
-    }
-  }, [isAuthenticated, displayName, profileAvatarId, setUsername]);
-
-  // Handle quick join from selector (skip profile if already set)
+  // Handle quick join from selector
   const handleQuickJoin = useCallback((roomCode: string) => {
     // Check if we have saved profile in localStorage
-    const savedUsername = typeof window !== 'undefined' ? localStorage.getItem('boggle_username') : null;
-    const savedAvatarId = typeof window !== 'undefined' ? localStorage.getItem('boggle_avatar_id') : null;
+    const storedUsername = typeof window !== 'undefined' ? localStorage.getItem('boggle_username') : null;
+    const storedAvatarId = typeof window !== 'undefined' ? localStorage.getItem('boggle_avatar_id') : null;
 
-    if (savedUsername && savedAvatarId) {
+    if (storedUsername && storedAvatarId) {
       // Already have profile, join directly
       setGameCode(roomCode);
-      setUsername(savedUsername);
+      setUsername(storedUsername);
       handleJoin(false, null, roomCode);
     } else {
-      // Need profile setup first
-      setMode('join');
-      setFlowState('profile-setup');
-      // Store room code for later
+      // Need to go through join setup
       setGameCode(roomCode);
+      setFlowState('join-setup');
     }
   }, [handleJoin, setGameCode, setUsername]);
-
-  // Handle profile complete
-  const handleProfileComplete = useCallback((profileData: ProfileData) => {
-    setProfile(profileData);
-    setUsername(profileData.username);
-
-    if (mode === 'create') {
-      setHostUsername(profileData.username);
-      if (profileData.roomName) {
-        setRoomName(profileData.roomName);
-      }
-      setFlowState('create-form');
-    } else {
-      setFlowState('join-form');
-    }
-  }, [mode, setUsername, setHostUsername, setRoomName]);
 
   // Handle back navigation
   const handleBackToSelector = useCallback(() => {
     setFlowState('selector');
-    setMode(null);
-  }, []);
-
-  const handleBackToProfile = useCallback(() => {
-    setFlowState('profile-setup');
   }, []);
 
   // Handle invitation quick join
@@ -208,8 +132,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
 
   // Handle change profile from invitation quick join
   const handleChangeProfileFromInvitation = useCallback(() => {
-    setFlowState('profile-setup');
-    setMode('join');
+    setFlowState('join-setup');
   }, []);
 
   // Handle create room submission
@@ -223,8 +146,9 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     setGameCode(config.gameCode);
     setRoomName(config.roomName);
     setHostUsername(config.hostUsername);
+    setUsername(config.hostUsername);
     handleJoin(true, config.language, config.gameCode);
-  }, [handleJoin, setGameCode, setRoomName, setHostUsername]);
+  }, [handleJoin, setGameCode, setRoomName, setHostUsername, setUsername]);
 
   // Handle join room submission
   const handleJoinSubmit = useCallback((config: {
@@ -250,41 +174,33 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
         />
       );
 
-    case 'profile-setup':
+    case 'create-setup':
       return (
-        <ProfileSetup
-          mode={mode!}
+        <CreateRoomSetup
           isAuthenticated={isAuthenticated}
           displayName={displayName || null}
-          initialAvatarId={profileAvatarId}
           profilePictureUrl={profilePictureUrl}
-          onComplete={handleProfileComplete}
+          initialAvatarId={profileAvatarId}
+          defaultLanguage={defaultLanguage}
+          isSubmitting={isJoining}
+          onSubmit={handleCreateSubmit}
           onBack={handleBackToSelector}
         />
       );
 
-    case 'create-form':
+    case 'join-setup':
       return (
-        <CreateRoomForm
-          profile={profile!}
-          defaultLanguage={defaultLanguage}
-          isSubmitting={isJoining}
+        <JoinRoomSetup
+          isAuthenticated={isAuthenticated}
+          displayName={displayName || null}
           profilePictureUrl={profilePictureUrl}
-          onSubmit={handleCreateSubmit}
-          onBack={handleBackToProfile}
-        />
-      );
-
-    case 'join-form':
-      return (
-        <JoinRoomForm
-          profile={profile!}
+          initialAvatarId={profileAvatarId}
           activeRooms={activeRooms}
           roomsLoading={roomsLoading}
           isSubmitting={isJoining}
           prefilledCode={prefilledRoom}
           onSubmit={handleJoinSubmit}
-          onBack={handleBackToProfile}
+          onBack={handleBackToSelector}
           onRefreshRooms={refreshRooms}
         />
       );

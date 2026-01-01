@@ -228,7 +228,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
     score,
     wordCount,
     isWinner,
-    achievements: achievements.map(a => ({ id: a.id || a.key || '', icon: a.icon })),
+    achievements: achievements.map((a, i) => ({ id: a.id || a.key || `achievement-${i}`, icon: a.icon })),
     streakDays,
     maxCombo,
     archetype: archetype ? {
@@ -341,13 +341,15 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
   }
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, y: 20, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: -10, scale: 0.95 }}
-        transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-        className={cn(
+    <>
+      <AnimatePresence>
+        <motion.div
+          key="share-win-prompt"
+          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -10, scale: 0.95 }}
+          transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+          className={cn(
           'relative p-4 sm:p-5 rounded-2xl border-3 overflow-hidden',
           isWinner
             ? isDarkMode
@@ -495,6 +497,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
           {language === 'he' ? 'תאתגרו את החברים 😈' : 'Challenge your friends 😈'}
         </p>
       </motion.div>
+      </AnimatePresence>
 
       {/* Unified Share Modal */}
       <UnifiedShareModal
@@ -507,7 +510,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
         language={language}
         wittyMessage={wittyMessage}
       />
-    </AnimatePresence>
+    </>
   );
 };
 

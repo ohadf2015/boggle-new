@@ -121,11 +121,35 @@ export async function getUser() {
 // Profile helpers
 type ProfileResult = { data: ProfileData | null; error: { message: string } | null };
 
-export async function getProfile(userId: string): Promise<ProfileResult> {
+/**
+ * Profile field selectors to reduce over-fetching
+ * Use the minimal selector needed for your view
+ */
+export const PROFILE_SELECTS = {
+  // Minimal fields for display (avatars, cards, leaderboards)
+  minimal: 'id, display_name, avatar_emoji, avatar_color, avatar_image, profile_picture_url',
+  // Overview fields for profile cards and summaries
+  overview: 'id, username, display_name, avatar_emoji, avatar_color, avatar_image, profile_picture_url, total_games, total_score, current_level, player_title',
+  // Game-related stats for results and stats pages
+  stats: 'id, display_name, total_games, total_score, total_words, casual_games, casual_wins, ranked_games, ranked_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_xp, current_level, player_title, achievement_counts, total_time_played',
+  // Auth and settings fields
+  settings: 'id, username, display_name, avatar_emoji, avatar_color, avatar_image, profile_picture_url, profile_picture_provider, has_customized_profile, is_admin, country_code, daily_email_subscribed, timezone',
+  // Full profile (use sparingly - only when all fields needed)
+  full: 'id, username, display_name, avatar_emoji, avatar_color, avatar_image, profile_picture_url, profile_picture_provider, has_customized_profile, total_games, total_score, total_words, casual_games, casual_wins, ranked_games, ranked_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_xp, current_level, player_title, is_admin, total_hints_used, free_hints_available, country_code, created_at, updated_at, achievement_counts, total_time_played, total_coins, lifetime_coins_earned, daily_email_subscribed, timezone'
+} as const;
+
+export type ProfileSelectType = keyof typeof PROFILE_SELECTS;
+
+/**
+ * Get profile with specific field selection to reduce over-fetching
+ * @param userId - User ID to fetch
+ * @param select - Which field set to fetch (default: 'full' for backward compatibility)
+ */
+export async function getProfile(userId: string, select: ProfileSelectType = 'full'): Promise<ProfileResult> {
   if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
   const result = await supabase
     .from('profiles')
-    .select('id, username, display_name, avatar_emoji, avatar_color, profile_picture_url, profile_picture_provider, total_games, total_score, total_words, casual_games, casual_wins, ranked_games, ranked_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_xp, current_level, player_title, is_admin, total_hints_used, free_hints_available, country_code, created_at, updated_at, achievement_counts, total_time_played, total_coins, lifetime_coins_earned, daily_email_subscribed, timezone')
+    .select(PROFILE_SELECTS[select])
     .eq('id', userId)
     .single();
   return { data: result.data as ProfileData | null, error: result.error ? { message: result.error.message } : null };
@@ -292,6 +316,7 @@ export interface CoinSyncResult {
 /**
  * Sync coins to the database (add coins to user's balance)
  * This should be called after awarding coins locally to persist them
+ * Uses RPC for atomic operation (single query instead of 3)
  */
 export async function syncCoinsToDatabase(
   userId: string,
@@ -303,49 +328,24 @@ export async function syncCoinsToDatabase(
   if (amount <= 0) return { success: false, error: 'Amount must be positive' };
 
   try {
-    // Get current balance
-    const { data: profile, error: fetchError } = await supabase
-      .from('profiles')
-      .select('total_coins, lifetime_coins_earned')
-      .eq('id', userId)
-      .single();
+    const { data, error } = await supabase.rpc('sync_coins', {
+      p_user_id: userId,
+      p_amount: amount,
+      p_reason: reason,
+      p_metadata: metadata || {}
+    });
 
-    if (fetchError) {
-      logger.error('Failed to fetch profile for coin sync:', fetchError);
-      return { success: false, error: fetchError.message };
+    if (error) {
+      logger.error('Coin sync RPC error:', error);
+      return { success: false, error: error.message };
     }
 
-    const currentCoins = profile?.total_coins || 0;
-    const lifetimeCoins = profile?.lifetime_coins_earned || 0;
-    const newBalance = currentCoins + amount;
-    const newLifetime = lifetimeCoins + amount;
-
-    // Update profile with new coin balance
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update({
-        total_coins: newBalance,
-        lifetime_coins_earned: newLifetime
-      })
-      .eq('id', userId);
-
-    if (updateError) {
-      logger.error('Failed to update coin balance:', updateError);
-      return { success: false, error: updateError.message };
+    const result = data?.[0];
+    if (!result?.success) {
+      return { success: false, error: result?.error_message || 'Unknown error' };
     }
 
-    // Log the transaction
-    await supabase
-      .from('coin_transactions')
-      .insert({
-        player_id: userId,
-        amount: amount,
-        balance_after: newBalance,
-        reason: reason,
-        metadata: metadata || {}
-      });
-
-    return { success: true, newBalance };
+    return { success: true, newBalance: result.new_balance };
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Unknown error';
     logger.error('Coin sync error:', error);
@@ -356,6 +356,7 @@ export async function syncCoinsToDatabase(
 /**
  * Spend coins from user's balance (deduct coins)
  * Returns success if user has enough coins, false otherwise
+ * Uses RPC for atomic operation (single query instead of 3)
  */
 export async function spendCoinsFromDatabase(
   userId: string,
@@ -367,46 +368,25 @@ export async function spendCoinsFromDatabase(
   if (amount <= 0) return { success: false, error: 'Amount must be positive' };
 
   try {
-    // Get current balance
-    const { data: profile, error: fetchError } = await supabase
-      .from('profiles')
-      .select('total_coins')
-      .eq('id', userId)
-      .single();
+    // Use negative amount for spending
+    const { data, error } = await supabase.rpc('sync_coins', {
+      p_user_id: userId,
+      p_amount: -amount,
+      p_reason: reason,
+      p_metadata: metadata || {}
+    });
 
-    if (fetchError) {
-      return { success: false, error: fetchError.message };
+    if (error) {
+      logger.error('Coin spend RPC error:', error);
+      return { success: false, error: error.message };
     }
 
-    const currentCoins = profile?.total_coins || 0;
-    if (currentCoins < amount) {
-      return { success: false, error: 'Insufficient coins' };
+    const result = data?.[0];
+    if (!result?.success) {
+      return { success: false, error: result?.error_message || 'Unknown error' };
     }
 
-    const newBalance = currentCoins - amount;
-
-    // Update profile with new coin balance
-    const { error: updateError } = await supabase
-      .from('profiles')
-      .update({ total_coins: newBalance })
-      .eq('id', userId);
-
-    if (updateError) {
-      return { success: false, error: updateError.message };
-    }
-
-    // Log the transaction (negative amount for spend)
-    await supabase
-      .from('coin_transactions')
-      .insert({
-        player_id: userId,
-        amount: -amount,
-        balance_after: newBalance,
-        reason: reason,
-        metadata: metadata || {}
-      });
-
-    return { success: true, newBalance };
+    return { success: true, newBalance: result.new_balance };
   } catch (err) {
     const error = err instanceof Error ? err.message : 'Unknown error';
     return { success: false, error };

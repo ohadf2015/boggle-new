@@ -140,7 +140,7 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
           onClick={(e) => e.stopPropagation()}
         >
           {/* Preview */}
-          <div className="flex flex-col items-center mb-6">
+          <div className="flex flex-col items-center mb-4">
             <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-neo-black shadow-hard mb-3 relative">
               {useProfileAvatar ? (
                 profileAvatar?.profilePictureUrl ? (
@@ -191,7 +191,7 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
           </div>
 
           {/* Avatar Gallery Grid */}
-          <div className="mb-6">
+          <div className="mb-4">
             <p className="text-sm font-bold mb-3 text-neo-black uppercase tracking-wide">
               Choose Your Avatar
             </p>

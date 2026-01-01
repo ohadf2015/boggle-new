@@ -174,7 +174,7 @@ const LandingView: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
+    <div className="flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
       {/* Onboarding Modal */}
       <OnboardingModal isOpen={showOnboarding} onClose={() => setShowOnboarding(false)} />
 
@@ -191,13 +191,13 @@ const LandingView: React.FC = () => {
       <Header />
 
       {/* Main content */}
-      <main className="max-w-6xl lg:max-w-7xl mx-auto px-2 xs:px-4 sm:px-6 lg:px-8 xl:px-12 py-2 sm:py-4 lg:py-8 xl:py-12 overflow-x-hidden">
+      <main className="max-w-6xl lg:max-w-7xl mx-auto px-2 xs:px-4 sm:px-6 lg:px-8 xl:px-12 py-2 sm:py-3 lg:py-6 xl:py-8 overflow-x-hidden">
         {/* Hero section - compact */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="text-center mb-2 sm:mb-3 lg:mb-6 xl:mb-8"
+          className="text-center mb-2 sm:mb-2 lg:mb-4 xl:mb-6"
         >
           <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white mb-0.5 sm:mb-1 lg:mb-2">
             {t('landing.chooseMode') || 'Choose Your Mode'}
@@ -219,7 +219,7 @@ const LandingView: React.FC = () => {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.05 }}
-          className="max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto mb-2 sm:mb-3 lg:mb-6 xl:mb-8"
+          className="max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto mb-2 sm:mb-2 lg:mb-4 xl:mb-6"
         >
           <DailyChallengeBanner />
         </motion.div>
@@ -229,7 +229,7 @@ const LandingView: React.FC = () => {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 lg:gap-6 xl:gap-8 max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto"
+          className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 lg:gap-4 xl:gap-6 max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto"
         >
           {/* Multiplayer Card */}
           <ModeCard
@@ -256,32 +256,33 @@ const LandingView: React.FC = () => {
           />
         </motion.div>
 
-        {/* Tutorial Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.15 }}
-          className="flex justify-center mt-2 sm:mt-3 lg:mt-8 xl:mt-10"
-        >
-          <button
-            onClick={handleOpenTutorial}
-            className="
-              inline-flex items-center gap-1.5 sm:gap-2 lg:gap-3
-              px-3 sm:px-4 lg:px-6 xl:px-8 py-1.5 sm:py-2 lg:py-3 xl:py-4
-              bg-neo-purple text-neo-white
-              font-bold text-sm sm:text-base lg:text-lg xl:text-xl
-              border-2 lg:border-3 border-neo-black
-              rounded-neo shadow-hard lg:shadow-hard-lg
-              hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
-              active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
-              transition-all duration-100
-            "
-          >
-            <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 xl:w-7 xl:h-7" />
-            {t('landing.tutorial') || 'Tutorial'}
-          </button>
-        </motion.div>
       </main>
+
+      {/* Tutorial FAB - Fixed bottom corner button */}
+      <motion.button
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3, delay: 0.3 }}
+        onClick={handleOpenTutorial}
+        className="
+          fixed bottom-4 right-4 z-40
+          flex items-center gap-2
+          px-4 py-3
+          bg-neo-purple text-neo-white
+          font-bold text-sm
+          border-3 border-neo-black
+          rounded-neo shadow-hard-lg
+          hover:scale-105 hover:shadow-hard-xl
+          active:scale-95 active:shadow-hard
+          transition-all duration-150
+          mb-[env(safe-area-inset-bottom)]
+          rtl:right-auto rtl:left-4
+        "
+        aria-label={t('landing.tutorial') || 'Tutorial'}
+      >
+        <GraduationCap className="w-5 h-5" />
+        <span className="hidden sm:inline">{t('landing.tutorial') || 'Tutorial'}</span>
+      </motion.button>
     </div>
   );
 };

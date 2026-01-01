@@ -4,7 +4,6 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Medal, ArrowLeft, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/Header';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/utils/ThemeContext';

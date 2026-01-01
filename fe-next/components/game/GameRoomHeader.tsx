@@ -129,7 +129,7 @@ const GameRoomHeader: React.FC<GameRoomHeaderProps> = ({
           {/* Share Button */}
           <button
             onClick={handleShare}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-cyan text-neo-black font-bold text-sm rounded-neo border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 active:shadow-none active:translate-y-0 transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-cream text-neo-black font-bold text-sm rounded-neo border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 active:shadow-none active:translate-y-0 transition-all"
           >
             <Share2 className="text-xs" />
             <span>{t('share.buttonLabel')}</span>

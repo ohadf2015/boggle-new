@@ -44,9 +44,10 @@ interface RoomChatProps {
   isHost: boolean;
   gameCode: string;
   className?: string;
+  onNewMessage?: () => void;
 }
 
-const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, className = '' }) => {
+const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, className = '', onNewMessage }) => {
   const { t } = useLanguage();
   const { socket } = useSocket();
   const { playMessageSound } = useSoundEffects();
@@ -85,6 +86,9 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
     if (!isOwnMessage) {
       // Increment unread count
       setUnreadCount(prev => prev + 1);
+
+      // Notify parent of new message
+      onNewMessage?.();
 
       // Play notification sound
       playMessageSound();
@@ -143,7 +147,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
         window.navigator.vibrate(200);
       }
     }
-  }, [username, isHost, messages.length, virtualizer, playMessageSound]);
+  }, [username, isHost, messages.length, virtualizer, playMessageSound, onNewMessage]);
 
   useEffect(() => {
     if (!socket) return;

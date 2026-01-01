@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Trophy, Target, X, ArrowLeft, Copy, Check, Send, Coins, RotateCcw, ImageDown, ChevronDown, Settings, Eye } from 'lucide-react';
+import { Share2, Trophy, Target, X, ArrowLeft, Copy, Check, Send, Coins, RotateCcw, ImageDown, ChevronDown, Settings, Eye, BarChart3, Medal } from 'lucide-react';
 
 // X/Twitter icon (no lucide equivalent)
 const XTwitterIcon = ({ className }: { className?: string }) => (
@@ -178,8 +178,12 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [leaderboardKey, setLeaderboardKey] = useState(0);
   const [showFullShareText, setShowFullShareText] = useState(false);
   const [showSharePlatforms, setShowSharePlatforms] = useState(false);
-  const [statsExpanded, setStatsExpanded] = useState(false);
-  const [attemptsExpanded, setAttemptsExpanded] = useState(false);
+  // Bottom tab navigation for mobile
+  type ResultTab = 'results' | 'stats' | 'ranks';
+  const [activeTab, setActiveTab] = useState<ResultTab>('results');
+  // Legacy expanded states (used in stats tab)
+  const [statsExpanded, setStatsExpanded] = useState(true); // Default open in stats tab
+  const [attemptsExpanded, setAttemptsExpanded] = useState(true); // Default open in stats tab
   const [secondaryActionsExpanded, setSecondaryActionsExpanded] = useState(false);
   const [shareImage, setShareImage] = useState<ShareImageResult | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
@@ -690,55 +694,65 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="flex-1 flex flex-col items-center justify-start p-4 overflow-y-auto"
+      className="flex-1 flex flex-col h-full overflow-hidden"
     >
-      {/* Back button */}
-      <motion.div className="absolute top-24 sm:top-28 start-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onBack}
-          className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-        >
-          <ArrowLeft className="w-4 h-4 me-2 rtl:rotate-180" />
-          {t('daily.home')}
-        </Button>
-      </motion.div>
+      {/* Fixed Header - Compact score summary */}
+      <div className="flex-shrink-0 px-3 pt-1 pb-2 border-b border-gray-200 dark:border-gray-700 bg-slate-50 dark:bg-neo-navy">
+        <div className="max-w-md mx-auto">
+          {/* Back + Score row */}
+          <div className="flex items-center justify-between gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onBack}
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white -ms-2 py-1"
+            >
+              <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
+              {t('daily.home')}
+            </Button>
 
-      {/* Main content */}
-      <div className="max-w-md w-full text-center space-y-4 py-6">
-        {/* Completion badge */}
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', delay: 0.1 }}
-          className="flex items-center justify-center gap-3"
-        >
-          {result.solved ? (
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 rounded-neo border-3 border-neo-black shadow-hard">
-              <Trophy className="w-5 h-5 text-white" />
-              <span className="font-black text-white uppercase">
-                {t('wordHunt.victory')}
-              </span>
+            {/* Compact score display */}
+            <div className="flex items-center gap-2">
+              {result.solved ? (
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500 rounded-neo border-2 border-neo-black">
+                  <Trophy className="w-4 h-4 text-white" />
+                  <span className="font-black text-white text-sm">{result.attemptsUsed}/10</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-gray-500 rounded-neo border-2 border-neo-black">
+                  <X className="w-4 h-4 text-white" />
+                  <span className="font-black text-white text-sm">X/10</span>
+                </div>
+              )}
+              {result.solved && (
+                <span className="font-black text-neo-yellow text-sm">
+                  {language === 'he' ? applyHebrewFinalLetters(result.targetWord) : result.targetWord.toUpperCase()}
+                </span>
+              )}
+              {result.streakDays > 0 && (
+                <span className="text-xs bg-orange-500 text-white px-1.5 py-0.5 rounded font-bold">
+                  🔥{result.streakDays}
+                </span>
+              )}
+              {result.solved && (
+                <ConfettiRetrigger
+                  variant={stats?.yourStats?.rank && stats.yourStats.rank <= 3 ? 'rank' : 'victory'}
+                  rank={stats?.yourStats?.rank}
+                  compact
+                />
+              )}
             </div>
-          ) : (
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-400 to-gray-500 rounded-neo border-3 border-neo-black shadow-hard">
-              <X className="w-5 h-5 text-white" />
-              <span className="font-black text-white uppercase">
-                {t('wordHunt.stats.youFailed')}
-              </span>
-            </div>
-          )}
-          {/* Confetti retrigger button - show for all winners (solved) */}
-          {result.solved && (
-            <ConfettiRetrigger
-              variant={stats?.yourStats?.rank && stats.yourStats.rank <= 3 ? 'rank' : 'victory'}
-              rank={stats?.yourStats?.rank}
-              compact
-            />
-          )}
-        </motion.div>
+          </div>
+        </div>
+      </div>
 
+      {/* Scrollable Tab Content - with bottom padding for tab bar */}
+      <div className="flex-1 overflow-y-auto px-3 pb-20">
+        <div className="max-w-md mx-auto text-center space-y-3 pt-3">
+
+        {/* ===== RESULTS TAB - Full details ===== */}
+        {activeTab === 'results' && (
+        <>
         {/* Puzzle number and attempts */}
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
@@ -752,63 +766,38 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           {/* Success: Show attempts used */}
           {result.solved ? (
             <>
-              <div className="text-4xl md:text-5xl font-black mt-2 text-green-500">
+              <div className="text-3xl sm:text-4xl font-black mt-1 text-green-500">
                 {result.attemptsUsed}/10
               </div>
-              <div className="text-gray-600 dark:text-gray-300">
-                {t('wordHunt.stats.attemptsUsed').replace('{count}', String(result.attemptsUsed))}
-              </div>
 
-              {/* Show target word for successful players */}
-              <div className="mt-2 space-y-1">
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  {t('wordHunt.results.targetWord')}:
-                </div>
-                <div className="text-2xl font-black text-neo-yellow tracking-wider">
+              {/* Target word - inline with label */}
+              <div className="mt-1">
+                <span className="text-xs text-gray-500 dark:text-gray-400">{t('wordHunt.results.targetWord')}: </span>
+                <span className="text-lg sm:text-xl font-black text-neo-yellow">
                   {language === 'he' ? applyHebrewFinalLetters(result.targetWord) : result.targetWord.toUpperCase()}
-                </div>
+                </span>
               </div>
 
-              {/* Show coins earned (net tokens) for successful players */}
-              {result.clueTokensEarned !== undefined && result.clueTokensSpent !== undefined && (
-                <div className="mt-2 flex items-center justify-center gap-2 px-3 py-1.5 bg-yellow-100 dark:bg-yellow-900/30 rounded-neo border-2 border-neo-black">
-                  <span className="text-2xl">🪙</span>
-                  <div className="text-sm">
-                    <span className="font-black text-xl">{result.clueTokensEarned - result.clueTokensSpent}</span>
-                    <span className="text-gray-600 dark:text-gray-400 ml-1">{t('wordHunt.results.tokensEarned')}</span>
+              {/* Rewards row - compact horizontal layout */}
+              <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
+                {/* Coins earned */}
+                {result.clueTokensEarned !== undefined && result.clueTokensSpent !== undefined && (
+                  <div className="flex items-center gap-1 px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 rounded-neo border-2 border-neo-black">
+                    <span className="text-base">🪙</span>
+                    <span className="font-black text-sm">{result.clueTokensEarned - result.clueTokensSpent}</span>
                   </div>
-                </div>
-              )}
-
-              {/* Coin reward for word reveals */}
-              {coinReward && (
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.5, type: 'spring' }}
-                  className="mt-2 px-3 py-2 bg-amber-400 rounded-neo border-2 border-neo-black shadow-hard-sm"
-                >
-                  <div className="flex items-center justify-center gap-1.5 mb-0.5">
-                    <Coins className="w-4 h-4 text-neo-black" />
-                    <span className="font-black text-lg text-neo-black">+{coinReward.awarded}</span>
-                    <span className="text-xs font-bold text-neo-black/70">{t('reveal.coins')}</span>
-                  </div>
-                  <div className="flex items-center justify-center gap-2 text-[10px] text-neo-black/70 font-medium">
-                    {coinReward.breakdown.base > 0 && (
-                      <span>{t('reveal.base')}: +{coinReward.breakdown.base}</span>
-                    )}
-                    {coinReward.breakdown.efficiency > 0 && (
-                      <span>{t('reveal.efficiency')}: +{coinReward.breakdown.efficiency}</span>
-                    )}
+                )}
+                {/* Coin reward */}
+                {coinReward && (
+                  <div className="flex items-center gap-1 px-2 py-1 bg-amber-400 rounded-neo border-2 border-neo-black">
+                    <Coins className="w-3.5 h-3.5 text-neo-black" />
+                    <span className="font-black text-sm text-neo-black">+{coinReward.awarded}</span>
                     {coinReward.breakdown.streak > 0 && (
-                      <span>🔥 {t('reveal.streak')}: +{coinReward.breakdown.streak}</span>
+                      <span className="text-xs text-neo-black/70">🔥</span>
                     )}
                   </div>
-                  <p className="text-[10px] text-neo-black/60 mt-0.5">
-                    {t('reveal.usedForReveals')}
-                  </p>
-                </motion.div>
-              )}
+                )}
+              </div>
             </>
           ) : (
             /* Failed: Show encouraging message and countdown */
@@ -987,66 +976,48 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           </motion.div>
         )}
 
-        {/* Share Section - Moved above statistics */}
+        {/* Share & Retry Section - Compact */}
         <motion.div
           layout
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="space-y-3"
+          transition={{ delay: 0.1 }}
+          className="space-y-2"
         >
-          {/* Shareable result preview - Enhanced UI */}
-          {/* Simplified share preview - clean design without decorative elements */}
-          <div className={cn(
-            "rounded-neo border-2 overflow-hidden",
-            result.solved
-              ? "bg-gray-900 border-emerald-600/50"
-              : "bg-gray-900 border-gray-600/50"
-          )}>
-            {/* Share text content - compact */}
-            <div className="p-3">
-              <pre className={cn(
-                "text-white text-xs font-mono whitespace-pre-wrap leading-relaxed break-words overflow-hidden max-w-full",
-                !showFullShareText && "line-clamp-3"
-              )}>
-                {shareText}
-              </pre>
-              {!showFullShareText && shareText.split('\n').length > 3 && (
-                <button
-                  onClick={() => setShowFullShareText(true)}
-                  className="text-xs text-emerald-400 hover:text-emerald-300 mt-1 font-medium"
-                >
-                  {t('common.showMore')}
-                </button>
+          {/* Primary actions - Share + Retry side by side */}
+          <div className="flex gap-2">
+            {/* Share button */}
+            <Button
+              onClick={handleNativeShare}
+              className={cn(
+                "flex-1 py-3 text-base font-black uppercase border-2 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all",
+                result.solved
+                  ? "bg-gradient-to-r from-neo-yellow via-neo-orange to-neo-pink text-neo-black"
+                  : "bg-gradient-to-r from-neo-cyan via-neo-purple to-neo-pink text-white"
               )}
-              {showFullShareText && (
-                <button
-                  onClick={() => setShowFullShareText(false)}
-                  className="text-xs text-gray-400 hover:text-gray-300 mt-1 font-medium"
-                >
-                  {t('common.showLess')}
-                </button>
-              )}
-            </div>
-          </div>
+            >
+              <Share2 className="mr-1.5 w-4 h-4" />
+              {t('wordHunt.results.share') || 'Share'}
+            </Button>
 
-          {/* Share buttons - Progressive disclosure */}
-          <div className="space-y-2">
-            {/* Primary share button - Eye-catching CTA */}
-            <motion.div layout="position" layoutId="primary-share-button">
-              <Button
-                onClick={handleNativeShare}
-                className={cn(
-                  "w-full py-4 text-lg font-black uppercase border-3 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1.5 transition-all group",
-                  result.solved
-                    ? "bg-gradient-to-r from-neo-yellow via-neo-orange to-neo-pink text-neo-black animate-pulse-subtle"
-                    : "bg-gradient-to-r from-neo-cyan via-neo-purple to-neo-pink text-white hover:brightness-110"
-                )}
-              >
-                <Share2 className="mr-2 w-6 h-6 group-hover:scale-110 transition-transform" />
-                {result.solved ? t('wordHunt.shareResult') : t('wordHunt.shareChallengeFriends')}
-              </Button>
-            </motion.div>
+            {/* Play Again button */}
+            <Button
+              onClick={handleRetryChallenge}
+              disabled={!canAfford(COIN_COSTS.DAILY_RETRY)}
+              className={cn(
+                "flex-1 py-3 text-base font-black uppercase border-2 border-neo-black rounded-neo shadow-hard transition-all",
+                canAfford(COIN_COSTS.DAILY_RETRY)
+                  ? "bg-gradient-to-r from-amber-400 to-orange-500 text-neo-black hover:shadow-hard-lg hover:-translate-y-0.5"
+                  : "bg-gray-400 text-gray-600 cursor-not-allowed"
+              )}
+            >
+              <RotateCcw className="mr-1.5 w-4 h-4" />
+              <span className="flex items-center gap-1">
+                {t('wordHunt.results.retry') || 'Retry'}
+                <span className="text-xs opacity-70">({COIN_COSTS.DAILY_RETRY}🪙)</span>
+              </span>
+            </Button>
+          </div>
 
             {/* Toggle for more share options - Clear labeling */}
             <button
@@ -1146,7 +1117,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 {t('daily.copiedToClipboard')}
               </motion.p>
             )}
-          </div>
         </motion.div>
 
         {/* Inline Signup for Guest Winners */}
@@ -1167,7 +1137,12 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             />
           </motion.div>
         )}
+        </>
+        )}
 
+        {/* ===== STATS TAB ===== */}
+        {activeTab === 'stats' && (
+        <>
         {/* Attempt history - Collapsible (only show if there are attempts) */}
         {result.attempts.length > 0 && (
         <motion.div
@@ -1413,13 +1388,17 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             </AnimatePresence>
           </motion.div>
         )}
+        </>
+        )}
 
+        {/* ===== RANKS TAB ===== */}
+        {activeTab === 'ranks' && (
+        <>
         {/* Today's Leaderboard */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.85 }}
-          className="mt-4"
+          transition={{ delay: 0.1 }}
         >
           <TabbedDailyLeaderboard
             key={leaderboardKey}
@@ -1570,6 +1549,51 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             )}
           </AnimatePresence>
         </motion.div>
+        </>
+        )}
+        </div>
+      </div>
+
+      {/* Bottom Tab Bar - Fixed */}
+      <div className="flex-shrink-0 fixed bottom-0 left-0 right-0 bg-slate-900 border-t-2 border-neo-black z-40 safe-area-bottom">
+        <div className="max-w-md mx-auto flex items-center justify-around py-1.5">
+          <button
+            onClick={() => setActiveTab('results')}
+            className={cn(
+              "flex flex-col items-center gap-0.5 px-5 py-1.5 rounded-lg transition-all min-w-[72px]",
+              activeTab === 'results'
+                ? "bg-neo-yellow text-neo-black"
+                : "text-gray-400 hover:text-white"
+            )}
+          >
+            <Share2 className="w-5 h-5" />
+            <span className="text-[10px] font-bold uppercase">{t('wordHunt.results.share') || 'Share'}</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('stats')}
+            className={cn(
+              "flex flex-col items-center gap-0.5 px-5 py-1.5 rounded-lg transition-all min-w-[72px]",
+              activeTab === 'stats'
+                ? "bg-neo-yellow text-neo-black"
+                : "text-gray-400 hover:text-white"
+            )}
+          >
+            <BarChart3 className="w-5 h-5" />
+            <span className="text-[10px] font-bold uppercase">{t('wordHunt.stats.title') || 'Stats'}</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('ranks')}
+            className={cn(
+              "flex flex-col items-center gap-0.5 px-5 py-1.5 rounded-lg transition-all min-w-[72px]",
+              activeTab === 'ranks'
+                ? "bg-neo-yellow text-neo-black"
+                : "text-gray-400 hover:text-white"
+            )}
+          >
+            <Medal className="w-5 h-5" />
+            <span className="text-[10px] font-bold uppercase">{t('daily.leaderboard') || 'Ranks'}</span>
+          </button>
+        </div>
       </div>
 
       {/* Share panel for browsers without native share */}

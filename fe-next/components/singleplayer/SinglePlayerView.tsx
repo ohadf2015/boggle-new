@@ -11,14 +11,6 @@ import { getHighScore, recordGameResult, getAllTimeBest } from './highScoreManag
 import { useGameMusic, type GamePhase } from '@/hooks/useGameMusic';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useLanguage } from '@/contexts/LanguageContext';
-import {
-  getPuzzleNumber,
-  getDailyChallengeDate,
-  hasPlayedToday,
-  getDailyStreak,
-  getSecondsUntilNextDaily,
-  formatCountdown,
-} from '@/utils/dailyChallenge';
 import { incrementTrainingGames } from '@/utils/playerProgressStorage';
 import { getMinWordLength, type PresetConfig } from './presetConfig';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
@@ -100,31 +92,6 @@ const SinglePlayerView: React.FC = () => {
   const [phase, setPhase] = useState<SinglePlayerPhase>('preset-selection');
   const isMobileLandscape = useMobileLandscape();
   const [isAnyLandscape, setIsAnyLandscape] = useState(false);
-
-  // Daily challenge state
-  const [dailyPuzzleNumber, setDailyPuzzleNumber] = useState<number>(0);
-  const [hasPlayedDaily, setHasPlayedDaily] = useState<boolean>(false);
-  const [dailyStreak, setDailyStreak] = useState<number>(0);
-  const [dailyCountdown, setDailyCountdown] = useState<string>('');
-
-  // Initialize daily challenge info
-  useEffect(() => {
-    const date = getDailyChallengeDate();
-    setDailyPuzzleNumber(getPuzzleNumber(date));
-    setHasPlayedDaily(hasPlayedToday(uiLanguage as Language));
-    setDailyStreak(getDailyStreak().currentStreak);
-  }, [uiLanguage]);
-
-  // Update countdown timer
-  useEffect(() => {
-    const updateCountdown = () => {
-      const seconds = getSecondsUntilNextDaily();
-      setDailyCountdown(formatCountdown(seconds));
-    };
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   // Track landscape orientation for ALL screen sizes (not just mobile)
   useEffect(() => {
@@ -326,18 +293,11 @@ const SinglePlayerView: React.FC = () => {
           <PresetSelector
             onSelectPreset={handleSelectPreset}
             onCustomGame={handleCustomGame}
-            dailyInfo={{
-              puzzleNumber: dailyPuzzleNumber,
-              hasPlayedToday: hasPlayedDaily,
-              streak: dailyStreak,
-              countdown: dailyCountdown,
-            }}
             challengeInfo={{
               highScore: challengeHighScore?.score || null,
               wordCount: challengeHighScore?.wordCount,
               longestWord: challengeHighScore?.longestWord,
             }}
-            currentLanguage={uiLanguage as Language}
           />
         )}
 

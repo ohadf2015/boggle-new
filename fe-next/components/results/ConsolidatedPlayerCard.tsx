@@ -146,9 +146,9 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
           }}
         />
 
-        <div className="relative z-10 p-4">
+        <div className="relative z-10 p-3 sm:p-4">
           {/* Header: Your Performance */}
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2 mb-2 sm:mb-3">
             <Sparkles className="w-5 h-5 text-neo-cyan" />
             <h2 className="text-sm font-black uppercase tracking-wide text-white">
               {t('results.yourPerformance') || 'Your Performance'}
@@ -156,19 +156,19 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
           </div>
 
           {/* Primary Row: Rank + Avatar + Info + Score */}
-          <div className="flex items-center gap-3 mb-3">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
             {/* Rank Badge */}
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
               className={cn(
-                'flex-shrink-0 w-12 h-12 rounded-neo flex items-center justify-center border-3 border-neo-black shadow-hard',
+                'flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-neo flex items-center justify-center border-2 sm:border-3 border-neo-black shadow-hard',
                 rankStyle.bg, rankStyle.text
               )}
             >
               <div className="text-center">
-                <span className="text-xl font-black">#{rank}</span>
+                <span className="text-lg sm:text-xl font-black">#{rank}</span>
               </div>
             </motion.div>
 
@@ -179,16 +179,16 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                 avatarEmoji={player.avatar.emoji}
                 avatarImage={player.avatar.avatarImage}
                 avatarColor={player.avatar.color}
-                size="xl"
-                className="flex-shrink-0 border-2 border-neo-black"
+                size="lg"
+                className="flex-shrink-0 border-2 border-neo-black w-10 h-10 sm:w-12 sm:h-12"
               />
             )}
 
             {/* Username + Archetype */}
             <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-black text-white truncate">{player.username}</h3>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs text-white/60 font-bold">
+              <h3 className="text-base sm:text-lg font-black text-white truncate">{player.username}</h3>
+              <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                <span className="text-[10px] sm:text-xs text-white/60 font-bold">
                   {rank}{getRankSuffix(rank)} of {totalPlayers}
                 </span>
                 {archetype && (
@@ -204,8 +204,8 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
               transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
               className="flex-shrink-0 text-right"
             >
-              <div className="text-3xl font-black text-white">{player.score}</div>
-              <div className="text-[10px] font-bold uppercase text-white/60">
+              <div className="text-2xl sm:text-3xl font-black text-white">{player.score}</div>
+              <div className="text-[9px] sm:text-[10px] font-bold uppercase text-white/60">
                 {t('results.points') || 'Points'}
               </div>
             </motion.div>
@@ -217,50 +217,50 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.25 }}
-              className="flex items-center gap-1.5 mb-3 px-2 py-1.5 rounded-neo bg-neo-cyan/20 border border-neo-cyan/40"
+              className="flex items-center gap-1.5 mb-2 sm:mb-3 px-2 py-1 sm:py-1.5 rounded-neo bg-neo-cyan/20 border border-neo-cyan/40"
             >
-              <TrendingUp className="w-3.5 h-3.5 text-neo-cyan" />
-              <span className="text-xs font-bold text-neo-cyan">
+              <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-neo-cyan" />
+              <span className="text-[10px] sm:text-xs font-bold text-neo-cyan">
                 {t('results.pointsFromFirst', { points: pointsFromWinner }) || `Just ${pointsFromWinner} pts from 1st!`}
               </span>
             </motion.div>
           )}
 
-          {/* Key Stats Grid - Always visible */}
-          <div className="grid grid-cols-3 gap-2 mb-3">
+          {/* Key Stats Grid - Always visible (2 cols mobile, 3 cols larger) */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2 mb-2 sm:mb-3">
             {/* Words Found */}
-            <div className="bg-white/10 rounded-neo border border-white/20 p-2 text-center">
-              <div className="flex justify-center mb-1">
-                <div className="w-6 h-6 rounded bg-neo-lime text-neo-black border border-neo-black flex items-center justify-center">
-                  <Hash className="w-3.5 h-3.5 text-neo-black" />
+            <div className="bg-white/10 rounded-neo border border-white/20 p-1.5 sm:p-2 text-center">
+              <div className="flex justify-center mb-0.5 sm:mb-1">
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded bg-neo-lime text-neo-black border border-neo-black flex items-center justify-center">
+                  <Hash className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-neo-black" />
                 </div>
               </div>
-              <div className="text-xl font-black text-white">{validWords.length}</div>
-              <div className="text-[9px] font-bold uppercase text-white/60">{t('results.words') || 'Words'}</div>
+              <div className="text-lg sm:text-xl font-black text-white">{validWords.length}</div>
+              <div className="text-[8px] sm:text-[9px] font-bold uppercase text-white/60">{t('results.words') || 'Words'}</div>
             </div>
 
             {/* Accuracy */}
-            <div className="bg-white/10 rounded-neo border border-white/20 p-2 text-center">
-              <div className="flex justify-center mb-1">
-                <div className="w-6 h-6 rounded bg-neo-pink text-white border border-neo-black flex items-center justify-center">
-                  <Target className="w-3.5 h-3.5 text-neo-black" />
+            <div className="bg-white/10 rounded-neo border border-white/20 p-1.5 sm:p-2 text-center">
+              <div className="flex justify-center mb-0.5 sm:mb-1">
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded bg-neo-pink text-white border border-neo-black flex items-center justify-center">
+                  <Target className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-neo-black" />
                 </div>
               </div>
-              <div className="text-xl font-black text-white">{summaryStats?.accuracy || 0}%</div>
-              <div className="text-[9px] font-bold uppercase text-white/60">{t('results.accuracy') || 'Accuracy'}</div>
+              <div className="text-lg sm:text-xl font-black text-white">{summaryStats?.accuracy || 0}%</div>
+              <div className="text-[8px] sm:text-[9px] font-bold uppercase text-white/60">{t('results.accuracy') || 'Accuracy'}</div>
             </div>
 
-            {/* Best Word */}
-            <div className="bg-white/10 rounded-neo border border-white/20 p-2 text-center">
-              <div className="flex justify-center mb-1">
-                <div className="w-6 h-6 rounded bg-neo-purple text-white border border-neo-black flex items-center justify-center">
-                  <Award className="w-3.5 h-3.5 text-neo-cream" />
+            {/* Best Word - Hidden on mobile (available in details), shown on sm+ */}
+            <div className="hidden sm:block bg-white/10 rounded-neo border border-white/20 p-1.5 sm:p-2 text-center">
+              <div className="flex justify-center mb-0.5 sm:mb-1">
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded bg-neo-purple text-white border border-neo-black flex items-center justify-center">
+                  <Award className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-neo-cream" />
                 </div>
               </div>
-              <div className="text-sm font-black text-white uppercase truncate">
+              <div className="text-xs sm:text-sm font-black text-white uppercase truncate">
                 {bestWord ? applyHebrewFinalLetters(bestWord.word) : '-'}
               </div>
-              <div className="text-[9px] font-bold uppercase text-white/60">
+              <div className="text-[8px] sm:text-[9px] font-bold uppercase text-white/60">
                 {bestWord?.score ? `${bestWord.score} pts` : (t('results.bestWord') || 'Best')}
               </div>
             </div>
@@ -268,24 +268,24 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
 
           {/* Bonus Badges Row */}
           {(totalComboBonus > 0 || totalFireRoundBonus > 0 || xpGainedData || levelUpData) && (
-            <div className="flex items-center gap-2 flex-wrap mb-3">
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap mb-2 sm:mb-3">
               {totalComboBonus > 0 && (
-                <span className="bg-neo-orange border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-black text-xs font-black">
+                <span className="bg-neo-orange border sm:border-2 border-neo-black rounded-neo px-1.5 sm:px-2 py-0.5 shadow-hard-sm text-neo-black text-[10px] sm:text-xs font-black">
                   ⚡ +{totalComboBonus}
                 </span>
               )}
               {totalFireRoundBonus > 0 && (
-                <span className="bg-neo-red border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-cream text-xs font-black">
+                <span className="bg-neo-red border sm:border-2 border-neo-black rounded-neo px-1.5 sm:px-2 py-0.5 shadow-hard-sm text-neo-cream text-[10px] sm:text-xs font-black">
                   🔥 +{totalFireRoundBonus}
                 </span>
               )}
               {xpGainedData && (
-                <span className="bg-neo-purple border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-cream text-xs font-black">
+                <span className="bg-neo-purple border sm:border-2 border-neo-black rounded-neo px-1.5 sm:px-2 py-0.5 shadow-hard-sm text-neo-cream text-[10px] sm:text-xs font-black">
                   ⭐ +{xpGainedData.xpEarned} XP
                 </span>
               )}
               {levelUpData && (
-                <span className="bg-neo-yellow border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-black text-xs font-black">
+                <span className="bg-neo-yellow border sm:border-2 border-neo-black rounded-neo px-1.5 sm:px-2 py-0.5 shadow-hard-sm text-neo-black text-[10px] sm:text-xs font-black">
                   🎉 Lvl {levelUpData.oldLevel} {levelArrow} {levelUpData.newLevel}
                 </span>
               )}
@@ -296,14 +296,15 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
           <button
             onClick={() => setShowDetails(!showDetails)}
             aria-expanded={showDetails}
-            className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-bold text-white uppercase border-2 border-neo-cyan/50 bg-neo-cyan/10 hover:bg-neo-cyan/20 transition-colors mb-2"
+            className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border sm:border-2 border-neo-cyan/50 bg-neo-cyan/10 hover:bg-neo-cyan/20 transition-colors mb-1.5 sm:mb-2"
           >
-            <span className="flex items-center gap-2">
-              <BarChart3 className="w-4 h-4" />
-              {t('results.viewDetails') || 'View Performance Details'}
+            <span className="flex items-center gap-1.5 sm:gap-2">
+              <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">{t('results.viewDetails') || 'View Performance Details'}</span>
+              <span className="sm:hidden">{t('results.details') || 'Details'}</span>
             </span>
             <motion.div animate={{ rotate: showDetails ? 180 : 0 }} transition={{ duration: 0.2 }}>
-              <ChevronDown className="w-5 h-5" />
+              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
             </motion.div>
           </button>
           <AnimatePresence>
@@ -326,14 +327,16 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
           <button
             onClick={() => setShowWords(!showWords)}
             aria-expanded={showWords}
-            className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-bold text-white uppercase border-2 border-white/20 bg-white/5 hover:bg-white/10 transition-colors mb-2"
+            className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border sm:border-2 border-white/20 bg-white/5 hover:bg-white/10 transition-colors mb-1.5 sm:mb-2"
           >
-            <span className="flex items-center gap-2">
-              <Hash className="w-4 h-4" />
-              {t('results.viewAllWords') || 'View All Words'} ({player.allWords?.length || 0})
+            <span className="flex items-center gap-1.5 sm:gap-2">
+              <Hash className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">{t('results.viewAllWords') || 'View All Words'}</span>
+              <span className="sm:hidden">{t('results.words') || 'Words'}</span>
+              <span className="text-white/60">({player.allWords?.length || 0})</span>
             </span>
             <motion.div animate={{ rotate: showWords ? 180 : 0 }} transition={{ duration: 0.2 }}>
-              <ChevronDown className="w-5 h-5" />
+              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
             </motion.div>
           </button>
           <AnimatePresence>
@@ -375,14 +378,15 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
               <button
                 onClick={() => setShowXp(!showXp)}
                 aria-expanded={showXp}
-                className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-bold text-white uppercase border-2 border-neo-purple/50 bg-neo-purple/10 hover:bg-neo-purple/20 transition-colors mb-2"
+                className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border sm:border-2 border-neo-purple/50 bg-neo-purple/10 hover:bg-neo-purple/20 transition-colors mb-1.5 sm:mb-2"
               >
-                <span className="flex items-center gap-2">
-                  <Zap className="w-4 h-4" />
-                  {t('results.viewXpBreakdown') || 'View XP Breakdown'}
+                <span className="flex items-center gap-1.5 sm:gap-2">
+                  <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">{t('results.viewXpBreakdown') || 'View XP Breakdown'}</span>
+                  <span className="sm:hidden">{t('results.xp') || 'XP'}</span>
                 </span>
                 <motion.div animate={{ rotate: showXp ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                  <ChevronDown className="w-5 h-5" />
+                  <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
                 </motion.div>
               </button>
               <AnimatePresence>
@@ -411,14 +415,16 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
               <button
                 onClick={() => setShowAchievements(!showAchievements)}
                 aria-expanded={showAchievements}
-                className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-bold text-white uppercase border-2 border-neo-yellow/50 bg-neo-yellow/10 hover:bg-neo-yellow/20 transition-colors"
+                className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border sm:border-2 border-neo-yellow/50 bg-neo-yellow/10 hover:bg-neo-yellow/20 transition-colors"
               >
-                <span className="flex items-center gap-2">
-                  <Award className="w-4 h-4" />
-                  {t('hostView.achievements') || 'Achievements'} ({gameAchievements.length})
+                <span className="flex items-center gap-1.5 sm:gap-2">
+                  <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">{t('hostView.achievements') || 'Achievements'}</span>
+                  <span className="sm:hidden">{t('results.badges') || 'Badges'}</span>
+                  <span className="text-white/60">({gameAchievements.length})</span>
                 </span>
                 <motion.div animate={{ rotate: showAchievements ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                  <ChevronDown className="w-5 h-5" />
+                  <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
                 </motion.div>
               </button>
               <AnimatePresence>

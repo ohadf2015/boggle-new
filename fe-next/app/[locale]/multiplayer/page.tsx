@@ -19,7 +19,6 @@ import { getSession as getSupabaseSession } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
-import { mapEmojiToAvatar } from '@/utils/avatarConfig';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 
 interface ResultsData {
@@ -48,11 +47,6 @@ const HostView = nextDynamic(() => import('@/host/HostView'), {
 });
 
 const PlayerView = nextDynamic(() => import('@/player/PlayerView'), {
-  loading: () => <ViewLoadingSkeleton />,
-  ssr: false,
-});
-
-const MultiplayerLobby = nextDynamic(() => import('@/components/multiplayer/MultiplayerLobby'), {
   loading: () => <ViewLoadingSkeleton />,
   ssr: false,
 });

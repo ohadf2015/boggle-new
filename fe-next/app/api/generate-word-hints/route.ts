@@ -249,7 +249,7 @@ export async function POST(request: NextRequest) {
     return rateLimitResponse(rateLimit);
   }
 
-  let body: { targetWord?: string; language?: string };
+  let body: { targetWord?: string; language?: string } | undefined;
 
   try {
     body = await request.json();
@@ -257,6 +257,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       error: 'Invalid request',
       details: ['Invalid request body'],
+    }, { status: 400 });
+  }
+
+  // Check if body is defined (can be undefined for empty requests)
+  if (!body || typeof body !== 'object') {
+    return NextResponse.json({
+      error: 'Invalid request',
+      details: ['Request body must be a JSON object'],
     }, { status: 400 });
   }
 

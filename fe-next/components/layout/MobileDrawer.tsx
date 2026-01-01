@@ -44,7 +44,7 @@ export function MobileDrawer({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 z-40 bg-neo-black/50"
+            className="fixed inset-0 z-[55] bg-neo-black/50"
           />
 
           {/* Drawer */}
@@ -56,7 +56,7 @@ export function MobileDrawer({
             className={cn(
               'mobile-drawer',
               heightClasses[height],
-              'overflow-hidden flex flex-col',
+              'overflow-hidden flex flex-col z-[60]',
               className
             )}
           >

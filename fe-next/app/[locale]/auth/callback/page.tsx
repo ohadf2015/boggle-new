@@ -31,6 +31,7 @@ function LoadingUI(): React.ReactNode {
 
 // Timeout for code exchange
 const CODE_EXCHANGE_TIMEOUT = 15000; // 15 seconds timeout for code exchange
+const MAX_CALLBACK_TIMEOUT = 30000; // 30 seconds max total time on callback page
 
 // Helper to wrap a promise with a timeout
 function withTimeout<T>(promise: Promise<T>, ms: number, errorMessage: string): Promise<T> {
@@ -63,8 +64,14 @@ function AuthCallbackContent(): React.ReactNode {
     return next;
   }, [searchParams, locale]);
 
+  // Track if we've already navigated away
+  const hasNavigated = useRef<boolean>(false);
+
   // Helper to safely redirect (clears URL params and navigates)
   const safeRedirect = useCallback((url: string) => {
+    // Prevent double navigation
+    if (hasNavigated.current) return;
+    hasNavigated.current = true;
     // Clean up all listeners
     cleanupFunctions.current.forEach(fn => fn());
     cleanupFunctions.current = [];
@@ -89,19 +96,19 @@ function AuthCallbackContent(): React.ReactNode {
 
         if (message.type === 'AUTH_SUCCESS') {
           logger.log('Auth callback: Received AUTH_SUCCESS from other tab');
-          resolved = true;
-          cleanup();
-          // Give a moment for session to sync via cookies
+          // Give a moment for session to sync via cookies, then check
+          // Don't cleanup yet - let polling continue as backup
           setTimeout(async () => {
+            if (resolved) return;
             if (!supabase) return;
             const { data } = await supabase.auth.getSession();
             if (data?.session) {
+              resolved = true;
+              cleanup();
               safeRedirect(next);
               resolve(true);
-            } else {
-              // Session not synced yet, keep polling
-              resolved = false;
             }
+            // If session not synced yet, polling will continue and eventually find it
           }, 200);
         }
       });
@@ -153,6 +160,29 @@ function AuthCallbackContent(): React.ReactNode {
 
     // Initialize cross-tab sync
     initCrossTabAuthSync();
+
+    // Global safety timeout - ensures we never stay stuck on callback page
+    const safetyTimeout = setTimeout(async () => {
+      if (hasNavigated.current) return;
+      logger.warn('Auth callback: Global safety timeout reached, attempting recovery');
+
+      // Try one final session check before giving up
+      if (supabase) {
+        const { data } = await supabase.auth.getSession();
+        if (data?.session) {
+          logger.log('Auth callback: Session found in safety timeout, redirecting');
+          safeRedirect(getRedirectUrl());
+          return;
+        }
+      }
+
+      // No session found, redirect with error
+      logger.error('Auth callback: Safety timeout reached with no session');
+      safeRedirect(`/${locale}?auth_error=true&reason=timeout`);
+    }, MAX_CALLBACK_TIMEOUT);
+
+    // Store cleanup for safety timeout
+    cleanupFunctions.current.push(() => clearTimeout(safetyTimeout));
 
     const handleCallback = async (): Promise<void> => {
       const next = getRedirectUrl();

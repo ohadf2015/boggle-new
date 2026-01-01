@@ -2,12 +2,13 @@
 
 import React, { useEffect, useCallback, memo } from 'react';
 import { motion } from 'framer-motion';
-import { Crown, Medal, Bot } from 'lucide-react';
+import { Bot } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import Avatar from '../Avatar';
 import type { Player } from './types';
 import { fireConfetti, RANK_COLORS } from '@/utils/confettiUtils';
+import { RANK_CONFIG, getRankConfig } from '@/utils/rankingStyles';
 
 // Fire confetti burst for a specific rank with custom origin
 const fireConfettiForRank = (rank: number, intensity: number = 1): void => {
@@ -76,34 +77,11 @@ interface Top3LeaderboardProps {
   headerText?: string;
   /** Show confetti celebration for top 3 (default: true) */
   showConfetti?: boolean;
+  /** Compact mode - reduced padding and no header (default: false) */
+  compact?: boolean;
 }
 
-const rankConfig = {
-  1: {
-    bg: 'bg-neo-yellow',
-    border: 'border-neo-yellow',
-    text: 'text-neo-black',
-    rankText: 'text-neo-yellow dark:text-neo-yellow',
-    icon: Crown,
-    iconColor: 'text-neo-yellow',
-  },
-  2: {
-    bg: 'bg-slate-300',
-    border: 'border-slate-300',
-    text: 'text-slate-800',
-    rankText: 'text-slate-500 dark:text-slate-300',
-    icon: Medal,
-    iconColor: 'text-slate-400',
-  },
-  3: {
-    bg: 'bg-neo-orange',
-    border: 'border-neo-orange',
-    text: 'text-neo-black',
-    rankText: 'text-neo-orange dark:text-neo-orange',
-    icon: Medal,
-    iconColor: 'text-neo-orange',
-  },
-};
+// Using shared RANK_CONFIG from @/utils/rankingStyles
 
 /**
  * Compact Top 3 Leaderboard
@@ -120,6 +98,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
   currentUsername,
   headerText,
   showConfetti = true,
+  compact = false,
 }) => {
   const { t } = useLanguage();
 
@@ -181,21 +160,23 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.3 }}
-      className="w-full max-w-lg mx-auto mb-4"
+      transition={{ delay: compact ? 0.1 : 0.3 }}
+      className={cn('w-full max-w-lg mx-auto', compact ? 'mb-2' : 'mb-4')}
     >
-      {/* Header */}
-      <div className="flex items-center justify-center gap-2 mb-2">
-        <span className="text-xs font-black uppercase tracking-wide text-slate-500 dark:text-slate-400">
-          {headerText || t('results.topPlayers') || 'Top Players'}
-        </span>
-      </div>
+      {/* Header - hidden in compact mode */}
+      {!compact && (
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <span className="text-xs font-black uppercase tracking-wide text-slate-500 dark:text-slate-400">
+            {headerText || t('results.topPlayers') || 'Top Players'}
+          </span>
+        </div>
+      )}
 
       {/* Horizontal cards for top 3 */}
-      <div className="flex gap-2">
+      <div className={cn('flex', compact ? 'gap-1.5' : 'gap-2')}>
         {top3.map((participant, index) => {
           const rank = index + 1;
-          const config = rankConfig[rank as 1 | 2 | 3];
+          const config = RANK_CONFIG[rank as 1 | 2 | 3];
           const isCurrentPlayer = participant.isCurrentPlayer ?? participant.name === currentUsername;
           const Icon = config.icon;
 
@@ -204,7 +185,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
               key={participant.name}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.1 + index * 0.1 }}
+              transition={{ delay: compact ? 0.05 * index : 0.1 + index * 0.1 }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => handleCardClick(rank)}
@@ -215,22 +196,17 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
               )}
             >
               {/* Rank indicator bar */}
-              <div className={cn('h-1.5', config.bg)} />
+              <div className={cn(compact ? 'h-1' : 'h-1.5', config.bg)} />
 
-              <div className="p-2">
-                {/* Rank + Icon */}
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <Icon className={cn('text-sm', config.iconColor)} />
-                  <span className={cn('text-xs font-black', config.rankText)}>
-                    #{rank}
-                  </span>
-                </div>
-
-                {/* Avatar or Bot icon */}
-                <div className="flex justify-center mb-1">
+              <div className={cn(compact ? 'p-1' : 'p-1.5 sm:p-2')}>
+                {/* Avatar with rank badge overlay */}
+                <div className={cn('flex justify-center relative', compact ? 'mb-0.5' : 'mb-1')}>
                   {participant.isBot ? (
-                    <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 border-2 border-neo-black flex items-center justify-center">
-                      <Bot className="text-slate-500 dark:text-slate-400 text-lg" />
+                    <div className={cn(
+                      'rounded-full bg-slate-200 dark:bg-slate-700 border-2 border-neo-black flex items-center justify-center',
+                      compact ? 'w-7 h-7' : 'w-8 h-8 sm:w-10 sm:h-10'
+                    )}>
+                      <Bot className={cn('text-slate-500 dark:text-slate-400', compact ? 'text-xs' : 'text-sm sm:text-lg')} />
                     </div>
                   ) : (
                     <Avatar
@@ -238,29 +214,38 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                       avatarEmoji={participant.avatar?.emoji}
                       avatarImage={participant.avatar?.avatarImage}
                       avatarColor={participant.avatar?.color}
-                      size="md"
-                      className="border-2 border-neo-black"
+                      size="sm"
+                      className={cn('border-2 border-neo-black', compact ? 'w-7 h-7' : 'w-8 h-8 sm:w-10 sm:h-10')}
                     />
                   )}
+                  {/* Rank badge overlay */}
+                  <div className={cn(
+                    'absolute -top-1 -end-1 rounded-full flex items-center justify-center border border-neo-black',
+                    compact ? 'w-4 h-4' : 'w-5 h-5',
+                    config.bg
+                  )}>
+                    <Icon className={cn(compact ? 'w-2.5 h-2.5' : 'w-3 h-3', config.text)} />
+                  </div>
                 </div>
 
-                {/* Name */}
+                {/* Name + Score combined */}
                 <p className={cn(
-                  'text-xs font-bold text-center truncate mb-1',
-                  'text-neo-black dark:text-white'
+                  'font-bold text-center truncate text-neo-black dark:text-white',
+                  compact ? 'text-[9px]' : 'text-[10px] sm:text-xs'
                 )}>
                   {participant.name}
                   {isCurrentPlayer && (
-                    <span className="text-[10px] text-neo-cyan"> ({t('common.you') || 'me'})</span>
+                    <span className="text-neo-cyan"> ★</span>
                   )}
                 </p>
 
-                {/* Score */}
+                {/* Score - more compact */}
                 <div className={cn(
-                  'text-center py-1 rounded-neo border border-neo-black',
+                  'text-center rounded-neo border border-neo-black',
+                  compact ? 'py-0 mt-0.5' : 'py-0.5 mt-1',
                   config.bg
                 )}>
-                  <span className={cn('text-sm font-black', config.text)}>
+                  <span className={cn('font-black', compact ? 'text-[10px]' : 'text-xs sm:text-sm', config.text)}>
                     {participant.score}
                   </span>
                 </div>

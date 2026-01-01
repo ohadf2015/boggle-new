@@ -32,6 +32,8 @@ export async function GET(request: Request) {
     const puzzleDate = searchParams.get('puzzleDate');
     const language = searchParams.get('language') || 'en';
     const search = searchParams.get('search'); // Optional: search by display name
+    const offset = parseInt(searchParams.get('offset') || '0', 10);
+    const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10), 100);
 
     if (!puzzleDate) {
       return NextResponse.json(
@@ -40,7 +42,7 @@ export async function GET(request: Request) {
       );
     }
 
-    // Query attempts
+    // Query attempts with pagination
     let query = supabase
       .from('daily_word_hunt_attempts')
       .select(`
@@ -58,17 +60,19 @@ export async function GET(request: Request) {
         target_word,
         efficiency_score,
         completed_at
-      `)
+      `, { count: 'exact' })
       .eq('puzzle_date', puzzleDate)
       .eq('language', language)
       .order('completed_at', { ascending: false });
 
     // If search term provided, filter by display name
+    // Use prefix search when possible for better index usage
     if (search) {
-      query = query.ilike('display_name', `%${search}%`);
+      // Prefix search uses index, full wildcard requires table scan
+      query = query.ilike('display_name', `${search}%`);
     }
 
-    const { data: attempts, error } = await query.limit(100);
+    const { data: attempts, error, count } = await query.range(offset, offset + limit - 1);
 
     if (error) {
       console.error('Fetch attempts error:', error);
@@ -80,7 +84,9 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       attempts: attempts || [],
-      total: attempts?.length || 0,
+      total: count ?? attempts?.length ?? 0,
+      offset,
+      limit,
       puzzleDate,
       language,
     });

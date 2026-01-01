@@ -7,18 +7,9 @@ import { Crown, LogIn, ArrowLeft, Users } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { LANGUAGE_FLAGS } from '@/lib/languageConfig';
 import type { ActiveRoom, Language } from '@/shared/types/game';
 import LandscapeIndicator from '@/components/LandscapeIndicator';
-
-const LANGUAGE_FLAGS: Record<Language, string> = {
-  en: '🇺🇸',
-  he: '🇮🇱',
-  sv: '🇸🇪',
-  ja: '🇯🇵',
-  es: '🇪🇸',
-  fr: '🇫🇷',
-  de: '🇩🇪',
-};
 
 interface MultiplayerSelectorProps {
   onSelectCreate: () => void;
@@ -54,7 +45,7 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative flex items-center justify-center py-4 sm:py-6 lg:py-10 xl:py-12 flex-shrink-0 px-4 lg:px-8"
+          className="relative flex items-center justify-center py-2 sm:py-3 lg:py-6 xl:py-8 flex-shrink-0 px-4 lg:px-8"
         >
           <Link
             href="/"
@@ -69,7 +60,7 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
         </motion.div>
 
         {/* Main Content - Decision Cards */}
-        <div className="flex-1 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-12 xl:px-16 pb-4 lg:pb-8 min-h-0 gap-4 lg:gap-8 xl:gap-10">
+        <div className="flex-1 flex flex-col justify-start items-center px-4 sm:px-6 lg:px-12 xl:px-16 pt-2 sm:pt-4 lg:pt-8 pb-4 lg:pb-6 min-h-0 gap-3 lg:gap-6 xl:gap-8">
           {/* Active Rooms Preview - Positioned at top for visibility */}
           <motion.div
             initial={{ y: -20, opacity: 0 }}
@@ -122,7 +113,7 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
           </motion.div>
 
           {/* Cards Container */}
-          <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 xl:gap-10 w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto flex-shrink-0">
+          <div className="flex flex-col lg:flex-row gap-3 lg:gap-6 xl:gap-8 w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto flex-shrink-0">
             {/* Create Room Card */}
             <motion.div
               initial={{ x: -30, opacity: 0 }}
