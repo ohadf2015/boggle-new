@@ -2464,6 +2464,7 @@ const es = {
     "quitConfirmMessage": "Perderás tu progreso actual. ¿Seguro que quieres salir?",
     "imSure": "Estoy seguro",
     "gamePaused": "Juego pausado",
+    "needHint": "¿Necesitas una pista?",
     "botWords": "Palabras encontradas",
     "aiOpponents": "Oponentes IA",
     "autoFillDesc": "Llena la sala con {count} oponentes IA",

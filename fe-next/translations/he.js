@@ -2468,6 +2468,7 @@ const he = {
     "quitConfirmMessage": "תאבד את ההתקדמות הנוכחית. בטוח שאתה רוצה לצאת?",
     "imSure": "אני בטוח/ה",
     "gamePaused": "המשחק מושהה",
+    "needHint": "צריכ/ה רמז?",
     "botWords": "מילים שנמצאו",
     "aiOpponents": "יריבי AI",
     "autoFillDesc": "ממלא את החדר ב-{count} יריבי AI",

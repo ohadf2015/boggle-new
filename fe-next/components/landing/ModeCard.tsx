@@ -67,7 +67,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
           // Neo-Brutalist card base
           'rounded-neo-lg border-3 border-neo-black',
           'shadow-hard-lg',
-          'p-3 sm:p-4 lg:p-6 xl:p-8',
+          'p-3 sm:p-3 lg:p-4',
           'cursor-pointer',
           'relative overflow-hidden',
           // Colors

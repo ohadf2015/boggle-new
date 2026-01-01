@@ -264,7 +264,7 @@ const SinglePlayerView: React.FC = () => {
     <div className="flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
       <AutoHideHeader />
 
-      <main className="max-w-6xl mx-auto px-2 xs:px-4 sm:px-6 py-8 landscape-content overflow-x-hidden">
+      <main className="w-full px-2 sm:px-3 lg:px-4 py-4 sm:py-4 lg:py-6 landscape-content overflow-x-hidden">
         {phase === 'preset-selection' && (
           <PresetSelector
             onSelectPreset={handleSelectPreset}

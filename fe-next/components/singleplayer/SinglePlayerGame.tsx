@@ -1215,18 +1215,31 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               className="absolute bottom-14 left-1/2 -translate-x-1/2 z-40"
             >
-              <Button
-                variant="outline"
-                size="sm"
+              <AdaptiveMotion.button
                 onClick={async () => {
                   setShowHintPrompt(false);
                   await handleReveal();
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-neo-purple border-3 border-neo-black text-white hover:bg-neo-pink hover:shadow-hard-sm rounded-neo font-bold text-sm transition-all shadow-hard-sm animate-pulse-subtle"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                animate={{
+                  scale: [1, 1.02, 1],
+                  boxShadow: [
+                    '6px 6px 0px rgb(var(--neo-black))',
+                    '8px 8px 0px rgb(var(--neo-black))',
+                    '6px 6px 0px rgb(var(--neo-black))'
+                  ]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'easeInOut'
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-neo-purple border-3 border-neo-black text-white hover:bg-neo-pink rounded-neo font-bold text-sm shadow-hard-sm"
               >
                 <Eye className="w-4 h-4" />
-                <span>{t('singlePlayer.needHint') || 'Need a hint?'}</span>
-              </Button>
+                <span>{t('singlePlayer.needHint')}</span>
+              </AdaptiveMotion.button>
             </AdaptiveMotion.div>
           )}
         </AdaptiveAnimatePresence>
@@ -1575,18 +1588,31 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             className="fixed bottom-0 left-1/2 -translate-x-1/2 z-40 mb-[max(env(safe-area-inset-bottom),16px)]"
           >
-            <Button
-              variant="outline"
-              size="sm"
+            <AdaptiveMotion.button
               onClick={async () => {
                 setShowHintPrompt(false);
                 await handleReveal();
               }}
-              className="flex items-center gap-2 px-4 py-2 bg-neo-purple border-3 border-neo-black text-white hover:bg-neo-pink hover:shadow-hard-sm rounded-neo font-bold text-sm transition-all shadow-hard-sm animate-pulse-subtle"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              animate={{
+                scale: [1, 1.02, 1],
+                boxShadow: [
+                  '6px 6px 0px rgb(var(--neo-black))',
+                  '8px 8px 0px rgb(var(--neo-black))',
+                  '6px 6px 0px rgb(var(--neo-black))'
+                ]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: 'easeInOut'
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-neo-purple border-3 border-neo-black text-white hover:bg-neo-pink rounded-neo font-bold text-sm shadow-hard-sm"
             >
               <Eye className="w-4 h-4" />
-              <span>{t('singlePlayer.needHint') || 'Need a hint?'}</span>
-            </Button>
+              <span>{t('singlePlayer.needHint')}</span>
+            </AdaptiveMotion.button>
           </AdaptiveMotion.div>
         )}
       </AdaptiveAnimatePresence>

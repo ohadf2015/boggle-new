@@ -402,7 +402,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   onClick={handleDontKnow}
                   className="
                     flex-1 max-w-28
-                    bg-neo-gray text-neo-black
+                    bg-neo-gray text-neo-cream
                     border-3 border-neo-black
                     rounded-neo-lg
                     shadow-hard

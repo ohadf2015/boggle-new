@@ -2474,6 +2474,7 @@ const en = {
     "quitConfirmMessage": "You'll lose progress. Sure?",
     "imSure": "Quit",
     "gamePaused": "Paused",
+    "needHint": "Need a hint?",
     "botWords": "Words",
     "aiOpponents": "AI Rivals",
     "autoFillDesc": "Fill with {count} bots",

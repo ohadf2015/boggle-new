@@ -30,7 +30,7 @@ const TutorialPrompt: React.FC<TutorialPromptProps> = ({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -10, scale: 0.95 }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
-          className="w-full max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto mb-3 sm:mb-4"
+          className="w-full mb-2 sm:mb-3"
           dir={dir}
         >
           <div className="relative bg-gradient-to-r from-neo-purple to-neo-pink border-3 border-neo-black rounded-neo shadow-hard overflow-hidden">

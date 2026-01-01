@@ -99,7 +99,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
           "bg-neo-yellow",
           // Subtle glow effect for visual distinction
           !hasPlayed && "ring-2 ring-neo-orange/40 ring-offset-2 ring-offset-transparent",
-          compact ? "p-2" : "p-3 sm:p-4",
+          compact ? "p-2" : "p-2 sm:p-3",
           className
         )}
       >
@@ -136,10 +136,10 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
             </div>
             <div className="flex items-center gap-1.5 text-xs text-neo-black/70 font-medium mt-0.5">
               <Clock className="w-3 h-3" />
-              <span>
+              <span className="tabular-nums min-w-[5ch]">
                 {hasPlayed
-                  ? `${t('daily.nextPuzzleIn') || 'Next'}: ${countdown}`
-                  : countdown
+                  ? <><span>{t('daily.nextPuzzleIn') || 'Next'}: </span><span className="inline-block min-w-[4.5em]">{countdown}</span></>
+                  : <span className="inline-block min-w-[4.5em]">{countdown}</span>
                 }
               </span>
             </div>

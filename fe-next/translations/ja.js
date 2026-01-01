@@ -2466,6 +2466,7 @@ const ja = {
     "quitConfirmMessage": "現在の進捗が失われます。本当に終了しますか？",
     "imSure": "終了する",
     "gamePaused": "ゲーム一時停止中",
+    "needHint": "ヒントが必要?",
     "botWords": "発見した単語",
     "aiOpponents": "AI対戦相手",
     "autoFillDesc": "{count}人のAI対戦相手を追加",

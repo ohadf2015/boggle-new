@@ -76,16 +76,16 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     return (
         <header
             className={cn(
-                "w-full mb-2 sm:mb-3 lg:mb-4 xl:mb-6 px-2 xs:px-3 sm:px-4 lg:px-8 xl:px-12 pt-2 sm:pt-3 lg:pt-4 xl:pt-6 pb-2 lg:pb-3 sticky top-0 z-50 bg-slate-50 dark:bg-slate-900",
+                "w-full mb-1 sm:mb-2 lg:mb-3 px-2 sm:px-3 lg:px-4 pt-2 sm:pt-2 lg:pt-3 pb-1 lg:pb-2 sticky top-0 z-50 bg-slate-50 dark:bg-slate-900",
                 className
             )}
         >
             {/* NEO-BRUTALIST Header Bar */}
             <div
                 className={cn(
-                    "max-w-6xl lg:max-w-7xl 2xl:max-w-[1800px] mx-auto",
+                    "w-full mx-auto",
                     "flex items-center justify-between",
-                    "px-1 xs:px-2 sm:px-4 md:px-6 lg:px-6 xl:px-8 2xl:px-10 py-2 xs:py-2 sm:py-2.5 lg:py-3 xl:py-3 2xl:py-3",
+                    "px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-2.5",
                     "bg-gradient-to-r from-neo-cyan/80 via-neo-cyan-muted/60 to-neo-lime/70",
                     "border-4 lg:border-4 xl:border-4 2xl:border-4 border-neo-black",
                     "shadow-hard-lg xl:shadow-hard-lg 2xl:shadow-hard-lg",

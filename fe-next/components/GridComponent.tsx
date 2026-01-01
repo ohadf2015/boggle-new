@@ -542,7 +542,7 @@ const GridComponent = memo<GridComponentProps>(({
                         ? `${comboColors.textColor || 'text-neo-black'} ${comboColors.border} z-10 ${comboColors.shadow}`
                         : `${comboColors.bg} ${comboColors.textColor || 'text-neo-black'} border-3 ${comboColors.border} z-10 ${comboColors.shadow}`
                       : isHighlighted
-                        ? "bg-neo-purple text-white border-3 border-neo-purple z-10"
+                        ? "bg-neo-purple text-white border-3 border-neo-purple z-10 animate-hint-glow"
                         : isEliminated
                           ? "bg-gray-400/60 text-gray-500/50 border-3 border-gray-400/40 shadow-none cursor-not-allowed"
                           : "bg-neo-white text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed",
@@ -550,19 +550,13 @@ const GridComponent = memo<GridComponentProps>(({
                     isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-2 ring-neo-yellow/70 ring-offset-1 ring-offset-neo-cream",
                     // Keyboard focus indicator
                     isFocused && !isSelected && "ring-4 ring-neo-cyan ring-offset-2 ring-offset-neo-cream z-20",
-                    // Highlighted path for revealed words - pulsing glow effect
-                    isHighlighted && !isSelected && "animate-pulse",
-                    // Transition controls (no longer using fire-glow CSS class)
+                    // Transition controls
                     "transition-all",
                     comboLevel > 0 ? "duration-300" : "duration-100"
                   )}
                   style={{
                     borderRadius: '6px',
                     fontSize: 'var(--cell-font-size)',
-                    // Revealed word highlight - purple glow effect
-                    ...(isHighlighted && !isSelected && {
-                      boxShadow: '0 0 12px rgba(139, 92, 246, 0.8), 0 0 24px rgba(139, 92, 246, 0.4), 4px 4px 0 #000',
-                    }),
                     // Rainbow dance floor effect during fire round (no solid fill)
                     ...(isGlowing && fireRoundActive && !isSelected && !isHighlighted && {
                       background: glowColor,

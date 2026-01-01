@@ -2467,6 +2467,7 @@ const sv = {
     "quitConfirmMessage": "Du kommer förlora dina framsteg. Är du säker på att du vill avsluta?",
     "imSure": "Jag är säker",
     "gamePaused": "Spelet pausat",
+    "needHint": "Behöver du en ledtråd?",
     "botWords": "Hittade ord",
     "aiOpponents": "AI-motståndare",
     "autoFillDesc": "Fyller rummet med {count} AI-motståndare",

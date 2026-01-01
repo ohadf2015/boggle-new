@@ -16,13 +16,13 @@ module.exports = {
     container: {
       center: true,
       padding: {
-        DEFAULT: "1rem",
-        sm: "2rem",
-        lg: "3rem",
-        xl: "4rem",
+        DEFAULT: "0.5rem",
+        sm: "0.75rem",
+        lg: "1rem",
+        xl: "1rem",
       },
       screens: {
-        "2xl": "1600px",
+        "2xl": "2400px",
       },
     },
     screens: {
@@ -243,6 +243,17 @@ module.exports = {
           "0%, 100%": { transform: "scale(1)", boxShadow: "6px 6px 0px rgb(var(--neo-black))" },
           "50%": { transform: "scale(1.02)", boxShadow: "8px 8px 0px rgb(var(--neo-black))" },
         },
+        // Smooth hint glow animation for revealed word paths
+        "hint-glow": {
+          "0%, 100%": {
+            boxShadow: "0 0 8px rgba(139, 92, 246, 0.6), 0 0 16px rgba(139, 92, 246, 0.3), 4px 4px 0 #000",
+            transform: "scale(1)"
+          },
+          "50%": {
+            boxShadow: "0 0 16px rgba(139, 92, 246, 0.9), 0 0 32px rgba(139, 92, 246, 0.5), 4px 4px 0 #000",
+            transform: "scale(1.03)"
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -256,6 +267,7 @@ module.exports = {
         "neo-slide-in": "neo-slide-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
         "neo-shake": "neo-shake 0.4s ease-in-out",
         "pulse-subtle": "pulse-subtle 2s ease-in-out infinite",
+        "hint-glow": "hint-glow 1.5s ease-in-out infinite",
       },
       // Custom rotation values for tilts
       rotate: {

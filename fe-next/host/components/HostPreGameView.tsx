@@ -246,7 +246,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
 
 
   return (
-    <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 w-full max-w-6xl pb-40 lg:pb-0">
+    <div className="flex flex-col gap-2 sm:gap-2 md:gap-3 w-full pb-40 lg:pb-0">
       {/* Row 1: Room Code + Language + Share + Exit */}
       <GameRoomHeader
         gameCode={gameCode}
@@ -425,43 +425,43 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                   className="overflow-hidden space-y-3"
                 >
                   {/* Timer Input */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold uppercase text-neo-cream flex items-center gap-1.5">
-                      <Clock className="text-neo-cyan text-xs" />
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold uppercase text-neo-cream flex items-center gap-2">
+                      <Clock className="text-neo-cyan text-sm" />
                       {t('hostView.roundDuration')}
                     </label>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                       <button
                         type="button"
                         onClick={handleDecreaseTimer}
                         disabled={timerValue <= 1}
-                        className="w-8 h-8 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
+                        className="w-10 h-10 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
                       >
-                        <Minus size={12} />
+                        <Minus size={14} />
                       </button>
-                      <div className="flex items-center gap-1.5">
-                        <div className="text-2xl font-black text-neo-yellow w-8 text-center overflow-hidden h-8 flex items-center justify-center">
+                      <div className="flex items-center gap-2">
+                        <div className="text-3xl font-black text-neo-yellow w-12 text-center overflow-hidden h-10 flex items-center justify-center">
                           <AnimatePresence mode="popLayout">
                             <motion.span
                               key={timerValue}
-                              initial={{ y: timerDirection > 0 ? 16 : -16, opacity: 0 }}
+                              initial={{ y: timerDirection > 0 ? 20 : -20, opacity: 0 }}
                               animate={{ y: 0, opacity: 1 }}
-                              exit={{ y: timerDirection > 0 ? -16 : 16, opacity: 0 }}
+                              exit={{ y: timerDirection > 0 ? -20 : 20, opacity: 0 }}
                               transition={{ duration: 0.15, ease: 'easeOut' }}
                             >
                               {timerValue}
                             </motion.span>
                           </AnimatePresence>
                         </div>
-                        <span className="text-sm text-neo-cream font-bold">{t('hostView.minutes')}</span>
+                        <span className="text-base text-neo-cream font-bold">{t('hostView.minutes')}</span>
                       </div>
                       <button
                         type="button"
                         onClick={handleIncreaseTimer}
                         disabled={timerValue >= 10}
-                        className="w-8 h-8 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
+                        className="w-10 h-10 flex items-center justify-center rounded-neo bg-neo-cream text-neo-black border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px] transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed font-black"
                       >
-                        <Plus size={12} />
+                        <Plus size={14} />
                       </button>
                     </div>
                   </div>
@@ -656,7 +656,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
 
       {/* Row 3: Chat */}
       <div className={cn(
-        "w-full max-w-2xl mx-auto",
+        "w-full lg:max-w-3xl mx-auto",
         mobileTab === 'chat' ? "block" : "hidden lg:block"
       )}>
         <RoomChat
