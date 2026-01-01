@@ -36,7 +36,11 @@ export function MobileTabBar({
         return (
           <button
             key={tab.id}
-            onClick={() => onTabChange(isActive ? '' : tab.id)}
+            onClick={() => {
+              onTabChange(isActive ? '' : tab.id);
+              // Scroll to top when switching tabs
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             className={cn(
               'flex flex-col items-center justify-center px-4 py-2 min-w-[64px]',
               'transition-all duration-100',

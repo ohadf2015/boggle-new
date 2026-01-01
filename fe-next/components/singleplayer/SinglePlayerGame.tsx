@@ -2,22 +2,17 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { ArrowLeft, Pause, Play, Crown, HelpCircle, TrendingUp, Target, Zap } from 'lucide-react';
+import { ArrowLeft, Pause, Play, Crown, TrendingUp, Target, Zap, Eye } from 'lucide-react';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
-import { HelpPanel, HelpButton } from '@/components/game/HelpPanel';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import ComboDisplay from '@/components/game/ComboDisplay';
 import { Button } from '@/components/ui/button';
 import GridComponent from '@/components/GridComponent';
 import CircularTimer from '@/components/CircularTimer';
 import { EarthquakeWarning, FireRoundIndicator } from '@/components/earthquake';
-import ThemeIndicator from '@/components/game/ThemeIndicator';
-import { WordsProgress } from '@/player/components/in-game/WordsProgress';
-import RevealButton from '@/components/singleplayer/RevealButton';
 import { AchievementProgressTracker } from '@/components/achievements/AchievementProgressTracker';
 import { selectRandomRevealWord, getRevealableWordCount } from '@/utils/wordPathFinder';
 import { useLanguage } from '@/contexts/LanguageContext';
-import type { BoardTheme } from '@/shared/types/socket';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useGameMusic } from '@/hooks/useGameMusic';
 import { useEarthquakeFireRound } from '@/hooks/useEarthquakeFireRound';
@@ -90,7 +85,6 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const [botWords, setBotWords] = useState<Record<string, string[]>>({});
   const [isGameOver, setIsGameOver] = useState(false);
   const [isValidatingWords, setIsValidatingWords] = useState(false);
-  const [boardTheme, setBoardTheme] = useState<BoardTheme | null>(null);
   // Available words from grid solver for bots to use
   const [availableWords, setAvailableWords] = useState<{
     easy: string[];
@@ -119,10 +113,12 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     return allWords.size;
   }, [availableWords]);
 
-  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
   const [showLandscapeTutorial, setShowLandscapeTutorial] = useState(false);
-  const [hasShownFirstGameHelp, setHasShownFirstGameHelp] = useState(false);
+
+  // Hint prompt state - shows after player hasn't found a word for a while
+  const [showHintPrompt, setShowHintPrompt] = useState(false);
+  const lastWordFoundTimeRef = useRef<number>(Date.now());
 
   // Word forming state (for external WordFormingArea)
   const [formedWord, setFormedWord] = useState('');
@@ -286,23 +282,22 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     }
   }, [isLandscape, isGameOver]);
 
-  // Auto-show help panel on first game - helps new players learn the mechanics
+  // Hint prompt system - shows subtle prompt after player hasn't found a word for 15+ seconds
+  // Resets when player finds a word. Helps players discover hints organically.
   useEffect(() => {
-    if (!grid || isGameOver || hasShownFirstGameHelp) return undefined;
+    if (isPaused || isGameOver || !grid) return;
 
-    const hasSeenHelp = localStorage.getItem('first-game-help-seen');
-    if (!hasSeenHelp) {
-      // Delay opening help panel by 1.5 seconds to let game UI settle
-      const timer = setTimeout(() => {
-        setIsHelpOpen(true);
-        setHasShownFirstGameHelp(true);
-        localStorage.setItem('first-game-help-seen', 'true');
-      }, 1500);
+    const HINT_PROMPT_DELAY = 15000; // 15 seconds of inactivity
 
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [grid, isGameOver, hasShownFirstGameHelp]);
+    const checkInactivity = setInterval(() => {
+      const timeSinceLastWord = Date.now() - lastWordFoundTimeRef.current;
+      if (timeSinceLastWord >= HINT_PROMPT_DELAY && !showHintPrompt) {
+        setShowHintPrompt(true);
+      }
+    }, 5000); // Check every 5 seconds
+
+    return () => clearInterval(checkInactivity);
+  }, [isPaused, isGameOver, grid, showHintPrompt]);
 
   const dismissLandscapeTutorial = useCallback(() => {
     setShowLandscapeTutorial(false);
@@ -327,9 +322,6 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       } else if (e.key === ' ' && settings.mode !== 'practice') {
         e.preventDefault();
         setIsPaused(prev => !prev);
-      } else if (e.key === '?' || e.key === 'h' || e.key === 'H') {
-        e.preventDefault();
-        setIsHelpOpen(prev => !prev);
       }
     };
 
@@ -445,9 +437,6 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           if (response.ok) {
             const data = await response.json();
             wordsToEmbed = data.words || [];
-            if (data.theme) {
-              setBoardTheme(data.theme);
-            }
           }
         } catch (error) {
           console.warn('Failed to fetch themed words, using random grid:', error);
@@ -945,6 +934,10 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           setScore(prev => prev + fullScore);
           playWordAcceptedSound();
 
+          // Reset hint prompt - player found a word so they don't need prompting
+          lastWordFoundTimeRef.current = Date.now();
+          setShowHintPrompt(false);
+
           // Combo increases for validated words (handled by hook)
           combo.incrementCombo(true);
 
@@ -1062,8 +1055,6 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   // Landscape mode layout - maximized grid with minimal chrome
   if (isLandscape) {
     const validWordCount = foundWords.filter(fw => fw.isValid === true).length;
-    // Count only 5+ letter words for WordsProgress (matches totalBoardWords filter)
-    const longWordCount = foundWords.filter(fw => fw.isValid === true && fw.word.length >= MIN_TRACKED_WORD_LENGTH).length;
 
     return (
       <div className="relative flex items-center justify-center w-full h-full min-h-screen overflow-hidden bg-slate-900 text-white">
@@ -1134,18 +1125,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               {t('common.score') || 'Score'}
             </div>
           </div>
-          {/* Reveal Button - below score, away from central gameplay area */}
-          <RevealButton
-            revealsUsed={revealState.revealsUsed}
-            revealableWordsCount={revealableWordCount}
-            isLoading={revealState.isLoading}
-            gameActive={!isPaused && !isGameOver && timer.remainingTime > 0}
-            onReveal={handleReveal}
-            t={t}
-          />
         </div>
 
-        {/* Right side: Words count + Words Remaining + Combo */}
+        {/* Right side: Words count + Combo */}
         <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
           <div className="bg-neo-cream border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center">
             <div className="text-sm font-black text-neo-black">{validWordCount}</div>
@@ -1153,25 +1135,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               {t('common.words') || 'Words'}
             </div>
           </div>
-          {totalBoardWords !== null && totalBoardWords > 0 && (
-            <WordsProgress
-              totalWords={totalBoardWords}
-              foundWordsCount={longWordCount}
-              t={t}
-              minLength={MIN_TRACKED_WORD_LENGTH}
-              compact
-            />
-          )}
           <ComboDisplay comboLevel={combo.comboLevel} compact />
-        </div>
-
-        {/* Top-right: Help button (moved to avoid covering game board) */}
-        <div className="absolute top-2 right-2 z-30">
-          <HelpButton
-            onClick={() => setIsHelpOpen(true)}
-            className="min-w-[44px] min-h-[44px] w-11 h-11 opacity-70 hover:opacity-100"
-            aria-label={t('common.help') || 'Help'}
-          />
         </div>
 
         {/* Bottom-left: Pause/Finish button (primary action - easy thumb reach) */}
@@ -1242,11 +1206,30 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           </div>
         </div>
 
-        {/* Help Panel */}
-        <HelpPanel
-          isOpen={isHelpOpen}
-          onClose={() => setIsHelpOpen(false)}
-        />
+        {/* Hint Prompt - shows after player hasn't found a word for a while (landscape) */}
+        <AdaptiveAnimatePresence>
+          {showHintPrompt && !isPaused && !isGameOver && timer.remainingTime > 0 && revealableWordCount > 0 && (
+            <AdaptiveMotion.div
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              className="absolute bottom-14 left-1/2 -translate-x-1/2 z-40"
+            >
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  setShowHintPrompt(false);
+                  await handleReveal();
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-neo-purple border-3 border-neo-black text-white hover:bg-neo-pink hover:shadow-hard-sm rounded-neo font-bold text-sm transition-all shadow-hard-sm animate-pulse-subtle"
+              >
+                <Eye className="w-4 h-4" />
+                <span>{t('singlePlayer.needHint') || 'Need a hint?'}</span>
+              </Button>
+            </AdaptiveMotion.div>
+          )}
+        </AdaptiveAnimatePresence>
 
         {/* Direction Guidance Tooltip - shows when player only uses straight-line directions */}
         <DirectionGuidanceTooltip
@@ -1300,15 +1283,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                     </div>
                     <span>{t('landscape.tutorialQuit') || 'Bottom-right: Quit game'}</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-neo-cyan text-neo-black border-2 border-neo-black rounded-neo flex items-center justify-center">
-                      <HelpCircle className="text-neo-black" />
-                    </div>
-                    <span>{t('landscape.tutorialHelp') || 'Top-right: Help & rules'}</span>
-                  </div>
                 </div>
                 <div className="mt-4 pt-4 border-t-2 border-neo-black/20 text-sm text-neo-black/75">
-                  <p>{t('landscape.tutorialKeyboard') || 'Keyboard: Space = Pause, Esc = Quit, ? = Help'}</p>
+                  <p>{t('landscape.tutorialKeyboard') || 'Keyboard: Space = Pause, Esc = Quit'}</p>
                 </div>
                 <Button
                   onClick={dismissLandscapeTutorial}
@@ -1554,24 +1531,6 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         />
       </div>
 
-      {/* Theme Indicator + Words Progress - same row below grid */}
-      {(boardTheme || (totalBoardWords !== null && totalBoardWords > 0)) && (
-        <div className="flex items-center justify-center gap-3 mt-1">
-          {boardTheme && (
-            <div className="opacity-70">
-              <ThemeIndicator theme={boardTheme} />
-            </div>
-          )}
-          {totalBoardWords !== null && totalBoardWords > 0 && (
-            <WordsProgress
-              totalWords={totalBoardWords}
-              foundWordsCount={foundWords.filter(fw => fw.isValid === true && fw.word.length >= MIN_TRACKED_WORD_LENGTH).length}
-              t={t}
-              minLength={MIN_TRACKED_WORD_LENGTH}
-            />
-          )}
-        </div>
-      )}
 
 
 
@@ -1598,29 +1557,30 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         </div>
       )}
 
-      {/* Reveal Button - fixed at bottom left corner (away from timer section) */}
-      <div className="fixed bottom-0 left-0 z-40 mb-[max(env(safe-area-inset-bottom),8px)] ml-2">
-        <RevealButton
-          revealsUsed={revealState.revealsUsed}
-          revealableWordsCount={revealableWordCount}
-          isLoading={revealState.isLoading}
-          gameActive={!isPaused && !isGameOver && timer.remainingTime > 0}
-          onReveal={handleReveal}
-          t={t}
-        />
-      </div>
-
-      {/* Help Button - fixed at bottom right corner, not covering the board */}
-      <HelpButton
-        onClick={() => setIsHelpOpen(true)}
-        className="fixed bottom-0 right-0 z-40 mb-[max(env(safe-area-inset-bottom),8px)] mr-2 min-w-[44px] min-h-[44px] w-11 h-11 opacity-70 hover:opacity-100"
-      />
-
-      {/* Help Panel - bottom sheet */}
-      <HelpPanel
-        isOpen={isHelpOpen}
-        onClose={() => setIsHelpOpen(false)}
-      />
+      {/* Hint Prompt - shows after player hasn't found a word for a while */}
+      <AdaptiveAnimatePresence>
+        {showHintPrompt && !isPaused && !isGameOver && timer.remainingTime > 0 && revealableWordCount > 0 && (
+          <AdaptiveMotion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            className="fixed bottom-0 left-1/2 -translate-x-1/2 z-40 mb-[max(env(safe-area-inset-bottom),16px)]"
+          >
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                setShowHintPrompt(false);
+                await handleReveal();
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-neo-purple border-3 border-neo-black text-white hover:bg-neo-pink hover:shadow-hard-sm rounded-neo font-bold text-sm transition-all shadow-hard-sm animate-pulse-subtle"
+            >
+              <Eye className="w-4 h-4" />
+              <span>{t('singlePlayer.needHint') || 'Need a hint?'}</span>
+            </Button>
+          </AdaptiveMotion.div>
+        )}
+      </AdaptiveAnimatePresence>
 
       {/* Direction Guidance Tooltip - shows when player only uses straight-line directions */}
       <DirectionGuidanceTooltip

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Medal, RotateCw, Home, Bot, BarChart3, Crown, Award, Settings, Sparkles, Hash, Target, ChevronDown, TrendingUp, Coins } from 'lucide-react';
+import { Trophy, Medal, RotateCw, Home, Bot, BarChart3, Crown, Award, Settings, Sparkles, Hash, Target, ChevronDown, TrendingUp, Coins, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import PlayerInsights from '@/components/results/PlayerInsights';
@@ -26,6 +26,7 @@ import { getPointColor, getTextColor } from '@/components/results/utils';
 import type { WordObject } from '@/components/results/types';
 import { getRankBgColor } from '@/utils/rankingStyles';
 import { addGameToHistory } from '@/utils/gameHistoryManager';
+import { MobileTabBar } from '@/components/layout/MobileTabBar';
 import { applyHebrewFinalLetters } from '@/utils/utils';
 import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
 import { useResultsData } from './results';
@@ -72,6 +73,10 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const [showDetails, setShowDetails] = useState(false);
   const [showWords, setShowWords] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
+
+  // Mobile tab navigation state - Consolidated to 2 tabs for reduced cognitive load
+  type MobileTab = 'results' | 'details';
+  const [mobileActiveTab, setMobileActiveTab] = useState<MobileTab>('results');
 
   // Refs to prevent duplicate stat updates
   const hasUpdatedStatsRef = useRef(false);
@@ -574,13 +579,383 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   };
   const rankStyle = mode === 'solo-bots' ? getRankStyle(playerRank) : { bg: 'bg-neo-cyan', text: 'text-neo-black' };
 
+  // Mobile tab configuration - Consolidated to 2 tabs for reduced cognitive load
+  const mobileTabs = [
+    { id: 'results' as const, icon: <Trophy className="w-5 h-5" />, label: t('results.results') || 'Results' },
+    { id: 'details' as const, icon: <BarChart3 className="w-5 h-5" />, label: t('results.details') || 'Details' },
+  ];
+
+  // Render Results Tab Content (Primary: Score, Leaderboard, Action Buttons)
+  const renderResultsTab = () => (
+    <div className="space-y-3">
+      {/* Victory/Results Banner */}
+      <div className="relative">
+        <ResultsWinnerBanner
+          winner={{
+            username: t('common.you') || 'You',
+            score: results.playerScore,
+          }}
+          isCurrentUserWinner={true}
+          rank={mode === 'solo-bots' ? playerRank : 1}
+          variant={
+            results.playerScore === 0 || validWordCount === 0 ? 'completion' :
+            mode === 'practice' ? 'completion' :
+            mode === 'challenge' && results.isNewHighScore ? (results.isNewAllTimeBest ? 'newRecord' : 'highScore') :
+            mode === 'challenge' ? 'completion' :
+            'ranking'
+          }
+          customMessage={
+            results.playerScore === 0 || validWordCount === 0 ? (t('singlePlayer.tryAgain') || 'Try Again!') :
+            validWordCount <= 2 ? (t('singlePlayer.keepPracticing') || 'Keep Practicing!') :
+            mode === 'solo-bots' && isWinner && results.playerScore > 0 ? (t('singlePlayer.victory') || 'Victory!') :
+            mode === 'solo-bots' && playerRank <= 3 && results.playerScore > 0 ? undefined :
+            mode === 'solo-bots' ? (t('singlePlayer.gameOver') || 'Game Over') :
+            mode === 'practice' ? (t('singlePlayer.practiceComplete') || 'Practice Complete!') :
+            undefined
+          }
+          customAnnouncement={
+            results.playerScore === 0 || validWordCount === 0 ? (t('singlePlayer.noWordsFound') || "Didn't find any words this time") :
+            validWordCount <= 2 ? (t('singlePlayer.fewWordsFound') || `Found ${validWordCount} ${validWordCount === 1 ? 'word' : 'words'}`) :
+            mode === 'solo-bots' ? `#${playerRank} ${t('results.of') || 'of'} ${allParticipants.length}` :
+            mode === 'challenge' && results.previousHighScore && results.previousHighScore > results.playerScore
+              ? (t('challenge.shortOf') || '{diff} points short of your record').replace('{diff}', String(results.previousHighScore - results.playerScore))
+              : undefined
+          }
+          showConfetti={shouldShowConfetti}
+        />
+        {shouldShowConfetti && (
+          <div className="absolute top-2 end-2">
+            <ConfettiRetrigger
+              variant={mode === 'solo-bots' && playerRank <= 3 ? 'rank' : 'default'}
+              rank={mode === 'solo-bots' ? playerRank : undefined}
+              compact
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Compact Stats Card */}
+      <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 shadow-hard">
+        <div className="flex items-center gap-3">
+          {/* Rank Badge */}
+          <div className={cn(
+            'w-12 h-12 rounded-neo flex items-center justify-center border-3 border-neo-black font-black text-lg',
+            rankStyle.bg, rankStyle.text
+          )}>
+            #{mode === 'solo-bots' ? playerRank : 1}
+          </div>
+          {/* Score & Stats */}
+          <div className="flex-1 min-w-0">
+            <div className="text-2xl font-black text-white">{results.playerScore} <span className="text-sm text-white/60">pts</span></div>
+            <div className="text-xs text-white/70 font-bold flex items-center gap-2 flex-wrap">
+              <span>{validWordCount} words</span>
+              <span>•</span>
+              <span>{accuracy}% accuracy</span>
+              {playerArchetype && (
+                <>
+                  <span>•</span>
+                  <span className="text-neo-cyan">{playerArchetype.name}</span>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Bonus Badges */}
+        {(totalComboBonus > 0 || totalFireRoundBonus > 0) && (
+          <div className="flex items-center gap-2 flex-wrap mt-2">
+            {totalComboBonus > 0 && (
+              <span className="bg-neo-orange border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-black text-xs font-black">
+                ⚡ +{totalComboBonus}
+              </span>
+            )}
+            {totalFireRoundBonus > 0 && (
+              <span className="bg-neo-red border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-cream text-xs font-black">
+                🔥 +{totalFireRoundBonus}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Coins Earned - Compact */}
+      {coinReward && (
+        <div className="bg-gradient-to-r from-neo-yellow to-amber-400 rounded-neo border-3 border-neo-black shadow-hard px-4 py-2">
+          <div className="flex items-center justify-center gap-2">
+            <Coins className="w-5 h-5 text-neo-black" />
+            <span className="font-black text-xl text-neo-black">+{coinReward.awarded}</span>
+            <span className="text-sm font-bold text-neo-black/70">{t('reveal.coins') || 'Coins'}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Compact Top 3 Leaderboard */}
+      {mode === 'solo-bots' && results.botScores.length > 0 && (
+        <Top3Leaderboard
+          participants={allParticipants.map(p => ({
+            name: p.name,
+            score: p.score,
+            isCurrentPlayer: p.isPlayer,
+            isBot: !p.isPlayer,
+          })) as LeaderboardParticipant[]}
+          headerText={t('common.leaderboard') || 'Leaderboard'}
+        />
+      )}
+
+      {/* Achievements - Inline badges */}
+      {results.achievements && results.achievements.length > 0 && (
+        <div className="flex flex-wrap gap-2 justify-center">
+          {results.achievements.slice(0, 4).map((ach, i) => (
+            <AchievementBadge key={ach.key} achievement={ach} index={i} />
+          ))}
+          {results.achievements.length > 4 && (
+            <button
+              onClick={() => setMobileActiveTab('details')}
+              className="text-xs text-neo-cyan underline font-bold"
+            >
+              +{results.achievements.length - 4} more
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Primary CTA - Quick Rematch */}
+      {onQuickRematch && (
+        <motion.div
+          animate={{ scale: [1, 1.02, 1] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <Button
+            size="lg"
+            className="w-full py-4 text-xl shadow-hard-lg hover:shadow-hard-xl border-4 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-black uppercase tracking-wider"
+            onClick={onQuickRematch}
+          >
+            <RotateCw className="me-2 w-6 h-6" />
+            {t('common.quickRematch') || 'Quick Rematch'}
+          </Button>
+        </motion.div>
+      )}
+
+      {/* Secondary Actions */}
+      <div className="flex gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex-1 py-2 text-xs text-neo-black/70 dark:text-white/70 hover:text-neo-black dark:hover:text-white hover:bg-neo-cream/50 dark:hover:bg-slate-700/50 border border-neo-black/20 dark:border-white/20"
+          onClick={onPlayAgain}
+        >
+          <Settings className="me-1 w-3.5 h-3.5" />
+          {t('common.settings') || 'Settings'}
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex-1 py-2 text-xs text-neo-black/70 dark:text-white/70 hover:text-neo-black dark:hover:text-white hover:bg-neo-cream/50 dark:hover:bg-slate-700/50 border border-neo-black/20 dark:border-white/20"
+          onClick={onBackToLobby}
+        >
+          <Home className="me-1 w-3.5 h-3.5" />
+          {t('common.lobby') || 'Lobby'}
+        </Button>
+      </div>
+    </div>
+  );
+
+  // Render Details Tab Content (Secondary: Words, Insights, Charts, Bot Details)
+  const renderDetailsTab = () => (
+    <div className="space-y-3">
+      {/* Performance Insights - Expanded */}
+      {playerInsights && (
+        <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 shadow-hard">
+          <div className="flex items-center gap-2 mb-2">
+            <BarChart3 className="w-4 h-4 text-neo-cyan" />
+            <h3 className="text-sm font-black uppercase text-white">{t('results.performanceDetails') || 'Performance Details'}</h3>
+          </div>
+          <PlayerInsights insights={playerInsights} />
+        </div>
+      )}
+
+      {/* Words List - Expanded */}
+      {results.playerWordData && results.playerWordData.length > 0 && (
+        <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 shadow-hard">
+          <div className="flex items-center gap-2 mb-2">
+            <Hash className="w-4 h-4 text-neo-lime" />
+            <h3 className="text-sm font-black uppercase text-white">
+              {t('results.yourWords') || 'Your Words'} ({results.playerWordData.length})
+            </h3>
+          </div>
+          <div className="space-y-2">
+            <WordPointsGroup
+              wordsByPoints={wordsByPoints}
+              sortedPointGroups={sortedPointGroups}
+              t={t}
+              mode="chip"
+            />
+            <InvalidWordsSection
+              invalidWords={invalidWords}
+              t={t}
+              mode="chip"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Performance Chart */}
+      <CollapsibleSection
+        title={t('results.performanceHistory') || 'Performance History'}
+        icon={<TrendingUp className="w-4 h-4" />}
+        defaultExpanded={false}
+        variant="tertiary"
+        className="shadow-hard"
+      >
+        <PerformanceChart currentScore={results.playerScore} gamesLimit={10} />
+      </CollapsibleSection>
+
+      {/* Missed Words */}
+      {mode === 'solo-bots' && missedWords.length > 0 && (
+        <MissedWords missedWords={missedWords} maxDisplay={5} />
+      )}
+
+      {/* All Achievements */}
+      {results.achievements && results.achievements.length > 0 && (
+        <CollapsibleSection
+          title={t('hostView.achievements') || 'Achievements'}
+          icon={<Award className="w-4 h-4" />}
+          badge={results.achievements.length}
+          defaultExpanded={true}
+          variant="tertiary"
+          className="shadow-hard"
+        >
+          <div className="flex flex-wrap gap-2">
+            {results.achievements.map((ach, i) => (
+              <AchievementBadge key={ach.key} achievement={ach} index={i} />
+            ))}
+          </div>
+          <p className="text-xs text-white/50 mt-2 italic">
+            {t('singlePlayer.achievementsNotSaved') || 'Achievements in single player mode are not saved to your profile.'}
+          </p>
+        </CollapsibleSection>
+      )}
+
+      {/* Bot Words Details */}
+      {mode === 'solo-bots' && botWordDetails.length > 0 && (
+        <CollapsibleSection
+          title={t('singlePlayer.botDetails') || 'Bot Performance Details'}
+          icon={<Bot className="w-4 h-4" />}
+          badge={botWordDetails.length}
+          defaultExpanded={false}
+          variant="tertiary"
+          className="shadow-hard"
+        >
+          <div className="space-y-2">
+            {botWordDetails.map((bot) => (
+              <div
+                key={bot.name}
+                className="border-2 border-neo-black/30 dark:border-slate-500 rounded-neo overflow-hidden"
+              >
+                <button
+                  onClick={() => setExpandedBot(expandedBot === bot.name ? null : bot.name)}
+                  className="w-full flex items-center justify-between p-2 bg-neo-cream/50 dark:bg-slate-700 hover:bg-neo-cream dark:hover:bg-slate-600 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <Bot className="w-4 h-4 text-neo-black/70 dark:text-white/70" />
+                    <span className="font-bold text-neo-black dark:text-white text-sm">{bot.name}</span>
+                    <span className="text-[10px] bg-neo-black/10 dark:bg-white/10 px-1.5 py-0.5 rounded-full font-bold">
+                      {bot.totalWords} words
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg font-black text-neo-black dark:text-white">{bot.score}</span>
+                    <motion.span
+                      animate={{ rotate: expandedBot === bot.name ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <ChevronDown className="w-4 h-4 text-neo-black/70 dark:text-white/70" />
+                    </motion.span>
+                  </div>
+                </button>
+                <AnimatePresence>
+                  {expandedBot === bot.name && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="p-2 bg-white dark:bg-slate-800 border-t border-neo-black/10 dark:border-slate-600 text-neo-black dark:text-white">
+                        {bot.words && bot.words.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {bot.words.map((word, i) => {
+                              const points = Math.max(word.length - 1, 1);
+                              const gameLanguage = results.language || language;
+                              const displayWord = gameLanguage === 'he' ? applyHebrewFinalLetters(word) : word;
+                              return (
+                                <span
+                                  key={`${word}-${i}`}
+                                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-black uppercase border border-neo-black rounded shadow-sm"
+                                  style={{
+                                    backgroundColor: getPointColor(points),
+                                    color: getTextColor(points)
+                                  }}
+                                >
+                                  {displayWord}
+                                  <span className="opacity-70">+{points}</span>
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ))}
+          </div>
+        </CollapsibleSection>
+      )}
+    </div>
+  );
+
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.4 }}
-      className="max-w-lg mx-auto space-y-3 px-2"
-    >
+    <div className="relative">
+      {/* MOBILE VIEW - Tab-based layout (hidden on lg+) */}
+      <div className="lg:hidden flex flex-col min-h-full">
+        {/* Tab Content - Scrollable area */}
+        <div className="flex-1 overflow-y-auto overscroll-contain px-2 pb-20">
+          <div className="max-w-lg mx-auto">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={mobileActiveTab}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.15 }}
+              >
+                {mobileActiveTab === 'results' && renderResultsTab()}
+                {mobileActiveTab === 'details' && renderDetailsTab()}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Fixed Bottom Tab Bar */}
+        <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black safe-area-bottom">
+          <MobileTabBar
+            tabs={mobileTabs}
+            activeTab={mobileActiveTab}
+            onTabChange={(id) => setMobileActiveTab(id as MobileTab)}
+          />
+        </div>
+      </div>
+
+      {/* DESKTOP VIEW - Original layout (hidden on mobile) */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
+        className="hidden lg:block max-w-lg mx-auto space-y-3 px-2"
+      >
       {/* Unified Victory/Results Banner - using shared component */}
       <div className="relative">
         <ResultsWinnerBanner
@@ -1060,6 +1435,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         </div>
       </div>
 
+      </motion.div>
+
+      {/* Modals - Outside both mobile and desktop views */}
       {/* Word validation modal */}
       {showWordValidation && wordValidationQueue.length > 0 && (
         <WordFeedbackModal
@@ -1085,7 +1463,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         onClose={() => setShowSignupModal(false)}
         variant="multiGames"
       />
-    </motion.div>
+    </div>
   );
 };
 

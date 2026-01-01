@@ -1606,7 +1606,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       </div>
 
       {/* Bottom Tab Bar - Fixed (using reusable MobileTabBar component) */}
-      <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-40 bg-neo-navy border-t-4 border-neo-black safe-area-bottom">
+      <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black safe-area-bottom">
         <MobileTabBar
           tabs={[
             { id: 'results', icon: <Share2 className="w-5 h-5" />, label: t('wordHunt.results.share') || 'Share' },

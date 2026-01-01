@@ -983,6 +983,40 @@ export async function updateRankedMmr(participants: RankedParticipant[]): Promis
   }
 }
 
+/**
+ * Record a wrong word submission from a player
+ * These are used to make bots more human-like by using real player mistakes
+ * @param word - The wrong word submitted
+ * @param language - Game language
+ */
+export async function recordPlayerWrongWord(word: string, language: string): Promise<void> {
+  const client = getSupabase();
+  if (!client) return;
+
+  const normalizedWord = word.toLowerCase().trim();
+
+  // Skip very short words (likely typos)
+  if (normalizedWord.length < 3) return;
+
+  try {
+    // Use the RPC function we created in the migration
+    const { error } = await client.rpc('record_player_wrong_word', {
+      p_word: normalizedWord,
+      p_language: language
+    });
+
+    if (error) {
+      // Ignore errors - this is non-critical functionality
+      logger.debug('SUPABASE', `Failed to record wrong word "${normalizedWord}": ${error.message}`);
+    } else {
+      logger.debug('SUPABASE', `Recorded wrong word "${normalizedWord}" for ${language}`);
+    }
+  } catch (err) {
+    // Ignore errors - this is non-critical functionality
+    logger.debug('SUPABASE', `Error recording wrong word: ${err}`);
+  }
+}
+
 // CommonJS exports for backward compatibility
 module.exports = {
   getSupabase,
@@ -998,5 +1032,6 @@ module.exports = {
   saveHostApprovedWord,
   savePlayerWord,
   getPopularPlayerWords,
-  incrementBotWordUsage
+  incrementBotWordUsage,
+  recordPlayerWrongWord
 };
