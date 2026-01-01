@@ -49,6 +49,28 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Sync display name when initialName prop changes (e.g., after profile loads)
+  useEffect(() => {
+    if (initialName && initialName !== displayName) {
+      setDisplayName(initialName);
+    }
+  }, [initialName]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Sync profile picture state when props change
+  useEffect(() => {
+    const newShouldUseProfilePicture = profilePictureUrl && initialAvatarId === PROFILE_AVATAR_ID;
+    if (newShouldUseProfilePicture !== useProfilePicture) {
+      setUseProfilePicture(newShouldUseProfilePicture);
+    }
+    // Also update selected avatar if not using profile picture
+    if (!newShouldUseProfilePicture && initialAvatarId) {
+      const avatar = AVATARS.find(a => a.id === initialAvatarId);
+      if (avatar) {
+        setSelectedAvatar(avatar);
+      }
+    }
+  }, [profilePictureUrl, initialAvatarId]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Fire confetti on mount
   useEffect(() => {
     if (isOpen) {

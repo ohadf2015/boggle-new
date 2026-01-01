@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -11,6 +12,8 @@ import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import ModeCard from './ModeCard';
 import TutorialPrompt from './TutorialPrompt';
 import Header from '@/components/Header';
@@ -38,6 +41,19 @@ const LandingView: React.FC = () => {
   const { isAuthenticated, needsProfileCustomization, profile, updateProfile } = useAuth();
   const isLandscape = useMobileLandscape();
   const liveRoomStats = useLiveRoomStats();
+
+  // Pull-to-refresh for room stats
+  const { pullToRefreshHandlers, pullState } = usePullToRefresh({
+    onRefresh: async () => {
+      liveRoomStats.refresh();
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      toast.success(t('common.refreshed') || 'Refreshed', {
+        duration: 2000,
+        icon: '🔄',
+      });
+    },
+    threshold: 60,
+  });
 
   // Tutorial prompt state (non-intrusive banner for first-time visitors)
   const [showTutorialPrompt, setShowTutorialPrompt] = useState(false);
@@ -174,7 +190,17 @@ const LandingView: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
+    <div
+      className="flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative"
+      {...pullToRefreshHandlers}
+    >
+      {/* Pull-to-refresh indicator */}
+      <PullToRefreshIndicator
+        pullDistance={pullState.pullDistance}
+        isRefreshing={pullState.isRefreshing}
+        threshold={60}
+      />
+
       {/* Onboarding Modal */}
       <OnboardingModal isOpen={showOnboarding} onClose={() => setShowOnboarding(false)} />
 
@@ -191,13 +217,13 @@ const LandingView: React.FC = () => {
       <Header />
 
       {/* Main content */}
-      <main className="max-w-6xl lg:max-w-7xl mx-auto px-2 xs:px-4 sm:px-6 lg:px-8 xl:px-12 py-2 sm:py-3 lg:py-6 xl:py-8 overflow-x-hidden">
+      <main className="w-full px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-4 overflow-x-hidden">
         {/* Hero section - compact */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="text-center mb-2 sm:mb-2 lg:mb-4 xl:mb-6"
+          className="text-center mb-1 sm:mb-2 lg:mb-3"
         >
           <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white mb-0.5 sm:mb-1 lg:mb-2">
             {t('landing.chooseMode') || 'Choose Your Mode'}
@@ -219,7 +245,7 @@ const LandingView: React.FC = () => {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.05 }}
-          className="max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto mb-2 sm:mb-2 lg:mb-4 xl:mb-6"
+          className="w-full mb-1 sm:mb-2 lg:mb-3"
         >
           <DailyChallengeBanner />
         </motion.div>
@@ -229,7 +255,7 @@ const LandingView: React.FC = () => {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 lg:gap-4 xl:gap-6 max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto"
+          className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-2 lg:gap-3 w-full"
         >
           {/* Multiplayer Card */}
           <ModeCard

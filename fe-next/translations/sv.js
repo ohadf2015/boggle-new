@@ -82,6 +82,7 @@ const sv = {
     "admin": "Admin",
     "understood": "Kör!",
     "refresh": "Uppdatera",
+    "refreshed": "Uppdaterat!",
     "reconnecting": "Återansluter...",
     "reconnected": "Vi är tillbaka!",
     "connectionLost": "Tappade anslutningen",
@@ -534,7 +535,8 @@ const sv = {
       },
       "activeRoomsPreview": "Rum",
       "playersOnline": "online",
-      "noRooms": "Inga rum - skapa ett!"
+      "noRooms": "Inga rum - skapa ett!",
+      "roomsRefreshed": "Rum uppdaterade"
     },
     "editProfile": "Redigera",
     "profileSetup": {
@@ -728,7 +730,9 @@ const sv = {
     "players": "spelare",
     "letterMinimum": "bokstäver minimum",
     "chat": "Chatt",
-    "settings": "Inställningar"
+    "settings": "Inställningar",
+    "regenerateBoard": "Regenerera bräda",
+    "boardRegenerated": "Brädan har regenererats!"
   },
   "tvBroadcast": {
     "joinAt": "Gå med på",
@@ -993,6 +997,7 @@ const sv = {
     "viewXpBreakdown": "XP-uppdelning",
     "summary": "Sammanfattning",
     "details": "Detaljer",
+    "performanceDetails": "Prestandadetaljer",
     "play": "Spela",
     "badges": "Märken",
     "xp": "XP",
@@ -2364,6 +2369,7 @@ const sv = {
     "dictionary5": "Forma vår ordbok tillsammans!",
     "notAWord": "Inte ett ord",
     "realWord": "Riktigt ord!",
+    "dontKnow": "Vet inte",
     "nextWord": "Nästa ord...",
     "almostApproved": "Nästan där!",
     "votesNeeded": "{count} röster till för att godkänna",
@@ -2453,7 +2459,8 @@ const sv = {
     "noWordsFound": "Inga ord hittade",
     "tryAgain": "Försök igen!",
     "keepPracticing": "Fortsätt öva!",
-    "fewWordsFound": "Hittade {validWordCount} {validWordCount === 1 ? 'ord' : 'ord'}",
+    "fewWordsFound": "Hittade {count} ord",
+    "fewWordsFoundSingular": "Hittade 1 ord",
     "achievementsNotSaved": "Prestationer i enspelarläge sparas inte till din profil.",
     "botDetails": "Bot-detaljer",
     "difficulty": "Svårighetsgrad",
@@ -2464,6 +2471,7 @@ const sv = {
     "quitConfirmMessage": "Du kommer förlora dina framsteg. Är du säker på att du vill avsluta?",
     "imSure": "Jag är säker",
     "gamePaused": "Spelet pausat",
+    "needHint": "Behöver du en ledtråd?",
     "botWords": "Hittade ord",
     "aiOpponents": "AI-motståndare",
     "autoFillDesc": "Fyller rummet med {count} AI-motståndare",
@@ -2680,6 +2688,7 @@ const sv = {
     "retryLinkInvalid": "Denna länk är ogiltig",
     "retryLinkError": "Kunde inte verifiera länken",
     "howToPlay": "Hur man spelar",
+    "firstTime": "(Ny?)",
     "canYouBeatMyScore": "Kan du slå mitt resultat?",
     "targetWordLength": "Hitta det dolda ordet:",
     "onlyMatchingLength": "Endast ord med {length} bokstäver använder dina försök!",

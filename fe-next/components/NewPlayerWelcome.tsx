@@ -62,26 +62,26 @@ const NewPlayerWelcome: React.FC<NewPlayerWelcomeProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-sm" dir={dir}>
-        <DialogHeader className="bg-neo-cyan text-neo-black p-3 sm:p-4">
-          <DialogTitle className="flex items-center justify-center gap-2 text-lg sm:text-xl">
-            <Gamepad2 className="text-xl sm:text-2xl" />
+        <DialogHeader className="bg-neo-cyan text-neo-black p-2 sm:p-3">
+          <DialogTitle className="flex items-center justify-center gap-2 text-base sm:text-lg">
+            <Gamepad2 className="text-lg sm:text-xl" />
             {t('howToPlay.newPlayer.welcomeTitle') || 'Welcome!'}
           </DialogTitle>
         </DialogHeader>
 
-        <DialogBody className="space-y-4 px-4 sm:px-5 py-3">
-          {/* Quick 3-step intro - no excessive animations */}
-          <div className="space-y-3">
+        <DialogBody className="space-y-2 px-3 sm:px-4 py-2">
+          {/* Quick 3-step intro - compact layout */}
+          <div className="space-y-2">
             {quickTips.map((tip, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="flex items-center gap-3"
+                className="flex items-center gap-2"
               >
-                <div className={`w-10 h-10 ${tip.color} rounded-lg border-2 border-neo-black flex items-center justify-center shadow-hard-sm flex-shrink-0`}>
-                  <tip.icon className="w-5 h-5 text-neo-black" />
+                <div className={`w-8 h-8 ${tip.color} rounded-lg border-2 border-neo-black flex items-center justify-center shadow-hard-sm flex-shrink-0`}>
+                  <tip.icon className="w-4 h-4 text-neo-black" />
                 </div>
                 <span className="text-sm font-medium text-neo-black">
                   {tip.label}
@@ -91,7 +91,7 @@ const NewPlayerWelcome: React.FC<NewPlayerWelcomeProps> = ({
           </div>
 
           {/* Don't show again */}
-          <label className="flex items-center justify-center gap-2 cursor-pointer pt-2">
+          <label className="flex items-center justify-center gap-2 cursor-pointer pt-1">
             <input
               type="checkbox"
               checked={dontShowAgain}
@@ -104,12 +104,12 @@ const NewPlayerWelcome: React.FC<NewPlayerWelcomeProps> = ({
           </label>
         </DialogBody>
 
-        <DialogFooter className="px-4 sm:px-5 pb-4">
+        <DialogFooter className="px-3 sm:px-4 pb-3">
           <Button
             onClick={handlePlay}
-            className="w-full bg-neo-lime hover:bg-neo-lime/90 text-neo-black font-bold border-3 border-neo-black shadow-hard"
+            className="w-full bg-neo-lime hover:bg-neo-lime/90 text-neo-black font-bold border-3 border-neo-black shadow-hard py-2"
           >
-            <Play className="w-5 h-5 me-2" />
+            <Play className="w-4 h-4 me-2" />
             {t('howToPlay.newPlayer.letsPlay') || "Let's Play!"}
           </Button>
         </DialogFooter>

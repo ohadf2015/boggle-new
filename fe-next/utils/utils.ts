@@ -8,6 +8,7 @@ import {
   isValidHebrewLetter,
   filterHebrewWord,
   applyHebrewFinalLetters,
+  normalizeWord,
 } from '@/shared/utils/wordNormalization';
 
 // Re-export for backwards compatibility
@@ -17,7 +18,95 @@ export {
   isValidHebrewLetter,
   filterHebrewWord,
   applyHebrewFinalLetters,
+  normalizeWord,
 };
+
+// ==========================================
+// Word Validation Functions for Board Verification
+// ==========================================
+
+/**
+ * Build a map of letter positions on the board for efficient path finding
+ */
+function makePositionsMap(board: LetterGrid, language: Language): Map<string, [number, number][]> {
+  const positions = new Map<string, [number, number][]>();
+  if (!board || board.length === 0) return positions;
+
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[0].length; j++) {
+      const ch = normalizeWord(String(board[i][j]), language);
+      if (!positions.has(ch)) positions.set(ch, []);
+      positions.get(ch)!.push([i, j]);
+    }
+  }
+  return positions;
+}
+
+/**
+ * DFS search for word path on board with 8-directional adjacency
+ */
+function searchWordOnBoard(
+  board: LetterGrid,
+  word: string,
+  row: number,
+  col: number,
+  index: number,
+  visited: Set<string>,
+  language: Language
+): boolean {
+  if (index === word.length) return true;
+
+  if (row < 0 || row >= board.length || col < 0 || col >= board[0].length) return false;
+
+  const cellKey = `${row},${col}`;
+  if (visited.has(cellKey)) return false;
+
+  const cellNormalized = normalizeWord(board[row][col], language);
+  if (cellNormalized !== word[index]) return false;
+
+  visited.add(cellKey);
+
+  // All 8 adjacent directions: horizontal, vertical, and diagonal
+  const allDirections: [number, number][] = [
+    [-1, -1], [-1, 0], [-1, 1],  // up-left, up, up-right
+    [0, -1],           [0, 1],   // left, right
+    [1, -1],  [1, 0],  [1, 1]    // down-left, down, down-right
+  ];
+
+  for (const [dx, dy] of allDirections) {
+    if (searchWordOnBoard(board, word, row + dx, col + dy, index + 1, visited, language)) {
+      visited.delete(cellKey);
+      return true;
+    }
+  }
+
+  visited.delete(cellKey);
+  return false;
+}
+
+/**
+ * Check if a word exists on the board as a valid path
+ * Uses DFS to find adjacent cell path (8-directional)
+ */
+function isWordOnBoard(word: string, letterGrid: LetterGrid, language: Language): boolean {
+  if (!letterGrid || !word || letterGrid.length === 0) return false;
+
+  // Normalize the word for comparison
+  const wordNormalized = normalizeWord(word, language);
+
+  // Find all starting positions (cells with the first letter)
+  const posMap = makePositionsMap(letterGrid, language);
+  const startPositions = posMap.get(wordNormalized[0]) || [];
+
+  // Try to find the word starting from each position
+  for (const [startRow, startCol] of startPositions) {
+    if (searchWordOnBoard(letterGrid, wordNormalized, startRow, startCol, 0, new Set(), language)) {
+      return true;
+    }
+  }
+
+  return false;
+}
 
 // Utilities for LexiClash game
 
@@ -115,7 +204,13 @@ export function generateRandomTable(
     return newTable;
   }
 
-// Generate a table with long dictionary words embedded for enhanced gameplay
+// Maximum number of board generation attempts before giving up
+const MAX_BOARD_GENERATION_ATTEMPTS = 5;
+
+/**
+ * Generate a table with long dictionary words embedded for enhanced gameplay
+ * This version includes verification that embedded words can actually be found
+ */
 function generateTableWithEmbeddedWords(
   rows: number,
   cols: number,
@@ -123,18 +218,7 @@ function generateTableWithEmbeddedWords(
   wordsToEmbed: string[],
   language: Language
 ): LetterGrid {
-  // Initialize grid with null values
-  const grid = Array(rows).fill(null).map(() => Array(cols).fill(null));
-  const usedCells = new Set<string>();
-
-  // Calculate how many words to embed based on board size
-  // Aim for roughly 1 word per 3-4 cells for denser coverage
-  // This ensures players have plenty of valid words to find
-  const totalCells = rows * cols;
-  const targetWords = Math.min(wordsToEmbed.length, Math.max(4, Math.floor(totalCells / 3)));
-
-  // Filter words to only include valid letters for the language
-  // For Hebrew, this removes punctuation marks like gershayim (״) and geresh (׳)
+  // Filter and prepare words once
   const cleanedWords = language === 'he'
     ? wordsToEmbed.map(filterHebrewWord).filter(w => w.length >= 2)
     : wordsToEmbed;
@@ -142,22 +226,60 @@ function generateTableWithEmbeddedWords(
   // Sort words by length (longer first) for better placement
   const sortedWords = [...cleanedWords].sort((a, b) => b.length - a.length);
 
-  let embeddedCount = 0;
+  const totalCells = rows * cols;
+  const targetWords = Math.min(sortedWords.length, Math.max(4, Math.floor(totalCells / 3)));
+  const lettersArray = typeof letters === 'string' ? letters.split('') : letters;
 
-  // Try to embed each word
+  // Try multiple times to generate a valid board
+  for (let attempt = 0; attempt < MAX_BOARD_GENERATION_ATTEMPTS; attempt++) {
+    const result = attemptGenerateBoard(rows, cols, sortedWords, targetWords, lettersArray, language);
+
+    // Verify that embedded words can actually be found on the board
+    const missingWords = result.embeddedWords.filter(word => !isWordOnBoard(word, result.grid, language));
+
+    if (missingWords.length === 0) {
+      // All embedded words are findable - success!
+      return result.grid;
+    }
+
+    // Some words can't be found, try again (only log in dev)
+    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+      console.warn(`Board generation attempt ${attempt + 1}: ${missingWords.length} words not findable, retrying...`);
+    }
+  }
+
+  // After all attempts, generate a basic board with just the words that work
+  // This is a fallback to ensure we always return a valid board
+  return generateVerifiedBoard(rows, cols, sortedWords, lettersArray, language);
+}
+
+/**
+ * Single attempt to generate a board with embedded words
+ */
+function attemptGenerateBoard(
+  rows: number,
+  cols: number,
+  sortedWords: string[],
+  targetWords: number,
+  lettersArray: string[],
+  language: Language
+): { grid: LetterGrid; embeddedWords: string[] } {
+  const grid: (string | null)[][] = Array(rows).fill(null).map(() => Array(cols).fill(null));
+  const usedCells = new Set<string>();
+  const embeddedWords: string[] = [];
+
+  let embeddedCount = 0;
   for (const word of sortedWords) {
     if (embeddedCount >= targetWords) break;
-
-    // Skip words that are too long to fit
     if (word.length > Math.max(rows, cols)) continue;
 
     if (tryEmbedWord(grid, word, rows, cols, usedCells, language)) {
+      embeddedWords.push(word);
       embeddedCount++;
     }
   }
 
   // Fill remaining empty cells with random letters
-  const lettersArray = typeof letters === 'string' ? letters.split('') : letters;
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
       if (grid[i][j] === null) {
@@ -166,7 +288,60 @@ function generateTableWithEmbeddedWords(
     }
   }
 
-  return grid;
+  return { grid: grid as LetterGrid, embeddedWords };
+}
+
+/**
+ * Generate a verified board where each word is confirmed to exist after embedding
+ */
+function generateVerifiedBoard(
+  rows: number,
+  cols: number,
+  sortedWords: string[],
+  lettersArray: string[],
+  language: Language
+): LetterGrid {
+  const grid: (string | null)[][] = Array(rows).fill(null).map(() => Array(cols).fill(null));
+  const usedCells = new Set<string>();
+
+  for (const word of sortedWords) {
+    if (word.length > Math.max(rows, cols)) continue;
+
+    // Try to embed the word
+    const gridCopy = grid.map(row => [...row]);
+    const usedCellsCopy = new Set(usedCells);
+
+    if (tryEmbedWord(gridCopy, word, rows, cols, usedCellsCopy, language)) {
+      // Fill empty cells temporarily to verify
+      const testGrid: LetterGrid = gridCopy.map(row =>
+        row.map(cell => cell ?? lettersArray[Math.floor(Math.random() * lettersArray.length)])
+      );
+
+      // Verify the word can be found
+      if (isWordOnBoard(word, testGrid, language)) {
+        // Word is valid - apply the embedding to actual grid
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (gridCopy[i][j] !== null) {
+              grid[i][j] = gridCopy[i][j];
+            }
+          }
+        }
+        usedCellsCopy.forEach(cell => usedCells.add(cell));
+      }
+    }
+  }
+
+  // Fill remaining empty cells
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      if (grid[i][j] === null) {
+        grid[i][j] = lettersArray[Math.floor(Math.random() * lettersArray.length)];
+      }
+    }
+  }
+
+  return grid as LetterGrid;
 }
 
 // Try to embed a word into the grid in any direction (including combinations)

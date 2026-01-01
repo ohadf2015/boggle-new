@@ -82,6 +82,7 @@ const ja = {
     "admin": "管理者",
     "understood": "行くぞ！",
     "refresh": "更新",
+    "refreshed": "更新完了！",
     "reconnecting": "再接続中...",
     "reconnected": "復活！",
     "connectionLost": "接続切れ",
@@ -534,7 +535,8 @@ const ja = {
       },
       "activeRoomsPreview": "ルーム",
       "playersOnline": "オンライン",
-      "noRooms": "ルームなし - 作成！"
+      "noRooms": "ルームなし - 作成！",
+      "roomsRefreshed": "ルーム更新完了"
     },
     "editProfile": "編集",
     "profileSetup": {
@@ -728,7 +730,9 @@ const ja = {
     "players": "プレイヤー",
     "letterMinimum": "文字以上",
     "chat": "チャット",
-    "settings": "設定"
+    "settings": "設定",
+    "regenerateBoard": "ボード再生成",
+    "boardRegenerated": "ボードが再生成されました！"
   },
   "tvBroadcast": {
     "joinAt": "参加URL",
@@ -992,6 +996,7 @@ const ja = {
     "viewXpBreakdown": "XP内訳",
     "summary": "サマリー",
     "details": "詳細",
+    "performanceDetails": "パフォーマンス詳細",
     "play": "プレイ",
     "badges": "バッジ",
     "xp": "XP",
@@ -2363,6 +2368,7 @@ const ja = {
     "dictionary5": "一緒に辞書を作ろう！",
     "notAWord": "言葉じゃない",
     "realWord": "本物の言葉！",
+    "dontKnow": "わからない",
     "nextWord": "次の言葉...",
     "almostApproved": "もう少し！",
     "votesNeeded": "あと{count}票で承認",
@@ -2452,7 +2458,8 @@ const ja = {
     "noWordsFound": "単語が見つかりません",
     "tryAgain": "もう一度！",
     "keepPracticing": "練習を続けよう！",
-    "fewWordsFound": "{validWordCount}個の単語を発見",
+    "fewWordsFound": "{count}個の単語を発見",
+    "fewWordsFoundSingular": "1個の単語を発見",
     "achievementsNotSaved": "シングルプレイヤーモードの実績はプロフィールに保存されません。",
     "botDetails": "ボット詳細",
     "difficulty": "難易度",
@@ -2463,6 +2470,7 @@ const ja = {
     "quitConfirmMessage": "現在の進捗が失われます。本当に終了しますか？",
     "imSure": "終了する",
     "gamePaused": "ゲーム一時停止中",
+    "needHint": "ヒントが必要?",
     "botWords": "発見した単語",
     "aiOpponents": "AI対戦相手",
     "autoFillDesc": "{count}人のAI対戦相手を追加",
@@ -2679,6 +2687,7 @@ const ja = {
     "retryLinkInvalid": "このリンクは無効です",
     "retryLinkError": "リンクを確認できませんでした",
     "howToPlay": "遊び方",
+    "firstTime": "(初めて？)",
     "canYouBeatMyScore": "私のスコアを超えられますか？",
     "targetWordLength": "隠された単語を見つけて：",
     "onlyMatchingLength": "{length}文字の単語のみが試行回数を消費します！",

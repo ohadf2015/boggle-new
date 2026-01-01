@@ -591,7 +591,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                 <CircularTimer
                   remainingTime={remainingTime}
                   totalTime={timerValue * 60}
-                  size="md"
+                  size="lg"
                 />
               )}
 
@@ -802,10 +802,10 @@ const InGameScreen = memo<InGameScreenProps>(({
         />
       )}
 
-      <div className="flex flex-col lg:flex-row gap-2 md:gap-4 lg:gap-6 flex-grow w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out">
+      <div className="flex flex-col lg:flex-row gap-1 md:gap-4 lg:gap-6 flex-grow w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out">
 
       {/* Top Bar - Only on mobile, integrated into parent on desktop */}
-      <div className="lg:hidden w-full flex items-center justify-between mb-1 px-2">
+      <div className="lg:hidden w-full flex items-center justify-between mb-0.5 px-2">
         {onExitRoom && (
           <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} className="relative z-50" />
         )}
@@ -885,10 +885,10 @@ const InGameScreen = memo<InGameScreenProps>(({
       <div className="flex-1 flex flex-col min-w-0 min-h-0">
         {/* Stats row - Combo | Timer | Score - timer always centered and visible */}
         {remainingTime !== null && (
-          <div ref={gameStatsRef} className="flex items-center justify-center gap-3 md:gap-4 mb-2" role="status" aria-label="Game status">
+          <div ref={gameStatsRef} className="flex items-center justify-center gap-2 md:gap-4 mb-1 md:mb-2" role="status" aria-label="Game status">
             {/* Combo (left - shows when level >= 2, placeholder otherwise for layout balance) */}
             {isPlaying && (
-              <div className="min-w-[70px] md:min-w-[90px] flex justify-end">
+              <div className="min-w-[60px] md:min-w-[90px] flex justify-end">
                 <ComboDisplay comboLevel={comboLevel} compact />
               </div>
             )}
@@ -913,7 +913,7 @@ const InGameScreen = memo<InGameScreenProps>(({
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="relative border-3 border-neo-black rounded-neo shadow-hard-lg px-3 md:px-4 py-1.5 min-w-[70px] md:min-w-[90px]"
+                className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-2 md:px-4 py-1 md:py-1.5 min-w-[60px] md:min-w-[90px]"
                 style={{
                   background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
                 }}
@@ -923,18 +923,18 @@ const InGameScreen = memo<InGameScreenProps>(({
                     key={playerData.score}
                     initial={{ scale: 1.3 }}
                     animate={{ scale: 1 }}
-                    className="text-xl md:text-2xl lg:text-3xl font-black text-neo-black leading-tight"
+                    className="text-lg md:text-2xl lg:text-3xl font-black text-neo-black leading-tight"
                     style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
                   >
                     {playerData.score}
                   </motion.div>
-                  <div className="text-[10px] md:text-xs lg:text-sm font-bold uppercase tracking-wider text-neo-black">
+                  <div className="text-[9px] md:text-xs lg:text-sm font-bold uppercase tracking-wider text-neo-black">
                     {t('common.score') || 'Score'}
                   </div>
                 </div>
                 {/* Rank badge */}
                 {playerData.rank && playerData.rank > 0 && (
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-neo-purple text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-xs font-black shadow-hard-sm">
+                  <div className="absolute -top-2 -right-2 w-5 h-5 md:w-6 md:h-6 bg-neo-purple text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-[10px] md:text-xs font-black shadow-hard-sm">
                     #{playerData.rank}
                   </div>
                 )}
@@ -1014,7 +1014,7 @@ const InGameScreen = memo<InGameScreenProps>(({
 
         {/* Words Remaining - 5+ letter words only (single-player only) */}
         {hints?.isSinglePlayer && isPlaying && totalBoardWords !== null && totalBoardWords !== undefined && totalBoardWords > 0 && (
-          <div className="flex justify-center mt-2">
+          <div className="flex justify-center mt-1 md:mt-2">
             <WordsRemaining
               totalWords={totalBoardWords}
               foundWordsCount={normalizedFoundWords.filter(fw => fw.isValid !== false && fw.word.length >= 5).length}
@@ -1026,7 +1026,7 @@ const InGameScreen = memo<InGameScreenProps>(({
 
         {/* Mobile: Split-view with compact leaderboard + words (eliminates tab switching) */}
         {isPlaying && !gameplayFocusMode && leaderboard && leaderboard.length > 0 && (
-          <div className="lg:hidden mt-2 space-y-2">
+          <div className="lg:hidden mt-1 md:mt-2 space-y-1 md:space-y-2">
             {/* Compact Leaderboard - Always visible */}
             <CompactLeaderboard
               players={leaderboard.map(p => ({

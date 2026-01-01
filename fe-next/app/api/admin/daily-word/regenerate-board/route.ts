@@ -1,0 +1,86 @@
+import { NextResponse } from 'next/server';
+import { createClient } from '@/utils/supabase/server';
+import { regenerateDailyPuzzle } from '@/utils/dailyChallenge';
+import type { Language } from '@/types';
+
+/**
+ * POST /api/admin/daily-word/regenerate-board
+ * Regenerate the board for a daily challenge
+ * This generates a new grid with the current target word embedded
+ * Only accessible to admin users
+ */
+export async function POST(request: Request) {
+  try {
+    const supabase = await createClient();
+
+    // Check if user is authenticated and is admin
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check if user is admin
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError || !profile?.is_admin) {
+      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    }
+
+    // Parse request body
+    const body = await request.json();
+    const { puzzleDate, language } = body;
+
+    if (!puzzleDate || !language) {
+      return NextResponse.json(
+        { error: 'puzzleDate and language are required' },
+        { status: 400 }
+      );
+    }
+
+    // Validate date format
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(puzzleDate)) {
+      return NextResponse.json(
+        { error: 'Invalid date format. Use YYYY-MM-DD' },
+        { status: 400 }
+      );
+    }
+
+    // Validate language
+    const validLanguages = ['en', 'he', 'sv', 'ja', 'es'];
+    if (!validLanguages.includes(language)) {
+      return NextResponse.json(
+        { error: 'Invalid language code' },
+        { status: 400 }
+      );
+    }
+
+    // Regenerate the puzzle (this will create a new grid with the target word embedded)
+    const puzzle = await regenerateDailyPuzzle(puzzleDate, language as Language);
+
+    return NextResponse.json({
+      success: true,
+      puzzle: {
+        puzzleDate: puzzle.puzzleDate,
+        puzzleNumber: puzzle.puzzleNumber,
+        language: puzzle.language,
+        targetWord: puzzle.targetWord,
+        gridDimensions: {
+          rows: puzzle.grid.length,
+          cols: puzzle.grid[0]?.length || 0
+        }
+      },
+      message: `Board regenerated successfully for ${puzzleDate}/${language}`
+    });
+  } catch (error) {
+    console.error('Regenerate board error:', error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

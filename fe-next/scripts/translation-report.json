@@ -1,76 +1,21 @@
 {
   "summary": {
-    "totalKeysInCode": 1418,
+    "totalKeysInCode": 1423,
     "keyCountByLanguage": {
-      "en": 2434,
-      "he": 2433,
-      "sv": 2433,
-      "ja": 2433,
-      "es": 2433
+      "en": 2442,
+      "he": 2442,
+      "sv": 2442,
+      "ja": 2442,
+      "es": 2442
     },
-    "missingFromEnglish": 2
+    "missingFromEnglish": 0
   },
-  "missingFromEnglish": [
-    {
-      "key": "results.performanceDetails",
-      "usages": [
-        {
-          "file": "components/singleplayer/SinglePlayerResults.tsx",
-          "line": 771
-        },
-        {
-          "file": "components/singleplayer/SinglePlayerResults.tsx",
-          "line": 771
-        },
-        {
-          "file": "components/singleplayer/SinglePlayerResults.tsx",
-          "line": 771
-        }
-      ]
-    },
-    {
-      "key": "singlePlayer.needHint",
-      "usages": [
-        {
-          "file": "components/singleplayer/SinglePlayerGame.tsx",
-          "line": 1228
-        },
-        {
-          "file": "components/singleplayer/SinglePlayerGame.tsx",
-          "line": 1228
-        },
-        {
-          "file": "components/singleplayer/SinglePlayerGame.tsx",
-          "line": 1228
-        },
-        {
-          "file": "components/singleplayer/SinglePlayerGame.tsx",
-          "line": 1579
-        },
-        {
-          "file": "components/singleplayer/SinglePlayerGame.tsx",
-          "line": 1579
-        },
-        {
-          "file": "components/singleplayer/SinglePlayerGame.tsx",
-          "line": 1579
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
-    "he": [
-      "multiplayerFlow.selector.roomsRefreshed"
-    ],
-    "sv": [
-      "multiplayerFlow.selector.roomsRefreshed"
-    ],
-    "ja": [
-      "multiplayerFlow.selector.roomsRefreshed"
-    ],
-    "es": [
-      "multiplayerFlow.selector.roomsRefreshed"
-    ]
+    "he": [],
+    "sv": [],
+    "ja": [],
+    "es": []
   },
   "keysNotInEnglish": {
     "he": [],

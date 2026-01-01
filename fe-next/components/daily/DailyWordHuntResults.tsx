@@ -83,6 +83,7 @@ interface DailyWordHuntResultsProps {
   isNewCompletion: boolean;
   onBack: () => void;
   onRetry: () => void;
+  onGameLanguageChange?: (lang: Language) => void;
 }
 
 // Language options for the "Try Another Language" section
@@ -97,8 +98,11 @@ const LANGUAGE_OPTIONS: { code: Language; flag: string; name: string }[] = [
 /**
  * TryAnotherLanguage - Shows available languages the player can still try today
  */
-const TryAnotherLanguage: React.FC<{ currentLanguage: Language }> = ({ currentLanguage }) => {
-  const { t, setLanguage } = useLanguage();
+const TryAnotherLanguage: React.FC<{
+  currentLanguage: Language;
+  onGameLanguageChange?: (lang: Language) => void;
+}> = ({ currentLanguage, onGameLanguageChange }) => {
+  const { t } = useLanguage();
 
   // Get languages that haven't been played today
   const availableLanguages = LANGUAGE_OPTIONS.filter(
@@ -111,10 +115,10 @@ const TryAnotherLanguage: React.FC<{ currentLanguage: Language }> = ({ currentLa
   }
 
   const handleLanguageClick = (langCode: Language) => {
-    setLanguage(langCode);
-    // Force reload to start fresh with new language
-    // Using assign() method to avoid React Compiler issues with property assignment
-    window.location.assign(`/${langCode}/daily`);
+    // Use the callback to change game language without navigating
+    if (onGameLanguageChange) {
+      onGameLanguageChange(langCode);
+    }
   };
 
   return (
@@ -160,6 +164,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   isNewCompletion,
   onBack,
   onRetry,
+  onGameLanguageChange,
 }) => {
   const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
@@ -192,7 +197,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [countryCodeReady, setCountryCodeReady] = useState(false);
   const [inlineSignupDismissed, setInlineSignupDismissed] = useState(false);
   const hasSubmittedRef = useRef(false);
-  const { user, profile, isAuthenticated } = useAuth();
+  const { user, profile, isAuthenticated, loading: authLoading } = useAuth();
 
   // Check for streak milestone
   const streakMilestone = getStreakMilestone(result.streakDays);
@@ -527,7 +532,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   // Show signup modal for unauthenticated users who FAILED (winners get inline signup instead)
   useEffect(() => {
     // Only show modal for guests who failed - winners get inline signup on page
-    if (!isNewCompletion || isAuthenticated || result.solved) {
+    // Also skip if user has a session (profile may still be loading) or auth is still loading
+    if (!isNewCompletion || isAuthenticated || user || authLoading || result.solved) {
       return;
     }
 
@@ -543,7 +549,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     }, 3000); // 3 second delay for better UX
 
     return () => clearTimeout(timer);
-  }, [isNewCompletion, isAuthenticated, result, stats?.yourStats?.percentile]);
+  }, [isNewCompletion, isAuthenticated, user, authLoading, result, stats?.yourStats?.percentile]);
 
   // Handle signup modal dismiss
   const handleSignupModalClose = useCallback(() => {
@@ -870,106 +876,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               <div className="text-sm text-gray-500 dark:text-gray-400">
                 {t('wordHunt.results.tryAgainTomorrow')}
               </div>
-
-              {/* Reveal Target Word Option */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-                className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
-              >
-                {targetWordRevealed ? (
-                  // Show the revealed target word
-                  <div className="space-y-2">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {t('wordHunt.results.theTargetWordWas')}
-                    </div>
-                    <div className="text-3xl font-black text-neo-yellow tracking-wider">
-                      {language === 'he' ? applyHebrewFinalLetters(result.targetWord) : result.targetWord.toUpperCase()}
-                    </div>
-                  </div>
-                ) : (
-                  // Show the reveal button - premium unlock card design
-                  <div className="max-w-xs mx-auto">
-                    <motion.div
-                      whileHover={canAfford(COIN_COSTS.REVEAL_TARGET_WORD) ? { scale: 1.02, y: -2 } : {}}
-                      whileTap={canAfford(COIN_COSTS.REVEAL_TARGET_WORD) ? { scale: 0.98 } : {}}
-                      className={cn(
-                        "relative overflow-hidden rounded-neo-lg border-3 border-neo-black shadow-hard transition-all",
-                        canAfford(COIN_COSTS.REVEAL_TARGET_WORD)
-                          ? "bg-gradient-to-br from-neo-purple to-neo-pink cursor-pointer hover:shadow-hard-lg"
-                          : "bg-gradient-to-br from-slate-600 to-slate-700"
-                      )}
-                      onClick={canAfford(COIN_COSTS.REVEAL_TARGET_WORD) ? handleRevealTargetWord : undefined}
-                    >
-                      {/* Cost badge - top corner */}
-                      <div className="absolute top-2 end-2 flex items-center gap-1 px-2.5 py-1 bg-neo-yellow rounded-full border-2 border-neo-black shadow-hard-sm">
-                        <Coins className="w-4 h-4 text-neo-black" />
-                        <span className="font-black text-sm text-neo-black">{COIN_COSTS.REVEAL_TARGET_WORD}</span>
-                      </div>
-
-                      {/* Main content */}
-                      <div className="px-4 py-4 pt-3">
-                        <div className="flex items-center gap-3">
-                          <div className={cn(
-                            "flex-shrink-0 w-12 h-12 rounded-neo flex items-center justify-center border-2 border-neo-black",
-                            canAfford(COIN_COSTS.REVEAL_TARGET_WORD)
-                              ? "bg-white/20"
-                              : "bg-white/10"
-                          )}>
-                            <Eye className="w-6 h-6 text-white" />
-                          </div>
-                          <div className="flex-1 text-start">
-                            <div className="font-black text-white text-sm uppercase tracking-wide">
-                              {t('wordHunt.results.revealTargetWord')}
-                            </div>
-                            <div className="text-xs text-white/70 mt-0.5">
-                              {t('wordHunt.results.seeTheAnswer') || 'See what you were looking for'}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Progress section */}
-                        <div className="mt-3 pt-3 border-t border-white/20">
-                          <div className="flex items-center justify-between text-xs mb-1.5">
-                            <span className="text-white/80 font-medium">
-                              {t('wordHunt.results.yourCoins')}
-                            </span>
-                            <span className={cn(
-                              "font-black",
-                              canAfford(COIN_COSTS.REVEAL_TARGET_WORD)
-                                ? "text-neo-yellow"
-                                : "text-white"
-                            )}>
-                              {currentCoins} / {COIN_COSTS.REVEAL_TARGET_WORD}
-                            </span>
-                          </div>
-                          {/* Progress bar */}
-                          <div className="h-2.5 bg-black/30 rounded-full overflow-hidden border border-white/20">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${Math.min((currentCoins / COIN_COSTS.REVEAL_TARGET_WORD) * 100, 100)}%` }}
-                              transition={{ duration: 0.5, ease: "easeOut" }}
-                              className={cn(
-                                "h-full rounded-full",
-                                canAfford(COIN_COSTS.REVEAL_TARGET_WORD)
-                                  ? "bg-neo-yellow"
-                                  : "bg-gradient-to-r from-neo-yellow/70 to-neo-orange/70"
-                              )}
-                            />
-                          </div>
-                          {/* Helpful hint when can't afford */}
-                          {!canAfford(COIN_COSTS.REVEAL_TARGET_WORD) && (
-                            <div className="mt-2 text-[10px] text-white/60 text-center">
-                              {t('wordHunt.results.earnMoreHint') || 'Win challenges to earn more coins!'}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  </div>
-                )}
-              </motion.div>
             </div>
           )}
 
@@ -1169,6 +1075,108 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               </motion.p>
             )}
         </motion.div>
+
+        {/* Reveal Target Word Option - Only for failed players, after share section */}
+        {!result.solved && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
+          >
+            {targetWordRevealed ? (
+              // Show the revealed target word
+              <div className="space-y-2 text-center">
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  {t('wordHunt.results.theTargetWordWas')}
+                </div>
+                <div className="text-3xl font-black text-neo-yellow tracking-wider">
+                  {language === 'he' ? applyHebrewFinalLetters(result.targetWord) : result.targetWord.toUpperCase()}
+                </div>
+              </div>
+            ) : (
+              // Show the reveal button - premium unlock card design
+              <div className="max-w-xs mx-auto">
+                <motion.div
+                  whileHover={canAfford(COIN_COSTS.REVEAL_TARGET_WORD) ? { scale: 1.02, y: -2 } : {}}
+                  whileTap={canAfford(COIN_COSTS.REVEAL_TARGET_WORD) ? { scale: 0.98 } : {}}
+                  className={cn(
+                    "relative overflow-hidden rounded-neo-lg border-3 border-neo-black shadow-hard transition-all",
+                    canAfford(COIN_COSTS.REVEAL_TARGET_WORD)
+                      ? "bg-gradient-to-br from-neo-purple to-neo-pink cursor-pointer hover:shadow-hard-lg"
+                      : "bg-gradient-to-br from-slate-600 to-slate-700"
+                  )}
+                  onClick={canAfford(COIN_COSTS.REVEAL_TARGET_WORD) ? handleRevealTargetWord : undefined}
+                >
+                  {/* Cost badge - top corner */}
+                  <div className="absolute top-2 end-2 flex items-center gap-1 px-2.5 py-1 bg-neo-yellow rounded-full border-2 border-neo-black shadow-hard-sm">
+                    <Coins className="w-4 h-4 text-neo-black" />
+                    <span className="font-black text-sm text-neo-black">{COIN_COSTS.REVEAL_TARGET_WORD}</span>
+                  </div>
+
+                  {/* Main content */}
+                  <div className="px-4 py-4 pt-3">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "flex-shrink-0 w-12 h-12 rounded-neo flex items-center justify-center border-2 border-neo-black",
+                        canAfford(COIN_COSTS.REVEAL_TARGET_WORD)
+                          ? "bg-white/20"
+                          : "bg-white/10"
+                      )}>
+                        <Eye className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1 text-start">
+                        <div className="font-black text-white text-sm uppercase tracking-wide">
+                          {t('wordHunt.results.revealTargetWord')}
+                        </div>
+                        <div className="text-xs text-white/70 mt-0.5">
+                          {t('wordHunt.results.seeTheAnswer') || 'See what you were looking for'}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Progress section */}
+                    <div className="mt-3 pt-3 border-t border-white/20">
+                      <div className="flex items-center justify-between text-xs mb-1.5">
+                        <span className="text-white/80 font-medium">
+                          {t('wordHunt.results.yourCoins')}
+                        </span>
+                        <span className={cn(
+                          "font-black",
+                          canAfford(COIN_COSTS.REVEAL_TARGET_WORD)
+                            ? "text-neo-yellow"
+                            : "text-white"
+                        )}>
+                          {currentCoins} / {COIN_COSTS.REVEAL_TARGET_WORD}
+                        </span>
+                      </div>
+                      {/* Progress bar */}
+                      <div className="h-2.5 bg-black/30 rounded-full overflow-hidden border border-white/20">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${Math.min((currentCoins / COIN_COSTS.REVEAL_TARGET_WORD) * 100, 100)}%` }}
+                          transition={{ duration: 0.5, ease: "easeOut" }}
+                          className={cn(
+                            "h-full rounded-full",
+                            canAfford(COIN_COSTS.REVEAL_TARGET_WORD)
+                              ? "bg-neo-yellow"
+                              : "bg-gradient-to-r from-neo-yellow/70 to-neo-orange/70"
+                          )}
+                        />
+                      </div>
+                      {/* Helpful hint when can't afford */}
+                      {!canAfford(COIN_COSTS.REVEAL_TARGET_WORD) && (
+                        <div className="mt-2 text-[10px] text-white/60 text-center">
+                          {t('wordHunt.results.earnMoreHint') || 'Win challenges to earn more coins!'}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </motion.div>
+        )}
 
         {/* Inline Signup for Guest Winners */}
         {!isAuthenticated && result.solved && !inlineSignupDismissed && (
@@ -1594,7 +1602,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                   </motion.div>
 
                   {/* Try Another Language - inline version */}
-                  <TryAnotherLanguage currentLanguage={language} />
+                  <TryAnotherLanguage currentLanguage={language} onGameLanguageChange={onGameLanguageChange} />
                 </div>
               </motion.div>
             )}

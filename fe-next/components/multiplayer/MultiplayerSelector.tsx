@@ -74,7 +74,7 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative flex items-center justify-center py-2 sm:py-3 lg:py-6 xl:py-8 flex-shrink-0 px-4 lg:px-8"
+          className="relative flex items-center justify-center py-2 sm:py-2 lg:py-4 flex-shrink-0 px-2 sm:px-3 lg:px-4"
         >
           <Link
             href="/"
@@ -89,13 +89,13 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
         </motion.div>
 
         {/* Main Content - Decision Cards */}
-        <div className="flex-1 flex flex-col justify-start items-center px-4 sm:px-6 lg:px-12 xl:px-16 pt-2 sm:pt-4 lg:pt-8 pb-4 lg:pb-6 min-h-0 gap-3 lg:gap-6 xl:gap-8">
+        <div className="flex-1 flex flex-col justify-start items-center px-2 sm:px-3 lg:px-4 pt-2 sm:pt-3 lg:pt-4 pb-3 lg:pb-4 min-h-0 gap-2 lg:gap-4">
           {/* Active Rooms Preview - Positioned at top for visibility */}
           <motion.div
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className="w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto flex-shrink-0"
+            className="w-full mx-auto flex-shrink-0"
           >
             <div className="flex items-center justify-between mb-2 lg:mb-4">
               <h3 className="text-sm sm:text-base lg:text-lg xl:text-xl font-bold uppercase text-neo-cream/70 flex items-center gap-2 lg:gap-3">
@@ -142,7 +142,7 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
           </motion.div>
 
           {/* Cards Container */}
-          <div className="flex flex-col lg:flex-row gap-2 sm:gap-3 lg:gap-6 xl:gap-8 w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto flex-shrink-0">
+          <div className="flex flex-col lg:flex-row gap-2 sm:gap-2 lg:gap-4 w-full mx-auto flex-shrink-0">
             {/* Create Room Card */}
             <motion.div
               initial={{ x: -30, opacity: 0 }}
@@ -158,7 +158,7 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
                 onKeyDown={(e) => e.key === 'Enter' && onSelectCreate()}
                 aria-label={t('multiplayerFlow.selector.createCard.title') || 'Create Room'}
               >
-                <CardContent className="flex flex-col items-center justify-center text-center p-4 sm:p-6 lg:p-10 xl:p-12 h-full min-h-[140px] sm:min-h-[180px] lg:min-h-[280px] xl:min-h-[320px]">
+                <CardContent className="flex flex-col items-center justify-center text-center p-3 sm:p-4 lg:p-6 h-full min-h-[140px] sm:min-h-[160px] lg:min-h-[220px]">
                   <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-24 lg:h-24 xl:w-28 xl:h-28 rounded-full bg-neo-lime text-neo-black border-2 sm:border-3 lg:border-4 border-neo-black flex items-center justify-center mb-2 sm:mb-3 lg:mb-6 shadow-hard lg:shadow-hard-lg group-hover:scale-110 transition-transform">
                     <Crown className="w-6 h-6 sm:w-8 sm:h-8 lg:w-12 lg:h-12 xl:w-14 xl:h-14 text-neo-black" />
                   </div>
@@ -195,7 +195,7 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
                 onKeyDown={(e) => e.key === 'Enter' && onSelectJoin()}
                 aria-label={t('multiplayerFlow.selector.joinCard.title') || 'Join Room'}
               >
-                <CardContent className="flex flex-col items-center justify-center text-center p-4 sm:p-6 lg:p-10 xl:p-12 h-full min-h-[140px] sm:min-h-[180px] lg:min-h-[280px] xl:min-h-[320px]">
+                <CardContent className="flex flex-col items-center justify-center text-center p-3 sm:p-4 lg:p-6 h-full min-h-[140px] sm:min-h-[160px] lg:min-h-[220px]">
                   <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-24 lg:h-24 xl:w-28 xl:h-28 rounded-full bg-neo-cyan text-neo-black border-2 sm:border-3 lg:border-4 border-neo-black flex items-center justify-center mb-2 sm:mb-3 lg:mb-6 shadow-hard lg:shadow-hard-lg group-hover:scale-110 transition-transform">
                     <LogIn className="w-6 h-6 sm:w-8 sm:h-8 lg:w-12 lg:h-12 xl:w-14 xl:h-14 text-neo-black" />
                   </div>

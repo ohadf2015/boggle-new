@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
+import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import PresetSelector from './PresetSelector';
 import SinglePlayerLobby from './SinglePlayerLobby';
 import SinglePlayerGame from './SinglePlayerGame';
@@ -10,6 +11,7 @@ import SinglePlayerResults from './SinglePlayerResults';
 import { getHighScore, recordGameResult, getAllTimeBest } from './highScoreManager';
 import { useGameMusic, type GamePhase } from '@/hooks/useGameMusic';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { incrementTrainingGames } from '@/utils/playerProgressStorage';
 import { getMinWordLength, type PresetConfig } from './presetConfig';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
@@ -113,6 +115,15 @@ const SinglePlayerView: React.FC = () => {
   useGameMusic({
     phase: musicPhase,
     enabled: phase !== 'playing', // Disable when playing - SinglePlayerGame handles it
+  });
+
+  // Pull-to-refresh - disabled during gameplay
+  const { pullToRefreshHandlers, pullState } = usePullToRefresh({
+    onRefresh: async () => {
+      window.location.reload();
+    },
+    threshold: 60,
+    enabled: phase !== 'playing', // Disable during gameplay
   });
 
   // Get current high score for challenge mode
@@ -261,10 +272,22 @@ const SinglePlayerView: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
+    <div
+      className="flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative"
+      {...pullToRefreshHandlers}
+    >
+      {/* Pull-to-refresh indicator - only show when not playing */}
+      {phase !== 'playing' && (
+        <PullToRefreshIndicator
+          pullDistance={pullState.pullDistance}
+          isRefreshing={pullState.isRefreshing}
+          threshold={60}
+        />
+      )}
+
       <AutoHideHeader />
 
-      <main className="max-w-6xl mx-auto px-2 xs:px-4 sm:px-6 py-8 landscape-content overflow-x-hidden">
+      <main className="w-full px-2 sm:px-3 lg:px-4 py-4 sm:py-4 lg:py-6 landscape-content overflow-x-hidden">
         {phase === 'preset-selection' && (
           <PresetSelector
             onSelectPreset={handleSelectPreset}

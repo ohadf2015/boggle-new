@@ -82,6 +82,7 @@ const es = {
     "admin": "Admin",
     "understood": "¡Vamos!",
     "refresh": "Actualizar",
+    "refreshed": "¡Actualizado!",
     "reconnecting": "Reconectando...",
     "reconnected": "¡Volvimos!",
     "connectionLost": "Conexión perdida",
@@ -531,7 +532,8 @@ const es = {
       },
       "activeRoomsPreview": "Salas Activas",
       "playersOnline": "en línea",
-      "noRooms": "Sin salas activas - ¡crea una!"
+      "noRooms": "Sin salas activas - ¡crea una!",
+      "roomsRefreshed": "¡Salas actualizadas!"
     },
     "editProfile": "Editar",
     "profileSetup": {
@@ -725,7 +727,9 @@ const es = {
     "players": "jugadores",
     "letterMinimum": "letras mínimo",
     "chat": "Chat",
-    "settings": "Ajustes"
+    "settings": "Ajustes",
+    "regenerateBoard": "Regenerar tablero",
+    "boardRegenerated": "¡Tablero regenerado!"
   },
   "tvBroadcast": {
     "joinAt": "Únete en",
@@ -990,6 +994,7 @@ const es = {
     "viewXpBreakdown": "Desglose XP",
     "summary": "Resumen",
     "details": "Detalles",
+    "performanceDetails": "Detalles de Rendimiento",
     "play": "Jugar",
     "badges": "Insignias",
     "xp": "XP",
@@ -2361,6 +2366,7 @@ const es = {
     "dictionary5": "¡Construyamos el diccionario juntos!",
     "notAWord": "No es una palabra",
     "realWord": "¡Palabra real!",
+    "dontKnow": "No lo sé",
     "nextWord": "Siguiente palabra...",
     "almostApproved": "¡Casi lista!",
     "votesNeeded": "{count} votos más para aprobar",
@@ -2450,7 +2456,8 @@ const es = {
     "noWordsFound": "No se encontraron palabras",
     "tryAgain": "¡Inténtalo de Nuevo!",
     "keepPracticing": "¡Sigue Practicando!",
-    "fewWordsFound": "Encontraste {validWordCount} {validWordCount === 1 ? 'palabra' : 'palabras'}",
+    "fewWordsFound": "Encontraste {count} palabras",
+    "fewWordsFoundSingular": "Encontraste 1 palabra",
     "achievementsNotSaved": "Los logros en modo un jugador no se guardan en tu perfil.",
     "botDetails": "Detalles del bot",
     "difficulty": "Dificultad",
@@ -2461,6 +2468,7 @@ const es = {
     "quitConfirmMessage": "Perderás tu progreso actual. ¿Seguro que quieres salir?",
     "imSure": "Estoy seguro",
     "gamePaused": "Juego pausado",
+    "needHint": "¿Necesitas una pista?",
     "botWords": "Palabras encontradas",
     "aiOpponents": "Oponentes IA",
     "autoFillDesc": "Llena la sala con {count} oponentes IA",
@@ -2677,6 +2685,7 @@ const es = {
     "retryLinkInvalid": "Este enlace no es válido",
     "retryLinkError": "No se pudo verificar el enlace",
     "howToPlay": "Cómo Jugar",
+    "firstTime": "(¿Nuevo?)",
     "canYouBeatMyScore": "¿Puedes superar mi puntuación?",
     "targetWordLength": "Encuentra la palabra oculta:",
     "onlyMatchingLength": "¡Solo las palabras de {length} letras usan tus intentos!",

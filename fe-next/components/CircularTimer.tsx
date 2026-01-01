@@ -9,12 +9,13 @@ import { useReducedMotion } from '../utils/accessibility';
 interface CircularTimerProps {
   remainingTime: number;
   totalTime?: number;
-  /** Size variant: 'sm' for compact landscape mode, 'md' (default) for normal, 'lg' for desktop */
-  size?: 'sm' | 'md' | 'lg';
+  /** Size variant: 'xs' for ultra-compact mobile, 'sm' for compact landscape mode, 'md' (default) for normal, 'lg' for desktop */
+  size?: 'xs' | 'sm' | 'md' | 'lg';
 }
 
 // Size configurations
 const SIZES = {
+  xs: { svgSize: 80, radius: 30, strokeWidth: 6, textSize: 'text-xl', frameClasses: 'p-1.5 border-2', badgeClasses: 'hidden' },
   sm: { svgSize: 100, radius: 38, strokeWidth: 8, textSize: 'text-2xl', frameClasses: 'p-2 border-3', badgeClasses: 'hidden' },
   md: { svgSize: 120, radius: 45, strokeWidth: 10, textSize: 'text-3xl', frameClasses: 'p-3 border-4', badgeClasses: '' },
   lg: { svgSize: 140, radius: 52, strokeWidth: 12, textSize: 'text-4xl', frameClasses: 'p-4 border-4', badgeClasses: '' },
@@ -64,12 +65,12 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
           bg-neo-cream text-neo-black
           border-neo-black
           rounded-neo-lg
-          ${size === 'sm' ? 'shadow-hard-sm' : size === 'lg' ? 'shadow-hard-xl' : 'shadow-hard-lg'}
+          ${size === 'xs' || size === 'sm' ? 'shadow-hard-sm' : size === 'lg' ? 'shadow-hard-xl' : 'shadow-hard-lg'}
           ${config.frameClasses}
         `}
-        style={{ transform: size === 'sm' ? 'rotate(-1deg)' : 'rotate(-2deg)' }}
+        style={{ transform: size === 'xs' || size === 'sm' ? 'rotate(-1deg)' : 'rotate(-2deg)' }}
       >
-        <div className="relative" style={{ transform: size === 'sm' ? 'rotate(1deg)' : 'rotate(2deg)' }}>
+        <div className="relative" style={{ transform: size === 'xs' || size === 'sm' ? 'rotate(1deg)' : 'rotate(2deg)' }}>
           <svg width={config.svgSize} height={config.svgSize} className="transform -rotate-90">
             {/* Neo-Brutalist: Solid colors instead of gradients */}
 
@@ -79,7 +80,7 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
               cy={svgCenter}
               r={radius}
               stroke="var(--neo-black)"
-              strokeWidth={size === 'sm' ? 2 : 4}
+              strokeWidth={size === 'xs' ? 1.5 : size === 'sm' ? 2 : 4}
               fill="none"
               opacity="0.2"
             />
@@ -88,9 +89,9 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
             <circle
               cx={svgCenter}
               cy={svgCenter}
-              r={radius - (size === 'sm' ? 3 : 6)}
+              r={radius - (size === 'xs' ? 2 : size === 'sm' ? 3 : 6)}
               stroke="var(--neo-black)"
-              strokeWidth={size === 'sm' ? 6 : 12}
+              strokeWidth={size === 'xs' ? 4 : size === 'sm' ? 6 : 12}
               fill="none"
               opacity="0.1"
             />
@@ -115,9 +116,9 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
             <circle
               cx={svgCenter}
               cy={svgCenter}
-              r={radius + (size === 'sm' ? 2 : 4)}
+              r={radius + (size === 'xs' ? 1.5 : size === 'sm' ? 2 : 4)}
               stroke="var(--neo-black)"
-              strokeWidth={size === 'sm' ? 2 : 3}
+              strokeWidth={size === 'xs' ? 1.5 : size === 'sm' ? 2 : 3}
               fill="none"
             />
           </svg>
@@ -130,8 +131,8 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
               className={`${config.textSize} font-black text-neo-black`}
               style={{
                 textShadow: isLowTime
-                  ? `${size === 'sm' ? '1px 1px' : '2px 2px'} 0px var(--neo-red)`
-                  : `${size === 'sm' ? '1px 1px' : '2px 2px'} 0px var(--neo-cyan)`,
+                  ? `${size === 'xs' || size === 'sm' ? '1px 1px' : '2px 2px'} 0px var(--neo-red)`
+                  : `${size === 'xs' || size === 'sm' ? '1px 1px' : '2px 2px'} 0px var(--neo-cyan)`,
               }}
             >
               {formatTime(remainingTime)}

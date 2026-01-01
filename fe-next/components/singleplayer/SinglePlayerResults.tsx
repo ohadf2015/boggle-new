@@ -62,7 +62,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   onBackToLobby,
 }) => {
   const { t, language } = useLanguage();
-  const { user, isAuthenticated, profile, updateProfile } = useAuth();
+  const { user, isAuthenticated, profile, updateProfile, loading: authLoading } = useAuth();
   const isLandscape = useMobileLandscape();
   const [expandedBot, setExpandedBot] = useState<string | null>(null);
   const [showSignupModal, setShowSignupModal] = useState(false);
@@ -310,8 +310,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   // Show signup prompt for guests who have played 2+ games
   useEffect(() => {
-    // Skip if authenticated or modal already shown this session
-    if (isAuthenticated) return;
+    // Skip if authenticated, has a user session (profile may still be loading), or auth is still loading
+    if (isAuthenticated || user || authLoading) return;
     if (typeof window === 'undefined') return;
 
     // Check if already shown this session
@@ -329,7 +329,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     }, 3500);
 
     return () => clearTimeout(timer);
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user, authLoading]);
 
 
   // Show word validation modal after game results load
@@ -615,7 +615,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           }
           customAnnouncement={
             results.playerScore === 0 || validWordCount === 0 ? (t('singlePlayer.noWordsFound') || "Didn't find any words this time") :
-            validWordCount <= 2 ? (t('singlePlayer.fewWordsFound') || `Found ${validWordCount} ${validWordCount === 1 ? 'word' : 'words'}`) :
+            validWordCount <= 2 ? (validWordCount === 1
+              ? (t('singlePlayer.fewWordsFoundSingular') || 'Found 1 word')
+              : (t('singlePlayer.fewWordsFound') || 'Found {count} words').replace('{count}', String(validWordCount))) :
             mode === 'solo-bots' ? `#${playerRank} ${t('results.of') || 'of'} ${allParticipants.length}` :
             mode === 'challenge' && results.previousHighScore && results.previousHighScore > results.playerScore
               ? (t('challenge.shortOf') || '{diff} points short of your record').replace('{diff}', String(results.previousHighScore - results.playerScore))
@@ -986,7 +988,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           customAnnouncement={
             // Low/zero score gets encouraging but honest message
             results.playerScore === 0 || validWordCount === 0 ? (t('singlePlayer.noWordsFound') || "Didn't find any words this time") :
-            validWordCount <= 2 ? (t('singlePlayer.fewWordsFound') || `Found ${validWordCount} ${validWordCount === 1 ? 'word' : 'words'}`) :
+            validWordCount <= 2 ? (validWordCount === 1
+              ? (t('singlePlayer.fewWordsFoundSingular') || 'Found 1 word')
+              : (t('singlePlayer.fewWordsFound') || 'Found {count} words').replace('{count}', String(validWordCount))) :
             mode === 'solo-bots' ? `#${playerRank} ${t('results.of') || 'of'} ${allParticipants.length}` :
             mode === 'challenge' && results.previousHighScore && results.previousHighScore > results.playerScore
               ? (t('challenge.shortOf') || '{diff} points short of your record').replace('{diff}', String(results.previousHighScore - results.playerScore))

@@ -1109,7 +1109,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             <CircularTimer
               remainingTime={timer.remainingTime}
               totalTime={settings.timerSeconds}
-              size="sm"
+              size="md"
             />
           )}
           <div className="bg-neo-yellow border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center">
@@ -1215,18 +1215,31 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
               className="absolute bottom-14 left-1/2 -translate-x-1/2 z-40"
             >
-              <Button
-                variant="outline"
-                size="sm"
+              <AdaptiveMotion.button
                 onClick={async () => {
                   setShowHintPrompt(false);
                   await handleReveal();
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-neo-purple border-3 border-neo-black text-white hover:bg-neo-pink hover:shadow-hard-sm rounded-neo font-bold text-sm transition-all shadow-hard-sm animate-pulse-subtle"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                animate={{
+                  scale: [1, 1.02, 1],
+                  boxShadow: [
+                    '6px 6px 0px rgb(var(--neo-black))',
+                    '8px 8px 0px rgb(var(--neo-black))',
+                    '6px 6px 0px rgb(var(--neo-black))'
+                  ]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'easeInOut'
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-neo-purple border-3 border-neo-black text-white hover:bg-neo-pink rounded-neo font-bold text-sm shadow-hard-sm"
               >
                 <Eye className="w-4 h-4" />
-                <span>{t('singlePlayer.needHint') || 'Need a hint?'}</span>
-              </Button>
+                <span>{t('singlePlayer.needHint')}</span>
+              </AdaptiveMotion.button>
             </AdaptiveMotion.div>
           )}
         </AdaptiveAnimatePresence>
@@ -1307,7 +1320,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   }
 
   return (
-    <div className="relative space-y-2">
+    <div className="relative space-y-1 md:space-y-2">
       {/* Earthquake Warning Overlay */}
       <EarthquakeWarning
         isVisible={earthquakeState === 'warning'}
@@ -1355,7 +1368,12 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
       {/* Header with controls */}
       <div className="flex items-center justify-between px-4">
-        <Button variant="ghost" size="sm" onClick={handleQuitRequest}>
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={handleQuitRequest}
+          className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-none font-bold"
+        >
           <ArrowLeft className="me-2 rtl:rotate-180" />
           {t('common.quit') || 'Quit'}
         </Button>
@@ -1375,9 +1393,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       </div>
 
       {/* Stats row - Combo | Timer | Score - matches multiplayer layout */}
-      <div ref={gameStatsRef} className="flex items-center justify-center gap-3 md:gap-4 mb-2" role="status" aria-label="Game status">
+      <div ref={gameStatsRef} className="flex items-center justify-center gap-2 md:gap-4 mb-1 md:mb-2" role="status" aria-label="Game status">
         {/* Combo (left - shows when level >= 2, placeholder otherwise for layout balance) */}
-        <div className="min-w-[70px] md:min-w-[90px] flex justify-end">
+        <div className="min-w-[60px] md:min-w-[90px] flex justify-end">
           <ComboDisplay comboLevel={combo.comboLevel} compact />
         </div>
 
@@ -1388,11 +1406,27 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             animate={{ scale: 1, opacity: 1 }}
             className="relative z-20"
           >
-            <CircularTimer
-              remainingTime={timer.remainingTime}
-              totalTime={settings.timerSeconds}
-              size="md"
-            />
+            <div className="hidden lg:block">
+              <CircularTimer
+                remainingTime={timer.remainingTime}
+                totalTime={settings.timerSeconds}
+                size="lg"
+              />
+            </div>
+            <div className="hidden md:block lg:hidden">
+              <CircularTimer
+                remainingTime={timer.remainingTime}
+                totalTime={settings.timerSeconds}
+                size="md"
+              />
+            </div>
+            <div className="md:hidden">
+              <CircularTimer
+                remainingTime={timer.remainingTime}
+                totalTime={settings.timerSeconds}
+                size="sm"
+              />
+            </div>
           </AdaptiveMotion.div>
         )}
 
@@ -1400,7 +1434,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         <AdaptiveMotion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="relative border-3 border-neo-black rounded-neo shadow-hard-lg px-3 md:px-4 py-1.5 min-w-[70px] md:min-w-[90px]"
+          className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-2 md:px-4 py-1 md:py-1.5 min-w-[60px] md:min-w-[90px]"
           style={{
             background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
           }}
@@ -1410,12 +1444,12 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               key={score}
               initial={{ scale: 1.3 }}
               animate={{ scale: 1 }}
-              className="text-xl md:text-2xl font-black text-neo-black leading-tight"
+              className="text-lg md:text-2xl font-black text-neo-black leading-tight"
               style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
             >
               {score}
             </AdaptiveMotion.div>
-            <div className="text-[10px] md:text-xs font-bold uppercase tracking-wider text-neo-black/80">
+            <div className="text-[9px] md:text-xs font-bold uppercase tracking-wider text-neo-black/80">
               {t('common.score') || 'Score'}
             </div>
           </div>
@@ -1437,11 +1471,11 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         <AdaptiveMotion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mx-4 mb-1"
+          className="mx-2 md:mx-4 mb-0.5 md:mb-1"
         >
           {targetHighScore !== null ? (
             <div className={cn(
-              'relative rounded-neo border-3 px-4 py-2 shadow-hard-sm',
+              'relative rounded-neo border-2 md:border-3 px-2 md:px-4 py-1 md:py-2 shadow-hard-sm',
               score > targetHighScore
                 ? 'bg-gradient-to-r from-neo-lime to-lime-300 border-neo-lime'
                 : score === targetHighScore
@@ -1449,42 +1483,42 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                   : 'bg-neo-cream dark:bg-slate-700 border-neo-black dark:border-slate-500'
             )}>
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 md:gap-2">
                   {score > targetHighScore ? (
                     <>
-                      <TrendingUp className="w-5 h-5 text-neo-black" />
-                      <span className="font-black text-sm text-neo-black uppercase">
+                      <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-neo-black" />
+                      <span className="font-black text-xs md:text-sm text-neo-black uppercase">
                         {t('challenge.newRecord') || 'New Record!'}
                       </span>
                     </>
                   ) : score === targetHighScore ? (
                     <>
-                      <Target className="w-5 h-5 text-neo-black" />
-                      <span className="font-black text-sm text-neo-black uppercase">
+                      <Target className="w-4 h-4 md:w-5 md:h-5 text-neo-black" />
+                      <span className="font-black text-xs md:text-sm text-neo-black uppercase">
                         {t('challenge.tied') || 'Tied!'}
                       </span>
                     </>
                   ) : (
                     <>
-                      <Crown className="w-4 h-4 text-neo-yellow" />
-                      <span className="font-bold text-sm text-neo-black/70 dark:text-neo-white/70">
+                      <Crown className="w-3.5 h-3.5 md:w-4 md:h-4 text-neo-yellow" />
+                      <span className="font-bold text-xs md:text-sm text-neo-black/70 dark:text-neo-white/70">
                         {t('challenge.recordToBeat') || 'Record'}: <span className="font-black text-neo-black dark:text-neo-white">{targetHighScore}</span>
                       </span>
                     </>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 md:gap-2">
                   {score > targetHighScore ? (
                     <AdaptiveMotion.span
                       key={score}
                       initial={{ scale: 1.3 }}
                       animate={{ scale: 1 }}
-                      className="font-black text-neo-black"
+                      className="font-black text-xs md:text-sm text-neo-black"
                     >
                       +{score - targetHighScore}
                     </AdaptiveMotion.span>
                   ) : score < targetHighScore ? (
-                    <span className="font-bold text-neo-black/75 dark:text-neo-white/75">
+                    <span className="font-bold text-xs md:text-sm text-neo-black/75 dark:text-neo-white/75">
                       {targetHighScore - score} {t('challenge.toGo')}
                     </span>
                   ) : null}
@@ -1492,7 +1526,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               </div>
               {/* Progress bar */}
               {score <= targetHighScore && (
-                <div className="mt-2 h-2 bg-neo-black/10 text-white dark:bg-white/10 rounded-full overflow-hidden">
+                <div className="mt-1 md:mt-2 h-1.5 md:h-2 bg-neo-black/10 text-white dark:bg-white/10 rounded-full overflow-hidden">
                   <AdaptiveMotion.div
                     className="h-full bg-gradient-to-r from-neo-cyan to-neo-lime rounded-full"
                     initial={{ width: 0 }}
@@ -1503,9 +1537,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               )}
             </div>
           ) : (
-            <div className="flex items-center justify-center gap-2 px-4 py-2 bg-neo-cyan/20 text-neo-black dark:bg-neo-cyan/10 dark:text-white rounded-neo border-2 border-dashed border-neo-cyan">
-              <Zap className="w-4 h-4 text-neo-cyan" />
-              <span className="font-bold text-sm text-neo-black/70 dark:text-neo-white/70">
+            <div className="flex items-center justify-center gap-1 md:gap-2 px-2 md:px-4 py-1 md:py-2 bg-neo-cyan/20 text-neo-black dark:bg-neo-cyan/10 dark:text-white rounded-neo border-2 border-dashed border-neo-cyan">
+              <Zap className="w-3.5 h-3.5 md:w-4 md:h-4 text-neo-cyan" />
+              <span className="font-bold text-xs md:text-sm text-neo-black/70 dark:text-neo-white/70">
                 {t('challenge.settingFirst') || 'Setting your first record!'}
               </span>
             </div>
@@ -1566,18 +1600,31 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             className="fixed bottom-0 left-1/2 -translate-x-1/2 z-40 mb-[max(env(safe-area-inset-bottom),16px)]"
           >
-            <Button
-              variant="outline"
-              size="sm"
+            <AdaptiveMotion.button
               onClick={async () => {
                 setShowHintPrompt(false);
                 await handleReveal();
               }}
-              className="flex items-center gap-2 px-4 py-2 bg-neo-purple border-3 border-neo-black text-white hover:bg-neo-pink hover:shadow-hard-sm rounded-neo font-bold text-sm transition-all shadow-hard-sm animate-pulse-subtle"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              animate={{
+                scale: [1, 1.02, 1],
+                boxShadow: [
+                  '6px 6px 0px rgb(var(--neo-black))',
+                  '8px 8px 0px rgb(var(--neo-black))',
+                  '6px 6px 0px rgb(var(--neo-black))'
+                ]
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: 'easeInOut'
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-neo-purple border-3 border-neo-black text-white hover:bg-neo-pink rounded-neo font-bold text-sm shadow-hard-sm"
             >
               <Eye className="w-4 h-4" />
-              <span>{t('singlePlayer.needHint') || 'Need a hint?'}</span>
-            </Button>
+              <span>{t('singlePlayer.needHint')}</span>
+            </AdaptiveMotion.button>
           </AdaptiveMotion.div>
         )}
       </AdaptiveAnimatePresence>
