@@ -580,6 +580,34 @@ const sv = {
       "noRooms": "Inga rum. Få en kod!",
       "joinButton": "Gå med",
       "joining": "Går med..."
+    },
+    "createSetup": {
+      "title": "Skapa Rum",
+      "nameLabel": "Ditt namn",
+      "namePlaceholder": "Ange ditt namn",
+      "avatarLabel": "Välj avatar",
+      "avatarRequired": "Välj en avatar",
+      "roomNameLabel": "Rumsnamn",
+      "roomNamePlaceholder": "Mitt rum",
+      "roomNameHint": "Visas för andra spelare",
+      "languageHint": "Spelare hittar ord på detta språk",
+      "createButton": "Skapa Rum",
+      "creating": "Skapar..."
+    },
+    "joinSetup": {
+      "title": "Gå Med i Rum",
+      "nameLabel": "Ditt namn",
+      "namePlaceholder": "Ange ditt namn",
+      "avatarLabel": "Välj avatar",
+      "avatarRequired": "Välj en avatar",
+      "codeLabel": "Rumskod",
+      "codePlaceholder": "ABC123",
+      "codeHint": "Fråga din vän om rumskoden",
+      "roomsLabel": "Eller välj ett rum",
+      "refreshButton": "Uppdatera",
+      "noRooms": "Inga aktiva rum",
+      "joinButton": "Gå Med",
+      "joining": "Går med..."
     }
   },
   "hostView": {
@@ -698,7 +726,9 @@ const sv = {
     "hostSpectates": "Åskådar",
     "letters": "bokstäver",
     "players": "spelare",
-    "letterMinimum": "bokstäver minimum"
+    "letterMinimum": "bokstäver minimum",
+    "chat": "Chatt",
+    "settings": "Inställningar"
   },
   "tvBroadcast": {
     "joinAt": "Gå med på",
@@ -952,6 +982,8 @@ const sv = {
     "newMessages": "Nya chattmeddelanden"
   },
   "results": {
+    "results": "Resultat",
+    "share": "Dela",
     "yourProgress": "Din Utveckling",
     "topPlayers": "Toppspelare",
     "otherPlayers": "Andra spelare",
@@ -2678,7 +2710,8 @@ const sv = {
       "bragCrushed": "Brädet hade ingen chans",
       "bragSolid": "Stabil ordjakt idag",
       "cta": "Tror du att du kan slå det här? 🎮"
-    }
+    },
+    "leaderboard": "Rankning"
   },
   "wordHunt": {
     "title": "Ordjakt",
@@ -2817,7 +2850,17 @@ const sv = {
       "retryChallenge": "Försök igen",
       "needMoreCoins": "behöver {amount} till",
       "retryExplanation": "Full återställning - börja om med nya försök",
-      "find": "FYND"
+      "find": "FYND",
+      "share": "Dela",
+      "retry": "Försök igen",
+      "survivalBonus": "Överlevnadsbonus",
+      "survivalTier": {
+        "legendary": "Legendarisk Överlevare!",
+        "excellent": "Utmärkt Uthållighet!",
+        "good": "Bra Ihärdighet!",
+        "nice": "Bra Insats!",
+        "start": "Varje Sekund Räknas!"
+      }
     },
     "shareCTA": {
       "canYouSolve": "Kan du lösa det?",

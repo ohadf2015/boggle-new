@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Trophy, Target, X, ArrowLeft, Copy, Check, Send, Coins, RotateCcw, ImageDown, ChevronDown, Settings, Eye, BarChart3, Medal } from 'lucide-react';
+import { Share2, Trophy, Target, X, ArrowLeft, Copy, Check, Send, Coins, RotateCcw, ImageDown, ChevronDown, Settings, Eye, BarChart3, Medal, Timer, Sparkles } from 'lucide-react';
 
 // X/Twitter icon (no lucide equivalent)
 const XTwitterIcon = ({ className }: { className?: string }) => (
@@ -199,6 +199,22 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
   // Find rarest word discovered
   const rarestWord = result.wordsDiscovered ? findRarestWord(result.wordsDiscovered, language) : null;
+
+  // Calculate survival bonus time (extra seconds survived beyond base 100 seconds)
+  // Each life point gained = 1 extra second of survival time
+  const survivalBonusTime = useMemo(() => {
+    if (!result.wordsDiscovered || result.wordsDiscovered.length === 0) return 0;
+    return result.wordsDiscovered.reduce((total, word) => total + (word.lifeGained || 0), 0);
+  }, [result.wordsDiscovered]);
+
+  // Get encouraging message based on survival bonus performance
+  const getSurvivalBonusMessage = (bonusSeconds: number): { emoji: string; tier: string } => {
+    if (bonusSeconds >= 120) return { emoji: '🏆', tier: 'legendary' };
+    if (bonusSeconds >= 60) return { emoji: '⭐', tier: 'excellent' };
+    if (bonusSeconds >= 30) return { emoji: '💪', tier: 'good' };
+    if (bonusSeconds >= 10) return { emoji: '👍', tier: 'nice' };
+    return { emoji: '🌱', tier: 'start' };
+  };
 
   // Get guest fingerprint and player info on mount
   useEffect(() => {
@@ -797,11 +813,45 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                     )}
                   </div>
                 )}
+
+                {/* Survival Bonus - for winners */}
+                {survivalBonusTime > 0 && (
+                  <div className="flex items-center gap-1 px-2 py-1 bg-cyan-100 dark:bg-cyan-900/30 rounded-neo border-2 border-neo-black">
+                    <Timer className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
+                    <span className="font-black text-sm text-cyan-700 dark:text-cyan-300">+{survivalBonusTime}s</span>
+                  </div>
+                )}
               </div>
             </>
           ) : (
             /* Failed: Show encouraging message and countdown */
             <div className="mt-4 space-y-4">
+              {/* Survival Bonus Achievement - show first for encouragement! */}
+              {survivalBonusTime > 0 && (
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', delay: 0.1 }}
+                  className="inline-block px-4 py-3 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-neo border-3 border-neo-black shadow-hard"
+                >
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="flex items-center gap-2">
+                      <Timer className="w-5 h-5 text-white" />
+                      <span className="text-2xl font-black text-white">
+                        +{survivalBonusTime}s
+                      </span>
+                      <Sparkles className="w-5 h-5 text-neo-yellow" />
+                    </div>
+                    <span className="text-xs font-bold text-white/90 uppercase">
+                      {t('wordHunt.results.survivalBonus')}
+                    </span>
+                    <span className="text-[10px] text-white/70">
+                      {getSurvivalBonusMessage(survivalBonusTime).emoji} {t(`wordHunt.results.survivalTier.${getSurvivalBonusMessage(survivalBonusTime).tier}`)}
+                    </span>
+                  </div>
+                </motion.div>
+              )}
+
               <div className="text-lg text-gray-600 dark:text-gray-300">
                 {t('wordHunt.results.betterLuckNextTime')}
               </div>

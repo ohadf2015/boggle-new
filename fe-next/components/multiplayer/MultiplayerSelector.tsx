@@ -40,7 +40,7 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
     <>
       <LandscapeIndicator />
 
-      <div dir={dir} className="min-h-screen h-screen bg-gradient-to-b from-neo-navy via-neo-navy-light to-neo-navy flex flex-col overflow-hidden">
+      <div dir={dir} className="screen-fit bg-gradient-to-b from-neo-navy via-neo-navy-light to-neo-navy">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

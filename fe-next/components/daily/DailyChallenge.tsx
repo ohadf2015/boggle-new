@@ -374,7 +374,7 @@ const DailyChallenge: React.FC = () => {
 
   // Render based on phase
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
+    <div className="flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
       {showHeader && <AutoHideHeader />}
 
       <AnimatePresence mode="wait">

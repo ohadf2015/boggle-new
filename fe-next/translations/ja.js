@@ -726,7 +726,9 @@ const ja = {
     "hostSpectates": "観戦中",
     "letters": "文字",
     "players": "プレイヤー",
-    "letterMinimum": "文字以上"
+    "letterMinimum": "文字以上",
+    "chat": "チャット",
+    "settings": "設定"
   },
   "tvBroadcast": {
     "joinAt": "参加URL",
@@ -980,6 +982,8 @@ const ja = {
     "newMessages": "新しいチャットメッセージ"
   },
   "results": {
+    "results": "結果",
+    "share": "シェア",
     "yourProgress": "あなたの進捗",
     "topPlayers": "トッププレイヤー",
     "yourPerformance": "あなたのゲーム",
@@ -2705,7 +2709,8 @@ const ja = {
       "bragCrushed": "ボードは相手にならなかった",
       "bragSolid": "今日は順調な単語狩り",
       "cta": "これを超えられる? 🎮"
-    }
+    },
+    "leaderboard": "ランキング"
   },
   "wordHunt": {
     "title": "ワードハント",
@@ -2844,7 +2849,17 @@ const ja = {
       "retryChallenge": "再挑戦",
       "needMoreCoins": "あと{amount}必要",
       "retryExplanation": "完全リセット - 新しい試行で最初からやり直し",
-      "find": "発見"
+      "find": "発見",
+      "share": "シェア",
+      "retry": "リトライ",
+      "survivalBonus": "サバイバルボーナス",
+      "survivalTier": {
+        "legendary": "伝説のサバイバー！",
+        "excellent": "素晴らしい耐久力！",
+        "good": "粘り強い！",
+        "nice": "ナイス！",
+        "start": "一秒も無駄にしない！"
+      }
     },
     "shareCTA": {
       "canYouSolve": "解けますか？",

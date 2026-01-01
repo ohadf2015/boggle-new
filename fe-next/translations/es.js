@@ -723,7 +723,9 @@ const es = {
     "hostSpectates": "Espectador",
     "letters": "letras",
     "players": "jugadores",
-    "letterMinimum": "letras mínimo"
+    "letterMinimum": "letras mínimo",
+    "chat": "Chat",
+    "settings": "Ajustes"
   },
   "tvBroadcast": {
     "joinAt": "Únete en",
@@ -977,6 +979,8 @@ const es = {
     "newMessages": "Nuevos mensajes de chat"
   },
   "results": {
+    "results": "Resultados",
+    "share": "Compartir",
     "yourProgress": "Tu Progreso",
     "topPlayers": "Top Jugadores",
     "otherPlayers": "Otros Jugadores",
@@ -2703,7 +2707,8 @@ const es = {
       "bragCrushed": "El tablero no tuvo oportunidad",
       "bragSolid": "Buena caza de palabras hoy",
       "cta": "¿Crees que puedes superarlo? 🎮"
-    }
+    },
+    "leaderboard": "Ranking"
   },
   "wordHunt": {
     "title": "Caza de Palabras",
@@ -2842,7 +2847,17 @@ const es = {
       "retryChallenge": "Reintentar desafío",
       "needMoreCoins": "necesitas {amount} más",
       "retryExplanation": "Reinicio completo - empieza de nuevo con nuevos intentos",
-      "find": "HALLAZGO"
+      "find": "HALLAZGO",
+      "share": "Compartir",
+      "retry": "Reintentar",
+      "survivalBonus": "Bonus de Supervivencia",
+      "survivalTier": {
+        "legendary": "¡Superviviente Legendario!",
+        "excellent": "¡Resistencia Excelente!",
+        "good": "¡Gran Persistencia!",
+        "nice": "¡Buen Esfuerzo!",
+        "start": "¡Cada Segundo Cuenta!"
+      }
     },
     "shareCTA": {
       "canYouSolve": "¿Puedes resolverlo?",

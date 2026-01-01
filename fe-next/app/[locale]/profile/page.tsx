@@ -958,7 +958,7 @@ export default function ProfilePage(): React.ReactNode {
   if (!loading && !isAuthenticated) {
     return (
       <div className={cn(
-        isLandscape ? 'h-screen overflow-y-auto' : 'min-h-screen',
+        'flex flex-col min-h-full',
         isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
       )}>
         <AutoHideHeader />
@@ -1018,7 +1018,7 @@ export default function ProfilePage(): React.ReactNode {
   if (loading) {
     return (
       <div className={cn(
-        isLandscape ? 'h-screen overflow-y-auto' : 'min-h-screen',
+        'flex flex-col min-h-full',
         isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
       )}>
         <AutoHideHeader />
@@ -1123,14 +1123,13 @@ export default function ProfilePage(): React.ReactNode {
 
       {/* ===== DESKTOP VIEW ===== */}
       <div className={cn(
-        'hidden lg:block',
-        isLandscape ? 'h-screen overflow-y-auto' : 'min-h-screen',
+        'hidden lg:flex lg:flex-col lg:min-h-full',
         isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
       )}>
         <AutoHideHeader />
 
         <div className={cn(
-          "max-w-4xl mx-auto px-4",
+          "flex-1 max-w-4xl mx-auto px-4 w-full",
           isLandscape ? "py-2" : "py-6"
         )}>
           {/* Profile Header */}

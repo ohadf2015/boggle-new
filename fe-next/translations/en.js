@@ -735,7 +735,9 @@ const en = {
     "hostSpectates": "Broadcasting",
     "letters": "letters",
     "players": "players",
-    "letterMinimum": "letter minimum"
+    "letterMinimum": "letter minimum",
+    "chat": "Chat",
+    "settings": "Settings"
   },
   "tvBroadcast": {
     "joinAt": "Join at",
@@ -990,6 +992,8 @@ const en = {
     "newMessages": "New chat messages"
   },
   "results": {
+    "results": "Results",
+    "share": "Share",
     "yourProgress": "Your Progress",
     "topPlayers": "Podium",
     "otherPlayers": "Others",
@@ -2716,7 +2720,8 @@ const en = {
       "bragCrushed": "The board never stood a chance",
       "bragSolid": "Solid word hunting today",
       "cta": "Think you can beat this? 🎮"
-    }
+    },
+    "leaderboard": "Ranks"
   },
   "wordHunt": {
     "title": "Word Hunt",
@@ -2855,7 +2860,17 @@ const en = {
       "retryChallenge": "Retry Challenge",
       "needMoreCoins": "need {amount} more",
       "retryExplanation": "Full reset - start fresh with new attempts",
-      "find": "FIND"
+      "find": "FIND",
+      "share": "Share",
+      "retry": "Retry",
+      "survivalBonus": "Survival Bonus",
+      "survivalTier": {
+        "legendary": "Legendary Survivor!",
+        "excellent": "Excellent Endurance!",
+        "good": "Great Persistence!",
+        "nice": "Nice Effort!",
+        "start": "Every Second Counts!"
+      }
     },
     "shareCTA": {
       "canYouSolve": "Can you solve it?",

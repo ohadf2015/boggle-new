@@ -727,7 +727,9 @@ const he = {
     "hostSpectates": "משדר",
     "letters": "אותיות",
     "players": "שחקנים",
-    "letterMinimum": "אותיות מינימום"
+    "letterMinimum": "אותיות מינימום",
+    "chat": "צ'אט",
+    "settings": "הגדרות"
   },
   "tvBroadcast": {
     "joinAt": "הצטרפו ב",
@@ -981,6 +983,8 @@ const he = {
     "newMessages": "הודעות צ'אט חדשות"
   },
   "results": {
+    "results": "תוצאות",
+    "share": "שתף",
     "yourProgress": "ההתקדמות שלך",
     "topPlayers": "שחקנים מובילים",
     "otherPlayers": "שחקנים אחרים",
@@ -2707,7 +2711,8 @@ const he = {
       "bragCrushed": "הלוח לא עמד בי",
       "bragSolid": "ציד מילים מוצלח היום",
       "cta": "תצליחו לנצח את זה? 🎮"
-    }
+    },
+    "leaderboard": "דירוג"
   },
   "wordHunt": {
     "title": "ציד מילים",
@@ -2846,7 +2851,17 @@ const he = {
       "retryChallenge": "נסה שוב",
       "needMoreCoins": "חסרים {amount}",
       "retryExplanation": "איפוס מלא - התחלה חדשה",
-      "find": "מציאה"
+      "find": "מציאה",
+      "share": "שתף",
+      "retry": "נסה שוב",
+      "survivalBonus": "בונוס הישרדות",
+      "survivalTier": {
+        "legendary": "הישרדות אגדית!",
+        "excellent": "סיבולת מעולה!",
+        "good": "התמדה נהדרת!",
+        "nice": "מאמץ יפה!",
+        "start": "כל שנייה חשובה!"
+      }
     },
     "shareCTA": {
       "canYouSolve": "תצליחו לפתור?",

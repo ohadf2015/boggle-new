@@ -61,7 +61,7 @@ export default function LeaderboardPage(): React.ReactNode {
   if (!isSupabaseEnabled) {
     return (
       <div className={cn(
-        isLandscape ? 'h-screen overflow-y-auto' : 'min-h-screen',
+        'flex flex-col min-h-full',
         isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
       )}>
         <AutoHideHeader />
@@ -95,13 +95,13 @@ export default function LeaderboardPage(): React.ReactNode {
 
   return (
     <div className={cn(
-      isLandscape ? 'h-screen overflow-y-auto' : 'min-h-screen',
+      'flex flex-col min-h-full',
       isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
     )}>
       <AutoHideHeader />
 
       <div className={cn(
-        "max-w-4xl mx-auto px-4",
+        "flex-1 max-w-4xl mx-auto px-4 w-full",
         isLandscape ? "py-2" : "py-8"
       )}>
         {/* Page Title */}
