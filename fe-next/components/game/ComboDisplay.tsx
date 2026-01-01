@@ -4,11 +4,20 @@ import React, { useMemo, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { getComboColors } from '../grid/comboColors';
+import FloatingCoinAnimation from './FloatingCoinAnimation';
 
 interface ComboDisplayProps {
   comboLevel: number;
   compact?: boolean;
   className?: string;
+  /** Whether combo timer is in danger zone (<30% remaining) */
+  isDanger?: boolean;
+  /** Time remaining as percentage (0-100) */
+  timeRemaining?: number | null;
+  /** Coin reward amount to animate (triggers animation when > 0) */
+  coinReward?: number | null;
+  /** Callback when coin animation completes */
+  onCoinAnimationComplete?: () => void;
 }
 
 // Sparkle particle component - memoized to prevent unnecessary re-renders
@@ -61,6 +70,10 @@ const ComboDisplay = memo<ComboDisplayProps>(({
   comboLevel,
   compact = false,
   className,
+  isDanger = false,
+  timeRemaining,
+  coinReward = null,
+  onCoinAnimationComplete,
 }) => {
   const comboColors = getComboColors(comboLevel);
   const isHighCombo = comboLevel >= 5;
@@ -121,23 +134,47 @@ const ComboDisplay = memo<ComboDisplayProps>(({
 
           {/* Main pill badge - notification style */}
           <motion.div
-            animate={isHighCombo ? {
-              scale: [1, 1.05, 1],
-            } : undefined}
-            transition={isHighCombo ? {
-              duration: 0.5,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            } : undefined}
+            animate={
+              isDanger
+                ? {
+                    // Subtle danger pulse - gentle opacity fluctuation
+                    opacity: [1, 0.85, 1],
+                    scale: [1, 1.02, 1],
+                  }
+                : isHighCombo
+                ? {
+                    scale: [1, 1.05, 1],
+                  }
+                : undefined
+            }
+            transition={
+              isDanger
+                ? {
+                    duration: 0.8,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }
+                : isHighCombo
+                ? {
+                    duration: 0.5,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }
+                : undefined
+            }
             className={cn(
               'rounded-full font-bold text-white backdrop-blur-sm relative overflow-hidden',
-              'border-2 border-white/40',
+              'border-2',
+              // Subtle border color shift in danger state
+              isDanger ? 'border-orange-400/70' : 'border-white/40',
               compact ? 'px-3 py-1.5 text-base' : 'px-4 py-2 text-lg',
               !isRainbow && 'bg-gradient-to-r from-orange-500 via-red-500 to-pink-500'
             )}
             style={{
               filter: isRainbow
                 ? 'drop-shadow(0 0 12px rgba(255, 255, 255, 0.8))'
+                : isDanger
+                ? 'drop-shadow(0 0 8px rgba(251, 146, 60, 0.8))'
                 : `drop-shadow(0 0 ${isHighCombo ? '10px' : '6px'} rgba(251, 146, 60, 0.6))`,
               ...(isRainbow && {
                 background: 'linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #06b6d4, #3b82f6, #8b5cf6, #ec4899, #ef4444)',
@@ -237,6 +274,12 @@ const ComboDisplay = memo<ComboDisplayProps>(({
           />
         </motion.div>
       </AnimatePresence>
+
+      {/* Coin reward animation */}
+      <FloatingCoinAnimation
+        coinAmount={coinReward}
+        onAnimationComplete={onCoinAnimationComplete}
+      />
     </div>
   );
 });

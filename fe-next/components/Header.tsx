@@ -105,32 +105,33 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     aria-label={t('common.goToHome') || 'Go to home page'}
                 >
                     <h1
-                        className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl 2xl:text-4xl font-black uppercase tracking-tight flex items-center gap-0.5 xs:gap-1 lg:gap-1.5 2xl:gap-2 flex-shrink min-w-0 overflow-hidden landscape:text-base landscape:xs:text-lg landscape:sm:text-xl"
+                        className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl 2xl:text-4xl font-black uppercase tracking-tight flex items-center gap-0 flex-shrink min-w-0 overflow-hidden landscape:text-base landscape:xs:text-lg landscape:sm:text-xl"
                         style={{ fontFamily }}
                     >
-                        {/* LEXI - Neo-Brutalist white with black shadow */}
+                        {/* Pink lightning - left side */}
+                        <span className="text-neo-pink text-xs xs:text-sm sm:text-base lg:text-lg xl:text-xl -mr-0.5 xs:-mr-1" style={{ transform: 'rotate(-15deg)' }}>⚡</span>
+                        {/* LEXI - Cyan with dark outline like og-image */}
                         <span
-                            className="text-white"
+                            className="text-neo-cyan relative"
                             style={{
-                                textShadow: '3px 3px 0px rgb(var(--neo-black)), -1px -1px 0px rgb(var(--neo-black)), 1px -1px 0px rgb(var(--neo-black)), -1px 1px 0px rgb(var(--neo-black))',
+                                textShadow: '2px 2px 0px #1a365d, 3px 3px 0px #1a365d, -1px -1px 0px #1a365d, 1px -1px 0px #1a365d, -1px 1px 0px #1a365d',
+                                WebkitTextStroke: '1px #1a365d',
                             }}
                         >
                             {t('logo.lexi')}
                         </span>
-                        {/* Lightning bolt - static for cleaner UX */}
-                        <span className="text-base xs:text-xl sm:text-2xl lg:text-2xl xl:text-3xl 2xl:text-3xl">
-                            ⚡
-                        </span>
-                        {/* CLASH - Neo-Brutalist white italic skewed with black shadow */}
+                        {/* CLASH - Yellow with dark outline like og-image */}
                         <span
-                            className="text-white italic"
+                            className="text-neo-yellow relative"
                             style={{
-                                transform: 'skewX(-8deg)',
-                                textShadow: '3px 3px 0px rgb(var(--neo-black)), -1px -1px 0px rgb(var(--neo-black)), 1px -1px 0px rgb(var(--neo-black)), -1px 1px 0px rgb(var(--neo-black))',
+                                textShadow: '2px 2px 0px #1a365d, 3px 3px 0px #1a365d, -1px -1px 0px #1a365d, 1px -1px 0px #1a365d, -1px 1px 0px #1a365d',
+                                WebkitTextStroke: '1px #1a365d',
                             }}
                         >
                             {t('logo.clash')}
                         </span>
+                        {/* Yellow lightning - right side */}
+                        <span className="text-neo-yellow text-xs xs:text-sm sm:text-base lg:text-lg xl:text-xl -ml-0.5 xs:-ml-1" style={{ transform: 'rotate(15deg)' }}>⚡</span>
                     </h1>
                 </motion.button>
 

@@ -36,6 +36,7 @@ const PerformanceChart = dynamic(() => import('@/components/results/PerformanceC
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 import { Users } from 'lucide-react';
+const PlayerArchetypeBadge = dynamic(() => import('@/components/results/PlayerArchetypeBadge'), { ssr: false });
 import { cn } from '@/lib/utils';
 import { addGameToHistory } from '@/utils/gameHistoryManager';
 import { awardGameCoins } from '@/utils/coinManager';
@@ -790,39 +791,35 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         </div>
       )}
 
-      {/* Compact Stats Row - Key metrics only */}
+      {/* Compact Stats Row - Key metrics (rank/score shown in podium below) */}
       {currentPlayerData && currentPlayerRank > 0 && (
         <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 shadow-hard">
-          <div className="flex items-center gap-3">
-            {/* Rank Badge */}
-            <div className={cn(
-              'w-12 h-12 rounded-neo flex items-center justify-center border-3 border-neo-black font-black text-lg',
-              currentPlayerRank === 1 ? 'bg-neo-yellow text-neo-black' :
-              currentPlayerRank === 2 ? 'bg-slate-300 text-slate-800' :
-              currentPlayerRank === 3 ? 'bg-neo-orange text-neo-black' :
-              'bg-neo-cream text-neo-black'
-            )}>
-              #{currentPlayerRank}
-            </div>
-            {/* Score & Stats */}
-            <div className="flex-1 min-w-0">
-              <div className="text-2xl font-black text-white">{currentPlayerData.score || 0} <span className="text-sm text-white/60">{t('results.points') || 'pts'}</span></div>
-              <div className="text-xs text-white/70 font-bold flex items-center gap-2 flex-wrap">
-                <span>{currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0} {t('results.words') || 'words'}</span>
-                <span>•</span>
-                <span>{(() => {
-                  const total = currentPlayerData.allWords?.length || 0;
-                  const valid = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0;
-                  return total > 0 ? Math.round((valid / total) * 100) : 0;
-                })()}% {t('results.accuracy') || 'accuracy'}</span>
-                {currentPlayerArchetype && (
-                  <>
-                    <span>•</span>
-                    <span className="text-neo-cyan">{currentPlayerArchetype.name}</span>
-                  </>
-                )}
+          <div className="flex items-center justify-between gap-3">
+            {/* Stats Grid */}
+            <div className="flex items-center gap-4">
+              {/* Words */}
+              <div className="text-center">
+                <div className="text-xl font-black text-white">
+                  {currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0}
+                </div>
+                <div className="text-[10px] text-white/60 font-bold uppercase">{t('results.words') || 'Words'}</div>
+              </div>
+              {/* Accuracy */}
+              <div className="text-center">
+                <div className="text-xl font-black text-white">
+                  {(() => {
+                    const total = currentPlayerData.allWords?.length || 0;
+                    const valid = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0;
+                    return total > 0 ? Math.round((valid / total) * 100) : 0;
+                  })()}%
+                </div>
+                <div className="text-[10px] text-white/60 font-bold uppercase">{t('results.accuracy') || 'Accuracy'}</div>
               </div>
             </div>
+            {/* Archetype Badge with Image and Tooltip */}
+            {currentPlayerArchetype && (
+              <PlayerArchetypeBadge archetype={currentPlayerArchetype} size="sm" showTooltip={true} />
+            )}
           </div>
         </div>
       )}

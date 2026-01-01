@@ -316,7 +316,7 @@ const Step3FindWord: React.FC<{ targetWordLength: number; t: (key: string, param
       </motion.div>
 
       <div className="text-xs text-neo-purple dark:text-neo-purple-light font-bold mt-3">
-        {t('daily.carousel.step3Hint', { length: displayLength }) || `Guess ${displayLength}-letter words to reveal clues`}
+        {t('daily.carousel.step3Hint', { length: targetWordLength }) || `Guess ${targetWordLength}-letter words to reveal clues`}
       </div>
     </div>
   );

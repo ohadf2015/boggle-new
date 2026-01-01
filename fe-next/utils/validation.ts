@@ -11,7 +11,11 @@ import {
   GAME_CODE_MAX_LENGTH,
   WORD_MIN_LENGTH,
   WORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_MAX_LENGTH,
   NAME_VALID_PATTERN,
+  EMAIL_VALID_PATTERN,
+  PASSWORD_STRENGTH_PATTERN,
 } from './consts';
 
 export interface ValidationResult {
@@ -148,6 +152,51 @@ export const validateWord = (word: string): ValidationResult => {
   const validPattern = /^[\p{L}]+$/u;
   if (!validPattern.test(trimmed)) {
     return { isValid: false, error: 'validation.wordInvalidChars' };
+  }
+
+  return { isValid: true };
+};
+
+/**
+ * Validates email input
+ * @param email - The email to validate
+ * @returns Validation result
+ */
+export const validateEmail = (email: string): ValidationResult => {
+  if (!email || !email.trim()) {
+    return { isValid: false, error: 'auth.inlineSignup.emailRequired' };
+  }
+
+  const trimmed = email.trim().toLowerCase();
+
+  if (!EMAIL_VALID_PATTERN.test(trimmed)) {
+    return { isValid: false, error: 'auth.inlineSignup.invalidEmail' };
+  }
+
+  return { isValid: true };
+};
+
+/**
+ * Validates password input for registration
+ * @param password - The password to validate
+ * @param requireStrength - Whether to require uppercase, lowercase, and number (default: false)
+ * @returns Validation result
+ */
+export const validatePassword = (password: string, requireStrength: boolean = false): ValidationResult => {
+  if (!password) {
+    return { isValid: false, error: 'auth.inlineSignup.passwordRequired' };
+  }
+
+  if (password.length < PASSWORD_MIN_LENGTH) {
+    return { isValid: false, error: 'auth.inlineSignup.passwordTooShort' };
+  }
+
+  if (password.length > PASSWORD_MAX_LENGTH) {
+    return { isValid: false, error: 'auth.inlineSignup.passwordTooLong' };
+  }
+
+  if (requireStrength && !PASSWORD_STRENGTH_PATTERN.test(password)) {
+    return { isValid: false, error: 'auth.inlineSignup.weakPassword' };
   }
 
   return { isValid: true };

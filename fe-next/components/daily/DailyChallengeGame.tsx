@@ -24,6 +24,7 @@ import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
 import { cn } from '@/lib/utils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { finalizeWordValidation } from '@/utils/wordValidationAPI';
+import { awardComboCoins } from '@/utils/coinManager';
 import type { LetterGrid, Language } from '@/types';
 
 interface DailyChallengeGameProps {
@@ -73,6 +74,9 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   // Exit confirmation dialog state
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
 
+  // Coin reward animation state
+  const [comboCoinReward, setComboCoinReward] = useState<number | null>(null);
+
   // Refs for game end handler
   const gameOverCalledRef = useRef(false);
   const scoreRef = useRef(score);
@@ -104,6 +108,13 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     onComboSound: (level) => {
       if (level >= 3) {
         playComboSound?.(level);
+      }
+    },
+    onComboMilestone: (level) => {
+      // Award coins for combo milestones (5, 10, 15, 20, 25, 30)
+      const coinsAwarded = awardComboCoins(level, 'daily');
+      if (coinsAwarded > 0) {
+        setComboCoinReward(coinsAwarded);
       }
     },
     trackMaxCombo: true,
@@ -299,7 +310,12 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       )} role="status" aria-label="Game status">
         {/* Combo (left - placeholder for layout balance) */}
         <div className="min-w-[70px] md:min-w-[90px] flex justify-end">
-          <ComboDisplay comboLevel={combo.comboLevel} compact />
+          <ComboDisplay
+            comboLevel={combo.comboLevel}
+            compact
+            coinReward={comboCoinReward}
+            onCoinAnimationComplete={() => setComboCoinReward(null)}
+          />
         </div>
 
         {/* Timer (center - always visible and prominent) */}
