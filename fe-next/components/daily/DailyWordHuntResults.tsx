@@ -21,6 +21,7 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
 import { Button } from '@/components/ui/button';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { cn } from '@/lib/utils';
+import { useScreenshotProtection } from '@/hooks/useScreenshotProtection';
 import {
   generateWordHuntShareableResult,
   getGuestFingerprint,
@@ -198,6 +199,9 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [inlineSignupDismissed, setInlineSignupDismissed] = useState(false);
   const hasSubmittedRef = useRef(false);
   const { user, profile, isAuthenticated, loading: authLoading } = useAuth();
+
+  // Screenshot protection - blur sensitive content when tab/window loses focus
+  const { isProtected } = useScreenshotProtection();
 
   // Check for streak milestone
   const streakMilestone = getStreakMilestone(result.streakDays);
@@ -770,8 +774,22 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       </div>
 
       {/* Scrollable Tab Content - with bottom padding for tab bar */}
-      <div className="flex-1 overflow-y-auto px-3 pb-20">
-        <div className="max-w-md mx-auto text-center space-y-3 pt-3">
+      <div className="flex-1 overflow-y-auto px-3 pb-20 relative">
+        {/* Screenshot protection overlay */}
+        {isProtected && (
+          <div className="absolute inset-0 flex items-center justify-center z-20 bg-black/40">
+            <div className="bg-neo-black/80 text-white px-6 py-4 rounded-neo border-3 border-neo-yellow shadow-hard text-center">
+              <div className="text-2xl mb-2">👀</div>
+              <div className="font-bold text-sm">
+                {t('daily.screenshotProtection') || 'Click here to continue'}
+              </div>
+            </div>
+          </div>
+        )}
+        <div className={cn(
+          "max-w-md mx-auto text-center space-y-3 pt-3 transition-all duration-200",
+          isProtected && "blur-xl pointer-events-none select-none"
+        )}>
 
         {/* ===== RESULTS TAB - Full details ===== */}
         {activeTab === 'results' && (

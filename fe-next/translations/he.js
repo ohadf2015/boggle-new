@@ -1547,7 +1547,9 @@ const he = {
         "usesAttempt": "5 אותיות = משתמש בניסיון",
         "noAttempt": "3 אותיות = בלי ניסיון, רק חיים!",
         "keyInsight": "💡 מצא מילים קצרות בחינם לחיים בלי לבזבז ניסיונות!",
-        "gotIt": "הבנתי!"
+        "gotIt": "הבנתי!",
+        "bonusTitle": "!בונוס",
+        "revealsClue": "מילים של 3+ אותיות גם חושפות רמזים!"
       },
       "letterFeedback": {
         "title": "קריאת הרמזים",
@@ -2721,7 +2723,8 @@ const he = {
       "bragSolid": "ציד מילים מוצלח היום",
       "cta": "תצליחו לנצח את זה? 🎮"
     },
-    "leaderboard": "דירוג"
+    "leaderboard": "דירוג",
+    "screenshotProtection": "חזרו כדי להמשיך לשחק"
   },
   "wordHunt": {
     "title": "ציד מילים",

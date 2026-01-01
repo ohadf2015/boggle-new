@@ -522,25 +522,44 @@ export function generateDailyPuzzle(
 
   // STEP 2: Get same-length words for gameplay assistance
   // These words help players practice same-length guesses and get letter feedback (clues)
+  // ENHANCED: Now prioritizes words with letter overlap with target
   const sameLengthWords = getSameLengthWords(targetWord, language, random);
 
   // STEP 3: Get other bonus words for survival mode (different lengths for variety)
+  // ENHANCED: Prioritize longer words that share letters with target (for clue revelation)
   const bonusWordList = BONUS_WORD_LISTS[language] || BONUS_WORD_LISTS['en'];
   const otherBonusWords = bonusWordList
     .filter(w => w.length !== targetWord.length) // Exclude same-length (already covered)
     .map(w => w.toUpperCase());
 
-  // Shuffle other bonus words
-  const shuffledOtherBonus = [...otherBonusWords];
-  for (let i = shuffledOtherBonus.length - 1; i > 0; i--) {
+  // Score and sort other bonus words by letter overlap with target
+  // Prioritize LONGER words (>= target length) that can reveal positional clues
+  const scoredOtherBonus = otherBonusWords.map(word => ({
+    word,
+    score: calculateLetterOverlapScore(word, targetWord),
+    isLonger: word.length >= targetWord.length
+  }));
+
+  // Sort: longer words with high overlap first, then other words by overlap
+  scoredOtherBonus.sort((a, b) => {
+    // Longer words with overlap get priority
+    if (a.isLonger && !b.isLonger && a.score > 0) return -1;
+    if (b.isLonger && !a.isLonger && b.score > 0) return 1;
+    // Then by overlap score
+    return b.score - a.score;
+  });
+
+  // Shuffle within top tier for variety (top 8 highest-scoring words)
+  const topBonus = scoredOtherBonus.slice(0, 8).map(s => s.word);
+  for (let i = topBonus.length - 1; i > 0; i--) {
     const j = Math.floor(random() * (i + 1));
-    [shuffledOtherBonus[i], shuffledOtherBonus[j]] = [shuffledOtherBonus[j], shuffledOtherBonus[i]];
+    [topBonus[i], topBonus[j]] = [topBonus[j], topBonus[i]];
   }
 
   // Prioritize same-length words: take at least MIN_SAME_LENGTH_WORDS (5) same-length words
-  // Then fill remaining slots with other bonus words for variety
+  // Then fill remaining slots with other bonus words (now prioritized by letter overlap)
   const sameLengthToEmbed = sameLengthWords.slice(0, Math.max(MIN_SAME_LENGTH_WORDS, 8));
-  const otherBonusToEmbed = shuffledOtherBonus.slice(0, 4);
+  const otherBonusToEmbed = topBonus.slice(0, 6); // Increased from 4 to 6 for more clue opportunities
 
   // Combine: same-length words first (priority), then other bonus words
   let bonusWordsToEmbed = [...sameLengthToEmbed, ...otherBonusToEmbed];
@@ -2325,9 +2344,43 @@ const SAME_LENGTH_HELPER_WORDS: Record<Language, Record<number, string[]>> = {
 };
 
 /**
+ * Calculate letter overlap score between a word and target word
+ * Counts how many letters from the word exist in the target (yellow-style matching)
+ * Higher score = more letters in common
+ */
+function calculateLetterOverlapScore(word: string, targetWord: string): number {
+  const wordUpper = word.toUpperCase();
+  const targetUpper = targetWord.toUpperCase();
+
+  // Count letters in target word
+  const targetLetterCounts = new Map<string, number>();
+  for (const letter of targetUpper) {
+    targetLetterCounts.set(letter, (targetLetterCounts.get(letter) || 0) + 1);
+  }
+
+  // Count matching letters (yellow-style: same letter, any position)
+  let score = 0;
+  const usedCounts = new Map<string, number>();
+
+  for (const letter of wordUpper) {
+    const available = targetLetterCounts.get(letter) || 0;
+    const used = usedCounts.get(letter) || 0;
+    if (used < available) {
+      score++;
+      usedCounts.set(letter, used + 1);
+    }
+  }
+
+  return score;
+}
+
+/**
  * Get same-length helper words for a given target word
  * Combines words from SAME_LENGTH_HELPER_WORDS and TARGET_WORD_LISTS
  * Excludes the target word itself
+ *
+ * ENHANCED: Prioritizes words with higher letter overlap with target word
+ * Words sharing more letters with target are sorted first, then shuffled within groups
  */
 function getSameLengthWords(targetWord: string, language: Language, random: () => number): string[] {
   const targetLength = targetWord.length;
@@ -2345,14 +2398,31 @@ function getSameLengthWords(targetWord: string, language: Language, random: () =
     .map(w => w.toUpperCase())
     .filter(w => w !== targetUpper);
 
-  // Shuffle using seeded random
-  const shuffled = [...allWords];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  // Score each word by letter overlap with target
+  const scoredWords = allWords.map(word => ({
+    word,
+    score: calculateLetterOverlapScore(word, targetUpper)
+  }));
+
+  // Sort by score descending (more shared letters = higher priority)
+  scoredWords.sort((a, b) => b.score - a.score);
+
+  // Group words by score tier and shuffle within each tier for variety
+  // This ensures high-overlap words come first but with some randomness
+  const tierSize = 5; // Group every 5 words into a tier
+  const result: string[] = [];
+
+  for (let i = 0; i < scoredWords.length; i += tierSize) {
+    const tier = scoredWords.slice(i, i + tierSize).map(s => s.word);
+    // Shuffle within tier using seeded random
+    for (let j = tier.length - 1; j > 0; j--) {
+      const k = Math.floor(random() * (j + 1));
+      [tier[j], tier[k]] = [tier[k], tier[j]];
+    }
+    result.push(...tier);
   }
 
-  return shuffled;
+  return result;
 }
 
 // Minimum number of same-length words to embed (excluding target word)

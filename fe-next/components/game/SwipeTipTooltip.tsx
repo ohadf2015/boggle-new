@@ -7,19 +7,36 @@ import { X, Hand } from 'lucide-react';
 const AUTO_DISMISS_MS = 8000; // 8 seconds
 
 // Demo grid letters for swipe demonstration
-const DEMO_GRID = [
+// LTR: reads left-to-right, RTL: reads right-to-left
+const DEMO_GRID_LTR = [
   ['S', 'W', 'I'],
   ['O', 'R', 'P'],
   ['N', 'D', 'E'],
 ];
 
+const DEMO_GRID_RTL = [
+  ['I', 'W', 'S'],
+  ['P', 'R', 'O'],
+  ['E', 'D', 'N'],
+];
+
 // Simple horizontal swipe path: S -> W -> I -> P -> E
-const DEMO_PATH: [number, number][] = [
+// LTR: swipes left-to-right (col 0 -> 2)
+const DEMO_PATH_LTR: [number, number][] = [
   [0, 0], // S
   [0, 1], // W
   [0, 2], // I
   [1, 2], // P
   [2, 2], // E
+];
+
+// RTL: swipes right-to-left (col 2 -> 0)
+const DEMO_PATH_RTL: [number, number][] = [
+  [0, 2], // S
+  [0, 1], // W
+  [0, 0], // I
+  [1, 0], // P
+  [2, 0], // E
 ];
 
 const DEMO_WORD = 'SWIPE';
@@ -43,6 +60,11 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
     const [isAnimating, setIsAnimating] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [fingerPosition, setFingerPosition] = useState<{ x: number; y: number } | null>(null);
+
+    // Select grid and path based on direction
+    const isRTL = dir === 'rtl';
+    const DEMO_GRID = isRTL ? DEMO_GRID_RTL : DEMO_GRID_LTR;
+    const DEMO_PATH = isRTL ? DEMO_PATH_RTL : DEMO_PATH_LTR;
 
     const cellSize = 36;
     const gap = 3;
@@ -84,7 +106,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
         },
         DEMO_PATH.length * 350 + 300
       );
-    }, [isAnimating]);
+    }, [isAnimating, DEMO_PATH]);
 
     // Auto-start animation when visible
     useEffect(() => {

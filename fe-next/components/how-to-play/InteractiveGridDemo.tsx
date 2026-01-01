@@ -22,13 +22,26 @@ interface InteractiveGridDemoProps {
  * Auto-plays words with combo demonstration
  */
 export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir }) => {
-  const demoGrid = [
+  const isRTL = dir === 'rtl';
+
+  // LTR grid: reads left-to-right, RTL grid: reads right-to-left (mirrored)
+  const demoGrid = isRTL ? [
+    ['T', 'A', 'C'],
+    ['S', 'R', 'O'],
+    ['E', 'D', 'W']
+  ] : [
     ['C', 'A', 'T'],
     ['O', 'R', 'S'],
     ['W', 'D', 'E']
   ];
 
-  const demoSequence: DemoWord[] = [
+  // Demo paths: LTR starts left, RTL starts right
+  const demoSequence: DemoWord[] = isRTL ? [
+    { word: 'CAT', path: [[0,2], [0,1], [0,0]], points: 2 },
+    { word: 'RAT', path: [[1,1], [0,1], [0,0]], points: 2 },
+    { word: 'ART', path: [[0,1], [1,1], [0,0]], points: 2 },
+    { word: 'CARS', path: [[0,2], [0,1], [1,1], [1,0]], points: 3 },
+  ] : [
     { word: 'CAT', path: [[0,0], [0,1], [0,2]], points: 2 },
     { word: 'RAT', path: [[1,1], [0,1], [0,2]], points: 2 },
     { word: 'ART', path: [[0,1], [1,1], [0,2]], points: 2 },

@@ -103,7 +103,7 @@ const MissedWords = memo<MissedWordsProps>(({
             </span>
           </div>
           <span className="text-xs font-black bg-neo-yellow px-2 py-0.5 rounded-full text-neo-black">
-            +{showAll ? allTotalPoints : totalPoints} pts
+            +{showAll ? allTotalPoints : totalPoints} {t('results.points') || 'pts'}
           </span>
         </div>
 
