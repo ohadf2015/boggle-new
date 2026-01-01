@@ -18,7 +18,6 @@ import { getGuestSessionId, hashToken } from '@/utils/guestManager';
 import { getSession as getSupabaseSession } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 
 interface ResultsData {
@@ -129,7 +128,6 @@ export default function MultiplayerPage(): React.JSX.Element {
 
   const { t, language } = useLanguage();
   const { user, isAuthenticated, isSupabaseEnabled, profile, loading, refreshProfile } = useAuth();
-  const isLandscape = useMobileLandscape();
   const { playTrack, fadeToTrack, TRACKS } = useMusic();
 
   // Track auth loading start time for timeout
@@ -1249,9 +1247,6 @@ export default function MultiplayerPage(): React.JSX.Element {
     );
   };
 
-  // Hide header completely in landscape mode during active gameplay (not just auto-hide)
-  const showHeader = !(isActive && !showResults && isLandscape);
-
   return (
     <SocketContext.Provider value={socketContextValue}>
       {/* Connection status indicator */}
@@ -1265,7 +1260,7 @@ export default function MultiplayerPage(): React.JSX.Element {
         spectatorCount={spectators.length}
       />
 
-      {showHeader && <AutoHideHeader />}
+      <AutoHideHeader />
       <ErrorBoundary>
         <div id="main-content" tabIndex={-1}>
           {renderView()}

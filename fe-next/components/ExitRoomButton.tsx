@@ -8,7 +8,7 @@ import { Button } from './ui/button';
  * ExitRoomButton Props
  *
  * Reusable Exit Room Button component with consistent Neo-Brutalist styling
- * Used across all game views (WaitingScreen, PlayerInGameView, PlayerWaitingResultsView, HostWaitingResultsView)
+ * Used across all game views (WaitingScreen, PlayerInGameView, HostInGameView, etc.)
  */
 interface ExitRoomButtonProps {
   onClick: () => void;

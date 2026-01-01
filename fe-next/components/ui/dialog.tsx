@@ -34,10 +34,14 @@ const DialogOverlay = React.forwardRef<
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 // Neo-Brutalist Dialog Content: Paper texture, thick borders, hard shadow, slight tilt
+interface DialogContentProps extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
+  hideCloseButton?: boolean;
+}
+
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  DialogContentProps
+>(({ className, children, hideCloseButton, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -75,28 +79,30 @@ const DialogContent = React.forwardRef<
     >
       {children}
       {/* Neo-Brutalist Close Button - adjusted for mobile and RTL */}
-      <DialogPrimitive.Close
-        className="
-          absolute top-3 sm:-top-3
-          right-3 sm:-right-3
-          rtl:right-auto rtl:left-3 rtl:sm:-left-3
-          w-11 h-11 sm:w-12 sm:h-12
-          min-w-[44px] min-h-[44px]
-          flex items-center justify-center
-          bg-neo-red text-neo-white
-          border-2 sm:border-3 border-neo-black
-          rounded-neo
-          shadow-hard-sm
-          transition-all duration-100
-          hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
-          active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
-          focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2
-          z-10
-        "
-      >
-        <X className="h-4 w-4 sm:h-5 sm:w-5 stroke-[3]" />
-        <span className="sr-only">Close</span>
-      </DialogPrimitive.Close>
+      {!hideCloseButton && (
+        <DialogPrimitive.Close
+          className="
+            absolute top-3 sm:-top-3
+            right-3 sm:-right-3
+            rtl:right-auto rtl:left-3 rtl:sm:-left-3
+            w-11 h-11 sm:w-12 sm:h-12
+            min-w-[44px] min-h-[44px]
+            flex items-center justify-center
+            bg-neo-red text-neo-white
+            border-2 sm:border-3 border-neo-black
+            rounded-neo
+            shadow-hard-sm
+            transition-all duration-100
+            hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
+            active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
+            focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2
+            z-10
+          "
+        >
+          <X className="h-4 w-4 sm:h-5 sm:w-5 stroke-[3]" />
+          <span className="sr-only">Close</span>
+        </DialogPrimitive.Close>
+      )}
     </DialogPrimitive.Content>
   </DialogPortal>
 ));
