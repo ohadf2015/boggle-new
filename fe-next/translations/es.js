@@ -2292,7 +2292,13 @@ const es = {
     "noRankYet": "¡Juega partidas para clasificarte!",
     "viewLeaderboard": "Ver Clasificación",
     "you": "TÚ",
-    "players": "jugadores"
+    "players": "jugadores",
+    "liveRace": "Carrera en Vivo",
+    "racing": "compitiendo",
+    "leader": "Líder",
+    "leading": "¡Liderando!",
+    "ahead": "adelante",
+    "toCatch": "pts para pasar"
   },
   "ranked": {
     "title": "Modo Clasificatorio",
@@ -2429,7 +2435,7 @@ const es = {
   "singlePlayer": {
     "title": "Un Jugador",
     "quickPlay": "Jugar Rápido",
-    "quickPlayDesc": "7×7 • 2 min • vs Bot",
+    "quickPlayDesc": "7×7 • 1 min • vs Bot",
     "selectMode": "Selecciona Modo",
     "chooseMode": "Elige tu modo",
     "mode": {

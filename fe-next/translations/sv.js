@@ -2167,7 +2167,13 @@ const sv = {
     "noRankYet": "Spela för att bli rankad!",
     "viewLeaderboard": "Visa topplista",
     "you": "DU",
-    "players": "spelare"
+    "players": "spelare",
+    "liveRace": "Live Race",
+    "racing": "tävlar",
+    "leader": "Ledare",
+    "leading": "Leder!",
+    "ahead": "före",
+    "toCatch": "p för att passera"
   },
   "ranked": {
     "title": "Rankat läge",
@@ -2432,7 +2438,7 @@ const sv = {
   "singlePlayer": {
     "title": "Enspelarläge",
     "quickPlay": "Snabbspel",
-    "quickPlayDesc": "7×7 • 2 min • mot Bot",
+    "quickPlayDesc": "7×7 • 1 min • mot Bot",
     "selectMode": "Välj läge",
     "chooseMode": "Välj ditt läge",
     "mode": {

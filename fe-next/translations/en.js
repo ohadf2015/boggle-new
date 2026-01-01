@@ -2301,7 +2301,13 @@ const en = {
     "noRankYet": "Play games to get ranked!",
     "viewLeaderboard": "View Leaderboard",
     "you": "YOU",
-    "players": "players"
+    "players": "players",
+    "liveRace": "Live Race",
+    "racing": "racing",
+    "leader": "Leader",
+    "leading": "Leading!",
+    "ahead": "ahead",
+    "toCatch": "pts to pass"
   },
   "ranked": {
     "title": "Ranked Mode",
@@ -2438,7 +2444,7 @@ const en = {
   "singlePlayer": {
     "title": "Solo",
     "quickPlay": "Quick Play",
-    "quickPlayDesc": "7×7 • 2 min • vs Bot",
+    "quickPlayDesc": "7×7 • 1 min • vs Bot",
     "selectMode": "Mode",
     "chooseMode": "Pick Your Mode",
     "soloVsBots": "vs AI",

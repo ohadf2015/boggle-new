@@ -2166,7 +2166,13 @@ const ja = {
     "noRankYet": "ゲームをプレイしてランク入り!",
     "viewLeaderboard": "リーダーボードを見る",
     "you": "あなた",
-    "players": "プレイヤー"
+    "players": "プレイヤー",
+    "liveRace": "ライブレース",
+    "racing": "競争中",
+    "leader": "リーダー",
+    "leading": "トップ!",
+    "ahead": "先行",
+    "toCatch": "pt追い越しまで"
   },
   "ranked": {
     "title": "ランクマッチ",
@@ -2431,7 +2437,7 @@ const ja = {
   "singlePlayer": {
     "title": "シングルプレイヤー",
     "quickPlay": "クイックプレイ",
-    "quickPlayDesc": "7×7 • 2分 • ボット戦",
+    "quickPlayDesc": "7×7 • 1分 • ボット戦",
     "selectMode": "モード選択",
     "chooseMode": "モードを選択",
     "mode": {

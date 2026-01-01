@@ -2296,7 +2296,13 @@ const he = {
     "noRankYet": "שחק משחקים כדי להיכנס לדירוג!",
     "viewLeaderboard": "צפייה בטבלת מובילים",
     "you": "אתה",
-    "players": "שחקנים"
+    "players": "שחקנים",
+    "liveRace": "מירוץ חי",
+    "racing": "מתחרים",
+    "leader": "מוביל",
+    "leading": "מוביל!",
+    "ahead": "קדימה",
+    "toCatch": "נק' לעבור"
   },
   "ranked": {
     "title": "מצב מדורג",
@@ -2433,7 +2439,7 @@ const he = {
   "singlePlayer": {
     "title": "שחקן יחיד",
     "quickPlay": "משחק מהיר",
-    "quickPlayDesc": "לוח 7×7 • 2 דק' • נגד בוט",
+    "quickPlayDesc": "לוח 7×7 • 1 דק' • נגד בוט",
     "selectMode": "בחר מצב",
     "chooseMode": "בחר את המצב שלך",
     "mode": {
