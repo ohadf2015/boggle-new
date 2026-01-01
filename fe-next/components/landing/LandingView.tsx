@@ -229,7 +229,7 @@ const LandingView: React.FC = () => {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 lg:gap-4 xl:gap-6 max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto"
+          className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 lg:gap-4 xl:gap-6 w-full"
         >
           {/* Multiplayer Card */}
           <ModeCard

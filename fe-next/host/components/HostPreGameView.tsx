@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Users, Settings, Plus, Minus, Crown, ChevronDown, ChevronUp, Bot, Check, Monitor, Info, MessageSquare } from 'lucide-react';
+import { Clock, Users, Settings, Plus, Minus, Crown, ChevronDown, ChevronUp, Bot, Check, Monitor, Info, MessageSquare, RefreshCw } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Checkbox } from '../../components/ui/checkbox';
@@ -79,6 +79,7 @@ interface HostPreGameViewProps {
   onStartGame: () => void;
   onExitRoom: () => void;
   onCancelTournament: () => void;
+  onRegenerateBoard?: () => void;
 
   // Loading states
   tournamentCreating: boolean;
@@ -165,6 +166,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
   onStartGame,
   onExitRoom,
   onCancelTournament,
+  onRegenerateBoard,
 
   // Loading states
   tournamentCreating,
@@ -542,11 +544,21 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
             </AnimatePresence>
 
             {/* Start Game Button - Desktop only (inside card) */}
-            <div className="pt-3 hidden lg:flex justify-center">
+            <div className="pt-3 hidden lg:flex justify-center gap-2">
+              {onRegenerateBoard && (
+                <Button
+                  onClick={onRegenerateBoard}
+                  disabled={tournamentCreating}
+                  className="h-14 px-4 bg-slate-600 text-neo-white font-bold uppercase border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] hover:bg-slate-500 active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  title={t('hostView.regenerateBoard') || 'Regenerate Board'}
+                >
+                  <RefreshCw className="w-5 h-5" />
+                </Button>
+              )}
               <Button
                 onClick={onStartGame}
                 disabled={!timerValue || playersReady.length === 0 || tournamentCreating}
-                className="w-full max-w-md h-14 text-lg bg-neo-lime text-neo-black font-black uppercase border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 max-w-md h-14 text-lg bg-neo-lime text-neo-black font-black uppercase border-3 border-neo-black shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {tournamentCreating ? (t('hostView.creatingTournament') || 'Creating...') : (
                   <>
@@ -664,11 +676,21 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
       {/* Fixed Bottom Bar - Mobile only: Start Button + Tabs */}
       <div className="fixed bottom-0 left-0 right-0 bg-slate-900/98 backdrop-blur-sm border-t-2 border-neo-black z-50 lg:hidden">
         {/* Start Button - Above tabs for prominence */}
-        <div className="p-3 pb-2">
+        <div className="p-3 pb-2 flex gap-2">
+          {onRegenerateBoard && (
+            <Button
+              onClick={onRegenerateBoard}
+              disabled={tournamentCreating}
+              className="h-12 px-3 bg-slate-600 text-neo-white font-bold shadow-hard border-2 border-neo-black"
+              title={t('hostView.regenerateBoard') || 'Regenerate Board'}
+            >
+              <RefreshCw className="w-5 h-5" />
+            </Button>
+          )}
           <Button
             onClick={onStartGame}
             disabled={!timerValue || playersReady.length === 0 || tournamentCreating}
-            className="w-full h-12 text-base bg-neo-lime text-neo-black font-black shadow-hard border-2 border-neo-black"
+            className="flex-1 h-12 text-base bg-neo-lime text-neo-black font-black shadow-hard border-2 border-neo-black"
           >
             {tournamentCreating ? t('hostView.creatingTournament') || 'Creating...' : (
               <>

@@ -728,7 +728,9 @@ const ja = {
     "players": "プレイヤー",
     "letterMinimum": "文字以上",
     "chat": "チャット",
-    "settings": "設定"
+    "settings": "設定",
+    "regenerateBoard": "ボード再生成",
+    "boardRegenerated": "ボードが再生成されました！"
   },
   "tvBroadcast": {
     "joinAt": "参加URL",
@@ -2363,6 +2365,7 @@ const ja = {
     "dictionary5": "一緒に辞書を作ろう！",
     "notAWord": "言葉じゃない",
     "realWord": "本物の言葉！",
+    "dontKnow": "わからない",
     "nextWord": "次の言葉...",
     "almostApproved": "もう少し！",
     "votesNeeded": "あと{count}票で承認",

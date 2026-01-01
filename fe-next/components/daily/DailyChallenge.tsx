@@ -59,9 +59,28 @@ interface ChallengeData {
 }
 
 const DailyChallenge: React.FC = () => {
-  const { t, language, setLanguage } = useLanguage();
+  const { t, language } = useLanguage();
   const { isAuthenticated, profile } = useAuth();
   const searchParams = useSearchParams();
+
+  // Game language state - separate from UI language
+  // This controls only the puzzle/dictionary language, not the UI
+  const [gameLanguage, setGameLanguage] = useState<Language>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('lexiclash_daily_game_language');
+      if (saved && ['en', 'he', 'sv', 'ja', 'es'].includes(saved)) {
+        return saved as Language;
+      }
+    }
+    return (language as Language) || 'en';
+  });
+
+  // Persist game language to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('lexiclash_daily_game_language', gameLanguage);
+    }
+  }, [gameLanguage]);
 
   // Get current language flag
   const getCurrentFlag = (lang: Language) => {
@@ -120,8 +139,8 @@ const DailyChallenge: React.FC = () => {
     // Handle admin reset: ?reset=true clears localStorage so player can replay
     const resetParam = searchParams.get('reset');
     if (resetParam === 'true' && typeof window !== 'undefined') {
-      // Clear the localStorage for this language
-      const cleared = clearWordHuntResultForRetry(language as Language);
+      // Clear the localStorage for this game language
+      const cleared = clearWordHuntResultForRetry(gameLanguage);
       if (cleared) {
         setWasReset(true);
         // Show success toast
@@ -149,7 +168,7 @@ const DailyChallenge: React.FC = () => {
 
           if (data.valid) {
             // Token is valid - clear localStorage and allow replay
-            const cleared = clearWordHuntResultForRetry(language as Language);
+            const cleared = clearWordHuntResultForRetry(gameLanguage);
             if (cleared) {
               setWasReset(true);
               neoSuccessToast(t('daily.retryLinkUsed'), { icon: '🔓', duration: 4000 });
@@ -198,7 +217,7 @@ const DailyChallenge: React.FC = () => {
       };
     }
     return undefined;
-  }, [searchParams, language, t]);
+  }, [searchParams, gameLanguage, t]);
 
   // Initialize Word Hunt daily challenge
   useEffect(() => {
@@ -214,13 +233,13 @@ const DailyChallenge: React.FC = () => {
       setPuzzleNumber(number);
 
       // Check if tutorial has been completed
-      const tutorialKey = `lexiclash_wordHunt_tutorial_completed_${language}`;
+      const tutorialKey = `lexiclash_wordHunt_tutorial_completed_${gameLanguage}`;
       const hasCompletedTutorial = typeof window !== 'undefined' && localStorage.getItem(tutorialKey) === 'true';
       setTutorialCompleted(hasCompletedTutorial);
 
       // Check if already played today
-      if (hasPlayedWordHuntToday(language as Language)) {
-        const result = getTodaysWordHuntResult(language as Language);
+      if (hasPlayedWordHuntToday(gameLanguage)) {
+        const result = getTodaysWordHuntResult(gameLanguage);
         if (!isMounted) return;
         setStoredResult(result);
         setPhase('already-played');
@@ -229,7 +248,7 @@ const DailyChallenge: React.FC = () => {
 
       // Try to fetch puzzle from API (includes AI-selected word if available)
       try {
-        const response = await fetch(`/api/daily-challenge/puzzle/${date}/${language}`);
+        const response = await fetch(`/api/daily-challenge/puzzle/${date}/${gameLanguage}`);
         if (!isMounted) return;
 
         if (response.ok) {
@@ -239,7 +258,7 @@ const DailyChallenge: React.FC = () => {
           setTargetWord(puzzleData.targetWord);
         } else {
           // Fall back to local generation
-          const puzzle = generateDailyPuzzle(date, language as Language);
+          const puzzle = generateDailyPuzzle(date, gameLanguage);
           if (!isMounted) return;
           setGrid(puzzle.grid);
           setTargetWord(puzzle.targetWord);
@@ -247,19 +266,14 @@ const DailyChallenge: React.FC = () => {
       } catch {
         // Fall back to local generation on network error
         if (!isMounted) return;
-        const puzzle = generateDailyPuzzle(date, language as Language);
+        const puzzle = generateDailyPuzzle(date, gameLanguage);
         setGrid(puzzle.grid);
         setTargetWord(puzzle.targetWord);
       }
 
-      // Show tutorial if not completed, otherwise go to ready screen
+      // Go to ready screen - tutorial is available via "How to Play" button
       if (!isMounted) return;
-      if (!hasCompletedTutorial) {
-        setShowTutorial(true);
-        setPhase('ready');
-      } else {
-        setPhase('ready');
-      }
+      setPhase('ready');
     };
 
     initializePuzzle();
@@ -267,7 +281,7 @@ const DailyChallenge: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [language, wasReset]); // Re-initialize when language changes or admin reset clears localStorage
+  }, [gameLanguage, wasReset]); // Re-initialize when game language changes or admin reset clears localStorage
 
   // Update countdown timer
   useEffect(() => {
@@ -293,7 +307,7 @@ const DailyChallenge: React.FC = () => {
     const wordHuntResult: WordHuntResult = {
       puzzleNumber,
       puzzleDate,
-      language: language as Language,
+      language: gameLanguage,
       solved: result.solved,
       attemptsUsed: result.attemptsUsed,
       targetWord: result.targetWord,
@@ -325,17 +339,17 @@ const DailyChallenge: React.FC = () => {
     });
 
     setPhase('completed');
-  }, [puzzleNumber, puzzleDate, language]);
+  }, [puzzleNumber, puzzleDate, gameLanguage]);
 
   // Handle tutorial completion
   const handleTutorialComplete = useCallback(() => {
-    const tutorialKey = `lexiclash_wordHunt_tutorial_completed_${language}`;
+    const tutorialKey = `lexiclash_wordHunt_tutorial_completed_${gameLanguage}`;
     if (typeof window !== 'undefined') {
       localStorage.setItem(tutorialKey, 'true');
     }
     setTutorialCompleted(true);
     setShowTutorial(false);
-  }, [language]);
+  }, [gameLanguage]);
 
   // Handle tutorial skip
   const handleTutorialSkip = useCallback(() => {
@@ -355,7 +369,7 @@ const DailyChallenge: React.FC = () => {
   // Handle retry challenge (paid with coins)
   const handleRetryChallenge = useCallback(() => {
     // Clear the stored result for today
-    const cleared = clearWordHuntResultForRetry(language as Language);
+    const cleared = clearWordHuntResultForRetry(gameLanguage);
     if (!cleared) {
       console.error('Failed to clear Word Hunt result for retry');
       return;
@@ -365,7 +379,7 @@ const DailyChallenge: React.FC = () => {
     setStoredResult(null);
     setGameResult(null);
     setPhase('ready');
-  }, [language]);
+  }, [gameLanguage]);
 
   // Render based on phase
   return (
@@ -395,14 +409,15 @@ const DailyChallenge: React.FC = () => {
           <DailyReadyScreen
             puzzleNumber={puzzleNumber}
             puzzleDate={puzzleDate}
-            language={language as Language}
-            currentFlag={getCurrentFlag(language as Language)}
+            language={gameLanguage}
+            currentFlag={getCurrentFlag(gameLanguage)}
             challengeData={challengeData}
             isAuthenticated={isAuthenticated}
             targetWordLength={targetWord?.length || 0}
             currentPlayerId={isAuthenticated && profile ? profile.id : null}
             guestFingerprint={!isAuthenticated ? guestFingerprint : null}
-            onLanguageChange={(lang) => setLanguage(lang)}
+            tutorialCompleted={tutorialCompleted}
+            onLanguageChange={setGameLanguage}
             onStart={handleStartGame}
             onBack={handleBack}
             onShowTutorial={handleShowTutorial}
@@ -414,7 +429,7 @@ const DailyChallenge: React.FC = () => {
           <DailyWordHuntSurvival
             grid={grid}
             puzzleNumber={puzzleNumber}
-            language={language as Language}
+            language={gameLanguage}
             targetWord={targetWord}
             onComplete={handleGameComplete}
             onQuit={handleBack}
@@ -426,11 +441,12 @@ const DailyChallenge: React.FC = () => {
             result={storedResult.result}
             puzzleNumber={puzzleNumber}
             puzzleDate={puzzleDate}
-            language={language as Language}
+            language={gameLanguage}
             countdown={countdown}
             isNewCompletion={phase === 'completed'}
             onBack={handleBack}
             onRetry={handleRetryChallenge}
+            onGameLanguageChange={setGameLanguage}
           />
         )}
       </AnimatePresence>
@@ -469,6 +485,7 @@ interface DailyReadyScreenProps {
   targetWordLength: number;
   currentPlayerId: string | null;
   guestFingerprint: string | null;
+  tutorialCompleted: boolean;
   onLanguageChange: (lang: Language) => void;
   onStart: () => void;
   onBack: () => void;
@@ -486,6 +503,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
   targetWordLength,
   currentPlayerId,
   guestFingerprint,
+  tutorialCompleted,
   onLanguageChange,
   onStart,
   onBack,
@@ -703,9 +721,19 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
         >
           <button
             onClick={onShowTutorial}
-            className="text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors flex items-center gap-1"
+            className={`text-sm font-bold transition-colors flex items-center gap-1 ${
+              !tutorialCompleted
+                ? 'text-neo-purple dark:text-neo-purple-light hover:text-neo-purple-dark'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+            }`}
           >
             <span>?</span> {t('daily.howToPlay')}
+            {!tutorialCompleted && (
+              <span className="relative flex h-2 w-2 ml-1">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-neo-purple opacity-75 animate-ping" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-purple" />
+              </span>
+            )}
           </button>
           <span className="text-gray-300 dark:text-gray-600">|</span>
           <button

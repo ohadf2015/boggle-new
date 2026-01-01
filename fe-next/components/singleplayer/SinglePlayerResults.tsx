@@ -62,7 +62,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   onBackToLobby,
 }) => {
   const { t, language } = useLanguage();
-  const { user, isAuthenticated, profile, updateProfile } = useAuth();
+  const { user, isAuthenticated, profile, updateProfile, loading: authLoading } = useAuth();
   const isLandscape = useMobileLandscape();
   const [expandedBot, setExpandedBot] = useState<string | null>(null);
   const [showSignupModal, setShowSignupModal] = useState(false);
@@ -310,8 +310,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   // Show signup prompt for guests who have played 2+ games
   useEffect(() => {
-    // Skip if authenticated or modal already shown this session
-    if (isAuthenticated) return;
+    // Skip if authenticated, has a user session (profile may still be loading), or auth is still loading
+    if (isAuthenticated || user || authLoading) return;
     if (typeof window === 'undefined') return;
 
     // Check if already shown this session
@@ -329,7 +329,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     }, 3500);
 
     return () => clearTimeout(timer);
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user, authLoading]);
 
 
   // Show word validation modal after game results load

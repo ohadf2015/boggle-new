@@ -74,6 +74,7 @@ export interface UseHostGameActionsReturn {
   handleShowQR: () => void;
   handleCancelTournamentDialog: () => void;
   handleHostWordSubmit: (word: string) => void;
+  regenerateBoard: () => void;
 }
 
 export function useHostGameActions(options: UseHostGameActionsOptions): UseHostGameActionsReturn {
@@ -306,6 +307,41 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     setHostFoundWords((prev: string[]) => [...prev, formedWord]);
   }, [setHostFoundWords]);
 
+  /**
+   * Regenerate the board with new words
+   * This allows the host to get a fresh board before starting the game
+   */
+  const regenerateBoard = useCallback(() => {
+    if (!socket) return;
+
+    // Request new words from server
+    const difficultyConfig = DIFFICULTIES[difficulty];
+    socket.emit('getWordsForBoard', {
+      language: roomLanguage,
+      boardSize: {
+        rows: difficultyConfig.rows,
+        cols: difficultyConfig.cols,
+      },
+    });
+
+    // The new words will be received via socket event and stored in wordsForBoard
+    // Generate a new board immediately with current words (will be updated when new words arrive)
+    const embedWords = roomLanguage !== 'ja' ? wordsForBoard : [];
+    const newTable = generateRandomTable(
+      difficultyConfig.rows,
+      difficultyConfig.cols,
+      roomLanguage,
+      embedWords
+    );
+
+    setTableData(newTable);
+
+    neoInfoToast(t('hostView.boardRegenerated') || 'Board regenerated!', {
+      icon: '🔄',
+      duration: 2000,
+    });
+  }, [socket, difficulty, roomLanguage, wordsForBoard, t, setTableData]);
+
   return {
     startGame,
     stopGame,
@@ -317,6 +353,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     handleShowQR,
     handleCancelTournamentDialog,
     handleHostWordSubmit,
+    regenerateBoard,
   };
 }
 

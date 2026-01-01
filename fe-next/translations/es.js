@@ -725,7 +725,9 @@ const es = {
     "players": "jugadores",
     "letterMinimum": "letras mínimo",
     "chat": "Chat",
-    "settings": "Ajustes"
+    "settings": "Ajustes",
+    "regenerateBoard": "Regenerar tablero",
+    "boardRegenerated": "¡Tablero regenerado!"
   },
   "tvBroadcast": {
     "joinAt": "Únete en",
@@ -2361,6 +2363,7 @@ const es = {
     "dictionary5": "¡Construyamos el diccionario juntos!",
     "notAWord": "No es una palabra",
     "realWord": "¡Palabra real!",
+    "dontKnow": "No lo sé",
     "nextWord": "Siguiente palabra...",
     "almostApproved": "¡Casi lista!",
     "votesNeeded": "{count} votos más para aprobar",

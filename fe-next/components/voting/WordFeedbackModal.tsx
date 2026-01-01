@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ThumbsUp, ThumbsDown, X, Book, CheckCircle } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, X, Book, CheckCircle, HelpCircle } from 'lucide-react';
 import Avatar from '../Avatar';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { applyHebrewFinalLetters } from '../../utils/utils';
@@ -186,6 +186,12 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
     }, 800);
   }, [hasVoted, onVote, currentWord.word, moveToNextWord]);
 
+  // Handle "I don't know" - skip without voting
+  const handleDontKnow = useCallback(() => {
+    if (hasVoted) return;
+    moveToNextWord();
+  }, [hasVoted, moveToNextWord]);
+
   // Handle timeout - move to next word instead of closing
   const handleTimeout = useCallback(() => {
     if (hasMoreWords) {
@@ -368,47 +374,68 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="flex gap-4 justify-center"
+                className="flex gap-3 justify-center"
               >
                 {/* Thumbs Down */}
                 <button
                   onClick={() => handleVote('dislike')}
                   className="
-                    flex-1 max-w-32
+                    flex-1 max-w-28
                     bg-neo-red text-neo-cream
                     border-3 border-neo-black
                     rounded-neo-lg
                     shadow-hard
-                    px-4 py-3
-                    font-bold uppercase text-sm
+                    px-3 py-3
+                    font-bold uppercase text-xs
                     flex flex-col items-center gap-2
                     hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
                     active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm
                     transition-all duration-150
                   "
                 >
-                  <ThumbsDown className="w-6 h-6" />
+                  <ThumbsDown className="w-5 h-5" />
                   <span>{t('wordFeedback.notAWord') || 'Not a word'}</span>
+                </button>
+
+                {/* I Don't Know */}
+                <button
+                  onClick={handleDontKnow}
+                  className="
+                    flex-1 max-w-28
+                    bg-neo-gray text-neo-black
+                    border-3 border-neo-black
+                    rounded-neo-lg
+                    shadow-hard
+                    px-3 py-3
+                    font-bold uppercase text-xs
+                    flex flex-col items-center gap-2
+                    hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
+                    active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm
+                    transition-all duration-150
+                  "
+                >
+                  <HelpCircle className="w-5 h-5" />
+                  <span>{t('wordFeedback.dontKnow') || "Don't know"}</span>
                 </button>
 
                 {/* Thumbs Up */}
                 <button
                   onClick={() => handleVote('like')}
                   className="
-                    flex-1 max-w-32
+                    flex-1 max-w-28
                     bg-neo-lime text-neo-black
                     border-3 border-neo-black
                     rounded-neo-lg
                     shadow-hard
-                    px-4 py-3
-                    font-bold uppercase text-sm
+                    px-3 py-3
+                    font-bold uppercase text-xs
                     flex flex-col items-center gap-2
                     hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
                     active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm
                     transition-all duration-150
                   "
                 >
-                  <ThumbsUp className="w-6 h-6" />
+                  <ThumbsUp className="w-5 h-5" />
                   <span>{t('wordFeedback.realWord') || 'Real word!'}</span>
                 </button>
               </motion.div>

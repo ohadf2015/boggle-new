@@ -14,6 +14,9 @@ import {
   generateRandomAvatar
 } from './consts';
 
+// Import word normalization for board verification
+import { normalizeWord } from '@/shared/utils/wordNormalization';
+
 // ==========================================
 // Type Definitions
 // ==========================================
@@ -125,6 +128,90 @@ export function normalizeLetterForBoard(letter: string, language: Language): str
 }
 
 // ==========================================
+// Word Validation for Board Verification
+// ==========================================
+
+/**
+ * Build a map of letter positions on the board for efficient path finding
+ */
+function makePositionsMap(board: LetterGrid, language: Language): Map<string, [number, number][]> {
+  const positions = new Map<string, [number, number][]>();
+  if (!board || board.length === 0) return positions;
+
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board[0].length; j++) {
+      const ch = normalizeWord(String(board[i][j]), language);
+      if (!positions.has(ch)) positions.set(ch, []);
+      positions.get(ch)!.push([i, j]);
+    }
+  }
+  return positions;
+}
+
+/**
+ * DFS search for word path on board with 8-directional adjacency
+ */
+function searchWordOnBoard(
+  board: LetterGrid,
+  word: string,
+  row: number,
+  col: number,
+  index: number,
+  visited: Set<string>,
+  language: Language
+): boolean {
+  if (index === word.length) return true;
+
+  if (row < 0 || row >= board.length || col < 0 || col >= board[0].length) return false;
+
+  const cellKey = `${row},${col}`;
+  if (visited.has(cellKey)) return false;
+
+  const cellNormalized = normalizeWord(board[row][col], language);
+  if (cellNormalized !== word[index]) return false;
+
+  visited.add(cellKey);
+
+  const allDirections: [number, number][] = [
+    [-1, -1], [-1, 0], [-1, 1],
+    [0, -1],           [0, 1],
+    [1, -1],  [1, 0],  [1, 1]
+  ];
+
+  for (const [dx, dy] of allDirections) {
+    if (searchWordOnBoard(board, word, row + dx, col + dy, index + 1, visited, language)) {
+      visited.delete(cellKey);
+      return true;
+    }
+  }
+
+  visited.delete(cellKey);
+  return false;
+}
+
+/**
+ * Check if a word exists on the board as a valid path
+ */
+function isWordOnBoard(word: string, letterGrid: LetterGrid, language: Language): boolean {
+  if (!letterGrid || !word || letterGrid.length === 0) return false;
+
+  const wordNormalized = normalizeWord(word, language);
+  const posMap = makePositionsMap(letterGrid, language);
+  const startPositions = posMap.get(wordNormalized[0]) || [];
+
+  for (const [startRow, startCol] of startPositions) {
+    if (searchWordOnBoard(letterGrid, wordNormalized, startRow, startCol, 0, new Set(), language)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+// Maximum number of board generation attempts
+const MAX_BOARD_GENERATION_ATTEMPTS = 5;
+
+// ==========================================
 // Grid Generation
 // ==========================================
 
@@ -174,7 +261,7 @@ export function generateRandomTable(
 }
 
 /**
- * Generate a table with embedded words
+ * Generate a table with embedded words and verify they exist on board
  */
 function generateTableWithEmbeddedWords(
   rows: number,
@@ -183,30 +270,108 @@ function generateTableWithEmbeddedWords(
   wordsToEmbed: string[],
   language: Language
 ): LetterGrid {
-  const grid: (string | null)[][] = Array(rows).fill(null).map(() => Array(cols).fill(null));
-  const usedCells = new Set<string>();
-
-  const totalCells = rows * cols;
-  const targetWords = Math.min(wordsToEmbed.length, Math.max(4, Math.floor(totalCells / 3)));
-
   const cleanedWords = language === 'he'
     ? wordsToEmbed.map(filterHebrewWord).filter(w => w.length >= 2)
     : wordsToEmbed;
 
   const sortedWords = [...cleanedWords].sort((a, b) => b.length - a.length);
 
-  let embeddedCount = 0;
+  const totalCells = rows * cols;
+  const targetWords = Math.min(sortedWords.length, Math.max(4, Math.floor(totalCells / 3)));
+  const lettersArray = typeof letters === 'string' ? letters.split('') : letters;
 
+  // Try multiple times to generate a valid board
+  for (let attempt = 0; attempt < MAX_BOARD_GENERATION_ATTEMPTS; attempt++) {
+    const result = attemptGenerateBoard(rows, cols, sortedWords, targetWords, lettersArray, language);
+
+    // Verify that embedded words can actually be found on the board
+    const missingWords = result.embeddedWords.filter(word => !isWordOnBoard(word, result.grid, language));
+
+    if (missingWords.length === 0) {
+      return result.grid;
+    }
+  }
+
+  // Fallback: generate a verified board
+  return generateVerifiedBoard(rows, cols, sortedWords, lettersArray, language);
+}
+
+/**
+ * Single attempt to generate a board with embedded words
+ */
+function attemptGenerateBoard(
+  rows: number,
+  cols: number,
+  sortedWords: string[],
+  targetWords: number,
+  lettersArray: string[],
+  language: Language
+): { grid: LetterGrid; embeddedWords: string[] } {
+  const grid: (string | null)[][] = Array(rows).fill(null).map(() => Array(cols).fill(null));
+  const usedCells = new Set<string>();
+  const embeddedWords: string[] = [];
+
+  let embeddedCount = 0;
   for (const word of sortedWords) {
     if (embeddedCount >= targetWords) break;
     if (word.length > Math.max(rows, cols)) continue;
 
     if (tryEmbedWord(grid, word, rows, cols, usedCells, language)) {
+      embeddedWords.push(word);
       embeddedCount++;
     }
   }
 
-  const lettersArray = typeof letters === 'string' ? letters.split('') : letters;
+  // Fill remaining empty cells
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      if (grid[i][j] === null) {
+        grid[i][j] = lettersArray[Math.floor(Math.random() * lettersArray.length)];
+      }
+    }
+  }
+
+  return { grid: grid as LetterGrid, embeddedWords };
+}
+
+/**
+ * Generate a verified board where each word is confirmed to exist after embedding
+ */
+function generateVerifiedBoard(
+  rows: number,
+  cols: number,
+  sortedWords: string[],
+  lettersArray: string[],
+  language: Language
+): LetterGrid {
+  const grid: (string | null)[][] = Array(rows).fill(null).map(() => Array(cols).fill(null));
+  const usedCells = new Set<string>();
+
+  for (const word of sortedWords) {
+    if (word.length > Math.max(rows, cols)) continue;
+
+    const gridCopy = grid.map(row => [...row]);
+    const usedCellsCopy = new Set(usedCells);
+
+    if (tryEmbedWord(gridCopy, word, rows, cols, usedCellsCopy, language)) {
+      const testGrid: LetterGrid = gridCopy.map(row =>
+        row.map(cell => cell ?? lettersArray[Math.floor(Math.random() * lettersArray.length)])
+      );
+
+      if (isWordOnBoard(word, testGrid, language)) {
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            if (gridCopy[i][j] !== null) {
+              grid[i][j] = gridCopy[i][j];
+            }
+          }
+        }
+        usedCellsCopy.forEach(cell => usedCells.add(cell));
+      }
+    }
+  }
+
+  // Fill remaining empty cells
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
       if (grid[i][j] === null) {

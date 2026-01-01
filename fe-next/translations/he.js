@@ -729,7 +729,9 @@ const he = {
     "players": "שחקנים",
     "letterMinimum": "אותיות מינימום",
     "chat": "צ'אט",
-    "settings": "הגדרות"
+    "settings": "הגדרות",
+    "regenerateBoard": "ערבב מחדש",
+    "boardRegenerated": "הלוח עורבב מחדש!"
   },
   "tvBroadcast": {
     "joinAt": "הצטרפו ב",
@@ -2365,6 +2367,7 @@ const he = {
     "dictionary5": "בנה את המילון שלנו ביחד!",
     "notAWord": "לא מילה",
     "realWord": "מילה אמיתית!",
+    "dontKnow": "לא יודע/ת",
     "nextWord": "מילה הבאה...",
     "almostApproved": "כמעט שם!",
     "votesNeeded": "עוד {count} הצבעות לאישור",

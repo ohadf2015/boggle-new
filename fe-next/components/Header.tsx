@@ -86,7 +86,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     "max-w-6xl lg:max-w-7xl 2xl:max-w-[1800px] mx-auto",
                     "flex items-center justify-between",
                     "px-1 xs:px-2 sm:px-4 md:px-6 lg:px-6 xl:px-8 2xl:px-10 py-2 xs:py-2 sm:py-2.5 lg:py-3 xl:py-3 2xl:py-3",
-                    "bg-gradient-to-br from-neo-cyan-muted/15 via-neo-cyan-muted/10 to-neo-lime/5",
+                    "bg-gradient-to-r from-neo-cyan/80 via-neo-cyan-muted/60 to-neo-lime/70",
                     "border-4 lg:border-4 xl:border-4 2xl:border-4 border-neo-black",
                     "shadow-hard-lg xl:shadow-hard-lg 2xl:shadow-hard-lg",
                     "rounded-neo-lg xl:rounded-neo-lg 2xl:rounded-neo-lg",

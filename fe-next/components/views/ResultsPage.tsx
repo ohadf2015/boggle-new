@@ -47,7 +47,7 @@ import { DIFFICULTIES } from '@/utils/consts';
 
 const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount, isHost = false, roomLanguage = 'en' }) => {
   const { t } = useLanguage();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const isLandscape = useMobileLandscape();
   const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
@@ -250,8 +250,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   // Show celebratory signup prompt for guests - triggered on scroll near bottom
   // This ensures it doesn't interfere with the word feedback modal
   useEffect(() => {
-    // Don't set up scroll listener if already shown, authenticated, or word feedback is showing
-    if (isAuthenticated || hasShownUpgradePrompt || !hasUpdatedStatsRef.current || showWordFeedback) {
+    // Don't set up scroll listener if already shown, authenticated, has user session, auth loading, or word feedback is showing
+    if (isAuthenticated || user || authLoading || hasShownUpgradePrompt || !hasUpdatedStatsRef.current || showWordFeedback) {
       return;
     }
 
@@ -298,7 +298,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       window.removeEventListener('scroll', handleScroll);
       clearTimeout(initialCheckTimeout);
     };
-  }, [isAuthenticated, hasShownUpgradePrompt, isCurrentUserWinner, showWordFeedback]);
+  }, [isAuthenticated, user, authLoading, hasShownUpgradePrompt, isCurrentUserWinner, showWordFeedback]);
 
   const handleExitRoom = () => {
     setShowExitConfirm(true);

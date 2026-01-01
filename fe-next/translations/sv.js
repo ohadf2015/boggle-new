@@ -728,7 +728,9 @@ const sv = {
     "players": "spelare",
     "letterMinimum": "bokstäver minimum",
     "chat": "Chatt",
-    "settings": "Inställningar"
+    "settings": "Inställningar",
+    "regenerateBoard": "Regenerera bräda",
+    "boardRegenerated": "Brädan har regenererats!"
   },
   "tvBroadcast": {
     "joinAt": "Gå med på",
@@ -2364,6 +2366,7 @@ const sv = {
     "dictionary5": "Forma vår ordbok tillsammans!",
     "notAWord": "Inte ett ord",
     "realWord": "Riktigt ord!",
+    "dontKnow": "Vet inte",
     "nextWord": "Nästa ord...",
     "almostApproved": "Nästan där!",
     "votesNeeded": "{count} röster till för att godkänna",

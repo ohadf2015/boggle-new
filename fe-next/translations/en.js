@@ -734,7 +734,9 @@ const en = {
     "players": "players",
     "letterMinimum": "letter minimum",
     "chat": "Chat",
-    "settings": "Settings"
+    "settings": "Settings",
+    "regenerateBoard": "Regenerate Board",
+    "boardRegenerated": "Board regenerated!"
   },
   "tvBroadcast": {
     "joinAt": "Join at",
@@ -2371,6 +2373,7 @@ const en = {
     "dictionary5": "Shape our dictionary together!",
     "notAWord": "Not a word",
     "realWord": "Real word!",
+    "dontKnow": "Don't know",
     "nextWord": "Next word...",
     "almostApproved": "Almost there!",
     "votesNeeded": "{count} more votes to approve",
@@ -2687,6 +2690,7 @@ const en = {
     "retryLinkInvalid": "Invalid link",
     "retryLinkError": "Link error",
     "howToPlay": "How to Play",
+    "firstTime": "(New?)",
     "canYouBeatMyScore": "Beat my score?",
     "targetWordLength": "Find the hidden word:",
     "onlyMatchingLength": "Only {length}-letter guesses count toward your 10 tries!",
