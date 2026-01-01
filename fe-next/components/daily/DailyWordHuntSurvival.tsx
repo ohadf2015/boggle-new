@@ -581,29 +581,74 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
     let cluesRevealed = 0;
 
-    // Check for GREEN clues (positional matches)
+    // Check for GREEN and YELLOW clues from discovered words
     // SIMPLIFIED: Any 3+ letter word can reveal clues at positions within target word range
     // This is incremental - only adds new clues, never removes existing ones
     if (normalizedWord.length >= 3) {
       setAccumulatedClues(prev => {
         const updated = new Map(prev);
         let newGreens = 0;
+        let newYellows = 0;
 
-        // Check positions up to the shorter of word length and target length
+        // Count how many of each letter are already GREEN in accumulated clues
+        const greenLetterCounts = new Map<string, number>();
+        updated.forEach((clue) => {
+          if (clue.type === 'green') {
+            greenLetterCounts.set(clue.letter, (greenLetterCounts.get(clue.letter) || 0) + 1);
+          }
+        });
+
+        // First pass: Check positions within target range for GREEN clues (exact matches)
         const checkLength = Math.min(normalizedWord.length, targetLength);
         for (let pos = 0; pos < checkLength; pos++) {
+          const wordLetter = normalizedWord[pos];
+          const targetLetter = normalizedTarget[pos];
+
           // If the discovered word has a letter at this position that matches target
-          if (normalizedWord[pos] === normalizedTarget[pos]) {
+          if (wordLetter === targetLetter) {
             // Only add if not already green at this position (incremental)
             const existing = updated.get(pos);
             if (!existing || existing.type !== 'green') {
-              updated.set(pos, { letter: normalizedWord[pos], type: 'green' });
+              updated.set(pos, { letter: wordLetter, type: 'green' });
               newGreens++;
+              // Update green count
+              greenLetterCounts.set(wordLetter, (greenLetterCounts.get(wordLetter) || 0) + 1);
             }
           }
         }
 
-        cluesRevealed += newGreens;
+        // Second pass: Check for YELLOW clues (letters in wrong position)
+        // Only add yellow if:
+        // 1. Letter exists in target but not at this position
+        // 2. No green already at this position
+        // 3. Target has more instances of this letter than we've found green
+        for (let pos = 0; pos < checkLength; pos++) {
+          const wordLetter = normalizedWord[pos];
+          const targetLetter = normalizedTarget[pos];
+          const existing = updated.get(pos);
+
+          // Skip if already green at this position or if it's a correct position match
+          if (wordLetter === targetLetter || existing?.type === 'green') {
+            continue;
+          }
+
+          // Check if letter exists in target word
+          const targetCount = targetLetterCounts.get(wordLetter) || 0;
+          const greenCount = greenLetterCounts.get(wordLetter) || 0;
+
+          // Only add yellow if target has this letter and has more instances than greens
+          if (targetCount > 0 && targetCount > greenCount) {
+            // Only add if no clue exists at this position, or if existing is yellow (keep yellow)
+            if (!existing || existing.type === 'yellow') {
+              updated.set(pos, { letter: wordLetter, type: 'yellow' });
+              if (!existing) {
+                newYellows++;
+              }
+            }
+          }
+        }
+
+        cluesRevealed += newGreens + newYellows;
         return updated;
       });
     }

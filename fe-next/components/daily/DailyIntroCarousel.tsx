@@ -13,7 +13,7 @@ export interface DailyIntroCarouselProps {
   className?: string;
 }
 
-const TOTAL_STEPS = 3;
+const TOTAL_STEPS = 4;
 const AUTO_ADVANCE_DELAY = 4500; // 4.5 seconds
 const PAUSE_AFTER_INTERACTION = 3000; // Resume after 3s of no interaction
 
@@ -108,6 +108,7 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
             {currentStep === 0 && <Step1SwipeDemo isRTL={isRTL} t={t} />}
             {currentStep === 1 && <Step2ColorFeedback t={t} />}
             {currentStep === 2 && <Step3FindWord targetWordLength={targetWordLength} t={t} />}
+            {currentStep === 3 && <Step4ClueRevelation t={t} />}
           </motion.div>
         </AnimatePresence>
       </div>
@@ -316,6 +317,95 @@ const Step3FindWord: React.FC<{ targetWordLength: number; t: (key: string, param
 
       <div className="text-xs text-neo-purple dark:text-neo-purple-light font-bold mt-3">
         {t('daily.carousel.step3Hint', { length: displayLength }) || `Guess ${displayLength}-letter words to reveal clues`}
+      </div>
+    </div>
+  );
+};
+
+// Step 4: Clue Revelation from Discovered Words
+const Step4ClueRevelation: React.FC<{ t: (key: string) => string }> = ({ t }) => {
+  return (
+    <div className="text-center py-2">
+      <div className="text-base font-bold text-neo-purple dark:text-neo-purple-light mb-4">
+        {t('daily.carousel.step4Title') || 'Discover Words, Reveal Clues'}
+      </div>
+
+      {/* Visual demonstration */}
+      <div className="flex flex-col items-center gap-3 mb-4">
+        {/* Example word discovery */}
+        <motion.div
+          className="flex items-center gap-2"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <div className="flex gap-1">
+            {['C', 'A', 'T'].map((letter, idx) => (
+              <motion.div
+                key={idx}
+                className="w-8 h-8 rounded-lg border-2 border-neo-black bg-neo-lime flex items-center justify-center font-bold text-sm text-neo-black shadow-[2px_2px_0px_rgb(0,0,0)]"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.3 + idx * 0.1, type: 'spring' }}
+              >
+                {letter}
+              </motion.div>
+            ))}
+          </div>
+          <motion.span
+            className="text-xl"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            💡
+          </motion.span>
+        </motion.div>
+
+        {/* Arrow */}
+        <motion.div
+          className="text-neo-purple dark:text-neo-purple-light text-2xl"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+        >
+          ↓
+        </motion.div>
+
+        {/* Revealed clue boxes */}
+        <motion.div
+          className="flex gap-1.5"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.2 }}
+        >
+          {[
+            { letter: 'C', type: 'green' },
+            { letter: 'A', type: 'yellow' },
+            { letter: '?', type: 'unknown' },
+            { letter: 'T', type: 'green' },
+          ].map((box, idx) => (
+            <motion.div
+              key={idx}
+              className={cn(
+                'w-9 h-9 rounded-lg border-2 border-neo-black flex items-center justify-center font-bold text-sm shadow-[2px_2px_0px_rgb(0,0,0)]',
+                box.type === 'green' && 'bg-green-500 text-neo-black',
+                box.type === 'yellow' && 'bg-yellow-500 text-neo-black',
+                box.type === 'unknown' && 'bg-neo-black text-white'
+              )}
+              initial={{ scale: 0, rotateY: 90 }}
+              animate={{ scale: 1, rotateY: 0 }}
+              transition={{ delay: 1.3 + idx * 0.1, type: 'spring' }}
+            >
+              {box.letter}
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+
+      {/* Description */}
+      <div className="text-sm text-gray-600 dark:text-gray-300 mt-3 font-medium">
+        {t('daily.carousel.step4Desc') || 'Every word 3+ letters reveals clues!'}
       </div>
     </div>
   );
