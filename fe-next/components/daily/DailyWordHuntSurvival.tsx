@@ -562,15 +562,77 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     setClueTokens(prev => prev + tokensGained);
     playWordAcceptedSound?.();
 
+    // ENHANCED: Reveal letter clues from discovered words (longer words can reveal positional clues)
+    // If the word is >= target length, check for positional matches (GREEN clues)
+    // Also check for letters that exist in target (YELLOW clues / knownLetters)
+    const normalizedWord = word.toUpperCase();
+    const normalizedTarget = targetWord.toUpperCase();
+    const targetLength = normalizedTarget.length;
+
+    // Count letters in target for yellow tracking (handles duplicates)
+    const targetLetterCounts = new Map<string, number>();
+    normalizedTarget.split('').forEach(letter => {
+      targetLetterCounts.set(letter, (targetLetterCounts.get(letter) || 0) + 1);
+    });
+
+    let cluesRevealed = 0;
+
+    // Check for GREEN clues (positional matches) - only for positions that exist in target
+    if (normalizedWord.length >= targetLength) {
+      setAccumulatedClues(prev => {
+        const updated = new Map(prev);
+        let newGreens = 0;
+
+        for (let pos = 0; pos < targetLength; pos++) {
+          // If the discovered word has a letter at this position that matches target
+          if (normalizedWord[pos] === normalizedTarget[pos]) {
+            // Only add if not already green at this position
+            const existing = updated.get(pos);
+            if (!existing || existing.type !== 'green') {
+              updated.set(pos, { letter: normalizedWord[pos], type: 'green' });
+              newGreens++;
+            }
+          }
+        }
+
+        cluesRevealed += newGreens;
+        return updated;
+      });
+    }
+
+    // Check for YELLOW clues (letters exist in target but at different positions)
+    // Add to knownLetters for the "Contains:" display
+    setKnownLetters(prev => {
+      const updated = new Set(prev);
+      const usedCounts = new Map<string, number>();
+
+      // First count how many greens we have for each letter
+      // (we need to read current accumulatedClues, but it's async - so we check the word itself)
+      for (const letter of normalizedWord) {
+        const targetCount = targetLetterCounts.get(letter) || 0;
+        if (targetCount > 0) {
+          const used = usedCounts.get(letter) || 0;
+          if (used < targetCount) {
+            usedCounts.set(letter, used + 1);
+            // Add to known letters if not already revealed
+            updated.add(letter);
+          }
+        }
+      }
+
+      return updated;
+    });
+
     // Trigger life gain animation
     setLifeGainAmount(lifeGained);
     setIsLifeGaining(true);
     // Reset animation trigger after animation completes
     setTimeout(() => setIsLifeGaining(false), 600);
 
-    // Show success feedback (toast only - no duplicate inline feedback)
-    showToast('valid-word', `+${lifeGained} ❤️ ${tokensGained > 0 ? `+${tokensGained} 🪙` : ''}`);
-  }, [discoveredWords, grid, language, playWordAcceptedSound, showToast, t, validateWordInDictionary]);
+    // Show success feedback with clue bonus if applicable
+    const clueBonus = cluesRevealed > 0 ? ` 💡+${cluesRevealed}` : '';
+    showToast('valid-word', `+${lifeGained} ❤️ ${tokensGained > 0 ? `+${tokensGained} 🪙` : ''}${clueBonus}`);
+  }, [discoveredWords, grid, language, playWordAcceptedSound, showToast, t, targetWord, validateWordInDictionary]);
 
   // Handle game over
   const handleGameOver = useCallback(async (won: boolean, finalAttempts?: TargetAttempt[]) => {

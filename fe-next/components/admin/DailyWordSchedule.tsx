@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Calendar, Sparkles, Edit2, Save, X, RefreshCw, AlertCircle, Check,
   Users, Trash2, RotateCcw, Search, ChevronDown, ChevronUp, Eye, Grid, List,
-  ChevronLeft, ChevronRight, Copy, AlertTriangle, Link
+  ChevronLeft, ChevronRight, Copy, AlertTriangle, Link, Shuffle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -99,6 +99,9 @@ export const DailyWordSchedule: React.FC = () => {
   const [setTodayModalOpen, setSetTodayModalOpen] = useState(false);
   const [todayWordValue, setTodayWordValue] = useState('');
   const [resetTodayAttempts, setResetTodayAttempts] = useState(false);
+
+  // Regenerate board state
+  const [regeneratingBoard, setRegeneratingBoard] = useState<string | null>(null);
 
   const supabase = createClient();
 
@@ -633,6 +636,44 @@ export const DailyWordSchedule: React.FC = () => {
     }
   };
 
+  // Regenerate the board for a specific date (shuffle with new words)
+  const handleRegenerateBoard = async (puzzleDate: string) => {
+    if (regeneratingBoard) return; // Prevent multiple simultaneous regenerations
+
+    setRegeneratingBoard(puzzleDate);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/admin/daily-word/regenerate-board', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          puzzleDate,
+          language: selectedLang,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to regenerate board');
+      }
+
+      const result = await response.json();
+      setSuccessMessage(
+        `Board regenerated for ${formatDate(puzzleDate)} - ${result.puzzle.gridDimensions.rows}x${result.puzzle.gridDimensions.cols} grid with "${result.puzzle.targetWord}"`
+      );
+      setTimeout(() => setSuccessMessage(null), 5000);
+
+      // Refresh the list
+      await fetchScheduledWords();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to regenerate board');
+    } finally {
+      setRegeneratingBoard(null);
+    }
+  };
+
   // Get date range info for display
   const getDateRangeInfo = () => {
     const today = new Date();
@@ -963,6 +1004,23 @@ export const DailyWordSchedule: React.FC = () => {
                     onClick={(e) => {
                       e.stopPropagation();
                       if (word) {
+                        handleRegenerateBoard(dateStr);
+                      }
+                    }}
+                    disabled={regeneratingBoard === dateStr}
+                    className="p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 disabled:opacity-50"
+                    title="Shuffle board (regenerate with new letters)"
+                  >
+                    {regeneratingBoard === dateStr ? (
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Shuffle className="w-4 h-4" />
+                    )}
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (word) {
                         toggleExpanded(dateStr);
                       }
                     }}
@@ -1167,6 +1225,21 @@ export const DailyWordSchedule: React.FC = () => {
                           >
                             <RotateCcw className="w-4 h-4 sm:mr-1" />
                             <span className="hidden sm:inline">Replace</span>
+                          </Button>
+
+                          <Button
+                            onClick={() => handleRegenerateBoard(dateStr)}
+                            disabled={regeneratingBoard === dateStr}
+                            size="sm"
+                            className="bg-blue-500 hover:bg-blue-600 text-white p-2 sm:px-3"
+                            title="Regenerate board with new letter arrangement (keeps same target word)"
+                          >
+                            {regeneratingBoard === dateStr ? (
+                              <RefreshCw className="w-4 h-4 animate-spin sm:mr-1" />
+                            ) : (
+                              <Shuffle className="w-4 h-4 sm:mr-1" />
+                            )}
+                            <span className="hidden sm:inline">Shuffle</span>
                           </Button>
 
                           <Button
