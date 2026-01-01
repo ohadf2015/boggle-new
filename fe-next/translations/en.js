@@ -538,7 +538,8 @@ const en = {
       },
       "activeRoomsPreview": "Rooms",
       "playersOnline": "online",
-      "noRooms": "No rooms - create one!"
+      "noRooms": "No rooms - create one!",
+      "roomsRefreshed": "Rooms refreshed"
     },
     "editProfile": "Edit",
     "profileSetup": {

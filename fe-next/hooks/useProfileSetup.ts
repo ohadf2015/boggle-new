@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { validateUsername } from '@/utils/validation';
 import { useDebouncedValidation } from '@/hooks/useDebouncedValidation';
 import { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
@@ -94,27 +94,32 @@ export function useProfileSetup(options: UseProfileSetupOptions): UseProfileSetu
   const [avatarError, setAvatarError] = useState(false);
   const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
 
+  // Track if username has been manually set to prevent overwrites
+  const usernameLoadedRef = useRef<boolean>(!!initialUsername);
+
   // Load from localStorage on mount (only for guests)
   useEffect(() => {
-    if (typeof window !== 'undefined' && !isAuthenticated) {
+    if (typeof window !== 'undefined' && !isAuthenticated && !usernameLoadedRef.current) {
       const savedUsername = localStorage.getItem('boggle_username');
       const savedAvatarId = localStorage.getItem('boggle_avatar_id');
 
       if (savedUsername && !username) {
         setUsername(savedUsername);
+        usernameLoadedRef.current = true;
       }
       if (savedAvatarId && !selectedAvatarId) {
         setSelectedAvatarId(savedAvatarId);
       }
     }
-  }, [isAuthenticated]); // Only run on mount and auth change
+  }, [isAuthenticated, username, selectedAvatarId]); // Include username/selectedAvatarId to properly check state
 
-  // For authenticated users, use display name
+  // For authenticated users, use display name - but only if username hasn't been set yet
   useEffect(() => {
-    if (isAuthenticated && displayName && !username) {
+    if (isAuthenticated && displayName && !username && !usernameLoadedRef.current) {
       setUsername(displayName);
+      usernameLoadedRef.current = true;
     }
-  }, [isAuthenticated, displayName]);
+  }, [isAuthenticated, displayName, username]);
 
   // Real-time validation
   const usernameValidation = useDebouncedValidation(username, {

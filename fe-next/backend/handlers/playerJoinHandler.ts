@@ -43,7 +43,7 @@ const {
 const { emitError, ErrorMessages } = require('../utils/errorHandler');
 const { checkRateLimit } = require('../utils/rateLimiter');
 const timerManager = require('../utils/timerManager');
-const botManager = require('../modules/botManager');
+const { cleanupGameBots } = require('../modules/botManager');
 const tournamentManager = require('../modules/tournamentManager');
 const { generateRandomAvatar } = require('../utils/gameUtils');
 const { ACHIEVEMENT_ICONS } = require('../modules/achievementManager');
@@ -282,7 +282,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     if (isRoomEmpty(gameCode)) {
       logger.info('SOCKET', `Room ${gameCode} is empty after ${username} left - closing immediately`);
       timerManager.clearGameTimer(gameCode);
-      botManager.stopAllBots(gameCode);
+      cleanupGameBots(gameCode);
       deleteGame(gameCode);
       io.emit('activeRooms', { rooms: getActiveRooms() });
       return;
@@ -425,7 +425,7 @@ async function handleExistingAuthConnectionJoin(io: Server, socket: Socket, auth
     if (isRoomEmpty(existingConnection.gameCode)) {
       logger.info('SOCKET', `Room ${existingConnection.gameCode} is empty after ${existingConnection.username} left to join ${gameCode} - closing immediately`);
       timerManager.clearGameTimer(existingConnection.gameCode);
-      botManager.stopAllBots(existingConnection.gameCode);
+      cleanupGameBots(existingConnection.gameCode);
       deleteGame(existingConnection.gameCode);
       io.emit('activeRooms', { rooms: getActiveRooms() });
     } else {

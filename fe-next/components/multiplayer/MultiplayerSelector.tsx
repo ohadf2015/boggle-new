@@ -3,9 +3,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 import { Crown, LogIn, ArrowLeft, Users } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LANGUAGE_FLAGS } from '@/lib/languageConfig';
 import type { ActiveRoom, Language } from '@/shared/types/game';
@@ -17,6 +20,7 @@ interface MultiplayerSelectorProps {
   activeRooms: ActiveRoom[];
   onQuickJoin: (roomCode: string) => void;
   roomsLoading: boolean;
+  onRefreshRooms: () => void;
 }
 
 /**
@@ -29,8 +33,23 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
   activeRooms,
   onQuickJoin,
   roomsLoading,
+  onRefreshRooms,
 }) => {
   const { t, dir } = useLanguage();
+
+  // Pull-to-refresh for room list
+  const { pullToRefreshHandlers, pullState } = usePullToRefresh({
+    onRefresh: async () => {
+      onRefreshRooms();
+      // Small delay to allow socket response
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      toast.success(t('multiplayerFlow.selector.roomsRefreshed') || 'Rooms refreshed', {
+        duration: 2000,
+        icon: '🔄',
+      });
+    },
+    threshold: 60,
+  });
 
   // Show up to 3 rooms in preview
   const previewRooms = activeRooms.slice(0, 3);
@@ -40,7 +59,17 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
     <>
       <LandscapeIndicator />
 
-      <div dir={dir} className="screen-fit bg-gradient-to-b from-neo-navy via-neo-navy-light to-neo-navy">
+      <div
+        dir={dir}
+        className="screen-fit bg-gradient-to-b from-neo-navy via-neo-navy-light to-neo-navy relative overflow-hidden"
+        {...pullToRefreshHandlers}
+      >
+        {/* Pull-to-refresh indicator */}
+        <PullToRefreshIndicator
+          pullDistance={pullState.pullDistance}
+          isRefreshing={pullState.isRefreshing}
+          threshold={60}
+        />
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
