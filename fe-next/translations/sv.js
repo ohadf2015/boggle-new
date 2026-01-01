@@ -2714,7 +2714,9 @@ const sv = {
       "step2Colors": "green,yellow,gray,green",
       "step3Title": "Hitta det gömda ordet",
       "step3Desc": "10 försök att knäcka koden",
-      "step3Hint": "Gissa ord med {length} bokstäver för ledtrådar"
+      "step3Hint": "Gissa ord med {length} bokstäver för ledtrådar",
+      "step4Title": "Hitta ord, avslöja ledtrådar",
+      "step4Desc": "Varje ord på 3+ bokstäver ger ledtrådar!"
     },
     "share": {
       "header": "LexiClash Daily #{number}",

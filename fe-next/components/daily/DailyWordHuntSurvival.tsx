@@ -1229,7 +1229,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
             <span className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
-              {lifePoints}/100
+              {Math.floor(lifePoints)}/100
             </span>
           </motion.div>
 

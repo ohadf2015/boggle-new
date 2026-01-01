@@ -2715,7 +2715,9 @@ const he = {
       "step2Colors": "green,yellow,gray,green",
       "step3Title": "מצאו את המילה",
       "step3Desc": "10 ניסיונות לפצח את הקוד",
-      "step3Hint": "נחשו מילים בנות {length} אותיות לגילוי רמזים"
+      "step3Hint": "נחשו מילים בנות {length} אותיות לגילוי רמזים",
+      "step4Title": "גלו מילים, חשפו רמזים",
+      "step4Desc": "כל מילה של 3+ אותיות חושפת רמזים!"
     },
     "share": {
       "header": "אתגר יומי #{number} LexiClash",

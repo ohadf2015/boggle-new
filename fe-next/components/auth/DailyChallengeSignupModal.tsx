@@ -201,7 +201,7 @@ const DailyChallengeSignupModal: React.FC<DailyChallengeSignupModalProps> = ({
           exit={{ scale: 0.8, opacity: 0, y: 20 }}
           transition={{ type: 'spring', damping: 20, stiffness: 300 }}
           className={cn(
-            'w-full max-w-md rounded-2xl p-6 shadow-2xl overflow-hidden relative',
+            'w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-2xl relative',
             isDarkMode
               ? 'bg-gradient-to-b from-slate-800 via-slate-800 to-slate-900 border border-orange-500/30'
               : 'bg-gradient-to-b from-white via-white to-gray-50 border border-orange-400/50'

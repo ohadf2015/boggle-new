@@ -96,43 +96,83 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     "min-w-0"
                 )}
             >
-                {/* Logo */}
+                {/* Logo - Clean design matching OG image */}
                 <motion.button
-                    className="flex items-center gap-1 xs:gap-2 sm:gap-3 lg:gap-3 2xl:gap-4 cursor-pointer bg-transparent border-none p-0 flex-shrink-0"
+                    className="flex items-center gap-0.5 xs:gap-1 sm:gap-1.5 cursor-pointer bg-transparent border-none p-0 flex-shrink-0 relative"
                     onClick={handleLogoClick}
-                    whileHover={{ x: -2, y: -2 }}
-                    whileTap={{ x: 2, y: 2 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     aria-label={t('common.goToHome') || 'Go to home page'}
                 >
+                    {/* Small yellow sparkle - top left decorative */}
+                    <svg className="w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3 absolute -top-1 xs:-top-2 left-2 xs:left-4 text-neo-yellow hidden xs:block" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0L14 10L24 12L14 14L12 24L10 14L0 12L10 10L12 0Z"/>
+                    </svg>
+
+                    {/* Pink lightning bolt - left */}
+                    <svg
+                        className="w-4 h-5 xs:w-5 xs:h-6 sm:w-6 sm:h-7 lg:w-7 lg:h-8 xl:w-8 xl:h-10 flex-shrink-0"
+                        viewBox="0 0 24 32"
+                        fill="none"
+                        style={{ transform: 'rotate(-15deg)' }}
+                    >
+                        <path
+                            d="M14 2L4 18h7l-3 12 13-18h-8l5-10H14z"
+                            fill="var(--neo-pink)"
+                            stroke="#1a365d"
+                            strokeWidth="2"
+                            strokeLinejoin="round"
+                        />
+                    </svg>
+
                     <h1
-                        className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl 2xl:text-5xl font-black uppercase tracking-tight flex items-center gap-0 flex-shrink min-w-0 overflow-hidden landscape:text-lg landscape:xs:text-xl landscape:sm:text-2xl"
+                        className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl font-black uppercase tracking-tight flex items-center gap-0.5 flex-shrink min-w-0 landscape:text-lg landscape:xs:text-xl landscape:sm:text-2xl"
                         style={{ fontFamily }}
                     >
-                        {/* Pink lightning - left side */}
-                        <span className="text-neo-pink text-sm xs:text-base sm:text-lg lg:text-xl xl:text-2xl -mr-0.5 xs:-mr-1" style={{ transform: 'rotate(-15deg)' }}>⚡</span>
-                        {/* LEXI - Cyan with dark outline like og-image */}
+                        {/* LEXI - Cyan with clean dark outline */}
                         <span
                             className="text-neo-cyan relative"
                             style={{
-                                textShadow: '2px 2px 0px #1a365d, 3px 3px 0px #1a365d, 4px 4px 0px #1a365d, -1px -1px 0px #1a365d, 1px -1px 0px #1a365d, -1px 1px 0px #1a365d',
-                                WebkitTextStroke: '1.5px #1a365d',
+                                WebkitTextStroke: '2px #1a365d',
+                                paintOrder: 'stroke fill',
+                                textShadow: '3px 3px 0px #1a365d',
                             }}
                         >
                             {t('logo.lexi')}
                         </span>
-                        {/* CLASH - Yellow with dark outline like og-image */}
+                        {/* CLASH - Yellow with clean dark outline */}
                         <span
                             className="text-neo-yellow relative"
                             style={{
-                                textShadow: '2px 2px 0px #1a365d, 3px 3px 0px #1a365d, 4px 4px 0px #1a365d, -1px -1px 0px #1a365d, 1px -1px 0px #1a365d, -1px 1px 0px #1a365d',
-                                WebkitTextStroke: '1.5px #1a365d',
+                                WebkitTextStroke: '2px #1a365d',
+                                paintOrder: 'stroke fill',
+                                textShadow: '3px 3px 0px #1a365d',
                             }}
                         >
                             {t('logo.clash')}
                         </span>
-                        {/* Yellow lightning - right side */}
-                        <span className="text-neo-yellow text-sm xs:text-base sm:text-lg lg:text-xl xl:text-2xl -ml-0.5 xs:-ml-1" style={{ transform: 'rotate(15deg)' }}>⚡</span>
                     </h1>
+
+                    {/* Yellow lightning bolt - right */}
+                    <svg
+                        className="w-4 h-5 xs:w-5 xs:h-6 sm:w-6 sm:h-7 lg:w-7 lg:h-8 xl:w-8 xl:h-10 flex-shrink-0"
+                        viewBox="0 0 24 32"
+                        fill="none"
+                        style={{ transform: 'rotate(15deg)' }}
+                    >
+                        <path
+                            d="M14 2L4 18h7l-3 12 13-18h-8l5-10H14z"
+                            fill="var(--neo-yellow)"
+                            stroke="#1a365d"
+                            strokeWidth="2"
+                            strokeLinejoin="round"
+                        />
+                    </svg>
+
+                    {/* Small pink sparkle - top right decorative */}
+                    <svg className="w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3 absolute -top-1 xs:-top-2 right-0 xs:right-2 text-neo-pink hidden xs:block" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0L14 10L24 12L14 14L12 24L10 14L0 12L10 10L12 0Z"/>
+                    </svg>
                 </motion.button>
 
                 {/* Desktop Controls: visible on sm+ */}

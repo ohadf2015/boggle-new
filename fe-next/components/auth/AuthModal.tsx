@@ -271,7 +271,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
           exit={{ scale: 0.95, opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           className={cn(
-            'w-full max-w-md rounded-2xl p-6 shadow-2xl',
+            'w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-2xl',
             isDarkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white'
           )}
           onClick={(e) => e.stopPropagation()}

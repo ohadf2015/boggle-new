@@ -2711,7 +2711,9 @@ const es = {
       "step2Colors": "green,yellow,gray,green",
       "step3Title": "Encuentra la palabra oculta",
       "step3Desc": "10 intentos para descifrar",
-      "step3Hint": "Adivina palabras de {length} letras para ver pistas"
+      "step3Hint": "Adivina palabras de {length} letras para ver pistas",
+      "step4Title": "Descubre palabras, revela pistas",
+      "step4Desc": "Cada palabra de 3+ letras revela pistas!"
     },
     "share": {
       "header": "LexiClash Daily #{number}",

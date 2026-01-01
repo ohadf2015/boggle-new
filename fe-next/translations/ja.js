@@ -2713,7 +2713,9 @@ const ja = {
       "step2Colors": "green,yellow,gray,green",
       "step3Title": "隠された単語を見つけよう",
       "step3Desc": "10回でコードを解読",
-      "step3Hint": "{length}文字の単語を当ててヒントをゲット"
+      "step3Hint": "{length}文字の単語を当ててヒントをゲット",
+      "step4Title": "単語を見つけてヒントを発見",
+      "step4Desc": "3文字以上の単語でヒントが出る!"
     },
     "share": {
       "header": "LexiClash Daily #{number}",

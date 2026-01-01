@@ -2720,7 +2720,9 @@ const en = {
       "step2Colors": "green,yellow,gray,green",
       "step3Title": "Find the Hidden Word",
       "step3Desc": "10 tries to crack the code",
-      "step3Hint": "Guess {length}-letter words to unlock clues"
+      "step3Hint": "Guess {length}-letter words to unlock clues",
+      "step4Title": "Discover Words, Reveal Clues",
+      "step4Desc": "Every word 3+ letters reveals clues!"
     },
     "share": {
       "header": "LexiClash Daily #{number}",
