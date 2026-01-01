@@ -171,6 +171,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
           activeRooms={activeRooms}
           onQuickJoin={handleQuickJoin}
           roomsLoading={roomsLoading}
+          onRefreshRooms={refreshRooms}
         />
       );
 

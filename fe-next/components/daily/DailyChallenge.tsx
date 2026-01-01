@@ -13,7 +13,6 @@ import { DailyChallengeTutorial } from './DailyChallengeTutorial';
 import DailyIntroCarousel from './DailyIntroCarousel';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import {
   generateDailyPuzzle,
   getDailyChallengeDate,
@@ -75,7 +74,6 @@ const DailyChallenge: React.FC = () => {
     };
     return flags[lang] || '🌐';
   };
-  const isLandscape = useMobileLandscape();
 
   // Challenge state (from URL parameter)
   const [challengeData, setChallengeData] = useState<ChallengeData | null>(null);
@@ -369,13 +367,10 @@ const DailyChallenge: React.FC = () => {
     setPhase('ready');
   }, [language]);
 
-  // Hide header completely in landscape mode during gameplay (not just auto-hide)
-  const showHeader = !(phase === 'playing' && isLandscape);
-
   // Render based on phase
   return (
     <div className="flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
-      {showHeader && <AutoHideHeader />}
+      <AutoHideHeader />
 
       <AnimatePresence mode="wait">
         {phase === 'loading' && (

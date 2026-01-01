@@ -41,6 +41,10 @@ export interface Bot {
   burstChance: number;
   pauseChance: number;
   comboFocus: boolean;
+  // Dynamic timing params (loaded from database, optional)
+  dynamicMinDelay?: number;
+  dynamicMaxDelay?: number;
+  dynamicStartDelay?: number;
 }
 
 // Word submission callback data
@@ -63,6 +67,24 @@ const playerWordsCache = new Map<string, CacheEntry<string[]>>();
 
 // Cache for blacklisted words (words bots should not use)
 const blacklistCache = new Map<string, CacheEntry<Set<string>>>();
+
+// Cache for dynamic difficulty params (loaded from bot_difficulty_params table)
+interface DynamicDifficultyParams {
+  adjustedWordsPerMinute: number;
+  adjustedMissChance: number;
+  adjustedWrongWordChance: number;
+  adjustedMinDelay: number;
+  adjustedMaxDelay: number;
+  adjustedStartDelay: number;
+  sampleSize: number;
+  calculatedAt: Date;
+}
+const difficultyParamsCache = new Map<string, CacheEntry<DynamicDifficultyParams>>();
+const DIFFICULTY_PARAMS_TTL = 5 * 60 * 1000; // 5 minutes cache
+
+// Cache for player wrong words (real mistakes players make)
+const wrongWordsCache = new Map<string, CacheEntry<string[]>>();
+const WRONG_WORDS_TTL = 10 * 60 * 1000; // 10 minutes cache
 
 // ==========================================
 // Cache Management
@@ -196,13 +218,133 @@ export function getCacheStats(): {
   playerWordsCacheLanguages: string[];
   blacklistCacheSize: number;
   blacklistCacheLanguages: string[];
+  difficultyParamsCacheSize: number;
+  wrongWordsCacheSize: number;
 } {
   return {
     playerWordsCacheSize: playerWordsCache.size,
     playerWordsCacheLanguages: Array.from(playerWordsCache.keys()),
     blacklistCacheSize: blacklistCache.size,
     blacklistCacheLanguages: Array.from(blacklistCache.keys()),
+    difficultyParamsCacheSize: difficultyParamsCache.size,
+    wrongWordsCacheSize: wrongWordsCache.size,
   };
+}
+
+/**
+ * Get cached dynamic difficulty parameters for a language/difficulty combo
+ * These are calculated hourly by the bot-difficulty-calculator Edge Function
+ * @param language - Language code
+ * @param difficulty - Difficulty level
+ * @returns Dynamic params or null if not available
+ */
+export async function getCachedDifficultyParams(
+  language: string,
+  difficulty: 'easy' | 'medium' | 'hard'
+): Promise<DynamicDifficultyParams | null> {
+  const cacheKey = `${language}-${difficulty}`;
+  const cacheEntry = difficultyParamsCache.get(cacheKey);
+  const now = Date.now();
+
+  if (cacheEntry && (now - cacheEntry.timestamp) < DIFFICULTY_PARAMS_TTL) {
+    return cacheEntry.words;
+  }
+
+  // Fetch from database
+  try {
+    const supabase = getSupabase();
+    if (!supabase) {
+      return null;
+    }
+
+    const { data, error } = await supabase
+      .from('bot_difficulty_params')
+      .select('*')
+      .eq('language', language)
+      .eq('difficulty', difficulty)
+      .single();
+
+    if (error) {
+      // Table might not exist yet or no data
+      if (error.code === 'PGRST116') { // No rows found
+        logger.debug('BOT', `No dynamic params for ${language}/${difficulty}, using defaults`);
+        return null;
+      }
+      throw error;
+    }
+
+    if (!data) return null;
+
+    const params: DynamicDifficultyParams = {
+      adjustedWordsPerMinute: data.adjusted_words_per_minute,
+      adjustedMissChance: data.adjusted_miss_chance,
+      adjustedWrongWordChance: data.adjusted_wrong_word_chance,
+      adjustedMinDelay: data.adjusted_min_delay,
+      adjustedMaxDelay: data.adjusted_max_delay,
+      adjustedStartDelay: data.adjusted_start_delay,
+      sampleSize: data.sample_size,
+      calculatedAt: new Date(data.calculated_at),
+    };
+
+    difficultyParamsCache.set(cacheKey, { words: params, timestamp: now });
+    logger.debug('BOT', `Loaded dynamic params for ${language}/${difficulty}: ${params.adjustedWordsPerMinute} wpm, ${params.sampleSize} samples`);
+    return params;
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    logger.debug('BOT', `Failed to fetch dynamic params: ${message}`);
+    return cacheEntry?.words || null;
+  }
+}
+
+/**
+ * Get cached wrong words that real players have submitted
+ * Bots use these to make more human-like mistakes
+ * @param language - Language code
+ * @param limit - Max number of wrong words to fetch
+ * @returns Array of wrong words ordered by frequency
+ */
+export async function getCachedWrongWords(
+  language: string,
+  limit: number = 100
+): Promise<string[]> {
+  const cacheEntry = wrongWordsCache.get(language);
+  const now = Date.now();
+
+  if (cacheEntry && (now - cacheEntry.timestamp) < WRONG_WORDS_TTL) {
+    return cacheEntry.words;
+  }
+
+  // Fetch from database
+  try {
+    const supabase = getSupabase();
+    if (!supabase) {
+      return [];
+    }
+
+    const { data, error } = await supabase
+      .from('player_wrong_words')
+      .select('word')
+      .eq('language', language)
+      .order('times_submitted', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      // Table might not exist yet
+      if (error.message?.includes('does not exist') || error.code === '42P01') {
+        return [];
+      }
+      throw error;
+    }
+
+    const words = (data || []).map((row: { word: string }) => row.word);
+    wrongWordsCache.set(language, { words, timestamp: now });
+    logger.debug('BOT', `Loaded ${words.length} wrong words for ${language}`);
+    return words;
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    logger.debug('BOT', `Failed to fetch wrong words: ${message}`);
+    return cacheEntry?.words || [];
+  }
 }
 
 // ==========================================
@@ -269,12 +411,33 @@ export function generateWrongWords(grid: LetterGrid, count: number): string[] {
 
 /**
  * Prepare bot for a game - find words and set up submission queue
+ * Uses dynamic difficulty params from database when available, falls back to static config
  * @param bot - Bot object
  * @param grid - Letter grid
  * @param language - Game language
  */
 export async function prepareBotWords(bot: Bot, grid: LetterGrid, language: Language): Promise<void> {
-  const config = BOT_CONFIG.WORDS[bot.difficulty] || BOT_CONFIG.WORDS.medium;
+  const staticConfig = BOT_CONFIG.WORDS[bot.difficulty] || BOT_CONFIG.WORDS.medium;
+
+  // Try to load dynamic params calculated from real player data
+  const dynamicParams = await getCachedDifficultyParams(language, bot.difficulty);
+
+  // Merge dynamic params with static config (dynamic takes precedence)
+  const config = {
+    maxWordLength: staticConfig.maxWordLength,
+    wordsPerMinute: dynamicParams?.adjustedWordsPerMinute ?? staticConfig.wordsPerMinute,
+    focusOnShort: staticConfig.focusOnShort,
+    missChance: dynamicParams?.adjustedMissChance ?? staticConfig.missChance,
+    wrongWordChance: dynamicParams?.adjustedWrongWordChance ?? staticConfig.wrongWordChance,
+  };
+
+  if (dynamicParams) {
+    // Store dynamic timing params on bot for use in calculateNextDelay
+    bot.dynamicMinDelay = dynamicParams.adjustedMinDelay;
+    bot.dynamicMaxDelay = dynamicParams.adjustedMaxDelay;
+    bot.dynamicStartDelay = dynamicParams.adjustedStartDelay;
+    logger.debug('BOT', `Bot "${bot.username}" using dynamic params: ${config.wordsPerMinute} wpm, ${(config.missChance * 100).toFixed(1)}% miss, ${(config.wrongWordChance * 100).toFixed(1)}% wrong, delays ${dynamicParams.adjustedMinDelay}-${dynamicParams.adjustedMaxDelay}ms`);
+  }
 
   // Safety check: ensure grid is valid
   if (!grid || !Array.isArray(grid) || grid.length === 0) {
@@ -389,10 +552,31 @@ export async function prepareBotWords(bot: Bot, grid: LetterGrid, language: Lang
   }
 
   // Generate and insert wrong words (like humans trying words that "look right")
+  // Prefer real wrong words from player data, fall back to random generation
   const wrongWordChance = config.wrongWordChance || 0;
   if (wrongWordChance > 0) {
     const wrongWordCount = Math.ceil(wordPool.length * wrongWordChance);
-    const wrongWords = generateWrongWords(grid, wrongWordCount);
+
+    // Try to get real wrong words that players have submitted
+    let wrongWords: string[] = [];
+    try {
+      const realWrongWords = await getCachedWrongWords(language, 100);
+      if (realWrongWords.length > 0) {
+        // Shuffle and pick random subset of real wrong words
+        const shuffledWrongWords = [...realWrongWords].sort(() => Math.random() - 0.5);
+        wrongWords = shuffledWrongWords.slice(0, wrongWordCount);
+        logger.debug('BOT', `Bot "${bot.username}" using ${wrongWords.length} real player wrong words`);
+      }
+    } catch (err) {
+      // Fall back to generated wrong words
+    }
+
+    // If we don't have enough real wrong words, generate some
+    if (wrongWords.length < wrongWordCount) {
+      const generatedCount = wrongWordCount - wrongWords.length;
+      const generatedWords = generateWrongWords(grid, generatedCount);
+      wrongWords = [...wrongWords, ...generatedWords];
+    }
 
     // Mark wrong words and insert them at random positions
     for (const wrongWord of wrongWords) {
@@ -435,12 +619,17 @@ function shuffleArray<T>(array: T[]): void {
 
 /**
  * Calculate delay until next word submission (human-like timing)
+ * Uses dynamic timing params from database when available, falls back to static config
  * Uses bot personality traits for more varied behavior
  * @param bot - Bot object
  * @returns Delay in milliseconds
  */
 export function calculateNextDelay(bot: Bot): number {
-  const timing = BOT_CONFIG.TIMING[bot.difficulty] || BOT_CONFIG.TIMING.medium;
+  const staticTiming = BOT_CONFIG.TIMING[bot.difficulty] || BOT_CONFIG.TIMING.medium;
+
+  // Use dynamic timing if available, otherwise fall back to static config
+  const minDelay = bot.dynamicMinDelay ?? staticTiming.minDelay;
+  const maxDelay = bot.dynamicMaxDelay ?? staticTiming.maxDelay;
 
   // Check if bot should enter burst mode (rapid word submissions)
   if (!bot.inBurstMode && Math.random() < (bot.burstChance || 0.15)) {
@@ -466,8 +655,8 @@ export function calculateNextDelay(bot: Bot): number {
     return Math.round(8000 + Math.random() * 7000); // 8-15 second pause
   }
 
-  // Base delay with randomization
-  let delay = timing.minDelay + Math.random() * (timing.maxDelay - timing.minDelay);
+  // Base delay with randomization (uses dynamic params if available)
+  let delay = minDelay + Math.random() * (maxDelay - minDelay);
 
   // Add "typing time" based on word length
   const nextWord = bot.wordsToFind[bot.currentWordIndex];
@@ -605,6 +794,10 @@ module.exports = {
   cleanupPlayerWordsCache,
   clearBehaviorCaches,
   getCacheStats,
+
+  // Dynamic difficulty (auto-adjusted from player data)
+  getCachedDifficultyParams,
+  getCachedWrongWords,
 
   // Blacklist
   addWordToBlacklist,

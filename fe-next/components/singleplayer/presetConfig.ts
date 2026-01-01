@@ -81,8 +81,8 @@ export const PRESETS: PresetConfig[] = [
     settings: {
       difficulty: 'HARD',
       timerSeconds: 180,
-      bots: 3,
-      botDifficulty: 'hard',
+      bots: 2,
+      botDifficulty: 'medium',
       minWordLength: 2, // Accept 2-letter words (especially for Japanese)
     },
     modes: ['solo-bots', 'practice', 'challenge'],
@@ -121,11 +121,12 @@ export const MODE_PRESETS: Record<Exclude<SinglePlayerMode, 'daily'>, PresetConf
       settings: {
         difficulty: 'EASY',
         timerSeconds: 90,
-        bots: 2,
-        botDifficulty: 'easy',
+        bots: 1,
+        botDifficulty: 'medium',
         minWordLength: 2, // EASY preset accepts 2-letter words
       },
       modes: ['solo-bots'],
+      isDefault: true,
     },
     {
       id: 'competitive',
@@ -137,12 +138,11 @@ export const MODE_PRESETS: Record<Exclude<SinglePlayerMode, 'daily'>, PresetConf
       settings: {
         difficulty: 'MEDIUM',
         timerSeconds: 120,
-        bots: 3,
+        bots: 2,
         botDifficulty: 'medium',
         minWordLength: 2, // Accept 2-letter words (especially for Japanese)
       },
       modes: ['solo-bots'],
-      isDefault: true,
     },
     {
       id: 'battle',
@@ -154,8 +154,8 @@ export const MODE_PRESETS: Record<Exclude<SinglePlayerMode, 'daily'>, PresetConf
       settings: {
         difficulty: 'HARD',
         timerSeconds: 180,
-        bots: 4,
-        botDifficulty: 'hard',
+        bots: 3,
+        botDifficulty: 'medium',
         minWordLength: 2, // Accept 2-letter words (especially for Japanese)
       },
       modes: ['solo-bots'],

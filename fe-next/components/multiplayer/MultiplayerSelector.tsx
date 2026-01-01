@@ -3,9 +3,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 import { Crown, LogIn, ArrowLeft, Users } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LANGUAGE_FLAGS } from '@/lib/languageConfig';
 import type { ActiveRoom, Language } from '@/shared/types/game';
@@ -17,6 +20,7 @@ interface MultiplayerSelectorProps {
   activeRooms: ActiveRoom[];
   onQuickJoin: (roomCode: string) => void;
   roomsLoading: boolean;
+  onRefreshRooms: () => void;
 }
 
 /**
@@ -29,8 +33,23 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
   activeRooms,
   onQuickJoin,
   roomsLoading,
+  onRefreshRooms,
 }) => {
   const { t, dir } = useLanguage();
+
+  // Pull-to-refresh for room list
+  const { pullToRefreshHandlers, pullState } = usePullToRefresh({
+    onRefresh: async () => {
+      onRefreshRooms();
+      // Small delay to allow socket response
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      toast.success(t('multiplayerFlow.selector.roomsRefreshed') || 'Rooms refreshed', {
+        duration: 2000,
+        icon: '🔄',
+      });
+    },
+    threshold: 60,
+  });
 
   // Show up to 3 rooms in preview
   const previewRooms = activeRooms.slice(0, 3);
@@ -40,7 +59,17 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
     <>
       <LandscapeIndicator />
 
-      <div dir={dir} className="screen-fit bg-gradient-to-b from-neo-navy via-neo-navy-light to-neo-navy">
+      <div
+        dir={dir}
+        className="screen-fit bg-gradient-to-b from-neo-navy via-neo-navy-light to-neo-navy relative overflow-hidden"
+        {...pullToRefreshHandlers}
+      >
+        {/* Pull-to-refresh indicator */}
+        <PullToRefreshIndicator
+          pullDistance={pullState.pullDistance}
+          isRefreshing={pullState.isRefreshing}
+          threshold={60}
+        />
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -113,7 +142,7 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
           </motion.div>
 
           {/* Cards Container */}
-          <div className="flex flex-col lg:flex-row gap-3 lg:gap-6 xl:gap-8 w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto flex-shrink-0">
+          <div className="flex flex-col lg:flex-row gap-2 sm:gap-3 lg:gap-6 xl:gap-8 w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl mx-auto flex-shrink-0">
             {/* Create Room Card */}
             <motion.div
               initial={{ x: -30, opacity: 0 }}
@@ -129,20 +158,20 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
                 onKeyDown={(e) => e.key === 'Enter' && onSelectCreate()}
                 aria-label={t('multiplayerFlow.selector.createCard.title') || 'Create Room'}
               >
-                <CardContent className="flex flex-col items-center justify-center text-center p-6 sm:p-8 lg:p-10 xl:p-12 h-full min-h-[180px] sm:min-h-[220px] lg:min-h-[280px] xl:min-h-[320px]">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 xl:w-28 xl:h-28 rounded-full bg-neo-lime text-neo-black border-3 lg:border-4 border-neo-black flex items-center justify-center mb-4 lg:mb-6 shadow-hard lg:shadow-hard-lg group-hover:scale-110 transition-transform">
-                    <Crown className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 xl:w-14 xl:h-14 text-neo-black" />
+                <CardContent className="flex flex-col items-center justify-center text-center p-4 sm:p-6 lg:p-10 xl:p-12 h-full min-h-[140px] sm:min-h-[180px] lg:min-h-[280px] xl:min-h-[320px]">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-24 lg:h-24 xl:w-28 xl:h-28 rounded-full bg-neo-lime text-neo-black border-2 sm:border-3 lg:border-4 border-neo-black flex items-center justify-center mb-2 sm:mb-3 lg:mb-6 shadow-hard lg:shadow-hard-lg group-hover:scale-110 transition-transform">
+                    <Crown className="w-6 h-6 sm:w-8 sm:h-8 lg:w-12 lg:h-12 xl:w-14 xl:h-14 text-neo-black" />
                   </div>
-                  <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black uppercase text-neo-white mb-2 lg:mb-3">
+                  <h2 className="text-lg sm:text-xl lg:text-3xl xl:text-4xl font-black uppercase text-neo-white mb-1 sm:mb-2 lg:mb-3">
                     {t('multiplayerFlow.selector.createCard.title') || 'Create Room'}
                   </h2>
-                  <p className="text-sm sm:text-base lg:text-lg xl:text-xl text-neo-cream mb-4 lg:mb-6">
+                  <p className="text-xs sm:text-sm lg:text-lg xl:text-xl text-neo-cream mb-2 sm:mb-3 lg:mb-6">
                     {t('multiplayerFlow.selector.createCard.description') || 'Host a new game and invite friends'}
                   </p>
                   <Button
                     variant="success"
-                    size="lg"
-                    className="w-full max-w-[200px] lg:max-w-[260px] xl:max-w-[300px] font-bold uppercase lg:text-lg xl:text-xl lg:py-3 xl:py-4"
+                    size="default"
+                    className="w-full max-w-[160px] sm:max-w-[200px] lg:max-w-[260px] xl:max-w-[300px] font-bold uppercase text-sm sm:text-base lg:text-lg xl:text-xl lg:py-3 xl:py-4"
                     tabIndex={-1}
                   >
                     {t('multiplayerFlow.selector.createCard.button') || 'Start Setup'}
@@ -166,20 +195,20 @@ const MultiplayerSelector: React.FC<MultiplayerSelectorProps> = ({
                 onKeyDown={(e) => e.key === 'Enter' && onSelectJoin()}
                 aria-label={t('multiplayerFlow.selector.joinCard.title') || 'Join Room'}
               >
-                <CardContent className="flex flex-col items-center justify-center text-center p-6 sm:p-8 lg:p-10 xl:p-12 h-full min-h-[180px] sm:min-h-[220px] lg:min-h-[280px] xl:min-h-[320px]">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 xl:w-28 xl:h-28 rounded-full bg-neo-cyan text-neo-black border-3 lg:border-4 border-neo-black flex items-center justify-center mb-4 lg:mb-6 shadow-hard lg:shadow-hard-lg group-hover:scale-110 transition-transform">
-                    <LogIn className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 xl:w-14 xl:h-14 text-neo-black" />
+                <CardContent className="flex flex-col items-center justify-center text-center p-4 sm:p-6 lg:p-10 xl:p-12 h-full min-h-[140px] sm:min-h-[180px] lg:min-h-[280px] xl:min-h-[320px]">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-24 lg:h-24 xl:w-28 xl:h-28 rounded-full bg-neo-cyan text-neo-black border-2 sm:border-3 lg:border-4 border-neo-black flex items-center justify-center mb-2 sm:mb-3 lg:mb-6 shadow-hard lg:shadow-hard-lg group-hover:scale-110 transition-transform">
+                    <LogIn className="w-6 h-6 sm:w-8 sm:h-8 lg:w-12 lg:h-12 xl:w-14 xl:h-14 text-neo-black" />
                   </div>
-                  <h2 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-black uppercase text-neo-white mb-2 lg:mb-3">
+                  <h2 className="text-lg sm:text-xl lg:text-3xl xl:text-4xl font-black uppercase text-neo-white mb-1 sm:mb-2 lg:mb-3">
                     {t('multiplayerFlow.selector.joinCard.title') || 'Join Room'}
                   </h2>
-                  <p className="text-sm sm:text-base lg:text-lg xl:text-xl text-neo-cream mb-4 lg:mb-6">
+                  <p className="text-xs sm:text-sm lg:text-lg xl:text-xl text-neo-cream mb-2 sm:mb-3 lg:mb-6">
                     {t('multiplayerFlow.selector.joinCard.description') || 'Enter an existing game with a code'}
                   </p>
                   <Button
                     variant="default"
-                    size="lg"
-                    className="w-full max-w-[200px] lg:max-w-[260px] xl:max-w-[300px] font-bold uppercase bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black lg:text-lg xl:text-xl lg:py-3 xl:py-4"
+                    size="default"
+                    className="w-full max-w-[160px] sm:max-w-[200px] lg:max-w-[260px] xl:max-w-[300px] font-bold uppercase bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black text-sm sm:text-base lg:text-lg xl:text-xl lg:py-3 xl:py-4"
                     tabIndex={-1}
                   >
                     {t('multiplayerFlow.selector.joinCard.button') || 'Browse Rooms'}

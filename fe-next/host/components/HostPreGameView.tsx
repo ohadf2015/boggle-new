@@ -176,8 +176,8 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
   const [hasInitialized, setHasInitialized] = useState<boolean>(false);
   // Mobile tab state
   const [mobileTab, setMobileTab] = useState<MobileTab>('settings');
-  // Unread chat messages indicator
-  const [hasUnreadMessages, setHasUnreadMessages] = useState<boolean>(false);
+  // Unread chat messages count
+  const [unreadChatCount, setUnreadChatCount] = useState<number>(0);
 
   // Apply default preset on mount
   React.useEffect(() => {
@@ -244,7 +244,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
 
 
   return (
-    <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 w-full max-w-6xl pb-16 lg:pb-0">
+    <div className="flex flex-col gap-2 sm:gap-3 md:gap-4 w-full max-w-6xl pb-40 lg:pb-0">
       {/* Row 1: Room Code + Language + Share + Exit */}
       <GameRoomHeader
         gameCode={gameCode}
@@ -653,9 +653,9 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
           gameCode={gameCode}
           className="h-full min-h-[240px] max-h-[280px]"
           onNewMessage={() => {
-            // Show unread indicator if not on chat tab (mobile only)
+            // Increment unread count if not on chat tab (mobile only)
             if (mobileTab !== 'chat') {
-              setHasUnreadMessages(true);
+              setUnreadChatCount(prev => prev + 1);
             }
           }}
         />
@@ -722,20 +722,28 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
             type="button"
             onClick={() => {
               setMobileTab('chat');
-              setHasUnreadMessages(false);
+              setUnreadChatCount(0);
             }}
             className={cn(
-              "flex-1 flex items-center justify-center gap-1.5 px-2 py-2.5 font-bold text-xs uppercase transition-all duration-150 relative",
+              "flex-1 flex items-center justify-center gap-1.5 px-2 py-2.5 font-bold text-xs uppercase transition-all duration-150",
               mobileTab === 'chat'
                 ? "bg-slate-800 text-neo-cream border-t-2 border-neo-cyan"
                 : "bg-transparent text-neo-cream/60 hover:text-neo-cream hover:bg-slate-800/50"
             )}
           >
-            <MessageSquare size={16} />
+            <div className="relative">
+              <MessageSquare size={16} />
+              {unreadChatCount > 0 && mobileTab !== 'chat' && (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-1.5 -right-1.5 min-w-[16px] h-[16px] px-1 flex items-center justify-center bg-neo-red text-neo-white text-[10px] font-black rounded-full border-2 border-neo-black"
+                >
+                  {unreadChatCount > 99 ? '99+' : unreadChatCount}
+                </motion.span>
+              )}
+            </div>
             <span className="hidden xs:inline">{t('hostView.chat') || 'Chat'}</span>
-            {hasUnreadMessages && mobileTab !== 'chat' && (
-              <span className="absolute top-1 right-2 w-2.5 h-2.5 bg-neo-red rounded-full animate-pulse" />
-            )}
           </button>
         </div>
       </div>

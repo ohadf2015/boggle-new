@@ -430,17 +430,32 @@ export function generateDailyPuzzle(
     targetWord = shuffled[0];
   }
 
-  // STEP 2: Get bonus words for survival mode playability
-  const bonusWordList = BONUS_WORD_LISTS[language] || BONUS_WORD_LISTS['en'];
-  const shuffledBonus = [...bonusWordList];
-  for (let i = shuffledBonus.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1));
-    [shuffledBonus[i], shuffledBonus[j]] = [shuffledBonus[j], shuffledBonus[i]];
-  }
-  // Select 6-10 bonus words to attempt embedding
-  let bonusWordsToEmbed = shuffledBonus.slice(0, 10);
+  // STEP 2: Get same-length words for gameplay assistance
+  // These words help players practice same-length guesses and get letter feedback (clues)
+  const sameLengthWords = getSameLengthWords(targetWord, language, random);
 
-  // STEP 2.5: Normalize Hebrew final letters for grid display
+  // STEP 3: Get other bonus words for survival mode (different lengths for variety)
+  const bonusWordList = BONUS_WORD_LISTS[language] || BONUS_WORD_LISTS['en'];
+  const otherBonusWords = bonusWordList
+    .filter(w => w.length !== targetWord.length) // Exclude same-length (already covered)
+    .map(w => w.toUpperCase());
+
+  // Shuffle other bonus words
+  const shuffledOtherBonus = [...otherBonusWords];
+  for (let i = shuffledOtherBonus.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [shuffledOtherBonus[i], shuffledOtherBonus[j]] = [shuffledOtherBonus[j], shuffledOtherBonus[i]];
+  }
+
+  // Prioritize same-length words: take at least MIN_SAME_LENGTH_WORDS (5) same-length words
+  // Then fill remaining slots with other bonus words for variety
+  const sameLengthToEmbed = sameLengthWords.slice(0, Math.max(MIN_SAME_LENGTH_WORDS, 8));
+  const otherBonusToEmbed = shuffledOtherBonus.slice(0, 4);
+
+  // Combine: same-length words first (priority), then other bonus words
+  let bonusWordsToEmbed = [...sameLengthToEmbed, ...otherBonusToEmbed];
+
+  // STEP 3.5: Normalize Hebrew final letters for grid display
   // Final letters (ך, ם, ן, ף, ץ) should not appear on the grid
   let normalizedTargetWord = targetWord;
   if (language === 'he') {
@@ -605,12 +620,19 @@ function embedMultipleWordsInGrid(
     }
   }
 
-  // STEP 2: Try to embed bonus words for survival mode playability
+  // STEP 2: Try to embed bonus words for gameplay
+  // Priority: same-length words first (for clue feedback), then other bonus words
   let embeddedCount = 0;
-  const maxBonusWords = 6; // Embed up to 6 bonus words
+  let sameLengthEmbedded = 0;
+  const targetLength = targetUpper.length;
+  const maxBonusWords = 12; // Embed more words to ensure good gameplay
+  const minSameLengthWords = MIN_SAME_LENGTH_WORDS; // Must embed at least 5 same-length words
 
   for (const bonusWord of bonusWords) {
     if (embeddedCount >= maxBonusWords) break;
+
+    // Track same-length words separately
+    const isSameLength = bonusWord.length === targetLength;
 
     const wordUpper = bonusWord.toUpperCase();
     let wordPlaced = false;
@@ -630,8 +652,16 @@ function embedMultipleWordsInGrid(
         }
         wordPlaced = true;
         embeddedCount++;
+        if (isSameLength) {
+          sameLengthEmbedded++;
+        }
       }
     }
+  }
+
+  // Log same-length embedding result for debugging
+  if (sameLengthEmbedded < minSameLengthWords) {
+    console.warn(`[Daily Puzzle] Only embedded ${sameLengthEmbedded}/${minSameLengthWords} same-length words for target length ${targetLength}`);
   }
 
   // STEP 3: Fill remaining cells with random letters
@@ -807,14 +837,24 @@ function generateJapaneseDailyPuzzle(
     targetWord = shuffled[0] || '日本';
   }
 
-  // Get bonus words for survival mode playability
+  // Get same-length words for gameplay assistance (prioritized)
+  const sameLengthWords = getSameLengthWords(targetWord, 'ja', random);
+
+  // Get other bonus words for variety (different lengths)
   const japaneseBonusWords = BONUS_WORD_LISTS['ja'] || [];
-  const shuffledBonus = [...japaneseBonusWords];
-  for (let i = shuffledBonus.length - 1; i > 0; i--) {
+  const otherBonusWords = japaneseBonusWords
+    .filter(w => w.length !== targetWord.length);
+
+  const shuffledOtherBonus = [...otherBonusWords];
+  for (let i = shuffledOtherBonus.length - 1; i > 0; i--) {
     const j = Math.floor(random() * (i + 1));
-    [shuffledBonus[i], shuffledBonus[j]] = [shuffledBonus[j], shuffledBonus[i]];
+    [shuffledOtherBonus[i], shuffledOtherBonus[j]] = [shuffledOtherBonus[j], shuffledOtherBonus[i]];
   }
-  const bonusWordsToEmbed = shuffledBonus.slice(0, 8);
+
+  // Prioritize same-length words, then other bonus words
+  const sameLengthToEmbed = sameLengthWords.slice(0, Math.max(MIN_SAME_LENGTH_WORDS, 6));
+  const otherBonusToEmbed = shuffledOtherBonus.slice(0, 4);
+  const bonusWordsToEmbed = [...sameLengthToEmbed, ...otherBonusToEmbed];
 
   // Generate grid with Japanese characters
   const grid: (string | null)[][] = Array(rows).fill(null).map(() => Array(cols).fill(null));
@@ -835,14 +875,17 @@ function generateJapaneseDailyPuzzle(
   usedCells.add(`${startRow},${startCol}`);
   usedCells.add(`${startRow},${startCol + 1}`);
 
-  // Embed bonus words for survival mode
+  // Embed bonus words (same-length words first for gameplay assistance)
   let embeddedCount = 0;
-  const maxBonusWords = 6;
+  let sameLengthEmbedded = 0;
+  const targetLength = targetWord.length;
+  const maxBonusWords = 10;
 
   for (const bonusWord of bonusWordsToEmbed) {
     if (embeddedCount >= maxBonusWords) break;
 
     const wordChars = bonusWord.split('');
+    const isSameLength = bonusWord.length === targetLength;
     let wordPlaced = false;
 
     for (let attempt = 0; attempt < 30 && !wordPlaced; attempt++) {
@@ -858,8 +901,16 @@ function generateJapaneseDailyPuzzle(
         }
         wordPlaced = true;
         embeddedCount++;
+        if (isSameLength) {
+          sameLengthEmbedded++;
+        }
       }
     }
+  }
+
+  // Log same-length embedding result for debugging
+  if (sameLengthEmbedded < MIN_SAME_LENGTH_WORDS) {
+    console.warn(`[Daily Puzzle - Japanese] Only embedded ${sameLengthEmbedded}/${MIN_SAME_LENGTH_WORDS} same-length words for target length ${targetLength}`);
   }
 
   // Fill rest with random Japanese characters
@@ -2010,6 +2061,91 @@ const TARGET_WORD_LISTS: Record<Language, string[]> = {
     'GARTEN', 'FENSTER', 'NATUR', 'HIMMEL', 'SOMMER'
   ]
 };
+
+/**
+ * Same-length helper words organized by word length for each language.
+ * These words are prioritized for embedding to help players practice
+ * same-length guesses and get letter feedback (green/yellow clues).
+ *
+ * Minimum 5 same-length words should be embedded alongside the target word.
+ */
+const SAME_LENGTH_HELPER_WORDS: Record<Language, Record<number, string[]>> = {
+  en: {
+    3: ['CAT', 'DOG', 'SUN', 'RUN', 'FUN', 'BIG', 'RED', 'SKY', 'FLY', 'CRY', 'DRY', 'TRY', 'BAT', 'RAT', 'HAT', 'MAT', 'SAT', 'FAT', 'PEN', 'TEN', 'HEN', 'MEN', 'DEN', 'BED', 'LED', 'WED', 'FED'],
+    4: ['TREE', 'BIRD', 'FISH', 'STAR', 'MOON', 'RAIN', 'WIND', 'SNOW', 'BOOK', 'DOOR', 'HAND', 'FOOT', 'HEAD', 'FACE', 'ROCK', 'SAND', 'BOAT', 'GAME', 'WOLF', 'BEAR', 'FROG', 'DEER', 'DUCK', 'HAWK', 'CAKE', 'MILK', 'SOUP', 'RICE', 'BEAN', 'CORN', 'PLUM', 'PEAR', 'GOLD', 'IRON', 'JADE', 'RUBY', 'SILK', 'WOOL', 'CLAY', 'COAL', 'HILL', 'LAKE', 'WAVE', 'CAVE', 'PATH', 'PEAK', 'POND', 'REEF', 'KING', 'DUKE', 'HERO', 'SAGE', 'MONK', 'CHEF', 'MAGE', 'BARD', 'SHIP', 'CART', 'BIKE', 'SLED', 'RAFT', 'KITE', 'DOME', 'ARCH'],
+    5: ['WORLD', 'HOUSE', 'WATER', 'LIGHT', 'NIGHT', 'DREAM', 'STORM', 'FLAME', 'STONE', 'CLOUD', 'RIVER', 'OCEAN', 'BEACH', 'HORSE', 'TIGER', 'EAGLE', 'SNAKE', 'WHALE', 'SHARK', 'CRANE', 'BREAD', 'GRAPE', 'LEMON', 'PEACH', 'MAPLE', 'CROWN', 'SWORD', 'SHIELD', 'TOWER', 'BRIDGE', 'PLANT', 'BLOOM', 'FRUIT', 'GRASS', 'TRAIL', 'GROVE', 'CLIFF', 'SHORE', 'DELTA', 'FROST', 'SPARK', 'BLAZE', 'GLEAM', 'SHADE', 'QUIET', 'PEACE', 'BRAVE', 'NOBLE', 'SWIFT', 'GRAND'],
+    6: ['CASTLE', 'GARDEN', 'FOREST', 'ISLAND', 'DESERT', 'JUNGLE', 'VALLEY', 'MEADOW', 'STREAM', 'SUNSET', 'WINTER', 'SUMMER', 'SPRING', 'AUTUMN', 'TEMPLE', 'PALACE', 'CHURCH', 'BRIDGE', 'HARBOR', 'MARKET', 'SCHOOL', 'STABLE', 'TAVERN', 'PRISON', 'DRAGON', 'KNIGHT', 'WIZARD', 'PIRATE', 'HUNTER', 'ARCHER', 'ORANGE', 'BANANA', 'CHERRY', 'MANGO', 'SILVER', 'BRONZE', 'COPPER', 'MARBLE', 'VELVET', 'COTTON', 'CANDLE', 'MIRROR', 'BASKET', 'HAMMER', 'ANCHOR', 'RIBBON', 'FEATHER', 'BUTTON'],
+    7: ['RAINBOW', 'THUNDER', 'VOLCANO', 'GLACIER', 'TORNADO', 'MONSOON', 'SUNRISE', 'MORNING', 'EVENING', 'WEATHER', 'CRYSTAL', 'DIAMOND', 'EMERALD', 'SAPPHIRE', 'KINGDOM', 'VILLAGE', 'COTTAGE', 'MANSION', 'LIBRARY', 'MUSEUM', 'CAPTAIN', 'SOLDIER', 'WARRIOR', 'GENERAL', 'EMPEROR', 'SCHOLAR', 'TEACHER', 'PAINTER', 'SCULPTOR', 'FOUNDER', 'MYSTERY', 'JOURNEY', 'DESTINY', 'VICTORY', 'FREEDOM', 'COURAGE', 'HARMONY', 'BALANCE', 'WONDER', 'MIRACLE'],
+    8: ['MOUNTAIN', 'WATERFALL', 'TREASURE', 'ADVENTURE', 'CHAMPION', 'GUARDIAN', 'EXPLORER', 'INVENTOR', 'COMPOSER', 'ARCHITECT', 'STRENGTH', 'PATIENCE', 'KINDNESS', 'LAUGHTER', 'SUNSHINE', 'MOONLIGHT', 'STARLIGHT', 'TWILIGHT', 'MIDNIGHT', 'DAYBREAK'],
+  },
+  he: {
+    2: ['יד', 'עץ', 'אב', 'אם', 'בן', 'בת', 'גן', 'דג', 'זב', 'חג', 'טל', 'כד', 'לב', 'מט', 'נר', 'סף', 'עד', 'פה', 'צל', 'קר'],
+    3: ['בית', 'מים', 'אדם', 'דבר', 'עין', 'ראש', 'ילד', 'ספר', 'חבר', 'דלת', 'שמש', 'ירח', 'פרח', 'סוס', 'כלב', 'עוף', 'דגי', 'אות', 'קול', 'אור'],
+    4: ['עולם', 'חלון', 'כוכב', 'ציפור', 'דגים', 'ארנב', 'נמר', 'זאב', 'דוב', 'אריה', 'עוגה', 'לחם', 'חלב', 'מרק', 'זהב', 'כסף', 'ברזל', 'נהר', 'אגם', 'גבעה', 'שיר', 'מכתב', 'סיפור', 'חלום', 'מלך', 'גיבור', 'חכם', 'אמן', 'רופא', 'רוח', 'אדמה', 'שמים', 'לילה', 'יום', 'בוקר'],
+    5: ['נחושת', 'שולחן', 'מחשב', 'טלפון', 'חיוך', 'משפחה', 'חברים', 'אהבה', 'שמחה', 'בריאות'],
+  },
+  sv: {
+    3: ['HUS', 'DAG', 'ÖGA', 'ÖRA', 'ARM', 'BEN', 'BOK', 'BIL', 'SOL', 'VÄG', 'BRO', 'SJÖ', 'SKY', 'SNÖ', 'TRÄ', 'ÖL', 'ÄGG', 'ÄRT', 'ÖST'],
+    4: ['HUND', 'KATT', 'STEN', 'BERG', 'REGN', 'SNÖN', 'VIND', 'NATT', 'LJUS', 'MÖRK', 'VÄGG', 'GOLV', 'DÖRR', 'BORD', 'STOL', 'SÄNG', 'LAMP', 'GLAS', 'SKÅL', 'BOLL', 'BÅGE', 'BÅLE', 'FISK', 'MASK', 'BLAD'],
+    5: ['FÅGEL', 'TRÄD', 'SOLEN', 'MÅNE', 'VATTEN', 'VÄRLD', 'PLATS', 'LJUD', 'KRAFT', 'BÄSTA', 'FÖRSTA', 'SISTA', 'RUNDA', 'KLAR', 'BLOM', 'HIMMEL', 'VINTER', 'SOMMAR'],
+    6: ['SLOTT', 'NATUR', 'MORGON', 'KVÄLL', 'FÖNSTER', 'MARKNAD', 'TRÄDGÅRD'],
+  },
+  ja: {
+    2: ['日本', '東京', '学校', '先生', '学生', '友達', '家族', '会社', '仕事', '時間', '天気', '音楽', '映画', '料理', '旅行', '電車', '新聞', '本', '犬', '猫', '花', '木', '山', '川', '海', '空', '雨', '雪', '風', '雲'],
+    3: ['日本語', '図書館', '大学', '病院', '空港', '公園', '駅', '銀行', '郵便局', '美術館', '電話', '新幹線', '桜', '富士山'],
+  },
+  es: {
+    3: ['SOL', 'MAR', 'PAN', 'SAL', 'LUZ', 'VOZ', 'PAZ', 'REY', 'LEY', 'RÍO', 'DÍA', 'MES', 'AÑO', 'VER', 'DAR', 'SER', 'OJO', 'PIE', 'MÁS', 'DOS'],
+    4: ['CASA', 'AGUA', 'VIDA', 'AMOR', 'MESA', 'LUNA', 'FLOR', 'ROSA', 'VINO', 'CAFE', 'LAGO', 'PATO', 'GATO', 'PERRO', 'PERA', 'MANO', 'PELO', 'CARA', 'BOCA', 'OJOS'],
+    5: ['LIBRO', 'MUNDO', 'LUGAR', 'GENTE', 'NOCHE', 'PLAYA', 'CAMPO', 'MONTE', 'LECHE', 'CARNE', 'AMIGO', 'CIELO', 'TIERRA', 'ARBOL', 'HOJA'],
+    6: ['FIESTA', 'JARDÍN', 'PUENTE', 'SIMPLE', 'COCINA', 'MAÑANA', 'TIEMPO', 'PLANTA', 'MERCADO', 'VENTANA', 'MODERNO', 'DORADO', 'CASTILLO'],
+    7: ['NATURAL', 'PERFECTO', 'HERMOSO', 'PEQUEÑO', 'GRANDE', 'FANTÁSTICO'],
+  },
+  fr: {
+    4: ['CHAT', 'PAIN', 'LUNE', 'JOUR', 'NUIT', 'ROSE', 'BLEU', 'NOIR', 'VENT', 'PLUIE', 'NEIGE', 'FROID', 'CHAUD', 'BEAU', 'DOUX'],
+    5: ['ARBRE', 'FLEUR', 'MONDE', 'TEMPS', 'VILLE', 'GRAND', 'PETIT', 'BELLE', 'FORCE', 'PLACE', 'CHOSE', 'LIVRE', 'CHIEN', 'AMOUR', 'JOLIE', 'RÊVE', 'ÉTOILE'],
+    6: ['MAISON', 'JARDIN', 'SOLEIL', 'NATURE', 'RIVIÈRE', 'FORÊT', 'CHÂTEAU', 'MONTAGNE'],
+  },
+  de: {
+    4: ['HAUS', 'BAUM', 'BUCH', 'HUND', 'MOND', 'BERG', 'WALD', 'MEER', 'LAND', 'WELT', 'ZEIT', 'BROT', 'WEIN', 'ROSE', 'BLAU', 'GOLD', 'ROTE'],
+    5: ['KATZE', 'SONNE', 'STERN', 'STADT', 'GROSS', 'KLEIN', 'KRAFT', 'PLATZ', 'SACHE', 'LIEBE', 'WASSER', 'FLUSS'],
+    6: ['GARTEN', 'FENSTER', 'NATUR', 'HIMMEL', 'SOMMER', 'WINTER', 'HERBST', 'SCHULE', 'KIRCHE', 'BRÜCKE'],
+  },
+};
+
+/**
+ * Get same-length helper words for a given target word
+ * Combines words from SAME_LENGTH_HELPER_WORDS and TARGET_WORD_LISTS
+ * Excludes the target word itself
+ */
+function getSameLengthWords(targetWord: string, language: Language, random: () => number): string[] {
+  const targetLength = targetWord.length;
+  const targetUpper = targetWord.toUpperCase();
+
+  // Collect same-length words from helper lists
+  const helperWords = SAME_LENGTH_HELPER_WORDS[language]?.[targetLength] || [];
+
+  // Also collect same-length words from TARGET_WORD_LISTS
+  const targetWords = (TARGET_WORD_LISTS[language] || [])
+    .filter(w => w.length === targetLength);
+
+  // Combine both sources and remove duplicates and the target word itself
+  const allWords = [...new Set([...helperWords, ...targetWords])]
+    .map(w => w.toUpperCase())
+    .filter(w => w !== targetUpper);
+
+  // Shuffle using seeded random
+  const shuffled = [...allWords];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  return shuffled;
+}
+
+// Minimum number of same-length words to embed (excluding target word)
+const MIN_SAME_LENGTH_WORDS = 5;
 
 /**
  * Interface for daily target word result

@@ -132,13 +132,12 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
   );
 };
 
-// Step 1: Animated Swipe Demo - Shows 4-letter word "CATS" in L-shape
+// Step 1: Animated Swipe Demo - Shows 4-letter word in L-shape (translated per language)
 const Step1SwipeDemo: React.FC<{ isRTL: boolean; t: (key: string) => string }> = ({ isRTL, t }) => {
-  // Grid letters: CATS forms an L-shape path (C→A→T→S)
-  // C(0,0) → A(1,0) → T(1,1) → S(1,2)
-  const letters = ['C', 'A', 'O', 'G', 'T', 'E', 'D', 'S', 'R'];
-  // Highlight indices for "CATS": 0, 1, 4, 7 (L-shape pattern)
-  const highlightedIndices = [0, 1, 4, 7];
+  // Grid letters from translation (defaults to CATS pattern if not translated)
+  const letters = (t('daily.carousel.step1Grid') || 'C,A,O,G,T,E,D,S,R').split(',');
+  // Highlight indices from translation (defaults to 0,1,4,7 for L-shape pattern)
+  const highlightedIndices = (t('daily.carousel.step1Highlighted') || '0,1,4,7').split(',').map(Number);
 
   return (
     <div className="text-center py-2">

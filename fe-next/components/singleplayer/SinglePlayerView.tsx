@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import PresetSelector from './PresetSelector';
@@ -9,7 +9,6 @@ import SinglePlayerGame from './SinglePlayerGame';
 import SinglePlayerResults from './SinglePlayerResults';
 import { getHighScore, recordGameResult, getAllTimeBest } from './highScoreManager';
 import { useGameMusic, type GamePhase } from '@/hooks/useGameMusic';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { incrementTrainingGames } from '@/utils/playerProgressStorage';
 import { getMinWordLength, type PresetConfig } from './presetConfig';
@@ -90,26 +89,6 @@ const SinglePlayerView: React.FC = () => {
   const { language: uiLanguage } = useLanguage();
   const router = useRouter();
   const [phase, setPhase] = useState<SinglePlayerPhase>('preset-selection');
-  const isMobileLandscape = useMobileLandscape();
-  const [isAnyLandscape, setIsAnyLandscape] = useState(false);
-
-  // Track landscape orientation for ALL screen sizes (not just mobile)
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const checkLandscape = () => {
-      setIsAnyLandscape(window.innerWidth > window.innerHeight);
-    };
-
-    checkLandscape();
-    window.addEventListener('resize', checkLandscape);
-    window.addEventListener('orientationchange', checkLandscape);
-
-    return () => {
-      window.removeEventListener('resize', checkLandscape);
-      window.removeEventListener('orientationchange', checkLandscape);
-    };
-  }, []);
 
   const [gameState, setGameState] = useState<SinglePlayerGameState>(() => ({
     mode: 'solo-bots',
@@ -281,12 +260,9 @@ const SinglePlayerView: React.FC = () => {
     setPhase('preset-selection');
   };
 
-  // Hide header completely in ANY landscape mode during gameplay (desktop or mobile)
-  const showHeader = !(phase === 'playing' && isAnyLandscape) && phase !== 'preset-selection';
-
   return (
     <div className="flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
-      {showHeader && <AutoHideHeader />}
+      <AutoHideHeader />
 
       <main className="max-w-6xl mx-auto px-2 xs:px-4 sm:px-6 py-8 landscape-content overflow-x-hidden">
         {phase === 'preset-selection' && (

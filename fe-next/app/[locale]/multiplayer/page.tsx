@@ -18,7 +18,6 @@ import { getGuestSessionId, hashToken } from '@/utils/guestManager';
 import { getSession as getSupabaseSession } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 
 interface ResultsData {
@@ -129,7 +128,6 @@ export default function MultiplayerPage(): React.JSX.Element {
 
   const { t, language } = useLanguage();
   const { user, isAuthenticated, isSupabaseEnabled, profile, loading, refreshProfile } = useAuth();
-  const isLandscape = useMobileLandscape();
   const { playTrack, fadeToTrack, TRACKS } = useMusic();
 
   // Track auth loading start time for timeout
@@ -144,6 +142,10 @@ export default function MultiplayerPage(): React.JSX.Element {
   // Track if we should auto-join (prefilled room + existing username)
   const [shouldAutoJoin, setShouldAutoJoin] = useState(false);
   const [prefilledRoomCode, setPrefilledRoomCode] = useState('');
+
+  // Track if username has been manually set by the user or loaded from session/localStorage
+  // This prevents auth loading from overwriting user-entered names
+  const usernameManuallySetRef = useRef<boolean>(false);
 
   // Music transitions based on game state
   // Note: We always call playTrack/fadeToTrack even if audio isn't unlocked yet
@@ -222,10 +224,12 @@ export default function MultiplayerPage(): React.JSX.Element {
       if (roomFromUrl && savedUsername) {
         // Already set above, derive avatar from name
         setGuestAvatar(getAvatarForName(savedUsername));
+        usernameManuallySetRef.current = true; // Mark as set from localStorage
       } else if (joiningNewRoomViaInvitation) {
         if (savedUsername) {
           setUsername(savedUsername);
           setGuestAvatar(getAvatarForName(savedUsername));
+          usernameManuallySetRef.current = true; // Mark as set from localStorage
         } else {
           // Set a fun random default name for guests with matching avatar
           const { name, avatar } = getRandomDefaultNameWithAvatar(language);
@@ -235,9 +239,11 @@ export default function MultiplayerPage(): React.JSX.Element {
       } else if (savedSession?.username) {
         setUsername(savedSession.username);
         setGuestAvatar(getAvatarForName(savedSession.username));
+        usernameManuallySetRef.current = true; // Mark as set from session
       } else if (savedUsername) {
         setUsername(savedUsername);
         setGuestAvatar(getAvatarForName(savedUsername));
+        usernameManuallySetRef.current = true; // Mark as set from localStorage
       }
       // Note: We don't set random guest names here anymore
       // For guests without saved names, the auth effect or handleJoin will handle it
@@ -263,6 +269,7 @@ export default function MultiplayerPage(): React.JSX.Element {
 
     if (user) {
       // Authenticated user - use display name from profile/OAuth
+      // BUT only if username wasn't already set from localStorage/session/form
       const displayName =
         profile?.display_name ||                    // Best: profile display name
         user?.user_metadata?.full_name ||           // Good: OAuth full name
@@ -270,8 +277,11 @@ export default function MultiplayerPage(): React.JSX.Element {
         user?.email?.split('@')[0] ||               // Fallback: email prefix
         '';
 
-      if (displayName) {
+      // Only set if username is empty OR if it hasn't been manually set yet
+      // This prevents overwriting user-typed names when auth loads
+      if (displayName && !usernameManuallySetRef.current && !username.trim()) {
         setUsername(displayName);
+        usernameManuallySetRef.current = true; // Mark as set from auth
       }
     } else if (!hasSetRandomNameRef.current) {
       // Guest user - check if we need to generate a random name
@@ -300,7 +310,7 @@ export default function MultiplayerPage(): React.JSX.Element {
         setGuestAvatar(getAvatarForName(username));
       }
     }
-  }, [user, profile?.display_name, loading, language]);
+  }, [user, profile?.display_name, loading, language, username]);
 
   // Refresh profile on mount for authenticated users to get latest display_name
   useEffect(() => {
@@ -1249,9 +1259,6 @@ export default function MultiplayerPage(): React.JSX.Element {
     );
   };
 
-  // Hide header completely in landscape mode during active gameplay (not just auto-hide)
-  const showHeader = !(isActive && !showResults && isLandscape);
-
   return (
     <SocketContext.Provider value={socketContextValue}>
       {/* Connection status indicator */}
@@ -1265,7 +1272,7 @@ export default function MultiplayerPage(): React.JSX.Element {
         spectatorCount={spectators.length}
       />
 
-      {showHeader && <AutoHideHeader />}
+      <AutoHideHeader />
       <ErrorBoundary>
         <div id="main-content" tabIndex={-1}>
           {renderView()}

@@ -22,8 +22,8 @@ import type {
 
 // Extracted components
 import PlayerWaitingView from './components/PlayerWaitingView';
-import PlayerWaitingResultsView from './components/PlayerWaitingResultsView';
 import PlayerInGameView from './components/PlayerInGameView';
+import ValidationModal from '../components/results/ValidationModal';
 
 // Custom hooks
 import usePlayerSocketEvents from './hooks/usePlayerSocketEvents';
@@ -476,29 +476,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     );
   }, []);
 
-  // Render appropriate view
-  if (waitingForResults) {
-    return (
-      <>
-        {showStartAnimation && (
-          <GoRipplesAnimation onComplete={() => setShowStartAnimation(false)} />
-        )}
-        <PlayerWaitingResultsView
-          username={username}
-          gameCode={gameCode}
-          t={t}
-          dir={dir}
-          leaderboard={leaderboard}
-          foundWords={mappedFoundWords}
-          showExitConfirm={showExitConfirm}
-          setShowExitConfirm={setShowExitConfirm}
-          onExitRoom={handleExitRoom}
-          onConfirmExit={confirmExitRoom}
-        />
-      </>
-    );
-  }
-
   // Show game board during countdown animation when we have letterGrid
   // This allows players to see the board while countdown is active
   // Also covers the transition period between countdown ending and gameActive being set
@@ -532,6 +509,19 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
           setShowExitConfirm={setShowExitConfirm}
           onExitRoom={handleExitRoom}
           onConfirmExit={confirmExitRoom}
+        />
+      </div>
+    );
+  }
+
+  // Waiting for results - show simple view with validation modal overlay
+  if (waitingForResults) {
+    return (
+      <div className="min-h-screen w-full bg-neo-cream text-neo-black dark:bg-slate-900 dark:text-white flex items-center justify-center transition-colors duration-300">
+        <ValidationModal
+          isOpen={true}
+          t={t}
+          foundWords={mappedFoundWords}
         />
       </div>
     );

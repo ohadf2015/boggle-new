@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Share2, Trophy, Target, X, ArrowLeft, Copy, Check, Send, Coins, RotateCcw, ImageDown, ChevronDown, Settings, Eye, BarChart3, Medal, Timer, Sparkles } from 'lucide-react';
+import { MobileTabBar } from '@/components/layout/MobileTabBar';
 
 // X/Twitter icon (no lucide equivalent)
 const XTwitterIcon = ({ className }: { className?: string }) => (
@@ -1604,46 +1605,17 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         </div>
       </div>
 
-      {/* Bottom Tab Bar - Fixed */}
-      <div className="flex-shrink-0 fixed bottom-0 left-0 right-0 bg-slate-900 border-t-2 border-neo-black z-40 safe-area-bottom">
-        <div className="max-w-md mx-auto flex items-center justify-around py-1.5">
-          <button
-            onClick={() => setActiveTab('results')}
-            className={cn(
-              "flex flex-col items-center gap-0.5 px-5 py-1.5 rounded-lg transition-all min-w-[72px]",
-              activeTab === 'results'
-                ? "bg-neo-yellow text-neo-black"
-                : "text-gray-400 hover:text-white"
-            )}
-          >
-            <Share2 className="w-5 h-5" />
-            <span className="text-[10px] font-bold uppercase">{t('wordHunt.results.share') || 'Share'}</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('stats')}
-            className={cn(
-              "flex flex-col items-center gap-0.5 px-5 py-1.5 rounded-lg transition-all min-w-[72px]",
-              activeTab === 'stats'
-                ? "bg-neo-yellow text-neo-black"
-                : "text-gray-400 hover:text-white"
-            )}
-          >
-            <BarChart3 className="w-5 h-5" />
-            <span className="text-[10px] font-bold uppercase">{t('wordHunt.stats.title') || 'Stats'}</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('ranks')}
-            className={cn(
-              "flex flex-col items-center gap-0.5 px-5 py-1.5 rounded-lg transition-all min-w-[72px]",
-              activeTab === 'ranks'
-                ? "bg-neo-yellow text-neo-black"
-                : "text-gray-400 hover:text-white"
-            )}
-          >
-            <Medal className="w-5 h-5" />
-            <span className="text-[10px] font-bold uppercase">{t('daily.leaderboard') || 'Ranks'}</span>
-          </button>
-        </div>
+      {/* Bottom Tab Bar - Fixed (using reusable MobileTabBar component) */}
+      <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black safe-area-bottom">
+        <MobileTabBar
+          tabs={[
+            { id: 'results', icon: <Share2 className="w-5 h-5" />, label: t('wordHunt.results.share') || 'Share' },
+            { id: 'stats', icon: <BarChart3 className="w-5 h-5" />, label: t('wordHunt.stats.title') || 'Stats' },
+            { id: 'ranks', icon: <Medal className="w-5 h-5" />, label: t('daily.leaderboard') || 'Ranks' },
+          ]}
+          activeTab={activeTab}
+          onTabChange={(id) => setActiveTab(id as ResultTab)}
+        />
       </div>
 
       {/* Share panel for browsers without native share */}

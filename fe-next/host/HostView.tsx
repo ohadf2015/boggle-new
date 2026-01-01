@@ -18,7 +18,7 @@ import type { Language, PlayerResult } from '@/types';
 import HostPreGameView from './components/HostPreGameView';
 import HostInGameView from './components/HostInGameView';
 import TvBroadcastView from './components/TvBroadcastView';
-import PlayerWaitingResultsView from '../player/components/PlayerWaitingResultsView';
+import ValidationModal from '../components/results/ValidationModal';
 import { TvResultsView } from './components/tv-results';
 import {
   QRCodeDialog,
@@ -374,22 +374,12 @@ const HostView: React.FC<HostViewProps> = memo(({
       />
 
 
-      {/* Waiting for Results View */}
-      {runtime.waitingForResults && (
-        <PlayerWaitingResultsView
-          username={username}
-          gameCode={gameCode}
-          t={t}
-          dir={dir}
-          leaderboard={leaderboard}
-          foundWords={hostPlayingState.hostFoundWords}
-          showExitConfirm={ui.showExitConfirm}
-          setShowExitConfirm={state.setShowExitConfirm}
-          onExitRoom={actions.handleExitRoom}
-          onConfirmExit={actions.confirmExitRoom}
-          isHost={true}
-        />
-      )}
+      {/* Validation Modal - Shows during AI word validation */}
+      <ValidationModal
+        isOpen={runtime.waitingForResults}
+        t={t}
+        foundWords={hostPlayingState.hostFoundWords}
+      />
 
       {/* Pre-Game View */}
       {!runtime.gameStarted && !runtime.waitingForResults && !runtime.showStartAnimation && !hasActiveGameData && (

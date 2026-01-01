@@ -29,7 +29,7 @@ const { isProfane } = require('../utils/profanityFilter');
 const { calculateWordScore } = require('../modules/scoringEngine');
 const { checkAndAwardAchievements, ACHIEVEMENT_ICONS } = require('../modules/achievementManager');
 const { isDictionaryWord } = require('../dictionary');
-const { isSupabaseConfigured, savePlayerWord } = require('../modules/supabaseServer');
+const { isSupabaseConfigured, savePlayerWord, recordPlayerWrongWord } = require('../modules/supabaseServer');
 const { recordVote, updatePendingCache, isWordCommunityValid, isWordValidForScoring } = require('../modules/communityWordManager');
 const { emitError, ErrorMessages, ErrorCodes } = require('../utils/errorHandler');
 const { checkRateLimit } = require('../utils/rateLimiter');
@@ -284,6 +284,10 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         incPerGame(gameCode, 'wordNotOnBoard');
         socket.emit('wordNotOnBoard', { word: normalizedWord });
         handleSpamDetection(socket, gameCode, username, normalizedWord, InvalidReason.NOT_ON_BOARD, game);
+        // Record wrong word for bot learning (non-blocking)
+        if (isSupabaseConfigured()) {
+          recordPlayerWrongWord(normalizedWord, game.language || 'en').catch(() => {});
+        }
         return;
       }
 
@@ -600,6 +604,11 @@ function handlePeerRejection(io: Server, gameCode: string, game: Game, result: P
   const scoreRemoved = removePeerRejectedWordScore(gameCode, result.word, result.submitter);
 
   logger.info('PEER_VALIDATION', `Word "${result.word}" rejected. Removed ${scoreRemoved} from ${result.submitter}`);
+
+  // Record rejected word for bot learning (if not a bot word)
+  if (!result.isBot && result.word && isSupabaseConfigured()) {
+    recordPlayerWrongWord(result.word, game.language || 'en').catch(() => {});
+  }
 
   // Blacklist bot words
   if (result.isBot && game.language) {

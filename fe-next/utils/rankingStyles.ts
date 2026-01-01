@@ -182,7 +182,7 @@ export function getRankBgColor(rank: number, isPlayer: boolean): string {
 
 /**
  * Get rank style for waiting results views
- * Used in HostWaitingResultsView and PlayerWaitingResultsView
+ * Used in leaderboard displays during results validation
  * @param index - 0-based index (0 = 1st place)
  * @returns Tailwind classes for the rank row
  */

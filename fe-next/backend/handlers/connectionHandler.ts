@@ -29,7 +29,7 @@ const {
 const timerManager = require('../utils/timerManager');
 const { resetRateLimit } = require('../utils/rateLimiter');
 const { cleanupPlayerData } = require('../utils/playerCleanup');
-const botManager = require('../modules/botManager');
+const { cleanupGameBots } = require('../modules/botManager');
 const logger = require('../utils/logger');
 
 // Configuration
@@ -107,7 +107,7 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
 
       // Stop timer and bots
       timerManager.clearGameTimer(gameCode);
-      botManager.stopAllBots(gameCode);
+      cleanupGameBots(gameCode);
 
       // Notify all players
       broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', {
@@ -139,7 +139,7 @@ function handlePlayerDisconnect(io: Server, socket: Socket, game: Game, gameCode
     if (isRoomEmpty(gameCode)) {
       logger.info('SOCKET', `Room ${gameCode} is empty after bot ${username} removed - closing immediately`);
       timerManager.clearGameTimer(gameCode);
-      botManager.stopAllBots(gameCode);
+      cleanupGameBots(gameCode);
       deleteGame(gameCode);
       io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
       return;
@@ -160,7 +160,7 @@ function handlePlayerDisconnect(io: Server, socket: Socket, game: Game, gameCode
     if (isRoomEmpty(gameCode)) {
       logger.info('SOCKET', `Room ${gameCode} is empty after ${username} disconnected - closing immediately`);
       timerManager.clearGameTimer(gameCode);
-      botManager.stopAllBots(gameCode);
+      cleanupGameBots(gameCode);
       deleteGame(gameCode);
       io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
       return;
@@ -189,7 +189,7 @@ function handlePlayerDisconnect(io: Server, socket: Socket, game: Game, gameCode
         if (isRoomEmpty(gameCode)) {
           logger.info('SOCKET', `Room ${gameCode} is empty after ${username} timeout - closing immediately`);
           timerManager.clearGameTimer(gameCode);
-          botManager.stopAllBots(gameCode);
+          cleanupGameBots(gameCode);
           deleteGame(gameCode);
           io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
           return;

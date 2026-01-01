@@ -15,7 +15,6 @@ import CircularTimer from '../CircularTimer';
 import RoomChat from '../RoomChat';
 import { EarthquakeWarning, FireRoundIndicator } from '../earthquake';
 import HintButton from '../HintButton';
-import { HelpPanel, HelpButton } from './HelpPanel';
 import WordFormingArea, { type WordFeedback } from './WordFormingArea';
 import ComboDisplay from './ComboDisplay';
 import ThemeIndicator from './ThemeIndicator';
@@ -193,9 +192,6 @@ const InGameScreen = memo<InGameScreenProps>(({
       announceTimer(remainingTime);
     }
   }, [remainingTime, gameActive, announceTimer]);
-
-  // Help panel state for discoverability
-  const [showHelpPanel, setShowHelpPanel] = useState(false);
 
   // Mobile tab state for words/leaderboard toggle
   const [mobileActiveTab, setMobileActiveTab] = useState<'words' | 'leaderboard'>('words');
@@ -537,8 +533,6 @@ const InGameScreen = memo<InGameScreenProps>(({
   if (isLandscape) {
     return (
       <>
-        <HelpPanel isOpen={showHelpPanel} onClose={() => setShowHelpPanel(false)} />
-
         {/* Earthquake Warning Overlay */}
         <EarthquakeWarning isVisible={earthquakeState === 'warning'} />
 
@@ -676,14 +670,6 @@ const InGameScreen = memo<InGameScreenProps>(({
             </div>
           )}
 
-
-          {/* Bottom-right corner: Help button (outside game board area) */}
-          <div className="absolute bottom-0 right-0 z-30 pb-[max(env(safe-area-inset-bottom),8px)] pr-2">
-            <HelpButton
-              onClick={() => setShowHelpPanel(true)}
-              className="w-12 h-12 min-w-[48px] min-h-[48px] opacity-70 hover:opacity-100"
-            />
-          </div>
 
           {/* Bottom-left: Exit button */}
           {onExitRoom && (
@@ -844,13 +830,6 @@ const InGameScreen = memo<InGameScreenProps>(({
         )}
       </div>
 
-      {/* Help Button - Fixed at bottom right corner on mobile, outside the game board */}
-      <div className="lg:hidden fixed bottom-0 right-0 z-50 pb-[max(env(safe-area-inset-bottom),8px)] pr-2">
-        <HelpButton onClick={() => setShowHelpPanel(true)} className="w-12 h-12 min-w-[48px] min-h-[48px] opacity-70 hover:opacity-100" />
-      </div>
-
-      {/* Help Panel - Accessible from anywhere */}
-      <HelpPanel isOpen={showHelpPanel} onClose={() => setShowHelpPanel(false)} />
 
       {/* Left Column: Found Words (Desktop only, only when playing, hidden in focus mode) */}
       {isPlaying && !gameplayFocusMode && (
