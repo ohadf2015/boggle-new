@@ -7,7 +7,6 @@ import GridComponent from '@/components/GridComponent';
 import CircularTimer from '@/components/CircularTimer';
 import WordFormingArea from '@/components/game/WordFormingArea';
 import ComboDisplay from '@/components/game/ComboDisplay';
-import { HelpPanel, HelpButton } from '@/components/game/HelpPanel';
 import { Button } from '@/components/ui/button';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { AchievementProgressTracker } from '@/components/achievements/AchievementProgressTracker';
@@ -70,9 +69,6 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   const [formedWord, setFormedWord] = useState('');
   const [letterCount, setLetterCount] = useState(0);
 
-  // Help panel state
-  const [isHelpOpen, setIsHelpOpen] = useState(false);
-  const [hasShownFirstGameHelp, setHasShownFirstGameHelp] = useState(false);
 
   // Exit confirmation dialog state
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
@@ -183,24 +179,6 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     };
   }, [stopMusic]);
 
-  // Auto-show help panel on first game - helps new players learn the mechanics
-  useEffect(() => {
-    if (isGameOver || hasShownFirstGameHelp) return undefined;
-
-    const hasSeenHelp = localStorage.getItem('first-game-help-seen');
-    if (!hasSeenHelp) {
-      // Delay opening help panel by 1.5 seconds to let game UI settle
-      const timer = setTimeout(() => {
-        setIsHelpOpen(true);
-        setHasShownFirstGameHelp(true);
-        localStorage.setItem('first-game-help-seen', 'true');
-      }, 1500);
-
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [isGameOver, hasShownFirstGameHelp]);
-
   // Game end handler - validates pending words with AI before completing
   const handleGameEnd = useCallback(async () => {
     if (gameOverCalledRef.current) return;
@@ -300,10 +278,10 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         isLandscape && "hidden"
       )}>
         <Button
-          variant="ghost"
+          variant="destructive"
           size="sm"
           onClick={handleQuitClick}
-          className="text-gray-600 hover:text-red-500"
+          className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-none font-bold"
         >
           <X className="w-4 h-4 mr-1" />
           {t('common.quit') || 'Quit'}
@@ -413,18 +391,6 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           )}
         </span>
       </div>
-
-      {/* Help Button - Fixed at corner, not covering the board */}
-      <HelpButton
-        onClick={() => setIsHelpOpen(true)}
-        className={isLandscape
-          ? "fixed top-2 right-2 z-30 w-9 h-9 opacity-70 hover:opacity-100"
-          : "fixed bottom-0 right-0 z-40 mb-[max(env(safe-area-inset-bottom),8px)] mr-2 w-10 h-10 opacity-70 hover:opacity-100"
-        }
-      />
-
-      {/* Help Panel */}
-      <HelpPanel isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
 
       {/* Direction Guidance Tooltip - shows when player only uses straight-line directions */}
       <DirectionGuidanceTooltip

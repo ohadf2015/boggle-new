@@ -4,7 +4,6 @@ import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Zap, Store, X, Heart, Coins, Lightbulb } from 'lucide-react';
 import GridComponent from '@/components/GridComponent';
-import { HelpPanel, HelpButton } from '@/components/game/HelpPanel';
 import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
 import { useContextualGuidance, useSwipeTipGuidanceTrigger } from '@/hooks/useContextualGuidance';
 import { Button } from '@/components/ui/button';
@@ -139,7 +138,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // UI state
   const [formedWord, setFormedWord] = useState('');
   const [letterCount, setLetterCount] = useState(0);
-  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [showShop, setShowShop] = useState(false);
   const [tokensSpent, setTokensSpent] = useState(0);
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
@@ -1231,15 +1229,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Help Button */}
-      <HelpButton
-        onClick={() => setIsHelpOpen(true)}
-        className="fixed bottom-0 right-0 z-40 mb-[max(env(safe-area-inset-bottom),8px)] mr-2 w-10 h-10"
-      />
-
-      {/* Help Panel */}
-      <HelpPanel isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
 
       {/* Swipe Tip Tooltip - shows after 15 seconds if player hasn't discovered any words */}
       <SwipeTipTooltip
