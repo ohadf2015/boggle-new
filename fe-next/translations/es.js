@@ -82,6 +82,7 @@ const es = {
     "admin": "Admin",
     "understood": "¡Vamos!",
     "refresh": "Actualizar",
+    "refreshed": "¡Actualizado!",
     "reconnecting": "Reconectando...",
     "reconnected": "¡Volvimos!",
     "connectionLost": "Conexión perdida",
@@ -531,7 +532,8 @@ const es = {
       },
       "activeRoomsPreview": "Salas Activas",
       "playersOnline": "en línea",
-      "noRooms": "Sin salas activas - ¡crea una!"
+      "noRooms": "Sin salas activas - ¡crea una!",
+      "roomsRefreshed": "¡Salas actualizadas!"
     },
     "editProfile": "Editar",
     "profileSetup": {
@@ -992,6 +994,7 @@ const es = {
     "viewXpBreakdown": "Desglose XP",
     "summary": "Resumen",
     "details": "Detalles",
+    "performanceDetails": "Detalles de Rendimiento",
     "play": "Jugar",
     "badges": "Insignias",
     "xp": "XP",
@@ -2682,6 +2685,7 @@ const es = {
     "retryLinkInvalid": "Este enlace no es válido",
     "retryLinkError": "No se pudo verificar el enlace",
     "howToPlay": "Cómo Jugar",
+    "firstTime": "(¿Nuevo?)",
     "canYouBeatMyScore": "¿Puedes superar mi puntuación?",
     "targetWordLength": "Encuentra la palabra oculta:",
     "onlyMatchingLength": "¡Solo las palabras de {length} letras usan tus intentos!",

@@ -591,7 +591,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                 <CircularTimer
                   remainingTime={remainingTime}
                   totalTime={timerValue * 60}
-                  size="md"
+                  size="lg"
                 />
               )}
 

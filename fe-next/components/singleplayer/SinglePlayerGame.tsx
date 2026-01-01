@@ -1109,7 +1109,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             <CircularTimer
               remainingTime={timer.remainingTime}
               totalTime={settings.timerSeconds}
-              size="sm"
+              size="md"
             />
           )}
           <div className="bg-neo-yellow border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center">
@@ -1406,7 +1406,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             animate={{ scale: 1, opacity: 1 }}
             className="relative z-20"
           >
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
+              <CircularTimer
+                remainingTime={timer.remainingTime}
+                totalTime={settings.timerSeconds}
+                size="lg"
+              />
+            </div>
+            <div className="hidden md:block lg:hidden">
               <CircularTimer
                 remainingTime={timer.remainingTime}
                 totalTime={settings.timerSeconds}
@@ -1417,7 +1424,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               <CircularTimer
                 remainingTime={timer.remainingTime}
                 totalTime={settings.timerSeconds}
-                size="xs"
+                size="sm"
               />
             </div>
           </AdaptiveMotion.div>

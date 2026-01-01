@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -11,6 +12,8 @@ import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import ModeCard from './ModeCard';
 import TutorialPrompt from './TutorialPrompt';
 import Header from '@/components/Header';
@@ -38,6 +41,19 @@ const LandingView: React.FC = () => {
   const { isAuthenticated, needsProfileCustomization, profile, updateProfile } = useAuth();
   const isLandscape = useMobileLandscape();
   const liveRoomStats = useLiveRoomStats();
+
+  // Pull-to-refresh for room stats
+  const { pullToRefreshHandlers, pullState } = usePullToRefresh({
+    onRefresh: async () => {
+      liveRoomStats.refresh();
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      toast.success(t('common.refreshed') || 'Refreshed', {
+        duration: 2000,
+        icon: '🔄',
+      });
+    },
+    threshold: 60,
+  });
 
   // Tutorial prompt state (non-intrusive banner for first-time visitors)
   const [showTutorialPrompt, setShowTutorialPrompt] = useState(false);
@@ -174,7 +190,17 @@ const LandingView: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
+    <div
+      className="flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative"
+      {...pullToRefreshHandlers}
+    >
+      {/* Pull-to-refresh indicator */}
+      <PullToRefreshIndicator
+        pullDistance={pullState.pullDistance}
+        isRefreshing={pullState.isRefreshing}
+        threshold={60}
+      />
+
       {/* Onboarding Modal */}
       <OnboardingModal isOpen={showOnboarding} onClose={() => setShowOnboarding(false)} />
 

@@ -2,12 +2,16 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import FriendsList from '@/components/friends/FriendsList';
+import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFriends } from '@/hooks/useFriends';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { cn } from '@/lib/utils';
 
 /**
@@ -17,8 +21,22 @@ export default function FriendsPage(): React.JSX.Element {
   const { language, t } = useLanguage();
   const { theme } = useTheme();
   const { isAuthenticated } = useAuth();
+  const { refresh: refreshFriends } = useFriends();
   const router = useRouter();
   const isDark = theme === 'dark';
+
+  // Pull-to-refresh for friends list
+  const { pullToRefreshHandlers, pullState } = usePullToRefresh({
+    onRefresh: async () => {
+      await refreshFriends();
+      toast.success(t('common.refreshed') || 'Refreshed', {
+        duration: 2000,
+        icon: '🔄',
+      });
+    },
+    threshold: 60,
+    enabled: isAuthenticated,
+  });
 
   // Handle challenge click - create a challenge and send to friend
   const handleChallengeClick = (friend: { odUserId: string; username: string }) => {
@@ -28,12 +46,21 @@ export default function FriendsPage(): React.JSX.Element {
   };
 
   return (
-    <div className={cn(
-      'min-h-screen',
-      isDark
-        ? 'bg-gradient-to-b from-neo-navy via-neo-navy-light to-neo-navy'
-        : 'bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200'
-    )}>
+    <div
+      className={cn(
+        'min-h-screen relative',
+        isDark
+          ? 'bg-gradient-to-b from-neo-navy via-neo-navy-light to-neo-navy'
+          : 'bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200'
+      )}
+      {...pullToRefreshHandlers}
+    >
+      {/* Pull-to-refresh indicator */}
+      <PullToRefreshIndicator
+        pullDistance={pullState.pullDistance}
+        isRefreshing={pullState.isRefreshing}
+        threshold={60}
+      />
       {/* Header */}
       <header className={cn(
         'sticky top-0 z-40 px-4 py-3 border-b-3 border-neo-black',

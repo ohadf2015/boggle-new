@@ -1,51 +1,21 @@
 {
   "summary": {
-    "totalKeysInCode": 1422,
+    "totalKeysInCode": 1423,
     "keyCountByLanguage": {
-      "en": 2440,
-      "he": 2438,
-      "sv": 2438,
-      "ja": 2438,
-      "es": 2438
+      "en": 2442,
+      "he": 2442,
+      "sv": 2442,
+      "ja": 2442,
+      "es": 2442
     },
-    "missingFromEnglish": 1
+    "missingFromEnglish": 0
   },
-  "missingFromEnglish": [
-    {
-      "key": "results.performanceDetails",
-      "usages": [
-        {
-          "file": "components/singleplayer/SinglePlayerResults.tsx",
-          "line": 773
-        },
-        {
-          "file": "components/singleplayer/SinglePlayerResults.tsx",
-          "line": 773
-        },
-        {
-          "file": "components/singleplayer/SinglePlayerResults.tsx",
-          "line": 773
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
-    "he": [
-      "multiplayerFlow.selector.roomsRefreshed",
-      "daily.firstTime"
-    ],
-    "sv": [
-      "multiplayerFlow.selector.roomsRefreshed",
-      "daily.firstTime"
-    ],
-    "ja": [
-      "multiplayerFlow.selector.roomsRefreshed",
-      "daily.firstTime"
-    ],
-    "es": [
-      "multiplayerFlow.selector.roomsRefreshed",
-      "daily.firstTime"
-    ]
+    "he": [],
+    "sv": [],
+    "ja": [],
+    "es": []
   },
   "keysNotInEnglish": {
     "he": [],

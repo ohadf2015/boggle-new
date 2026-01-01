@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { ArrowLeft, Globe, ChevronDown, Trophy, Target, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import DailyWordHuntSurvival from './DailyWordHuntSurvival';
 import DailyWordHuntResults from './DailyWordHuntResults';
@@ -13,6 +15,7 @@ import { DailyChallengeTutorial } from './DailyChallengeTutorial';
 import DailyIntroCarousel from './DailyIntroCarousel';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import {
   generateDailyPuzzle,
   getDailyChallengeDate,
@@ -125,6 +128,15 @@ const DailyChallenge: React.FC = () => {
   useEffect(() => {
     getGuestFingerprint().then(setGuestFingerprint);
   }, []);
+
+  // Pull-to-refresh - disabled during gameplay
+  const { pullToRefreshHandlers, pullState } = usePullToRefresh({
+    onRefresh: async () => {
+      window.location.reload();
+    },
+    threshold: 60,
+    enabled: phase !== 'playing', // Disable during gameplay
+  });
 
   // Parse challenge parameter and handle admin reset from URL
   useEffect(() => {
@@ -383,7 +395,19 @@ const DailyChallenge: React.FC = () => {
 
   // Render based on phase
   return (
-    <div className="flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
+    <div
+      className="flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative"
+      {...pullToRefreshHandlers}
+    >
+      {/* Pull-to-refresh indicator - only show when not playing */}
+      {phase !== 'playing' && (
+        <PullToRefreshIndicator
+          pullDistance={pullState.pullDistance}
+          isRefreshing={pullState.isRefreshing}
+          threshold={60}
+        />
+      )}
+
       <AutoHideHeader />
 
       <AnimatePresence mode="wait">

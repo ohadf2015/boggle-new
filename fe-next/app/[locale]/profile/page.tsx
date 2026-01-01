@@ -8,9 +8,11 @@ import { useRouter } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import AuthModal from '@/components/auth/AuthModal';
 import Avatar from '@/components/Avatar';
 import EmojiAvatarPicker from '@/components/EmojiAvatarPicker';
@@ -126,6 +128,18 @@ export default function ProfilePage(): React.ReactNode {
   const router = useRouter();
   const isLandscape = useMobileLandscape();
   const isDarkMode = theme === 'dark';
+
+  // Pull-to-refresh for profile data
+  const { pullToRefreshHandlers, pullState } = usePullToRefresh({
+    onRefresh: async () => {
+      await refreshProfile();
+      toast.success(t('common.refreshed') || 'Refreshed', {
+        duration: 2000,
+        icon: '🔄',
+      });
+    },
+    threshold: 60,
+  });
 
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState<boolean>(false);
@@ -1035,10 +1049,20 @@ export default function ProfilePage(): React.ReactNode {
   return (
     <>
       {/* ===== MOBILE VIEW ===== */}
-      <div className={cn(
-        'lg:hidden mobile-viewport',
-        isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
-      )}>
+      <div
+        className={cn(
+          'lg:hidden mobile-viewport relative',
+          isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
+        )}
+        {...pullToRefreshHandlers}
+      >
+        {/* Pull-to-refresh indicator */}
+        <PullToRefreshIndicator
+          pullDistance={pullState.pullDistance}
+          isRefreshing={pullState.isRefreshing}
+          threshold={60}
+        />
+
         <AutoHideHeader />
 
         {/* Tab Content */}
@@ -1122,10 +1146,20 @@ export default function ProfilePage(): React.ReactNode {
       </div>
 
       {/* ===== DESKTOP VIEW ===== */}
-      <div className={cn(
-        'hidden lg:flex lg:flex-col lg:min-h-full',
-        isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
-      )}>
+      <div
+        className={cn(
+          'hidden lg:flex lg:flex-col lg:min-h-full relative',
+          isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
+        )}
+        {...pullToRefreshHandlers}
+      >
+        {/* Pull-to-refresh indicator */}
+        <PullToRefreshIndicator
+          pullDistance={pullState.pullDistance}
+          isRefreshing={pullState.isRefreshing}
+          threshold={60}
+        />
+
         <AutoHideHeader />
 
         <div className={cn(

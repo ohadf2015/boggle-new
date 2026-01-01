@@ -2,15 +2,18 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { Trophy, Medal, ArrowLeft, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { Button } from '@/components/ui/button';
+import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLeaderboard, useUserRank } from '@/hooks/useSupabaseRealtime';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
 
@@ -44,6 +47,19 @@ export default function LeaderboardPage(): React.ReactNode {
   } = useLeaderboard({ limit: 100, enabled: isSupabaseEnabled });
 
   const { rank: userRank } = useUserRank(user?.id);
+
+  // Pull-to-refresh for leaderboard data
+  const { pullToRefreshHandlers, pullState } = usePullToRefresh({
+    onRefresh: async () => {
+      refetch();
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      toast.success(t('common.refreshed') || 'Refreshed', {
+        duration: 2000,
+        icon: '🔄',
+      });
+    },
+    threshold: 60,
+  });
 
   const getRankIcon = (rank: number): React.ReactNode => {
     switch (rank) {
@@ -94,10 +110,20 @@ export default function LeaderboardPage(): React.ReactNode {
   }
 
   return (
-    <div className={cn(
-      'flex flex-col min-h-full',
-      isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
-    )}>
+    <div
+      className={cn(
+        'flex flex-col min-h-full relative',
+        isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
+      )}
+      {...pullToRefreshHandlers}
+    >
+      {/* Pull-to-refresh indicator */}
+      <PullToRefreshIndicator
+        pullDistance={pullState.pullDistance}
+        isRefreshing={pullState.isRefreshing}
+        threshold={60}
+      />
+
       <AutoHideHeader />
 
       <div className={cn(

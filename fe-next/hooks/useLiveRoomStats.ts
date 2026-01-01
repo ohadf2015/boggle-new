@@ -8,6 +8,7 @@ interface LiveRoomStats {
   openRooms: number;
   totalPlayers: number;
   isLoading: boolean;
+  refresh: () => void;
 }
 
 /**
@@ -16,11 +17,17 @@ interface LiveRoomStats {
  */
 export function useLiveRoomStats(): LiveRoomStats {
   const { socket, isConnected } = useSocket();
-  const [stats, setStats] = useState<LiveRoomStats>({
+  const [stats, setStats] = useState<Omit<LiveRoomStats, 'refresh'>>({
     openRooms: 0,
     totalPlayers: 0,
     isLoading: true,
   });
+
+  const refresh = useCallback(() => {
+    if (socket?.connected) {
+      socket.emit('getActiveRooms');
+    }
+  }, [socket]);
 
   const handleActiveRooms = useCallback((data: { rooms?: ActiveRoom[] }) => {
     const rooms = data.rooms || [];
@@ -68,7 +75,7 @@ export function useLiveRoomStats(): LiveRoomStats {
     return undefined;
   }, [isConnected]);
 
-  return stats;
+  return { ...stats, refresh };
 }
 
 export default useLiveRoomStats;

@@ -82,6 +82,7 @@ const sv = {
     "admin": "Admin",
     "understood": "Kör!",
     "refresh": "Uppdatera",
+    "refreshed": "Uppdaterat!",
     "reconnecting": "Återansluter...",
     "reconnected": "Vi är tillbaka!",
     "connectionLost": "Tappade anslutningen",
@@ -534,7 +535,8 @@ const sv = {
       },
       "activeRoomsPreview": "Rum",
       "playersOnline": "online",
-      "noRooms": "Inga rum - skapa ett!"
+      "noRooms": "Inga rum - skapa ett!",
+      "roomsRefreshed": "Rum uppdaterade"
     },
     "editProfile": "Redigera",
     "profileSetup": {
@@ -995,6 +997,7 @@ const sv = {
     "viewXpBreakdown": "XP-uppdelning",
     "summary": "Sammanfattning",
     "details": "Detaljer",
+    "performanceDetails": "Prestandadetaljer",
     "play": "Spela",
     "badges": "Märken",
     "xp": "XP",
@@ -2685,6 +2688,7 @@ const sv = {
     "retryLinkInvalid": "Denna länk är ogiltig",
     "retryLinkError": "Kunde inte verifiera länken",
     "howToPlay": "Hur man spelar",
+    "firstTime": "(Ny?)",
     "canYouBeatMyScore": "Kan du slå mitt resultat?",
     "targetWordLength": "Hitta det dolda ordet:",
     "onlyMatchingLength": "Endast ord med {length} bokstäver använder dina försök!",

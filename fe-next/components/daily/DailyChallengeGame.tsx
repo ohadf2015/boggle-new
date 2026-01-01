@@ -308,11 +308,12 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           animate={{ scale: 1, opacity: 1 }}
           className="relative z-20"
         >
-          <CircularTimer
-            remainingTime={timer.remainingTime}
-            totalTime={duration}
-            size="md"
-          />
+          <div className="hidden lg:block">
+            <CircularTimer remainingTime={timer.remainingTime} totalTime={duration} size="lg" />
+          </div>
+          <div className="lg:hidden">
+            <CircularTimer remainingTime={timer.remainingTime} totalTime={duration} size="md" />
+          </div>
         </motion.div>
 
         {/* Score (right position) - vibrant yellow/lime gradient like multiplayer */}

@@ -82,6 +82,7 @@ const ja = {
     "admin": "管理者",
     "understood": "行くぞ！",
     "refresh": "更新",
+    "refreshed": "更新完了！",
     "reconnecting": "再接続中...",
     "reconnected": "復活！",
     "connectionLost": "接続切れ",
@@ -534,7 +535,8 @@ const ja = {
       },
       "activeRoomsPreview": "ルーム",
       "playersOnline": "オンライン",
-      "noRooms": "ルームなし - 作成！"
+      "noRooms": "ルームなし - 作成！",
+      "roomsRefreshed": "ルーム更新完了"
     },
     "editProfile": "編集",
     "profileSetup": {
@@ -994,6 +996,7 @@ const ja = {
     "viewXpBreakdown": "XP内訳",
     "summary": "サマリー",
     "details": "詳細",
+    "performanceDetails": "パフォーマンス詳細",
     "play": "プレイ",
     "badges": "バッジ",
     "xp": "XP",
@@ -2684,6 +2687,7 @@ const ja = {
     "retryLinkInvalid": "このリンクは無効です",
     "retryLinkError": "リンクを確認できませんでした",
     "howToPlay": "遊び方",
+    "firstTime": "(初めて？)",
     "canYouBeatMyScore": "私のスコアを超えられますか？",
     "targetWordLength": "隠された単語を見つけて：",
     "onlyMatchingLength": "{length}文字の単語のみが試行回数を消費します！",
