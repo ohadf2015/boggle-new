@@ -19,7 +19,7 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 import { Button } from '@/components/ui/button';
-import { fireConfetti } from '@/utils/confettiUtils';
+import { fireConfetti, fireRankConfetti } from '@/utils/confettiUtils';
 import {
   generateShareableResult,
   getGuestFingerprint,
@@ -29,7 +29,6 @@ import {
   type GuestDailyPlayer,
 } from '@/utils/dailyChallenge';
 import DailyLeaderboard from './DailyLeaderboard';
-import ConfettiRetrigger from '@/components/results/ConfettiRetrigger';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   shareImageWithNativeShare,
@@ -416,21 +415,15 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               </span>
             </div>
           )}
-          {/* Confetti retrigger button - show for all completions with score > 0 */}
-          {result.score > 0 && (
-            <ConfettiRetrigger
-              variant={currentUserRank && currentUserRank <= 3 ? 'rank' : 'default'}
-              rank={currentUserRank || undefined}
-              compact
-            />
-          )}
         </motion.div>
 
-        {/* Puzzle number and score */}
+        {/* Puzzle number and score - Click to fire confetti */}
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2 }}
+          onClick={() => result.score > 0 && fireRankConfettiLocal(currentUserRank && currentUserRank <= 3 ? currentUserRank : 1)}
+          className="cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]"
         >
           <div className="text-sm text-gray-600 dark:text-gray-300 uppercase font-bold">
             {t('daily.puzzleNumber').replace('{number}', String(result.puzzleNumber))}

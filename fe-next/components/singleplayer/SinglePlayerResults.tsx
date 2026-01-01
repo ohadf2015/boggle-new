@@ -10,11 +10,15 @@ import PlayerInsights from '@/components/results/PlayerInsights';
 import PlayerArchetypeBadge from '@/components/results/PlayerArchetypeBadge';
 import { WordPointsGroup, InvalidWordsSection } from '@/components/results/WordPointsGroup';
 import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
-import ConfettiRetrigger from '@/components/results/ConfettiRetrigger';
 import Top3Leaderboard, { type LeaderboardParticipant } from '@/components/results/Top3Leaderboard';
 import { AchievementBadge } from '@/components/AchievementBadge';
 import WordFeedbackModal from '@/components/voting/WordFeedbackModal';
 import MissedWords from '@/components/results/MissedWords';
+// Shared result components
+import StatsGrid, { createGameStats } from '@/components/results/StatsGrid';
+import BonusBadgesRow from '@/components/results/BonusBadgesRow';
+import CoinRewardDisplay from '@/components/results/CoinRewardDisplay';
+import { SinglePlayerActions } from '@/components/results/ResultsActionButtons';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -445,15 +449,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           )}
 
           {/* Coins earned - compact for landscape */}
-          {coinReward && (
-            <div className="bg-neo-yellow border-2 border-neo-black rounded-neo px-3 py-1 text-center">
-              <div className="flex items-center justify-center gap-1">
-                <Coins className="w-3 h-3 text-neo-black" />
-                <span className="font-black text-neo-black">+{coinReward.awarded}</span>
-              </div>
-              <div className="text-[8px] font-bold uppercase text-neo-black/70">{t('reveal.coins') || 'Coins'}</div>
-            </div>
-          )}
+          <CoinRewardDisplay reward={coinReward} variant="inline" />
         </div>
 
         {/* Right column: Words + Bot scores + Actions */}
@@ -517,38 +513,13 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           )}
 
           {/* Action buttons - landscape compact layout */}
-          <div className="flex flex-col gap-2 mt-auto">
-            {onQuickRematch && (
-              <Button
-                size="sm"
-                className="w-full py-2 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-bold text-xs border-2 border-neo-black"
-                onClick={onQuickRematch}
-              >
-                <RotateCw className="me-1 text-xs" />
-                {t('common.rematch') || 'Rematch'}
-              </Button>
-            )}
-            <div className="flex gap-2">
-              <Button
-                variant="cyan"
-                size="sm"
-                className="flex-1 py-2 font-bold text-xs border-2 border-neo-black"
-                onClick={onPlayAgain}
-              >
-                <Settings className="me-1 text-xs" />
-                {t('common.settings') || 'Settings'}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1 py-2 font-bold text-xs border-2 border-neo-black"
-                onClick={onBackToLobby}
-              >
-                <Home className="me-1 text-xs" />
-                {t('common.lobby') || 'Lobby'}
-              </Button>
-            </div>
-          </div>
+          <SinglePlayerActions
+            onQuickRematch={onQuickRematch}
+            onPlayAgain={onPlayAgain}
+            onBackToLobby={onBackToLobby}
+            variant="landscape"
+            className="mt-auto"
+          />
         </div>
 
         {/* Signup prompt for guests who have played multiple games */}
@@ -625,15 +596,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           }
           showConfetti={shouldShowConfetti}
         />
-        {shouldShowConfetti && (
-          <div className="absolute top-2 end-2">
-            <ConfettiRetrigger
-              variant={mode === 'solo-bots' && playerRank <= 3 ? 'rank' : 'default'}
-              rank={mode === 'solo-bots' ? playerRank : undefined}
-              compact
-            />
-          </div>
-        )}
       </div>
 
       {/* Compact Stats Card */}
@@ -664,32 +626,15 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         </div>
 
         {/* Bonus Badges */}
-        {(totalComboBonus > 0 || totalFireRoundBonus > 0) && (
-          <div className="flex items-center gap-2 flex-wrap mt-2">
-            {totalComboBonus > 0 && (
-              <span className="bg-neo-orange border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-black text-xs font-black">
-                ⚡ +{totalComboBonus}
-              </span>
-            )}
-            {totalFireRoundBonus > 0 && (
-              <span className="bg-neo-red border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-cream text-xs font-black">
-                🔥 +{totalFireRoundBonus}
-              </span>
-            )}
-          </div>
-        )}
+        <BonusBadgesRow
+          comboBonus={totalComboBonus}
+          fireRoundBonus={totalFireRoundBonus}
+          className="mt-2"
+        />
       </div>
 
       {/* Coins Earned - Compact */}
-      {coinReward && (
-        <div className="bg-gradient-to-r from-neo-yellow to-amber-400 rounded-neo border-3 border-neo-black shadow-hard px-4 py-2">
-          <div className="flex items-center justify-center gap-2">
-            <Coins className="w-5 h-5 text-neo-black" />
-            <span className="font-black text-xl text-neo-black">+{coinReward.awarded}</span>
-            <span className="text-sm font-bold text-neo-black/70">{t('reveal.coins') || 'Coins'}</span>
-          </div>
-        </div>
-      )}
+      <CoinRewardDisplay reward={coinReward} variant="compact" />
 
       {/* Compact Top 3 Leaderboard */}
       {mode === 'solo-bots' && results.botScores.length > 0 && (
@@ -721,44 +666,13 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         </div>
       )}
 
-      {/* Primary CTA - Quick Rematch */}
-      {onQuickRematch && (
-        <motion.div
-          animate={{ scale: [1, 1.02, 1] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <Button
-            size="lg"
-            className="w-full py-4 text-xl shadow-hard-lg hover:shadow-hard-xl border-4 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-black uppercase tracking-wider"
-            onClick={onQuickRematch}
-          >
-            <RotateCw className="me-2 w-6 h-6" />
-            {t('common.quickRematch') || 'Quick Rematch'}
-          </Button>
-        </motion.div>
-      )}
-
-      {/* Secondary Actions */}
-      <div className="flex gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="flex-1 py-2 text-xs text-neo-black/70 dark:text-white/70 hover:text-neo-black dark:hover:text-white hover:bg-neo-cream/50 dark:hover:bg-slate-700/50 border border-neo-black/20 dark:border-white/20"
-          onClick={onPlayAgain}
-        >
-          <Settings className="me-1 w-3.5 h-3.5" />
-          {t('common.settings') || 'Settings'}
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="flex-1 py-2 text-xs text-neo-black/70 dark:text-white/70 hover:text-neo-black dark:hover:text-white hover:bg-neo-cream/50 dark:hover:bg-slate-700/50 border border-neo-black/20 dark:border-white/20"
-          onClick={onBackToLobby}
-        >
-          <Home className="me-1 w-3.5 h-3.5" />
-          {t('common.lobby') || 'Lobby'}
-        </Button>
-      </div>
+      {/* Action Buttons */}
+      <SinglePlayerActions
+        onQuickRematch={onQuickRematch}
+        onPlayAgain={onPlayAgain}
+        onBackToLobby={onBackToLobby}
+        variant="mobile"
+      />
     </div>
   );
 
@@ -998,16 +912,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           }
           showConfetti={shouldShowConfetti}
         />
-        {/* Confetti retrigger button for celebrations */}
-        {shouldShowConfetti && (
-          <div className="absolute top-2 end-2">
-            <ConfettiRetrigger
-              variant={mode === 'solo-bots' && playerRank <= 3 ? 'rank' : 'default'}
-              rank={mode === 'solo-bots' ? playerRank : undefined}
-              compact
-            />
-          </div>
-        )}
       </div>
 
       {/* Consolidated Performance Card - Similar to multiplayer */}
@@ -1127,50 +1031,20 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             </div>
 
             {/* Bonus Badges Row */}
-            {(totalComboBonus > 0 || totalFireRoundBonus > 0) && (
-              <div className="flex items-center gap-2 flex-wrap mb-3">
-                {totalComboBonus > 0 && (
-                  <span className="bg-neo-orange border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-black text-xs font-black">
-                    ⚡ +{totalComboBonus}
-                  </span>
-                )}
-                {totalFireRoundBonus > 0 && (
-                  <span className="bg-neo-red border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-cream text-xs font-black">
-                    🔥 +{totalFireRoundBonus}
-                  </span>
-                )}
-              </div>
-            )}
+            <BonusBadgesRow
+              comboBonus={totalComboBonus}
+              fireRoundBonus={totalFireRoundBonus}
+              className="mb-3"
+            />
 
             {/* Coins Earned */}
-            {coinReward && (
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.3, type: 'spring' }}
-                className="mb-3 px-4 py-3 bg-gradient-to-r from-neo-yellow to-amber-400 rounded-neo border-3 border-neo-black shadow-hard"
-              >
-                <div className="flex items-center justify-center gap-2 mb-1">
-                  <Coins className="w-5 h-5 text-neo-black" />
-                  <span className="font-black text-xl text-neo-black">+{coinReward.awarded}</span>
-                  <span className="text-sm font-bold text-neo-black/70">{t('reveal.coins') || 'Coins'}</span>
-                </div>
-                <div className="flex items-center justify-center gap-3 text-xs text-neo-black/70 font-medium">
-                  {coinReward.breakdown.base > 0 && (
-                    <span>{t('reveal.base') || 'Base'}: +{coinReward.breakdown.base}</span>
-                  )}
-                  {coinReward.breakdown.scoreBonus > 0 && (
-                    <span>{t('coins.score') || 'Score'}: +{coinReward.breakdown.scoreBonus}</span>
-                  )}
-                  {coinReward.breakdown.placement > 0 && (
-                    <span>🏆 {t('coins.placement') || 'Placement'}: +{coinReward.breakdown.placement}</span>
-                  )}
-                </div>
-                <p className="text-xs text-neo-black/60 mt-1 text-center">
-                  {t('reveal.usedForReveals') || 'Use coins to reveal words in single player games!'}
-                </p>
-              </motion.div>
-            )}
+            <CoinRewardDisplay
+              reward={coinReward}
+              variant="full"
+              showBreakdown
+              showHint
+              className="mb-3"
+            />
 
             {/* Collapsible: Performance Details */}
             {playerInsights && (
@@ -1401,42 +1275,13 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       )}
 
       {/* Action buttons - Compact */}
-      <div ref={actionButtonsRef} className="flex flex-col gap-2 pt-2">
-        {onQuickRematch && (
-          <motion.div
-            animate={{ scale: [1, 1.02, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <Button
-              size="lg"
-              className="w-full py-4 text-xl shadow-hard-lg hover:shadow-hard-xl border-4 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-black uppercase tracking-wider"
-              onClick={onQuickRematch}
-            >
-              <RotateCw className="me-2 w-6 h-6" />
-              {t('common.quickRematch') || 'Quick Rematch'}
-            </Button>
-          </motion.div>
-        )}
-        <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex-1 py-2 text-xs text-neo-black/70 dark:text-white/70 hover:text-neo-black dark:hover:text-white hover:bg-neo-cream/50 dark:hover:bg-slate-700/50 border border-neo-black/20 dark:border-white/20"
-            onClick={onPlayAgain}
-          >
-            <Settings className="me-1 w-3.5 h-3.5" />
-            {t('common.settings') || 'Settings'}
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex-1 py-2 text-xs text-neo-black/70 dark:text-white/70 hover:text-neo-black dark:hover:text-white hover:bg-neo-cream/50 dark:hover:bg-slate-700/50 border border-neo-black/20 dark:border-white/20"
-            onClick={onBackToLobby}
-          >
-            <Home className="me-1 w-3.5 h-3.5" />
-            {t('common.lobby') || 'Lobby'}
-          </Button>
-        </div>
+      <div ref={actionButtonsRef} className="pt-2">
+        <SinglePlayerActions
+          onQuickRematch={onQuickRematch}
+          onPlayAgain={onPlayAgain}
+          onBackToLobby={onBackToLobby}
+          variant="desktop"
+        />
       </div>
 
       </motion.div>

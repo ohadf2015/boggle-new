@@ -139,6 +139,38 @@ export const hapticForComboLevel = (comboLevel: number): boolean => {
   return vibrate(10);
 };
 
+/**
+ * Combo break feedback - deflating pattern
+ * Intensity scales with lost combo level
+ */
+export const hapticComboBreak = (lostLevel: number): boolean => {
+  if (lostLevel >= 10) {
+    // Lost a big combo - more impactful deflate
+    return vibrate([40, 40, 30, 40, 20, 40, 10]);
+  } else if (lostLevel >= 5) {
+    // Lost a medium combo
+    return vibrate([30, 40, 20, 40, 10]);
+  }
+  // Lost a small combo - subtle deflate
+  return vibrate([20, 30, 10]);
+};
+
+/**
+ * Combo saved feedback - relief pulse
+ * Brief satisfying confirmation that you narrowly saved your combo
+ */
+export const hapticComboSaved = (): boolean => {
+  return vibrate([40, 50, 30]);
+};
+
+/**
+ * Combo danger warning - heartbeat pattern
+ * Used when combo timer is running low
+ */
+export const hapticComboDanger = (): boolean => {
+  return vibrate([5, 100, 5]);
+};
+
 const haptics = {
   isSupported: isVibrationSupported,
   isEnabled: isHapticsEnabled,
@@ -152,6 +184,9 @@ const haptics = {
   timerWarning: hapticTimerWarning,
   forWordScore: hapticForWordScore,
   forComboLevel: hapticForComboLevel,
+  comboBreak: hapticComboBreak,
+  comboSaved: hapticComboSaved,
+  comboDanger: hapticComboDanger,
 };
 
 export default haptics;

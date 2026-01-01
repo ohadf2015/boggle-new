@@ -34,7 +34,7 @@ export interface PresetConfig {
  * Each preset provides a complete set of game settings
  */
 export const PRESETS: PresetConfig[] = [
-  // Quick Play - Fast 1-minute game
+  // Quick Play - Fast 1-minute game on 7x7 board
   {
     id: 'quick',
     nameKey: 'singlePlayer.preset.quick',
@@ -43,11 +43,11 @@ export const PRESETS: PresetConfig[] = [
     color: 'from-neo-cyan to-cyan-400',
     bgColor: 'bg-neo-cyan',
     settings: {
-      difficulty: 'EASY',
+      difficulty: 'MEDIUM', // 7x7 board
       timerSeconds: 60,
       bots: 1,
       botDifficulty: 'easy',
-      minWordLength: 2, // EASY preset accepts 2-letter words
+      minWordLength: 2,
     },
     modes: ['solo-bots', 'practice', 'challenge'],
   },

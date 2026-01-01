@@ -10,7 +10,6 @@ import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
 import { getChallengeUrl, generateChallengeShareMessage, type ScoreChallenge } from '@/utils/challenges';
 import type { SinglePlayerResultsData } from '@/components/singleplayer/SinglePlayerView';
-import ConfettiRetrigger from '@/components/results/ConfettiRetrigger';
 
 interface ChallengeResultsProps {
   results: SinglePlayerResultsData;
@@ -110,13 +109,14 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
         animate={{ scale: 1, opacity: 1, y: 0 }}
         className="max-w-md w-full space-y-6"
       >
-        {/* Result Card */}
+        {/* Result Card - Click to fire confetti */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
+          onClick={() => beatCreator && fireConfetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } })}
           className={cn(
-            'p-6 rounded-neo border-4 border-neo-black shadow-hard-xl overflow-hidden relative',
+            'p-6 rounded-neo border-4 border-neo-black shadow-hard-xl overflow-hidden relative cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]',
             beatCreator
               ? 'bg-gradient-to-br from-green-400 to-emerald-500'
               : isDark
@@ -125,7 +125,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
           )}
         >
           {/* Background pattern */}
-          <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 opacity-10 pointer-events-none">
             <div className="absolute inset-0" style={{
               backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)`,
             }} />
@@ -133,12 +133,6 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
 
           {/* Result Header */}
           <div className="relative text-center mb-6">
-            {/* Confetti retrigger button for winners */}
-            {beatCreator && (
-              <div className="absolute top-0 end-0">
-                <ConfettiRetrigger variant="default" compact />
-              </div>
-            )}
             <motion.div
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}

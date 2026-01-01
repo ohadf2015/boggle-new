@@ -37,6 +37,17 @@ export const COIN_EARNING_OTHER = {
 // Free reveals per game
 export const FREE_REVEALS_PER_GAME = 2;
 
+// Combo milestone coin rewards
+export const COMBO_COIN_REWARDS = {
+  MILESTONE_5: 5,    // Hot Streak - combo x5
+  MILESTONE_10: 10,  // Unstoppable - combo x10
+  MILESTONE_15: 15,  // Legendary - combo x15
+  MILESTONE_20: 20,  // Every 5 levels after 15
+} as const;
+
+// Milestone levels that trigger coin rewards
+export const COMBO_MILESTONES = [5, 10, 15, 20, 25, 30] as const;
+
 export interface CoinBalance {
   total: number;
   earnedFromDaily: number;
@@ -343,4 +354,47 @@ export function awardGameCoins(
     awarded: reward.total,
     breakdown: reward.breakdown,
   };
+}
+
+/**
+ * Calculate coins earned from a combo milestone
+ */
+export function calculateComboMilestoneReward(comboLevel: number): number {
+  if (comboLevel >= 20) {
+    return COMBO_COIN_REWARDS.MILESTONE_20;
+  } else if (comboLevel >= 15) {
+    return COMBO_COIN_REWARDS.MILESTONE_15;
+  } else if (comboLevel >= 10) {
+    return COMBO_COIN_REWARDS.MILESTONE_10;
+  } else if (comboLevel >= 5) {
+    return COMBO_COIN_REWARDS.MILESTONE_5;
+  }
+  return 0;
+}
+
+/**
+ * Check if a combo level is a milestone that awards coins
+ */
+export function isComboMilestone(comboLevel: number): boolean {
+  return COMBO_MILESTONES.includes(comboLevel as typeof COMBO_MILESTONES[number]);
+}
+
+/**
+ * Award coins for reaching a combo milestone
+ * Returns the amount awarded, or 0 if not a milestone
+ */
+export function awardComboCoins(comboLevel: number, gameMode: string): number {
+  if (!isComboMilestone(comboLevel)) {
+    return 0;
+  }
+
+  const reward = calculateComboMilestoneReward(comboLevel);
+  if (reward <= 0) return 0;
+
+  addCoins(reward, 'Combo Milestone', {
+    comboLevel,
+    gameMode,
+  });
+
+  return reward;
 }

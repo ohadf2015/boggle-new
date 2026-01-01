@@ -25,6 +25,8 @@ import { DIFFICULTIES } from '@/utils/consts';
 import { cn } from '@/lib/utils';
 import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
 import { wordErrorToast } from '@/components/NeoToast';
+import { awardComboCoins } from '@/utils/coinManager';
+import { hapticForWordScore, hapticError } from '@/utils/haptics';
 import { useAnnouncer } from '@/components/GameAnnouncer';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
@@ -144,6 +146,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   // Track grid version for earthquake recalculation
   const gridVersionRef = useRef(0);
 
+  // Coin reward animation state
+  const [comboCoinReward, setComboCoinReward] = useState<number | null>(null);
+
   // === SHARED HOOKS ===
 
   // Combo system - handles combo state, refs, and timeouts
@@ -151,6 +156,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     onComboSound: (level) => {
       if (level >= 2) {
         playComboSound(level);
+      }
+    },
+    onComboMilestone: (level) => {
+      // Award coins for combo milestones (5, 10, 15, 20, 25, 30)
+      const coinsAwarded = awardComboCoins(level, 'singleplayer');
+      if (coinsAwarded > 0) {
+        setComboCoinReward(coinsAwarded);
       }
     },
     trackMaxCombo: true,
@@ -830,6 +842,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         message: msg,
         timestamp: now,
       });
+      hapticError();
       announceWordResult(normalizedWord, false, undefined, msg);
       // Reset combo on invalid word submission (consistent with multiplayer behavior)
       combo.resetCombo();
@@ -850,6 +863,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         message: notOnBoardMsg,
         timestamp: now,
       });
+      hapticError();
       announceWordResult(normalizedWord, false, undefined, notOnBoardMsg);
       // Reset combo on invalid word submission (consistent with multiplayer behavior)
       combo.resetCombo();
@@ -868,6 +882,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         message: alreadyFoundMsg,
         timestamp: now,
       });
+      hapticError();
       announceWordResult(normalizedWord, false, undefined, alreadyFoundMsg);
       // Reset combo on duplicate submission
       combo.resetCombo();
@@ -933,6 +948,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           // Add full score with combo (exactly like multiplayer)
           setScore(prev => prev + fullScore);
           playWordAcceptedSound();
+          hapticForWordScore(normalizedWord.length);
 
           // Reset hint prompt - player found a word so they don't need prompting
           lastWordFoundTimeRef.current = Date.now();
@@ -1135,7 +1151,12 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               {t('common.words') || 'Words'}
             </div>
           </div>
-          <ComboDisplay comboLevel={combo.comboLevel} compact />
+          <ComboDisplay
+            comboLevel={combo.comboLevel}
+            compact
+            coinReward={comboCoinReward}
+            onCoinAnimationComplete={() => setComboCoinReward(null)}
+          />
         </div>
 
         {/* Bottom-left: Pause/Finish button (primary action - easy thumb reach) */}
@@ -1396,7 +1417,12 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       <div ref={gameStatsRef} className="flex items-center justify-center gap-2 md:gap-4 mb-1 md:mb-2" role="status" aria-label="Game status">
         {/* Combo (left - shows when level >= 2, placeholder otherwise for layout balance) */}
         <div className="min-w-[60px] md:min-w-[90px] flex justify-end">
-          <ComboDisplay comboLevel={combo.comboLevel} compact />
+          <ComboDisplay
+            comboLevel={combo.comboLevel}
+            compact
+            coinReward={comboCoinReward}
+            onCoinAnimationComplete={() => setComboCoinReward(null)}
+          />
         </div>
 
         {/* Timer (center - always visible and prominent) */}

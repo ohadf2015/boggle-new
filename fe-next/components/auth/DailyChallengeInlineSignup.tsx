@@ -10,6 +10,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { signInWithGoogle, signInWithDiscord, signUpWithEmail, signInWithEmail } from '../../lib/supabase';
 import { cn } from '../../lib/utils';
 import { setPendingDailyResult } from '../../utils/dailyChallenge';
+import { validateEmail, validatePassword } from '../../utils/validation';
 import type { WordHuntResult } from '../../utils/dailyChallenge';
 import type { Language } from '@/types';
 
@@ -63,10 +64,8 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-
-  // Validation
-  const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
-  const isValidPassword = (p: string) => p.length >= 8;
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const handleOAuthSignIn = async (provider: 'google' | 'discord') => {
     setIsLoading(provider);
@@ -94,21 +93,48 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
     }
   };
 
+  // Real-time validation handlers
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    if (value) {
+      const result = validateEmail(value);
+      setEmailError(result.isValid ? null : (result.error ? t(result.error) : null));
+    } else {
+      setEmailError(null);
+    }
+  };
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    if (value) {
+      const result = validatePassword(value);
+      setPasswordError(result.isValid ? null : (result.error ? t(result.error) : null));
+    } else {
+      setPasswordError(null);
+    }
+  };
+
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isValidEmail(email)) {
-      setError(t('auth.inlineSignup.invalidEmail') || 'Please enter a valid email address');
+    // Validate email
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      setEmailError(emailValidation.error ? t(emailValidation.error) : 'Invalid email');
       return;
     }
 
-    if (!isValidPassword(password)) {
-      setError(t('auth.inlineSignup.weakPassword') || 'Password must be at least 8 characters');
+    // Validate password
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      setPasswordError(passwordValidation.error ? t(passwordValidation.error) : 'Invalid password');
       return;
     }
 
     setIsLoading('email');
     setError(null);
+    setEmailError(null);
+    setPasswordError(null);
 
     try {
       // Store pending result before auth
@@ -289,38 +315,54 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
               </div>
 
               {/* Email Input */}
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
-                className="w-full px-4 py-3 rounded-neo border-2 border-neo-black bg-white dark:bg-gray-800 text-neo-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-neo-purple"
-                disabled={isAnyLoading}
-              />
-
-              {/* Password Input */}
-              <div className="relative">
+              <div>
                 <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder={t('auth.inlineSignup.passwordPlaceholder') || 'Password (8+ characters)'}
-                  className="w-full px-4 py-3 rounded-neo border-2 border-neo-black bg-white dark:bg-gray-800 text-neo-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-neo-purple pr-12"
+                  type="email"
+                  value={email}
+                  onChange={(e) => handleEmailChange(e.target.value)}
+                  placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
+                  className={cn(
+                    "w-full px-4 py-3 rounded-neo border-2 bg-white dark:bg-gray-800 text-neo-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-neo-purple",
+                    emailError ? "border-red-500" : "border-neo-black"
+                  )}
                   disabled={isAnyLoading}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
+                {emailError && (
+                  <p className="mt-1 text-xs text-red-500 dark:text-red-400">{emailError}</p>
+                )}
+              </div>
+
+              {/* Password Input */}
+              <div>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => handlePasswordChange(e.target.value)}
+                    placeholder={t('auth.inlineSignup.passwordPlaceholder') || 'Password (8+ characters)'}
+                    className={cn(
+                      "w-full px-4 py-3 rounded-neo border-2 bg-white dark:bg-gray-800 text-neo-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-neo-purple pr-12",
+                      passwordError ? "border-red-500" : "border-neo-black"
+                    )}
+                    disabled={isAnyLoading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+                {passwordError && (
+                  <p className="mt-1 text-xs text-red-500 dark:text-red-400">{passwordError}</p>
+                )}
               </div>
 
               {/* Submit Button */}
               <Button
                 type="submit"
-                disabled={isAnyLoading || !email || !password}
+                disabled={isAnyLoading || !email || !password || !!emailError || !!passwordError}
                 className="w-full py-3 bg-neo-purple hover:bg-neo-purple/90 text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 transition-all font-bold"
               >
                 {isLoading === 'email' ? (

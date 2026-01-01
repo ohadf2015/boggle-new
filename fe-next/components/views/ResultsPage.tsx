@@ -23,7 +23,6 @@ import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 // Dynamic imports for heavy components (loaded after initial render)
 const ResultsPlayerCard = dynamic(() => import('@/components/results/ResultsPlayerCard'), { ssr: false });
 const ResultsWinnerBanner = dynamic(() => import('@/components/results/ResultsWinnerBanner'), { ssr: false });
-const ConfettiRetrigger = dynamic(() => import('@/components/results/ConfettiRetrigger'), { ssr: false });
 const ConsolidatedPlayerCard = dynamic(() => import('@/components/results/ConsolidatedPlayerCard'), { ssr: false });
 const Top3Leaderboard = dynamic(() => import('@/components/results/Top3Leaderboard'), { ssr: false });
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
@@ -36,11 +35,14 @@ const PerformanceChart = dynamic(() => import('@/components/results/PerformanceC
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 import { Users } from 'lucide-react';
+const PlayerArchetypeBadge = dynamic(() => import('@/components/results/PlayerArchetypeBadge'), { ssr: false });
 import { cn } from '@/lib/utils';
 import { addGameToHistory } from '@/utils/gameHistoryManager';
 import { awardGameCoins } from '@/utils/coinManager';
 import { syncCoinsToDatabase } from '@/lib/supabase';
 import RoomChat from '@/components/RoomChat';
+// Shared result components
+import { MultiplayerActions } from '@/components/results/ResultsActionButtons';
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 
@@ -780,49 +782,38 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     <div className="space-y-3">
       {/* Compact Celebration Banner */}
       {bannerPlayer && (
-        <div className="relative">
-          <ResultsWinnerBanner winner={bannerPlayer} isCurrentUserWinner={isCurrentUserInBanner} rank={bannerRank} />
-          {isCurrentUserInBanner && bannerRank <= 3 && (
-            <div className="absolute top-2 end-2">
-              <ConfettiRetrigger variant="rank" rank={bannerRank} compact />
-            </div>
-          )}
-        </div>
+        <ResultsWinnerBanner winner={bannerPlayer} isCurrentUserWinner={isCurrentUserInBanner} rank={bannerRank} />
       )}
 
-      {/* Compact Stats Row - Key metrics only */}
+      {/* Compact Stats Row - Key metrics (rank/score shown in podium below) */}
       {currentPlayerData && currentPlayerRank > 0 && (
         <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 shadow-hard">
-          <div className="flex items-center gap-3">
-            {/* Rank Badge */}
-            <div className={cn(
-              'w-12 h-12 rounded-neo flex items-center justify-center border-3 border-neo-black font-black text-lg',
-              currentPlayerRank === 1 ? 'bg-neo-yellow text-neo-black' :
-              currentPlayerRank === 2 ? 'bg-slate-300 text-slate-800' :
-              currentPlayerRank === 3 ? 'bg-neo-orange text-neo-black' :
-              'bg-neo-cream text-neo-black'
-            )}>
-              #{currentPlayerRank}
-            </div>
-            {/* Score & Stats */}
-            <div className="flex-1 min-w-0">
-              <div className="text-2xl font-black text-white">{currentPlayerData.score || 0} <span className="text-sm text-white/60">{t('results.points') || 'pts'}</span></div>
-              <div className="text-xs text-white/70 font-bold flex items-center gap-2 flex-wrap">
-                <span>{currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0} {t('results.words') || 'words'}</span>
-                <span>•</span>
-                <span>{(() => {
-                  const total = currentPlayerData.allWords?.length || 0;
-                  const valid = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0;
-                  return total > 0 ? Math.round((valid / total) * 100) : 0;
-                })()}% {t('results.accuracy') || 'accuracy'}</span>
-                {currentPlayerArchetype && (
-                  <>
-                    <span>•</span>
-                    <span className="text-neo-cyan">{currentPlayerArchetype.name}</span>
-                  </>
-                )}
+          <div className="flex items-center justify-between gap-3">
+            {/* Stats Grid */}
+            <div className="flex items-center gap-4">
+              {/* Words */}
+              <div className="text-center">
+                <div className="text-xl font-black text-white">
+                  {currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0}
+                </div>
+                <div className="text-[10px] text-white/60 font-bold uppercase">{t('results.words') || 'Words'}</div>
+              </div>
+              {/* Accuracy */}
+              <div className="text-center">
+                <div className="text-xl font-black text-white">
+                  {(() => {
+                    const total = currentPlayerData.allWords?.length || 0;
+                    const valid = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0;
+                    return total > 0 ? Math.round((valid / total) * 100) : 0;
+                  })()}%
+                </div>
+                <div className="text-[10px] text-white/60 font-bold uppercase">{t('results.accuracy') || 'Accuracy'}</div>
               </div>
             </div>
+            {/* Archetype Badge with Image and Tooltip */}
+            {currentPlayerArchetype && (
+              <PlayerArchetypeBadge archetype={currentPlayerArchetype} size="sm" showTooltip={true} />
+            )}
           </div>
         </div>
       )}
@@ -1074,19 +1065,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           <div className="max-w-4xl mx-auto">
             {/* Celebration Banner (shows current player if in top 3) */}
             {bannerPlayer && (
-              <div className="relative">
-                <ResultsWinnerBanner winner={bannerPlayer} isCurrentUserWinner={isCurrentUserInBanner} rank={bannerRank} />
-                {/* Confetti retrigger button for winners and top 3 */}
-                {isCurrentUserInBanner && bannerRank <= 3 && (
-                  <div className="absolute top-2 end-2">
-                    <ConfettiRetrigger
-                      variant="rank"
-                      rank={bannerRank}
-                      compact
-                    />
-                  </div>
-                )}
-              </div>
+              <ResultsWinnerBanner winner={bannerPlayer} isCurrentUserWinner={isCurrentUserInBanner} rank={bannerRank} />
             )}
 
             {/* Consolidated Player Card - Your Performance (always shows current player) */}
@@ -1238,142 +1217,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
         {/* PROMINENT Action Section - Host sees Start Game, Players see I'm Ready */}
         {gameCode && onReturnToRoom && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.2, duration: 0.4, type: 'spring' }}
-            className="mt-4 max-w-2xl mx-auto px-2 sm:px-4"
-          >
-            {isHost ? (
-              /* HOST VIEW - Start Game Button */
-              <div className="bg-neo-lime text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-6 sm:p-8 relative overflow-hidden">
-                {/* Attention-grabbing pattern */}
-                <div className="absolute inset-0 pointer-events-none opacity-[0.08]" style={{
-                  backgroundImage: 'radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px)',
-                  backgroundSize: '16px 16px',
-                }} />
-                <div className="text-center space-y-5 relative z-10">
-                  <div>
-                    <h3 className="text-2xl sm:text-3xl font-black uppercase" style={{ textShadow: '3px 3px 0px var(--neo-cyan)' }}>
-                      {t('results.readyForNextRound') || 'Ready for Next Round?'}
-                    </h3>
-                  </div>
-                  <p className="text-neo-black/80 text-base font-bold max-w-md mx-auto">
-                    {t('results.hostStartDescription') || 'Start a new game when everyone is ready!'}
-                  </p>
-
-                  {/* HUGE Start Game Button for Host */}
-                  <motion.button
-                    onClick={handleStartGame}
-                    whileHover={{ scale: 1.02, x: -2, y: -2 }}
-                    whileTap={{ scale: 0.98, x: 2, y: 2 }}
-                    className="w-full sm:w-auto bg-emerald-500 text-white font-black text-xl sm:text-2xl px-12 py-5 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl transition-all flex items-center justify-center gap-3 mx-auto"
-                  >
-                    <Play className="w-7 h-7" />
-                    {t('hostView.startGame') || 'Start Game'}
-                    <Play className="w-7 h-7" />
-                  </motion.button>
-
-                  <motion.button
-                    whileHover={{ x: -2, y: -2 }}
-                    whileTap={{ x: 2, y: 2 }}
-                    onClick={handleExitRoom}
-                    className="bg-neo-red text-neo-cream font-bold text-sm px-6 py-2.5 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2 mx-auto mt-2"
-                  >
-                    <DoorOpen className="w-4 h-4" />
-                    {t('results.leaveRoom')}
-                  </motion.button>
-                </div>
-              </div>
-            ) : isCurrentPlayerReady ? (
-              /* PLAYER Ready State - Confirmed */
-              <div className="bg-emerald-500 text-white border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-6 sm:p-8 relative overflow-hidden">
-                {/* Success pattern */}
-                <div className="absolute inset-0 pointer-events-none opacity-10" style={{
-                  backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px)',
-                }} />
-                <div className="text-center space-y-4 relative z-10">
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                    className="flex items-center justify-center gap-4"
-                  >
-                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center border-4 border-neo-black shadow-hard">
-                      <Check className="w-8 h-8 text-emerald-600" />
-                    </div>
-                  </motion.div>
-                  <h3 className="text-2xl sm:text-3xl font-black uppercase" style={{ textShadow: '2px 2px 0px rgba(0,0,0,0.3)' }}>
-                    {t('results.youAreReady')}
-                  </h3>
-                  <p className="text-white/90 text-base font-bold">
-                    {t('results.waitingForHostToStart') || 'Waiting for host to start the next round...'}
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center mt-4">
-                    <motion.button
-                      whileHover={{ x: -2, y: -2 }}
-                      whileTap={{ x: 2, y: 2 }}
-                      onClick={onReturnToRoom}
-                      className="bg-white text-neo-black font-black text-base px-6 py-3 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
-                    >
-                      <ArrowRight className="w-5 h-5 rtl:rotate-180" />
-                      {t('results.goToLobby')}
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ x: -2, y: -2 }}
-                      whileTap={{ x: 2, y: 2 }}
-                      onClick={handleExitRoom}
-                      className="bg-neo-red text-neo-cream font-black text-base px-6 py-3 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
-                    >
-                      <DoorOpen className="w-5 h-5" />
-                      {t('results.leaveRoom')}
-                    </motion.button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              /* PLAYER Not Ready State - PROMINENT CTA */
-              <div className="bg-neo-yellow text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-6 sm:p-8 relative overflow-hidden">
-                {/* Attention-grabbing pattern */}
-                <div className="absolute inset-0 pointer-events-none opacity-[0.08]" style={{
-                  backgroundImage: 'radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px)',
-                  backgroundSize: '16px 16px',
-                }} />
-                <div className="text-center space-y-5 relative z-10">
-                  <div>
-                    <h3 className="text-2xl sm:text-3xl font-black uppercase" style={{ textShadow: '3px 3px 0px var(--neo-pink)' }}>
-                      {t('results.playAgainQuestion')}
-                    </h3>
-                  </div>
-                  <p className="text-neo-black/80 text-base font-bold max-w-md mx-auto">
-                    {t('results.markReadyDescription') || 'Click below to let the host know you\'re ready for the next round'}
-                  </p>
-
-                  {/* HUGE I'm Ready Button */}
-                  <motion.button
-                    onClick={handleMarkReady}
-                    whileHover={{ scale: 1.02, x: -2, y: -2 }}
-                    whileTap={{ scale: 0.98, x: 2, y: 2 }}
-                    className="w-full sm:w-auto bg-neo-lime text-neo-black font-black text-xl sm:text-2xl px-12 py-5 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl transition-all flex items-center justify-center gap-3 mx-auto"
-                  >
-                    <Star className="w-7 h-7" />
-                    {t('results.imReady')}
-                    <Star className="w-7 h-7" />
-                  </motion.button>
-
-                  <motion.button
-                    whileHover={{ x: -2, y: -2 }}
-                    whileTap={{ x: 2, y: 2 }}
-                    onClick={handleExitRoom}
-                    className="bg-neo-red text-neo-cream font-bold text-sm px-6 py-2.5 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2 mx-auto mt-2"
-                  >
-                    <DoorOpen className="w-4 h-4" />
-                    {t('results.leaveRoom')}
-                  </motion.button>
-                </div>
-              </div>
-            )}
-          </motion.div>
+          <div className="mt-4 max-w-2xl mx-auto px-2 sm:px-4">
+            <MultiplayerActions
+              isHost={isHost}
+              isCurrentPlayerReady={isCurrentPlayerReady}
+              onStartGame={handleStartGame}
+              onMarkReady={handleMarkReady}
+              onReturnToRoom={onReturnToRoom}
+              onExitRoom={handleExitRoom}
+              variant="desktop"
+            />
+          </div>
         )}
 
         {/* Players Ready Indicator - Shows who's ready for next round */}

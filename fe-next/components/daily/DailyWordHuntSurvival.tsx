@@ -38,7 +38,7 @@ import { logGameStart, logGameEnd, formatWordsForLogging } from '@/utils/gameLog
 
 const MAX_ATTEMPTS = 10;
 const INITIAL_LIFE = 100;
-const LIFE_DRAIN_RATE = 1.0; // points per second (gives 100 seconds total)
+const LIFE_DRAIN_RATE = 1.2; // points per second (gives ~83 seconds total)
 const INVALID_WORD_PENALTY = 5; // life points lost for invalid submissions
 const NOT_IN_DICTIONARY_PENALTY = 4; // life points lost for words not in dictionary
 
@@ -468,10 +468,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         }
       });
 
-      // Remove letters from knownLetters if they're now fully accounted for by greens
+      // Remove letters from knownLetters if they have ANY green position
+      // Once a letter is green, the player knows it's in the word - no need to show in "wrong spot" hints
       allGreenCounts.forEach((greenCount, letter) => {
-        const targetCount = targetLetterCounts.get(letter) || 0;
-        if (greenCount >= targetCount) {
+        if (greenCount > 0) {
           updated.delete(letter);
         }
       });
@@ -1130,7 +1130,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                   {t('wordHunt.survival.hintLevel')?.replace('{level}', String(currentHint.level)) || `Hint Lvl ${currentHint.level}`}
                 </span>
               </div>
-              {/* Known letters (yellow) display */}
+              {/* Known letters (yellow) display - letters in word but not in right place */}
               {knownLetters.size > 0 && (
                 <motion.div
                   initial={{ opacity: 0, y: -5 }}
@@ -1138,7 +1138,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                   className="flex items-center gap-1 text-[10px] sm:text-xs"
                 >
                   <span className="text-yellow-600 dark:text-yellow-400 font-medium">
-                    {t('wordHunt.survival.knownLetters') || 'Contains:'}
+                    {t('wordHunt.survival.knownLetters') || 'Wrong spot:'}
                   </span>
                   <div className="flex gap-0.5">
                     {Array.from(knownLetters).map((letter) => (

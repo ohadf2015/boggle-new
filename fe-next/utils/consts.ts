@@ -207,6 +207,17 @@ export const GAME_CODE_MAX_LENGTH = 10;
 export const WORD_MIN_LENGTH = 2;
 export const WORD_MAX_LENGTH = 20;
 
+// Password constraints
+export const PASSWORD_MIN_LENGTH = 8;
+export const PASSWORD_MAX_LENGTH = 128;
+
+// Email validation pattern
+// Matches standard email format: local@domain.tld
+export const EMAIL_VALID_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Password must contain at least one uppercase, one lowercase, one number
+export const PASSWORD_STRENGTH_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
+
 // Pattern for valid username/room name characters
 // Uses Unicode property escapes to allow any letter or number from any language, plus spaces and ._-
 export const NAME_VALID_PATTERN = /^[\p{L}\p{N}\s._-]+$/u;

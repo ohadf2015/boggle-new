@@ -9,3 +9,4 @@ export { useGridInteraction } from './useGridInteraction';
 export { getPerformanceMode } from './performanceUtils';
 export { default as ComboIndicator } from './ComboIndicator';
 export { default as ComboExplanationTooltip } from './ComboExplanationTooltip';
+export { default as ComboBreakEffect } from './ComboBreakEffect';

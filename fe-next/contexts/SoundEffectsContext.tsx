@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useRef, useCallback, useMe
 import { Howl } from 'howler';
 import { useMusic } from './MusicContext';
 import logger from '@/utils/logger';
-import { hapticAchievement, hapticForComboLevel } from '@/utils/haptics';
+import { hapticAchievement, hapticForComboLevel, hapticComboBreak, hapticComboSaved } from '@/utils/haptics';
 import { useLocalStorageObject } from '@/hooks/useLocalStorageState';
 
 interface SoundEffectOptions {
@@ -23,6 +23,10 @@ interface SoundEffectsContextType {
   playWordAcceptedSound: () => void;
   playCountdownBeep: (secondsRemaining: number) => void;
   playMessageSound: () => void;
+  // Combo feedback sounds
+  playComboMilestoneSound: (milestoneLevel: number) => void;
+  playComboBreakSound: (lostLevel: number) => void;
+  playComboSavedSound: () => void;
   // Earthquake/Fire Round sounds
   playEarthquakeRumble: () => void;
   playEarthquakeShake: () => void;
@@ -45,6 +49,10 @@ const SOUND_EFFECTS = {
   wordAccepted: '/sounds/word-accepted.wav',
   countdownBeep: '/sounds/countdown-beep.wav',
   message: '/sounds/message.mp3',
+  // Combo feedback sounds (user will provide custom files)
+  comboMilestone: '/sounds/combo-milestone.mp3',
+  comboBreak: '/sounds/combo-break.mp3',
+  comboSaved: '/sounds/combo-saved.mp3',
   // Earthquake/Fire Round sounds (user will provide custom files)
   earthquakeRumble: '/sounds/earthquake-rumble.wav',
   earthquakeShake: '/sounds/earthquake-shake.wav',
@@ -60,7 +68,9 @@ interface SoundEffectsProviderProps {
 }
 
 export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
-  const { isMuted, audioUnlocked } = useMusic();
+  // Only use audioUnlocked from MusicContext - isMuted should NOT affect SFX
+  // SFX have their own mute control (sfxMuted)
+  const { audioUnlocked } = useMusic();
   const soundsRef = useRef<Record<string, Howl>>({});
   const soundsLoadedRef = useRef(false);
   const isTabVisibleRef = useRef(true);
@@ -135,7 +145,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
 
   // Play a sound effect
   const playSound = useCallback((soundKey: keyof typeof SOUND_EFFECTS, options: SoundEffectOptions = {}) => {
-    if (!audioUnlocked || isMuted || sfxMuted || !isTabVisibleRef.current) return;
+    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current) return;
 
     const howl = soundsRef.current[soundKey];
     if (!howl) {
@@ -161,12 +171,12 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     }
 
     howl.play();
-  }, [audioUnlocked, isMuted, sfxMuted, sfxVolume]);
+  }, [audioUnlocked, sfxMuted, sfxVolume]);
 
   // Play combo sound with dynamic pitch based on combo level
   // Pitch increases with each combo level (infinite scaling)
   const playComboSound = useCallback((comboLevel: number) => {
-    if (!audioUnlocked || isMuted || sfxMuted || !isTabVisibleRef.current || comboLevel < 1) return;
+    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || comboLevel < 1) return;
 
     // Calculate pitch rate: starts at 1.0, increases by ~0.1 per combo level
     // Uses logarithmic scaling for smooth progression that doesn't get too extreme
@@ -180,7 +190,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
 
     playSound('combo', { rate, volume: volumeBoost });
     hapticForComboLevel(comboLevel);
-  }, [audioUnlocked, isMuted, sfxMuted, playSound]);
+  }, [audioUnlocked, sfxMuted, playSound]);
 
   // Play achievement unlock sound with haptic feedback
   const playAchievementSound = useCallback(() => {
@@ -196,7 +206,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   // Play countdown beep with increasing pitch (3, 2, 1 seconds remaining)
   // secondsRemaining: 3 = lowest pitch, 1 = highest pitch
   const playCountdownBeep = useCallback((secondsRemaining: number) => {
-    if (!audioUnlocked || isMuted || sfxMuted || !isTabVisibleRef.current) return;
+    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current) return;
 
     // Pitch increases as we get closer to 0: 3->1.0, 2->1.2, 1->1.4
     const pitchMap: Record<number, number> = { 3: 1.0, 2: 1.2, 1: 1.4 };
@@ -204,12 +214,58 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     const volume = secondsRemaining === 1 ? 0.9 : 0.7; // Loudest on final beep
 
     playSound('countdownBeep', { rate, volume });
-  }, [audioUnlocked, isMuted, sfxMuted, playSound]);
+  }, [audioUnlocked, sfxMuted, playSound]);
 
   // Play chat message notification sound
   const playMessageSound = useCallback(() => {
     playSound('message', { volume: 0.5 });
   }, [playSound]);
+
+  // ==================== Combo Feedback Sounds ====================
+
+  /**
+   * Play milestone celebration sound for combo 5, 10, 15
+   * Higher milestones get slightly louder and higher pitched
+   */
+  const playComboMilestoneSound = useCallback((milestoneLevel: number) => {
+    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current) return;
+
+    // Pitch and volume increase with milestone level
+    const pitchMap: Record<number, number> = { 5: 1.0, 10: 1.1, 15: 1.2 };
+    const volumeMap: Record<number, number> = { 5: 0.7, 10: 0.8, 15: 0.9 };
+
+    const rate = pitchMap[milestoneLevel] || 1.0;
+    const volume = volumeMap[milestoneLevel] || 0.7;
+
+    playSound('comboMilestone', { rate, volume });
+    // Milestone also triggers a celebratory haptic
+    hapticForComboLevel(milestoneLevel);
+  }, [audioUnlocked, sfxMuted, playSound]);
+
+  /**
+   * Play combo break sound when combo is lost
+   * Louder for higher combos that were lost (more impactful loss)
+   */
+  const playComboBreakSound = useCallback((lostLevel: number) => {
+    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current) return;
+
+    // Volume scales with lost combo level (losing a big combo is more impactful)
+    // But capped to not be too harsh
+    const volume = Math.min(0.3 + (lostLevel * 0.04), 0.6);
+
+    playSound('comboBreak', { volume });
+    hapticComboBreak(lostLevel);
+  }, [audioUnlocked, sfxMuted, playSound]);
+
+  /**
+   * Play combo saved sound when player narrowly avoids losing combo
+   */
+  const playComboSavedSound = useCallback(() => {
+    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current) return;
+
+    playSound('comboSaved', { volume: 0.5 });
+    hapticComboSaved();
+  }, [audioUnlocked, sfxMuted, playSound]);
 
   // Earthquake/Fire Round sound effects
 
@@ -230,7 +286,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
 
   // Start fire crackle ambient loop (plays for 15 seconds)
   const startFireCrackleLoop = useCallback(() => {
-    if (!audioUnlocked || isMuted || sfxMuted || !isTabVisibleRef.current) return;
+    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current) return;
 
     const howl = soundsRef.current['fireCrackleLoop'];
     if (!howl) {
@@ -259,7 +315,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     fireCrackleLoopIdRef.current = soundId;
 
     logger.log('[SFX] Started fire crackle loop');
-  }, [audioUnlocked, isMuted, sfxMuted, sfxVolume]);
+  }, [audioUnlocked, sfxMuted, sfxVolume]);
 
   // Stop fire crackle ambient loop
   const stopFireCrackleLoop = useCallback(() => {
@@ -292,6 +348,10 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     playWordAcceptedSound,
     playCountdownBeep,
     playMessageSound,
+    // Combo feedback sounds
+    playComboMilestoneSound,
+    playComboBreakSound,
+    playComboSavedSound,
     // Earthquake/Fire Round sounds
     playEarthquakeRumble,
     playEarthquakeShake,
@@ -309,6 +369,9 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     playWordAcceptedSound,
     playCountdownBeep,
     playMessageSound,
+    playComboMilestoneSound,
+    playComboBreakSound,
+    playComboSavedSound,
     playEarthquakeRumble,
     playEarthquakeShake,
     playFireRoundStart,

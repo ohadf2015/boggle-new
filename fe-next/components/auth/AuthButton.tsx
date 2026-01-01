@@ -44,9 +44,20 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
   const isRTL = dir === 'rtl';
 
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+  const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signin');
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
   const [isSigningOut, setIsSigningOut] = useState<boolean>(false);
   const [isLanguageExpanded, setIsLanguageExpanded] = useState<boolean>(false);
+
+  const openSignIn = () => {
+    setAuthModalMode('signin');
+    setShowAuthModal(true);
+  };
+
+  const openSignUp = () => {
+    setAuthModalMode('signup');
+    setShowAuthModal(true);
+  };
 
   const currentLang = languages.find(l => l.code === language) ?? languages[0] ?? { code: 'en', flag: '🇺🇸', name: 'English' };
 
@@ -390,7 +401,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
     );
   }
 
-  // Guest user - show prominent Sign In button + settings dropdown
+  // Guest user - show Sign In and Sign Up buttons
   // Inline variant for mobile menu
   if (inline) {
     return (
@@ -398,7 +409,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
         <div className="flex flex-col gap-2 w-full">
           {/* Sign In Button */}
           <button
-            onClick={() => setShowAuthModal(true)}
+            onClick={openSignIn}
             className={cn(
               "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
               "bg-neo-cyan shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard"
@@ -406,6 +417,18 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
           >
             <User size={14} className="text-neo-black" />
             <span className="text-neo-black">{t('auth.signIn') || 'Sign In'}</span>
+          </button>
+
+          {/* Sign Up Button */}
+          <button
+            onClick={openSignUp}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
+              "bg-neo-purple text-white shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard"
+            )}
+          >
+            <User size={14} />
+            <span>{t('auth.signUp') || 'Sign Up'}</span>
           </button>
 
           {/* Theme Toggle */}
@@ -425,33 +448,52 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
           isOpen={showAuthModal}
           onClose={() => setShowAuthModal(false)}
           showGuestStats={true}
+          initialMode={authModalMode}
         />
       </>
     );
   }
 
-  // Default dropdown variant - just sign in button (settings now in Header)
+  // Default dropdown variant - Sign In and Sign Up buttons
   return (
     <>
-      {/* Prominent Sign In Button */}
-      <Button
-        size="sm"
-        onClick={() => setShowAuthModal(true)}
-        className={cn(
-          'flex items-center gap-2 rounded-full font-bold transition-all duration-300 min-h-[44px]',
-          isDarkMode
-            ? 'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] border-2 border-neo-black'
-            : 'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.4)] border-2 border-neo-black'
-        )}
-      >
-        <User size={14} />
-        <span className="hidden sm:inline">{t('auth.signIn') || 'Sign In'}</span>
-      </Button>
+      <div className="flex items-center gap-2">
+        {/* Sign In Button */}
+        <Button
+          size="sm"
+          onClick={openSignIn}
+          className={cn(
+            'flex items-center gap-2 rounded-full font-bold transition-all duration-300 min-h-[44px]',
+            isDarkMode
+              ? 'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] border-2 border-neo-black'
+              : 'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.4)] border-2 border-neo-black'
+          )}
+        >
+          <User size={14} />
+          <span className="hidden sm:inline">{t('auth.signIn') || 'Sign In'}</span>
+        </Button>
+
+        {/* Sign Up Button */}
+        <Button
+          size="sm"
+          onClick={openSignUp}
+          className={cn(
+            'flex items-center gap-2 rounded-full font-bold transition-all duration-300 min-h-[44px]',
+            isDarkMode
+              ? 'bg-neo-purple text-white hover:bg-purple-500 hover:shadow-[0_0_15px_rgba(147,51,234,0.5)] border-2 border-neo-black'
+              : 'bg-neo-purple text-white hover:bg-purple-500 hover:shadow-[0_0_15px_rgba(147,51,234,0.4)] border-2 border-neo-black'
+          )}
+        >
+          <span className="hidden sm:inline">{t('auth.signUp') || 'Sign Up'}</span>
+          <span className="sm:hidden">+</span>
+        </Button>
+      </div>
 
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         showGuestStats={true}
+        initialMode={authModalMode}
       />
     </>
   );
