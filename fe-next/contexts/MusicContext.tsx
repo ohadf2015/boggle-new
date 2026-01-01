@@ -228,7 +228,16 @@ export function MusicProvider({ children }: MusicProviderProps) {
             logger.log(`[Music] ${reason} - resumed AudioContext`);
         }
 
-        // Also resume the current Howl instance if it was paused
+        // CRITICAL: Stop all tracks except the current one to prevent multiple tracks playing
+        // This ensures only the intended track resumes, not any stale paused tracks
+        const currentKey = currentTrackRef.current;
+        Object.entries(howlsRef.current).forEach(([key, howl]) => {
+            if (key !== currentKey) {
+                howl.stop();
+            }
+        });
+
+        // Resume the current Howl instance if it was paused
         // This handles cases where we paused via Howl.pause() in suspendAudio
         if (currentHowlRef.current && !currentHowlRef.current.playing() && currentTrackRef.current) {
             const targetVolume = isMutedRef.current ? 0 : volumeRef.current;
@@ -418,12 +427,25 @@ export function MusicProvider({ children }: MusicProviderProps) {
         const oldHowl = currentHowlRef.current;
         const targetVolume = isMutedRef.current ? 0 : volumeRef.current;
 
-        // Fade out old track
-        if (oldHowl && oldHowl !== newHowl && oldHowl.playing()) {
-            oldHowl.fade(oldHowl.volume(), 0, fadeOutMs);
-            fadeTimeoutRef.current = setTimeout(() => {
-                oldHowl.stop();
-            }, fadeOutMs);
+        // CRITICAL: Stop ALL other tracks to ensure only one music track plays at a time
+        // This handles edge cases where tracks might be paused but not stopped
+        Object.entries(howlsRef.current).forEach(([key, howl]) => {
+            if (key !== trackKey) {
+                if (howl.playing()) {
+                    // Fade out if playing (for crossfade effect)
+                    howl.fade(howl.volume(), 0, fadeOutMs);
+                    setTimeout(() => howl.stop(), fadeOutMs);
+                } else {
+                    // Stop immediately if paused (to prevent resurrection)
+                    howl.stop();
+                }
+            }
+        });
+
+        // Also handle the tracked old howl (in case it wasn't in the loop)
+        if (oldHowl && oldHowl !== newHowl && !oldHowl.playing()) {
+            // Old track is paused - stop it immediately to prevent it from resuming
+            oldHowl.stop();
         }
 
         // Start and fade in new track
@@ -545,13 +567,17 @@ export function MusicProvider({ children }: MusicProviderProps) {
 
     // Stop music with fade out
     const stopMusic = useCallback((fadeOutMs = 1000) => {
-        const howl = currentHowlRef.current;
-        if (howl && howl.playing()) {
-            howl.fade(howl.volume(), 0, fadeOutMs);
-            setTimeout(() => {
+        // CRITICAL: Stop ALL tracks to ensure nothing continues playing
+        Object.values(howlsRef.current).forEach(howl => {
+            if (howl.playing()) {
+                howl.fade(howl.volume(), 0, fadeOutMs);
+                setTimeout(() => howl.stop(), fadeOutMs);
+            } else {
+                // Stop immediately if paused
                 howl.stop();
-            }, fadeOutMs);
-        }
+            }
+        });
+
         currentHowlRef.current = null;
         currentTrackRef.current = null;
         setCurrentTrack(null);

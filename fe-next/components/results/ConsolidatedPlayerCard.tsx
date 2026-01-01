@@ -13,6 +13,8 @@ import XpBreakdownCard from './XpBreakdownCard';
 import { WordPointsGroup, SharedWordsSection, InvalidWordsSection } from './WordPointsGroup';
 import { filterGameAchievements } from './utils';
 import { useWordCategories } from './useWordCategories';
+import StatsGrid, { createGameStats } from './StatsGrid';
+import BonusBadgesRow from './BonusBadgesRow';
 import { calculatePlayerInsights } from '@/utils/gameInsights';
 import { applyHebrewFinalLetters } from '@/utils/utils';
 import type { Player, WordObject, XpGainedData, LevelUpData } from './types';
@@ -128,7 +130,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
       initial={{ opacity: 0, y: -20, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
-      className="w-full max-w-lg mx-auto mb-4"
+      className="w-full max-w-xl mx-auto mb-4"
     >
       <div
         className={cn(
@@ -146,7 +148,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
           }}
         />
 
-        <div className="relative z-10 p-3 sm:p-4">
+        <div className="relative z-10 p-4 sm:p-5">
           {/* Header: Your Performance */}
           <div className="flex items-center gap-2 mb-2 sm:mb-3">
             <Sparkles className="w-5 h-5 text-neo-cyan" />
@@ -156,19 +158,19 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
           </div>
 
           {/* Primary Row: Rank + Avatar + Info + Score */}
-          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-            {/* Rank Badge */}
+          <div className="flex items-center gap-3 sm:gap-4 mb-2 sm:mb-3">
+            {/* Rank Badge - Large and prominent */}
             <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
+              initial={{ scale: 0, rotate: -10 }}
+              animate={{ scale: 1, rotate: 3 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
               className={cn(
-                'flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-neo flex items-center justify-center border-2 sm:border-3 border-neo-black shadow-hard',
+                'flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-neo flex items-center justify-center border-3 sm:border-4 border-neo-black shadow-hard-lg',
                 rankStyle.bg, rankStyle.text
               )}
             >
               <div className="text-center">
-                <span className="text-lg sm:text-xl font-black">#{rank}</span>
+                <span className="text-2xl sm:text-3xl font-black">#{rank}</span>
               </div>
             </motion.div>
 
@@ -179,8 +181,8 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                 avatarEmoji={player.avatar.emoji}
                 avatarImage={player.avatar.avatarImage}
                 avatarColor={player.avatar.color}
-                size="lg"
-                className="flex-shrink-0 border-2 border-neo-black w-10 h-10 sm:w-12 sm:h-12"
+                size="xl"
+                className="flex-shrink-0 border-2 border-neo-black w-12 h-12 sm:w-14 sm:h-14"
               />
             )}
 
@@ -267,30 +269,13 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
           </div>
 
           {/* Bonus Badges Row */}
-          {(totalComboBonus > 0 || totalFireRoundBonus > 0 || xpGainedData || levelUpData) && (
-            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap mb-2 sm:mb-3">
-              {totalComboBonus > 0 && (
-                <span className="bg-neo-orange border sm:border-2 border-neo-black rounded-neo px-1.5 sm:px-2 py-0.5 shadow-hard-sm text-neo-black text-[10px] sm:text-xs font-black">
-                  ⚡ +{totalComboBonus}
-                </span>
-              )}
-              {totalFireRoundBonus > 0 && (
-                <span className="bg-neo-red border sm:border-2 border-neo-black rounded-neo px-1.5 sm:px-2 py-0.5 shadow-hard-sm text-neo-cream text-[10px] sm:text-xs font-black">
-                  🔥 +{totalFireRoundBonus}
-                </span>
-              )}
-              {xpGainedData && (
-                <span className="bg-neo-purple border sm:border-2 border-neo-black rounded-neo px-1.5 sm:px-2 py-0.5 shadow-hard-sm text-neo-cream text-[10px] sm:text-xs font-black">
-                  ⭐ +{xpGainedData.xpEarned} XP
-                </span>
-              )}
-              {levelUpData && (
-                <span className="bg-neo-yellow border sm:border-2 border-neo-black rounded-neo px-1.5 sm:px-2 py-0.5 shadow-hard-sm text-neo-black text-[10px] sm:text-xs font-black">
-                  🎉 Lvl {levelUpData.oldLevel} {levelArrow} {levelUpData.newLevel}
-                </span>
-              )}
-            </div>
-          )}
+          <BonusBadgesRow
+            comboBonus={totalComboBonus}
+            fireRoundBonus={totalFireRoundBonus}
+            xpGainedData={xpGainedData}
+            levelUpData={levelUpData}
+            className="mb-2 sm:mb-3"
+          />
 
           {/* Collapsible: Performance Details */}
           <button

@@ -14,7 +14,7 @@ import logger from '@/utils/logger';
 import XpBreakdownCard from './XpBreakdownCard';
 import PlayerArchetypeBadge from './PlayerArchetypeBadge';
 import { WordPointsGroup, SharedWordsSection, InvalidWordsSection } from './WordPointsGroup';
-import { getRankIconString, getRankBoxStyle, getCardStyle } from '../../utils/rankingStyles';
+import { getCardStyle } from '../../utils/rankingStyles';
 import { filterGameAchievements } from './utils';
 import type { WordObject, ResultsPlayerCardProps } from './types';
 
@@ -169,8 +169,6 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
   }, [allPlayerWords]);
 
   // Use centralized ranking utilities
-  const rankIcon = getRankIconString(index);
-  const rankBoxStyleClass = getRankBoxStyle(index);
   const cardStyleClass = getCardStyle(index);
 
   return (
@@ -204,16 +202,10 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
         />
         {/* Header: Rank, Name, Score - Neo-Brutalist - Organized */}
         <div className="relative z-10">
-          {/* Main row: Rank, Avatar, Username, Score */}
+          {/* Main row: Avatar, Username (no rank/score for secondary cards) */}
           <div className="flex items-center justify-between gap-2 sm:gap-3 mb-3">
-            {/* Left: Rank + Avatar + Username with key badges */}
+            {/* Left: Avatar + Username with key badges */}
             <div className="flex items-center gap-2 min-w-0 flex-1">
-              <div className={cn(
-                "w-11 h-11 sm:w-12 sm:h-12 rounded-neo flex items-center justify-center text-lg sm:text-2xl font-black border-3 shadow-hard-sm flex-shrink-0",
-                rankBoxStyleClass
-              )}>
-                {rankIcon}
-              </div>
               <Avatar
                 profilePictureUrl={avatar?.profilePictureUrl}
                 avatarEmoji={avatar?.emoji}
@@ -276,11 +268,6 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                   )}
                 </div>
               </div>
-            </div>
-
-            {/* Right: Score */}
-            <div className="bg-neo-cream border-3 border-neo-black rounded-neo px-3 py-1 sm:px-4 sm:py-2 shadow-hard text-neo-black flex-shrink-0">
-              <span className="text-2xl sm:text-3xl font-black">{player.score}</span>
             </div>
           </div>
 

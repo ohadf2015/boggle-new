@@ -384,9 +384,9 @@ export function useGridInteraction({
     // Initialize selection
     setSelectedCells([{ row: rowIndex, col: colIndex, letter }]);
 
-    // Haptic feedback - light tap feedback
+    // Haptic feedback - subtle but noticeable tap on first cell selection
     if (window.navigator && window.navigator.vibrate) {
-      window.navigator.vibrate(fireRoundActive ? 15 : 8);
+      window.navigator.vibrate(fireRoundActive ? 18 : 12);
     }
   };
 
@@ -460,9 +460,10 @@ export function useGridInteraction({
     if (isAdjacentCell(lastCell, currentCell)) {
       const newSelection = [...selectedCells, { row: currentCell.row, col: currentCell.col, letter: currentCell.letter }];
       setSelectedCells(newSelection);
-      // Smooth, consistent haptic during drag - not increasing with word length
+      // Subtle but satisfying haptic during drag
       if (window.navigator?.vibrate) {
-        window.navigator.vibrate(fireRoundActive ? 12 : 6);
+        // Consistent light taps - not overwhelming during fast swiping
+        window.navigator.vibrate(fireRoundActive ? 12 : 8);
       }
     }
   }, [selectedCells, setSelectedCells, fireRoundActive, getCellAtPosition, calculateVelocity, isAdjacentCell, isDiagonalMove]);

@@ -564,15 +564,17 @@ const GridComponent = memo<GridComponentProps>(({
                       animation: 'rainbow-pulse 1.5s ease-in-out infinite',
                       willChange: 'transform, box-shadow',
                     }),
-                    // Dynamic glow based on combo level
+                    // Dynamic glow based on combo level - ENHANCED for more prominent feedback
                     ...(isSelected && {
                       boxShadow: comboColors.isRainbow
-                        ? '0 0 20px rgba(255, 51, 102, 0.6), 0 0 40px rgba(0, 255, 255, 0.4), 6px 6px 0 #000'
+                        ? '0 0 25px rgba(255, 51, 102, 0.8), 0 0 50px rgba(0, 255, 255, 0.5), 0 0 75px rgba(255, 51, 102, 0.3), 6px 6px 0 #000'
+                        : comboLevel >= 7
+                        ? '0 0 22px rgba(255, 51, 102, 0.8), 0 0 40px rgba(255, 107, 53, 0.5), 0 0 60px rgba(255, 51, 102, 0.3), 5px 5px 0 #000'
                         : comboLevel >= 5
-                        ? '0 0 15px rgba(255, 107, 53, 0.7), 0 0 30px rgba(255, 51, 102, 0.4), 5px 5px 0 #000'
+                        ? '0 0 18px rgba(255, 107, 53, 0.8), 0 0 35px rgba(255, 51, 102, 0.5), 5px 5px 0 #000'
                         : comboLevel >= 3
-                        ? '0 0 12px rgba(255, 107, 53, 0.5), 4px 4px 0 #000'
-                        : '0 0 8px rgba(255, 200, 100, 0.4), 4px 4px 0 #000',
+                        ? '0 0 15px rgba(255, 107, 53, 0.7), 0 0 25px rgba(255, 150, 50, 0.4), 4px 4px 0 #000'
+                        : '0 0 12px rgba(255, 200, 100, 0.6), 0 0 20px rgba(255, 150, 50, 0.3), 4px 4px 0 #000',
                     }),
                     ...(isSelected && comboColors.isRainbow ? {
                       background: 'linear-gradient(135deg, #FF3366, #FF6B35, #FFE135, #BFFF00, #00FFFF, #FF1493, #8B5CF6)',
@@ -593,85 +595,107 @@ const GridComponent = memo<GridComponentProps>(({
                   {/* Ripple effect on selection - disabled on minimal mode for performance */}
                   {isSelected && effectiveRenderMode !== 'minimal' && (
                     <>
-                      {/* Primary ripple - shown in reduced and full modes */}
+                      {/* Primary ripple - shown in reduced and full modes - MORE PROMINENT */}
                       <motion.div
                         className="absolute inset-0"
                         style={{
                           borderRadius: '6px',
-                          background: comboLevel >= 5
-                            ? 'radial-gradient(circle, rgba(255,107,53,0.5), transparent 70%)'
-                            : 'radial-gradient(circle, rgba(255,255,255,0.5), transparent 70%)',
+                          background: comboColors.isRainbow
+                            ? 'radial-gradient(circle, rgba(255,51,102,0.7), rgba(0,255,255,0.4) 50%, transparent 75%)'
+                            : comboLevel >= 5
+                            ? 'radial-gradient(circle, rgba(255,107,53,0.7), rgba(255,51,102,0.4) 50%, transparent 75%)'
+                            : comboLevel >= 3
+                            ? 'radial-gradient(circle, rgba(255,150,50,0.6), transparent 70%)'
+                            : 'radial-gradient(circle, rgba(255,255,255,0.6), transparent 70%)',
                         }}
                         initial={{ scale: 0.3, opacity: 1 }}
-                        animate={{ scale: 2.5, opacity: 0 }}
-                        transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        animate={{ scale: 3, opacity: 0 }}
+                        transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
                       />
-                      {/* Secondary glow pulse - only in full mode */}
+                      {/* Secondary glow pulse - only in full mode - ENHANCED */}
                       {effectiveRenderMode === 'full' && (
-                        <motion.div
-                          className="absolute inset-0 pointer-events-none"
-                          style={{
-                            background: comboColors.isRainbow
-                              ? 'radial-gradient(circle at center, rgba(255, 51, 102, 0.8), rgba(0, 255, 255, 0.4) 50%, transparent 70%)'
-                              : 'radial-gradient(circle at center, rgba(255, 255, 255, 0.9), transparent 60%)',
-                            filter: 'blur(3px)',
-                            borderRadius: '6px'
-                          }}
-                          initial={{ scale: 0, opacity: 1 }}
-                          animate={{ scale: [0, 1.3, 1.5], opacity: [1, 0.6, 0] }}
-                          transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-                        />
-                      )}
-                      {/* Combo level glow ring - reduced and full modes (already inside effectiveRenderMode !== 'minimal' check) */}
-                      {comboLevel >= 3 && !reduceMotion && (
                         <motion.div
                           className="absolute inset-[-4px] pointer-events-none"
                           style={{
-                            borderRadius: '10px',
+                            background: comboColors.isRainbow
+                              ? 'radial-gradient(circle at center, rgba(255, 51, 102, 0.9), rgba(0, 255, 255, 0.5) 40%, transparent 70%)'
+                              : comboLevel >= 5
+                              ? 'radial-gradient(circle at center, rgba(255, 107, 53, 0.9), rgba(255, 51, 102, 0.5) 40%, transparent 70%)'
+                              : comboLevel >= 3
+                              ? 'radial-gradient(circle at center, rgba(255, 150, 50, 0.8), transparent 60%)'
+                              : 'radial-gradient(circle at center, rgba(255, 255, 255, 0.95), transparent 60%)',
+                            filter: 'blur(4px)',
+                            borderRadius: '10px'
+                          }}
+                          initial={{ scale: 0, opacity: 1 }}
+                          animate={{ scale: [0, 1.5, 1.8], opacity: [1, 0.7, 0] }}
+                          transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        />
+                      )}
+                      {/* Combo level glow ring - reduced and full modes - ENHANCED with pulsing */}
+                      {comboLevel >= 3 && !reduceMotion && (
+                        <motion.div
+                          className="absolute inset-[-6px] pointer-events-none"
+                          style={{
+                            borderRadius: '12px',
                             border: comboColors.isRainbow
-                              ? '2px solid rgba(255, 51, 102, 0.8)'
-                              : '2px solid rgba(255, 107, 53, 0.6)',
+                              ? '3px solid rgba(255, 51, 102, 0.9)'
+                              : comboLevel >= 7
+                              ? '3px solid rgba(255, 51, 102, 0.8)'
+                              : comboLevel >= 5
+                              ? '3px solid rgba(255, 107, 53, 0.8)'
+                              : '2px solid rgba(255, 150, 50, 0.7)',
                             boxShadow: comboColors.isRainbow
-                              ? '0 0 10px rgba(255, 51, 102, 0.5), inset 0 0 10px rgba(0, 255, 255, 0.3)'
-                              : '0 0 8px rgba(255, 107, 53, 0.4)',
+                              ? '0 0 16px rgba(255, 51, 102, 0.7), inset 0 0 12px rgba(0, 255, 255, 0.4), 0 0 24px rgba(0, 255, 255, 0.3)'
+                              : comboLevel >= 7
+                              ? '0 0 14px rgba(255, 51, 102, 0.6), 0 0 20px rgba(255, 107, 53, 0.4)'
+                              : comboLevel >= 5
+                              ? '0 0 12px rgba(255, 107, 53, 0.6), 0 0 18px rgba(255, 150, 50, 0.3)'
+                              : '0 0 10px rgba(255, 150, 50, 0.5)',
                           }}
                           initial={{ scale: 0.8, opacity: 0 }}
-                          animate={{ scale: [0.9, 1.1, 1], opacity: [0, 1, 0.6] }}
-                          transition={{ duration: 0.4, ease: 'easeOut' }}
+                          animate={{
+                            scale: [0.9, 1.15, 1.05],
+                            opacity: [0, 1, 0.8],
+                          }}
+                          transition={{ duration: 0.5, ease: 'easeOut' }}
                         />
                       )}
 
-                      {/* Sparkle burst - first letter gets extra flair (full mode only) */}
+                      {/* Sparkle burst - first letter gets extra flair (full mode only) - ENHANCED */}
                       {isFirstSelected && !reduceMotion && effectiveRenderMode === 'full' && (
                         <>
-                          {[...Array(4)].map((_, idx) => {
-                            const angle = (idx * 90) * (Math.PI / 180);
-                            const distance = 24;
+                          {[...Array(6)].map((_, idx) => {
+                            const angle = (idx * 60) * (Math.PI / 180);
+                            const distance = 32;
                             const colors = comboColors.isRainbow
-                              ? ['#FF3366', '#00FFFF', '#FFE135', '#FF1493']
-                              : ['#FFD700', '#FF6B35', '#FF3366', '#FFA500'];
+                              ? ['#FF3366', '#00FFFF', '#FFE135', '#FF1493', '#BFFF00', '#8B5CF6']
+                              : comboLevel >= 5
+                              ? ['#FF3366', '#FF6B35', '#FFE135', '#FF1493', '#FFA500', '#FFD700']
+                              : ['#FFD700', '#FF6B35', '#FF3366', '#FFA500', '#FFE135', '#FF9500'];
                             return (
                               <motion.div
                                 key={`first-burst-${idx}`}
                                 className="absolute pointer-events-none rounded-full"
                                 style={{
-                                  width: 6,
-                                  height: 6,
+                                  width: 8,
+                                  height: 8,
                                   background: colors[idx],
                                   left: '50%',
                                   top: '50%',
-                                  marginLeft: -3,
-                                  marginTop: -3,
+                                  marginLeft: -4,
+                                  marginTop: -4,
+                                  boxShadow: `0 0 6px ${colors[idx]}`,
                                 }}
                                 initial={{ scale: 0, opacity: 1, x: 0, y: 0 }}
                                 animate={{
-                                  scale: [0, 1.2, 0],
+                                  scale: [0, 1.5, 0],
                                   opacity: [0, 1, 0],
                                   x: Math.cos(angle) * distance,
                                   y: Math.sin(angle) * distance,
                                 }}
                                 transition={{
-                                  duration: 0.35,
+                                  duration: 0.45,
                                   ease: 'easeOut',
                                 }}
                               />
@@ -680,39 +704,41 @@ const GridComponent = memo<GridComponentProps>(({
                         </>
                       )}
 
-                      {/* Center burst particles - full mode only */}
+                      {/* Center burst particles - full mode only - ENHANCED */}
                       {!reduceMotion && effectiveRenderMode === 'full' && comboLevel >= 2 && (
                         <>
-                          {[...Array(4)].map((_, idx) => {
-                            const angle = (idx * 90 + 45) * (Math.PI / 180);
-                            const distance = 16;
-                            const particleColor = comboColors.isRainbow
-                              ? '#FF1493'
+                          {[...Array(6)].map((_, idx) => {
+                            const angle = (idx * 60 + 30) * (Math.PI / 180);
+                            const distance = comboLevel >= 5 ? 24 : 20;
+                            const particleColors = comboColors.isRainbow
+                              ? ['#FF1493', '#00FFFF', '#FFE135', '#BFFF00', '#FF3366', '#8B5CF6']
                               : comboLevel >= 5
-                              ? '#FF3366'
-                              : '#FF6B35';
+                              ? ['#FF3366', '#FF6B35', '#FFE135', '#FF1493', '#FFA500', '#FFD700']
+                              : ['#FF6B35', '#FFE135', '#FF3366', '#FFA500', '#FFD700', '#FF9500'];
+                            const particleColor = particleColors[idx % particleColors.length];
                             return (
                               <motion.div
                                 key={`burst-${idx}`}
                                 className="absolute rounded-full pointer-events-none"
                                 style={{
-                                  width: 4,
-                                  height: 4,
+                                  width: 6,
+                                  height: 6,
                                   background: particleColor,
                                   left: '50%',
                                   top: '50%',
-                                  marginLeft: -2,
-                                  marginTop: -2,
+                                  marginLeft: -3,
+                                  marginTop: -3,
+                                  boxShadow: `0 0 4px ${particleColor}`,
                                 }}
                                 initial={{ scale: 0, opacity: 1, x: 0, y: 0 }}
                                 animate={{
-                                  scale: [0, 1, 0],
+                                  scale: [0, 1.3, 0],
                                   opacity: [0, 1, 0],
                                   x: Math.cos(angle) * distance,
                                   y: Math.sin(angle) * distance
                                 }}
                                 transition={{
-                                  duration: 0.3,
+                                  duration: 0.4,
                                   ease: 'easeOut',
                                 }}
                               />

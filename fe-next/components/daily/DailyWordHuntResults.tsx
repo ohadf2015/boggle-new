@@ -19,7 +19,7 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 import { Button } from '@/components/ui/button';
-import { fireConfetti } from '@/utils/confettiUtils';
+import { fireConfetti, fireRankConfetti, fireVictoryConfetti } from '@/utils/confettiUtils';
 import { cn } from '@/lib/utils';
 import { useScreenshotProtection } from '@/hooks/useScreenshotProtection';
 import {
@@ -39,7 +39,6 @@ import {
 import DailyChallengeSignupModal from '@/components/auth/DailyChallengeSignupModal';
 import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
 import StreakMilestoneCelebration from './StreakMilestoneCelebration';
-import ConfettiRetrigger from '@/components/results/ConfettiRetrigger';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchGeolocation } from '@/contexts/auth/authUtils';
@@ -738,8 +737,11 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               {t('daily.home')}
             </Button>
 
-            {/* Compact score display */}
-            <div className="flex items-center gap-2">
+            {/* Compact score display - Click to fire confetti */}
+            <div
+              className="flex items-center gap-2 cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              onClick={() => result.solved && (stats?.yourStats?.rank && stats.yourStats.rank <= 3 ? fireRankConfetti(stats.yourStats.rank) : fireVictoryConfetti())}
+            >
               {result.solved ? (
                 <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500 rounded-neo border-2 border-neo-black">
                   <Trophy className="w-4 h-4 text-white" />
@@ -760,13 +762,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 <span className="text-xs bg-orange-500 text-white px-1.5 py-0.5 rounded font-bold">
                   🔥{result.streakDays}
                 </span>
-              )}
-              {result.solved && (
-                <ConfettiRetrigger
-                  variant={stats?.yourStats?.rank && stats.yourStats.rank <= 3 ? 'rank' : 'victory'}
-                  rank={stats?.yourStats?.rank}
-                  compact
-                />
               )}
             </div>
           </div>

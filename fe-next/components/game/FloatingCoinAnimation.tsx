@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '@/utils/accessibility';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 interface CoinParticle {
   id: number;
@@ -33,9 +34,25 @@ const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
   className,
 }) => {
   const prefersReducedMotion = useReducedMotion();
+  const { isLowEnd, enableComplexAnimations } = useDevicePerformance();
   const [showAnimation, setShowAnimation] = useState(false);
   const [displayAmount, setDisplayAmount] = useState<number | null>(null);
   const [particles, setParticles] = useState<CoinParticle[]>([]);
+
+  // Pre-compute target position to avoid calc() in animation (causes jank)
+  const targetPosition = useMemo(() => {
+    if (typeof window === 'undefined') return { x: 0, y: 0 };
+    const startX = typeof startPosition?.x === 'number' ? startPosition.x : window.innerWidth / 2;
+    const startY = typeof startPosition?.y === 'number' ? startPosition.y : window.innerHeight * 0.35;
+    return {
+      // Target: top-right corner (coin display area)
+      x: window.innerWidth - 80 - startX,
+      y: 40 - startY,
+    };
+  }, [startPosition]);
+
+  // Skip complex animation on low-end devices
+  const skipComplexAnimation = isLowEnd || !enableComplexAnimations;
 
   // Generate coin particles based on amount (max 8 for performance)
   const generateParticles = useCallback((amount: number): CoinParticle[] => {
@@ -70,8 +87,8 @@ const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
     return null;
   }
 
-  // For reduced motion, show a simple fade animation
-  if (prefersReducedMotion) {
+  // For reduced motion or low-end devices, show a simple fade animation
+  if (prefersReducedMotion || skipComplexAnimation) {
     return (
       <motion.div
         className={`fixed z-[100] pointer-events-none ${className || ''}`}
@@ -81,9 +98,9 @@ const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
           transform: 'translate(-50%, -50%)',
         }}
         initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
+        animate={{ opacity: 1, scale: 1, y: -20 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.5 }}
       >
         <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 text-white font-bold shadow-lg">
           <span>💰</span>
@@ -145,11 +162,11 @@ const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
           </motion.div>
         </motion.div>
 
-        {/* Flying coin particles */}
+        {/* Flying coin particles - using pre-computed positions to avoid calc() jank */}
         {particles.map((particle) => (
           <motion.div
             key={`coin-${particle.id}`}
-            className="absolute w-6 h-6 text-2xl"
+            className="absolute w-6 h-6 text-2xl will-change-transform"
             style={{
               left: startPosition?.x ?? '50%',
               top: startPosition?.y ?? '35%',
@@ -164,22 +181,22 @@ const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
               x: [
                 particle.offsetX,
                 particle.offsetX + (particle.id % 2 === 0 ? 30 : -30),
-                'calc(100vw - 80px - 50%)',
+                targetPosition.x,
               ],
               y: [
                 particle.offsetY,
                 particle.offsetY - 50,
-                'calc(-35vh + 40px)',
+                targetPosition.y,
               ],
               scale: [0, 1.2, 1, 0.6],
               opacity: [0, 1, 1, 0],
               rotate: [0, 180, 360],
             }}
             transition={{
-              duration: 1.2,
+              duration: 1.0, // Slightly faster for snappier feel
               delay: particle.delay,
               ease: [0.25, 0.1, 0.25, 1],
-              times: [0, 0.2, 0.8, 1],
+              times: [0, 0.15, 0.85, 1],
             }}
           >
             🪙

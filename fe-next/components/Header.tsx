@@ -105,17 +105,17 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     aria-label={t('common.goToHome') || 'Go to home page'}
                 >
                     <h1
-                        className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl 2xl:text-4xl font-black uppercase tracking-tight flex items-center gap-0 flex-shrink min-w-0 overflow-hidden landscape:text-base landscape:xs:text-lg landscape:sm:text-xl"
+                        className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl 2xl:text-5xl font-black uppercase tracking-tight flex items-center gap-0 flex-shrink min-w-0 overflow-hidden landscape:text-lg landscape:xs:text-xl landscape:sm:text-2xl"
                         style={{ fontFamily }}
                     >
                         {/* Pink lightning - left side */}
-                        <span className="text-neo-pink text-xs xs:text-sm sm:text-base lg:text-lg xl:text-xl -mr-0.5 xs:-mr-1" style={{ transform: 'rotate(-15deg)' }}>⚡</span>
+                        <span className="text-neo-pink text-sm xs:text-base sm:text-lg lg:text-xl xl:text-2xl -mr-0.5 xs:-mr-1" style={{ transform: 'rotate(-15deg)' }}>⚡</span>
                         {/* LEXI - Cyan with dark outline like og-image */}
                         <span
                             className="text-neo-cyan relative"
                             style={{
-                                textShadow: '2px 2px 0px #1a365d, 3px 3px 0px #1a365d, -1px -1px 0px #1a365d, 1px -1px 0px #1a365d, -1px 1px 0px #1a365d',
-                                WebkitTextStroke: '1px #1a365d',
+                                textShadow: '2px 2px 0px #1a365d, 3px 3px 0px #1a365d, 4px 4px 0px #1a365d, -1px -1px 0px #1a365d, 1px -1px 0px #1a365d, -1px 1px 0px #1a365d',
+                                WebkitTextStroke: '1.5px #1a365d',
                             }}
                         >
                             {t('logo.lexi')}
@@ -124,14 +124,14 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         <span
                             className="text-neo-yellow relative"
                             style={{
-                                textShadow: '2px 2px 0px #1a365d, 3px 3px 0px #1a365d, -1px -1px 0px #1a365d, 1px -1px 0px #1a365d, -1px 1px 0px #1a365d',
-                                WebkitTextStroke: '1px #1a365d',
+                                textShadow: '2px 2px 0px #1a365d, 3px 3px 0px #1a365d, 4px 4px 0px #1a365d, -1px -1px 0px #1a365d, 1px -1px 0px #1a365d, -1px 1px 0px #1a365d',
+                                WebkitTextStroke: '1.5px #1a365d',
                             }}
                         >
                             {t('logo.clash')}
                         </span>
                         {/* Yellow lightning - right side */}
-                        <span className="text-neo-yellow text-xs xs:text-sm sm:text-base lg:text-lg xl:text-xl -ml-0.5 xs:-ml-1" style={{ transform: 'rotate(15deg)' }}>⚡</span>
+                        <span className="text-neo-yellow text-sm xs:text-base sm:text-lg lg:text-xl xl:text-2xl -ml-0.5 xs:-ml-1" style={{ transform: 'rotate(15deg)' }}>⚡</span>
                     </h1>
                 </motion.button>
 

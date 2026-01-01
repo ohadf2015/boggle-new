@@ -4,6 +4,7 @@ import React, { useMemo, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { getComboColors } from '../grid/comboColors';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import FloatingCoinAnimation from './FloatingCoinAnimation';
 
 interface ComboDisplayProps {
@@ -20,7 +21,7 @@ interface ComboDisplayProps {
   onCoinAnimationComplete?: () => void;
 }
 
-// Sparkle particle component - memoized to prevent unnecessary re-renders
+// Sparkle particle component - memoized and optimized for smooth animation
 const Sparkle = memo<{
   index: number;
   angle: number;
@@ -30,7 +31,7 @@ const Sparkle = memo<{
   delay: number;
 }>(({ angle, distance, color, size, delay }) => (
   <motion.div
-    className="absolute pointer-events-none"
+    className="absolute pointer-events-none will-change-transform"
     style={{
       width: size,
       height: size,
@@ -40,17 +41,18 @@ const Sparkle = memo<{
       marginTop: -size / 2,
     }}
     animate={{
-      scale: [0, 1.2, 0.8, 0, 0, 1.2, 0.8, 0],
-      opacity: [0, 1, 0.6, 0, 0, 1, 0.6, 0],
-      x: [0, Math.cos(angle) * distance, Math.cos(angle) * distance * 1.2, 0],
-      y: [0, Math.sin(angle) * distance, Math.sin(angle) * distance * 1.2, 0],
-      rotate: [0, 180, 360, 360],
+      // Simplified 4-step animation for smoother performance
+      scale: [0, 1, 0.8, 0],
+      opacity: [0, 1, 0.5, 0],
+      x: [0, Math.cos(angle) * distance, Math.cos(angle) * distance * 1.1, 0],
+      y: [0, Math.sin(angle) * distance, Math.sin(angle) * distance * 1.1, 0],
     }}
     transition={{
-      duration: 2,
+      duration: 1.5,
       delay,
       repeat: Infinity,
       ease: 'easeOut',
+      repeatDelay: 0.5, // Add pause between cycles
     }}
   >
     <svg viewBox="0 0 24 24" fill={color} className="w-full h-full drop-shadow-lg">
@@ -76,22 +78,26 @@ const ComboDisplay = memo<ComboDisplayProps>(({
   onCoinAnimationComplete,
 }) => {
   const comboColors = getComboColors(comboLevel);
+  const { isLowEnd, enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
   const isHighCombo = comboLevel >= 5;
   const isVeryHighCombo = comboLevel >= 7;
   const isInsaneCombo = comboLevel >= 10;
   const isMediumCombo = comboLevel >= 3;
   const isRainbow = comboColors.isRainbow;
 
+  // Skip sparkle effects on low-end devices for better performance
+  const skipSparkles = isLowEnd || !enableComplexAnimations || prefersReducedMotion;
+
   // Memoize sparkle data for performance - reduced distance in compact mode to prevent overflow
   const sparkleData = useMemo(() => {
-    if (comboLevel < 3) return [];
-    const count = isHighCombo ? 6 : 4;
+    if (comboLevel < 3 || skipSparkles) return [];
+    const count = isHighCombo ? 4 : 3; // Reduced count for better performance
     return [...Array(count)].map((_, i) => ({
       angle: (i * (360 / count)) * (Math.PI / 180),
-      distance: compact ? 15 : 35, // Reduced from 25 to 15 in compact mode
-      delay: i * 0.2,
+      distance: compact ? 15 : 30, // Slightly reduced for smoother animation
+      delay: i * 0.25,
     }));
-  }, [comboLevel, isHighCombo, compact]);
+  }, [comboLevel, isHighCombo, compact, skipSparkles]);
 
   const sparkleColors = isRainbow
     ? ['#FF3366', '#FFE135', '#00FFFF', '#FF1493', '#BFFF00']
@@ -163,8 +169,10 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                 : undefined
             }
             className={cn(
-              'rounded-full font-bold text-white backdrop-blur-sm relative overflow-hidden',
+              'rounded-full font-bold backdrop-blur-sm relative overflow-hidden',
               'border-2',
+              // Rainbow mode uses black text for better contrast, others use white
+              isRainbow ? 'text-neo-black' : 'text-white',
               // Subtle border color shift in danger state
               isDanger ? 'border-orange-400/70' : 'border-white/40',
               compact ? 'px-3 py-1.5 text-base' : 'px-4 py-2 text-lg',
@@ -180,43 +188,51 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                 background: 'linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #06b6d4, #3b82f6, #8b5cf6, #ec4899, #ef4444)',
                 backgroundSize: '300% 100%',
                 animation: 'rainbow-shift 1.5s linear infinite',
+                textShadow: '1px 1px 0 rgba(255,255,255,0.8), -1px -1px 0 rgba(255,255,255,0.8), 1px -1px 0 rgba(255,255,255,0.8), -1px 1px 0 rgba(255,255,255,0.8)',
               }),
             }}
           >
-            {/* Shimmer effect */}
-            <motion.div
-              className="absolute inset-0 rounded-full pointer-events-none overflow-hidden"
-              style={{ zIndex: 5 }}
-            >
+            {/* Shimmer effect - skip on low-end devices */}
+            {!skipSparkles && (
               <motion.div
-                className="absolute inset-0"
-                style={{
-                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)',
-                  width: '200%',
-                  marginLeft: '-100%',
-                }}
-                animate={{ marginLeft: ['-100%', '100%'] }}
-                transition={{
-                  duration: 1,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                  repeatDelay: 1,
-                }}
-              />
-            </motion.div>
+                className="absolute inset-0 rounded-full pointer-events-none overflow-hidden"
+                style={{ zIndex: 5 }}
+              >
+                <motion.div
+                  className="absolute inset-0"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)',
+                    width: '200%',
+                    marginLeft: '-100%',
+                  }}
+                  animate={{ marginLeft: ['-100%', '100%'] }}
+                  transition={{
+                    duration: 1.2,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    repeatDelay: 1.5, // Longer pause for less GPU work
+                  }}
+                />
+              </motion.div>
+            )}
 
             {/* Content */}
             <div className="flex items-center gap-1.5 relative z-10">
-              {/* Fire emoji */}
+              {/* Fire emoji - simplified animation for performance */}
               <motion.span
-                animate={{
-                  scale: [1, isMediumCombo ? 1.2 : 1.05, 1],
-                  rotate: [0, isMediumCombo ? 8 : 3, 0, isMediumCombo ? -8 : -3, 0],
-                }}
+                animate={
+                  skipSparkles
+                    ? undefined // No animation on low-end devices
+                    : {
+                        scale: [1, isMediumCombo ? 1.15 : 1.05, 1],
+                        rotate: [0, isMediumCombo ? 5 : 2, 0, isMediumCombo ? -5 : -2, 0],
+                      }
+                }
                 transition={{
-                  duration: 0.5,
+                  duration: 0.6,
                   repeat: Infinity,
                   ease: 'easeInOut',
+                  repeatDelay: 0.3, // Small pause for less CPU usage
                 }}
               >
                 {isRainbow ? '🌈' : '🔥'}

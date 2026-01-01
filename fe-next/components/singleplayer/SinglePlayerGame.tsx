@@ -26,6 +26,7 @@ import { cn } from '@/lib/utils';
 import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
 import { wordErrorToast } from '@/components/NeoToast';
 import { awardComboCoins } from '@/utils/coinManager';
+import { hapticForWordScore, hapticError } from '@/utils/haptics';
 import { useAnnouncer } from '@/components/GameAnnouncer';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
@@ -841,6 +842,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         message: msg,
         timestamp: now,
       });
+      hapticError();
       announceWordResult(normalizedWord, false, undefined, msg);
       // Reset combo on invalid word submission (consistent with multiplayer behavior)
       combo.resetCombo();
@@ -861,6 +863,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         message: notOnBoardMsg,
         timestamp: now,
       });
+      hapticError();
       announceWordResult(normalizedWord, false, undefined, notOnBoardMsg);
       // Reset combo on invalid word submission (consistent with multiplayer behavior)
       combo.resetCombo();
@@ -879,6 +882,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         message: alreadyFoundMsg,
         timestamp: now,
       });
+      hapticError();
       announceWordResult(normalizedWord, false, undefined, alreadyFoundMsg);
       // Reset combo on duplicate submission
       combo.resetCombo();
@@ -944,6 +948,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           // Add full score with combo (exactly like multiplayer)
           setScore(prev => prev + fullScore);
           playWordAcceptedSound();
+          hapticForWordScore(normalizedWord.length);
 
           // Reset hint prompt - player found a word so they don't need prompting
           lastWordFoundTimeRef.current = Date.now();

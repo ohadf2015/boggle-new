@@ -182,10 +182,11 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
       transition={{ duration: 0.4 }}
       className="mb-4 sm:mb-6 md:mb-8 relative w-full"
     >
-      {/* Neo-Brutalist Main Container */}
+      {/* Neo-Brutalist Main Container - Clickable for confetti */}
       <div
-        className={`relative ${styles.bgClass} border-4 border-neo-black rounded-neo-lg shadow-hard-xl overflow-hidden texture-halftone-comic-dense`}
+        className={`relative ${styles.bgClass} border-4 border-neo-black rounded-neo-lg shadow-hard-xl overflow-hidden texture-halftone-comic-dense cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]`}
         style={{ transform: 'rotate(-1deg)' }}
+        onClick={handleConfetti}
       >
         {/* Comic-style halftone texture pattern - subtle for winner banner */}
         <div
@@ -206,8 +207,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
               animate={{ scale: 1, rotate: 0 }}
               transition={{ delay: 0.3, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
               whileHover={{ scale: 1.1, transition: { duration: 0.2 } }}
-              className="cursor-pointer flex-shrink-0"
-              onClick={handleConfetti}
+              className="flex-shrink-0"
             >
               <div className={`${styles.iconBgClass} border-3 border-neo-black rounded-neo p-2 shadow-hard inline-block`}>
                 <RankIcon
@@ -224,8 +224,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 }}
-              className="flex items-center gap-2 sm:gap-3 cursor-pointer"
-              onClick={handleConfetti}
+              className="flex items-center gap-2 sm:gap-3"
             >
               {/* Winner Avatar - Smaller */}
               {winner.avatar && (
