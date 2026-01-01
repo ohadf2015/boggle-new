@@ -907,7 +907,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                 <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" />
               </div>
               <div className="md:hidden">
-                <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="xs" />
+                <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="sm" />
               </div>
             </motion.div>
 

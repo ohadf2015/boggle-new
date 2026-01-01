@@ -1,14 +1,14 @@
 {
   "summary": {
-    "totalKeysInCode": 1418,
+    "totalKeysInCode": 1421,
     "keyCountByLanguage": {
-      "en": 2434,
-      "he": 2433,
-      "sv": 2433,
-      "ja": 2433,
-      "es": 2433
+      "en": 2439,
+      "he": 2437,
+      "sv": 2437,
+      "ja": 2437,
+      "es": 2437
     },
-    "missingFromEnglish": 2
+    "missingFromEnglish": 1
   },
   "missingFromEnglish": [
     {
@@ -27,49 +27,24 @@
           "line": 771
         }
       ]
-    },
-    {
-      "key": "singlePlayer.needHint",
-      "usages": [
-        {
-          "file": "components/singleplayer/SinglePlayerGame.tsx",
-          "line": 1228
-        },
-        {
-          "file": "components/singleplayer/SinglePlayerGame.tsx",
-          "line": 1228
-        },
-        {
-          "file": "components/singleplayer/SinglePlayerGame.tsx",
-          "line": 1228
-        },
-        {
-          "file": "components/singleplayer/SinglePlayerGame.tsx",
-          "line": 1579
-        },
-        {
-          "file": "components/singleplayer/SinglePlayerGame.tsx",
-          "line": 1579
-        },
-        {
-          "file": "components/singleplayer/SinglePlayerGame.tsx",
-          "line": 1579
-        }
-      ]
     }
   ],
   "missingByLanguage": {
     "he": [
-      "multiplayerFlow.selector.roomsRefreshed"
+      "multiplayerFlow.selector.roomsRefreshed",
+      "daily.firstTime"
     ],
     "sv": [
-      "multiplayerFlow.selector.roomsRefreshed"
+      "multiplayerFlow.selector.roomsRefreshed",
+      "daily.firstTime"
     ],
     "ja": [
-      "multiplayerFlow.selector.roomsRefreshed"
+      "multiplayerFlow.selector.roomsRefreshed",
+      "daily.firstTime"
     ],
     "es": [
-      "multiplayerFlow.selector.roomsRefreshed"
+      "multiplayerFlow.selector.roomsRefreshed",
+      "daily.firstTime"
     ]
   },
   "keysNotInEnglish": {

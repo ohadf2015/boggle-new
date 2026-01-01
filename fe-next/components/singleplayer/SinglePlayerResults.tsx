@@ -615,7 +615,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           }
           customAnnouncement={
             results.playerScore === 0 || validWordCount === 0 ? (t('singlePlayer.noWordsFound') || "Didn't find any words this time") :
-            validWordCount <= 2 ? (t('singlePlayer.fewWordsFound') || `Found ${validWordCount} ${validWordCount === 1 ? 'word' : 'words'}`) :
+            validWordCount <= 2 ? (validWordCount === 1
+              ? (t('singlePlayer.fewWordsFoundSingular') || 'Found 1 word')
+              : (t('singlePlayer.fewWordsFound') || 'Found {count} words').replace('{count}', String(validWordCount))) :
             mode === 'solo-bots' ? `#${playerRank} ${t('results.of') || 'of'} ${allParticipants.length}` :
             mode === 'challenge' && results.previousHighScore && results.previousHighScore > results.playerScore
               ? (t('challenge.shortOf') || '{diff} points short of your record').replace('{diff}', String(results.previousHighScore - results.playerScore))
@@ -986,7 +988,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           customAnnouncement={
             // Low/zero score gets encouraging but honest message
             results.playerScore === 0 || validWordCount === 0 ? (t('singlePlayer.noWordsFound') || "Didn't find any words this time") :
-            validWordCount <= 2 ? (t('singlePlayer.fewWordsFound') || `Found ${validWordCount} ${validWordCount === 1 ? 'word' : 'words'}`) :
+            validWordCount <= 2 ? (validWordCount === 1
+              ? (t('singlePlayer.fewWordsFoundSingular') || 'Found 1 word')
+              : (t('singlePlayer.fewWordsFound') || 'Found {count} words').replace('{count}', String(validWordCount))) :
             mode === 'solo-bots' ? `#${playerRank} ${t('results.of') || 'of'} ${allParticipants.length}` :
             mode === 'challenge' && results.previousHighScore && results.previousHighScore > results.playerScore
               ? (t('challenge.shortOf') || '{diff} points short of your record').replace('{diff}', String(results.previousHighScore - results.playerScore))
