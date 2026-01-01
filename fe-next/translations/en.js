@@ -1552,7 +1552,9 @@ const en = {
         "usesAttempt": "5 letters = uses a try",
         "noAttempt": "3 letters = NO try used, just gains life!",
         "keyInsight": "💡 Find shorter words freely to gain life without using tries!",
-        "gotIt": "Got it!"
+        "gotIt": "Got it!",
+        "bonusTitle": "BONUS!",
+        "revealsClue": "3+ letter words also reveal letter clues!"
       },
       "letterFeedback": {
         "title": "Reading the Clues",
@@ -2726,7 +2728,8 @@ const en = {
       "bragSolid": "Solid word hunting today",
       "cta": "Think you can beat this? 🎮"
     },
-    "leaderboard": "Ranks"
+    "leaderboard": "Ranks",
+    "screenshotProtection": "Return to continue playing"
   },
   "wordHunt": {
     "title": "Word Hunt",

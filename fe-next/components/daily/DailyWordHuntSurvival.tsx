@@ -14,6 +14,7 @@ import { useMusic } from '@/contexts/MusicContext';
 import { cn } from '@/lib/utils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { useScreenshotProtection } from '@/hooks/useScreenshotProtection';
 import type { LetterGrid, Language } from '@/types';
 import {
   getLetterFeedback,
@@ -96,6 +97,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // Performance optimization for low-end devices
   const { isLowEnd, enableComplexAnimations } = useDevicePerformance();
   const skipAnimations = useMemo(() => isLowEnd || !enableComplexAnimations, [isLowEnd, enableComplexAnimations]);
+
+  // Screenshot protection - blur sensitive content when tab/window loses focus
+  const { isProtected } = useScreenshotProtection();
 
   // Survival state
   const [lifePoints, setLifePoints] = useState(INITIAL_LIFE);
@@ -577,16 +581,20 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
     let cluesRevealed = 0;
 
-    // Check for GREEN clues (positional matches) - only for positions that exist in target
-    if (normalizedWord.length >= targetLength) {
+    // Check for GREEN clues (positional matches)
+    // SIMPLIFIED: Any 3+ letter word can reveal clues at positions within target word range
+    // This is incremental - only adds new clues, never removes existing ones
+    if (normalizedWord.length >= 3) {
       setAccumulatedClues(prev => {
         const updated = new Map(prev);
         let newGreens = 0;
 
-        for (let pos = 0; pos < targetLength; pos++) {
+        // Check positions up to the shorter of word length and target length
+        const checkLength = Math.min(normalizedWord.length, targetLength);
+        for (let pos = 0; pos < checkLength; pos++) {
           // If the discovered word has a letter at this position that matches target
           if (normalizedWord[pos] === normalizedTarget[pos]) {
-            // Only add if not already green at this position
+            // Only add if not already green at this position (incremental)
             const existing = updated.get(pos);
             if (!existing || existing.type !== 'green') {
               updated.set(pos, { letter: normalizedWord[pos], type: 'green' });
@@ -602,26 +610,28 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
     // Check for YELLOW clues (letters exist in target but at different positions)
     // Add to knownLetters for the "Contains:" display
-    setKnownLetters(prev => {
-      const updated = new Set(prev);
-      const usedCounts = new Map<string, number>();
+    // SIMPLIFIED: Also requires 3+ letter words for consistency
+    if (normalizedWord.length >= 3) {
+      setKnownLetters(prev => {
+        const updated = new Set(prev);
+        const usedCounts = new Map<string, number>();
 
-      // First count how many greens we have for each letter
-      // (we need to read current accumulatedClues, but it's async - so we check the word itself)
-      for (const letter of normalizedWord) {
-        const targetCount = targetLetterCounts.get(letter) || 0;
-        if (targetCount > 0) {
-          const used = usedCounts.get(letter) || 0;
-          if (used < targetCount) {
-            usedCounts.set(letter, used + 1);
-            // Add to known letters if not already revealed
-            updated.add(letter);
+        // Check letters and add to known letters if they exist in target (incremental)
+        for (const letter of normalizedWord) {
+          const targetCount = targetLetterCounts.get(letter) || 0;
+          if (targetCount > 0) {
+            const used = usedCounts.get(letter) || 0;
+            if (used < targetCount) {
+              usedCounts.set(letter, used + 1);
+              // Add to known letters if not already revealed (incremental)
+              updated.add(letter);
+            }
           }
         }
-      }
 
-      return updated;
-    });
+        return updated;
+      });
+    }
 
     // Trigger life gain animation
     setLifeGainAmount(lifeGained);
@@ -865,7 +875,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         </div>
       </div>
 
-      {/* Target word black boxes - always visible */}
+      {/* Target word black boxes - always visible, with screenshot protection */}
       {currentHint && (
         <motion.div
           // Key on attempts length to retrigger attention animation on each guess
@@ -877,7 +887,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
             "bg-neo-navy/30 dark:bg-neo-navy/50 border-2 border-neo-black/20",
             showFeedbackOverlay
               ? "clue-feedback-active clue-container-attention"
-              : "clue-container-glow" // Subtle continuous glow when idle
+              : "clue-container-glow", // Subtle continuous glow when idle
+            // Screenshot protection blur
+            isProtected && "blur-xl select-none"
           )}
         >
           {/* Label for the clue area */}
@@ -1207,18 +1219,34 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         </motion.div>
       </div>
 
-      {/* Game Grid */}
-      <div className="flex items-center justify-center">
-        <GridComponent
-          grid={grid}
-          interactive={!isGameOver}
-          onWordSubmit={handleWordSubmit}
-          onWordChange={handleWordChange}
-          hideWordPreview
-          hideComboIndicator
-          comboLevel={0}
-          eliminatedLetters={eliminatedLetters}
-        />
+      {/* Game Grid - with screenshot protection */}
+      <div className="flex items-center justify-center relative">
+        <div className={cn(
+          "transition-all duration-200",
+          isProtected && "blur-xl pointer-events-none select-none"
+        )}>
+          <GridComponent
+            grid={grid}
+            interactive={!isGameOver && !isProtected}
+            onWordSubmit={handleWordSubmit}
+            onWordChange={handleWordChange}
+            hideWordPreview
+            hideComboIndicator
+            comboLevel={0}
+            eliminatedLetters={eliminatedLetters}
+          />
+        </div>
+        {/* Screenshot protection overlay */}
+        {isProtected && (
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+            <div className="bg-neo-black/80 text-white px-6 py-4 rounded-neo border-3 border-neo-yellow shadow-hard text-center">
+              <div className="text-2xl mb-2">👀</div>
+              <div className="font-bold text-sm">
+                {t('daily.screenshotProtection') || 'Click here to continue'}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Clue Shop Modal */}

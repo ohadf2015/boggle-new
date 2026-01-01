@@ -806,15 +806,15 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             </div>
             {/* Score & Stats */}
             <div className="flex-1 min-w-0">
-              <div className="text-2xl font-black text-white">{currentPlayerData.score || 0} <span className="text-sm text-white/60">pts</span></div>
+              <div className="text-2xl font-black text-white">{currentPlayerData.score || 0} <span className="text-sm text-white/60">{t('results.points') || 'pts'}</span></div>
               <div className="text-xs text-white/70 font-bold flex items-center gap-2 flex-wrap">
-                <span>{currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0} words</span>
+                <span>{currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0} {t('results.words') || 'words'}</span>
                 <span>•</span>
                 <span>{(() => {
                   const total = currentPlayerData.allWords?.length || 0;
                   const valid = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0;
                   return total > 0 ? Math.round((valid / total) * 100) : 0;
-                })()}% accuracy</span>
+                })()}% {t('results.accuracy') || 'accuracy'}</span>
                 {currentPlayerArchetype && (
                   <>
                     <span>•</span>

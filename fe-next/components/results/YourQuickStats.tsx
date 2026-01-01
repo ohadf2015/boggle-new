@@ -195,7 +195,7 @@ const YourQuickStats = memo<YourQuickStatsProps>(({
                 {bestWord || '-'}
               </div>
               <div className="text-[9px] font-bold uppercase text-white/60">
-                {bestWordScore > 0 ? `${bestWordScore} pts` : (t('results.bestWord') || 'Best')}
+                {bestWordScore > 0 ? `${bestWordScore} ${t('results.points') || 'pts'}` : (t('results.bestWord') || 'Best')}
               </div>
             </motion.div>
           </div>

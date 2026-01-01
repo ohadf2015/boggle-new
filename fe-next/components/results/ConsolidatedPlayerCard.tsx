@@ -261,7 +261,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                 {bestWord ? applyHebrewFinalLetters(bestWord.word) : '-'}
               </div>
               <div className="text-[8px] sm:text-[9px] font-bold uppercase text-white/60">
-                {bestWord?.score ? `${bestWord.score} pts` : (t('results.bestWord') || 'Best')}
+                {bestWord?.score ? `${bestWord.score} ${t('results.points') || 'pts'}` : (t('results.bestWord') || 'Best')}
               </div>
             </div>
           </div>

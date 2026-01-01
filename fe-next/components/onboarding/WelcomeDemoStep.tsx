@@ -58,14 +58,15 @@ const demoConfigs: Record<string, DemoConfig> = {
     word: 'SOL',
   },
   // Hebrew: שמש (sun) - using Hebrew letters for native experience
+  // RTL: path goes right-to-left (col 2 -> 1 -> 1)
   he: {
     letters: [
-      ['ש', 'מ', 'ל'],
-      ['ד', 'ש', 'ו'],
-      ['ת', 'ר', 'ס'],
+      ['ל', 'מ', 'ש'],
+      ['ו', 'ש', 'ד'],
+      ['ס', 'ר', 'ת'],
     ],
     path: [
-      { row: 0, col: 0 }, // ש
+      { row: 0, col: 2 }, // ש
       { row: 0, col: 1 }, // מ
       { row: 1, col: 1 }, // ש
     ],

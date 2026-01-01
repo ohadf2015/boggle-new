@@ -1546,7 +1546,9 @@ const sv = {
         "usesAttempt": "5 bokstäver = använder försök",
         "noAttempt": "3 bokstäver = INGET försök, bara liv!",
         "keyInsight": "💡 Hitta kortare ord fritt för liv utan att använda försök!",
-        "gotIt": "Fattar!"
+        "gotIt": "Fattar!",
+        "bonusTitle": "BONUS!",
+        "revealsClue": "Ord med 3+ bokstäver avslöjar också ledtrådar!"
       },
       "letterFeedback": {
         "title": "Läsa Ledtrådarna",
@@ -2720,7 +2722,8 @@ const sv = {
       "bragSolid": "Stabil ordjakt idag",
       "cta": "Tror du att du kan slå det här? 🎮"
     },
-    "leaderboard": "Rankning"
+    "leaderboard": "Rankning",
+    "screenshotProtection": "Återvänd för att fortsätta spela"
   },
   "wordHunt": {
     "title": "Ordjakt",

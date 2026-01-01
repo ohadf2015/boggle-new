@@ -302,12 +302,25 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
             </div>
           </div>
         </div>
+
+        {/* NEW: Clue revelation benefit */}
+        <div className="flex items-center gap-3 border-t border-gray-300 dark:border-gray-600 pt-3 mt-2">
+          <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+            <span className="text-white font-bold text-sm">💡</span>
+          </div>
+          <div>
+            <div className="font-bold text-yellow-600">{t('tutorial.wordHunt.triesRule.bonusTitle') || 'BONUS!'}</div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">
+              {t('tutorial.wordHunt.triesRule.revealsClue') || '3+ letter words also reveal letter clues!'}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Key insight box */}
       <div className="bg-amber-50 dark:bg-amber-900/20 rounded-neo border-2 border-amber-300 dark:border-amber-700 p-3 mb-4">
         <div className="text-sm font-bold text-center">
-          {t('tutorial.wordHunt.triesRule.keyInsight') || '💡 Find shorter words freely to gain life without using tries!'}
+          {t('tutorial.wordHunt.triesRule.keyInsight') || '💡 Shorter words gain life AND reveal letter clues!'}
         </div>
       </div>
 

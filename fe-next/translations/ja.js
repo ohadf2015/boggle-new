@@ -1545,7 +1545,9 @@ const ja = {
         "usesAttempt": "5文字 = 試行を消費",
         "noAttempt": "3文字 = 試行なし、ライフだけ！",
         "keyInsight": "💡 短い単語を自由に見つけて、試行を使わずにライフを獲得！",
-        "gotIt": "わかった！"
+        "gotIt": "わかった！",
+        "bonusTitle": "ボーナス！",
+        "revealsClue": "3文字以上の単語もヒントを表示！"
       },
       "letterFeedback": {
         "title": "ヒントを読む",
@@ -2719,7 +2721,8 @@ const ja = {
       "bragSolid": "今日は順調な単語狩り",
       "cta": "これを超えられる? 🎮"
     },
-    "leaderboard": "ランキング"
+    "leaderboard": "ランキング",
+    "screenshotProtection": "続けるには戻ってください"
   },
   "wordHunt": {
     "title": "ワードハント",

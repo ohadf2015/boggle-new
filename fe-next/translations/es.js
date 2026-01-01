@@ -2240,7 +2240,9 @@ const es = {
         "usesAttempt": "5 letras = usa un intento",
         "noAttempt": "3 letras = NO usa intento, ¡solo gana vida!",
         "keyInsight": "💡 ¡Encuentra palabras cortas libremente para ganar vida sin gastar intentos!",
-        "gotIt": "¡Entendido!"
+        "gotIt": "¡Entendido!",
+        "bonusTitle": "¡BONUS!",
+        "revealsClue": "¡Las palabras de 3+ letras también revelan pistas!"
       },
       "letterFeedback": {
         "title": "Leyendo las Pistas",
@@ -2717,7 +2719,8 @@ const es = {
       "bragSolid": "Buena caza de palabras hoy",
       "cta": "¿Crees que puedes superarlo? 🎮"
     },
-    "leaderboard": "Ranking"
+    "leaderboard": "Ranking",
+    "screenshotProtection": "Regresa para continuar jugando"
   },
   "wordHunt": {
     "title": "Caza de Palabras",
