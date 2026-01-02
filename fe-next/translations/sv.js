@@ -2707,6 +2707,7 @@ const sv = {
     "onlyMatchingLength": "Endast ord med {length} bokstäver använder dina försök!",
     "tookChallenge": "tog utmaningen",
     "signUpToAppear": "Registrera dig för att synas på topplistan!",
+    "showLeaderboard": "Visa topplistan",
     "carousel": {
       "step1Title": "Svep för att hitta ord",
       "step1Desc": "Koppla bokstäver i alla riktningar",

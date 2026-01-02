@@ -2706,6 +2706,7 @@ const ja = {
     "onlyMatchingLength": "{length}文字の単語のみが試行回数を消費します！",
     "tookChallenge": "{count}人がチャレンジしました",
     "signUpToAppear": "リーダーボードに表示されるには登録してください",
+    "showLeaderboard": "リーダーボードを表示",
     "carousel": {
       "step1Title": "スワイプで単語を作ろう",
       "step1Desc": "どの方向でも文字を繋げよう",

@@ -360,23 +360,23 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
     }
   }, [currentUserData, puzzleDate, language]);
 
-  // Filter out guests - only show authenticated users on leaderboard
-  // For Word Hunt, also filter out failed attempts (only show solved)
-  const authenticatedParticipants = participants.filter(p => {
-    if (p.player_id === null) return false; // Filter out guests
+  // Filter participants based on game type
+  // For Word Hunt: show all players who SOLVED (guests AND authenticated)
+  // For Puzzle: show all players (guests AND authenticated)
+  const filteredParticipants = participants.filter(p => {
     if (gameType === 'wordHunt' && !p.solved) return false; // Filter out failed attempts in Word Hunt
-    return true;
+    return true; // Show all players who succeeded (both guests and authenticated)
   });
 
   // Determine which participants to show
   const visibleParticipants = expanded
-    ? authenticatedParticipants
-    : authenticatedParticipants.slice(0, maxVisible);
+    ? filteredParticipants
+    : filteredParticipants.slice(0, maxVisible);
 
-  const hasMore = authenticatedParticipants.length > maxVisible;
+  const hasMore = filteredParticipants.length > maxVisible;
 
-  // Empty state - no authenticated players on leaderboard (may have guests)
-  if (!loading && authenticatedParticipants.length === 0) {
+  // Empty state - no successful players on leaderboard
+  if (!loading && filteredParticipants.length === 0) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -574,7 +574,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
               ) : (
                 <>
                   <ChevronDown className="w-4 h-4" />
-                  {t('daily.showMore')} ({authenticatedParticipants.length - maxVisible} {t('daily.more')})
+                  {t('daily.showMore')} ({filteredParticipants.length - maxVisible} {t('daily.more')})
                 </>
               )}
             </motion.button>
