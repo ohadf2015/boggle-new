@@ -27,6 +27,42 @@ jest.mock('framer-motion', () => ({
   }),
 }));
 
+// Mock accessibility context
+jest.mock('@/contexts/AccessibilityContext', () => ({
+  useDisableFireRoundLights: () => false,
+  useDisableEarthquakeEffects: () => false,
+}));
+
+// Mock sound effects context
+jest.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => ({
+    playLetterSelectSound: jest.fn(),
+  }),
+}));
+
+// Mock device performance hook
+jest.mock('../../hooks/useDevicePerformance', () => ({
+  useDevicePerformance: () => ({
+    isLowEnd: false,
+    enableComplexAnimations: true,
+    prefersReducedMotion: false,
+  }),
+}));
+
+// Mock earthquake animation hook
+jest.mock('../../hooks/useEarthquakeAnimation', () => ({
+  useEarthquakeAnimation: () => ({
+    earthquakePhase: 'idle',
+    earthquakeParticles: [],
+    earthquakeDust: [],
+    showCracks: false,
+    dustPhase: 'idle',
+    getShakeOffset: () => ({ x: 0, y: 0, rotate: 0, scale: 1, delay: 0 }),
+    getPhaseAnimation: () => ({}),
+    useEnhancedMode: false,
+  }),
+}));
+
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <LanguageProvider>{children}</LanguageProvider>
 );

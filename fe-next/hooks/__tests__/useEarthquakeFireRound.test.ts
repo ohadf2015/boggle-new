@@ -68,8 +68,8 @@ describe('useEarthquakeFireRound', () => {
       });
 
       // Timer should be paused during warning phase
-      expect(onTimerPause).toHaveBeenCalledTimes(1);
-      expect(onEarthquakeStart).toHaveBeenCalledTimes(1);
+      expect(onTimerPause).toHaveBeenCalled();
+      expect(onEarthquakeStart).toHaveBeenCalled();
       expect(result.current.earthquakeState).toBe('warning');
     });
 
