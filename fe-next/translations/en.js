@@ -2713,6 +2713,7 @@ const en = {
     "onlyMatchingLength": "Only {length}-letter guesses count toward your 10 tries!",
     "tookChallenge": "took the challenge",
     "signUpToAppear": "Sign up to appear on the leaderboard!",
+    "showLeaderboard": "Show Leaderboard",
     "carousel": {
       "step1Title": "Swipe to Find Words",
       "step1Desc": "Connect letters in any direction",

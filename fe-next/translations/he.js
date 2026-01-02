@@ -2708,6 +2708,7 @@ const he = {
     "onlyMatchingLength": "רק מילים בנות {length} אותיות משתמשות בניסיונות!",
     "tookChallenge": "קיבלו את האתגר",
     "signUpToAppear": "הירשמו כדי להופיע בטבלה!",
+    "showLeaderboard": "הצג לוח מובילים",
     "carousel": {
       "step1Title": "החליקו למילים",
       "step1Desc": "חברו אותיות בכל כיוון",
