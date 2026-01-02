@@ -1449,7 +1449,12 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-around;
+  /* Solid opaque background with fallback */
+  background-color: #1a1a2e;
   background-color: rgb(var(--neo-navy));
+  /* Backdrop blur for extra polish - visible if any transparency occurs */
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
   padding-top: 0.5rem;
   padding-bottom: max(0.5rem, var(--safe-area-bottom));
   border-top: 4px solid rgb(var(--neo-black));
