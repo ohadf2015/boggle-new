@@ -706,7 +706,7 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
       insertData.hints_unlocked = hintsUnlocked;
     }
     if (efficiencyScore !== undefined) {
-      insertData.efficiency_score = efficiencyScore;
+      insertData.efficiency_score = Math.round(efficiencyScore);
     }
 
     if (playerId) {
