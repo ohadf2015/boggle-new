@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, memo } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Trophy, Clock, ChevronDown, ChevronUp, Sparkles, Crown, Calendar } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
@@ -133,10 +134,13 @@ const TodayParticipantRow = memo<{
       {/* Avatar with Country Flag */}
       <div className="relative">
         {participant.profile_picture_url ? (
-          <img
+          <Image
             src={participant.profile_picture_url}
             alt={participant.display_name || 'Player'}
+            width={44}
+            height={44}
             className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl object-cover border-2 border-neo-black/80 shadow-sm"
+            unoptimized
           />
         ) : (
           <div
@@ -263,10 +267,13 @@ const AllTimeParticipantRow = memo<{
       {/* Avatar with Country Flag */}
       <div className="relative">
         {participant.profile_picture_url ? (
-          <img
+          <Image
             src={participant.profile_picture_url}
             alt={participant.display_name || 'Player'}
+            width={44}
+            height={44}
             className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl object-cover border-2 border-neo-black/80 shadow-sm"
+            unoptimized
           />
         ) : (
           <div
