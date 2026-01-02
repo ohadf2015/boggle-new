@@ -865,426 +865,253 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         </div>
       </div>
 
-      {/* DESKTOP VIEW - Original layout (hidden on mobile) */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4 }}
-        className="hidden lg:block max-w-lg mx-auto space-y-3 px-2"
-      >
-      {/* Unified Victory/Results Banner - using shared component */}
-      <div className="relative">
-        <ResultsWinnerBanner
-          winner={{
-            username: t('common.you') || 'You',
-            score: results.playerScore,
-          }}
-          isCurrentUserWinner={true}
-          rank={mode === 'solo-bots' ? playerRank : 1}
-          variant={
-            // If score is 0 or very low, always use 'completion' variant (less celebratory)
-            results.playerScore === 0 || validWordCount === 0 ? 'completion' :
-            mode === 'practice' ? 'completion' :
-            mode === 'challenge' && results.isNewHighScore ? (results.isNewAllTimeBest ? 'newRecord' : 'highScore') :
-            mode === 'challenge' ? 'completion' :
-            'ranking'
-          }
-          customMessage={
-            // Low/zero score gets appropriate messaging
-            results.playerScore === 0 || validWordCount === 0 ? (t('singlePlayer.tryAgain') || 'Try Again!') :
-            validWordCount <= 2 ? (t('singlePlayer.keepPracticing') || 'Keep Practicing!') :
-            mode === 'solo-bots' && isWinner && results.playerScore > 0 ? (t('singlePlayer.victory') || 'Victory!') :
-            mode === 'solo-bots' && playerRank <= 3 && results.playerScore > 0 ? undefined :
-            mode === 'solo-bots' ? (t('singlePlayer.gameOver') || 'Game Over') :
-            mode === 'practice' ? (t('singlePlayer.practiceComplete') || 'Practice Complete!') :
-            undefined
-          }
-          customAnnouncement={
-            // Low/zero score gets encouraging but honest message
-            results.playerScore === 0 || validWordCount === 0 ? (t('singlePlayer.noWordsFound') || "Didn't find any words this time") :
-            validWordCount <= 2 ? (validWordCount === 1
-              ? (t('singlePlayer.fewWordsFoundSingular') || 'Found 1 word')
-              : (t('singlePlayer.fewWordsFound') || 'Found {count} words').replace('{count}', String(validWordCount))) :
-            mode === 'solo-bots' ? `#${playerRank} ${t('results.of') || 'of'} ${allParticipants.length}` :
-            mode === 'challenge' && results.previousHighScore && results.previousHighScore > results.playerScore
-              ? (t('challenge.shortOf') || '{diff} points short of your record').replace('{diff}', String(results.previousHighScore - results.playerScore))
-              : undefined
-          }
-          showConfetti={shouldShowConfetti}
-        />
-      </div>
-
-      {/* Consolidated Performance Card - Similar to multiplayer */}
-      <motion.div
-        initial={{ opacity: 0, y: -20, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
-        className="w-full"
-      >
-        <div
-          className={cn(
-            'relative overflow-hidden rounded-neo-lg border-4 border-neo-black shadow-hard-lg',
-            'bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800'
-          )}
-          style={{ transform: 'rotate(-0.5deg)' }}
-        >
-          {/* Halftone texture */}
-          <div
-            className="absolute inset-0 pointer-events-none opacity-[0.04]"
-            style={{
-              backgroundImage: `radial-gradient(circle, white 1px, transparent 1px)`,
-              backgroundSize: '8px 8px',
-            }}
-          />
-
-          <div className="relative z-10 p-4">
-            {/* Header */}
-            <div className="flex items-center gap-2 mb-3">
-              <Sparkles className="w-5 h-5 text-neo-cyan" />
-              <h2 className="text-sm font-black uppercase tracking-wide text-white">
-                {t('results.yourPerformance') || 'Your Performance'}
-              </h2>
-            </div>
-
-            {/* Primary Row: Rank + Score */}
-            <div className="flex items-center gap-3 mb-3">
-              {/* Rank Badge */}
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
-                className={cn(
-                  'flex-shrink-0 w-12 h-12 rounded-neo flex items-center justify-center border-3 border-neo-black shadow-hard',
-                  rankStyle.bg, rankStyle.text
-                )}
-              >
-                <span className="text-xl font-black">#{mode === 'solo-bots' ? playerRank : 1}</span>
-              </motion.div>
-
-              {/* Username + Archetype */}
-              <div className="flex-1 min-w-0">
-                <h3 className="text-lg font-black text-white truncate">{t('common.you') || 'You'}</h3>
-                <div className="flex items-center gap-2 flex-wrap">
-                  {mode === 'solo-bots' && (
-                    <span className="text-xs text-white/60 font-bold">
-                      #{playerRank} of {allParticipants.length}
-                    </span>
-                  )}
-                  {playerArchetype && (
-                    <PlayerArchetypeBadge archetype={playerArchetype} size="sm" />
-                  )}
-                </div>
-              </div>
-
-              {/* Score */}
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                className="flex-shrink-0 text-right"
-              >
-                <div className="text-3xl font-black text-white">{results.playerScore}</div>
-                <div className="text-[10px] font-bold uppercase text-white/60">
-                  {t('results.points') || 'Points'}
-                </div>
-              </motion.div>
-            </div>
-
-            {/* Key Stats Grid - Always visible */}
-            <div className="grid grid-cols-3 gap-2 mb-3">
-              {/* Words Found */}
-              <div className="bg-white/10 rounded-neo border border-white/20 p-2 text-center">
-                <div className="flex justify-center mb-1">
-                  <div className="w-6 h-6 rounded bg-neo-lime text-neo-black border border-neo-black flex items-center justify-center">
-                    <Hash className="w-3.5 h-3.5 text-neo-black" />
-                  </div>
-                </div>
-                <div className="text-xl font-black text-white">{validWordCount}</div>
-                <div className="text-[9px] font-bold uppercase text-white/60">{t('results.words') || 'Words'}</div>
-              </div>
-
-              {/* Accuracy */}
-              <div className="bg-white/10 rounded-neo border border-white/20 p-2 text-center">
-                <div className="flex justify-center mb-1">
-                  <div className="w-6 h-6 rounded bg-neo-pink text-white border border-neo-black flex items-center justify-center">
-                    <Target className="w-3.5 h-3.5 text-neo-black" />
-                  </div>
-                </div>
-                <div className="text-xl font-black text-white">{accuracy}%</div>
-                <div className="text-[9px] font-bold uppercase text-white/60">{t('results.accuracy') || 'Accuracy'}</div>
-              </div>
-
-              {/* Best Word */}
-              <div className="bg-white/10 rounded-neo border border-white/20 p-2 text-center">
-                <div className="flex justify-center mb-1">
-                  <div className="w-6 h-6 rounded bg-neo-purple text-white border border-neo-black flex items-center justify-center">
-                    <Award className="w-3.5 h-3.5 text-neo-cream" />
-                  </div>
-                </div>
-                <div className="text-sm font-black text-white uppercase truncate">
-                  {bestWord ? applyHebrewFinalLetters(bestWord.word) : '-'}
-                </div>
-                <div className="text-[9px] font-bold uppercase text-white/60">
-                  {bestWord?.score ? `${bestWord.score} pts` : (t('results.bestWord') || 'Best')}
-                </div>
-              </div>
-            </div>
-
-            {/* Bonus Badges Row */}
-            <BonusBadgesRow
-              comboBonus={totalComboBonus}
-              fireRoundBonus={totalFireRoundBonus}
-              className="mb-3"
+      {/* DESKTOP VIEW - Two-column side-by-side layout (hidden on mobile) */}
+      <div className="hidden lg:flex lg:flex-col lg:overflow-auto p-4 xl:p-6">
+        {/* Two-Column Layout */}
+        <div className="flex-1 w-full max-w-5xl mx-auto flex flex-row gap-6">
+          {/* LEFT COLUMN: Results (Banner, Score, Leaderboard, Actions) */}
+          <div className="flex-1 min-w-0 max-w-xl space-y-4">
+            {/* Victory/Results Banner */}
+            <ResultsWinnerBanner
+              winner={{
+                username: t('common.you') || 'You',
+                score: results.playerScore,
+              }}
+              isCurrentUserWinner={true}
+              rank={mode === 'solo-bots' ? playerRank : 1}
+              variant={
+                results.playerScore === 0 || validWordCount === 0 ? 'completion' :
+                mode === 'practice' ? 'completion' :
+                mode === 'challenge' && results.isNewHighScore ? (results.isNewAllTimeBest ? 'newRecord' : 'highScore') :
+                mode === 'challenge' ? 'completion' :
+                'ranking'
+              }
+              customMessage={
+                results.playerScore === 0 || validWordCount === 0 ? (t('singlePlayer.tryAgain') || 'Try Again!') :
+                validWordCount <= 2 ? (t('singlePlayer.keepPracticing') || 'Keep Practicing!') :
+                mode === 'solo-bots' && isWinner && results.playerScore > 0 ? (t('singlePlayer.victory') || 'Victory!') :
+                mode === 'solo-bots' && playerRank <= 3 && results.playerScore > 0 ? undefined :
+                mode === 'solo-bots' ? (t('singlePlayer.gameOver') || 'Game Over') :
+                mode === 'practice' ? (t('singlePlayer.practiceComplete') || 'Practice Complete!') :
+                undefined
+              }
+              customAnnouncement={
+                results.playerScore === 0 || validWordCount === 0 ? (t('singlePlayer.noWordsFound') || "Didn't find any words this time") :
+                validWordCount <= 2 ? (validWordCount === 1
+                  ? (t('singlePlayer.fewWordsFoundSingular') || 'Found 1 word')
+                  : (t('singlePlayer.fewWordsFound') || 'Found {count} words').replace('{count}', String(validWordCount))) :
+                mode === 'solo-bots' ? `#${playerRank} ${t('results.of') || 'of'} ${allParticipants.length}` :
+                mode === 'challenge' && results.previousHighScore && results.previousHighScore > results.playerScore
+                  ? (t('challenge.shortOf') || '{diff} points short of your record').replace('{diff}', String(results.previousHighScore - results.playerScore))
+                  : undefined
+              }
+              showConfetti={shouldShowConfetti}
             />
+
+            {/* Compact Stats Card */}
+            <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 shadow-hard">
+              <div className="flex items-center gap-3">
+                {/* Rank Badge */}
+                <div className={cn(
+                  'w-12 h-12 rounded-neo flex items-center justify-center border-3 border-neo-black font-black text-lg',
+                  rankStyle.bg, rankStyle.text
+                )}>
+                  #{mode === 'solo-bots' ? playerRank : 1}
+                </div>
+                {/* Score & Stats */}
+                <div className="flex-1 min-w-0">
+                  <div className="text-2xl font-black text-white">{results.playerScore} <span className="text-sm text-white/60">{t('results.points') || 'pts'}</span></div>
+                  <div className="text-xs text-white/70 font-bold flex items-center gap-2 flex-wrap">
+                    <span>{validWordCount} {t('results.words') || 'words'}</span>
+                    <span>•</span>
+                    <span>{accuracy}% {t('results.accuracy') || 'accuracy'}</span>
+                    {playerArchetype && (
+                      <>
+                        <span>•</span>
+                        <span className="text-neo-cyan">{playerArchetype.name}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <BonusBadgesRow comboBonus={totalComboBonus} fireRoundBonus={totalFireRoundBonus} className="mt-2" />
+            </div>
 
             {/* Coins Earned */}
-            <CoinRewardDisplay
-              reward={coinReward}
-              variant="full"
-              showBreakdown
-              showHint
-              className="mb-3"
-            />
+            <CoinRewardDisplay reward={coinReward} variant="compact" />
 
-            {/* Collapsible: Performance Details */}
-            {playerInsights && (
-              <>
-                <button
-                  onClick={() => setShowDetails(!showDetails)}
-                  aria-expanded={showDetails}
-                  className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-bold text-white uppercase border-2 border-neo-cyan/50 bg-neo-cyan/10 hover:bg-neo-cyan/20 transition-colors mb-2"
-                >
-                  <span className="flex items-center gap-2">
-                    <BarChart3 className="w-4 h-4" />
-                    {t('results.viewDetails') || 'View Performance Details'}
-                  </span>
-                  <motion.div animate={{ rotate: showDetails ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                    <ChevronDown className="w-5 h-5" />
-                  </motion.div>
-                </button>
-                <AnimatePresence>
-                  {showDetails && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25 }}
-                      className="overflow-hidden mb-2"
-                    >
-                      <div className="bg-white/5 rounded-neo border border-white/10 p-2">
-                        <PlayerInsights insights={playerInsights} />
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </>
+            {/* Leaderboard (solo-bots mode) */}
+            {mode === 'solo-bots' && results.botScores.length > 0 && (
+              <Top3Leaderboard
+                participants={allParticipants.map(p => ({
+                  name: p.name,
+                  score: p.score,
+                  isCurrentPlayer: p.isPlayer,
+                  isBot: !p.isPlayer,
+                })) as LeaderboardParticipant[]}
+                headerText={t('common.leaderboard') || 'Leaderboard'}
+              />
             )}
 
-            {/* Collapsible: Words (only show if there are words) */}
-            {results.playerWordData && results.playerWordData.length > 0 && (
-            <>
-            <button
-              onClick={() => setShowWords(!showWords)}
-              aria-expanded={showWords}
-              className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-bold text-white uppercase border-2 border-white/20 bg-white/5 hover:bg-white/10 transition-colors mb-2"
-            >
-              <span className="flex items-center gap-2">
-                <Hash className="w-4 h-4" />
-                {t('results.viewAllWords') || 'View All Words'} ({results.playerWordData.length})
-              </span>
-              <motion.div animate={{ rotate: showWords ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                <ChevronDown className="w-5 h-5" />
-              </motion.div>
-            </button>
-            <AnimatePresence>
-              {showWords && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.25 }}
-                  className="overflow-hidden mb-2"
-                >
-                  <div className="bg-white/5 rounded-neo border border-white/10 p-2 space-y-2">
-                    <WordPointsGroup
-                      wordsByPoints={wordsByPoints}
-                      sortedPointGroups={sortedPointGroups}
-                      t={t}
-                      mode="chip"
-                    />
-                    <InvalidWordsSection
-                      invalidWords={invalidWords}
-                      t={t}
-                      mode="chip"
-                    />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-            </>
-            )}
-
-            {/* Collapsible: Achievements */}
+            {/* Achievements - Inline badges */}
             {results.achievements && results.achievements.length > 0 && (
-              <>
-                <button
-                  onClick={() => setShowAchievements(!showAchievements)}
-                  aria-expanded={showAchievements}
-                  className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-bold text-white uppercase border-2 border-neo-yellow/50 bg-neo-yellow/10 hover:bg-neo-yellow/20 transition-colors"
-                >
-                  <span className="flex items-center gap-2">
-                    <Award className="w-4 h-4" />
-                    {t('hostView.achievements') || 'Achievements'} ({results.achievements.length})
-                  </span>
-                  <motion.div animate={{ rotate: showAchievements ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                    <ChevronDown className="w-5 h-5" />
-                  </motion.div>
-                </button>
-                <AnimatePresence>
-                  {showAchievements && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25 }}
-                      className="overflow-hidden mt-2"
-                    >
-                      <div className="flex flex-wrap gap-2">
-                        {results.achievements.map((ach, i) => (
-                          <AchievementBadge key={ach.key} achievement={ach} index={i} />
-                        ))}
-                      </div>
-                      <p className="text-xs text-white/50 mt-2 italic">
-                        {t('singlePlayer.achievementsNotSaved') || 'Achievements in single player mode are not saved to your profile.'}
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </>
+              <div className="flex flex-wrap gap-2 justify-center">
+                {results.achievements.slice(0, 4).map((ach, i) => (
+                  <AchievementBadge key={ach.key} achievement={ach} index={i} />
+                ))}
+                {results.achievements.length > 4 && (
+                  <span className="text-xs text-neo-cyan font-bold">+{results.achievements.length - 4} more</span>
+                )}
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div ref={actionButtonsRef}>
+              <SinglePlayerActions
+                onQuickRematch={onQuickRematch}
+                onPlayAgain={onPlayAgain}
+                onBackToLobby={onBackToLobby}
+                variant="desktop"
+              />
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN: Details (Performance, Words, Charts, Bot Details) */}
+          <div className="flex-1 min-w-0 max-w-xl space-y-4">
+            {/* Performance Insights */}
+            {playerInsights && (
+              <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 shadow-hard">
+                <div className="flex items-center gap-2 mb-2">
+                  <BarChart3 className="w-4 h-4 text-neo-cyan" />
+                  <h3 className="text-sm font-black uppercase text-white">{t('results.performanceDetails') || 'Performance Details'}</h3>
+                </div>
+                <PlayerInsights insights={playerInsights} />
+              </div>
+            )}
+
+            {/* Words List */}
+            {results.playerWordData && results.playerWordData.length > 0 && (
+              <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 shadow-hard">
+                <div className="flex items-center gap-2 mb-2">
+                  <Hash className="w-4 h-4 text-neo-lime" />
+                  <h3 className="text-sm font-black uppercase text-white">
+                    {t('results.yourWords') || 'Your Words'} ({results.playerWordData.length})
+                  </h3>
+                </div>
+                <div className="space-y-2">
+                  <WordPointsGroup wordsByPoints={wordsByPoints} sortedPointGroups={sortedPointGroups} t={t} mode="chip" />
+                  <InvalidWordsSection invalidWords={invalidWords} t={t} mode="chip" />
+                </div>
+              </div>
+            )}
+
+            {/* Performance Chart */}
+            <CollapsibleSection
+              title={t('results.performanceHistory') || 'Performance History'}
+              icon={<TrendingUp className="w-4 h-4" />}
+              defaultExpanded={false}
+              variant="tertiary"
+              className="shadow-hard"
+            >
+              <PerformanceChart currentScore={results.playerScore} gamesLimit={10} />
+            </CollapsibleSection>
+
+            {/* Missed Words */}
+            {mode === 'solo-bots' && missedWords.length > 0 && (
+              <MissedWords missedWords={missedWords} maxDisplay={5} />
+            )}
+
+            {/* Bot Words Details */}
+            {mode === 'solo-bots' && botWordDetails.length > 0 && (
+              <CollapsibleSection
+                title={t('singlePlayer.botDetails') || 'Bot Performance Details'}
+                icon={<Bot className="w-4 h-4" />}
+                badge={botWordDetails.length}
+                defaultExpanded={false}
+                variant="tertiary"
+                className="shadow-hard"
+              >
+                <div className="space-y-2">
+                  {botWordDetails.map((bot) => (
+                    <div key={bot.name} className="border-2 border-neo-black/30 dark:border-slate-500 rounded-neo overflow-hidden">
+                      <button
+                        onClick={() => setExpandedBot(expandedBot === bot.name ? null : bot.name)}
+                        className="w-full flex items-center justify-between p-2 bg-neo-cream/50 dark:bg-slate-700 hover:bg-neo-cream dark:hover:bg-slate-600 transition-colors"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Bot className="w-4 h-4 text-neo-black/70 dark:text-white/70" />
+                          <span className="font-bold text-neo-black dark:text-white text-sm">{bot.name}</span>
+                          <span className="text-[10px] bg-neo-black/10 dark:bg-white/10 px-1.5 py-0.5 rounded-full font-bold">{bot.totalWords} words</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg font-black text-neo-black dark:text-white">{bot.score}</span>
+                          <motion.span animate={{ rotate: expandedBot === bot.name ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                            <ChevronDown className="w-4 h-4 text-neo-black/70 dark:text-white/70" />
+                          </motion.span>
+                        </div>
+                      </button>
+                      <AnimatePresence>
+                        {expandedBot === bot.name && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="p-2 bg-white dark:bg-slate-800 border-t border-neo-black/10 dark:border-slate-600 text-neo-black dark:text-white">
+                              {bot.words && bot.words.length > 0 && (
+                                <div className="flex flex-wrap gap-1">
+                                  {bot.words.map((word, i) => {
+                                    const points = Math.max(word.length - 1, 1);
+                                    const gameLanguage = results.language || language;
+                                    const displayWord = gameLanguage === 'he' ? applyHebrewFinalLetters(word) : word;
+                                    return (
+                                      <span
+                                        key={`${word}-${i}`}
+                                        className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-black uppercase border border-neo-black rounded shadow-sm"
+                                        style={{ backgroundColor: getPointColor(points), color: getTextColor(points) }}
+                                      >
+                                        {displayWord}
+                                        <span className="opacity-70">+{points}</span>
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  ))}
+                </div>
+              </CollapsibleSection>
+            )}
+
+            {/* All Achievements (if more than 4) */}
+            {results.achievements && results.achievements.length > 4 && (
+              <CollapsibleSection
+                title={t('hostView.achievements') || 'Achievements'}
+                icon={<Award className="w-4 h-4" />}
+                badge={results.achievements.length}
+                defaultExpanded={false}
+                variant="tertiary"
+                className="shadow-hard"
+              >
+                <div className="flex flex-wrap gap-2">
+                  {results.achievements.map((ach, i) => (
+                    <AchievementBadge key={ach.key} achievement={ach} index={i} />
+                  ))}
+                </div>
+                <p className="text-xs text-white/50 mt-2 italic">
+                  {t('singlePlayer.achievementsNotSaved') || 'Achievements in single player mode are not saved to your profile.'}
+                </p>
+              </CollapsibleSection>
             )}
           </div>
         </div>
-      </motion.div>
-
-      {/* Performance Chart - Collapsible */}
-      <CollapsibleSection
-        title={t('results.performanceHistory') || 'Performance History'}
-        icon={<TrendingUp className="w-4 h-4" />}
-        defaultExpanded={false}
-        variant="tertiary"
-        className="shadow-hard"
-      >
-        <PerformanceChart currentScore={results.playerScore} gamesLimit={10} />
-      </CollapsibleSection>
-
-      {/* Missed Words - Collapsible (for solo-bots mode) */}
-      {mode === 'solo-bots' && missedWords.length > 0 && (
-        <MissedWords missedWords={missedWords} maxDisplay={5} />
-      )}
-
-      {/* Leaderboard (solo-bots mode) - using shared Top3Leaderboard component */}
-      {mode === 'solo-bots' && results.botScores.length > 0 && (
-        <Top3Leaderboard
-          participants={allParticipants.map(p => ({
-            name: p.name,
-            score: p.score,
-            isCurrentPlayer: p.isPlayer,
-            isBot: !p.isPlayer,
-          })) as LeaderboardParticipant[]}
-          headerText={t('common.leaderboard') || 'Leaderboard'}
-        />
-      )}
-
-      {/* Bot Words Details - Collapsible */}
-      {mode === 'solo-bots' && botWordDetails.length > 0 && (
-        <CollapsibleSection
-          title={t('singlePlayer.botDetails') || 'Bot Performance Details'}
-          icon={<Bot className="w-4 h-4" />}
-          badge={botWordDetails.length}
-          defaultExpanded={false}
-          variant="tertiary"
-          className="shadow-hard"
-        >
-          <div className="space-y-2">
-            {botWordDetails.map((bot) => (
-              <div
-                key={bot.name}
-                className="border-2 border-neo-black/30 dark:border-slate-500 rounded-neo overflow-hidden"
-              >
-                <button
-                  onClick={() => setExpandedBot(expandedBot === bot.name ? null : bot.name)}
-                  className="w-full flex items-center justify-between p-2 bg-neo-cream/50 dark:bg-slate-700 hover:bg-neo-cream dark:hover:bg-slate-600 transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <Bot className="w-4 h-4 text-neo-black/70 dark:text-white/70" />
-                    <span className="font-bold text-neo-black dark:text-white text-sm">{bot.name}</span>
-                    <span className="text-[10px] bg-neo-black/10 dark:bg-white/10 px-1.5 py-0.5 rounded-full font-bold">
-                      {bot.totalWords} words
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-black text-neo-black dark:text-white">{bot.score}</span>
-                    <motion.span
-                      animate={{ rotate: expandedBot === bot.name ? 180 : 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <ChevronDown className="w-4 h-4 text-neo-black/70 dark:text-white/70" />
-                    </motion.span>
-                  </div>
-                </button>
-                <AnimatePresence>
-                  {expandedBot === bot.name && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="p-2 bg-white dark:bg-slate-800 border-t border-neo-black/10 dark:border-slate-600 text-neo-black dark:text-white">
-                        {bot.words && bot.words.length > 0 && (
-                          <div className="flex flex-wrap gap-1">
-                            {bot.words.map((word, i) => {
-                              const points = Math.max(word.length - 1, 1);
-                              const gameLanguage = results.language || language;
-                              const displayWord = gameLanguage === 'he' ? applyHebrewFinalLetters(word) : word;
-                              return (
-                                <span
-                                  key={`${word}-${i}`}
-                                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-black uppercase border border-neo-black rounded shadow-sm"
-                                  style={{
-                                    backgroundColor: getPointColor(points),
-                                    color: getTextColor(points)
-                                  }}
-                                >
-                                  {displayWord}
-                                  <span className="opacity-70">+{points}</span>
-                                </span>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ))}
-          </div>
-        </CollapsibleSection>
-      )}
-
-      {/* Action buttons - Compact */}
-      <div ref={actionButtonsRef} className="pt-2">
-        <SinglePlayerActions
-          onQuickRematch={onQuickRematch}
-          onPlayAgain={onPlayAgain}
-          onBackToLobby={onBackToLobby}
-          variant="desktop"
-        />
       </div>
-
-      </motion.div>
 
       {/* Modals - Outside both mobile and desktop views */}
       {/* Word validation modal */}

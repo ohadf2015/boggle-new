@@ -578,7 +578,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="flex-1 flex flex-col items-center justify-center p-4"
+      className="flex-1 flex flex-col items-center justify-start pt-28 sm:pt-32 pb-4 px-4"
     >
       {/* Top bar with back and language */}
       <div className="absolute top-20 sm:top-24 left-4 right-4 flex items-center justify-between">

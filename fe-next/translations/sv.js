@@ -2167,7 +2167,13 @@ const sv = {
     "noRankYet": "Spela för att bli rankad!",
     "viewLeaderboard": "Visa topplista",
     "you": "DU",
-    "players": "spelare"
+    "players": "spelare",
+    "liveRace": "Live Race",
+    "racing": "tävlar",
+    "leader": "Ledare",
+    "leading": "Leder!",
+    "ahead": "före",
+    "toCatch": "p för att passera"
   },
   "ranked": {
     "title": "Rankat läge",
@@ -2432,7 +2438,7 @@ const sv = {
   "singlePlayer": {
     "title": "Enspelarläge",
     "quickPlay": "Snabbspel",
-    "quickPlayDesc": "7×7 • 2 min • mot Bot",
+    "quickPlayDesc": "7×7 • 1 min • mot Bot",
     "selectMode": "Välj läge",
     "chooseMode": "Välj ditt läge",
     "mode": {
@@ -2670,6 +2676,10 @@ const sv = {
     "beFirstToPlay": "Bli först att spela dagens utmaning!",
     "playerSingular": "spelare",
     "playersPlural": "spelare",
+    "guestSingular": "gast",
+    "guestsPlural": "gaster",
+    "tookChallenge": "spelade utmaningen",
+    "signUpToAppear": "Registrera dig for att synas pa tavlan!",
     "totalAttempts": "försök",
     "yourRank": "Din placering",
     "yourPosition": "Din position",
@@ -2701,6 +2711,7 @@ const sv = {
     "onlyMatchingLength": "Endast ord med {length} bokstäver använder dina försök!",
     "tookChallenge": "tog utmaningen",
     "signUpToAppear": "Registrera dig för att synas på topplistan!",
+    "showLeaderboard": "Visa topplistan",
     "carousel": {
       "step1Title": "Svep för att hitta ord",
       "step1Desc": "Koppla bokstäver i alla riktningar",
@@ -2714,7 +2725,9 @@ const sv = {
       "step2Colors": "green,yellow,gray,green",
       "step3Title": "Hitta det gömda ordet",
       "step3Desc": "10 försök att knäcka koden",
-      "step3Hint": "Gissa ord med {length} bokstäver för ledtrådar"
+      "step3Hint": "Gissa ord med {length} bokstäver för ledtrådar",
+      "step4Title": "Hitta ord, avslöja ledtrådar",
+      "step4Desc": "Varje ord på 3+ bokstäver ger ledtrådar!"
     },
     "share": {
       "header": "LexiClash Daily #{number}",
@@ -2778,7 +2791,8 @@ const sv = {
       "youFailed": "Du löste det inte den här gången",
       "attemptsUsed": "Försök använda: {count}",
       "top": "Topp",
-      "solved": "löste"
+      "solved": "löste",
+      "betterThan": "bättre än andra spelare"
     },
     "survival": {
       "lifePoints": "Liv",

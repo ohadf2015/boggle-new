@@ -4,6 +4,7 @@ import { Clock, Trophy, Rocket } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
 import { useLanguage } from '../contexts/LanguageContext';
+import { formatTimeMMSS } from '@/shared/utils';
 
 interface LateJoinerWelcomeProps {
   isOpen: boolean;
@@ -23,12 +24,6 @@ const LateJoinerWelcome: React.FC<LateJoinerWelcomeProps> = ({
   topPlayers,
 }): React.ReactElement => {
   const { t, dir } = useLanguage();
-
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
 
   const tips = [
     { icon: Rocket, text: t('lateJoiner.quickTip1'), color: 'bg-neo-yellow' },
@@ -78,7 +73,7 @@ const LateJoinerWelcome: React.FC<LateJoinerWelcomeProps> = ({
                 </span>
               </div>
               <div className="text-lg sm:text-2xl font-black text-neo-black">
-                {formatTime(timeRemaining)}
+                {formatTimeMMSS(timeRemaining)}
               </div>
             </motion.div>
 

@@ -6,6 +6,7 @@ import { Users, Trophy, Clock, ChevronDown, ChevronUp, Sparkles, Crown, Calendar
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { getRankDisplay } from '@/utils/rankingStyles';
 import { getPuzzleNumber } from '@/utils/dailyChallenge';
+import { formatDistanceToNow, getCountryFlag } from '@/shared/utils';
 import type { Language } from '@/types';
 
 // ==========================================
@@ -50,33 +51,6 @@ export interface AllTimeParticipant {
 }
 
 type LeaderboardTab = 'today' | 'alltime';
-
-// Simple relative time formatter with translation support
-function formatDistanceToNow(dateString: string, t: (key: string) => string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffSecs = Math.floor(diffMs / 1000);
-  const diffMins = Math.floor(diffSecs / 60);
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffSecs < 60) return t('wordHunt.leaderboard.justNow');
-  if (diffMins < 60) return t('wordHunt.leaderboard.minutesAgo').replace('{count}', String(diffMins));
-  if (diffHours < 24) return t('wordHunt.leaderboard.hoursAgo').replace('{count}', String(diffHours));
-  if (diffDays < 7) return t('wordHunt.leaderboard.daysAgo').replace('{count}', String(diffDays));
-  return date.toLocaleDateString();
-}
-
-// Country code to flag emoji converter
-function getCountryFlag(countryCode: string | null | undefined): string {
-  if (!countryCode || countryCode.length !== 2) return '';
-  const codePoints = countryCode
-    .toUpperCase()
-    .split('')
-    .map(char => 127397 + char.charCodeAt(0));
-  return String.fromCodePoint(...codePoints);
-}
 
 interface TabbedDailyLeaderboardProps {
   puzzleDate: string;

@@ -2292,7 +2292,13 @@ const es = {
     "noRankYet": "¡Juega partidas para clasificarte!",
     "viewLeaderboard": "Ver Clasificación",
     "you": "TÚ",
-    "players": "jugadores"
+    "players": "jugadores",
+    "liveRace": "Carrera en Vivo",
+    "racing": "compitiendo",
+    "leader": "Líder",
+    "leading": "¡Liderando!",
+    "ahead": "adelante",
+    "toCatch": "pts para pasar"
   },
   "ranked": {
     "title": "Modo Clasificatorio",
@@ -2429,7 +2435,7 @@ const es = {
   "singlePlayer": {
     "title": "Un Jugador",
     "quickPlay": "Jugar Rápido",
-    "quickPlayDesc": "7×7 • 2 min • vs Bot",
+    "quickPlayDesc": "7×7 • 1 min • vs Bot",
     "selectMode": "Selecciona Modo",
     "chooseMode": "Elige tu modo",
     "mode": {
@@ -2667,6 +2673,10 @@ const es = {
     "beFirstToPlay": "¡Sé el primero en jugar el desafío de hoy!",
     "playerSingular": "jugador",
     "playersPlural": "jugadores",
+    "guestSingular": "invitado",
+    "guestsPlural": "invitados",
+    "tookChallenge": "jugaron el desafio",
+    "signUpToAppear": "Registrate para aparecer en la tabla!",
     "totalAttempts": "intentos",
     "yourRank": "Tu posición",
     "yourPosition": "Tu puesto",
@@ -2698,6 +2708,7 @@ const es = {
     "onlyMatchingLength": "¡Solo las palabras de {length} letras usan tus intentos!",
     "tookChallenge": "aceptaron el desafío",
     "signUpToAppear": "¡Regístrate para aparecer en la clasificación!",
+    "showLeaderboard": "Mostrar tabla de líderes",
     "carousel": {
       "step1Title": "Desliza para formar palabras",
       "step1Desc": "Conecta letras en cualquier dirección",
@@ -2711,7 +2722,9 @@ const es = {
       "step2Colors": "green,yellow,gray,green",
       "step3Title": "Encuentra la palabra oculta",
       "step3Desc": "10 intentos para descifrar",
-      "step3Hint": "Adivina palabras de {length} letras para ver pistas"
+      "step3Hint": "Adivina palabras de {length} letras para ver pistas",
+      "step4Title": "Descubre palabras, revela pistas",
+      "step4Desc": "Cada palabra de 3+ letras revela pistas!"
     },
     "share": {
       "header": "LexiClash Daily #{number}",
@@ -2775,7 +2788,8 @@ const es = {
       "youFailed": "No lo resolviste esta vez",
       "attemptsUsed": "Intentos usados: {count}",
       "top": "Top",
-      "solved": "resuelto"
+      "solved": "resuelto",
+      "betterThan": "mejor que otros jugadores"
     },
     "survival": {
       "lifePoints": "Vida",

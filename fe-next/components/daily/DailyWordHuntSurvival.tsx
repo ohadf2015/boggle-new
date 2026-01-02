@@ -656,23 +656,46 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     // Check for YELLOW clues (letters exist in target but at different positions)
     // Add to knownLetters for the "Contains:" display
     // SIMPLIFIED: Also requires 3+ letter words for consistency
+    // IMPORTANT: Don't add letters that are already fully revealed as green
     if (normalizedWord.length >= 3) {
       setKnownLetters(prev => {
         const updated = new Set(prev);
         const usedCounts = new Map<string, number>();
 
+        // Count existing GREEN letters from accumulatedClues
+        // Letters with full green coverage should NOT be added to knownLetters
+        const greenLetterCounts = new Map<string, number>();
+        accumulatedClues.forEach((clue) => {
+          if (clue.type === 'green') {
+            greenLetterCounts.set(clue.letter, (greenLetterCounts.get(clue.letter) || 0) + 1);
+          }
+        });
+
         // Check letters and add to known letters if they exist in target (incremental)
+        // But ONLY if target has more instances than we've already found as green
         for (const letter of normalizedWord) {
           const targetCount = targetLetterCounts.get(letter) || 0;
-          if (targetCount > 0) {
+          const greenCount = greenLetterCounts.get(letter) || 0;
+
+          // Only add if letter exists in target AND target has more instances than greens found
+          if (targetCount > 0 && targetCount > greenCount) {
             const used = usedCounts.get(letter) || 0;
-            if (used < targetCount) {
+            if (used < targetCount - greenCount) {
               usedCounts.set(letter, used + 1);
-              // Add to known letters if not already revealed (incremental)
+              // Add to known letters
               updated.add(letter);
             }
           }
         }
+
+        // Clean up: remove any letters that have full green coverage
+        // This handles cases where greens were found in previous guesses
+        greenLetterCounts.forEach((greenCount, letter) => {
+          const targetCount = targetLetterCounts.get(letter) || 0;
+          if (greenCount >= targetCount) {
+            updated.delete(letter);
+          }
+        });
 
         return updated;
       });
@@ -1229,7 +1252,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
             transition={{ duration: 0.5, ease: "easeOut" }}
           >
             <span className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">
-              {lifePoints}/100
+              {Math.floor(lifePoints)}/100
             </span>
           </motion.div>
 

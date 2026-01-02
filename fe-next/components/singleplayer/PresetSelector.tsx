@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { type PresetConfig, getDefaultPreset } from './presetConfig';
+import { type PresetConfig, getDefaultPreset, getPresetById } from './presetConfig';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import LandscapeIndicator from '@/components/LandscapeIndicator';
 import type { SinglePlayerMode } from './SinglePlayerView';
@@ -140,7 +140,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
             {/* Quick Play Button - Primary CTA */}
             <button
               onClick={() => {
-                const quickPreset = getDefaultPreset('solo-bots');
+                const quickPreset = getPresetById('quick');
                 if (quickPreset) onSelectPreset(quickPreset);
               }}
               className={cn(
@@ -249,7 +249,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.05 }}
           onClick={() => {
-            const quickPreset = getDefaultPreset('solo-bots');
+            const quickPreset = getPresetById('quick');
             if (quickPreset) onSelectPreset(quickPreset);
           }}
           className={cn(

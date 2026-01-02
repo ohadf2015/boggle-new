@@ -11,6 +11,11 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 });
 
+// Check if this is a preview/staging environment (explicitly set or PR preview)
+// Only block indexing when NEXT_PUBLIC_IS_PREVIEW is explicitly true or when it's a PR preview
+const isPreviewEnvironment = process.env.NEXT_PUBLIC_IS_PREVIEW === 'true' ||
+  process.env.RAILWAY_ENVIRONMENT_NAME?.startsWith('pr-');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Enable system TLS certs for Turbopack to fetch Google Fonts
@@ -142,6 +147,11 @@ const nextConfig = {
       {
         source: '/:path*',
         headers: [
+          // Block indexing for preview/staging environments via X-Robots-Tag header
+          ...(isPreviewEnvironment ? [{
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow, noarchive, nosnippet, noimageindex',
+          }] : []),
           {
             key: 'Strict-Transport-Security',
             value: 'max-age=31536000; includeSubDomains; preload',

@@ -17,7 +17,6 @@ import { useDisableFireRoundLights, useDisableEarthquakeEffects } from '@/contex
 import { useDevicePerformance } from '../hooks/useDevicePerformance';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useEarthquakeAnimation } from '../hooks/useEarthquakeAnimation';
-import ScreenCracks from './earthquake/ScreenCracks';
 
 /** Cell position for highlighted paths */
 export interface HighlightedCell {
@@ -189,6 +188,7 @@ const GridComponent = memo<GridComponentProps>(({
     earthquakeParticles,
     earthquakeDust,
     showCracks,
+    dustPhase,
     getShakeOffset,
     getPhaseAnimation,
     useEnhancedMode,
@@ -386,11 +386,6 @@ const GridComponent = memo<GridComponentProps>(({
       {/* First-time combo explanation tooltip */}
       <ComboExplanationTooltip comboLevel={comboLevel} />
 
-      {/* Screen crack effect overlay */}
-      <ScreenCracks
-        visible={showCracks}
-        intensity={useEnhancedMode ? 'high' : 'medium'}
-      />
 
       {/* NEO-BRUTALIST: Clean frame wrapper with OPTIMIZED screen shake during earthquake */}
       <motion.div

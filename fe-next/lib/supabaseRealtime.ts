@@ -92,12 +92,12 @@ function getOrCreateLeaderboardChannel(): RealtimeChannel | null {
     .on(
       'postgres_changes',
       {
-        event: 'UPDATE', // Only listen to updates, not inserts (new players don't affect existing ranks immediately)
+        event: '*', // Listen to all events: INSERT (new players), UPDATE (score changes), DELETE
         schema: 'public',
         table: 'leaderboard'
       },
       (payload) => {
-        logger.log('[Realtime] Leaderboard update:', payload.eventType);
+        logger.log('[Realtime] Leaderboard change:', payload.eventType, payload.new ? `player: ${(payload.new as { username?: string }).username}` : '');
         // Notify all subscribers with debouncing per callback
         leaderboardCallbacks.forEach(callback => {
           debounce(`leaderboard-callback-${callback.toString().slice(0, 50)}`, () => callback(payload), 500);

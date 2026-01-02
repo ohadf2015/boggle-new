@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { memo, useMemo } from 'react';
+import { memo, useState, useEffect } from 'react';
 
 interface NewYearFireworksProps {
   /** Whether to show fireworks */
@@ -12,6 +12,15 @@ interface NewYearFireworksProps {
   duration?: number;
 }
 
+interface FireworkData {
+  id: number;
+  x: number;
+  y: number;
+  color: string;
+  delay: number;
+  size: number;
+}
+
 /**
  * Neo-Brutalist Fireworks Component
  *
@@ -20,17 +29,23 @@ interface NewYearFireworksProps {
  * Optimized for performance with GPU acceleration.
  */
 const NewYearFireworks = memo(({ active, count = 8, duration = 5000 }: NewYearFireworksProps) => {
-  // Generate random firework positions and colors
-  const fireworks = useMemo(() => {
-    return Array.from({ length: count }, (_, i) => ({
-      id: i,
-      x: 20 + Math.random() * 60, // 20-80% of screen width
-      y: 20 + Math.random() * 40, // 20-60% of screen height
-      color: ['neo-yellow', 'neo-pink', 'neo-cyan', 'neo-purple', 'neo-orange'][i % 5],
-      delay: (i * duration) / (count * 2), // Stagger launches
-      size: 80 + Math.random() * 60, // 80-140px diameter
-    }));
-  }, [count, duration]);
+  // Generate random firework positions and colors in useEffect to avoid impure render
+  const [fireworks, setFireworks] = useState<FireworkData[]>([]);
+
+  useEffect(() => {
+    if (active) {
+      setFireworks(
+        Array.from({ length: count }, (_, i) => ({
+          id: i,
+          x: 20 + Math.random() * 60, // 20-80% of screen width
+          y: 20 + Math.random() * 40, // 20-60% of screen height
+          color: ['neo-yellow', 'neo-pink', 'neo-cyan', 'neo-purple', 'neo-orange'][i % 5],
+          delay: (i * duration) / (count * 2), // Stagger launches
+          size: 80 + Math.random() * 60, // 80-140px diameter
+        }))
+      );
+    }
+  }, [active, count, duration]);
 
   return (
     <AnimatePresence>
@@ -71,18 +86,17 @@ const Firework = memo(({ x, y, color, delay, size }: FireworkProps) => {
   const particleCount = 16;
 
   // Generate particle angles (evenly distributed in circle)
-  const particles = useMemo(() => {
-    return Array.from({ length: particleCount }, (_, i) => {
-      const angle = (i / particleCount) * Math.PI * 2;
-      const distance = size / 2;
-      return {
-        id: i,
-        x: Math.cos(angle) * distance,
-        y: Math.sin(angle) * distance,
-        rotation: Math.random() * 360,
-      };
-    });
-  }, [particleCount, size]);
+  // Use deterministic rotation based on index instead of Math.random()
+  const particles = Array.from({ length: particleCount }, (_, i) => {
+    const angle = (i / particleCount) * Math.PI * 2;
+    const distance = size / 2;
+    return {
+      id: i,
+      x: Math.cos(angle) * distance,
+      y: Math.sin(angle) * distance,
+      rotation: (i * 22.5) % 360, // Deterministic rotation based on index
+    };
+  });
 
   return (
     <motion.div

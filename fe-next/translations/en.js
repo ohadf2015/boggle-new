@@ -2301,7 +2301,13 @@ const en = {
     "noRankYet": "Play games to get ranked!",
     "viewLeaderboard": "View Leaderboard",
     "you": "YOU",
-    "players": "players"
+    "players": "players",
+    "liveRace": "Live Race",
+    "racing": "racing",
+    "leader": "Leader",
+    "leading": "Leading!",
+    "ahead": "ahead",
+    "toCatch": "pts to pass"
   },
   "ranked": {
     "title": "Ranked Mode",
@@ -2438,7 +2444,7 @@ const en = {
   "singlePlayer": {
     "title": "Solo",
     "quickPlay": "Quick Play",
-    "quickPlayDesc": "7×7 • 2 min • vs Bot",
+    "quickPlayDesc": "7×7 • 1 min • vs Bot",
     "selectMode": "Mode",
     "chooseMode": "Pick Your Mode",
     "soloVsBots": "vs AI",
@@ -2676,6 +2682,10 @@ const en = {
     "beFirstToPlay": "Be the first today!",
     "playerSingular": "player",
     "playersPlural": "players",
+    "guestSingular": "guest",
+    "guestsPlural": "guests",
+    "tookChallenge": "took the challenge",
+    "signUpToAppear": "Sign up to appear on the leaderboard!",
     "totalAttempts": "attempts",
     "yourRank": "Your rank",
     "yourPosition": "Your Rank",
@@ -2707,6 +2717,7 @@ const en = {
     "onlyMatchingLength": "Only {length}-letter guesses count toward your 10 tries!",
     "tookChallenge": "took the challenge",
     "signUpToAppear": "Sign up to appear on the leaderboard!",
+    "showLeaderboard": "Show Leaderboard",
     "carousel": {
       "step1Title": "Swipe to Find Words",
       "step1Desc": "Connect letters in any direction",
@@ -2720,7 +2731,9 @@ const en = {
       "step2Colors": "green,yellow,gray,green",
       "step3Title": "Find the Hidden Word",
       "step3Desc": "10 tries to crack the code",
-      "step3Hint": "Guess {length}-letter words to unlock clues"
+      "step3Hint": "Guess {length}-letter words to unlock clues",
+      "step4Title": "Discover Words, Reveal Clues",
+      "step4Desc": "Every word 3+ letters reveals clues!"
     },
     "share": {
       "header": "LexiClash Daily #{number}",
@@ -2784,7 +2797,8 @@ const en = {
       "youFailed": "You didn't solve it this time",
       "attemptsUsed": "Attempts used: {count}",
       "top": "Top",
-      "solved": "solved"
+      "solved": "solved",
+      "betterThan": "better than other players"
     },
     "survival": {
       "lifePoints": "Life",

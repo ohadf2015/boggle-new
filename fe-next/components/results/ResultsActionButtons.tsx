@@ -47,14 +47,27 @@ export const SinglePlayerActions: React.FC<SinglePlayerActionsProps> = memo(({
     return (
       <div className={cn('flex flex-col gap-2', className)}>
         {onQuickRematch && (
-          <Button
-            size="sm"
-            className="w-full py-2 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-bold text-xs border-2 border-neo-black"
-            onClick={onQuickRematch}
-          >
-            <RotateCw className="me-1 text-xs" />
-            {t('common.rematch') || 'Rematch'}
-          </Button>
+          <motion.div className="relative">
+            <motion.div
+              className="absolute -inset-0.5 rounded-neo bg-gradient-to-r from-neo-yellow via-neo-lime to-neo-yellow opacity-60 blur-[2px]"
+              animate={{ opacity: [0.4, 0.7, 0.4] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <Button
+              size="sm"
+              className="relative w-full py-2 bg-gradient-to-r from-neo-yellow to-neo-lime hover:brightness-105 text-neo-black font-bold text-xs border-2 border-neo-black overflow-hidden"
+              onClick={onQuickRematch}
+            >
+              <motion.span
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                className="inline-flex"
+              >
+                <RotateCw className="me-1 w-3.5 h-3.5" />
+              </motion.span>
+              {t('common.rematch') || 'Rematch'}
+            </Button>
+          </motion.div>
         )}
         <div className="flex gap-2">
           <Button
@@ -83,19 +96,49 @@ export const SinglePlayerActions: React.FC<SinglePlayerActionsProps> = memo(({
   // Desktop and Mobile variants - similar layout
   return (
     <div className={cn('flex flex-col gap-2', className)}>
-      {/* Primary CTA - Quick Rematch (with animation) */}
+      {/* Primary CTA - Quick Rematch (with enhanced animation) */}
       {onQuickRematch && (
         <motion.div
-          animate={{ scale: [1, 1.02, 1] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+          animate={{ scale: [1, 1.03, 1] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="relative"
         >
+          {/* Pulsing glow behind button */}
+          <motion.div
+            className="absolute -inset-1 rounded-neo-lg bg-gradient-to-r from-neo-yellow via-neo-lime to-neo-yellow opacity-75 blur-sm"
+            animate={{
+              opacity: [0.5, 0.8, 0.5],
+              scale: [1, 1.02, 1]
+            }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          />
           <Button
             size="lg"
-            className="w-full py-4 text-xl shadow-hard-lg hover:shadow-hard-xl border-4 bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black font-black uppercase tracking-wider"
+            className="relative w-full py-5 text-xl shadow-hard-xl hover:shadow-hard-2xl border-4 border-neo-black bg-gradient-to-r from-neo-yellow via-neo-lime to-neo-yellow text-neo-black font-black uppercase tracking-wider overflow-hidden group"
             onClick={onQuickRematch}
+            style={{ textShadow: '1px 1px 0px var(--neo-cyan)' }}
           >
-            <RotateCw className="me-2 w-6 h-6" />
-            {t('common.quickRematch') || 'Quick Rematch'}
+            {/* Animated shine effect */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12"
+              animate={{ x: ['-200%', '200%'] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", repeatDelay: 1 }}
+            />
+            <motion.span
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              className="inline-flex"
+            >
+              <RotateCw className="me-2 w-7 h-7" />
+            </motion.span>
+            <span className="relative z-10">{t('common.quickRematch') || 'Quick Rematch'}</span>
+            <motion.span
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
+              className="ms-2"
+            >
+              <ArrowRight className="w-6 h-6 rtl:rotate-180" />
+            </motion.span>
           </Button>
         </motion.div>
       )}

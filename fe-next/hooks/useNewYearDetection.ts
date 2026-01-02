@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { formatTimeAdaptive } from '@/shared/utils';
 
 export interface NewYearState {
   isNewYearsEve: boolean;
@@ -132,14 +133,6 @@ function calculateNewYearState(
 
 /**
  * Format seconds into MM:SS or HH:MM:SS
+ * @deprecated Use formatTimeAdaptive from '@/shared/utils' directly
  */
-export function formatTimeRemaining(seconds: number): string {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
-
-  if (hours > 0) {
-    return `${hours}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-  }
-  return `${minutes}:${String(secs).padStart(2, '0')}`;
-}
+export const formatTimeRemaining = formatTimeAdaptive;

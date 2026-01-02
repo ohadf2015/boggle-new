@@ -203,7 +203,7 @@ const JoinRoomSetup: React.FC<JoinRoomSetupProps> = ({
 
     onSubmit({
       gameCode: gameCode.toUpperCase(),
-      username,
+      username: isAuthenticated && displayName ? displayName : username,
       avatarId: effectiveAvatarId,
     });
   };
@@ -232,7 +232,7 @@ const JoinRoomSetup: React.FC<JoinRoomSetupProps> = ({
 
     onSubmit({
       gameCode: roomCode,
-      username,
+      username: isAuthenticated && displayName ? displayName : username,
       avatarId: effectiveAvatarId,
     });
   };

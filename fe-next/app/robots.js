@@ -1,6 +1,23 @@
 export default function robots() {
   const baseUrl = 'https://www.lexiclash.live';
 
+  // Check if this is a preview/staging environment (explicitly set or PR preview)
+  // Only block indexing when NEXT_PUBLIC_IS_PREVIEW is explicitly true or when it's a PR preview
+  const isPreviewEnvironment = process.env.NEXT_PUBLIC_IS_PREVIEW === 'true' ||
+    process.env.RAILWAY_ENVIRONMENT_NAME?.startsWith('pr-');
+
+  // Block all crawlers for preview/staging environments
+  if (isPreviewEnvironment) {
+    return {
+      rules: [
+        {
+          userAgent: '*',
+          disallow: '/',
+        },
+      ],
+    };
+  }
+
   // Common allowed paths for all bots
   const commonAllowPaths = [
     '/',

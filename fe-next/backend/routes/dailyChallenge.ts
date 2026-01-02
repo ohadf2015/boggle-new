@@ -706,7 +706,7 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
       insertData.hints_unlocked = hintsUnlocked;
     }
     if (efficiencyScore !== undefined) {
-      insertData.efficiency_score = efficiencyScore;
+      insertData.efficiency_score = Math.round(efficiencyScore);
     }
 
     if (playerId) {
@@ -850,20 +850,33 @@ router.get('/word-hunt/leaderboard/:date/:language', async (req: Request<Leaderb
       logger.warn('API', `Word Hunt leaderboard total count error: ${totalCountError.message}`);
     }
 
+    // Get guest player count (guests who played, regardless of solved status)
+    const { count: guestCount, error: guestCountError } = await supabase
+      .from('daily_word_hunt_attempts')
+      .select('*', { count: 'exact', head: true })
+      .eq('puzzle_date', date)
+      .eq('language', language)
+      .is('player_id', null)
+      .not('guest_fingerprint', 'is', null);
+
+    if (guestCountError) {
+      logger.warn('API', `Word Hunt leaderboard guest count error: ${guestCountError.message}`);
+    }
+
     // Calculate participant count - ensure we show at least as many as we have data rows
     const dataLength = data?.length || 0;
     const queryCount = count ?? 0;
     const totalParticipants = Math.max(queryCount, dataLength);
+    const guestPlayerCount = guestCount ?? 0;
 
     // Debug: Log leaderboard fetch results
-    const guestCount = (data || []).filter((p: Record<string, unknown>) => p.guest_fingerprint && !p.player_id).length;
-    const authCount = (data || []).filter((p: Record<string, unknown>) => p.player_id).length;
-    logger.info('API', `[WordHunt Leaderboard] ${date}/${language}: total=${totalParticipants}, queryCount=${queryCount}, dataLength=${dataLength}, guests=${guestCount}, authenticated=${authCount}`);
+    logger.info('API', `[WordHunt Leaderboard] ${date}/${language}: total=${totalParticipants}, totalAttempts=${totalCount ?? 0}, guests=${guestPlayerCount}, authenticated=${(totalCount ?? 0) - guestPlayerCount}`);
 
     res.json({
       data: data || [],
       totalParticipants,
       totalAttempts: totalCount ?? 0,
+      guestPlayerCount,
       date,
       language
     });

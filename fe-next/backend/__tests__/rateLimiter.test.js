@@ -3,7 +3,12 @@
  * Tests for IP-based rate limiting functionality
  */
 
-const { RateLimiter, checkRateLimit, initRateLimit, resetRateLimit, isIpBlocked, getRateLimitStats } = require('../utils/rateLimiter');
+const { RateLimiter, checkRateLimit, initRateLimit, resetRateLimit, isIpBlocked, getRateLimitStats, rateLimiterInstance } = require('../utils/rateLimiter');
+
+// Shutdown the singleton instance after all tests complete
+afterAll(() => {
+  rateLimiterInstance.shutdown();
+});
 
 describe('RateLimiter', () => {
   let rateLimiter;

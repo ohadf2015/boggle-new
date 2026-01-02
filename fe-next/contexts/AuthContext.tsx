@@ -13,7 +13,7 @@ import {
 } from '../lib/supabase';
 import { getGuestSessionId, clearGuestData, hashToken } from '../utils/guestManager';
 import { getUtmDataForProfile } from '../utils/utmCapture';
-import { getPendingDailyResult, clearPendingDailyResult, getGuestDailyPlayer, setWinnerOnboarding } from '../utils/dailyChallenge';
+import { getPendingDailyResult, clearPendingDailyResult, getGuestDailyPlayer, setWinnerOnboarding, syncGuestDailyResultsToAccount } from '../utils/dailyChallenge';
 import logger from '@/utils/logger';
 import { setSentryUser, clearSentryUser } from '@/utils/sentry';
 import type { User } from '@supabase/supabase-js';
@@ -237,6 +237,23 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         // Submit any pending daily challenge result (from pre-signup)
         submitPendingDailyResult(userId, newProfile);
 
+        // Sync ALL guest daily challenge results to authenticated account
+        // This ensures all past progress appears on the leaderboard
+        syncGuestDailyResultsToAccount(userId, {
+          display_name: newProfile.display_name ?? null,
+          username: newProfile.username,
+          avatar_emoji: newProfile.avatar_emoji ?? null,
+          avatar_color: newProfile.avatar_color ?? null,
+          avatar_image: newProfile.avatar_image ?? null,
+          profile_picture_url: newProfile.profile_picture_url ?? null,
+        }).then((syncedCount) => {
+          if (syncedCount > 0) {
+            logger.info(`Synced ${syncedCount} guest daily results to account`);
+          }
+        }).catch((err) => {
+          logger.warn('Failed to sync guest daily results:', err);
+        });
+
         // Fetch geolocation and update in background
         fetchGeolocation().then(async (geoData) => {
           if (geoData.countryCode) {
@@ -265,6 +282,23 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       // Submit any pending daily challenge result (from pre-signup or returning user)
       submitPendingDailyResult(userId, profileData);
+
+      // Sync ALL guest daily challenge results to authenticated account
+      // This ensures all past progress appears on the leaderboard
+      syncGuestDailyResultsToAccount(userId, {
+        display_name: profileData.display_name ?? null,
+        username: profileData.username,
+        avatar_emoji: profileData.avatar_emoji ?? null,
+        avatar_color: profileData.avatar_color ?? null,
+        avatar_image: profileData.avatar_image ?? null,
+        profile_picture_url: profileData.profile_picture_url ?? null,
+      }).then((syncedCount) => {
+        if (syncedCount > 0) {
+          logger.info(`Synced ${syncedCount} guest daily results to account`);
+        }
+      }).catch((err) => {
+        logger.warn('Failed to sync guest daily results:', err);
+      });
 
       // If user doesn't have country_code yet, fetch and update it
       if (!profileData.country_code) {

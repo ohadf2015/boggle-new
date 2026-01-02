@@ -2166,7 +2166,13 @@ const ja = {
     "noRankYet": "ゲームをプレイしてランク入り!",
     "viewLeaderboard": "リーダーボードを見る",
     "you": "あなた",
-    "players": "プレイヤー"
+    "players": "プレイヤー",
+    "liveRace": "ライブレース",
+    "racing": "競争中",
+    "leader": "リーダー",
+    "leading": "トップ!",
+    "ahead": "先行",
+    "toCatch": "pt追い越しまで"
   },
   "ranked": {
     "title": "ランクマッチ",
@@ -2431,7 +2437,7 @@ const ja = {
   "singlePlayer": {
     "title": "シングルプレイヤー",
     "quickPlay": "クイックプレイ",
-    "quickPlayDesc": "7×7 • 2分 • ボット戦",
+    "quickPlayDesc": "7×7 • 1分 • ボット戦",
     "selectMode": "モード選択",
     "chooseMode": "モードを選択",
     "mode": {
@@ -2669,6 +2675,10 @@ const ja = {
     "beFirstToPlay": "今日のチャレンジに最初に挑戦しよう！",
     "playerSingular": "プレイヤー",
     "playersPlural": "プレイヤー",
+    "guestSingular": "ゲスト",
+    "guestsPlural": "ゲスト",
+    "tookChallenge": "がチャレンジしました",
+    "signUpToAppear": "ランキングに表示するには登録してください",
     "totalAttempts": "回",
     "yourRank": "あなたの順位",
     "yourPosition": "あなたの順位",
@@ -2700,6 +2710,7 @@ const ja = {
     "onlyMatchingLength": "{length}文字の単語のみが試行回数を消費します！",
     "tookChallenge": "{count}人がチャレンジしました",
     "signUpToAppear": "リーダーボードに表示されるには登録してください",
+    "showLeaderboard": "リーダーボードを表示",
     "carousel": {
       "step1Title": "スワイプで単語を作ろう",
       "step1Desc": "どの方向でも文字を繋げよう",
@@ -2713,7 +2724,9 @@ const ja = {
       "step2Colors": "green,yellow,gray,green",
       "step3Title": "隠された単語を見つけよう",
       "step3Desc": "10回でコードを解読",
-      "step3Hint": "{length}文字の単語を当ててヒントをゲット"
+      "step3Hint": "{length}文字の単語を当ててヒントをゲット",
+      "step4Title": "単語を見つけてヒントを発見",
+      "step4Desc": "3文字以上の単語でヒントが出る!"
     },
     "share": {
       "header": "LexiClash Daily #{number}",
@@ -2777,7 +2790,8 @@ const ja = {
       "youFailed": "今回は解決できませんでした",
       "attemptsUsed": "使用した試行回数：{count}",
       "top": "トップ",
-      "solved": "解決"
+      "solved": "解決",
+      "betterThan": "他のプレイヤーより上位"
     },
     "survival": {
       "lifePoints": "ライフ",

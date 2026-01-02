@@ -100,7 +100,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
         }
       }, 1200);
     }, currentWord.path.length * 300 + 400);
-  }, [currentWordIndex, isAnimating, comboCount]);
+  }, [currentWordIndex, isAnimating, comboCount, demoSequence]);
 
   useEffect(() => {
     if (!autoPlay) return;

@@ -2296,7 +2296,13 @@ const he = {
     "noRankYet": "שחק משחקים כדי להיכנס לדירוג!",
     "viewLeaderboard": "צפייה בטבלת מובילים",
     "you": "אתה",
-    "players": "שחקנים"
+    "players": "שחקנים",
+    "liveRace": "מירוץ חי",
+    "racing": "מתחרים",
+    "leader": "מוביל",
+    "leading": "מוביל!",
+    "ahead": "קדימה",
+    "toCatch": "נק' לעבור"
   },
   "ranked": {
     "title": "מצב מדורג",
@@ -2433,7 +2439,7 @@ const he = {
   "singlePlayer": {
     "title": "שחקן יחיד",
     "quickPlay": "משחק מהיר",
-    "quickPlayDesc": "לוח 7×7 • 2 דק' • נגד בוט",
+    "quickPlayDesc": "לוח 7×7 • 1 דק' • נגד בוט",
     "selectMode": "בחר מצב",
     "chooseMode": "בחר את המצב שלך",
     "mode": {
@@ -2671,6 +2677,10 @@ const he = {
     "beFirstToPlay": "היו הראשונים לשחק באתגר של היום!",
     "playerSingular": "שחקן",
     "playersPlural": "שחקנים",
+    "guestSingular": "אורח",
+    "guestsPlural": "אורחים",
+    "tookChallenge": "שיחקו באתגר",
+    "signUpToAppear": "הירשמו כדי להופיע בטבלה!",
     "totalAttempts": "ניסיונות",
     "yourRank": "הדירוג שלך",
     "yourPosition": "המיקום שלך",
@@ -2702,6 +2712,7 @@ const he = {
     "onlyMatchingLength": "רק מילים בנות {length} אותיות משתמשות בניסיונות!",
     "tookChallenge": "קיבלו את האתגר",
     "signUpToAppear": "הירשמו כדי להופיע בטבלה!",
+    "showLeaderboard": "הצג לוח מובילים",
     "carousel": {
       "step1Title": "החליקו למילים",
       "step1Desc": "חברו אותיות בכל כיוון",
@@ -2715,7 +2726,9 @@ const he = {
       "step2Colors": "green,yellow,gray,green",
       "step3Title": "מצאו את המילה",
       "step3Desc": "10 ניסיונות לפצח את הקוד",
-      "step3Hint": "נחשו מילים בנות {length} אותיות לגילוי רמזים"
+      "step3Hint": "נחשו מילים בנות {length} אותיות לגילוי רמזים",
+      "step4Title": "גלו מילים, חשפו רמזים",
+      "step4Desc": "כל מילה של 3+ אותיות חושפת רמזים!"
     },
     "share": {
       "header": "אתגר יומי #{number} LexiClash",
@@ -2779,7 +2792,8 @@ const he = {
       "youFailed": "לא הצלחתם לפתור הפעם",
       "attemptsUsed": "ניסיונות שהושקעו: {count}",
       "top": "טופ",
-      "solved": "פתרו"
+      "solved": "פתרו",
+      "betterThan": "טוב יותר משאר השחקנים"
     },
     "survival": {
       "lifePoints": "חיים",

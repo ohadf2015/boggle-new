@@ -116,9 +116,9 @@ export const ALLOWED_IMAGE_DOMAINS: string[] = [
   'res.cloudinary.com',
   'storage.googleapis.com',
   'firebasestorage.googleapis.com',
-  // SECURITY: Use specific project domains when available, fallback to generic supabase.co
-  // Includes both API domain and storage paths (same domain, different paths)
-  ...(supabaseDomains.length > 0 ? supabaseDomains : ['supabase.co']),
+  // SECURITY: Only include specific project domains when configured
+  // Never fall back to broad supabase.co (SSRF prevention)
+  ...supabaseDomains,
 ].filter(Boolean);
 
 export const avatarSchema = compiledSchemas?.avatarSchema || z.object({
