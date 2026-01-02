@@ -326,7 +326,9 @@ const es = {
     "darkMode": "Cambiar a modo oscuro",
     "theme": "Tema",
     "dark": "Oscuro",
-    "light": "Claro"
+    "light": "Claro",
+    "support": "Soporte y Feedback",
+    "contactDescription": "Preguntas, sugerencias, o solo saludar!"
   },
   "share": {
     "linkCopied": "¡Link copiado! 🔗",
@@ -3091,6 +3093,30 @@ const es = {
     "errorMessage": "El enlace no funcionó. Puede que haya expirado o ya se usó. ¡Prueba desde un correo reciente!",
     "backToGame": "Volver al juego",
     "resubscribe": "¿Cambiaste de opinión?"
+  },
+  "contact": {
+    "title": "¡Hola!",
+    "connectWithUs": "Encuéntranos",
+    "sendMessage": "Escríbenos",
+    "nameLabel": "Nombre",
+    "namePlaceholder": "¿Cómo te llamamos?",
+    "emailLabel": "Email",
+    "emailPlaceholder": "¿Dónde te respondemos?",
+    "messageLabel": "Mensaje",
+    "messagePlaceholder": "¿Sugerencias? ¿Ideas? ¿Encontraste un bug? ¡Te escuchamos!",
+    "submit": "¡Enviar!",
+    "sending": "Enviando...",
+    "successTitle": "¡Recibido!",
+    "successMessage": "¡Nos encanta saber de nuestros jugadores! Te responderemos pronto.",
+    "sendAnother": "Enviar otro",
+    "errorMessage": "¡Ups! Algo salió mal. ¡Inténtalo de nuevo!",
+    "responseTime": "Solemos responder en uno o dos días"
+  },
+  "footer": {
+    "aboutGame": "Sobre el juego",
+    "leaderboard": "Clasificación",
+    "contact": "Contacto",
+    "interactiveTutorial": "Tutorial Interactivo"
   }
 };
 

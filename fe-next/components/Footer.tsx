@@ -89,6 +89,19 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               {t('legal.privacyPolicy')}
             </Link>
             <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
+            <Link
+              href={`/${language}/contact`}
+              className="
+                min-h-[44px] px-2 flex items-center
+                text-sm font-bold uppercase tracking-wide
+                text-neo-cream/90 hover:text-neo-cyan
+                transition-colors duration-100
+                hover:underline underline-offset-4 decoration-2
+              "
+            >
+              {t('footer.contact') || 'Contact'}
+            </Link>
+            <span className="text-neo-cream/90 font-black hidden sm:inline">•</span>
             <a
               href="https://ko-fi.com/lexiclash"
               target="_blank"

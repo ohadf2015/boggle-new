@@ -326,7 +326,9 @@ const ja = {
     "darkMode": "ダークモードに切り替え",
     "theme": "テーマ",
     "dark": "ダーク",
-    "light": "ライト"
+    "light": "ライト",
+    "support": "サポート＆フィードバック",
+    "contactDescription": "質問、フィードバック、またはご挨拶!"
   },
   "share": {
     "linkCopied": "リンクコピー完了！🔗",
@@ -3093,6 +3095,30 @@ const ja = {
     "errorMessage": "リンクが使えませんでした。期限切れか使用済みかも。最新のメールから試してみて！",
     "backToGame": "ゲームに戻る",
     "resubscribe": "やっぱり登録する？"
+  },
+  "contact": {
+    "title": "こんにちは！",
+    "connectWithUs": "SNSで見つける",
+    "sendMessage": "メッセージを送る",
+    "nameLabel": "お名前",
+    "namePlaceholder": "なんてお呼びすればいい？",
+    "emailLabel": "メール",
+    "emailPlaceholder": "返信先はどこ？",
+    "messageLabel": "メッセージ",
+    "messagePlaceholder": "フィードバック？アイデア？バグ発見？何でもどうぞ！",
+    "submit": "送信！",
+    "sending": "送信中...",
+    "successTitle": "届いた！",
+    "successMessage": "プレイヤーからのメッセージ大歓迎！すぐに返信するね。",
+    "sendAnother": "もう一通送る",
+    "errorMessage": "おっと！送信できなかった。もう一度試してね！",
+    "responseTime": "だいたい1〜2日で返信するよ"
+  },
+  "footer": {
+    "aboutGame": "ゲームについて",
+    "leaderboard": "リーダーボード",
+    "contact": "お問い合わせ",
+    "interactiveTutorial": "インタラクティブチュートリアル"
   }
 };
 

@@ -327,7 +327,9 @@ const en = {
     "darkMode": "Switch to dark mode",
     "theme": "Theme",
     "dark": "Dark",
-    "light": "Light"
+    "light": "Light",
+    "support": "Support & Feedback",
+    "contactDescription": "Questions, feedback, or just say hi!"
   },
   "share": {
     "linkCopied": "Link copied! 🔗",
@@ -3107,6 +3109,30 @@ const en = {
     "errorMessage": "That link didn't work. It might be expired or already used. Try again from a recent email!",
     "backToGame": "Back to Game",
     "resubscribe": "Changed Your Mind?"
+  },
+  "contact": {
+    "title": "Say Hello!",
+    "connectWithUs": "Find Us",
+    "sendMessage": "Drop Us a Line",
+    "nameLabel": "Name",
+    "namePlaceholder": "What should we call you?",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Where can we reply?",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Feedback? Ideas? Found a bug? We're all ears!",
+    "submit": "Send It!",
+    "sending": "Sending...",
+    "successTitle": "Got It!",
+    "successMessage": "Love hearing from players! We'll get back to you soon.",
+    "sendAnother": "Send Another",
+    "errorMessage": "Oops! Something went wrong. Give it another shot!",
+    "responseTime": "We usually reply within a day or two"
+  },
+  "footer": {
+    "aboutGame": "About the Game",
+    "leaderboard": "Leaderboard",
+    "contact": "Contact",
+    "interactiveTutorial": "Interactive Tutorial"
   }
 };
 

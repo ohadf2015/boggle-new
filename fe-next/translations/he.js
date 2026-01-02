@@ -326,7 +326,9 @@ const he = {
     "darkMode": "עבור למצב כהה",
     "theme": "ערכת נושא",
     "dark": "כהה",
-    "light": "בהיר"
+    "light": "בהיר",
+    "support": "תמיכה ומשוב",
+    "contactDescription": "שאלות, משוב, או סתם להגיד שלום!"
   },
   "share": {
     "linkCopied": "הקישור הועתק! 🔗",
@@ -3095,6 +3097,30 @@ const he = {
     "errorMessage": "הקישור לא עבד. אולי פג תוקף או כבר נוצל. נסה שוב ממייל אחרון!",
     "backToGame": "חזרה למשחק",
     "resubscribe": "התחרטת?"
+  },
+  "contact": {
+    "title": "היי!",
+    "connectWithUs": "מצאו אותנו",
+    "sendMessage": "כתבו לנו",
+    "nameLabel": "שם",
+    "namePlaceholder": "איך קוראים לך?",
+    "emailLabel": "אימייל",
+    "emailPlaceholder": "לאן נשלח תשובה?",
+    "messageLabel": "הודעה",
+    "messagePlaceholder": "פידבק? רעיונות? מצאתם באג? אנחנו פה!",
+    "submit": "שלח!",
+    "sending": "שולח...",
+    "successTitle": "קיבלנו!",
+    "successMessage": "אנחנו אוהבים לשמוע משחקנים! נחזור אליכם בקרוב.",
+    "sendAnother": "שלח עוד הודעה",
+    "errorMessage": "אופס! משהו השתבש. נסו שוב!",
+    "responseTime": "בדרך כלל עונים תוך יום-יומיים"
+  },
+  "footer": {
+    "aboutGame": "על המשחק",
+    "leaderboard": "טבלת מובילים",
+    "contact": "צור קשר",
+    "interactiveTutorial": "מדריך אינטראקטיבי"
   }
 };
 

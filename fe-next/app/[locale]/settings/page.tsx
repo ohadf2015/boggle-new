@@ -2,8 +2,9 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Sun, Moon, Volume2, VolumeX, Music, Bell, Eye, Sparkles, Zap, Languages, Monitor } from 'lucide-react';
+import { ArrowLeft, Sun, Moon, Volume2, VolumeX, Music, Bell, Eye, Sparkles, Zap, Languages, Monitor, MessageSquare, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/utils/ThemeContext';
@@ -346,13 +347,52 @@ export default function SettingsPage(): React.ReactNode {
               </SettingRow>
             </div>
           </motion.section>
+
+          {/* Support & Feedback */}
+          <motion.section
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <h2 className={cn(
+              'text-sm font-black uppercase mb-3 flex items-center gap-2',
+              isDarkMode ? 'text-gray-400' : 'text-gray-600'
+            )}>
+              <MessageSquare className="w-4 h-4" />
+              {t('settings.support') || 'Support & Feedback'}
+            </h2>
+            <Link
+              href={`/${language}/contact`}
+              className={cn(
+                'flex items-center justify-between p-4 rounded-neo border-3 border-neo-black transition-all hover:scale-[1.01]',
+                isDarkMode ? 'bg-slate-800 hover:bg-slate-700' : 'bg-white hover:bg-neo-cream shadow-hard'
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div className={cn(
+                  'w-10 h-10 rounded-lg flex items-center justify-center border-2 border-neo-black bg-neo-cyan'
+                )}>
+                  <MessageSquare className="w-5 h-5 text-neo-black" />
+                </div>
+                <div>
+                  <p className={cn('font-bold', isDarkMode ? 'text-white' : 'text-neo-black')}>
+                    {t('contact.title') || 'Contact Us'}
+                  </p>
+                  <p className={cn('text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+                    {t('settings.contactDescription') || 'Questions, feedback, or just say hi!'}
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className={cn('w-5 h-5', isDarkMode ? 'text-gray-400' : 'text-gray-500')} />
+            </Link>
+          </motion.section>
         </div>
 
         {/* Footer */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.5 }}
           className={cn(
             'mt-8 pt-4 border-t text-center',
             isDarkMode ? 'border-slate-700' : 'border-gray-200'

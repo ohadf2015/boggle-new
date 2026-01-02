@@ -326,7 +326,9 @@ const sv = {
     "darkMode": "Byt till mörkt läge",
     "theme": "Tema",
     "dark": "Mörkt",
-    "light": "Ljust"
+    "light": "Ljust",
+    "support": "Support & Feedback",
+    "contactDescription": "Frågor, feedback, eller bara säg hej!"
   },
   "share": {
     "linkCopied": "Länk kopierad! 🔗",
@@ -3094,6 +3096,30 @@ const sv = {
     "errorMessage": "Länken funkade inte. Den kanske har gått ut eller redan använts. Prova igen från ett nytt mail!",
     "backToGame": "Tillbaka till spelet",
     "resubscribe": "Ångrat dig?"
+  },
+  "contact": {
+    "title": "Hej!",
+    "connectWithUs": "Hitta oss",
+    "sendMessage": "Skriv till oss",
+    "nameLabel": "Namn",
+    "namePlaceholder": "Vad ska vi kalla dig?",
+    "emailLabel": "E-post",
+    "emailPlaceholder": "Var kan vi svara?",
+    "messageLabel": "Meddelande",
+    "messagePlaceholder": "Feedback? Idéer? Hittat en bugg? Vi lyssnar!",
+    "submit": "Skicka!",
+    "sending": "Skickar...",
+    "successTitle": "Mottaget!",
+    "successMessage": "Vi älskar att höra från spelare! Vi återkommer snart.",
+    "sendAnother": "Skicka ett till",
+    "errorMessage": "Hoppsan! Något gick fel. Försök igen!",
+    "responseTime": "Vi svarar oftast inom en dag eller två"
+  },
+  "footer": {
+    "aboutGame": "Om spelet",
+    "leaderboard": "Topplista",
+    "contact": "Kontakt",
+    "interactiveTutorial": "Interaktiv handledning"
   }
 };
 
