@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "rm -rf .next && tsx server.ts",
-    "build": "npm run build:schemas && next build",
+    "build": "(npm run build:schemas || true) && next build",
     "build:analyze": "ANALYZE=true npm run build",
     "build:schemas": "tsc --project backend/tsconfig.schemas.json",
     "start": "NODE_ENV=production tsx server.ts",

@@ -239,7 +239,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
         // Sync ALL guest daily challenge results to authenticated account
         // This ensures all past progress appears on the leaderboard
-        syncGuestDailyResultsToAccount(userId, newProfile).then((syncedCount) => {
+        syncGuestDailyResultsToAccount(userId, {
+          display_name: newProfile.display_name ?? null,
+          username: newProfile.username,
+          avatar_emoji: newProfile.avatar_emoji ?? null,
+          avatar_color: newProfile.avatar_color ?? null,
+          avatar_image: newProfile.avatar_image ?? null,
+          profile_picture_url: newProfile.profile_picture_url ?? null,
+        }).then((syncedCount) => {
           if (syncedCount > 0) {
             logger.info(`Synced ${syncedCount} guest daily results to account`);
           }
@@ -278,7 +285,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       // Sync ALL guest daily challenge results to authenticated account
       // This ensures all past progress appears on the leaderboard
-      syncGuestDailyResultsToAccount(userId, profileData).then((syncedCount) => {
+      syncGuestDailyResultsToAccount(userId, {
+        display_name: profileData.display_name ?? null,
+        username: profileData.username,
+        avatar_emoji: profileData.avatar_emoji ?? null,
+        avatar_color: profileData.avatar_color ?? null,
+        avatar_image: profileData.avatar_image ?? null,
+        profile_picture_url: profileData.profile_picture_url ?? null,
+      }).then((syncedCount) => {
         if (syncedCount > 0) {
           logger.info(`Synced ${syncedCount} guest daily results to account`);
         }
