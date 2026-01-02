@@ -88,6 +88,8 @@
 - **Accessibility**: Follow WCAG 2.1 AA standards
 - **ALWAYS refer to CLAUDE.md before making changes**
 - **ALWAYS VERIFY BUILD AND TESTS PASS AFTER CHANGES**
+- **ALWAYS RUN LINT (`npm run lint`) after writing new code and fix any issues**
+- **ALWAYS RUN RELEVANT TESTS after implementing a feature and fix any failures**
 
 # Investigation Protocol
 - NEVER apply quick patches
