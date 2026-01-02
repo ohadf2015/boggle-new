@@ -1,10 +1,44 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { memo, useMemo } from 'react';
+import { memo, useState, useEffect } from 'react';
 
 interface ComicDustRevealProps {
   visible: boolean;
   phase: 'cover' | 'reveal' | 'idle';
   intensity?: 'low' | 'medium' | 'high';
+}
+
+interface DustCloud {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+  delay: number;
+  rotation: number;
+}
+
+interface StarBurst {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+  delay: number;
+}
+
+interface ActionLine {
+  id: number;
+  angle: number;
+  length: number;
+  delay: number;
+}
+
+interface DustParticle {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+  delay: number;
+  vx: number;
+  vy: number;
 }
 
 /**
@@ -18,48 +52,48 @@ interface ComicDustRevealProps {
  * Performance optimizations:
  * - SVG-based for crisp rendering
  * - GPU-accelerated transforms
- * - Memoized particle positions
+ * - Generated particle positions in useEffect to avoid impure renders
  */
 const ComicDustReveal = memo(({ visible, phase, intensity = 'medium' }: ComicDustRevealProps) => {
-  // Generate dust cloud positions based on intensity
-  const dustClouds = useMemo(() => {
-    const count = intensity === 'high' ? 12 : intensity === 'medium' ? 8 : 5;
-    return Array.from({ length: count }, (_, i) => ({
+  const [dustClouds, setDustClouds] = useState<DustCloud[]>([]);
+  const [starBursts, setStarBursts] = useState<StarBurst[]>([]);
+  const [actionLines, setActionLines] = useState<ActionLine[]>([]);
+  const [dustParticles, setDustParticles] = useState<DustParticle[]>([]);
+
+  // Generate all random positions in useEffect to avoid impure render
+  useEffect(() => {
+    // Dust clouds
+    const cloudCount = intensity === 'high' ? 12 : intensity === 'medium' ? 8 : 5;
+    setDustClouds(Array.from({ length: cloudCount }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
       size: 60 + Math.random() * 80,
       delay: i * 0.04,
       rotation: Math.random() * 360,
-    }));
-  }, [intensity]);
+    })));
 
-  // Generate star burst positions for reveal
-  const starBursts = useMemo(() => {
-    const count = intensity === 'high' ? 8 : intensity === 'medium' ? 5 : 3;
-    return Array.from({ length: count }, (_, i) => ({
+    // Star bursts
+    const burstCount = intensity === 'high' ? 8 : intensity === 'medium' ? 5 : 3;
+    setStarBursts(Array.from({ length: burstCount }, (_, i) => ({
       id: i,
       x: 20 + Math.random() * 60,
       y: 20 + Math.random() * 60,
       size: 20 + Math.random() * 30,
       delay: i * 0.06,
-    }));
-  }, [intensity]);
+    })));
 
-  // Generate action lines for comic effect
-  const actionLines = useMemo(() => {
-    return Array.from({ length: 12 }, (_, i) => ({
+    // Action lines
+    setActionLines(Array.from({ length: 12 }, (_, i) => ({
       id: i,
       angle: (i * 30) + Math.random() * 10,
       length: 80 + Math.random() * 40,
       delay: i * 0.02,
-    }));
-  }, []);
+    })));
 
-  // Dust particle positions
-  const dustParticles = useMemo(() => {
-    const count = intensity === 'high' ? 30 : intensity === 'medium' ? 20 : 12;
-    return Array.from({ length: count }, (_, i) => ({
+    // Dust particles
+    const particleCount = intensity === 'high' ? 30 : intensity === 'medium' ? 20 : 12;
+    setDustParticles(Array.from({ length: particleCount }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
@@ -67,7 +101,7 @@ const ComicDustReveal = memo(({ visible, phase, intensity = 'medium' }: ComicDus
       delay: Math.random() * 0.3,
       vx: (Math.random() - 0.5) * 200,
       vy: (Math.random() - 0.5) * 200,
-    }));
+    })));
   }, [intensity]);
 
   return (

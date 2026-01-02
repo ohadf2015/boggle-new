@@ -2787,7 +2787,8 @@ const sv = {
       "youFailed": "Du löste det inte den här gången",
       "attemptsUsed": "Försök använda: {count}",
       "top": "Topp",
-      "solved": "löste"
+      "solved": "löste",
+      "betterThan": "bättre än andra spelare"
     },
     "survival": {
       "lifePoints": "Liv",

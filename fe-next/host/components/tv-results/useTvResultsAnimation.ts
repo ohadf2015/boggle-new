@@ -98,42 +98,7 @@ export function useTvResultsAnimation({
   const isComplete = currentPhase === 'complete' || currentPhase === 'tournament-standings';
   const isAnimating = !isComplete && currentPhase !== 'idle';
 
-  // Start animation when enabled
-  useEffect(() => {
-    if (enabled && currentPhase === 'idle') {
-      // Small delay before starting
-      timerRef.current = setTimeout(() => {
-        advancePhaseInternal();
-      }, 300);
-    }
-
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-    };
-  }, [enabled]);
-
-  // Handle auto-advance
-  useEffect(() => {
-    if (!autoAdvance || isComplete || currentPhase === 'idle') return;
-    if (isManualSkipRef.current) return;
-
-    const currentConfig = adjustedSequence[phaseIndex];
-    if (!currentConfig || currentConfig.duration === 0) return;
-
-    timerRef.current = setTimeout(() => {
-      advancePhaseInternal();
-    }, currentConfig.duration);
-
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-    };
-  }, [currentPhase, phaseIndex, autoAdvance]);
-
-  // Internal phase advance
+  // Internal phase advance - defined before useEffects that use it
   const advancePhaseInternal = useCallback(() => {
     setPhaseIndex(prev => {
       const nextIndex = prev + 1;
@@ -152,6 +117,41 @@ export function useTvResultsAnimation({
       return nextIndex;
     });
   }, [adjustedSequence, onPhaseChange, onSound]);
+
+  // Start animation when enabled
+  useEffect(() => {
+    if (enabled && currentPhase === 'idle') {
+      // Small delay before starting
+      timerRef.current = setTimeout(() => {
+        advancePhaseInternal();
+      }, 300);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, [enabled, currentPhase, advancePhaseInternal]);
+
+  // Handle auto-advance
+  useEffect(() => {
+    if (!autoAdvance || isComplete || currentPhase === 'idle') return;
+    if (isManualSkipRef.current) return;
+
+    const currentConfig = adjustedSequence[phaseIndex];
+    if (!currentConfig || currentConfig.duration === 0) return;
+
+    timerRef.current = setTimeout(() => {
+      advancePhaseInternal();
+    }, currentConfig.duration);
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, [currentPhase, phaseIndex, autoAdvance, isComplete, adjustedSequence, advancePhaseInternal]);
 
   // Public advance (for manual control)
   const advancePhase = useCallback(() => {

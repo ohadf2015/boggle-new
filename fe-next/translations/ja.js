@@ -2786,7 +2786,8 @@ const ja = {
       "youFailed": "今回は解決できませんでした",
       "attemptsUsed": "使用した試行回数：{count}",
       "top": "トップ",
-      "solved": "解決"
+      "solved": "解決",
+      "betterThan": "他のプレイヤーより上位"
     },
     "survival": {
       "lifePoints": "ライフ",

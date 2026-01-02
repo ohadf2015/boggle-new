@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/use-memo */
 import { useRef, useEffect, useCallback } from 'react';
 
 /**
@@ -52,6 +53,7 @@ export function useStableCallback<T extends (...args: any[]) => any>(
   const callbackRef = useCallbackRef(callback);
 
   // Return a stable callback that delegates to the ref
+  // Note: Empty deps array is intentional - callbackRef.current always has latest value
   return useCallback(
     ((...args: Parameters<T>) => callbackRef.current(...args)) as T,
     []

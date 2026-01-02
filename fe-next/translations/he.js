@@ -2788,7 +2788,8 @@ const he = {
       "youFailed": "לא הצלחתם לפתור הפעם",
       "attemptsUsed": "ניסיונות שהושקעו: {count}",
       "top": "טופ",
-      "solved": "פתרו"
+      "solved": "פתרו",
+      "betterThan": "טוב יותר משאר השחקנים"
     },
     "survival": {
       "lifePoints": "חיים",

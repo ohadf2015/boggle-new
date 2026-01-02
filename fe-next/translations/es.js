@@ -2784,7 +2784,8 @@ const es = {
       "youFailed": "No lo resolviste esta vez",
       "attemptsUsed": "Intentos usados: {count}",
       "top": "Top",
-      "solved": "resuelto"
+      "solved": "resuelto",
+      "betterThan": "mejor que otros jugadores"
     },
     "survival": {
       "lifePoints": "Vida",

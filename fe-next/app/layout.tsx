@@ -2,6 +2,11 @@ import './globals.css';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
+// Check if this is a preview/staging environment (explicitly set or PR preview)
+// Only block indexing when NEXT_PUBLIC_IS_PREVIEW is explicitly true or when it's a PR preview
+const isPreviewEnvironment = process.env.NEXT_PUBLIC_IS_PREVIEW === 'true' ||
+    process.env.RAILWAY_ENVIRONMENT_NAME?.startsWith('pr-');
+
 export const metadata: Metadata = {
     metadataBase: new URL('https://www.lexiclash.live'),
     title: {
@@ -34,7 +39,21 @@ export const metadata: Metadata = {
         description: 'Compete in real-time word battles against friends. LexiClash is a fast-paced multiplayer strategy game. Play for free now.',
         images: ['https://www.lexiclash.live/og-image-en.jpg'],
     },
-    robots: {
+    // Block indexing for preview/staging environments
+    robots: isPreviewEnvironment ? {
+        index: false,
+        follow: false,
+        noarchive: true,
+        nosnippet: true,
+        noimageindex: true,
+        googleBot: {
+            index: false,
+            follow: false,
+            noarchive: true,
+            nosnippet: true,
+            noimageindex: true,
+        },
+    } : {
         index: true,
         follow: true,
         googleBot: {

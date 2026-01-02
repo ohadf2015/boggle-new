@@ -302,7 +302,7 @@ const TvNotification = memo<TvNotificationProps>(({
           )}
         </div>
 
-        {/* Decorative sparkles for mega tier */}
+        {/* Decorative sparkles for mega tier - positions deterministic based on index */}
         {notification.tier === 'mega' && (
           <>
             {[...Array(4)].map((_, i) => (
@@ -310,8 +310,8 @@ const TvNotification = memo<TvNotificationProps>(({
                 key={i}
                 className="absolute w-2 h-2 bg-neo-cream rounded-full"
                 style={{
-                  top: `${20 + Math.random() * 60}%`,
-                  left: `${10 + Math.random() * 80}%`,
+                  top: `${25 + (i * 15) % 55}%`,
+                  left: `${15 + (i * 22) % 70}%`,
                 }}
                 animate={{
                   scale: [0, 1, 0],

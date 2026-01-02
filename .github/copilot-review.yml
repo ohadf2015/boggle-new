@@ -1,0 +1,34 @@
+# GitHub Copilot Code Review Configuration
+# This enables automatic code review on PRs
+
+# Enable Copilot review on all PRs
+review:
+  enabled: true
+  auto_review: true
+
+# Review triggers
+triggers:
+  - pull_request.opened
+  - pull_request.synchronize
+  - pull_request.reopened
+
+# Focus areas for review
+focus:
+  - bugs
+  - security
+  - performance
+  - best_practices
+
+# Language-specific rules
+languages:
+  typescript:
+    - type_safety
+    - null_checks
+    - async_await
+  javascript:
+    - error_handling
+    - memory_leaks
+  react:
+    - hooks_rules
+    - component_patterns
+    - prop_types

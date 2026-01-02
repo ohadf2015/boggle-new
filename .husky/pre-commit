@@ -1,0 +1,2 @@
+# Pre-commit: Quick checks only (translations)
+cd fe-next && npm run check:translations
