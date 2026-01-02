@@ -5,8 +5,8 @@ import { motion } from 'framer-motion';
 import {
   Users, Gamepad2, Clock, Globe, TrendingUp,
   ArrowLeft, RefreshCw, UserPlus, Languages, Link,
-  Trophy, CalendarDays, CalendarRange, Server, User, Bot,
-  Book, Settings, History, ChevronLeft, ChevronRight, Mail
+  Trophy, CalendarDays, CalendarRange, Server, User,
+  Book, Settings, History, ChevronLeft, ChevronRight, Mail, Check
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
@@ -18,6 +18,8 @@ import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { DailyWordSchedule } from '@/components/admin/DailyWordSchedule';
+import { PullToRefreshWrapper } from '@/components/ui/PullToRefreshWrapper';
+import { isMobileDevice } from '@/utils/mobileAccessibility';
 
 // Country code to flag emoji and name mapping
 const COUNTRY_INFO: Record<string, { flag: string; name: string }> = {
@@ -111,17 +113,11 @@ interface TopPlayer {
   total_words: number;
   total_time_played: number;
   current_level?: number;
+  ranked_mmr?: number;
+  last_game_at?: string;
   created_at: string;
 }
 
-interface BotWord {
-  word: string;
-  language: string;
-  likes: number;
-  dislikes: number;
-  netScore: number;
-  isAutoBlacklisted: boolean;
-}
 
 interface CommunityWord {
   word: string;
@@ -189,18 +185,21 @@ export default function AdminDashboard() {
   const [sources, setSources] = useState<SourceData | null>(null);
   const [dailyActivity, setDailyActivity] = useState<DailyActivity[]>([]);
   const [topPlayers, setTopPlayers] = useState<TopPlayer[]>([]);
-  const [botWords, setBotWords] = useState<BotWord[]>([]);
-  const [communityWords, setCommunityWords] = useState<CommunityWord[]>([]);
+  const [recentPlayers, setRecentPlayers] = useState<TopPlayer[]>([]);
+  const [playerViewMode, setPlayerViewMode] = useState<'top' | 'recent'>('top');
+    const [communityWords, setCommunityWords] = useState<CommunityWord[]>([]);
   const [communityWordsStats, setCommunityWordsStats] = useState<CommunityWordsStats | null>(null);
   const [communityWordsTotal, setCommunityWordsTotal] = useState(0);
   const [communityWordSearch, setCommunityWordSearch] = useState('');
   const [communityWordStatus, setCommunityWordStatus] = useState<string>('pending_review');
   const [communityWordLanguage, setCommunityWordLanguage] = useState<string>('all');
   const [communityWordLoading, setCommunityWordLoading] = useState(false);
+  const [selectedWords, setSelectedWords] = useState<Set<string>>(new Set());
+  const [bulkActionLoading, setBulkActionLoading] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'players' | 'sources' | 'activity' | 'bot-words' | 'community-words' | 'game-logs'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'players' | 'sources' | 'activity' | 'community-words' | 'game-logs'>('overview');
 
   // Game Logs state
   const [gameLogs, setGameLogs] = useState<GameLog[]>([]);
@@ -223,6 +222,12 @@ export default function AdminDashboard() {
   const [testEmailLoading, setTestEmailLoading] = useState(false);
   const [testEmailAddress, setTestEmailAddress] = useState('');
 
+  // Mobile detection for pull-to-refresh
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    setIsMobile(isMobileDevice());
+  }, []);
+
   // Get auth token for API calls
   const getAuthToken = useCallback(async () => {
     if (!supabase) return null;
@@ -242,14 +247,14 @@ export default function AdminDashboard() {
 
     try {
       // Fetch all data in parallel
-      const [statsRes, realtimeRes, countriesRes, sourcesRes, dailyRes, playersRes, botWordsRes] = await Promise.all([
+      const [statsRes, realtimeRes, countriesRes, sourcesRes, dailyRes, playersRes, recentPlayersRes] = await Promise.all([
         fetch('/api/admin/stats', { headers }),
         fetch('/api/admin/realtime', { headers }),
         fetch('/api/admin/players/countries', { headers }),
         fetch('/api/admin/players/sources', { headers }),
         fetch('/api/admin/activity/daily?days=30', { headers }),
         fetch('/api/admin/players/top?limit=20', { headers }),
-        fetch('/api/admin/bot-words', { headers }),
+        fetch('/api/admin/players/recent?limit=20', { headers }),
       ]);
 
       if (!statsRes.ok) {
@@ -257,14 +262,14 @@ export default function AdminDashboard() {
         throw new Error(error.error || 'Failed to fetch stats');
       }
 
-      const [statsData, realtimeData, countriesData, sourcesData, dailyData, playersData, botWordsData] = await Promise.all([
+      const [statsData, realtimeData, countriesData, sourcesData, dailyData, playersData, recentPlayersData] = await Promise.all([
         statsRes.json(),
         realtimeRes.json(),
         countriesRes.json(),
         sourcesRes.json(),
         dailyRes.json(),
         playersRes.json(),
-        botWordsRes.json(),
+        recentPlayersRes.json(),
       ]);
 
       setStats(statsData);
@@ -273,7 +278,7 @@ export default function AdminDashboard() {
       setSources(sourcesData);
       setDailyActivity(dailyData.daily || []);
       setTopPlayers(playersData.players || []);
-      setBotWords(botWordsData.words || []);
+      setRecentPlayers(recentPlayersData.players || []);
     } catch (error) {
       console.error('Failed to fetch admin data:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to load dashboard data');
@@ -417,94 +422,6 @@ export default function AdminDashboard() {
   // Helper to get word key for tracking processing state
   const getWordKey = (word: string, language: string) => `${word}-${language}`;
 
-  // Track which bot words are being processed
-  const [processingBotWords, setProcessingBotWords] = useState<Set<string>>(new Set());
-
-  // Handle bot word approval
-  const handleApprove = async (word: BotWord) => {
-    const token = await getAuthToken();
-    if (!token) {
-      toast.error('Authentication required');
-      return;
-    }
-
-    const wordKey = getWordKey(word.word, word.language);
-    setProcessingBotWords(prev => new Set(prev).add(wordKey));
-
-    try {
-      const res = await fetch('/api/admin/bot-words/approve', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ word: word.word, language: word.language })
-      });
-
-      if (res.ok) {
-        toast.success(`Approved: ${word.word}`);
-        // Optimistic update: remove the word from the list (it's now approved)
-        setBotWords(prev => prev.filter(w => !(w.word === word.word && w.language === word.language)));
-      } else {
-        const error = await res.json();
-        toast.error(error.error || 'Failed to approve word');
-      }
-    } catch (error) {
-      console.error('Failed to approve word:', error);
-      toast.error('Failed to approve word');
-    } finally {
-      setProcessingBotWords(prev => {
-        const next = new Set(prev);
-        next.delete(wordKey);
-        return next;
-      });
-    }
-  };
-
-  // Handle bot word disapproval
-  const handleDisapprove = async (word: BotWord) => {
-    const token = await getAuthToken();
-    if (!token) {
-      toast.error('Authentication required');
-      return;
-    }
-
-    const wordKey = getWordKey(word.word, word.language);
-    setProcessingBotWords(prev => new Set(prev).add(wordKey));
-
-    try {
-      const res = await fetch('/api/admin/bot-words/disapprove', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          word: word.word,
-          language: word.language,
-          reason: 'Admin review: invalid word'
-        })
-      });
-
-      if (res.ok) {
-        toast.success(`Disapproved: ${word.word}`);
-        // Optimistic update: remove the word from the list (it's now blacklisted)
-        setBotWords(prev => prev.filter(w => !(w.word === word.word && w.language === word.language)));
-      } else {
-        const error = await res.json();
-        toast.error(error.error || 'Failed to disapprove word');
-      }
-    } catch (error) {
-      console.error('Failed to disapprove word:', error);
-      toast.error('Failed to disapprove word');
-    } finally {
-      setProcessingBotWords(prev => {
-        const next = new Set(prev);
-        next.delete(wordKey);
-        return next;
-      });
-    }
-  };
 
   // Fetch community words with filters
   const fetchCommunityWords = useCallback(async (search?: string, status?: string, lang?: string) => {
@@ -776,6 +693,152 @@ export default function AdminDashboard() {
     }
   };
 
+  // Toggle word selection for bulk actions
+  const toggleWordSelection = (word: CommunityWord) => {
+    const wordKey = getWordKey(word.word, word.language);
+    setSelectedWords(prev => {
+      const next = new Set(prev);
+      if (next.has(wordKey)) {
+        next.delete(wordKey);
+      } else {
+        next.add(wordKey);
+      }
+      return next;
+    });
+  };
+
+  // Toggle all visible words selection
+  const toggleSelectAll = () => {
+    if (selectedWords.size === communityWords.length && communityWords.length > 0) {
+      // Deselect all
+      setSelectedWords(new Set());
+    } else {
+      // Select all visible words
+      const allKeys = communityWords.map(w => getWordKey(w.word, w.language));
+      setSelectedWords(new Set(allKeys));
+    }
+  };
+
+  // Clear selection when filters change
+  useEffect(() => {
+    setSelectedWords(new Set());
+  }, [communityWordStatus, communityWordLanguage, communityWordSearch]);
+
+  // Handle bulk add to dictionary
+  const handleBulkAdd = async () => {
+    if (selectedWords.size === 0) return;
+
+    const token = await getAuthToken();
+    if (!token) {
+      toast.error('Authentication required');
+      return;
+    }
+
+    setBulkActionLoading(true);
+    let successCount = 0;
+    let failCount = 0;
+
+    const wordsToProcess = communityWords.filter(w =>
+      selectedWords.has(getWordKey(w.word, w.language))
+    );
+
+    for (const word of wordsToProcess) {
+      try {
+        const res = await fetch('/api/admin/community-words/approve', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            word: word.word,
+            language: word.language,
+            addToDictionary: true
+          })
+        });
+
+        if (res.ok) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } catch {
+        failCount++;
+      }
+    }
+
+    setBulkActionLoading(false);
+    setSelectedWords(new Set());
+
+    if (successCount > 0) {
+      toast.success(`Added ${successCount} word${successCount > 1 ? 's' : ''} to dictionary`);
+    }
+    if (failCount > 0) {
+      toast.error(`Failed to add ${failCount} word${failCount > 1 ? 's' : ''}`);
+    }
+
+    // Refresh the list
+    fetchCommunityWords(communityWordSearch, communityWordStatus, communityWordLanguage);
+  };
+
+  // Handle bulk remove (blacklist)
+  const handleBulkRemove = async () => {
+    if (selectedWords.size === 0) return;
+
+    const token = await getAuthToken();
+    if (!token) {
+      toast.error('Authentication required');
+      return;
+    }
+
+    setBulkActionLoading(true);
+    let successCount = 0;
+    let failCount = 0;
+
+    const wordsToProcess = communityWords.filter(w =>
+      selectedWords.has(getWordKey(w.word, w.language))
+    );
+
+    for (const word of wordsToProcess) {
+      try {
+        const res = await fetch('/api/admin/community-words/disapprove', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            word: word.word,
+            language: word.language,
+            reason: 'Bulk admin review: invalid word',
+            addToBlacklist: true
+          })
+        });
+
+        if (res.ok) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } catch {
+        failCount++;
+      }
+    }
+
+    setBulkActionLoading(false);
+    setSelectedWords(new Set());
+
+    if (successCount > 0) {
+      toast.success(`Removed ${successCount} word${successCount > 1 ? 's' : ''}`);
+    }
+    if (failCount > 0) {
+      toast.error(`Failed to remove ${failCount} word${failCount > 1 ? 's' : ''}`);
+    }
+
+    // Refresh the list
+    fetchCommunityWords(communityWordSearch, communityWordStatus, communityWordLanguage);
+  };
+
   // Fetch community words when tab changes or filters update
   useEffect(() => {
     if (activeTab === 'community-words' && isAdmin) {
@@ -859,7 +922,14 @@ export default function AdminDashboard() {
     )}>
       <Header />
 
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+      <PullToRefreshWrapper
+        onRefresh={async () => {
+          await fetchAdminData();
+          toast.success('Dashboard refreshed');
+        }}
+        enabled={isMobile && !refreshing}
+      >
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
         {/* Header - Responsive with back button */}
         <div className="flex items-center justify-between gap-2 sm:gap-4 mb-4 sm:mb-6">
           {/* Back Button - Always visible */}
@@ -1057,7 +1127,7 @@ export default function AdminDashboard() {
         {/* Tab Navigation - Scrollable on mobile */}
         <div className="relative mb-4 sm:mb-6">
           <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-3 px-3 sm:mx-0 sm:px-0">
-            {(['overview', 'players', 'sources', 'activity', 'game-logs', 'community-words', 'bot-words'] as const).map((tab) => (
+            {(['overview', 'players', 'sources', 'activity', 'game-logs', 'community-words'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -1078,7 +1148,6 @@ export default function AdminDashboard() {
                 {tab === 'activity' && 'Activity'}
                 {tab === 'game-logs' && 'Game Logs'}
                 {tab === 'community-words' && 'Community'}
-                {tab === 'bot-words' && 'Bot Words'}
               </button>
             ))}
           </div>
@@ -1427,80 +1496,281 @@ export default function AdminDashboard() {
         )}
 
         {/* Players Tab */}
-        {activeTab === 'players' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={cn(
-              'rounded-xl p-6 border',
-              isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-gray-200 shadow-md'
-            )}
-          >
-            <h3 className={cn(
-              'text-lg font-bold mb-4 flex items-center gap-2',
-              isDarkMode ? 'text-white' : 'text-gray-900'
-            )}>
-              <Trophy className="text-yellow-500" />
-              Top Players
-            </h3>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className={cn(
-                    'text-left border-b',
-                    isDarkMode ? 'border-slate-700' : 'border-gray-200'
-                  )}>
-                    <th className={cn('pb-2 pr-4', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>#</th>
-                    <th className={cn('pb-2 pr-4', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Player</th>
-                    <th className={cn('pb-2 pr-4 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Score</th>
-                    <th className={cn('pb-2 pr-4 text-right hidden sm:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Games</th>
-                    <th className={cn('pb-2 pr-4 text-right hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Words</th>
-                    <th className={cn('pb-2 text-right hidden lg:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Time</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {topPlayers.map((player, index) => (
-                    <tr
-                      key={player.id}
-                      className={cn(
-                        'border-b last:border-0',
-                        isDarkMode ? 'border-slate-700' : 'border-gray-100'
-                      )}
-                    >
-                      <td className={cn('py-3 pr-4', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
-                        {index + 1}
-                      </td>
-                      <td className="py-3 pr-4">
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
-                            style={{ backgroundColor: player.avatar_color || '#6366f1' }}
-                          >
-                            {player.avatar_emoji || '😀'}
-                          </div>
-                          <span className={isDarkMode ? 'text-white' : 'text-gray-900'}>
-                            {player.display_name || player.username}
-                          </span>
+        {activeTab === 'players' && stats && (
+          <div className="space-y-6">
+            {/* Player Stats Summary */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4"
+            >
+              <div className={cn(
+                'rounded-xl p-4 border text-center',
+                isDarkMode ? 'bg-gradient-to-br from-cyan-900/40 to-blue-900/40 border-cyan-500/30' : 'bg-gradient-to-br from-cyan-50 to-blue-50 border-cyan-200'
+              )}>
+                <Users className={cn('w-5 h-5 mx-auto mb-2', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')} />
+                <p className={cn('text-2xl font-bold', isDarkMode ? 'text-white' : 'text-gray-900')}>
+                  {stats.overview.totalPlayers.toLocaleString()}
+                </p>
+                <p className={cn('text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                  Total Registered
+                </p>
+              </div>
+              <div className={cn(
+                'rounded-xl p-4 border text-center',
+                isDarkMode ? 'bg-gradient-to-br from-green-900/40 to-emerald-900/40 border-green-500/30' : 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200'
+              )}>
+                <UserPlus className={cn('w-5 h-5 mx-auto mb-2', isDarkMode ? 'text-green-400' : 'text-green-600')} />
+                <p className={cn('text-2xl font-bold', isDarkMode ? 'text-white' : 'text-gray-900')}>
+                  {stats.activity.signupsToday}
+                </p>
+                <p className={cn('text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                  Signups Today
+                </p>
+              </div>
+              <div className={cn(
+                'rounded-xl p-4 border text-center',
+                isDarkMode ? 'bg-gradient-to-br from-purple-900/40 to-pink-900/40 border-purple-500/30' : 'bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200'
+              )}>
+                <UserPlus className={cn('w-5 h-5 mx-auto mb-2', isDarkMode ? 'text-purple-400' : 'text-purple-600')} />
+                <p className={cn('text-2xl font-bold', isDarkMode ? 'text-white' : 'text-gray-900')}>
+                  {stats.activity.signupsWeek}
+                </p>
+                <p className={cn('text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                  Signups This Week
+                </p>
+              </div>
+              <div className={cn(
+                'rounded-xl p-4 border text-center',
+                isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-gray-200'
+              )}>
+                <Gamepad2 className={cn('w-5 h-5 mx-auto mb-2', isDarkMode ? 'text-blue-400' : 'text-blue-600')} />
+                <p className={cn('text-2xl font-bold', isDarkMode ? 'text-white' : 'text-gray-900')}>
+                  {stats.activity.uniquePlayersToday}
+                </p>
+                <p className={cn('text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                  Active Today
+                </p>
+              </div>
+              <div className={cn(
+                'rounded-xl p-4 border text-center',
+                isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-gray-200'
+              )}>
+                <CalendarRange className={cn('w-5 h-5 mx-auto mb-2', isDarkMode ? 'text-orange-400' : 'text-orange-600')} />
+                <p className={cn('text-2xl font-bold', isDarkMode ? 'text-white' : 'text-gray-900')}>
+                  {stats.activity.uniquePlayersWeek}
+                </p>
+                <p className={cn('text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                  Active This Week
+                </p>
+              </div>
+              <div className={cn(
+                'rounded-xl p-4 border text-center',
+                isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-gray-200'
+              )}>
+                <CalendarDays className={cn('w-5 h-5 mx-auto mb-2', isDarkMode ? 'text-amber-400' : 'text-amber-600')} />
+                <p className={cn('text-2xl font-bold', isDarkMode ? 'text-white' : 'text-gray-900')}>
+                  {stats.activity.uniquePlayersMonth}
+                </p>
+                <p className={cn('text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                  Active This Month
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Country Distribution */}
+            {countries.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className={cn(
+                  'rounded-xl p-4 sm:p-6 border',
+                  isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-gray-200 shadow-md'
+                )}
+              >
+                <h3 className={cn(
+                  'text-base sm:text-lg font-bold mb-4 flex items-center gap-2',
+                  isDarkMode ? 'text-white' : 'text-gray-900'
+                )}>
+                  <Globe className={isDarkMode ? 'text-blue-400' : 'text-blue-600'} />
+                  Players by Country
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                  {countries.slice(0, 10).map((country) => {
+                    const countryInfo = COUNTRY_INFO[country.country] || { flag: '🌍', name: country.country };
+                    return (
+                      <div
+                        key={country.country}
+                        className={cn(
+                          'rounded-lg p-3 border flex items-center gap-2',
+                          isDarkMode ? 'bg-slate-700/50 border-slate-600' : 'bg-gray-50 border-gray-200'
+                        )}
+                      >
+                        <span className="text-xl">{countryInfo.flag}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className={cn(
+                            'text-sm font-medium truncate',
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                          )}>
+                            {countryInfo.name}
+                          </p>
+                          <p className={cn(
+                            'text-xs',
+                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                          )}>
+                            {country.count} players
+                          </p>
                         </div>
-                      </td>
-                      <td className={cn('py-3 pr-4 text-right font-medium', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}>
-                        {player.total_score.toLocaleString()}
-                      </td>
-                      <td className={cn('py-3 pr-4 text-right hidden sm:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
-                        {player.total_games}
-                      </td>
-                      <td className={cn('py-3 pr-4 text-right hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
-                        {player.total_words?.toLocaleString() || 0}
-                      </td>
-                      <td className={cn('py-3 text-right hidden lg:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
-                        {formatTime(player.total_time_played || 0)}
-                      </td>
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Players Table */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className={cn(
+                'rounded-xl p-4 sm:p-6 border',
+                isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-gray-200 shadow-md'
+              )}
+            >
+              {/* Header with toggle */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                <h3 className={cn(
+                  'text-base sm:text-lg font-bold flex items-center gap-2',
+                  isDarkMode ? 'text-white' : 'text-gray-900'
+                )}>
+                  {playerViewMode === 'top' ? (
+                    <>
+                      <Trophy className="text-yellow-500" />
+                      Top Players by Score
+                    </>
+                  ) : (
+                    <>
+                      <Clock className="text-green-500" />
+                      Recently Active Players
+                    </>
+                  )}
+                </h3>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setPlayerViewMode('top')}
+                    className={cn(
+                      'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+                      playerViewMode === 'top'
+                        ? isDarkMode
+                          ? 'bg-yellow-600 text-white'
+                          : 'bg-yellow-500 text-white'
+                        : isDarkMode
+                          ? 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    )}
+                  >
+                    <Trophy className="w-4 h-4 inline-block mr-1" />
+                    Top
+                  </button>
+                  <button
+                    onClick={() => setPlayerViewMode('recent')}
+                    className={cn(
+                      'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+                      playerViewMode === 'recent'
+                        ? isDarkMode
+                          ? 'bg-green-600 text-white'
+                          : 'bg-green-500 text-white'
+                        : isDarkMode
+                          ? 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    )}
+                  >
+                    <Clock className="w-4 h-4 inline-block mr-1" />
+                    Recent
+                  </button>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className={cn(
+                      'text-left border-b',
+                      isDarkMode ? 'border-slate-700' : 'border-gray-200'
+                    )}>
+                      <th className={cn('pb-2 pr-4', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>#</th>
+                      <th className={cn('pb-2 pr-4', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Player</th>
+                      <th className={cn('pb-2 pr-4 text-center hidden sm:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Level</th>
+                      <th className={cn('pb-2 pr-4 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Score</th>
+                      <th className={cn('pb-2 pr-4 text-right hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Games</th>
+                      <th className={cn('pb-2 pr-4 text-right hidden lg:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>MMR</th>
+                      <th className={cn('pb-2 text-right hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                        {playerViewMode === 'top' ? 'Joined' : 'Last Active'}
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </motion.div>
+                  </thead>
+                  <tbody>
+                    {(playerViewMode === 'top' ? topPlayers : recentPlayers).map((player, index) => (
+                      <tr
+                        key={player.id}
+                        className={cn(
+                          'border-b last:border-0',
+                          isDarkMode ? 'border-slate-700' : 'border-gray-100'
+                        )}
+                      >
+                        <td className={cn('py-3 pr-4', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                          {index + 1}
+                        </td>
+                        <td className="py-3 pr-4">
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0"
+                              style={{ backgroundColor: player.avatar_color || '#6366f1' }}
+                            >
+                              {player.avatar_emoji || '😀'}
+                            </div>
+                            <div className="min-w-0">
+                              <span className={cn('block truncate', isDarkMode ? 'text-white' : 'text-gray-900')}>
+                                {player.display_name || player.username}
+                              </span>
+                              <span className={cn('text-xs block sm:hidden', isDarkMode ? 'text-gray-500' : 'text-gray-400')}>
+                                Lvl {player.current_level || 1}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className={cn('py-3 pr-4 text-center hidden sm:table-cell')}>
+                          <span className={cn(
+                            'inline-flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold',
+                            isDarkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-100 text-purple-700'
+                          )}>
+                            {player.current_level || 1}
+                          </span>
+                        </td>
+                        <td className={cn('py-3 pr-4 text-right font-medium', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}>
+                          {player.total_score.toLocaleString()}
+                        </td>
+                        <td className={cn('py-3 pr-4 text-right hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                          {player.total_games}
+                        </td>
+                        <td className={cn('py-3 pr-4 text-right hidden lg:table-cell', isDarkMode ? 'text-orange-400' : 'text-orange-600')}>
+                          {player.ranked_mmr ? player.ranked_mmr.toLocaleString() : '-'}
+                        </td>
+                        <td className={cn('py-3 text-right hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                          {playerViewMode === 'top'
+                            ? formatRelativeTime(player.created_at)
+                            : player.last_game_at ? formatRelativeTime(player.last_game_at) : '-'
+                          }
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </motion.div>
+          </div>
         )}
 
         {/* Traffic Sources Tab */}
@@ -2079,12 +2349,67 @@ export default function AdminDashboard() {
               </select>
             </div>
 
-            {/* Results Count */}
-            <div className={cn(
-              'text-sm mb-4',
-              isDarkMode ? 'text-gray-400' : 'text-gray-600'
-            )}>
-              Showing {communityWords.length} of {communityWordsTotal} words
+            {/* Results Count & Bulk Actions */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+              <div className={cn(
+                'text-sm',
+                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+              )}>
+                Showing {communityWords.length} of {communityWordsTotal} words
+                {selectedWords.size > 0 && (
+                  <span className="ml-2 font-medium text-cyan-500">
+                    ({selectedWords.size} selected)
+                  </span>
+                )}
+              </div>
+
+              {/* Bulk Actions Bar */}
+              {selectedWords.size > 0 && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleBulkAdd}
+                    disabled={bulkActionLoading}
+                    className={cn(
+                      'px-3 py-1.5 text-xs font-medium rounded transition-colors flex items-center gap-1.5',
+                      bulkActionLoading
+                        ? 'bg-gray-500 cursor-not-allowed'
+                        : 'bg-green-600 hover:bg-green-500',
+                      'text-white'
+                    )}
+                  >
+                    {bulkActionLoading ? (
+                      <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Check className="w-3 h-3" />
+                    )}
+                    Add All ({selectedWords.size})
+                  </button>
+                  <button
+                    onClick={handleBulkRemove}
+                    disabled={bulkActionLoading}
+                    className={cn(
+                      'px-3 py-1.5 text-xs font-medium rounded transition-colors',
+                      bulkActionLoading
+                        ? 'bg-gray-500 cursor-not-allowed'
+                        : 'bg-red-600 hover:bg-red-500',
+                      'text-white'
+                    )}
+                  >
+                    Remove All ({selectedWords.size})
+                  </button>
+                  <button
+                    onClick={() => setSelectedWords(new Set())}
+                    className={cn(
+                      'px-3 py-1.5 text-xs font-medium rounded transition-colors',
+                      isDarkMode
+                        ? 'bg-slate-700 hover:bg-slate-600 text-gray-300'
+                        : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                    )}
+                  >
+                    Clear
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Loading State */}
@@ -2096,26 +2421,34 @@ export default function AdminDashboard() {
 
             {/* Words Table */}
             {!communityWordLoading && (
-              <div className="overflow-x-auto">
-                <table className="w-full">
+              <div className="overflow-x-auto -mx-3 sm:mx-0">
+                <table className="w-full min-w-[500px] sm:min-w-0">
                   <thead>
                     <tr className={cn(
                       'text-left border-b',
                       isDarkMode ? 'border-slate-700' : 'border-gray-200'
                     )}>
+                      <th className={cn('pb-2 px-2 w-8', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+                        <input
+                          type="checkbox"
+                          checked={communityWords.length > 0 && selectedWords.size === communityWords.length}
+                          onChange={toggleSelectAll}
+                          className="w-4 h-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                        />
+                      </th>
                       <th className={cn('pb-2 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Word</th>
-                      <th className={cn('pb-2 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Language</th>
-                      <th className={cn('pb-2 px-2 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Likes</th>
-                      <th className={cn('pb-2 px-2 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Dislikes</th>
-                      <th className={cn('pb-2 px-2 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Net Score</th>
-                      <th className={cn('pb-2 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Status</th>
+                      <th className={cn('pb-2 px-2 hidden sm:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Language</th>
+                      <th className={cn('pb-2 px-2 text-right hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Likes</th>
+                      <th className={cn('pb-2 px-2 text-right hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Dislikes</th>
+                      <th className={cn('pb-2 px-2 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Score</th>
+                      <th className={cn('pb-2 px-2 hidden sm:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Status</th>
                       <th className={cn('pb-2 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {communityWords.length === 0 ? (
                       <tr>
-                        <td colSpan={7} className={cn(
+                        <td colSpan={8} className={cn(
                           'py-8 text-center',
                           isDarkMode ? 'text-gray-500' : 'text-gray-400'
                         )}>
@@ -2123,19 +2456,35 @@ export default function AdminDashboard() {
                         </td>
                       </tr>
                     ) : (
-                      communityWords.map((word) => (
-                        <tr key={`${word.word}-${word.language}`} className={cn(
-                          'border-b',
-                          isDarkMode ? 'border-slate-700' : 'border-gray-200'
-                        )}>
+                      communityWords.map((word) => {
+                        const wordKey = getWordKey(word.word, word.language);
+                        const isSelected = selectedWords.has(wordKey);
+                        return (
+                        <tr
+                          key={wordKey}
+                          className={cn(
+                            'border-b cursor-pointer transition-colors',
+                            isDarkMode ? 'border-slate-700' : 'border-gray-200',
+                            isSelected && (isDarkMode ? 'bg-cyan-900/20' : 'bg-cyan-50')
+                          )}
+                          onClick={() => toggleWordSelection(word)}
+                        >
+                          <td className="py-3 px-2" onClick={(e) => e.stopPropagation()}>
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => toggleWordSelection(word)}
+                              className="w-4 h-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                            />
+                          </td>
                           <td className={cn('py-3 px-2 font-mono font-medium', isDarkMode ? 'text-white' : 'text-gray-900')}>
                             {word.word}
                           </td>
-                          <td className={cn('py-3 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
+                          <td className={cn('py-3 px-2 hidden sm:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
                             {LANGUAGE_NAMES[word.language] || word.language}
                           </td>
-                          <td className="py-3 px-2 text-right text-green-400">{word.likes_count}</td>
-                          <td className="py-3 px-2 text-right text-red-400">{word.dislikes_count}</td>
+                          <td className="py-3 px-2 text-right text-green-400 hidden md:table-cell">{word.likes_count}</td>
+                          <td className="py-3 px-2 text-right text-red-400 hidden md:table-cell">{word.dislikes_count}</td>
                           <td className={cn(
                             'py-3 px-2 text-right font-bold',
                             word.net_score >= 10 ? 'text-green-400' :
@@ -2144,7 +2493,7 @@ export default function AdminDashboard() {
                           )}>
                             {word.net_score}
                           </td>
-                          <td className="py-3 px-2">
+                          <td className="py-3 px-2 hidden sm:table-cell">
                             {word.status === 'validated' && (
                               <span className="px-2 py-1 rounded text-xs bg-green-900/30 text-green-400">
                                 Validated
@@ -2166,47 +2515,33 @@ export default function AdminDashboard() {
                               </span>
                             )}
                           </td>
-                          <td className="py-3 px-2">
+                          <td className="py-3 px-2" onClick={(e) => e.stopPropagation()}>
                             {(() => {
                               const isProcessing = processingWords.has(getWordKey(word.word, word.language));
                               return (
-                                <div className="flex gap-2">
+                                <div className="flex gap-1 sm:gap-2">
                                   {isProcessing ? (
-                                    <div className="flex items-center gap-2 px-3 py-1.5">
+                                    <div className="flex items-center gap-2 px-2 sm:px-3 py-1.5">
                                       <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
-                                      <span className={cn('text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                                      <span className={cn('text-xs hidden sm:inline', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
                                         Processing...
                                       </span>
                                     </div>
                                   ) : (
                                     <>
                                       <button
-                                        onClick={() => handleCommunityApprove(word, false)}
-                                        className="px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-500 transition-colors"
-                                        title="Approve (add votes to validate)"
-                                      >
-                                        Approve
-                                      </button>
-                                      <button
                                         onClick={() => handleCommunityApprove(word, true)}
-                                        className="px-3 py-1.5 text-xs font-medium bg-blue-600 text-white rounded hover:bg-blue-500 transition-colors"
-                                        title="Approve and add to permanent dictionary"
+                                        className="px-2 sm:px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-500 transition-colors"
+                                        title="Add to dictionary"
                                       >
-                                        + Dict
-                                      </button>
-                                      <button
-                                        onClick={() => handleCommunityDisapprove(word, false)}
-                                        className="px-3 py-1.5 text-xs font-medium bg-red-600 text-white rounded hover:bg-red-500 transition-colors"
-                                        title="Disapprove (add negative votes)"
-                                      >
-                                        Reject
+                                        Add
                                       </button>
                                       <button
                                         onClick={() => handleCommunityDisapprove(word, true)}
-                                        className="px-3 py-1.5 text-xs font-medium bg-red-800 text-white rounded hover:bg-red-700 transition-colors"
-                                        title="Reject and blacklist"
+                                        className="px-2 sm:px-3 py-1.5 text-xs font-medium bg-red-600 text-white rounded hover:bg-red-500 transition-colors"
+                                        title="Remove and blacklist"
                                       >
-                                        Ban
+                                        Remove
                                       </button>
                                     </>
                                   )}
@@ -2215,7 +2550,8 @@ export default function AdminDashboard() {
                             })()}
                           </td>
                         </tr>
-                      ))
+                        );
+                      })
                     )}
                   </tbody>
                 </table>
@@ -2236,133 +2572,13 @@ export default function AdminDashboard() {
               </ul>
               <p className="mt-3"><strong>Actions:</strong></p>
               <ul className="list-disc list-inside space-y-1 ml-2">
-                <li><span className="text-green-400">Approve</span>: Add votes to push word toward validation threshold</li>
-                <li><span className="text-blue-400">+ Dict</span>: Approve and add to permanent dictionary file</li>
-                <li><span className="text-red-400">Reject</span>: Add negative votes</li>
-                <li><span className="text-red-600">Ban</span>: Reject and add to blacklist (prevents future use)</li>
+                <li><span className="text-green-400">Add</span>: Add word to permanent dictionary</li>
+                <li><span className="text-red-400">Remove</span>: Blacklist word (prevents future use)</li>
               </ul>
             </div>
           </motion.div>
         )}
 
-        {/* Bot Words Tab */}
-        {activeTab === 'bot-words' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={cn(
-              'rounded-xl p-6 border',
-              isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-gray-200 shadow-md'
-            )}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className={cn(
-                'text-lg font-bold flex items-center gap-2',
-                isDarkMode ? 'text-white' : 'text-gray-900'
-              )}>
-                <Bot className="text-purple-500" />
-                Bot Words Review
-              </h3>
-
-              {/* Language Filter */}
-              <select
-                value={selectedLanguage}
-                onChange={(e) => setSelectedLanguage(e.target.value)}
-                className={cn(
-                  'px-3 py-1 rounded-lg border',
-                  isDarkMode
-                    ? 'bg-slate-700 border-slate-600 text-white'
-                    : 'bg-white border-gray-300 text-gray-900'
-                )}
-              >
-                <option value="all">All Languages</option>
-                <option value="en">English</option>
-                <option value="he">Hebrew</option>
-                <option value="sv">Swedish</option>
-                <option value="ja">Japanese</option>
-              </select>
-            </div>
-
-            {/* Words Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className={cn(
-                    'text-left border-b',
-                    isDarkMode ? 'border-slate-700' : 'border-gray-200'
-                  )}>
-                    <th className={cn('pb-2 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Word</th>
-                    <th className={cn('pb-2 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Language</th>
-                    <th className={cn('pb-2 px-2 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Likes</th>
-                    <th className={cn('pb-2 px-2 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Dislikes</th>
-                    <th className={cn('pb-2 px-2 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Net Score</th>
-                    <th className={cn('pb-2 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Status</th>
-                    <th className={cn('pb-2 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {botWords
-                    .filter(w => selectedLanguage === 'all' || w.language === selectedLanguage)
-                    .map((word) => (
-                      <tr key={`${word.word}-${word.language}`} className={cn(
-                        'border-b',
-                        isDarkMode ? 'border-slate-700' : 'border-gray-200'
-                      )}>
-                        <td className={cn('py-3 px-2 font-mono', isDarkMode ? 'text-white' : 'text-gray-900')}>{word.word}</td>
-                        <td className={cn('py-3 px-2', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>{LANGUAGE_NAMES[word.language] || word.language}</td>
-                        <td className="py-3 px-2 text-right text-green-400">{word.likes}</td>
-                        <td className="py-3 px-2 text-right text-red-400">{word.dislikes}</td>
-                        <td className={cn('py-3 px-2 text-right font-bold', word.netScore < 0 ? 'text-red-400' : 'text-gray-400')}>{word.netScore}</td>
-                        <td className="py-3 px-2">
-                          {word.isAutoBlacklisted ? (
-                            <span className="px-2 py-1 rounded text-xs bg-red-900/30 text-red-400">
-                              Auto-Blacklisted
-                            </span>
-                          ) : (
-                            <span className="px-2 py-1 rounded text-xs bg-yellow-900/30 text-yellow-400">
-                              Pending
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-3 px-2">
-                          {(() => {
-                            const isProcessing = processingBotWords.has(getWordKey(word.word, word.language));
-                            return (
-                              <div className="flex gap-2">
-                                {isProcessing ? (
-                                  <div className="flex items-center gap-2 px-3 py-1.5">
-                                    <div className="w-4 h-4 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
-                                    <span className={cn('text-xs', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
-                                      Processing...
-                                    </span>
-                                  </div>
-                                ) : (
-                                  <>
-                                    <button
-                                      onClick={() => handleApprove(word)}
-                                      className="px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded hover:bg-green-500 transition-colors"
-                                    >
-                                      Approve
-                                    </button>
-                                    <button
-                                      onClick={() => handleDisapprove(word)}
-                                      className="px-3 py-1.5 text-xs font-medium bg-red-600 text-white rounded hover:bg-red-500 transition-colors"
-                                    >
-                                      Disapprove
-                                    </button>
-                                  </>
-                                )}
-                              </div>
-                            );
-                          })()}
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
-          </motion.div>
-        )}
 
         {/* Retry Link Modal */}
         {retryLinkModalOpen && (
@@ -2482,6 +2698,7 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
+      </PullToRefreshWrapper>
     </div>
   );
 }
@@ -2672,4 +2889,22 @@ function formatTime(seconds: number): string {
     return `${hours}h ${minutes}m`;
   }
   return `${minutes}m`;
+}
+
+function formatRelativeTime(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+
+  if (diffMinutes < 1) return 'just now';
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays === 1) return 'yesterday';
+  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)}mo ago`;
+  return `${Math.floor(diffDays / 365)}y ago`;
 }

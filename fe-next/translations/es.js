@@ -101,6 +101,7 @@ const es = {
     "goToHome": "Inicio",
     "comboBonus": "¡combo!",
     "pending": "Pendiente",
+    "selected": "Seleccionado",
     "xpGained": "XP",
     "score": "Puntos",
     "points": "pts",
@@ -1958,7 +1959,15 @@ const es = {
     "shareWith": "Comparte tu enlace",
     "referralRewards": "Recompensas de referencia",
     "yourReferrals": "Tus referencias",
-    "noReferralsYet": "No hay referencias aún. ¡Empieza a compartir!"
+    "noReferralsYet": "No hay referencias aún. ¡Empieza a compartir!",
+    "selectCountry": "Seleccionar país",
+    "searchCountry": "Buscar...",
+    "clearCountry": "Borrar selección",
+    "noCountryFound": "No se encontró el país",
+    "addCountry": "Añadir país",
+    "changeCountry": "Cambiar país",
+    "countrySaved": "¡País actualizado!",
+    "countryError": "Error al actualizar el país"
   },
   "coins": {
     "title": "Monedas y Recompensas",

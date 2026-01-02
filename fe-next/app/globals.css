@@ -2487,37 +2487,36 @@ html.reduce-motion *::after {
    ==================================== */
 
 /* Attention-grabbing pulse for clue container when new feedback appears */
+/* Uses single amber/gold color for elegant, non-distracting effect */
 @keyframes clue-attention-pulse {
   0% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(255, 225, 53, 0.7),
-                0 0 0 0 rgba(255, 51, 102, 0.5);
+    box-shadow: 0 0 0 0 rgba(255, 200, 50, 0.6);
   }
   50% {
-    transform: scale(1.02);
-    box-shadow: 0 0 20px 10px rgba(255, 225, 53, 0.6),
-                0 0 40px 20px rgba(255, 51, 102, 0.3);
+    transform: scale(1.015);
+    box-shadow: 0 0 24px 8px rgba(255, 200, 50, 0.35);
   }
   100% {
     transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(255, 225, 53, 0),
-                0 0 0 0 rgba(255, 51, 102, 0);
+    box-shadow: 0 0 0 0 rgba(255, 200, 50, 0);
   }
 }
 
 /* Glow ring that expands outward from clue container */
+/* Single amber/gold color for consistency */
 @keyframes clue-glow-ring {
   0% {
     transform: scale(0.95);
     opacity: 1;
-    box-shadow: inset 0 0 20px rgba(255, 225, 53, 0.8),
-                0 0 30px rgba(255, 225, 53, 0.6);
+    box-shadow: inset 0 0 15px rgba(255, 200, 50, 0.6),
+                0 0 20px rgba(255, 200, 50, 0.4);
   }
   100% {
-    transform: scale(1.1);
+    transform: scale(1.08);
     opacity: 0;
-    box-shadow: inset 0 0 0 rgba(255, 225, 53, 0),
-                0 0 60px rgba(255, 225, 53, 0);
+    box-shadow: inset 0 0 0 rgba(255, 200, 50, 0),
+                0 0 40px rgba(255, 200, 50, 0);
   }
 }
 
@@ -2554,24 +2553,27 @@ html.reduce-motion *::after {
 }
 
 /* Border glow effect for active clue container */
+/* Single amber/gold color with subtle breathing - elegant and not distracting */
 @keyframes clue-border-glow {
   0%, 100% {
-    border-color: var(--neo-yellow);
-    box-shadow: 0 0 10px rgba(255, 225, 53, 0.5),
+    border-color: rgba(255, 200, 50, 0.7);
+    box-shadow: 0 0 8px rgba(255, 200, 50, 0.25),
+                0 0 16px rgba(255, 200, 50, 0.15),
                 4px 4px 0 rgb(var(--neo-black));
   }
   50% {
-    border-color: var(--neo-pink);
-    box-shadow: 0 0 25px rgba(255, 20, 147, 0.6),
-                0 0 50px rgba(255, 225, 53, 0.3),
+    border-color: rgba(255, 200, 50, 0.95);
+    box-shadow: 0 0 12px rgba(255, 200, 50, 0.35),
+                0 0 24px rgba(255, 200, 50, 0.2),
                 4px 4px 0 rgb(var(--neo-black));
   }
 }
 
 /* Flash effect for new clue reveal */
+/* Single amber/gold color for consistency */
 @keyframes clue-flash {
   0% {
-    background-color: rgba(255, 225, 53, 0.8);
+    background-color: rgba(255, 200, 50, 0.6);
   }
   100% {
     background-color: transparent;
@@ -2584,7 +2586,7 @@ html.reduce-motion *::after {
 }
 
 .clue-container-glow {
-  animation: clue-border-glow 1.5s ease-in-out infinite;
+  animation: clue-border-glow 3s ease-in-out infinite;
 }
 
 .clue-letter-entrance {
@@ -2596,14 +2598,12 @@ html.reduce-motion *::after {
 }
 
 /* Persistent glow for clue container when showing feedback */
+/* Single amber/gold color for consistent, elegant styling */
 .clue-feedback-active {
-  background: linear-gradient(135deg,
-    rgba(255, 225, 53, 0.15) 0%,
-    rgba(255, 20, 147, 0.1) 50%,
-    rgba(255, 225, 53, 0.15) 100%);
-  border: 3px solid var(--neo-yellow);
-  box-shadow: 0 0 20px rgba(255, 225, 53, 0.4),
-              0 0 40px rgba(255, 20, 147, 0.2),
+  background: rgba(255, 200, 50, 0.08);
+  border: 3px solid rgba(255, 200, 50, 0.9);
+  box-shadow: 0 0 16px rgba(255, 200, 50, 0.35),
+              0 0 32px rgba(255, 200, 50, 0.15),
               4px 4px 0 rgb(var(--neo-black));
 }
 
@@ -2616,8 +2616,8 @@ html.reduce-motion *::after {
 
 .low-end-device .clue-container-glow {
   animation: none;
-  border-color: var(--neo-yellow);
-  box-shadow: 0 0 10px rgba(255, 225, 53, 0.5),
+  border-color: rgba(255, 200, 50, 0.8);
+  box-shadow: 0 0 10px rgba(255, 200, 50, 0.3),
               4px 4px 0 rgb(var(--neo-black));
 }
 

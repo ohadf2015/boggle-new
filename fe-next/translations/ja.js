@@ -101,6 +101,7 @@ const ja = {
     "goToHome": "ホーム",
     "comboBonus": "コンボ！",
     "pending": "保留中",
+    "selected": "選択済み",
     "xpGained": "XP",
     "score": "スコア",
     "points": "pt",
@@ -2043,7 +2044,15 @@ const ja = {
     "shareWith": "リンクを共有",
     "referralRewards": "紹介報酬",
     "yourReferrals": "あなたの紹介",
-    "noReferralsYet": "まだ紹介はありません。シェアを始めましょう！"
+    "noReferralsYet": "まだ紹介はありません。シェアを始めましょう！",
+    "selectCountry": "国を選択",
+    "searchCountry": "検索...",
+    "clearCountry": "選択を解除",
+    "noCountryFound": "国が見つかりません",
+    "addCountry": "国を追加",
+    "changeCountry": "国を変更",
+    "countrySaved": "国が更新されました！",
+    "countryError": "国の更新に失敗しました"
   },
   "coins": {
     "title": "コイン＆報酬",

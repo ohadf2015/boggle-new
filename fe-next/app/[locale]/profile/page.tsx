@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, ArrowLeft, Edit, Gamepad2, Trophy, Star, Camera, X, Check, Clock, Play, Gift, BarChart2, Award } from 'lucide-react';
+import { User, ArrowLeft, Edit, Gamepad2, Trophy, Star, Camera, X, Check, Clock, Play, Gift, BarChart2, Award, Globe } from 'lucide-react';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 import { useRouter } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
@@ -23,6 +23,8 @@ import XpProgressBar from '@/components/XpProgressBar';
 import { CoinBalance } from '@/components/CoinBalance';
 import { CollectionGrid } from '@/components/CollectionGrid';
 import { EmailPreferences } from '@/components/settings/EmailPreferences';
+import { CountrySelector } from '@/components/settings/CountrySelector';
+import { getCountryFlag } from '@/shared/utils/countryUtils';
 import { uploadProfilePicture, removeProfilePicture } from '@/lib/supabase';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -150,6 +152,8 @@ export default function ProfilePage(): React.ReactNode {
   const [activeGameSession, setActiveGameSession] = useState<GameSession | null>(null);
   const [playerCollectibles, setPlayerCollectibles] = useState<PlayerCollectible[]>([]);
   const [isLoadingCollectibles, setIsLoadingCollectibles] = useState<boolean>(false);
+  const [isEditingCountry, setIsEditingCountry] = useState<boolean>(false);
+  const [isSavingCountry, setIsSavingCountry] = useState<boolean>(false);
 
   // Mobile tab state
   type MobileTab = 'overview' | 'stats' | 'achievements' | 'collection';
@@ -337,6 +341,23 @@ export default function ProfilePage(): React.ReactNode {
     setIsEditingName(true);
   };
 
+  // Handle country change
+  const handleCountryChange = useCallback(async (countryCode: string | null): Promise<void> => {
+    setIsSavingCountry(true);
+
+    try {
+      await updateProfile({ country_code: countryCode });
+      await refreshProfile();
+      setIsEditingCountry(false);
+      toast.success(t('profile.countrySaved') || 'Country updated!');
+    } catch (err) {
+      console.error('Save country error:', err);
+      toast.error(t('profile.countryError') || 'Failed to update country');
+    } finally {
+      setIsSavingCountry(false);
+    }
+  }, [updateProfile, refreshProfile, t]);
+
   // ============================================
   // Render Helpers for Mobile/Desktop Views
   // ============================================
@@ -459,7 +480,7 @@ export default function ProfilePage(): React.ReactNode {
                 onClick={startEditingName}
                 className={cn(
                   'p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0',
-                  isDarkMode ? 'text-gray-600' : 'text-gray-600'
+                  isDarkMode ? 'text-gray-400' : 'text-gray-600'
                 )}
                 title={t('profile.editName') || 'Edit Name'}
               >
@@ -469,10 +490,55 @@ export default function ProfilePage(): React.ReactNode {
           )}
           <p className={cn(
             'text-sm truncate',
-            isDarkMode ? 'text-gray-600' : 'text-gray-600'
+            isDarkMode ? 'text-gray-400' : 'text-gray-600'
           )}>
             {t('profile.memberSince')} {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}
           </p>
+
+          {/* Country Display/Edit */}
+          <div className="mt-2">
+            {isEditingCountry ? (
+              <div className={cn('max-w-[200px]', compact && 'max-w-[160px]')}>
+                <CountrySelector
+                  value={profile?.country_code}
+                  onChange={handleCountryChange}
+                  isDarkMode={isDarkMode}
+                  disabled={isSavingCountry}
+                />
+                <button
+                  onClick={() => setIsEditingCountry(false)}
+                  className={cn(
+                    'mt-1 text-xs',
+                    isDarkMode ? 'text-gray-500 hover:text-gray-400' : 'text-gray-500 hover:text-gray-600'
+                  )}
+                >
+                  {t('common.cancel') || 'Cancel'}
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsEditingCountry(true)}
+                className={cn(
+                  'flex items-center gap-1.5 text-sm transition-colors',
+                  isDarkMode ? 'text-gray-500 hover:text-gray-400' : 'text-gray-500 hover:text-gray-600'
+                )}
+                title={t('profile.changeCountry') || 'Change country'}
+              >
+                {profile?.country_code ? (
+                  <>
+                    <span className="text-base">{getCountryFlag(profile.country_code)}</span>
+                    <span>{profile.country_code}</span>
+                  </>
+                ) : (
+                  <>
+                    <Globe className="w-3.5 h-3.5" />
+                    <span>{t('profile.addCountry') || 'Add country'}</span>
+                  </>
+                )}
+                <Edit className="w-3 h-3 opacity-60" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </motion.div>
@@ -518,7 +584,7 @@ export default function ProfilePage(): React.ReactNode {
         )}>
           <p className={cn(
             'text-sm font-medium',
-            isDarkMode ? 'text-gray-600' : 'text-gray-600'
+            isDarkMode ? 'text-gray-400' : 'text-gray-600'
           )}>
             {t('xp.totalXpEarned') || 'Total XP Earned'}: <span className={cn(
               'font-bold',
@@ -730,7 +796,7 @@ export default function ProfilePage(): React.ReactNode {
             </p>
             <p className={cn(
               'text-sm',
-              isDarkMode ? 'text-gray-600' : 'text-gray-600'
+              isDarkMode ? 'text-gray-400' : 'text-gray-600'
             )}>
               MMR: {profile?.ranked_mmr || 1000}
             </p>
@@ -741,7 +807,7 @@ export default function ProfilePage(): React.ReactNode {
           <div className="flex justify-between mb-2">
             <span className={cn(
               'text-sm',
-              isDarkMode ? 'text-gray-600' : 'text-gray-600'
+              isDarkMode ? 'text-gray-400' : 'text-gray-600'
             )}>
               {t('ranked.unlockProgress', { current: profile?.casual_games || 0, required: 10 })}
             </span>
@@ -987,7 +1053,7 @@ export default function ProfilePage(): React.ReactNode {
             </h2>
             <p className={cn(
               'text-lg mb-6',
-              isDarkMode ? 'text-gray-600' : 'text-gray-600'
+              isDarkMode ? 'text-gray-400' : 'text-gray-600'
             )}>
               {t('auth.upgradePrompt')}
             </p>
@@ -1278,7 +1344,7 @@ export default function ProfilePage(): React.ReactNode {
                     onClick={startEditingName}
                     className={cn(
                       'p-1 rounded hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors',
-                      isDarkMode ? 'text-gray-600' : 'text-gray-600'
+                      isDarkMode ? 'text-gray-400' : 'text-gray-600'
                     )}
                     title={t('profile.editName') || 'Edit Name'}
                   >
@@ -1288,10 +1354,55 @@ export default function ProfilePage(): React.ReactNode {
               )}
               <p className={cn(
                 'text-sm',
-                isDarkMode ? 'text-gray-600' : 'text-gray-600'
+                isDarkMode ? 'text-gray-400' : 'text-gray-600'
               )}>
                 {t('profile.memberSince')} {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}
               </p>
+
+              {/* Country Display/Edit - Desktop */}
+              <div className="mt-2">
+                {isEditingCountry ? (
+                  <div className="max-w-[220px]">
+                    <CountrySelector
+                      value={profile?.country_code}
+                      onChange={handleCountryChange}
+                      isDarkMode={isDarkMode}
+                      disabled={isSavingCountry}
+                    />
+                    <button
+                      onClick={() => setIsEditingCountry(false)}
+                      className={cn(
+                        'mt-1 text-xs',
+                        isDarkMode ? 'text-gray-500 hover:text-gray-400' : 'text-gray-500 hover:text-gray-600'
+                      )}
+                    >
+                      {t('common.cancel') || 'Cancel'}
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setIsEditingCountry(true)}
+                    className={cn(
+                      'flex items-center gap-1.5 text-sm transition-colors',
+                      isDarkMode ? 'text-gray-500 hover:text-gray-400' : 'text-gray-500 hover:text-gray-600'
+                    )}
+                    title={t('profile.changeCountry') || 'Change country'}
+                  >
+                    {profile?.country_code ? (
+                      <>
+                        <span className="text-base">{getCountryFlag(profile.country_code)}</span>
+                        <span>{profile.country_code}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Globe className="w-3.5 h-3.5" />
+                        <span>{t('profile.addCountry') || 'Add country'}</span>
+                      </>
+                    )}
+                    <Edit className="w-3 h-3 opacity-60" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </motion.div>
@@ -1333,7 +1444,7 @@ export default function ProfilePage(): React.ReactNode {
             )}>
               <p className={cn(
                 'text-sm font-medium',
-                isDarkMode ? 'text-gray-600' : 'text-gray-600'
+                isDarkMode ? 'text-gray-400' : 'text-gray-600'
               )}>
                 {t('xp.totalXpEarned') || 'Total XP Earned'}: <span className={cn(
                   'font-bold',
@@ -1494,7 +1605,7 @@ export default function ProfilePage(): React.ReactNode {
                 </p>
                 <p className={cn(
                   'text-sm',
-                  isDarkMode ? 'text-gray-600' : 'text-gray-600'
+                  isDarkMode ? 'text-gray-400' : 'text-gray-600'
                 )}>
                   MMR: {profile?.ranked_mmr || 1000}
                 </p>
@@ -1505,7 +1616,7 @@ export default function ProfilePage(): React.ReactNode {
               <div className="flex justify-between mb-2">
                 <span className={cn(
                   'text-sm',
-                  isDarkMode ? 'text-gray-600' : 'text-gray-600'
+                  isDarkMode ? 'text-gray-400' : 'text-gray-600'
                 )}>
                   {t('ranked.unlockProgress', { current: profile?.casual_games || 0, required: 10 })}
                 </span>
@@ -1527,7 +1638,7 @@ export default function ProfilePage(): React.ReactNode {
               </div>
               <p className={cn(
                 'mt-2 text-sm',
-                isDarkMode ? 'text-gray-600' : 'text-gray-600'
+                isDarkMode ? 'text-gray-400' : 'text-gray-600'
               )}>
                 {t('ranked.playMoreToUnlock', { count: gamesUntilRanked })}
               </p>
@@ -1769,7 +1880,7 @@ function StatCard({ icon, label, value, isDarkMode, highlight = false }: StatCar
         'text-2xl mb-2',
         highlight
           ? isDarkMode ? 'text-cyan-400' : 'text-cyan-600'
-          : isDarkMode ? 'text-gray-600' : 'text-gray-600'
+          : isDarkMode ? 'text-gray-400' : 'text-gray-600'
       )}>
         {icon}
       </div>
@@ -1783,7 +1894,7 @@ function StatCard({ icon, label, value, isDarkMode, highlight = false }: StatCar
       </p>
       <p className={cn(
         'text-xs',
-        isDarkMode ? 'text-gray-600' : 'text-gray-600'
+        isDarkMode ? 'text-gray-400' : 'text-gray-600'
       )}>
         {label}
       </p>

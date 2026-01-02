@@ -1,18 +1,55 @@
 /**
  * API Route: /api/validate-word
  * Validates words for single-player mode
- * Supports English and Spanish dictionaries
- * For full validation (including community validation), use /api/dictionary/check
+ * Supports English, Spanish, Hebrew, Swedish, and Japanese dictionaries
+ * Also checks community-validated words (words with 6+ net votes)
  */
 
 import { NextRequest } from 'next/server';
 import englishWords from 'an-array-of-english-words';
 import spanishWords from 'an-array-of-spanish-words';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
+import { createClient } from '@supabase/supabase-js';
 
 // Pre-build dictionaries at module load (cached by Next.js)
 const englishDictionary = new Set(englishWords.map((w: string) => w.toLowerCase()));
 const spanishDictionary = new Set(spanishWords.map((w: string) => w.toLowerCase()));
+
+// Supabase client for checking community words
+function getSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anonKey) return null;
+  return createClient(url, anonKey);
+}
+
+/**
+ * Check if a word is community-validated (net_score >= 6)
+ */
+async function checkCommunityWord(word: string, language: string): Promise<boolean> {
+  const supabase = getSupabase();
+  if (!supabase) return false;
+
+  try {
+    const { data, error } = await supabase
+      .from('word_scores')
+      .select('id')
+      .eq('word', word)
+      .eq('language', language)
+      .eq('is_potentially_valid', true)
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      console.warn('[validate-word] Community word check error:', error.message);
+      return false;
+    }
+
+    return data !== null;
+  } catch {
+    return false;
+  }
+}
 
 // Spanish accent normalization - accented vowels to base vowels for dictionary lookup
 const spanishAccentMap: Record<string, string> = {
@@ -94,8 +131,17 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Word not in dictionary - return pending
-    // Note: For community validation, use /api/dictionary/check instead
+    // Check community-validated words (words with 6+ net votes)
+    // Returns same response as dictionary words - players shouldn't know the difference
+    const isCommunityValid = await checkCommunityWord(normalizedWord, language);
+    if (isCommunityValid) {
+      return Response.json({
+        isValid: true,
+        source: 'dictionary',
+      });
+    }
+
+    // Word not in dictionary or community - return pending
     return Response.json({
       isValid: false,
       reason: 'Word not in dictionary',

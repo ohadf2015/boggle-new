@@ -107,6 +107,7 @@ const en = {
     "goToHome": "Home",
     "comboBonus": "combo!",
     "pending": "Pending",
+    "selected": "Selected",
     "xpGained": "XP",
     "score": "Score",
     "points": "pts",
@@ -2178,7 +2179,15 @@ const en = {
     "shareWith": "Share Your Link",
     "referralRewards": "Referral Rewards",
     "yourReferrals": "Your Referrals",
-    "noReferralsYet": "No referrals yet. Start sharing!"
+    "noReferralsYet": "No referrals yet. Start sharing!",
+    "selectCountry": "Select country",
+    "searchCountry": "Search...",
+    "clearCountry": "Clear selection",
+    "noCountryFound": "No country found",
+    "addCountry": "Add country",
+    "changeCountry": "Change country",
+    "countrySaved": "Country updated!",
+    "countryError": "Failed to update country"
   },
   "coins": {
     "title": "Coins & Rewards",

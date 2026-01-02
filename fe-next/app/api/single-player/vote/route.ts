@@ -17,8 +17,8 @@ function getSupabaseClient() {
   return createClient(supabaseUrl, supabaseAnonKey);
 }
 
-// Constants from communityWordManager
-const PROMINENT_THRESHOLD = 10;
+// Constants from communityWordManager (must match database is_potentially_valid threshold)
+const PROMINENT_THRESHOLD = 6;
 
 // Word normalization functions
 const hebrewFinalToRegular: Record<string, string> = {

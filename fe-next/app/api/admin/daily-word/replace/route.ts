@@ -42,11 +42,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate word format (4 letters, uppercase)
+    // Validate word format (3-10 letters, uppercase)
     const formattedWord = newWord.toUpperCase().trim();
-    if (formattedWord.length !== 4) {
+    if (formattedWord.length < 3 || formattedWord.length > 10) {
       return NextResponse.json(
-        { error: 'Word must be exactly 4 letters' },
+        { error: 'Word must be between 3 and 10 letters' },
         { status: 400 }
       );
     }

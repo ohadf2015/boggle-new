@@ -214,8 +214,9 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
   if (!isOpen) return null;
 
   // Get vote info for current word
-  // Words need 10 points to be prominently valid (added to dictionary)
-  const PROMINENT_THRESHOLD = 10;
+  // Words need 6 points to be prominently valid (added to dictionary)
+  // This matches the database is_potentially_valid threshold
+  const PROMINENT_THRESHOLD = 6;
   const wordVoteInfo = currentWord.voteInfo;
   const votesNeeded = wordVoteInfo?.votesNeeded ?? PROMINENT_THRESHOLD;
   const progressPercent = wordVoteInfo ? Math.min(100, ((PROMINENT_THRESHOLD - votesNeeded) / PROMINENT_THRESHOLD) * 100) : 0;

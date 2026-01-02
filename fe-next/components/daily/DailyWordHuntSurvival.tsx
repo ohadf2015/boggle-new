@@ -990,7 +990,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           </div>
 
           {/* Black boxes for target word OR Letter Feedback Overlay */}
-          <div className="flex justify-center flex-wrap gap-1.5 sm:gap-2 px-2">
+          <div className="flex justify-center flex-wrap gap-2 sm:gap-2.5 px-2">
             <AnimatePresence mode="wait">
               {showFeedbackOverlay && latestAttemptFeedback ? (
                 // Show colored letter feedback when overlay is active
@@ -1000,18 +1000,18 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.3 }}
-                  className="flex justify-center flex-wrap gap-1.5 sm:gap-2"
+                  className="flex justify-center flex-wrap gap-2 sm:gap-2.5"
                 >
                   {latestAttemptFeedback.map((letterFb, idx) => {
                     const wordLength = latestAttemptFeedback.length;
-                    // Compact but visible boxes
+                    // Bigger, more visible boxes
                     const sizeClass = wordLength <= 4
-                      ? "w-9 h-9 sm:w-10 sm:h-10 text-base sm:text-lg"
+                      ? "w-11 h-11 sm:w-12 sm:h-12 text-lg sm:text-xl"
                       : wordLength <= 6
-                        ? "w-8 h-8 sm:w-9 sm:h-9 text-sm sm:text-base"
+                        ? "w-10 h-10 sm:w-11 sm:h-11 text-base sm:text-lg"
                         : wordLength <= 8
-                          ? "w-7 h-7 sm:w-8 sm:h-8 text-xs sm:text-sm"
-                          : "w-6 h-6 sm:w-7 sm:h-7 text-[10px] sm:text-xs";
+                          ? "w-9 h-9 sm:w-10 sm:h-10 text-sm sm:text-base"
+                          : "w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm";
 
                     return (
                       <motion.div
@@ -1048,20 +1048,20 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.3 }}
-                  className="flex justify-center flex-wrap gap-1.5 sm:gap-2"
+                  className="flex justify-center flex-wrap gap-2 sm:gap-2.5"
                 >
                   {(() => {
                     // Parse hint to understand revealed letters
                     const hintChars = currentHint.hint.split(' ').filter(c => c !== '');
                     const wordLength = hintChars.length;
-                    // Compact but visible boxes
+                    // Bigger, more visible boxes
                     const sizeClass = wordLength <= 4
-                      ? "w-9 h-9 sm:w-10 sm:h-10 text-base sm:text-lg"
+                      ? "w-11 h-11 sm:w-12 sm:h-12 text-lg sm:text-xl"
                       : wordLength <= 6
-                        ? "w-8 h-8 sm:w-9 sm:h-9 text-sm sm:text-base"
+                        ? "w-10 h-10 sm:w-11 sm:h-11 text-base sm:text-lg"
                         : wordLength <= 8
-                          ? "w-7 h-7 sm:w-8 sm:h-8 text-xs sm:text-sm"
-                          : "w-6 h-6 sm:w-7 sm:h-7 text-[10px] sm:text-xs";
+                          ? "w-9 h-9 sm:w-10 sm:h-10 text-sm sm:text-base"
+                          : "w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm";
 
                     return hintChars.map((char, idx) => {
                       // Check accumulated clues from guesses first (green/yellow)

@@ -690,20 +690,22 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
     };
 
     // Add survival mode fields if present
+    // Note: All integer fields must be rounded because lifePoints can be a float
+    // (due to continuous drain at 1.2 points/second)
     if (wordsDiscovered !== undefined) {
       insertData.words_discovered = wordsDiscovered;
     }
     if (lifeRemaining !== undefined) {
-      insertData.life_remaining = lifeRemaining;
+      insertData.life_remaining = Math.round(lifeRemaining);
     }
     if (clueTokensEarned !== undefined) {
-      insertData.clue_tokens_earned = clueTokensEarned;
+      insertData.clue_tokens_earned = Math.round(clueTokensEarned);
     }
     if (clueTokensSpent !== undefined) {
-      insertData.clue_tokens_spent = clueTokensSpent;
+      insertData.clue_tokens_spent = Math.round(clueTokensSpent);
     }
     if (hintsUnlocked !== undefined) {
-      insertData.hints_unlocked = hintsUnlocked;
+      insertData.hints_unlocked = Math.round(hintsUnlocked);
     }
     if (efficiencyScore !== undefined) {
       insertData.efficiency_score = Math.round(efficiencyScore);

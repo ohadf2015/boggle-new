@@ -42,10 +42,10 @@ export interface AllTimeParticipant {
   profile_picture_url?: string | null;
   country_code?: string | null;
   total_efficiency_score: number;
-  puzzles_played: number;
-  puzzles_solved: number;
+  total_games: number;       // Number of challenges played
+  games_won: number;         // Number of challenges solved
   avg_attempts: number | null;
-  best_efficiency_score: number;
+  best_efficiency: number;   // Best efficiency score
   last_played_at: string;
   rank_position: number;
 }
@@ -305,9 +305,9 @@ const AllTimeParticipantRow = memo<{
             {participant.total_efficiency_score} {t('wordHunt.leaderboard.pts')}
           </span>
           <span className="text-slate-400 dark:text-slate-500">•</span>
-          {/* Puzzles solved */}
+          {/* Challenges solved */}
           <span className="text-slate-600 dark:text-slate-300 font-medium">
-            {participant.puzzles_solved}/{participant.puzzles_played} {t('wordHunt.leaderboard.solved')}
+            {participant.games_won}/{participant.total_games} {t('wordHunt.leaderboard.solved')}
           </span>
         </div>
       </div>
@@ -316,7 +316,7 @@ const AllTimeParticipantRow = memo<{
       {!compact && (
         <div className="hidden sm:flex flex-col items-end text-xs">
           <div className="text-slate-500 dark:text-slate-400">{t('wordHunt.leaderboard.best')}</div>
-          <div className="font-bold text-purple-600 dark:text-purple-400">{participant.best_efficiency_score}</div>
+          <div className="font-bold text-purple-600 dark:text-purple-400">{participant.best_efficiency}</div>
         </div>
       )}
     </motion.div>
@@ -380,13 +380,14 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
 
       const responseData = await response.json();
       const data = responseData.data || [];
-      const totalParticipants = responseData.totalParticipants || 0;
+      // Use totalAttempts to show ALL players (including guests), not just authenticated solvers
+      const totalPlayers = responseData.totalAttempts || responseData.totalParticipants || 0;
 
       setTodayParticipants(data);
-      setTodayTotalCount(totalParticipants);
+      setTodayTotalCount(totalPlayers);
 
       if (onParticipantCountChange && activeTab === 'today') {
-        onParticipantCountChange(totalParticipants);
+        onParticipantCountChange(totalPlayers);
       }
     } catch (err) {
       console.error('Failed to fetch today leaderboard:', err);

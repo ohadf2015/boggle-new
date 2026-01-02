@@ -101,6 +101,7 @@ const sv = {
     "goToHome": "Hem",
     "comboBonus": "kombo!",
     "pending": "Väntar",
+    "selected": "Vald",
     "xpGained": "XP",
     "score": "Poäng",
     "points": "pts",
@@ -2044,7 +2045,15 @@ const sv = {
     "shareWith": "Dela din länk",
     "referralRewards": "Remiss-belöningar",
     "yourReferrals": "Dina remisser",
-    "noReferralsYet": "Inga remisser än. Börja dela!"
+    "noReferralsYet": "Inga remisser än. Börja dela!",
+    "selectCountry": "Välj land",
+    "searchCountry": "Sök...",
+    "clearCountry": "Rensa val",
+    "noCountryFound": "Inget land hittades",
+    "addCountry": "Lägg till land",
+    "changeCountry": "Ändra land",
+    "countrySaved": "Land uppdaterat!",
+    "countryError": "Kunde inte uppdatera land"
   },
   "coins": {
     "title": "Mynt & Belöningar",

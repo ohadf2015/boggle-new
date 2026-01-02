@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Search, AlertTriangle, Plus, Trash2, Copy, Download, Check } from 'lucide-react';
+import { Search, AlertTriangle, Plus, Trash2, Copy, Download, Check, Sparkles, Calendar, Loader2, Save, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -74,6 +74,26 @@ const LANGUAGES: { code: Language; name: string; flag: string }[] = [
   { code: 'de', name: 'German', flag: '🇩🇪' },
 ];
 
+interface BulkGeneratedWord {
+  date: string;
+  word: string;
+  reason: string;
+}
+
+interface BulkGenerateState {
+  isLoading: boolean;
+  generatedWords: BulkGeneratedWord[];
+  existingWords: Array<{ date: string; word: string }>;
+  excludedWords: string[];
+  stats: {
+    totalDates: number;
+    existingDates: number;
+    generatedDates: number;
+    excludedWordsCount: number;
+  } | null;
+  error: string | null;
+}
+
 export const DailyWordManager: React.FC = () => {
   const { t } = useLanguage();
   const [selectedLang, setSelectedLang] = useState<Language>('en');
@@ -81,6 +101,28 @@ export const DailyWordManager: React.FC = () => {
   const [newWord, setNewWord] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [copied, setCopied] = useState(false);
+
+  // Bulk generation state
+  const [showBulkGenerator, setShowBulkGenerator] = useState(false);
+  const [bulkStartDate, setBulkStartDate] = useState(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  });
+  const [bulkEndDate, setBulkEndDate] = useState(() => {
+    const weekLater = new Date();
+    weekLater.setDate(weekLater.getDate() + 7);
+    return weekLater.toISOString().split('T')[0];
+  });
+  const [bulkState, setBulkState] = useState<BulkGenerateState>({
+    isLoading: false,
+    generatedWords: [],
+    existingWords: [],
+    excludedWords: [],
+    stats: null,
+    error: null,
+  });
+  const [isSaving, setIsSaving] = useState(false);
 
   const currentWords = wordLists[selectedLang];
 
@@ -153,6 +195,103 @@ export const DailyWordManager: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
+  // Bulk generation handlers
+  const handleBulkGenerate = useCallback(async () => {
+    setBulkState(prev => ({ ...prev, isLoading: true, error: null }));
+
+    try {
+      const response = await fetch('/api/admin/daily-word/bulk-generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          language: selectedLang,
+          startDate: bulkStartDate,
+          endDate: bulkEndDate,
+          existingWords: currentWords, // Pass current word list for reference
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to generate words');
+      }
+
+      setBulkState({
+        isLoading: false,
+        generatedWords: data.generatedWords || [],
+        existingWords: data.existingWords || [],
+        excludedWords: data.excludedWords || [],
+        stats: data.stats || null,
+        error: null,
+      });
+    } catch (error) {
+      setBulkState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }));
+    }
+  }, [selectedLang, bulkStartDate, bulkEndDate, currentWords]);
+
+  const handleBulkWordChange = useCallback((index: number, newWord: string) => {
+    setBulkState(prev => ({
+      ...prev,
+      generatedWords: prev.generatedWords.map((item, i) =>
+        i === index ? { ...item, word: newWord.toUpperCase() } : item
+      ),
+    }));
+  }, []);
+
+  const handleBulkSave = useCallback(async () => {
+    const wordsToSave = bulkState.generatedWords
+      .filter(w => w.word.trim().length > 0)
+      .map(w => ({ date: w.date, word: w.word }));
+
+    if (wordsToSave.length === 0) {
+      alert('No words to save. Please fill in at least one word.');
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const response = await fetch('/api/admin/daily-word/bulk-generate', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          language: selectedLang,
+          words: wordsToSave,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to save words');
+      }
+
+      alert(`Saved ${data.summary.created} new and ${data.summary.updated} updated words${data.summary.errors > 0 ? ` (${data.summary.errors} errors)` : ''}`);
+
+      // Clear the generated words
+      setBulkState(prev => ({
+        ...prev,
+        generatedWords: [],
+        existingWords: [],
+        stats: null,
+      }));
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to save');
+    } finally {
+      setIsSaving(false);
+    }
+  }, [bulkState.generatedWords, selectedLang]);
+
+  const formatDateDisplay = (dateStr: string) => {
+    const date = new Date(dateStr + 'T00:00:00Z');
+    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  };
+
   return (
     <div className="w-full">
       <div className="max-w-6xl mx-auto">
@@ -177,6 +316,188 @@ export const DailyWordManager: React.FC = () => {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* AI Bulk Generator Section */}
+        <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700 p-3 sm:p-4 mb-4 text-gray-900 dark:text-white">
+          <button
+            onClick={() => setShowBulkGenerator(!showBulkGenerator)}
+            className="w-full flex items-center justify-between"
+          >
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-purple-500" />
+              <span className="font-bold text-base sm:text-lg">AI Bulk Word Generator</span>
+            </div>
+            <span className="text-sm text-gray-500">{showBulkGenerator ? '▼' : '▶'}</span>
+          </button>
+
+          {showBulkGenerator && (
+            <div className="mt-4 space-y-4">
+              {/* Date Range Selection */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                    <Calendar className="w-4 h-4 inline mr-1" />
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    value={bulkStartDate}
+                    onChange={(e) => setBulkStartDate(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-sm"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                    <Calendar className="w-4 h-4 inline mr-1" />
+                    End Date
+                  </label>
+                  <input
+                    type="date"
+                    value={bulkEndDate}
+                    onChange={(e) => setBulkEndDate(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-sm"
+                  />
+                </div>
+                <div className="flex items-end">
+                  <Button
+                    onClick={handleBulkGenerate}
+                    disabled={bulkState.isLoading}
+                    className="bg-purple-600 hover:bg-purple-700 text-white min-h-[42px]"
+                  >
+                    {bulkState.isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Generate with AI
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Error Display */}
+              {bulkState.error && (
+                <div className="p-3 bg-red-100 dark:bg-red-900/30 border border-red-500 rounded-lg text-red-600 dark:text-red-400 text-sm">
+                  <AlertTriangle className="w-4 h-4 inline mr-2" />
+                  {bulkState.error}
+                </div>
+              )}
+
+              {/* Stats Display */}
+              {bulkState.stats && (
+                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-sm">
+                  <div className="flex flex-wrap gap-4 text-blue-800 dark:text-blue-300">
+                    <span>Total dates: <strong>{bulkState.stats.totalDates}</strong></span>
+                    <span>Already scheduled: <strong>{bulkState.stats.existingDates}</strong></span>
+                    <span>To generate: <strong>{bulkState.stats.generatedDates}</strong></span>
+                    <span>Excluded words (30-day): <strong>{bulkState.stats.excludedWordsCount}</strong></span>
+                  </div>
+                </div>
+              )}
+
+              {/* Existing Words Display */}
+              {bulkState.existingWords.length > 0 && (
+                <div className="p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg">
+                  <h4 className="font-semibold text-sm mb-2 text-gray-600 dark:text-gray-400">Already Scheduled:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {bulkState.existingWords.map((item) => (
+                      <span
+                        key={item.date}
+                        className="px-2 py-1 bg-gray-200 dark:bg-slate-600 rounded text-xs font-mono"
+                      >
+                        {formatDateDisplay(item.date)}: <strong>{item.word}</strong>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Generated Words Editor */}
+              {bulkState.generatedWords.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-sm text-gray-600 dark:text-gray-400">
+                    AI Generated Words (edit before saving):
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                    {bulkState.generatedWords.map((item, index) => (
+                      <div
+                        key={item.date}
+                        className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-200 dark:border-slate-600"
+                      >
+                        <div className="flex-shrink-0 text-xs text-gray-500 dark:text-gray-400 w-20">
+                          {formatDateDisplay(item.date)}
+                        </div>
+                        <input
+                          type="text"
+                          value={item.word}
+                          onChange={(e) => handleBulkWordChange(index, e.target.value)}
+                          placeholder="Enter word"
+                          className={cn(
+                            "flex-1 px-2 py-1 border rounded font-mono text-sm uppercase min-w-0",
+                            "bg-white dark:bg-slate-600 border-gray-300 dark:border-slate-500",
+                            !item.word && "border-orange-400 bg-orange-50 dark:bg-orange-900/20"
+                          )}
+                          maxLength={selectedLang === 'ja' ? 4 : 8}
+                        />
+                        {item.reason && (
+                          <span className="flex-shrink-0 text-xs text-gray-400 truncate max-w-[80px]" title={item.reason}>
+                            {item.reason.length > 15 ? item.reason.slice(0, 15) + '...' : item.reason}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Save and Regenerate Buttons */}
+                  <div className="flex gap-2 pt-2">
+                    <Button
+                      onClick={handleBulkSave}
+                      disabled={isSaving || bulkState.generatedWords.every(w => !w.word.trim())}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      {isSaving ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-4 h-4 mr-2" />
+                          Save All Words
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      onClick={handleBulkGenerate}
+                      disabled={bulkState.isLoading}
+                      variant="outline"
+                      className="border-purple-400 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                    >
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Regenerate
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Excluded Words Info */}
+              {bulkState.excludedWords.length > 0 && (
+                <details className="text-sm">
+                  <summary className="cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                    Show excluded words (used within 30 days)
+                  </summary>
+                  <div className="mt-2 p-2 bg-gray-50 dark:bg-slate-700/50 rounded text-xs font-mono text-gray-600 dark:text-gray-400 max-h-32 overflow-y-auto">
+                    {bulkState.excludedWords.join(', ')}
+                  </div>
+                </details>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

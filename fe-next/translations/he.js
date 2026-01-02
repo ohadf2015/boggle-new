@@ -101,6 +101,7 @@ const he = {
     "goToHome": "חזרה לדף הבית",
     "comboBonus": "קומבו!",
     "pending": "ממתין",
+    "selected": "נבחר",
     "xpGained": "XP",
     "score": "ניקוד",
     "points": "נק׳",
@@ -2173,7 +2174,15 @@ const he = {
     "shareWith": "שתף את הקישור שלך",
     "referralRewards": "פרסי הפניות",
     "yourReferrals": "ההפניות שלך",
-    "noReferralsYet": "אין הפניות עדיין. התחל לשתף!"
+    "noReferralsYet": "אין הפניות עדיין. התחל לשתף!",
+    "selectCountry": "בחר מדינה",
+    "searchCountry": "חיפוש...",
+    "clearCountry": "נקה בחירה",
+    "noCountryFound": "לא נמצאה מדינה",
+    "addCountry": "הוסף מדינה",
+    "changeCountry": "שנה מדינה",
+    "countrySaved": "המדינה עודכנה!",
+    "countryError": "שגיאה בעדכון המדינה"
   },
   "coins": {
     "title": "מטבעות ופרסים",
