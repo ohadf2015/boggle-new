@@ -360,12 +360,13 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
     }
   }, [currentUserData, puzzleDate, language]);
 
-  // Filter participants based on game type
-  // For Word Hunt: show all players who SOLVED (guests AND authenticated)
-  // For Puzzle: show all players (guests AND authenticated)
+  // Filter out guests - only show authenticated users on leaderboard
+  // For Word Hunt: only show authenticated players who SOLVED
+  // For Puzzle: show all authenticated players
   const filteredParticipants = participants.filter(p => {
+    if (p.player_id === null) return false; // Filter out guests
     if (gameType === 'wordHunt' && !p.solved) return false; // Filter out failed attempts in Word Hunt
-    return true; // Show all players who succeeded (both guests and authenticated)
+    return true; // Show only authenticated players who succeeded
   });
 
   // Determine which participants to show
