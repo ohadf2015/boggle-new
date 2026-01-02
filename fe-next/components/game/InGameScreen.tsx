@@ -486,6 +486,7 @@ const InGameScreen = memo<InGameScreenProps>(({
 
     // Add to local found words
     onWordSubmit?.(formedWord);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- effectiveComboLevelRef and fireRoundActiveRef are refs (stable objects), accessing .current always gets latest value
   }, [
     isPlaying,
     gameLanguage,
@@ -499,7 +500,7 @@ const InGameScreen = memo<InGameScreenProps>(({
     t,
     playWordAcceptedSound,
     announceWordResult,
-  ]); // Optimized: removed effectiveComboLevelRef and fireRoundActive from deps (using refs)
+  ]);
 
   // Keyboard word input - allows typing words directly instead of swiping
   const keyboardInput = useKeyboardWordInput({

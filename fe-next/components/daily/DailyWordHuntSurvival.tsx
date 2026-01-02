@@ -710,7 +710,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     // Show success feedback with clue bonus if applicable
     const clueBonus = cluesRevealed > 0 ? ` 💡+${cluesRevealed}` : '';
     showToast('valid-word', `+${lifeGained} ❤️ ${tokensGained > 0 ? `+${tokensGained} 🪙` : ''}${clueBonus}`);
-  }, [discoveredWords, grid, language, playWordAcceptedSound, showToast, t, targetWord, validateWordInDictionary]);
+  }, [accumulatedClues, discoveredWords, grid, language, playWordAcceptedSound, showToast, t, targetWord, validateWordInDictionary]);
 
   // Handle game over
   const handleGameOver = useCallback(async (won: boolean, finalAttempts?: TargetAttempt[]) => {
