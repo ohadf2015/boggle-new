@@ -10,7 +10,7 @@ import type { PlayerArchetype } from '@/utils/playerArchetypes';
 
 interface PlayerArchetypeBadgeProps {
   archetype: PlayerArchetype;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
   showTooltip?: boolean;
   animate?: boolean;
   className?: string;
@@ -110,25 +110,31 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
     }
   };
 
-  // Size classes - 1.5x larger for better visibility
+  // Size classes - various sizes for different contexts
   const sizeClasses = {
+    xs: {
+      container: 'px-1.5 py-1 gap-1.5',
+      icon: 'w-6 h-6',       // 24px - compact for inline display
+      text: 'text-xs',
+      emoji: 'text-base',
+    },
     sm: {
-      container: 'px-2.5 py-1.5 gap-2',
-      icon: 'w-12 h-12',     // Was w-8 h-8 (32px), now 48px
+      container: 'px-2 py-1 gap-1.5',
+      icon: 'w-8 h-8',       // 32px - good for cards
+      text: 'text-xs',
+      emoji: 'text-xl',
+    },
+    md: {
+      container: 'px-3 py-1.5 gap-2',
+      icon: 'w-10 h-10',     // 40px
       text: 'text-sm',
       emoji: 'text-2xl',
     },
-    md: {
-      container: 'px-3.5 py-2 gap-3',
-      icon: 'w-16 h-16',     // Was w-12 h-12 (48px), now 64px
-      text: 'text-base',
-      emoji: 'text-3xl',
-    },
     lg: {
-      container: 'px-5 py-2.5 gap-4',
-      icon: 'w-20 h-20',     // Was w-16 h-16 (64px), now 80px
-      text: 'text-lg font-black',
-      emoji: 'text-5xl',
+      container: 'px-4 py-2 gap-3',
+      icon: 'w-14 h-14',     // 56px
+      text: 'text-base font-black',
+      emoji: 'text-3xl',
     },
   };
 
@@ -185,18 +191,19 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
       transition={{ type: 'spring', stiffness: 300, damping: 15 }}
     >
       {/* Icon - Image or Emoji fallback */}
-      <div className={cn('flex-shrink-0', sizes.icon)}>
+      <div className={cn('flex-shrink-0 flex items-center justify-center', sizes.icon)}>
         {archetype.icon && !imageError ? (
           <Image
             src={archetype.icon}
             alt={archetype.name}
-            width={80}
-            height={80}
+            width={size === 'xs' ? 24 : size === 'sm' ? 32 : size === 'md' ? 40 : 56}
+            height={size === 'xs' ? 24 : size === 'sm' ? 32 : size === 'md' ? 40 : 56}
             className="w-full h-full object-contain"
             onError={() => setImageError(true)}
+            priority={size === 'lg'}
           />
         ) : (
-          <span className={sizes.emoji}>{archetype.emoji}</span>
+          <span className={cn('flex items-center justify-center', sizes.emoji)}>{archetype.emoji}</span>
         )}
       </div>
 

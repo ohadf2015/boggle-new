@@ -87,7 +87,7 @@ export function CompactLeaderboard({
       className
     )}>
       {/* Compact Header with Race Track theme */}
-      <div className="bg-neo-navy px-3 py-1.5 flex items-center justify-between">
+      <div className="bg-neo-navy px-2 py-1 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
           <Zap className="w-3.5 h-3.5 text-neo-yellow" />
           <span className="text-[10px] font-black uppercase text-neo-cream tracking-wider">
@@ -99,13 +99,13 @@ export function CompactLeaderboard({
         </span>
       </div>
 
-      <div className="p-2 space-y-1.5">
+      <div className="p-1.5 space-y-1">
         {/* LEADER SECTION - Only show if user is NOT leading */}
         {!isLeading && leader && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-2 px-2 py-1.5 rounded-neo bg-gradient-to-r from-neo-yellow to-neo-orange border-2 border-neo-black shadow-hard-sm"
+            className="flex items-center gap-1.5 px-1.5 py-1 rounded-neo bg-gradient-to-r from-neo-yellow to-neo-orange border-2 border-neo-black shadow-hard-sm"
           >
             {/* Crown Icon */}
             <div className="w-7 h-7 rounded-full bg-neo-black flex items-center justify-center flex-shrink-0">
@@ -148,7 +148,7 @@ export function CompactLeaderboard({
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.05 }}
-            className="flex items-center gap-2 px-2 py-1 rounded-neo bg-neo-cream border-2 border-neo-black/30"
+            className="flex items-center gap-1.5 px-1.5 py-0.5 rounded-neo bg-neo-cream border-2 border-neo-black/30"
           >
             {/* Target Icon */}
             <div className="w-6 h-6 rounded-full bg-neo-pink/20 flex items-center justify-center flex-shrink-0">
@@ -184,7 +184,7 @@ export function CompactLeaderboard({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className={cn(
-            'relative flex items-center gap-2 px-2 py-2 rounded-neo border-3',
+            'relative flex items-center gap-1.5 px-1.5 py-1.5 rounded-neo border-3',
             isLeading
               ? 'bg-gradient-to-r from-neo-yellow to-neo-lime border-neo-black shadow-hard'
               : 'bg-neo-cyan/20 border-neo-cyan shadow-hard-sm'

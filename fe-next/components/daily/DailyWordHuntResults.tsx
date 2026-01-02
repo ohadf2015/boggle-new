@@ -1232,6 +1232,15 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 {t('daily.copiedToClipboard')}
               </motion.p>
             )}
+
+            {/* Show Leaderboard Button - Quick link to ranks tab */}
+            <Button
+              onClick={() => setActiveTab('ranks')}
+              className="w-full py-2.5 mt-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all font-bold flex items-center justify-center gap-2"
+            >
+              <Trophy className="w-4 h-4" />
+              {t('daily.showLeaderboard')}
+            </Button>
         </motion.div>
 
         {/* Reveal Target Word Option - Only for failed players, after share section */}

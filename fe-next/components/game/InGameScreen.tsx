@@ -741,12 +741,6 @@ const InGameScreen = memo<InGameScreenProps>(({
             </div>
           </div>
 
-          {/* Theme Indicator - subtle, bottom center in landscape */}
-          {boardTheme && (
-            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 z-20 opacity-60">
-              <ThemeIndicator theme={boardTheme} />
-            </div>
-          )}
         </div>
 
         {/* Achievement dock */}
@@ -802,10 +796,10 @@ const InGameScreen = memo<InGameScreenProps>(({
         />
       )}
 
-      <div className="flex flex-col lg:flex-row gap-1 md:gap-4 lg:gap-6 flex-grow w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out">
+      <div className="flex flex-col lg:flex-row gap-0.5 md:gap-4 lg:gap-6 flex-grow w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out">
 
       {/* Top Bar - Only on mobile, integrated into parent on desktop */}
-      <div className="lg:hidden w-full flex items-center justify-between mb-0.5 px-2">
+      <div className="lg:hidden w-full flex items-center justify-between mb-0 px-1">
         {onExitRoom && (
           <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} className="relative z-50" />
         )}
@@ -885,10 +879,10 @@ const InGameScreen = memo<InGameScreenProps>(({
       <div className="flex-1 flex flex-col min-w-0 min-h-0">
         {/* Stats row - Combo | Timer | Score - timer always centered and visible */}
         {remainingTime !== null && (
-          <div ref={gameStatsRef} className="flex items-center justify-center gap-2 md:gap-4 mb-1 md:mb-2" role="status" aria-label="Game status">
+          <div ref={gameStatsRef} className="flex items-center justify-center gap-1 md:gap-4 mb-0.5 md:mb-2" role="status" aria-label="Game status">
             {/* Combo (left - shows when level >= 2, placeholder otherwise for layout balance) */}
             {isPlaying && (
-              <div className="min-w-[60px] md:min-w-[90px] flex justify-end">
+              <div className="min-w-[50px] md:min-w-[90px] flex justify-end">
                 <ComboDisplay comboLevel={comboLevel} compact />
               </div>
             )}
@@ -904,7 +898,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                 <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="lg" />
               </div>
               <div className="lg:hidden">
-                <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" />
+                <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="xs" />
               </div>
             </motion.div>
 
@@ -913,7 +907,7 @@ const InGameScreen = memo<InGameScreenProps>(({
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-2 md:px-4 py-1 md:py-1.5 min-w-[60px] md:min-w-[90px]"
+                className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px]"
                 style={{
                   background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
                 }}
@@ -946,7 +940,7 @@ const InGameScreen = memo<InGameScreenProps>(({
         {/* Word Forming Area with feedback - centered below timer */}
         {/* Shows typed word when in keyboard mode, otherwise shows swiped word */}
         {isPlaying && (
-          <div className="flex items-center justify-center mb-1">
+          <div className="flex items-center justify-center mb-0.5 md:mb-1">
             <WordFormingArea
               word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
               letterCount={keyboardInput.isTypingMode ? keyboardInput.typedWord.length : letterCount}
@@ -1026,7 +1020,7 @@ const InGameScreen = memo<InGameScreenProps>(({
 
         {/* Mobile: Split-view with compact leaderboard + words (eliminates tab switching) */}
         {isPlaying && !gameplayFocusMode && leaderboard && leaderboard.length > 0 && (
-          <div className="lg:hidden mt-1 md:mt-2 space-y-1 md:space-y-2">
+          <div className="mt-0.5 md:mt-2 space-y-0.5 max-w-md mx-auto lg:max-w-lg md:space-y-2">
             {/* Compact Leaderboard - Always visible */}
             <CompactLeaderboard
               players={leaderboard.map(p => ({
@@ -1042,18 +1036,18 @@ const InGameScreen = memo<InGameScreenProps>(({
             />
 
             {/* Found Words - Auto-scroll, always visible */}
-            <div className="bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard p-2">
-              <div className="flex items-center justify-between mb-2 px-1">
-                <span className="text-xs font-black uppercase text-neo-black">
+            <div className="bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard p-1.5 md:p-2">
+              <div className="flex items-center justify-between mb-1 px-0.5">
+                <span className="text-[10px] md:text-xs font-black uppercase text-neo-black">
                   {t('hostView.words') || 'Your Words'}
                 </span>
                 <span className="text-xs font-bold text-neo-black/90">
                   {normalizedFoundWords.length}
                 </span>
               </div>
-              <div className="max-h-[120px] overflow-y-auto">
+              <div className="max-h-[70px] overflow-y-auto">
                 {normalizedFoundWords.length === 0 ? (
-                  <p className="text-center text-neo-black/90 py-4 text-sm font-bold">
+                  <p className="text-center text-neo-black/90 py-2 text-sm font-bold">
                     {t('playerView.noWordsYet') || 'No words found yet'}
                   </p>
                 ) : (

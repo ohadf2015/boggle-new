@@ -13,7 +13,6 @@ import XpBreakdownCard from './XpBreakdownCard';
 import { WordPointsGroup, SharedWordsSection, InvalidWordsSection } from './WordPointsGroup';
 import { filterGameAchievements } from './utils';
 import { useWordCategories } from './useWordCategories';
-import StatsGrid, { createGameStats } from './StatsGrid';
 import BonusBadgesRow from './BonusBadgesRow';
 import { calculatePlayerInsights } from '@/utils/gameInsights';
 import { applyHebrewFinalLetters } from '@/utils/utils';
@@ -46,10 +45,9 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
   xpGainedData,
   levelUpData,
   archetype,
-  duplicateRuleDisabled,
+  duplicateRuleDisabled: _duplicateRuleDisabled,
 }) => {
-  const { t, dir } = useLanguage();
-  const levelArrow = dir === 'rtl' ? '←' : '→';
+  const { t } = useLanguage();
 
   // Expanded states for collapsible sections
   const [showDetails, setShowDetails] = useState(false);
@@ -194,7 +192,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                   {rank}{getRankSuffix(rank)} of {totalPlayers}
                 </span>
                 {archetype && (
-                  <PlayerArchetypeBadge archetype={archetype} size="sm" />
+                  <PlayerArchetypeBadge archetype={archetype} size="sm" showTooltip={true} />
                 )}
               </div>
             </div>

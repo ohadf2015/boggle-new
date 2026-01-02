@@ -180,7 +180,7 @@ const CreateRoomSetup: React.FC<CreateRoomSetupProps> = ({
       gameCode,
       roomName: finalRoomName,
       language,
-      hostUsername: username,
+      hostUsername: isAuthenticated && displayName ? displayName : username,
       avatarId: effectiveAvatarId,
     });
   };

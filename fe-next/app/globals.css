@@ -501,8 +501,8 @@ body {
       padding: 3px;
       /* Maximize width: full screen minus tiny 8px total margin (4px each side) */
       width: calc(100vw - 8px);
-      /* Height: square but capped to leave room for header/UI */
-      height: min(calc(100vw - 8px), calc(100dvh - 160px));
+      /* Height: square but capped to leave room for header/UI (timer, stats, word area) */
+      height: min(calc(100vw - 8px), calc(100dvh - 190px));
       max-width: calc(100vw - 8px);
     }
   }

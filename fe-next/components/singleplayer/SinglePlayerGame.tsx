@@ -1346,7 +1346,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   }
 
   return (
-    <div className="relative space-y-1 md:space-y-2">
+    <div className="relative space-y-0.5 md:space-y-2">
       {/* Earthquake Warning Overlay */}
       <EarthquakeWarning
         isVisible={earthquakeState === 'warning'}
@@ -1393,7 +1393,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       />
 
       {/* Header with controls */}
-      <div className="flex items-center justify-between px-4">
+      <div className="flex items-center justify-between px-2 md:px-4">
         <Button
           variant="destructive"
           size="sm"
@@ -1419,9 +1419,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       </div>
 
       {/* Stats row - Combo | Timer | Score - matches multiplayer layout */}
-      <div ref={gameStatsRef} className="flex items-center justify-center gap-2 md:gap-4 mb-1 md:mb-2" role="status" aria-label="Game status">
+      <div ref={gameStatsRef} className="flex items-center justify-center gap-1 md:gap-4 mb-0.5 md:mb-2" role="status" aria-label="Game status">
         {/* Combo (left - shows when level >= 2, placeholder otherwise for layout balance) */}
-        <div className="min-w-[60px] md:min-w-[90px] flex justify-end">
+        <div className="min-w-[50px] md:min-w-[90px] flex justify-end">
           <ComboDisplay
             comboLevel={combo.comboLevel}
             compact
@@ -1455,7 +1455,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               <CircularTimer
                 remainingTime={timer.remainingTime}
                 totalTime={settings.timerSeconds}
-                size="sm"
+                size="xs"
               />
             </div>
           </AdaptiveMotion.div>
@@ -1465,7 +1465,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         <AdaptiveMotion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-2 md:px-4 py-1 md:py-1.5 min-w-[60px] md:min-w-[90px]"
+          className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px]"
           style={{
             background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
           }}
@@ -1488,7 +1488,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       </div>
 
       {/* Word Forming Area with feedback - centered below timer (keep timer section clean) */}
-      <div className="flex items-center justify-center mb-1">
+      <div className="flex items-center justify-center mb-0.5 md:mb-1">
         <WordFormingArea
           word={formedWord}
           letterCount={letterCount}
@@ -1502,11 +1502,11 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         <AdaptiveMotion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mx-2 md:mx-4 mb-0.5 md:mb-1"
+          className="mx-1 md:mx-4 mb-0 md:mb-1"
         >
           {targetHighScore !== null ? (
             <div className={cn(
-              'relative rounded-neo border-2 md:border-3 px-2 md:px-4 py-1 md:py-2 shadow-hard-sm',
+              'relative rounded-neo border-2 md:border-3 px-1.5 md:px-4 py-0.5 md:py-2 shadow-hard-sm',
               score > targetHighScore
                 ? 'bg-gradient-to-r from-neo-lime to-lime-300 border-neo-lime'
                 : score === targetHighScore
