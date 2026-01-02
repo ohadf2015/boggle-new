@@ -400,8 +400,8 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         />
       </div>
 
-      {/* Word count */}
-      <div className="text-center mt-2 sm:mt-4">
+      {/* Word count - hidden on fold phones to save space */}
+      <div className="text-center mt-2 sm:mt-4 hide-on-fold">
         <span className="text-sm text-gray-600">
           {t('daily.wordsFound').replace('{count}', String(wordSubmission.validWordCount))}
           {wordSubmission.foundWords.filter(w => w.isValid === null).length > 0 && (

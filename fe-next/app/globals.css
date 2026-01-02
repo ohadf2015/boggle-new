@@ -1454,6 +1454,9 @@ body {
   padding-bottom: max(0.5rem, var(--safe-area-bottom));
   border-top: 4px solid rgb(var(--neo-black));
   min-height: 56px;
+  /* Ensure solid background with no transparency bleed-through */
+  isolation: isolate;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* Mobile viewport container - fills screen without scrolling */
@@ -1942,6 +1945,52 @@ body {
 
   .text-responsive-sm {
     font-size: 0.75rem;
+  }
+}
+
+/* ====================================
+   FOLDABLE PHONE PORTRAIT OPTIMIZATION
+   ==================================== */
+
+/* Short portrait screens - foldable phones when folded (e.g., Galaxy Z Flip cover) */
+/* These screens have very limited vertical space (~280-500px height) */
+@media (orientation: portrait) and (max-height: 500px) {
+  /* Board must fit without scroll - use available height minus minimal UI chrome */
+  .game-board-frame {
+    /* Minimize reserved space: ~100px for timer/stats/word-area on ultra-short screens */
+    width: min(calc(100vw - 8px), calc(100dvh - 100px));
+    height: min(calc(100vw - 8px), calc(100dvh - 100px));
+    max-height: calc(100dvh - 100px);
+    padding: 2px;
+    /* Ensure no overflow */
+    overflow: hidden;
+  }
+
+  /* Reduce gap between elements */
+  .space-y-0\.5, .space-y-1, .space-y-2 {
+    gap: 2px !important;
+  }
+
+  /* Compact stats row */
+  .game-stats-row {
+    gap: 4px;
+    margin-bottom: 2px;
+  }
+}
+
+/* Very short portrait screens - extreme fold phones */
+@media (orientation: portrait) and (max-height: 400px) {
+  .game-board-frame {
+    /* Minimal UI chrome for extreme cases */
+    width: min(calc(100vw - 4px), calc(100dvh - 80px));
+    height: min(calc(100vw - 4px), calc(100dvh - 80px));
+    max-height: calc(100dvh - 80px);
+    padding: 1px;
+  }
+
+  /* Hide non-essential UI */
+  .hide-on-fold {
+    display: none !important;
   }
 }
 

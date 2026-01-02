@@ -675,7 +675,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
     finalizeAndEndGame();
     // No cleanup needed - we use ref pattern instead of isMounted check
-  }, [isGameOver, settings.bots, settings.language, settings.timerSeconds, combo.maxCombo]);
+  }, [isGameOver, settings.bots, settings.language, settings.timerSeconds, combo.maxCombo, revealState.revealsUsed]);
 
   // Timer is now handled by useGameTimer hook (lines 126-136)
 
@@ -1528,12 +1528,12 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         />
       </div>
 
-      {/* Challenge Mode Progress Tracker */}
+      {/* Challenge Mode Progress Tracker - hidden on fold phones to save space */}
       {settings.mode === 'challenge' && (
         <AdaptiveMotion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mx-1 md:mx-4 mb-0 md:mb-1"
+          className="mx-1 md:mx-4 mb-0 md:mb-1 hide-on-fold"
         >
           {targetHighScore !== null ? (
             <div className={cn(
@@ -1630,9 +1630,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
 
 
-      {/* Bot scores (only in solo-bots mode) */}
+      {/* Bot scores (only in solo-bots mode) - hidden on fold phones to save space */}
       {settings.mode === 'solo-bots' && settings.bots.length > 0 && (
-        <div className="bg-neo-cream text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-3 border-neo-black p-4">
+        <div className="bg-neo-cream text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-3 border-neo-black p-4 hide-on-fold">
           <h3 className="text-sm font-bold uppercase tracking-wide text-neo-black/70 dark:text-neo-white/70 mb-2">
             {t('singlePlayer.opponents') || 'Opponents'}
           </h3>

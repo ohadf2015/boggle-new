@@ -101,7 +101,7 @@ export function MobileTabBar({
 
   if (fixed) {
     return (
-      <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 lg:hidden safe-area-bottom">
+      <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-[100] lg:hidden safe-area-bottom">
         {tabBar}
       </div>
     );

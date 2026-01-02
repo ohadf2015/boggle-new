@@ -1019,8 +1019,9 @@ const InGameScreen = memo<InGameScreenProps>(({
         )}
 
         {/* Mobile: Split-view with compact leaderboard + words (eliminates tab switching) */}
+        {/* Hidden on fold phones to maximize grid space */}
         {isPlaying && !gameplayFocusMode && leaderboard && leaderboard.length > 0 && (
-          <div className="mt-0.5 md:mt-2 space-y-0.5 max-w-md mx-auto lg:max-w-lg md:space-y-2">
+          <div className="mt-0.5 md:mt-2 space-y-0.5 max-w-md mx-auto lg:max-w-lg md:space-y-2 hide-on-fold">
             {/* Compact Leaderboard - Always visible */}
             <CompactLeaderboard
               players={leaderboard.map(p => ({

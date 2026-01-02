@@ -616,7 +616,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, [user, profile]);
 
   // Create profile after OAuth sign up
-  const setupProfile = async (username: string, avatarEmoji?: string, avatarColor?: string) => {
+  const setupProfile = useCallback(async (username: string, avatarEmoji?: string, avatarColor?: string) => {
     if (!user) return { data: null, error: { message: 'Not authenticated' } };
 
     // Extract profile picture from OAuth provider metadata
@@ -686,10 +686,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
 
     return { data, error };
-  };
+  }, [user]);
 
   // Update profile
-  const updateUserProfile = async (updates: Partial<ProfileData>) => {
+  const updateUserProfile = useCallback(async (updates: Partial<ProfileData>) => {
     if (!user?.id) return { data: null, error: { message: 'Not authenticated' } };
 
     const { data, error } = await updateProfile(user.id, updates);
@@ -699,7 +699,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
 
     return { data, error };
-  };
+  }, [user?.id]);
 
   // Memoize computed values to prevent recalculation on every render
   const canPlayRanked = useMemo((): boolean => {
@@ -758,7 +758,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     canPlayRanked,
     gamesUntilRanked,
     needsProfileCustomization,
-    // Note: setupProfile, updateUserProfile, refreshProfile are stable due to their definitions
+    setupProfile,
+    updateUserProfile,
     refreshProfile
   ]);
 
