@@ -2805,3 +2805,176 @@ export function clearWinnerOnboarding(): void {
     // Ignore storage errors
   }
 }
+
+// ==========================================
+// Guest Data Sync for Signup
+// ==========================================
+
+/**
+ * Get all guest daily challenge results for syncing to authenticated account
+ * Returns results from ALL languages that the guest has played
+ */
+export function getAllGuestDailyResults(): Array<{
+  result: WordHuntResult;
+  puzzleNumber: number;
+  puzzleDate: string;
+  language: Language;
+}> {
+  if (typeof window === 'undefined') return [];
+
+  const allResults: Array<{
+    result: WordHuntResult;
+    puzzleNumber: number;
+    puzzleDate: string;
+    language: Language;
+  }> = [];
+
+  const languages: Language[] = ['en', 'he', 'sv', 'ja', 'es'];
+
+  for (const language of languages) {
+    const results = getAllWordHuntResults(language);
+    for (const stored of results) {
+      allResults.push({
+        result: stored.result,
+        puzzleNumber: stored.puzzleNumber,
+        puzzleDate: stored.date,
+        language,
+      });
+    }
+  }
+
+  return allResults;
+}
+
+/**
+ * Sync all guest daily challenge results to authenticated account
+ * Should be called after signup to ensure all progress is transferred
+ * Returns the number of results successfully synced
+ */
+export async function syncGuestDailyResultsToAccount(
+  userId: string,
+  userProfile: { display_name: string | null; username: string; avatar_emoji: string | null; avatar_color: string | null; avatar_image: string | null; profile_picture_url: string | null }
+): Promise<number> {
+  if (typeof window === 'undefined') return 0;
+
+  try {
+    // Get all guest results from localStorage
+    const allGuestResults = getAllGuestDailyResults();
+
+    if (allGuestResults.length === 0) {
+      console.log('[Sync] No guest daily results to sync');
+      return 0;
+    }
+
+    console.log(`[Sync] Found ${allGuestResults.length} guest daily results to sync`);
+
+    // Get guest player info for fallback
+    const guestPlayer = await getGuestDailyPlayer();
+    let successCount = 0;
+
+    // Submit each result to the backend
+    for (const { result, puzzleNumber, puzzleDate, language } of allGuestResults) {
+      try {
+        const bodyData: Record<string, unknown> = {
+          puzzleDate,
+          puzzleNumber,
+          language,
+          playerId: userId,
+          guestFingerprint: null, // Now authenticated, use player ID
+          displayName: userProfile.display_name || userProfile.username,
+          avatarEmoji: userProfile.avatar_emoji || guestPlayer?.avatarEmoji || '🎯',
+          avatarColor: userProfile.avatar_color || guestPlayer?.avatarColor || '#6366f1',
+          avatarImage: userProfile.avatar_image || undefined,
+          profilePictureUrl: userProfile.profile_picture_url || undefined,
+          solved: result.solved,
+          attemptsUsed: result.attemptsUsed,
+          targetWord: result.targetWord,
+          attemptWords: result.attempts.map(a => ({
+            word: a.word,
+            feedback: a.feedback.map(f => ({
+              letter: f.letter,
+              feedback: f.feedback,
+              position: f.position,
+            })),
+            timestamp: a.timestamp,
+          })),
+        };
+
+        // Add survival mode fields if present
+        if (result.wordsDiscovered) bodyData.wordsDiscovered = result.wordsDiscovered;
+        if (result.lifeRemaining !== undefined) bodyData.lifeRemaining = result.lifeRemaining;
+        if (result.clueTokensEarned !== undefined) bodyData.clueTokensEarned = result.clueTokensEarned;
+        if (result.clueTokensSpent !== undefined) bodyData.clueTokensSpent = result.clueTokensSpent;
+        if (result.hintsUnlocked !== undefined) bodyData.hintsUnlocked = result.hintsUnlocked;
+        if (result.efficiencyScore !== undefined) bodyData.efficiencyScore = result.efficiencyScore;
+
+        const response = await fetch('/api/daily-challenge/word-hunt/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(bodyData),
+        });
+
+        if (response.ok) {
+          successCount++;
+          console.log(`[Sync] Synced result for ${puzzleDate} (${language})`);
+        } else {
+          const errorText = await response.text();
+          console.warn(`[Sync] Failed to sync result for ${puzzleDate} (${language}):`, errorText);
+        }
+      } catch (err) {
+        console.warn(`[Sync] Error syncing result for ${puzzleDate} (${language}):`, err);
+      }
+    }
+
+    console.log(`[Sync] Successfully synced ${successCount}/${allGuestResults.length} guest daily results`);
+
+    // Clear guest daily results from localStorage after successful sync
+    if (successCount > 0) {
+      clearAllGuestDailyResults();
+    }
+
+    return successCount;
+  } catch (err) {
+    console.error('[Sync] Error syncing guest daily results:', err);
+    return 0;
+  }
+}
+
+/**
+ * Clear all guest daily challenge results from localStorage
+ * Should be called after syncing to authenticated account
+ */
+function clearAllGuestDailyResults(): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    const languages: Language[] = ['en', 'he', 'sv', 'ja', 'es'];
+
+    for (const language of languages) {
+      // Find and remove all Word Hunt results for this language
+      const prefix = `${WORD_HUNT_STORAGE_KEY}_${language}_`;
+      const keysToRemove: string[] = [];
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(prefix)) {
+          keysToRemove.push(key);
+        }
+      }
+
+      // Remove all found keys
+      for (const key of keysToRemove) {
+        localStorage.removeItem(key);
+      }
+    }
+
+    // Also clear streak data and other guest daily-related data
+    localStorage.removeItem(DAILY_STREAK_KEY);
+    localStorage.removeItem(GUEST_DAILY_PLAYER_KEY);
+    localStorage.removeItem(GUEST_FINGERPRINT_KEY);
+
+    console.log('[Sync] Cleared all guest daily results from localStorage');
+  } catch (err) {
+    console.warn('[Sync] Error clearing guest daily results:', err);
+  }
+}

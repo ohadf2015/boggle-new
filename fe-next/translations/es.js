@@ -2704,6 +2704,7 @@ const es = {
     "onlyMatchingLength": "¡Solo las palabras de {length} letras usan tus intentos!",
     "tookChallenge": "aceptaron el desafío",
     "signUpToAppear": "¡Regístrate para aparecer en la clasificación!",
+    "showLeaderboard": "Mostrar tabla de líderes",
     "carousel": {
       "step1Title": "Desliza para formar palabras",
       "step1Desc": "Conecta letras en cualquier dirección",
