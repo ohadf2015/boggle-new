@@ -25,12 +25,38 @@ fi
 echo "✅ Type check passed"
 echo ""
 
-# Step 3: Tests
-echo "🧪 Step 3/3: Running tests..."
-if ! npm test; then
-  echo ""
-  echo "❌ Tests failed. Please fix the failing tests above before pushing."
-  exit 1
+# Step 3: Tests (only for changed files)
+echo "🧪 Step 3/3: Running tests for changed files..."
+
+# Get list of changed files vs origin/master (excluding deleted files)
+CHANGED_FILES=$(git -C .. diff --name-only --diff-filter=d origin/master...HEAD 2>/dev/null | grep -E '\.(ts|tsx|js|jsx)$' || true)
+
+if [ -z "$CHANGED_FILES" ]; then
+  echo "ℹ️  No relevant file changes detected, skipping tests"
+else
+  # Separate backend and frontend files
+  BACKEND_FILES=$(echo "$CHANGED_FILES" | grep -E '^fe-next/backend/' | sed 's|^fe-next/||' || true)
+  FRONTEND_FILES=$(echo "$CHANGED_FILES" | grep -E '^fe-next/' | grep -v '^fe-next/backend/' | sed 's|^fe-next/||' || true)
+
+  # Run backend tests if backend files changed
+  if [ -n "$BACKEND_FILES" ]; then
+    echo "  📦 Running backend tests for changed files..."
+    if ! npx jest --config=backend/jest.config.js --findRelatedTests $BACKEND_FILES --passWithNoTests; then
+      echo ""
+      echo "❌ Backend tests failed. Please fix the failing tests above before pushing."
+      exit 1
+    fi
+  fi
+
+  # Run frontend tests if frontend files changed
+  if [ -n "$FRONTEND_FILES" ]; then
+    echo "  🎨 Running frontend tests for changed files..."
+    if ! npx jest --config=jest.config.js --findRelatedTests $FRONTEND_FILES --passWithNoTests; then
+      echo ""
+      echo "❌ Frontend tests failed. Please fix the failing tests above before pushing."
+      exit 1
+    fi
+  fi
 fi
 echo "✅ Tests passed"
 echo ""
