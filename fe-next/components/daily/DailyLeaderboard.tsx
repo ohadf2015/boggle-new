@@ -205,6 +205,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
   const [participants, setParticipants] = useState<DailyParticipant[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [totalAttempts, setTotalAttempts] = useState(0);
+  const [guestPlayerCount, setGuestPlayerCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState(false);
@@ -230,10 +231,11 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       }
 
       const data = await response.json();
-      console.log('Leaderboard data:', { url, date: puzzleDate, language, gameType, participants: data.data?.length, total: data.totalParticipants, totalAttempts: data.totalAttempts });
+      console.log('Leaderboard data:', { url, date: puzzleDate, language, gameType, participants: data.data?.length, total: data.totalParticipants, totalAttempts: data.totalAttempts, guestPlayerCount: data.guestPlayerCount });
       setParticipants(data.data || []);
       setTotalCount(data.totalParticipants || 0);
       setTotalAttempts(data.totalAttempts || 0);
+      setGuestPlayerCount(data.guestPlayerCount || 0);
 
       if (onParticipantCountChange) {
         onParticipantCountChange(data.totalParticipants || 0);
@@ -397,9 +399,14 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
             <h3 className="font-black text-base sm:text-lg uppercase tracking-wide text-slate-800 dark:text-white">
               {t('daily.todaysPlayers')}
             </h3>
-            {totalAttempts > 0 && (
+            {(totalAttempts > 0 || guestPlayerCount > 0) && (
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
                 {totalAttempts} {totalAttempts === 1 ? t('daily.playerSingular') : t('daily.playersPlural')} {t('daily.tookChallenge') || 'took the challenge'}
+                {guestPlayerCount > 0 && (
+                  <span className="text-slate-500 dark:text-slate-500">
+                    {' '}({guestPlayerCount} {guestPlayerCount === 1 ? t('daily.guestSingular') || 'guest' : t('daily.guestsPlural') || 'guests'})
+                  </span>
+                )}
               </p>
             )}
           </div>
@@ -439,7 +446,12 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
             </h3>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
               {totalCount} {totalCount === 1 ? t('daily.playerSingular') : t('daily.playersPlural')}
-              {totalAttempts > totalCount && (
+              {guestPlayerCount > 0 && (
+                <span className="text-slate-500 dark:text-slate-500">
+                  {' '}• {guestPlayerCount} {guestPlayerCount === 1 ? t('daily.guestSingular') || 'guest' : t('daily.guestsPlural') || 'guests'}
+                </span>
+              )}
+              {totalAttempts > totalCount + guestPlayerCount && (
                 <span className="text-slate-500 dark:text-slate-500">
                   {' '}• {totalAttempts} {t('daily.totalAttempts') || 'total attempts'}
                 </span>
