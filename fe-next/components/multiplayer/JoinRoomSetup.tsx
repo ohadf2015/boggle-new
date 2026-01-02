@@ -100,6 +100,7 @@ const JoinRoomSetup: React.FC<JoinRoomSetupProps> = ({
         setSelectedAvatarId(savedAvatarId);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentionally run only on mount
   }, []);
 
   // For authenticated users, use display name
@@ -107,6 +108,7 @@ const JoinRoomSetup: React.FC<JoinRoomSetupProps> = ({
     if (isAuthenticated && displayName && !username) {
       setUsername(displayName);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Only run when auth state changes
   }, [isAuthenticated, displayName]);
 
   // Real-time validation
@@ -285,18 +287,21 @@ const JoinRoomSetup: React.FC<JoinRoomSetupProps> = ({
                       >
                         <div className="w-20 h-20 rounded-full border-3 border-neo-cyan shadow-hard overflow-hidden group-hover:border-purple-400 transition-colors">
                           {selectedAvatarId && selectedAvatarId !== PROFILE_AVATAR_ID ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
                             <img
                               src={getAvatarPath(getAvatarById(selectedAvatarId) || AVATARS[0])}
                               alt={displayName || 'Avatar'}
                               className="w-full h-full object-cover"
                             />
                           ) : profilePictureUrl ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
                             <img
                               src={profilePictureUrl}
                               alt={displayName || 'Profile'}
                               className="w-full h-full object-cover"
                             />
                           ) : initialAvatarId ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
                             <img
                               src={getAvatarPath(getAvatarById(initialAvatarId) || AVATARS[0])}
                               alt={displayName || 'Avatar'}
@@ -320,6 +325,7 @@ const JoinRoomSetup: React.FC<JoinRoomSetupProps> = ({
                               "w-20 h-20 rounded-full border-3 shadow-hard overflow-hidden transition-all",
                               avatarError ? "border-red-500" : "border-neo-cyan"
                             )}>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
                                 src={getAvatarPath(getAvatarById(selectedAvatarId) || AVATARS[0])}
                                 alt="Selected avatar"
@@ -412,6 +418,7 @@ const JoinRoomSetup: React.FC<JoinRoomSetupProps> = ({
                               className="aspect-square rounded-full border-2 border-neo-black hover:scale-105 shadow-hard-sm transition-all overflow-hidden"
                               aria-label={`Select ${avatar.name} avatar`}
                             >
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
                                 src={getAvatarPath(avatar)}
                                 alt={avatar.name}

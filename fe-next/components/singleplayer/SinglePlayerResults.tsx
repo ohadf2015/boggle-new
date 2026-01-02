@@ -221,7 +221,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         const sessionId = await logGameStart({
           mode: 'singleplayer',
           language: language as string,
-          userId: null, // Will be set by the API if authenticated
+          userId: user?.id || null, // Pass user ID if authenticated
         });
 
         if (sessionId) {

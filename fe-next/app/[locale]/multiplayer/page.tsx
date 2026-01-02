@@ -1144,7 +1144,7 @@ export default function MultiplayerPage(): React.JSX.Element {
 
       logger.log('[JOIN] join event emitted, waiting for response...');
     }
-  }, [socket, isConnected, gameCode, username, roomName, language, t, isSupabaseEnabled, user, profile, loading, authLoadingStartTime, guestAvatar]);
+  }, [socket, isConnected, gameCode, username, roomName, language, t, isSupabaseEnabled, user, profile, loading, authLoadingStartTime, guestAvatar, hostUsername]);
 
   const refreshRooms = useCallback(() => {
     if (socket && isConnected) {

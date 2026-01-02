@@ -76,6 +76,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
         setSelectedAvatarId(savedAvatarId);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentionally run only on mount
   }, []);
 
   // For authenticated users, use display name
@@ -83,6 +84,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
     if (isAuthenticated && displayName && !username) {
       setUsername(displayName);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Only run when auth state changes
   }, [isAuthenticated, displayName]);
 
   // Real-time validation
@@ -228,18 +230,21 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                         <div className="w-14 h-14 rounded-full border-3 border-neo-cyan shadow-hard overflow-hidden group-hover:border-purple-400 transition-colors">
                           {/* Show selected game avatar if set (not PROFILE_AVATAR_ID), otherwise profile picture or initial avatar */}
                           {selectedAvatarId && selectedAvatarId !== PROFILE_AVATAR_ID ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
                             <img
                               src={getAvatarPath(getAvatarById(selectedAvatarId) || AVATARS[0])}
                               alt={displayName || 'Avatar'}
                               className="w-full h-full object-cover"
                             />
                           ) : profilePictureUrl ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
                             <img
                               src={profilePictureUrl}
                               alt={displayName || 'Profile'}
                               className="w-full h-full object-cover"
                             />
                           ) : initialAvatarId ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
                             <img
                               src={getAvatarPath(getAvatarById(initialAvatarId) || AVATARS[0])}
                               alt={displayName || 'Avatar'}
@@ -316,6 +321,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                             aria-pressed={isSelected}
                           >
                             {avatarConfig && (
+                              /* eslint-disable-next-line @next/next/no-img-element */
                               <img
                                 src={getAvatarPath(avatarConfig)}
                                 alt={avatar.name}

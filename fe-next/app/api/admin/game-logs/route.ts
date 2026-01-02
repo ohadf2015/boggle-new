@@ -233,15 +233,158 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Fetch Word Hunt games from daily_word_hunt_attempts
+    let wordHuntGames: any[] = [];
+    let wordHuntCount = 0;
+
+    try {
+      let wordHuntQuery = supabase
+        .from('daily_word_hunt_attempts')
+        .select(`
+          id,
+          user_id,
+          guest_token,
+          language,
+          score,
+          words_found,
+          longest_word,
+          duration_seconds,
+          created_at,
+          profiles:user_id (
+            username,
+            display_name,
+            avatar_emoji,
+            avatar_color
+          )
+        `, { count: 'exact' });
+
+      // Apply filters
+      if (language && language !== 'all') {
+        wordHuntQuery = wordHuntQuery.eq('language', language);
+      }
+
+      // Word Hunt games are never ranked
+      if (isRanked === 'true') {
+        wordHuntGames = [];
+        wordHuntCount = 0;
+      } else {
+        if (startDate) {
+          wordHuntQuery = wordHuntQuery.gte('created_at', startDate);
+        }
+
+        if (endDate) {
+          wordHuntQuery = wordHuntQuery.lte('created_at', `${endDate}T23:59:59.999Z`);
+        }
+
+        wordHuntQuery = wordHuntQuery.order('created_at', { ascending });
+
+        const { data: wordHuntData, error: wordHuntError, count: whCount } = await wordHuntQuery;
+
+        if (wordHuntError) {
+          console.error('[admin/game-logs] Word Hunt query error:', wordHuntError);
+        } else {
+          wordHuntCount = whCount || 0;
+          wordHuntGames = (wordHuntData || []).map((attempt: any) => ({
+            id: attempt.id,
+            player_id: attempt.user_id,
+            guest_session_id: attempt.guest_token,
+            game_code: 'word_hunt',
+            score: attempt.score || 0,
+            word_count: Array.isArray(attempt.words_found) ? attempt.words_found.length : 0,
+            longest_word: attempt.longest_word || null,
+            placement: null,
+            is_ranked: false,
+            is_guest: !attempt.user_id,
+            mode: 'word_hunt',
+            language: attempt.language,
+            time_played: attempt.duration_seconds || 0,
+            created_at: attempt.created_at,
+            profiles: attempt.profiles || null,
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('[admin/game-logs] Word Hunt fetch error:', error);
+    }
+
+    // Fetch Daily Challenge games from daily_puzzle_attempts
+    let dailyChallengeGames: any[] = [];
+    let dailyChallengeCount = 0;
+
+    try {
+      let dailyQuery = supabase
+        .from('daily_puzzle_attempts')
+        .select(`
+          id,
+          user_id,
+          guest_token,
+          puzzle_number,
+          score,
+          words_found,
+          completed,
+          duration_seconds,
+          created_at,
+          profiles:user_id (
+            username,
+            display_name,
+            avatar_emoji,
+            avatar_color
+          )
+        `, { count: 'exact' });
+
+      // Daily Challenge games are never ranked
+      if (isRanked === 'true') {
+        dailyChallengeGames = [];
+        dailyChallengeCount = 0;
+      } else {
+        if (startDate) {
+          dailyQuery = dailyQuery.gte('created_at', startDate);
+        }
+
+        if (endDate) {
+          dailyQuery = dailyQuery.lte('created_at', `${endDate}T23:59:59.999Z`);
+        }
+
+        dailyQuery = dailyQuery.order('created_at', { ascending });
+
+        const { data: dailyData, error: dailyError, count: dcCount } = await dailyQuery;
+
+        if (dailyError) {
+          console.error('[admin/game-logs] Daily Challenge query error:', dailyError);
+        } else {
+          dailyChallengeCount = dcCount || 0;
+          dailyChallengeGames = (dailyData || []).map((attempt: any) => ({
+            id: attempt.id,
+            player_id: attempt.user_id,
+            guest_session_id: attempt.guest_token,
+            game_code: `daily_${attempt.puzzle_number}`,
+            score: attempt.score || 0,
+            word_count: Array.isArray(attempt.words_found) ? attempt.words_found.length : 0,
+            longest_word: null,
+            placement: null,
+            is_ranked: false,
+            is_guest: !attempt.user_id,
+            mode: 'daily_challenge',
+            language: 'en', // Daily puzzles are typically English
+            time_played: attempt.duration_seconds || 0,
+            created_at: attempt.created_at,
+            profiles: attempt.profiles || null,
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('[admin/game-logs] Daily Challenge fetch error:', error);
+    }
+
     // Combine and sort all games
-    const allGames = [...authGames, ...guestGames].sort((a, b) => {
+    const allGames = [...authGames, ...guestGames, ...wordHuntGames, ...dailyChallengeGames].sort((a, b) => {
       const dateA = new Date(a.created_at).getTime();
       const dateB = new Date(b.created_at).getTime();
       return ascending ? dateA - dateB : dateB - dateA;
     });
 
     // Calculate total count
-    const totalCount = (authCount || 0) + guestCount;
+    const totalCount = (authCount || 0) + guestCount + wordHuntCount + dailyChallengeCount;
 
     // Apply pagination to combined results
     const paginatedGames = allGames.slice(offset, offset + pageSize);
@@ -265,6 +408,8 @@ export async function GET(request: NextRequest) {
       breakdown: {
         authenticatedGames: authCount || 0,
         guestGames: guestCount,
+        wordHuntGames: wordHuntCount,
+        dailyChallengeGames: dailyChallengeCount,
       },
     });
   } catch (error) {

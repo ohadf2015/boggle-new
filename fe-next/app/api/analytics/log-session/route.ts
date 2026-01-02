@@ -10,6 +10,7 @@ import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 // Import backend services (dynamic to avoid server/client issues)
 let logGameSession: any;
 let updateGameSession: any;
+let getOrCreateGuestSession: any;
 
 async function getLoggers() {
   if (!logGameSession || !updateGameSession) {
@@ -18,6 +19,14 @@ async function getLoggers() {
     updateGameSession = loggerModule.updateGameSession;
   }
   return { logGameSession, updateGameSession };
+}
+
+async function getGuestTracker() {
+  if (!getOrCreateGuestSession) {
+    const guestModule = await import('@/backend/modules/guestTracker');
+    getOrCreateGuestSession = guestModule.getOrCreateGuestSession;
+  }
+  return { getOrCreateGuestSession };
 }
 
 // Rate limit: 60 requests per minute per IP (generous for gameplay)
@@ -94,6 +103,17 @@ export async function POST(request: NextRequest) {
       }
 
       const { logGameSession: logFn } = await getLoggers();
+
+      // Ensure guest_sessions record exists for guest players (to satisfy FK constraint)
+      if (guestSessionId && !userId) {
+        const { getOrCreateGuestSession: createGuestFn } = await getGuestTracker();
+        await createGuestFn({
+          sessionId: guestSessionId,
+          deviceType: deviceType || null,
+          browser: browser || null,
+          language: language || null,
+        });
+      }
 
       // Log new session
       const newSessionId = await logFn({

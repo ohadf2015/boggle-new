@@ -220,6 +220,7 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
                 />
               ) : profile?.profile_picture_url ? (
                 <div className="w-12 h-12 rounded-full overflow-hidden border-3 border-neo-black shadow-hard-sm group-hover:border-neo-cyan transition-colors">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={profile.profile_picture_url}
                     alt={displayName}
