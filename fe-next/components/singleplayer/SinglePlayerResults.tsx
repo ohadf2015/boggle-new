@@ -46,6 +46,13 @@ const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSign
 // Session storage key for tracking if signup prompt was shown
 const SIGNUP_PROMPT_SHOWN_KEY = 'boggle_sp_signup_shown';
 
+// Confetti colors for each rank (matching Top3Leaderboard)
+const RANK_CONFETTI_COLORS: Record<number, string[]> = {
+  1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'], // Gold
+  2: ['#c0c0c0', '#94a3b8', '#e2e8f0', '#cbd5e1'], // Silver
+  3: ['#cd7f32', '#ea580c', '#f97316', '#fb923c'], // Bronze/Orange
+};
+
 interface SinglePlayerResultsProps {
   results: SinglePlayerResultsData;
   mode: SinglePlayerMode;
@@ -116,13 +123,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   // BUT only if player actually scored points (no confetti for 0 score)
   const hasMinimumScore = results.playerScore > 0;
   const shouldShowConfetti = hasMinimumScore && ((mode === 'solo-bots' && playerRank >= 1 && playerRank <= 3) || isWinner || results.isNewHighScore);
-
-  // Confetti colors for each rank (matching Top3Leaderboard)
-  const RANK_CONFETTI_COLORS: Record<number, string[]> = {
-    1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'], // Gold
-    2: ['#c0c0c0', '#94a3b8', '#e2e8f0', '#cbd5e1'], // Silver
-    3: ['#cd7f32', '#ea580c', '#f97316', '#fb923c'], // Bronze/Orange
-  };
 
   useEffect(() => {
     if (shouldShowConfetti) {
@@ -240,6 +240,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
     logSession();
     hasLoggedGameSessionRef.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- One-time logging, user?.id captured at mount
   }, [results, language, playerRank]);
 
   // Add game to history for the performance chart (runs for all users)
