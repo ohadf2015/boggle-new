@@ -309,6 +309,19 @@ function createTestEnvironment() {
     } catch (e) {
       // Module not loaded yet, nothing to clean
     }
+
+    // Clean up game start coordinator active sequences
+    try {
+      const gameStartCoordinator = require('../../utils/gameStartCoordinator');
+      // Cancel all active sequences to clear pending timeouts
+      if (gameStartCoordinator.activeSequences) {
+        for (const gameCode of gameStartCoordinator.activeSequences.keys()) {
+          gameStartCoordinator.cleanupSequence(gameCode);
+        }
+      }
+    } catch (e) {
+      // Module not loaded yet, nothing to clean
+    }
   };
 
   return {
