@@ -15,6 +15,7 @@ import { AVATARS, getAvatarById, getAvatarPath, type AvatarConfig } from '@/util
 import LandscapeIndicator from '@/components/LandscapeIndicator';
 import { Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getStoredUsername, getStoredAvatarId, setStoredUsername, setStoredAvatarId } from '@/utils/profileStorage';
 
 export interface ProfileData {
   username: string;
@@ -65,8 +66,8 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
   // Load from localStorage on mount (only for guests)
   useEffect(() => {
     if (typeof window !== 'undefined' && !isAuthenticated) {
-      const savedUsername = localStorage.getItem('boggle_username');
-      const savedAvatarId = localStorage.getItem('boggle_avatar_id');
+      const savedUsername = getStoredUsername();
+      const savedAvatarId = getStoredAvatarId();
 
       if (savedUsername && !username) {
         setUsername(savedUsername);
@@ -105,9 +106,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
   const handleAvatarSelect = (avatar: AvatarConfig) => {
     setSelectedAvatarId(avatar.id);
     setAvatarError(false); // Clear error when avatar is selected
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('boggle_avatar_id', avatar.id);
-    }
+    setStoredAvatarId(avatar.id);
     // Pre-fill username with avatar name if empty
     if (!username.trim()) {
       setUsername(avatar.name);
@@ -145,10 +144,10 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
     const effectiveAvatarId = selectedAvatarId || initialAvatarId || PROFILE_AVATAR_ID;
 
     // Save to localStorage (only for guests, authenticated users keep their profile settings)
-    if (typeof window !== 'undefined' && !isAuthenticated) {
-      localStorage.setItem('boggle_username', username);
+    if (!isAuthenticated) {
+      setStoredUsername(username);
       if (selectedAvatarId) {
-        localStorage.setItem('boggle_avatar_id', selectedAvatarId);
+        setStoredAvatarId(selectedAvatarId);
       }
     }
 

@@ -18,6 +18,7 @@ import { getGuestSessionId, hashToken } from '@/utils/guestManager';
 import { getSession as getSupabaseSession } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
+import { getStoredUsername, setStoredUsername, getStoredAvatarId } from '@/utils/profileStorage';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 
 interface ResultsData {
@@ -174,9 +175,7 @@ export default function MultiplayerPage(): React.JSX.Element {
       const urlParams = new URLSearchParams(window.location.search);
       const roomFromUrl = urlParams.get('room');
       logger.log('[Init] URL search:', window.location.search, '| roomFromUrl:', roomFromUrl);
-      const savedUsername = typeof window !== 'undefined'
-        ? localStorage.getItem('boggle_username') || ''
-        : '';
+      const savedUsername = getStoredUsername() || '';
       const savedSession = getSession();
 
       let joiningNewRoomViaInvitation = false;
@@ -286,9 +285,7 @@ export default function MultiplayerPage(): React.JSX.Element {
     } else if (!hasSetRandomNameRef.current) {
       // Guest user - check if we need to generate a random name
       // Use ref to prevent setting random names multiple times
-      const savedUsername = typeof window !== 'undefined'
-        ? localStorage.getItem('boggle_username') || ''
-        : '';
+      const savedUsername = getStoredUsername() || '';
 
       // IMPORTANT: Check current username state first - user may have typed a name in the form
       // Only generate random name if BOTH saved and current username are empty
@@ -489,9 +486,9 @@ export default function MultiplayerPage(): React.JSX.Element {
       const joinedUsername = data.username || username;
       if (data.isHost) {
         setUsername(joinedUsername);
-        localStorage.setItem('boggle_username', joinedUsername);
+        setStoredUsername(joinedUsername);
       } else if (username) {
-        localStorage.setItem('boggle_username', username);
+        setStoredUsername(username);
       }
 
       saveSession({
@@ -1023,7 +1020,7 @@ export default function MultiplayerPage(): React.JSX.Element {
     }
 
     // Get selected avatar image from localStorage
-    const avatarImageId = typeof window !== 'undefined' ? localStorage.getItem('boggle_avatar_id') : null;
+    const avatarImageId = getStoredAvatarId();
 
     // Determine avatar to use: profile > guest state > just-generated > derive from name
     const effectiveAvatar = profile

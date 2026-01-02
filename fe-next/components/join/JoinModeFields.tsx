@@ -14,6 +14,7 @@ import EmojiAvatarPicker, { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPi
 import { AVATARS, getAvatarById, type AvatarConfig } from '@/utils/avatarConfig';
 import { useAuth } from '@/contexts/AuthContext';
 import Avatar from '@/components/Avatar';
+import { getStoredAvatarId, setStoredAvatarId, setStoredUsername } from '@/utils/profileStorage';
 
 export interface JoinModeFieldsProps {
   gameCode: string;
@@ -66,7 +67,7 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
         }
       } else {
         // Guest users: load from localStorage
-        const saved = localStorage.getItem('boggle_avatar_id');
+        const saved = getStoredAvatarId();
         if (saved) {
           setSelectedAvatarId(saved);
         }
@@ -88,17 +89,13 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
       await updateProfile({ avatar_image: avatar.id });
     } else {
       // Guest users: save to localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('boggle_avatar_id', avatar.id);
-      }
+      setStoredAvatarId(avatar.id);
       // Pre-fill username with avatar name ONLY if username is empty
       // Don't override if user has already entered a name (even if it matches an avatar name)
       if (!username || username.trim() === '') {
         setUsername(avatar.name);
         // Save the avatar name to localStorage to persist across page reloads
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('boggle_username', avatar.name);
-        }
+        setStoredUsername(avatar.name);
       }
     }
   };

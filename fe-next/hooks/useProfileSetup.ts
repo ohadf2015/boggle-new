@@ -3,6 +3,13 @@ import { validateUsername } from '@/utils/validation';
 import { useDebouncedValidation } from '@/hooks/useDebouncedValidation';
 import { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
 import { getAvatarById, type AvatarConfig } from '@/utils/avatarConfig';
+import {
+  getStoredUsername,
+  getStoredAvatarId,
+  setStoredUsername,
+  setStoredAvatarId,
+  saveStoredProfile,
+} from '@/utils/profileStorage';
 
 interface UseProfileSetupOptions {
   isAuthenticated: boolean;
@@ -100,8 +107,8 @@ export function useProfileSetup(options: UseProfileSetupOptions): UseProfileSetu
   // Load from localStorage on mount (only for guests)
   useEffect(() => {
     if (typeof window !== 'undefined' && !isAuthenticated && !usernameLoadedRef.current) {
-      const savedUsername = localStorage.getItem('boggle_username');
-      const savedAvatarId = localStorage.getItem('boggle_avatar_id');
+      const savedUsername = getStoredUsername();
+      const savedAvatarId = getStoredAvatarId();
 
       if (savedUsername && !username) {
         setUsername(savedUsername);
@@ -143,10 +150,8 @@ export function useProfileSetup(options: UseProfileSetupOptions): UseProfileSetu
       setSelectedAvatarId(avatar.id);
       setAvatarError(false);
 
-      // Save to localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('boggle_avatar_id', avatar.id);
-      }
+      // Save to profile storage
+      setStoredAvatarId(avatar.id);
 
       // Pre-fill username with avatar name if empty
       if (!username.trim()) {
@@ -196,14 +201,10 @@ export function useProfileSetup(options: UseProfileSetupOptions): UseProfileSetu
 
   // Save current state to localStorage
   const saveToLocalStorage = useCallback(() => {
-    if (typeof window !== 'undefined') {
-      if (username.trim()) {
-        localStorage.setItem('boggle_username', username.trim());
-      }
-      if (selectedAvatarId && selectedAvatarId !== PROFILE_AVATAR_ID) {
-        localStorage.setItem('boggle_avatar_id', selectedAvatarId);
-      }
-    }
+    saveStoredProfile({
+      username: username.trim() || undefined,
+      avatarId: selectedAvatarId !== PROFILE_AVATAR_ID ? selectedAvatarId : undefined,
+    });
   }, [username, selectedAvatarId]);
 
   return {

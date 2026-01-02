@@ -17,6 +17,7 @@ import { AVATARS, getAvatarById, getAvatarPath, type AvatarConfig } from '@/util
 import LandscapeIndicator from '@/components/LandscapeIndicator';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/shared/types/game';
+import { getStoredUsername, getStoredAvatarId, setStoredUsername, setStoredAvatarId } from '@/utils/profileStorage';
 
 interface CreateRoomSetupProps {
   // Auth state
@@ -79,8 +80,8 @@ const CreateRoomSetup: React.FC<CreateRoomSetupProps> = ({
   // Load from localStorage on mount (only for guests)
   useEffect(() => {
     if (typeof window !== 'undefined' && !isAuthenticated) {
-      const savedUsername = localStorage.getItem('boggle_username');
-      const savedAvatarId = localStorage.getItem('boggle_avatar_id');
+      const savedUsername = getStoredUsername();
+      const savedAvatarId = getStoredAvatarId();
 
       if (savedUsername && !username) {
         setUsername(savedUsername);
@@ -128,9 +129,7 @@ const CreateRoomSetup: React.FC<CreateRoomSetupProps> = ({
   const handleAvatarSelect = (avatar: AvatarConfig) => {
     setSelectedAvatarId(avatar.id);
     setAvatarError(false);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('boggle_avatar_id', avatar.id);
-    }
+    setStoredAvatarId(avatar.id);
     // Pre-fill username with avatar name if empty
     if (!username.trim()) {
       setUsername(avatar.name);
@@ -169,10 +168,10 @@ const CreateRoomSetup: React.FC<CreateRoomSetupProps> = ({
     const finalRoomName = roomName.trim() || `${username} Room`;
 
     // Save to localStorage (only for guests)
-    if (typeof window !== 'undefined' && !isAuthenticated) {
-      localStorage.setItem('boggle_username', username);
+    if (!isAuthenticated) {
+      setStoredUsername(username);
       if (selectedAvatarId) {
-        localStorage.setItem('boggle_avatar_id', selectedAvatarId);
+        setStoredAvatarId(selectedAvatarId);
       }
     }
 

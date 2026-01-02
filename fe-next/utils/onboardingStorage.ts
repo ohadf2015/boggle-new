@@ -3,6 +3,8 @@
  * Tracks whether user has completed onboarding and stores their preferences
  */
 
+import { setStoredUsername, setStoredAvatarId } from '@/utils/profileStorage';
+
 const STORAGE_KEYS = {
   ONBOARDING_COMPLETED: 'lexiclash_onboarding_completed',
   ONBOARDING_DATA: 'lexiclash_onboarding_data',
@@ -38,8 +40,8 @@ export const markOnboardingComplete = (data: Omit<OnboardingData, 'completedAt'>
   localStorage.setItem(STORAGE_KEYS.ONBOARDING_DATA, JSON.stringify(completeData));
 
   // Also save to keys used by multiplayer flow for profile persistence
-  localStorage.setItem('boggle_username', data.displayName);
-  localStorage.setItem('boggle_avatar_id', data.avatarId);
+  setStoredUsername(data.displayName);
+  setStoredAvatarId(data.avatarId);
 };
 
 /**

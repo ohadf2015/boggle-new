@@ -6,6 +6,7 @@ import CreateRoomSetup from './CreateRoomSetup';
 import JoinRoomSetup from './JoinRoomSetup';
 import InvitationQuickJoin from './InvitationQuickJoin';
 import type { Language, ActiveRoom } from '@/shared/types/game';
+import { getStoredUsername, getStoredAvatarId } from '@/utils/profileStorage';
 
 type FlowState = 'selector' | 'create-setup' | 'join-setup' | 'invitation-quick-join';
 
@@ -67,8 +68,8 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     if (!prefilledRoom) return;
 
     // Check for saved profile in localStorage
-    const storedUsername = typeof window !== 'undefined' ? localStorage.getItem('boggle_username') : null;
-    const storedAvatarId = typeof window !== 'undefined' ? localStorage.getItem('boggle_avatar_id') : null;
+    const storedUsername = getStoredUsername();
+    const storedAvatarId = getStoredAvatarId();
 
     // Set the game code for the prefilled room
     setGameCode(prefilledRoom);
@@ -103,8 +104,8 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   // Handle quick join from selector
   const handleQuickJoin = useCallback((roomCode: string) => {
     // Check if we have saved profile in localStorage
-    const storedUsername = typeof window !== 'undefined' ? localStorage.getItem('boggle_username') : null;
-    const storedAvatarId = typeof window !== 'undefined' ? localStorage.getItem('boggle_avatar_id') : null;
+    const storedUsername = getStoredUsername();
+    const storedAvatarId = getStoredAvatarId();
 
     if (storedUsername && storedAvatarId) {
       // Already have profile, join directly
