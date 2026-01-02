@@ -120,7 +120,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
   // Hint prompt state - shows after player hasn't found a word for a while
   const [showHintPrompt, setShowHintPrompt] = useState(false);
-  const lastWordFoundTimeRef = useRef<number>(Date.now());
+  const lastWordFoundTimeRef = useRef<number>(0);
 
   // Word forming state (for external WordFormingArea)
   const [formedWord, setFormedWord] = useState('');
@@ -300,6 +300,11 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     if (isPaused || isGameOver || !grid) return;
 
     const HINT_PROMPT_DELAY = 15000; // 15 seconds of inactivity
+
+    // Initialize the ref on first run (avoids impure Date.now() call during render)
+    if (lastWordFoundTimeRef.current === 0) {
+      lastWordFoundTimeRef.current = Date.now();
+    }
 
     const checkInactivity = setInterval(() => {
       const timeSinceLastWord = Date.now() - lastWordFoundTimeRef.current;

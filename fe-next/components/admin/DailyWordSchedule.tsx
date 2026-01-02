@@ -108,6 +108,39 @@ export const DailyWordSchedule: React.FC = () => {
   // Get today's date string
   const getTodayDateString = () => new Date().toISOString().split('T')[0];
 
+  // Fetch attempt summaries for multiple dates
+  const fetchAttemptSummaries = useCallback(async (dates: string[]) => {
+    try {
+      const { data, error } = await supabase
+        .from('daily_word_hunt_attempts')
+        .select('puzzle_date, solved')
+        .eq('language', selectedLang)
+        .in('puzzle_date', dates);
+
+      if (error) throw error;
+
+      const summaries: Record<string, AttemptSummary> = {};
+      dates.forEach(date => {
+        summaries[date] = { total: 0, solved: 0, failed: 0 };
+      });
+
+      (data || []).forEach((attempt: { puzzle_date: string; solved: boolean }) => {
+        if (summaries[attempt.puzzle_date]) {
+          summaries[attempt.puzzle_date].total++;
+          if (attempt.solved) {
+            summaries[attempt.puzzle_date].solved++;
+          } else {
+            summaries[attempt.puzzle_date].failed++;
+          }
+        }
+      });
+
+      setAttemptSummaries(summaries);
+    } catch (err) {
+      console.error('Failed to fetch attempt summaries:', err);
+    }
+  }, [supabase, selectedLang]);
+
   // Fetch scheduled words for the configured date range
   const fetchScheduledWords = useCallback(async () => {
     setLoading(true);
@@ -144,40 +177,7 @@ export const DailyWordSchedule: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [selectedLang, supabase, daysToShow, dateOffset]);
-
-  // Fetch attempt summaries for multiple dates
-  const fetchAttemptSummaries = async (dates: string[]) => {
-    try {
-      const { data, error } = await supabase
-        .from('daily_word_hunt_attempts')
-        .select('puzzle_date, solved')
-        .eq('language', selectedLang)
-        .in('puzzle_date', dates);
-
-      if (error) throw error;
-
-      const summaries: Record<string, AttemptSummary> = {};
-      dates.forEach(date => {
-        summaries[date] = { total: 0, solved: 0, failed: 0 };
-      });
-
-      (data || []).forEach((attempt: { puzzle_date: string; solved: boolean }) => {
-        if (summaries[attempt.puzzle_date]) {
-          summaries[attempt.puzzle_date].total++;
-          if (attempt.solved) {
-            summaries[attempt.puzzle_date].solved++;
-          } else {
-            summaries[attempt.puzzle_date].failed++;
-          }
-        }
-      });
-
-      setAttemptSummaries(summaries);
-    } catch (err) {
-      console.error('Failed to fetch attempt summaries:', err);
-    }
-  };
+  }, [selectedLang, supabase, daysToShow, dateOffset, fetchAttemptSummaries]);
 
   useEffect(() => {
     fetchScheduledWords();
