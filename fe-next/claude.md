@@ -86,6 +86,7 @@
 - **Resource Cleanup**: Close connections, clear timers
 - **Modular Code**: Split files > 500 lines
 - **Accessibility**: Follow WCAG 2.1 AA standards
+- **Supabase MCP**: ALWAYS use Supabase MCP tools to test, debug, and implement Supabase-related issues (queries, migrations, RLS policies, logs, etc.)
 - **ALWAYS refer to CLAUDE.md before making changes**
 - **ALWAYS VERIFY BUILD AND TESTS PASS AFTER CHANGES**
 

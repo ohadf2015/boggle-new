@@ -1086,4 +1086,143 @@ router.get('/word-hunt/alltime-leaderboard/:language', async (req: Request<{ lan
   }
 });
 
+/**
+ * POST /api/daily-challenge/claim-guest-results
+ * Claim all guest daily challenge results for a newly authenticated user
+ * This securely transfers guest results to the user account by updating
+ * existing server records (not from localStorage - preventing manipulation)
+ */
+router.post('/claim-guest-results', async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!isSupabaseConfigured()) {
+      res.status(503).json({ error: 'Service not available' });
+      return;
+    }
+
+    const {
+      guestFingerprint,
+      playerId,
+      displayName,
+      avatarEmoji,
+      avatarColor,
+      avatarImage,
+      profilePictureUrl
+    } = req.body;
+
+    // Validate required fields
+    if (!guestFingerprint || !playerId) {
+      res.status(400).json({ error: 'guestFingerprint and playerId are required' });
+      return;
+    }
+
+    logger.info('API', `[ClaimGuestResults] Claiming results for guestFingerprint=${guestFingerprint.substring(0, 8)}... playerId=${playerId}`);
+
+    const supabase = getSupabase();
+    let claimedCount = 0;
+    let totalEfficiencyScore = 0;
+
+    // Update Word Hunt attempts - transfer guest entries to the authenticated user
+    // Only update entries that haven't been claimed yet (player_id is null)
+    const updateData: Record<string, unknown> = {
+      player_id: playerId,
+    };
+
+    // Update display info if provided
+    if (displayName) updateData.display_name = displayName;
+    if (avatarEmoji) updateData.avatar_emoji = avatarEmoji;
+    if (avatarColor) updateData.avatar_color = avatarColor;
+    if (avatarImage) updateData.avatar_image = avatarImage;
+    if (profilePictureUrl) updateData.profile_picture_url = profilePictureUrl;
+
+    // First, get all unclaimed guest attempts to calculate total efficiency score
+    const { data: guestAttempts, error: fetchError } = await supabase
+      .from('daily_word_hunt_attempts')
+      .select('id, efficiency_score, solved')
+      .eq('guest_fingerprint', guestFingerprint)
+      .is('player_id', null);
+
+    if (fetchError) {
+      logger.error('API', `[ClaimGuestResults] Error fetching guest Word Hunt attempts: ${fetchError.message}`);
+    } else if (guestAttempts && guestAttempts.length > 0) {
+      // Calculate total efficiency score for solved puzzles
+      for (const attempt of guestAttempts) {
+        if (attempt.solved && attempt.efficiency_score) {
+          totalEfficiencyScore += Math.round(attempt.efficiency_score);
+        }
+      }
+
+      // Claim Word Hunt attempts
+      const { data: wordHuntData, error: wordHuntError } = await supabase
+        .from('daily_word_hunt_attempts')
+        .update(updateData)
+        .eq('guest_fingerprint', guestFingerprint)
+        .is('player_id', null)
+        .select('id');
+
+      if (wordHuntError) {
+        logger.error('API', `[ClaimGuestResults] Error claiming Word Hunt attempts: ${wordHuntError.message}`);
+      } else {
+        claimedCount += wordHuntData?.length || 0;
+        logger.info('API', `[ClaimGuestResults] Claimed ${wordHuntData?.length || 0} Word Hunt attempts`);
+      }
+    }
+
+    // Also claim regular daily puzzle attempts
+    const { data: dailyPuzzleData, error: dailyPuzzleError } = await supabase
+      .from('daily_puzzle_attempts')
+      .update(updateData)
+      .eq('guest_fingerprint', guestFingerprint)
+      .is('player_id', null)
+      .select('id');
+
+    if (dailyPuzzleError) {
+      logger.error('API', `[ClaimGuestResults] Error claiming daily puzzle attempts: ${dailyPuzzleError.message}`);
+    } else {
+      claimedCount += dailyPuzzleData?.length || 0;
+      if (dailyPuzzleData?.length) {
+        logger.info('API', `[ClaimGuestResults] Claimed ${dailyPuzzleData.length} daily puzzle attempts`);
+      }
+    }
+
+    // Update user's total_score with the efficiency points from claimed puzzles
+    if (totalEfficiencyScore > 0) {
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('total_score')
+          .eq('id', playerId)
+          .single();
+
+        if (profile) {
+          const newTotalScore = (profile.total_score || 0) + totalEfficiencyScore;
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ total_score: newTotalScore })
+            .eq('id', playerId);
+
+          if (updateError) {
+            logger.error('API', `[ClaimGuestResults] Failed to update total_score: ${updateError.message}`);
+          } else {
+            logger.info('API', `[ClaimGuestResults] Updated total_score: +${totalEfficiencyScore} (new total: ${newTotalScore})`);
+          }
+        }
+      } catch (scoreError) {
+        logger.error('API', `[ClaimGuestResults] Error updating total_score: ${(scoreError as Error).message}`);
+      }
+    }
+
+    logger.info('API', `[ClaimGuestResults] Successfully claimed ${claimedCount} total results for playerId=${playerId}`);
+
+    res.json({
+      success: true,
+      claimedCount,
+      totalEfficiencyScore
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('API', `[ClaimGuestResults] Error: ${err.message}`);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;

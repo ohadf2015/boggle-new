@@ -1741,7 +1741,8 @@ const he = {
     "LOYAL_PLAYER": {
       "name": "שחקן נאמן",
       "description": "שיחק ב-30 ימים שונים"
-    }
+    },
+    "coinReward": "+{amount} מטבעות"
   },
   "achievementTiers": {
     "bronze": "ארד",
@@ -3095,6 +3096,52 @@ const he = {
     "errorMessage": "הקישור לא עבד. אולי פג תוקף או כבר נוצל. נסה שוב ממייל אחרון!",
     "backToGame": "חזרה למשחק",
     "resubscribe": "התחרטת?"
+  },
+  "cognitive": {
+    "brainScore": "ניקוד מוח",
+    "brainTraining": "אימון מוחי",
+    "cognitiveAnalysis": "ניתוח ביצועים קוגניטיביים",
+    "domainBreakdown": "פירוט לפי תחום",
+    "brainScoreDesc": "ניקוד המוח שלך הוא ממוצע משוקלל של 5 תחומים קוגניטיביים. שחק עוד משחקים כדי לעקוב אחר ההתקדמות!",
+    "processingSpeed": "מהירות",
+    "processingSpeedDesc": "כמה מהר את/ה מוצא/ת ושולח/ת מילים",
+    "workingMemory": "זיכרון",
+    "workingMemoryDesc": "מעקב אחר דפוסים ומציאת מילים ארוכות",
+    "attention": "ריכוז",
+    "attentionDesc": "שמירה על קומבו ועקביות",
+    "cognitiveFlexibility": "גמישות",
+    "cognitiveFlexibilityDesc": "מגוון באורכי מילים ואסטרטגיות",
+    "vocabulary": "אוצר מילים",
+    "vocabularyDesc": "ידע במילים נדירות ויוצאות דופן",
+    "excellent": "מעולה",
+    "great": "מצוין",
+    "good": "טוב",
+    "improving": "משתפר",
+    "needsPractice": "דורש תרגול",
+    "excellentScore": "ביצועים קוגניטיביים יוצאי דופן! המוח שלך בוער!",
+    "greatScore": "זריזות מחשבה מעולה! את/ה מעל הממוצע.",
+    "goodScore": "ביצועים מוצקים! המשך/י לשחק כדי לשפר.",
+    "improvingScore": "התקדמות טובה! תרגול קבוע ישפר את הציונים.",
+    "lowScore": "כל משחק מחזק את המוח. המשך/י!",
+    "unlockBrainTraining": "פתח אימון מוחי",
+    "playSingleplayerToUnlock": "שחק/י משחקי יחיד כדי לעקוב אחר הכישורים הקוגניטיביים ולראות את ניקוד המוח!",
+    "startSingleplayer": "התחל משחק יחיד",
+    "gamesAnalyzed": "{count} משחקים נותחו",
+    "stable": "יציב",
+    "declining": "יורד",
+    "currentScores": "ציונים נוכחיים",
+    "peakScores": "שיאים אישיים",
+    "peakBrainScore": "שיא ניקוד מוח",
+    "profileTip": "הציונים שלך הם ממוצעים מתגלגלים מ-30 המשחקים האחרונים. המשך/י לשחק כדי להשתפר!",
+    "brainTab": "מוח"
+  },
+  "streakFreeze": {
+    "protectStreak": "הגן על הרצף",
+    "protectDescription": "דלג על מחר בלי לאבד את הרצף (פעם אחת בשבוע)",
+    "active": "הרצף מוגן!",
+    "cooldown": "הגנה זמינה בעוד {days} ימים",
+    "purchased": "הגנת רצף הופעלה!",
+    "notEnoughCoins": "אין מספיק מטבעות"
   }
 };
 

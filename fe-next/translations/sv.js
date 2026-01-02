@@ -1740,7 +1740,8 @@ const sv = {
     "LOYAL_PLAYER": {
       "name": "Lojal spelare",
       "description": "Spelade på 30 olika dagar"
-    }
+    },
+    "coinReward": "+{amount} mynt"
   },
   "achievementTiers": {
     "bronze": "Brons",
@@ -3094,6 +3095,52 @@ const sv = {
     "errorMessage": "Länken funkade inte. Den kanske har gått ut eller redan använts. Prova igen från ett nytt mail!",
     "backToGame": "Tillbaka till spelet",
     "resubscribe": "Ångrat dig?"
+  },
+  "cognitive": {
+    "brainScore": "Hjärnpoäng",
+    "brainTraining": "Hjärnträning",
+    "cognitiveAnalysis": "Kognitiv Prestationsanalys",
+    "domainBreakdown": "Områdesuppdelning",
+    "brainScoreDesc": "Din Hjärnpoäng är ett viktat genomsnitt av 5 kognitiva områden. Spela mer för att följa din utveckling!",
+    "processingSpeed": "Hastighet",
+    "processingSpeedDesc": "Hur snabbt du hittar och skickar ord",
+    "workingMemory": "Minne",
+    "workingMemoryDesc": "Följa mönster och hitta längre ord",
+    "attention": "Fokus",
+    "attentionDesc": "Bibehålla kombos och konsekvens",
+    "cognitiveFlexibility": "Flexibilitet",
+    "cognitiveFlexibilityDesc": "Variation i ordlängder och strategier",
+    "vocabulary": "Ordförråd",
+    "vocabularyDesc": "Kunskap om ovanliga och sällsynta ord",
+    "excellent": "Utmärkt",
+    "great": "Bra",
+    "good": "Okej",
+    "improving": "Förbättras",
+    "needsPractice": "Behöver Övning",
+    "excellentScore": "Enastående kognitiv prestation! Din hjärna är på topp!",
+    "greatScore": "Bra mental smidighet! Du presterar över genomsnittet.",
+    "goodScore": "Solid prestation! Fortsätt spela för att vässa dina färdigheter.",
+    "improvingScore": "Bra framsteg! Regelbunden träning förbättrar dina poäng.",
+    "lowScore": "Varje spel stärker din hjärna. Fortsätt!",
+    "unlockBrainTraining": "Lås upp Hjärnträning",
+    "playSingleplayerToUnlock": "Spela ensamspel för att spåra dina kognitiva färdigheter och se din hjärnpoäng!",
+    "startSingleplayer": "Starta Ensamspel",
+    "gamesAnalyzed": "{count} spel analyserade",
+    "stable": "Stabil",
+    "declining": "Sjunkande",
+    "currentScores": "Nuvarande Poäng",
+    "peakScores": "Personliga Rekord",
+    "peakBrainScore": "Topp Hjärnpoäng",
+    "profileTip": "Dina poäng är rullande medelvärden från dina senaste 30 spel. Fortsätt spela för att förbättras!",
+    "brainTab": "Hjärna"
+  },
+  "streakFreeze": {
+    "protectStreak": "Skydda Streak",
+    "protectDescription": "Hoppa över imorgon utan att förlora din streak (1 gång per vecka)",
+    "active": "Streak Skyddad!",
+    "cooldown": "Skydd tillgängligt om {days} dagar",
+    "purchased": "Streak-skydd aktiverat!",
+    "notEnoughCoins": "Inte tillräckligt med mynt"
   }
 };
 

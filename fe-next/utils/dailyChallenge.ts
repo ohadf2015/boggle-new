@@ -2847,11 +2847,15 @@ export function getAllGuestDailyResults(): Array<{
 }
 
 /**
- * Sync all guest daily challenge results to authenticated account
- * Should be called after signup to ensure all progress is transferred
- * Returns the number of results successfully synced
+ * @deprecated SECURITY VULNERABILITY - DO NOT USE
+ *
+ * This function reads from localStorage which can be manipulated by users.
+ * Use `claimGuestDailyResultsSecure` instead, which claims results from
+ * validated server-side records.
+ *
+ * This function is kept for reference only and will be removed in a future version.
  */
-export async function syncGuestDailyResultsToAccount(
+async function syncGuestDailyResultsToAccount_DEPRECATED(
   userId: string,
   userProfile: { display_name: string | null; username: string; avatar_emoji: string | null; avatar_color: string | null; avatar_image: string | null; profile_picture_url: string | null }
 ): Promise<number> {
@@ -2976,5 +2980,68 @@ function clearAllGuestDailyResults(): void {
     console.log('[Sync] Cleared all guest daily results from localStorage');
   } catch (err) {
     console.warn('[Sync] Error clearing guest daily results:', err);
+  }
+}
+
+/**
+ * SECURE: Claim guest daily challenge results for a newly authenticated user
+ *
+ * This function securely transfers guest daily results to the user's account by
+ * calling a server API that updates existing database records. This prevents
+ * localStorage manipulation attacks since the data comes from server-side records
+ * that were validated when originally submitted.
+ *
+ * @param guestFingerprint - The guest's fingerprint (session ID used when playing as guest)
+ * @param userId - The authenticated user's ID
+ * @param userProfile - The user's profile info for display updates
+ * @returns Number of results successfully claimed
+ */
+export async function claimGuestDailyResultsSecure(
+  guestFingerprint: string,
+  userId: string,
+  userProfile: {
+    display_name: string | null;
+    username: string;
+    avatar_emoji: string | null;
+    avatar_color: string | null;
+    avatar_image: string | null;
+    profile_picture_url: string | null;
+  }
+): Promise<number> {
+  if (typeof window === 'undefined') return 0;
+
+  try {
+    console.log(`[SecureClaim] Claiming guest daily results for user ${userId}`);
+
+    const response = await fetch('/api/daily-challenge/claim-guest-results', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        guestFingerprint,
+        playerId: userId,
+        displayName: userProfile.display_name || userProfile.username,
+        avatarEmoji: userProfile.avatar_emoji,
+        avatarColor: userProfile.avatar_color,
+        avatarImage: userProfile.avatar_image,
+        profilePictureUrl: userProfile.profile_picture_url,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.warn('[SecureClaim] Failed to claim guest results:', errorText);
+      return 0;
+    }
+
+    const result = await response.json();
+    console.log(`[SecureClaim] Successfully claimed ${result.claimedCount} results (efficiency: ${result.totalEfficiencyScore})`);
+
+    // Clear localStorage guest data after successful claim
+    clearAllGuestDailyResults();
+
+    return result.claimedCount;
+  } catch (err) {
+    console.error('[SecureClaim] Error claiming guest daily results:', err);
+    return 0;
   }
 }

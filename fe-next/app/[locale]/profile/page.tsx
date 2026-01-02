@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, ArrowLeft, Edit, Gamepad2, Trophy, Star, Camera, X, Check, Clock, Play, Gift, BarChart2, Award } from 'lucide-react';
+import { User, ArrowLeft, Edit, Gamepad2, Trophy, Star, Camera, X, Check, Clock, Play, Gift, BarChart2, Award, Brain } from 'lucide-react';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 import { useRouter } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
@@ -23,6 +23,7 @@ import XpProgressBar from '@/components/XpProgressBar';
 import { CoinBalance } from '@/components/CoinBalance';
 import { CollectionGrid } from '@/components/CollectionGrid';
 import { EmailPreferences } from '@/components/settings/EmailPreferences';
+import CognitiveProfileSection from '@/components/cognitive/CognitiveProfileSection';
 import { uploadProfilePicture, removeProfilePicture } from '@/lib/supabase';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -152,13 +153,14 @@ export default function ProfilePage(): React.ReactNode {
   const [isLoadingCollectibles, setIsLoadingCollectibles] = useState<boolean>(false);
 
   // Mobile tab state
-  type MobileTab = 'overview' | 'stats' | 'achievements' | 'collection';
+  type MobileTab = 'overview' | 'stats' | 'brain' | 'achievements' | 'collection';
   const [mobileActiveTab, setMobileActiveTab] = useState<MobileTab>('overview');
 
   // Mobile tab configuration
   const mobileTabs = [
     { id: 'overview' as MobileTab, icon: <User className="w-5 h-5" />, label: t('profile.overview') || 'Overview' },
     { id: 'stats' as MobileTab, icon: <BarChart2 className="w-5 h-5" />, label: t('profile.stats') || 'Stats' },
+    { id: 'brain' as MobileTab, icon: <Brain className="w-5 h-5" />, label: t('cognitive.brainTab') || 'Brain' },
     { id: 'achievements' as MobileTab, icon: <Award className="w-5 h-5" />, label: t('profile.achievements') || 'Achievements' },
     { id: 'collection' as MobileTab, icon: <Gift className="w-5 h-5" />, label: t('collectibles.title') || 'Collection' },
   ];
@@ -1097,6 +1099,22 @@ export default function ProfilePage(): React.ReactNode {
               </motion.div>
             )}
 
+            {mobileActiveTab === 'brain' && (
+              <motion.div
+                key="brain"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+              >
+                <CognitiveProfileSection
+                  cognitiveProfile={profile?.cognitive_profile ?? null}
+                  isDarkMode={isDarkMode}
+                  compact={true}
+                />
+              </motion.div>
+            )}
+
             {mobileActiveTab === 'achievements' && (
               <motion.div
                 key="achievements"
@@ -1126,13 +1144,11 @@ export default function ProfilePage(): React.ReactNode {
         </div>
 
         {/* Mobile Tab Bar */}
-        <div className="fixed bottom-0 left-0 right-0 z-50">
-          <MobileTabBar
-            tabs={mobileTabs}
-            activeTab={mobileActiveTab}
-            onTabChange={(tabId) => setMobileActiveTab(tabId as MobileTab)}
-          />
-        </div>
+        <MobileTabBar
+          tabs={mobileTabs}
+          activeTab={mobileActiveTab}
+          onTabChange={(tabId) => setMobileActiveTab(tabId as MobileTab)}
+        />
 
         {/* Avatar Picker Modal - Mobile */}
         <EmojiAvatarPicker
@@ -1457,6 +1473,19 @@ export default function ProfilePage(): React.ReactNode {
             icon={<Clock />}
             label={t('profile.timePlayed')}
             value={formatTimePlayed(profile?.total_time_played)}
+            isDarkMode={isDarkMode}
+          />
+        </motion.div>
+
+        {/* Cognitive Profile / Brain Training Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="mb-4"
+        >
+          <CognitiveProfileSection
+            cognitiveProfile={profile?.cognitive_profile ?? null}
             isDarkMode={isDarkMode}
           />
         </motion.div>

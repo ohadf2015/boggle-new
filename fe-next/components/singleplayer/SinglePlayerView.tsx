@@ -52,6 +52,8 @@ export interface SinglePlayerAchievement {
   icon: string;
 }
 
+import type { GameCognitiveScores } from '@/shared/types/cognitiveScores';
+
 export interface SinglePlayerResultsData {
   playerScore: number;
   playerWords: string[];
@@ -67,6 +69,8 @@ export interface SinglePlayerResultsData {
   botWordsForValidation?: string[]; // Bot words to show in validation modal
   gameSessionId?: string; // Unique session ID for vote tracking
   language?: Language; // Game language for vote recording
+  cognitiveScores?: GameCognitiveScores; // Brain training cognitive scores
+  hintsUsed?: number; // Number of hints used (for cognitive scoring)
 }
 
 /**

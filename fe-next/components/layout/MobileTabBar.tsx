@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '../../lib/utils';
 
-interface Tab {
+export interface Tab {
   id: string;
   icon: React.ReactNode;
   label: string;
@@ -16,20 +16,48 @@ interface MobileTabBarProps {
   activeTab: string | null;
   onTabChange: (tabId: string) => void;
   className?: string;
+  /**
+   * When true (default), the tab bar is fixed at the bottom of the screen.
+   * Set to false for inline/embedded usage.
+   */
+  fixed?: boolean;
+  /**
+   * Whether to scroll to top when switching tabs. Defaults to true.
+   */
+  scrollToTopOnChange?: boolean;
 }
 
 /**
  * Mobile tab bar for switching between content panels.
- * Fixed at the bottom of the screen with Neo-Brutalist styling.
+ * By default, fixed at the bottom of the screen with Neo-Brutalist styling.
+ *
+ * @example
+ * // Fixed at bottom (default) - no wrapper needed
+ * <MobileTabBar
+ *   tabs={[{ id: 'results', icon: <Trophy />, label: 'Results' }]}
+ *   activeTab={activeTab}
+ *   onTabChange={setActiveTab}
+ * />
+ *
+ * @example
+ * // Inline/embedded usage
+ * <MobileTabBar
+ *   tabs={tabs}
+ *   activeTab={activeTab}
+ *   onTabChange={setActiveTab}
+ *   fixed={false}
+ * />
  */
 export function MobileTabBar({
   tabs,
   activeTab,
   onTabChange,
   className,
+  fixed = true,
+  scrollToTopOnChange = true,
 }: MobileTabBarProps) {
-  return (
-    <nav className={cn('mobile-tab-bar lg:hidden', className)}>
+  const tabBar = (
+    <nav className={cn('mobile-tab-bar', !fixed && 'lg:hidden', className)}>
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
 
@@ -38,8 +66,9 @@ export function MobileTabBar({
             key={tab.id}
             onClick={() => {
               onTabChange(isActive ? '' : tab.id);
-              // Scroll to top when switching tabs
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              if (scrollToTopOnChange) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
             }}
             className={cn(
               'flex flex-col items-center justify-center px-4 py-2 min-w-[64px]',
@@ -69,6 +98,16 @@ export function MobileTabBar({
       })}
     </nav>
   );
+
+  if (fixed) {
+    return (
+      <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 lg:hidden safe-area-bottom">
+        {tabBar}
+      </div>
+    );
+  }
+
+  return tabBar;
 }
 
 export default MobileTabBar;

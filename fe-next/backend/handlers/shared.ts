@@ -12,7 +12,8 @@ const { calculateWordScore, calculateGameScores } = require('../modules/scoringE
 const { awardFinalAchievements, checkAndAwardAchievements, getLocalizedAchievements, ACHIEVEMENT_ICONS } = require('../modules/achievementManager');
 const { calculatePlayerTitles } = require('../modules/playerTitlesManager');
 const { isDictionaryWord, addApprovedWord } = require('../dictionary');
-const { processGameResults, isSupabaseConfigured } = require('../modules/supabaseServer');
+const { processGameResults, isSupabaseConfigured, saveCognitiveScores, updateCognitiveProfileAfterGame } = require('../modules/supabaseServer');
+const { calculateGameCognitiveScores } = require('../modules/cognitiveScoreManager');
 const { invalidateLeaderboardCaches, incrementWordApproval } = require('../redisClient');
 const { processGameEndEngagement, processAchievementEngagement } = require('./engagementHandler');
 const {
@@ -543,8 +544,62 @@ async function recordGameResultsToSupabase(io: Server, gameCode: string, scoresA
       }
     }
 
-    // Process engagement events for each player
+    // Calculate and save cognitive scores for authenticated players
+    const gridSize = game.letterGrid ? { rows: game.letterGrid.length, cols: game.letterGrid[0]?.length || 0 } : { rows: 5, cols: 5 };
     const playerCount = scoresArray.length;
+
+    for (const playerResult of scoresArray) {
+      const userData = game.users?.[playerResult.username] as { socketId?: string; authUserId?: string } | undefined;
+      if (!userData?.authUserId) continue; // Skip guests for cognitive scoring
+
+      try {
+        // Build cognitive calculation input from player result
+        // Note: WordDetail in multiplayer doesn't have timestamp/rarity, so we use available data
+        const cognitiveInput = {
+          wordsFound: playerResult.wordDetails?.length || 0,
+          validWordsFound: playerResult.wordDetails?.filter((w: WordDetail) => w.validated).length || 0,
+          score: playerResult.totalScore || 0,
+          gameDuration: game.timerSeconds || 180,
+          gridSize,
+          maxCombo: game.playerCombos?.[playerResult.username] || 0,
+          playerWordDetails: (playerResult.wordDetails || []).map((w: WordDetail) => ({
+            word: w.word,
+            comboBonus: w.comboBonus || 0,
+            validated: w.validated,
+            // In multiplayer, unique words (found only by this player) indicate rarer vocabulary
+            wordRarity: w.isUnique ? 'uncommon' as const : 'common' as const,
+          })),
+          hintsUsed: undefined, // No hints in multiplayer
+          accuracy: playerResult.wordDetails?.length > 0
+            ? (playerResult.wordDetails.filter((w: WordDetail) => w.validated).length / playerResult.wordDetails.length) * 100
+            : 0,
+          achievements: playerResult.achievements?.map(a => a.key) || [],
+        };
+
+        // Calculate cognitive scores
+        const cognitiveScores = calculateGameCognitiveScores(cognitiveInput, undefined, 'multiplayer');
+
+        // Save to database
+        await saveCognitiveScores(userData.authUserId, gameCode, cognitiveScores);
+
+        // Update cognitive profile (rolling averages)
+        const updatedProfile = await updateCognitiveProfileAfterGame(userData.authUserId);
+
+        // Emit cognitive scores to player
+        const playerSocket = getSocketById(io, userData.socketId);
+        if (playerSocket) {
+          safeEmit(playerSocket, 'cognitiveScoresUpdate', {
+            gameScores: cognitiveScores,
+            profile: updatedProfile.data,
+          });
+          logger.debug('COGNITIVE', `Emitted cognitive scores to ${playerResult.username}: Brain Score ${cognitiveScores.brainScore}`);
+        }
+      } catch (cognitiveError) {
+        logger.error('COGNITIVE', `Failed to calculate cognitive scores for ${playerResult.username}:`, cognitiveError);
+      }
+    }
+
+    // Process engagement events for each player
     const sortedScores = [...scoresArray].sort((a, b) => b.totalScore - a.totalScore);
     const winnerUsername = sortedScores[0]?.username;
 

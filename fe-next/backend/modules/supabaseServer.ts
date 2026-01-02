@@ -1017,6 +1017,159 @@ export async function recordPlayerWrongWord(word: string, language: string): Pro
   }
 }
 
+// ==================== Cognitive Score Functions ====================
+
+import type { GameCognitiveScores, CognitiveProfile } from '@/shared/types/cognitiveScores';
+
+export interface CognitiveScoreInput {
+  playerId: string;
+  gameCode: string;
+  scores: GameCognitiveScores;
+}
+
+/**
+ * Save per-game cognitive scores to the database
+ */
+export async function saveCognitiveScores(
+  playerId: string,
+  gameCode: string,
+  scores: GameCognitiveScores
+): Promise<{ data: unknown; error: { message: string } | null }> {
+  const client = getSupabase();
+  if (!client) return { data: null, error: { message: 'Supabase not configured' } };
+
+  try {
+    const { data, error } = await client
+      .from('game_cognitive_scores')
+      .insert({
+        player_id: playerId,
+        game_code: gameCode,
+        processing_speed: scores.domains.processingSpeed,
+        working_memory: scores.domains.workingMemory,
+        attention: scores.domains.attention,
+        cognitive_flexibility: scores.domains.cognitiveFlexibility,
+        vocabulary: scores.domains.vocabulary,
+        brain_score: scores.brainScore,
+        game_mode: scores.gameMode,
+        grid_size: scores.gridSize,
+        game_duration: scores.gameDuration,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      logger.error('SUPABASE', `Failed to save cognitive scores for ${playerId}`, error.message);
+      return { data: null, error };
+    }
+
+    logger.debug('SUPABASE', `Saved cognitive scores for ${playerId} - Brain Score: ${scores.brainScore}`);
+    return { data, error: null };
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error saving cognitive scores';
+    logger.error('SUPABASE', 'Error saving cognitive scores', err);
+    return { data: null, error: { message: errorMessage } };
+  }
+}
+
+/**
+ * Update player's cognitive profile (rolling averages) after a game
+ * Calls the database function to recalculate averages
+ */
+export async function updateCognitiveProfileAfterGame(
+  playerId: string
+): Promise<{ data: CognitiveProfile | null; error: { message: string } | null }> {
+  const client = getSupabase();
+  if (!client) return { data: null, error: { message: 'Supabase not configured' } };
+
+  try {
+    const { data, error } = await client.rpc('update_cognitive_profile', {
+      p_player_id: playerId
+    });
+
+    if (error) {
+      logger.error('SUPABASE', `Failed to update cognitive profile for ${playerId}`, error.message);
+      return { data: null, error };
+    }
+
+    logger.debug('SUPABASE', `Updated cognitive profile for ${playerId}`);
+    return { data: data as CognitiveProfile, error: null };
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error updating cognitive profile';
+    logger.error('SUPABASE', 'Error updating cognitive profile', err);
+    return { data: null, error: { message: errorMessage } };
+  }
+}
+
+/**
+ * Get player's current cognitive profile from their profile
+ */
+export async function getPlayerCognitiveProfile(
+  playerId: string
+): Promise<{ data: CognitiveProfile | null; error: { message: string } | null }> {
+  const client = getSupabase();
+  if (!client) return { data: null, error: { message: 'Supabase not configured' } };
+
+  try {
+    const { data, error } = await client
+      .from('profiles')
+      .select('cognitive_profile')
+      .eq('id', playerId)
+      .single();
+
+    if (error) {
+      logger.error('SUPABASE', `Failed to get cognitive profile for ${playerId}`, error.message);
+      return { data: null, error };
+    }
+
+    return { data: data?.cognitive_profile as CognitiveProfile | null, error: null };
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error getting cognitive profile';
+    logger.error('SUPABASE', 'Error getting cognitive profile', err);
+    return { data: null, error: { message: errorMessage } };
+  }
+}
+
+export interface RecentCognitiveScore {
+  processing_speed: number;
+  working_memory: number;
+  attention: number;
+  cognitive_flexibility: number;
+  vocabulary: number;
+  brain_score: number;
+  game_mode: string;
+  grid_size: string;
+  created_at: string;
+}
+
+/**
+ * Get recent cognitive scores for a player (for trend charts)
+ */
+export async function getRecentCognitiveScores(
+  playerId: string,
+  limit: number = 30
+): Promise<{ data: RecentCognitiveScore[]; error: { message: string } | null }> {
+  const client = getSupabase();
+  if (!client) return { data: [], error: { message: 'Supabase not configured' } };
+
+  try {
+    const { data, error } = await client.rpc('get_recent_cognitive_scores', {
+      p_player_id: playerId,
+      p_limit: limit
+    });
+
+    if (error) {
+      logger.error('SUPABASE', `Failed to get recent cognitive scores for ${playerId}`, error.message);
+      return { data: [], error };
+    }
+
+    return { data: (data as RecentCognitiveScore[]) || [], error: null };
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error getting recent cognitive scores';
+    logger.error('SUPABASE', 'Error getting recent cognitive scores', err);
+    return { data: [], error: { message: errorMessage } };
+  }
+}
+
 // CommonJS exports for backward compatibility
 module.exports = {
   getSupabase,
@@ -1033,5 +1186,10 @@ module.exports = {
   savePlayerWord,
   getPopularPlayerWords,
   incrementBotWordUsage,
-  recordPlayerWrongWord
+  recordPlayerWrongWord,
+  // Cognitive score functions
+  saveCognitiveScores,
+  updateCognitiveProfileAfterGame,
+  getPlayerCognitiveProfile,
+  getRecentCognitiveScores,
 };

@@ -82,6 +82,8 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   const scoreRef = useRef(score);
   const handleGameEndRef = useRef<(() => void) | null>(null);
   const isMountedRef = useRef(true);
+  // Stable session ID for combo coin tracking (cap per game)
+  const comboSessionIdRef = useRef<string>(crypto.randomUUID());
 
   // Keep score ref in sync
   useEffect(() => { scoreRef.current = score; }, [score]);
@@ -112,7 +114,8 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     },
     onComboMilestone: (level) => {
       // Award coins for combo milestones (5, 10, 15, 20, 25, 30)
-      const coinsAwarded = awardComboCoins(level, 'daily');
+      // Pass sessionId to enforce per-game cap of 30 combo coins
+      const coinsAwarded = awardComboCoins(level, 'daily', comboSessionIdRef.current);
       if (coinsAwarded > 0) {
         setComboCoinReward(coinsAwarded);
       }

@@ -1493,7 +1493,8 @@ const es = {
     "LOYAL_PLAYER": {
       "name": "Jugador Leal",
       "description": "Jugó en 30 días diferentes"
-    }
+    },
+    "coinReward": "+{amount} monedas"
   },
   "achievementTiers": {
     "bronze": "Bronce",
@@ -3091,6 +3092,52 @@ const es = {
     "errorMessage": "El enlace no funcionó. Puede que haya expirado o ya se usó. ¡Prueba desde un correo reciente!",
     "backToGame": "Volver al juego",
     "resubscribe": "¿Cambiaste de opinión?"
+  },
+  "cognitive": {
+    "brainScore": "Puntuación Cerebral",
+    "brainTraining": "Entrenamiento Mental",
+    "cognitiveAnalysis": "Análisis de Rendimiento Cognitivo",
+    "domainBreakdown": "Desglose por Áreas",
+    "brainScoreDesc": "Tu Puntuación Cerebral es un promedio ponderado de 5 áreas cognitivas. ¡Juega más para seguir tu progreso!",
+    "processingSpeed": "Velocidad",
+    "processingSpeedDesc": "Qué tan rápido encuentras y envías palabras",
+    "workingMemory": "Memoria",
+    "workingMemoryDesc": "Seguimiento de patrones y búsqueda de palabras largas",
+    "attention": "Enfoque",
+    "attentionDesc": "Mantenimiento de combos y consistencia",
+    "cognitiveFlexibility": "Flexibilidad",
+    "cognitiveFlexibilityDesc": "Diversidad en longitud de palabras y estrategias",
+    "vocabulary": "Vocabulario",
+    "vocabularyDesc": "Conocimiento de palabras raras e inusuales",
+    "excellent": "Excelente",
+    "great": "Muy Bien",
+    "good": "Bien",
+    "improving": "Mejorando",
+    "needsPractice": "Necesita Práctica",
+    "excellentScore": "¡Rendimiento cognitivo excepcional! ¡Tu cerebro está en llamas!",
+    "greatScore": "¡Gran agilidad mental! Estás por encima del promedio.",
+    "goodScore": "¡Buen rendimiento! Sigue jugando para mejorar tus habilidades.",
+    "improvingScore": "¡Buen progreso! La práctica regular mejorará tus puntuaciones.",
+    "lowScore": "Cada juego fortalece tu cerebro. ¡Sigue adelante!",
+    "unlockBrainTraining": "Desbloquea Entrenamiento Mental",
+    "playSingleplayerToUnlock": "¡Juega partidas individuales para seguir tus habilidades cognitivas y ver tu puntuación cerebral!",
+    "startSingleplayer": "Iniciar Modo Individual",
+    "gamesAnalyzed": "{count} partidas analizadas",
+    "stable": "Estable",
+    "declining": "En Descenso",
+    "currentScores": "Puntuaciones Actuales",
+    "peakScores": "Mejores Marcas",
+    "peakBrainScore": "Mejor Puntuación Cerebral",
+    "profileTip": "Tus puntuaciones son promedios móviles de tus últimas 30 partidas. ¡Sigue jugando para mejorar!",
+    "brainTab": "Cerebro"
+  },
+  "streakFreeze": {
+    "protectStreak": "Proteger Racha",
+    "protectDescription": "Salta mañana sin perder tu racha (1 uso por semana)",
+    "active": "¡Racha Protegida!",
+    "cooldown": "Protección disponible en {days} días",
+    "purchased": "¡Protección de racha activada!",
+    "notEnoughCoins": "No tienes suficientes monedas"
   }
 };
 

@@ -1,4 +1,4 @@
 export { GamePageWrapper } from './GamePageWrapper';
 export { MobileDrawer } from './MobileDrawer';
-export { MobileTabBar } from './MobileTabBar';
+export { MobileTabBar, type Tab as MobileTabConfig } from './MobileTabBar';
 export { CollapsibleSection } from './CollapsibleSection';

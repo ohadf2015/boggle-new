@@ -390,7 +390,8 @@ const DailyChallenge: React.FC = () => {
     // Reset state for fresh start
     setStoredResult(null);
     setGameResult(null);
-    setPhase('ready');
+    setPhase('loading'); // Show loading state while re-initializing
+    setWasReset(prev => !prev); // Toggle to trigger re-initialization effect
   }, [gameLanguage]);
 
   // Render based on phase

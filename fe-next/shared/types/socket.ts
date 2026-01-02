@@ -194,6 +194,9 @@ export interface ServerToClientEvents {
   xpGained: (data: XpGainedPayload) => void;
   levelUp: (data: LevelUpPayload) => void;
 
+  // Cognitive scores events
+  cognitiveScoresUpdate: (data: CognitiveScoresUpdatePayload) => void;
+
   // Engagement events
   'engagement:dailyChallenges': (data: { challenges: DailyChallenge[] }) => void;
   'engagement:challengeProgress': (data: { progress: ChallengeProgress[] }) => void;
@@ -449,6 +452,17 @@ export interface LevelUpPayload {
   newLevel: number;
   levelsGained: number;
   newTitles: string[];
+}
+
+// ==================== Cognitive Score Types ====================
+
+import type { GameCognitiveScores, CognitiveProfile } from './cognitiveScores';
+
+export interface CognitiveScoresUpdatePayload {
+  /** Per-game cognitive scores */
+  gameScores: GameCognitiveScores;
+  /** Updated cognitive profile (rolling averages) */
+  profile: CognitiveProfile | null;
 }
 
 // ==================== Engagement Types ====================

@@ -1043,13 +1043,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         </div>
 
         {/* Fixed Bottom Tab Bar */}
-        <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black safe-area-bottom">
-          <MobileTabBar
-            tabs={mobileTabs}
-            activeTab={mobileActiveTab}
-            onTabChange={(id) => setMobileActiveTab(id as MobileTab)}
-          />
-        </div>
+        <MobileTabBar
+          tabs={mobileTabs}
+          activeTab={mobileActiveTab}
+          onTabChange={(id) => setMobileActiveTab(id as MobileTab)}
+        />
       </div>
 
       {/* DESKTOP VIEW - Two-column side-by-side layout (hidden on mobile) */}

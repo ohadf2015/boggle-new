@@ -4,6 +4,7 @@
  */
 
 import type { User } from '@supabase/supabase-js';
+import type { CognitiveProfile } from '@/shared/types/cognitiveScores';
 
 export interface ProfileData {
   id: string;
@@ -46,6 +47,8 @@ export interface ProfileData {
   timezone?: string | null;
   email_unsubscribe_token?: string | null;
   last_daily_email_sent_at?: string | null;
+  // Cognitive Profile (Brain Training)
+  cognitive_profile?: CognitiveProfile | null;
 }
 
 // Collectible item from the catalog

@@ -1739,7 +1739,8 @@ const ja = {
     "LOYAL_PLAYER": {
       "name": "忠実なプレイヤー",
       "description": "30日間にわたってプレイ"
-    }
+    },
+    "coinReward": "+{amount}コイン"
   },
   "achievementTiers": {
     "bronze": "ブロンズ",
@@ -3093,6 +3094,52 @@ const ja = {
     "errorMessage": "リンクが使えませんでした。期限切れか使用済みかも。最新のメールから試してみて！",
     "backToGame": "ゲームに戻る",
     "resubscribe": "やっぱり登録する？"
+  },
+  "cognitive": {
+    "brainScore": "脳スコア",
+    "brainTraining": "脳トレーニング",
+    "cognitiveAnalysis": "認知パフォーマンス分析",
+    "domainBreakdown": "分野別内訳",
+    "brainScoreDesc": "脳スコアは5つの認知分野の加重平均です。もっとプレイして上達を追跡しよう！",
+    "processingSpeed": "速度",
+    "processingSpeedDesc": "単語を見つけて送信する速さ",
+    "workingMemory": "記憶力",
+    "workingMemoryDesc": "パターンの追跡と長い単語の発見",
+    "attention": "集中力",
+    "attentionDesc": "コンボの維持と一貫性",
+    "cognitiveFlexibility": "柔軟性",
+    "cognitiveFlexibilityDesc": "単語の長さと戦略の多様性",
+    "vocabulary": "語彙力",
+    "vocabularyDesc": "珍しい単語の知識",
+    "excellent": "優秀",
+    "great": "素晴らしい",
+    "good": "良い",
+    "improving": "向上中",
+    "needsPractice": "練習が必要",
+    "excellentScore": "素晴らしい認知パフォーマンス！脳が絶好調！",
+    "greatScore": "優れた思考力！平均以上のパフォーマンス。",
+    "goodScore": "堅実なパフォーマンス！プレイを続けてスキルを磨こう。",
+    "improvingScore": "良い進歩！定期的な練習でスコアが上がります。",
+    "lowScore": "毎回のゲームで脳が鍛えられます。頑張って！",
+    "unlockBrainTraining": "脳トレーニングを解放",
+    "playSingleplayerToUnlock": "シングルプレイヤーでプレイして認知スキルを追跡し、脳スコアを確認しよう！",
+    "startSingleplayer": "シングルプレイヤーを開始",
+    "gamesAnalyzed": "{count}ゲームを分析",
+    "stable": "安定",
+    "declining": "低下中",
+    "currentScores": "現在のスコア",
+    "peakScores": "自己ベスト",
+    "peakBrainScore": "最高脳スコア",
+    "profileTip": "スコアは直近30ゲームの移動平均です。プレイを続けて上達しよう！",
+    "brainTab": "脳"
+  },
+  "streakFreeze": {
+    "protectStreak": "連続記録を守る",
+    "protectDescription": "明日休んでも連続記録を維持（週1回使用可能）",
+    "active": "連続記録保護中！",
+    "cooldown": "あと{days}日で使用可能",
+    "purchased": "連続記録保護を有効化しました！",
+    "notEnoughCoins": "コインが足りません"
   }
 };
 

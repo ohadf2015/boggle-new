@@ -36,6 +36,7 @@ import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerVi
 import { useResultsData } from './results';
 import { awardGameCoins } from '@/utils/coinManager';
 import { syncCoinsToDatabase } from '@/lib/supabase';
+import { CognitiveResultsSection } from '@/components/cognitive';
 
 // Dynamic import for PerformanceChart (heavy component)
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
@@ -679,6 +680,14 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   // Render Details Tab Content (Secondary: Words, Insights, Charts, Bot Details)
   const renderDetailsTab = () => (
     <div className="space-y-3">
+      {/* Brain Training Cognitive Scores */}
+      {results.cognitiveScores && (
+        <CognitiveResultsSection
+          scores={results.cognitiveScores}
+          defaultCollapsed={false}
+        />
+      )}
+
       {/* Performance Insights - Expanded */}
       {playerInsights && (
         <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 shadow-hard">
@@ -856,13 +865,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         </div>
 
         {/* Fixed Bottom Tab Bar */}
-        <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black safe-area-bottom">
-          <MobileTabBar
-            tabs={mobileTabs}
-            activeTab={mobileActiveTab}
-            onTabChange={(id) => setMobileActiveTab(id as MobileTab)}
-          />
-        </div>
+        <MobileTabBar
+          tabs={mobileTabs}
+          activeTab={mobileActiveTab}
+          onTabChange={(id) => setMobileActiveTab(id as MobileTab)}
+        />
       </div>
 
       {/* DESKTOP VIEW - Two-column side-by-side layout (hidden on mobile) */}
@@ -978,6 +985,14 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
           {/* RIGHT COLUMN: Details (Performance, Words, Charts, Bot Details) */}
           <div className="flex-1 min-w-0 max-w-xl space-y-4">
+            {/* Brain Training Cognitive Scores */}
+            {results.cognitiveScores && (
+              <CognitiveResultsSection
+                scores={results.cognitiveScores}
+                defaultCollapsed={true}
+              />
+            )}
+
             {/* Performance Insights */}
             {playerInsights && (
               <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 shadow-hard">

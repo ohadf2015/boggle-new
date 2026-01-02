@@ -1746,7 +1746,8 @@ const en = {
     "LOYAL_PLAYER": {
       "name": "Loyalist",
       "description": "30-day warrior"
-    }
+    },
+    "coinReward": "+{amount} coins"
   },
   "achievementTiers": {
     "bronze": "Bronze",
@@ -3107,6 +3108,52 @@ const en = {
     "errorMessage": "That link didn't work. It might be expired or already used. Try again from a recent email!",
     "backToGame": "Back to Game",
     "resubscribe": "Changed Your Mind?"
+  },
+  "cognitive": {
+    "brainScore": "Brain Score",
+    "brainTraining": "Brain Training",
+    "cognitiveAnalysis": "Cognitive Performance Analysis",
+    "domainBreakdown": "Domain Breakdown",
+    "brainScoreDesc": "Your Brain Score is a weighted average of 5 cognitive domains. Play more games to track your improvement over time!",
+    "processingSpeed": "Speed",
+    "processingSpeedDesc": "How quickly you find and submit words",
+    "workingMemory": "Memory",
+    "workingMemoryDesc": "Tracking patterns and finding longer words",
+    "attention": "Focus",
+    "attentionDesc": "Combo maintenance and consistency",
+    "cognitiveFlexibility": "Flexibility",
+    "cognitiveFlexibilityDesc": "Diversity of word lengths and strategies",
+    "vocabulary": "Vocabulary",
+    "vocabularyDesc": "Knowledge of rare and unusual words",
+    "excellent": "Excellent",
+    "great": "Great",
+    "good": "Good",
+    "improving": "Improving",
+    "needsPractice": "Needs Practice",
+    "excellentScore": "Outstanding cognitive performance! Your brain is on fire!",
+    "greatScore": "Great mental agility! You're performing above average.",
+    "goodScore": "Solid performance! Keep playing to sharpen your skills.",
+    "improvingScore": "Good progress! Regular practice will boost your scores.",
+    "lowScore": "Every game makes your brain stronger. Keep at it!",
+    "unlockBrainTraining": "Unlock Brain Training",
+    "playSingleplayerToUnlock": "Play singleplayer games to track your cognitive skills and see your brain score!",
+    "startSingleplayer": "Start Singleplayer",
+    "gamesAnalyzed": "{count} games analyzed",
+    "stable": "Stable",
+    "declining": "Declining",
+    "currentScores": "Current Scores",
+    "peakScores": "Personal Bests",
+    "peakBrainScore": "Peak Brain Score",
+    "profileTip": "Your scores are rolling averages from your last 30 games. Keep playing to improve!",
+    "brainTab": "Brain"
+  },
+  "streakFreeze": {
+    "protectStreak": "Protect Streak",
+    "protectDescription": "Skip tomorrow without losing your streak (1 use per week)",
+    "active": "Streak Protected!",
+    "cooldown": "Freeze available in {days} days",
+    "purchased": "Streak freeze activated!",
+    "notEnoughCoins": "Not enough coins"
   }
 };
 

@@ -35,6 +35,10 @@ import {
   type WordData as AchievementWordData,
 } from '@/utils/singlePlayerAchievements';
 import { finalizeWordValidation } from '@/utils/wordValidationAPI';
+import {
+  calculateGameCognitiveScores,
+  buildCognitiveInputFromSinglePlayer,
+} from '@/utils/cognitiveScoreClient';
 import type { SinglePlayerGameState, SinglePlayerResultsData, BotOpponent } from './SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
 
@@ -97,6 +101,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const botUsedWordsRef = useRef<Record<string, Set<string>>>({});
   // Ref to access current availableWords in callbacks (avoids stale closure)
   const availableWordsRef = useRef(availableWords);
+  // Stable session ID for combo coin tracking (cap per game)
+  const comboSessionIdRef = useRef<string>(crypto.randomUUID());
 
   // Minimum word length for "Words Remaining" counter and hints
   // Only count/hint words with 5+ letters to reduce overwhelming large numbers
@@ -160,7 +166,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     },
     onComboMilestone: (level) => {
       // Award coins for combo milestones (5, 10, 15, 20, 25, 30)
-      const coinsAwarded = awardComboCoins(level, 'singleplayer');
+      // Pass sessionId to enforce per-game cap of 30 combo coins
+      const coinsAwarded = awardComboCoins(level, 'singleplayer', comboSessionIdRef.current);
       if (coinsAwarded > 0) {
         setComboCoinReward(coinsAwarded);
       }
@@ -596,6 +603,27 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       // Generate a unique session ID for this game (used for vote tracking)
       const gameSessionId = crypto.randomUUID();
 
+      // Calculate cognitive scores for brain training feature
+      const cognitiveInput = buildCognitiveInputFromSinglePlayer({
+        playerWordData: finalWords.map(w => ({
+          word: w.word,
+          score: w.isValid ? w.score : 0,
+          isValid: w.isValid === true,
+          comboBonus: w.comboBonus,
+          timestamp: w.timestamp,
+          timeSinceStart: w.timeSinceStart,
+        })),
+        gameDuration: settings.timerSeconds,
+        gridSize: {
+          rows: gridRef.current!.length,
+          cols: gridRef.current![0].length,
+        },
+        maxCombo: combo.maxCombo,
+        hintsUsed: revealState.revealsUsed,
+        achievements: finalAchievements.map(a => a.key),
+      });
+      const cognitiveScores = calculateGameCognitiveScores(cognitiveInput, 'singleplayer');
+
       // Collect bot words for validation modal
       // Get all unique bot words that are actual words (not fallback format like "word5")
       const allBotWords = settings.bots.flatMap(bot => {
@@ -635,6 +663,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         botWordsForValidation,
         gameSessionId,
         language: settings.language,
+        // Brain training cognitive scores
+        cognitiveScores,
+        hintsUsed: revealState.revealsUsed,
       };
 
       // Use ref to call onGameEnd - ensures we always have latest callback

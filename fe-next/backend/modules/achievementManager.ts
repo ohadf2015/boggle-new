@@ -57,6 +57,63 @@ export const ACHIEVEMENT_ICONS: Record<string, string> = {
   LOYAL_PLAYER: '⭐',         // Play games on 30 different days
 };
 
+/**
+ * Coin rewards for each achievement tier
+ * Basic in-game: 15 coins
+ * Intermediate: 25 coins
+ * Elite: 50 coins
+ * Lifetime: 100-250 coins
+ */
+export const ACHIEVEMENT_COIN_REWARDS: Record<string, number> = {
+  // Basic (in-game) achievements - 15 coins
+  FIRST_BLOOD: 15,
+  QUICK_THINKER: 15,
+  DOUBLE_TROUBLE: 15,
+  TRIPLE_THREAT: 15,
+  COMEBACK_KID: 15,
+  ANAGRAM_ARTIST: 15,
+
+  // Intermediate achievements - 25 coins
+  WORD_MASTER: 25,
+  SPEED_DEMON: 25,
+  COMBO_KING: 25,
+  LIGHTNING_ROUND: 25,
+  CLUTCH_PLAYER: 25,
+  WORDSMITH: 25,
+  DIVERSE_VOCABULARY: 25,
+  STREAK_MASTER: 25,
+
+  // Elite achievements - 50 coins
+  TREASURE_HUNTER: 50,
+  RARE_GEM: 50,
+  WORD_ARCHITECT: 50,
+  SPEED_LEGEND: 50,
+  COMBO_GOD: 50,
+  VOCABULARY_TITAN: 50,
+  PRECISION_MASTER: 50,
+  WORD_SNIPER: 50,
+  PHOTO_FINISH: 50,
+  MINIMALIST: 50,
+  LEXICON: 50,
+  UNSTOPPABLE: 50,
+  DICTIONARY_DIVER: 50,
+  EXPLORER: 50,
+  PERFECTIONIST: 50,
+  LONG_WORD_CHAIN: 50,
+
+  // Lifetime achievements - 100-250 coins
+  VETERAN: 100,        // 50 games
+  CENTURION: 150,      // 100 games
+  WORD_COLLECTOR: 100, // 1000 words
+  WORD_HOARDER: 200,   // 5000 words
+  CHAMPION: 150,       // 25 wins
+  LEGEND: 250,         // 100 wins
+  POINT_MASTER: 100,   // 10,000 points
+  POINT_KING: 200,     // 50,000 points
+  DEDICATION: 100,     // 7 play days
+  LOYAL_PLAYER: 200,   // 30 play days
+};
+
 export interface Achievement {
   name: string;
   description: string;
@@ -656,6 +713,34 @@ export function checkLifetimeAchievements(
   return newAchievements;
 }
 
+/**
+ * Get the coin reward for an achievement
+ * Returns the coin amount, or 0 if no reward defined
+ */
+export function getAchievementCoinReward(achievementKey: string): number {
+  return ACHIEVEMENT_COIN_REWARDS[achievementKey] || 0;
+}
+
+/**
+ * Get achievement info with coin reward for UI display
+ */
+export function getAchievementWithReward(
+  achievementKey: string,
+  locale: string = 'en'
+): { name: string; description: string; icon: string; coinReward: number } | null {
+  const achievements = getLocalizedAchievements(locale);
+  const achievement = achievements[achievementKey];
+
+  if (!achievement) {
+    return null;
+  }
+
+  return {
+    ...achievement,
+    coinReward: getAchievementCoinReward(achievementKey),
+  };
+}
+
 // Export lifetime achievement thresholds for UI display
 export const LIFETIME_ACHIEVEMENT_THRESHOLDS: Record<string, LifetimeThreshold> = {
   VETERAN: { stat: 'gamesPlayed', threshold: 50 },
@@ -674,11 +759,14 @@ export const LIFETIME_ACHIEVEMENT_THRESHOLDS: Record<string, LifetimeThreshold> 
 module.exports = {
   ACHIEVEMENTS,
   ACHIEVEMENT_ICONS,
+  ACHIEVEMENT_COIN_REWARDS,
   getLocalizedAchievements,
   checkLiveAchievements,
   awardFinalAchievements,
   checkLifetimeAchievements,
   LIFETIME_ACHIEVEMENT_THRESHOLDS,
   checkAndAwardAchievements,
-  getPlayerAchievements
+  getPlayerAchievements,
+  getAchievementCoinReward,
+  getAchievementWithReward,
 };

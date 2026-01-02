@@ -44,6 +44,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { fetchGeolocation } from '@/contexts/auth/authUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { awardDailyCoins, spendCoins, canAfford, getCoins, COIN_COSTS } from '@/utils/coinManager';
+import {
+  getStreakFreezeStatus,
+  activateStreakFreeze,
+  isStreakFreezeAvailable,
+  canAffordStreakFreeze,
+} from '@/utils/streakFreezeManager';
 import { syncCoinsToDatabase } from '@/lib/supabase';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import {
@@ -196,6 +202,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [countryCode, setCountryCode] = useState<string | null>(null);
   const [countryCodeReady, setCountryCodeReady] = useState(false);
   const [inlineSignupDismissed, setInlineSignupDismissed] = useState(false);
+  const [streakFreezeStatus, setStreakFreezeStatus] = useState(() => getStreakFreezeStatus());
+  const [isActivatingFreeze, setIsActivatingFreeze] = useState(false);
   const hasSubmittedRef = useRef(false);
   const { user, profile, isAuthenticated, loading: authLoading } = useAuth();
 
@@ -559,6 +567,28 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     setShowSignupModal(false);
     recordSignupModalDismissed();
   }, []);
+
+  // Handle streak freeze purchase
+  const handleActivateStreakFreeze = useCallback(() => {
+    if (isActivatingFreeze) return;
+
+    // Get tomorrow's date for the freeze
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowStr = tomorrow.toISOString().split('T')[0];
+
+    setIsActivatingFreeze(true);
+
+    const success = activateStreakFreeze(tomorrowStr);
+
+    if (success) {
+      // Update local state
+      setStreakFreezeStatus(getStreakFreezeStatus());
+      setCurrentCoins(getCoins());
+    }
+
+    setIsActivatingFreeze(false);
+  }, [isActivatingFreeze]);
 
   // Get display info for sharing
   const displayName = isAuthenticated && profile
@@ -1053,6 +1083,59 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 <span className="text-lg ml-1">{milestoneMessage.emoji}</span>
               )}
             </motion.div>
+          )}
+
+          {/* Streak Freeze Button - protect your streak for tomorrow */}
+          {result.streakDays > 0 && streakFreezeStatus.available && !streakFreezeStatus.activeFreezeDate && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+              className="mt-2"
+            >
+              <Button
+                onClick={handleActivateStreakFreeze}
+                disabled={!streakFreezeStatus.affordable || isActivatingFreeze}
+                className={cn(
+                  "inline-flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-neo border-2 border-neo-black shadow-hard-sm transition-all",
+                  streakFreezeStatus.affordable
+                    ? "bg-cyan-500 hover:bg-cyan-400 text-white hover:-translate-y-0.5"
+                    : "bg-gray-400 text-gray-200 cursor-not-allowed"
+                )}
+              >
+                <span className="text-base">🛡️</span>
+                <span>{t('streakFreeze.protectStreak')}</span>
+                <span className="flex items-center gap-0.5">
+                  <Coins className="w-3 h-3" />
+                  {COIN_COSTS.STREAK_FREEZE}
+                </span>
+              </Button>
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-1">
+                {t('streakFreeze.protectDescription')}
+              </p>
+            </motion.div>
+          )}
+
+          {/* Active Streak Freeze indicator */}
+          {streakFreezeStatus.activeFreezeDate && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', delay: 0.3 }}
+              className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-cyan-500 rounded-neo border-2 border-neo-black shadow-hard-sm"
+            >
+              <span className="text-lg">🛡️</span>
+              <span className="font-bold text-white text-xs">
+                {t('streakFreeze.active')}
+              </span>
+            </motion.div>
+          )}
+
+          {/* Streak Freeze on cooldown indicator */}
+          {result.streakDays > 0 && !streakFreezeStatus.available && !streakFreezeStatus.activeFreezeDate && (
+            <p className="mt-1 text-[10px] text-gray-400">
+              🛡️ {t('streakFreeze.cooldown').replace('{days}', String(streakFreezeStatus.daysUntilAvailable))}
+            </p>
           )}
 
           {/* Rarest word highlight */}
@@ -1781,17 +1864,15 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       </div>
 
       {/* Bottom Tab Bar - Fixed, mobile only (hidden on desktop lg+) */}
-      <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black safe-area-bottom lg:hidden">
-        <MobileTabBar
-          tabs={[
-            { id: 'results', icon: <Share2 className="w-5 h-5" />, label: t('wordHunt.results.share') || 'Share' },
-            { id: 'stats', icon: <BarChart3 className="w-5 h-5" />, label: t('wordHunt.stats.title') || 'Stats' },
-            { id: 'ranks', icon: <Medal className="w-5 h-5" />, label: t('daily.leaderboard') || 'Ranks' },
-          ]}
-          activeTab={activeTab}
-          onTabChange={(id) => setActiveTab(id as ResultTab)}
-        />
-      </div>
+      <MobileTabBar
+        tabs={[
+          { id: 'results', icon: <Share2 className="w-5 h-5" />, label: t('wordHunt.results.share') || 'Share' },
+          { id: 'stats', icon: <BarChart3 className="w-5 h-5" />, label: t('wordHunt.stats.title') || 'Stats' },
+          { id: 'ranks', icon: <Medal className="w-5 h-5" />, label: t('daily.leaderboard') || 'Ranks' },
+        ]}
+        activeTab={activeTab}
+        onTabChange={(id) => setActiveTab(id as ResultTab)}
+      />
 
       {/* Share panel for browsers without native share */}
       <AnimatePresence>

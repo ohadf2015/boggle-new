@@ -21,8 +21,9 @@ export const COIN_EARNING = {
 // Coin cost constants
 export const COIN_COSTS = {
   REVEAL_5_PLUS: 60,        // Cost to reveal a 5+ letter word (balances with daily earnings)
-  REVEAL_TARGET_WORD: 250,  // Cost to reveal the target word in daily challenge when failed
-  DAILY_RETRY: 500,         // Cost to retry daily challenge (full reset, more expensive than reveal)
+  REVEAL_TARGET_WORD: 150,  // Cost to reveal the target word in daily challenge when failed (reduced from 250)
+  DAILY_RETRY: 200,         // Cost to retry daily challenge (reduced from 500 for accessibility)
+  STREAK_FREEZE: 100,       // Cost to protect daily streak for 1 missed day (limited to 1/week)
 } as const;
 
 // Coin earning constants for other game modes
@@ -47,6 +48,12 @@ export const COMBO_COIN_REWARDS = {
 
 // Milestone levels that trigger coin rewards
 export const COMBO_MILESTONES = [5, 10, 15, 20, 25, 30] as const;
+
+// Maximum combo coins per game to prevent inflation
+export const MAX_COMBO_COINS_PER_GAME = 30;
+
+// Storage key for tracking combo coins per session
+const COMBO_COINS_SESSION_KEY = 'lexiclash_combo_coins_session';
 
 export interface CoinBalance {
   total: number;
@@ -380,10 +387,40 @@ export function isComboMilestone(comboLevel: number): boolean {
 }
 
 /**
- * Award coins for reaching a combo milestone
- * Returns the amount awarded, or 0 if not a milestone
+ * Get current combo coins earned in a session
  */
-export function awardComboCoins(comboLevel: number, gameMode: string): number {
+function getSessionComboCoinTotal(sessionId: string): number {
+  if (typeof window === 'undefined') return 0;
+
+  try {
+    const stored = localStorage.getItem(`${COMBO_COINS_SESSION_KEY}_${sessionId}`);
+    return stored ? parseInt(stored, 10) : 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * Update combo coins earned in a session
+ */
+function setSessionComboCoinTotal(sessionId: string, total: number): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    localStorage.setItem(`${COMBO_COINS_SESSION_KEY}_${sessionId}`, total.toString());
+  } catch (error) {
+    logger.error('Error saving session combo coins:', error);
+  }
+}
+
+/**
+ * Award coins for reaching a combo milestone
+ * Returns the amount awarded, or 0 if not a milestone or cap reached
+ * @param comboLevel - The combo level reached
+ * @param gameMode - The game mode (singleplayer, multiplayer, daily)
+ * @param sessionId - The game session ID for tracking per-game caps
+ */
+export function awardComboCoins(comboLevel: number, gameMode: string, sessionId?: string): number {
   if (!isComboMilestone(comboLevel)) {
     return 0;
   }
@@ -391,10 +428,55 @@ export function awardComboCoins(comboLevel: number, gameMode: string): number {
   const reward = calculateComboMilestoneReward(comboLevel);
   if (reward <= 0) return 0;
 
+  // If sessionId provided, enforce per-game cap
+  if (sessionId) {
+    const currentSessionTotal = getSessionComboCoinTotal(sessionId);
+
+    // Check if we've already hit the cap
+    if (currentSessionTotal >= MAX_COMBO_COINS_PER_GAME) {
+      logger.debug(`Combo coin cap reached for session ${sessionId}: ${currentSessionTotal}/${MAX_COMBO_COINS_PER_GAME}`);
+      return 0;
+    }
+
+    // Calculate how much we can actually award (might be partial if near cap)
+    const remainingAllowance = MAX_COMBO_COINS_PER_GAME - currentSessionTotal;
+    const actualReward = Math.min(reward, remainingAllowance);
+
+    if (actualReward <= 0) return 0;
+
+    // Update session tracking
+    setSessionComboCoinTotal(sessionId, currentSessionTotal + actualReward);
+
+    addCoins(actualReward, 'Combo Milestone', {
+      comboLevel,
+      gameMode,
+      sessionId,
+      capped: actualReward < reward ? 1 : 0,
+    });
+
+    return actualReward;
+  }
+
+  // Legacy behavior without session tracking (backward compatible)
   addCoins(reward, 'Combo Milestone', {
     comboLevel,
     gameMode,
   });
 
   return reward;
+}
+
+/**
+ * Get remaining combo coins allowed for a session
+ */
+export function getRemainingComboCoinAllowance(sessionId: string): number {
+  const currentTotal = getSessionComboCoinTotal(sessionId);
+  return Math.max(0, MAX_COMBO_COINS_PER_GAME - currentTotal);
+}
+
+/**
+ * Check if combo coin cap has been reached for a session
+ */
+export function isComboCoinCapReached(sessionId: string): boolean {
+  return getSessionComboCoinTotal(sessionId) >= MAX_COMBO_COINS_PER_GAME;
 }
