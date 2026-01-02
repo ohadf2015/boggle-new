@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useReducedMotion } from '../utils/accessibility';
+import { formatTimeMMSS } from '@/shared/utils';
 
 /**
  * CircularTimer Props
@@ -19,13 +20,6 @@ const SIZES = {
   sm: { svgSize: 100, radius: 38, strokeWidth: 8, textSize: 'text-2xl', frameClasses: 'p-2 border-3', badgeClasses: 'hidden' },
   md: { svgSize: 120, radius: 45, strokeWidth: 10, textSize: 'text-3xl', frameClasses: 'p-3 border-4', badgeClasses: '' },
   lg: { svgSize: 140, radius: 52, strokeWidth: 12, textSize: 'text-4xl', frameClasses: 'p-4 border-4', badgeClasses: '' },
-};
-
-// Format time as MM:SS - defined outside component to avoid recreation on each render
-const formatTime = (seconds: number): string => {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
 /**
@@ -135,7 +129,7 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
                   : `${size === 'xs' || size === 'sm' ? '1px 1px' : '2px 2px'} 0px var(--neo-cyan)`,
               }}
             >
-              {formatTime(remainingTime)}
+              {formatTimeMMSS(remainingTime)}
             </motion.div>
           </div>
         </div>

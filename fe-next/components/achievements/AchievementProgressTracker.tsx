@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -26,11 +26,15 @@ interface AchievementProgressTrackerProps {
   className?: string;
 }
 
+// Duration in ms before each achievement auto-dismisses in single player
+const AUTO_DISMISS_MS = 3000;
+
 /**
  * AchievementProgressTracker - Shows near-completion achievements during gameplay
  *
  * Displays a small panel showing 2-3 achievements the player is close to unlocking.
  * Only shows achievements that are 50%+ complete to avoid clutter.
+ * In single player mode: auto-dismisses after 3 seconds, or when clicked.
  */
 export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProps> = ({
   validWordCount,
@@ -45,6 +49,10 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
 }) => {
   const { t } = useLanguage();
   const [isDismissed, setIsDismissed] = useState(false);
+  // Track which individual achievements have been dismissed (by click or auto-dismiss)
+  const [dismissedAchievements, setDismissedAchievements] = useState<Set<string>>(new Set());
+  // Track when each achievement was first shown for auto-dismiss
+  const shownAtRef = useRef<Record<string, number>>({});
 
   // Auto-dismiss after 2 seconds when game ends
   useEffect(() => {
@@ -56,6 +64,11 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
     }
     return undefined;
   }, [isGameOver, isDismissed]);
+
+  // Handle clicking on an achievement to dismiss it
+  const handleDismiss = useCallback((key: string) => {
+    setDismissedAchievements(prev => new Set([...prev, key]));
+  }, []);
 
   // Calculate achievement progress for all trackable achievements
   const achievementProgress = useMemo<AchievementProgress[]>(() => {
@@ -168,22 +181,61 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
       .slice(0, 3); // Show max 3 achievements
   }, [validWordCount, comboLevel, maxCombo, wordLengths, timeSinceStart, gameDuration, earnedAchievements, t]);
 
-  // Don't render if no near-completion achievements or dismissed
-  if (achievementProgress.length === 0 || isDismissed) {
+  // Filter out dismissed achievements
+  const visibleAchievements = useMemo(() => {
+    return achievementProgress.filter(p => !dismissedAchievements.has(p.key));
+  }, [achievementProgress, dismissedAchievements]);
+
+  // Auto-dismiss achievements after 3 seconds
+  useEffect(() => {
+    if (isGameOver) return; // Don't set up individual timers if game is over (global dismiss handles it)
+
+    const now = Date.now();
+    const timers: NodeJS.Timeout[] = [];
+
+    visibleAchievements.forEach(achievement => {
+      // Track when this achievement was first shown
+      if (!shownAtRef.current[achievement.key]) {
+        shownAtRef.current[achievement.key] = now;
+      }
+
+      const shownAt = shownAtRef.current[achievement.key];
+      const elapsed = now - shownAt;
+      const remaining = AUTO_DISMISS_MS - elapsed;
+
+      if (remaining > 0) {
+        const timer = setTimeout(() => {
+          handleDismiss(achievement.key);
+        }, remaining);
+        timers.push(timer);
+      } else {
+        // Already expired, dismiss immediately
+        handleDismiss(achievement.key);
+      }
+    });
+
+    return () => {
+      timers.forEach(clearTimeout);
+    };
+  }, [visibleAchievements, isGameOver, handleDismiss]);
+
+  // Don't render if no visible achievements or globally dismissed
+  if (visibleAchievements.length === 0 || isDismissed) {
     return null;
   }
 
   return (
     <div className={cn("fixed bottom-20 right-4 z-40 space-y-2", className)}>
       <AnimatePresence>
-        {achievementProgress.map((progress) => (
+        {visibleAchievements.map((progress) => (
           <motion.div
             key={progress.key}
             initial={{ opacity: 0, x: 50, scale: 0.8 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 50, scale: 0.8 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="bg-neo-navy border-2 border-neo-cyan rounded-neo px-3 py-2 shadow-hard-sm max-w-[200px]"
+            onClick={() => handleDismiss(progress.key)}
+            className="bg-neo-navy border-2 border-neo-cyan rounded-neo px-3 py-2 shadow-hard-sm max-w-[200px] cursor-pointer hover:border-neo-pink transition-colors"
           >
             {/* Header */}
             <div className="flex items-center gap-2 mb-1">

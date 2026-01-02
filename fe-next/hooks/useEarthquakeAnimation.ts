@@ -27,6 +27,7 @@ interface DustCloud {
 }
 
 type EarthquakePhase = 'idle' | 'rumble' | 'quake' | 'settle';
+type DustPhase = 'idle' | 'cover' | 'reveal';
 
 interface UseEarthquakeAnimationProps {
   earthquakeShaking: boolean;
@@ -66,6 +67,7 @@ export function useEarthquakeAnimation({
   const [earthquakeParticles, setEarthquakeParticles] = useState<Particle[]>([]);
   const [earthquakeDust, setEarthquakeDust] = useState<DustCloud[]>([]);
   const [showCracks, setShowCracks] = useState(false);
+  const [dustPhase, setDustPhase] = useState<DustPhase>('idle');
 
   // Stable shake offsets stored in ref to prevent recalculation
   const shakeOffsetsRef = useRef<Map<string, ShakeOffset>>(new Map());
@@ -150,7 +152,7 @@ export function useEarthquakeAnimation({
       setEarthquakePhase('rumble');
       playEarthquakeRumble();
 
-      // Phase 2: Main quake (after 300ms)
+      // Phase 2: Main quake (after 300ms) - dust covers the board
       const quakeTimeout = setTimeout(() => {
         setEarthquakePhase('quake');
         playEarthquakeShake();
@@ -160,20 +162,25 @@ export function useEarthquakeAnimation({
           setEarthquakeParticles(generateParticles());
           setEarthquakeDust(generateDustClouds());
           setShowCracks(true);
+          setDustPhase('cover'); // Comic dust covers the board
         }
       }, 300);
 
-      // Phase 3: Settle (after 1100ms)
+      // Phase 3: Settle (after 1100ms) - comic reveal effect
       const settleTimeout = setTimeout(() => {
         setEarthquakePhase('settle');
         setEarthquakeParticles([]);
         setEarthquakeDust([]);
+        if (useEnhancedMode) {
+          setDustPhase('reveal'); // Comic book reveal with action lines
+        }
       }, 1100);
 
       // Phase 4: Back to idle (after 1700ms)
       const idleTimeout = setTimeout(() => {
         setEarthquakePhase('idle');
         setShowCracks(false);
+        setDustPhase('idle');
       }, 1700);
 
       prevEarthquakeShakingRef.current = earthquakeShaking;
@@ -187,6 +194,7 @@ export function useEarthquakeAnimation({
     } else if (!earthquakeShaking) {
       setEarthquakePhase('idle');
       setShowCracks(false);
+      setDustPhase('idle');
       prevEarthquakeShakingRef.current = earthquakeShaking;
     }
 
@@ -258,6 +266,7 @@ export function useEarthquakeAnimation({
     earthquakeParticles,
     earthquakeDust,
     showCracks,
+    dustPhase,
     getShakeOffset,
     getPhaseAnimation,
     useEnhancedMode,

@@ -1052,23 +1052,136 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         </div>
       </div>
 
-      {/* DESKTOP VIEW - Original scrollable layout (hidden on mobile) */}
-      <div className="hidden lg:flex lg:flex-col lg:overflow-auto px-1 py-2 sm:px-4 sm:py-3 md:p-6 pb-6">
+      {/* DESKTOP VIEW - Two-column side-by-side layout (hidden on mobile) */}
+      <div className="hidden lg:flex lg:flex-col lg:overflow-auto p-4 xl:p-6">
         {/* Top Bar with Exit Button */}
-        <div className="w-full max-w-4xl mx-auto flex items-center justify-end mb-2">
+        <div className="w-full max-w-6xl mx-auto flex items-center justify-end mb-4">
           <ExitRoomButton onClick={handleExitRoom} label={t('results.exitRoom')} />
         </div>
 
-        {/* Main Content Area */}
-        <div className="flex-1 w-full">
-          {/* Header Section - Centered */}
-          <div className="max-w-4xl mx-auto">
-            {/* Celebration Banner (shows current player if in top 3) */}
+        {/* Two-Column Layout */}
+        <div className="flex-1 w-full max-w-6xl mx-auto flex flex-row gap-6">
+          {/* LEFT COLUMN: Results (Winner banner, stats, leaderboard, actions) */}
+          <div className="flex-1 min-w-0 max-w-xl space-y-4">
+            {/* Celebration Banner */}
             {bannerPlayer && (
               <ResultsWinnerBanner winner={bannerPlayer} isCurrentUserWinner={isCurrentUserInBanner} rank={bannerRank} />
             )}
 
-            {/* Consolidated Player Card - Your Performance (always shows current player) */}
+            {/* Compact Stats Row */}
+            {currentPlayerData && currentPlayerRank > 0 && (
+              <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 shadow-hard">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-4">
+                    <div className="text-center">
+                      <div className="text-xl font-black text-white">
+                        {currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0}
+                      </div>
+                      <div className="text-[10px] text-white/60 font-bold uppercase">{t('results.words') || 'Words'}</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xl font-black text-white">
+                        {(() => {
+                          const total = currentPlayerData.allWords?.length || 0;
+                          const valid = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0;
+                          return total > 0 ? Math.round((valid / total) * 100) : 0;
+                        })()}%
+                      </div>
+                      <div className="text-[10px] text-white/60 font-bold uppercase">{t('results.accuracy') || 'Accuracy'}</div>
+                    </div>
+                  </div>
+                  {currentPlayerArchetype && (
+                    <PlayerArchetypeBadge archetype={currentPlayerArchetype} size="sm" showTooltip={true} />
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Top 3 Leaderboard */}
+            {sortedScores.length > 1 && (
+              <Top3Leaderboard players={sortedScores} currentUsername={username} compact />
+            )}
+
+            {/* Large Room Notice */}
+            {duplicateRuleDisabled && (
+              <div className="bg-neo-cyan/20 border-2 border-neo-cyan rounded-neo p-2 text-center">
+                <span className="text-xs text-neo-cyan font-bold">
+                  👥 {t('results.largeRoomMode') || 'Large Room Mode'} - {t('results.duplicateRuleDisabled') || 'duplicate words count'}
+                </span>
+              </div>
+            )}
+
+            {/* Play Again / Ready CTA */}
+            {gameCode && onReturnToRoom && (
+              <div className="mt-2">
+                {isHost ? (
+                  <motion.button
+                    onClick={handleStartGame}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full bg-emerald-500 text-white font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
+                  >
+                    <Play className="w-6 h-6" />
+                    {t('hostView.startGame') || 'Start Game'}
+                  </motion.button>
+                ) : isCurrentPlayerReady ? (
+                  <div className="bg-emerald-500 text-white border-3 border-neo-black rounded-neo p-3 shadow-hard">
+                    <div className="flex items-center justify-center gap-2">
+                      <Check className="w-5 h-5" />
+                      <span className="font-black uppercase">{t('results.youAreReady')}</span>
+                    </div>
+                    <p className="text-center text-sm text-white/80 mt-1">{t('results.waitingForHostToStart') || 'Waiting for host...'}</p>
+                  </div>
+                ) : (
+                  <motion.button
+                    onClick={handleMarkReady}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full bg-neo-yellow text-neo-black font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
+                  >
+                    <Star className="w-6 h-6" />
+                    {t('results.imReady')}
+                  </motion.button>
+                )}
+              </div>
+            )}
+
+            {/* Secondary Actions */}
+            <div className="flex gap-2">
+              {currentPlayerData && gameCode && !hasZeroScore && (currentPlayerData.score || 0) >= 10 && (
+                <button
+                  onClick={() => {/* Scroll to share section */}}
+                  className="flex-1 bg-neo-pink text-white font-bold text-sm px-4 py-2.5 uppercase border-2 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-1"
+                >
+                  <Share2 className="w-4 h-4" />
+                  {t('results.share') || 'Share'}
+                </button>
+              )}
+              <button
+                onClick={handleExitRoom}
+                className="flex-1 bg-neo-red text-neo-cream font-bold text-sm px-4 py-2.5 uppercase border-2 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-1"
+              >
+                <DoorOpen className="w-4 h-4" />
+                {t('results.leaveRoom')}
+              </button>
+            </div>
+
+            {/* Players Ready Indicator */}
+            {gameCode && sortedScores.length > 1 && (
+              <PlayersReadyIndicator
+                players={sortedScores
+                  .filter(p => !isHost || p.username !== username)
+                  .map(p => ({ username: p.username, avatar: p.avatar, isBot: p.isBot }))}
+                readyUsernames={readyUsernames}
+                currentUsername={username}
+                isHost={isHost}
+              />
+            )}
+          </div>
+
+          {/* RIGHT COLUMN: Details (Your words, other players, charts, chat) */}
+          <div className="flex-1 min-w-0 max-w-xl space-y-4">
+            {/* Full Player Performance Card */}
             {currentPlayerData && currentPlayerRank > 0 && (
               <ConsolidatedPlayerCard
                 player={currentPlayerData}
@@ -1083,75 +1196,27 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               />
             )}
 
-            {/* Performance Chart & Missed Words - Collapsed by default for cleaner initial view */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.3 }}
-              className="mt-4 space-y-2"
-            >
-              {/* Performance Chart - Hidden behind toggle */}
-              <CollapsibleSection
-                title={t('results.yourProgress') || 'Your Progress'}
-                icon={<Trophy className="w-4 h-4" />}
-                defaultExpanded={false}
-                variant="tertiary"
-                className="shadow-hard"
-              >
-                <PerformanceChart currentScore={currentPlayerData?.score} gamesLimit={10} />
-              </CollapsibleSection>
-
-              {/* Missed Words - Only show if there are words, and collapsed */}
-              {missedWords.length > 0 && (
-                <CollapsibleSection
-                  title={t('results.missedWords') || 'Words You Missed'}
-                  icon={<Star className="w-4 h-4" />}
-                  badge={missedWords.length}
-                  defaultExpanded={false}
-                  variant="tertiary"
-                  className="shadow-hard"
-                >
-                  <MissedWords missedWords={missedWords} maxDisplay={5} />
-                </CollapsibleSection>
-              )}
-            </motion.div>
-
-            {/* Compact Top 3 Leaderboard */}
-            {sortedScores.length > 1 && (
-              <Top3Leaderboard
-                players={sortedScores}
-                currentUsername={username}
+            {/* Share Prompt */}
+            {currentPlayerData && gameCode && !hasZeroScore && (currentPlayerData.score || 0) >= 10 && (isCurrentUserWinner || currentPlayerData.score >= 30) && (
+              <ShareWinPrompt
+                isWinner={isCurrentUserWinner}
+                username={username}
+                score={currentPlayerData.score || 0}
+                wordCount={currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0}
+                achievements={currentPlayerData.achievements || achievements || []}
+                gameCode={gameCode}
+                streakDays={isCurrentUserWinner ? currentStreak : 0}
+                compact={!isCurrentUserWinner}
+                maxCombo={shareCardStats.maxCombo}
+                archetype={currentPlayerArchetype}
+                placement={currentPlayerRank}
+                totalPlayers={sortedScores.length}
+                longestWord={shareCardStats.longestWord}
               />
             )}
 
-            {/* Large Room Notice - Duplicate rule disabled */}
-            {duplicateRuleDisabled && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.3 }}
-                className="mb-2 mx-auto max-w-md"
-              >
-                <div className="bg-neo-cyan border-3 border-neo-black rounded-neo p-3 shadow-hard text-center">
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="text-lg">👥</span>
-                    <span className="font-black text-neo-black text-sm uppercase">
-                      {t('results.largeRoomMode') || 'Large Room Mode'}
-                    </span>
-                    <span className="text-lg">👥</span>
-                  </div>
-                  <p className="text-xs text-neo-black mt-1 font-bold">
-                    {t('results.duplicateRuleDisabled') || `With ${playerCount || '8+'} players, duplicate words still count!`}
-                  </p>
-                </div>
-              </motion.div>
-            )}
-
-          </div>
-
-          {/* Other Players Results - Collapsible Section */}
-          {sortedScores.filter(p => p.username !== username).length > 0 && (
-            <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 mt-2">
+            {/* Other Players */}
+            {sortedScores.filter(p => p.username !== username).length > 0 && (
               <CollapsibleSection
                 title={t('results.otherPlayers') || 'Other Players'}
                 icon={<Users className="w-4 h-4" />}
@@ -1163,8 +1228,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                 <div className="space-y-2">
                   {sortedScores
                     .filter(player => player.username !== username)
-                    .map((player, filteredIndex) => {
-                      // Find original index for proper ranking display
+                    .map((player) => {
                       const originalIndex = sortedScores.findIndex(p => p.username === player.username);
                       return (
                         <ResultsPlayerCard
@@ -1183,96 +1247,39 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                     })}
                 </div>
               </CollapsibleSection>
-            </div>
-          )}
+            )}
 
-          {/* Growth Features Section */}
-          <div className="w-full max-w-2xl mx-auto px-2 sm:px-4 mt-3 space-y-2">
-            {/* Share Prompt */}
-            {currentPlayerData && gameCode && !hasZeroScore && (currentPlayerData.score || 0) >= 10 && (isCurrentUserWinner || currentPlayerData.score >= 30) && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-30px" }}
-                transition={{ duration: 0.3, delay: 0.1, ease: "easeOut" }}
+            {/* Performance Chart */}
+            <CollapsibleSection
+              title={t('results.yourProgress') || 'Your Progress'}
+              icon={<Trophy className="w-4 h-4" />}
+              defaultExpanded={false}
+              variant="tertiary"
+              className="shadow-hard"
+            >
+              <PerformanceChart currentScore={currentPlayerData?.score} gamesLimit={10} />
+            </CollapsibleSection>
+
+            {/* Missed Words */}
+            {missedWords.length > 0 && (
+              <CollapsibleSection
+                title={t('results.missedWords') || 'Words You Missed'}
+                icon={<Star className="w-4 h-4" />}
+                badge={missedWords.length}
+                defaultExpanded={false}
+                variant="tertiary"
+                className="shadow-hard"
               >
-                <ShareWinPrompt
-                  isWinner={isCurrentUserWinner}
-                  username={username}
-                  score={currentPlayerData.score || 0}
-                  wordCount={currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0}
-                  achievements={currentPlayerData.achievements || achievements || []}
-                  gameCode={gameCode}
-                  streakDays={isCurrentUserWinner ? currentStreak : 0}
-                  compact={!isCurrentUserWinner}
-                  maxCombo={shareCardStats.maxCombo}
-                  archetype={currentPlayerArchetype}
-                  placement={currentPlayerRank}
-                  totalPlayers={sortedScores.length}
-                  longestWord={shareCardStats.longestWord}
-                />
-              </motion.div>
+                <MissedWords missedWords={missedWords} maxDisplay={10} />
+              </CollapsibleSection>
+            )}
+
+            {/* Room Chat */}
+            {gameCode && sortedScores.length > 1 && (
+              <RoomChat username={username} isHost={isHost} gameCode={gameCode} className="max-h-[250px]" />
             )}
           </div>
-
-        {/* PROMINENT Action Section - Host sees Start Game, Players see I'm Ready */}
-        {gameCode && onReturnToRoom && (
-          <div className="mt-4 max-w-2xl mx-auto px-2 sm:px-4">
-            <MultiplayerActions
-              isHost={isHost}
-              isCurrentPlayerReady={isCurrentPlayerReady}
-              onStartGame={handleStartGame}
-              onMarkReady={handleMarkReady}
-              onReturnToRoom={onReturnToRoom}
-              onExitRoom={handleExitRoom}
-              variant="desktop"
-            />
-          </div>
-        )}
-
-        {/* Players Ready Indicator - Shows who's ready for next round */}
-        {gameCode && sortedScores.length > 1 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-30px" }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            className="mt-4 max-w-2xl mx-auto px-2 sm:px-4"
-          >
-            <PlayersReadyIndicator
-              players={sortedScores
-                .filter(p => !isHost || p.username !== username)
-                .map(p => ({
-                  username: p.username,
-                  avatar: p.avatar,
-                  isBot: p.isBot
-                }))}
-              readyUsernames={readyUsernames}
-              currentUsername={username}
-              isHost={isHost}
-            />
-          </motion.div>
-        )}
-
         </div>
-
-        {/* Room Chat - At the bottom of the page for communication */}
-        {gameCode && sortedScores.length > 1 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-30px" }}
-            transition={{ duration: 0.4, delay: 0.1, ease: "easeOut" }}
-            className="mt-6 max-w-2xl mx-auto px-2 sm:px-4 pb-4"
-          >
-            <RoomChat
-              username={username}
-              isHost={isHost}
-              gameCode={gameCode}
-              className="max-h-[300px]"
-            />
-          </motion.div>
-        )}
       </div>
 
       {/* Exit Confirmation Dialog */}

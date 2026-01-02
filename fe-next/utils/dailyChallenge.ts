@@ -6,6 +6,7 @@
  */
 
 import { hebrewLetters, swedishLetters, spanishLetters, japaneseLetters, kanjiCompounds, DIFFICULTIES, DEFAULT_DIFFICULTY } from './consts';
+import { formatTimeHHMMSS } from '@/shared/utils';
 import type { Language, LetterGrid } from '@/types';
 import type { LetterFeedback } from './wordHuntFeedback';
 
@@ -127,13 +128,9 @@ export function getSecondsUntilNextDaily(): number {
 
 /**
  * Format countdown as HH:MM:SS
+ * @deprecated Use formatTimeHHMMSS from '@/shared/utils' directly
  */
-export function formatCountdown(seconds: number): string {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
-  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-}
+export const formatCountdown = formatTimeHHMMSS;
 
 // ==========================================
 // Seeded Grid Generation

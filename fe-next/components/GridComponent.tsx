@@ -17,7 +17,7 @@ import { useDisableFireRoundLights, useDisableEarthquakeEffects } from '@/contex
 import { useDevicePerformance } from '../hooks/useDevicePerformance';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useEarthquakeAnimation } from '../hooks/useEarthquakeAnimation';
-import ScreenCracks from './earthquake/ScreenCracks';
+import ComicDustReveal from './earthquake/ComicDustReveal';
 
 /** Cell position for highlighted paths */
 export interface HighlightedCell {
@@ -189,6 +189,7 @@ const GridComponent = memo<GridComponentProps>(({
     earthquakeParticles,
     earthquakeDust,
     showCracks,
+    dustPhase,
     getShakeOffset,
     getPhaseAnimation,
     useEnhancedMode,
@@ -386,9 +387,10 @@ const GridComponent = memo<GridComponentProps>(({
       {/* First-time combo explanation tooltip */}
       <ComboExplanationTooltip comboLevel={comboLevel} />
 
-      {/* Screen crack effect overlay */}
-      <ScreenCracks
+      {/* Comic book dust reveal effect overlay */}
+      <ComicDustReveal
         visible={showCracks}
+        phase={dustPhase}
         intensity={useEnhancedMode ? 'high' : 'medium'}
       />
 

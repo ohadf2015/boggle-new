@@ -6,23 +6,9 @@ import { Users, Trophy, Clock, ChevronDown, ChevronUp, Sparkles, Share2, Check, 
 import { Button } from '@/components/ui/button';
 import { getRankDisplay } from '@/utils/rankingStyles';
 import { getPuzzleNumber } from '@/utils/dailyChallenge';
+import { formatDistanceToNow, getCountryFlag } from '@/shared/utils';
 import Avatar from '@/components/Avatar';
 import type { Language } from '@/types';
-
-// Simple relative time formatter with translation support
-function formatDistanceToNow(dateString: string, t: (key: string) => string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffSecs = Math.floor(diffMs / 1000);
-  const diffMins = Math.floor(diffSecs / 60);
-  const diffHours = Math.floor(diffMins / 60);
-
-  if (diffSecs < 60) return t('wordHunt.leaderboard.justNow');
-  if (diffMins < 60) return t('wordHunt.leaderboard.minutesAgo').replace('{count}', String(diffMins));
-  if (diffHours < 24) return t('wordHunt.leaderboard.hoursAgo').replace('{count}', String(diffHours));
-  return date.toLocaleDateString();
-}
 
 // ==========================================
 // Types
@@ -46,16 +32,6 @@ export interface DailyParticipant {
   solved?: boolean;
   attempts_used?: number;
   efficiency_score?: number;
-}
-
-// Country code to flag emoji converter
-function getCountryFlag(countryCode: string | null | undefined): string {
-  if (!countryCode || countryCode.length !== 2) return '';
-  const codePoints = countryCode
-    .toUpperCase()
-    .split('')
-    .map(char => 127397 + char.charCodeAt(0));
-  return String.fromCodePoint(...codePoints);
 }
 
 interface DailyLeaderboardProps {

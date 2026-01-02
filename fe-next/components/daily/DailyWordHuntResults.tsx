@@ -768,8 +768,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         </div>
       </div>
 
-      {/* Scrollable Tab Content - with bottom padding for tab bar */}
-      <div className="flex-1 overflow-y-auto px-3 pb-20 relative">
+      {/* Scrollable Tab Content - with bottom padding for tab bar on mobile */}
+      <div className="flex-1 overflow-y-auto px-3 pb-20 lg:pb-4 relative">
         {/* Screenshot protection overlay */}
         {isProtected && (
           <div className="absolute inset-0 flex items-center justify-center z-20 bg-black/40">
@@ -781,8 +781,153 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             </div>
           </div>
         )}
+
+        {/* DESKTOP VIEW - Two-column side-by-side layout (hidden on mobile) */}
+        <div className="hidden lg:flex lg:flex-row lg:gap-6 lg:max-w-5xl lg:mx-auto lg:pt-4">
+          {/* LEFT COLUMN: Results + Share */}
+          <div className={cn(
+            "flex-1 min-w-0 max-w-xl text-center space-y-3 transition-all duration-200",
+            isProtected && "blur-xl pointer-events-none select-none"
+          )}>
+
+        {/* ===== RESULTS CONTENT (DESKTOP LEFT COLUMN) ===== */}
+        {/* This content is always visible on desktop */}
+        <>
+        {/* Puzzle number and attempts */}
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <div className="text-sm text-gray-600 dark:text-gray-300 uppercase font-bold">
+            🎯 {t('daily.puzzleNumber').replace('{number}', String(puzzleNumber))}
+          </div>
+
+          {/* Success: Show attempts used */}
+          {result.solved ? (
+            <>
+              <div className="text-3xl sm:text-4xl font-black mt-1 text-green-500">
+                {result.attemptsUsed}/10
+              </div>
+
+              {/* Target word - inline with label */}
+              <div className="mt-1">
+                <span className="text-xs text-gray-500 dark:text-gray-400">{t('wordHunt.results.targetWord')}: </span>
+                <span className="text-lg sm:text-xl font-black text-neo-yellow">
+                  {language === 'he' ? applyHebrewFinalLetters(result.targetWord) : result.targetWord.toUpperCase()}
+                </span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="text-3xl sm:text-4xl font-black mt-1 text-red-500">X/10</div>
+              <div className="mt-1">
+                <span className="text-xs text-gray-500 dark:text-gray-400">{t('wordHunt.results.targetWord')}: </span>
+                <span className="text-lg sm:text-xl font-black text-neo-yellow">
+                  {language === 'he' ? applyHebrewFinalLetters(result.targetWord) : result.targetWord.toUpperCase()}
+                </span>
+              </div>
+            </>
+          )}
+        </motion.div>
+
+        {/* Streak display */}
+        {result.streakDays > 0 && (
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="inline-flex items-center gap-2 px-3 py-1.5 bg-orange-500 text-white rounded-neo border-2 border-neo-black shadow-hard-sm"
+          >
+            <span className="text-xl">🔥</span>
+            <span className="font-black">{result.streakDays} {t('daily.dayStreak')}</span>
+          </motion.div>
+        )}
+
+        {/* Share Button */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
+          <Button
+            onClick={handleNativeShare}
+            className="w-full max-w-xs py-3 bg-neo-cyan text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all font-bold"
+          >
+            <Share2 className="mr-2 w-5 h-5" />
+            {t('wordHunt.shareResult')}
+          </Button>
+        </motion.div>
+
+        {/* Coins earned */}
+        {result.solved && coinReward && coinReward.awarded > 0 && (
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neo-yellow text-neo-black rounded-neo border-2 border-neo-black shadow-hard-sm"
+          >
+            <Coins className="w-4 h-4" />
+            <span className="font-black">+{coinReward.awarded}</span>
+          </motion.div>
+        )}
+        </>
+
+          </div>
+
+          {/* RIGHT COLUMN: Stats + Leaderboard */}
+          <div className={cn(
+            "flex-1 min-w-0 max-w-xl text-center space-y-4 transition-all duration-200",
+            isProtected && "blur-xl pointer-events-none select-none"
+          )}>
+            {/* Stats Section */}
+            <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-4 shadow-hard text-left">
+              <h3 className="text-sm font-black uppercase text-white mb-3 flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-neo-cyan" />
+                {t('wordHunt.stats.title') || 'Statistics'}
+              </h3>
+              {stats ? (
+                <div className="space-y-3">
+                  {/* Your percentile */}
+                  {stats.yourStats && (
+                    <div className="text-center">
+                      <span className="text-3xl font-black text-neo-yellow">{stats.yourStats.percentile}%</span>
+                      <span className="text-white/70 text-sm block">{t('wordHunt.stats.betterThan')}</span>
+                    </div>
+                  )}
+                  {/* Stats grid */}
+                  <div className="grid grid-cols-2 gap-2 text-center">
+                    <div className="bg-white/10 rounded-neo p-2">
+                      <div className="text-lg font-black text-white">{stats.totalPlayers}</div>
+                      <div className="text-[10px] text-white/60 uppercase font-bold">{t('wordHunt.stats.totalPlayers')}</div>
+                    </div>
+                    <div className="bg-white/10 rounded-neo p-2">
+                      <div className="text-lg font-black text-white">{Math.round(stats.solveRate)}%</div>
+                      <div className="text-[10px] text-white/60 uppercase font-bold">{t('wordHunt.stats.solveRate')}</div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-white/50 text-sm">{t('common.loading')}</div>
+              )}
+            </div>
+
+            {/* Leaderboard Section */}
+            <TabbedDailyLeaderboard
+              puzzleDate={puzzleDate}
+              language={language}
+              currentPlayerId={isAuthenticated && profile ? profile.id : null}
+              currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
+              maxVisible={5}
+              t={t}
+              defaultTab="today"
+            />
+          </div>
+        </div>
+
+        {/* MOBILE VIEW - Tab-based layout (hidden on desktop) */}
         <div className={cn(
-          "max-w-md mx-auto text-center space-y-3 pt-3 transition-all duration-200",
+          "max-w-md mx-auto text-center space-y-3 pt-3 transition-all duration-200 lg:hidden",
           isProtected && "blur-xl pointer-events-none select-none"
         )}>
 
@@ -1626,8 +1771,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         </div>
       </div>
 
-      {/* Bottom Tab Bar - Fixed (using reusable MobileTabBar component) */}
-      <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black safe-area-bottom">
+      {/* Bottom Tab Bar - Fixed, mobile only (hidden on desktop lg+) */}
+      <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black safe-area-bottom lg:hidden">
         <MobileTabBar
           tabs={[
             { id: 'results', icon: <Share2 className="w-5 h-5" />, label: t('wordHunt.results.share') || 'Share' },

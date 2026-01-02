@@ -465,18 +465,33 @@ body {
     /* No rotation - keep grid perfectly straight */
     padding: 10px;
     /* Simplified sizing using vmin to prevent layout shift on orientation change */
-    width: min(80vmin, calc(100vw - 32px));
-    height: min(80vmin, calc(100vw - 32px));
+    /* Max height leaves room for timer, stats, and word forming area above grid */
+    width: min(80vmin, calc(100vw - 32px), calc(100dvh - 220px));
+    height: min(80vmin, calc(100vw - 32px), calc(100dvh - 220px));
+    max-height: calc(100dvh - 220px);
     aspect-ratio: 1 / 1;
     /* Center within parent */
     margin: 0 auto;
   }
 
-  /* On desktop screens, make the board a bit smaller */
+  /* On desktop screens, make the board a bit smaller to fit with side panels */
   @media (min-width: 769px) {
     .game-board-frame {
-      width: min(65vmin, calc(100vw - 400px));
-      height: min(65vmin, calc(100vw - 400px));
+      /* Desktop: constrain by viewport height minus header/stats space (~180px) */
+      /* Also constrain by width accounting for side panels (~400px total) */
+      width: min(65vmin, calc(100vw - 400px), calc(100dvh - 180px));
+      height: min(65vmin, calc(100vw - 400px), calc(100dvh - 180px));
+      max-height: calc(100dvh - 180px);
+    }
+  }
+
+  /* Large desktop screens - comfortable size with more room */
+  @media (min-width: 1280px) {
+    .game-board-frame {
+      /* Large desktops have more vertical space, but still constrain */
+      width: min(60vmin, calc(100vw - 500px), calc(100dvh - 200px));
+      height: min(60vmin, calc(100vw - 500px), calc(100dvh - 200px));
+      max-height: calc(100dvh - 200px);
     }
   }
 
