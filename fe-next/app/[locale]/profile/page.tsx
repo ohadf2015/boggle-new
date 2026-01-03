@@ -597,42 +597,6 @@ export default function ProfilePage(): React.ReactNode {
     </motion.div>
   );
 
-  // Key Stats Grid (compact 2x2 for mobile overview)
-  const renderKeyStats = () => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1 }}
-      className="grid grid-cols-2 gap-2 mb-4"
-    >
-      <StatCard
-        icon={<Gamepad2 className="w-5 h-5" />}
-        label={t('profile.totalGames')}
-        value={profile?.total_games || 0}
-        isDarkMode={isDarkMode}
-      />
-      <StatCard
-        icon={<Trophy className="w-5 h-5" />}
-        label={t('profile.wins')}
-        value={(profile?.ranked_wins || 0) + (profile?.casual_wins || 0)}
-        isDarkMode={isDarkMode}
-      />
-      <StatCard
-        icon={<Star className="w-5 h-5" />}
-        label={t('profile.totalScore')}
-        value={(profile?.total_score || 0).toLocaleString()}
-        isDarkMode={isDarkMode}
-        highlight
-      />
-      <StatCard
-        icon={<span className="text-lg">📝</span>}
-        label={t('profile.wordsFound')}
-        value={profile?.total_words || 0}
-        isDarkMode={isDarkMode}
-      />
-    </motion.div>
-  );
-
   // Full Stats Grid (for Stats tab and desktop)
   const renderFullStats = () => (
     <motion.div
@@ -1145,7 +1109,7 @@ export default function ProfilePage(): React.ReactNode {
               >
                 {renderProfileHeader(true)}
                 {renderXpSection(true)}
-                {renderKeyStats()}
+                {renderCoinsSection(true)}
                 {renderBackButtons()}
               </motion.div>
             )}
@@ -1158,7 +1122,6 @@ export default function ProfilePage(): React.ReactNode {
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.2 }}
               >
-                {renderCoinsSection(true)}
                 {renderFullStats()}
                 {renderRankedProgress()}
               </motion.div>

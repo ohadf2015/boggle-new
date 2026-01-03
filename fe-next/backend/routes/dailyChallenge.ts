@@ -811,7 +811,7 @@ router.get('/word-hunt/leaderboard/:date/:language', async (req: Request<Leaderb
     const supabase = getSupabase();
 
     // Fetch leaderboard from the Word Hunt leaderboard view
-    // Filter: only show solved attempts from authenticated users
+    // Filter: only show solved attempts from authenticated users (guests shown in stats only)
     const { data, error } = await supabase
       .from('daily_word_hunt_leaderboard')
       .select('*')
@@ -828,7 +828,7 @@ router.get('/word-hunt/leaderboard/:date/:language', async (req: Request<Leaderb
       return;
     }
 
-    // Get total participant count (only solved attempts from authenticated users)
+    // Get authenticated solved count (for leaderboard display)
     const { count, error: countError } = await supabase
       .from('daily_word_hunt_attempts')
       .select('*', { count: 'exact', head: true })
@@ -841,44 +841,46 @@ router.get('/word-hunt/leaderboard/:date/:language', async (req: Request<Leaderb
       logger.warn('API', `Word Hunt leaderboard count error: ${countError.message}`);
     }
 
-    // Get total attempts count (including guests and failed attempts)
-    const { count: totalCount, error: totalCountError } = await supabase
+    // Get total players count (ALL players who attempted - authenticated + guests)
+    const { count: totalPlayersCount, error: totalPlayersError } = await supabase
       .from('daily_word_hunt_attempts')
       .select('*', { count: 'exact', head: true })
       .eq('puzzle_date', date)
       .eq('language', language);
 
-    if (totalCountError) {
-      logger.warn('API', `Word Hunt leaderboard total count error: ${totalCountError.message}`);
+    if (totalPlayersError) {
+      logger.warn('API', `Word Hunt total players count error: ${totalPlayersError.message}`);
     }
 
-    // Get guest player count (guests who played, regardless of solved status)
-    const { count: guestCount, error: guestCountError } = await supabase
+    // Get total solved count (ALL players who solved - authenticated + guests)
+    const { count: totalSolvedCount, error: totalSolvedError } = await supabase
       .from('daily_word_hunt_attempts')
       .select('*', { count: 'exact', head: true })
       .eq('puzzle_date', date)
       .eq('language', language)
-      .is('player_id', null)
-      .not('guest_fingerprint', 'is', null);
+      .eq('solved', true);
 
-    if (guestCountError) {
-      logger.warn('API', `Word Hunt leaderboard guest count error: ${guestCountError.message}`);
+    if (totalSolvedError) {
+      logger.warn('API', `Word Hunt total solved count error: ${totalSolvedError.message}`);
     }
 
     // Calculate participant count - ensure we show at least as many as we have data rows
     const dataLength = data?.length || 0;
     const queryCount = count ?? 0;
     const totalParticipants = Math.max(queryCount, dataLength);
-    const guestPlayerCount = guestCount ?? 0;
+
+    // Stats for display: total players who attempted and total who solved (including guests)
+    const totalPlayers = totalPlayersCount ?? 0;
+    const totalSolved = totalSolvedCount ?? 0;
 
     // Debug: Log leaderboard fetch results
-    logger.info('API', `[WordHunt Leaderboard] ${date}/${language}: total=${totalParticipants}, totalAttempts=${totalCount ?? 0}, guests=${guestPlayerCount}, authenticated=${(totalCount ?? 0) - guestPlayerCount}`);
+    logger.info('API', `[WordHunt Leaderboard] ${date}/${language}: leaderboard=${totalParticipants}, totalPlayers=${totalPlayers}, totalSolved=${totalSolved}`);
 
     res.json({
       data: data || [],
-      totalParticipants,
-      totalAttempts: totalCount ?? 0,
-      guestPlayerCount,
+      totalParticipants,       // Authenticated solvers on leaderboard
+      totalPlayers,            // ALL players who attempted (for stats display)
+      totalSolved,             // ALL players who solved (for stats display)
       date,
       language
     });

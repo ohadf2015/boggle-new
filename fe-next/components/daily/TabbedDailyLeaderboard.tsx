@@ -353,6 +353,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   // Today's leaderboard state
   const [todayParticipants, setTodayParticipants] = useState<DailyParticipant[]>([]);
   const [todayTotalCount, setTodayTotalCount] = useState(0);
+  const [todayTotalSolved, setTodayTotalSolved] = useState(0);
   const [todayLoading, setTodayLoading] = useState(true);
   const [todayError, setTodayError] = useState<string | null>(null);
 
@@ -387,11 +388,13 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
 
       const responseData = await response.json();
       const data = responseData.data || [];
-      // Use totalAttempts to show ALL players (including guests), not just authenticated solvers
-      const totalPlayers = responseData.totalAttempts || responseData.totalParticipants || 0;
+      // Use totalPlayers for ALL who attempted, totalSolved for ALL who solved (including guests)
+      const totalPlayers = responseData.totalPlayers || responseData.totalParticipants || 0;
+      const totalSolved = responseData.totalSolved || 0;
 
       setTodayParticipants(data);
       setTodayTotalCount(totalPlayers);
+      setTodayTotalSolved(totalSolved);
 
       if (onParticipantCountChange && activeTab === 'today') {
         onParticipantCountChange(totalPlayers);
@@ -507,6 +510,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   // Get current data based on active tab
   const participants = activeTab === 'today' ? todayParticipants : allTimeParticipants;
   const totalCount = activeTab === 'today' ? todayTotalCount : allTimeTotalCount;
+  const totalSolvedCount = activeTab === 'today' ? todayTotalSolved : 0;
   const loading = activeTab === 'today' ? todayLoading : allTimeLoading;
   const error = activeTab === 'today' ? todayError : allTimeError;
 
@@ -583,7 +587,15 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
                 {t('wordHunt.leaderboard.title')}
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
-                {totalCount} {totalCount === 1 ? t('daily.playerSingular') : t('daily.playersPlural')}
+                {activeTab === 'today' && totalCount > 0 ? (
+                  <>
+                    <span>{totalCount} {t('wordHunt.leaderboard.played')}</span>
+                    <span className="mx-1.5">•</span>
+                    <span className="text-emerald-600 dark:text-emerald-400">{totalSolvedCount} {t('wordHunt.leaderboard.solved')}</span>
+                  </>
+                ) : (
+                  <>{totalCount} {totalCount === 1 ? t('daily.playerSingular') : t('daily.playersPlural')}</>
+                )}
               </p>
             </div>
           </div>
