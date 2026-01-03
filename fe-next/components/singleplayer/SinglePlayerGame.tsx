@@ -30,6 +30,7 @@ import { awardComboCoins } from '@/utils/coinManager';
 import { hapticForWordScore, hapticError } from '@/utils/haptics';
 import { useAnnouncer } from '@/components/GameAnnouncer';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
+import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
 import {
   calculateFinalAchievements,
@@ -205,6 +206,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   useAutoScrollOnGameStart(gameStatsRef, {
     gameActive,
     isLandscape,
+  });
+
+  // CrazyGames SDK lifecycle events (gameplayStart/Stop, happyTime)
+  useCrazyGamesLifecycle({
+    isGameActive: gameActive,
+    isGameOver,
+    score,
+    maxCombo: combo.maxCombo,
   });
 
   // Announce timer at key intervals for screen reader users

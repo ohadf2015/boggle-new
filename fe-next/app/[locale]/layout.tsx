@@ -5,6 +5,7 @@ import { translations } from '@/translations';
 import { Providers } from '../providers';
 import Footer from '@/components/Footer';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
+import { CrazyGamesScript } from '@/components/CrazyGamesSDK';
 import SocialMediaPixels from '@/components/SocialMediaPixels';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
 import PWAInstallPrompt from '@/components/PWAInstallPrompt';
@@ -500,6 +501,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     {validLocale === 'he' ? 'דלג לתוכן הראשי' : validLocale === 'sv' ? 'Hoppa till huvudinnehåll' : validLocale === 'ja' ? 'メインコンテンツへスキップ' : validLocale === 'es' ? 'Saltar al contenido principal' : 'Skip to main content'}
                 </a>
                 <GoogleAnalytics />
+                <CrazyGamesScript />
                 <SocialMediaPixels />
                 <WebVitalsReporter />
                 <ServiceWorkerRegistration />

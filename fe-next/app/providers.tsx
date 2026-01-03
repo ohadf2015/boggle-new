@@ -10,6 +10,7 @@ import { AchievementQueueProvider } from '@/components/achievements';
 import { GameAnnouncerProvider } from '@/components/GameAnnouncer';
 import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
 import { MotionConfigProvider } from '@/components/motion/MotionConfigProvider';
+import { CrazyGamesProvider } from '@/components/CrazyGamesSDK';
 import { SocketProvider } from '@/utils/SocketContext';
 import { GameStateProvider } from '@/contexts/GameStateContext';
 import { SocketEventBusProvider } from '@/contexts/SocketEventBusContext';
@@ -116,18 +117,20 @@ export function Providers({ children, lang }: ProvidersProps) {
             <>
                 <ThemeProvider>
                     <LanguageProvider initialLanguage={lang}>
-                        <SocketProvider>
-                            <GameStateProvider>
-                                <SocketEventBusProvider>
-                                    <AudioProviders>
-                                        <GameProviders>
-                                            {children}
-                                            <WinnerOnboardingWrapper />
-                                        </GameProviders>
-                                    </AudioProviders>
-                                </SocketEventBusProvider>
-                            </GameStateProvider>
-                        </SocketProvider>
+                        <CrazyGamesProvider>
+                            <SocketProvider>
+                                <GameStateProvider>
+                                    <SocketEventBusProvider>
+                                        <AudioProviders>
+                                            <GameProviders>
+                                                {children}
+                                                <WinnerOnboardingWrapper />
+                                            </GameProviders>
+                                        </AudioProviders>
+                                    </SocketEventBusProvider>
+                                </GameStateProvider>
+                            </SocketProvider>
+                        </CrazyGamesProvider>
                     </LanguageProvider>
                 </ThemeProvider>
                 <Toaster

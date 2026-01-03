@@ -1647,6 +1647,18 @@ body {
   -webkit-touch-callout: none;
 }
 
+/* CrazyGames iframe requirements - prevent mobile selection issues */
+/* When embedded in CrazyGames, prevent text selection and magnification */
+.crazygames-embed body,
+body.crazygames-embed {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
 /* Scrollable areas - allow vertical scroll only */
 .scrollable-area {
   touch-action: pan-y;

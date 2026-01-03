@@ -17,6 +17,7 @@ import { useMusic } from '@/contexts/MusicContext';
 import { useComboSystem } from '@/hooks/useComboSystem';
 import { useGameTimer } from '@/hooks/useGameTimer';
 import { useWordSubmission } from '@/hooks/useWordSubmission';
+import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
 import { useContextualGuidance, useSwipeTipGuidanceTrigger } from '@/hooks/useContextualGuidance';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
@@ -140,6 +141,14 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     initialTime: duration,
     isPaused: isGameOver,
     onTimeUp: stableOnTimeUp,
+  });
+
+  // CrazyGames SDK lifecycle events (gameplayStart/Stop, happyTime)
+  useCrazyGamesLifecycle({
+    isGameActive: !isGameOver && timer.remainingTime > 0,
+    isGameOver,
+    score,
+    maxCombo: combo.maxCombo,
   });
 
   // Word submission - handles validation, dictionary checks, and feedback

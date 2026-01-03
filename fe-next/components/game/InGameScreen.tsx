@@ -45,6 +45,7 @@ import {
 } from '@/hooks/useContextualGuidance';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
+import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import KeyboardHintTooltip from './KeyboardHintTooltip';
 import CompactLeaderboard, { type CompactPlayer } from './CompactLeaderboard';
 
@@ -200,6 +201,15 @@ const InGameScreen = memo<InGameScreenProps>(({
       announceTimer(remainingTime);
     }
   }, [remainingTime, gameActive, announceTimer]);
+
+  // CrazyGames SDK lifecycle events (gameplayStart/Stop, happyTime)
+  // In multiplayer, game ends when remainingTime hits 0
+  const isGameOver = remainingTime === 0;
+  useCrazyGamesLifecycle({
+    isGameActive: gameActive && !isGameOver,
+    isGameOver,
+    maxCombo: comboLevel,
+  });
 
   // Mobile tab state for words/leaderboard toggle
   const [mobileActiveTab, setMobileActiveTab] = useState<'words' | 'leaderboard'>('words');
