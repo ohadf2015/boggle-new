@@ -87,7 +87,9 @@ export function useGridInteraction({
   const [focusedCell, setFocusedCell] = useState<GridPosition | null>(null);
   const [isKeyboardMode, setIsKeyboardMode] = useState<boolean>(false);
   const [adjacentCells, setAdjacentCells] = useState<GridPosition[]>([]);
-  const [swipeVelocity, setSwipeVelocity] = useState<number>(0);
+  // Use ref for swipeVelocity to avoid re-renders on every touch move
+  // This value is only used internally for velocity bonus calculation, not for rendering
+  const swipeVelocityRef = useRef<number>(0);
   // Desktop-specific state
   const [hoveredCell, setHoveredCell] = useState<GridPosition | null>(null);
   const [isClickSelectMode, setIsClickSelectMode] = useState<boolean>(false);
@@ -454,7 +456,7 @@ export function useGridInteraction({
     // Clear touch history for fresh velocity tracking
     touchHistoryRef.current = [{ x: touch.clientX, y: touch.clientY, time: Date.now() }];
     lastDirectionRef.current = null;
-    setSwipeVelocity(0);
+    swipeVelocityRef.current = 0;
 
     // Store start cell
     startCellRef.current = { row: rowIndex, col: colIndex, letter };
@@ -478,9 +480,9 @@ export function useGridInteraction({
       touchHistoryRef.current = touchHistoryRef.current.slice(-VELOCITY_SAMPLES);
     }
 
-    // Update swipe velocity
+    // Update swipe velocity (using ref to avoid re-renders)
     const velocity = calculateVelocity();
-    setSwipeVelocity(velocity);
+    swipeVelocityRef.current = velocity;
 
     // Deadzone check
     const deltaX = touchX - startPosRef.current.x;
@@ -590,7 +592,7 @@ export function useGridInteraction({
 
     // Clear gesture tracking state
     setAdjacentCells([]);
-    setSwipeVelocity(0);
+    swipeVelocityRef.current = 0;
     touchHistoryRef.current = [];
     lastDirectionRef.current = null;
 
@@ -1029,7 +1031,7 @@ export function useGridInteraction({
     fadingCells,
     focusedCell,
     adjacentCells,
-    swipeVelocity,
+    swipeVelocity: swipeVelocityRef.current,
     hoveredCell,
     isSelecting: isClickSelectMode,
     isDragging,
