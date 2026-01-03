@@ -12,6 +12,7 @@ export interface CompactPlayer {
   rank: number;
   isCurrentUser?: boolean;
   profilePictureUrl?: string | null;
+  avatarImage?: string;
   avatarEmoji?: string;
   avatarColor?: string;
   previousRank?: number;
@@ -115,6 +116,7 @@ export function CompactLeaderboard({
             {/* Avatar */}
             <Avatar
               profilePictureUrl={leader.profilePictureUrl ?? undefined}
+              avatarImage={leader.avatarImage}
               avatarEmoji={leader.avatarEmoji}
               avatarColor={leader.avatarColor}
               size="sm"
@@ -158,6 +160,7 @@ export function CompactLeaderboard({
             {/* Avatar */}
             <Avatar
               profilePictureUrl={nextTarget.profilePictureUrl ?? undefined}
+              avatarImage={nextTarget.avatarImage}
               avatarEmoji={nextTarget.avatarEmoji}
               avatarColor={nextTarget.avatarColor}
               size="sm"
@@ -205,6 +208,7 @@ export function CompactLeaderboard({
           {/* Avatar */}
           <Avatar
             profilePictureUrl={currentUser.profilePictureUrl ?? undefined}
+            avatarImage={currentUser.avatarImage}
             avatarEmoji={currentUser.avatarEmoji}
             avatarColor={currentUser.avatarColor}
             size="sm"

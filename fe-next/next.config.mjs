@@ -110,6 +110,7 @@ const nextConfig = {
   // Environment variables
   env: {
     NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL,
+    NEXT_PUBLIC_BUILD_TIME: new Date().toISOString(),
   },
 
   // Security headers and API caching

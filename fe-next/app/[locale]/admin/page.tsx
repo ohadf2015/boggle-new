@@ -960,6 +960,14 @@ export default function AdminDashboard() {
               isDarkMode ? 'text-gray-400' : 'text-gray-600'
             )}>
               <span className="hidden xs:inline">Welcome, </span>{profile?.display_name || profile?.username}
+              {process.env.NEXT_PUBLIC_BUILD_TIME && (
+                <span className={cn('mx-1.5', isDarkMode ? 'text-gray-500' : 'text-gray-400')}>•</span>
+              )}
+              {process.env.NEXT_PUBLIC_BUILD_TIME && (
+                <span className={isDarkMode ? 'text-gray-500' : 'text-gray-400'}>
+                  Built {formatRelativeTime(process.env.NEXT_PUBLIC_BUILD_TIME)}
+                </span>
+              )}
             </p>
           </div>
 

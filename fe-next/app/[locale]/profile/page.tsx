@@ -19,7 +19,7 @@ import EmojiAvatarPicker from '@/components/EmojiAvatarPicker';
 import { AchievementBadge } from '@/components/AchievementBadge';
 import { isHallOfFameAchievement } from '@/utils/achievementTiers';
 import LevelBadge from '@/components/LevelBadge';
-import XpProgressBar from '@/components/XpProgressBar';
+import XpProgressBar, { getLevelFromXp } from '@/components/XpProgressBar';
 import { CoinBalance } from '@/components/CoinBalance';
 import { CollectionGrid } from '@/components/CollectionGrid';
 import { EmailPreferences } from '@/components/settings/EmailPreferences';
@@ -378,6 +378,7 @@ export default function ProfilePage(): React.ReactNode {
         <div className="relative">
           <Avatar
             profilePictureUrl={profile?.profile_picture_url ?? undefined}
+            avatarImage={profile?.avatar_image ?? undefined}
             avatarEmoji={profile?.avatar_emoji ?? undefined}
             avatarColor={profile?.avatar_color ?? undefined}
             size={compact ? 'md' : 'xl'}
@@ -387,8 +388,8 @@ export default function ProfilePage(): React.ReactNode {
           {/* Upload Button (camera icon) */}
           <label
             className={cn(
-              'absolute bottom-0 right-0 rounded-full flex items-center justify-center shadow-md cursor-pointer transition-colors',
-              compact ? 'w-6 h-6' : 'w-8 h-8',
+              'absolute bottom-0 right-0 rounded-full flex items-center justify-center shadow-md cursor-pointer transition-colors min-w-[44px] min-h-[44px]',
+              compact ? 'w-8 h-8' : 'w-10 h-10',
               isDarkMode ? 'bg-slate-700 text-gray-300 hover:bg-slate-600' : 'bg-white text-gray-600 hover:bg-gray-100'
             )}
             title={t('profile.uploadPhoto') || 'Upload Photo'}
@@ -412,13 +413,13 @@ export default function ProfilePage(): React.ReactNode {
             <button
               onClick={handleRemoveProfilePicture}
               className={cn(
-                'absolute -top-1 -right-1 rounded-full flex items-center justify-center shadow-md transition-colors',
-                compact ? 'w-5 h-5' : 'w-6 h-6',
+                'absolute -top-1 -right-1 rounded-full flex items-center justify-center shadow-md transition-colors min-w-[44px] min-h-[44px]',
+                compact ? 'w-8 h-8' : 'w-9 h-9',
                 isDarkMode ? 'bg-red-600 text-white hover:bg-red-500' : 'bg-red-500 text-white hover:bg-red-400'
               )}
               title={t('profile.removePhoto') || 'Remove Photo'}
             >
-              <X size={compact ? 8 : 10} />
+              <X size={compact ? 12 : 14} />
             </button>
           )}
 
@@ -427,13 +428,13 @@ export default function ProfilePage(): React.ReactNode {
             <button
               onClick={() => setShowEmojiPicker(true)}
               className={cn(
-                'absolute -top-1 -right-1 rounded-full flex items-center justify-center shadow-md transition-colors',
-                compact ? 'w-5 h-5' : 'w-6 h-6',
+                'absolute -top-1 -right-1 rounded-full flex items-center justify-center shadow-md transition-colors min-w-[44px] min-h-[44px]',
+                compact ? 'w-8 h-8' : 'w-9 h-9',
                 isDarkMode ? 'bg-slate-600 text-gray-300 hover:bg-slate-500' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
               )}
               title={t('profile.chooseEmoji') || 'Change Emoji'}
             >
-              <Edit size={compact ? 8 : 10} />
+              <Edit size={compact ? 12 : 14} />
             </button>
           )}
         </div>
@@ -566,7 +567,7 @@ export default function ProfilePage(): React.ReactNode {
           {t('xp.title') || 'Player Level'}
         </h2>
         <LevelBadge
-          level={profile?.current_level || 1}
+          level={getLevelFromXp(profile?.total_xp || 0)}
           size={compact ? 'md' : 'lg'}
           showLabel
         />
@@ -1246,6 +1247,7 @@ export default function ProfilePage(): React.ReactNode {
               <div className="relative">
                 <Avatar
                   profilePictureUrl={profile?.profile_picture_url ?? undefined}
+                  avatarImage={profile?.avatar_image ?? undefined}
                   avatarEmoji={profile?.avatar_emoji ?? undefined}
                   avatarColor={profile?.avatar_color ?? undefined}
                   size="xl"
@@ -1255,7 +1257,7 @@ export default function ProfilePage(): React.ReactNode {
                 {/* Upload Button (camera icon) */}
                 <label
                   className={cn(
-                    'absolute bottom-0 right-0 w-8 h-8 rounded-full flex items-center justify-center shadow-md cursor-pointer transition-colors',
+                    'absolute bottom-0 right-0 w-10 h-10 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center shadow-md cursor-pointer transition-colors',
                     isDarkMode ? 'bg-slate-700 text-gray-300 hover:bg-slate-600' : 'bg-white text-gray-600 hover:bg-gray-100'
                   )}
                   title={t('profile.uploadPhoto') || 'Upload Photo'}
@@ -1279,12 +1281,12 @@ export default function ProfilePage(): React.ReactNode {
                   <button
                     onClick={handleRemoveProfilePicture}
                     className={cn(
-                      'absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center shadow-md transition-colors',
+                      'absolute -top-1 -right-1 w-9 h-9 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center shadow-md transition-colors',
                       isDarkMode ? 'bg-red-600 text-white hover:bg-red-500' : 'bg-red-500 text-white hover:bg-red-400'
                     )}
                     title={t('profile.removePhoto') || 'Remove Photo'}
                   >
-                    <X size={10} />
+                    <X size={14} />
                   </button>
                 )}
 
@@ -1293,12 +1295,12 @@ export default function ProfilePage(): React.ReactNode {
                   <button
                   onClick={() => setShowEmojiPicker(true)}
                   className={cn(
-                    'absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center shadow-md transition-colors',
+                    'absolute -top-1 -right-1 w-9 h-9 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center shadow-md transition-colors',
                     isDarkMode ? 'bg-slate-600 text-gray-300 hover:bg-slate-500' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
                   )}
                   title={t('profile.chooseEmoji') || 'Change Emoji'}
                 >
-                  <Edit size={10} />
+                  <Edit size={14} />
                 </button>
               )}
             </div>
@@ -1426,7 +1428,7 @@ export default function ProfilePage(): React.ReactNode {
               {t('xp.title') || 'Player Level'}
             </h2>
             <LevelBadge
-              level={profile?.current_level || 1}
+              level={getLevelFromXp(profile?.total_xp || 0)}
               size="lg"
               showLabel
             />

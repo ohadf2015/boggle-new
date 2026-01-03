@@ -180,7 +180,7 @@ const LevelBadge = memo<LevelBadgeProps>(({
       >
         {badge}
         {showLabel && (
-          <span className="text-xs font-bold text-neo-black/75 dark:text-neo-cream/75 uppercase">
+          <span className="text-xs font-bold text-gray-700 dark:text-gray-200 uppercase">
             Lvl {level}
           </span>
         )}
@@ -192,7 +192,7 @@ const LevelBadge = memo<LevelBadgeProps>(({
     <div className="inline-flex items-center gap-1">
       {badge}
       {showLabel && (
-        <span className="text-xs font-bold text-neo-black/75 dark:text-neo-cream/75 uppercase">
+        <span className="text-xs font-bold text-gray-700 dark:text-gray-200 uppercase">
           Lvl {level}
         </span>
       )}

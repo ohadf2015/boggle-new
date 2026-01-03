@@ -1181,7 +1181,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
           {/* RIGHT COLUMN: Details (Your words, other players, charts, chat) */}
           <div className="flex-1 min-w-0 max-w-xl space-y-4">
-            {/* Full Player Performance Card */}
+            {/* Full Player Performance Card - hide rank/score since banner already shows them */}
             {currentPlayerData && currentPlayerRank > 0 && (
               <ConsolidatedPlayerCard
                 player={currentPlayerData}
@@ -1193,6 +1193,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                 levelUpData={levelUpData}
                 archetype={currentPlayerArchetype}
                 duplicateRuleDisabled={duplicateRuleDisabled}
+                hideRankAndScore
               />
             )}
 

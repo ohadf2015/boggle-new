@@ -29,6 +29,7 @@ interface ConsolidatedPlayerCardProps {
   levelUpData: LevelUpData | null;
   archetype: PlayerArchetype | null;
   duplicateRuleDisabled?: boolean;
+  hideRankAndScore?: boolean; // When shown alongside ResultsWinnerBanner
 }
 
 /**
@@ -46,6 +47,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
   levelUpData,
   archetype,
   duplicateRuleDisabled: _duplicateRuleDisabled,
+  hideRankAndScore = false,
 }) => {
   const { t } = useLanguage();
 
@@ -157,20 +159,22 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
 
           {/* Primary Row: Rank + Avatar + Info + Score */}
           <div className="flex items-center gap-3 sm:gap-4 mb-2 sm:mb-3">
-            {/* Rank Badge - Large and prominent */}
-            <motion.div
-              initial={{ scale: 0, rotate: -10 }}
-              animate={{ scale: 1, rotate: 3 }}
-              transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
-              className={cn(
-                'flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-neo flex items-center justify-center border-3 sm:border-4 border-neo-black shadow-hard-lg',
-                rankStyle.bg, rankStyle.text
-              )}
-            >
-              <div className="text-center">
-                <span className="text-2xl sm:text-3xl font-black">#{rank}</span>
-              </div>
-            </motion.div>
+            {/* Rank Badge - Large and prominent (hidden when shown alongside banner) */}
+            {!hideRankAndScore && (
+              <motion.div
+                initial={{ scale: 0, rotate: -10 }}
+                animate={{ scale: 1, rotate: 3 }}
+                transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+                className={cn(
+                  'flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-neo flex items-center justify-center border-3 sm:border-4 border-neo-black shadow-hard-lg',
+                  rankStyle.bg, rankStyle.text
+                )}
+              >
+                <div className="text-center">
+                  <span className="text-2xl sm:text-3xl font-black">#{rank}</span>
+                </div>
+              </motion.div>
+            )}
 
             {/* Avatar */}
             {player.avatar && (
@@ -188,27 +192,31 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
             <div className="flex-1 min-w-0">
               <h3 className="text-base sm:text-lg font-black text-white truncate">{player.username}</h3>
               <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-                <span className="text-[10px] sm:text-xs text-white/60 font-bold">
-                  {rank}{getRankSuffix(rank)} of {totalPlayers}
-                </span>
+                {!hideRankAndScore && (
+                  <span className="text-[10px] sm:text-xs text-white/60 font-bold">
+                    {rank}{getRankSuffix(rank)} of {totalPlayers}
+                  </span>
+                )}
                 {archetype && (
                   <PlayerArchetypeBadge archetype={archetype} size="sm" showTooltip={true} />
                 )}
               </div>
             </div>
 
-            {/* Score */}
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-              className="flex-shrink-0 text-right"
-            >
-              <div className="text-2xl sm:text-3xl font-black text-white">{player.score}</div>
-              <div className="text-[9px] sm:text-[10px] font-bold uppercase text-white/60">
-                {t('results.points') || 'Points'}
-              </div>
-            </motion.div>
+            {/* Score (hidden when shown alongside banner) */}
+            {!hideRankAndScore && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                className="flex-shrink-0 text-right"
+              >
+                <div className="text-2xl sm:text-3xl font-black text-white">{player.score}</div>
+                <div className="text-[9px] sm:text-[10px] font-bold uppercase text-white/60">
+                  {t('results.points') || 'Points'}
+                </div>
+              </motion.div>
+            )}
           </div>
 
           {/* Gap to winner */}

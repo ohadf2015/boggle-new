@@ -427,11 +427,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           <div className="flex items-center gap-4">
             <div className="bg-neo-yellow border-2 border-neo-black rounded-neo px-4 py-2 text-center shadow-hard-sm">
               <div className="text-2xl font-black text-neo-black">{results.playerScore}</div>
-              <div className="text-[8px] font-bold uppercase text-neo-black/70">{t('common.score') || 'Score'}</div>
+              <div className="text-[10px] sm:text-xs font-bold uppercase text-neo-black/70">{t('common.score') || 'Score'}</div>
             </div>
             <div className="bg-neo-cream border-2 border-neo-black rounded-neo px-3 py-2 text-center">
               <div className="text-lg font-black text-neo-black">{validWordCount}</div>
-              <div className="text-[8px] font-bold uppercase text-neo-black/70">{t('common.words') || 'Words'}</div>
+              <div className="text-[10px] sm:text-xs font-bold uppercase text-neo-black/70">{t('common.words') || 'Words'}</div>
             </div>
           </div>
 
@@ -469,7 +469,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                     {words.map(w => (
                       <span
                         key={w.word}
-                        className="px-2 py-0.5 rounded-neo border border-neo-black text-[10px] font-bold"
+                        className="px-2 py-0.5 rounded-neo border border-neo-black text-[10px] sm:text-xs font-bold"
                         style={{ backgroundColor: getPointColor(points), color: getTextColor(points) }}
                       >
                         {w.word.toUpperCase()} +{w.score}
@@ -499,7 +499,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                     <span className="flex items-center gap-1">
                       {getRankIcon(i + 1)}
                       <span className="font-bold">{p.name}</span>
-                      {p.isPlayer && <span className="text-[8px] opacity-75">(you)</span>}
+                      {p.isPlayer && <span className="text-[9px] sm:text-[10px] opacity-75">(you)</span>}
                     </span>
                     <span className="font-black">{p.score}</span>
                   </div>
@@ -809,7 +809,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                               return (
                                 <span
                                   key={`${word}-${i}`}
-                                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-black uppercase border border-neo-black rounded shadow-sm"
+                                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] sm:text-xs font-black uppercase border border-neo-black rounded shadow-sm"
                                   style={{
                                     backgroundColor: getPointColor(points),
                                     color: getTextColor(points)
@@ -1070,7 +1070,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                                     return (
                                       <span
                                         key={`${word}-${i}`}
-                                        className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-black uppercase border border-neo-black rounded shadow-sm"
+                                        className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] sm:text-xs font-black uppercase border border-neo-black rounded shadow-sm"
                                         style={{ backgroundColor: getPointColor(points), color: getTextColor(points) }}
                                       >
                                         {displayWord}

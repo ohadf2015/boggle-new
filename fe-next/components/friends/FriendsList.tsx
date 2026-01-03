@@ -24,6 +24,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import Avatar from '@/components/Avatar';
 import type { Friend, FriendRequest, FriendChallenge } from '@/utils/friends';
 
 interface FriendsListProps {
@@ -360,12 +361,12 @@ const FriendsList: React.FC<FriendsListProps> = ({
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-lg border-2 border-neo-black"
-                      style={{ backgroundColor: user.avatarColor }}
-                    >
-                      {user.avatarEmoji}
-                    </div>
+                    <Avatar
+                      avatarImage={user.avatarImage}
+                      avatarEmoji={user.avatarEmoji}
+                      avatarColor={user.avatarColor}
+                      size="md"
+                    />
                     <div>
                       <p className={cn('font-bold', isDark ? 'text-white' : 'text-gray-900')}>
                         {user.displayName || user.username}
@@ -437,12 +438,13 @@ const FriendsList: React.FC<FriendsListProps> = ({
                 </p>
                 {outgoingRequests.map(req => (
                   <div key={req.id} className="flex items-center gap-2 text-sm">
-                    <div
-                      className="w-6 h-6 rounded-full flex items-center justify-center text-xs border border-neo-black"
-                      style={{ backgroundColor: req.fromAvatarColor }}
-                    >
-                      {req.fromAvatarEmoji}
-                    </div>
+                    <Avatar
+                      avatarImage={req.fromAvatarImage}
+                      avatarEmoji={req.fromAvatarEmoji}
+                      avatarColor={req.fromAvatarColor}
+                      size="sm"
+                      className="w-6 h-6 text-xs"
+                    />
                     <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>
                       {req.fromUsername}
                     </span>
@@ -467,12 +469,12 @@ const FriendsList: React.FC<FriendsListProps> = ({
             <>
               <DialogHeader>
                 <div className="flex items-center gap-3">
-                  <div
-                    className="w-14 h-14 rounded-full flex items-center justify-center text-2xl border-3 border-neo-black"
-                    style={{ backgroundColor: selectedFriend.avatarColor }}
-                  >
-                    {selectedFriend.avatarEmoji}
-                  </div>
+                  <Avatar
+                    avatarImage={selectedFriend.avatarImage}
+                    avatarEmoji={selectedFriend.avatarEmoji}
+                    avatarColor={selectedFriend.avatarColor}
+                    size="lg"
+                  />
                   <div>
                     <DialogTitle className="text-lg">
                       {selectedFriend.displayName || selectedFriend.username}
@@ -599,15 +601,12 @@ const FriendRow: React.FC<FriendRowProps> = ({
       )}
     >
       <div className="relative">
-        <div
-          className={cn(
-            'rounded-full flex items-center justify-center border-2 border-neo-black',
-            compact ? 'w-8 h-8 text-sm' : 'w-10 h-10 text-lg'
-          )}
-          style={{ backgroundColor: friend.avatarColor }}
-        >
-          {friend.avatarEmoji}
-        </div>
+        <Avatar
+          avatarImage={friend.avatarImage}
+          avatarEmoji={friend.avatarEmoji}
+          avatarColor={friend.avatarColor}
+          size={compact ? 'sm' : 'md'}
+        />
         <Circle
           className={cn(
             'absolute -bottom-0.5 -right-0.5 w-3 h-3',
@@ -673,12 +672,12 @@ const RequestRow: React.FC<RequestRowProps> = ({
       'flex items-center gap-3 p-2 rounded-neo',
       isDark ? 'bg-black/20' : 'bg-white/50'
     )}>
-      <div
-        className="w-8 h-8 rounded-full flex items-center justify-center text-sm border-2 border-neo-black"
-        style={{ backgroundColor: request.fromAvatarColor }}
-      >
-        {request.fromAvatarEmoji}
-      </div>
+      <Avatar
+        avatarImage={request.fromAvatarImage}
+        avatarEmoji={request.fromAvatarEmoji}
+        avatarColor={request.fromAvatarColor}
+        size="sm"
+      />
       <div className="flex-1 min-w-0">
         <p className={cn('font-bold text-sm truncate', isDark ? 'text-white' : 'text-gray-900')}>
           {request.fromUsername}
@@ -729,12 +728,12 @@ const ChallengeRow: React.FC<ChallengeRowProps> = ({
         isDark ? 'bg-black/20 hover:bg-black/40' : 'bg-white/50 hover:bg-white/80'
       )}
     >
-      <div
-        className="w-8 h-8 rounded-full flex items-center justify-center text-sm border-2 border-neo-black"
-        style={{ backgroundColor: challenge.challengerAvatarColor }}
-      >
-        {challenge.challengerAvatarEmoji}
-      </div>
+      <Avatar
+        avatarImage={challenge.challengerAvatarImage}
+        avatarEmoji={challenge.challengerAvatarEmoji}
+        avatarColor={challenge.challengerAvatarColor}
+        size="sm"
+      />
       <div className="flex-1 min-w-0">
         <p className={cn('font-bold text-sm truncate', isDark ? 'text-white' : 'text-gray-900')}>
           {challenge.challengerUsername}

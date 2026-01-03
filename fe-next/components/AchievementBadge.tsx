@@ -160,7 +160,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
             {locked && (
               <div className="flex items-center gap-1 mb-1">
                 <span className="text-sm">🔒</span>
-                <span className="text-[10px] uppercase font-bold text-neo-cyan tracking-wide">
+                <span className="text-[11px] sm:text-xs uppercase font-bold text-neo-cyan tracking-wide">
                   {t('profile.locked') || 'Locked'}
                 </span>
               </div>
@@ -183,7 +183,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
                 {/* Progress to next tier */}
                 {!tierProgress.isMaxTier && tierProgress.nextTier && (
                   <div className="mt-1">
-                    <div className="flex justify-between text-[10px] text-neo-white/75 mb-0.5">
+                    <div className="flex justify-between text-[11px] sm:text-xs text-neo-white/75 mb-0.5">
                       <span>{tierProgress.currentCount}/{tierProgress.nextThreshold}</span>
                       <span>{TIER_ICONS[tierProgress.nextTier]} {getTierName(tierProgress.nextTier)}</span>
                     </div>
@@ -197,7 +197,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
                 )}
 
                 {tierProgress.isMaxTier && (
-                  <p className="text-[10px] text-neo-lime mt-1 font-bold">
+                  <p className="text-[11px] sm:text-xs text-neo-lime mt-1 font-bold">
                     {t('achievementTiers.maxTier') || 'Max Tier Reached!'}
                   </p>
                 )}
@@ -206,7 +206,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
 
             {/* Hint for locked achievements */}
             {locked && (
-              <p className="text-[10px] text-neo-white/60 mt-2 italic">
+              <p className="text-[11px] sm:text-xs text-neo-white/60 mt-2 italic">
                 {t('profile.earnThisAchievement') || 'Play games to unlock this achievement!'}
               </p>
             )}

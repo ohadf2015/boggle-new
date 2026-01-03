@@ -100,6 +100,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
           >
             <Avatar
               profilePictureUrl={profile.profile_picture_url ?? undefined}
+              avatarImage={profile.avatar_image}
               avatarEmoji={profile.avatar_emoji}
               avatarColor={profile.avatar_color}
               size="sm"

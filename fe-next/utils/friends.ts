@@ -20,6 +20,7 @@ interface ProfileRow {
   id: string;
   username: string;
   display_name?: string;
+  avatar_image?: string;
   avatar_emoji?: string;
   avatar_color?: string;
   total_games?: number;
@@ -70,6 +71,7 @@ export interface Friend {
   odUserId: string;
   username: string;
   displayName?: string;
+  avatarImage?: string;
   avatarEmoji: string;
   avatarColor: string;
   status: FriendStatus;
@@ -89,6 +91,7 @@ export interface FriendRequest {
   fromUserId: string;
   fromUsername: string;
   fromDisplayName?: string;
+  fromAvatarImage?: string;
   fromAvatarEmoji: string;
   fromAvatarColor: string;
   createdAt: string;
@@ -119,6 +122,7 @@ export interface FriendChallenge {
   id: string;
   challengerId: string;
   challengerUsername: string;
+  challengerAvatarImage?: string;
   challengerAvatarEmoji: string;
   challengerAvatarColor: string;
   challengeId: string;
@@ -335,7 +339,7 @@ export async function getFriends(): Promise<Friend[]> {
   // Fetch profile data for all friends
   const { data: profiles, error: profileError } = await supabase
     .from('profiles')
-    .select('id, username, display_name, avatar_emoji, avatar_color, total_games, ranked_mmr, current_level, last_seen_at')
+    .select('id, username, display_name, avatar_image, avatar_emoji, avatar_color, total_games, ranked_mmr, current_level, last_seen_at')
     .in('id', friendIds);
 
   if (profileError || !profiles) {
@@ -350,6 +354,7 @@ export async function getFriends(): Promise<Friend[]> {
     odUserId: p.id,
     username: p.username,
     displayName: p.display_name,
+    avatarImage: p.avatar_image,
     avatarEmoji: p.avatar_emoji || '😊',
     avatarColor: p.avatar_color || '#4F46E5',
     status: 'accepted' as FriendStatus,
@@ -483,7 +488,7 @@ export async function searchUsers(query: string, limit: number = 10): Promise<Fr
 
   const { data: profiles, error } = await supabase
     .from('profiles')
-    .select('id, username, display_name, avatar_emoji, avatar_color, total_games, current_level, last_seen_at')
+    .select('id, username, display_name, avatar_image, avatar_emoji, avatar_color, total_games, current_level, last_seen_at')
     .or(`username.ilike.%${query}%,display_name.ilike.%${query}%`)
     .neq('id', user.id)
     .limit(limit);
@@ -515,6 +520,7 @@ export async function searchUsers(query: string, limit: number = 10): Promise<Fr
     odUserId: p.id,
     username: p.username,
     displayName: p.display_name,
+    avatarImage: p.avatar_image,
     avatarEmoji: p.avatar_emoji || '😊',
     avatarColor: p.avatar_color || '#4F46E5',
     status: existingMap.get(p.id) || ('none' as FriendStatus),
@@ -778,7 +784,7 @@ export async function getUserByUsername(username: string): Promise<Friend | null
 
   const { data: profile, error } = await supabase
     .from('profiles')
-    .select('id, username, display_name, avatar_emoji, avatar_color, total_games, current_level, last_seen_at')
+    .select('id, username, display_name, avatar_image, avatar_emoji, avatar_color, total_games, current_level, last_seen_at')
     .eq('username', username)
     .single();
 
@@ -791,6 +797,7 @@ export async function getUserByUsername(username: string): Promise<Friend | null
     odUserId: profile.id,
     username: profile.username,
     displayName: profile.display_name,
+    avatarImage: profile.avatar_image,
     avatarEmoji: profile.avatar_emoji || '😊',
     avatarColor: profile.avatar_color || '#4F46E5',
     status: 'none' as FriendStatus,

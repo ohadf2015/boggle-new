@@ -89,6 +89,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   onQuit,
 }) => {
   const { t } = useLanguage();
+  // Determine game text direction based on GAME language (not UI language)
+  // This ensures clue boxes display in correct order regardless of UI language setting
+  const gameDir = language === 'he' ? 'rtl' : 'ltr';
   const { playWordAcceptedSound } = useSoundEffects();
   const { fadeToTrack, stopMusic, TRACKS } = useMusic();
   const isLandscape = useMobileLandscape();
@@ -581,6 +584,18 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
     let cluesRevealed = 0;
 
+    // Pre-compute new green positions from this discovered word
+    // This is needed to properly update knownLetters without stale state issues
+    const checkLength = Math.min(normalizedWord.length, targetLength);
+    const newGreenPositions = new Map<number, string>(); // position → letter
+    for (let pos = 0; pos < checkLength; pos++) {
+      const wordLetter = normalizedWord[pos];
+      const targetLetter = normalizedTarget[pos];
+      if (wordLetter === targetLetter) {
+        newGreenPositions.set(pos, wordLetter);
+      }
+    }
+
     // Check for GREEN and YELLOW clues from discovered words
     // SIMPLIFIED: Any 3+ letter word can reveal clues at positions within target word range
     // This is incremental - only adds new clues, never removes existing ones
@@ -599,7 +614,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         });
 
         // First pass: Check positions within target range for GREEN clues (exact matches)
-        const checkLength = Math.min(normalizedWord.length, targetLength);
         for (let pos = 0; pos < checkLength; pos++) {
           const wordLetter = normalizedWord[pos];
           const targetLetter = normalizedTarget[pos];
@@ -662,12 +676,20 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         const updated = new Set(prev);
         const usedCounts = new Map<string, number>();
 
-        // Count existing GREEN letters from accumulatedClues
-        // Letters with full green coverage should NOT be added to knownLetters
+        // Count existing GREEN letters from accumulatedClues PLUS new greens from this word
+        // This fixes the stale state issue where accumulatedClues hasn't been updated yet
         const greenLetterCounts = new Map<string, number>();
         accumulatedClues.forEach((clue) => {
           if (clue.type === 'green') {
             greenLetterCounts.set(clue.letter, (greenLetterCounts.get(clue.letter) || 0) + 1);
+          }
+        });
+        // Add new greens from this discovered word (computed before state updates)
+        newGreenPositions.forEach((letter, pos) => {
+          // Only count if not already green at this position
+          const existingClue = accumulatedClues.get(pos);
+          if (!existingClue || existingClue.type !== 'green') {
+            greenLetterCounts.set(letter, (greenLetterCounts.get(letter) || 0) + 1);
           }
         });
 
@@ -960,21 +982,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
             isProtected && "blur-xl select-none"
           )}
         >
-          {/* Label for the clue area */}
-          <div className="flex justify-center mb-1">
-            <span className={cn(
-              "text-xs font-bold uppercase tracking-wider px-3 py-0.5 rounded-full transition-colors",
-              showFeedbackOverlay
-                ? "bg-neo-yellow text-neo-black"
-                : "bg-neo-black/20 text-gray-600 dark:text-gray-400"
-            )}>
-              {showFeedbackOverlay
-                ? (t('wordHunt.survival.yourGuess') || 'Your Guess')
-                : (t('wordHunt.survival.targetWord') || 'Find This Word')
-              }
-            </span>
-          </div>
-
           {/* Tries counter - big and prominent */}
           <div className="text-center mb-2">
             <span className={cn(
@@ -990,7 +997,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           </div>
 
           {/* Black boxes for target word OR Letter Feedback Overlay */}
-          <div className="flex justify-center flex-wrap gap-2 sm:gap-2.5 px-2">
+          {/* Use explicit dir based on GAME language to ensure correct letter ordering */}
+          <div dir={gameDir} className="flex justify-center flex-wrap gap-2 sm:gap-2.5 px-2">
             <AnimatePresence mode="wait">
               {showFeedbackOverlay && latestAttemptFeedback ? (
                 // Show colored letter feedback when overlay is active

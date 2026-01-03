@@ -201,15 +201,21 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
             className="w-full h-full object-contain"
             onError={() => setImageError(true)}
             priority={size === 'lg'}
+            unoptimized
           />
         ) : (
           <span className={cn('flex items-center justify-center', sizes.emoji)}>{archetype.emoji}</span>
         )}
       </div>
 
-      {/* Name */}
+      {/* Name - use translation if available, fallback to archetype.name */}
       <span className={sizes.text}>
-        {t(`archetypes.${archetype.id}`) || archetype.name}
+        {(() => {
+          const translationKey = `archetypes.${archetype.id}`;
+          const translated = t(translationKey);
+          // If t() returns the key path itself, translation is missing - use fallback
+          return translated !== translationKey ? translated : archetype.name;
+        })()}
       </span>
     </motion.div>
   );
@@ -246,7 +252,11 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
           )}
 
           <p className="text-sm font-bold text-neo-black relative z-10">
-            {t(`archetypes.${archetype.id}Desc`) || archetype.description}
+            {(() => {
+              const translationKey = `archetypes.${archetype.id}Desc`;
+              const translated = t(translationKey);
+              return translated !== translationKey ? translated : archetype.description;
+            })()}
           </p>
         </motion.div>
       )}

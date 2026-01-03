@@ -76,7 +76,7 @@ function ToggleButton({ isOn, onToggle, isDarkMode, onLabel = 'On', offLabel = '
     <button
       onClick={onToggle}
       className={cn(
-        'relative w-16 h-9 rounded-full border-3 border-neo-black transition-colors',
+        'relative w-16 h-11 min-h-[44px] rounded-full border-3 border-neo-black transition-colors',
         isOn
           ? 'bg-neo-lime'
           : isDarkMode ? 'bg-slate-600' : 'bg-gray-300'
@@ -84,8 +84,8 @@ function ToggleButton({ isOn, onToggle, isDarkMode, onLabel = 'On', offLabel = '
     >
       <div
         className={cn(
-          "absolute top-0.5 start-0.5 w-7 h-7 bg-white rounded-full border-2 border-neo-black shadow-sm transition-transform duration-200",
-          isOn ? "translate-x-[26px] rtl:-translate-x-[26px]" : "translate-x-0"
+          "absolute top-1 start-1 w-8 h-8 bg-white rounded-full border-2 border-neo-black shadow-sm transition-transform duration-200",
+          isOn ? "translate-x-[24px] rtl:-translate-x-[24px]" : "translate-x-0"
         )}
       />
     </button>
@@ -106,13 +106,13 @@ function VolumeSlider({ value, onChange, isMuted, onToggleMute, isDarkMode }: Vo
       <button
         onClick={onToggleMute}
         className={cn(
-          'w-8 h-8 rounded-lg flex items-center justify-center border-2 border-neo-black transition-colors',
+          'w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg flex items-center justify-center border-2 border-neo-black transition-colors',
           isMuted
             ? 'bg-neo-red text-white'
             : isDarkMode ? 'bg-slate-700 text-gray-300' : 'bg-neo-cream text-neo-black'
         )}
       >
-        {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+        {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
       </button>
       <input
         type="range"
