@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lightbulb, ArrowRight, Star, Zap, Target, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -60,15 +60,15 @@ const TIPS: GameTip[] = [
 export function WaitingTips({ t, className, rotationInterval = 5000 }: WaitingTipsProps) {
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
 
-  // Shuffle tips on mount for variety
-  const shuffledTips = useMemo(() => {
+  // Shuffle tips on mount for variety (lazy initializer runs once)
+  const [shuffledTips] = useState(() => {
     const shuffled = [...TIPS];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
     return shuffled;
-  }, []);
+  });
 
   useEffect(() => {
     const timer = setInterval(() => {
