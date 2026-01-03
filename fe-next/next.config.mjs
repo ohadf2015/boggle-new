@@ -164,12 +164,8 @@ const nextConfig = {
             key: 'X-Content-Type-Options',
             value: 'nosniff',
           },
-          // Allow CrazyGames to embed our game in iframe when enabled
-          // Note: X-Frame-Options doesn't support wildcards, so we use CSP frame-ancestors instead when CrazyGames is enabled
-          ...(isCrazyGamesEnabled ? [] : [{
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
-          }]),
+          // X-Frame-Options removed - using CSP frame-ancestors instead (modern approach)
+          // This allows CrazyGames and other game portals to embed our game
           {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
@@ -184,11 +180,13 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
+            // Always allow CrazyGames iframe embedding via frame-ancestors
+            // SDK script loading is controlled separately by NEXT_PUBLIC_CRAZYGAMES_ENABLED
             value: isCrazyGamesEnabled
-              // CSP for CrazyGames: allow SDK script and iframe embedding from CrazyGames domains
-              ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://sdk.crazygames.com https://*.crazygames.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.crazygames.com wss: ws:; worker-src 'self' blob:; frame-src 'self' https://*.crazygames.com; frame-ancestors 'self' https://*.crazygames.com https://crazygames.com https://www.crazygames.com https://developer.crazygames.com;"
-              // Standard CSP without CrazyGames
-              : "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com wss: ws:; worker-src 'self' blob:; frame-src 'self';",
+              // Full CrazyGames mode: SDK script + iframe embedding
+              ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://sdk.crazygames.com https://*.crazygames.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.crazygames.com wss: ws:; worker-src 'self' blob:; frame-src 'self' https://*.crazygames.com; frame-ancestors 'self' https://*.crazygames.com https://crazygames.com https://www.crazygames.com https://developer.crazygames.com https://*.poki.com https://poki.com;"
+              // Iframe embedding allowed for game portals, but no SDK script
+              : "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com wss: ws:; worker-src 'self' blob:; frame-src 'self'; frame-ancestors 'self' https://*.crazygames.com https://crazygames.com https://www.crazygames.com https://developer.crazygames.com https://*.poki.com https://poki.com;",
           },
         ],
       },
