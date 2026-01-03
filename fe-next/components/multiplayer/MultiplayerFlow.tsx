@@ -136,7 +136,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
       // No saved profile - go to join setup
       setFlowState('join-setup');
     }
-  }, [prefilledRoom, isAuthenticated, displayName, profileAvatarId, setGameCode, setUsername]);
+  }, [inviteRoomId, prefilledRoom, isAuthenticated, displayName, profileAvatarId, setGameCode, setUsername]);
 
   // Handle selector choices - go directly to single-step setup
   const handleSelectCreate = useCallback(() => {

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, LogOut, Trophy, ChevronDown, Sun, Moon, Users } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -433,10 +434,13 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                   "bg-neo-cyan shadow-hard-sm"
                 )}>
                   {crazyGamesUser.profilePictureUrl ? (
-                    <img
+                    <Image
                       src={crazyGamesUser.profilePictureUrl}
                       alt={crazyGamesUser.username}
+                      width={24}
+                      height={24}
                       className="w-6 h-6 rounded-full object-cover"
+                      unoptimized
                     />
                   ) : (
                     <User size={14} className="text-neo-black" />
@@ -540,10 +544,13 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
           >
             {/* CrazyGames Profile Picture */}
             {crazyGamesUser.profilePictureUrl ? (
-              <img
+              <Image
                 src={crazyGamesUser.profilePictureUrl}
                 alt={crazyGamesUser.username}
+                width={24}
+                height={24}
                 className="w-6 h-6 rounded-full object-cover"
+                unoptimized
               />
             ) : (
               <User size={16} />

@@ -60,6 +60,19 @@ interface GridComponentProps {
  *
  * VERSION: 2025-01-01-FIXED - effectiveRenderMode TDZ fix
  */
+
+// Rainbow colors for dance floor effect - Soft pastels for gentle party atmosphere
+// Moved outside component to be a stable reference for useEffect dependencies
+const RAINBOW_COLORS = [
+  '#FFB3D9', // Soft pink
+  '#FFB380', // Peachy orange
+  '#FFE680', // Gentle yellow
+  '#B3FFB3', // Mint green
+  '#B3E5FF', // Sky blue
+  '#D9B3FF', // Lavender
+  '#FFD1DC', // Rose
+];
+
 const GridComponent = memo<GridComponentProps>(({
   grid,
   interactive = false,
@@ -211,17 +224,6 @@ const GridComponent = memo<GridComponentProps>(({
   // Fire Round: Random glowing cells with rainbow cycling
   const [glowingCells, setGlowingCells] = useState<Set<string>>(new Set());
   const [cellColorIndices, setCellColorIndices] = useState<Map<string, number>>(new Map());
-
-  // Rainbow colors for dance floor effect - Soft pastels for gentle party atmosphere
-  const RAINBOW_COLORS = [
-    '#FFB3D9', // Soft pink
-    '#FFB380', // Peachy orange
-    '#FFE680', // Gentle yellow
-    '#B3FFB3', // Mint green
-    '#B3E5FF', // Sky blue
-    '#D9B3FF', // Lavender
-    '#FFD1DC', // Rose
-  ];
 
   // Randomize glowing cells when fire round is active (optimized for performance)
   // PERFORMANCE: Skip on low-end devices, reduced motion, or user accessibility setting

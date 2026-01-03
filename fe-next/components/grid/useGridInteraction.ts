@@ -579,7 +579,7 @@ export function useGridInteraction({
     }
   }, [interactive, performanceConfig.isLowEnd, processTouchMove]);
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = useCallback(() => {
     if (!interactive || !isTouchingRef.current) return;
     isTouchingRef.current = false;
 
@@ -658,7 +658,7 @@ export function useGridInteraction({
     }
 
     hasMovedRef.current = false;
-  };
+  }, [interactive, resetSelectionState, selectedCells, onWordSubmit, onPathSubmit, fireRoundActive, comboLevel, startSequentialFadeOut, setSelectedCells]);
 
   // Handle click-to-select for desktop (single clicks to build word)
   const handleCellClick = useCallback((
@@ -986,7 +986,7 @@ export function useGridInteraction({
     return () => {
       element.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [handleTouchMove]);
+  }, [gridRef, handleTouchMove]);
 
   // Cleanup RAF on unmount to prevent memory leaks
   useEffect(() => {
