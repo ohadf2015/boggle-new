@@ -13,6 +13,7 @@ import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import GuestNameEditor from './GuestNameEditor';
 import { DailyChallengeTutorial } from './DailyChallengeTutorial';
 import DailyIntroCarousel from './DailyIntroCarousel';
+import TrainingSuggestionModal from './TrainingSuggestionModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
@@ -34,6 +35,11 @@ import {
 } from '@/utils/dailyChallenge';
 import { neoSuccessToast, neoErrorToast } from '@/components/NeoToast';
 import { useSearchParams } from 'next/navigation';
+import {
+  hasPlayedAnyGame,
+  hasSkippedTrainingSuggestion,
+  markTrainingSuggestionSkipped,
+} from '@/utils/playerProgressStorage';
 import type { LetterGrid, Language } from '@/types';
 import type { SurvivalGameResult } from './DailyWordHuntSurvival';
 
@@ -124,9 +130,40 @@ const DailyChallenge: React.FC = () => {
   // Guest fingerprint for leaderboard
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
 
+  // Training suggestion modal for new players
+  const [showTrainingSuggestion, setShowTrainingSuggestion] = useState(false);
+
   // Fetch guest fingerprint on mount
   useEffect(() => {
     getGuestFingerprint().then(setGuestFingerprint);
+  }, []);
+
+  // Check if we should show training suggestion for new players
+  useEffect(() => {
+    // Only show when page loads in ready phase (not during game or results)
+    if (phase !== 'ready') return;
+
+    // Check if player has played any game before
+    const hasPlayed = hasPlayedAnyGame();
+
+    // Check if already skipped this session
+    const hasSkipped = hasSkippedTrainingSuggestion();
+
+    // Show modal if new player and hasn't skipped
+    if (!hasPlayed && !hasSkipped) {
+      // Small delay to let the page load first
+      const timer = setTimeout(() => {
+        setShowTrainingSuggestion(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+    return;
+  }, [phase]);
+
+  // Handle skipping training suggestion
+  const handleSkipTrainingSuggestion = useCallback(() => {
+    markTrainingSuggestionSkipped();
+    setShowTrainingSuggestion(false);
   }, []);
 
   // Pull-to-refresh - disabled during gameplay
@@ -482,6 +519,13 @@ const DailyChallenge: React.FC = () => {
           onSkip={handleTutorialSkip}
         />
       )}
+
+      {/* Training Suggestion Modal for New Players */}
+      <TrainingSuggestionModal
+        isOpen={showTrainingSuggestion}
+        onClose={handleSkipTrainingSuggestion}
+        onSkipToDaily={handleSkipTrainingSuggestion}
+      />
     </div>
   );
 };

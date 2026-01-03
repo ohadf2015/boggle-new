@@ -3,6 +3,8 @@
  * Tracks training game progress to enable progressive mode discovery
  */
 
+import { getGuestStats } from './guestManager';
+
 const STORAGE_KEY = 'lexiclash_player_progress';
 const GAMES_BEFORE_PROMPT = 2; // Show mode discovery after 2 training games
 
@@ -125,4 +127,45 @@ export const resetPlayerProgress = (): void => {
  */
 export const isNewPlayer = (): boolean => {
   return getTrainingGamesCount() < GAMES_BEFORE_PROMPT;
+};
+
+/**
+ * Check if player has played ANY game across all modes
+ * Uses guestManager stats which track all games (singleplayer, multiplayer, daily)
+ * Returns true if they have played at least one game
+ */
+export const hasPlayedAnyGame = (): boolean => {
+  if (typeof window === 'undefined') return true; // Assume played during SSR
+
+  try {
+    const guestStats = getGuestStats();
+    return guestStats.games > 0;
+  } catch {
+    // Fallback to training games if guestStats fails
+    return getTrainingGamesCount() > 0;
+  }
+};
+
+/**
+ * Check if training suggestion was already skipped this session
+ * Uses sessionStorage so it resets when browser closes
+ */
+const TRAINING_SUGGESTION_SKIPPED_KEY = 'lexiclash_training_suggestion_skipped';
+
+export const hasSkippedTrainingSuggestion = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  try {
+    return sessionStorage.getItem(TRAINING_SUGGESTION_SKIPPED_KEY) === 'true';
+  } catch {
+    return false;
+  }
+};
+
+export const markTrainingSuggestionSkipped = (): void => {
+  if (typeof window === 'undefined') return;
+  try {
+    sessionStorage.setItem(TRAINING_SUGGESTION_SKIPPED_KEY, 'true');
+  } catch {
+    // Ignore storage errors
+  }
 };

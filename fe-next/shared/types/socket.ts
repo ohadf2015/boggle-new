@@ -208,6 +208,7 @@ export interface ServerToClientEvents {
   'engagement:nearMisses': (data: { nearMisses: NearMiss[] }) => void;
   'engagement:oneMoreGame': (data: { prompt: OneMoreGamePrompt }) => void;
   'engagement:mysteryReward': (data: { reward: MysteryReward }) => void;
+  'engagement:referralMilestone': (data: { milestone: ReferralMilestone }) => void;
   'engagement:status': (data: EngagementStatus) => void;
   'engagement:error': (data: { message: string }) => void;
 
@@ -561,6 +562,13 @@ export interface MysteryReward {
   value: string | number;
   display: string;
   rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+}
+
+export interface ReferralMilestone {
+  milestone: 'first_game_played' | 'five_games_played' | 'ten_games_played';
+  referredUsername: string;
+  rewardXp: number;
+  message: string;
 }
 
 export interface EngagementStatus {

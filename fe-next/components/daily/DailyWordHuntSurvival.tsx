@@ -94,7 +94,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // Determine game text direction based on GAME language (not UI language)
   // This ensures clue boxes display in correct order regardless of UI language setting
   const gameDir = language === 'he' ? 'rtl' : 'ltr';
-  const { playWordAcceptedSound } = useSoundEffects();
+  const { playWordAcceptedSound, setGameActive } = useSoundEffects();
   const { fadeToTrack, stopMusic, TRACKS } = useMusic();
   const isLandscape = useMobileLandscape();
   const { user } = useAuth();
@@ -162,6 +162,14 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // Session tracking
   const [gameSessionId, setGameSessionId] = useState<string | null>(null);
   const gameStartTimeRef = useRef<number>(0);
+
+  // Enable sound effects when game is active, disable when leaving
+  useEffect(() => {
+    setGameActive(true);
+    return () => {
+      setGameActive(false);
+    };
+  }, [setGameActive]);
 
   // Refs for callbacks that need to be accessed before declaration
   const handleGameOverRef = useRef<((won: boolean, finalAttempts?: TargetAttempt[]) => void) | null>(null);

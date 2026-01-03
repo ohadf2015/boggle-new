@@ -260,16 +260,25 @@ export async function POST(request: NextRequest) {
     }, { status: 400 });
   }
 
-  // Check if body is defined (can be undefined for empty requests)
-  if (!body || typeof body !== 'object') {
+  // Check if body is defined and is a plain object (not null, undefined, or array)
+  if (!body || body === null || typeof body !== 'object' || Array.isArray(body)) {
     return NextResponse.json({
       error: 'Invalid request',
       details: ['Request body must be a JSON object'],
     }, { status: 400 });
   }
 
+  // Ensure we have an object before Zod validation (additional safety check)
+  const bodyObj = body as Record<string, unknown>;
+  if (typeof bodyObj.targetWord === 'undefined') {
+    return NextResponse.json({
+      error: 'Invalid request',
+      details: ['targetWord is required'],
+    }, { status: 400 });
+  }
+
   // Validate input
-  const parseResult = generateHintsSchema.safeParse(body);
+  const parseResult = generateHintsSchema.safeParse(bodyObj);
   if (!parseResult.success) {
     return NextResponse.json({
       error: 'Invalid request',

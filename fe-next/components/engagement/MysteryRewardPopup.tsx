@@ -1,0 +1,348 @@
+'use client';
+
+import React, { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
+import { cn } from '@/lib/utils';
+import { Sparkles, Gift, Zap, Star, Crown } from 'lucide-react';
+import { fireConfetti } from '@/utils/confettiUtils';
+
+/**
+ * Mystery reward data from engagement system
+ */
+export interface MysteryReward {
+  type: string;
+  value: number | string;
+  display: string;
+  triggerType: string;
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+}
+
+interface MysteryRewardPopupProps {
+  reward: MysteryReward | null;
+  isOpen: boolean;
+  onClose: () => void;
+  t: (key: string) => string;
+}
+
+/**
+ * Rarity color schemes
+ */
+const RARITY_STYLES = {
+  common: {
+    bg: 'bg-gradient-to-br from-slate-600 to-slate-800',
+    border: 'border-slate-500',
+    text: 'text-slate-200',
+    glow: 'shadow-[0_0_30px_rgba(100,116,139,0.5)]',
+    particle: '#94a3b8',
+  },
+  uncommon: {
+    bg: 'bg-gradient-to-br from-emerald-600 to-emerald-800',
+    border: 'border-emerald-400',
+    text: 'text-emerald-200',
+    glow: 'shadow-[0_0_40px_rgba(52,211,153,0.5)]',
+    particle: '#34d399',
+  },
+  rare: {
+    bg: 'bg-gradient-to-br from-blue-600 to-blue-800',
+    border: 'border-blue-400',
+    text: 'text-blue-200',
+    glow: 'shadow-[0_0_50px_rgba(59,130,246,0.5)]',
+    particle: '#3b82f6',
+  },
+  epic: {
+    bg: 'bg-gradient-to-br from-purple-600 to-purple-900',
+    border: 'border-purple-400',
+    text: 'text-purple-200',
+    glow: 'shadow-[0_0_60px_rgba(168,85,247,0.6)]',
+    particle: '#a855f7',
+  },
+  legendary: {
+    bg: 'bg-gradient-to-br from-amber-500 via-orange-500 to-red-600',
+    border: 'border-yellow-400',
+    text: 'text-yellow-100',
+    glow: 'shadow-[0_0_80px_rgba(251,191,36,0.7)]',
+    particle: '#fbbf24',
+  },
+};
+
+/**
+ * Get icon for reward type
+ */
+function getRewardIcon(type: string) {
+  switch (type) {
+    case 'xp_multiplier':
+    case 'xp_flat':
+    case 'instant_xp':
+      return <Zap className="w-8 h-8" />;
+    case 'bonus_hints':
+      return <Star className="w-8 h-8" />;
+    case 'streak_freeze':
+      return <Crown className="w-8 h-8" />;
+    case 'rare_title':
+      return <Crown className="w-8 h-8" />;
+    case 'combo_boost':
+      return <Sparkles className="w-8 h-8" />;
+    default:
+      return <Gift className="w-8 h-8" />;
+  }
+}
+
+/**
+ * Mystery Reward Popup Component
+ * Animated chest opening reveal for mystery rewards
+ */
+const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
+  reward,
+  isOpen,
+  onClose,
+  t,
+}) => {
+  const [phase, setPhase] = useState<'chest' | 'opening' | 'reveal'>('chest');
+
+  const rarity = reward?.rarity || 'common';
+  const styles = RARITY_STYLES[rarity];
+
+  // Reset phase when popup opens
+  useEffect(() => {
+    if (isOpen && reward) {
+      setPhase('chest');
+
+      // Sequence: chest -> opening -> reveal
+      const openingTimer = setTimeout(() => {
+        setPhase('opening');
+      }, 1000);
+
+      const revealTimer = setTimeout(() => {
+        setPhase('reveal');
+        // Fire confetti for rare+ rewards
+        if (['rare', 'epic', 'legendary'].includes(rarity)) {
+          fireConfetti({
+            particleCount: rarity === 'legendary' ? 150 : rarity === 'epic' ? 100 : 50,
+            spread: 70,
+            colors: [styles.particle, '#ffffff', styles.particle],
+          });
+        }
+      }, 2000);
+
+      return () => {
+        clearTimeout(openingTimer);
+        clearTimeout(revealTimer);
+      };
+    }
+    return;
+  }, [isOpen, reward, rarity, styles.particle]);
+
+  // Auto-close after reveal
+  useEffect(() => {
+    if (phase === 'reveal') {
+      const autoCloseTimer = setTimeout(() => {
+        onClose();
+      }, 4000);
+      return () => clearTimeout(autoCloseTimer);
+    }
+    return;
+  }, [phase, onClose]);
+
+  const handleClose = useCallback(() => {
+    if (phase === 'reveal') {
+      onClose();
+    }
+  }, [phase, onClose]);
+
+  if (!reward) return null;
+
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+      <DialogContent
+        className={cn(
+          'sm:max-w-sm border-4 rounded-neo p-0 overflow-hidden',
+          styles.bg,
+          styles.border,
+          styles.glow
+        )}
+      >
+        {/* Hidden title for accessibility */}
+        <DialogTitle className="sr-only">
+          {t('mysteryReward.title') || 'Mystery Reward'}
+        </DialogTitle>
+
+        <div className="p-6 flex flex-col items-center">
+          <AnimatePresence mode="wait">
+            {phase === 'chest' && (
+              /* Chest Phase - Show mystery box */
+              <motion.div
+                key="chest"
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 1.2, opacity: 0 }}
+                className="flex flex-col items-center gap-4"
+              >
+                <motion.div
+                  animate={{
+                    y: [0, -8, 0],
+                    rotate: [0, -2, 2, 0]
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: 'easeInOut'
+                  }}
+                  className="text-8xl"
+                >
+                  🎁
+                </motion.div>
+                <p className={cn('text-lg font-black uppercase', styles.text)}>
+                  {t('mysteryReward.youFound') || 'You Found a Mystery Reward!'}
+                </p>
+                <motion.div
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                  className="text-sm text-white/60"
+                >
+                  {t('mysteryReward.opening') || 'Opening...'}
+                </motion.div>
+              </motion.div>
+            )}
+
+            {phase === 'opening' && (
+              /* Opening Phase - Shaking/glowing animation */
+              <motion.div
+                key="opening"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex flex-col items-center gap-4"
+              >
+                <motion.div
+                  animate={{
+                    scale: [1, 1.1, 1, 1.15, 1],
+                    rotate: [-5, 5, -8, 8, 0],
+                  }}
+                  transition={{
+                    duration: 0.5,
+                    repeat: 3,
+                    ease: 'easeInOut'
+                  }}
+                  className={cn(
+                    'text-8xl p-4 rounded-full',
+                    'animate-pulse'
+                  )}
+                >
+                  ✨
+                </motion.div>
+                <motion.div
+                  animate={{
+                    scale: [1, 1.3, 1],
+                    opacity: [0.7, 1, 0.7]
+                  }}
+                  transition={{
+                    duration: 0.3,
+                    repeat: Infinity
+                  }}
+                  className={cn('text-xl font-black uppercase', styles.text)}
+                >
+                  {t('mysteryReward.revealing') || 'Revealing...'}
+                </motion.div>
+              </motion.div>
+            )}
+
+            {phase === 'reveal' && (
+              /* Reveal Phase - Show the reward */
+              <motion.div
+                key="reveal"
+                initial={{ scale: 0, opacity: 0, rotateY: 180 }}
+                animate={{ scale: 1, opacity: 1, rotateY: 0 }}
+                transition={{
+                  type: 'spring',
+                  damping: 15,
+                  stiffness: 150
+                }}
+                className="flex flex-col items-center gap-4 text-center"
+              >
+                {/* Rarity Badge */}
+                <motion.div
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className={cn(
+                    'px-3 py-1 rounded-full text-xs font-black uppercase tracking-wide',
+                    rarity === 'legendary' && 'bg-yellow-500 text-yellow-900',
+                    rarity === 'epic' && 'bg-purple-500 text-purple-100',
+                    rarity === 'rare' && 'bg-blue-500 text-blue-100',
+                    rarity === 'uncommon' && 'bg-emerald-500 text-emerald-100',
+                    rarity === 'common' && 'bg-slate-500 text-slate-100'
+                  )}
+                >
+                  {rarity}
+                </motion.div>
+
+                {/* Reward Icon */}
+                <motion.div
+                  animate={{
+                    scale: [1, 1.1, 1],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: 'easeInOut'
+                  }}
+                  className={cn(
+                    'p-6 rounded-full border-4',
+                    'bg-white/10',
+                    styles.border,
+                    styles.text
+                  )}
+                >
+                  {getRewardIcon(reward.type)}
+                </motion.div>
+
+                {/* Reward Display */}
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <p className="text-2xl font-black text-white">
+                    {reward.display}
+                  </p>
+                </motion.div>
+
+                {/* Trigger info */}
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="text-xs text-white/50"
+                >
+                  {reward.triggerType === 'game_completion' && (t('mysteryReward.gameCompletion') || 'Game Completion Bonus')}
+                  {reward.triggerType === 'win' && (t('mysteryReward.winBonus') || 'Victory Bonus')}
+                  {reward.triggerType === 'long_word' && (t('mysteryReward.longWord') || 'Long Word Bonus')}
+                  {reward.triggerType === 'achievement' && (t('mysteryReward.achievement') || 'Achievement Bonus')}
+                </motion.p>
+
+                {/* Tap to dismiss */}
+                <motion.button
+                  onClick={onClose}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1 }}
+                  className={cn(
+                    'mt-4 px-6 py-2.5 rounded-neo border-2 border-neo-black shadow-hard-sm',
+                    'font-bold uppercase text-sm',
+                    'bg-white/20 hover:bg-white/30 transition-colors',
+                    styles.text
+                  )}
+                >
+                  {t('mysteryReward.awesome') || 'Awesome!'}
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default MysteryRewardPopup;

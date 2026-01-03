@@ -1,7 +1,9 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
 import { cn } from '../lib/utils';
+import { Sparkles } from 'lucide-react';
+import PrestigeModal from './engagement/PrestigeModal';
 
 /**
  * XP calculation helpers (mirror of backend xpManager.js)
@@ -11,6 +13,17 @@ const XP_CONFIG = {
   LEVEL_BASE: 100,
   MAX_LEVEL: 100,
 };
+
+/**
+ * Prestige display configuration
+ */
+const PRESTIGE_DISPLAY = {
+  1: { name: 'Prestige I', color: '#CD7F32', icon: '⭐', gradient: 'from-amber-700 to-amber-500' },
+  2: { name: 'Prestige II', color: '#C0C0C0', icon: '🌟', gradient: 'from-gray-500 to-gray-300' },
+  3: { name: 'Prestige III', color: '#FFD700', icon: '✨', gradient: 'from-yellow-600 to-yellow-400' },
+  4: { name: 'Prestige IV', color: '#B9F2FF', icon: '💫', gradient: 'from-cyan-500 to-cyan-300' },
+  5: { name: 'Prestige V', color: '#9B59B6', icon: '🌌', gradient: 'from-purple-700 to-pink-500' },
+} as const;
 
 /**
  * XP Progress information
@@ -68,6 +81,17 @@ function getXpProgress(totalXp: number): XpProgress {
 }
 
 /**
+ * Prestige reward for modal display
+ */
+interface PrestigeReward {
+  type: 'title' | 'multiplier' | 'border' | 'icon';
+  value: string;
+  displayName: string;
+  description: string;
+  icon: string;
+}
+
+/**
  * XpProgressBar Props
  */
 interface XpProgressBarProps {
@@ -75,38 +99,91 @@ interface XpProgressBarProps {
   compact?: boolean;
   showNumbers?: boolean;
   className?: string;
+  // Prestige props
+  prestigeLevel?: number;
+  prestigeMultiplier?: number;
+  showPrestige?: boolean;
+  nextPrestigeRewards?: PrestigeReward[];
+  onPrestigeSuccess?: () => void;
 }
 
 /**
  * Neo-Brutalist XP Progress Bar Component
- * Shows level progress with animated fill bar
+ * Shows level progress with animated fill bar and prestige indicator
  */
 const XpProgressBar = memo<XpProgressBarProps>(({
   totalXp = 0,
   compact = false,
   showNumbers = true,
   className,
+  prestigeLevel = 0,
+  prestigeMultiplier = 1.0,
+  showPrestige = true,
+  nextPrestigeRewards = [],
+  onPrestigeSuccess,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const progress = useMemo(() => getXpProgress(totalXp), [totalXp]);
+  const [showPrestigeModal, setShowPrestigeModal] = useState(false);
+
+  const prestigeDisplay = prestigeLevel > 0 && prestigeLevel <= 5
+    ? PRESTIGE_DISPLAY[prestigeLevel as keyof typeof PRESTIGE_DISPLAY]
+    : null;
+
+  const canPrestige = progress.isMaxLevel && prestigeLevel < 5;
 
   return (
     <div className={cn('w-full', className)}>
       {/* Level indicator and XP numbers */}
       {!compact && (
         <div className="flex items-center justify-between mb-1">
-          <span className="text-sm font-black text-neo-black dark:text-gray-100 uppercase">
-            {t('xp.level') || 'Level'} {progress.currentLevel}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-black text-neo-black dark:text-gray-100 uppercase">
+              {t('xp.level') || 'Level'} {progress.currentLevel}
+            </span>
+            {/* Prestige Badge */}
+            {showPrestige && prestigeDisplay && (
+              <button
+                onClick={() => setShowPrestigeModal(true)}
+                className={cn(
+                  'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold',
+                  'border border-current/30',
+                  'hover:scale-105 transition-transform cursor-pointer',
+                  `bg-gradient-to-r ${prestigeDisplay.gradient} text-white`
+                )}
+                title={`${prestigeDisplay.name} - Click for details`}
+              >
+                <span>{prestigeDisplay.icon}</span>
+                <span className="hidden sm:inline">{prestigeLevel}</span>
+              </button>
+            )}
+            {/* XP Multiplier indicator */}
+            {showPrestige && prestigeMultiplier > 1 && (
+              <span className="text-[10px] font-bold text-neo-lime bg-neo-lime/20 px-1.5 py-0.5 rounded">
+                +{Math.round((prestigeMultiplier - 1) * 100)}% XP
+              </span>
+            )}
+          </div>
           {showNumbers && !progress.isMaxLevel && (
             <span className="text-xs font-bold text-neo-black/75 dark:text-gray-300">
               {progress.xpInCurrentLevel.toLocaleString()} / {progress.xpNeededForNextLevel.toLocaleString()} XP
             </span>
           )}
           {progress.isMaxLevel && (
-            <span className="text-xs font-bold text-neo-purple">
-              {t('xp.maxLevel') || 'Max Level'}
-            </span>
+            <button
+              onClick={() => showPrestige && setShowPrestigeModal(true)}
+              className={cn(
+                'text-xs font-bold flex items-center gap-1',
+                canPrestige
+                  ? 'text-neo-yellow animate-pulse cursor-pointer hover:underline'
+                  : 'text-neo-purple'
+              )}
+            >
+              {canPrestige && <Sparkles className="w-3 h-3" />}
+              {canPrestige
+                ? (t('xp.canPrestige') || 'Prestige Available!')
+                : (t('xp.maxLevel') || 'Max Level')}
+            </button>
           )}
         </div>
       )}
@@ -149,13 +226,35 @@ const XpProgressBar = memo<XpProgressBarProps>(({
       {/* Compact mode shows level inline */}
       {compact && (
         <div className="flex items-center justify-between mt-0.5">
-          <span className="text-[10px] font-bold text-neo-black/75 dark:text-gray-300">
-            Lv {progress.currentLevel}
-          </span>
+          <div className="flex items-center gap-1">
+            <span className="text-[10px] font-bold text-neo-black/75 dark:text-gray-300">
+              Lv {progress.currentLevel}
+            </span>
+            {showPrestige && prestigeDisplay && (
+              <span className="text-[10px]">{prestigeDisplay.icon}</span>
+            )}
+          </div>
           <span className="text-[10px] font-bold text-neo-black/75 dark:text-gray-300">
             {progress.progressPercent}%
           </span>
         </div>
+      )}
+
+      {/* Prestige Modal */}
+      {showPrestige && (
+        <PrestigeModal
+          isOpen={showPrestigeModal}
+          onClose={() => setShowPrestigeModal(false)}
+          currentLevel={progress.currentLevel}
+          currentPrestige={prestigeLevel}
+          prestigeMultiplier={prestigeMultiplier}
+          nextRewards={nextPrestigeRewards}
+          canPrestige={canPrestige}
+          maxPrestige={5}
+          t={t}
+          language={language}
+          onPrestigeSuccess={onPrestigeSuccess}
+        />
       )}
     </div>
   );

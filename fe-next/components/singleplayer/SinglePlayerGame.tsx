@@ -20,6 +20,7 @@ import { useComboSystem } from '@/hooks/useComboSystem';
 import { useGameTimer } from '@/hooks/useGameTimer';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import { cn } from '@/lib/utils';
@@ -74,6 +75,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     playFireRoundStart,
     startFireCrackleLoop,
     stopFireCrackleLoop,
+    setGameActive,
   } = useSoundEffects();
   const { announceWordResult, announceCombo, announceTimer } = useAnnouncer();
   // Use shared hook for consistent landscape detection across multiplayer and single player
@@ -117,6 +119,16 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
   const [showLandscapeTutorial, setShowLandscapeTutorial] = useState(false);
+
+  // Guard against accidental browser back button / swipe navigation during active game
+  useNavigationGuard({
+    enabled: !!grid && !isGameOver && score > 0,
+    message: t('singlePlayer.quitConfirmMessage') || 'You will lose your current progress. Are you sure you want to quit?',
+    onNavigationAttempt: () => {
+      setShowQuitConfirm(true);
+      return false; // Block navigation, let modal handle it
+    },
+  });
 
   // Hint prompt state - shows after player hasn't found a word for a while
   const [showHintPrompt, setShowHintPrompt] = useState(false);
@@ -212,6 +224,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   useEffect(() => {
     gameStartTimeRef.current = Date.now();
   }, []);
+
+  // Enable sound effects when game is active, disable when leaving
+  useEffect(() => {
+    setGameActive(true);
+    return () => {
+      setGameActive(false);
+    };
+  }, [setGameActive]);
 
   // Abuse detection: track submission timestamps (like multiplayer's spamDetector)
   const submissionTimestampsRef = useRef<number[]>([]);

@@ -11,6 +11,8 @@ import Avatar from '../../components/Avatar';
 import RoomChat from '../../components/RoomChat';
 import PresenceIndicator from '../../components/PresenceIndicator';
 import GameRoomHeader from '../../components/game/GameRoomHeader';
+import WaitingProgressBar from '../../components/game/WaitingProgressBar';
+import WaitingTips from '../../components/game/WaitingTips';
 import { getJoinUrl } from '../../utils/share';
 import { cn } from '../../lib/utils';
 import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus, GridPosition } from '@/shared/types/game';
@@ -79,64 +81,68 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
       {/* Row 2: Waiting Message + Players List (side by side on desktop) */}
       <div className="flex flex-col lg:flex-row lg:items-stretch gap-3 sm:gap-4 md:gap-6">
-        {/* Waiting Message Card - Neo-Brutalist (compact version) */}
-        <Card className="flex-1 p-2 sm:p-3 md:p-4 bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg flex flex-col items-center justify-center min-h-[180px]">
-          <motion.div
-            initial={{ scale: 0.9, rotate: -3 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="relative"
-            aria-hidden="true"
-          >
-            {/* Neo-Brutalist Hourglass - Compact */}
+        {/* Waiting Message Card - Neo-Brutalist with Progress */}
+        <Card className="flex-1 p-4 sm:p-5 md:p-6 bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg flex flex-col gap-5">
+          {/* Header with hourglass */}
+          <div className="flex items-center justify-center gap-4">
             <motion.div
-              animate={{ rotate: [0, 10, -10, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              className="bg-neo-yellow border-3 border-neo-black shadow-hard p-3 rotate-[2deg]"
+              initial={{ scale: 0.9, rotate: -3 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className="relative flex-shrink-0"
+              aria-hidden="true"
             >
-              <div className="relative w-8 h-12 flex flex-col items-center">
-                <div className="w-0 h-0 border-l-[14px] border-r-[14px] border-t-[18px] border-l-transparent border-r-transparent border-t-neo-black" />
-                <div className="w-1 h-0.5 bg-neo-black -my-[1px] z-10" />
-                <div className="w-0 h-0 border-l-[14px] border-r-[14px] border-b-[18px] border-l-transparent border-r-transparent border-b-neo-black" />
-                <motion.div
-                  animate={{ y: [0, 18, 0], opacity: [1, 1, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                  className="absolute top-[24px] w-0.5 h-2 bg-neo-pink"
-                />
-              </div>
-            </motion.div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mt-3 text-center"
-            role="status"
-            aria-live="polite"
-          >
-            <div className="bg-neo-black text-neo-white px-4 py-2 font-black uppercase text-base md:text-lg tracking-wider rotate-[1deg] shadow-hard border-3 border-neo-black">
-              {t('playerView.waitForGameStart')}
-            </div>
-            <motion.p
-              animate={{ opacity: [0.6, 1, 0.6] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="text-neo-cream/80 font-bold text-xs mt-2 uppercase tracking-wide"
-            >
-              {t('playerView.waitingForHostToStart') || 'Waiting for host to start the game...'}
-            </motion.p>
-          </motion.div>
-
-          <div className="flex gap-2 mt-3" aria-hidden="true">
-            {[0, 1, 2].map((i) => (
+              {/* Neo-Brutalist Hourglass - Compact */}
               <motion.div
-                key={i}
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
-                className="w-3 h-3 bg-neo-pink border-2 border-neo-black"
-              />
-            ))}
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                className="bg-neo-yellow border-3 border-neo-black shadow-hard p-2 rotate-[2deg]"
+              >
+                <div className="relative w-6 h-10 flex flex-col items-center">
+                  <div className="w-0 h-0 border-l-[10px] border-r-[10px] border-t-[14px] border-l-transparent border-r-transparent border-t-neo-black" />
+                  <div className="w-0.5 h-0.5 bg-neo-black -my-[1px] z-10" />
+                  <div className="w-0 h-0 border-l-[10px] border-r-[10px] border-b-[14px] border-l-transparent border-r-transparent border-b-neo-black" />
+                  <motion.div
+                    animate={{ y: [0, 14, 0], opacity: [1, 1, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                    className="absolute top-[18px] w-0.5 h-1.5 bg-neo-pink"
+                  />
+                </div>
+              </motion.div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              role="status"
+              aria-live="polite"
+            >
+              <div className="bg-neo-black text-neo-white px-4 py-2 font-black uppercase text-sm md:text-base tracking-wider rotate-[1deg] shadow-hard border-2 border-neo-black">
+                {t('playerView.waitForGameStart')}
+              </div>
+              <motion.p
+                animate={{ opacity: [0.6, 1, 0.6] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="text-neo-cream/80 font-bold text-xs mt-1 uppercase tracking-wide text-center"
+              >
+                {t('playerView.waitingForHostToStart') || 'Waiting for host to start the game...'}
+              </motion.p>
+            </motion.div>
           </div>
+
+          {/* Progress Bar */}
+          <WaitingProgressBar
+            currentPlayers={playersReady.length}
+            t={t}
+            className="mt-2"
+          />
+
+          {/* Tips Section */}
+          <WaitingTips
+            t={t}
+            className="mt-2"
+          />
         </Card>
 
         {/* Players List - RIGHT */}

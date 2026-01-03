@@ -97,6 +97,91 @@ export const shareViaTelegram = (message: string, url?: string): void => {
 };
 
 /**
+ * Share game via Twitter/X
+ * Opens Twitter's intent URL with pre-filled text
+ * @param message - The message to tweet
+ * @param url - The URL to include
+ */
+export const shareViaTwitter = (message: string, url?: string): void => {
+  // Twitter/X Web Intent URL
+  const text = url ? `${message}\n${url}` : message;
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+  window.open(twitterUrl, '_blank', 'width=550,height=420');
+};
+
+/**
+ * Share game via Discord
+ * Copies a formatted message to clipboard for pasting in Discord
+ * Discord doesn't have a direct share URL, so we copy to clipboard
+ * @param message - The message to share
+ * @param url - The URL to include
+ * @param t - Translation function
+ * @returns Promise resolving to success status
+ */
+export const shareViaDiscord = async (message: string, url: string, t: TranslationFunction | null = null): Promise<boolean> => {
+  // Discord-optimized formatting with embed-friendly URL
+  const discordMessage = `${message}\n${url}`;
+
+  try {
+    await navigator.clipboard.writeText(discordMessage);
+    const successMessage = t ? t('share.discordCopied') : 'Copied for Discord! Paste in your server 💬';
+    toast.success(successMessage, {
+      duration: 3000,
+      icon: '🎮',
+    });
+    return true;
+  } catch (error) {
+    logger.error('Failed to copy for Discord:', error);
+    const errorMessage = t ? t('share.copyError') : 'Error copying message';
+    toast.error(errorMessage, { duration: 2000 });
+    return false;
+  }
+};
+
+/**
+ * Share game via Email
+ * Opens the default email client with pre-filled subject and body
+ * @param subject - Email subject line
+ * @param body - Email body content
+ * @param url - The URL to include in the body
+ */
+export const shareViaEmail = (subject: string, body: string, url: string): void => {
+  // Build mailto URL with subject and body
+  const fullBody = `${body}\n\n${url}`;
+  const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(fullBody)}`;
+  window.location.href = mailtoUrl;
+};
+
+/**
+ * Share game via SMS
+ * Opens the native SMS app with pre-filled message (mobile only)
+ * @param message - The message to send
+ * @param url - The URL to include
+ */
+export const shareViaSms = (message: string, url: string): void => {
+  // SMS URL format - works on iOS and Android
+  // Using body parameter which is more widely supported
+  const fullMessage = `${message}\n${url}`;
+  // iOS uses &body=, Android uses ?body= - use ? for broader compatibility
+  const smsUrl = `sms:?body=${encodeURIComponent(fullMessage)}`;
+  window.location.href = smsUrl;
+};
+
+/**
+ * Check if SMS sharing is likely supported (mobile device)
+ * @returns boolean indicating if SMS share is available
+ */
+export const canShareViaSms = (): boolean => {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
+
+  // Check for mobile user agents
+  const userAgent = navigator.userAgent.toLowerCase();
+  const isMobile = /iphone|ipad|ipod|android|webos|blackberry|windows phone/i.test(userAgent);
+
+  return isMobile;
+};
+
+/**
  * Copy the game code to clipboard
  * @param gameCode - The game code
  * @param t - Translation function (optional for backward compatibility)

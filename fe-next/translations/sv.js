@@ -79,6 +79,7 @@ const sv = {
     "close": "Stäng",
     "changeLanguage": "Byt Språk",
     "adminDashboard": "Administratörspanel",
+    "awesome": "Fantastiskt!",
     "admin": "Admin",
     "understood": "Kör!",
     "refresh": "Uppdatera",
@@ -166,6 +167,15 @@ const sv = {
     "validating": "Kollar...",
     "later": "Senare",
     "skip": "Hoppa"
+  },
+  "connection": {
+    "reconnecting": "Återansluter...",
+    "disconnected": "Anslutning förlorad",
+    "attempt": "Försök",
+    "checkConnection": "Kontrollera din internetanslutning",
+    "retry": "Försök igen",
+    "retryNow": "Försök nu",
+    "connectionRestored": "Anslutning återställd!"
   },
   "theme": {
     "sundayFunday": "Kul Söndag",
@@ -359,7 +369,14 @@ const sv = {
     "scanToJoin": "Skanna för action",
     "challengeFriends": "Ta med dina bästa vänner 😈",
     "beatMyScore": "Tror du att du kan slå detta? 👀",
-    "canYouBeatMe": "Slå det. Jag utmanar dig. 🎯"
+    "canYouBeatMe": "Slå det. Jag utmanar dig. 🎯",
+    "twitter": "X",
+    "discord": "Discord",
+    "email": "E-post",
+    "sms": "SMS",
+    "discordCopied": "Kopierat för Discord! Klistra in i din server 💬",
+    "morePlatforms": "Fler plattformar",
+    "lessOptions": "Färre alternativ"
   },
   "errors": {
     "unstableConnection": "Skakigt WiFi! Vänta...",
@@ -921,6 +938,28 @@ const sv = {
     "tierstar": "Stjärna",
     "tierfire": "I Elden",
     "tierlegend": "Legend"
+  },
+  "waiting": {
+    "milestoneFirst": "Första spelaren!",
+    "milestoneParty": "Festen börjar!",
+    "milestoneFull": "Fullsatt!",
+    "waitingForPlayers": "Väntar på spelare...",
+    "oneMoreNeeded": "Bjud in vänner för att börja!",
+    "readyToStart": "Redo att starta! Fler spelare = mer kul!",
+    "fullHouse": "Fullsatt! Låt striden börja!"
+  },
+  "tips": {
+    "header": "Pro Tips",
+    "swipeTitle": "Svep för att koppla",
+    "swipeText": "Dra fingret över bokstäver för att bilda ord. Du kan röra dig i vilken riktning som helst!",
+    "longerTitle": "Längre = Bättre",
+    "longerText": "Längre ord ger exponentiellt fler poäng. Ett 6-bokstavsord är värt mycket mer än två 3-bokstavsord!",
+    "comboTitle": "Bygg Kombos",
+    "comboText": "Hitta ord snabbt i rad för att bygga kombomultiplikatorer för bonuspoäng!",
+    "uniqueTitle": "Var Unik",
+    "uniqueText": "Ord som hittats av flera spelare ger noll poäng! Tänk kreativt för att hitta unika ord.",
+    "bonusTitle": "Bonusrundor",
+    "bonusText": "Håll utkik efter eldrundor med 2x poäng! Perfekt timing kan vända spelet."
   },
   "lateJoiner": {
     "welcomeTitle": "Spelet pågår!",
@@ -1879,7 +1918,43 @@ const sv = {
       "eloquentElite": "Vältalande Elit",
       "linguisticLegend": "Lingvistisk Legend",
       "lexiClashChampion": "LexiClash-mästare"
+    },
+    "canPrestige": "Prestige tillgänglig!",
+    "prestige": {
+      "title": "Prestige-system",
+      "currentLevel": "Nuvarande nivå",
+      "prestigeLevel": "Prestige",
+      "xpMultiplier": "XP-multiplikator",
+      "rewards": "Belöningar",
+      "confirm": "Bekräfta Prestige",
+      "cancel": "Avbryt",
+      "warning": "Varning!",
+      "warningText": "Detta återställer dig till nivå 1. All nuvarande XP nollställs, men du får alla belöningar nedan.",
+      "success": "Prestige uppnådd!",
+      "rewardsUnlocked": "Dina belöningar har låsts upp!",
+      "reachLevel": "Nå nivå 100 för att Prestige",
+      "levelsRemaining": "nivåer kvar",
+      "maxPrestige": "Maximal Prestige!",
+      "maxPrestigeText": "Du har nått den högsta nivån. Du är en legend!"
     }
+  },
+  "nearMiss": {
+    "almostThere": "Nästan där!",
+    "oneMoreGame": "Ett spel till!",
+    "tip": "Tips",
+    "more": "mer",
+    "soClose": "Du var så nära! Ett spel till kan göra det."
+  },
+  "mysteryReward": {
+    "title": "Mysteriebelöning",
+    "youFound": "Du hittade en mysteriebelöning!",
+    "opening": "Öppnar...",
+    "revealing": "Avslöjar...",
+    "awesome": "Fantastiskt!",
+    "gameCompletion": "Spelslutbonus",
+    "winBonus": "Vinnarbonus",
+    "longWord": "Långordsbonus",
+    "achievement": "Prestationsbonus"
   },
   "auth": {
     "signIn": "Logga in",
@@ -2054,6 +2129,46 @@ const sv = {
     "changeCountry": "Ändra land",
     "countrySaved": "Land uppdaterat!",
     "countryError": "Kunde inte uppdatera land"
+  },
+  "calendar": {
+    "title": "Dagliga Belöningar",
+    "claimToday": "Hämta dagens belöning",
+    "claimedCount": "Hämtade",
+    "alreadyClaimed": "Dagens belöning hämtad!",
+    "comeBackTomorrow": "Kom tillbaka imorgon för fler belöningar",
+    "claimError": "Kunde inte hämta belöning",
+    "rewardTypes": "Belöningstyper",
+    "day": "Dag",
+    "today": "Idag",
+    "claimed": "Hämtad",
+    "locked": "Låst",
+    "available": "Tillgänglig",
+    "rewards": {
+      "xp": "XP",
+      "hint": "Ledtråd",
+      "hints": "Ledtrådar",
+      "streakFreeze": "Svitfrys",
+      "mysteryBox": "Mystisk låda",
+      "title": "Titel",
+      "exclusiveTitle": "Exklusiv Titel"
+    },
+    "rarity": {
+      "common": "Vanlig",
+      "uncommon": "Ovanlig",
+      "rare": "Sällsynt",
+      "epic": "Episk",
+      "legendary": "Legendarisk"
+    },
+    "milestone": "Milstolpsbelöning",
+    "claimSuccess": "Du fick {reward}!",
+    "streakBonus": "Svitbonus: +{percent}%"
+  },
+  "referral": {
+    "milestoneTitle": "Vänmilstolpe!",
+    "milestone_first_game_played": "spelade sitt första spel!",
+    "milestone_five_games_played": "har spelat 5 spel!",
+    "milestone_ten_games_played": "har spelat 10 spel!",
+    "milestoneMessage": "Fortsätt bjuda in vänner för fler belöningar!"
   },
   "coins": {
     "title": "Mynt & Belöningar",
@@ -2752,7 +2867,21 @@ const sv = {
       "cta": "Tror du att du kan slå det här? 🎮"
     },
     "leaderboard": "Rankning",
-    "screenshotProtection": "Återvänd för att fortsätta spela"
+    "screenshotProtection": "Återvänd för att fortsätta spela",
+    "trainingSuggestion": {
+      "title": "Ny på LexiClash?",
+      "subtitle": "Prova ett snabbt träningsspel först för att lära dig mekaniken!",
+      "benefitsTitle": "Träning hjälper dig:",
+      "benefits": {
+        "learnMechanics": "Lär dig hur man sveper och bildar ord",
+        "practiceSwipes": "Öva utan press",
+        "noPressure": "Bli bekväm med spelet"
+      },
+      "returnNote": "Efter träningen kommer du automatiskt tillbaka till daglig utmaning!",
+      "startTraining": "Starta träning",
+      "skipToDaily": "Hoppa över, jag klarar mig",
+      "redirecting": "På väg till daglig utmaning..."
+    }
   },
   "wordHunt": {
     "title": "Ordjakt",
@@ -2923,6 +3052,7 @@ const sv = {
       "title": "Topplista",
       "today": "Idag",
       "allTime": "Alla tider",
+      "played": "spelade",
       "solved": "Löst",
       "failed": "Misslyckades",
       "attempts": "försök",

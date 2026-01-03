@@ -1492,6 +1492,8 @@ export interface StoredWordHuntResult {
   puzzleNumber: number;
   result: WordHuntResult;
   completedAt: string;
+  /** Whether this result has been successfully submitted to the server */
+  submittedToServer?: boolean;
 }
 
 /**
@@ -1621,6 +1623,7 @@ export function saveWordHuntResult(result: WordHuntResult): DailyStreak {
     puzzleNumber: result.puzzleNumber,
     result,
     completedAt: new Date().toISOString(),
+    submittedToServer: false, // Will be set to true after successful API submission
   };
 
   localStorage.setItem(key, JSON.stringify(storedResult));
@@ -1646,6 +1649,30 @@ export function clearWordHuntResultForRetry(language: Language): boolean {
     // Also clear the coin award flag so they can earn coins again
     const awardKey = `lexiclash_daily_coin_award_${today}_${language}`;
     localStorage.removeItem(awardKey);
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Mark a Word Hunt result as successfully submitted to the server
+ * Called after the API submission succeeds to prevent duplicate submissions
+ */
+export function markWordHuntResultSubmitted(language: Language): boolean {
+  if (typeof window === 'undefined') return false;
+
+  const today = getDailyChallengeDate();
+  const key = `${WORD_HUNT_STORAGE_KEY}_${language}_${today}`;
+
+  try {
+    const stored = localStorage.getItem(key);
+    if (!stored) return false;
+
+    const storedResult: StoredWordHuntResult = JSON.parse(stored);
+    storedResult.submittedToServer = true;
+    localStorage.setItem(key, JSON.stringify(storedResult));
 
     return true;
   } catch {

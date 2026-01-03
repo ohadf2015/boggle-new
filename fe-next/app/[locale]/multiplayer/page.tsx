@@ -1180,12 +1180,22 @@ export default function MultiplayerPage(): React.JSX.Element {
 
   // QuickJoinView handlers removed - invitation flow now handled by MultiplayerFlow
 
+  // Manual reconnect handler
+  const handleManualReconnect = useCallback(() => {
+    if (socket && !socket.connected) {
+      socket.connect();
+    }
+  }, [socket]);
+
   // Create context value
   const socketContextValue = {
     socket,
     isConnected,
     connectionError: error,
     isReconnecting: attemptingReconnect,
+    reconnectAttempt: 0, // Local override doesn't track attempts
+    maxReconnectAttempts: 20,
+    manualReconnect: handleManualReconnect,
   };
 
   const renderView = () => {

@@ -217,7 +217,7 @@ const LandingView: React.FC = () => {
       <Header />
 
       {/* Main content */}
-      <main className="w-full px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-4 overflow-x-hidden">
+      <main className="w-full max-w-6xl mx-auto px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-4 overflow-x-hidden">
         {/* Hero section - compact */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}

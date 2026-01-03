@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import PresetSelector from './PresetSelector';
@@ -13,7 +13,7 @@ import { useGameMusic, type GamePhase } from '@/hooks/useGameMusic';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { incrementTrainingGames } from '@/utils/playerProgressStorage';
-import { getMinWordLength, type PresetConfig } from './presetConfig';
+import { getMinWordLength, getDefaultPreset, type PresetConfig } from './presetConfig';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 
 export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge' | 'daily';
@@ -88,9 +88,15 @@ const BOT_NAMES = [
 ];
 
 const SinglePlayerView: React.FC = () => {
-  const { language: uiLanguage } = useLanguage();
+  const { language: uiLanguage, t } = useLanguage();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [phase, setPhase] = useState<SinglePlayerPhase>('preset-selection');
+
+  // Check for returnTo param (e.g., returnTo=daily from training suggestion)
+  const returnTo = searchParams.get('returnTo');
+  // Check for autoStart param (e.g., autoStart=practice from onboarding)
+  const autoStart = searchParams.get('autoStart');
 
   const [gameState, setGameState] = useState<SinglePlayerGameState>(() => ({
     mode: 'solo-bots',
@@ -125,6 +131,42 @@ const SinglePlayerView: React.FC = () => {
     threshold: 60,
     enabled: phase !== 'playing', // Disable during gameplay
   });
+
+  // Auto-redirect to daily challenge after game ends when returnTo=daily
+  // This is used when players come from the training suggestion modal
+  useEffect(() => {
+    if (phase === 'results' && returnTo === 'daily' && resultsData) {
+      // Wait a moment for user to see results, then redirect
+      const timer = setTimeout(() => {
+        router.push(`/${uiLanguage}/daily`);
+      }, 3000); // 3 second delay to see results
+
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [phase, returnTo, resultsData, router, uiLanguage]);
+
+  // Auto-start practice mode when coming from onboarding (autoStart=practice)
+  useEffect(() => {
+    if (autoStart === 'practice' && phase === 'preset-selection') {
+      // Get the default practice preset (explorer - EASY, no timer, no bots)
+      const practicePreset = getDefaultPreset('practice');
+      if (practicePreset) {
+        const minWordLength = getMinWordLength(uiLanguage, practicePreset.settings.difficulty);
+        setGameState(prev => ({
+          ...prev,
+          mode: 'practice',
+          difficulty: practicePreset.settings.difficulty,
+          timerSeconds: practicePreset.settings.timerSeconds,
+          bots: [],
+          language: uiLanguage as Language,
+          grid: null,
+          minWordLength,
+        }));
+        setPhase('playing');
+      }
+    }
+  }, [autoStart, phase, uiLanguage]);
 
   // Get current high score for challenge mode
   const currentHighScore = useMemo(() => {
@@ -318,13 +360,23 @@ const SinglePlayerView: React.FC = () => {
         )}
 
         {phase === 'results' && resultsData && (
-          <SinglePlayerResults
-            results={resultsData}
-            mode={gameState.mode}
-            onPlayAgain={handlePlayAgain}
-            onQuickRematch={handleQuickRematch}
-            onBackToLobby={handleBackToLobby}
-          />
+          <>
+            <SinglePlayerResults
+              results={resultsData}
+              mode={gameState.mode}
+              onPlayAgain={handlePlayAgain}
+              onQuickRematch={handleQuickRematch}
+              onBackToLobby={handleBackToLobby}
+            />
+            {/* Show redirect notice when coming from training suggestion */}
+            {returnTo === 'daily' && (
+              <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
+                <div className="bg-neo-orange text-neo-black px-4 py-2 rounded-full shadow-hard-sm border-2 border-neo-black text-sm font-medium animate-pulse">
+                  {t('daily.trainingSuggestion.redirecting') || 'Heading to Daily Challenge...'}
+                </div>
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>

@@ -181,9 +181,18 @@ const InGameScreen = memo<InGameScreenProps>(({
     playFireRoundStart,
     startFireCrackleLoop,
     stopFireCrackleLoop,
+    setGameActive,
   } = useSoundEffects();
   const { announceWordResult, announceTimer } = useAnnouncer();
   const isLandscape = useMobileLandscape();
+
+  // Enable sound effects when in-game, disable when leaving
+  useEffect(() => {
+    setGameActive(true);
+    return () => {
+      setGameActive(false);
+    };
+  }, [setGameActive]);
 
   // Announce timer at key intervals for screen reader users
   useEffect(() => {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useRef, useCallback, useMemo, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useCallback, useMemo, useState, ReactNode } from 'react';
 import { Howl } from 'howler';
 import { useMusic } from './MusicContext';
 import logger from '@/utils/logger';
@@ -10,13 +10,17 @@ import { useLocalStorageObject } from '@/hooks/useLocalStorageState';
 interface SoundEffectOptions {
   volume?: number;
   rate?: number;
+  /** If false, sound plays even when game is not active (e.g., for achievements, chat) */
+  requiresGameActive?: boolean;
 }
 
 interface SoundEffectsContextType {
   sfxVolume: number;
   sfxMuted: boolean;
+  isGameActive: boolean;
   setSfxVolume: (volume: number) => void;
   toggleSfxMute: () => void;
+  setGameActive: (active: boolean) => void;
   playSound: (soundKey: keyof typeof SOUND_EFFECTS, options?: SoundEffectOptions) => void;
   playComboSound: (comboLevel: number) => void;
   playAchievementSound: () => void;
@@ -76,6 +80,11 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   const isTabVisibleRef = useRef(true);
   const fireCrackleLoopIdRef = useRef<number | null>(null); // Track fire crackle loop sound ID
 
+  // Game-active state - sounds only play when a game is active
+  // This prevents sounds from playing on results screens, menus, etc.
+  const [isGameActive, setIsGameActiveState] = useState(false);
+  const isGameActiveRef = useRef(false);
+
   // Use shared localStorage hook for SFX settings
   const [sfxSettings, , updateSfxSetting] = useLocalStorageObject<SfxSettings>(
     SFX_STORAGE_KEY,
@@ -95,6 +104,13 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   const toggleSfxMute = useCallback(() => {
     updateSfxSetting('muted', !sfxMuted);
   }, [updateSfxSetting, sfxMuted]);
+
+  // Set game active state - sounds only play when game is active
+  const setGameActive = useCallback((active: boolean) => {
+    setIsGameActiveState(active);
+    isGameActiveRef.current = active;
+    logger.log('[SFX] Game active state changed:', active);
+  }, []);
 
   // Track tab visibility to block sounds when tab is hidden
   useEffect(() => {
@@ -145,7 +161,12 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
 
   // Play a sound effect
   const playSound = useCallback((soundKey: keyof typeof SOUND_EFFECTS, options: SoundEffectOptions = {}) => {
+    // Check basic conditions
     if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current) return;
+
+    // Check game active state (default: requires game to be active)
+    const requiresGameActive = options.requiresGameActive !== false;
+    if (requiresGameActive && !isGameActiveRef.current) return;
 
     const howl = soundsRef.current[soundKey];
     if (!howl) {
@@ -176,7 +197,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   // Play combo sound with dynamic pitch based on combo level
   // Pitch increases with each combo level (infinite scaling)
   const playComboSound = useCallback((comboLevel: number) => {
-    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || comboLevel < 1) return;
+    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current || comboLevel < 1) return;
 
     // Calculate pitch rate: starts at 1.0, increases by ~0.1 per combo level
     // Uses logarithmic scaling for smooth progression that doesn't get too extreme
@@ -193,8 +214,9 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   }, [audioUnlocked, sfxMuted, playSound]);
 
   // Play achievement unlock sound with haptic feedback
+  // Achievements can trigger on results screen, so don't require game active
   const playAchievementSound = useCallback(() => {
-    playSound('achievement', { volume: 0.8 });
+    playSound('achievement', { volume: 0.8, requiresGameActive: false });
     hapticAchievement();
   }, [playSound]);
 
@@ -206,7 +228,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   // Play countdown beep with increasing pitch (3, 2, 1 seconds remaining)
   // secondsRemaining: 3 = lowest pitch, 1 = highest pitch
   const playCountdownBeep = useCallback((secondsRemaining: number) => {
-    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current) return;
+    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current) return;
 
     // Pitch increases as we get closer to 0: 3->1.0, 2->1.2, 1->1.4
     const pitchMap: Record<number, number> = { 3: 1.0, 2: 1.2, 1: 1.4 };
@@ -217,8 +239,9 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   }, [audioUnlocked, sfxMuted, playSound]);
 
   // Play chat message notification sound
+  // Chat works throughout the app, so don't require game active
   const playMessageSound = useCallback(() => {
-    playSound('message', { volume: 0.5 });
+    playSound('message', { volume: 0.5, requiresGameActive: false });
   }, [playSound]);
 
   // ==================== Combo Feedback Sounds ====================
@@ -228,7 +251,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
    * Higher milestones get slightly louder and higher pitched
    */
   const playComboMilestoneSound = useCallback((milestoneLevel: number) => {
-    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current) return;
+    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current) return;
 
     // Pitch and volume increase with milestone level
     const pitchMap: Record<number, number> = { 5: 1.0, 10: 1.1, 15: 1.2 };
@@ -247,7 +270,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
    * Louder for higher combos that were lost (more impactful loss)
    */
   const playComboBreakSound = useCallback((lostLevel: number) => {
-    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current) return;
+    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current) return;
 
     // Volume scales with lost combo level (losing a big combo is more impactful)
     // But capped to not be too harsh
@@ -261,7 +284,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
    * Play combo saved sound when player narrowly avoids losing combo
    */
   const playComboSavedSound = useCallback(() => {
-    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current) return;
+    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current) return;
 
     playSound('comboSaved', { volume: 0.5 });
     hapticComboSaved();
@@ -286,7 +309,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
 
   // Start fire crackle ambient loop (plays for 15 seconds)
   const startFireCrackleLoop = useCallback(() => {
-    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current) return;
+    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current) return;
 
     const howl = soundsRef.current['fireCrackleLoop'];
     if (!howl) {
@@ -341,6 +364,9 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     sfxMuted,
     setSfxVolume,
     toggleSfxMute,
+    // Game active state
+    isGameActive,
+    setGameActive,
     // Sound playback
     playSound,
     playComboSound,
@@ -363,6 +389,8 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     sfxMuted,
     setSfxVolume,
     toggleSfxMute,
+    isGameActive,
+    setGameActive,
     playSound,
     playComboSound,
     playAchievementSound,

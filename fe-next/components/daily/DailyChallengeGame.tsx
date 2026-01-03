@@ -58,7 +58,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   onQuit,
 }) => {
   const { t } = useLanguage();
-  const { playWordAcceptedSound, playComboSound } = useSoundEffects();
+  const { playWordAcceptedSound, playComboSound, setGameActive } = useSoundEffects();
   const { stopMusic } = useMusic();
   const isLandscape = useMobileLandscape();
 
@@ -93,6 +93,14 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       isMountedRef.current = false;
     };
   }, []);
+
+  // Enable sound effects when game is active, disable when leaving
+  useEffect(() => {
+    setGameActive(true);
+    return () => {
+      setGameActive(false);
+    };
+  }, [setGameActive]);
 
   // Stable callback for timer - prevents timer restart on every render
   const stableOnTimeUp = useCallback(() => {

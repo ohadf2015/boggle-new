@@ -79,6 +79,7 @@ const he = {
     "close": "סגור",
     "changeLanguage": "שנה שפה",
     "adminDashboard": "לוח בקרה",
+    "awesome": "מדהים!",
     "admin": "מנהל",
     "understood": "יאללה!",
     "refresh": "רענן",
@@ -166,6 +167,15 @@ const he = {
     "validating": "בודק...",
     "later": "אחר כך",
     "skip": "דלג"
+  },
+  "connection": {
+    "reconnecting": "מתחבר מחדש...",
+    "disconnected": "החיבור נפל",
+    "attempt": "ניסיון",
+    "checkConnection": "בדוק את חיבור האינטרנט",
+    "retry": "נסה שוב",
+    "retryNow": "נסה עכשיו",
+    "connectionRestored": "החיבור התחדש!"
   },
   "theme": {
     "sundayFunday": "יום ראשון כיפי",
@@ -359,7 +369,14 @@ const he = {
     "scanToJoin": "סרקו להצטרפות לפעולה",
     "challengeFriends": "הביאו את הטובים שלכם 😈",
     "beatMyScore": "חושבים שתצליחו לנצח? 👀",
-    "canYouBeatMe": "תנסו לנצח. אני מאתגר. 🎯"
+    "canYouBeatMe": "תנסו לנצח. אני מאתגר. 🎯",
+    "twitter": "X",
+    "discord": "Discord",
+    "email": "אימייל",
+    "sms": "SMS",
+    "discordCopied": "הועתק לדיסקורד! הדביקו בשרת שלכם 💬",
+    "morePlatforms": "עוד פלטפורמות",
+    "lessOptions": "פחות אפשרויות"
   },
   "errors": {
     "unstableConnection": "WiFi רועד! רגע...",
@@ -922,6 +939,28 @@ const he = {
     "longWordsLabel": "${min}+ אותיות",
     "longWordsOnBoard": "מילים עם ${min}+ אותיות",
     "longWordsRemaining": "מילים של ${min}+ אותיות נותרו"
+  },
+  "waiting": {
+    "milestoneFirst": "שחקן ראשון!",
+    "milestoneParty": "המסיבה מתחילה!",
+    "milestoneFull": "בית מלא!",
+    "waitingForPlayers": "ממתינים לשחקנים...",
+    "oneMoreNeeded": "הזמינו חברים כדי להתחיל!",
+    "readyToStart": "מוכנים להתחיל! יותר שחקנים = יותר כיף!",
+    "fullHouse": "בית מלא! שהקרב יתחיל!"
+  },
+  "tips": {
+    "header": "טיפים מקצועיים",
+    "swipeTitle": "החליקו לחיבור",
+    "swipeText": "גררו את האצבע על אותיות כדי ליצור מילים. אפשר לנוע לכל כיוון!",
+    "longerTitle": "ארוך יותר = טוב יותר",
+    "longerText": "מילים ארוכות שוות הרבה יותר נקודות. מילה בת 6 אותיות שווה הרבה יותר משתי מילים בנות 3 אותיות!",
+    "comboTitle": "בנו קומבו",
+    "comboText": "מצאו מילים ברצף מהיר כדי לבנות מכפילי קומבו לנקודות בונוס!",
+    "uniqueTitle": "היו ייחודיים",
+    "uniqueText": "מילים שנמצאו על ידי כמה שחקנים שוות אפס! חשבו יצירתי כדי למצוא מילים ייחודיות.",
+    "bonusTitle": "סיבובי בונוס",
+    "bonusText": "שימו לב לסיבובי האש עם נקודות כפולות! תזמון מושלם יכול להפוך את המשחק."
   },
   "lateJoiner": {
     "welcomeTitle": "המשחק כבר התחיל!",
@@ -1880,7 +1919,43 @@ const he = {
       "eloquentElite": "עילית רהוטה",
       "linguisticLegend": "אגדת הלשון",
       "lexiClashChampion": "אלוף לקסיקלאש"
+    },
+    "canPrestige": "פרסטיג' זמין!",
+    "prestige": {
+      "title": "מערכת פרסטיג'",
+      "currentLevel": "רמה נוכחית",
+      "prestigeLevel": "פרסטיג'",
+      "xpMultiplier": "מכפיל XP",
+      "rewards": "פרסים",
+      "confirm": "אשר פרסטיג'",
+      "cancel": "ביטול",
+      "warning": "שים לב!",
+      "warningText": "האיפוס יחזיר אותך לרמה 1. כל ה-XP הנוכחי יאופס, אבל תקבל את כל הפרסים למטה.",
+      "success": "הגעת לפרסטיג'!",
+      "rewardsUnlocked": "הפרסים שלך נפתחו!",
+      "reachLevel": "הגע לרמה 100 כדי לבצע פרסטיג'",
+      "levelsRemaining": "רמות נותרו",
+      "maxPrestige": "פרסטיג' מקסימלי!",
+      "maxPrestigeText": "הגעת לרמה הגבוהה ביותר. אתה אגדה!"
     }
+  },
+  "nearMiss": {
+    "almostThere": "כמעט שם!",
+    "oneMoreGame": "עוד משחק אחד!",
+    "tip": "טיפ",
+    "more": "עוד",
+    "soClose": "היית כל כך קרוב! משחק אחד עוד יכול לעשות את זה."
+  },
+  "mysteryReward": {
+    "title": "פרס מסתורי",
+    "youFound": "מצאת פרס מסתורי!",
+    "opening": "פותח...",
+    "revealing": "מגלה...",
+    "awesome": "מדהים!",
+    "gameCompletion": "בונוס סיום משחק",
+    "winBonus": "בונוס ניצחון",
+    "longWord": "בונוס מילה ארוכה",
+    "achievement": "בונוס הישג"
   },
   "auth": {
     "signIn": "התחברות",
@@ -2183,6 +2258,46 @@ const he = {
     "changeCountry": "שנה מדינה",
     "countrySaved": "המדינה עודכנה!",
     "countryError": "שגיאה בעדכון המדינה"
+  },
+  "calendar": {
+    "title": "פרסים יומיים",
+    "claimToday": "קבל את הפרס של היום",
+    "claimedCount": "נאספו",
+    "alreadyClaimed": "הפרס של היום נאסף!",
+    "comeBackTomorrow": "חזור מחר לעוד פרסים",
+    "claimError": "שגיאה באיסוף הפרס",
+    "rewardTypes": "סוגי פרסים",
+    "day": "יום",
+    "today": "היום",
+    "claimed": "נאסף",
+    "locked": "נעול",
+    "available": "זמין",
+    "rewards": {
+      "xp": "XP",
+      "hint": "רמז",
+      "hints": "רמזים",
+      "streakFreeze": "הקפאת רצף",
+      "mysteryBox": "קופסת הפתעה",
+      "title": "תואר",
+      "exclusiveTitle": "תואר בלעדי"
+    },
+    "rarity": {
+      "common": "רגיל",
+      "uncommon": "נדיר",
+      "rare": "נדיר מאוד",
+      "epic": "אפי",
+      "legendary": "אגדי"
+    },
+    "milestone": "פרס אבן דרך",
+    "claimSuccess": "קיבלת {reward}!",
+    "streakBonus": "בונוס רצף: +{percent}%"
+  },
+  "referral": {
+    "milestoneTitle": "אבן דרך של חבר!",
+    "milestone_first_game_played": "שיחק את המשחק הראשון!",
+    "milestone_five_games_played": "שיחק 5 משחקים!",
+    "milestone_ten_games_played": "שיחק 10 משחקים!",
+    "milestoneMessage": "המשך להזמין חברים כדי להרוויח עוד פרסים!"
   },
   "coins": {
     "title": "מטבעות ופרסים",
@@ -2753,7 +2868,21 @@ const he = {
       "cta": "תצליחו לנצח את זה? 🎮"
     },
     "leaderboard": "דירוג",
-    "screenshotProtection": "חזרו כדי להמשיך לשחק"
+    "screenshotProtection": "חזרו כדי להמשיך לשחק",
+    "trainingSuggestion": {
+      "title": "חדשים ב-LexiClash?",
+      "subtitle": "נסו משחק אימון קצר כדי ללמוד את המכניקה!",
+      "benefitsTitle": "אימון עוזר לכם:",
+      "benefits": {
+        "learnMechanics": "ללמוד להחליק וליצור מילים",
+        "practiceSwipes": "לתרגל בלי לחץ",
+        "noPressure": "להרגיש נוח עם המשחק"
+      },
+      "returnNote": "אחרי האימון, תחזרו לאתגר היומי אוטומטית!",
+      "startTraining": "התחילו אימון",
+      "skipToDaily": "דלגו, אני אסתדר",
+      "redirecting": "בדרך לאתגר היומי..."
+    }
   },
   "wordHunt": {
     "title": "ציד מילים",

@@ -20,6 +20,7 @@
 import React, { memo, useMemo, createContext, useContext, ReactNode } from 'react';
 import { motion, AnimatePresence, HTMLMotionProps, MotionProps } from 'framer-motion';
 import { getPerformanceConfig } from '@/components/grid/performanceUtils';
+import { useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 
 // Context to allow overriding animation behavior
 interface MotionContextValue {
@@ -31,8 +32,9 @@ const MotionContext = createContext<MotionContextValue>({ skipAnimations: false 
 export function useSkipAnimations(): boolean {
   const context = useContext(MotionContext);
   const config = useMemo(() => getPerformanceConfig(), []);
-  // Skip if either context says so, or device is low-end
-  return context.skipAnimations || config.isLowEnd || !config.enableComplexAnimations;
+  const shouldReduceMotion = useShouldReduceMotion();
+  // Skip if: context says so, device is low-end, or user prefers reduced motion
+  return context.skipAnimations || config.isLowEnd || !config.enableComplexAnimations || shouldReduceMotion;
 }
 
 /**

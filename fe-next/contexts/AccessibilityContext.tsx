@@ -13,6 +13,8 @@ interface AccessibilitySettings {
   disableEarthquakeEffects: boolean;
   /** Reduce animations throughout the app (respects system preference + manual override) */
   reduceMotion: boolean | 'system';
+  /** Disable haptic feedback vibrations on mobile devices */
+  disableHaptics: boolean;
 }
 
 interface AccessibilityContextType {
@@ -22,10 +24,14 @@ interface AccessibilityContextType {
   toggleFireRoundLights: () => void;
   /** Toggle the earthquake effects on/off */
   toggleEarthquakeEffects: () => void;
+  /** Toggle haptic feedback on/off */
+  toggleHaptics: () => void;
   /** Cycle through reduceMotion options: system -> on -> off -> system */
   cycleReduceMotion: () => void;
   /** Whether animations should be reduced (combines setting + system preference) */
   shouldReduceMotion: boolean;
+  /** Whether haptic feedback is enabled */
+  hapticsEnabled: boolean;
   /** Update a specific setting */
   updateSetting: <K extends keyof AccessibilitySettings>(
     key: K,
@@ -40,6 +46,7 @@ const DEFAULT_SETTINGS: AccessibilitySettings = {
   disableFireRoundLights: false,
   disableEarthquakeEffects: false,
   reduceMotion: 'system', // Respect system preference by default
+  disableHaptics: false, // Enable haptics by default
 };
 
 interface AccessibilityProviderProps {
@@ -120,16 +127,28 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
     [settings.reduceMotion, updateField]
   );
 
+  const toggleHaptics = useMemo(
+    () => () => {
+      updateField('disableHaptics', !settings.disableHaptics);
+    },
+    [settings.disableHaptics, updateField]
+  );
+
+  // Haptics are enabled if not disabled in settings
+  const hapticsEnabled = !settings.disableHaptics;
+
   const value = useMemo<AccessibilityContextType>(
     () => ({
       settings,
       toggleFireRoundLights,
       toggleEarthquakeEffects,
+      toggleHaptics,
       cycleReduceMotion,
       shouldReduceMotion,
+      hapticsEnabled,
       updateSetting: updateField,
     }),
-    [settings, toggleFireRoundLights, toggleEarthquakeEffects, cycleReduceMotion, shouldReduceMotion, updateField]
+    [settings, toggleFireRoundLights, toggleEarthquakeEffects, toggleHaptics, cycleReduceMotion, shouldReduceMotion, hapticsEnabled, updateField]
   );
 
   return (
@@ -193,4 +212,13 @@ export function useShouldReduceMotion(): boolean {
   }, []);
 
   return context?.shouldReduceMotion ?? systemPref;
+}
+
+/**
+ * Hook that returns whether haptic feedback is enabled
+ * Safe to use outside of provider - returns true as default (haptics on)
+ */
+export function useHapticsEnabled(): boolean {
+  const context = useContext(AccessibilityContext);
+  return context?.hapticsEnabled ?? true;
 }

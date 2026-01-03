@@ -79,6 +79,7 @@ const ja = {
     "close": "閉じる",
     "changeLanguage": "言語を変更",
     "adminDashboard": "管理ダッシュボード",
+    "awesome": "最高！",
     "admin": "管理者",
     "understood": "行くぞ！",
     "refresh": "更新",
@@ -166,6 +167,15 @@ const ja = {
     "validating": "確認中...",
     "later": "後で",
     "skip": "スキップ"
+  },
+  "connection": {
+    "reconnecting": "再接続中...",
+    "disconnected": "接続が切断されました",
+    "attempt": "試行",
+    "checkConnection": "インターネット接続を確認してください",
+    "retry": "再接続",
+    "retryNow": "今すぐ再試行",
+    "connectionRestored": "接続が復元されました！"
   },
   "theme": {
     "sundayFunday": "楽しい日曜日",
@@ -359,7 +369,14 @@ const ja = {
     "scanToJoin": "スキャンでアクション",
     "challengeFriends": "最強の友達を連れてこい 😈",
     "beatMyScore": "これ超えられる？ 👀",
-    "canYouBeatMe": "超えてみろ。🎯"
+    "canYouBeatMe": "超えてみろ。🎯",
+    "twitter": "X",
+    "discord": "Discord",
+    "email": "メール",
+    "sms": "SMS",
+    "discordCopied": "Discordにコピー！サーバーに貼り付けて 💬",
+    "morePlatforms": "他のプラットフォーム",
+    "lessOptions": "オプションを減らす"
   },
   "errors": {
     "unstableConnection": "WiFi不安定！待って...",
@@ -921,6 +938,28 @@ const ja = {
     "tierstar": "スター",
     "tierfire": "オンファイア",
     "tierlegend": "レジェンド"
+  },
+  "waiting": {
+    "milestoneFirst": "最初のプレイヤー！",
+    "milestoneParty": "パーティー開始！",
+    "milestoneFull": "満員御礼！",
+    "waitingForPlayers": "プレイヤーを待っています...",
+    "oneMoreNeeded": "友達を招待して始めましょう！",
+    "readyToStart": "開始準備完了！プレイヤーが多いほど楽しい！",
+    "fullHouse": "満員御礼！バトル開始！"
+  },
+  "tips": {
+    "header": "プロのコツ",
+    "swipeTitle": "スワイプで接続",
+    "swipeText": "文字の上で指をドラッグして単語を作成。どの方向にも動けます！",
+    "longerTitle": "長い = 良い",
+    "longerText": "長い単語は指数関数的にポイントが高くなります。6文字の単語は3文字の単語2つよりずっと価値があります！",
+    "comboTitle": "コンボを構築",
+    "comboText": "連続で素早く単語を見つけてコンボ倍率を上げてボーナスポイント！",
+    "uniqueTitle": "ユニークに",
+    "uniqueText": "複数のプレイヤーが見つけた単語は0点！創造的に考えてユニークな単語を見つけよう。",
+    "bonusTitle": "ボーナスラウンド",
+    "bonusText": "2倍ポイントのファイアラウンドに注目！完璧なタイミングでゲームを逆転できます。"
   },
   "lateJoiner": {
     "welcomeTitle": "ゲーム進行中！",
@@ -1878,7 +1917,43 @@ const ja = {
       "eloquentElite": "エロクエントエリート",
       "linguisticLegend": "リングイスティックレジェンド",
       "lexiClashChampion": "レキシクラッシュチャンピオン"
+    },
+    "canPrestige": "プレステージ可能！",
+    "prestige": {
+      "title": "プレステージシステム",
+      "currentLevel": "現在のレベル",
+      "prestigeLevel": "プレステージ",
+      "xpMultiplier": "XPマルチプライヤー",
+      "rewards": "報酬",
+      "confirm": "プレステージを確認",
+      "cancel": "キャンセル",
+      "warning": "注意！",
+      "warningText": "レベル1にリセットされます。現在のXPはすべてリセットされますが、以下の報酬がもらえます。",
+      "success": "プレステージ達成！",
+      "rewardsUnlocked": "報酬がアンロックされました！",
+      "reachLevel": "レベル100に達するとプレステージ可能",
+      "levelsRemaining": "レベル残り",
+      "maxPrestige": "最大プレステージ！",
+      "maxPrestigeText": "最高レベルに達しました。あなたは伝説です！"
     }
+  },
+  "nearMiss": {
+    "almostThere": "もう少し！",
+    "oneMoreGame": "もう1ゲーム！",
+    "tip": "ヒント",
+    "more": "あと",
+    "soClose": "あと少しでした！もう1ゲームで達成できるかも。"
+  },
+  "mysteryReward": {
+    "title": "ミステリー報酬",
+    "youFound": "ミステリー報酬を見つけました！",
+    "opening": "開封中...",
+    "revealing": "公開中...",
+    "awesome": "すごい！",
+    "gameCompletion": "ゲーム完了ボーナス",
+    "winBonus": "勝利ボーナス",
+    "longWord": "長い単語ボーナス",
+    "achievement": "実績ボーナス"
   },
   "auth": {
     "signIn": "ログイン",
@@ -2053,6 +2128,46 @@ const ja = {
     "changeCountry": "国を変更",
     "countrySaved": "国が更新されました！",
     "countryError": "国の更新に失敗しました"
+  },
+  "calendar": {
+    "title": "デイリー報酬",
+    "claimToday": "今日の報酬を受け取る",
+    "claimedCount": "受取済み",
+    "alreadyClaimed": "今日の報酬を受け取りました！",
+    "comeBackTomorrow": "明日また来てね",
+    "claimError": "報酬の受け取りに失敗しました",
+    "rewardTypes": "報酬タイプ",
+    "day": "日",
+    "today": "今日",
+    "claimed": "受取済み",
+    "locked": "ロック中",
+    "available": "受取可能",
+    "rewards": {
+      "xp": "XP",
+      "hint": "ヒント",
+      "hints": "ヒント",
+      "streakFreeze": "連続記録フリーズ",
+      "mysteryBox": "ミステリーボックス",
+      "title": "称号",
+      "exclusiveTitle": "限定称号"
+    },
+    "rarity": {
+      "common": "コモン",
+      "uncommon": "アンコモン",
+      "rare": "レア",
+      "epic": "エピック",
+      "legendary": "レジェンダリー"
+    },
+    "milestone": "マイルストーン報酬",
+    "claimSuccess": "{reward}を獲得しました！",
+    "streakBonus": "連続ボーナス: +{percent}%"
+  },
+  "referral": {
+    "milestoneTitle": "友達のマイルストーン！",
+    "milestone_first_game_played": "が初めてのゲームをプレイしました！",
+    "milestone_five_games_played": "が5ゲームプレイしました！",
+    "milestone_ten_games_played": "が10ゲームプレイしました！",
+    "milestoneMessage": "友達を招待してもっと報酬を獲得しよう！"
   },
   "coins": {
     "title": "コイン＆報酬",
@@ -2751,7 +2866,21 @@ const ja = {
       "cta": "これを超えられる? 🎮"
     },
     "leaderboard": "ランキング",
-    "screenshotProtection": "続けるには戻ってください"
+    "screenshotProtection": "続けるには戻ってください",
+    "trainingSuggestion": {
+      "title": "LexiClashは初めてですか?",
+      "subtitle": "まずは練習ゲームで操作を覚えましょう！",
+      "benefitsTitle": "練習で学べること:",
+      "benefits": {
+        "learnMechanics": "スワイプして単語を作る方法",
+        "practiceSwipes": "プレッシャーなく練習",
+        "noPressure": "ゲームに慣れる"
+      },
+      "returnNote": "練習後、自動的にデイリーチャレンジに戻ります！",
+      "startTraining": "練習を始める",
+      "skipToDaily": "スキップして始める",
+      "redirecting": "デイリーチャレンジに移動中..."
+    }
   },
   "wordHunt": {
     "title": "ワードハント",
@@ -2922,6 +3051,7 @@ const ja = {
       "title": "リーダーボード",
       "today": "今日",
       "allTime": "全期間",
+      "played": "プレイ済み",
       "solved": "成功",
       "failed": "失敗",
       "attempts": "試行",

@@ -9,6 +9,7 @@ import AuthButton from './auth/AuthButton';
 import MusicControls from './MusicControls';
 import DailyQuickLink from './daily/DailyQuickLink';
 import Avatar from './Avatar';
+import { CalendarButton } from './engagement/CalendarButton';
 
 /**
  * Header Props
@@ -126,27 +127,27 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     </svg>
 
                     <h1
-                        className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl font-black uppercase tracking-tight flex items-center gap-0.5 flex-shrink min-w-0 landscape:text-lg landscape:xs:text-xl landscape:sm:text-2xl"
+                        className="font-black uppercase tracking-tight flex items-center gap-0.5 flex-shrink min-w-0"
                         style={{ fontFamily }}
                     >
-                        {/* LEXI - Cyan with clean dark outline */}
+                        {/* LEXI - Hero text: larger, bolder, with subtle glow */}
                         <span
-                            className="text-neo-cyan relative"
+                            className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl text-neo-cyan relative animate-lexi-glow landscape:text-xl landscape:xs:text-2xl landscape:sm:text-3xl"
                             style={{
-                                WebkitTextStroke: '2px #1a365d',
+                                WebkitTextStroke: '3px #1a365d',
                                 paintOrder: 'stroke fill',
-                                textShadow: '3px 3px 0px #1a365d',
+                                textShadow: '4px 4px 0px #1a365d',
                             }}
                         >
                             {t('logo.lexi')}
                         </span>
-                        {/* CLASH - Yellow with clean dark outline */}
+                        {/* CLASH - Supporting text: smaller, softer */}
                         <span
-                            className="text-neo-yellow relative"
+                            className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl text-neo-yellow relative landscape:text-base landscape:xs:text-lg landscape:sm:text-xl"
                             style={{
-                                WebkitTextStroke: '2px #1a365d',
+                                WebkitTextStroke: '1.5px #1a365d',
                                 paintOrder: 'stroke fill',
-                                textShadow: '3px 3px 0px #1a365d',
+                                textShadow: '2px 2px 0px rgba(26, 54, 93, 0.7)',
                             }}
                         >
                             {t('logo.clash')}
@@ -218,6 +219,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             <BarChart3 className="text-base lg:text-base xl:text-lg 2xl:text-lg" size={16} aria-hidden="true" />
                         </Link>
                     )}
+                    <CalendarButton />
                     <MusicControls />
                     <AuthButton />
                 </div>
@@ -465,7 +467,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                             )}
                                         >
                                             <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-purple-light border-2 border-neo-black">
-                                                <Shield className="w-4 h-4 text-white" />
+                                                <Shield className="w-4 h-4 text-neo-black" />
                                             </span>
                                             <span>{t('legal.privacyPolicy')}</span>
                                         </Link>

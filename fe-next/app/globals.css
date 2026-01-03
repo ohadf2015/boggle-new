@@ -2744,3 +2744,35 @@ html.reduce-motion *::after {
 .low-end-device .life-meter-pulse {
   animation: none;
 }
+
+/* ====================================
+   LOGO "LEXI" EMPHASIS ANIMATION
+   Subtle glow effect to make "Lexi" stand out
+   ==================================== */
+
+@keyframes lexi-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 16px rgba(0, 255, 255, 0.7));
+  }
+}
+
+.animate-lexi-glow {
+  animation: lexi-glow 3s ease-in-out infinite;
+}
+
+/* Reduced motion: disable glow animation */
+@media (prefers-reduced-motion: reduce) {
+  .animate-lexi-glow {
+    animation: none;
+    filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.5));
+  }
+}
+
+/* Low-end device fallback */
+.low-end-device .animate-lexi-glow {
+  animation: none;
+  filter: drop-shadow(0 0 6px rgba(0, 255, 255, 0.4));
+}

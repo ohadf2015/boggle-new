@@ -18,6 +18,9 @@ import logger from '@/utils/logger';
 import { levelUpToast } from '@/components/NeoToast';
 import { calculateAllPlayerArchetypes, getMissedWords, type PlayerArchetype } from '@/utils/playerArchetypes';
 import type { ResultsPageProps, WordToVote, XpGainedData, LevelUpData } from '@/types/components';
+import type { NearMiss } from '@/components/results/NearMissCard';
+import type { MysteryReward } from '@/components/engagement/MysteryRewardPopup';
+import type { ReferralMilestone } from '@/shared/types/socket';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 
 // Dynamic imports for heavy components (loaded after initial render)
@@ -32,6 +35,9 @@ const WordFeedbackModal = dynamic(() => import('@/components/voting/WordFeedback
 const PlayersReadyIndicator = dynamic(() => import('@/components/results/PlayersReadyIndicator'), { ssr: false });
 const MissedWords = dynamic(() => import('@/components/results/MissedWords'), { ssr: false });
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
+const NearMissCard = dynamic(() => import('@/components/results/NearMissCard'), { ssr: false });
+const MysteryRewardPopup = dynamic(() => import('@/components/engagement/MysteryRewardPopup'), { ssr: false });
+const ReferralMilestonePopup = dynamic(() => import('@/components/engagement/ReferralMilestonePopup'), { ssr: false });
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 import { Users } from 'lucide-react';
@@ -73,6 +79,18 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   // XP and Level state (received via socket after game ends)
   const [xpGainedData, setXpGainedData] = useState<XpGainedData | null>(null);
   const [levelUpData, setLevelUpData] = useState<LevelUpData | null>(null);
+
+  // Near-miss notifications (received via socket after game ends)
+  const [nearMisses, setNearMisses] = useState<NearMiss[]>([]);
+
+  // Mystery reward state (received via socket after game ends)
+  const [mysteryReward, setMysteryReward] = useState<MysteryReward | null>(null);
+  const [showMysteryReward, setShowMysteryReward] = useState<boolean>(false);
+  const mysteryRewardQueueRef = useRef<MysteryReward[]>([]);
+
+  // Referral milestone state (received via socket when friend reaches milestone)
+  const [referralMilestone, setReferralMilestone] = useState<ReferralMilestone | null>(null);
+  const [showReferralMilestone, setShowReferralMilestone] = useState<boolean>(false);
 
   // Track which players are ready for next game (received from socket)
   const [readyUsernames, setReadyUsernames] = useState<string[]>([]);
@@ -469,18 +487,55 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       });
     };
 
+    // Near-miss notifications handler
+    const handleNearMisses = (data: { nearMisses: NearMiss[] }) => {
+      logger.log('[RESULTS] Near-miss notifications:', data);
+      if (data.nearMisses && data.nearMisses.length > 0) {
+        setNearMisses(data.nearMisses);
+      }
+    };
+
+    // Mystery reward handler - queue rewards to show one at a time
+    const handleMysteryReward = (data: { reward: MysteryReward }) => {
+      logger.log('[RESULTS] Mystery reward received:', data);
+      if (data.reward) {
+        // Add to queue
+        mysteryRewardQueueRef.current.push(data.reward);
+        // If not currently showing a reward, show this one
+        if (!showMysteryReward) {
+          setMysteryReward(data.reward);
+          setShowMysteryReward(true);
+        }
+      }
+    };
+
+    // Handle referral milestone notifications
+    const handleReferralMilestone = (data: { milestone: ReferralMilestone }) => {
+      logger.log('[RESULTS] Referral milestone received:', data);
+      if (data.milestone) {
+        setReferralMilestone(data.milestone);
+        setShowReferralMilestone(true);
+      }
+    };
+
     socket.on('showWordFeedback', handleShowWordFeedback);
     socket.on('voteRecorded', handleVoteRecorded);
     socket.on('xpGained', handleXpGained);
     socket.on('levelUp', handleLevelUp);
+    socket.on('engagement:nearMisses', handleNearMisses);
+    socket.on('engagement:mysteryReward', handleMysteryReward);
+    socket.on('engagement:referralMilestone', handleReferralMilestone);
 
     return () => {
       socket.off('showWordFeedback', handleShowWordFeedback);
       socket.off('voteRecorded', handleVoteRecorded);
       socket.off('xpGained', handleXpGained);
       socket.off('levelUp', handleLevelUp);
+      socket.off('engagement:nearMisses', handleNearMisses);
+      socket.off('engagement:mysteryReward', handleMysteryReward);
+      socket.off('engagement:referralMilestone', handleReferralMilestone);
     };
-  }, [socket, t]);
+  }, [socket, t, showMysteryReward]);
 
   // Socket listener for players ready for next game updates
   useEffect(() => {
@@ -551,6 +606,28 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     setShowWordFeedback(false);
     setWordToVote(null);
     setWordQueue([]); // Clear the queue
+  }, []);
+
+  // Handle mystery reward popup close - show next in queue if any
+  const handleMysteryRewardClose = useCallback(() => {
+    setShowMysteryReward(false);
+    // Remove the current reward from queue
+    mysteryRewardQueueRef.current.shift();
+    // If there are more rewards, show the next one after a short delay
+    if (mysteryRewardQueueRef.current.length > 0) {
+      setTimeout(() => {
+        setMysteryReward(mysteryRewardQueueRef.current[0]);
+        setShowMysteryReward(true);
+      }, 500);
+    } else {
+      setMysteryReward(null);
+    }
+  }, []);
+
+  // Handle referral milestone popup close
+  const handleReferralMilestoneClose = useCallback(() => {
+    setShowReferralMilestone(false);
+    setReferralMilestone(null);
   }, []);
 
   // Handle marking the player as ready for the next game
@@ -784,6 +861,16 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       {/* Compact Celebration Banner */}
       {bannerPlayer && (
         <ResultsWinnerBanner winner={bannerPlayer} isCurrentUserWinner={isCurrentUserInBanner} rank={bannerRank} />
+      )}
+
+      {/* Near-Miss Notifications - Motivate "one more game" */}
+      {nearMisses.length > 0 && (
+        <NearMissCard
+          nearMisses={nearMisses}
+          t={t}
+          onPlayAgain={isHost ? handleStartGame : handleMarkReady}
+          compact
+        />
       )}
 
       {/* Compact Stats Row - Using shared component */}
@@ -1049,6 +1136,15 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               <ResultsWinnerBanner winner={bannerPlayer} isCurrentUserWinner={isCurrentUserInBanner} rank={bannerRank} />
             )}
 
+            {/* Near-Miss Notifications - Motivate "one more game" */}
+            {nearMisses.length > 0 && (
+              <NearMissCard
+                nearMisses={nearMisses}
+                t={t}
+                onPlayAgain={isHost ? handleStartGame : handleMarkReady}
+              />
+            )}
+
             {/* Compact Stats Row - Using shared component */}
             {currentPlayerData && currentPlayerRank > 0 && (
               <CompactResultsStats
@@ -1288,6 +1384,21 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         onVote={handleVote}
         onSkip={handleFeedbackSkip}
         onTimeout={handleFeedbackSkip}
+      />
+
+      {/* Mystery Reward Popup - Variable ratio reward system */}
+      <MysteryRewardPopup
+        reward={mysteryReward}
+        isOpen={showMysteryReward}
+        onClose={handleMysteryRewardClose}
+        t={t}
+      />
+
+      {/* Referral Milestone Popup - Notify when friend hits milestone */}
+      <ReferralMilestonePopup
+        milestone={referralMilestone}
+        isOpen={showReferralMilestone}
+        onClose={handleReferralMilestoneClose}
       />
 
     </div>

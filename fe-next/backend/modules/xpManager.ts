@@ -19,6 +19,40 @@ export const XP_CONFIG = {
   MAX_LEVEL: 100,
 } as const;
 
+// Prestige System Configuration
+export const PRESTIGE_CONFIG = {
+  MAX_PRESTIGE: 5,
+  REQUIRED_LEVEL: 100, // Must be max level to prestige
+
+  // XP multipliers for each prestige level
+  MULTIPLIERS: {
+    0: 1.00,
+    1: 1.05,
+    2: 1.10,
+    3: 1.15,
+    4: 1.20,
+    5: 1.25,
+  } as Record<number, number>,
+
+  // Exclusive titles for each prestige level
+  TITLES: {
+    1: 'ASCENDED_ONE',
+    2: 'TWICE_RISEN',
+    3: 'THRICE_BLESSED',
+    4: 'ETERNAL_WARRIOR',
+    5: 'LEXICON_IMMORTAL',
+  } as Record<number, string>,
+
+  // Display info for prestige levels
+  DISPLAY: {
+    1: { name: 'Prestige I', color: '#CD7F32', icon: '⭐' },    // Bronze
+    2: { name: 'Prestige II', color: '#C0C0C0', icon: '🌟' },   // Silver
+    3: { name: 'Prestige III', color: '#FFD700', icon: '✨' },  // Gold
+    4: { name: 'Prestige IV', color: '#B9F2FF', icon: '💫' },   // Diamond
+    5: { name: 'Prestige V', color: '#9B59B6', icon: '🌌' },    // Cosmic
+  } as Record<number, { name: string; color: string; icon: string }>,
+} as const;
+
 // Player titles unlocked at specific levels
 export const LEVEL_TITLES: Record<number, string | null> = {
   1: null,
@@ -262,6 +296,168 @@ export function getNextMilestone(totalXp: number): NextMilestone {
   };
 }
 
+// ==================== PRESTIGE SYSTEM ====================
+
+export interface PrestigeInfo {
+  prestigeLevel: number;
+  prestigeMultiplier: number;
+  canPrestige: boolean;
+  prestigeDisplay: { name: string; color: string; icon: string } | null;
+  nextPrestigeRewards: PrestigeReward[];
+}
+
+export interface PrestigeReward {
+  type: 'title' | 'multiplier' | 'border' | 'icon';
+  value: string;
+  displayName: string;
+  description: string;
+  icon: string;
+}
+
+export interface PrestigeResult {
+  success: boolean;
+  newPrestigeLevel: number;
+  newMultiplier: number;
+  unlockedRewards: PrestigeReward[];
+  error?: string;
+}
+
+/**
+ * Check if a player can prestige
+ * Requires max level (100) and not at max prestige (5)
+ */
+export function canPrestige(currentLevel: number, currentPrestige: number): boolean {
+  return currentLevel >= PRESTIGE_CONFIG.REQUIRED_LEVEL &&
+         currentPrestige < PRESTIGE_CONFIG.MAX_PRESTIGE;
+}
+
+/**
+ * Get the XP multiplier for a prestige level
+ */
+export function getPrestigeMultiplier(prestigeLevel: number): number {
+  return PRESTIGE_CONFIG.MULTIPLIERS[prestigeLevel] || 1.00;
+}
+
+/**
+ * Get prestige display info (name, color, icon)
+ */
+export function getPrestigeDisplay(prestigeLevel: number): { name: string; color: string; icon: string } | null {
+  if (prestigeLevel <= 0 || prestigeLevel > PRESTIGE_CONFIG.MAX_PRESTIGE) {
+    return null;
+  }
+  return PRESTIGE_CONFIG.DISPLAY[prestigeLevel] || null;
+}
+
+/**
+ * Get the rewards for the next prestige level
+ */
+export function getNextPrestigeRewards(currentPrestige: number): PrestigeReward[] {
+  if (currentPrestige >= PRESTIGE_CONFIG.MAX_PRESTIGE) {
+    return [];
+  }
+
+  const nextLevel = currentPrestige + 1;
+  const rewards: PrestigeReward[] = [];
+
+  // Title reward
+  if (PRESTIGE_CONFIG.TITLES[nextLevel]) {
+    rewards.push({
+      type: 'title',
+      value: PRESTIGE_CONFIG.TITLES[nextLevel],
+      displayName: formatTitleName(PRESTIGE_CONFIG.TITLES[nextLevel]),
+      description: `Exclusive title for Prestige ${toRoman(nextLevel)}`,
+      icon: PRESTIGE_CONFIG.DISPLAY[nextLevel]?.icon || '⭐',
+    });
+  }
+
+  // Multiplier reward
+  const multiplier = PRESTIGE_CONFIG.MULTIPLIERS[nextLevel];
+  if (multiplier && multiplier > 1) {
+    const bonus = Math.round((multiplier - 1) * 100);
+    rewards.push({
+      type: 'multiplier',
+      value: multiplier.toString(),
+      displayName: `+${bonus}% XP Bonus`,
+      description: `Earn ${bonus}% more XP on all games`,
+      icon: '🔥',
+    });
+  }
+
+  // Border reward (all prestige levels)
+  const borderNames: Record<number, string> = {
+    1: 'Bronze Prestige Border',
+    2: 'Silver Prestige Border',
+    3: 'Gold Prestige Border',
+    4: 'Diamond Prestige Border',
+    5: 'Cosmic Prestige Border',
+  };
+
+  rewards.push({
+    type: 'border',
+    value: `prestige_${['bronze', 'silver', 'gold', 'diamond', 'cosmic'][nextLevel - 1]}`,
+    displayName: borderNames[nextLevel],
+    description: 'Exclusive profile border',
+    icon: ['🥉', '🥈', '🥇', '💎', '🌈'][nextLevel - 1],
+  });
+
+  return rewards;
+}
+
+/**
+ * Get comprehensive prestige info for a player
+ */
+export function getPrestigeInfo(
+  currentLevel: number,
+  currentPrestige: number,
+  currentMultiplier: number = 1.0
+): PrestigeInfo {
+  return {
+    prestigeLevel: currentPrestige,
+    prestigeMultiplier: currentMultiplier || getPrestigeMultiplier(currentPrestige),
+    canPrestige: canPrestige(currentLevel, currentPrestige),
+    prestigeDisplay: getPrestigeDisplay(currentPrestige),
+    nextPrestigeRewards: getNextPrestigeRewards(currentPrestige),
+  };
+}
+
+/**
+ * Apply XP with prestige multiplier
+ */
+export function applyPrestigeMultiplier(baseXp: number, prestigeMultiplier: number): number {
+  return Math.round(baseXp * prestigeMultiplier);
+}
+
+/**
+ * Format title name from constant to display name
+ * e.g., "ASCENDED_ONE" -> "Ascended One"
+ */
+function formatTitleName(title: string): string {
+  return title
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
+/**
+ * Convert number to Roman numeral (for prestige display)
+ */
+function toRoman(num: number): string {
+  const romanNumerals: [number, string][] = [
+    [5, 'V'],
+    [4, 'IV'],
+    [1, 'I'],
+  ];
+
+  let result = '';
+  for (const [value, numeral] of romanNumerals) {
+    while (num >= value) {
+      result += numeral;
+      num -= value;
+    }
+  }
+  return result;
+}
+
 // CommonJS exports for backward compatibility
 module.exports = {
   calculateGameXp,
@@ -273,6 +469,14 @@ module.exports = {
   checkLevelUp,
   getLevelTier,
   getNextMilestone,
+  // Prestige exports
+  canPrestige,
+  getPrestigeMultiplier,
+  getPrestigeDisplay,
+  getNextPrestigeRewards,
+  getPrestigeInfo,
+  applyPrestigeMultiplier,
   XP_CONFIG,
   LEVEL_TITLES,
+  PRESTIGE_CONFIG,
 };

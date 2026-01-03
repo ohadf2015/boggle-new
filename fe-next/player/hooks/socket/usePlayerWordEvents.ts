@@ -18,6 +18,7 @@ import {
 import { calculateComboChainWindow, calculateComboTimeout, resetComboState } from '@/shared/utils/comboUtils';
 import { useGameStateContext } from '@/contexts/GameStateContext';
 import { useSafeSocketEvents } from '@/hooks/useSafeSocketEvent';
+import { useHapticFeedback, GAME_HAPTICS } from '@/hooks/useHapticFeedback';
 import logger from '@/utils/logger';
 import type { WordAcceptedPayload } from '@/shared/types/socket';
 import type {
@@ -71,6 +72,9 @@ export function usePlayerWordEvents({
 }: UsePlayerWordEventsProps): void {
   // Get foundWords state from context (no more prop drilling!)
   const { foundWords, setFoundWords } = useGameStateContext();
+
+  // Haptic feedback for word events
+  const { customHaptic } = useHapticFeedback();
   // Calculate available shields
   const getAvailableShields = useCallback(() => {
     const validWordCount = foundWords.filter(w => w.validated === true).length;
@@ -103,6 +107,9 @@ export function usePlayerWordEvents({
 
   // Define all event handlers as stable callbacks
   const handleWordAccepted = useCallback((data: WordAcceptedPayload) => {
+      // Haptic feedback for accepted word
+      customHaptic(GAME_HAPTICS.validWord);
+
       // Dismiss any AI validation toast
       toast.dismiss(`ai-validating-${data.word.toLowerCase()}`);
 
@@ -147,6 +154,8 @@ export function usePlayerWordEvents({
           setComboLevel(newComboLevel);
           comboLevelRef.current = newComboLevel;
           playComboSound(newComboLevel);
+          // Haptic feedback for combo level up
+          customHaptic(GAME_HAPTICS.comboLevelUp);
         } else {
           newComboLevel = 0;
           setComboLevel(0);
@@ -172,7 +181,7 @@ export function usePlayerWordEvents({
 
       // Note: WordFormingArea now handles word accepted feedback visually
       // Toast removed to avoid duplicate notifications
-    }, [inputRef, setFoundWords, comboLevelRef, lastWordTimeRef, setComboLevel, setLastWordTime, comboTimeoutRef, playComboSound, resetCombo]);
+    }, [inputRef, setFoundWords, comboLevelRef, lastWordTimeRef, setComboLevel, setLastWordTime, comboTimeoutRef, playComboSound, resetCombo, customHaptic]);
 
   const handleWordNeedsValidation = useCallback((data: any) => {
     // Note: WordFormingArea now handles pending feedback visually
@@ -188,6 +197,9 @@ export function usePlayerWordEvents({
   }, [t]);
 
   const handleWordAlreadyFound = useCallback((data: any) => {
+    // Haptic feedback for duplicate word (warning pattern)
+    customHaptic(GAME_HAPTICS.invalidWord);
+
     // Note: WordFormingArea now handles duplicate feedback visually
     if (data?.word) {
       setFoundWords(prev => prev.filter(fw => {
@@ -198,9 +210,12 @@ export function usePlayerWordEvents({
       }));
     }
     resetCombo();
-  }, [setFoundWords, resetCombo]);
+  }, [setFoundWords, resetCombo, customHaptic]);
 
   const handleWordNotOnBoard = useCallback((data: any) => {
+    // Haptic feedback for invalid word
+    customHaptic(GAME_HAPTICS.invalidWord);
+
     // Note: WordFormingArea now handles rejected feedback visually
     setFoundWords(prev => prev.map(fw =>
       fw.word.toLowerCase() === data.word.toLowerCase()
@@ -208,24 +223,30 @@ export function usePlayerWordEvents({
         : fw
     ));
     resetCombo();
-  }, [setFoundWords, resetCombo]);
+  }, [setFoundWords, resetCombo, customHaptic]);
 
   const handleWordTooShort = useCallback((data: any) => {
+    // Haptic feedback for too short word
+    customHaptic(GAME_HAPTICS.invalidWord);
+
     // Note: WordFormingArea now handles rejected feedback visually
     setFoundWords(prev => prev.filter(fw =>
       fw.word.toLowerCase() !== data.word.toLowerCase()
     ));
     resetCombo();
-  }, [setFoundWords, resetCombo]);
+  }, [setFoundWords, resetCombo, customHaptic]);
 
   const handleWordRejected = useCallback((data: any) => {
+    // Haptic feedback for rejected word
+    customHaptic(GAME_HAPTICS.invalidWord);
+
     toast.dismiss(`ai-validating-${data.word.toLowerCase()}`);
     // Note: WordFormingArea now handles rejected feedback visually
     setFoundWords(prev => prev.filter(fw =>
       fw.word.toLowerCase() !== data.word.toLowerCase()
     ));
     resetCombo();
-  }, [setFoundWords, resetCombo]);
+  }, [setFoundWords, resetCombo, customHaptic]);
 
   // Word feedback handlers
   const handleShowWordFeedback = useCallback((data: any) => {

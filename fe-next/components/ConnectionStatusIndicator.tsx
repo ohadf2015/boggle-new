@@ -202,4 +202,139 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
   );
 };
 
+/**
+ * Connection Banner - Fixed banner shown when disconnected
+ * Shows reconnection progress and manual retry button
+ */
+interface ConnectionBannerProps {
+  className?: string;
+}
+
+export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className }) => {
+  const {
+    isConnected,
+    isReconnecting,
+    connectionError,
+    reconnectAttempt,
+    maxReconnectAttempts,
+    manualReconnect
+  } = useSocket();
+  const { t } = useLanguage();
+
+  const getStatus = (): ConnectionStatus => {
+    if (isConnected) return 'connected';
+    if (isReconnecting) return 'reconnecting';
+    if (connectionError) return 'disconnected';
+    return 'connecting';
+  };
+
+  const status = getStatus();
+
+  // Don't show banner when connected
+  if (status === 'connected') {
+    return null;
+  }
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: -100, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        className={cn(
+          'fixed top-0 left-0 right-0 z-50',
+          'bg-neo-red border-b-4 border-neo-black',
+          'shadow-hard-lg',
+          className
+        )}
+        role="alert"
+        aria-live="assertive"
+      >
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            {/* Status message */}
+            <div className="flex items-center gap-3">
+              {/* Pulsing indicator */}
+              <div className="relative">
+                <motion.div
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                  className={cn(
+                    'w-4 h-4 rounded-full border-2 border-neo-black',
+                    status === 'reconnecting' && 'bg-neo-orange',
+                    status === 'disconnected' && 'bg-neo-yellow',
+                    status === 'connecting' && 'bg-neo-yellow'
+                  )}
+                />
+              </div>
+
+              <div className="flex flex-col gap-0.5">
+                <span className="text-neo-white font-bold text-sm">
+                  {status === 'reconnecting'
+                    ? t('connection.reconnecting') || 'Reconnecting...'
+                    : t('connection.disconnected') || 'Connection Lost'
+                  }
+                </span>
+
+                {/* Progress indicator */}
+                {status === 'reconnecting' && reconnectAttempt > 0 && (
+                  <span className="text-neo-white/80 text-xs">
+                    {t('connection.attempt') || 'Attempt'} {reconnectAttempt}/{maxReconnectAttempts}
+                  </span>
+                )}
+
+                {status === 'disconnected' && connectionError && (
+                  <span className="text-neo-white/80 text-xs">
+                    {t('connection.checkConnection') || 'Check your internet connection'}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Progress bar (for reconnecting) */}
+            {status === 'reconnecting' && reconnectAttempt > 0 && (
+              <div className="hidden sm:flex flex-1 max-w-[200px] items-center gap-2">
+                <div className="flex-1 h-2 bg-neo-black/30 rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full bg-neo-yellow"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${(reconnectAttempt / maxReconnectAttempts) * 100}%` }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Retry button */}
+            <button
+              onClick={manualReconnect}
+              className={cn(
+                'px-4 py-2 rounded-neo',
+                'bg-neo-yellow text-neo-black',
+                'font-bold text-sm uppercase tracking-wide',
+                'border-2 border-neo-black shadow-hard-sm',
+                'hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]',
+                'active:shadow-none active:translate-x-[1px] active:translate-y-[1px]',
+                'transition-all duration-100',
+                'flex items-center gap-2'
+              )}
+              aria-label={t('connection.retry') || 'Retry connection'}
+            >
+              <motion.span
+                animate={status === 'reconnecting' ? { rotate: 360 } : {}}
+                transition={{ duration: 1, repeat: status === 'reconnecting' ? Infinity : 0, ease: 'linear' }}
+                className="text-base"
+              >
+                ↻
+              </motion.span>
+              <span>{t('connection.retryNow') || 'Retry Now'}</span>
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
 export default ConnectionStatus;

@@ -3,10 +3,11 @@
 import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
-import { Copy, MessageCircle, Trophy, Flame, Check, Loader2, Target } from 'lucide-react';
+import { Copy, MessageCircle, Trophy, Flame, Check, Loader2, Target, Mail, MessageSquare } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { cn } from '@/lib/utils';
-import { getJoinUrl, copyJoinUrl, shareViaWhatsApp, generatePersonalizedShareMessage, type GameResultForShare } from '@/utils/share';
+import { getJoinUrl, copyJoinUrl, shareViaWhatsApp, shareViaTwitter, shareViaDiscord, shareViaEmail, shareViaSms, canShareViaSms, generatePersonalizedShareMessage, type GameResultForShare } from '@/utils/share';
+import { trackShare } from '@/utils/growthTracking';
 import { useNativeShare } from '@/hooks/useNativeShare';
 import { createChallenge, getChallengeUrl, generateChallengeShareMessage, type ChallengeCreatorData, type ChallengeGameConfig, type ChallengePerformance } from '@/utils/challenges';
 import toast from 'react-hot-toast';
@@ -68,6 +69,13 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isCreatingChallenge, setIsCreatingChallenge] = useState(false);
   const [challengeCreated, setChallengeCreated] = useState(false);
+  const [showMorePlatforms, setShowMorePlatforms] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check for mobile on mount
+  useEffect(() => {
+    setIsMobile(canShareViaSms());
+  }, []);
 
   // Keyboard shortcut: Cmd/Ctrl+C to copy link when modal is open
   useEffect(() => {
@@ -108,6 +116,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
   }, [gameCode, t, isPostGame]);
 
   const handleWhatsApp = useCallback(() => {
+    trackShare('whatsapp', gameCode);
     if (isPostGame && gameResult) {
       // Use personalized message for post-game
       const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`;
@@ -116,6 +125,41 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
       shareViaWhatsApp(gameCode, roomName, t);
     }
   }, [gameCode, roomName, t, isPostGame, gameResult, shareMessage]);
+
+  const handleTwitter = useCallback(() => {
+    trackShare('twitter', gameCode);
+    const twitterMessage = isPostGame && gameResult
+      ? shareMessage.split('\n').slice(0, 2).join(' ') // Shorter for Twitter
+      : `${t('share.inviteTitle')} ${t('share.inviteMessage')}`;
+    shareViaTwitter(twitterMessage, joinUrl);
+  }, [shareMessage, joinUrl, isPostGame, gameResult, t, gameCode]);
+
+  const handleDiscord = useCallback(async () => {
+    trackShare('discord', gameCode);
+    const discordMessage = isPostGame && gameResult
+      ? shareMessage
+      : `🎮 **${t('share.inviteTitle')}**\n${t('share.inviteMessage')}\n\n🎯 Room Code: \`${gameCode}\``;
+    await shareViaDiscord(discordMessage, joinUrl, t);
+  }, [shareMessage, joinUrl, isPostGame, gameResult, t, gameCode]);
+
+  const handleEmail = useCallback(() => {
+    trackShare('email', gameCode);
+    const subject = isPostGame
+      ? (language === 'he' ? 'הצלחתי ב-LexiClash!' : 'I crushed it at LexiClash!')
+      : (language === 'he' ? 'בואו לשחק LexiClash!' : 'Join me for LexiClash!');
+    const body = isPostGame && gameResult
+      ? shareMessage
+      : `${t('share.inviteTitle')}\n${t('share.inviteMessage')}\n\nRoom Code: ${gameCode}`;
+    shareViaEmail(subject, body, joinUrl);
+  }, [shareMessage, joinUrl, isPostGame, gameResult, language, t, gameCode]);
+
+  const handleSms = useCallback(() => {
+    trackShare('sms', gameCode);
+    const smsMessage = isPostGame && gameResult
+      ? shareMessage.split('\n').slice(0, 3).join('\n') // Shorter for SMS
+      : `${t('share.inviteTitle')} ${t('share.inviteMessage')}`;
+    shareViaSms(smsMessage, joinUrl);
+  }, [shareMessage, joinUrl, isPostGame, gameResult, t, gameCode]);
 
   const handleNativeShare = useCallback(async () => {
     const success = await nativeShare({
@@ -434,6 +478,132 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
               <MessageCircle className="w-5 h-5" />
               <span>{t('share.whatsapp')}</span>
             </motion.button>
+
+            {/* More Platforms Toggle */}
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.42 }}
+              onClick={() => setShowMorePlatforms(!showMorePlatforms)}
+              aria-expanded={showMorePlatforms}
+              aria-controls="more-platforms"
+              className={cn(
+                'w-full flex items-center justify-center gap-1.5 py-2 rounded-neo',
+                'text-white/70 hover:text-white transition-colors',
+                'font-medium text-xs uppercase tracking-wide',
+                'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
+              )}
+            >
+              <span>{showMorePlatforms ? (t('share.lessOptions') || 'Less options') : (t('share.morePlatforms') || 'More platforms')}</span>
+              <svg
+                className={cn('w-3.5 h-3.5 transition-transform', showMorePlatforms && 'rotate-180')}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </motion.button>
+
+            {/* Additional Share Platforms */}
+            {showMorePlatforms && (
+              <motion.div
+                id="more-platforms"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="grid grid-cols-2 gap-2"
+              >
+                {/* Twitter/X */}
+                <motion.button
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.05 }}
+                  onClick={handleTwitter}
+                  aria-label={t('share.twitter') || 'Twitter/X'}
+                  className={cn(
+                    'flex items-center justify-center gap-2 p-3 rounded-neo',
+                    'border-2 border-neo-black shadow-hard-sm',
+                    'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
+                    'transition-all duration-150',
+                    'font-bold text-xs uppercase tracking-wide',
+                    'bg-black text-white',
+                    'focus:outline-none focus:ring-2 focus:ring-neo-yellow focus:ring-offset-2'
+                  )}
+                >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                  <span>{t('share.twitter') || 'X'}</span>
+                </motion.button>
+
+                {/* Discord */}
+                <motion.button
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.1 }}
+                  onClick={handleDiscord}
+                  aria-label={t('share.discord') || 'Discord'}
+                  className={cn(
+                    'flex items-center justify-center gap-2 p-3 rounded-neo',
+                    'border-2 border-neo-black shadow-hard-sm',
+                    'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
+                    'transition-all duration-150',
+                    'font-bold text-xs uppercase tracking-wide',
+                    'bg-[#5865F2] text-white',
+                    'focus:outline-none focus:ring-2 focus:ring-neo-yellow focus:ring-offset-2'
+                  )}
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  <span>{t('share.discord') || 'Discord'}</span>
+                </motion.button>
+
+                {/* Email */}
+                <motion.button
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.15 }}
+                  onClick={handleEmail}
+                  aria-label={t('share.email') || 'Email'}
+                  className={cn(
+                    'flex items-center justify-center gap-2 p-3 rounded-neo',
+                    'border-2 border-neo-black shadow-hard-sm',
+                    'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
+                    'transition-all duration-150',
+                    'font-bold text-xs uppercase tracking-wide',
+                    'bg-neo-pink text-neo-black',
+                    'focus:outline-none focus:ring-2 focus:ring-neo-yellow focus:ring-offset-2'
+                  )}
+                >
+                  <Mail className="w-4 h-4" />
+                  <span>{t('share.email') || 'Email'}</span>
+                </motion.button>
+
+                {/* SMS - Mobile Only */}
+                {isMobile && (
+                  <motion.button
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    onClick={handleSms}
+                    aria-label={t('share.sms') || 'SMS'}
+                    className={cn(
+                      'flex items-center justify-center gap-2 p-3 rounded-neo',
+                      'border-2 border-neo-black shadow-hard-sm',
+                      'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
+                      'transition-all duration-150',
+                      'font-bold text-xs uppercase tracking-wide',
+                      'bg-neo-lime text-neo-black',
+                      'focus:outline-none focus:ring-2 focus:ring-neo-yellow focus:ring-offset-2'
+                    )}
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>{t('share.sms') || 'SMS'}</span>
+                  </motion.button>
+                )}
+              </motion.div>
+            )}
 
             {/* Challenge a Friend (Post-game only, when challenge data is available) */}
             {isPostGame && challengeData && (

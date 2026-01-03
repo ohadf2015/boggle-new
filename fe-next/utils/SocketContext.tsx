@@ -11,6 +11,9 @@ export interface SocketContextValue {
   isConnected: boolean;
   isReconnecting: boolean;
   connectionError: string | null;
+  reconnectAttempt: number;
+  maxReconnectAttempts: number;
+  manualReconnect: () => void;
 }
 
 // Socket.IO Context
@@ -113,7 +116,19 @@ export function SocketProvider({ children }: SocketProviderProps) {
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isReconnecting, setIsReconnecting] = useState<boolean>(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
+  const [reconnectAttempt, setReconnectAttempt] = useState<number>(0);
   const socketRef = useRef<Socket | null>(null);
+
+  // Manual reconnect function
+  const manualReconnect = useCallback(() => {
+    const socketInstance = socketRef.current;
+    if (socketInstance && !socketInstance.connected) {
+      logger.log('[SOCKET.IO] Manual reconnection triggered');
+      setReconnectAttempt(0);
+      setConnectionError(null);
+      socketInstance.connect();
+    }
+  }, []);
 
   useEffect(() => {
     // Use shared socket singleton
@@ -154,6 +169,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
     const handleReconnectAttempt = (attemptNumber: number) => {
       logger.log('[SOCKET.IO] Reconnection attempt:', attemptNumber);
       setIsReconnecting(true);
+      setReconnectAttempt(attemptNumber);
     };
 
     const handleReconnectError = (error: Error) => {
@@ -218,7 +234,15 @@ export function SocketProvider({ children }: SocketProviderProps) {
   }, []);
 
   return (
-    <SocketContext.Provider value={{ socket, isConnected, isReconnecting, connectionError }}>
+    <SocketContext.Provider value={{
+      socket,
+      isConnected,
+      isReconnecting,
+      connectionError,
+      reconnectAttempt,
+      maxReconnectAttempts: SOCKET_CONFIG.reconnectionAttempts,
+      manualReconnect
+    }}>
       {children}
     </SocketContext.Provider>
   );

@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, AlertTriangle, Plus, Trash2, Copy, Download, Check, Sparkles, Calendar, Loader2, Save, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { createClient } from '@/utils/supabase/client';
 import type { Language } from '@/types';
 
 // Import word lists from dailyChallenge (we'll need to export them)
@@ -101,6 +102,19 @@ export const DailyWordManager: React.FC = () => {
   const [newWord, setNewWord] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [copied, setCopied] = useState(false);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+
+  // Fetch access token on mount
+  useEffect(() => {
+    const fetchToken = async () => {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        setAccessToken(session.access_token);
+      }
+    };
+    fetchToken();
+  }, []);
 
   // Bulk generation state
   const [showBulkGenerator, setShowBulkGenerator] = useState(false);
@@ -197,12 +211,20 @@ export const DailyWordManager: React.FC = () => {
 
   // Bulk generation handlers
   const handleBulkGenerate = useCallback(async () => {
+    if (!accessToken) {
+      setBulkState(prev => ({ ...prev, error: 'Not authenticated. Please refresh the page.' }));
+      return;
+    }
+
     setBulkState(prev => ({ ...prev, isLoading: true, error: null }));
 
     try {
       const response = await fetch('/api/admin/daily-word/bulk-generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
         credentials: 'include',
         body: JSON.stringify({
           language: selectedLang,
@@ -233,7 +255,7 @@ export const DailyWordManager: React.FC = () => {
         error: error instanceof Error ? error.message : 'Unknown error',
       }));
     }
-  }, [selectedLang, bulkStartDate, bulkEndDate, currentWords]);
+  }, [selectedLang, bulkStartDate, bulkEndDate, currentWords, accessToken]);
 
   const handleBulkWordChange = useCallback((index: number, newWord: string) => {
     setBulkState(prev => ({
@@ -245,6 +267,11 @@ export const DailyWordManager: React.FC = () => {
   }, []);
 
   const handleBulkSave = useCallback(async () => {
+    if (!accessToken) {
+      alert('Not authenticated. Please refresh the page.');
+      return;
+    }
+
     const wordsToSave = bulkState.generatedWords
       .filter(w => w.word.trim().length > 0)
       .map(w => ({ date: w.date, word: w.word }));
@@ -259,7 +286,10 @@ export const DailyWordManager: React.FC = () => {
     try {
       const response = await fetch('/api/admin/daily-word/bulk-generate', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
         credentials: 'include',
         body: JSON.stringify({
           language: selectedLang,
@@ -287,7 +317,7 @@ export const DailyWordManager: React.FC = () => {
     } finally {
       setIsSaving(false);
     }
-  }, [bulkState.generatedWords, selectedLang]);
+  }, [bulkState.generatedWords, selectedLang, accessToken]);
 
   const formatDateDisplay = (dateStr: string) => {
     const date = new Date(dateStr + 'T00:00:00Z');

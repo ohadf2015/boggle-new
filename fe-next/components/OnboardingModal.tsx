@@ -160,8 +160,8 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
       });
     }
 
-    // Always navigate to singleplayer (training mode)
-    router.push(`/${language}/singleplayer`);
+    // Navigate directly to practice mode (no timer, relaxed exploration)
+    router.push(`/${language}/singleplayer?autoStart=practice`);
 
     onClose();
   };

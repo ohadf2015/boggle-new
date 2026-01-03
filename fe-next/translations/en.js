@@ -85,6 +85,7 @@ const en = {
     "close": "Close",
     "changeLanguage": "Change Language",
     "adminDashboard": "Admin Dashboard",
+    "awesome": "Awesome!",
     "admin": "Admin",
     "understood": "Got it!",
     "refresh": "Refresh",
@@ -167,6 +168,15 @@ const en = {
     "validating": "Checking...",
     "later": "Later",
     "skip": "Skip"
+  },
+  "connection": {
+    "reconnecting": "Reconnecting...",
+    "disconnected": "Connection Lost",
+    "attempt": "Attempt",
+    "checkConnection": "Check your internet connection",
+    "retry": "Retry connection",
+    "retryNow": "Retry Now",
+    "connectionRestored": "Connection restored!"
   },
   "theme": {
     "sundayFunday": "Sunday Funday",
@@ -360,7 +370,14 @@ const en = {
     "scanToJoin": "Scan to join the action",
     "challengeFriends": "Bring your A-game friends 😈",
     "beatMyScore": "Think you can top this? 👀",
-    "canYouBeatMe": "Beat that. I dare you. 🎯"
+    "canYouBeatMe": "Beat that. I dare you. 🎯",
+    "twitter": "X",
+    "discord": "Discord",
+    "email": "Email",
+    "sms": "SMS",
+    "discordCopied": "Copied for Discord! Paste in your server 💬",
+    "morePlatforms": "More platforms",
+    "lessOptions": "Less options"
   },
   "errors": {
     "unstableConnection": "Connection unstable. Reconnecting...",
@@ -927,6 +944,28 @@ const en = {
     "longWordsLabel": "${min}+ letters",
     "longWordsOnBoard": "${min}+ Letter Words",
     "longWordsRemaining": "${min}+ letter words left"
+  },
+  "waiting": {
+    "milestoneFirst": "First player!",
+    "milestoneParty": "Party starting!",
+    "milestoneFull": "Full house!",
+    "waitingForPlayers": "Waiting for players to join...",
+    "oneMoreNeeded": "Invite friends to get started!",
+    "readyToStart": "Ready to start! More players = more fun!",
+    "fullHouse": "Full house! Let the battle begin!"
+  },
+  "tips": {
+    "header": "Pro Tips",
+    "swipeTitle": "Swipe to Connect",
+    "swipeText": "Drag your finger across letters to form words. You can move in any direction!",
+    "longerTitle": "Longer = Better",
+    "longerText": "Longer words score exponentially more points. A 6-letter word is worth much more than two 3-letter words!",
+    "comboTitle": "Build Combos",
+    "comboText": "Find words quickly in succession to build combo multipliers for bonus points!",
+    "uniqueTitle": "Stay Unique",
+    "uniqueText": "Words found by multiple players score zero! Think creatively to find unique words.",
+    "bonusTitle": "Bonus Rounds",
+    "bonusText": "Watch for fire rounds with 2x points! Perfect timing can turn the game around."
   },
   "lateJoiner": {
     "welcomeTitle": "Game in Progress!",
@@ -1885,7 +1924,43 @@ const en = {
       "eloquentElite": "Eloquent Elite",
       "linguisticLegend": "Linguistic Legend",
       "lexiClashChampion": "LexiClash Champion"
+    },
+    "canPrestige": "Prestige Available!",
+    "prestige": {
+      "title": "Prestige System",
+      "currentLevel": "Current Level",
+      "prestigeLevel": "Prestige",
+      "xpMultiplier": "XP Multiplier",
+      "rewards": "Rewards",
+      "confirm": "Confirm Prestige",
+      "cancel": "Cancel",
+      "warning": "Warning!",
+      "warningText": "This will reset you to Level 1. All current XP will be reset, but you will gain all rewards below.",
+      "success": "Prestige Achieved!",
+      "rewardsUnlocked": "Your rewards have been unlocked!",
+      "reachLevel": "Reach Level 100 to Prestige",
+      "levelsRemaining": "levels remaining",
+      "maxPrestige": "Maximum Prestige!",
+      "maxPrestigeText": "You have reached the highest level. You are a legend!"
     }
+  },
+  "nearMiss": {
+    "almostThere": "Almost There!",
+    "oneMoreGame": "One More Game!",
+    "tip": "Tip",
+    "more": "more",
+    "soClose": "You're so close! One more game could do it."
+  },
+  "mysteryReward": {
+    "title": "Mystery Reward",
+    "youFound": "You Found a Mystery Reward!",
+    "opening": "Opening...",
+    "revealing": "Revealing...",
+    "awesome": "Awesome!",
+    "gameCompletion": "Game Completion Bonus",
+    "winBonus": "Victory Bonus",
+    "longWord": "Long Word Bonus",
+    "achievement": "Achievement Bonus"
   },
   "auth": {
     "signIn": "Sign In",
@@ -2188,6 +2263,46 @@ const en = {
     "changeCountry": "Change country",
     "countrySaved": "Country updated!",
     "countryError": "Failed to update country"
+  },
+  "calendar": {
+    "title": "Daily Rewards",
+    "claimToday": "Claim Today's Reward",
+    "claimedCount": "Claimed",
+    "alreadyClaimed": "Today's reward claimed!",
+    "comeBackTomorrow": "Come back tomorrow for more rewards",
+    "claimError": "Failed to claim reward",
+    "rewardTypes": "Reward Types",
+    "rewards": {
+      "xp": "XP Bonus",
+      "hint": "Free Hint",
+      "hints": "Free Hints",
+      "streakFreeze": "Streak Freeze",
+      "mysteryBox": "Mystery Box",
+      "title": "Title",
+      "exclusiveTitle": "Exclusive Title"
+    },
+    "rarity": {
+      "common": "Common",
+      "uncommon": "Uncommon",
+      "rare": "Rare",
+      "epic": "Epic",
+      "legendary": "Legendary"
+    },
+    "milestone": "Milestone Reward",
+    "day": "Day",
+    "today": "Today",
+    "claimed": "Claimed",
+    "locked": "Locked",
+    "available": "Available",
+    "claimSuccess": "You got {reward}!",
+    "streakBonus": "Streak Bonus: +{percent}%"
+  },
+  "referral": {
+    "milestoneTitle": "Friend Milestone!",
+    "milestone_first_game_played": "played their first game!",
+    "milestone_five_games_played": "has played 5 games!",
+    "milestone_ten_games_played": "has played 10 games!",
+    "milestoneMessage": "Keep inviting friends to earn more rewards!"
   },
   "coins": {
     "title": "Coins & Rewards",
@@ -2758,7 +2873,21 @@ const en = {
       "cta": "Think you can beat this? 🎮"
     },
     "leaderboard": "Ranks",
-    "screenshotProtection": "Return to continue playing"
+    "screenshotProtection": "Return to continue playing",
+    "trainingSuggestion": {
+      "title": "New to LexiClash?",
+      "subtitle": "Try a quick training game first to learn the mechanics!",
+      "benefitsTitle": "Training helps you:",
+      "benefits": {
+        "learnMechanics": "Learn how to swipe and form words",
+        "practiceSwipes": "Practice without pressure",
+        "noPressure": "Get comfortable with the game"
+      },
+      "returnNote": "After training, you'll return to the Daily Challenge automatically!",
+      "startTraining": "Start Training",
+      "skipToDaily": "Skip, I'll figure it out",
+      "redirecting": "Heading to Daily Challenge..."
+    }
   },
   "wordHunt": {
     "title": "Word Hunt",

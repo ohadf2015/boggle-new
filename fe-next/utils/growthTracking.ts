@@ -59,7 +59,7 @@ export interface GrowthEventData {
   wordCount?: number;
   achievementId?: string;
   achievementTier?: string;
-  shareMethod?: 'whatsapp' | 'copy' | 'qr' | 'native' | 'facebook' | 'telegram';
+  shareMethod?: 'whatsapp' | 'copy' | 'qr' | 'native' | 'facebook' | 'telegram' | 'twitter' | 'discord' | 'email' | 'sms';
   referralSource?: string;
   streakDays?: number;
   position?: number; // Leaderboard position
@@ -180,10 +180,13 @@ const storeEventLocally = (event: GrowthEvent, data: GrowthEventData): void => {
   }
 };
 
+/** Share method type for tracking */
+export type ShareMethod = 'whatsapp' | 'copy' | 'qr' | 'native' | 'facebook' | 'telegram' | 'twitter' | 'discord' | 'email' | 'sms';
+
 /**
  * Track share event with method
  */
-export const trackShare = (method: 'whatsapp' | 'copy' | 'qr' | 'native' | 'facebook' | 'telegram', gameCode?: string): void => {
+export const trackShare = (method: ShareMethod, gameCode?: string): void => {
   const eventMap: Record<string, GrowthEvent> = {
     whatsapp: 'share_whatsapp_clicked',
     copy: 'share_link_copied',
@@ -191,6 +194,10 @@ export const trackShare = (method: 'whatsapp' | 'copy' | 'qr' | 'native' | 'face
     native: 'share_link_copied',
     facebook: 'share_link_copied',
     telegram: 'share_link_copied',
+    twitter: 'share_link_copied',
+    discord: 'share_link_copied',
+    email: 'share_link_copied',
+    sms: 'share_link_copied',
   };
 
   const event = eventMap[method];

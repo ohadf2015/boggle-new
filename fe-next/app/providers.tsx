@@ -9,6 +9,7 @@ import { SoundEffectsProvider } from '@/contexts/SoundEffectsContext';
 import { AchievementQueueProvider } from '@/components/achievements';
 import { GameAnnouncerProvider } from '@/components/GameAnnouncer';
 import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
+import { MotionConfigProvider } from '@/components/motion/MotionConfigProvider';
 import { SocketProvider } from '@/utils/SocketContext';
 import { GameStateProvider } from '@/contexts/GameStateContext';
 import { SocketEventBusProvider } from '@/contexts/SocketEventBusContext';
@@ -65,12 +66,14 @@ const AudioProviders = composeProviders([
     [SoundEffectsProvider as React.ComponentType<{ children: ReactNode }>, {}],
 ]);
 
-// Game-related providers (Achievements + Auth + Announcer + Accessibility)
+// Game-related providers (Achievements + Auth + Announcer + Accessibility + MotionConfig)
+// Note: MotionConfigProvider must come AFTER AccessibilityProvider so it can consume shouldReduceMotion
 const GameProviders = composeProviders([
     [GameAnnouncerProvider as React.ComponentType<{ children: ReactNode }>, {}],
     [AchievementQueueProvider as React.ComponentType<{ children: ReactNode }>, {}],
     [AuthProvider as React.ComponentType<{ children: ReactNode }>, {}],
     [AccessibilityProvider as React.ComponentType<{ children: ReactNode }>, {}],
+    [MotionConfigProvider as React.ComponentType<{ children: ReactNode }>, {}],
 ]);
 
 export function Providers({ children, lang }: ProvidersProps) {

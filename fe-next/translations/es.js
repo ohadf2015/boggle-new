@@ -79,6 +79,7 @@ const es = {
     "close": "Cerrar",
     "changeLanguage": "Cambiar idioma",
     "adminDashboard": "Panel de administración",
+    "awesome": "¡Genial!",
     "admin": "Admin",
     "understood": "¡Vamos!",
     "refresh": "Actualizar",
@@ -166,6 +167,15 @@ const es = {
     "validating": "Verificando...",
     "later": "Después",
     "skip": "Omitir"
+  },
+  "connection": {
+    "reconnecting": "Reconectando...",
+    "disconnected": "Conexión perdida",
+    "attempt": "Intento",
+    "checkConnection": "Verifica tu conexión a internet",
+    "retry": "Reintentar",
+    "retryNow": "Reintentar ahora",
+    "connectionRestored": "¡Conexión restaurada!"
   },
   "theme": {
     "sundayFunday": "Domingo Divertido",
@@ -359,7 +369,14 @@ const es = {
     "scanToJoin": "Escanea para la acción",
     "challengeFriends": "Trae a tus mejores amigos 😈",
     "beatMyScore": "¿Crees que puedes superar esto? 👀",
-    "canYouBeatMe": "Supera eso. Te reto. 🎯"
+    "canYouBeatMe": "Supera eso. Te reto. 🎯",
+    "twitter": "X",
+    "discord": "Discord",
+    "email": "Correo",
+    "sms": "SMS",
+    "discordCopied": "¡Copiado para Discord! Pega en tu servidor 💬",
+    "morePlatforms": "Más plataformas",
+    "lessOptions": "Menos opciones"
   },
   "errors": {
     "unstableConnection": "¡WiFi inestable! Espera...",
@@ -918,6 +935,28 @@ const es = {
     "tierstar": "Estrella",
     "tierfire": "En Llamas",
     "tierlegend": "Leyenda"
+  },
+  "waiting": {
+    "milestoneFirst": "¡Primer jugador!",
+    "milestoneParty": "¡La fiesta comienza!",
+    "milestoneFull": "¡Casa llena!",
+    "waitingForPlayers": "Esperando jugadores...",
+    "oneMoreNeeded": "¡Invita amigos para empezar!",
+    "readyToStart": "¡Listos para empezar! ¡Más jugadores = más diversión!",
+    "fullHouse": "¡Casa llena! ¡Que comience la batalla!"
+  },
+  "tips": {
+    "header": "Tips Pro",
+    "swipeTitle": "Desliza para Conectar",
+    "swipeText": "Arrastra el dedo sobre las letras para formar palabras. ¡Puedes moverte en cualquier dirección!",
+    "longerTitle": "Más Largo = Mejor",
+    "longerText": "Las palabras más largas dan exponencialmente más puntos. ¡Una palabra de 6 letras vale mucho más que dos de 3 letras!",
+    "comboTitle": "Construye Combos",
+    "comboText": "¡Encuentra palabras rápidamente en sucesión para construir multiplicadores de combo y puntos extra!",
+    "uniqueTitle": "Sé Único",
+    "uniqueText": "¡Las palabras encontradas por varios jugadores valen cero! Piensa creativamente para encontrar palabras únicas.",
+    "bonusTitle": "Rondas Bonus",
+    "bonusText": "¡Atento a las rondas de fuego con 2x puntos! El timing perfecto puede cambiar el juego."
   },
   "hints": {
     "hint": "Pista",
@@ -1632,7 +1671,43 @@ const es = {
       "eloquentElite": "Élite Elocuente",
       "linguisticLegend": "Leyenda Lingüística",
       "lexiClashChampion": "Campeón de LexiClash"
+    },
+    "canPrestige": "¡Prestigio Disponible!",
+    "prestige": {
+      "title": "Sistema de Prestigio",
+      "currentLevel": "Nivel Actual",
+      "prestigeLevel": "Prestigio",
+      "xpMultiplier": "Multiplicador XP",
+      "rewards": "Recompensas",
+      "confirm": "Confirmar Prestigio",
+      "cancel": "Cancelar",
+      "warning": "¡Advertencia!",
+      "warningText": "Esto te reiniciará al Nivel 1. Todo el XP actual se reiniciará, pero ganarás todas las recompensas de abajo.",
+      "success": "¡Prestigio Logrado!",
+      "rewardsUnlocked": "¡Tus recompensas han sido desbloqueadas!",
+      "reachLevel": "Alcanza el Nivel 100 para Prestigiar",
+      "levelsRemaining": "niveles restantes",
+      "maxPrestige": "¡Prestigio Máximo!",
+      "maxPrestigeText": "Has alcanzado el nivel más alto. ¡Eres una leyenda!"
     }
+  },
+  "nearMiss": {
+    "almostThere": "¡Casi lo logras!",
+    "oneMoreGame": "¡Una partida más!",
+    "tip": "Consejo",
+    "more": "más",
+    "soClose": "¡Estuviste tan cerca! Una partida más podría lograrlo."
+  },
+  "mysteryReward": {
+    "title": "Recompensa Misteriosa",
+    "youFound": "¡Encontraste una recompensa misteriosa!",
+    "opening": "Abriendo...",
+    "revealing": "Revelando...",
+    "awesome": "¡Increíble!",
+    "gameCompletion": "Bonus por completar partida",
+    "winBonus": "Bonus de victoria",
+    "longWord": "Bonus de palabra larga",
+    "achievement": "Bonus de logro"
   },
   "auth": {
     "signIn": "Iniciar Sesión",
@@ -1968,6 +2043,46 @@ const es = {
     "changeCountry": "Cambiar país",
     "countrySaved": "¡País actualizado!",
     "countryError": "Error al actualizar el país"
+  },
+  "calendar": {
+    "title": "Recompensas Diarias",
+    "claimToday": "Reclamar Recompensa de Hoy",
+    "claimedCount": "Reclamadas",
+    "alreadyClaimed": "¡Recompensa de hoy reclamada!",
+    "comeBackTomorrow": "Vuelve mañana para más recompensas",
+    "claimError": "Error al reclamar recompensa",
+    "rewardTypes": "Tipos de Recompensa",
+    "day": "Día",
+    "today": "Hoy",
+    "claimed": "Reclamado",
+    "locked": "Bloqueado",
+    "available": "Disponible",
+    "rewards": {
+      "xp": "XP",
+      "hint": "Pista",
+      "hints": "Pistas",
+      "streakFreeze": "Congelar Racha",
+      "mysteryBox": "Caja Misteriosa",
+      "title": "Título",
+      "exclusiveTitle": "Título Exclusivo"
+    },
+    "rarity": {
+      "common": "Común",
+      "uncommon": "Poco común",
+      "rare": "Raro",
+      "epic": "Épico",
+      "legendary": "Legendario"
+    },
+    "milestone": "Recompensa de Hito",
+    "claimSuccess": "¡Obtuviste {reward}!",
+    "streakBonus": "Bonus de racha: +{percent}%"
+  },
+  "referral": {
+    "milestoneTitle": "¡Hito de amigo!",
+    "milestone_first_game_played": "¡jugó su primera partida!",
+    "milestone_five_games_played": "¡ha jugado 5 partidas!",
+    "milestone_ten_games_played": "¡ha jugado 10 partidas!",
+    "milestoneMessage": "¡Sigue invitando amigos para ganar más recompensas!"
   },
   "coins": {
     "title": "Monedas y Recompensas",
@@ -2749,7 +2864,21 @@ const es = {
       "cta": "¿Crees que puedes superarlo? 🎮"
     },
     "leaderboard": "Ranking",
-    "screenshotProtection": "Regresa para continuar jugando"
+    "screenshotProtection": "Regresa para continuar jugando",
+    "trainingSuggestion": {
+      "title": "¿Nuevo en LexiClash?",
+      "subtitle": "¡Prueba un juego de práctica para aprender la mecánica!",
+      "benefitsTitle": "El entrenamiento te ayuda a:",
+      "benefits": {
+        "learnMechanics": "Aprender a deslizar y formar palabras",
+        "practiceSwipes": "Practicar sin presión",
+        "noPressure": "Familiarizarte con el juego"
+      },
+      "returnNote": "¡Después del entrenamiento, volverás automáticamente al Desafío Diario!",
+      "startTraining": "Comenzar Entrenamiento",
+      "skipToDaily": "Saltar, ya aprenderé",
+      "redirecting": "Yendo al Desafío Diario..."
+    }
   },
   "wordHunt": {
     "title": "Caza de Palabras",
@@ -2920,6 +3049,7 @@ const es = {
       "title": "Clasificación",
       "today": "Hoy",
       "allTime": "Histórico",
+      "played": "jugaron",
       "solved": "Resuelto",
       "failed": "Fallido",
       "attempts": "intentos",

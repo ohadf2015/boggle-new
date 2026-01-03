@@ -32,6 +32,8 @@ import {
   hasPlayedWordHuntToday,
   getConversionTrigger,
   recordSignupModalDismissed,
+  getTodaysWordHuntResult,
+  markWordHuntResultSubmitted,
   type WordHuntResult,
   type GuestDailyPlayer,
   type ConversionTrigger,
@@ -282,12 +284,17 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
   // Submit result to backend when completing a new challenge
   useEffect(() => {
+    // Check if we need to retry submission for a previously saved but unsubmitted result
+    const storedResult = getTodaysWordHuntResult(language);
+    const needsRetrySubmission = !isNewCompletion && storedResult && storedResult.submittedToServer === false;
+
     // Wait for country code to be fetched (with timeout fallback)
-    const canSubmit = isNewCompletion && result && guestFingerprint && countryCodeReady && (isAuthenticated ? !!profile : true);
+    const canSubmit = (isNewCompletion || needsRetrySubmission) && result && guestFingerprint && countryCodeReady && (isAuthenticated ? !!profile : true);
 
     // Debug logging for submission conditions
     console.log('[WordHunt Submit Check]', {
       isNewCompletion,
+      needsRetrySubmission,
       hasResult: !!result,
       guestFingerprint: guestFingerprint ? guestFingerprint.substring(0, 8) + '...' : 'null',
       countryCodeReady,
@@ -389,6 +396,9 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             dataId: responseData.data?.id,
             playerType: bodyData.playerId ? 'authenticated' : 'guest',
           });
+
+          // Mark the result as successfully submitted to prevent retry on next page load
+          markWordHuntResultSubmitted(language);
 
           // Refresh the leaderboard and fetch stats after successful submission
           setLeaderboardKey(prev => prev + 1);
