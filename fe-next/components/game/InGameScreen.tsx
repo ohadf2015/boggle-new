@@ -498,7 +498,8 @@ const InGameScreen = memo<InGameScreenProps>(({
     t,
     playWordAcceptedSound,
     announceWordResult,
-  ]); // Optimized: removed effectiveComboLevelRef and fireRoundActive from deps (using refs)
+    effectiveComboLevelRef,
+  ]);
 
   // Keyboard word input - allows typing words directly instead of swiping
   const keyboardInput = useKeyboardWordInput({
