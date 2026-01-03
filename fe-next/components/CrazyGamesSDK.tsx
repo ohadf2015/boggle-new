@@ -26,6 +26,43 @@ interface BannerOptions {
   height: number;
 }
 
+// Standard banner sizes supported by CrazyGames
+export type BannerSize =
+  | '728x90'   // Leaderboard
+  | '300x250'  // Medium Rectangle
+  | '320x50'   // Mobile Banner
+  | '468x60'   // Main Banner
+  | '320x100'  // Large Mobile Banner
+  | '160x600'  // Wide Skyscraper
+  | '336x280'  // Large Rectangle
+  | '300x600'  // Half Page
+  | '970x90'   // Large Leaderboard
+  | '970x250'  // Billboard
+  | '250x250'  // Square
+  | '120x600'; // Skyscraper
+
+// Invite link parameters for multiplayer
+export interface InviteLinkParams {
+  roomId?: string;
+  [key: string]: string | undefined;
+}
+
+// System info returned by SDK
+export interface SystemInfo {
+  countryCode: string;
+  browser: {
+    name: string;
+    version: string;
+  };
+  os: {
+    name: string;
+    version: string;
+  };
+  device: {
+    type: 'desktop' | 'tablet' | 'mobile';
+  };
+}
+
 interface CrazyGamesSDK {
   getEnvironment: () => Promise<CrazyGamesEnvironment>;
   ad: {
@@ -46,12 +83,21 @@ interface CrazyGamesSDK {
     happyTime: () => void;
     sdkGameLoadingStart: () => void;
     sdkGameLoadingStop: () => void;
+    // Invite link features
+    inviteLink: (params: InviteLinkParams) => string;
+    showInviteButton: (params: InviteLinkParams) => void;
+    hideInviteButton: () => void;
+    getInviteParam: (paramName: string) => string | null;
+    // Instant multiplayer flag
+    isInstantMultiplayer: boolean;
   };
   user: {
     isUserAccountAvailable: () => Promise<boolean>;
     getUser: () => Promise<{ username: string; profilePictureUrl: string } | null>;
     showAuthPrompt: () => Promise<{ username: string; profilePictureUrl: string } | null>;
-    getSystemInfo: () => Promise<{ countryCode: string; browser: { name: string; version: string }; os: { name: string; version: string }; device: { type: string } }>;
+    getSystemInfo: () => Promise<SystemInfo>;
+    // Direct property access (v3 SDK)
+    systemInfo?: SystemInfo;
   };
   data: {
     getItem: (key: string) => Promise<string | null>;
@@ -76,6 +122,11 @@ interface CrazyGamesContextType {
   showMidgameAd: (callbacks?: AdCallbacks) => void;
   showRewardedAd: (callbacks?: AdCallbacks) => void;
   hasAdblock: () => Promise<boolean>;
+  // Banner ads
+  requestBanner: (containerId: string, width: number, height: number) => void;
+  requestResponsiveBanner: (containerId: string) => void;
+  clearBanner: (containerId: string) => void;
+  clearAllBanners: () => void;
   // Data persistence
   saveData: (key: string, value: string) => Promise<void>;
   loadData: (key: string) => Promise<string | null>;
@@ -84,6 +135,13 @@ interface CrazyGamesContextType {
   getUser: () => Promise<{ username: string; profilePictureUrl: string } | null>;
   showAuthPrompt: () => Promise<{ username: string; profilePictureUrl: string } | null>;
   isUserAccountAvailable: () => Promise<boolean>;
+  getSystemInfo: () => Promise<SystemInfo | null>;
+  // Invite links & multiplayer
+  inviteLink: (params: InviteLinkParams) => string | null;
+  showInviteButton: (params: InviteLinkParams) => void;
+  hideInviteButton: () => void;
+  getInviteParam: (paramName: string) => string | null;
+  isInstantMultiplayer: boolean;
 }
 
 const CrazyGamesContext = createContext<CrazyGamesContextType | null>(null);
@@ -120,6 +178,7 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
   const [isAvailable, setIsAvailable] = useState(false);
   const [environment, setEnvironment] = useState<CrazyGamesEnvironment | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInstantMultiplayer, setIsInstantMultiplayer] = useState(false);
 
   // Initialize SDK and set up CrazyGames-specific handlers
   useEffect(() => {
@@ -132,18 +191,140 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     document.body.classList.add('crazygames-embed');
 
     // Prevent page scrolling (CrazyGames requirement)
+    // But allow scrolling within scrollable containers
     const preventScroll = (event: WheelEvent) => {
+      // Check if the event target or any parent is a scrollable container
+      let target = event.target as HTMLElement | null;
+
+      while (target && target !== document.body) {
+        const style = window.getComputedStyle(target);
+        const overflowY = style.overflowY;
+        const overflowX = style.overflowX;
+
+        // Check if this element is scrollable
+        const isScrollableY = (overflowY === 'auto' || overflowY === 'scroll') && target.scrollHeight > target.clientHeight;
+        const isScrollableX = (overflowX === 'auto' || overflowX === 'scroll') && target.scrollWidth > target.clientWidth;
+
+        if (isScrollableY || isScrollableX) {
+          // Check if we can scroll in the direction the user is trying to scroll
+          if (event.deltaY !== 0 && isScrollableY) {
+            const canScrollUp = target.scrollTop > 0;
+            const canScrollDown = target.scrollTop < target.scrollHeight - target.clientHeight;
+
+            if ((event.deltaY < 0 && canScrollUp) || (event.deltaY > 0 && canScrollDown)) {
+              // Allow this scroll event - we're inside a scrollable container
+              return;
+            }
+          }
+
+          if (event.deltaX !== 0 && isScrollableX) {
+            const canScrollLeft = target.scrollLeft > 0;
+            const canScrollRight = target.scrollLeft < target.scrollWidth - target.clientWidth;
+
+            if ((event.deltaX < 0 && canScrollLeft) || (event.deltaX > 0 && canScrollRight)) {
+              // Allow this scroll event - we're inside a scrollable container
+              return;
+            }
+          }
+        }
+
+        target = target.parentElement;
+      }
+
+      // Prevent page-level scrolling
       event.preventDefault();
     };
 
     const preventKeyScroll = (event: KeyboardEvent) => {
+      // Check if the active element or event target is within a scrollable container
+      const activeElement = document.activeElement as HTMLElement | null;
+      const target = (event.target as HTMLElement) || activeElement;
+
+      if (target) {
+        let element: HTMLElement | null = target;
+
+        while (element && element !== document.body) {
+          const style = window.getComputedStyle(element);
+          const overflowY = style.overflowY;
+
+          // If we're inside a scrollable container, allow keyboard scrolling
+          if ((overflowY === 'auto' || overflowY === 'scroll') && element.scrollHeight > element.clientHeight) {
+            return;
+          }
+
+          element = element.parentElement;
+        }
+      }
+
+      // Only prevent keyboard scroll for page-level scrolling
       if (['ArrowUp', 'ArrowDown', ' ', 'PageUp', 'PageDown'].includes(event.key)) {
         event.preventDefault();
       }
     };
 
+    // Helper to check if an element is a scrollable container
+    const isScrollableElement = (element: HTMLElement | null): boolean => {
+      while (element && element !== document.body) {
+        const style = window.getComputedStyle(element);
+        const overflowY = style.overflowY;
+
+        if ((overflowY === 'auto' || overflowY === 'scroll') && element.scrollHeight > element.clientHeight) {
+          return true;
+        }
+
+        element = element.parentElement;
+      }
+      return false;
+    };
+
+    // Track touch start position for touch scroll prevention
+    let touchStartY = 0;
+    let touchStartElement: HTMLElement | null = null;
+
+    const handleTouchStart = (event: TouchEvent) => {
+      if (event.touches.length === 1) {
+        touchStartY = event.touches[0].clientY;
+        touchStartElement = event.target as HTMLElement;
+      }
+    };
+
+    const handleTouchMove = (event: TouchEvent) => {
+      if (event.touches.length !== 1 || !touchStartElement) return;
+
+      // Check if we're inside a scrollable container
+      if (isScrollableElement(touchStartElement)) {
+        // Find the scrollable container
+        let element: HTMLElement | null = touchStartElement;
+        while (element && element !== document.body) {
+          const style = window.getComputedStyle(element);
+          const overflowY = style.overflowY;
+
+          if ((overflowY === 'auto' || overflowY === 'scroll') && element.scrollHeight > element.clientHeight) {
+            const touchY = event.touches[0].clientY;
+            const deltaY = touchStartY - touchY;
+
+            const canScrollUp = element.scrollTop > 0;
+            const canScrollDown = element.scrollTop < element.scrollHeight - element.clientHeight;
+
+            // Allow scroll if we can scroll in that direction
+            if ((deltaY > 0 && canScrollDown) || (deltaY < 0 && canScrollUp)) {
+              return; // Allow scroll
+            }
+            break;
+          }
+
+          element = element.parentElement;
+        }
+      }
+
+      // Prevent page-level touch scrolling
+      event.preventDefault();
+    };
+
     window.addEventListener('wheel', preventScroll, { passive: false });
     window.addEventListener('keydown', preventKeyScroll);
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
 
     const checkSDK = async () => {
       // Wait for SDK to load
@@ -160,6 +341,10 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
           const env = await window.CrazyGames.SDK.getEnvironment();
           setEnvironment(env);
           setIsAvailable(env !== 'disabled');
+
+          // Check for instant multiplayer mode
+          const instantMultiplayer = window.CrazyGames.SDK.game.isInstantMultiplayer;
+          setIsInstantMultiplayer(!!instantMultiplayer);
 
           // Signal that game is ready to play
           if (env === 'crazygames') {
@@ -178,6 +363,8 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
       document.body.classList.remove('crazygames-embed');
       window.removeEventListener('wheel', preventScroll);
       window.removeEventListener('keydown', preventKeyScroll);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
     };
   }, []);
 
@@ -284,24 +471,104 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
     return false;
   }, [isAvailable]);
 
+  // System info handler
+  const getSystemInfo = useCallback(async (): Promise<SystemInfo | null> => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      // Try direct property first (v3 SDK), then fall back to method
+      if (window.CrazyGames.SDK.user.systemInfo) {
+        return window.CrazyGames.SDK.user.systemInfo;
+      }
+      return window.CrazyGames.SDK.user.getSystemInfo();
+    }
+    return null;
+  }, [isAvailable]);
+
+  // Banner ad handlers
+  const requestBanner = useCallback((containerId: string, width: number, height: number) => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      window.CrazyGames.SDK.banner.requestBanner({ id: containerId, width, height });
+    }
+  }, [isAvailable]);
+
+  const requestResponsiveBanner = useCallback((containerId: string) => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      window.CrazyGames.SDK.banner.requestResponsiveBanner(containerId);
+    }
+  }, [isAvailable]);
+
+  const clearBanner = useCallback((containerId: string) => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      window.CrazyGames.SDK.banner.clearBanner(containerId);
+    }
+  }, [isAvailable]);
+
+  const clearAllBanners = useCallback(() => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      window.CrazyGames.SDK.banner.clearAllBanners();
+    }
+  }, [isAvailable]);
+
+  // Invite link handlers
+  const inviteLink = useCallback((params: InviteLinkParams): string | null => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      return window.CrazyGames.SDK.game.inviteLink(params);
+    }
+    return null;
+  }, [isAvailable]);
+
+  const showInviteButton = useCallback((params: InviteLinkParams) => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      window.CrazyGames.SDK.game.showInviteButton(params);
+    }
+  }, [isAvailable]);
+
+  const hideInviteButton = useCallback(() => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      window.CrazyGames.SDK.game.hideInviteButton();
+    }
+  }, [isAvailable]);
+
+  const getInviteParam = useCallback((paramName: string): string | null => {
+    if (isAvailable && window.CrazyGames?.SDK) {
+      return window.CrazyGames.SDK.game.getInviteParam(paramName);
+    }
+    return null;
+  }, [isAvailable]);
+
   const value: CrazyGamesContextType = {
     isAvailable,
     environment,
     isLoading,
+    // Gameplay events
     gameplayStart,
     gameplayStop,
     loadingStart,
     loadingStop,
     happyTime,
+    // Video ads
     showMidgameAd,
     showRewardedAd,
     hasAdblock,
+    // Banner ads
+    requestBanner,
+    requestResponsiveBanner,
+    clearBanner,
+    clearAllBanners,
+    // Data persistence
     saveData,
     loadData,
     removeData,
+    // User
     getUser,
     showAuthPrompt,
     isUserAccountAvailable,
+    getSystemInfo,
+    // Invite links & multiplayer
+    inviteLink,
+    showInviteButton,
+    hideInviteButton,
+    getInviteParam,
+    isInstantMultiplayer,
   };
 
   return (
@@ -322,20 +589,36 @@ export function useCrazyGames(): CrazyGamesContextType {
       isAvailable: false,
       environment: null,
       isLoading: false,
+      // Gameplay events
       gameplayStart: () => {},
       gameplayStop: () => {},
       loadingStart: () => {},
       loadingStop: () => {},
       happyTime: () => {},
+      // Video ads
       showMidgameAd: (callbacks) => callbacks?.adFinished?.(),
       showRewardedAd: (callbacks) => callbacks?.adError?.('SDK not available'),
       hasAdblock: async () => false,
+      // Banner ads
+      requestBanner: () => {},
+      requestResponsiveBanner: () => {},
+      clearBanner: () => {},
+      clearAllBanners: () => {},
+      // Data persistence
       saveData: async () => {},
       loadData: async () => null,
       removeData: async () => {},
+      // User
       getUser: async () => null,
       showAuthPrompt: async () => null,
       isUserAccountAvailable: async () => false,
+      getSystemInfo: async () => null,
+      // Invite links & multiplayer
+      inviteLink: () => null,
+      showInviteButton: () => {},
+      hideInviteButton: () => {},
+      getInviteParam: () => null,
+      isInstantMultiplayer: false,
     };
   }
   return context;
@@ -346,6 +629,14 @@ export function useCrazyGames(): CrazyGamesContextType {
  */
 export function isCrazyGamesEnvironment(): boolean {
   return CRAZYGAMES_ENABLED && typeof window !== 'undefined' && !!window.CrazyGames?.SDK;
+}
+
+/**
+ * Check if external login should be hidden (CrazyGames requirement)
+ * Returns true when on CrazyGames - use to hide login modals, signup prompts, etc.
+ */
+export function shouldHideExternalLogin(): boolean {
+  return isCrazyGamesEnvironment();
 }
 
 export default CrazyGamesScript;

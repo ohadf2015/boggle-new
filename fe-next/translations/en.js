@@ -263,6 +263,16 @@ const en = {
     "fireRound": "🔥 FIRE ROUND",
     "multiplier": "2× EVERYTHING"
   },
+  "effects": {
+    "preferenceTitle": "Animation Settings",
+    "preferenceSubtitle": "First time seeing this?",
+    "preferenceDescription": "This game has screen shake and flashing light effects. You can disable them now if you prefer.",
+    "earthquakeShake": "Screen Shake",
+    "fireRoundLights": "Flashing Lights",
+    "keepAnimations": "Keep Effects",
+    "disableAnimations": "Disable Effects",
+    "settingsHint": "You can change this anytime in Settings"
+  },
   "spam": {
     "warning": "Take a breath! Too many wrong guesses",
     "penalty": "-${points} pts",
@@ -1425,6 +1435,7 @@ const en = {
       "demoWord": "CAT",
       "demoHint": "Connect touching letters",
       "demoSuccess": "Perfect!",
+      "demoComplete": "You got it! Now you know how to play.",
       "clickNext": "Next →"
     },
     "combo": {
@@ -1966,6 +1977,7 @@ const en = {
     "signIn": "Sign In",
     "signOut": "Sign Out",
     "signUp": "Sign Up",
+    "loginCrazyGames": "Login",
     "userMenu": "User menu",
     "signInWith": "Continue with ${provider}",
     "alreadyHaveAccount": "Already have an account? Sign in",
@@ -2910,6 +2922,8 @@ const en = {
     "playAgainTomorrow": "New puzzle tomorrow!",
     "tryAnotherLanguage": "Try Another Language",
     "playDifferentLanguage": "Test your skills in another language!",
+    "quitConfirmTitle": "Leave the Hunt?",
+    "quitConfirmMessage": "Your progress will be lost!",
     "feedback": {
       "tooShort": "📏 Minimum 3 letters",
       "duplicate": "🔁 Already found!",

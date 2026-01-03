@@ -4,6 +4,7 @@ import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowDown, ArrowUp, ArrowLeft, ArrowRight, ArrowDownLeft, ArrowDownRight, ArrowUpLeft, ArrowUpRight, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export interface GridPosition {
   row: number;
@@ -82,6 +83,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
   showHints = true,
   className,
 }) => {
+  const { t } = useLanguage();
   const [selectedCells, setSelectedCells] = useState<SelectedCell[]>([]);
   const [isSelecting, setIsSelecting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -144,10 +146,10 @@ const MiniGrid: React.FC<MiniGridProps> = ({
     const cols = letters[0]?.length || size;
     const rows = letters.length;
 
-    // Use cached measurements or measure if stale (cache valid for 100ms)
+    // Use cached measurements or measure if stale (cache valid for 500ms during active touch)
     let measurements = gridMeasurementsRef.current;
     const now = performance.now();
-    if (!measurements || now - measurements.timestamp > 100) {
+    if (!measurements || now - measurements.timestamp > 500) {
       measurements = measureGrid();
       if (!measurements) return null;
     }
@@ -166,32 +168,24 @@ const MiniGrid: React.FC<MiniGridProps> = ({
     const adjustedX = touchX - gridRect.left - gridPaddingLeft;
     const adjustedY = touchY - gridRect.top - gridPaddingTop;
 
-    // Calculate which cell based on position
+    // Calculate which cell based on position - use simple grid math
     const col = Math.floor(adjustedX / cellWithGapWidth);
     const row = Math.floor(adjustedY / cellWithGapHeight);
 
     // Bounds check
     if (row < 0 || row >= rows || col < 0 || col >= cols) return null;
 
-    // Calculate position within the cell area (including gap tolerance)
+    // Simple rectangular bounds check with generous tolerance
+    // Accept any touch within the cell area plus half the gap on each side
     const cellStartX = col * cellWithGapWidth;
     const cellStartY = row * cellWithGapHeight;
     const xInCell = adjustedX - cellStartX;
     const yInCell = adjustedY - cellStartY;
 
-    // Calculate distance from cell center for tolerance-based selection
-    const cellCenterX = cellWidth / 2;
-    const cellCenterY = cellHeight / 2;
-    const distanceFromCenter = Math.sqrt(
-      Math.pow(xInCell - cellCenterX, 2) + Math.pow(yInCell - cellCenterY, 2)
-    );
-
-    // Allow selection if within 90% of cell radius (forgiving threshold)
-    // This makes it MUCH easier to select cells, especially on mobile
-    const cellRadius = Math.min(cellWidth, cellHeight) / 2;
-    const selectionThreshold = cellRadius * 1.3; // 130% tolerance - very forgiving
-
-    if (distanceFromCenter > selectionThreshold) return null;
+    // Very forgiving - accept touches anywhere in the cell's grid space
+    // Only reject if clearly outside (negative or beyond cell+gap)
+    if (xInCell < -10 || xInCell > cellWithGapWidth + 10) return null;
+    if (yInCell < -10 || yInCell > cellWithGapHeight + 10) return null;
 
     return { row, col };
   }, [letters, size, measureGrid]);
@@ -269,15 +263,35 @@ const MiniGrid: React.FC<MiniGridProps> = ({
     [selectedCells, letters, demoPath, demoWord, showSuccess, onDemoComplete, isCellSelected, isNextCorrectCell]
   );
 
-  // Touch/Mouse event handlers
-  const handleTouchStart = (e: React.TouchEvent, row: number, col: number) => {
+  // Touch/Mouse event handlers - cell-level (for direct cell touches)
+  const handleCellTouchStart = (e: React.TouchEvent, row: number, col: number) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsSelecting(true);
     isSelectingRef.current = true;
-    // Invalidate cache on touch start to get fresh measurements
-    gridMeasurementsRef.current = null;
+    // Pre-measure grid for smooth subsequent touches
+    measureGrid();
     selectCell(row, col);
   };
+
+  // Grid-level touch start - catches touches anywhere in grid area
+  const handleGridTouchStart = useCallback((e: React.TouchEvent) => {
+    // Don't double-handle if cell already handled it
+    if (isSelectingRef.current) return;
+
+    e.preventDefault();
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    setIsSelecting(true);
+    isSelectingRef.current = true;
+    measureGrid();
+
+    const cell = getCellAtPosition(touch.clientX, touch.clientY);
+    if (cell) {
+      selectCell(cell.row, cell.col);
+    }
+  }, [getCellAtPosition, selectCell, measureGrid]);
 
   // Process touch move using mathematical cell detection
   const processTouchMove = useCallback((touchX: number, touchY: number) => {
@@ -297,8 +311,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
   const handleMouseDown = (row: number, col: number) => {
     setIsSelecting(true);
     isSelectingRef.current = true;
-    // Invalidate cache on interaction start
-    gridMeasurementsRef.current = null;
+    measureGrid();
     selectCell(row, col);
   };
 
@@ -380,6 +393,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
           // Increased container sizes to accommodate larger touch targets
           size === 3 ? 'grid-cols-3 max-w-[280px] sm:max-w-[340px]' : 'grid-cols-4 max-w-[360px] sm:max-w-[420px]'
         )}
+        onTouchStart={handleGridTouchStart}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
@@ -405,11 +419,11 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                   'min-h-[80px] min-w-[80px] sm:min-h-[95px] sm:min-w-[95px]',
                   isSelected
                     ? 'bg-neo-lime shadow-hard-sm scale-95 text-neo-black'
-                    : 'bg-neo-cream shadow-hard-sm sm:shadow-hard',
+                    : 'letter-tile-gradient-cream shadow-hard-sm sm:shadow-hard',
                   // Enhanced glow for hint cell - bright lime green
                   isHint && !isSelected && 'ring-4 ring-neo-lime shadow-[0_0_20px_rgba(132,204,22,0.6),0_0_40px_rgba(132,204,22,0.3)]'
                 )}
-                onTouchStart={(e) => handleTouchStart(e, rowIndex, colIndex)}
+                onTouchStart={(e) => handleCellTouchStart(e, rowIndex, colIndex)}
                 onMouseDown={() => handleMouseDown(rowIndex, colIndex)}
                 whileHover={{ scale: isSelected ? 0.95 : 1.08 }}
                 whileTap={{ scale: 0.9 }}
@@ -527,10 +541,10 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                 🎉
               </motion.div>
               <div className="text-2xl sm:text-3xl font-black text-neo-black mb-1">
-                Perfect!
+                {t('onboarding.welcome.demoSuccess')}
               </div>
               <div className="text-sm sm:text-base font-bold text-neo-black/80">
-                You got it! Now you know how to play.
+                {t('onboarding.welcome.demoComplete')}
               </div>
             </motion.div>
           </motion.div>

@@ -13,6 +13,8 @@ export interface GuidanceState {
   fireRoundShown: boolean;
   directionPatternShown: boolean;
   swipeTipShown: boolean;
+  /** Whether the user has been shown the option to disable effects on first earthquake */
+  effectsPreferenceShown: boolean;
 }
 
 const DEFAULT_STATE: GuidanceState = {
@@ -21,6 +23,7 @@ const DEFAULT_STATE: GuidanceState = {
   fireRoundShown: false,
   directionPatternShown: false,
   swipeTipShown: false,
+  effectsPreferenceShown: false,
 };
 
 /**
@@ -78,6 +81,7 @@ export function hasCompletedAllGuidance(): boolean {
     state.earthquakeShown &&
     state.fireRoundShown &&
     state.directionPatternShown &&
-    state.swipeTipShown
+    state.swipeTipShown &&
+    state.effectsPreferenceShown
   );
 }

@@ -1,0 +1,140 @@
+'use client';
+
+import React, { useEffect, useRef, useId, memo } from 'react';
+import { useCrazyGames, type BannerSize } from './CrazyGamesSDK';
+import { cn } from '@/lib/utils';
+
+interface CrazyGamesBannerProps {
+  /** Use responsive banner that auto-sizes to container */
+  responsive?: boolean;
+  /** Fixed banner size (ignored if responsive=true) */
+  size?: BannerSize;
+  /** Additional CSS class for the container */
+  className?: string;
+  /** Whether to show the banner (useful for conditional rendering) */
+  show?: boolean;
+}
+
+// Banner dimension mappings
+const BANNER_DIMENSIONS: Record<BannerSize, { width: number; height: number }> = {
+  '728x90': { width: 728, height: 90 },
+  '300x250': { width: 300, height: 250 },
+  '320x50': { width: 320, height: 50 },
+  '468x60': { width: 468, height: 60 },
+  '320x100': { width: 320, height: 100 },
+  '160x600': { width: 160, height: 600 },
+  '336x280': { width: 336, height: 280 },
+  '300x600': { width: 300, height: 600 },
+  '970x90': { width: 970, height: 90 },
+  '970x250': { width: 970, height: 250 },
+  '250x250': { width: 250, height: 250 },
+  '120x600': { width: 120, height: 600 },
+};
+
+/**
+ * CrazyGamesBanner - Displays CrazyGames banner ads
+ *
+ * Can display either fixed-size or responsive banners.
+ * The component automatically handles ad request and cleanup.
+ *
+ * @example Fixed size banner
+ * ```tsx
+ * <CrazyGamesBanner size="300x250" />
+ * ```
+ *
+ * @example Responsive banner
+ * ```tsx
+ * <CrazyGamesBanner responsive className="w-full max-w-lg h-24" />
+ * ```
+ */
+const CrazyGamesBanner = memo<CrazyGamesBannerProps>(({
+  responsive = false,
+  size = '300x250',
+  className,
+  show = true,
+}) => {
+  const uniqueId = useId();
+  const containerId = `cg-banner-${uniqueId.replace(/:/g, '')}`;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const hasRequestedRef = useRef(false);
+
+  const {
+    isAvailable,
+    isLoading,
+    requestBanner,
+    requestResponsiveBanner,
+    clearBanner,
+  } = useCrazyGames();
+
+  // Request banner when component mounts and SDK is ready
+  useEffect(() => {
+    if (isLoading || !isAvailable || !show || hasRequestedRef.current) return;
+
+    // Small delay to ensure DOM is ready
+    const timeoutId = setTimeout(() => {
+      if (responsive) {
+        requestResponsiveBanner(containerId);
+      } else {
+        const { width, height } = BANNER_DIMENSIONS[size];
+        requestBanner(containerId, width, height);
+      }
+      hasRequestedRef.current = true;
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [isAvailable, isLoading, show, responsive, size, containerId, requestBanner, requestResponsiveBanner]);
+
+  // Clear banner when component unmounts or show becomes false
+  useEffect(() => {
+    return () => {
+      if (hasRequestedRef.current && isAvailable) {
+        clearBanner(containerId);
+        hasRequestedRef.current = false;
+      }
+    };
+  }, [containerId, clearBanner, isAvailable]);
+
+  // Also clear when show becomes false
+  useEffect(() => {
+    if (!show && hasRequestedRef.current && isAvailable) {
+      clearBanner(containerId);
+      hasRequestedRef.current = false;
+    }
+  }, [show, containerId, clearBanner, isAvailable]);
+
+  // Don't render if SDK is not available or not showing
+  if (!isAvailable || !show) {
+    return null;
+  }
+
+  const dimensions = BANNER_DIMENSIONS[size];
+
+  return (
+    <div
+      ref={containerRef}
+      id={containerId}
+      className={cn(
+        'flex items-center justify-center',
+        !responsive && 'mx-auto',
+        className
+      )}
+      style={
+        responsive
+          ? undefined
+          : {
+              width: dimensions.width,
+              height: dimensions.height,
+              minWidth: dimensions.width,
+              minHeight: dimensions.height,
+            }
+      }
+      role="complementary"
+      aria-label="Advertisement"
+    />
+  );
+});
+
+CrazyGamesBanner.displayName = 'CrazyGamesBanner';
+
+export default CrazyGamesBanner;
+export { CrazyGamesBanner };

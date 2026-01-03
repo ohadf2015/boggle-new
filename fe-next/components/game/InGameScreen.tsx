@@ -599,93 +599,76 @@ const InGameScreen = memo<InGameScreenProps>(({
         {/* Full-screen landscape container with grid centered - uses full viewport */}
         <div className="relative flex items-center justify-center w-full h-screen overflow-hidden bg-slate-900 text-white landscape-full-height">
 
-          {/* Left Side Stats - Consolidated Panel (Timer + Stats) - ENLARGED FOR LANDSCAPE */}
+          {/* Left Side Panel - Timer, Rank, Words Count */}
           <div className={cn(
-            "absolute left-2 top-1/2 -translate-y-1/2 z-40 landscape-side-panel",
-            isExtremelyShortLandscape && "scale-75 left-1"
+            "absolute left-3 top-1/2 -translate-y-1/2 z-40 landscape-side-panel",
+            isExtremelyShortLandscape && "left-2"
           )}>
-            <div className="bg-neo-cream/95 text-neo-black border-4 border-neo-black rounded-neo shadow-hard-lg p-3 flex flex-col items-center gap-3">
-              {/* Timer - Larger for better visibility */}
+            <div className="landscape-panel flex flex-col items-center gap-4">
+              {/* Timer - Large and prominent */}
               {remainingTime !== null && (
                 <CircularTimer
                   remainingTime={remainingTime}
                   totalTime={timerValue * 60}
-                  size="lg"
+                  size={isExtremelyShortLandscape ? "md" : "lg"}
                 />
               )}
 
-              {/* Stats Row - Rank & Words side by side when both exist - ENLARGED */}
-              {isPlaying && (
-                <div className="flex items-center gap-2">
-                  {/* Rank Badge (if in multiplayer) - LARGER */}
-                  {playerData.rank && playerData.rank > 0 && leaderboard.length > 1 && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="bg-neo-purple text-neo-cream border-3 border-neo-black rounded-neo shadow-hard px-3 py-2 text-center min-w-[56px]"
-                    >
-                      <div className="text-lg font-black leading-tight">
-                        #{playerData.rank}
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {/* Words count - LARGER */}
-                  <div className="bg-neo-navy text-neo-cream border-3 border-neo-black rounded-neo shadow-hard px-3 py-2 text-center min-w-[56px]">
-                    <div className="text-lg font-black leading-tight">
-                      {normalizedFoundWords.length}
-                    </div>
+              {/* Rank Badge (if in multiplayer) */}
+              {isPlaying && playerData.rank && playerData.rank > 0 && leaderboard.length > 1 && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="flex flex-col items-center"
+                >
+                  <div className="landscape-stat-secondary text-neo-black">
+                    #{playerData.rank}
                   </div>
+                  <div className="landscape-stat-label text-neo-black">
+                    {t('common.rank') || 'RANK'}
+                  </div>
+                </motion.div>
+              )}
 
-                  {/* Words Remaining - Compact for landscape (single-player only) */}
-                  {hints?.isSinglePlayer && totalBoardWords !== null && totalBoardWords > 0 && (
-                    <WordsRemaining
-                      totalWords={totalBoardWords}
-                      foundWordsCount={normalizedFoundWords.filter(w => w.isValid !== false).length}
-                      t={t}
-                      compact
-                    />
-                  )}
+              {/* Words Found Count */}
+              {isPlaying && (
+                <div className="flex flex-col items-center">
+                  <div className="landscape-stat-secondary text-neo-black">
+                    {normalizedFoundWords.length}
+                  </div>
+                  <div className="landscape-stat-label text-neo-black">
+                    {t('common.words') || 'WORDS'}
+                  </div>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Right Side Stats - Consolidated Score Panel - ENLARGED FOR LANDSCAPE */}
+          {/* Right Side Panel - Score & Combo */}
           {isPlaying && (
             <div className={cn(
-              "absolute right-2 top-1/2 -translate-y-1/2 z-40 landscape-side-panel",
-              isExtremelyShortLandscape && "scale-75 right-1"
+              "absolute right-3 top-1/2 -translate-y-1/2 z-40 landscape-side-panel",
+              isExtremelyShortLandscape && "right-2"
             )}>
-              <motion.div
-                initial={{ scale: 0, rotate: -2 }}
-                animate={{ scale: 1, rotate: 1 }}
-                className="bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard-lg p-3 flex flex-col items-center gap-2"
-              >
-                {/* Score - MUCH LARGER */}
-                <motion.div
-                  key={playerData.score}
-                  initial={{ scale: 1.2 }}
-                  animate={{ scale: 1 }}
-                  className="text-4xl font-black text-neo-black leading-none"
-                >
-                  {playerData.score}
-                </motion.div>
+              <div className="landscape-panel flex flex-col items-center gap-4">
+                {/* Score - Primary stat, large and animated */}
+                <div className="flex flex-col items-center">
+                  <motion.div
+                    key={playerData.score}
+                    initial={{ scale: 1.3 }}
+                    animate={{ scale: 1 }}
+                    className="landscape-stat-primary text-neo-black"
+                  >
+                    {playerData.score}
+                  </motion.div>
+                  <div className="landscape-stat-label text-neo-black">
+                    {t('common.score') || 'SCORE'}
+                  </div>
+                </div>
 
-                {/* Enhanced Combo Display */}
+                {/* Combo Display - Full variant for visibility */}
                 <ComboDisplay comboLevel={comboLevel} />
-
-                {/* Words Remaining - 5+ letter words only (single-player only) */}
-                {hints?.isSinglePlayer && totalBoardWords !== null && totalBoardWords !== undefined && totalBoardWords > 0 && (
-                  <WordsRemaining
-                    totalWords={totalBoardWords}
-                    foundWordsCount={normalizedFoundWords.filter(fw => fw.isValid !== false && fw.word.length >= 5).length}
-                    t={t}
-                    compact
-                    minLength={5}
-                  />
-                )}
-              </motion.div>
+              </div>
             </div>
           )}
 
@@ -722,12 +705,12 @@ const InGameScreen = memo<InGameScreenProps>(({
             </div>
           )}
 
-          {/* Center: Word Forming Area + Notification + Grid */}
+          {/* Center: Word Forming Area + Grid - with horizontal padding for side panels */}
           <div className={cn(
             "flex flex-col items-center justify-center w-full h-full landscape-grid-container",
-            isExtremelyShortLandscape ? "px-2 gap-0 py-0" :
-            isVeryShortLandscape ? "px-3 gap-0.5 py-0.5" :
-            "px-3 gap-1 py-0.5"
+            isExtremelyShortLandscape ? "px-[120px] gap-1 py-1" :
+            isVeryShortLandscape ? "px-[130px] gap-1.5 py-1" :
+            "px-[150px] gap-2 py-2"
           )}>
             {/* Word Forming Area with integrated feedback - flex-shrink-0 prevents squishing, z-50 keeps it visible */}
             {/* Shows typed word when in keyboard mode, otherwise shows swiped word */}

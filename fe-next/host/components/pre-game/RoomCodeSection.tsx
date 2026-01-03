@@ -6,6 +6,7 @@ import { Card } from '../../../components/ui/card';
 import { Badge } from '../../../components/ui/badge';
 import UnifiedShareModal from '../../../components/modals/UnifiedShareModal';
 import { useNativeShare } from '../../../hooks/useNativeShare';
+import { useCrazyGamesInvite } from '../../../hooks/useCrazyGamesInvite';
 import { getJoinUrl } from '../../../utils/share';
 import type { Language } from '@/shared/types/game';
 
@@ -37,10 +38,13 @@ export const RoomCodeSection = memo<RoomCodeSectionProps>(({
 }) => {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const { canNativeShare, nativeShare } = useNativeShare();
+  const { createInviteLink } = useCrazyGamesInvite();
 
   const handleShare = useCallback(async () => {
     if (canNativeShare) {
-      const joinUrl = getJoinUrl(gameCode, 'native-share');
+      // Prefer CrazyGames invite link if available, otherwise use regular join URL
+      const crazyGamesLink = createInviteLink(gameCode);
+      const joinUrl = crazyGamesLink || getJoinUrl(gameCode, 'native-share');
       const shared = await nativeShare({
         title: t('share.inviteTitle'),
         text: t('share.inviteMessage'),
@@ -54,7 +58,7 @@ export const RoomCodeSection = memo<RoomCodeSectionProps>(({
       // Desktop: show unified modal
       setIsShareModalOpen(true);
     }
-  }, [canNativeShare, nativeShare, gameCode, t]);
+  }, [canNativeShare, nativeShare, gameCode, t, createInviteLink]);
 
   const getLanguageDisplay = (lang: Language) => {
     switch (lang) {

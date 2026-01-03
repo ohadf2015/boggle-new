@@ -48,6 +48,8 @@ import { addGameToHistory } from '@/utils/gameHistoryManager';
 import { awardGameCoins } from '@/utils/coinManager';
 import { syncCoinsToDatabase } from '@/lib/supabase';
 import RoomChat from '@/components/RoomChat';
+import CrazyGamesBanner from '@/components/CrazyGamesBanner';
+import { shouldHideExternalLogin } from '@/components/CrazyGamesSDK';
 // Shared result components
 import { MultiplayerActions } from '@/components/results/ResultsActionButtons';
 import { generateRandomTable } from '@/utils/utils';
@@ -681,54 +683,111 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     return () => observer.disconnect();
   }, []);
 
-  // Landscape mode layout - 2-column: winner/grid left, player cards right
+  // Landscape mode layout - 2-column: winner/actions left, player cards right
   if (isLandscape) {
     return (
-      <div className="flex h-screen w-full overflow-hidden bg-slate-900 text-white p-2 gap-2">
-        {/* Left column: Winner Banner */}
-        <div className="w-1/2 flex flex-col items-center justify-start gap-2 overflow-y-auto">
-          {/* Exit button - compact */}
-          <div className="w-full flex justify-end">
-            <ExitRoomButton onClick={handleExitRoom} label="" className="w-11 h-11 min-w-[44px] min-h-[44px] p-0" />
-          </div>
-
-          {/* Winner Banner - compact */}
+      <div className="flex h-dvh w-full overflow-hidden bg-neo-cream text-neo-black p-3 gap-3">
+        {/* Left column: Winner Banner + Action Buttons (Hero Area) */}
+        <div className="w-[55%] flex flex-col items-center justify-center gap-4 p-4 border-2 border-neo-black rounded-neo bg-white/50 shadow-hard-sm">
+          {/* Winner Banner - prominent */}
           {winner && (
-            <div className="w-full max-w-xs">
+            <div className="w-full max-w-sm">
               <ResultsWinnerBanner winner={winner} isCurrentUserWinner={winner.username === username} />
             </div>
           )}
 
-          {/* Players Ready Indicator - Compact for landscape */}
-          {gameCode && sortedScores.length > 1 && (
-            <div className="w-full max-w-xs mt-4">
-              <PlayersReadyIndicator
-                players={sortedScores
-                  .filter(p => !isHost || p.username !== username)
-                  .map(p => ({
-                    username: p.username,
-                    avatar: p.avatar,
-                    isBot: p.isBot
-                  }))}
-                readyUsernames={readyUsernames}
-                currentUsername={username}
-                isHost={isHost}
-              />
+          {/* Action Buttons - prominent placement */}
+          {gameCode && onReturnToRoom && (
+            <div className="flex flex-col gap-2 w-full max-w-xs mt-2">
+              {isHost ? (
+                /* HOST: Start Game button */
+                <>
+                  <button
+                    onClick={handleStartGame}
+                    className="w-full bg-neo-green text-neo-black font-black text-base py-3 px-4 uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2"
+                  >
+                    <Play className="w-5 h-5" />
+                    {t('hostView.startGame') || 'Start Game'}
+                  </button>
+                  <button
+                    onClick={handleExitRoom}
+                    className="w-full bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
+                  >
+                    <DoorOpen className="w-4 h-4" />
+                    {t('results.leaveRoom')}
+                  </button>
+                </>
+              ) : isCurrentPlayerReady ? (
+                /* PLAYER: Ready state */
+                <>
+                  <button
+                    onClick={onReturnToRoom}
+                    disabled
+                    className="w-full bg-neo-green/80 text-neo-black font-bold text-base py-3 px-4 uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2 cursor-default"
+                  >
+                    <Check className="w-5 h-5" />
+                    {t('results.ready')}
+                  </button>
+                  <button
+                    onClick={handleExitRoom}
+                    className="w-full bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
+                  >
+                    <DoorOpen className="w-4 h-4" />
+                    {t('results.leaveRoom')}
+                  </button>
+                </>
+              ) : (
+                /* PLAYER: Not ready state */
+                <>
+                  <button
+                    onClick={handleMarkReady}
+                    className="w-full bg-neo-yellow text-neo-black font-black text-base py-3 px-4 uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2 animate-pulse"
+                  >
+                    <Star className="w-5 h-5" />
+                    {t('results.imReady')}
+                  </button>
+                  <button
+                    onClick={handleExitRoom}
+                    className="w-full bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
+                  >
+                    <DoorOpen className="w-4 h-4" />
+                    {t('results.leaveRoom')}
+                  </button>
+                </>
+              )}
             </div>
           )}
 
+          {/* Single player exit button */}
+          {!gameCode && (
+            <button
+              onClick={handleExitRoom}
+              className="w-full max-w-xs bg-neo-blue text-white font-bold text-sm py-3 px-4 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
+            >
+              <DoorOpen className="w-4 h-4" />
+              {t('results.playAgain') || 'Play Again'}
+            </button>
+          )}
         </div>
 
-        {/* Right column: Player cards + Actions */}
-        <div className="w-1/2 flex flex-col gap-2 overflow-y-auto">
-          {/* Final Scores Title - compact */}
-          <div className="flex items-center justify-center gap-2">
-            <Trophy className="w-5 h-5 text-yellow-500" />
-            <h2 className="text-lg font-black text-yellow-400">{t('results.finalScores')}</h2>
+        {/* Right column: Player Cards + Chat */}
+        <div className="w-[45%] flex flex-col gap-2 p-3 border-2 border-neo-black rounded-neo bg-white/50 shadow-hard-sm">
+          {/* Header: Final Scores + Ready indicator */}
+          <div className="flex items-center justify-between gap-2 pb-2 border-b-2 border-neo-black/20">
+            <div className="flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-amber-600" />
+              <h2 className="text-base font-black text-neo-black uppercase tracking-wide">{t('results.finalScores')}</h2>
+            </div>
+            {/* Compact ready indicator */}
+            {gameCode && sortedScores.length > 1 && (
+              <span className="text-xs font-bold text-neo-black/70 bg-neo-yellow/30 px-2 py-1 rounded-full">
+                {readyUsernames.length}/{sortedScores.length} {t('results.ready')}
+              </span>
+            )}
           </div>
 
-          {/* Player Cards - compact */}
-          <div className="space-y-2 flex-1 overflow-y-auto">
+          {/* Player Cards - scrollable */}
+          <div className="space-y-2 flex-1 overflow-y-auto min-h-0 pr-1">
             {sortedScores.map((player, index) => (
               <ResultsPlayerCard
                 key={player.username}
@@ -745,75 +804,14 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             ))}
           </div>
 
-          {/* Action Buttons */}
-          {gameCode && onReturnToRoom && (
-            <div className="flex gap-2 mt-2">
-              {isHost ? (
-                /* HOST: Start Game button */
-                <>
-                  <button
-                    onClick={handleStartGame}
-                    className="flex-1 bg-emerald-500 text-white font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
-                  >
-                    <Play className="w-3 h-3" />
-                    {t('hostView.startGame') || 'Start Game'}
-                  </button>
-                  <button
-                    onClick={handleExitRoom}
-                    className="flex-1 bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
-                  >
-                    <DoorOpen className="w-3 h-3" />
-                    {t('results.leaveRoom')}
-                  </button>
-                </>
-              ) : isCurrentPlayerReady ? (
-                /* PLAYER: Ready state */
-                <>
-                  <button
-                    onClick={onReturnToRoom}
-                    className="flex-1 bg-emerald-500 text-white font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
-                  >
-                    <Check className="w-3 h-3" />
-                    {t('results.ready')}
-                  </button>
-                  <button
-                    onClick={handleExitRoom}
-                    className="flex-1 bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
-                  >
-                    <DoorOpen className="w-3 h-3" />
-                    {t('results.leaveRoom')}
-                  </button>
-                </>
-              ) : (
-                /* PLAYER: Not ready state */
-                <>
-                  <button
-                    onClick={handleMarkReady}
-                    className="flex-1 bg-neo-yellow text-neo-black font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
-                  >
-                    <Star className="w-3 h-3" />
-                    {t('results.imReady')}
-                  </button>
-                  <button
-                    onClick={handleExitRoom}
-                    className="flex-1 bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
-                  >
-                    <DoorOpen className="w-3 h-3" />
-                    {t('results.leaveRoom')}
-                  </button>
-                </>
-              )}
-            </div>
-          )}
-
-          {/* Room Chat - At the bottom of right column */}
+          {/* Room Chat - bottom of right column */}
           {gameCode && sortedScores.length > 1 && (
-            <div className="mt-2">
+            <div className="pt-2 border-t-2 border-neo-black/20">
               <RoomChat
                 username={username}
                 isHost={isHost}
                 gameCode={gameCode}
-                className="max-h-[150px]"
+                className="max-h-[120px]"
               />
             </div>
           )}
@@ -968,6 +966,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           </span>
         </div>
       )}
+
+      {/* CrazyGames Banner Ad - Mobile Results */}
+      <div className="flex justify-center py-2">
+        <CrazyGamesBanner size="320x50" />
+      </div>
     </div>
   );
 
@@ -1340,6 +1343,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             {gameCode && sortedScores.length > 1 && (
               <RoomChat username={username} isHost={isHost} gameCode={gameCode} className="max-h-[250px]" />
             )}
+
+            {/* CrazyGames Banner Ad - Results Screen */}
+            <div className="flex justify-center py-2">
+              <CrazyGamesBanner size="300x250" />
+            </div>
           </div>
         </div>
       </div>
@@ -1356,18 +1364,22 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         variant="default"
       />
 
-      {/* Sign Up Prompt for Guests (non-winners) */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        showGuestStats={true}
-      />
+      {/* Sign Up Prompt for Guests (non-winners) - Hidden on CrazyGames */}
+      {!shouldHideExternalLogin() && (
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          showGuestStats={true}
+        />
+      )}
 
-      {/* Celebratory First Win Signup Prompt */}
-      <FirstWinSignupModal
-        isOpen={showFirstWinModal}
-        onClose={() => setShowFirstWinModal(false)}
-      />
+      {/* Celebratory First Win Signup Prompt - Hidden on CrazyGames */}
+      {!shouldHideExternalLogin() && (
+        <FirstWinSignupModal
+          isOpen={showFirstWinModal}
+          onClose={() => setShowFirstWinModal(false)}
+        />
+      )}
 
       {/* Word Feedback Modal - Self-healing dictionary validation */}
       <WordFeedbackModal

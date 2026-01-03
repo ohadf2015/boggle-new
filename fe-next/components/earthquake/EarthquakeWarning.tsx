@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { shouldShowGuidance, markGuidanceShown } from '@/utils/contextualGuidanceStorage';
+import { EffectsPreferencePrompt } from './EffectsPreferencePrompt';
 
 interface EarthquakeWarningProps {
   isVisible: boolean;
@@ -13,6 +15,9 @@ interface EarthquakeWarningProps {
  *
  * Shows a bold Neo-Brutalist warning card 2 seconds before earthquake hits.
  * Includes pulsing animation, screen reader announcement, and dramatic styling.
+ *
+ * On the user's FIRST earthquake, also shows an effects preference prompt
+ * allowing them to disable animations before experiencing them.
  */
 export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible }) => {
   const { t } = useLanguage();
@@ -21,6 +26,30 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
   const [distances] = useState(() =>
     Array.from({ length: 8 }, () => 100 + Math.random() * 50)
   );
+
+  // Track if we should show the effects preference prompt (first earthquake only)
+  const [showPreferencePrompt, setShowPreferencePrompt] = useState(false);
+  const hasCheckedRef = useRef(false);
+
+  // Check if this is the user's first earthquake when warning appears
+  useEffect(() => {
+    if (isVisible && !hasCheckedRef.current) {
+      hasCheckedRef.current = true;
+      if (shouldShowGuidance('effectsPreferenceShown')) {
+        setShowPreferencePrompt(true);
+      }
+    }
+    // Reset when warning is hidden (for next earthquake in different game)
+    if (!isVisible) {
+      hasCheckedRef.current = false;
+    }
+  }, [isVisible]);
+
+  // Handle dismissing the preference prompt
+  const handlePreferenceDismiss = useCallback(() => {
+    markGuidanceShown('effectsPreferenceShown');
+    setShowPreferencePrompt(false);
+  }, []);
 
   // Announce for screen readers when warning appears
   useEffect(() => {
@@ -45,15 +74,15 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+          className={`fixed inset-0 z-50 flex items-center justify-center ${showPreferencePrompt ? 'pointer-events-auto' : 'pointer-events-none'}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
-          {/* Semi-transparent backdrop - pointer-events-none to allow word selection */}
+          {/* Semi-transparent backdrop */}
           <motion.div
-            className="absolute inset-0 bg-neo-black/40 text-white backdrop-blur-sm pointer-events-none"
+            className={`absolute inset-0 bg-neo-black/40 text-white backdrop-blur-sm ${showPreferencePrompt ? '' : 'pointer-events-none'}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -166,6 +195,13 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
               />
             );
           })}
+
+          {/* First-time effects preference prompt */}
+          <AnimatePresence>
+            {showPreferencePrompt && (
+              <EffectsPreferencePrompt onDismiss={handlePreferenceDismiss} />
+            )}
+          </AnimatePresence>
         </motion.div>
       )}
     </AnimatePresence>

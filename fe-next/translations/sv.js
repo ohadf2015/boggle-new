@@ -262,6 +262,16 @@ const sv = {
     "fireRound": "🔥 ELDRUNDA",
     "multiplier": "2× ALLT"
   },
+  "effects": {
+    "preferenceTitle": "Animationsinställningar",
+    "preferenceSubtitle": "Första gången du ser detta?",
+    "preferenceDescription": "Detta spel har skärmskakningar och blinkande ljuseffekter. Du kan stänga av dem nu om du föredrar.",
+    "earthquakeShake": "Skärmskakning",
+    "fireRoundLights": "Blinkande ljus",
+    "keepAnimations": "Behåll effekter",
+    "disableAnimations": "Inaktivera effekter",
+    "settingsHint": "Du kan ändra detta när som helst i Inställningar"
+  },
   "spam": {
     "warning": "Lugnt! För många missar",
     "penalty": "-${points} poäng",
@@ -1419,6 +1429,7 @@ const sv = {
       "demoWord": "SOL",
       "demoHint": "Koppla ihop angränsande bokstäver",
       "demoSuccess": "Perfekt!",
+      "demoComplete": "Du förstår! Nu vet du hur man spelar.",
       "clickNext": "Nästa →"
     },
     "combo": {
@@ -1960,6 +1971,7 @@ const sv = {
     "signIn": "Logga in",
     "signOut": "Logga ut",
     "signUp": "Registrera",
+    "loginCrazyGames": "Logga in",
     "userMenu": "Användarmeny",
     "signInWith": "Fortsätt med ${provider}",
     "alreadyHaveAccount": "Har du redan ett konto? Logga in",
@@ -2904,6 +2916,8 @@ const sv = {
     "playAgainTomorrow": "Kom tillbaka imorgon för ett nytt pussel!",
     "tryAnotherLanguage": "Prova ett annat språk",
     "playDifferentLanguage": "Utmana dig själv på ett annat språk!",
+    "quitConfirmTitle": "Lämna jakten?",
+    "quitConfirmMessage": "Du förlorar dina framsteg!",
     "feedback": {
       "tooShort": "📏 Minst 3 bokstäver",
       "duplicate": "🔁 Redan hittat!",

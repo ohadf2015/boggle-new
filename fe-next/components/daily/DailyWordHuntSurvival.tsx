@@ -935,15 +935,276 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     return 'bg-red-500';
   };
 
+  // ==================== Landscape Layout ====================
+  // In landscape mobile mode, use a 3-column layout with grid centered
+  if (isLandscape) {
+    return (
+      <div className="relative flex items-center justify-center w-full h-screen overflow-hidden bg-slate-900 text-white">
+        {/* Toast feedback */}
+        <WordFeedbackToast
+          type={feedbackType}
+          message={feedbackMessage}
+          onClose={closeToast}
+        />
+
+        {/* Swipe tip guidance for new players */}
+        <SwipeTipTooltip
+          isVisible={contextualGuidance.showSwipeTip}
+          onDismiss={contextualGuidance.dismissSwipeTip}
+          t={t}
+        />
+
+        {/* Left Side Panel - Life & Tries */}
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20 landscape-side-panel">
+          <div className="landscape-panel flex flex-col items-center gap-4">
+            {/* Life Heart Icon */}
+            <motion.div
+              className={cn(
+                "flex items-center justify-center w-14 h-14 rounded-full border-3 border-neo-black shadow-hard",
+                lifePoints > 66 ? "bg-green-500" : lifePoints > 33 ? "bg-yellow-500" : "bg-red-500",
+                isLifeGaining && "heart-beating"
+              )}
+              animate={
+                lifePoints <= 20 && !isGameOver && !isLifeGaining
+                  ? { scale: [1, 1.15, 1] }
+                  : {}
+              }
+              transition={{ duration: 0.6, repeat: lifePoints <= 20 && !isLifeGaining ? Infinity : 0 }}
+            >
+              <Heart className="w-7 h-7 text-white fill-white" />
+            </motion.div>
+
+            {/* Life Points */}
+            <div className="flex flex-col items-center">
+              <div className={cn(
+                "landscape-stat-secondary",
+                lifePoints > 66 ? "text-green-600" : lifePoints > 33 ? "text-yellow-600" : "text-red-600"
+              )}>
+                {Math.floor(lifePoints)}%
+              </div>
+              <div className="landscape-stat-label text-neo-black">LIFE</div>
+            </div>
+
+            {/* Tries Remaining */}
+            <div className="flex flex-col items-center">
+              <div className={cn(
+                "landscape-stat-secondary text-neo-black",
+                MAX_ATTEMPTS - attempts.length <= 2 && "text-red-600"
+              )}>
+                {MAX_ATTEMPTS - attempts.length}
+              </div>
+              <div className="landscape-stat-label text-neo-black">
+                {t('wordHunt.survival.triesLeft') || 'TRIES'}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side Panel - Tokens & Shop */}
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 z-20 landscape-side-panel">
+          <div className="landscape-panel flex flex-col items-center gap-4">
+            {/* Clue Tokens */}
+            <div className="flex flex-col items-center">
+              <div className="flex items-center gap-1">
+                <Coins className={cn("w-6 h-6", isClueGaining && "animate-bounce text-yellow-500")} style={{ color: '#ca8a04' }} />
+                <span className="landscape-stat-secondary text-neo-black">{clueTokens}</span>
+              </div>
+              <div className="landscape-stat-label text-neo-black">TOKENS</div>
+            </div>
+
+            {/* Shop Button */}
+            <Button
+              size="sm"
+              onClick={() => {
+                setShowShop(!showShop);
+                setShowShopHint(false);
+              }}
+              className={cn(
+                "w-14 h-14 p-0 bg-neo-purple text-white border-3 border-neo-black rounded-neo shadow-hard hover:bg-neo-purple/80",
+                showShopHint && "animate-pulse ring-2 ring-neo-yellow ring-offset-1"
+              )}
+            >
+              <Store className="w-6 h-6" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Bottom-left: Quit button */}
+        <div className="absolute bottom-2 left-2 z-30">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowQuitConfirm(true)}
+            className="w-12 h-12 p-0 bg-neo-red hover:brightness-110 border-2 border-neo-black rounded-neo flex items-center justify-center shadow-hard-sm"
+          >
+            <X className="text-lg text-neo-cream" />
+          </Button>
+        </div>
+
+        {/* Center: Target Word + Grid - with horizontal padding for side panels */}
+        <div className="flex flex-col items-center justify-center w-full h-full px-[150px] py-2 gap-2 landscape-grid-container">
+          {/* Target word hint boxes - compact for landscape */}
+          {currentHint && (
+            <div
+              dir={gameDir}
+              className={cn(
+                "flex justify-center flex-wrap gap-1.5 mb-2 p-2 rounded-neo bg-neo-navy/30 border-2 border-neo-black/20",
+                isProtected && "blur-xl select-none"
+              )}
+            >
+              {(() => {
+                const hintChars = currentHint.hint.split(' ').filter(c => c !== '');
+                const wordLength = hintChars.length;
+                const sizeClass = wordLength <= 4
+                  ? "w-9 h-9 text-base"
+                  : wordLength <= 6
+                    ? "w-8 h-8 text-sm"
+                    : "w-7 h-7 text-xs";
+
+                return hintChars.map((char, idx) => {
+                  const accumulatedClue = accumulatedClues.get(idx);
+                  const isHintRevealed = char !== '_';
+                  const isShopRevealed = revealedLetters.has(idx);
+
+                  let displayChar: string;
+                  let bgClass: string;
+
+                  if (accumulatedClue) {
+                    displayChar = accumulatedClue.letter;
+                    bgClass = accumulatedClue.type === 'green'
+                      ? "bg-green-500 border-green-700 text-white"
+                      : "bg-yellow-500 border-yellow-600 text-neo-black";
+                  } else if (isShopRevealed) {
+                    displayChar = targetWord[idx]?.toUpperCase() || '?';
+                    bgClass = "bg-green-500 border-green-700 text-white";
+                  } else if (isHintRevealed) {
+                    displayChar = char.toUpperCase();
+                    bgClass = "bg-neo-purple border-neo-purple text-white";
+                  } else {
+                    displayChar = '';
+                    bgClass = "bg-neo-black border-neo-black";
+                  }
+
+                  return (
+                    <div
+                      key={idx}
+                      className={cn(
+                        "flex items-center justify-center border-2 rounded-neo font-bold shadow-hard-sm",
+                        sizeClass,
+                        bgClass
+                      )}
+                    >
+                      {displayChar}
+                    </div>
+                  );
+                });
+              })()}
+            </div>
+          )}
+
+          {/* Grid - centered */}
+          <div className="flex-1 flex items-center justify-center game-board-frame-landscape" style={{ aspectRatio: '1/1' }}>
+            <div className={cn(
+              "transition-all duration-200",
+              isProtected && "blur-xl pointer-events-none select-none"
+            )}>
+              <GridComponent
+                grid={grid}
+                interactive={!isGameOver && !isProtected}
+                onWordSubmit={handleWordSubmit}
+                onWordChange={handleWordChange}
+                hideWordPreview
+                hideComboIndicator
+                comboLevel={0}
+                eliminatedLetters={eliminatedLetters}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Clue Shop Modal */}
+        <AnimatePresence>
+          {showShop && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+              onClick={() => setShowShop(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.9 }}
+                className="bg-white dark:bg-neo-navy rounded-neo border-4 border-neo-black p-4 max-w-sm w-full"
+                onClick={e => e.stopPropagation()}
+              >
+                <h3 className="text-lg font-black mb-3">{t('wordHunt.survival.shop') || 'Clue Shop'}</h3>
+                <div className="space-y-2">
+                  {CLUE_SHOP_ITEMS.map((item) => {
+                    const itemNames: Record<string, string> = {
+                      'reveal_letter': t('wordHunt.survival.revealLetter') || 'Reveal Letter',
+                      'eliminate_letters': t('wordHunt.survival.eliminateLetters') || 'Eliminate Wrong Letters',
+                      'example_sentence': t('wordHunt.survival.exampleSentence') || 'Example Sentence',
+                      'reveal_category': t('wordHunt.survival.revealCategory') || 'Reveal Category',
+                    };
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => handlePurchase(item)}
+                        disabled={clueTokens < item.cost}
+                        className={cn(
+                          "w-full flex items-center justify-between p-2 rounded-neo border-2 transition-all text-left",
+                          clueTokens >= item.cost
+                            ? "bg-neo-yellow hover:shadow-hard border-neo-black"
+                            : "border-gray-300 bg-gray-100 opacity-50 cursor-not-allowed"
+                        )}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">{item.icon}</span>
+                          <span className="font-bold text-sm">{itemNames[item.id] || item.name}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-sm font-bold">
+                          <Coins className="w-4 h-4 text-yellow-600" />
+                          {item.cost}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+                <Button
+                  onClick={() => setShowShop(false)}
+                  className="w-full mt-3"
+                >
+                  {t('common.close') || 'Close'}
+                </Button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Quit Confirmation Dialog */}
+        <ConfirmationDialog
+          open={showQuitConfirm}
+          onOpenChange={setShowQuitConfirm}
+          onConfirm={onQuit}
+          title={t('wordHunt.quitConfirmTitle') || 'Quit Game?'}
+          description={t('wordHunt.quitConfirmMessage') || 'You will lose your current progress.'}
+          confirmText={t('common.quit') || 'Quit'}
+          cancelText={t('common.cancel') || 'Cancel'}
+          variant="danger"
+        />
+      </div>
+    );
+  }
+
+  // ==================== Portrait Layout ====================
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className={cn(
-        "flex-1 flex flex-col p-2 sm:p-4 overflow-hidden",
-        isLandscape && "flex-row"
-      )}
+      className="flex-1 flex flex-col p-2 sm:p-4 overflow-hidden"
     >
       {/* Top bar */}
       <div className="flex items-center justify-between mb-1 px-2 max-w-3xl mx-auto w-full">

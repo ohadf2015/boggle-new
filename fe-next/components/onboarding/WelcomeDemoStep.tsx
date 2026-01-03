@@ -164,22 +164,6 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
           showHints={true}
         />
       </motion.div>
-
-      {/* Success message */}
-      {demoCompleted && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-neo-lime border-3 border-neo-black rounded-neo p-2.5 sm:p-4 shadow-hard-md text-center max-w-sm"
-        >
-          <div className="text-lg sm:text-xl font-black text-neo-black">
-            {t('onboarding.welcome.demoSuccess')}
-          </div>
-          <div className="text-xs sm:text-sm text-neo-black/70 mt-1">
-            {t('onboarding.welcome.clickNext')}
-          </div>
-        </motion.div>
-      )}
     </div>
   );
 };

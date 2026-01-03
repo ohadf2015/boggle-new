@@ -262,6 +262,16 @@ const es = {
     "fireRound": "🔥 RONDA DE FUEGO",
     "multiplier": "2× TODO"
   },
+  "effects": {
+    "preferenceTitle": "Ajustes de animación",
+    "preferenceSubtitle": "¿Primera vez viendo esto?",
+    "preferenceDescription": "Este juego tiene efectos de vibración y luces parpadeantes. Puedes desactivarlos ahora si prefieres.",
+    "earthquakeShake": "Vibración de pantalla",
+    "fireRoundLights": "Luces parpadeantes",
+    "keepAnimations": "Mantener efectos",
+    "disableAnimations": "Desactivar efectos",
+    "settingsHint": "Puedes cambiar esto en cualquier momento en Ajustes"
+  },
   "spam": {
     "warning": "¡Tranquilo! Muchos fallos",
     "penalty": "-${points} pts",
@@ -1713,6 +1723,7 @@ const es = {
     "signIn": "Iniciar Sesión",
     "signOut": "Cerrar Sesión",
     "signUp": "Registrarse",
+    "loginCrazyGames": "Iniciar Sesión",
     "userMenu": "Menú de usuario",
     "signInWith": "Continuar con ${provider}",
     "alreadyHaveAccount": "¿Ya tienes una cuenta? Inicia sesión",
@@ -2202,6 +2213,7 @@ const es = {
       "demoWord": "SOL",
       "demoHint": "Conecta letras adyacentes",
       "demoSuccess": "¡Genial!",
+      "demoComplete": "¡Lo tienes! Ahora sabes cómo jugar.",
       "clickNext": "Siguiente →"
     },
     "combo": {
@@ -2901,6 +2913,8 @@ const es = {
     "playAgainTomorrow": "¡Vuelve mañana para un nuevo puzzle!",
     "tryAnotherLanguage": "Prueba Otro Idioma",
     "playDifferentLanguage": "¡Desafíate en un idioma diferente!",
+    "quitConfirmTitle": "¿Abandonar la cacería?",
+    "quitConfirmMessage": "¡Perderás tu progreso!",
     "feedback": {
       "tooShort": "📏 Mínimo 3 letras",
       "duplicate": "🔁 ¡Ya encontrada!",

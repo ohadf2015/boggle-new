@@ -7,6 +7,7 @@ import JoinRoomSetup from './JoinRoomSetup';
 import InvitationQuickJoin from './InvitationQuickJoin';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 import { getStoredUsername, getStoredAvatarId } from '@/utils/profileStorage';
+import { useCrazyGamesInvite } from '@/hooks/useCrazyGamesInvite';
 
 type FlowState = 'selector' | 'create-setup' | 'join-setup' | 'invitation-quick-join';
 
@@ -63,8 +64,53 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   const [savedUsername, setSavedUsername] = useState<string | null>(null);
   const [savedAvatarId, setSavedAvatarId] = useState<string | null>(null);
 
+  // CrazyGames invite integration
+  const { isReady: isCrazyGamesReady, inviteRoomId, isInstantMultiplayer } = useCrazyGamesInvite({
+    // When player joins via CrazyGames invite link with roomId
+    onInviteJoin: (roomId) => {
+      // Set the game code and trigger join flow
+      setGameCode(roomId);
+    },
+    // When player starts via "Play with Friends" (instant multiplayer)
+    onInstantMultiplayer: () => {
+      // Go directly to create room setup with dialog for name/avatar
+      setFlowState('create-setup');
+    },
+  });
+
+  // Handle CrazyGames invite room ID (similar to prefilledRoom)
+  useEffect(() => {
+    if (!isCrazyGamesReady || !inviteRoomId) return;
+
+    // Check for saved profile in localStorage
+    const storedUsername = getStoredUsername();
+    const storedAvatarId = getStoredAvatarId();
+
+    // Set the game code for the invite room
+    setGameCode(inviteRoomId);
+
+    if (storedUsername && storedAvatarId) {
+      // User has saved profile - show quick join confirmation
+      setSavedUsername(storedUsername);
+      setSavedAvatarId(storedAvatarId);
+      setUsername(storedUsername);
+      setFlowState('invitation-quick-join');
+    } else if (isAuthenticated && displayName && profileAvatarId) {
+      // Authenticated user with profile - show quick join
+      setSavedUsername(displayName);
+      setSavedAvatarId(profileAvatarId);
+      setUsername(displayName);
+      setFlowState('invitation-quick-join');
+    } else {
+      // No saved profile - go to join setup
+      setFlowState('join-setup');
+    }
+  }, [isCrazyGamesReady, inviteRoomId, isAuthenticated, displayName, profileAvatarId, setGameCode, setUsername]);
+
   // Handle invitation link: when prefilledRoom is provided, skip selector
   useEffect(() => {
+    // Skip if CrazyGames invite already handled
+    if (inviteRoomId) return;
     if (!prefilledRoom) return;
 
     // Check for saved profile in localStorage
@@ -126,10 +172,11 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
 
   // Handle invitation quick join
   const handleInvitationJoin = useCallback(() => {
-    if (prefilledRoom && savedUsername) {
-      handleJoin(false, null, prefilledRoom);
+    const roomCode = inviteRoomId || prefilledRoom;
+    if (roomCode && savedUsername) {
+      handleJoin(false, null, roomCode);
     }
-  }, [prefilledRoom, savedUsername, handleJoin]);
+  }, [inviteRoomId, prefilledRoom, savedUsername, handleJoin]);
 
   // Handle change profile from invitation quick join
   const handleChangeProfileFromInvitation = useCallback(() => {
@@ -210,7 +257,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     case 'invitation-quick-join':
       return (
         <InvitationQuickJoin
-          gameCode={prefilledRoom || ''}
+          gameCode={inviteRoomId || prefilledRoom || ''}
           username={savedUsername || ''}
           avatarId={savedAvatarId || ''}
           profilePictureUrl={profilePictureUrl}

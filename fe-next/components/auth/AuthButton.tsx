@@ -13,6 +13,8 @@ import Avatar from '../Avatar';
 import LevelBadge from '../LevelBadge';
 import { cn } from '../../lib/utils';
 import { useRouter } from 'next/navigation';
+import { shouldHideExternalLogin } from '../CrazyGamesSDK';
+import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 import type { Language as LanguageType } from '@/shared/types';
 
 interface LanguageItem {
@@ -42,6 +44,16 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
   const router = useRouter();
   const isDarkMode = theme === 'dark';
   const isRTL = dir === 'rtl';
+
+  // CrazyGames authentication
+  const {
+    isCrazyGames,
+    user: crazyGamesUser,
+    isLoggedIn: isCrazyGamesLoggedIn,
+    isLoggingIn: isCrazyGamesLoggingIn,
+    login: loginWithCrazyGames,
+    isAccountAvailable: isCrazyGamesAccountAvailable,
+  } = useCrazyGamesAuth();
 
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signin');
@@ -403,36 +415,82 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
   }
 
   // Guest user - show Sign In and Sign Up buttons
+  // Hide login options on CrazyGames platform
+  const hideLogin = shouldHideExternalLogin();
+
   // Inline variant for mobile menu
   if (inline) {
     return (
       <>
         <div className="flex flex-col gap-2 w-full">
-          {/* Sign In Button */}
-          <button
-            onClick={openSignIn}
-            className={cn(
-              "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
-              "bg-neo-cyan shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard"
-            )}
-          >
-            <User size={14} className="text-neo-black" />
-            <span className="text-neo-black">{t('auth.signIn') || 'Sign In'}</span>
-          </button>
+          {/* CrazyGames: Show logged in user or login button */}
+          {hideLogin ? (
+            <>
+              {/* CrazyGames user logged in */}
+              {isCrazyGamesLoggedIn && crazyGamesUser ? (
+                <div className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black w-full",
+                  "bg-neo-cyan shadow-hard-sm"
+                )}>
+                  {crazyGamesUser.profilePictureUrl ? (
+                    <img
+                      src={crazyGamesUser.profilePictureUrl}
+                      alt={crazyGamesUser.username}
+                      className="w-6 h-6 rounded-full object-cover"
+                    />
+                  ) : (
+                    <User size={14} className="text-neo-black" />
+                  )}
+                  <span className="text-neo-black truncate flex-1">{crazyGamesUser.username}</span>
+                </div>
+              ) : isCrazyGamesAccountAvailable ? (
+                /* CrazyGames login button */
+                <button
+                  onClick={loginWithCrazyGames}
+                  disabled={isCrazyGamesLoggingIn}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
+                    "bg-neo-cyan shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
+                    isCrazyGamesLoggingIn && "opacity-70 cursor-wait"
+                  )}
+                >
+                  {isCrazyGamesLoggingIn ? (
+                    <div className="w-4 h-4 border-2 border-neo-black border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <User size={14} className="text-neo-black" />
+                  )}
+                  <span className="text-neo-black">{t('auth.loginCrazyGames') || 'Login with CrazyGames'}</span>
+                </button>
+              ) : null}
+            </>
+          ) : (
+            /* Normal Sign In/Up Buttons */
+            <>
+              <button
+                onClick={openSignIn}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
+                  "bg-neo-cyan shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard"
+                )}
+              >
+                <User size={14} className="text-neo-black" />
+                <span className="text-neo-black">{t('auth.signIn') || 'Sign In'}</span>
+              </button>
 
-          {/* Sign Up Button */}
-          <button
-            onClick={openSignUp}
-            className={cn(
-              "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
-              "bg-neo-purple text-white shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard"
-            )}
-          >
-            <User size={14} />
-            <span>{t('auth.signUp') || 'Sign Up'}</span>
-          </button>
+              <button
+                onClick={openSignUp}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
+                  "bg-neo-purple text-white shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard"
+                )}
+              >
+                <User size={14} />
+                <span>{t('auth.signUp') || 'Sign Up'}</span>
+              </button>
+            </>
+          )}
 
-          {/* Theme Toggle */}
+          {/* Theme Toggle - Always shown */}
           <button
             onClick={toggleTheme}
             className={cn(
@@ -445,17 +503,139 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
           </button>
         </div>
 
-        <AuthModal
-          isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
-          showGuestStats={true}
-          initialMode={authModalMode}
-        />
+        {/* Auth Modal - Hidden on CrazyGames */}
+        {!hideLogin && (
+          <AuthModal
+            isOpen={showAuthModal}
+            onClose={() => setShowAuthModal(false)}
+            showGuestStats={true}
+            initialMode={authModalMode}
+          />
+        )}
       </>
     );
   }
 
   // Default dropdown variant - Sign In and Sign Up buttons
+  // On CrazyGames platform, show CrazyGames login instead
+  if (hideLogin) {
+    // CrazyGames user is logged in - show their info
+    if (isCrazyGamesLoggedIn && crazyGamesUser) {
+      return (
+        <div className="relative flex-shrink-0">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowUserMenu(!showUserMenu)}
+            onBlur={() => setTimeout(() => { setShowUserMenu(false); }, 200)}
+            aria-haspopup="menu"
+            aria-expanded={showUserMenu}
+            aria-label={t('auth.userMenu') || 'User menu'}
+            className={cn(
+              'flex items-center gap-1 sm:gap-2 rounded-full transition-all duration-300 px-2 sm:px-3 min-h-[44px]',
+              isDarkMode
+                ? 'bg-slate-800 text-cyan-300 hover:bg-slate-700 hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] border-slate-700'
+                : 'bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200'
+            )}
+          >
+            {/* CrazyGames Profile Picture */}
+            {crazyGamesUser.profilePictureUrl ? (
+              <img
+                src={crazyGamesUser.profilePictureUrl}
+                alt={crazyGamesUser.username}
+                className="w-6 h-6 rounded-full object-cover"
+              />
+            ) : (
+              <User size={16} />
+            )}
+            <span className="hidden sm:inline max-w-[80px] truncate font-medium">
+              {crazyGamesUser.username}
+            </span>
+            <ChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} aria-hidden="true" />
+          </Button>
+
+          {/* CrazyGames User Dropdown - just theme toggle */}
+          <AnimatePresence>
+            {showUserMenu && (
+              <motion.div
+                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                onMouseDown={(e) => e.preventDefault()}
+                role="menu"
+                aria-label={t('auth.userMenu') || 'User menu'}
+                className={cn(
+                  'absolute top-full mt-2 min-w-[180px] rounded-lg shadow-xl z-[100]',
+                  isRTL ? 'left-0' : 'right-0',
+                  isDarkMode
+                    ? 'bg-slate-800 border border-slate-700'
+                    : 'bg-white border border-gray-200'
+                )}
+              >
+                {/* Theme Toggle */}
+                <Button
+                  role="menuitem"
+                  variant="ghost"
+                  onClick={toggleTheme}
+                  className={cn(
+                    'w-full justify-start gap-3 rounded-lg',
+                    isDarkMode
+                      ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
+                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
+                  )}
+                >
+                  {isDarkMode ? <Sun size={14} className="text-yellow-400" aria-hidden="true" /> : <Moon size={14} className="text-slate-600" aria-hidden="true" />}
+                  <span>{isDarkMode ? (t('common.lightMode') || 'Light Mode') : (t('common.darkMode') || 'Dark Mode')}</span>
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      );
+    }
+
+    // CrazyGames platform, not logged in - show CrazyGames login button
+    if (isCrazyGamesAccountAvailable) {
+      return (
+        <Button
+          size="sm"
+          onClick={loginWithCrazyGames}
+          disabled={isCrazyGamesLoggingIn}
+          className={cn(
+            'flex items-center gap-2 rounded-full font-bold transition-all duration-300 min-h-[44px]',
+            isDarkMode
+              ? 'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)] border-2 border-neo-black'
+              : 'bg-neo-cyan text-neo-black hover:bg-cyan-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.4)] border-2 border-neo-black'
+          )}
+        >
+          {isCrazyGamesLoggingIn ? (
+            <div className="w-4 h-4 border-2 border-neo-black border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <User size={14} />
+          )}
+          <span className="hidden sm:inline">{t('auth.loginCrazyGames') || 'Login'}</span>
+        </Button>
+      );
+    }
+
+    // CrazyGames platform, accounts not available - just show theme toggle
+    return (
+      <Button
+        size="sm"
+        onClick={toggleTheme}
+        className={cn(
+          'flex items-center gap-2 rounded-full font-bold transition-all duration-300 min-h-[44px]',
+          isDarkMode
+            ? 'bg-slate-800 text-gray-300 hover:bg-slate-700 border-2 border-slate-700'
+            : 'bg-white text-gray-600 hover:bg-gray-50 border-2 border-gray-200'
+        )}
+      >
+        {isDarkMode ? <Sun size={14} className="text-yellow-400" /> : <Moon size={14} className="text-slate-600" />}
+      </Button>
+    );
+  }
+
   return (
     <>
       <div className="flex items-center gap-2">

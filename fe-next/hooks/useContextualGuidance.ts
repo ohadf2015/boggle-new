@@ -50,6 +50,7 @@ export function useContextualGuidance(): UseContextualGuidanceReturn {
     fireRoundShown: false,
     directionPatternShown: false,
     swipeTipShown: false,
+    effectsPreferenceShown: false,
   });
 
   // Trigger combo guidance - called when combo reaches 2 or higher

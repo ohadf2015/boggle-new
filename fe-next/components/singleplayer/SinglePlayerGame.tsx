@@ -1153,44 +1153,55 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           isGameOver={isGameOver}
         />
 
-        {/* Left side: Timer + Score + Reveal */}
-        <div className="absolute left-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
-          {settings.mode !== 'practice' && (
-            <CircularTimer
-              remainingTime={timer.remainingTime}
-              totalTime={settings.timerSeconds}
-              size="md"
-            />
-          )}
-          <div className="bg-neo-yellow border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center">
-            <AdaptiveMotion.div
-              key={score}
-              initial={{ scale: 1.2 }}
-              animate={{ scale: 1 }}
-              className="text-sm font-black text-neo-black"
-            >
-              {score}
-            </AdaptiveMotion.div>
-            <div className="text-xs font-bold uppercase text-neo-black/70">
-              {t('common.score') || 'Score'}
+        {/* Left Side Panel - Timer & Score */}
+        <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20 landscape-side-panel">
+          <div className="landscape-panel flex flex-col items-center gap-4">
+            {/* Timer - Large and prominent */}
+            {settings.mode !== 'practice' && (
+              <CircularTimer
+                remainingTime={timer.remainingTime}
+                totalTime={settings.timerSeconds}
+                size="lg"
+              />
+            )}
+
+            {/* Score - Primary stat */}
+            <div className="flex flex-col items-center">
+              <AdaptiveMotion.div
+                key={score}
+                initial={{ scale: 1.2 }}
+                animate={{ scale: 1 }}
+                className="landscape-stat-primary text-neo-black"
+              >
+                {score}
+              </AdaptiveMotion.div>
+              <div className="landscape-stat-label text-neo-black">
+                {t('common.score') || 'SCORE'}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Right side: Words count + Combo */}
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 z-20">
-          <div className="bg-neo-cream border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center">
-            <div className="text-sm font-black text-neo-black">{validWordCount}</div>
-            <div className="text-xs font-bold uppercase text-neo-black/70">
-              {t('common.words') || 'Words'}
+        {/* Right Side Panel - Words & Combo */}
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 z-20 landscape-side-panel">
+          <div className="landscape-panel flex flex-col items-center gap-4">
+            {/* Words Found Count */}
+            <div className="flex flex-col items-center">
+              <div className="landscape-stat-secondary text-neo-black">
+                {validWordCount}
+              </div>
+              <div className="landscape-stat-label text-neo-black">
+                {t('common.words') || 'WORDS'}
+              </div>
             </div>
+
+            {/* Combo Display - Full variant for visibility */}
+            <ComboDisplay
+              comboLevel={combo.comboLevel}
+              coinReward={comboCoinReward}
+              onCoinAnimationComplete={() => setComboCoinReward(null)}
+            />
           </div>
-          <ComboDisplay
-            comboLevel={combo.comboLevel}
-            compact
-            coinReward={comboCoinReward}
-            onCoinAnimationComplete={() => setComboCoinReward(null)}
-          />
         </div>
 
         {/* Bottom-left: Pause/Finish button (primary action - easy thumb reach) */}
@@ -1232,8 +1243,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           </Button>
         </div>
 
-        {/* Center: Word Forming Area + Grid - maximized for landscape */}
-        <div className="flex flex-col items-center justify-center w-full h-full px-3 py-0.5 landscape-grid-container">
+        {/* Center: Word Forming Area + Grid - with horizontal padding for side panels */}
+        <div className="flex flex-col items-center justify-center w-full h-full px-[150px] py-2 gap-2 landscape-grid-container">
           {/* Word Forming Area - Permanent space above grid (keep timer section clear) */}
           <div className="flex items-center mb-0.5">
             <WordFormingArea

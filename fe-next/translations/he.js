@@ -262,6 +262,16 @@ const he = {
     "fireRound": "🔥 סיבוב אש",
     "multiplier": "×2 על הכל"
   },
+  "effects": {
+    "preferenceTitle": "הגדרות אנימציה",
+    "preferenceSubtitle": "פעם ראשונה שאתה רואה את זה?",
+    "preferenceDescription": "המשחק כולל רעידות מסך ואורות מהבהבים. אפשר לכבות אותם עכשיו.",
+    "earthquakeShake": "רעידת מסך",
+    "fireRoundLights": "אורות מהבהבים",
+    "keepAnimations": "השאר אפקטים",
+    "disableAnimations": "כבה אפקטים",
+    "settingsHint": "אפשר לשנות בכל עת בהגדרות"
+  },
   "spam": {
     "warning": "רגוע! יותר מדי פספוסים",
     "penalty": "${points}- נק׳",
@@ -1420,6 +1430,7 @@ const he = {
       "demoWord": "שמש",
       "demoHint": "חברו אותיות סמוכות",
       "demoSuccess": "מצוין!",
+      "demoComplete": "הבנת! עכשיו את/ה יודע/ת לשחק.",
       "clickNext": "הבא ←"
     },
     "combo": {
@@ -1961,6 +1972,7 @@ const he = {
     "signIn": "התחברות",
     "signOut": "התנתקות",
     "signUp": "הרשמה",
+    "loginCrazyGames": "התחברות",
     "userMenu": "תפריט משתמש",
     "signInWith": "המשך עם ${provider}",
     "alreadyHaveAccount": "יש לך כבר חשבון? התחבר",
@@ -2905,6 +2917,8 @@ const he = {
     "playAgainTomorrow": "חזרו מחר לפאזל חדש!",
     "tryAnotherLanguage": "נסו שפה אחרת",
     "playDifferentLanguage": "אתגרו את עצמכם בשפה אחרת!",
+    "quitConfirmTitle": "לעזוב את הציד?",
+    "quitConfirmMessage": "ההתקדמות שלך תאבד!",
     "feedback": {
       "tooShort": "📏 לפחות 3 אותיות",
       "duplicate": "🔁 כבר נמצאה!",

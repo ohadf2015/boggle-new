@@ -43,14 +43,24 @@ interface UseGridInteractionReturn {
   adjacentCells: GridPosition[];
   /** Swipe velocity for animation intensity */
   swipeVelocity: number;
+  /** Currently hovered cell (for desktop preview) */
+  hoveredCell: GridPosition | null;
+  /** Whether user is in active selection mode (click-to-select started) */
+  isSelecting: boolean;
+  /** Whether user is dragging (mouse held down) */
+  isDragging: boolean;
   handleTouchStart: (rowIndex: number, colIndex: number, letter: string, event: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>) => void;
   handleTouchMove: (e: TouchEvent | MouseEvent) => void;
   handleTouchEnd: () => void;
   handleMouseDown: (rowIndex: number, colIndex: number, letter: string, event: React.MouseEvent<HTMLDivElement>) => void;
   handleMouseMove: (e: React.MouseEvent<HTMLDivElement>) => void;
+  handleMouseLeave: () => void;
+  handleRightClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+  handleDoubleClick: (rowIndex: number, colIndex: number) => void;
   handleKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => void;
   startSequentialFadeOut: (isCombo?: boolean) => void;
   undoLastCell: () => void;
+  submitWord: () => void;
 }
 
 // Selection threshold - must be within this % of cell center to select
@@ -78,6 +88,10 @@ export function useGridInteraction({
   const [isKeyboardMode, setIsKeyboardMode] = useState<boolean>(false);
   const [adjacentCells, setAdjacentCells] = useState<GridPosition[]>([]);
   const [swipeVelocity, setSwipeVelocity] = useState<number>(0);
+  // Desktop-specific state
+  const [hoveredCell, setHoveredCell] = useState<GridPosition | null>(null);
+  const [isClickSelectMode, setIsClickSelectMode] = useState<boolean>(false);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
 
   const isTouchingRef = useRef<boolean>(false);
   const startPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -94,6 +108,11 @@ export function useGridInteraction({
   // RAF throttling for touch moves on low-end devices
   const pendingTouchRef = useRef<{ x: number; y: number } | null>(null);
   const rafIdRef = useRef<number | null>(null);
+  // Track if interaction is from touch device (for hybrid mode)
+  const isTouchDeviceRef = useRef<boolean>(false);
+  // Track last click time for double-click detection
+  const lastClickTimeRef = useRef<number>(0);
+  const lastClickCellRef = useRef<GridPosition | null>(null);
 
   // Get performance config once (cached)
   const performanceConfig = useMemo(() => getPerformanceConfig(), []);
@@ -311,6 +330,65 @@ export function useGridInteraction({
       fadeTimeoutRef.current = null;
     }, totalDelay);
   }, [selectedCells, setSelectedCells]);
+
+  // Submit word helper - can be called from various triggers
+  const submitWord = useCallback(() => {
+    if (selectedCells.length === 0) return;
+
+    const formedWord = selectedCells.map(c => c.letter).join('');
+    if (onWordSubmit) {
+      onWordSubmit(formedWord);
+    }
+    if (onPathSubmit) {
+      onPathSubmit([...selectedCells]);
+    }
+
+    // Haptic feedback
+    if (window.navigator?.vibrate) {
+      const wordLength = selectedCells.length;
+      if (fireRoundActive) {
+        if (comboLevel >= 7) {
+          window.navigator.vibrate([100, 50, 100, 50, 100, 50, 150]);
+        } else if (comboLevel >= 5) {
+          window.navigator.vibrate([80, 40, 80, 40, 120]);
+        } else if (comboLevel >= 3) {
+          window.navigator.vibrate([60, 40, 60, 40, 100]);
+        } else if (comboLevel >= 1) {
+          window.navigator.vibrate([50, 30, 50, 30, 80]);
+        } else if (wordLength >= 6) {
+          window.navigator.vibrate([40, 30, 60]);
+        } else if (wordLength >= 3) {
+          window.navigator.vibrate(50);
+        }
+      } else {
+        if (comboLevel >= 7) {
+          window.navigator.vibrate([30, 20, 30]);
+        } else if (comboLevel >= 5) {
+          window.navigator.vibrate([25, 15, 25]);
+        } else if (comboLevel >= 3) {
+          window.navigator.vibrate([20, 10, 20]);
+        } else if (comboLevel >= 1) {
+          window.navigator.vibrate([15, 10, 15]);
+        } else if (wordLength >= 6) {
+          window.navigator.vibrate(20);
+        } else if (wordLength >= 3) {
+          window.navigator.vibrate(15);
+        }
+      }
+    }
+
+    // Clear selection with animation
+    if (comboLevel > 0) {
+      startSequentialFadeOut(true);
+    } else {
+      setTimeout(() => {
+        setSelectedCells([]);
+      }, 500);
+    }
+
+    // Exit click-select mode
+    setIsClickSelectMode(false);
+  }, [selectedCells, onWordSubmit, onPathSubmit, comboLevel, fireRoundActive, startSequentialFadeOut, setSelectedCells]);
 
   // Auto-validation for combo words
   useEffect(() => {
@@ -582,32 +660,194 @@ export function useGridInteraction({
     hasMovedRef.current = false;
   };
 
+  // Handle click-to-select for desktop (single clicks to build word)
+  const handleCellClick = useCallback((
+    rowIndex: number,
+    colIndex: number,
+    letter: string
+  ) => {
+    // Check for double-click
+    const now = Date.now();
+    const timeSinceLastClick = now - lastClickTimeRef.current;
+    const sameCell = lastClickCellRef.current?.row === rowIndex &&
+                     lastClickCellRef.current?.col === colIndex;
+
+    // Double-click on same cell = submit
+    if (sameCell && timeSinceLastClick < 300 && selectedCells.length > 0) {
+      submitWord();
+      lastClickTimeRef.current = 0;
+      lastClickCellRef.current = null;
+      return;
+    }
+
+    lastClickTimeRef.current = now;
+    lastClickCellRef.current = { row: rowIndex, col: colIndex };
+
+    // If no cells selected, start selection
+    if (selectedCells.length === 0) {
+      setSelectedCells([{ row: rowIndex, col: colIndex, letter }]);
+      setIsClickSelectMode(true);
+      if (window.navigator?.vibrate) window.navigator.vibrate(12);
+      return;
+    }
+
+    // Check if clicking on already selected cell
+    const existingIndex = selectedCells.findIndex(
+      c => c.row === rowIndex && c.col === colIndex
+    );
+
+    if (existingIndex !== -1) {
+      // Clicking on last cell = submit word
+      if (existingIndex === selectedCells.length - 1 && selectedCells.length >= 2) {
+        submitWord();
+        return;
+      }
+      // Clicking on earlier cell = backtrack
+      setSelectedCells(selectedCells.slice(0, existingIndex + 1));
+      if (window.navigator?.vibrate) window.navigator.vibrate(8);
+      return;
+    }
+
+    // Check if new cell is adjacent to last selected
+    const lastCell = selectedCells[selectedCells.length - 1];
+    if (lastCell && isAdjacentCell(lastCell, { row: rowIndex, col: colIndex })) {
+      setSelectedCells([...selectedCells, { row: rowIndex, col: colIndex, letter }]);
+      if (window.navigator?.vibrate) window.navigator.vibrate(10);
+    }
+  }, [selectedCells, setSelectedCells, isAdjacentCell, submitWord]);
+
   const handleMouseDown = (
     rowIndex: number,
     colIndex: number,
     letter: string,
     event: React.MouseEvent<HTMLDivElement>
   ) => {
+    // Don't use touch behavior for desktop - use click-to-select
+    if (!isTouchDeviceRef.current) {
+      // If in click-select mode, handle as click
+      if (isClickSelectMode || selectedCells.length > 0) {
+        handleCellClick(rowIndex, colIndex, letter);
+        return;
+      }
+      // Start drag mode if no cells selected and mouse held down
+      setIsDragging(true);
+    }
     handleTouchStart(rowIndex, colIndex, letter, event);
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!interactive || !isTouchingRef.current) return;
+    if (!interactive) return;
 
-    const mockEvent = {
-      touches: [{ clientX: e.clientX, clientY: e.clientY }],
-      cancelable: true,
-      preventDefault: () => {}
-    } as unknown as TouchEvent;
-    handleTouchMove(mockEvent);
+    // Track hover for desktop preview (even when not selecting)
+    const hoveredCellPos = getCellAtPosition(e.clientX, e.clientY);
+    if (hoveredCellPos) {
+      setHoveredCell({ row: hoveredCellPos.row, col: hoveredCellPos.col });
+    } else {
+      setHoveredCell(null);
+    }
+
+    // If dragging, process touch move
+    if (isTouchingRef.current && isDragging) {
+      const mockEvent = {
+        touches: [{ clientX: e.clientX, clientY: e.clientY }],
+        cancelable: true,
+        preventDefault: () => {}
+      } as unknown as TouchEvent;
+      handleTouchMove(mockEvent);
+    }
   };
+
+  // Handle mouse leaving grid area
+  const handleMouseLeave = useCallback(() => {
+    setHoveredCell(null);
+  }, []);
+
+  // Undo last selected cell - can be called from button, keyboard, or right-click
+  const undoLastCell = useCallback(() => {
+    if (selectedCells.length > 0) {
+      setSelectedCells(selectedCells.slice(0, -1));
+      if (window.navigator?.vibrate) {
+        window.navigator.vibrate(fireRoundActive ? 15 : 5);
+      }
+    }
+  }, [selectedCells, setSelectedCells, fireRoundActive]);
+
+  // Handle right-click to undo last cell
+  const handleRightClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!interactive) return;
+    e.preventDefault(); // Prevent context menu
+
+    if (selectedCells.length > 0) {
+      undoLastCell();
+    } else if (isClickSelectMode) {
+      // Exit click-select mode on right-click with no cells
+      setIsClickSelectMode(false);
+    }
+  }, [interactive, selectedCells.length, undoLastCell, isClickSelectMode]);
+
+  // Handle double-click on a cell
+  const handleDoubleClick = useCallback((rowIndex: number, colIndex: number) => {
+    if (!interactive) return;
+
+    // Double-click on last selected cell submits the word
+    const lastCell = selectedCells[selectedCells.length - 1];
+    if (lastCell && lastCell.row === rowIndex && lastCell.col === colIndex) {
+      if (selectedCells.length >= 2) {
+        submitWord();
+      }
+    }
+  }, [interactive, selectedCells, submitWord]);
 
   // Global mouse up
   useEffect(() => {
-    const handleMouseUp = () => handleTouchEnd();
+    const handleMouseUp = () => {
+      setIsDragging(false);
+      if (isDragging) {
+        handleTouchEnd();
+      }
+    };
     window.addEventListener('mouseup', handleMouseUp);
     return () => window.removeEventListener('mouseup', handleMouseUp);
-  }, [handleTouchEnd]); // Fixed: proper dependency
+  }, [handleTouchEnd, isDragging]);
+
+  // Detect touch device (set on first touch)
+  useEffect(() => {
+    const handleFirstTouch = () => {
+      isTouchDeviceRef.current = true;
+      window.removeEventListener('touchstart', handleFirstTouch);
+    };
+    window.addEventListener('touchstart', handleFirstTouch, { passive: true });
+    return () => window.removeEventListener('touchstart', handleFirstTouch);
+  }, []);
+
+  // Exit click-select mode when clicking outside grid or pressing Escape
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (gridRef.current && !gridRef.current.contains(e.target as Node)) {
+        if (isClickSelectMode && selectedCells.length > 0) {
+          // Submit word when clicking outside
+          submitWord();
+        } else {
+          setIsClickSelectMode(false);
+          setSelectedCells([]);
+        }
+      }
+    };
+
+    const handleEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isClickSelectMode) {
+        setIsClickSelectMode(false);
+        setSelectedCells([]);
+      }
+    };
+
+    window.addEventListener('mousedown', handleClickOutside);
+    window.addEventListener('keydown', handleEscapeKey);
+    return () => {
+      window.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [gridRef, isClickSelectMode, selectedCells.length, submitWord, setSelectedCells]);
 
   // Keyboard navigation handler
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -784,29 +1024,26 @@ export function useGridInteraction({
     };
   }, [gridRef]);
 
-  // Undo last selected cell - can be called from button or keyboard
-  const undoLastCell = useCallback(() => {
-    if (selectedCells.length > 0) {
-      setSelectedCells(selectedCells.slice(0, -1));
-      if (window.navigator?.vibrate) {
-        window.navigator.vibrate(fireRoundActive ? 15 : 5);
-      }
-    }
-  }, [selectedCells, setSelectedCells, fireRoundActive]);
-
   return {
     selectedCells,
     fadingCells,
     focusedCell,
     adjacentCells,
     swipeVelocity,
+    hoveredCell,
+    isSelecting: isClickSelectMode,
+    isDragging,
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,
     handleMouseDown,
     handleMouseMove,
+    handleMouseLeave,
+    handleRightClick,
+    handleDoubleClick,
     handleKeyDown,
     startSequentialFadeOut,
     undoLastCell,
+    submitWord,
   };
 }

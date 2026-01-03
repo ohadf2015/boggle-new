@@ -268,6 +268,26 @@ body {
     animation: earthquake-shake 0.6s ease-in-out;
   }
 
+  /* Letter Tile Gradient - Subtle 3D effect for grid cells */
+  .letter-tile-gradient {
+    background: linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #fefefa 40%,
+      #f8f7f0 100%
+    );
+  }
+
+  /* Letter Tile Gradient (Cream variant) - For onboarding grids */
+  .letter-tile-gradient-cream {
+    background: linear-gradient(
+      135deg,
+      #fffef8 0%,
+      #fdfcf4 40%,
+      #f5f4ec 100%
+    );
+  }
+
   /* Texture Overlays */
   .texture-halftone {
     position: relative;
@@ -2047,14 +2067,14 @@ body.crazygames-embed {
     width: auto;
   }
 
-  /* Game board frame adjustments for landscape - maximized for playability */
+  /* Game board frame adjustments for landscape - balanced for side panels */
   .game-board-frame {
-    /* Maximized to 94dvh for largest possible grid in landscape */
-    /* Use viewport units directly without percentage dependency */
-    width: min(94dvh, calc(100vw - 200px));
-    max-width: min(94dvh, calc(100vw - 200px));
-    height: min(94dvh, calc(100vw - 200px));
-    max-height: min(94dvh, calc(100vw - 200px));
+    /* Reduced from 94dvh to 68dvh to leave space for larger side panels */
+    /* This allows stats to be more readable while keeping grid playable */
+    width: min(68dvh, calc(100vw - 260px));
+    max-width: min(68dvh, calc(100vw - 260px));
+    height: min(68dvh, calc(100vw - 260px));
+    max-height: min(68dvh, calc(100vw - 260px));
     aspect-ratio: 1 / 1;
     padding: 4px;
   }
@@ -2073,6 +2093,44 @@ body.crazygames-embed {
     gap: 1rem;
     align-items: flex-start;
     justify-content: center;
+  }
+
+  /* ====== Landscape Side Panel Styles ====== */
+
+  /* Landscape side panel sizing */
+  .landscape-side-panel {
+    min-width: 110px;
+    max-width: 140px;
+  }
+
+  /* Large stats typography for landscape panels */
+  .landscape-stat-primary {
+    font-size: 2.25rem;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .landscape-stat-secondary {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .landscape-stat-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.85;
+  }
+
+  /* Neo-brutalist panel background for landscape */
+  .landscape-panel {
+    background: rgba(255, 254, 240, 0.97);
+    border: 4px solid rgb(0, 0, 0);
+    border-radius: 8px;
+    box-shadow: 6px 6px 0px rgb(0, 0, 0);
+    padding: 16px;
   }
 
   /* Hide non-essential elements in landscape */
@@ -2268,13 +2326,28 @@ body.crazygames-embed {
   }
 
   .game-board-frame {
-    /* Maximized to 96dvh for best playability on short screens */
-    /* Use viewport units without percentage dependency */
-    width: min(96dvh, calc(100vw - 150px));
-    max-width: min(96dvh, calc(100vw - 150px));
-    height: min(96dvh, calc(100vw - 150px));
-    max-height: min(96dvh, calc(100vw - 150px));
+    /* Reduced from 96dvh to 70dvh for better balance with side panels */
+    /* Still playable on short screens while allowing room for stats */
+    width: min(70dvh, calc(100vw - 220px));
+    max-width: min(70dvh, calc(100vw - 220px));
+    height: min(70dvh, calc(100vw - 220px));
+    max-height: min(70dvh, calc(100vw - 220px));
     padding: 2px;
+  }
+
+  /* Very short landscape panel adjustments */
+  .landscape-panel {
+    padding: 10px;
+    border-width: 3px;
+    box-shadow: 4px 4px 0px rgb(0, 0, 0);
+  }
+
+  .landscape-stat-primary {
+    font-size: 1.75rem;
+  }
+
+  .landscape-stat-secondary {
+    font-size: 1.25rem;
   }
 
   /* Full-height mode - even larger on short screens */

@@ -106,15 +106,21 @@ const GridComponent = memo<GridComponentProps>(({
   // Disable enhanced earthquake effects if user preference is set or device is low-end
   const shouldDisableEarthquakeEffects = disableEarthquakeEffects || isLowEnd || prefersReducedMotion;
 
-  // Use extracted interaction hook
+  // Use extracted interaction hook with desktop enhancements
   const {
     selectedCells,
     fadingCells,
     focusedCell,
+    hoveredCell,
+    isSelecting,
+    isDragging,
     handleTouchStart,
     handleTouchEnd,
     handleMouseDown,
     handleMouseMove,
+    handleMouseLeave,
+    handleRightClick,
+    handleDoubleClick,
     handleKeyDown,
   } = useGridInteraction({
     grid,
@@ -416,6 +422,9 @@ const GridComponent = memo<GridComponentProps>(({
             gridDimensions.gap,
             "bg-neo-cream border-2 border-neo-black/20",
             earthquakeShaking && "earthquake-shake",
+            // Desktop cursor styles based on interaction state
+            interactive && isSelecting && "cursor-crosshair",
+            interactive && isDragging && "cursor-grabbing",
             className
           )}
           style={{
@@ -432,6 +441,8 @@ const GridComponent = memo<GridComponentProps>(({
           tabIndex={interactive ? 0 : -1}
           onTouchEnd={handleTouchEnd}
           onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          onContextMenu={handleRightClick}
           onKeyDown={handleKeyDown}
         >
           {grid.map((row, i) =>
@@ -448,6 +459,11 @@ const GridComponent = memo<GridComponentProps>(({
               const glowColor = RAINBOW_COLORS[glowColorIndex];
               const isHighlighted = highlightedCellsSet.has(cellKey);
               const isEliminated = eliminatedLetters?.has(cell.toUpperCase()) ?? false;
+              // Desktop hover state
+              const isHovered = hoveredCell?.row === i && hoveredCell?.col === j;
+              const isLastSelected = selectedCells.length > 0 &&
+                selectedCells[selectedCells.length - 1]?.row === i &&
+                selectedCells[selectedCells.length - 1]?.col === j;
 
               // OPTIMIZED: Get shake offset from hook (no 3D transforms)
               const shakeOffset = getShakeOffset(cellKey);
@@ -464,6 +480,7 @@ const GridComponent = memo<GridComponentProps>(({
                   tabIndex={interactive ? 0 : -1}
                   onTouchStart={(e) => handleTouchStart(i, j, cell, e)}
                   onMouseDown={(e) => handleMouseDown(i, j, cell, e)}
+                  onDoubleClick={() => handleDoubleClick(i, j)}
                   initial={effectiveRenderMode === 'minimal' ? false : (animateOnMount
                     ? { scale: 0, opacity: 0, rotateX: -90, y: -20 }
                     : false
@@ -540,9 +557,13 @@ const GridComponent = memo<GridComponentProps>(({
                         ? "bg-neo-purple text-white border-3 border-neo-purple z-10 animate-hint-glow"
                         : isEliminated
                           ? "bg-gray-400/60 text-gray-500/50 border-3 border-gray-400/40 shadow-none cursor-not-allowed"
-                          : "bg-neo-white text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed",
+                          : "letter-tile-gradient text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed",
                     // Adjacent cell hint - subtle glow indicating valid next selection
                     isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-2 ring-neo-yellow/70 ring-offset-1 ring-offset-neo-cream",
+                    // Desktop hover on adjacent hint - stronger glow when hovering over valid next cell
+                    isHovered && isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-4 ring-neo-cyan/90 ring-offset-2 scale-105 z-10",
+                    // Hover on last selected cell - hint to click again to submit
+                    isHovered && isLastSelected && selectedCells.length >= 2 && "ring-4 ring-neo-green/80 ring-offset-2 animate-pulse",
                     // Keyboard focus indicator
                     isFocused && !isSelected && "ring-4 ring-neo-cyan ring-offset-2 ring-offset-neo-cream z-20",
                     // Transition controls

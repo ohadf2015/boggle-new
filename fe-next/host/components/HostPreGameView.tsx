@@ -10,6 +10,8 @@ import RoomChat from '../../components/RoomChat';
 import PresenceIndicator from '../../components/PresenceIndicator';
 import BotControls from '../../components/BotControls';
 import GameRoomHeader from '../../components/game/GameRoomHeader';
+import CrazyGamesBanner from '../../components/CrazyGamesBanner';
+import { useCrazyGamesInvite } from '../../hooks/useCrazyGamesInvite';
 import { DIFFICULTIES, MIN_WORD_LENGTH_OPTIONS, getRecommendedTimer } from '../../utils/consts';
 import { cn } from '../../lib/utils';
 import { useSocket } from '../../utils/SocketContext';
@@ -180,6 +182,21 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
   const [mobileTab, setMobileTab] = useState<MobileTab>('settings');
   // Unread chat messages count
   const [unreadChatCount, setUnreadChatCount] = useState<number>(0);
+
+  // CrazyGames invite button integration
+  const { showInviteButton, hideInviteButton, isInviteButtonVisible } = useCrazyGamesInvite();
+
+  // Show CrazyGames invite button when in lobby
+  useEffect(() => {
+    if (gameCode) {
+      showInviteButton(gameCode);
+    }
+    return () => {
+      if (isInviteButtonVisible) {
+        hideInviteButton();
+      }
+    };
+  }, [gameCode, showInviteButton, hideInviteButton, isInviteButtonVisible]);
 
   // Apply default preset on mount
   React.useEffect(() => {
@@ -671,6 +688,12 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
             }
           }}
         />
+      </div>
+
+      {/* CrazyGames Banner Ad - Pre-game Lobby */}
+      <div className="flex justify-center py-2">
+        <CrazyGamesBanner size="728x90" className="hidden lg:block" />
+        <CrazyGamesBanner size="320x50" className="lg:hidden" />
       </div>
 
       {/* Fixed Bottom Bar - Mobile only: Start Button + Tabs */}

@@ -262,6 +262,16 @@ const ja = {
     "fireRound": "🔥 ファイアラウンド",
     "multiplier": "全て2倍"
   },
+  "effects": {
+    "preferenceTitle": "アニメーション設定",
+    "preferenceSubtitle": "初めてですか？",
+    "preferenceDescription": "このゲームには画面の揺れと点滅効果があります。必要に応じて今すぐ無効にできます。",
+    "earthquakeShake": "画面の揺れ",
+    "fireRoundLights": "点滅ライト",
+    "keepAnimations": "効果を維持",
+    "disableAnimations": "効果を無効化",
+    "settingsHint": "設定でいつでも変更できます"
+  },
   "spam": {
     "warning": "落ち着いて！ミスが多すぎ",
     "penalty": "-${points}pt",
@@ -1418,6 +1428,7 @@ const ja = {
       "demoWord": "CAT",
       "demoHint": "隣接する文字をつなげよう",
       "demoSuccess": "完璧！",
+      "demoComplete": "できた！遊び方がわかったね。",
       "clickNext": "次へ →"
     },
     "combo": {
@@ -1959,6 +1970,7 @@ const ja = {
     "signIn": "ログイン",
     "signOut": "ログアウト",
     "signUp": "新規登録",
+    "loginCrazyGames": "ログイン",
     "userMenu": "ユーザーメニュー",
     "signInWith": "${provider}で続ける",
     "alreadyHaveAccount": "すでにアカウントをお持ちですか？ログイン",
@@ -2903,6 +2915,8 @@ const ja = {
     "playAgainTomorrow": "明日また新しいパズルに挑戦してください！",
     "tryAnotherLanguage": "別の言語に挑戦",
     "playDifferentLanguage": "違う言語でチャレンジしよう！",
+    "quitConfirmTitle": "ハントを終了する？",
+    "quitConfirmMessage": "進行状況が失われます！",
     "feedback": {
       "tooShort": "📏 最低3文字必要",
       "duplicate": "🔁 既に見つかりました！",
