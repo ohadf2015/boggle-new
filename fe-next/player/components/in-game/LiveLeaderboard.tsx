@@ -54,6 +54,7 @@ export const LiveLeaderboard = memo<LiveLeaderboardProps>(({
   // Use virtual scrolling for large player counts
   const useVirtual = memoizedLeaderboard.length > VIRTUAL_SCROLL_THRESHOLD;
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Virtual intentionally returns mutable functions
   const virtualizer = useVirtualizer({
     count: memoizedLeaderboard.length,
     getScrollElement: () => parentRef.current,
