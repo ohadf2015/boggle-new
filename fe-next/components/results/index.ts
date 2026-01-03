@@ -15,6 +15,8 @@
 export { default as StatsGrid, createGameStats } from './StatsGrid';
 export type { StatItem, GameStatsConfig } from './StatsGrid';
 
+export { default as CompactResultsStats } from './CompactResultsStats';
+
 export { default as BonusBadgesRow } from './BonusBadgesRow';
 
 export { default as CoinRewardDisplay } from './CoinRewardDisplay';

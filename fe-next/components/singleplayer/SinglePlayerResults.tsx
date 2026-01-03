@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Medal, RotateCw, Home, Bot, BarChart3, Crown, Award, Settings, Sparkles, Hash, Target, ChevronDown, TrendingUp, Coins, Users } from 'lucide-react';
@@ -15,7 +15,7 @@ import { AchievementBadge } from '@/components/AchievementBadge';
 import WordFeedbackModal from '@/components/voting/WordFeedbackModal';
 import MissedWords from '@/components/results/MissedWords';
 // Shared result components
-import StatsGrid, { createGameStats } from '@/components/results/StatsGrid';
+import CompactResultsStats from '@/components/results/CompactResultsStats';
 import BonusBadgesRow from '@/components/results/BonusBadgesRow';
 import CoinRewardDisplay from '@/components/results/CoinRewardDisplay';
 import { SinglePlayerActions } from '@/components/results/ResultsActionButtons';
@@ -103,6 +103,17 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     breakdown: { base: number; scoreBonus: number; placement: number };
   } | null>(null);
 
+  // Get player avatar from profile for leaderboard display
+  const playerAvatar = useMemo(() => {
+    if (!profile) return undefined;
+    return {
+      emoji: profile.avatar_emoji,
+      color: profile.avatar_color,
+      profilePictureUrl: profile.profile_picture_url,
+      avatarImage: profile.avatar_image,
+    };
+  }, [profile]);
+
   // Use extracted hook for data processing
   const {
     allParticipants,
@@ -117,7 +128,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     botWordDetails,
     playerArchetype,
     missedWords,
-  } = useResultsData(results, t);
+  } = useResultsData(results, t, playerAvatar);
 
   // Celebration effect on mount - top 3 in solo-bots mode, or winner/high score
   // BUT only if player actually scored points (no confetti for 0 score)
@@ -542,15 +553,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     null
   );
 
-  // Get rank-specific styling
-  const getRankStyle = (rank: number) => {
-    if (rank === 1) return { bg: 'bg-neo-yellow', text: 'text-neo-black' };
-    if (rank === 2) return { bg: 'bg-slate-300', text: 'text-slate-800' };
-    if (rank === 3) return { bg: 'bg-neo-orange', text: 'text-neo-black' };
-    return { bg: 'bg-neo-cream', text: 'text-neo-black' };
-  };
-  const rankStyle = mode === 'solo-bots' ? getRankStyle(playerRank) : { bg: 'bg-neo-cyan', text: 'text-neo-black' };
-
   // Mobile tab configuration - Consolidated to 2 tabs for reduced cognitive load
   const mobileTabs = [
     { id: 'results' as const, icon: <Trophy className="w-5 h-5" />, label: t('results.results') || 'Results' },
@@ -599,40 +601,18 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         />
       </div>
 
-      {/* Compact Stats Card */}
-      <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 shadow-hard">
-        <div className="flex items-center gap-3">
-          {/* Rank Badge */}
-          <div className={cn(
-            'w-12 h-12 rounded-neo flex items-center justify-center border-3 border-neo-black font-black text-lg',
-            rankStyle.bg, rankStyle.text
-          )}>
-            #{mode === 'solo-bots' ? playerRank : 1}
-          </div>
-          {/* Score & Stats */}
-          <div className="flex-1 min-w-0">
-            <div className="text-2xl font-black text-white">{results.playerScore} <span className="text-sm text-white/60">{t('results.points') || 'pts'}</span></div>
-            <div className="text-xs text-white/70 font-bold flex items-center gap-2 flex-wrap">
-              <span>{validWordCount} {t('results.words') || 'words'}</span>
-              <span>•</span>
-              <span>{accuracy}% {t('results.accuracy') || 'accuracy'}</span>
-              {playerArchetype && (
-                <>
-                  <span>•</span>
-                  <span className="text-neo-cyan">{playerArchetype.name}</span>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
+      {/* Compact Stats - Matching multiplayer pattern */}
+      <CompactResultsStats
+        wordCount={validWordCount}
+        accuracy={accuracy}
+        archetype={playerArchetype}
+      />
 
-        {/* Bonus Badges */}
-        <BonusBadgesRow
-          comboBonus={totalComboBonus}
-          fireRoundBonus={totalFireRoundBonus}
-          className="mt-2"
-        />
-      </div>
+      {/* Bonus Badges */}
+      <BonusBadgesRow
+        comboBonus={totalComboBonus}
+        fireRoundBonus={totalFireRoundBonus}
+      />
 
       {/* Coins Earned - Compact */}
       <CoinRewardDisplay reward={coinReward} variant="compact" />
@@ -645,8 +625,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             score: p.score,
             isCurrentPlayer: p.isPlayer,
             isBot: !p.isPlayer,
+            avatar: p.avatar,
           })) as LeaderboardParticipant[]}
-          headerText={t('common.leaderboard') || 'Leaderboard'}
+          compact
         />
       )}
 
@@ -909,34 +890,15 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               showConfetti={shouldShowConfetti}
             />
 
-            {/* Compact Stats Card */}
-            <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 shadow-hard">
-              <div className="flex items-center gap-3">
-                {/* Rank Badge */}
-                <div className={cn(
-                  'w-12 h-12 rounded-neo flex items-center justify-center border-3 border-neo-black font-black text-lg',
-                  rankStyle.bg, rankStyle.text
-                )}>
-                  #{mode === 'solo-bots' ? playerRank : 1}
-                </div>
-                {/* Score & Stats */}
-                <div className="flex-1 min-w-0">
-                  <div className="text-2xl font-black text-white">{results.playerScore} <span className="text-sm text-white/60">{t('results.points') || 'pts'}</span></div>
-                  <div className="text-xs text-white/70 font-bold flex items-center gap-2 flex-wrap">
-                    <span>{validWordCount} {t('results.words') || 'words'}</span>
-                    <span>•</span>
-                    <span>{accuracy}% {t('results.accuracy') || 'accuracy'}</span>
-                    {playerArchetype && (
-                      <>
-                        <span>•</span>
-                        <span className="text-neo-cyan">{playerArchetype.name}</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <BonusBadgesRow comboBonus={totalComboBonus} fireRoundBonus={totalFireRoundBonus} className="mt-2" />
-            </div>
+            {/* Compact Stats - Matching multiplayer pattern */}
+            <CompactResultsStats
+              wordCount={validWordCount}
+              accuracy={accuracy}
+              archetype={playerArchetype}
+            />
+
+            {/* Bonus Badges */}
+            <BonusBadgesRow comboBonus={totalComboBonus} fireRoundBonus={totalFireRoundBonus} />
 
             {/* Coins Earned */}
             <CoinRewardDisplay reward={coinReward} variant="compact" />
@@ -949,8 +911,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                   score: p.score,
                   isCurrentPlayer: p.isPlayer,
                   isBot: !p.isPlayer,
+                  avatar: p.avatar,
                 })) as LeaderboardParticipant[]}
-                headerText={t('common.leaderboard') || 'Leaderboard'}
+                compact
               />
             )}
 

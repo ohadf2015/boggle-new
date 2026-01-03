@@ -1346,7 +1346,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   }
 
   return (
-    <div className="relative space-y-0.5 md:space-y-2">
+    <div className="relative flex-1 flex flex-col overflow-hidden">
       {/* Earthquake Warning Overlay */}
       <EarthquakeWarning
         isVisible={earthquakeState === 'warning'}
@@ -1393,7 +1393,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       />
 
       {/* Header with controls */}
-      <div className="flex items-center justify-between px-2 md:px-4">
+      <div className="flex items-center justify-between px-2 md:px-4 py-0.5 md:py-1 flex-shrink-0">
         <Button
           variant="destructive"
           size="sm"
@@ -1419,7 +1419,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       </div>
 
       {/* Stats row - Combo | Timer | Score - matches multiplayer layout */}
-      <div ref={gameStatsRef} className="flex items-center justify-center gap-1 md:gap-4 mb-0.5 md:mb-2" role="status" aria-label="Game status">
+      <div ref={gameStatsRef} className="flex items-center justify-center gap-1 md:gap-4 flex-shrink-0" role="status" aria-label="Game status">
         {/* Combo (left - shows when level >= 2, placeholder otherwise for layout balance) */}
         <div className="min-w-[50px] md:min-w-[90px] flex justify-end">
           <ComboDisplay
@@ -1488,7 +1488,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       </div>
 
       {/* Word Forming Area with feedback - centered below timer (keep timer section clean) */}
-      <div className="flex items-center justify-center mb-0.5 md:mb-1">
+      <div className="flex items-center justify-center flex-shrink-0">
         <WordFormingArea
           word={formedWord}
           letterCount={letterCount}
@@ -1502,7 +1502,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         <AdaptiveMotion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mx-1 md:mx-4 mb-0 md:mb-1"
+          className="mx-1 md:mx-4 flex-shrink-0"
         >
           {targetHighScore !== null ? (
             <div className={cn(
@@ -1579,7 +1579,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       )}
 
       {/* Game grid */}
-      <div className="flex justify-center">
+      <div className="flex-1 flex items-center justify-center min-h-0">
         <GridComponent
           grid={grid}
           interactive={!isPaused}
@@ -1599,9 +1599,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
 
 
-      {/* Bot scores (only in solo-bots mode) */}
+      {/* Bot scores (only in solo-bots mode) - hidden on mobile to prevent scroll */}
       {settings.mode === 'solo-bots' && settings.bots.length > 0 && (
-        <div className="bg-neo-cream text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-3 border-neo-black p-4">
+        <div className="hidden md:block bg-neo-cream text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-3 border-neo-black p-4 flex-shrink-0">
           <h3 className="text-sm font-bold uppercase tracking-wide text-neo-black/70 dark:text-neo-white/70 mb-2">
             {t('singlePlayer.opponents') || 'Opponents'}
           </h3>

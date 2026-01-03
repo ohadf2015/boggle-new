@@ -48,14 +48,42 @@ function playerWordDataToWordObject(word: PlayerWordData): WordObject {
   };
 }
 
-export function useResultsData(results: SinglePlayerResultsData, t: (key: string) => string) {
+export interface ParticipantAvatar {
+  emoji?: string;
+  color?: string;
+  profilePictureUrl?: string | null;
+  avatarImage?: string;
+}
+
+export interface Participant {
+  name: string;
+  score: number;
+  isPlayer: boolean;
+  avatar?: ParticipantAvatar;
+}
+
+export function useResultsData(
+  results: SinglePlayerResultsData,
+  t: (key: string) => string,
+  playerAvatar?: ParticipantAvatar
+) {
   // Calculate rankings for solo-bots mode
-  const allParticipants = useMemo(() => {
+  const allParticipants = useMemo((): Participant[] => {
     return [
-      { name: t('common.you') || 'You', score: results.playerScore, isPlayer: true },
-      ...results.botScores.map(bot => ({ name: bot.name, score: bot.score, isPlayer: false })),
+      {
+        name: t('common.you') || 'You',
+        score: results.playerScore,
+        isPlayer: true,
+        avatar: playerAvatar,
+      },
+      ...results.botScores.map(bot => ({
+        name: bot.name,
+        score: bot.score,
+        isPlayer: false,
+        avatar: undefined, // Bots use Bot icon in Top3Leaderboard
+      })),
     ].sort((a, b) => b.score - a.score);
-  }, [results.playerScore, results.botScores, t]);
+  }, [results.playerScore, results.botScores, t, playerAvatar]);
 
   const playerRank = allParticipants.findIndex(p => p.isPlayer) + 1;
   const isWinner = playerRank === 1;

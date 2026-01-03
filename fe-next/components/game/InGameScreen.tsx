@@ -17,7 +17,6 @@ import { EarthquakeWarning, FireRoundIndicator } from '../earthquake';
 import HintButton from '../HintButton';
 import WordFormingArea, { type WordFeedback } from './WordFormingArea';
 import ComboDisplay from './ComboDisplay';
-import ThemeIndicator from './ThemeIndicator';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { wordErrorToast } from '../NeoToast';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
@@ -796,10 +795,10 @@ const InGameScreen = memo<InGameScreenProps>(({
         />
       )}
 
-      <div className="flex flex-col lg:flex-row gap-0.5 md:gap-4 lg:gap-6 flex-grow w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out">
+      <div className="flex flex-col lg:flex-row gap-0.5 md:gap-4 lg:gap-6 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out">
 
       {/* Top Bar - Only on mobile, integrated into parent on desktop */}
-      <div className="lg:hidden w-full flex items-center justify-between mb-0 px-1">
+      <div className="lg:hidden w-full flex items-center justify-between px-1 flex-shrink-0">
         {onExitRoom && (
           <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} className="relative z-50" />
         )}
@@ -879,7 +878,7 @@ const InGameScreen = memo<InGameScreenProps>(({
       <div className="flex-1 flex flex-col min-w-0 min-h-0">
         {/* Stats row - Combo | Timer | Score - timer always centered and visible */}
         {remainingTime !== null && (
-          <div ref={gameStatsRef} className="flex items-center justify-center gap-1 md:gap-4 mb-0.5 md:mb-2" role="status" aria-label="Game status">
+          <div ref={gameStatsRef} className="flex items-center justify-center gap-1 md:gap-4 flex-shrink-0" role="status" aria-label="Game status">
             {/* Combo (left - shows when level >= 2, placeholder otherwise for layout balance) */}
             {isPlaying && (
               <div className="min-w-[50px] md:min-w-[90px] flex justify-end">
@@ -940,7 +939,7 @@ const InGameScreen = memo<InGameScreenProps>(({
         {/* Word Forming Area with feedback - centered below timer */}
         {/* Shows typed word when in keyboard mode, otherwise shows swiped word */}
         {isPlaying && (
-          <div className="flex items-center justify-center mb-0.5 md:mb-1">
+          <div className="flex items-center justify-center flex-shrink-0">
             <WordFormingArea
               word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
               letterCount={keyboardInput.isTypingMode ? keyboardInput.typedWord.length : letterCount}
@@ -981,7 +980,7 @@ const InGameScreen = memo<InGameScreenProps>(({
         )}
 
         {/* Grid - Direct connection to timer row */}
-        <div className="flex justify-center">
+        <div className="flex-1 flex items-center justify-center min-h-0">
           <GridComponent
               key={isPlaying ? 'playing-grid' : 'spectating-grid'}
               grid={letterGrid}
@@ -999,16 +998,10 @@ const InGameScreen = memo<InGameScreenProps>(({
             />
         </div>
 
-        {/* Theme Indicator - subtle, below grid */}
-        {boardTheme && (
-          <div className="flex justify-center mt-1 opacity-70">
-            <ThemeIndicator theme={boardTheme} />
-          </div>
-        )}
 
         {/* Words Remaining - 5+ letter words only (single-player only) */}
         {hints?.isSinglePlayer && isPlaying && totalBoardWords !== null && totalBoardWords !== undefined && totalBoardWords > 0 && (
-          <div className="flex justify-center mt-1 md:mt-2">
+          <div className="flex justify-center flex-shrink-0">
             <WordsRemaining
               totalWords={totalBoardWords}
               foundWordsCount={normalizedFoundWords.filter(fw => fw.isValid !== false && fw.word.length >= 5).length}
@@ -1019,8 +1012,9 @@ const InGameScreen = memo<InGameScreenProps>(({
         )}
 
         {/* Mobile: Split-view with compact leaderboard + words (eliminates tab switching) */}
+        {/* Hidden on very small screens (< 600px height) to prevent scroll - visible on tablet and desktop */}
         {isPlaying && !gameplayFocusMode && leaderboard && leaderboard.length > 0 && (
-          <div className="mt-0.5 md:mt-2 space-y-0.5 max-w-md mx-auto lg:max-w-lg md:space-y-2">
+          <div className="hidden sm:block lg:hidden mt-0.5 md:mt-2 space-y-0.5 max-w-md mx-auto lg:max-w-lg md:space-y-2 flex-shrink-0 overflow-hidden">
             {/* Compact Leaderboard - Always visible */}
             <CompactLeaderboard
               players={leaderboard.map(p => ({

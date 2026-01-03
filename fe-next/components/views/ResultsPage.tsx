@@ -36,6 +36,7 @@ import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 import { Users } from 'lucide-react';
 const PlayerArchetypeBadge = dynamic(() => import('@/components/results/PlayerArchetypeBadge'), { ssr: false });
+const CompactResultsStats = dynamic(() => import('@/components/results/CompactResultsStats'), { ssr: false });
 import { cn } from '@/lib/utils';
 import { addGameToHistory } from '@/utils/gameHistoryManager';
 import { awardGameCoins } from '@/utils/coinManager';
@@ -785,37 +786,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         <ResultsWinnerBanner winner={bannerPlayer} isCurrentUserWinner={isCurrentUserInBanner} rank={bannerRank} />
       )}
 
-      {/* Compact Stats Row - Key metrics (rank/score shown in podium below) */}
+      {/* Compact Stats Row - Using shared component */}
       {currentPlayerData && currentPlayerRank > 0 && (
-        <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 shadow-hard">
-          <div className="flex items-center justify-between gap-3">
-            {/* Stats Grid */}
-            <div className="flex items-center gap-4">
-              {/* Words */}
-              <div className="text-center">
-                <div className="text-xl font-black text-white">
-                  {currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0}
-                </div>
-                <div className="text-[10px] text-white/60 font-bold uppercase">{t('results.words') || 'Words'}</div>
-              </div>
-              {/* Accuracy */}
-              <div className="text-center">
-                <div className="text-xl font-black text-white">
-                  {(() => {
-                    const total = currentPlayerData.allWords?.length || 0;
-                    const valid = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0;
-                    return total > 0 ? Math.round((valid / total) * 100) : 0;
-                  })()}%
-                </div>
-                <div className="text-[10px] text-white/60 font-bold uppercase">{t('results.accuracy') || 'Accuracy'}</div>
-              </div>
-            </div>
-            {/* Archetype Badge with Image and Tooltip */}
-            {currentPlayerArchetype && (
-              <PlayerArchetypeBadge archetype={currentPlayerArchetype} size="sm" showTooltip={true} />
-            )}
-          </div>
-        </div>
+        <CompactResultsStats
+          wordCount={currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0}
+          accuracy={(() => {
+            const total = currentPlayerData.allWords?.length || 0;
+            const valid = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0;
+            return total > 0 ? Math.round((valid / total) * 100) : 0;
+          })()}
+          archetype={currentPlayerArchetype}
+        />
       )}
 
       {/* Compact Top 3 Leaderboard - Horizontal */}
@@ -1068,33 +1049,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               <ResultsWinnerBanner winner={bannerPlayer} isCurrentUserWinner={isCurrentUserInBanner} rank={bannerRank} />
             )}
 
-            {/* Compact Stats Row */}
+            {/* Compact Stats Row - Using shared component */}
             {currentPlayerData && currentPlayerRank > 0 && (
-              <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 shadow-hard">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-4">
-                    <div className="text-center">
-                      <div className="text-xl font-black text-white">
-                        {currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0}
-                      </div>
-                      <div className="text-[10px] text-white/60 font-bold uppercase">{t('results.words') || 'Words'}</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xl font-black text-white">
-                        {(() => {
-                          const total = currentPlayerData.allWords?.length || 0;
-                          const valid = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0;
-                          return total > 0 ? Math.round((valid / total) * 100) : 0;
-                        })()}%
-                      </div>
-                      <div className="text-[10px] text-white/60 font-bold uppercase">{t('results.accuracy') || 'Accuracy'}</div>
-                    </div>
-                  </div>
-                  {currentPlayerArchetype && (
-                    <PlayerArchetypeBadge archetype={currentPlayerArchetype} size="sm" showTooltip={true} />
-                  )}
-                </div>
-              </div>
+              <CompactResultsStats
+                wordCount={currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0}
+                accuracy={(() => {
+                  const total = currentPlayerData.allWords?.length || 0;
+                  const valid = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0;
+                  return total > 0 ? Math.round((valid / total) * 100) : 0;
+                })()}
+                archetype={currentPlayerArchetype}
+              />
             )}
 
             {/* Top 3 Leaderboard */}

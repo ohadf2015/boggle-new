@@ -346,6 +346,7 @@ export default function AdminDashboard() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({
           puzzleDate: today,
           language: retryLinkLanguage,
@@ -391,6 +392,7 @@ export default function AdminDashboard() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify(body),
       });
 
@@ -738,47 +740,59 @@ export default function AdminDashboard() {
     let successCount = 0;
     let failCount = 0;
 
-    const wordsToProcess = communityWords.filter(w =>
-      selectedWords.has(getWordKey(w.word, w.language))
-    );
+    try {
+      const wordsToProcess = communityWords.filter(w =>
+        selectedWords.has(getWordKey(w.word, w.language))
+      );
 
-    for (const word of wordsToProcess) {
-      try {
-        const res = await fetch('/api/admin/community-words/approve', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            word: word.word,
-            language: word.language,
-            addToDictionary: true
-          })
-        });
+      // Process words in parallel for better performance
+      const results = await Promise.allSettled(
+        wordsToProcess.map(async (word) => {
+          const res = await fetch('/api/admin/community-words/approve', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              word: word.word,
+              language: word.language,
+              addToDictionary: true
+            })
+          });
 
-        if (res.ok) {
+          if (!res.ok) {
+            const error = await res.json().catch(() => ({}));
+            throw new Error(error.error || `HTTP ${res.status}`);
+          }
+          return res.json();
+        })
+      );
+
+      results.forEach(result => {
+        if (result.status === 'fulfilled') {
           successCount++;
         } else {
           failCount++;
+          console.error('Bulk add error:', result.reason);
         }
-      } catch {
-        failCount++;
+      });
+
+      if (successCount > 0) {
+        toast.success(`Added ${successCount} word${successCount > 1 ? 's' : ''} to dictionary`);
       }
+      if (failCount > 0) {
+        toast.error(`Failed to add ${failCount} word${failCount > 1 ? 's' : ''}`);
+      }
+    } catch (error) {
+      console.error('Bulk add operation failed:', error);
+      toast.error('Bulk operation failed. Please try again.');
+    } finally {
+      setBulkActionLoading(false);
+      setSelectedWords(new Set());
+      // Refresh the list
+      fetchCommunityWords(communityWordSearch, communityWordStatus, communityWordLanguage);
     }
-
-    setBulkActionLoading(false);
-    setSelectedWords(new Set());
-
-    if (successCount > 0) {
-      toast.success(`Added ${successCount} word${successCount > 1 ? 's' : ''} to dictionary`);
-    }
-    if (failCount > 0) {
-      toast.error(`Failed to add ${failCount} word${failCount > 1 ? 's' : ''}`);
-    }
-
-    // Refresh the list
-    fetchCommunityWords(communityWordSearch, communityWordStatus, communityWordLanguage);
   };
 
   // Handle bulk remove (blacklist)
@@ -795,48 +809,60 @@ export default function AdminDashboard() {
     let successCount = 0;
     let failCount = 0;
 
-    const wordsToProcess = communityWords.filter(w =>
-      selectedWords.has(getWordKey(w.word, w.language))
-    );
+    try {
+      const wordsToProcess = communityWords.filter(w =>
+        selectedWords.has(getWordKey(w.word, w.language))
+      );
 
-    for (const word of wordsToProcess) {
-      try {
-        const res = await fetch('/api/admin/community-words/disapprove', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            word: word.word,
-            language: word.language,
-            reason: 'Bulk admin review: invalid word',
-            addToBlacklist: true
-          })
-        });
+      // Process words in parallel for better performance
+      const results = await Promise.allSettled(
+        wordsToProcess.map(async (word) => {
+          const res = await fetch('/api/admin/community-words/disapprove', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              word: word.word,
+              language: word.language,
+              reason: 'Bulk admin review: invalid word',
+              addToBlacklist: true
+            })
+          });
 
-        if (res.ok) {
+          if (!res.ok) {
+            const error = await res.json().catch(() => ({}));
+            throw new Error(error.error || `HTTP ${res.status}`);
+          }
+          return res.json();
+        })
+      );
+
+      results.forEach(result => {
+        if (result.status === 'fulfilled') {
           successCount++;
         } else {
           failCount++;
+          console.error('Bulk remove error:', result.reason);
         }
-      } catch {
-        failCount++;
+      });
+
+      if (successCount > 0) {
+        toast.success(`Removed ${successCount} word${successCount > 1 ? 's' : ''}`);
       }
+      if (failCount > 0) {
+        toast.error(`Failed to remove ${failCount} word${failCount > 1 ? 's' : ''}`);
+      }
+    } catch (error) {
+      console.error('Bulk remove operation failed:', error);
+      toast.error('Bulk operation failed. Please try again.');
+    } finally {
+      setBulkActionLoading(false);
+      setSelectedWords(new Set());
+      // Refresh the list
+      fetchCommunityWords(communityWordSearch, communityWordStatus, communityWordLanguage);
     }
-
-    setBulkActionLoading(false);
-    setSelectedWords(new Set());
-
-    if (successCount > 0) {
-      toast.success(`Removed ${successCount} word${successCount > 1 ? 's' : ''}`);
-    }
-    if (failCount > 0) {
-      toast.error(`Failed to remove ${failCount} word${failCount > 1 ? 's' : ''}`);
-    }
-
-    // Refresh the list
-    fetchCommunityWords(communityWordSearch, communityWordStatus, communityWordLanguage);
   };
 
   // Fetch community words when tab changes or filters update

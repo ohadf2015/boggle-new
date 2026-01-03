@@ -203,6 +203,7 @@ export const DailyWordManager: React.FC = () => {
       const response = await fetch('/api/admin/daily-word/bulk-generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           language: selectedLang,
           startDate: bulkStartDate,
@@ -259,6 +260,7 @@ export const DailyWordManager: React.FC = () => {
       const response = await fetch('/api/admin/daily-word/bulk-generate', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           language: selectedLang,
           words: wordsToSave,

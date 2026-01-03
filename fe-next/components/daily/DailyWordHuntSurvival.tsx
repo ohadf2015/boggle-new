@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Zap, Store, X, Heart, Coins, Lightbulb } from 'lucide-react';
+import { Trophy, Zap, Store, X, Heart, Coins } from 'lucide-react';
 import GridComponent from '@/components/GridComponent';
 import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
 import { useContextualGuidance, useSwipeTipGuidanceTrigger } from '@/hooks/useContextualGuidance';
@@ -35,6 +35,8 @@ import { WordFeedbackToast, type FeedbackType } from './WordFeedbackToast';
 import { LifeGainAnimation } from './LifeGainAnimation';
 import { useAuth } from '@/contexts/AuthContext';
 import { logGameStart, logGameEnd, formatWordsForLogging } from '@/utils/gameLogger';
+import { fireConfetti } from '@/utils/confettiUtils';
+import { hapticClueRevealed } from '@/utils/haptics';
 
 const MAX_ATTEMPTS = 10;
 const INITIAL_LIFE = 100;
@@ -150,10 +152,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
   const [showShopHint, setShowShopHint] = useState(false);
   const shopHintShownRef = useRef(false);
+  const [isClueGaining, setIsClueGaining] = useState(false);
 
-  // Refs for life drain
+  // Refs for life drain and UI elements
   const lifeIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const gameOverRef = useRef(false);
+  const clueContainerRef = useRef<HTMLDivElement>(null);
 
   // Session tracking
   const [gameSessionId, setGameSessionId] = useState<string | null>(null);
@@ -729,6 +733,32 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     // Reset animation trigger after animation completes
     setTimeout(() => setIsLifeGaining(false), 600);
 
+    // Trigger clue gain animation (green glow + confetti + haptic on clue container)
+    if (cluesRevealed > 0) {
+      setIsClueGaining(true);
+      setTimeout(() => setIsClueGaining(false), 800);
+
+      // Haptic feedback for clue reveal
+      hapticClueRevealed(cluesRevealed);
+
+      // Fire small confetti burst from clue container
+      if (clueContainerRef.current && typeof window !== 'undefined') {
+        const rect = clueContainerRef.current.getBoundingClientRect();
+        const originX = (rect.left + rect.width / 2) / window.innerWidth;
+        const originY = (rect.top + rect.height / 2) / window.innerHeight;
+        fireConfetti({
+          particleCount: 12 + cluesRevealed * 4, // More confetti for more clues
+          spread: 45,
+          startVelocity: 20,
+          gravity: 0.8,
+          ticks: 80,
+          origin: { x: originX, y: originY },
+          colors: ['#22c55e', '#4ade80', '#86efac', '#fde047'], // Green + yellow accent
+          scalar: 0.7,
+        });
+      }
+    }
+
     // Show success feedback with clue bonus if applicable
     const clueBonus = cluesRevealed > 0 ? ` 💡+${cluesRevealed}` : '';
     showToast('valid-word', `+${lifeGained} ❤️ ${tokensGained > 0 ? `+${tokensGained} 🪙` : ''}${clueBonus}`);
@@ -968,6 +998,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       {/* Target word black boxes - always visible, with screenshot protection */}
       {currentHint && (
         <motion.div
+          ref={clueContainerRef}
           // Key on attempts length to retrigger attention animation on each guess
           key={`clue-container-${attempts.length}`}
           initial={{ opacity: 0, y: -10 }}
@@ -977,7 +1008,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
             "bg-neo-navy/30 dark:bg-neo-navy/50 border-2 border-neo-black/20",
             showFeedbackOverlay
               ? "clue-feedback-active clue-container-attention"
-              : "clue-container-glow", // Subtle continuous glow when idle
+              : isClueGaining
+                ? "clue-container-green-glow" // Green glow when revealing clues
+                : "clue-container-glow", // Subtle continuous glow when idle
             // Screenshot protection blur
             isProtected && "blur-xl select-none"
           )}
@@ -1126,65 +1159,68 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
             </AnimatePresence>
           </div>
 
-          {/* Feedback legend when showing overlay */}
-          <AnimatePresence>
-            {showFeedbackOverlay && latestAttemptFeedback && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2, delay: 0.3 }}
-                className="flex items-center justify-center gap-2 mt-1 text-[10px] sm:text-xs"
-              >
-                <span className="flex items-center gap-1">
-                  <span className="w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded border border-green-700"></span>
-                  <span className="text-gray-600 dark:text-gray-400">{t('wordHunt.feedback.correct') || 'Correct'}</span>
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-3 h-3 sm:w-4 sm:h-4 bg-yellow-500 rounded border border-yellow-600"></span>
-                  <span className="text-gray-600 dark:text-gray-400">{t('wordHunt.feedback.wrongPlace') || 'Wrong place'}</span>
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-3 h-3 sm:w-4 sm:h-4 bg-gray-400 rounded border border-gray-500"></span>
-                  <span className="text-gray-600 dark:text-gray-400">{t('wordHunt.feedback.notInWord') || 'Not in word'}</span>
-                </span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Hint level indicator below boxes - hide when showing feedback */}
-          {!showFeedbackOverlay && (
-            <div className="flex flex-col items-center gap-0.5 mt-0.5">
-              <div className="flex items-center gap-1">
-                <Lightbulb className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
-                <span className="text-[10px] sm:text-xs font-bold text-gray-500">
-                  {t('wordHunt.survival.hintLevel')?.replace('{level}', String(currentHint.level)) || `Hint Lvl ${currentHint.level}`}
-                </span>
-              </div>
-              {/* Known letters (yellow) display - letters in word but not in right place */}
-              {knownLetters.size > 0 && (
+          {/* Fixed height wrapper to prevent layout jumps when switching between feedback/hint states */}
+          <div className="min-h-[40px] sm:min-h-[44px] flex flex-col justify-center">
+            {/* Feedback legend when showing overlay */}
+            <AnimatePresence mode="wait">
+              {showFeedbackOverlay && latestAttemptFeedback ? (
                 <motion.div
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-1 text-[10px] sm:text-xs"
+                  key="feedback-legend"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="flex items-center justify-center gap-2 mt-1 text-[10px] sm:text-xs"
                 >
-                  <span className="text-yellow-600 dark:text-yellow-400 font-medium">
-                    {t('wordHunt.survival.knownLetters') || 'Wrong spot:'}
+                  <span className="flex items-center gap-1">
+                    <span className="w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded border border-green-700"></span>
+                    <span className="text-gray-600 dark:text-gray-400">{t('wordHunt.feedback.correct') || 'Correct'}</span>
                   </span>
-                  <div className="flex gap-0.5">
-                    {Array.from(knownLetters).map((letter) => (
-                      <span
-                        key={letter}
-                        className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center bg-yellow-500 border border-yellow-600 rounded text-neo-black font-bold text-xs"
-                      >
-                        {letter}
+                  <span className="flex items-center gap-1">
+                    <span className="w-3 h-3 sm:w-4 sm:h-4 bg-yellow-500 rounded border border-yellow-600"></span>
+                    <span className="text-gray-600 dark:text-gray-400">{t('wordHunt.feedback.wrongPlace') || 'Wrong place'}</span>
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-3 h-3 sm:w-4 sm:h-4 bg-gray-400 rounded border border-gray-500"></span>
+                    <span className="text-gray-600 dark:text-gray-400">{t('wordHunt.feedback.notInWord') || 'Not in word'}</span>
+                  </span>
+                </motion.div>
+              ) : (
+                /* Known letters indicator below boxes */
+                <motion.div
+                  key="known-letters"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="flex flex-col items-center gap-0.5 mt-0.5"
+                >
+                  {/* Known letters (yellow) display - letters in word but not in right place */}
+                  {knownLetters.size > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center gap-1 text-[10px] sm:text-xs"
+                    >
+                      <span className="text-yellow-600 dark:text-yellow-400 font-medium">
+                        {t('wordHunt.survival.knownLetters') || 'Wrong spot:'}
                       </span>
-                    ))}
-                  </div>
+                      <div className="flex gap-0.5">
+                        {Array.from(knownLetters).map((letter) => (
+                          <span
+                            key={letter}
+                            className="w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center bg-yellow-500 border border-yellow-600 rounded text-neo-black font-bold text-xs"
+                          >
+                            {letter}
+                          </span>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
                 </motion.div>
               )}
-            </div>
-          )}
+            </AnimatePresence>
+          </div>
         </motion.div>
       )}
 

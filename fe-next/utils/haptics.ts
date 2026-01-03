@@ -171,6 +171,22 @@ export const hapticComboDanger = (): boolean => {
   return vibrate([5, 100, 5]);
 };
 
+/**
+ * Clue revealed - discovery pattern
+ * Scales with number of clues revealed
+ */
+export const hapticClueRevealed = (clueCount: number = 1): boolean => {
+  if (clueCount >= 3) {
+    // Multiple clues - celebratory triple pulse
+    return vibrate([20, 30, 20, 30, 25]);
+  } else if (clueCount >= 2) {
+    // Two clues - double pulse
+    return vibrate([18, 40, 18]);
+  }
+  // Single clue - satisfying single tap
+  return vibrate(20);
+};
+
 const haptics = {
   isSupported: isVibrationSupported,
   isEnabled: isHapticsEnabled,
@@ -187,6 +203,7 @@ const haptics = {
   comboBreak: hapticComboBreak,
   comboSaved: hapticComboSaved,
   comboDanger: hapticComboDanger,
+  clueRevealed: hapticClueRevealed,
 };
 
 export default haptics;

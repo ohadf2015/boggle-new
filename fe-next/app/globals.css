@@ -2607,6 +2607,40 @@ html.reduce-motion *::after {
               4px 4px 0 rgb(var(--neo-black));
 }
 
+/* Green glow for clue container when word reveals new clues */
+.clue-container-green-glow {
+  animation: clue-green-pulse 0.8s ease-out;
+}
+
+@keyframes clue-green-pulse {
+  0% {
+    border-color: rgba(34, 197, 94, 0.3);
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.4),
+                0 0 16px rgba(34, 197, 94, 0.2),
+                4px 4px 0 rgb(var(--neo-black));
+  }
+  30% {
+    border-color: rgba(34, 197, 94, 1);
+    box-shadow: 0 0 24px rgba(34, 197, 94, 0.8),
+                0 0 48px rgba(34, 197, 94, 0.4),
+                0 0 72px rgba(34, 197, 94, 0.2),
+                4px 4px 0 rgb(var(--neo-black));
+  }
+  100% {
+    border-color: rgba(34, 197, 94, 0.3);
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.2),
+                4px 4px 0 rgb(var(--neo-black));
+  }
+}
+
+/* Low-end device fallback for green glow */
+.low-end-device .clue-container-green-glow {
+  animation: none;
+  border-color: rgba(34, 197, 94, 0.8);
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.4),
+              4px 4px 0 rgb(var(--neo-black));
+}
+
 /* Low-end device fallback - simpler animations */
 .low-end-device .clue-container-attention {
   animation: none;
