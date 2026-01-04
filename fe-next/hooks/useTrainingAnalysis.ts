@@ -80,11 +80,18 @@ export function useTrainingAnalysis(options: UseTrainingAnalysisOptions): UseTra
   const [skillGaps, setSkillGaps] = useState<string[]>([]);
 
   // Refs for timing
-  const gameStartTimeRef = useRef<number>(Date.now());
+  const gameStartTimeRef = useRef<number>(0);
   const lastHintTimeRef = useRef<number>(0);
   const wordsFoundRef = useRef<number>(0);
   const hintsShownRef = useRef<Set<TrainingHintType>>(new Set());
   const hasCalledCompleteRef = useRef<boolean>(false);
+
+  // Initialize game start time when enabled
+  useEffect(() => {
+    if (enabled && gameStartTimeRef.current === 0) {
+      gameStartTimeRef.current = Date.now();
+    }
+  }, [enabled]);
 
   // Update skill gaps periodically
   useEffect(() => {
