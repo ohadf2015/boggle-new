@@ -14,11 +14,12 @@ import {
 import { getGuestSessionId, clearGuestData, hashToken } from '../utils/guestManager';
 import { getUtmDataForProfile } from '../utils/utmCapture';
 import { getPendingDailyResult, clearPendingDailyResult, getGuestDailyPlayer, setWinnerOnboarding, syncGuestDailyResultsToAccount } from '../utils/dailyChallenge';
+import { getStoredProfile, hasCompleteStoredProfile, clearStoredProfile } from '../utils/profileStorage';
 import logger from '@/utils/logger';
 import { setSentryUser, clearSentryUser } from '@/utils/sentry';
 import type { User } from '@supabase/supabase-js';
 import { linkSessionToUser } from '@/utils/sessionTracking';
-import { getRandomAvatar } from '@/utils/avatarConfig';
+import { getRandomAvatar, getAvatarEmojiAndColor } from '@/utils/avatarConfig';
 import {
   initCrossTabAuthSync,
   destroyCrossTabAuthSync,
@@ -72,15 +73,46 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       // Check if this is a brand new user who hasn't customized their profile yet
       // If so, trigger the winner onboarding flow instead of immediate submission
       if (userProfile.has_customized_profile === false && pending.trigger) {
-        logger.info('New user with pending result - triggering winner onboarding flow');
-        setWinnerOnboarding({
-          needsOnboarding: true,
-          trigger: pending.trigger,
-          initialName: userProfile.display_name || userProfile.username || '',
-          initialAvatarId: userProfile.avatar_image || '',
-        });
-        // DON'T clear the pending result yet - it will be submitted after onboarding
-        return;
+        // First check if the guest already chose a name and avatar before signing up
+        // If they did, use those values directly instead of showing the onboarding modal
+        if (hasCompleteStoredProfile()) {
+          const guestProfile = getStoredProfile();
+          logger.info('Guest already has stored profile, using those values:', guestProfile);
+
+          // Get emoji and color for the stored avatar
+          const { emoji, color } = getAvatarEmojiAndColor(guestProfile.avatarId || '');
+
+          // Update the user's profile with the guest's chosen values
+          const { error: updateError } = await updateProfile(userId, {
+            display_name: guestProfile.username || userProfile.display_name || userProfile.username,
+            avatar_image: guestProfile.avatarId || userProfile.avatar_image,
+            avatar_emoji: emoji || userProfile.avatar_emoji,
+            avatar_color: color || userProfile.avatar_color,
+            has_customized_profile: true,
+          });
+
+          if (updateError) {
+            logger.warn('Failed to update profile with guest data:', updateError);
+          } else {
+            logger.info('Profile updated with guest data, skipping onboarding modal');
+          }
+
+          // Clear the stored guest profile
+          clearStoredProfile();
+
+          // Continue to submit the pending result (don't return early)
+        } else {
+          // Guest hasn't set up their profile yet, show the onboarding modal
+          logger.info('New user with pending result - triggering winner onboarding flow');
+          setWinnerOnboarding({
+            needsOnboarding: true,
+            trigger: pending.trigger,
+            initialName: userProfile.display_name || userProfile.username || '',
+            initialAvatarId: userProfile.avatar_image || '',
+          });
+          // DON'T clear the pending result yet - it will be submitted after onboarding
+          return;
+        }
       }
 
       // Returning user or no trigger - submit immediately as before

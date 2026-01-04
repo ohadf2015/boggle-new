@@ -2467,7 +2467,8 @@ const es = {
       "practiceMore": "Practicar Más",
       "tryAgain": "Intentar de Nuevo",
       "skipAnyway": "Continuar de todos modos"
-    }
+    },
+    "viewProgress": "Ver Progreso"
   },
   "leaderboard": {
     "title": "Clasificación",

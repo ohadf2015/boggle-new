@@ -984,8 +984,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                     <span className="font-black text-sm">{result.clueTokensEarned - result.clueTokensSpent}</span>
                   </div>
                 )}
-                {/* Coin reward */}
-                {coinReward && (
+                {/* Coin reward - only show if actually earned coins */}
+                {coinReward && coinReward.awarded > 0 && (
                   <div className="flex items-center gap-1 px-2 py-1 bg-amber-400 rounded-neo border-2 border-neo-black">
                     <Coins className="w-3.5 h-3.5 text-neo-black" />
                     <span className="font-black text-sm text-neo-black">+{coinReward.awarded}</span>

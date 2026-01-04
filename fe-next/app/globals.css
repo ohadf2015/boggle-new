@@ -2464,9 +2464,10 @@ body.crazygames-embed {
   }
 }
 
-/* ====== Consolidated Landscape Touch Targets ====== */
-/* Single source of truth for all landscape touch targets */
-@media (orientation: landscape) {
+/* ====== Consolidated Landscape Touch Targets (Mobile/Tablet only) ====== */
+/* Single source of truth for mobile/tablet landscape touch targets */
+/* Max-width 1199px ensures desktop uses its own min-width based styles */
+@media (orientation: landscape) and (max-width: 1199px) {
   /* All interactive elements must meet 48px minimum */
   button,
   a[role="button"],
@@ -2483,6 +2484,7 @@ body.crazygames-embed {
   }
 
   /* Grid cells - use max() to ensure WCAG 44px minimum while scaling up */
+  /* This only applies to mobile/tablet landscape, not desktop */
   .game-board-frame [role="gridcell"] {
     min-width: max(44px, calc((100vw - 300px) / 8));
     min-height: max(44px, calc((100vw - 300px) / 8));
@@ -2684,10 +2686,11 @@ body.crazygames-embed {
   }
 }
 
-/* Landscape tablets and desktop (larger screens in landscape) */
-@media (orientation: landscape) and (min-height: 601px) and (max-height: 900px) {
+/* Landscape tablets (larger screens in landscape, but NOT desktop) */
+/* Max-width 1199px ensures this doesn't override desktop min-width styles */
+@media (orientation: landscape) and (min-height: 601px) and (max-height: 900px) and (max-width: 1199px) {
   .game-board-frame {
-    /* Larger grid for better playability on tablets/desktop landscape */
+    /* Larger grid for better playability on tablets in landscape */
     width: min(80vh, calc(100vw - 300px));
     max-width: min(80vh, calc(100vw - 300px));
     height: min(85vh, calc(100vw - 360px));
@@ -2695,16 +2698,9 @@ body.crazygames-embed {
   }
 }
 
-/* Large desktop landscape screens (height > 900px) */
-@media (orientation: landscape) and (min-height: 901px) {
-  .game-board-frame {
-    /* Comfortable size for large desktop screens */
-    width: min(70vh, calc(100vw - 400px));
-    max-width: min(70vh, calc(100vw - 400px));
-    height: min(70vh, calc(100vw - 400px));
-    max-height: min(70vh, calc(100vw - 400px));
-  }
-}
+/* NOTE: Removed separate landscape query for large screens (height > 900px) */
+/* Desktop screens use min-width based queries defined earlier (lines 536-553) */
+/* This avoids landscape media queries overriding desktop-specific styles */
 
 /* Accessibility: Larger text mode */
 html.larger-text {

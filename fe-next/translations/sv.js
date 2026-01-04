@@ -1683,7 +1683,8 @@ const sv = {
       "practiceMore": "Öva Mer",
       "tryAgain": "Försök Igen",
       "skipAnyway": "Fortsätt ändå"
-    }
+    },
+    "viewProgress": "Se Framsteg"
   },
   "achievements": {
     "FIRST_BLOOD": {

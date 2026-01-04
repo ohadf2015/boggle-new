@@ -90,19 +90,22 @@ export async function GET(request: Request) {
 
 /**
  * POST /api/daily/validate-retry-token
- * Use a retry token (increments use count)
+ * Use a retry token (increments use count and resets server-side attempts)
  * Called after successful validation when player actually uses the retry
  *
  * Request body:
  * - token: string
+ * - playerId?: string (optional - for authenticated users to reset server-side attempt)
+ * - guestFingerprint?: string (optional - for guests to reset server-side attempt)
  *
  * Response:
  * - success: boolean
+ * - attemptsReset?: number (number of server-side attempts deleted)
  */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { token } = body;
+    const { token, playerId, guestFingerprint } = body;
 
     if (!token) {
       return NextResponse.json(
@@ -158,10 +161,53 @@ export async function POST(request: Request) {
       // Continue anyway - the main functionality still works
     }
 
+    // Reset server-side attempts for the player
+    // This allows authenticated users to replay after using a retry link
+    let attemptsReset = 0;
+
+    if (playerId) {
+      // Delete attempt for authenticated player
+      const { data: deletedData, error: deleteError } = await supabase
+        .from('daily_word_hunt_attempts')
+        .delete()
+        .eq('puzzle_date', tokenData.puzzle_date)
+        .eq('language', tokenData.language)
+        .eq('player_id', playerId)
+        .select('id');
+
+      if (deleteError) {
+        console.warn('Could not reset player attempt:', deleteError.message);
+      } else {
+        attemptsReset = deletedData?.length || 0;
+        if (attemptsReset > 0) {
+          console.log(`Reset ${attemptsReset} attempt(s) for player ${playerId} on ${tokenData.puzzle_date}/${tokenData.language}`);
+        }
+      }
+    } else if (guestFingerprint) {
+      // Delete attempt for guest
+      const { data: deletedData, error: deleteError } = await supabase
+        .from('daily_word_hunt_attempts')
+        .delete()
+        .eq('puzzle_date', tokenData.puzzle_date)
+        .eq('language', tokenData.language)
+        .eq('guest_fingerprint', guestFingerprint)
+        .select('id');
+
+      if (deleteError) {
+        console.warn('Could not reset guest attempt:', deleteError.message);
+      } else {
+        attemptsReset = deletedData?.length || 0;
+        if (attemptsReset > 0) {
+          console.log(`Reset ${attemptsReset} attempt(s) for guest ${guestFingerprint.substring(0, 8)}... on ${tokenData.puzzle_date}/${tokenData.language}`);
+        }
+      }
+    }
+
     return NextResponse.json({
       success: true,
       puzzleDate: tokenData.puzzle_date,
       language: tokenData.language,
+      attemptsReset,
     });
   } catch (error) {
     console.error('Use retry token error:', error);

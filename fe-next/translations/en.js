@@ -1689,7 +1689,8 @@ const en = {
       "practiceMore": "Practice More",
       "tryAgain": "Try Again",
       "skipAnyway": "Go anyway"
-    }
+    },
+    "viewProgress": "View Progress"
   },
   "achievements": {
     "FIRST_BLOOD": {

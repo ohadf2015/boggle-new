@@ -1684,7 +1684,8 @@ const he = {
       "practiceMore": "עוד אימון",
       "tryAgain": "נסה שוב",
       "skipAnyway": "בכל זאת"
-    }
+    },
+    "viewProgress": "צפה בהתקדמות"
   },
   "achievements": {
     "FIRST_BLOOD": {

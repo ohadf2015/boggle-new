@@ -1682,7 +1682,8 @@ const ja = {
       "practiceMore": "もっと練習",
       "tryAgain": "もう一度",
       "skipAnyway": "そのまま進む"
-    }
+    },
+    "viewProgress": "進捗を見る"
   },
   "achievements": {
     "FIRST_BLOOD": {

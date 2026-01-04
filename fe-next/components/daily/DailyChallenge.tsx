@@ -212,24 +212,51 @@ const DailyChallenge: React.FC = () => {
           if (!isMounted) return;
 
           if (data.valid) {
-            // Token is valid - clear localStorage and allow replay
-            const cleared = clearWordHuntResultForRetry(gameLanguage);
-            if (cleared) {
-              setWasReset(true);
-              neoSuccessToast(t('daily.retryLinkUsed'), { icon: '🔓', duration: 4000 });
+            // Token is valid - reset both localStorage and server-side attempts
+            // IMPORTANT: Must await server reset before allowing puzzle to initialize
+            // to prevent race condition where server check finds existing attempt
+
+            // Record token usage and reset server-side attempts first
+            const resetBody: { token: string; playerId?: string; guestFingerprint?: string } = { token: retryToken };
+            if (isAuthenticated && profile) {
+              resetBody.playerId = profile.id;
             } else {
-              // No previous attempt to clear, but still allow playing
-              neoSuccessToast(t('daily.retryLinkReady'), { icon: '🎯', duration: 3000 });
+              const fp = await getGuestFingerprint();
+              if (fp) {
+                resetBody.guestFingerprint = fp;
+              }
             }
 
-            // Record token usage
-            fetch('/api/daily/validate-retry-token', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ token: retryToken }),
-            }).catch(() => {
-              // Ignore errors - token usage tracking is non-critical
-            });
+            try {
+              const resetResponse = await fetch('/api/daily/validate-retry-token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(resetBody),
+              });
+              const resetResult = await resetResponse.json();
+
+              if (!isMounted) return;
+
+              // Now clear localStorage after server reset succeeded
+              const cleared = clearWordHuntResultForRetry(gameLanguage);
+
+              // Set wasReset to trigger puzzle re-initialization
+              setWasReset(true);
+
+              if (resetResult.attemptsReset > 0 || cleared) {
+                neoSuccessToast(t('daily.retryLinkUsed'), { icon: '🔓', duration: 4000 });
+              } else {
+                // No previous attempt to clear, but still allow playing
+                neoSuccessToast(t('daily.retryLinkReady'), { icon: '🎯', duration: 3000 });
+              }
+            } catch (resetError) {
+              console.warn('Failed to reset server attempt:', resetError);
+              // Still try to proceed with localStorage clear
+              if (!isMounted) return;
+              clearWordHuntResultForRetry(gameLanguage);
+              setWasReset(true);
+              neoSuccessToast(t('daily.retryLinkReady'), { icon: '🎯', duration: 3000 });
+            }
           } else {
             // Token is invalid - show appropriate error message
             if (data.reason === 'expired') {
@@ -262,7 +289,7 @@ const DailyChallenge: React.FC = () => {
       };
     }
     return undefined;
-  }, [searchParams, gameLanguage, t]);
+  }, [searchParams, gameLanguage, t, isAuthenticated, profile]);
 
   // Initialize Word Hunt daily challenge
   useEffect(() => {
