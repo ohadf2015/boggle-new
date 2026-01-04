@@ -7,6 +7,9 @@ import { useLanguage } from '../contexts/LanguageContext';
 
 const STORAGE_KEY = 'boggle_landscape_dismissed';
 
+// TEMPORARILY DISABLED: Feature flag to disable landscape mode recommendation
+const FEATURE_ENABLED = false;
+
 interface LandscapeIndicatorProps {
   /** Optional className for positioning */
   className?: string;
@@ -24,9 +27,6 @@ const LandscapeIndicator = memo<LandscapeIndicatorProps>(({ className = '' }) =>
   const [isVisible, setIsVisible] = useState(false);
   const [isPortrait, setIsPortrait] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-
-  // TEMPORARILY DISABLED: Feature flag to disable landscape mode recommendation
-  const FEATURE_ENABLED = false;
 
   // Check if we should show based on localStorage
   useEffect(() => {

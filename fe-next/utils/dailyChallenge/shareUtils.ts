@@ -110,8 +110,7 @@ ${dailyUrl}`;
 export function generateWordHuntShareableResult(
   result: WordHuntResult,
   t?: ShareTranslationFn,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  siteUrl?: string
+  _siteUrl?: string
 ): string {
   // Format the main result message
   const resultEmoji = result.solved ? '🎯' : '💪';
@@ -193,8 +192,7 @@ ${cta} 🎮`;
  */
 export function getWordHuntShareTextForPlatform(
   result: WordHuntResult,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  platform: 'whatsapp' | 'twitter' | 'telegram' | 'copy',
+  _platform: 'whatsapp' | 'twitter' | 'telegram' | 'copy',
   t?: ShareTranslationFn,
   siteUrl = 'lexiclash.live'
 ): string {
