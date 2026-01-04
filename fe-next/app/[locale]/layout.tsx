@@ -510,7 +510,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                         <main id="main-content" className="screen-fit-content" tabIndex={-1}>
                             {children}
                         </main>
-                        <Footer className="hidden md:block" />
+                        <Footer className="hidden sm:block" />
                     </div>
                     <PWAInstallPrompt />
                     <EmailCaptureModal />

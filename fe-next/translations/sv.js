@@ -89,6 +89,7 @@ const sv = {
     "connectionLost": "Tappade anslutningen",
     "notConnected": "Offline",
     "connected": "Ansluten",
+    "coins": "mynt",
     "connecting": "Ansluter...",
     "connectedToServer": "Redo för strid!",
     "connectingToServer": "Värmer upp...",
@@ -2366,7 +2367,9 @@ const sv = {
     "leader": "Ledare",
     "leading": "Leder!",
     "ahead": "före",
-    "toCatch": "p för att passera"
+    "toCatch": "p för att passera",
+    "live": "Live",
+    "backToGame": "Tillbaka till spelet"
   },
   "ranked": {
     "title": "Rankat läge",
@@ -2922,7 +2925,8 @@ const sv = {
       "step3Desc": "10 försök att knäcka koden",
       "step3Hint": "Gissa ord med {length} bokstäver för ledtrådar",
       "step4Title": "Hitta ord, avslöja ledtrådar",
-      "step4Desc": "Varje ord på 3+ bokstäver ger ledtrådar!"
+      "step4Desc": "Varje ord på 3+ bokstäver ger ledtrådar!",
+      "goToStep": "Gå till steg {step}"
     },
     "share": {
       "header": "LexiClash Daily #{number}",
@@ -3103,6 +3107,19 @@ const sv = {
         "nice": "Bra Insats!",
         "start": "Varje Sekund Räknas!"
       }
+    },
+    "ad": {
+      "watchAd": "Titta på Annons",
+      "needMoreCoins": "Behöver fler mynt?",
+      "coinsNeeded": "{current} / {needed} mynt",
+      "coinsEarned": "mynt intjänade!",
+      "loading": "Laddar annons...",
+      "watching": "Tittar på annons...",
+      "almostDone": "Nästan klart!",
+      "error": "Annonsen misslyckades",
+      "tryAgain": "Försök igen senare",
+      "earnCoins": "Tjäna Mynt",
+      "watchToEarn": "Titta på en kort video för att tjäna mynt"
     },
     "shareCTA": {
       "canYouSolve": "Kan du lösa det?",

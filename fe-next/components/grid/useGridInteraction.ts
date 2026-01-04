@@ -93,7 +93,9 @@ export function useGridInteraction({
   // Desktop-specific state
   const [hoveredCell, setHoveredCell] = useState<GridPosition | null>(null);
   const [isClickSelectMode, setIsClickSelectMode] = useState<boolean>(false);
-  const [isDragging, setIsDragging] = useState<boolean>(false);
+  // FIXED: Use ref for isDragging to avoid async state update race condition
+  // handleMouseMove fires before setIsDragging state update completes
+  const isDraggingRef = useRef<boolean>(false);
 
   const isTouchingRef = useRef<boolean>(false);
   const startPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -726,13 +728,13 @@ export function useGridInteraction({
   ) => {
     // Don't use touch behavior for desktop - use click-to-select
     if (!isTouchDeviceRef.current) {
-      // If in click-select mode, handle as click
+      // If in click-select mode (not dragging), handle as click
       if (isClickSelectMode || selectedCells.length > 0) {
         handleCellClick(rowIndex, colIndex, letter);
         return;
       }
       // Start drag mode if no cells selected and mouse held down
-      setIsDragging(true);
+      isDraggingRef.current = true;
     }
     handleTouchStart(rowIndex, colIndex, letter, event);
   };
@@ -749,7 +751,8 @@ export function useGridInteraction({
     }
 
     // If dragging, process touch move
-    if (isTouchingRef.current && isDragging) {
+    // FIXED: Use isDraggingRef.current instead of isDragging state for synchronous check
+    if (isTouchingRef.current && isDraggingRef.current) {
       const mockEvent = {
         touches: [{ clientX: e.clientX, clientY: e.clientY }],
         cancelable: true,
@@ -803,14 +806,15 @@ export function useGridInteraction({
   // Global mouse up
   useEffect(() => {
     const handleMouseUp = () => {
-      setIsDragging(false);
-      if (isDragging) {
+      // FIXED: Use ref instead of state for synchronous update
+      if (isDraggingRef.current) {
+        isDraggingRef.current = false;
         handleTouchEnd();
       }
     };
     window.addEventListener('mouseup', handleMouseUp);
     return () => window.removeEventListener('mouseup', handleMouseUp);
-  }, [handleTouchEnd, isDragging]);
+  }, [handleTouchEnd]);
 
   // Detect touch device (set on first touch)
   useEffect(() => {
@@ -1034,7 +1038,7 @@ export function useGridInteraction({
     swipeVelocity: swipeVelocityRef.current,
     hoveredCell,
     isSelecting: isClickSelectMode,
-    isDragging,
+    isDragging: isDraggingRef.current,
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,

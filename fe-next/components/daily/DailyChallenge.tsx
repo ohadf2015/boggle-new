@@ -73,14 +73,13 @@ const DailyChallenge: React.FC = () => {
 
   // Game language state - separate from UI language
   // This controls only the puzzle/dictionary language, not the UI
+  // FIXED: Always initialize from URL locale to ensure /en/daily shows English, /he/daily shows Hebrew
+  // User can switch languages via the dropdown during the session
   const [gameLanguage, setGameLanguage] = useState<Language>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('lexiclash_daily_game_language');
-      if (saved && ['en', 'he', 'sv', 'ja', 'es'].includes(saved)) {
-        return saved as Language;
-      }
-    }
-    return (language as Language) || 'en';
+    const urlLocale = language as Language;
+    return urlLocale && ['en', 'he', 'sv', 'ja', 'es'].includes(urlLocale)
+      ? urlLocale
+      : 'en';
   });
 
   // Persist game language to localStorage
@@ -822,7 +821,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
 
   const formattedDate = useMemo(() => {
     try {
-      return new Date(puzzleDate + 'T00:00:00Z').toLocaleDateString(undefined, {
+      return new Date(puzzleDate + 'T00:00:00Z').toLocaleDateString(language, {
         weekday: 'long',
         month: 'long',
         day: 'numeric',

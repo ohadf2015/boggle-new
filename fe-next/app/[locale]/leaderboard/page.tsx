@@ -101,7 +101,7 @@ export default function LeaderboardPage(): React.ReactNode {
               className="mt-6"
             >
               <ArrowLeft className="me-2 rtl:rotate-180" />
-              Back to Game
+              {t('leaderboard.backToGame') || 'Back to Game'}
             </Button>
           </div>
         </div>
@@ -159,7 +159,7 @@ export default function LeaderboardPage(): React.ReactNode {
                 'text-xs',
                 isDarkMode ? 'text-gray-600' : 'text-gray-600'
               )}>
-                {subscriptionStatus === 'SUBSCRIBED' ? 'Live' : 'Connecting...'}
+                {subscriptionStatus === 'SUBSCRIBED' ? (t('leaderboard.live') || 'Live') : (t('common.connecting') || 'Connecting...')}
               </span>
             </div>
             <Button
@@ -360,7 +360,7 @@ export default function LeaderboardPage(): React.ReactNode {
             )}
           >
             <ArrowLeft className="me-2 rtl:rotate-180" />
-            Back to Game
+            {t('leaderboard.backToGame') || 'Back to Game'}
           </Button>
         </div>
       </div>

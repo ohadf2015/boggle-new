@@ -89,6 +89,7 @@ const ja = {
     "connectionLost": "接続切れ",
     "notConnected": "オフライン",
     "connected": "接続済み",
+    "coins": "コイン",
     "connecting": "接続中...",
     "connectedToServer": "バトル準備OK！",
     "connectingToServer": "ウォーミングアップ...",
@@ -2365,7 +2366,9 @@ const ja = {
     "leader": "リーダー",
     "leading": "トップ!",
     "ahead": "先行",
-    "toCatch": "pt追い越しまで"
+    "toCatch": "pt追い越しまで",
+    "live": "ライブ",
+    "backToGame": "ゲームに戻る"
   },
   "ranked": {
     "title": "ランクマッチ",
@@ -2921,7 +2924,8 @@ const ja = {
       "step3Desc": "10回でコードを解読",
       "step3Hint": "{length}文字の単語を当ててヒントをゲット",
       "step4Title": "単語を見つけてヒントを発見",
-      "step4Desc": "3文字以上の単語でヒントが出る!"
+      "step4Desc": "3文字以上の単語でヒントが出る!",
+      "goToStep": "ステップ {step} へ"
     },
     "share": {
       "header": "LexiClash Daily #{number}",
@@ -3102,6 +3106,19 @@ const ja = {
         "nice": "ナイス！",
         "start": "一秒も無駄にしない！"
       }
+    },
+    "ad": {
+      "watchAd": "広告を見る",
+      "needMoreCoins": "コインが足りない？",
+      "coinsNeeded": "{current} / {needed} コイン",
+      "coinsEarned": "コイン獲得！",
+      "loading": "広告を読み込み中...",
+      "watching": "広告視聴中...",
+      "almostDone": "もうすぐ終わります！",
+      "error": "広告エラー",
+      "tryAgain": "後でもう一度お試しください",
+      "earnCoins": "コインを獲得",
+      "watchToEarn": "短い動画を見てコインを獲得"
     },
     "shareCTA": {
       "canYouSolve": "解けますか？",

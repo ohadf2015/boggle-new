@@ -1,0 +1,182 @@
+'use client';
+
+import { useState, useCallback } from 'react';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useIMAVideoAds } from '@/components/ads/IMAVideoAdsProvider';
+import { useGoogleAds } from '@/components/ads/GoogleAdsProvider';
+import { addCoins, COIN_REWARDS } from '@/utils/coinManager';
+
+export type AdStatus = 'idle' | 'loading' | 'showing' | 'completed' | 'error';
+
+interface UseRewardedAdOptions {
+  /** Callback when ad is successfully completed and coins are awarded */
+  onRewardEarned?: (coinsAwarded: number) => void;
+  /** Callback when ad fails or is cancelled */
+  onAdError?: (error: string) => void;
+  /** Callback when ad starts playing */
+  onAdStarted?: () => void;
+}
+
+interface UseRewardedAdReturn {
+  /** Current status of the ad */
+  status: AdStatus;
+  /** Whether a rewarded ad is available to show */
+  isAdAvailable: boolean;
+  /** Show a rewarded ad and earn coins on completion */
+  showAd: () => void;
+  /** Error message if ad failed */
+  error: string | null;
+  /** Amount of coins that will be rewarded */
+  rewardAmount: number;
+}
+
+/**
+ * Hook to show rewarded video ads and earn coins.
+ *
+ * Priority order:
+ * 1. CrazyGames SDK - when running on CrazyGames platform
+ * 2. Google IMA SDK - rewarded video ads (requires Ad Manager)
+ * 3. Google AdSense - display ad fallback (requires AdSense)
+ * 4. Simulation fallback - for development/testing
+ *
+ * @example
+ * ```tsx
+ * const { showAd, isAdAvailable, status, rewardAmount } = useRewardedAd({
+ *   onRewardEarned: (coins) => setCurrentCoins(getCoins()),
+ * });
+ *
+ * <Button onClick={showAd} disabled={!isAdAvailable || status === 'loading'}>
+ *   Watch Ad (+{rewardAmount} coins)
+ * </Button>
+ * ```
+ */
+export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAdReturn {
+  const { onRewardEarned, onAdError, onAdStarted } = options;
+  const [status, setStatus] = useState<AdStatus>('idle');
+  const [error, setError] = useState<string | null>(null);
+
+  // Ad platform hooks
+  const crazyGames = useCrazyGames();
+  const imaVideoAds = useIMAVideoAds();
+  const googleAds = useGoogleAds();
+
+  // Determine which ad platform to use (priority order)
+  const shouldUseCrazyGames = crazyGames.isAvailable && crazyGames.isOnCrazyGamesPlatform;
+  const shouldUseIMAVideoAds = !shouldUseCrazyGames && imaVideoAds.isAvailable;
+  const shouldUseGoogleAds = !shouldUseCrazyGames && !shouldUseIMAVideoAds && googleAds.isAvailable;
+  const shouldUseSimulation = !shouldUseCrazyGames && !shouldUseIMAVideoAds && !shouldUseGoogleAds;
+
+  // Ad is available if any platform is ready
+  const isAdAvailable = shouldUseCrazyGames || shouldUseIMAVideoAds || shouldUseGoogleAds || shouldUseSimulation;
+
+  const rewardAmount = COIN_REWARDS.WATCH_AD;
+
+  const showAd = useCallback(() => {
+    if (status === 'loading' || status === 'showing') {
+      return; // Don't allow multiple simultaneous ads
+    }
+
+    setStatus('loading');
+    setError(null);
+
+    // Determine platform for logging
+    const platform = shouldUseCrazyGames
+      ? 'crazygames'
+      : shouldUseIMAVideoAds
+        ? 'ima-sdk'
+        : shouldUseGoogleAds
+          ? 'adsense'
+          : 'simulation';
+
+    // Award coins helper
+    const awardCoinsAndNotify = () => {
+      addCoins(rewardAmount, 'Watched Ad', {
+        platform,
+        timestamp: new Date().toISOString(),
+      });
+      setStatus('completed');
+      onRewardEarned?.(rewardAmount);
+
+      // Reset to idle after a short delay
+      setTimeout(() => setStatus('idle'), 1500);
+    };
+
+    // Handle ad error
+    const handleAdError = (errorMsg: string) => {
+      setStatus('error');
+      setError(errorMsg);
+      onAdError?.(errorMsg);
+
+      // Reset to idle after showing error
+      setTimeout(() => {
+        setStatus('idle');
+        setError(null);
+      }, 3000);
+    };
+
+    if (shouldUseCrazyGames) {
+      // Priority 1: CrazyGames SDK for rewarded ads
+      crazyGames.showRewardedAd({
+        adStarted: () => {
+          setStatus('showing');
+          onAdStarted?.();
+        },
+        adFinished: () => {
+          awardCoinsAndNotify();
+        },
+        adError: (errorMsg: string) => {
+          handleAdError(errorMsg || 'Ad failed to load');
+        },
+      });
+    } else if (shouldUseIMAVideoAds) {
+      // Priority 2: Google IMA SDK for rewarded video ads
+      imaVideoAds.showRewardedAd({
+        onAdStarted: () => {
+          setStatus('showing');
+          onAdStarted?.();
+        },
+        onAdComplete: () => {
+          awardCoinsAndNotify();
+        },
+        onAdError: (errorMsg: string) => {
+          handleAdError(errorMsg || 'Ad failed to load');
+        },
+      });
+    } else if (shouldUseGoogleAds) {
+      // Priority 3: Google AdSense display ads (fallback)
+      googleAds.showRewardedAd({
+        onAdStarted: () => {
+          setStatus('showing');
+          onAdStarted?.();
+        },
+        onAdComplete: () => {
+          awardCoinsAndNotify();
+        },
+        onAdError: (errorMsg: string) => {
+          handleAdError(errorMsg || 'Ad failed to load');
+        },
+      });
+    } else {
+      // Priority 4: Simulation fallback for development/testing
+      // This allows testing the flow without real ads
+      console.log('[RewardedAd] Using simulation mode - no real ads configured');
+      setStatus('showing');
+      onAdStarted?.();
+
+      // Simulate ad duration (3 seconds)
+      setTimeout(() => {
+        awardCoinsAndNotify();
+      }, 3000);
+    }
+  }, [status, shouldUseCrazyGames, shouldUseIMAVideoAds, shouldUseGoogleAds, crazyGames, imaVideoAds, googleAds, rewardAmount, onRewardEarned, onAdError, onAdStarted]);
+
+  return {
+    status,
+    isAdAvailable,
+    showAd,
+    error,
+    rewardAmount,
+  };
+}
+
+export default useRewardedAd;

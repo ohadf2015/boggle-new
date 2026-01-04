@@ -127,7 +127,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     </svg>
 
                     <h1
-                        className="font-black uppercase tracking-tight flex items-center gap-0.5 flex-shrink min-w-0"
+                        className="font-black uppercase tracking-tight flex items-center gap-0.5 whitespace-nowrap"
                         style={{ fontFamily }}
                     >
                         {/* LEXI - Hero text: larger, bolder, with subtle glow */}

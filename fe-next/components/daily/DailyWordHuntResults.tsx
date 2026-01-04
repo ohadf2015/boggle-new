@@ -42,6 +42,7 @@ import DailyChallengeSignupModal from '@/components/auth/DailyChallengeSignupMod
 import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
 import StreakMilestoneCelebration from './StreakMilestoneCelebration';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
+import WatchAdButton from './WatchAdButton';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchGeolocation } from '@/contexts/auth/authUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -1149,6 +1150,27 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               </span>
             </Button>
           </div>
+
+          {/* Watch Ad for Coins - Show when player can't afford retry */}
+          {!canAfford(COIN_COSTS.DAILY_RETRY) && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-xs text-gray-400">
+                <div className="flex-1 h-px bg-gray-600" />
+                <span>{t('wordHunt.ad.needMoreCoins') || 'Need more coins?'}</span>
+                <div className="flex-1 h-px bg-gray-600" />
+              </div>
+              <WatchAdButton
+                onCoinsEarned={(coins, newTotal) => {
+                  setCurrentCoins(newTotal);
+                }}
+                t={t}
+              />
+              <p className="text-[10px] text-gray-500 text-center">
+                {t('wordHunt.ad.coinsNeeded')?.replace('{current}', String(currentCoins)).replace('{needed}', String(COIN_COSTS.DAILY_RETRY)) ||
+                  `${currentCoins} / ${COIN_COSTS.DAILY_RETRY} coins`}
+              </p>
+            </div>
+          )}
 
             {/* Toggle for more share options - Clear labeling */}
             <button

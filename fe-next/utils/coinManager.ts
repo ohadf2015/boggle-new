@@ -25,6 +25,11 @@ export const COIN_COSTS = {
   DAILY_RETRY: 500,         // Cost to retry daily challenge (full reset, more expensive than reveal)
 } as const;
 
+// Coin reward constants for ads and bonuses
+export const COIN_REWARDS = {
+  WATCH_AD: 250,            // Coins earned for watching a rewarded video ad
+} as const;
+
 // Coin earning constants for other game modes
 export const COIN_EARNING_OTHER = {
   SCORE_DIVISOR: 10,        // Coins = score / this value

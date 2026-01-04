@@ -161,7 +161,7 @@ export default function ContactPage(): React.ReactNode {
               </div>
               <div>
                 <p className={cn('font-bold', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                  Email
+                  {t('contact.emailLabel') || 'Email'}
                 </p>
                 <p className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
                   lexiclash.game@gmail.com

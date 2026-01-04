@@ -1,0 +1,189 @@
+'use client';
+
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Play, Coins, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useRewardedAd, AdStatus } from '@/hooks/useRewardedAd';
+import { cn } from '@/lib/utils';
+
+interface WatchAdButtonProps {
+  /** Callback when coins are earned */
+  onCoinsEarned: (coins: number, newTotal: number) => void;
+  /** Translation function */
+  t: (key: string) => string;
+  /** Optional className for styling */
+  className?: string;
+  /** Whether to show as a compact button or full card */
+  variant?: 'button' | 'card';
+}
+
+/**
+ * WatchAdButton - A button/card component to watch a rewarded ad and earn coins.
+ *
+ * Shows different states:
+ * - Idle: "Watch Ad" button with reward amount
+ * - Loading: Loading spinner
+ * - Showing: "Watching ad..." state
+ * - Completed: Success checkmark with coin animation
+ * - Error: Error message
+ */
+const WatchAdButton: React.FC<WatchAdButtonProps> = ({
+  onCoinsEarned,
+  t,
+  className,
+  variant = 'button',
+}) => {
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [earnedAmount, setEarnedAmount] = useState(0);
+
+  const { showAd, isAdAvailable, status, error, rewardAmount } = useRewardedAd({
+    onRewardEarned: (coins) => {
+      setEarnedAmount(coins);
+      setShowSuccess(true);
+
+      // Get current coins from localStorage for the callback
+      const stored = typeof window !== 'undefined' ? localStorage.getItem('lexiclash_coins') : null;
+      const balance = stored ? JSON.parse(stored) : { total: 0 };
+      onCoinsEarned(coins, balance.total);
+
+      // Hide success after 2 seconds
+      setTimeout(() => setShowSuccess(false), 2000);
+    },
+    onAdError: (errorMsg) => {
+      console.warn('Ad error:', errorMsg);
+    },
+  });
+
+  const isLoading = status === 'loading';
+  const isShowing = status === 'showing';
+  const isDisabled = !isAdAvailable || isLoading || isShowing;
+
+  // Get status-specific content
+  const getStatusContent = () => {
+    if (showSuccess) {
+      return {
+        icon: <CheckCircle className="w-5 h-5 text-neo-lime" />,
+        text: `+${earnedAmount} ${t('wordHunt.ad.coinsEarned') || 'coins earned!'}`,
+        subtext: null,
+      };
+    }
+
+    switch (status) {
+      case 'loading':
+        return {
+          icon: <Loader2 className="w-5 h-5 animate-spin" />,
+          text: t('wordHunt.ad.loading') || 'Loading ad...',
+          subtext: null,
+        };
+      case 'showing':
+        return {
+          icon: <Play className="w-5 h-5 animate-pulse" />,
+          text: t('wordHunt.ad.watching') || 'Watching ad...',
+          subtext: t('wordHunt.ad.almostDone') || 'Almost done!',
+        };
+      case 'error':
+        return {
+          icon: <AlertCircle className="w-5 h-5 text-red-400" />,
+          text: t('wordHunt.ad.error') || 'Ad failed',
+          subtext: error || t('wordHunt.ad.tryAgain') || 'Try again later',
+        };
+      default:
+        return {
+          icon: <Play className="w-5 h-5" />,
+          text: t('wordHunt.ad.watchAd') || 'Watch Ad',
+          subtext: `+${rewardAmount} ${t('common.coins') || 'coins'}`,
+        };
+    }
+  };
+
+  const content = getStatusContent();
+
+  if (variant === 'card') {
+    // Full card variant for settings/dedicated section
+    return (
+      <motion.div
+        whileHover={!isDisabled ? { scale: 1.02, y: -2 } : {}}
+        whileTap={!isDisabled ? { scale: 0.98 } : {}}
+        className={cn(
+          "relative overflow-hidden rounded-neo-lg border-3 border-neo-black shadow-hard transition-all cursor-pointer",
+          showSuccess
+            ? "bg-gradient-to-br from-neo-lime to-emerald-500"
+            : isDisabled
+              ? "bg-gradient-to-br from-slate-500 to-slate-600 cursor-not-allowed"
+              : "bg-gradient-to-br from-purple-500 to-indigo-600 hover:shadow-hard-lg",
+          className
+        )}
+        onClick={!isDisabled ? showAd : undefined}
+      >
+        {/* Reward badge */}
+        <div className="absolute top-2 end-2 flex items-center gap-1 px-2.5 py-1 bg-neo-yellow rounded-full border-2 border-neo-black shadow-hard-sm">
+          <Coins className="w-4 h-4 text-neo-black" />
+          <span className="font-black text-sm text-neo-black">+{rewardAmount}</span>
+        </div>
+
+        {/* Main content */}
+        <div className="p-4">
+          <div className="flex items-center gap-3">
+            <div className={cn(
+              "flex-shrink-0 w-12 h-12 rounded-neo flex items-center justify-center border-2 border-neo-black",
+              showSuccess ? "bg-white/30" : "bg-white/20"
+            )}>
+              {content.icon}
+            </div>
+            <div className="flex-1 text-start">
+              <div className="font-black text-sm uppercase tracking-wide text-white">
+                {content.text}
+              </div>
+              {content.subtext && (
+                <div className="text-xs mt-0.5 text-white/80">
+                  {content.subtext}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // Compact button variant (default)
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={showSuccess ? 'success' : status}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.15 }}
+        className={className}
+      >
+        <Button
+          onClick={showAd}
+          disabled={isDisabled}
+          className={cn(
+            "w-full py-3 text-base font-black uppercase border-2 border-neo-black rounded-neo shadow-hard transition-all",
+            showSuccess
+              ? "bg-neo-lime text-neo-black"
+              : isDisabled
+                ? "bg-slate-500 text-slate-300 cursor-not-allowed opacity-70"
+                : "bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:shadow-hard-lg hover:-translate-y-0.5"
+          )}
+        >
+          <span className="flex items-center justify-center gap-2">
+            {content.icon}
+            <span>{content.text}</span>
+            {!showSuccess && status === 'idle' && (
+              <span className="flex items-center gap-0.5 text-neo-yellow">
+                <Coins className="w-4 h-4" />
+                <span className="text-xs font-bold">+{rewardAmount}</span>
+              </span>
+            )}
+          </span>
+        </Button>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+export default WatchAdButton;

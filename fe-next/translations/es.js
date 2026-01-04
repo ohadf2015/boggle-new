@@ -89,6 +89,7 @@ const es = {
     "connectionLost": "Conexión perdida",
     "notConnected": "Sin conexión",
     "connected": "Conectado",
+    "coins": "monedas",
     "connecting": "Conectando...",
     "connectedToServer": "¡Listo para la batalla!",
     "connectingToServer": "Calentando...",
@@ -2491,7 +2492,9 @@ const es = {
     "leader": "Líder",
     "leading": "¡Liderando!",
     "ahead": "adelante",
-    "toCatch": "pts para pasar"
+    "toCatch": "pts para pasar",
+    "live": "En Vivo",
+    "backToGame": "Volver al Juego"
   },
   "ranked": {
     "title": "Modo Clasificatorio",
@@ -2919,7 +2922,8 @@ const es = {
       "step3Desc": "10 intentos para descifrar",
       "step3Hint": "Adivina palabras de {length} letras para ver pistas",
       "step4Title": "Descubre palabras, revela pistas",
-      "step4Desc": "Cada palabra de 3+ letras revela pistas!"
+      "step4Desc": "Cada palabra de 3+ letras revela pistas!",
+      "goToStep": "Ir al paso {step}"
     },
     "share": {
       "header": "LexiClash Daily #{number}",
@@ -3100,6 +3104,19 @@ const es = {
         "nice": "¡Buen Esfuerzo!",
         "start": "¡Cada Segundo Cuenta!"
       }
+    },
+    "ad": {
+      "watchAd": "Ver Anuncio",
+      "needMoreCoins": "¿Necesitas más monedas?",
+      "coinsNeeded": "{current} / {needed} monedas",
+      "coinsEarned": "¡monedas ganadas!",
+      "loading": "Cargando anuncio...",
+      "watching": "Viendo anuncio...",
+      "almostDone": "¡Casi listo!",
+      "error": "Error en anuncio",
+      "tryAgain": "Intenta más tarde",
+      "earnCoins": "Ganar Monedas",
+      "watchToEarn": "Mira un video corto para ganar monedas"
     },
     "shareCTA": {
       "canYouSolve": "¿Puedes resolverlo?",

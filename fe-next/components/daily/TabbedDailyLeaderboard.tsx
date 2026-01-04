@@ -508,7 +508,10 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   }, [currentUserTodayData?.rank_position, onCurrentUserRankChange, activeTab]);
 
   // Get current data based on active tab
-  const participants = activeTab === 'today' ? todayParticipants : allTimeParticipants;
+  // Filter all-time participants to only show those who have solved at least one challenge
+  // to avoid "shaming" users who attempted but never solved
+  const filteredAllTimeParticipants = allTimeParticipants.filter(p => p.games_won > 0);
+  const participants = activeTab === 'today' ? todayParticipants : filteredAllTimeParticipants;
   const totalCount = activeTab === 'today' ? todayTotalCount : allTimeTotalCount;
   const totalSolvedCount = activeTab === 'today' ? todayTotalSolved : 0;
   const loading = activeTab === 'today' ? todayLoading : allTimeLoading;

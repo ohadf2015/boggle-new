@@ -89,6 +89,7 @@ const he = {
     "connectionLost": "החיבור נפל",
     "notConnected": "לא מחובר",
     "connected": "מחובר",
+    "coins": "מטבעות",
     "connecting": "מתחבר...",
     "connectedToServer": "מוכן לקרב!",
     "connectingToServer": "מתחמם...",
@@ -2495,7 +2496,9 @@ const he = {
     "leader": "מוביל",
     "leading": "מוביל!",
     "ahead": "קדימה",
-    "toCatch": "נק' לעבור"
+    "toCatch": "נק' לעבור",
+    "live": "שידור חי",
+    "backToGame": "חזרה למשחק"
   },
   "ranked": {
     "title": "מצב מדורג",
@@ -2923,7 +2926,8 @@ const he = {
       "step3Desc": "10 ניסיונות לפצח את הקוד",
       "step3Hint": "נחשו מילים בנות {length} אותיות לגילוי רמזים",
       "step4Title": "גלו מילים, חשפו רמזים",
-      "step4Desc": "כל מילה של 3+ אותיות חושפת רמזים!"
+      "step4Desc": "כל מילה של 3+ אותיות חושפת רמזים!",
+      "goToStep": "עבור לשלב {step}"
     },
     "share": {
       "header": "אתגר יומי #{number} LexiClash",
@@ -3104,6 +3108,19 @@ const he = {
         "nice": "מאמץ יפה!",
         "start": "כל שנייה חשובה!"
       }
+    },
+    "ad": {
+      "watchAd": "צפה בפרסומת",
+      "needMoreCoins": "צריכים עוד מטבעות?",
+      "coinsNeeded": "{current} / {needed} מטבעות",
+      "coinsEarned": "מטבעות נצברו!",
+      "loading": "טוען פרסומת...",
+      "watching": "צופה בפרסומת...",
+      "almostDone": "כמעט סיימנו!",
+      "error": "הפרסומת נכשלה",
+      "tryAgain": "נסו שוב מאוחר יותר",
+      "earnCoins": "הרווח מטבעות",
+      "watchToEarn": "צפו בסרטון קצר כדי להרוויח מטבעות"
     },
     "shareCTA": {
       "canYouSolve": "תצליחו לפתור?",

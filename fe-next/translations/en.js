@@ -95,6 +95,7 @@ const en = {
     "connectionLost": "Connection lost",
     "notConnected": "Offline",
     "connected": "Connected",
+    "coins": "coins",
     "connecting": "Connecting...",
     "connectedToServer": "Ready to battle!",
     "connectingToServer": "Warming up...",
@@ -2500,7 +2501,9 @@ const en = {
     "leader": "Leader",
     "leading": "Leading!",
     "ahead": "ahead",
-    "toCatch": "pts to pass"
+    "toCatch": "pts to pass",
+    "live": "Live",
+    "backToGame": "Back to Game"
   },
   "ranked": {
     "title": "Ranked Mode",
@@ -2928,7 +2931,8 @@ const en = {
       "step3Desc": "10 tries to crack the code",
       "step3Hint": "Guess {length}-letter words to unlock clues",
       "step4Title": "Discover Words, Reveal Clues",
-      "step4Desc": "Every word 3+ letters reveals clues!"
+      "step4Desc": "Every word 3+ letters reveals clues!",
+      "goToStep": "Go to step {step}"
     },
     "share": {
       "header": "LexiClash Daily #{number}",
@@ -3109,6 +3113,19 @@ const en = {
         "nice": "Nice Effort!",
         "start": "Every Second Counts!"
       }
+    },
+    "ad": {
+      "watchAd": "Watch Ad",
+      "needMoreCoins": "Need more coins?",
+      "coinsNeeded": "{current} / {needed} coins",
+      "coinsEarned": "coins earned!",
+      "loading": "Loading ad...",
+      "watching": "Watching ad...",
+      "almostDone": "Almost done!",
+      "error": "Ad failed",
+      "tryAgain": "Try again later",
+      "earnCoins": "Earn Coins",
+      "watchToEarn": "Watch a short video to earn coins"
     },
     "shareCTA": {
       "canYouSolve": "Can you solve it?",

@@ -125,7 +125,7 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
                 ? 'bg-neo-pink scale-125 shadow-[2px_2px_0px_rgb(0,0,0)]'
                 : 'bg-neo-cream dark:bg-gray-600 hover:bg-neo-pink/30 hover:scale-110'
             )}
-            aria-label={`Go to step ${i + 1}`}
+            aria-label={t('daily.carousel.goToStep', { step: i + 1 }) || `Go to step ${i + 1}`}
           />
         ))}
       </div>

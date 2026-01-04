@@ -39,9 +39,11 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
         setShowPreferencePrompt(true);
       }
     }
-    // Reset when warning is hidden (for next earthquake in different game)
+    // FIXED: Reset prompt when warning is hidden to prevent it from persisting during gameplay
+    // Also reset the check flag for next earthquake in different game
     if (!isVisible) {
       hasCheckedRef.current = false;
+      setShowPreferencePrompt(false);
     }
   }, [isVisible]);
 
