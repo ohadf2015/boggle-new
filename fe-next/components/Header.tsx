@@ -182,11 +182,12 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     <DailyQuickLink />
 
                     {/* Settings Link - replaces language dropdown */}
+                    {/* Using 48x48px minimum for better touch accessibility */}
                     <Link
                         href={`/${language}/settings`}
                         className={cn(
                             "flex items-center justify-center gap-1",
-                            "min-w-[44px] min-h-[44px] w-11 h-11 lg:w-12 lg:h-12 xl:w-12 xl:h-12 2xl:w-14 2xl:h-14",
+                            "min-w-[48px] min-h-[48px] w-12 h-12 lg:w-12 lg:h-12 xl:w-12 xl:h-12 2xl:w-14 2xl:h-14",
                             "bg-neo-cream text-neo-black",
                             "border-3 lg:border-3 2xl:border-3 border-neo-black",
                             "rounded-neo lg:rounded-neo shadow-hard lg:shadow-hard 2xl:shadow-hard-lg",
@@ -205,7 +206,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             href={`/${language}/admin`}
                             className="
                                 flex items-center justify-center
-                                min-w-[44px] min-h-[44px] w-11 h-11 lg:w-12 lg:h-12 xl:w-12 xl:h-12 2xl:w-14 2xl:h-14
+                                min-w-[48px] min-h-[48px] w-12 h-12 lg:w-12 lg:h-12 xl:w-12 xl:h-12 2xl:w-14 2xl:h-14
                                 bg-neo-purple text-white
                                 border-3 lg:border-3 2xl:border-3 border-neo-black
                                 rounded-neo lg:rounded-neo
@@ -227,12 +228,13 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 {/* Mobile: Avatar + Volume Controls + Hamburger Menu */}
                 <div className="sm:hidden flex items-center gap-2" ref={mobileMenuRef}>
                     {/* Profile Avatar - visible on mobile header when authenticated */}
+                    {/* Using 48x48px minimum for better touch accessibility */}
                     {isAuthenticated && profile && (
                         <Link
                             href={`/${language}/profile`}
                             className={cn(
                                 "flex items-center justify-center",
-                                "min-w-[44px] min-h-[44px] w-11 h-11",
+                                "min-w-[48px] min-h-[48px] w-12 h-12",
                                 "bg-neo-cream",
                                 "border-3 border-neo-black",
                                 "rounded-full shadow-hard",
@@ -256,11 +258,12 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     {/* Sound controls - visible on mobile header */}
                     <MusicControls />
 
+                    {/* Hamburger menu button - 48x48px for better touch accessibility */}
                     <button
                         onClick={() => setShowMobileMenu(!showMobileMenu)}
                         className={cn(
                             "flex items-center justify-center",
-                            "min-w-[44px] min-h-[44px] w-11 h-11",
+                            "min-w-[48px] min-h-[48px] w-12 h-12",
                             "bg-neo-cream text-neo-black",
                             "border-3 border-neo-black",
                             "rounded-neo shadow-hard",
@@ -319,7 +322,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                     onClick={() => setShowMobileMenu(false)}
                                     className={cn(
                                         "flex items-center justify-center",
-                                        "min-w-[44px] min-h-[44px] w-11 h-11",
+                                        "min-w-[48px] min-h-[48px] w-12 h-12",
                                         "bg-white dark:bg-slate-700 text-neo-black dark:text-white",
                                         "border-2 border-neo-black dark:border-slate-500",
                                         "rounded-neo shadow-hard-sm",
@@ -391,7 +394,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 onClick={() => setShowMobileMenu(false)}
                                                 className="
                                                     flex items-center justify-center
-                                                    min-w-[44px] min-h-[44px] w-11 h-11
+                                                    min-w-[48px] min-h-[48px] w-12 h-12
                                                     bg-neo-purple text-white
                                                     border-2 border-neo-black
                                                     rounded-neo shadow-hard-sm

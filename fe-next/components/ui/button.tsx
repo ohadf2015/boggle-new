@@ -39,17 +39,18 @@ const buttonVariants = cva(
         ].join(" "),
         // Secondary: Orange accent
         secondary: "bg-neo-orange text-neo-black hover:bg-neo-orange-hover",
-        // Ghost: Minimal, with visible border for accessibility (WCAG AA 3:1 for UI components)
+        // Ghost: Minimal, with high-contrast visible border for accessibility (WCAG AA 3:1 for UI components)
         ghost: [
-          "bg-transparent text-neo-white border-3 border-neo-cream shadow-none",
-          "hover:bg-neo-navy-light hover:border-neo-white hover:shadow-hard-sm",
+          "bg-transparent text-neo-white border-3 border-neo-black dark:border-neo-cream shadow-none",
+          "hover:bg-neo-navy-light/50 hover:border-neo-cyan hover:shadow-hard-sm",
           "hover:translate-x-0 hover:translate-y-0",
           "active:translate-x-0 active:translate-y-0 active:shadow-none",
         ].join(" "),
-        // Link: Text only
+        // Link: Text only with always-visible underline for accessibility
         link: [
-          "bg-transparent text-neo-cyan border-0 shadow-none underline-offset-4",
-          "hover:underline hover:translate-x-0 hover:translate-y-0 hover:shadow-none",
+          "bg-transparent text-neo-cyan dark:text-neo-cyan border-0 shadow-none",
+          "underline underline-offset-4 decoration-2",
+          "hover:brightness-110 hover:translate-x-0 hover:translate-y-0 hover:shadow-none",
           "active:translate-x-0 active:translate-y-0",
         ].join(" "),
         // NEW: Success variant (green)
@@ -60,10 +61,11 @@ const buttonVariants = cva(
         cyan: "bg-neo-cyan text-neo-black hover:brightness-110",
       },
       size: {
-        default: "h-11 px-5 py-2 [&_svg]:w-5 [&_svg]:h-5",
-        sm: "min-h-[44px] h-11 sm:h-11 px-4 text-xs [&_svg]:w-4 [&_svg]:h-4",
-        lg: "h-14 px-8 text-base [&_svg]:w-6 [&_svg]:h-6",
-        icon: "h-11 w-11 min-w-[44px] min-h-[44px] p-0 [&_svg]:w-5 [&_svg]:h-5",
+        // Consistent sizing with proper touch targets (48px minimum)
+        default: "h-12 min-h-[48px] px-5 py-3 [&_svg]:w-5 [&_svg]:h-5",
+        sm: "h-10 min-h-[40px] px-4 py-2 text-xs [&_svg]:w-4 [&_svg]:h-4",
+        lg: "h-14 min-h-[56px] px-8 py-4 text-base [&_svg]:w-6 [&_svg]:h-6",
+        icon: "h-12 w-12 min-h-[48px] min-w-[48px] p-0 [&_svg]:w-5 [&_svg]:h-5",
       },
     },
     defaultVariants: {

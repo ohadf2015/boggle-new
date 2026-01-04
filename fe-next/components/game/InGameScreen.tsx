@@ -600,11 +600,17 @@ const InGameScreen = memo<InGameScreenProps>(({
         <div className="relative flex items-center justify-center w-full h-screen overflow-hidden bg-slate-900 text-white landscape-full-height">
 
           {/* Left Side Panel - Timer, Rank, Words Count */}
+          {/* Using clamp to prevent panel overlap on very narrow/short screens */}
           <div className={cn(
-            "absolute left-3 top-1/2 -translate-y-1/2 z-40 landscape-side-panel",
-            isExtremelyShortLandscape && "left-2"
-          )}>
-            <div className="landscape-panel flex flex-col items-center gap-4">
+            "absolute top-1/2 -translate-y-1/2 z-40 landscape-side-panel",
+            isExtremelyShortLandscape ? "left-1" : "left-2"
+          )}
+            style={{
+              left: 'clamp(4px, 1.5vw, 12px)',
+              maxWidth: 'clamp(70px, 14vw, 110px)'
+            }}
+          >
+            <div className="landscape-panel flex flex-col items-center gap-2">
               {/* Timer - Large and prominent */}
               {remainingTime !== null && (
                 <CircularTimer
@@ -645,12 +651,18 @@ const InGameScreen = memo<InGameScreenProps>(({
           </div>
 
           {/* Right Side Panel - Score & Combo */}
+          {/* Using clamp to prevent panel overlap on very narrow/short screens */}
           {isPlaying && (
             <div className={cn(
-              "absolute right-3 top-1/2 -translate-y-1/2 z-40 landscape-side-panel",
-              isExtremelyShortLandscape && "right-2"
-            )}>
-              <div className="landscape-panel flex flex-col items-center gap-4">
+              "absolute top-1/2 -translate-y-1/2 z-40 landscape-side-panel",
+              isExtremelyShortLandscape ? "right-1" : "right-2"
+            )}
+              style={{
+                right: 'clamp(4px, 1.5vw, 12px)',
+                maxWidth: 'clamp(70px, 14vw, 110px)'
+              }}
+            >
+              <div className="landscape-panel flex flex-col items-center gap-2">
                 {/* Score - Primary stat, large and animated */}
                 <div className="flex flex-col items-center">
                   <motion.div
@@ -666,27 +678,35 @@ const InGameScreen = memo<InGameScreenProps>(({
                   </div>
                 </div>
 
-                {/* Combo Display - Full variant for visibility */}
-                <ComboDisplay comboLevel={comboLevel} />
+                {/* Combo Display - High contrast for light panel background */}
+                <ComboDisplay comboLevel={comboLevel} highContrast compact />
               </div>
             </div>
           )}
 
 
-          {/* Bottom-left: Exit button */}
-          {onExitRoom && (
-            <div className="absolute bottom-2 left-2 z-30">
+          {/* Bottom action bar - safe from side panel overlap */}
+          <div
+            className="absolute bottom-2 left-0 right-0 z-30 flex justify-between items-center"
+            style={{
+              paddingInline: 'clamp(100px, 18vw, 150px)',
+              paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+            }}
+          >
+            {/* Exit button - positioned safely inside side panels */}
+            {onExitRoom && (
               <ExitRoomButton
                 onClick={onExitRoom}
                 label={t('playerView.exit')}
                 className="w-12 h-12"
               />
-            </div>
-          )}
+            )}
 
-          {/* Bottom-right: Hint Button - Single Player Mode Only */}
-          {hints && hints.isSinglePlayer && (
-            <div className="absolute bottom-2 right-2 z-30">
+            {/* Spacer for when no exit button */}
+            {!onExitRoom && <div />}
+
+            {/* Hint Button - Single Player Mode Only */}
+            {hints && hints.isSinglePlayer && (
               <HintButton
                 hint={hints.hint}
                 hintType={hints.hintType}
@@ -702,16 +722,17 @@ const InGameScreen = memo<InGameScreenProps>(({
                 onClearHint={hints.clearHint}
                 t={t}
               />
-            </div>
-          )}
+            )}
+          </div>
 
-          {/* Center: Word Forming Area + Grid - with horizontal padding for side panels */}
+          {/* Center: Word Forming Area + Grid - with responsive padding for side panels */}
           <div className={cn(
             "flex flex-col items-center justify-center w-full h-full landscape-grid-container",
-            isExtremelyShortLandscape ? "px-[120px] gap-1 py-1" :
-            isVeryShortLandscape ? "px-[130px] gap-1.5 py-1" :
-            "px-[150px] gap-2 py-2"
-          )}>
+            "gap-1.5 py-1"
+          )}
+            style={{
+              paddingInline: 'clamp(120px, 18vw, 180px)'
+            }}>
             {/* Word Forming Area with integrated feedback - flex-shrink-0 prevents squishing, z-50 keeps it visible */}
             {/* Shows typed word when in keyboard mode, otherwise shows swiped word */}
             {isPlaying && (
@@ -742,6 +763,27 @@ const InGameScreen = memo<InGameScreenProps>(({
               />
             </div>
           </div>
+
+          {/* Compact Leaderboard - Top center in landscape multiplayer */}
+          {isPlaying && leaderboard.length > 1 && (
+            <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30 w-auto max-w-[280px]">
+              <CompactLeaderboard
+                players={leaderboard.map((p, index) => ({
+                  username: p.username,
+                  score: p.score,
+                  rank: index + 1,
+                  isCurrentUser: p.username === username,
+                  profilePictureUrl: p.avatar?.profilePictureUrl,
+                  avatarImage: p.avatar?.avatarImage,
+                  avatarEmoji: p.avatar?.emoji,
+                  avatarColor: p.avatar?.color,
+                }))}
+                currentUsername={username}
+                t={t}
+                className="text-xs"
+              />
+            </div>
+          )}
 
         </div>
 
@@ -800,191 +842,191 @@ const InGameScreen = memo<InGameScreenProps>(({
 
       <div className="flex flex-col lg:flex-row gap-0.5 md:gap-4 lg:gap-6 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out">
 
-      {/* Top Bar - Only on mobile, integrated into parent on desktop */}
-      <div className="lg:hidden w-full flex items-center justify-between px-1 flex-shrink-0">
-        {onExitRoom && (
-          <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} className="relative z-50" />
-        )}
+        {/* Top Bar - Only on mobile, integrated into parent on desktop */}
+        <div className="lg:hidden w-full flex items-center justify-between px-1 flex-shrink-0">
+          {onExitRoom && (
+            <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} className="relative z-50" />
+          )}
 
-        {/* Hint Button - Single Player Mode Only */}
-        {hints && hints.isSinglePlayer && (
-          <HintButton
-            hint={hints.hint}
-            hintType={hints.hintType}
-            hintsRemaining={hints.hintsRemaining}
-            wordLength={hints.wordLength}
-            firstLetter={hints.firstLetter}
-            isLoading={hints.isLoading}
-            error={hints.error}
-            isAvailable={hints.isAvailable}
-            isSinglePlayer={hints.isSinglePlayer}
-            gameActive={gameActive}
-            onRequestHint={hints.requestHint}
-            onClearHint={hints.clearHint}
-            t={t}
-          />
-        )}
-      </div>
+          {/* Hint Button - Single Player Mode Only */}
+          {hints && hints.isSinglePlayer && (
+            <HintButton
+              hint={hints.hint}
+              hintType={hints.hintType}
+              hintsRemaining={hints.hintsRemaining}
+              wordLength={hints.wordLength}
+              firstLetter={hints.firstLetter}
+              isLoading={hints.isLoading}
+              error={hints.error}
+              isAvailable={hints.isAvailable}
+              isSinglePlayer={hints.isSinglePlayer}
+              gameActive={gameActive}
+              onRequestHint={hints.requestHint}
+              onClearHint={hints.clearHint}
+              t={t}
+            />
+          )}
+        </div>
 
 
-      {/* Left Column: Found Words (Desktop only, only when playing, hidden in focus mode) */}
-      {isPlaying && !gameplayFocusMode && (
-        <div className="hidden lg:flex lg:flex-col lg:w-80 xl:w-96 2xl:w-[28rem] gap-2 min-h-0">
-          <div
-            className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col min-h-0 max-h-[65vh] lg:max-h-[70vh] overflow-hidden"
-            style={{ transform: 'rotate(1deg)' }}
-          >
-            {/* Header */}
-            <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-cyan text-neo-black">
-              <h3 className="text-neo-black text-base uppercase tracking-widest font-black">
-                {t('playerView.wordsFound')}
-              </h3>
-            </div>
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto p-3 min-h-0 custom-scrollbar">
-              <div className="space-y-2">
-                <AnimatePresence>
-                  {normalizedFoundWords.map((foundWordObj, index) => {
-                    const wordText = foundWordObj.word;
-                    const isInvalid = foundWordObj.isValid === false;
-                    const isLatest = index === normalizedFoundWords.length - 1;
-                    return (
-                      <motion.div
-                        key={`${wordText}-${foundWordObj.timestamp || index}`}
-                        initial={{ x: -30, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: -30, opacity: 0 }}
-                        className={`p-2 text-center font-black uppercase border-3 border-neo-black rounded-neo transition-all
+        {/* Left Column: Found Words (Desktop only, only when playing, hidden in focus mode) */}
+        {isPlaying && !gameplayFocusMode && (
+          <div className="hidden lg:flex lg:flex-col lg:w-80 xl:w-96 2xl:w-[28rem] gap-2 min-h-0">
+            <div
+              className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col min-h-0 max-h-[65vh] lg:max-h-[70vh] overflow-hidden"
+              style={{ transform: 'rotate(1deg)' }}
+            >
+              {/* Header */}
+              <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-cyan text-neo-black">
+                <h3 className="text-neo-black text-base uppercase tracking-widest font-black">
+                  {t('playerView.wordsFound')}
+                </h3>
+              </div>
+              {/* Content */}
+              <div className="flex-1 overflow-y-auto p-3 min-h-0 custom-scrollbar">
+                <div className="space-y-2">
+                  <AnimatePresence>
+                    {normalizedFoundWords.map((foundWordObj, index) => {
+                      const wordText = foundWordObj.word;
+                      const isInvalid = foundWordObj.isValid === false;
+                      const isLatest = index === normalizedFoundWords.length - 1;
+                      return (
+                        <motion.div
+                          key={`${wordText}-${foundWordObj.timestamp || index}`}
+                          initial={{ x: -30, opacity: 0 }}
+                          animate={{ x: 0, opacity: 1 }}
+                          exit={{ x: -30, opacity: 0 }}
+                          className={`p-2 text-center font-black uppercase border-3 border-neo-black rounded-neo transition-all
                           ${isInvalid
-                            ? 'bg-neo-red text-neo-cream shadow-hard-sm line-through opacity-70'
-                            : isLatest
-                              ? 'bg-neo-orange text-neo-black shadow-hard'
-                              : 'bg-neo-cream text-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard'}`}
-                      >
-                        {applyHebrewFinalLetters(wordText).toUpperCase()}
-                      </motion.div>
-                    );
-                  })}
-                </AnimatePresence>
-                {normalizedFoundWords.length === 0 && (
-                  <p className="text-center text-neo-black py-6 text-sm font-bold">
-                    {t('playerView.noWordsYet') || 'No words found yet'}
-                  </p>
-                )}
+                              ? 'bg-neo-red text-neo-cream shadow-hard-sm line-through opacity-70'
+                              : isLatest
+                                ? 'bg-neo-orange text-neo-black shadow-hard'
+                                : 'bg-neo-cream text-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard'}`}
+                        >
+                          {applyHebrewFinalLetters(wordText).toUpperCase()}
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
+                  {normalizedFoundWords.length === 0 && (
+                    <p className="text-center text-neo-black py-6 text-sm font-bold">
+                      {t('playerView.noWordsYet') || 'No words found yet'}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Center Column: Timer, Score, Grid */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-0">
-        {/* Stats row - Combo | Timer | Score - timer always centered and visible */}
-        {remainingTime !== null && (
-          <div ref={gameStatsRef} className="flex items-center justify-center gap-1 md:gap-4 flex-shrink-0" role="status" aria-label="Game status">
-            {/* Combo (left - shows when level >= 2, placeholder otherwise for layout balance) */}
-            {isPlaying && (
-              <div className="min-w-[50px] md:min-w-[90px] flex justify-end">
-                <ComboDisplay comboLevel={comboLevel} compact />
-              </div>
-            )}
+        {/* Center Column: Timer, Score, Grid */}
+        <div className="flex-1 flex flex-col min-w-0 min-h-0">
+          {/* Stats row - Combo | Timer | Score - timer always centered and visible */}
+          {remainingTime !== null && (
+            <div ref={gameStatsRef} className="flex items-center justify-center gap-1 md:gap-4 flex-shrink-0" role="status" aria-label="Game status">
+              {/* Combo (left - shows when level >= 2, placeholder otherwise for layout balance) */}
+              {isPlaying && (
+                <div className="min-w-[50px] md:min-w-[90px] flex justify-end">
+                  <ComboDisplay comboLevel={comboLevel} compact />
+                </div>
+              )}
 
-            {/* Timer (center - always visible and prominent) */}
-            <motion.div
-              data-tutorial="timer"
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="relative z-20"
-            >
-              <div className="hidden lg:block">
-                <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="lg" />
-              </div>
-              <div className="lg:hidden">
-                <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="xs" />
-              </div>
-            </motion.div>
-
-            {/* Score (right position) - vibrant yellow/lime gradient */}
-            {isPlaying && (
+              {/* Timer (center - always visible and prominent) */}
               <motion.div
+                data-tutorial="timer"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px]"
-                style={{
-                  background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
-                }}
+                className="relative z-20"
               >
-                <div className="text-center">
-                  <motion.div
-                    key={playerData.score}
-                    initial={{ scale: 1.3 }}
-                    animate={{ scale: 1 }}
-                    className="text-lg md:text-2xl lg:text-3xl font-black text-neo-black leading-tight"
-                    style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
-                  >
-                    {playerData.score}
-                  </motion.div>
-                  <div className="text-[9px] md:text-xs lg:text-sm font-bold uppercase tracking-wider text-neo-black">
-                    {t('common.score') || 'Score'}
-                  </div>
+                <div className="hidden lg:block">
+                  <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="lg" />
                 </div>
-                {/* Rank badge */}
-                {playerData.rank && playerData.rank > 0 && (
-                  <div className="absolute -top-2 -right-2 w-5 h-5 md:w-6 md:h-6 bg-neo-purple text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-[10px] md:text-xs font-black shadow-hard-sm">
-                    #{playerData.rank}
-                  </div>
-                )}
+                <div className="lg:hidden">
+                  <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="xs" />
+                </div>
               </motion.div>
-            )}
-          </div>
-        )}
 
-        {/* Word Forming Area with feedback - centered below timer */}
-        {/* Shows typed word when in keyboard mode, otherwise shows swiped word */}
-        {isPlaying && (
-          <div className="flex items-center justify-center flex-shrink-0">
-            <WordFormingArea
-              word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
-              letterCount={keyboardInput.isTypingMode ? keyboardInput.typedWord.length : letterCount}
-              feedback={currentFeedback}
-              compact
-            />
-          </div>
-        )}
-
-        {/* Tournament Progress Banner */}
-        {tournamentData && (
-          <motion.div
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            className="max-w-7xl mx-auto mb-1"
-          >
-            <Card className="bg-gradient-to-r from-purple-600/90 to-pink-600/90 dark:from-purple-700/90 dark:to-pink-700/90 backdrop-blur-md border border-purple-400/50 shadow-[0_0_20px_rgba(168,85,247,0.3)]">
-              <CardContent className="py-1 px-3">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <Trophy className="w-5 h-5 text-yellow-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
-                    <div>
-                      <div className="text-white font-bold text-xs md:text-sm">
-                        {tournamentData.name || t('hostView.tournament')}
-                      </div>
-                      <div className="text-purple-100 text-[10px] md:text-xs">
-                        {t('hostView.tournamentRound')} {tournamentData.currentRound || 1} / {tournamentData.totalRounds || 3}
-                      </div>
+              {/* Score (right position) - vibrant yellow/lime gradient */}
+              {isPlaying && (
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px]"
+                  style={{
+                    background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
+                  }}
+                >
+                  <div className="text-center">
+                    <motion.div
+                      key={playerData.score}
+                      initial={{ scale: 1.3 }}
+                      animate={{ scale: 1 }}
+                      className="text-lg md:text-2xl lg:text-3xl font-black text-neo-black leading-tight"
+                      style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
+                    >
+                      {playerData.score}
+                    </motion.div>
+                    <div className="text-[9px] md:text-xs lg:text-sm font-bold uppercase tracking-wider text-neo-black">
+                      {t('common.score') || 'Score'}
                     </div>
                   </div>
-                  <Badge className="bg-white/20 text-neo-black border-white/30 text-[10px] md:text-xs">
-                    {t('hostView.tournamentProgress')}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
+                  {/* Rank badge */}
+                  {playerData.rank && playerData.rank > 0 && (
+                    <div className="absolute -top-2 -right-2 w-5 h-5 md:w-6 md:h-6 bg-neo-purple text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-[10px] md:text-xs font-black shadow-hard-sm">
+                      #{playerData.rank}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </div>
+          )}
 
-        {/* Grid - Direct connection to timer row */}
-        <div className="flex-1 flex items-center justify-center min-h-0">
-          <GridComponent
+          {/* Word Forming Area with feedback - centered below timer */}
+          {/* Shows typed word when in keyboard mode, otherwise shows swiped word */}
+          {isPlaying && (
+            <div className="flex items-center justify-center flex-shrink-0">
+              <WordFormingArea
+                word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
+                letterCount={keyboardInput.isTypingMode ? keyboardInput.typedWord.length : letterCount}
+                feedback={currentFeedback}
+                compact
+              />
+            </div>
+          )}
+
+          {/* Tournament Progress Banner */}
+          {tournamentData && (
+            <motion.div
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              className="max-w-7xl mx-auto mb-1"
+            >
+              <Card className="bg-gradient-to-r from-purple-600/90 to-pink-600/90 dark:from-purple-700/90 dark:to-pink-700/90 backdrop-blur-md border border-purple-400/50 shadow-[0_0_20px_rgba(168,85,247,0.3)]">
+                <CardContent className="py-1 px-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Trophy className="w-5 h-5 text-yellow-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
+                      <div>
+                        <div className="text-white font-bold text-xs md:text-sm">
+                          {tournamentData.name || t('hostView.tournament')}
+                        </div>
+                        <div className="text-purple-100 text-[10px] md:text-xs">
+                          {t('hostView.tournamentRound')} {tournamentData.currentRound || 1} / {tournamentData.totalRounds || 3}
+                        </div>
+                      </div>
+                    </div>
+                    <Badge className="bg-white/20 text-neo-black border-white/30 text-[10px] md:text-xs">
+                      {t('hostView.tournamentProgress')}
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+
+          {/* Grid - Direct connection to timer row */}
+          <div className="flex-1 flex items-center justify-center min-h-0">
+            <GridComponent
               key={isPlaying ? 'playing-grid' : 'spectating-grid'}
               grid={letterGrid}
               interactive={isPlaying && !showStartAnimation}
@@ -999,179 +1041,178 @@ const InGameScreen = memo<InGameScreenProps>(({
               earthquakeShaking={earthquakeState === 'shaking'}
               highlightedPath={keyboardInput.isTypingMode ? keyboardInput.highlightedCells : []}
             />
-        </div>
-
-
-        {/* Words Remaining - 5+ letter words only (single-player only) */}
-        {hints?.isSinglePlayer && isPlaying && totalBoardWords !== null && totalBoardWords !== undefined && totalBoardWords > 0 && (
-          <div className="flex justify-center flex-shrink-0">
-            <WordsRemaining
-              totalWords={totalBoardWords}
-              foundWordsCount={normalizedFoundWords.filter(fw => fw.isValid !== false && fw.word.length >= 5).length}
-              t={t}
-              minLength={5}
-            />
           </div>
-        )}
 
-        {/* Mobile: Split-view with compact leaderboard + words (eliminates tab switching) */}
-        {/* Hidden on very small screens (< 600px height) to prevent scroll - visible on tablet and desktop */}
-        {isPlaying && !gameplayFocusMode && leaderboard && leaderboard.length > 0 && (
-          <div className="hidden sm:block lg:hidden mt-0.5 md:mt-2 space-y-0.5 max-w-md mx-auto lg:max-w-lg md:space-y-2 flex-shrink-0 overflow-hidden">
-            {/* Compact Leaderboard - Always visible */}
-            <CompactLeaderboard
-              players={leaderboard.map(p => ({
-                username: p.username,
-                score: p.score,
-                rank: 0, // Will be calculated in component
-                profilePictureUrl: p.avatar?.profilePictureUrl,
-                avatarEmoji: p.avatar?.emoji,
-                avatarColor: p.avatar?.color,
-              }))}
-              currentUsername={username}
-              t={t}
-            />
 
-            {/* Found Words - Auto-scroll, always visible */}
-            <div className="bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard p-1.5 md:p-2">
-              <div className="flex items-center justify-between mb-1 px-0.5">
-                <span className="text-[10px] md:text-xs font-black uppercase text-neo-black">
-                  {t('hostView.words') || 'Your Words'}
-                </span>
-                <span className="text-xs font-bold text-neo-black/90">
-                  {normalizedFoundWords.length}
-                </span>
-              </div>
-              <div className="max-h-[70px] overflow-y-auto">
-                {normalizedFoundWords.length === 0 ? (
-                  <p className="text-center text-neo-black/90 py-2 text-sm font-bold">
-                    {t('playerView.noWordsYet') || 'No words found yet'}
-                  </p>
-                ) : (
-                  <div className="flex flex-wrap gap-1">
-                    {normalizedFoundWords.slice().reverse().map((wordObj, index) => (
-                      <motion.span
-                        key={`${wordObj.word}-${index}`}
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                        className={`inline-block px-2 py-1 text-xs font-bold uppercase rounded-neo border-2 border-neo-black ${
-                          wordObj.isValid === false
+          {/* Words Remaining - 5+ letter words only (single-player only) */}
+          {hints?.isSinglePlayer && isPlaying && totalBoardWords !== null && totalBoardWords !== undefined && totalBoardWords > 0 && (
+            <div className="flex justify-center flex-shrink-0">
+              <WordsRemaining
+                totalWords={totalBoardWords}
+                foundWordsCount={normalizedFoundWords.filter(fw => fw.isValid !== false && fw.word.length >= 5).length}
+                t={t}
+                minLength={5}
+              />
+            </div>
+          )}
+
+          {/* Mobile: Split-view with compact leaderboard + words (eliminates tab switching) */}
+          {/* Now visible on all mobile/tablet screens with scroll support, hidden on desktop where sidebar is used */}
+          {isPlaying && !gameplayFocusMode && leaderboard && leaderboard.length > 0 && (
+            <div className="block lg:hidden mt-0.5 md:mt-2 space-y-0.5 max-w-md mx-auto lg:max-w-lg md:space-y-2 flex-shrink overflow-auto max-h-[160px]">
+              {/* Compact Leaderboard - Always visible */}
+              <CompactLeaderboard
+                players={leaderboard.map(p => ({
+                  username: p.username,
+                  score: p.score,
+                  rank: 0, // Will be calculated in component
+                  profilePictureUrl: p.avatar?.profilePictureUrl,
+                  avatarEmoji: p.avatar?.emoji,
+                  avatarColor: p.avatar?.color,
+                }))}
+                currentUsername={username}
+                t={t}
+              />
+
+              {/* Found Words - Auto-scroll, always visible */}
+              <div className="bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard p-1.5 md:p-2">
+                <div className="flex items-center justify-between mb-1 px-0.5">
+                  <span className="text-[10px] md:text-xs font-black uppercase text-neo-black">
+                    {t('hostView.words') || 'Your Words'}
+                  </span>
+                  <span className="text-xs font-bold text-neo-black/90">
+                    {normalizedFoundWords.length}
+                  </span>
+                </div>
+                <div className="max-h-[70px] overflow-y-auto">
+                  {normalizedFoundWords.length === 0 ? (
+                    <p className="text-center text-neo-black/90 py-2 text-sm font-bold">
+                      {t('playerView.noWordsYet') || 'No words found yet'}
+                    </p>
+                  ) : (
+                    <div className="flex flex-wrap gap-1">
+                      {normalizedFoundWords.slice().reverse().map((wordObj, index) => (
+                        <motion.span
+                          key={`${wordObj.word}-${index}`}
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                          className={`inline-block px-2 py-1 text-xs font-bold uppercase rounded-neo border-2 border-neo-black ${wordObj.isValid === false
                             ? 'bg-neo-red text-neo-cream line-through opacity-70'
                             : index === 0
                               ? 'bg-neo-orange text-neo-black'
                               : 'bg-white text-neo-black'
-                        }`}
-                      >
-                        {applyHebrewFinalLetters(wordObj.word)}
-                      </motion.span>
-                    ))}
-                  </div>
-                )}
+                            }`}
+                        >
+                          {applyHebrewFinalLetters(wordObj.word)}
+                        </motion.span>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
+            </div>
+          )}
+
+          {/* Achievement dock */}
+          {children}
+        </div>
+
+        {/* Right Column: Live Leaderboard (hidden in focus mode) */}
+        {!gameplayFocusMode && (
+          <div className="lg:w-80 xl:w-96 2xl:w-[28rem] flex flex-col gap-2">
+            <div
+              className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[45vh] lg:max-h-none lg:flex-grow"
+              style={{ transform: 'rotate(-1deg)' }}
+            >
+              {/* Header */}
+              <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple text-white">
+                <h3 className="flex items-center gap-2 text-neo-cream text-base uppercase tracking-widest font-black">
+                  <Trophy className="w-4 h-4 text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
+                  {t('playerView.leaderboard')}
+                </h3>
+              </div>
+              {/* Content */}
+              <div className="overflow-y-auto flex-1 p-3 custom-scrollbar">
+                <div className="space-y-2">
+                  {memoizedLeaderboard.map((player, index) => (
+                    <motion.div
+                      key={player.username}
+                      initial={{ x: 50, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: index * 0.05 }}
+                      layout
+                      className={`flex items-center gap-3 p-2 rounded-neo border-3 shadow-hard-sm transition-all
+                    hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
+                    ${player.rankStyle} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
+                    >
+                      {/* Rank badge */}
+                      <div className="w-10 h-10 rounded-neo flex items-center justify-center font-black text-lg bg-neo-black text-neo-cream border-2 border-neo-black">
+                        {player.rankDisplay}
+                      </div>
+                      {/* Avatar */}
+                      <Avatar
+                        profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
+                        avatarEmoji={player.avatar?.emoji}
+                        avatarImage={player.avatar?.avatarImage}
+                        avatarColor={player.avatar?.color}
+                        size="xl"
+                      />
+                      {/* Player info */}
+                      <div className="flex-1 min-w-0">
+                        <div className={`font-black truncate text-sm flex items-center gap-1 text-neo-black ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+                          {player.isHost && <Crown className="w-4 h-4 text-neo-yellow flex-shrink-0" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />}
+                          <span className="truncate" title={player.username}>{player.username}</span>
+                          {player.isMe && (
+                            <span className="text-xs bg-neo-black text-neo-cream px-1.5 py-0.5 rounded-neo font-bold flex-shrink-0">
+                              {t('playerView.me') || 'YOU'}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs font-bold text-neo-black/90">
+                          {player.wordCount || 0} {t('hostView.words') || 'words'}
+                        </div>
+                      </div>
+                      {/* Presence and Score */}
+                      <div className="flex items-center gap-2">
+                        {/* Presence indicator (only show for others when host) */}
+                        {isHost && !player.isMe && player.presenceStatus && (
+                          <PresenceIndicator
+                            status={player.presenceStatus}
+                            isWindowFocused={player.isWindowFocused}
+                            size="lg"
+                          />
+                        )}
+                        <div className="text-right">
+                          <div className="text-lg font-black text-neo-black leading-none">
+                            {player.score}
+                          </div>
+                          <div className="text-xs font-bold text-neo-black/90 uppercase">pts</div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                  {leaderboard.length === 0 && (
+                    <p className="text-center text-neo-black/90 py-6 text-sm font-bold">
+                      {t('hostView.waitingForPlayers') || 'Waiting for players...'}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Chat Component - Desktop only */}
+            <div className="hidden lg:block">
+              <RoomChat
+                username={isHost ? "Host" : username}
+                isHost={isHost}
+                gameCode={gameCode}
+                className="max-h-[200px]"
+              />
             </div>
           </div>
         )}
-
-        {/* Achievement dock */}
-        {children}
       </div>
-
-      {/* Right Column: Live Leaderboard (hidden in focus mode) */}
-      {!gameplayFocusMode && (
-      <div className="lg:w-80 xl:w-96 2xl:w-[28rem] flex flex-col gap-2">
-        <div
-          className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[45vh] lg:max-h-none lg:flex-grow"
-          style={{ transform: 'rotate(-1deg)' }}
-        >
-          {/* Header */}
-          <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple text-white">
-            <h3 className="flex items-center gap-2 text-neo-cream text-base uppercase tracking-widest font-black">
-              <Trophy className="w-4 h-4 text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
-              {t('playerView.leaderboard')}
-            </h3>
-          </div>
-          {/* Content */}
-          <div className="overflow-y-auto flex-1 p-3 custom-scrollbar">
-            <div className="space-y-2">
-              {memoizedLeaderboard.map((player, index) => (
-                <motion.div
-                  key={player.username}
-                  initial={{ x: 50, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: index * 0.05 }}
-                  layout
-                  className={`flex items-center gap-3 p-2 rounded-neo border-3 shadow-hard-sm transition-all
-                    hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
-                    ${player.rankStyle} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
-                >
-                  {/* Rank badge */}
-                  <div className="w-10 h-10 rounded-neo flex items-center justify-center font-black text-lg bg-neo-black text-neo-cream border-2 border-neo-black">
-                    {player.rankDisplay}
-                  </div>
-                  {/* Avatar */}
-                  <Avatar
-                    profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
-                    avatarEmoji={player.avatar?.emoji}
-                    avatarImage={player.avatar?.avatarImage}
-                    avatarColor={player.avatar?.color}
-                    size="xl"
-                  />
-                  {/* Player info */}
-                  <div className="flex-1 min-w-0">
-                    <div className={`font-black truncate text-sm flex items-center gap-1 text-neo-black ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                      {player.isHost && <Crown className="w-4 h-4 text-neo-yellow flex-shrink-0" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />}
-                      <span className="truncate">{player.username}</span>
-                      {player.isMe && (
-                        <span className="text-xs bg-neo-black text-neo-cream px-1.5 py-0.5 rounded-neo font-bold flex-shrink-0">
-                          {t('playerView.me') || 'YOU'}
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-xs font-bold text-neo-black/90">
-                      {player.wordCount || 0} {t('hostView.words') || 'words'}
-                    </div>
-                  </div>
-                  {/* Presence and Score */}
-                  <div className="flex items-center gap-2">
-                    {/* Presence indicator (only show for others when host) */}
-                    {isHost && !player.isMe && player.presenceStatus && (
-                      <PresenceIndicator
-                        status={player.presenceStatus}
-                        isWindowFocused={player.isWindowFocused}
-                        size="lg"
-                      />
-                    )}
-                    <div className="text-right">
-                      <div className="text-lg font-black text-neo-black leading-none">
-                        {player.score}
-                      </div>
-                      <div className="text-xs font-bold text-neo-black/90 uppercase">pts</div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-              {leaderboard.length === 0 && (
-                <p className="text-center text-neo-black/90 py-6 text-sm font-bold">
-                  {t('hostView.waitingForPlayers') || 'Waiting for players...'}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Chat Component - Desktop only */}
-        <div className="hidden lg:block">
-          <RoomChat
-            username={isHost ? "Host" : username}
-            isHost={isHost}
-            gameCode={gameCode}
-            className="max-h-[200px]"
-          />
-        </div>
-      </div>
-      )}
-    </div>
     </>
   );
 });

@@ -1,0 +1,123 @@
+/**
+ * Daily Challenge Constants
+ *
+ * All constants used across daily challenge modules
+ */
+
+import type { Language } from '@/types';
+
+// ==========================================
+// Core Constants
+// ==========================================
+
+// Epoch date for puzzle numbering (first daily challenge)
+// Puzzle #1 = 2025-12-30, Puzzle #2 = 2025-12-31
+export const DAILY_CHALLENGE_EPOCH = new Date('2025-12-30T00:00:00Z');
+
+// Salt for seeding (prevents reverse-engineering grids)
+export const SEED_SALT = 'lexiclash-daily-v1';
+
+// Default game duration for daily challenge (in seconds)
+export const DAILY_CHALLENGE_DURATION = 120;
+
+// Minimum number of same-length words to embed (excluding target word)
+export const MIN_SAME_LENGTH_WORDS = 5;
+
+// ==========================================
+// Hebrew Letter Normalization
+// ==========================================
+
+// Hebrew final letters mapping to regular forms
+// Final letters should not appear on the grid - only regular forms
+export const HEBREW_FINAL_TO_REGULAR: Record<string, string> = {
+  'ך': 'כ', // final kaf → kaf
+  'ם': 'מ', // final mem → mem
+  'ן': 'נ', // final nun → nun
+  'ף': 'פ', // final pe → pe
+  'ץ': 'צ', // final tsade → tsade
+};
+
+/**
+ * Normalize Hebrew final letters to regular forms for grid display
+ * Final letters (ך, ם, ן, ף, ץ) are replaced with their regular forms
+ */
+export function normalizeHebrewFinalLetters(text: string): string {
+  let normalized = text;
+  for (const [final, regular] of Object.entries(HEBREW_FINAL_TO_REGULAR)) {
+    normalized = normalized.replace(new RegExp(final, 'g'), regular);
+  }
+  return normalized;
+}
+
+// ==========================================
+// Storage Keys
+// ==========================================
+
+export const DAILY_STORAGE_KEY = 'lexiclash_daily';
+export const WORD_HUNT_STORAGE_KEY = 'lexiclash_word_hunt';
+export const DAILY_STREAK_KEY = 'lexiclash_daily_streak';
+export const GUEST_DAILY_PLAYER_KEY = 'lexiclash_guest_daily_player';
+export const GUEST_FINGERPRINT_KEY = 'lexiclash_guest_fingerprint';
+export const SIGNUP_MODAL_DISMISSED_KEY = 'lexiclash_signup_dismissed';
+export const PENDING_DAILY_RESULT_KEY = 'lexiclash_pending_daily_result';
+export const FIRST_COMPLETION_KEY = 'lexiclash_first_daily_completion';
+export const WINNER_ONBOARDING_KEY = 'lexiclash_winner_onboarding';
+
+// ==========================================
+// Share Emojis
+// ==========================================
+
+/**
+ * Color emoji for each word length - representing word value/difficulty
+ */
+export const LENGTH_EMOJI: Record<number, string> = {
+  2: '⬜',  // 2-letter (rare/bonus)
+  3: '🟨',  // Yellow - common
+  4: '🟩',  // Green - good
+  5: '🟦',  // Blue - great
+  6: '🟪',  // Purple - excellent
+  7: '🔶',  // Orange - amazing
+  8: '🔶',  // Orange (same for 8+)
+};
+
+/**
+ * Get emoji for a word length
+ */
+export function getWordLengthEmoji(length: number): string {
+  if (length >= 7) return LENGTH_EMOJI[7];
+  return LENGTH_EMOJI[length] || LENGTH_EMOJI[3];
+}
+
+// ==========================================
+// Word Frequency Tiers
+// ==========================================
+
+/**
+ * Common word frequency tiers (lower = more common)
+ * Words found less frequently are considered rarer
+ */
+export const WORD_FREQUENCY_TIERS: Record<Language, Record<string, number>> = {
+  en: {
+    // Tier 1: Very common (frequency 1)
+    'THE': 1, 'AND': 1, 'FOR': 1, 'ARE': 1, 'BUT': 1, 'NOT': 1, 'YOU': 1, 'ALL': 1,
+    'CAN': 1, 'HER': 1, 'WAS': 1, 'ONE': 1, 'OUR': 1, 'OUT': 1, 'DAY': 1, 'HAD': 1,
+    // Tier 2: Common (frequency 2)
+    'CAT': 2, 'DOG': 2, 'RUN': 2, 'SUN': 2, 'FUN': 2, 'BIG': 2, 'TOP': 2, 'MAN': 2,
+    'RED': 2, 'BOX': 2, 'CUP': 2, 'PEN': 2, 'CAR': 2, 'BUS': 2, 'MAP': 2, 'KEY': 2,
+    // Tier 3: Less common (frequency 3)
+    'MOON': 3, 'STAR': 3, 'BIRD': 3, 'FISH': 3, 'TREE': 3, 'BOOK': 3, 'DOOR': 3, 'HAND': 3,
+    'FOOT': 3, 'HEAD': 3, 'ROCK': 3, 'SAND': 3, 'BOAT': 3, 'GAME': 3, 'WOLF': 3, 'BEAR': 3,
+    // Tier 4: Uncommon (frequency 4) - these are considered rare
+    'HAWK': 4, 'FROG': 4, 'DEER': 4, 'DUCK': 4, 'JADE': 4, 'RUBY': 4, 'SILK': 4, 'WOOL': 4,
+    'CAVE': 4, 'PEAK': 4, 'POND': 4, 'REEF': 4, 'MYTH': 4, 'BARD': 4, 'MAGE': 4, 'SAGE': 4,
+    // Tier 5: Rare (frequency 5) - these are very rare
+    'LYNX': 5, 'FLUX': 5, 'APEX': 5, 'VOID': 5, 'ECHO': 5, 'QUIZ': 5, 'MAZE': 5, 'GRID': 5,
+    'SWAN': 5, 'CROW': 5, 'MOTH': 5, 'WASP': 5, 'CRAB': 5, 'SEAL': 5, 'TOAD': 5, 'BREW': 5,
+  },
+  he: {},
+  sv: {},
+  ja: {},
+  es: {},
+  fr: {},
+  de: {},
+};

@@ -1,0 +1,129 @@
+/**
+ * Daily Challenge Streak Utilities
+ *
+ * Streak tracking and milestone calculations
+ */
+
+import type { DailyStreak } from './types';
+import { DAILY_STREAK_KEY } from './constants';
+import { getDailyChallengeDate, getYesterdayDate } from './dateUtils';
+
+/**
+ * Get the current daily streak
+ */
+export function getDailyStreak(): DailyStreak {
+  if (typeof window === 'undefined') {
+    return { currentStreak: 0, longestStreak: 0, lastPlayedDate: null, totalDailiesCompleted: 0 };
+  }
+
+  const stored = localStorage.getItem(DAILY_STREAK_KEY);
+  if (!stored) {
+    return { currentStreak: 0, longestStreak: 0, lastPlayedDate: null, totalDailiesCompleted: 0 };
+  }
+
+  try {
+    return JSON.parse(stored);
+  } catch {
+    return { currentStreak: 0, longestStreak: 0, lastPlayedDate: null, totalDailiesCompleted: 0 };
+  }
+}
+
+/**
+ * Update the daily streak after completing a daily challenge
+ */
+export function updateDailyStreak(): DailyStreak {
+  if (typeof window === 'undefined') {
+    return { currentStreak: 0, longestStreak: 0, lastPlayedDate: null, totalDailiesCompleted: 0 };
+  }
+
+  const today = getDailyChallengeDate();
+  const yesterday = getYesterdayDate();
+  const current = getDailyStreak();
+
+  // Already played today - no update needed
+  if (current.lastPlayedDate === today) {
+    return current;
+  }
+
+  let newStreak: number;
+
+  if (current.lastPlayedDate === yesterday) {
+    // Continue the streak
+    newStreak = current.currentStreak + 1;
+  } else {
+    // Streak broken (or first time)
+    newStreak = 1;
+  }
+
+  const updated: DailyStreak = {
+    currentStreak: newStreak,
+    longestStreak: Math.max(newStreak, current.longestStreak),
+    lastPlayedDate: today,
+    totalDailiesCompleted: current.totalDailiesCompleted + 1,
+  };
+
+  localStorage.setItem(DAILY_STREAK_KEY, JSON.stringify(updated));
+
+  return updated;
+}
+
+/**
+ * Check if this streak update hits a milestone
+ */
+export function getStreakMilestone(streak: number): number | null {
+  const milestones = [7, 14, 30, 50, 100, 365];
+  return milestones.find(m => m === streak) || null;
+}
+
+/**
+ * Check if the player's streak is at risk (hasn't played today but has an active streak)
+ * Returns the hours remaining until streak expires, or null if no active streak at risk
+ */
+export function isStreakAtRisk(): { atRisk: boolean; hoursRemaining: number; currentStreak: number } {
+  if (typeof window === 'undefined') {
+    return { atRisk: false, hoursRemaining: 0, currentStreak: 0 };
+  }
+
+  const streak = getDailyStreak();
+  const today = getDailyChallengeDate();
+
+  // No streak or already played today - not at risk
+  if (streak.currentStreak < 2 || streak.lastPlayedDate === today) {
+    return { atRisk: false, hoursRemaining: 0, currentStreak: streak.currentStreak };
+  }
+
+  // Check if they played yesterday (streak is still valid but at risk today)
+  const yesterdayStr = getYesterdayDate();
+
+  if (streak.lastPlayedDate === yesterdayStr) {
+    // Calculate hours until midnight UTC (when streak expires)
+    const now = new Date();
+    const nextMidnight = new Date(Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate() + 1,
+      0, 0, 0, 0
+    ));
+    const hoursRemaining = Math.max(0, Math.floor((nextMidnight.getTime() - now.getTime()) / (1000 * 60 * 60)));
+
+    return { atRisk: true, hoursRemaining, currentStreak: streak.currentStreak };
+  }
+
+  // Streak already broken (missed yesterday)
+  return { atRisk: false, hoursRemaining: 0, currentStreak: 0 };
+}
+
+/**
+ * Get a celebratory message for streak milestones
+ */
+export function getStreakMilestoneMessage(streak: number): { emoji: string; title: string; subtitle: string } | null {
+  const milestoneMessages: Record<number, { emoji: string; title: string; subtitle: string }> = {
+    7: { emoji: '🔥', title: '1 WEEK STREAK!', subtitle: 'A full week of word hunting!' },
+    14: { emoji: '🌟', title: '2 WEEKS STRONG!', subtitle: 'Two weeks of dedication!' },
+    30: { emoji: '👑', title: 'MONTHLY MASTER!', subtitle: '30 days of excellence!' },
+    50: { emoji: '💎', title: 'LEGENDARY STREAK!', subtitle: '50 days unstoppable!' },
+    100: { emoji: '🏆', title: 'CENTURY CHAMPION!', subtitle: '100 days - you are a legend!' },
+    365: { emoji: '🌍', title: 'YEAR-LONG WARRIOR!', subtitle: '365 days of pure dedication!' },
+  };
+  return milestoneMessages[streak] || null;
+}

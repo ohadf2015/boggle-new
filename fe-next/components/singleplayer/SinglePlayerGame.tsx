@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { ArrowLeft, Pause, Play, Crown, TrendingUp, Target, Zap, Eye } from 'lucide-react';
+import { ArrowLeft, Pause, Play, Crown, TrendingUp, Target, Zap, Eye, List } from 'lucide-react';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import ComboDisplay from '@/components/game/ComboDisplay';
@@ -305,7 +305,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId }),
-      }).catch(() => {});
+      }).catch(() => { });
     };
   }, [settings.language, settings.mode]);
 
@@ -1154,8 +1154,11 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         />
 
         {/* Left Side Panel - Timer & Score */}
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20 landscape-side-panel">
-          <div className="landscape-panel flex flex-col items-center gap-4">
+        <div
+          className="absolute top-1/2 -translate-y-1/2 z-20 landscape-side-panel"
+          style={{ left: 'clamp(4px, 1vw, 12px)' }}
+        >
+          <div className="landscape-panel flex flex-col items-center gap-3">
             {/* Timer - Large and prominent */}
             {settings.mode !== 'practice' && (
               <CircularTimer
@@ -1183,8 +1186,11 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         </div>
 
         {/* Right Side Panel - Words & Combo */}
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 z-20 landscape-side-panel">
-          <div className="landscape-panel flex flex-col items-center gap-4">
+        <div
+          className="absolute top-1/2 -translate-y-1/2 z-20 landscape-side-panel"
+          style={{ right: 'clamp(4px, 1vw, 12px)' }}
+        >
+          <div className="landscape-panel flex flex-col items-center gap-3">
             {/* Words Found Count */}
             <div className="flex flex-col items-center">
               <div className="landscape-stat-secondary text-neo-black">
@@ -1195,17 +1201,26 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               </div>
             </div>
 
-            {/* Combo Display - Full variant for visibility */}
+            {/* Combo Display - High contrast for light panel background */}
             <ComboDisplay
               comboLevel={combo.comboLevel}
               coinReward={comboCoinReward}
               onCoinAnimationComplete={() => setComboCoinReward(null)}
+              highContrast
+              compact
             />
           </div>
         </div>
 
-        {/* Bottom-left: Pause/Finish button (primary action - easy thumb reach) */}
-        <div className="absolute bottom-2 left-2 z-30">
+        {/* Bottom action bar - safe from side panel overlap */}
+        <div
+          className="absolute bottom-2 left-0 right-0 z-30 flex justify-between items-center"
+          style={{
+            paddingInline: 'clamp(100px, 18vw, 150px)',
+            paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+          }}
+        >
+          {/* Pause/Finish button (primary action - easy thumb reach) */}
           {settings.mode !== 'practice' ? (
             <Button
               variant="ghost"
@@ -1228,10 +1243,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               {t('singlePlayer.finish') || 'Finish'}
             </Button>
           )}
-        </div>
 
-        {/* Bottom-right: Quit button (secondary - requires confirmation if score > 0) */}
-        <div className="absolute bottom-2 right-2 z-30">
+          {/* Quit button (secondary - requires confirmation if score > 0) */}
           <Button
             variant="ghost"
             size="sm"
@@ -1243,8 +1256,11 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           </Button>
         </div>
 
-        {/* Center: Word Forming Area + Grid - with horizontal padding for side panels */}
-        <div className="flex flex-col items-center justify-center w-full h-full px-[150px] py-2 gap-2 landscape-grid-container">
+        {/* Center: Word Forming Area + Grid - with responsive padding for side panels */}
+        <div
+          className="flex flex-col items-center justify-center w-full h-full py-1 gap-1.5 landscape-grid-container"
+          style={{ paddingInline: 'clamp(100px, 18vw, 150px)' }}
+        >
           {/* Word Forming Area - Permanent space above grid (keep timer section clear) */}
           <div className="flex items-center mb-0.5">
             <WordFormingArea
@@ -1271,6 +1287,36 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             />
           </div>
         </div>
+
+        {/* Collapsible Found Words Panel - Top center, shows last 3 words */}
+        {foundWords.length > 0 && (
+          <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30">
+            <AdaptiveMotion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-cream/95 backdrop-blur-sm border-2 border-neo-black rounded-full shadow-hard-sm"
+            >
+              <List className="w-3.5 h-3.5 text-neo-black/70" />
+              {foundWords.slice(-3).reverse().map((fw, i) => (
+                <span
+                  key={`${fw.word}-${fw.timestamp}`}
+                  className={cn(
+                    "px-2 py-0.5 text-xs font-bold uppercase rounded-full border border-neo-black/30",
+                    i === 0 ? "bg-neo-yellow text-neo-black" : "bg-neo-cream text-neo-black/80",
+                    fw.isValid === false && "line-through opacity-60 bg-neo-red/20"
+                  )}
+                >
+                  {fw.word}
+                </span>
+              ))}
+              {foundWords.length > 3 && (
+                <span className="text-xs font-bold text-neo-black/60">
+                  +{foundWords.length - 3}
+                </span>
+              )}
+            </AdaptiveMotion.div>
+          </div>
+        )}
 
         {/* Hint Prompt - shows after player hasn't found a word for a while (landscape) */}
         <AdaptiveAnimatePresence>
