@@ -181,20 +181,74 @@ const DailyChallenge: React.FC = () => {
       }
     }
 
-    // Handle admin reset: ?reset=true clears localStorage so player can replay
+    // Handle admin reset: ?reset=true clears both localStorage AND server-side attempt
     const resetParam = searchParams.get('reset');
     if (resetParam === 'true' && typeof window !== 'undefined') {
-      // Clear the localStorage for this game language
-      const cleared = clearWordHuntResultForRetry(gameLanguage);
-      if (cleared) {
-        setWasReset(true);
-        // Show success toast
-        neoSuccessToast(t('daily.attemptReset'), { icon: '🔄', duration: 4000 });
-        // Clean up URL by removing the reset parameter
-        const url = new URL(window.location.href);
-        url.searchParams.delete('reset');
-        window.history.replaceState({}, '', url.toString());
-      }
+      let isMounted = true;
+
+      const performReset = async () => {
+        try {
+          // Get today's date for the API call
+          const today = new Date().toISOString().split('T')[0];
+
+          // Build reset request body with player credentials
+          const resetBody: { puzzleDate: string; language: string; playerId?: string; guestFingerprint?: string } = {
+            puzzleDate: today,
+            language: gameLanguage,
+          };
+
+          if (isAuthenticated && profile) {
+            resetBody.playerId = profile.id;
+          } else {
+            const fp = await getGuestFingerprint();
+            if (fp) {
+              resetBody.guestFingerprint = fp;
+            }
+          }
+
+          // Delete server-side attempt record
+          let serverReset = false;
+          if (resetBody.playerId || resetBody.guestFingerprint) {
+            try {
+              const resetResponse = await fetch('/api/daily/reset-attempt', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(resetBody),
+              });
+              const resetResult = await resetResponse.json();
+              serverReset = resetResult.success && (resetResult.deleted > 0);
+            } catch (serverError) {
+              console.warn('Failed to reset server attempt:', serverError);
+            }
+          }
+
+          if (!isMounted) return;
+
+          // Clear the localStorage for this game language
+          const localCleared = clearWordHuntResultForRetry(gameLanguage);
+
+          if (localCleared || serverReset) {
+            setWasReset(true);
+            // Show success toast
+            neoSuccessToast(t('daily.attemptReset'), { icon: '🔄', duration: 4000 });
+          }
+        } catch (error) {
+          console.error('Reset error:', error);
+        }
+
+        // Clean up URL by removing the reset parameter (always, even on error)
+        if (isMounted && typeof window !== 'undefined') {
+          const url = new URL(window.location.href);
+          url.searchParams.delete('reset');
+          window.history.replaceState({}, '', url.toString());
+        }
+      };
+
+      performReset();
+
+      return () => {
+        isMounted = false;
+      };
     }
 
     // Handle retry token: ?retryToken={token} validates and clears localStorage

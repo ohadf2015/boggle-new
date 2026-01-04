@@ -239,17 +239,63 @@ export async function updatePlayerStats(
       logger.info('SUPABASE', `Profile not found for ${playerId}, creating minimal profile for stats tracking`);
 
       // Create a minimal profile so we can track stats
-      const generateRandomPlayerName = getRandomPlayerNameGenerator();
-      const randomPlayerData = generateRandomPlayerName!([], 'en');
+      // Try to use the user's first name from auth metadata if available
+      let username: string;
+      let displayName: string;
+      let avatarEmoji: string;
+      let avatarColor: string;
+
+      // Fetch auth user metadata to get their name from OAuth provider
+      const { data: authUser } = await client.auth.admin.getUserById(playerId);
+      const userMetadata = authUser?.user?.user_metadata;
+
+      // Extract first name from OAuth metadata (full_name or name field)
+      const oauthFullName = userMetadata?.full_name || userMetadata?.name;
+      const getFirstName = (fullName: string): string => {
+        if (!fullName) return '';
+        const firstName = fullName.split(' ')[0];
+        // Capitalize first letter, lowercase rest for Latin chars
+        if (/^[A-Z]+$/.test(firstName)) {
+          return firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+        }
+        return firstName;
+      };
+      const oauthFirstName = oauthFullName ? getFirstName(oauthFullName) : null;
+
+      if (oauthFirstName) {
+        // Use the OAuth first name
+        username = oauthFirstName;
+        displayName = oauthFirstName;
+        // Use generic avatar for OAuth users
+        const genericAvatars = [
+          { emoji: '😊', color: '#4F46E5' },
+          { emoji: '🎮', color: '#059669' },
+          { emoji: '⭐', color: '#D97706' },
+          { emoji: '🎯', color: '#DC2626' },
+          { emoji: '🏆', color: '#7C3AED' },
+        ];
+        const randomAvatar = genericAvatars[Math.floor(Math.random() * genericAvatars.length)];
+        avatarEmoji = randomAvatar.emoji;
+        avatarColor = randomAvatar.color;
+        logger.info('SUPABASE', `Using OAuth first name for profile: ${oauthFirstName}`);
+      } else {
+        // Fallback to random player name
+        const generateRandomPlayerName = getRandomPlayerNameGenerator();
+        const randomPlayerData = generateRandomPlayerName!([], 'en');
+        username = randomPlayerData.name;
+        displayName = randomPlayerData.name;
+        avatarEmoji = randomPlayerData.avatar.emoji;
+        avatarColor = randomPlayerData.avatar.color;
+      }
 
       const { data: newProfile, error: createError } = await client
         .from('profiles')
         .insert({
           id: playerId,
-          username: randomPlayerData.name,
-          display_name: randomPlayerData.name,
-          avatar_emoji: randomPlayerData.avatar.emoji,
-          avatar_color: randomPlayerData.avatar.color
+          username,
+          display_name: displayName,
+          avatar_emoji: avatarEmoji,
+          avatar_color: avatarColor
         })
         .select()
         .single();
