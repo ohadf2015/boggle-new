@@ -829,7 +829,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
     } catch {
       return puzzleDate;
     }
-  }, [puzzleDate]);
+  }, [puzzleDate, language]);
 
   return (
     <motion.div

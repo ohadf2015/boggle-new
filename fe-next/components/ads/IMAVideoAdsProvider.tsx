@@ -76,14 +76,11 @@ export function IMAVideoAdsProvider({ children }: { children: ReactNode }) {
   const [isAvailable, setIsAvailable] = useState(false);
   const [isShowingAd, setIsShowingAd] = useState(false);
 
-  // Refs for IMA SDK objects (using any to avoid type conflicts)
+  // Refs for IMA SDK objects (using any for dynamically loaded SDK types)
   const adContainerRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const adDisplayContainerRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const adsLoaderRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const adsManagerRef = useRef<any>(null);
   const callbacksRef = useRef<{
     onAdStarted?: () => void;
@@ -91,40 +88,75 @@ export function IMAVideoAdsProvider({ children }: { children: ReactNode }) {
     onAdError?: (error: string) => void;
   } | null>(null);
 
-  // Initialize IMA SDK after script loads
-  const initializeIMA = useCallback(() => {
-    if (!window.google?.ima || !adContainerRef.current || !videoRef.current) {
-      return;
+  // Cleanup ad resources - defined first as other callbacks depend on it
+  const cleanupAd = useCallback(() => {
+    if (adsManagerRef.current) {
+      adsManagerRef.current.destroy();
+      adsManagerRef.current = null;
     }
-
-    try {
-      // Create ad display container
-      adDisplayContainerRef.current = new window.google.ima.AdDisplayContainer(
-        adContainerRef.current,
-        videoRef.current
-      );
-
-      // Create ads loader
-      adsLoaderRef.current = new window.google.ima.AdsLoader(adDisplayContainerRef.current);
-
-      // Set up event listeners
-      adsLoaderRef.current.addEventListener(
-        'adsManagerLoaded',
-        handleAdsManagerLoaded,
-        false
-      );
-      adsLoaderRef.current.addEventListener('adError', handleAdError, false);
-
-      setIsAvailable(true);
-      console.log('[IMA SDK] Initialized successfully');
-    } catch (error) {
-      console.error('[IMA SDK] Initialization error:', error);
-      setIsAvailable(false);
-    }
+    setIsShowingAd(false);
+    callbacksRef.current = null;
   }, []);
 
+  // Handle ad errors
+  const handleAdError = useCallback((event: any) => {
+    const error = event.getError();
+    const errorCode = error.getErrorCode();
+    const message = error.getMessage();
+
+    console.error(`[IMA SDK] Ad error ${errorCode}: ${message}`);
+    cleanupAd();
+
+    // User-friendly error messages
+    const errorMessages: Record<number, string> = {
+      301: 'No ads available at this time',
+      303: 'No ads available at this time',
+      400: 'Invalid ad response',
+      402: 'Ad playback error',
+      900: 'Network error - check your connection',
+    };
+
+    callbacksRef.current?.onAdError?.(
+      errorMessages[errorCode] || 'Failed to load ad'
+    );
+  }, [cleanupAd]);
+
+  // Handle ad events
+  const handleAdEvent = useCallback((event: any) => {
+    const callbacks = callbacksRef.current;
+
+    switch (event.type) {
+      case window.google!.ima.AdEvent.Type.STARTED:
+        console.log('[IMA SDK] Ad started');
+        callbacks?.onAdStarted?.();
+        break;
+
+      case window.google!.ima.AdEvent.Type.COMPLETE:
+        console.log('[IMA SDK] Ad completed - granting reward');
+        cleanupAd();
+        callbacks?.onAdComplete?.();
+        break;
+
+      case window.google!.ima.AdEvent.Type.SKIPPED:
+        console.log('[IMA SDK] Ad skipped - no reward');
+        cleanupAd();
+        callbacks?.onAdError?.('Ad was skipped');
+        break;
+
+      case window.google!.ima.AdEvent.Type.USER_CLOSE:
+        console.log('[IMA SDK] Ad closed by user - no reward');
+        cleanupAd();
+        callbacks?.onAdError?.('Ad was closed');
+        break;
+
+      case window.google!.ima.AdEvent.Type.ALL_ADS_COMPLETED:
+        console.log('[IMA SDK] All ads completed');
+        cleanupAd();
+        break;
+    }
+  }, [cleanupAd]);
+
   // Handle successful ads manager load
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleAdsManagerLoaded = useCallback((event: any) => {
       try {
         const adsRenderingSettings = {
@@ -172,78 +204,40 @@ export function IMAVideoAdsProvider({ children }: { children: ReactNode }) {
         callbacksRef.current?.onAdError?.('Failed to initialize ad');
       }
     },
-    []
+    [cleanupAd, handleAdEvent, handleAdError]
   );
 
-  // Handle ad events
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleAdEvent = useCallback((event: any) => {
-    const callbacks = callbacksRef.current;
-
-    switch (event.type) {
-      case window.google!.ima.AdEvent.Type.STARTED:
-        console.log('[IMA SDK] Ad started');
-        callbacks?.onAdStarted?.();
-        break;
-
-      case window.google!.ima.AdEvent.Type.COMPLETE:
-        console.log('[IMA SDK] Ad completed - granting reward');
-        cleanupAd();
-        callbacks?.onAdComplete?.();
-        break;
-
-      case window.google!.ima.AdEvent.Type.SKIPPED:
-        console.log('[IMA SDK] Ad skipped - no reward');
-        cleanupAd();
-        callbacks?.onAdError?.('Ad was skipped');
-        break;
-
-      case window.google!.ima.AdEvent.Type.USER_CLOSE:
-        console.log('[IMA SDK] Ad closed by user - no reward');
-        cleanupAd();
-        callbacks?.onAdError?.('Ad was closed');
-        break;
-
-      case window.google!.ima.AdEvent.Type.ALL_ADS_COMPLETED:
-        console.log('[IMA SDK] All ads completed');
-        cleanupAd();
-        break;
+  // Initialize IMA SDK after script loads
+  const initializeIMA = useCallback(() => {
+    if (!window.google?.ima || !adContainerRef.current || !videoRef.current) {
+      return;
     }
-  }, []);
 
-  // Handle ad errors
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleAdError = useCallback((event: any) => {
-    const error = event.getError();
-    const errorCode = error.getErrorCode();
-    const message = error.getMessage();
+    try {
+      // Create ad display container
+      adDisplayContainerRef.current = new window.google.ima.AdDisplayContainer(
+        adContainerRef.current,
+        videoRef.current
+      );
 
-    console.error(`[IMA SDK] Ad error ${errorCode}: ${message}`);
-    cleanupAd();
+      // Create ads loader
+      adsLoaderRef.current = new window.google.ima.AdsLoader(adDisplayContainerRef.current);
 
-    // User-friendly error messages
-    const errorMessages: Record<number, string> = {
-      301: 'No ads available at this time',
-      303: 'No ads available at this time',
-      400: 'Invalid ad response',
-      402: 'Ad playback error',
-      900: 'Network error - check your connection',
-    };
+      // Set up event listeners
+      adsLoaderRef.current.addEventListener(
+        'adsManagerLoaded',
+        handleAdsManagerLoaded,
+        false
+      );
+      adsLoaderRef.current.addEventListener('adError', handleAdError, false);
 
-    callbacksRef.current?.onAdError?.(
-      errorMessages[errorCode] || 'Failed to load ad'
-    );
-  }, []);
-
-  // Cleanup ad resources
-  const cleanupAd = useCallback(() => {
-    if (adsManagerRef.current) {
-      adsManagerRef.current.destroy();
-      adsManagerRef.current = null;
+      setIsAvailable(true);
+      console.log('[IMA SDK] Initialized successfully');
+    } catch (error) {
+      console.error('[IMA SDK] Initialization error:', error);
+      setIsAvailable(false);
     }
-    setIsShowingAd(false);
-    callbacksRef.current = null;
-  }, []);
+  }, [handleAdsManagerLoaded, handleAdError]);
 
   // Handle script load
   const handleScriptLoad = useCallback(() => {
