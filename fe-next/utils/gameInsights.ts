@@ -106,14 +106,32 @@ export function calculatePlayerInsights(
     };
   }
 
+  // For practice mode (gameDuration = 0), calculate actual play time from word timestamps
+  let effectiveGameDuration = gameDuration;
+  if (gameDuration === 0 && playerWords.length > 0) {
+    // Find the maximum timeSinceStart value to determine actual play duration
+    const timings = playerWords
+      .map(w => w.timeSinceStart)
+      .filter((t): t is number => typeof t === 'number');
+
+    if (timings.length > 0) {
+      const maxTime = Math.max(...timings);
+      // Add a small buffer (10 seconds) and round up to nearest 30 seconds for cleaner stats
+      effectiveGameDuration = Math.max(Math.ceil((maxTime + 10) / 30) * 30, 60);
+    } else {
+      // Fall back to a reasonable default if no timing data
+      effectiveGameDuration = 180;
+    }
+  }
+
   // Calculate basic stats
   const wordLengths = validWords.map(w => w.word.length);
   const totalLength = wordLengths.reduce((sum, len) => sum + len, 0);
   const longestWord = validWords.reduce((longest, current) =>
     current.word.length > (longest?.word.length || 0) ? current : longest, validWords[0]);
 
-  // Words per minute calculation
-  const gameMinutes = gameDuration / 60;
+  // Words per minute calculation (use effective duration)
+  const gameMinutes = effectiveGameDuration / 60;
   const wordsPerMinute = gameMinutes > 0 ? parseFloat((wordCount / gameMinutes).toFixed(1)) : 0;
 
   // Average word length
@@ -136,8 +154,9 @@ export function calculatePlayerInsights(
   });
 
   // Speed pattern analysis (based on timestamps if available)
+  // Use effectiveGameDuration so practice mode also gets proper speed pattern analysis
   const { speedPattern, earlyGameWords, midGameWords, lateGameWords } =
-    analyzeSpeedPattern(validWords, gameDuration);
+    analyzeSpeedPattern(validWords, effectiveGameDuration);
 
   // Accuracy (valid words vs all submitted)
   const totalSubmitted = playerWords.length;

@@ -138,6 +138,8 @@ const es = {
     "rank": "Puesto",
     "menu": "Menú",
     "showControls": "Toca para controles",
+    "showPreview": "Mostrar vista previa",
+    "hidePreview": "Ocultar vista previa",
     "loadingProfile": "Cargando...",
     "rematch": "Revancha",
     "roomFull": "Sala llena - mirando por ahora",

@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Trophy, Flame, Target, Clock, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ImageDown } from 'lucide-react';
+import { Share2, Trophy, Flame, Target, Clock, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ImageDown, ChevronDown, ChevronUp } from 'lucide-react';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 // X/Twitter icon (no lucide equivalent)
@@ -19,6 +19,9 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 import { Button } from '@/components/ui/button';
+import { hasPlayedToday } from '@/utils/dailyChallenge/storage';
+import { LANGUAGE_OPTIONS } from './results/constants';
+import type { Language } from '@/types';
 import { fireConfetti, fireRankConfetti } from '@/utils/confettiUtils';
 import {
   generateShareableResult,
@@ -48,6 +51,7 @@ interface DailyChallengeResultsProps {
   countdown: string;
   isNewCompletion: boolean;
   onBack: () => void;
+  onGameLanguageChange?: (lang: Language) => void;
   t: (key: string) => string;
 }
 
@@ -63,6 +67,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   countdown,
   isNewCompletion,
   onBack,
+  onGameLanguageChange,
   t,
 }) => {
   const [copied, setCopied] = useState(false);
@@ -75,8 +80,17 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   const [showImagePreview, setShowImagePreview] = useState(false);
   const [currentUserRank, setCurrentUserRank] = useState<number | null>(null);
   const [totalPlayers, setTotalPlayers] = useState(0);
-  const [showFullShareText, setShowFullShareText] = useState(false);
+  const [showSharePreview, setShowSharePreview] = useState(false);
+  const [showWords, setShowWords] = useState(false);
   const { profile, isAuthenticated } = useAuth();
+
+  // Get languages that haven't been played today
+  const availableLanguages = useMemo(() =>
+    LANGUAGE_OPTIONS.filter(
+      (option) => option.code !== result.language && !hasPlayedToday(option.code as Language)
+    ),
+    [result.language]
+  );
 
   // Performance optimization for low-end devices
   const { isLowEnd, enableComplexAnimations } = useDevicePerformance();
@@ -384,198 +398,163 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           variant="ghost"
           size="sm"
           onClick={onBack}
-          className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+          className="text-slate-400 hover:text-white"
         >
           <ArrowLeft className="w-4 h-4 me-2 rtl:rotate-180" />
           {t('daily.home')}
         </Button>
       </motion.div>
 
-      {/* Main content */}
-      <div className="max-w-md w-full text-center space-y-4 py-6">
-        {/* Completion badge */}
+      {/* Main content - Cleaner design */}
+      <div className="max-w-md w-full text-center space-y-5 py-6">
+
+        {/* Completion badge - Simplified */}
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', delay: 0.1 }}
-          className="flex items-center justify-center gap-3"
         >
           {isNewCompletion ? (
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-neo-lime to-neo-cyan rounded-neo border-3 border-neo-black shadow-hard">
-              <Trophy className="w-5 h-5 text-neo-black" />
-              <span className="font-black text-neo-black uppercase">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-neo-cyan/20 rounded-full border border-neo-cyan/40">
+              <Trophy className="w-4 h-4 text-neo-cyan" />
+              <span className="font-bold text-neo-cyan text-sm uppercase tracking-wide">
                 {t('daily.completed')}
               </span>
             </div>
           ) : (
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-neo border-3 border-neo-black dark:border-gray-600">
-              <Target className="w-5 h-5" />
-              <span className="font-black uppercase">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-700/50 rounded-full border border-slate-600">
+              <Target className="w-4 h-4 text-slate-400" />
+              <span className="font-bold text-slate-400 text-sm uppercase tracking-wide">
                 {t('daily.alreadyPlayed')}
               </span>
             </div>
           )}
         </motion.div>
 
-        {/* Puzzle number and score - Click to fire confetti */}
+        {/* Score - Clear focal point */}
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2 }}
           onClick={() => result.score > 0 && fireRankConfettiLocal(currentUserRank && currentUserRank <= 3 ? currentUserRank : 1)}
-          className="cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]"
+          className="cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] py-2"
         >
-          <div className="text-sm text-gray-600 dark:text-gray-300 uppercase font-bold">
+          <div className="text-xs text-slate-500 uppercase font-bold tracking-wider">
             {t('daily.puzzleNumber').replace('{number}', String(result.puzzleNumber))}
           </div>
-          <div className="text-6xl md:text-7xl font-black text-neo-yellow mt-2">
+          <div className="text-7xl md:text-8xl font-black text-neo-yellow drop-shadow-[0_0_20px_rgba(255,225,53,0.3)] my-1">
             {result.score}
           </div>
-          <div className="text-gray-600 dark:text-gray-300">
+          <div className="text-slate-400 text-sm font-medium">
             {t('common.points')}
           </div>
         </motion.div>
 
-        {/* Streak milestone celebration */}
+        {/* Streak milestone - Simplified */}
         {streakMilestone && isNewCompletion && (
           <motion.div
-            initial={{ scale: 0, rotate: -10 }}
-            animate={{ scale: 1, rotate: 0 }}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
             transition={{ type: 'spring', delay: 0.3 }}
-            className="inline-block px-6 py-3 bg-gradient-to-r from-neo-pink to-neo-red rounded-neo border-3 border-neo-black shadow-hard"
+            className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-full border border-amber-500/40"
           >
-            <div className="flex items-center gap-2">
-              <Flame className="w-6 h-6 text-white animate-pulse" />
-              <span className="font-black text-white text-lg">
-                {t('daily.streakDays').replace('{count}', String(streakMilestone))}
-              </span>
-              <Flame className="w-6 h-6 text-white animate-pulse" />
-            </div>
+            <Flame className="w-5 h-5 text-amber-400" />
+            <span className="font-black text-amber-400">
+              {t('daily.streakDays').replace('{count}', String(streakMilestone))}
+            </span>
           </motion.div>
         )}
 
-        {/* Stats grid */}
+        {/* Stats - Unified row design */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="grid grid-cols-3 gap-2"
+          className="bg-slate-800/50 rounded-xl border border-slate-700/50 p-3"
         >
-          <div className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-2 border-neo-black dark:border-white/20 p-2 shadow-hard-sm">
-            <BookOpen className="w-4 h-4 mx-auto mb-0.5 text-cyan-600 dark:text-neo-cyan" />
-            <div className="text-lg font-black text-neo-black dark:text-white">
-              {result.wordCount}
+          <div className="flex items-center justify-around">
+            <div className="text-center px-3">
+              <div className="text-2xl font-black text-white">{result.wordCount}</div>
+              <div className="text-xs text-slate-400 font-medium">{t('common.words')}</div>
             </div>
-            <div className="text-[10px] text-gray-600 dark:text-gray-300">
-              {t('common.words')}
+            <div className="w-px h-8 bg-slate-700" />
+            <div className="text-center px-3">
+              <div className="flex items-center justify-center gap-1">
+                <Flame className="w-4 h-4 text-amber-400" />
+                <span className="text-2xl font-black text-white">{streak?.currentStreak ?? 0}</span>
+              </div>
+              <div className="text-xs text-slate-400 font-medium">{t('daily.streak')}</div>
             </div>
-          </div>
-
-          <div className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-2 border-neo-black dark:border-white/20 p-2 shadow-hard-sm">
-            <Flame className="w-4 h-4 mx-auto mb-0.5 text-neo-red" />
-            <div className="text-lg font-black text-neo-black dark:text-white">
-              {streak?.currentStreak ?? 0}
-            </div>
-            <div className="text-[10px] text-gray-600 dark:text-gray-300">
-              {t('daily.streak')}
-            </div>
-          </div>
-
-          <div className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-2 border-neo-black dark:border-white/20 p-2 shadow-hard-sm">
-            <Clock className="w-4 h-4 mx-auto mb-0.5 text-neo-cyan" />
-            <div className="text-lg font-black text-neo-black dark:text-white">
-              {Math.floor(result.timeSeconds / 60)}<span className="text-xs font-bold text-gray-500">m</span> {(result.timeSeconds % 60).toString().padStart(2, '0')}<span className="text-xs font-bold text-gray-500">s</span>
-            </div>
-            <div className="text-[10px] text-gray-600 dark:text-gray-300">
-              {t('results.time')}
+            <div className="w-px h-8 bg-slate-700" />
+            <div className="text-center px-3">
+              <div className="text-2xl font-black text-white">
+                {Math.floor(result.timeSeconds / 60)}:{(result.timeSeconds % 60).toString().padStart(2, '0')}
+              </div>
+              <div className="text-xs text-slate-400 font-medium">{t('results.time')}</div>
             </div>
           </div>
         </motion.div>
 
-        {/* Shareable result preview - truncated with ellipsis */}
+        {/* Share Section - Streamlined */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="bg-gray-900 dark:bg-black rounded-neo border-2 border-gray-700 p-3 text-left"
+          className="space-y-3"
         >
-          <pre className={`text-white text-xs font-mono whitespace-pre-wrap leading-relaxed ${!showFullShareText ? 'line-clamp-3' : ''}`}>
-            {shareText}
-          </pre>
-          {!showFullShareText && shareText.split('\n').length > 3 && (
-            <button
-              onClick={() => setShowFullShareText(true)}
-              className="text-xs text-neo-cyan hover:text-neo-lime mt-1 font-medium"
-            >
-              {t('common.showMore')}
-            </button>
-          )}
-          {showFullShareText && (
-            <button
-              onClick={() => setShowFullShareText(false)}
-              className="text-xs text-gray-400 hover:text-gray-300 mt-1 font-medium"
-            >
-              {t('common.showLess')}
-            </button>
-          )}
-        </motion.div>
-
-        {/* Share buttons */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="space-y-2"
-        >
-          {/* Main share button */}
+          {/* Primary CTA */}
           <Button
             onClick={handleNativeShare}
-            className="w-full py-3 text-base font-black uppercase bg-gradient-to-r from-neo-yellow to-neo-pink text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all duration-150"
+            className="w-full py-4 text-base font-black uppercase bg-neo-cyan text-neo-black border-3 border-neo-black rounded-xl shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all duration-150"
           >
             <Share2 className="mr-2 w-5 h-5" />
             {t('daily.shareScore')}
           </Button>
 
-          {/* Platform-specific buttons */}
-          <div className="grid grid-cols-4 gap-2">
+          {/* Secondary share options - Cleaner row */}
+          <div className="flex items-center justify-center gap-2">
             <Button
               onClick={handleWhatsApp}
               aria-label="Share on WhatsApp"
-              className="py-3 min-h-[44px] bg-[#25D366] text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all duration-150 focus:ring-2 focus:ring-neo-yellow focus:ring-offset-2"
+              size="sm"
+              className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-600 rounded-lg transition-all"
             >
-              <WhatsAppIcon className="w-5 h-5" />
+              <WhatsAppIcon className="w-4 h-4" />
             </Button>
 
             <Button
               onClick={handleTwitter}
-              aria-label="Share on X (Twitter)"
-              className="py-3 min-h-[44px] bg-black text-white border-3 border-gray-700 rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all duration-150 focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2"
+              aria-label="Share on X"
+              size="sm"
+              className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-600 rounded-lg transition-all"
             >
-              <XTwitterIcon className="w-5 h-5" />
+              <XTwitterIcon className="w-4 h-4" />
             </Button>
 
             <Button
               onClick={handleGenerateImage}
               disabled={isGeneratingImage}
               aria-label={t('daily.shareImage') || 'Share as Image'}
-              className="py-3 min-h-[44px] bg-neo-pink text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all duration-150 focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 disabled:opacity-50"
+              size="sm"
+              className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-600 rounded-lg transition-all disabled:opacity-50"
             >
               {isGeneratingImage ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
-                <ImageIcon className="w-5 h-5" />
+                <ImageIcon className="w-4 h-4" />
               )}
             </Button>
 
             <Button
               onClick={handleCopy}
               aria-label={copied ? t('common.copied') : t('daily.copyToClipboard')}
-              className="py-3 min-h-[44px] bg-gray-600 text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all duration-150 focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2"
+              size="sm"
+              className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-600 rounded-lg transition-all"
             >
               {copied ? (
-                <Check className="w-5 h-5 text-neo-lime" />
+                <Check className="w-4 h-4 text-neo-cyan" />
               ) : (
-                <Copy className="w-5 h-5" />
+                <Copy className="w-4 h-4" />
               )}
             </Button>
           </div>
@@ -584,36 +563,61 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             <motion.p
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-sm text-neo-lime font-bold"
+              className="text-sm text-neo-cyan font-medium"
             >
               {t('daily.copiedToClipboard')}
             </motion.p>
           )}
+
+          {/* Collapsible share preview */}
+          <button
+            onClick={() => setShowSharePreview(!showSharePreview)}
+            className="flex items-center justify-center gap-1 text-xs text-slate-500 hover:text-slate-400 transition-colors mx-auto"
+          >
+            {showSharePreview ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            {showSharePreview ? t('common.hidePreview') || 'Hide preview' : t('common.showPreview') || 'Show preview'}
+          </button>
+
+          <AnimatePresence>
+            {showSharePreview && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="bg-slate-900 rounded-lg border border-slate-700 p-3 text-left">
+                  <pre className="text-white text-xs font-mono whitespace-pre-wrap leading-relaxed">
+                    {shareText}
+                  </pre>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
-        {/* Words found (if available) */}
-        {words.length > 0 && (
+        {/* Try Another Language */}
+        {availableLanguages.length > 0 && onGameLanguageChange && (
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.7 }}
-            className="text-left"
+            transition={{ delay: 0.55 }}
+            className="pt-4 border-t border-slate-700/50"
           >
-            <h3 className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase mb-1.5">
-              {t('common.wordsFound')} ({words.length})
-            </h3>
-            <div className="flex flex-wrap gap-0.5">
-              {words.map((word, i) => (
-                <span
-                  key={i}
-                  className={`px-1.5 py-0.5 text-[10px] font-bold rounded border border-neo-black ${
-                    word === longestWord
-                      ? 'bg-neo-yellow text-neo-black'
-                      : 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-200'
-                  }`}
+            <p className="text-xs text-slate-500 font-medium uppercase tracking-wide mb-2">
+              {t('wordHunt.results.tryAnotherLanguage') || 'Try another language'}
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {availableLanguages.map((option) => (
+                <Button
+                  key={option.code}
+                  onClick={() => onGameLanguageChange(option.code as Language)}
+                  size="sm"
+                  className="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white border border-slate-600 rounded-lg transition-all flex items-center gap-1.5"
                 >
-                  {word}
-                </span>
+                  <span className="text-base">{option.flag}</span>
+                  <span className="font-medium text-xs">{option.name}</span>
+                </Button>
               ))}
             </div>
           </motion.div>
@@ -623,10 +627,10 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="pt-3 border-t border-gray-200 dark:border-gray-700"
+          transition={{ delay: 0.6 }}
+          className="py-3"
         >
-          <p className="text-xs text-gray-600 dark:text-gray-300">
+          <p className="text-xs text-slate-500">
             {t('daily.nextPuzzleIn')} <span className="font-bold text-neo-cyan">{countdown}</span>
           </p>
         </motion.div>
@@ -635,8 +639,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.9 }}
-          className="mt-4"
+          transition={{ delay: 0.7 }}
         >
           <DailyLeaderboard
             key={leaderboardKey}
@@ -651,6 +654,50 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             gameType="puzzle"
           />
         </motion.div>
+
+        {/* Words found - Collapsible */}
+        {words.length > 0 && (
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            <button
+              onClick={() => setShowWords(!showWords)}
+              className="flex items-center justify-center gap-2 text-sm text-slate-400 hover:text-slate-300 transition-colors mx-auto py-2"
+            >
+              <BookOpen className="w-4 h-4" />
+              <span className="font-medium">{t('common.wordsFound')} ({words.length})</span>
+              {showWords ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+
+            <AnimatePresence>
+              {showWords && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex flex-wrap gap-1 justify-center pt-2">
+                    {words.map((word, i) => (
+                      <span
+                        key={i}
+                        className={`px-2 py-1 text-xs font-medium rounded-md ${
+                          word === longestWord
+                            ? 'bg-neo-yellow/20 text-neo-yellow border border-neo-yellow/30'
+                            : 'bg-slate-800 text-slate-300 border border-slate-700'
+                        }`}
+                      >
+                        {word}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        )}
       </div>
 
       {/* Share panel for browsers without native share */}

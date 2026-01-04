@@ -138,6 +138,8 @@ const he = {
     "rank": "דירוג",
     "menu": "תפריט",
     "showControls": "הקש לפקדים",
+    "showPreview": "הצג תצוגה מקדימה",
+    "hidePreview": "הסתר תצוגה מקדימה",
     "loadingProfile": "טוען...",
     "rematch": "עוד סיבוב",
     "roomFull": "החדר מלא - צופה בינתיים",

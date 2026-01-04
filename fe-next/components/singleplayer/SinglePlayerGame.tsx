@@ -615,6 +615,12 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       const validWords = finalWords.filter(w => w.isValid === true);
       const finalScore = validWords.reduce((sum, w) => sum + w.score, 0);
 
+      // For practice mode, use actual elapsed time instead of settings.timerSeconds
+      // This ensures time-based achievements are calculated correctly
+      const actualGameDuration = settings.mode === 'practice'
+        ? Math.max(1, Math.floor((Date.now() - gameStartTimeRef.current) / 1000))
+        : settings.timerSeconds;
+
       // Convert to achievement word data format
       const validWordData: AchievementWordData[] = validWords.map(w => ({
         word: w.word,
@@ -638,7 +644,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       const finalAchievements = calculateFinalAchievements(
         validWordData,
         allWordData,
-        settings.timerSeconds,
+        actualGameDuration,
         combo.maxCombo
       );
 
@@ -670,7 +676,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           comboBonus: w.isValid ? (w.comboBonus || 0) : 0,
           fireRoundBonus: w.isValid ? (w.fireRoundBonus || 0) : 0,
         })),
-        gameDuration: settings.timerSeconds,
+        gameDuration: actualGameDuration,
         botScores: settings.bots.map(bot => ({
           name: bot.name,
           score: botScoresRef.current[bot.id] || 0,
@@ -1407,6 +1413,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             currentHint={trainingAnalysis.currentHint}
             onDismiss={trainingAnalysis.dismissHint}
             trainingComplete={trainingAnalysis.hasPassed}
+            otherTooltipVisible={directionGuidance.showDirectionGuidance}
           />
         )}
 
@@ -1838,6 +1845,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           currentHint={trainingAnalysis.currentHint}
           onDismiss={trainingAnalysis.dismissHint}
           trainingComplete={trainingAnalysis.hasPassed}
+          otherTooltipVisible={directionGuidance.showDirectionGuidance}
         />
       )}
 

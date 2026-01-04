@@ -142,11 +142,27 @@ export function calculatePlayerStats(
   const totalWords = allWords.length;
   const validCount = validWords.length;
 
+  // For practice mode (gameDuration = 0), calculate actual play time from word timestamps
+  let effectiveGameDuration = gameDuration;
+  if (gameDuration === 0 && allWords.length > 0) {
+    const timings = allWords
+      .map(w => w.timeSinceStart)
+      .filter((t): t is number => typeof t === 'number');
+
+    if (timings.length > 0) {
+      const maxTime = Math.max(...timings);
+      // Add buffer and round up to nearest 30 seconds for cleaner stats
+      effectiveGameDuration = Math.max(Math.ceil((maxTime + 10) / 30) * 30, 60);
+    } else {
+      effectiveGameDuration = 180;
+    }
+  }
+
   // Calculate accuracy
   const accuracy = totalWords > 0 ? Math.round((validCount / totalWords) * 100) : 100;
 
-  // Calculate words per minute
-  const gameMinutes = gameDuration / 60;
+  // Calculate words per minute (use effective duration)
+  const gameMinutes = effectiveGameDuration / 60;
   const wordsPerMinute = gameMinutes > 0 ? parseFloat((validCount / gameMinutes).toFixed(1)) : 0;
 
   // Calculate average and longest word length
@@ -182,8 +198,8 @@ export function calculatePlayerStats(
   // Count AI-verified words
   const aiVerifiedCount = allWords.filter(w => w.isAiVerified).length;
 
-  // Determine speed pattern
-  const speedPattern = determineSpeedPatternFromWords(validWords, gameDuration);
+  // Determine speed pattern (use effective duration for practice mode)
+  const speedPattern = determineSpeedPatternFromWords(validWords, effectiveGameDuration);
 
   return {
     username: player.username,

@@ -143,6 +143,8 @@ const en = {
     "rank": "Rank",
     "menu": "Menu",
     "showControls": "Tap for controls",
+    "showPreview": "Show preview",
+    "hidePreview": "Hide preview",
     "loadingProfile": "Loading...",
     "rematch": "Rematch",
     "roomFull": "Room full - spectating until a slot opens",

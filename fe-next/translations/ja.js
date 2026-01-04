@@ -138,6 +138,8 @@ const ja = {
     "rank": "ランク",
     "menu": "メニュー",
     "showControls": "タップでコントロール",
+    "showPreview": "プレビューを表示",
+    "hidePreview": "プレビューを非表示",
     "loadingProfile": "読込中...",
     "rematch": "再戦",
     "roomFull": "満員 - 観戦中",

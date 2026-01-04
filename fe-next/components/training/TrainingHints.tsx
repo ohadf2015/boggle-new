@@ -16,6 +16,8 @@ interface TrainingHintsProps {
   onDismiss: () => void;
   /** Whether training is complete (show celebration) */
   trainingComplete?: boolean;
+  /** Whether another tooltip is currently visible (to prevent overlap) */
+  otherTooltipVisible?: boolean;
 }
 
 interface HintConfig {
@@ -68,6 +70,7 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
   currentHint,
   onDismiss,
   trainingComplete = false,
+  otherTooltipVisible = false,
 }) => {
   const { theme } = useTheme();
   const { t } = useLanguage();
@@ -76,9 +79,12 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
   // Track if hint should be visible (for auto-dismiss)
   const [isVisible, setIsVisible] = useState(false);
 
+  // Don't show if another tooltip is visible
+  const shouldShow = isVisible && !otherTooltipVisible;
+
   // Show hint with haptic feedback
   useEffect(() => {
-    if (currentHint) {
+    if (currentHint && !otherTooltipVisible) {
       setIsVisible(true);
       triggerHaptic('light');
 
@@ -89,11 +95,15 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
       }, HINT_AUTO_DISMISS_MS);
 
       return () => clearTimeout(timer);
+    } else if (otherTooltipVisible) {
+      // Hide if another tooltip becomes visible
+      setIsVisible(false);
+      return undefined;
     } else {
       setIsVisible(false);
       return undefined;
     }
-  }, [currentHint, onDismiss]);
+  }, [currentHint, onDismiss, otherTooltipVisible]);
 
   // Show celebration when training complete
   useEffect(() => {
@@ -124,38 +134,50 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
     <>
       {/* Hint Tooltip */}
       <AnimatePresence>
-        {isVisible && currentHint && config && (
-          <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className={cn(
-              'fixed inset-x-4 top-1/2 -translate-y-1/2 z-50',
-              'max-w-sm mx-auto'
-            )}
-          >
-            <div
+        {shouldShow && currentHint && config && (
+          <>
+            {/* Backdrop overlay for visibility */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40 bg-black/40"
+              onClick={handleDismiss}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{ type: 'spring', damping: 20, stiffness: 300 }}
               className={cn(
-                'relative rounded-xl border-2 p-4 shadow-lg backdrop-blur-sm',
-                config.bgColor,
-                config.borderColor
+                'fixed inset-x-4 top-1/2 -translate-y-1/2 z-50',
+                'max-w-sm mx-auto'
               )}
+              onClick={handleDismiss}
             >
-              {/* Close button */}
-              <button
-                onClick={handleDismiss}
+              <div
                 className={cn(
-                  'absolute top-2 right-2 rounded-full p-1 transition-colors',
-                  isDarkMode
-                    ? 'hover:bg-white/10 text-gray-400 hover:text-gray-200'
-                    : 'hover:bg-black/5 text-gray-500 hover:text-gray-700'
+                  'relative rounded-xl border-3 border-neo-black p-4 shadow-hard-lg',
+                  isDarkMode ? 'bg-slate-800' : 'bg-white'
                 )}
+                onClick={(e) => e.stopPropagation()}
               >
-                <X size={14} />
-              </button>
+                {/* Close button */}
+                <button
+                  onClick={handleDismiss}
+                  className={cn(
+                    'absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center',
+                    'bg-neo-pink text-white border-2 border-neo-black shadow-hard-sm',
+                    'hover:scale-110 transition-transform'
+                  )}
+                >
+                  <X size={14} />
+                </button>
 
-              <div className="flex items-start gap-3">
+                {/* Colored accent bar */}
+                <div className={cn('absolute top-0 left-0 right-0 h-1 rounded-t-lg', config.color.replace('text-', 'bg-'))} />
+
+                <div className="flex items-start gap-3 mt-1">
                 {/* Icon with animation */}
                 <motion.div
                   animate={{
@@ -274,8 +296,25 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
                   </div>
                 </motion.div>
               )}
+
+              {/* Tap to dismiss hint */}
+              <p className={cn(
+                'text-center text-[10px] mt-3 uppercase tracking-wider',
+                isDarkMode ? 'text-gray-500' : 'text-gray-400'
+              )}>
+                {t('common.tapToDismiss') || 'Tap anywhere to dismiss'}
+              </p>
+
+              {/* Progress bar */}
+              <motion.div
+                className={cn('absolute bottom-0 left-0 h-1 rounded-b-xl', config.color.replace('text-', 'bg-'))}
+                initial={{ width: '100%' }}
+                animate={{ width: '0%' }}
+                transition={{ duration: HINT_AUTO_DISMISS_MS / 1000, ease: 'linear' }}
+              />
             </div>
           </motion.div>
+          </>
         )}
       </AnimatePresence>
 

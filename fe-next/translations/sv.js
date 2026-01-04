@@ -138,6 +138,8 @@ const sv = {
     "rank": "Rank",
     "menu": "Meny",
     "showControls": "Tryck för kontroller",
+    "showPreview": "Visa förhandsgranskning",
+    "hidePreview": "Dölj förhandsgranskning",
     "loadingProfile": "Laddar...",
     "rematch": "Returmatch",
     "roomFull": "Fullt rum - tittar på nu",
