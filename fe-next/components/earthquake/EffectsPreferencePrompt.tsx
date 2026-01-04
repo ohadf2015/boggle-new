@@ -44,17 +44,30 @@ export const EffectsPreferencePrompt: React.FC<EffectsPreferencePromptProps> = (
 
   return (
     <motion.div
-      className="absolute inset-0 z-10 flex items-end justify-center pb-4 px-4"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 20 }}
-      transition={{ delay: 0.3, duration: 0.3 }}
+      className="fixed inset-0 z-[100] flex items-center justify-center px-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
     >
-      <div className="w-full max-w-md">
+      {/* Full opaque backdrop */}
+      <motion.div
+        className="absolute inset-0 bg-neo-black/80 backdrop-blur-md"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      />
+      <motion.div
+        className="relative z-10 w-full max-w-md"
+        initial={{ scale: 0.9, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.9, y: 20 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+      >
         {/* Card container */}
         <div
           className={cn(
-            'bg-neo-cream/95 backdrop-blur-sm border-4 border-neo-black rounded-neo-lg shadow-hard-xl',
+            'bg-neo-cream border-4 border-neo-black rounded-neo-lg shadow-hard-xl',
             'p-4 text-neo-black'
           )}
         >
@@ -146,7 +159,7 @@ export const EffectsPreferencePrompt: React.FC<EffectsPreferencePromptProps> = (
             {t('effects.settingsHint') || 'You can change this anytime in Settings'}
           </p>
         </div>
-      </div>
+      </motion.div>
     </motion.div>
   );
 };

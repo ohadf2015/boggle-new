@@ -36,6 +36,8 @@ import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerVi
 import { useResultsData } from './results';
 import { awardGameCoins } from '@/utils/coinManager';
 import { syncCoinsToDatabase } from '@/lib/supabase';
+import { TrainingAnalysisModal } from '@/components/training';
+import { getTrainingProgress } from '@/utils/trainingProgressStorage';
 
 // Dynamic import for PerformanceChart (heavy component)
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
@@ -78,6 +80,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const [expandedBot, setExpandedBot] = useState<string | null>(null);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [wordValidationQueue, setWordValidationQueue] = useState<string[]>([]);
+  const [showTrainingAnalysis, setShowTrainingAnalysis] = useState(false);
   const [showWordValidation, setShowWordValidation] = useState(false);
 
   // Collapsible section states - matching multiplayer pattern
@@ -150,6 +153,18 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       });
     }
   }, [shouldShowConfetti, mode, playerRank]);
+
+  // Show training analysis modal for practice mode
+  useEffect(() => {
+    if (mode === 'practice') {
+      // Small delay to let confetti and results appear first
+      const timer = setTimeout(() => {
+        setShowTrainingAnalysis(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [mode]);
 
   // Update guest stats for single player games (only for unauthenticated users)
   useEffect(() => {
@@ -349,10 +364,13 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
 
   // Show word validation modal after game results load
+  // Limit to 2 words to avoid overwhelming the user with modals
   useEffect(() => {
-    if (results.botWordsForValidation && results.botWordsForValidation.length > 0) {
+    const wordsForValidation = results.botWordsForValidation;
+    if (wordsForValidation && wordsForValidation.length > 0) {
       setTimeout(() => {
-        setWordValidationQueue(results.botWordsForValidation || []);
+        const limitedQueue = wordsForValidation.slice(0, 2);
+        setWordValidationQueue(limitedQueue);
         setShowWordValidation(true);
       }, 1500); // 1.5s delay so results render first
     }
@@ -539,6 +557,13 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           isOpen={showSignupModal}
           onClose={() => setShowSignupModal(false)}
           variant="multiGames"
+        />
+
+        {/* Training Analysis Modal for practice mode */}
+        <TrainingAnalysisModal
+          isOpen={showTrainingAnalysis}
+          onClose={() => setShowTrainingAnalysis(false)}
+          returnTo={null}
         />
       </div>
     );
@@ -1102,6 +1127,13 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         isOpen={showSignupModal}
         onClose={() => setShowSignupModal(false)}
         variant="multiGames"
+      />
+
+      {/* Training Analysis Modal for practice mode */}
+      <TrainingAnalysisModal
+        isOpen={showTrainingAnalysis}
+        onClose={() => setShowTrainingAnalysis(false)}
+        returnTo={null}
       />
     </div>
   );

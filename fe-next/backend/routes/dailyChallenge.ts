@@ -1032,6 +1032,90 @@ router.get('/word-hunt/stats/:date/:language', async (req: Request<WordHuntStats
 });
 
 /**
+ * GET /api/daily-challenge/word-hunt/check-played/:date/:language
+ * Check if a player has already played today's Word Hunt
+ * Returns hasPlayed: true/false along with the stored result if already played
+ */
+router.get('/word-hunt/check-played/:date/:language', async (req: Request<{ date: string; language: string }, unknown, unknown, { playerId?: string; guestFingerprint?: string }>, res: Response): Promise<void> => {
+  try {
+    if (!isSupabaseConfigured()) {
+      // If Supabase is not configured, return hasPlayed: false to allow playing
+      res.json({ hasPlayed: false });
+      return;
+    }
+
+    const { date, language } = req.params;
+    const playerId = req.query.playerId as string | undefined;
+    const guestFingerprint = req.query.guestFingerprint as string | undefined;
+
+    // Validate date format
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
+      return;
+    }
+
+    // Validate language
+    if (!VALID_LANGUAGES.includes(language as ValidLanguage)) {
+      res.status(400).json({ error: 'Invalid language code' });
+      return;
+    }
+
+    // Must have either playerId or guestFingerprint
+    if (!playerId && !guestFingerprint) {
+      res.status(400).json({ error: 'Either playerId or guestFingerprint is required' });
+      return;
+    }
+
+    const supabase = getSupabase();
+
+    // Check if attempt exists in database
+    let query = supabase
+      .from('daily_word_hunt_attempts')
+      .select('id, solved, attempts_used, efficiency_score, words_discovered, life_remaining, target_word, attempt_words, completed_at')
+      .eq('puzzle_date', date)
+      .eq('language', language);
+
+    if (playerId) {
+      query = query.eq('player_id', playerId);
+    } else {
+      query = query.eq('guest_fingerprint', guestFingerprint);
+    }
+
+    const { data: existingAttempt, error } = await query.single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+      logger.error('API', `Check played error: ${error.message}`);
+      res.status(500).json({ error: 'Failed to check attempt status' });
+      return;
+    }
+
+    if (existingAttempt) {
+      // Player has already played - return the result data
+      res.json({
+        hasPlayed: true,
+        result: {
+          solved: existingAttempt.solved,
+          attemptsUsed: existingAttempt.attempts_used,
+          efficiencyScore: existingAttempt.efficiency_score,
+          wordsDiscovered: existingAttempt.words_discovered,
+          lifeRemaining: existingAttempt.life_remaining,
+          targetWord: existingAttempt.target_word,
+          attempts: existingAttempt.attempt_words,
+          completedAt: existingAttempt.completed_at
+        }
+      });
+    } else {
+      // Player has not played yet
+      res.json({ hasPlayed: false });
+    }
+  } catch (error) {
+    const err = error as Error;
+    logger.error('API', `Check played error: ${err.message}`);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
  * GET /api/daily-challenge/word-hunt/alltime-leaderboard/:language
  * Get all-time Word Hunt leaderboard for a specific language
  * Ranked by total efficiency score across all puzzles

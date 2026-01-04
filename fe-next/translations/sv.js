@@ -1633,6 +1633,58 @@ const sv = {
     },
     "swipeHint": "← Svep för att navigera →"
   },
+  "training": {
+    "gateway": {
+      "title": "Ny på LexiClash?",
+      "subtitle": "En snabb träning hjälper dig bemästra kontrollerna!",
+      "demoHint": "Svep i valfri riktning - även diagonalt!",
+      "benefitsTitle": "Träningen lär dig:",
+      "benefits": {
+        "learnControls": "Svepkontroller",
+        "masterDirections": "Riktningsbyten",
+        "noPressure": "Ingen timer, inga motståndare"
+      },
+      "returnNote": "Efter träningen är du redo för riktiga utmaningen!",
+      "startTraining": "Börja Träna",
+      "skipAnyway": "Hoppa över, jag kan spela"
+    },
+    "hints": {
+      "tryDiagonal": "Prova att dra diagonalt!",
+      "changeDirection": "Protips: Byt riktning mitt i ordet!",
+      "checkCorners": "Kolla hörnen för dolda ord!",
+      "longerWords": "Längre ord = fler poäng! Prova 5+ bokstäver",
+      "skillsUnlocked": "Kunskaper upplåsta! Du är redo!"
+    },
+    "analysis": {
+      "titleComplete": "Träning Klar!",
+      "titleProgress": "Fortsätt Öva!",
+      "subtitleComplete": "Du har bemästrat grunderna!",
+      "subtitleProgress": "Några fler kunskaper att låsa upp",
+      "progress": "Kunskapsframsteg",
+      "skills": {
+        "diagonal": "Diagonala Drag",
+        "directionChange": "Riktningsbyten",
+        "gridCoverage": "Rutnätsutforskning",
+        "longWords": "Långa Ord"
+      },
+      "stats": "Din Statistik",
+      "wordsFound": "Ord",
+      "longestWord": "Längsta",
+      "dirChanges": "Riktningsbyten",
+      "tips": "Tips till nästa gång:",
+      "tip": {
+        "diagonal": "Svep diagonalt för att hitta fler ord",
+        "directionChange": "Byt riktning mitt i ordet för längre ord",
+        "gridCoverage": "Kolla hörn och kanter för dolda ord",
+        "longWords": "Hitta 5+ bokstavsord för bonuspoäng"
+      },
+      "multiplayer": "Flerspelare",
+      "daily": "Daglig",
+      "practiceMore": "Öva Mer",
+      "tryAgain": "Försök Igen",
+      "skipAnyway": "Fortsätt ändå"
+    }
+  },
   "achievements": {
     "FIRST_BLOOD": {
       "name": "Första Blodet",

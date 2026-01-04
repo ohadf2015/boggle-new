@@ -1634,6 +1634,58 @@ const he = {
     },
     "swipeHint": "החלק לניווט → ←"
   },
+  "training": {
+    "gateway": {
+      "title": "פעם ראשונה?",
+      "subtitle": "אימון קצר ותשלוט בשליטות!",
+      "demoHint": "החלק לכל כיוון - גם באלכסון!",
+      "benefitsTitle": "האימון יעזור לך:",
+      "benefits": {
+        "learnControls": "לשלוט בהחלקות",
+        "masterDirections": "לשנות כיוון תוך כדי",
+        "noPressure": "בלי טיימר, בלי יריבים"
+      },
+      "returnNote": "אחרי האימון, תהיה מוכן לאתגר האמיתי!",
+      "startTraining": "יאללה לאימון",
+      "skipAnyway": "דלג, אני יודע לשחק"
+    },
+    "hints": {
+      "tryDiagonal": "נסה להחליק באלכסון!",
+      "changeDirection": "טיפ: אפשר לשנות כיוון באמצע מילה!",
+      "checkCorners": "בדוק את הפינות - יש שם אוצרות!",
+      "longerWords": "מילים ארוכות = יותר נקודות!",
+      "skillsUnlocked": "כישורים נפתחו! מוכן לקרב!"
+    },
+    "analysis": {
+      "titleComplete": "האימון הושלם!",
+      "titleProgress": "המשך להתאמן!",
+      "subtitleComplete": "שלטת בבסיס!",
+      "subtitleProgress": "עוד כמה כישורים לפתוח",
+      "progress": "התקדמות",
+      "skills": {
+        "diagonal": "תנועה באלכסון",
+        "directionChange": "שינוי כיוון",
+        "gridCoverage": "חקירת הלוח",
+        "longWords": "מילים ארוכות"
+      },
+      "stats": "הסטטיסטיקות שלך",
+      "wordsFound": "מילים",
+      "longestWord": "הכי ארוכה",
+      "dirChanges": "שינויי כיוון",
+      "tips": "טיפים לפעם הבאה:",
+      "tip": {
+        "diagonal": "החלק באלכסון לעוד מילים",
+        "directionChange": "שנה כיוון למילים ארוכות יותר",
+        "gridCoverage": "בדוק פינות וקצוות",
+        "longWords": "מצא מילים של 5+ אותיות"
+      },
+      "multiplayer": "רב משתתפים",
+      "daily": "אתגר יומי",
+      "practiceMore": "עוד אימון",
+      "tryAgain": "נסה שוב",
+      "skipAnyway": "בכל זאת"
+    }
+  },
   "achievements": {
     "FIRST_BLOOD": {
       "name": "דם ראשון",

@@ -12,6 +12,8 @@ import SpectatorBanner from '@/components/SpectatorBanner';
 import { SocketContext, getSharedSocket, releaseSharedSocket, getSharedSocketIfExists, getSocketURL } from '@/utils/SocketContext';
 import { saveSession, getSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { TrainingGatewayModal } from '@/components/training';
+import { shouldShowTrainingGateway } from '@/utils/trainingProgressStorage';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { getGuestSessionId, hashToken } from '@/utils/guestManager';
@@ -118,6 +120,9 @@ export default function MultiplayerPage(): React.JSX.Element {
   // Late joiner & spectator state
   const [isSpectator, setIsSpectator] = useState<boolean>(false);
   const [isLateJoiner, setIsLateJoiner] = useState<boolean>(false);
+
+  // Training gateway state - show prompt before allowing multiplayer for new players
+  const [showTrainingGateway, setShowTrainingGateway] = useState<boolean>(false);
   const [showLateJoinerWelcome, setShowLateJoinerWelcome] = useState<boolean>(false);
   const [spectators, setSpectators] = useState<Array<{ username: string; socketId: string; avatar: any }>>([]);
 
@@ -165,6 +170,24 @@ export default function MultiplayerPage(): React.JSX.Element {
       playTrack(TRACKS.BEFORE_GAME);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isActive, showResults]);
+
+  // Check if we should show the training gateway for new players
+  // Only show on initial load, not when returning from an active game
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (isActive || showResults) return; // Don't show during/after game
+
+    // Check if player should see training gateway
+    const shouldShow = shouldShowTrainingGateway();
+    if (shouldShow) {
+      // Small delay to let the page render first
+      const timer = setTimeout(() => {
+        setShowTrainingGateway(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
   }, [isActive, showResults]);
 
   // Initialize state from URL and session
@@ -1270,6 +1293,14 @@ export default function MultiplayerPage(): React.JSX.Element {
     <SocketContext.Provider value={socketContextValue}>
       {/* Connection status indicator */}
       <ConnectionDot />
+
+      {/* Training gateway modal - prompts new players to try training first */}
+      <TrainingGatewayModal
+        isOpen={showTrainingGateway}
+        onClose={() => setShowTrainingGateway(false)}
+        onSkip={() => setShowTrainingGateway(false)}
+        returnTo="multiplayer"
+      />
 
       {/* Spectator status banner */}
       <SpectatorBanner

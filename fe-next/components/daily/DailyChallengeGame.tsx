@@ -20,6 +20,7 @@ import { useWordSubmission } from '@/hooks/useWordSubmission';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
 import { useContextualGuidance, useSwipeTipGuidanceTrigger } from '@/hooks/useContextualGuidance';
+import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
 import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
 import { cn } from '@/lib/utils';
@@ -74,6 +75,17 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
 
   // Exit confirmation dialog state
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
+
+  // Guard against accidental browser back button / tab close during active game
+  // Daily challenge is one-per-day so always guard (unlike single player which waits for score > 0)
+  useNavigationGuard({
+    enabled: !isGameOver,
+    message: t('daily.quitConfirm') || 'If you quit, this will count as your attempt for today.',
+    onNavigationAttempt: () => {
+      setShowQuitConfirm(true);
+      return false; // Block navigation, let modal handle it
+    },
+  });
 
   // Coin reward animation state
   const [comboCoinReward, setComboCoinReward] = useState<number | null>(null);

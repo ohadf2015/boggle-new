@@ -1632,6 +1632,58 @@ const ja = {
     },
     "swipeHint": "← スワイプで移動 →"
   },
+  "training": {
+    "gateway": {
+      "title": "LexiClash初めて？",
+      "subtitle": "簡単なトレーニングで操作をマスター！",
+      "demoHint": "どの方向にもスワイプ - 斜めもOK！",
+      "benefitsTitle": "トレーニングで学べること：",
+      "benefits": {
+        "learnControls": "スワイプ操作",
+        "masterDirections": "方向転換",
+        "noPressure": "タイマーなし、対戦相手なし"
+      },
+      "returnNote": "トレーニング後、本番の挑戦へ！",
+      "startTraining": "トレーニング開始",
+      "skipAnyway": "スキップ、遊び方知ってる"
+    },
+    "hints": {
+      "tryDiagonal": "斜めにドラッグしてみて！",
+      "changeDirection": "プロテク：途中で方向転換！",
+      "checkCorners": "隅っこに隠れた単語をチェック！",
+      "longerWords": "長い単語 = 高得点！5文字以上を狙え",
+      "skillsUnlocked": "スキル解放！準備完了！"
+    },
+    "analysis": {
+      "titleComplete": "トレーニング完了！",
+      "titleProgress": "もう少し練習！",
+      "subtitleComplete": "基本をマスターしました！",
+      "subtitleProgress": "あと少しでスキル解放",
+      "progress": "スキル進捗",
+      "skills": {
+        "diagonal": "斜め移動",
+        "directionChange": "方向転換",
+        "gridCoverage": "グリッド探索",
+        "longWords": "長い単語"
+      },
+      "stats": "あなたの成績",
+      "wordsFound": "単語数",
+      "longestWord": "最長",
+      "dirChanges": "方向転換",
+      "tips": "次回のヒント：",
+      "tip": {
+        "diagonal": "斜めスワイプでもっと単語を発見",
+        "directionChange": "途中で方向転換してより長い単語を",
+        "gridCoverage": "隅や端に隠れた単語をチェック",
+        "longWords": "5文字以上でボーナスポイント"
+      },
+      "multiplayer": "マルチプレイヤー",
+      "daily": "デイリー",
+      "practiceMore": "もっと練習",
+      "tryAgain": "もう一度",
+      "skipAnyway": "そのまま進む"
+    }
+  },
   "achievements": {
     "FIRST_BLOOD": {
       "name": "ファーストブラッド",

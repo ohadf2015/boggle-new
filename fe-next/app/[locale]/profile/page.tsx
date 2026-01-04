@@ -1085,19 +1085,20 @@ export default function ProfilePage(): React.ReactNode {
           'lg:hidden mobile-viewport relative',
           isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
         )}
-        {...pullToRefreshHandlers}
       >
-        {/* Pull-to-refresh indicator */}
-        <PullToRefreshIndicator
-          pullDistance={pullState.pullDistance}
-          isRefreshing={pullState.isRefreshing}
-          threshold={60}
-        />
-
         <AutoHideHeader />
 
-        {/* Tab Content */}
-        <div className="flex-1 overflow-y-auto overscroll-contain px-3 pt-2 pb-20">
+        {/* Tab Content - pull handlers on scrollable container */}
+        <div
+          className="flex-1 overflow-y-auto overscroll-contain px-3 pt-2 pb-20 relative"
+          {...pullToRefreshHandlers}
+        >
+          {/* Pull-to-refresh indicator */}
+          <PullToRefreshIndicator
+            pullDistance={pullState.pullDistance}
+            isRefreshing={pullState.isRefreshing}
+            threshold={60}
+          />
           <AnimatePresence mode="wait">
             {mobileActiveTab === 'overview' && (
               <motion.div

@@ -442,9 +442,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       logger.log('[RESULTS] Received word feedback request:', data);
 
       // Handle new word queue format (self-healing system)
+      // Limit to 2 words to avoid overwhelming the user with modals
       if (data.wordQueue && data.wordQueue.length > 0) {
-        setWordQueue(data.wordQueue);
-        logger.log('[RESULTS] Word queue with', data.wordQueue.length, 'words for voting');
+        const limitedQueue = data.wordQueue.slice(0, 2);
+        setWordQueue(limitedQueue);
+        logger.log('[RESULTS] Word queue limited to', limitedQueue.length, 'of', data.wordQueue.length, 'words for voting');
       }
 
       // Transform voteInfo to match expected VoteInfo interface

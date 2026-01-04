@@ -2417,6 +2417,58 @@ const es = {
     },
     "swipeHint": "← Desliza para navegar →"
   },
+  "training": {
+    "gateway": {
+      "title": "¿Nuevo en LexiClash?",
+      "subtitle": "¡Un entrenamiento rápido te ayudará a dominar los controles!",
+      "demoHint": "¡Desliza en cualquier dirección - incluso diagonal!",
+      "benefitsTitle": "El entrenamiento te ayuda a:",
+      "benefits": {
+        "learnControls": "Aprender controles de deslizamiento",
+        "masterDirections": "Dominar cambios de dirección",
+        "noPressure": "Sin cronómetro, sin oponentes"
+      },
+      "returnNote": "¡Después del entrenamiento estarás listo para el reto real!",
+      "startTraining": "Empezar Entrenamiento",
+      "skipAnyway": "Saltar, ya sé jugar"
+    },
+    "hints": {
+      "tryDiagonal": "¡Prueba arrastrar en diagonal!",
+      "changeDirection": "Pro tip: ¡Cambia dirección a mitad de palabra!",
+      "checkCorners": "¡Busca palabras ocultas en las esquinas!",
+      "longerWords": "Palabras largas = más puntos! Prueba 5+ letras",
+      "skillsUnlocked": "¡Habilidades desbloqueadas! ¡Estás listo!"
+    },
+    "analysis": {
+      "titleComplete": "¡Entrenamiento Completo!",
+      "titleProgress": "¡Sigue Practicando!",
+      "subtitleComplete": "¡Has dominado lo básico!",
+      "subtitleProgress": "Algunas habilidades más por desbloquear",
+      "progress": "Progreso de Habilidades",
+      "skills": {
+        "diagonal": "Movimiento Diagonal",
+        "directionChange": "Cambios de Dirección",
+        "gridCoverage": "Exploración del Tablero",
+        "longWords": "Palabras Largas"
+      },
+      "stats": "Tus Estadísticas",
+      "wordsFound": "Palabras",
+      "longestWord": "Más Larga",
+      "dirChanges": "Cambios Dir.",
+      "tips": "Consejos para la próxima:",
+      "tip": {
+        "diagonal": "Desliza diagonal para encontrar más palabras",
+        "directionChange": "Cambia dirección a mitad de palabra para palabras más largas",
+        "gridCoverage": "Revisa esquinas y bordes para palabras ocultas",
+        "longWords": "Encuentra palabras de 5+ letras para puntos extra"
+      },
+      "multiplayer": "Multijugador",
+      "daily": "Diario",
+      "practiceMore": "Practicar Más",
+      "tryAgain": "Intentar de Nuevo",
+      "skipAnyway": "Continuar de todos modos"
+    }
+  },
   "leaderboard": {
     "title": "Clasificación",
     "allTime": "Histórico",

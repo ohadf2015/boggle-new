@@ -13,7 +13,8 @@ import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import GuestNameEditor from './GuestNameEditor';
 import { DailyChallengeTutorial } from './DailyChallengeTutorial';
 import DailyIntroCarousel from './DailyIntroCarousel';
-import TrainingSuggestionModal from './TrainingSuggestionModal';
+import { TrainingGatewayModal } from '@/components/training';
+import { shouldShowTrainingGateway, markGatewaySkipped } from '@/utils/trainingProgressStorage';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
@@ -37,8 +38,6 @@ import { neoSuccessToast, neoErrorToast } from '@/components/NeoToast';
 import { useSearchParams } from 'next/navigation';
 import {
   hasPlayedAnyGame,
-  hasSkippedTrainingSuggestion,
-  markTrainingSuggestionSkipped,
 } from '@/utils/playerProgressStorage';
 import type { LetterGrid, Language } from '@/types';
 import type { SurvivalGameResult } from './DailyWordHuntSurvival';
@@ -130,40 +129,37 @@ const DailyChallenge: React.FC = () => {
   // Guest fingerprint for leaderboard
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
 
-  // Training suggestion modal for new players
-  const [showTrainingSuggestion, setShowTrainingSuggestion] = useState(false);
+  // Training gateway modal for new players
+  const [showTrainingGateway, setShowTrainingGateway] = useState(false);
 
   // Fetch guest fingerprint on mount
   useEffect(() => {
     getGuestFingerprint().then(setGuestFingerprint);
   }, []);
 
-  // Check if we should show training suggestion for new players
+  // Check if we should show training gateway for new players
   useEffect(() => {
     // Only show when page loads in ready phase (not during game or results)
     if (phase !== 'ready') return;
 
-    // Check if player has played any game before
-    const hasPlayed = hasPlayedAnyGame();
+    // Check if player should see training gateway
+    const shouldShow = shouldShowTrainingGateway();
 
-    // Check if already skipped this session
-    const hasSkipped = hasSkippedTrainingSuggestion();
-
-    // Show modal if new player and hasn't skipped
-    if (!hasPlayed && !hasSkipped) {
+    // Show modal if new player and hasn't passed/skipped
+    if (shouldShow) {
       // Small delay to let the page load first
       const timer = setTimeout(() => {
-        setShowTrainingSuggestion(true);
+        setShowTrainingGateway(true);
       }, 500);
       return () => clearTimeout(timer);
     }
     return;
   }, [phase]);
 
-  // Handle skipping training suggestion
-  const handleSkipTrainingSuggestion = useCallback(() => {
-    markTrainingSuggestionSkipped();
-    setShowTrainingSuggestion(false);
+  // Handle skipping training gateway
+  const handleSkipTrainingGateway = useCallback(() => {
+    markGatewaySkipped();
+    setShowTrainingGateway(false);
   }, []);
 
   // Pull-to-refresh - disabled during gameplay
@@ -286,15 +282,80 @@ const DailyChallenge: React.FC = () => {
       const hasCompletedTutorial = typeof window !== 'undefined' && localStorage.getItem(tutorialKey) === 'true';
       setTutorialCompleted(hasCompletedTutorial);
 
-      // Check if already played today
-      if (hasPlayedWordHuntToday(gameLanguage)) {
-        const result = getTodaysWordHuntResult(gameLanguage);
+      // Quick check: If localStorage says already played, show results immediately
+      // (Server check below will catch cases where localStorage was cleared)
+      const localResult = getTodaysWordHuntResult(gameLanguage);
+      if (localResult) {
         if (!isMounted) return;
-        setStoredResult(result);
+        setStoredResult(localResult);
         setPhase('already-played');
         return;
       }
 
+      // Server-side check: Verify with Supabase if player has already played
+      // This catches cases where localStorage was cleared but player already submitted
+      try {
+        const fp = await getGuestFingerprint();
+        const checkParams = new URLSearchParams();
+        if (isAuthenticated && profile) {
+          checkParams.set('playerId', profile.id);
+        } else if (fp) {
+          checkParams.set('guestFingerprint', fp);
+        }
+
+        if (checkParams.toString()) {
+          const checkResponse = await fetch(
+            `/api/daily-challenge/word-hunt/check-played/${date}/${gameLanguage}?${checkParams.toString()}`
+          );
+
+          if (!isMounted) return;
+
+          if (checkResponse.ok) {
+            const checkData = await checkResponse.json();
+            if (checkData.hasPlayed && checkData.result) {
+              // Player already played - reconstruct stored result from server data
+              const serverResult: StoredWordHuntResult = {
+                date,
+                puzzleNumber: number,
+                result: {
+                  puzzleNumber: number,
+                  puzzleDate: date,
+                  language: gameLanguage,
+                  solved: checkData.result.solved,
+                  attemptsUsed: checkData.result.attemptsUsed,
+                  targetWord: checkData.result.targetWord,
+                  attempts: checkData.result.attempts || [],
+                  wordsDiscovered: checkData.result.wordsDiscovered || [],
+                  lifeRemaining: checkData.result.lifeRemaining || 0,
+                  clueTokensEarned: 0,
+                  clueTokensSpent: 0,
+                  hintsUnlocked: 0,
+                  efficiencyScore: checkData.result.efficiencyScore || 0,
+                  streakDays: 0,
+                  completedAt: checkData.result.completedAt || new Date().toISOString(),
+                },
+                completedAt: checkData.result.completedAt || new Date().toISOString(),
+                submittedToServer: true,
+              };
+
+              // Sync localStorage with server data
+              if (typeof window !== 'undefined') {
+                const storageKey = `lexiclash_word_hunt_${gameLanguage}_${date}`;
+                localStorage.setItem(storageKey, JSON.stringify(serverResult));
+              }
+
+              setStoredResult(serverResult);
+              setPhase('already-played');
+              return;
+            }
+          }
+        }
+      } catch (checkError) {
+        // Log but don't block - if server check fails, fall back to local-only check
+        console.warn('Failed to check server for existing attempt:', checkError);
+      }
+
+      // Player has not played yet - fetch the puzzle
       // Try to fetch puzzle from API (includes AI-selected word if available)
       try {
         const response = await fetch(`/api/daily-challenge/puzzle/${date}/${gameLanguage}`);
@@ -330,7 +391,7 @@ const DailyChallenge: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [gameLanguage, wasReset]); // Re-initialize when game language changes or admin reset clears localStorage
+  }, [gameLanguage, wasReset, isAuthenticated, profile]); // Re-initialize when game language changes or admin reset clears localStorage
 
   // Update countdown timer
   useEffect(() => {
@@ -346,9 +407,11 @@ const DailyChallenge: React.FC = () => {
   }, []);
 
   // Handle game start - with safety check to prevent replay
-  const handleStartGame = useCallback(() => {
+  const handleStartGame = useCallback(async () => {
     // Safety check: verify user hasn't already played today
     // This prevents replay if phase state somehow becomes 'ready' when it shouldn't
+
+    // First check localStorage (quick)
     if (hasPlayedWordHuntToday(gameLanguage)) {
       const result = getTodaysWordHuntResult(gameLanguage);
       if (result) {
@@ -357,8 +420,69 @@ const DailyChallenge: React.FC = () => {
         return;
       }
     }
+
+    // Additional server-side check to prevent replay after localStorage clear
+    try {
+      const date = getDailyChallengeDate();
+      const fp = await getGuestFingerprint();
+      const checkParams = new URLSearchParams();
+      if (isAuthenticated && profile) {
+        checkParams.set('playerId', profile.id);
+      } else if (fp) {
+        checkParams.set('guestFingerprint', fp);
+      }
+
+      if (checkParams.toString()) {
+        const checkResponse = await fetch(
+          `/api/daily-challenge/word-hunt/check-played/${date}/${gameLanguage}?${checkParams.toString()}`
+        );
+
+        if (checkResponse.ok) {
+          const checkData = await checkResponse.json();
+          if (checkData.hasPlayed) {
+            // Player already played - redirect to results
+            neoErrorToast(t('daily.alreadyPlayed') || 'You have already played today!', { icon: '🔒', duration: 3000 });
+
+            if (checkData.result) {
+              const number = getPuzzleNumber(date);
+              const serverResult: StoredWordHuntResult = {
+                date,
+                puzzleNumber: number,
+                result: {
+                  puzzleNumber: number,
+                  puzzleDate: date,
+                  language: gameLanguage,
+                  solved: checkData.result.solved,
+                  attemptsUsed: checkData.result.attemptsUsed,
+                  targetWord: checkData.result.targetWord,
+                  attempts: checkData.result.attempts || [],
+                  wordsDiscovered: checkData.result.wordsDiscovered || [],
+                  lifeRemaining: checkData.result.lifeRemaining || 0,
+                  clueTokensEarned: 0,
+                  clueTokensSpent: 0,
+                  hintsUnlocked: 0,
+                  efficiencyScore: checkData.result.efficiencyScore || 0,
+                  streakDays: 0,
+                  completedAt: checkData.result.completedAt || new Date().toISOString(),
+                },
+                completedAt: checkData.result.completedAt || new Date().toISOString(),
+                submittedToServer: true,
+              };
+              setStoredResult(serverResult);
+            }
+
+            setPhase('already-played');
+            return;
+          }
+        }
+      }
+    } catch (error) {
+      // If server check fails, allow playing (server will reject duplicate submissions anyway)
+      console.warn('Failed to check server before game start:', error);
+    }
+
     setPhase('playing');
-  }, [gameLanguage]);
+  }, [gameLanguage, isAuthenticated, profile, t]);
 
   // Handle Word Hunt game completion
   const handleGameComplete = useCallback((result: SurvivalGameResult) => {
@@ -530,11 +654,12 @@ const DailyChallenge: React.FC = () => {
         />
       )}
 
-      {/* Training Suggestion Modal for New Players */}
-      <TrainingSuggestionModal
-        isOpen={showTrainingSuggestion}
-        onClose={handleSkipTrainingSuggestion}
-        onSkipToDaily={handleSkipTrainingSuggestion}
+      {/* Training Gateway Modal for New Players */}
+      <TrainingGatewayModal
+        isOpen={showTrainingGateway}
+        onClose={() => setShowTrainingGateway(false)}
+        onSkip={handleSkipTrainingGateway}
+        returnTo="daily"
       />
     </div>
   );

@@ -71,22 +71,23 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
   }, [isVisible, t]);
 
   return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.div
-          className={`fixed inset-0 z-50 flex items-center justify-center ${showPreferencePrompt ? 'pointer-events-auto' : 'pointer-events-none'}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          {/* Semi-transparent backdrop */}
+    <>
+      <AnimatePresence>
+        {isVisible && (
           <motion.div
-            className={`absolute inset-0 bg-neo-black/40 text-white backdrop-blur-sm ${showPreferencePrompt ? '' : 'pointer-events-none'}`}
+            className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-          />
+            transition={{ duration: 0.2 }}
+          >
+            {/* Semi-transparent backdrop */}
+            <motion.div
+              className="absolute inset-0 bg-neo-black/40 text-white backdrop-blur-sm pointer-events-none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            />
 
           {/* Warning Card */}
           <motion.div
@@ -196,14 +197,16 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
             );
           })}
 
-          {/* First-time effects preference prompt */}
-          <AnimatePresence>
-            {showPreferencePrompt && (
-              <EffectsPreferencePrompt onDismiss={handlePreferenceDismiss} />
-            )}
-          </AnimatePresence>
         </motion.div>
       )}
     </AnimatePresence>
+
+      {/* First-time effects preference prompt - rendered separately so it persists */}
+      <AnimatePresence>
+        {showPreferencePrompt && (
+          <EffectsPreferencePrompt onDismiss={handlePreferenceDismiss} />
+        )}
+      </AnimatePresence>
+    </>
   );
 };

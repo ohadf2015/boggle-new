@@ -14,6 +14,7 @@ import { useMusic } from '@/contexts/MusicContext';
 import { cn } from '@/lib/utils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useScreenshotProtection } from '@/hooks/useScreenshotProtection';
 import type { LetterGrid, Language } from '@/types';
 import {
@@ -150,6 +151,18 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const [showShop, setShowShop] = useState(false);
   const [tokensSpent, setTokensSpent] = useState(0);
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
+
+  // Guard against accidental browser back button / tab close during active game
+  // Daily Word Hunt is one-per-day so always guard from the start
+  useNavigationGuard({
+    enabled: !isGameOver,
+    message: t('wordHunt.quitConfirmMessage') || 'Your progress will be lost!',
+    onNavigationAttempt: () => {
+      setShowQuitConfirm(true);
+      return false; // Block navigation, let modal handle it
+    },
+  });
+
   const [showShopHint, setShowShopHint] = useState(false);
   const shopHintShownRef = useRef(false);
   const [isClueGaining, setIsClueGaining] = useState(false);
@@ -420,9 +433,17 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         }
       });
 
+      // Count how many of each letter are YELLOW in accumulated clues
+      const yellowLetterCounts = new Map<string, number>();
+      updated.forEach((clue) => {
+        if (clue.type === 'yellow') {
+          yellowLetterCounts.set(clue.letter, (yellowLetterCounts.get(clue.letter) || 0) + 1);
+        }
+      });
+
       // Second pass: add YELLOW letters only if:
       // 1. No clue at this position already (don't overwrite existing yellows!)
-      // 2. Target has more of this letter than we've found green (handles duplicates)
+      // 2. Target has more of this letter than (greens + existing yellows)
       // Note: We don't overwrite existing yellows to preserve previously discovered clues
       feedback.forEach((fb) => {
         if (fb.feedback === 'yellow') {
@@ -430,11 +451,13 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           const existing = updated.get(fb.position);
           const targetCount = targetLetterCounts.get(upperLetter) || 0;
           const greenCount = greenLetterCounts.get(upperLetter) || 0;
+          const yellowCount = yellowLetterCounts.get(upperLetter) || 0;
 
-          // Only add yellow if no clue exists at this position AND target has more of this letter than we've found
-          // This prevents overwriting existing yellow clues from previous guesses
-          if (!existing && targetCount > greenCount) {
+          // Only add yellow if no clue exists at this position AND we haven't exhausted all instances
+          // (greens + yellows < target count) - this prevents duplicate yellows beyond what target contains
+          if (!existing && (greenCount + yellowCount) < targetCount) {
             updated.set(fb.position, { letter: upperLetter, type: 'yellow' });
+            yellowLetterCounts.set(upperLetter, yellowCount + 1);
           }
         }
       });
@@ -628,6 +651,14 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           }
         });
 
+        // Count how many of each letter are already YELLOW in accumulated clues
+        const yellowLetterCounts = new Map<string, number>();
+        updated.forEach((clue) => {
+          if (clue.type === 'yellow') {
+            yellowLetterCounts.set(clue.letter, (yellowLetterCounts.get(clue.letter) || 0) + 1);
+          }
+        });
+
         // First pass: Check positions within target range for GREEN clues (exact matches)
         for (let pos = 0; pos < checkLength; pos++) {
           const wordLetter = normalizedWord[pos];
@@ -650,7 +681,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         // Only add yellow if:
         // 1. Letter exists in target but not at this position
         // 2. No green already at this position
-        // 3. Target has more instances of this letter than we've found green
+        // 3. Target has more instances of this letter than (greens + existing yellows)
         for (let pos = 0; pos < checkLength; pos++) {
           const wordLetter = normalizedWord[pos];
           const targetLetter = normalizedTarget[pos];
@@ -664,12 +695,15 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           // Check if letter exists in target word
           const targetCount = targetLetterCounts.get(wordLetter) || 0;
           const greenCount = greenLetterCounts.get(wordLetter) || 0;
+          const yellowCount = yellowLetterCounts.get(wordLetter) || 0;
 
-          // Only add yellow if target has this letter and has more instances than greens
-          if (targetCount > 0 && targetCount > greenCount) {
+          // Only add yellow if target has this letter and we haven't exhausted all instances
+          // (greens + yellows < target count) - this prevents duplicate yellows beyond what target contains
+          if (targetCount > 0 && (greenCount + yellowCount) < targetCount) {
             // Only add if no clue exists at this position (don't overwrite existing yellows)
             if (!existing) {
               updated.set(pos, { letter: wordLetter, type: 'yellow' });
+              yellowLetterCounts.set(wordLetter, yellowCount + 1);
               newYellows++;
             }
           }

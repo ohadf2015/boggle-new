@@ -1639,6 +1639,58 @@ const en = {
     },
     "swipeHint": "← Swipe to navigate →"
   },
+  "training": {
+    "gateway": {
+      "title": "New to LexiClash?",
+      "subtitle": "A quick training will help you master the controls!",
+      "demoHint": "Swipe in any direction - even diagonally!",
+      "benefitsTitle": "Training helps you:",
+      "benefits": {
+        "learnControls": "Learn swipe controls",
+        "masterDirections": "Master direction changes",
+        "noPressure": "No timer, no opponents"
+      },
+      "returnNote": "After training, you'll be ready for the real challenge!",
+      "startTraining": "Start Training",
+      "skipAnyway": "Skip, I know how to play"
+    },
+    "hints": {
+      "tryDiagonal": "Try dragging diagonally!",
+      "changeDirection": "Pro tip: Change direction mid-word!",
+      "checkCorners": "Check the corners for hidden words!",
+      "longerWords": "Longer words = more points! Try 5+ letters",
+      "skillsUnlocked": "Skills unlocked! You're ready!"
+    },
+    "analysis": {
+      "titleComplete": "Training Complete!",
+      "titleProgress": "Keep Practicing!",
+      "subtitleComplete": "You've mastered the basics!",
+      "subtitleProgress": "A few more skills to unlock",
+      "progress": "Skills Progress",
+      "skills": {
+        "diagonal": "Diagonal Movement",
+        "directionChange": "Direction Changes",
+        "gridCoverage": "Grid Exploration",
+        "longWords": "Long Words"
+      },
+      "stats": "Your Stats",
+      "wordsFound": "Words",
+      "longestWord": "Longest",
+      "dirChanges": "Dir. Changes",
+      "tips": "Tips for next time:",
+      "tip": {
+        "diagonal": "Swipe diagonally to find more words",
+        "directionChange": "Change direction mid-word for longer words",
+        "gridCoverage": "Check corners and edges for hidden words",
+        "longWords": "Find 5+ letter words for bonus points"
+      },
+      "multiplayer": "Multiplayer",
+      "daily": "Daily",
+      "practiceMore": "Practice More",
+      "tryAgain": "Try Again",
+      "skipAnyway": "Go anyway"
+    }
+  },
   "achievements": {
     "FIRST_BLOOD": {
       "name": "First Blood",

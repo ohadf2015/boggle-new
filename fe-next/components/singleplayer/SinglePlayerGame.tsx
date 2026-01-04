@@ -31,7 +31,9 @@ import { hapticForWordScore, hapticError } from '@/utils/haptics';
 import { useAnnouncer } from '@/components/GameAnnouncer';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
+import { useTrainingAnalysis } from '@/hooks/useTrainingAnalysis';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
+import { TrainingHints } from '@/components/training';
 import {
   calculateFinalAchievements,
   type WordData as AchievementWordData,
@@ -183,6 +185,24 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
   // Direction pattern guidance - shows when player only uses straight-line directions
   const directionGuidance = useDirectionPatternGuidance();
+
+  // Training analysis - tracks player behavior in practice mode for interactive tutorial
+  const trainingAnalysis = useTrainingAnalysis({
+    enabled: settings.mode === 'practice',
+    gridSize: { rows: 5, cols: 5 }, // Standard grid size
+    onTrainingComplete: () => {
+      // Player has demonstrated all basic skills
+      // Could show celebration or enable "ready for more" badge
+    },
+  });
+
+  // Combined path submit handler for both guidance systems
+  const handlePathSubmit = useCallback((cells: Array<{ row: number; col: number }>) => {
+    // Track for direction guidance
+    directionGuidance.trackWordPath(cells);
+    // Track for training analysis (only in practice mode)
+    trainingAnalysis.trackPath(cells);
+  }, [directionGuidance, trainingAnalysis]);
 
   // Game timer - handles countdown with pause support
   const timer = useGameTimer({
@@ -666,6 +686,11 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         language: settings.language,
       };
 
+      // Mark training session as complete (tracks progress for practice mode)
+      if (settings.mode === 'practice') {
+        trainingAnalysis.finishTraining();
+      }
+
       // Use ref to call onGameEnd - ensures we always have latest callback
       // and avoids race conditions with effect cleanup during async operations
       onGameEndRef.current(results);
@@ -673,7 +698,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
     finalizeAndEndGame();
     // No cleanup needed - we use ref pattern instead of isMounted check
-  }, [isGameOver, settings.bots, settings.language, settings.timerSeconds, combo.maxCombo]);
+  }, [isGameOver, settings.bots, settings.language, settings.timerSeconds, combo.maxCombo, settings.mode, trainingAnalysis]);
 
   // Timer is now handled by useGameTimer hook (lines 126-136)
 
@@ -991,6 +1016,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           // Combo increases for validated words (handled by hook)
           combo.incrementCombo(true);
 
+          // Track for training analysis (practice mode only)
+          trainingAnalysis.trackValidWord(normalizedWord.length);
+
           if (combo.validWordCount > 1) {
             playComboSound(currentCombo + 1);
           }
@@ -1033,7 +1061,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           timestamp: Date.now(),
         });
       });
-  }, [settings.language, settings.minWordLength, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getComboBonus, getScoreMultiplier, fireRoundActive, calculateWordScore]);
+  }, [settings.language, settings.minWordLength, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getComboBonus, getScoreMultiplier, fireRoundActive, calculateWordScore, trainingAnalysis]);
 
   const handleFinishPractice = useCallback(() => {
     setIsGameOver(true);
@@ -1275,7 +1303,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               grid={grid}
               interactive={!isPaused}
               onWordSubmit={handleWordSubmit}
-              onPathSubmit={directionGuidance.trackWordPath}
+              onPathSubmit={handlePathSubmit}
               onWordChange={handleWordChange}
               hideWordPreview
               hideComboIndicator={true}
@@ -1362,6 +1390,15 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           onDismiss={directionGuidance.dismissDirectionGuidance}
           t={t}
         />
+
+        {/* Training Hints - shows real-time tips in practice mode */}
+        {settings.mode === 'practice' && (
+          <TrainingHints
+            currentHint={trainingAnalysis.currentHint}
+            onDismiss={trainingAnalysis.dismissHint}
+            trainingComplete={trainingAnalysis.hasPassed}
+          />
+        )}
 
         {/* Quit Confirmation Dialog */}
         <ConfirmationDialog
@@ -1670,7 +1707,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           grid={grid}
           interactive={!isPaused}
           onWordSubmit={handleWordSubmit}
-          onPathSubmit={directionGuidance.trackWordPath}
+          onPathSubmit={handlePathSubmit}
           onWordChange={handleWordChange}
           hideWordPreview
           hideComboIndicator={true}
@@ -1752,6 +1789,15 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         onDismiss={directionGuidance.dismissDirectionGuidance}
         t={t}
       />
+
+      {/* Training Hints - shows real-time tips in practice mode */}
+      {settings.mode === 'practice' && (
+        <TrainingHints
+          currentHint={trainingAnalysis.currentHint}
+          onDismiss={trainingAnalysis.dismissHint}
+          trainingComplete={trainingAnalysis.hasPassed}
+        />
+      )}
 
       {/* Quit Confirmation Dialog */}
       <ConfirmationDialog

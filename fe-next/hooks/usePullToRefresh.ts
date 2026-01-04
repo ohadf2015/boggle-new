@@ -16,13 +16,54 @@ export interface PullToRefreshState {
 }
 
 /**
+ * Get the current scroll position, checking element scroll first, then window scroll
+ */
+function getScrollTop(element: HTMLElement | null, scrollableParent: HTMLElement | null): number {
+  // First check if we have a scrollable element
+  if (scrollableParent) {
+    return scrollableParent.scrollTop;
+  }
+
+  // Check the direct element
+  if (element && element.scrollTop !== undefined && element.scrollTop > 0) {
+    return element.scrollTop;
+  }
+
+  // Fallback to window scroll
+  return window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+}
+
+/**
+ * Find the nearest scrollable parent element
+ */
+function findScrollableParent(element: HTMLElement | null): HTMLElement | null {
+  if (!element) return null;
+
+  let current: HTMLElement | null = element;
+  while (current) {
+    const style = window.getComputedStyle(current);
+    const overflowY = style.overflowY;
+
+    if (overflowY === 'auto' || overflowY === 'scroll') {
+      if (current.scrollHeight > current.clientHeight) {
+        return current;
+      }
+    }
+
+    current = current.parentElement;
+  }
+
+  return null;
+}
+
+/**
  * usePullToRefresh - Hook for pull-to-refresh functionality
  *
  * Features:
  * - Native iOS-style pull-to-refresh
+ * - Works with both window scroll and element scroll
  * - Configurable threshold and resistance
  * - Haptic feedback on trigger
- * - Works with scrollable containers
  *
  * @example
  * const { pullToRefreshHandlers, pullState } = usePullToRefresh({
@@ -52,11 +93,12 @@ export function usePullToRefresh(options: PullToRefreshOptions) {
     isRefreshing: false,
   });
 
-  const touchStartRef = useRef<{ y: number; scrollTop: number } | null>(null);
+  const touchStartRef = useRef<{ y: number; scrollTop: number; canPull: boolean } | null>(null);
   const containerRef = useRef<HTMLElement | null>(null);
+  const isRefreshingRef = useRef(false);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    if (!enabled) return;
+    if (!enabled || isRefreshingRef.current) return;
 
     const target = e.currentTarget as HTMLElement;
     containerRef.current = target;
@@ -64,26 +106,35 @@ export function usePullToRefresh(options: PullToRefreshOptions) {
     const touch = e.touches[0];
     if (!touch) return;
 
-    // Only start pull-to-refresh if scrolled to top
-    if (target.scrollTop === 0) {
-      touchStartRef.current = {
-        y: touch.clientY,
-        scrollTop: target.scrollTop,
-      };
-    }
+    // Find scrollable parent and get scroll position
+    const scrollableParent = findScrollableParent(target);
+    const scrollTop = getScrollTop(target, scrollableParent);
+
+    // Allow pull-to-refresh if at the top (with small tolerance for rounding)
+    const canPull = scrollTop <= 1;
+
+    touchStartRef.current = {
+      y: touch.clientY,
+      scrollTop,
+      canPull,
+    };
   }, [enabled]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!enabled || !touchStartRef.current) return;
+    if (!enabled || !touchStartRef.current || isRefreshingRef.current) return;
 
     const touch = e.touches[0];
     if (!touch) return;
 
-    const target = e.currentTarget as HTMLElement;
     const deltaY = touch.clientY - touchStartRef.current.y;
 
-    // Only pull down when at top of scroll
-    if (deltaY > 0 && target.scrollTop === 0) {
+    // Re-check scroll position on each move (user might have scrolled)
+    const target = e.currentTarget as HTMLElement;
+    const scrollableParent = findScrollableParent(target);
+    const currentScrollTop = getScrollTop(target, scrollableParent);
+
+    // Only pull down when at top of scroll and pulling down
+    if (deltaY > 10 && currentScrollTop <= 1) {
       // Prevent default scroll behavior while pulling
       if (e.cancelable) {
         e.preventDefault();
@@ -91,7 +142,7 @@ export function usePullToRefresh(options: PullToRefreshOptions) {
 
       // Apply resistance to make it feel natural
       const pullDistance = Math.min(
-        deltaY / resistance,
+        (deltaY - 10) / resistance,
         maxPullDistance
       );
 
@@ -100,17 +151,33 @@ export function usePullToRefresh(options: PullToRefreshOptions) {
         pullDistance,
         isRefreshing: false,
       });
+
+      // Trigger light haptic when reaching threshold
+      if (pullDistance >= threshold && touchStartRef.current.canPull) {
+        touchStartRef.current.canPull = false; // Only trigger once per pull
+        triggerHaptic('light');
+      }
+    } else if (deltaY <= 0 || currentScrollTop > 1) {
+      // Reset if scrolling up or not at top
+      if (pullState.isPulling) {
+        setPullState({
+          isPulling: false,
+          pullDistance: 0,
+          isRefreshing: false,
+        });
+      }
     }
-  }, [enabled, maxPullDistance, resistance]);
+  }, [enabled, maxPullDistance, resistance, threshold, pullState.isPulling]);
 
   const handleTouchEnd = useCallback(async () => {
-    if (!enabled || !pullState.isPulling) return;
+    if (!enabled || !pullState.isPulling || isRefreshingRef.current) return;
 
     const shouldRefresh = pullState.pullDistance >= threshold;
 
     if (shouldRefresh) {
       // Trigger haptic feedback
       triggerHaptic('medium');
+      isRefreshingRef.current = true;
 
       setPullState({
         isPulling: false,
@@ -124,6 +191,7 @@ export function usePullToRefresh(options: PullToRefreshOptions) {
         console.error('Pull-to-refresh error:', error);
         triggerHaptic('error');
       } finally {
+        isRefreshingRef.current = false;
         setPullState({
           isPulling: false,
           pullDistance: 0,
@@ -142,10 +210,23 @@ export function usePullToRefresh(options: PullToRefreshOptions) {
     touchStartRef.current = null;
   }, [enabled, pullState, threshold, onRefresh]);
 
+  // Also handle touch cancel (e.g., when a gesture is interrupted)
+  const handleTouchCancel = useCallback(() => {
+    if (pullState.isPulling) {
+      setPullState({
+        isPulling: false,
+        pullDistance: 0,
+        isRefreshing: false,
+      });
+    }
+    touchStartRef.current = null;
+  }, [pullState.isPulling]);
+
   // Clean up on unmount
   useEffect(() => {
     return () => {
       touchStartRef.current = null;
+      isRefreshingRef.current = false;
     };
   }, []);
 
@@ -154,6 +235,7 @@ export function usePullToRefresh(options: PullToRefreshOptions) {
       onTouchStart: handleTouchStart,
       onTouchMove: handleTouchMove,
       onTouchEnd: handleTouchEnd,
+      onTouchCancel: handleTouchCancel,
     },
     pullState,
     isAtThreshold: pullState.pullDistance >= threshold,
