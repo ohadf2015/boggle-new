@@ -421,8 +421,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       });
 
       // Second pass: add YELLOW letters only if:
-      // 1. No green at this position already
+      // 1. No clue at this position already (don't overwrite existing yellows!)
       // 2. Target has more of this letter than we've found green (handles duplicates)
+      // Note: We don't overwrite existing yellows to preserve previously discovered clues
       feedback.forEach((fb) => {
         if (fb.feedback === 'yellow') {
           const upperLetter = fb.letter.toUpperCase();
@@ -430,8 +431,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           const targetCount = targetLetterCounts.get(upperLetter) || 0;
           const greenCount = greenLetterCounts.get(upperLetter) || 0;
 
-          // Only add yellow if no green at this position AND target has more of this letter than we've found
-          if ((!existing || existing.type !== 'green') && targetCount > greenCount) {
+          // Only add yellow if no clue exists at this position AND target has more of this letter than we've found
+          // This prevents overwriting existing yellow clues from previous guesses
+          if (!existing && targetCount > greenCount) {
             updated.set(fb.position, { letter: upperLetter, type: 'yellow' });
           }
         }
@@ -483,10 +485,11 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         }
       });
 
-      // Remove letters from knownLetters if they have ANY green position
-      // Once a letter is green, the player knows it's in the word - no need to show in "wrong spot" hints
+      // Remove letters from knownLetters only if ALL instances are found as green
+      // If target has 2 A's and we found 1 green A, keep showing A as "wrong spot" for the remaining one
       allGreenCounts.forEach((greenCount, letter) => {
-        if (greenCount > 0) {
+        const targetCount = targetLetterCounts.get(letter) || 0;
+        if (greenCount >= targetCount) {
           updated.delete(letter);
         }
       });
@@ -664,12 +667,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
           // Only add yellow if target has this letter and has more instances than greens
           if (targetCount > 0 && targetCount > greenCount) {
-            // Only add if no clue exists at this position, or if existing is yellow (keep yellow)
-            if (!existing || existing.type === 'yellow') {
+            // Only add if no clue exists at this position (don't overwrite existing yellows)
+            if (!existing) {
               updated.set(pos, { letter: wordLetter, type: 'yellow' });
-              if (!existing) {
-                newYellows++;
-              }
+              newYellows++;
             }
           }
         }

@@ -181,13 +181,15 @@ export function CompactLeaderboard({
         )}
 
         {/* YOUR POSITION - Always shown prominently */}
+        {/* Responsive gap and padding for narrow screens (<375px) */}
         <motion.div
           layout
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className={cn(
-            'relative flex items-center gap-1.5 px-1.5 py-1.5 rounded-neo border-3',
+            'relative flex items-center gap-1 sm:gap-1.5 px-1 sm:px-1.5 py-1.5 rounded-neo border-3',
+            'min-w-0 w-full', // Ensure flex container respects width
             isLeading
               ? 'bg-gradient-to-r from-neo-yellow to-neo-lime border-neo-black shadow-hard'
               : 'bg-neo-cyan/20 border-neo-cyan shadow-hard-sm'

@@ -9,6 +9,8 @@ declare global {
     CrazyGames?: {
       SDK: CrazyGamesSDK;
     };
+    /** Cached CrazyGames environment for utility function access */
+    __crazyGamesEnvironment?: CrazyGamesEnvironment;
   }
 }
 
@@ -110,6 +112,8 @@ interface CrazyGamesSDK {
 // Context types
 interface CrazyGamesContextType {
   isAvailable: boolean;
+  /** True only when actually running on CrazyGames platform (not local/standalone) */
+  isOnCrazyGamesPlatform: boolean;
   environment: CrazyGamesEnvironment | null;
   isLoading: boolean;
   // Gameplay events
@@ -339,6 +343,8 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
       if (window.CrazyGames?.SDK) {
         try {
           const env = await window.CrazyGames.SDK.getEnvironment();
+          // Cache environment on window for utility function access
+          window.__crazyGamesEnvironment = env;
           setEnvironment(env);
           setIsAvailable(env !== 'disabled');
 
@@ -537,6 +543,7 @@ export function CrazyGamesProvider({ children }: { children: ReactNode }) {
 
   const value: CrazyGamesContextType = {
     isAvailable,
+    isOnCrazyGamesPlatform: environment === 'crazygames',
     environment,
     isLoading,
     // Gameplay events
@@ -587,6 +594,7 @@ export function useCrazyGames(): CrazyGamesContextType {
     // Return a no-op implementation when not in provider
     return {
       isAvailable: false,
+      isOnCrazyGamesPlatform: false,
       environment: null,
       isLoading: false,
       // Gameplay events
@@ -625,15 +633,23 @@ export function useCrazyGames(): CrazyGamesContextType {
 }
 
 /**
- * Utility to check if we're running on CrazyGames platform
+ * Utility to check if we're running on CrazyGames platform (runtime detection)
+ * Uses the cached environment from SDK.getEnvironment() - returns true only when
+ * actually running on CrazyGames portal, not when running locally with SDK enabled.
+ *
+ * @deprecated Prefer using `useCrazyGames().isOnCrazyGamesPlatform` in React components
  */
 export function isCrazyGamesEnvironment(): boolean {
-  return CRAZYGAMES_ENABLED && typeof window !== 'undefined' && !!window.CrazyGames?.SDK;
+  if (typeof window === 'undefined') return false;
+  // Use cached runtime environment - only true when SDK reports 'crazygames'
+  return window.__crazyGamesEnvironment === 'crazygames';
 }
 
 /**
  * Check if external login should be hidden (CrazyGames requirement)
- * Returns true when on CrazyGames - use to hide login modals, signup prompts, etc.
+ * Returns true only when actually on CrazyGames portal - use to hide login modals, signup prompts, etc.
+ *
+ * @deprecated Prefer using `useCrazyGames().isOnCrazyGamesPlatform` in React components
  */
 export function shouldHideExternalLogin(): boolean {
   return isCrazyGamesEnvironment();

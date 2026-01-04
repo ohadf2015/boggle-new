@@ -19,6 +19,8 @@ interface ComboDisplayProps {
   coinReward?: number | null;
   /** Callback when coin animation completes */
   onCoinAnimationComplete?: () => void;
+  /** Force high contrast mode for light backgrounds (e.g., landscape panels) */
+  highContrast?: boolean;
 }
 
 // Sparkle particle component - memoized and optimized for smooth animation
@@ -76,6 +78,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
   timeRemaining,
   coinReward = null,
   onCoinAnimationComplete,
+  highContrast = false,
 }) => {
   const comboColors = getComboColors(comboLevel);
   const { isLowEnd, enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
@@ -176,7 +179,9 @@ const ComboDisplay = memo<ComboDisplayProps>(({
               // Subtle border color shift in danger state
               isDanger ? 'border-orange-400/70' : 'border-white/40',
               compact ? 'px-3 py-1.5 text-base' : 'px-4 py-2 text-lg',
-              !isRainbow && 'bg-gradient-to-r from-orange-500 via-red-500 to-pink-500'
+              !isRainbow && 'bg-gradient-to-r from-orange-600 via-red-600 to-pink-600',
+              // High contrast mode for light backgrounds (landscape panels)
+              highContrast && 'border-neo-black/60'
             )}
             style={{
               filter: isRainbow
@@ -184,11 +189,17 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                 : isDanger
                 ? 'drop-shadow(0 0 8px rgba(251, 146, 60, 0.8))'
                 : `drop-shadow(0 0 ${isHighCombo ? '10px' : '6px'} rgba(251, 146, 60, 0.6))`,
+              // Enhanced text shadow for better contrast on light backgrounds
+              textShadow: highContrast && !isRainbow
+                ? '1px 1px 2px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.5)'
+                : undefined,
               ...(isRainbow && {
-                background: 'linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #06b6d4, #3b82f6, #8b5cf6, #ec4899, #ef4444)',
+                background: 'linear-gradient(90deg, #dc2626, #ea580c, #ca8a04, #16a34a, #0891b2, #2563eb, #7c3aed, #db2777, #dc2626)',
                 backgroundSize: '300% 100%',
                 animation: 'rainbow-shift 1.5s linear infinite',
-                textShadow: '1px 1px 0 rgba(255,255,255,0.8), -1px -1px 0 rgba(255,255,255,0.8), 1px -1px 0 rgba(255,255,255,0.8), -1px 1px 0 rgba(255,255,255,0.8)',
+                textShadow: highContrast
+                  ? '1px 1px 2px rgba(0,0,0,0.6), -1px -1px 2px rgba(0,0,0,0.6), 0 0 3px rgba(0,0,0,0.4)'
+                  : '1px 1px 0 rgba(255,255,255,0.8), -1px -1px 0 rgba(255,255,255,0.8), 1px -1px 0 rgba(255,255,255,0.8), -1px 1px 0 rgba(255,255,255,0.8)',
               }),
             }}
           >

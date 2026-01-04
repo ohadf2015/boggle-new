@@ -11,14 +11,14 @@
 
 import React, { ReactNode } from 'react';
 import { MotionConfig } from 'framer-motion';
-import { useShouldReduceMotion } from '@/contexts/AccessibilityContext';
+import { useAccessibility } from '@/contexts/AccessibilityContext';
 
 interface MotionConfigProviderProps {
   children: ReactNode;
 }
 
 export function MotionConfigProvider({ children }: MotionConfigProviderProps) {
-  const shouldReduceMotion = useShouldReduceMotion();
+  const { shouldReduceMotion } = useAccessibility();
 
   return (
     <MotionConfig reducedMotion={shouldReduceMotion ? 'always' : 'never'}>

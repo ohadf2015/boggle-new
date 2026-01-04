@@ -77,7 +77,7 @@ const Avatar = memo<AvatarProps>(({
           src={profilePictureUrl}
           alt="Profile"
           fill
-          sizes={`${config.px}px`}
+          sizes={`(max-width: 768px) ${config.px}px, ${config.px}px`}
           className="object-cover"
           onError={() => setImageError(true)}
           referrerPolicy="no-referrer"
@@ -110,7 +110,7 @@ const Avatar = memo<AvatarProps>(({
           src={avatarPath}
           alt="Avatar"
           fill
-          sizes={`${config.px}px`}
+          sizes={`(max-width: 768px) ${config.px}px, ${config.px}px`}
           className="object-cover"
           onError={() => setAvatarError(true)}
           loading="lazy"

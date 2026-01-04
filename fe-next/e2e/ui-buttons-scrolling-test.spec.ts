@@ -16,6 +16,12 @@ const VIEWPORTS = {
     { name: 'iPhone SE Landscape', width: 667, height: 375 },
     { name: 'iPhone 12 Landscape', width: 844, height: 390 },
     { name: 'iPad Landscape', width: 1024, height: 768 },
+    { name: 'iPhone Plus Landscape', width: 736, height: 414 },
+    { name: 'iPhone XR Landscape', width: 896, height: 414 },
+    { name: 'Tablet Landscape 1024x600', width: 1024, height: 600 },
+    { name: 'Tablet Landscape 1280x800', width: 1280, height: 800 },
+    { name: 'Desktop Landscape 1366x768', width: 1366, height: 768 },
+    { name: 'Desktop Landscape 1920x1080', width: 1920, height: 1080 },
   ],
 };
 
@@ -80,7 +86,7 @@ async function testButtonStates(page: Page, buttonSelector: string, buttonName: 
     hoverShadow: hoverStyles.boxShadow,
     activeTransform: activeStyles.transform,
     activeShadow: activeStyles.boxShadow,
-    minSizeOk: box.width >= 44 && box.height >= 44,
+    minSizeOk: box.width >= 48 && box.height >= 48,
   };
 }
 
@@ -92,6 +98,9 @@ test.describe('UI Buttons, Scrolling, and Layout Tests', () => {
         await page.goto('/en');
         await page.waitForLoadState('networkidle');
         await page.waitForTimeout(1000);
+
+        const headerVisible = await page.locator('header').first().isVisible().catch(() => false);
+        expect(headerVisible).toBe(true);
 
         const filename = `test-results/landing-${viewport.name.replace(/\s+/g, '-')}-${viewport.width}x${viewport.height}.png`;
         await page.screenshot({ path: filename, fullPage: true });
@@ -254,8 +263,20 @@ test.describe('UI Buttons, Scrolling, and Layout Tests', () => {
         await page.waitForTimeout(1500);
 
         // Start game
-        const startButton = page.locator('button:has-text("Start"), button:has-text("Start Game")').first();
-        await startButton.click();
+        let startButton = page.locator('button:has-text("Start Game"), button:has-text("Start")').first();
+        const startVisible = await startButton.isVisible().catch(() => false);
+        if (!startVisible) {
+          const nextBtn = page.locator('button:has-text("Next")').first();
+          const nextVisible = await nextBtn.isVisible().catch(() => false);
+          if (nextVisible) {
+            await nextBtn.click();
+            await page.waitForTimeout(300);
+            await nextBtn.click();
+            await page.waitForTimeout(300);
+          }
+          startButton = page.locator('button:has-text("Start Game"), button:has-text("Start")').first();
+        }
+        await startButton.click({ timeout: 10000 });
         await page.waitForTimeout(3000);
 
         const filename = `test-results/singleplayer-game-${viewport.name.replace(/\s+/g, '-')}-${viewport.width}x${viewport.height}.png`;
@@ -419,4 +440,3 @@ test.describe('UI Buttons, Scrolling, and Layout Tests', () => {
     });
   });
 });
-

@@ -1,4 +1,6 @@
 'use client';
+// Force rebuild
+
 
 import React, { createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
 import { useLocalStorageObject } from '@/hooks/useLocalStorageState';
@@ -39,7 +41,7 @@ interface AccessibilityContextType {
   ) => void;
 }
 
-const AccessibilityContext = createContext<AccessibilityContextType | null>(null);
+export const AccessibilityContext = createContext<AccessibilityContextType | null>(null);
 
 const ACCESSIBILITY_STORAGE_KEY = 'boggle_accessibility_settings';
 const DEFAULT_SETTINGS: AccessibilitySettings = {

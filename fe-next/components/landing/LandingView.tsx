@@ -166,8 +166,8 @@ const LandingView: React.FC = () => {
         onSave={handleProfileCustomizationSave}
       />
 
-      {/* Header - hidden in landscape */}
-      {!isLandscape && <Header />}
+      {/* Header - compact in landscape via CSS */}
+      <Header />
 
       {/* Main content */}
       <main className={`w-full max-w-6xl mx-auto overflow-x-hidden ${isLandscape ? 'flex-1 flex flex-col justify-center px-4 py-2' : 'px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-4'}`}>
@@ -272,14 +272,16 @@ const LandingView: React.FC = () => {
       </main>
 
       {/* Tutorial FAB - Fixed bottom corner button */}
+      {/* Z-index 45 ensures it stays below mobile menu backdrop (z-9998) but above other content */}
       <motion.button
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.3, delay: 0.3 }}
         onClick={handleOpenTutorial}
         className="
-          fixed bottom-4 right-4 z-40
+          fixed bottom-4 right-4 z-[45]
           flex items-center gap-2
+          min-w-[48px] min-h-[48px]
           px-4 py-3
           bg-neo-purple text-neo-white
           font-bold text-sm
@@ -288,8 +290,10 @@ const LandingView: React.FC = () => {
           hover:scale-105 hover:shadow-hard-xl
           active:scale-95 active:shadow-hard
           transition-all duration-150
-          mb-[env(safe-area-inset-bottom)]
+          mb-[max(env(safe-area-inset-bottom),16px)]
+          mr-[max(env(safe-area-inset-right),0px)]
           rtl:right-auto rtl:left-4
+          rtl:mr-0 rtl:ml-[max(env(safe-area-inset-left),0px)]
         "
         aria-label={t('landing.tutorial') || 'Tutorial'}
       >

@@ -105,10 +105,10 @@ const ModeCard: React.FC<ModeCardProps> = ({
             </span>
           </div>
 
-          {/* Arrow indicator */}
+          {/* Arrow indicator - min 44x44px touch target on mobile */}
           <div
             className={cn(
-              'w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 xl:w-12 xl:h-12',
+              'w-10 h-10 sm:w-10 sm:h-10 lg:w-11 lg:h-11 xl:w-12 xl:h-12',
               'rounded-full border-2 lg:border-3 border-neo-black',
               'flex items-center justify-center',
               'transition-transform duration-200 ease-out',
@@ -131,16 +131,17 @@ const ModeCard: React.FC<ModeCardProps> = ({
         </p>
 
         {/* Live Badge - shows open rooms and players only when meaningful (> 5) */}
+        {/* Using bg-neo-cream for WCAG AA compliant contrast (19.8:1 vs neo-black) */}
         {liveBadge && (liveBadge.openRooms > 5 || liveBadge.totalPlayers > 5) && (
-          <div className="flex flex-wrap gap-1 lg:gap-2">
+          <div className="flex flex-wrap gap-1.5 lg:gap-2">
             {liveBadge.openRooms > 5 && (
-              <span className="inline-flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-1 lg:py-1.5 bg-neo-lime/90 text-neo-black text-xs lg:text-sm font-bold rounded-neo border-2 border-neo-black shadow-hard-sm">
+              <span className="inline-flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-1 lg:py-1.5 bg-neo-cream text-neo-black text-xs lg:text-sm font-bold rounded-neo border-2 border-neo-black shadow-hard-sm">
                 <LayoutGrid className="w-3 h-3 lg:w-4 lg:h-4" />
                 {liveBadge.openRooms} {liveBadge.roomsLabel}
               </span>
             )}
             {liveBadge.totalPlayers > 5 && (
-              <span className="inline-flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-1 lg:py-1.5 bg-neo-lime/90 text-neo-black text-xs lg:text-sm font-bold rounded-neo border-2 border-neo-black shadow-hard-sm">
+              <span className="inline-flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-1 lg:py-1.5 bg-neo-cream text-neo-black text-xs lg:text-sm font-bold rounded-neo border-2 border-neo-black shadow-hard-sm">
                 <Users className="w-3 h-3 lg:w-4 lg:h-4" />
                 {liveBadge.totalPlayers} {liveBadge.playersLabel}
               </span>

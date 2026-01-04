@@ -345,10 +345,20 @@ const DailyChallenge: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Handle game start
+  // Handle game start - with safety check to prevent replay
   const handleStartGame = useCallback(() => {
+    // Safety check: verify user hasn't already played today
+    // This prevents replay if phase state somehow becomes 'ready' when it shouldn't
+    if (hasPlayedWordHuntToday(gameLanguage)) {
+      const result = getTodaysWordHuntResult(gameLanguage);
+      if (result) {
+        setStoredResult(result);
+        setPhase('already-played');
+        return;
+      }
+    }
     setPhase('playing');
-  }, []);
+  }, [gameLanguage]);
 
   // Handle Word Hunt game completion
   const handleGameComplete = useCallback((result: SurvivalGameResult) => {

@@ -123,10 +123,12 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
   const displayWord = rawDisplayWord ? applyHebrewFinalLetter(rawDisplayWord) : rawDisplayWord;
   const displayLetterCount = showForming ? letterCount : lastLetterCount;
 
-  // Container size classes
+  // Container size classes - responsive min-width for small screens
   const containerClasses = cn(
     'flex items-center justify-center relative',
-    compact ? 'h-10 min-h-[40px] min-w-[100px]' : 'h-14 min-h-[56px] min-w-[140px]',
+    compact
+      ? 'h-10 min-h-[40px] min-w-[80px] xs:min-w-[100px]'
+      : 'h-14 min-h-[56px] min-w-[100px] xs:min-w-[140px]',
     className
   );
 

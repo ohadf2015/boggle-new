@@ -14,7 +14,6 @@ import Avatar from '../Avatar';
 import LevelBadge from '../LevelBadge';
 import { cn } from '../../lib/utils';
 import { useRouter } from 'next/navigation';
-import { shouldHideExternalLogin } from '../CrazyGamesSDK';
 import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 import type { Language as LanguageType } from '@/shared/types';
 
@@ -416,8 +415,8 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
   }
 
   // Guest user - show Sign In and Sign Up buttons
-  // Hide login options on CrazyGames platform
-  const hideLogin = shouldHideExternalLogin();
+  // Hide external login options when on CrazyGames platform (runtime detection)
+  const hideLogin = isCrazyGames;
 
   // Inline variant for mobile menu
   if (inline) {

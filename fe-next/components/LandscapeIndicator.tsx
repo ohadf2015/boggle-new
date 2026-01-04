@@ -70,7 +70,7 @@ const LandscapeIndicator = memo<LandscapeIndicatorProps>(({ className = '' }) =>
     };
   }, []);
 
-  // Update visibility based on mobile + portrait
+  // Update visibility based on mobile + portrait + game pages only
   useEffect(() => {
     if (!FEATURE_ENABLED) return;
     if (typeof window === 'undefined') return;
@@ -81,7 +81,27 @@ const LandscapeIndicator = memo<LandscapeIndicatorProps>(({ className = '' }) =>
       return;
     }
 
-    setIsVisible(isMobile && isPortrait);
+    // Only show on active game pages, not configuration screens
+    const isGamePage = window.location.pathname.includes('/singleplayer') ||
+                       window.location.pathname.includes('/multiplayer');
+
+    // Don't show on lobby/configuration screens - only during active gameplay
+    // The multiplayer page has /multiplayer/{roomCode} format when in-game
+    const isInActiveGame = isGamePage && (
+      window.location.pathname.includes('/singleplayer') ||
+      window.location.pathname.split('/').length > 3 // e.g., /en/multiplayer/ROOMCODE
+    );
+
+    // Show after 2 second delay to let page settle
+    if (isMobile && isPortrait && isInActiveGame) {
+      const timer = setTimeout(() => {
+        setIsVisible(true);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+
+    setIsVisible(false);
+    return undefined;
   }, [isMobile, isPortrait]);
 
   const handleDismiss = useCallback(() => {

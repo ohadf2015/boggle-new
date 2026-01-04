@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { useCrazyGames, isCrazyGamesEnvironment } from '@/components/CrazyGamesSDK';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 export interface CrazyGamesUser {
   username: string;
@@ -47,6 +47,7 @@ interface UseCrazyGamesAuthReturn {
 export function useCrazyGamesAuth(): UseCrazyGamesAuthReturn {
   const {
     isAvailable,
+    isOnCrazyGamesPlatform,
     isLoading,
     getUser,
     showAuthPrompt,
@@ -58,7 +59,8 @@ export function useCrazyGamesAuth(): UseCrazyGamesAuthReturn {
   const [isAccountAvailable, setIsAccountAvailable] = useState(false);
   const [hasCheckedUser, setHasCheckedUser] = useState(false);
 
-  const isCrazyGames = isCrazyGamesEnvironment();
+  // Use runtime detection - only true when actually on CrazyGames platform
+  const isCrazyGames = isOnCrazyGamesPlatform;
   const isReady = !isLoading && hasCheckedUser;
 
   // Check if user is already logged in on mount

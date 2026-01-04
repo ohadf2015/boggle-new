@@ -84,7 +84,7 @@
 - **Error Handling**: Graceful degradation on failures
 - **Rate Limiting**: Prevent abuse (50 msg/10s default)
 - **Resource Cleanup**: Close connections, clear timers
-- **Modular Code**: Split files > 500 lines
+- **Modular Code**: NEVER create files > 500 lines. Split into logical units and modules (hooks, utils, sub-components). Each file should have a single responsibility
 - **Accessibility**: Follow WCAG 2.1 AA standards
 - **ALWAYS refer to CLAUDE.md before making changes**
 - **ALWAYS VERIFY BUILD AND TESTS PASS AFTER CHANGES**
