@@ -3324,4 +3324,4 @@ const ja = {
   }
 };
 
-export { ja };
+module.exports = { ja };

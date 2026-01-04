@@ -3338,4 +3338,4 @@ const en = {
   }
 };
 
-export { en };
+module.exports = { en };

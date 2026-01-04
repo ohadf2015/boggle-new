@@ -3326,4 +3326,4 @@ const he = {
   }
 };
 
-export { he };
+module.exports = { he };

@@ -3325,4 +3325,4 @@ const sv = {
   }
 };
 
-export { sv };
+module.exports = { sv };

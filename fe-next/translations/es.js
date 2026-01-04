@@ -3322,4 +3322,4 @@ const es = {
   }
 };
 
-export { es };
+module.exports = { es };
