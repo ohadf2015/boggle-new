@@ -27,8 +27,8 @@ const statDisplayVariants = cva(
         default: "bg-slate-100/50 dark:bg-slate-800/50 border-slate-300 dark:border-slate-600",
         accent: "bg-neo-cyan/10 border-neo-cyan/40",
         success: "bg-neo-lime/10 border-neo-lime/40",
-        warning: "bg-neo-orange/10 border-neo-orange/40",
-        info: "bg-neo-purple/10 border-neo-purple/40",
+        warning: "bg-neo-yellow/10 border-neo-yellow/40",
+        info: "bg-neo-pink/10 border-neo-pink/40",
       },
       size: {
         sm: "px-2 py-1 gap-0.5",

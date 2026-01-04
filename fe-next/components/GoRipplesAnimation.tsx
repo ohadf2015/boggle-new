@@ -120,7 +120,7 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete }) =
                 style={{
                   width: particle.size,
                   height: particle.size,
-                  background: 'linear-gradient(135deg, var(--neo-yellow), var(--neo-orange))',
+                  background: 'linear-gradient(135deg, var(--neo-yellow), var(--neo-red))',
                   boxShadow: '0 0 10px rgba(251, 213, 53, 0.6)'
                 }}
               />
@@ -189,7 +189,7 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete }) =
           }}
           className={`relative px-8 py-4 border-4 border-neo-black rounded-neo ${
             isGo
-              ? 'bg-gradient-to-r from-neo-yellow via-neo-orange to-neo-yellow bg-[length:200%_100%]'
+              ? 'bg-gradient-to-r from-neo-yellow via-neo-red to-neo-yellow bg-[length:200%_100%]'
               : 'bg-neo-yellow'
           }`}
           style={{

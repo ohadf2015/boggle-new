@@ -231,7 +231,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
                   <span>Streak Freeze</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-neo-cream/80">
-                  <Gift className="w-3 h-3 text-neo-purple" />
+                  <Gift className="w-3 h-3 text-neo-pink" />
                   <span>Mystery Box</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-neo-cream/80">
@@ -239,7 +239,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
                   <span>Exclusive Title</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-neo-cream/80">
-                  <Flame className="w-3 h-3 text-neo-orange" />
+                  <Flame className="w-3 h-3 text-neo-yellow" />
                   <span>Milestone</span>
                 </div>
               </div>

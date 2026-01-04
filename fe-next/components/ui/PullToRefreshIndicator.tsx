@@ -47,7 +47,7 @@ export const PullToRefreshIndicator: React.FC<PullToRefreshIndicatorProps> = ({
             className={cn(
               'rounded-full p-2.5 shadow-lg border-2 transition-colors duration-200',
               isAtThreshold || isRefreshing
-                ? 'bg-neo-purple border-neo-purple text-white'
+                ? 'bg-neo-pink border-neo-pink text-white'
                 : 'bg-white dark:bg-neo-navy border-gray-300 dark:border-slate-600'
             )}
             initial={{ scale: 0.5, opacity: 0 }}
@@ -69,7 +69,7 @@ export const PullToRefreshIndicator: React.FC<PullToRefreshIndicatorProps> = ({
               <ArrowDown
                 className={cn(
                   'w-5 h-5 transition-colors',
-                  progress > 0.5 ? 'text-neo-purple' : 'text-gray-400 dark:text-gray-500'
+                  progress > 0.5 ? 'text-neo-pink' : 'text-gray-400 dark:text-gray-500'
                 )}
               />
             )}
@@ -78,7 +78,7 @@ export const PullToRefreshIndicator: React.FC<PullToRefreshIndicatorProps> = ({
           {/* Release text hint */}
           {isAtThreshold && !isRefreshing && (
             <motion.span
-              className="absolute bottom-1 text-xs font-medium text-neo-purple dark:text-neo-cyan"
+              className="absolute bottom-1 text-xs font-medium text-neo-pink dark:text-neo-cyan"
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
             >

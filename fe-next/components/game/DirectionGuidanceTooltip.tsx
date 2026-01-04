@@ -146,7 +146,7 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
                 }}
                 className="
                   absolute -top-2 -right-2 w-6 h-6
-                  bg-neo-purple text-white rounded-full
+                  bg-neo-pink text-white rounded-full
                   border-2 border-neo-black shadow-hard-sm
                   flex items-center justify-center
                   hover:scale-110 transition-transform
@@ -158,7 +158,7 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
 
               {/* Header */}
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-neo-purple to-neo-pink rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
+                <div className="w-8 h-8 bg-gradient-to-br from-neo-pink to-neo-pink rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
                   <Route className="w-4 h-4 text-white" />
                 </div>
                 <h4 className="font-black text-neo-black text-sm uppercase tracking-wide">
@@ -290,7 +290,7 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
 
               {/* Progress bar */}
               <motion.div
-                className="absolute bottom-0 left-0 h-1 bg-neo-purple/40 rounded-b-lg"
+                className="absolute bottom-0 left-0 h-1 bg-neo-pink/40 rounded-b-lg"
                 initial={{ width: '100%' }}
                 animate={{ width: '0%' }}
                 transition={{ duration: AUTO_DISMISS_MS / 1000, ease: 'linear' }}

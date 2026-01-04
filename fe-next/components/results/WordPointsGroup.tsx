@@ -79,7 +79,7 @@ const SimpleWordSpan = memo<{
       {wordObj.word}
       {/* Show fire round bonus indicator (earthquake 2x) */}
       {(wordObj.fireRoundBonus ?? 0) > 0 && (
-        <span className="text-[10px] px-1 py-0.5 bg-neo-orange text-neo-black rounded border border-neo-black font-black" title="Fire Round 2x Bonus">
+        <span className="text-[10px] px-1 py-0.5 bg-neo-red text-neo-black rounded border border-neo-black font-black" title="Fire Round 2x Bonus">
           🔥+{wordObj.fireRoundBonus}
         </span>
       )}
@@ -248,7 +248,7 @@ export const SharedWordsSection = memo<SharedWordsSectionProps>(({
       className
     )}>
       <div className="text-sm font-black text-neo-black dark:text-neo-cream mb-1.5 flex items-center gap-1.5 uppercase">
-        <span className="bg-neo-orange text-neo-black px-2 py-0.5 rounded-neo border-2 border-neo-black">👥</span>
+        <span className="bg-neo-red text-neo-black px-2 py-0.5 rounded-neo border-2 border-neo-black">👥</span>
         {t('results.shared') || 'Shared Words'} ({duplicateWords.length})
       </div>
       <div className="flex flex-wrap gap-1">

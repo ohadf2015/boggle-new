@@ -152,7 +152,7 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
                 initial={{ scale: 0, rotate: -10 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 15 }}
-                className="px-2 py-1 bg-gradient-to-r from-neo-orange to-neo-red border-2 border-neo-black rounded font-black text-xs text-neo-cream"
+                className="px-2 py-1 bg-gradient-to-r from-neo-red to-neo-pink border-2 border-neo-black rounded font-black text-xs text-neo-cream"
               >
                 🔥 ×2
               </motion.span>
@@ -163,7 +163,7 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
                 initial={{ scale: 0, rotate: -10 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.25, type: 'spring', stiffness: 400, damping: 15 }}
-                className="px-2 py-1 bg-neo-orange border-2 border-neo-black rounded font-black text-sm text-neo-black"
+                className="px-2 py-1 bg-neo-pink border-2 border-neo-black rounded font-black text-sm text-neo-white"
               >
                 +{comboBonus} {options.comboBonusLabel || 'combo!'}
               </motion.span>
@@ -228,7 +228,7 @@ export const wordAIValidatingToast = (word: string, options: WordAIValidatingOpt
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-purple border-3 border-neo-black shadow-hard"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-pink border-3 border-neo-black shadow-hard"
             style={{ minWidth: '220px', pointerEvents: 'auto' }}
           >
             <motion.span
@@ -484,7 +484,7 @@ export const levelUpToast = (oldLevel: number, newLevel: number, options: LevelU
               stiffness: 300,
               damping: 20
             }}
-            className="flex flex-col items-center gap-2 px-6 py-4 rounded-neo bg-gradient-to-br from-neo-yellow via-neo-orange to-neo-pink border-4 border-neo-black shadow-hard-lg"
+            className="flex flex-col items-center gap-2 px-6 py-4 rounded-neo bg-gradient-to-br from-neo-yellow via-neo-pink to-neo-cyan border-4 border-neo-black shadow-hard-lg"
             style={{ minWidth: '220px', pointerEvents: 'auto' }}
           >
             <motion.div
@@ -599,7 +599,7 @@ export const neoWarningToast = (message: string, options: NeoToastOptions = {}):
               damping: 25,
               x: { duration: 0.3, delay: 0.1 }
             }}
-            className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-orange border-3 border-neo-black shadow-hard"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-yellow border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
             {options.icon && (

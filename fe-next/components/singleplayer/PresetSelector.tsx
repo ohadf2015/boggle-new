@@ -180,7 +180,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           <div className="w-[70%] flex flex-col gap-3 justify-center">
             {/* Challenge high score preview */}
             {challengeInfo.highScore !== null && (
-              <Card className="border-3 border-neo-yellow shadow-hard bg-gradient-to-br from-neo-yellow/20 to-neo-orange/10">
+              <Card className="border-3 border-neo-yellow shadow-hard bg-gradient-to-br from-neo-yellow/20 to-neo-red/10">
                 <CardContent className="p-4 flex items-center gap-4">
                   <div className="flex items-center gap-2">
                     <Crown className="text-neo-yellow text-xl" />
@@ -294,7 +294,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <Card className="border-3 border-neo-yellow dark:border-neo-yellow/60 shadow-hard bg-gradient-to-r from-neo-yellow/10 to-neo-orange/10">
+            <Card className="border-3 border-neo-yellow dark:border-neo-yellow/60 shadow-hard bg-gradient-to-r from-neo-yellow/10 to-neo-red/10">
               <CardContent className="p-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Crown className="text-neo-yellow text-lg" />

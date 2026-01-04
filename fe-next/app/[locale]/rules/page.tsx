@@ -127,7 +127,7 @@ export default function RulesPage(): React.JSX.Element {
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-2 sm:p-6">
-                            <div className="bg-gradient-to-br from-neo-navy/5 to-neo-purple/5 rounded-lg sm:rounded-xl p-2 sm:p-4 flex justify-center">
+                            <div className="bg-gradient-to-br from-neo-navy/5 to-neo-pink/5 rounded-lg sm:rounded-xl p-2 sm:p-4 flex justify-center">
                                 <InteractiveGridDemo t={t} dir={dir} />
                             </div>
                         </CardContent>
@@ -152,7 +152,7 @@ export default function RulesPage(): React.JSX.Element {
                                 {/* Multiplayer Card */}
                                 <div className="p-2 sm:p-4 rounded-lg sm:rounded-xl bg-neo-cyan/10 border-2 sm:border-3 border-neo-black">
                                     <div className={`flex items-center gap-2 mb-2 sm:mb-3 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                                        <Users className="text-neo-purple w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                                        <Users className="text-neo-pink w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                                         <h3 className="font-bold text-sm sm:text-lg text-slate-900 dark:text-white">{t('landing.multiPlayer')}</h3>
                                     </div>
                                     <ul className={`space-y-1 sm:space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300 ${dir === 'rtl' ? 'text-right' : ''}`}>
@@ -183,9 +183,9 @@ export default function RulesPage(): React.JSX.Element {
                                 </div>
 
                                 {/* Single Player Card */}
-                                <div className="p-2 sm:p-4 rounded-lg sm:rounded-xl bg-neo-orange/10 border-2 sm:border-3 border-neo-black">
+                                <div className="p-2 sm:p-4 rounded-lg sm:rounded-xl bg-neo-cyan/10 border-2 sm:border-3 border-neo-black">
                                     <div className={`flex items-center gap-2 mb-2 sm:mb-3 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                                        <Bot className="text-neo-orange w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                                        <Bot className="text-neo-cyan w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                                         <h3 className="font-bold text-sm sm:text-lg text-slate-900 dark:text-white">{t('landing.singlePlayer')}</h3>
                                     </div>
                                     <ul className={`space-y-1 sm:space-y-2 text-xs sm:text-sm text-slate-600 dark:text-slate-300 ${dir === 'rtl' ? 'text-right' : ''}`}>
@@ -206,7 +206,7 @@ export default function RulesPage(): React.JSX.Element {
                                         <Link href={`/${language}/singleplayer`}>
                                             <Button
                                                 size="sm"
-                                                className="bg-neo-orange text-neo-black hover:bg-neo-orange/90 font-bold w-full text-xs sm:text-sm py-1.5 sm:py-2"
+                                                className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold w-full text-xs sm:text-sm py-1.5 sm:py-2"
                                             >
                                                 <Bot className={`w-3 h-3 sm:w-4 sm:h-4 ${dir === 'rtl' ? 'ml-1 sm:ml-2' : 'mr-1 sm:mr-2'}`} />
                                                 {t('landing.singlePlayer')}
@@ -250,7 +250,7 @@ export default function RulesPage(): React.JSX.Element {
                                         </tr>
                                         <tr className="bg-slate-50 dark:bg-slate-600">
                                             <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black text-slate-900 dark:text-slate-100 ${dir === 'rtl' ? 'text-right' : ''}`}>5-6 {t('howToPlay.letters')}</td>
-                                            <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black font-bold text-neo-purple ${dir === 'rtl' ? 'text-right' : ''}`}>2-3 {t('howToPlay.pts')}</td>
+                                            <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black font-bold text-neo-pink ${dir === 'rtl' ? 'text-right' : ''}`}>2-3 {t('howToPlay.pts')}</td>
                                             <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black text-slate-600 dark:text-slate-300 hidden sm:table-cell ${dir === 'rtl' ? 'text-right' : ''}`}>BRAIN</td>
                                         </tr>
                                         <tr className="bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100">
@@ -275,7 +275,7 @@ export default function RulesPage(): React.JSX.Element {
                     transition={{ delay: 0.5 }}
                 >
                     <Card className="border-2 sm:border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
-                        <CardHeader className="bg-neo-purple/20 border-b-2 sm:border-b-4 border-neo-black py-2 sm:py-4">
+                        <CardHeader className="bg-neo-pink/20 border-b-2 sm:border-b-4 border-neo-black py-2 sm:py-4">
                             <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-2xl font-black text-slate-900 dark:text-white">
                                 <Lightbulb className="text-amber-500 w-5 h-5 sm:w-6 sm:h-6" />
                                 {t('howToPlay.tipsTitle')}

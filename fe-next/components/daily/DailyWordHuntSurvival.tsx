@@ -1055,7 +1055,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                 setShowShopHint(false);
               }}
               className={cn(
-                "w-14 h-14 p-0 bg-neo-purple text-white border-3 border-neo-black rounded-neo shadow-hard hover:bg-neo-purple/80",
+                "w-14 h-14 p-0 bg-neo-pink text-white border-3 border-neo-black rounded-neo shadow-hard hover:bg-neo-pink/80",
                 showShopHint && "animate-pulse ring-2 ring-neo-yellow ring-offset-1"
               )}
             >
@@ -1114,7 +1114,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                     bgClass = "bg-green-500 border-green-700 text-white";
                   } else if (isHintRevealed) {
                     displayChar = char.toUpperCase();
-                    bgClass = "bg-neo-purple border-neo-purple text-white";
+                    bgClass = "bg-neo-pink border-neo-pink text-white";
                   } else {
                     displayChar = '';
                     bgClass = "bg-neo-black border-neo-black";
@@ -1267,7 +1267,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                 setShowShopHint(false);
               }}
               className={cn(
-                "bg-neo-purple text-white relative hover:bg-neo-purple/80",
+                "bg-neo-pink text-white relative hover:bg-neo-pink/80",
                 showShopHint && "animate-pulse ring-2 ring-neo-yellow ring-offset-1"
               )}
             >

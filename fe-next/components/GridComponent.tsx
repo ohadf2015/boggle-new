@@ -565,7 +565,8 @@ const GridComponent = memo<GridComponentProps>(({
                     // Desktop hover on adjacent hint - stronger glow when hovering over valid next cell
                     isHovered && isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-4 ring-neo-cyan/90 ring-offset-2 scale-105 z-10",
                     // Hover on last selected cell - hint to click again to submit
-                    isHovered && isLastSelected && selectedCells.length >= 2 && "ring-4 ring-neo-green/80 ring-offset-2 animate-pulse",
+                    // NOTE: Removed animate-pulse - caused excessive blinking on desktop when mouse hovers over last selected letter
+                    isHovered && isLastSelected && selectedCells.length >= 2 && "ring-4 ring-neo-green/80 ring-offset-2",
                     // Keyboard focus indicator
                     isFocused && !isSelected && "ring-4 ring-neo-cyan ring-offset-2 ring-offset-neo-cream z-20",
                     // Transition controls

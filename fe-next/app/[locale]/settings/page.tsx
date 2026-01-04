@@ -206,7 +206,7 @@ export default function SettingsPage(): React.ReactNode {
             </h2>
             <div className="space-y-3">
               <SettingRow
-                icon={isDarkMode ? <Moon className="w-5 h-5 text-neo-purple" /> : <Sun className="w-5 h-5 text-neo-yellow" />}
+                icon={isDarkMode ? <Moon className="w-5 h-5 text-neo-pink" /> : <Sun className="w-5 h-5 text-neo-yellow" />}
                 label={t('settings.theme') || 'Theme'}
                 description={isDarkMode ? t('settings.dark') || 'Dark' : t('settings.light') || 'Light'}
                 isDarkMode={isDarkMode}
@@ -270,7 +270,7 @@ export default function SettingsPage(): React.ReactNode {
               </SettingRow>
 
               <SettingRow
-                icon={<Bell className="w-5 h-5 text-neo-orange" />}
+                icon={<Bell className="w-5 h-5 text-neo-yellow" />}
                 label={t('settings.soundEffects') || 'Sound Effects'}
                 isDarkMode={isDarkMode}
               >
@@ -334,7 +334,7 @@ export default function SettingsPage(): React.ReactNode {
               </SettingRow>
 
               <SettingRow
-                icon={<Sparkles className="w-5 h-5 text-neo-purple" />}
+                icon={<Sparkles className="w-5 h-5 text-neo-pink" />}
                 label={t('settings.earthquakeEffects') || 'Earthquake Effects'}
                 description={t('settings.earthquakeEffectsDescription') || 'Screen shake & particles'}
                 isDarkMode={isDarkMode}

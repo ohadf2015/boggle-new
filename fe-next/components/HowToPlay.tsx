@@ -210,7 +210,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
 
             <div className="bg-neo-yellow/30 text-neo-black rounded-neo border-2 border-neo-black p-2 sm:p-3">
               <p className="text-xs sm:text-sm font-medium text-neo-black flex items-center gap-2">
-                <Lightbulb className="text-neo-orange flex-shrink-0" />
+                <Lightbulb className="text-neo-red flex-shrink-0" />
                 {t('howToPlay.findWordsNote')}
               </p>
             </div>
@@ -247,7 +247,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
             {/* Bonus features mention */}
             <div className="bg-neo-lime/30 text-neo-black rounded-neo border-2 border-neo-black p-2 sm:p-3">
               <p className="text-xs sm:text-sm font-medium text-neo-black flex items-center gap-2">
-                <Flame className="text-neo-orange flex-shrink-0" />
+                <Flame className="text-neo-red flex-shrink-0" />
                 {t('howToPlay.steps.combo.description') || 'Find words quickly for combo bonuses!'}
               </p>
             </div>

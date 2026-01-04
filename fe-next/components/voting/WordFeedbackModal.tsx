@@ -262,7 +262,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
         >
           {/* Header - Dictionary Building Focus */}
           <div className="
-            bg-neo-purple text-white
+            bg-neo-pink text-white
             border-b-4 border-neo-black
             px-4 py-3
             flex items-center justify-between
@@ -297,7 +297,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
             <motion.p
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center text-neo-purple font-bold text-sm"
+              className="text-center text-neo-pink font-bold text-sm"
             >
               {encouragementSentence}
             </motion.p>
@@ -323,7 +323,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   />
                 )}
                 <span className="text-sm font-semibold">
-                  {t('wordFeedback.submittedBy') || 'Submitted by'}: <span className="font-bold text-neo-purple">{currentWord.submittedBy}</span>
+                  {t('wordFeedback.submittedBy') || 'Submitted by'}: <span className="font-bold text-neo-pink">{currentWord.submittedBy}</span>
                 </span>
               </motion.div>
             )}
@@ -446,7 +446,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                 animate={{ scale: 1 }}
                 className="text-center py-4"
               >
-                <span className="text-2xl font-black text-neo-purple flex items-center justify-center gap-2">
+                <span className="text-2xl font-black text-neo-pink flex items-center justify-center gap-2">
                   <CheckCircle className="w-6 h-6 text-neo-lime" />
                   {hasMoreWords
                     ? (t('wordFeedback.nextWord') || 'Next word...')

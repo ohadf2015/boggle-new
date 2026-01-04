@@ -26,14 +26,14 @@ interface CalendarRewardCardProps {
 const rarityColors = {
   common: 'from-neo-gray to-neo-navy-light',
   rare: 'from-neo-cyan to-neo-navy-light',
-  epic: 'from-neo-purple to-neo-pink',
-  legendary: 'from-neo-yellow to-neo-orange',
+  epic: 'from-neo-pink to-neo-pink',
+  legendary: 'from-neo-yellow to-neo-yellow',
 };
 
 const rarityBorders = {
   common: 'border-neo-gray',
   rare: 'border-neo-cyan',
-  epic: 'border-neo-purple',
+  epic: 'border-neo-pink',
   legendary: 'border-neo-yellow',
 };
 
@@ -53,7 +53,7 @@ function getRewardIcon(type: CalendarReward['type'], rarity?: string) {
     case 'streak_freeze':
       return <Shield className="w-4 h-4 text-neo-lime" />;
     case 'mystery_box':
-      return <Gift className={cn("w-4 h-4", rarity === 'legendary' ? 'text-neo-yellow' : rarity === 'epic' ? 'text-neo-purple' : rarity === 'rare' ? 'text-neo-cyan' : 'text-neo-cream')} />;
+      return <Gift className={cn("w-4 h-4", rarity === 'legendary' ? 'text-neo-yellow' : rarity === 'epic' ? 'text-neo-pink' : rarity === 'rare' ? 'text-neo-cyan' : 'text-neo-cream')} />;
     case 'exclusive_title':
       return <Crown className="w-4 h-4 text-neo-pink" />;
     default:

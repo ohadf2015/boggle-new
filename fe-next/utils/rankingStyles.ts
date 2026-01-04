@@ -47,12 +47,12 @@ export const RANK_CONFIG: Record<1 | 2 | 3, RankConfig> = {
     iconColor: 'text-slate-400',
   },
   3: {
-    bg: 'bg-neo-orange',
-    border: 'border-neo-orange',
+    bg: 'bg-amber-500',
+    border: 'border-amber-500',
     text: 'text-neo-black',
-    rankText: 'text-neo-orange dark:text-neo-orange',
+    rankText: 'text-amber-500 dark:text-amber-500',
     icon: Medal,
-    iconColor: 'text-neo-orange',
+    iconColor: 'text-amber-500',
   },
 };
 
@@ -63,7 +63,7 @@ export const RANK_CONFIG: Record<1 | 2 | 3, RankConfig> = {
 export const RANK_COLORS_SIMPLE: Record<number, { bg: string; text: string }> = {
   1: { bg: 'bg-neo-yellow', text: 'text-neo-black' },
   2: { bg: 'bg-slate-300', text: 'text-slate-800' },
-  3: { bg: 'bg-neo-orange', text: 'text-neo-black' },
+  3: { bg: 'bg-amber-500', text: 'text-neo-black' },
 };
 
 /**
@@ -126,7 +126,7 @@ export function getRankDisplay(rank: number): string {
 export function getRankStyle(index: number): string {
   if (index === 0) return 'bg-neo-yellow text-neo-black border-neo-black';
   if (index === 1) return 'bg-slate-300 text-neo-black border-neo-black';
-  if (index === 2) return 'bg-neo-orange text-neo-black border-neo-black';
+  if (index === 2) return 'bg-amber-500 text-neo-black border-neo-black';
   return 'bg-neo-cream text-neo-black border-neo-black';
 }
 
@@ -138,7 +138,7 @@ export function getRankStyle(index: number): string {
 export function getRankBoxStyle(index: number): string {
   if (index === 0) return 'bg-neo-yellow border-neo-black';
   if (index === 1) return 'bg-slate-300 border-neo-black';
-  if (index === 2) return 'bg-neo-orange border-neo-black';
+  if (index === 2) return 'bg-amber-500 border-neo-black';
   return 'bg-neo-cream border-neo-black';
 }
 
@@ -150,7 +150,7 @@ export function getRankBoxStyle(index: number): string {
 export function getCardStyle(index: number): string {
   if (index === 0) return 'bg-neo-yellow border-neo-black';
   if (index === 1) return 'bg-slate-200 border-neo-black';
-  if (index === 2) return 'bg-neo-orange border-neo-black';
+  if (index === 2) return 'bg-amber-500 border-neo-black';
   return 'bg-neo-cream border-neo-black';
 }
 
@@ -194,7 +194,7 @@ export function getWaitingResultsRankStyle(index: number): string {
     return 'bg-gradient-to-r from-slate-300 via-slate-200 to-slate-300 text-neo-black font-bold border border-slate-400';
   }
   if (index === 2) {
-    return 'bg-gradient-to-r from-neo-orange via-orange-300 to-neo-orange text-neo-black font-bold border border-neo-orange';
+    return 'bg-gradient-to-r from-amber-500 via-orange-300 to-amber-500 text-neo-black font-bold border border-amber-500';
   }
   return 'bg-white/80 dark:bg-slate-700/80 text-neo-black dark:text-white border border-slate-200 dark:border-slate-600';
 }

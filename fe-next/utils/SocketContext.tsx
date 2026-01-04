@@ -154,7 +154,14 @@ export function SocketProvider({ children }: SocketProviderProps) {
     };
 
     const handleConnectError = (error: Error) => {
-      logger.error('[SOCKET.IO] Connection error:', error.message);
+      // Use warn for transient WebSocket errors (they auto-recover via polling fallback)
+      // These are common during dev server restarts or network hiccups
+      const isTransient = error.message === 'websocket error' || error.message === 'timeout';
+      if (isTransient) {
+        logger.warn('[SOCKET.IO] Connection error (will retry):', error.message);
+      } else {
+        logger.error('[SOCKET.IO] Connection error:', error.message);
+      }
       setConnectionError(error.message);
       setIsConnected(false);
     };

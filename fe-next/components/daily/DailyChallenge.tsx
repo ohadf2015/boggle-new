@@ -953,15 +953,15 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
             onClick={onShowTutorial}
             className={`text-sm font-bold transition-colors flex items-center gap-1 ${
               !tutorialCompleted
-                ? 'text-neo-purple dark:text-neo-purple-light hover:text-neo-purple-dark'
+                ? 'text-neo-pink dark:text-neo-pink-light hover:text-neo-pink-dark'
                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
             }`}
           >
             <span>?</span> {t('daily.howToPlay')}
             {!tutorialCompleted && (
               <span className="relative flex h-2 w-2 ml-1">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-neo-purple opacity-75 animate-ping" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-purple" />
+                <span className="absolute inline-flex h-full w-full rounded-full bg-neo-pink opacity-75 animate-ping" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-pink" />
               </span>
             )}
           </button>

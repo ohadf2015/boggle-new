@@ -2590,6 +2590,7 @@ const en = {
   "footer": {
     "aboutGame": "About the Game",
     "leaderboard": "Leaderboard",
+    "contact": "Contact",
     "interactiveTutorial": "Interactive Tutorial"
   },
   "support": {
@@ -2909,6 +2910,7 @@ const en = {
     "tookChallenge": "took the challenge",
     "signUpToAppear": "Sign up to appear on the leaderboard!",
     "showLeaderboard": "Show Leaderboard",
+    "tryAnotherLanguage": "Try the challenge in another language:",
     "carousel": {
       "step1Title": "Swipe to Find Words",
       "step1Desc": "Connect letters in any direction",
@@ -3333,13 +3335,7 @@ const en = {
     "sendAnother": "Send Another",
     "errorMessage": "Oops! Something went wrong. Give it another shot!",
     "responseTime": "We usually reply within a day or two"
-  },
-  "footer": {
-    "aboutGame": "About the Game",
-    "leaderboard": "Leaderboard",
-    "contact": "Contact",
-    "interactiveTutorial": "Interactive Tutorial"
   }
 };
 
-module.exports = { en };
+export { en };

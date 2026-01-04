@@ -38,7 +38,7 @@ interface StatsGridProps {
  *   stats={[
  *     { icon: <Hash />, iconBg: 'bg-neo-lime', value: 15, label: 'Words' },
  *     { icon: <Target />, iconBg: 'bg-neo-pink', value: '87%', label: 'Accuracy' },
- *     { icon: <Award />, iconBg: 'bg-neo-purple', value: 'CHAMPION', label: '12 pts', hiddenOnMobile: true },
+ *     { icon: <Award />, iconBg: 'bg-neo-pink', value: 'CHAMPION', label: '12 pts', hiddenOnMobile: true },
  *   ]}
  * />
  * ```
@@ -129,7 +129,7 @@ export function createGameStats(config: GameStatsConfig, t: (key: string) => str
   if (config.bestWord) {
     stats.push({
       icon: <Award className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-neo-cream" />,
-      iconBg: 'bg-neo-purple',
+      iconBg: 'bg-neo-pink',
       value: config.bestWord.word.toUpperCase(),
       label: config.bestWord.score
         ? `${config.bestWord.score} ${t('results.points') || 'pts'}`

@@ -142,7 +142,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
         onClick={onComplete}
       >
         {/* Compact toast container - Neo-Brutalist */}
-        <div className="relative overflow-hidden rounded-lg bg-neo-purple text-white border-3 border-neo-black shadow-hard-lg cursor-pointer hover:scale-[1.02] transition-transform">
+        <div className="relative overflow-hidden rounded-lg bg-neo-pink text-white border-3 border-neo-black shadow-hard-lg cursor-pointer hover:scale-[1.02] transition-transform">
           {/* Content */}
           <div className="p-3">
             <div className="flex items-center gap-3">

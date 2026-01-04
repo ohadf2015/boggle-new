@@ -172,7 +172,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
                 }}
                 className="
                   absolute -top-2 -right-2 w-6 h-6
-                  bg-neo-purple text-white rounded-full
+                  bg-neo-pink text-white rounded-full
                   border-2 border-neo-black shadow-hard-sm
                   flex items-center justify-center
                   hover:scale-110 transition-transform
@@ -250,7 +250,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.15 }}
                       >
-                        <div className="w-6 h-6 text-neo-purple drop-shadow-lg">
+                        <div className="w-6 h-6 text-neo-pink drop-shadow-lg">
                           <svg viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12.5 2.5a2.5 2.5 0 00-2.5 2.5v8.5a.5.5 0 01-1 0V8a2 2 0 10-4 0v9a7 7 0 0014 0v-6a2 2 0 00-4 0v2.5a.5.5 0 01-1 0V5a2.5 2.5 0 00-2.5-2.5z"/>
                           </svg>

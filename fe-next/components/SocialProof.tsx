@@ -131,7 +131,7 @@ const SocialProof: React.FC<SocialProofProps> = ({
           <Users className="w-3.5 h-3.5" />
           <span className="font-bold">{displayStats.playersOnline}</span>
         </div>
-        <div className="flex items-center gap-1.5 text-neo-orange">
+        <div className="flex items-center gap-1.5 text-neo-yellow">
           <Gamepad2 className="w-3.5 h-3.5" />
           <span className="font-bold">{displayStats.gamesActive}</span>
           <span className="text-neo-white/90">{t('social.games') || 'games'}</span>
@@ -147,7 +147,7 @@ const SocialProof: React.FC<SocialProofProps> = ({
       animate={{ opacity: 1, y: 0 }}
       className={cn(
         "relative overflow-hidden",
-        "bg-gradient-to-r from-neo-purple via-neo-purple-light to-neo-purple",
+        "bg-gradient-to-r from-neo-pink via-neo-pink-light to-neo-pink",
         "border-y-3 border-neo-black",
         className
       )}
@@ -188,7 +188,7 @@ const SocialProof: React.FC<SocialProofProps> = ({
           transition={{ delay: 0.2, type: 'spring' }}
           className="flex items-center gap-2"
         >
-          <Flame className="text-neo-orange w-4 h-4 animate-pulse" />
+          <Flame className="text-neo-yellow w-4 h-4 animate-pulse" />
           <span className="font-black text-neo-white">
             {displayStats.gamesActive}
           </span>

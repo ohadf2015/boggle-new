@@ -151,7 +151,7 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
           'transition-all duration-300',
           status === 'connected' && 'bg-neo-lime',
           status === 'connecting' && 'bg-neo-yellow animate-pulse',
-          status === 'reconnecting' && 'bg-neo-orange animate-pulse',
+          status === 'reconnecting' && 'bg-neo-yellow animate-pulse',
           status === 'disconnected' && 'bg-neo-red'
         )}
         aria-hidden="true"
@@ -164,7 +164,7 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
             'text-xs font-bold uppercase tracking-wide',
             status === 'connected' && 'text-neo-lime',
             status === 'connecting' && 'text-neo-yellow',
-            status === 'reconnecting' && 'text-neo-orange',
+            status === 'reconnecting' && 'text-neo-yellow',
             status === 'disconnected' && 'text-neo-red'
           )}
         >
@@ -262,7 +262,7 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className })
                   transition={{ duration: 1.5, repeat: Infinity }}
                   className={cn(
                     'w-4 h-4 rounded-full border-2 border-neo-black',
-                    status === 'reconnecting' && 'bg-neo-orange',
+                    status === 'reconnecting' && 'bg-neo-yellow',
                     status === 'disconnected' && 'bg-neo-yellow',
                     status === 'connecting' && 'bg-neo-yellow'
                   )}

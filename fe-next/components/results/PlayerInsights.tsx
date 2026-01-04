@@ -262,8 +262,8 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
       subValue: insights.longestWordLength > 0
         ? `${insights.longestWordLength} ${t('insights.letters') || 'letters'}`
         : null,
-      color: 'var(--neo-purple)',
-      bgColor: 'var(--neo-purple)',
+      color: 'var(--neo-pink)',
+      bgColor: 'var(--neo-pink)',
     },
     {
       icon: Zap,
@@ -278,8 +278,8 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
       label: t('insights.avgWordLength') || 'Avg Length',
       value: insights.averageWordLength,
       subValue: t('insights.letters') || 'letters',
-      color: 'var(--neo-orange)',
-      bgColor: 'var(--neo-orange)',
+      color: 'var(--neo-yellow)',
+      bgColor: 'var(--neo-yellow)',
     },
     {
       icon: Target,
@@ -310,7 +310,7 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
           transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
           className={cn(
             'mb-3 p-3 rounded-neo border-3 border-neo-black',
-            'bg-gradient-to-br from-neo-purple to-neo-purple-light',
+            'bg-gradient-to-br from-neo-pink to-neo-pink-light',
             'shadow-hard relative overflow-hidden texture-halftone-comic-dense'
           )}
         >
@@ -432,7 +432,7 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
               {t('insights.mid') || 'M'}: {insights.midGameWords}
             </span>
             <span
-              className="px-1.5 py-0.5 rounded border border-gray-400 bg-neo-orange/50 text-neo-black"
+              className="px-1.5 py-0.5 rounded border border-gray-400 bg-neo-yellow/50 text-neo-black"
               title={t('insights.late') || 'Late'}
             >
               {t('insights.late') || 'L'}: {insights.lateGameWords}

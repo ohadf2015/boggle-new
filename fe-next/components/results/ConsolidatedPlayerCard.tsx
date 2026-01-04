@@ -71,7 +71,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
   const rankColors: Record<number, { bg: string; text: string }> = {
     1: { bg: 'bg-neo-yellow', text: 'text-neo-black' },
     2: { bg: 'bg-slate-300', text: 'text-slate-800' },
-    3: { bg: 'bg-neo-orange', text: 'text-neo-black' },
+    3: { bg: 'bg-neo-yellow', text: 'text-neo-black' },
   };
   const rankStyle = rankColors[rank] || { bg: 'bg-neo-cream', text: 'text-neo-black' };
 
@@ -261,7 +261,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
             {/* Best Word - Hidden on mobile (available in details), shown on sm+ */}
             <div className="hidden sm:block bg-white/10 rounded-neo border border-white/20 p-1.5 sm:p-2 text-center">
               <div className="flex justify-center mb-0.5 sm:mb-1">
-                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded bg-neo-purple text-white border border-neo-black flex items-center justify-center">
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded bg-neo-pink text-white border border-neo-black flex items-center justify-center">
                   <Award className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-neo-cream" />
                 </div>
               </div>
@@ -369,7 +369,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
               <button
                 onClick={() => setShowXp(!showXp)}
                 aria-expanded={showXp}
-                className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border sm:border-2 border-neo-purple/50 bg-neo-purple/10 hover:bg-neo-purple/20 transition-colors mb-1.5 sm:mb-2"
+                className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border sm:border-2 border-neo-pink/50 bg-neo-pink/10 hover:bg-neo-pink/20 transition-colors mb-1.5 sm:mb-2"
               >
                 <span className="flex items-center gap-1.5 sm:gap-2">
                   <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

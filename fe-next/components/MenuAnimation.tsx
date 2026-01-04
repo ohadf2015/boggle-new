@@ -136,8 +136,8 @@ const BRUTALIST_COLORS: ColorScheme[] = [
   { bg: 'var(--neo-pink)', border: 'var(--neo-black)' },
   { bg: 'var(--neo-lime)', border: 'var(--neo-black)' },
   { bg: 'var(--neo-cyan)', border: 'var(--neo-black)' },
-  { bg: 'var(--neo-orange)', border: 'var(--neo-black)' },
-  { bg: 'var(--neo-purple-light)', border: 'var(--neo-black)' },
+  { bg: 'var(--neo-red)', border: 'var(--neo-black)' },
+  { bg: 'var(--neo-pink-light)', border: 'var(--neo-black)' },
   { bg: 'var(--neo-cream)', border: 'var(--neo-black)' },
 ];
 

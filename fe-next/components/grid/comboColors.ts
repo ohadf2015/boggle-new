@@ -1,6 +1,7 @@
 /**
  * Combo Colors
  * NEO-BRUTALIST FLAT COLORS with hard shadows for combo levels
+ * Uses simplified 5-color palette: yellow, pink, cyan, red, lime
  */
 
 import type { ComboColors } from './types';
@@ -24,26 +25,17 @@ export function getComboColors(level: number): ComboColors {
       flicker: false
     };
   } else if (level === 1) {
-    // +1 - Orange
+    // +1 - Pink Light (starting combo)
     return {
-      bg: 'bg-neo-orange',
-      border: 'border-neo-black',
-      shadow: 'shadow-hard-lg',
-      text: bonusText,
-      flicker: false
-    };
-  } else if (level === 2) {
-    // +2 - Red
-    return {
-      bg: 'bg-neo-red',
+      bg: 'bg-neo-pink-light',
       border: 'border-neo-black',
       shadow: 'shadow-hard-lg',
       text: bonusText,
       flicker: false,
-      textColor: 'text-neo-white'
+      textColor: 'text-neo-black'
     };
-  } else if (level === 3) {
-    // +3 - Pink
+  } else if (level === 2) {
+    // +2 - Pink (building momentum)
     return {
       bg: 'bg-neo-pink',
       border: 'border-neo-black',
@@ -52,27 +44,38 @@ export function getComboColors(level: number): ComboColors {
       flicker: false,
       textColor: 'text-neo-white'
     };
-  } else if (level === 4) {
-    // +4 - Purple
+  } else if (level === 3) {
+    // +3 - Red (getting hot!)
     return {
-      bg: 'bg-neo-purple',
+      bg: 'bg-neo-red',
       border: 'border-neo-black',
-      shadow: 'shadow-hard-xl',
+      shadow: 'shadow-hard-lg',
       text: bonusText,
       flicker: false,
       textColor: 'text-neo-white'
     };
-  } else if (level === 5) {
-    // +5 (max bonus) - Cyan
+  } else if (level === 4) {
+    // +4 - Cyan (high combo)
     return {
       bg: 'bg-neo-cyan',
       border: 'border-neo-black',
       shadow: 'shadow-hard-xl',
       text: bonusText,
-      flicker: false
+      flicker: false,
+      textColor: 'text-neo-black'
+    };
+  } else if (level === 5) {
+    // +5 (max bonus) - Cyan with muted variant
+    return {
+      bg: 'bg-neo-cyan-muted',
+      border: 'border-neo-black',
+      shadow: 'shadow-hard-xl',
+      text: bonusText,
+      flicker: false,
+      textColor: 'text-neo-black'
     };
   } else if (level === 6) {
-    // +5 (visual level 6) - Lime
+    // +5 (visual level 6) - Lime (success!)
     return {
       bg: 'bg-neo-lime',
       border: 'border-neo-black',

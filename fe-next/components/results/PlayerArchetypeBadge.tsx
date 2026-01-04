@@ -144,8 +144,8 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
   const bgColorMap: Record<string, string> = {
     strategist: 'bg-neo-cyan',
     speedster: 'bg-neo-yellow',
-    scholar: 'bg-neo-purple',
-    explorer: 'bg-neo-orange',
+    scholar: 'bg-neo-pink',
+    explorer: 'bg-neo-red',
     perfectionist: 'bg-neo-pink',
     maverick: 'bg-neo-red',
     workhorse: 'bg-amber-400',

@@ -122,8 +122,8 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
             className={cn(
               'w-3 h-3 min-w-3 min-h-3 flex-none rounded-full border-2 border-neo-black transition-all duration-300 ease-out',
               i === currentStep
-                ? 'bg-neo-purple scale-125 shadow-[2px_2px_0px_rgb(0,0,0)]'
-                : 'bg-neo-cream dark:bg-gray-600 hover:bg-neo-purple/30 hover:scale-110'
+                ? 'bg-neo-pink scale-125 shadow-[2px_2px_0px_rgb(0,0,0)]'
+                : 'bg-neo-cream dark:bg-gray-600 hover:bg-neo-pink/30 hover:scale-110'
             )}
             aria-label={`Go to step ${i + 1}`}
           />
@@ -142,7 +142,7 @@ const Step1SwipeDemo: React.FC<{ isRTL: boolean; t: (key: string) => string }> =
 
   return (
     <div className="text-center py-2">
-      <div className="text-base font-bold text-neo-purple dark:text-neo-purple-light mb-4">
+      <div className="text-base font-bold text-neo-pink dark:text-neo-pink-light mb-4">
         {t('daily.carousel.step1Title') || 'Swipe to Find Words'}
       </div>
 
@@ -213,7 +213,7 @@ const Step2ColorFeedback: React.FC<{ t: (key: string) => string }> = ({ t }) => 
 
   return (
     <div className="text-center py-2">
-      <div className="text-base font-bold text-neo-purple dark:text-neo-purple-light mb-4">
+      <div className="text-base font-bold text-neo-pink dark:text-neo-pink-light mb-4">
         {t('daily.carousel.step2Title') || 'Color Clues'}
       </div>
 
@@ -274,7 +274,7 @@ const Step3FindWord: React.FC<{ targetWordLength: number; t: (key: string, param
 
   return (
     <div className="text-center py-2">
-      <div className="text-base font-bold text-neo-purple dark:text-neo-purple-light mb-4">
+      <div className="text-base font-bold text-neo-pink dark:text-neo-pink-light mb-4">
         {t('daily.carousel.step3Title') || 'Find the Hidden Word'}
       </div>
 
@@ -309,13 +309,13 @@ const Step3FindWord: React.FC<{ targetWordLength: number; t: (key: string, param
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        <HelpCircle className="w-5 h-5 text-neo-purple dark:text-neo-purple-light" />
+        <HelpCircle className="w-5 h-5 text-neo-pink dark:text-neo-pink-light" />
         <span className="text-sm font-bold text-neo-black dark:text-white">
           {t('daily.carousel.step3Desc') || '10 tries to crack the code'}
         </span>
       </motion.div>
 
-      <div className="text-xs text-neo-purple dark:text-neo-purple-light font-bold mt-3">
+      <div className="text-xs text-neo-pink dark:text-neo-pink-light font-bold mt-3">
         {t('daily.carousel.step3Hint', { length: targetWordLength }) || `Guess ${targetWordLength}-letter words to reveal clues`}
       </div>
     </div>
@@ -326,7 +326,7 @@ const Step3FindWord: React.FC<{ targetWordLength: number; t: (key: string, param
 const Step4ClueRevelation: React.FC<{ t: (key: string) => string }> = ({ t }) => {
   return (
     <div className="text-center py-2">
-      <div className="text-base font-bold text-neo-purple dark:text-neo-purple-light mb-4">
+      <div className="text-base font-bold text-neo-pink dark:text-neo-pink-light mb-4">
         {t('daily.carousel.step4Title') || 'Discover Words, Reveal Clues'}
       </div>
 
@@ -364,7 +364,7 @@ const Step4ClueRevelation: React.FC<{ t: (key: string) => string }> = ({ t }) =>
 
         {/* Arrow */}
         <motion.div
-          className="text-neo-purple dark:text-neo-purple-light text-2xl"
+          className="text-neo-pink dark:text-neo-pink-light text-2xl"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}

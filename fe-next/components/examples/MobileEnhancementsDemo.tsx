@@ -84,7 +84,7 @@ export const MobileEnhancementsDemo: React.FC = () => {
         </p>
 
         {pullState.isRefreshing && (
-          <div className="text-center text-neo-purple font-bold mt-4">
+          <div className="text-center text-neo-pink font-bold mt-4">
             Refreshing...
           </div>
         )}
@@ -146,7 +146,7 @@ export const MobileEnhancementsDemo: React.FC = () => {
               key={i}
               className={`h-2 rounded-full transition-all ${
                 i + 1 === currentPage
-                  ? 'w-8 bg-neo-purple'
+                  ? 'w-8 bg-neo-pink'
                   : 'w-2 bg-gray-300'
               }`}
             />

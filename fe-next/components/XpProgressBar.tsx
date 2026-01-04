@@ -176,7 +176,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
                 'text-xs font-bold flex items-center gap-1',
                 canPrestige
                   ? 'text-neo-yellow animate-pulse cursor-pointer hover:underline'
-                  : 'text-neo-purple'
+                  : 'text-neo-pink'
               )}
             >
               {canPrestige && <Sparkles className="w-3 h-3" />}
@@ -204,7 +204,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
           transition={{ duration: 0.8, ease: 'easeOut' }}
           className={cn(
             'absolute inset-y-0 left-0',
-            'bg-gradient-to-r from-neo-cyan via-neo-purple to-neo-pink',
+            'bg-gradient-to-r from-neo-cyan via-neo-pink to-neo-pink',
             'shadow-sm'
           )}
         />

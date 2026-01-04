@@ -138,8 +138,8 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
       switch (visibleFeedback?.type) {
         case 'accepted': return 'bg-neo-lime';
         case 'rejected': return 'bg-neo-red';
-        case 'duplicate': return 'bg-neo-orange';
-        case 'foundByOther': return 'bg-neo-orange';
+        case 'duplicate': return 'bg-neo-pink';
+        case 'foundByOther': return 'bg-neo-pink';
         case 'pending': return 'bg-neo-yellow';
         default: return 'bg-neo-cyan';
       }

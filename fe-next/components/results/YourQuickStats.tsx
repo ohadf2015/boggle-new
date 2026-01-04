@@ -51,7 +51,7 @@ const YourQuickStats = memo<YourQuickStatsProps>(({
   const rankColors: Record<number, { bg: string; text: string; border: string }> = {
     1: { bg: 'bg-neo-yellow', text: 'text-neo-black', border: 'border-neo-black' },
     2: { bg: 'bg-slate-300', text: 'text-slate-800', border: 'border-neo-black' },
-    3: { bg: 'bg-neo-orange', text: 'text-neo-black', border: 'border-neo-black' },
+    3: { bg: 'bg-neo-yellow', text: 'text-neo-black', border: 'border-neo-black' },
   };
 
   const rankStyle = rankColors[rank] || { bg: 'bg-neo-cream', text: 'text-neo-black', border: 'border-neo-black' };
@@ -187,7 +187,7 @@ const YourQuickStats = memo<YourQuickStatsProps>(({
               className="bg-white/10 rounded-neo border border-white/20 p-1.5 text-center"
             >
               <div className="flex justify-center mb-0.5">
-                <div className="w-5 h-5 rounded bg-neo-purple text-white border border-neo-black flex items-center justify-center">
+                <div className="w-5 h-5 rounded bg-neo-pink text-white border border-neo-black flex items-center justify-center">
                   <Award className="w-3 h-3 text-neo-cream" />
                 </div>
               </div>

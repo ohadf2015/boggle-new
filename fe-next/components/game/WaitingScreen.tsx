@@ -71,7 +71,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
 
           {/* Language Badge */}
           {gameLanguage && (
-            <Badge className="text-sm px-3 py-1.5 bg-neo-purple text-white border-3 border-neo-black w-full text-center" dir="auto">
+            <Badge className="text-sm px-3 py-1.5 bg-neo-pink text-white border-3 border-neo-black w-full text-center" dir="auto">
               {gameLanguage === 'he' ? '🇮🇱' : gameLanguage === 'sv' ? '🇸🇪' : gameLanguage === 'ja' ? '🇯🇵' : '🇺🇸'}
             </Badge>
           )}
@@ -103,7 +103,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
             variant="ghost"
             size="sm"
             onClick={() => setShowQR(true)}
-            className="w-full h-12 min-h-[48px] p-0 bg-neo-purple/90 hover:bg-neo-purple border-3 border-neo-black rounded-neo flex items-center justify-center shadow-hard"
+            className="w-full h-12 min-h-[48px] p-0 bg-neo-pink/90 hover:bg-neo-pink border-3 border-neo-black rounded-neo flex items-center justify-center shadow-hard"
             title={t('hostView.qrCode')}
           >
             <QrCode className="w-4 h-4 text-neo-cream" />
@@ -263,7 +263,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                   </h2>
                 </div>
                 {gameLanguage && (
-                  <Badge className="text-base sm:text-lg px-3 py-1 bg-neo-purple text-white border-3 border-neo-black shadow-hard-sm font-bold" dir="auto">
+                  <Badge className="text-base sm:text-lg px-3 py-1 bg-neo-pink text-white border-3 border-neo-black shadow-hard-sm font-bold" dir="auto">
                     {gameLanguage === 'he' ? '🇮🇱 עברית' : gameLanguage === 'sv' ? '🇸🇪 Svenska' : gameLanguage === 'ja' ? '🇯🇵 日本語' : '🇺🇸 English'}
                   </Badge>
                 )}

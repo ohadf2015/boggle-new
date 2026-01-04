@@ -216,10 +216,10 @@ const BotControls: React.FC<BotControlsProps> = ({
       </AnimatePresence>
 
       {/* Auto-fill Card - Promoted to top */}
-      <div className="bg-neo-purple/10 text-white border-2 border-neo-purple rounded-neo p-3 shadow-hard-sm">
+      <div className="bg-neo-pink/10 text-white border-2 border-neo-pink rounded-neo p-3 shadow-hard-sm">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <Wand2 className="text-neo-purple shrink-0" aria-hidden="true" />
+            <Wand2 className="text-neo-pink shrink-0" aria-hidden="true" />
             <div className="min-w-0">
               <label
                 htmlFor="auto-fill-switch"

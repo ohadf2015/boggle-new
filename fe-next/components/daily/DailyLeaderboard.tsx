@@ -465,7 +465,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
           <Button
             onClick={handleShareRank}
             size="sm"
-            className="px-3 py-1 h-8 bg-neo-purple hover:bg-neo-purple/90 text-white border-2 border-neo-black rounded-xl shadow-sm hover:-translate-y-0.5 transition-all"
+            className="px-3 py-1 h-8 bg-neo-pink hover:bg-neo-pink/90 text-white border-2 border-neo-black rounded-xl shadow-sm hover:-translate-y-0.5 transition-all"
             aria-label="Share your rank"
           >
             {copied ? (
@@ -537,7 +537,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       {/* Loading state */}
       {loading && participants.length === 0 && (
         <div className="flex items-center justify-center py-8">
-          <div className="w-8 h-8 border-3 border-neo-purple border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-3 border-neo-pink border-t-transparent rounded-full animate-spin" />
         </div>
       )}
 

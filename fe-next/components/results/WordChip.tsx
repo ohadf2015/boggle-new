@@ -58,8 +58,8 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
 
   // Get color based on score - Neo-Brutalist solid colors
   const getBackgroundColor = (): string => {
-    if (isDuplicate) return 'var(--neo-orange)';
-    if (isPending) return 'var(--neo-purple)';
+    if (isDuplicate) return 'var(--neo-pink)';
+    if (isPending) return 'var(--neo-cyan)';
     if (!isValid) return '#DC2626'; // Darker red for 4.6:1 contrast with cream text
     return getPointColor(wordObj.score);
   };
@@ -123,7 +123,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
             </TooltipTrigger>
             <TooltipContent
               side="top"
-              className="bg-neo-orange text-neo-black border-2 border-neo-black shadow-hard rounded-neo p-2"
+              className="bg-neo-red text-neo-cream border-2 border-neo-black shadow-hard rounded-neo p-2"
             >
               <p className="text-xs font-bold text-neo-black">
                 {t('results.fireRoundBonus') || 'Fire Round Bonus!'}
@@ -146,7 +146,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
             </TooltipTrigger>
             <TooltipContent
               side="top"
-              className="bg-neo-purple text-white border-2 border-neo-black shadow-hard rounded-neo p-2"
+              className="bg-neo-pink text-white border-2 border-neo-black shadow-hard rounded-neo p-2"
             >
               <p className="text-xs font-bold text-neo-cream">
                 {t('results.pendingValidation') || 'Pending community validation'}
@@ -165,13 +165,13 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
         <TooltipProvider delayDuration={0}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <span className="text-xs px-1.5 py-0.5 bg-neo-purple text-neo-cream rounded border border-neo-black font-black cursor-help">
+              <span className="text-xs px-1.5 py-0.5 bg-neo-pink text-neo-cream rounded border border-neo-black font-black cursor-help">
                 AI
               </span>
             </TooltipTrigger>
             <TooltipContent
               side="top"
-              className="bg-neo-purple text-white border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px]"
+              className="bg-neo-pink text-white border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px]"
             >
               <p className="text-xs font-bold text-neo-cream">{t('results.aiVerified') || 'Verified by AI'}</p>
               {aiReason && (
@@ -199,7 +199,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
             >
               {isAiVerified && (
                 <p className="font-black text-xs uppercase flex items-center gap-1.5 mb-1.5 text-neo-yellow">
-                  <span className="px-1.5 py-0.5 bg-neo-purple rounded border border-neo-black text-neo-cream">AI</span>
+                  <span className="px-1.5 py-0.5 bg-neo-pink rounded border border-neo-black text-neo-cream">AI</span>
                   {t('results.aiRejected') || 'Rejected by AI'}
                 </p>
               )}
@@ -251,7 +251,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
                 {/* AI rejection indicator */}
                 {isAiVerified && (
                   <p className="text-[11px] font-bold text-neo-yellow mb-2 flex items-center gap-1">
-                    <span className="px-1.5 py-0.5 bg-neo-purple rounded border border-neo-black text-neo-cream">AI</span>
+                    <span className="px-1.5 py-0.5 bg-neo-pink rounded border border-neo-black text-neo-cream">AI</span>
                     {t('results.aiRejected') || 'Rejected by AI'}
                   </p>
                 )}

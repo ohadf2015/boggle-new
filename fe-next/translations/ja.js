@@ -2583,6 +2583,7 @@ const ja = {
   "footer": {
     "aboutGame": "ゲームについて",
     "leaderboard": "ランキング",
+    "contact": "お問い合わせ",
     "interactiveTutorial": "インタラクティブチュートリアル"
   },
   "support": {
@@ -2902,6 +2903,7 @@ const ja = {
     "tookChallenge": "{count}人がチャレンジしました",
     "signUpToAppear": "リーダーボードに表示されるには登録してください",
     "showLeaderboard": "リーダーボードを表示",
+    "tryAnotherLanguage": "他の言語でチャレンジ：",
     "carousel": {
       "step1Title": "スワイプで単語を作ろう",
       "step1Desc": "どの方向でも文字を繋げよう",
@@ -3319,13 +3321,7 @@ const ja = {
     "sendAnother": "もう一通送る",
     "errorMessage": "おっと！送信できなかった。もう一度試してね！",
     "responseTime": "だいたい1〜2日で返信するよ"
-  },
-  "footer": {
-    "aboutGame": "ゲームについて",
-    "leaderboard": "リーダーボード",
-    "contact": "お問い合わせ",
-    "interactiveTutorial": "インタラクティブチュートリアル"
   }
 };
 
-module.exports = { ja };
+export { ja };

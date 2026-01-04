@@ -106,20 +106,20 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     aria-label={t('common.goToHome') || 'Go to home page'}
                 >
                     {/* Small yellow sparkle - top left decorative */}
-                    <svg className="w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3 absolute -top-1 xs:-top-2 left-2 xs:left-4 text-neo-yellow hidden xs:block" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3 absolute -top-1 xs:-top-2 left-2 xs:left-4 text-neo-yellow hidden xs:block animate-sparkle-left" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 0L14 10L24 12L14 14L12 24L10 14L0 12L10 10L12 0Z"/>
                     </svg>
 
                     {/* Pink lightning bolt - left */}
                     <svg
-                        className="w-4 h-5 xs:w-5 xs:h-6 sm:w-6 sm:h-7 lg:w-7 lg:h-8 xl:w-8 xl:h-10 flex-shrink-0"
+                        className="w-4 h-5 xs:w-5 xs:h-6 sm:w-6 sm:h-7 lg:w-7 lg:h-8 xl:w-8 xl:h-10 flex-shrink-0 text-neo-pink animate-lightning-left"
                         viewBox="0 0 24 32"
                         fill="none"
                         style={{ transform: 'rotate(-15deg)' }}
                     >
                         <path
                             d="M14 2L4 18h7l-3 12 13-18h-8l5-10H14z"
-                            fill="var(--neo-pink)"
+                            fill="currentColor"
                             stroke="#1a365d"
                             strokeWidth="2"
                             strokeLinejoin="round"
@@ -156,14 +156,14 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
 
                     {/* Yellow lightning bolt - right */}
                     <svg
-                        className="w-4 h-5 xs:w-5 xs:h-6 sm:w-6 sm:h-7 lg:w-7 lg:h-8 xl:w-8 xl:h-10 flex-shrink-0"
+                        className="w-4 h-5 xs:w-5 xs:h-6 sm:w-6 sm:h-7 lg:w-7 lg:h-8 xl:w-8 xl:h-10 flex-shrink-0 text-neo-yellow animate-lightning-right"
                         viewBox="0 0 24 32"
                         fill="none"
                         style={{ transform: 'rotate(15deg)' }}
                     >
                         <path
                             d="M14 2L4 18h7l-3 12 13-18h-8l5-10H14z"
-                            fill="var(--neo-yellow)"
+                            fill="currentColor"
                             stroke="#1a365d"
                             strokeWidth="2"
                             strokeLinejoin="round"
@@ -171,7 +171,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     </svg>
 
                     {/* Small pink sparkle - top right decorative */}
-                    <svg className="w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3 absolute -top-1 xs:-top-2 right-0 xs:right-2 text-neo-pink hidden xs:block" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3 absolute -top-1 xs:-top-2 right-0 xs:right-2 text-neo-pink hidden xs:block animate-sparkle-right" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 0L14 10L24 12L14 14L12 24L10 14L0 12L10 10L12 0Z"/>
                     </svg>
                 </motion.button>
@@ -207,7 +207,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             className="
                                 flex items-center justify-center
                                 min-w-[48px] min-h-[48px] w-12 h-12 lg:w-12 lg:h-12 xl:w-12 xl:h-12 2xl:w-14 2xl:h-14
-                                bg-neo-purple text-white
+                                bg-neo-pink text-white
                                 border-3 lg:border-3 2xl:border-3 border-neo-black
                                 rounded-neo lg:rounded-neo
                                 shadow-hard lg:shadow-hard 2xl:shadow-hard-lg
@@ -395,7 +395,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 className="
                                                     flex items-center justify-center
                                                     min-w-[48px] min-h-[48px] w-12 h-12
-                                                    bg-neo-purple text-white
+                                                    bg-neo-pink text-white
                                                     border-2 border-neo-black
                                                     rounded-neo shadow-hard-sm
                                                     active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
@@ -469,7 +469,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 "shadow-hard-sm hover:shadow-hard"
                                             )}
                                         >
-                                            <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-purple-light border-2 border-neo-black">
+                                            <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-pink-light border-2 border-neo-black">
                                                 <Shield className="w-4 h-4 text-neo-black" />
                                             </span>
                                             <span>{t('legal.privacyPolicy')}</span>

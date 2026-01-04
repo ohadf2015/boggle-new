@@ -91,9 +91,9 @@ export const DailyChallengeTutorial: React.FC<DailyChallengeTutorialProps> = ({
               className={cn(
                 'h-2 rounded-full transition-all',
                 i + 1 === currentStep
-                  ? 'w-8 bg-neo-purple'
+                  ? 'w-8 bg-neo-pink'
                   : i + 1 < currentStep
-                  ? 'w-2 bg-neo-purple'
+                  ? 'w-2 bg-neo-pink'
                   : 'w-2 bg-gray-300 dark:bg-gray-600'
               )}
             />
@@ -133,7 +133,7 @@ const Step1Welcome: React.FC<{ onNext: () => void }> = ({ onNext }) => {
       <p className="text-lg mb-6">
         {t('tutorial.wordHunt.welcome.description') || 'Find the hidden word! You have 10 attempts.'}
       </p>
-      <Button onClick={onNext} className="w-full bg-neo-purple text-white">
+      <Button onClick={onNext} className="w-full bg-neo-pink text-white">
         {t('tutorial.wordHunt.welcome.next') || 'Next'} <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
       </Button>
     </div>
@@ -188,7 +188,7 @@ const Step2WordDiscovery: React.FC<{ onNext: () => void; onPrev: () => void }> =
         <Button onClick={onPrev} variant="outline" className="flex-1">
           ← {t('common.back') || 'Back'}
         </Button>
-        <Button onClick={onNext} className="flex-1 bg-neo-purple text-white">
+        <Button onClick={onNext} className="flex-1 bg-neo-pink text-white">
           {t('tutorial.wordHunt.lifeSystem.tryIt') || 'Got it!'} <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
         </Button>
       </div>
@@ -234,7 +234,7 @@ const Step3LetterFeedback: React.FC<{ onNext: () => void; onPrev: () => void }> 
         <Button onClick={onPrev} variant="outline" className="flex-1">
           ← {t('common.back') || 'Back'}
         </Button>
-        <Button onClick={onNext} className="flex-1 bg-neo-purple text-white">
+        <Button onClick={onNext} className="flex-1 bg-neo-pink text-white">
           {t('tutorial.wordHunt.letterFeedback.gotIt') || 'Got it!'} <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
         </Button>
       </div>
@@ -279,11 +279,11 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
 
         {/* Uses a try */}
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-neo-purple text-neo-white rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 bg-neo-pink text-neo-white rounded-full flex items-center justify-center">
             <span className="text-white font-bold text-xs">-1</span>
           </div>
           <div>
-            <div className="font-bold text-neo-purple">BEACH</div>
+            <div className="font-bold text-neo-pink">BEACH</div>
             <div className="text-xs text-gray-600 dark:text-gray-400">
               {t('tutorial.wordHunt.triesRule.usesAttempt') || '5 letters = uses a try'}
             </div>
@@ -328,7 +328,7 @@ const Step4MinimumLength: React.FC<{ onNext: () => void; onPrev: () => void }> =
         <Button onClick={onPrev} variant="outline" className="flex-1">
           ← {t('common.back') || 'Back'}
         </Button>
-        <Button onClick={onNext} className="flex-1 bg-neo-purple text-white">
+        <Button onClick={onNext} className="flex-1 bg-neo-pink text-white">
           {t('tutorial.wordHunt.triesRule.gotIt') || 'Got it!'} <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
         </Button>
       </div>
@@ -357,7 +357,7 @@ const Step5Summary: React.FC<{ onNext: () => void; onPrev: () => void }> = ({
       </div>
 
       <div className="flex flex-col gap-2">
-        <Button onClick={onNext} className="w-full bg-neo-purple text-white text-lg py-6">
+        <Button onClick={onNext} className="w-full bg-neo-pink text-white text-lg py-6">
           {t('tutorial.wordHunt.complete.start') || 'Start Daily Challenge'} 🚀
         </Button>
         <Button onClick={onPrev} variant="outline" size="sm">

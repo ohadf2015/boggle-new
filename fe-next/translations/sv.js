@@ -2584,6 +2584,7 @@ const sv = {
   "footer": {
     "aboutGame": "Om Spelet",
     "leaderboard": "Topplista",
+    "contact": "Kontakt",
     "interactiveTutorial": "Interaktiv handledning"
   },
   "support": {
@@ -2903,6 +2904,7 @@ const sv = {
     "tookChallenge": "tog utmaningen",
     "signUpToAppear": "Registrera dig för att synas på topplistan!",
     "showLeaderboard": "Visa topplistan",
+    "tryAnotherLanguage": "Prova utmaningen på ett annat språk:",
     "carousel": {
       "step1Title": "Svep för att hitta ord",
       "step1Desc": "Koppla bokstäver i alla riktningar",
@@ -3320,13 +3322,7 @@ const sv = {
     "sendAnother": "Skicka ett till",
     "errorMessage": "Hoppsan! Något gick fel. Försök igen!",
     "responseTime": "Vi svarar oftast inom en dag eller två"
-  },
-  "footer": {
-    "aboutGame": "Om spelet",
-    "leaderboard": "Topplista",
-    "contact": "Kontakt",
-    "interactiveTutorial": "Interaktiv handledning"
   }
 };
 
-module.exports = { sv };
+export { sv };

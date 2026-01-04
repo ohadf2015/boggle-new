@@ -83,7 +83,7 @@ export function KeyboardHintTooltip({
           className={cn(
             'fixed bottom-20 right-4 z-50',
             'max-w-[280px] sm:max-w-[320px]',
-            'bg-neo-purple text-white',
+            'bg-neo-pink text-white',
             'border-4 border-neo-black',
             'rounded-neo-lg shadow-hard-xl',
             'p-4'
@@ -154,7 +154,7 @@ export function KeyboardHintTooltip({
 
           {/* Pointer arrow */}
           <div className="absolute bottom-[-12px] right-8 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[12px] border-t-neo-black" />
-          <div className="absolute bottom-[-8px] right-[34px] w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-neo-purple" />
+          <div className="absolute bottom-[-8px] right-[34px] w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-neo-pink" />
         </motion.div>
       )}
     </AnimatePresence>

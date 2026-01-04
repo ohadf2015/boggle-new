@@ -442,7 +442,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             initial={{ scale: 0, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', delay: 0.3 }}
-            className="inline-block px-6 py-3 bg-gradient-to-r from-neo-orange to-neo-pink rounded-neo border-3 border-neo-black shadow-hard"
+            className="inline-block px-6 py-3 bg-gradient-to-r from-neo-pink to-neo-red rounded-neo border-3 border-neo-black shadow-hard"
           >
             <div className="flex items-center gap-2">
               <Flame className="w-6 h-6 text-white animate-pulse" />
@@ -472,7 +472,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           </div>
 
           <div className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-2 border-neo-black dark:border-white/20 p-2 shadow-hard-sm">
-            <Flame className="w-4 h-4 mx-auto mb-0.5 text-neo-orange" />
+            <Flame className="w-4 h-4 mx-auto mb-0.5 text-neo-red" />
             <div className="text-lg font-black text-neo-black dark:text-white">
               {streak?.currentStreak ?? 0}
             </div>
@@ -482,7 +482,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           </div>
 
           <div className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-2 border-neo-black dark:border-white/20 p-2 shadow-hard-sm">
-            <Clock className="w-4 h-4 mx-auto mb-0.5 text-neo-purple" />
+            <Clock className="w-4 h-4 mx-auto mb-0.5 text-neo-cyan" />
             <div className="text-lg font-black text-neo-black dark:text-white">
               {Math.floor(result.timeSeconds / 60)}<span className="text-xs font-bold text-gray-500">m</span> {(result.timeSeconds % 60).toString().padStart(2, '0')}<span className="text-xs font-bold text-gray-500">s</span>
             </div>
@@ -530,7 +530,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           {/* Main share button */}
           <Button
             onClick={handleNativeShare}
-            className="w-full py-3 text-base font-black uppercase bg-gradient-to-r from-neo-yellow to-neo-orange text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all duration-150"
+            className="w-full py-3 text-base font-black uppercase bg-gradient-to-r from-neo-yellow to-neo-pink text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all duration-150"
           >
             <Share2 className="mr-2 w-5 h-5" />
             {t('daily.shareScore')}
@@ -558,7 +558,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               onClick={handleGenerateImage}
               disabled={isGeneratingImage}
               aria-label={t('daily.shareImage') || 'Share as Image'}
-              className="py-3 min-h-[44px] bg-neo-purple text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all duration-150 focus:ring-2 focus:ring-neo-pink focus:ring-offset-2 disabled:opacity-50"
+              className="py-3 min-h-[44px] bg-neo-pink text-white border-3 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all duration-150 focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2 disabled:opacity-50"
             >
               {isGeneratingImage ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -755,7 +755,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               <div className="grid grid-cols-2 gap-3">
                 <Button
                   onClick={handleShareImage}
-                  className="py-3 bg-gradient-to-r from-neo-yellow to-neo-orange text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm font-bold"
+                  className="py-3 bg-gradient-to-r from-neo-yellow to-neo-pink text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm font-bold"
                 >
                   <Share2 className="mr-2 w-5 h-5" />
                   {t('daily.shareScore')}

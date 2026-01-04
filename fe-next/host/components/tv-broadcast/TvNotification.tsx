@@ -72,7 +72,7 @@ const NOTIFICATION_CONFIGS: Record<TvNotificationType, {
   },
   epic_word: {
     icon: Sparkles,
-    bgGradient: 'from-neo-purple to-neo-pink',
+    bgGradient: 'from-neo-pink to-neo-pink',
     textColor: 'text-neo-cream',
     borderColor: 'border-neo-black',
   },
@@ -84,13 +84,13 @@ const NOTIFICATION_CONFIGS: Record<TvNotificationType, {
   },
   combo_5x: {
     icon: Flame,
-    bgGradient: 'from-neo-orange to-neo-yellow',
+    bgGradient: 'from-neo-red to-neo-yellow',
     textColor: 'text-neo-black',
     borderColor: 'border-neo-black',
   },
   combo_10x: {
     icon: Flame,
-    bgGradient: 'from-neo-orange to-neo-red',
+    bgGradient: 'from-neo-red to-neo-red',
     textColor: 'text-neo-cream',
     borderColor: 'border-neo-black',
   },
@@ -102,7 +102,7 @@ const NOTIFICATION_CONFIGS: Record<TvNotificationType, {
   },
   combo_20x: {
     icon: Crown,
-    bgGradient: 'from-neo-pink via-neo-purple to-neo-cyan',
+    bgGradient: 'from-neo-pink via-neo-pink to-neo-cyan',
     textColor: 'text-neo-cream',
     borderColor: 'border-neo-black',
   },
@@ -114,7 +114,7 @@ const NOTIFICATION_CONFIGS: Record<TvNotificationType, {
   },
   first_blood: {
     icon: Target,
-    bgGradient: 'from-neo-red to-neo-orange',
+    bgGradient: 'from-neo-red to-neo-red',
     textColor: 'text-neo-cream',
     borderColor: 'border-neo-black',
   },
@@ -126,13 +126,13 @@ const NOTIFICATION_CONFIGS: Record<TvNotificationType, {
   },
   comeback: {
     icon: Zap,
-    bgGradient: 'from-neo-yellow via-neo-orange to-neo-red',
+    bgGradient: 'from-neo-yellow via-neo-red to-neo-red',
     textColor: 'text-neo-black',
     borderColor: 'border-neo-black',
   },
   photo_finish: {
     icon: Sword,
-    bgGradient: 'from-neo-purple to-neo-cyan',
+    bgGradient: 'from-neo-pink to-neo-cyan',
     textColor: 'text-neo-cream',
     borderColor: 'border-neo-black',
   },
@@ -144,7 +144,7 @@ const NOTIFICATION_CONFIGS: Record<TvNotificationType, {
   },
   fire_round_start: {
     icon: Flame,
-    bgGradient: 'from-neo-orange via-neo-red to-neo-pink',
+    bgGradient: 'from-neo-red via-neo-red to-neo-pink',
     textColor: 'text-neo-cream',
     borderColor: 'border-neo-black',
   },
@@ -156,25 +156,25 @@ const NOTIFICATION_CONFIGS: Record<TvNotificationType, {
   },
   achievement: {
     icon: Trophy,
-    bgGradient: 'from-neo-yellow to-neo-orange',
+    bgGradient: 'from-neo-yellow to-neo-red',
     textColor: 'text-neo-black',
     borderColor: 'border-neo-black',
   },
   level_up: {
     icon: Star,
-    bgGradient: 'from-neo-purple to-neo-pink',
+    bgGradient: 'from-neo-pink to-neo-pink',
     textColor: 'text-neo-cream',
     borderColor: 'border-neo-black',
   },
   final_warning: {
     icon: Clock,
-    bgGradient: 'from-neo-red to-neo-orange',
+    bgGradient: 'from-neo-red to-neo-red',
     textColor: 'text-neo-cream',
     borderColor: 'border-neo-black',
   },
   earthquake: {
     icon: AlertTriangle,
-    bgGradient: 'from-neo-orange to-neo-red',
+    bgGradient: 'from-neo-red to-neo-red',
     textColor: 'text-neo-cream',
     borderColor: 'border-neo-black',
   },

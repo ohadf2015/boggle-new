@@ -19,8 +19,8 @@ interface WinStreakDisplayProps {
 const STREAK_TIERS = [
   { min: 1, emoji: '✨', icon: Star, bg: 'bg-neo-yellow', text: 'text-neo-black', bar: 'bg-neo-yellow', name: 'Starting' },
   { min: 3, emoji: '⚡', icon: Zap, bg: 'bg-neo-cyan', text: 'text-neo-black', bar: 'bg-neo-cyan', name: 'Hot' },
-  { min: 7, emoji: '🔥', icon: Flame, bg: 'bg-neo-orange', text: 'text-neo-black', bar: 'bg-neo-orange', name: 'On Fire' },
-  { min: 14, emoji: '💎', icon: Gem, bg: 'bg-neo-purple', text: 'text-neo-cream', bar: 'bg-neo-purple', name: 'Epic' },
+  { min: 7, emoji: '🔥', icon: Flame, bg: 'bg-neo-red', text: 'text-neo-black', bar: 'bg-neo-red', name: 'On Fire' },
+  { min: 14, emoji: '💎', icon: Gem, bg: 'bg-neo-pink', text: 'text-neo-cream', bar: 'bg-neo-pink', name: 'Epic' },
   { min: 30, emoji: '👑', icon: Crown, bg: 'bg-tier-gold', text: 'text-neo-black', bar: 'bg-tier-gold', name: 'Legendary' },
 ];
 
@@ -97,7 +97,7 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
           'inline-flex items-center gap-2 px-3 py-1.5 rounded-neo-pill',
           'border-2 border-neo-black shadow-hard-sm',
           'text-sm font-bold',
-          isDarkMode ? 'bg-neo-orange text-neo-black' : 'bg-neo-orange text-neo-black'
+          isDarkMode ? 'bg-neo-red text-neo-black' : 'bg-neo-red text-neo-black'
         )}
       >
         <Icon className="w-4 h-4" />

@@ -720,7 +720,7 @@ export const DailyWordSchedule: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
         <div className="flex items-center gap-3">
-          <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-neo-purple" />
+          <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-neo-pink" />
           <h2 className="text-xl sm:text-2xl font-black">Daily Word Schedule</h2>
         </div>
 
@@ -733,7 +733,7 @@ export const DailyWordSchedule: React.FC = () => {
               className={cn(
                 'p-2 transition-colors',
                 viewMode === 'list'
-                  ? 'bg-neo-purple text-white'
+                  ? 'bg-neo-pink text-white'
                   : 'bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600'
               )}
               title="List view"
@@ -745,7 +745,7 @@ export const DailyWordSchedule: React.FC = () => {
               className={cn(
                 'p-2 transition-colors',
                 viewMode === 'grid'
-                  ? 'bg-neo-purple text-white'
+                  ? 'bg-neo-pink text-white'
                   : 'bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600'
               )}
               title="Grid view"
@@ -784,7 +784,7 @@ export const DailyWordSchedule: React.FC = () => {
             onClick={handleTriggerGeneration}
             disabled={triggerLoading}
             size="sm"
-            className="bg-neo-purple hover:bg-neo-purple/90 text-white"
+            className="bg-neo-pink hover:bg-neo-pink/90 text-white"
           >
             {triggerLoading ? (
               <RefreshCw className="w-4 h-4 sm:mr-2 animate-spin" />
@@ -820,7 +820,7 @@ export const DailyWordSchedule: React.FC = () => {
           {dateOffset !== 0 && (
             <button
               onClick={() => setDateOffset(0)}
-              className="ml-1 sm:ml-2 text-xs text-neo-purple hover:underline font-bold whitespace-nowrap"
+              className="ml-1 sm:ml-2 text-xs text-neo-pink hover:underline font-bold whitespace-nowrap"
             >
               Today
             </button>
@@ -878,7 +878,7 @@ export const DailyWordSchedule: React.FC = () => {
             className={cn(
               'px-2.5 sm:px-4 py-2 rounded-neo border-2 border-neo-black font-bold transition-all flex-shrink-0 text-xs sm:text-sm min-h-[40px]',
               selectedLang === lang.code
-                ? 'bg-neo-purple text-white shadow-hard'
+                ? 'bg-neo-pink text-white shadow-hard'
                 : 'bg-white dark:bg-gray-700 hover:shadow-hard'
             )}
           >
@@ -892,7 +892,7 @@ export const DailyWordSchedule: React.FC = () => {
       {/* Scheduled Words - Grid View */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <RefreshCw className="w-8 h-8 animate-spin text-neo-purple" />
+          <RefreshCw className="w-8 h-8 animate-spin text-neo-pink" />
         </div>
       ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
@@ -1144,7 +1144,7 @@ export const DailyWordSchedule: React.FC = () => {
                             setNewWordDate(dateStr);
                             setAddWordModalOpen(true);
                           }}
-                          className="font-mono text-lg sm:text-2xl text-gray-400 hover:text-neo-purple transition-colors flex items-center gap-1 sm:gap-2"
+                          className="font-mono text-lg sm:text-2xl text-gray-400 hover:text-neo-pink transition-colors flex items-center gap-1 sm:gap-2"
                         >
                           <span className="px-2 sm:px-4 py-1 sm:py-2 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-neo">
                             ----
@@ -1318,7 +1318,7 @@ export const DailyWordSchedule: React.FC = () => {
                                 onClick={copyResetLink}
                                 size="sm"
                                 variant="outline"
-                                className="border-2 border-neo-purple text-neo-purple hover:bg-neo-purple hover:text-white"
+                                className="border-2 border-neo-pink text-neo-pink hover:bg-neo-pink hover:text-white"
                                 title="Copy reset link to share with player"
                               >
                                 <Link className="w-4 h-4 mr-1" />
@@ -1331,7 +1331,7 @@ export const DailyWordSchedule: React.FC = () => {
                       {/* Attempts List */}
                       {attemptsLoading ? (
                         <div className="flex justify-center py-6 sm:py-8">
-                          <RefreshCw className="w-5 h-5 sm:w-6 sm:h-6 animate-spin text-neo-purple" />
+                          <RefreshCw className="w-5 h-5 sm:w-6 sm:h-6 animate-spin text-neo-pink" />
                         </div>
                       ) : filteredAttempts.length === 0 ? (
                         <div className="text-center py-6 sm:py-8 text-gray-500">

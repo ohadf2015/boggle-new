@@ -25,8 +25,8 @@ interface MissedWordsProps {
 }
 
 const getWordLengthColor = (length: number): string => {
-  if (length >= 7) return 'bg-neo-orange text-neo-black';
-  if (length === 6) return 'bg-neo-purple text-white';
+  if (length >= 7) return 'bg-neo-red text-neo-black';
+  if (length === 6) return 'bg-neo-pink text-white';
   if (length === 5) return 'bg-neo-cyan text-neo-black';
   if (length === 4) return 'bg-neo-lime text-neo-black';
   return 'bg-neo-yellow text-neo-black';

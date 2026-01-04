@@ -2581,6 +2581,7 @@ const es = {
   "footer": {
     "aboutGame": "Sobre el Juego",
     "leaderboard": "Clasificación",
+    "contact": "Contacto",
     "interactiveTutorial": "Tutorial Interactivo"
   },
   "support": {
@@ -2900,6 +2901,7 @@ const es = {
     "tookChallenge": "aceptaron el desafío",
     "signUpToAppear": "¡Regístrate para aparecer en la clasificación!",
     "showLeaderboard": "Mostrar tabla de líderes",
+    "tryAnotherLanguage": "Prueba el desafío en otro idioma:",
     "carousel": {
       "step1Title": "Desliza para formar palabras",
       "step1Desc": "Conecta letras en cualquier dirección",
@@ -3317,13 +3319,7 @@ const es = {
     "sendAnother": "Enviar otro",
     "errorMessage": "¡Ups! Algo salió mal. ¡Inténtalo de nuevo!",
     "responseTime": "Solemos responder en uno o dos días"
-  },
-  "footer": {
-    "aboutGame": "Sobre el juego",
-    "leaderboard": "Clasificación",
-    "contact": "Contacto",
-    "interactiveTutorial": "Tutorial Interactivo"
   }
 };
 
-module.exports = { es };
+export { es };

@@ -1123,8 +1123,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               className={cn(
                 "flex-1 py-3 text-base font-black uppercase border-2 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all",
                 result.solved
-                  ? "bg-gradient-to-r from-neo-yellow via-neo-orange to-neo-pink text-neo-black"
-                  : "bg-gradient-to-r from-neo-cyan via-neo-purple to-neo-pink text-white"
+                  ? "bg-gradient-to-r from-neo-yellow via-neo-yellow to-neo-pink text-neo-black"
+                  : "bg-gradient-to-r from-neo-cyan via-neo-pink to-neo-pink text-white"
               )}
             >
               <Share2 className="mr-1.5 w-4 h-4" />
@@ -1224,7 +1224,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                   <Button
                     onClick={handleDownloadShareImage}
                     disabled={isGeneratingImage}
-                    className="w-full mt-2 py-2 min-h-[44px] bg-neo-purple text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="w-full mt-2 py-2 min-h-[44px] bg-neo-pink text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     {isGeneratingImage ? (
                       <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -1257,6 +1257,35 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               <Trophy className="w-4 h-4" />
               {t('daily.showLeaderboard')}
             </Button>
+
+            {/* Try Another Language - Suggestion after completing */}
+            {onGameLanguageChange && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700"
+              >
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                  {t('daily.tryAnotherLanguage')}
+                </p>
+                <div className="flex items-center justify-center gap-2">
+                  {LANGUAGE_OPTIONS.filter(opt => opt.code !== language).map(opt => (
+                    <button
+                      key={opt.code}
+                      onClick={() => {
+                        onGameLanguageChange(opt.code);
+                        onBack();
+                      }}
+                      className="group flex flex-col items-center gap-1 px-3 py-2 bg-white dark:bg-slate-800 rounded-neo border-2 border-gray-300 dark:border-gray-600 hover:border-neo-cyan hover:bg-neo-cyan/10 transition-all hover:-translate-y-0.5"
+                    >
+                      <span className="text-2xl group-hover:scale-110 transition-transform">{opt.flag}</span>
+                      <span className="text-[10px] font-bold text-gray-600 dark:text-gray-400 group-hover:text-neo-cyan">{opt.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
         </motion.div>
 
         {/* Reveal Target Word Option - Only for failed players, after share section */}
@@ -1286,7 +1315,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                   className={cn(
                     "relative overflow-hidden rounded-neo-lg border-3 border-neo-black shadow-hard transition-all",
                     canAfford(COIN_COSTS.REVEAL_TARGET_WORD)
-                      ? "bg-gradient-to-br from-neo-purple to-neo-pink cursor-pointer hover:shadow-hard-lg"
+                      ? "bg-gradient-to-br from-neo-pink to-neo-pink cursor-pointer hover:shadow-hard-lg"
                       : "bg-gradient-to-br from-slate-600 to-slate-700"
                   )}
                   onClick={canAfford(COIN_COSTS.REVEAL_TARGET_WORD) ? handleRevealTargetWord : undefined}
@@ -1343,7 +1372,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                             "h-full rounded-full",
                             canAfford(COIN_COSTS.REVEAL_TARGET_WORD)
                               ? "bg-neo-yellow"
-                              : "bg-gradient-to-r from-neo-yellow/70 to-neo-orange/70"
+                              : "bg-gradient-to-r from-neo-yellow/70 to-neo-yellow/70"
                           )}
                         />
                       </div>
@@ -1474,7 +1503,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 {/* Summary badges shown when collapsed */}
                 <div className="flex items-center gap-2 text-xs">
                   {stats.yourStats?.solved && stats.yourStats.percentile !== undefined && (
-                    <span className="px-2 py-0.5 bg-neo-purple/20 text-neo-purple dark:text-purple-300 rounded-full font-bold">
+                    <span className="px-2 py-0.5 bg-neo-pink/20 text-neo-pink dark:text-purple-300 rounded-full font-bold">
                       {t('wordHunt.stats.top')} {stats.yourStats.percentile}%
                     </span>
                   )}
@@ -1770,7 +1799,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                               "h-full rounded-full",
                               canAfford(COIN_COSTS.DAILY_RETRY)
                                 ? "bg-neo-black/50"
-                                : "bg-gradient-to-r from-neo-yellow/70 to-neo-orange/70"
+                                : "bg-gradient-to-r from-neo-yellow/70 to-neo-yellow/70"
                             )}
                           />
                         </div>

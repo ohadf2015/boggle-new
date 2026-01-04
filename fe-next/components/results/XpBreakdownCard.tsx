@@ -51,7 +51,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
       transition={{ delay: 0.5, type: 'spring', stiffness: 200, damping: 20 }}
       className={cn(
         "mt-4 p-4 rounded-neo border-3 border-neo-black shadow-hard relative overflow-hidden texture-halftone-comic-light",
-        levelUpData ? "bg-gradient-to-br from-neo-yellow via-neo-orange to-neo-pink" : "bg-neo-cream dark:bg-slate-700"
+        levelUpData ? "bg-gradient-to-br from-neo-yellow via-neo-yellow to-neo-pink" : "bg-neo-cream dark:bg-slate-700"
       )}
     >
       {/* Comic-style halftone dots */}
@@ -144,7 +144,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.1 }}
-              className="text-xs font-bold text-neo-purple mt-1"
+              className="text-xs font-bold text-neo-pink mt-1"
             >
               {t('xp.titleUnlocked') || 'Title Unlocked'}: {levelUpData.newTitles[0]}
             </motion.p>

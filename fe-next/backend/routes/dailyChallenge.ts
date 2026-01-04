@@ -780,6 +780,13 @@ router.get('/word-hunt/leaderboard/:date/:language', async (req: Request<Leaderb
 
     const supabase = getSupabase();
 
+    // Defensive null check - should not happen if isSupabaseConfigured() passed
+    if (!supabase) {
+      logger.error('API', 'Word Hunt leaderboard: Supabase client is null despite isSupabaseConfigured() returning true');
+      res.status(503).json({ error: 'Database connection unavailable' });
+      return;
+    }
+
     // Fetch leaderboard from the Word Hunt leaderboard view
     // Filter: only show solved attempts from authenticated users (guests shown in stats only)
     const { data, error } = await supabase
@@ -793,7 +800,27 @@ router.get('/word-hunt/leaderboard/:date/:language', async (req: Request<Leaderb
       .limit(limit);
 
     if (error) {
-      logger.error('API', `Word Hunt leaderboard error: ${error.message}`);
+      // Log detailed error information for debugging
+      const errorDetails = JSON.stringify({ message: error.message, code: error.code, details: error.details, hint: error.hint });
+      logger.error('API', `Word Hunt leaderboard error: ${errorDetails}`);
+
+      // Check for authentication errors which indicate invalid service key
+      const isAuthError =
+        error.message?.includes('401') ||
+        error.message?.includes('JWT') ||
+        error.message?.includes('Invalid API key') ||
+        error.code === 'PGRST301' ||  // JWT required but not provided
+        error.code === 'PGRST302' ||  // JWT role claim missing
+        error.code === 'PGRST303';    // JWT role not in acceptable roles
+
+      if (isAuthError) {
+        logger.error('API', 'Supabase authentication failed - check SUPABASE_SERVICE_ROLE_KEY environment variable');
+        res.status(503).json({
+          error: 'Database authentication failed',
+          hint: 'The service role key may be invalid or expired. Check server logs.'
+        });
+        return;
+      }
       res.status(500).json({ error: 'Failed to fetch leaderboard' });
       return;
     }
@@ -1108,6 +1135,13 @@ router.get('/word-hunt/alltime-leaderboard/:language', async (req: Request<{ lan
 
     const supabase = getSupabase();
 
+    // Defensive null check - should not happen if isSupabaseConfigured() passed
+    if (!supabase) {
+      logger.error('API', 'Word Hunt all-time leaderboard: Supabase client is null despite isSupabaseConfigured() returning true');
+      res.status(503).json({ error: 'Database connection unavailable' });
+      return;
+    }
+
     // Fetch all-time leaderboard from the view
     const { data, error } = await supabase
       .from('word_hunt_alltime_leaderboard')
@@ -1117,7 +1151,27 @@ router.get('/word-hunt/alltime-leaderboard/:language', async (req: Request<{ lan
       .limit(limit);
 
     if (error) {
-      logger.error('API', `Word Hunt all-time leaderboard error: ${error.message}`);
+      // Log detailed error information for debugging
+      const errorDetails = JSON.stringify({ message: error.message, code: error.code, details: error.details, hint: error.hint });
+      logger.error('API', `Word Hunt all-time leaderboard error: ${errorDetails}`);
+
+      // Check for authentication errors which indicate invalid service key
+      const isAuthError =
+        error.message?.includes('401') ||
+        error.message?.includes('JWT') ||
+        error.message?.includes('Invalid API key') ||
+        error.code === 'PGRST301' ||  // JWT required but not provided
+        error.code === 'PGRST302' ||  // JWT role claim missing
+        error.code === 'PGRST303';    // JWT role not in acceptable roles
+
+      if (isAuthError) {
+        logger.error('API', 'Supabase authentication failed - check SUPABASE_SERVICE_ROLE_KEY environment variable');
+        res.status(503).json({
+          error: 'Database authentication failed',
+          hint: 'The service role key may be invalid or expired. Check server logs.'
+        });
+        return;
+      }
       res.status(500).json({ error: 'Failed to fetch leaderboard' });
       return;
     }

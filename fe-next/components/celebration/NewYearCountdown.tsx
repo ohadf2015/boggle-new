@@ -113,7 +113,7 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
             exit={{ opacity: 0, x: 100, rotate: -3 }}
             transition={{ type: 'spring', damping: 20 }}
           >
-            <div className="bg-neo-purple text-neo-white border-3 border-neo-black rounded-neo-lg shadow-hard-lg p-4">
+            <div className="bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo-lg shadow-hard-lg p-4">
               <div className="flex items-center gap-3">
                 <Sparkles className="w-6 h-6 flex-shrink-0" />
                 <div>
@@ -193,7 +193,7 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
                 <motion.h1
                   className="text-6xl sm:text-7xl md:text-8xl font-black uppercase tracking-tight"
                   style={{
-                    background: 'linear-gradient(135deg, var(--neo-yellow) 0%, var(--neo-orange) 25%, var(--neo-pink) 50%, var(--neo-purple) 75%, var(--neo-cyan) 100%)',
+                    background: 'linear-gradient(135deg, var(--neo-yellow) 0%, var(--neo-red) 25%, var(--neo-pink) 50%, var(--neo-pink) 75%, var(--neo-cyan) 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',

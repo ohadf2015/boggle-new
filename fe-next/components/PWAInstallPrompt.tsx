@@ -105,7 +105,7 @@ export function PWAInstallPrompt() {
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
         className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-md z-[100]"
       >
-        <div className="bg-neo-purple border-3 border-neo-black rounded-neo shadow-hard-lg p-4">
+        <div className="bg-neo-pink border-3 border-neo-black rounded-neo shadow-hard-lg p-4">
           {/* Close button */}
           <button
             onClick={handleDismiss}
@@ -117,7 +117,7 @@ export function PWAInstallPrompt() {
 
           <div className="flex items-start gap-3 mb-3">
             <div className="p-2 bg-neo-white rounded-neo border-2 border-neo-black">
-              <Download size={24} className="text-neo-purple" />
+              <Download size={24} className="text-neo-pink" />
             </div>
             <div className="flex-1">
               <h3 className="font-black text-neo-white text-lg mb-1">

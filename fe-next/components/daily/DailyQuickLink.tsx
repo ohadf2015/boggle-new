@@ -56,14 +56,14 @@ const DailyQuickLink: React.FC<DailyQuickLinkProps> = ({
           "font-bold text-sm",
           hasPlayed
             ? "bg-neo-lime/20 border-neo-lime text-neo-black dark:text-white"
-            : "bg-gradient-to-r from-neo-orange/20 to-neo-yellow/20 border-neo-orange text-neo-black dark:text-white",
+            : "bg-gradient-to-r from-neo-pink/20 to-neo-yellow/20 border-neo-pink text-neo-black dark:text-white",
           "hover:shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px]",
           className
         )}
       >
         <div className={cn(
           "flex items-center justify-center w-8 h-8 rounded-full border-2 border-neo-black",
-          hasPlayed ? "bg-neo-lime" : "bg-neo-orange"
+          hasPlayed ? "bg-neo-lime" : "bg-neo-pink"
         )}>
           {hasPlayed ? (
             <Check className="w-4 h-4 text-neo-black" strokeWidth={3} />
@@ -84,7 +84,7 @@ const DailyQuickLink: React.FC<DailyQuickLinkProps> = ({
         </div>
         {streak > 0 && (
           <div className="flex items-center gap-1 px-2 py-1 bg-neo-black/10 rounded-full">
-            <Flame className="w-3 h-3 text-neo-orange" />
+            <Flame className="w-3 h-3 text-neo-pink" />
             <span className="text-xs font-black">{streak}</span>
           </div>
         )}
@@ -107,7 +107,7 @@ const DailyQuickLink: React.FC<DailyQuickLinkProps> = ({
         "transition-all duration-100",
         hasPlayed
           ? "bg-neo-lime"
-          : "bg-gradient-to-br from-neo-orange to-neo-yellow",
+          : "bg-gradient-to-br from-neo-pink to-neo-yellow",
         className
       )}
       aria-label={`${t('daily.badge') || 'Daily Challenge'}${streak > 0 ? ` - ${streak} ${t('daily.streak') || 'streak'}` : ''}`}
@@ -128,7 +128,7 @@ const DailyQuickLink: React.FC<DailyQuickLinkProps> = ({
         <motion.span
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          className="absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-neo-orange text-neo-black text-[10px] font-black rounded-full border-2 border-neo-black"
+          className="absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[18px] h-[18px] px-1 bg-neo-pink text-neo-black text-[10px] font-black rounded-full border-2 border-neo-black"
         >
           <Flame className="w-2.5 h-2.5 mr-0.5" />
           {streak}

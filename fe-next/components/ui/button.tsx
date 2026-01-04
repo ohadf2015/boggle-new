@@ -37,8 +37,8 @@ const buttonVariants = cva(
           "bg-neo-cream text-neo-black",
           "hover:bg-neo-white",
         ].join(" "),
-        // Secondary: Orange accent
-        secondary: "bg-neo-orange text-neo-black hover:bg-neo-orange-hover",
+        // Secondary: Pink accent
+        secondary: "bg-neo-pink text-neo-white hover:brightness-110",
         // Ghost: Minimal, with high-contrast visible border for accessibility (WCAG AA 3:1 for UI components)
         ghost: [
           "bg-transparent text-neo-white border-3 border-neo-black dark:border-neo-cream shadow-none",

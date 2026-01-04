@@ -58,7 +58,7 @@ export function HelpPanel({ isOpen, onClose }: HelpPanelProps) {
             {/* Header */}
             <div className="flex items-center justify-between px-4 pb-3 border-b-2 border-neo-black/10">
               <div className="flex items-center gap-2">
-                <HelpCircle className="w-6 h-6 text-neo-purple" />
+                <HelpCircle className="w-6 h-6 text-neo-pink" />
                 <h2 className="text-xl font-black text-neo-black uppercase">
                   {t('help.title') || 'Quick Help'}
                 </h2>
@@ -119,7 +119,7 @@ export function HelpPanel({ isOpen, onClose }: HelpPanelProps) {
               </section>
 
               {/* Combos */}
-              <section className="bg-neo-orange/20 text-neo-black border-2 border-neo-orange rounded-neo p-3">
+              <section className="bg-neo-red/20 text-neo-black border-2 border-neo-red rounded-neo p-3">
                 <h3 className="font-black text-neo-black uppercase flex items-center gap-2 mb-2">
                   <Zap className="w-4 h-4" />
                   {t('help.combos') || 'Combos'}
@@ -131,7 +131,7 @@ export function HelpPanel({ isOpen, onClose }: HelpPanelProps) {
                   <span className="px-2 py-1 bg-neo-yellow text-neo-black text-xs font-bold rounded-neo border border-neo-black">
                     x2 = +1
                   </span>
-                  <span className="px-2 py-1 bg-neo-orange text-neo-cream text-xs font-bold rounded-neo border border-neo-black">
+                  <span className="px-2 py-1 bg-neo-red text-neo-cream text-xs font-bold rounded-neo border border-neo-black">
                     x3 = +2
                   </span>
                   <span className="px-2 py-1 bg-neo-pink text-neo-cream text-xs font-bold rounded-neo border border-neo-black">
@@ -159,7 +159,7 @@ export function HelpPanel({ isOpen, onClose }: HelpPanelProps) {
                       className={cn(
                         "relative w-12 h-7 rounded-full border-2 border-neo-black transition-colors",
                         settings.disableFireRoundLights
-                          ? "bg-neo-purple"
+                          ? "bg-neo-pink"
                           : "bg-neo-cream"
                       )}
                     >
@@ -180,8 +180,8 @@ export function HelpPanel({ isOpen, onClose }: HelpPanelProps) {
               </section>
 
               {/* Keyboard Shortcuts - Desktop only */}
-              <section className="bg-neo-purple/10 text-white border-2 border-neo-purple rounded-neo p-3 hidden sm:block">
-                <h3 className="font-black text-neo-purple uppercase flex items-center gap-2 mb-2">
+              <section className="bg-neo-pink/10 text-white border-2 border-neo-pink rounded-neo p-3 hidden sm:block">
+                <h3 className="font-black text-neo-pink uppercase flex items-center gap-2 mb-2">
                   <Keyboard className="w-4 h-4" />
                   {t('help.keyboardShortcuts') || 'Keyboard Shortcuts'}
                 </h3>
@@ -247,7 +247,7 @@ export function HelpButton({ onClick, className }: HelpButtonProps) {
       transition={{ delay: 0.5, type: 'spring', stiffness: 300 }}
       onClick={onClick}
       className={cn(
-        "w-12 h-12 bg-neo-purple border-3 border-neo-black rounded-full shadow-hard-lg flex items-center justify-center",
+        "w-12 h-12 bg-neo-pink border-3 border-neo-black rounded-full shadow-hard-lg flex items-center justify-center",
         "hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-xl",
         "active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed",
         "transition-all",

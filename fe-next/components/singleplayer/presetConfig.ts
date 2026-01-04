@@ -76,8 +76,8 @@ export const PRESETS: PresetConfig[] = [
     nameKey: 'singlePlayer.preset.intense',
     descKey: 'singlePlayer.preset.intenseDesc',
     Icon: Flame,
-    color: 'from-neo-orange to-red-400',
-    bgColor: 'bg-neo-orange',
+    color: 'from-neo-red to-neo-pink',
+    bgColor: 'bg-neo-red',
     settings: {
       difficulty: 'HARD',
       timerSeconds: 180,
@@ -93,8 +93,8 @@ export const PRESETS: PresetConfig[] = [
     nameKey: 'daily.badge',
     descKey: 'daily.bannerSubtitle',
     Icon: Calendar,
-    color: 'from-neo-orange via-neo-yellow to-neo-pink',
-    bgColor: 'bg-gradient-to-r from-neo-orange via-neo-yellow to-neo-pink',
+    color: 'from-neo-pink via-neo-yellow to-neo-cyan',
+    bgColor: 'bg-gradient-to-r from-neo-pink via-neo-yellow to-neo-cyan',
     settings: {
       difficulty: 'MEDIUM',
       timerSeconds: 120,
@@ -251,8 +251,8 @@ export const MODE_PRESETS: Record<Exclude<SinglePlayerMode, 'daily'>, PresetConf
       nameKey: 'singlePlayer.preset.ultra',
       descKey: 'singlePlayer.preset.ultraDesc',
       Icon: Flame,
-      color: 'from-neo-orange to-red-400',
-      bgColor: 'bg-neo-orange',
+      color: 'from-neo-red to-neo-pink',
+      bgColor: 'bg-neo-red',
       settings: {
         difficulty: 'HARD',
         timerSeconds: 180,

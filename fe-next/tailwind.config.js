@@ -35,26 +35,30 @@ module.exports = {
     },
     extend: {
       colors: {
-        // Neo-Brutalist Color Palette
+        // Neo-Brutalist Color Palette - Simplified to 5 accent colors
+        // Primary: yellow, Secondary: pink, Tertiary: cyan, Error: red, Success: lime
         neo: {
+          // Primary accent colors (use these)
           yellow: "var(--neo-yellow)",
           "yellow-hover": "var(--neo-yellow-hover)",
-          orange: "var(--neo-orange)",
-          "orange-hover": "var(--neo-orange-hover)",
           pink: "var(--neo-pink)",
           "pink-light": "var(--neo-pink-light)",
-          purple: "var(--neo-purple)",
-          "purple-light": "var(--neo-purple-light)",
-          navy: "var(--neo-navy)",
-          "navy-light": "var(--neo-navy-light)",
           cyan: "var(--neo-cyan)",
           "cyan-muted": "var(--neo-cyan-muted)",
-          lime: "var(--neo-lime)",
           red: "var(--neo-red)",
+          lime: "var(--neo-lime)",
+          // Structural colors
+          navy: "var(--neo-navy)",
+          "navy-light": "var(--neo-navy-light)",
           cream: "var(--neo-cream)",
           black: "rgb(var(--neo-black) / <alpha-value>)",
           white: "rgb(var(--neo-white) / <alpha-value>)",
           gray: "var(--neo-gray)",
+          // Deprecated - migrate to 5 accent palette (yellow, pink, cyan, red, lime)
+          orange: "var(--neo-orange)",
+          "orange-hover": "var(--neo-orange-hover)",
+          purple: "var(--neo-purple)",
+          "purple-light": "var(--neo-purple-light)",
         },
         // Brand colors for social auth
         brand: {
@@ -243,14 +247,14 @@ module.exports = {
           "0%, 100%": { transform: "scale(1)", boxShadow: "6px 6px 0px rgb(var(--neo-black))" },
           "50%": { transform: "scale(1.02)", boxShadow: "8px 8px 0px rgb(var(--neo-black))" },
         },
-        // Smooth hint glow animation for revealed word paths
+        // Smooth hint glow animation for revealed word paths (using pink accent)
         "hint-glow": {
           "0%, 100%": {
-            boxShadow: "0 0 8px rgba(139, 92, 246, 0.6), 0 0 16px rgba(139, 92, 246, 0.3), 4px 4px 0 #000",
+            boxShadow: "0 0 8px rgba(255, 20, 147, 0.6), 0 0 16px rgba(255, 20, 147, 0.3), 4px 4px 0 #000",
             transform: "scale(1)"
           },
           "50%": {
-            boxShadow: "0 0 16px rgba(139, 92, 246, 0.9), 0 0 32px rgba(139, 92, 246, 0.5), 4px 4px 0 #000",
+            boxShadow: "0 0 16px rgba(255, 20, 147, 0.9), 0 0 32px rgba(255, 20, 147, 0.5), 4px 4px 0 #000",
             transform: "scale(1.03)"
           },
         },

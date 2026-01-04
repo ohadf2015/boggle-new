@@ -226,7 +226,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
             transition={{ delay: 0.2 + idx * 0.05 }}
             className="flex items-center gap-2 text-xs"
           >
-            <benefit.icon className="w-4 h-4 text-neo-purple flex-shrink-0" />
+            <benefit.icon className="w-4 h-4 text-neo-pink flex-shrink-0" />
             <span className="text-gray-700 dark:text-gray-300">
               {t(`auth.dailyChallenge.benefits.${benefit.key}`) || benefit.key}
             </span>
@@ -322,7 +322,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                   onChange={(e) => handleEmailChange(e.target.value)}
                   placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
                   className={cn(
-                    "w-full px-4 py-3 rounded-neo border-2 bg-white dark:bg-gray-800 text-neo-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-neo-purple",
+                    "w-full px-4 py-3 rounded-neo border-2 bg-white dark:bg-gray-800 text-neo-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-neo-pink",
                     emailError ? "border-red-500" : "border-neo-black"
                   )}
                   disabled={isAnyLoading}
@@ -341,7 +341,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                     onChange={(e) => handlePasswordChange(e.target.value)}
                     placeholder={t('auth.inlineSignup.passwordPlaceholder') || 'Password (8+ characters)'}
                     className={cn(
-                      "w-full px-4 py-3 rounded-neo border-2 bg-white dark:bg-gray-800 text-neo-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-neo-purple pr-12",
+                      "w-full px-4 py-3 rounded-neo border-2 bg-white dark:bg-gray-800 text-neo-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-neo-pink pr-12",
                       passwordError ? "border-red-500" : "border-neo-black"
                     )}
                     disabled={isAnyLoading}
@@ -363,7 +363,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
               <Button
                 type="submit"
                 disabled={isAnyLoading || !email || !password || !!emailError || !!passwordError}
-                className="w-full py-3 bg-neo-purple hover:bg-neo-purple/90 text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 transition-all font-bold"
+                className="w-full py-3 bg-neo-pink hover:bg-neo-pink/90 text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 transition-all font-bold"
               >
                 {isLoading === 'email' ? (
                   <Loader2 className="w-5 h-5 animate-spin" />

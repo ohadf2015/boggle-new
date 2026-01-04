@@ -64,17 +64,17 @@ const MODE_CONFIG = {
   },
   'daily': {
     Icon: CalendarDays,
-    color: 'from-neo-orange via-neo-yellow to-neo-pink',
-    selectedBorder: 'border-neo-orange',
+    color: 'from-neo-pink via-neo-yellow to-neo-cyan',
+    selectedBorder: 'border-neo-pink',
     labelKey: 'daily.badge',
     descKey: 'daily.bannerSubtitle',
   },
 };
 
 const BOT_DIFFICULTY_CONFIG: Record<BotDifficulty, { labelKey: string; color: string; icon: string }> = {
-  easy: { labelKey: 'bots.easy', color: 'bg-sky-400', icon: '🤖' },
-  medium: { labelKey: 'bots.medium', color: 'bg-violet-400', icon: '⚙️' },
-  hard: { labelKey: 'bots.hard', color: 'bg-fuchsia-500 text-white', icon: '💀' },
+  easy: { labelKey: 'bots.easy', color: 'bg-neo-cyan', icon: '🤖' },
+  medium: { labelKey: 'bots.medium', color: 'bg-neo-yellow', icon: '⚙️' },
+  hard: { labelKey: 'bots.hard', color: 'bg-neo-pink text-white', icon: '💀' },
 };
 
 // Difficulty configuration with icons for simplified UI
@@ -276,13 +276,13 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
 
           {/* Daily mode info */}
           {mode === 'daily' && (
-            <div className="bg-gradient-to-r from-neo-orange via-neo-yellow to-neo-pink border-3 border-neo-black rounded-neo p-3 text-center shadow-hard">
+            <div className="bg-gradient-to-r from-neo-pink via-neo-yellow to-neo-cyan border-3 border-neo-black rounded-neo p-3 text-center shadow-hard">
               <div className="flex items-center justify-center gap-2 mb-1">
                 <Target className="text-neo-black w-5 h-5" />
                 <span className="font-black text-neo-black">#{dailyPuzzleNumber}</span>
                 {dailyStreak > 0 && (
                   <span className="flex items-center gap-1 text-sm">
-                    <Flame className="w-4 h-4 text-neo-orange" />
+                    <Flame className="w-4 h-4 text-neo-red" />
                     {dailyStreak}
                   </span>
                 )}
@@ -299,7 +299,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
           <div className="flex-1 overflow-y-auto space-y-3">
             {/* Daily mode message */}
             {mode === 'daily' && (
-              <div className="p-4 bg-gradient-to-br from-neo-orange/20 to-neo-pink/20 rounded-neo border-2 border-neo-orange/30 text-center">
+              <div className="p-4 bg-gradient-to-br from-neo-pink/20 to-neo-cyan/20 rounded-neo border-2 border-neo-pink/30 text-center">
                 <p className="text-neo-white font-bold">
                   {hasPlayedDaily
                     ? `${t('daily.nextPuzzleIn') || 'Next puzzle in'}: ${dailyCountdown}`
@@ -526,7 +526,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                 <div className="absolute top-1 right-1 flex items-center gap-1">
                   {dailyStreak > 0 && (
                     <span className="flex items-center gap-0.5 text-[10px] font-bold bg-neo-black/20 dark:bg-white/20 px-1.5 py-0.5 rounded-full">
-                      <Flame className="w-3 h-3 text-neo-orange" />
+                      <Flame className="w-3 h-3 text-neo-red" />
                       {dailyStreak}
                     </span>
                   )}
@@ -807,7 +807,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
 
           {/* Daily Challenge Info Panel - Simplified */}
           {mode === 'daily' && (
-            <div className="mb-2 sm:mb-3 p-3 bg-gradient-to-r from-neo-orange via-neo-yellow to-neo-pink rounded-neo-lg border-3 border-neo-black shadow-hard">
+            <div className="mb-2 sm:mb-3 p-3 bg-gradient-to-r from-neo-pink via-neo-yellow to-neo-cyan rounded-neo-lg border-3 border-neo-black shadow-hard">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Target className="w-5 h-5 text-neo-black" />
@@ -816,7 +816,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
                   </span>
                   {dailyStreak > 0 && (
                     <span className="flex items-center gap-1 text-sm font-bold text-neo-black/80">
-                      <Flame className="w-4 h-4 text-neo-orange" />
+                      <Flame className="w-4 h-4 text-neo-red" />
                       {dailyStreak}
                     </span>
                   )}

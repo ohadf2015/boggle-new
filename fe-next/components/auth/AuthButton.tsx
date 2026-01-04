@@ -484,7 +484,7 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                 onClick={openSignUp}
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full",
-                  "bg-neo-purple text-white shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard"
+                  "bg-neo-pink text-white shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard"
                 )}
               >
                 <User size={14} />
@@ -667,8 +667,8 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
           className={cn(
             'flex items-center gap-2 rounded-full font-bold transition-all duration-300 min-h-[44px]',
             isDarkMode
-              ? 'bg-neo-purple text-white hover:bg-purple-500 hover:shadow-[0_0_15px_rgba(147,51,234,0.5)] border-2 border-neo-black'
-              : 'bg-neo-purple text-white hover:bg-purple-500 hover:shadow-[0_0_15px_rgba(147,51,234,0.4)] border-2 border-neo-black'
+              ? 'bg-neo-pink text-white hover:bg-purple-500 hover:shadow-[0_0_15px_rgba(147,51,234,0.5)] border-2 border-neo-black'
+              : 'bg-neo-pink text-white hover:bg-purple-500 hover:shadow-[0_0_15px_rgba(147,51,234,0.4)] border-2 border-neo-black'
           )}
         >
           <span className="hidden sm:inline">{t('auth.signUp') || 'Sign Up'}</span>

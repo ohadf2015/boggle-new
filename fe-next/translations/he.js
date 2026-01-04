@@ -2585,6 +2585,7 @@ const he = {
   "footer": {
     "aboutGame": "על המשחק",
     "leaderboard": "טבלת מובילים",
+    "contact": "צור קשר",
     "interactiveTutorial": "מדריך אינטראקטיבי"
   },
   "support": {
@@ -2904,6 +2905,7 @@ const he = {
     "tookChallenge": "קיבלו את האתגר",
     "signUpToAppear": "הירשמו כדי להופיע בטבלה!",
     "showLeaderboard": "הצג לוח מובילים",
+    "tryAnotherLanguage": "נסו את האתגר בשפה אחרת:",
     "carousel": {
       "step1Title": "החליקו למילים",
       "step1Desc": "חברו אותיות בכל כיוון",
@@ -3321,13 +3323,7 @@ const he = {
     "sendAnother": "שלח עוד הודעה",
     "errorMessage": "אופס! משהו השתבש. נסו שוב!",
     "responseTime": "בדרך כלל עונים תוך יום-יומיים"
-  },
-  "footer": {
-    "aboutGame": "על המשחק",
-    "leaderboard": "טבלת מובילים",
-    "contact": "צור קשר",
-    "interactiveTutorial": "מדריך אינטראקטיבי"
   }
 };
 
-module.exports = { he };
+export { he };

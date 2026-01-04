@@ -46,7 +46,7 @@ const RANK_STYLES: Record<number, {
     messageBgClass: 'bg-neo-pink',
     messageTextClass: 'text-neo-cream',
     nameShadowColor: 'var(--neo-cyan)',
-    trophyShadowColor: 'var(--neo-orange)',
+    trophyShadowColor: 'var(--neo-pink)',
   },
   2: {
     bgClass: 'bg-gradient-to-br from-slate-300 via-slate-200 to-slate-300',
@@ -58,9 +58,9 @@ const RANK_STYLES: Record<number, {
     trophyShadowColor: '#94a3b8',
   },
   3: {
-    bgClass: 'bg-gradient-to-br from-neo-orange via-orange-400 to-neo-orange',
+    bgClass: 'bg-gradient-to-br from-neo-pink via-orange-400 to-neo-pink',
     iconBgClass: 'bg-orange-100',
-    iconTextClass: 'text-neo-orange',
+    iconTextClass: 'text-neo-pink',
     messageBgClass: 'bg-amber-700',
     messageTextClass: 'text-white',
     nameShadowColor: 'var(--neo-cyan)',
@@ -68,9 +68,9 @@ const RANK_STYLES: Record<number, {
   },
   // 4+ place: Purple encouraging banner for non-winners
   4: {
-    bgClass: 'bg-gradient-to-br from-neo-purple via-purple-500 to-neo-purple',
+    bgClass: 'bg-gradient-to-br from-neo-pink via-purple-500 to-neo-pink',
     iconBgClass: 'bg-purple-100',
-    iconTextClass: 'text-neo-purple',
+    iconTextClass: 'text-neo-pink',
     messageBgClass: 'bg-purple-700',
     messageTextClass: 'text-white',
     nameShadowColor: 'var(--neo-cyan)',

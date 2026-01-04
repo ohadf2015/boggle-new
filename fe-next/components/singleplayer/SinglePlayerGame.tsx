@@ -1187,7 +1187,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           style={{ left: 'clamp(4px, 1vw, 12px)' }}
         >
           <div className="landscape-panel flex flex-col items-center gap-3">
-            {/* Timer - Large and prominent */}
+            {/* Timer - Large and prominent (hidden in practice mode) */}
             {settings.mode !== 'practice' && (
               <CircularTimer
                 remainingTime={timer.remainingTime}
@@ -1196,17 +1196,27 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               />
             )}
 
-            {/* Score - Primary stat */}
+            {/* Score - Primary stat (extra large when no timer in practice mode) */}
             <div className="flex flex-col items-center">
               <AdaptiveMotion.div
                 key={score}
                 initial={{ scale: 1.2 }}
                 animate={{ scale: 1 }}
-                className="landscape-stat-primary text-neo-black"
+                className={cn(
+                  "text-neo-black font-black",
+                  settings.mode === 'practice'
+                    ? "text-5xl leading-none" // Extra large when no timer
+                    : "landscape-stat-primary"
+                )}
               >
                 {score}
               </AdaptiveMotion.div>
-              <div className="landscape-stat-label text-neo-black">
+              <div className={cn(
+                "text-neo-black font-bold uppercase tracking-wider",
+                settings.mode === 'practice'
+                  ? "text-sm mt-1" // Larger label when no timer
+                  : "landscape-stat-label"
+              )}>
                 {t('common.score') || 'SCORE'}
               </div>
             </div>
@@ -1375,7 +1385,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                   repeat: Infinity,
                   ease: 'easeInOut'
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-neo-purple border-3 border-neo-black text-white hover:bg-neo-pink rounded-neo font-bold text-sm shadow-hard-sm"
+                className="flex items-center gap-2 px-4 py-2 bg-neo-pink border-3 border-neo-black text-white hover:bg-neo-pink rounded-neo font-bold text-sm shadow-hard-sm"
               >
                 <Eye className="w-4 h-4" />
                 <span>{t('singlePlayer.needHint')}</span>
@@ -1542,16 +1552,20 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       </div>
 
       {/* Stats row - Combo | Timer | Score - matches multiplayer layout */}
+      {/* In practice mode (no timer), score is centered and larger */}
       <div ref={gameStatsRef} className="flex items-center justify-center gap-1 md:gap-4 flex-shrink-0" role="status" aria-label="Game status">
         {/* Combo (left - shows when level >= 2, placeholder otherwise for layout balance) */}
-        <div className="min-w-[50px] md:min-w-[90px] flex justify-end">
-          <ComboDisplay
-            comboLevel={combo.comboLevel}
-            compact
-            coinReward={comboCoinReward}
-            onCoinAnimationComplete={() => setComboCoinReward(null)}
-          />
-        </div>
+        {/* Hidden in practice mode when score is centered */}
+        {settings.mode !== 'practice' && (
+          <div className="min-w-[50px] md:min-w-[90px] flex justify-end">
+            <ComboDisplay
+              comboLevel={combo.comboLevel}
+              compact
+              coinReward={comboCoinReward}
+              onCoinAnimationComplete={() => setComboCoinReward(null)}
+            />
+          </div>
+        )}
 
         {/* Timer (center - always visible and prominent) */}
         {settings.mode !== 'practice' && (
@@ -1584,11 +1598,17 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           </AdaptiveMotion.div>
         )}
 
-        {/* Score (right position) - vibrant yellow/lime gradient like multiplayer */}
+        {/* Score - vibrant yellow/lime gradient like multiplayer */}
+        {/* Extra large and centered in practice mode (no timer) */}
         <AdaptiveMotion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px]"
+          className={cn(
+            "relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg",
+            settings.mode === 'practice'
+              ? "px-6 md:px-10 py-2 md:py-4 min-w-[120px] md:min-w-[180px]" // Larger in practice mode
+              : "px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px]"
+          )}
           style={{
             background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
           }}
@@ -1598,16 +1618,38 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               key={score}
               initial={{ scale: 1.3 }}
               animate={{ scale: 1 }}
-              className="text-lg md:text-2xl font-black text-neo-black leading-tight"
+              className={cn(
+                "font-black text-neo-black leading-tight",
+                settings.mode === 'practice'
+                  ? "text-4xl md:text-5xl" // Extra large in practice mode
+                  : "text-lg md:text-2xl"
+              )}
               style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
             >
               {score}
             </AdaptiveMotion.div>
-            <div className="text-[9px] md:text-xs font-bold uppercase tracking-wider text-neo-black/80">
+            <div className={cn(
+              "font-bold uppercase tracking-wider text-neo-black/80",
+              settings.mode === 'practice'
+                ? "text-sm md:text-base" // Larger label in practice mode
+                : "text-[9px] md:text-xs"
+            )}>
               {t('common.score') || 'Score'}
             </div>
           </div>
         </AdaptiveMotion.div>
+
+        {/* Combo (right side in practice mode - shows when score is centered) */}
+        {settings.mode === 'practice' && (
+          <div className="min-w-[50px] md:min-w-[90px] flex justify-start">
+            <ComboDisplay
+              comboLevel={combo.comboLevel}
+              compact
+              coinReward={comboCoinReward}
+              onCoinAnimationComplete={() => setComboCoinReward(null)}
+            />
+          </div>
+        )}
       </div>
 
       {/* Word Forming Area with feedback - centered below timer (keep timer section clean) */}
@@ -1774,7 +1816,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                 repeat: Infinity,
                 ease: 'easeInOut'
               }}
-              className="flex items-center gap-2 px-4 py-2 bg-neo-purple border-3 border-neo-black text-white hover:bg-neo-pink rounded-neo font-bold text-sm shadow-hard-sm"
+              className="flex items-center gap-2 px-4 py-2 bg-neo-pink border-3 border-neo-black text-white hover:bg-neo-pink rounded-neo font-bold text-sm shadow-hard-sm"
             >
               <Eye className="w-4 h-4" />
               <span>{t('singlePlayer.needHint')}</span>

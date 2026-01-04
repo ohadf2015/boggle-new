@@ -134,7 +134,7 @@ export function ReferralCard() {
     return (
       <div className="bg-white/90 dark:bg-neo-navy-light/90 rounded-neo border-3 border-neo-black dark:border-white/20 p-6 shadow-hard-sm">
         <div className="flex items-center justify-center py-8">
-          <div className="w-8 h-8 border-3 border-neo-purple border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-3 border-neo-pink border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     );
@@ -156,7 +156,7 @@ export function ReferralCard() {
     >
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-neo-purple text-white rounded-neo border-2 border-neo-black">
+        <div className="p-2 bg-neo-pink text-white rounded-neo border-2 border-neo-black">
           <Gift className="w-5 h-5" />
         </div>
         <div>
@@ -190,8 +190,8 @@ export function ReferralCard() {
         </div>
 
         {/* Active Referrals */}
-        <div className="bg-neo-orange/20 border-2 border-neo-orange rounded-neo p-3 text-center">
-          <Trophy className="w-5 h-5 mx-auto mb-1 text-neo-orange" />
+        <div className="bg-neo-yellow/20 border-2 border-neo-yellow rounded-neo p-3 text-center">
+          <Trophy className="w-5 h-5 mx-auto mb-1 text-neo-yellow" />
           <div className="text-2xl font-black text-neo-black dark:text-white">
             {referralData.referrals.filter(r => r.referred_games_played > 0).length}
           </div>
@@ -208,11 +208,11 @@ export function ReferralCard() {
         </div>
         <div className="flex items-center gap-2">
           <div className="flex-1 bg-white dark:bg-neo-navy-light text-neo-black dark:text-white border-2 border-neo-black rounded-neo px-4 py-3">
-            <code className="text-2xl font-black text-neo-purple tracking-wider">{referralData.referralCode}</code>
+            <code className="text-2xl font-black text-neo-pink tracking-wider">{referralData.referralCode}</code>
           </div>
           <Button
             onClick={handleCopyLink}
-            className="px-4 py-3 h-auto bg-neo-purple hover:bg-neo-purple/90 text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
+            className="px-4 py-3 h-auto bg-neo-pink hover:bg-neo-pink/90 text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all"
           >
             {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
           </Button>
@@ -262,10 +262,10 @@ export function ReferralCard() {
           💎 {t('profile.referralRewards') || 'Referral Rewards'}
         </div>
         <div className="space-y-1 text-xs text-gray-600 dark:text-gray-300">
-          <div>🎯 Friend joins: <span className="font-bold text-neo-purple">+100 XP</span></div>
-          <div>🎮 First game: <span className="font-bold text-neo-purple">+50 XP</span></div>
-          <div>🔥 5 games: <span className="font-bold text-neo-purple">+100 XP</span></div>
-          <div>⭐ 10 games: <span className="font-bold text-neo-purple">+200 XP</span></div>
+          <div>🎯 Friend joins: <span className="font-bold text-neo-pink">+100 XP</span></div>
+          <div>🎮 First game: <span className="font-bold text-neo-pink">+50 XP</span></div>
+          <div>🔥 5 games: <span className="font-bold text-neo-pink">+100 XP</span></div>
+          <div>⭐ 10 games: <span className="font-bold text-neo-pink">+200 XP</span></div>
         </div>
       </div>
 
@@ -298,7 +298,7 @@ export function ReferralCard() {
                     <div className="text-xs text-gray-600 dark:text-gray-300">
                       {referral.referred_games_played} {t('common.games') || 'games'}
                       {referral.reward_granted && (
-                        <span className="ml-1 text-neo-purple">✓</span>
+                        <span className="ml-1 text-neo-pink">✓</span>
                       )}
                     </div>
                   </div>

@@ -245,17 +245,17 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                             initial={{ scale: 0, opacity: 0, x: -10 }}
                             animate={{ scale: 1, opacity: 1, x: 0 }}
                             transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
-                            className="flex items-center gap-1 cursor-help bg-neo-purple/10 text-white px-1.5 py-0.5 rounded-neo border border-neo-black w-fit"
+                            className="flex items-center gap-1 cursor-help bg-neo-pink/10 text-white px-1.5 py-0.5 rounded-neo border border-neo-black w-fit"
                           >
                             <span className="text-sm">{player.title.icon}</span>
-                            <span className="text-xs font-black text-neo-purple uppercase tracking-wide">
+                            <span className="text-xs font-black text-neo-pink uppercase tracking-wide">
                               {player.title.name}
                             </span>
                           </motion.div>
                         </TooltipTrigger>
                         <TooltipContent
                           side="bottom"
-                          className="bg-neo-purple text-white border-2 border-neo-black shadow-hard rounded-neo p-2"
+                          className="bg-neo-pink text-white border-2 border-neo-black shadow-hard rounded-neo p-2"
                         >
                           <p className="text-xs font-bold text-neo-cream">{player.title.description}</p>
                         </TooltipContent>
@@ -280,7 +280,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                   initial={{ scale: 0, rotate: -10 }}
                   animate={{ scale: 1, rotate: 3 }}
                   transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
-                  className="bg-neo-orange border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-black flex items-center gap-1"
+                  className="bg-neo-yellow border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-black flex items-center gap-1"
                 >
                   <span className="text-xs font-black">⚡ +{totalComboBonus}</span>
                 </motion.div>
@@ -410,7 +410,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
               className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-black text-neo-black dark:text-neo-cream uppercase border-2 border-neo-black bg-neo-yellow/20 dark:bg-neo-yellow/10 shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard transition-all"
             >
               <span className="flex items-center gap-2">
-                <Award className="w-4 h-4 text-neo-purple" />
+                <Award className="w-4 h-4 text-neo-pink" />
                 {t('hostView.achievements') || 'Achievements'} ({gameAchievements.length})
               </span>
               {showAchievements ? (

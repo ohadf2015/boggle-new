@@ -506,10 +506,12 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <WebVitalsReporter />
                 <ServiceWorkerRegistration />
                 <Providers lang={validLocale}>
-                    <main id="main-content" className="screen-fit-content" tabIndex={-1}>
-                        {children}
-                    </main>
-                    <Footer className="hidden md:block" />
+                    <div className="flex-1 flex flex-col min-h-0">
+                        <main id="main-content" className="screen-fit-content" tabIndex={-1}>
+                            {children}
+                        </main>
+                        <Footer className="hidden md:block" />
+                    </div>
                     <PWAInstallPrompt />
                     <EmailCaptureModal />
                     <NewYearCountdown />

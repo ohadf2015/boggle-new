@@ -98,7 +98,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
           // Solid neo-yellow for clean neo-brutalist look
           "bg-neo-yellow",
           // Subtle glow effect for visual distinction
-          !hasPlayed && "ring-2 ring-neo-orange/40 ring-offset-2 ring-offset-transparent",
+          !hasPlayed && "ring-2 ring-neo-red/40 ring-offset-2 ring-offset-transparent",
           compact ? "p-2" : "p-2 sm:p-3",
           className
         )}
@@ -128,7 +128,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
                 #{puzzleNumber}
               </span>
               {streak > 0 && (
-                <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-neo-orange/30 text-neo-black">
+                <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-neo-red/30 text-neo-black">
                   <Flame className="w-3 h-3" />
                   <span className="text-xs font-bold">{streak}</span>
                 </span>

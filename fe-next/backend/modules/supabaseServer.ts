@@ -43,6 +43,28 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 logger.info('SUPABASE', `Configuration status: URL=${!!supabaseUrl}, ServiceKey=${!!supabaseServiceKey}`);
 if (!supabaseUrl || !supabaseServiceKey) {
   logger.warn('SUPABASE', 'Supabase not fully configured (missing URL or SUPABASE_SERVICE_ROLE_KEY). Stats will not be saved to database.');
+} else {
+  // Validate service key by testing a simple query on startup
+  // This helps catch invalid/expired keys early
+  (async () => {
+    try {
+      const testClient = createClient(supabaseUrl, supabaseServiceKey, {
+        auth: { autoRefreshToken: false, persistSession: false }
+      });
+      // Simple test query that should always work with service role key
+      const { error } = await testClient.from('profiles').select('id').limit(1);
+      if (error) {
+        logger.error('SUPABASE', `SERVICE KEY VALIDATION FAILED: ${error.message}. Check your SUPABASE_SERVICE_ROLE_KEY in .env`);
+        if (error.message.includes('401') || error.code === 'PGRST301') {
+          logger.error('SUPABASE', 'The service role key appears to be invalid or expired. Please get a new key from Supabase dashboard > Settings > API');
+        }
+      } else {
+        logger.info('SUPABASE', 'Service role key validated successfully');
+      }
+    } catch (err) {
+      logger.error('SUPABASE', `Failed to validate service key: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  })();
 }
 
 let supabase: SupabaseClient | null = null;

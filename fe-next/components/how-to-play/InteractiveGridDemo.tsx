@@ -137,8 +137,8 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
             animate={{ scale: 1, opacity: 1, y: 0 }}
             className="flex items-center gap-1"
           >
-            <Flame className={`w-4 h-4 sm:w-5 sm:h-5 ${comboCount >= 3 ? 'text-neo-orange animate-pulse drop-shadow-[0_0_8px_rgba(255,140,0,0.7)]' : 'text-gray-600'}`} />
-            <Badge className={`${comboCount >= 3 ? 'bg-neo-orange shadow-[0_0_12px_rgba(255,140,0,0.5)]' : 'bg-gray-300'} text-neo-black border sm:border-2 border-neo-black font-bold text-[10px] sm:text-sm px-1.5 sm:px-2 py-0.5 whitespace-nowrap`}>
+            <Flame className={`w-4 h-4 sm:w-5 sm:h-5 ${comboCount >= 3 ? 'text-neo-red animate-pulse drop-shadow-[0_0_8px_rgba(255,140,0,0.7)]' : 'text-gray-600'}`} />
+            <Badge className={`${comboCount >= 3 ? 'bg-neo-red shadow-[0_0_12px_rgba(255,140,0,0.5)]' : 'bg-gray-300'} text-neo-black border sm:border-2 border-neo-black font-bold text-[10px] sm:text-sm px-1.5 sm:px-2 py-0.5 whitespace-nowrap`}>
               {comboCount}x {comboCount >= 3 && `(${getComboMultiplier(comboCount)}×)`}
             </Badge>
           </motion.div>
@@ -159,7 +159,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
 
       {/* Demo Grid */}
       <div className="relative overflow-hidden p-1 sm:p-2">
-        <div className="grid grid-cols-3 gap-1 sm:gap-2 p-2 sm:p-4 bg-gradient-to-br from-neo-navy/10 to-neo-purple/10 rounded-lg sm:rounded-xl border-2 sm:border-4 border-neo-black shadow-hard-lg">
+        <div className="grid grid-cols-3 gap-1 sm:gap-2 p-2 sm:p-4 bg-gradient-to-br from-neo-navy/10 to-neo-pink/10 rounded-lg sm:rounded-xl border-2 sm:border-4 border-neo-black shadow-hard-lg">
           {demoGrid.map((row, rowIndex) => (
             row.map((letter, colIndex) => {
               const isSelected = isCellSelected(rowIndex, colIndex);

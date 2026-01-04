@@ -75,7 +75,7 @@ const GuestNameEditor: React.FC<GuestNameEditorProps> = ({
   if (loading || !guestPlayer) {
     return (
       <div className="flex items-center justify-center gap-2 py-2">
-        <div className="w-4 h-4 border-2 border-neo-purple border-t-transparent rounded-full animate-spin" />
+        <div className="w-4 h-4 border-2 border-neo-pink border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -135,7 +135,7 @@ const GuestNameEditor: React.FC<GuestNameEditorProps> = ({
             <span className="font-bold text-sm text-neo-black dark:text-white">
               {guestPlayer.displayName}
             </span>
-            <Edit2 className="w-3 h-3 text-gray-500 group-hover:text-neo-purple transition-colors" />
+            <Edit2 className="w-3 h-3 text-gray-500 group-hover:text-neo-pink transition-colors" />
           </button>
         )}
       </motion.div>
@@ -149,7 +149,7 @@ const GuestNameEditor: React.FC<GuestNameEditorProps> = ({
       className="bg-white/90 dark:bg-slate-700/90 rounded-neo border-3 border-neo-black dark:border-slate-500 p-4 shadow-hard-sm"
     >
       <div className="flex items-center gap-2 mb-3">
-        <User className="w-4 h-4 text-neo-purple" />
+        <User className="w-4 h-4 text-neo-pink" />
         <span className="text-sm font-bold text-gray-600 dark:text-gray-300 uppercase">
           {t('daily.playingAs') || 'Playing as'}
         </span>
@@ -219,7 +219,7 @@ const GuestNameEditor: React.FC<GuestNameEditorProps> = ({
           <Button
             onClick={() => setIsEditing(true)}
             size="sm"
-            className="px-3 py-2 bg-neo-purple text-white font-bold border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 transition-all"
+            className="px-3 py-2 bg-neo-pink text-white font-bold border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 transition-all"
           >
             <Edit2 className="w-4 h-4 mr-1" />
             {t('common.edit') || 'Edit'}

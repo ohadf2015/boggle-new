@@ -56,9 +56,9 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
       case 2:
         return 'bg-slate-300 text-neo-black';
       case 3:
-        return 'bg-neo-orange text-neo-black';
+        return 'bg-neo-yellow text-neo-black';
       default:
-        return 'bg-neo-purple text-neo-cream';
+        return 'bg-neo-pink text-neo-cream';
     }
   };
 

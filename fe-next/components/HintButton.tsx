@@ -86,7 +86,7 @@ const HintButton = memo<HintButtonProps>(({
           flex items-center gap-1.5 px-2 py-1.5 max-w-[120px]
           ${isLoading ? 'animate-pulse' : ''}
           ${hintsRemaining > 0
-            ? 'bg-neo-yellow border-neo-black text-neo-black hover:bg-neo-orange hover:shadow-hard-sm'
+            ? 'bg-neo-yellow border-neo-black text-neo-black hover:bg-neo-pink hover:shadow-hard-sm'
             : 'bg-gray-300 border-gray-400 text-gray-600 cursor-not-allowed'}
           border-3 rounded-neo font-bold text-sm transition-all shadow-hard-sm
         `}
@@ -106,7 +106,7 @@ const HintButton = memo<HintButtonProps>(({
                 key={i}
                 className={`w-3 h-3 ${
                   i < hintsRemaining
-                    ? 'text-neo-orange fill-neo-orange'
+                    ? 'text-neo-pink fill-neo-pink'
                     : 'text-gray-400 opacity-40'
                 }`}
               />
@@ -137,7 +137,7 @@ const HintButton = memo<HintButtonProps>(({
                   {t('hints.hint') || 'Hint'}
                 </span>
                 {wordLength && (
-                  <span className="ml-auto text-xs bg-neo-purple text-white px-2 py-0.5 rounded-neo font-bold">
+                  <span className="ml-auto text-xs bg-neo-pink text-white px-2 py-0.5 rounded-neo font-bold">
                     {wordLength} {t('hints.letters') || 'letters'}
                   </span>
                 )}

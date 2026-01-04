@@ -30,7 +30,7 @@ export const ComboVisualizer: React.FC<ComboVisualizerProps> = ({ t }) => {
     { level: '1-2', multiplier: '+1-2', color: 'bg-neo-cyan', bonus: '+1-2' },
     { level: '3-4', multiplier: '+3-4', color: 'bg-neo-lime', bonus: '+3-4' },
     { level: '5-6', multiplier: '+5-6', color: 'bg-neo-yellow text-neo-black', bonus: '+5-6' },
-    { level: '7-8', multiplier: '+7-8', color: 'bg-neo-orange', bonus: '+7-8' },
+    { level: '7-8', multiplier: '+7-8', color: 'bg-neo-red', bonus: '+7-8' },
     { level: '9+', multiplier: '+10', color: 'bg-neo-pink', bonus: '+10 max' },
   ];
 
@@ -71,7 +71,7 @@ export const ComboVisualizer: React.FC<ComboVisualizerProps> = ({ t }) => {
       <div className="relative bg-neo-cream text-neo-black rounded-neo border-3 border-neo-black p-4 shadow-hard-sm">
         <div className="flex items-center justify-between mb-3">
           <span className="font-bold text-neo-black flex items-center gap-2">
-            <Flame className={comboLevel > 2 ? 'text-neo-orange animate-pulse' : 'text-gray-600'} />
+            <Flame className={comboLevel > 2 ? 'text-neo-red animate-pulse' : 'text-gray-600'} />
             {t('howToPlay.combo.currentCombo')}
           </span>
           <motion.span
@@ -128,7 +128,7 @@ export const ComboVisualizer: React.FC<ComboVisualizerProps> = ({ t }) => {
         variant="outline"
         onClick={simulateCombo}
         disabled={isAnimating}
-        className="w-full bg-neo-yellow hover:bg-neo-orange"
+        className="w-full bg-neo-yellow hover:bg-neo-red"
       >
         <Zap className="mr-2 h-4 w-4" />
         {isAnimating ? t('howToPlay.combo.building') : t('howToPlay.combo.tryIt')}

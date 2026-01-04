@@ -900,7 +900,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                           ${isInvalid
                               ? 'bg-neo-red text-neo-cream shadow-hard-sm line-through opacity-70'
                               : isLatest
-                                ? 'bg-neo-orange text-neo-black shadow-hard'
+                                ? 'bg-neo-yellow text-neo-black shadow-hard'
                                 : 'bg-neo-cream text-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard'}`}
                         >
                           {applyHebrewFinalLetters(wordText).toUpperCase()}
@@ -972,7 +972,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                   </div>
                   {/* Rank badge */}
                   {playerData.rank && playerData.rank > 0 && (
-                    <div className="absolute -top-2 -right-2 w-5 h-5 md:w-6 md:h-6 bg-neo-purple text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-[10px] md:text-xs font-black shadow-hard-sm">
+                    <div className="absolute -top-2 -right-2 w-5 h-5 md:w-6 md:h-6 bg-neo-pink text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-[10px] md:text-xs font-black shadow-hard-sm">
                       #{playerData.rank}
                     </div>
                   )}
@@ -1100,7 +1100,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                           className={`inline-block px-2 py-1 text-xs font-bold uppercase rounded-neo border-2 border-neo-black ${wordObj.isValid === false
                             ? 'bg-neo-red text-neo-cream line-through opacity-70'
                             : index === 0
-                              ? 'bg-neo-orange text-neo-black'
+                              ? 'bg-neo-yellow text-neo-black'
                               : 'bg-white text-neo-black'
                             }`}
                         >
@@ -1126,7 +1126,7 @@ const InGameScreen = memo<InGameScreenProps>(({
               style={{ transform: 'rotate(-1deg)' }}
             >
               {/* Header */}
-              <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-purple text-white">
+              <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-pink text-white">
                 <h3 className="flex items-center gap-2 text-neo-cream text-base uppercase tracking-widest font-black">
                   <Trophy className="w-4 h-4 text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
                   {t('playerView.leaderboard')}

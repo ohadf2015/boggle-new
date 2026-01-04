@@ -167,7 +167,7 @@ const AchievementDock = ({ achievements = [], className }: AchievementDockProps)
             )}
           >
             {/* Header - Neo-Brutalist stripe */}
-            <div className="bg-neo-purple text-white border-b-4 border-neo-black px-4 py-3 flex items-center gap-2">
+            <div className="bg-neo-pink text-white border-b-4 border-neo-black px-4 py-3 flex items-center gap-2">
               <span className="text-xl">🏆</span>
               <h3 className="font-black uppercase text-neo-white tracking-wide">
                 {t('achievementDock.title') || 'YOUR ACHIEVEMENTS'}
@@ -213,7 +213,7 @@ const AchievementDock = ({ achievements = [], className }: AchievementDockProps)
                     </TooltipTrigger>
                     <TooltipContent
                       side="left"
-                      className="bg-neo-purple text-neo-white border-3 border-neo-black shadow-hard p-3 max-w-[200px]"
+                      className="bg-neo-pink text-neo-white border-3 border-neo-black shadow-hard p-3 max-w-[200px]"
                     >
                       <p className="font-black text-sm uppercase">{achievement.name}</p>
                       <p className="text-xs mt-1">{achievement.description}</p>

@@ -589,7 +589,7 @@ export default function ProfilePage(): React.ReactNode {
           )}>
             {t('xp.totalXpEarned') || 'Total XP Earned'}: <span className={cn(
               'font-bold',
-              isDarkMode ? 'text-neo-cyan' : 'text-neo-purple'
+              isDarkMode ? 'text-neo-cyan' : 'text-neo-pink'
             )}>{(profile?.total_xp || 0).toLocaleString()}</span>
           </p>
         </div>
@@ -720,7 +720,7 @@ export default function ProfilePage(): React.ReactNode {
         <p className={cn('text-sm', isDarkMode ? 'text-gray-500' : 'text-gray-500')}>
           {t('coins.lifetimeEarned') || 'Lifetime coins earned'}:
         </p>
-        <span className="font-bold text-neo-orange">
+        <span className="font-bold text-neo-yellow">
           {(profile?.lifetime_coins_earned || 0).toLocaleString()} 💰
         </span>
       </div>
@@ -907,7 +907,7 @@ export default function ProfilePage(): React.ReactNode {
           'text-base font-bold flex items-center gap-2',
           isDarkMode ? 'text-white' : 'text-gray-900'
         )}>
-          <Gift className="text-neo-purple" />
+          <Gift className="text-neo-pink" />
           {t('collectibles.title') || 'My Collection'}
         </h2>
         {playerCollectibles.length > 0 && (
@@ -922,7 +922,7 @@ export default function ProfilePage(): React.ReactNode {
 
       {isLoadingCollectibles ? (
         <div className="flex justify-center py-6">
-          <div className="w-6 h-6 border-3 border-neo-purple border-t-transparent rounded-full animate-spin" />
+          <div className="w-6 h-6 border-3 border-neo-pink border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
         <CollectionGrid collectibles={playerCollectibles} />
@@ -988,7 +988,7 @@ export default function ProfilePage(): React.ReactNode {
               : 'bg-white text-gray-700 hover:bg-gray-100'
             : isDarkMode
               ? 'bg-neo-cyan text-neo-black hover:bg-neo-cyan/90'
-              : 'bg-neo-purple text-neo-white hover:bg-neo-purple/90'
+              : 'bg-neo-pink text-neo-white hover:bg-neo-pink/90'
         )}
       >
         <ArrowLeft className="me-2 rtl:rotate-180" />
@@ -1414,7 +1414,7 @@ export default function ProfilePage(): React.ReactNode {
               )}>
                 {t('xp.totalXpEarned') || 'Total XP Earned'}: <span className={cn(
                   'font-bold',
-                  isDarkMode ? 'text-neo-cyan' : 'text-neo-purple'
+                  isDarkMode ? 'text-neo-cyan' : 'text-neo-pink'
                 )}>{(profile?.total_xp || 0).toLocaleString()}</span>
               </p>
             </div>
@@ -1492,7 +1492,7 @@ export default function ProfilePage(): React.ReactNode {
             <p className={cn('text-sm', isDarkMode ? 'text-gray-500' : 'text-gray-500')}>
               {t('coins.lifetimeEarned') || 'Lifetime coins earned'}:
             </p>
-            <span className="font-bold text-neo-orange">
+            <span className="font-bold text-neo-yellow">
               {(profile?.lifetime_coins_earned || 0).toLocaleString()} 💰
             </span>
           </div>
@@ -1725,7 +1725,7 @@ export default function ProfilePage(): React.ReactNode {
               'text-lg font-bold flex items-center gap-2',
               isDarkMode ? 'text-white' : 'text-gray-900'
             )}>
-              <Gift className="text-neo-purple" />
+              <Gift className="text-neo-pink" />
               {t('collectibles.title') || 'My Collection'}
             </h2>
             {playerCollectibles.length > 0 && (
@@ -1740,7 +1740,7 @@ export default function ProfilePage(): React.ReactNode {
 
           {isLoadingCollectibles ? (
             <div className="flex justify-center py-8">
-              <div className="w-6 h-6 border-3 border-neo-purple border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-3 border-neo-pink border-t-transparent rounded-full animate-spin" />
             </div>
           ) : (
             <CollectionGrid collectibles={playerCollectibles} />
@@ -1805,7 +1805,7 @@ export default function ProfilePage(): React.ReactNode {
                   : 'bg-white text-gray-700 hover:bg-gray-100'
                 : isDarkMode
                   ? 'bg-neo-cyan text-neo-black hover:bg-neo-cyan/90'
-                  : 'bg-neo-purple text-neo-white hover:bg-neo-purple/90'
+                  : 'bg-neo-pink text-neo-white hover:bg-neo-pink/90'
             )}
           >
             <ArrowLeft className="me-2 rtl:rotate-180" />
