@@ -154,17 +154,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     }
   }, [shouldShowConfetti, mode, playerRank]);
 
-  // Show training analysis modal for practice mode
-  useEffect(() => {
-    if (mode === 'practice') {
-      // Small delay to let confetti and results appear first
-      const timer = setTimeout(() => {
-        setShowTrainingAnalysis(true);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [mode]);
+  // Training analysis is shown manually via button click in practice mode
+  // No auto-transition - let player decide when to continue
 
   // Update guest stats for single player games (only for unauthenticated users)
   useEffect(() => {
@@ -547,6 +538,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             onQuickRematch={onQuickRematch}
             onPlayAgain={onPlayAgain}
             onBackToLobby={onBackToLobby}
+            onViewTrainingProgress={mode === 'practice' ? () => setShowTrainingAnalysis(true) : undefined}
             variant="landscape"
             className="mt-auto"
           />
@@ -678,6 +670,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         onQuickRematch={onQuickRematch}
         onPlayAgain={onPlayAgain}
         onBackToLobby={onBackToLobby}
+        onViewTrainingProgress={mode === 'practice' ? () => setShowTrainingAnalysis(true) : undefined}
         variant="mobile"
       />
     </div>
@@ -960,6 +953,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 onQuickRematch={onQuickRematch}
                 onPlayAgain={onPlayAgain}
                 onBackToLobby={onBackToLobby}
+                onViewTrainingProgress={mode === 'practice' ? () => setShowTrainingAnalysis(true) : undefined}
                 variant="desktop"
               />
             </div>

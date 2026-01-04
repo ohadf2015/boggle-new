@@ -1,6 +1,6 @@
 {
   "summary": {
-    "totalKeysInCode": 1557,
+    "totalKeysInCode": 1558,
     "keyCountByLanguage": {
       "en": 2646,
       "he": 2646,
@@ -8,9 +8,39 @@
       "ja": 2646,
       "es": 2646
     },
-    "missingFromEnglish": 0
+    "missingFromEnglish": 1
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "training.viewProgress",
+      "usages": [
+        {
+          "file": "components/results/ResultsActionButtons.tsx",
+          "line": 60
+        },
+        {
+          "file": "components/results/ResultsActionButtons.tsx",
+          "line": 60
+        },
+        {
+          "file": "components/results/ResultsActionButtons.tsx",
+          "line": 60
+        },
+        {
+          "file": "components/results/ResultsActionButtons.tsx",
+          "line": 120
+        },
+        {
+          "file": "components/results/ResultsActionButtons.tsx",
+          "line": 120
+        },
+        {
+          "file": "components/results/ResultsActionButtons.tsx",
+          "line": 120
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [],
     "sv": [],

@@ -397,8 +397,14 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             playerType: bodyData.playerId ? 'authenticated' : 'guest',
           });
 
-          // Mark the result as successfully submitted to prevent retry on next page load
-          markWordHuntResultSubmitted(language);
+          // Only mark as submitted if this was a NEW submission (not if we hit a duplicate constraint)
+          // This prevents the case where localStorage gets marked "submitted" but actually
+          // contains different result data than what was already in the database
+          if (!responseData.alreadySubmitted) {
+            markWordHuntResultSubmitted(language);
+          } else {
+            console.warn('[WordHunt Submit] Server indicated submission already existed - not marking localStorage as submitted');
+          }
 
           // Refresh the leaderboard and fetch stats after successful submission
           setLeaderboardKey(prev => prev + 1);

@@ -338,26 +338,10 @@ router.post('/submit', async (req: SubmitRequest, res: Response): Promise<void> 
 
     const supabase = getSupabase();
 
-    // Check if already submitted
-    let existingQuery = supabase
-      .from('daily_puzzle_attempts')
-      .select('id')
-      .eq('puzzle_date', puzzleDate)
-      .eq('language', language);
-
-    if (playerId) {
-      existingQuery = existingQuery.eq('player_id', playerId);
-    } else {
-      existingQuery = existingQuery.eq('guest_fingerprint', guestFingerprint);
-    }
-
-    const { data: existing } = await existingQuery.single();
-
-    if (existing) {
-      // Already submitted - return existing entry
-      res.json({ success: true, alreadySubmitted: true } as SubmitResponse);
-      return;
-    }
+    // NOTE: We use atomic insert with unique constraint fallback instead of check-then-insert
+    // This prevents race conditions where two concurrent requests both pass the "check" phase
+    // The database unique constraint on (puzzle_date, language, player_id/guest_fingerprint)
+    // ensures only one submission succeeds; the other gets error code 23505
 
     // Insert new attempt
     const insertData: AttemptInsertData = {
@@ -413,6 +397,7 @@ router.post('/submit', async (req: SubmitRequest, res: Response): Promise<void> 
 
     res.json({
       success: true,
+      alreadySubmitted: false, // Explicitly indicate this is a NEW submission
       data,
       rank: rankData?.rank_position || null
     } as SubmitResponse);
@@ -652,26 +637,10 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
 
     const supabase = getSupabase();
 
-    // Check if already submitted
-    let existingQuery = supabase
-      .from('daily_word_hunt_attempts')
-      .select('id')
-      .eq('puzzle_date', puzzleDate)
-      .eq('language', language);
-
-    if (playerId) {
-      existingQuery = existingQuery.eq('player_id', playerId);
-    } else {
-      existingQuery = existingQuery.eq('guest_fingerprint', guestFingerprint);
-    }
-
-    const { data: existing } = await existingQuery.single();
-
-    if (existing) {
-      // Already submitted
-      res.json({ success: true, alreadySubmitted: true });
-      return;
-    }
+    // NOTE: We use atomic insert with unique constraint fallback instead of check-then-insert
+    // This prevents race conditions where two concurrent requests both pass the "check" phase
+    // The database unique constraint on (puzzle_date, language, player_id/guest_fingerprint)
+    // ensures only one submission succeeds; the other gets error code 23505
 
     // Insert new Word Hunt attempt
     const insertData: Record<string, unknown> = {
@@ -773,6 +742,7 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
 
     res.json({
       success: true,
+      alreadySubmitted: false, // Explicitly indicate this is a NEW submission
       data
     });
   } catch (error) {

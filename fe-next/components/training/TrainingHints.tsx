@@ -131,8 +131,8 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
             className={cn(
-              'fixed top-20 left-1/2 -translate-x-1/2 z-50',
-              'max-w-sm w-[90vw] mx-auto'
+              'fixed inset-x-4 top-1/2 -translate-y-1/2 z-50',
+              'max-w-sm mx-auto'
             )}
           >
             <div
@@ -287,7 +287,7 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ type: 'spring', damping: 15, stiffness: 200 }}
-            className="fixed top-20 left-1/2 -translate-x-1/2 z-50"
+            className="fixed inset-x-4 top-1/2 -translate-y-1/2 z-50 flex justify-center"
           >
             <div className={cn(
               'rounded-xl border-2 px-6 py-3 shadow-lg backdrop-blur-sm',

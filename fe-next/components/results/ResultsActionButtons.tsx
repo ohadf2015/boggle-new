@@ -2,7 +2,7 @@
 
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
-import { RotateCw, Settings, Home, Play, DoorOpen, Star, Check, ArrowRight } from 'lucide-react';
+import { RotateCw, Settings, Home, Play, DoorOpen, Star, Check, ArrowRight, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -15,6 +15,8 @@ interface SinglePlayerActionsProps {
   onQuickRematch?: () => void;
   onPlayAgain: () => void;
   onBackToLobby: () => void;
+  /** Optional callback to view training progress (practice mode) */
+  onViewTrainingProgress?: () => void;
   /** Display variant */
   variant?: 'desktop' | 'mobile' | 'landscape';
   className?: string;
@@ -37,6 +39,7 @@ export const SinglePlayerActions: React.FC<SinglePlayerActionsProps> = memo(({
   onQuickRematch,
   onPlayAgain,
   onBackToLobby,
+  onViewTrainingProgress,
   variant = 'desktop',
   className,
 }) => {
@@ -46,6 +49,17 @@ export const SinglePlayerActions: React.FC<SinglePlayerActionsProps> = memo(({
   if (variant === 'landscape') {
     return (
       <div className={cn('flex flex-col gap-2', className)}>
+        {/* Training Progress Button - for practice mode */}
+        {onViewTrainingProgress && (
+          <Button
+            size="sm"
+            onClick={onViewTrainingProgress}
+            className="w-full py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold text-xs border-2 border-neo-black"
+          >
+            <BarChart3 className="me-1 w-3.5 h-3.5" />
+            {t('training.viewProgress') || 'View Progress'}
+          </Button>
+        )}
         {onQuickRematch && (
           <motion.div className="relative">
             <motion.div
@@ -96,6 +110,17 @@ export const SinglePlayerActions: React.FC<SinglePlayerActionsProps> = memo(({
   // Desktop and Mobile variants - similar layout
   return (
     <div className={cn('flex flex-col gap-2', className)}>
+      {/* Training Progress Button - for practice mode */}
+      {onViewTrainingProgress && (
+        <Button
+          onClick={onViewTrainingProgress}
+          className="w-full py-4 text-base font-bold rounded-xl transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl border-2 border-neo-black"
+        >
+          <BarChart3 className="w-5 h-5" />
+          {t('training.viewProgress') || 'View Training Progress'}
+        </Button>
+      )}
+
       {/* Primary CTA - Quick Rematch (with enhanced animation) */}
       {onQuickRematch && (
         <motion.div
