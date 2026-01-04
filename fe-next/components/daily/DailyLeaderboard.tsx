@@ -360,7 +360,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
     } catch (err) {
       console.error('Failed to copy:', err);
     }
-  }, [currentUserData, puzzleDate, language]);
+  }, [currentUserData, puzzleDate, language, gameType]);
 
   // Filter out guests - only show authenticated users on leaderboard
   // For Word Hunt: only show authenticated players who SOLVED

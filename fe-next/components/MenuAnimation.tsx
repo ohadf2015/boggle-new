@@ -234,7 +234,7 @@ const MenuAnimation: React.FC<MenuAnimationProps> = ({ className = '' }) => {
       const newCount = prevCount + 1;
       return newCount;
     });
-  }, [generateLetter, t]);
+  }, [generateLetter]);
 
   // Remove explosion after animation
   const handleExplosionComplete = (explosionId: string) => {

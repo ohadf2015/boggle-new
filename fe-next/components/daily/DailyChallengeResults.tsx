@@ -82,16 +82,16 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   const { isLowEnd, enableComplexAnimations } = useDevicePerformance();
   const skipConfetti = useMemo(() => isLowEnd || !enableComplexAnimations, [isLowEnd, enableComplexAnimations]);
 
-  // Confetti colors for each rank (matching Top3Leaderboard)
-  const RANK_CONFETTI_COLORS: Record<number, string[]> = {
-    1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'], // Gold
-    2: ['#c0c0c0', '#94a3b8', '#e2e8f0', '#cbd5e1'], // Silver
-    3: ['#cd7f32', '#ea580c', '#f97316', '#fb923c'], // Bronze/Orange
-  };
-
   // Fire confetti burst for a specific rank (top 3 celebration) - skip on low-end devices
   const fireRankConfettiLocal = useCallback((rank: number): void => {
     if (skipConfetti) return;
+
+    // Confetti colors for each rank (matching Top3Leaderboard)
+    const RANK_CONFETTI_COLORS: Record<number, string[]> = {
+      1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'], // Gold
+      2: ['#c0c0c0', '#94a3b8', '#e2e8f0', '#cbd5e1'], // Silver
+      3: ['#cd7f32', '#ea580c', '#f97316', '#fb923c'], // Bronze/Orange
+    };
 
     const count = Math.floor(60 * (1.2 - rank * 0.15)); // Reduced: 1st = 60, 2nd = 51, 3rd = 42
     const colors = RANK_CONFETTI_COLORS[rank] || RANK_CONFETTI_COLORS[1];

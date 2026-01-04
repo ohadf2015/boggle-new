@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Flame, RotateCw, Play, Check } from 'lucide-react';
 import { Badge } from '../ui/badge';
@@ -36,7 +36,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
   ];
 
   // Demo paths: LTR starts left, RTL starts right
-  const demoSequence: DemoWord[] = isRTL ? [
+  const demoSequence: DemoWord[] = useMemo(() => isRTL ? [
     { word: 'CAT', path: [[0,2], [0,1], [0,0]], points: 2 },
     { word: 'RAT', path: [[1,1], [0,1], [0,0]], points: 2 },
     { word: 'ART', path: [[0,1], [1,1], [0,0]], points: 2 },
@@ -46,7 +46,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
     { word: 'RAT', path: [[1,1], [0,1], [0,2]], points: 2 },
     { word: 'ART', path: [[0,1], [1,1], [0,2]], points: 2 },
     { word: 'CARS', path: [[0,0], [0,1], [1,1], [1,2]], points: 3 },
-  ];
+  ], [isRTL]);
 
   const [selectedCells, setSelectedCells] = useState<[number, number][]>([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
