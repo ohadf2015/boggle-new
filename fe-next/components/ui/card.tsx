@@ -17,6 +17,8 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         // Dark mode - use dark background with 3:1+ contrast border
         "dark:bg-slate-800 dark:text-neo-white dark:border-slate-400",
         "shadow-hard-lg h-full",
+        // Container query setup for responsive children
+        "cq-container",
         // Optional tilt for playfulness
         tilt === "left" && "rotate-[-2deg]",
         tilt === "right" && "rotate-[2deg]",
@@ -36,6 +38,8 @@ const CardDark = React.forwardRef<HTMLDivElement, CardProps>(
       className={cn(
         "rounded-neo-lg border-4 border-neo-black bg-neo-gray text-neo-white",
         "shadow-hard-lg h-full",
+        // Container query setup for responsive children
+        "cq-container",
         tilt === "left" && "rotate-[-2deg]",
         tilt === "right" && "rotate-[2deg]",
         className
@@ -52,7 +56,7 @@ const CardHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col space-y-1.5 p-4 sm:p-5 md:p-6", className)}
+    className={cn("flex flex-col space-y-1.5 cq-p-responsive", className)}
     {...props}
   />
 ));
@@ -90,7 +94,7 @@ const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-4 sm:p-5 md:p-6 pt-0", className)} {...props} />
+  <div ref={ref} className={cn("cq-p-responsive pt-0", className)} {...props} />
 ));
 CardContent.displayName = "CardContent";
 
@@ -100,7 +104,7 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center p-4 sm:p-5 md:p-6 pt-0", className)}
+    className={cn("flex items-center cq-p-responsive pt-0", className)}
     {...props}
   />
 ));

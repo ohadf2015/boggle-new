@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Trophy, X, ArrowLeft, Copy, Check, Send, Coins, RotateCcw, ImageDown, ChevronDown, Eye, BarChart3, Medal, Timer, Sparkles } from 'lucide-react';
+import { Share2, Trophy, X, ArrowLeft, Copy, Check, Send, Coins, RotateCcw, ImageDown, ChevronDown, Eye, BarChart3, Timer, Sparkles } from 'lucide-react';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 
 // X/Twitter icon (no lucide equivalent)
@@ -92,7 +92,7 @@ interface DailyWordHuntResultsProps {
   onGameLanguageChange?: (lang: Language) => void;
 }
 
-type ResultTab = 'results' | 'stats' | 'ranks';
+type ResultTab = 'results' | 'stats';
 
 // ============================================================================
 // CONSTANTS
@@ -420,9 +420,8 @@ const ShareSection: React.FC<{
   onDownloadImage: () => void;
   copied: boolean;
   isGeneratingImage: boolean;
-  onShowLeaderboard: () => void;
   t: (key: string) => string;
-}> = ({ solved, onShare, onRetry, canAffordRetry, retryCost, onWhatsApp, onTwitter, onTelegram, onCopy, onDownloadImage, copied, isGeneratingImage, onShowLeaderboard, t }) => (
+}> = ({ solved, onShare, onRetry, canAffordRetry, retryCost, onWhatsApp, onTwitter, onTelegram, onCopy, onDownloadImage, copied, isGeneratingImage, t }) => (
   <motion.div
     initial={{ y: 20, opacity: 0 }}
     animate={{ y: 0, opacity: 1 }}
@@ -487,15 +486,17 @@ const ShareSection: React.FC<{
       </button>
     </div>
 
-    {/* Retry button */}
+    {/* Retry button - subtle for solved players, prominent for failed */}
     <Button
       onClick={onRetry}
       disabled={!canAffordRetry}
       className={cn(
-        "w-full py-2.5 text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard transition-all",
-        canAffordRetry
-          ? "bg-gradient-to-r from-amber-400 to-orange-500 text-neo-black hover:shadow-hard-lg hover:-translate-y-0.5"
-          : "bg-gray-400 text-gray-600 cursor-not-allowed"
+        "w-full py-2 text-sm uppercase border-2 rounded-neo transition-all",
+        solved
+          ? "font-medium bg-transparent border-gray-400 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 shadow-none"
+          : canAffordRetry
+            ? "font-black bg-gradient-to-r from-amber-400 to-orange-500 text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5"
+            : "font-black bg-gray-400 text-gray-600 border-neo-black cursor-not-allowed shadow-hard"
       )}
     >
       <RotateCcw className="mr-1.5 w-4 h-4" />
@@ -503,15 +504,6 @@ const ShareSection: React.FC<{
         {t('wordHunt.results.retry') || 'Retry'}
         <span className="text-xs opacity-70">({retryCost}🪙)</span>
       </span>
-    </Button>
-
-    {/* Leaderboard button */}
-    <Button
-      onClick={onShowLeaderboard}
-      className="w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all font-bold text-sm lg:hidden"
-    >
-      <Trophy className="w-4 h-4 mr-2" />
-      {t('daily.showLeaderboard')}
     </Button>
   </motion.div>
 );
@@ -1081,8 +1073,19 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         onDownloadImage={handleDownloadShareImage}
         copied={copied}
         isGeneratingImage={isGeneratingImage}
-        onShowLeaderboard={() => setActiveTab('ranks')}
         t={t}
+      />
+
+      {/* Leaderboard - inline in results */}
+      <TabbedDailyLeaderboard
+        key={leaderboardKey}
+        puzzleDate={puzzleDate}
+        language={language}
+        currentPlayerId={isAuthenticated && profile ? profile.id : null}
+        currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
+        maxVisible={5}
+        t={t}
+        defaultTab="today"
       />
 
       {/* Collapsible details for rewards and secondary info */}
@@ -1158,20 +1161,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     </div>
   );
 
-  const renderRanksContent = () => (
-    <div className="space-y-4">
-      <TabbedDailyLeaderboard
-        key={leaderboardKey}
-        puzzleDate={puzzleDate}
-        language={language}
-        currentPlayerId={isAuthenticated && profile ? profile.id : null}
-        currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
-        maxVisible={5}
-        t={t}
-        defaultTab="today"
-      />
-    </div>
-  );
 
   return (
     <motion.div
@@ -1264,7 +1253,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         <div className={cn("max-w-md mx-auto pt-3 lg:hidden", isProtected && "blur-xl pointer-events-none select-none")}>
           {activeTab === 'results' && renderResultsContent()}
           {activeTab === 'stats' && renderStatsContent()}
-          {activeTab === 'ranks' && renderRanksContent()}
         </div>
       </div>
 
@@ -1274,7 +1262,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           tabs={[
             { id: 'results', icon: <Trophy className="w-5 h-5" />, label: t('wordHunt.results.title') || 'Results' },
             { id: 'stats', icon: <BarChart3 className="w-5 h-5" />, label: t('wordHunt.stats.title') || 'Stats' },
-            { id: 'ranks', icon: <Medal className="w-5 h-5" />, label: t('daily.leaderboard') || 'Ranks' },
           ]}
           activeTab={activeTab}
           onTabChange={(id) => setActiveTab(id as ResultTab)}

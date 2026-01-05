@@ -2922,6 +2922,7 @@ const sv = {
     "maxAttempts": "Max Försök",
     "huntDescription": "Jaga det dolda ordet med färgkodad feedback!",
     "shareImage": "Dela som bild",
+    "shareImageHint": "Dela din prestation med vänner!",
     "download": "Spara som bild",
     "downloadImage": "Spara delningsbild",
     "generatingImage": "Skapar bild...",

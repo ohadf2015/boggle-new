@@ -2928,6 +2928,7 @@ const en = {
     "maxAttempts": "Max Tries",
     "huntDescription": "Find the hidden word with color clues!",
     "shareImage": "Share Image",
+    "shareImageHint": "Share your achievement with friends!",
     "download": "Save Image",
     "downloadImage": "Save Image",
     "generatingImage": "Creating...",

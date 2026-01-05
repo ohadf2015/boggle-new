@@ -773,57 +773,70 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center z-50 p-4"
             onClick={() => setShowImagePreview(false)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-neo-navy rounded-neo border-4 border-neo-black p-4 max-w-2xl w-full"
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 10 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="bg-slate-900 rounded-xl border-2 border-slate-700 p-5 max-w-lg w-full shadow-2xl"
               onClick={e => e.stopPropagation()}
             >
-              <h3 className="text-xl font-black mb-4 text-white text-center">
-                {t('daily.shareImage') || 'Share Image'}
-              </h3>
+              {/* Header */}
+              <div className="text-center mb-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-neo-cyan/10 rounded-full border border-neo-cyan/30 mb-2">
+                  <ImageIcon className="w-4 h-4 text-neo-cyan" />
+                  <span className="text-xs font-bold text-neo-cyan uppercase tracking-wide">
+                    {t('daily.shareImage') || 'Share Image'}
+                  </span>
+                </div>
+                <p className="text-slate-400 text-sm">
+                  {t('daily.shareImageHint') || 'Share your achievement with friends!'}
+                </p>
+              </div>
 
               {/* Image preview - using <img> intentionally for data URL which Next.js Image doesn't optimize */}
-              <div className="relative rounded-neo overflow-hidden border-3 border-neo-black mb-4">
+              <div className="relative rounded-lg overflow-hidden border border-slate-600 mb-4 bg-slate-800">
+                <div className="absolute inset-0 bg-gradient-to-br from-neo-cyan/5 via-transparent to-neo-pink/5 pointer-events-none" />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={shareImage.dataUrl}
                   alt={`LexiClash Daily Challenge #${result.puzzleNumber} - Score: ${result.score}`}
-                  className="w-full h-auto"
-                  style={{ maxHeight: '60vh', objectFit: 'contain' }}
+                  className="w-full h-auto relative"
+                  style={{ maxHeight: '50vh', objectFit: 'contain' }}
                 />
               </div>
 
               {/* Action buttons */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                {/* Primary CTA - Share */}
                 <Button
                   onClick={handleShareImage}
-                  className="py-3 bg-gradient-to-r from-neo-yellow to-neo-pink text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm font-bold"
+                  className="w-full py-3.5 bg-neo-cyan text-neo-black border-2 border-neo-black rounded-lg shadow-hard font-bold text-sm hover:shadow-hard-lg hover:-translate-y-0.5 transition-all"
                 >
-                  <Share2 className="mr-2 w-5 h-5" />
+                  <Share2 className="mr-2 w-4 h-4" />
                   {t('daily.shareScore')}
                 </Button>
 
+                {/* Secondary - Download */}
                 <Button
                   onClick={handleDownloadImage}
-                  className="py-3 bg-neo-cyan text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm font-bold"
+                  className="w-full py-3 bg-slate-700 hover:bg-slate-600 text-white border border-slate-600 rounded-lg font-medium text-sm transition-all"
                 >
-                  <ImageDown className="mr-2 w-5 h-5" />
-                  {t('daily.download') || 'Save as Image'}
+                  <ImageDown className="mr-2 w-4 h-4" />
+                  {t('daily.download') || 'Save Image'}
                 </Button>
               </div>
 
-              <Button
+              {/* Close button */}
+              <button
                 onClick={() => setShowImagePreview(false)}
-                variant="ghost"
-                className="w-full mt-3 text-gray-400 hover:text-white"
+                className="w-full mt-3 py-2 text-sm text-slate-500 hover:text-slate-300 transition-colors"
               >
                 {t('daily.close')}
-              </Button>
+              </button>
             </motion.div>
           </motion.div>
         )}

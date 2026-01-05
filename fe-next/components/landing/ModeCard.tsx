@@ -67,7 +67,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
           // Neo-Brutalist card base
           'rounded-neo-lg border-3 border-neo-black',
           'shadow-hard-lg',
-          'p-3 sm:p-3 lg:p-4',
+          // Container query setup for responsive children
+          'cq-container',
           'cursor-pointer',
           'relative overflow-hidden',
           // Colors
@@ -86,21 +87,28 @@ const ModeCard: React.FC<ModeCardProps> = ({
           'active:shadow-hard-pressed',
           className
         )}
+        style={{
+          // Container-relative padding using cqw
+          padding: 'clamp(0.75rem, 3cqw, 1rem)',
+        }}
         // Removed micro-animations for cleaner UX
       >
         {/* Header with icon and arrow */}
-        <div className="flex items-start justify-between mb-2 lg:mb-4">
-          {/* Icon */}
+        <div className="flex items-start justify-between" style={{ marginBottom: 'clamp(0.5rem, 2cqw, 1rem)' }}>
+          {/* Icon - container-relative sizing */}
           <div
             className={cn(
-              'w-9 h-9 sm:w-10 sm:h-10 lg:w-14 lg:h-14 xl:w-16 xl:h-16',
-              'rounded-neo border-2 lg:border-3 border-neo-black',
-              'shadow-hard-sm lg:shadow-hard',
+              'rounded-neo border-2 border-neo-black',
+              'shadow-hard-sm',
               'flex items-center justify-center',
               styles.iconBg
             )}
+            style={{
+              width: 'clamp(2.25rem, 12cqw, 4rem)',
+              height: 'clamp(2.25rem, 12cqw, 4rem)',
+            }}
           >
-            <span className={cn('text-lg sm:text-xl lg:text-2xl xl:text-3xl', styles.iconText)}>
+            <span className={styles.iconText} style={{ fontSize: 'clamp(1.125rem, 6cqw, 1.875rem)' }}>
               {icon}
             </span>
           </div>
@@ -108,41 +116,71 @@ const ModeCard: React.FC<ModeCardProps> = ({
           {/* Arrow indicator - min 44x44px touch target on mobile */}
           <div
             className={cn(
-              'w-10 h-10 sm:w-10 sm:h-10 lg:w-11 lg:h-11 xl:w-12 xl:h-12',
-              'rounded-full border-2 lg:border-3 border-neo-black',
+              'min-w-[44px] min-h-[44px]',
+              'rounded-full border-2 border-neo-black',
               'flex items-center justify-center',
               'transition-transform duration-200 ease-out',
               isRTL ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1',
               styles.arrow
             )}
+            style={{
+              width: 'clamp(2.5rem, 10cqw, 3rem)',
+              height: 'clamp(2.5rem, 10cqw, 3rem)',
+            }}
           >
-            <ArrowIcon className="text-sm sm:text-base lg:text-lg xl:text-xl" />
+            <ArrowIcon style={{ fontSize: 'clamp(0.875rem, 4cqw, 1.25rem)' }} />
           </div>
         </div>
 
-        {/* Title */}
-        <h2 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-black uppercase tracking-tight text-neo-black mb-0.5 lg:mb-1 xl:mb-2">
+        {/* Title - container-relative font size */}
+        <h2
+          className="font-black uppercase tracking-tight text-neo-black"
+          style={{
+            fontSize: 'clamp(1.125rem, 6cqw, 1.875rem)',
+            marginBottom: 'clamp(0.125rem, 0.5cqw, 0.5rem)',
+          }}
+        >
           {title}
         </h2>
 
-        {/* Description */}
-        <p className="text-xs sm:text-sm lg:text-base xl:text-lg font-medium text-neo-black mb-2 lg:mb-4">
+        {/* Description - container-relative font size */}
+        <p
+          className="font-medium text-neo-black"
+          style={{
+            fontSize: 'clamp(0.75rem, 3.5cqw, 1.125rem)',
+            marginBottom: 'clamp(0.5rem, 2cqw, 1rem)',
+          }}
+        >
           {description}
         </p>
 
         {/* Live Badge - shows open rooms and players only when meaningful (> 5) */}
         {/* Using bg-neo-cream for WCAG AA compliant contrast (19.8:1 vs neo-black) */}
         {liveBadge && (liveBadge.openRooms > 5 || liveBadge.totalPlayers > 5) && (
-          <div className="flex flex-wrap gap-1.5 lg:gap-2">
+          <div className="flex flex-wrap" style={{ gap: 'clamp(0.375rem, 1.5cqw, 0.5rem)' }}>
             {liveBadge.openRooms > 5 && (
-              <span className="inline-flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-1 lg:py-1.5 bg-neo-cream text-neo-black text-xs lg:text-sm font-bold rounded-neo border-2 border-neo-black shadow-hard-sm">
-                <LayoutGrid className="w-3 h-3 lg:w-4 lg:h-4" />
+              <span
+                className="inline-flex items-center bg-neo-cream text-neo-black font-bold rounded-neo border-2 border-neo-black shadow-hard-sm"
+                style={{
+                  gap: 'clamp(0.25rem, 1cqw, 0.5rem)',
+                  padding: 'clamp(0.25rem, 1cqw, 0.375rem) clamp(0.5rem, 2cqw, 0.75rem)',
+                  fontSize: 'clamp(0.75rem, 3cqw, 0.875rem)',
+                }}
+              >
+                <LayoutGrid style={{ width: 'clamp(0.75rem, 3cqw, 1rem)', height: 'clamp(0.75rem, 3cqw, 1rem)' }} />
                 {liveBadge.openRooms} {liveBadge.roomsLabel}
               </span>
             )}
             {liveBadge.totalPlayers > 5 && (
-              <span className="inline-flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-1 lg:py-1.5 bg-neo-cream text-neo-black text-xs lg:text-sm font-bold rounded-neo border-2 border-neo-black shadow-hard-sm">
-                <Users className="w-3 h-3 lg:w-4 lg:h-4" />
+              <span
+                className="inline-flex items-center bg-neo-cream text-neo-black font-bold rounded-neo border-2 border-neo-black shadow-hard-sm"
+                style={{
+                  gap: 'clamp(0.25rem, 1cqw, 0.5rem)',
+                  padding: 'clamp(0.25rem, 1cqw, 0.375rem) clamp(0.5rem, 2cqw, 0.75rem)',
+                  fontSize: 'clamp(0.75rem, 3cqw, 0.875rem)',
+                }}
+              >
+                <Users style={{ width: 'clamp(0.75rem, 3cqw, 1rem)', height: 'clamp(0.75rem, 3cqw, 1rem)' }} />
                 {liveBadge.totalPlayers} {liveBadge.playersLabel}
               </span>
             )}

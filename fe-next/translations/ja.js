@@ -2921,6 +2921,7 @@ const ja = {
     "maxAttempts": "最大試行回数",
     "huntDescription": "色分けされたフィードバックで隠された単語を探そう！",
     "shareImage": "画像として共有",
+    "shareImageHint": "友達と達成を共有しよう！",
     "download": "画像として保存",
     "downloadImage": "シェア画像を保存",
     "generatingImage": "画像を作成中...",

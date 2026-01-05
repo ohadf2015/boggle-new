@@ -2923,6 +2923,7 @@ const he = {
     "maxAttempts": "ניסיונות מקסימליים",
     "huntDescription": "חפשו את המילה המוסתרת בעזרת משוב צבעוני!",
     "shareImage": "שתף כתמונה",
+    "shareImageHint": "שתפו את ההישג שלכם עם חברים!",
     "download": "שמור כתמונה",
     "downloadImage": "שמור תמונה לשיתוף",
     "generatingImage": "יוצר תמונה...",

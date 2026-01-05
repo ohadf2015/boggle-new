@@ -663,6 +663,45 @@ body {
   [dir="rtl"] .drop-shadow-neo-lg {
     filter: drop-shadow(-3px 3px 0px rgb(var(--neo-black)));
   }
+
+  /* ====================================
+     CONTAINER QUERY UTILITIES
+     ==================================== */
+
+  /* Container type setup */
+  .cq-container {
+    container-type: inline-size;
+  }
+
+  .cq-container-size {
+    container-type: size;
+  }
+
+  /* Container-relative responsive padding */
+  .cq-p-responsive {
+    padding: clamp(0.75rem, 3cqw, 1.5rem);
+  }
+
+  /* Container-relative responsive gap */
+  .cq-gap-responsive {
+    gap: clamp(0.5rem, 2cqw, 1rem);
+  }
+
+  /* Container-relative responsive text */
+  .cq-text-responsive {
+    font-size: clamp(0.875rem, 4cqw, 1.25rem);
+  }
+
+  /* Container-relative responsive text - larger variant */
+  .cq-text-lg-responsive {
+    font-size: clamp(1.125rem, 5cqw, 1.875rem);
+  }
+
+  /* Container-relative responsive icon sizing */
+  .cq-icon-responsive {
+    width: clamp(2rem, 10cqw, 4rem);
+    height: clamp(2rem, 10cqw, 4rem);
+  }
 }
 
 @layer components {

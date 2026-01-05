@@ -2919,6 +2919,7 @@ const es = {
     "maxAttempts": "Intentos Máximos",
     "huntDescription": "¡Caza la palabra oculta usando retroalimentación de colores!",
     "shareImage": "Compartir como imagen",
+    "shareImageHint": "¡Comparte tu logro con amigos!",
     "download": "Guardar como Imagen",
     "downloadImage": "Guardar imagen para compartir",
     "generatingImage": "Creando imagen...",
