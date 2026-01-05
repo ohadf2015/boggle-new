@@ -246,7 +246,7 @@ jest.mock('@/lib/utils', () => ({
   cn: (...classes: (string | undefined)[]) => classes.filter(Boolean).join(' '),
 }));
 
-global.fetch = jest.fn();
+(global as { fetch: unknown }).fetch = jest.fn();
 
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <LanguageProvider>
@@ -257,7 +257,7 @@ const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 describe('SinglePlayerGame - Word Submission', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    (global.fetch as jest.Mock).mockResolvedValue({
+    ((global as { fetch: unknown }).fetch as jest.Mock).mockResolvedValue({
       json: async () => ({ isValid: true }),
     });
   });

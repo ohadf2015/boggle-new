@@ -1,16 +1,18 @@
 /**
  * Server Entry Point
  *
- * This file now delegates to the modular server implementation.
- * See server/index.ts for the main orchestration logic.
+ * Uses Bun native server with @socket.io/bun-engine for optimal WebSocket performance.
+ * See server/bunServer.ts for the main server implementation.
  *
  * Modular structure:
- * - server/middleware.ts - Express middleware configuration
- * - server/socketSetup.ts - Socket.IO setup and monitoring
+ * - server/bunServer.ts - Bun native HTTP server with Socket.IO
+ * - server/socketSetup.ts - Socket.IO monitoring and cleanup
  * - server/redisAdapter.ts - Redis adapter for horizontal scaling
- * - server/localeRedirect.ts - i18n locale detection
- * - server/healthRoutes.ts - Health and metrics endpoints
+ * - server/middleware.ts - CORS configuration utilities
+ * - server/healthRoutes.ts - Health and metrics endpoints (legacy Express)
  * - server/lifecycle.ts - Startup and shutdown management
+ *
+ * Note: Express server is available in server/index.ts for fallback if needed.
  */
 
-import './server/index';
+import './server/bunServer';
