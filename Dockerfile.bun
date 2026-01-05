@@ -51,7 +51,9 @@ COPY --from=builder /app/contexts ./contexts
 COPY --from=builder /app/lib ./lib
 COPY --from=builder /app/hooks ./hooks
 COPY --from=builder /app/supabase ./supabase
+COPY --from=builder /app/translations ./translations
 COPY --from=builder /app/next.config.mjs ./
+COPY --from=builder /app/tsconfig.json ./
 
 # Copy scripts
 COPY scripts/docker-migrate.sh ./scripts/docker-migrate.sh
@@ -61,9 +63,9 @@ RUN chmod +x ./scripts/*.sh
 # Expose port
 EXPOSE 3001
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3001/ || exit 1
+# Health check (increased start period for Next.js preparation)
+HEALTHCHECK --interval=10s --timeout=5s --start-period=60s --retries=5 \
+  CMD curl -f http://localhost:3001/health || exit 1
 
 # Run entrypoint (migrations + server with Bun)
 ENTRYPOINT ["/app/scripts/docker-entrypoint.sh"]
