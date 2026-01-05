@@ -409,7 +409,8 @@ export async function getPendingRequests(): Promise<FriendRequest[]> {
     }>;
   }
   return (requests as unknown as RequestWithProfile[]).map((r: RequestWithProfile) => {
-    const profile = r.profiles?.[0];
+    // Handle both array and object returns from Supabase foreign key joins
+    const profile = Array.isArray(r.profiles) ? r.profiles[0] : r.profiles;
     return {
       id: r.id,
       fromUserId: r.user_id,
@@ -464,7 +465,8 @@ export async function getOutgoingRequests(): Promise<FriendRequest[]> {
     }>;
   }
   return (requests as unknown as OutgoingRequestWithProfile[]).map((r: OutgoingRequestWithProfile) => {
-    const profile = r.profiles?.[0];
+    // Handle both array and object returns from Supabase foreign key joins
+    const profile = Array.isArray(r.profiles) ? r.profiles[0] : r.profiles;
     return {
       id: r.id,
       fromUserId: r.friend_id,

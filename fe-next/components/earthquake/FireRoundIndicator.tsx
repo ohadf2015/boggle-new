@@ -28,9 +28,10 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
 
   // Determine position based on layout
   // Position below header to avoid overlapping with header controls
+  // Use logical 'end' property for RTL support (flips to left in Hebrew)
   const positionClasses = isLandscape
     ? 'top-2 left-1/2 -translate-x-1/2' // Center top in landscape
-    : 'top-20 sm:top-24 right-4'; // Below header in portrait/desktop
+    : 'top-20 sm:top-24 ltr:right-4 rtl:left-4'; // Below header in portrait/desktop, RTL-aware
 
   return (
     <AnimatePresence>
