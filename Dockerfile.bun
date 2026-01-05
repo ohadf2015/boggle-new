@@ -54,6 +54,7 @@ COPY --from=builder /app/supabase ./supabase
 COPY --from=builder /app/translations ./translations
 COPY --from=builder /app/next.config.mjs ./
 COPY --from=builder /app/tsconfig.json ./
+COPY --from=builder /app/bunfig.toml ./
 
 # Copy scripts
 COPY scripts/docker-migrate.sh ./scripts/docker-migrate.sh
