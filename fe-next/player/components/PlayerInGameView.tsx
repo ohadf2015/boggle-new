@@ -191,7 +191,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-0 md:p-4 flex flex-col transition-colors duration-300">
+    <div className="h-screen overflow-hidden bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-0 md:p-4 flex flex-col transition-colors duration-300">
 
       {/* Top Bar - Desktop only */}
       <div className="hidden lg:flex w-full max-w-7xl mx-auto items-center justify-between mb-1 pt-24">

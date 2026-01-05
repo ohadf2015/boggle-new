@@ -63,7 +63,7 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className={cn(
-          'lg:hidden fixed bottom-24 z-30 safe-area-bottom',
+          'md:hidden fixed bottom-24 z-30 safe-area-bottom',
           dir === 'rtl' ? 'left-3' : 'right-3'
         )}
       >

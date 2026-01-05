@@ -769,7 +769,9 @@ const sv = {
     "chat": "Chatt",
     "settings": "Inställningar",
     "regenerateBoard": "Regenerera bräda",
-    "boardRegenerated": "Brädan har regenererats!"
+    "boardRegenerated": "Brädan har regenererats!",
+    "noPlayers": "Inga spelare i lobbyn",
+    "connectionLost": "Anslutningen förlorades. Vänligen uppdatera."
   },
   "tvBroadcast": {
     "joinAt": "Gå med på",
@@ -1654,7 +1656,8 @@ const sv = {
       },
       "returnNote": "Efter träningen är du redo för riktiga utmaningen!",
       "startTraining": "Börja Träna",
-      "skipAnyway": "Hoppa över, jag kan spela"
+      "skipAnyway": "Hoppa över, jag kan spela",
+      "dontShowAgain": "Visa inte detta igen"
     },
     "hints": {
       "tryDiagonal": "Prova att dra diagonalt!",
@@ -2265,7 +2268,8 @@ const sv = {
     "claimSuccess": "Du fick {reward}!",
     "streakBonus": "Svitbonus: +{percent}%",
     "loginRequired": "Inloggning krävs",
-    "loginToClaimRewards": "Logga in för att hämta dina dagliga belöningar och följa din framgång!"
+    "loginToClaimRewards": "Logga in för att hämta dina dagliga belöningar och följa din framgång!",
+    "rewardAvailable": "Belöning tillgänglig"
   },
   "referral": {
     "milestoneTitle": "Vänmilstolpe!",
@@ -2938,6 +2942,7 @@ const sv = {
     "retryLinkWrongDate": "Denna länk är för en annan dag",
     "retryLinkInvalid": "Denna länk är ogiltig",
     "retryLinkError": "Kunde inte verifiera länken",
+    "retryFailed": "Återställning misslyckades. Försök igen!",
     "howToPlay": "Hur man spelar",
     "firstTime": "(Ny?)",
     "canYouBeatMyScore": "Kan du slå mitt resultat?",

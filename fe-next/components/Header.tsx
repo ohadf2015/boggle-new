@@ -8,7 +8,6 @@ import { cn } from '../lib/utils';
 import AuthButton from './auth/AuthButton';
 import MusicControls from './MusicControls';
 import DailyQuickLink from './daily/DailyQuickLink';
-import { CalendarButton } from './engagement/CalendarButton';
 import { CoinBalance } from './CoinBalance';
 
 /**
@@ -181,48 +180,6 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     {/* Daily Challenge Quick Link */}
                     <DailyQuickLink />
 
-                    {/* Settings Link - replaces language dropdown */}
-                    {/* Using 48x48px minimum for better touch accessibility */}
-                    <Link
-                        href={`/${language}/settings`}
-                        className={cn(
-                            "flex items-center justify-center gap-1",
-                            "min-w-[48px] min-h-[48px] w-12 h-12 lg:w-12 lg:h-12 xl:w-12 xl:h-12 2xl:w-14 2xl:h-14",
-                            "bg-neo-cream text-neo-black",
-                            "border-3 lg:border-3 2xl:border-3 border-neo-black",
-                            "rounded-neo lg:rounded-neo shadow-hard lg:shadow-hard 2xl:shadow-hard-lg",
-                            "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg",
-                            "active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm",
-                            "transition-all duration-100"
-                        )}
-                        aria-label={t('settings.title') || 'Settings'}
-                        title={t('settings.title') || 'Settings'}
-                    >
-                        <Settings className="w-5 h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6" />
-                    </Link>
-
-                    {/* Admin Dashboard Link - only shown for admin users */}
-                    {isAdmin && (
-                        <Link
-                            href={`/${language}/admin`}
-                            className="
-                                flex items-center justify-center
-                                min-w-[48px] min-h-[48px] w-12 h-12 lg:w-12 lg:h-12 xl:w-12 xl:h-12 2xl:w-14 2xl:h-14
-                                bg-neo-pink text-white
-                                border-3 lg:border-3 2xl:border-3 border-neo-black
-                                rounded-neo lg:rounded-neo
-                                shadow-hard lg:shadow-hard 2xl:shadow-hard-lg
-                                hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
-                                active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
-                                transition-all duration-100
-                            "
-                            aria-label={t('common.adminDashboard') || 'Admin Dashboard'}
-                            title={t('common.adminDashboard') || 'Admin Dashboard'}
-                        >
-                            <Shield className="w-5 h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-6 2xl:h-6" aria-hidden="true" />
-                        </Link>
-                    )}
-
                     {/* Coin Balance - shown for authenticated users */}
                     {isAuthenticated && profile && (
                         <Link
@@ -238,7 +195,6 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         </Link>
                     )}
 
-                    <CalendarButton />
                     <MusicControls />
                     <AuthButton />
                 </div>

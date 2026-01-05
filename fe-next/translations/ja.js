@@ -769,7 +769,9 @@ const ja = {
     "chat": "チャット",
     "settings": "設定",
     "regenerateBoard": "ボード再生成",
-    "boardRegenerated": "ボードが再生成されました！"
+    "boardRegenerated": "ボードが再生成されました！",
+    "noPlayers": "ロビーにプレイヤーがいません",
+    "connectionLost": "接続が切断されました。更新してください。"
   },
   "tvBroadcast": {
     "joinAt": "参加URL",
@@ -1653,7 +1655,8 @@ const ja = {
       },
       "returnNote": "トレーニング後、本番の挑戦へ！",
       "startTraining": "トレーニング開始",
-      "skipAnyway": "スキップ、遊び方知ってる"
+      "skipAnyway": "スキップ、遊び方知ってる",
+      "dontShowAgain": "今後表示しない"
     },
     "hints": {
       "tryDiagonal": "斜めにドラッグしてみて！",
@@ -2264,7 +2267,8 @@ const ja = {
     "claimSuccess": "{reward}を獲得しました！",
     "streakBonus": "連続ボーナス: +{percent}%",
     "loginRequired": "ログインが必要です",
-    "loginToClaimRewards": "ログインしてデイリー報酬を受け取り、進捗を確認しましょう！"
+    "loginToClaimRewards": "ログインしてデイリー報酬を受け取り、進捗を確認しましょう！",
+    "rewardAvailable": "報酬あり"
   },
   "referral": {
     "milestoneTitle": "友達のマイルストーン！",
@@ -2937,6 +2941,7 @@ const ja = {
     "retryLinkWrongDate": "このリンクは別の日用です",
     "retryLinkInvalid": "このリンクは無効です",
     "retryLinkError": "リンクを確認できませんでした",
+    "retryFailed": "リセット失敗。もう一度試してね！",
     "howToPlay": "遊び方",
     "firstTime": "(初めて？)",
     "canYouBeatMyScore": "私のスコアを超えられますか？",

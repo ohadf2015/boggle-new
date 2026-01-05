@@ -770,7 +770,9 @@ const he = {
     "chat": "צ'אט",
     "settings": "הגדרות",
     "regenerateBoard": "ערבב מחדש",
-    "boardRegenerated": "הלוח עורבב מחדש!"
+    "boardRegenerated": "הלוח עורבב מחדש!",
+    "noPlayers": "אין שחקנים בלובי",
+    "connectionLost": "החיבור נותק. אנא רענן."
   },
   "tvBroadcast": {
     "joinAt": "הצטרפו ב",
@@ -1655,7 +1657,8 @@ const he = {
       },
       "returnNote": "אחרי האימון, תהיה מוכן לאתגר האמיתי!",
       "startTraining": "יאללה לאימון",
-      "skipAnyway": "דלג, אני יודע לשחק"
+      "skipAnyway": "דלג, אני יודע לשחק",
+      "dontShowAgain": "אל תציג שוב"
     },
     "hints": {
       "tryDiagonal": "נסה להחליק באלכסון!",
@@ -2394,7 +2397,8 @@ const he = {
     "claimSuccess": "קיבלת {reward}!",
     "streakBonus": "בונוס רצף: +{percent}%",
     "loginRequired": "נדרשת התחברות",
-    "loginToClaimRewards": "התחבר כדי לאסוף את הפרסים היומיים שלך ולעקוב אחר ההתקדמות!"
+    "loginToClaimRewards": "התחבר כדי לאסוף את הפרסים היומיים שלך ולעקוב אחר ההתקדמות!",
+    "rewardAvailable": "פרס זמין"
   },
   "referral": {
     "milestoneTitle": "אבן דרך של חבר!",
@@ -2939,6 +2943,7 @@ const he = {
     "retryLinkWrongDate": "קישור זה מיועד ליום אחר",
     "retryLinkInvalid": "קישור זה אינו תקין",
     "retryLinkError": "לא ניתן לאמת את הקישור",
+    "retryFailed": "האיפוס נכשל. נסה שוב!",
     "howToPlay": "איך לשחק",
     "firstTime": "(חדשים?)",
     "canYouBeatMyScore": "תוכלו לנצח את הניקוד שלי?",

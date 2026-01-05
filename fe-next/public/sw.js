@@ -8,7 +8,7 @@
  * - Offline fallback page
  */
 
-const CACHE_VERSION = 'lexiclash-v2'; // Bumped version to force cache refresh
+const CACHE_VERSION = 'lexiclash-v3'; // Bumped version to fix chunk caching issue
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
@@ -176,12 +176,25 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Static assets - cache first
+  // Next.js chunks - network first (these change on each deployment)
+  // CRITICAL: Do NOT cache-first these, as chunk hashes change between deployments
+  if (url.pathname.startsWith('/_next/static/chunks/')) {
+    event.respondWith(networkFirst(request));
+    return;
+  }
+
+  // Static assets - cache first (but NOT chunks)
   if (
-    url.pathname.match(/\.(js|css|woff2?|ttf|otf|png|jpg|jpeg|svg|ico|webp)$/) ||
+    url.pathname.match(/\.(woff2?|ttf|otf|png|jpg|jpeg|svg|ico|webp)$/) ||
     STATIC_ASSETS.includes(url.pathname)
   ) {
     event.respondWith(cacheFirst(request));
+    return;
+  }
+
+  // CSS and other Next.js static files - network first for freshness
+  if (url.pathname.match(/\.(js|css)$/) || url.pathname.startsWith('/_next/')) {
+    event.respondWith(networkFirst(request));
     return;
   }
 

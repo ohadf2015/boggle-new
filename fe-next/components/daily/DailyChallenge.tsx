@@ -642,52 +642,62 @@ const DailyChallenge: React.FC = () => {
 
   // Handle retry challenge (paid with coins)
   const handleRetryChallenge = useCallback(async () => {
-    const today = getDailyChallengeDate();
+    try {
+      const today = getDailyChallengeDate();
 
-    // Build reset request body with player credentials
-    const resetBody: { puzzleDate: string; language: string; playerId?: string; guestFingerprint?: string } = {
-      puzzleDate: today,
-      language: gameLanguage,
-    };
+      // Build reset request body with player credentials
+      const resetBody: { puzzleDate: string; language: string; playerId?: string; guestFingerprint?: string } = {
+        puzzleDate: today,
+        language: gameLanguage,
+      };
 
-    if (isAuthenticated && profile) {
-      resetBody.playerId = profile.id;
-    } else {
-      const fp = await getGuestFingerprint();
-      if (fp) {
-        resetBody.guestFingerprint = fp;
-      }
-    }
-
-    // Delete server-side attempt record
-    if (resetBody.playerId || resetBody.guestFingerprint) {
-      try {
-        const resetResponse = await fetch('/api/daily/reset-attempt', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(resetBody),
-        });
-        const resetResult = await resetResponse.json();
-        if (!resetResult.success) {
-          console.warn('Server reset returned failure:', resetResult);
+      if (isAuthenticated && profile) {
+        resetBody.playerId = profile.id;
+      } else {
+        const fp = await getGuestFingerprint();
+        if (fp) {
+          resetBody.guestFingerprint = fp;
         }
-      } catch (serverError) {
-        console.warn('Failed to reset server attempt:', serverError);
       }
-    }
 
-    // Clear the stored result for today
-    const cleared = clearWordHuntResultForRetry(gameLanguage);
-    if (!cleared) {
-      console.error('Failed to clear Word Hunt result for retry');
-      return;
-    }
+      // Delete server-side attempt record
+      if (resetBody.playerId || resetBody.guestFingerprint) {
+        try {
+          const resetResponse = await fetch('/api/daily/reset-attempt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(resetBody),
+          });
+          const resetResult = await resetResponse.json();
+          if (!resetResult.success) {
+            console.warn('Server reset returned failure:', resetResult);
+          }
+        } catch (serverError) {
+          console.warn('Failed to reset server attempt:', serverError);
+          // Continue anyway - local reset is more important
+        }
+      }
 
-    // Reset state for fresh start
-    setStoredResult(null);
-    setGameResult(null);
-    setPhase('ready');
-  }, [gameLanguage, isAuthenticated, profile]);
+      // Clear the stored result for today
+      const cleared = clearWordHuntResultForRetry(gameLanguage);
+      if (!cleared) {
+        console.error('Failed to clear Word Hunt result for retry');
+        neoErrorToast(t('daily.retryFailed') || 'Failed to reset. Please try again.', { icon: '❌', duration: 4000 });
+        return;
+      }
+
+      // Reset state for fresh start
+      setStoredResult(null);
+      setGameResult(null);
+      setPhase('ready');
+
+      // Show success feedback
+      neoSuccessToast(t('daily.attemptReset') || 'Challenge reset! Good luck!', { icon: '🔄', duration: 3000 });
+    } catch (error) {
+      console.error('Retry challenge error:', error);
+      neoErrorToast(t('daily.retryFailed') || 'Failed to reset. Please try again.', { icon: '❌', duration: 4000 });
+    }
+  }, [gameLanguage, isAuthenticated, profile, t]);
 
   // Render based on phase
   return (
