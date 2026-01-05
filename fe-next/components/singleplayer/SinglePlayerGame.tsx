@@ -1202,7 +1202,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               />
             )}
 
-            {/* Score - Primary stat (extra large when no timer in practice mode) */}
+            {/* Score - Primary stat (sized appropriately in practice mode) */}
             <div className="flex flex-col items-center">
               <AdaptiveMotion.div
                 key={score}
@@ -1211,7 +1211,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                 className={cn(
                   "text-neo-black font-black",
                   settings.mode === 'practice'
-                    ? "text-5xl leading-none" // Extra large when no timer
+                    ? "text-3xl sm:text-4xl leading-none" // Responsive for small phones
                     : "landscape-stat-primary"
                 )}
               >
@@ -1220,7 +1220,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               <div className={cn(
                 "text-neo-black font-bold uppercase tracking-wider",
                 settings.mode === 'practice'
-                  ? "text-sm mt-1" // Larger label when no timer
+                  ? "text-xs sm:text-sm mt-0.5" // Smaller label for small phones
                   : "landscape-stat-label"
               )}>
                 {t('common.score') || 'SCORE'}
@@ -1282,7 +1282,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               size="sm"
               onClick={handleFinishPractice}
               aria-label={t('singlePlayer.finish') || 'Finish'}
-              className="px-4 h-12 min-h-[48px] bg-neo-lime hover:brightness-110 border-2 border-neo-black rounded-neo text-sm font-bold text-neo-black shadow-hard-sm"
+              className="px-3 sm:px-4 h-10 sm:h-12 min-h-[44px] bg-neo-lime hover:brightness-110 border-2 border-neo-black rounded-neo text-xs sm:text-sm font-bold text-neo-black shadow-hard-sm"
             >
               {t('singlePlayer.finish') || 'Finish'}
             </Button>
@@ -1552,7 +1552,11 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             {isPaused ? <Play /> : <Pause />}
           </Button>
         ) : (
-          <Button variant="accent" onClick={handleFinishPractice}>
+          <Button
+            variant="accent"
+            onClick={handleFinishPractice}
+            className="min-h-[44px] min-w-[80px] text-sm sm:text-base font-bold"
+          >
             {t('singlePlayer.finish') || 'Finish'}
           </Button>
         )}
@@ -1606,14 +1610,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         )}
 
         {/* Score - vibrant yellow/lime gradient like multiplayer */}
-        {/* Extra large and centered in practice mode (no timer) */}
+        {/* Centered in practice mode (no timer) - sized appropriately for small phones */}
         <AdaptiveMotion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className={cn(
             "relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg",
             settings.mode === 'practice'
-              ? "px-6 md:px-10 py-2 md:py-4 min-w-[120px] md:min-w-[180px]" // Larger in practice mode
+              ? "px-4 sm:px-6 md:px-10 py-1.5 sm:py-2 md:py-4 min-w-[80px] sm:min-w-[120px] md:min-w-[180px]" // Responsive in practice mode
               : "px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px]"
           )}
           style={{
@@ -1628,7 +1632,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               className={cn(
                 "font-black text-neo-black leading-tight",
                 settings.mode === 'practice'
-                  ? "text-4xl md:text-5xl" // Extra large in practice mode
+                  ? "text-2xl sm:text-3xl md:text-4xl" // Smaller on small phones
                   : "text-lg md:text-2xl"
               )}
               style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
@@ -1638,7 +1642,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             <div className={cn(
               "font-bold uppercase tracking-wider text-neo-black/80",
               settings.mode === 'practice'
-                ? "text-sm md:text-base" // Larger label in practice mode
+                ? "text-xs sm:text-sm md:text-base" // Smaller label on small phones
                 : "text-[9px] md:text-xs"
             )}>
               {t('common.score') || 'Score'}

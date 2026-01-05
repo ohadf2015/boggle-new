@@ -144,7 +144,9 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   });
 
   // Use timer's remaining time for display
-  const remainingTime = gameActive ? gameTimer.remainingTime : null;
+  // Note: Always use the actual timer value, not conditioned on gameActive
+  // The timer is set during pendingGameStart processing before gameActive is true
+  const remainingTime = gameTimer.remainingTime;
 
   // Player state
   const [playersReady, setPlayersReady] = useState<Player[]>(initialPlayers);

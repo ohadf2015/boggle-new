@@ -560,8 +560,8 @@ const es = {
       },
       "joinCard": {
         "title": "Unirse",
-        "description": "Ingresa código",
-        "button": "Unirse"
+        "description": "Explorar salas abiertas",
+        "button": "Explorar"
       },
       "activeRoomsPreview": "Salas Activas",
       "playersOnline": "en línea",
@@ -1720,7 +1720,11 @@ const es = {
     "gameCompletion": "Bonus por completar partida",
     "winBonus": "Bonus de victoria",
     "longWord": "Bonus de palabra larga",
-    "achievement": "Bonus de logro"
+    "achievement": "Bonus de logro",
+    "gameCompletionExplain": "¡Sigue jugando para más sorpresas!",
+    "winBonusExplain": "¡Los ganadores tienen suerte extra!",
+    "longWordExplain": "¡Tu vocabulario valió la pena!",
+    "achievementExplain": "¡Los logros traen recompensas!"
   },
   "auth": {
     "signIn": "Iniciar Sesión",
@@ -2005,6 +2009,7 @@ const es = {
   },
   "profile": {
     "title": "Perfil",
+    "viewCoins": "Ver tus monedas",
     "overview": "General",
     "stats": "Estadísticas",
     "memberSince": "Miembro desde",
@@ -2089,7 +2094,9 @@ const es = {
     },
     "milestone": "Recompensa de Hito",
     "claimSuccess": "¡Obtuviste {reward}!",
-    "streakBonus": "Bonus de racha: +{percent}%"
+    "streakBonus": "Bonus de racha: +{percent}%",
+    "loginRequired": "Inicio de sesión requerido",
+    "loginToClaimRewards": "¡Inicia sesión para reclamar tus recompensas diarias y seguir tu progreso!"
   },
   "referral": {
     "milestoneTitle": "¡Hito de amigo!",
@@ -3006,6 +3013,18 @@ const es = {
       "solved": "resuelto",
       "betterThan": "mejor que otros jugadores"
     },
+    "ranking": {
+      "howItWorks": "Cómo funciona el ranking",
+      "title": "Sistema de Ranking",
+      "explanation": "Los jugadores se clasifican por menos intentos usados. Si hay empate, la puntuación de eficiencia determina tu posición.",
+      "efficiencyTitle": "Tu Puntuación de Eficiencia",
+      "life": "Vida",
+      "tokens": "Fichas",
+      "words": "Palabras",
+      "guesses": "Intentos",
+      "total": "Total",
+      "pts": "pts"
+    },
     "survival": {
       "lifePoints": "Vida",
       "lifeRemaining": "{points} Vida",
@@ -3226,6 +3245,8 @@ const es = {
     "configureOptions": "Opciones de Juego",
     "reviewSettings": "Revisar e Iniciar",
     "stepMode": "Modo",
+    "stepSettings": "Ajustes",
+    "stepStart": "Iniciar",
     "stepDifficulty": "Dificultad",
     "stepOf": "Paso {current} de {total}",
     "stepOptions": "Opciones",
@@ -3353,6 +3374,22 @@ const es = {
     "sendAnother": "Enviar otro",
     "errorMessage": "¡Ups! Algo salió mal. ¡Inténtalo de nuevo!",
     "responseTime": "Solemos responder en uno o dos días"
+  },
+  "bugReport": {
+    "title": "Reportar un Bug",
+    "description": "¿Encontraste un fallo? ¡Ayúdanos a aplastarlo!",
+    "whatHappened": "¿Qué pasó?",
+    "placeholder": "Cuéntanos qué pasó... cuanto más detalle, más rápido lo arreglamos!",
+    "submit": "Enviar reporte",
+    "submitting": "Enviando...",
+    "cancel": "Mejor no",
+    "success": "¡Reporte enviado! Estás ayudando a mejorar LexiClash.",
+    "error": "No se pudo enviar. ¡Inténtalo de nuevo!",
+    "sessionInfo": "Info de sesión (automático)",
+    "browserInfo": "Navegador",
+    "currentPage": "Página",
+    "userId": "ID de jugador",
+    "sessionRecorded": "Grabación de sesión adjunta"
   }
 };
 

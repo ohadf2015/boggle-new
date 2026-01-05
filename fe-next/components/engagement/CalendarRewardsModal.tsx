@@ -55,8 +55,13 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
   }, [user?.id]);
 
   useEffect(() => {
-    if (isOpen && user?.id) {
-      fetchCalendarStatus();
+    if (isOpen) {
+      if (user?.id) {
+        fetchCalendarStatus();
+      } else {
+        // No user - stop loading and show login prompt
+        setIsLoading(false);
+      }
     }
   }, [isOpen, user?.id, fetchCalendarStatus]);
 
@@ -149,6 +154,25 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
           {isLoading && (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin w-8 h-8 border-4 border-neo-cyan border-t-transparent rounded-full" />
+            </div>
+          )}
+
+          {/* Not logged in state */}
+          {!isLoading && !user?.id && (
+            <div className="text-center py-8">
+              <Gift className="w-12 h-12 mx-auto mb-3 text-neo-pink/50" />
+              <h3 className="text-lg font-bold text-neo-black mb-2">
+                {t('calendar.loginRequired') || 'Login Required'}
+              </h3>
+              <p className="text-sm text-neo-black/70 mb-4">
+                {t('calendar.loginToClaimRewards') || 'Sign in to claim your daily rewards and track your progress!'}
+              </p>
+              <Button
+                onClick={onClose}
+                className="bg-neo-cyan text-neo-black font-bold uppercase text-sm py-2 px-4 border-2 border-neo-black shadow-hard hover:shadow-hard-lg"
+              >
+                {t('common.close') || 'Close'}
+              </Button>
             </div>
           )}
 

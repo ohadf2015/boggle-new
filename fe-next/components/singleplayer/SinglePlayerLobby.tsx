@@ -361,7 +361,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
             {mode !== 'daily' && (
               <div>
                 <label className="text-sm font-bold uppercase text-neo-white mb-2 block">{t('joinView.language') || 'Language'}</label>
-                <LanguageSelector selectedLanguage={gameLanguage} onLanguageChange={setGameLanguage} />
+                <LanguageSelector selectedLanguage={gameLanguage} onLanguageChange={setGameLanguage} hideLabel />
               </div>
             )}
 
@@ -625,7 +625,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
               <label className="text-sm font-bold uppercase tracking-wide text-neo-black/70 dark:text-neo-white/70 mb-2 block">
                 {t('joinView.language') || 'Language'}
               </label>
-              <LanguageSelector selectedLanguage={gameLanguage} onLanguageChange={setGameLanguage} />
+              <LanguageSelector selectedLanguage={gameLanguage} onLanguageChange={setGameLanguage} hideLabel />
             </div>
 
             {/* Bot management for solo-bots mode */}

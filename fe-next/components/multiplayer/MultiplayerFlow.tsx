@@ -13,7 +13,7 @@ type FlowState = 'selector' | 'create-setup' | 'join-setup' | 'invitation-quick-
 
 interface MultiplayerFlowProps {
   // Callbacks
-  handleJoin: (isHostMode: boolean, roomLanguage?: Language | null, gameCode?: string) => void;
+  handleJoin: (isHostMode: boolean, roomLanguage?: Language | null, gameCode?: string, roomName?: string) => void;
   refreshRooms: () => void;
 
   // State from parent
@@ -195,7 +195,8 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     setRoomName(config.roomName);
     setHostUsername(config.hostUsername);
     setUsername(config.hostUsername);
-    handleJoin(true, config.language, config.gameCode);
+    // Pass roomName directly to handleJoin since React state updates are async
+    handleJoin(true, config.language, config.gameCode, config.roomName);
   }, [handleJoin, setGameCode, setRoomName, setHostUsername, setUsername]);
 
   // Handle join room submission

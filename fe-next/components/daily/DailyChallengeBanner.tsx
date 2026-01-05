@@ -67,6 +67,36 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
     setStreak(getDailyStreak().currentStreak);
   }, [language, isClient]);
 
+  // Refresh has played status when page becomes visible (handles navigation back)
+  useEffect(() => {
+    if (!isClient) return;
+
+    const refreshStatus = () => {
+      setHasPlayed(hasPlayedWordHuntToday(language as Language));
+      setStreak(getDailyStreak().currentStreak);
+    };
+
+    // Refresh on page visibility change
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        refreshStatus();
+      }
+    };
+
+    // Refresh on window focus (handles tab switches and navigation)
+    const handleFocus = () => {
+      refreshStatus();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [isClient, language]);
+
   const isRTL = dir === 'rtl';
 
   if (!isClient) {

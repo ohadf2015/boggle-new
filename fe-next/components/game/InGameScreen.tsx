@@ -1025,7 +1025,11 @@ const InGameScreen = memo<InGameScreenProps>(({
           )}
 
           {/* Grid - Direct connection to timer row */}
-          <div className="flex-1 flex items-center justify-center min-h-0">
+          {/* Added bottom padding for safe area on devices with bottom bars/notches */}
+          <div
+            className="flex-1 flex items-center justify-center min-h-0"
+            style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom, 0px))' }}
+          >
             <GridComponent
               key={isPlaying ? 'playing-grid' : 'spectating-grid'}
               grid={letterGrid}

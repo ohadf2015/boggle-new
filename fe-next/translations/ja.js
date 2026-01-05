@@ -563,7 +563,7 @@ const ja = {
       },
       "joinCard": {
         "title": "参加",
-        "description": "コードで",
+        "description": "ルームを探す",
         "button": "探す"
       },
       "activeRoomsPreview": "ルーム",
@@ -2020,7 +2020,11 @@ const ja = {
     "gameCompletion": "ゲーム完了ボーナス",
     "winBonus": "勝利ボーナス",
     "longWord": "長い単語ボーナス",
-    "achievement": "実績ボーナス"
+    "achievement": "実績ボーナス",
+    "gameCompletionExplain": "プレイを続けてチャンスを増やそう！",
+    "winBonusExplain": "勝者には特別なご褒美！",
+    "longWordExplain": "語彙力が報われました！",
+    "achievementExplain": "実績には特典がついてくる！"
   },
   "auth": {
     "signIn": "ログイン",
@@ -2144,6 +2148,7 @@ const ja = {
   },
   "profile": {
     "title": "プロフィール",
+    "viewCoins": "コインを確認",
     "overview": "概要",
     "stats": "統計",
     "memberSince": "登録日",
@@ -2228,7 +2233,9 @@ const ja = {
     },
     "milestone": "マイルストーン報酬",
     "claimSuccess": "{reward}を獲得しました！",
-    "streakBonus": "連続ボーナス: +{percent}%"
+    "streakBonus": "連続ボーナス: +{percent}%",
+    "loginRequired": "ログインが必要です",
+    "loginToClaimRewards": "ログインしてデイリー報酬を受け取り、進捗を確認しましょう！"
   },
   "referral": {
     "milestoneTitle": "友達のマイルストーン！",
@@ -3008,6 +3015,18 @@ const ja = {
       "solved": "解決",
       "betterThan": "他のプレイヤーより上位"
     },
+    "ranking": {
+      "howItWorks": "ランキングの仕組み",
+      "title": "ランキングシステム",
+      "explanation": "試行回数が少ないほど上位にランクされます。同点の場合は効率スコアで順位が決まります。",
+      "efficiencyTitle": "あなたの効率スコア",
+      "life": "ライフ",
+      "tokens": "トークン",
+      "words": "単語",
+      "guesses": "推測",
+      "total": "合計",
+      "pts": "点"
+    },
     "survival": {
       "lifePoints": "ライフ",
       "lifeRemaining": "{points} ライフ",
@@ -3228,6 +3247,8 @@ const ja = {
     "configureOptions": "ゲームオプション",
     "reviewSettings": "確認してスタート",
     "stepMode": "モード",
+    "stepSettings": "設定",
+    "stepStart": "スタート",
     "stepDifficulty": "難易度",
     "stepOf": "ステップ {current} / {total}",
     "stepOptions": "オプション",
@@ -3355,6 +3376,22 @@ const ja = {
     "sendAnother": "もう一通送る",
     "errorMessage": "おっと！送信できなかった。もう一度試してね！",
     "responseTime": "だいたい1〜2日で返信するよ"
+  },
+  "bugReport": {
+    "title": "バグを報告",
+    "description": "不具合を発見？退治を手伝って！",
+    "whatHappened": "何が起きた？",
+    "placeholder": "何があったか教えて...詳しいほど早く直せるよ！",
+    "submit": "報告を送る",
+    "submitting": "送信中...",
+    "cancel": "やっぱりいい",
+    "success": "バグ報告送信完了！LexiClashの改善に協力ありがとう。",
+    "error": "送信できなかった。もう一度試してね！",
+    "sessionInfo": "セッション情報（自動取得）",
+    "browserInfo": "ブラウザ",
+    "currentPage": "ページ",
+    "userId": "プレイヤーID",
+    "sessionRecorded": "セッション録画添付済み"
   }
 };
 

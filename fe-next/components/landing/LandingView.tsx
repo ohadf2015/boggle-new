@@ -198,20 +198,22 @@ const LandingView: React.FC = () => {
         )}
 
         {/* Daily Challenge Banner - Compact inline placement */}
+        {/* Reduced animation delay for faster perceived load time */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0.3, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.05 }}
+          transition={{ duration: 0.2, delay: 0 }}
           className={`w-full ${isLandscape ? 'mb-2' : 'mb-1 sm:mb-2 lg:mb-3'}`}
         >
           <DailyChallengeBanner compact={isLandscape} />
         </motion.div>
 
         {/* Mode cards grid - horizontal in landscape, vertical on portrait */}
+        {/* Start with partial opacity for instant visibility, then animate to full */}
         <motion.div
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0.3, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
+          transition={{ duration: 0.2, delay: 0.05 }}
           className={`w-full ${isLandscape ? 'flex gap-3 flex-1 min-h-0' : 'grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-2 lg:gap-3'}`}
         >
           {/* Multiplayer Card */}

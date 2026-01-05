@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
@@ -146,9 +146,14 @@ const SinglePlayerView: React.FC = () => {
     return undefined;
   }, [phase, returnTo, resultsData, router, uiLanguage]);
 
+  // Guard to prevent auto-start from running multiple times
+  const hasAutoStartedRef = useRef(false);
+
   // Auto-start practice mode when coming from onboarding (autoStart=practice)
   useEffect(() => {
-    if (autoStart === 'practice' && phase === 'preset-selection') {
+    // Only run once - prevents infinite loop when uiLanguage changes during hydration
+    if (autoStart === 'practice' && phase === 'preset-selection' && !hasAutoStartedRef.current) {
+      hasAutoStartedRef.current = true;
       // Get the default practice preset (explorer - EASY, no timer, no bots)
       const practicePreset = getDefaultPreset('practice');
       if (practicePreset) {

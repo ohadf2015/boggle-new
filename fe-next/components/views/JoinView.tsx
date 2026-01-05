@@ -341,7 +341,7 @@ const JoinView: React.FC<JoinViewProps> = ({
                   />
                   <div>
                     <Label className="text-xs font-bold uppercase text-neo-white">{t('joinView.language') || 'Language'}</Label>
-                    <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={setRoomLanguage} />
+                    <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={setRoomLanguage} hideLabel />
                   </div>
                 </div>
               ) : (

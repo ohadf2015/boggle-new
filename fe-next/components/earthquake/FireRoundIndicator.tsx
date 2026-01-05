@@ -27,15 +27,16 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
   const isLandscape = useMobileLandscape();
 
   // Determine position based on layout
+  // Position below header to avoid overlapping with header controls
   const positionClasses = isLandscape
     ? 'top-2 left-1/2 -translate-x-1/2' // Center top in landscape
-    : 'top-4 right-4'; // Top-right in portrait/desktop
+    : 'top-20 sm:top-24 right-4'; // Below header in portrait/desktop
 
   return (
     <AnimatePresence>
       {isActive && (
         <motion.div
-          className={`fixed z-[60] ${positionClasses}`}
+          className={`fixed z-40 ${positionClasses}`}
           initial={{ scale: 0, opacity: 0, y: -20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0, opacity: 0, y: -20 }}

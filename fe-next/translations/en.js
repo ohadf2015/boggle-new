@@ -567,7 +567,7 @@ const en = {
       },
       "joinCard": {
         "title": "Join",
-        "description": "Enter with code",
+        "description": "Browse open rooms",
         "button": "Browse"
       },
       "activeRoomsPreview": "Rooms",
@@ -2027,7 +2027,11 @@ const en = {
     "gameCompletion": "Game Completion Bonus",
     "winBonus": "Victory Bonus",
     "longWord": "Long Word Bonus",
-    "achievement": "Achievement Bonus"
+    "achievement": "Achievement Bonus",
+    "gameCompletionExplain": "Keep playing for more chances!",
+    "winBonusExplain": "Winners get extra surprises!",
+    "longWordExplain": "Your vocabulary skills paid off!",
+    "achievementExplain": "Achievements come with perks!"
   },
   "auth": {
     "signIn": "Sign In",
@@ -2279,6 +2283,7 @@ const en = {
   },
   "profile": {
     "title": "Profile",
+    "viewCoins": "View your coins",
     "overview": "Overview",
     "stats": "Stats",
     "memberSince": "Member since",
@@ -2363,7 +2368,9 @@ const en = {
     "locked": "Locked",
     "available": "Available",
     "claimSuccess": "You got {reward}!",
-    "streakBonus": "Streak Bonus: +{percent}%"
+    "streakBonus": "Streak Bonus: +{percent}%",
+    "loginRequired": "Login Required",
+    "loginToClaimRewards": "Sign in to claim your daily rewards and track your progress!"
   },
   "referral": {
     "milestoneTitle": "Friend Milestone!",
@@ -3015,6 +3022,18 @@ const en = {
       "solved": "solved",
       "betterThan": "better than other players"
     },
+    "ranking": {
+      "howItWorks": "How ranking works",
+      "title": "Ranking System",
+      "explanation": "Players are ranked by fewest attempts used. If tied, efficiency score determines your position.",
+      "efficiencyTitle": "Your Efficiency Score",
+      "life": "Life",
+      "tokens": "Tokens",
+      "words": "Words",
+      "guesses": "Guesses",
+      "total": "Total",
+      "pts": "pts"
+    },
     "survival": {
       "lifePoints": "Life",
       "lifeRemaining": "{points} Life",
@@ -3242,6 +3261,8 @@ const en = {
     "configureOptions": "Game Options",
     "reviewSettings": "Review & Start",
     "stepMode": "Mode",
+    "stepSettings": "Settings",
+    "stepStart": "Start",
     "stepDifficulty": "Difficulty",
     "stepOf": "Step {current} of {total}",
     "stepOptions": "Options",
@@ -3369,6 +3390,22 @@ const en = {
     "sendAnother": "Send Another",
     "errorMessage": "Oops! Something went wrong. Give it another shot!",
     "responseTime": "We usually reply within a day or two"
+  },
+  "bugReport": {
+    "title": "Report a Bug",
+    "description": "Spotted a glitch? Help us squash it!",
+    "whatHappened": "What went wrong?",
+    "placeholder": "Tell us what happened... the more detail, the faster we fix it!",
+    "submit": "Send Report",
+    "submitting": "Sending...",
+    "cancel": "Never mind",
+    "success": "Bug report sent! You're helping make LexiClash better.",
+    "error": "Couldn't send that. Give it another try!",
+    "sessionInfo": "Session info (auto-captured)",
+    "browserInfo": "Browser",
+    "currentPage": "Page",
+    "userId": "Player ID",
+    "sessionRecorded": "Session recording attached"
   }
 };
 

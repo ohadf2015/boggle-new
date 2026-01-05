@@ -309,17 +309,25 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
                 </motion.div>
 
                 {/* Trigger info */}
-                <motion.p
+                <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
-                  className="text-xs text-white/50"
+                  className="text-center space-y-1"
                 >
-                  {reward.triggerType === 'game_completion' && (t('mysteryReward.gameCompletion') || 'Game Completion Bonus')}
-                  {reward.triggerType === 'win' && (t('mysteryReward.winBonus') || 'Victory Bonus')}
-                  {reward.triggerType === 'long_word' && (t('mysteryReward.longWord') || 'Long Word Bonus')}
-                  {reward.triggerType === 'achievement' && (t('mysteryReward.achievement') || 'Achievement Bonus')}
-                </motion.p>
+                  <p className="text-xs text-white/50">
+                    {reward.triggerType === 'game_completion' && (t('mysteryReward.gameCompletion') || 'Game Completion Bonus')}
+                    {reward.triggerType === 'win' && (t('mysteryReward.winBonus') || 'Victory Bonus')}
+                    {reward.triggerType === 'long_word' && (t('mysteryReward.longWord') || 'Long Word Bonus')}
+                    {reward.triggerType === 'achievement' && (t('mysteryReward.achievement') || 'Achievement Bonus')}
+                  </p>
+                  <p className="text-xs text-white/70 italic">
+                    {reward.triggerType === 'game_completion' && (t('mysteryReward.gameCompletionExplain') || 'Keep playing for more chances!')}
+                    {reward.triggerType === 'win' && (t('mysteryReward.winBonusExplain') || 'Winners get extra surprises!')}
+                    {reward.triggerType === 'long_word' && (t('mysteryReward.longWordExplain') || 'Your vocabulary skills paid off!')}
+                    {reward.triggerType === 'achievement' && (t('mysteryReward.achievementExplain') || 'Achievements come with perks!')}
+                  </p>
+                </motion.div>
 
                 {/* Tap to dismiss */}
                 <motion.button

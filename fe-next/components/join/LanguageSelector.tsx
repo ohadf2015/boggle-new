@@ -15,6 +15,8 @@ import type { Language } from '@/shared/types/game';
 interface LanguageSelectorProps {
   selectedLanguage: Language;
   onLanguageChange: (language: Language) => void;
+  /** Hide the internal label (use when parent provides its own label) */
+  hideLabel?: boolean;
 }
 
 interface LanguageOption {
@@ -37,6 +39,7 @@ const LANGUAGE_OPTIONS: LanguageOption[] = [
 export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   selectedLanguage,
   onLanguageChange,
+  hideLabel = false,
 }) => {
   const { t } = useLanguage();
 
@@ -44,9 +47,11 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
 
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
-        {t('joinView.selectLanguage')}
-      </Label>
+      {!hideLabel && (
+        <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
+          {t('joinView.selectLanguage')}
+        </Label>
+      )}
       <Select value={selectedLanguage} onValueChange={(val) => onLanguageChange(val as Language)}>
         <SelectTrigger className="h-10 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white">
           <SelectValue>

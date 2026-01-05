@@ -10,6 +10,7 @@ import MusicControls from './MusicControls';
 import DailyQuickLink from './daily/DailyQuickLink';
 import Avatar from './Avatar';
 import { CalendarButton } from './engagement/CalendarButton';
+import { CoinBalance } from './CoinBalance';
 
 /**
  * Header Props
@@ -216,17 +217,49 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 transition-all duration-100
                             "
                             aria-label={t('common.adminDashboard') || 'Admin Dashboard'}
+                            title={t('common.adminDashboard') || 'Admin Dashboard'}
                         >
-                            <BarChart3 className="text-base lg:text-base xl:text-lg 2xl:text-lg" size={16} aria-hidden="true" />
+                            <Shield className="w-5 h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-6 2xl:h-6" aria-hidden="true" />
                         </Link>
                     )}
+
+                    {/* Coin Balance - shown for authenticated users */}
+                    {isAuthenticated && profile && (
+                        <Link
+                            href={`/${language}/profile`}
+                            className="hover:scale-105 active:scale-95 transition-transform"
+                            aria-label={t('profile.viewCoins') || `${profile.total_coins?.toLocaleString() || 0} coins - View profile`}
+                        >
+                            <CoinBalance
+                                coins={profile.total_coins || 0}
+                                size="sm"
+                                showAnimation={false}
+                            />
+                        </Link>
+                    )}
+
                     <CalendarButton />
                     <MusicControls />
                     <AuthButton />
                 </div>
 
-                {/* Mobile: Avatar + Volume Controls + Hamburger Menu */}
+                {/* Mobile: Coins + Avatar + Volume Controls + Hamburger Menu */}
                 <div className="sm:hidden flex items-center gap-2" ref={mobileMenuRef}>
+                    {/* Coin Balance - shown on mobile for authenticated users */}
+                    {isAuthenticated && profile && (
+                        <Link
+                            href={`/${language}/profile`}
+                            className="hover:scale-105 active:scale-95 transition-transform"
+                            aria-label={t('profile.viewCoins') || `${profile.total_coins?.toLocaleString() || 0} coins - View profile`}
+                        >
+                            <CoinBalance
+                                coins={profile.total_coins || 0}
+                                size="sm"
+                                showAnimation={false}
+                            />
+                        </Link>
+                    )}
+
                     {/* Profile Avatar - visible on mobile header when authenticated */}
                     {/* Using 48x48px minimum for better touch accessibility */}
                     {isAuthenticated && profile && (

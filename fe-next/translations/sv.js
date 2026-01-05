@@ -563,7 +563,7 @@ const sv = {
       },
       "joinCard": {
         "title": "Gå med",
-        "description": "Med kod",
+        "description": "Bläddra bland rum",
         "button": "Bläddra"
       },
       "activeRoomsPreview": "Rum",
@@ -2021,7 +2021,11 @@ const sv = {
     "gameCompletion": "Spelslutbonus",
     "winBonus": "Vinnarbonus",
     "longWord": "Långordsbonus",
-    "achievement": "Prestationsbonus"
+    "achievement": "Prestationsbonus",
+    "gameCompletionExplain": "Fortsätt spela för fler chanser!",
+    "winBonusExplain": "Vinnare får extra överraskningar!",
+    "longWordExplain": "Ditt ordförråd lönade sig!",
+    "achievementExplain": "Prestationer ger bonus!"
   },
   "auth": {
     "signIn": "Logga in",
@@ -2145,6 +2149,7 @@ const sv = {
   },
   "profile": {
     "title": "Profil",
+    "viewCoins": "Se dina mynt",
     "overview": "Översikt",
     "stats": "Statistik",
     "memberSince": "Medlem sedan",
@@ -2229,7 +2234,9 @@ const sv = {
     },
     "milestone": "Milstolpsbelöning",
     "claimSuccess": "Du fick {reward}!",
-    "streakBonus": "Svitbonus: +{percent}%"
+    "streakBonus": "Svitbonus: +{percent}%",
+    "loginRequired": "Inloggning krävs",
+    "loginToClaimRewards": "Logga in för att hämta dina dagliga belöningar och följa din framgång!"
   },
   "referral": {
     "milestoneTitle": "Vänmilstolpe!",
@@ -3009,6 +3016,18 @@ const sv = {
       "solved": "löste",
       "betterThan": "bättre än andra spelare"
     },
+    "ranking": {
+      "howItWorks": "Hur rankning fungerar",
+      "title": "Rankningssystem",
+      "explanation": "Spelare rankas efter färre försök. Vid lika avgör effektivitetspoäng din position.",
+      "efficiencyTitle": "Din Effektivitetspoäng",
+      "life": "Liv",
+      "tokens": "Poletter",
+      "words": "Ord",
+      "guesses": "Gissningar",
+      "total": "Totalt",
+      "pts": "p"
+    },
     "survival": {
       "lifePoints": "Liv",
       "lifeRemaining": "{points} Liv",
@@ -3229,6 +3248,8 @@ const sv = {
     "configureOptions": "Spelalternativ",
     "reviewSettings": "Granska & Starta",
     "stepMode": "Läge",
+    "stepSettings": "Inställningar",
+    "stepStart": "Starta",
     "stepDifficulty": "Svårighetsgrad",
     "stepOf": "Steg {current} av {total}",
     "stepOptions": "Alternativ",
@@ -3356,6 +3377,22 @@ const sv = {
     "sendAnother": "Skicka ett till",
     "errorMessage": "Hoppsan! Något gick fel. Försök igen!",
     "responseTime": "Vi svarar oftast inom en dag eller två"
+  },
+  "bugReport": {
+    "title": "Rapportera en bugg",
+    "description": "Hittat ett fel? Hjälp oss fixa det!",
+    "whatHappened": "Vad hände?",
+    "placeholder": "Berätta vad som hände... ju mer detaljer, desto snabbare fixar vi det!",
+    "submit": "Skicka rapport",
+    "submitting": "Skickar...",
+    "cancel": "Glöm det",
+    "success": "Buggrapport skickad! Du hjälper till att förbättra LexiClash.",
+    "error": "Kunde inte skicka. Försök igen!",
+    "sessionInfo": "Sessionsinfo (automatisk)",
+    "browserInfo": "Webbläsare",
+    "currentPage": "Sida",
+    "userId": "Spelar-ID",
+    "sessionRecorded": "Sessionsinspelning bifogad"
   }
 };
 

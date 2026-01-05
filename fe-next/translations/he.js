@@ -564,7 +564,7 @@ const he = {
       },
       "joinCard": {
         "title": "הצטרף",
-        "description": "הכנס עם קוד",
+        "description": "חפש חדרים פתוחים",
         "button": "חפש"
       },
       "activeRoomsPreview": "חדרים",
@@ -2022,7 +2022,11 @@ const he = {
     "gameCompletion": "בונוס סיום משחק",
     "winBonus": "בונוס ניצחון",
     "longWord": "בונוס מילה ארוכה",
-    "achievement": "בונוס הישג"
+    "achievement": "בונוס הישג",
+    "gameCompletionExplain": "המשיכו לשחק לעוד הפתעות!",
+    "winBonusExplain": "למנצחים מגיע יותר!",
+    "longWordExplain": "אוצר המילים שלך השתלם!",
+    "achievementExplain": "הישגים מגיעים עם בונוסים!"
   },
   "auth": {
     "signIn": "התחברות",
@@ -2274,6 +2278,7 @@ const he = {
   },
   "profile": {
     "title": "פרופיל",
+    "viewCoins": "צפה במטבעות שלך",
     "overview": "סקירה",
     "stats": "סטטיסטיקה",
     "memberSince": "חבר מאז",
@@ -2358,7 +2363,9 @@ const he = {
     },
     "milestone": "פרס אבן דרך",
     "claimSuccess": "קיבלת {reward}!",
-    "streakBonus": "בונוס רצף: +{percent}%"
+    "streakBonus": "בונוס רצף: +{percent}%",
+    "loginRequired": "נדרשת התחברות",
+    "loginToClaimRewards": "התחבר כדי לאסוף את הפרסים היומיים שלך ולעקוב אחר ההתקדמות!"
   },
   "referral": {
     "milestoneTitle": "אבן דרך של חבר!",
@@ -3010,6 +3017,18 @@ const he = {
       "solved": "פתרו",
       "betterThan": "טוב יותר משאר השחקנים"
     },
+    "ranking": {
+      "howItWorks": "איך הדירוג עובד",
+      "title": "מערכת הדירוג",
+      "explanation": "שחקנים מדורגים לפי פחות ניסיונות. במקרה של שוויון, ניקוד היעילות קובע את המיקום.",
+      "efficiencyTitle": "ניקוד היעילות שלך",
+      "life": "חיים",
+      "tokens": "אסימונים",
+      "words": "מילים",
+      "guesses": "ניחושים",
+      "total": "סה״כ",
+      "pts": "נק׳"
+    },
     "survival": {
       "lifePoints": "חיים",
       "lifeRemaining": "{points} חיים",
@@ -3230,6 +3249,8 @@ const he = {
     "configureOptions": "אפשרויות משחק",
     "reviewSettings": "סקירה והתחלה",
     "stepMode": "מצב",
+    "stepSettings": "הגדרות",
+    "stepStart": "התחל",
     "stepDifficulty": "קושי",
     "stepOf": "שלב {current} מתוך {total}",
     "stepOptions": "אפשרויות",
@@ -3357,6 +3378,22 @@ const he = {
     "sendAnother": "שלח עוד הודעה",
     "errorMessage": "אופס! משהו השתבש. נסו שוב!",
     "responseTime": "בדרך כלל עונים תוך יום-יומיים"
+  },
+  "bugReport": {
+    "title": "דיווח על באג",
+    "description": "מצאת תקלה? עזור לנו לתקן!",
+    "whatHappened": "מה קרה?",
+    "placeholder": "ספר לנו מה קרה... ככל שיותר פרטים, ככה נתקן מהר יותר!",
+    "submit": "שלח דיווח",
+    "submitting": "שולח...",
+    "cancel": "בעצם לא",
+    "success": "הדיווח נשלח! אתה עוזר לשפר את LexiClash.",
+    "error": "לא הצלחנו לשלוח. נסה שוב!",
+    "sessionInfo": "פרטי הפעלה (אוטומטי)",
+    "browserInfo": "דפדפן",
+    "currentPage": "עמוד",
+    "userId": "מזהה שחקן",
+    "sessionRecorded": "הקלטת הפעלה מצורפת"
   }
 };
 

@@ -714,24 +714,28 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
       try {
         const scoreToAdd = Math.round(efficiencyScore); // Round to integer
 
-        // Fetch current score and update atomically
+        // Fetch current score and games count, update atomically
         const { data: profile } = await supabase
           .from('profiles')
-          .select('total_score')
+          .select('total_score, total_games')
           .eq('id', playerId)
           .single();
 
         if (profile) {
           const newTotalScore = (profile.total_score || 0) + scoreToAdd;
+          const newTotalGames = (profile.total_games || 0) + 1;
           const { error: updateError } = await supabase
             .from('profiles')
-            .update({ total_score: newTotalScore })
+            .update({
+              total_score: newTotalScore,
+              total_games: newTotalGames  // Increment games count for leaderboard
+            })
             .eq('id', playerId);
 
           if (updateError) {
             logger.error('API', `[WordHunt] Failed to update leaderboard score for ${playerId}: ${updateError.message}`);
           } else {
-            logger.info('API', `[WordHunt] Updated leaderboard score for ${playerId}: +${scoreToAdd} efficiency points (total: ${newTotalScore})`);
+            logger.info('API', `[WordHunt] Updated leaderboard score for ${playerId}: +${scoreToAdd} efficiency points (total: ${newTotalScore}, games: ${newTotalGames})`);
           }
         }
       } catch (scoreError) {

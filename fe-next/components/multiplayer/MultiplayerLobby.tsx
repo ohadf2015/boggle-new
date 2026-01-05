@@ -283,7 +283,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                     <Label className="text-sm font-bold uppercase text-neo-white mb-1 block">
                       {t('joinView.language') || 'Language'}
                     </Label>
-                    <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={setRoomLanguage} />
+                    <LanguageSelector selectedLanguage={roomLanguage} onLanguageChange={setRoomLanguage} hideLabel />
                   </div>
                 </div>
               ) : (

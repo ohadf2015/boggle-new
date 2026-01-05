@@ -985,7 +985,7 @@ export default function MultiplayerPage(): React.JSX.Element {
     return () => clearTimeout(reconnectTimeout);
   }, [attemptingReconnect, isActive, socket, isConnected, language, getAuthContext, profile]);
 
-  const handleJoin = useCallback(async (isHostMode: boolean, roomLang?: Language | null, overrideGameCode?: string) => {
+  const handleJoin = useCallback(async (isHostMode: boolean, roomLang?: Language | null, overrideGameCode?: string, overrideRoomName?: string) => {
     console.log(`🎮 [JOIN] handleJoin called - mode: ${isHostMode ? 'HOST' : 'PLAYER'}, socket connected: ${socket?.connected}`);
 
     if (!socket || !isConnected) {
@@ -1104,8 +1104,9 @@ export default function MultiplayerPage(): React.JSX.Element {
       // Authenticated users: use their display name as username, custom room name for room
       // Guest users: use both hostUsername and roomName from state
       const finalHostUsername = user ? effectiveUsername : (hostUsername || effectiveUsername);
+      // Use overrideRoomName if provided (from direct submission), or fall back to state, or generate default
       // Use dash instead of apostrophe to avoid validation issues with special characters
-      const finalRoomName = roomName || `${finalHostUsername} Room`;
+      const finalRoomName = overrideRoomName || roomName || `${finalHostUsername} Room`;
 
       // For guest hosts, use the finalHostUsername for avatar generation
       const hostAvatar = profile
