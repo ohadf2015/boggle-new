@@ -43,6 +43,7 @@ import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSi
 import StreakMilestoneCelebration from './StreakMilestoneCelebration';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import WatchAdButton from './WatchAdButton';
+import KeepPlayingSection from './KeepPlayingSection';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchGeolocation } from '@/contexts/auth/authUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -1430,6 +1431,13 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             />
           </motion.div>
         )}
+
+        {/* Keep Playing Section - Encourage players to try other modes */}
+        <KeepPlayingSection
+          isSuccess={result.solved}
+          timeSurvived={result.lifeRemaining !== undefined ? (10 - result.attemptsUsed) * 10 : undefined}
+          efficiencyScore={result.efficiencyScore}
+        />
         </>
         )}
 

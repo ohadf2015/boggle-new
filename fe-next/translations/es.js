@@ -3181,6 +3181,21 @@ const es = {
       "cta5": "¡Buena suerte superando esto!"
     }
   },
+  "keepPlaying": {
+    "succeeded": {
+      "title": "¡En llamas!",
+      "message": "¡Lo lograste! ¿Listo para dominar amigos?",
+      "ctaSinglePlayer": "Seguir rodando",
+      "ctaMultiplayer": "Retar amigos",
+      "subtext": "Tus habilidades están afiladas hoy"
+    },
+    "struggled": {
+      "title": "¡Sigue así!",
+      "message": "Cada puzzle afila tus habilidades. ¡La práctica hace al maestro!",
+      "ctaSinglePlayer": "Subir nivel"
+    },
+    "dismiss": "Quizás luego"
+  },
   "guidance": {
     "combo": {
       "title": "¡Bono de Combo!",

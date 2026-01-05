@@ -3190,6 +3190,21 @@ const en = {
       "cta5": "Good luck topping this!"
     }
   },
+  "keepPlaying": {
+    "succeeded": {
+      "title": "On Fire!",
+      "message": "You cracked it! Ready to dominate friends?",
+      "ctaSinglePlayer": "Keep Rolling",
+      "ctaMultiplayer": "Challenge Friends",
+      "subtext": "Your skills are sharp today"
+    },
+    "struggled": {
+      "title": "Keep Going!",
+      "message": "Every puzzle sharpens your skills. Practice makes perfect!",
+      "ctaSinglePlayer": "Level Up"
+    },
+    "dismiss": "Maybe later"
+  },
   "guidance": {
     "combo": {
       "title": "Combo Bonus!",

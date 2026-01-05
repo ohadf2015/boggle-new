@@ -3185,6 +3185,21 @@ const he = {
       "cta5": "בהצלחה לעבור את זה!"
     }
   },
+  "keepPlaying": {
+    "succeeded": {
+      "title": "אש!",
+      "message": "פיצחת את זה! מוכן להשתלט על חברים?",
+      "ctaSinglePlayer": "להמשיך לגלגל",
+      "ctaMultiplayer": "אתגר חברים",
+      "subtext": "הכישורים שלך חדים היום"
+    },
+    "struggled": {
+      "title": "להמשיך!",
+      "message": "כל פאזל מחדד את הכישורים. תרגול עושה מושלם!",
+      "ctaSinglePlayer": "לשדרג"
+    },
+    "dismiss": "אולי אחר כך"
+  },
   "guidance": {
     "combo": {
       "title": "בונוס קומבו!",

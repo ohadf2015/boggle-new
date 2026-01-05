@@ -677,6 +677,21 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           }
         }
 
+        // Clean up: remove any existing yellow entries for letters now fully accounted for by greens
+        // This handles the case where a letter was yellow before but is now green elsewhere
+        // (e.g., letter only appears once in target - once green is found, yellow should be removed)
+        updated.forEach((clue, position) => {
+          if (clue.type === 'yellow') {
+            const targetCount = targetLetterCounts.get(clue.letter) || 0;
+            const greenCount = greenLetterCounts.get(clue.letter) || 0;
+            if (greenCount >= targetCount) {
+              updated.delete(position);
+              // Also update yellow count to keep tracking accurate for new yellow additions
+              yellowLetterCounts.set(clue.letter, Math.max(0, (yellowLetterCounts.get(clue.letter) || 0) - 1));
+            }
+          }
+        });
+
         // Second pass: Check for YELLOW clues (letters in wrong position)
         // Only add yellow if:
         // 1. Letter exists in target but not at this position

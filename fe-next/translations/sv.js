@@ -3184,6 +3184,21 @@ const sv = {
       "cta5": "Lycka till med att slå det!"
     }
   },
+  "keepPlaying": {
+    "succeeded": {
+      "title": "På eld!",
+      "message": "Du klarade det! Redo att dominera vänner?",
+      "ctaSinglePlayer": "Fortsätt rulla",
+      "ctaMultiplayer": "Utmana vänner",
+      "subtext": "Dina färdigheter är vassa idag"
+    },
+    "struggled": {
+      "title": "Fortsätt!",
+      "message": "Varje pussel skärper dina färdigheter. Övning ger färdighet!",
+      "ctaSinglePlayer": "Nivå upp"
+    },
+    "dismiss": "Kanske senare"
+  },
   "guidance": {
     "combo": {
       "title": "Kombobonus!",

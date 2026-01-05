@@ -45,19 +45,20 @@ const rarityGlows = {
 };
 
 function getRewardIcon(type: CalendarReward['type'], rarity?: string) {
+  const iconClass = "w-3 h-3 sm:w-4 sm:h-4";
   switch (type) {
     case 'xp':
-      return <Zap className="w-4 h-4 text-neo-yellow" />;
+      return <Zap className={cn(iconClass, "text-neo-yellow")} />;
     case 'hints':
-      return <Sparkles className="w-4 h-4 text-neo-cyan" />;
+      return <Sparkles className={cn(iconClass, "text-neo-cyan")} />;
     case 'streak_freeze':
-      return <Shield className="w-4 h-4 text-neo-lime" />;
+      return <Shield className={cn(iconClass, "text-neo-lime")} />;
     case 'mystery_box':
-      return <Gift className={cn("w-4 h-4", rarity === 'legendary' ? 'text-neo-yellow' : rarity === 'epic' ? 'text-neo-pink' : rarity === 'rare' ? 'text-neo-cyan' : 'text-neo-cream')} />;
+      return <Gift className={cn(iconClass, rarity === 'legendary' ? 'text-neo-yellow' : rarity === 'epic' ? 'text-neo-pink' : rarity === 'rare' ? 'text-neo-cyan' : 'text-neo-black/70')} />;
     case 'exclusive_title':
-      return <Crown className="w-4 h-4 text-neo-pink" />;
+      return <Crown className={cn(iconClass, "text-neo-pink")} />;
     default:
-      return <Gift className="w-4 h-4 text-neo-cream" />;
+      return <Gift className={cn(iconClass, "text-neo-black/70")} />;
   }
 }
 
@@ -94,12 +95,13 @@ export function CalendarRewardCard({
       onClick={canClaim ? onClaim : undefined}
       disabled={!canClaim}
       className={cn(
-        "relative flex flex-col items-center justify-center p-2 rounded-neo border-2 transition-all",
-        "min-h-[60px] sm:min-h-[70px]",
+        "relative flex flex-col items-center justify-center p-1 sm:p-2 rounded-neo border transition-all",
+        "min-h-[42px] sm:min-h-[56px] md:min-h-[70px]",
+        "border-1 sm:border-2",
         // Base styles
-        isClaimed && "bg-neo-gray/50 border-neo-gray/50 opacity-60",
-        !isClaimed && !isPast && !isToday && "bg-neo-navy-light border-neo-cream/30",
-        isPast && !isClaimed && "bg-neo-navy-light/50 border-neo-cream/20 opacity-40",
+        isClaimed && "bg-neo-lime/10 border-neo-lime/30",
+        !isClaimed && !isPast && !isToday && "bg-neo-black/5 border-neo-black/20",
+        isPast && !isClaimed && "bg-neo-black/5 border-neo-black/10 opacity-40",
         // Today styles
         isToday && canClaim && [
           "bg-gradient-to-br",
@@ -109,7 +111,7 @@ export function CalendarRewardCard({
           "cursor-pointer hover:scale-105 hover:shadow-hard",
           "animate-pulse",
         ],
-        isToday && !canClaim && "bg-neo-gray/50 border-neo-lime/50",
+        isToday && !canClaim && "bg-neo-lime/20 border-neo-lime/50",
         // Milestone styles
         isMilestone && !isClaimed && !isPast && "border-neo-yellow",
       )}
@@ -117,9 +119,9 @@ export function CalendarRewardCard({
     >
       {/* Day number */}
       <span className={cn(
-        "text-xs font-bold absolute top-1 left-1.5",
-        isClaimed ? "text-neo-cream/50" : "text-neo-cream/70",
-        isToday && "text-neo-cream font-black",
+        "text-[10px] sm:text-xs font-bold absolute top-0.5 sm:top-1 left-1 sm:left-1.5",
+        isClaimed ? "text-neo-black/40" : "text-neo-black/60",
+        isToday && "text-neo-black font-black",
       )}>
         {reward.day}
       </span>
@@ -127,23 +129,23 @@ export function CalendarRewardCard({
       {/* Status indicator */}
       {isClaimed && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <Check className="w-6 h-6 text-neo-lime" />
+          <Check className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-neo-lime" />
         </div>
       )}
 
       {isPast && !isClaimed && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <Lock className="w-4 h-4 text-neo-cream/30" />
+          <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-neo-black/30" />
         </div>
       )}
 
       {/* Reward content (hidden when claimed) */}
       {!isClaimed && !isPast && (
-        <div className="flex flex-col items-center gap-0.5 mt-2">
+        <div className="flex flex-col items-center gap-0 sm:gap-0.5 mt-1.5 sm:mt-2">
           {getRewardIcon(reward.type, reward.rarity)}
           <span className={cn(
-            "text-[9px] sm:text-[10px] font-bold uppercase",
-            isToday ? "text-neo-cream" : "text-neo-cream/70",
+            "text-[8px] sm:text-[9px] md:text-[10px] font-bold uppercase leading-tight text-center",
+            isToday ? "text-neo-black" : "text-neo-black/70",
           )}>
             {getRewardLabel(reward)}
           </span>
@@ -152,12 +154,12 @@ export function CalendarRewardCard({
 
       {/* Milestone indicator */}
       {isMilestone && !isClaimed && (
-        <div className="absolute -top-1 -right-1 w-3 h-3 bg-neo-yellow rounded-full border border-neo-black" />
+        <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-2 h-2 sm:w-3 sm:h-3 bg-neo-yellow rounded-full border border-neo-black" />
       )}
 
       {/* Today badge */}
       {isToday && (
-        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-neo-yellow text-neo-black text-[8px] font-black px-1.5 py-0.5 rounded-neo border border-neo-black">
+        <div className="absolute -bottom-0.5 sm:-bottom-1 left-1/2 -translate-x-1/2 bg-neo-yellow text-neo-black text-[6px] sm:text-[8px] font-black px-1 sm:px-1.5 py-0 sm:py-0.5 rounded-neo border border-neo-black whitespace-nowrap">
           TODAY
         </div>
       )}

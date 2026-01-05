@@ -348,6 +348,10 @@ const DailyChallenge: React.FC = () => {
   useEffect(() => {
     let isMounted = true;
 
+    // Set loading phase to ensure clean transition when language changes
+    // This forces React to re-render and show the correct screen for the new language
+    setPhase('loading');
+
     const initializePuzzle = async () => {
       const date = getDailyChallengeDate();
       const number = getPuzzleNumber(date);

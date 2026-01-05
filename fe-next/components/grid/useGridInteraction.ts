@@ -728,13 +728,20 @@ export function useGridInteraction({
   ) => {
     // Don't use touch behavior for desktop - use click-to-select
     if (!isTouchDeviceRef.current) {
-      // If in click-select mode (not dragging), handle as click
-      if (isClickSelectMode || selectedCells.length > 0) {
-        handleCellClick(rowIndex, colIndex, letter);
-        return;
+      // FIXED: Always use handleCellClick for desktop mouse input
+      // This ensures click-to-select mode works correctly without being
+      // cleared by handleTouchEnd on mouseup
+      handleCellClick(rowIndex, colIndex, letter);
+
+      // Also set up drag mode for users who want to drag-select
+      // But only start dragging after movement (not on initial click)
+      if (selectedCells.length === 0 || isClickSelectMode) {
+        // Prepare for potential drag, but don't enter drag mode yet
+        isTouchingRef.current = true;
+        startPosRef.current = { x: event.clientX, y: event.clientY };
+        hasMovedRef.current = false;
       }
-      // Start drag mode if no cells selected and mouse held down
-      isDraggingRef.current = true;
+      return;
     }
     handleTouchStart(rowIndex, colIndex, letter, event);
   };
@@ -750,8 +757,21 @@ export function useGridInteraction({
       setHoveredCell(null);
     }
 
+    // FIXED: For desktop, enable drag mode only after user moves past deadzone
+    // This allows click-to-select to work while also supporting drag-to-select
+    if (isTouchingRef.current && !isDraggingRef.current && !isTouchDeviceRef.current) {
+      const deltaX = e.clientX - startPosRef.current.x;
+      const deltaY = e.clientY - startPosRef.current.y;
+      const movement = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+      // Only enter drag mode if user moved past deadzone threshold
+      if (movement > getDeadzoneThreshold()) {
+        isDraggingRef.current = true;
+        hasMovedRef.current = true;
+      }
+    }
+
     // If dragging, process touch move
-    // FIXED: Use isDraggingRef.current instead of isDragging state for synchronous check
     if (isTouchingRef.current && isDraggingRef.current) {
       const mockEvent = {
         touches: [{ clientX: e.clientX, clientY: e.clientY }],
@@ -806,11 +826,14 @@ export function useGridInteraction({
   // Global mouse up
   useEffect(() => {
     const handleMouseUp = () => {
-      // FIXED: Use ref instead of state for synchronous update
+      // FIXED: Only call handleTouchEnd if user was actually dragging
+      // For click-to-select mode, we don't want to clear selection on mouseup
       if (isDraggingRef.current) {
         isDraggingRef.current = false;
         handleTouchEnd();
       }
+      // Always reset touching state on mouseup
+      isTouchingRef.current = false;
     };
     window.addEventListener('mouseup', handleMouseUp);
     return () => window.removeEventListener('mouseup', handleMouseUp);

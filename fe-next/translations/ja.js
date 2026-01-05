@@ -3183,6 +3183,21 @@ const ja = {
       "cta5": "これを超える幸運を！"
     }
   },
+  "keepPlaying": {
+    "succeeded": {
+      "title": "絶好調！",
+      "message": "クリアした！友達を倒す準備はできた？",
+      "ctaSinglePlayer": "続ける",
+      "ctaMultiplayer": "友達に挑戦",
+      "subtext": "今日のスキルは鋭い"
+    },
+    "struggled": {
+      "title": "頑張ろう！",
+      "message": "毎回のパズルがスキルを磨く。練習あるのみ！",
+      "ctaSinglePlayer": "レベルアップ"
+    },
+    "dismiss": "また今度"
+  },
   "guidance": {
     "combo": {
       "title": "コンボボーナス！",

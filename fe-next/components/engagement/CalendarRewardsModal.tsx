@@ -1,15 +1,14 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar, Gift, Zap, Sparkles, Shield, Crown, Flame } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { motion } from 'framer-motion';
+import { Calendar, Gift, Zap, Sparkles, Shield, Crown, Flame } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { CalendarRewardCard, CalendarReward } from './CalendarRewardCard';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'react-hot-toast';
-import { cn } from '@/lib/utils';
 
 interface CalendarStatus {
   month: number;
@@ -125,127 +124,123 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="bg-neo-navy border-3 border-neo-black shadow-hard-lg max-w-md sm:max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
-        <DialogHeader className="flex flex-row items-center justify-between">
-          <DialogTitle className="text-xl font-black uppercase text-neo-cream flex items-center gap-2">
-            <Calendar className="w-6 h-6 text-neo-yellow" />
+      <DialogContent className="max-w-[95vw] sm:max-w-md md:max-w-lg p-0">
+        {/* Header */}
+        <DialogHeader>
+          <DialogTitle className="flex items-center justify-center gap-2">
+            <Calendar className="w-5 h-5 sm:w-6 sm:h-6" />
             {t('calendar.title') || 'Daily Rewards'}
           </DialogTitle>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="text-neo-cream hover:text-neo-yellow"
-          >
-            <X className="w-5 h-5" />
-          </Button>
         </DialogHeader>
 
-        {/* Month header */}
-        <div className="text-center mb-4">
-          <h3 className="text-lg font-bold text-neo-cyan uppercase">
-            {monthName} {calendarStatus?.year}
-          </h3>
-          <p className="text-sm text-neo-cream/70">
-            {t('calendar.claimedCount') || 'Claimed'}: {calendarStatus?.daysClaimed.length || 0}/{daysInMonth}
-          </p>
-        </div>
-
-        {/* Loading state */}
-        {isLoading && (
-          <div className="flex items-center justify-center py-8">
-            <div className="animate-spin w-8 h-8 border-4 border-neo-cyan border-t-transparent rounded-full" />
+        {/* Body with scroll */}
+        <DialogBody className="p-3 sm:p-4 md:p-6">
+          {/* Month header */}
+          <div className="text-center mb-3 sm:mb-4">
+            <h3 className="text-base sm:text-lg font-bold text-neo-navy uppercase">
+              {monthName} {calendarStatus?.year}
+            </h3>
+            <p className="text-xs sm:text-sm text-neo-black/70">
+              {t('calendar.claimedCount') || 'Claimed'}: {calendarStatus?.daysClaimed.length || 0}/{daysInMonth}
+            </p>
           </div>
-        )}
 
-        {/* Calendar grid */}
-        {!isLoading && calendarStatus && (
-          <>
-            <div className="grid grid-cols-7 gap-1.5 sm:gap-2 mb-4">
-              {calendarStatus.rewards.slice(0, daysInMonth).map((reward) => (
-                <CalendarRewardCard
-                  key={reward.day}
-                  reward={reward}
-                  isClaimed={calendarStatus.daysClaimed.includes(reward.day)}
-                  isToday={reward.day === calendarStatus.currentDay}
-                  canClaim={reward.day === calendarStatus.currentDay && calendarStatus.canClaimToday}
-                  isPast={reward.day < calendarStatus.currentDay}
-                  onClaim={handleClaimReward}
-                />
-              ))}
+          {/* Loading state */}
+          {isLoading && (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin w-8 h-8 border-4 border-neo-cyan border-t-transparent rounded-full" />
             </div>
+          )}
 
-            {/* Claim button for today */}
-            {calendarStatus.canClaimToday && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-4"
-              >
-                <Button
-                  onClick={handleClaimReward}
-                  disabled={isClaiming}
-                  className="w-full bg-neo-yellow text-neo-black font-black uppercase text-lg py-4 border-3 border-neo-black shadow-hard hover:shadow-hard-lg"
+          {/* Calendar grid */}
+          {!isLoading && calendarStatus && (
+            <>
+              <div className="grid grid-cols-7 gap-1 sm:gap-1.5 md:gap-2 mb-3 sm:mb-4">
+                {calendarStatus.rewards.slice(0, daysInMonth).map((reward) => (
+                  <CalendarRewardCard
+                    key={reward.day}
+                    reward={reward}
+                    isClaimed={calendarStatus.daysClaimed.includes(reward.day)}
+                    isToday={reward.day === calendarStatus.currentDay}
+                    canClaim={reward.day === calendarStatus.currentDay && calendarStatus.canClaimToday}
+                    isPast={reward.day < calendarStatus.currentDay}
+                    onClaim={handleClaimReward}
+                  />
+                ))}
+              </div>
+
+              {/* Claim button for today */}
+              {calendarStatus.canClaimToday && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-3 sm:mt-4"
                 >
-                  {isClaiming ? (
-                    <div className="animate-spin w-5 h-5 border-2 border-neo-black border-t-transparent rounded-full" />
-                  ) : (
-                    <>
-                      <Gift className="w-5 h-5 mr-2" />
-                      {t('calendar.claimToday') || "Claim Today's Reward"}
-                    </>
-                  )}
-                </Button>
-              </motion.div>
-            )}
+                  <Button
+                    onClick={handleClaimReward}
+                    disabled={isClaiming}
+                    className="w-full bg-neo-yellow text-neo-black font-black uppercase text-sm sm:text-base md:text-lg py-3 sm:py-4 border-2 sm:border-3 border-neo-black shadow-hard hover:shadow-hard-lg"
+                  >
+                    {isClaiming ? (
+                      <div className="animate-spin w-5 h-5 border-2 border-neo-black border-t-transparent rounded-full" />
+                    ) : (
+                      <>
+                        <Gift className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                        {t('calendar.claimToday') || "Claim Today's Reward"}
+                      </>
+                    )}
+                  </Button>
+                </motion.div>
+              )}
 
-            {/* Already claimed message */}
-            {!calendarStatus.canClaimToday && (
-              <div className="mt-4 text-center py-3 bg-neo-gray/30 rounded-neo border-2 border-neo-lime/30">
-                <p className="text-neo-lime font-bold uppercase text-sm flex items-center justify-center gap-2">
-                  <Sparkles className="w-4 h-4" />
-                  {t('calendar.alreadyClaimed') || "Today's reward claimed!"}
-                </p>
-                <p className="text-neo-cream/60 text-xs mt-1">
-                  {t('calendar.comeBackTomorrow') || 'Come back tomorrow for more rewards'}
-                </p>
-              </div>
-            )}
+              {/* Already claimed message */}
+              {!calendarStatus.canClaimToday && (
+                <div className="mt-3 sm:mt-4 text-center py-2 sm:py-3 bg-neo-lime/10 rounded-neo border-2 border-neo-lime/30">
+                  <p className="text-neo-lime font-bold uppercase text-xs sm:text-sm flex items-center justify-center gap-2">
+                    <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
+                    {t('calendar.alreadyClaimed') || "Today's reward claimed!"}
+                  </p>
+                  <p className="text-neo-black/60 text-[10px] sm:text-xs mt-1">
+                    {t('calendar.comeBackTomorrow') || 'Come back tomorrow for more rewards'}
+                  </p>
+                </div>
+              )}
 
-            {/* Legend */}
-            <div className="mt-6 pt-4 border-t border-neo-cream/20">
-              <h4 className="text-xs font-bold uppercase text-neo-cream/70 mb-2">
-                {t('calendar.rewardTypes') || 'Reward Types'}
-              </h4>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                <div className="flex items-center gap-1.5 text-neo-cream/80">
-                  <Zap className="w-3 h-3 text-neo-yellow" />
-                  <span>XP Bonus</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-neo-cream/80">
-                  <Sparkles className="w-3 h-3 text-neo-cyan" />
-                  <span>Free Hints</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-neo-cream/80">
-                  <Shield className="w-3 h-3 text-neo-lime" />
-                  <span>Streak Freeze</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-neo-cream/80">
-                  <Gift className="w-3 h-3 text-neo-pink" />
-                  <span>Mystery Box</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-neo-cream/80">
-                  <Crown className="w-3 h-3 text-neo-pink" />
-                  <span>Exclusive Title</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-neo-cream/80">
-                  <Flame className="w-3 h-3 text-neo-yellow" />
-                  <span>Milestone</span>
+              {/* Legend - collapsible on mobile */}
+              <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-neo-black/20">
+                <h4 className="text-[10px] sm:text-xs font-bold uppercase text-neo-black/70 mb-2">
+                  {t('calendar.rewardTypes') || 'Reward Types'}
+                </h4>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
+                  <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
+                    <Zap className="w-3 h-3 text-neo-yellow flex-shrink-0" />
+                    <span>XP Bonus</span>
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
+                    <Sparkles className="w-3 h-3 text-neo-cyan flex-shrink-0" />
+                    <span>Free Hints</span>
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
+                    <Shield className="w-3 h-3 text-neo-lime flex-shrink-0" />
+                    <span>Streak Freeze</span>
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
+                    <Gift className="w-3 h-3 text-neo-pink flex-shrink-0" />
+                    <span>Mystery Box</span>
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
+                    <Crown className="w-3 h-3 text-neo-pink flex-shrink-0" />
+                    <span>Exclusive Title</span>
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
+                    <Flame className="w-3 h-3 text-neo-yellow flex-shrink-0" />
+                    <span>Milestone</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </>
-        )}
+            </>
+          )}
+        </DialogBody>
       </DialogContent>
     </Dialog>
   );
