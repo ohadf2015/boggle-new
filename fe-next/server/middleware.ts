@@ -137,6 +137,25 @@ function requestTimeout(): RequestHandler {
 }
 
 /**
+ * WWW redirect middleware
+ * Redirects non-www to www in production for consistent URLs
+ */
+function wwwRedirect(): RequestHandler {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    const host = req.get('host') || '';
+
+    // Only redirect in production and for the apex domain
+    if (!dev && host === 'lexiclash.live') {
+      const redirectUrl = `https://www.lexiclash.live${req.originalUrl}`;
+      res.redirect(301, redirectUrl);
+      return;
+    }
+
+    next();
+  };
+}
+
+/**
  * Configure all middleware on Express app
  * @param app - Express application instance
  * @param options - Configuration options
@@ -144,6 +163,9 @@ function requestTimeout(): RequestHandler {
 export function configureMiddleware(app: Application, { corsOrigin, isDev }: MiddlewareOptions): void {
   // Disable x-powered-by header
   app.disable('x-powered-by');
+
+  // WWW redirect (must be first - before other middleware)
+  app.use(wwwRedirect());
 
   // Compression middleware (gzip/brotli)
   app.use(compression({
