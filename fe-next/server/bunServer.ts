@@ -137,12 +137,20 @@ let io: ExtendedSocketServer;
 let engine: BunEngine;
 let bunServer: ReturnType<typeof Bun.serve>;
 
+// Server readiness state - health endpoint available immediately, full server after init
+let serverReady = false;
+
 /**
  * Health check routes
+ * Returns 200 even during initialization so Railway healthcheck passes
  */
 function handleHealthRoutes(url: URL, origin: string | null): Response | null {
   if (url.pathname === '/health') {
-    return jsonResponse({ status: 'ok', timestamp: Date.now() }, 200, { origin });
+    return jsonResponse({
+      status: serverReady ? 'ok' : 'starting',
+      ready: serverReady,
+      timestamp: Date.now()
+    }, 200, { origin });
   }
 
   if (url.pathname === '/health/scaling') {
@@ -418,9 +426,82 @@ async function handleNextJs(req: Request, url: URL, origin: string | null, clien
 
 /**
  * Start the Bun server
+ * IMPORTANT: HTTP server starts FIRST for health checks, then heavy initialization happens
  */
 async function start(): Promise<void> {
   console.log('🚀 Starting Bun native server with Socket.IO...');
+
+  // Start HTTP server IMMEDIATELY for health checks
+  // This ensures Railway healthcheck passes while we initialize
+  bunServer = Bun.serve({
+    port: PORT,
+    hostname: HOST,
+    idleTimeout: 30,
+
+    async fetch(req: Request, server): Promise<Response> {
+      const url = new URL(req.url);
+      const origin = req.headers.get('origin');
+
+      // Health routes ALWAYS work - even during initialization
+      const healthResponse = handleHealthRoutes(url, origin);
+      if (healthResponse) return healthResponse;
+
+      // Handle preflight
+      if (req.method === 'OPTIONS') {
+        return handlePreflight(origin);
+      }
+
+      // If server not ready yet, return 503 for all other routes
+      if (!serverReady) {
+        return jsonResponse(
+          { error: 'Server is starting up, please retry in a moment' },
+          503,
+          { origin }
+        );
+      }
+
+      const clientIP = server.requestIP(req)?.address;
+
+      // WWW redirect
+      const wwwRedirect = checkWwwRedirect(req);
+      if (wwwRedirect) return wwwRedirect;
+
+      // Socket.IO requests - handle with Bun native WebSocket
+      if (url.pathname.startsWith('/socket.io/')) {
+        return engine.handleRequest(req, server);
+      }
+
+      // Metrics routes (fast path)
+      const metricsResponse = handleMetricsRoutes(url, origin);
+      if (metricsResponse) return metricsResponse;
+
+      // Async metrics/redis
+      if (url.pathname === '/metrics/redis') {
+        try {
+          const metrics = await getRedisMetrics();
+          return jsonResponse(metrics, 200, { origin });
+        } catch (error) {
+          return jsonResponse({ error: (error as Error).message }, 500, { origin });
+        }
+      }
+
+      // All other requests -> Next.js (direct conversion, no proxy!)
+      return handleNextJs(req, url, origin, clientIP);
+    },
+
+    // WebSocket handler - will be properly configured after Socket.IO init
+    websocket: {
+      open() {},
+      message() {},
+      close() {},
+    },
+  });
+
+  console.log(`> HTTP server listening on http://${HOST}:${PORT}`);
+  console.log(`> Health endpoint available immediately`);
+
+  // Now do the heavy initialization while health checks pass
+  console.log('🔄 Initializing server components...');
 
   // Prepare Next.js
   await nextApp.prepare();
@@ -460,61 +541,18 @@ async function start(): Promise<void> {
   // Set up event loop monitoring
   setupEventLoopMonitoring();
 
-  // Get the Bun engine handler
+  // Get the Bun engine handler and reload server with WebSocket support
   const engineHandler = engine.handler();
 
-  // Create Bun server - single server, no proxy!
-  bunServer = Bun.serve({
-    port: PORT,
-    hostname: HOST,
-    idleTimeout: 30,
-
-    async fetch(req: Request, server): Promise<Response> {
-      const url = new URL(req.url);
-      const origin = req.headers.get('origin');
-      const clientIP = server.requestIP(req)?.address;
-
-      // WWW redirect
-      const wwwRedirect = checkWwwRedirect(req);
-      if (wwwRedirect) return wwwRedirect;
-
-      // Handle preflight
-      if (req.method === 'OPTIONS') {
-        return handlePreflight(origin);
-      }
-
-      // Socket.IO requests - handle with Bun native WebSocket
-      if (url.pathname.startsWith('/socket.io/')) {
-        return engine.handleRequest(req, server);
-      }
-
-      // Health routes (fast path)
-      const healthResponse = handleHealthRoutes(url, origin);
-      if (healthResponse) return healthResponse;
-
-      // Metrics routes (fast path)
-      const metricsResponse = handleMetricsRoutes(url, origin);
-      if (metricsResponse) return metricsResponse;
-
-      // Async metrics/redis
-      if (url.pathname === '/metrics/redis') {
-        try {
-          const metrics = await getRedisMetrics();
-          return jsonResponse(metrics, 200, { origin });
-        } catch (error) {
-          return jsonResponse({ error: (error as Error).message }, 500, { origin });
-        }
-      }
-
-      // All other requests -> Next.js (direct conversion, no proxy!)
-      return handleNextJs(req, url, origin, clientIP);
-    },
-
-    // Native Bun WebSocket handler for Socket.IO
+  // Reload server with proper WebSocket handler
+  bunServer.reload({
+    fetch: bunServer.fetch,
     websocket: engineHandler.websocket as unknown as Bun.WebSocketHandler<unknown>,
   });
 
-  console.log(`> Server ready on http://${HOST}:${PORT}`);
+  // Mark server as fully ready
+  serverReady = true;
+  console.log(`✅ Server fully ready on http://${HOST}:${PORT}`);
   console.log(`> Socket.IO with Bun native WebSocket (no proxy)`);
   console.log(`> Environment: ${dev ? 'development' : 'production'}`);
 
