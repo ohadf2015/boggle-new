@@ -146,13 +146,13 @@ jobs:
 
       - name: Run backend tests with Bun
         working-directory: fe-next
-        run: bun run test:backend:node
+        run: bun run test:backend
         env:
           CI: true
 
       - name: Run frontend tests with Bun
         working-directory: fe-next
-        run: bun run test:frontend:node
+        run: bun run test:frontend
         env:
           CI: true
 
