@@ -3118,6 +3118,9 @@ const sv = {
       "find": "FYND",
       "share": "Dela",
       "retry": "Försök igen",
+      "title": "Resultat",
+      "details": "Detaljer & Belöningar",
+      "coinsEarned": "Intjänade mynt",
       "survivalBonus": "Överlevnadsbonus",
       "survivalTier": {
         "legendary": "Legendarisk Överlevare!",

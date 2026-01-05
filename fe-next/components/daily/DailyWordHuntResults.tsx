@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Trophy, Target, X, ArrowLeft, Copy, Check, Send, Coins, RotateCcw, ImageDown, ChevronDown, Eye, BarChart3, Medal, Timer, Sparkles, Calculator, Heart, Zap } from 'lucide-react';
+import { Share2, Trophy, X, ArrowLeft, Copy, Check, Send, Coins, RotateCcw, ImageDown, ChevronDown, Eye, BarChart3, Medal, Timer, Sparkles } from 'lucide-react';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 
 // X/Twitter icon (no lucide equivalent)
@@ -153,7 +153,7 @@ const ScoreBadge: React.FC<{
   </div>
 );
 
-/** Main result display - puzzle number, score, target word */
+/** Main result display - simplified hero section with core metrics */
 const ResultDisplay: React.FC<{
   solved: boolean;
   attemptsUsed: number;
@@ -161,21 +161,9 @@ const ResultDisplay: React.FC<{
   streakDays: number;
   language: Language;
   puzzleNumber: number;
-  coinReward: { awarded: number; breakdown: { base: number; efficiency: number; streak: number } } | null;
-  survivalBonusTime: number;
-  milestoneMessage: { emoji: string; title: string; subtitle: string } | null;
-  rarestWord: { word: string; rarity: number; emoji: string; label: string } | null;
   countdown: string;
   t: (key: string) => string;
-}> = ({ solved, attemptsUsed, targetWord, streakDays, language, puzzleNumber, coinReward, survivalBonusTime, milestoneMessage, rarestWord, countdown, t }) => {
-  const getSurvivalBonusMessage = (bonusSeconds: number): { emoji: string; tier: string } => {
-    if (bonusSeconds >= 120) return { emoji: '🏆', tier: 'legendary' };
-    if (bonusSeconds >= 60) return { emoji: '⭐', tier: 'excellent' };
-    if (bonusSeconds >= 30) return { emoji: '💪', tier: 'good' };
-    if (bonusSeconds >= 10) return { emoji: '👍', tier: 'nice' };
-    return { emoji: '🌱', tier: 'start' };
-  };
-
+}> = ({ solved, attemptsUsed, targetWord, streakDays, language, puzzleNumber, countdown, t }) => {
   return (
     <motion.div
       initial={{ scale: 0.9, opacity: 0 }}
@@ -189,57 +177,22 @@ const ResultDisplay: React.FC<{
 
       {solved ? (
         <>
-          <div className="text-3xl sm:text-4xl font-black mt-1 text-green-500">
+          <div className="text-4xl sm:text-5xl font-black mt-2 text-green-500">
             {attemptsUsed}/10
           </div>
-          <div className="mt-1">
+          <div className="mt-2">
             <span className="text-xs text-gray-500 dark:text-gray-400">{t('wordHunt.results.targetWord')}: </span>
-            <span className="text-lg sm:text-xl font-black text-neo-yellow">
+            <span className="text-xl sm:text-2xl font-black text-neo-yellow">
               {language === 'he' ? applyHebrewFinalLetters(targetWord) : targetWord.toUpperCase()}
             </span>
           </div>
-
-          {/* Rewards row */}
-          <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
-            {coinReward && coinReward.awarded > 0 && (
-              <div className="flex items-center gap-1 px-2 py-1 bg-amber-400 rounded-neo border-2 border-neo-black">
-                <Coins className="w-3.5 h-3.5 text-neo-black" />
-                <span className="font-black text-sm text-neo-black">+{coinReward.awarded}</span>
-              </div>
-            )}
-            {survivalBonusTime > 0 && (
-              <div className="flex items-center gap-1 px-2 py-1 bg-cyan-100 dark:bg-cyan-900/30 rounded-neo border-2 border-neo-black">
-                <Timer className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400" />
-                <span className="font-black text-sm text-cyan-700 dark:text-cyan-300">+{survivalBonusTime}s</span>
-              </div>
-            )}
-          </div>
         </>
       ) : (
-        <div className="mt-4 space-y-4">
-          {survivalBonusTime > 0 && (
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              className="inline-block px-4 py-3 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-neo border-3 border-neo-black shadow-hard"
-            >
-              <div className="flex flex-col items-center gap-1">
-                <div className="flex items-center gap-2">
-                  <Timer className="w-5 h-5 text-white" />
-                  <span className="text-2xl font-black text-white">+{survivalBonusTime}s</span>
-                  <Sparkles className="w-5 h-5 text-neo-yellow" />
-                </div>
-                <span className="text-xs font-bold text-white/90 uppercase">{t('wordHunt.results.survivalBonus')}</span>
-                <span className="text-[10px] text-white/70">
-                  {getSurvivalBonusMessage(survivalBonusTime).emoji} {t(`wordHunt.results.survivalTier.${getSurvivalBonusMessage(survivalBonusTime).tier}`)}
-                </span>
-              </div>
-            </motion.div>
-          )}
+        <div className="mt-4 space-y-3">
           <div className="text-lg text-gray-600 dark:text-gray-300">{t('wordHunt.results.betterLuckNextTime')}</div>
-          <div className="inline-block px-6 py-4 bg-slate-600 rounded-neo border-3 border-neo-black shadow-hard">
-            <div className="text-sm text-white/80 uppercase font-bold mb-1">{t('wordHunt.results.nextChallengeIn')}</div>
-            <div className="text-3xl font-black text-white">{countdown}</div>
+          <div className="inline-block px-5 py-3 bg-slate-600 rounded-neo border-3 border-neo-black shadow-hard">
+            <div className="text-xs text-white/80 uppercase font-bold mb-1">{t('wordHunt.results.nextChallengeIn')}</div>
+            <div className="text-2xl font-black text-white">{countdown}</div>
           </div>
         </div>
       )}
@@ -252,30 +205,125 @@ const ResultDisplay: React.FC<{
           transition={{ type: 'spring', delay: 0.25 }}
           className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-500 rounded-neo border-2 border-neo-black shadow-hard-sm"
         >
-          <span className="text-2xl">🔥</span>
-          <span className="font-black text-white">
+          <span className="text-xl">🔥</span>
+          <span className="font-black text-white text-sm">
             {streakDays} {streakDays === 1 ? t('daily.dayStreak') : t('daily.daysStreak')}
           </span>
-          {milestoneMessage && <span className="text-lg ml-1">{milestoneMessage.emoji}</span>}
-        </motion.div>
-      )}
-
-      {/* Rarest word */}
-      {rarestWord && rarestWord.rarity >= 4 && (
-        <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', delay: 0.3 }}
-          className="mt-2 inline-flex flex-col items-center gap-0.5 px-3 py-2 bg-indigo-600 rounded-neo border-2 border-neo-black shadow-hard-sm"
-        >
-          <div className="flex items-center gap-2">
-            <span className="text-xl">{rarestWord.emoji}</span>
-            <span className="font-black text-white text-sm uppercase">{rarestWord.label} {t('wordHunt.results.find')}</span>
-          </div>
-          <span className="font-black text-white text-xl tracking-wider">{rarestWord.word.toUpperCase()}</span>
         </motion.div>
       )}
     </motion.div>
+  );
+};
+
+/** Collapsible details section for rewards and secondary info */
+const CollapsibleDetails: React.FC<{
+  coinReward: { awarded: number; breakdown: { base: number; efficiency: number; streak: number } } | null;
+  survivalBonusTime: number;
+  rarestWord: { word: string; rarity: number; emoji: string; label: string } | null;
+  t: (key: string) => string;
+}> = ({ coinReward, survivalBonusTime, rarestWord, t }) => {
+  const [expanded, setExpanded] = useState(false);
+
+  const getSurvivalBonusMessage = (bonusSeconds: number): { emoji: string; tier: string } => {
+    if (bonusSeconds >= 120) return { emoji: '🏆', tier: 'legendary' };
+    if (bonusSeconds >= 60) return { emoji: '⭐', tier: 'excellent' };
+    if (bonusSeconds >= 30) return { emoji: '💪', tier: 'good' };
+    if (bonusSeconds >= 10) return { emoji: '👍', tier: 'nice' };
+    return { emoji: '🌱', tier: 'start' };
+  };
+
+  // Don't show if no details to display
+  const hasDetails = (coinReward && coinReward.awarded > 0) || survivalBonusTime > 0 || (rarestWord && rarestWord.rarity >= 4);
+  if (!hasDetails) return null;
+
+  return (
+    <div className="rounded-neo border-2 border-neo-black overflow-hidden">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center justify-between p-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-neo-yellow" />
+          <span className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
+            {t('wordHunt.results.details') || 'Details & Rewards'}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          {/* Preview badges when collapsed */}
+          {!expanded && (
+            <div className="flex items-center gap-1.5">
+              {coinReward && coinReward.awarded > 0 && (
+                <span className="text-xs font-bold text-amber-600 dark:text-amber-400">+{coinReward.awarded}🪙</span>
+              )}
+              {survivalBonusTime > 0 && (
+                <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400">+{survivalBonusTime}s</span>
+              )}
+            </div>
+          )}
+          <motion.div animate={{ rotate: expanded ? 180 : 0 }}>
+            <ChevronDown className="w-4 h-4 text-gray-500" />
+          </motion.div>
+        </div>
+      </button>
+
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="p-3 space-y-3 bg-white dark:bg-slate-800">
+              {/* Coin rewards */}
+              {coinReward && coinReward.awarded > 0 && (
+                <div className="flex items-center justify-between p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                  <div className="flex items-center gap-2">
+                    <Coins className="w-5 h-5 text-amber-600" />
+                    <span className="font-bold text-sm text-gray-700 dark:text-gray-200">{t('wordHunt.results.coinsEarned') || 'Coins Earned'}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-black text-lg text-amber-600 dark:text-amber-400">+{coinReward.awarded}</span>
+                    {(coinReward.breakdown.base > 0 || coinReward.breakdown.efficiency > 0 || coinReward.breakdown.streak > 0) && (
+                      <div className="text-[10px] text-gray-500 dark:text-gray-400">
+                        {coinReward.breakdown.base > 0 && <span>Base: {coinReward.breakdown.base}</span>}
+                        {coinReward.breakdown.efficiency > 0 && <span> + Efficiency: {coinReward.breakdown.efficiency}</span>}
+                        {coinReward.breakdown.streak > 0 && <span> + Streak: {coinReward.breakdown.streak}</span>}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Survival bonus */}
+              {survivalBonusTime > 0 && (
+                <div className="flex items-center justify-between p-2 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg border border-cyan-200 dark:border-cyan-800">
+                  <div className="flex items-center gap-2">
+                    <Timer className="w-5 h-5 text-cyan-600" />
+                    <span className="font-bold text-sm text-gray-700 dark:text-gray-200">{t('wordHunt.results.survivalBonus')}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-gray-500">{getSurvivalBonusMessage(survivalBonusTime).emoji}</span>
+                    <span className="font-black text-lg text-cyan-600 dark:text-cyan-400">+{survivalBonusTime}s</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Rarest word */}
+              {rarestWord && rarestWord.rarity >= 4 && (
+                <div className="flex items-center justify-between p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{rarestWord.emoji}</span>
+                    <span className="font-bold text-sm text-gray-700 dark:text-gray-200">{rarestWord.label} {t('wordHunt.results.find')}</span>
+                  </div>
+                  <span className="font-black text-lg text-indigo-600 dark:text-indigo-400 tracking-wide">{rarestWord.word.toUpperCase()}</span>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 
@@ -358,15 +406,13 @@ const CoinUnlockCard: React.FC<{
   );
 };
 
-/** Share buttons section */
+/** Share buttons section - always visible platform buttons */
 const ShareSection: React.FC<{
   solved: boolean;
   onShare: () => void;
   onRetry: () => void;
   canAffordRetry: boolean;
   retryCost: number;
-  showPlatforms: boolean;
-  setShowPlatforms: (show: boolean) => void;
   onWhatsApp: () => void;
   onTwitter: () => void;
   onTelegram: () => void;
@@ -376,109 +422,93 @@ const ShareSection: React.FC<{
   isGeneratingImage: boolean;
   onShowLeaderboard: () => void;
   t: (key: string) => string;
-}> = ({ solved, onShare, onRetry, canAffordRetry, retryCost, showPlatforms, setShowPlatforms, onWhatsApp, onTwitter, onTelegram, onCopy, onDownloadImage, copied, isGeneratingImage, onShowLeaderboard, t }) => (
+}> = ({ solved, onShare, onRetry, canAffordRetry, retryCost, onWhatsApp, onTwitter, onTelegram, onCopy, onDownloadImage, copied, isGeneratingImage, onShowLeaderboard, t }) => (
   <motion.div
     initial={{ y: 20, opacity: 0 }}
     animate={{ y: 0, opacity: 1 }}
     transition={{ delay: 0.3 }}
     className="space-y-3"
   >
-    {/* Primary actions */}
-    <div className="flex gap-2">
-      <Button
-        onClick={onShare}
-        className={cn(
-          "flex-1 py-3 text-base font-black uppercase border-2 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all",
-          solved
-            ? "bg-gradient-to-r from-neo-yellow via-neo-yellow to-neo-pink text-neo-black"
-            : "bg-gradient-to-r from-neo-cyan via-neo-pink to-neo-pink text-white"
-        )}
-      >
-        <Share2 className="mr-1.5 w-4 h-4" />
-        {t('wordHunt.results.share') || 'Share'}
-      </Button>
+    {/* Primary share button */}
+    <Button
+      onClick={onShare}
+      className={cn(
+        "w-full py-3.5 text-lg font-black uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all",
+        solved
+          ? "bg-gradient-to-r from-neo-yellow via-neo-yellow to-neo-pink text-neo-black"
+          : "bg-gradient-to-r from-neo-cyan via-neo-pink to-neo-pink text-white"
+      )}
+    >
+      <Share2 className="mr-2 w-5 h-5" />
+      {t('wordHunt.results.share') || 'Share'}
+    </Button>
 
-      <Button
-        onClick={onRetry}
-        disabled={!canAffordRetry}
-        className={cn(
-          "flex-1 py-3 text-base font-black uppercase border-2 border-neo-black rounded-neo shadow-hard transition-all",
-          canAffordRetry
-            ? "bg-gradient-to-r from-amber-400 to-orange-500 text-neo-black hover:shadow-hard-lg hover:-translate-y-0.5"
-            : "bg-gray-400 text-gray-600 cursor-not-allowed"
-        )}
+    {/* Platform buttons - always visible, icon-focused */}
+    <div className="flex items-center justify-center gap-2">
+      <button
+        onClick={onWhatsApp}
+        className="w-12 h-12 flex items-center justify-center rounded-full bg-[#25D366] text-white border-2 border-neo-black shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard transition-all"
+        aria-label="Share on WhatsApp"
       >
-        <RotateCcw className="mr-1.5 w-4 h-4" />
-        <span className="flex items-center gap-1">
-          {t('wordHunt.results.retry') || 'Retry'}
-          <span className="text-xs opacity-70">({retryCost}🪙)</span>
-        </span>
-      </Button>
+        <WhatsAppIcon className="w-5 h-5" />
+      </button>
+      <button
+        onClick={onTwitter}
+        className="w-12 h-12 flex items-center justify-center rounded-full bg-black text-white border-2 border-gray-700 shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard transition-all"
+        aria-label="Share on X/Twitter"
+      >
+        <XTwitterIcon className="w-5 h-5" />
+      </button>
+      <button
+        onClick={onTelegram}
+        className="w-12 h-12 flex items-center justify-center rounded-full bg-[#0088cc] text-white border-2 border-neo-black shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard transition-all"
+        aria-label="Share on Telegram"
+      >
+        <Send className="w-5 h-5" />
+      </button>
+      <button
+        onClick={onCopy}
+        className="w-12 h-12 flex items-center justify-center rounded-full bg-gray-600 text-white border-2 border-neo-black shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard transition-all"
+        aria-label={copied ? t('common.copied') : t('daily.copyToClipboard')}
+      >
+        {copied ? <Check className="w-5 h-5 text-neo-lime" /> : <Copy className="w-5 h-5" />}
+      </button>
+      <button
+        onClick={onDownloadImage}
+        disabled={isGeneratingImage}
+        className="w-12 h-12 flex items-center justify-center rounded-full bg-neo-pink text-white border-2 border-neo-black shadow-hard-sm hover:-translate-y-0.5 hover:shadow-hard transition-all disabled:opacity-50"
+        aria-label={t('daily.downloadImage')}
+      >
+        {isGeneratingImage ? (
+          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+        ) : (
+          <ImageDown className="w-5 h-5" />
+        )}
+      </button>
     </div>
 
-    {/* More share options toggle */}
-    <button
-      onClick={() => setShowPlatforms(!showPlatforms)}
-      className="w-full flex items-center justify-center gap-2 py-2 text-sm text-gray-400 hover:text-neo-cyan transition-colors"
-    >
-      <Share2 className="w-3.5 h-3.5 opacity-60" />
-      <span className="underline underline-offset-2 decoration-dotted">
-        {showPlatforms ? t('common.showLess') : t('common.moreShareOptions')}
-      </span>
-      <motion.div animate={{ rotate: showPlatforms ? 180 : 0 }}>
-        <ChevronDown className="w-4 h-4" />
-      </motion.div>
-    </button>
-
-    {/* Platform buttons */}
-    <AnimatePresence>
-      {showPlatforms && (
-        <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          className="overflow-hidden"
-        >
-          <div className="grid grid-cols-2 gap-2">
-            <Button onClick={onWhatsApp} className="py-2.5 min-h-[44px] bg-[#25D366] text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all">
-              <WhatsAppIcon className="w-4 h-4 mr-2" />
-              <span className="text-sm font-bold">WhatsApp</span>
-            </Button>
-            <Button onClick={onTwitter} className="py-2.5 min-h-[44px] bg-black text-white border-2 border-gray-700 rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all">
-              <XTwitterIcon className="w-4 h-4 mr-2" />
-              <span className="text-sm font-bold">X / Twitter</span>
-            </Button>
-            <Button onClick={onTelegram} className="py-2.5 min-h-[44px] bg-[#0088cc] text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all">
-              <Send className="w-4 h-4 mr-2" />
-              <span className="text-sm font-bold">Telegram</span>
-            </Button>
-            <Button onClick={onCopy} className="py-2.5 min-h-[44px] bg-gray-600 text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all">
-              {copied ? <Check className="w-4 h-4 mr-2 text-neo-lime" /> : <Copy className="w-4 h-4 mr-2" />}
-              <span className="text-sm font-bold">{copied ? t('common.copied') : t('daily.copyToClipboard')}</span>
-            </Button>
-          </div>
-          <Button
-            onClick={onDownloadImage}
-            disabled={isGeneratingImage}
-            className="w-full mt-2 py-2 min-h-[44px] bg-neo-pink text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all disabled:opacity-50"
-          >
-            {isGeneratingImage ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <>
-                <ImageDown className="w-4 h-4 mr-2" />
-                <span className="text-sm font-bold">{t('daily.downloadImage')}</span>
-              </>
-            )}
-          </Button>
-        </motion.div>
+    {/* Retry button */}
+    <Button
+      onClick={onRetry}
+      disabled={!canAffordRetry}
+      className={cn(
+        "w-full py-2.5 text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard transition-all",
+        canAffordRetry
+          ? "bg-gradient-to-r from-amber-400 to-orange-500 text-neo-black hover:shadow-hard-lg hover:-translate-y-0.5"
+          : "bg-gray-400 text-gray-600 cursor-not-allowed"
       )}
-    </AnimatePresence>
+    >
+      <RotateCcw className="mr-1.5 w-4 h-4" />
+      <span className="flex items-center gap-1">
+        {t('wordHunt.results.retry') || 'Retry'}
+        <span className="text-xs opacity-70">({retryCost}🪙)</span>
+      </span>
+    </Button>
 
     {/* Leaderboard button */}
     <Button
       onClick={onShowLeaderboard}
-      className="w-full py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all font-bold lg:hidden"
+      className="w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all font-bold text-sm lg:hidden"
     >
       <Trophy className="w-4 h-4 mr-2" />
       {t('daily.showLeaderboard')}
@@ -486,13 +516,13 @@ const ShareSection: React.FC<{
   </motion.div>
 );
 
-/** Attempt history grid (Wordle-style) */
+/** Attempt history grid (Wordle-style) - collapsed by default for cleaner results */
 const AttemptHistory: React.FC<{
   attempts: WordHuntResult['attempts'];
   attemptsUsed: number;
   t: (key: string) => string;
 }> = ({ attempts, attemptsUsed, t }) => {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
 
   if (attempts.length === 0) return null;
 
@@ -547,13 +577,13 @@ const AttemptHistory: React.FC<{
   );
 };
 
-/** Stats section with distribution histogram */
+/** Stats section with distribution histogram - collapsed by default for cleaner results */
 const StatsSection: React.FC<{
   stats: WordHuntStats;
   result: WordHuntResult;
   t: (key: string) => string;
 }> = ({ stats, result, t }) => {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
 
   return (
     <div className="rounded-neo border-2 border-neo-black overflow-hidden">
@@ -669,87 +699,12 @@ const StatsSection: React.FC<{
   );
 };
 
-/** Ranking explainer section */
-const RankingExplainer: React.FC<{
-  result: WordHuntResult;
-  showExplainer: boolean;
-  setShowExplainer: (show: boolean) => void;
-  t: (key: string) => string;
-}> = ({ result, showExplainer, setShowExplainer, t }) => {
-  if (!result.solved || !result.efficiencyScore) return null;
-
-  return (
-    <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }} className="w-full max-w-xs mx-auto">
-      <button
-        onClick={() => setShowExplainer(!showExplainer)}
-        className="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors mx-auto py-1"
-      >
-        <Calculator className="w-3.5 h-3.5" />
-        <span className="font-medium">{t('wordHunt.ranking.howItWorks')}</span>
-        <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", showExplainer && "rotate-180")} />
-      </button>
-
-      <AnimatePresence>
-        {showExplainer && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden"
-          >
-            <div className="bg-slate-800/80 rounded-neo border-2 border-slate-700 p-3 mt-2 text-left">
-              <div className="space-y-2 text-xs">
-                <div className="text-white/90">
-                  <span className="font-bold text-neo-cyan">{t('wordHunt.ranking.title')}</span>
-                </div>
-                <div className="text-white/70 leading-relaxed">{t('wordHunt.ranking.explanation')}</div>
-
-                {result.efficiencyScore > 0 && (
-                  <div className="pt-2 border-t border-slate-700 space-y-1.5">
-                    <div className="font-bold text-neo-yellow flex items-center gap-1.5">
-                      <Zap className="w-3.5 h-3.5" />
-                      {t('wordHunt.ranking.efficiencyTitle')}
-                    </div>
-                    <div className="grid grid-cols-2 gap-1 text-[10px]">
-                      {result.lifeRemaining !== undefined && (
-                        <div className="flex items-center gap-1 text-white/80">
-                          <Heart className="w-3 h-3 text-rose-400" />
-                          <span>{t('wordHunt.ranking.life')}: {result.lifeRemaining} × 10 = <span className="text-emerald-400">+{result.lifeRemaining * 10}</span></span>
-                        </div>
-                      )}
-                      {result.wordsDiscovered && (
-                        <div className="flex items-center gap-1 text-white/80">
-                          <Target className="w-3 h-3 text-cyan-400" />
-                          <span>{t('wordHunt.ranking.words')}: {result.wordsDiscovered.length} × 3 = <span className="text-emerald-400">+{result.wordsDiscovered.length * 3}</span></span>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-1 text-white/80">
-                        <span className="w-3 h-3 text-center">🎯</span>
-                        <span>{t('wordHunt.ranking.guesses')}: {result.attemptsUsed} × 2 = <span className="text-rose-400">-{result.attemptsUsed * 2}</span></span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between pt-1 border-t border-slate-600">
-                      <span className="font-bold text-white">{t('wordHunt.ranking.total')}</span>
-                      <span className="font-black text-neo-yellow">{result.efficiencyScore} {t('wordHunt.ranking.pts')}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-};
-
-/** Try another language section */
+/** Try another language - compact inline version */
 const TryAnotherLanguage: React.FC<{
   currentLanguage: Language;
   onGameLanguageChange?: (lang: Language) => void;
-  onBack: () => void;
   t: (key: string) => string;
-}> = ({ currentLanguage, onGameLanguageChange, onBack, t }) => {
+}> = ({ currentLanguage, onGameLanguageChange, t }) => {
   const availableLanguages = LANGUAGE_OPTIONS.filter(
     (option) => option.code !== currentLanguage && !hasPlayedWordHuntToday(option.code)
   );
@@ -757,26 +712,21 @@ const TryAnotherLanguage: React.FC<{
   if (availableLanguages.length === 0 || !onGameLanguageChange) return null;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5 }}
-      className="pt-4 border-t border-gray-200 dark:border-gray-700"
-    >
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-2 text-center">{t('daily.tryAnotherLanguage')}</p>
-      <div className="flex items-center justify-center gap-2">
+    <div className="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+      <span>{t('daily.tryAnotherLanguage') || 'Try another language'}:</span>
+      <div className="flex items-center gap-1">
         {availableLanguages.map(opt => (
           <button
             key={opt.code}
-            onClick={() => { onGameLanguageChange(opt.code); onBack(); }}
-            className="group flex flex-col items-center gap-1 px-3 py-2 bg-white dark:bg-slate-800 rounded-neo border-2 border-gray-300 dark:border-gray-600 hover:border-neo-cyan hover:bg-neo-cyan/10 transition-all hover:-translate-y-0.5"
+            onClick={() => onGameLanguageChange(opt.code)}
+            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 hover:scale-110 transition-all"
+            title={opt.name}
           >
-            <span className="text-2xl group-hover:scale-110 transition-transform">{opt.flag}</span>
-            <span className="text-[10px] font-bold text-gray-600 dark:text-gray-400 group-hover:text-neo-cyan">{opt.name}</span>
+            <span className="text-lg">{opt.flag}</span>
           </button>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -808,13 +758,11 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [signupTrigger, setSignupTrigger] = useState<ConversionTrigger | null>(null);
   const [leaderboardKey, setLeaderboardKey] = useState(0);
-  const [showSharePlatforms, setShowSharePlatforms] = useState(false);
   const [activeTab, setActiveTab] = useState<ResultTab>('results');
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [_countryCode, setCountryCode] = useState<string | null>(null);
   const [countryCodeReady, setCountryCodeReady] = useState(false);
   const [inlineSignupDismissed, setInlineSignupDismissed] = useState(false);
-  const [showRankingExplainer, setShowRankingExplainer] = useState(false);
   const hasSubmittedRef = useRef(false);
   const { user, profile, isAuthenticated, loading: authLoading } = useAuth();
   const { isProtected } = useScreenshotProtection();
@@ -835,6 +783,9 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const avatarEmoji = isAuthenticated && profile
     ? profile.avatar_emoji || '🎯'
     : guestPlayer?.avatarEmoji || '🎯';
+  const avatarImage = isAuthenticated && profile
+    ? profile.avatar_image || null
+    : null;
 
   // Share URL and text
   const shareUrl = useMemo(() => {
@@ -846,8 +797,13 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       whName: displayName,
       whEmoji: avatarEmoji,
     });
+    // Add custom avatar image if available (for OG image rendering)
+    if (avatarImage) {
+      const avatarFilename = avatarImage.endsWith('.png') ? avatarImage : `${avatarImage}.png`;
+      params.set('whAvatar', avatarFilename);
+    }
     return `${origin}/${language}/daily?${params.toString()}`;
-  }, [result.solved, result.attemptsUsed, puzzleNumber, displayName, avatarEmoji, language]);
+  }, [result.solved, result.attemptsUsed, puzzleNumber, displayName, avatarEmoji, avatarImage, language]);
 
   const shareText = generateWordHuntShareableResult(
     { ...result, puzzleNumber, puzzleDate, language, streakDays: result.streakDays || 0, completedAt: result.completedAt || new Date().toISOString() },
@@ -1081,6 +1037,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
   const renderResultsContent = () => (
     <div className="space-y-4">
+      {/* Hero section: Score + Rank */}
       <ResultDisplay
         solved={result.solved}
         attemptsUsed={result.attemptsUsed}
@@ -1088,10 +1045,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         streakDays={result.streakDays}
         language={language}
         puzzleNumber={puzzleNumber}
-        coinReward={coinReward}
-        survivalBonusTime={survivalBonusTime}
-        milestoneMessage={milestoneMessage}
-        rarestWord={rarestWord}
         countdown={countdown}
         t={t}
       />
@@ -1115,16 +1068,12 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         </motion.div>
       )}
 
-      <RankingExplainer result={result} showExplainer={showRankingExplainer} setShowExplainer={setShowRankingExplainer} t={t} />
-
       <ShareSection
         solved={result.solved}
         onShare={handleNativeShare}
         onRetry={handleRetryChallenge}
         canAffordRetry={canAfford(COIN_COSTS.DAILY_RETRY)}
         retryCost={COIN_COSTS.DAILY_RETRY}
-        showPlatforms={showSharePlatforms}
-        setShowPlatforms={setShowSharePlatforms}
         onWhatsApp={handleWhatsApp}
         onTwitter={handleTwitter}
         onTelegram={handleTelegram}
@@ -1133,6 +1082,14 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         copied={copied}
         isGeneratingImage={isGeneratingImage}
         onShowLeaderboard={() => setActiveTab('ranks')}
+        t={t}
+      />
+
+      {/* Collapsible details for rewards and secondary info */}
+      <CollapsibleDetails
+        coinReward={coinReward}
+        survivalBonusTime={survivalBonusTime}
+        rarestWord={rarestWord}
         t={t}
       />
 
@@ -1176,7 +1133,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         </div>
       )}
 
-      <TryAnotherLanguage currentLanguage={language} onGameLanguageChange={onGameLanguageChange} onBack={onBack} t={t} />
+      <TryAnotherLanguage currentLanguage={language} onGameLanguageChange={onGameLanguageChange} t={t} />
 
       {/* Inline signup for guest winners */}
       {!isAuthenticated && result.solved && !inlineSignupDismissed && (
@@ -1315,7 +1272,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black safe-area-bottom lg:hidden">
         <MobileTabBar
           tabs={[
-            { id: 'results', icon: <Share2 className="w-5 h-5" />, label: t('wordHunt.results.share') || 'Share' },
+            { id: 'results', icon: <Trophy className="w-5 h-5" />, label: t('wordHunt.results.title') || 'Results' },
             { id: 'stats', icon: <BarChart3 className="w-5 h-5" />, label: t('wordHunt.stats.title') || 'Stats' },
             { id: 'ranks', icon: <Medal className="w-5 h-5" />, label: t('daily.leaderboard') || 'Ranks' },
           ]}

@@ -420,10 +420,10 @@ const en = {
     "enterFourDigitCode": "Enter the code",
     "usernameTooShort": "Too short! 2+ characters",
     "usernameTooLong": "Too long! Max 20 characters",
-    "usernameInvalidChars": "Letters and numbers only",
+    "usernameInvalidChars": "Use letters, numbers, spaces, or _ - only",
     "roomNameTooShort": "Too short! 2+ characters",
     "roomNameTooLong": "Too long! Max 30 characters",
-    "roomNameInvalidChars": "Letters and numbers only",
+    "roomNameInvalidChars": "Use letters, numbers, spaces, or _ - only (no apostrophes)",
     "gameCodeRequired": "Need a code to join",
     "gameCodeInvalid": "Invalid code. Check it and try again.",
     "wordRequired": "Enter a word",
@@ -3124,6 +3124,9 @@ const en = {
       "find": "FIND",
       "share": "Share",
       "retry": "Retry",
+      "title": "Results",
+      "details": "Details & Rewards",
+      "coinsEarned": "Coins Earned",
       "survivalBonus": "Survival Bonus",
       "survivalTier": {
         "legendary": "Legendary Survivor!",
@@ -3406,6 +3409,30 @@ const en = {
     "currentPage": "Page",
     "userId": "Player ID",
     "sessionRecorded": "Session recording attached"
+  },
+  "training": {
+    "progress": {
+      "title": "Training Progress",
+      "firstWord": "Find First Word",
+      "diagonal": "Swipe Diagonally",
+      "directionChange": "Change Direction",
+      "targetScore": "Score 50 Points",
+      "fiveWords": "Find 5 Words",
+      "complete": "You're Ready!",
+      "almostThere": "Almost there!",
+      "keepGoing": "Keep going!",
+      "getStarted": "Let's get started!",
+      "ready": "Ready!",
+      "readyForMultiplayer": "You're ready for multiplayer!"
+    },
+    "unlock": {
+      "title": "Skill Unlocked!",
+      "firstWord": "First word found!",
+      "diagonal": "Diagonal movement unlocked!",
+      "directionChange": "Direction changes unlocked!",
+      "targetScore": "50 points reached!",
+      "fiveWords": "5 words found!"
+    }
   }
 };
 

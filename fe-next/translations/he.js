@@ -3119,6 +3119,9 @@ const he = {
       "find": "מציאה",
       "share": "שתף",
       "retry": "נסה שוב",
+      "title": "תוצאות",
+      "details": "פרטים ופרסים",
+      "coinsEarned": "מטבעות שנצברו",
       "survivalBonus": "בונוס הישרדות",
       "survivalTier": {
         "legendary": "הישרדות אגדית!",
