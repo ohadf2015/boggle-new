@@ -77,6 +77,9 @@ export const metadata: Metadata = {
             { rel: 'icon', url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
         ],
     },
+    other: {
+        'google-adsense-account': 'ca-pub-1896836706464880',
+    },
 };
 
 interface RootLayoutProps {
