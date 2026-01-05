@@ -6,7 +6,7 @@
     "dev": "rm -rf .next && tsx server.ts",
     "dev:bun": "rm -rf .next && bun server.ts",
     "clean": "rm -rf .next",
-    "build": "(npm run build:schemas || true) && next build",
+    "build": "(bun run build:schemas || true) && next build",
     "build:analyze": "ANALYZE=true npm run build",
     "build:schemas": "tsc --project backend/tsconfig.schemas.json",
     "start": "NODE_ENV=production tsx server.ts",

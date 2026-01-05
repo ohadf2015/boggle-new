@@ -22,7 +22,7 @@ RUN bun install --frozen-lockfile || bun install
 COPY . ./
 
 # Build Next.js app (without postbuild migration - handled at runtime)
-RUN bun run build --ignore-scripts
+RUN bun run build
 
 # Production stage
 FROM oven/bun:1-slim
