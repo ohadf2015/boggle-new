@@ -1,29 +1,44 @@
-import { Fredoka, Rubik } from 'next/font/google';
+import localFont from 'next/font/local';
 
 /**
- * Font configuration using next/font for optimal performance
+ * Font configuration using next/font/local for optimal performance
  *
- * Benefits over Google Fonts link:
- * - Zero CLS (Cumulative Layout Shift) with font-display: swap auto-handled
- * - Self-hosted fonts (no external requests)
- * - Automatic font subsetting
- * - Preloaded and inlined CSS
+ * Using @fontsource-variable packages for offline builds
+ * Benefits:
+ * - Zero CLS (Cumulative Layout Shift) with font-display: swap
+ * - Self-hosted fonts (no external requests during build)
+ * - Works in Docker/CI environments without internet
+ * - Automatic font optimization
  */
 
-export const fredoka = Fredoka({
-  subsets: ['latin', 'hebrew'],
-  weight: ['400', '500', '600', '700'],
+export const fredoka = localFont({
+  src: [
+    {
+      path: '../node_modules/@fontsource-variable/fredoka/files/fredoka-latin-wght-normal.woff2',
+      style: 'normal',
+    },
+    {
+      path: '../node_modules/@fontsource-variable/fredoka/files/fredoka-hebrew-wght-normal.woff2',
+      style: 'normal',
+    },
+  ],
   display: 'swap',
   variable: '--font-fredoka',
-  // Fallback fonts to minimize CLS during font load
   fallback: ['system-ui', 'Arial', 'sans-serif'],
-  // Preload for above-the-fold content
   preload: true,
 });
 
-export const rubik = Rubik({
-  subsets: ['latin', 'hebrew'],
-  weight: ['400', '500', '600', '700'],
+export const rubik = localFont({
+  src: [
+    {
+      path: '../node_modules/@fontsource-variable/rubik/files/rubik-latin-wght-normal.woff2',
+      style: 'normal',
+    },
+    {
+      path: '../node_modules/@fontsource-variable/rubik/files/rubik-hebrew-wght-normal.woff2',
+      style: 'normal',
+    },
+  ],
   display: 'swap',
   variable: '--font-rubik',
   fallback: ['system-ui', 'Arial', 'sans-serif'],
