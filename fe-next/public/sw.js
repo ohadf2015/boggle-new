@@ -8,7 +8,7 @@
  * - Offline fallback page
  */
 
-const CACHE_VERSION = 'lexiclash-v3'; // Bumped version to fix chunk caching issue
+const CACHE_VERSION = 'lexiclash-v4'; // v4: Remove fake offline page, let browser handle errors
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 
@@ -126,13 +126,13 @@ async function networkFirst(request) {
     if (cached) {
       return cached;
     }
-    // No cache available - return a proper error response instead of throwing
-    // This prevents net::ERR_FAILED by always returning a valid Response
+    // For navigation requests, let the browser handle the error naturally
+    // This allows proper error pages and avoids showing misleading "offline" messages
+    // when the issue is actually a server error or deployment issue
     if (request.mode === 'navigate') {
-      return new Response(
-        '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Offline</title></head><body style="font-family:system-ui;text-align:center;padding:50px"><h1>You are offline</h1><p>Please check your internet connection and try again.</p><button onclick="location.reload()">Retry</button></body></html>',
-        { status: 503, statusText: 'Service Unavailable', headers: { 'Content-Type': 'text/html' } }
-      );
+      // Re-throw to let browser show its native error page
+      // This is better UX than a fake "offline" page when the server is down
+      throw error;
     }
     return new Response('Network error', { status: 503, statusText: 'Service Unavailable' });
   }
