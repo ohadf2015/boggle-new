@@ -491,6 +491,12 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <meta name="apple-mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
                 <meta name="apple-mobile-web-app-title" content="LexiClash" />
+                {/* Google AdSense */}
+                <script
+                    async
+                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1896836706464880"
+                    crossOrigin="anonymous"
+                />
             </head>
             <body className="antialiased screen-fit" suppressHydrationWarning>
                 {/* Skip to main content link for keyboard/screen reader users */}
