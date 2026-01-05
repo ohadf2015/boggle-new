@@ -1,6 +1,10 @@
 # Bun-based multi-stage build for production
 # Use this Dockerfile for Bun runtime instead of Node.js
+# Build context: fe-next (Railway root directory)
 FROM oven/bun:1 AS builder
+
+# Cache buster: 2026-01-05
+ARG CACHEBUST=1
 
 WORKDIR /app
 
