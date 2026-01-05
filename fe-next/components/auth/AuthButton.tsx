@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, LogOut, Trophy, ChevronDown, Sun, Moon, Users } from 'lucide-react';
+import { User, LogOut, Trophy, ChevronDown, Sun, Moon, Users, Settings, Calendar, Gift, Shield } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useTheme } from '../../utils/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -16,6 +16,7 @@ import { getLevelFromXp } from '../XpProgressBar';
 import { cn } from '../../lib/utils';
 import { useRouter } from 'next/navigation';
 import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
+import { CalendarRewardsModal } from '../engagement/CalendarRewardsModal';
 import type { Language as LanguageType } from '@/shared/types';
 
 interface LanguageItem {
@@ -41,7 +42,7 @@ interface AuthButtonProps {
 const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.ReactElement | null => {
   const { theme, toggleTheme } = useTheme();
   const { t, language, setLanguage, dir } = useLanguage();
-  const { isAuthenticated, profile, isSupabaseEnabled, loading } = useAuth();
+  const { isAuthenticated, profile, isSupabaseEnabled, loading, isAdmin, user } = useAuth();
   const router = useRouter();
   const isDarkMode = theme === 'dark';
   const isRTL = dir === 'rtl';
@@ -61,6 +62,61 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
   const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
   const [isSigningOut, setIsSigningOut] = useState<boolean>(false);
   const [isLanguageExpanded, setIsLanguageExpanded] = useState<boolean>(false);
+  const [showCalendarModal, setShowCalendarModal] = useState<boolean>(false);
+  const [hasUnclaimedReward, setHasUnclaimedReward] = useState<boolean>(false);
+
+  // Ref for click-outside detection
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+        setIsLanguageExpanded(false);
+      }
+    };
+
+    if (showUserMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showUserMenu]);
+
+  // Check for unclaimed calendar rewards
+  const checkUnclaimedReward = useCallback(async () => {
+    if (!user?.id) return;
+    try {
+      const response = await fetch('/api/engagement/calendar');
+      if (response.ok) {
+        const data = await response.json();
+        setHasUnclaimedReward(data.canClaimToday);
+      }
+    } catch (error) {
+      console.error('[AuthButton] Error checking reward:', error);
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    checkUnclaimedReward();
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkUnclaimedReward();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [user?.id, checkUnclaimedReward]);
+
+  const handleCalendarClose = () => {
+    setShowCalendarModal(false);
+    setShowUserMenu(false);
+    setTimeout(checkUnclaimedReward, 500);
+  };
 
   const openSignIn = () => {
     setAuthModalMode('signin');
@@ -179,12 +235,11 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
 
     // Default dropdown variant
     return (
-      <div className="relative flex-shrink-0">
+      <div className="relative flex-shrink-0" ref={dropdownRef}>
         <Button
           variant="outline"
           size="sm"
           onClick={() => setShowUserMenu(!showUserMenu)}
-          onBlur={() => setTimeout(() => { setShowUserMenu(false); setIsLanguageExpanded(false); }, 200)}
           aria-haspopup="menu"
           aria-expanded={showUserMenu}
           aria-label={t('auth.userMenu') || 'User menu'}
@@ -289,6 +344,78 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                 <Users size={14} aria-hidden="true" />
                 <span>{t('friends.title') || 'Friends'}</span>
               </Button>
+
+              {/* Divider */}
+              <div className={cn(
+                'my-1 h-px',
+                isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+              )} />
+
+              {/* Settings Link */}
+              <Button
+                role="menuitem"
+                variant="ghost"
+                onClick={() => {
+                  router.push(`/${language}/settings`);
+                  setShowUserMenu(false);
+                }}
+                className={cn(
+                  'w-full justify-start gap-3',
+                  isDarkMode
+                    ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
+                )}
+              >
+                <Settings size={14} aria-hidden="true" />
+                <span>{t('settings.title') || 'Settings'}</span>
+              </Button>
+
+              {/* Daily Rewards Calendar */}
+              <Button
+                role="menuitem"
+                variant="ghost"
+                onClick={() => {
+                  setShowCalendarModal(true);
+                }}
+                className={cn(
+                  'w-full justify-start gap-3 relative',
+                  isDarkMode
+                    ? 'text-gray-300 hover:bg-slate-700 hover:text-gray-300'
+                    : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
+                )}
+              >
+                <div className="relative">
+                  <Calendar size={14} aria-hidden="true" />
+                  {hasUnclaimedReward && (
+                    <div className="absolute -top-1.5 -right-1.5 w-2.5 h-2.5 bg-neo-yellow rounded-full border border-neo-black" />
+                  )}
+                </div>
+                <span>{t('calendar.title') || 'Daily Rewards'}</span>
+                {hasUnclaimedReward && (
+                  <Gift size={12} className="ms-auto text-neo-yellow" aria-label={t('calendar.rewardAvailable') || 'Reward available'} />
+                )}
+              </Button>
+
+              {/* Admin Dashboard Link - only shown for admin users */}
+              {isAdmin && (
+                <Button
+                  role="menuitem"
+                  variant="ghost"
+                  onClick={() => {
+                    router.push(`/${language}/admin`);
+                    setShowUserMenu(false);
+                  }}
+                  className={cn(
+                    'w-full justify-start gap-3',
+                    isDarkMode
+                      ? 'text-neo-pink hover:bg-slate-700 hover:text-neo-pink'
+                      : 'text-neo-pink hover:bg-gray-50 hover:text-neo-pink'
+                  )}
+                >
+                  <Shield size={14} aria-hidden="true" />
+                  <span>{t('common.adminDashboard') || 'Admin'}</span>
+                </Button>
+              )}
 
               {/* Divider */}
               <div className={cn(
@@ -411,6 +538,9 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Calendar Rewards Modal */}
+        <CalendarRewardsModal isOpen={showCalendarModal} onClose={handleCalendarClose} />
       </div>
     );
   }
@@ -526,12 +656,11 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
     // CrazyGames user is logged in - show their info
     if (isCrazyGamesLoggedIn && crazyGamesUser) {
       return (
-        <div className="relative flex-shrink-0">
+        <div className="relative flex-shrink-0" ref={dropdownRef}>
           <Button
             variant="outline"
             size="sm"
             onClick={() => setShowUserMenu(!showUserMenu)}
-            onBlur={() => setTimeout(() => { setShowUserMenu(false); }, 200)}
             aria-haspopup="menu"
             aria-expanded={showUserMenu}
             aria-label={t('auth.userMenu') || 'User menu'}

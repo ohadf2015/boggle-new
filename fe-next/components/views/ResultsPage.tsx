@@ -1091,7 +1091,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       />
 
       {/* MOBILE VIEW - Tab-based layout (hidden on lg+) */}
-      <div className="lg:hidden flex flex-col h-full">
+      <div className="md:hidden flex flex-col h-full">
         {/* Exit Button Header */}
         <div className="flex-shrink-0 w-full flex items-center justify-end px-2 py-2">
           <ExitRoomButton onClick={handleExitRoom} label="" className="w-10 h-10 min-w-[40px] min-h-[40px] p-0" />
@@ -1125,8 +1125,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         </div>
       </div>
 
-      {/* DESKTOP VIEW - Two-column side-by-side layout (hidden on mobile) */}
-      <div className="hidden lg:flex lg:flex-col lg:overflow-auto p-4 xl:p-6">
+      {/* DESKTOP/TABLET VIEW - Two-column side-by-side layout (hidden on mobile) */}
+      <div className="hidden md:flex md:flex-col md:overflow-auto p-4 xl:p-6">
         {/* Top Bar with Exit Button */}
         <div className="w-full max-w-6xl mx-auto flex items-center justify-end mb-4">
           <ExitRoomButton onClick={handleExitRoom} label={t('results.exitRoom')} />

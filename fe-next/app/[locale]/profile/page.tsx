@@ -1082,7 +1082,7 @@ export default function ProfilePage(): React.ReactNode {
       {/* ===== MOBILE VIEW ===== */}
       <div
         className={cn(
-          'lg:hidden mobile-viewport relative',
+          'md:hidden mobile-viewport relative',
           isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
         )}
       >
@@ -1157,7 +1157,7 @@ export default function ProfilePage(): React.ReactNode {
         </div>
 
         {/* Mobile Tab Bar */}
-        <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
+        <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
           <MobileTabBar
             tabs={mobileTabs}
             activeTab={mobileActiveTab}
@@ -1179,7 +1179,7 @@ export default function ProfilePage(): React.ReactNode {
       {/* ===== DESKTOP VIEW ===== */}
       <div
         className={cn(
-          'hidden lg:flex lg:flex-col lg:min-h-full relative',
+          'hidden md:flex md:flex-col md:min-h-full relative',
           isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
         )}
         {...pullToRefreshHandlers}

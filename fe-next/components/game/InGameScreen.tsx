@@ -1027,7 +1027,7 @@ const InGameScreen = memo<InGameScreenProps>(({
           {/* Grid - Direct connection to timer row */}
           {/* Added bottom padding for safe area on devices with bottom bars/notches */}
           <div
-            className="flex-1 flex items-center justify-center min-h-0"
+            className="flex-1 flex items-start justify-center min-h-0 pt-1"
             style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom, 0px))' }}
           >
             <GridComponent

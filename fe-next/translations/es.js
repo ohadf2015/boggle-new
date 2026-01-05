@@ -766,7 +766,9 @@ const es = {
     "chat": "Chat",
     "settings": "Ajustes",
     "regenerateBoard": "Regenerar tablero",
-    "boardRegenerated": "¡Tablero regenerado!"
+    "boardRegenerated": "¡Tablero regenerado!",
+    "noPlayers": "No hay jugadores en la sala",
+    "connectionLost": "Conexión perdida. Por favor actualiza."
   },
   "tvBroadcast": {
     "joinAt": "Únete en",
@@ -2102,7 +2104,8 @@ const es = {
     "claimSuccess": "¡Obtuviste {reward}!",
     "streakBonus": "Bonus de racha: +{percent}%",
     "loginRequired": "Inicio de sesión requerido",
-    "loginToClaimRewards": "¡Inicia sesión para reclamar tus recompensas diarias y seguir tu progreso!"
+    "loginToClaimRewards": "¡Inicia sesión para reclamar tus recompensas diarias y seguir tu progreso!",
+    "rewardAvailable": "¡Recompensa disponible!"
   },
   "referral": {
     "milestoneTitle": "¡Hito de amigo!",
@@ -2447,7 +2450,8 @@ const es = {
       },
       "returnNote": "¡Después del entrenamiento estarás listo para el reto real!",
       "startTraining": "Empezar Entrenamiento",
-      "skipAnyway": "Saltar, ya sé jugar"
+      "skipAnyway": "Saltar, ya sé jugar",
+      "dontShowAgain": "No mostrar de nuevo"
     },
     "hints": {
       "tryDiagonal": "¡Prueba arrastrar en diagonal!",
@@ -2935,6 +2939,7 @@ const es = {
     "retryLinkWrongDate": "Este enlace es para otro día",
     "retryLinkInvalid": "Este enlace no es válido",
     "retryLinkError": "No se pudo verificar el enlace",
+    "retryFailed": "¡Error al reiniciar. Inténtalo de nuevo!",
     "howToPlay": "Cómo Jugar",
     "firstTime": "(¿Nuevo?)",
     "canYouBeatMyScore": "¿Puedes superar mi puntuación?",

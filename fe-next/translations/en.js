@@ -774,7 +774,9 @@ const en = {
     "chat": "Chat",
     "settings": "Settings",
     "regenerateBoard": "Regenerate Board",
-    "boardRegenerated": "Board regenerated!"
+    "boardRegenerated": "Board regenerated!",
+    "noPlayers": "No players in lobby",
+    "connectionLost": "Connection lost. Please refresh."
   },
   "tvBroadcast": {
     "joinAt": "Join at",
@@ -1660,7 +1662,8 @@ const en = {
       },
       "returnNote": "After training, you'll be ready for the real challenge!",
       "startTraining": "Start Training",
-      "skipAnyway": "Skip, I know how to play"
+      "skipAnyway": "Skip, I know how to play",
+      "dontShowAgain": "Don't show this again"
     },
     "hints": {
       "tryDiagonal": "Try dragging diagonally!",
@@ -2399,7 +2402,8 @@ const en = {
     "claimSuccess": "You got {reward}!",
     "streakBonus": "Streak Bonus: +{percent}%",
     "loginRequired": "Login Required",
-    "loginToClaimRewards": "Sign in to claim your daily rewards and track your progress!"
+    "loginToClaimRewards": "Sign in to claim your daily rewards and track your progress!",
+    "rewardAvailable": "Reward available"
   },
   "referral": {
     "milestoneTitle": "Friend Milestone!",
@@ -2944,6 +2948,7 @@ const en = {
     "retryLinkWrongDate": "Wrong day for this link",
     "retryLinkInvalid": "Invalid link",
     "retryLinkError": "Link error",
+    "retryFailed": "Reset failed. Try again!",
     "howToPlay": "How to Play",
     "firstTime": "(New?)",
     "canYouBeatMyScore": "Beat my score?",

@@ -114,12 +114,24 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
   } = options;
 
   const startGame = useCallback(() => {
-    if (playersCount === 0) return;
+    // Validate players are ready
+    if (playersCount === 0) {
+      logger.warn('[HOST] Cannot start game: no players');
+      neoErrorToast(t('hostView.noPlayers') || 'No players in lobby', { icon: '⚠️', duration: 3000 });
+      return;
+    }
+
+    // Validate socket connection
+    if (!socket || !socket.connected) {
+      logger.error('[HOST] Cannot start game: socket not connected');
+      neoErrorToast(t('hostView.connectionLost') || 'Connection lost. Please refresh.', { icon: '🔌', duration: 4000 });
+      return;
+    }
 
     // Tournament creation
     if (gameType === 'tournament' && !tournamentData) {
       setTournamentCreating(true);
-      socket?.emit('createTournament', {
+      socket.emit('createTournament', {
         name: 'Tournament',
         totalRounds: tournamentRounds,
         timerSeconds: timerValue * 60,
@@ -141,7 +153,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
 
     // Tournament round
     if (gameType === 'tournament' && tournamentData) {
-      socket?.emit('startTournamentRound');
+      socket.emit('startTournamentRound');
       return;
     }
 
@@ -164,7 +176,8 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     setHostFoundWords([]);
     setHostAchievements([]);
 
-    socket?.emit('startGame', {
+    logger.info('[HOST] Starting game with', playersCount, 'players');
+    socket.emit('startGame', {
       letterGrid: newTable,
       timerSeconds: seconds,
       language: roomLanguage,

@@ -835,8 +835,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   return (
     <div className="relative">
-      {/* MOBILE VIEW - Tab-based layout (hidden on lg+) */}
-      <div className="lg:hidden flex flex-col min-h-full">
+      {/* MOBILE VIEW - Tab-based layout (hidden on md+, shown on fold mobiles) */}
+      <div className="md:hidden flex flex-col min-h-full">
         {/* Tab Content - Scrollable area */}
         <div className="flex-1 overflow-y-auto overscroll-contain px-2 pb-20">
           <div className="max-w-lg mx-auto">
@@ -865,8 +865,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         </div>
       </div>
 
-      {/* DESKTOP VIEW - Two-column side-by-side layout (hidden on mobile) */}
-      <div className="hidden lg:flex lg:flex-col lg:overflow-auto p-4 xl:p-6">
+      {/* DESKTOP/TABLET VIEW - Two-column side-by-side layout (hidden on mobile) */}
+      <div className="hidden md:flex md:flex-col md:overflow-auto p-4 xl:p-6">
         {/* Two-Column Layout */}
         <div className="flex-1 w-full max-w-5xl mx-auto flex flex-row gap-6">
           {/* LEFT COLUMN: Results (Banner, Score, Leaderboard, Actions) */}

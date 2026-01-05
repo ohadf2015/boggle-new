@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Dumbbell, ArrowRight, Gamepad2, Move3D, Target, Sparkles } from 'lucide-react';
@@ -46,6 +46,9 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
   const router = useRouter();
   const isDarkMode = theme === 'dark';
 
+  // State for "don't show again" checkbox
+  const [dontShowAgain, setDontShowAgain] = useState(false);
+
   // Trigger haptic when modal opens
   useEffect(() => {
     if (isOpen) {
@@ -62,8 +65,10 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
 
   const handleSkip = () => {
     triggerHaptic('selection');
-    // Mark as skipped so we don't show again
-    markGatewaySkipped();
+    // Only mark as skipped permanently if checkbox is checked
+    if (dontShowAgain) {
+      markGatewaySkipped();
+    }
     onSkip();
     onClose();
   };
@@ -327,6 +332,27 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
             >
               {t('training.gateway.skipAnyway') || "Skip, I know how to play"}
             </Button>
+
+            {/* Don't show again checkbox */}
+            <label
+              className={cn(
+                'flex items-center justify-center gap-2 cursor-pointer text-xs pt-1',
+                isDarkMode ? 'text-gray-500' : 'text-gray-400'
+              )}
+            >
+              <input
+                type="checkbox"
+                checked={dontShowAgain}
+                onChange={(e) => setDontShowAgain(e.target.checked)}
+                className={cn(
+                  'w-4 h-4 rounded border-2 cursor-pointer transition-colors',
+                  isDarkMode
+                    ? 'bg-slate-700 border-slate-600 checked:bg-purple-500 checked:border-purple-500'
+                    : 'bg-white border-gray-300 checked:bg-purple-500 checked:border-purple-500'
+                )}
+              />
+              <span>{t('training.gateway.dontShowAgain') || "Don't show this again"}</span>
+            </label>
           </motion.div>
         </motion.div>
       </motion.div>

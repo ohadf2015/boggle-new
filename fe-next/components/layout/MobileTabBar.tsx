@@ -29,7 +29,7 @@ export function MobileTabBar({
   className,
 }: MobileTabBarProps) {
   return (
-    <nav className={cn('mobile-tab-bar lg:hidden', className)}>
+    <nav className={cn('mobile-tab-bar md:hidden', className)}>
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
 
