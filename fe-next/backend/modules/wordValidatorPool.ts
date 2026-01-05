@@ -2,11 +2,13 @@
  * Word Validator Worker Pool
  * Manages a pool of worker threads for CPU-intensive word validation
  * Falls back to synchronous validation if workers are unavailable
+ *
+ * Supports both Node.js worker_threads and Bun.Worker
  */
 
-import { Worker } from 'worker_threads';
 import path from 'path';
 import os from 'os';
+import { createWorker, WorkerLike, isBun } from './workerRuntime';
 
 // Interfaces
 export interface WorkerMessage {
@@ -54,8 +56,8 @@ const TASK_TIMEOUT = 5000; // 5 second timeout per task
 const MAX_QUEUE_SIZE = 1000; // Maximum pending tasks
 
 export class WordValidatorPool {
-  private workers: Worker[] = [];
-  private availableWorkers: Worker[] = [];
+  private workers: WorkerLike[] = [];
+  private availableWorkers: WorkerLike[] = [];
   private taskQueue: QueuedTask[] = [];
   private pendingTasks: Map<number, PendingTask> = new Map();
   private taskIdCounter: number = 0;
@@ -77,12 +79,14 @@ export class WordValidatorPool {
   private async _initWorkers(): Promise<void> {
     // Worker file must be JavaScript as worker_threads don't support TypeScript directly
     const workerPath = path.join(__dirname, 'wordValidatorWorker.js');
+    const runtime = isBun ? 'Bun' : 'Node.js';
+    console.log(`[WORKER POOL] Initializing with ${runtime} runtime...`);
 
     for (let i = 0; i < POOL_SIZE; i++) {
       try {
-        const worker = new Worker(workerPath);
+        const worker = await createWorker(workerPath);
 
-        worker.on('message', (data: WorkerResponse) => this._handleWorkerMessage(worker, data));
+        worker.on('message', (data: unknown) => this._handleWorkerMessage(worker, data as WorkerResponse));
         worker.on('error', (error: Error) => this._handleWorkerError(worker, error));
         worker.on('exit', (code: number) => this._handleWorkerExit(worker, code));
 
@@ -95,7 +99,7 @@ export class WordValidatorPool {
     }
 
     if (this.workers.length > 0) {
-      console.log(`[WORKER POOL] Initialized with ${this.workers.length} workers`);
+      console.log(`[WORKER POOL] Initialized with ${this.workers.length} workers (${runtime})`);
     } else {
       console.warn('[WORKER POOL] No workers available, falling back to sync mode');
     }
@@ -104,7 +108,7 @@ export class WordValidatorPool {
   /**
    * Handle message from a worker
    */
-  private _handleWorkerMessage(worker: Worker, data: WorkerResponse): void {
+  private _handleWorkerMessage(worker: WorkerLike, data: WorkerResponse): void {
     const { id, success, result, error } = data;
     const task = this.pendingTasks.get(id);
 
@@ -127,7 +131,7 @@ export class WordValidatorPool {
   /**
    * Handle worker error
    */
-  private _handleWorkerError(worker: Worker, error: Error): void {
+  private _handleWorkerError(worker: WorkerLike, error: Error): void {
     console.error('[WORKER POOL] Worker error:', error.message);
     this._removeWorker(worker);
   }
@@ -135,7 +139,7 @@ export class WordValidatorPool {
   /**
    * Handle worker exit
    */
-  private _handleWorkerExit(worker: Worker, code: number): void {
+  private _handleWorkerExit(worker: WorkerLike, code: number): void {
     if (code !== 0) {
       console.warn(`[WORKER POOL] Worker exited with code ${code}`);
     }
@@ -145,7 +149,7 @@ export class WordValidatorPool {
   /**
    * Remove a worker from the pool
    */
-  private _removeWorker(worker: Worker): void {
+  private _removeWorker(worker: WorkerLike): void {
     const workerIndex = this.workers.indexOf(worker);
     if (workerIndex !== -1) {
       this.workers.splice(workerIndex, 1);
@@ -214,17 +218,16 @@ export class WordValidatorPool {
    * Synchronous fallback for when workers are unavailable
    */
   private async _runSync(action: string, data: Record<string, unknown>): Promise<unknown> {
-    // Import the synchronous validator
-     
-    const validator = require('./wordValidator');
+    // Dynamic import for ES module compatibility
+    const validator = await import('./wordValidator');
 
     switch (action) {
       case 'isWordOnBoard':
-        return validator.isWordOnBoard(data.word, data.board, data.positions);
+        return validator.isWordOnBoard(data.word as string, data.board as string[][], data.positions as PositionsMap);
       case 'getWordPath':
-        return validator.getWordPath(data.word, data.board, data.positions);
+        return validator.getWordPath(data.word as string, data.board as string[][], data.positions as PositionsMap);
       case 'makePositionsMap':
-        return Array.from(validator.makePositionsMap(data.board).entries());
+        return Array.from(validator.makePositionsMap(data.board as string[][]).entries());
       default:
         throw new Error(`Unknown action: ${action}`);
     }
@@ -250,8 +253,7 @@ export class WordValidatorPool {
       // Fall back to sync on error
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.warn('[WORKER POOL] Falling back to sync:', errorMessage);
-       
-      const validator = require('./wordValidator');
+      const validator = await import('./wordValidator');
       return validator.isWordOnBoard(word, board, positions);
     }
   }
@@ -275,8 +277,7 @@ export class WordValidatorPool {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.warn('[WORKER POOL] Falling back to sync:', errorMessage);
-       
-      const validator = require('./wordValidator');
+      const validator = await import('./wordValidator');
       return validator.getWordPath(word, board, positions);
     }
   }
@@ -293,8 +294,7 @@ export class WordValidatorPool {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.warn('[WORKER POOL] Falling back to sync:', errorMessage);
-       
-      const validator = require('./wordValidator');
+      const validator = await import('./wordValidator');
       return validator.makePositionsMap(board);
     }
   }
@@ -388,13 +388,3 @@ export function getPoolStats(): PoolStats {
 export function shutdownPool(): Promise<void> {
   return pool.shutdown();
 }
-
-// CommonJS exports for backward compatibility
-module.exports = {
-  pool,
-  isWordOnBoardAsync,
-  getWordPathAsync,
-  makePositionsMapAsync,
-  getPoolStats,
-  shutdownPool
-};
