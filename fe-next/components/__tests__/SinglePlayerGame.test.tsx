@@ -40,6 +40,7 @@ jest.mock('@/contexts/SoundEffectsContext', () => ({
     playFireRoundStart: jest.fn(),
     startFireCrackleLoop: jest.fn(),
     stopFireCrackleLoop: jest.fn(),
+    setGameActive: jest.fn(),
   }),
 }));
 
@@ -47,6 +48,7 @@ jest.mock('@/components/GameAnnouncer', () => ({
   useAnnouncer: () => ({
     announceWordResult: jest.fn(),
     announceCombo: jest.fn(),
+    announceTimer: jest.fn(),
   }),
 }));
 
@@ -103,6 +105,8 @@ jest.mock('@/contexts/AccessibilityContext', () => ({
     largeText: false,
   }),
   useDisableFireRoundLights: () => false,
+  useShouldReduceMotion: () => false,
+  useDisableEarthquakeEffects: () => false,
 }));
 
 jest.mock('@/hooks/useAutoScrollOnGameStart', () => ({
@@ -178,7 +182,7 @@ describe('SinglePlayerGame - Word Submission', () => {
       expect(screen.getByRole('grid')).toBeInTheDocument();
     });
 
-    // Verify the timer is shown
-    expect(screen.getByText('3:00')).toBeInTheDocument();
+    // Verify the timer is shown (multiple instances for responsive layout)
+    expect(screen.getAllByText('3:00').length).toBeGreaterThan(0);
   });
 });
