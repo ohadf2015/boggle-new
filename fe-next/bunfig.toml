@@ -1,0 +1,16 @@
+# Bun configuration for production
+# https://bun.sh/docs/runtime/bunfig
+
+[run]
+# Silence lifecycle scripts output
+silent = true
+
+[install]
+# Use production optimizations
+production = true
+
+# Cache for faster subsequent installs
+cache = true
+
+# Don't save to package.json by default
+save = false

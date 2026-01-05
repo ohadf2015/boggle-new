@@ -55,13 +55,17 @@ const handle = nextApp.getRequestHandler();
 
 /**
  * Start the server
+ *
+ * IMPORTANT: Health endpoint must be available IMMEDIATELY for Railway healthchecks.
+ * Next.js preparation can take 60+ seconds, so we start the HTTP server first
+ * with a basic health endpoint, then prepare Next.js in parallel.
  */
 async function start(): Promise<void> {
-  await nextApp.prepare();
+  let nextReady = false;
 
   const app: Application = express();
   const httpServer = http.createServer(app);
-  
+
   // HTTP server optimizations
   httpServer.keepAliveTimeout = 65000;
   httpServer.headersTimeout = 66000;
@@ -78,10 +82,10 @@ async function start(): Promise<void> {
   setupConnectionMonitoring(io);
   setupCleanupTimers(io);
 
-  // Health and metrics routes
+  // Health and metrics routes - available IMMEDIATELY before Next.js prepares
   configureHealthRoutes(app, io);
 
-  // API routes
+  // API routes - also available immediately
   app.use('/api/leaderboard', leaderboardRoutes);
   app.use('/api/geolocation', geolocationRoutes);
   app.use('/api/analytics', analyticsRoutes);
@@ -92,8 +96,17 @@ async function start(): Promise<void> {
   app.use('/api/daily-challenge', dailyChallengeRoutes);
   app.use('/api', aiHintsRoutes);
 
-  // Next.js request handler (catch-all)
+  // Next.js request handler (catch-all) - waits for Next.js to be ready
   app.use(async (req: Request, res: Response): Promise<void> => {
+    // Return 503 if Next.js isn't ready yet (but health endpoint already works)
+    if (!nextReady) {
+      res.status(503).json({
+        status: 'starting',
+        message: 'Server is starting up, please wait...'
+      });
+      return;
+    }
+
     try {
       const parsedUrl = url.parse(req.url, true);
       const { pathname } = parsedUrl;
@@ -114,6 +127,18 @@ async function start(): Promise<void> {
     }
   });
 
+  // Start listening IMMEDIATELY so health endpoint is available
+  httpServer.listen(PORT, HOST, () => {
+    console.log(`> Server listening on http://${HOST}:${PORT}`);
+    console.log(`> Health endpoint available, preparing Next.js...`);
+  });
+
+  // Now prepare Next.js (this is the slow part)
+  console.log(`> Preparing Next.js...`);
+  await nextApp.prepare();
+  nextReady = true;
+  console.log(`> Next.js ready`);
+
   // Initialize server components
   await initializeServer(io);
 
@@ -124,12 +149,9 @@ async function start(): Promise<void> {
   const shutdownHandler = createShutdownHandler(httpServer, io);
   registerShutdownHandlers(shutdownHandler);
 
-  // Start listening
-  httpServer.listen(PORT, HOST, () => {
-    console.log(`> Server ready on http://${HOST}:${PORT}`);
-    console.log(`> Socket.IO server ready`);
-    console.log(`> Environment: ${dev ? 'development' : 'production'}`);
-  });
+  console.log(`> Server fully ready`);
+  console.log(`> Socket.IO server ready`);
+  console.log(`> Environment: ${dev ? 'development' : 'production'}`);
 }
 
 // Start the server
