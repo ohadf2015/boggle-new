@@ -1,5 +1,6 @@
 /**
  * Jest Configuration for Backend Tests
+ * Supports both Node.js (Jest) and Bun test runners
  */
 
 module.exports = {
@@ -22,12 +23,19 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/../$1'
   },
 
-  // Transform TypeScript files using ts-jest
+  // Transform TypeScript files using ts-jest with ESM support
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
-      useESM: false,
+      useESM: true,
+      tsconfig: {
+        module: 'ESNext',
+        moduleResolution: 'bundler'
+      }
     }],
   },
+
+  // Enable ESM support
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
 
   // Ignore patterns for transform
   transformIgnorePatterns: [
