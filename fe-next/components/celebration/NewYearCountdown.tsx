@@ -132,7 +132,7 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
 
       {/* Countdown Modal */}
       <Dialog open={showCountdown} onOpenChange={(open) => { if (!open) setShowCountdown(false); }}>
-        <DialogContent className="max-w-md">
+        <DialogContent noDescription className="max-w-md">
           <DialogBody className="text-center py-8">
             <motion.div
               className="flex flex-col items-center gap-6"
@@ -178,7 +178,7 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
 
       {/* Celebration Modal with Fireworks */}
       <Dialog open={showCelebration} onOpenChange={setShowCelebration}>
-        <DialogContent className="max-w-2xl overflow-hidden">
+        <DialogContent noDescription className="max-w-2xl overflow-hidden">
           <DialogBody className="text-center py-12 relative">
             <motion.div
               className="flex flex-col items-center gap-8"

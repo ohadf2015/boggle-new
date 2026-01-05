@@ -322,6 +322,15 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       puzzleNumber: String(puzzleNumber),
     });
 
+    // Add custom avatar image if available (for OG image rendering)
+    if (currentUserData.avatar_image) {
+      // Avatar image can be an ID like "broccoli-bob" or a filename like "broccoli-bob.png"
+      const avatarFilename = currentUserData.avatar_image.endsWith('.png')
+        ? currentUserData.avatar_image
+        : `${currentUserData.avatar_image}.png`;
+      ogParams.set('avatarImage', avatarFilename);
+    }
+
     // Add game-type specific fields
     if (gameType === 'wordHunt') {
       ogParams.set('solved', String(currentUserData.solved ?? false));

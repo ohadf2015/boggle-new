@@ -1,4 +1,6 @@
 import { useCallback, useRef, useEffect } from 'react';
+import { useSoundEffects } from '../../contexts/SoundEffectsContext';
+import { useMusic } from '../../contexts/MusicContext';
 import type { NotificationTier } from '../components/tv-broadcast/TvNotification';
 
 interface UseTvSoundsOptions {
@@ -33,6 +35,10 @@ export function useTvSounds({
   const mutedRef = useRef(false);
   const volumeRef = useRef(initialVolume);
 
+  // Get global mute settings
+  const { sfxMuted, sfxVolume } = useSoundEffects();
+  const { isMuted: musicMuted, audioUnlocked } = useMusic();
+
   // Pre-load audio files
   useEffect(() => {
     if (typeof window === 'undefined' || !enabled) return;
@@ -62,35 +68,37 @@ export function useTvSounds({
     };
   }, [enabled]);
 
-  // Play sound by tier
+  // Play sound by tier - respects global mute settings
   const playSound = useCallback((tier: NotificationTier) => {
-    if (!enabled || mutedRef.current) return;
+    // Check both local and global mute settings
+    if (!enabled || mutedRef.current || !audioUnlocked || sfxMuted || musicMuted) return;
 
     const audio = audioRefs.current[tier];
     if (audio) {
-      // Reset and play
+      // Reset and play - use global SFX volume
       audio.currentTime = 0;
-      audio.volume = volumeRef.current;
+      audio.volume = sfxVolume * volumeRef.current;
       audio.play().catch(error => {
         // Silently fail if autoplay is blocked
         console.debug('TV sound play failed:', error);
       });
     }
-  }, [enabled]);
+  }, [enabled, audioUnlocked, sfxMuted, musicMuted, sfxVolume]);
 
-  // Play combo break sound
+  // Play combo break sound - respects global mute settings
   const playComboBreak = useCallback(() => {
-    if (!enabled || mutedRef.current) return;
+    // Check both local and global mute settings
+    if (!enabled || mutedRef.current || !audioUnlocked || sfxMuted || musicMuted) return;
 
     const audio = audioRefs.current['combo_break'];
     if (audio) {
       audio.currentTime = 0;
-      audio.volume = volumeRef.current;
+      audio.volume = sfxVolume * volumeRef.current;
       audio.play().catch(error => {
         console.debug('Combo break sound play failed:', error);
       });
     }
-  }, [enabled]);
+  }, [enabled, audioUnlocked, sfxMuted, musicMuted, sfxVolume]);
 
   // Set muted state
   const setMuted = useCallback((muted: boolean) => {

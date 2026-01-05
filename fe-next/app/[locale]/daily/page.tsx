@@ -17,6 +17,7 @@ interface PageParams {
     whName?: string;
     whEmoji?: string;
     whStreak?: string;
+    whAvatar?: string; // Custom avatar image filename
   }>;
 }
 
@@ -62,7 +63,7 @@ function getWhPerformanceMessage(solved: boolean, attempts: number, locale: stri
 
 export async function generateMetadata({ params, searchParams }: PageParams): Promise<Metadata> {
   const { locale } = await params;
-  const { share, wh, whSolved, whAttempts, whPuzzle, whName, whEmoji, whStreak } = await searchParams;
+  const { share, wh, whSolved, whAttempts, whPuzzle, whName, whEmoji, whStreak, whAvatar } = await searchParams;
   const validLocale = (locale as Locale) || 'en';
   const seo = translations[validLocale]?.seo?.daily || translations.en.seo.daily;
 
@@ -79,6 +80,7 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
       let puzzleNumber: string | null;
       let displayName: string;
       let avatarEmoji: string;
+      let avatarImage: string | null;
       let emojiGrid: string;
 
       // Check for new simple params first (WhatsApp-friendly)
@@ -89,6 +91,7 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
         puzzleNumber = whPuzzle || null;
         displayName = whName || 'Player';
         avatarEmoji = whEmoji || '🎯';
+        avatarImage = whAvatar || null;
         emojiGrid = '';
       } else {
         // Fall back to old wh param format
@@ -105,6 +108,7 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
         puzzleNumber = whParams.get('puzzleNumber');
         displayName = whParams.get('displayName') || 'Player';
         avatarEmoji = whParams.get('avatarEmoji') || '🎯';
+        avatarImage = whParams.get('avatarImage') || null;
         emojiGrid = whParams.get('emojiGrid') || '';
       }
 
@@ -119,6 +123,7 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
           avatarEmoji,
           locale: validLocale,
           ...(emojiGrid && { emojiGrid }),
+          ...(avatarImage && { avatarImage }),
         });
         const ogImageUrl = `${baseUrl}/api/og/word-hunt?${ogParams.toString()}`;
 
@@ -138,6 +143,7 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
           whName: displayName,
           whEmoji: avatarEmoji,
           ...(streak > 0 && { whStreak: String(streak) }),
+          ...(avatarImage && { whAvatar: avatarImage }),
         });
         const shareUrl = `${baseUrl}${localePath}/daily?${shareParams.toString()}`;
 

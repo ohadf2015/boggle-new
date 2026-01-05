@@ -63,8 +63,10 @@ export function GoogleAdsProvider({ children }: { children: ReactNode }) {
     setIsAvailable(true);
   }, []);
 
+  // Handle script error (expected when ad blockers are active)
   const handleScriptError = useCallback(() => {
-    console.warn('Google AdSense script failed to load (likely blocked)');
+    // Use debug level - script failures are expected when ad blockers are active
+    console.debug('[AdSense] Script failed to load (likely blocked by ad blocker)');
     setIsLoaded(true);
     setIsAvailable(false);
   }, []);

@@ -156,6 +156,7 @@ const ja = {
     "join": "参加",
     "showLess": "少なく",
     "showMore": "もっと",
+    "collapse": "折りたたむ",
     "moreOptions": "その他",
     "moreShareOptions": "他の共有オプション",
     "or": "または",
@@ -325,7 +326,10 @@ const ja = {
     "musicVolumeSlider": "音楽ボリュームスライダー",
     "sfxVolumeSlider": "効果音ボリュームスライダー",
     "haptics": "触覚",
-    "toggleHaptics": "触覚フィードバックを切り替え"
+    "toggleHaptics": "触覚フィードバックを切り替え",
+    "sound": "サウンド",
+    "soundOn": "サウンドオン",
+    "soundOff": "サウンドオフ"
   },
   "settings": {
     "title": "設定",
@@ -1514,7 +1518,8 @@ const ja = {
       "back": "戻る",
       "next": "次へ",
       "letsPlay": "行くぞ！",
-      "title": "ようこそ"
+      "title": "ようこそ",
+      "description": "LexiClashの遊び方を学ぶ"
     },
     "skipHint": "ESCかスキップでゲームへ 🎮",
     "swipeHint": "← スワイプで移動 →"
@@ -1685,6 +1690,28 @@ const ja = {
       "practiceMore": "もっと練習",
       "tryAgain": "もう一度",
       "skipAnyway": "そのまま進む"
+    },
+    "progress": {
+      "title": "トレーニング進捗",
+      "firstWord": "最初の単語を見つける",
+      "diagonal": "斜めにスワイプ",
+      "directionChange": "方向を変える",
+      "targetScore": "50ポイント獲得",
+      "fiveWords": "5つの単語を見つける",
+      "complete": "準備完了！",
+      "almostThere": "もう少し！",
+      "keepGoing": "続けて！",
+      "getStarted": "始めよう！",
+      "ready": "準備完了！",
+      "readyForMultiplayer": "マルチプレイヤーの準備ができました！"
+    },
+    "unlock": {
+      "title": "スキル解放！",
+      "firstWord": "最初の単語を見つけた！",
+      "diagonal": "斜め移動が解放された！",
+      "directionChange": "方向転換が解放された！",
+      "targetScore": "50ポイント達成！",
+      "fiveWords": "5つの単語を見つけた！"
     },
     "viewProgress": "進捗を見る"
   },
@@ -2204,6 +2231,8 @@ const ja = {
   },
   "calendar": {
     "title": "デイリー報酬",
+    "description": "毎日報酬を受け取ってコイン、XP、特別アイテムをゲット！",
+    "loadError": "報酬の読み込みに失敗しました。もう一度お試しください。",
     "claimToday": "今日の報酬を受け取る",
     "claimedCount": "受取済み",
     "alreadyClaimed": "今日の報酬を受け取りました！",

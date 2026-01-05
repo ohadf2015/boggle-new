@@ -156,6 +156,7 @@ const he = {
     "join": "הצטרף",
     "showLess": "פחות",
     "showMore": "עוד",
+    "collapse": "כווץ",
     "moreOptions": "עוד",
     "moreShareOptions": "עוד אפשרויות שיתוף",
     "or": "או",
@@ -325,7 +326,10 @@ const he = {
     "musicVolumeSlider": "החלקת עוצמת מוזיקה",
     "sfxVolumeSlider": "החלקת עוצמת אפקטים",
     "haptics": "רטט",
-    "toggleHaptics": "הפעל/בטל רטט"
+    "toggleHaptics": "הפעל/בטל רטט",
+    "sound": "צליל",
+    "soundOn": "צליל פועל",
+    "soundOff": "צליל כבוי"
   },
   "settings": {
     "title": "הגדרות",
@@ -1516,7 +1520,8 @@ const he = {
       "back": "חזרה",
       "next": "הבא",
       "letsPlay": "יאללה!",
-      "title": "ברוכים הבאים"
+      "title": "ברוכים הבאים",
+      "description": "לימדו לשחק לקסיקלאש"
     },
     "skipHint": "ESC או דלג לקפוץ למשחק 🎮",
     "swipeHint": "החלק לניווט → ←"
@@ -1687,6 +1692,28 @@ const he = {
       "practiceMore": "עוד אימון",
       "tryAgain": "נסה שוב",
       "skipAnyway": "בכל זאת"
+    },
+    "progress": {
+      "title": "התקדמות אימון",
+      "firstWord": "מצא מילה ראשונה",
+      "diagonal": "החלק באלכסון",
+      "directionChange": "שנה כיוון",
+      "targetScore": "הגע ל-50 נקודות",
+      "fiveWords": "מצא 5 מילים",
+      "complete": "מוכן!",
+      "almostThere": "כמעט שם!",
+      "keepGoing": "המשך!",
+      "getStarted": "בוא נתחיל!",
+      "ready": "מוכן!",
+      "readyForMultiplayer": "מוכן לרב משתתפים!"
+    },
+    "unlock": {
+      "title": "כישור נפתח!",
+      "firstWord": "מילה ראשונה נמצאה!",
+      "diagonal": "תנועה באלכסון נפתחה!",
+      "directionChange": "שינוי כיוון נפתח!",
+      "targetScore": "50 נקודות הושגו!",
+      "fiveWords": "5 מילים נמצאו!"
     },
     "viewProgress": "צפה בהתקדמות"
   },
@@ -2334,6 +2361,8 @@ const he = {
   },
   "calendar": {
     "title": "פרסים יומיים",
+    "description": "אספו פרסים יומיים והרוויחו מטבעות, XP ופריטים מיוחדים!",
+    "loadError": "טעינת הפרסים נכשלה. נסו שוב.",
     "claimToday": "קבל את הפרס של היום",
     "claimedCount": "נאספו",
     "alreadyClaimed": "הפרס של היום נאסף!",

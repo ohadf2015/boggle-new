@@ -157,8 +157,8 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
         )}
       </div>
 
-      {/* Demo Grid */}
-      <div className="relative overflow-hidden p-1 sm:p-2">
+      {/* Demo Grid - Force LTR for consistent SVG line positioning */}
+      <div dir="ltr" className="relative overflow-hidden p-1 sm:p-2">
         <div className="grid grid-cols-3 gap-1 sm:gap-2 p-2 sm:p-4 bg-gradient-to-br from-neo-navy/10 to-neo-pink/10 rounded-lg sm:rounded-xl border-2 sm:border-4 border-neo-black shadow-hard-lg">
           {demoGrid.map((row, rowIndex) => (
             row.map((letter, colIndex) => {
@@ -222,19 +222,11 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
               const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
               const cellSize = isMobile ? 40 : 56;
               const gap = isMobile ? 4 : 8;
-              const numCols = 3;
-              const gridContentWidth = numCols * cellSize + (numCols - 1) * gap;
-              const isRTL = dir === 'rtl';
 
-              // Calculate x coordinates (flip for RTL to match CSS grid direction)
-              const getX = (col: number): number => {
-                const ltrX = col * (cellSize + gap) + cellSize / 2;
-                return isRTL ? gridContentWidth - ltrX : ltrX;
-              };
-
-              const x1 = getX(prevCol);
+              // Calculate cell centers (grid container is always LTR, no flip needed)
+              const x1 = prevCol * (cellSize + gap) + cellSize / 2;
               const y1 = prevRow * (cellSize + gap) + cellSize / 2;
-              const x2 = getX(cellCol);
+              const x2 = cellCol * (cellSize + gap) + cellSize / 2;
               const y2 = cellRow * (cellSize + gap) + cellSize / 2;
 
               return (

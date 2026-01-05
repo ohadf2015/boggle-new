@@ -132,9 +132,11 @@ export async function logGameStart(params: GameStartParams): Promise<string | nu
   } catch (error) {
     // AbortError means timeout - this is expected and shouldn't spam console
     if (error instanceof Error && error.name === 'AbortError') {
-      console.warn('Game start logging timed out (analytics non-critical)');
+      // Use debug level - timeouts are expected in high-latency situations
+      console.debug('[Analytics] Game start logging timed out (non-blocking)');
     } else {
-      console.warn('Error logging game start:', error);
+      // Use debug for other errors too since analytics is non-critical
+      console.debug('[Analytics] Error logging game start:', error);
     }
     return null;
   }
@@ -185,9 +187,10 @@ export async function logGameEnd(
     return true;
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
-      console.warn('Game end logging timed out (analytics non-critical)');
+      // Use debug level - timeouts are expected in high-latency situations
+      console.debug('[Analytics] Game end logging timed out (non-blocking)');
     } else {
-      console.warn('Error logging game end:', error);
+      console.debug('[Analytics] Error logging game end:', error);
     }
     return false;
   }
@@ -226,9 +229,10 @@ export async function updateGameSession(
     return true;
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
-      console.warn('Game session update timed out (analytics non-critical)');
+      // Use debug level - timeouts are expected in high-latency situations
+      console.debug('[Analytics] Game session update timed out (non-blocking)');
     } else {
-      console.warn('Error updating game session:', error);
+      console.debug('[Analytics] Error updating game session:', error);
     }
     return false;
   }

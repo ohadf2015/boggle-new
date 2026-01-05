@@ -192,9 +192,10 @@ export const presenceStatusSchema = compiledSchemas?.presenceStatusSchema || z.e
 
 // Room name schema - similar restrictions as username to prevent XSS
 // Allow spaces for multi-word room names (e.g., "Fun Room", "Disco Potato Room")
+// Also allow dots (.) to match frontend NAME_VALID_PATTERN
 export const roomNameSchema = z.string()
   .max(50, 'Room name must be at most 50 characters')
-  .regex(/^[a-zA-Z0-9\s_\-\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]+$/, 'Room name can only contain letters, numbers, spaces, underscores, and hyphens')
+  .regex(/^[a-zA-Z0-9\s._\-\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]+$/, 'Room name can only contain letters, numbers, spaces, dots, underscores, and hyphens')
   .transform(s => s.trim())
   .refine((val) => !/[\u0000-\u001F\u007F-\u009F\u200B-\u200D\uFEFF]/.test(val), 'Room name contains invalid characters')
   .optional();

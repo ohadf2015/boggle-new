@@ -68,6 +68,7 @@ export function CalendarButton({ className, variant = 'icon' }: CalendarButtonPr
           className
         )}
         aria-label="Daily Rewards Calendar"
+        title="Daily Rewards"
       >
         <Calendar className={cn("text-neo-cream", variant === 'icon' ? "w-5 h-5" : "w-4 h-4 mr-2")} />
         {variant === 'full' && <span>Rewards</span>}

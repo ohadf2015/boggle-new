@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { Dialog, DialogContent, DialogTitle, DialogBody, DialogFooter } from './ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogBody, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useMusic } from '../contexts/MusicContext';
@@ -220,6 +220,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
       <DialogContent className="max-w-2xl" dir={dir}>
         {/* Visually hidden title for accessibility */}
         <DialogTitle className="sr-only">{t('onboarding.navigation.title') || 'Player Onboarding'}</DialogTitle>
+        <DialogDescription className="sr-only">
+          {t('onboarding.navigation.description') || 'Learn how to play the game with this tutorial'}
+        </DialogDescription>
 
         {/* Progress indicator */}
         <div className="px-3 sm:px-6 pt-3 sm:pt-4">

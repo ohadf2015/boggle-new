@@ -8,7 +8,6 @@ import { cn } from '../lib/utils';
 import AuthButton from './auth/AuthButton';
 import MusicControls from './MusicControls';
 import DailyQuickLink from './daily/DailyQuickLink';
-import Avatar from './Avatar';
 import { CalendarButton } from './engagement/CalendarButton';
 import { CoinBalance } from './CoinBalance';
 
@@ -95,7 +94,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     "shadow-hard-lg xl:shadow-hard-lg 2xl:shadow-hard-lg",
                     "rounded-neo-lg xl:rounded-neo-lg 2xl:rounded-neo-lg",
                     "transition-all duration-100",
-                    "min-w-0"
+                    "min-w-0 overflow-hidden"
                 )}
             >
                 {/* Logo - Clean design matching OG image */}
@@ -133,7 +132,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     >
                         {/* LEXI - Hero text: larger, bolder, with subtle glow */}
                         <span
-                            className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl text-neo-cyan relative animate-lexi-glow landscape:text-xl landscape:xs:text-2xl landscape:sm:text-3xl"
+                            className="text-xl xs:text-2xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl text-neo-cyan relative animate-lexi-glow landscape:text-xl landscape:xs:text-2xl landscape:sm:text-3xl"
                             style={{
                                 WebkitTextStroke: '3px #1a365d',
                                 paintOrder: 'stroke fill',
@@ -144,7 +143,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         </span>
                         {/* CLASH - Supporting text: smaller, softer */}
                         <span
-                            className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl text-neo-yellow relative landscape:text-base landscape:xs:text-lg landscape:sm:text-xl"
+                            className="text-base xs:text-lg sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl text-neo-yellow relative landscape:text-base landscape:xs:text-lg landscape:sm:text-xl"
                             style={{
                                 WebkitTextStroke: '1.5px #1a365d',
                                 paintOrder: 'stroke fill',
@@ -197,6 +196,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             "transition-all duration-100"
                         )}
                         aria-label={t('settings.title') || 'Settings'}
+                        title={t('settings.title') || 'Settings'}
                     >
                         <Settings className="w-5 h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6" />
                     </Link>
@@ -243,74 +243,46 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     <AuthButton />
                 </div>
 
-                {/* Mobile: Coins + Avatar + Volume Controls + Hamburger Menu */}
-                <div className="sm:hidden flex items-center gap-2" ref={mobileMenuRef}>
-                    {/* Coin Balance - shown on mobile for authenticated users */}
+                {/* Mobile: Coins + Volume + Hamburger - simplified grouping */}
+                <div className="sm:hidden flex items-center gap-1.5 min-w-0 flex-shrink-0" ref={mobileMenuRef}>
+                    {/* Coin Balance - links to profile, shown for authenticated users */}
                     {isAuthenticated && profile && (
                         <Link
                             href={`/${language}/profile`}
-                            className="hover:scale-105 active:scale-95 transition-transform"
+                            className="hover:scale-105 active:scale-95 transition-transform flex-shrink-0"
                             aria-label={t('profile.viewCoins') || `${profile.total_coins?.toLocaleString() || 0} coins - View profile`}
                         >
                             <CoinBalance
                                 coins={profile.total_coins || 0}
-                                size="sm"
+                                size="xs"
                                 showAnimation={false}
                             />
                         </Link>
                     )}
 
-                    {/* Profile Avatar - visible on mobile header when authenticated */}
-                    {/* Using 48x48px minimum for better touch accessibility */}
-                    {isAuthenticated && profile && (
-                        <Link
-                            href={`/${language}/profile`}
-                            className={cn(
-                                "flex items-center justify-center",
-                                "min-w-[48px] min-h-[48px] w-12 h-12",
-                                "bg-neo-cream",
-                                "border-3 border-neo-black",
-                                "rounded-full shadow-hard",
-                                "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg",
-                                "active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm",
-                                "transition-all duration-100",
-                                "overflow-hidden"
-                            )}
-                            aria-label={t('profile.title') || 'Profile'}
-                        >
-                            <Avatar
-                                profilePictureUrl={profile.profile_picture_url ?? undefined}
-                                avatarImage={profile.avatar_image ?? undefined}
-                                avatarEmoji={profile.avatar_emoji}
-                                avatarColor={profile.avatar_color}
-                                size="md"
-                            />
-                        </Link>
-                    )}
-
-                    {/* Sound controls - visible on mobile header */}
+                    {/* Sound controls */}
                     <MusicControls />
 
-                    {/* Hamburger menu button - 48x48px for better touch accessibility */}
+                    {/* Hamburger menu button */}
                     <button
                         onClick={() => setShowMobileMenu(!showMobileMenu)}
                         className={cn(
-                            "flex items-center justify-center",
-                            "min-w-[48px] min-h-[48px] w-12 h-12",
+                            "flex items-center justify-center flex-shrink-0",
+                            "w-9 h-9",
                             "bg-neo-cream text-neo-black",
-                            "border-3 border-neo-black",
-                            "rounded-neo shadow-hard",
-                            "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg",
-                            "active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-sm",
+                            "border-2 border-neo-black",
+                            "rounded-neo shadow-hard-sm",
+                            "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
+                            "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
                             "transition-all duration-100"
                         )}
                         aria-label={showMobileMenu ? (t('common.closeMenu') || 'Close menu') : (t('common.openMenu') || 'Open menu')}
                         aria-expanded={showMobileMenu}
                     >
                         {showMobileMenu ? (
-                            <X className="text-xl" size={20} />
+                            <X size={18} />
                         ) : (
-                            <Menu className="text-xl" size={20} />
+                            <Menu size={18} />
                         )}
                     </button>
                 </div>

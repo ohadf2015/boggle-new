@@ -11,6 +11,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { validateUsername, validateRoomName, sanitizeInput } from '@/utils/validation';
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
 import { generateRoomCode } from '@/utils/utils';
+import { sanitizeRoomName } from '@/utils/consts';
 import { LanguageSelector } from '@/components/join/LanguageSelector';
 import EmojiAvatarPicker, { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
 import { AVATARS, getAvatarById, getAvatarPath, type AvatarConfig } from '@/utils/avatarConfig';
@@ -167,7 +168,8 @@ const CreateRoomSetup: React.FC<CreateRoomSetupProps> = ({
     }
 
     const effectiveAvatarId = selectedAvatarId || initialAvatarId || PROFILE_AVATAR_ID;
-    const finalRoomName = roomName.trim() || `${username} Room`;
+    // Sanitize room name to remove invalid characters (like apostrophes)
+    const finalRoomName = sanitizeRoomName(roomName.trim() || `${username} Room`);
 
     // Save to localStorage (only for guests)
     if (!isAuthenticated) {

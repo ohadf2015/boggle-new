@@ -68,8 +68,13 @@ export async function GET(request: NextRequest) {
     const attempts = parseInt(searchParams.get('attempts') || '0');
     const displayName = searchParams.get('displayName') || 'Player';
     const avatarEmoji = searchParams.get('avatarEmoji') || '🎯';
+    const avatarImage = searchParams.get('avatarImage'); // Custom avatar image filename
     const puzzleNumber = searchParams.get('puzzleNumber') || '';
     const locale = searchParams.get('locale') || 'en';
+
+    // Construct avatar image URL if provided
+    const origin = new URL(request.url).origin;
+    const avatarImageUrl = avatarImage ? `${origin}/avatars/${avatarImage}` : null;
 
     const challenge = CHALLENGE[locale] || CHALLENGE.en;
     const performanceKey = getPerformanceKey(solved, attempts);
@@ -124,7 +129,24 @@ export async function GET(request: NextRequest) {
               marginBottom: '20px',
             }}
           >
-            <span style={{ fontSize: '64px' }}>{avatarEmoji}</span>
+            {avatarImageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={avatarImageUrl}
+                alt="Avatar"
+                width={72}
+                height={72}
+                style={{
+                  width: '72px',
+                  height: '72px',
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  border: '4px solid #fff',
+                }}
+              />
+            ) : (
+              <span style={{ fontSize: '64px' }}>{avatarEmoji}</span>
+            )}
             <span style={{
               fontSize: '52px',
               fontWeight: 900,
@@ -221,8 +243,8 @@ export async function GET(request: NextRequest) {
         </div>
       ),
       {
-        width: 1200,
-        height: 630,
+        width: 2400,
+        height: 1260,
       }
     );
   } catch (error) {

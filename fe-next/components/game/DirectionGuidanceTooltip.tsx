@@ -42,6 +42,14 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
     const [selectedCells, setSelectedCells] = useState<[number, number][]>([]);
     const [isAnimating, setIsAnimating] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [isPopping, setIsPopping] = useState(false);
+
+    // Handle dismiss with pop animation
+    const handleDismiss = useCallback(() => {
+      setIsPopping(true);
+      // Let animation play before actual dismiss
+      setTimeout(onDismiss, 300);
+    }, [onDismiss]);
 
     // Animate the demo path
     const animatePath = useCallback(() => {
@@ -101,9 +109,16 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
     useEffect(() => {
       if (!isVisible) return;
 
-      const dismissTimer = setTimeout(onDismiss, AUTO_DISMISS_MS);
+      const dismissTimer = setTimeout(handleDismiss, AUTO_DISMISS_MS);
       return () => clearTimeout(dismissTimer);
-    }, [isVisible, onDismiss]);
+    }, [isVisible, handleDismiss]);
+
+    // Reset popping state when tooltip becomes visible again
+    useEffect(() => {
+      if (isVisible) {
+        setIsPopping(false);
+      }
+    }, [isVisible]);
 
     const isCellSelected = (row: number, col: number): boolean => {
       return selectedCells.some(([r, c]) => r === row && c === col);
@@ -123,18 +138,25 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
         {isVisible && (
           <motion.div
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            animate={isPopping
+              ? { opacity: 0, scale: 1.15, y: -20 }
+              : { opacity: 1, y: 0, scale: 1 }
+            }
+            exit={{ opacity: 0, scale: 0, y: -30 }}
+            transition={isPopping
+              ? { duration: 0.25, ease: [0.36, 1.2, 0.5, 1] }
+              : { type: 'spring', stiffness: 300, damping: 25 }
+            }
             className="fixed bottom-24 left-1/2 z-50 pointer-events-auto safe-area-bottom"
             style={{ transform: 'translateX(-50%)' }}
           >
             <div
               className="
                 bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo-lg shadow-hard-lg
-                px-4 py-3 max-w-[340px] relative
+                px-4 py-3 max-w-[340px] relative cursor-pointer
+                hover:shadow-hard-xl transition-shadow active:scale-[0.98]
               "
-              onClick={onDismiss}
+              onClick={handleDismiss}
               role="tooltip"
               aria-live="polite"
             >
@@ -142,7 +164,7 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  onDismiss();
+                  handleDismiss();
                 }}
                 className="
                   absolute -top-2 -right-2 w-6 h-6
@@ -174,7 +196,8 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
 
               {/* Interactive Demo Grid */}
               <div className="flex flex-col items-center gap-2">
-                <div className="relative p-2 bg-neo-navy/5 rounded-lg border-2 border-neo-black/20">
+                {/* Force LTR for consistent SVG line positioning regardless of document direction */}
+                <div dir="ltr" className="relative p-2 bg-neo-navy/5 rounded-lg border-2 border-neo-black/20">
                   {/* Grid */}
                   <div
                     className="grid grid-cols-3"
@@ -283,10 +306,24 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
                 </motion.div>
               </div>
 
-              {/* Tap to dismiss */}
-              <p className="text-center text-[10px] text-neo-black/50 mt-2 uppercase tracking-wider">
-                {t('common.tapToDismiss') || 'Tap to dismiss'}
-              </p>
+              {/* Tap to dismiss - more prominent with pulse animation */}
+              <motion.div
+                className="flex items-center justify-center gap-1.5 mt-3 py-1.5 px-3 mx-auto w-fit
+                  bg-neo-black/5 rounded-full border border-neo-black/20"
+                animate={{ scale: [1, 1.02, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <span className="text-[11px] font-semibold text-neo-black/70 uppercase tracking-wide">
+                  {t('common.tapToDismiss') || 'Tap anywhere to dismiss'}
+                </span>
+                <motion.span
+                  className="text-neo-pink"
+                  animate={{ y: [0, -2, 0] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                >
+                  <X className="w-3 h-3" />
+                </motion.span>
+              </motion.div>
 
               {/* Progress bar */}
               <motion.div

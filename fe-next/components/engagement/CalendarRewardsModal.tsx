@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Gift, Zap, Sparkles, Shield, Crown, Flame } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { CalendarRewardCard, CalendarReward } from './CalendarRewardCard';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -36,19 +36,26 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
   const [isLoading, setIsLoading] = useState(true);
   const [isClaiming, setIsClaiming] = useState(false);
   const [claimedReward, setClaimedReward] = useState<CalendarReward | null>(null);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   const fetchCalendarStatus = useCallback(async () => {
     if (!user?.id) return;
 
     try {
       setIsLoading(true);
+      setFetchError(null);
       const response = await fetch('/api/engagement/calendar');
       if (response.ok) {
         const data = await response.json();
         setCalendarStatus(data);
+      } else {
+        // Handle HTTP errors (401, 500, etc.)
+        console.error('[Calendar] API error:', response.status, response.statusText);
+        setFetchError(response.status === 401 ? 'Session expired. Please refresh the page.' : 'Failed to load calendar. Please try again.');
       }
     } catch (error) {
       console.error('[Calendar] Error fetching status:', error);
+      setFetchError('Network error. Please check your connection.');
     } finally {
       setIsLoading(false);
     }
@@ -136,6 +143,9 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
             <Calendar className="w-5 h-5 sm:w-6 sm:h-6" />
             {t('calendar.title') || 'Daily Rewards'}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            {t('calendar.description') || 'Claim daily rewards by playing regularly'}
+          </DialogDescription>
         </DialogHeader>
 
         {/* Body with scroll */}
@@ -176,8 +186,27 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
             </div>
           )}
 
+          {/* Error state */}
+          {!isLoading && user?.id && fetchError && (
+            <div className="text-center py-8">
+              <Gift className="w-12 h-12 mx-auto mb-3 text-neo-pink/50" />
+              <h3 className="text-lg font-bold text-neo-black mb-2">
+                {t('calendar.loadError') || 'Oops!'}
+              </h3>
+              <p className="text-sm text-neo-black/70 mb-4">
+                {fetchError}
+              </p>
+              <Button
+                onClick={() => fetchCalendarStatus()}
+                className="bg-neo-cyan text-neo-black font-bold uppercase text-sm py-2 px-4 border-2 border-neo-black shadow-hard hover:shadow-hard-lg"
+              >
+                {t('common.retry') || 'Try Again'}
+              </Button>
+            </div>
+          )}
+
           {/* Calendar grid */}
-          {!isLoading && calendarStatus && (
+          {!isLoading && calendarStatus && !fetchError && (
             <>
               <div className="grid grid-cols-7 gap-1 sm:gap-1.5 md:gap-2 mb-3 sm:mb-4">
                 {calendarStatus.rewards.slice(0, daysInMonth).map((reward) => (

@@ -198,7 +198,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
 
         {/* QR Code Dialog - same as portrait */}
         <Dialog open={showQR} onOpenChange={setShowQR}>
-          <DialogContent className="sm:max-w-md bg-white text-neo-black dark:bg-slate-800 dark:text-white border-cyan-500/30">
+          <DialogContent noDescription className="sm:max-w-md bg-white text-neo-black dark:bg-slate-800 dark:text-white border-cyan-500/30">
             <DialogHeader>
               <DialogTitle className="text-center text-cyan-600 dark:text-cyan-300 flex items-center justify-center gap-2">
                 <QrCode className="w-4 h-4" />
@@ -448,7 +448,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
 
       {/* QR Code Dialog */}
       <Dialog open={showQR} onOpenChange={setShowQR}>
-        <DialogContent className="sm:max-w-md bg-white text-neo-black dark:bg-slate-800 dark:text-white border-cyan-500/30">
+        <DialogContent noDescription className="sm:max-w-md bg-white text-neo-black dark:bg-slate-800 dark:text-white border-cyan-500/30">
           <DialogHeader>
             <DialogTitle className="text-center text-cyan-600 dark:text-cyan-300 flex items-center justify-center gap-2">
               <QrCode className="w-4 h-4" />

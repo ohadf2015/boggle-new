@@ -247,9 +247,10 @@ export function IMAVideoAdsProvider({ children }: { children: ReactNode }) {
     setTimeout(initializeIMA, 100);
   }, [initializeIMA]);
 
-  // Handle script error
+  // Handle script error (expected when ad blockers are active)
   const handleScriptError = useCallback(() => {
-    console.error('[IMA SDK] Script failed to load');
+    // Use debug level - script failures are expected when ad blockers are active
+    console.debug('[IMA SDK] Script failed to load (likely blocked by ad blocker)');
     setIsLoaded(true);
     setIsAvailable(false);
   }, []);

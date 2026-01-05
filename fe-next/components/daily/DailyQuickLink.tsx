@@ -111,6 +111,7 @@ const DailyQuickLink: React.FC<DailyQuickLinkProps> = ({
         className
       )}
       aria-label={`${t('daily.badge') || 'Daily Challenge'}${streak > 0 ? ` - ${streak} ${t('daily.streak') || 'streak'}` : ''}`}
+      title={t('daily.badge') || 'Daily Challenge'}
     >
       {hasPlayed ? (
         <Check className="w-5 h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-6 2xl:h-6 text-neo-black" strokeWidth={3} />

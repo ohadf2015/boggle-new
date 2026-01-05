@@ -156,6 +156,7 @@ const es = {
     "join": "Unirse",
     "showLess": "Menos",
     "showMore": "Más",
+    "collapse": "Colapsar",
     "moreOptions": "Más",
     "moreShareOptions": "Más opciones para compartir",
     "or": "o",
@@ -325,7 +326,10 @@ const es = {
     "musicVolumeSlider": "Control de volumen de música",
     "sfxVolumeSlider": "Control de volumen de efectos de sonido",
     "haptics": "Hápticos",
-    "toggleHaptics": "Activar/desactivar retroalimentación háptica"
+    "toggleHaptics": "Activar/desactivar retroalimentación háptica",
+    "sound": "Sonido",
+    "soundOn": "Sonido Activado",
+    "soundOff": "Sonido Desactivado"
   },
   "settings": {
     "title": "Configuración",
@@ -2065,6 +2069,8 @@ const es = {
   },
   "calendar": {
     "title": "Recompensas Diarias",
+    "description": "¡Reclama recompensas diarias para ganar monedas, XP y objetos especiales!",
+    "loadError": "Error al cargar recompensas. Por favor, inténtalo de nuevo.",
     "claimToday": "Reclamar Recompensa de Hoy",
     "claimedCount": "Reclamadas",
     "alreadyClaimed": "¡Recompensa de hoy reclamada!",
@@ -2306,7 +2312,8 @@ const es = {
       "back": "Atrás",
       "next": "Siguiente",
       "letsPlay": "¡A Jugar!",
-      "title": "Bienvenida"
+      "title": "Bienvenida",
+      "description": "Aprende a jugar LexiClash"
     },
     "skipHint": "ESC o Saltar para ir al juego 🎮",
     "swipeHint": "← Desliza para navegar →"
@@ -2477,6 +2484,28 @@ const es = {
       "practiceMore": "Practicar Más",
       "tryAgain": "Intentar de Nuevo",
       "skipAnyway": "Continuar de todos modos"
+    },
+    "progress": {
+      "title": "Progreso del Entrenamiento",
+      "firstWord": "Encuentra la Primera Palabra",
+      "diagonal": "Desliza en Diagonal",
+      "directionChange": "Cambia de Dirección",
+      "targetScore": "Alcanza 50 Puntos",
+      "fiveWords": "Encuentra 5 Palabras",
+      "complete": "¡Estás Listo!",
+      "almostThere": "¡Casi lo logras!",
+      "keepGoing": "¡Sigue así!",
+      "getStarted": "¡Empecemos!",
+      "ready": "¡Listo!",
+      "readyForMultiplayer": "¡Estás listo para multijugador!"
+    },
+    "unlock": {
+      "title": "¡Habilidad Desbloqueada!",
+      "firstWord": "¡Primera palabra encontrada!",
+      "diagonal": "¡Movimiento diagonal desbloqueado!",
+      "directionChange": "¡Cambio de dirección desbloqueado!",
+      "targetScore": "¡50 puntos alcanzados!",
+      "fiveWords": "¡5 palabras encontradas!"
     },
     "viewProgress": "Ver Progreso"
   },

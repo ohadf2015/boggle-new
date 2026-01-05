@@ -73,9 +73,16 @@ const DailyChallenge: React.FC = () => {
 
   // Game language state - separate from UI language
   // This controls only the puzzle/dictionary language, not the UI
-  // FIXED: Always initialize from URL locale to ensure /en/daily shows English, /he/daily shows Hebrew
   // User can switch languages via the dropdown during the session
   const [gameLanguage, setGameLanguage] = useState<Language>(() => {
+    // Check localStorage for saved game language preference (persists language selection)
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('lexiclash_daily_game_language');
+      if (saved && ['en', 'he', 'sv', 'ja', 'es'].includes(saved)) {
+        return saved as Language;
+      }
+    }
+    // Fall back to URL locale
     const urlLocale = language as Language;
     return urlLocale && ['en', 'he', 'sv', 'ja', 'es'].includes(urlLocale)
       ? urlLocale
@@ -634,7 +641,41 @@ const DailyChallenge: React.FC = () => {
   }, [language]);
 
   // Handle retry challenge (paid with coins)
-  const handleRetryChallenge = useCallback(() => {
+  const handleRetryChallenge = useCallback(async () => {
+    const today = getDailyChallengeDate();
+
+    // Build reset request body with player credentials
+    const resetBody: { puzzleDate: string; language: string; playerId?: string; guestFingerprint?: string } = {
+      puzzleDate: today,
+      language: gameLanguage,
+    };
+
+    if (isAuthenticated && profile) {
+      resetBody.playerId = profile.id;
+    } else {
+      const fp = await getGuestFingerprint();
+      if (fp) {
+        resetBody.guestFingerprint = fp;
+      }
+    }
+
+    // Delete server-side attempt record
+    if (resetBody.playerId || resetBody.guestFingerprint) {
+      try {
+        const resetResponse = await fetch('/api/daily/reset-attempt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(resetBody),
+        });
+        const resetResult = await resetResponse.json();
+        if (!resetResult.success) {
+          console.warn('Server reset returned failure:', resetResult);
+        }
+      } catch (serverError) {
+        console.warn('Failed to reset server attempt:', serverError);
+      }
+    }
+
     // Clear the stored result for today
     const cleared = clearWordHuntResultForRetry(gameLanguage);
     if (!cleared) {
@@ -646,7 +687,7 @@ const DailyChallenge: React.FC = () => {
     setStoredResult(null);
     setGameResult(null);
     setPhase('ready');
-  }, [gameLanguage]);
+  }, [gameLanguage, isAuthenticated, profile]);
 
   // Render based on phase
   return (

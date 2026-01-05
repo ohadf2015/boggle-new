@@ -354,6 +354,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   const [todayParticipants, setTodayParticipants] = useState<DailyParticipant[]>([]);
   const [todayTotalCount, setTodayTotalCount] = useState(0);
   const [todayTotalSolved, setTodayTotalSolved] = useState(0);
+  const [todayGuestCount, setTodayGuestCount] = useState(0);
   const [todayLoading, setTodayLoading] = useState(true);
   const [todayError, setTodayError] = useState<string | null>(null);
 
@@ -391,10 +392,12 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       // Use totalPlayers for ALL who attempted, totalSolved for ALL who solved (including guests)
       const totalPlayers = responseData.totalPlayers || responseData.totalParticipants || 0;
       const totalSolved = responseData.totalSolved || 0;
+      const guestCount = responseData.guestPlayerCount || 0;
 
       setTodayParticipants(data);
       setTodayTotalCount(totalPlayers);
       setTodayTotalSolved(totalSolved);
+      setTodayGuestCount(guestCount);
 
       if (onParticipantCountChange && activeTab === 'today') {
         onParticipantCountChange(totalPlayers);
@@ -595,6 +598,14 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
                     <span>{totalCount} {t('wordHunt.leaderboard.played')}</span>
                     <span className="mx-1.5">•</span>
                     <span className="text-emerald-600 dark:text-emerald-400">{totalSolvedCount} {t('wordHunt.leaderboard.solved')}</span>
+                    {todayGuestCount > 0 && (
+                      <>
+                        <span className="mx-1.5">•</span>
+                        <span className="text-slate-500 dark:text-slate-500">
+                          {todayGuestCount} {todayGuestCount === 1 ? t('daily.guestSingular') || 'guest' : t('daily.guestsPlural') || 'guests'}
+                        </span>
+                      </>
+                    )}
                   </>
                 ) : (
                   <>{totalCount} {totalCount === 1 ? t('daily.playerSingular') : t('daily.playersPlural')}</>

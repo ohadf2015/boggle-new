@@ -21,9 +21,14 @@ export async function GET(request: NextRequest) {
     const rank = parseInt(searchParams.get('rank') || '0');
     const displayName = searchParams.get('displayName') || 'Player';
     const avatarEmoji = searchParams.get('avatarEmoji') || '🎯';
+    const avatarImage = searchParams.get('avatarImage'); // Custom avatar image filename
     const score = parseInt(searchParams.get('score') || '0');
     const wordCount = parseInt(searchParams.get('wordCount') || '0');
     const puzzleNumber = parseInt(searchParams.get('puzzleNumber') || '0');
+
+    // Construct avatar image URL if provided
+    const origin = new URL(request.url).origin;
+    const avatarImageUrl = avatarImage ? `${origin}/avatars/${avatarImage}` : null;
 
     // Get rank display (medal for top 3, number otherwise)
     const getRankDisplay = (r: number): { emoji: string; text: string } => {
@@ -90,7 +95,24 @@ export async function GET(request: NextRequest) {
               marginBottom: '16px',
             }}
           >
-            <span style={{ fontSize: '72px' }}>{avatarEmoji}</span>
+            {avatarImageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={avatarImageUrl}
+                alt="Avatar"
+                width={80}
+                height={80}
+                style={{
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  border: '4px solid #fff',
+                }}
+              />
+            ) : (
+              <span style={{ fontSize: '72px' }}>{avatarEmoji}</span>
+            )}
             <span style={{
               fontSize: '56px',
               fontWeight: 900,
@@ -243,8 +265,8 @@ export async function GET(request: NextRequest) {
         </div>
       ),
       {
-        width: 1200,
-        height: 630,
+        width: 2400,
+        height: 1260,
       }
     );
   } catch (error) {

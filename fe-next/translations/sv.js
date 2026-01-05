@@ -156,6 +156,7 @@ const sv = {
     "join": "Gå med",
     "showLess": "Mindre",
     "showMore": "Mer",
+    "collapse": "Minimera",
     "moreOptions": "Mer",
     "moreShareOptions": "Fler delningsalternativ",
     "or": "eller",
@@ -325,7 +326,10 @@ const sv = {
     "musicVolumeSlider": "Musikvolymreglage",
     "sfxVolumeSlider": "Ljudeffektvolymreglage",
     "haptics": "Haptik",
-    "toggleHaptics": "Växla haptisk feedback"
+    "toggleHaptics": "Växla haptisk feedback",
+    "sound": "Ljud",
+    "soundOn": "Ljud på",
+    "soundOff": "Ljud av"
   },
   "settings": {
     "title": "Inställningar",
@@ -1515,7 +1519,8 @@ const sv = {
       "back": "Tillbaka",
       "next": "Nästa",
       "letsPlay": "Kör!",
-      "title": "Välkommen"
+      "title": "Välkommen",
+      "description": "Lär dig spela LexiClash"
     },
     "skipHint": "ESC eller Hoppa över för att komma till spelet 🎮",
     "swipeHint": "← Svep för att navigera →"
@@ -1686,6 +1691,28 @@ const sv = {
       "practiceMore": "Öva Mer",
       "tryAgain": "Försök Igen",
       "skipAnyway": "Fortsätt ändå"
+    },
+    "progress": {
+      "title": "Träningsframsteg",
+      "firstWord": "Hitta Första Ordet",
+      "diagonal": "Svep Diagonalt",
+      "directionChange": "Byt Riktning",
+      "targetScore": "Nå 50 Poäng",
+      "fiveWords": "Hitta 5 Ord",
+      "complete": "Du är Redo!",
+      "almostThere": "Nästan där!",
+      "keepGoing": "Fortsätt!",
+      "getStarted": "Nu börjar vi!",
+      "ready": "Redo!",
+      "readyForMultiplayer": "Du är redo för multiplayer!"
+    },
+    "unlock": {
+      "title": "Färdighet Upplåst!",
+      "firstWord": "Första ordet hittat!",
+      "diagonal": "Diagonal rörelse upplåst!",
+      "directionChange": "Riktningsändring upplåst!",
+      "targetScore": "50 poäng uppnått!",
+      "fiveWords": "5 ord hittade!"
     },
     "viewProgress": "Se Framsteg"
   },
@@ -2205,6 +2232,8 @@ const sv = {
   },
   "calendar": {
     "title": "Dagliga Belöningar",
+    "description": "Hämta dagliga belöningar för att tjäna mynt, XP och speciella föremål!",
+    "loadError": "Kunde inte ladda belöningar. Försök igen.",
     "claimToday": "Hämta dagens belöning",
     "claimedCount": "Hämtade",
     "alreadyClaimed": "Dagens belöning hämtad!",

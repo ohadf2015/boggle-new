@@ -160,6 +160,7 @@ const en = {
     "join": "Join",
     "showLess": "Less",
     "showMore": "More",
+    "collapse": "Collapse",
     "moreOptions": "More",
     "moreShareOptions": "More share options",
     "closeMenu": "Close",
@@ -326,7 +327,10 @@ const en = {
     "musicVolumeSlider": "Music volume slider",
     "sfxVolumeSlider": "Sound effects volume slider",
     "haptics": "Haptics",
-    "toggleHaptics": "Toggle haptic feedback"
+    "toggleHaptics": "Toggle haptic feedback",
+    "sound": "Sound",
+    "soundOn": "Sound On",
+    "soundOff": "Sound Off"
   },
   "settings": {
     "title": "Settings",
@@ -1521,7 +1525,8 @@ const en = {
       "back": "Back",
       "next": "Next",
       "letsPlay": "Let's Go!",
-      "title": "Welcome"
+      "title": "Welcome",
+      "description": "Learn how to play LexiClash"
     },
     "skipHint": "Press ESC to skip",
     "swipeHint": "← Swipe to navigate →"
@@ -1692,6 +1697,28 @@ const en = {
       "practiceMore": "Practice More",
       "tryAgain": "Try Again",
       "skipAnyway": "Go anyway"
+    },
+    "progress": {
+      "title": "Training Progress",
+      "firstWord": "Find First Word",
+      "diagonal": "Swipe Diagonally",
+      "directionChange": "Change Direction",
+      "targetScore": "Score 50 Points",
+      "fiveWords": "Find 5 Words",
+      "complete": "You're Ready!",
+      "almostThere": "Almost there!",
+      "keepGoing": "Keep going!",
+      "getStarted": "Let's get started!",
+      "ready": "Ready!",
+      "readyForMultiplayer": "You're ready for multiplayer!"
+    },
+    "unlock": {
+      "title": "Skill Unlocked!",
+      "firstWord": "First word found!",
+      "diagonal": "Diagonal movement unlocked!",
+      "directionChange": "Direction changes unlocked!",
+      "targetScore": "50 points reached!",
+      "fiveWords": "5 words found!"
     },
     "viewProgress": "View Progress"
   },
@@ -2339,6 +2366,8 @@ const en = {
   },
   "calendar": {
     "title": "Daily Rewards",
+    "description": "Claim daily rewards to earn coins, XP, and special items!",
+    "loadError": "Failed to load rewards. Please try again.",
     "claimToday": "Claim Today's Reward",
     "claimedCount": "Claimed",
     "alreadyClaimed": "Today's reward claimed!",
@@ -3409,30 +3438,6 @@ const en = {
     "currentPage": "Page",
     "userId": "Player ID",
     "sessionRecorded": "Session recording attached"
-  },
-  "training": {
-    "progress": {
-      "title": "Training Progress",
-      "firstWord": "Find First Word",
-      "diagonal": "Swipe Diagonally",
-      "directionChange": "Change Direction",
-      "targetScore": "Score 50 Points",
-      "fiveWords": "Find 5 Words",
-      "complete": "You're Ready!",
-      "almostThere": "Almost there!",
-      "keepGoing": "Keep going!",
-      "getStarted": "Let's get started!",
-      "ready": "Ready!",
-      "readyForMultiplayer": "You're ready for multiplayer!"
-    },
-    "unlock": {
-      "title": "Skill Unlocked!",
-      "firstWord": "First word found!",
-      "diagonal": "Diagonal movement unlocked!",
-      "directionChange": "Direction changes unlocked!",
-      "targetScore": "50 points reached!",
-      "fiveWords": "5 words found!"
-    }
   }
 };
 

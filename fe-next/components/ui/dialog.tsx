@@ -36,16 +36,23 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 // Neo-Brutalist Dialog Content: Paper texture, thick borders, hard shadow, slight tilt
 interface DialogContentProps extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
   hideCloseButton?: boolean;
+  /**
+   * Set to true to hide accessibility warnings when no DialogDescription is used.
+   * This adds aria-describedby={undefined} to explicitly mark the dialog as not needing description.
+   */
+  noDescription?: boolean;
 }
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   DialogContentProps
->(({ className, children, hideCloseButton, ...props }, ref) => (
+>(({ className, children, hideCloseButton, noDescription, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
+      // Suppress accessibility warning when dialog intentionally has no description
+      aria-describedby={noDescription ? undefined : props['aria-describedby']}
       className={cn(
         // Mobile-first positioning - constrained on mobile, centered modal on desktop
         "fixed z-50 grid w-[calc(100%-1rem)] max-w-[95vw]",

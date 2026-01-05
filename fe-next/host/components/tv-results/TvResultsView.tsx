@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useMemo, useCallback, useEffect, useRef, useState } from 'react';
+import React, { memo, useMemo, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import TvResultsWinnersPodium from './TvResultsWinnersPodium';
 import TvResultsStatsGrid from './TvResultsStatsGrid';
@@ -11,6 +11,8 @@ import TournamentStandings from '../../../components/TournamentStandings';
 import PlayersReadyIndicator from '../../../components/results/PlayersReadyIndicator';
 import { useTvResultsAnimation, type SoundType } from './useTvResultsAnimation';
 import { cn } from '../../../lib/utils';
+import { useSoundEffects } from '../../../contexts/SoundEffectsContext';
+import { useMusic } from '../../../contexts/MusicContext';
 import type { PlayerResult } from '@/types/components';
 import type { TournamentStanding } from '@/shared/types/game';
 
@@ -68,6 +70,8 @@ const TvResultsView = memo<TvResultsViewProps>(({
   t,
 }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { sfxMuted, sfxVolume } = useSoundEffects();
+  const { isMuted: musicMuted, audioUnlocked } = useMusic();
 
   // Filter out host from results (they're not playing in broadcast mode)
   const filteredScores = useMemo(() => {
@@ -86,9 +90,12 @@ const TvResultsView = memo<TvResultsViewProps>(({
       }));
   }, [finalScores, username]);
 
-  // Play sound effect
+  // Play sound effect - respects global mute settings
   const playSound = useCallback((sound: SoundType) => {
     if (typeof window === 'undefined') return;
+
+    // Respect mute settings - don't play if either music or SFX is muted
+    if (!audioUnlocked || sfxMuted || musicMuted) return;
 
     try {
       const path = RESULTS_SOUNDS[sound];
@@ -99,14 +106,15 @@ const TvResultsView = memo<TvResultsViewProps>(({
       }
 
       audioRef.current = new Audio(path);
-      audioRef.current.volume = 0.7;
+      // Use SFX volume setting instead of hardcoded value
+      audioRef.current.volume = sfxVolume * 0.7;
       audioRef.current.play().catch(() => {
         // Silently fail if autoplay is blocked
       });
     } catch (error) {
       // Silently fail
     }
-  }, []);
+  }, [audioUnlocked, sfxMuted, musicMuted, sfxVolume]);
 
   // Animation orchestration
   const {

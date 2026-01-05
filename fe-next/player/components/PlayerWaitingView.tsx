@@ -228,7 +228,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
       {/* QR Code Dialog */}
       <Dialog open={showQR} onOpenChange={setShowQR}>
-        <DialogContent className="sm:max-w-md bg-neo-cream text-neo-black border-4 border-neo-black shadow-hard">
+        <DialogContent noDescription className="sm:max-w-md bg-neo-cream text-neo-black border-4 border-neo-black shadow-hard">
           <DialogHeader>
             <DialogTitle className="text-center text-neo-black flex items-center justify-center gap-2 font-black">
               <QrCode />

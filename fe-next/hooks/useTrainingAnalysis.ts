@@ -12,13 +12,16 @@ import {
 } from '@/utils/trainingProgressStorage';
 
 // Minimum words before showing hints (give player a chance to explore)
-const MIN_WORDS_BEFORE_HINTS = 2;
+const MIN_WORDS_BEFORE_HINTS = 1;
 
-// Minimum time (ms) before showing a hint (don't overwhelm immediately)
-const HINT_DELAY_MS = 5000;
+// Time (ms) without finding a word before showing a hint ("stuck" detection)
+const STUCK_THRESHOLD_MS = 20000;
 
 // Time between showing different hints
-const HINT_COOLDOWN_MS = 15000;
+const HINT_COOLDOWN_MS = 30000;
+
+// Maximum hints to show per session (prevent hint fatigue)
+const MAX_HINTS_PER_SESSION = 3;
 
 export type TrainingHintType = 'diagonal' | 'directionChange' | 'corners' | 'longWords';
 
@@ -82,8 +85,10 @@ export function useTrainingAnalysis(options: UseTrainingAnalysisOptions): UseTra
   // Refs for timing
   const gameStartTimeRef = useRef<number>(0);
   const lastHintTimeRef = useRef<number>(0);
+  const lastWordFoundTimeRef = useRef<number>(0);
   const wordsFoundRef = useRef<number>(0);
   const hintsShownRef = useRef<Set<TrainingHintType>>(new Set());
+  const totalHintsShownRef = useRef<number>(0);
   const hasCalledCompleteRef = useRef<boolean>(false);
 
   // Initialize game start time when enabled
@@ -93,11 +98,11 @@ export function useTrainingAnalysis(options: UseTrainingAnalysisOptions): UseTra
     }
   }, [enabled]);
 
-  // Update skill gaps periodically
+  // Update skill gaps and check for stuck state periodically
   useEffect(() => {
     if (!enabled) return;
 
-    const updateGaps = () => {
+    const updateGapsAndCheckStuck = () => {
       const gaps = getSkillGaps();
       setSkillGaps(gaps);
 
@@ -108,50 +113,79 @@ export function useTrainingAnalysis(options: UseTrainingAnalysisOptions): UseTra
         setHasPassed(true);
         onTrainingComplete?.();
       }
+
+      // Check if player is stuck and should see a hint
+      const now = Date.now();
+      const timeSinceLastWord = lastWordFoundTimeRef.current > 0
+        ? now - lastWordFoundTimeRef.current
+        : now - gameStartTimeRef.current;
+      const timeSinceLastHint = now - lastHintTimeRef.current;
+
+      // Only show hint if stuck and no recent hint shown
+      if (
+        wordsFoundRef.current >= MIN_WORDS_BEFORE_HINTS &&
+        totalHintsShownRef.current < MAX_HINTS_PER_SESSION &&
+        timeSinceLastWord >= STUCK_THRESHOLD_MS &&
+        (timeSinceLastHint >= HINT_COOLDOWN_MS || lastHintTimeRef.current === 0)
+      ) {
+        // Only show the 2 most important hints
+        const hintPriority: TrainingHintType[] = ['diagonal', 'directionChange'];
+        for (const hintType of hintPriority) {
+          if (gaps.includes(hintType) && !hintsShownRef.current.has(hintType)) {
+            setCurrentHint(hintType);
+            lastHintTimeRef.current = now;
+            hintsShownRef.current.add(hintType);
+            totalHintsShownRef.current++;
+            break;
+          }
+        }
+      }
     };
 
-    // Update immediately and then periodically
-    updateGaps();
-    const interval = setInterval(updateGaps, 2000);
+    // Update immediately and then periodically (every 5 seconds)
+    updateGapsAndCheckStuck();
+    const interval = setInterval(updateGapsAndCheckStuck, 5000);
 
     return () => clearInterval(interval);
   }, [enabled, onTrainingComplete]);
 
   /**
    * Determine which hint to show based on current gaps and context
+   * Only shows hints when player appears stuck (20+ seconds since last word)
+   * Limited to 2 key skills: diagonal and directionChange
+   * Maximum 3 hints per session to prevent fatigue
    */
   const selectHint = useCallback((): TrainingHintType | null => {
     const now = Date.now();
-    const timeSinceStart = now - gameStartTimeRef.current;
+    const timeSinceLastWord = lastWordFoundTimeRef.current > 0
+      ? now - lastWordFoundTimeRef.current
+      : now - gameStartTimeRef.current;
     const timeSinceLastHint = now - lastHintTimeRef.current;
 
-    // Don't show hints too early or too frequently
-    if (timeSinceStart < HINT_DELAY_MS) return null;
-    if (timeSinceLastHint < HINT_COOLDOWN_MS && lastHintTimeRef.current > 0) return null;
-
-    // Don't show hints until player has tried a few words
+    // Don't show hints until player has found at least one word
     if (wordsFoundRef.current < MIN_WORDS_BEFORE_HINTS) return null;
+
+    // Don't exceed max hints per session (prevent hint fatigue)
+    if (totalHintsShownRef.current >= MAX_HINTS_PER_SESSION) return null;
+
+    // Only show hints when player is stuck (20+ seconds without finding a word)
+    if (timeSinceLastWord < STUCK_THRESHOLD_MS) return null;
+
+    // Don't show hints too frequently (30s cooldown)
+    if (timeSinceLastHint < HINT_COOLDOWN_MS && lastHintTimeRef.current > 0) return null;
 
     const gaps = getSkillGaps();
 
-    // Priority order for hints (most impactful first)
+    // Only show the 2 most important hints (diagonal and direction change)
+    // Removed: corners and longWords (confusing, less impactful)
     const hintPriority: TrainingHintType[] = [
-      'directionChange', // Most important skill
-      'diagonal',        // Second most important
-      'corners',         // Encourages exploration
-      'longWords',       // Performance optimization
+      'diagonal',        // Primary skill - swipe diagonally
+      'directionChange', // Secondary skill - change direction mid-word
     ];
 
     // Find first gap that hasn't been shown yet
     for (const hintType of hintPriority) {
       if (gaps.includes(hintType) && !hintsShownRef.current.has(hintType)) {
-        return hintType;
-      }
-    }
-
-    // If all hints shown but gaps remain, cycle through again
-    for (const hintType of hintPriority) {
-      if (gaps.includes(hintType)) {
         return hintType;
       }
     }
@@ -171,12 +205,13 @@ export function useTrainingAnalysis(options: UseTrainingAnalysisOptions): UseTra
     // Update local skill gaps
     setSkillGaps(getSkillGaps());
 
-    // Check if we should show a hint
+    // Check if we should show a hint (only when stuck)
     const hint = selectHint();
     if (hint && hint !== currentHint) {
       setCurrentHint(hint);
       lastHintTimeRef.current = Date.now();
       hintsShownRef.current.add(hint);
+      totalHintsShownRef.current++;
     }
   }, [enabled, gridSize, selectHint, currentHint]);
 
@@ -187,10 +222,17 @@ export function useTrainingAnalysis(options: UseTrainingAnalysisOptions): UseTra
     if (!enabled) return;
 
     wordsFoundRef.current++;
+    // Track when word was found (resets "stuck" timer)
+    lastWordFoundTimeRef.current = Date.now();
     updateSkillsFromWord(wordLength);
 
     // Update local state
     setSkillGaps(getSkillGaps());
+
+    // Clear any current hint since player just found a word
+    if (currentHint) {
+      setCurrentHint(null);
+    }
 
     // Check if training is complete
     const progress = getTrainingProgress();
@@ -199,15 +241,7 @@ export function useTrainingAnalysis(options: UseTrainingAnalysisOptions): UseTra
       setHasPassed(true);
       onTrainingComplete?.();
     }
-
-    // Check if we should show a hint
-    const hint = selectHint();
-    if (hint && hint !== currentHint) {
-      setCurrentHint(hint);
-      lastHintTimeRef.current = Date.now();
-      hintsShownRef.current.add(hint);
-    }
-  }, [enabled, selectHint, currentHint, onTrainingComplete]);
+  }, [enabled, currentHint, onTrainingComplete]);
 
   /**
    * Dismiss current hint

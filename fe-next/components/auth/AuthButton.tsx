@@ -12,6 +12,7 @@ import { signOut } from '../../lib/supabase';
 import AuthModal from './AuthModal';
 import Avatar from '../Avatar';
 import LevelBadge from '../LevelBadge';
+import { getLevelFromXp } from '../XpProgressBar';
 import { cn } from '../../lib/utils';
 import { useRouter } from 'next/navigation';
 import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
@@ -120,9 +121,9 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
             <span className="text-neo-black truncate flex-1">
               {profile.display_name || profile.username}
             </span>
-            {profile.current_level && (
+            {profile.total_xp !== undefined && (
               <LevelBadge
-                level={profile.current_level}
+                level={getLevelFromXp(profile.total_xp || 0)}
                 size="sm"
                 animate={false}
               />
@@ -203,9 +204,9 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
           <span className="hidden sm:inline max-w-[80px] truncate font-medium">
             {profile.display_name || profile.username}
           </span>
-          {profile.current_level && (
+          {profile.total_xp !== undefined && (
             <LevelBadge
-              level={profile.current_level}
+              level={getLevelFromXp(profile.total_xp || 0)}
               size="sm"
               animate={false}
             />

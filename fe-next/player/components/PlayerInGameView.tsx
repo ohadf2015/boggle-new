@@ -267,7 +267,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
       {/* Tournament Standings Modal */}
       <Dialog open={showTournamentStandings} onOpenChange={setShowTournamentStandings}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white text-neo-black dark:bg-slate-800 dark:text-white border-purple-500/30">
+        <DialogContent noDescription className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white text-neo-black dark:bg-slate-800 dark:text-white border-purple-500/30">
           <DialogHeader>
             <DialogTitle className="text-center text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400">
               {tournamentData?.status === 'completed' ? t('hostView.tournamentComplete') : t('hostView.tournamentStandings')}

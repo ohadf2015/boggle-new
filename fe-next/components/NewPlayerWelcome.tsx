@@ -61,7 +61,7 @@ const NewPlayerWelcome: React.FC<NewPlayerWelcomeProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm" dir={dir}>
+      <DialogContent noDescription className="max-w-sm" dir={dir}>
         <DialogHeader className="bg-neo-cyan text-neo-black p-2 sm:p-3">
           <DialogTitle className="flex items-center justify-center gap-2 text-base sm:text-lg">
             <Gamepad2 className="text-lg sm:text-xl" />

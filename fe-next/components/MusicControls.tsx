@@ -56,7 +56,7 @@ const MusicControls: React.FC = memo(() => {
   }, [hapticsEnabled]);
 
   // Responsive icon class for consistent sizing with button
-  const iconClass = "w-5 h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-6 2xl:h-6";
+  const iconClass = "w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-6 2xl:h-6";
 
   // Memoized volume icon
   const volumeIcon = useMemo(() => {
@@ -91,9 +91,11 @@ const MusicControls: React.FC = memo(() => {
     if (!audioUnlocked) {
       unlockAudio();
     } else {
+      // Toggle both music and SFX mute together for unified mute experience
       toggleMute();
+      toggleSfxMute();
     }
-  }, [audioUnlocked, unlockAudio, toggleMute]);
+  }, [audioUnlocked, unlockAudio, toggleMute, toggleSfxMute]);
 
   const handleMouseEnter = useCallback(() => setShowSlider(true), []);
   const handleMouseLeave = useCallback(() => setShowSlider(false), []);
@@ -112,9 +114,10 @@ const MusicControls: React.FC = memo(() => {
         variant="outline"
         size="icon"
         onClick={handleClick}
-        className="relative bg-neo-cream text-neo-black min-w-[44px] min-h-[44px] w-11 h-11 lg:w-12 lg:h-12 xl:w-12 xl:h-12 2xl:w-14 2xl:h-14 border-3 lg:border-3 2xl:border-3 rounded-neo lg:rounded-neo shadow-hard lg:shadow-hard 2xl:shadow-hard-lg"
+        className={`relative w-9 h-9 sm:w-11 sm:h-11 lg:w-12 lg:h-12 xl:w-12 xl:h-12 2xl:w-14 2xl:h-14 border-2 sm:border-3 lg:border-3 2xl:border-3 rounded-neo lg:rounded-neo shadow-hard-sm sm:shadow-hard lg:shadow-hard 2xl:shadow-hard-lg flex-shrink-0 ${hasMounted && (isMuted || volume === 0) && (sfxMuted || sfxVolume === 0) ? 'bg-slate-200 text-slate-400 dark:bg-slate-600 dark:text-slate-400' : 'bg-neo-cream text-neo-black'}`}
         aria-label={hasMounted ? (isMuted ? (t('music.unmute') || 'Unmute') : (t('music.mute') || 'Mute')) : (t('music.mute') || 'Mute')}
         aria-pressed={hasMounted ? !isMuted : true}
+        title={hasMounted ? (isMuted ? (t('music.soundOff') || 'Sound Off - Click to unmute') : (t('music.soundOn') || 'Sound On')) : (t('music.sound') || 'Sound')}
       >
         {volumeIcon}
 

@@ -35,7 +35,7 @@ export const QRCodeDialog: React.FC<QRCodeDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-white text-neo-black dark:bg-slate-800 dark:text-white border-cyan-500/30">
+      <DialogContent noDescription className="sm:max-w-md bg-white text-neo-black dark:bg-slate-800 dark:text-white border-cyan-500/30">
         <DialogHeader>
           <DialogTitle className="text-center text-cyan-600 dark:text-cyan-300 flex items-center justify-center gap-2">
             <QrCode />
@@ -144,7 +144,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col bg-slate-900 text-white border-cyan-500/40">
+      <DialogContent noDescription className="max-w-2xl max-h-[85vh] flex flex-col bg-slate-900 text-white border-cyan-500/40">
         <DialogHeader className="flex-shrink-0 pb-2">
           <DialogTitle className="text-center text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
             {t('hostView.validation')}
@@ -282,7 +282,7 @@ export const FinalScoresModal: React.FC<FinalScoresModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-auto bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+      <DialogContent noDescription className="max-w-5xl max-h-[90vh] overflow-auto bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
         <DialogHeader>
           <DialogTitle className="text-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center gap-3">
             <Trophy className="text-yellow-500" />

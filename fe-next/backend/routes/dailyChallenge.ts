@@ -275,6 +275,19 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       logger.warn('API', `Daily leaderboard total count error: ${totalCountError.message}`);
     }
 
+    // Get guest player count (players who solved but are not authenticated)
+    const { count: guestCount, error: guestCountError } = await supabase
+      .from('daily_puzzle_attempts')
+      .select('*', { count: 'exact', head: true })
+      .eq('puzzle_date', date)
+      .eq('language', language)
+      .is('player_id', null)
+      .not('guest_fingerprint', 'is', null);
+
+    if (guestCountError) {
+      logger.warn('API', `Daily leaderboard guest count error: ${guestCountError.message}`);
+    }
+
     // Calculate participant count - ensure we show at least as many as we have data rows
     const dataLength = data?.length || 0;
     const queryCount = count ?? 0;
@@ -284,6 +297,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       data: data || [],
       totalParticipants,
       totalAttempts: totalCount ?? 0,
+      guestPlayerCount: guestCount ?? 0,
       date,
       language
     } as LeaderboardResponse);
@@ -865,6 +879,20 @@ router.get('/word-hunt/leaderboard/:date/:language', async (req: Request<Leaderb
       logger.warn('API', `Word Hunt total solved count error: ${totalSolvedError.message}`);
     }
 
+    // Get guest player count (players who solved but are not authenticated)
+    const { count: guestSolvedCount, error: guestSolvedError } = await supabase
+      .from('daily_word_hunt_attempts')
+      .select('*', { count: 'exact', head: true })
+      .eq('puzzle_date', date)
+      .eq('language', language)
+      .eq('solved', true)
+      .is('player_id', null)
+      .not('guest_fingerprint', 'is', null);
+
+    if (guestSolvedError) {
+      logger.warn('API', `Word Hunt guest solved count error: ${guestSolvedError.message}`);
+    }
+
     // Calculate participant count - ensure we show at least as many as we have data rows
     const dataLength = data?.length || 0;
     const queryCount = count ?? 0;
@@ -873,15 +901,17 @@ router.get('/word-hunt/leaderboard/:date/:language', async (req: Request<Leaderb
     // Stats for display: total players who attempted and total who solved (including guests)
     const totalPlayers = totalPlayersCount ?? 0;
     const totalSolved = totalSolvedCount ?? 0;
+    const guestPlayerCount = guestSolvedCount ?? 0;
 
     // Debug: Log leaderboard fetch results
-    logger.info('API', `[WordHunt Leaderboard] ${date}/${language}: leaderboard=${totalParticipants}, totalPlayers=${totalPlayers}, totalSolved=${totalSolved}`);
+    logger.info('API', `[WordHunt Leaderboard] ${date}/${language}: leaderboard=${totalParticipants}, totalPlayers=${totalPlayers}, totalSolved=${totalSolved}, guests=${guestPlayerCount}`);
 
     res.json({
       data: data || [],
       totalParticipants,       // Authenticated solvers on leaderboard
       totalPlayers,            // ALL players who attempted (for stats display)
       totalSolved,             // ALL players who solved (for stats display)
+      guestPlayerCount,        // Guests who solved (for display)
       date,
       language
     });

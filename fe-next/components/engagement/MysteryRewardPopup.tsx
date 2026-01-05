@@ -155,6 +155,7 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent
+        noDescription
         className={cn(
           'sm:max-w-sm border-4 rounded-neo p-0 overflow-hidden',
           styles.bg,

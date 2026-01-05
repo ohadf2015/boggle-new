@@ -100,6 +100,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
       <DialogContent
+        noDescription
         className="max-w-md"
         dir={dir}
         onPointerDownOutside={(e) => e.preventDefault()}

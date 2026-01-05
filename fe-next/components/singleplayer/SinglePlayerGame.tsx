@@ -32,8 +32,9 @@ import { useAnnouncer } from '@/components/GameAnnouncer';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useTrainingAnalysis } from '@/hooks/useTrainingAnalysis';
+import { useTrainingProgress } from '@/hooks/useTrainingProgress';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
-import { TrainingHints } from '@/components/training';
+import { TrainingHints, TrainingProgressBar, SkillUnlockToast } from '@/components/training';
 import {
   calculateFinalAchievements,
   type WordData as AchievementWordData,
@@ -196,13 +197,31 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     },
   });
 
+  // Training progress - visible progress bar with 5 clear skills for practice mode
+  const trainingProgress = useTrainingProgress({
+    enabled: settings.mode === 'practice',
+    onSkillUnlock: (skillId) => {
+      // Skill unlock celebration is handled by the progress bar component
+      console.log(`Skill unlocked: ${skillId}`);
+    },
+    onComplete: () => {
+      // All skills complete - player is ready for multiplayer
+      console.log('Training complete!');
+    },
+  });
+
+  // State for progress bar expansion (mobile)
+  const [progressBarExpanded, setProgressBarExpanded] = useState(false);
+
   // Combined path submit handler for both guidance systems
   const handlePathSubmit = useCallback((cells: Array<{ row: number; col: number }>) => {
     // Track for direction guidance
     directionGuidance.trackWordPath(cells);
     // Track for training analysis (only in practice mode)
     trainingAnalysis.trackPath(cells);
-  }, [directionGuidance, trainingAnalysis]);
+    // Track for progress bar (only in practice mode)
+    trainingProgress.trackPath(cells);
+  }, [directionGuidance, trainingAnalysis, trainingProgress]);
 
   // Game timer - handles countdown with pause support
   const timer = useGameTimer({
@@ -235,6 +254,18 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     score,
     maxCombo: combo.maxCombo,
   });
+
+  // Update training progress when score changes (for targetScore skill)
+  useEffect(() => {
+    if (settings.mode === 'practice' && score >= 50) {
+      trainingProgress.updateProgress({
+        score,
+        wordsFound: foundWords.filter(fw => fw.isValid === true).length,
+        hasDiagonal: trainingProgress.completedSkills.has('diagonal'),
+        hasDirectionChange: trainingProgress.completedSkills.has('directionChange'),
+      });
+    }
+  }, [score, settings.mode, foundWords, trainingProgress]);
 
   // Announce timer at key intervals for screen reader users
   useEffect(() => {
@@ -1024,6 +1055,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
           // Track for training analysis (practice mode only)
           trainingAnalysis.trackValidWord(normalizedWord.length);
+          // Track for progress bar (practice mode only)
+          trainingProgress.trackValidWord(normalizedWord.length);
 
           if (combo.validWordCount > 1) {
             playComboSound(currentCombo + 1);
@@ -1067,7 +1100,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           timestamp: Date.now(),
         });
       });
-  }, [settings.language, settings.minWordLength, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getComboBonus, getScoreMultiplier, fireRoundActive, calculateWordScore, trainingAnalysis]);
+  }, [settings.language, settings.minWordLength, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getComboBonus, getScoreMultiplier, fireRoundActive, calculateWordScore, trainingAnalysis, trainingProgress]);
 
   const handleFinishPractice = useCallback(() => {
     setIsGameOver(true);
@@ -1186,6 +1219,23 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           earnedAchievements={[]}
           isGameOver={isGameOver}
         />
+
+        {/* Training Progress Bar - compact chip in landscape practice mode */}
+        {settings.mode === 'practice' && (
+          <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30">
+            <TrainingProgressBar
+              completedSkills={trainingProgress.completedSkills}
+              score={score}
+              wordsFound={validWordCount}
+              compact={!progressBarExpanded}
+              expanded={progressBarExpanded}
+              onToggleExpand={() => setProgressBarExpanded(!progressBarExpanded)}
+              justUnlocked={trainingProgress.justUnlocked}
+              onUnlockAnimationComplete={trainingProgress.clearJustUnlocked}
+              isComplete={trainingProgress.isComplete}
+            />
+          </div>
+        )}
 
         {/* Left Side Panel - Timer & Score */}
         <div
@@ -1306,7 +1356,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           style={{ paddingInline: 'clamp(100px, 18vw, 150px)' }}
         >
           {/* Word Forming Area - Permanent space above grid (keep timer section clear) */}
-          <div className="flex items-center mb-0.5">
+          <div className="flex items-center justify-center mb-0.5">
             <WordFormingArea
               word={formedWord}
               letterCount={letterCount}
@@ -1414,6 +1464,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             onDismiss={trainingAnalysis.dismissHint}
             trainingComplete={trainingAnalysis.hasPassed}
             otherTooltipVisible={directionGuidance.showDirectionGuidance}
+          />
+        )}
+
+        {/* Skill Unlock Toast - celebration when training skill is unlocked */}
+        {settings.mode === 'practice' && (
+          <SkillUnlockToast
+            skillId={trainingProgress.justUnlocked}
+            onDismiss={trainingProgress.clearJustUnlocked}
           />
         )}
 
@@ -1562,12 +1620,29 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         )}
       </div>
 
+      {/* Training Progress Bar - shown in practice mode (portrait) */}
+      {settings.mode === 'practice' && (
+        <div className="px-2 md:px-4 py-1 flex-shrink-0">
+          <TrainingProgressBar
+            completedSkills={trainingProgress.completedSkills}
+            score={score}
+            wordsFound={foundWords.filter(fw => fw.isValid === true).length}
+            compact={!progressBarExpanded}
+            expanded={progressBarExpanded}
+            onToggleExpand={() => setProgressBarExpanded(!progressBarExpanded)}
+            justUnlocked={trainingProgress.justUnlocked}
+            onUnlockAnimationComplete={trainingProgress.clearJustUnlocked}
+            isComplete={trainingProgress.isComplete}
+          />
+        </div>
+      )}
+
       {/* Stats row - Combo | Timer | Score - matches multiplayer layout */}
       {/* In practice mode (no timer), score is centered and larger */}
       <div ref={gameStatsRef} className="flex items-center justify-center gap-1 md:gap-4 flex-shrink-0" role="status" aria-label="Game status">
         {/* Combo (left - shows when level >= 2, placeholder otherwise for layout balance) */}
-        {/* Hidden in practice mode when score is centered */}
-        {settings.mode !== 'practice' && (
+        {/* In practice mode, show empty placeholder to balance right-side combo for centering */}
+        {settings.mode !== 'practice' ? (
           <div className="min-w-[50px] md:min-w-[90px] flex justify-end">
             <ComboDisplay
               comboLevel={combo.comboLevel}
@@ -1576,6 +1651,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               onCoinAnimationComplete={() => setComboCoinReward(null)}
             />
           </div>
+        ) : (
+          <div className="min-w-[50px] md:min-w-[90px]" aria-hidden="true" />
         )}
 
         {/* Timer (center - always visible and prominent) */}
@@ -1850,6 +1927,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           onDismiss={trainingAnalysis.dismissHint}
           trainingComplete={trainingAnalysis.hasPassed}
           otherTooltipVisible={directionGuidance.showDirectionGuidance}
+        />
+      )}
+
+      {/* Skill Unlock Toast - celebration when training skill is unlocked */}
+      {settings.mode === 'practice' && (
+        <SkillUnlockToast
+          skillId={trainingProgress.justUnlocked}
+          onDismiss={trainingProgress.clearJustUnlocked}
         />
       )}
 

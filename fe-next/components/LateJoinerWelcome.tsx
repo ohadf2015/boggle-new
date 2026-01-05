@@ -33,7 +33,7 @@ const LateJoinerWelcome: React.FC<LateJoinerWelcomeProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md" dir={dir}>
+      <DialogContent noDescription className="max-w-md" dir={dir}>
         <DialogHeader className="bg-neo-orange text-neo-black p-3 sm:p-4">
           <DialogTitle className="flex items-center justify-center gap-2 sm:gap-3 text-base sm:text-xl">
             <motion.div

@@ -648,17 +648,22 @@ export default function MultiplayerPage(): React.JSX.Element {
         }
       } else if (data.message?.includes('already in use') || data.message?.includes('Game code already')) {
         setError(t('errors.gameCodeExists'));
+        toast.error(t('errors.gameCodeExists'), { duration: 4000, icon: '❌' });
         setIsActive(false);
         setIsHost(false);
         setAttemptingReconnect(false);
       } else if (data.message?.includes('username') || data.message?.includes('Username')) {
         setError(t('errors.usernameTaken'));
+        toast.error(t('errors.usernameTaken'), { duration: 4000, icon: '❌' });
         setIsActive(false);
         setAttemptingReconnect(false);
         setShouldAutoJoin(false);
         clearSession();
       } else {
-        setError(data.message || 'An error occurred');
+        const errorMsg = data.message || 'An error occurred';
+        setError(errorMsg);
+        // Show toast for all other errors to ensure user gets visual feedback
+        toast.error(errorMsg, { duration: 4000, icon: '❌' });
       }
     });
 

@@ -499,7 +499,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
 
       {/* QR Code Dialog */}
       <Dialog open={showQR} onOpenChange={setShowQR}>
-        <DialogContent>
+        <DialogContent noDescription>
           <DialogHeader>
             <DialogTitle>{t('share.qrCodeTitle') || 'Scan to Join'}</DialogTitle>
           </DialogHeader>

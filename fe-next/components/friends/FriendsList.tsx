@@ -315,10 +315,13 @@ const FriendsList: React.FC<FriendsListProps> = ({
 
       {/* Add Friend Dialog */}
       <Dialog open={showAddFriend} onOpenChange={setShowAddFriend}>
-        <DialogContent className={cn(
-          'max-w-md',
-          isDark ? 'bg-slate-800 text-white' : 'bg-white text-gray-900'
-        )}>
+        <DialogContent
+          noDescription
+          className={cn(
+            'max-w-md',
+            isDark ? 'bg-slate-800 text-white' : 'bg-white text-gray-900'
+          )}
+        >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <UserPlus className="w-5 h-5" />
@@ -461,10 +464,13 @@ const FriendsList: React.FC<FriendsListProps> = ({
 
       {/* Friend Detail Dialog */}
       <Dialog open={!!selectedFriend} onOpenChange={(open) => !open && setSelectedFriend(null)}>
-        <DialogContent className={cn(
-          'max-w-sm',
-          isDark ? 'bg-slate-800 text-white' : 'bg-white text-gray-900'
-        )}>
+        <DialogContent
+          noDescription
+          className={cn(
+            'max-w-sm',
+            isDark ? 'bg-slate-800 text-white' : 'bg-white text-gray-900'
+          )}
+        >
           {selectedFriend && (
             <>
               <DialogHeader>

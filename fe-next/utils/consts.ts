@@ -221,3 +221,14 @@ export const PASSWORD_STRENGTH_PATTERN = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
 // Pattern for valid username/room name characters
 // Uses Unicode property escapes to allow any letter or number from any language, plus spaces and ._-
 export const NAME_VALID_PATTERN = /^[\p{L}\p{N}\s._-]+$/u;
+
+/**
+ * Sanitize a string to only contain valid room name characters
+ * Removes any characters that don't match the NAME_VALID_PATTERN
+ * This ensures room names are compatible with backend validation
+ */
+export function sanitizeRoomName(name: string): string {
+  // Remove any characters not in the allowed set
+  // Keep: letters (any language), numbers, spaces, dots, underscores, hyphens
+  return name.replace(/[^\p{L}\p{N}\s._-]/gu, '').trim();
+}
