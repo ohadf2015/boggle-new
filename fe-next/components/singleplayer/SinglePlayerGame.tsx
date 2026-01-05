@@ -257,7 +257,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
   // Update training progress when score changes (for targetScore skill)
   useEffect(() => {
-    if (settings.mode === 'practice' && score >= 50) {
+    if (settings.mode === 'practice' && score >= 20) {
       trainingProgress.updateProgress({
         score,
         wordsFound: foundWords.filter(fw => fw.isValid === true).length,
@@ -511,7 +511,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     const rows = difficultyConfig.rows;
     const cols = difficultyConfig.cols;
     const totalCells = rows * cols;
-    const wordCount = Math.min(35, Math.max(5, Math.floor(totalCells / 3)));
+    // Practice mode gets more words embedded for better training experience
+    const baseWordCount = Math.min(35, Math.max(5, Math.floor(totalCells / 3)));
+    const wordCount = settings.mode === 'practice' ? Math.min(50, baseWordCount * 2) : baseWordCount;
     const maxWordLen = Math.min(12, Math.max(rows, cols));
 
     // Initialize grid generation
@@ -562,7 +564,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       initialBotUsedWords[bot.id] = new Set();
     });
     botUsedWordsRef.current = initialBotUsedWords;
-  }, [settings.difficulty, settings.language, settings.bots]);
+  }, [settings.difficulty, settings.language, settings.bots, settings.mode]);
 
   // Fetch valid words from grid for bots and word progress tracking
   // Runs for ALL modes to support WordsProgress, not just solo-bots

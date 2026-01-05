@@ -4,7 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import type { TrainingSkillId } from '@/components/training';
 import { triggerHaptic } from '@/utils/hapticFeedback';
 
-const TARGET_SCORE = 50;
+const TARGET_SCORE = 20;
 const TARGET_WORDS = 5;
 
 interface TrainingProgressState {

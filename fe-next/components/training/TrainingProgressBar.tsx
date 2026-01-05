@@ -50,7 +50,7 @@ const TRAINING_SKILLS: TrainingSkill[] = [
     id: 'targetScore',
     icon: Target,
     labelKey: 'training.progress.targetScore',
-    fallbackLabel: 'Score 50 Points',
+    fallbackLabel: 'Score 20 Points',
     color: 'text-cyan-500',
     bgColor: 'bg-cyan-100 dark:bg-cyan-900/30',
   },
@@ -213,7 +213,12 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
     return undefined;
   }, [justUnlocked, onUnlockAnimationComplete]);
 
-  // Compact mode for mobile - shows chip that can be tapped to expand
+  // Get the next incomplete skill for compact hint
+  const nextIncompleteSkill = useMemo(() => {
+    return TRAINING_SKILLS.find(skill => !completedSkills.has(skill.id));
+  }, [completedSkills]);
+
+  // Compact mode for mobile - shows prominent clickable bar
   // min-h-[44px] ensures touch target meets accessibility requirements
   if (compact && !expanded) {
     return (
@@ -221,7 +226,7 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
         onClick={onToggleExpand}
         whileTap={{ scale: 0.98 }}
         className={cn(
-          'flex items-center gap-2 px-4 py-2.5 min-h-[44px] rounded-full border-2 shadow-hard-sm transition-all',
+          'flex items-center gap-3 px-4 py-3 min-h-[52px] w-full max-w-[320px] rounded-xl border-2 shadow-hard-sm transition-all',
           isComplete
             ? 'bg-neo-lime border-neo-lime text-neo-black'
             : isDarkMode
@@ -231,13 +236,13 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
       >
         {isComplete ? (
           <>
-            <Trophy className="w-4 h-4" />
-            <span className="text-sm font-bold">{t('training.progress.ready') || 'Ready!'}</span>
+            <Trophy className="w-5 h-5" />
+            <span className="text-base font-bold">{t('training.progress.ready') || 'Ready!'}</span>
           </>
         ) : (
           <>
-            <span className="text-sm font-bold">{completedCount}/{totalSkills}</span>
-            <div className="w-12 h-2 rounded-full bg-gray-200 dark:bg-slate-600 overflow-hidden">
+            <span className="text-base font-bold min-w-[32px]">{completedCount}/{totalSkills}</span>
+            <div className="flex-1 h-3 rounded-full bg-gray-200 dark:bg-slate-600 overflow-hidden">
               <motion.div
                 className={cn(
                   'h-full rounded-full',
@@ -250,6 +255,15 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
                 transition={{ duration: 0.5 }}
               />
             </div>
+            {/* Show next skill hint */}
+            {nextIncompleteSkill && (
+              <span className={cn(
+                'text-xs font-medium whitespace-nowrap',
+                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+              )}>
+                → {t(nextIncompleteSkill.labelKey) || nextIncompleteSkill.fallbackLabel}
+              </span>
+            )}
           </>
         )}
       </motion.button>

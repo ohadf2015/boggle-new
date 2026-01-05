@@ -12,6 +12,7 @@ import { useAuth } from '../contexts/AuthContext';
 import OnboardingProgress from './onboarding/OnboardingProgress';
 import { markOnboardingComplete, markOnboardingSkipped } from '../utils/onboardingStorage';
 import { AVATARS } from '../utils/avatarConfig';
+import { hasCompleteStoredProfile, getStoredProfile } from '../utils/profileStorage';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
 import { triggerHaptic } from '../utils/hapticFeedback';
 
@@ -31,8 +32,6 @@ interface FormData {
   selectedMode: 'single' | 'multi' | 'daily' | null;
 }
 
-const TOTAL_STEPS = 3;
-
 /**
  * OnboardingModal - Interactive multi-step onboarding for new players
  * Teaches game mechanics through hands-on demos and guides avatar/name setup
@@ -40,8 +39,25 @@ const TOTAL_STEPS = 3;
 const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) => {
   const { t, dir, language } = useLanguage();
   const { fadeToTrack, TRACKS, audioUnlocked } = useMusic();
-  const { profile, updateProfile } = useAuth();
+  const { profile, updateProfile, isAuthenticated } = useAuth();
   const router = useRouter();
+
+  // Determine if we should skip the profile setup step
+  // Skip if: (1) authenticated with avatar+name, or (2) guest with stored avatar+name
+  const shouldSkipProfileStep = React.useMemo(() => {
+    // Check if authenticated user has complete profile
+    if (isAuthenticated && profile?.avatar_image && profile?.display_name) {
+      return true;
+    }
+    // Check if guest has a complete stored profile
+    if (hasCompleteStoredProfile()) {
+      return true;
+    }
+    return false;
+  }, [isAuthenticated, profile?.avatar_image, profile?.display_name]);
+
+  // Calculate total steps based on whether profile step is skipped
+  const TOTAL_STEPS = shouldSkipProfileStep ? 2 : 3;
 
   const [currentStep, setCurrentStep] = useState(0);
   const [demoCompleted, setDemoCompleted] = useState(false);
@@ -51,9 +67,31 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
     selectedMode: null,
   });
 
-  // Set random avatar and its name as default on mount
-  // Use sessionStorage to prevent re-selection within the same session (avoids "jumping")
+  // Set avatar and name defaults on mount
+  // Priority: (1) authenticated profile, (2) stored guest profile, (3) random
   useEffect(() => {
+    // If authenticated with complete profile, use that data
+    if (isAuthenticated && profile?.avatar_image && profile?.display_name) {
+      setFormData((prev) => ({
+        ...prev,
+        avatarId: profile.avatar_image || prev.avatarId,
+        displayName: profile.display_name || prev.displayName,
+      }));
+      return;
+    }
+
+    // If guest has stored profile, use that data
+    const storedProfile = getStoredProfile();
+    if (storedProfile.avatarId && storedProfile.username) {
+      setFormData((prev) => ({
+        ...prev,
+        avatarId: storedProfile.avatarId || prev.avatarId,
+        displayName: storedProfile.username || prev.displayName,
+      }));
+      return;
+    }
+
+    // Otherwise, use session storage to prevent re-selection within the same session
     const sessionKey = 'lexiclash_onboarding_session_avatar';
     const storedData = sessionStorage.getItem(sessionKey);
 
@@ -78,7 +116,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
       avatarId: avatarToUse.id,
       displayName: prev.displayName || avatarToUse.name,
     }));
-  }, []);
+  }, [isAuthenticated, profile?.avatar_image, profile?.display_name]);
 
   // Play bossa music when modal opens (after audio unlock)
   useEffect(() => {
@@ -111,7 +149,8 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
       return;
     }
 
-    if (currentStep === 1 && !formData.displayName.trim()) {
+    // Only validate displayName if we're on the profile step (step 1 when not skipping)
+    if (!shouldSkipProfileStep && currentStep === 1 && !formData.displayName.trim()) {
       // Name is required in profile step
       triggerHaptic('warning');
       return;
@@ -167,8 +206,15 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
   };
 
   const renderStep = () => {
-    switch (currentStep) {
-      case 0:
+    // Map current step index to actual step component
+    // When profile step is skipped: 0 = Demo, 1 = Tips
+    // When profile step included: 0 = Demo, 1 = Profile, 2 = Tips
+    const actualStep = shouldSkipProfileStep
+      ? (currentStep === 0 ? 'demo' : 'tips')
+      : (currentStep === 0 ? 'demo' : currentStep === 1 ? 'profile' : 'tips');
+
+    switch (actualStep) {
+      case 'demo':
         // Step 1: Interactive demo - learn the basics
         return (
           <WelcomeDemoStep
@@ -176,8 +222,8 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
             demoCompleted={demoCompleted}
           />
         );
-      case 1:
-        // Step 2: Profile setup - avatar + name combined
+      case 'profile':
+        // Step 2: Profile setup - avatar + name combined (skipped for authenticated/stored users)
         return (
           <ProfileSetupStep
             selectedAvatarId={formData.avatarId}
@@ -190,8 +236,8 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
             }
           />
         );
-      case 2:
-        // Step 3: Quick tips + mode selection
+      case 'tips':
+        // Step 3 (or 2 when skipping profile): Quick tips + mode selection
         return (
           <QuickTipsStep
             selectedMode={formData.selectedMode}
@@ -208,8 +254,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
 
   const canAdvance = () => {
     if (currentStep === 0 && !demoCompleted) return false;
-    if (currentStep === 1 && !formData.displayName.trim()) return false;
-    // Step 2 no longer requires mode selection - we auto-select training mode
+    // Only validate displayName if we're on the profile step (step 1 when not skipping)
+    if (!shouldSkipProfileStep && currentStep === 1 && !formData.displayName.trim()) return false;
+    // Tips step no longer requires mode selection - we auto-select training mode
     return true;
   };
 
