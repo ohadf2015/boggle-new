@@ -2,17 +2,17 @@
  * Bun Native Server with Socket.IO
  *
  * Uses @socket.io/bun-engine for native Bun WebSocket performance.
- * Next.js runs on an internal HTTP server and requests are proxied.
+ * Next.js requests are handled via Node.js request/response conversion (no proxy).
  */
 
 import 'dotenv/config';
-import { createServer } from 'http';
 import { Server as BunEngine } from '@socket.io/bun-engine';
 import { Server } from 'socket.io';
 import next from 'next';
-import express from 'express';
+import { Readable } from 'stream';
 
-import type { Application } from 'express';
+import type { IncomingMessage, ServerResponse } from 'http';
+import type { Socket } from 'net';
 
 // Socket handlers and lifecycle
 import { initializeSocketHandlers } from '../backend/socketHandlers';
@@ -34,7 +34,6 @@ const dev: boolean = process.env.NODE_ENV !== 'production';
 const PORT: number = parseInt(process.env.PORT || '3001', 10);
 const HOST: string = process.env.HOST || '0.0.0.0';
 const CORS_ORIGIN: string = process.env.CORS_ORIGIN || '*';
-const INTERNAL_PORT = 3002; // Internal Next.js server port
 
 // Initialize Next.js
 const nextApp = next({ dev });
@@ -137,7 +136,6 @@ function jsonResponse(data: unknown, status = 200, options: { path?: string; ori
 let io: ExtendedSocketServer;
 let engine: BunEngine;
 let bunServer: ReturnType<typeof Bun.serve>;
-let internalServer: ReturnType<typeof createServer>;
 
 /**
  * Health check routes
@@ -187,8 +185,7 @@ function handleMetricsRoutes(url: URL, origin: string | null): Response | null {
   }
 
   if (url.pathname === '/metrics/redis') {
-    // This is async, handle separately
-    return null;
+    return null; // Handle async separately
   }
 
   return null;
@@ -219,41 +216,202 @@ function handlePreflight(origin: string | null): Response {
 }
 
 /**
- * Proxy request to internal Next.js server
+ * Convert Bun Request to Node.js IncomingMessage
  */
-async function proxyToNextJs(req: Request, url: URL, origin: string | null): Promise<Response> {
+function createNodeRequest(req: Request, url: URL, clientIP?: string): IncomingMessage {
+  const readable = new Readable({
+    read() {}
+  });
+
+  // Push body data if present
+  if (req.body) {
+    const reader = req.body.getReader();
+    (async () => {
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) {
+            readable.push(null);
+            break;
+          }
+          readable.push(value);
+        }
+      } catch {
+        readable.push(null);
+      }
+    })();
+  } else {
+    readable.push(null);
+  }
+
+  // Create mock socket with minimal properties Next.js needs
+  const mockSocket = {
+    remoteAddress: clientIP || '127.0.0.1',
+    encrypted: url.protocol === 'https:',
+  } as unknown as Socket;
+
+  // Extend readable as IncomingMessage
+  const nodeReq = readable as IncomingMessage;
+  nodeReq.url = url.pathname + url.search;
+  nodeReq.method = req.method;
+  nodeReq.headers = {};
+  nodeReq.socket = mockSocket;
+
+  // Convert headers
+  req.headers.forEach((value, key) => {
+    nodeReq.headers[key.toLowerCase()] = value;
+  });
+
+  return nodeReq;
+}
+
+/**
+ * Create a mock ServerResponse that captures the response
+ */
+function createNodeResponse(): {
+  res: ServerResponse;
+  getResponse: () => Promise<Response>;
+} {
+  let statusCode = 200;
+  let statusMessage = 'OK';
+  const headers: Record<string, string | string[]> = {};
+  const chunks: Uint8Array[] = [];
+  let resolvePromise: (response: Response) => void;
+  let finished = false;
+
+  const responsePromise = new Promise<Response>((resolve) => {
+    resolvePromise = resolve;
+  });
+
+  // Create a mock response object
+  const res = {
+    statusCode: 200,
+    statusMessage: 'OK',
+
+    setHeader(name: string, value: string | string[]) {
+      headers[name.toLowerCase()] = value;
+      return this;
+    },
+
+    getHeader(name: string) {
+      return headers[name.toLowerCase()];
+    },
+
+    removeHeader(name: string) {
+      delete headers[name.toLowerCase()];
+      return this;
+    },
+
+    hasHeader(name: string) {
+      return name.toLowerCase() in headers;
+    },
+
+    writeHead(code: number, message?: string | Record<string, string | string[]>, hdrs?: Record<string, string | string[]>) {
+      statusCode = code;
+      if (typeof message === 'string') {
+        statusMessage = message;
+        if (hdrs) {
+          Object.entries(hdrs).forEach(([k, v]) => {
+            headers[k.toLowerCase()] = v;
+          });
+        }
+      } else if (message) {
+        Object.entries(message).forEach(([k, v]) => {
+          headers[k.toLowerCase()] = v;
+        });
+      }
+      return this;
+    },
+
+    write(chunk: string | Uint8Array) {
+      if (typeof chunk === 'string') {
+        chunks.push(new TextEncoder().encode(chunk));
+      } else {
+        chunks.push(chunk);
+      }
+      return true;
+    },
+
+    end(chunk?: string | Uint8Array) {
+      if (finished) return this;
+      finished = true;
+
+      if (chunk) {
+        if (typeof chunk === 'string') {
+          chunks.push(new TextEncoder().encode(chunk));
+        } else {
+          chunks.push(chunk);
+        }
+      }
+
+      // Convert headers to Headers object
+      const responseHeaders = new Headers();
+      Object.entries(headers).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach(v => responseHeaders.append(key, v));
+        } else {
+          responseHeaders.set(key, value);
+        }
+      });
+
+      // Combine chunks into body
+      const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+      const body = new Uint8Array(totalLength);
+      let offset = 0;
+      for (const chunk of chunks) {
+        body.set(chunk, offset);
+        offset += chunk.length;
+      }
+
+      resolvePromise(new Response(body.length > 0 ? body : null, {
+        status: statusCode,
+        statusText: statusMessage,
+        headers: responseHeaders,
+      }));
+
+      return this;
+    },
+
+    // Additional properties Next.js might access
+    finished: false,
+    headersSent: false,
+    get writableEnded() { return finished; },
+    get writableFinished() { return finished; },
+  } as unknown as ServerResponse;
+
+  return {
+    res,
+    getResponse: () => responsePromise,
+  };
+}
+
+/**
+ * Handle Next.js requests by converting to Node.js format
+ */
+async function handleNextJs(req: Request, url: URL, origin: string | null, clientIP?: string): Promise<Response> {
   try {
-    // Build internal URL
-    const internalUrl = `http://127.0.0.1:${INTERNAL_PORT}${url.pathname}${url.search}`;
+    const nodeReq = createNodeRequest(req, url, clientIP);
+    const { res: nodeRes, getResponse } = createNodeResponse();
 
-    // Forward the request to internal Next.js server
-    const proxyReq: RequestInit = {
-      method: req.method,
-      headers: req.headers,
-    };
+    // Call Next.js handler
+    await nextHandler(nodeReq, nodeRes);
 
-    // Include body for non-GET/HEAD requests
-    if (req.method !== 'GET' && req.method !== 'HEAD' && req.body) {
-      proxyReq.body = req.body;
-      // duplex is needed for streaming bodies in Bun
-      (proxyReq as RequestInit & { duplex?: string }).duplex = 'half';
-    }
+    // Get the response from Next.js
+    const response = await getResponse();
 
-    const proxyResponse = await fetch(internalUrl, proxyReq);
-
-    // Add security headers to proxied response
-    const headers = new Headers(proxyResponse.headers);
+    // Add security headers
+    const headers = new Headers(response.headers);
     addSecurityHeaders(headers);
     addCorsHeaders(headers, origin);
     addCacheHeaders(headers, url.pathname);
 
-    return new Response(proxyResponse.body, {
-      status: proxyResponse.status,
-      statusText: proxyResponse.statusText,
-      headers
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
     });
   } catch (error) {
-    console.error('Error proxying to Next.js:', url.pathname, error);
+    console.error('Error handling Next.js request:', url.pathname, error);
     return createResponse('Internal Server Error', { status: 500, origin });
   }
 }
@@ -267,18 +425,6 @@ async function start(): Promise<void> {
   // Prepare Next.js
   await nextApp.prepare();
   console.log('✓ Next.js prepared');
-
-  // Create internal Express + Next.js server
-  const expressApp: Application = express();
-  expressApp.all('*', (req, res) => nextHandler(req, res));
-  internalServer = createServer(expressApp);
-
-  await new Promise<void>((resolve) => {
-    internalServer.listen(INTERNAL_PORT, '127.0.0.1', () => {
-      console.log(`✓ Internal Next.js server ready on port ${INTERNAL_PORT}`);
-      resolve();
-    });
-  });
 
   // Create Socket.IO with Bun engine
   io = new Server() as ExtendedSocketServer;
@@ -317,15 +463,16 @@ async function start(): Promise<void> {
   // Get the Bun engine handler
   const engineHandler = engine.handler();
 
-  // Create Bun server
+  // Create Bun server - single server, no proxy!
   bunServer = Bun.serve({
     port: PORT,
     hostname: HOST,
-    idleTimeout: 30, // Must be > pingInterval (25s)
+    idleTimeout: 30,
 
     async fetch(req: Request, server): Promise<Response> {
       const url = new URL(req.url);
       const origin = req.headers.get('origin');
+      const clientIP = server.requestIP(req)?.address;
 
       // WWW redirect
       const wwwRedirect = checkWwwRedirect(req);
@@ -341,11 +488,11 @@ async function start(): Promise<void> {
         return engine.handleRequest(req, server);
       }
 
-      // Health routes
+      // Health routes (fast path)
       const healthResponse = handleHealthRoutes(url, origin);
       if (healthResponse) return healthResponse;
 
-      // Metrics routes
+      // Metrics routes (fast path)
       const metricsResponse = handleMetricsRoutes(url, origin);
       if (metricsResponse) return metricsResponse;
 
@@ -359,38 +506,29 @@ async function start(): Promise<void> {
         }
       }
 
-      // All other requests -> proxy to internal Next.js server
-      return proxyToNextJs(req, url, origin);
+      // All other requests -> Next.js (direct conversion, no proxy!)
+      return handleNextJs(req, url, origin, clientIP);
     },
 
-    // The bun-engine websocket handler is compatible with Bun.serve
+    // Native Bun WebSocket handler for Socket.IO
     websocket: engineHandler.websocket as unknown as Bun.WebSocketHandler<unknown>,
   });
 
   console.log(`> Server ready on http://${HOST}:${PORT}`);
-  console.log(`> Socket.IO with Bun native WebSocket engine`);
+  console.log(`> Socket.IO with Bun native WebSocket (no proxy)`);
   console.log(`> Environment: ${dev ? 'development' : 'production'}`);
 
   // Graceful shutdown
   const shutdown = async (signal: string) => {
     console.log(`\n${signal} received. Starting graceful shutdown...`);
 
-    // Clear cleanup timers
     clearCleanupTimers();
 
-    // Close Socket.IO connections
     if (io) {
       console.log('Closing Socket.IO connections...');
       io.close();
     }
 
-    // Stop internal server
-    if (internalServer) {
-      console.log('Stopping internal Next.js server...');
-      internalServer.close();
-    }
-
-    // Stop Bun server
     if (bunServer) {
       console.log('Stopping Bun server...');
       bunServer.stop();
