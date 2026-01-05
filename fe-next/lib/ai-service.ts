@@ -390,7 +390,7 @@ class GameAIService {
   }
 
   /**
-   * Check if an error is retryable (network errors, rate limits, etc.)
+   * Check if an error is retryable (network errors, rate limits, truncation, etc.)
    */
   private isRetryableError(error: unknown): boolean {
     if (error instanceof Error) {
@@ -399,6 +399,7 @@ class GameAIService {
         message.includes('network') ||
         message.includes('timeout') ||
         message.includes('rate limit') ||
+        message.includes('truncated') ||
         message.includes('429') ||
         message.includes('503') ||
         message.includes('unavailable')
@@ -440,8 +441,9 @@ class GameAIService {
       this.model = this.vertexAI.getGenerativeModel({
         model: process.env.VERTEX_AI_MODEL || 'gemini-1.5-flash-002',
         generationConfig: {
-          maxOutputTokens: 256,
+          maxOutputTokens: 512, // Increased to prevent truncation
           temperature: 0.1, // Low temperature for consistent validation
+          responseMimeType: 'application/json', // Force proper JSON output
         },
       });
 
@@ -654,6 +656,13 @@ Respond with ONLY valid JSON (no markdown):
           };
         }
 
+        // Handle severely truncated responses (e.g., {"isValid or {"isValid":)
+        // These indicate the AI started to respond but got cut off - throw to trigger retry
+        if (text.includes('"isValid"') || text.includes('"isValid')) {
+          console.warn(`[GameAIService] Truncated AI response for "${word}": ${text.substring(0, 50)}`);
+          throw new Error('AI response truncated');
+        }
+
         console.warn('[GameAIService] Could not extract JSON from AI response:', text.substring(0, 100));
         return { isValid: false, reason: 'Failed to parse AI response', confidence: 0 };
       }
@@ -768,8 +777,11 @@ Respond with ONLY valid JSON (no markdown):
         };
       }
 
-      // Step 5: Slow Check (AI)
-      const aiResult = await this.validateWithAI(normalizedWord, language);
+      // Step 5: Slow Check (AI) - with retry for transient failures
+      const aiResult = await this.withRetry(
+        () => this.validateWithAI(normalizedWord, language),
+        `validateWord:${normalizedWord}`
+      );
 
       // Cache the AI result
       validationCache.set(normalizedWord, language, {

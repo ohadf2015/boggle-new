@@ -333,7 +333,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       setShufflingGrid(null);
       setHighlightedCells([]);
     }
-  }, [gameActive]);
+  }, [gameActive, setShufflingGrid]);
 
   // Clear game state on mount and cleanup
   useEffect(() => {
@@ -407,7 +407,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       startGame();
       return;
     }
-  }, [pendingGameStart, socket, onGameStartConsumed, fadeToTrack, TRACKS]);
+  }, [pendingGameStart, socket, onGameStartConsumed, fadeToTrack, TRACKS, gameTimer, setFoundWords, setLetterGrid]);
 
   // Exit handlers
   const handleExitRoom = useCallback((e?: React.MouseEvent) => {
