@@ -7,7 +7,10 @@ import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
-import type { LetterGrid } from '@/types';
+import { isWordOnBoard } from '@/utils/utils';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { AnimatePresence, motion } from 'framer-motion';
+import type { LetterGrid, Language } from '@/types';
 
 // Level configurations
 const LEVEL_CONFIGS = [
@@ -45,6 +48,7 @@ interface RareGemsProps {
   grid: LetterGrid;
   availableWords: { word: string; path: { row: number; col: number }[] }[];
   level?: number;
+  language?: Language;
   onComplete: (result: {
     score: number;
     rareWordsFound: number;
@@ -67,11 +71,13 @@ export default function RareGems({
   grid,
   availableWords,
   level = 1,
+  language = 'en',
   onComplete,
   onExit,
 }: RareGemsProps) {
   const { theme } = useTheme();
   const { t } = useLanguage();
+  const { playErrorSound } = useSoundEffects();
   const isDarkMode = theme === 'dark';
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
@@ -81,6 +87,7 @@ export default function RareGems({
   const [wordsFound, setWordsFound] = useState<{ word: string; rarity: string }[]>([]);
   const [score, setScore] = useState(0);
   const [lastWord, setLastWord] = useState<{ word: string; rarity: string; points: number } | null>(null);
+  const [feedback, setFeedback] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -118,28 +125,49 @@ export default function RareGems({
     if (phase !== 'playing') return;
 
     const upperWord = word.toUpperCase();
-    const alreadyFound = wordsFound.some(w => w.word === upperWord);
 
-    if (availableWordSet.has(upperWord) && !alreadyFound) {
-      const rarity = getWordRarity(word);
-      const points = RARITY_POINTS[rarity];
-
-      setWordsFound(prev => [...prev, { word: upperWord, rarity }]);
-      setScore(prev => prev + points);
-      setLastWord({ word: upperWord, rarity, points });
-
-      setTimeout(() => setLastWord(null), 1000);
-
-      // Check win condition
-      if (rareWordsFound + (rarity === 'rare' || rarity === 'legendary' ? 1 : 0) >= levelConfig.targetRare) {
-        if (timerRef.current) clearInterval(timerRef.current);
-        // Bonus for early completion
-        const bonusTime = timeRemaining * 2;
-        setScore(prev => prev + bonusTime);
-        setPhase('complete');
-      }
+    // Check if word can be formed on the board
+    if (!isWordOnBoard(upperWord, grid, language)) {
+      setFeedback({ message: t('brain.drills.errors.notOnBoard') || 'Word not on board', type: 'error' });
+      playErrorSound?.();
+      setTimeout(() => setFeedback(null), 2000);
+      return;
     }
-  }, [phase, availableWordSet, wordsFound, rareWordsFound, levelConfig.targetRare, timeRemaining]);
+
+    const alreadyFound = wordsFound.some(w => w.word === upperWord);
+    if (alreadyFound) {
+      setFeedback({ message: t('brain.drills.errors.alreadyFound') || 'Already found', type: 'error' });
+      playErrorSound?.();
+      setTimeout(() => setFeedback(null), 2000);
+      return;
+    }
+
+    if (!availableWordSet.has(upperWord)) {
+      setFeedback({ message: t('brain.drills.errors.invalidWord') || 'Invalid word', type: 'error' });
+      playErrorSound?.();
+      setTimeout(() => setFeedback(null), 2000);
+      return;
+    }
+
+    // Valid word!
+    const rarity = getWordRarity(word);
+    const points = RARITY_POINTS[rarity];
+    setWordsFound(prev => [...prev, { word: upperWord, rarity }]);
+    setScore(prev => prev + points);
+    setLastWord({ word: upperWord, rarity, points });
+    setFeedback({ message: `+${points} ${t('brain.drills.points')} (${t(`brain.drills.rarity.${rarity}`)})`, type: 'success' });
+    setTimeout(() => {
+      setLastWord(null);
+      setFeedback(null);
+    }, 1500);
+
+    if (rareWordsFound + (rarity === 'rare' || rarity === 'legendary' ? 1 : 0) >= levelConfig.targetRare) {
+      if (timerRef.current) clearInterval(timerRef.current);
+      const bonusTime = timeRemaining * 2;
+      setScore(prev => prev + bonusTime);
+      setPhase('complete');
+    }
+  }, [phase, availableWordSet, wordsFound, rareWordsFound, levelConfig.targetRare, timeRemaining, grid, language, t, playErrorSound]);
 
   // Results
   const getResults = useCallback(() => {
@@ -216,7 +244,7 @@ export default function RareGems({
           'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
           'bg-neo-green text-neo-black'
         )}>
-          {score} pts
+          {score} {t('brain.drills.points')}
         </div>
       </div>
 
@@ -231,7 +259,7 @@ export default function RareGems({
             <div key={rarity} className="flex items-center gap-1">
               <div className={cn('w-3 h-3 rounded border border-neo-black', color)} />
               <span className={isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'}>
-                {rarity} (+{RARITY_POINTS[rarity as keyof typeof RARITY_POINTS]})
+                {t(`brain.drills.rarity.${rarity}`)} (+{RARITY_POINTS[rarity as keyof typeof RARITY_POINTS]})
               </span>
             </div>
           ))}
@@ -265,7 +293,7 @@ export default function RareGems({
             )}>
               <p>{t('brain.drills.level')}: {level}</p>
               <p>{t('brain.drills.timeSpent')}: {levelConfig.timeLimit}s</p>
-              <p>Target rare words: {levelConfig.targetRare}</p>
+              <p>{t('brain.drills.targetRareWords')}: {levelConfig.targetRare}</p>
             </div>
             <motion.button
               whileTap={{ scale: 0.95 }}
@@ -285,6 +313,25 @@ export default function RareGems({
               onWordSubmit={handleWordSubmit}
               className="w-full"
             />
+
+            {/* Feedback message */}
+            <AnimatePresence>
+              {feedback && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className={cn(
+                    'text-center px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm',
+                    feedback.type === 'error'
+                      ? 'bg-neo-red text-neo-white'
+                      : 'bg-neo-green text-neo-black'
+                  )}
+                >
+                  {feedback.message}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Word popup */}
             <AnimatePresence>
@@ -351,11 +398,11 @@ export default function RareGems({
               'p-4 rounded-neo border-3 border-neo-black space-y-2',
               isDarkMode ? 'bg-slate-800' : 'bg-white'
             )}>
-              <p className="text-3xl font-black text-neo-green">{score} pts</p>
+              <p className="text-3xl font-black text-neo-green">{score} {t('brain.drills.points')}</p>
               <div className="flex items-center justify-center gap-1">
                 <Gem className="w-4 h-4 text-neo-purple" />
                 <span className={isDarkMode ? 'text-neo-white' : 'text-neo-black'}>
-                  {rareWordsFound} rare words
+                  {rareWordsFound} {t('brain.drills.rareWords')}
                 </span>
               </div>
               <p className={cn('text-sm', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>

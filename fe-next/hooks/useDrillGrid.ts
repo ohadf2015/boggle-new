@@ -9,53 +9,7 @@ import {
   japaneseLetters,
   kanjiCompounds,
 } from '@/utils/consts';
-
-// Drill words by language - common 3-6 letter words for training
-const DRILL_WORDS: Record<Language, string[]> = {
-  en: [
-    'cat', 'dog', 'run', 'sun', 'hat', 'bat', 'rat', 'mat', 'sat', 'pat',
-    'ball', 'call', 'fall', 'tall', 'wall', 'mall', 'hall', 'bell', 'cell', 'tell',
-    'game', 'same', 'name', 'came', 'fame', 'tame', 'lame', 'dame', 'make', 'take',
-    'word', 'bird', 'herd', 'nerd', 'work', 'fork', 'cork', 'pork', 'born', 'corn',
-    'play', 'stay', 'clay', 'gray', 'pray', 'sway', 'away', 'okay', 'plan', 'scan',
-    'brain', 'train', 'drain', 'grain', 'plain', 'chain', 'claim', 'trail', 'snail', 'frail',
-  ],
-  he: [
-    'בית', 'מים', 'יד', 'עץ', 'אב', 'אם', 'בן', 'בת', 'גן', 'דג',
-    'עין', 'ראש', 'ילד', 'ספר', 'חבר', 'דלת', 'שמש', 'ירח', 'פרח', 'סוס',
-    'כלב', 'דבר', 'אדם', 'עולם', 'חלון', 'כוכב', 'אריה', 'נמר', 'זאב', 'דוב',
-    'לחם', 'חלב', 'מרק', 'זהב', 'כסף', 'ברזל', 'נהר', 'אגם', 'שיר', 'מלך',
-  ],
-  sv: [
-    'hus', 'dag', 'öga', 'öra', 'arm', 'ben', 'bok', 'bil', 'sol', 'väg',
-    'hund', 'katt', 'sten', 'berg', 'regn', 'vind', 'natt', 'ljus', 'mörk', 'vägg',
-    'golv', 'dörr', 'bord', 'stol', 'säng', 'lamp', 'glas', 'skål', 'fågel', 'träd',
-    'solen', 'måne', 'vatten', 'värld', 'plats', 'ljud', 'kraft', 'blom', 'himmel',
-  ],
-  ja: [
-    '日本', '東京', '学校', '先生', '学生', '友達', '家族', '会社', '仕事', '時間',
-    '天気', '音楽', '映画', '料理', '旅行', '電車', '新聞', '本', '犬', '猫',
-    '花', '木', '山', '川', '海', '空', '雨', '雪', '風', '雲',
-    '日本語', '図書館', '大学', '病院', '空港', '公園', '駅', '銀行',
-  ],
-  es: [
-    'sol', 'mar', 'pan', 'sal', 'luz', 'voz', 'paz', 'rey', 'ley', 'rio',
-    'casa', 'agua', 'vida', 'amor', 'mesa', 'luna', 'flor', 'rosa', 'vino', 'cafe',
-    'lago', 'pato', 'gato', 'perro', 'pera', 'mano', 'pelo', 'cara', 'boca', 'ojos',
-    'libro', 'mundo', 'lugar', 'gente', 'noche', 'playa', 'campo', 'monte', 'leche', 'carne',
-    'amigo', 'cielo', 'tierra', 'arbol', 'hoja', 'fiesta',
-  ],
-  fr: [
-    'chat', 'pain', 'lune', 'jour', 'nuit', 'rose', 'bleu', 'noir', 'vent', 'froid',
-    'arbre', 'fleur', 'monde', 'temps', 'ville', 'grand', 'petit', 'belle', 'force', 'place',
-    'chose', 'livre', 'chien', 'amour', 'jolie', 'maison', 'jardin', 'soleil', 'nature',
-  ],
-  de: [
-    'haus', 'baum', 'buch', 'hund', 'mond', 'berg', 'wald', 'meer', 'land', 'welt',
-    'zeit', 'brot', 'wein', 'rose', 'blau', 'gold', 'katze', 'sonne', 'stern', 'stadt',
-    'gross', 'klein', 'kraft', 'platz', 'sache', 'liebe', 'wasser', 'fluss', 'garten',
-  ],
-};
+import { normalizeHebrewWord } from '@/shared/utils/wordNormalization';
 
 // Letter frequency weights by language
 const LETTER_WEIGHTS: Record<Language, Record<string, number>> = {
@@ -157,9 +111,40 @@ function getRandomLetter(language: Language): string {
 }
 
 /**
+ * Fetch random words from dictionary API
+ */
+async function fetchRandomWords(
+  language: Language,
+  count: number = 15,
+  minLength: number = 3,
+  maxLength: number = 6
+): Promise<string[]> {
+  try {
+    const params = new URLSearchParams({
+      language,
+      count: count.toString(),
+      minLength: minLength.toString(),
+      maxLength: maxLength.toString(),
+    });
+    const response = await fetch(`/api/drills/random-words?${params}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch random words');
+    }
+    const data = await response.json();
+    return data.words || [];
+  } catch (error) {
+    console.error('Error fetching random words:', error);
+    return [];
+  }
+}
+
+/**
  * Generate a grid with some words placed intentionally
  */
-function generateDrillGrid(size: number = 5, language: Language = 'en'): { grid: LetterGrid; words: WordWithPath[] } {
+async function generateDrillGrid(
+  size: number = 5,
+  language: Language = 'en'
+): Promise<{ grid: LetterGrid; words: WordWithPath[] }> {
   // For Japanese, use special grid generation with kanji compounds
   if (language === 'ja') {
     return generateJapaneseDrillGrid(size);
@@ -172,21 +157,27 @@ function generateDrillGrid(size: number = 5, language: Language = 'en'): { grid:
 
   const placedWords: WordWithPath[] = [];
 
-  // Get words for the current language
-  const languageWords = DRILL_WORDS[language] || DRILL_WORDS['en'];
+  // Fetch random words from dictionary
+  const dictionaryWords = await fetchRandomWords(language, 20, 3, Math.min(6, size));
+  
+  // Fallback to empty array if fetch fails
+  const wordsToTry = dictionaryWords.length > 0 ? dictionaryWords : [];
 
-  // Try to place some words
-  const shuffledWords = [...languageWords].sort(() => Math.random() - 0.5);
-  const wordsToPlace = shuffledWords.slice(0, 10); // Try to place up to 10 words
-
-  for (const word of wordsToPlace) {
-    const normalizedWord = word.toUpperCase();
+  // Try to place words from dictionary
+  for (const word of wordsToTry) {
+    // Normalize word: uppercase for non-Hebrew, normalize Hebrew final letters
+    let normalizedWord = word.toUpperCase();
+    if (language === 'he') {
+      normalizedWord = normalizeHebrewWord(normalizedWord);
+    }
     const result = tryPlaceWord(grid, normalizedWord, size);
     if (result) {
       placedWords.push({
         word: normalizedWord,
         path: result,
       });
+      // Stop after placing 10 words
+      if (placedWords.length >= 10) break;
     }
   }
 
@@ -194,7 +185,12 @@ function generateDrillGrid(size: number = 5, language: Language = 'en'): { grid:
   for (let row = 0; row < size; row++) {
     for (let col = 0; col < size; col++) {
       if (!grid[row][col]) {
-        grid[row][col] = getRandomLetter(language);
+        let letter = getRandomLetter(language);
+        // Ensure Hebrew letters are normalized (no final letters on grid)
+        if (language === 'he') {
+          letter = normalizeHebrewWord(letter);
+        }
+        grid[row][col] = letter;
       }
     }
   }
@@ -205,16 +201,19 @@ function generateDrillGrid(size: number = 5, language: Language = 'en'): { grid:
 /**
  * Generate a Japanese drill grid with embedded kanji compounds
  */
-function generateJapaneseDrillGrid(size: number): { grid: LetterGrid; words: WordWithPath[] } {
+async function generateJapaneseDrillGrid(size: number): Promise<{ grid: LetterGrid; words: WordWithPath[] }> {
   const grid: (string | null)[][] = Array(size).fill(null).map(() =>
     Array(size).fill(null)
   );
   const placedWords: WordWithPath[] = [];
 
-  // Get Japanese words and kanji compounds
-  const languageWords = DRILL_WORDS['ja'];
-  const shuffledWords = [...languageWords].sort(() => Math.random() - 0.5);
-  const wordsToPlace = shuffledWords.slice(0, 8);
+  // Fetch random Japanese words from dictionary
+  const dictionaryWords = await fetchRandomWords('ja', 15, 2, 4);
+  
+  // Fallback to kanji compounds if dictionary fetch fails
+  const wordsToPlace = dictionaryWords.length > 0 
+    ? dictionaryWords.slice(0, 8)
+    : kanjiCompounds.slice(0, 8);
 
   for (const word of wordsToPlace) {
     // Try to place the word adjacently
@@ -367,12 +366,20 @@ export function useDrillGrid(gridSize: number = 5, language: Language = 'en'): U
   const [availableWords, setAvailableWords] = useState<WordWithPath[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const regenerate = useCallback(() => {
+  const regenerate = useCallback(async () => {
     setIsLoading(true);
-    const { grid: newGrid, words } = generateDrillGrid(gridSize, language);
-    setGrid(newGrid);
-    setAvailableWords(words);
-    setIsLoading(false);
+    try {
+      const { grid: newGrid, words } = await generateDrillGrid(gridSize, language);
+      setGrid(newGrid);
+      setAvailableWords(words);
+    } catch (error) {
+      console.error('Error generating drill grid:', error);
+      // Fallback to empty grid on error
+      setGrid(Array(gridSize).fill(null).map(() => Array(gridSize).fill('')));
+      setAvailableWords([]);
+    } finally {
+      setIsLoading(false);
+    }
   }, [gridSize, language]);
 
   // Generate initial grid

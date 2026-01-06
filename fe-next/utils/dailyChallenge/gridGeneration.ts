@@ -634,7 +634,11 @@ function embedMultipleWordsInGrid(
   ];
 
   // STEP 1: Embed the target word (REQUIRED)
-  const targetUpper = targetWord.toUpperCase();
+  // Normalize Hebrew final letters to regular letters for grid display
+  let targetUpper = targetWord.toUpperCase();
+  if (language === 'he') {
+    targetUpper = normalizeHebrewFinalLetters(targetUpper);
+  }
   let targetPlaced = false;
   const maxAttempts = 100;
 
@@ -685,7 +689,11 @@ function embedMultipleWordsInGrid(
     // Track same-length words separately
     const isSameLength = bonusWord.length === targetLength;
 
-    const wordUpper = bonusWord.toUpperCase();
+    // Normalize Hebrew final letters to regular letters for grid display
+    let wordUpper = bonusWord.toUpperCase();
+    if (language === 'he') {
+      wordUpper = normalizeHebrewFinalLetters(wordUpper);
+    }
     let wordPlaced = false;
 
     // Try a few random positions

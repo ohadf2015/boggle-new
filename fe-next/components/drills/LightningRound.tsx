@@ -7,7 +7,9 @@ import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
-import type { LetterGrid } from '@/types';
+import { isWordOnBoard } from '@/utils/utils';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import type { LetterGrid, Language } from '@/types';
 
 // Level configurations
 const LEVEL_CONFIGS = [
@@ -22,6 +24,7 @@ interface LightningRoundProps {
   grid: LetterGrid;
   availableWords: { word: string; path: { row: number; col: number }[] }[];
   level?: number;
+  language?: Language;
   onComplete: (result: {
     score: number;
     wordsFound: number;
@@ -44,11 +47,13 @@ export default function LightningRound({
   grid,
   availableWords,
   level = 1,
+  language = 'en',
   onComplete,
   onExit,
 }: LightningRoundProps) {
   const { theme } = useTheme();
   const { t } = useLanguage();
+  const { playErrorSound } = useSoundEffects();
   const isDarkMode = theme === 'dark';
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
@@ -58,6 +63,7 @@ export default function LightningRound({
   const [wordsFound, setWordsFound] = useState<string[]>([]);
   const [score, setScore] = useState(0);
   const [lastWordScore, setLastWordScore] = useState<number | null>(null);
+  const [feedback, setFeedback] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -93,19 +99,41 @@ export default function LightningRound({
 
     const upperWord = word.toUpperCase();
 
-    // Check if valid and not already found
-    if (availableWordSet.has(upperWord) && !wordsFound.includes(upperWord)) {
-      setWordsFound(prev => [...prev, upperWord]);
-
-      // Score based on word length (longer = more points)
-      const wordScore = word.length * 10;
-      setScore(prev => prev + wordScore);
-      setLastWordScore(wordScore);
-
-      // Clear score popup after animation
-      setTimeout(() => setLastWordScore(null), 500);
+    // Check if word can be formed on the board
+    if (!isWordOnBoard(upperWord, grid, language)) {
+      setFeedback({ message: t('brain.drills.errors.notOnBoard') || 'Word not on board', type: 'error' });
+      playErrorSound?.();
+      setTimeout(() => setFeedback(null), 2000);
+      return;
     }
-  }, [phase, availableWordSet, wordsFound]);
+
+    // Check if already found
+    if (wordsFound.includes(upperWord)) {
+      setFeedback({ message: t('brain.drills.errors.alreadyFound') || 'Already found', type: 'error' });
+      playErrorSound?.();
+      setTimeout(() => setFeedback(null), 2000);
+      return;
+    }
+
+    // Check if word is in available words list
+    if (!availableWordSet.has(upperWord)) {
+      setFeedback({ message: t('brain.drills.errors.invalidWord') || 'Invalid word', type: 'error' });
+      playErrorSound?.();
+      setTimeout(() => setFeedback(null), 2000);
+      return;
+    }
+
+    // Valid word!
+    setWordsFound(prev => [...prev, upperWord]);
+    const wordScore = word.length * 10;
+    setScore(prev => prev + wordScore);
+    setLastWordScore(wordScore);
+    setFeedback({ message: `+${wordScore} ${t('brain.drills.points')}`, type: 'success' });
+    setTimeout(() => {
+      setLastWordScore(null);
+      setFeedback(null);
+    }, 1000);
+  }, [phase, availableWordSet, wordsFound, grid, language, t, playErrorSound]);
 
   // Calculate results
   const getResults = useCallback(() => {
@@ -184,7 +212,7 @@ export default function LightningRound({
             'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
             isDarkMode ? 'bg-neo-yellow text-neo-black' : 'bg-neo-yellow text-neo-black'
           )}>
-            {score} pts
+            {score} {t('brain.drills.points')}
           </div>
 
           {/* Score popup */}
@@ -233,7 +261,7 @@ export default function LightningRound({
               isDarkMode ? 'bg-slate-800' : 'bg-white'
             )}>
               <p>{t('brain.drills.level')}: {level}</p>
-              <p>{t('brain.drills.timeSpent')}: {levelConfig.timeLimit}s</p>
+              <p>{t('brain.drills.timeLimit')}: {levelConfig.timeLimit}s</p>
             </div>
             <motion.button
               whileTap={{ scale: 0.95 }}
@@ -269,6 +297,25 @@ export default function LightningRound({
               onWordSubmit={handleWordSubmit}
               className="w-full"
             />
+
+            {/* Feedback message */}
+            <AnimatePresence>
+              {feedback && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className={cn(
+                    'text-center px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm',
+                    feedback.type === 'error'
+                      ? 'bg-neo-red text-neo-white'
+                      : 'bg-neo-green text-neo-black'
+                  )}
+                >
+                  {feedback.message}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Recent words */}
             {wordsFound.length > 0 && (
@@ -314,7 +361,7 @@ export default function LightningRound({
                 'text-3xl font-black',
                 isDarkMode ? 'text-neo-yellow' : 'text-neo-yellow'
               )}>
-                {score} pts
+                {score} {t('brain.drills.points')}
               </p>
               <p className={cn(
                 'text-sm',
@@ -326,7 +373,7 @@ export default function LightningRound({
                 'text-sm font-bold',
                 isDarkMode ? 'text-neo-cyan' : 'text-neo-purple'
               )}>
-                {getResults().wordsPerMinute} WPM
+                {getResults().wordsPerMinute} {t('brain.drills.wpm')}
               </p>
             </div>
             <div className="flex gap-3 justify-center">

@@ -137,17 +137,23 @@ export default function ScientificTipsCarousel() {
           </button>
 
           {/* Dots */}
-          <div className="flex items-center justify-center gap-1.5">
+          <div className="flex items-center justify-center gap-2">
             {TIPS.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setActiveIndex(index)}
                 aria-label={`Go to tip ${index + 1}`}
                 className={cn(
-                  'w-1.5 h-1.5 rounded-full transition-all',
+                  'w-2.5 h-2.5 rounded-full border-2 border-neo-black transition-all duration-300',
                   index === activeIndex
-                    ? isDarkMode ? 'bg-neo-yellow' : 'bg-neo-purple'
-                    : isDarkMode ? 'bg-slate-600' : 'bg-gray-300'
+                    ? cn(
+                        'scale-125 shadow-[2px_2px_0px_rgb(0,0,0)]',
+                        isDarkMode ? 'bg-neo-yellow' : 'bg-neo-purple'
+                      )
+                    : cn(
+                        'hover:scale-110',
+                        isDarkMode ? 'bg-slate-600 hover:bg-slate-500' : 'bg-gray-300 hover:bg-gray-400'
+                      )
                 )}
               />
             ))}

@@ -224,11 +224,14 @@ export const NAME_VALID_PATTERN = /^[\p{L}\p{N}\s._-]+$/u;
 
 /**
  * Sanitize a string to only contain valid room name characters
- * Removes any characters that don't match the NAME_VALID_PATTERN
+ * Removes any characters that don't match the backend validation pattern
+ * Backend allows: a-zA-Z0-9, spaces, dots, underscores, hyphens, and specific Unicode ranges
+ * (Hebrew: \u0590-\u05FF, Hiragana: \u3040-\u309F, Katakana: \u30A0-\u30FF, CJK: \u4E00-\u9FFF)
  * This ensures room names are compatible with backend validation
  */
 export function sanitizeRoomName(name: string): string {
-  // Remove any characters not in the allowed set
-  // Keep: letters (any language), numbers, spaces, dots, underscores, hyphens
-  return name.replace(/[^\p{L}\p{N}\s._-]/gu, '').trim();
+  if (!name) return '';
+  // Remove any characters not in the backend-allowed set
+  // Keep: a-zA-Z0-9, spaces, dots, underscores, hyphens, and specific Unicode ranges
+  return name.replace(/[^a-zA-Z0-9\s._\-\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]/g, '').trim();
 }

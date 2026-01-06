@@ -10,6 +10,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigation } from '@/contexts/NavigationContext';
 import MemoryHunt from '@/components/drills/MemoryHunt';
 import { useDrillGrid } from '@/hooks/useDrillGrid';
+import { useSaveDrillResult } from '@/hooks/useSaveDrillResult';
 
 /**
  * Memory Hunt Drill Page
@@ -23,6 +24,7 @@ export default function MemoryHuntPage() {
   const { t, language } = useLanguage();
   const { setIsInGame } = useNavigation();
   const isDarkMode = theme === 'dark';
+  const { saveDrillResult } = useSaveDrillResult();
 
   // Generate drill grid
   const { grid, availableWords, regenerate, isLoading } = useDrillGrid(5, language);
@@ -33,16 +35,24 @@ export default function MemoryHuntPage() {
     return () => setIsInGame(false);
   }, [setIsInGame]);
 
-  const handleComplete = useCallback((result: {
+  const handleComplete = useCallback(async (result: {
     score: number;
     wordsFound: number;
     totalWords: number;
     timeSpent: number;
     level: number;
   }) => {
-    // TODO: Save drill results to database
-    console.log('Drill completed:', result);
-  }, []);
+    await saveDrillResult({
+      drillType: 'memory-hunt',
+      level: result.level,
+      score: result.score,
+      durationSeconds: result.timeSpent,
+      wordsFound: result.wordsFound,
+      extraData: {
+        totalWords: result.totalWords,
+      },
+    });
+  }, [saveDrillResult]);
 
   const handleExit = useCallback(() => {
     router.push(`/${language}/brain`);
@@ -110,6 +120,7 @@ export default function MemoryHuntPage() {
           grid={grid}
           availableWords={availableWords}
           level={1}
+          language={language}
           onComplete={handleComplete}
           onExit={handleExit}
         />

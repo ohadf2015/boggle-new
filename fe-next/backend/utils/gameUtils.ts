@@ -119,10 +119,14 @@ export function filterHebrewWord(word: string): string {
 
 /**
  * Normalize letter for board display based on language
+ * For Hebrew, converts final letters to regular letters
  */
 export function normalizeLetterForBoard(letter: string, language: Language): string {
   if (language === 'en' || language === 'sv' || language === 'es') {
     return letter.toUpperCase();
+  }
+  if (language === 'he') {
+    return normalizeWord(letter, 'he');
   }
   return letter;
 }
@@ -270,8 +274,9 @@ function generateTableWithEmbeddedWords(
   wordsToEmbed: string[],
   language: Language
 ): LetterGrid {
+  // For Hebrew, normalize final letters to regular letters before embedding
   const cleanedWords = language === 'he'
-    ? wordsToEmbed.map(filterHebrewWord).filter(w => w.length >= 2)
+    ? wordsToEmbed.map(w => normalizeWord(w, 'he')).filter(w => w.length >= 2)
     : wordsToEmbed;
 
   const sortedWords = [...cleanedWords].sort((a, b) => b.length - a.length);

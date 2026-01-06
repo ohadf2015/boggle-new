@@ -10,6 +10,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigation } from '@/contexts/NavigationContext';
 import PatternSwitcher from '@/components/drills/PatternSwitcher';
 import { useDrillGrid } from '@/hooks/useDrillGrid';
+import { useSaveDrillResult } from '@/hooks/useSaveDrillResult';
 
 /**
  * Pattern Switcher Drill Page
@@ -23,6 +24,7 @@ export default function PatternSwitcherPage() {
   const { t, language } = useLanguage();
   const { setIsInGame } = useNavigation();
   const isDarkMode = theme === 'dark';
+  const { saveDrillResult } = useSaveDrillResult();
 
   // Generate drill grid
   const { grid, availableWords, isLoading } = useDrillGrid(5, language);
@@ -33,16 +35,24 @@ export default function PatternSwitcherPage() {
     return () => setIsInGame(false);
   }, [setIsInGame]);
 
-  const handleComplete = useCallback((result: {
+  const handleComplete = useCallback(async (result: {
     score: number;
     patternsCompleted: number;
     wordsFound: number;
     timeSpent: number;
     level: number;
   }) => {
-    // TODO: Save drill results to database
-    console.log('Pattern Switcher completed:', result);
-  }, []);
+    await saveDrillResult({
+      drillType: 'pattern-switcher',
+      level: result.level,
+      score: result.score,
+      durationSeconds: result.timeSpent,
+      wordsFound: result.wordsFound,
+      extraData: {
+        patternsCompleted: result.patternsCompleted,
+      },
+    });
+  }, [saveDrillResult]);
 
   const handleExit = useCallback(() => {
     router.push(`/${language}/brain`);
@@ -110,6 +120,7 @@ export default function PatternSwitcherPage() {
           grid={grid}
           availableWords={availableWords}
           level={1}
+          language={language}
           onComplete={handleComplete}
           onExit={handleExit}
         />

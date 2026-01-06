@@ -22,6 +22,7 @@ import logger from '@/utils/logger';
 import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
 import { getStoredUsername, setStoredUsername, getStoredAvatarId } from '@/utils/profileStorage';
 import { captureSocketError, addSocketEventBreadcrumb, addGameBreadcrumb, isExpectedError } from '@/utils/sentry';
+import { sanitizeRoomName } from '@/utils/consts';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 
 interface ResultsData {
@@ -1151,7 +1152,7 @@ export default function MultiplayerPage(): React.JSX.Element {
       const finalHostUsername = user ? effectiveUsername : (hostUsername || effectiveUsername);
       // Use overrideRoomName if provided (from direct submission), or fall back to state, or generate default
       // Use dash instead of apostrophe to avoid validation issues with special characters
-      const finalRoomName = overrideRoomName || roomName || `${finalHostUsername} Room`;
+      const finalRoomName = sanitizeRoomName(overrideRoomName || roomName || `${finalHostUsername} Room`);
 
       // For guest hosts, use the finalHostUsername for avatar generation
       const hostAvatar = profile

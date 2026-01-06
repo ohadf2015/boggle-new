@@ -25,6 +25,7 @@ import {
   setStoredAvatarId,
 } from '@/utils/profileStorage';
 import { AVATARS, getAvatarPath, getRandomAvatar } from '@/utils/avatarConfig';
+import { sanitizeRoomName } from '@/utils/consts';
 import type { Language } from '@/shared/types/game';
 
 interface CreateRoomConfig {
@@ -122,7 +123,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   const generateRoomName = useCallback((hostName: string): string => {
     // Sanitize room name - remove apostrophes and special chars
     const sanitized = hostName.replace(/[']/g, '').trim();
-    return `${sanitized}'s Room`;
+    return `${sanitized} Room`;
   }, []);
 
   // Handle create submission
@@ -135,8 +136,8 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
       setStoredAvatarId(avatarId);
     }
 
-    // Use provided room name or generate one
-    const finalRoomName = roomName.trim() || generateRoomName(username.trim());
+    // Use provided room name or generate one, then sanitize for backend compatibility
+    const finalRoomName = sanitizeRoomName(roomName.trim() || generateRoomName(username.trim()));
 
     onCreate({
       hostUsername: username.trim(),

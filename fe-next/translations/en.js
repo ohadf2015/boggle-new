@@ -3559,8 +3559,26 @@ const en = {
       "gameOver": "Game Over",
       "wordsFound": "words found",
       "timeSpent": "Time",
+      "timeLimit": "Time limit",
       "playAgain": "Play Again",
       "exit": "Exit",
+      "points": "pts",
+      "wpm": "WPM",
+      "letters": "letters",
+      "target": "Target",
+      "timer": "Timer",
+      "perWord": "per word",
+      "maxCombo": "Max Combo",
+      "patterns": "Patterns",
+      "patternLength": "Pattern length",
+      "targetRareWords": "Target rare words",
+      "rareWords": "rare words",
+      "rarity": {
+        "common": "common",
+        "uncommon": "uncommon",
+        "rare": "rare",
+        "legendary": "legendary"
+      },
       "lightning-round": {
         "name": "Lightning Round",
         "description": "Find words as fast as possible"
@@ -3577,7 +3595,9 @@ const en = {
       },
       "combo-master": {
         "name": "Combo Master",
-        "description": "Maintain combo streaks without breaks"
+        "description": "Maintain combo streaks without breaks",
+        "targetCombo": "Target: x{combo} combo",
+        "timerPerWord": "Timer: {time}s per word"
       },
       "pattern-switcher": {
         "name": "Pattern Switcher",
@@ -3590,7 +3610,14 @@ const en = {
       "locked": "Locked",
       "unlock": "Complete level {{level}} to unlock",
       "unlockRequirement": "Play {{games}} more games to unlock",
-      "unlockHint": "Play more games to unlock this drill!"
+      "unlockHint": "Play more games to unlock this drill!",
+      "errors": {
+        "notOnBoard": "Word not on board",
+        "alreadyFound": "Already found",
+        "invalidWord": "Invalid word",
+        "wrongLength": "Wrong length",
+        "notInTarget": "Not a target word"
+      }
     },
     "tips": {
       "title": "Did You Know?",

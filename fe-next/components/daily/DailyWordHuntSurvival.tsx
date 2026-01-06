@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
@@ -8,6 +8,7 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useScreenshotProtection } from '@/hooks/useScreenshotProtection';
 import { useContextualGuidance, useSwipeTipGuidanceTrigger } from '@/hooks/useContextualGuidance';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
 import { WordFeedbackToast } from './WordFeedbackToast';
@@ -53,6 +54,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 }) => {
   const { t } = useLanguage();
   const isLandscape = useMobileLandscape();
+  const setIsInGame = useHideNavigation();
 
   // Performance optimization for low-end devices
   const { isLowEnd, enableComplexAnimations } = useDevicePerformance();
@@ -94,6 +96,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     isGameActive,
     15
   );
+
+  // Hide bottom navigation during active gameplay
+  useEffect(() => {
+    setIsInGame(isGameActive);
+    return () => setIsInGame(false);
+  }, [isGameActive, setIsInGame]);
 
   // Handle quit flow
   const handleQuitConfirm = () => {

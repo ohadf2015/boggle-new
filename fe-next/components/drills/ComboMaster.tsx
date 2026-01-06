@@ -7,7 +7,10 @@ import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
-import type { LetterGrid } from '@/types';
+import { isWordOnBoard } from '@/utils/utils';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { AnimatePresence, motion } from 'framer-motion';
+import type { LetterGrid, Language } from '@/types';
 
 // Level configurations
 const LEVEL_CONFIGS = [
@@ -22,6 +25,7 @@ interface ComboMasterProps {
   grid: LetterGrid;
   availableWords: { word: string; path: { row: number; col: number }[] }[];
   level?: number;
+  language?: Language;
   onComplete: (result: {
     score: number;
     maxCombo: number;
@@ -44,11 +48,13 @@ export default function ComboMaster({
   grid,
   availableWords,
   level = 1,
+  language = 'en',
   onComplete,
   onExit,
 }: ComboMasterProps) {
   const { theme } = useTheme();
   const { t } = useLanguage();
+  const { playErrorSound } = useSoundEffects();
   const isDarkMode = theme === 'dark';
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
@@ -60,6 +66,7 @@ export default function ComboMaster({
   const [wordsFound, setWordsFound] = useState<string[]>([]);
   const [score, setScore] = useState(0);
   const [comboBreaks, setComboBreaks] = useState(0);
+  const [feedback, setFeedback] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const comboTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -112,30 +119,48 @@ export default function ComboMaster({
 
     const upperWord = word.toUpperCase();
 
-    if (availableWordSet.has(upperWord) && !wordsFound.includes(upperWord)) {
-      setWordsFound(prev => [...prev, upperWord]);
-
-      // Increase combo
-      const newCombo = combo + 1;
-      setCombo(newCombo);
-      setMaxCombo(prev => Math.max(prev, newCombo));
-
-      // Score with combo multiplier
-      const baseScore = word.length * 10;
-      const comboMultiplier = 1 + (newCombo * 0.1);
-      const wordScore = Math.round(baseScore * comboMultiplier);
-      setScore(prev => prev + wordScore);
-
-      // Reset combo timer
-      startComboTimer();
-
-      // Check for target combo win
-      if (newCombo >= levelConfig.targetCombo) {
-        if (comboTimerRef.current) clearInterval(comboTimerRef.current);
-        setPhase('complete');
-      }
+    // Check if word can be formed on the board
+    if (!isWordOnBoard(upperWord, grid, language)) {
+      setFeedback({ message: t('brain.drills.errors.notOnBoard') || 'Word not on board', type: 'error' });
+      playErrorSound?.();
+      setTimeout(() => setFeedback(null), 2000);
+      return;
     }
-  }, [phase, availableWordSet, wordsFound, combo, startComboTimer, levelConfig.targetCombo]);
+
+    // Check if already found
+    if (wordsFound.includes(upperWord)) {
+      setFeedback({ message: t('brain.drills.errors.alreadyFound') || 'Already found', type: 'error' });
+      playErrorSound?.();
+      setTimeout(() => setFeedback(null), 2000);
+      return;
+    }
+
+    // Check if word is in available words list
+    if (!availableWordSet.has(upperWord)) {
+      setFeedback({ message: t('brain.drills.errors.invalidWord') || 'Invalid word', type: 'error' });
+      playErrorSound?.();
+      setTimeout(() => setFeedback(null), 2000);
+      return;
+    }
+
+    // Valid word!
+    setWordsFound(prev => [...prev, upperWord]);
+    const newCombo = combo + 1;
+    setCombo(newCombo);
+    setMaxCombo(prev => Math.max(prev, newCombo));
+    const baseScore = word.length * 10;
+    const comboMultiplier = 1 + (newCombo * 0.1);
+    const wordScore = Math.round(baseScore * comboMultiplier);
+    setScore(prev => prev + wordScore);
+    setFeedback({ message: `+${wordScore} ${t('brain.drills.points')} x${newCombo}`, type: 'success' });
+    setTimeout(() => setFeedback(null), 1000);
+    startComboTimer();
+
+    if (newCombo >= levelConfig.targetCombo) {
+      if (comboTimerRef.current) clearInterval(comboTimerRef.current);
+      setPhase('complete');
+    }
+  }, [phase, availableWordSet, wordsFound, combo, startComboTimer, levelConfig.targetCombo, grid, language, t, playErrorSound]);
 
   // Calculate results
   const getResults = useCallback(() => {
@@ -218,7 +243,7 @@ export default function ComboMaster({
           'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
           isDarkMode ? 'bg-neo-orange text-neo-black' : 'bg-neo-orange text-neo-black'
         )}>
-          {score} pts
+          {score} {t('brain.drills.points')}
         </div>
       </div>
 
@@ -267,8 +292,8 @@ export default function ComboMaster({
               isDarkMode ? 'bg-slate-800' : 'bg-white'
             )}>
               <p>{t('brain.drills.level')}: {level}</p>
-              <p>Target: x{levelConfig.targetCombo} combo</p>
-              <p>Timer: {levelConfig.comboTimeout}s per word</p>
+              <p>{t('brain.drills.combo-master.targetCombo', { combo: levelConfig.targetCombo })}</p>
+              <p>{t('brain.drills.combo-master.timerPerWord', { time: levelConfig.comboTimeout })}</p>
             </div>
             <motion.button
               whileTap={{ scale: 0.95 }}
@@ -293,7 +318,7 @@ export default function ComboMaster({
                 'font-bold',
                 isDarkMode ? 'text-neo-white' : 'text-neo-black'
               )}>
-                Target: x{levelConfig.targetCombo}
+                {t('brain.drills.target')}: x{levelConfig.targetCombo}
               </span>
               <Timer className="w-4 h-4 text-neo-cyan ml-2" />
               <span className={cn(
@@ -311,6 +336,25 @@ export default function ComboMaster({
               comboLevel={combo}
               className="w-full"
             />
+
+            {/* Feedback message */}
+            <AnimatePresence>
+              {feedback && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className={cn(
+                    'text-center px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm',
+                    feedback.type === 'error'
+                      ? 'bg-neo-red text-neo-white'
+                      : 'bg-neo-green text-neo-black'
+                  )}
+                >
+                  {feedback.message}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
 
@@ -336,13 +380,13 @@ export default function ComboMaster({
               isDarkMode ? 'bg-slate-800' : 'bg-white'
             )}>
               <p className="text-3xl font-black text-neo-orange">
-                {score} pts
+                {score} {t('brain.drills.points')}
               </p>
               <p className={cn(
                 'text-lg font-bold',
                 isDarkMode ? 'text-neo-cyan' : 'text-neo-purple'
               )}>
-                Max Combo: x{maxCombo}
+                {t('brain.drills.maxCombo')}: x{maxCombo}
               </p>
               <p className={cn(
                 'text-sm',

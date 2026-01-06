@@ -7,7 +7,9 @@ import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
-import type { LetterGrid } from '@/types';
+import { isWordOnBoard } from '@/utils/utils';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import type { LetterGrid, Language } from '@/types';
 
 // Level configurations
 const LEVEL_CONFIGS = [
@@ -22,6 +24,7 @@ interface PatternSwitcherProps {
   grid: LetterGrid;
   availableWords: { word: string; path: { row: number; col: number }[] }[];
   level?: number;
+  language?: Language;
   onComplete: (result: {
     score: number;
     patternsCompleted: number;
@@ -44,11 +47,13 @@ export default function PatternSwitcher({
   grid,
   availableWords,
   level = 1,
+  language = 'en',
   onComplete,
   onExit,
 }: PatternSwitcherProps) {
   const { theme } = useTheme();
   const { t } = useLanguage();
+  const { playErrorSound } = useSoundEffects();
   const isDarkMode = theme === 'dark';
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
@@ -96,10 +101,29 @@ export default function PatternSwitcher({
     if (phase !== 'playing') return;
 
     const upperWord = word.toUpperCase();
-    const wordExists = availableWords.some(w => w.word.toUpperCase() === upperWord);
 
+    // Check if word can be formed on the board
+    if (!isWordOnBoard(upperWord, grid, language)) {
+      setLastFeedback('wrong');
+      setPhase('feedback');
+      playErrorSound?.();
+      setTimeout(() => {
+        setLastFeedback(null);
+        setPhase('playing');
+      }, 500);
+      return;
+    }
+
+    const wordExists = availableWords.some(w => w.word.toUpperCase() === upperWord);
     if (!wordExists || wordsFound.includes(upperWord)) {
-      return; // Invalid word, ignore
+      setLastFeedback('wrong');
+      setPhase('feedback');
+      playErrorSound?.();
+      setTimeout(() => {
+        setLastFeedback(null);
+        setPhase('playing');
+      }, 500);
+      return;
     }
 
     if (word.length === requiredLength) {
@@ -136,6 +160,7 @@ export default function PatternSwitcher({
       setLives(prev => prev - 1);
       setLastFeedback('wrong');
       setPhase('feedback');
+      playErrorSound?.();
 
       setTimeout(() => {
         setLastFeedback(null);
@@ -146,7 +171,7 @@ export default function PatternSwitcher({
         }
       }, 500);
     }
-  }, [phase, availableWords, wordsFound, requiredLength, patternIndex, pattern, lives, generatePattern]);
+  }, [phase, availableWords, wordsFound, requiredLength, patternIndex, pattern, lives, generatePattern, grid, language, playErrorSound]);
 
   // Results
   const getResults = useCallback(() => {
@@ -186,7 +211,7 @@ export default function PatternSwitcher({
             'px-4 py-2 rounded-neo border-3 border-neo-black font-black text-xl',
             'bg-neo-cyan text-neo-black'
           )}>
-            {requiredLength} letters
+            {requiredLength} {t('brain.drills.letters')}
           </div>
 
           {/* Lives */}
@@ -207,7 +232,7 @@ export default function PatternSwitcher({
           'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
           'bg-neo-cyan text-neo-black'
         )}>
-          {score} pts
+          {score} {t('brain.drills.points')}
         </div>
       </div>
 
@@ -259,7 +284,7 @@ export default function PatternSwitcher({
               isDarkMode ? 'bg-slate-800' : 'bg-white'
             )}>
               <p>{t('brain.drills.level')}: {level}</p>
-              <p>Pattern length: {levelConfig.patternLength}</p>
+              <p>{t('brain.drills.patternLength')}: {levelConfig.patternLength}</p>
             </div>
             <motion.button
               whileTap={{ scale: 0.95 }}
@@ -319,9 +344,9 @@ export default function PatternSwitcher({
               'p-4 rounded-neo border-3 border-neo-black space-y-2',
               isDarkMode ? 'bg-slate-800' : 'bg-white'
             )}>
-              <p className="text-3xl font-black text-neo-cyan">{score} pts</p>
+              <p className="text-3xl font-black text-neo-cyan">{score} {t('brain.drills.points')}</p>
               <p className={cn('text-sm', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
-                Patterns: {patternsCompleted}
+                {t('brain.drills.patterns')}: {patternsCompleted}
               </p>
               <p className={cn('text-sm', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
                 {wordsFound.length} {t('brain.drills.wordsFound')}

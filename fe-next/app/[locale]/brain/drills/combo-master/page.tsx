@@ -10,6 +10,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigation } from '@/contexts/NavigationContext';
 import ComboMaster from '@/components/drills/ComboMaster';
 import { useDrillGrid } from '@/hooks/useDrillGrid';
+import { useSaveDrillResult } from '@/hooks/useSaveDrillResult';
 
 /**
  * Combo Master Drill Page
@@ -23,6 +24,7 @@ export default function ComboMasterPage() {
   const { t, language } = useLanguage();
   const { setIsInGame } = useNavigation();
   const isDarkMode = theme === 'dark';
+  const { saveDrillResult } = useSaveDrillResult();
 
   // Generate drill grid
   const { grid, availableWords, isLoading } = useDrillGrid(5, language);
@@ -33,16 +35,24 @@ export default function ComboMasterPage() {
     return () => setIsInGame(false);
   }, [setIsInGame]);
 
-  const handleComplete = useCallback((result: {
+  const handleComplete = useCallback(async (result: {
     score: number;
     maxCombo: number;
     wordsFound: number;
     timeSpent: number;
     level: number;
   }) => {
-    // TODO: Save drill results to database
-    console.log('Combo Master completed:', result);
-  }, []);
+    await saveDrillResult({
+      drillType: 'combo-master',
+      level: result.level,
+      score: result.score,
+      durationSeconds: result.timeSpent,
+      wordsFound: result.wordsFound,
+      extraData: {
+        maxCombo: result.maxCombo,
+      },
+    });
+  }, [saveDrillResult]);
 
   const handleExit = useCallback(() => {
     router.push(`/${language}/brain`);
@@ -110,6 +120,7 @@ export default function ComboMasterPage() {
           grid={grid}
           availableWords={availableWords}
           level={1}
+          language={language}
           onComplete={handleComplete}
           onExit={handleExit}
         />

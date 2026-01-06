@@ -7,7 +7,9 @@ import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent, { HighlightedCell } from '@/components/GridComponent';
-import type { LetterGrid } from '@/types';
+import { isWordOnBoard } from '@/utils/utils';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import type { LetterGrid, Language } from '@/types';
 
 // Level configurations
 const LEVEL_CONFIGS = [
@@ -28,6 +30,7 @@ interface MemoryHuntProps {
   grid: LetterGrid;
   availableWords: { word: string; path: { row: number; col: number }[] }[];
   level?: number;
+  language?: Language;
   onComplete: (result: {
     score: number;
     wordsFound: number;
@@ -52,11 +55,13 @@ export default function MemoryHunt({
   grid,
   availableWords,
   level = 1,
+  language = 'en',
   onComplete,
   onExit,
 }: MemoryHuntProps) {
   const { theme } = useTheme();
   const { t } = useLanguage();
+  const { playErrorSound } = useSoundEffects();
   const isDarkMode = theme === 'dark';
 
   // Get level config
@@ -146,6 +151,19 @@ export default function MemoryHunt({
     if (phase !== 'recall') return;
 
     const upperWord = word.toUpperCase();
+
+    // Check if word can be formed on the board
+    if (!isWordOnBoard(upperWord, grid, language)) {
+      setLastFeedback('wrong');
+      setPhase('feedback');
+      playErrorSound?.();
+      setTimeout(() => {
+        setLastFeedback(null);
+        setPhase('recall');
+      }, 800);
+      return;
+    }
+
     const targetIndex = targetWords.findIndex(
       tw => tw.word === upperWord && !tw.found
     );
@@ -207,8 +225,9 @@ export default function MemoryHunt({
       });
       setLastFeedback('wrong');
       setPhase('feedback');
+      playErrorSound?.();
     }
-  }, [phase, targetWords, round, startRound]);
+  }, [phase, targetWords, round, startRound, grid, language, playErrorSound]);
 
   // Calculate final results
   const results = useMemo(() => {
@@ -275,7 +294,7 @@ export default function MemoryHunt({
           'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
           isDarkMode ? 'bg-neo-purple text-neo-white' : 'bg-neo-yellow text-neo-black'
         )}>
-          {score} pts
+          {score} {t('brain.drills.points')}
         </div>
       </div>
 
@@ -495,7 +514,7 @@ export default function MemoryHunt({
                 'text-3xl font-black',
                 isDarkMode ? 'text-neo-purple' : 'text-neo-purple'
               )}>
-                {results.score} pts
+                {results.score} {t('brain.drills.points')}
               </p>
               <p className={cn(
                 'text-sm',
