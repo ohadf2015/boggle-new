@@ -1,8 +1,7 @@
 'use client';
 
-import React from 'react';
+import React, { memo, useMemo, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
 import { Gamepad2, Brain, User } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useNavigation } from '../../contexts/NavigationContext';
@@ -19,51 +18,52 @@ interface NavTab {
  * Global Bottom Navigation for mobile devices.
  * Fixed at the bottom of the screen, hidden during active gameplay.
  * Provides navigation between Home, Brain Training, and Profile.
+ * Memoized to prevent unnecessary re-renders.
  */
-export function GlobalBottomNav() {
+export const GlobalBottomNav = memo(function GlobalBottomNav() {
   const router = useRouter();
   const pathname = usePathname();
   const { isInGame } = useNavigation();
   const { t, language } = useLanguage();
 
-  // Don't render on desktop or during gameplay
-  if (isInGame) {
-    return null;
-  }
-
-  const tabs: NavTab[] = [
+  // Memoize tabs to prevent recreation on every render
+  const tabs: NavTab[] = useMemo(() => [
     {
-      id: 'home',
+      id: 'home' as const,
       icon: <Gamepad2 className="w-6 h-6" />,
       labelKey: 'brain.nav.home',
       href: `/${language}`,
     },
     {
-      id: 'brain',
+      id: 'brain' as const,
       icon: <Brain className="w-6 h-6" />,
       labelKey: 'brain.nav.brain',
       href: `/${language}/brain`,
     },
     {
-      id: 'profile',
+      id: 'profile' as const,
       icon: <User className="w-6 h-6" />,
       labelKey: 'brain.nav.profile',
       href: `/${language}/profile`,
     },
-  ];
+  ], [language]);
 
-  // Determine active tab from pathname
-  const getActiveTab = (): 'home' | 'brain' | 'profile' => {
+  // Determine active tab from pathname - memoized
+  const activeTab = useMemo((): 'home' | 'brain' | 'profile' => {
     if (pathname?.includes('/brain')) return 'brain';
     if (pathname?.includes('/profile')) return 'profile';
     return 'home';
-  };
+  }, [pathname]);
 
-  const activeTab = getActiveTab();
-
-  const handleNavigation = (tab: NavTab) => {
+  // Memoize navigation handler
+  const handleNavigation = useCallback((tab: NavTab) => {
     router.push(tab.href);
-  };
+  }, [router]);
+
+  // Don't render on desktop or during gameplay
+  if (isInGame) {
+    return null;
+  }
 
   return (
     <nav
@@ -80,42 +80,43 @@ export function GlobalBottomNav() {
           const isActive = activeTab === tab.id;
 
           return (
-            <motion.button
+            <button
               key={tab.id}
               onClick={() => handleNavigation(tab)}
-              whileTap={{ scale: 0.95 }}
               className={cn(
                 'flex flex-col items-center justify-center',
                 'px-6 py-2 min-w-[72px]',
                 'transition-all duration-150',
+                'active:scale-95', // CSS-based tap animation (replaces whileTap)
                 isActive
                   ? 'text-neo-yellow'
                   : 'text-neo-white/60 hover:text-neo-white/80'
               )}
             >
-              <motion.div
-                className="relative"
-                animate={isActive ? { scale: 1.1 } : { scale: 1 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              <div
+                className={cn(
+                  'relative transition-transform duration-300 ease-out',
+                  isActive ? 'scale-110' : 'scale-100'
+                )}
               >
                 {tab.icon}
                 {isActive && (
-                  <motion.div
-                    layoutId="nav-indicator"
+                  <div
                     className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-neo-yellow rounded-full"
-                    initial={false}
                   />
                 )}
-              </motion.div>
+              </div>
               <span className="text-[10px] font-bold uppercase tracking-wider mt-1">
                 {t(tab.labelKey) || tab.id}
               </span>
-            </motion.button>
+            </button>
           );
         })}
       </div>
     </nav>
   );
-}
+});
+
+GlobalBottomNav.displayName = 'GlobalBottomNav';
 
 export default GlobalBottomNav;

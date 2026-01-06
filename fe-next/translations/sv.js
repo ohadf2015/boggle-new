@@ -3575,7 +3575,9 @@ const sv = {
         "description": "Upptäck ovanliga och sällsynta ord"
       },
       "locked": "Låst",
-      "unlock": "Slutför nivå {{level}} för att låsa upp"
+      "unlock": "Slutför nivå {{level}} för att låsa upp",
+      "unlockRequirement": "Spela {{games}} fler spel för att låsa upp",
+      "unlockHint": "Spela fler spel för att låsa upp denna övning!"
     },
     "tips": {
       "title": "Visste du?",

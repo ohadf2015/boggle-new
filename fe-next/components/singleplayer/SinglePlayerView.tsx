@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
@@ -97,7 +97,8 @@ const SinglePlayerView: React.FC = () => {
   const setIsInGame = useHideNavigation();
 
   // Hide bottom navigation during gameplay
-  useEffect(() => {
+  // Use useLayoutEffect to set state synchronously before paint to prevent nav flash
+  useLayoutEffect(() => {
     setIsInGame(phase === 'playing');
     return () => setIsInGame(false);
   }, [phase, setIsInGame]);

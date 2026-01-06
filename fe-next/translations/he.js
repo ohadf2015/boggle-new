@@ -3576,7 +3576,9 @@ const he = {
         "description": "גלה מילים לא נפוצות ונדירות"
       },
       "locked": "נעול",
-      "unlock": "השלם רמה {{level}} לפתיחה"
+      "unlock": "השלם רמה {{level}} לפתיחה",
+      "unlockRequirement": "שחק {{games}} משחקים נוספים לפתיחה",
+      "unlockHint": "שחק עוד משחקים כדי לפתוח את התרגיל הזה!"
     },
     "tips": {
       "title": "הידעת?",

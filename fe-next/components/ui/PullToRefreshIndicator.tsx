@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, ArrowDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -16,8 +16,9 @@ interface PullToRefreshIndicatorProps {
  * PullToRefreshIndicator - Visual feedback for pull-to-refresh
  *
  * Shows a rotating refresh icon that indicates pull progress
+ * Memoized to prevent unnecessary re-renders
  */
-export const PullToRefreshIndicator: React.FC<PullToRefreshIndicatorProps> = ({
+export const PullToRefreshIndicator = memo<PullToRefreshIndicatorProps>(({
   pullDistance,
   isRefreshing,
   threshold,
@@ -89,4 +90,6 @@ export const PullToRefreshIndicator: React.FC<PullToRefreshIndicatorProps> = ({
       )}
     </AnimatePresence>
   );
-};
+});
+
+PullToRefreshIndicator.displayName = 'PullToRefreshIndicator';

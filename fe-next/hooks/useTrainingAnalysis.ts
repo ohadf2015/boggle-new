@@ -12,13 +12,13 @@ import {
 } from '@/utils/trainingProgressStorage';
 
 // Minimum words before showing hints (give player a chance to explore)
-const MIN_WORDS_BEFORE_HINTS = 1;
+const MIN_WORDS_BEFORE_HINTS = 5;
 
 // Time (ms) without finding a word before showing a hint ("stuck" detection)
-const STUCK_THRESHOLD_MS = 20000;
+const STUCK_THRESHOLD_MS = 40000;
 
 // Time between showing different hints
-const HINT_COOLDOWN_MS = 30000;
+const HINT_COOLDOWN_MS = 60000;
 
 // Maximum hints to show per session (prevent hint fatigue)
 const MAX_HINTS_PER_SESSION = 3;
@@ -142,16 +142,16 @@ export function useTrainingAnalysis(options: UseTrainingAnalysisOptions): UseTra
       }
     };
 
-    // Update immediately and then periodically (every 5 seconds)
+    // Update immediately and then periodically (every 10 seconds)
     updateGapsAndCheckStuck();
-    const interval = setInterval(updateGapsAndCheckStuck, 5000);
+    const interval = setInterval(updateGapsAndCheckStuck, 10000);
 
     return () => clearInterval(interval);
   }, [enabled, onTrainingComplete]);
 
   /**
    * Determine which hint to show based on current gaps and context
-   * Only shows hints when player appears stuck (20+ seconds since last word)
+   * Only shows hints when player appears stuck (40+ seconds since last word)
    * Limited to 2 key skills: diagonal and directionChange
    * Maximum 3 hints per session to prevent fatigue
    */
@@ -168,10 +168,10 @@ export function useTrainingAnalysis(options: UseTrainingAnalysisOptions): UseTra
     // Don't exceed max hints per session (prevent hint fatigue)
     if (totalHintsShownRef.current >= MAX_HINTS_PER_SESSION) return null;
 
-    // Only show hints when player is stuck (20+ seconds without finding a word)
+    // Only show hints when player is stuck (40+ seconds without finding a word)
     if (timeSinceLastWord < STUCK_THRESHOLD_MS) return null;
 
-    // Don't show hints too frequently (30s cooldown)
+    // Don't show hints too frequently (60s cooldown)
     if (timeSinceLastHint < HINT_COOLDOWN_MS && lastHintTimeRef.current > 0) return null;
 
     const gaps = getSkillGaps();

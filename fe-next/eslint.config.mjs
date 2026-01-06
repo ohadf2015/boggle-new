@@ -18,6 +18,8 @@ const eslintConfig = defineConfig([
       // and data fetching (setState after async operations in effects)
       "react-hooks/set-state-in-effect": "off",
       "react-hooks/refs": "off",
+      // Prevent duplicate imports (caught build error)
+      "no-duplicate-imports": "error",
     },
   },
 ]);

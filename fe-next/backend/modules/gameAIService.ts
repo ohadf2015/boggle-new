@@ -575,7 +575,7 @@ export class GameAIService {
       this.model = this.vertexAI.getGenerativeModel({
         model: process.env.VERTEX_AI_MODEL || 'gemini-1.5-flash-002',
         generationConfig: {
-          maxOutputTokens: 256,
+          maxOutputTokens: 1024, // Increased to prevent truncation
           temperature: 0.1, // Low temperature for consistent validation
         },
       });
@@ -769,6 +769,15 @@ export class GameAIService {
 
     const result = await withRetry(async () => {
       const response = await this.model!.generateContent(prompt);
+      const candidate = response.response?.candidates?.[0];
+      
+      // Check if response was truncated
+      if (candidate?.finishReason === 'MAX_TOKENS' || candidate?.finishReason === 'OTHER') {
+        const error = new Error('AI response truncated');
+        error.name = 'TruncatedResponseError';
+        throw error;
+      }
+      
       return response;
     }, `validateWithAI("${word}")`);
 
@@ -906,6 +915,15 @@ export class GameAIService {
 
     const result = await withRetry(async () => {
       const response = await this.batchModel!.generateContent(prompt);
+      const candidate = response.response?.candidates?.[0];
+      
+      // Check if response was truncated
+      if (candidate?.finishReason === 'MAX_TOKENS' || candidate?.finishReason === 'OTHER') {
+        const error = new Error('AI response truncated');
+        error.name = 'TruncatedResponseError';
+        throw error;
+      }
+      
       return response;
     }, `batchValidateWithAI(${words.length} words)`);
 

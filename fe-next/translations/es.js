@@ -3572,7 +3572,9 @@ const es = {
         "description": "Descubre palabras poco comunes y raras"
       },
       "locked": "Bloqueado",
-      "unlock": "Completa nivel {{level}} para desbloquear"
+      "unlock": "Completa nivel {{level}} para desbloquear",
+      "unlockRequirement": "Juega {{games}} juegos más para desbloquear",
+      "unlockHint": "¡Juega más juegos para desbloquear este ejercicio!"
     },
     "tips": {
       "title": "¿Sabías que?",

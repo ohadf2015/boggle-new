@@ -309,15 +309,13 @@ export const MultiplayerActions: React.FC<MultiplayerActionsProps> = memo(({
     return (
       <div className={cn('space-y-2', className)}>
         {isHost ? (
-          <motion.button
+          <button
             onClick={onStartGame}
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full bg-emerald-500 text-white font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
+            className="w-full bg-emerald-500 text-white font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2 transition-transform active:scale-[0.98] hover:scale-[1.01]"
           >
             <Play className="w-6 h-6" />
             {t('hostView.startGame') || 'Start Game'}
-          </motion.button>
+          </button>
         ) : isCurrentPlayerReady ? (
           <div className="bg-emerald-500 text-white border-3 border-neo-black rounded-neo p-3 shadow-hard">
             <div className="flex items-center justify-center gap-2">
@@ -329,15 +327,13 @@ export const MultiplayerActions: React.FC<MultiplayerActionsProps> = memo(({
             </p>
           </div>
         ) : (
-          <motion.button
+          <button
             onClick={onMarkReady}
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full bg-neo-yellow text-neo-black font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
+            className="w-full bg-neo-yellow text-neo-black font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2 transition-transform active:scale-[0.98] hover:scale-[1.01]"
           >
             <Star className="w-6 h-6" />
             {t('results.imReady')}
-          </motion.button>
+          </button>
         )}
 
         {/* Secondary Actions Row */}
@@ -428,26 +424,22 @@ const DesktopHostActions: React.FC<DesktopHostActionsProps> = memo(({
         </p>
 
         {/* HUGE Start Game Button for Host */}
-        <motion.button
+        <button
           onClick={onStartGame}
-          whileHover={{ scale: 1.02, x: -2, y: -2 }}
-          whileTap={{ scale: 0.98, x: 2, y: 2 }}
-          className="w-full sm:w-auto bg-emerald-500 text-white font-black text-xl sm:text-2xl px-12 py-5 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl transition-all flex items-center justify-center gap-3 mx-auto"
+          className="w-full sm:w-auto bg-emerald-500 text-white font-black text-xl sm:text-2xl px-12 py-5 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl transition-all flex items-center justify-center gap-3 mx-auto hover:scale-[1.02] hover:-translate-x-0.5 hover:-translate-y-0.5 active:scale-[0.98] active:translate-x-0.5 active:translate-y-0.5"
         >
           <Play className="w-7 h-7" />
           {t('hostView.startGame') || 'Start Game'}
           <Play className="w-7 h-7" />
-        </motion.button>
+        </button>
 
-        <motion.button
-          whileHover={{ x: -2, y: -2 }}
-          whileTap={{ x: 2, y: 2 }}
+        <button
           onClick={onExitRoom}
-          className="bg-neo-red text-neo-cream font-bold text-sm px-6 py-2.5 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2 mx-auto mt-2"
+          className="bg-neo-red text-neo-cream font-bold text-sm px-6 py-2.5 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2 mx-auto mt-2 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5"
         >
           <DoorOpen className="w-4 h-4" />
           {t('results.leaveRoom')}
-        </motion.button>
+        </button>
       </div>
     </motion.div>
   );
@@ -497,24 +489,20 @@ const DesktopReadyActions: React.FC<DesktopReadyActionsProps> = memo(({
           {t('results.waitingForHostToStart') || 'Waiting for host to start the next round...'}
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center mt-4">
-          <motion.button
-            whileHover={{ x: -2, y: -2 }}
-            whileTap={{ x: 2, y: 2 }}
+          <button
             onClick={onReturnToRoom}
-            className="bg-white text-neo-black font-black text-base px-6 py-3 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
+            className="bg-white text-neo-black font-black text-base px-6 py-3 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5"
           >
             <ArrowRight className="w-5 h-5 rtl:rotate-180" />
             {t('results.goToLobby')}
-          </motion.button>
-          <motion.button
-            whileHover={{ x: -2, y: -2 }}
-            whileTap={{ x: 2, y: 2 }}
+          </button>
+          <button
             onClick={onExitRoom}
-            className="bg-neo-red text-neo-cream font-black text-base px-6 py-3 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2"
+            className="bg-neo-red text-neo-cream font-black text-base px-6 py-3 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5"
           >
             <DoorOpen className="w-5 h-5" />
             {t('results.leaveRoom')}
-          </motion.button>
+          </button>
         </div>
       </div>
     </motion.div>
@@ -559,26 +547,22 @@ const DesktopNotReadyActions: React.FC<DesktopNotReadyActionsProps> = memo(({
         </p>
 
         {/* HUGE I'm Ready Button */}
-        <motion.button
+        <button
           onClick={onMarkReady}
-          whileHover={{ scale: 1.02, x: -2, y: -2 }}
-          whileTap={{ scale: 0.98, x: 2, y: 2 }}
-          className="w-full sm:w-auto bg-neo-lime text-neo-black font-black text-xl sm:text-2xl px-12 py-5 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl transition-all flex items-center justify-center gap-3 mx-auto"
+          className="w-full sm:w-auto bg-neo-lime text-neo-black font-black text-xl sm:text-2xl px-12 py-5 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl transition-all flex items-center justify-center gap-3 mx-auto hover:scale-[1.02] hover:-translate-x-0.5 hover:-translate-y-0.5 active:scale-[0.98] active:translate-x-0.5 active:translate-y-0.5"
         >
           <Star className="w-7 h-7" />
           {t('results.imReady')}
           <Star className="w-7 h-7" />
-        </motion.button>
+        </button>
 
-        <motion.button
-          whileHover={{ x: -2, y: -2 }}
-          whileTap={{ x: 2, y: 2 }}
+        <button
           onClick={onExitRoom}
-          className="bg-neo-red text-neo-cream font-bold text-sm px-6 py-2.5 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2 mx-auto mt-2"
+          className="bg-neo-red text-neo-cream font-bold text-sm px-6 py-2.5 uppercase border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all flex items-center justify-center gap-2 mx-auto mt-2 hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5"
         >
           <DoorOpen className="w-4 h-4" />
           {t('results.leaveRoom')}
-        </motion.button>
+        </button>
       </div>
     </motion.div>
   );

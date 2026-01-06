@@ -3574,7 +3574,9 @@ const ja = {
         "description": "珍しくてレアな単語を発見せよ"
       },
       "locked": "ロック中",
-      "unlock": "レベル{{level}}をクリアしてアンロック"
+      "unlock": "レベル{{level}}をクリアしてアンロック",
+      "unlockRequirement": "あと{{games}}ゲームプレイでアンロック",
+      "unlockHint": "もっとゲームをプレイしてこのドリルをアンロックしましょう！"
     },
     "tips": {
       "title": "知ってた？",

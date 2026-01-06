@@ -26,6 +26,25 @@ interface CognitiveRadarChartProps {
   };
 }
 
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: any[];
+  t: (key: string) => string;
+}
+
+const CustomTooltip = ({ active, payload, t }: CustomTooltipProps) => {
+  if (!active || !payload || !payload[0]) return null;
+
+  return (
+    <div className="bg-neo-cream border-3 border-neo-black rounded-neo p-2 shadow-hard text-neo-black">
+      <p className="font-bold text-sm">{payload[0].payload.domain}</p>
+      <p className="text-xs">
+        {t('brain.score')}: <span className="font-black">{payload[0].value}/100</span>
+      </p>
+    </div>
+  );
+};
+
 /**
  * Cognitive Radar Chart Component
  * Modern radar chart visualization of cognitive domains.
@@ -63,20 +82,6 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
       fullMark: 100,
     },
   ];
-
-  // Custom tooltip
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (!active || !payload || !payload[0]) return null;
-
-    return (
-      <div className="bg-neo-cream border-3 border-neo-black rounded-neo p-2 shadow-hard text-neo-black">
-        <p className="font-bold text-sm">{payload[0].payload.domain}</p>
-        <p className="text-xs">
-          {t('brain.score')}: <span className="font-black">{payload[0].value}/100</span>
-        </p>
-      </div>
-    );
-  };
 
   return (
     <motion.div
@@ -176,7 +181,7 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
             />
 
             {/* Tooltip */}
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip t={t} />} />
 
             {/* Radar Data */}
             <Radar

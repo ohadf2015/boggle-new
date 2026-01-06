@@ -3,31 +3,19 @@
     "totalKeysInCode": 1668,
     "keyCountByLanguage": {
       "en": 2866,
-      "he": 2864,
-      "sv": 2864,
-      "ja": 2864,
-      "es": 2864
+      "he": 2866,
+      "sv": 2866,
+      "ja": 2866,
+      "es": 2866
     },
     "missingFromEnglish": 0
   },
   "missingFromEnglish": [],
   "missingByLanguage": {
-    "he": [
-      "brain.drills.unlockRequirement",
-      "brain.drills.unlockHint"
-    ],
-    "sv": [
-      "brain.drills.unlockRequirement",
-      "brain.drills.unlockHint"
-    ],
-    "ja": [
-      "brain.drills.unlockRequirement",
-      "brain.drills.unlockHint"
-    ],
-    "es": [
-      "brain.drills.unlockRequirement",
-      "brain.drills.unlockHint"
-    ]
+    "he": [],
+    "sv": [],
+    "ja": [],
+    "es": []
   },
   "keysNotInEnglish": {
     "he": [],

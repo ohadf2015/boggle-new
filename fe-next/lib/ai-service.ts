@@ -448,7 +448,7 @@ class GameAIService {
       this.model = this.vertexAI.getGenerativeModel({
         model: process.env.VERTEX_AI_MODEL || 'gemini-1.5-flash-002',
         generationConfig: {
-          maxOutputTokens: 512, // Increased to prevent truncation
+          maxOutputTokens: 1024, // Increased to prevent truncation
           temperature: 0.1, // Low temperature for consistent validation
           responseMimeType: 'application/json', // Force proper JSON output
         },
@@ -644,7 +644,16 @@ Respond with ONLY valid JSON (no markdown):
     try {
       const result = await this.model.generateContent(prompt);
       const response = result.response;
-      let text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const candidate = response.candidates?.[0];
+      
+      // Check if response was truncated
+      if (candidate?.finishReason === 'MAX_TOKENS' || candidate?.finishReason === 'OTHER') {
+        const error = new Error('AI response truncated');
+        error.name = 'TruncatedResponseError';
+        throw error;
+      }
+      
+      let text = candidate?.content?.parts?.[0]?.text || '';
 
       // Strip markdown code blocks if present (```json ... ``` or ``` ... ```)
       text = text.replace(/```(?:json)?\s*/gi, '').replace(/```\s*/g, '').trim();
@@ -667,11 +676,22 @@ Respond with ONLY valid JSON (no markdown):
         }
 
         // Handle severely truncated responses (e.g., {"isValid or {"isValid":)
-        // Return a safe fallback instead of throwing - the withRetry wrapper already handled retries
+        // Try to extract partial information before giving up
         if (text.includes('"isValid"') || text.includes('"isValid')) {
-          console.warn(`[GameAIService] Truncated AI response after retries for "${word}": ${text.substring(0, 50)}`);
-          // Return safe fallback - word validation will continue with other methods
-          return { isValid: false, reason: 'AI response incomplete', confidence: 0 };
+          const partialMatch = text.match(/\{\s*"isValid"\s*:\s*(true|false)/i);
+          if (partialMatch) {
+            const isValid = partialMatch[1].toLowerCase() === 'true';
+            console.warn(`[GameAIService] Truncated AI response for "${word}": ${text.substring(0, 50)}`);
+            return {
+              isValid,
+              reason: isValid ? 'Word accepted (partial response)' : 'Word not recognized (partial response)',
+              confidence: isValid ? 75 : 60
+            };
+          }
+          // If we can't extract even partial info, throw to trigger retry
+          const error = new Error('AI response truncated');
+          error.name = 'TruncatedResponseError';
+          throw error;
         }
 
         console.warn('[GameAIService] Could not extract JSON from AI response:', text.substring(0, 100));

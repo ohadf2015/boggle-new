@@ -54,8 +54,11 @@ const HINT_CONFIGS: Record<TrainingHintType, HintConfig> = {
   },
 };
 
+// Delay before showing hint (give player time to explore)
+const HINT_DELAY_MS = 3000;
+
 // Auto-dismiss hint after this duration
-const HINT_AUTO_DISMISS_MS = 8000;
+const HINT_AUTO_DISMISS_MS = 15000;
 
 /**
  * TrainingHints - Real-time hint overlays during training mode
@@ -76,31 +79,44 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
   const { t } = useLanguage();
   const isDarkMode = theme === 'dark';
 
-  // Track if hint should be visible (for auto-dismiss)
+  // Track if hint should be visible (for delayed appearance and auto-dismiss)
   const [isVisible, setIsVisible] = useState(false);
+  const [showCloseButton, setShowCloseButton] = useState(false);
 
   // Don't show if another tooltip is visible
   const shouldShow = isVisible && !otherTooltipVisible;
 
-  // Show hint with haptic feedback
+  // Show hint with gentle delay and haptic feedback
   useEffect(() => {
     if (currentHint && !otherTooltipVisible) {
-      setIsVisible(true);
-      triggerHaptic('light');
+      // Delay showing the hint to give player time to explore
+      const delayTimer = setTimeout(() => {
+        setIsVisible(true);
+        triggerHaptic('light');
+        
+        // Show close button after a short delay (less aggressive)
+        setTimeout(() => setShowCloseButton(true), 2000);
+      }, HINT_DELAY_MS);
 
       // Auto-dismiss after timeout
-      const timer = setTimeout(() => {
+      const dismissTimer = setTimeout(() => {
         setIsVisible(false);
+        setShowCloseButton(false);
         onDismiss();
-      }, HINT_AUTO_DISMISS_MS);
+      }, HINT_DELAY_MS + HINT_AUTO_DISMISS_MS);
 
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(delayTimer);
+        clearTimeout(dismissTimer);
+      };
     } else if (otherTooltipVisible) {
       // Hide if another tooltip becomes visible
       setIsVisible(false);
+      setShowCloseButton(false);
       return undefined;
     } else {
       setIsVisible(false);
+      setShowCloseButton(false);
       return undefined;
     }
   }, [currentHint, onDismiss, otherTooltipVisible]);
@@ -149,10 +165,10 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
         {shouldShow && currentHint && config && (
           <>
             <motion.div
-              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 30, scale: 0.95 }}
-              transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+              exit={{ opacity: 0, y: 20, scale: 0.98 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200, delay: HINT_DELAY_MS / 1000 }}
               className={cn(
                 'fixed inset-x-4 bottom-20 z-50',
                 'max-w-sm mx-auto'
@@ -164,31 +180,36 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
                   isDarkMode ? 'bg-slate-800' : 'bg-white'
                 )}
               >
-                {/* Close button */}
-                <button
-                  onClick={handleDismiss}
-                  className={cn(
-                    'absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center',
-                    'bg-neo-pink text-white border-2 border-neo-black shadow-hard-sm',
-                    'hover:scale-110 transition-transform'
-                  )}
-                >
-                  <X size={14} />
-                </button>
+                {/* Close button - appears after delay, less prominent */}
+                {showCloseButton && (
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    onClick={handleDismiss}
+                    className={cn(
+                      'absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center',
+                      'bg-white/80 dark:bg-slate-700/80 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600',
+                      'hover:bg-white dark:hover:bg-slate-700 hover:scale-110 transition-all'
+                    )}
+                  >
+                    <X size={12} />
+                  </motion.button>
+                )}
 
                 {/* Colored accent bar */}
                 <div className={cn('absolute top-0 left-0 right-0 h-1 rounded-t-lg', config.color.replace('text-', 'bg-'))} />
 
                 <div className="flex items-start gap-3 mt-1">
-                {/* Icon with animation */}
+                {/* Icon with gentle animation */}
                 <motion.div
                   animate={{
-                    scale: [1, 1.1, 1],
-                    rotate: currentHint === 'directionChange' ? [0, 90, 0] : [0, 10, -10, 0],
+                    scale: [1, 1.05, 1],
+                    rotate: currentHint === 'directionChange' ? [0, 45, 0] : [0, 5, -5, 0],
                   }}
                   transition={{
-                    duration: currentHint === 'directionChange' ? 1.5 : 1,
+                    duration: currentHint === 'directionChange' ? 2 : 1.5,
                     repeat: Infinity,
+                    repeatDelay: 1,
                     ease: 'easeInOut',
                   }}
                   className={cn('flex-shrink-0 p-2 rounded-lg', config.bgColor)}
@@ -209,13 +230,15 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
 
               {/* Removed visual demos - hints are now compact non-blocking toasts */}
 
-              {/* Progress bar */}
-              <motion.div
-                className={cn('absolute bottom-0 left-0 h-1 rounded-b-xl', config.color.replace('text-', 'bg-'))}
-                initial={{ width: '100%' }}
-                animate={{ width: '0%' }}
-                transition={{ duration: HINT_AUTO_DISMISS_MS / 1000, ease: 'linear' }}
-              />
+              {/* Progress bar - starts when hint becomes visible */}
+              {isVisible && (
+                <motion.div
+                  className={cn('absolute bottom-0 left-0 h-1 rounded-b-xl', config.color.replace('text-', 'bg-'))}
+                  initial={{ width: '100%' }}
+                  animate={{ width: '0%' }}
+                  transition={{ duration: HINT_AUTO_DISMISS_MS / 1000, ease: 'linear' }}
+                />
+              )}
             </div>
           </motion.div>
           </>

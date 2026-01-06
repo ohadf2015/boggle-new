@@ -3589,7 +3589,7 @@ const en = {
       },
       "locked": "Locked",
       "unlock": "Complete level {{level}} to unlock",
-      "unlockRequirement": "Play {games} more games to unlock",
+      "unlockRequirement": "Play {{games}} more games to unlock",
       "unlockHint": "Play more games to unlock this drill!"
     },
     "tips": {

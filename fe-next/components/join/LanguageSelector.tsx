@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import {
   Select,
   SelectContent,
@@ -35,8 +35,9 @@ const LANGUAGE_OPTIONS: LanguageOption[] = [
 
 /**
  * Compact language selection dropdown for host mode
+ * Memoized to prevent unnecessary re-renders
  */
-export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
+export const LanguageSelector = memo<LanguageSelectorProps>(({
   selectedLanguage,
   onLanguageChange,
   hideLabel = false,
@@ -74,6 +75,8 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       </Select>
     </div>
   );
-};
+});
+
+LanguageSelector.displayName = 'LanguageSelector';
 
 export default LanguageSelector;
