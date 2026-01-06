@@ -113,6 +113,28 @@ export function MusicProvider({ children }: MusicProviderProps) {
     useEffect(() => { volumeRef.current = volume; }, [volume]);
     useEffect(() => { audioUnlockedRef.current = audioUnlocked; }, [audioUnlocked]);
 
+    // Handle iOS Safari audio device errors (InvalidStateError: Failed to start the audio device)
+    // These are thrown by the Web Audio API when the device can't start (silent mode, Bluetooth issues, etc.)
+    // We catch them globally to prevent unhandled rejections being reported to Sentry
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+
+        const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+            const error = event.reason;
+            // Check if this is an iOS Safari audio device error
+            if (error instanceof DOMException &&
+                error.name === 'InvalidStateError' &&
+                error.message.includes('audio device')) {
+                // Prevent this error from being reported to Sentry
+                event.preventDefault();
+                logger.warn('[Music] iOS Safari audio device error (silenced):', error.message);
+            }
+        };
+
+        window.addEventListener('unhandledrejection', handleUnhandledRejection);
+        return () => window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    }, []);
+
     // Initialize Howl instances
     useEffect(() => {
         if (typeof window === 'undefined') return;

@@ -9,6 +9,7 @@ import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
 import BrainScoreHero from '@/components/brain/BrainScoreHero';
 import CognitiveDomainGrid from '@/components/brain/CognitiveDomainGrid';
+import CognitiveRadarChart from '@/components/brain/CognitiveRadarChart';
 import QuickDrillsSection from '@/components/brain/QuickDrillsSection';
 import ScientificTipsCarousel from '@/components/brain/ScientificTipsCarousel';
 
@@ -93,11 +94,20 @@ export default function BrainTrainingPage() {
           />
         </motion.div>
 
-        {/* Cognitive Domains */}
+        {/* Radar Chart */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
+        >
+          <CognitiveRadarChart domains={mockBrainScore.domains} />
+        </motion.div>
+
+        {/* Cognitive Domains */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.15 }}
         >
           <CognitiveDomainGrid domains={mockBrainScore.domains} />
         </motion.div>

@@ -273,5 +273,20 @@ export default function sitemap() {
     });
   });
 
+  // Hebrew SEO landing page (high priority for Hebrew keyword searches)
+  routes.push({
+    url: `${baseUrl}/he/hebrew-multiplayer-word-game`,
+    lastModified: now,
+    changeFrequency: 'weekly',
+    priority: 0.95,
+    alternates: {
+      languages: {
+        'x-default': `${baseUrl}/he/hebrew-multiplayer-word-game`,
+        he: `${baseUrl}/he/hebrew-multiplayer-word-game`,
+      },
+    },
+    images: [`${baseUrl}/og-image-he.jpg`],
+  });
+
   return routes;
 }

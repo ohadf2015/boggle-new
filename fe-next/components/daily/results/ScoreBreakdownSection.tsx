@@ -30,11 +30,11 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
 }) => {
   const [expanded, setExpanded] = useState(false);
 
-  // Calculate individual contributions
-  const lifeContribution = Math.max(0, lifeRemaining) * 10;
-  const tokenContribution = Math.max(0, unusedTokens) * 5;
-  const wordsContribution = Math.max(0, wordsDiscovered) * 3;
-  const guessPenalty = Math.max(0, guessesUsed) * 2;
+  // Calculate individual contributions (ensure whole numbers)
+  const lifeContribution = Math.round(Math.max(0, lifeRemaining) * 10);
+  const tokenContribution = Math.round(Math.max(0, unusedTokens) * 5);
+  const wordsContribution = Math.round(Math.max(0, wordsDiscovered) * 3);
+  const guessPenalty = Math.round(Math.max(0, guessesUsed) * 2);
 
   // Determine weakest area for tips
   const getImprovementTips = () => {
@@ -87,7 +87,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
         <div className="flex items-center gap-2">
           {/* Preview score when collapsed */}
           {!expanded && solved && (
-            <span className="text-sm font-black text-purple-600 dark:text-purple-400">{efficiencyScore} pts</span>
+            <span className="text-sm font-black text-purple-600 dark:text-purple-400">{Math.round(efficiencyScore)} pts</span>
           )}
           <motion.div animate={{ rotate: expanded ? 180 : 0 }}>
             <ChevronDown className="w-4 h-4 text-gray-500" />
@@ -107,7 +107,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
               {/* Total Score Display */}
               <div className="text-center pb-3 border-b border-gray-200 dark:border-gray-700">
                 <div className="text-3xl font-black text-purple-600 dark:text-purple-400">
-                  {solved ? efficiencyScore : 0}
+                  {solved ? Math.round(efficiencyScore) : 0}
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold">
                   {t('wordHunt.results.efficiencyScore') || 'Efficiency Score'}
@@ -164,7 +164,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
                         style={{ width: `${Math.min((tokenContribution / (50 * 5)) * 100, 100)}%` }}
                       />
                     </div>
-                    <div className="text-[10px] text-gray-400">{unusedTokens} × 5</div>
+                    <div className="text-[10px] text-gray-400">{Math.round(unusedTokens)} × 5</div>
                   </div>
                 </div>
 
@@ -219,7 +219,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
                 {/* Divider with formula */}
                 <div className="pt-2 mt-2 border-t border-dashed border-gray-300 dark:border-gray-600">
                   <div className="text-[10px] text-center text-gray-400 font-mono">
-                    {lifeContribution} + {tokenContribution} + {wordsContribution} - {guessPenalty} = <span className="font-bold text-purple-600 dark:text-purple-400">{efficiencyScore}</span>
+                    {lifeContribution} + {tokenContribution} + {wordsContribution} - {guessPenalty} = <span className="font-bold text-purple-600 dark:text-purple-400">{Math.round(efficiencyScore)}</span>
                   </div>
                 </div>
               </div>

@@ -149,7 +149,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex-1 flex flex-col p-2 sm:p-4 overflow-hidden"
+      className="flex-1 flex flex-col p-2 sm:p-4 overflow-hidden pb-safe"
+      style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))' }}
     >
       {/* Top bar */}
       <SurvivalHeader

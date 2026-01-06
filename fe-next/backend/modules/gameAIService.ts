@@ -308,6 +308,7 @@ function isRetryableError(error: unknown): boolean {
     message.includes('network') ||
     message.includes('timeout') ||
     message.includes('rate limit') ||
+    message.includes('truncated') ||
     message.includes('429') ||
     message.includes('503') ||
     message.includes('unavailable') ||

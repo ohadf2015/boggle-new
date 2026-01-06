@@ -1,4 +1,5 @@
 import { memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BarChart3, Menu, X, Settings, BookOpen, Trophy, ScrollText, Shield, Coffee } from 'lucide-react';
 import Link from 'next/link';
@@ -25,7 +26,13 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     const { t, language, currentFlag } = useLanguage();
     const { isAuthenticated, isAdmin, profile } = useAuth();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
+
+    // Track client-side mounting for portal
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // Close mobile menu when clicking outside
     useEffect(() => {
@@ -245,35 +252,36 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
 
 </div>
 
-            {/* Mobile Menu Slide-out Pane - Rendered outside header bar to avoid stacking context issues */}
-            <AnimatePresence>
-                {showMobileMenu && (
-                    <>
-                        {/* Backdrop overlay */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="fixed inset-0 bg-neo-black/50 z-[9998] sm:hidden"
-                            onClick={() => setShowMobileMenu(false)}
-                        />
-                        {/* Slide-out pane - slides from right in LTR, left in RTL */}
-                        <motion.div
-                            ref={mobileMenuRef}
-                            initial={{ x: language === 'he' ? '-100%' : '100%' }}
-                            animate={{ x: 0 }}
-                            exit={{ x: language === 'he' ? '-100%' : '100%' }}
-                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            className={cn(
-                                "fixed top-0 bottom-0 w-[280px] max-w-[85vw] z-[9999] sm:hidden",
-                                "bg-neo-cream dark:bg-slate-800 border-neo-black dark:border-slate-600",
-                                "shadow-hard-xl overflow-y-auto",
-                                language === 'he'
-                                    ? "left-0 border-r-4 rounded-r-neo-lg"
-                                    : "right-0 border-l-4 rounded-l-neo-lg"
-                            )}
-                        >
+            {/* Mobile Menu Slide-out Pane - Rendered via portal to escape header's stacking context */}
+            {mounted && createPortal(
+                <AnimatePresence>
+                    {showMobileMenu && (
+                        <>
+                            {/* Backdrop overlay */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="fixed inset-0 bg-neo-black/50 z-[9998] sm:hidden"
+                                onClick={() => setShowMobileMenu(false)}
+                            />
+                            {/* Slide-out pane - slides from right in LTR, left in RTL */}
+                            <motion.div
+                                ref={mobileMenuRef}
+                                initial={{ x: language === 'he' ? '-100%' : '100%' }}
+                                animate={{ x: 0 }}
+                                exit={{ x: language === 'he' ? '-100%' : '100%' }}
+                                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                                className={cn(
+                                    "fixed top-0 bottom-0 w-[280px] max-w-[85vw] z-[9999] sm:hidden",
+                                    "bg-neo-cream dark:bg-slate-800 border-neo-black dark:border-slate-600",
+                                    "shadow-hard-xl overflow-y-auto",
+                                    language === 'he'
+                                        ? "left-0 border-r-4 rounded-r-neo-lg"
+                                        : "right-0 border-l-4 rounded-l-neo-lg"
+                                )}
+                            >
                             {/* Pane Header with close button */}
                             <div className="flex items-center justify-between p-4 border-b-3 border-neo-black/20 dark:border-slate-600">
                                 <span className="text-lg font-bold text-neo-black dark:text-white">
@@ -454,10 +462,12 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                     </div>
                                 </div>
                             </div>
-                        </motion.div>
-                    </>
-                )}
-            </AnimatePresence>
+                            </motion.div>
+                        </>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
         </header>
     );
 });

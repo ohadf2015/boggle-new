@@ -667,16 +667,11 @@ Respond with ONLY valid JSON (no markdown):
         }
 
         // Handle severely truncated responses (e.g., {"isValid or {"isValid":)
-        // These indicate the AI started to respond but got cut off - throw to trigger retry
+        // Return a safe fallback instead of throwing - the withRetry wrapper already handled retries
         if (text.includes('"isValid"') || text.includes('"isValid')) {
-          console.warn(`[GameAIService] Truncated AI response for "${word}": ${text.substring(0, 50)}`);
-          const truncationError = new Error('AI response truncated');
-          captureAIServiceError(truncationError, {
-            operation: 'validateWithAI',
-            word,
-            language,
-          });
-          throw truncationError;
+          console.warn(`[GameAIService] Truncated AI response after retries for "${word}": ${text.substring(0, 50)}`);
+          // Return safe fallback - word validation will continue with other methods
+          return { isValid: false, reason: 'AI response incomplete', confidence: 0 };
         }
 
         console.warn('[GameAIService] Could not extract JSON from AI response:', text.substring(0, 100));

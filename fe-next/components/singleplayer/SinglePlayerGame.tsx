@@ -259,6 +259,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   });
 
   // Update training progress when score changes (for targetScore skill)
+  // NOTE: We deliberately exclude trainingProgress from deps to avoid infinite loops.
+  // The updateProgress function is stable (useCallback), and completedSkills is accessed via ref pattern.
   useEffect(() => {
     if (settings.mode === 'practice' && score >= 20) {
       trainingProgress.updateProgress({
@@ -268,7 +270,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         hasDirectionChange: trainingProgress.completedSkills.has('directionChange'),
       });
     }
-  }, [score, settings.mode, foundWords, trainingProgress]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [score, settings.mode, foundWords]);
 
   // Announce timer at key intervals for screen reader users
   useEffect(() => {

@@ -163,7 +163,7 @@ SkillCheckpoint.displayName = 'SkillCheckpoint';
  * 1. Find First Word (instant success)
  * 2. Swipe Diagonally
  * 3. Change Direction Mid-Word
- * 4. Score 50 Points (target score)
+ * 4. Score 20 Points (target score)
  * 5. Find 5 Words Total
  */
 const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
@@ -270,16 +270,31 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
     );
   }
 
+  // Make the expanded container clickable to collapse in compact mode
+  const containerProps = compact && onToggleExpand ? {
+    onClick: onToggleExpand,
+    role: 'button' as const,
+    tabIndex: 0,
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onToggleExpand();
+      }
+    },
+  } : {};
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
+      {...containerProps}
       className={cn(
         'rounded-xl border-2 overflow-hidden shadow-hard-sm',
         isDarkMode
           ? 'bg-slate-800/90 border-slate-600'
           : 'bg-white/95 border-neo-black',
-        compact ? 'p-3' : 'p-4'
+        compact ? 'p-3' : 'p-4',
+        compact && onToggleExpand && 'cursor-pointer'
       )}
     >
       {/* Header with progress bar */}

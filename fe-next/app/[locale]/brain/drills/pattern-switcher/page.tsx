@@ -25,7 +25,7 @@ export default function PatternSwitcherPage() {
   const isDarkMode = theme === 'dark';
 
   // Generate drill grid
-  const { grid, availableWords, isLoading } = useDrillGrid(5);
+  const { grid, availableWords, isLoading } = useDrillGrid(5, language);
 
   // Hide bottom nav during drill
   React.useEffect(() => {

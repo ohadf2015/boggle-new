@@ -173,7 +173,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             '@type': ['WebApplication', 'VideoGame'],
             '@id': 'https://www.lexiclash.live/#webapp',
             name: 'LexiClash',
-            alternateName: ['LexiClash Multiplayer Word Game', 'LexiClash Word Battle', 'לקסיקלאש'],
+            alternateName: ['LexiClash Multiplayer Word Game', 'LexiClash Word Battle', 'לקסיקלאש', 'לקסי קלאש', 'משחק מילים מרובה משתתפים', 'קרב מילים אונליין', 'משחק כמו בוגל', 'משחק כמו סקראבל', 'וורדל מרובה משתתפים'],
             applicationCategory: 'GameApplication',
             applicationSubCategory: 'Multiplayer Word Game',
             typicalAgeRange: '6-99',
@@ -258,7 +258,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 name: 'LexiClash',
                 url: 'https://www.lexiclash.live',
             },
-            keywords: 'multiplayer word game, real-time word battle, competitive word game, party game, word puzzle',
+            keywords: 'multiplayer word game, real-time word battle, competitive word game, party game, word puzzle, wordle multiplayer, scrabble online, boggle online, ruzzle alternative, משחק מילים מרובה משתתפים, משחק מילים בעברית, קרב מילים אונליין, משחק מילים לחברים, וורדל בעברית, סקראבל אונליין, בוגל אונליין, תפזורת אונליין',
         },
         // Organization schema with social proof
         {
@@ -284,6 +284,13 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             },
             foundingDate: '2024',
             slogan: 'Real-Time Multiplayer Word Battles',
+            foundingLocation: {
+                '@type': 'Place',
+                address: {
+                    '@type': 'PostalAddress',
+                    addressCountry: 'IL',
+                },
+            },
         },
         // Website schema
         {
@@ -340,7 +347,23 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     name: 'What is a free online game like Boggle I can play with friends?',
                     acceptedAnswer: {
                         '@type': 'Answer',
-                        text: 'LexiClash is a free online word game similar to Boggle that you can play with friends in real-time. It features competitive multiplayer gameplay, live leaderboards, and supports multiple languages including English, Hebrew, Swedish, Japanese, and Spanish. No account required - just create a room and share the link!',
+                        text: 'LexiClash is a free online word game similar to Boggle that you can play with friends in real-time. Like Boggle and Scrabble, players find words from letters - but in LexiClash everyone competes simultaneously! It features competitive multiplayer gameplay, live leaderboards, and supports multiple languages including English, Hebrew, Swedish, Japanese, and Spanish. No account required - just create a room and share the link!',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'Is there a multiplayer version of Wordle I can play with friends?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'Yes! While Wordle is single-player, LexiClash offers real-time multiplayer word game fun. Like Wordle, it challenges your vocabulary - but you compete live against friends! Create a room, share the code, and race to find more words than your opponents. It also has a Daily Challenge mode similar to Wordle where everyone plays the same puzzle.',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'What is a good Scrabble alternative to play online?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'LexiClash is a great Scrabble alternative for online play! Unlike turn-based Scrabble, LexiClash is real-time - all players race simultaneously to find words on the same grid. It\'s faster, more exciting, and supports 2-20+ players. Perfect for parties or quick games with friends. Free to play, no download needed!',
                     },
                 },
                 {
@@ -454,6 +477,47 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     acceptedAnswer: {
                         '@type': 'Answer',
                         text: 'LexiClash works on any device with a modern web browser! Play on desktop computers, laptops, tablets, and smartphones. No app download needed - just visit lexiclash.live. The game is optimized for touch screens and supports both portrait and landscape orientations on mobile.',
+                    },
+                },
+                // Hebrew-specific FAQ questions for Israeli SEO
+                {
+                    '@type': 'Question',
+                    name: 'מה המשחק מילים הכי טוב בעברית לשחק עם חברים?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'לקסיקלאש הוא משחק מילים מרובה משתתפים בעברית, דומה לבוגל וסקראבל! צרו חדר, שלחו לינק לחברים והתחרו בזמן אמת. עם יותר מ-10,000 מילים בעברית, ללא צורך בהרשמה או הורדה. מושלם לערבי משפחה, מסיבות וגיבוש. פותח בישראל.',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'האם יש משחק כמו וורדל בעברית שאפשר לשחק עם חברים?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'כן! לקסיקלאש הוא כמו וורדל אבל מרובה משתתפים ובעברית! במקום לשחק לבד, מתחרים בזמן אמת נגד חברים. יש גם מצב אתגר יומי כמו וורדל - אותו פאזל לכולם כל יום. בנוסף, יש מצב משחק חופשי עם חברים.',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'איפה אפשר לשחק סקראבל או בוגל אונליין בעברית?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'לקסיקלאש הוא אלטרנטיבה מעולה לסקראבל ובוגל אונליין בעברית! בניגוד לסקראבל שמשחקים בתורות, בלקסיקלאש כולם מתחרים בו-זמנית על אותו לוח. מהיר יותר, מותח יותר, ותומך ב-2 עד 20+ שחקנים. חינם וללא הורדה!',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'איך משחקים משחק מילים מרובה משתתפים אונליין?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'בלקסיקלאש: 1) צרו חדר חדש 2) שלחו לינק או קוד QR לחברים 3) כולם מצטרפים ורואים את אותו לוח אותיות 4) התחרו בזמן אמת למצוא מילים - מי שימצא יותר ינצח! עובד בכל דפדפן ללא התקנה.',
+                    },
+                },
+                {
+                    '@type': 'Question',
+                    name: 'האם יש משחק מילים בחינם בעברית לנייד?',
+                    acceptedAnswer: {
+                        '@type': 'Answer',
+                        text: 'כן! לקסיקלאש הוא משחק מילים חינמי לחלוטין שעובד מצוין בנייד. אין צורך להוריד אפליקציה - פשוט היכנסו ל-lexiclash.live מהדפדפן. דומה לבוגל, סקראבל ותפזורת אבל מרובה משתתפים. תומך ב-2 עד 20+ שחקנים, עם מילון עברית מקיף.',
                     },
                 },
             ],

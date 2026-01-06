@@ -581,9 +581,11 @@ body {
       padding: 3px;
       /* Maximize width: full screen minus tiny 8px total margin (4px each side) */
       width: calc(100vw - 8px);
-      /* Height: square but capped to leave room for header/UI (timer, stats, word area) */
-      height: min(calc(100vw - 8px), calc(100dvh - 190px));
+      /* Height: square but capped to leave room for header/UI and safe area (home indicator) */
+      height: min(calc(100vw - 8px), calc(100dvh - 190px - env(safe-area-inset-bottom, 0px)));
       max-width: calc(100vw - 8px);
+      /* Ensure board shrinks properly in flex containers on very short phones */
+      max-height: 100%;
     }
   }
 

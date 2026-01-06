@@ -3588,7 +3588,9 @@ const en = {
         "description": "Discover uncommon and rare words"
       },
       "locked": "Locked",
-      "unlock": "Complete level {{level}} to unlock"
+      "unlock": "Complete level {{level}} to unlock",
+      "unlockRequirement": "Play {games} more games to unlock",
+      "unlockHint": "Play more games to unlock this drill!"
     },
     "tips": {
       "title": "Did You Know?",

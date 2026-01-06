@@ -25,7 +25,7 @@ export default function MemoryHuntPage() {
   const isDarkMode = theme === 'dark';
 
   // Generate drill grid
-  const { grid, availableWords, regenerate, isLoading } = useDrillGrid(5);
+  const { grid, availableWords, regenerate, isLoading } = useDrillGrid(5, language);
 
   // Hide bottom nav during drill
   React.useEffect(() => {
