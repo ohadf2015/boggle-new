@@ -52,6 +52,7 @@ interface CognitiveScoreResult {
 
 export function useSaveCognitiveScore() {
   const { user } = useAuth();
+  const userId = user?.id;
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const hasSavedRef = useRef(false);
@@ -60,7 +61,7 @@ export function useSaveCognitiveScore() {
     input: SaveCognitiveScoreInput
   ): Promise<CognitiveScoreResult | null> => {
     // Only save for authenticated users
-    if (!user?.id) {
+    if (!userId) {
       console.log('[useSaveCognitiveScore] Skipping - no authenticated user');
       return null;
     }
@@ -119,7 +120,7 @@ export function useSaveCognitiveScore() {
       // Calculate cognitive scores
       const gameScores = calculateGameCognitiveScores(
         cognitiveInput,
-        user.id,
+        userId,
         input.gameSessionId
       );
 
@@ -135,7 +136,7 @@ export function useSaveCognitiveScore() {
       const { error: insertError } = await supabase
         .from('game_cognitive_scores')
         .insert({
-          user_id: user.id,
+          user_id: userId,
           game_session_id: input.gameSessionId,
           processing_speed: gameScores.processingSpeed,
           working_memory: gameScores.workingMemory,
@@ -162,7 +163,7 @@ export function useSaveCognitiveScore() {
       const { data: currentBrainScore } = await supabase
         .from('brain_scores')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .single();
 
       let overallScore: number;
@@ -200,7 +201,7 @@ export function useSaveCognitiveScore() {
             games_analyzed: currentBrainScore.games_analyzed + 1,
             last_game_at: new Date().toISOString(),
           })
-          .eq('user_id', user.id);
+          .eq('user_id', userId);
 
         if (updateError) {
           console.error('[useSaveCognitiveScore] Failed to update brain score:', updateError);
@@ -214,7 +215,7 @@ export function useSaveCognitiveScore() {
         await supabase
           .from('brain_score_history')
           .insert({
-            user_id: user.id,
+            user_id: userId,
             overall_score: updated.overallScore,
             processing_speed: updated.domainScores.processingSpeed,
             working_memory: updated.domainScores.workingMemory,
@@ -240,7 +241,7 @@ export function useSaveCognitiveScore() {
         const { error: createError } = await supabase
           .from('brain_scores')
           .insert({
-            user_id: user.id,
+            user_id: userId,
             processing_speed: gameScores.processingSpeed,
             working_memory: gameScores.workingMemory,
             attention: gameScores.attention,
@@ -261,7 +262,7 @@ export function useSaveCognitiveScore() {
         await supabase
           .from('brain_score_history')
           .insert({
-            user_id: user.id,
+            user_id: userId,
             overall_score: overallScore,
             processing_speed: gameScores.processingSpeed,
             working_memory: gameScores.workingMemory,
@@ -290,7 +291,7 @@ export function useSaveCognitiveScore() {
       setIsSaving(false);
       return null;
     }
-  }, [user?.id]);
+  }, [userId]);
 
   // Reset the saved flag (call when mounting a new game)
   const resetSaveState = useCallback(() => {

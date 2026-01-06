@@ -67,8 +67,8 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
     setShowQR(false);
   }, [setShowQR]);
 
-  // Waiting Info Card Content
-  const WaitingInfoCard = () => (
+  // Waiting Info Card Content - render function to avoid static component warning
+  const renderWaitingInfoCard = () => (
     <Card className="flex-1 p-4 sm:p-5 md:p-6 bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg flex flex-col gap-5">
       {/* Header with hourglass */}
       <div className="flex items-center justify-center gap-4">
@@ -133,8 +133,8 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
     </Card>
   );
 
-  // Players List Card Content
-  const PlayersListCard = ({ className = '' }: { className?: string }) => (
+  // Players List Card Content - render function to avoid static component warning
+  const renderPlayersListCard = (className = '') => (
     <Card className={cn("h-auto p-3 sm:p-4 md:p-6 flex flex-col bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg", className)}>
       <h3 className="text-base font-bold uppercase text-neo-cream/80 mb-3 flex items-center gap-2 flex-shrink-0">
         <Users className="text-neo-pink/80" />
@@ -205,8 +205,8 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
     </Card>
   );
 
-  // Chat Card Content
-  const ChatCard = () => (
+  // Chat Card Content - render function to avoid static component warning
+  const renderChatCard = () => (
     <div className="w-full">
       <RoomChat
         username={username}
@@ -235,11 +235,11 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       {/* Desktop Layout: Side by side + chat below */}
       <div className="hidden lg:flex flex-col gap-6">
         <div className="flex lg:items-stretch gap-6">
-          <WaitingInfoCard />
-          <PlayersListCard className="lg:w-[350px]" />
+          {renderWaitingInfoCard()}
+          {renderPlayersListCard("lg:w-[350px]")}
         </div>
         <div className="max-w-2xl mx-auto w-full">
-          <ChatCard />
+          {renderChatCard()}
         </div>
       </div>
 
@@ -252,7 +252,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <WaitingInfoCard />
+            {renderWaitingInfoCard()}
           </motion.div>
         )}
         {mobileTab === 'players' && (
@@ -262,7 +262,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <PlayersListCard />
+            {renderPlayersListCard()}
           </motion.div>
         )}
         {mobileTab === 'chat' && (
@@ -272,7 +272,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <ChatCard />
+            {renderChatCard()}
           </motion.div>
         )}
       </div>

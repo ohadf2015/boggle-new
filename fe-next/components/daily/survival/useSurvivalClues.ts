@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type { AccumulatedClue } from './types';
 import { fireConfetti } from '@/utils/confettiUtils';
@@ -37,11 +37,14 @@ export function useSurvivalClues({
 
   const normalizedTarget = targetWord.toUpperCase();
 
-  // Count letters in target for handling duplicates
-  const targetLetterCounts = new Map<string, number>();
-  normalizedTarget.split('').forEach(letter => {
-    targetLetterCounts.set(letter, (targetLetterCounts.get(letter) || 0) + 1);
-  });
+  // Count letters in target for handling duplicates (memoized to prevent useCallback deps from changing)
+  const targetLetterCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    normalizedTarget.split('').forEach(letter => {
+      counts.set(letter, (counts.get(letter) || 0) + 1);
+    });
+    return counts;
+  }, [normalizedTarget]);
 
   /**
    * Update clues from target word attempt feedback
