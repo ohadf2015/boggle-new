@@ -1,19 +1,29 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import MultiplayerSelector from './MultiplayerSelector';
-import CreateRoomSetup from './CreateRoomSetup';
-import JoinRoomSetup from './JoinRoomSetup';
-import InvitationQuickJoin from './InvitationQuickJoin';
+import RoomListView from './RoomListView';
+import JoinRoomModal from './JoinRoomModal';
+import CreateRoomModal from './CreateRoomModal';
 import type { Language, ActiveRoom } from '@/shared/types/game';
-import { getStoredUsername, getStoredAvatarId } from '@/utils/profileStorage';
+import {
+  getStoredUsername,
+  getStoredAvatarId,
+  hasCompleteStoredProfile,
+} from '@/utils/profileStorage';
 import { useCrazyGamesInvite } from '@/hooks/useCrazyGamesInvite';
+import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
+import { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
 
-type FlowState = 'selector' | 'create-setup' | 'join-setup' | 'invitation-quick-join';
+type FlowState = 'room-list' | 'join-modal' | 'create-modal';
 
 interface MultiplayerFlowProps {
   // Callbacks
-  handleJoin: (isHostMode: boolean, roomLanguage?: Language | null, gameCode?: string, roomName?: string) => void;
+  handleJoin: (
+    isHostMode: boolean,
+    roomLanguage?: Language | null,
+    gameCode?: string,
+    roomName?: string
+  ) => void;
   refreshRooms: () => void;
 
   // State from parent
@@ -38,7 +48,7 @@ interface MultiplayerFlowProps {
 
 /**
  * MultiplayerFlow - Orchestrator for the multiplayer flow
- * Simplified state machine: selector -> create-setup/join-setup (single step each)
+ * New simplified state machine: room-list -> join-modal/create-modal overlays
  */
 const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   handleJoin,
@@ -57,220 +67,194 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   setRoomName,
   setHostUsername,
 }) => {
-  // Flow state - simplified to just selector and single-step setup screens
-  const [flowState, setFlowState] = useState<FlowState>('selector');
-
-  // Saved profile for invitation quick join
-  const [savedUsername, setSavedUsername] = useState<string | null>(null);
-  const [savedAvatarId, setSavedAvatarId] = useState<string | null>(null);
+  // Flow state - simplified to room-list with modal overlays
+  const [flowState, setFlowState] = useState<FlowState>('room-list');
+  const [selectedRoom, setSelectedRoom] = useState<ActiveRoom | null>(null);
 
   // CrazyGames invite integration
-  const { isReady: isCrazyGamesReady, inviteRoomId, isInstantMultiplayer } = useCrazyGamesInvite({
+  const {
+    isReady: isCrazyGamesReady,
+    inviteRoomId,
+    isInstantMultiplayer,
+  } = useCrazyGamesInvite({
     // When player joins via CrazyGames invite link with roomId
     onInviteJoin: (roomId) => {
-      // Set the game code and trigger join flow
-      setGameCode(roomId);
+      // Try to auto-join if profile exists
+      handleInvitationAutoJoin(roomId);
     },
     // When player starts via "Play with Friends" (instant multiplayer)
     onInstantMultiplayer: () => {
-      // Go directly to create room setup with dialog for name/avatar
-      setFlowState('create-setup');
+      // Go directly to create room modal
+      setFlowState('create-modal');
     },
   });
 
-  // Handle CrazyGames invite room ID (similar to prefilledRoom)
+  // Check if user has a complete profile for auto-join
+  const hasProfile = useCallback(() => {
+    if (isAuthenticated) {
+      return !!(displayName && profileAvatarId);
+    }
+    return hasCompleteStoredProfile();
+  }, [isAuthenticated, displayName, profileAvatarId]);
+
+  // Get user profile data for auto-join
+  const getProfileData = useCallback(() => {
+    if (isAuthenticated && displayName) {
+      return {
+        username: displayName,
+        avatarId: profileAvatarId || PROFILE_AVATAR_ID,
+      };
+    }
+    return {
+      username: getStoredUsername() || '',
+      avatarId: getStoredAvatarId() || '',
+    };
+  }, [isAuthenticated, displayName, profileAvatarId]);
+
+  // Handle auto-join for invitation links
+  const handleInvitationAutoJoin = useCallback(
+    (roomCode: string) => {
+      if (hasProfile()) {
+        // Auto-join directly - no modal needed
+        const profile = getProfileData();
+        setGameCode(roomCode);
+        setUsername(profile.username);
+        handleJoin(false, null, roomCode);
+      } else {
+        // Need to collect profile - show join modal
+        // Create a minimal room object for the modal
+        setSelectedRoom({
+          gameCode: roomCode,
+          roomName: roomCode,
+          playerCount: 0,
+          language: defaultLanguage,
+          gameState: 'waiting' as const,
+          isRanked: false,
+          createdAt: Date.now(),
+        });
+        setFlowState('join-modal');
+      }
+    },
+    [hasProfile, getProfileData, handleJoin, setGameCode, setUsername, defaultLanguage]
+  );
+
+  // Handle CrazyGames invite room ID
   useEffect(() => {
     if (!isCrazyGamesReady || !inviteRoomId) return;
+    handleInvitationAutoJoin(inviteRoomId);
+  }, [isCrazyGamesReady, inviteRoomId, handleInvitationAutoJoin]);
 
-    // Check for saved profile in localStorage
-    const storedUsername = getStoredUsername();
-    const storedAvatarId = getStoredAvatarId();
-
-    // Set the game code for the invite room
-    setGameCode(inviteRoomId);
-
-    if (storedUsername && storedAvatarId) {
-      // User has saved profile - show quick join confirmation
-      setSavedUsername(storedUsername);
-      setSavedAvatarId(storedAvatarId);
-      setUsername(storedUsername);
-      setFlowState('invitation-quick-join');
-    } else if (isAuthenticated && displayName && profileAvatarId) {
-      // Authenticated user with profile - show quick join
-      setSavedUsername(displayName);
-      setSavedAvatarId(profileAvatarId);
-      setUsername(displayName);
-      setFlowState('invitation-quick-join');
-    } else {
-      // No saved profile - go to join setup
-      setFlowState('join-setup');
-    }
-  }, [isCrazyGamesReady, inviteRoomId, isAuthenticated, displayName, profileAvatarId, setGameCode, setUsername]);
-
-  // Handle invitation link: when prefilledRoom is provided, skip selector
+  // Handle URL prefilled room code (invitation links)
   useEffect(() => {
     // Skip if CrazyGames invite already handled
     if (inviteRoomId) return;
     if (!prefilledRoom) return;
 
-    // Check for saved profile in localStorage
-    const storedUsername = getStoredUsername();
-    const storedAvatarId = getStoredAvatarId();
+    handleInvitationAutoJoin(prefilledRoom);
+  }, [inviteRoomId, prefilledRoom, handleInvitationAutoJoin]);
 
-    // Set the game code for the prefilled room
-    setGameCode(prefilledRoom);
+  // Handle room click from list
+  const handleRoomClick = useCallback((room: ActiveRoom) => {
+    setSelectedRoom(room);
+    setFlowState('join-modal');
+  }, []);
 
-    if (storedUsername && storedAvatarId) {
-      // User has saved profile - show quick join confirmation
-      setSavedUsername(storedUsername);
-      setSavedAvatarId(storedAvatarId);
-      setUsername(storedUsername);
-      setFlowState('invitation-quick-join');
-    } else if (isAuthenticated && displayName && profileAvatarId) {
-      // Authenticated user with profile - show quick join
-      setSavedUsername(displayName);
-      setSavedAvatarId(profileAvatarId);
-      setUsername(displayName);
-      setFlowState('invitation-quick-join');
-    } else {
-      // No saved profile - go to join setup
-      setFlowState('join-setup');
+  // Handle create room button
+  const handleCreateClick = useCallback(() => {
+    setFlowState('create-modal');
+  }, []);
+
+  // Handle modal close
+  const handleModalClose = useCallback(() => {
+    setFlowState('room-list');
+    setSelectedRoom(null);
+  }, []);
+
+  // Handle join from modal
+  const handleJoinFromModal = useCallback(
+    (username: string, avatarId: string) => {
+      if (!selectedRoom) return;
+
+      setGameCode(selectedRoom.gameCode);
+      setUsername(username);
+
+      // Get emoji/color for backward compatibility
+      const { emoji, color } = getAvatarEmojiAndColor(avatarId);
+
+      handleJoin(false, null, selectedRoom.gameCode);
+    },
+    [selectedRoom, handleJoin, setGameCode, setUsername]
+  );
+
+  // Generate a random game code - defined before useCallback that uses it
+  const generateGameCode = (): string => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = '';
+    for (let i = 0; i < 6; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-  }, [inviteRoomId, prefilledRoom, isAuthenticated, displayName, profileAvatarId, setGameCode, setUsername]);
+    return code;
+  };
 
-  // Handle selector choices - go directly to single-step setup
-  const handleSelectCreate = useCallback(() => {
-    setFlowState('create-setup');
-  }, []);
+  // Handle create from modal
+  const handleCreateFromModal = useCallback(
+    (config: {
+      hostUsername: string;
+      avatarId: string;
+      roomName: string;
+      language: Language;
+    }) => {
+      // Generate a random game code
+      const gameCode = generateGameCode();
 
-  const handleSelectJoin = useCallback(() => {
-    setFlowState('join-setup');
-  }, []);
+      setGameCode(gameCode);
+      setRoomName(config.roomName);
+      setHostUsername(config.hostUsername);
+      setUsername(config.hostUsername);
 
-  // Handle quick join from selector
-  const handleQuickJoin = useCallback((roomCode: string) => {
-    // Check if we have saved profile in localStorage
-    const storedUsername = getStoredUsername();
-    const storedAvatarId = getStoredAvatarId();
+      handleJoin(true, config.language, gameCode, config.roomName);
+    },
+    [handleJoin, setGameCode, setRoomName, setHostUsername, setUsername]
+  );
 
-    if (storedUsername && storedAvatarId) {
-      // Already have profile, join directly
-      setGameCode(roomCode);
-      setUsername(storedUsername);
-      handleJoin(false, null, roomCode);
-    } else {
-      // Need to go through join setup
-      setGameCode(roomCode);
-      setFlowState('join-setup');
-    }
-  }, [handleJoin, setGameCode, setUsername]);
+  // Always show RoomListView as base, with modals as overlays
+  return (
+    <>
+      <RoomListView
+        activeRooms={activeRooms}
+        roomsLoading={roomsLoading}
+        onRefreshRooms={refreshRooms}
+        onRoomClick={handleRoomClick}
+        onCreateRoom={handleCreateClick}
+      />
 
-  // Handle back navigation
-  const handleBackToSelector = useCallback(() => {
-    setFlowState('selector');
-  }, []);
+      {/* Join Room Modal */}
+      <JoinRoomModal
+        isOpen={flowState === 'join-modal'}
+        onClose={handleModalClose}
+        room={selectedRoom}
+        isJoining={isJoining}
+        onJoin={handleJoinFromModal}
+        isAuthenticated={isAuthenticated}
+        displayName={displayName || null}
+        profilePictureUrl={profilePictureUrl}
+        profileAvatarId={profileAvatarId}
+      />
 
-  // Handle invitation quick join
-  const handleInvitationJoin = useCallback(() => {
-    const roomCode = inviteRoomId || prefilledRoom;
-    if (roomCode && savedUsername) {
-      handleJoin(false, null, roomCode);
-    }
-  }, [inviteRoomId, prefilledRoom, savedUsername, handleJoin]);
-
-  // Handle change profile from invitation quick join
-  const handleChangeProfileFromInvitation = useCallback(() => {
-    setFlowState('join-setup');
-  }, []);
-
-  // Handle create room submission
-  const handleCreateSubmit = useCallback((config: {
-    gameCode: string;
-    roomName: string;
-    language: Language;
-    hostUsername: string;
-    avatarId: string;
-  }) => {
-    setGameCode(config.gameCode);
-    setRoomName(config.roomName);
-    setHostUsername(config.hostUsername);
-    setUsername(config.hostUsername);
-    // Pass roomName directly to handleJoin since React state updates are async
-    handleJoin(true, config.language, config.gameCode, config.roomName);
-  }, [handleJoin, setGameCode, setRoomName, setHostUsername, setUsername]);
-
-  // Handle join room submission
-  const handleJoinSubmit = useCallback((config: {
-    gameCode: string;
-    username: string;
-    avatarId: string;
-  }) => {
-    setGameCode(config.gameCode);
-    setUsername(config.username);
-    handleJoin(false, null, config.gameCode);
-  }, [handleJoin, setGameCode, setUsername]);
-
-  // Render based on flow state
-  switch (flowState) {
-    case 'selector':
-      return (
-        <MultiplayerSelector
-          onSelectCreate={handleSelectCreate}
-          onSelectJoin={handleSelectJoin}
-          activeRooms={activeRooms}
-          onQuickJoin={handleQuickJoin}
-          roomsLoading={roomsLoading}
-          onRefreshRooms={refreshRooms}
-        />
-      );
-
-    case 'create-setup':
-      return (
-        <CreateRoomSetup
-          isAuthenticated={isAuthenticated}
-          displayName={displayName || null}
-          profilePictureUrl={profilePictureUrl}
-          initialAvatarId={profileAvatarId}
-          defaultLanguage={defaultLanguage}
-          isSubmitting={isJoining}
-          onSubmit={handleCreateSubmit}
-          onBack={handleBackToSelector}
-        />
-      );
-
-    case 'join-setup':
-      return (
-        <JoinRoomSetup
-          isAuthenticated={isAuthenticated}
-          displayName={displayName || null}
-          profilePictureUrl={profilePictureUrl}
-          initialAvatarId={profileAvatarId}
-          activeRooms={activeRooms}
-          roomsLoading={roomsLoading}
-          isSubmitting={isJoining}
-          prefilledCode={prefilledRoom}
-          onSubmit={handleJoinSubmit}
-          onBack={handleBackToSelector}
-          onRefreshRooms={refreshRooms}
-        />
-      );
-
-    case 'invitation-quick-join':
-      return (
-        <InvitationQuickJoin
-          gameCode={inviteRoomId || prefilledRoom || ''}
-          username={savedUsername || ''}
-          avatarId={savedAvatarId || ''}
-          profilePictureUrl={profilePictureUrl}
-          isJoining={isJoining}
-          onJoin={handleInvitationJoin}
-          onChangeProfile={handleChangeProfileFromInvitation}
-        />
-      );
-
-    default:
-      return null;
-  }
+      {/* Create Room Modal */}
+      <CreateRoomModal
+        isOpen={flowState === 'create-modal'}
+        onClose={handleModalClose}
+        isCreating={isJoining}
+        onCreate={handleCreateFromModal}
+        defaultLanguage={defaultLanguage}
+        isAuthenticated={isAuthenticated}
+        displayName={displayName || null}
+        profilePictureUrl={profilePictureUrl}
+        profileAvatarId={profileAvatarId}
+      />
+    </>
+  );
 };
 
 export default MultiplayerFlow;

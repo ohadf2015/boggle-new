@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Write, Bash(npm *), Bash(npx *), Bash(git *)
+allowed-tools: Read, Write, Bash(npm *), Bash(npx *), Bash(git *), Skill(ui)
 description: Implement new feature thoroughly - understand first, ask questions, write tests
 ---
 
@@ -72,6 +72,10 @@ Present plan before coding:
 - [ ] [test case 1]
 - [ ] [test case 2]
 - [ ] [edge case]
+
+### UI Components (if applicable)
+- [ ] [component name] - [design approach]
+- [ ] Will run `/ui` after implementation for polish
 ```
 
 **Wait for approval before coding.**
@@ -112,6 +116,29 @@ npm test -- [test-file]
 
 ### 5.5 Refactor if Needed
 Clean up while keeping tests green.
+
+---
+
+## Phase 5.5: UI Polish (if feature has UI components)
+
+**Skip this phase if the feature has no UI components.**
+
+When the feature includes UI components, run the `/ui` command to ensure the implementation:
+- Aligns with the project's design system
+- Follows modern UI patterns (clean structure, proper whitespace, consistent spacing)
+- Is simplified and not over-nested
+- Matches existing component patterns
+
+```
+/ui [component-name]
+```
+
+Key UI checks:
+- [ ] Component structure is flat (avoid deep nesting)
+- [ ] Using design system colors/spacing/typography
+- [ ] Responsive design works on mobile
+- [ ] Matches visual style of existing components
+- [ ] Whitespace is generous, not cramped
 
 ---
 
@@ -171,6 +198,7 @@ After implementation:
 - TypeScript: ✅ No errors
 - Lint: ✅ No errors
 - Tests: ✅ All passing
+- UI Polish: ✅ (if applicable) Design system aligned
 ```
 
 ---
@@ -181,3 +209,4 @@ After implementation:
 - Match existing code patterns
 - Write tests BEFORE implementation
 - No implementation without approved plan
+- Run `/ui` for UI polish when feature includes UI components

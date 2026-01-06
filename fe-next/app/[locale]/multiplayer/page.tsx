@@ -625,13 +625,15 @@ export default function MultiplayerPage(): React.JSX.Element {
       }
 
       // Handle specific error cases
-      if (data.message?.includes('not found') || data.message?.includes('Game not found')) {
+      if (data.message?.includes('not found') || data.message?.includes('Game not found') || data.message?.includes('closed')) {
         if (attemptingReconnectRef.current) {
           setError(t('errors.sessionExpired'));
           toast.error(t('errors.sessionExpired'), { duration: 4000, icon: '⚠️' });
         } else {
-          setError(t('errors.gameCodeNotExist'));
-          toast.error(t('errors.gameCodeNotExist'), { duration: 4000, icon: '❌' });
+          // Show friendly message for room not found
+          const errorKey = data.message?.includes('closed') ? 'errors.roomClosed' : 'errors.gameCodeNotExist';
+          setError(t(errorKey) || t('errors.gameCodeNotExist'));
+          toast.error(t('errors.roomNoLongerExists') || t('errors.gameCodeNotExist'), { duration: 4000, icon: '❌' });
         }
         setGameCode('');
         setPrefilledRoomCode(''); // Clear prefilled room so user sees main join page
@@ -639,6 +641,9 @@ export default function MultiplayerPage(): React.JSX.Element {
         setAttemptingReconnect(false);
         setShouldAutoJoin(false);
         clearSession();
+
+        // Auto-refresh room list after error
+        socketInstance.emit('getActiveRooms');
 
         // Remove room parameter from URL without page reload
         if (typeof window !== 'undefined' && window.location.search.includes('room=')) {

@@ -400,6 +400,8 @@ const he = {
     "slowConnection": "חיבור איטי - עובדים על זה",
     "sessionExpired": "הסשן נגמר. התחלה חדשה!",
     "gameCodeNotExist": "קוד לא נמצא. בדוק ונסה שוב!",
+    "roomNoLongerExists": "החדר כבר לא קיים",
+    "roomClosed": "החדר נסגר",
     "usernameTaken": "מישהו הקדים! נסה שם אחר",
     "gameCodeExists": "הקוד תפוס. בחר חדש!",
     "somethingWentWrong": "אופס! משהו השתבש",
@@ -575,6 +577,33 @@ const he = {
       "playersOnline": "מחוברים",
       "noRooms": "אין חדרים - צור אחד!",
       "roomsRefreshed": "החדרים רועננו 🔄"
+    },
+    "roomList": {
+      "activeRooms": "חדרים פעילים",
+      "online": "מחוברים",
+      "noRooms": "אין חדרים פעילים",
+      "beFirst": "היה הראשון ליצור אחד!",
+      "createButton": "צור חדר",
+      "refreshed": "החדרים רועננו"
+    },
+    "joinModal": {
+      "title": "הצטרף לחדר",
+      "changeAvatar": "שנה אווטאר",
+      "namePlaceholder": "השם שלך",
+      "authenticatedHint": "מחובר",
+      "joinButton": "הצטרף למשחק",
+      "joining": "מצטרף..."
+    },
+    "createModal": {
+      "title": "צור חדר",
+      "changeAvatar": "שנה אווטאר",
+      "namePlaceholder": "השם שלך",
+      "authenticatedHint": "מחובר",
+      "roomNameLabel": "שם החדר",
+      "optional": "אופציונלי",
+      "roomNameHint": "השאר ריק לשם אוטומטי",
+      "createButton": "צור חדר",
+      "creating": "יוצר..."
     },
     "editProfile": "ערוך",
     "profileSetup": {

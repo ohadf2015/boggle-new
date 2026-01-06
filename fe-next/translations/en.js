@@ -401,6 +401,8 @@ const en = {
     "slowConnection": "Slow connection - we're on it",
     "sessionExpired": "Session ended. Time for a fresh start!",
     "gameCodeNotExist": "Code not found. Check and try again!",
+    "roomNoLongerExists": "Room no longer exists",
+    "roomClosed": "Room was closed",
     "usernameTaken": "Someone beat you to it! Try another name",
     "gameCodeExists": "That code's taken. Pick a new one!",
     "somethingWentWrong": "Oops! Something went sideways",
@@ -578,6 +580,33 @@ const en = {
       "playersOnline": "online",
       "noRooms": "No rooms - create one!",
       "roomsRefreshed": "Rooms refreshed"
+    },
+    "roomList": {
+      "activeRooms": "Active Rooms",
+      "online": "online",
+      "noRooms": "No active rooms",
+      "beFirst": "Be the first to create one!",
+      "createButton": "Create Room",
+      "refreshed": "Rooms refreshed"
+    },
+    "joinModal": {
+      "title": "Join Room",
+      "changeAvatar": "Change avatar",
+      "namePlaceholder": "Your name",
+      "authenticatedHint": "Signed in",
+      "joinButton": "Join Game",
+      "joining": "Joining..."
+    },
+    "createModal": {
+      "title": "Create Room",
+      "changeAvatar": "Change avatar",
+      "namePlaceholder": "Your name",
+      "authenticatedHint": "Signed in",
+      "roomNameLabel": "Room Name",
+      "optional": "optional",
+      "roomNameHint": "Leave empty for auto-generated name",
+      "createButton": "Create Room",
+      "creating": "Creating..."
     },
     "editProfile": "Edit",
     "profileSetup": {
