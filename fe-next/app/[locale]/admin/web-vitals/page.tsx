@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   Activity, ArrowLeft, RefreshCw, Monitor, Smartphone, Tablet,
@@ -71,18 +71,7 @@ export default function WebVitalsPage() {
   const [selectedRating, setSelectedRating] = useState<string>('all');
   const [timeRange, setTimeRange] = useState<'1h' | '24h' | '7d' | '30d'>('24h');
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/');
-      return;
-    }
-
-    if (user) {
-      checkAdminAccess();
-    }
-  }, [user, authLoading, router]);
-
-  async function checkAdminAccess() {
+  const checkAdminAccess = useCallback(async () => {
     try {
       if (!supabase) {
         toast.error('Database connection error');
@@ -108,7 +97,19 @@ export default function WebVitalsPage() {
       toast.error('Error checking permissions');
       router.push('/');
     }
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, router]);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/');
+      return;
+    }
+
+    if (user) {
+      checkAdminAccess();
+    }
+  }, [user, authLoading, router, checkAdminAccess]);
 
   async function fetchData() {
     setLoading(true);
