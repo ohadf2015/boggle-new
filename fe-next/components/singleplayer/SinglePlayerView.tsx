@@ -15,6 +15,7 @@ import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { incrementTrainingGames } from '@/utils/playerProgressStorage';
 import { getMinWordLength, getDefaultPreset, type PresetConfig } from './presetConfig';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 
 export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge' | 'daily';
 export type SinglePlayerPhase = 'preset-selection' | 'lobby' | 'playing' | 'results';
@@ -91,7 +92,15 @@ const SinglePlayerView: React.FC = () => {
   const { language: uiLanguage, t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
+
   const [phase, setPhase] = useState<SinglePlayerPhase>('preset-selection');
+  const setIsInGame = useHideNavigation();
+
+  // Hide bottom navigation during gameplay
+  useEffect(() => {
+    setIsInGame(phase === 'playing');
+    return () => setIsInGame(false);
+  }, [phase, setIsInGame]);
 
   // Check for returnTo param (e.g., returnTo=daily from training suggestion)
   const returnTo = searchParams.get('returnTo');

@@ -1,8 +1,8 @@
 {
   "summary": {
-    "totalKeysInCode": 1665,
+    "totalKeysInCode": 1668,
     "keyCountByLanguage": {
-      "en": 2864,
+      "en": 2866,
       "he": 2864,
       "sv": 2864,
       "ja": 2864,
@@ -12,10 +12,22 @@
   },
   "missingFromEnglish": [],
   "missingByLanguage": {
-    "he": [],
-    "sv": [],
-    "ja": [],
-    "es": []
+    "he": [
+      "brain.drills.unlockRequirement",
+      "brain.drills.unlockHint"
+    ],
+    "sv": [
+      "brain.drills.unlockRequirement",
+      "brain.drills.unlockHint"
+    ],
+    "ja": [
+      "brain.drills.unlockRequirement",
+      "brain.drills.unlockHint"
+    ],
+    "es": [
+      "brain.drills.unlockRequirement",
+      "brain.drills.unlockHint"
+    ]
   },
   "keysNotInEnglish": {
     "he": [],

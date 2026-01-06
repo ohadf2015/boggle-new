@@ -29,7 +29,9 @@ import ValidationModal from '../components/results/ValidationModal';
 import usePlayerSocketEvents from './hooks/usePlayerSocketEvents';
 import { resetComboState } from '@/shared/utils/comboUtils';
 import { useGameStateContext } from '@/contexts/GameStateContext';
+import { useGameStateContext } from '@/contexts/GameStateContext';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 
 // ==========================================
 // Type Definitions
@@ -100,6 +102,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   const { queueAchievement } = useAchievementQueue();
   const inputRef = useRef<HTMLInputElement>(null);
   const intentionalExitRef = useRef<boolean>(false);
+  const setIsInGame = useHideNavigation();
 
   // Enable presence tracking
   usePresence({ enabled: !!gameCode });
@@ -482,7 +485,14 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // This allows players to see the board while countdown is active
   // Also covers the transition period between countdown ending and gameActive being set
   const hasGameData = letterGrid && remainingTime !== null && remainingTime > 0;
+  const hasGameData = letterGrid && remainingTime !== null && remainingTime > 0;
   const showGameView = gameActive || (hasGameData && !waitingForResults);
+
+  // Hide bottom navigation during gameplay
+  useEffect(() => {
+    setIsInGame(showStartAnimation || !!showGameView);
+    return () => setIsInGame(false);
+  }, [showStartAnimation, showGameView, setIsInGame]);
 
   if (!showGameView && !waitingForResults) {
     // When countdown animation is active, only show the countdown overlay

@@ -36,6 +36,7 @@ import {
   type Player,
 } from './hooks';
 import { useNavigationGuard } from '../hooks/useNavigationGuard';
+import { useHideNavigation } from '../contexts/NavigationContext';
 
 // ==========================================
 // Props
@@ -65,6 +66,7 @@ const HostView: React.FC<HostViewProps> = memo(({
   const { fadeToTrack, stopMusic, TRACKS } = useMusic();
   const { playComboSound, playCountdownBeep } = useSoundEffects();
   const { queueAchievement } = useAchievementQueue();
+  const setIsInGame = useHideNavigation();
 
   // Enable presence tracking
   usePresence({ enabled: !!gameCode });
@@ -305,6 +307,13 @@ const HostView: React.FC<HostViewProps> = memo(({
 
   // Detect when we have active game data (covers countdown and transition to active game)
   const hasActiveGameData = runtime.tableData && runtime.remainingTime !== null && runtime.remainingTime > 0;
+
+  // Hide bottom navigation during gameplay
+  useEffect(() => {
+    const isGameActive = runtime.showStartAnimation || ((runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults);
+    setIsInGame(!!isGameActive);
+    return () => setIsInGame(false);
+  }, [runtime.showStartAnimation, runtime.gameStarted, hasActiveGameData, runtime.waitingForResults, setIsInGame]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-2 sm:p-4 md:p-6 lg:p-8 overflow-auto transition-colors duration-300">
