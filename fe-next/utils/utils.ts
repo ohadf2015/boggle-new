@@ -88,7 +88,7 @@ function searchWordOnBoard(
  * Check if a word exists on the board as a valid path
  * Uses DFS to find adjacent cell path (8-directional)
  */
-function isWordOnBoard(word: string, letterGrid: LetterGrid, language: Language): boolean {
+export function isWordOnBoard(word: string, letterGrid: LetterGrid, language: Language): boolean {
   if (!letterGrid || !word || letterGrid.length === 0) return false;
 
   // Normalize the word for comparison

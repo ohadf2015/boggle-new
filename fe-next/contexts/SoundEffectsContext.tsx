@@ -27,6 +27,7 @@ interface SoundEffectsContextType {
   playWordAcceptedSound: () => void;
   playCountdownBeep: (secondsRemaining: number) => void;
   playMessageSound: () => void;
+  playErrorSound: () => void;
   // Combo feedback sounds
   playComboMilestoneSound: (milestoneLevel: number) => void;
   playComboBreakSound: (lostLevel: number) => void;
@@ -244,6 +245,11 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     playSound('message', { volume: 0.5, requiresGameActive: false });
   }, [playSound]);
 
+  // Play error sound for invalid actions
+  const playErrorSound = useCallback(() => {
+    playSound('comboBreak', { volume: 0.4 });
+  }, [playSound]);
+
   // ==================== Combo Feedback Sounds ====================
 
   /**
@@ -374,6 +380,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     playWordAcceptedSound,
     playCountdownBeep,
     playMessageSound,
+    playErrorSound,
     // Combo feedback sounds
     playComboMilestoneSound,
     playComboBreakSound,
@@ -397,6 +404,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     playWordAcceptedSound,
     playCountdownBeep,
     playMessageSound,
+    playErrorSound,
     playComboMilestoneSound,
     playComboBreakSound,
     playComboSavedSound,
