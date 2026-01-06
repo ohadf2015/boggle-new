@@ -50,7 +50,7 @@ const TRAINING_SKILLS: TrainingSkill[] = [
     id: 'targetScore',
     icon: Target,
     labelKey: 'training.progress.targetScore',
-    fallbackLabel: 'Score 20 Points',
+    fallbackLabel: 'Score 15 Points',
     color: 'text-cyan-500',
     bgColor: 'bg-cyan-100 dark:bg-cyan-900/30',
   },
@@ -163,7 +163,7 @@ SkillCheckpoint.displayName = 'SkillCheckpoint';
  * 1. Find First Word (instant success)
  * 2. Swipe Diagonally
  * 3. Change Direction Mid-Word
- * 4. Score 20 Points (target score)
+ * 4. Score 15 Points (target score)
  * 5. Find 5 Words Total
  */
 const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
@@ -271,8 +271,11 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
   }
 
   // Make the expanded container clickable to collapse in compact mode
-  const containerProps = compact && onToggleExpand ? {
-    onClick: onToggleExpand,
+  const containerProps = compact && expanded && onToggleExpand ? {
+    onClick: (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onToggleExpand();
+    },
     role: 'button' as const,
     tabIndex: 0,
     onKeyDown: (e: React.KeyboardEvent) => {
@@ -308,7 +311,10 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
           </h3>
           {compact && onToggleExpand && (
             <button
-              onClick={onToggleExpand}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleExpand();
+              }}
               className={cn(
                 'text-xs px-3 py-2 min-h-[36px] rounded border',
                 isDarkMode ? 'border-slate-500 text-gray-400 hover:bg-slate-700' : 'border-gray-300 text-gray-500 hover:bg-gray-100'

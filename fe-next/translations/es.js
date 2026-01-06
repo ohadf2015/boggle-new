@@ -2524,7 +2524,7 @@ const es = {
       "firstWord": "Encuentra la Primera Palabra",
       "diagonal": "Desliza en Diagonal",
       "directionChange": "Cambia de Dirección",
-      "targetScore": "Alcanza 50 Puntos",
+      "targetScore": "Alcanza 15 Puntos",
       "fiveWords": "Encuentra 5 Palabras",
       "complete": "¡Estás Listo!",
       "almostThere": "¡Casi lo logras!",
@@ -2538,7 +2538,7 @@ const es = {
       "firstWord": "¡Primera palabra encontrada!",
       "diagonal": "¡Movimiento diagonal desbloqueado!",
       "directionChange": "¡Cambio de dirección desbloqueado!",
-      "targetScore": "¡50 puntos alcanzados!",
+      "targetScore": "¡15 puntos alcanzados!",
       "fiveWords": "¡5 palabras encontradas!"
     },
     "viewProgress": "Ver Progreso"

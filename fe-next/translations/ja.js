@@ -1729,7 +1729,7 @@ const ja = {
       "firstWord": "最初の単語を見つける",
       "diagonal": "斜めにスワイプ",
       "directionChange": "方向を変える",
-      "targetScore": "50ポイント獲得",
+      "targetScore": "15ポイント獲得",
       "fiveWords": "5つの単語を見つける",
       "complete": "準備完了！",
       "almostThere": "もう少し！",
@@ -1743,7 +1743,7 @@ const ja = {
       "firstWord": "最初の単語を見つけた！",
       "diagonal": "斜め移動が解放された！",
       "directionChange": "方向転換が解放された！",
-      "targetScore": "50ポイント達成！",
+      "targetScore": "15ポイント達成！",
       "fiveWords": "5つの単語を見つけた！"
     },
     "viewProgress": "進捗を見る"

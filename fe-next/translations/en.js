@@ -1736,7 +1736,7 @@ const en = {
       "firstWord": "Find First Word",
       "diagonal": "Swipe Diagonally",
       "directionChange": "Change Direction",
-      "targetScore": "Score 50 Points",
+      "targetScore": "Score 15 Points",
       "fiveWords": "Find 5 Words",
       "complete": "You're Ready!",
       "almostThere": "Almost there!",
@@ -1750,7 +1750,7 @@ const en = {
       "firstWord": "First word found!",
       "diagonal": "Diagonal movement unlocked!",
       "directionChange": "Direction changes unlocked!",
-      "targetScore": "50 points reached!",
+      "targetScore": "15 points reached!",
       "fiveWords": "5 words found!"
     },
     "viewProgress": "View Progress"

@@ -4,7 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import type { TrainingSkillId } from '@/components/training';
 import { triggerHaptic } from '@/utils/hapticFeedback';
 
-const TARGET_SCORE = 20;
+const TARGET_SCORE = 15;
 const TARGET_WORDS = 5;
 
 interface TrainingProgressState {
@@ -54,7 +54,7 @@ interface UseTrainingProgressReturn {
  * 1. firstWord - Find your first valid word
  * 2. diagonal - Use diagonal movement
  * 3. directionChange - Change direction mid-word
- * 4. targetScore - Score 50+ points
+ * 4. targetScore - Score 15+ points
  * 5. fiveWords - Find 5+ words total
  */
 export function useTrainingProgress(options: UseTrainingProgressOptions): UseTrainingProgressReturn {

@@ -1730,7 +1730,7 @@ const sv = {
       "firstWord": "Hitta Första Ordet",
       "diagonal": "Svep Diagonalt",
       "directionChange": "Byt Riktning",
-      "targetScore": "Nå 50 Poäng",
+      "targetScore": "Nå 15 Poäng",
       "fiveWords": "Hitta 5 Ord",
       "complete": "Du är Redo!",
       "almostThere": "Nästan där!",
@@ -1744,7 +1744,7 @@ const sv = {
       "firstWord": "Första ordet hittat!",
       "diagonal": "Diagonal rörelse upplåst!",
       "directionChange": "Riktningsändring upplåst!",
-      "targetScore": "50 poäng uppnått!",
+      "targetScore": "15 poäng uppnått!",
       "fiveWords": "5 ord hittade!"
     },
     "viewProgress": "Se Framsteg"

@@ -1731,7 +1731,7 @@ const he = {
       "firstWord": "מצא מילה ראשונה",
       "diagonal": "החלק באלכסון",
       "directionChange": "שנה כיוון",
-      "targetScore": "הגע ל-50 נקודות",
+      "targetScore": "הגע ל-15 נקודות",
       "fiveWords": "מצא 5 מילים",
       "complete": "מוכן!",
       "almostThere": "כמעט שם!",
@@ -1745,7 +1745,7 @@ const he = {
       "firstWord": "מילה ראשונה נמצאה!",
       "diagonal": "תנועה באלכסון נפתחה!",
       "directionChange": "שינוי כיוון נפתח!",
-      "targetScore": "50 נקודות הושגו!",
+      "targetScore": "15 נקודות הושגו!",
       "fiveWords": "5 מילים נמצאו!"
     },
     "viewProgress": "צפה בהתקדמות"
