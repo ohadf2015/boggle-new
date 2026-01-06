@@ -9,7 +9,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
 import { isWordOnBoard } from '@/utils/utils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
-import { AnimatePresence, motion } from 'framer-motion';
 import type { LetterGrid, Language } from '@/types';
 
 // Level configurations
