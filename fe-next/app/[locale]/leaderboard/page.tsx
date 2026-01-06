@@ -127,7 +127,7 @@ export default function LeaderboardPage(): React.ReactNode {
       <AutoHideHeader />
 
       <div className={cn(
-        "flex-1 max-w-4xl mx-auto px-4 w-full",
+        "flex-1 max-w-4xl mx-auto px-4 w-full pb-24 lg:pb-8",
         isLandscape ? "py-2" : "py-8"
       )}>
         {/* Page Title */}

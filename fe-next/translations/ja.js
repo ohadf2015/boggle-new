@@ -3532,6 +3532,8 @@ const ja = {
     "cognitiveProfile": "認知プロフィール",
     "scientificTips": "知ってた？",
     "learnMore": "詳細",
+    "radarChart": "認知レーダー",
+    "currentScores": "現在のスコア",
     "gamesAnalyzed": "分析ゲーム数",
     "toNextTier": "まで",
     "drills": {

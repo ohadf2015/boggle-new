@@ -87,7 +87,7 @@ export default function FriendsPage(): React.JSX.Element {
       </header>
 
       {/* Content */}
-      <main className="max-w-2xl mx-auto p-4">
+      <main className="max-w-2xl mx-auto p-4 pb-24 lg:pb-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

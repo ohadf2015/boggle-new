@@ -72,7 +72,7 @@ export default function ContactPage(): React.ReactNode {
       <AutoHideHeader />
 
       <div className={cn(
-        "max-w-2xl mx-auto px-4",
+        "max-w-2xl mx-auto px-4 pb-24 lg:pb-6",
         isLandscape ? "py-2" : "py-6"
       )}>
         {/* Header */}

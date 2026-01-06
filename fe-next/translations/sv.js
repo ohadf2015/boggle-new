@@ -3533,6 +3533,8 @@ const sv = {
     "cognitiveProfile": "Kognitiv profil",
     "scientificTips": "Visste du?",
     "learnMore": "Läs mer",
+    "radarChart": "Kognitiv radar",
+    "currentScores": "Nuvarande poäng",
     "gamesAnalyzed": "Analyserade spel",
     "toNextTier": "till",
     "drills": {

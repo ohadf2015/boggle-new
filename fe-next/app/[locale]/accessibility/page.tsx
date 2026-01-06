@@ -153,7 +153,7 @@ export default function AccessibilitySettingsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <Header />
-      <div className="max-w-3xl mx-auto px-4 py-8 md:py-12">
+      <div className="max-w-3xl mx-auto px-4 py-8 md:py-12 pb-24 lg:pb-12">
         {/* Page Title */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

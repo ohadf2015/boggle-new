@@ -3534,6 +3534,8 @@ const he = {
     "cognitiveProfile": "פרופיל קוגניטיבי",
     "scientificTips": "הידעת?",
     "learnMore": "למד עוד",
+    "radarChart": "רדאר קוגניטיבי",
+    "currentScores": "ציונים נוכחיים",
     "gamesAnalyzed": "משחקים נותחו",
     "toNextTier": "ל",
     "drills": {

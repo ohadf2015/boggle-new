@@ -3546,6 +3546,8 @@ const en = {
     "cognitiveProfile": "Cognitive Profile",
     "scientificTips": "Did You Know?",
     "learnMore": "Learn more",
+    "radarChart": "Cognitive Radar",
+    "currentScores": "Current Scores",
     "gamesAnalyzed": "Games Analyzed",
     "toNextTier": "to",
     "drills": {

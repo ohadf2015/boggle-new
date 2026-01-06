@@ -96,7 +96,7 @@ export default function RulesPage(): React.JSX.Element {
             <div dir={dir} className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
                 <Header />
 
-            <main className="max-w-4xl mx-auto px-2 sm:px-6 py-3 sm:py-10">
+            <main className="max-w-4xl mx-auto px-2 sm:px-6 py-3 sm:py-10 pb-24 lg:pb-10">
                 {/* Page Header - Compact */}
                 <motion.div
                     className="text-center mb-3 sm:mb-6"

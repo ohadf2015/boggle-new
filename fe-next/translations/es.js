@@ -3530,6 +3530,8 @@ const es = {
     "cognitiveProfile": "Perfil Cognitivo",
     "scientificTips": "¿Sabías que?",
     "learnMore": "Saber más",
+    "radarChart": "Radar cognitivo",
+    "currentScores": "Puntuaciones actuales",
     "gamesAnalyzed": "Juegos Analizados",
     "toNextTier": "para",
     "drills": {
