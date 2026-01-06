@@ -299,6 +299,15 @@ export async function syncGuestDailyResultsToAccount(
     // Submit each result to the backend
     for (const { result, puzzleNumber, puzzleDate, language } of allGuestResults) {
       try {
+        // Validate required fields before syncing
+        if (!result || !puzzleDate || !puzzleNumber || !language) {
+          continue;
+        }
+
+        if (result.solved === undefined || !result.attemptsUsed || !result.targetWord || !Array.isArray(result.attempts)) {
+          continue;
+        }
+
         const bodyData: Record<string, unknown> = {
           puzzleDate,
           puzzleNumber,
@@ -315,11 +324,11 @@ export async function syncGuestDailyResultsToAccount(
           targetWord: result.targetWord,
           attemptWords: result.attempts.map(a => ({
             word: a.word,
-            feedback: a.feedback.map(f => ({
+            feedback: Array.isArray(a.feedback) ? a.feedback.map(f => ({
               letter: f.letter,
               feedback: f.feedback,
               position: f.position,
-            })),
+            })) : [],
             timestamp: a.timestamp,
           })),
         };

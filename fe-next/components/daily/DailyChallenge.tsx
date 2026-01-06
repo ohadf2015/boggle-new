@@ -74,27 +74,29 @@ const DailyChallenge: React.FC = () => {
   // Game language state - separate from UI language
   // This controls only the puzzle/dictionary language, not the UI
   // User can switch languages via the dropdown during the session
-  const [gameLanguage, setGameLanguage] = useState<Language>(() => {
-    // Check localStorage for saved game language preference (persists language selection)
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('lexiclash_daily_game_language');
-      if (saved && ['en', 'he', 'sv', 'ja', 'es'].includes(saved)) {
-        return saved as Language;
-      }
-    }
-    // Fall back to URL locale
-    const urlLocale = language as Language;
-    return urlLocale && ['en', 'he', 'sv', 'ja', 'es'].includes(urlLocale)
-      ? urlLocale
-      : 'en';
-  });
+  // Initialize with URL locale to avoid hydration mismatch (localStorage is read in useEffect)
+  const urlLocale = language as Language;
+  const defaultLanguage = urlLocale && ['en', 'he', 'sv', 'ja', 'es'].includes(urlLocale)
+    ? urlLocale
+    : 'en';
+  const [gameLanguage, setGameLanguage] = useState<Language>(defaultLanguage);
+  const [isLanguageInitialized, setIsLanguageInitialized] = useState(false);
 
-  // Persist game language to localStorage
+  // Load saved game language from localStorage after mount (avoids hydration mismatch)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('lexiclash_daily_game_language');
+    if (saved && ['en', 'he', 'sv', 'ja', 'es'].includes(saved)) {
+      setGameLanguage(saved as Language);
+    }
+    setIsLanguageInitialized(true);
+  }, []);
+
+  // Persist game language to localStorage (only after initial load to avoid overwriting saved value)
+  useEffect(() => {
+    if (isLanguageInitialized) {
       localStorage.setItem('lexiclash_daily_game_language', gameLanguage);
     }
-  }, [gameLanguage]);
+  }, [gameLanguage, isLanguageInitialized]);
 
   // Get current language flag
   const getCurrentFlag = (lang: Language) => {
