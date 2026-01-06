@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
 import { translations } from '@/translations';
@@ -21,19 +21,22 @@ interface PageParams {
   }>;
 }
 
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
+    <div className="text-center">
+      <div className="relative w-12 h-12 mx-auto mb-3">
+        <div className="absolute inset-0 border-4 border-neo-yellow/30 rounded-full" />
+        <div className="absolute inset-0 border-4 border-transparent border-t-neo-yellow rounded-full animate-spin" />
+      </div>
+      <p className="text-gray-600 dark:text-gray-300 text-sm">Loading Daily Challenge...</p>
+    </div>
+  </div>
+);
+
 // Dynamic import for code splitting (client component)
 const DailyChallenge = dynamicImport(() => import('@/components/daily/DailyChallenge'), {
-  loading: () => (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
-      <div className="text-center">
-        <div className="relative w-12 h-12 mx-auto mb-3">
-          <div className="absolute inset-0 border-4 border-neo-yellow/30 rounded-full" />
-          <div className="absolute inset-0 border-4 border-transparent border-t-neo-yellow rounded-full animate-spin" />
-        </div>
-        <p className="text-gray-600 dark:text-gray-300 text-sm">Loading Daily Challenge...</p>
-      </div>
-    </div>
-  ),
+  loading: LoadingFallback,
 });
 
 // Force dynamic rendering
@@ -274,7 +277,14 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
  * Daily Challenge page route
  * Same puzzle for everyone worldwide each day
  * Shareable emoji results like Wordle
+ *
+ * Wrapped in Suspense boundary to properly handle useSearchParams
+ * which can cause "Rendered fewer hooks than expected" errors without it.
  */
 export default function DailyChallengePage(): React.JSX.Element {
-  return <DailyChallenge />;
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <DailyChallenge />
+    </Suspense>
+  );
 }

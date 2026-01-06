@@ -488,7 +488,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             <div className="w-px h-8 bg-slate-700" />
             <div className="text-center px-3">
               <div className="text-2xl font-black text-white">
-                {Math.floor(result.timeSeconds / 60)}:{(result.timeSeconds % 60).toString().padStart(2, '0')}
+                {Math.floor((result.timeSeconds ?? 0) / 60)}:{((result.timeSeconds ?? 0) % 60).toString().padStart(2, '0')}
               </div>
               <div className="text-xs text-slate-400 font-medium">{t('results.time')}</div>
             </div>

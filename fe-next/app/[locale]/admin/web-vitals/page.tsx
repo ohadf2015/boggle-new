@@ -257,7 +257,7 @@ export default function WebVitalsPage() {
               variant="outline"
               size="sm"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <ArrowLeft className="w-4 h-4 me-2 rtl:rotate-180" />
               Back to Admin
             </Button>
             <div>

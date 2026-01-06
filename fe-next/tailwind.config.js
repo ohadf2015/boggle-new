@@ -247,15 +247,13 @@ module.exports = {
           "0%, 100%": { transform: "scale(1)", boxShadow: "6px 6px 0px rgb(var(--neo-black))" },
           "50%": { transform: "scale(1.02)", boxShadow: "8px 8px 0px rgb(var(--neo-black))" },
         },
-        // Smooth hint glow animation for revealed word paths (using pink accent)
+        // Subtle hint glow animation for revealed word paths (softer purple)
         "hint-glow": {
           "0%, 100%": {
-            boxShadow: "0 0 8px rgba(255, 20, 147, 0.6), 0 0 16px rgba(255, 20, 147, 0.3), 4px 4px 0 #000",
-            transform: "scale(1)"
+            boxShadow: "0 0 6px rgba(139, 92, 246, 0.4), 0 0 12px rgba(139, 92, 246, 0.2), 4px 4px 0 #000",
           },
           "50%": {
-            boxShadow: "0 0 16px rgba(255, 20, 147, 0.9), 0 0 32px rgba(255, 20, 147, 0.5), 4px 4px 0 #000",
-            transform: "scale(1.03)"
+            boxShadow: "0 0 10px rgba(139, 92, 246, 0.5), 0 0 20px rgba(139, 92, 246, 0.25), 4px 4px 0 #000",
           },
         },
       },
@@ -271,7 +269,7 @@ module.exports = {
         "neo-slide-in": "neo-slide-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
         "neo-shake": "neo-shake 0.4s ease-in-out",
         "pulse-subtle": "pulse-subtle 2s ease-in-out infinite",
-        "hint-glow": "hint-glow 1.5s ease-in-out infinite",
+        "hint-glow": "hint-glow 2.5s ease-in-out infinite",
       },
       // Custom rotation values for tilts
       rotate: {

@@ -10,6 +10,7 @@ import englishWords from 'an-array-of-english-words';
 import spanishWords from 'an-array-of-spanish-words';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 import { createClient } from '@supabase/supabase-js';
+import { captureApiError } from '@/utils/sentry';
 
 // Pre-build dictionaries at module load (cached by Next.js)
 const englishDictionary = new Set(englishWords.map((w: string) => w.toLowerCase()));
@@ -151,6 +152,11 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Unknown error';
     console.error('[validate-word] Error:', msg);
+    captureApiError(
+      error instanceof Error ? error : new Error(String(error)),
+      '/api/validate-word',
+      { method: 'POST', statusCode: 500 }
+    );
     return Response.json({
       isValid: false,
       reason: 'Validation error',

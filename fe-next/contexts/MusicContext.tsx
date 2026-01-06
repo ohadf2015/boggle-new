@@ -135,11 +135,20 @@ export function MusicProvider({ children }: MusicProviderProps) {
                 },
                 onplayerror: (id, err) => {
                     logger.error(`[Music] Failed to play ${key}:`, err);
-                    // Try to unlock and retry
+                    // Try to unlock and retry - wrap in catch for iOS Safari errors
                     if (Howler.ctx && Howler.ctx.state === 'suspended') {
-                        Howler.ctx.resume().then(() => {
-                            howlsRef.current[key as TrackKey]?.play();
-                        });
+                        Howler.ctx.resume()
+                            .then(() => {
+                                try {
+                                    howlsRef.current[key as TrackKey]?.play();
+                                } catch (playErr) {
+                                    logger.warn(`[Music] Retry play failed for ${key}:`, playErr);
+                                }
+                            })
+                            .catch((resumeErr: Error) => {
+                                // Silently handle iOS Safari audio device errors
+                                logger.warn(`[Music] AudioContext resume failed in onplayerror:`, resumeErr.message);
+                            });
                     }
                 },
                 onend: () => {
@@ -222,10 +231,23 @@ export function MusicProvider({ children }: MusicProviderProps) {
     // Helper to resume all audio
     // Resumes AudioContext and also explicitly plays paused Howl instance
     const resumeAudio = useCallback((reason: string) => {
-        // Resume AudioContext
+        // Resume AudioContext - wrap in try-catch for iOS Safari errors
+        // iOS Safari can throw "InvalidStateError: Failed to start the audio device"
         if (Howler.ctx && Howler.ctx.state === 'suspended' && audioUnlockedRef.current) {
-            Howler.ctx.resume();
-            logger.log(`[Music] ${reason} - resumed AudioContext`);
+            try {
+                // Note: resume() returns a Promise on some browsers
+                const result = Howler.ctx.resume();
+                if (result && typeof result.catch === 'function') {
+                    result.catch((err: Error) => {
+                        // Silently handle iOS Safari audio device errors
+                        // These occur when the device can't start audio (e.g., silent mode, bluetooth issues)
+                        logger.warn(`[Music] ${reason} - AudioContext resume failed:`, err.message);
+                    });
+                }
+                logger.log(`[Music] ${reason} - resumed AudioContext`);
+            } catch (err) {
+                logger.warn(`[Music] ${reason} - AudioContext resume error:`, err);
+            }
         }
 
         // CRITICAL: Stop all tracks except the current one to prevent multiple tracks playing
@@ -240,10 +262,15 @@ export function MusicProvider({ children }: MusicProviderProps) {
         // Resume the current Howl instance if it was paused
         // This handles cases where we paused via Howl.pause() in suspendAudio
         if (currentHowlRef.current && !currentHowlRef.current.playing() && currentTrackRef.current) {
-            const targetVolume = isMutedRef.current ? 0 : volumeRef.current;
-            currentHowlRef.current.play();
-            currentHowlRef.current.volume(targetVolume);
-            logger.log(`[Music] ${reason} - resumed current Howl`);
+            try {
+                const targetVolume = isMutedRef.current ? 0 : volumeRef.current;
+                currentHowlRef.current.play();
+                currentHowlRef.current.volume(targetVolume);
+                logger.log(`[Music] ${reason} - resumed current Howl`);
+            } catch (err) {
+                // Silently handle play errors (iOS can throw InvalidStateError)
+                logger.warn(`[Music] ${reason} - Howl play error:`, err);
+            }
         }
     }, []);
 
@@ -346,9 +373,18 @@ export function MusicProvider({ children }: MusicProviderProps) {
     const unlockAudio = useCallback(() => {
         if (audioUnlockedRef.current) return;
 
-        // Resume AudioContext for iOS Safari
+        // Resume AudioContext for iOS Safari - wrap in try-catch for device errors
         if (Howler.ctx && Howler.ctx.state === 'suspended') {
-            Howler.ctx.resume();
+            try {
+                const result = Howler.ctx.resume();
+                if (result && typeof result.catch === 'function') {
+                    result.catch((err: Error) => {
+                        logger.warn('[Music] unlockAudio - AudioContext resume failed:', err.message);
+                    });
+                }
+            } catch (err) {
+                logger.warn('[Music] unlockAudio - AudioContext error:', err);
+            }
         }
 
         audioUnlockedRef.current = true;

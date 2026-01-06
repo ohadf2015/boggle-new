@@ -4,6 +4,7 @@ import {
   getEligibleRecipients,
   sendDailyChallengeEmail,
 } from '@/lib/email';
+import { captureApiError } from '@/utils/sentry';
 
 /**
  * POST /api/email/send-daily
@@ -93,6 +94,11 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('[Email Cron] Error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error(String(error)),
+      '/api/email/send-daily',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: 'Failed to send daily emails' },
       { status: 500 }

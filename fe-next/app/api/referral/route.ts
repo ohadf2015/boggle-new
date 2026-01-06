@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { captureApiError } from '@/utils/sentry';
 
 /**
  * GET /api/referral
@@ -28,6 +29,11 @@ export async function GET(request: NextRequest) {
 
     if (profileError) {
       console.error('Error fetching profile:', profileError);
+      captureApiError(new Error(profileError.message), '/api/referral', {
+        method: 'GET',
+        userId: user.id,
+        statusCode: 500,
+      });
       return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 });
     }
 
@@ -48,6 +54,11 @@ export async function GET(request: NextRequest) {
 
     if (referralsError) {
       console.error('Error fetching referrals:', referralsError);
+      captureApiError(new Error(referralsError.message), '/api/referral', {
+        method: 'GET',
+        userId: user.id,
+        statusCode: 500,
+      });
     }
 
     // Get referred user details for display
@@ -99,6 +110,11 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error in GET /api/referral:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error(String(error)),
+      '/api/referral',
+      { method: 'GET', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -167,6 +183,11 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       console.error('Error updating referred_by:', updateError);
+      captureApiError(new Error(updateError.message), '/api/referral', {
+        method: 'POST',
+        userId: user.id,
+        statusCode: 500,
+      });
       return NextResponse.json({ error: 'Failed to track referral' }, { status: 500 });
     }
 
@@ -186,6 +207,11 @@ export async function POST(request: NextRequest) {
 
     if (referralError) {
       console.error('Error creating referral record:', referralError);
+      captureApiError(new Error(referralError.message), '/api/referral', {
+        method: 'POST',
+        userId: user.id,
+        statusCode: 500,
+      });
       // Don't fail the request if tracking fails
     }
 
@@ -203,6 +229,11 @@ export async function POST(request: NextRequest) {
 
     if (xpError) {
       console.error('Error granting referral XP:', xpError);
+      captureApiError(new Error(xpError.message), '/api/referral', {
+        method: 'POST',
+        userId: user.id,
+        statusCode: 500,
+      });
     }
 
     // Record the reward
@@ -239,6 +270,11 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error in POST /api/referral:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error(String(error)),
+      '/api/referral',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

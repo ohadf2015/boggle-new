@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { captureApiError } from '@/utils/sentry';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -122,6 +123,11 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('[API] Calendar GET error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error(String(error)),
+      '/api/engagement/calendar',
+      { method: 'GET', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: 'Failed to get calendar status' },
       { status: 500 }
@@ -252,6 +258,11 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('[API] Calendar POST error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error(String(error)),
+      '/api/engagement/calendar',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: 'Failed to claim reward' },
       { status: 500 }

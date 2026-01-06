@@ -170,7 +170,7 @@ const LandingView: React.FC = () => {
       <Header />
 
       {/* Main content */}
-      <main className={`w-full max-w-6xl mx-auto overflow-x-hidden ${isLandscape ? 'flex-1 flex flex-col justify-center px-4 py-2' : 'px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-4'}`}>
+      <main className={`w-full max-w-6xl mx-auto overflow-x-hidden ${isLandscape ? 'flex-1 flex flex-col justify-center px-4 py-2' : 'px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-4 pb-24 lg:pb-4'}`}>
         {/* Hero section - compact (hidden in landscape) */}
         {!isLandscape && (
           <motion.div
@@ -281,7 +281,7 @@ const LandingView: React.FC = () => {
         transition={{ duration: 0.3, delay: 0.3 }}
         onClick={handleOpenTutorial}
         className="
-          fixed bottom-4 right-4 z-[45]
+          fixed bottom-24 lg:bottom-4 right-4 z-[45]
           flex items-center gap-2
           min-w-[48px] min-h-[48px]
           px-4 py-3

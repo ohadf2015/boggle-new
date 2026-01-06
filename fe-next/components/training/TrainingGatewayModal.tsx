@@ -207,7 +207,7 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
               >
                 W
               </motion.div>
-              <ArrowRight className={cn('w-4 h-4', isDarkMode ? 'text-purple-400' : 'text-purple-600')} />
+              <ArrowRight className={cn('w-4 h-4 rtl:rotate-180', isDarkMode ? 'text-purple-400' : 'text-purple-600')} />
               <div className={cn(
                 'w-8 h-8 rounded-lg border-2 flex items-center justify-center font-bold text-sm',
                 isDarkMode
@@ -316,7 +316,7 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
             >
               <Dumbbell size={20} />
               {t('training.gateway.startTraining') || 'Start Training'}
-              <ArrowRight size={18} />
+              <ArrowRight size={18} className="rtl:rotate-180" />
             </Button>
 
             {/* Secondary: Skip */}

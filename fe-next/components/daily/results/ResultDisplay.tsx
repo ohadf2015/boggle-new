@@ -50,7 +50,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
           <div className="mt-2">
             <span className="text-xs text-gray-500 dark:text-gray-400">{t('wordHunt.results.targetWord')}: </span>
             <span className="text-xl sm:text-2xl font-black text-neo-yellow">
-              {language === 'he' ? applyHebrewFinalLetters(targetWord) : targetWord.toUpperCase()}
+              {language === 'he' ? applyHebrewFinalLetters(targetWord ?? '') : (targetWord ?? '').toUpperCase()}
             </span>
           </div>
         </>

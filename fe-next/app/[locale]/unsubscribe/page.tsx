@@ -85,7 +85,7 @@ export default function UnsubscribePage() {
                     'bg-neo-yellow text-neo-black hover:bg-neo-yellow/90'
                   )}
                 >
-                  <ArrowLeft className="me-2" />
+                  <ArrowLeft className="me-2 rtl:rotate-180" />
                   {t('unsubscribe.backToGame') || 'Back to Game'}
                 </Button>
 
@@ -128,7 +128,7 @@ export default function UnsubscribePage() {
                   'bg-neo-cyan text-neo-black hover:bg-neo-cyan/90'
                 )}
               >
-                <ArrowLeft className="me-2" />
+                <ArrowLeft className="me-2 rtl:rotate-180" />
                 {t('unsubscribe.backToGame') || 'Back to Game'}
               </Button>
             </>

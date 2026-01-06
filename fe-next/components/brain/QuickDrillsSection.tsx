@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Zap, Brain, Target, Shuffle, BookOpen, ChevronRight, Lock } from 'lucide-react';
+import { Zap, Brain, Target, Shuffle, BookOpen, Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
@@ -78,24 +78,12 @@ export default function QuickDrillsSection() {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <h2 className={cn(
-          'text-lg font-bold uppercase tracking-wide',
-          isDarkMode ? 'text-neo-white' : 'text-neo-black'
-        )}>
-          {t('brain.quickDrills')}
-        </h2>
-        <button
-          onClick={() => router.push(`/${language}/brain/drills`)}
-          className={cn(
-            'flex items-center gap-1 text-sm font-bold',
-            isDarkMode ? 'text-neo-cyan hover:text-neo-cyan/80' : 'text-neo-purple hover:text-neo-purple/80'
-          )}
-        >
-          {t('brain.viewAll')}
-          <ChevronRight className="w-4 h-4" />
-        </button>
-      </div>
+      <h2 className={cn(
+        'text-lg font-bold uppercase tracking-wide',
+        isDarkMode ? 'text-neo-white' : 'text-neo-black'
+      )}>
+        {t('brain.quickDrills')}
+      </h2>
 
       {/* Horizontal Scroll Container */}
       <div className="overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { captureApiError } from '@/utils/sentry';
 
 /**
  * GET /api/daily/validate-retry-token?token={token}
@@ -81,6 +82,11 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error('Validate retry token error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error(String(error)),
+      '/api/daily/validate-retry-token',
+      { method: 'GET', statusCode: 500 }
+    );
     return NextResponse.json(
       { valid: false, reason: 'server_error' },
       { status: 500 }
@@ -211,6 +217,11 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error('Use retry token error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error(String(error)),
+      '/api/daily/validate-retry-token',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
       { success: false, error: 'server_error' },
       { status: 500 }

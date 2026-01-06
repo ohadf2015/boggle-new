@@ -7,6 +7,40 @@ interface ProfileData {
   country_code?: string | null;
 }
 
+// ============================================================================
+// Error Context Interfaces
+// ============================================================================
+
+interface ApiErrorContext {
+  method?: string;
+  userId?: string;
+  statusCode?: number;
+  body?: Record<string, unknown>;
+}
+
+interface SocketErrorContext {
+  event: string;
+  gameCode?: string;
+  socketId?: string;
+  username?: string;
+  isHost?: boolean;
+}
+
+interface AIServiceErrorContext {
+  operation: string;
+  word?: string;
+  language?: string;
+  retryAttempt?: number;
+  isRateLimited?: boolean;
+}
+
+interface BackgroundErrorContext {
+  operation: string;
+  service?: string;
+  userId?: string;
+  isRetryable?: boolean;
+}
+
 /**
  * Set user context in Sentry when user authenticates
  */
@@ -99,4 +133,276 @@ export function linkLogRocketSession(): void {
       Sentry.setTag("logrocket_session", sessionURL);
     });
   }
+}
+
+// ============================================================================
+// Expected Error Detection
+// ============================================================================
+
+/**
+ * Patterns for errors that are expected and should NOT be captured to Sentry
+ */
+const EXPECTED_ERROR_PATTERNS = [
+  // Audio autoplay blocks (common on mobile/strict browsers)
+  /NotAllowedError/i,
+  /play\(\) failed/i,
+  /autoplay/i,
+  /user denied permission/i,
+
+  // Rate limiting (handled gracefully by UI)
+  /rate limit/i,
+  /too many requests/i,
+  /429/,
+
+  // Network timeouts for non-critical operations
+  /AbortError/i,
+  /timeout/i,
+  /network request failed/i,
+
+  // User input validation (expected user errors)
+  /invalid referral code/i,
+  /username taken/i,
+  /room not found/i,
+  /game not found/i,
+  /already referred/i,
+  /cannot refer yourself/i,
+
+  // Socket reconnection (normal lifecycle)
+  /transport close/i,
+  /ping timeout/i,
+];
+
+/**
+ * Check if an error is expected (should NOT be captured to Sentry)
+ */
+export function isExpectedError(error: Error | unknown): boolean {
+  if (!error) return true;
+
+  const errorMessage =
+    error instanceof Error
+      ? error.message
+      : typeof error === "string"
+        ? error
+        : String(error);
+
+  const errorName = error instanceof Error ? error.name : "";
+
+  return EXPECTED_ERROR_PATTERNS.some(
+    (pattern) => pattern.test(errorMessage) || pattern.test(errorName)
+  );
+}
+
+// ============================================================================
+// Specialized Error Capture Functions
+// ============================================================================
+
+/**
+ * Capture API route errors with route-specific context
+ */
+export function captureApiError(
+  error: Error,
+  route: string,
+  context?: ApiErrorContext
+): void {
+  if (process.env.NODE_ENV !== "production") {
+    console.error(`[Sentry API Error] ${route}:`, error, context);
+    return;
+  }
+
+  // Don't capture expected errors
+  if (isExpectedError(error)) return;
+
+  Sentry.withScope((scope) => {
+    scope.setTag("error.type", "api_error");
+    scope.setTag("api.route", route);
+
+    if (context?.method) {
+      scope.setTag("api.method", context.method);
+    }
+    if (context?.statusCode) {
+      scope.setTag("api.status_code", String(context.statusCode));
+    }
+    if (context?.userId) {
+      scope.setUser({ id: context.userId });
+    }
+
+    scope.setContext("api_request", {
+      route,
+      method: context?.method,
+      statusCode: context?.statusCode,
+      body: context?.body,
+    });
+
+    Sentry.captureException(error);
+  });
+}
+
+/**
+ * Capture Socket.IO errors with socket-specific context
+ */
+export function captureSocketError(
+  error: Error,
+  context: SocketErrorContext
+): void {
+  if (process.env.NODE_ENV !== "production") {
+    console.error(`[Sentry Socket Error] ${context.event}:`, error, context);
+    return;
+  }
+
+  // Don't capture expected errors
+  if (isExpectedError(error)) return;
+
+  Sentry.withScope((scope) => {
+    scope.setTag("error.type", "socket_error");
+    scope.setTag("socket.event", context.event);
+
+    if (context.gameCode) {
+      scope.setTag("socket.game_code", context.gameCode);
+    }
+    if (context.isHost !== undefined) {
+      scope.setTag("socket.is_host", String(context.isHost));
+    }
+
+    scope.setContext("socket_event", {
+      event: context.event,
+      gameCode: context.gameCode,
+      socketId: context.socketId,
+      username: context.username,
+      isHost: context.isHost,
+    });
+
+    Sentry.captureException(error);
+  });
+}
+
+/**
+ * Capture AI service errors with operation-specific context
+ */
+export function captureAIServiceError(
+  error: Error,
+  context: AIServiceErrorContext
+): void {
+  if (process.env.NODE_ENV !== "production") {
+    console.error(
+      `[Sentry AI Service Error] ${context.operation}:`,
+      error,
+      context
+    );
+    return;
+  }
+
+  // Don't capture rate limit errors (expected)
+  if (context.isRateLimited || isExpectedError(error)) return;
+
+  Sentry.withScope((scope) => {
+    scope.setTag("error.type", "ai_service_error");
+    scope.setTag("ai.operation", context.operation);
+
+    if (context.language) {
+      scope.setTag("ai.language", context.language);
+    }
+    if (context.retryAttempt !== undefined) {
+      scope.setTag("ai.retry_attempt", String(context.retryAttempt));
+    }
+
+    scope.setContext("ai_operation", {
+      operation: context.operation,
+      word: context.word,
+      language: context.language,
+      retryAttempt: context.retryAttempt,
+    });
+
+    Sentry.captureException(error);
+  });
+}
+
+/**
+ * Capture background operation errors (sync, notifications, etc.)
+ */
+export function captureBackgroundError(
+  error: Error,
+  context: BackgroundErrorContext
+): void {
+  if (process.env.NODE_ENV !== "production") {
+    console.error(
+      `[Sentry Background Error] ${context.operation}:`,
+      error,
+      context
+    );
+    return;
+  }
+
+  // Don't capture expected errors
+  if (isExpectedError(error)) return;
+
+  Sentry.withScope((scope) => {
+    scope.setTag("error.type", "background_error");
+    scope.setTag("background.operation", context.operation);
+
+    if (context.service) {
+      scope.setTag("background.service", context.service);
+    }
+    if (context.userId) {
+      scope.setUser({ id: context.userId });
+    }
+
+    scope.setContext("background_operation", {
+      operation: context.operation,
+      service: context.service,
+      userId: context.userId,
+      isRetryable: context.isRetryable,
+    });
+
+    Sentry.captureException(error);
+  });
+}
+
+// ============================================================================
+// Breadcrumb Helpers
+// ============================================================================
+
+/**
+ * Add a game-related breadcrumb for debugging context
+ */
+export function addGameBreadcrumb(
+  action: string,
+  data: Record<string, unknown>
+): void {
+  Sentry.addBreadcrumb({
+    category: "game",
+    message: action,
+    data,
+    level: "info",
+  });
+}
+
+/**
+ * Add an API call breadcrumb for debugging context
+ */
+export function addApiCallBreadcrumb(
+  url: string,
+  method: string,
+  status?: number
+): void {
+  Sentry.addBreadcrumb({
+    category: "api",
+    message: `${method} ${url}`,
+    data: { url, method, status },
+    level: status && status >= 400 ? "warning" : "info",
+  });
+}
+
+/**
+ * Add a Socket.IO event breadcrumb for debugging context
+ */
+export function addSocketEventBreadcrumb(
+  event: string,
+  direction: "sent" | "received"
+): void {
+  Sentry.addBreadcrumb({
+    category: "socket",
+    message: `${direction}: ${event}`,
+    data: { event, direction },
+    level: "info",
+  });
 }

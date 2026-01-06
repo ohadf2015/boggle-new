@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { captureApiError } from '@/utils/sentry';
 
 /**
  * Email Subscription API Endpoint
@@ -142,6 +143,10 @@ export async function POST(request: NextRequest) {
 
       if (dbError) {
         console.error('[Email Subscription DB Error]', dbError);
+        captureApiError(new Error(dbError.message), '/api/subscribe-email', {
+          method: 'POST',
+          statusCode: 500,
+        });
         // Don't fail the request if DB storage fails but email provider succeeded
         if (!process.env.MAILCHIMP_API_KEY && !process.env.SENDGRID_API_KEY) {
           throw new Error('Failed to save email subscription');
@@ -159,6 +164,11 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('[Email Subscription Error]', error);
+    captureApiError(
+      error instanceof Error ? error : new Error(String(error)),
+      '/api/subscribe-email',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: 'Failed to subscribe. Please try again.' },
       { status: 500 }

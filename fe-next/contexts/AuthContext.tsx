@@ -16,7 +16,7 @@ import { getUtmDataForProfile } from '../utils/utmCapture';
 import { getPendingDailyResult, clearPendingDailyResult, getGuestDailyPlayer, setWinnerOnboarding, syncGuestDailyResultsToAccount } from '../utils/dailyChallenge';
 import { getStoredProfile, hasCompleteStoredProfile, clearStoredProfile } from '../utils/profileStorage';
 import logger from '@/utils/logger';
-import { setSentryUser, clearSentryUser } from '@/utils/sentry';
+import { setSentryUser, clearSentryUser, captureBackgroundError } from '@/utils/sentry';
 import type { User } from '@supabase/supabase-js';
 import { linkSessionToUser } from '@/utils/sessionTracking';
 import { getRandomAvatar, getAvatarEmojiAndColor } from '@/utils/avatarConfig';
@@ -284,6 +284,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           }
         }).catch((err) => {
           logger.warn('Failed to sync guest daily results:', err);
+          captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
+            operation: 'sync_guest_daily_results',
+            service: 'dailyChallenge',
+            userId,
+          });
         });
 
         // Fetch geolocation and update in background
@@ -298,6 +303,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           }
         }).catch((err) => {
           logger.warn('Failed to update country_code:', err);
+          captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
+            operation: 'geolocation_update',
+            service: 'geolocation',
+            userId,
+          });
         });
       }
 
@@ -330,6 +340,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }
       }).catch((err) => {
         logger.warn('Failed to sync guest daily results:', err);
+        captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
+          operation: 'sync_guest_daily_results',
+          service: 'dailyChallenge',
+          userId,
+        });
       });
 
       // If user doesn't have country_code yet, fetch and update it
@@ -345,6 +360,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           }
         }).catch((err) => {
           logger.warn('Failed to update country_code:', err);
+          captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
+            operation: 'geolocation_update',
+            service: 'geolocation',
+            userId,
+          });
         });
       }
     }
@@ -419,6 +439,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           // Fetch user data in background, don't block loading state
           fetchUserData(session.user.id, session.user.user_metadata).catch((err) => {
             logger.warn('Failed to fetch user data:', err.message);
+            captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
+              operation: 'fetch_user_data',
+              service: 'auth',
+              userId: session.user.id,
+            });
           });
         }
       } catch (err) {
@@ -450,6 +475,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             // Link guest session to user account
             linkSessionToUser(session.user.id).catch((err) => {
               logger.warn('Failed to link guest session to user:', err);
+              captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
+                operation: 'link_session_to_user',
+                service: 'sessionTracking',
+                userId: session.user.id,
+              });
             });
             // Only set loading if we don't already have profile data
             // This prevents loading state getting stuck on tab visibility change
@@ -486,6 +516,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
               // Link guest session to user account
               linkSessionToUser(session.user.id).catch((err) => {
                 logger.warn('Failed to link guest session to user:', err);
+                captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
+                  operation: 'link_session_to_user',
+                  service: 'sessionTracking',
+                  userId: session.user.id,
+                });
               });
               try {
                 await fetchUserData(session.user.id, session.user.user_metadata);
@@ -796,10 +831,35 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   );
 };
 
+// Default value for SSR and when context is unavailable
+// This allows components to render safely during SSR before hydration
+const defaultAuthValue: AuthContextValue = {
+  user: null,
+  profile: null,
+  rankedProgress: null,
+  loading: true, // Important: loading=true during SSR prevents flash of unauthenticated content
+  isSupabaseEnabled: false,
+  isAuthenticated: false,
+  isGuest: true,
+  isAdmin: false,
+  canPlayRanked: false,
+  gamesUntilRanked: 10,
+  needsProfileCustomization: false,
+  setupProfile: async () => ({ data: null, error: { message: 'Auth not initialized' } }),
+  updateProfile: async () => ({ data: null, error: { message: 'Auth not initialized' } }),
+  refreshProfile: async () => {},
+};
+
 export const useAuth = (): AuthContextValue => {
   const context = useContext(AuthContext);
+  // Return default value during SSR or when outside provider
+  // This prevents "useAuth must be used within an AuthProvider" errors during SSR
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    // Only warn in development if we're in browser (likely a real misconfiguration)
+    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+      console.warn('useAuth called outside AuthProvider, returning default value');
+    }
+    return defaultAuthValue;
   }
   return context;
 };

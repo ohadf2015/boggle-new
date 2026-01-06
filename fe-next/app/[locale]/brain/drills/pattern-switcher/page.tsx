@@ -90,7 +90,7 @@ export default function PatternSwitcherPage() {
             isDarkMode ? 'bg-neo-navy text-neo-white' : 'bg-neo-cream text-neo-black'
           )}
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
           <span className="font-bold text-sm hidden sm:inline">{t('common.back')}</span>
         </button>
 

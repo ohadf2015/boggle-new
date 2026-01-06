@@ -4,6 +4,7 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { captureBackgroundError } from '@/utils/sentry';
 
 const logger = require('../utils/logger');
 
@@ -156,6 +157,11 @@ export async function logGameSession(sessionData: GameSessionData): Promise<stri
 
     if (error) {
       logger.error('GAME_SESSION_LOGGER', `Failed to log game session: ${error.message}`);
+      captureBackgroundError(new Error(error.message), {
+        operation: 'log_game_session',
+        service: 'gameSessionLogger',
+        userId: sessionData.userId || undefined,
+      });
       return null;
     }
 
@@ -163,6 +169,11 @@ export async function logGameSession(sessionData: GameSessionData): Promise<stri
     return data.id;
   } catch (err) {
     logger.error('GAME_SESSION_LOGGER', `Exception logging game session: ${err}`);
+    captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
+      operation: 'log_game_session_exception',
+      service: 'gameSessionLogger',
+      userId: sessionData.userId || undefined,
+    });
     return null;
   }
 }
@@ -201,6 +212,10 @@ export async function updateGameSession(
 
     if (error) {
       logger.error('GAME_SESSION_LOGGER', `Failed to update game session: ${error.message}`);
+      captureBackgroundError(new Error(error.message), {
+        operation: 'update_game_session',
+        service: 'gameSessionLogger',
+      });
       return false;
     }
 
@@ -208,6 +223,10 @@ export async function updateGameSession(
     return true;
   } catch (err) {
     logger.error('GAME_SESSION_LOGGER', `Exception updating game session: ${err}`);
+    captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
+      operation: 'update_game_session_exception',
+      service: 'gameSessionLogger',
+    });
     return false;
   }
 }

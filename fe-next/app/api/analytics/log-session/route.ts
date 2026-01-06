@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
+import { captureApiError } from '@/utils/sentry';
 
 // Import backend services (dynamic to avoid server/client issues)
 let logGameSession: any;
@@ -207,6 +208,11 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Unknown error';
     console.error('[log-session] Error:', msg);
+    captureApiError(
+      error instanceof Error ? error : new Error(String(error)),
+      '/api/analytics/log-session',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { captureApiError } from '@/utils/sentry';
 
 /**
  * Contact Form API Endpoint
@@ -92,6 +93,10 @@ async function sendEmailNotification(name: string, email: string, message: strin
     if (!response.ok) {
       const errorText = await response.text();
       console.error('[Contact Form] SendGrid error:', errorText);
+      captureApiError(new Error(`SendGrid error: ${errorText}`), '/api/contact', {
+        method: 'POST',
+        statusCode: 500,
+      });
       return false;
     }
 
@@ -99,6 +104,11 @@ async function sendEmailNotification(name: string, email: string, message: strin
     return true;
   } catch (error) {
     console.error('[Contact Form] Failed to send email:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error(String(error)),
+      '/api/contact',
+      { method: 'POST', statusCode: 500 }
+    );
     return false;
   }
 }
@@ -147,6 +157,10 @@ export async function POST(request: NextRequest) {
 
       if (dbError) {
         console.error('[Contact Form] Database error:', dbError);
+        captureApiError(new Error(dbError.message), '/api/contact', {
+          method: 'POST',
+          statusCode: 500,
+        });
         // Continue even if DB fails - we'll try to send email
       } else {
         dbStored = true;
@@ -171,6 +185,11 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('[Contact Form] Unexpected error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error(String(error)),
+      '/api/contact',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: 'An unexpected error occurred. Please try again.' },
       { status: 500 }

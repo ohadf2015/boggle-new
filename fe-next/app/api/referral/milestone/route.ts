@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { captureApiError } from '@/utils/sentry';
 
 /**
  * POST /api/referral/milestone
@@ -38,6 +39,11 @@ export async function POST(request: NextRequest) {
 
     if (profileError) {
       console.error('Error fetching profile:', profileError);
+      captureApiError(new Error(profileError.message), '/api/referral/milestone', {
+        method: 'POST',
+        userId: user.id,
+        statusCode: 500,
+      });
       return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 });
     }
 
@@ -59,6 +65,13 @@ export async function POST(request: NextRequest) {
 
     if (referralError || !referral) {
       console.error('Error fetching referral record:', referralError);
+      if (referralError) {
+        captureApiError(new Error(referralError.message), '/api/referral/milestone', {
+          method: 'POST',
+          userId: user.id,
+          statusCode: 404,
+        });
+      }
       return NextResponse.json({ error: 'Referral record not found' }, { status: 404 });
     }
 
@@ -125,6 +138,11 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       console.error('Error updating referral milestone:', updateError);
+      captureApiError(new Error(updateError.message), '/api/referral/milestone', {
+        method: 'POST',
+        userId: user.id,
+        statusCode: 500,
+      });
     }
 
     // Grant reward XP to referrer
@@ -135,6 +153,11 @@ export async function POST(request: NextRequest) {
 
     if (xpError) {
       console.error('Error granting milestone XP:', xpError);
+      captureApiError(new Error(xpError.message), '/api/referral/milestone', {
+        method: 'POST',
+        userId: user.id,
+        statusCode: 500,
+      });
       // Try direct update if RPC fails
       await supabase
         .from('profiles')
@@ -160,6 +183,11 @@ export async function POST(request: NextRequest) {
 
     if (rewardError) {
       console.error('Error recording referral reward:', rewardError);
+      captureApiError(new Error(rewardError.message), '/api/referral/milestone', {
+        method: 'POST',
+        userId: user.id,
+        statusCode: 500,
+      });
     }
 
     return NextResponse.json({
@@ -173,6 +201,11 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error in POST /api/referral/milestone:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error(String(error)),
+      '/api/referral/milestone',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

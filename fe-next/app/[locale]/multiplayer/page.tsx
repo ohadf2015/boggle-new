@@ -21,6 +21,7 @@ import { getSession as getSupabaseSession } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
 import { getStoredUsername, setStoredUsername, getStoredAvatarId } from '@/utils/profileStorage';
+import { captureSocketError, addSocketEventBreadcrumb, addGameBreadcrumb, isExpectedError } from '@/utils/sentry';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 
 interface ResultsData {
@@ -472,6 +473,12 @@ export default function MultiplayerPage(): React.JSX.Element {
 
     socketInstance.on('connect_error', (error) => {
       logger.error('[SOCKET.IO] Connection error:', error.message);
+      captureSocketError(error, {
+        event: 'connect_error',
+        gameCode: gameCode || undefined,
+        socketId: socketInstance.id || undefined,
+        username: username || undefined,
+      });
       setError(t('errors.unstableConnection') || 'Connection error');
       setIsJoining(false); // Clear joining state on connection error
     });
@@ -487,6 +494,12 @@ export default function MultiplayerPage(): React.JSX.Element {
 
     socketInstance.on('reconnect_failed', () => {
       logger.error('[SOCKET.IO] Reconnection failed');
+      captureSocketError(new Error('Reconnection exhausted after max attempts'), {
+        event: 'reconnect_failed',
+        gameCode: gameCode || undefined,
+        socketId: socketInstance.id || undefined,
+        username: username || undefined,
+      });
       setError(t('errors.connectionLost') || 'Connection lost');
       setIsJoining(false); // Clear joining state on reconnection failure
     });
@@ -494,6 +507,11 @@ export default function MultiplayerPage(): React.JSX.Element {
     // Game events
     socketInstance.on('joined', (data) => {
       logger.log('[SOCKET.IO] ✅ Joined successfully:', data);
+      addGameBreadcrumb('room_joined', {
+        gameCode: data.gameCode,
+        isHost: data.isHost,
+        username: data.username,
+      });
       setIsHost(data.isHost);
       setIsActive(true);
       setError('');
@@ -618,6 +636,18 @@ export default function MultiplayerPage(): React.JSX.Element {
       // Log meaningful errors with the extracted message
       logger.error('[SOCKET.IO] ❌ Error received:', errorMessage || errorCode || 'Unknown error');
 
+      // Capture to Sentry only for unexpected errors (not user errors like room not found)
+      const errorToCapture = new Error(errorMessage || errorCode || 'Unknown socket error');
+      if (!isExpectedError(errorToCapture)) {
+        captureSocketError(errorToCapture, {
+          event: 'error',
+          gameCode: gameCode || undefined,
+          socketId: socketInstance.id || undefined,
+          username: username || undefined,
+          isHost,
+        });
+      }
+
       // If error is about game not in progress, query server for actual state
       if (data?.code === 'GAME_NOT_IN_PROGRESS' || data?.message?.includes('not in progress')) {
         logger.error('[SOCKET.IO] Game state mismatch - querying server for actual state');
@@ -678,6 +708,11 @@ export default function MultiplayerPage(): React.JSX.Element {
     // Note: The actual "Game Started" toast is shown by PlayerView/HostView components
     socketInstance.on('startGame', (data) => {
       logger.log('[SOCKET.IO] startGame received:', data);
+      addGameBreadcrumb('game_started', {
+        language: data.language,
+        timerSeconds: data.timerSeconds,
+        gridSize: data.letterGrid?.length,
+      });
 
       // Always store pending game start data for PlayerView to consume
       setPendingGameStart(data);

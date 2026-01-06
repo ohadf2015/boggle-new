@@ -483,7 +483,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                 >
                   <RotateCcw size={20} />
                   {t('training.analysis.tryAgain') || 'Try Again'}
-                  <ArrowRight size={18} />
+                  <ArrowRight size={18} className="rtl:rotate-180" />
                 </Button>
 
                 {/* Allow skip if they really want to */}

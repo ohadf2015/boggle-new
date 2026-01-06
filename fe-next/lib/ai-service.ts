@@ -13,6 +13,7 @@ import { VertexAI, GenerativeModel } from '@google-cloud/vertexai';
 import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
+import { captureAIServiceError } from '@/utils/sentry';
 
 // =============================================================================
 // Zod Schemas for AI Response Validation
@@ -373,6 +374,12 @@ class GameAIService {
         if (!isRetryable || attempt === RETRY_CONFIG.maxRetries - 1) {
           const msg = error instanceof Error ? error.message : 'Unknown error';
           console.error(`[GameAIService] ${operationName} failed after ${attempt + 1} attempts:`, msg);
+          // Capture to Sentry after all retries exhausted
+          captureAIServiceError(error instanceof Error ? error : new Error(msg), {
+            operation: operationName,
+            retryAttempt: attempt + 1,
+            isRateLimited: msg.toLowerCase().includes('rate limit') || msg.includes('429'),
+          });
           throw error;
         }
 
@@ -456,6 +463,9 @@ class GameAIService {
       this.initError = error as Error;
       const msg = error instanceof Error ? error.message : 'Unknown initialization error';
       console.error('[GameAIService] Initialization failed:', msg);
+      captureAIServiceError(error instanceof Error ? error : new Error(msg), {
+        operation: 'initialize',
+      });
       throw error;
     }
   }
@@ -660,7 +670,13 @@ Respond with ONLY valid JSON (no markdown):
         // These indicate the AI started to respond but got cut off - throw to trigger retry
         if (text.includes('"isValid"') || text.includes('"isValid')) {
           console.warn(`[GameAIService] Truncated AI response for "${word}": ${text.substring(0, 50)}`);
-          throw new Error('AI response truncated');
+          const truncationError = new Error('AI response truncated');
+          captureAIServiceError(truncationError, {
+            operation: 'validateWithAI',
+            word,
+            language,
+          });
+          throw truncationError;
         }
 
         console.warn('[GameAIService] Could not extract JSON from AI response:', text.substring(0, 100));
@@ -702,6 +718,11 @@ Respond with ONLY valid JSON (no markdown):
     } catch (error) {
       if (error instanceof z.ZodError) {
         console.error('[GameAIService] AI response schema validation failed:', error.issues);
+        captureAIServiceError(new Error(`Schema validation failed: ${error.issues.map(i => i.message).join(', ')}`), {
+          operation: 'validateWithAI_schema',
+          word,
+          language,
+        });
         return { isValid: false, reason: 'Invalid AI response format', confidence: 0 };
       }
       const msg = error instanceof Error ? error.message : 'Unknown error';
@@ -807,6 +828,11 @@ Respond with ONLY valid JSON (no markdown):
       // Safely extract error message without disturbing any Response bodies
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('[GameAIService] validateAndSaveWord error:', errorMessage);
+      captureAIServiceError(error instanceof Error ? error : new Error(errorMessage), {
+        operation: 'validateAndSaveWord',
+        word: normalizedWord,
+        language,
+      });
 
       return {
         isValid: false,
