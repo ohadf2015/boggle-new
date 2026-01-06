@@ -124,6 +124,8 @@
 - **ALWAYS VERIFY BUILD AND TESTS PASS AFTER CHANGES**
 - **ALWAYS RUN LINT (`npm run lint`) after writing new code and fix any issues**
 - **ALWAYS RUN RELEVANT TESTS after implementing a feature and fix any failures**
+- **MANDATORY TESTING**: Every new component and logic MUST have corresponding tests. No exceptions.
+- **TEST FAILURE PROTOCOL**: When a test fails, FIRST analyze if the failure is expected behavior or if the test discovered a bug. If the test found a legitimate bug in the code, FIX THE BUG - never modify the test to make it pass. Tests are the source of truth for expected behavior.
 
 # Investigation Protocol
 - NEVER apply quick patches

@@ -90,6 +90,7 @@ const sv = {
     "notConnected": "Offline",
     "connected": "Ansluten",
     "coins": "mynt",
+    "chat": "Chatt",
     "connecting": "Ansluter...",
     "connectedToServer": "Redo för strid!",
     "connectingToServer": "Värmer upp...",
@@ -399,6 +400,8 @@ const sv = {
     "unstableConnection": "Skakigt WiFi! Vänta...",
     "slowConnection": "Långsam anslutning - vi jobbar på det",
     "sessionExpired": "Sessionen slutade. Dags att börja om!",
+    "roomNoLongerExists": "Rummet finns inte längre",
+    "roomClosed": "Rummet stängdes",
     "gameCodeNotExist": "Koden hittades inte. Kolla och försök!",
     "usernameTaken": "Någon var snabbare! Prova annat namn",
     "gameCodeExists": "Den koden är upptagen. Välj en ny!",
@@ -574,6 +577,33 @@ const sv = {
       "playersOnline": "online",
       "noRooms": "Inga rum - skapa ett!",
       "roomsRefreshed": "Rum uppdaterade"
+    },
+    "roomList": {
+      "activeRooms": "Aktiva rum",
+      "online": "online",
+      "noRooms": "Inga aktiva rum",
+      "beFirst": "Var först med att skapa ett!",
+      "createButton": "Skapa rum",
+      "refreshed": "Rum uppdaterade"
+    },
+    "joinModal": {
+      "title": "Gå med i rum",
+      "changeAvatar": "Byt avatar",
+      "namePlaceholder": "Ditt namn",
+      "authenticatedHint": "Inloggad",
+      "joinButton": "Gå med",
+      "joining": "Går med..."
+    },
+    "createModal": {
+      "title": "Skapa rum",
+      "changeAvatar": "Byt avatar",
+      "namePlaceholder": "Ditt namn",
+      "authenticatedHint": "Inloggad",
+      "roomNameLabel": "Rumsnamn",
+      "optional": "valfritt",
+      "roomNameHint": "Lämna tomt för automatiskt namn",
+      "createButton": "Skapa rum",
+      "creating": "Skapar..."
     },
     "editProfile": "Redigera",
     "profileSetup": {
@@ -3163,7 +3193,25 @@ const sv = {
         "good": "Bra Ihärdighet!",
         "nice": "Bra Insats!",
         "start": "Varje Sekund Räknas!"
-      }
+      },
+      "scoreBreakdown": "Poängfördelning",
+      "efficiencyScore": "Effektivitetspoäng",
+      "howItsCalculated": "Så räknas det",
+      "lifeRemaining": "Liv",
+      "tokensSaved": "Polletter",
+      "wordsFound": "Ord",
+      "guessesPenalty": "Gissningar",
+      "wordValues": "Ordvärden för Liv",
+      "letters": "bokstäver",
+      "tipsToImprove": "Tips att Förbättra"
+    },
+    "scoreTips": {
+      "solveFirst": "Lös pusslet för att få poäng!",
+      "findMoreWords": "Hitta fler ord för att få liv",
+      "longerWords": "Längre ord (5+ bokstäver) ger mer liv",
+      "saveTokens": "Spara polletter genom att använda färre ledtrådar",
+      "exploreGrid": "Utforska rutnätet för bonusord",
+      "strategicGuessing": "Använd ledtrådar innan du gissar"
     },
     "ad": {
       "watchAd": "Titta på Annons",
@@ -3234,27 +3282,27 @@ const sv = {
       "fail2": "🔄 Imorgon är min!",
       "fail3": "😤 Det ordet var orättvist!",
       "fail4": "🎲 Dåligt bräde!",
-      "cta1": "Tror du att du kan bättre?",
+      "cta1": "Kan du slå det?",
       "cta2": "Din tur.",
-      "cta3": "Slå det.",
-      "cta4": "Jag utmanar dig att försöka.",
-      "cta5": "Lycka till med att slå det!"
+      "cta3": "Slå det då.",
+      "cta4": "Du klarar det inte.",
+      "cta5": "Våga försöka."
     }
   },
   "keepPlaying": {
     "succeeded": {
-      "title": "På eld!",
-      "message": "Du klarade det! Redo att dominera vänner?",
-      "ctaSinglePlayer": "Fortsätt rulla",
+      "title": "Snyggt!",
+      "message": "Uppvärmd? Dags för riktig tävling.",
+      "ctaSinglePlayer": "Spela mer",
       "ctaMultiplayer": "Utmana vänner",
-      "subtext": "Dina färdigheter är vassa idag"
+      "subtext": "Ta den energin till multiplayer 🔥"
     },
     "struggled": {
       "title": "Fortsätt!",
-      "message": "Varje pussel skärper dina färdigheter. Övning ger färdighet!",
-      "ctaSinglePlayer": "Nivå upp"
+      "message": "Varje match gör dig bättre. Fortsätt öva!",
+      "ctaSinglePlayer": "Öva mer"
     },
-    "dismiss": "Kanske senare"
+    "dismiss": "Inte nu"
   },
   "guidance": {
     "combo": {
@@ -3276,6 +3324,10 @@ const sv = {
     "swipeTip": {
       "title": "Svep för att bilda ord!",
       "text": "Dra fingret över bokstäverna för att bilda ord. Koppla ihop angränsande bokstäver i valfri riktning!"
+    },
+    "dragTutorial": {
+      "title": "Dra för att koppla!",
+      "text": "Dra fingret över bokstäverna för att bilda ord"
     },
     "dismiss": "Förstått!"
   },
@@ -3431,6 +3483,115 @@ const sv = {
     "currentPage": "Sida",
     "userId": "Spelar-ID",
     "sessionRecorded": "Sessionsinspelning bifogad"
+  },
+  "brain": {
+    "title": "Hjärnträning",
+    "subtitle": "Följ dina kognitiva prestationer",
+    "score": "Hjärnpoäng",
+    "overall": "Totalt",
+    "nav": {
+      "home": "Spela",
+      "brain": "Hjärna",
+      "profile": "Profil"
+    },
+    "domains": {
+      "processingSpeed": "Bearbetningshastighet",
+      "processingSpeedDesc": "Hur snabbt du hittar ord",
+      "workingMemory": "Arbetsminne",
+      "workingMemoryDesc": "Förmåga att hålla och bearbeta information",
+      "attention": "Uppmärksamhet",
+      "attentionDesc": "Uthållig koncentration och kombinationer",
+      "flexibility": "Flexibilitet",
+      "flexibilityDesc": "Mental anpassningsförmåga och variation",
+      "vocabulary": "Ordförråd",
+      "vocabularyDesc": "Djupet av ordkunskap"
+    },
+    "tiers": {
+      "novice": "Nybörjare",
+      "apprentice": "Lärling",
+      "intermediate": "Mellanliggande",
+      "advanced": "Avancerad",
+      "expert": "Expert",
+      "master": "Mästare"
+    },
+    "progress": {
+      "title": "Framsteg",
+      "improving": "Förbättras",
+      "stable": "Stabil",
+      "declining": "Behöver arbete",
+      "gamesAnalyzed": "analyserade spel",
+      "toNextTier": "till nästa nivå"
+    },
+    "recommendation": {
+      "title": "Personligt tips",
+      "weakest": "Din {{domain}} behöver lite arbete.",
+      "tryDrill": "Prova {{drill}}-övningen för att förbättra!",
+      "startDrill": "Starta övning"
+    },
+    "quickDrills": "Snabba övningar",
+    "viewAll": "Visa alla",
+    "cognitiveProfile": "Kognitiv profil",
+    "scientificTips": "Visste du?",
+    "learnMore": "Läs mer",
+    "gamesAnalyzed": "Analyserade spel",
+    "toNextTier": "till",
+    "drills": {
+      "title": "Hjärnövningar",
+      "round": "Runda",
+      "level": "Nivå",
+      "start": "Starta",
+      "complete": "Klart!",
+      "gameOver": "Spelet slut",
+      "wordsFound": "ord hittade",
+      "timeSpent": "Tid",
+      "playAgain": "Spela igen",
+      "exit": "Avsluta",
+      "lightning-round": {
+        "name": "Blixtrundan",
+        "description": "Hitta ord så snabbt som möjligt"
+      },
+      "memory-hunt": {
+        "name": "Minnesjakt",
+        "description": "Kom ihåg ord, hitta dem sedan från minnet",
+        "wordsToRemember": "Ord att minnas",
+        "studyTime": "Studietid",
+        "studyPhase": "Memorera!",
+        "memorizeHint": "Kom ihåg dessa ord:",
+        "recallPhase": "Hitta dem!",
+        "remaining": "Återstående"
+      },
+      "combo-master": {
+        "name": "Kombomästare",
+        "description": "Behåll kombinationsserier utan avbrott"
+      },
+      "pattern-switcher": {
+        "name": "Mönsterväxlare",
+        "description": "Hitta ord i krävda längdsekvenser"
+      },
+      "rare-gems": {
+        "name": "Sällsynta ädelstenar",
+        "description": "Upptäck ovanliga och sällsynta ord"
+      },
+      "locked": "Låst",
+      "unlock": "Slutför nivå {{level}} för att låsa upp"
+    },
+    "tips": {
+      "title": "Visste du?",
+      "tip1": "Arbetsminneskapaciteten ökar med 15% efter bara 2 veckors daglig ordspelsträning.",
+      "tip2": "Bearbetningshastigheten toppar med daglig träning - hjärnan skapar snabbare nervbanor.",
+      "tip3": "Att hitta sällsynta ord aktiverar djupare ordförrådsåtkomst - en viktig kognitiv förmåga.",
+      "tip4": "Att hålla kombos tränar uthållig uppmärksamhet - avgörande för fokus i vardagen.",
+      "tip5": "Att växla mellan ordlängder bygger kognitiv flexibilitet - mental anpassningsförmåga."
+    },
+    "streak": {
+      "title": "Träningssvit",
+      "days": "dagar",
+      "best": "Personligt rekord"
+    },
+    "empty": {
+      "title": "Börja träna!",
+      "description": "Spela spel för att bygga din hjärnpoäng och följa kognitiva förbättringar över tid."
+    }
   }
 };
 

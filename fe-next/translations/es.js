@@ -90,6 +90,7 @@ const es = {
     "notConnected": "Sin conexión",
     "connected": "Conectado",
     "coins": "monedas",
+    "chat": "Chat",
     "connecting": "Conectando...",
     "connectedToServer": "¡Listo para la batalla!",
     "connectingToServer": "Calentando...",
@@ -399,6 +400,8 @@ const es = {
     "unstableConnection": "¡WiFi inestable! Espera...",
     "slowConnection": "Conexión lenta - trabajando",
     "sessionExpired": "Sesión terminada. ¡Hora de empezar de nuevo!",
+    "roomNoLongerExists": "La sala ya no existe",
+    "roomClosed": "La sala fue cerrada",
     "gameCodeNotExist": "Código no encontrado. ¡Verifica!",
     "usernameTaken": "¡Alguien fue más rápido! Prueba otro nombre",
     "gameCodeExists": "¡Ese código está ocupado! Elige otro",
@@ -571,6 +574,33 @@ const es = {
       "playersOnline": "en línea",
       "noRooms": "Sin salas activas - ¡crea una!",
       "roomsRefreshed": "¡Salas actualizadas!"
+    },
+    "roomList": {
+      "activeRooms": "Salas activas",
+      "online": "en línea",
+      "noRooms": "Sin salas activas",
+      "beFirst": "¡Sé el primero en crear una!",
+      "createButton": "Crear sala",
+      "refreshed": "¡Salas actualizadas!"
+    },
+    "joinModal": {
+      "title": "Unirse a sala",
+      "changeAvatar": "Cambiar avatar",
+      "namePlaceholder": "Tu nombre",
+      "authenticatedHint": "Sesión iniciada",
+      "joinButton": "Unirse",
+      "joining": "Uniéndose..."
+    },
+    "createModal": {
+      "title": "Crear sala",
+      "changeAvatar": "Cambiar avatar",
+      "namePlaceholder": "Tu nombre",
+      "authenticatedHint": "Sesión iniciada",
+      "roomNameLabel": "Nombre de sala",
+      "optional": "opcional",
+      "roomNameHint": "Deja vacío para nombre automático",
+      "createButton": "Crear sala",
+      "creating": "Creando..."
     },
     "editProfile": "Editar",
     "profileSetup": {
@@ -3160,7 +3190,25 @@ const es = {
         "good": "¡Gran Persistencia!",
         "nice": "¡Buen Esfuerzo!",
         "start": "¡Cada Segundo Cuenta!"
-      }
+      },
+      "scoreBreakdown": "Desglose de Puntos",
+      "efficiencyScore": "Puntuación de Eficiencia",
+      "howItsCalculated": "Cómo se calcula",
+      "lifeRemaining": "Vida",
+      "tokensSaved": "Fichas",
+      "wordsFound": "Palabras",
+      "guessesPenalty": "Intentos",
+      "wordValues": "Valores de Vida por Palabra",
+      "letters": "letras",
+      "tipsToImprove": "Consejos para Mejorar"
+    },
+    "scoreTips": {
+      "solveFirst": "¡Resuelve el puzzle para ganar puntos!",
+      "findMoreWords": "Encuentra más palabras para ganar vida",
+      "longerWords": "Palabras largas (5+ letras) dan más vida",
+      "saveTokens": "Ahorra fichas usando menos pistas",
+      "exploreGrid": "Explora el tablero para palabras bonus",
+      "strategicGuessing": "Usa las pistas antes de adivinar"
     },
     "ad": {
       "watchAd": "Ver Anuncio",
@@ -3231,27 +3279,27 @@ const es = {
       "fail2": "🔄 ¡Mañana es mío!",
       "fail3": "😤 ¡Esta palabra era injusta!",
       "fail4": "🎲 ¡Mal tablero!",
-      "cta1": "¿Crees que puedes hacerlo mejor?",
+      "cta1": "¿Me superas?",
       "cta2": "Tu turno.",
-      "cta3": "Supera eso.",
-      "cta4": "Te reto a intentarlo.",
-      "cta5": "¡Buena suerte superando esto!"
+      "cta3": "A ver si puedes.",
+      "cta4": "Ni de broma me ganas.",
+      "cta5": "Inténtalo."
     }
   },
   "keepPlaying": {
     "succeeded": {
-      "title": "¡En llamas!",
-      "message": "¡Lo lograste! ¿Listo para dominar amigos?",
-      "ctaSinglePlayer": "Seguir rodando",
-      "ctaMultiplayer": "Retar amigos",
-      "subtext": "Tus habilidades están afiladas hoy"
+      "title": "¡Bien!",
+      "message": "¿Ya entraste en calor? Hora del modo serio.",
+      "ctaSinglePlayer": "Seguir jugando",
+      "ctaMultiplayer": "Reta amigos",
+      "subtext": "Lleva ese flow al multijugador 🔥"
     },
     "struggled": {
-      "title": "¡Sigue así!",
-      "message": "Cada puzzle afila tus habilidades. ¡La práctica hace al maestro!",
-      "ctaSinglePlayer": "Subir nivel"
+      "title": "¡Dale!",
+      "message": "Cada partida te hace mejor. ¡Sigue practicando!",
+      "ctaSinglePlayer": "Practicar más"
     },
-    "dismiss": "Quizás luego"
+    "dismiss": "Ahora no"
   },
   "guidance": {
     "combo": {
@@ -3273,6 +3321,10 @@ const es = {
     "swipeTip": {
       "title": "¡Desliza para formar palabras!",
       "text": "Arrastra el dedo sobre las letras para formar palabras. ¡Conecta letras adyacentes en cualquier dirección!"
+    },
+    "dragTutorial": {
+      "title": "¡Arrastra para conectar!",
+      "text": "Arrastra el dedo sobre las letras para formar palabras"
     },
     "dismiss": "¡Entendido!"
   },
@@ -3428,6 +3480,115 @@ const es = {
     "currentPage": "Página",
     "userId": "ID de jugador",
     "sessionRecorded": "Grabación de sesión adjunta"
+  },
+  "brain": {
+    "title": "Entrenamiento Mental",
+    "subtitle": "Rastrea tu rendimiento cognitivo",
+    "score": "Puntuación Cerebral",
+    "overall": "General",
+    "nav": {
+      "home": "Jugar",
+      "brain": "Cerebro",
+      "profile": "Perfil"
+    },
+    "domains": {
+      "processingSpeed": "Velocidad de Procesamiento",
+      "processingSpeedDesc": "Qué tan rápido encuentras palabras",
+      "workingMemory": "Memoria de Trabajo",
+      "workingMemoryDesc": "Capacidad para retener y manipular información",
+      "attention": "Atención",
+      "attentionDesc": "Concentración sostenida y mantenimiento de combos",
+      "flexibility": "Flexibilidad",
+      "flexibilityDesc": "Adaptabilidad mental y variedad",
+      "vocabulary": "Vocabulario",
+      "vocabularyDesc": "Profundidad del conocimiento de palabras"
+    },
+    "tiers": {
+      "novice": "Novato",
+      "apprentice": "Aprendiz",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado",
+      "expert": "Experto",
+      "master": "Maestro"
+    },
+    "progress": {
+      "title": "Progreso",
+      "improving": "Mejorando",
+      "stable": "Estable",
+      "declining": "Necesita trabajo",
+      "gamesAnalyzed": "juegos analizados",
+      "toNextTier": "para el siguiente nivel"
+    },
+    "recommendation": {
+      "title": "Consejo Personalizado",
+      "weakest": "Tu {{domain}} necesita un poco de trabajo.",
+      "tryDrill": "¡Prueba el ejercicio {{drill}} para mejorar!",
+      "startDrill": "Iniciar Ejercicio"
+    },
+    "quickDrills": "Ejercicios Rápidos",
+    "viewAll": "Ver Todo",
+    "cognitiveProfile": "Perfil Cognitivo",
+    "scientificTips": "¿Sabías que?",
+    "learnMore": "Saber más",
+    "gamesAnalyzed": "Juegos Analizados",
+    "toNextTier": "para",
+    "drills": {
+      "title": "Ejercicios Mentales",
+      "round": "Ronda",
+      "level": "Nivel",
+      "start": "Iniciar",
+      "complete": "¡Completado!",
+      "gameOver": "Fin del Juego",
+      "wordsFound": "palabras encontradas",
+      "timeSpent": "Tiempo",
+      "playAgain": "Jugar de Nuevo",
+      "exit": "Salir",
+      "lightning-round": {
+        "name": "Ronda Relámpago",
+        "description": "Encuentra palabras lo más rápido posible"
+      },
+      "memory-hunt": {
+        "name": "Caza de Memoria",
+        "description": "Recuerda palabras y encuéntralas de memoria",
+        "wordsToRemember": "Palabras a recordar",
+        "studyTime": "Tiempo de estudio",
+        "studyPhase": "¡Memoriza!",
+        "memorizeHint": "Recuerda estas palabras:",
+        "recallPhase": "¡Encuéntralas!",
+        "remaining": "Restantes"
+      },
+      "combo-master": {
+        "name": "Maestro del Combo",
+        "description": "Mantén rachas de combos sin pausas"
+      },
+      "pattern-switcher": {
+        "name": "Cambiador de Patrones",
+        "description": "Encuentra palabras en secuencias de longitud requeridas"
+      },
+      "rare-gems": {
+        "name": "Gemas Raras",
+        "description": "Descubre palabras poco comunes y raras"
+      },
+      "locked": "Bloqueado",
+      "unlock": "Completa nivel {{level}} para desbloquear"
+    },
+    "tips": {
+      "title": "¿Sabías que?",
+      "tip1": "La capacidad de memoria de trabajo aumenta un 15% con solo 2 semanas de práctica diaria de juegos de palabras.",
+      "tip2": "La velocidad de procesamiento alcanza su máximo con práctica diaria constante - tu cerebro forma vías neuronales más rápidas.",
+      "tip3": "Encontrar palabras raras activa una recuperación más profunda del vocabulario - una habilidad cognitiva clave.",
+      "tip4": "Mantener combos entrena la atención sostenida - crucial para el enfoque en la vida diaria.",
+      "tip5": "Cambiar entre longitudes de palabras construye flexibilidad cognitiva - adaptabilidad mental."
+    },
+    "streak": {
+      "title": "Racha de Entrenamiento",
+      "days": "días",
+      "best": "Récord Personal"
+    },
+    "empty": {
+      "title": "¡Empieza a Entrenar!",
+      "description": "Juega partidas para construir tu Puntuación Cerebral y rastrea la mejora cognitiva con el tiempo."
+    }
   }
 };
 

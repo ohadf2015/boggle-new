@@ -162,6 +162,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   // Track grid version for earthquake recalculation
   const gridVersionRef = useRef(0);
 
+  // Track highlight timeout for cleanup
+  const highlightTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Coin reward animation state
   const [comboCoinReward, setComboCoinReward] = useState<number | null>(null);
 
@@ -846,6 +849,10 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     return () => {
       botIntervalsRef.current.forEach(clearInterval);
       botIntervalsRef.current = [];
+      // Clean up highlight timeout
+      if (highlightTimeoutRef.current) {
+        clearTimeout(highlightTimeoutRef.current);
+      }
     };
   }, [settings.mode, settings.bots, isPaused, isGameOver, availableWords, getBotInterval, simulateBotFindWord]);
 
@@ -1147,8 +1154,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       highlightedPath: path.map(p => ({ row: p.row, col: p.col })),
     }));
 
+    // Clear any existing highlight timeout
+    if (highlightTimeoutRef.current) {
+      clearTimeout(highlightTimeoutRef.current);
+    }
+
     // Clear highlight after 4 seconds (longer to give player time to trace it)
-    setTimeout(() => {
+    highlightTimeoutRef.current = setTimeout(() => {
       setRevealState(prev => ({ ...prev, highlightedPath: [] }));
     }, 4000);
 
@@ -1176,7 +1188,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     const validWordCount = foundWords.filter(fw => fw.isValid === true).length;
 
     return (
-      <div className="relative flex items-center justify-center w-full h-full min-h-screen overflow-hidden bg-slate-900 text-white">
+      <div className="relative flex items-center justify-center w-full h-full min-h-screen max-h-[100dvh] overflow-hidden bg-slate-900 text-white">
         {/* Earthquake Warning Overlay */}
         <EarthquakeWarning
           isVisible={earthquakeState === 'warning'}
@@ -1546,7 +1558,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   }
 
   return (
-    <div className="relative flex-1 flex flex-col overflow-hidden">
+    <div className="relative flex-1 flex flex-col overflow-hidden max-h-[100dvh]">
       {/* Earthquake Warning Overlay */}
       <EarthquakeWarning
         isVisible={earthquakeState === 'warning'}
@@ -1834,7 +1846,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       )}
 
       {/* Game grid */}
-      <div className="flex-1 flex items-center justify-center min-h-0">
+      <div className="flex-1 flex items-center justify-center min-h-0 overflow-hidden">
         <GridComponent
           grid={grid}
           interactive={!isPaused}
@@ -1854,28 +1866,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
 
 
-      {/* Bot scores (only in solo-bots mode) - hidden on mobile to prevent scroll */}
-      {settings.mode === 'solo-bots' && settings.bots.length > 0 && (
-        <div className="hidden md:block bg-neo-cream text-neo-black dark:bg-neo-navy-light dark:text-white rounded-neo border-3 border-neo-black p-4 flex-shrink-0">
-          <h3 className="text-sm font-bold uppercase tracking-wide text-neo-black/70 dark:text-neo-white/70 mb-2">
-            {t('singlePlayer.opponents') || 'Opponents'}
-          </h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {settings.bots.map(bot => (
-              <div
-                key={bot.id}
-                className={cn(
-                  'p-2 rounded-neo border-2 border-neo-black text-center',
-                  botScores[bot.id] > score ? 'bg-neo-red/20' : 'bg-neo-lime/20'
-                )}
-              >
-                <div className="text-xs font-bold truncate">{bot.name}</div>
-                <div className="text-lg font-black">{botScores[bot.id] || 0}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Bot scores removed - bots compete silently, results shown at game end */}
 
       {/* Hint Prompt - shows after player hasn't found a word for a while */}
       <AdaptiveAnimatePresence>

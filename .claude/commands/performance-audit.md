@@ -42,6 +42,10 @@ Conduct comprehensive performance audit following these steps:
    - Review image optimization and lazy loading
    - Examine render performance and re-render cycles
    - Check for memory leaks in UI components
+   - **Run React Scan** (already integrated in providers.tsx) to identify:
+     - Components with unnecessary re-renders
+     - Props/state changes causing cascading re-renders
+     - Missing memoization opportunities (React.memo, useMemo, useCallback)
 
 5. **Network Performance**
    - Review API call patterns and caching strategies

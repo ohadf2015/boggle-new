@@ -90,6 +90,16 @@ const MiniGrid: React.FC<MiniGridProps> = ({
   const gridRef = useRef<HTMLDivElement>(null);
   const gridMeasurementsRef = useRef<GridMeasurements | null>(null);
   const isSelectingRef = useRef(false); // Ref for use in event handlers
+  const demoCompleteTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (demoCompleteTimeoutRef.current) {
+        clearTimeout(demoCompleteTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Keep isSelectingRef in sync
   useEffect(() => {
@@ -254,7 +264,11 @@ const MiniGrid: React.FC<MiniGridProps> = ({
         const formedWord = newSelectedCells.map((c) => c.letter).join('');
         if (formedWord === demoWord) {
           setShowSuccess(true);
-          setTimeout(() => {
+          // Clear any existing timeout before setting new one
+          if (demoCompleteTimeoutRef.current) {
+            clearTimeout(demoCompleteTimeoutRef.current);
+          }
+          demoCompleteTimeoutRef.current = setTimeout(() => {
             onDemoComplete();
           }, 1500);
         }

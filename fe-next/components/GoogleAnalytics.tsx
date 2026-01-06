@@ -11,7 +11,13 @@ const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
  * to enable tracking. Without it, analytics is disabled.
  */
 export function GoogleAnalytics() {
+  // Skip analytics if no measurement ID or if running locally
   if (!GA_MEASUREMENT_ID) {
+    return null;
+  }
+
+  // Don't run analytics on localhost
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
     return null;
   }
 
@@ -48,7 +54,7 @@ export function trackEvent(
   eventName: string,
   eventParams?: Record<string, string | number | boolean>
 ): void {
-  if (typeof window !== 'undefined' && 'gtag' in window && GA_MEASUREMENT_ID) {
+  if (typeof window !== 'undefined' && 'gtag' in window && GA_MEASUREMENT_ID && window.location.hostname !== 'localhost') {
     (window as typeof window & { gtag: (...args: unknown[]) => void }).gtag('event', eventName, eventParams);
   }
 }
@@ -57,7 +63,7 @@ export function trackEvent(
  * Track page views manually (useful for SPA navigation)
  */
 export function trackPageView(url: string, title?: string): void {
-  if (typeof window !== 'undefined' && 'gtag' in window && GA_MEASUREMENT_ID) {
+  if (typeof window !== 'undefined' && 'gtag' in window && GA_MEASUREMENT_ID && window.location.hostname !== 'localhost') {
     (window as typeof window & { gtag: (...args: unknown[]) => void }).gtag('config', GA_MEASUREMENT_ID, {
       page_path: url,
       page_title: title,

@@ -11,6 +11,14 @@
  * - useShareHandlers.ts - Share functionality hook
  * - useResultSubmission.ts - Result submission hook
  * - useCoinActions.ts  - Coin spending actions hook
+ * - ScoreBadge.tsx     - Header score badge component
+ * - ResultDisplay.tsx  - Hero result display component
+ * - ScoreBreakdownSection.tsx - Score formula breakdown
+ * - CollapsibleDetails.tsx - Rewards and details section
+ * - CoinUnlockCard.tsx - Coin-gated action cards
+ * - ShareSection.tsx   - Share buttons section
+ * - AttemptHistory.tsx - Wordle-style attempt grid
+ * - StatsSection.tsx   - Statistics with histogram
  * - TryAnotherLanguage.tsx - Language switching component
  * - SharePanel.tsx     - Share modal component
  */
@@ -35,7 +43,38 @@ export { XTwitterIcon, WhatsAppIcon } from './icons';
 export { useShareHandlers } from './useShareHandlers';
 export { useResultSubmission } from './useResultSubmission';
 export { useCoinActions } from './useCoinActions';
+export { useConfettiEffects } from './useConfettiEffects';
 
 // Components
+export { ScoreBadge } from './ScoreBadge';
+export type { ScoreBadgeProps } from './ScoreBadge';
+
+export { ResultDisplay } from './ResultDisplay';
+export type { ResultDisplayProps } from './ResultDisplay';
+
+export { ScoreBreakdownSection } from './ScoreBreakdownSection';
+export type { ScoreBreakdownSectionProps } from './ScoreBreakdownSection';
+
+export { CollapsibleDetails } from './CollapsibleDetails';
+export type { CollapsibleDetailsProps } from './CollapsibleDetails';
+
+export { CoinUnlockCard } from './CoinUnlockCard';
+export type { CoinUnlockCardProps } from './CoinUnlockCard';
+
+export { ShareSection } from './ShareSection';
+export type { ShareSectionProps } from './ShareSection';
+
+export { AttemptHistory } from './AttemptHistory';
+export type { AttemptHistoryProps } from './AttemptHistory';
+
+export { StatsSection } from './StatsSection';
+export type { StatsSectionProps } from './StatsSection';
+
+export { DesktopStatsCard } from './DesktopStatsCard';
+export type { DesktopStatsCardProps } from './DesktopStatsCard';
+
+export { RankBadge } from './RankBadge';
+export type { RankBadgeProps } from './RankBadge';
+
 export { TryAnotherLanguage } from './TryAnotherLanguage';
 export { SharePanel } from './SharePanel';

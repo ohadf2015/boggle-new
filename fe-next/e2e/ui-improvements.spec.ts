@@ -9,7 +9,7 @@ import { test, expect, Page } from '@playwright/test';
  * 4. Enhanced Hint Button
  */
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'http://localhost:3001';
 
 // Helper: Wait for page to be ready
 async function waitForPageReady(page: Page) {

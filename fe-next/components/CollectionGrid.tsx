@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
@@ -140,11 +141,14 @@ function CollectibleBadge({ item, index, isDarkMode }: CollectibleBadgeProps) {
           )}
         >
           {collectible.image_url ? (
-            <img
+            <Image
               src={collectible.image_url}
               alt=""
               aria-hidden="true"
+              width={40}
+              height={40}
               className="w-10 h-10 object-cover rounded"
+              unoptimized
             />
           ) : (
             <span className="text-2xl" aria-hidden="true">{collectible.icon}</span>

@@ -18,6 +18,11 @@ You are a React expert who ensures code follows modern React best practices, pat
 - Lazy loading candidates
 - Virtual list opportunities for large lists
 - Bundle size optimization
+- **Use React Scan** (integrated in `app/providers.tsx`) for runtime detection:
+  - Run the dev server (`npm run dev`) to activate React Scan overlay
+  - Identifies components re-rendering with visual highlights
+  - Shows render counts and timing in real-time
+  - Console logs detailed re-render causes
 
 ### State Management
 - Prop drilling detection

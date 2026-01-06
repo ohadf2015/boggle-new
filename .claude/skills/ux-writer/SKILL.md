@@ -1,17 +1,19 @@
 ---
 name: ux-writer
-description: UX copywriting specialist for LexiClash. This skill should be used when writing or improving micro-copy, creating share messages, translating content while preserving tone, writing achievement text, crafting witty user-facing text, defining voice and tone guidelines, or researching competitor copy for inspiration. Can establish new style directions or improve existing copy across all languages.
+description: UX copywriting specialist for LexiClash. This skill should be used when writing or improving micro-copy, creating share messages, writing native copy for each supported language (NOT translating), writing achievement text, crafting witty user-facing text, defining voice and tone guidelines, or researching competitor copy for inspiration. Can establish new style directions or improve existing copy across all languages.
 ---
 
 # LexiClash UX Writer
 
 A specialized skill for crafting, defining, and improving user-facing text throughout LexiClash. This skill can both follow existing patterns and establish new style directions.
 
+**Core principle: Write native, don't translate.** Each language should sound like a native speaker wrote it from scratch.
+
 ## When to Use This Skill
 
 - Writing or improving micro-copy (buttons, labels, tooltips, error messages)
 - Creating share messages for social media (daily challenge results, victories)
-- Translating content while preserving or enhancing tone
+- Writing native copy for each language (never literal translation)
 - Writing achievement titles and descriptions
 - Crafting witty, engaging text for any user-facing feature
 - Defining or evolving the app's voice and tone
@@ -65,21 +67,38 @@ Example search queries:
 - "word game achievement names examples"
 - "mobile game streak notification copy"
 
-### 5. Translate Content
+### 5. Write Native Copy for Each Language
 
-When translating:
+**CRITICAL: Never translate. Write original copy that sounds native.**
 
-1. **Preserve energy** - Translations should feel as engaging as English
-2. **Adapt, don't translate literally** - Find cultural equivalents for idioms
-3. **Match length** - UI space is limited
-4. **Use glossary** - Reference [translation-glossary.md](references/translation-glossary.md)
+Each language version should read like a native speaker wrote it from scratch. If text "feels translated," it's wrong.
 
-Supported languages:
-- English (en) - Primary source
-- Spanish (es) - Latin American casual
-- Hebrew (he) - RTL, informal register
-- Japanese (ja) - Energetic, appropriate particles
-- Swedish (sv) - Casual Nordic tone
+**Process:**
+1. **Understand the intent** - What emotion/action should this text trigger?
+2. **Write fresh for each language** - Don't translate word-by-word
+3. **Use local expressions** - Slang, idioms, and cultural references that resonate
+4. **Match the vibe, not the words** - Same energy, different expression
+
+**Language-specific guidance:**
+
+| Language | Tone | Native Expressions | Avoid |
+|----------|------|-------------------|-------|
+| 🇺🇸 English | Punchy, competitive | "No way you beat this", "Your move" | Formal language |
+| 🇪🇸 Spanish | Latin American casual | "Ni de broma", "¿Ya entraste en calor?" | Spain Spanish formality |
+| 🇮🇱 Hebrew | Israeli colloquial | "יאללה", "אחלה", "אין סיכוי", "מי מתמודד?" | Formal/biblical Hebrew |
+| 🇯🇵 Japanese | Energetic casual | "勝てないでしょ", "本番いこう" | Overly polite keigo |
+| 🇸🇪 Swedish | Friendly casual | "Snyggt!", "Våga försöka" | Stiff/corporate tone |
+
+**Examples of BAD vs GOOD:**
+
+❌ BAD (translated): "Ready to dominate friends?" → "מוכן להשתלט על חברים?"
+✅ GOOD (native): "מוכנים למשחק אמיתי?"
+
+❌ BAD (translated): "Challenge your friends" → "אתגר את החברים שלך"
+✅ GOOD (native): "למולטי" or "בואו נראה אתכם מול חברים"
+
+❌ BAD (translated): "Good luck beating this!" → "¡Buena suerte superando esto!"
+✅ GOOD (native): "Ni de broma me ganas."
 
 ## Copy Patterns by Context
 
@@ -112,13 +131,14 @@ Can you beat this?
 lexiclash.com/daily
 ```
 
-## Translation Workflow
+## Multi-Language Workflow
 
-1. Write English copy first
-2. Add to [translations/en.js](fe-next/translations/en.js)
-3. Translate to each language using glossary
-4. Update: [es.js](fe-next/translations/es.js), [he.js](fe-next/translations/he.js), [ja.js](fe-next/translations/ja.js), [sv.js](fe-next/translations/sv.js)
-5. For Hebrew: ensure RTL compatibility, emoji at end of text
+1. **Write English copy first** - Establish the intent and energy
+2. **Add to [translations/en.js](fe-next/translations/en.js)**
+3. **Write native versions for each language** - NOT translate, but write fresh copy that captures the same vibe
+4. **Update all files:** [es.js](fe-next/translations/es.js), [he.js](fe-next/translations/he.js), [ja.js](fe-next/translations/ja.js), [sv.js](fe-next/translations/sv.js)
+5. **Hebrew specifics:** RTL compatibility, emoji typically at end of text
+6. **Quality check:** Read each version aloud - does it sound like something a native would actually say?
 
 ## References
 

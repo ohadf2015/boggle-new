@@ -44,9 +44,11 @@ import {
   useFireRoundGuidanceTrigger,
 } from '@/hooks/useContextualGuidance';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
+import { useTapToDragGuidance } from '@/hooks/useTapToDragGuidance';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import KeyboardHintTooltip from './KeyboardHintTooltip';
+import TapToDragTooltip from './TapToDragTooltip';
 import CompactLeaderboard, { type CompactPlayer } from './CompactLeaderboard';
 
 // ==================== Types ====================
@@ -253,6 +255,9 @@ const InGameScreen = memo<InGameScreenProps>(({
 
   // Direction pattern guidance - shows when player only uses straight-line directions
   const directionGuidance = useDirectionPatternGuidance();
+
+  // Tap-to-drag guidance - shows when player taps single letter without dragging
+  const tapDragGuidance = useTapToDragGuidance();
 
   // Track viewport height for responsive landscape adjustments
   useEffect(() => {
@@ -586,6 +591,12 @@ const InGameScreen = memo<InGameScreenProps>(({
           t={t}
           dir={dir}
         />
+        <TapToDragTooltip
+          isVisible={tapDragGuidance.showDragTutorial}
+          onDismiss={tapDragGuidance.dismissDragTutorial}
+          t={t}
+          dir={dir}
+        />
 
         {/* Keyboard Input Hint - Desktop only */}
         {isPlaying && (
@@ -596,8 +607,8 @@ const InGameScreen = memo<InGameScreenProps>(({
           />
         )}
 
-        {/* Full-screen landscape container with grid centered - uses full viewport */}
-        <div className="relative flex items-center justify-center w-full h-screen overflow-hidden bg-slate-900 text-white landscape-full-height">
+        {/* Full-screen landscape container with grid centered - uses full viewport, no scroll */}
+        <div className="relative flex items-center justify-center w-full h-screen max-h-[100dvh] overflow-hidden bg-slate-900 text-white landscape-full-height">
 
           {/* Left Side Panel - Timer, Rank, Words Count */}
           {/* Using clamp to prevent panel overlap on very narrow/short screens */}
@@ -760,6 +771,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                 fireRoundActive={fireRoundActive}
                 earthquakeShaking={earthquakeState === 'shaking'}
                 highlightedPath={keyboardInput.isTypingMode ? keyboardInput.highlightedCells : []}
+                onSingleTapDetected={tapDragGuidance.handleSingleTapDetected}
               />
             </div>
           </div>
@@ -830,6 +842,12 @@ const InGameScreen = memo<InGameScreenProps>(({
         t={t}
         dir={dir}
       />
+      <TapToDragTooltip
+        isVisible={tapDragGuidance.showDragTutorial}
+        onDismiss={tapDragGuidance.dismissDragTutorial}
+        t={t}
+        dir={dir}
+      />
 
       {/* Keyboard Input Hint - Desktop only */}
       {isPlaying && (
@@ -840,7 +858,7 @@ const InGameScreen = memo<InGameScreenProps>(({
         />
       )}
 
-      <div className="flex flex-col lg:flex-row gap-0.5 md:gap-4 lg:gap-6 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out">
+      <div className="flex flex-col lg:flex-row gap-0 md:gap-2 lg:gap-4 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out h-full max-h-[100dvh]">
 
         {/* Top Bar - Only on mobile, integrated into parent on desktop */}
         <div className="lg:hidden w-full flex items-center justify-between px-1 flex-shrink-0">
@@ -920,7 +938,7 @@ const InGameScreen = memo<InGameScreenProps>(({
         )}
 
         {/* Center Column: Timer, Score, Grid */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-0">
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden max-h-full">
           {/* Stats row - Combo | Timer | Score - timer always centered and visible */}
           {remainingTime !== null && (
             <div ref={gameStatsRef} className="flex items-center justify-center gap-1 md:gap-4 flex-shrink-0" role="status" aria-label="Game status">
@@ -1025,11 +1043,8 @@ const InGameScreen = memo<InGameScreenProps>(({
           )}
 
           {/* Grid - Direct connection to timer row */}
-          {/* Added bottom padding for safe area on devices with bottom bars/notches */}
-          <div
-            className="flex-1 flex items-start justify-center min-h-0 pt-1"
-            style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom, 0px))' }}
-          >
+          {/* Removed extra padding to prevent scroll - safe area handled by parent */}
+          <div className="flex-1 flex items-center justify-center min-h-0 overflow-hidden">
             <GridComponent
               key={isPlaying ? 'playing-grid' : 'spectating-grid'}
               grid={letterGrid}
@@ -1044,6 +1059,7 @@ const InGameScreen = memo<InGameScreenProps>(({
               fireRoundActive={fireRoundActive}
               earthquakeShaking={earthquakeState === 'shaking'}
               highlightedPath={keyboardInput.isTypingMode ? keyboardInput.highlightedCells : []}
+              onSingleTapDetected={tapDragGuidance.handleSingleTapDetected}
             />
           </div>
 
@@ -1061,9 +1077,9 @@ const InGameScreen = memo<InGameScreenProps>(({
           )}
 
           {/* Mobile: Split-view with compact leaderboard + words (eliminates tab switching) */}
-          {/* Now visible on all mobile/tablet screens with scroll support, hidden on desktop where sidebar is used */}
+          {/* Now visible on all mobile/tablet screens, hidden on desktop where sidebar is used */}
           {isPlaying && !gameplayFocusMode && leaderboard && leaderboard.length > 0 && (
-            <div className="block lg:hidden mt-0.5 md:mt-2 space-y-0.5 max-w-md mx-auto lg:max-w-lg md:space-y-2 flex-shrink overflow-auto max-h-[160px]">
+            <div className="block lg:hidden mt-0.5 md:mt-1 space-y-0.5 max-w-md mx-auto lg:max-w-lg md:space-y-1 flex-shrink-0 overflow-hidden max-h-[120px]">
               {/* Compact Leaderboard - Always visible */}
               <CompactLeaderboard
                 players={leaderboard.map(p => ({
@@ -1078,7 +1094,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                 t={t}
               />
 
-              {/* Found Words - Auto-scroll, always visible */}
+              {/* Found Words - Compact view, no scroll */}
               <div className="bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard p-1.5 md:p-2">
                 <div className="flex items-center justify-between mb-1 px-0.5">
                   <span className="text-[10px] md:text-xs font-black uppercase text-neo-black">
@@ -1088,7 +1104,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                     {normalizedFoundWords.length}
                   </span>
                 </div>
-                <div className="max-h-[70px] overflow-y-auto">
+                <div className="max-h-[50px] overflow-hidden">
                   {normalizedFoundWords.length === 0 ? (
                     <p className="text-center text-neo-black/90 py-2 text-sm font-bold">
                       {t('playerView.noWordsYet') || 'No words found yet'}

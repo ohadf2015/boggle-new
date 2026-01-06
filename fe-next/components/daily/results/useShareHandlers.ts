@@ -24,7 +24,7 @@ interface UseShareHandlersProps {
   isAuthenticated: boolean;
   profile: { display_name?: string | null; username?: string; avatar_emoji?: string | null } | null;
   guestPlayer: GuestDailyPlayer | null;
-  t: (key: string, values?: Record<string, unknown>) => string;
+  t: (key: string) => string;
 }
 
 export function useShareHandlers({

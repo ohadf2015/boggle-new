@@ -25,7 +25,7 @@ cd fe-next
 npm run dev
 ```
 
-The app will run on http://localhost:3000
+The app will run on http://localhost:3001
 
 ### 2. Log In as Admin
 
@@ -53,7 +53,7 @@ WHERE id = 'your-user-id';
 
 Once logged in as admin, go to:
 ```
-http://localhost:3000/en/admin
+http://localhost:3001/en/admin
 ```
 
 You should see tabs for:

@@ -90,6 +90,7 @@ const ja = {
     "notConnected": "オフライン",
     "connected": "接続済み",
     "coins": "コイン",
+    "chat": "チャット",
     "connecting": "接続中...",
     "connectedToServer": "バトル準備OK！",
     "connectingToServer": "ウォーミングアップ...",
@@ -399,6 +400,8 @@ const ja = {
     "unstableConnection": "WiFi不安定！待って...",
     "slowConnection": "接続遅い - 対応中",
     "sessionExpired": "セッション終了。新しく始めよう！",
+    "roomNoLongerExists": "ルームは既に存在しません",
+    "roomClosed": "ルームが閉じられました",
     "gameCodeNotExist": "コードが見つからない。確認して！",
     "usernameTaken": "先を越された！別の名前で",
     "gameCodeExists": "そのコードは使用中！新しいのを選んで",
@@ -574,6 +577,33 @@ const ja = {
       "playersOnline": "オンライン",
       "noRooms": "ルームなし - 作成！",
       "roomsRefreshed": "ルーム更新完了"
+    },
+    "roomList": {
+      "activeRooms": "アクティブルーム",
+      "online": "オンライン",
+      "noRooms": "アクティブなルームなし",
+      "beFirst": "最初に作成しよう！",
+      "createButton": "ルーム作成",
+      "refreshed": "ルーム更新完了"
+    },
+    "joinModal": {
+      "title": "ルームに参加",
+      "changeAvatar": "アバター変更",
+      "namePlaceholder": "あなたの名前",
+      "authenticatedHint": "ログイン済み",
+      "joinButton": "参加",
+      "joining": "参加中..."
+    },
+    "createModal": {
+      "title": "ルーム作成",
+      "changeAvatar": "アバター変更",
+      "namePlaceholder": "あなたの名前",
+      "authenticatedHint": "ログイン済み",
+      "roomNameLabel": "ルーム名",
+      "optional": "任意",
+      "roomNameHint": "空欄で自動生成",
+      "createButton": "ルーム作成",
+      "creating": "作成中..."
     },
     "editProfile": "編集",
     "profileSetup": {
@@ -3162,7 +3192,25 @@ const ja = {
         "good": "粘り強い！",
         "nice": "ナイス！",
         "start": "一秒も無駄にしない！"
-      }
+      },
+      "scoreBreakdown": "スコア内訳",
+      "efficiencyScore": "効率スコア",
+      "howItsCalculated": "計算方法",
+      "lifeRemaining": "ライフ",
+      "tokensSaved": "トークン",
+      "wordsFound": "単語",
+      "guessesPenalty": "推測",
+      "wordValues": "単語のライフ値",
+      "letters": "文字",
+      "tipsToImprove": "上達のコツ"
+    },
+    "scoreTips": {
+      "solveFirst": "パズルを解いてポイントをゲット！",
+      "findMoreWords": "もっと単語を見つけてライフを増やそう",
+      "longerWords": "長い単語（5文字以上）はライフが多い",
+      "saveTokens": "ヒントを節約してトークンを貯めよう",
+      "exploreGrid": "グリッドでボーナス単語を探そう",
+      "strategicGuessing": "推測する前にヒントを活用しよう"
     },
     "ad": {
       "watchAd": "広告を見る",
@@ -3233,25 +3281,25 @@ const ja = {
       "fail2": "🔄 明日は勝つ！",
       "fail3": "😤 この単語ズルい！",
       "fail4": "🎲 運が悪かった！",
-      "cta1": "もっとできると思う？",
+      "cta1": "超えられる？",
       "cta2": "君の番。",
-      "cta3": "これを超えて。",
-      "cta4": "挑戦してみて。",
-      "cta5": "これを超える幸運を！"
+      "cta3": "やってみて。",
+      "cta4": "勝てないでしょ。",
+      "cta5": "どうぞ挑戦して。"
     }
   },
   "keepPlaying": {
     "succeeded": {
-      "title": "絶好調！",
-      "message": "クリアした！友達を倒す準備はできた？",
-      "ctaSinglePlayer": "続ける",
-      "ctaMultiplayer": "友達に挑戦",
-      "subtext": "今日のスキルは鋭い"
+      "title": "いいね！",
+      "message": "ウォームアップ完了？本番いこう。",
+      "ctaSinglePlayer": "もっと遊ぶ",
+      "ctaMultiplayer": "友達とバトル",
+      "subtext": "その調子でマルチへ 🔥"
     },
     "struggled": {
-      "title": "頑張ろう！",
-      "message": "毎回のパズルがスキルを磨く。練習あるのみ！",
-      "ctaSinglePlayer": "レベルアップ"
+      "title": "ファイト！",
+      "message": "毎回のプレイで上達する！練習あるのみ！",
+      "ctaSinglePlayer": "もう少し練習"
     },
     "dismiss": "また今度"
   },
@@ -3275,6 +3323,10 @@ const ja = {
     "swipeTip": {
       "title": "スワイプで単語を作ろう！",
       "text": "文字の上で指をドラッグして単語を作ります。隣り合う文字をどの方向にもつなげられます！"
+    },
+    "dragTutorial": {
+      "title": "ドラッグでつなげよう！",
+      "text": "文字の上で指をドラッグして単語を作ります"
     },
     "dismiss": "了解！"
   },
@@ -3430,6 +3482,115 @@ const ja = {
     "currentPage": "ページ",
     "userId": "プレイヤーID",
     "sessionRecorded": "セッション録画添付済み"
+  },
+  "brain": {
+    "title": "脳トレ",
+    "subtitle": "認知パフォーマンスを追跡",
+    "score": "ブレインスコア",
+    "overall": "総合",
+    "nav": {
+      "home": "プレイ",
+      "brain": "脳",
+      "profile": "プロフィール"
+    },
+    "domains": {
+      "processingSpeed": "処理速度",
+      "processingSpeedDesc": "単語を見つける速さ",
+      "workingMemory": "ワーキングメモリ",
+      "workingMemoryDesc": "情報を保持・操作する能力",
+      "attention": "注意力",
+      "attentionDesc": "持続的な集中とコンボ維持",
+      "flexibility": "柔軟性",
+      "flexibilityDesc": "精神的な適応力と多様性",
+      "vocabulary": "語彙力",
+      "vocabularyDesc": "単語知識の深さ"
+    },
+    "tiers": {
+      "novice": "初心者",
+      "apprentice": "見習い",
+      "intermediate": "中級者",
+      "advanced": "上級者",
+      "expert": "エキスパート",
+      "master": "マスター"
+    },
+    "progress": {
+      "title": "進捗",
+      "improving": "向上中",
+      "stable": "安定",
+      "declining": "要改善",
+      "gamesAnalyzed": "分析ゲーム数",
+      "toNextTier": "次のランクまで"
+    },
+    "recommendation": {
+      "title": "パーソナルアドバイス",
+      "weakest": "{{domain}}をもう少し鍛えよう。",
+      "tryDrill": "{{drill}}ドリルで改善しよう！",
+      "startDrill": "ドリル開始"
+    },
+    "quickDrills": "クイックドリル",
+    "viewAll": "すべて表示",
+    "cognitiveProfile": "認知プロフィール",
+    "scientificTips": "知ってた？",
+    "learnMore": "詳細",
+    "gamesAnalyzed": "分析ゲーム数",
+    "toNextTier": "まで",
+    "drills": {
+      "title": "脳トレドリル",
+      "round": "ラウンド",
+      "level": "レベル",
+      "start": "スタート",
+      "complete": "クリア！",
+      "gameOver": "ゲームオーバー",
+      "wordsFound": "語発見",
+      "timeSpent": "時間",
+      "playAgain": "もう一度",
+      "exit": "終了",
+      "lightning-round": {
+        "name": "ライトニングラウンド",
+        "description": "できるだけ速く単語を見つけろ"
+      },
+      "memory-hunt": {
+        "name": "メモリーハント",
+        "description": "単語を覚えて、記憶から見つけ出せ",
+        "wordsToRemember": "覚える単語数",
+        "studyTime": "暗記時間",
+        "studyPhase": "暗記！",
+        "memorizeHint": "これらの単語を覚えよう：",
+        "recallPhase": "見つけろ！",
+        "remaining": "残り"
+      },
+      "combo-master": {
+        "name": "コンボマスター",
+        "description": "途切れずにコンボストリークを維持せよ"
+      },
+      "pattern-switcher": {
+        "name": "パターンスイッチャー",
+        "description": "指定された長さの順序で単語を見つけろ"
+      },
+      "rare-gems": {
+        "name": "レアジェム",
+        "description": "珍しくてレアな単語を発見せよ"
+      },
+      "locked": "ロック中",
+      "unlock": "レベル{{level}}をクリアしてアンロック"
+    },
+    "tips": {
+      "title": "知ってた？",
+      "tip1": "ワーキングメモリ容量は2週間の毎日のワードゲーム練習で15%向上する。",
+      "tip2": "処理速度は継続的な練習でピークに達する - 脳がより速い神経経路を形成するよ。",
+      "tip3": "珍しい単語を見つけると深い語彙検索が活性化される - 重要な認知スキルだ。",
+      "tip4": "コンボを維持すると持続的な注意力が鍛えられる - 日常生活での集中に不可欠。",
+      "tip5": "単語の長さを切り替えると認知的柔軟性が養われる - 精神的適応力だ。"
+    },
+    "streak": {
+      "title": "トレーニングストリーク",
+      "days": "日",
+      "best": "自己ベスト"
+    },
+    "empty": {
+      "title": "トレーニング開始！",
+      "description": "ゲームをプレイしてブレインスコアを構築し、認知的改善を追跡しよう。"
+    }
   }
 };
 

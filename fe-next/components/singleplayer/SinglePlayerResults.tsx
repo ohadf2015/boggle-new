@@ -38,6 +38,7 @@ import { awardGameCoins } from '@/utils/coinManager';
 import { syncCoinsToDatabase } from '@/lib/supabase';
 import { TrainingAnalysisModal } from '@/components/training';
 import { getTrainingProgress } from '@/utils/trainingProgressStorage';
+import { useSaveCognitiveScore } from '@/hooks/useSaveCognitiveScore';
 
 // Dynamic import for PerformanceChart (heavy component)
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
@@ -98,7 +99,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const hasLoggedGameSessionRef = useRef(false);
   const hasAwardedCoinsRef = useRef(false);
   const hasSavedAchievementsRef = useRef(false);
+  const hasSavedCognitiveScoreRef = useRef(false);
   const actionButtonsRef = useRef<HTMLDivElement>(null);
+
+  // Cognitive scoring hook
+  const { saveCognitiveScore, isSaving: isSavingCognitiveScore } = useSaveCognitiveScore();
 
   // Coin reward state
   const [coinReward, setCoinReward] = useState<{
@@ -330,6 +335,41 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     hasAwardedCoinsRef.current = true;
   }, [results.playerScore, results.gameSessionId, playerRank, allParticipants.length, user?.id]);
 
+  // Save cognitive scores for brain training (authenticated users only)
+  useEffect(() => {
+    if (hasSavedCognitiveScoreRef.current) return;
+    if (!user?.id) return; // Only for authenticated users
+
+    // Calculate max combo from word data
+    const validWords = results.playerWordData?.filter(w => w.isValid) || [];
+    let maxCombo = 0;
+    let currentCombo = 0;
+    for (const word of validWords) {
+      if (word.comboBonus && word.comboBonus > 0) {
+        currentCombo++;
+        maxCombo = Math.max(maxCombo, currentCombo);
+      } else {
+        currentCombo = 0;
+      }
+    }
+
+    // Save cognitive score
+    saveCognitiveScore({
+      playerWordData: results.playerWordData || [],
+      gameDuration: results.gameDuration || 0,
+      gridSize: results.grid?.length || 4,
+      maxCombo,
+      hintsUsed: 0, // Single player mode doesn't have hints
+      gameSessionId: results.gameSessionId,
+    }).then(cognitiveResult => {
+      if (cognitiveResult) {
+        console.log('[SinglePlayerResults] Cognitive scores saved:', cognitiveResult);
+      }
+    });
+
+    hasSavedCognitiveScoreRef.current = true;
+  }, [user?.id, results.playerWordData, results.gameDuration, results.grid, results.gameSessionId, saveCognitiveScore]);
+
   // Show signup prompt for guests who have played 2+ games
   useEffect(() => {
     // Skip if authenticated, has a user session (profile may still be loading), or auth is still loading
@@ -358,13 +398,15 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   // Limit to 2 words to avoid overwhelming the user with modals
   useEffect(() => {
     const wordsForValidation = results.botWordsForValidation;
-    if (wordsForValidation && wordsForValidation.length > 0) {
-      setTimeout(() => {
-        const limitedQueue = wordsForValidation.slice(0, 2);
-        setWordValidationQueue(limitedQueue);
-        setShowWordValidation(true);
-      }, 1500); // 1.5s delay so results render first
+    if (!wordsForValidation || wordsForValidation.length === 0) {
+      return;
     }
+    const timer = setTimeout(() => {
+      const limitedQueue = wordsForValidation.slice(0, 2);
+      setWordValidationQueue(limitedQueue);
+      setShowWordValidation(true);
+    }, 1500); // 1.5s delay so results render first
+    return () => clearTimeout(timer);
   }, [results.botWordsForValidation]);
 
 

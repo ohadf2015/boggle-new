@@ -1,7 +1,7 @@
 # LexiClash Boggle Game - Comprehensive UI Testing Report
 **Test Date:** December 28, 2025
 **Tester:** UI Comprehensive Tester Agent
-**Test Environment:** Local Development Server (http://localhost:3000)
+**Test Environment:** Local Development Server (http://localhost:3001)
 **Browser:** Chrome/Chromium (Playwright)
 
 ---
@@ -748,7 +748,7 @@ className={`
 - (Firefox and WebKit available but not run for this test)
 
 **Server:**
-- Local development server: http://localhost:3000
+- Local development server: http://localhost:3001
 - Server running: ✅ Confirmed (PID 32051)
 
 ---

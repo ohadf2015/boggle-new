@@ -116,14 +116,14 @@ After 3:  [💡 Free Hints ☆☆☆]  ← Gray, disabled
 
 1. **Responsive Grid** (30 seconds)
    ```
-   → Go to: http://localhost:3000/en/singleplayer
+   → Go to: http://localhost:3001/en/singleplayer
    → Resize browser: Mobile → Tablet → Desktop
    → Verify grid columns: 2 → 3 → 3
    ```
 
 2. **Language Indicators** (1 minute)
    ```
-   → Go to: http://localhost:3000/en/daily
+   → Go to: http://localhost:3001/en/daily
    → Complete daily challenge
    → Verify badge shows "1"
    → Click language selector
@@ -132,7 +132,7 @@ After 3:  [💡 Free Hints ☆☆☆]  ← Gray, disabled
 
 3. **3-Letter Minimum** (1 minute)
    ```
-   → Go to: http://localhost:3000/en/singleplayer
+   → Go to: http://localhost:3001/en/singleplayer
    → Start Solo game (Easy preset)
    → Type "IT" and submit → Expect rejection
    → Type "CAT" and submit → Expect acceptance
@@ -150,11 +150,11 @@ After 3:  [💡 Free Hints ☆☆☆]  ← Gray, disabled
 
 5. **Cross-Language** (1.5 minutes)
    ```
-   → Go to: http://localhost:3000/he/daily
+   → Go to: http://localhost:3001/he/daily
    → Verify RTL layout (text right-to-left)
-   → Go to: http://localhost:3000/sv/daily
-   → Go to: http://localhost:3000/ja/daily
-   → Go to: http://localhost:3000/es/daily
+   → Go to: http://localhost:3001/sv/daily
+   → Go to: http://localhost:3001/ja/daily
+   → Go to: http://localhost:3001/es/daily
    → All should load without errors
    ```
 
@@ -215,14 +215,14 @@ document.querySelectorAll('.text-neo-orange').length
 
 | Feature | URL | Expected |
 |---------|-----|----------|
-| Responsive Grid | http://localhost:3000/en/singleplayer | 2-3 column grid |
-| Language Indicators | http://localhost:3000/en/daily | Badge + checkmarks |
-| 3-Letter Validation | http://localhost:3000/en/singleplayer | Rejects < 3 letters |
-| Hint Button | http://localhost:3000/en/singleplayer (Solo mode) | Stars + Free Hints |
-| Hebrew RTL | http://localhost:3000/he/singleplayer | Right-to-left layout |
-| Swedish | http://localhost:3000/sv/singleplayer | å, ä, ö characters |
-| Japanese | http://localhost:3000/ja/singleplayer | Kanji/Hiragana |
-| Spanish | http://localhost:3000/es/singleplayer | Accented characters |
+| Responsive Grid | http://localhost:3001/en/singleplayer | 2-3 column grid |
+| Language Indicators | http://localhost:3001/en/daily | Badge + checkmarks |
+| 3-Letter Validation | http://localhost:3001/en/singleplayer | Rejects < 3 letters |
+| Hint Button | http://localhost:3001/en/singleplayer (Solo mode) | Stars + Free Hints |
+| Hebrew RTL | http://localhost:3001/he/singleplayer | Right-to-left layout |
+| Swedish | http://localhost:3001/sv/singleplayer | å, ä, ö characters |
+| Japanese | http://localhost:3001/ja/singleplayer | Kanji/Hiragana |
+| Spanish | http://localhost:3001/es/singleplayer | Accented characters |
 
 ---
 

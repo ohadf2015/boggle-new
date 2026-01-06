@@ -90,6 +90,7 @@ const he = {
     "notConnected": "לא מחובר",
     "connected": "מחובר",
     "coins": "מטבעות",
+    "chat": "צ'אט",
     "connecting": "מתחבר...",
     "connectedToServer": "מוכן לקרב!",
     "connectingToServer": "מתחמם...",
@@ -3193,7 +3194,25 @@ const he = {
         "good": "התמדה נהדרת!",
         "nice": "מאמץ יפה!",
         "start": "כל שנייה חשובה!"
-      }
+      },
+      "scoreBreakdown": "פירוט הניקוד",
+      "efficiencyScore": "ניקוד יעילות",
+      "howItsCalculated": "איך זה מחושב",
+      "lifeRemaining": "חיים",
+      "tokensSaved": "אסימונים",
+      "wordsFound": "מילים",
+      "guessesPenalty": "ניחושים",
+      "wordValues": "ערכי מילים לחיים",
+      "letters": "אותיות",
+      "tipsToImprove": "טיפים להשתפר"
+    },
+    "scoreTips": {
+      "solveFirst": "פתרו את החידה כדי לצבור נקודות!",
+      "findMoreWords": "מצאו עוד מילים להרוויח חיים",
+      "longerWords": "מילים ארוכות (5+ אותיות) נותנות יותר חיים",
+      "saveTokens": "חסכו אסימונים על ידי שימוש בפחות רמזים",
+      "exploreGrid": "חפשו בלוח מילים בונוס",
+      "strategicGuessing": "השתמשו ברמזים לפני שמנחשים"
     },
     "ad": {
       "watchAd": "צפה בפרסומת",
@@ -3264,27 +3283,27 @@ const he = {
       "fail2": "🔄 מחר שלי!",
       "fail3": "😤 המילה הזו לא הוגנת!",
       "fail4": "🎲 לוח גרוע!",
-      "cta1": "חושבים שתעשו יותר טוב?",
-      "cta2": "תורכם.",
-      "cta3": "נסו לעבור את זה.",
-      "cta4": "אתגר אתכם לנסות.",
-      "cta5": "בהצלחה לעבור את זה!"
+      "cta1": "יאללה, תנסו",
+      "cta2": "עכשיו אתם.",
+      "cta3": "מי מתמודד?",
+      "cta4": "אין סיכוי שתעברו",
+      "cta5": "בהצלחה 😏"
     }
   },
   "keepPlaying": {
     "succeeded": {
-      "title": "אש!",
-      "message": "פיצחת את זה! מוכן להשתלט על חברים?",
-      "ctaSinglePlayer": "להמשיך לגלגל",
-      "ctaMultiplayer": "אתגר חברים",
-      "subtext": "הכישורים שלך חדים היום"
+      "title": "אחלה!",
+      "message": "מוכנים למשחק אמיתי?",
+      "ctaSinglePlayer": "עוד סיבוב",
+      "ctaMultiplayer": "למולטי",
+      "subtext": "בואו נראה אתכם מול חברים 🔥"
     },
     "struggled": {
-      "title": "להמשיך!",
-      "message": "כל פאזל מחדד את הכישורים. תרגול עושה מושלם!",
-      "ctaSinglePlayer": "לשדרג"
+      "title": "לא נורא!",
+      "message": "עוד קצת אימון ותהיו מכונה",
+      "ctaSinglePlayer": "עוד פעם"
     },
-    "dismiss": "אולי אחר כך"
+    "dismiss": "אח״כ"
   },
   "guidance": {
     "combo": {
@@ -3306,6 +3325,10 @@ const he = {
     "swipeTip": {
       "title": "החליקו ליצירת מילים!",
       "text": "גררו את האצבע על האותיות ליצירת מילים. חברו אותיות סמוכות בכל כיוון!"
+    },
+    "dragTutorial": {
+      "title": "גררו לחיבור!",
+      "text": "גררו את האצבע על האותיות ליצירת מילים"
     },
     "dismiss": "הבנתי!"
   },
@@ -3461,6 +3484,115 @@ const he = {
     "currentPage": "עמוד",
     "userId": "מזהה שחקן",
     "sessionRecorded": "הקלטת הפעלה מצורפת"
+  },
+  "brain": {
+    "title": "אימון מוחי",
+    "subtitle": "עקוב אחר הביצועים הקוגניטיביים שלך",
+    "score": "ציון מוח",
+    "overall": "כללי",
+    "nav": {
+      "home": "שחק",
+      "brain": "מוח",
+      "profile": "פרופיל"
+    },
+    "domains": {
+      "processingSpeed": "מהירות עיבוד",
+      "processingSpeedDesc": "כמה מהר אתה מוצא מילים",
+      "workingMemory": "זיכרון עבודה",
+      "workingMemoryDesc": "יכולת לאחסן ולעבד מידע",
+      "attention": "קשב",
+      "attentionDesc": "ריכוז מתמשך ושמירת קומבו",
+      "flexibility": "גמישות",
+      "flexibilityDesc": "הסתגלות מנטלית ומגוון",
+      "vocabulary": "אוצר מילים",
+      "vocabularyDesc": "עומק הידע המילוני"
+    },
+    "tiers": {
+      "novice": "מתחיל",
+      "apprentice": "שוליה",
+      "intermediate": "בינוני",
+      "advanced": "מתקדם",
+      "expert": "מומחה",
+      "master": "אלוף"
+    },
+    "progress": {
+      "title": "התקדמות",
+      "improving": "משתפר",
+      "stable": "יציב",
+      "declining": "דורש עבודה",
+      "gamesAnalyzed": "משחקים נותחו",
+      "toNextTier": "לדרגה הבאה"
+    },
+    "recommendation": {
+      "title": "טיפ אישי",
+      "weakest": "ה{{domain}} שלך צריך קצת עבודה.",
+      "tryDrill": "נסה את תרגיל ה{{drill}} להשתפר!",
+      "startDrill": "התחל תרגיל"
+    },
+    "quickDrills": "תרגילים מהירים",
+    "viewAll": "הצג הכל",
+    "cognitiveProfile": "פרופיל קוגניטיבי",
+    "scientificTips": "הידעת?",
+    "learnMore": "למד עוד",
+    "gamesAnalyzed": "משחקים נותחו",
+    "toNextTier": "ל",
+    "drills": {
+      "title": "תרגילי מוח",
+      "round": "סיבוב",
+      "level": "רמה",
+      "start": "התחל",
+      "complete": "הושלם!",
+      "gameOver": "המשחק נגמר",
+      "wordsFound": "מילים נמצאו",
+      "timeSpent": "זמן",
+      "playAgain": "שחק שוב",
+      "exit": "יציאה",
+      "lightning-round": {
+        "name": "סיבוב ברק",
+        "description": "מצא מילים הכי מהר שאפשר"
+      },
+      "memory-hunt": {
+        "name": "ציד זיכרון",
+        "description": "זכור מילים ומצא אותן מזיכרון",
+        "wordsToRemember": "מילים לזכור",
+        "studyTime": "זמן לימוד",
+        "studyPhase": "שנן!",
+        "memorizeHint": "זכור את המילים האלה:",
+        "recallPhase": "מצא אותן!",
+        "remaining": "נותרו"
+      },
+      "combo-master": {
+        "name": "אלוף הקומבו",
+        "description": "שמור על רצפי קומבו בלי הפסקות"
+      },
+      "pattern-switcher": {
+        "name": "מחליף דפוסים",
+        "description": "מצא מילים ברצפי אורך נדרשים"
+      },
+      "rare-gems": {
+        "name": "אבנים נדירות",
+        "description": "גלה מילים לא נפוצות ונדירות"
+      },
+      "locked": "נעול",
+      "unlock": "השלם רמה {{level}} לפתיחה"
+    },
+    "tips": {
+      "title": "הידעת?",
+      "tip1": "קיבולת זיכרון העבודה עולה ב-15% עם שבועיים של תרגול יומי במשחקי מילים.",
+      "tip2": "מהירות העיבוד מגיעה לשיא עם תרגול יומי קבוע - המוח יוצר מסלולים עצביים מהירים יותר.",
+      "tip3": "מציאת מילים נדירות מפעילה שליפת אוצר מילים עמוקה יותר - מיומנות קוגניטיבית מפתח.",
+      "tip4": "שמירה על קומבו מאמנת קשב מתמשך - חיוני לריכוז בחיי היומיום.",
+      "tip5": "מעבר בין אורכי מילים בונה גמישות קוגניטיבית - הסתגלות מנטלית."
+    },
+    "streak": {
+      "title": "רצף אימונים",
+      "days": "ימים",
+      "best": "שיא אישי"
+    },
+    "empty": {
+      "title": "התחל להתאמן!",
+      "description": "שחק משחקים כדי לבנות את ציון המוח שלך ולעקוב אחר שיפור קוגניטיבי לאורך זמן."
+    }
   }
 };
 

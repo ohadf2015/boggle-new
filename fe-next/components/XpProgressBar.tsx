@@ -1,4 +1,4 @@
-import { memo, useMemo, useState } from 'react';
+import { memo, useMemo, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
 import { cn } from '../lib/utils';
@@ -126,6 +126,10 @@ const XpProgressBar = memo<XpProgressBarProps>(({
   const progress = useMemo(() => getXpProgress(totalXp), [totalXp]);
   const [showPrestigeModal, setShowPrestigeModal] = useState(false);
 
+  const openPrestigeModal = useCallback(() => {
+    setShowPrestigeModal(true);
+  }, []);
+
   const prestigeDisplay = prestigeLevel > 0 && prestigeLevel <= 5
     ? PRESTIGE_DISPLAY[prestigeLevel as keyof typeof PRESTIGE_DISPLAY]
     : null;
@@ -144,7 +148,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
             {/* Prestige Badge */}
             {showPrestige && prestigeDisplay && (
               <button
-                onClick={() => setShowPrestigeModal(true)}
+                onClick={openPrestigeModal}
                 className={cn(
                   'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold',
                   'border border-current/30',
@@ -171,7 +175,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
           )}
           {progress.isMaxLevel && (
             <button
-              onClick={() => showPrestige && setShowPrestigeModal(true)}
+              onClick={showPrestige ? openPrestigeModal : undefined}
               className={cn(
                 'text-xs font-bold flex items-center gap-1',
                 canPrestige

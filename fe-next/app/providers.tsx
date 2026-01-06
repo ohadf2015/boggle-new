@@ -16,6 +16,7 @@ import { GoogleAdsProvider } from '@/components/ads/GoogleAdsProvider';
 import { SocketProvider } from '@/utils/SocketContext';
 import { GameStateProvider } from '@/contexts/GameStateContext';
 import { SocketEventBusProvider } from '@/contexts/SocketEventBusContext';
+import { NavigationProvider } from '@/contexts/NavigationContext';
 import { Toaster } from 'react-hot-toast';
 import ErrorBoundary from './components/ErrorBoundary';
 import { initUtmCapture } from '@/utils/utmCapture';
@@ -23,8 +24,28 @@ import { composeProviders } from '@/utils/composeProviders';
 import { linkLogRocketSession } from '@/utils/sentry';
 import { initSessionTracking } from '@/utils/sessionTracking';
 import WinnerOnboardingWrapper from './components/WinnerOnboardingWrapper';
+import GlobalBottomNav from '@/components/layout/GlobalBottomNav';
 
 import type { Language } from '@/shared/types/game';
+
+// Initialize React Scan for development performance monitoring
+let reactScanInitialized = false;
+const initReactScan = async () => {
+    if (reactScanInitialized) return;
+    if (typeof window === 'undefined') return;
+    if (process.env.NODE_ENV !== 'development') return;
+
+    reactScanInitialized = true;
+    const { scan } = await import('react-scan');
+    scan({
+        enabled: true,
+        log: true, // Log render info to console
+    });
+};
+
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+    initReactScan();
+}
 
 interface ProvidersProps {
   children: ReactNode;
@@ -127,8 +148,11 @@ export function Providers({ children, lang }: ProvidersProps) {
                                     <SocketEventBusProvider>
                                         <AudioProviders>
                                             <GameProviders>
-                                                {children}
-                                                <WinnerOnboardingWrapper />
+                                                <NavigationProvider>
+                                                    {children}
+                                                    <GlobalBottomNav />
+                                                    <WinnerOnboardingWrapper />
+                                                </NavigationProvider>
                                             </GameProviders>
                                         </AudioProviders>
                                     </SocketEventBusProvider>

@@ -15,6 +15,8 @@ export interface GuidanceState {
   swipeTipShown: boolean;
   /** Whether the user has been shown the option to disable effects on first earthquake */
   effectsPreferenceShown: boolean;
+  /** Whether the user has seen the tap-to-drag tutorial (shown when tapping single letter without dragging) */
+  dragTutorialShown: boolean;
 }
 
 const DEFAULT_STATE: GuidanceState = {
@@ -24,6 +26,7 @@ const DEFAULT_STATE: GuidanceState = {
   directionPatternShown: false,
   swipeTipShown: false,
   effectsPreferenceShown: false,
+  dragTutorialShown: false,
 };
 
 /**

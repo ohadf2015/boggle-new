@@ -47,6 +47,8 @@ interface GridComponentProps {
   highlightedPath?: HighlightedCell[];
   /** Letters that have been eliminated (not in target word) - shown dimmed on board */
   eliminatedLetters?: Set<string>;
+  /** Callback when user taps a single cell without dragging (for tap-to-drag tutorial) */
+  onSingleTapDetected?: (cell: { row: number; col: number; letter: string }) => void;
 }
 
 /**
@@ -90,6 +92,7 @@ const GridComponent = memo<GridComponentProps>(({
   hideComboIndicator = false,
   highlightedPath = [],
   eliminatedLetters,
+  onSingleTapDetected,
 }) => {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
@@ -144,6 +147,7 @@ const GridComponent = memo<GridComponentProps>(({
     externalSelectedCells,
     gridRef,
     fireRoundActive,
+    onSingleTapDetected,
   });
 
   // Calculate the word being formed from selected cells

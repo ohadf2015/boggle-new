@@ -96,6 +96,7 @@ const en = {
     "notConnected": "Offline",
     "connected": "Connected",
     "coins": "coins",
+    "chat": "Chat",
     "connecting": "Connecting...",
     "connectedToServer": "Ready to battle!",
     "connectingToServer": "Warming up...",
@@ -3198,7 +3199,25 @@ const en = {
         "good": "Great Persistence!",
         "nice": "Nice Effort!",
         "start": "Every Second Counts!"
-      }
+      },
+      "scoreBreakdown": "Score Breakdown",
+      "efficiencyScore": "Efficiency Score",
+      "howItsCalculated": "How it's calculated",
+      "lifeRemaining": "Life",
+      "tokensSaved": "Tokens",
+      "wordsFound": "Words",
+      "guessesPenalty": "Guesses",
+      "wordValues": "Word Life Values",
+      "letters": "letters",
+      "tipsToImprove": "Tips to Improve"
+    },
+    "scoreTips": {
+      "solveFirst": "Solve the puzzle to earn points!",
+      "findMoreWords": "Find more words to gain life",
+      "longerWords": "Longer words (5+ letters) give more life",
+      "saveTokens": "Save tokens by using fewer clues",
+      "exploreGrid": "Explore the grid for bonus words",
+      "strategicGuessing": "Use clues wisely before guessing"
     },
     "ad": {
       "watchAd": "Watch Ad",
@@ -3269,27 +3288,27 @@ const en = {
       "fail2": "🔄 Tomorrow's mine!",
       "fail3": "😤 This word was unfair!",
       "fail4": "🎲 Bad board!",
-      "cta1": "Think you can do better?",
-      "cta2": "Your turn.",
-      "cta3": "Beat that.",
-      "cta4": "I dare you to try.",
-      "cta5": "Good luck topping this!"
+      "cta1": "Think you can beat this?",
+      "cta2": "Your move.",
+      "cta3": "Top that.",
+      "cta4": "No way you beat this.",
+      "cta5": "Try to keep up."
     }
   },
   "keepPlaying": {
     "succeeded": {
-      "title": "On Fire!",
-      "message": "You cracked it! Ready to dominate friends?",
-      "ctaSinglePlayer": "Keep Rolling",
-      "ctaMultiplayer": "Challenge Friends",
-      "subtext": "Your skills are sharp today"
+      "title": "Nice one!",
+      "message": "Brain warmed up? Time for some real competition.",
+      "ctaSinglePlayer": "Keep Playing",
+      "ctaMultiplayer": "Battle Friends",
+      "subtext": "Bring that energy to multiplayer 🔥"
     },
     "struggled": {
       "title": "Keep Going!",
       "message": "Every puzzle sharpens your skills. Practice makes perfect!",
-      "ctaSinglePlayer": "Level Up"
+      "ctaSinglePlayer": "Practice More"
     },
-    "dismiss": "Maybe later"
+    "dismiss": "Not now"
   },
   "guidance": {
     "combo": {
@@ -3311,6 +3330,10 @@ const en = {
     "swipeTip": {
       "title": "Swipe to Form Words!",
       "text": "Drag your finger across letters to form words. Connect adjacent letters in any direction!"
+    },
+    "dragTutorial": {
+      "title": "Drag to Connect!",
+      "text": "Drag your finger across letters to form words"
     },
     "dismiss": "Got it!"
   },
@@ -3473,6 +3496,115 @@ const en = {
     "currentPage": "Page",
     "userId": "Player ID",
     "sessionRecorded": "Session recording attached"
+  },
+  "brain": {
+    "title": "Brain Training",
+    "subtitle": "Track your cognitive performance",
+    "score": "Brain Score",
+    "overall": "Overall",
+    "nav": {
+      "home": "Play",
+      "brain": "Brain",
+      "profile": "Profile"
+    },
+    "domains": {
+      "processingSpeed": "Processing Speed",
+      "processingSpeedDesc": "How quickly you find words",
+      "workingMemory": "Working Memory",
+      "workingMemoryDesc": "Ability to hold and manipulate information",
+      "attention": "Attention",
+      "attentionDesc": "Sustained focus and combo maintenance",
+      "flexibility": "Flexibility",
+      "flexibilityDesc": "Mental adaptability and variety",
+      "vocabulary": "Vocabulary",
+      "vocabularyDesc": "Depth of word knowledge"
+    },
+    "tiers": {
+      "novice": "Novice",
+      "apprentice": "Apprentice",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "expert": "Expert",
+      "master": "Master"
+    },
+    "progress": {
+      "title": "Progress",
+      "improving": "Improving",
+      "stable": "Stable",
+      "declining": "Needs work",
+      "gamesAnalyzed": "games analyzed",
+      "toNextTier": "to next tier"
+    },
+    "recommendation": {
+      "title": "Personalized Tip",
+      "weakest": "Your {{domain}} could use some work.",
+      "tryDrill": "Try the {{drill}} drill to improve!",
+      "startDrill": "Start Drill"
+    },
+    "quickDrills": "Quick Drills",
+    "viewAll": "View All",
+    "cognitiveProfile": "Cognitive Profile",
+    "scientificTips": "Did You Know?",
+    "learnMore": "Learn more",
+    "gamesAnalyzed": "Games Analyzed",
+    "toNextTier": "to",
+    "drills": {
+      "title": "Brain Drills",
+      "round": "Round",
+      "level": "Level",
+      "start": "Start",
+      "complete": "Complete!",
+      "gameOver": "Game Over",
+      "wordsFound": "words found",
+      "timeSpent": "Time",
+      "playAgain": "Play Again",
+      "exit": "Exit",
+      "lightning-round": {
+        "name": "Lightning Round",
+        "description": "Find words as fast as possible"
+      },
+      "memory-hunt": {
+        "name": "Memory Hunt",
+        "description": "Remember words, then find them from memory",
+        "wordsToRemember": "Words to remember",
+        "studyTime": "Study time",
+        "studyPhase": "Memorize!",
+        "memorizeHint": "Remember these words:",
+        "recallPhase": "Find them!",
+        "remaining": "Remaining"
+      },
+      "combo-master": {
+        "name": "Combo Master",
+        "description": "Maintain combo streaks without breaks"
+      },
+      "pattern-switcher": {
+        "name": "Pattern Switcher",
+        "description": "Find words in required length sequences"
+      },
+      "rare-gems": {
+        "name": "Rare Gems",
+        "description": "Discover uncommon and rare words"
+      },
+      "locked": "Locked",
+      "unlock": "Complete level {{level}} to unlock"
+    },
+    "tips": {
+      "title": "Did You Know?",
+      "tip1": "Working memory capacity increases by 15% with just 2 weeks of daily word game practice.",
+      "tip2": "Processing speed peaks with consistent daily practice - your brain forms faster neural pathways.",
+      "tip3": "Finding rare words activates deeper vocabulary retrieval - a key cognitive skill.",
+      "tip4": "Maintaining combos trains sustained attention - crucial for focus in daily life.",
+      "tip5": "Switching between word lengths builds cognitive flexibility - mental adaptability."
+    },
+    "streak": {
+      "title": "Training Streak",
+      "days": "days",
+      "best": "Personal Best"
+    },
+    "empty": {
+      "title": "Start Training!",
+      "description": "Play games to build your Brain Score and track cognitive improvement over time."
+    }
   }
 };
 

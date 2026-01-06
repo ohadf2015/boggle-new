@@ -548,30 +548,30 @@ body {
   @media (min-width: 769px) {
     .game-board-frame {
       /* Desktop: smaller grid to show timer, stats, leaderboard without scrolling */
-      /* Reduced from 65vmin to 50vmin for better fit */
-      width: min(50vmin, calc(100vw - 450px), calc(100dvh - 260px));
-      height: min(50vmin, calc(100vw - 450px), calc(100dvh - 260px));
-      max-height: calc(100dvh - 260px);
-      padding: 8px;
+      /* Reduced to 42vmin to prevent letters overlapping - grid must fit comfortably */
+      width: min(42vmin, calc(100vw - 500px), calc(100dvh - 280px));
+      height: min(42vmin, calc(100vw - 500px), calc(100dvh - 280px));
+      max-height: calc(100dvh - 280px);
+      padding: 6px;
     }
   }
 
   /* Large desktop screens - comfortable size with more room */
   @media (min-width: 1280px) {
     .game-board-frame {
-      /* Large desktops: still constrained but slightly larger */
-      width: min(48vmin, calc(100vw - 550px), calc(100dvh - 280px));
-      height: min(48vmin, calc(100vw - 550px), calc(100dvh - 280px));
-      max-height: calc(100dvh - 280px);
+      /* Large desktops: moderately constrained */
+      width: min(40vmin, calc(100vw - 600px), calc(100dvh - 300px));
+      height: min(40vmin, calc(100vw - 600px), calc(100dvh - 300px));
+      max-height: calc(100dvh - 300px);
     }
   }
 
-  /* Extra large desktop screens - allow slightly larger grid */
+  /* Extra large desktop screens - still constrained to prevent oversized grid */
   @media (min-width: 1536px) {
     .game-board-frame {
-      width: min(45vmin, calc(100vw - 650px), calc(100dvh - 300px));
-      height: min(45vmin, calc(100vw - 650px), calc(100dvh - 300px));
-      max-height: calc(100dvh - 300px);
+      width: min(38vmin, calc(100vw - 700px), calc(100dvh - 320px));
+      height: min(38vmin, calc(100vw - 700px), calc(100dvh - 320px));
+      max-height: calc(100dvh - 320px);
     }
   }
 

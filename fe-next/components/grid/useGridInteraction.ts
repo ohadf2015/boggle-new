@@ -33,6 +33,8 @@ interface UseGridInteractionProps {
   externalSelectedCells?: SelectedCell[];
   gridRef: React.RefObject<HTMLDivElement | null>;
   fireRoundActive?: boolean;
+  /** Callback when user taps a single cell without dragging (for tap-to-drag tutorial) */
+  onSingleTapDetected?: (cell: { row: number; col: number; letter: string }) => void;
 }
 
 interface UseGridInteractionReturn {
@@ -81,6 +83,7 @@ export function useGridInteraction({
   externalSelectedCells,
   gridRef,
   fireRoundActive = false,
+  onSingleTapDetected,
 }: UseGridInteractionProps): UseGridInteractionReturn {
   const [internalSelectedCells, setInternalSelectedCells] = useState<SelectedCell[]>([]);
   const [fadingCells, setFadingCells] = useState<GridPosition[]>([]);
@@ -658,11 +661,26 @@ export function useGridInteraction({
         }, 500);
       }
     } else {
+      // Detect single tap without drag - user tapped one letter and released without moving
+      // Only trigger for touch interactions (isTouchDeviceRef is set on touchstart)
+      if (
+        selectedCells.length === 1 &&
+        !hasMovedRef.current &&
+        isTouchDeviceRef.current &&
+        onSingleTapDetected
+      ) {
+        const cell = selectedCells[0];
+        onSingleTapDetected({
+          row: cell.row,
+          col: cell.col,
+          letter: cell.letter,
+        });
+      }
       setSelectedCells([]);
     }
 
     hasMovedRef.current = false;
-  }, [interactive, resetSelectionState, selectedCells, onWordSubmit, onPathSubmit, fireRoundActive, comboLevel, startSequentialFadeOut, setSelectedCells]);
+  }, [interactive, resetSelectionState, selectedCells, onWordSubmit, onPathSubmit, fireRoundActive, comboLevel, startSequentialFadeOut, setSelectedCells, onSingleTapDetected]);
 
   // Handle click-to-select for desktop (single clicks to build word)
   const handleCellClick = useCallback((

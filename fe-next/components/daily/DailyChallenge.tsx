@@ -137,6 +137,8 @@ const DailyChallenge: React.FC = () => {
 
   // Training gateway modal for new players
   const [showTrainingGateway, setShowTrainingGateway] = useState(false);
+  // Track if gateway was already shown this session to prevent re-showing
+  const [gatewayShownThisSession, setGatewayShownThisSession] = useState(false);
 
   // Fetch guest fingerprint on mount
   useEffect(() => {
@@ -148,6 +150,9 @@ const DailyChallenge: React.FC = () => {
     // Only show when page loads in ready phase (not during game or results)
     if (phase !== 'ready') return;
 
+    // Don't show again if already shown this session
+    if (gatewayShownThisSession) return;
+
     // Check if player should see training gateway
     const shouldShow = shouldShowTrainingGateway();
 
@@ -156,11 +161,12 @@ const DailyChallenge: React.FC = () => {
       // Small delay to let the page load first
       const timer = setTimeout(() => {
         setShowTrainingGateway(true);
+        setGatewayShownThisSession(true); // Mark as shown this session
       }, 500);
       return () => clearTimeout(timer);
     }
     return;
-  }, [phase]);
+  }, [phase, gatewayShownThisSession]);
 
   // Handle skipping training gateway
   const handleSkipTrainingGateway = useCallback(() => {

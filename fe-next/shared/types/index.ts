@@ -18,6 +18,9 @@ export * from './spam';
 // Score card types
 export * from './scorecard';
 
+// Cognitive scoring types (Brain Training)
+export * from './cognitive';
+
 // Engagement system types - export only unique types not already in socket.ts
 // The socket.ts file contains simplified versions of engagement types for socket payloads
 // For full engagement types, import directly from './engagement'
