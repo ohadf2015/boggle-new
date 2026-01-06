@@ -7,7 +7,7 @@ import { ArrowLeft, Globe, ChevronDown, Trophy, Target, Check } from 'lucide-rea
 import { Button } from '@/components/ui/button';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import AutoHideHeader from '@/components/AutoHideHeader';
-import DailyWordHuntSurvival from './DailyWordHuntSurvival';
+import DailyWordHuntSurvival, { type SurvivalGameResult } from './DailyWordHuntSurvival';
 import DailyWordHuntResults from './DailyWordHuntResults';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import GuestNameEditor from './GuestNameEditor';
@@ -40,7 +40,6 @@ import {
   hasPlayedAnyGame,
 } from '@/utils/playerProgressStorage';
 import type { LetterGrid, Language } from '@/types';
-import type { SurvivalGameResult } from './DailyWordHuntSurvival';
 
 // Retry token validation response type
 interface RetryTokenValidation {

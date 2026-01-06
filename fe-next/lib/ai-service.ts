@@ -10,8 +10,7 @@
  */
 
 import { VertexAI, GenerativeModel } from '@google-cloud/vertexai';
-import { createClient } from '@supabase/supabase-js';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import { captureAIServiceError } from '@/utils/sentry';
 

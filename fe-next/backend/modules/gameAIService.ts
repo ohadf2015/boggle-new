@@ -17,10 +17,8 @@
  * - Better error handling for truncated responses
  */
 
-import { VertexAI } from '@google-cloud/vertexai';
-import type { GenerativeModel, Content, GenerateContentResult } from '@google-cloud/vertexai';
-import { createClient } from '@supabase/supabase-js';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { VertexAI, type GenerativeModel, type Content, type GenerateContentResult } from '@google-cloud/vertexai';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
  
 const logger = require('../utils/logger');
