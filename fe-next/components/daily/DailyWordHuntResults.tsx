@@ -34,7 +34,6 @@ import KeepPlayingSection from './KeepPlayingSection';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchGeolocation } from '@/contexts/auth/authUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useHideNavigation } from '@/contexts/NavigationContext';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 
 // Import from results module
@@ -78,7 +77,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const { t } = useLanguage();
   const { user, profile, isAuthenticated, loading: authLoading } = useAuth();
   const { isProtected } = useScreenshotProtection();
-  const setIsInGame = useHideNavigation();
 
   // Local state
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
@@ -171,12 +169,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   // ============================================================================
   // EFFECTS
   // ============================================================================
-
-  // Hide global bottom navigation while this results UI (fixed MobileTabBar) is mounted
-  useEffect(() => {
-    setIsInGame(true);
-    return () => setIsInGame(false);
-  }, [setIsInGame]);
 
   // Get guest fingerprint and player info
   useEffect(() => {
