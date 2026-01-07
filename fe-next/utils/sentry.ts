@@ -1,4 +1,17 @@
-import * as Sentry from "@sentry/nextjs";
+let sentryModule: (typeof import("@sentry/nextjs")) | null = null;
+
+function getSentry(): typeof import("@sentry/nextjs") | null {
+  if (process.env.NODE_ENV !== "production") return null;
+  if (sentryModule) return sentryModule;
+
+  try {
+    // Avoid importing Sentry client routing instrumentation during Jest/module init.
+    sentryModule = require("@sentry/nextjs") as typeof import("@sentry/nextjs");
+    return sentryModule;
+  } catch {
+    return null;
+  }
+}
 
 interface ProfileData {
   username?: string;
@@ -48,7 +61,8 @@ export function setSentryUser(
   user: { id: string } | null,
   profile: ProfileData | null
 ): void {
-  if (process.env.NODE_ENV !== "production") return;
+  const Sentry = getSentry();
+  if (!Sentry) return;
 
   if (user && profile) {
     Sentry.setUser({
@@ -71,6 +85,9 @@ export function setSentryUser(
  * Clear user context on logout
  */
 export function clearSentryUser(): void {
+  const Sentry = getSentry();
+  if (!Sentry) return;
+
   Sentry.setUser(null);
 }
 
@@ -81,7 +98,8 @@ export function captureError(
   error: Error,
   context?: Record<string, unknown>
 ): void {
-  if (process.env.NODE_ENV !== "production") {
+  const Sentry = getSentry();
+  if (!Sentry) {
     console.error("[Sentry would capture]:", error, context);
     return;
   }
@@ -101,6 +119,9 @@ export function setGameContext(
   gameCode: string | null,
   language?: string
 ): void {
+  const Sentry = getSentry();
+  if (!Sentry) return;
+
   if (gameCode) {
     Sentry.setTag("game_code", gameCode);
     if (language) {
@@ -118,6 +139,9 @@ export function setGameContext(
  */
 export function linkLogRocketSession(): void {
   if (typeof window === "undefined") return;
+
+  const Sentry = getSentry();
+  if (!Sentry) return;
 
   const LogRocket = (
     window as unknown as {
@@ -204,7 +228,8 @@ export function captureApiError(
   route: string,
   context?: ApiErrorContext
 ): void {
-  if (process.env.NODE_ENV !== "production") {
+  const Sentry = getSentry();
+  if (!Sentry) {
     console.error(`[Sentry API Error] ${route}:`, error, context);
     return;
   }
@@ -244,7 +269,8 @@ export function captureSocketError(
   error: Error,
   context: SocketErrorContext
 ): void {
-  if (process.env.NODE_ENV !== "production") {
+  const Sentry = getSentry();
+  if (!Sentry) {
     console.error(`[Sentry Socket Error] ${context.event}:`, error, context);
     return;
   }
@@ -282,7 +308,8 @@ export function captureAIServiceError(
   error: Error,
   context: AIServiceErrorContext
 ): void {
-  if (process.env.NODE_ENV !== "production") {
+  const Sentry = getSentry();
+  if (!Sentry) {
     console.error(
       `[Sentry AI Service Error] ${context.operation}:`,
       error,
@@ -323,7 +350,8 @@ export function captureBackgroundError(
   error: Error,
   context: BackgroundErrorContext
 ): void {
-  if (process.env.NODE_ENV !== "production") {
+  const Sentry = getSentry();
+  if (!Sentry) {
     console.error(
       `[Sentry Background Error] ${context.operation}:`,
       error,
@@ -368,6 +396,9 @@ export function addGameBreadcrumb(
   action: string,
   data: Record<string, unknown>
 ): void {
+  const Sentry = getSentry();
+  if (!Sentry) return;
+
   Sentry.addBreadcrumb({
     category: "game",
     message: action,
@@ -384,6 +415,9 @@ export function addApiCallBreadcrumb(
   method: string,
   status?: number
 ): void {
+  const Sentry = getSentry();
+  if (!Sentry) return;
+
   Sentry.addBreadcrumb({
     category: "api",
     message: `${method} ${url}`,
@@ -399,6 +433,9 @@ export function addSocketEventBreadcrumb(
   event: string,
   direction: "sent" | "received"
 ): void {
+  const Sentry = getSentry();
+  if (!Sentry) return;
+
   Sentry.addBreadcrumb({
     category: "socket",
     message: `${direction}: ${event}`,
