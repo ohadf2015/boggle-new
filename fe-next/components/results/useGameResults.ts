@@ -14,9 +14,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCoins } from '@/hooks/useCoins';
 import { addGameToHistory } from '@/utils/gameHistoryManager';
 import { updateGuestStatsAfterGame } from '@/utils/guestManager';
-import { awardGameCoins } from '@/utils/coinManager';
+import { calculateGameReward } from '@/utils/coinManager';
 
 /** Result type from awardGameCoins */
 export interface CoinRewardResult {
@@ -27,7 +28,6 @@ export interface CoinRewardResult {
     placement: number;
   };
 }
-import { syncCoinsToDatabase } from '@/lib/supabase';
 import type { WordObject } from './types';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
 
@@ -98,6 +98,7 @@ export interface GameResultsData {
  */
 export function useGameResults(config: GameResultsConfig): GameResultsData {
   const { user, isAuthenticated, profile, updateProfile } = useAuth();
+  const { addCoins, refreshCoins } = useCoins();
 
   // Refs to prevent duplicate side effects
   const hasUpdatedStatsRef = useRef(false);
@@ -200,36 +201,51 @@ export function useGameResults(config: GameResultsConfig): GameResultsData {
   useEffect(() => {
     if (hasAwardedCoinsRef.current) return;
 
-    const reward = awardGameCoins(
-      config.sessionId,
-      config.mode,
+    if (typeof window === 'undefined') return;
+
+    const awardKey = `lexiclash_game_coin_award_${config.sessionId}`;
+    if (localStorage.getItem(awardKey)) {
+      hasAwardedCoinsRef.current = true;
+      return;
+    }
+
+    const calculated = calculateGameReward(
       config.score,
+      config.mode,
       config.rank,
       config.totalPlayers
     );
 
-    if (reward) {
-      setCoinReward(reward);
+    if (calculated.total <= 0) {
+      hasAwardedCoinsRef.current = true;
+      return;
+    }
 
-      // Sync coins to database for authenticated users
-      if (user?.id && reward.awarded > 0) {
-        const transactionName = config.mode === 'singleplayer' ? 'Single Player Game' : 'Multiplayer Game';
-        syncCoinsToDatabase(
-          user.id,
-          reward.awarded,
-          transactionName,
-          {
-            sessionId: config.sessionId,
-            ...(config.gameCode && { gameCode: config.gameCode }),
-            score: config.score,
-            rank: config.rank,
-            totalPlayers: config.totalPlayers,
-          }
-        );
+    const transactionName = config.mode === 'singleplayer' ? 'Single Player Game' : 'Multiplayer Game';
+    const metadata = {
+      sessionId: config.sessionId,
+      ...(config.gameCode && { gameCode: config.gameCode }),
+      score: config.score,
+      rank: config.rank,
+      totalPlayers: config.totalPlayers,
+    };
+
+    async function awardCoins() {
+      const beforeBalance = await refreshCoins();
+      await addCoins(calculated.total, transactionName, metadata);
+      const afterBalance = await refreshCoins();
+
+      if (afterBalance > beforeBalance) {
+        localStorage.setItem(awardKey, new Date().toISOString());
+        setCoinReward({ awarded: calculated.total, breakdown: calculated.breakdown });
       }
     }
 
-    hasAwardedCoinsRef.current = true;
+    awardCoins().catch(error => {
+      console.error('Failed to award coins:', error);
+    }).finally(() => {
+      hasAwardedCoinsRef.current = true;
+    });
   }, [
     config.sessionId,
     config.mode,
@@ -237,7 +253,8 @@ export function useGameResults(config: GameResultsConfig): GameResultsData {
     config.rank,
     config.totalPlayers,
     config.gameCode,
-    user?.id,
+    addCoins,
+    refreshCoins,
   ]);
 
   // Effect: Save achievements to profile (for authenticated users)

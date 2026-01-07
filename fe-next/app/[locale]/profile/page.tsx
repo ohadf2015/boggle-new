@@ -30,6 +30,7 @@ import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { getSession } from '@/utils/session';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import type { PlayerCollectible, CollectibleItem } from '@/contexts/auth/authTypes';
 
 interface Achievement {
@@ -129,6 +130,13 @@ export default function ProfilePage(): React.ReactNode {
   const router = useRouter();
   const isLandscape = useMobileLandscape();
   const isDarkMode = theme === 'dark';
+  const setIsInGame = useHideNavigation();
+
+  // Hide global bottom navigation while this page's fixed MobileTabBar is mounted
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
 
   // Pull-to-refresh for profile data
   const { pullToRefreshHandlers, pullState } = usePullToRefresh({

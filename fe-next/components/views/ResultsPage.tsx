@@ -46,8 +46,7 @@ const PlayerArchetypeBadge = dynamic(() => import('@/components/results/PlayerAr
 const CompactResultsStats = dynamic(() => import('@/components/results/CompactResultsStats'), { ssr: false });
 import { cn } from '@/lib/utils';
 import { addGameToHistory } from '@/utils/gameHistoryManager';
-import { awardGameCoins } from '@/utils/coinManager';
-import { syncCoinsToDatabase } from '@/lib/supabase';
+import { calculateGameReward } from '@/utils/coinManager';
 import RoomChat from '@/components/RoomChat';
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
 import { shouldHideExternalLogin } from '@/components/CrazyGamesSDK';
@@ -203,62 +202,60 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     }
   }, [isAuthenticated, finalScores, username, isCurrentUserWinner, achievements]);
 
-  // Use unified unified coin hook
-  const { refreshCoins } = useCoins();
+  const { addCoins, refreshCoins } = useCoins();
 
   // Award coins for multiplayer game completion
   useEffect(() => {
     if (hasAwardedCoinsRef.current || !currentPlayerData || !gameCode) return;
 
-    // Generate a session ID for this game
-    const sessionId = `mp_${gameCode}_${Date.now()}`;
+    if (typeof window === 'undefined') return;
+
+    const nonNullableGameCode = gameCode;
+    const currentScore = currentPlayerData.score || 0;
     const totalPlayers = sortedScores.length;
 
-    // Calculate reward using utility but DON'T award yet (let hook do it)
-    // We can't import calculateGameCoins from coinManager directly as it's not exported or might be internal
-    // So we use awardGameCoins locally to calculate, but then we would double award if we use hook?
-    // awardGameCoins does: check dupe -> addCoins -> return reward.
+    const sessionId = `mp_${gameCode}`;
 
-    // Better approach: Let awardGameCoins handle local storage details (session check etc)
-    // picking apart awardGameCoins logic inside a component is risky.
+    const awardKey = `lexiclash_game_coin_award_${sessionId}`;
+    if (localStorage.getItem(awardKey)) {
+      hasAwardedCoinsRef.current = true;
+      return;
+    }
 
-    // ISSUE: awardGameCoins is "smart" (checks existing session to prevent dupe).
-    // useCoins.addCoins is "dumb" (just adds).
-
-    // If I replace awardGameCoins with useCoins.addCoins, I lose the session duplication check unless I reimplement it.
-
-    // Alternative: Keep awardGameCoins, but if authenticated, we also need to trigger refreshProfile.
-
-    const reward = awardGameCoins(
-      sessionId,
+    const calculated = calculateGameReward(
+      currentScore,
       'multiplayer',
-      currentPlayerData.score || 0,
       currentPlayerRank,
       totalPlayers
     );
 
-    if (reward && reward.awarded > 0) {
-      if (user?.id) {
-        // Authenticated: Sync to DB AND Refresh Profile
-        syncCoinsToDatabase(
-          user.id,
-          reward.awarded,
-          'Multiplayer Game',
-          {
-            gameCode,
-            score: currentPlayerData.score || 0,
-            rank: currentPlayerRank,
-            totalPlayers
-          }
-        ).then(() => {
-          // Refresh coins to update header immediately
-          refreshCoins();
-        });
+    if (calculated.total <= 0) {
+      hasAwardedCoinsRef.current = true;
+      return;
+    }
+
+    async function awardCoins() {
+      const beforeBalance = await refreshCoins();
+      await addCoins(calculated.total, 'Multiplayer Game', {
+        sessionId,
+        gameCode: nonNullableGameCode,
+        score: currentScore,
+        rank: currentPlayerRank,
+        totalPlayers,
+      });
+      const afterBalance = await refreshCoins();
+
+      if (afterBalance > beforeBalance) {
+        localStorage.setItem(awardKey, new Date().toISOString());
       }
     }
 
-    hasAwardedCoinsRef.current = true;
-  }, [currentPlayerData, currentPlayerRank, sortedScores.length, gameCode, user?.id, refreshCoins]);
+    awardCoins().catch(error => {
+      console.error('Failed to award multiplayer coins:', error);
+    }).finally(() => {
+      hasAwardedCoinsRef.current = true;
+    });
+  }, [currentPlayerData, currentPlayerRank, sortedScores.length, gameCode, addCoins, refreshCoins]);
 
   // Save cognitive scores for brain training (authenticated users only)
   useEffect(() => {
