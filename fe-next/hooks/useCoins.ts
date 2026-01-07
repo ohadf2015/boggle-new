@@ -122,7 +122,7 @@ export function useCoins() {
             }
             return success;
         }
-    }, [isAuthenticated, user, canAfford, coins, refreshProfile]);
+    }, [isAuthenticated, user, canAfford, refreshProfile]);
 
     return {
         coins,

@@ -5,12 +5,11 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { getDeadzoneThreshold } from '@/utils/consts';
-import type { LetterGrid, GridPosition } from '@/types';
+import type { LetterGrid, GridPosition, Language } from '@/types';
 import type { CellPosition, SelectedCell } from './types';
 import { getPerformanceConfig } from './performanceUtils';
 import { findWordPath } from '@/utils/wordPathFinder';
 import { normalizeWord } from '@/utils/clientWordValidator';
-import type { Language } from '@/types';
 
 // Cached grid measurements to avoid layout thrashing on every touch move
 interface GridMeasurements {

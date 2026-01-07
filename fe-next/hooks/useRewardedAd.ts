@@ -172,7 +172,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
         awardCoinsAndNotify();
       }, 3000);
     }
-  }, [status, shouldUseCrazyGames, shouldUseIMAVideoAds, shouldUseGoogleAds, crazyGames, imaVideoAds, googleAds, rewardAmount, onRewardEarned, onAdError, onAdStarted]);
+  }, [status, shouldUseCrazyGames, shouldUseIMAVideoAds, shouldUseGoogleAds, crazyGames, imaVideoAds, googleAds, rewardAmount, onRewardEarned, onAdError, onAdStarted, addCoinsUnified]);
 
   return {
     status,

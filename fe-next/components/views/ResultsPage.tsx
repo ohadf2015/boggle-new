@@ -3,7 +3,7 @@
 import React, { useMemo, useEffect, useState, useCallback, useRef, useDeferredValue, useTransition } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Star, DoorOpen, Check, ArrowRight, Play, BarChart2, Share2 } from 'lucide-react';
+import { Trophy, Star, DoorOpen, Check, ArrowRight, Play, BarChart2, Share2, Users } from 'lucide-react';
 import ExitRoomButton from '@/components/ExitRoomButton';
 import { fireLevelUpConfetti } from '@/utils/confettiUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -42,7 +42,6 @@ const MysteryRewardPopup = dynamic(() => import('@/components/engagement/Mystery
 const ReferralMilestonePopup = dynamic(() => import('@/components/engagement/ReferralMilestonePopup'), { ssr: false });
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
-import { Users } from 'lucide-react';
 const PlayerArchetypeBadge = dynamic(() => import('@/components/results/PlayerArchetypeBadge'), { ssr: false });
 const CompactResultsStats = dynamic(() => import('@/components/results/CompactResultsStats'), { ssr: false });
 import { cn } from '@/lib/utils';
@@ -290,7 +289,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       word: w.word,
       score: w.score,
       isValid: w.validated,
-      timestamp: w.timestamp
+      timestamp: (w as { timestamp?: number }).timestamp
     }));
 
     // Generate session ID if missing
@@ -315,10 +314,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     });
 
     hasSavedCognitiveScoreRef.current = true;
-    // Note: gameDuration and gridSize are intentionally not in dependencies
-    // The effect only runs once (guarded by hasSavedCognitiveScoreRef), so we use
-    // the prop values at the time of execution to avoid unnecessary re-evaluations
-  }, [user?.id, currentPlayerData, gameCode, saveCognitiveScore]);
+  }, [user?.id, currentPlayerData, gameCode, saveCognitiveScore, gameDuration, gridSize]);
 
   // Track game completion and record win streak (only once)
   useEffect(() => {
