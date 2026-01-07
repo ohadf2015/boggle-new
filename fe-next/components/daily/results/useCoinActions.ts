@@ -95,8 +95,7 @@ export function useCoinActions({
 
       void awardCoinsAsync();
     }
-  }, [isNewCompletion, puzzleDate, language, solved, efficiencyScore, streakDays, addCoins, refreshCoins]);
-
+  }, [isNewCompletion, puzzleDate, language, solved, efficiencyScore, streakDays, addCoins]);
 
   // Handle reveal target word (costs coins)
   const handleRevealTargetWord = useCallback(async () => {
