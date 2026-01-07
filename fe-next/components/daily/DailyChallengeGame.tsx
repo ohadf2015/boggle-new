@@ -26,8 +26,7 @@ import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
 import { cn } from '@/lib/utils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { finalizeWordValidation } from '@/utils/wordValidationAPI';
-import { calculateComboMilestoneReward, isComboMilestone } from '@/utils/coinManager';
-import { useCoins } from '@/hooks/useCoins';
+import { awardComboCoins } from '@/utils/coinManager';
 import type { LetterGrid, Language } from '@/types';
 
 interface DailyChallengeGameProps {
@@ -61,7 +60,6 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   onQuit,
 }) => {
   const { t } = useLanguage();
-  const { addCoins } = useCoins();
   const { playWordAcceptedSound, playComboSound, setGameActive } = useSoundEffects();
   const { stopMusic } = useMusic();
   const isLandscape = useMobileLandscape();
@@ -134,17 +132,11 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       }
     },
     onComboMilestone: (level) => {
-      if (!isComboMilestone(level)) return;
-
-      const coinsAwarded = calculateComboMilestoneReward(level);
-      if (coinsAwarded <= 0) return;
-
-      void addCoins(coinsAwarded, 'Combo Milestone', {
-        comboLevel: level,
-        gameMode: 'daily',
-      }).then(() => {
+      // Award coins for combo milestones (5, 10, 15, 20, 25, 30)
+      const coinsAwarded = awardComboCoins(level, 'daily');
+      if (coinsAwarded > 0) {
         setComboCoinReward(coinsAwarded);
-      });
+      }
     },
     trackMaxCombo: true,
   });

@@ -35,11 +35,11 @@ import { MobileTabBar } from '@/components/layout/MobileTabBar';
 import { applyHebrewFinalLetters } from '@/utils/utils';
 import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
 import { useResultsData } from './results';
-import { calculateGameReward } from '@/utils/coinManager';
+import { awardGameCoins } from '@/utils/coinManager';
+import { syncCoinsToDatabase } from '@/lib/supabase';
 import { TrainingAnalysisModal } from '@/components/training';
 import { getTrainingProgress } from '@/utils/trainingProgressStorage';
 import { useSaveCognitiveScore } from '@/hooks/useSaveCognitiveScore';
-import { useCoins } from '@/hooks/useCoins';
 
 // Dynamic import for PerformanceChart (heavy component)
 const PerformanceChart = dynamic(() => import('@/components/results/PerformanceChart'), { ssr: false });
@@ -78,7 +78,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 }) => {
   const { t, language } = useLanguage();
   const { user, isAuthenticated, profile, updateProfile, loading: authLoading } = useAuth();
-  const { addCoins, refreshCoins } = useCoins();
   const isLandscape = useMobileLandscape();
   const [expandedBot, setExpandedBot] = useState<string | null>(null);
   const [showSignupModal, setShowSignupModal] = useState(false);
@@ -310,51 +309,38 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   useEffect(() => {
     if (hasAwardedCoinsRef.current) return;
 
-    if (typeof window === 'undefined') return;
-
     // Generate a unique session ID for this game if not already present
     const sessionId = results.gameSessionId || `sp_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-    const awardKey = `lexiclash_game_coin_award_${sessionId}`;
-    if (localStorage.getItem(awardKey)) {
-      hasAwardedCoinsRef.current = true;
-      return;
-    }
-
-    const calculated = calculateGameReward(
-      results.playerScore,
+    const reward = awardGameCoins(
+      sessionId,
       'singleplayer',
+      results.playerScore,
       playerRank,
       allParticipants.length
     );
 
-    if (calculated.total <= 0) {
-      hasAwardedCoinsRef.current = true;
-      return;
-    }
+    if (reward) {
+      setCoinReward(reward);
 
-    async function awardCoins() {
-      const beforeBalance = await refreshCoins();
-      await addCoins(calculated.total, 'Single Player Game', {
-        sessionId,
-        score: results.playerScore,
-        rank: playerRank,
-        totalPlayers: allParticipants.length,
-      });
-      const afterBalance = await refreshCoins();
-
-      if (afterBalance > beforeBalance) {
-        localStorage.setItem(awardKey, new Date().toISOString());
-        setCoinReward({ awarded: calculated.total, breakdown: calculated.breakdown });
+      // Sync coins to database for authenticated users
+      if (user?.id && reward.awarded > 0) {
+        syncCoinsToDatabase(
+          user.id,
+          reward.awarded,
+          'Single Player Game',
+          {
+            sessionId,
+            score: results.playerScore,
+            rank: playerRank,
+            totalPlayers: allParticipants.length
+          }
+        );
       }
     }
 
-    awardCoins().catch(error => {
-      console.error('Failed to award single player coins:', error);
-    }).finally(() => {
-      hasAwardedCoinsRef.current = true;
-    });
-  }, [results.playerScore, results.gameSessionId, playerRank, allParticipants.length, addCoins, refreshCoins]);
+    hasAwardedCoinsRef.current = true;
+  }, [results.playerScore, results.gameSessionId, playerRank, allParticipants.length, user?.id]);
 
   // Save cognitive scores for brain training (authenticated users only)
   useEffect(() => {

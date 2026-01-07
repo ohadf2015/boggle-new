@@ -485,13 +485,12 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // Also covers the transition period between countdown ending and gameActive being set
   const hasGameData = letterGrid && remainingTime !== null && remainingTime > 0;
   const showGameView = gameActive || (hasGameData && !waitingForResults);
-  const showWaitingView = !showGameView && !waitingForResults;
 
   // Hide bottom navigation during gameplay
   useEffect(() => {
-    setIsInGame(showStartAnimation || !!showGameView || showWaitingView);
+    setIsInGame(showStartAnimation || !!showGameView);
     return () => setIsInGame(false);
-  }, [showStartAnimation, showGameView, showWaitingView, setIsInGame]);
+  }, [showStartAnimation, showGameView, setIsInGame]);
 
   if (!showGameView && !waitingForResults) {
     // When countdown animation is active, only show the countdown overlay

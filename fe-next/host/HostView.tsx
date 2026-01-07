@@ -307,14 +307,13 @@ const HostView: React.FC<HostViewProps> = memo(({
 
   // Detect when we have active game data (covers countdown and transition to active game)
   const hasActiveGameData = runtime.tableData && runtime.remainingTime !== null && runtime.remainingTime > 0;
-  const showPreGameView = !runtime.gameStarted && !runtime.waitingForResults && !runtime.showStartAnimation && !hasActiveGameData;
 
   // Hide bottom navigation during gameplay
   useEffect(() => {
-    const isGameActive = showPreGameView || runtime.showStartAnimation || ((runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults);
+    const isGameActive = runtime.showStartAnimation || ((runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults);
     setIsInGame(!!isGameActive);
     return () => setIsInGame(false);
-  }, [showPreGameView, runtime.showStartAnimation, runtime.gameStarted, hasActiveGameData, runtime.waitingForResults, setIsInGame]);
+  }, [runtime.showStartAnimation, runtime.gameStarted, hasActiveGameData, runtime.waitingForResults, setIsInGame]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-2 sm:p-4 md:p-6 lg:p-8 overflow-auto transition-colors duration-300">
