@@ -54,7 +54,11 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
 export function useNavigation() {
   const context = useContext(NavigationContext);
   if (!context) {
-    throw new Error('useNavigation must be used within a NavigationProvider');
+    const errorMessage = 'useNavigation must be used within a NavigationProvider';
+    if (process.env.NODE_ENV === 'development') {
+      console.error(errorMessage);
+    }
+    throw new Error(errorMessage);
   }
   return context;
 }

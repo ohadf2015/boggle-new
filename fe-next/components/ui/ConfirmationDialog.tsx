@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
 } from './alert-dialog';
 import { cn } from '../../lib/utils';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export type ConfirmationDialogVariant = 'danger' | 'warning' | 'default';
 
@@ -92,21 +93,25 @@ export function ConfirmationDialog({
   variant = 'danger',
   className,
 }: ConfirmationDialogProps) {
+  const { dir } = useLanguage();
   const styles = variantStyles[variant];
+  const isRtl = dir === 'rtl';
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className={cn(styles.content, className)}>
+      <AlertDialogContent className={cn(styles.content, className)} dir={dir}>
         <AlertDialogHeader>
           <AlertDialogTitle className={cn(
             variant === 'danger' && 'text-neo-black font-black text-xl',
-            variant === 'warning' && 'text-neo-black font-black text-xl'
+            variant === 'warning' && 'text-neo-black font-black text-xl',
+            isRtl ? 'text-right' : 'text-left'
           )}>
             {title}
           </AlertDialogTitle>
           <AlertDialogDescription className={cn(
             variant === 'danger' && 'text-neo-black/70 font-medium',
-            variant === 'warning' && 'text-neo-black/70 font-medium'
+            variant === 'warning' && 'text-neo-black/70 font-medium',
+            isRtl ? 'text-right' : 'text-left'
           )}>
             {description}
           </AlertDialogDescription>

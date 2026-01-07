@@ -66,6 +66,10 @@ export default function ComboMaster({
   const [score, setScore] = useState(0);
   const [comboBreaks, setComboBreaks] = useState(0);
   const [feedback, setFeedback] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
+  // Track highlighted cells for visual feedback
+  const [highlightedPath, setHighlightedPath] = useState<{ row: number; col: number }[]>([]);
+  // Track last path submitted by user to use it on successful word submission
+  const [lastSubmittedPath, setLastSubmittedPath] = useState<{ row: number; col: number }[]>([]);
   const startTimeRef = useRef<number | null>(null);
   const comboTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -108,9 +112,17 @@ export default function ComboMaster({
     setWordsFound([]);
     setScore(0);
     setComboBreaks(0);
+
+    setHighlightedPath([]);
     startTimeRef.current = Date.now();
     startComboTimer();
   }, [startComboTimer]);
+
+  // Capture the path when user submits a word (called before onWordSubmit)
+  const handlePathSubmit = useCallback((cells: any[]) => {
+    // Convert SelectedCell to simplified path format
+    setLastSubmittedPath(cells.map(c => ({ row: c.row, col: c.col })));
+  }, []);
 
   // Handle word submission
   const handleWordSubmit = useCallback((word: string) => {
@@ -150,7 +162,16 @@ export default function ComboMaster({
     const baseScore = word.length * 10;
     const comboMultiplier = 1 + (newCombo * 0.1);
     const wordScore = Math.round(baseScore * comboMultiplier);
+
     setScore(prev => prev + wordScore);
+
+    // Highlight the valid word on the board
+    if (lastSubmittedPath.length > 0) {
+      setHighlightedPath(lastSubmittedPath);
+      // Keep it highlighted briefly
+      setTimeout(() => setHighlightedPath([]), 1000);
+    }
+
     setFeedback({ message: `+${wordScore} ${t('brain.drills.points')} x${newCombo}`, type: 'success' });
     setTimeout(() => setFeedback(null), 1000);
     startComboTimer();
@@ -159,7 +180,7 @@ export default function ComboMaster({
       if (comboTimerRef.current) clearInterval(comboTimerRef.current);
       setPhase('complete');
     }
-  }, [phase, availableWordSet, wordsFound, combo, startComboTimer, levelConfig.targetCombo, grid, language, t, playErrorSound]);
+  }, [phase, availableWordSet, wordsFound, combo, startComboTimer, levelConfig.targetCombo, grid, language, t, playErrorSound, lastSubmittedPath]);
 
   // Calculate results
   const getResults = useCallback(() => {
@@ -256,7 +277,7 @@ export default function ComboMaster({
             className={cn(
               'h-full',
               comboBarPercent > 50 ? 'bg-neo-green' :
-              comboBarPercent > 25 ? 'bg-neo-yellow' : 'bg-neo-red'
+                comboBarPercent > 25 ? 'bg-neo-yellow' : 'bg-neo-red'
             )}
             animate={{ width: `${comboBarPercent}%` }}
             transition={{ duration: 0.3 }}
@@ -332,6 +353,8 @@ export default function ComboMaster({
               grid={grid}
               interactive={true}
               onWordSubmit={handleWordSubmit}
+              onPathSubmit={handlePathSubmit}
+              highlightedPath={highlightedPath}
               comboLevel={combo}
               className="w-full"
             />

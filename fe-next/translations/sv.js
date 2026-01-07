@@ -1696,6 +1696,12 @@ const sv = {
       "longerWords": "Längre ord = fler poäng! Prova 5+ bokstäver",
       "skillsUnlocked": "Kunskaper upplåsta! Du är redo!"
     },
+    "completion": {
+      "title": "Bra gjort!",
+      "message": "Du har bemästrat spelet! Du kan fortsätta öva eller avsluta och starta en riktig match.",
+      "finish": "Avsluta",
+      "continuePractice": "Fortsätt Öva"
+    },
     "analysis": {
       "titleComplete": "Träning Klar!",
       "titleProgress": "Fortsätt Öva!",
@@ -3488,6 +3494,7 @@ const sv = {
     "title": "Hjärnträning",
     "subtitle": "Följ dina kognitiva prestationer",
     "score": "Hjärnpoäng",
+    "points": "Hjärnpoäng",
     "overall": "Totalt",
     "nav": {
       "home": "Spela",

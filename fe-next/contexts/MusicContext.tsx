@@ -652,7 +652,7 @@ export function MusicProvider({ children }: MusicProviderProps) {
         }
     }, [isMuted]);
 
-    // Toggle mute
+    // Toggle mute - uses volumeRef to avoid dependency on volume state
     const toggleMute = useCallback(() => {
         setIsMuted(prev => {
             const newMuted = !prev;
@@ -660,12 +660,12 @@ export function MusicProvider({ children }: MusicProviderProps) {
                 if (newMuted) {
                     currentHowlRef.current.volume(0);
                 } else {
-                    currentHowlRef.current.volume(volume);
+                    currentHowlRef.current.volume(volumeRef.current);
                 }
             }
             return newMuted;
         });
-    }, [volume]);
+    }, []);
 
     // Update volume when mute state changes and we have an active track
     useEffect(() => {

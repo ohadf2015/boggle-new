@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useRef, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import logger from '@/utils/logger';
+import { sanitizeRoomName } from '@/utils/consts';
 import type { LetterGrid, Language, Avatar } from '@/types';
 
 // Socket.IO Context Value Type
@@ -345,7 +346,7 @@ export function useGameSocket(): GameSocketOperations {
 
   // Create game
   const createGame = useCallback((gameCode: string, roomName: string, language: Language, hostUsername: string) => {
-    return emit('createGame', { gameCode, roomName, language, hostUsername });
+    return emit('createGame', { gameCode, roomName: sanitizeRoomName(roomName), language, hostUsername });
   }, [emit]);
 
   // Join game

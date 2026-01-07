@@ -64,6 +64,10 @@ export default function LightningRound({
   const [score, setScore] = useState(0);
   const [lastWordScore, setLastWordScore] = useState<number | null>(null);
   const [feedback, setFeedback] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
+  // Track highlighted cells for visual feedback
+  const [highlightedPath, setHighlightedPath] = useState<{ row: number; col: number }[]>([]);
+  // Track last path submitted by user to use it on successful word submission
+  const [lastSubmittedPath, setLastSubmittedPath] = useState<{ row: number; col: number }[]>([]);
   const startTimeRef = useRef<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -92,6 +96,12 @@ export default function LightningRound({
       });
     }, 1000);
   }, [levelConfig.timeLimit]);
+
+  // Capture the path when user submits a word (called before onWordSubmit)
+  const handlePathSubmit = useCallback((cells: any[]) => {
+    // Convert SelectedCell to simplified path format
+    setLastSubmittedPath(cells.map(c => ({ row: c.row, col: c.col })));
+  }, []);
 
   // Handle word submission
   const handleWordSubmit = useCallback((word: string) => {
@@ -128,12 +138,20 @@ export default function LightningRound({
     const wordScore = word.length * 10;
     setScore(prev => prev + wordScore);
     setLastWordScore(wordScore);
+
+    // Highlight the valid word on the board
+    if (lastSubmittedPath.length > 0) {
+      setHighlightedPath(lastSubmittedPath);
+      // Keep it highlighted briefly
+      setTimeout(() => setHighlightedPath([]), 1000);
+    }
+
     setFeedback({ message: `+${wordScore} ${t('brain.drills.points')}`, type: 'success' });
     setTimeout(() => {
       setLastWordScore(null);
       setFeedback(null);
     }, 1000);
-  }, [phase, availableWordSet, wordsFound, grid, language, t, playErrorSound]);
+  }, [phase, availableWordSet, wordsFound, grid, language, t, playErrorSound, lastSubmittedPath]);
 
   // Calculate results
   const getResults = useCallback(() => {
@@ -295,6 +313,8 @@ export default function LightningRound({
               grid={grid}
               interactive={true}
               onWordSubmit={handleWordSubmit}
+              onPathSubmit={handlePathSubmit}
+              highlightedPath={highlightedPath}
               className="w-full"
             />
 

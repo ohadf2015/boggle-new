@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import LogRocket from 'logrocket';
 import { validateUsername, validateRoomName, validateGameCode, sanitizeInput } from '@/utils/validation';
+import { sanitizeRoomName } from '@/utils/consts';
 import { useValidation } from '@/hooks/useValidation';
 import { generateRoomCode as generateCode, generateRandomRoomName } from '@/utils/utils';
 import { setGuestName } from '@/utils/guestManager';
@@ -167,7 +168,7 @@ const JoinView: React.FC<JoinViewProps> = ({
         setRoomName(effectiveRoomName);
       }
 
-      const rn = sanitizeInput(effectiveRoomName, 30);
+      const rn = sanitizeRoomName(effectiveRoomName);
       const { isValid: roomOk, error: roomErr } = validateRoomName(rn, true); // true = optional
       const { isValid: codeOk, error: codeErr } = validateGameCode(gameCode);
 

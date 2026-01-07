@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 1683,
+    "totalKeysInCode": 1688,
     "keyCountByLanguage": {
-      "en": 2889,
-      "he": 2866,
-      "sv": 2866,
-      "ja": 2866,
-      "es": 2866
+      "en": 2898,
+      "he": 2875,
+      "sv": 2871,
+      "ja": 2871,
+      "es": 2871
     },
     "missingFromEnglish": 0
   },
@@ -38,6 +38,10 @@
       "brain.drills.errors.notInTarget"
     ],
     "sv": [
+      "training.analysis.completion.title",
+      "training.analysis.completion.message",
+      "training.analysis.completion.finish",
+      "training.analysis.completion.continuePractice",
       "brain.drills.timeLimit",
       "brain.drills.points",
       "brain.drills.wpm",
@@ -63,6 +67,10 @@
       "brain.drills.errors.notInTarget"
     ],
     "ja": [
+      "training.analysis.completion.title",
+      "training.analysis.completion.message",
+      "training.analysis.completion.finish",
+      "training.analysis.completion.continuePractice",
       "brain.drills.timeLimit",
       "brain.drills.points",
       "brain.drills.wpm",
@@ -88,6 +96,10 @@
       "brain.drills.errors.notInTarget"
     ],
     "es": [
+      "training.analysis.completion.title",
+      "training.analysis.completion.message",
+      "training.analysis.completion.finish",
+      "training.analysis.completion.continuePractice",
       "brain.drills.timeLimit",
       "brain.drills.points",
       "brain.drills.wpm",

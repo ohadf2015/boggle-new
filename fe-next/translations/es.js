@@ -2490,6 +2490,12 @@ const es = {
       "longerWords": "Palabras largas = más puntos! Prueba 5+ letras",
       "skillsUnlocked": "¡Habilidades desbloqueadas! ¡Estás listo!"
     },
+    "completion": {
+      "title": "¡Bien hecho!",
+      "message": "¡Has dominado el juego! Puedes seguir practicando o terminar y comenzar una partida real.",
+      "finish": "Terminar",
+      "continuePractice": "Continuar Practicando"
+    },
     "analysis": {
       "titleComplete": "¡Entrenamiento Completo!",
       "titleProgress": "¡Sigue Practicando!",
@@ -3485,6 +3491,7 @@ const es = {
     "title": "Entrenamiento Mental",
     "subtitle": "Rastrea tu rendimiento cognitivo",
     "score": "Puntuación Cerebral",
+    "points": "Puntos Cerebrales",
     "overall": "General",
     "nav": {
       "home": "Jugar",

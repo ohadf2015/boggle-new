@@ -159,7 +159,7 @@ async function generateDrillGrid(
 
   // Fetch random words from dictionary
   const dictionaryWords = await fetchRandomWords(language, 20, 3, Math.min(6, size));
-  
+
   // Fallback to empty array if fetch fails
   const wordsToTry = dictionaryWords.length > 0 ? dictionaryWords : [];
 
@@ -195,6 +195,43 @@ async function generateDrillGrid(
     }
   }
 
+  // Optimize: Solve the grid to find ALL valid words (including accidentally formed ones)
+  // This prevents "Invalid Word" errors for words that are clearly on the board
+  try {
+    const solveResponse = await fetch('/api/solve-grid', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ grid, language }),
+    });
+
+    if (solveResponse.ok) {
+      const solveData = await solveResponse.json();
+      if (solveData.success && solveData.words) {
+        const { easy = [], medium = [], hard = [] } = solveData.words;
+        const allSolvedWords = [...easy, ...medium, ...hard];
+
+        // Add any words that weren't already in our list
+        const existingWords = new Set(placedWords.map(p => p.word));
+
+        for (const word of allSolvedWords) {
+          const upperWord = word.toUpperCase();
+          if (!existingWords.has(upperWord)) {
+            // We don't have the path for these, but LightningRound doesn't strictly need it for validation
+            // It uses the set of words for validation
+            placedWords.push({
+              word: upperWord,
+              path: [] // Empty path for solved words
+            });
+            existingWords.add(upperWord);
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.warn('Failed to solve grid for complete word list:', error);
+    // Continue with just the placed words if solver fails
+  }
+
   return { grid, words: placedWords };
 }
 
@@ -209,9 +246,9 @@ async function generateJapaneseDrillGrid(size: number): Promise<{ grid: LetterGr
 
   // Fetch random Japanese words from dictionary
   const dictionaryWords = await fetchRandomWords('ja', 15, 2, 4);
-  
+
   // Fallback to kanji compounds if dictionary fetch fails
-  const wordsToPlace = dictionaryWords.length > 0 
+  const wordsToPlace = dictionaryWords.length > 0
     ? dictionaryWords.slice(0, 8)
     : kanjiCompounds.slice(0, 8);
 

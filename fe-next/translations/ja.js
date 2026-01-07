@@ -1695,6 +1695,12 @@ const ja = {
       "longerWords": "長い単語 = 高得点！5文字以上を狙え",
       "skillsUnlocked": "スキル解放！準備完了！"
     },
+    "completion": {
+      "title": "よくできました！",
+      "message": "ゲームをマスターしました！練習を続けるか、終了して実際のマッチを開始できます。",
+      "finish": "終了",
+      "continuePractice": "練習を続ける"
+    },
     "analysis": {
       "titleComplete": "トレーニング完了！",
       "titleProgress": "もう少し練習！",
@@ -3487,6 +3493,7 @@ const ja = {
     "title": "脳トレ",
     "subtitle": "認知パフォーマンスを追跡",
     "score": "ブレインスコア",
+    "points": "ブレインポイント",
     "overall": "総合",
     "nav": {
       "home": "プレイ",

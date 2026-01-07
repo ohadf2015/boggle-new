@@ -37,9 +37,13 @@ interface AuthButtonProps {
   inline?: boolean;
   /** Callback when an action closes the menu */
   onClose?: () => void;
+  /** External handler for opening sign in modal */
+  onSignInClick?: () => void;
+  /** External handler for opening sign up modal */
+  onSignUpClick?: () => void;
 }
 
-const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.ReactElement | null => {
+const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: AuthButtonProps = {}): React.ReactElement | null => {
   const { theme, toggleTheme } = useTheme();
   const { t, language, setLanguage, dir } = useLanguage();
   const { isAuthenticated, profile, isSupabaseEnabled, loading, isAdmin, user } = useAuth();
@@ -119,13 +123,21 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
   };
 
   const openSignIn = () => {
-    setAuthModalMode('signin');
-    setShowAuthModal(true);
+    if (onSignInClick) {
+      onSignInClick();
+    } else {
+      setAuthModalMode('signin');
+      setShowAuthModal(true);
+    }
   };
 
   const openSignUp = () => {
-    setAuthModalMode('signup');
-    setShowAuthModal(true);
+    if (onSignUpClick) {
+      onSignUpClick();
+    } else {
+      setAuthModalMode('signup');
+      setShowAuthModal(true);
+    }
   };
 
   const currentLang = languages.find(l => l.code === language) ?? languages[0] ?? { code: 'en', flag: '🇺🇸', name: 'English' };
@@ -281,12 +293,16 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
               role="menu"
               aria-label={t('auth.userMenu') || 'User menu'}
               className={cn(
-                'absolute top-full mt-2 min-w-[180px] rounded-lg shadow-xl z-[100]',
+                'absolute top-full mt-2 min-w-[180px] rounded-lg shadow-xl z-[10000]',
                 isRTL ? 'left-0' : 'right-0',
                 isDarkMode
                   ? 'bg-slate-800 border border-slate-700'
                   : 'bg-white border border-gray-200'
               )}
+              style={{ 
+                position: 'absolute',
+                ...(isRTL ? { left: 0 } : { right: 0 })
+              }}
             >
               {/* Profile Link */}
               <Button
@@ -702,12 +718,16 @@ const AuthButton = ({ inline = false, onClose }: AuthButtonProps = {}): React.Re
                 role="menu"
                 aria-label={t('auth.userMenu') || 'User menu'}
                 className={cn(
-                  'absolute top-full mt-2 min-w-[180px] rounded-lg shadow-xl z-[100]',
+                  'absolute top-full mt-2 min-w-[180px] rounded-lg shadow-xl z-[10000]',
                   isRTL ? 'left-0' : 'right-0',
                   isDarkMode
                     ? 'bg-slate-800 border border-slate-700'
                     : 'bg-white border border-gray-200'
                 )}
+                style={{ 
+                  position: 'absolute',
+                  ...(isRTL ? { left: 0 } : { right: 0 })
+                }}
               >
                 {/* Theme Toggle */}
                 <Button

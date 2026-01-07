@@ -63,7 +63,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   profilePictureUrl,
   profileAvatarId,
 }) => {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
 
   // Form state
   const [username, setUsername] = useState<string>('');
@@ -137,7 +137,10 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
     }
 
     // Use provided room name or generate one, then sanitize for backend compatibility
-    const finalRoomName = sanitizeRoomName(roomName.trim() || generateRoomName(username.trim()));
+    // Desktop: Allow empty room name (same as mobile) - will use random name logic
+    const finalRoomName = roomName.trim() 
+      ? sanitizeRoomName(roomName.trim())
+      : sanitizeRoomName(generateRoomName(username.trim()));
 
     onCreate({
       hostUsername: username.trim(),
@@ -180,8 +183,8 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
         <DialogContent noDescription className="max-w-sm sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>
+          <DialogHeader className="relative pr-12 rtl:pr-0 rtl:pl-12">
+            <DialogTitle className={cn("text-lg font-black uppercase", dir === 'rtl' ? 'text-right' : 'text-left')}>
               {t('multiplayerFlow.createModal.title') || 'Create Room'}
             </DialogTitle>
           </DialogHeader>
@@ -201,12 +204,14 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                     <Image
                       src={avatarImagePath}
                       alt="Avatar"
-                      fill
-                      sizes="64px"
-                      className="object-cover"
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-cover"
                     />
                   ) : (
-                    <Avatar {...getAvatarDisplayProps()} size="xl" />
+                    <div className="w-full h-full">
+                      <Avatar {...getAvatarDisplayProps()} size="xl" />
+                    </div>
                   )}
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-neo-cyan rounded-full border-2 border-neo-black flex items-center justify-center">

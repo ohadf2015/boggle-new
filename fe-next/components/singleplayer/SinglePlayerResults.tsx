@@ -18,6 +18,7 @@ import MissedWords from '@/components/results/MissedWords';
 import CompactResultsStats from '@/components/results/CompactResultsStats';
 import BonusBadgesRow from '@/components/results/BonusBadgesRow';
 import CoinRewardDisplay from '@/components/results/CoinRewardDisplay';
+import BrainPointsDisplay from '@/components/results/BrainPointsDisplay';
 import { SinglePlayerActions } from '@/components/results/ResultsActionButtons';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -109,6 +110,12 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const [coinReward, setCoinReward] = useState<{
     awarded: number;
     breakdown: { base: number; scoreBonus: number; placement: number };
+  } | null>(null);
+
+  // Brain points state
+  const [brainPointsReward, setBrainPointsReward] = useState<{
+    scoreDelta: number;
+    newScore: number;
   } | null>(null);
 
   // Get player avatar from profile for leaderboard display
@@ -364,6 +371,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     }).then(cognitiveResult => {
       if (cognitiveResult) {
         console.log('[SinglePlayerResults] Cognitive scores saved:', cognitiveResult);
+        // Set the state to display the brain points feedback
+        setBrainPointsReward({
+          scoreDelta: cognitiveResult.scoreDelta,
+          newScore: cognitiveResult.overallScore
+        });
       }
     });
 
@@ -513,6 +525,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
           {/* Coins earned - compact for landscape */}
           <CoinRewardDisplay reward={coinReward} variant="inline" />
+
+          {/* Brain Points - compact for landscape */}
+          <BrainPointsDisplay reward={brainPointsReward} variant="inline" />
         </div>
 
         {/* Right column: Words + Bot scores + Actions */}
@@ -632,29 +647,29 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           rank={mode === 'solo-bots' ? playerRank : 1}
           variant={
             results.playerScore === 0 || validWordCount === 0 ? 'completion' :
-            mode === 'practice' ? 'completion' :
-            mode === 'challenge' && results.isNewHighScore ? (results.isNewAllTimeBest ? 'newRecord' : 'highScore') :
-            mode === 'challenge' ? 'completion' :
-            'ranking'
+              mode === 'practice' ? 'completion' :
+                mode === 'challenge' && results.isNewHighScore ? (results.isNewAllTimeBest ? 'newRecord' : 'highScore') :
+                  mode === 'challenge' ? 'completion' :
+                    'ranking'
           }
           customMessage={
             results.playerScore === 0 || validWordCount === 0 ? (t('singlePlayer.tryAgain') || 'Try Again!') :
-            validWordCount <= 2 ? (t('singlePlayer.keepPracticing') || 'Keep Practicing!') :
-            mode === 'solo-bots' && isWinner && results.playerScore > 0 ? (t('singlePlayer.victory') || 'Victory!') :
-            mode === 'solo-bots' && playerRank <= 3 && results.playerScore > 0 ? undefined :
-            mode === 'solo-bots' ? (t('singlePlayer.gameOver') || 'Game Over') :
-            mode === 'practice' ? (t('singlePlayer.practiceComplete') || 'Practice Complete!') :
-            undefined
+              validWordCount <= 2 ? (t('singlePlayer.keepPracticing') || 'Keep Practicing!') :
+                mode === 'solo-bots' && isWinner && results.playerScore > 0 ? (t('singlePlayer.victory') || 'Victory!') :
+                  mode === 'solo-bots' && playerRank <= 3 && results.playerScore > 0 ? undefined :
+                    mode === 'solo-bots' ? (t('singlePlayer.gameOver') || 'Game Over') :
+                      mode === 'practice' ? (t('singlePlayer.practiceComplete') || 'Practice Complete!') :
+                        undefined
           }
           customAnnouncement={
             results.playerScore === 0 || validWordCount === 0 ? (t('singlePlayer.noWordsFound') || "Didn't find any words this time") :
-            validWordCount <= 2 ? (validWordCount === 1
-              ? (t('singlePlayer.fewWordsFoundSingular') || 'Found 1 word')
-              : (t('singlePlayer.fewWordsFound') || 'Found {count} words').replace('{count}', String(validWordCount))) :
-            mode === 'solo-bots' ? `#${playerRank} ${t('results.of') || 'of'} ${allParticipants.length}` :
-            mode === 'challenge' && results.previousHighScore && results.previousHighScore > results.playerScore
-              ? (t('challenge.shortOf') || '{diff} points short of your record').replace('{diff}', String(results.previousHighScore - results.playerScore))
-              : undefined
+              validWordCount <= 2 ? (validWordCount === 1
+                ? (t('singlePlayer.fewWordsFoundSingular') || 'Found 1 word')
+                : (t('singlePlayer.fewWordsFound') || 'Found {count} words').replace('{count}', String(validWordCount))) :
+                mode === 'solo-bots' ? `#${playerRank} ${t('results.of') || 'of'} ${allParticipants.length}` :
+                  mode === 'challenge' && results.previousHighScore && results.previousHighScore > results.playerScore
+                    ? (t('challenge.shortOf') || '{diff} points short of your record').replace('{diff}', String(results.previousHighScore - results.playerScore))
+                    : undefined
           }
           showConfetti={shouldShowConfetti}
         />
@@ -675,6 +690,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
       {/* Coins Earned - Compact */}
       <CoinRewardDisplay reward={coinReward} variant="compact" />
+
+      {/* Brain Points - Compact */}
+      <BrainPointsDisplay reward={brainPointsReward} variant="compact" />
 
       {/* Compact Top 3 Leaderboard */}
       {mode === 'solo-bots' && results.botScores.length > 0 && (
@@ -923,29 +941,29 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               rank={mode === 'solo-bots' ? playerRank : 1}
               variant={
                 results.playerScore === 0 || validWordCount === 0 ? 'completion' :
-                mode === 'practice' ? 'completion' :
-                mode === 'challenge' && results.isNewHighScore ? (results.isNewAllTimeBest ? 'newRecord' : 'highScore') :
-                mode === 'challenge' ? 'completion' :
-                'ranking'
+                  mode === 'practice' ? 'completion' :
+                    mode === 'challenge' && results.isNewHighScore ? (results.isNewAllTimeBest ? 'newRecord' : 'highScore') :
+                      mode === 'challenge' ? 'completion' :
+                        'ranking'
               }
               customMessage={
                 results.playerScore === 0 || validWordCount === 0 ? (t('singlePlayer.tryAgain') || 'Try Again!') :
-                validWordCount <= 2 ? (t('singlePlayer.keepPracticing') || 'Keep Practicing!') :
-                mode === 'solo-bots' && isWinner && results.playerScore > 0 ? (t('singlePlayer.victory') || 'Victory!') :
-                mode === 'solo-bots' && playerRank <= 3 && results.playerScore > 0 ? undefined :
-                mode === 'solo-bots' ? (t('singlePlayer.gameOver') || 'Game Over') :
-                mode === 'practice' ? (t('singlePlayer.practiceComplete') || 'Practice Complete!') :
-                undefined
+                  validWordCount <= 2 ? (t('singlePlayer.keepPracticing') || 'Keep Practicing!') :
+                    mode === 'solo-bots' && isWinner && results.playerScore > 0 ? (t('singlePlayer.victory') || 'Victory!') :
+                      mode === 'solo-bots' && playerRank <= 3 && results.playerScore > 0 ? undefined :
+                        mode === 'solo-bots' ? (t('singlePlayer.gameOver') || 'Game Over') :
+                          mode === 'practice' ? (t('singlePlayer.practiceComplete') || 'Practice Complete!') :
+                            undefined
               }
               customAnnouncement={
                 results.playerScore === 0 || validWordCount === 0 ? (t('singlePlayer.noWordsFound') || "Didn't find any words this time") :
-                validWordCount <= 2 ? (validWordCount === 1
-                  ? (t('singlePlayer.fewWordsFoundSingular') || 'Found 1 word')
-                  : (t('singlePlayer.fewWordsFound') || 'Found {count} words').replace('{count}', String(validWordCount))) :
-                mode === 'solo-bots' ? `#${playerRank} ${t('results.of') || 'of'} ${allParticipants.length}` :
-                mode === 'challenge' && results.previousHighScore && results.previousHighScore > results.playerScore
-                  ? (t('challenge.shortOf') || '{diff} points short of your record').replace('{diff}', String(results.previousHighScore - results.playerScore))
-                  : undefined
+                  validWordCount <= 2 ? (validWordCount === 1
+                    ? (t('singlePlayer.fewWordsFoundSingular') || 'Found 1 word')
+                    : (t('singlePlayer.fewWordsFound') || 'Found {count} words').replace('{count}', String(validWordCount))) :
+                    mode === 'solo-bots' ? `#${playerRank} ${t('results.of') || 'of'} ${allParticipants.length}` :
+                      mode === 'challenge' && results.previousHighScore && results.previousHighScore > results.playerScore
+                        ? (t('challenge.shortOf') || '{diff} points short of your record').replace('{diff}', String(results.previousHighScore - results.playerScore))
+                        : undefined
               }
               showConfetti={shouldShowConfetti}
             />

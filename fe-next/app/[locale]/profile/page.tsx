@@ -1090,7 +1090,7 @@ export default function ProfilePage(): React.ReactNode {
 
         {/* Tab Content - pull handlers on scrollable container */}
         <div
-          className="flex-1 overflow-y-auto overscroll-contain px-3 pt-2 pb-24 relative"
+          className="flex-1 overflow-y-auto overscroll-contain px-3 pt-2 pb-[max(env(safe-area-inset-bottom),100px)] relative"
           {...pullToRefreshHandlers}
         >
           {/* Pull-to-refresh indicator */}

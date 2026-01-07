@@ -189,6 +189,7 @@ const TutorialOverlay: React.FC = () => {
                   <motion.rect
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
+                    transition={{ duration: 0.3, ease: 'easeOut' }}
                     x={targetRect.left}
                     y={targetRect.top}
                     width={targetRect.width}

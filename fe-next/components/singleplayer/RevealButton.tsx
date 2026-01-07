@@ -9,7 +9,8 @@ import React, { memo, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, Star, Coins } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getCoins, spendCoins, canAfford, COIN_COSTS, FREE_REVEALS_PER_GAME } from '@/utils/coinManager';
+import { useCoins } from '@/hooks/useCoins';
+import { COIN_COSTS, FREE_REVEALS_PER_GAME } from '@/utils/coinManager';
 import type { PathCell } from '@/utils/wordPathFinder';
 
 interface RevealButtonProps {
@@ -30,11 +31,12 @@ const RevealButton = memo<RevealButtonProps>(({
   t,
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
-  const [coins, setCoins] = useState(() => getCoins());
+  const { coins, spendCoins, canAfford } = useCoins();
 
   const freeRevealsRemaining = Math.max(0, FREE_REVEALS_PER_GAME - revealsUsed);
   const isFreeReveal = freeRevealsRemaining > 0;
   const revealCost = isFreeReveal ? 0 : COIN_COSTS.REVEAL_5_PLUS;
+  // Use hook's canAfford checking against unified balance
   const canAffordReveal = isFreeReveal || canAfford(revealCost);
   const hasWordsToReveal = revealableWordsCount > 0;
 
@@ -45,20 +47,14 @@ const RevealButton = memo<RevealButtonProps>(({
 
     // If not free, spend coins first
     if (!isFreeReveal) {
-      const spent = spendCoins(revealCost, 'Word Reveal', { wordLength: '5+' });
-      if (!spent) {
+      const success = await spendCoins(revealCost, 'Word Reveal', { wordLength: '5+' });
+      if (!success) {
         return; // Failed to spend coins
       }
-      setCoins(getCoins());
     }
 
     await onReveal();
   };
-
-  // Update coins when component mounts or after reveal
-  React.useEffect(() => {
-    setCoins(getCoins());
-  }, [revealsUsed]);
 
   // Escape key handler to dismiss tooltip
   // IMPORTANT: This hook must be called unconditionally (before any early returns)
@@ -139,11 +135,10 @@ const RevealButton = memo<RevealButtonProps>(({
               [...Array(FREE_REVEALS_PER_GAME)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`w-3 h-3 ${
-                    i < freeRevealsRemaining
+                  className={`w-3 h-3 ${i < freeRevealsRemaining
                       ? 'text-neo-yellow fill-neo-yellow'
                       : 'text-gray-400 opacity-40'
-                  }`}
+                    }`}
                 />
               ))
             ) : (
@@ -174,8 +169,8 @@ const RevealButton = memo<RevealButtonProps>(({
               {!hasWordsToReveal
                 ? (t('reveal.noWordsLeft') || 'No 5+ letter words left')
                 : !canAffordReveal
-                ? (t('reveal.notEnoughCoins') || `Need ${revealCost} coins (have ${coins})`)
-                : (t('reveal.gameNotActive') || 'Game not active')
+                  ? (t('reveal.notEnoughCoins') || `Need ${revealCost} coins (have ${coins})`)
+                  : (t('reveal.gameNotActive') || 'Game not active')
               }
             </div>
           </motion.div>

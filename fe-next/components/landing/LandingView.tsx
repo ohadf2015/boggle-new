@@ -275,13 +275,14 @@ const LandingView: React.FC = () => {
 
       {/* Tutorial FAB - Fixed bottom corner button */}
       {/* Z-index 45 ensures it stays below mobile menu backdrop (z-9998) but above other content */}
+      {/* On desktop, positioned above Footer to avoid overlap with "Buy us a coffee" button */}
       <motion.button
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.3, delay: 0.3 }}
         onClick={handleOpenTutorial}
         className="
-          fixed bottom-24 lg:bottom-4 right-4 z-[45]
+          fixed bottom-[calc(6rem+max(env(safe-area-inset-bottom),1rem))] lg:bottom-[calc(5rem+max(env(safe-area-inset-bottom),1rem))] right-4 z-[45]
           flex items-center gap-2
           min-w-[48px] min-h-[48px]
           px-4 py-3
@@ -292,10 +293,8 @@ const LandingView: React.FC = () => {
           hover:scale-105 hover:shadow-hard-xl
           active:scale-95 active:shadow-hard
           transition-all duration-150
-          mb-[max(env(safe-area-inset-bottom),16px)]
-          mr-[max(env(safe-area-inset-right),0px)]
           rtl:right-auto rtl:left-4
-          rtl:mr-0 rtl:ml-[max(env(safe-area-inset-left),0px)]
+          rtl:ml-[max(env(safe-area-inset-left),0px)]
         "
         aria-label={t('landing.tutorial') || 'Tutorial'}
       >

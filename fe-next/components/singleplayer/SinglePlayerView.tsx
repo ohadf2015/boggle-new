@@ -99,7 +99,7 @@ const SinglePlayerView: React.FC = () => {
   // Hide bottom navigation during gameplay
   // Use useLayoutEffect to set state synchronously before paint to prevent nav flash
   useLayoutEffect(() => {
-    setIsInGame(phase === 'playing');
+    setIsInGame(phase === 'playing' || phase === 'results');
     return () => setIsInGame(false);
   }, [phase, setIsInGame]);
 

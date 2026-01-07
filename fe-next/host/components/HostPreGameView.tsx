@@ -416,10 +416,11 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
             <button
               type="button"
               onClick={handleToggleAdvancedSettings}
-              className="w-full flex items-center justify-between py-1.5 text-neo-cream/90 hover:text-neo-cream transition-colors duration-100"
+              className="w-full flex items-center justify-between py-2 px-3 rounded-neo border-2 border-neo-cream/30 hover:border-neo-cream/60 bg-neo-cream/10 hover:bg-neo-cream/20 text-neo-cream/90 hover:text-neo-cream transition-all duration-100 shadow-hard-sm hover:shadow-hard"
             >
               <div className="flex flex-col items-start gap-0.5">
-                <span className="text-xs font-bold uppercase">
+                <span className="text-xs font-bold uppercase flex items-center gap-2">
+                  <Settings className="w-3.5 h-3.5" />
                   {t('hostView.advancedSettings')}
                 </span>
                 {!showAdvancedSettings && (

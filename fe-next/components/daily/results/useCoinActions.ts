@@ -4,8 +4,8 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { awardDailyCoins, spendCoins, canAfford, getCoins, COIN_COSTS } from '@/utils/coinManager';
-import { syncCoinsToDatabase } from '@/lib/supabase';
+import { calculateDailyReward, COIN_COSTS } from '@/utils/coinManager';
+import { useCoins } from '@/hooks/useCoins';
 import type { Language } from '@/types';
 import type { CoinReward } from './types';
 
@@ -34,71 +34,90 @@ export function useCoinActions({
 }: UseCoinActionsProps) {
   const [coinReward, setCoinReward] = useState<CoinReward | null>(null);
   const [targetWordRevealed, setTargetWordRevealed] = useState(false);
-  const [currentCoins, setCurrentCoins] = useState(() => getCoins());
+
+  // Use unified unified coin hook
+  const { coins: currentCoins, addCoins, spendCoins, canAfford } = useCoins();
 
   // Award coins for completing the daily challenge
   useEffect(() => {
     if (isNewCompletion) {
-      const reward = awardDailyCoins(
-        puzzleDate,
-        language,
-        solved,
-        efficiencyScore || 0,
-        streakDays || 0
-      );
-      if (reward) {
-        setCoinReward(reward);
+      // Check if already awarded locally first to avoid unnecessary processing
+      const awardKey = `lexiclash_daily_coin_award_${puzzleDate}_${language}`;
+      if (typeof window !== 'undefined' && localStorage.getItem(awardKey)) {
+        return;
+      }
 
-        // Sync coins to database for authenticated users
-        if (userId && reward.awarded > 0) {
-          syncCoinsToDatabase(userId, reward.awarded, 'Daily Challenge', {
+      // Set flag immediately (synchronously) to prevent race condition
+      // if effect runs again before async operation completes
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(awardKey, 'pending');
+      }
+
+      // Calculate reward
+      const reward = calculateDailyReward(solved, efficiencyScore || 0, streakDays || 0);
+
+      const awardCoinsAsync = async () => {
+        try {
+          // Use hook to add coins (handles both auth and guest modes)
+          const newBalance = await addCoins(reward.total, 'Daily Challenge', {
             puzzleDate,
             language,
-            solved: solved ? 1 : 0,
+            solved: solved ? 'yes' : 'no',
             efficiencyScore: efficiencyScore || 0,
             streakDays: streakDays || 0,
           });
+
+          // Set reward state for UI display
+          setCoinReward({
+            awarded: reward.total,
+            breakdown: reward.breakdown
+          });
+
+          // Mark as awarded locally to prevent double-awarding on re-renders
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(awardKey, new Date().toISOString());
+          }
+        } catch (error) {
+          console.error('[useCoinActions] Failed to award coins:', error);
+          // Remove pending flag on error so user can retry
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem(awardKey);
+          }
         }
-      }
+      };
+
+      void awardCoinsAsync();
     }
-  }, [isNewCompletion, puzzleDate, language, solved, efficiencyScore, streakDays, userId]);
+  }, [isNewCompletion, puzzleDate, language, solved, efficiencyScore, streakDays, addCoins]);
 
   // Handle reveal target word (costs coins)
-  const handleRevealTargetWord = useCallback(() => {
+  const handleRevealTargetWord = useCallback(async () => {
     const cost = COIN_COSTS.REVEAL_TARGET_WORD;
-    if (!canAfford(cost)) {
-      return; // Not enough coins
-    }
 
-    const spent = spendCoins(cost, 'Reveal Target Word', {
+    const success = await spendCoins(cost, 'Reveal Target Word', {
       puzzleDate,
       language,
     });
 
-    if (spent) {
+    if (success) {
       setTargetWordRevealed(true);
-      setCurrentCoins(getCoins());
     }
-  }, [puzzleDate, language]);
+  }, [puzzleDate, language, spendCoins]);
 
   // Handle retry challenge (costs coins)
-  const handleRetryChallenge = useCallback(() => {
+  const handleRetryChallenge = useCallback(async () => {
     const cost = COIN_COSTS.DAILY_RETRY;
-    if (!canAfford(cost)) {
-      return; // Not enough coins
-    }
 
-    const spent = spendCoins(cost, 'Daily Challenge Retry', {
+    const success = await spendCoins(cost, 'Daily Challenge Retry', {
       puzzleDate,
       language,
       puzzleNumber: String(puzzleNumber),
     });
 
-    if (spent) {
-      setCurrentCoins(getCoins());
+    if (success) {
       onRetry();
     }
-  }, [puzzleDate, language, puzzleNumber, onRetry]);
+  }, [puzzleDate, language, puzzleNumber, onRetry, spendCoins]);
 
   return {
     coinReward,

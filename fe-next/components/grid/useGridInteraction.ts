@@ -8,6 +8,9 @@ import { getDeadzoneThreshold } from '@/utils/consts';
 import type { LetterGrid, GridPosition } from '@/types';
 import type { CellPosition, SelectedCell } from './types';
 import { getPerformanceConfig } from './performanceUtils';
+import { findWordPath } from '@/utils/wordPathFinder';
+import { normalizeWord } from '@/utils/clientWordValidator';
+import type { Language } from '@/types';
 
 // Cached grid measurements to avoid layout thrashing on every touch move
 interface GridMeasurements {
@@ -35,6 +38,7 @@ interface UseGridInteractionProps {
   fireRoundActive?: boolean;
   /** Callback when user taps a single cell without dragging (for tap-to-drag tutorial) */
   onSingleTapDetected?: (cell: { row: number; col: number; letter: string }) => void;
+  language?: Language;
 }
 
 interface UseGridInteractionReturn {
@@ -72,7 +76,7 @@ const DIAGONAL_SELECTION_THRESHOLD = 0.95;
 // Velocity calculation - samples to average
 const VELOCITY_SAMPLES = 3;
 
-const noOp = () => {};
+const noOp = () => { };
 
 export function useGridInteraction({
   grid,
@@ -84,6 +88,7 @@ export function useGridInteraction({
   gridRef,
   fireRoundActive = false,
   onSingleTapDetected,
+  language = 'en',
 }: UseGridInteractionProps): UseGridInteractionReturn {
   const [internalSelectedCells, setInternalSelectedCells] = useState<SelectedCell[]>([]);
   const [fadingCells, setFadingCells] = useState<GridPosition[]>([]);
@@ -343,11 +348,12 @@ export function useGridInteraction({
     if (selectedCells.length === 0) return;
 
     const formedWord = selectedCells.map(c => c.letter).join('');
-    if (onWordSubmit) {
-      onWordSubmit(formedWord);
-    }
+    // Call onPathSubmit first so path is captured before word submission handlers run
     if (onPathSubmit) {
       onPathSubmit([...selectedCells]);
+    }
+    if (onWordSubmit) {
+      onWordSubmit(formedWord);
     }
 
     // Haptic feedback
@@ -692,7 +698,7 @@ export function useGridInteraction({
     const now = Date.now();
     const timeSinceLastClick = now - lastClickTimeRef.current;
     const sameCell = lastClickCellRef.current?.row === rowIndex &&
-                     lastClickCellRef.current?.col === colIndex;
+      lastClickCellRef.current?.col === colIndex;
 
     // Double-click on same cell = submit
     if (sameCell && timeSinceLastClick < 300 && selectedCells.length > 0) {
@@ -794,7 +800,7 @@ export function useGridInteraction({
       const mockEvent = {
         touches: [{ clientX: e.clientX, clientY: e.clientY }],
         cancelable: true,
-        preventDefault: () => {}
+        preventDefault: () => { }
       } as unknown as TouchEvent;
       handleTouchMove(mockEvent);
     }
@@ -1002,7 +1008,68 @@ export function useGridInteraction({
         e.preventDefault();
         return;
       default:
-        return;
+        // Handle letter typing (a-z)
+        // Only auto-select if explicitly in keyboard mode or no active touch/drag in progress
+        // This prevents interrupting user's swipe gestures
+        if (e.key.length === 1 && /[a-zA-Z]/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+          // Don't auto-select if user is actively dragging/touching (would interrupt swipe)
+          if (isTouchingRef.current || isDraggingRef.current) {
+            return; // Let the swipe continue, ignore keyboard input
+          }
+
+          e.preventDefault();
+
+          // Determine the word we are trying to form
+          let currentWord = '';
+          if (selectedCells.length > 0) {
+            currentWord = selectedCells.map(c => c.letter).join('');
+          }
+          const nextWord = currentWord + e.key;
+
+          // Try to find a path for this word
+          const path = findWordPath(nextWord, grid, language);
+
+          if (path) {
+            // Valid path found! Update selection
+            // Convert PathCell[] to SelectedCell[] (SelectedCell needs letter property which PathCell has)
+            const newSelection = path.map(p => ({
+              row: p.row,
+              col: p.col,
+              letter: p.letter
+            }));
+
+            setSelectedCells(newSelection);
+            setFocusedCell({ row: path[path.length - 1].row, col: path[path.length - 1].col });
+            setIsKeyboardMode(true);
+
+            if (window.navigator?.vibrate) {
+              window.navigator.vibrate(fireRoundActive ? 20 : 8);
+            }
+          } else {
+            // Don't auto-start new word on single key press if user has existing selection
+            // This prevents unexpected clearing of user's current selection
+            // Only allow starting new word if there's no current selection
+            if (selectedCells.length === 0) {
+              const startNewPath = findWordPath(e.key, grid, language);
+              if (startNewPath) {
+                const newSelection = startNewPath.map(p => ({
+                  row: p.row,
+                  col: p.col,
+                  letter: p.letter
+                }));
+                setSelectedCells(newSelection);
+                setFocusedCell({ row: startNewPath[0].row, col: startNewPath[0].col });
+                setIsKeyboardMode(true);
+                if (window.navigator?.vibrate) {
+                  window.navigator.vibrate(fireRoundActive ? 20 : 8);
+                }
+              }
+            }
+            // If path not found and user has existing selection, do nothing
+            // (don't clear their selection unexpectedly)
+          }
+          return;
+        }
     }
 
     // Update focused cell
@@ -1012,7 +1079,7 @@ export function useGridInteraction({
       // Haptic feedback for navigation
       if (window.navigator?.vibrate) window.navigator.vibrate(10);
     }
-  }, [interactive, grid, focusedCell, selectedCells, comboLevel, onWordSubmit, onPathSubmit, startSequentialFadeOut, setSelectedCells, isAdjacentCell, fireRoundActive]);
+  }, [interactive, grid, focusedCell, selectedCells, comboLevel, onWordSubmit, onPathSubmit, startSequentialFadeOut, setSelectedCells, isAdjacentCell, fireRoundActive, language]);
 
   // Reset keyboard mode on touch/mouse interaction
   useEffect(() => {

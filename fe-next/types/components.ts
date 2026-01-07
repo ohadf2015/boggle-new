@@ -100,6 +100,10 @@ export interface ResultsPageProps {
   isHost?: boolean;
   /** Room language for starting new games */
   roomLanguage?: Language;
+  /** Grid size for cognitive scoring */
+  gridSize?: number;
+  /** Game duration in seconds for cognitive scoring */
+  gameDuration?: number;
 }
 
 export interface VoteInfo {

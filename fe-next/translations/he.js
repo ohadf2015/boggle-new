@@ -1697,8 +1697,20 @@ const he = {
       "longerWords": "מילים ארוכות = יותר נקודות!",
       "skillsUnlocked": "כישורים נפתחו! מוכן לקרב!"
     },
+    "completion": {
+      "title": "כל הכבוד!",
+      "message": "הבנת את המשחק! אתה יכול להמשיך לתרגל או לסיים ולעבור למשחק האמיתי.",
+      "finish": "סיום",
+      "continuePractice": "המשך תרגול"
+    },
     "analysis": {
       "titleComplete": "האימון הושלם!",
+      "completion": {
+        "title": "כל הכבוד!",
+        "message": "הבנת את המשחק! אתה יכול להמשיך לתרגל או לסיים ולעבור למשחק האמיתי.",
+        "finish": "סיום",
+        "continuePractice": "המשך תרגול"
+      },
       "titleProgress": "המשך להתאמן!",
       "subtitleComplete": "שלטת בבסיס!",
       "subtitleProgress": "עוד כמה כישורים לפתוח",
@@ -3467,7 +3479,7 @@ const he = {
     "successMessage": "אנחנו אוהבים לשמוע משחקנים! נחזור אליכם בקרוב.",
     "sendAnother": "שלח עוד הודעה",
     "errorMessage": "אופס! משהו השתבש. נסו שוב!",
-    "responseTime": "בדרך כלל עונים תוך יום-יומיים"
+    "responseTime": "זמן מענה משוער: יום-יומיים עסקים"
   },
   "bugReport": {
     "title": "דיווח על באג",
@@ -3489,6 +3501,7 @@ const he = {
     "title": "אימון מוחי",
     "subtitle": "עקוב אחר הביצועים הקוגניטיביים שלך",
     "score": "ציון מוח",
+    "points": "נקודות מוח",
     "overall": "כללי",
     "nav": {
       "home": "שחק",

@@ -101,10 +101,13 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     updateSfxSetting('volume', clampedVolume);
   }, [updateSfxSetting]);
 
-  // Toggle SFX mute
+  // Toggle SFX mute - using ref to avoid dependency on sfxMuted state
+  const sfxMutedRef = useRef(sfxMuted);
+  useEffect(() => { sfxMutedRef.current = sfxMuted; }, [sfxMuted]);
+  
   const toggleSfxMute = useCallback(() => {
-    updateSfxSetting('muted', !sfxMuted);
-  }, [updateSfxSetting, sfxMuted]);
+    updateSfxSetting('muted', !sfxMutedRef.current);
+  }, [updateSfxSetting]);
 
   // Set game active state - sounds only play when game is active
   const setGameActive = useCallback((active: boolean) => {

@@ -12,6 +12,7 @@ import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { shouldShowUpgradePrompt, getGuestStatsSummary, updateGuestStatsAfterGame, isFirstWin } from '@/utils/guestManager';
 import { useWinStreak } from '@/hooks/useWinStreak';
+import { useCoins } from '@/hooks/useCoins';
 import { useFirstWinCelebration } from '@/hooks/useFirstWinCelebration';
 import { trackGameCompletion, trackStreakMilestone } from '@/utils/growthTracking';
 import logger from '@/utils/logger';
@@ -22,6 +23,7 @@ import type { NearMiss } from '@/components/results/NearMissCard';
 import type { MysteryReward } from '@/components/engagement/MysteryRewardPopup';
 import type { ReferralMilestone } from '@/shared/types/socket';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 
 // Dynamic imports for heavy components (loaded after initial render)
 const ResultsPlayerCard = dynamic(() => import('@/components/results/ResultsPlayerCard'), { ssr: false });
@@ -56,10 +58,20 @@ import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 
 
-const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount, isHost = false, roomLanguage = 'en' }) => {
+import { useSaveCognitiveScore } from '@/hooks/useSaveCognitiveScore';
+import BrainPointsDisplay from '@/components/results/BrainPointsDisplay';
+
+const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, username, socket, achievements, duplicateRuleDisabled, playerCount, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180 }) => {
   const { t } = useLanguage();
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const isLandscape = useMobileLandscape();
+  const setIsInGame = useHideNavigation();
+
+  // Hide global bottom nav on mobile while viewing results
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
   const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [showFirstWinModal, setShowFirstWinModal] = useState<boolean>(false);
@@ -70,6 +82,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   const hasTrackedGameRef = useRef<boolean>(false);
   const hasAddedToHistoryRef = useRef<boolean>(false);
   const hasAwardedCoinsRef = useRef<boolean>(false);
+  const hasSavedCognitiveScoreRef = useRef<boolean>(false);
   // previousStreak needs to be state since it's used in render
   const [previousStreak, setPreviousStreak] = useState<number>(0);
 
@@ -110,6 +123,15 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
   // Win streak tracking
   const { currentStreak, bestStreak, recordWin } = useWinStreak();
+
+  // Cognitive scoring hook
+  const { saveCognitiveScore, isSaving: isSavingCognitiveScore } = useSaveCognitiveScore();
+
+  // Brain points state
+  const [brainPointsReward, setBrainPointsReward] = useState<{
+    scoreDelta: number;
+    newScore: number;
+  } | null>(null);
 
   // Calculate if current player is the winner
   const sortedScores = useMemo(() => {
@@ -182,6 +204,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     }
   }, [isAuthenticated, finalScores, username, isCurrentUserWinner, achievements]);
 
+  // Use unified unified coin hook
+  const { refreshCoins } = useCoins();
+
   // Award coins for multiplayer game completion
   useEffect(() => {
     if (hasAwardedCoinsRef.current || !currentPlayerData || !gameCode) return;
@@ -189,6 +214,21 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     // Generate a session ID for this game
     const sessionId = `mp_${gameCode}_${Date.now()}`;
     const totalPlayers = sortedScores.length;
+
+    // Calculate reward using utility but DON'T award yet (let hook do it)
+    // We can't import calculateGameCoins from coinManager directly as it's not exported or might be internal
+    // So we use awardGameCoins locally to calculate, but then we would double award if we use hook?
+    // awardGameCoins does: check dupe -> addCoins -> return reward.
+
+    // Better approach: Let awardGameCoins handle local storage details (session check etc)
+    // picking apart awardGameCoins logic inside a component is risky.
+
+    // ISSUE: awardGameCoins is "smart" (checks existing session to prevent dupe).
+    // useCoins.addCoins is "dumb" (just adds).
+
+    // If I replace awardGameCoins with useCoins.addCoins, I lose the session duplication check unless I reimplement it.
+
+    // Alternative: Keep awardGameCoins, but if authenticated, we also need to trigger refreshProfile.
 
     const reward = awardGameCoins(
       sessionId,
@@ -199,8 +239,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     );
 
     if (reward && reward.awarded > 0) {
-      // Sync coins to database for authenticated users
       if (user?.id) {
+        // Authenticated: Sync to DB AND Refresh Profile
         syncCoinsToDatabase(
           user.id,
           reward.awarded,
@@ -211,12 +251,74 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             rank: currentPlayerRank,
             totalPlayers
           }
-        );
+        ).then(() => {
+          // Refresh coins to update header immediately
+          refreshCoins();
+        });
       }
     }
 
     hasAwardedCoinsRef.current = true;
-  }, [currentPlayerData, currentPlayerRank, sortedScores.length, gameCode, user?.id]);
+  }, [currentPlayerData, currentPlayerRank, sortedScores.length, gameCode, user?.id, refreshCoins]);
+
+  // Save cognitive scores for brain training (authenticated users only)
+  useEffect(() => {
+    if (hasSavedCognitiveScoreRef.current) return;
+    if (!user?.id || !currentPlayerData) return; // Only for authenticated users
+
+    // Calculate max combo
+    // Track combo streaks: words with comboBonus > 0 continued a combo
+    // Note: comboBonus is calculated from comboLevel, so comboBonus > 0 means comboLevel > 0
+    // We track consecutive words with comboBonus > 0 to find the max streak
+    const validWords = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0) || [];
+    let maxCombo = 0;
+    let currentCombo = 0;
+    for (const word of validWords) {
+      // comboBonus > 0 indicates the word was submitted with comboLevel > 0 (continued combo)
+      // comboBonus = 0 indicates comboLevel = 0 (combo was broken or first word)
+      if (word.comboBonus && word.comboBonus > 0) {
+        currentCombo++;
+        maxCombo = Math.max(maxCombo, currentCombo);
+      } else {
+        // Combo broken - reset streak
+        currentCombo = 0;
+      }
+    }
+
+    // Map words to expected format
+    const playerWordData = (currentPlayerData.allWords || []).map(w => ({
+      word: w.word,
+      score: w.score,
+      isValid: w.validated,
+      timestamp: w.timestamp
+    }));
+
+    // Generate session ID if missing
+    const sessionId = `mp_${gameCode}_${Date.now()}`;
+
+    // Save cognitive score
+    saveCognitiveScore({
+      playerWordData,
+      gameDuration: gameDuration,
+      gridSize: gridSize,
+      maxCombo,
+      hintsUsed: 0,
+      gameSessionId: sessionId,
+    }).then(cognitiveResult => {
+      if (cognitiveResult) {
+        console.log('[ResultsPage] Cognitive scores saved:', cognitiveResult);
+        setBrainPointsReward({
+          scoreDelta: cognitiveResult.scoreDelta,
+          newScore: cognitiveResult.overallScore
+        });
+      }
+    });
+
+    hasSavedCognitiveScoreRef.current = true;
+    // Note: gameDuration and gridSize are intentionally not in dependencies
+    // The effect only runs once (guarded by hasSavedCognitiveScoreRef), so we use
+    // the prop values at the time of execution to avoid unnecessary re-evaluations
+  }, [user?.id, currentPlayerData, gameCode, saveCognitiveScore]);
 
   // Track game completion and record win streak (only once)
   useEffect(() => {
@@ -335,7 +437,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
   // Defer expensive word mapping calculation
   const deferredFinalScoresForWords = useDeferredValue(finalScores);
-  
+
   // Create a map of all player words for duplicate detection
   // Using 'any' here as the exact WordObject type varies between components
   const allPlayerWords = useMemo(() => {
@@ -886,6 +988,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         />
       )}
 
+      {/* Brain Points Feedback */}
+      <BrainPointsDisplay reward={brainPointsReward} variant="compact" />
+
       {/* Compact Top 3 Leaderboard - Horizontal */}
       {sortedScores.length > 1 && (
         <Top3Leaderboard players={sortedScores} currentUsername={username} compact />
@@ -1163,6 +1268,9 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               />
             )}
 
+            {/* Brain Points Feedback */}
+            <BrainPointsDisplay reward={brainPointsReward} variant="compact" />
+
             {/* Top 3 Leaderboard */}
             {sortedScores.length > 1 && (
               <Top3Leaderboard players={sortedScores} currentUsername={username} compact />
@@ -1216,7 +1324,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             <div className="flex gap-2">
               {currentPlayerData && gameCode && !hasZeroScore && (currentPlayerData.score || 0) >= 10 && (
                 <button
-                  onClick={() => {/* Scroll to share section */}}
+                  onClick={() => {/* Scroll to share section */ }}
                   className="flex-1 bg-neo-pink text-white font-bold text-sm px-4 py-2.5 uppercase border-2 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-1"
                 >
                   <Share2 className="w-4 h-4" />

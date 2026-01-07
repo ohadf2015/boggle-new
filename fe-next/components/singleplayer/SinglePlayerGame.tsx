@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { ArrowLeft, Pause, Play, Crown, TrendingUp, Target, Zap, Eye, List } from 'lucide-react';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import ComboDisplay from '@/components/game/ComboDisplay';
 import { Button } from '@/components/ui/button';
@@ -33,7 +34,9 @@ import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useTrainingAnalysis } from '@/hooks/useTrainingAnalysis';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
+import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
+import KeyboardHintTooltip from '@/components/game/KeyboardHintTooltip';
 import { TrainingHints, TrainingProgressBar, SkillUnlockToast } from '@/components/training';
 import {
   calculateFinalAchievements,
@@ -123,6 +126,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
   const [showLandscapeTutorial, setShowLandscapeTutorial] = useState(false);
+  const [showCompletionPopup, setShowCompletionPopup] = useState(false);
 
   // Guard against accidental browser back button / swipe navigation during active game
   useNavigationGuard({
@@ -208,8 +212,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       console.log(`Skill unlocked: ${skillId}`);
     },
     onComplete: () => {
-      // All skills complete - player is ready for multiplayer
-      console.log('Training complete!');
+      // All skills complete - show completion popup
+      setShowCompletionPopup(true);
     },
   });
 
@@ -258,20 +262,25 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     maxCombo: combo.maxCombo,
   });
 
+  // Memoize valid words count to avoid reference changes triggering the effect
+  const validWordsCount = React.useMemo(
+    () => foundWords.filter(fw => fw.isValid === true).length,
+    [foundWords]
+  );
+
   // Update training progress when score changes (for targetScore skill)
-  // NOTE: We deliberately exclude trainingProgress from deps to avoid infinite loops.
-  // The updateProgress function is stable (useCallback), and completedSkills is accessed via ref pattern.
+  // Uses refs to read skills without triggering re-renders
   useEffect(() => {
-    if (settings.mode === 'practice' && score >= 20) {
-      trainingProgress.updateProgress({
-        score,
-        wordsFound: foundWords.filter(fw => fw.isValid === true).length,
-        hasDiagonal: trainingProgress.completedSkills.has('diagonal'),
-        hasDirectionChange: trainingProgress.completedSkills.has('directionChange'),
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [score, settings.mode, foundWords]);
+    if (settings.mode !== 'practice' || score < 20) return;
+
+    const skillsRef = trainingProgress.completedSkillsRef.current;
+    trainingProgress.updateProgress({
+      score,
+      wordsFound: validWordsCount,
+      hasDiagonal: skillsRef?.has('diagonal') ?? false,
+      hasDirectionChange: skillsRef?.has('directionChange') ?? false,
+    });
+  }, [score, settings.mode, validWordsCount, trainingProgress]);
 
   // Announce timer at key intervals for screen reader users
   useEffect(() => {
@@ -407,30 +416,6 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     localStorage.setItem('landscape-tutorial-seen', 'true');
   }, []);
 
-  // Keyboard shortcuts for landscape mode
-  useEffect(() => {
-    if (!isLandscape || isGameOver) return;
-
-    const handleKeyPress = (e: KeyboardEvent) => {
-      // Don't trigger if user is typing in an input
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        if (score > 0) {
-          setShowQuitConfirm(true);
-        } else {
-          onQuit();
-        }
-      } else if (e.key === ' ' && settings.mode !== 'practice') {
-        e.preventDefault();
-        setIsPaused(prev => !prev);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [isLandscape, isGameOver, score, settings.mode, onQuit]);
 
   // Handle quit with confirmation
   const handleQuitRequest = useCallback(() => {
@@ -1124,6 +1109,53 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     setLetterCount(count);
   }, []);
 
+  // Keyboard word input - allows typing words directly instead of swiping
+  // Enable when grid is loaded and game is not paused/over
+  const keyboardInput = useKeyboardWordInput({
+    grid: grid || ([] as LetterGrid),
+    language: settings.language,
+    enabled: !!grid && !isPaused && !isGameOver,
+    onWordSubmit: handleWordSubmit,
+    minWordLength: settings.minWordLength ?? 3,
+  });
+
+  // Ref to track typing mode for landscape keyboard handler
+  const isTypingModeRef = useRef(keyboardInput.isTypingMode);
+  useEffect(() => {
+    isTypingModeRef.current = keyboardInput.isTypingMode;
+  }, [keyboardInput.isTypingMode]);
+
+  // Keyboard shortcuts for landscape mode
+  // Note: Must be after keyboardInput hook to check typing mode
+  useEffect(() => {
+    if (!isLandscape || isGameOver) return;
+
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Don't trigger if user is typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+      // Don't handle Escape if user is typing a word (let keyboard input handle it)
+      if (e.key === 'Escape' && isTypingModeRef.current) {
+        return; // Let keyboard input handler clear the word
+      }
+
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        if (score > 0) {
+          setShowQuitConfirm(true);
+        } else {
+          onQuit();
+        }
+      } else if (e.key === ' ' && settings.mode !== 'practice') {
+        e.preventDefault();
+        setIsPaused(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [isLandscape, isGameOver, score, settings.mode, onQuit]);
+
   // Calculate revealable word count
   const revealableWordCount = React.useMemo(() => {
     if (!availableWords || !grid) return 0;
@@ -1375,8 +1407,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           {/* Word Forming Area - Permanent space above grid (keep timer section clear) */}
           <div className="flex items-center justify-center mb-0.5">
             <WordFormingArea
-              word={formedWord}
-              letterCount={letterCount}
+              word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
+              letterCount={keyboardInput.isTypingMode ? keyboardInput.typedWord.length : letterCount}
               feedback={currentFeedback}
               compact
             />
@@ -1394,7 +1426,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               largeText
               fireRoundActive={fireRoundActive}
               earthquakeShaking={earthquakeState === 'shaking'}
-              highlightedPath={revealState.highlightedPath}
+              highlightedPath={keyboardInput.isTypingMode ? keyboardInput.highlightedCells : revealState.highlightedPath}
+              language={settings.language}
             />
           </div>
         </div>
@@ -1473,6 +1506,15 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           onDismiss={directionGuidance.dismissDirectionGuidance}
           t={t}
         />
+
+        {/* Keyboard Input Hint - Desktop only */}
+        {!isPaused && !isGameOver && (
+          <KeyboardHintTooltip
+            delaySeconds={10}
+            desktopOnly={true}
+            t={t}
+          />
+        )}
 
         {/* Training Hints - shows real-time tips in practice mode */}
         {settings.mode === 'practice' && (
@@ -1760,8 +1802,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       {/* Word Forming Area with feedback - centered below timer (keep timer section clean) */}
       <div className="flex items-center justify-center flex-shrink-0">
         <WordFormingArea
-          word={formedWord}
-          letterCount={letterCount}
+          word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
+          letterCount={keyboardInput.isTypingMode ? keyboardInput.typedWord.length : letterCount}
           feedback={currentFeedback}
           compact
         />
@@ -1862,7 +1904,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           largeText
           fireRoundActive={fireRoundActive}
           earthquakeShaking={earthquakeState === 'shaking'}
-          highlightedPath={revealState.highlightedPath}
+          highlightedPath={keyboardInput.isTypingMode ? keyboardInput.highlightedCells : revealState.highlightedPath}
+          language={settings.language}
         />
       </div>
 
@@ -1878,7 +1921,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            className="fixed bottom-0 left-1/2 -translate-x-1/2 z-40 mb-[max(env(safe-area-inset-bottom),16px)]"
+            className="fixed bottom-[max(env(safe-area-inset-bottom),1rem)] left-1/2 -translate-x-1/2 z-40"
           >
             <AdaptiveMotion.button
               onClick={async () => {
@@ -1916,6 +1959,15 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         t={t}
       />
 
+      {/* Keyboard Input Hint - Desktop only */}
+      {!isPaused && !isGameOver && (
+        <KeyboardHintTooltip
+          delaySeconds={10}
+          desktopOnly={true}
+          t={t}
+        />
+      )}
+
       {/* Training Hints - shows real-time tips in practice mode */}
       {settings.mode === 'practice' && (
         <TrainingHints
@@ -1932,6 +1984,43 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           skillId={trainingProgress.justUnlocked}
           onDismiss={trainingProgress.clearJustUnlocked}
         />
+      )}
+
+      {/* Practice Completion Popup */}
+      {settings.mode === 'practice' && (
+        <Dialog open={showCompletionPopup} onOpenChange={setShowCompletionPopup}>
+          <DialogContent noDescription className="max-w-sm sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-black uppercase text-center">
+                {t('training.completion.title') || 'Well done!'}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="p-4 space-y-4">
+              <p className="text-center text-neo-black dark:text-neo-white font-medium">
+                {t('training.completion.message') || "You've mastered the game! You can continue practicing or finish and start a real match."}
+              </p>
+            </div>
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowCompletionPopup(false)}
+                className="flex-1 min-h-[48px] font-bold"
+              >
+                {t('training.completion.continuePractice') || 'Continue Practice'}
+              </Button>
+              <Button
+                variant="success"
+                onClick={() => {
+                  setShowCompletionPopup(false);
+                  handleFinishPractice();
+                }}
+                className="flex-1 min-h-[48px] font-bold"
+              >
+                {t('training.completion.finish') || 'Finish'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
 
       {/* Quit Confirmation Dialog */}

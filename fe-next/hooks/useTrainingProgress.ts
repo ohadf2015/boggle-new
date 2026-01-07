@@ -28,6 +28,8 @@ interface UseTrainingProgressOptions {
 interface UseTrainingProgressReturn {
   /** Current completed skills */
   completedSkills: Set<TrainingSkillId>;
+  /** Ref for stable reads in effects without triggering re-renders */
+  completedSkillsRef: React.RefObject<Set<TrainingSkillId>>;
   /** Skill that was just unlocked */
   justUnlocked: TrainingSkillId | null;
   /** Whether training is complete */
@@ -72,15 +74,22 @@ export function useTrainingProgress(options: UseTrainingProgressOptions): UseTra
   const hasDirectionChangeRef = useRef<boolean>(false);
   const hasCalledCompleteRef = useRef<boolean>(false);
 
+  // Ref to track completed skills without causing re-renders when read
+  const completedSkillsRef = useRef<Set<TrainingSkillId>>(completedSkills);
+
   /**
    * Unlock a skill if not already unlocked
    */
   const unlockSkill = useCallback((skillId: TrainingSkillId) => {
+    // Early return using ref to avoid state update if already unlocked
+    if (completedSkillsRef.current.has(skillId)) return;
+
     setCompletedSkills((prev) => {
       if (prev.has(skillId)) return prev;
 
       const next = new Set(prev);
       next.add(skillId);
+      completedSkillsRef.current = next; // Keep ref in sync
 
       // Trigger celebration
       setJustUnlocked(skillId);
@@ -211,7 +220,9 @@ export function useTrainingProgress(options: UseTrainingProgressOptions): UseTra
   // Reset state when disabled
   useEffect(() => {
     if (!enabled) {
-      setCompletedSkills(new Set());
+      const emptySet = new Set<TrainingSkillId>();
+      setCompletedSkills(emptySet);
+      completedSkillsRef.current = emptySet;
       setJustUnlocked(null);
       setIsComplete(false);
       wordsFoundRef.current = 0;
@@ -224,6 +235,7 @@ export function useTrainingProgress(options: UseTrainingProgressOptions): UseTra
 
   return {
     completedSkills,
+    completedSkillsRef, // Expose ref for stable reads in effects
     justUnlocked,
     isComplete,
     clearJustUnlocked,

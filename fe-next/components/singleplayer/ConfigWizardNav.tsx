@@ -147,7 +147,7 @@ export const WizardNavigationButtons: React.FC<WizardNavigationButtonsProps> = (
   className,
 }) => {
   return (
-    <div className={cn("flex items-center gap-3 pt-4 border-t-2 border-neo-black/10 dark:border-slate-600", className)}>
+    <div className={cn("flex items-center gap-3 pt-4 border-t-2 border-neo-black/10 dark:border-slate-600 overflow-hidden", className)}>
       {/* Back Button */}
       {currentStep > 1 && (
         <Button

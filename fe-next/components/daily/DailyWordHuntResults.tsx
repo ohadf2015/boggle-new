@@ -34,7 +34,6 @@ import KeepPlayingSection from './KeepPlayingSection';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchGeolocation } from '@/contexts/auth/authUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { canAfford, COIN_COSTS } from '@/utils/coinManager';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 
 // Import from results module
@@ -307,14 +306,14 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       />
 
       {/* Watch Ad for Coins */}
-      {!canAfford(COIN_COSTS.DAILY_RETRY) && (
+      {!coinActions.canAffordRetry && (
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-xs text-gray-400">
             <div className="flex-1 h-px bg-gray-600" />
             <span>{t('wordHunt.ad.needMoreCoins') || 'Need more coins?'}</span>
             <div className="flex-1 h-px bg-gray-600" />
           </div>
-          <WatchAdButton onCoinsEarned={() => {/* Update handled by coinActions */}} t={t} />
+          <WatchAdButton onCoinsEarned={() => {/* Update handled by coinActions */ }} t={t} />
         </div>
       )}
 

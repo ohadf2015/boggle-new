@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import nextDynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { Socket } from 'socket.io-client';
@@ -116,6 +116,7 @@ export default function MultiplayerPage(): React.JSX.Element {
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [roomsLoading, setRoomsLoading] = useState<boolean>(true); // Track rooms loading state
   const [pendingGameStart, setPendingGameStart] = useState<GameStartData | null>(null); // Store game start data for players returning from results
+  const [gameStartTime, setGameStartTime] = useState<number | null>(null); // Track when current game started for duration calculation
   const [isJoining, setIsJoining] = useState<boolean>(false); // Track join/create loading state
   const [authLoadingStartTime, setAuthLoadingStartTime] = useState<number | null>(null); // Track when auth loading started
 
@@ -131,6 +132,9 @@ export default function MultiplayerPage(): React.JSX.Element {
   const socketRef = useRef<Socket | null>(null);
   const attemptingReconnectRef = useRef<boolean>(attemptingReconnect);
   const hostKeepAliveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Store calculated game duration when results are shown to prevent recalculation
+  // if state is reset before cognitive scoring effect executes
+  const gameDurationRef = useRef<number | null>(null);
   const wasConnectedRef = useRef<boolean>(false);
   const showResultsRef = useRef<boolean>(showResults);
 
@@ -717,6 +721,8 @@ export default function MultiplayerPage(): React.JSX.Element {
 
       // Always store pending game start data for PlayerView to consume
       setPendingGameStart(data);
+      // Track game start time for duration calculation
+      setGameStartTime(Date.now());
 
       // If viewing results, transition back to game
       if (showResultsRef.current) {
@@ -1240,13 +1246,55 @@ export default function MultiplayerPage(): React.JSX.Element {
     }
     setShowResults(false);
     setResultsData(null);
+    // Reset game state atomically - these must be reset together to prevent
+    // calculateGameDuration() from returning stale/incorrect values
     setPendingGameStart(null);
+    setGameStartTime(null);
+    // Reset stored duration for next game
+    gameDurationRef.current = null;
   }, [socket, gameCode]);
 
   const handleShowResults = useCallback((data: unknown) => {
     setResultsData(data as ResultsData);
     setShowResults(true);
   }, []);
+
+  // Calculate and store game duration when results are first shown
+  // This ensures the duration remains stable even if gameStartTime/pendingGameStart are reset
+  useEffect(() => {
+    if (showResults && resultsData && gameDurationRef.current === null) {
+      // Calculate duration once when results are first shown
+      if (gameStartTime && pendingGameStart?.timerSeconds) {
+        // Calculate actual elapsed time, but cap at configured timer duration
+        const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
+        gameDurationRef.current = Math.min(elapsed, pendingGameStart.timerSeconds);
+      } else {
+        // Fallback to configured duration if we don't have start time
+        gameDurationRef.current = pendingGameStart?.timerSeconds || 180;
+      }
+    }
+  }, [showResults, resultsData, gameStartTime, pendingGameStart]);
+
+  // Memoized game duration - uses ref value if available, otherwise calculates
+  // This ensures stable duration value for cognitive scoring calculations
+  const gameDuration = useMemo(() => {
+    // If we have a stored duration from when results were shown, use it
+    // This prevents recalculation if state is reset before cognitive scoring executes
+    if (gameDurationRef.current !== null) {
+      return gameDurationRef.current;
+    }
+    
+    // Fallback calculation if ref not set yet (shouldn't happen in normal flow)
+    if (!showResults || !resultsData) {
+      return pendingGameStart?.timerSeconds || 180;
+    }
+    
+    if (gameStartTime && pendingGameStart?.timerSeconds) {
+      const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
+      return Math.min(elapsed, pendingGameStart.timerSeconds);
+    }
+    return pendingGameStart?.timerSeconds || 180;
+  }, [showResults, resultsData, gameStartTime, pendingGameStart]);
 
   // QuickJoinView handlers removed - invitation flow now handled by MultiplayerFlow
 
@@ -1282,6 +1330,8 @@ export default function MultiplayerPage(): React.JSX.Element {
             playerCount={resultsData?.playerCount}
             isHost={isHost}
             roomLanguage={roomLanguage ?? undefined}
+            gridSize={resultsData?.letterGrid && Array.isArray(resultsData.letterGrid) && resultsData.letterGrid.length > 0 ? resultsData.letterGrid.length : 4}
+            gameDuration={gameDuration}
           />
         </FeatureErrorBoundary>
       );

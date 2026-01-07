@@ -1702,8 +1702,20 @@ const en = {
       "longerWords": "Longer words = more points! Try 5+ letters",
       "skillsUnlocked": "Skills unlocked! You're ready!"
     },
+    "completion": {
+      "title": "Well done!",
+      "message": "You've mastered the game! You can continue practicing or finish and start a real match.",
+      "finish": "Finish",
+      "continuePractice": "Continue Practice"
+    },
     "analysis": {
       "titleComplete": "Training Complete!",
+      "completion": {
+        "title": "Well done!",
+        "message": "You've mastered the game! You can continue practicing or finish and start a real match.",
+        "finish": "Finish",
+        "continuePractice": "Continue Practice"
+      },
       "titleProgress": "Keep Practicing!",
       "subtitleComplete": "You've mastered the basics!",
       "subtitleProgress": "A few more skills to unlock",
@@ -3479,7 +3491,7 @@ const en = {
     "successMessage": "Love hearing from players! We'll get back to you soon.",
     "sendAnother": "Send Another",
     "errorMessage": "Oops! Something went wrong. Give it another shot!",
-    "responseTime": "We usually reply within a day or two"
+    "responseTime": "Estimated response time: 1-2 business days"
   },
   "bugReport": {
     "title": "Report a Bug",
@@ -3501,6 +3513,7 @@ const en = {
     "title": "Brain Training",
     "subtitle": "Track your cognitive performance",
     "score": "Brain Score",
+    "points": "Brain Points",
     "overall": "Overall",
     "nav": {
       "home": "Play",

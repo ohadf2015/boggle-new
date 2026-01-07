@@ -48,6 +48,7 @@ interface CognitiveScoreResult {
   vocabulary: number;
   overallScore: number;
   tier: string;
+  scoreDelta: number;
 }
 
 export function useSaveCognitiveScore() {
@@ -169,6 +170,7 @@ export function useSaveCognitiveScore() {
       let overallScore: number;
       let tier: string;
       let tierProgress: number;
+      let scoreDelta: number = 0;
 
       if (currentBrainScore) {
         // Update existing brain score with rolling average
@@ -210,6 +212,7 @@ export function useSaveCognitiveScore() {
         overallScore = updated.overallScore;
         tier = updated.tier;
         tierProgress = updated.tierProgress;
+        scoreDelta = overallScore - currentBrainScore.overall_score;
 
         // Also add to brain_score_history for trend tracking
         await supabase
@@ -237,6 +240,7 @@ export function useSaveCognitiveScore() {
         ) / 5;
         tier = getTierFromScore(overallScore);
         tierProgress = calculateTierProgress(overallScore);
+        scoreDelta = overallScore; // First game so all points are new
 
         const { error: createError } = await supabase
           .from('brain_scores')
@@ -284,6 +288,7 @@ export function useSaveCognitiveScore() {
         vocabulary: gameScores.vocabulary,
         overallScore,
         tier,
+        scoreDelta,
       };
     } catch (err) {
       console.error('[useSaveCognitiveScore] Error:', err);

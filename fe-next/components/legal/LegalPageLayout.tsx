@@ -84,10 +84,10 @@ export default function LegalPageLayout({
             variant="outline"
             onClick={() => router.push(`/${language}`)}
             className={cn(
-              'rounded-full',
+              'rounded-full font-bold',
               isDarkMode
-                ? 'border-slate-600 text-gray-300 hover:bg-slate-700'
-                : 'border-gray-300 text-gray-700 hover:bg-gray-100'
+                ? 'border-slate-500 bg-slate-700 text-slate-100 hover:bg-slate-600 hover:text-white'
+                : 'border-gray-400 bg-gray-100 text-gray-800 hover:bg-gray-200 hover:text-gray-900'
             )}
           >
             <ArrowLeft className="me-2 rtl:rotate-180" />

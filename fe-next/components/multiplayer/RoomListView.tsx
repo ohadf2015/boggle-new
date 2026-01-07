@@ -87,11 +87,29 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col px-2 sm:px-3 lg:px-4 pt-2 sm:pt-3 lg:pt-4 pb-3 lg:pb-4 min-h-0 gap-3 lg:gap-4 overflow-hidden">
-          {/* Room List Header */}
+          {/* Create Room Button - Above the fold on Desktop */}
           <motion.div
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.1 }}
+            className="hidden lg:block flex-shrink-0"
+          >
+            <Button
+              variant="success"
+              size="lg"
+              onClick={onCreateRoom}
+              className="max-w-md mx-auto w-full py-4 lg:py-5 text-base lg:text-lg font-bold uppercase"
+            >
+              <Plus className="w-5 h-5 lg:w-6 lg:h-6 me-2" />
+              {t('multiplayerFlow.roomList.createButton') || 'Create Room'}
+            </Button>
+          </motion.div>
+
+          {/* Room List Header */}
+          <motion.div
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.15 }}
             className="flex items-center justify-between flex-shrink-0"
           >
             <h3 className="text-sm sm:text-base lg:text-lg xl:text-xl font-bold uppercase text-neo-cream/70 flex items-center gap-2 lg:gap-3">
@@ -175,20 +193,20 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             )}
           </div>
 
-          {/* Create Room Button - Fixed at bottom */}
+          {/* Create Room Button - Mobile only (at bottom) */}
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="flex-shrink-0 pt-2"
+            className="lg:hidden flex-shrink-0 pt-2"
           >
             <Button
               variant="success"
               size="lg"
               onClick={onCreateRoom}
-              className="w-full py-4 lg:py-5 xl:py-6 text-base lg:text-lg xl:text-xl font-bold uppercase"
+              className="w-full py-4 text-base font-bold uppercase"
             >
-              <Plus className="w-5 h-5 lg:w-6 lg:h-6 me-2" />
+              <Plus className="w-5 h-5 me-2" />
               {t('multiplayerFlow.roomList.createButton') || 'Create Room'}
             </Button>
           </motion.div>

@@ -772,6 +772,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                 earthquakeShaking={earthquakeState === 'shaking'}
                 highlightedPath={keyboardInput.isTypingMode ? keyboardInput.highlightedCells : []}
                 onSingleTapDetected={tapDragGuidance.handleSingleTapDetected}
+                language={gameLanguage || 'en'}
               />
             </div>
           </div>
@@ -941,7 +942,7 @@ const InGameScreen = memo<InGameScreenProps>(({
         <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden max-h-full">
           {/* Stats row - Combo | Timer | Score - timer always centered and visible */}
           {remainingTime !== null && (
-            <div ref={gameStatsRef} className="flex items-center justify-center gap-1 md:gap-4 flex-shrink-0" role="status" aria-label="Game status">
+            <div ref={gameStatsRef} className="flex items-center justify-center gap-1 md:gap-4 flex-shrink-0 mb-0 md:mb-1" role="status" aria-label="Game status">
               {/* Combo (left - shows when level >= 2, placeholder otherwise for layout balance) */}
               {isPlaying && (
                 <div className="min-w-[50px] md:min-w-[90px] flex justify-end">
@@ -1002,7 +1003,7 @@ const InGameScreen = memo<InGameScreenProps>(({
           {/* Word Forming Area with feedback - centered below timer */}
           {/* Shows typed word when in keyboard mode, otherwise shows swiped word */}
           {isPlaying && (
-            <div className="flex items-center justify-center flex-shrink-0">
+            <div className="flex items-center justify-center flex-shrink-0 mb-0 md:mb-1">
               <WordFormingArea
                 word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
                 letterCount={keyboardInput.isTypingMode ? keyboardInput.typedWord.length : letterCount}
@@ -1044,7 +1045,7 @@ const InGameScreen = memo<InGameScreenProps>(({
 
           {/* Grid - Direct connection to timer row */}
           {/* Removed extra padding to prevent scroll - safe area handled by parent */}
-          <div className="flex-1 flex items-center justify-center min-h-0 overflow-hidden">
+          <div className="flex-1 flex items-center justify-center min-h-0 overflow-hidden -mt-1 md:-mt-2">
             <GridComponent
               key={isPlaying ? 'playing-grid' : 'spectating-grid'}
               grid={letterGrid}
@@ -1060,6 +1061,7 @@ const InGameScreen = memo<InGameScreenProps>(({
               earthquakeShaking={earthquakeState === 'shaking'}
               highlightedPath={keyboardInput.isTypingMode ? keyboardInput.highlightedCells : []}
               onSingleTapDetected={tapDragGuidance.handleSingleTapDetected}
+              language={gameLanguage || 'en'}
             />
           </div>
 

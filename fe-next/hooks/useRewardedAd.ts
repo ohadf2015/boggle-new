@@ -4,13 +4,14 @@ import { useState, useCallback } from 'react';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useIMAVideoAds } from '@/components/ads/IMAVideoAdsProvider';
 import { useGoogleAds } from '@/components/ads/GoogleAdsProvider';
-import { addCoins, COIN_REWARDS } from '@/utils/coinManager';
+import { COIN_REWARDS } from '@/utils/coinManager';
+import { useCoins } from '@/hooks/useCoins';
 
 export type AdStatus = 'idle' | 'loading' | 'showing' | 'completed' | 'error';
 
 interface UseRewardedAdOptions {
   /** Callback when ad is successfully completed and coins are awarded */
-  onRewardEarned?: (coinsAwarded: number) => void;
+  onRewardEarned?: (coinsAwarded: number) => void | Promise<void>;
   /** Callback when ad fails or is cancelled */
   onAdError?: (error: string) => void;
   /** Callback when ad starts playing */
@@ -55,6 +56,9 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   const [status, setStatus] = useState<AdStatus>('idle');
   const [error, setError] = useState<string | null>(null);
 
+  // Use unified unified coin hook
+  const { addCoins: addCoinsUnified } = useCoins();
+
   // Ad platform hooks
   const crazyGames = useCrazyGames();
   const imaVideoAds = useIMAVideoAds();
@@ -89,13 +93,13 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
           : 'simulation';
 
     // Award coins helper
-    const awardCoinsAndNotify = () => {
-      addCoins(rewardAmount, 'Watched Ad', {
+    const awardCoinsAndNotify = async () => {
+      await addCoinsUnified(rewardAmount, 'Watched Ad', {
         platform,
         timestamp: new Date().toISOString(),
       });
       setStatus('completed');
-      onRewardEarned?.(rewardAmount);
+      await onRewardEarned?.(rewardAmount);
 
       // Reset to idle after a short delay
       setTimeout(() => setStatus('idle'), 1500);

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Coins, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRewardedAd, AdStatus } from '@/hooks/useRewardedAd';
+import { useCoins } from '@/hooks/useCoins';
 import { cn } from '@/lib/utils';
 
 interface WatchAdButtonProps {
@@ -37,15 +38,19 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
   const [showSuccess, setShowSuccess] = useState(false);
   const [earnedAmount, setEarnedAmount] = useState(0);
 
+  const { coins: currentCoins, refreshCoins } = useCoins();
+
+  // Update effect to refresh coins when ad succeeds
   const { showAd, isAdAvailable, status, error, rewardAmount } = useRewardedAd({
-    onRewardEarned: (coins) => {
-      setEarnedAmount(coins);
+    onRewardEarned: async (earned) => {
+      setEarnedAmount(earned);
       setShowSuccess(true);
 
-      // Get current coins from localStorage for the callback
-      const stored = typeof window !== 'undefined' ? localStorage.getItem('lexiclash_coins') : null;
-      const balance = stored ? JSON.parse(stored) : { total: 0 };
-      onCoinsEarned(coins, balance.total);
+      // Refresh coins to get latest balance (especially for auth users)
+      // refreshCoins now returns the new balance, avoiding stale closure issues
+      // Note: freshCoins already includes the earned coins (added by useRewardedAd)
+      const freshCoins = await refreshCoins();
+      onCoinsEarned(earned, freshCoins);
 
       // Hide success after 2 seconds
       setTimeout(() => setShowSuccess(false), 2000);

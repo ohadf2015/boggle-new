@@ -16,26 +16,29 @@ interface ThemeProviderProps {
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: ThemeProviderProps): React.ReactElement => {
-    // Initialize with default value to avoid hydration mismatch
-    const [theme, setTheme] = useState<Theme>('dark');
-    const [mounted, setMounted] = useState<boolean>(false);
-
-    // Load saved theme from localStorage after mount
-    useEffect(() => {
-        const savedTheme = localStorage.getItem('boggle_theme');
-        if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
-            setTheme(savedTheme);
+    // Initialize theme synchronously from localStorage or default to 'dark'
+    // The blocking script in layout.tsx already sets the class, so we just sync state
+    const [theme, setTheme] = useState<Theme>(() => {
+        if (typeof window !== 'undefined') {
+            try {
+                const savedTheme = localStorage.getItem('boggle_theme');
+                if (savedTheme === 'light' || savedTheme === 'dark') {
+                    return savedTheme;
+                }
+            } catch (e) {
+                // localStorage access failed, use default
+            }
         }
-        setMounted(true);
-    }, []);
+        return 'dark';
+    });
 
+    // Sync theme class with state changes (but don't wait for mount since script already set it)
     useEffect(() => {
-        if (!mounted) return;
         const root = window.document.documentElement;
         root.classList.remove('light', 'dark');
         root.classList.add(theme);
         localStorage.setItem('boggle_theme', theme);
-    }, [theme, mounted]);
+    }, [theme]);
 
     const toggleTheme = (): void => {
         setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));

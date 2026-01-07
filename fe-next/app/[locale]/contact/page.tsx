@@ -338,7 +338,7 @@ export default function ContactPage(): React.ReactNode {
           )}
         >
           <p className={cn('text-xs', isDarkMode ? 'text-gray-500' : 'text-gray-400')}>
-            {t('contact.responseTime') || 'We typically respond within 24-48 hours'}
+            {t('contact.responseTime') || 'Estimated response time: 1-2 business days'}
           </p>
         </motion.div>
       </div>

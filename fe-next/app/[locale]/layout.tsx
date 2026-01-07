@@ -528,6 +528,22 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
         <html lang={validLocale} dir={dir} className={`${fredoka.variable} ${rubik.variable}`}>
             <head>
                 <meta charSet="utf-8" />
+                {/* Blocking script to set theme before React hydrates - prevents flash */}
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `
+                            (function() {
+                                try {
+                                    const savedTheme = localStorage.getItem('boggle_theme');
+                                    const theme = (savedTheme === 'light' || savedTheme === 'dark') ? savedTheme : 'dark';
+                                    document.documentElement.classList.add(theme);
+                                } catch (e) {
+                                    document.documentElement.classList.add('dark');
+                                }
+                            })();
+                        `,
+                    }}
+                />
                 {/* Preconnect hints for faster resource loading on slow connections */}
                 {/* Note: Google Fonts preconnects removed - now using next/font for zero CLS */}
                 <link rel="preconnect" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
@@ -558,12 +574,12 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <meta name="apple-mobile-web-app-title" content="LexiClash" />
             </head>
             <body className="antialiased screen-fit" suppressHydrationWarning>
-                {/* Google AdSense - using beforeInteractive for crawler verification */}
+                {/* Google AdSense - moved to afterInteractive to prevent blocking initial render */}
                 <Script
                     async
                     src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1896836706464880"
                     crossOrigin="anonymous"
-                    strategy="beforeInteractive"
+                    strategy="afterInteractive"
                 />
                 {/* Skip to main content link for keyboard/screen reader users */}
                 <a

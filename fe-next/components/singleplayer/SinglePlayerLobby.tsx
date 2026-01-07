@@ -459,11 +459,11 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
         className="max-w-xl mx-auto space-y-3 sm:space-y-4 px-2 xs:px-4 overflow-x-hidden"
       >
       {/* Title with back button */}
-      <div className="relative flex items-center justify-center mb-1">
+      <div className="relative flex items-center justify-center mb-1 px-16 overflow-visible">
         {onBack ? (
           <button
             onClick={onBack}
-            className="absolute start-0 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all text-neo-black dark:text-neo-white text-sm font-bold min-h-[44px] min-w-[44px]"
+            className="absolute start-0 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all text-neo-black dark:text-neo-white text-sm font-bold min-h-[44px] min-w-[44px] z-10"
           >
             <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
@@ -471,13 +471,13 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
         ) : (
           <Link
             href="/"
-            className="absolute start-0 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all text-neo-black dark:text-neo-white text-sm font-bold min-h-[44px] min-w-[44px]"
+            className="absolute start-0 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all text-neo-black dark:text-neo-white text-sm font-bold min-h-[44px] min-w-[44px] z-10"
           >
             <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
           </Link>
         )}
-        <h1 className="text-2xl sm:text-3xl font-black uppercase text-center text-neo-black dark:text-neo-white">
+        <h1 className="text-2xl sm:text-3xl font-black uppercase text-center text-neo-black dark:text-neo-white flex-1">
           {t('singlePlayer.preset.customGame') || 'Custom Game'}
         </h1>
       </div>
@@ -494,8 +494,16 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
       )}
 
       {/* Step 1: Mode Selection - 2x2 Grid */}
-      {(!useWizard || wizardStep === 1) && (
-        <>
+      <AnimatePresence mode="wait">
+        {(!useWizard || wizardStep === 1) && (
+          <motion.div
+            key="step-1"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
         <div className="text-center mb-2">
           <h2 className="text-lg font-bold text-neo-black dark:text-neo-white">
             {t('wizard.selectMode') || 'Select Game Mode'}
@@ -552,12 +560,21 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
           );
         })}
       </div>
-        </>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Step 2: Settings (Difficulty + Options combined) */}
-      {(!useWizard || wizardStep === 2) && mode !== 'daily' && (
-        <>
+      <AnimatePresence mode="wait">
+        {(!useWizard || wizardStep === 2) && mode !== 'daily' && (
+          <motion.div
+            key="step-2"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
         <div className="text-center mb-2">
           <h2 className="text-lg font-bold text-neo-black dark:text-neo-white">
             {t('wizard.gameSettings') || 'Game Settings'}
@@ -698,12 +715,21 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
             )}
           </CardContent>
         </Card>
-        </>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Step 3: Review & Start */}
-      {(!useWizard || wizardStep === 3) && (
-        <>
+      <AnimatePresence mode="wait">
+        {(!useWizard || wizardStep === 3) && (
+          <motion.div
+            key="step-3"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
         <div className="text-center mb-2">
           <h2 className="text-lg font-bold text-neo-black dark:text-neo-white">
             {t('wizard.reviewSettings') || 'Review & Start'}
@@ -763,8 +789,9 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
             </div>
           </CardContent>
         </Card>
-        </>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Wizard Navigation Buttons */}
       {useWizard && (

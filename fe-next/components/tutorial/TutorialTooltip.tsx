@@ -125,9 +125,9 @@ const TutorialTooltip: React.FC<TutorialTooltipProps> = ({
       initial={{ opacity: 0, scale: 0.9, y: 20 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9, y: 20 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30, mass: 0.8 }}
       className="fixed z-[10001] w-[320px] max-w-[90vw] pointer-events-auto"
-      style={tooltipStyle}
+      style={{ ...tooltipStyle, willChange: 'transform, opacity' }}
       onClick={(e) => e.stopPropagation()}
     >
       {/* Main tooltip card */}
@@ -149,10 +149,10 @@ const TutorialTooltip: React.FC<TutorialTooltipProps> = ({
               e.stopPropagation();
               onSkip();
             }}
-            className="w-7 h-7 bg-neo-white border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm hover:bg-neo-pink transition-colors"
+            className="w-8 h-8 bg-neo-white border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm hover:bg-neo-pink transition-colors overflow-visible"
             aria-label={t('tutorial.skip')}
           >
-            <X className="w-4 h-4 text-neo-black" />
+            <X className="w-5 h-5 text-neo-black" />
           </button>
         </div>
 

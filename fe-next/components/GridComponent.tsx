@@ -49,6 +49,8 @@ interface GridComponentProps {
   eliminatedLetters?: Set<string>;
   /** Callback when user taps a single cell without dragging (for tap-to-drag tutorial) */
   onSingleTapDetected?: (cell: { row: number; col: number; letter: string }) => void;
+  /** Language for keyboard input validation */
+  language?: Language;
 }
 
 /**
@@ -93,6 +95,7 @@ const GridComponent = memo<GridComponentProps>(({
   highlightedPath = [],
   eliminatedLetters,
   onSingleTapDetected,
+  language = 'en',
 }) => {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
@@ -109,9 +112,9 @@ const GridComponent = memo<GridComponentProps>(({
   // Using inline calculation to avoid any TDZ/initialization issues
   const effectiveRenderMode: PerformanceMode =
     (isLowEnd || prefersReducedMotion) ? 'minimal' :
-    performanceMode === 'minimal' ? 'minimal' :
-    performanceMode === 'reduced' ? 'reduced' :
-    'full';
+      performanceMode === 'minimal' ? 'minimal' :
+        performanceMode === 'reduced' ? 'reduced' :
+          'full';
 
   // Sound effects for earthquake
   const { playEarthquakeRumble, playEarthquakeShake } = useSoundEffects();
@@ -148,6 +151,7 @@ const GridComponent = memo<GridComponentProps>(({
     gridRef,
     fireRoundActive,
     onSingleTapDetected,
+    language,
   });
 
   // Calculate the word being formed from selected cells
@@ -178,7 +182,7 @@ const GridComponent = memo<GridComponentProps>(({
         const newRow = lastCell.row + dr;
         const newCol = lastCell.col + dc;
         if (newRow >= 0 && newRow < grid.length &&
-            newCol >= 0 && newCol < (grid[0]?.length || 0)) {
+          newCol >= 0 && newCol < (grid[0]?.length || 0)) {
           // Only hint cells that aren't already selected
           const isAlreadySelected = selectedCells.some(c => c.row === newRow && c.col === newCol);
           if (!isAlreadySelected) {
@@ -494,63 +498,63 @@ const GridComponent = memo<GridComponentProps>(({
                   animate={effectiveRenderMode === 'minimal'
                     ? { opacity: 1, rotateX: 0 } // Minimal mode: no complex animations
                     : earthquakePhase !== 'idle' ? (
-                        // OPTIMIZED MULTI-PHASE EARTHQUAKE ANIMATION
-                        earthquakePhase === 'rumble' ? {
-                          ...getPhaseAnimation.rumble.animate,
-                          rotateX: 0,
-                        } : earthquakePhase === 'quake' ? {
-                          // Phase 2: OPTIMIZED QUAKE - removed 3D transforms and motion blur
-                          x: shakeOffset.x,
-                          y: shakeOffset.y,
-                          rotate: shakeOffset.rotate,
-                          scale: shakeOffset.scale,
-                          opacity: 0.8, // Less transparent for better visibility
-                          rotateX: 0,
-                        } : earthquakePhase === 'settle' ? {
-                          ...getPhaseAnimation.settle.animate,
-                          rotateX: 0,
-                        } : {
-                          // Idle state
-                          x: 0,
-                          y: 0,
-                          rotate: 0,
-                          scale: 1,
-                          opacity: 1,
-                          rotateX: 0,
-                        }
-                      ) : {
-                        scale: isSelected ? 1.05 : (isFading ? 1.02 : 1),
-                        opacity: 1,
-                        rotate: 0,
-                        y: isSelected ? -2 : 0,
+                      // OPTIMIZED MULTI-PHASE EARTHQUAKE ANIMATION
+                      earthquakePhase === 'rumble' ? {
+                        ...getPhaseAnimation.rumble.animate,
+                        rotateX: 0,
+                      } : earthquakePhase === 'quake' ? {
+                        // Phase 2: OPTIMIZED QUAKE - removed 3D transforms and motion blur
+                        x: shakeOffset.x,
+                        y: shakeOffset.y,
+                        rotate: shakeOffset.rotate,
+                        scale: shakeOffset.scale,
+                        opacity: 0.8, // Less transparent for better visibility
+                        rotateX: 0,
+                      } : earthquakePhase === 'settle' ? {
+                        ...getPhaseAnimation.settle.animate,
+                        rotateX: 0,
+                      } : {
+                        // Idle state
                         x: 0,
+                        y: 0,
+                        rotate: 0,
+                        scale: 1,
+                        opacity: 1,
                         rotateX: 0,
                       }
+                    ) : {
+                      scale: isSelected ? 1.05 : (isFading ? 1.02 : 1),
+                      opacity: 1,
+                      rotate: 0,
+                      y: isSelected ? -2 : 0,
+                      x: 0,
+                      rotateX: 0,
+                    }
                   }
                   whileTap={effectiveRenderMode === 'minimal' ? undefined : { scale: 0.95 }}
                   transition={effectiveRenderMode === 'minimal'
                     ? { duration: 0 } // Instant transitions for low-end devices
                     : earthquakePhase !== 'idle' ? (
-                        earthquakePhase === 'rumble' ? {
-                          ...getPhaseAnimation.rumble.transition,
-                          delay: shakeOffset.delay,
-                        } : earthquakePhase === 'quake' ? {
-                          // OPTIMIZED: Faster spring physics
-                          ...getPhaseAnimation.quake.transition,
-                          delay: shakeOffset.delay,
-                        } : earthquakePhase === 'settle' ? {
-                          ...getPhaseAnimation.settle.transition,
-                          delay: shakeOffset.delay,
-                        } : {
-                          duration: 0.1,
-                        }
-                      ) : {
-                        // Elastic snap-back after shake or normal animation
-                        type: 'spring',
-                        stiffness: 200,
-                        damping: 15,
-                        delay: reduceMotion ? 0 : (animateOnMount ? (i + j) * 0.03 : 0),
+                      earthquakePhase === 'rumble' ? {
+                        ...getPhaseAnimation.rumble.transition,
+                        delay: shakeOffset.delay,
+                      } : earthquakePhase === 'quake' ? {
+                        // OPTIMIZED: Faster spring physics
+                        ...getPhaseAnimation.quake.transition,
+                        delay: shakeOffset.delay,
+                      } : earthquakePhase === 'settle' ? {
+                        ...getPhaseAnimation.settle.transition,
+                        delay: shakeOffset.delay,
+                      } : {
+                        duration: 0.1,
                       }
+                    ) : {
+                      // Elastic snap-back after shake or normal animation
+                      type: 'spring',
+                      stiffness: 200,
+                      damping: 15,
+                      delay: reduceMotion ? 0 : (animateOnMount ? (i + j) * 0.03 : 0),
+                    }
                   }
                   className={cn(
                     "aspect-square flex items-center justify-center font-black cursor-pointer relative overflow-hidden",
@@ -592,12 +596,12 @@ const GridComponent = memo<GridComponentProps>(({
                       boxShadow: comboColors.isRainbow
                         ? '0 0 25px rgba(255, 51, 102, 0.8), 0 0 50px rgba(0, 255, 255, 0.5), 0 0 75px rgba(255, 51, 102, 0.3), 6px 6px 0 #000'
                         : comboLevel >= 7
-                        ? '0 0 22px rgba(255, 51, 102, 0.8), 0 0 40px rgba(255, 107, 53, 0.5), 0 0 60px rgba(255, 51, 102, 0.3), 5px 5px 0 #000'
-                        : comboLevel >= 5
-                        ? '0 0 18px rgba(255, 107, 53, 0.8), 0 0 35px rgba(255, 51, 102, 0.5), 5px 5px 0 #000'
-                        : comboLevel >= 3
-                        ? '0 0 15px rgba(255, 107, 53, 0.7), 0 0 25px rgba(255, 150, 50, 0.4), 4px 4px 0 #000'
-                        : '0 0 12px rgba(255, 200, 100, 0.6), 0 0 20px rgba(255, 150, 50, 0.3), 4px 4px 0 #000',
+                          ? '0 0 22px rgba(255, 51, 102, 0.8), 0 0 40px rgba(255, 107, 53, 0.5), 0 0 60px rgba(255, 51, 102, 0.3), 5px 5px 0 #000'
+                          : comboLevel >= 5
+                            ? '0 0 18px rgba(255, 107, 53, 0.8), 0 0 35px rgba(255, 51, 102, 0.5), 5px 5px 0 #000'
+                            : comboLevel >= 3
+                              ? '0 0 15px rgba(255, 107, 53, 0.7), 0 0 25px rgba(255, 150, 50, 0.4), 4px 4px 0 #000'
+                              : '0 0 12px rgba(255, 200, 100, 0.6), 0 0 20px rgba(255, 150, 50, 0.3), 4px 4px 0 #000',
                     }),
                     ...(isSelected && comboColors.isRainbow ? {
                       background: 'linear-gradient(135deg, #FF3366, #FF6B35, #FFE135, #BFFF00, #00FFFF, #FF1493, #8B5CF6)',
@@ -626,10 +630,10 @@ const GridComponent = memo<GridComponentProps>(({
                           background: comboColors.isRainbow
                             ? 'radial-gradient(circle, rgba(255,51,102,0.7), rgba(0,255,255,0.4) 50%, transparent 75%)'
                             : comboLevel >= 5
-                            ? 'radial-gradient(circle, rgba(255,107,53,0.7), rgba(255,51,102,0.4) 50%, transparent 75%)'
-                            : comboLevel >= 3
-                            ? 'radial-gradient(circle, rgba(255,150,50,0.6), transparent 70%)'
-                            : 'radial-gradient(circle, rgba(255,255,255,0.6), transparent 70%)',
+                              ? 'radial-gradient(circle, rgba(255,107,53,0.7), rgba(255,51,102,0.4) 50%, transparent 75%)'
+                              : comboLevel >= 3
+                                ? 'radial-gradient(circle, rgba(255,150,50,0.6), transparent 70%)'
+                                : 'radial-gradient(circle, rgba(255,255,255,0.6), transparent 70%)',
                         }}
                         initial={{ scale: 0.3, opacity: 1 }}
                         animate={{ scale: 3, opacity: 0 }}
@@ -643,10 +647,10 @@ const GridComponent = memo<GridComponentProps>(({
                             background: comboColors.isRainbow
                               ? 'radial-gradient(circle at center, rgba(255, 51, 102, 0.9), rgba(0, 255, 255, 0.5) 40%, transparent 70%)'
                               : comboLevel >= 5
-                              ? 'radial-gradient(circle at center, rgba(255, 107, 53, 0.9), rgba(255, 51, 102, 0.5) 40%, transparent 70%)'
-                              : comboLevel >= 3
-                              ? 'radial-gradient(circle at center, rgba(255, 150, 50, 0.8), transparent 60%)'
-                              : 'radial-gradient(circle at center, rgba(255, 255, 255, 0.95), transparent 60%)',
+                                ? 'radial-gradient(circle at center, rgba(255, 107, 53, 0.9), rgba(255, 51, 102, 0.5) 40%, transparent 70%)'
+                                : comboLevel >= 3
+                                  ? 'radial-gradient(circle at center, rgba(255, 150, 50, 0.8), transparent 60%)'
+                                  : 'radial-gradient(circle at center, rgba(255, 255, 255, 0.95), transparent 60%)',
                             filter: 'blur(4px)',
                             borderRadius: '10px'
                           }}
@@ -664,17 +668,17 @@ const GridComponent = memo<GridComponentProps>(({
                             border: comboColors.isRainbow
                               ? '3px solid rgba(255, 51, 102, 0.9)'
                               : comboLevel >= 7
-                              ? '3px solid rgba(255, 51, 102, 0.8)'
-                              : comboLevel >= 5
-                              ? '3px solid rgba(255, 107, 53, 0.8)'
-                              : '2px solid rgba(255, 150, 50, 0.7)',
+                                ? '3px solid rgba(255, 51, 102, 0.8)'
+                                : comboLevel >= 5
+                                  ? '3px solid rgba(255, 107, 53, 0.8)'
+                                  : '2px solid rgba(255, 150, 50, 0.7)',
                             boxShadow: comboColors.isRainbow
                               ? '0 0 16px rgba(255, 51, 102, 0.7), inset 0 0 12px rgba(0, 255, 255, 0.4), 0 0 24px rgba(0, 255, 255, 0.3)'
                               : comboLevel >= 7
-                              ? '0 0 14px rgba(255, 51, 102, 0.6), 0 0 20px rgba(255, 107, 53, 0.4)'
-                              : comboLevel >= 5
-                              ? '0 0 12px rgba(255, 107, 53, 0.6), 0 0 18px rgba(255, 150, 50, 0.3)'
-                              : '0 0 10px rgba(255, 150, 50, 0.5)',
+                                ? '0 0 14px rgba(255, 51, 102, 0.6), 0 0 20px rgba(255, 107, 53, 0.4)'
+                                : comboLevel >= 5
+                                  ? '0 0 12px rgba(255, 107, 53, 0.6), 0 0 18px rgba(255, 150, 50, 0.3)'
+                                  : '0 0 10px rgba(255, 150, 50, 0.5)',
                           }}
                           initial={{ scale: 0.8, opacity: 0 }}
                           animate={{
@@ -694,8 +698,8 @@ const GridComponent = memo<GridComponentProps>(({
                             const colors = comboColors.isRainbow
                               ? ['#FF3366', '#00FFFF', '#FFE135', '#FF1493', '#BFFF00', '#8B5CF6']
                               : comboLevel >= 5
-                              ? ['#FF3366', '#FF6B35', '#FFE135', '#FF1493', '#FFA500', '#FFD700']
-                              : ['#FFD700', '#FF6B35', '#FF3366', '#FFA500', '#FFE135', '#FF9500'];
+                                ? ['#FF3366', '#FF6B35', '#FFE135', '#FF1493', '#FFA500', '#FFD700']
+                                : ['#FFD700', '#FF6B35', '#FF3366', '#FFA500', '#FFE135', '#FF9500'];
                             return (
                               <motion.div
                                 key={`first-burst-${idx}`}
@@ -736,8 +740,8 @@ const GridComponent = memo<GridComponentProps>(({
                             const particleColors = comboColors.isRainbow
                               ? ['#FF1493', '#00FFFF', '#FFE135', '#BFFF00', '#FF3366', '#8B5CF6']
                               : comboLevel >= 5
-                              ? ['#FF3366', '#FF6B35', '#FFE135', '#FF1493', '#FFA500', '#FFD700']
-                              : ['#FF6B35', '#FFE135', '#FF3366', '#FFA500', '#FFD700', '#FF9500'];
+                                ? ['#FF3366', '#FF6B35', '#FFE135', '#FF1493', '#FFA500', '#FFD700']
+                                : ['#FF6B35', '#FFE135', '#FF3366', '#FFA500', '#FFD700', '#FF9500'];
                             const particleColor = particleColors[idx % particleColors.length];
                             return (
                               <motion.div
