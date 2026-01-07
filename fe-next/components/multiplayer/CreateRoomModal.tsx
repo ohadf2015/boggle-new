@@ -26,6 +26,7 @@ import {
 } from '@/utils/profileStorage';
 import { AVATARS, getAvatarPath, getRandomAvatar } from '@/utils/avatarConfig';
 import { sanitizeRoomName } from '@/utils/consts';
+import { cn } from '@/lib/utils';
 import type { Language } from '@/shared/types/game';
 
 interface CreateRoomConfig {

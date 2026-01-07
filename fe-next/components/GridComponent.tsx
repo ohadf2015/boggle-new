@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/utils';
-import type { LetterGrid, GridPosition } from '@/types';
+import type { LetterGrid, GridPosition, Language } from '@/types';
 
 // Import extracted utilities
 import {
