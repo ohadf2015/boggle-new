@@ -36,7 +36,7 @@ export function useCoinActions({
   const [targetWordRevealed, setTargetWordRevealed] = useState(false);
 
   // Use unified unified coin hook
-  const { coins: currentCoins, addCoins, spendCoins, canAfford, refreshCoins } = useCoins();
+  const { coins: currentCoins, addCoins, spendCoins, canAfford } = useCoins();
 
   // Award coins for completing the daily challenge
   useEffect(() => {
@@ -58,21 +58,14 @@ export function useCoinActions({
 
       const awardCoinsAsync = async () => {
         try {
-          const beforeBalance = await refreshCoins();
-
           // Use hook to add coins (handles both auth and guest modes)
-          await addCoins(reward.total, 'Daily Challenge', {
+          const newBalance = await addCoins(reward.total, 'Daily Challenge', {
             puzzleDate,
             language,
             solved: solved ? 'yes' : 'no',
             efficiencyScore: efficiencyScore || 0,
             streakDays: streakDays || 0,
           });
-
-          const afterBalance = await refreshCoins();
-          if (afterBalance <= beforeBalance) {
-            throw new Error('Coin award did not apply');
-          }
 
           // Set reward state for UI display
           setCoinReward({
@@ -95,8 +88,7 @@ export function useCoinActions({
 
       void awardCoinsAsync();
     }
-  }, [isNewCompletion, puzzleDate, language, solved, efficiencyScore, streakDays, addCoins, refreshCoins]);
-
+  }, [isNewCompletion, puzzleDate, language, solved, efficiencyScore, streakDays, addCoins]);
 
   // Handle reveal target word (costs coins)
   const handleRevealTargetWord = useCallback(async () => {

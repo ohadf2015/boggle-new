@@ -27,7 +27,7 @@ import { DIFFICULTIES } from '@/utils/consts';
 import { cn } from '@/lib/utils';
 import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
 import { wordErrorToast } from '@/components/NeoToast';
-import { calculateComboMilestoneReward, isComboMilestone } from '@/utils/coinManager';
+import { awardComboCoins } from '@/utils/coinManager';
 import { hapticForWordScore, hapticError } from '@/utils/haptics';
 import { useAnnouncer } from '@/components/GameAnnouncer';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
@@ -35,7 +35,6 @@ import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useTrainingAnalysis } from '@/hooks/useTrainingAnalysis';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
-import { useCoins } from '@/hooks/useCoins';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
 import KeyboardHintTooltip from '@/components/game/KeyboardHintTooltip';
 import { TrainingHints, TrainingProgressBar, SkillUnlockToast } from '@/components/training';
@@ -75,7 +74,6 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   onQuit,
 }) => {
   const { t } = useLanguage();
-  const { addCoins } = useCoins();
   const {
     playWordAcceptedSound,
     playComboSound,
@@ -184,17 +182,11 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       }
     },
     onComboMilestone: (level) => {
-      if (!isComboMilestone(level)) return;
-
-      const coinsAwarded = calculateComboMilestoneReward(level);
-      if (coinsAwarded <= 0) return;
-
-      void addCoins(coinsAwarded, 'Combo Milestone', {
-        comboLevel: level,
-        gameMode: 'singleplayer',
-      }).then(() => {
+      // Award coins for combo milestones (5, 10, 15, 20, 25, 30)
+      const coinsAwarded = awardComboCoins(level, 'singleplayer');
+      if (coinsAwarded > 0) {
         setComboCoinReward(coinsAwarded);
-      });
+      }
     },
     trackMaxCombo: true,
   });
