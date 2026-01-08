@@ -148,21 +148,22 @@ export const WizardNavigationButtons: React.FC<WizardNavigationButtonsProps> = (
 }) => {
   return (
     <div className={cn("flex items-center gap-3 pt-4 border-t-2 border-neo-black/10 dark:border-slate-600", className)}>
-      {/* Back Button */}
-      {currentStep > 1 && (
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onBack}
-          className="flex-1 sm:flex-initial min-h-[48px] gap-2"
-        >
-          <ArrowLeft className="rtl:rotate-180" />
-          <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
-        </Button>
-      )}
-
-      {/* Spacer when no back button */}
-      {currentStep === 1 && <div className="flex-1 sm:hidden" />}
+      {/* Back Button - always reserve space to prevent layout shift */}
+      <div className="flex-1 sm:flex-initial">
+        {currentStep > 1 ? (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onBack}
+            className="w-full sm:w-auto min-h-[48px] gap-2"
+          >
+            <ArrowLeft className="rtl:rotate-180" />
+            <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
+          </Button>
+        ) : (
+          <div className="sm:hidden" />
+        )}
+      </div>
 
       {/* Next/Start Button */}
       {currentStep < 3 ? (

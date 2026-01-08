@@ -58,6 +58,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [rankedProgress, setRankedProgress] = useState<RankedProgress | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [isSupabaseEnabled, setIsSupabaseEnabled] = useState<boolean>(false);
+  const lastVisibleTimeRef = useRef<number>(Date.now());
 
   /**
    * Submit any pending daily challenge result after OAuth signup
@@ -610,7 +611,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // Handle tab visibility change - ensure loading is reset when coming back to tab
     // This prevents the avatar section from being stuck at loading
     let visibilityTimeout: NodeJS.Timeout | null = null;
-    const lastVisibleTimeRef = useRef<number>(Date.now());
 
     const handleVisibilityChange = async () => {
       if (document.visibilityState === 'visible' && isMounted) {

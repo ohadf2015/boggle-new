@@ -198,16 +198,16 @@ function AuthCallbackContent(): React.ReactNode {
         // IMPORTANT: Check for existing session FIRST with retry
         // This handles the case where another tab already completed the auth
         // Retry mechanism handles cookie sync timing issues across tabs
-        for (let attempt = 0; attempt < 3; attempt++) {
+        for (let attempt = 0; attempt < 5; attempt++) {
           const { data: existingSession } = await supabase.auth.getSession();
           if (existingSession?.session) {
             logger.log(`Auth callback: Session already exists (attempt ${attempt + 1}), redirecting`);
             safeRedirect(next);
             return;
           }
-          // Wait 300ms before retry to allow cookies to sync
-          if (attempt < 2) {
-            await new Promise(resolve => setTimeout(resolve, 300));
+          // Wait 400ms before retry to allow cookies to sync across tabs (increased from 300ms)
+          if (attempt < 4) {
+            await new Promise(resolve => setTimeout(resolve, 400));
           }
         }
 
