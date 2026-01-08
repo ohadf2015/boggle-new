@@ -116,6 +116,28 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     logger.log('[SFX] Game active state changed:', active);
   }, []);
 
+  // Handle iOS Safari audio device errors (InvalidStateError: Failed to start the audio device)
+  // These are thrown by the Web Audio API when the device can't start (silent mode, Bluetooth issues, etc.)
+  // We catch them globally to prevent unhandled rejections being reported to Sentry
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      const error = event.reason;
+      // Check if this is an iOS Safari audio device error
+      if (error instanceof DOMException &&
+          error.name === 'InvalidStateError' &&
+          error.message.includes('audio device')) {
+        // Prevent this error from being reported to Sentry
+        event.preventDefault();
+        logger.warn('[SFX] iOS Safari audio device error (silenced):', error.message);
+      }
+    };
+
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    return () => window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+  }, []);
+
   // Track tab visibility to block sounds when tab is hidden
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -146,6 +168,11 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
         },
         onloaderror: (id, err) => {
           logger.warn(`[SFX] Failed to load ${key}:`, err);
+        },
+        onplayerror: (id, err) => {
+          // Silently handle iOS Safari audio device errors
+          // These occur when the device can't start audio (e.g., silent mode, bluetooth issues)
+          logger.warn(`[SFX] Failed to play ${key}:`, err);
         },
       });
     });
@@ -195,7 +222,13 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
       howl.rate(1.0); // Reset to normal
     }
 
-    howl.play();
+    // Wrap play in try-catch to handle iOS Safari audio device errors
+    try {
+      howl.play();
+    } catch (err) {
+      // Silently handle play errors (iOS can throw InvalidStateError)
+      logger.warn(`[SFX] Play error for ${soundKey}:`, err);
+    }
   }, [audioUnlocked, sfxMuted, sfxVolume]);
 
   // Play combo sound with dynamic pitch based on combo level
@@ -342,11 +375,15 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     howl.loop(true);
     howl.volume(0.3 * sfxVolume); // Lower volume for ambient sound
 
-    // Play and store sound ID
-    const soundId = howl.play();
-    fireCrackleLoopIdRef.current = soundId;
-
-    logger.log('[SFX] Started fire crackle loop');
+    // Play and store sound ID - wrap in try-catch for iOS Safari errors
+    try {
+      const soundId = howl.play();
+      fireCrackleLoopIdRef.current = soundId;
+      logger.log('[SFX] Started fire crackle loop');
+    } catch (err) {
+      // Silently handle play errors (iOS can throw InvalidStateError)
+      logger.warn('[SFX] Fire crackle loop play error:', err);
+    }
   }, [audioUnlocked, sfxMuted, sfxVolume]);
 
   // Stop fire crackle ambient loop

@@ -19,7 +19,7 @@ interface ModeCardProps {
   description: string;
   href: string;
   icon: React.ReactNode;
-  variant: 'cyan' | 'pink';
+  variant: 'cyan' | 'pink' | 'purple';
   className?: string;
   liveBadge?: LiveBadgeProps;
 }
@@ -55,6 +55,13 @@ const ModeCard: React.FC<ModeCardProps> = ({
       iconBg: 'bg-neo-navy',
       iconText: 'text-neo-pink',
       arrow: 'bg-neo-navy text-neo-pink',
+    },
+    purple: {
+      bg: 'bg-gradient-to-br from-neo-purple to-purple-400',
+      hoverBg: 'hover:from-neo-purple hover:to-purple-300',
+      iconBg: 'bg-neo-navy',
+      iconText: 'text-neo-purple',
+      arrow: 'bg-neo-navy text-neo-purple',
     },
   };
 

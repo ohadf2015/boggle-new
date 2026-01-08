@@ -638,10 +638,10 @@ const InGameScreen = memo<InGameScreenProps>(({
                   animate={{ scale: 1 }}
                   className="flex flex-col items-center"
                 >
-                  <div className="landscape-stat-secondary text-neo-black">
+                  <div className="landscape-stat-secondary text-white">
                     #{playerData.rank}
                   </div>
-                  <div className="landscape-stat-label text-neo-black">
+                  <div className="landscape-stat-label text-white">
                     {t('common.rank') || 'RANK'}
                   </div>
                 </motion.div>
@@ -650,10 +650,10 @@ const InGameScreen = memo<InGameScreenProps>(({
               {/* Words Found Count */}
               {isPlaying && (
                 <div className="flex flex-col items-center">
-                  <div className="landscape-stat-secondary text-neo-black">
+                  <div className="landscape-stat-secondary text-white">
                     {normalizedFoundWords.length}
                   </div>
-                  <div className="landscape-stat-label text-neo-black">
+                  <div className="landscape-stat-label text-white">
                     {t('common.words') || 'WORDS'}
                   </div>
                 </div>

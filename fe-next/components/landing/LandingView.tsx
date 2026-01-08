@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
-import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap } from 'lucide-react';
+import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -214,7 +214,7 @@ const LandingView: React.FC = () => {
           initial={{ opacity: 0.3, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, delay: 0.05 }}
-          className={`w-full ${isLandscape ? 'flex gap-3 flex-1 min-h-0' : 'grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-2 lg:gap-3'}`}
+          className={`w-full ${isLandscape ? 'flex gap-3 flex-1 min-h-0' : 'grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-2 lg:gap-3'}`}
         >
           {/* Multiplayer Card */}
           {isLandscape ? (
@@ -267,6 +267,17 @@ const LandingView: React.FC = () => {
               href={`/${language}/singleplayer`}
               icon={<User className="w-6 h-6" />}
               variant="cyan"
+            />
+          )}
+
+          {/* Brain Training Card - Only on non-landscape */}
+          {!isLandscape && (
+            <ModeCard
+              title={t('landing.brainTraining') || 'Brain Training'}
+              description={t('landing.brainTrainingDesc') || 'Track cognitive growth'}
+              href={`/${language}/brain`}
+              icon={<Brain className="w-6 h-6" />}
+              variant="purple"
             />
           )}
         </motion.div>

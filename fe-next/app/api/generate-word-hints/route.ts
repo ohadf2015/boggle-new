@@ -270,6 +270,15 @@ export async function POST(request: NextRequest) {
 
   // Ensure we have an object before Zod validation (additional safety check)
   const bodyObj = body as Record<string, unknown>;
+
+  // Additional runtime safety check for undefined body
+  if (bodyObj === undefined || bodyObj === null) {
+    return NextResponse.json({
+      error: 'Invalid request',
+      details: ['Request body is required'],
+    }, { status: 400 });
+  }
+
   if (typeof bodyObj.targetWord === 'undefined') {
     return NextResponse.json({
       error: 'Invalid request',

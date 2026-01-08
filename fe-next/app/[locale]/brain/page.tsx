@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Brain, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -14,6 +14,7 @@ import CognitiveDomainGrid from '@/components/brain/CognitiveDomainGrid';
 import CognitiveRadarChart from '@/components/brain/CognitiveRadarChart';
 import QuickDrillsSection from '@/components/brain/QuickDrillsSection';
 import ScientificTipsCarousel from '@/components/brain/ScientificTipsCarousel';
+import FirstGameCelebration from '@/components/brain/FirstGameCelebration';
 
 /**
  * Header component for Brain Training page
@@ -69,7 +70,23 @@ export default function BrainTrainingPage() {
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
   const { isAuthenticated } = useAuth();
-  const { brainScore, isLoading, error, refresh, initializeBrainScore } = useBrainScore();
+  const { brainScore, recentGameScores, isLoading, error, refresh, initializeBrainScore } = useBrainScore();
+
+  // State for first game celebration
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [hasShownCelebration, setHasShownCelebration] = useState(false);
+
+  // Show celebration modal for first game (only once per session)
+  useEffect(() => {
+    if (brainScore && brainScore.gamesAnalyzed === 1 && !hasShownCelebration) {
+      const timer = setTimeout(() => {
+        setShowCelebration(true);
+        setHasShownCelebration(true);
+      }, 500); // Small delay for dramatic effect
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [brainScore, hasShownCelebration]);
 
   const handleBack = () => {
     router.push(`/${language}`);
@@ -319,7 +336,11 @@ export default function BrainTrainingPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.15 }}
         >
-          <CognitiveDomainGrid domains={brainScore.domains} />
+          <CognitiveDomainGrid
+            domains={brainScore.domains}
+            gamesAnalyzed={brainScore.gamesAnalyzed}
+            recentGameScores={recentGameScores}
+          />
         </motion.div>
 
         {/* Quick Drills */}
@@ -366,6 +387,23 @@ export default function BrainTrainingPage() {
           </motion.div>
         )}
       </main>
+
+      {/* First Game Celebration Modal */}
+      {brainScore && (
+        <FirstGameCelebration
+          isOpen={showCelebration}
+          onClose={() => setShowCelebration(false)}
+          overallScore={brainScore.overallScore}
+          tier={brainScore.tier}
+          domains={{
+            processingSpeed: brainScore.domains.processingSpeed.score,
+            workingMemory: brainScore.domains.workingMemory.score,
+            attention: brainScore.domains.attention.score,
+            flexibility: brainScore.domains.flexibility.score,
+            vocabulary: brainScore.domains.vocabulary.score,
+          }}
+        />
+      )}
     </div>
   );
 }

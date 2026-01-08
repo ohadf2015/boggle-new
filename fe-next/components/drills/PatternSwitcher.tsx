@@ -7,9 +7,10 @@ import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
-import { isWordOnBoard } from '@/utils/utils';
+import WordFormingArea from '@/components/game/WordFormingArea';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { LetterGrid, Language } from '@/types';
+import type { WordFeedback } from '@/components/game/WordFormingArea';
 
 // Level configurations
 const LEVEL_CONFIGS = [
@@ -66,8 +67,9 @@ export default function PatternSwitcher({
   const [wordsFound, setWordsFound] = useState<string[]>([]);
   const [score, setScore] = useState(0);
   const [patternsCompleted, setPatternsCompleted] = useState(0);
-  const [lastFeedback, setLastFeedback] = useState<'correct' | 'wrong' | null>(null);
+  const [currentFeedback, setCurrentFeedback] = useState<WordFeedback | null>(null);
   const startTimeRef = useRef<number | null>(null);
+  const wordsFoundSetRef = useRef<Set<string>>(new Set());
 
   // Generate available lengths from words
   const availableLengths = [...new Set(availableWords.map(w => w.word.length))].sort();
@@ -92,50 +94,66 @@ export default function PatternSwitcher({
     setWordsFound([]);
     setScore(0);
     setPatternsCompleted(0);
+    setCurrentFeedback(null);
+    wordsFoundSetRef.current.clear();
     startTimeRef.current = Date.now();
     setPhase('playing');
   }, [generatePattern, levelConfig.lives]);
 
-  // Handle word submission
+  // Handle word submission with integrated validation feedback
   const handleWordSubmit = useCallback((word: string) => {
     if (phase !== 'playing') return;
 
-    const upperWord = word.toUpperCase();
+    const normalizedWord = word.toLowerCase().trim();
+    const upperWord = normalizedWord.toUpperCase();
+    const now = Date.now();
 
-    // Check if word can be formed on the board
-    if (!isWordOnBoard(upperWord, grid, language)) {
-      setLastFeedback('wrong');
-      setPhase('feedback');
+    // Check for duplicates first
+    if (wordsFoundSetRef.current.has(normalizedWord)) {
+      setCurrentFeedback({
+        id: `duplicate-${now}`,
+        type: 'duplicate',
+        word: upperWord,
+        message: t('playerView.wordAlreadyFound') || 'Already found!',
+        timestamp: now,
+      });
       playErrorSound?.();
-      setTimeout(() => {
-        setLastFeedback(null);
-        setPhase('playing');
-      }, 500);
       return;
     }
 
-    const wordExists = availableWords.some(w => w.word.toUpperCase() === upperWord);
-    if (!wordExists || wordsFound.includes(upperWord)) {
-      setLastFeedback('wrong');
-      setPhase('feedback');
+    // Check if word exists in available words
+    const wordExists = availableWords.some(w => w.word.toLowerCase() === normalizedWord);
+    if (!wordExists) {
+      setCurrentFeedback({
+        id: `reject-${now}`,
+        type: 'rejected',
+        word: upperWord,
+        message: t('playerView.wordNotInList') || 'Word not available',
+        timestamp: now,
+      });
       playErrorSound?.();
-      setTimeout(() => {
-        setLastFeedback(null);
-        setPhase('playing');
-      }, 500);
       return;
     }
 
+    // Check drill-specific requirement: word length must match pattern
     if (word.length === requiredLength) {
-      // Correct length!
+      // Correct length! Show positive feedback
+      wordsFoundSetRef.current.add(normalizedWord);
       setWordsFound(prev => [...prev, upperWord]);
       const wordScore = word.length * 15;
       setScore(prev => prev + wordScore);
-      setLastFeedback('correct');
-      setPhase('feedback');
+
+      // Show positive feedback using WordFormingArea component
+      setCurrentFeedback({
+        id: `accept-${now}`,
+        type: 'accepted',
+        word: upperWord,
+        score: wordScore,
+        timestamp: now,
+      });
 
       setTimeout(() => {
-        setLastFeedback(null);
+        setCurrentFeedback(null);
 
         // Move to next in pattern
         const nextIndex = patternIndex + 1;
@@ -153,25 +171,27 @@ export default function PatternSwitcher({
           setPatternIndex(nextIndex);
           setRequiredLength(pattern[nextIndex]);
         }
-        setPhase('playing');
-      }, 500);
+      }, 800);
     } else {
-      // Wrong length
+      // Wrong length - show specific feedback
       setLives(prev => prev - 1);
-      setLastFeedback('wrong');
-      setPhase('feedback');
+      setCurrentFeedback({
+        id: `reject-${now}`,
+        type: 'rejected',
+        word: upperWord,
+        message: t('brain.drills.wrongLength', { length: requiredLength }),
+        timestamp: now,
+      });
       playErrorSound?.();
 
       setTimeout(() => {
-        setLastFeedback(null);
+        setCurrentFeedback(null);
         if (lives <= 1) {
           setPhase('complete');
-        } else {
-          setPhase('playing');
         }
-      }, 500);
+      }, 800);
     }
-  }, [phase, availableWords, wordsFound, requiredLength, patternIndex, pattern, lives, generatePattern, grid, language, playErrorSound]);
+  }, [phase, availableWords, requiredLength, patternIndex, pattern, lives, generatePattern, playErrorSound, t]);
 
   // Results
   const getResults = useCallback(() => {
@@ -298,29 +318,23 @@ export default function PatternSwitcher({
 
         {(phase === 'playing' || phase === 'feedback') && (
           <div className="w-full max-w-md space-y-4 relative">
+            {/* Word feedback area - shows validation results */}
+            <div className="flex justify-center">
+              <WordFormingArea
+                word=""
+                letterCount={0}
+                feedback={currentFeedback}
+                compact={false}
+              />
+            </div>
+
             <GridComponent
               grid={grid}
               interactive={phase === 'playing'}
               onWordSubmit={handleWordSubmit}
+              hideWordPreview={false}
               className="w-full"
             />
-
-            <AnimatePresence>
-              {lastFeedback && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.5 }}
-                  className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-neo"
-                >
-                  {lastFeedback === 'correct' ? (
-                    <CheckCircle2 className="w-20 h-20 text-neo-green" />
-                  ) : (
-                    <XCircle className="w-20 h-20 text-neo-red" />
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
         )}
 

@@ -103,7 +103,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="p-3 space-y-4 bg-white dark:bg-slate-800">
+            <div className="p-3 space-y-4 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">
               {/* Total Score Display */}
               <div className="text-center pb-3 border-b border-gray-200 dark:border-gray-700">
                 <div className="text-3xl font-black text-purple-600 dark:text-purple-400">
@@ -116,7 +116,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
 
               {/* Score Formula Breakdown */}
               <div className="space-y-2">
-                <div className="text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">
+                <div className="text-[10px] font-bold text-gray-700 dark:text-gray-400 uppercase mb-2">
                   {t('wordHunt.results.howItsCalculated') || 'How it\'s calculated'}
                 </div>
 

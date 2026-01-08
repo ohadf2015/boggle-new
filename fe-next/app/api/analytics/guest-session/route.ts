@@ -53,8 +53,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { getGuestSession: getFn } = await getTrackers();
-    const session = await getFn(sessionId);
+    // Get the trackers first to catch any import errors early
+    const trackers = await getTrackers();
+    const session = await trackers.getGuestSession(sessionId);
 
     if (!session) {
       return NextResponse.json(
@@ -88,6 +89,9 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    // Get the trackers first to catch any import errors early
+    const trackers = await getTrackers();
+
     const body = await request.json();
     const {
       action, // 'create' or 'update' or 'link'
@@ -112,9 +116,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const { getOrCreateGuestSession: createFn } = await getTrackers();
-
-      const session = await createFn({
+      const session = await trackers.getOrCreateGuestSession({
         sessionId,
         deviceType: deviceType || null,
         browser: browser || null,
@@ -148,8 +150,6 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const { updateGuestSession: updateFn } = await getTrackers();
-
       const updates: any = {};
       if (deviceType !== undefined) updates.deviceType = deviceType;
       if (browser !== undefined) updates.browser = browser;
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
       if (country !== undefined) updates.country = country;
       updates.lastVisitAt = new Date();
 
-      const success = await updateFn(sessionId, updates);
+      const success = await trackers.updateGuestSession(sessionId, updates);
 
       if (!success) {
         return NextResponse.json(
@@ -184,9 +184,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const { linkGuestSessionToUser: linkFn } = await getTrackers();
-
-      const success = await linkFn(sessionId, userId);
+      const success = await trackers.linkGuestSessionToUser(sessionId, userId);
 
       if (!success) {
         return NextResponse.json(

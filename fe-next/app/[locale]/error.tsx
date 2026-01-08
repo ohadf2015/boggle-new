@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { captureError } from '@/utils/sentry';
+import { translations } from '../../translations';
 
 function isChunkLoadError(error: Error): boolean {
   const message = error.message?.toLowerCase() || '';
@@ -42,6 +44,23 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const params = useParams();
+  const locale = (params?.locale as string) || 'en';
+
+  // Helper function to get translation
+  const t = (path: string): string => {
+    try {
+      const keys = path.split('.');
+      let current: unknown = translations[locale as keyof typeof translations] || translations.en;
+      for (const key of keys) {
+        current = (current as Record<string, unknown>)[key];
+        if (current === undefined) return path;
+      }
+      return current as string;
+    } catch {
+      return path;
+    }
+  };
   useEffect(() => {
     // Auto-refresh on chunk load errors (stale deployment cache)
     if (isChunkLoadError(error)) {
@@ -78,31 +97,42 @@ export default function Error({
   const isChunkError = isChunkLoadError(error);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-4">
-      <div className="text-center max-w-md">
-        <div className="text-6xl mb-4">{isChunkError ? '🔄' : '😵'}</div>
-        <h2 className="text-2xl font-bold text-white mb-2">
-          {isChunkError ? 'Update Available' : 'Something went wrong!'}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-50 via-lime-50 to-cyan-100 px-4 py-8">
+      <div className="neo-card max-w-lg w-full p-8 text-center animate-neo-pop rotate-[-1deg]">
+        {/* Floating icon with gentle animation */}
+        <div className="text-7xl mb-6 animate-pulse">
+          {isChunkError ? '🔄' : '🌟'}
+        </div>
+
+        <h2 className="text-3xl font-black text-neo-black mb-3 uppercase tracking-wide font-neo-display">
+          {isChunkError ? t('errors.updateHeading') : t('errors.errorHeading')}
         </h2>
-        <p className="text-gray-400 mb-6">
+
+        <p className="text-neo-gray text-lg mb-8 leading-relaxed">
           {isChunkError
-            ? 'A new version of the app is available. Please refresh to continue.'
-            : error.message || 'An unexpected error occurred. Please try again.'}
+            ? t('errors.updateMessage')
+            : error.message || t('errors.errorMessage')}
         </p>
-        <div className="flex gap-3 justify-center">
+
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
             onClick={handleRefresh}
-            className="px-5 py-2 rounded-lg font-bold bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white transition-all"
+            className="btn-neo-primary px-6 py-3 text-lg"
           >
-            {isChunkError ? 'Refresh Now' : 'Try again'}
+            {isChunkError ? `✨ ${t('errors.refreshPage')}` : `🔄 ${t('common.retry')}`}
           </button>
           <button
             onClick={() => window.location.href = '/'}
-            className="px-5 py-2 rounded-lg font-bold border border-slate-600 text-gray-300 hover:bg-slate-700 transition-all"
+            className="btn-neo-secondary px-6 py-3 text-lg"
           >
-            Go home
+            🏠 {t('common.back')}
           </button>
         </div>
+
+        {/* Subtle encouragement */}
+        <p className="text-neo-gray text-sm mt-6 opacity-75">
+          {isChunkError ? t('errors.updateProgress') : t('errors.errorProgress')}
+        </p>
       </div>
     </div>
   );

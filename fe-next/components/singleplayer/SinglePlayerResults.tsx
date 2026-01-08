@@ -916,7 +916,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         </div>
 
         {/* Fixed Bottom Tab Bar */}
-        <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black safe-area-bottom">
+        <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy text-neo-cream border-t-4 border-neo-black safe-area-bottom">
           <MobileTabBar
             tabs={mobileTabs}
             activeTab={mobileActiveTab}

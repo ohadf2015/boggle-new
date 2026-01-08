@@ -88,7 +88,7 @@ export function CompactLeaderboard({
       className
     )}>
       {/* Compact Header with Race Track theme */}
-      <div className="bg-neo-navy px-2 py-1 flex items-center justify-between">
+      <div className="bg-neo-navy text-neo-cream px-2 py-1 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
           <Zap className="w-3.5 h-3.5 text-neo-yellow" />
           <span className="text-[10px] font-black uppercase text-neo-cream tracking-wider">
@@ -109,8 +109,8 @@ export function CompactLeaderboard({
             className="flex items-center gap-1.5 px-1.5 py-1 rounded-neo bg-gradient-to-r from-neo-yellow to-neo-orange border-2 border-neo-black shadow-hard-sm"
           >
             {/* Crown Icon */}
-            <div className="w-7 h-7 rounded-full bg-neo-black flex items-center justify-center flex-shrink-0">
-              <Crown className="w-4 h-4 text-neo-yellow" />
+            <div className="w-7 h-7 rounded-full bg-neo-black text-neo-yellow flex items-center justify-center flex-shrink-0">
+              <Crown className="w-4 h-4" />
             </div>
 
             {/* Avatar */}

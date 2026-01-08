@@ -46,7 +46,7 @@ export default function UnsubscribePage() {
   };
 
   return (
-    <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4">
+    <div className="min-h-screen bg-neo-navy text-neo-cream flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -62,8 +62,8 @@ export default function UnsubscribePage() {
             </>
           ) : status === 'success' ? (
             <>
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-neo-lime border-4 border-neo-black rounded-full mb-6">
-                <CheckCircle className="w-10 h-10 text-neo-black" />
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-neo-lime border-4 border-neo-black rounded-full mb-6 text-neo-black">
+                <CheckCircle className="w-10 h-10" />
               </div>
 
               <h1 className="text-2xl font-black text-neo-cream mb-4">

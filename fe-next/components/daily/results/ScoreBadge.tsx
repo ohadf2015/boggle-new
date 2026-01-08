@@ -37,7 +37,7 @@ export const ScoreBadge: React.FC<ScoreBadgeProps> = ({
         <span className="font-black text-white text-sm">{attemptsUsed}/10</span>
       </div>
     ) : (
-      <div className="flex items-center gap-1.5 px-2 py-1 bg-gray-500 rounded-neo border-2 border-neo-black">
+      <div className="flex items-center gap-1.5 px-2 py-1 bg-gray-700 dark:bg-gray-600 rounded-neo border-2 border-neo-black">
         <X className="w-4 h-4 text-white" />
         <span className="font-black text-white text-sm">X/10</span>
       </div>

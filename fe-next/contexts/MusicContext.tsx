@@ -127,7 +127,8 @@ export function MusicProvider({ children }: MusicProviderProps) {
                 error.message.includes('audio device')) {
                 // Prevent this error from being reported to Sentry
                 event.preventDefault();
-                logger.warn('[Music] iOS Safari audio device error (silenced):', error.message);
+                // Log only in development - this is expected, handled behavior on iOS Safari
+                logger.log('[Music] iOS Safari audio device error (silenced):', error.message);
             }
         };
 
@@ -168,8 +169,8 @@ export function MusicProvider({ children }: MusicProviderProps) {
                                 }
                             })
                             .catch((resumeErr: Error) => {
-                                // Silently handle iOS Safari audio device errors
-                                logger.warn(`[Music] AudioContext resume failed in onplayerror:`, resumeErr.message);
+                                // Silently handle iOS Safari audio device errors - log only in development
+                                logger.log(`[Music] AudioContext resume failed in onplayerror:`, resumeErr.message);
                             });
                     }
                 },
@@ -261,14 +262,15 @@ export function MusicProvider({ children }: MusicProviderProps) {
                 const result = Howler.ctx.resume();
                 if (result && typeof result.catch === 'function') {
                     result.catch((err: Error) => {
-                        // Silently handle iOS Safari audio device errors
+                        // Silently handle iOS Safari audio device errors - log only in development
                         // These occur when the device can't start audio (e.g., silent mode, bluetooth issues)
-                        logger.warn(`[Music] ${reason} - AudioContext resume failed:`, err.message);
+                        logger.log(`[Music] ${reason} - AudioContext resume failed:`, err.message);
                     });
                 }
                 logger.log(`[Music] ${reason} - resumed AudioContext`);
             } catch (err) {
-                logger.warn(`[Music] ${reason} - AudioContext resume error:`, err);
+                // Log only in development - expected errors on iOS Safari
+                logger.log(`[Music] ${reason} - AudioContext resume error:`, err);
             }
         }
 
@@ -290,8 +292,8 @@ export function MusicProvider({ children }: MusicProviderProps) {
                 currentHowlRef.current.volume(targetVolume);
                 logger.log(`[Music] ${reason} - resumed current Howl`);
             } catch (err) {
-                // Silently handle play errors (iOS can throw InvalidStateError)
-                logger.warn(`[Music] ${reason} - Howl play error:`, err);
+                // Silently handle play errors (iOS can throw InvalidStateError) - log only in development
+                logger.log(`[Music] ${reason} - Howl play error:`, err);
             }
         }
     }, []);
@@ -401,11 +403,13 @@ export function MusicProvider({ children }: MusicProviderProps) {
                 const result = Howler.ctx.resume();
                 if (result && typeof result.catch === 'function') {
                     result.catch((err: Error) => {
-                        logger.warn('[Music] unlockAudio - AudioContext resume failed:', err.message);
+                        // Log only in development - expected iOS Safari audio device errors
+                        logger.log('[Music] unlockAudio - AudioContext resume failed:', err.message);
                     });
                 }
             } catch (err) {
-                logger.warn('[Music] unlockAudio - AudioContext error:', err);
+                // Log only in development - expected iOS Safari audio device errors
+                logger.log('[Music] unlockAudio - AudioContext error:', err);
             }
         }
 

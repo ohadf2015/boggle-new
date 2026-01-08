@@ -569,7 +569,10 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     // Set timeout to ensure we get words even if API is slow/fails
     const timeoutId = setTimeout(() => {
       if (!availableWordsRef.current) {
-        console.warn('Grid solve API timed out');
+        // Log only in development - this is non-critical fallback behavior
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Grid solve API timed out (non-critical, using empty word list)');
+        }
         setAvailableWords({ easy: [], medium: [], hard: [] });
       }
     }, 5000); // 5 second timeout
@@ -1440,12 +1443,12 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               animate={{ opacity: 1, y: 0 }}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-cream/95 backdrop-blur-sm border-2 border-neo-black rounded-full shadow-hard-sm"
             >
-              <List className="w-3.5 h-3.5 text-neo-black/70" />
+              <List className="w-4 h-4 text-neo-black/70" />
               {foundWords.slice(-3).reverse().map((fw, i) => (
                 <span
                   key={`${fw.word}-${fw.timestamp}`}
                   className={cn(
-                    "px-2 py-0.5 text-xs font-bold uppercase rounded-full border border-neo-black/30",
+                    "px-3 py-1 text-sm font-bold uppercase rounded-full border border-neo-black/30",
                     i === 0 ? "bg-neo-yellow text-neo-black" : "bg-neo-cream text-neo-black/80",
                     fw.isValid === false && "line-through opacity-60 bg-neo-red/20"
                   )}
@@ -1454,7 +1457,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                 </span>
               ))}
               {foundWords.length > 3 && (
-                <span className="text-xs font-bold text-neo-black/60">
+                <span className="text-sm font-bold text-neo-black/60">
                   +{foundWords.length - 3}
                 </span>
               )}

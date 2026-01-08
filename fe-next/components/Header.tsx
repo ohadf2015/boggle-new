@@ -419,8 +419,8 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                     "shadow-hard-sm hover:shadow-hard"
                                                 )}
                                             >
-                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cyan border-2 border-neo-black">
-                                                    <BookOpen className="w-4 h-4 text-neo-black" />
+                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cyan border-2 border-neo-black text-neo-black">
+                                                    <BookOpen className="w-4 h-4" />
                                                 </span>
                                                 <span>{t('footer.aboutGame') || 'About the Game'}</span>
                                             </Link>
@@ -433,8 +433,8 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                     "shadow-hard-sm hover:shadow-hard"
                                                 )}
                                             >
-                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-yellow border-2 border-neo-black">
-                                                    <Trophy className="w-4 h-4 text-neo-black" />
+                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-yellow border-2 border-neo-black text-neo-black">
+                                                    <Trophy className="w-4 h-4" />
                                                 </span>
                                                 <span>{t('footer.leaderboard') || 'Leaderboard'}</span>
                                             </Link>
@@ -447,8 +447,8 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                     "shadow-hard-sm hover:shadow-hard"
                                                 )}
                                             >
-                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cream border-2 border-neo-black">
-                                                    <ScrollText className="w-4 h-4 text-neo-black" />
+                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cream border-2 border-neo-black text-neo-black">
+                                                    <ScrollText className="w-4 h-4" />
                                                 </span>
                                                 <span>{t('legal.termsOfService')}</span>
                                             </Link>
@@ -477,8 +477,8 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                     "shadow-hard-sm hover:shadow-hard"
                                                 )}
                                             >
-                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-pink border-2 border-neo-black">
-                                                    <Coffee className="w-4 h-4 text-white" />
+                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-pink border-2 border-neo-black text-white">
+                                                    <Coffee className="w-4 h-4" />
                                                 </span>
                                                 <span>{t('support.kofiFooter')}</span>
                                             </a>

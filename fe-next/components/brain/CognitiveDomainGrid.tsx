@@ -7,6 +7,9 @@ import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import type { GameCognitiveScore } from '@/shared/types/cognitive';
+import NewBadge from './NewBadge';
+import DeltaDisplay from './DeltaDisplay';
 
 type TrendType = 'improving' | 'stable' | 'declining';
 
@@ -23,6 +26,8 @@ interface CognitiveDomainGridProps {
     flexibility: DomainScore;
     vocabulary: DomainScore;
   };
+  gamesAnalyzed?: number;
+  recentGameScores?: GameCognitiveScore[];
 }
 
 const DOMAIN_CONFIG = {
@@ -75,15 +80,38 @@ const TrendIcon = ({ trend }: { trend: TrendType }) => {
 };
 
 /**
+ * Calculate delta for a domain between current and previous game
+ */
+function calculateDomainDelta(
+  domainKey: keyof typeof DOMAIN_CONFIG,
+  recentScores: GameCognitiveScore[]
+): number {
+  if (recentScores.length < 2) return 0;
+
+  const currentScore = recentScores[0][domainKey];
+  const previousScore = recentScores[1][domainKey];
+
+  return currentScore - previousScore;
+}
+
+/**
  * Cognitive Domain Grid Component
  * Displays the 5 cognitive domains with their scores and trends.
  */
-export default function CognitiveDomainGrid({ domains }: CognitiveDomainGridProps) {
+export default function CognitiveDomainGrid({
+  domains,
+  gamesAnalyzed = 0,
+  recentGameScores = []
+}: CognitiveDomainGridProps) {
   const { theme } = useTheme();
   const { t } = useLanguage();
   const isDarkMode = theme === 'dark';
 
   const domainEntries = Object.entries(domains) as [keyof typeof DOMAIN_CONFIG, DomainScore][];
+
+  // Show NEW badge for game 1, delta for game 2, trends for 3+ games
+  const showNewBadge = gamesAnalyzed === 1;
+  const showDelta = gamesAnalyzed === 2 && recentGameScores.length >= 2;
 
   return (
     <TooltipProvider>
@@ -120,7 +148,13 @@ export default function CognitiveDomainGrid({ domains }: CognitiveDomainGridProp
                       )}>
                         <Icon className="w-5 h-5 text-neo-black" />
                       </div>
-                      <TrendIcon trend={domainData.trend} />
+                      {showNewBadge ? (
+                        <NewBadge />
+                      ) : showDelta ? (
+                        <DeltaDisplay delta={calculateDomainDelta(domainKey, recentGameScores)} />
+                      ) : (
+                        <TrendIcon trend={domainData.trend} />
+                      )}
                     </div>
 
                     <p className={cn(

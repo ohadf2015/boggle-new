@@ -122,9 +122,9 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
         onClick={!isDisabled ? showAd : undefined}
       >
         {/* Reward badge */}
-        <div className="absolute top-2 end-2 flex items-center gap-1 px-2.5 py-1 bg-neo-yellow rounded-full border-2 border-neo-black shadow-hard-sm">
-          <Coins className="w-4 h-4 text-neo-black" />
-          <span className="font-black text-sm text-neo-black">+{rewardAmount}</span>
+        <div className="absolute top-2 end-2 flex items-center gap-1 px-2.5 py-1 bg-neo-yellow rounded-full border-2 border-neo-black shadow-hard-sm text-neo-black">
+          <Coins className="w-4 h-4" />
+          <span className="font-black text-sm">+{rewardAmount}</span>
         </div>
 
         {/* Main content */}

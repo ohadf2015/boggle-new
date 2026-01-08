@@ -27,6 +27,13 @@ Sentry.init({
       }
     }
 
+    // Filter out non-critical analytics API errors
+    // These are already handled gracefully with timeouts and error catching
+    const requestUrl = event.request?.url || event.contexts?.trace?.data?.url;
+    if (requestUrl && typeof requestUrl === 'string' && requestUrl.includes('/api/analytics/guest-session')) {
+      return null;
+    }
+
     const error = hint.originalException;
     if (error instanceof Error) {
       const errorMessage = error.message.toLowerCase();

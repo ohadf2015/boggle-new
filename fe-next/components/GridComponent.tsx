@@ -564,7 +564,7 @@ const GridComponent = memo<GridComponentProps>(({
                         ? `${comboColors.textColor || 'text-neo-black'} ${comboColors.border} z-10 ${comboColors.shadow}`
                         : `${comboColors.bg} ${comboColors.textColor || 'text-neo-black'} border-3 ${comboColors.border} z-10 ${comboColors.shadow}`
                       : isHighlighted
-                        ? "bg-neo-purple text-white border-3 border-neo-purple z-10 animate-hint-glow"
+                        ? "letter-tile-gradient text-neo-black border-3 border-neo-yellow/60 z-10 shadow-[0_0_12px_rgba(255,225,53,0.4)]"
                         : isEliminated
                           ? "bg-gray-400/60 text-gray-500/50 border-3 border-gray-400/40 shadow-none cursor-not-allowed"
                           : "letter-tile-gradient text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed",

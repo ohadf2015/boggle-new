@@ -240,7 +240,8 @@ export function useBrainScore(): UseBrainScoreReturn {
         }));
       }
     }
-  }, [isAuthenticated, user, supabase]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user]);
 
   // Initialize brain score for new users
   const initializeBrainScore = useCallback(async () => {
@@ -277,7 +278,8 @@ export function useBrainScore(): UseBrainScoreReturn {
     } catch (err) {
       logger.error('Error initializing brain score:', err);
     }
-  }, [isAuthenticated, user, supabase, fetchBrainScore]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user, fetchBrainScore]);
 
   // Refresh function
   const refresh = useCallback(async () => {

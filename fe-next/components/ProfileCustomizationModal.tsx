@@ -281,9 +281,9 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                       )}
                     >
                       {isNameValid ? (
-                        <Check className="text-neo-black w-4 h-4" />
+                        <Check className="text-neo-black dark:text-neo-black w-4 h-4" />
                       ) : (
-                        <X className="text-neo-white w-4 h-4" />
+                        <X className="text-neo-black dark:text-neo-white w-4 h-4" />
                       )}
                     </motion.div>
                   )}

@@ -1,0 +1,281 @@
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Brain, Sparkles, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useTheme } from '@/utils/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+
+interface FirstGameCelebrationProps {
+  isOpen: boolean;
+  onClose: () => void;
+  overallScore: number;
+  tier: string;
+  domains: {
+    processingSpeed: number;
+    workingMemory: number;
+    attention: number;
+    flexibility: number;
+    vocabulary: number;
+  };
+}
+
+/**
+ * FirstGameCelebration Component
+ *
+ * Celebratory modal shown after completing the first brain training game.
+ * Features confetti-like particles, animated score reveal, and encouraging messaging.
+ */
+export default function FirstGameCelebration({
+  isOpen,
+  onClose,
+  overallScore,
+  tier,
+  domains
+}: FirstGameCelebrationProps) {
+  const { theme } = useTheme();
+  const { t } = useLanguage();
+  const isDarkMode = theme === 'dark';
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setShowConfetti(true);
+      // Stop confetti after 3 seconds
+      const timer = setTimeout(() => setShowConfetti(false), 3000);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60"
+        onClick={onClose}
+      >
+        {/* Confetti Particles */}
+        {showConfetti && (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            {Array.from({ length: 50 }).map((_, i) => (
+              <motion.div
+                key={i}
+                className={cn(
+                  'absolute w-2 h-2 rounded-full',
+                  i % 5 === 0 ? 'bg-neo-yellow' :
+                  i % 5 === 1 ? 'bg-neo-cyan' :
+                  i % 5 === 2 ? 'bg-neo-purple' :
+                  i % 5 === 3 ? 'bg-neo-green' :
+                  'bg-neo-orange'
+                )}
+                initial={{
+                  x: '50vw',
+                  y: '50vh',
+                  scale: 0,
+                  rotate: 0
+                }}
+                animate={{
+                  x: `${Math.random() * 100}vw`,
+                  y: `${Math.random() * 100}vh`,
+                  scale: [0, 1, 0.5],
+                  rotate: Math.random() * 360,
+                  opacity: [1, 1, 0]
+                }}
+                transition={{
+                  duration: 2 + Math.random(),
+                  ease: "easeOut"
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Modal Content */}
+        <motion.div
+          initial={{ scale: 0.8, rotate: -5 }}
+          animate={{ scale: 1, rotate: 0 }}
+          exit={{ scale: 0.8, opacity: 0 }}
+          transition={{ type: "spring", damping: 20 }}
+          className={cn(
+            'relative max-w-md w-full rounded-neo border-4 border-neo-black shadow-hard-lg p-8',
+            isDarkMode ? 'bg-slate-800' : 'bg-white'
+          )}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className={cn(
+              'absolute top-3 right-3 p-2 rounded-neo border-2 border-neo-black',
+              'transition-all hover:translate-y-[-2px] hover:shadow-hard-sm',
+              isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-neo-cream text-neo-black'
+            )}
+          >
+            <X className="w-4 h-4" />
+          </button>
+
+          {/* Animated Brain Icon */}
+          <motion.div
+            className="flex justify-center mb-4"
+            animate={{
+              scale: [1, 1.1, 1],
+              rotate: [0, 5, -5, 0]
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            <div className="w-20 h-20 rounded-neo border-3 border-neo-black bg-neo-purple flex items-center justify-center">
+              <Brain className="w-12 h-12 text-white" />
+            </div>
+          </motion.div>
+
+          {/* Title */}
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className={cn(
+              'text-3xl font-black text-center mb-2 uppercase',
+              isDarkMode ? 'text-neo-white' : 'text-neo-black'
+            )}
+          >
+            {t('brain.firstGameComplete')}
+          </motion.h2>
+
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className={cn(
+              'text-center mb-6 text-sm',
+              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+            )}
+          >
+            {t('brain.baselineEstablished')}
+          </motion.p>
+
+          {/* Overall Score */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.4, type: "spring" }}
+            className={cn(
+              'mb-6 p-4 rounded-neo border-3 border-neo-black text-center',
+              isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+            )}
+          >
+            <p className={cn(
+              'text-sm font-bold uppercase mb-1',
+              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+            )}>
+              {t('brain.overallScore')}
+            </p>
+            <div className="flex items-baseline justify-center gap-2">
+              <motion.span
+                className={cn(
+                  'text-5xl font-black',
+                  isDarkMode ? 'text-neo-cyan' : 'text-neo-purple'
+                )}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+              >
+                {overallScore}
+              </motion.span>
+              <span className={cn(
+                'text-2xl font-bold',
+                isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+              )}>
+                /100
+              </span>
+            </div>
+            <p className={cn(
+              'text-xs font-bold uppercase mt-1',
+              isDarkMode ? 'text-neo-white' : 'text-neo-black'
+            )}>
+              {t(`brain.tiers.${tier}`)}
+            </p>
+          </motion.div>
+
+          {/* Domain Scores Preview */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="space-y-2 mb-6"
+          >
+            {Object.entries(domains).map(([key, value], index) => (
+              <motion.div
+                key={key}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.8 + index * 0.05 }}
+                className={cn(
+                  'flex items-center justify-between p-2 rounded-neo border-2 border-neo-black',
+                  isDarkMode ? 'bg-slate-700/50' : 'bg-white'
+                )}
+              >
+                <span className={cn(
+                  'text-xs font-bold',
+                  isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                )}>
+                  {t(`brain.domains.${key}`)}
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className={cn(
+                    'text-sm font-black',
+                    isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                  )}>
+                    {value}
+                  </span>
+                  <div className="flex items-center gap-1 px-1.5 py-0.5 rounded border border-neo-black bg-neo-yellow">
+                    <Sparkles className="w-2.5 h-2.5 text-neo-black" />
+                    <span className="text-[9px] font-black text-neo-black uppercase">
+                      {t('brain.newBadge')}
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Call to Action */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2 }}
+            className={cn(
+              'p-4 rounded-neo border-2 border-neo-black text-center',
+              'bg-gradient-to-r from-neo-purple to-purple-400'
+            )}
+          >
+            <p className="text-sm font-bold text-white mb-2">
+              🔥 {t('brain.playMoreForTrends', { count: 2 })}
+            </p>
+            <button
+              onClick={onClose}
+              className={cn(
+                'w-full px-6 py-3 rounded-neo font-black uppercase',
+                'border-3 border-neo-black shadow-hard',
+                'transition-all hover:translate-y-[-2px] hover:shadow-hard-lg',
+                'bg-neo-cyan text-neo-black'
+              )}
+            >
+              {t('brain.playAgain')}
+            </button>
+          </motion.div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
