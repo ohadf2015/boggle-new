@@ -87,7 +87,7 @@ export default function ContactPage(): React.ReactNode {
             onClick={() => router.push(`/${language}`)}
             className={cn(
               'rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-slate-800 text-white' : 'bg-white text-neo-black'
+              isDarkMode ? 'bg-slate-800 text-white hover:bg-slate-700 hover:text-white' : 'bg-white text-neo-black hover:bg-neo-cream'
             )}
           >
             <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />

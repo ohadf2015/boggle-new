@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useState, useContext, useEffect, useCallback, useMemo, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback, useMemo, ReactNode, useRef } from 'react';
 import {
   supabase,
   getProfile,
@@ -26,6 +26,7 @@ import {
   subscribeToAuthSync,
   broadcastSignedOut,
   broadcastAuthSuccess,
+  broadcastSessionRefreshed,
   type AuthSyncMessage,
 } from '@/utils/crossTabAuthSync';
 
@@ -504,6 +505,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             if (!session) {
               // Token refresh failed - sign out
               await clearAuthState('Token refresh failed');
+            } else {
+              // Notify other tabs of successful token refresh
+              broadcastSessionRefreshed(session.user.id);
             }
             // Even on successful refresh, ensure loading is false
             if (isMounted) {
@@ -606,10 +610,56 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // Handle tab visibility change - ensure loading is reset when coming back to tab
     // This prevents the avatar section from being stuck at loading
     let visibilityTimeout: NodeJS.Timeout | null = null;
-    const handleVisibilityChange = () => {
+    const lastVisibleTimeRef = useRef<number>(Date.now());
+
+    const handleVisibilityChange = async () => {
       if (document.visibilityState === 'visible' && isMounted) {
-        // When tab becomes visible, ensure loading is reset after a short delay
-        // This catches any edge cases where loading got stuck
+        // Check if tab was inactive for >10 minutes
+        const now = Date.now();
+        const timeInactive = now - lastVisibleTimeRef.current;
+        const TEN_MINUTES = 10 * 60 * 1000;
+
+        if (timeInactive > TEN_MINUTES && user) {
+          // Verify session is still valid after long inactivity
+          logger.log('Tab visible after long inactivity, checking session validity');
+          if (supabase) {
+            const { data: sessionData } = await supabase.auth.getSession();
+            if (!sessionData?.session && isMounted) {
+              logger.warn('Session expired during inactivity');
+              await clearAuthState('Session expired during inactivity');
+              return;
+            }
+          }
+        }
+
+        // Always sync session when tab becomes visible (fixes stuck auth issue when logging in with multiple tabs)
+        logger.log('Tab became visible, syncing session state');
+        if (supabase) {
+          const { data: sessionData } = await supabase.auth.getSession();
+          if (sessionData?.session?.user) {
+            // Session exists - ensure our state reflects it
+            if (!user || user.id !== sessionData.session.user.id) {
+              if (isMounted) {
+                logger.log('Session synced from cookies on tab visibility');
+                setUser(sessionData.session.user);
+                try {
+                  await fetchUserData(sessionData.session.user.id, sessionData.session.user.user_metadata);
+                } catch (err) {
+                  logger.warn('Error fetching user data on tab visibility:', err);
+                }
+              }
+            }
+          } else if (user && isMounted) {
+            // Session doesn't exist but we think user is logged in - clear state
+            logger.warn('No session found on tab visibility but user state exists');
+            await clearAuthState('Session not found on tab visibility');
+          }
+        }
+
+        // Update last visible timestamp
+        lastVisibleTimeRef.current = now;
+
+        // Existing loading state reset logic
         if (visibilityTimeout) clearTimeout(visibilityTimeout);
         visibilityTimeout = setTimeout(() => {
           if (isMounted) {
