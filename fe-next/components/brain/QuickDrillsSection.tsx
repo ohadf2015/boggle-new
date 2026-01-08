@@ -1,17 +1,18 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { Zap, Brain, Target, Shuffle, BookOpen, Lock, Info } from 'lucide-react';
+import { Zap, Brain, Target, Shuffle, BookOpen, Lock, Info, Trophy, BarChart3, Play } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import type { DrillProgress, DrillType } from '@/shared/types/cognitive';
 
 interface Drill {
-  id: string;
+  id: DrillType;
   icon: React.ElementType;
   domain: string;
   color: string;
@@ -62,19 +63,28 @@ const DRILLS: Drill[] = [
   },
 ];
 
+interface QuickDrillsSectionProps {
+  drillProgress?: DrillProgress[];
+}
+
 /**
  * Quick Drills Section
- * Horizontal scroll list of brain training drills with unlock status.
+ * Grid of brain training drills with unlock status and player stats.
  */
-export default function QuickDrillsSection() {
+export default function QuickDrillsSection({ drillProgress = [] }: QuickDrillsSectionProps) {
   const router = useRouter();
   const { theme } = useTheme();
   const { t, language } = useLanguage();
   const { profile } = useAuth();
   const isDarkMode = theme === 'dark';
-  
+
   // Get games played count from profile
   const gamesPlayed = profile?.total_games || 0;
+
+  // Helper to get drill progress by drill type
+  const getDrillStats = (drillId: DrillType): DrillProgress | undefined => {
+    return drillProgress.find(p => p.drillType === drillId);
+  };
 
   const handleDrillClick = (drill: Drill, isUnlocked: boolean) => {
     if (isUnlocked) {
@@ -92,37 +102,39 @@ export default function QuickDrillsSection() {
           {t('brain.quickDrills')}
         </h2>
 
-        {/* Horizontal Scroll Container */}
-        <div className="overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-          <div className="flex gap-3" style={{ minWidth: 'max-content' }}>
-            {DRILLS.map((drill, index) => {
-              const Icon = drill.icon;
-              const isUnlocked = gamesPlayed >= drill.unlockRequirement;
-              const gamesRemaining = Math.max(0, drill.unlockRequirement - gamesPlayed);
+        {/* 2-Column Grid Layout */}
+        <div className="grid grid-cols-2 gap-3">
+          {DRILLS.map((drill, index) => {
+            const Icon = drill.icon;
+            const isUnlocked = gamesPlayed >= drill.unlockRequirement;
+            const gamesRemaining = Math.max(0, drill.unlockRequirement - gamesPlayed);
+            const stats = getDrillStats(drill.id);
 
-              const progressPercent = drill.unlockRequirement > 0 
-                ? Math.min(100, (gamesPlayed / drill.unlockRequirement) * 100)
-                : 100;
+            const progressPercent = drill.unlockRequirement > 0
+              ? Math.min(100, (gamesPlayed / drill.unlockRequirement) * 100)
+              : 100;
 
-              const drillButton = (
-                <motion.button
-                  key={drill.id}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  onClick={() => handleDrillClick(drill, isUnlocked)}
-                  disabled={!isUnlocked}
-                  className={cn(
-                    'flex items-center gap-2.5 p-2.5 rounded-neo border-3 border-neo-black',
-                    'min-w-[140px] transition-all relative',
-                    isUnlocked
-                      ? 'shadow-hard-sm hover:translate-y-[-2px] hover:shadow-hard active:translate-y-[2px] active:shadow-none'
-                      : 'opacity-75 cursor-not-allowed',
-                    isDarkMode ? 'bg-slate-800' : 'bg-white'
-                  )}
-                >
+            const drillButton = (
+              <motion.button
+                key={drill.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                onClick={() => handleDrillClick(drill, isUnlocked)}
+                disabled={!isUnlocked}
+                className={cn(
+                  'flex flex-col p-3 rounded-neo border-3 border-neo-black',
+                  'w-full transition-all relative',
+                  isUnlocked
+                    ? 'shadow-hard-sm hover:translate-y-[-2px] hover:shadow-hard active:translate-y-[2px] active:shadow-none'
+                    : 'opacity-75 cursor-not-allowed',
+                  isDarkMode ? 'bg-slate-800' : 'bg-white'
+                )}
+              >
+                {/* Header row with icon and title */}
+                <div className="flex items-center gap-2 w-full mb-2">
                   <div className={cn(
-                    'w-9 h-9 rounded-lg border-2 border-neo-black flex items-center justify-center relative shrink-0',
+                    'w-10 h-10 rounded-lg border-2 border-neo-black flex items-center justify-center relative shrink-0',
                     drill.bgColor
                   )}>
                     <Icon className="w-5 h-5 text-neo-black" />
@@ -147,64 +159,149 @@ export default function QuickDrillsSection() {
                     )}>
                       {t(`brain.domains.${drill.domain}`)}
                     </p>
-
-                    {/* Progress indicator for locked drills */}
-                    {!isUnlocked && drill.unlockRequirement > 0 && (
-                      <div className="w-full mt-1">
-                        <div className={cn(
-                          'h-1 rounded-full border border-neo-black overflow-hidden',
-                          isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
-                        )}>
-                          <motion.div
-                            className={cn('h-full', drill.bgColor)}
-                            initial={{ width: 0 }}
-                            animate={{ width: `${progressPercent}%` }}
-                            transition={{ duration: 0.5 }}
-                          />
-                        </div>
-                        <p className={cn(
-                          'text-[8px] text-left mt-0.5 font-bold',
-                          isDarkMode ? 'text-neo-white/60' : 'text-neo-black/60'
-                        )}>
-                          {gamesPlayed}/{drill.unlockRequirement}
-                        </p>
-                      </div>
-                    )}
                   </div>
-                </motion.button>
-              );
+                </div>
 
-              // Wrap locked drills in enhanced tooltip
-              if (!isUnlocked) {
-                return (
-                  <Tooltip key={drill.id} delayDuration={200}>
-                    <TooltipTrigger asChild>
-                      {drillButton}
-                    </TooltipTrigger>
-                    <TooltipContent side="top" className="max-w-[250px]">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <Lock className="w-4 h-4" />
-                          <p className="font-bold">{t('brain.drills.locked')}</p>
-                        </div>
-                        <p className="text-xs">
-                          {t('brain.drills.unlockRequirement', { games: gamesRemaining })}
+                {/* Stats section for unlocked drills with progress */}
+                {isUnlocked && stats && stats.totalPlays > 0 && (
+                  <div className={cn(
+                    'w-full pt-2 mt-1 border-t',
+                    isDarkMode ? 'border-slate-600' : 'border-gray-200'
+                  )}>
+                    <div className="grid grid-cols-3 gap-1">
+                      {/* High Score */}
+                      <div className="flex flex-col items-center">
+                        <Trophy className={cn(
+                          'w-3 h-3 mb-0.5',
+                          isDarkMode ? 'text-neo-yellow' : 'text-yellow-500'
+                        )} />
+                        <p className={cn(
+                          'text-[10px] font-black',
+                          isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                        )}>
+                          {stats.highScore}
                         </p>
-                        <div className="flex items-center gap-1.5 pt-1 border-t border-neo-black/20">
-                          <Info className="w-3 h-3" />
-                          <p className="text-[10px] opacity-80">
-                            {t('brain.drills.unlockHint') || 'Play more games to unlock this drill!'}
-                          </p>
-                        </div>
+                        <p className={cn(
+                          'text-[8px]',
+                          isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+                        )}>
+                          {t('brain.drills.stats.best')}
+                        </p>
                       </div>
-                    </TooltipContent>
-                  </Tooltip>
-                );
-              }
 
-              return drillButton;
-            })}
-          </div>
+                      {/* Average Score */}
+                      <div className="flex flex-col items-center">
+                        <BarChart3 className={cn(
+                          'w-3 h-3 mb-0.5',
+                          isDarkMode ? 'text-neo-cyan' : 'text-cyan-500'
+                        )} />
+                        <p className={cn(
+                          'text-[10px] font-black',
+                          isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                        )}>
+                          {Math.round(stats.avgScore)}
+                        </p>
+                        <p className={cn(
+                          'text-[8px]',
+                          isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+                        )}>
+                          {t('brain.drills.stats.avg')}
+                        </p>
+                      </div>
+
+                      {/* Total Plays */}
+                      <div className="flex flex-col items-center">
+                        <Play className={cn(
+                          'w-3 h-3 mb-0.5',
+                          isDarkMode ? 'text-neo-green' : 'text-green-500'
+                        )} />
+                        <p className={cn(
+                          'text-[10px] font-black',
+                          isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                        )}>
+                          {stats.totalPlays}
+                        </p>
+                        <p className={cn(
+                          'text-[8px]',
+                          isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+                        )}>
+                          {t('brain.drills.stats.plays')}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* "Not played yet" for unlocked drills with no progress */}
+                {isUnlocked && (!stats || stats.totalPlays === 0) && (
+                  <div className={cn(
+                    'w-full pt-2 mt-1 border-t text-center',
+                    isDarkMode ? 'border-slate-600' : 'border-gray-200'
+                  )}>
+                    <p className={cn(
+                      'text-[10px] italic',
+                      isDarkMode ? 'text-neo-white/40' : 'text-neo-black/40'
+                    )}>
+                      {t('brain.drills.stats.notPlayed')}
+                    </p>
+                  </div>
+                )}
+
+                {/* Progress indicator for locked drills */}
+                {!isUnlocked && drill.unlockRequirement > 0 && (
+                  <div className="w-full mt-2">
+                    <div className={cn(
+                      'h-1.5 rounded-full border border-neo-black overflow-hidden',
+                      isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+                    )}>
+                      <motion.div
+                        className={cn('h-full', drill.bgColor)}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${progressPercent}%` }}
+                        transition={{ duration: 0.5 }}
+                      />
+                    </div>
+                    <p className={cn(
+                      'text-[9px] text-center mt-1 font-bold',
+                      isDarkMode ? 'text-neo-white/60' : 'text-neo-black/60'
+                    )}>
+                      {gamesPlayed}/{drill.unlockRequirement} {t('brain.drills.gamesToUnlock')}
+                    </p>
+                  </div>
+                )}
+              </motion.button>
+            );
+
+            // Wrap locked drills in enhanced tooltip
+            if (!isUnlocked) {
+              return (
+                <Tooltip key={drill.id} delayDuration={200}>
+                  <TooltipTrigger asChild>
+                    {drillButton}
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-[250px]">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Lock className="w-4 h-4" />
+                        <p className="font-bold">{t('brain.drills.locked')}</p>
+                      </div>
+                      <p className="text-xs">
+                        {t('brain.drills.unlockRequirement', { games: gamesRemaining })}
+                      </p>
+                      <div className="flex items-center gap-1.5 pt-1 border-t border-neo-black/20">
+                        <Info className="w-3 h-3" />
+                        <p className="text-[10px] opacity-80">
+                          {t('brain.drills.unlockHint') || 'Play more games to unlock this drill!'}
+                        </p>
+                      </div>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              );
+            }
+
+            return drillButton;
+          })}
         </div>
       </div>
     </TooltipProvider>

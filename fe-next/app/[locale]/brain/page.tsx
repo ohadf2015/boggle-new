@@ -15,6 +15,7 @@ import CognitiveRadarChart from '@/components/brain/CognitiveRadarChart';
 import QuickDrillsSection from '@/components/brain/QuickDrillsSection';
 import ScientificTipsCarousel from '@/components/brain/ScientificTipsCarousel';
 import FirstGameCelebration from '@/components/brain/FirstGameCelebration';
+import AuthModal from '@/components/auth/AuthModal';
 
 /**
  * Header component for Brain Training page
@@ -70,11 +71,14 @@ export default function BrainTrainingPage() {
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
   const { isAuthenticated } = useAuth();
-  const { brainScore, recentGameScores, isLoading, error, refresh, initializeBrainScore } = useBrainScore();
+  const { brainScore, recentGameScores, drillProgress, isLoading, error, refresh, initializeBrainScore } = useBrainScore();
 
   // State for first game celebration
   const [showCelebration, setShowCelebration] = useState(false);
   const [hasShownCelebration, setHasShownCelebration] = useState(false);
+
+  // State for auth modal
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Show celebration modal for first game (only once per session)
   useEffect(() => {
@@ -221,7 +225,7 @@ export default function BrainTrainingPage() {
               {t('brain.guestView.description') || 'Sign in to track your brain training progress and unlock personalized cognitive insights'}
             </p>
             <button
-              onClick={() => router.push(`/${language}/auth`)}
+              onClick={() => setShowAuthModal(true)}
               className={cn(
                 'px-6 py-3 rounded-neo font-bold',
                 'border-3 border-neo-black shadow-hard',
@@ -232,6 +236,13 @@ export default function BrainTrainingPage() {
               {t('common.signIn') || 'Sign In'}
             </button>
           </motion.div>
+
+          {/* Auth Modal */}
+          <AuthModal
+            isOpen={showAuthModal}
+            onClose={() => setShowAuthModal(false)}
+            showGuestStats={true}
+          />
         </main>
       </div>
     );
@@ -286,7 +297,7 @@ export default function BrainTrainingPage() {
           </motion.div>
 
           {/* Show Quick Drills section even for new users */}
-          <QuickDrillsSection />
+          <QuickDrillsSection drillProgress={drillProgress} />
         </main>
       </div>
     );
@@ -349,7 +360,7 @@ export default function BrainTrainingPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
         >
-          <QuickDrillsSection />
+          <QuickDrillsSection drillProgress={drillProgress} />
         </motion.div>
 
         {/* Scientific Tips */}

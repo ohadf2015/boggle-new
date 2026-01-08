@@ -69,12 +69,13 @@ export async function GET(request: NextRequest) {
     const displayName = searchParams.get('displayName') || 'Player';
     const avatarEmoji = searchParams.get('avatarEmoji') || '🎯';
     const avatarImage = searchParams.get('avatarImage'); // Custom avatar image filename
+    const avatarUrl = searchParams.get('avatarUrl'); // Direct avatar URL (e.g., social login)
     const puzzleNumber = searchParams.get('puzzleNumber') || '';
     const locale = searchParams.get('locale') || 'en';
 
-    // Construct avatar image URL if provided
+    // Construct avatar image URL - prioritize direct URL, then local avatar
     const origin = new URL(request.url).origin;
-    const avatarImageUrl = avatarImage ? `${origin}/avatars/${avatarImage}` : null;
+    const avatarImageUrl = avatarUrl || (avatarImage ? `${origin}/avatars/${avatarImage}` : null);
 
     const challenge = CHALLENGE[locale] || CHALLENGE.en;
     const performanceKey = getPerformanceKey(solved, attempts);
@@ -95,38 +96,38 @@ export async function GET(request: NextRequest) {
             justifyContent: 'center',
             background: `linear-gradient(135deg, #0f0f14 0%, #1a1a2e 50%, #0f0f14 100%)`,
             fontFamily: 'system-ui, -apple-system, sans-serif',
-            padding: '40px',
+            padding: '60px',
           }}
         >
-          {/* Top: Brand + Puzzle Number */}
+          {/* Top: Brand + Puzzle Number - BIGGER */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '12px',
-              marginBottom: '16px',
+              gap: '24px',
+              marginBottom: '32px',
             }}
           >
-            <span style={{ fontSize: '32px' }}>🎮</span>
-            <span style={{ fontSize: '28px', fontWeight: 900, color: '#fff', letterSpacing: '2px' }}>
+            <span style={{ fontSize: '56px' }}>🎮</span>
+            <span style={{ fontSize: '52px', fontWeight: 900, color: '#fff', letterSpacing: '4px' }}>
               LEXICLASH
             </span>
             {puzzleNumber && (
-              <span style={{ fontSize: '22px', fontWeight: 700, color: '#6b7280' }}>
+              <span style={{ fontSize: '44px', fontWeight: 700, color: '#6b7280' }}>
                 #{puzzleNumber}
               </span>
             )}
           </div>
 
-          {/* Player info - large and prominent */}
+          {/* Player info - MUCH larger and prominent */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '20px',
-              marginBottom: '20px',
+              gap: '32px',
+              marginBottom: '40px',
             }}
           >
             {avatarImageUrl ? (
@@ -134,24 +135,25 @@ export async function GET(request: NextRequest) {
               <img
                 src={avatarImageUrl}
                 alt="Avatar"
-                width={72}
-                height={72}
+                width={120}
+                height={120}
                 style={{
-                  width: '72px',
-                  height: '72px',
+                  width: '120px',
+                  height: '120px',
                   borderRadius: '50%',
                   objectFit: 'cover',
-                  border: '4px solid #fff',
+                  border: '6px solid #fff',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
                 }}
               />
             ) : (
-              <span style={{ fontSize: '64px' }}>{avatarEmoji}</span>
+              <span style={{ fontSize: '100px' }}>{avatarEmoji}</span>
             )}
             <span style={{
-              fontSize: '52px',
+              fontSize: '72px',
               fontWeight: 900,
               color: '#fff',
-              maxWidth: '600px',
+              maxWidth: '800px',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -160,54 +162,56 @@ export async function GET(request: NextRequest) {
             </span>
           </div>
 
-          {/* Main result - HUGE and prominent */}
+          {/* Main result - MASSIVE and prominent */}
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              background: `linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%)`,
-              borderRadius: '24px',
-              padding: '24px 60px',
-              marginBottom: '20px',
+              background: `linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 100%)`,
+              borderRadius: '32px',
+              padding: '48px 100px',
+              marginBottom: '40px',
+              border: `4px solid ${accent}33`,
             }}
           >
             {solved ? (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                {/* Big attempt number */}
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
+                {/* HUGE attempt number */}
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '16px' }}>
                   <span
                     style={{
-                      fontSize: '180px',
+                      fontSize: '280px',
                       fontWeight: 900,
                       color: accent,
-                      lineHeight: 0.9,
-                      letterSpacing: '-10px',
+                      lineHeight: 0.85,
+                      letterSpacing: '-16px',
+                      textShadow: '0 8px 32px rgba(0,0,0,0.5)',
                     }}
                   >
                     {attempts}
                   </span>
-                  <span style={{ fontSize: '64px', fontWeight: 900, color: '#4b5563' }}>/10</span>
+                  <span style={{ fontSize: '100px', fontWeight: 900, color: '#4b5563' }}>/10</span>
                 </div>
-                {/* Performance message with emoji */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '4px' }}>
-                  <span style={{ fontSize: '44px' }}>{performanceEmoji}</span>
-                  <span style={{ fontSize: '40px', fontWeight: 800, color: accent }}>
+                {/* Performance message with emoji - BIGGER */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginTop: '16px' }}>
+                  <span style={{ fontSize: '72px' }}>{performanceEmoji}</span>
+                  <span style={{ fontSize: '64px', fontWeight: 800, color: accent }}>
                     {performanceMsg}
                   </span>
-                  <span style={{ fontSize: '44px' }}>{performanceEmoji}</span>
+                  <span style={{ fontSize: '72px' }}>{performanceEmoji}</span>
                 </div>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <span style={{ fontSize: '120px' }}>💪</span>
+                <span style={{ fontSize: '180px' }}>💪</span>
                 <span
                   style={{
-                    fontSize: '44px',
+                    fontSize: '72px',
                     fontWeight: 900,
                     color: accent,
-                    marginTop: '12px',
+                    marginTop: '24px',
                   }}
                 >
                   {performanceMsg}
@@ -216,29 +220,30 @@ export async function GET(request: NextRequest) {
             )}
           </div>
 
-          {/* Bottom CTA - full width bar */}
+          {/* Bottom CTA - BIGGER bar */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '12px',
-              padding: '16px 48px',
+              gap: '24px',
+              padding: '28px 80px',
               background: accent,
-              borderRadius: '14px',
+              borderRadius: '20px',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
             }}
           >
-            <span style={{ fontSize: '40px' }}>🎯</span>
+            <span style={{ fontSize: '64px' }}>🎯</span>
             <span style={{
-              fontSize: '32px',
+              fontSize: '52px',
               fontWeight: 900,
               color: '#000',
-              letterSpacing: isRTL ? '0' : '1px',
+              letterSpacing: isRTL ? '0' : '2px',
               direction: isRTL ? 'rtl' : 'ltr'
             }}>
               {challenge}
             </span>
-            <span style={{ fontSize: '40px' }}>🎯</span>
+            <span style={{ fontSize: '64px' }}>🎯</span>
           </div>
         </div>
       ),

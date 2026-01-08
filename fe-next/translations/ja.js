@@ -2243,6 +2243,8 @@ const ja = {
   },
   "profile": {
     "title": "プロフィール",
+    "coins": "コイン",
+    "viewProfile": "プロフィールへ",
     "viewCoins": "コインを確認",
     "overview": "概要",
     "stats": "統計",
@@ -2747,7 +2749,28 @@ const ja = {
     "hint": "初めて？シングルプレイヤーで基本を学ぼう！",
     "openRooms": "部屋が開放中",
     "playersLive": "プレイ中",
-    "tutorial": "チュートリアル"
+    "tutorial": "チュートリアル",
+    "seoHeadline": "無料マルチプレイヤーワードゲーム",
+    "seoSubheadline": "Wordle×Boggle - 友達とリアルタイムで対戦！",
+    "valueProps": {
+      "realTime": "リアルタイムバトル",
+      "realTimeDesc": "友達とライブ対戦",
+      "noDownload": "すぐプレイ",
+      "noDownloadDesc": "ダウンロード不要",
+      "freeForever": "完全無料",
+      "freeForeverDesc": "サブスク不要",
+      "multiLanguage": "5言語対応",
+      "multiLanguageDesc": "日本語、英語、ヘブライ語、スウェーデン語、スペイン語"
+    },
+    "socialProof": {
+      "playersDaily": "1,000+",
+      "playersDailyLabel": "デイリープレイヤー",
+      "wordsFound": "500K+",
+      "wordsFoundLabel": "発見された単語",
+      "rating": "4.8★",
+      "ratingLabel": "プレイヤー評価"
+    },
+    "altComparison": "グループで遊べるBoggle・Scrabble・Wordleの無料代替ゲーム"
   },
   "modeDiscovery": {
     "title": "もっと遊ぼう！",
@@ -2989,6 +3012,7 @@ const ja = {
     "streakDays": "{count}日連続！",
     "shareScore": "スコアをシェア",
     "copyToClipboard": "クリップボードにコピー",
+    "copyLink": "リンクをコピー",
     "copiedToClipboard": "コピーしました！",
     "home": "ホーム",
     "close": "閉じる",
@@ -3265,6 +3289,9 @@ const ja = {
       "letters": "文字",
       "tipsToImprove": "上達のコツ",
       "generating": "生成中...",
+      "previewImage": "プレビュー画像",
+      "moreOptions": "その他の共有オプション",
+      "lessOptions": "オプションを減らす",
       "performanceRewards": "パフォーマンス＆報酬",
       "tryAgain": "もう一度"
     },
@@ -3651,6 +3678,13 @@ const ja = {
       "unlock": "レベル{{level}}をクリアしてアンロック",
       "unlockRequirement": "あと{{games}}ゲームプレイでアンロック",
       "unlockHint": "もっとゲームをプレイしてこのドリルをアンロックしましょう！",
+      "gamesToUnlock": "ゲーム",
+      "stats": {
+        "best": "ベスト",
+        "avg": "平均",
+        "plays": "回数",
+        "notPlayed": "未プレイ"
+      },
       "points": "pt",
       "wpm": "分速",
       "letters": "文字",

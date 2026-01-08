@@ -4,12 +4,15 @@
  */
 
 import { useState, useCallback, useMemo } from 'react';
-import { generateWordHuntShareableResult } from '@/utils/dailyChallenge';
+import {
+  generateWordHuntShareableResult,
+  type WordHuntResult,
+  type GuestDailyPlayer,
+} from '@/utils/dailyChallenge';
 import {
   generateDailyShareImage,
   downloadDailyShareImage,
 } from '@/utils/dailyShareImage';
-import type { WordHuntResult, GuestDailyPlayer } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 import type { WordHuntStats } from './types';
 
@@ -22,7 +25,7 @@ interface UseShareHandlersProps {
   avatarEmoji: string;
   stats: WordHuntStats | null;
   isAuthenticated: boolean;
-  profile: { display_name?: string | null; username?: string; avatar_emoji?: string | null } | null;
+  profile: { display_name?: string | null; username?: string; avatar_emoji?: string | null; avatar_image?: string | null; profile_picture_url?: string | null } | null;
   guestPlayer: GuestDailyPlayer | null;
   t: (key: string) => string;
 }
@@ -56,6 +59,26 @@ export function useShareHandlers({
     });
     return `${origin}/${language}/daily?${params.toString()}`;
   }, [result.solved, result.attemptsUsed, puzzleNumber, displayName, avatarEmoji, language]);
+
+  // Build OG image URL for preview
+  const ogImageUrl = useMemo(() => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.lexiclash.live';
+    const params = new URLSearchParams({
+      solved: String(result.solved),
+      attempts: String(result.attemptsUsed),
+      puzzleNumber: String(puzzleNumber),
+      displayName,
+      avatarEmoji,
+      locale: language,
+    });
+    // Add custom avatar image if available (authenticated users)
+    if (isAuthenticated && profile?.avatar_image) {
+      params.set('avatarImage', profile.avatar_image);
+    } else if (isAuthenticated && profile?.profile_picture_url) {
+      params.set('avatarUrl', profile.profile_picture_url);
+    }
+    return `${origin}/api/og/word-hunt?${params.toString()}`;
+  }, [result.solved, result.attemptsUsed, puzzleNumber, displayName, avatarEmoji, language, isAuthenticated, profile?.avatar_image, profile?.profile_picture_url]);
 
   // Generate shareable text
   const shareText = useMemo(() => {
@@ -105,6 +128,32 @@ export function useShareHandlers({
     const url = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
     window.open(url, '_blank');
   }, [shareText, shareUrl]);
+
+  // Handle share to LinkedIn
+  const handleLinkedIn = useCallback(() => {
+    const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
+    window.open(url, '_blank');
+  }, [shareUrl]);
+
+  // Handle share to Facebook
+  const handleFacebook = useCallback(() => {
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+    window.open(url, '_blank');
+  }, [shareText, shareUrl]);
+
+  // Handle share via Email
+  const handleEmail = useCallback(() => {
+    const subject = `LexiClash Word Hunt #${puzzleNumber}`;
+    const body = shareTextWithUrl;
+    const url = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = url;
+  }, [puzzleNumber, shareTextWithUrl]);
+
+  // Handle share via SMS
+  const handleSMS = useCallback(() => {
+    const url = `sms:?body=${encodeURIComponent(shareTextWithUrl)}`;
+    window.location.href = url;
+  }, [shareTextWithUrl]);
 
   // Handle native share
   const handleNativeShare = useCallback(async () => {
@@ -157,12 +206,17 @@ export function useShareHandlers({
     setShowSharePanel,
     isGeneratingImage,
     shareUrl,
+    ogImageUrl,
     shareText,
     shareTextWithUrl,
     handleCopy,
     handleWhatsApp,
     handleTwitter,
     handleTelegram,
+    handleLinkedIn,
+    handleFacebook,
+    handleEmail,
+    handleSMS,
     handleNativeShare,
     handleDownloadShareImage,
   };

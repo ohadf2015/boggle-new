@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, ArrowLeft, Users, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -69,7 +68,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
 
   return (
     <Link href={href} className="block w-full group">
-      <motion.div
+      <div
         className={cn(
           // Neo-Brutalist card base
           'rounded-neo-lg border-3 border-neo-black',
@@ -98,7 +97,6 @@ const ModeCard: React.FC<ModeCardProps> = ({
           // Container-relative padding using cqw
           padding: 'clamp(0.75rem, 3cqw, 1rem)',
         }}
-        // Removed micro-animations for cleaner UX
       >
         {/* Header with icon, title, and arrow in one row */}
         <div className="flex items-center gap-2 sm:gap-3" style={{ marginBottom: 'clamp(0.25rem, 1cqw, 0.5rem)' }}>
@@ -193,7 +191,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
           </div>
         )}
         {/* Removed decorative blur element */}
-      </motion.div>
+      </div>
     </Link>
   );
 };

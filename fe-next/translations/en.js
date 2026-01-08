@@ -8,13 +8,13 @@ const en = {
     "clash": "Clash"
   },
   "seo": {
-    "title": "LexiClash - Fast-Paced Multiplayer Word Game | Compete in Real-Time",
-    "description": "Race against friends in thrilling real-time word battles! LexiClash is a fast-paced multiplayer word game where every second counts. Find words, outsmart opponents, and climb the leaderboard. Perfect for parties, game nights, and friendly competition. Also great for building vocabulary while having fun! Play free in 5 languages - no download needed.",
-    "keywords": "multiplayer word game, real-time word game, online word battle, party word game, competitive word game, fast-paced word game, word puzzle multiplayer, boggle online, alias game, kahoot alternative, family game night, party games, team building games, word competition, live word game, word race game, vocabulary game, language learning game, ESL game online, brain training game, free online game",
-    "ogTitle": "LexiClash - Fast-Paced Multiplayer Word Game | Compete in Real-Time",
-    "ogDescription": "Race against friends in thrilling real-time word battles! Find words fast, outsmart opponents, climb the leaderboard. Perfect for parties and game nights. Play free in 5 languages!",
-    "twitterTitle": "LexiClash - Fast-Paced Multiplayer Word Game | Compete in Real-Time",
-    "twitterDescription": "Race against friends in thrilling real-time word battles! Find words fast, outsmart opponents, climb the leaderboard. Perfect for parties and game nights. Play free in 5 languages!",
+    "title": "LexiClash - Free Multiplayer Word Game Like Boggle & Wordle | Play Online",
+    "description": "Play the best free multiplayer word game online! LexiClash combines Boggle-style gameplay with real-time competition. Race friends to find words, build combos, and climb leaderboards. Perfect Wordle alternative for groups. No download - play instantly in 5 languages. Great for parties, team building, and family game nights!",
+    "keywords": "free word game online, multiplayer word game, boggle online free, wordle multiplayer, scrabble alternative online, word game with friends, real-time word battle, party word game, ruzzle alternative, word hunt game, competitive word game, best word game app, online boggle with friends, word puzzle multiplayer, family word game, team building word game, kahoot alternative word game, ESL word game, vocabulary builder game, brain training word game, word race game online, free browser game no download",
+    "ogTitle": "LexiClash - Free Multiplayer Word Game | Better Than Boggle & Wordle",
+    "ogDescription": "The best free word game for groups! Race friends in real-time word battles. Like Boggle meets Wordle - but multiplayer. No download, play instantly. Perfect for parties!",
+    "twitterTitle": "LexiClash - Free Multiplayer Word Game | Play With Friends Online",
+    "twitterDescription": "Challenge friends to real-time word battles! 🎮 Find words fast, build combos, climb leaderboards. Free to play, no download needed. Try now!",
     "locale": "en_US",
     "language": "English",
     "leaderboard": {
@@ -2378,6 +2378,8 @@ const en = {
   },
   "profile": {
     "title": "Profile",
+    "coins": "Coins",
+    "viewProfile": "View Profile",
     "viewCoins": "View your coins",
     "overview": "Overview",
     "stats": "Stats",
@@ -2754,7 +2756,28 @@ const en = {
     "hint": "First time? Try solo mode first!",
     "openRooms": "rooms",
     "playersLive": "live",
-    "tutorial": "Tutorial"
+    "tutorial": "Tutorial",
+    "seoHeadline": "Free Multiplayer Word Game",
+    "seoSubheadline": "Like Wordle meets Boggle - but play with friends in real-time!",
+    "valueProps": {
+      "realTime": "Real-Time Battles",
+      "realTimeDesc": "Race against friends live",
+      "noDownload": "Play Instantly",
+      "noDownloadDesc": "No app download needed",
+      "freeForever": "100% Free",
+      "freeForeverDesc": "No subscriptions ever",
+      "multiLanguage": "5 Languages",
+      "multiLanguageDesc": "EN, HE, SV, JA, ES"
+    },
+    "socialProof": {
+      "playersDaily": "1,000+",
+      "playersDailyLabel": "daily players",
+      "wordsFound": "500K+",
+      "wordsFoundLabel": "words found",
+      "rating": "4.8★",
+      "ratingLabel": "player rating"
+    },
+    "altComparison": "Best free alternative to Boggle, Scrabble, and Wordle for groups"
   },
   "modeDiscovery": {
     "title": "Ready for More?",
@@ -2996,6 +3019,7 @@ const en = {
     "streakDays": "{count} Days!",
     "shareScore": "Share",
     "copyToClipboard": "Copy",
+    "copyLink": "Copy Link",
     "copiedToClipboard": "Copied!",
     "home": "Home",
     "close": "Close",
@@ -3272,6 +3296,9 @@ const en = {
       "letters": "letters",
       "tipsToImprove": "Tips to Improve",
       "generating": "Generating...",
+      "previewImage": "Preview Image",
+      "moreOptions": "More share options",
+      "lessOptions": "Less options",
       "performanceRewards": "Performance & Rewards",
       "tryAgain": "Try again"
     },
@@ -3683,6 +3710,13 @@ const en = {
       "unlock": "Complete level {{level}} to unlock",
       "unlockRequirement": "Play {{games}} more games to unlock",
       "unlockHint": "Play more games to unlock this drill!",
+      "gamesToUnlock": "games",
+      "stats": {
+        "best": "Best",
+        "avg": "Avg",
+        "plays": "Plays",
+        "notPlayed": "Not played yet"
+      },
       "errors": {
         "notOnBoard": "Word not on board",
         "alreadyFound": "Already found",

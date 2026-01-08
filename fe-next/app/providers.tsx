@@ -26,7 +26,6 @@ import { linkLogRocketSession } from '@/utils/sentry';
 import { initSessionTracking } from '@/utils/sessionTracking';
 import { initConsoleOverride } from '@/utils/consoleOverride';
 import WinnerOnboardingWrapper from './components/WinnerOnboardingWrapper';
-import GlobalBottomNav from '@/components/layout/GlobalBottomNav';
 
 import type { Language } from '@/shared/types/game';
 
@@ -194,7 +193,6 @@ export function Providers({ children, lang }: ProvidersProps) {
                                             <GameProviders>
                                                 <NavigationProvider>
                                                     {children}
-                                                    <GlobalBottomNav />
                                                     <WinnerOnboardingWrapper />
                                                 </NavigationProvider>
                                             </GameProviders>

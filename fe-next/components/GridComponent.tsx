@@ -198,13 +198,16 @@ const GridComponent = memo<GridComponentProps>(({
     return hints;
   }, [selectedCells, grid]);
 
-  // Create set of highlighted cells for revealed word path
-  const highlightedCellsSet = useMemo(() => {
+  // Create set and order map for highlighted cells in revealed word path
+  const { highlightedCellsSet, highlightedCellOrder } = useMemo(() => {
     const set = new Set<string>();
-    for (const cell of highlightedPath) {
-      set.add(`${cell.row}-${cell.col}`);
-    }
-    return set;
+    const orderMap = new Map<string, number>();
+    highlightedPath.forEach((cell, index) => {
+      const key = `${cell.row}-${cell.col}`;
+      set.add(key);
+      orderMap.set(key, index + 1); // 1-indexed for display
+    });
+    return { highlightedCellsSet: set, highlightedCellOrder: orderMap };
   }, [highlightedPath]);
 
   // OPTIMIZED: Earthquake animation using dedicated hook
@@ -472,6 +475,7 @@ const GridComponent = memo<GridComponentProps>(({
               const glowColorIndex = cellColorIndices.get(cellKey) ?? 0;
               const glowColor = RAINBOW_COLORS[glowColorIndex];
               const isHighlighted = highlightedCellsSet.has(cellKey);
+              const highlightedOrder = highlightedCellOrder.get(cellKey);
               const isEliminated = eliminatedLetters?.has(cell.toUpperCase()) ?? false;
               // Desktop hover state
               const isHovered = hoveredCell?.row === i && hoveredCell?.col === j;
@@ -568,7 +572,7 @@ const GridComponent = memo<GridComponentProps>(({
                         ? `${comboColors.textColor || 'text-neo-black'} ${comboColors.border} z-10 ${comboColors.shadow}`
                         : `${comboColors.bg} ${comboColors.textColor || 'text-neo-black'} border-3 ${comboColors.border} z-10 ${comboColors.shadow}`
                       : isHighlighted
-                        ? "letter-tile-gradient text-neo-black border-3 border-neo-yellow/60 z-10 shadow-[0_0_12px_rgba(255,225,53,0.4)]"
+                        ? "bg-neo-yellow text-neo-black border-3 border-neo-black z-10 shadow-[0_0_20px_rgba(255,225,53,0.8),_0_0_40px_rgba(255,225,53,0.4)]"
                         : isEliminated
                           ? "bg-gray-400/60 text-gray-500/50 border-3 border-gray-400/40 shadow-none cursor-not-allowed"
                           : "letter-tile-gradient text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed",
@@ -781,6 +785,16 @@ const GridComponent = memo<GridComponentProps>(({
                   )}
 
                   {cell}
+
+                  {/* Path order indicator for highlighted cells */}
+                  {isHighlighted && highlightedOrder !== undefined && (
+                    <span
+                      className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center bg-neo-black text-neo-yellow text-[10px] font-black rounded-full border-2 border-neo-yellow shadow-[0_0_8px_rgba(255,225,53,0.6)]"
+                      aria-hidden="true"
+                    >
+                      {highlightedOrder}
+                    </span>
+                  )}
                 </motion.div>
               );
             })

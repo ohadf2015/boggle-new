@@ -1,14 +1,13 @@
 import { memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BarChart3, Menu, X, Settings, BookOpen, Trophy, ScrollText, Shield, Coffee } from 'lucide-react';
+import { BarChart3, Menu, X, Settings, BookOpen, Trophy, ScrollText, Shield, Coffee, User } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { cn } from '../lib/utils';
 import AuthButton from './auth/AuthButton';
 import MusicControls from './MusicControls';
-import DailyQuickLink from './daily/DailyQuickLink';
 import { CoinBalance } from './CoinBalance';
 import AuthModal from './auth/AuthModal';
 
@@ -201,9 +200,6 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
 
                 {/* Desktop Controls: visible on sm+ */}
                 <div className="hidden sm:flex items-center gap-3 md:gap-3 lg:gap-4 xl:gap-4 2xl:gap-5 flex-shrink-0">
-                    {/* Daily Challenge Quick Link */}
-                    <DailyQuickLink />
-
                     {/* Coin Balance - shown for authenticated users */}
                     {isAuthenticated && profile && (
                         <Link
@@ -219,27 +215,30 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         </Link>
                     )}
 
+                    {/* Profile Link */}
+                    <Link
+                        href={`/${language}/profile`}
+                        className={cn(
+                            "flex items-center justify-center",
+                            "w-10 h-10",
+                            "bg-neo-cream text-neo-black",
+                            "border-2 border-neo-black",
+                            "rounded-neo shadow-hard-sm",
+                            "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-cyan/30",
+                            "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+                            "transition-all duration-100"
+                        )}
+                        aria-label={t('brain.nav.profile') || 'Profile'}
+                    >
+                        <User size={20} />
+                    </Link>
+
                     <MusicControls />
                     <AuthButton />
                 </div>
 
-                {/* Mobile: Coins + Volume + Hamburger - simplified grouping */}
+                {/* Mobile: Volume + Hamburger - simplified grouping */}
                 <div className="sm:hidden flex items-center gap-1.5 min-w-0 flex-shrink-0" ref={mobileMenuRef}>
-                    {/* Coin Balance - links to profile, shown for authenticated users */}
-                    {isAuthenticated && profile && (
-                        <Link
-                            href={`/${language}/profile`}
-                            className="hover:scale-105 active:scale-95 transition-transform flex-shrink-0"
-                            aria-label={t('profile.viewCoins') || `${profile.total_coins?.toLocaleString() || 0} coins - View profile`}
-                        >
-                            <CoinBalance
-                                coins={profile.total_coins || 0}
-                                size="xs"
-                                showAnimation={false}
-                            />
-                        </Link>
-                    )}
-
                     {/* Sound controls */}
                     <MusicControls />
 
@@ -323,16 +322,37 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 </div>
 
                                 <div className="flex flex-col gap-4 p-4">
-                                    {/* Daily Challenge - TOP PRIORITY */}
-                                    <div className="flex flex-col gap-2">
-                                        <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
-                                            {t('daily.badge') || 'Daily Challenge'}
-                                        </span>
-                                        <DailyQuickLink inline onClick={() => setShowMobileMenu(false)} />
-                                    </div>
+                                    {/* Coin Balance - shown for authenticated users */}
+                                    {isAuthenticated && profile && (
+                                        <>
+                                            <div className="flex flex-col gap-2">
+                                                <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
+                                                    {t('profile.coins') || 'Coins'}
+                                                </span>
+                                                <Link
+                                                    href={`/${language}/profile`}
+                                                    onClick={() => setShowMobileMenu(false)}
+                                                    className={cn(
+                                                        "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                        "bg-white dark:bg-slate-700 hover:bg-neo-yellow/30 dark:hover:bg-slate-600 text-neo-black dark:text-white",
+                                                        "shadow-hard-sm hover:shadow-hard"
+                                                    )}
+                                                >
+                                                    <CoinBalance
+                                                        coins={profile.total_coins || 0}
+                                                        size="sm"
+                                                        showAnimation={false}
+                                                    />
+                                                    <span className="ms-auto text-neo-black/60 dark:text-slate-400">
+                                                        {t('profile.viewProfile') || 'View Profile'}
+                                                    </span>
+                                                </Link>
+                                            </div>
 
-                                    {/* Divider */}
-                                    <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
+                                            {/* Divider */}
+                                            <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
+                                        </>
+                                    )}
 
                                     {/* Account Section */}
                                     <div className="flex flex-col gap-2">

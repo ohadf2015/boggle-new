@@ -483,8 +483,13 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         onWhatsApp={shareHandlers.handleWhatsApp}
         onTwitter={shareHandlers.handleTwitter}
         onTelegram={shareHandlers.handleTelegram}
+        onLinkedIn={shareHandlers.handleLinkedIn}
+        onFacebook={shareHandlers.handleFacebook}
+        onEmail={shareHandlers.handleEmail}
+        onSMS={shareHandlers.handleSMS}
         onDownloadImage={shareHandlers.handleDownloadShareImage}
         isGeneratingImage={shareHandlers.isGeneratingImage}
+        ogImageUrl={shareHandlers.ogImageUrl}
         t={t}
       />
 

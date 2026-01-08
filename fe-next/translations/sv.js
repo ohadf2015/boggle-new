@@ -2244,6 +2244,8 @@ const sv = {
   },
   "profile": {
     "title": "Profil",
+    "coins": "Mynt",
+    "viewProfile": "Visa Profil",
     "viewCoins": "Se dina mynt",
     "overview": "Översikt",
     "stats": "Statistik",
@@ -2748,7 +2750,28 @@ const sv = {
     "hint": "Ny i spelet? Börja med enspelarläge för att lära dig!",
     "openRooms": "öppna rum",
     "playersLive": "spelar nu",
-    "tutorial": "Handledning"
+    "tutorial": "Handledning",
+    "seoHeadline": "Gratis Multiplayer Ordspel",
+    "seoSubheadline": "Som Wordle möter Boggle - men spela med vänner i realtid!",
+    "valueProps": {
+      "realTime": "Realtidsstrider",
+      "realTimeDesc": "Tävla mot vänner live",
+      "noDownload": "Spela Direkt",
+      "noDownloadDesc": "Ingen nedladdning behövs",
+      "freeForever": "100% Gratis",
+      "freeForeverDesc": "Inga prenumerationer",
+      "multiLanguage": "5 Språk",
+      "multiLanguageDesc": "EN, HE, SV, JA, ES"
+    },
+    "socialProof": {
+      "playersDaily": "1 000+",
+      "playersDailyLabel": "dagliga spelare",
+      "wordsFound": "500K+",
+      "wordsFoundLabel": "ord hittade",
+      "rating": "4.8★",
+      "ratingLabel": "spelarens betyg"
+    },
+    "altComparison": "Bästa gratisalternativet till Boggle, Scrabble och Wordle för grupper"
   },
   "modeDiscovery": {
     "title": "Redo för mer?",
@@ -2990,6 +3013,7 @@ const sv = {
     "streakDays": "{count} dagars streak!",
     "shareScore": "Dela din poäng",
     "copyToClipboard": "Kopiera till urklipp",
+    "copyLink": "Kopiera länk",
     "copiedToClipboard": "Kopierad till urklipp!",
     "home": "Hem",
     "close": "Stäng",
@@ -3266,6 +3290,9 @@ const sv = {
       "letters": "bokstäver",
       "tipsToImprove": "Tips att Förbättra",
       "generating": "Genererar...",
+      "previewImage": "Förhandsgranska bild",
+      "moreOptions": "Fler delningsalternativ",
+      "lessOptions": "Färre alternativ",
       "performanceRewards": "Prestanda & Belöningar",
       "tryAgain": "Försök igen"
     },
@@ -3652,6 +3679,13 @@ const sv = {
       "unlock": "Slutför nivå {{level}} för att låsa upp",
       "unlockRequirement": "Spela {{games}} fler spel för att låsa upp",
       "unlockHint": "Spela fler spel för att låsa upp denna övning!",
+      "gamesToUnlock": "spel",
+      "stats": {
+        "best": "Bäst",
+        "avg": "Snitt",
+        "plays": "Spel",
+        "notPlayed": "Ej spelat än"
+      },
       "points": "p",
       "wpm": "OPM",
       "letters": "bokstäver",

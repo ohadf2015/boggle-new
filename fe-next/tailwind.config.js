@@ -256,6 +256,16 @@ module.exports = {
             boxShadow: "0 0 10px rgba(139, 92, 246, 0.5), 0 0 20px rgba(139, 92, 246, 0.25), 4px 4px 0 #000",
           },
         },
+        // Fast fade-in for instant paint optimization
+        "fade-in-fast": {
+          "0%": { opacity: "0.6" },
+          "100%": { opacity: "1" },
+        },
+        // Fade in with upward motion
+        "fade-in-up": {
+          "0%": { opacity: "0", transform: "translateY(8px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -270,6 +280,9 @@ module.exports = {
         "neo-shake": "neo-shake 0.4s ease-in-out",
         "pulse-subtle": "pulse-subtle 2s ease-in-out infinite",
         "hint-glow": "hint-glow 2.5s ease-in-out infinite",
+        // Fast animations for landing page optimization
+        "fade-in-fast": "fade-in-fast 0.15s ease-out forwards",
+        "fade-in-up": "fade-in-up 0.3s ease-out 0.2s both",
       },
       // Custom rotation values for tilts
       rotate: {

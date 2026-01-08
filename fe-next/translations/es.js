@@ -2068,6 +2068,8 @@ const es = {
   },
   "profile": {
     "title": "Perfil",
+    "coins": "Monedas",
+    "viewProfile": "Ver Perfil",
     "viewCoins": "Ver tus monedas",
     "overview": "General",
     "stats": "Estadísticas",
@@ -2745,7 +2747,28 @@ const es = {
     "hint": "¿Nuevo en el juego? ¡Empieza con Un Jugador para aprender!",
     "openRooms": "salas abiertas",
     "playersLive": "jugando ahora",
-    "tutorial": "Tutorial"
+    "tutorial": "Tutorial",
+    "seoHeadline": "Juego de Palabras Multijugador Gratis",
+    "seoSubheadline": "¡Como Wordle y Boggle - pero juega con amigos en tiempo real!",
+    "valueProps": {
+      "realTime": "Batallas en Tiempo Real",
+      "realTimeDesc": "Compite contra amigos en vivo",
+      "noDownload": "Juega Al Instante",
+      "noDownloadDesc": "Sin descarga de apps",
+      "freeForever": "100% Gratis",
+      "freeForeverDesc": "Sin suscripciones nunca",
+      "multiLanguage": "5 Idiomas",
+      "multiLanguageDesc": "EN, HE, SV, JA, ES"
+    },
+    "socialProof": {
+      "playersDaily": "1,000+",
+      "playersDailyLabel": "jugadores diarios",
+      "wordsFound": "500K+",
+      "wordsFoundLabel": "palabras encontradas",
+      "rating": "4.8★",
+      "ratingLabel": "calificación"
+    },
+    "altComparison": "Mejor alternativa gratuita a Boggle, Scrabble y Wordle para grupos"
   },
   "modeDiscovery": {
     "title": "¿Listo para más?",
@@ -2987,6 +3010,7 @@ const es = {
     "streakDays": "¡Racha de {count} días!",
     "shareScore": "Comparte tu Puntuación",
     "copyToClipboard": "Copiar al portapapeles",
+    "copyLink": "Copiar enlace",
     "copiedToClipboard": "¡Copiado al portapapeles!",
     "home": "Inicio",
     "close": "Cerrar",
@@ -3263,6 +3287,9 @@ const es = {
       "letters": "letras",
       "tipsToImprove": "Consejos para Mejorar",
       "generating": "Generando...",
+      "previewImage": "Vista previa de imagen",
+      "moreOptions": "Más opciones de compartir",
+      "lessOptions": "Menos opciones",
       "performanceRewards": "Rendimiento y Recompensas",
       "tryAgain": "Intentar de nuevo"
     },
@@ -3649,6 +3676,13 @@ const es = {
       "unlock": "Completa nivel {{level}} para desbloquear",
       "unlockRequirement": "Juega {{games}} juegos más para desbloquear",
       "unlockHint": "¡Juega más juegos para desbloquear este ejercicio!",
+      "gamesToUnlock": "juegos",
+      "stats": {
+        "best": "Mejor",
+        "avg": "Prom",
+        "plays": "Partidas",
+        "notPlayed": "No jugado aún"
+      },
       "points": "pts",
       "wpm": "PPM",
       "letters": "letras",

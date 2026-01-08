@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, lazy, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
-import { motion } from 'framer-motion';
-import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain } from 'lucide-react';
+import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Zap, Download, Gift, Globe } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,8 +16,10 @@ import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import ModeCard from './ModeCard';
 import TutorialPrompt from './TutorialPrompt';
 import Header from '@/components/Header';
-import DailyChallengeBanner from '@/components/daily/DailyChallengeBanner';
 import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
+
+// Lazy load DailyChallengeBanner - not critical for initial paint
+const DailyChallengeBanner = lazy(() => import('@/components/daily/DailyChallengeBanner'));
 
 // Dynamic import for OnboardingModal (not needed on initial page load)
 const OnboardingModal = dynamic(() => import('@/components/OnboardingModal'), {
@@ -171,21 +172,16 @@ const LandingView: React.FC = () => {
 
       {/* Main content */}
       <main className={`w-full max-w-6xl mx-auto overflow-x-hidden ${isLandscape ? 'flex-1 flex flex-col justify-center px-4 py-2' : 'px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-4 pb-24 lg:pb-4'}`}>
-        {/* Hero section - compact (hidden in landscape) */}
+        {/* Hero section - compact (hidden in landscape) - CSS animation for instant paint */}
         {!isLandscape && (
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="text-center mb-1 sm:mb-2 lg:mb-3"
-          >
+          <div className="text-center mb-1 sm:mb-2 lg:mb-3 animate-fade-in-fast">
             <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white mb-0.5 sm:mb-1 lg:mb-2">
               {t('landing.chooseMode') || 'Choose Your Mode'}
             </h1>
             <p className="text-sm sm:text-base lg:text-lg xl:text-xl font-medium text-neo-black/80 dark:text-neo-white/85">
               {t('landing.subtitleSimple') || 'Practice solo or challenge friends'}
             </p>
-          </motion.div>
+          </div>
         )}
 
         {/* Tutorial Prompt - Non-intrusive banner for first-time visitors (hidden in landscape) */}
@@ -197,25 +193,26 @@ const LandingView: React.FC = () => {
           />
         )}
 
-        {/* Daily Challenge Banner - Compact inline placement */}
-        {/* Reduced animation delay for faster perceived load time */}
-        <motion.div
-          initial={{ opacity: 0.3, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, delay: 0 }}
-          className={`w-full ${isLandscape ? 'mb-2' : 'mb-1 sm:mb-2 lg:mb-3'}`}
-        >
-          <DailyChallengeBanner compact={isLandscape} />
-        </motion.div>
+        {/* Daily Challenge Banner - Lazy loaded with skeleton fallback */}
+        <div className={`w-full ${isLandscape ? 'mb-2' : 'mb-1 sm:mb-2 lg:mb-3'}`}>
+          <Suspense fallback={
+            <div className="w-full p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-yellow animate-pulse">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-neo bg-neo-black/20" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-5 w-32 bg-neo-black/20 rounded" />
+                  <div className="h-3 w-20 bg-neo-black/10 rounded" />
+                </div>
+              </div>
+            </div>
+          }>
+            <DailyChallengeBanner compact={isLandscape} />
+          </Suspense>
+        </div>
 
         {/* Mode cards grid - horizontal in landscape, vertical on portrait */}
-        {/* Start with partial opacity for instant visibility, then animate to full */}
-        <motion.div
-          initial={{ opacity: 0.3, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, delay: 0.05 }}
-          className={`w-full ${isLandscape ? 'flex gap-3 flex-1 min-h-0' : 'grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-2 lg:gap-3'}`}
-        >
+        {/* Using CSS animation for instant paint without JS overhead */}
+        <div className={`w-full animate-fade-in-fast ${isLandscape ? 'flex gap-3 flex-1 min-h-0' : 'grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-2 lg:gap-3'}`}>
           {/* Multiplayer Card */}
           {isLandscape ? (
             <Link
@@ -280,17 +277,102 @@ const LandingView: React.FC = () => {
               variant="purple"
             />
           )}
-        </motion.div>
+        </div>
+
+        {/* SEO Content Section - Value Props & Social Proof (hidden in landscape) */}
+        {!isLandscape && (
+          <section className="mt-4 sm:mt-6 lg:mt-8 animate-fade-in-fast" aria-label="Why LexiClash">
+            {/* SEO Headline - targets search keywords */}
+            <div className="text-center mb-4">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white">
+                {t('landing.seoHeadline') || 'Free Multiplayer Word Game'}
+              </h2>
+              <p className="text-sm sm:text-base text-neo-black/70 dark:text-neo-white/70 mt-1">
+                {t('landing.seoSubheadline') || 'Like Wordle meets Boggle - but play with friends in real-time!'}
+              </p>
+            </div>
+
+            {/* Value Propositions Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 mb-4">
+              <div className="flex flex-col items-center p-2 sm:p-3 bg-white/50 dark:bg-neo-navy-light/50 rounded-neo border-2 border-neo-black/20 dark:border-neo-white/20">
+                <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-neo-yellow mb-1" aria-hidden="true" />
+                <span className="text-xs sm:text-sm font-bold text-neo-black dark:text-neo-white text-center">
+                  {t('landing.valueProps.realTime') || 'Real-Time Battles'}
+                </span>
+                <span className="text-[10px] sm:text-xs text-neo-black/60 dark:text-neo-white/60 text-center">
+                  {t('landing.valueProps.realTimeDesc') || 'Race against friends live'}
+                </span>
+              </div>
+              <div className="flex flex-col items-center p-2 sm:p-3 bg-white/50 dark:bg-neo-navy-light/50 rounded-neo border-2 border-neo-black/20 dark:border-neo-white/20">
+                <Download className="w-5 h-5 sm:w-6 sm:h-6 text-neo-cyan mb-1" aria-hidden="true" />
+                <span className="text-xs sm:text-sm font-bold text-neo-black dark:text-neo-white text-center">
+                  {t('landing.valueProps.noDownload') || 'Play Instantly'}
+                </span>
+                <span className="text-[10px] sm:text-xs text-neo-black/60 dark:text-neo-white/60 text-center">
+                  {t('landing.valueProps.noDownloadDesc') || 'No app download needed'}
+                </span>
+              </div>
+              <div className="flex flex-col items-center p-2 sm:p-3 bg-white/50 dark:bg-neo-navy-light/50 rounded-neo border-2 border-neo-black/20 dark:border-neo-white/20">
+                <Gift className="w-5 h-5 sm:w-6 sm:h-6 text-neo-green mb-1" aria-hidden="true" />
+                <span className="text-xs sm:text-sm font-bold text-neo-black dark:text-neo-white text-center">
+                  {t('landing.valueProps.freeForever') || '100% Free'}
+                </span>
+                <span className="text-[10px] sm:text-xs text-neo-black/60 dark:text-neo-white/60 text-center">
+                  {t('landing.valueProps.freeForeverDesc') || 'No subscriptions ever'}
+                </span>
+              </div>
+              <div className="flex flex-col items-center p-2 sm:p-3 bg-white/50 dark:bg-neo-navy-light/50 rounded-neo border-2 border-neo-black/20 dark:border-neo-white/20">
+                <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-neo-purple mb-1" aria-hidden="true" />
+                <span className="text-xs sm:text-sm font-bold text-neo-black dark:text-neo-white text-center">
+                  {t('landing.valueProps.multiLanguage') || '5 Languages'}
+                </span>
+                <span className="text-[10px] sm:text-xs text-neo-black/60 dark:text-neo-white/60 text-center">
+                  {t('landing.valueProps.multiLanguageDesc') || 'EN, HE, SV, JA, ES'}
+                </span>
+              </div>
+            </div>
+
+            {/* Social Proof Stats */}
+            <div className="flex justify-center gap-4 sm:gap-8 py-2 sm:py-3 bg-gradient-to-r from-neo-yellow/20 via-neo-pink/20 to-neo-cyan/20 dark:from-neo-yellow/10 dark:via-neo-pink/10 dark:to-neo-cyan/10 rounded-neo border-2 border-neo-black/10 dark:border-neo-white/10">
+              <div className="text-center">
+                <span className="block text-lg sm:text-xl lg:text-2xl font-black text-neo-black dark:text-neo-white">
+                  {t('landing.socialProof.playersDaily') || '1,000+'}
+                </span>
+                <span className="text-[10px] sm:text-xs text-neo-black/60 dark:text-neo-white/60 uppercase tracking-wide">
+                  {t('landing.socialProof.playersDailyLabel') || 'daily players'}
+                </span>
+              </div>
+              <div className="text-center">
+                <span className="block text-lg sm:text-xl lg:text-2xl font-black text-neo-black dark:text-neo-white">
+                  {t('landing.socialProof.wordsFound') || '500K+'}
+                </span>
+                <span className="text-[10px] sm:text-xs text-neo-black/60 dark:text-neo-white/60 uppercase tracking-wide">
+                  {t('landing.socialProof.wordsFoundLabel') || 'words found'}
+                </span>
+              </div>
+              <div className="text-center">
+                <span className="block text-lg sm:text-xl lg:text-2xl font-black text-neo-black dark:text-neo-white">
+                  {t('landing.socialProof.rating') || '4.8★'}
+                </span>
+                <span className="text-[10px] sm:text-xs text-neo-black/60 dark:text-neo-white/60 uppercase tracking-wide">
+                  {t('landing.socialProof.ratingLabel') || 'player rating'}
+                </span>
+              </div>
+            </div>
+
+            {/* SEO Text - hidden visually but readable by search engines */}
+            <p className="sr-only">
+              {t('landing.altComparison') || 'Best free alternative to Boggle, Scrabble, and Wordle for groups'}
+            </p>
+          </section>
+        )}
 
       </main>
 
       {/* Tutorial FAB - Fixed bottom corner button */}
       {/* Z-index 45 ensures it stays below mobile menu backdrop (z-9998) but above other content */}
       {/* On desktop, positioned above Footer to avoid overlap with "Buy us a coffee" button */}
-      <motion.button
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.3, delay: 0.3 }}
+      <button
         onClick={handleOpenTutorial}
         className="
           fixed bottom-[calc(6rem+max(env(safe-area-inset-bottom),1rem))] lg:bottom-[calc(8.5rem+max(env(safe-area-inset-bottom),1rem))] right-4 z-[45]
@@ -306,12 +388,13 @@ const LandingView: React.FC = () => {
           transition-all duration-150
           rtl:right-auto rtl:left-4
           rtl:ml-[max(env(safe-area-inset-left),0px)]
+          animate-fade-in-up
         "
         aria-label={t('landing.tutorial') || 'Tutorial'}
       >
         <GraduationCap className="w-5 h-5" />
         <span className="hidden sm:inline">{t('landing.tutorial') || 'Tutorial'}</span>
-      </motion.button>
+      </button>
     </div>
   );
 };
