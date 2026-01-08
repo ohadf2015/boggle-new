@@ -1,147 +1,53 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { getCoins, addCoins as addLocalCoins, spendCoins as spendLocalCoins } from '@/utils/coinManager';
-import { syncCoinsToDatabase, spendCoinsFromDatabase, getProfile } from '@/lib/supabase';
-import toast from 'react-hot-toast';
+/**
+ * @deprecated This hook is deprecated. Use `useCoinContext()` from '@/contexts/CoinContext' instead.
+ *
+ * Migration:
+ * - For basic operations (coins, canAfford, addCoins, spendCoins, refreshCoins):
+ *   Replace `useCoins()` with `useCoinContext()`
+ * - For award operations (daily, game, combo, ad):
+ *   Use `useCoinContext()` which provides them directly
+ *
+ * Example migration:
+ * ```ts
+ * // Before
+ * import { useCoins } from '@/hooks/useCoins';
+ * const { coins, spendCoins } = useCoins();
+ *
+ * // After
+ * import { useCoinContext } from '@/contexts/CoinContext';
+ * const { coins, spendCoins } = useCoinContext();
+ * ```
+ */
 
-// Re-export types and context hook for convenience
+// Re-export everything from CoinContext for backward compatibility
 export type { CoinRewardResult, CoinRewardBreakdown } from '@/contexts/CoinContext';
-export { useCoinContext } from '@/contexts/CoinContext';
+export { useCoinContext, useCoinsFromContext } from '@/contexts/CoinContext';
+
+import { useRef, useEffect } from 'react';
+import { useCoinsFromContext } from '@/contexts/CoinContext';
 
 /**
- * useCoins Hook
+ * @deprecated Use `useCoinContext()` from '@/contexts/CoinContext' instead.
  *
- * Unifies coin management for both authenticated and guest users.
- * - Authenticated: Uses `profile.total_coins` and syncs with Supabase.
- * - Guest: Uses `localStorage` via `coinManager`.
- *
- * Note: This hook provides basic coin operations. For specialized
- * award operations (daily, game, combo), use useCoinContext() instead.
+ * This hook is a legacy wrapper around CoinContext that will be removed in a future version.
+ * It provides the same basic operations (coins, canAfford, addCoins, spendCoins, refreshCoins)
+ * but lacks the specialized award operations available in useCoinContext().
  */
 export function useCoins() {
-    const { user, profile, isAuthenticated, refreshProfile } = useAuth();
+  const hasWarned = useRef(false);
 
-    // Local state for guests or immediate updates
-    const [localCoins, setLocalCoins] = useState<number>(0);
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development' && !hasWarned.current) {
+      console.warn(
+        '[DEPRECATION] useCoins() from hooks/useCoins.ts is deprecated.\n' +
+        'Please migrate to useCoinContext() from "@/contexts/CoinContext".\n' +
+        'See the JSDoc in hooks/useCoins.ts for migration guide.'
+      );
+      hasWarned.current = true;
+    }
+  }, []);
 
-    // Initialize local coins on mount (for guests)
-    useEffect(() => {
-        if (!isAuthenticated) {
-            setLocalCoins(getCoins());
-        }
-    }, [isAuthenticated]);
-
-    // Determine effective coin balance
-    // Handle loading state: if user exists but profile not loaded yet, return 0
-    // (prevents using guest localCoins for authenticated users during profile load)
-    // Once profile loads, use profile.total_coins; for guests, use localCoins
-    const coins = user
-        ? (profile?.total_coins ?? 0) // Return 0 during profile loading for authenticated users
-        : localCoins; // Guest users use localStorage
-
-    /**
-     * Refreshes the coin balance
-     * - Auth: Refreshes profile from DB and returns fresh balance
-     * - Guest: Re-reads from localStorage
-     * @returns The new coin balance after refresh
-     */
-    const refreshCoins = useCallback(async (): Promise<number> => {
-        if (isAuthenticated && user?.id) {
-            // Refresh profile in context for UI updates
-            await refreshProfile();
-            // Also fetch profile directly to get fresh value immediately (avoids stale closure)
-            const { data: freshProfile } = await getProfile(user.id);
-            return freshProfile?.total_coins ?? 0;
-        } else {
-            const newBalance = getCoins();
-            setLocalCoins(newBalance);
-            return newBalance;
-        }
-    }, [isAuthenticated, user, refreshProfile]);
-
-    /**
-     * Check if user can afford an amount
-     */
-    const canAfford = useCallback((amount: number) => {
-        return coins >= amount;
-    }, [coins]);
-
-    /**
-     * Add coins to balance
-     */
-    const addCoins = useCallback(async (
-        amount: number,
-        reason: string,
-        metadata?: Record<string, string | number>
-    ) => {
-        if (amount <= 0) return 0;
-
-        if (isAuthenticated && user) {
-            // Authenticated: Sync to DB
-            const result = await syncCoinsToDatabase(user.id, amount, reason, metadata);
-
-            if (result.success) {
-                // Refresh profile to update UI with new balance
-                await refreshProfile();
-                // Also fetch fresh profile to get the actual updated value
-                const { data: freshProfile } = await getProfile(user.id);
-                return freshProfile?.total_coins ?? result.newBalance ?? (coins + amount);
-            } else {
-                console.error('Failed to add coins:', result.error);
-                toast.error('Failed to update coin balance');
-                return coins;
-            }
-        } else {
-            // Guest: Update localStorage
-            const newTotal = addLocalCoins(amount, reason, metadata);
-            setLocalCoins(newTotal);
-            return newTotal;
-        }
-    }, [isAuthenticated, user, coins, refreshProfile]);
-
-    /**
-     * Spend coins from balance
-     * Returns true if successful, false otherwise
-     */
-    const spendCoins = useCallback(async (
-        amount: number,
-        reason: string,
-        metadata?: Record<string, string | number>
-    ) => {
-        if (!canAfford(amount)) return false;
-
-        if (isAuthenticated && user) {
-            // Authenticated: Spend from DB
-            const result = await spendCoinsFromDatabase(user.id, amount, reason, metadata);
-
-            if (result.success) {
-                // Refresh profile to update UI with new balance
-                await refreshProfile();
-                // Fetch fresh profile to ensure UI updates immediately
-                await getProfile(user.id);
-                return true;
-            } else {
-                console.error('Failed to spend coins:', result.error);
-                toast.error('Failed to process transaction');
-                return false;
-            }
-        } else {
-            // Guest: Spend from localStorage
-            const success = spendLocalCoins(amount, reason, metadata);
-            if (success) {
-                setLocalCoins(getCoins());
-            }
-            return success;
-        }
-    }, [isAuthenticated, user, canAfford, refreshProfile]);
-
-    return {
-        coins,
-        canAfford,
-        addCoins,
-        spendCoins,
-        refreshCoins
-    };
+  return useCoinsFromContext();
 }

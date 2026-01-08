@@ -52,6 +52,10 @@ export interface TrainingProgress {
   // Did they skip the gateway modal? (respects choice but tracks for analytics)
   hasSkippedGateway: boolean;
   gatewaySkippedAt: string | null;
+
+  // Has the gateway modal been shown to this user? (shows only once)
+  hasSeenGateway: boolean;
+  gatewaySeenAt: string | null;
 }
 
 const DEFAULT_SKILLS: TrainingSkills = {
@@ -75,6 +79,8 @@ const DEFAULT_PROGRESS: TrainingProgress = {
   firstPassedDate: null,
   hasSkippedGateway: false,
   gatewaySkippedAt: null,
+  hasSeenGateway: false,
+  gatewaySeenAt: null,
 };
 
 /**
@@ -115,11 +121,25 @@ function saveTrainingProgress(progress: TrainingProgress): void {
 
 /**
  * Check if the training gateway should be shown
- * Shows if: not passed training AND not skipped gateway
+ * Shows if: not passed training AND not skipped gateway AND not already seen
+ * This ensures the modal only shows ONCE per user
  */
 export function shouldShowTrainingGateway(): boolean {
   const progress = getTrainingProgress();
-  return !progress.hasPassedTraining && !progress.hasSkippedGateway;
+  return !progress.hasPassedTraining && !progress.hasSkippedGateway && !progress.hasSeenGateway;
+}
+
+/**
+ * Mark the gateway as seen (called when modal is displayed)
+ * This ensures the modal only shows once, regardless of how user closes it
+ */
+export function markGatewaySeen(): void {
+  const progress = getTrainingProgress();
+  if (!progress.hasSeenGateway) {
+    progress.hasSeenGateway = true;
+    progress.gatewaySeenAt = new Date().toISOString();
+    saveTrainingProgress(progress);
+  }
 }
 
 /**

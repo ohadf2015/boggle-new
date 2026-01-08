@@ -566,7 +566,9 @@ router.post('/word-hunt/submit', async (req: WordHuntSubmitRequest, res: Respons
     } = req.body;
 
     // Validate required fields
-    if (!puzzleDate || !puzzleNumber || !language || solved === undefined || !attemptsUsed || !targetWord || !attemptWords) {
+    // Note: Use explicit undefined/null checks for attemptsUsed since 0 is a valid (but out-of-range) value
+    // that should be caught by the range validation below with a more specific error message
+    if (!puzzleDate || !puzzleNumber || !language || solved === undefined || attemptsUsed === undefined || attemptsUsed === null || !targetWord || !attemptWords) {
       res.status(400).json({ error: 'Missing required fields' });
       return;
     }

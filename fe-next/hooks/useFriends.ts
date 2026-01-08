@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMounted } from '@/hooks/useMounted';
 import {
   getFriends,
   getPendingRequests,
@@ -68,7 +69,7 @@ export function useFriends(): UseFriendsReturn {
     error: null,
   });
 
-  const isMounted = useRef(true);
+  const isMounted = useMounted();
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const onlineStatusIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -180,8 +181,6 @@ export function useFriends(): UseFriendsReturn {
 
   // Initial fetch and setup intervals
   useEffect(() => {
-    isMounted.current = true;
-
     if (isAuthenticated) {
       fetchAll();
 
@@ -207,7 +206,6 @@ export function useFriends(): UseFriendsReturn {
       }, FRIEND_LIST_REFRESH_INTERVAL);
 
       return () => {
-        isMounted.current = false;
         document.removeEventListener('visibilitychange', handleVisibilityChange);
         if (refreshIntervalRef.current) {
           clearInterval(refreshIntervalRef.current);
@@ -225,11 +223,8 @@ export function useFriends(): UseFriendsReturn {
         pendingChallenges: [],
         isLoading: false,
       }));
+      return undefined;
     }
-
-    return () => {
-      isMounted.current = false;
-    };
   }, [isAuthenticated, fetchAll]);
 
   return {

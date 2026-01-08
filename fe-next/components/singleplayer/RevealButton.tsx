@@ -9,7 +9,7 @@ import React, { memo, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, Star, Coins } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useCoins } from '@/hooks/useCoins';
+import { useCoinContext } from '@/contexts/CoinContext';
 import { COIN_COSTS, FREE_REVEALS_PER_GAME } from '@/utils/coinManager';
 import type { PathCell } from '@/utils/wordPathFinder';
 
@@ -31,7 +31,7 @@ const RevealButton = memo<RevealButtonProps>(({
   t,
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
-  const { coins, spendCoins, canAfford } = useCoins();
+  const { coins, spendCoins, canAfford } = useCoinContext();
 
   const freeRevealsRemaining = Math.max(0, FREE_REVEALS_PER_GAME - revealsUsed);
   const isFreeReveal = freeRevealsRemaining > 0;

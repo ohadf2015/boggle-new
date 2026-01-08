@@ -2908,7 +2908,9 @@ export async function syncGuestDailyResultsToAccount(
           continue;
         }
 
-        if (result.solved === undefined || result.attemptsUsed === undefined || !result.targetWord || !Array.isArray(result.attempts)) {
+        // Validate result has all required fields and attemptsUsed is within valid range (1-10)
+        // attemptsUsed < 1 indicates an incomplete/abandoned game that shouldn't be synced
+        if (result.solved === undefined || result.attemptsUsed === undefined || result.attemptsUsed < 1 || !result.targetWord || !Array.isArray(result.attempts)) {
           console.warn(`[Sync] Skipping malformed result for ${puzzleDate} (${language}):`, {
             solved: result.solved,
             attemptsUsed: result.attemptsUsed,

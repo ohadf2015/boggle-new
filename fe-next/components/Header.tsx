@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BarChart3, Menu, X, Settings, BookOpen, Trophy, ScrollText, Shield, Coffee, User } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { cn } from '../lib/utils';
@@ -25,6 +26,7 @@ interface HeaderProps {
 const Header = memo<HeaderProps>(({ className = '' }) => {
     const { t, language, currentFlag } = useLanguage();
     const { isAuthenticated, isAdmin, profile } = useAuth();
+    const router = useRouter();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [mounted, setMounted] = useState(false);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
@@ -75,10 +77,10 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
         }
     }, [language]);
 
-    // Memoized navigation handler
+    // Memoized navigation handler - use router for client-side navigation with locale
     const handleLogoClick = useCallback(() => {
-        window.location.href = '/';
-    }, []);
+        router.push(`/${language}`);
+    }, [language, router]);
 
     // Auth Modal State
     const [showAuthModal, setShowAuthModal] = useState(false);

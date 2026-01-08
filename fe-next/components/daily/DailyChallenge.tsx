@@ -14,7 +14,7 @@ import GuestNameEditor from './GuestNameEditor';
 import { DailyChallengeTutorial } from './DailyChallengeTutorial';
 import DailyIntroCarousel from './DailyIntroCarousel';
 import { TrainingGatewayModal } from '@/components/training';
-import { shouldShowTrainingGateway, markGatewaySkipped } from '@/utils/trainingProgressStorage';
+import { shouldShowTrainingGateway, markGatewaySkipped, markGatewaySeen } from '@/utils/trainingProgressStorage';
 import WordHuntLoginGate from '@/components/auth/WordHuntLoginGate';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -164,6 +164,7 @@ const DailyChallenge: React.FC = () => {
       const timer = setTimeout(() => {
         setShowTrainingGateway(true);
         setGatewayShownThisSession(true); // Mark as shown this session
+        markGatewaySeen(); // Mark as seen in localStorage so it only shows once per user
       }, 500);
       return () => clearTimeout(timer);
     }

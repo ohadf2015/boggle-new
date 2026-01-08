@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/utils/supabase/client';
+import { useMounted } from '@/hooks/useMounted';
 import type {
   BrainScore,
   BrainScoreWithDomains,
@@ -133,7 +134,7 @@ export function useBrainScore(): UseBrainScoreReturn {
     hasFetched: false,
   });
 
-  const isMounted = useRef(true);
+  const isMounted = useMounted();
   const isFetching = useRef(false); // Prevent concurrent fetches
   const hasFetchedRef = useRef(false); // Track if initial fetch is done (use ref to avoid stale closure)
   const lastUserId = useRef<string | null>(null); // Track user ID to detect changes
@@ -331,18 +332,12 @@ export function useBrainScore(): UseBrainScoreReturn {
   // Fetch on mount and when auth changes
   // Wait for auth to finish loading to prevent multiple fetches during auth initialization
   useEffect(() => {
-    isMounted.current = true;
-
     // Don't fetch while auth is still loading - this prevents flickering
     if (authLoading) {
       return;
     }
 
     fetchBrainScore();
-
-    return () => {
-      isMounted.current = false;
-    };
   }, [fetchBrainScore, authLoading]);
 
   // Destructure to exclude hasFetched from return value

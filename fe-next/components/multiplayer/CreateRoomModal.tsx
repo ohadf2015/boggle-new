@@ -85,8 +85,13 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
     // Get initial values from storage or profile
     if (isAuthenticated && displayName) {
       setUsername(displayName);
-      // Use profile avatar ID or special PROFILE_AVATAR_ID marker
-      setAvatarId(profileAvatarId || PROFILE_AVATAR_ID);
+      // Prioritize profile picture - use PROFILE_AVATAR_ID to show it
+      // If no profile picture, fall back to profile avatar ID or PROFILE_AVATAR_ID marker
+      if (profilePictureUrl) {
+        setAvatarId(PROFILE_AVATAR_ID);
+      } else {
+        setAvatarId(profileAvatarId || PROFILE_AVATAR_ID);
+      }
     } else {
       // Guest user - check localStorage
       const storedUsername = getStoredUsername();
@@ -109,7 +114,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
         setAvatarId(randomAvatar.id);
       }
     }
-  }, [isOpen, isAuthenticated, displayName, profileAvatarId, defaultLanguage, avatarId]);
+  }, [isOpen, isAuthenticated, displayName, profileAvatarId, profilePictureUrl, defaultLanguage, avatarId]);
 
   // Handle avatar picker save
   const handleAvatarSave = useCallback(

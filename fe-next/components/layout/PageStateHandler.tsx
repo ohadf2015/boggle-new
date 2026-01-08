@@ -1,0 +1,184 @@
+'use client';
+
+import React from 'react';
+import { motion } from 'framer-motion';
+import { AlertCircle, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useTheme } from '@/utils/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
+
+interface PageStateHandlerProps {
+  /** Whether content is loading */
+  isLoading: boolean;
+  /** Error message to display */
+  error?: string | null;
+  /** Whether the data is empty (show empty state) */
+  isEmpty?: boolean;
+  /** Callback when retry button is clicked */
+  onRetry?: () => void;
+  /** Custom loading component */
+  loadingComponent?: React.ReactNode;
+  /** Custom error component */
+  errorComponent?: React.ReactNode;
+  /** Custom empty state component */
+  emptyComponent?: React.ReactNode;
+  /** Loading text */
+  loadingText?: string;
+  /** Empty state text */
+  emptyText?: string;
+  /** Empty state icon */
+  emptyIcon?: React.ReactNode;
+  /** Content to render when not loading/error/empty */
+  children: React.ReactNode;
+}
+
+/**
+ * PageStateHandler - Handles loading, error, and empty states for pages
+ *
+ * Provides consistent UI for:
+ * - Loading spinner with message
+ * - Error state with retry button
+ * - Empty state with customizable message
+ *
+ * Falls through to children when none of the above states apply.
+ *
+ * @example
+ * <PageStateHandler
+ *   isLoading={loading}
+ *   error={error}
+ *   onRetry={refetch}
+ * >
+ *   <PageContent data={data} />
+ * </PageStateHandler>
+ */
+export function PageStateHandler({
+  isLoading,
+  error,
+  isEmpty = false,
+  onRetry,
+  loadingComponent,
+  errorComponent,
+  emptyComponent,
+  loadingText,
+  emptyText,
+  emptyIcon,
+  children,
+}: PageStateHandlerProps) {
+  const { theme } = useTheme();
+  const { t } = useLanguage();
+  const isDarkMode = theme === 'dark';
+
+  // Loading state
+  if (isLoading) {
+    if (loadingComponent) {
+      return <>{loadingComponent}</>;
+    }
+
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <motion.div
+          className={cn(
+            'w-12 h-12 border-4 rounded-full',
+            isDarkMode
+              ? 'border-cyan-500 border-t-transparent'
+              : 'border-cyan-600 border-t-transparent'
+          )}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+        />
+        <p
+          className={cn(
+            'mt-4 text-sm',
+            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+          )}
+        >
+          {loadingText || t('common.loading') || 'Loading...'}
+        </p>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    if (errorComponent) {
+      return <>{errorComponent}</>;
+    }
+
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <AlertCircle
+          className={cn(
+            'w-16 h-16 mb-4',
+            isDarkMode ? 'text-red-400' : 'text-red-500'
+          )}
+        />
+        <p
+          className={cn(
+            'text-lg font-medium mb-2',
+            isDarkMode ? 'text-white' : 'text-gray-900'
+          )}
+        >
+          {t('common.error') || 'Something went wrong'}
+        </p>
+        <p
+          className={cn(
+            'text-sm mb-4 text-center max-w-md',
+            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+          )}
+        >
+          {error}
+        </p>
+        {onRetry && (
+          <Button
+            onClick={onRetry}
+            className={cn(
+              'flex items-center gap-2',
+              isDarkMode
+                ? 'bg-cyan-600 hover:bg-cyan-700 text-white'
+                : 'bg-cyan-500 hover:bg-cyan-600 text-white'
+            )}
+          >
+            <RefreshCw className="w-4 h-4" />
+            {t('common.retry') || 'Try Again'}
+          </Button>
+        )}
+      </div>
+    );
+  }
+
+  // Empty state
+  if (isEmpty) {
+    if (emptyComponent) {
+      return <>{emptyComponent}</>;
+    }
+
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        {emptyIcon || (
+          <div
+            className={cn(
+              'w-16 h-16 mb-4 rounded-full flex items-center justify-center',
+              isDarkMode ? 'bg-slate-700' : 'bg-gray-100'
+            )}
+          >
+            <span className="text-3xl">📭</span>
+          </div>
+        )}
+        <p
+          className={cn(
+            'text-lg font-medium',
+            isDarkMode ? 'text-white' : 'text-gray-900'
+          )}
+        >
+          {emptyText || t('common.noData') || 'No data available'}
+        </p>
+      </div>
+    );
+  }
+
+  // Render children when no special state
+  return <>{children}</>;
+}
+
+export default PageStateHandler;

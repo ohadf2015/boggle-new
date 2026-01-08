@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Coins, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRewardedAd, AdStatus } from '@/hooks/useRewardedAd';
-import { useCoins } from '@/hooks/useCoins';
+import { useCoinContext } from '@/contexts/CoinContext';
 import { cn } from '@/lib/utils';
 
 interface WatchAdButtonProps {
@@ -38,7 +38,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
   const [showSuccess, setShowSuccess] = useState(false);
   const [earnedAmount, setEarnedAmount] = useState(0);
 
-  const { coins: currentCoins, refreshCoins } = useCoins();
+  const { coins: currentCoins, refreshCoins } = useCoinContext();
 
   // Update effect to refresh coins when ad succeeds
   const { showAd, isAdAvailable, status, error, rewardAmount } = useRewardedAd({

@@ -5,6 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, X, User } from 'lucide-react';
 import Image from 'next/image';
 import { AVATARS, getAvatarPath, mapEmojiToAvatar, type AvatarConfig } from '@/utils/avatarConfig';
+import { useTheme } from '@/utils/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
 
 // Special constant for "use profile avatar" selection
 export const PROFILE_AVATAR_ID = '__profile_avatar__';
@@ -54,6 +57,10 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
   currentAvatarImage,
   profileAvatar
 }) => {
+  const { theme } = useTheme();
+  const { t } = useLanguage();
+  const isDarkMode = theme === 'dark';
+
   // Check if profile avatar is available (user has profile picture, avatar image, or emoji)
   const hasProfileAvatar = profileAvatar && (profileAvatar.profilePictureUrl || profileAvatar.avatarImage || profileAvatar.avatarEmoji);
 
@@ -134,45 +141,68 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4"
         onClick={onClose}
         role="dialog"
         aria-modal="true"
-        aria-label="Choose your avatar"
+        aria-label={t('profile.chooseAvatar') || 'Choose your avatar'}
       >
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
-          className="w-full max-w-md p-6 bg-neo-cream border-4 border-neo-black shadow-hard"
+          className={cn(
+            'w-full max-w-md rounded-2xl overflow-hidden',
+            isDarkMode
+              ? 'bg-slate-800 border border-slate-700'
+              : 'bg-white border border-gray-200 shadow-xl'
+          )}
           onClick={(e) => e.stopPropagation()}
         >
+          {/* Header */}
+          <div className={cn(
+            'px-6 py-4 border-b',
+            isDarkMode ? 'border-slate-700' : 'border-gray-200'
+          )}>
+            <h2 className={cn(
+              'text-lg font-bold text-center',
+              isDarkMode ? 'text-white' : 'text-gray-900'
+            )}>
+              {t('profile.chooseAvatar') || 'Choose Your Avatar'}
+            </h2>
+          </div>
+
           {/* Preview */}
-          <div className="flex flex-col items-center mb-4">
-            <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-neo-black shadow-hard mb-3 relative">
+          <div className={cn(
+            'flex flex-col items-center py-4',
+            isDarkMode ? 'bg-slate-900/50' : 'bg-gray-50'
+          )}>
+            <div className={cn(
+              'w-20 h-20 rounded-full overflow-hidden border-4 mb-2 relative',
+              isDarkMode ? 'border-slate-600' : 'border-gray-300'
+            )}>
               {useProfileAvatar ? (
                 profileAvatar?.profilePictureUrl ? (
                   <Image
                     src={profileAvatar.profilePictureUrl}
                     alt={profileAvatar.displayName || 'Profile'}
                     fill
-                    sizes="96px"
+                    sizes="80px"
                     className="object-cover"
                     priority
                   />
                 ) : profileAvatar?.avatarImage ? (
-                  // Show profile's avatar_image in preview
                   <Image
                     src={getAvatarPath(AVATARS.find(a => a.id === profileAvatar.avatarImage) || AVATARS[0])}
                     alt={profileAvatar.displayName || 'Profile Avatar'}
                     fill
-                    sizes="96px"
+                    sizes="80px"
                     className="object-cover"
                     priority
                   />
                 ) : (
                   <div
-                    className="w-full h-full flex items-center justify-center text-4xl"
+                    className="w-full h-full flex items-center justify-center text-3xl"
                     style={{ backgroundColor: profileAvatar?.avatarColor || '#4ECDC4' }}
                   >
                     {profileAvatar?.avatarEmoji || '🎮'}
@@ -183,116 +213,148 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
                   src={getAvatarPath(selectedAvatar)}
                   alt={selectedAvatar.name}
                   fill
-                  sizes="96px"
+                  sizes="80px"
                   className="object-cover"
                   priority
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-slate-200">
-                  <User className="w-12 h-12 text-slate-400" />
+                <div className={cn(
+                  'w-full h-full flex items-center justify-center',
+                  isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+                )}>
+                  <User className={cn('w-10 h-10', isDarkMode ? 'text-slate-500' : 'text-gray-400')} />
                 </div>
               )}
             </div>
-            <p className="text-lg font-black text-neo-black uppercase tracking-wide">
+            <p className={cn(
+              'text-sm font-bold',
+              isDarkMode ? 'text-gray-300' : 'text-gray-700'
+            )}>
               {getPreviewName()}
             </p>
           </div>
 
           {/* Avatar Gallery Grid */}
-          <div className="mb-4">
-            <p className="text-sm font-bold mb-3 text-neo-black uppercase tracking-wide">
-              Choose Your Avatar
-            </p>
-            <div className="grid grid-cols-4 gap-3 max-h-80 overflow-y-auto pr-2">
+          <div className="p-4">
+            <div className="grid grid-cols-5 gap-2 max-h-64 overflow-y-auto">
               {/* Profile Avatar Option (if available) */}
               {hasProfileAvatar && (
                 <button
                   onClick={handleSelectProfileAvatar}
-                  aria-label="Use your profile avatar"
+                  aria-label={t('profile.useProfileAvatar') || 'Use your profile avatar'}
                   aria-pressed={useProfileAvatar}
-                  className={`relative aspect-square overflow-hidden transition-all duration-100 border-3 ${
+                  className={cn(
+                    'relative aspect-square rounded-xl overflow-hidden transition-all duration-150',
                     useProfileAvatar
-                      ? 'ring-4 ring-neo-cyan scale-105 shadow-hard border-neo-cyan'
-                      : 'hover:scale-105 hover:shadow-hard-sm border-neo-black'
-                  }`}
+                      ? 'ring-3 ring-neo-cyan ring-offset-2 scale-105'
+                      : cn(
+                          'hover:scale-105',
+                          isDarkMode ? 'ring-offset-slate-800' : 'ring-offset-white'
+                        ),
+                    isDarkMode ? 'ring-offset-slate-800' : 'ring-offset-white'
+                  )}
                 >
                   {profileAvatar?.profilePictureUrl ? (
                     <Image
                       src={profileAvatar.profilePictureUrl}
                       alt={profileAvatar.displayName || 'Profile'}
                       fill
-                      sizes="(max-width: 640px) 64px, 80px"
+                      sizes="64px"
                       className="object-cover"
                       loading="lazy"
                     />
                   ) : profileAvatar?.avatarImage ? (
-                    // Show profile's avatar_image if no profile picture URL
                     <Image
                       src={getAvatarPath(AVATARS.find(a => a.id === profileAvatar.avatarImage) || AVATARS[0])}
                       alt={profileAvatar.displayName || 'Profile Avatar'}
                       fill
-                      sizes="(max-width: 640px) 64px, 80px"
+                      sizes="64px"
                       className="object-cover"
                       loading="lazy"
                     />
                   ) : (
                     <div
-                      className="w-full h-full flex items-center justify-center text-2xl"
+                      className="w-full h-full flex items-center justify-center text-xl"
                       style={{ backgroundColor: profileAvatar?.avatarColor || '#4ECDC4' }}
                     >
                       {profileAvatar?.avatarEmoji || '🎮'}
                     </div>
                   )}
-                  {/* "Your Profile" label */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-neo-black/80 text-white text-[8px] font-bold text-center py-0.5">
-                    PROFILE
+                  {/* "Profile" label */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-neo-black/80 text-white text-[7px] font-bold text-center py-0.5">
+                    {t('profile.you') || 'YOU'}
                   </div>
+                  {/* Selected checkmark */}
+                  {useProfileAvatar && (
+                    <div className="absolute top-1 right-1 w-5 h-5 bg-neo-cyan rounded-full flex items-center justify-center">
+                      <Check className="w-3 h-3 text-white" />
+                    </div>
+                  )}
                 </button>
               )}
 
               {/* Regular Avatars */}
-              {AVATARS.map((avatar) => (
-                <button
-                  key={avatar.id}
-                  onClick={() => handleSelectAvatar(avatar)}
-                  aria-label={`Select ${avatar.name} avatar`}
-                  aria-pressed={!useProfileAvatar && selectedAvatar?.id === avatar.id}
-                  className={`relative aspect-square overflow-hidden transition-all duration-100 border-3 border-neo-black ${
-                    !useProfileAvatar && selectedAvatar?.id === avatar.id
-                      ? 'ring-4 ring-neo-cyan scale-105 shadow-hard'
-                      : 'hover:scale-105 hover:shadow-hard-sm'
-                  }`}
-                >
-                  <Image
-                    src={getAvatarPath(avatar)}
-                    alt={avatar.name}
-                    fill
-                    sizes="(max-width: 640px) 64px, 80px"
-                    className="object-cover"
-                    loading="lazy"
-                  />
-                </button>
-              ))}
+              {AVATARS.map((avatar) => {
+                const isSelected = !useProfileAvatar && selectedAvatar?.id === avatar.id;
+                return (
+                  <button
+                    key={avatar.id}
+                    onClick={() => handleSelectAvatar(avatar)}
+                    aria-label={`${t('profile.selectAvatar') || 'Select'} ${avatar.name}`}
+                    aria-pressed={isSelected}
+                    className={cn(
+                      'relative aspect-square rounded-xl overflow-hidden transition-all duration-150',
+                      isSelected
+                        ? 'ring-3 ring-neo-cyan ring-offset-2 scale-105'
+                        : 'hover:scale-105',
+                      isDarkMode ? 'ring-offset-slate-800' : 'ring-offset-white'
+                    )}
+                  >
+                    <Image
+                      src={getAvatarPath(avatar)}
+                      alt={avatar.name}
+                      fill
+                      sizes="64px"
+                      className="object-cover"
+                      loading="lazy"
+                    />
+                    {/* Selected checkmark */}
+                    {isSelected && (
+                      <div className="absolute top-1 right-1 w-5 h-5 bg-neo-cyan rounded-full flex items-center justify-center">
+                        <Check className="w-3 h-3 text-white" />
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           {/* Buttons */}
-          <div className="flex gap-3">
+          <div className={cn(
+            'flex gap-3 p-4 border-t',
+            isDarkMode ? 'border-slate-700' : 'border-gray-200'
+          )}>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 font-bold uppercase tracking-wide transition-all duration-100 flex items-center justify-center gap-2 bg-neo-cream text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
+              className={cn(
+                'flex-1 py-3 font-bold rounded-xl transition-all flex items-center justify-center gap-2',
+                isDarkMode
+                  ? 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              )}
             >
-              <X size={14} />
-              Cancel
+              <X size={16} />
+              {t('common.cancel') || 'Cancel'}
             </button>
             <button
               type="button"
               onClick={handleSave}
-              className="flex-1 py-3 font-bold uppercase tracking-wide transition-all duration-100 flex items-center justify-center gap-2 bg-neo-cyan text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
+              className="flex-1 py-3 font-bold rounded-xl transition-all flex items-center justify-center gap-2 bg-neo-cyan text-neo-black hover:bg-neo-cyan/90"
             >
-              <Check size={14} />
-              Save
+              <Check size={16} />
+              {t('common.save') || 'Save'}
             </button>
           </div>
         </motion.div>

@@ -332,34 +332,6 @@ const LandingView: React.FC = () => {
               </div>
             </div>
 
-            {/* Social Proof Stats */}
-            <div className="flex justify-center gap-4 sm:gap-8 py-2 sm:py-3 bg-gradient-to-r from-neo-yellow/20 via-neo-pink/20 to-neo-cyan/20 dark:from-neo-yellow/10 dark:via-neo-pink/10 dark:to-neo-cyan/10 rounded-neo border-2 border-neo-black/10 dark:border-neo-white/10">
-              <div className="text-center">
-                <span className="block text-lg sm:text-xl lg:text-2xl font-black text-neo-black dark:text-neo-white">
-                  {t('landing.socialProof.playersDaily') || '1,000+'}
-                </span>
-                <span className="text-[10px] sm:text-xs text-neo-black/60 dark:text-neo-white/60 uppercase tracking-wide">
-                  {t('landing.socialProof.playersDailyLabel') || 'daily players'}
-                </span>
-              </div>
-              <div className="text-center">
-                <span className="block text-lg sm:text-xl lg:text-2xl font-black text-neo-black dark:text-neo-white">
-                  {t('landing.socialProof.wordsFound') || '500K+'}
-                </span>
-                <span className="text-[10px] sm:text-xs text-neo-black/60 dark:text-neo-white/60 uppercase tracking-wide">
-                  {t('landing.socialProof.wordsFoundLabel') || 'words found'}
-                </span>
-              </div>
-              <div className="text-center">
-                <span className="block text-lg sm:text-xl lg:text-2xl font-black text-neo-black dark:text-neo-white">
-                  {t('landing.socialProof.rating') || '4.8★'}
-                </span>
-                <span className="text-[10px] sm:text-xs text-neo-black/60 dark:text-neo-white/60 uppercase tracking-wide">
-                  {t('landing.socialProof.ratingLabel') || 'player rating'}
-                </span>
-              </div>
-            </div>
-
             {/* SEO Text - hidden visually but readable by search engines */}
             <p className="sr-only">
               {t('landing.altComparison') || 'Best free alternative to Boggle, Scrabble, and Wordle for groups'}

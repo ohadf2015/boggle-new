@@ -61,6 +61,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [isSupabaseEnabled, setIsSupabaseEnabled] = useState<boolean>(false);
   const lastVisibleTimeRef = useRef<number>(Date.now());
+  // Track user ID in ref for comparisons to avoid stale closure issues
+  // This prevents infinite loops when setUser is called with same user (different object reference)
+  const userIdRef = useRef<string | null>(null);
+
+  // Keep ref in sync with user state - runs whenever user changes
+  useEffect(() => {
+    userIdRef.current = user?.id ?? null;
+  }, [user]);
 
   /**
    * Submit any pending daily challenge result after OAuth signup
@@ -439,16 +447,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             }
           }
         } else if (session?.user) {
-          setUser(session.user);
-          // Fetch user data in background, don't block loading state
-          fetchUserData(session.user.id, session.user.user_metadata).catch((err) => {
-            logger.warn('Failed to fetch user data:', err.message);
-            captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
-              operation: 'fetch_user_data',
-              service: 'auth',
-              userId: session.user.id,
+          // Only update user if ID changed to prevent infinite loops
+          // (Supabase returns new object references even for same user)
+          if (session.user.id !== userIdRef.current) {
+            setUser(session.user);
+            // Fetch user data in background, don't block loading state
+            fetchUserData(session.user.id, session.user.user_metadata).catch((err) => {
+              logger.warn('Failed to fetch user data:', err.message);
+              captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
+                operation: 'fetch_user_data',
+                service: 'auth',
+                userId: session.user.id,
+              });
             });
-          });
+          }
         }
       } catch (err) {
         if (!isMounted) return;
@@ -475,28 +487,32 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
           // Handle cross-tab auth state sync
           if (event === 'SIGNED_IN' && session?.user) {
-            setUser(session.user);
-            // Link guest session to user account
-            linkSessionToUser(session.user.id).catch((err) => {
-              logger.warn('Failed to link guest session to user:', err);
-              captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
-                operation: 'link_session_to_user',
-                service: 'sessionTracking',
-                userId: session.user.id,
+            // Only update user if ID changed to prevent infinite loops
+            const isNewUser = session.user.id !== userIdRef.current;
+            if (isNewUser) {
+              setUser(session.user);
+              // Link guest session to user account
+              linkSessionToUser(session.user.id).catch((err) => {
+                logger.warn('Failed to link guest session to user:', err);
+                captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
+                  operation: 'link_session_to_user',
+                  service: 'sessionTracking',
+                  userId: session.user.id,
+                });
               });
-            });
-            // Only set loading if we don't already have profile data
-            // This prevents loading state getting stuck on tab visibility change
-            setLoading(currentLoading => {
-              // If already loading, stay loading; if not loading and no profile, set loading
-              // If we already have profile data, don't set loading - just refresh in background
-              return currentLoading;
-            });
-            try {
-              await fetchUserData(session.user.id, session.user.user_metadata);
-            } finally {
-              if (isMounted) {
-                setLoading(false);
+              // Only set loading if we don't already have profile data
+              // This prevents loading state getting stuck on tab visibility change
+              setLoading(currentLoading => {
+                // If already loading, stay loading; if not loading and no profile, set loading
+                // If we already have profile data, don't set loading - just refresh in background
+                return currentLoading;
+              });
+              try {
+                await fetchUserData(session.user.id, session.user.user_metadata);
+              } finally {
+                if (isMounted) {
+                  setLoading(false);
+                }
               }
             }
           } else if (event === 'SIGNED_OUT') {
@@ -519,19 +535,28 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           } else if (event === 'INITIAL_SESSION') {
             // Handle initial session from other tabs - ensure loading is set
             if (session?.user) {
-              setUser(session.user);
-              // Link guest session to user account
-              linkSessionToUser(session.user.id).catch((err) => {
-                logger.warn('Failed to link guest session to user:', err);
-                captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
-                  operation: 'link_session_to_user',
-                  service: 'sessionTracking',
-                  userId: session.user.id,
+              // Only update user if ID changed to prevent infinite loops
+              const isNewUser = session.user.id !== userIdRef.current;
+              if (isNewUser) {
+                setUser(session.user);
+                // Link guest session to user account
+                linkSessionToUser(session.user.id).catch((err) => {
+                  logger.warn('Failed to link guest session to user:', err);
+                  captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
+                    operation: 'link_session_to_user',
+                    service: 'sessionTracking',
+                    userId: session.user.id,
+                  });
                 });
-              });
-              try {
-                await fetchUserData(session.user.id, session.user.user_metadata);
-              } finally {
+                try {
+                  await fetchUserData(session.user.id, session.user.user_metadata);
+                } finally {
+                  if (isMounted) {
+                    setLoading(false);
+                  }
+                }
+              } else {
+                // Same user, just ensure loading is false
                 if (isMounted) {
                   setLoading(false);
                 }
@@ -559,10 +584,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             try {
               const { data: sessionData } = await supabase.auth.getSession();
               if (sessionData?.session?.user && isMounted) {
-                // Session synced from other tab - update state
-                setUser(sessionData.session.user);
-                await fetchUserData(sessionData.session.user.id, sessionData.session.user.user_metadata);
-                setLoading(false);
+                // Only update user if ID changed to prevent infinite loops
+                if (sessionData.session.user.id !== userIdRef.current) {
+                  // Session synced from other tab - update state
+                  setUser(sessionData.session.user);
+                  await fetchUserData(sessionData.session.user.id, sessionData.session.user.user_metadata);
+                  setLoading(false);
+                }
               }
             } catch (err) {
               logger.warn('AuthContext: Error handling cross-tab auth success:', err);
@@ -583,7 +611,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             try {
               const { data: sessionData } = await supabase.auth.getSession();
               if (sessionData?.session?.user && isMounted) {
-                setUser(sessionData.session.user);
+                // Only update user if ID changed to prevent infinite loops
+                if (sessionData.session.user.id !== userIdRef.current) {
+                  setUser(sessionData.session.user);
+                }
               }
             } catch (err) {
               logger.warn('AuthContext: Error handling cross-tab session refresh:', err);
@@ -621,7 +652,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         const timeInactive = now - lastVisibleTimeRef.current;
         const TEN_MINUTES = 10 * 60 * 1000;
 
-        if (timeInactive > TEN_MINUTES && user) {
+        // Use ref for current user ID to avoid stale closure issues
+        const currentUserId = userIdRef.current;
+
+        if (timeInactive > TEN_MINUTES && currentUserId) {
           // Verify session is still valid after long inactivity
           logger.log('Tab visible after long inactivity, checking session validity');
           if (supabase) {
@@ -640,7 +674,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           const { data: sessionData } = await supabase.auth.getSession();
           if (sessionData?.session?.user) {
             // Session exists - ensure our state reflects it
-            if (!user || user.id !== sessionData.session.user.id) {
+            // Use ref for accurate comparison (closure would be stale)
+            if (sessionData.session.user.id !== userIdRef.current) {
               if (isMounted) {
                 logger.log('Session synced from cookies on tab visibility');
                 setUser(sessionData.session.user);
@@ -651,7 +686,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                 }
               }
             }
-          } else if (user && isMounted) {
+          } else if (userIdRef.current && isMounted) {
             // Session doesn't exist but we think user is logged in - clear state
             logger.warn('No session found on tab visibility but user state exists');
             await clearAuthState('Session not found on tab visibility');
@@ -711,7 +746,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       window.removeEventListener('supabase-auth-error', handleAuthError as EventListener);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [fetchUserData, clearAuthState, user]);
+  // Note: user removed from deps - using userIdRef instead to prevent infinite loops
+  // when Supabase returns new object references for same user
+  }, [fetchUserData, clearAuthState]);
 
   const refreshProfile = useCallback(async () => {
     if (user?.id) {

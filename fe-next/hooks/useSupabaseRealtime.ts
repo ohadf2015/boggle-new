@@ -17,6 +17,7 @@ import {
 import {
   leaderboardOperations
 } from '../lib/supabaseEnhanced';
+import { useMounted } from '@/hooks/useMounted';
 
 /**
  * Hook to create a debounced callback
@@ -92,13 +93,7 @@ export function useLeaderboard(options: LeaderboardOptions = {}): LeaderboardRes
   const [subscriptionStatus, setSubscriptionStatus] = useState('disconnected');
 
   // Track if component is mounted to prevent state updates after unmount
-  const isMountedRef = useRef(true);
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
+  const isMountedRef = useMounted();
 
   const fetchLeaderboard = useCallback(async () => {
     if (!enabled) return;
@@ -171,13 +166,7 @@ export function useUserRank(userId: string | null | undefined): UserRankResult {
   const [error, setError] = useState<any>(null);
 
   // Track if component is mounted
-  const isMountedRef = useRef(true);
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
+  const isMountedRef = useMounted();
 
   const fetchRank = useCallback(async () => {
     if (!userId) {

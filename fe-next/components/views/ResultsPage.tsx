@@ -12,7 +12,7 @@ import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { shouldShowUpgradePrompt, getGuestStatsSummary, updateGuestStatsAfterGame, isFirstWin } from '@/utils/guestManager';
 import { useWinStreak } from '@/hooks/useWinStreak';
-import { useCoins } from '@/hooks/useCoins';
+import { useCoinContext } from '@/contexts/CoinContext';
 import { useFirstWinCelebration } from '@/hooks/useFirstWinCelebration';
 import { trackGameCompletion, trackStreakMilestone } from '@/utils/growthTracking';
 import logger from '@/utils/logger';
@@ -206,8 +206,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     }
   }, [isAuthenticated, finalScores, username, isCurrentUserWinner, achievements]);
 
-  // Use unified unified coin hook
-  const { refreshCoins } = useCoins();
+  // Use unified coin context
+  const { refreshCoins } = useCoinContext();
 
   // Award coins for multiplayer game completion
   useEffect(() => {

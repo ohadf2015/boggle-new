@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
+import { useMounted } from '@/hooks/useMounted';
 
 /**
  * Modal types in priority order (higher priority = shown first)
@@ -82,15 +83,8 @@ export function useModalQueue(options?: {
     queue: [],
   });
 
-  // Track if component is mounted
-  const isMountedRef = useRef(true);
-
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
+  // Track if component is mounted (for future use if needed)
+  const _isMountedRef = useMounted();
 
   const canShowModal = useCallback((type: ModalType): boolean => {
     // Always allow types in the whitelist
