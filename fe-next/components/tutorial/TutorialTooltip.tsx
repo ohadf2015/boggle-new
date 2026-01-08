@@ -131,9 +131,9 @@ const TutorialTooltip: React.FC<TutorialTooltipProps> = ({
       onClick={(e) => e.stopPropagation()}
     >
       {/* Main tooltip card */}
-      <div className="bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg overflow-hidden">
+      <div className="bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg">
         {/* Header with icon and skip button */}
-        <div className="bg-neo-yellow border-b-3 border-neo-black px-4 py-3 flex items-center justify-between text-neo-black">
+        <div className="bg-neo-yellow border-b-3 border-neo-black px-4 py-3 flex items-center justify-between text-neo-black overflow-visible">
           <div className="flex items-center gap-2">
             {IconComponent && (
               <div className="w-8 h-8 bg-neo-white border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm">
@@ -157,7 +157,7 @@ const TutorialTooltip: React.FC<TutorialTooltipProps> = ({
         </div>
 
         {/* Content */}
-        <div className="px-4 py-4 space-y-3">
+        <div className="px-4 py-4 space-y-3 overflow-hidden">
           <h3 className="font-black text-lg text-neo-black">
             {t(step.titleKey)}
           </h3>
@@ -167,7 +167,7 @@ const TutorialTooltip: React.FC<TutorialTooltipProps> = ({
         </div>
 
         {/* Navigation buttons */}
-        <div className="px-4 py-3 bg-neo-white/50 border-t-2 border-neo-black/20 flex items-center justify-between">
+        <div className="px-4 py-3 bg-neo-white/50 border-t-2 border-neo-black/20 flex items-center justify-between overflow-hidden">
           <button
             onClick={(e) => {
               e.stopPropagation();

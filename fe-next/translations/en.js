@@ -2188,6 +2188,11 @@ const en = {
       "maybeLater": "Later",
       "continueAsGuest": "Continue as guest"
     },
+    "wordHunt": {
+      "loginTitle": "Sign in to play",
+      "loginSubtitle": "Sync your progress across devices",
+      "skipCta": "Skip for now"
+    },
     "winnerOnboarding": {
       "topPercentile": {
         "title": "You're a Top Player!",
