@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/utils/supabase/client';
 import type {
@@ -14,6 +14,17 @@ import type {
 import { getTierFromScore, calculateTierProgress } from '@/utils/cognitiveScoring';
 import logger from '@/utils/logger';
 
+// Internal state including hasFetched for tracking
+interface UseBrainScoreInternalState {
+  brainScore: BrainScoreWithDomains | null;
+  drillProgress: DrillProgress[];
+  recentGameScores: GameCognitiveScore[];
+  isLoading: boolean;
+  error: string | null;
+  hasFetched: boolean; // Internal: Track if we've done initial fetch
+}
+
+// Public state exposed by the hook (excludes internal tracking fields)
 interface UseBrainScoreState {
   brainScore: BrainScoreWithDomains | null;
   drillProgress: DrillProgress[];
@@ -109,22 +120,28 @@ function transformToBrainScoreWithDomains(
  * - Recent game cognitive scores for trend calculation
  */
 export function useBrainScore(): UseBrainScoreReturn {
-  const { isAuthenticated, user } = useAuth();
-  const supabase = createClient();
+  const { isAuthenticated, user, loading: authLoading } = useAuth();
+  // Memoize supabase client to prevent recreation on every render
+  const supabase = useMemo(() => createClient(), []);
 
-  const [state, setState] = useState<UseBrainScoreState>({
+  const [state, setState] = useState<UseBrainScoreInternalState>({
     brainScore: null,
     drillProgress: [],
     recentGameScores: [],
     isLoading: true,
     error: null,
+    hasFetched: false,
   });
 
   const isMounted = useRef(true);
+  const isFetching = useRef(false); // Prevent concurrent fetches
+  const hasFetchedRef = useRef(false); // Track if initial fetch is done (use ref to avoid stale closure)
+  const lastUserId = useRef<string | null>(null); // Track user ID to detect changes
 
   // Fetch brain score data from Supabase
-  const fetchBrainScore = useCallback(async () => {
+  const fetchBrainScore = useCallback(async (forceRefresh = false) => {
     if (!isAuthenticated || !user) {
+      hasFetchedRef.current = true;
       setState(prev => ({
         ...prev,
         brainScore: null,
@@ -132,12 +149,32 @@ export function useBrainScore(): UseBrainScoreReturn {
         recentGameScores: [],
         isLoading: false,
         error: null,
+        hasFetched: true,
       }));
+      lastUserId.current = null;
+      return;
+    }
+
+    // Prevent concurrent fetches
+    if (isFetching.current && !forceRefresh) {
+      return;
+    }
+
+    // Skip if already fetched for this user (unless force refresh)
+    const userChanged = lastUserId.current !== user.id;
+    if (hasFetchedRef.current && !userChanged && !forceRefresh) {
       return;
     }
 
     try {
-      setState(prev => ({ ...prev, isLoading: true, error: null }));
+      isFetching.current = true;
+      lastUserId.current = user.id;
+
+      // Only show loading if we don't have data yet (first load)
+      // This prevents flickering on subsequent fetches
+      if (!hasFetchedRef.current) {
+        setState(prev => ({ ...prev, isLoading: true, error: null }));
+      }
 
       // Fetch brain score, drill progress, and recent game scores in parallel
       const [brainScoreResult, drillProgressResult, recentScoresResult] = await Promise.all([
@@ -223,25 +260,31 @@ export function useBrainScore(): UseBrainScoreReturn {
         updatedAt: row.updated_at,
       }));
 
+      hasFetchedRef.current = true;
       setState({
         brainScore,
         drillProgress,
         recentGameScores,
         isLoading: false,
         error: null,
+        hasFetched: true,
       });
     } catch (err) {
       logger.error('Error fetching brain score:', err);
+      hasFetchedRef.current = true;
       if (isMounted.current) {
         setState(prev => ({
           ...prev,
           isLoading: false,
           error: 'Failed to load brain score data',
+          hasFetched: true,
         }));
       }
+    } finally {
+      isFetching.current = false;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, supabase]);
 
   // Initialize brain score for new users
   const initializeBrainScore = useCallback(async () => {
@@ -281,23 +324,33 @@ export function useBrainScore(): UseBrainScoreReturn {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, user, fetchBrainScore]);
 
-  // Refresh function
+  // Refresh function - forces a fresh fetch
   const refresh = useCallback(async () => {
-    await fetchBrainScore();
+    await fetchBrainScore(true);
   }, [fetchBrainScore]);
 
   // Fetch on mount and when auth changes
+  // Wait for auth to finish loading to prevent multiple fetches during auth initialization
   useEffect(() => {
     isMounted.current = true;
+
+    // Don't fetch while auth is still loading - this prevents flickering
+    if (authLoading) {
+      return;
+    }
+
     fetchBrainScore();
 
     return () => {
       isMounted.current = false;
     };
-  }, [fetchBrainScore]);
+  }, [fetchBrainScore, authLoading]);
+
+  // Destructure to exclude hasFetched from return value
+  const { hasFetched: _, ...publicState } = state;
 
   return {
-    ...state,
+    ...publicState,
     refresh,
     initializeBrainScore,
   };

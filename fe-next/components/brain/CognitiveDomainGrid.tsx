@@ -136,18 +136,25 @@ export default function CognitiveDomainGrid({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
                     className={cn(
-                      'rounded-neo border-3 border-neo-black shadow-hard-sm p-3',
+                      'rounded-neo border-3 border-neo-black shadow-hard-sm p-2.5',
                       'transition-all hover:translate-y-[-2px] hover:shadow-hard cursor-pointer',
                       isDarkMode ? config.bgDark : config.bgLight
                     )}
                   >
-                    <div className="flex items-start justify-between mb-2">
+                    {/* Icon + Title row */}
+                    <div className="flex items-center gap-2 mb-1.5">
                       <div className={cn(
-                        'w-8 h-8 rounded-lg border-2 border-neo-black flex items-center justify-center',
+                        'w-7 h-7 rounded-lg border-2 border-neo-black flex items-center justify-center shrink-0',
                         config.iconBg
                       )}>
-                        <Icon className="w-5 h-5 text-neo-black" />
+                        <Icon className="w-4 h-4 text-neo-black" />
                       </div>
+                      <p className={cn(
+                        'text-[11px] font-bold uppercase tracking-wide line-clamp-1 flex-1',
+                        isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+                      )}>
+                        {t(`brain.domains.${domainKey}`)}
+                      </p>
                       {showNewBadge ? (
                         <NewBadge />
                       ) : showDelta ? (
@@ -157,31 +164,25 @@ export default function CognitiveDomainGrid({
                       )}
                     </div>
 
-                    <p className={cn(
-                      'text-xs font-bold uppercase tracking-wide mb-1 line-clamp-1',
-                      isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
-                    )}>
-                      {t(`brain.domains.${domainKey}`)}
-                    </p>
-
+                    {/* Score */}
                     <div className="flex items-baseline gap-1">
                       <span className={cn(
-                        'text-2xl font-black',
+                        'text-xl font-black',
                         isDarkMode ? 'text-neo-white' : 'text-neo-black'
                       )}>
                         {domainData.score}
                       </span>
                       <span className={cn(
-                        'text-xs font-bold',
+                        'text-[10px] font-bold',
                         isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
                       )}>
                         /100
                       </span>
                     </div>
 
-                    {/* Mini Progress Bar - Fixed color bug */}
+                    {/* Mini Progress Bar */}
                     <div className={cn(
-                      'h-1.5 mt-2 rounded-full border border-neo-black overflow-hidden',
+                      'h-1 mt-1.5 rounded-full border border-neo-black overflow-hidden',
                       isDarkMode ? 'bg-slate-700' : 'bg-white'
                     )}>
                       <motion.div

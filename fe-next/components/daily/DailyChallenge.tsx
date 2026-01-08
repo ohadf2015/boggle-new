@@ -359,13 +359,28 @@ const DailyChallenge: React.FC = () => {
     return undefined;
   }, [searchParams, gameLanguage, t, isAuthenticated, profile]);
 
+  // Track previous values for smarter re-initialization
+  const prevGameLanguageRef = React.useRef<Language | null>(null);
+  const prevWasResetRef = React.useRef<boolean>(false);
+
   // Initialize Word Hunt daily challenge
   useEffect(() => {
     let isMounted = true;
 
-    // Set loading phase to ensure clean transition when language changes
-    // This forces React to re-render and show the correct screen for the new language
-    setPhase('loading');
+    // Determine if we need a full reload (new puzzle) vs just a re-check (auth changed)
+    const languageChanged = prevGameLanguageRef.current !== null && prevGameLanguageRef.current !== gameLanguage;
+    const wasJustReset = wasReset && !prevWasResetRef.current;
+    const needsFullReload = languageChanged || wasJustReset || prevGameLanguageRef.current === null;
+
+    // Update refs for next comparison
+    prevGameLanguageRef.current = gameLanguage;
+    prevWasResetRef.current = wasReset;
+
+    // Only set loading phase when we need a full puzzle reload
+    // Skip setting loading when just auth state changes (prevents infinite loading)
+    if (needsFullReload) {
+      setPhase('loading');
+    }
 
     const initializePuzzle = async () => {
       const date = getDailyChallengeDate();
@@ -490,7 +505,8 @@ const DailyChallenge: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [gameLanguage, wasReset, isAuthenticated, profile]); // Re-initialize when game language changes or admin reset clears localStorage
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentionally using profile?.id instead of profile to prevent infinite re-init when profile object reference changes
+  }, [gameLanguage, wasReset, isAuthenticated, profile?.id]); // Re-initialize when game language changes, admin reset, or auth state changes
 
   // Update countdown timer
   useEffect(() => {

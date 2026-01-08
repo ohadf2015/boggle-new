@@ -113,8 +113,8 @@ export default function QuickDrillsSection() {
                   onClick={() => handleDrillClick(drill, isUnlocked)}
                   disabled={!isUnlocked}
                   className={cn(
-                    'flex flex-col items-center p-4 rounded-neo border-3 border-neo-black',
-                    'min-w-[100px] transition-all relative',
+                    'flex items-center gap-2.5 p-2.5 rounded-neo border-3 border-neo-black',
+                    'min-w-[140px] transition-all relative',
                     isUnlocked
                       ? 'shadow-hard-sm hover:translate-y-[-2px] hover:shadow-hard active:translate-y-[2px] active:shadow-none'
                       : 'opacity-75 cursor-not-allowed',
@@ -122,53 +122,55 @@ export default function QuickDrillsSection() {
                   )}
                 >
                   <div className={cn(
-                    'w-12 h-12 rounded-lg border-2 border-neo-black flex items-center justify-center mb-2 relative',
+                    'w-9 h-9 rounded-lg border-2 border-neo-black flex items-center justify-center relative shrink-0',
                     drill.bgColor
                   )}>
-                    <Icon className="w-6 h-6 text-neo-black" />
+                    <Icon className="w-5 h-5 text-neo-black" />
                     {!isUnlocked && (
                       <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
-                        <Lock className="w-5 h-5 text-white" />
+                        <Lock className="w-4 h-4 text-white" />
                       </div>
                     )}
                   </div>
 
-                  <p className={cn(
-                    'text-xs font-bold text-center line-clamp-2',
-                    isDarkMode ? 'text-neo-white' : 'text-neo-black'
-                  )}>
-                    {t(`brain.drills.${drill.id}.name`)}
-                  </p>
+                  <div className="flex flex-col items-start min-w-0 flex-1">
+                    <p className={cn(
+                      'text-xs font-bold text-left line-clamp-1',
+                      isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                    )}>
+                      {t(`brain.drills.${drill.id}.name`)}
+                    </p>
 
-                  <p className={cn(
-                    'text-[10px] uppercase mt-1',
-                    isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
-                  )}>
-                    {t(`brain.domains.${drill.domain}`)}
-                  </p>
+                    <p className={cn(
+                      'text-[9px] uppercase',
+                      isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+                    )}>
+                      {t(`brain.domains.${drill.domain}`)}
+                    </p>
 
-                  {/* Progress indicator for locked drills */}
-                  {!isUnlocked && drill.unlockRequirement > 0 && (
-                    <div className="w-full mt-2">
-                      <div className={cn(
-                        'h-1.5 rounded-full border border-neo-black overflow-hidden',
-                        isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
-                      )}>
-                        <motion.div
-                          className={cn('h-full', drill.bgColor)}
-                          initial={{ width: 0 }}
-                          animate={{ width: `${progressPercent}%` }}
-                          transition={{ duration: 0.5 }}
-                        />
+                    {/* Progress indicator for locked drills */}
+                    {!isUnlocked && drill.unlockRequirement > 0 && (
+                      <div className="w-full mt-1">
+                        <div className={cn(
+                          'h-1 rounded-full border border-neo-black overflow-hidden',
+                          isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+                        )}>
+                          <motion.div
+                            className={cn('h-full', drill.bgColor)}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progressPercent}%` }}
+                            transition={{ duration: 0.5 }}
+                          />
+                        </div>
+                        <p className={cn(
+                          'text-[8px] text-left mt-0.5 font-bold',
+                          isDarkMode ? 'text-neo-white/60' : 'text-neo-black/60'
+                        )}>
+                          {gamesPlayed}/{drill.unlockRequirement}
+                        </p>
                       </div>
-                      <p className={cn(
-                        'text-[9px] text-center mt-0.5 font-bold',
-                        isDarkMode ? 'text-neo-white/60' : 'text-neo-black/60'
-                      )}>
-                        {gamesPlayed}/{drill.unlockRequirement}
-                      </p>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </motion.button>
               );
 
