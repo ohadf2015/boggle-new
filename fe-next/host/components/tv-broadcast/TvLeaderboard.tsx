@@ -50,6 +50,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
   // Use virtual scrolling only for large player counts
   const useVirtual = sortedPlayers.length > VIRTUAL_THRESHOLD;
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Virtual returns unstable functions by design
   const virtualizer = useVirtualizer({
     count: sortedPlayers.length,
     getScrollElement: () => parentRef.current,
