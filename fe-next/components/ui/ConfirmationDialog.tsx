@@ -117,7 +117,8 @@ export function ConfirmationDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className={cn(
-          (variant === 'danger' || variant === 'warning') && 'flex-row gap-2'
+          (variant === 'danger' || variant === 'warning') && 'flex-row gap-2',
+          isRtl && 'flex-row-reverse'
         )}>
           <AlertDialogCancel className={cn(
             (variant === 'danger' || variant === 'warning') &&

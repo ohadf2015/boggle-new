@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, LogOut, Trophy, ChevronDown, Sun, Moon, Users, Settings, Calendar, Gift, Shield } from 'lucide-react';
@@ -69,8 +70,12 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
   const [showCalendarModal, setShowCalendarModal] = useState<boolean>(false);
   const [hasUnclaimedReward, setHasUnclaimedReward] = useState<boolean>(false);
 
-  // Ref for click-outside detection
+  // Refs for click-outside detection and position tracking
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // State for dropdown position (for portal rendering)
+  const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; right: number } | null>(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -89,6 +94,31 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showUserMenu]);
+
+  // Calculate dropdown position for portal rendering
+  useEffect(() => {
+    const updatePosition = () => {
+      if (buttonRef.current && showUserMenu) {
+        const rect = buttonRef.current.getBoundingClientRect();
+        setDropdownPosition({
+          top: rect.bottom + 8, // 8px = mt-2
+          left: isRTL ? rect.left : undefined!,
+          right: isRTL ? undefined! : window.innerWidth - rect.right,
+        });
+      }
+    };
+
+    if (showUserMenu) {
+      updatePosition();
+      window.addEventListener('resize', updatePosition);
+      window.addEventListener('scroll', updatePosition, true);
+    }
+
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
+    };
+  }, [showUserMenu, isRTL]);
 
   // Check for unclaimed calendar rewards
   const checkUnclaimedReward = useCallback(async () => {
@@ -249,6 +279,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
     return (
       <div className="relative flex-shrink-0" ref={dropdownRef}>
         <Button
+          ref={buttonRef}
           variant="outline"
           size="sm"
           onClick={() => setShowUserMenu(!showUserMenu)}
@@ -281,29 +312,31 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
           <ChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} aria-hidden="true" />
         </Button>
 
-        {/* User Dropdown */}
-        <AnimatePresence>
-          {showUserMenu && (
-            <motion.div
-              initial={{ opacity: 0, y: -10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-              onMouseDown={(e) => e.preventDefault()}
-              role="menu"
-              aria-label={t('auth.userMenu') || 'User menu'}
-              className={cn(
-                'absolute top-full mt-2 min-w-[180px] rounded-lg shadow-xl z-[10000]',
-                isRTL ? 'left-0' : 'right-0',
-                isDarkMode
-                  ? 'bg-slate-800 border border-slate-700'
-                  : 'bg-white border border-gray-200'
-              )}
-              style={{ 
-                position: 'absolute',
-                ...(isRTL ? { left: 0 } : { right: 0 })
-              }}
-            >
+        {/* User Dropdown - Portal for proper z-index layering */}
+        {showUserMenu && dropdownPosition && typeof document !== 'undefined' && createPortal(
+          <AnimatePresence>
+            {showUserMenu && (
+              <motion.div
+                ref={dropdownRef}
+                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                onMouseDown={(e) => e.preventDefault()}
+                role="menu"
+                aria-label={t('auth.userMenu') || 'User menu'}
+                className={cn(
+                  'min-w-[180px] rounded-lg shadow-xl z-[10000]',
+                  isDarkMode
+                    ? 'bg-slate-800 border border-slate-700'
+                    : 'bg-white border border-gray-200'
+                )}
+                style={{
+                  position: 'fixed',
+                  top: dropdownPosition.top,
+                  ...(isRTL ? { left: dropdownPosition.left } : { right: dropdownPosition.right })
+                }}
+              >
               {/* Profile Link */}
               <Button
                 role="menuitem"
@@ -551,9 +584,11 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                 )}
                 <span>{t('auth.signOut') || 'Sign Out'}</span>
               </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
 
         {/* Calendar Rewards Modal */}
         <CalendarRewardsModal isOpen={showCalendarModal} onClose={handleCalendarClose} />

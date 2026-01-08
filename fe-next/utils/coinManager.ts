@@ -293,10 +293,12 @@ export function calculateGameReward(
   rank?: number,
   totalPlayers?: number
 ): { total: number; breakdown: { base: number; scoreBonus: number; placement: number } } {
-  // Base coins for completing the game
-  const base = mode === 'multiplayer'
-    ? COIN_EARNING_OTHER.MULTIPLAYER_BASE
-    : COIN_EARNING_OTHER.SINGLEPLAYER_BASE;
+  // Base coins for completing the game (only if player scored points)
+  const base = score > 0
+    ? (mode === 'multiplayer'
+        ? COIN_EARNING_OTHER.MULTIPLAYER_BASE
+        : COIN_EARNING_OTHER.SINGLEPLAYER_BASE)
+    : 0;
 
   // Score-based bonus
   const scoreBonus = Math.floor(score / COIN_EARNING_OTHER.SCORE_DIVISOR);

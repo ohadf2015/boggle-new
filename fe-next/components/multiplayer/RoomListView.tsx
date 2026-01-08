@@ -86,7 +86,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         </motion.div>
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col px-2 sm:px-3 lg:px-4 pt-2 sm:pt-3 lg:pt-4 pb-3 lg:pb-4 min-h-0 gap-3 lg:gap-4 overflow-hidden">
+        <div className="flex-1 flex flex-col px-2 sm:px-3 lg:px-4 pt-2 sm:pt-3 lg:pt-4 pb-24 lg:pb-4 min-h-0 gap-3 lg:gap-4 overflow-hidden">
           {/* Create Room Button - Above the fold on Desktop */}
           <motion.div
             initial={{ y: -20, opacity: 0 }}
@@ -98,7 +98,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               variant="success"
               size="lg"
               onClick={onCreateRoom}
-              className="max-w-md mx-auto w-full py-4 lg:py-5 text-base lg:text-lg font-bold uppercase"
+              className="max-w-sm mx-auto w-full py-4 lg:py-5 text-base lg:text-lg font-bold uppercase"
             >
               <Plus className="w-5 h-5 lg:w-6 lg:h-6 me-2" />
               {t('multiplayerFlow.roomList.createButton') || 'Create Room'}

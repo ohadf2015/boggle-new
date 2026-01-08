@@ -23,6 +23,7 @@ import { initUtmCapture } from '@/utils/utmCapture';
 import { composeProviders } from '@/utils/composeProviders';
 import { linkLogRocketSession } from '@/utils/sentry';
 import { initSessionTracking } from '@/utils/sessionTracking';
+import { initConsoleOverride } from '@/utils/consoleOverride';
 import WinnerOnboardingWrapper from './components/WinnerOnboardingWrapper';
 import GlobalBottomNav from '@/components/layout/GlobalBottomNav';
 
@@ -67,6 +68,24 @@ const initUtm = () => {
 // Critical for capturing UTM params from share links before they might be lost
 if (typeof window !== 'undefined') {
     initUtm();
+}
+
+// Initialize console override immediately in production
+// This captures all console.error and console.warn calls and sends them to Sentry
+// while preventing them from appearing in the browser console
+let consoleOverrideInitialized = false;
+const initConsole = () => {
+    if (consoleOverrideInitialized) return;
+    if (typeof window === 'undefined') return;
+
+    consoleOverrideInitialized = true;
+    initConsoleOverride();
+};
+
+// Call immediately at module level - this runs before any React component renders
+// Critical for capturing all console errors/warnings from the very start
+if (typeof window !== 'undefined') {
+    initConsole();
 }
 
 // Lazy load LogRocket after user interaction to save ~100KB on initial load

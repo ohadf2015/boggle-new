@@ -271,7 +271,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   // Update training progress when score changes (for targetScore skill)
   // Uses refs to read skills without triggering re-renders
   useEffect(() => {
-    if (settings.mode !== 'practice' || score < 20) return;
+    if (settings.mode !== 'practice' || score < 15) return;
 
     const skillsRef = trainingProgress.completedSkillsRef.current;
     trainingProgress.updateProgress({

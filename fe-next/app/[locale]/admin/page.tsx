@@ -911,8 +911,8 @@ export default function AdminDashboard() {
               className={cn(
                 'rounded-full px-6',
                 isDarkMode
-                  ? 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500'
-                  : 'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400'
+                  ? 'bg-gradient-to-r from-cyan-700 to-blue-700 hover:from-cyan-600 hover:to-blue-600'
+                  : 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500'
               )}
             >
               <ArrowLeft className="me-2 rtl:rotate-180" />

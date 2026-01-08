@@ -92,6 +92,7 @@ const es = {
     "coins": "monedas",
     "chat": "Chat",
     "connecting": "Conectando...",
+    "signIn": "Iniciar Sesión",
     "connectedToServer": "¡Listo para la batalla!",
     "connectingToServer": "Calentando...",
     "duplicateWarning": "¡Palabras compartidas = cero puntos!",
@@ -2498,6 +2499,12 @@ const es = {
     },
     "analysis": {
       "titleComplete": "¡Entrenamiento Completo!",
+      "completion": {
+        "title": "¡Bien hecho!",
+        "message": "¡Has dominado el juego! Puedes continuar practicando o terminar y comenzar una partida real.",
+        "finish": "Terminar",
+        "continuePractice": "Continuar Practicando"
+      },
       "titleProgress": "¡Sigue Practicando!",
       "subtitleComplete": "¡Has dominado lo básico!",
       "subtitleProgress": "Algunas habilidades más por desbloquear",
@@ -3568,7 +3575,9 @@ const es = {
       },
       "combo-master": {
         "name": "Maestro del Combo",
-        "description": "Mantén rachas de combos sin pausas"
+        "description": "Mantén rachas de combos sin pausas",
+        "targetCombo": "Meta: combo x{combo}",
+        "timerPerWord": "Tiempo: {time}s por palabra"
       },
       "pattern-switcher": {
         "name": "Cambiador de Patrones",
@@ -3581,7 +3590,32 @@ const es = {
       "locked": "Bloqueado",
       "unlock": "Completa nivel {{level}} para desbloquear",
       "unlockRequirement": "Juega {{games}} juegos más para desbloquear",
-      "unlockHint": "¡Juega más juegos para desbloquear este ejercicio!"
+      "unlockHint": "¡Juega más juegos para desbloquear este ejercicio!",
+      "points": "pts",
+      "wpm": "PPM",
+      "letters": "letras",
+      "target": "Meta",
+      "timer": "Tiempo",
+      "timeLimit": "Límite de tiempo",
+      "perWord": "por palabra",
+      "maxCombo": "Combo Máx",
+      "patterns": "Patrones",
+      "patternLength": "Largo del patrón",
+      "targetRareWords": "Meta: palabras raras",
+      "rareWords": "palabras raras",
+      "rarity": {
+        "common": "común",
+        "uncommon": "rara",
+        "rare": "épica",
+        "legendary": "legendaria"
+      },
+      "errors": {
+        "notOnBoard": "No está en el tablero",
+        "alreadyFound": "¡Ya la encontraste!",
+        "invalidWord": "Palabra inválida",
+        "wrongLength": "Largo incorrecto",
+        "notInTarget": "No es palabra objetivo"
+      }
     },
     "tips": {
       "title": "¿Sabías que?",
@@ -3598,7 +3632,16 @@ const es = {
     },
     "empty": {
       "title": "¡Empieza a Entrenar!",
-      "description": "Juega partidas para construir tu Puntuación Cerebral y rastrea la mejora cognitiva con el tiempo."
+      "description": "Juega partidas para construir tu Puntuación Cerebral y rastrea la mejora cognitiva con el tiempo.",
+      "playNow": "Jugar Ahora"
+    },
+    "errors": {
+      "loadFailed": "Error al cargar datos cerebrales",
+      "retry": "Reintentar"
+    },
+    "guestView": {
+      "title": "Rastrea tu Progreso",
+      "description": "Inicia sesión para rastrear tu rendimiento cognitivo a lo largo del tiempo y ver información detallada sobre tus habilidades de búsqueda de palabras."
     }
   }
 };

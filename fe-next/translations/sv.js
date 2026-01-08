@@ -92,6 +92,7 @@ const sv = {
     "coins": "mynt",
     "chat": "Chatt",
     "connecting": "Ansluter...",
+    "signIn": "Logga in",
     "connectedToServer": "Redo för strid!",
     "connectingToServer": "Värmer upp...",
     "duplicateWarning": "Delade ord = inga poäng!",
@@ -1704,6 +1705,12 @@ const sv = {
     },
     "analysis": {
       "titleComplete": "Träning Klar!",
+      "completion": {
+        "title": "Bra gjort!",
+        "message": "Du har bemästrat spelet! Du kan fortsätta öva eller avsluta och starta en riktig match.",
+        "finish": "Avsluta",
+        "continuePractice": "Fortsätt Öva"
+      },
       "titleProgress": "Fortsätt Öva!",
       "subtitleComplete": "Du har bemästrat grunderna!",
       "subtitleProgress": "Några fler kunskaper att låsa upp",
@@ -3571,7 +3578,9 @@ const sv = {
       },
       "combo-master": {
         "name": "Kombomästare",
-        "description": "Behåll kombinationsserier utan avbrott"
+        "description": "Behåll kombinationsserier utan avbrott",
+        "targetCombo": "Mål: x{combo} kombo",
+        "timerPerWord": "Timer: {time}s per ord"
       },
       "pattern-switcher": {
         "name": "Mönsterväxlare",
@@ -3584,7 +3593,32 @@ const sv = {
       "locked": "Låst",
       "unlock": "Slutför nivå {{level}} för att låsa upp",
       "unlockRequirement": "Spela {{games}} fler spel för att låsa upp",
-      "unlockHint": "Spela fler spel för att låsa upp denna övning!"
+      "unlockHint": "Spela fler spel för att låsa upp denna övning!",
+      "points": "p",
+      "wpm": "OPM",
+      "letters": "bokstäver",
+      "target": "Mål",
+      "timer": "Timer",
+      "timeLimit": "Tidsgräns",
+      "perWord": "per ord",
+      "maxCombo": "Max Kombo",
+      "patterns": "Mönster",
+      "patternLength": "Mönsterlängd",
+      "targetRareWords": "Mål: sällsynta ord",
+      "rareWords": "sällsynta ord",
+      "rarity": {
+        "common": "vanlig",
+        "uncommon": "ovanlig",
+        "rare": "sällsynt",
+        "legendary": "legendarisk"
+      },
+      "errors": {
+        "notOnBoard": "Finns inte på brädet",
+        "alreadyFound": "Redan hittat!",
+        "invalidWord": "Ogiltigt ord",
+        "wrongLength": "Fel längd",
+        "notInTarget": "Inte målord"
+      }
     },
     "tips": {
       "title": "Visste du?",
@@ -3601,7 +3635,16 @@ const sv = {
     },
     "empty": {
       "title": "Börja träna!",
-      "description": "Spela spel för att bygga din hjärnpoäng och följa kognitiva förbättringar över tid."
+      "description": "Spela spel för att bygga din hjärnpoäng och följa kognitiva förbättringar över tid.",
+      "playNow": "Spela Nu"
+    },
+    "errors": {
+      "loadFailed": "Kunde inte ladda hjärndata",
+      "retry": "Försök igen"
+    },
+    "guestView": {
+      "title": "Följ Din Framsteg",
+      "description": "Logga in för att följa dina kognitiva prestationer över tid och se detaljerade insikter om dina ordfinnande färdigheter."
     }
   }
 };

@@ -17,6 +17,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { addGameToHistory } from '@/utils/gameHistoryManager';
 import { updateGuestStatsAfterGame } from '@/utils/guestManager';
 import { awardGameCoins } from '@/utils/coinManager';
+import { useCoins } from '@/hooks/useCoins';
+import { syncCoinsToDatabase } from '@/lib/supabase';
 
 /** Result type from awardGameCoins */
 export interface CoinRewardResult {
@@ -27,7 +29,7 @@ export interface CoinRewardResult {
     placement: number;
   };
 }
-import { syncCoinsToDatabase } from '@/lib/supabase';
+
 import type { WordObject } from './types';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
 
@@ -98,6 +100,7 @@ export interface GameResultsData {
  */
 export function useGameResults(config: GameResultsConfig): GameResultsData {
   const { user, isAuthenticated, profile, updateProfile } = useAuth();
+  const { refreshCoins } = useCoins();
 
   // Refs to prevent duplicate side effects
   const hasUpdatedStatsRef = useRef(false);
@@ -225,7 +228,12 @@ export function useGameResults(config: GameResultsConfig): GameResultsData {
             rank: config.rank,
             totalPlayers: config.totalPlayers,
           }
-        );
+        ).then(() => {
+          // Refresh coins to update header immediately
+          refreshCoins();
+        }).catch((error) => {
+          console.error('Failed to sync coins:', error);
+        });
       }
     }
 
@@ -238,6 +246,7 @@ export function useGameResults(config: GameResultsConfig): GameResultsData {
     config.totalPlayers,
     config.gameCode,
     user?.id,
+    refreshCoins,
   ]);
 
   // Effect: Save achievements to profile (for authenticated users)

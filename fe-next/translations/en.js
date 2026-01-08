@@ -98,6 +98,7 @@ const en = {
     "coins": "coins",
     "chat": "Chat",
     "connecting": "Connecting...",
+    "signIn": "Sign In",
     "connectedToServer": "Ready to battle!",
     "connectingToServer": "Warming up...",
     "duplicateWarning": "Same word as others = no points!",
@@ -3647,7 +3648,16 @@ const en = {
     },
     "empty": {
       "title": "Start Training!",
-      "description": "Play games to build your Brain Score and track cognitive improvement over time."
+      "description": "Play games to build your Brain Score and track cognitive improvement over time.",
+      "playNow": "Play Now"
+    },
+    "errors": {
+      "loadFailed": "Failed to load brain data",
+      "retry": "Retry"
+    },
+    "guestView": {
+      "title": "Track Your Progress",
+      "description": "Sign in to track your cognitive performance over time and see detailed insights about your word-finding skills."
     }
   }
 };

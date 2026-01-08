@@ -226,7 +226,7 @@ export default function RulesPage(): React.JSX.Element {
                     transition={{ delay: 0.4 }}
                 >
                     <Card className="border-2 sm:border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
-                        <CardHeader className="bg-neo-pink/20 border-b-2 sm:border-b-4 border-neo-black py-2 sm:py-4">
+                        <CardHeader className="bg-neo-pink/10 border-b-2 sm:border-b-4 border-neo-black py-2 sm:py-4">
                             <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-2xl font-black text-slate-900 dark:text-white">
                                 <Trophy className="text-amber-500 w-5 h-5 sm:w-6 sm:h-6" />
                                 {t('howToPlay.scoringSystemTitle')}
@@ -275,7 +275,7 @@ export default function RulesPage(): React.JSX.Element {
                     transition={{ delay: 0.5 }}
                 >
                     <Card className="border-2 sm:border-4 border-neo-black shadow-hard-lg bg-white dark:bg-slate-800">
-                        <CardHeader className="bg-neo-pink/20 border-b-2 sm:border-b-4 border-neo-black py-2 sm:py-4">
+                        <CardHeader className="bg-neo-pink/10 border-b-2 sm:border-b-4 border-neo-black py-2 sm:py-4">
                             <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-2xl font-black text-slate-900 dark:text-white">
                                 <Lightbulb className="text-amber-500 w-5 h-5 sm:w-6 sm:h-6" />
                                 {t('howToPlay.tipsTitle')}

@@ -89,9 +89,9 @@ const DialogContent = React.forwardRef<
       {!hideCloseButton && (
         <DialogPrimitive.Close
           className="
-            absolute top-3 sm:-top-3
-            right-3 sm:-right-3
-            rtl:right-auto rtl:left-3 rtl:sm:-left-3
+            absolute top-2 sm:top-3
+            right-2 sm:right-3
+            rtl:right-auto rtl:left-2 rtl:sm:left-3
             w-11 h-11 sm:w-12 sm:h-12
             min-w-[44px] min-h-[44px]
             flex items-center justify-center
@@ -106,7 +106,7 @@ const DialogContent = React.forwardRef<
             z-10
           "
         >
-          <X className="h-4 w-4 sm:h-5 sm:w-5 stroke-[3]" />
+          <X className="h-5 w-5 sm:h-6 sm:w-6 stroke-[3]" />
           <span className="sr-only">Close</span>
         </DialogPrimitive.Close>
       )}

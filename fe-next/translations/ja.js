@@ -92,6 +92,7 @@ const ja = {
     "coins": "コイン",
     "chat": "チャット",
     "connecting": "接続中...",
+    "signIn": "サインイン",
     "connectedToServer": "バトル準備OK！",
     "connectingToServer": "ウォーミングアップ...",
     "duplicateWarning": "かぶり = ノーポイント！",
@@ -1703,6 +1704,12 @@ const ja = {
     },
     "analysis": {
       "titleComplete": "トレーニング完了！",
+      "completion": {
+        "title": "よくやった！",
+        "message": "ゲームをマスターしました！練習を続けるか、終了して本番に挑戦できます。",
+        "finish": "終了",
+        "continuePractice": "練習を続ける"
+      },
       "titleProgress": "もう少し練習！",
       "subtitleComplete": "基本をマスターしました！",
       "subtitleProgress": "あと少しでスキル解放",
@@ -3570,7 +3577,9 @@ const ja = {
       },
       "combo-master": {
         "name": "コンボマスター",
-        "description": "途切れずにコンボストリークを維持せよ"
+        "description": "途切れずにコンボストリークを維持せよ",
+        "targetCombo": "目標: x{combo}コンボ",
+        "timerPerWord": "制限: {time}秒/語"
       },
       "pattern-switcher": {
         "name": "パターンスイッチャー",
@@ -3583,7 +3592,32 @@ const ja = {
       "locked": "ロック中",
       "unlock": "レベル{{level}}をクリアしてアンロック",
       "unlockRequirement": "あと{{games}}ゲームプレイでアンロック",
-      "unlockHint": "もっとゲームをプレイしてこのドリルをアンロックしましょう！"
+      "unlockHint": "もっとゲームをプレイしてこのドリルをアンロックしましょう！",
+      "points": "pt",
+      "wpm": "分速",
+      "letters": "文字",
+      "target": "目標",
+      "timer": "タイマー",
+      "timeLimit": "制限時間",
+      "perWord": "単語毎",
+      "maxCombo": "最高コンボ",
+      "patterns": "パターン",
+      "patternLength": "パターン長",
+      "targetRareWords": "目標レア数",
+      "rareWords": "レア語",
+      "rarity": {
+        "common": "普通",
+        "uncommon": "レア",
+        "rare": "激レア",
+        "legendary": "伝説"
+      },
+      "errors": {
+        "notOnBoard": "盤面にない",
+        "alreadyFound": "見つけ済み",
+        "invalidWord": "無効な単語",
+        "wrongLength": "長さ違い",
+        "notInTarget": "対象外"
+      }
     },
     "tips": {
       "title": "知ってた？",
@@ -3600,7 +3634,16 @@ const ja = {
     },
     "empty": {
       "title": "トレーニング開始！",
-      "description": "ゲームをプレイしてブレインスコアを構築し、認知的改善を追跡しよう。"
+      "description": "ゲームをプレイしてブレインスコアを構築し、認知的改善を追跡しよう。",
+      "playNow": "今すぐプレイ"
+    },
+    "errors": {
+      "loadFailed": "ブレインデータの読み込みに失敗しました",
+      "retry": "再試行"
+    },
+    "guestView": {
+      "title": "進捗を追跡",
+      "description": "サインインして認知パフォーマンスを経時的に追跡し、単語発見スキルに関する詳細な洞察を確認できます。"
     }
   }
 };

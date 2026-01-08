@@ -24,6 +24,7 @@ import { CoinBalance } from '@/components/CoinBalance';
 import { CollectionGrid } from '@/components/CollectionGrid';
 import { EmailPreferences } from '@/components/settings/EmailPreferences';
 import { CountrySelector } from '@/components/settings/CountrySelector';
+import { ReferralCard } from '@/components/profile/ReferralCard';
 import { getCountryFlag } from '@/shared/utils/countryUtils';
 import { uploadProfilePicture, removeProfilePicture, supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -890,6 +891,20 @@ export default function ProfilePage(): React.ReactNode {
     );
   };
 
+  // Referral Section
+  const renderReferralSection = () => (
+    user ? (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.35 }}
+        className="mb-4"
+      >
+        <ReferralCard />
+      </motion.div>
+    ) : null
+  );
+
   // Collection Section
   const renderCollection = () => (
     <motion.div
@@ -1147,6 +1162,7 @@ export default function ProfilePage(): React.ReactNode {
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.2 }}
               >
+                {renderReferralSection()}
                 {renderCollection()}
                 {renderEmailPreferences()}
                 {renderBackButtons()}
@@ -1497,12 +1513,23 @@ export default function ProfilePage(): React.ReactNode {
           </div>
         </motion.div>
 
+        {/* Referral Section */}
+        {user && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.11 }}
+          >
+            <ReferralCard />
+          </motion.div>
+        )}
+
         {/* Stats Grid */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-4"
+          transition={{ delay: 0.15 }}
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-4 mt-4"
         >
           <StatCard
             icon={<Gamepad2 />}

@@ -76,7 +76,9 @@ export function useCoins() {
             if (result.success) {
                 // Refresh profile to update UI with new balance
                 await refreshProfile();
-                return result.newBalance ?? (coins + amount);
+                // Also fetch fresh profile to get the actual updated value
+                const { data: freshProfile } = await getProfile(user.id);
+                return freshProfile?.total_coins ?? result.newBalance ?? (coins + amount);
             } else {
                 console.error('Failed to add coins:', result.error);
                 toast.error('Failed to update coin balance');
@@ -108,6 +110,8 @@ export function useCoins() {
             if (result.success) {
                 // Refresh profile to update UI with new balance
                 await refreshProfile();
+                // Fetch fresh profile to ensure UI updates immediately
+                await getProfile(user.id);
                 return true;
             } else {
                 console.error('Failed to spend coins:', result.error);

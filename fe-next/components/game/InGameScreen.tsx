@@ -1003,7 +1003,7 @@ const InGameScreen = memo<InGameScreenProps>(({
           {/* Word Forming Area with feedback - centered below timer */}
           {/* Shows typed word when in keyboard mode, otherwise shows swiped word */}
           {isPlaying && (
-            <div className="flex items-center justify-center flex-shrink-0 mb-0 md:mb-1">
+            <div className="flex items-center justify-center flex-shrink-0 mb-0">
               <WordFormingArea
                 word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
                 letterCount={keyboardInput.isTypingMode ? keyboardInput.typedWord.length : letterCount}
@@ -1045,7 +1045,7 @@ const InGameScreen = memo<InGameScreenProps>(({
 
           {/* Grid - Direct connection to timer row */}
           {/* Removed extra padding to prevent scroll - safe area handled by parent */}
-          <div className="flex-1 flex items-center justify-center min-h-0 overflow-hidden -mt-1 md:-mt-2">
+          <div className="flex-1 flex items-center justify-center min-h-0 overflow-hidden -mt-2 md:-mt-4">
             <GridComponent
               key={isPlaying ? 'playing-grid' : 'spectating-grid'}
               grid={letterGrid}

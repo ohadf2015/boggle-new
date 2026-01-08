@@ -92,6 +92,7 @@ const he = {
     "coins": "מטבעות",
     "chat": "צ'אט",
     "connecting": "מתחבר...",
+    "signIn": "התחבר",
     "connectedToServer": "מוכן לקרב!",
     "connectingToServer": "מתחמם...",
     "duplicateWarning": "מילים משותפות = אפס נקודות!",
@@ -3578,7 +3579,9 @@ const he = {
       },
       "combo-master": {
         "name": "אלוף הקומבו",
-        "description": "שמור על רצפי קומבו בלי הפסקות"
+        "description": "שמור על רצפי קומבו בלי הפסקות",
+        "targetCombo": "יעד: קומבו x{combo}",
+        "timerPerWord": "טיימר: {time}ש למילה"
       },
       "pattern-switcher": {
         "name": "מחליף דפוסים",
@@ -3591,7 +3594,32 @@ const he = {
       "locked": "נעול",
       "unlock": "השלם רמה {{level}} לפתיחה",
       "unlockRequirement": "שחק {{games}} משחקים נוספים לפתיחה",
-      "unlockHint": "שחק עוד משחקים כדי לפתוח את התרגיל הזה!"
+      "unlockHint": "שחק עוד משחקים כדי לפתוח את התרגיל הזה!",
+      "points": "נק'",
+      "wpm": "מ/ד",
+      "letters": "אותיות",
+      "target": "יעד",
+      "timer": "טיימר",
+      "timeLimit": "מגבלת זמן",
+      "perWord": "למילה",
+      "maxCombo": "קומבו מקס",
+      "patterns": "דפוסים",
+      "patternLength": "אורך דפוס",
+      "targetRareWords": "יעד: מילים נדירות",
+      "rareWords": "מילים נדירות",
+      "rarity": {
+        "common": "רגיל",
+        "uncommon": "נדיר",
+        "rare": "נדיר מאוד",
+        "legendary": "אגדי"
+      },
+      "errors": {
+        "notOnBoard": "לא על הלוח",
+        "alreadyFound": "כבר מצאת",
+        "invalidWord": "מילה לא תקינה",
+        "wrongLength": "אורך לא נכון",
+        "notInTarget": "לא מילת יעד"
+      }
     },
     "tips": {
       "title": "הידעת?",
@@ -3608,7 +3636,16 @@ const he = {
     },
     "empty": {
       "title": "התחל להתאמן!",
-      "description": "שחק משחקים כדי לבנות את ציון המוח שלך ולעקוב אחר שיפור קוגניטיבי לאורך זמן."
+      "description": "שחק משחקים כדי לבנות את ציון המוח שלך ולעקוב אחר שיפור קוגניטיבי לאורך זמן.",
+      "playNow": "שחק עכשיו"
+    },
+    "errors": {
+      "loadFailed": "טעינת נתוני המוח נכשלה",
+      "retry": "נסה שוב"
+    },
+    "guestView": {
+      "title": "עקוב אחר ההתקדמות שלך",
+      "description": "התחבר כדי לעקוב אחר הביצועים הקוגניטיביים שלך לאורך זמן ולראות תובנות מפורטות על כישורי מציאת המילים שלך."
     }
   }
 };

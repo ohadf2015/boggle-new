@@ -1,9 +1,13 @@
 /**
  * Frontend logger utility
  * Only logs in development mode to keep production console clean
+ * In production, errors and warnings are sent to Sentry but not shown in console
  */
 
+import * as Sentry from "@sentry/nextjs";
+
 const isDevelopment = process.env.NODE_ENV === 'development';
+const isProduction = process.env.NODE_ENV === 'production';
 
 class FrontendLogger {
   /**
@@ -25,17 +29,67 @@ class FrontendLogger {
   }
 
   /**
-   * Log warning messages (always shown, even in production)
+   * Log warning messages
+   * In production: sent to Sentry, hidden from console
+   * In development: shown in console
    */
   warn(...args: unknown[]): void {
-    console.warn(...args);
+    if (isProduction) {
+      // Send to Sentry but don't show in console
+      const message = args.map(arg =>
+        typeof arg === 'string' ? arg : JSON.stringify(arg)
+      ).join(' ');
+
+      Sentry.captureMessage(message, {
+        level: 'warning',
+        contexts: {
+          warning_details: {
+            args: args.map(arg => String(arg))
+          }
+        }
+      });
+    } else {
+      console.warn(...args);
+    }
   }
 
   /**
-   * Log error messages (always shown, even in production)
+   * Log error messages
+   * In production: sent to Sentry, hidden from console
+   * In development: shown in console
    */
   error(...args: unknown[]): void {
-    console.error(...args);
+    if (isProduction) {
+      // Send to Sentry but don't show in console
+      const firstArg = args[0];
+
+      if (firstArg instanceof Error) {
+        // If it's an Error object, capture it properly
+        Sentry.captureException(firstArg, {
+          contexts: {
+            error_details: {
+              additional_args: args.slice(1).map(arg => String(arg))
+            }
+          }
+        });
+      } else {
+        // Otherwise, capture as a message
+        const message = args.map(arg =>
+          typeof arg === 'string' ? arg : JSON.stringify(arg)
+        ).join(' ');
+
+        Sentry.captureMessage(message, {
+          level: 'error',
+          contexts: {
+            error_details: {
+              args: args.map(arg => String(arg))
+            }
+          }
+        });
+      }
+    } else {
+      console.error(...args);
+    }
   }
 
   /**

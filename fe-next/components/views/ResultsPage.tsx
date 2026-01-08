@@ -873,7 +873,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         {/* Right column: Player Cards + Chat */}
         <div className="w-[45%] flex flex-col gap-2 p-3 border-2 border-neo-black rounded-neo bg-white/50 shadow-hard-sm">
           {/* Header: Final Scores + Ready indicator */}
-          <div className="flex items-center justify-between gap-2 pb-2 border-b-2 border-neo-black/20">
+          <div className="flex items-center justify-between gap-2 pb-2 border-b-2 border-slate-200 dark:border-slate-700">
             <div className="flex items-center gap-2">
               <Trophy className="w-5 h-5 text-amber-600" />
               <h2 className="text-base font-black text-neo-black uppercase tracking-wide">{t('results.finalScores')}</h2>
@@ -906,7 +906,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
           {/* Room Chat - bottom of right column */}
           {gameCode && sortedScores.length > 1 && (
-            <div className="pt-2 border-t-2 border-neo-black/20">
+            <div className="pt-2 border-t-2 border-slate-200 dark:border-slate-700">
               <RoomChat
                 username={username}
                 isHost={isHost}
