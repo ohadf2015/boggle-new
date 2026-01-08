@@ -283,7 +283,6 @@ export function useBrainScore(): UseBrainScoreReturn {
     } finally {
       isFetching.current = false;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, user, supabase]);
 
   // Initialize brain score for new users
