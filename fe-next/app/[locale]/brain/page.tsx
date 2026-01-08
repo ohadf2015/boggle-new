@@ -16,6 +16,50 @@ import QuickDrillsSection from '@/components/brain/QuickDrillsSection';
 import ScientificTipsCarousel from '@/components/brain/ScientificTipsCarousel';
 
 /**
+ * Header component for Brain Training page
+ */
+interface HeaderProps {
+  isDarkMode: boolean;
+  onBack: () => void;
+  title: string;
+  backText: string;
+}
+
+function Header({ isDarkMode, onBack, title, backText }: HeaderProps) {
+  return (
+    <header className={cn(
+      'sticky top-0 z-40',
+      'border-b-4 border-neo-black',
+      isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
+    )}>
+      <div className="flex items-center justify-between px-4 py-3">
+        <button
+          onClick={onBack}
+          className={cn(
+            'flex items-center gap-2 px-3 py-2 rounded-neo',
+            'border-3 border-neo-black shadow-hard-sm',
+            'transition-all hover:translate-y-[-2px] hover:shadow-hard',
+            isDarkMode ? 'bg-neo-navy text-neo-white' : 'bg-neo-cream text-neo-black'
+          )}
+        >
+          <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
+          <span className="font-bold text-sm hidden sm:inline">{backText}</span>
+        </button>
+
+        <h1 className={cn(
+          'text-xl font-black uppercase tracking-wide',
+          isDarkMode ? 'text-neo-white' : 'text-neo-black'
+        )}>
+          {title}
+        </h1>
+
+        <div className="w-10" /> {/* Spacer for centering */}
+      </div>
+    </header>
+  );
+}
+
+/**
  * Brain Training Dashboard
  * Displays cognitive scores, progress, and quick access to brain drills.
  */
@@ -31,39 +75,6 @@ export default function BrainTrainingPage() {
     router.push(`/${language}`);
   };
 
-  // Shared header component
-  const Header = () => (
-    <header className={cn(
-      'sticky top-0 z-40',
-      'border-b-4 border-neo-black',
-      isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
-    )}>
-      <div className="flex items-center justify-between px-4 py-3">
-        <button
-          onClick={handleBack}
-          className={cn(
-            'flex items-center gap-2 px-3 py-2 rounded-neo',
-            'border-3 border-neo-black shadow-hard-sm',
-            'transition-all hover:translate-y-[-2px] hover:shadow-hard',
-            isDarkMode ? 'bg-neo-navy text-neo-white' : 'bg-neo-cream text-neo-black'
-          )}
-        >
-          <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
-          <span className="font-bold text-sm hidden sm:inline">{t('common.back')}</span>
-        </button>
-
-        <h1 className={cn(
-          'text-xl font-black uppercase tracking-wide',
-          isDarkMode ? 'text-neo-white' : 'text-neo-black'
-        )}>
-          {t('brain.title')}
-        </h1>
-
-        <div className="w-10" /> {/* Spacer for centering */}
-      </div>
-    </header>
-  );
-
   // Loading state
   if (isLoading) {
     return (
@@ -71,7 +82,12 @@ export default function BrainTrainingPage() {
         'min-h-screen pb-24',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
-        <Header />
+        <Header
+          isDarkMode={isDarkMode}
+          onBack={handleBack}
+          title={t('brain.title')}
+          backText={t('common.back')}
+        />
         <main className="px-4 py-6 space-y-6 max-w-4xl mx-auto">
           {/* Loading skeleton */}
           <div className="space-y-6 animate-pulse">
@@ -107,7 +123,12 @@ export default function BrainTrainingPage() {
         'min-h-screen pb-24',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
-        <Header />
+        <Header
+          isDarkMode={isDarkMode}
+          onBack={handleBack}
+          title={t('brain.title')}
+          backText={t('common.back')}
+        />
         <main className="px-4 py-6 max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -154,7 +175,12 @@ export default function BrainTrainingPage() {
         'min-h-screen pb-24',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
-        <Header />
+        <Header
+          isDarkMode={isDarkMode}
+          onBack={handleBack}
+          title={t('brain.title')}
+          backText={t('common.back')}
+        />
         <main className="px-4 py-6 max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -201,7 +227,12 @@ export default function BrainTrainingPage() {
         'min-h-screen pb-24',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
-        <Header />
+        <Header
+          isDarkMode={isDarkMode}
+          onBack={handleBack}
+          title={t('brain.title')}
+          backText={t('common.back')}
+        />
         <main className="px-4 py-6 space-y-6 max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -250,7 +281,12 @@ export default function BrainTrainingPage() {
       'min-h-screen pb-24', // Extra padding for bottom nav
       isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
     )}>
-      <Header />
+      <Header
+        isDarkMode={isDarkMode}
+        onBack={handleBack}
+        title={t('brain.title')}
+        backText={t('common.back')}
+      />
 
       {/* Main Content */}
       <main className="px-4 py-6 space-y-6 max-w-4xl mx-auto">

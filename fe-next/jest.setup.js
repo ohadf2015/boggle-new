@@ -11,6 +11,30 @@
 import '@testing-library/jest-dom';
 
 // ==========================================
+// Mock Sentry
+// ==========================================
+
+jest.mock('@sentry/nextjs', () => ({
+  captureException: jest.fn(),
+  captureMessage: jest.fn(),
+  captureEvent: jest.fn(),
+  withScope: jest.fn((callback) => callback({ setTag: jest.fn(), setContext: jest.fn() })),
+  configureScope: jest.fn(),
+  setUser: jest.fn(),
+  setTag: jest.fn(),
+  setContext: jest.fn(),
+  addBreadcrumb: jest.fn(),
+  Severity: {
+    Fatal: 'fatal',
+    Error: 'error',
+    Warning: 'warning',
+    Log: 'log',
+    Info: 'info',
+    Debug: 'debug',
+  },
+}));
+
+// ==========================================
 // Mock Browser APIs
 // ==========================================
 
