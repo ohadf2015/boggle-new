@@ -107,6 +107,7 @@ jest.mock('@/contexts/AccessibilityContext', () => ({
   useDisableFireRoundLights: () => false,
   useShouldReduceMotion: () => false,
   useDisableEarthquakeEffects: () => false,
+  useLargeLetters: () => false,
 }));
 
 jest.mock('@/hooks/useAutoScrollOnGameStart', () => ({

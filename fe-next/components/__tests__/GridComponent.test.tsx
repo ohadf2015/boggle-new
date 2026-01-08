@@ -31,6 +31,7 @@ jest.mock('framer-motion', () => ({
 jest.mock('@/contexts/AccessibilityContext', () => ({
   useDisableFireRoundLights: () => false,
   useDisableEarthquakeEffects: () => false,
+  useLargeLetters: () => false,
 }));
 
 // Mock sound effects context
