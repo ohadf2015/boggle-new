@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Shuffle, CheckCircle2, XCircle, Trophy, RotateCcw } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Shuffle, Trophy, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';

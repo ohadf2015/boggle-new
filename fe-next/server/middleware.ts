@@ -4,11 +4,9 @@
  */
 
 import compression from 'compression';
-import cors from 'cors';
+import cors, { type CorsOptions } from 'cors';
 import express, { Application, Request, Response, NextFunction, RequestHandler } from 'express';
 import { geolocationMiddleware } from '../backend/utils/geolocation';
-
-import type { CorsOptions } from 'cors';
 
 const dev: boolean = process.env.NODE_ENV !== 'production';
 

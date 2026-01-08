@@ -31,7 +31,6 @@ import {
 } from '@/utils/crossTabAuthSync';
 
 // Import types and utils from auth module
-import type { ProfileData, RankedProgress, AuthContextValue } from './auth';
 import {
   fetchGeolocation,
   fetchRandomPlayerName,
@@ -40,6 +39,9 @@ import {
   isNetworkError,
   isRecoverableError,
   getAuthErrorMessage,
+  type ProfileData,
+  type RankedProgress,
+  type AuthContextValue,
   type SupabaseAuthError,
 } from './auth';
 
@@ -709,7 +711,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       window.removeEventListener('supabase-auth-error', handleAuthError as EventListener);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [fetchUserData, clearAuthState]);
+  }, [fetchUserData, clearAuthState, user]);
 
   const refreshProfile = useCallback(async () => {
     if (user?.id) {

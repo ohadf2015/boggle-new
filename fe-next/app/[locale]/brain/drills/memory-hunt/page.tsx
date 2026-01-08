@@ -27,7 +27,7 @@ export default function MemoryHuntPage() {
   const { saveDrillResult } = useSaveDrillResult();
 
   // Generate drill grid
-  const { grid, availableWords, regenerate, isLoading } = useDrillGrid(5, language);
+  const { grid, availableWords, isLoading } = useDrillGrid(5, language);
 
   // Hide bottom nav during drill
   React.useEffect(() => {

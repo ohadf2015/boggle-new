@@ -62,7 +62,7 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
     (!currentAvatarImage && !!hasProfileAvatar);
 
   // Determine initial avatar selection
-  const getInitialAvatar = (): AvatarConfig | null => {
+  const getInitialAvatar = React.useCallback((): AvatarConfig | null => {
     // If using profile avatar, return null to indicate profile selection
     if (isUsingProfileAvatar) {
       return null;
@@ -76,7 +76,7 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
     }
     // Default to first avatar if no profile avatar available
     return hasProfileAvatar ? null : AVATARS[0];
-  };
+  }, [isUsingProfileAvatar, currentAvatarImage, currentEmoji, hasProfileAvatar]);
 
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarConfig | null>(getInitialAvatar());
   const [useProfileAvatar, setUseProfileAvatar] = useState<boolean>(isUsingProfileAvatar);
@@ -87,7 +87,7 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
       setSelectedAvatar(getInitialAvatar());
       setUseProfileAvatar(isUsingProfileAvatar);
     }
-  }, [isOpen, currentAvatarImage, profileAvatar, hasProfileAvatar, isUsingProfileAvatar]);
+  }, [isOpen, getInitialAvatar, isUsingProfileAvatar]);
 
   // Handle selecting a regular avatar
   const handleSelectAvatar = (avatar: AvatarConfig) => {
