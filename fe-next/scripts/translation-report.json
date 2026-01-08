@@ -1,49 +1,21 @@
 {
   "summary": {
-    "totalKeysInCode": 1720,
+    "totalKeysInCode": 1743,
     "keyCountByLanguage": {
-      "en": 2930,
-      "he": 2924,
-      "sv": 2924,
-      "ja": 2924,
-      "es": 2924
+      "en": 2957,
+      "he": 2957,
+      "sv": 2957,
+      "ja": 2957,
+      "es": 2957
     },
     "missingFromEnglish": 0
   },
   "missingFromEnglish": [],
   "missingByLanguage": {
-    "he": [
-      "auth.wordHunt.gateTitle",
-      "auth.wordHunt.gateSubtitle",
-      "auth.wordHunt.benefit1",
-      "auth.wordHunt.benefit2",
-      "auth.wordHunt.benefit3",
-      "auth.wordHunt.footerNote"
-    ],
-    "sv": [
-      "auth.wordHunt.gateTitle",
-      "auth.wordHunt.gateSubtitle",
-      "auth.wordHunt.benefit1",
-      "auth.wordHunt.benefit2",
-      "auth.wordHunt.benefit3",
-      "auth.wordHunt.footerNote"
-    ],
-    "ja": [
-      "auth.wordHunt.gateTitle",
-      "auth.wordHunt.gateSubtitle",
-      "auth.wordHunt.benefit1",
-      "auth.wordHunt.benefit2",
-      "auth.wordHunt.benefit3",
-      "auth.wordHunt.footerNote"
-    ],
-    "es": [
-      "auth.wordHunt.gateTitle",
-      "auth.wordHunt.gateSubtitle",
-      "auth.wordHunt.benefit1",
-      "auth.wordHunt.benefit2",
-      "auth.wordHunt.benefit3",
-      "auth.wordHunt.footerNote"
-    ]
+    "he": [],
+    "sv": [],
+    "ja": [],
+    "es": []
   },
   "keysNotInEnglish": {
     "he": [],

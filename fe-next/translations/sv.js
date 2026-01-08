@@ -253,7 +253,9 @@ const sv = {
     "swipeDownToClose": "Svep nedåt för att stänga",
     "accessibility": "Tillgänglighet",
     "disableFireRoundLights": "Inaktivera eldrundebelysning",
-    "disableFireRoundLightsDescription": "Stäng av blinkande ljus på rutorna under eldrunda"
+    "disableFireRoundLightsDescription": "Stäng av blinkande ljus på rutorna under eldrunda",
+    "largeLetters": "Stora bokstäver",
+    "largeLettersDescription": "Använd större bokstäver på spelplanen för enklare visning"
   },
   "combo": {
     "shieldUsed": "Skölden räddade din streak!",
@@ -2185,7 +2187,13 @@ const sv = {
     "wordHunt": {
       "loginTitle": "Logga in för att spela",
       "loginSubtitle": "Synkronisera dina framsteg på alla enheter",
-      "skipCta": "Hoppa över för nu"
+      "skipCta": "Hoppa över för nu",
+      "gateTitle": "Gå med för att lösa dagens pussel",
+      "gateSubtitle": "Logga in för att tävla med spelare världen över",
+      "benefit1": "Följ din dagliga svit",
+      "benefit2": "Tävla på globala topplistor",
+      "benefit3": "Synkronisera framsteg på alla enheter",
+      "footerNote": "Gå med tusentals ordjägare som löser dagens utmaning"
     },
     "winnerOnboarding": {
       "topPercentile": {
@@ -2357,7 +2365,31 @@ const sv = {
     },
     "score": "Poäng",
     "placement": "Placering",
-    "topThreeBonus": "Topp 3 bonus"
+    "topThreeBonus": "Topp 3 bonus",
+    "efficiency": "Effektivitet",
+    "streak": "Svit"
+  },
+  "partyScreen": {
+    "title": "Partyskärm",
+    "subtitle": "Visa spelet på din TV så alla kan se!",
+    "qrJoin": "QR-kod Gå med",
+    "qrJoinDesc": "Vänner skannar QR-koden för att gå med direkt från sina telefoner",
+    "liveLeaderboard": "Live Topplista",
+    "liveLeaderboardDesc": "Se poäng uppdateras i realtid när spelare hittar ord",
+    "enterRoomCode": "Ange Rumskod",
+    "startDisplay": "Starta Partyvisning",
+    "tip": "Tips: Casta den här sidan till din TV med Chrome eller AirPlay för bästa upplevelse!",
+    "room": "Rum",
+    "scanToJoin": "Skanna för att Gå med",
+    "orEnterCode": "Eller ange kod",
+    "players": "Spelare",
+    "waitingForPlayers": "Väntar på spelare...",
+    "hostWillStart": "Värden startar spelet när alla är redo",
+    "gameOver": "Spelet Slut!",
+    "recentWords": "Senaste Ord",
+    "leaderboard": "Topplista",
+    "words": "ord",
+    "noPlayersYet": "Inga spelare ännu"
   },
   "collectibles": {
     "title": "Min samling",
@@ -3232,7 +3264,10 @@ const sv = {
       "guessesPenalty": "Gissningar",
       "wordValues": "Ordvärden för Liv",
       "letters": "bokstäver",
-      "tipsToImprove": "Tips att Förbättra"
+      "tipsToImprove": "Tips att Förbättra",
+      "generating": "Genererar...",
+      "performanceRewards": "Prestanda & Belöningar",
+      "tryAgain": "Försök igen"
     },
     "scoreTips": {
       "solveFirst": "Lös pusslet för att få poäng!",

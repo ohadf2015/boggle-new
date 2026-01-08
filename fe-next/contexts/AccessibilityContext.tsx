@@ -17,6 +17,8 @@ interface AccessibilitySettings {
   reduceMotion: boolean | 'system';
   /** Disable haptic feedback vibrations on mobile devices */
   disableHaptics: boolean;
+  /** Use larger letters on the game grid for easier viewing */
+  useLargeLetters: boolean;
 }
 
 interface AccessibilityContextType {
@@ -30,10 +32,14 @@ interface AccessibilityContextType {
   toggleHaptics: () => void;
   /** Cycle through reduceMotion options: system -> on -> off -> system */
   cycleReduceMotion: () => void;
+  /** Toggle large letters mode on/off */
+  toggleLargeLetters: () => void;
   /** Whether animations should be reduced (combines setting + system preference) */
   shouldReduceMotion: boolean;
   /** Whether haptic feedback is enabled */
   hapticsEnabled: boolean;
+  /** Whether large letters are enabled */
+  largeLettersEnabled: boolean;
   /** Update a specific setting */
   updateSetting: <K extends keyof AccessibilitySettings>(
     key: K,
@@ -49,6 +55,7 @@ const DEFAULT_SETTINGS: AccessibilitySettings = {
   disableEarthquakeEffects: false,
   reduceMotion: 'system', // Respect system preference by default
   disableHaptics: false, // Enable haptics by default
+  useLargeLetters: false, // Normal letter size by default
 };
 
 interface AccessibilityProviderProps {
@@ -136,8 +143,18 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
     [settings.disableHaptics, updateField]
   );
 
+  const toggleLargeLetters = useMemo(
+    () => () => {
+      updateField('useLargeLetters', !settings.useLargeLetters);
+    },
+    [settings.useLargeLetters, updateField]
+  );
+
   // Haptics are enabled if not disabled in settings
   const hapticsEnabled = !settings.disableHaptics;
+
+  // Large letters enabled
+  const largeLettersEnabled = settings.useLargeLetters;
 
   const value = useMemo<AccessibilityContextType>(
     () => ({
@@ -146,11 +163,13 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
       toggleEarthquakeEffects,
       toggleHaptics,
       cycleReduceMotion,
+      toggleLargeLetters,
       shouldReduceMotion,
       hapticsEnabled,
+      largeLettersEnabled,
       updateSetting: updateField,
     }),
-    [settings, toggleFireRoundLights, toggleEarthquakeEffects, toggleHaptics, cycleReduceMotion, shouldReduceMotion, hapticsEnabled, updateField]
+    [settings, toggleFireRoundLights, toggleEarthquakeEffects, toggleHaptics, cycleReduceMotion, toggleLargeLetters, shouldReduceMotion, hapticsEnabled, largeLettersEnabled, updateField]
   );
 
   return (
@@ -223,4 +242,13 @@ export function useShouldReduceMotion(): boolean {
 export function useHapticsEnabled(): boolean {
   const context = useContext(AccessibilityContext);
   return context?.hapticsEnabled ?? true;
+}
+
+/**
+ * Hook that returns whether large letters are enabled
+ * Safe to use outside of provider - returns false as default (normal size)
+ */
+export function useLargeLetters(): boolean {
+  const context = useContext(AccessibilityContext);
+  return context?.largeLettersEnabled ?? false;
 }

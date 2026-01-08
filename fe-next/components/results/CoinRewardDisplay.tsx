@@ -10,8 +10,10 @@ export interface CoinReward {
   awarded: number;
   breakdown: {
     base: number;
-    scoreBonus: number;
-    placement: number;
+    scoreBonus?: number;
+    placement?: number;
+    efficiency?: number;
+    streak?: number;
   };
 }
 
@@ -121,15 +123,21 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
 
       {/* Breakdown */}
       {showBreakdown && (
-        <div className="flex items-center justify-center gap-3 text-xs text-neo-black/70 font-medium">
+        <div className="flex items-center justify-center gap-3 text-xs text-neo-black/70 font-medium flex-wrap">
           {reward.breakdown.base > 0 && (
             <span>{t('reveal.base') || 'Base'}: +{reward.breakdown.base}</span>
           )}
-          {reward.breakdown.scoreBonus > 0 && (
+          {(reward.breakdown.scoreBonus ?? 0) > 0 && (
             <span>{t('coins.score') || 'Score'}: +{reward.breakdown.scoreBonus}</span>
           )}
-          {reward.breakdown.placement > 0 && (
+          {(reward.breakdown.placement ?? 0) > 0 && (
             <span>🏆 {t('coins.placement') || 'Placement'}: +{reward.breakdown.placement}</span>
+          )}
+          {(reward.breakdown.efficiency ?? 0) > 0 && (
+            <span>⚡ {t('coins.efficiency') || 'Efficiency'}: +{reward.breakdown.efficiency}</span>
+          )}
+          {(reward.breakdown.streak ?? 0) > 0 && (
+            <span>🔥 {t('coins.streak') || 'Streak'}: +{reward.breakdown.streak}</span>
           )}
         </div>
       )}

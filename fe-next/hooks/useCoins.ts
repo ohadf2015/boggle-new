@@ -1,15 +1,24 @@
+'use client';
+
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCoins, addCoins as addLocalCoins, spendCoins as spendLocalCoins } from '@/utils/coinManager';
 import { syncCoinsToDatabase, spendCoinsFromDatabase, getProfile } from '@/lib/supabase';
 import toast from 'react-hot-toast';
 
+// Re-export types and context hook for convenience
+export type { CoinRewardResult, CoinRewardBreakdown } from '@/contexts/CoinContext';
+export { useCoinContext } from '@/contexts/CoinContext';
+
 /**
  * useCoins Hook
- * 
+ *
  * Unifies coin management for both authenticated and guest users.
  * - Authenticated: Uses `profile.total_coins` and syncs with Supabase.
  * - Guest: Uses `localStorage` via `coinManager`.
+ *
+ * Note: This hook provides basic coin operations. For specialized
+ * award operations (daily, game, combo), use useCoinContext() instead.
  */
 export function useCoins() {
     const { user, profile, isAuthenticated, refreshProfile } = useAuth();

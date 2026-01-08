@@ -9,6 +9,7 @@ import { SoundEffectsProvider } from '@/contexts/SoundEffectsContext';
 import { AchievementQueueProvider } from '@/components/achievements';
 import { GameAnnouncerProvider } from '@/components/GameAnnouncer';
 import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
+import { CoinProvider } from '@/contexts/CoinContext';
 import { MotionConfigProvider } from '@/components/motion/MotionConfigProvider';
 import { CrazyGamesProvider } from '@/components/CrazyGamesSDK';
 import { IMAVideoAdsProvider } from '@/components/ads/IMAVideoAdsProvider';
@@ -109,12 +110,14 @@ const AudioProviders = composeProviders([
     [SoundEffectsProvider as React.ComponentType<{ children: ReactNode }>, {}],
 ]);
 
-// Game-related providers (Achievements + Auth + Announcer + Accessibility + MotionConfig)
+// Game-related providers (Achievements + Auth + Coins + Announcer + Accessibility + MotionConfig)
+// Note: CoinProvider must come AFTER AuthProvider so it can access auth context
 // Note: MotionConfigProvider must come AFTER AccessibilityProvider so it can consume shouldReduceMotion
 const GameProviders = composeProviders([
     [GameAnnouncerProvider as React.ComponentType<{ children: ReactNode }>, {}],
     [AchievementQueueProvider as React.ComponentType<{ children: ReactNode }>, {}],
     [AuthProvider as React.ComponentType<{ children: ReactNode }>, {}],
+    [CoinProvider as React.ComponentType<{ children: ReactNode }>, {}],
     [AccessibilityProvider as React.ComponentType<{ children: ReactNode }>, {}],
     [MotionConfigProvider as React.ComponentType<{ children: ReactNode }>, {}],
 ]);

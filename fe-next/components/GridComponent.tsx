@@ -13,7 +13,7 @@ import {
   type SelectedCell,
   type PerformanceMode,
 } from './grid';
-import { useDisableFireRoundLights, useDisableEarthquakeEffects } from '@/contexts/AccessibilityContext';
+import { useDisableFireRoundLights, useDisableEarthquakeEffects, useLargeLetters } from '@/contexts/AccessibilityContext';
 import { useDevicePerformance } from '../hooks/useDevicePerformance';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useEarthquakeAnimation } from '../hooks/useEarthquakeAnimation';
@@ -104,6 +104,10 @@ const GridComponent = memo<GridComponentProps>(({
   // Accessibility settings
   const disableFireRoundLights = useDisableFireRoundLights();
   const disableEarthquakeEffects = useDisableEarthquakeEffects();
+  const accessibilityLargeLetters = useLargeLetters();
+
+  // Combine prop and accessibility setting - either can enable large text
+  const effectiveLargeText = largeText || accessibilityLargeLetters;
 
   // PERFORMANCE: Device capability detection for adaptive rendering
   const { isLowEnd, enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
@@ -443,7 +447,7 @@ const GridComponent = memo<GridComponentProps>(({
             gridTemplateRows: `repeat(${gridDimensions.rows}, minmax(0, 1fr))`,
             backgroundImage: 'var(--halftone-pattern)',
             backgroundColor: 'var(--neo-cream)',
-            ['--cell-font-size' as string]: `calc((100cqw / ${gridDimensions.cols}) * ${largeText ? 0.70 : 0.50})`,
+            ['--cell-font-size' as string]: `calc((100cqw / ${gridDimensions.cols}) * ${effectiveLargeText ? 0.70 : 0.50})`,
             containerType: 'size',
           }}
           role="grid"

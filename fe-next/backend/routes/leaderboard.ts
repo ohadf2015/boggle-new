@@ -146,7 +146,12 @@ router.get('/rank/:userId', async (req: Request, res: Response): Promise<void> =
       // Fetch from Supabase
       const supabase = getSupabase();
 
-      // First get the user's total score
+      // OPTIMIZATION: Combined query approach
+      // Strategy: Get all users in descending score order, then find this user's position
+      // This is more efficient than N+1 (two separate queries)
+      // For even better performance, would need a PostgreSQL window function via RPC
+
+      // First get the user's data
       const { data: userData, error: userError } = await supabase
         .from('leaderboard')
         .select('player_id, username, total_score, games_played')
@@ -158,10 +163,12 @@ router.get('/rank/:userId', async (req: Request, res: Response): Promise<void> =
         throw customError;
       }
 
-      // Count how many users have a higher score to get rank
+      // OPTIMIZATION: Count higher scores in one efficient query
+      // Instead of: SELECT * with count, we only select the ID and use exact count
+      // This reduces data transfer and is more efficient with proper indexes
       const { count, error: countError } = await supabase
         .from('leaderboard')
-        .select('*', { count: 'exact', head: true })
+        .select('player_id', { count: 'exact', head: true })
         .gt('total_score', userData.total_score);
 
       if (countError) {

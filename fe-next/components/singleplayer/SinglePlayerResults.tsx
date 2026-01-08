@@ -35,8 +35,7 @@ import { MobileTabBar } from '@/components/layout/MobileTabBar';
 import { applyHebrewFinalLetters } from '@/utils/utils';
 import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerView';
 import { useResultsData } from './results';
-import { awardGameCoins } from '@/utils/coinManager';
-import { syncCoinsToDatabase } from '@/lib/supabase';
+import { useCoinContext, type CoinRewardResult } from '@/contexts/CoinContext';
 import { TrainingAnalysisModal } from '@/components/training';
 import { getTrainingProgress } from '@/utils/trainingProgressStorage';
 import { useSaveCognitiveScore } from '@/hooks/useSaveCognitiveScore';
@@ -78,6 +77,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 }) => {
   const { t, language } = useLanguage();
   const { user, isAuthenticated, profile, updateProfile, loading: authLoading } = useAuth();
+  const { awardGameCompletion } = useCoinContext();
   const isLandscape = useMobileLandscape();
   const [expandedBot, setExpandedBot] = useState<string | null>(null);
   const [showSignupModal, setShowSignupModal] = useState(false);
@@ -106,11 +106,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   // Cognitive scoring hook
   const { saveCognitiveScore, isSaving: isSavingCognitiveScore } = useSaveCognitiveScore();
 
-  // Coin reward state
-  const [coinReward, setCoinReward] = useState<{
-    awarded: number;
-    breakdown: { base: number; scoreBonus: number; placement: number };
-  } | null>(null);
+  // Coin reward state - uses CoinRewardResult type from unified context
+  const [coinReward, setCoinReward] = useState<CoinRewardResult | null>(null);
 
   // Brain points state
   const [brainPointsReward, setBrainPointsReward] = useState<{
@@ -305,42 +302,31 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     hasAddedToHistoryRef.current = true;
   }, [results, playerRank, allParticipants.length, isWinner, totalComboBonus, totalFireRoundBonus, playerArchetype]);
 
-  // Award coins for single player game completion
+  // Award coins for single player game completion using unified CoinContext
+  // This handles both auth and guest modes, duplicate prevention, and DB sync
   useEffect(() => {
     if (hasAwardedCoinsRef.current) return;
+    hasAwardedCoinsRef.current = true;
 
     // Generate a unique session ID for this game if not already present
     const sessionId = results.gameSessionId || `sp_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-    const reward = awardGameCoins(
-      sessionId,
-      'singleplayer',
-      results.playerScore,
-      playerRank,
-      allParticipants.length
-    );
+    const awardCoins = async () => {
+      const reward = await awardGameCompletion({
+        sessionId,
+        mode: 'singleplayer',
+        score: results.playerScore,
+        rank: playerRank,
+        totalPlayers: allParticipants.length,
+      });
 
-    if (reward) {
-      setCoinReward(reward);
-
-      // Sync coins to database for authenticated users
-      if (user?.id && reward.awarded > 0) {
-        syncCoinsToDatabase(
-          user.id,
-          reward.awarded,
-          'Single Player Game',
-          {
-            sessionId,
-            score: results.playerScore,
-            rank: playerRank,
-            totalPlayers: allParticipants.length
-          }
-        );
+      if (reward) {
+        setCoinReward(reward);
       }
-    }
+    };
 
-    hasAwardedCoinsRef.current = true;
-  }, [results.playerScore, results.gameSessionId, playerRank, allParticipants.length, user?.id]);
+    void awardCoins();
+  }, [awardGameCompletion, results.playerScore, results.gameSessionId, playerRank, allParticipants.length]);
 
   // Save cognitive scores for brain training (authenticated users only)
   useEffect(() => {

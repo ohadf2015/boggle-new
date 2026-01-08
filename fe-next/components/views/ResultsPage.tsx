@@ -30,6 +30,7 @@ const ResultsPlayerCard = dynamic(() => import('@/components/results/ResultsPlay
 const ResultsWinnerBanner = dynamic(() => import('@/components/results/ResultsWinnerBanner'), { ssr: false });
 const ConsolidatedPlayerCard = dynamic(() => import('@/components/results/ConsolidatedPlayerCard'), { ssr: false });
 const Top3Leaderboard = dynamic(() => import('@/components/results/Top3Leaderboard'), { ssr: false });
+const ScoreRevealAnimation = dynamic(() => import('@/components/results/ScoreRevealAnimation'), { ssr: false });
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
 const ShareWinPrompt = dynamic(() => import('@/components/results/ShareWinPrompt'), { ssr: false });
@@ -72,6 +73,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     return () => setIsInGame(false);
   }, [setIsInGame]);
   const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
+  // Score reveal animation state (Netflix Boggle Party-inspired "trading places" reveal)
+  const [scoreRevealComplete, setScoreRevealComplete] = useState<boolean>(false);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [showFirstWinModal, setShowFirstWinModal] = useState<boolean>(false);
   const [hasShownUpgradePrompt, setHasShownUpgradePrompt] = useState<boolean>(false);
@@ -987,9 +990,23 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       {/* Brain Points Feedback */}
       <BrainPointsDisplay reward={brainPointsReward} variant="compact" />
 
-      {/* Compact Top 3 Leaderboard - Horizontal */}
+      {/* Compact Top 3 Leaderboard with Score Reveal Animation */}
       {sortedScores.length > 1 && (
-        <Top3Leaderboard players={sortedScores} currentUsername={username} compact />
+        scoreRevealComplete ? (
+          <Top3Leaderboard players={sortedScores} currentUsername={username} compact />
+        ) : (
+          <ScoreRevealAnimation
+            players={sortedScores.map(p => ({
+              username: p.username,
+              finalScore: p.score,
+              avatar: p.avatar,
+              isCurrentPlayer: p.username === username,
+            }))}
+            currentUsername={username}
+            duration={2500}
+            onComplete={() => setScoreRevealComplete(true)}
+          />
+        )
       )}
 
       {/* Primary CTA - Play Again / Ready */}
@@ -1267,9 +1284,23 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             {/* Brain Points Feedback */}
             <BrainPointsDisplay reward={brainPointsReward} variant="compact" />
 
-            {/* Top 3 Leaderboard */}
+            {/* Top 3 Leaderboard with Score Reveal Animation */}
             {sortedScores.length > 1 && (
-              <Top3Leaderboard players={sortedScores} currentUsername={username} compact />
+              scoreRevealComplete ? (
+                <Top3Leaderboard players={sortedScores} currentUsername={username} compact />
+              ) : (
+                <ScoreRevealAnimation
+                  players={sortedScores.map(p => ({
+                    username: p.username,
+                    finalScore: p.score,
+                    avatar: p.avatar,
+                    isCurrentPlayer: p.username === username,
+                  }))}
+                  currentUsername={username}
+                  duration={2500}
+                  onComplete={() => setScoreRevealComplete(true)}
+                />
+              )
             )}
 
             {/* Large Room Notice */}

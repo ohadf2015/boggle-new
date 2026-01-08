@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Copy, Check, Send } from 'lucide-react';
+import { Copy, Check, Send, ImageDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { XTwitterIcon, WhatsAppIcon } from './icons';
 
@@ -19,6 +19,8 @@ interface SharePanelProps {
   onWhatsApp: () => void;
   onTwitter: () => void;
   onTelegram: () => void;
+  onDownloadImage?: () => void;
+  isGeneratingImage?: boolean;
   t: (key: string) => string;
 }
 
@@ -30,6 +32,8 @@ export const SharePanel: React.FC<SharePanelProps> = ({
   onWhatsApp,
   onTwitter,
   onTelegram,
+  onDownloadImage,
+  isGeneratingImage,
   t,
 }) => {
   return (
@@ -92,6 +96,26 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                   </>
                 )}
               </Button>
+
+              {onDownloadImage && (
+                <Button
+                  onClick={onDownloadImage}
+                  disabled={isGeneratingImage}
+                  className="w-full py-3 bg-neo-pink text-white border-3 border-neo-black rounded-neo disabled:opacity-50"
+                >
+                  {isGeneratingImage ? (
+                    <>
+                      <div className="mr-2 w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      {t('wordHunt.results.generating') || 'Generating...'}
+                    </>
+                  ) : (
+                    <>
+                      <ImageDown className="mr-2 w-5 h-5" />
+                      {t('daily.downloadImage') || 'Download Image'}
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
 
             <Button onClick={onClose} variant="ghost" className="w-full mt-4">

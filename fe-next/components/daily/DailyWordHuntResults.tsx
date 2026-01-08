@@ -47,8 +47,7 @@ import {
   useConfettiEffects,
   ScoreBadge,
   ResultDisplay,
-  ScoreBreakdownSection,
-  CollapsibleDetails,
+  PerformanceSection,
   CoinUnlockCard,
   ShareSection,
   AttemptHistory,
@@ -247,6 +246,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
   const renderResultsContent = () => (
     <div className="space-y-4">
+      {/* Hero Result Display */}
       <ResultDisplay
         solved={result.solved}
         attemptsUsed={result.attemptsUsed}
@@ -258,9 +258,10 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         t={t}
       />
 
-      {/* Rank badge */}
+      {/* Rank badge - shows for both WIN and FAIL */}
       {stats && <RankBadge stats={stats} t={t} />}
 
+      {/* Share/Retry Section - order differs by result */}
       <ShareSection
         solved={result.solved}
         onShare={shareHandlers.handleNativeShare}
@@ -277,72 +278,92 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         t={t}
       />
 
+      {/* FAIL state: Show reveal target word early + watch ad */}
+      {!result.solved && (
+        <>
+          {/* Reveal target word - now appears early for failed players */}
+          <div className="py-3 border-y border-gray-200 dark:border-gray-700">
+            {coinActions.targetWordRevealed ? (
+              <div className="space-y-2 text-center">
+                <div className="text-sm text-gray-600 dark:text-gray-400">{t('wordHunt.results.theTargetWordWas')}</div>
+                <div className="text-3xl font-black text-neo-yellow tracking-wider">
+                  {language === 'he' ? applyHebrewFinalLetters(result.targetWord) : result.targetWord.toUpperCase()}
+                </div>
+              </div>
+            ) : (
+              <div className="max-w-xs mx-auto">
+                <CoinUnlockCard
+                  icon={<Eye className="w-6 h-6 text-white" />}
+                  title={t('wordHunt.results.revealTargetWord')}
+                  subtitle={t('wordHunt.results.seeTheAnswer') || 'See what you were looking for'}
+                  cost={coinActions.revealCost}
+                  currentCoins={coinActions.currentCoins}
+                  gradientFrom="from-neo-pink"
+                  gradientTo="to-neo-pink"
+                  onClick={coinActions.handleRevealTargetWord}
+                  t={t}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Watch Ad for Coins - only for failed players who can't afford retry */}
+          {!coinActions.canAffordRetry && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-xs text-gray-400">
+                <div className="flex-1 h-px bg-gray-600" />
+                <span>{t('wordHunt.ad.needMoreCoins') || 'Need more coins?'}</span>
+                <div className="flex-1 h-px bg-gray-600" />
+              </div>
+              <WatchAdButton onCoinsEarned={() => {/* Update handled by coinActions */ }} t={t} />
+            </div>
+          )}
+        </>
+      )}
+
+      {/* WIN state: Show rewards prominently */}
+      {result.solved && (
+        <PerformanceSection
+          coinReward={coinActions.coinReward}
+          survivalBonusTime={survivalBonusTime}
+          rarestWord={rarestWord}
+          solved={result.solved}
+          efficiencyScore={result.efficiencyScore || 0}
+          lifeRemaining={result.lifeRemaining || 0}
+          unusedTokens={(result.clueTokensEarned || 0) - (result.clueTokensSpent || 0)}
+          wordsDiscovered={result.wordsDiscovered?.length || 0}
+          guessesUsed={result.attemptsUsed}
+          t={t}
+        />
+      )}
+
+      {/* Leaderboard - compact view */}
       <TabbedDailyLeaderboard
         key={leaderboardKey}
         puzzleDate={puzzleDate}
         language={language}
         currentPlayerId={isAuthenticated && profile ? profile.id : null}
         currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
-        maxVisible={5}
+        maxVisible={3}
+        compact
         t={t}
         defaultTab="today"
       />
 
-      <CollapsibleDetails
-        coinReward={coinActions.coinReward}
-        survivalBonusTime={survivalBonusTime}
-        rarestWord={rarestWord}
-        t={t}
-      />
-
-      <ScoreBreakdownSection
-        solved={result.solved}
-        efficiencyScore={result.efficiencyScore || 0}
-        lifeRemaining={result.lifeRemaining || 0}
-        unusedTokens={(result.clueTokensEarned || 0) - (result.clueTokensSpent || 0)}
-        wordsDiscovered={result.wordsDiscovered?.length || 0}
-        guessesUsed={result.attemptsUsed}
-        t={t}
-      />
-
-      {/* Watch Ad for Coins */}
-      {!coinActions.canAffordRetry && (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-xs text-gray-400">
-            <div className="flex-1 h-px bg-gray-600" />
-            <span>{t('wordHunt.ad.needMoreCoins') || 'Need more coins?'}</span>
-            <div className="flex-1 h-px bg-gray-600" />
-          </div>
-          <WatchAdButton onCoinsEarned={() => {/* Update handled by coinActions */ }} t={t} />
-        </div>
-      )}
-
-      {/* Reveal target word for failed players */}
+      {/* FAIL state: Show performance breakdown lower */}
       {!result.solved && (
-        <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-          {coinActions.targetWordRevealed ? (
-            <div className="space-y-2 text-center">
-              <div className="text-sm text-gray-600 dark:text-gray-400">{t('wordHunt.results.theTargetWordWas')}</div>
-              <div className="text-3xl font-black text-neo-yellow tracking-wider">
-                {language === 'he' ? applyHebrewFinalLetters(result.targetWord) : result.targetWord.toUpperCase()}
-              </div>
-            </div>
-          ) : (
-            <div className="max-w-xs mx-auto">
-              <CoinUnlockCard
-                icon={<Eye className="w-6 h-6 text-white" />}
-                title={t('wordHunt.results.revealTargetWord')}
-                subtitle={t('wordHunt.results.seeTheAnswer') || 'See what you were looking for'}
-                cost={coinActions.revealCost}
-                currentCoins={coinActions.currentCoins}
-                gradientFrom="from-neo-pink"
-                gradientTo="to-neo-pink"
-                onClick={coinActions.handleRevealTargetWord}
-                t={t}
-              />
-            </div>
-          )}
-        </div>
+        <PerformanceSection
+          coinReward={coinActions.coinReward}
+          survivalBonusTime={survivalBonusTime}
+          rarestWord={rarestWord}
+          solved={result.solved}
+          efficiencyScore={result.efficiencyScore || 0}
+          lifeRemaining={result.lifeRemaining || 0}
+          unusedTokens={(result.clueTokensEarned || 0) - (result.clueTokensSpent || 0)}
+          wordsDiscovered={result.wordsDiscovered?.length || 0}
+          guessesUsed={result.attemptsUsed}
+          t={t}
+        />
       )}
 
       <TryAnotherLanguage currentLanguage={language} onGameLanguageChange={onGameLanguageChange} />
@@ -426,7 +447,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
               language={language}
               currentPlayerId={isAuthenticated && profile ? profile.id : null}
               currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
-              maxVisible={5}
+              maxVisible={3}
+              compact
               t={t}
               defaultTab="today"
             />
@@ -461,6 +483,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         onWhatsApp={shareHandlers.handleWhatsApp}
         onTwitter={shareHandlers.handleTwitter}
         onTelegram={shareHandlers.handleTelegram}
+        onDownloadImage={shareHandlers.handleDownloadShareImage}
+        isGeneratingImage={shareHandlers.isGeneratingImage}
         t={t}
       />
 

@@ -4,7 +4,7 @@
  * Handles:
  * - Game history tracking (for performance chart)
  * - Guest stats updates (for unauthenticated users)
- * - Coin rewards (for both single/multiplayer)
+ * - Coin rewards (for both single/multiplayer) via unified CoinContext
  * - Achievement saving (for authenticated users)
  *
  * Consolidates duplicated logic from:
@@ -16,21 +16,11 @@ import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { addGameToHistory } from '@/utils/gameHistoryManager';
 import { updateGuestStatsAfterGame } from '@/utils/guestManager';
-import { awardGameCoins } from '@/utils/coinManager';
-import { useCoins } from '@/hooks/useCoins';
-import { syncCoinsToDatabase } from '@/lib/supabase';
-
-/** Result type from awardGameCoins */
-export interface CoinRewardResult {
-  awarded: number;
-  breakdown: {
-    base: number;
-    scoreBonus: number;
-    placement: number;
-  };
-}
-
+import { useCoinContext, type CoinRewardResult } from '@/contexts/CoinContext';
 import type { WordObject } from './types';
+
+// Re-export for backward compatibility
+export type { CoinRewardResult };
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
 
 export interface GameResultsConfig {
@@ -99,8 +89,8 @@ export interface GameResultsData {
  * ```
  */
 export function useGameResults(config: GameResultsConfig): GameResultsData {
-  const { user, isAuthenticated, profile, updateProfile } = useAuth();
-  const { refreshCoins } = useCoins();
+  const { isAuthenticated, profile, updateProfile } = useAuth();
+  const { awardGameCompletion } = useCoinContext();
 
   // Refs to prevent duplicate side effects
   const hasUpdatedStatsRef = useRef(false);
@@ -199,54 +189,36 @@ export function useGameResults(config: GameResultsConfig): GameResultsData {
     config.achievements,
   ]);
 
-  // Effect: Award coins
+  // Effect: Award coins using unified CoinContext
+  // This handles both auth and guest modes, duplicate prevention, and DB sync
   useEffect(() => {
     if (hasAwardedCoinsRef.current) return;
-
-    const reward = awardGameCoins(
-      config.sessionId,
-      config.mode,
-      config.score,
-      config.rank,
-      config.totalPlayers
-    );
-
-    if (reward) {
-      setCoinReward(reward);
-
-      // Sync coins to database for authenticated users
-      if (user?.id && reward.awarded > 0) {
-        const transactionName = config.mode === 'singleplayer' ? 'Single Player Game' : 'Multiplayer Game';
-        syncCoinsToDatabase(
-          user.id,
-          reward.awarded,
-          transactionName,
-          {
-            sessionId: config.sessionId,
-            ...(config.gameCode && { gameCode: config.gameCode }),
-            score: config.score,
-            rank: config.rank,
-            totalPlayers: config.totalPlayers,
-          }
-        ).then(() => {
-          // Refresh coins to update header immediately
-          refreshCoins();
-        }).catch((error) => {
-          console.error('Failed to sync coins:', error);
-        });
-      }
-    }
-
     hasAwardedCoinsRef.current = true;
+
+    const awardCoins = async () => {
+      const reward = await awardGameCompletion({
+        sessionId: config.sessionId,
+        mode: config.mode,
+        score: config.score,
+        rank: config.rank,
+        totalPlayers: config.totalPlayers,
+        gameCode: config.gameCode,
+      });
+
+      if (reward) {
+        setCoinReward(reward);
+      }
+    };
+
+    void awardCoins();
   }, [
+    awardGameCompletion,
     config.sessionId,
     config.mode,
     config.score,
     config.rank,
     config.totalPlayers,
     config.gameCode,
-    user?.id,
-    refreshCoins,
   ]);
 
   // Effect: Save achievements to profile (for authenticated users)

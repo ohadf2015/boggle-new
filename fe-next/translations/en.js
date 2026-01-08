@@ -254,7 +254,9 @@ const en = {
     "swipeDownToClose": "Swipe down to close",
     "accessibility": "Accessibility",
     "disableFireRoundLights": "Disable fire round lights",
-    "disableFireRoundLightsDescription": "Turn off the flashing lights on grid cells during fire round"
+    "disableFireRoundLightsDescription": "Turn off the flashing lights on grid cells during fire round",
+    "largeLetters": "Large letters",
+    "largeLettersDescription": "Use larger letters on the game grid for easier viewing"
   },
   "combo": {
     "shieldUsed": "Shield blocked the reset!",
@@ -2497,7 +2499,31 @@ const en = {
     },
     "score": "Score",
     "placement": "Placement",
-    "topThreeBonus": "Top 3 Bonus"
+    "topThreeBonus": "Top 3 Bonus",
+    "efficiency": "Efficiency",
+    "streak": "Streak"
+  },
+  "partyScreen": {
+    "title": "Party Screen",
+    "subtitle": "Display the game on your TV for everyone to see!",
+    "qrJoin": "QR Code Join",
+    "qrJoinDesc": "Friends scan the QR code to join instantly on their phones",
+    "liveLeaderboard": "Live Leaderboard",
+    "liveLeaderboardDesc": "Watch scores update in real-time as players find words",
+    "enterRoomCode": "Enter Room Code",
+    "startDisplay": "Start Party Display",
+    "tip": "Tip: Cast this page to your TV using Chrome or AirPlay for the best experience!",
+    "room": "Room",
+    "scanToJoin": "Scan to Join",
+    "orEnterCode": "Or enter code",
+    "players": "Players",
+    "waitingForPlayers": "Waiting for players...",
+    "hostWillStart": "The host will start the game when ready",
+    "gameOver": "Game Over!",
+    "recentWords": "Recent Words",
+    "leaderboard": "Leaderboard",
+    "words": "words",
+    "noPlayersYet": "No players yet"
   },
   "collectibles": {
     "title": "My Collection",
@@ -3244,7 +3270,10 @@ const en = {
       "guessesPenalty": "Guesses",
       "wordValues": "Word Life Values",
       "letters": "letters",
-      "tipsToImprove": "Tips to Improve"
+      "tipsToImprove": "Tips to Improve",
+      "generating": "Generating...",
+      "performanceRewards": "Performance & Rewards",
+      "tryAgain": "Try again"
     },
     "scoreTips": {
       "solveFirst": "Solve the puzzle to earn points!",

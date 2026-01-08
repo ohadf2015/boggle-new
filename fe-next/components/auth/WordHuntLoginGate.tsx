@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Lock, Sparkles, Trophy, Flame, Loader2 } from 'lucide-react';
+import { ArrowLeft, Target, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { signInWithGoogle, signInWithDiscord } from '@/lib/supabase';
@@ -32,7 +32,6 @@ interface WordHuntLoginGateProps {
 
 const WordHuntLoginGate: React.FC<WordHuntLoginGateProps> = ({
   puzzleNumber,
-  puzzleDate,
   onBack,
 }) => {
   const { t } = useLanguage();
@@ -58,25 +57,15 @@ const WordHuntLoginGate: React.FC<WordHuntLoginGateProps> = ({
     }
   };
 
-  const benefits = [
-    { icon: Flame, text: t('auth.wordHunt.benefit1') },
-    { icon: Trophy, text: t('auth.wordHunt.benefit2') },
-    { icon: Sparkles, text: t('auth.wordHunt.benefit3') },
-  ];
-
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       className="flex flex-col items-center justify-center min-h-[80vh] px-4 py-8"
     >
       {/* Back button */}
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        className="absolute top-4 left-4"
-      >
+      <div className="absolute top-4 left-4">
         <Button
           variant="ghost"
           size="sm"
@@ -86,104 +75,50 @@ const WordHuntLoginGate: React.FC<WordHuntLoginGateProps> = ({
           <ArrowLeft size={18} />
           {t('common.back')}
         </Button>
-      </motion.div>
+      </div>
 
       {/* Main card */}
       <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+        initial={{ scale: 0.95, opacity: 0, y: 10 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
         className={cn(
-          'w-full max-w-md rounded-2xl p-8',
-          'bg-gradient-to-b from-slate-800 via-slate-800 to-slate-900',
+          'w-full max-w-sm rounded-2xl p-6 sm:p-8',
+          'bg-gradient-to-b from-slate-800 to-slate-900',
           'border-4 border-neo-yellow shadow-hard-lg'
         )}
       >
         {/* Puzzle badge */}
-        <motion.div
-          initial={{ y: -10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="flex justify-center mb-6"
-        >
-          <div className="bg-neo-yellow text-black px-4 py-2 rounded-full font-bold text-sm shadow-hard-sm">
+        <div className="flex justify-center mb-5">
+          <div className="bg-neo-yellow text-black px-4 py-1.5 rounded-full font-bold text-sm shadow-hard-sm">
             {t('daily.puzzleNumber', { number: puzzleNumber })}
           </div>
-        </motion.div>
+        </div>
 
-        {/* Lock icon with animation */}
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.3, type: 'spring', stiffness: 300 }}
-          className="flex justify-center mb-6"
-        >
-          <div className="relative">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-neo-orange to-neo-pink flex items-center justify-center shadow-hard">
-              <Lock className="w-10 h-10 text-white" />
-            </div>
-            {/* Animated ring */}
-            <motion.div
-              animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="absolute inset-0 rounded-full border-4 border-neo-yellow"
-            />
+        {/* Target icon - simpler, cleaner */}
+        <div className="flex justify-center mb-5">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-neo-pink to-neo-cyan flex items-center justify-center shadow-hard">
+            <Target className="w-8 h-8 text-white" />
           </div>
-        </motion.div>
+        </div>
 
         {/* Title */}
-        <motion.h1
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="text-2xl md:text-3xl font-bold text-center text-white mb-3"
-        >
+        <h1 className="text-xl sm:text-2xl font-bold text-center text-white mb-2">
           {t('auth.wordHunt.gateTitle')}
-        </motion.h1>
+        </h1>
 
         {/* Subtitle */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="text-gray-300 text-center mb-6"
-        >
+        <p className="text-gray-400 text-center text-sm mb-6">
           {t('auth.wordHunt.gateSubtitle')}
-        </motion.p>
+        </p>
 
-        {/* Benefits */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="space-y-3 mb-8"
-        >
-          {benefits.map((benefit, index) => (
-            <motion.div
-              key={benefit.text}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.7 + index * 0.1 }}
-              className="flex items-center gap-3 text-gray-200"
-            >
-              <benefit.icon className="w-5 h-5 text-neo-yellow flex-shrink-0" />
-              <span className="text-sm">{benefit.text}</span>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Auth buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.9 }}
-          className="space-y-3"
-        >
+        {/* Auth buttons - prominent and clear */}
+        <div className="space-y-3">
           <Button
             onClick={() => handleSignIn('google')}
             disabled={isLoading !== null}
             className={cn(
-              'w-full h-14 text-base font-bold rounded-xl',
+              'w-full h-12 text-base font-bold rounded-xl',
               'bg-white text-gray-800 hover:bg-gray-100',
               'border-3 border-black shadow-hard',
               'transition-all active:translate-y-1 active:shadow-hard-pressed'
@@ -194,14 +129,14 @@ const WordHuntLoginGate: React.FC<WordHuntLoginGateProps> = ({
             ) : (
               <GoogleIcon className="w-5 h-5" />
             )}
-            <span className="ml-3">{t('auth.signInWith', { provider: 'Google' })}</span>
+            <span className="ml-2">{t('auth.signInWith', { provider: 'Google' })}</span>
           </Button>
 
           <Button
             onClick={() => handleSignIn('discord')}
             disabled={isLoading !== null}
             className={cn(
-              'w-full h-14 text-base font-bold rounded-xl',
+              'w-full h-12 text-base font-bold rounded-xl',
               'bg-brand-discord text-white hover:bg-brand-discord-hover',
               'border-3 border-black shadow-hard',
               'transition-all active:translate-y-1 active:shadow-hard-pressed'
@@ -212,31 +147,21 @@ const WordHuntLoginGate: React.FC<WordHuntLoginGateProps> = ({
             ) : (
               <DiscordIcon className="w-5 h-5" />
             )}
-            <span className="ml-3">{t('auth.signInWith', { provider: 'Discord' })}</span>
+            <span className="ml-2">{t('auth.signInWith', { provider: 'Discord' })}</span>
           </Button>
-        </motion.div>
+        </div>
 
         {/* Error message */}
         {error && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
             className="mt-4 p-3 rounded-lg bg-red-900/30 border border-red-500/50 text-red-300 text-sm text-center"
           >
             {error}
           </motion.div>
         )}
       </motion.div>
-
-      {/* Footer note */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.1 }}
-        className="mt-6 text-gray-500 text-sm text-center max-w-sm"
-      >
-        {t('auth.wordHunt.footerNote')}
-      </motion.p>
     </motion.div>
   );
 };

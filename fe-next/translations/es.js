@@ -253,7 +253,9 @@ const es = {
     "swipeDownToClose": "Desliza hacia abajo para cerrar",
     "accessibility": "Accesibilidad",
     "disableFireRoundLights": "Desactivar luces de ronda de fuego",
-    "disableFireRoundLightsDescription": "Apaga las luces parpadeantes en las celdas de la cuadrícula durante la ronda de fuego"
+    "disableFireRoundLightsDescription": "Apaga las luces parpadeantes en las celdas de la cuadrícula durante la ronda de fuego",
+    "largeLetters": "Letras grandes",
+    "largeLettersDescription": "Usa letras más grandes en la cuadrícula del juego para una visualización más fácil"
   },
   "combo": {
     "shieldUsed": "¡El escudo salvó tu racha!",
@@ -1848,7 +1850,13 @@ const es = {
     "wordHunt": {
       "loginTitle": "Inicia sesión para jugar",
       "loginSubtitle": "Sincroniza tu progreso en todos los dispositivos",
-      "skipCta": "Omitir por ahora"
+      "skipCta": "Omitir por ahora",
+      "gateTitle": "Únete para resolver el puzzle de hoy",
+      "gateSubtitle": "Inicia sesión para competir con jugadores de todo el mundo",
+      "benefit1": "Sigue tu racha diaria",
+      "benefit2": "Compite en tablas de clasificación globales",
+      "benefit3": "Sincroniza progreso en todos los dispositivos",
+      "footerNote": "Únete a miles de cazadores de palabras resolviendo el desafío de hoy"
     },
     "winnerOnboarding": {
       "topPercentile": {
@@ -2181,7 +2189,31 @@ const es = {
     },
     "score": "Puntuación",
     "placement": "Posición",
-    "topThreeBonus": "Bono por top 3"
+    "topThreeBonus": "Bono por top 3",
+    "efficiency": "Eficiencia",
+    "streak": "Racha"
+  },
+  "partyScreen": {
+    "title": "Pantalla de Fiesta",
+    "subtitle": "¡Muestra el juego en tu TV para que todos lo vean!",
+    "qrJoin": "Unirse con QR",
+    "qrJoinDesc": "Los amigos escanean el código QR para unirse al instante desde sus teléfonos",
+    "liveLeaderboard": "Tabla en Vivo",
+    "liveLeaderboardDesc": "Mira las puntuaciones actualizarse en tiempo real mientras los jugadores encuentran palabras",
+    "enterRoomCode": "Ingresa Código de Sala",
+    "startDisplay": "Iniciar Pantalla de Fiesta",
+    "tip": "Consejo: ¡Transmite esta página a tu TV usando Chrome o AirPlay para la mejor experiencia!",
+    "room": "Sala",
+    "scanToJoin": "Escanea para Unirte",
+    "orEnterCode": "O ingresa código",
+    "players": "Jugadores",
+    "waitingForPlayers": "Esperando jugadores...",
+    "hostWillStart": "El anfitrión iniciará el juego cuando esté listo",
+    "gameOver": "¡Juego Terminado!",
+    "recentWords": "Palabras Recientes",
+    "leaderboard": "Tabla de Clasificación",
+    "words": "palabras",
+    "noPlayersYet": "Aún no hay jugadores"
   },
   "collectibles": {
     "title": "Mi Colección",
@@ -3229,7 +3261,10 @@ const es = {
       "guessesPenalty": "Intentos",
       "wordValues": "Valores de Vida por Palabra",
       "letters": "letras",
-      "tipsToImprove": "Consejos para Mejorar"
+      "tipsToImprove": "Consejos para Mejorar",
+      "generating": "Generando...",
+      "performanceRewards": "Rendimiento y Recompensas",
+      "tryAgain": "Intentar de nuevo"
     },
     "scoreTips": {
       "solveFirst": "¡Resuelve el puzzle para ganar puntos!",

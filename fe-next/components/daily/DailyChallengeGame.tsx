@@ -26,7 +26,7 @@ import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
 import { cn } from '@/lib/utils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { finalizeWordValidation } from '@/utils/wordValidationAPI';
-import { awardComboCoins } from '@/utils/coinManager';
+import { useCoinContext } from '@/contexts/CoinContext';
 import type { LetterGrid, Language } from '@/types';
 
 interface DailyChallengeGameProps {
@@ -62,6 +62,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   const { t } = useLanguage();
   const { playWordAcceptedSound, playComboSound, setGameActive } = useSoundEffects();
   const { stopMusic } = useMusic();
+  const { awardComboMilestone } = useCoinContext();
   const isLandscape = useMobileLandscape();
 
   // Game state
@@ -133,10 +134,12 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     },
     onComboMilestone: (level) => {
       // Award coins for combo milestones (5, 10, 15, 20, 25, 30)
-      const coinsAwarded = awardComboCoins(level, 'daily');
-      if (coinsAwarded > 0) {
-        setComboCoinReward(coinsAwarded);
-      }
+      // Using unified CoinContext which handles auth/guest modes and DB sync
+      void awardComboMilestone({ comboLevel: level, gameMode: 'daily' }).then((coinsAwarded) => {
+        if (coinsAwarded > 0) {
+          setComboCoinReward(coinsAwarded);
+        }
+      });
     },
     trackMaxCombo: true,
   });

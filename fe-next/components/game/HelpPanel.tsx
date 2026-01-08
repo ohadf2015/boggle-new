@@ -18,7 +18,7 @@ interface HelpPanelProps {
  */
 export function HelpPanel({ isOpen, onClose }: HelpPanelProps) {
   const { t } = useLanguage();
-  const { settings, toggleFireRoundLights } = useAccessibility();
+  const { settings, toggleFireRoundLights, toggleLargeLetters } = useAccessibility();
 
   return (
     <AnimatePresence>
@@ -146,36 +146,70 @@ export function HelpPanel({ isOpen, onClose }: HelpPanelProps) {
                   <Eye className="w-4 h-4" />
                   {t('help.accessibility') || 'Accessibility'}
                 </h3>
-                <div className="space-y-2">
-                  {/* Fire Round Lights Toggle */}
-                  <label className="flex items-center justify-between cursor-pointer group">
-                    <span className="text-sm text-neo-black/90 flex-1 pr-3">
-                      {t('help.disableFireRoundLights') || 'Disable fire round lights'}
-                    </span>
-                    <button
-                      role="switch"
-                      aria-checked={settings.disableFireRoundLights}
-                      onClick={toggleFireRoundLights}
-                      className={cn(
-                        "relative w-12 h-7 rounded-full border-2 border-neo-black transition-colors",
-                        settings.disableFireRoundLights
-                          ? "bg-neo-pink"
-                          : "bg-neo-cream"
-                      )}
-                    >
-                      <span
+                <div className="space-y-3">
+                  {/* Large Letters Toggle */}
+                  <div>
+                    <label className="flex items-center justify-between cursor-pointer group">
+                      <span className="text-sm text-neo-black/90 flex-1 pr-3">
+                        {t('help.largeLetters') || 'Large letters'}
+                      </span>
+                      <button
+                        role="switch"
+                        aria-checked={settings.useLargeLetters}
+                        onClick={toggleLargeLetters}
                         className={cn(
-                          "absolute top-0.5 w-5 h-5 rounded-full bg-neo-cream border-2 border-neo-black shadow-hard-sm transition-all",
-                          settings.disableFireRoundLights
-                            ? "left-[calc(100%-1.5rem)]"
-                            : "left-0.5"
+                          "relative w-12 h-7 rounded-full border-2 border-neo-black transition-colors",
+                          settings.useLargeLetters
+                            ? "bg-neo-pink"
+                            : "bg-neo-cream"
                         )}
-                      />
-                    </button>
-                  </label>
-                  <p className="text-xs text-neo-black/60">
-                    {t('help.disableFireRoundLightsDescription') || 'Turn off the flashing lights on grid cells during fire round'}
-                  </p>
+                      >
+                        <span
+                          className={cn(
+                            "absolute top-0.5 w-5 h-5 rounded-full bg-neo-cream border-2 border-neo-black shadow-hard-sm transition-all",
+                            settings.useLargeLetters
+                              ? "left-[calc(100%-1.5rem)]"
+                              : "left-0.5"
+                          )}
+                        />
+                      </button>
+                    </label>
+                    <p className="text-xs text-neo-black/60 mt-1">
+                      {t('help.largeLettersDescription') || 'Use larger letters on the game grid for easier viewing'}
+                    </p>
+                  </div>
+
+                  {/* Fire Round Lights Toggle */}
+                  <div>
+                    <label className="flex items-center justify-between cursor-pointer group">
+                      <span className="text-sm text-neo-black/90 flex-1 pr-3">
+                        {t('help.disableFireRoundLights') || 'Disable fire round lights'}
+                      </span>
+                      <button
+                        role="switch"
+                        aria-checked={settings.disableFireRoundLights}
+                        onClick={toggleFireRoundLights}
+                        className={cn(
+                          "relative w-12 h-7 rounded-full border-2 border-neo-black transition-colors",
+                          settings.disableFireRoundLights
+                            ? "bg-neo-pink"
+                            : "bg-neo-cream"
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "absolute top-0.5 w-5 h-5 rounded-full bg-neo-cream border-2 border-neo-black shadow-hard-sm transition-all",
+                            settings.disableFireRoundLights
+                              ? "left-[calc(100%-1.5rem)]"
+                              : "left-0.5"
+                          )}
+                        />
+                      </button>
+                    </label>
+                    <p className="text-xs text-neo-black/60 mt-1">
+                      {t('help.disableFireRoundLightsDescription') || 'Turn off the flashing lights on grid cells during fire round'}
+                    </p>
+                  </div>
                 </div>
               </section>
 

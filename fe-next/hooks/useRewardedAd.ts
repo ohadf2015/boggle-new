@@ -4,8 +4,7 @@ import { useState, useCallback } from 'react';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useIMAVideoAds } from '@/components/ads/IMAVideoAdsProvider';
 import { useGoogleAds } from '@/components/ads/GoogleAdsProvider';
-import { COIN_REWARDS } from '@/utils/coinManager';
-import { useCoins } from '@/hooks/useCoins';
+import { useCoinContext } from '@/contexts/CoinContext';
 
 export type AdStatus = 'idle' | 'loading' | 'showing' | 'completed' | 'error';
 
@@ -56,8 +55,8 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   const [status, setStatus] = useState<AdStatus>('idle');
   const [error, setError] = useState<string | null>(null);
 
-  // Use unified unified coin hook
-  const { addCoins: addCoinsUnified } = useCoins();
+  // Use unified CoinContext for all coin operations
+  const { awardWatchedAd, rewards } = useCoinContext();
 
   // Ad platform hooks
   const crazyGames = useCrazyGames();
@@ -73,7 +72,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
   // Ad is available if any platform is ready
   const isAdAvailable = shouldUseCrazyGames || shouldUseIMAVideoAds || shouldUseGoogleAds || shouldUseSimulation;
 
-  const rewardAmount = COIN_REWARDS.WATCH_AD;
+  const rewardAmount = rewards.WATCH_AD;
 
   const showAd = useCallback(() => {
     if (status === 'loading' || status === 'showing') {
@@ -92,14 +91,11 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
           ? 'adsense'
           : 'simulation';
 
-    // Award coins helper
+    // Award coins helper - uses unified CoinContext for auth/guest sync
     const awardCoinsAndNotify = async () => {
-      await addCoinsUnified(rewardAmount, 'Watched Ad', {
-        platform,
-        timestamp: new Date().toISOString(),
-      });
+      const result = await awardWatchedAd(platform);
       setStatus('completed');
-      await onRewardEarned?.(rewardAmount);
+      await onRewardEarned?.(result?.awarded ?? rewardAmount);
 
       // Reset to idle after a short delay
       setTimeout(() => setStatus('idle'), 1500);
@@ -172,7 +168,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
         awardCoinsAndNotify();
       }, 3000);
     }
-  }, [status, shouldUseCrazyGames, shouldUseIMAVideoAds, shouldUseGoogleAds, crazyGames, imaVideoAds, googleAds, rewardAmount, onRewardEarned, onAdError, onAdStarted, addCoinsUnified]);
+  }, [status, shouldUseCrazyGames, shouldUseIMAVideoAds, shouldUseGoogleAds, crazyGames, imaVideoAds, googleAds, rewardAmount, onRewardEarned, onAdError, onAdStarted, awardWatchedAd]);
 
   return {
     status,

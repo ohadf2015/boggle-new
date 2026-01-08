@@ -253,7 +253,9 @@ const ja = {
     "swipeDownToClose": "下にスワイプして閉じる",
     "accessibility": "アクセシビリティ",
     "disableFireRoundLights": "ファイアラウンドのライトを無効化",
-    "disableFireRoundLightsDescription": "ファイアラウンド中のグリッドセルの点滅ライトをオフにする"
+    "disableFireRoundLightsDescription": "ファイアラウンド中のグリッドセルの点滅ライトをオフにする",
+    "largeLetters": "大きな文字",
+    "largeLettersDescription": "ゲームグリッドで大きな文字を使用して見やすくする"
   },
   "combo": {
     "shieldUsed": "シールドがストリークを守った！",
@@ -2184,7 +2186,13 @@ const ja = {
     "wordHunt": {
       "loginTitle": "ログインしてプレイ",
       "loginSubtitle": "すべてのデバイスで進捗を同期",
-      "skipCta": "今はスキップ"
+      "skipCta": "今はスキップ",
+      "gateTitle": "今日のパズルに参加しよう",
+      "gateSubtitle": "ログインして世界中のプレイヤーと競争",
+      "benefit1": "デイリーストリークを追跡",
+      "benefit2": "グローバルリーダーボードで競争",
+      "benefit3": "すべてのデバイスで進捗を同期",
+      "footerNote": "今日のチャレンジを解く何千人ものワードハンターに参加"
     },
     "winnerOnboarding": {
       "topPercentile": {
@@ -2356,7 +2364,31 @@ const ja = {
     },
     "score": "スコア",
     "placement": "順位",
-    "topThreeBonus": "トップ3ボーナス"
+    "topThreeBonus": "トップ3ボーナス",
+    "efficiency": "効率",
+    "streak": "連続"
+  },
+  "partyScreen": {
+    "title": "パーティースクリーン",
+    "subtitle": "みんなで見られるようにゲームをTVに表示！",
+    "qrJoin": "QRコードで参加",
+    "qrJoinDesc": "友達がQRコードをスキャンして即座にスマホから参加",
+    "liveLeaderboard": "リアルタイムランキング",
+    "liveLeaderboardDesc": "プレイヤーが単語を見つけるとスコアがリアルタイムで更新",
+    "enterRoomCode": "ルームコードを入力",
+    "startDisplay": "パーティー画面を開始",
+    "tip": "ヒント：ChromeまたはAirPlayでこのページをTVにキャストすると最高の体験ができます！",
+    "room": "ルーム",
+    "scanToJoin": "スキャンして参加",
+    "orEnterCode": "またはコードを入力",
+    "players": "プレイヤー",
+    "waitingForPlayers": "プレイヤーを待っています...",
+    "hostWillStart": "ホストが準備ができたらゲームを開始します",
+    "gameOver": "ゲーム終了！",
+    "recentWords": "最近の単語",
+    "leaderboard": "ランキング",
+    "words": "単語",
+    "noPlayersYet": "まだプレイヤーがいません"
   },
   "collectibles": {
     "title": "マイコレクション",
@@ -3231,7 +3263,10 @@ const ja = {
       "guessesPenalty": "推測",
       "wordValues": "単語のライフ値",
       "letters": "文字",
-      "tipsToImprove": "上達のコツ"
+      "tipsToImprove": "上達のコツ",
+      "generating": "生成中...",
+      "performanceRewards": "パフォーマンス＆報酬",
+      "tryAgain": "もう一度"
     },
     "scoreTips": {
       "solveFirst": "パズルを解いてポイントをゲット！",

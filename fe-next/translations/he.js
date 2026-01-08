@@ -253,7 +253,9 @@ const he = {
     "swipeDownToClose": "החלק למטה לסגירה",
     "accessibility": "נגישות",
     "disableFireRoundLights": "כבה את אורות סיבוב האש",
-    "disableFireRoundLightsDescription": "כבה את האורות המהבהבים על תאי הרשת בזמן סיבוב אש"
+    "disableFireRoundLightsDescription": "כבה את האורות המהבהבים על תאי הרשת בזמן סיבוב אש",
+    "largeLetters": "אותיות גדולות",
+    "largeLettersDescription": "השתמש באותיות גדולות יותר על לוח המשחק לצפייה קלה יותר"
   },
   "combo": {
     "shieldUsed": "המגן הציל את הרצף!",
@@ -2186,7 +2188,13 @@ const he = {
     "wordHunt": {
       "loginTitle": "היכנס כדי לשחק",
       "loginSubtitle": "סנכרן את ההתקדמות שלך בכל המכשירים",
-      "skipCta": "דלג בעת זו"
+      "skipCta": "דלג בעת זו",
+      "gateTitle": "הצטרף לפתור את החידה היומית",
+      "gateSubtitle": "היכנס כדי להתחרות עם שחקנים מכל העולם",
+      "benefit1": "עקוב אחר הרצף היומי שלך",
+      "benefit2": "התחרה בטבלאות המובילים הגלובליות",
+      "benefit3": "סנכרן התקדמות בין כל המכשירים",
+      "footerNote": "הצטרף לאלפי ציידי מילים שפותרים את האתגר היומי"
     },
     "winnerOnboarding": {
       "topPercentile": {
@@ -2486,7 +2494,31 @@ const he = {
     },
     "score": "ניקוד",
     "placement": "מיקום",
-    "topThreeBonus": "בונוס טופ 3"
+    "topThreeBonus": "בונוס טופ 3",
+    "efficiency": "יעילות",
+    "streak": "רצף"
+  },
+  "partyScreen": {
+    "title": "מסך מסיבה",
+    "subtitle": "הצג את המשחק על הטלוויזיה לכולם!",
+    "qrJoin": "הצטרף עם QR",
+    "qrJoinDesc": "חברים סורקים את קוד ה-QR להצטרפות מיידית מהטלפון",
+    "liveLeaderboard": "טבלת מובילים חיה",
+    "liveLeaderboardDesc": "צפה בניקוד מתעדכן בזמן אמת כשמשתתפים מוצאים מילים",
+    "enterRoomCode": "הזן קוד חדר",
+    "startDisplay": "התחל תצוגת מסיבה",
+    "tip": "טיפ: שדר את הדף הזה לטלוויזיה דרך Chrome או AirPlay לחוויה הטובה ביותר!",
+    "room": "חדר",
+    "scanToJoin": "סרוק להצטרפות",
+    "orEnterCode": "או הזן קוד",
+    "players": "שחקנים",
+    "waitingForPlayers": "ממתין לשחקנים...",
+    "hostWillStart": "המארח יתחיל את המשחק כשיהיה מוכן",
+    "gameOver": "המשחק נגמר!",
+    "recentWords": "מילים אחרונות",
+    "leaderboard": "טבלת מובילים",
+    "words": "מילים",
+    "noPlayersYet": "אין שחקנים עדיין"
   },
   "collectibles": {
     "title": "האוסף שלי",
@@ -3233,7 +3265,10 @@ const he = {
       "guessesPenalty": "ניחושים",
       "wordValues": "ערכי מילים לחיים",
       "letters": "אותיות",
-      "tipsToImprove": "טיפים להשתפר"
+      "tipsToImprove": "טיפים להשתפר",
+      "generating": "מייצר...",
+      "performanceRewards": "ביצועים ופרסים",
+      "tryAgain": "נסה שוב"
     },
     "scoreTips": {
       "solveFirst": "פתרו את החידה כדי לצבור נקודות!",

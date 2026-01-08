@@ -58,6 +58,9 @@ export type { ScoreBreakdownSectionProps } from './ScoreBreakdownSection';
 export { CollapsibleDetails } from './CollapsibleDetails';
 export type { CollapsibleDetailsProps } from './CollapsibleDetails';
 
+export { PerformanceSection } from './PerformanceSection';
+export type { PerformanceSectionProps } from './PerformanceSection';
+
 export { CoinUnlockCard } from './CoinUnlockCard';
 export type { CoinUnlockCardProps } from './CoinUnlockCard';
 
