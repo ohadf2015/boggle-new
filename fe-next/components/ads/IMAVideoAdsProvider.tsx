@@ -9,6 +9,7 @@ import {
   useRef,
   ReactNode,
   useEffect,
+  useMemo,
 } from 'react';
 
 // IMA SDK - using 'any' for SDK objects to avoid type conflicts with global declarations
@@ -330,11 +331,12 @@ export function IMAVideoAdsProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const value: IMAVideoAdsContextType = {
+  // Memoize the context value to prevent unnecessary re-renders of all consumers
+  const value = useMemo<IMAVideoAdsContextType>(() => ({
     isLoaded,
     isAvailable,
     showRewardedAd,
-  };
+  }), [isLoaded, isAvailable, showRewardedAd]);
 
   return (
     <IMAVideoAdsContext.Provider value={value}>

@@ -184,8 +184,8 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
         <DialogContent noDescription className="max-w-sm sm:max-w-md">
-          <DialogHeader className="relative pr-12 rtl:pr-0 rtl:pl-12">
-            <DialogTitle className={cn("text-lg font-black uppercase", dir === 'rtl' ? 'text-right' : 'text-left')}>
+          <DialogHeader className="relative pr-14 sm:pr-16 rtl:pr-0 rtl:pl-14 sm:rtl:pl-16">
+            <DialogTitle className={cn("text-lg font-black uppercase truncate", dir === 'rtl' ? 'text-right' : 'text-left')}>
               {t('multiplayerFlow.createModal.title') || 'Create Room'}
             </DialogTitle>
           </DialogHeader>
@@ -215,7 +215,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                     </div>
                   )}
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-neo-cyan rounded-full border-2 border-neo-black flex items-center justify-center text-neo-black">
+                <div className="absolute -bottom-1 -right-1 rtl:-right-auto rtl:-left-1 w-6 h-6 bg-neo-cyan rounded-full border-2 border-neo-black flex items-center justify-center text-neo-black">
                   <Pencil className="w-3 h-3 text-neo-black" />
                 </div>
               </button>
