@@ -205,7 +205,17 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   });
 
   // Training progress - visible progress bar with 5 clear skills for practice mode
-  const trainingProgress = useTrainingProgress({
+  // Destructure to get stable function references for dependency arrays (prevents infinite loops)
+  const {
+    completedSkills: trainingCompletedSkills,
+    completedSkillsRef: trainingCompletedSkillsRef,
+    justUnlocked: trainingJustUnlocked,
+    isComplete: trainingIsComplete,
+    clearJustUnlocked: trainingClearJustUnlocked,
+    updateProgress: trainingUpdateProgress,
+    trackPath: trainingTrackPath,
+    trackValidWord: trainingTrackValidWord,
+  } = useTrainingProgress({
     enabled: settings.mode === 'practice',
     onSkillUnlock: (skillId) => {
       // Skill unlock celebration is handled by the progress bar component
@@ -227,8 +237,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     // Track for training analysis (only in practice mode)
     trainingAnalysis.trackPath(cells);
     // Track for progress bar (only in practice mode)
-    trainingProgress.trackPath(cells);
-  }, [directionGuidance, trainingAnalysis, trainingProgress]);
+    trainingTrackPath(cells);
+  }, [directionGuidance, trainingAnalysis, trainingTrackPath]);
 
   // Game timer - handles countdown with pause support
   const timer = useGameTimer({
@@ -270,17 +280,19 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
   // Update training progress when score changes (for targetScore skill)
   // Uses refs to read skills without triggering re-renders
+  // NOTE: Uses stable function references (trainingUpdateProgress, trainingCompletedSkillsRef)
+  // instead of the whole hook object to prevent infinite loops
   useEffect(() => {
     if (settings.mode !== 'practice' || score < 15) return;
 
-    const skillsRef = trainingProgress.completedSkillsRef.current;
-    trainingProgress.updateProgress({
+    const skillsRef = trainingCompletedSkillsRef.current;
+    trainingUpdateProgress({
       score,
       wordsFound: validWordsCount,
       hasDiagonal: skillsRef?.has('diagonal') ?? false,
       hasDirectionChange: skillsRef?.has('directionChange') ?? false,
     });
-  }, [score, settings.mode, validWordsCount, trainingProgress]);
+  }, [score, settings.mode, validWordsCount, trainingUpdateProgress, trainingCompletedSkillsRef]);
 
   // Announce timer at key intervals for screen reader users
   useEffect(() => {
@@ -1056,7 +1068,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           // Track for training analysis (practice mode only)
           trainingAnalysis.trackValidWord(normalizedWord.length);
           // Track for progress bar (practice mode only)
-          trainingProgress.trackValidWord(normalizedWord.length);
+          trainingTrackValidWord(normalizedWord.length);
 
           if (combo.validWordCount > 1) {
             playComboSound(currentCombo + 1);
@@ -1100,7 +1112,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           timestamp: Date.now(),
         });
       });
-  }, [settings.language, settings.minWordLength, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getComboBonus, getScoreMultiplier, fireRoundActive, calculateWordScore, trainingAnalysis, trainingProgress]);
+  }, [settings.language, settings.minWordLength, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getComboBonus, getScoreMultiplier, fireRoundActive, calculateWordScore, trainingAnalysis, trainingTrackValidWord]);
 
   const handleFinishPractice = useCallback(() => {
     setIsGameOver(true);
@@ -1276,15 +1288,15 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         {settings.mode === 'practice' && (
           <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30">
             <TrainingProgressBar
-              completedSkills={trainingProgress.completedSkills}
+              completedSkills={trainingCompletedSkills}
               score={score}
               wordsFound={validWordCount}
               compact={!progressBarExpanded}
               expanded={progressBarExpanded}
               onToggleExpand={() => setProgressBarExpanded(!progressBarExpanded)}
-              justUnlocked={trainingProgress.justUnlocked}
-              onUnlockAnimationComplete={trainingProgress.clearJustUnlocked}
-              isComplete={trainingProgress.isComplete}
+              justUnlocked={trainingJustUnlocked}
+              onUnlockAnimationComplete={trainingClearJustUnlocked}
+              isComplete={trainingIsComplete}
             />
           </div>
         )}
@@ -1532,8 +1544,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         {/* Skill Unlock Toast - celebration when training skill is unlocked */}
         {settings.mode === 'practice' && (
           <SkillUnlockToast
-            skillId={trainingProgress.justUnlocked}
-            onDismiss={trainingProgress.clearJustUnlocked}
+            skillId={trainingJustUnlocked}
+            onDismiss={trainingClearJustUnlocked}
           />
         )}
 
@@ -1686,15 +1698,15 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       {settings.mode === 'practice' && (
         <div className="px-2 md:px-4 py-1 flex-shrink-0">
           <TrainingProgressBar
-            completedSkills={trainingProgress.completedSkills}
+            completedSkills={trainingCompletedSkills}
             score={score}
             wordsFound={foundWords.filter(fw => fw.isValid === true).length}
             compact={!progressBarExpanded}
             expanded={progressBarExpanded}
             onToggleExpand={() => setProgressBarExpanded(!progressBarExpanded)}
-            justUnlocked={trainingProgress.justUnlocked}
-            onUnlockAnimationComplete={trainingProgress.clearJustUnlocked}
-            isComplete={trainingProgress.isComplete}
+            justUnlocked={trainingJustUnlocked}
+            onUnlockAnimationComplete={trainingClearJustUnlocked}
+            isComplete={trainingIsComplete}
           />
         </div>
       )}
@@ -1984,8 +1996,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       {/* Skill Unlock Toast - celebration when training skill is unlocked */}
       {settings.mode === 'practice' && (
         <SkillUnlockToast
-          skillId={trainingProgress.justUnlocked}
-          onDismiss={trainingProgress.clearJustUnlocked}
+          skillId={trainingJustUnlocked}
+          onDismiss={trainingClearJustUnlocked}
         />
       )}
 

@@ -41,7 +41,7 @@ const supabaseDomains = getSupabaseDomains();
 export const ALLOWED_IMAGE_DOMAINS: string[] = [
   'i.imgur.com',
   'cdn.discordapp.com',
-  'lh3.googleusercontent.com',
+  'googleusercontent.com',  // Allows all *.googleusercontent.com (lh3, lh4, lh5, etc.)
   'avatars.githubusercontent.com',
   'cdn.cloudflare.com',
   'res.cloudinary.com',

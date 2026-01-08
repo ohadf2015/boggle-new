@@ -89,6 +89,28 @@ if (typeof window !== 'undefined') {
     initConsole();
 }
 
+// Suppress benign ResizeObserver errors
+// This error occurs when ResizeObserver can't deliver all notifications in a single frame
+// It's a browser warning, not an actual bug - common in React apps with responsive layouts
+// Already ignored in Sentry (sentry.client.config.ts) but still appears in browser console
+let resizeObserverHandlerInitialized = false;
+const initResizeObserverErrorHandler = () => {
+    if (resizeObserverHandlerInitialized) return;
+    if (typeof window === 'undefined') return;
+
+    resizeObserverHandlerInitialized = true;
+    window.addEventListener('error', (event) => {
+        if (event.message?.includes('ResizeObserver loop')) {
+            event.stopImmediatePropagation();
+            event.preventDefault();
+        }
+    });
+};
+
+if (typeof window !== 'undefined') {
+    initResizeObserverErrorHandler();
+}
+
 // Lazy load LogRocket after user interaction to save ~100KB on initial load
 let logRocketInitialized = false;
 const initLogRocket = () => {

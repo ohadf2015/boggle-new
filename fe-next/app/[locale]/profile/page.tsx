@@ -1188,6 +1188,13 @@ export default function ProfilePage(): React.ReactNode {
           currentAvatarImage={profile?.avatar_image}
           currentEmoji={profile?.avatar_emoji}
           currentColor={profile?.avatar_color}
+          profileAvatar={{
+            profilePictureUrl: profile?.profile_picture_url,
+            avatarImage: profile?.avatar_image,
+            avatarEmoji: profile?.avatar_emoji,
+            avatarColor: profile?.avatar_color,
+            displayName: profile?.display_name,
+          }}
         />
       </div>
 
@@ -1850,6 +1857,13 @@ export default function ProfilePage(): React.ReactNode {
         currentAvatarImage={profile?.avatar_image}
         currentEmoji={profile?.avatar_emoji}
         currentColor={profile?.avatar_color}
+        profileAvatar={{
+          profilePictureUrl: profile?.profile_picture_url,
+          avatarImage: profile?.avatar_image,
+          avatarEmoji: profile?.avatar_emoji,
+          avatarColor: profile?.avatar_color,
+          displayName: profile?.display_name,
+        }}
       />
     </div>
   </>

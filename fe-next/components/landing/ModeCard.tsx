@@ -100,62 +100,61 @@ const ModeCard: React.FC<ModeCardProps> = ({
         }}
         // Removed micro-animations for cleaner UX
       >
-        {/* Header with icon and arrow */}
-        <div className="flex items-start justify-between" style={{ marginBottom: 'clamp(0.5rem, 2cqw, 1rem)' }}>
+        {/* Header with icon, title, and arrow in one row */}
+        <div className="flex items-center gap-2 sm:gap-3" style={{ marginBottom: 'clamp(0.25rem, 1cqw, 0.5rem)' }}>
           {/* Icon - container-relative sizing */}
           <div
             className={cn(
               'rounded-neo border-2 border-neo-black',
               'shadow-hard-sm',
-              'flex items-center justify-center',
+              'flex items-center justify-center shrink-0',
               styles.iconBg
             )}
             style={{
-              width: 'clamp(2.25rem, 12cqw, 4rem)',
-              height: 'clamp(2.25rem, 12cqw, 4rem)',
+              width: 'clamp(2rem, 10cqw, 3rem)',
+              height: 'clamp(2rem, 10cqw, 3rem)',
             }}
           >
-            <span className={styles.iconText} style={{ fontSize: 'clamp(1.125rem, 6cqw, 1.875rem)' }}>
+            <span className={styles.iconText} style={{ fontSize: 'clamp(1rem, 5cqw, 1.5rem)' }}>
               {icon}
             </span>
           </div>
 
+          {/* Title - container-relative font size */}
+          <h2
+            className="font-black uppercase tracking-tight text-neo-black flex-1 min-w-0"
+            style={{
+              fontSize: 'clamp(1rem, 5cqw, 1.5rem)',
+            }}
+          >
+            {title}
+          </h2>
+
           {/* Arrow indicator - min 44x44px touch target on mobile */}
           <div
             className={cn(
-              'min-w-[44px] min-h-[44px]',
+              'min-w-[40px] min-h-[40px]',
               'rounded-full border-2 border-neo-black',
-              'flex items-center justify-center',
+              'flex items-center justify-center shrink-0',
               'transition-transform duration-200 ease-out',
               isRTL ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1',
               styles.arrow
             )}
             style={{
-              width: 'clamp(2.5rem, 10cqw, 3rem)',
-              height: 'clamp(2.5rem, 10cqw, 3rem)',
+              width: 'clamp(2.25rem, 8cqw, 2.75rem)',
+              height: 'clamp(2.25rem, 8cqw, 2.75rem)',
             }}
           >
-            <ArrowIcon style={{ fontSize: 'clamp(0.875rem, 4cqw, 1.25rem)' }} />
+            <ArrowIcon style={{ fontSize: 'clamp(0.75rem, 3.5cqw, 1rem)' }} />
           </div>
         </div>
-
-        {/* Title - container-relative font size */}
-        <h2
-          className="font-black uppercase tracking-tight text-neo-black"
-          style={{
-            fontSize: 'clamp(1.125rem, 6cqw, 1.875rem)',
-            marginBottom: 'clamp(0.125rem, 0.5cqw, 0.5rem)',
-          }}
-        >
-          {title}
-        </h2>
 
         {/* Description - container-relative font size */}
         <p
           className="font-medium text-neo-black"
           style={{
-            fontSize: 'clamp(0.75rem, 3.5cqw, 1.125rem)',
-            marginBottom: 'clamp(0.5rem, 2cqw, 1rem)',
+            fontSize: 'clamp(0.7rem, 3cqw, 1rem)',
+            marginBottom: 'clamp(0.375rem, 1.5cqw, 0.75rem)',
           }}
         >
           {description}
