@@ -1,8 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { LanguageProvider } from '@/contexts/LanguageContext';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext';
 import { Monitor, QrCode, Users, ArrowRight } from 'lucide-react';
 
 /**
