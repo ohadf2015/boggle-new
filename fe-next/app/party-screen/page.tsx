@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { LanguageProvider } from '@/contexts/LanguageContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Monitor, QrCode, Users, ArrowRight } from 'lucide-react';
 
@@ -11,7 +11,7 @@ import { Monitor, QrCode, Users, ArrowRight } from 'lucide-react';
  * Shows instructions for setting up a TV/Party display.
  * Redirects to room-specific party screen when code is entered.
  */
-export default function PartyScreenLanding() {
+function PartyScreenContent() {
   const { t } = useLanguage();
   const router = useRouter();
 
@@ -99,5 +99,17 @@ export default function PartyScreenLanding() {
         </p>
       </div>
     </div>
+  );
+}
+
+/**
+ * Wrapper component that provides the LanguageProvider context.
+ * This page is outside the [locale] route group, so it needs its own provider.
+ */
+export default function PartyScreenLanding() {
+  return (
+    <LanguageProvider initialLanguage="en">
+      <PartyScreenContent />
+    </LanguageProvider>
   );
 }
