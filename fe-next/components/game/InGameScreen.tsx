@@ -1045,7 +1045,7 @@ const InGameScreen = memo<InGameScreenProps>(({
 
           {/* Grid - Direct connection to timer row */}
           {/* Removed extra padding to prevent scroll - safe area handled by parent */}
-          <div className="flex-1 flex items-center justify-center min-h-0 overflow-hidden -mt-4 md:-mt-6 lg:-mt-8">
+          <div className="flex-1 flex items-start justify-center min-h-0 overflow-hidden">
             <GridComponent
               key={isPlaying ? 'playing-grid' : 'spectating-grid'}
               grid={letterGrid}
