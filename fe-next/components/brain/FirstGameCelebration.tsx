@@ -39,6 +39,16 @@ export default function FirstGameCelebration({
   const isDarkMode = theme === 'dark';
   const [showConfetti, setShowConfetti] = useState(false);
 
+  // Generate random values for confetti particles once on mount
+  const [confettiValues] = useState(() =>
+    Array.from({ length: 50 }).map(() => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      rotation: Math.random() * 360,
+      duration: 2 + Math.random()
+    }))
+  );
+
   useEffect(() => {
     if (isOpen) {
       setShowConfetti(true);
@@ -63,7 +73,7 @@ export default function FirstGameCelebration({
         {/* Confetti Particles */}
         {showConfetti && (
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            {Array.from({ length: 50 }).map((_, i) => (
+            {confettiValues.map((values, i) => (
               <motion.div
                 key={i}
                 className={cn(
@@ -81,14 +91,14 @@ export default function FirstGameCelebration({
                   rotate: 0
                 }}
                 animate={{
-                  x: `${Math.random() * 100}vw`,
-                  y: `${Math.random() * 100}vh`,
+                  x: `${values.x}vw`,
+                  y: `${values.y}vh`,
                   scale: [0, 1, 0.5],
-                  rotate: Math.random() * 360,
+                  rotate: values.rotation,
                   opacity: [1, 1, 0]
                 }}
                 transition={{
-                  duration: 2 + Math.random(),
+                  duration: values.duration,
                   ease: "easeOut"
                 }}
               />

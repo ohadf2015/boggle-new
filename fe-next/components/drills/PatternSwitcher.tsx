@@ -7,10 +7,9 @@ import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
-import WordFormingArea from '@/components/game/WordFormingArea';
+import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { LetterGrid, Language } from '@/types';
-import type { WordFeedback } from '@/components/game/WordFormingArea';
 
 // Level configurations
 const LEVEL_CONFIGS = [
