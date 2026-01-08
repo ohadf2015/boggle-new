@@ -1,8 +1,8 @@
 {
   "summary": {
-    "totalKeysInCode": 1711,
+    "totalKeysInCode": 1714,
     "keyCountByLanguage": {
-      "en": 2921,
+      "en": 2924,
       "he": 2921,
       "sv": 2921,
       "ja": 2921,
@@ -12,10 +12,26 @@
   },
   "missingFromEnglish": [],
   "missingByLanguage": {
-    "he": [],
-    "sv": [],
-    "ja": [],
-    "es": []
+    "he": [
+      "auth.wordHunt.loginTitle",
+      "auth.wordHunt.loginSubtitle",
+      "auth.wordHunt.skipCta"
+    ],
+    "sv": [
+      "auth.wordHunt.loginTitle",
+      "auth.wordHunt.loginSubtitle",
+      "auth.wordHunt.skipCta"
+    ],
+    "ja": [
+      "auth.wordHunt.loginTitle",
+      "auth.wordHunt.loginSubtitle",
+      "auth.wordHunt.skipCta"
+    ],
+    "es": [
+      "auth.wordHunt.loginTitle",
+      "auth.wordHunt.loginSubtitle",
+      "auth.wordHunt.skipCta"
+    ]
   },
   "keysNotInEnglish": {
     "he": [],

@@ -2183,6 +2183,11 @@ const he = {
       "maybeLater": "אולי אחר כך",
       "continueAsGuest": "המשך כאורח"
     },
+    "wordHunt": {
+      "loginTitle": "היכנס כדי לשחק",
+      "loginSubtitle": "סנכרן את ההתקדמות שלך בכל המכשירים",
+      "skipCta": "דלג בעת זו"
+    },
     "winnerOnboarding": {
       "topPercentile": {
         "title": "אתה בין השחקנים המובילים!",

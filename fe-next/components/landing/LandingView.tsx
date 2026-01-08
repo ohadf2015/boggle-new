@@ -293,7 +293,7 @@ const LandingView: React.FC = () => {
         transition={{ duration: 0.3, delay: 0.3 }}
         onClick={handleOpenTutorial}
         className="
-          fixed bottom-[calc(6rem+max(env(safe-area-inset-bottom),1rem))] lg:bottom-[calc(7rem+max(env(safe-area-inset-bottom),1rem))] right-4 z-[45]
+          fixed bottom-[calc(6rem+max(env(safe-area-inset-bottom),1rem))] lg:bottom-[calc(8.5rem+max(env(safe-area-inset-bottom),1rem))] right-4 z-[45]
           flex items-center gap-2
           min-w-[48px] min-h-[48px]
           px-4 py-3

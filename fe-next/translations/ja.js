@@ -2181,6 +2181,11 @@ const ja = {
       "maybeLater": "また今度",
       "continueAsGuest": "ゲストとして続ける"
     },
+    "wordHunt": {
+      "loginTitle": "ログインしてプレイ",
+      "loginSubtitle": "すべてのデバイスで進捗を同期",
+      "skipCta": "今はスキップ"
+    },
     "winnerOnboarding": {
       "topPercentile": {
         "title": "あなたはトッププレイヤーです！",

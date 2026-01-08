@@ -1845,6 +1845,11 @@ const es = {
       "maybeLater": "Quizás después",
       "continueAsGuest": "Continuar como invitado"
     },
+    "wordHunt": {
+      "loginTitle": "Inicia sesión para jugar",
+      "loginSubtitle": "Sincroniza tu progreso en todos los dispositivos",
+      "skipCta": "Omitir por ahora"
+    },
     "winnerOnboarding": {
       "topPercentile": {
         "title": "¡Eres un jugador destacado!",

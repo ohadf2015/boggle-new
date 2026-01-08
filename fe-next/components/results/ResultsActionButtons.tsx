@@ -169,7 +169,7 @@ export const SinglePlayerActions: React.FC<SinglePlayerActionsProps> = memo(({
       )}
 
       {/* Secondary Actions */}
-      <div className="flex gap-2 overflow-hidden">
+      <div className="flex gap-2">
         <Button
           variant="ghost"
           size="sm"

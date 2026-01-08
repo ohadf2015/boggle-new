@@ -2182,6 +2182,11 @@ const sv = {
       "maybeLater": "Kanske senare",
       "continueAsGuest": "Fortsätt som gäst"
     },
+    "wordHunt": {
+      "loginTitle": "Logga in för att spela",
+      "loginSubtitle": "Synkronisera dina framsteg på alla enheter",
+      "skipCta": "Hoppa över för nu"
+    },
     "winnerOnboarding": {
       "topPercentile": {
         "title": "Du är en toppspelare!",
