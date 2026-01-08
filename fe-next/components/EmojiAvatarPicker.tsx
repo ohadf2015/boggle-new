@@ -81,6 +81,14 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarConfig | null>(getInitialAvatar());
   const [useProfileAvatar, setUseProfileAvatar] = useState<boolean>(isUsingProfileAvatar);
 
+  // Reset state when modal opens to reflect current profile state
+  React.useEffect(() => {
+    if (isOpen) {
+      setSelectedAvatar(getInitialAvatar());
+      setUseProfileAvatar(isUsingProfileAvatar);
+    }
+  }, [isOpen, currentAvatarImage, profileAvatar, hasProfileAvatar, isUsingProfileAvatar]);
+
   // Handle selecting a regular avatar
   const handleSelectAvatar = (avatar: AvatarConfig) => {
     setSelectedAvatar(avatar);
@@ -94,7 +102,7 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
   };
 
   const handleSave = () => {
-    if (useProfileAvatar) {
+    if (useProfileAvatar && hasProfileAvatar) {
       onSave({
         avatarImage: PROFILE_AVATAR_ID,
         emoji: profileAvatar?.avatarEmoji || '🎮',

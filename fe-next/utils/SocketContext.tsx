@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback, useRef, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef, ReactNode, useMemo } from 'react';
 import { io, Socket } from 'socket.io-client';
 import logger from '@/utils/logger';
 import { sanitizeRoomName } from '@/utils/consts';
@@ -241,16 +241,20 @@ export function SocketProvider({ children }: SocketProviderProps) {
     };
   }, []);
 
+  // Memoize the context value to prevent unnecessary re-renders of all consumers
+  // This is critical - Socket.IO state changes frequently but consumers may not care about all changes
+  const value = useMemo<SocketContextValue>(() => ({
+    socket,
+    isConnected,
+    isReconnecting,
+    connectionError,
+    reconnectAttempt,
+    maxReconnectAttempts: SOCKET_CONFIG.reconnectionAttempts,
+    manualReconnect
+  }), [socket, isConnected, isReconnecting, connectionError, reconnectAttempt, manualReconnect]);
+
   return (
-    <SocketContext.Provider value={{
-      socket,
-      isConnected,
-      isReconnecting,
-      connectionError,
-      reconnectAttempt,
-      maxReconnectAttempts: SOCKET_CONFIG.reconnectionAttempts,
-      manualReconnect
-    }}>
+    <SocketContext.Provider value={value}>
       {children}
     </SocketContext.Provider>
   );

@@ -19,7 +19,7 @@
 
 'use client';
 
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useMemo } from 'react';
 import { useGameState, type UseGameStateReturn } from '@/hooks/useGameState';
 
 // ==========================================
@@ -39,8 +39,35 @@ interface GameStateProviderProps {
 export function GameStateProvider({ children }: GameStateProviderProps) {
   const gameState = useGameState();
 
+  // Memoize the context value to prevent unnecessary re-renders of all consumers
+  // This is critical for performance - without memoization, every state update in the hook
+  // would cause all child components to re-render even if they don't use all the values
+  const value = useMemo(() => gameState, [
+    gameState.gameActive,
+    gameState.foundWords,
+    gameState.currentWord,
+    gameState.validWords,
+    gameState.score,
+    gameState.timeRemaining,
+    gameState.gamePhase,
+    gameState.roomCode,
+    gameState.players,
+    gameState.setGameActive,
+    gameState.setFoundWords,
+    gameState.setCurrentWord,
+    gameState.setValidWords,
+    gameState.setScore,
+    gameState.setTimeRemaining,
+    gameState.setGamePhase,
+    gameState.setRoomCode,
+    gameState.setPlayers,
+    gameState.addFoundWord,
+    gameState.removeFoundWord,
+    gameState.reset,
+  ]);
+
   return (
-    <GameStateContext.Provider value={gameState}>
+    <GameStateContext.Provider value={value}>
       {children}
     </GameStateContext.Provider>
   );

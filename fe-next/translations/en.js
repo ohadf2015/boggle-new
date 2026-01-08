@@ -2191,7 +2191,13 @@ const en = {
     "wordHunt": {
       "loginTitle": "Sign in to play",
       "loginSubtitle": "Sync your progress across devices",
-      "skipCta": "Skip for now"
+      "skipCta": "Skip for now",
+      "gateTitle": "Join to Play Today's Puzzle",
+      "gateSubtitle": "Sign in to compete with players worldwide",
+      "benefit1": "Track your daily streak",
+      "benefit2": "Compete on global leaderboards",
+      "benefit3": "Sync progress across devices",
+      "footerNote": "Join thousands of word hunters solving today's challenge"
     },
     "winnerOnboarding": {
       "topPercentile": {

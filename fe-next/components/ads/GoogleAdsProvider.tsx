@@ -1,7 +1,7 @@
 'use client';
 
 import Script from 'next/script';
-import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback, ReactNode, useEffect, useMemo } from 'react';
 
 // AdSense type declarations
 interface AdsByGoogleArray extends Array<Record<string, unknown>> {
@@ -188,11 +188,12 @@ export function GoogleAdsProvider({ children }: { children: ReactNode }) {
     }
   }, [isAvailable]);
 
-  const value: GoogleAdsContextType = {
+  // Memoize the context value to prevent unnecessary re-renders of all consumers
+  const value = useMemo<GoogleAdsContextType>(() => ({
     isLoaded,
     isAvailable,
     showRewardedAd,
-  };
+  }), [isLoaded, isAvailable, showRewardedAd]);
 
   return (
     <GoogleAdsContext.Provider value={value}>

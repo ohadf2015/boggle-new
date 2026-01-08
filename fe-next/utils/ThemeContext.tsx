@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 
 type Theme = 'light' | 'dark';
 
@@ -40,12 +40,15 @@ export const ThemeProvider = ({ children }: ThemeProviderProps): React.ReactElem
         localStorage.setItem('boggle_theme', theme);
     }, [theme]);
 
-    const toggleTheme = (): void => {
+    const toggleTheme = React.useCallback((): void => {
         setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
-    };
+    }, []);
+
+    // Memoize the context value to prevent unnecessary re-renders of all consumers
+    const value = useMemo<ThemeContextValue>(() => ({ theme, toggleTheme }), [theme, toggleTheme]);
 
     return (
-        <ThemeContext.Provider value={{ theme, toggleTheme }}>
+        <ThemeContext.Provider value={value}>
             {children}
         </ThemeContext.Provider>
     );

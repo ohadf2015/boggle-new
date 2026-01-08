@@ -14,8 +14,8 @@ import GuestNameEditor from './GuestNameEditor';
 import { DailyChallengeTutorial } from './DailyChallengeTutorial';
 import DailyIntroCarousel from './DailyIntroCarousel';
 import { TrainingGatewayModal } from '@/components/training';
-import WordHuntLoginGate from '@/components/auth/WordHuntLoginGate';
 import { shouldShowTrainingGateway, markGatewaySkipped } from '@/utils/trainingProgressStorage';
+import WordHuntLoginGate from '@/components/auth/WordHuntLoginGate';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
@@ -141,7 +141,6 @@ const DailyChallenge: React.FC = () => {
   const [showTrainingGateway, setShowTrainingGateway] = useState(false);
   // Track if gateway was already shown this session to prevent re-showing
   const [gatewayShownThisSession, setGatewayShownThisSession] = useState(false);
-
 
   // Fetch guest fingerprint on mount
   useEffect(() => {
@@ -1085,8 +1084,8 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
             <span>?</span> {t('daily.howToPlay')}
             {!tutorialCompleted && (
               <span className="relative flex h-2 w-2 ml-1">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-neo-pink opacity-75 animate-ping text-neo-white" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-pink text-neo-white" />
+                <span className="absolute inline-flex h-full w-full rounded-full bg-neo-pink opacity-75 animate-ping" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-pink" />
               </span>
             )}
           </button>
