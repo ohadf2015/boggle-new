@@ -67,7 +67,7 @@ export const CollapsibleDetails: React.FC<CollapsibleDetailsProps> = ({
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="p-3 space-y-3 bg-white dark:bg-slate-800">
+            <div className="p-3 space-y-3 bg-white dark:bg-slate-800 text-neo-black dark:text-neo-white">
               {/* Coin rewards */}
               {coinReward && coinReward.awarded > 0 && (
                 <div className="flex items-center justify-between p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">

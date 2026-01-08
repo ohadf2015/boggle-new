@@ -172,7 +172,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
             </div>
 
             {/* Profile Section */}
-            <div className="flex items-center gap-4 p-4 bg-neo-cream dark:bg-slate-700 rounded-neo border-3 border-neo-black">
+            <div className="flex items-center gap-4 p-4 bg-neo-cream dark:bg-slate-700 rounded-neo border-3 border-neo-black text-neo-black dark:text-neo-white">
               {/* Avatar Button */}
               <button
                 type="button"
@@ -193,7 +193,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
                     <Avatar {...getAvatarDisplayProps()} size="xl" />
                   )}
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-neo-cyan rounded-full border-2 border-neo-black flex items-center justify-center">
+                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-neo-cyan rounded-full border-2 border-neo-black flex items-center justify-center text-neo-black">
                   <Pencil className="w-3 h-3 text-neo-black" />
                 </div>
               </button>

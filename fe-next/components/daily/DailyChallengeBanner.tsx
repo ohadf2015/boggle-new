@@ -177,7 +177,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
 
           {/* Completion indicator */}
           {hasPlayed && (
-            <div className="flex items-center justify-center w-8 h-8 bg-neo-lime rounded-full border-2 border-neo-black">
+            <div className="flex items-center justify-center w-8 h-8 bg-neo-lime rounded-full border-2 border-neo-black text-neo-black">
               <Check className="w-4 h-4 text-neo-black" strokeWidth={3} />
             </div>
           )}

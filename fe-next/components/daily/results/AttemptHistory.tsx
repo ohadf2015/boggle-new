@@ -48,7 +48,7 @@ export const AttemptHistory: React.FC<AttemptHistoryProps> = ({
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="p-2.5 space-y-0.5 bg-white dark:bg-slate-800">
+            <div className="p-2.5 space-y-0.5 bg-white dark:bg-slate-800 text-neo-black dark:text-neo-white">
               {attempts.map((attempt, idx) => (
                 <div key={idx} className="flex items-center justify-center gap-1.5">
                   <span className="text-[10px] text-gray-700 dark:text-gray-400 w-5">{idx + 1}.</span>

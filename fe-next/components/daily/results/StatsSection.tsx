@@ -60,7 +60,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="p-4 pt-2 bg-white dark:bg-neo-navy-light border-t border-gray-200 dark:border-gray-700 space-y-4">
+            <div className="p-4 pt-2 bg-white dark:bg-neo-navy-light border-t border-gray-200 dark:border-gray-700 space-y-4 text-neo-black dark:text-neo-white">
               {/* Stats grid */}
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 border border-blue-200 dark:border-blue-800">

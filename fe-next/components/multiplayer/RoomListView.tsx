@@ -92,13 +92,13 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className="hidden lg:block flex-shrink-0"
+            className="hidden lg:flex justify-center flex-shrink-0"
           >
             <Button
               variant="success"
               size="lg"
               onClick={onCreateRoom}
-              className="max-w-sm mx-auto w-full py-4 lg:py-5 text-base lg:text-lg font-bold uppercase"
+              className="w-auto px-8 lg:px-10 py-4 lg:py-5 text-base lg:text-lg font-bold uppercase"
             >
               <Plus className="w-5 h-5 lg:w-6 lg:h-6 me-2" />
               {t('multiplayerFlow.roomList.createButton') || 'Create Room'}

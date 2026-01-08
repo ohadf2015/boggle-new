@@ -106,7 +106,7 @@ const BugReportModal = memo<BugReportModalProps>(({ isOpen, onClose }) => {
           )}
         >
           {/* Header */}
-          <div className="bg-neo-pink border-b-4 border-neo-black px-4 py-3 flex items-center justify-between">
+          <div className="bg-neo-pink border-b-4 border-neo-black px-4 py-3 flex items-center justify-between text-neo-white">
             <h2 className="text-xl font-black uppercase tracking-tight text-neo-cream flex items-center gap-2">
               <Bug className="w-5 h-5 text-neo-yellow" />
               {t('bugReport.title') || 'Report a Bug'}

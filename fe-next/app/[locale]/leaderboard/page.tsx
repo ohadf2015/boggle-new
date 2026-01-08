@@ -98,7 +98,7 @@ export default function LeaderboardPage(): React.ReactNode {
             </p>
             <Button
               onClick={() => router.push(`/${language}`)}
-              className="mt-6"
+              className="mt-6 bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg"
             >
               <ArrowLeft className="me-2 rtl:rotate-180" />
               {t('leaderboard.backToGame') || 'Back to Game'}
@@ -350,14 +350,8 @@ export default function LeaderboardPage(): React.ReactNode {
         {/* Back Button */}
         <div className="mt-8 text-center">
           <Button
-            variant="outline"
             onClick={() => router.push(`/${language}`)}
-            className={cn(
-              'rounded-full font-bold',
-              isDarkMode
-                ? 'border-slate-500 bg-slate-700 text-slate-100 hover:bg-slate-600 hover:text-white'
-                : 'border-gray-400 bg-gray-100 text-gray-800 hover:bg-gray-200 hover:text-gray-900'
-            )}
+            className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg rounded-neo"
           >
             <ArrowLeft className="me-2 rtl:rotate-180" />
             {t('leaderboard.backToGame') || 'Back to Game'}

@@ -1075,8 +1075,8 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
             <span>?</span> {t('daily.howToPlay')}
             {!tutorialCompleted && (
               <span className="relative flex h-2 w-2 ml-1">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-neo-pink opacity-75 animate-ping" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-pink" />
+                <span className="absolute inline-flex h-full w-full rounded-full bg-neo-pink opacity-75 animate-ping text-neo-white" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-pink text-neo-white" />
               </span>
             )}
           </button>

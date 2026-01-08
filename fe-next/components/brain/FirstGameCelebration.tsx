@@ -143,7 +143,7 @@ export default function FirstGameCelebration({
               ease: "easeInOut"
             }}
           >
-            <div className="w-20 h-20 rounded-neo border-3 border-neo-black bg-neo-purple flex items-center justify-center">
+            <div className="w-20 h-20 rounded-neo border-3 border-neo-black bg-neo-purple text-neo-white flex items-center justify-center">
               <Brain className="w-12 h-12 text-white" />
             </div>
           </motion.div>
@@ -248,7 +248,7 @@ export default function FirstGameCelebration({
                   )}>
                     {value}
                   </span>
-                  <div className="flex items-center gap-1 px-1.5 py-0.5 rounded border border-neo-black bg-neo-yellow">
+                  <div className="flex items-center gap-1 px-1.5 py-0.5 rounded border border-neo-black bg-neo-yellow text-neo-black">
                     <Sparkles className="w-2.5 h-2.5 text-neo-black" />
                     <span className="text-[9px] font-black text-neo-black uppercase">
                       {t('brain.newBadge')}

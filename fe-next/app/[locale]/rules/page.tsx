@@ -248,14 +248,14 @@ export default function RulesPage(): React.JSX.Element {
                                             <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black font-bold text-neo-cyan ${dir === 'rtl' ? 'text-right' : ''}`}>1-2 {t('howToPlay.pts')}</td>
                                             <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black text-slate-600 dark:text-slate-300 hidden sm:table-cell ${dir === 'rtl' ? 'text-right' : ''}`}>CAT, GAME</td>
                                         </tr>
-                                        <tr className="bg-slate-50 dark:bg-slate-600">
+                                        <tr className="bg-pink-100 dark:bg-slate-600">
                                             <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black text-slate-900 dark:text-slate-100 ${dir === 'rtl' ? 'text-right' : ''}`}>5-6 {t('howToPlay.letters')}</td>
-                                            <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black font-bold text-pink-400 ${dir === 'rtl' ? 'text-right' : ''}`}>2-3 {t('howToPlay.pts')}</td>
+                                            <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black font-bold text-pink-600 dark:text-pink-300 ${dir === 'rtl' ? 'text-right' : ''}`}>2-3 {t('howToPlay.pts')}</td>
                                             <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black text-slate-600 dark:text-slate-300 hidden sm:table-cell ${dir === 'rtl' ? 'text-right' : ''}`}>BRAIN</td>
                                         </tr>
                                         <tr className="bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100">
                                             <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black text-slate-900 dark:text-slate-100 ${dir === 'rtl' ? 'text-right' : ''}`}>7+ {t('howToPlay.letters')}</td>
-                                            <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black font-bold text-pink-400 ${dir === 'rtl' ? 'text-right' : ''}`}>5+ {t('howToPlay.pts')}</td>
+                                            <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black font-bold text-pink-600 dark:text-pink-300 ${dir === 'rtl' ? 'text-right' : ''}`}>5+ {t('howToPlay.pts')}</td>
                                             <td className={`p-1.5 sm:p-3 border sm:border-2 border-neo-black text-slate-600 dark:text-slate-300 hidden sm:table-cell ${dir === 'rtl' ? 'text-right' : ''}`}>CHAMPION</td>
                                         </tr>
                                     </tbody>

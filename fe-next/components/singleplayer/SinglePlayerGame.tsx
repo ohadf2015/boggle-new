@@ -1247,7 +1247,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               exit={{ opacity: 0 }}
               className="absolute inset-0 z-50 flex items-center justify-center bg-neo-navy/90 backdrop-blur-sm"
             >
-              <div className="flex flex-col items-center gap-4 p-6 bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard-lg">
+              <div className="flex flex-col items-center gap-4 p-6 bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard-lg text-neo-black">
                 <div className="relative w-12 h-12">
                   <div className="absolute inset-0 border-4 border-neo-cyan/30 rounded-full" />
                   <div className="absolute inset-0 border-4 border-transparent border-t-neo-cyan rounded-full animate-spin" />
@@ -1627,7 +1627,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/90 backdrop-blur-sm"
           >
-            <div className="flex flex-col items-center gap-4 p-6 bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard-lg">
+            <div className="flex flex-col items-center gap-4 p-6 bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard-lg text-neo-black">
               <div className="relative w-12 h-12">
                 <div className="absolute inset-0 border-4 border-neo-cyan/30 rounded-full" />
                 <div className="absolute inset-0 border-4 border-transparent border-t-neo-cyan rounded-full animate-spin" />

@@ -478,7 +478,7 @@ const DesktopReadyActions: React.FC<DesktopReadyActionsProps> = memo(({
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
           className="flex items-center justify-center gap-4"
         >
-          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center border-4 border-neo-black shadow-hard">
+          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center border-4 border-neo-black shadow-hard text-neo-black">
             <Check className="w-8 h-8 text-emerald-600" />
           </div>
         </motion.div>
