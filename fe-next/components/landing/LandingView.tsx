@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
-import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Zap, Download, Gift, Globe } from 'lucide-react';
+import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -278,66 +278,6 @@ const LandingView: React.FC = () => {
             />
           )}
         </div>
-
-        {/* SEO Content Section - Value Props & Social Proof (hidden in landscape) */}
-        {!isLandscape && (
-          <section className="mt-4 sm:mt-6 lg:mt-8 animate-fade-in-fast" aria-label="Why LexiClash">
-            {/* SEO Headline - targets search keywords */}
-            <div className="text-center mb-4">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white">
-                {t('landing.seoHeadline') || 'Free Multiplayer Word Game'}
-              </h2>
-              <p className="text-sm sm:text-base text-neo-black/70 dark:text-neo-white/70 mt-1">
-                {t('landing.seoSubheadline') || 'Like Wordle meets Boggle - but play with friends in real-time!'}
-              </p>
-            </div>
-
-            {/* Value Propositions Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 mb-4">
-              <div className="flex flex-col items-center p-2 sm:p-3 bg-white/50 dark:bg-neo-navy-light/50 rounded-neo border-2 border-neo-black/20 dark:border-neo-white/20">
-                <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-neo-yellow mb-1" aria-hidden="true" />
-                <span className="text-xs sm:text-sm font-bold text-neo-black dark:text-neo-white text-center">
-                  {t('landing.valueProps.realTime') || 'Real-Time Battles'}
-                </span>
-                <span className="text-[10px] sm:text-xs text-neo-black/60 dark:text-neo-white/60 text-center">
-                  {t('landing.valueProps.realTimeDesc') || 'Race against friends live'}
-                </span>
-              </div>
-              <div className="flex flex-col items-center p-2 sm:p-3 bg-white/50 dark:bg-neo-navy-light/50 rounded-neo border-2 border-neo-black/20 dark:border-neo-white/20">
-                <Download className="w-5 h-5 sm:w-6 sm:h-6 text-neo-cyan mb-1" aria-hidden="true" />
-                <span className="text-xs sm:text-sm font-bold text-neo-black dark:text-neo-white text-center">
-                  {t('landing.valueProps.noDownload') || 'Play Instantly'}
-                </span>
-                <span className="text-[10px] sm:text-xs text-neo-black/60 dark:text-neo-white/60 text-center">
-                  {t('landing.valueProps.noDownloadDesc') || 'No app download needed'}
-                </span>
-              </div>
-              <div className="flex flex-col items-center p-2 sm:p-3 bg-white/50 dark:bg-neo-navy-light/50 rounded-neo border-2 border-neo-black/20 dark:border-neo-white/20">
-                <Gift className="w-5 h-5 sm:w-6 sm:h-6 text-neo-green mb-1" aria-hidden="true" />
-                <span className="text-xs sm:text-sm font-bold text-neo-black dark:text-neo-white text-center">
-                  {t('landing.valueProps.freeForever') || '100% Free'}
-                </span>
-                <span className="text-[10px] sm:text-xs text-neo-black/60 dark:text-neo-white/60 text-center">
-                  {t('landing.valueProps.freeForeverDesc') || 'No subscriptions ever'}
-                </span>
-              </div>
-              <div className="flex flex-col items-center p-2 sm:p-3 bg-white/50 dark:bg-neo-navy-light/50 rounded-neo border-2 border-neo-black/20 dark:border-neo-white/20">
-                <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-neo-purple mb-1" aria-hidden="true" />
-                <span className="text-xs sm:text-sm font-bold text-neo-black dark:text-neo-white text-center">
-                  {t('landing.valueProps.multiLanguage') || '5 Languages'}
-                </span>
-                <span className="text-[10px] sm:text-xs text-neo-black/60 dark:text-neo-white/60 text-center">
-                  {t('landing.valueProps.multiLanguageDesc') || 'EN, HE, SV, JA, ES'}
-                </span>
-              </div>
-            </div>
-
-            {/* SEO Text - hidden visually but readable by search engines */}
-            <p className="sr-only">
-              {t('landing.altComparison') || 'Best free alternative to Boggle, Scrabble, and Wordle for groups'}
-            </p>
-          </section>
-        )}
 
       </main>
 

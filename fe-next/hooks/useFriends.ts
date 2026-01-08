@@ -121,7 +121,7 @@ export function useFriends(): UseFriendsReturn {
         }));
       }
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, isMounted]);
 
   // Refresh friend data
   const refresh = useCallback(async () => {

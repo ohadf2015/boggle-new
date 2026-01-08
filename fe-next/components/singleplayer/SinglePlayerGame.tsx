@@ -204,6 +204,18 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     },
   });
 
+  // Memoized callbacks for training progress (prevents infinite re-render loops)
+  // These must be stable references to avoid recreating the hook's internal callbacks
+  const handleTrainingSkillUnlock = useCallback((skillId: string) => {
+    // Skill unlock celebration is handled by the progress bar component
+    console.log(`Skill unlocked: ${skillId}`);
+  }, []);
+
+  const handleTrainingComplete = useCallback(() => {
+    // All skills complete - show completion popup
+    setShowCompletionPopup(true);
+  }, []);
+
   // Training progress - visible progress bar with 5 clear skills for practice mode
   // Destructure to get stable function references for dependency arrays (prevents infinite loops)
   const {
@@ -217,14 +229,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     trackValidWord: trainingTrackValidWord,
   } = useTrainingProgress({
     enabled: settings.mode === 'practice',
-    onSkillUnlock: (skillId) => {
-      // Skill unlock celebration is handled by the progress bar component
-      console.log(`Skill unlocked: ${skillId}`);
-    },
-    onComplete: () => {
-      // All skills complete - show completion popup
-      setShowCompletionPopup(true);
-    },
+    onSkillUnlock: handleTrainingSkillUnlock,
+    onComplete: handleTrainingComplete,
   });
 
   // State for progress bar expansion (mobile)

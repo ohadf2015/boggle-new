@@ -284,7 +284,7 @@ export function useBrainScore(): UseBrainScoreReturn {
     } finally {
       isFetching.current = false;
     }
-  }, [isAuthenticated, user, supabase]);
+  }, [isAuthenticated, user, supabase, isMounted]);
 
   // Initialize brain score for new users
   const initializeBrainScore = useCallback(async () => {

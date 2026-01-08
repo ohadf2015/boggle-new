@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { PlayerCollectible, CollectibleItem } from '@/contexts/auth/authTypes';
 
@@ -19,7 +19,7 @@ export function usePlayerCollectibles(userId: string | undefined): UsePlayerColl
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchCollectibles = async () => {
+  const fetchCollectibles = useCallback(async () => {
     if (!userId || !supabase) {
       setCollectibles([]);
       return;
@@ -75,11 +75,11 @@ export function usePlayerCollectibles(userId: string | undefined): UsePlayerColl
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [userId]);
 
   useEffect(() => {
     fetchCollectibles();
-  }, [userId]);
+  }, [fetchCollectibles]);
 
   return {
     collectibles,

@@ -110,7 +110,7 @@ export function useLeaderboard(options: LeaderboardOptions = {}): LeaderboardRes
       setError(null);
     }
     setLoading(false);
-  }, [limit, orderBy, enabled]);
+  }, [limit, orderBy, enabled, isMountedRef]);
 
   // Debounced refetch for realtime updates
   const debouncedRefetch = useDebouncedCallback(fetchLeaderboard, debounceMs);
@@ -187,7 +187,7 @@ export function useUserRank(userId: string | null | undefined): UserRankResult {
       setError(null);
     }
     setLoading(false);
-  }, [userId]);
+  }, [userId, isMountedRef]);
 
   // Debounced refetch for realtime updates (500ms default)
   const debouncedRefetch = useDebouncedCallback(fetchRank, 500);

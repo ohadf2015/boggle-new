@@ -19,6 +19,7 @@ import type {
   GameCognitiveInput,
   CognitiveDomain,
 } from '@/shared/types/cognitive';
+import { getValidUUIDOrUndefined } from '@/utils/validation/uuid';
 
 // Word length thresholds for rarity classification
 const RARE_WORD_MIN_LENGTH = 6;
@@ -134,11 +135,14 @@ export function useSaveCognitiveScore() {
       });
 
       // Save game cognitive score to database
+      // Note: game_session_id must be a valid UUID or undefined
+      // Non-UUID formats like "mp_PLW9X5_1767889799004" are filtered out
+      const validGameSessionId = getValidUUIDOrUndefined(input.gameSessionId);
       const { error: insertError } = await supabase
         .from('game_cognitive_scores')
         .insert({
           user_id: userId,
-          game_session_id: input.gameSessionId,
+          game_session_id: validGameSessionId,
           processing_speed: gameScores.processingSpeed,
           working_memory: gameScores.workingMemory,
           attention: gameScores.attention,
@@ -201,7 +205,7 @@ export function useSaveCognitiveScore() {
             tier: updated.tier,
             tier_progress: updated.tierProgress,
             games_analyzed: currentBrainScore.games_analyzed + 1,
-            last_game_at: new Date().toISOString(),
+            last_activity_at: new Date().toISOString(),
           })
           .eq('user_id', userId);
 
@@ -215,17 +219,20 @@ export function useSaveCognitiveScore() {
         scoreDelta = overallScore - currentBrainScore.overall_score;
 
         // Also add to brain_score_history for trend tracking
+        const today = new Date().toISOString().split('T')[0];
         await supabase
           .from('brain_score_history')
           .insert({
             user_id: userId,
+            period_type: 'daily',
+            period_start: today,
             overall_score: updated.overallScore,
             processing_speed: updated.domainScores.processingSpeed,
             working_memory: updated.domainScores.workingMemory,
             attention: updated.domainScores.attention,
             flexibility: updated.domainScores.flexibility,
             vocabulary: updated.domainScores.vocabulary,
-            tier: updated.tier,
+            games_played: 1,
           });
 
       } else {
@@ -255,7 +262,7 @@ export function useSaveCognitiveScore() {
             tier,
             tier_progress: tierProgress,
             games_analyzed: 1,
-            last_game_at: new Date().toISOString(),
+            last_activity_at: new Date().toISOString(),
           });
 
         if (createError) {
@@ -263,17 +270,20 @@ export function useSaveCognitiveScore() {
         }
 
         // Also add to history
+        const todayDate = new Date().toISOString().split('T')[0];
         await supabase
           .from('brain_score_history')
           .insert({
             user_id: userId,
+            period_type: 'daily',
+            period_start: todayDate,
             overall_score: overallScore,
             processing_speed: gameScores.processingSpeed,
             working_memory: gameScores.workingMemory,
             attention: gameScores.attention,
             flexibility: gameScores.flexibility,
             vocabulary: gameScores.vocabulary,
-            tier,
+            games_played: 1,
           });
       }
 
