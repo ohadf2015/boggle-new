@@ -104,14 +104,14 @@ export function ConfirmationDialog({
           <AlertDialogTitle className={cn(
             variant === 'danger' && 'text-neo-black font-black text-xl',
             variant === 'warning' && 'text-neo-black font-black text-xl',
-            isRtl ? 'text-right' : 'text-left'
+            'text-center'
           )}>
             {title}
           </AlertDialogTitle>
           <AlertDialogDescription className={cn(
             variant === 'danger' && 'text-neo-black/70 font-medium',
             variant === 'warning' && 'text-neo-black/70 font-medium',
-            isRtl ? 'text-right' : 'text-left'
+            'text-center'
           )}>
             {description}
           </AlertDialogDescription>

@@ -14,7 +14,7 @@ import GuestNameEditor from './GuestNameEditor';
 import { DailyChallengeTutorial } from './DailyChallengeTutorial';
 import DailyIntroCarousel from './DailyIntroCarousel';
 import { TrainingGatewayModal } from '@/components/training';
-import WordHuntLoginModal from '@/components/auth/WordHuntLoginModal';
+import WordHuntLoginGate from '@/components/auth/WordHuntLoginGate';
 import { shouldShowTrainingGateway, markGatewaySkipped } from '@/utils/trainingProgressStorage';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -142,8 +142,6 @@ const DailyChallenge: React.FC = () => {
   // Track if gateway was already shown this session to prevent re-showing
   const [gatewayShownThisSession, setGatewayShownThisSession] = useState(false);
 
-  // Word hunt login modal for unauthenticated players
-  const [showLoginModal, setShowLoginModal] = useState(false);
 
   // Fetch guest fingerprint on mount
   useEffect(() => {
@@ -178,13 +176,6 @@ const DailyChallenge: React.FC = () => {
     markGatewaySkipped();
     setShowTrainingGateway(false);
   }, []);
-
-  // Show login modal for unauthenticated users when ready phase is reached
-  useEffect(() => {
-    if (phase === 'ready' && !isAuthenticated) {
-      setShowLoginModal(true);
-    }
-  }, [phase, isAuthenticated]);
 
   // Pull-to-refresh - disabled during gameplay
   const { pullToRefreshHandlers, pullState } = usePullToRefresh({
@@ -813,12 +804,6 @@ const DailyChallenge: React.FC = () => {
         onClose={() => setShowTrainingGateway(false)}
         onSkip={handleSkipTrainingGateway}
         returnTo="daily"
-      />
-
-      {/* Word Hunt Login Modal for Unauthenticated Players */}
-      <WordHuntLoginModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
       />
     </div>
   );
