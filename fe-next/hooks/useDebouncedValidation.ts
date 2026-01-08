@@ -1,11 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import type { ValidationResult } from '../utils/validation';
 
-export type ValidationResult = {
-  isValid: boolean;
-  error?: string;
-};
+// Re-export for backward compatibility
+export type { ValidationResult };
 
 export type ValidationState = 'idle' | 'validating' | 'valid' | 'invalid';
 

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback } from 'react';
+import { useSafeTimeout } from './useSafeTimeout';
 
 interface UseAutoHideControlsOptions {
   /** Time in ms before hiding controls (default: 3000) */
@@ -42,27 +43,18 @@ export function useAutoHideControls(options: UseAutoHideControlsOptions = {}): U
 
   const [isVisible, setIsVisible] = useState(!initialHidden);
   const [isPinned, setIsPinned] = useState(false);
-  const hideTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Clear any existing timer
-  const clearHideTimer = useCallback(() => {
-    if (hideTimerRef.current) {
-      clearTimeout(hideTimerRef.current);
-      hideTimerRef.current = null;
-    }
-  }, []);
+  const { set: setHideTimer, clear: clearHideTimer } = useSafeTimeout();
 
   // Start hide timer
   const startHideTimer = useCallback(() => {
-    clearHideTimer();
     if (!enabled) return;
 
-    hideTimerRef.current = setTimeout(() => {
+    setHideTimer(() => {
       if (!isPinned) {
         setIsVisible(false);
       }
     }, hideDelay);
-  }, [hideDelay, isPinned, clearHideTimer, enabled]);
+  }, [hideDelay, isPinned, setHideTimer, enabled]);
 
   // Show controls (with auto-hide timer)
   const show = useCallback(() => {
@@ -97,13 +89,6 @@ export function useAutoHideControls(options: UseAutoHideControlsOptions = {}): U
       pin();
     }
   }, [isPinned, pin, unpin, enabled]);
-
-  // Cleanup timer on unmount
-  useEffect(() => {
-    return () => {
-      clearHideTimer();
-    };
-  }, [clearHideTimer]);
 
   // If disabled, always show
   if (!enabled) {

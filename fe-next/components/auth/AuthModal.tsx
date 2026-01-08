@@ -3,8 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Eye, EyeOff, Loader2 } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { X, Mail, Eye, EyeOff, Loader2, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Button as ButtonComponent } from '../ui/button';
 
@@ -454,7 +453,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
                         className={cn(
-                          'absolute right-3 top-1/2 -translate-y-1/2 transition-colors',
+                          'absolute right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 transition-colors',
                           isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'
                         )}
                       >

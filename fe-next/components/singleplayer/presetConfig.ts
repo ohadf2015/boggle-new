@@ -5,8 +5,7 @@
 
 import type { DifficultyLevel } from '@/shared/types/game';
 import type { SinglePlayerMode } from './SinglePlayerView';
-import { Zap, Target, Flame, Calendar, Users, BookOpen, Trophy, Timer } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { Zap, Target, Flame, Calendar, Users, BookOpen, Trophy, Timer, type LucideIcon } from 'lucide-react';
 
 export interface PresetSettings {
   difficulty: DifficultyLevel;

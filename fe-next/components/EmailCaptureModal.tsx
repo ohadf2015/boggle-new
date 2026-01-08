@@ -162,7 +162,7 @@ export function EmailCaptureModal() {
           {/* Close button */}
           <button
             onClick={handleDismiss}
-            className="absolute top-3 right-3 p-2 hover:bg-neo-white hover:bg-opacity-10 rounded-neo transition-colors"
+            className="absolute top-3 right-3 rtl:right-auto rtl:left-3 p-2 hover:bg-neo-white hover:bg-opacity-10 rounded-neo transition-colors"
             aria-label="Close"
           >
             <X size={24} className="text-neo-white" />

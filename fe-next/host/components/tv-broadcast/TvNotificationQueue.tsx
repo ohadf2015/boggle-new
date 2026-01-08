@@ -8,6 +8,7 @@ interface TvNotificationQueueProps {
   notifications: TvNotificationData[];
   onDismiss: (id: string) => void;
   maxVisible?: number;
+  t: (path: string, params?: Record<string, string | number>) => string;
 }
 
 /**
@@ -18,6 +19,7 @@ const TvNotificationQueue = memo<TvNotificationQueueProps>(({
   notifications,
   onDismiss,
   maxVisible = 1,
+  t,
 }) => {
   const handleDismiss = useCallback((id: string) => {
     onDismiss(id);
@@ -43,7 +45,7 @@ const TvNotificationQueue = memo<TvNotificationQueueProps>(({
       {/* Queue indicator (shows how many are waiting) */}
       {notifications.length > maxVisible && (
         <div className="absolute bottom-4 right-4 bg-neo-black/80 text-neo-cream px-3 py-1 rounded-full text-sm font-bold">
-          +{notifications.length - maxVisible} more
+          {t('tvBroadcast.moreNotifications', { count: notifications.length - maxVisible })}
         </div>
       )}
     </div>

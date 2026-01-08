@@ -171,7 +171,7 @@ const LandingView: React.FC = () => {
       <Header />
 
       {/* Main content */}
-      <main className={`w-full max-w-6xl mx-auto overflow-x-hidden ${isLandscape ? 'flex-1 flex flex-col justify-center px-4 py-2' : 'px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-4 pb-24 lg:pb-4'}`}>
+      <main className={`w-full max-w-6xl mx-auto overflow-x-hidden ${isLandscape ? 'flex-1 flex flex-col justify-center px-4 py-2' : 'px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-4 pb-40 lg:pb-4'}`}>
         {/* Hero section - compact (hidden in landscape) - CSS animation for instant paint */}
         {!isLandscape && (
           <div className="text-center mb-1 sm:mb-2 lg:mb-3 animate-fade-in-fast">

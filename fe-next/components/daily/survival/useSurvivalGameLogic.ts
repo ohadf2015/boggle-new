@@ -2,11 +2,10 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import type { LetterGrid, Language } from '@/types';
-import type { LetterFeedback } from '@/utils/wordHuntFeedback';
-import type { ClueShopItem } from '@/utils/aiHintGenerator';
+import { getLetterFeedback, isTargetWordFound, type LetterFeedback } from '@/utils/wordHuntFeedback';
+import { calculateLifeReward, calculateTokenReward, calculateEfficiencyScore, type ClueShopItem, type HintLevel } from '@/utils/aiHintGenerator';
 import type { FeedbackType } from '../WordFeedbackToast';
 import type { WordDiscovery, TargetAttempt, SurvivalGameResult, AccumulatedClue } from './types';
-import type { HintLevel } from '@/utils/aiHintGenerator';
 import {
   MAX_ATTEMPTS,
   INITIAL_LIFE,
@@ -18,16 +17,8 @@ import {
   FEEDBACK_OVERLAY_DURATION,
   SHOP_HINT_DISMISS_DELAY,
 } from './constants';
-import {
-  getLetterFeedback,
-  isTargetWordFound,
-} from '@/utils/wordHuntFeedback';
-import {
-  calculateLifeReward,
-  calculateTokenReward,
-  calculateEfficiencyScore,
-} from '@/utils/aiHintGenerator';
 import { isWordOnBoard } from '@/utils/clientWordValidator';
+import { formatRewardMessage } from '@/utils/formatRewardMessage';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useMusic } from '@/contexts/MusicContext';
@@ -444,8 +435,7 @@ export function useSurvivalGameLogic({
       clueActions.triggerClueGainAnimation(cluesRevealed);
     }
 
-    const clueBonus = cluesRevealed > 0 ? ` +${cluesRevealed}` : '';
-    showToast('valid-word', `+${lifeGained} ${tokensGained > 0 ? `+${tokensGained}` : ''}${clueBonus}`);
+    showToast('valid-word', formatRewardMessage({ lifeGained, tokensGained }));
   }, [discoveredWords, grid, language, playWordAcceptedSound, showToast, t, validateWordInDictionary, clueActions]);
 
   // Handle word submission

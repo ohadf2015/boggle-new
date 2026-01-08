@@ -121,17 +121,17 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
               </motion.div>
               {/* Sparkle effects */}
               <motion.div
-                className="absolute -top-2 -right-2 w-4 h-4 bg-yellow-300 rounded-full"
+                className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2 w-4 h-4 bg-yellow-300 rounded-full"
                 animate={{ scale: [0, 1, 0], opacity: [0, 1, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
               />
               <motion.div
-                className="absolute -top-1 -left-3 w-3 h-3 bg-yellow-400 rounded-full"
+                className="absolute -top-1 -left-3 rtl:-left-auto rtl:-right-3 w-3 h-3 bg-yellow-400 rounded-full"
                 animate={{ scale: [0, 1, 0], opacity: [0, 1, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
               />
               <motion.div
-                className="absolute -bottom-1 right-0 w-2 h-2 bg-orange-400 rounded-full"
+                className="absolute -bottom-1 right-0 rtl:right-auto rtl:left-0 w-2 h-2 bg-orange-400 rounded-full"
                 animate={{ scale: [0, 1, 0], opacity: [0, 1, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity, delay: 1 }}
               />

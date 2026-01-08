@@ -12,7 +12,7 @@
  * This module is specifically for guest/unauthenticated profile data persistence.
  */
 
-import logger from '@/utils/logger';
+import { getFromStorage, saveToStorage, removeFromStorage } from '@/utils/storageHelpers';
 
 // Storage key constants - single source of truth
 export const PROFILE_STORAGE_KEYS = {
@@ -26,53 +26,6 @@ export const PROFILE_STORAGE_KEYS = {
 export interface GuestProfileData {
   username: string | null;
   avatarId: string | null;
-}
-
-// ============================================================================
-// Low-level storage helpers (with incognito mode support)
-// ============================================================================
-
-/**
- * Get a value from storage with fallback to sessionStorage for incognito mode
- */
-function getFromStorage(key: string): string | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    return localStorage.getItem(key) || sessionStorage.getItem(key);
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Save a value to both localStorage and sessionStorage for redundancy
- */
-function saveToStorage(key: string, value: string): void {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(key, value);
-    sessionStorage.setItem(key, value);
-  } catch {
-    try {
-      sessionStorage.setItem(key, value);
-    } catch {
-      // Storage completely blocked
-      logger.warn(`Failed to save ${key} to storage`);
-    }
-  }
-}
-
-/**
- * Remove a value from both localStorage and sessionStorage
- */
-function removeFromStorage(key: string): void {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.removeItem(key);
-    sessionStorage.removeItem(key);
-  } catch {
-    // Ignore errors on removal
-  }
 }
 
 // ============================================================================

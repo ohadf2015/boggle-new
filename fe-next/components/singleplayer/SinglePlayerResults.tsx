@@ -350,7 +350,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     saveCognitiveScore({
       playerWordData: results.playerWordData || [],
       gameDuration: results.gameDuration || 0,
-      gridSize: results.grid?.length || 4,
+      gridSize: (results.grid?.length || 5) ** 2, // Total cells: 5x5=25, 7x7=49, etc.
       maxCombo,
       hintsUsed: 0, // Single player mode doesn't have hints
       gameSessionId: results.gameSessionId,

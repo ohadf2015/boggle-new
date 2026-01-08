@@ -119,8 +119,9 @@ const ModeCard: React.FC<ModeCardProps> = ({
           </div>
 
           {/* Title - container-relative font size */}
+          {/* drop-shadow-lg added for WCAG AA contrast compliance on gradient backgrounds */}
           <h2
-            className="font-black uppercase tracking-tight text-neo-black flex-1 min-w-0"
+            className="font-black uppercase tracking-tight text-neo-black flex-1 min-w-0 drop-shadow-lg"
             style={{
               fontSize: 'clamp(1rem, 5cqw, 1.5rem)',
             }}
@@ -148,8 +149,9 @@ const ModeCard: React.FC<ModeCardProps> = ({
         </div>
 
         {/* Description - container-relative font size */}
+        {/* drop-shadow-md added for WCAG AA contrast compliance on gradient backgrounds */}
         <p
-          className="font-medium text-neo-black"
+          className="font-medium text-neo-black drop-shadow-md"
           style={{
             fontSize: 'clamp(0.7rem, 3cqw, 1rem)',
             marginBottom: 'clamp(0.375rem, 1.5cqw, 0.75rem)',

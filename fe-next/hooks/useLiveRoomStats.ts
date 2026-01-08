@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useSocket } from '@/utils/SocketContext';
+import { useSocketOptional } from '@/utils/SocketContext';
 import type { ActiveRoom } from '@/shared/types/game';
 
 interface LiveRoomStats {
@@ -14,9 +14,12 @@ interface LiveRoomStats {
 /**
  * useLiveRoomStats - Hook to fetch live room statistics for the landing page
  * Returns the number of open rooms and total players across all rooms
+ * Uses useSocketOptional to gracefully handle cases where socket context isn't available
  */
 export function useLiveRoomStats(): LiveRoomStats {
-  const { socket, isConnected } = useSocket();
+  const socketContext = useSocketOptional();
+  const socket = socketContext?.socket ?? null;
+  const isConnected = socketContext?.isConnected ?? false;
   const [stats, setStats] = useState<Omit<LiveRoomStats, 'refresh'>>({
     openRooms: 0,
     totalPlayers: 0,

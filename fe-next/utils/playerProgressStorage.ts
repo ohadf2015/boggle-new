@@ -4,6 +4,7 @@
  */
 
 import { getGuestStats } from './guestManager';
+import { getJsonFromLocalStorage, saveJsonToLocalStorage, removeFromLocalStorage } from './storageHelpers';
 
 const STORAGE_KEY = 'lexiclash_player_progress';
 const GAMES_BEFORE_PROMPT = 2; // Show mode discovery after 2 training games
@@ -15,34 +16,26 @@ export interface PlayerProgress {
   firstGameAt: string | null;
 }
 
-const getDefaultProgress = (): PlayerProgress => ({
+const DEFAULT_PROGRESS: PlayerProgress = {
   trainingGamesPlayed: 0,
   hasSeenModePrompt: false,
   promptDismissedAt: null,
   firstGameAt: null,
-});
+};
 
 /**
  * Get current player progress from localStorage
  */
 export const getPlayerProgress = (): PlayerProgress => {
-  if (typeof window === 'undefined') return getDefaultProgress();
-
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return getDefaultProgress();
-    return { ...getDefaultProgress(), ...JSON.parse(stored) };
-  } catch {
-    return getDefaultProgress();
-  }
+  const stored = getJsonFromLocalStorage<Partial<PlayerProgress>>(STORAGE_KEY, {});
+  return { ...DEFAULT_PROGRESS, ...stored };
 };
 
 /**
  * Save player progress to localStorage
  */
 const savePlayerProgress = (progress: PlayerProgress): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+  saveJsonToLocalStorage(STORAGE_KEY, progress);
 };
 
 /**
@@ -117,8 +110,7 @@ export const dismissModePrompt = (): void => {
  * Reset progress (for testing/debugging)
  */
 export const resetPlayerProgress = (): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem(STORAGE_KEY);
+  removeFromLocalStorage(STORAGE_KEY);
 };
 
 /**

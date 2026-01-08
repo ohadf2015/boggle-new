@@ -108,12 +108,30 @@ interface TopPlayer {
   display_name?: string;
   avatar_emoji?: string;
   avatar_color?: string;
+  avatar_image?: string;
   total_score: number;
   total_games: number;
   total_words: number;
   total_time_played: number;
+  total_xp?: number;
   current_level?: number;
+  casual_games?: number;
+  ranked_games?: number;
+  casual_wins?: number;
+  ranked_wins?: number;
   ranked_mmr?: number;
+  peak_mmr?: number;
+  longest_word?: string;
+  longest_word_length?: number;
+  total_coins?: number;
+  lifetime_coins_earned?: number;
+  total_hints_used?: number;
+  prestige_level?: number;
+  prestige_multiplier?: number;
+  country_code?: string;
+  referral_count?: number;
+  daily_email_subscribed?: boolean;
+  last_seen_at?: string;
   last_game_at?: string;
   created_at: string;
 }
@@ -152,6 +170,8 @@ interface GameLog {
   is_ranked: boolean;
   is_guest?: boolean;
   mode?: string;
+  drill_type?: string;
+  drill_level?: number;
   language: string;
   time_played: number;
   created_at: string;
@@ -208,6 +228,7 @@ export default function AdminDashboard() {
   const [gameLogsPage, setGameLogsPage] = useState(1);
   const [gameLogsLanguage, setGameLogsLanguage] = useState<string>('all');
   const [gameLogsRanked, setGameLogsRanked] = useState<string>('all');
+  const [gameLogsGameMode, setGameLogsGameMode] = useState<string>('all');
   const [gameLogsStartDate, setGameLogsStartDate] = useState<string>('');
   const [gameLogsEndDate, setGameLogsEndDate] = useState<string>('');
 
@@ -466,7 +487,7 @@ export default function AdminDashboard() {
     try {
       const params = new URLSearchParams();
       params.set('page', page.toString());
-      params.set('pageSize', '20');
+      params.set('pageSize', '50'); // Fetch more to allow client-side filtering
       if (gameLogsLanguage !== 'all') params.set('language', gameLogsLanguage);
       if (gameLogsRanked !== 'all') params.set('isRanked', gameLogsRanked);
       if (gameLogsStartDate) params.set('startDate', gameLogsStartDate);
@@ -478,7 +499,14 @@ export default function AdminDashboard() {
 
       if (res.ok) {
         const data = await res.json();
-        setGameLogs(data.games || []);
+        let games = data.games || [];
+
+        // Apply client-side game mode filtering
+        if (gameLogsGameMode !== 'all') {
+          games = games.filter((game: GameLog) => game.mode === gameLogsGameMode);
+        }
+
+        setGameLogs(games);
         setGameLogsPagination(data.pagination || null);
         setGameLogsPage(page);
       } else {
@@ -491,7 +519,7 @@ export default function AdminDashboard() {
     } finally {
       setGameLogsLoading(false);
     }
-  }, [getAuthToken, gameLogsLanguage, gameLogsRanked, gameLogsStartDate, gameLogsEndDate]);
+  }, [getAuthToken, gameLogsLanguage, gameLogsRanked, gameLogsGameMode, gameLogsStartDate, gameLogsEndDate]);
 
   // Track which community words are being processed
   const [processingWords, setProcessingWords] = useState<Set<string>>(new Set());
@@ -877,7 +905,7 @@ export default function AdminDashboard() {
     if (activeTab === 'game-logs' && isAdmin) {
       fetchGameLogs(1); // Reset to page 1 when filters change
     }
-  }, [activeTab, isAdmin, gameLogsLanguage, gameLogsRanked, gameLogsStartDate, gameLogsEndDate, fetchGameLogs]);
+  }, [activeTab, isAdmin, gameLogsLanguage, gameLogsRanked, gameLogsGameMode, gameLogsStartDate, gameLogsEndDate, fetchGameLogs]);
 
   // Still loading profile - wait before showing access denied
   // This prevents showing "Access Required" while profile is still being fetched
@@ -1728,20 +1756,27 @@ export default function AdminDashboard() {
               </div>
 
               <div className="overflow-x-auto">
-                <table className="w-full">
+                <table className="w-full min-w-[900px]">
                   <thead>
                     <tr className={cn(
-                      'text-left border-b',
+                      'text-left border-b text-xs',
                       isDarkMode ? 'border-slate-700' : 'border-gray-200'
                     )}>
-                      <th className={cn('pb-2 pr-4', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>#</th>
-                      <th className={cn('pb-2 pr-4', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Player</th>
-                      <th className={cn('pb-2 pr-4 text-center hidden sm:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Level</th>
-                      <th className={cn('pb-2 pr-4 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Score</th>
-                      <th className={cn('pb-2 pr-4 text-right hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Games</th>
-                      <th className={cn('pb-2 pr-4 text-right hidden lg:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>MMR</th>
-                      <th className={cn('pb-2 text-right hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
-                        {playerViewMode === 'top' ? 'Joined' : 'Last Active'}
+                      <th className={cn('pb-2 pr-3', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>#</th>
+                      <th className={cn('pb-2 pr-3', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Player</th>
+                      <th className={cn('pb-2 pr-3 text-center', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>🌍</th>
+                      <th className={cn('pb-2 pr-3 text-center', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Lvl</th>
+                      <th className={cn('pb-2 pr-3 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Score</th>
+                      <th className={cn('pb-2 pr-3 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>XP</th>
+                      <th className={cn('pb-2 pr-3 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Games</th>
+                      <th className={cn('pb-2 pr-3 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Wins</th>
+                      <th className={cn('pb-2 pr-3 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Words</th>
+                      <th className={cn('pb-2 pr-3 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Time</th>
+                      <th className={cn('pb-2 pr-3 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>MMR</th>
+                      <th className={cn('pb-2 pr-3 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>Coins</th>
+                      <th className={cn('pb-2 pr-3 text-center', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>P</th>
+                      <th className={cn('pb-2 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                        {playerViewMode === 'top' ? 'Joined' : 'Active'}
                       </th>
                     </tr>
                   </thead>
@@ -1750,49 +1785,79 @@ export default function AdminDashboard() {
                       <tr
                         key={player.id}
                         className={cn(
-                          'border-b last:border-0',
+                          'border-b last:border-0 text-sm',
                           isDarkMode ? 'border-slate-700' : 'border-gray-100'
                         )}
                       >
-                        <td className={cn('py-3 pr-4', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                        <td className={cn('py-2 pr-3', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
                           {index + 1}
                         </td>
-                        <td className="py-3 pr-4">
+                        <td className="py-2 pr-3">
                           <div className="flex items-center gap-2">
                             <div
-                              className="w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0"
+                              className="w-7 h-7 rounded-full flex items-center justify-center text-xs flex-shrink-0"
                               style={{ backgroundColor: player.avatar_color || '#6366f1' }}
                             >
                               {player.avatar_emoji || '😀'}
                             </div>
-                            <div className="min-w-0">
-                              <span className={cn('block truncate', isDarkMode ? 'text-white' : 'text-gray-900')}>
-                                {player.display_name || player.username}
-                              </span>
-                              <span className={cn('text-xs block sm:hidden', isDarkMode ? 'text-gray-500' : 'text-gray-400')}>
-                                Lvl {player.current_level || 1}
-                              </span>
-                            </div>
+                            <span className={cn('truncate max-w-[120px]', isDarkMode ? 'text-white' : 'text-gray-900')}>
+                              {player.display_name || player.username}
+                            </span>
                           </div>
                         </td>
-                        <td className={cn('py-3 pr-4 text-center hidden sm:table-cell')}>
+                        <td className="py-2 pr-3 text-center">
+                          {player.country_code ? (
+                            <span title={COUNTRY_INFO[player.country_code]?.name || player.country_code}>
+                              {COUNTRY_INFO[player.country_code]?.flag || '🌍'}
+                            </span>
+                          ) : '-'}
+                        </td>
+                        <td className={cn('py-2 pr-3 text-center')}>
                           <span className={cn(
-                            'inline-flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold',
+                            'inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold',
                             isDarkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-100 text-purple-700'
                           )}>
                             {player.current_level || 1}
                           </span>
                         </td>
-                        <td className={cn('py-3 pr-4 text-right font-medium', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}>
+                        <td className={cn('py-2 pr-3 text-right font-medium', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}>
                           {player.total_score.toLocaleString()}
                         </td>
-                        <td className={cn('py-3 pr-4 text-right hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
-                          {player.total_games}
+                        <td className={cn('py-2 pr-3 text-right', isDarkMode ? 'text-amber-400' : 'text-amber-600')}>
+                          {(player.total_xp || 0).toLocaleString()}
                         </td>
-                        <td className={cn('py-3 pr-4 text-right hidden lg:table-cell', isDarkMode ? 'text-orange-400' : 'text-orange-600')}>
-                          {player.ranked_mmr ? player.ranked_mmr.toLocaleString() : '-'}
+                        <td className={cn('py-2 pr-3 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                          <span title={`Casual: ${player.casual_games || 0} | Ranked: ${player.ranked_games || 0}`}>
+                            {player.total_games}
+                          </span>
                         </td>
-                        <td className={cn('py-3 text-right hidden md:table-cell', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                        <td className={cn('py-2 pr-3 text-right', isDarkMode ? 'text-green-400' : 'text-green-600')}>
+                          <span title={`Casual: ${player.casual_wins || 0} | Ranked: ${player.ranked_wins || 0}`}>
+                            {(player.casual_wins || 0) + (player.ranked_wins || 0)}
+                          </span>
+                        </td>
+                        <td className={cn('py-2 pr-3 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                          {player.total_words.toLocaleString()}
+                        </td>
+                        <td className={cn('py-2 pr-3 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
+                          {player.total_time_played > 3600
+                            ? `${Math.floor(player.total_time_played / 3600)}h`
+                            : `${Math.floor(player.total_time_played / 60)}m`}
+                        </td>
+                        <td className={cn('py-2 pr-3 text-right', isDarkMode ? 'text-orange-400' : 'text-orange-600')}>
+                          <span title={player.peak_mmr ? `Peak: ${player.peak_mmr}` : undefined}>
+                            {player.ranked_mmr ? player.ranked_mmr.toLocaleString() : '-'}
+                          </span>
+                        </td>
+                        <td className={cn('py-2 pr-3 text-right', isDarkMode ? 'text-yellow-400' : 'text-yellow-600')}>
+                          <span title={`Lifetime: ${(player.lifetime_coins_earned || 0).toLocaleString()}`}>
+                            {(player.total_coins || 0).toLocaleString()}
+                          </span>
+                        </td>
+                        <td className={cn('py-2 pr-3 text-center', isDarkMode ? 'text-pink-400' : 'text-pink-600')}>
+                          {player.prestige_level ? `P${player.prestige_level}` : '-'}
+                        </td>
+                        <td className={cn('py-2 text-right', isDarkMode ? 'text-gray-400' : 'text-gray-500')}>
                           {playerViewMode === 'top'
                             ? formatRelativeTime(player.created_at)
                             : player.last_game_at ? formatRelativeTime(player.last_game_at) : '-'
@@ -1964,7 +2029,26 @@ export default function AdminDashboard() {
                 <option value="ja">Japanese</option>
               </select>
 
-              {/* Game Mode Filter */}
+              {/* Game Type Filter */}
+              <select
+                value={gameLogsGameMode}
+                onChange={(e) => setGameLogsGameMode(e.target.value)}
+                className={cn(
+                  'px-3 py-2 rounded-lg border text-sm',
+                  isDarkMode
+                    ? 'bg-slate-700 border-slate-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
+                )}
+              >
+                <option value="all">All Game Types</option>
+                <option value="multiplayer">Multiplayer</option>
+                <option value="singleplayer">Singleplayer</option>
+                <option value="daily_challenge">Daily Challenge</option>
+                <option value="word_hunt">Word Hunt</option>
+                <option value="drill">Brain Drills</option>
+              </select>
+
+              {/* Ranked Filter */}
               <select
                 value={gameLogsRanked}
                 onChange={(e) => setGameLogsRanked(e.target.value)}
@@ -1975,9 +2059,9 @@ export default function AdminDashboard() {
                     : 'bg-white border-gray-300 text-gray-900'
                 )}
               >
-                <option value="all">All Modes</option>
-                <option value="false">Casual</option>
-                <option value="true">Ranked</option>
+                <option value="all">Casual & Ranked</option>
+                <option value="false">Casual Only</option>
+                <option value="true">Ranked Only</option>
               </select>
 
               {/* Date Range */}
@@ -2007,11 +2091,12 @@ export default function AdminDashboard() {
               />
 
               {/* Clear Filters */}
-              {(gameLogsLanguage !== 'all' || gameLogsRanked !== 'all' || gameLogsStartDate || gameLogsEndDate) && (
+              {(gameLogsLanguage !== 'all' || gameLogsRanked !== 'all' || gameLogsGameMode !== 'all' || gameLogsStartDate || gameLogsEndDate) && (
                 <button
                   onClick={() => {
                     setGameLogsLanguage('all');
                     setGameLogsRanked('all');
+                    setGameLogsGameMode('all');
                     setGameLogsStartDate('');
                     setGameLogsEndDate('');
                   }}

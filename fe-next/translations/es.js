@@ -824,6 +824,9 @@ const es = {
     "earthquake": "¡TERREMOTO!",
     "fireRound": "RONDA DE FUEGO",
     "twoXPoints": "2X PUNTOS",
+    "host": "ANFITRIÓN",
+    "hostBadge": "Este jugador es el anfitrión",
+    "moreNotifications": "+{{count}} más",
     "notifications": {
       "longWord": "¡PODER DE PALABRAS!",
       "epicWord": "¡PALABRA MONSTRUOSA!",
@@ -3525,6 +3528,42 @@ const es = {
     "clear": "para borrar",
     "gotIt": "¡Entendido!"
   },
+  "keyboardShortcuts": {
+    "title": "Atajos de Teclado",
+    "wordBuilding": "Formar Palabras",
+    "gridNavigation": "Navegar Tablero",
+    "desktopShortcuts": "Atajos de Escritorio",
+    "type": "Escribe",
+    "typeDesc": "Empieza a teclear letras",
+    "enter": "Enter",
+    "enterDesc": "Enviar palabra",
+    "escape": "Esc",
+    "escapeDesc": "Limpiar selección",
+    "backspace": "⌫",
+    "backspaceDesc": "Borrar última letra",
+    "arrows": "← ↑ → ↓",
+    "arrowsDesc": "Mover foco",
+    "space": "Espacio",
+    "spaceDesc": "Seleccionar celda enfocada",
+    "doubleClick": "Doble Clic",
+    "doubleClickDesc": "Enviar palabra",
+    "rightClick": "Clic Derecho",
+    "rightClickDesc": "Deshacer última celda",
+    "tip": "¡Escribe cualquier letra para encontrar caminos en el tablero!",
+    "pressForHelp": "Presiona ? para atajos"
+  },
+  "keyboardMode": {
+    "navigation": "NAVEGACIÓN",
+    "typing": "ESCRIBIENDO",
+    "navigationHint": "Usa las flechas",
+    "typingHint": "Sigue así..."
+  },
+  "keyboardQuickTip": {
+    "title": "Truco Rápido",
+    "message": "¡Intenta escribir una palabra!",
+    "pressQuestion": "Presiona ? para todos los atajos",
+    "gotIt": "¡Entendido!"
+  },
   "emailPreferences": {
     "title": "Alertas del Puzzle Diario",
     "sendingTo": "Enviando a",
@@ -3740,7 +3779,15 @@ const es = {
     "guestView": {
       "title": "Rastrea tu Progreso",
       "description": "Inicia sesión para rastrear tu rendimiento cognitivo a lo largo del tiempo y ver información detallada sobre tus habilidades de búsqueda de palabras."
-    }
+    },
+    "progressHistory": "Historial de Progreso",
+    "startTracking": "Empezar a Registrar",
+    "historyEmptyDesc": "Juega partidas o completa ejercicios para rastrear tu puntuación cerebral",
+    "daysTracked": "Días",
+    "currentScore": "Actual",
+    "peakScore": "Máximo",
+    "gamesPlayed": "partidas",
+    "drillsCompleted": "ejercicios"
   }
 };
 

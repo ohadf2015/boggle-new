@@ -583,8 +583,8 @@ const GridComponent = memo<GridComponentProps>(({
                     // Hover on last selected cell - hint to click again to submit
                     // NOTE: Removed animate-pulse - caused excessive blinking on desktop when mouse hovers over last selected letter
                     isHovered && isLastSelected && selectedCells.length >= 2 && "ring-4 ring-neo-green/80 ring-offset-2",
-                    // Keyboard focus indicator
-                    isFocused && !isSelected && "ring-4 ring-neo-cyan ring-offset-2 ring-offset-neo-cream z-20",
+                    // Keyboard focus indicator - enhanced with glow animation
+                    isFocused && !isSelected && "z-20 animate-keyboard-focus",
                     // Transition controls
                     "transition-all",
                     comboLevel > 0 ? "duration-300" : "duration-100"

@@ -436,7 +436,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                 <div className="relative">
                   <Calendar size={14} aria-hidden="true" />
                   {hasUnclaimedReward && (
-                    <div className="absolute -top-1.5 -right-1.5 w-2.5 h-2.5 bg-neo-yellow rounded-full border border-neo-black" />
+                    <div className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-2.5 h-2.5 bg-neo-yellow rounded-full border border-neo-black" />
                   )}
                 </div>
                 <span>{t('calendar.title') || 'Daily Rewards'}</span>

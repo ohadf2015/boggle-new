@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
-import type {
-  EarthquakeState,
-  UseEarthquakeFireRoundOptions,
-  UseEarthquakeFireRoundReturn,
-  EarthquakeConfig,
-  TriggerEarthquakePayload,
+import {
+  DEFAULT_EARTHQUAKE_CONFIG,
+  type EarthquakeState,
+  type UseEarthquakeFireRoundOptions,
+  type UseEarthquakeFireRoundReturn,
+  type EarthquakeConfig,
+  type TriggerEarthquakePayload,
 } from '@/shared/types/earthquake';
-import { DEFAULT_EARTHQUAKE_CONFIG } from '@/shared/types/earthquake';
 
 /**
  * useEarthquakeFireRound

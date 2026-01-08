@@ -7,6 +7,7 @@ import { useMounted } from '@/hooks/useMounted';
 import type {
   BrainScore,
   BrainScoreWithDomains,
+  BrainScoreHistory,
   CognitiveDomains,
   DrillProgress,
   TrendDirection,
@@ -20,6 +21,7 @@ interface UseBrainScoreInternalState {
   brainScore: BrainScoreWithDomains | null;
   drillProgress: DrillProgress[];
   recentGameScores: GameCognitiveScore[];
+  brainScoreHistory: BrainScoreHistory[];
   isLoading: boolean;
   error: string | null;
   hasFetched: boolean; // Internal: Track if we've done initial fetch
@@ -30,6 +32,7 @@ interface UseBrainScoreState {
   brainScore: BrainScoreWithDomains | null;
   drillProgress: DrillProgress[];
   recentGameScores: GameCognitiveScore[];
+  brainScoreHistory: BrainScoreHistory[];
   isLoading: boolean;
   error: string | null;
 }
@@ -129,6 +132,7 @@ export function useBrainScore(): UseBrainScoreReturn {
     brainScore: null,
     drillProgress: [],
     recentGameScores: [],
+    brainScoreHistory: [],
     isLoading: true,
     error: null,
     hasFetched: false,
@@ -148,6 +152,7 @@ export function useBrainScore(): UseBrainScoreReturn {
         brainScore: null,
         drillProgress: [],
         recentGameScores: [],
+        brainScoreHistory: [],
         isLoading: false,
         error: null,
         hasFetched: true,
@@ -177,8 +182,8 @@ export function useBrainScore(): UseBrainScoreReturn {
         setState(prev => ({ ...prev, isLoading: true, error: null }));
       }
 
-      // Fetch brain score, drill progress, and recent game scores in parallel
-      const [brainScoreResult, drillProgressResult, recentScoresResult] = await Promise.all([
+      // Fetch brain score, drill progress, recent game scores, and history in parallel
+      const [brainScoreResult, drillProgressResult, recentScoresResult, historyResult] = await Promise.all([
         supabase
           .from('brain_scores')
           .select('*')
@@ -194,6 +199,13 @@ export function useBrainScore(): UseBrainScoreReturn {
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(10),
+        supabase
+          .from('brain_score_history')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('period_type', 'daily')
+          .order('period_start', { ascending: false })
+          .limit(30), // Last 30 days
       ]);
 
       if (!isMounted.current) return;
@@ -261,11 +273,29 @@ export function useBrainScore(): UseBrainScoreReturn {
         updatedAt: row.updated_at,
       }));
 
+      // Transform brain score history (reverse to get chronological order)
+      const brainScoreHistory: BrainScoreHistory[] = (historyResult.data ?? []).reverse().map(row => ({
+        id: row.id,
+        userId: row.user_id,
+        periodType: row.period_type,
+        periodStart: row.period_start,
+        overallScore: row.overall_score,
+        processingSpeed: row.processing_speed,
+        workingMemory: row.working_memory,
+        attention: row.attention,
+        flexibility: row.flexibility,
+        vocabulary: row.vocabulary,
+        gamesPlayed: row.games_played,
+        drillsCompleted: row.drills_completed,
+        createdAt: row.created_at,
+      }));
+
       hasFetchedRef.current = true;
       setState({
         brainScore,
         drillProgress,
         recentGameScores,
+        brainScoreHistory,
         isLoading: false,
         error: null,
         hasFetched: true,

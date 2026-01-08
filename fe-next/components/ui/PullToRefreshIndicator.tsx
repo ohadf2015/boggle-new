@@ -33,7 +33,7 @@ export const PullToRefreshIndicator = memo<PullToRefreshIndicatorProps>(({
       {isVisible && (
         <motion.div
           className={cn(
-            'absolute top-0 left-0 right-0 flex justify-center items-center z-50 pointer-events-none',
+            'absolute top-0 left-0 right-0 flex justify-center items-center z-[70] pointer-events-none',
             className
           )}
           initial={{ opacity: 0, height: 0 }}

@@ -1,11 +1,6 @@
 import { useCallback } from 'react';
-import { validateUsername, validateRoomName, validateGameCode, sanitizeInput } from '../utils/validation';
+import { validateUsername, validateRoomName, validateGameCode, sanitizeInput, ValidationResult } from '../utils/validation';
 import toast from 'react-hot-toast';
-
-interface ValidationResult {
-  isValid: boolean;
-  error?: string;
-}
 
 interface UserValidationResult extends ValidationResult {
   cleaned: string;

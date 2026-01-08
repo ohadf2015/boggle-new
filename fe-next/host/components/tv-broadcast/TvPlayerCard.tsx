@@ -16,6 +16,7 @@ interface TvPlayerCardProps {
   comboLevel?: number;
   isHost?: boolean;
   index: number;
+  t: (path: string, params?: Record<string, string | number>) => string;
 }
 
 // Rank badge configurations
@@ -56,6 +57,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
   comboLevel = 0,
   isHost = false,
   index,
+  t,
 }) => {
   const rankConfig = RANK_CONFIGS[rank as keyof typeof RANK_CONFIGS];
   const isTopThree = rank <= 3;
@@ -97,8 +99,11 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
           className="border-2 border-neo-black"
         />
         {isHost && (
-          <div className="absolute -top-1 -right-1 bg-neo-purple text-neo-cream text-[10px] font-bold px-1 rounded border border-neo-black">
-            HOST
+          <div
+            className="absolute -top-1 -right-1 bg-neo-purple text-neo-cream text-[10px] font-bold px-1 rounded border border-neo-black"
+            aria-label={t('tvBroadcast.hostBadge')}
+          >
+            {t('tvBroadcast.host')}
           </div>
         )}
       </div>
@@ -119,7 +124,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
             isTopThree ? `${rankConfig?.textColor} opacity-80` : 'text-neo-black/60'
           )}
         >
-          {wordCount} words
+          {wordCount} {t('tvResults.words')}
         </p>
       </div>
 
@@ -161,7 +166,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
             isTopThree ? `${rankConfig?.textColor} opacity-70` : 'text-neo-black/50'
           )}
         >
-          pts
+          {t('tvResults.pts')}
         </p>
       </div>
     </motion.div>

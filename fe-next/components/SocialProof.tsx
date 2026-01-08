@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Flame, Gamepad2, Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useSocket } from '@/utils/SocketContext';
+import { useSocketOptional } from '@/utils/SocketContext';
 import { cn } from '@/lib/utils';
 
 interface SocialProofProps {
@@ -15,13 +15,16 @@ interface SocialProofProps {
 /**
  * SocialProof - Displays live player activity to create urgency and social validation
  * Shows: active players, games in progress, recent high scores
+ * Uses useSocketOptional to gracefully handle cases where socket context isn't available
  */
 const SocialProof: React.FC<SocialProofProps> = ({
   className,
   variant = 'banner',
 }) => {
   const { t } = useLanguage();
-  const { socket, isConnected } = useSocket();
+  const socketContext = useSocketOptional();
+  const socket = socketContext?.socket ?? null;
+  const isConnected = socketContext?.isConnected ?? false;
 
   // Player activity stats (can be populated from backend)
   const [stats, setStats] = useState({

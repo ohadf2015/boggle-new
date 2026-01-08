@@ -5,12 +5,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Gamepad2, Users, Trophy, Clock, Star, Flame,
   ChevronRight, ChevronLeft, Lightbulb,
-  Check, Pointer
+  Check, Pointer,
+  type LucideIcon
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Progress } from './ui/progress';
 import { useLanguage } from '../contexts/LanguageContext';
-import type { LucideIcon } from 'lucide-react';
 import MiniGrid, { GridPosition } from './onboarding/MiniGrid';
 
 interface DemoConfig {

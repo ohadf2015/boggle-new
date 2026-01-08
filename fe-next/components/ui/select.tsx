@@ -126,7 +126,7 @@ const SelectLabel = React.forwardRef<
   <SelectPrimitive.Label
     ref={ref}
     className={cn(
-      "py-1.5 pl-8 pr-2 text-sm font-bold uppercase tracking-tight",
+      "py-1.5 pl-8 rtl:pl-2 rtl:pr-8 pr-2 text-sm font-bold uppercase tracking-tight",
       className
     )}
     {...props}
@@ -142,7 +142,7 @@ const SelectItem = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex w-full cursor-default select-none items-center",
-      "rounded-sm py-1.5 pl-8 pr-2 text-sm font-medium",
+      "rounded-sm py-1.5 pl-8 rtl:pl-2 rtl:pr-8 pr-2 text-sm font-medium",
       "outline-none",
       "focus:bg-neo-yellow focus:text-neo-black",
       "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
@@ -150,7 +150,7 @@ const SelectItem = React.forwardRef<
     )}
     {...props}
   >
-    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+    <span className="absolute left-2 rtl:left-auto rtl:right-2 flex h-3.5 w-3.5 items-center justify-center">
       <SelectPrimitive.ItemIndicator>
         <Check className="h-4 w-4" />
       </SelectPrimitive.ItemIndicator>

@@ -420,11 +420,12 @@ export function useGridInteraction({
       autoSubmitTimeoutRef.current = setTimeout(() => {
         if (selectedCells.length >= 3 && isTouchingRef.current) {
           const formedWord = selectedCells.map(c => c.letter).join('');
-          if (onWordSubmit) {
-            onWordSubmit(formedWord);
-          }
+          // Call onPathSubmit first so path is captured before word submission handlers run
           if (onPathSubmit) {
             onPathSubmit([...selectedCells]);
+          }
+          if (onWordSubmit) {
+            onWordSubmit(formedWord);
           }
           startSequentialFadeOut(true);
           isTouchingRef.current = false;
@@ -611,11 +612,12 @@ export function useGridInteraction({
     // Submit word
     if (selectedCells.length > 0 && (hasMovedRef.current || selectedCells.length >= 2)) {
       const formedWord = selectedCells.map(c => c.letter).join('');
-      if (onWordSubmit) {
-        onWordSubmit(formedWord);
-      }
+      // Call onPathSubmit first so path is captured before word submission handlers run
       if (onPathSubmit) {
         onPathSubmit([...selectedCells]);
+      }
+      if (onWordSubmit) {
+        onWordSubmit(formedWord);
       }
 
       // Haptic feedback based on word length and combo
@@ -947,11 +949,12 @@ export function useGridInteraction({
         // If Enter with cells selected, submit the word
         if (e.key === 'Enter' && selectedCells.length > 0) {
           const formedWord = selectedCells.map(c => c.letter).join('');
-          if (onWordSubmit) {
-            onWordSubmit(formedWord);
-          }
+          // Call onPathSubmit first so path is captured before word submission handlers run
           if (onPathSubmit) {
             onPathSubmit([...selectedCells]);
+          }
+          if (onWordSubmit) {
+            onWordSubmit(formedWord);
           }
           // Haptic feedback
           if (window.navigator?.vibrate) {

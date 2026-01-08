@@ -4,44 +4,11 @@
  */
 
 import logger from '@/utils/logger';
+import { getFromStorage, saveToStorage, removeFromStorage, getJsonFromStorage, saveJsonToStorage } from '@/utils/storageHelpers';
 
 const GUEST_SESSION_KEY = 'boggle_guest_session_id';
 const GUEST_STATS_KEY = 'boggle_guest_stats';
 const GUEST_NAME_KEY = 'boggle_guest_name';
-
-// Storage helpers for incognito mode support
-function getFromStorage(key: string): string | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    return localStorage.getItem(key) || sessionStorage.getItem(key);
-  } catch {
-    return null;
-  }
-}
-
-function saveToStorage(key: string, value: string): void {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(key, value);
-    sessionStorage.setItem(key, value);
-  } catch {
-    try {
-      sessionStorage.setItem(key, value);
-    } catch {
-      // Storage blocked
-    }
-  }
-}
-
-function removeFromStorage(key: string): void {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.removeItem(key);
-    sessionStorage.removeItem(key);
-  } catch {
-    // Ignore
-  }
-}
 
 export interface GuestStats {
   games: number;
@@ -137,31 +104,14 @@ function getDefaultGuestStats(): GuestStats {
  * Get current guest stats from storage
  */
 export function getGuestStats(): GuestStats {
-  if (typeof window === 'undefined') return getDefaultGuestStats();
-
-  try {
-    const statsStr = getFromStorage(GUEST_STATS_KEY);
-    if (!statsStr) {
-      return getDefaultGuestStats();
-    }
-    return JSON.parse(statsStr) as GuestStats;
-  } catch (error) {
-    logger.error('Error reading guest stats:', error);
-    return getDefaultGuestStats();
-  }
+  return getJsonFromStorage<GuestStats>(GUEST_STATS_KEY, getDefaultGuestStats());
 }
 
 /**
  * Save guest stats to storage (both localStorage and sessionStorage)
  */
 export function saveGuestStats(stats: GuestStats): void {
-  if (typeof window === 'undefined') return;
-
-  try {
-    saveToStorage(GUEST_STATS_KEY, JSON.stringify(stats));
-  } catch (error) {
-    logger.error('Error saving guest stats:', error);
-  }
+  saveJsonToStorage(GUEST_STATS_KEY, stats);
 }
 
 /**

@@ -832,6 +832,9 @@ const en = {
     "earthquake": "EARTHQUAKE!",
     "fireRound": "FIRE ROUND",
     "twoXPoints": "2X POINTS",
+    "host": "HOST",
+    "hostBadge": "This player is the host",
+    "moreNotifications": "+{{count}} more",
     "notifications": {
       "longWord": "WORD POWER!",
       "epicWord": "MONSTER WORD!",
@@ -2193,15 +2196,15 @@ const en = {
       "continueAsGuest": "Continue as guest"
     },
     "wordHunt": {
-      "loginTitle": "Sign in to play",
-      "loginSubtitle": "Sync your progress across devices",
+      "loginTitle": "Quick sign-in, then let's play!",
+      "loginSubtitle": "Takes 10 seconds - your streaks will thank you",
       "skipCta": "Skip for now",
-      "gateTitle": "Join to Play Today's Puzzle",
-      "gateSubtitle": "Sign in to compete with players worldwide",
-      "benefit1": "Track your daily streak",
-      "benefit2": "Compete on global leaderboards",
-      "benefit3": "Sync progress across devices",
-      "footerNote": "Join thousands of word hunters solving today's challenge"
+      "gateTitle": "One quick step to today's puzzle",
+      "gateSubtitle": "We need to know who's crushing it",
+      "benefit1": "Keep your streak alive across devices",
+      "benefit2": "See how you rank globally",
+      "benefit3": "Pick up where you left off, anywhere",
+      "footerNote": "Same puzzle, everyone, worldwide. Who's fastest today?"
     },
     "winnerOnboarding": {
       "topPercentile": {
@@ -3441,6 +3444,42 @@ const en = {
     "clear": "to clear",
     "gotIt": "Got it!"
   },
+  "keyboardShortcuts": {
+    "title": "Keyboard Shortcuts",
+    "wordBuilding": "Word Building",
+    "gridNavigation": "Grid Navigation",
+    "desktopShortcuts": "Desktop Shortcuts",
+    "type": "Type",
+    "typeDesc": "Start typing letters",
+    "enter": "Enter",
+    "enterDesc": "Submit word",
+    "escape": "Esc",
+    "escapeDesc": "Clear selection",
+    "backspace": "⌫",
+    "backspaceDesc": "Remove last letter",
+    "arrows": "← ↑ → ↓",
+    "arrowsDesc": "Move focus",
+    "space": "Space",
+    "spaceDesc": "Select focused cell",
+    "doubleClick": "Double Click",
+    "doubleClickDesc": "Submit word",
+    "rightClick": "Right Click",
+    "rightClickDesc": "Undo last cell",
+    "tip": "Start typing any letter to auto-find paths on the grid!",
+    "pressForHelp": "Press ? for shortcuts"
+  },
+  "keyboardMode": {
+    "navigation": "NAVIGATION",
+    "typing": "TYPING",
+    "navigationHint": "Use arrow keys",
+    "typingHint": "Keep going..."
+  },
+  "keyboardQuickTip": {
+    "title": "Quick Tip",
+    "message": "Try typing a word!",
+    "pressQuestion": "Press ? for all shortcuts",
+    "gotIt": "Got it!"
+  },
   "wizard": {
     "selectMode": "Select Game Mode",
     "chooseDifficulty": "Choose Difficulty",
@@ -3756,7 +3795,15 @@ const en = {
     "guestView": {
       "title": "Track Your Progress",
       "description": "Sign in to track your cognitive performance over time and see detailed insights about your word-finding skills."
-    }
+    },
+    "progressHistory": "Progress History",
+    "startTracking": "Start Tracking",
+    "historyEmptyDesc": "Play games or complete drills to track your brain score over time",
+    "daysTracked": "Days",
+    "currentScore": "Current",
+    "peakScore": "Peak",
+    "gamesPlayed": "games",
+    "drillsCompleted": "drills"
   }
 };
 

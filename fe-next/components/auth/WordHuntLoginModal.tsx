@@ -90,7 +90,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="absolute top-4 right-4 rounded-full z-10"
+            className="absolute top-4 right-4 rtl:right-auto rtl:left-4 rounded-full z-10"
             asChild={false}
           >
             <X size={18} />

@@ -94,6 +94,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
             comboLevel={playerCombos[player.username]?.level || 0}
             isHost={player.username === hostUsername || player.isHost}
             index={index}
+            t={t}
           />
         ))}
       </motion.div>
@@ -144,6 +145,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
                   comboLevel={playerCombos[player.username]?.level || 0}
                   isHost={player.username === hostUsername || player.isHost}
                   index={virtualRow.index}
+                  t={t}
                 />
               </div>
             );

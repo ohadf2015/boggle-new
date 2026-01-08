@@ -236,7 +236,7 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
                 />
               )}
               {/* Edit indicator */}
-              <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-neo-yellow text-neo-black border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm group-hover:scale-110 transition-transform">
+              <div className="absolute -bottom-0.5 -right-0.5 rtl:-right-auto rtl:-left-0.5 w-5 h-5 bg-neo-yellow text-neo-black border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm group-hover:scale-110 transition-transform">
                 <Pencil className="w-2 h-2" />
               </div>
             </button>

@@ -47,8 +47,10 @@ import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance
 import { useTapToDragGuidance } from '@/hooks/useTapToDragGuidance';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
+import { useKeyboardHelpState } from '@/hooks/useKeyboardHelpState';
 import KeyboardHintTooltip from './KeyboardHintTooltip';
 import TapToDragTooltip from './TapToDragTooltip';
+import { KeyboardShortcutsOverlay, KeyboardModeIndicator, KeyboardQuickTip } from '../keyboard';
 import CompactLeaderboard, { type CompactPlayer } from './CompactLeaderboard';
 
 // ==================== Types ====================
@@ -534,6 +536,18 @@ const InGameScreen = memo<InGameScreenProps>(({
     minWordLength,
   });
 
+  // Desktop detection for keyboard help features
+  const isDesktop = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  }, []);
+
+  // Keyboard help state - manages help overlay and quick tip visibility
+  const keyboardHelp = useKeyboardHelpState({
+    enabled: isDesktop && isPlaying,
+    enableQuickTip: isDesktop,
+  });
+
   // Memoize leaderboard items with centralized ranking utilities (using deferred value)
   const memoizedLeaderboard = useMemo(() => deferredLeaderboard.map((player, index) => ({
     ...player,
@@ -598,11 +612,39 @@ const InGameScreen = memo<InGameScreenProps>(({
           dir={dir}
         />
 
-        {/* Keyboard Input Hint - Desktop only */}
-        {isPlaying && (
+        {/* Keyboard Input Hint - Desktop only (legacy fallback) */}
+        {isPlaying && !keyboardHelp.showQuickTip && (
           <KeyboardHintTooltip
             delaySeconds={10}
             desktopOnly={true}
+            t={t}
+          />
+        )}
+
+        {/* Keyboard Quick Tip - Desktop only (immediate hint) */}
+        {isPlaying && isDesktop && (
+          <KeyboardQuickTip
+            isVisible={keyboardHelp.showQuickTip}
+            onDismiss={keyboardHelp.dismissQuickTip}
+            t={t}
+          />
+        )}
+
+        {/* Keyboard Mode Indicator - Desktop only */}
+        {isPlaying && isDesktop && (
+          <KeyboardModeIndicator
+            isNavigationMode={false}
+            isTypingMode={keyboardInput.isTypingMode}
+            t={t}
+            position="top-right"
+          />
+        )}
+
+        {/* Keyboard Shortcuts Overlay - Desktop only */}
+        {isDesktop && (
+          <KeyboardShortcutsOverlay
+            isOpen={keyboardHelp.isHelpOpen}
+            onClose={keyboardHelp.closeHelp}
             t={t}
           />
         )}
@@ -850,11 +892,39 @@ const InGameScreen = memo<InGameScreenProps>(({
         dir={dir}
       />
 
-      {/* Keyboard Input Hint - Desktop only */}
-      {isPlaying && (
+      {/* Keyboard Input Hint - Desktop only (legacy fallback) */}
+      {isPlaying && !keyboardHelp.showQuickTip && (
         <KeyboardHintTooltip
           delaySeconds={10}
           desktopOnly={true}
+          t={t}
+        />
+      )}
+
+      {/* Keyboard Quick Tip - Desktop only (immediate hint) */}
+      {isPlaying && isDesktop && (
+        <KeyboardQuickTip
+          isVisible={keyboardHelp.showQuickTip}
+          onDismiss={keyboardHelp.dismissQuickTip}
+          t={t}
+        />
+      )}
+
+      {/* Keyboard Mode Indicator - Desktop only */}
+      {isPlaying && isDesktop && (
+        <KeyboardModeIndicator
+          isNavigationMode={false}
+          isTypingMode={keyboardInput.isTypingMode}
+          t={t}
+          position="top-right"
+        />
+      )}
+
+      {/* Keyboard Shortcuts Overlay - Desktop only */}
+      {isDesktop && (
+        <KeyboardShortcutsOverlay
+          isOpen={keyboardHelp.isHelpOpen}
+          onClose={keyboardHelp.closeHelp}
           t={t}
         />
       )}
@@ -991,7 +1061,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                   </div>
                   {/* Rank badge */}
                   {playerData.rank && playerData.rank > 0 && (
-                    <div className="absolute -top-2 -right-2 w-5 h-5 md:w-6 md:h-6 bg-neo-pink text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-[10px] md:text-xs font-black shadow-hard-sm">
+                    <div className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2 w-5 h-5 md:w-6 md:h-6 bg-neo-pink text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-[10px] md:text-xs font-black shadow-hard-sm">
                       #{playerData.rank}
                     </div>
                   )}

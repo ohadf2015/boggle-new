@@ -1,4 +1,5 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback } from 'react';
+import { useSafeTimeout } from './useSafeTimeout';
 
 interface UseCopyToClipboardOptions {
   /** Delay in ms before resetting copied state (default: 2000) */
@@ -42,33 +43,16 @@ export function useCopyToClipboard(
 
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Clear timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
+  const { set: setTimeout, clear: clearTimeout } = useSafeTimeout();
 
   const reset = useCallback(() => {
     setCopied(false);
     setError(null);
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-  }, []);
+    clearTimeout();
+  }, [clearTimeout]);
 
   const copy = useCallback(
     async (text: string): Promise<boolean> => {
-      // Clear any existing timeout
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-
       try {
         await navigator.clipboard.writeText(text);
         setCopied(true);
@@ -76,7 +60,7 @@ export function useCopyToClipboard(
         onSuccess?.();
 
         // Auto-reset after delay
-        timeoutRef.current = setTimeout(() => {
+        setTimeout(() => {
           setCopied(false);
         }, resetDelay);
 
@@ -90,7 +74,7 @@ export function useCopyToClipboard(
         return false;
       }
     },
-    [resetDelay, onSuccess, onError]
+    [resetDelay, onSuccess, onError, setTimeout]
   );
 
   return { copied, error, copy, reset };

@@ -5,9 +5,9 @@
  * Updates both game_cognitive_scores and brain_scores tables.
  */
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/utils/supabase/client';
 import {
   calculateGameCognitiveScores,
   updateBrainScore,
@@ -58,6 +58,8 @@ export function useSaveCognitiveScore() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const hasSavedRef = useRef(false);
+  // Use createClient() to ensure auth session is properly available (same pattern as useBrainScore)
+  const supabase = useMemo(() => createClient(), []);
 
   const saveCognitiveScore = useCallback(async (
     input: SaveCognitiveScoreInput
@@ -71,12 +73,6 @@ export function useSaveCognitiveScore() {
     // Prevent duplicate saves
     if (hasSavedRef.current) {
       console.log('[useSaveCognitiveScore] Already saved this session');
-      return null;
-    }
-
-    // Check if supabase is available
-    if (!supabase) {
-      console.log('[useSaveCognitiveScore] Skipping - supabase not available');
       return null;
     }
 
@@ -111,7 +107,7 @@ export function useSaveCognitiveScore() {
       const cognitiveInput: GameCognitiveInput = {
         wordsFound: validWords.length,
         gameDurationSeconds: input.gameDuration,
-        gridSize: input.gridSize ?? 4, // Default 4x4 grid
+        gridSize: input.gridSize ?? 25, // Default 5x5 grid (25 cells)
         wordLengths,
         maxCombo,
         hintsUsed: input.hintsUsed ?? 0,
@@ -218,22 +214,48 @@ export function useSaveCognitiveScore() {
         tierProgress = updated.tierProgress;
         scoreDelta = overallScore - currentBrainScore.overall_score;
 
-        // Also add to brain_score_history for trend tracking
+        // Update brain_score_history for trend tracking (fetch-then-update to handle unique constraint)
         const today = new Date().toISOString().split('T')[0];
-        await supabase
+        const { data: existingHistory } = await supabase
           .from('brain_score_history')
-          .insert({
-            user_id: userId,
-            period_type: 'daily',
-            period_start: today,
-            overall_score: updated.overallScore,
-            processing_speed: updated.domainScores.processingSpeed,
-            working_memory: updated.domainScores.workingMemory,
-            attention: updated.domainScores.attention,
-            flexibility: updated.domainScores.flexibility,
-            vocabulary: updated.domainScores.vocabulary,
-            games_played: 1,
-          });
+          .select('*')
+          .eq('user_id', userId)
+          .eq('period_type', 'daily')
+          .eq('period_start', today)
+          .single();
+
+        if (existingHistory) {
+          // Update existing entry for today
+          await supabase
+            .from('brain_score_history')
+            .update({
+              overall_score: updated.overallScore,
+              processing_speed: updated.domainScores.processingSpeed,
+              working_memory: updated.domainScores.workingMemory,
+              attention: updated.domainScores.attention,
+              flexibility: updated.domainScores.flexibility,
+              vocabulary: updated.domainScores.vocabulary,
+              games_played: (existingHistory.games_played || 0) + 1,
+            })
+            .eq('id', existingHistory.id);
+        } else {
+          // Insert new entry for today
+          await supabase
+            .from('brain_score_history')
+            .insert({
+              user_id: userId,
+              period_type: 'daily',
+              period_start: today,
+              overall_score: updated.overallScore,
+              processing_speed: updated.domainScores.processingSpeed,
+              working_memory: updated.domainScores.workingMemory,
+              attention: updated.domainScores.attention,
+              flexibility: updated.domainScores.flexibility,
+              vocabulary: updated.domainScores.vocabulary,
+              games_played: 1,
+              drills_completed: 0,
+            });
+        }
 
       } else {
         // Create new brain score
@@ -269,22 +291,46 @@ export function useSaveCognitiveScore() {
           console.error('[useSaveCognitiveScore] Failed to create brain score:', createError);
         }
 
-        // Also add to history
+        // Also add to history (fetch-then-update to handle case where drill was done first)
         const todayDate = new Date().toISOString().split('T')[0];
-        await supabase
+        const { data: existingHistoryNew } = await supabase
           .from('brain_score_history')
-          .insert({
-            user_id: userId,
-            period_type: 'daily',
-            period_start: todayDate,
-            overall_score: overallScore,
-            processing_speed: gameScores.processingSpeed,
-            working_memory: gameScores.workingMemory,
-            attention: gameScores.attention,
-            flexibility: gameScores.flexibility,
-            vocabulary: gameScores.vocabulary,
-            games_played: 1,
-          });
+          .select('*')
+          .eq('user_id', userId)
+          .eq('period_type', 'daily')
+          .eq('period_start', todayDate)
+          .single();
+
+        if (existingHistoryNew) {
+          await supabase
+            .from('brain_score_history')
+            .update({
+              overall_score: overallScore,
+              processing_speed: gameScores.processingSpeed,
+              working_memory: gameScores.workingMemory,
+              attention: gameScores.attention,
+              flexibility: gameScores.flexibility,
+              vocabulary: gameScores.vocabulary,
+              games_played: (existingHistoryNew.games_played || 0) + 1,
+            })
+            .eq('id', existingHistoryNew.id);
+        } else {
+          await supabase
+            .from('brain_score_history')
+            .insert({
+              user_id: userId,
+              period_type: 'daily',
+              period_start: todayDate,
+              overall_score: overallScore,
+              processing_speed: gameScores.processingSpeed,
+              working_memory: gameScores.workingMemory,
+              attention: gameScores.attention,
+              flexibility: gameScores.flexibility,
+              vocabulary: gameScores.vocabulary,
+              games_played: 1,
+              drills_completed: 0,
+            });
+        }
       }
 
       hasSavedRef.current = true;
@@ -306,7 +352,7 @@ export function useSaveCognitiveScore() {
       setIsSaving(false);
       return null;
     }
-  }, [userId]);
+  }, [userId, supabase]);
 
   // Reset the saved flag (call when mounting a new game)
   const resetSaveState = useCallback(() => {

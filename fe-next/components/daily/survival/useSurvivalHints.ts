@@ -2,11 +2,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import type { Language } from '@/types';
-import type { HintLevel, ClueShopItem } from '@/utils/aiHintGenerator';
-import {
-  generateProgressiveHints,
-  generateFallbackHints,
-} from '@/utils/aiHintGenerator';
+import { generateProgressiveHints, generateFallbackHints, type HintLevel, type ClueShopItem } from '@/utils/aiHintGenerator';
 import type { FeedbackType } from '../WordFeedbackToast';
 
 export interface UseSurvivalHintsProps {

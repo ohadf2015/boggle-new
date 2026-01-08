@@ -37,7 +37,7 @@ const TutorialPrompt: React.FC<TutorialPromptProps> = ({
             {/* Dismiss button */}
             <button
               onClick={onDismiss}
-              className="absolute top-2 right-2 sm:top-3 sm:right-3 p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-neo transition-colors z-10"
+              className="absolute top-2 right-2 rtl:right-auto rtl:left-2 sm:top-3 sm:right-3 sm:rtl:right-auto sm:rtl:left-3 p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-neo transition-colors z-10"
               aria-label={t('common.dismiss') || 'Dismiss'}
             >
               <X className="w-4 h-4 sm:w-5 sm:h-5" />

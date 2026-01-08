@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Flame, Trophy, BarChart3, Smartphone, Shield } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { X, Flame, Trophy, BarChart3, Smartphone, Shield, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { Button as ButtonComponent } from '../ui/button';
@@ -15,8 +14,7 @@ import { useTheme } from '../../utils/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { signInWithGoogle, signInWithDiscord } from '../../lib/supabase';
 import { cn } from '../../lib/utils';
-import { setPendingDailyResult } from '../../utils/dailyChallenge';
-import type { WordHuntResult } from '../../utils/dailyChallenge';
+import { setPendingDailyResult, type WordHuntResult } from '../../utils/dailyChallenge';
 import type { Language } from '@/types';
 
 // Brand icon SVG components
@@ -216,7 +214,7 @@ const DailyChallengeSignupModal: React.FC<DailyChallengeSignupModalProps> = ({
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="absolute top-4 right-4 rounded-full z-10"
+            className="absolute top-4 right-4 rtl:right-auto rtl:left-4 rounded-full z-10"
             asChild={false}
           >
             <X size={18} />
@@ -243,12 +241,12 @@ const DailyChallengeSignupModal: React.FC<DailyChallengeSignupModalProps> = ({
               {trigger === 'streakAtRisk' && streakDays >= 3 && (
                 <>
                   <motion.div
-                    className="absolute -top-2 -right-2 w-4 h-4 bg-orange-400 rounded-full"
+                    className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2 w-4 h-4 bg-orange-400 rounded-full"
                     animate={{ scale: [0, 1, 0], opacity: [0, 1, 0] }}
                     transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
                   />
                   <motion.div
-                    className="absolute -top-1 -left-3 w-3 h-3 bg-red-400 rounded-full"
+                    className="absolute -top-1 -left-3 rtl:-left-auto rtl:-right-3 w-3 h-3 bg-red-400 rounded-full"
                     animate={{ scale: [0, 1, 0], opacity: [0, 1, 0] }}
                     transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
                   />

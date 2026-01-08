@@ -5,6 +5,7 @@
  */
 
 import logger from '@/utils/logger';
+import { getJsonFromLocalStorage, saveJsonToLocalStorage, removeFromLocalStorage } from './storageHelpers';
 
 const GAME_HISTORY_KEY = 'boggle_game_history';
 const MAX_GAMES_TO_TRACK = 20; // Keep last 20 games for chart
@@ -36,42 +37,25 @@ export interface GameHistoryData {
   lastUpdated: number;
 }
 
+const DEFAULT_HISTORY: GameHistoryData = { entries: [], lastUpdated: 0 };
+
 /**
  * Get game history from localStorage
  */
 export function getGameHistory(): GameHistoryData {
-  if (typeof window === 'undefined') {
-    return { entries: [], lastUpdated: 0 };
+  const data = getJsonFromLocalStorage<GameHistoryData>(GAME_HISTORY_KEY, DEFAULT_HISTORY);
+  // Ensure entries array exists and is valid
+  if (!Array.isArray(data.entries)) {
+    return DEFAULT_HISTORY;
   }
-
-  try {
-    const data = localStorage.getItem(GAME_HISTORY_KEY);
-    if (!data) {
-      return { entries: [], lastUpdated: 0 };
-    }
-    const parsed = JSON.parse(data) as GameHistoryData;
-    // Ensure entries array exists and is valid
-    if (!Array.isArray(parsed.entries)) {
-      return { entries: [], lastUpdated: 0 };
-    }
-    return parsed;
-  } catch (error) {
-    logger.error('Error reading game history:', error);
-    return { entries: [], lastUpdated: 0 };
-  }
+  return data;
 }
 
 /**
  * Save game history to localStorage
  */
 function saveGameHistory(data: GameHistoryData): void {
-  if (typeof window === 'undefined') return;
-
-  try {
-    localStorage.setItem(GAME_HISTORY_KEY, JSON.stringify(data));
-  } catch (error) {
-    logger.error('Error saving game history:', error);
-  }
+  saveJsonToLocalStorage(GAME_HISTORY_KEY, data);
 }
 
 /**
@@ -222,12 +206,6 @@ export function getTrendMessage(trend: PerformanceTrend): string {
  * Clear game history
  */
 export function clearGameHistory(): void {
-  if (typeof window === 'undefined') return;
-
-  try {
-    localStorage.removeItem(GAME_HISTORY_KEY);
-    logger.log('[GameHistory] Cleared game history');
-  } catch (error) {
-    logger.error('Error clearing game history:', error);
-  }
+  removeFromLocalStorage(GAME_HISTORY_KEY);
+  logger.log('[GameHistory] Cleared game history');
 }

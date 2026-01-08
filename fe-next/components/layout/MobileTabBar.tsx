@@ -55,7 +55,7 @@ export function MobileTabBar({
                 <motion.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-2 bg-neo-pink text-neo-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center border-2 border-neo-black"
+                  className="absolute -top-1 -right-2 rtl:-right-auto rtl:-left-2 bg-neo-pink text-neo-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center border-2 border-neo-black"
                 >
                   {tab.badge > 99 ? '99+' : tab.badge}
                 </motion.span>

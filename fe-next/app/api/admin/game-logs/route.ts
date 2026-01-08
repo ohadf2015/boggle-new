@@ -376,15 +376,86 @@ export async function GET(request: NextRequest) {
       console.error('[admin/game-logs] Daily Challenge fetch error:', error);
     }
 
+    // Fetch Brain Training Drill sessions from drill_sessions
+    let drillGames: any[] = [];
+    let drillCount = 0;
+
+    try {
+      let drillQuery = supabase
+        .from('drill_sessions')
+        .select(`
+          id,
+          user_id,
+          drill_type,
+          level,
+          score,
+          duration_seconds,
+          words_found,
+          domain_score_earned,
+          created_at,
+          profiles:user_id (
+            username,
+            display_name,
+            avatar_emoji,
+            avatar_color
+          )
+        `, { count: 'exact' });
+
+      // Drills are never ranked
+      if (isRanked === 'true') {
+        drillGames = [];
+        drillCount = 0;
+      } else {
+        if (startDate) {
+          drillQuery = drillQuery.gte('created_at', startDate);
+        }
+
+        if (endDate) {
+          drillQuery = drillQuery.lte('created_at', `${endDate}T23:59:59.999Z`);
+        }
+
+        drillQuery = drillQuery.order('created_at', { ascending });
+
+        const { data: drillData, error: drillError, count: dCount } = await drillQuery;
+
+        if (drillError) {
+          console.error('[admin/game-logs] Drill sessions query error:', drillError);
+        } else {
+          drillCount = dCount || 0;
+          drillGames = (drillData || []).map((session: any) => ({
+            id: session.id,
+            player_id: session.user_id,
+            guest_session_id: null,
+            game_code: `drill_${session.drill_type}_L${session.level}`,
+            score: session.score || 0,
+            word_count: session.words_found || 0,
+            longest_word: null,
+            placement: null,
+            is_ranked: false,
+            is_guest: false,
+            mode: 'drill',
+            drill_type: session.drill_type,
+            drill_level: session.level,
+            language: 'en',
+            time_played: session.duration_seconds || 0,
+            created_at: session.created_at,
+            profiles: session.profiles || null,
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('[admin/game-logs] Drill sessions fetch error:', error);
+    }
+
     // Combine and sort all games
-    const allGames = [...authGames, ...guestGames, ...wordHuntGames, ...dailyChallengeGames].sort((a, b) => {
+    const allGames = [...authGames, ...guestGames, ...wordHuntGames, ...dailyChallengeGames, ...drillGames].sort((a, b) => {
       const dateA = new Date(a.created_at).getTime();
       const dateB = new Date(b.created_at).getTime();
       return ascending ? dateA - dateB : dateB - dateA;
     });
 
     // Calculate total count
-    const totalCount = (authCount || 0) + guestCount + wordHuntCount + dailyChallengeCount;
+    const totalCount = (authCount || 0) + guestCount + wordHuntCount + dailyChallengeCount + drillCount;
 
     // Apply pagination to combined results
     const paginatedGames = allGames.slice(offset, offset + pageSize);
@@ -410,6 +481,7 @@ export async function GET(request: NextRequest) {
         guestGames: guestCount,
         wordHuntGames: wordHuntCount,
         dailyChallengeGames: dailyChallengeCount,
+        drillGames: drillCount,
       },
     });
   } catch (error) {

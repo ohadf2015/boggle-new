@@ -5,13 +5,14 @@
  * Handles rolling averages for long-term tracking.
  */
 
-import type {
-  BrainTier,
-  CognitiveDomain,
-  GameCognitiveScore,
-  TrendDirection,
+import {
+  DOMAIN_WEIGHTS,
+  TIER_CONFIGS,
+  type BrainTier,
+  type CognitiveDomain,
+  type GameCognitiveScore,
+  type TrendDirection,
 } from '@/shared/types/cognitive';
-import { DOMAIN_WEIGHTS, TIER_CONFIGS } from '@/shared/types/cognitive';
 
 /**
  * Calculate overall brain score from individual domain scores

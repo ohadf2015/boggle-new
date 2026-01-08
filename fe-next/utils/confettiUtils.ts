@@ -7,8 +7,7 @@
  * 3. Handles errors gracefully
  */
 
-import confettiLib from 'canvas-confetti';
-import type { CreateTypes, Options } from 'canvas-confetti';
+import confettiLib, { type CreateTypes, type Options } from 'canvas-confetti';
 
 // Singleton canvas for confetti
 let confettiCanvas: HTMLCanvasElement | null = null;

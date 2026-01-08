@@ -10,11 +10,9 @@ import * as dictionary from '../backend/dictionary';
 import { restoreTournamentsFromRedis } from '../backend/modules/tournamentManager';
 import { pool as wordValidatorPool } from '../backend/modules/wordValidatorPool';
 import { setEventLoopLag } from '../backend/utils/metrics';
-import { setupRedisAdapter, cleanupRedisAdapter } from './redisAdapter';
+import { setupRedisAdapter, cleanupRedisAdapter, type ExtendedSocketServer } from './redisAdapter';
 import { clearCleanupTimers } from './socketSetup';
 import * as gameStateManager from '../backend/modules/gameStateManager';
-
-import type { ExtendedSocketServer } from './redisAdapter';
 
 /**
  * Shutdown handler function type

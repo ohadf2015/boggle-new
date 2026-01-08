@@ -18,7 +18,7 @@ import type { TournamentStanding } from '@/shared/types/game';
 
 // Sound paths for results
 const RESULTS_SOUNDS: Record<SoundType, string> = {
-  whoosh: '/sounds/whoosh.mp3',
+  whoosh: '/sounds/message.mp3',
   pop: '/sounds/word-accepted.wav',
   fanfare: '/sounds/achievment.mp3',
   victory: '/sounds/fire-round-start.wav',

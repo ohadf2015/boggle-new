@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import BrainScoreHero from '@/components/brain/BrainScoreHero';
 import CognitiveDomainGrid from '@/components/brain/CognitiveDomainGrid';
 import CognitiveRadarChart from '@/components/brain/CognitiveRadarChart';
+import BrainScoreHistoryChart from '@/components/brain/BrainScoreHistoryChart';
 import QuickDrillsSection from '@/components/brain/QuickDrillsSection';
 import ScientificTipsCarousel from '@/components/brain/ScientificTipsCarousel';
 import FirstGameCelebration from '@/components/brain/FirstGameCelebration';
@@ -71,7 +72,7 @@ export default function BrainTrainingPage() {
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
   const { isAuthenticated } = useAuth();
-  const { brainScore, recentGameScores, drillProgress, isLoading, error, refresh, initializeBrainScore } = useBrainScore();
+  const { brainScore, recentGameScores, drillProgress, brainScoreHistory, isLoading, error, refresh, initializeBrainScore } = useBrainScore();
 
   // State for first game celebration
   const [showCelebration, setShowCelebration] = useState(false);
@@ -339,6 +340,15 @@ export default function BrainTrainingPage() {
           transition={{ duration: 0.3, delay: 0.1 }}
         >
           <CognitiveRadarChart domains={brainScore.domains} />
+        </motion.div>
+
+        {/* Progress History Chart */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.12 }}
+        >
+          <BrainScoreHistoryChart history={brainScoreHistory} />
         </motion.div>
 
         {/* Cognitive Domains */}

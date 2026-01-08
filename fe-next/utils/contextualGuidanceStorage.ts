@@ -17,6 +17,8 @@ export interface GuidanceState {
   effectsPreferenceShown: boolean;
   /** Whether the user has seen the tap-to-drag tutorial (shown when tapping single letter without dragging) */
   dragTutorialShown: boolean;
+  /** Whether the user has completed the first-play tutorial by making a word with combined directions */
+  firstPlayTutorialCompleted: boolean;
 }
 
 const DEFAULT_STATE: GuidanceState = {
@@ -27,6 +29,7 @@ const DEFAULT_STATE: GuidanceState = {
   swipeTipShown: false,
   effectsPreferenceShown: false,
   dragTutorialShown: false,
+  firstPlayTutorialCompleted: false,
 };
 
 /**

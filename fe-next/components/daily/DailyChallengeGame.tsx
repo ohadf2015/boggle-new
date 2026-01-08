@@ -19,6 +19,7 @@ import { useGameTimer } from '@/hooks/useGameTimer';
 import { useWordSubmission } from '@/hooks/useWordSubmission';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
+import { useFirstPlayTutorial } from '@/hooks/useFirstPlayTutorial';
 import { useContextualGuidance, useSwipeTipGuidanceTrigger } from '@/hooks/useContextualGuidance';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
@@ -69,6 +70,13 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   const [score, setScore] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
 
+  // Available words from grid solver (for first-play tutorial)
+  const [availableWords, setAvailableWords] = useState<{
+    easy: string[];
+    medium: string[];
+    hard: string[];
+  } | null>(null);
+
   // Word forming state (for external WordFormingArea)
   const [formedWord, setFormedWord] = useState('');
   const [letterCount, setLetterCount] = useState(0);
@@ -115,6 +123,37 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       setGameActive(false);
     };
   }, [setGameActive]);
+
+  // Fetch valid words from grid for first-play tutorial
+  useEffect(() => {
+    if (!grid) return;
+
+    const fetchGridWords = async () => {
+      try {
+        const response = await fetch('/api/solve-grid', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ grid, language }),
+        });
+
+        if (!response.ok) {
+          setAvailableWords({ easy: [], medium: [], hard: [] });
+          return;
+        }
+
+        const result = await response.json();
+        if (result.success && result.words) {
+          setAvailableWords(result.words);
+        } else {
+          setAvailableWords({ easy: [], medium: [], hard: [] });
+        }
+      } catch {
+        setAvailableWords({ easy: [], medium: [], hard: [] });
+      }
+    };
+
+    fetchGridWords();
+  }, [grid, language]);
 
   // Stable callback for timer - prevents timer restart on every render
   const stableOnTimeUp = useCallback(() => {
@@ -215,6 +254,14 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     15 // 15 seconds delay
   );
 
+  // First-play tutorial - shows highlighted word path until player uses combined directions
+  const firstPlayTutorial = useFirstPlayTutorial({
+    grid,
+    availableWords,
+    language,
+    isGameActive,
+  });
+
   // Stop music on unmount
   useEffect(() => {
     return () => {
@@ -292,6 +339,14 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     onComplete(result);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duration, onComplete]);
+
+  // Combined path submit handler for guidance systems
+  const handlePathSubmit = useCallback((cells: Array<{ row: number; col: number }>) => {
+    // Track for direction guidance
+    directionGuidance.trackWordPath(cells);
+    // Track for first-play tutorial (detect mixed-direction usage)
+    firstPlayTutorial.trackUserPath(cells);
+  }, [directionGuidance, firstPlayTutorial]);
 
   // Handle word forming changes from GridComponent
   const handleWordChange = useCallback((word: string, count: number) => {
@@ -421,11 +476,16 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           grid={grid}
           interactive={!isGameOver}
           onWordSubmit={handleWordSubmit}
-          onPathSubmit={directionGuidance.trackWordPath}
+          onPathSubmit={handlePathSubmit}
           onWordChange={handleWordChange}
           hideWordPreview
           hideComboIndicator={true}
           comboLevel={combo.comboLevel}
+          highlightedPath={
+            firstPlayTutorial.tutorialPath
+              ? firstPlayTutorial.tutorialPath.map(p => ({ row: p.row, col: p.col }))
+              : undefined
+          }
         />
       </div>
 

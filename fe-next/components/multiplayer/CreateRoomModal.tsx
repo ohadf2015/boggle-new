@@ -243,7 +243,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                     type="button"
                     onClick={() => !isAuthenticated && setIsEditingName(true)}
                     disabled={isAuthenticated}
-                    className={`text-left w-full ${!isAuthenticated ? 'cursor-pointer hover:bg-neo-black/5 rounded px-1 -mx-1' : 'cursor-default'}`}
+                    className={`text-start w-full ${!isAuthenticated ? 'cursor-pointer hover:bg-neo-black/5 rounded px-1 -mx-1' : 'cursor-default'}`}
                   >
                     <p className="font-bold text-lg text-neo-black dark:text-neo-white truncate flex items-center gap-2">
                       {username || t('multiplayerFlow.createModal.namePlaceholder') || 'Your name'}

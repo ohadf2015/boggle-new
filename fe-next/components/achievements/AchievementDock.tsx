@@ -127,7 +127,7 @@ const AchievementDock = ({ achievements = [], className }: AchievementDockProps)
           initial={{ scale: 1.5 }}
           animate={{ scale: 1 }}
           className={cn(
-            'absolute -top-2 -right-2',
+            'absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2',
             'w-7 h-7 rounded-md',
             'bg-neo-pink border-3 border-neo-black',
             'text-neo-white text-xs font-black',

@@ -6,8 +6,7 @@
  * from multiple components into reusable utility functions.
  */
 
-import { Crown, Medal } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { Crown, Medal, type LucideIcon } from 'lucide-react';
 
 // Re-export confetti colors for convenience
 export { RANK_COLORS as RANK_CONFETTI_COLORS } from './confettiUtils';

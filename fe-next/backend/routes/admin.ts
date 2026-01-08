@@ -678,7 +678,7 @@ router.get('/players/sources', async (_req: AdminRequest, res: Response): Promis
 
 /**
  * GET /api/admin/players/top
- * Get top players by score
+ * Get top players by score with full profile data
  */
 router.get('/players/top', async (req: AdminRequest, res: Response): Promise<void> => {
   try {
@@ -687,7 +687,16 @@ router.get('/players/top', async (req: AdminRequest, res: Response): Promise<voi
 
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, username, display_name, avatar_emoji, avatar_color, total_score, total_games, total_words, total_time_played, ranked_mmr, current_level, created_at')
+      .select(`
+        id, username, display_name, avatar_emoji, avatar_color, avatar_image,
+        total_score, total_games, total_words, total_time_played, total_xp, current_level,
+        casual_games, ranked_games, casual_wins, ranked_wins,
+        ranked_mmr, peak_mmr, longest_word, longest_word_length,
+        total_coins, lifetime_coins_earned, total_hints_used,
+        prestige_level, prestige_multiplier,
+        country_code, referral_count,
+        daily_email_subscribed, last_seen_at, last_game_at, created_at
+      `)
       .order('total_score', { ascending: false })
       .limit(limit);
 
@@ -703,7 +712,7 @@ router.get('/players/top', async (req: AdminRequest, res: Response): Promise<voi
 
 /**
  * GET /api/admin/players/recent
- * Get recently active players
+ * Get recently active players with full profile data
  */
 router.get('/players/recent', async (req: AdminRequest, res: Response): Promise<void> => {
   try {
@@ -712,7 +721,16 @@ router.get('/players/recent', async (req: AdminRequest, res: Response): Promise<
 
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, username, display_name, avatar_emoji, avatar_color, total_score, total_games, last_game_at, created_at')
+      .select(`
+        id, username, display_name, avatar_emoji, avatar_color, avatar_image,
+        total_score, total_games, total_words, total_time_played, total_xp, current_level,
+        casual_games, ranked_games, casual_wins, ranked_wins,
+        ranked_mmr, peak_mmr, longest_word, longest_word_length,
+        total_coins, lifetime_coins_earned, total_hints_used,
+        prestige_level, prestige_multiplier,
+        country_code, referral_count,
+        daily_email_subscribed, last_seen_at, last_game_at, created_at
+      `)
       .order('last_game_at', { ascending: false, nullsFirst: false })
       .limit(limit);
 

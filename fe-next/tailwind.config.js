@@ -247,6 +247,17 @@ module.exports = {
           "0%, 100%": { transform: "scale(1)", boxShadow: "6px 6px 0px rgb(var(--neo-black))" },
           "50%": { transform: "scale(1.02)", boxShadow: "8px 8px 0px rgb(var(--neo-black))" },
         },
+        // Keyboard focus indicator glow
+        "keyboard-focus": {
+          "0%, 100%": {
+            boxShadow: "0 0 0 4px rgb(var(--neo-cyan)), 0 0 16px rgba(0, 255, 255, 0.5)",
+            transform: "scale(1)",
+          },
+          "50%": {
+            boxShadow: "0 0 0 4px rgb(var(--neo-cyan)), 0 0 24px rgba(0, 255, 255, 0.7)",
+            transform: "scale(1.02)",
+          },
+        },
         // Subtle hint glow animation for revealed word paths (softer purple)
         "hint-glow": {
           "0%, 100%": {
@@ -280,6 +291,7 @@ module.exports = {
         "neo-shake": "neo-shake 0.4s ease-in-out",
         "pulse-subtle": "pulse-subtle 2s ease-in-out infinite",
         "hint-glow": "hint-glow 2.5s ease-in-out infinite",
+        "keyboard-focus": "keyboard-focus 1.5s ease-in-out infinite",
         // Fast animations for landing page optimization
         "fade-in-fast": "fade-in-fast 0.15s ease-out forwards",
         "fade-in-up": "fade-in-up 0.3s ease-out 0.2s both",

@@ -186,6 +186,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         notifications={notifications}
         onDismiss={dismissNotification}
         maxVisible={1}
+        t={t}
       />
     </div>
   );

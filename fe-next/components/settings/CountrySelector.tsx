@@ -198,7 +198,7 @@ export function CountrySelector({
           )}>
             <div className="relative">
               <Search className={cn(
-                'absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4',
+                'absolute left-2 rtl:left-auto rtl:right-2 top-1/2 -translate-y-1/2 w-4 h-4',
                 isDarkMode ? 'text-gray-500' : 'text-gray-400'
               )} />
               <input
@@ -219,7 +219,7 @@ export function CountrySelector({
                   type="button"
                   onClick={() => setSearch('')}
                   className={cn(
-                    'absolute right-2 top-1/2 -translate-y-1/2',
+                    'absolute right-2 rtl:right-auto rtl:left-2 top-1/2 -translate-y-1/2',
                     isDarkMode ? 'text-gray-500 hover:text-gray-400' : 'text-gray-400 hover:text-gray-500'
                   )}
                 >

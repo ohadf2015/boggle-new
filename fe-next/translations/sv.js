@@ -827,6 +827,9 @@ const sv = {
     "earthquake": "JORDBÄVNING!",
     "fireRound": "ELDRUNDA",
     "twoXPoints": "2X POÄNG",
+    "host": "VÄRD",
+    "hostBadge": "Denna spelare är värden",
+    "moreNotifications": "+{{count}} till",
     "notifications": {
       "longWord": "ORDKRAFT!",
       "epicWord": "MONSTERORD!",
@@ -2187,15 +2190,15 @@ const sv = {
       "continueAsGuest": "Fortsätt som gäst"
     },
     "wordHunt": {
-      "loginTitle": "Logga in för att spela",
-      "loginSubtitle": "Synkronisera dina framsteg på alla enheter",
+      "loginTitle": "Snabb inloggning, sen kör vi!",
+      "loginSubtitle": "Tar 10 sekunder – din streak tackar dig",
       "skipCta": "Hoppa över för nu",
-      "gateTitle": "Gå med för att lösa dagens pussel",
-      "gateSubtitle": "Logga in för att tävla med spelare världen över",
-      "benefit1": "Följ din dagliga svit",
-      "benefit2": "Tävla på globala topplistor",
-      "benefit3": "Synkronisera framsteg på alla enheter",
-      "footerNote": "Gå med tusentals ordjägare som löser dagens utmaning"
+      "gateTitle": "Ett litet steg till dagens pussel",
+      "gateSubtitle": "Vi behöver veta vem som krossar det",
+      "benefit1": "Behåll din streak på alla enheter",
+      "benefit2": "Se var du hamnar globalt",
+      "benefit3": "Fortsätt där du slutade, var som helst",
+      "footerNote": "Samma pussel, alla, världen över. Vem är snabbast idag?"
     },
     "winnerOnboarding": {
       "topPercentile": {
@@ -3528,6 +3531,42 @@ const sv = {
     "clear": "för att rensa",
     "gotIt": "Fattat!"
   },
+  "keyboardShortcuts": {
+    "title": "Tangentbordsgenvägar",
+    "wordBuilding": "Ordbyggande",
+    "gridNavigation": "Rutnätsnavigering",
+    "desktopShortcuts": "Datorgenvägar",
+    "type": "Skriv",
+    "typeDesc": "Börja skriva bokstäver",
+    "enter": "Enter",
+    "enterDesc": "Skicka ord",
+    "escape": "Esc",
+    "escapeDesc": "Rensa urval",
+    "backspace": "⌫",
+    "backspaceDesc": "Ta bort sista bokstaven",
+    "arrows": "← ↑ → ↓",
+    "arrowsDesc": "Flytta fokus",
+    "space": "Mellanslag",
+    "spaceDesc": "Välj fokuserad cell",
+    "doubleClick": "Dubbelklick",
+    "doubleClickDesc": "Skicka ord",
+    "rightClick": "Högerklick",
+    "rightClickDesc": "Ångra sista cellen",
+    "tip": "Börja skriva vilken bokstav som helst för att hitta vägar i rutnätet!",
+    "pressForHelp": "Tryck ? för genvägar"
+  },
+  "keyboardMode": {
+    "navigation": "NAVIGERING",
+    "typing": "SKRIVER",
+    "navigationHint": "Använd piltangenterna",
+    "typingHint": "Fortsätt..."
+  },
+  "keyboardQuickTip": {
+    "title": "Snabbtips",
+    "message": "Prova att skriva ett ord!",
+    "pressQuestion": "Tryck ? för alla genvägar",
+    "gotIt": "Fattat!"
+  },
   "emailPreferences": {
     "title": "Dagliga pusselaviseringar",
     "sendingTo": "Skickas till",
@@ -3743,7 +3782,15 @@ const sv = {
     "guestView": {
       "title": "Följ Din Framsteg",
       "description": "Logga in för att följa dina kognitiva prestationer över tid och se detaljerade insikter om dina ordfinnande färdigheter."
-    }
+    },
+    "progressHistory": "Framstegshistorik",
+    "startTracking": "Börja Spåra",
+    "historyEmptyDesc": "Spela spel eller genomför övningar för att spåra din hjärnpoäng över tid",
+    "daysTracked": "Dagar",
+    "currentScore": "Nuvarande",
+    "peakScore": "Toppnotering",
+    "gamesPlayed": "spel",
+    "drillsCompleted": "övningar"
   }
 };
 

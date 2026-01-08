@@ -1,6 +1,5 @@
 // _redisClient.ts - Enhanced Redis Client with Connection Pooling, Circuit Breaker, and Optimizations
-import Redis from 'ioredis';
-import type { Redis as RedisClient } from 'ioredis';
+import Redis, { type Redis as RedisClient } from 'ioredis';
 
 const logger = require('./utils/logger');
 

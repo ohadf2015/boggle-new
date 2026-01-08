@@ -31,6 +31,7 @@ import { awardComboCoins } from '@/utils/coinManager';
 import { hapticForWordScore, hapticError } from '@/utils/haptics';
 import { useAnnouncer } from '@/components/GameAnnouncer';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
+import { useFirstPlayTutorial } from '@/hooks/useFirstPlayTutorial';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useTrainingAnalysis } from '@/hooks/useTrainingAnalysis';
 import { useTrainingProgress } from '@/hooks/useTrainingProgress';
@@ -194,6 +195,15 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   // Direction pattern guidance - shows when player only uses straight-line directions
   const directionGuidance = useDirectionPatternGuidance();
 
+  // First-play tutorial - shows highlighted word path until player uses combined directions
+  // Note: isGameActive is computed inline since gameActive variable is defined later
+  const firstPlayTutorial = useFirstPlayTutorial({
+    grid,
+    availableWords,
+    language: settings.language,
+    isGameActive: !!grid && !isPaused && !isGameOver,
+  });
+
   // Training analysis - tracks player behavior in practice mode for interactive tutorial
   const trainingAnalysis = useTrainingAnalysis({
     enabled: settings.mode === 'practice',
@@ -240,11 +250,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const handlePathSubmit = useCallback((cells: Array<{ row: number; col: number }>) => {
     // Track for direction guidance
     directionGuidance.trackWordPath(cells);
+    // Track for first-play tutorial (detect mixed-direction usage)
+    firstPlayTutorial.trackUserPath(cells);
     // Track for training analysis (only in practice mode)
     trainingAnalysis.trackPath(cells);
     // Track for progress bar (only in practice mode)
     trainingTrackPath(cells);
-  }, [directionGuidance, trainingAnalysis, trainingTrackPath]);
+  }, [directionGuidance, firstPlayTutorial, trainingAnalysis, trainingTrackPath]);
 
   // Game timer - handles countdown with pause support
   const timer = useGameTimer({
@@ -1447,7 +1459,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               largeText
               fireRoundActive={fireRoundActive}
               earthquakeShaking={earthquakeState === 'shaking'}
-              highlightedPath={keyboardInput.isTypingMode ? keyboardInput.highlightedCells : revealState.highlightedPath}
+              highlightedPath={
+                keyboardInput.isTypingMode
+                  ? keyboardInput.highlightedCells
+                  : firstPlayTutorial.tutorialPath
+                    ? firstPlayTutorial.tutorialPath.map(p => ({ row: p.row, col: p.col }))
+                    : revealState.highlightedPath
+              }
               language={settings.language}
             />
           </div>
@@ -1925,7 +1943,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           largeText
           fireRoundActive={fireRoundActive}
           earthquakeShaking={earthquakeState === 'shaking'}
-          highlightedPath={keyboardInput.isTypingMode ? keyboardInput.highlightedCells : revealState.highlightedPath}
+          highlightedPath={
+            keyboardInput.isTypingMode
+              ? keyboardInput.highlightedCells
+              : firstPlayTutorial.tutorialPath
+                ? firstPlayTutorial.tutorialPath.map(p => ({ row: p.row, col: p.col }))
+                : revealState.highlightedPath
+          }
           language={settings.language}
         />
       </div>

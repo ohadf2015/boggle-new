@@ -828,6 +828,9 @@ const he = {
     "earthquake": "רעידת אדמה!",
     "fireRound": "סיבוב אש",
     "twoXPoints": "נקודות X2",
+    "host": "מארח",
+    "hostBadge": "שחקן זה הוא המארח",
+    "moreNotifications": "+{{count}} נוספים",
     "notifications": {
       "longWord": "כוח מילים!",
       "epicWord": "מילה ענקית!",
@@ -2188,15 +2191,15 @@ const he = {
       "continueAsGuest": "המשך כאורח"
     },
     "wordHunt": {
-      "loginTitle": "היכנס כדי לשחק",
-      "loginSubtitle": "סנכרן את ההתקדמות שלך בכל המכשירים",
-      "skipCta": "דלג בעת זו",
-      "gateTitle": "הצטרף לפתור את החידה היומית",
-      "gateSubtitle": "היכנס כדי להתחרות עם שחקנים מכל העולם",
-      "benefit1": "עקוב אחר הרצף היומי שלך",
-      "benefit2": "התחרה בטבלאות המובילים הגלובליות",
-      "benefit3": "סנכרן התקדמות בין כל המכשירים",
-      "footerNote": "הצטרף לאלפי ציידי מילים שפותרים את האתגר היומי"
+      "loginTitle": "רגע קטן, ואז משחקים!",
+      "loginSubtitle": "10 שניות והרצף שלך שמור לנצח",
+      "skipCta": "אולי אחר כך",
+      "gateTitle": "צעד קטן לפני החידה של היום",
+      "gateSubtitle": "ככה נדע מי פה האלוף",
+      "benefit1": "הרצף שלך שמור בכל מכשיר",
+      "benefit2": "תראה איפה אתה בדירוג העולמי",
+      "benefit3": "תמשיך מאיפה שהפסקת, מכל מקום",
+      "footerNote": "אותה חידה, כולם, בכל העולם. מי הכי מהיר היום?"
     },
     "winnerOnboarding": {
       "topPercentile": {
@@ -3529,6 +3532,42 @@ const he = {
     "clear": "למחיקה",
     "gotIt": "הבנתי!"
   },
+  "keyboardShortcuts": {
+    "title": "קיצורי מקלדת",
+    "wordBuilding": "בניית מילים",
+    "gridNavigation": "ניווט בלוח",
+    "desktopShortcuts": "קיצורי דסקטופ",
+    "type": "הקלד",
+    "typeDesc": "התחל להקליד אותיות",
+    "enter": "Enter",
+    "enterDesc": "שלח מילה",
+    "escape": "Esc",
+    "escapeDesc": "נקה בחירה",
+    "backspace": "⌫",
+    "backspaceDesc": "מחק אות אחרונה",
+    "arrows": "← ↑ → ↓",
+    "arrowsDesc": "הזז מיקוד",
+    "space": "רווח",
+    "spaceDesc": "בחר תא ממוקד",
+    "doubleClick": "לחיצה כפולה",
+    "doubleClickDesc": "שלח מילה",
+    "rightClick": "לחיצה ימנית",
+    "rightClickDesc": "בטל אות אחרונה",
+    "tip": "התחל להקליד כל אות כדי למצוא נתיבים בלוח!",
+    "pressForHelp": "לחץ ? לקיצורים"
+  },
+  "keyboardMode": {
+    "navigation": "ניווט",
+    "typing": "הקלדה",
+    "navigationHint": "השתמש בחצים",
+    "typingHint": "המשך להקליד..."
+  },
+  "keyboardQuickTip": {
+    "title": "טיפ מהיר",
+    "message": "נסה להקליד מילה!",
+    "pressQuestion": "לחץ ? לכל הקיצורים",
+    "gotIt": "הבנתי!"
+  },
   "emailPreferences": {
     "title": "התראות פאזל יומי",
     "sendingTo": "נשלח אל",
@@ -3744,7 +3783,15 @@ const he = {
     "guestView": {
       "title": "עקוב אחר ההתקדמות שלך",
       "description": "התחבר כדי לעקוב אחר הביצועים הקוגניטיביים שלך לאורך זמן ולראות תובנות מפורטות על כישורי מציאת המילים שלך."
-    }
+    },
+    "progressHistory": "היסטוריית התקדמות",
+    "startTracking": "התחל לעקוב",
+    "historyEmptyDesc": "שחק משחקים או השלם תרגילים כדי לעקוב אחר ציון המוח שלך לאורך זמן",
+    "daysTracked": "ימים",
+    "currentScore": "נוכחי",
+    "peakScore": "שיא",
+    "gamesPlayed": "משחקים",
+    "drillsCompleted": "תרגילים"
   }
 };
 

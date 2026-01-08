@@ -81,7 +81,7 @@ const TvResultsStatsGrid = memo<TvResultsStatsGridProps>(({
       icon: Hash,
       label: t('tvResults.wordsFound'),
       value: uniqueWords.size,
-      subValue: uniqueWords.size > 100 ? 'LEGENDARY!' : uniqueWords.size > 50 ? 'AMAZING!' : '',
+      subValue: uniqueWords.size > 100 ? t('tvResults.legendary') : uniqueWords.size > 50 ? t('tvResults.amazing') : '',
       color: 'bg-neo-cyan',
     });
 
@@ -98,7 +98,7 @@ const TvResultsStatsGrid = memo<TvResultsStatsGridProps>(({
         icon: Ruler,
         label: t('tvResults.longestWord'),
         value: longestWord.word.toUpperCase(),
-        subValue: `${longestWord.word.length} letters`,
+        subValue: `${longestWord.word.length} ${t('tvResults.letters')}`,
         player: longestWord.player ? {
           username: longestWord.player.username,
           avatar: longestWord.player.avatar,
@@ -142,7 +142,7 @@ const TvResultsStatsGrid = memo<TvResultsStatsGridProps>(({
         icon: Flame,
         label: t('tvResults.bestCombo'),
         value: `${bestCombo.level}x`,
-        subValue: bestCombo.level >= 10 ? 'ON FIRE!' : '',
+        subValue: bestCombo.level >= 10 ? t('tvResults.onFire') : '',
         player: bestCombo.player ? {
           username: bestCombo.player.username,
           avatar: bestCombo.player.avatar,
@@ -161,7 +161,7 @@ const TvResultsStatsGrid = memo<TvResultsStatsGridProps>(({
           icon: Target,
           label: t('tvResults.photoFinish'),
           value: `${scoreDiff}`,
-          subValue: 'points apart!',
+          subValue: t('tvResults.pointsApart'),
           color: 'bg-neo-pink',
         });
       }
@@ -178,9 +178,9 @@ const TvResultsStatsGrid = memo<TvResultsStatsGridProps>(({
       calculatedStats.push({
         id: 'fire-hero',
         icon: Trophy,
-        label: t('tvResults.fireRoundHero') || 'Fire Round Hero',
+        label: t('tvResults.fireRoundHero'),
         value: `+${hero.fireBonus}`,
-        subValue: 'bonus pts',
+        subValue: t('tvResults.bonusPts'),
         player: {
           username: hero.player.username,
           avatar: hero.player.avatar,

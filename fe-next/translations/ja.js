@@ -827,6 +827,9 @@ const ja = {
     "earthquake": "地震!",
     "fireRound": "ファイアラウンド",
     "twoXPoints": "2倍ポイント",
+    "host": "ホスト",
+    "hostBadge": "このプレイヤーはホストです",
+    "moreNotifications": "+{{count}}件",
     "notifications": {
       "longWord": "ワードパワー!",
       "epicWord": "モンスターワード!",
@@ -2186,15 +2189,15 @@ const ja = {
       "continueAsGuest": "ゲストとして続ける"
     },
     "wordHunt": {
-      "loginTitle": "ログインしてプレイ",
-      "loginSubtitle": "すべてのデバイスで進捗を同期",
+      "loginTitle": "サクッとログイン、さあ始めよう！",
+      "loginSubtitle": "10秒で完了 – ストリークを守ろう",
       "skipCta": "今はスキップ",
-      "gateTitle": "今日のパズルに参加しよう",
-      "gateSubtitle": "ログインして世界中のプレイヤーと競争",
-      "benefit1": "デイリーストリークを追跡",
-      "benefit2": "グローバルリーダーボードで競争",
-      "benefit3": "すべてのデバイスで進捗を同期",
-      "footerNote": "今日のチャレンジを解く何千人ものワードハンターに参加"
+      "gateTitle": "あと一歩で今日のパズル",
+      "gateSubtitle": "誰が最強か見せてもらおう",
+      "benefit1": "どのデバイスでもストリーク継続",
+      "benefit2": "世界ランキングをチェック",
+      "benefit3": "どこでも続きからプレイ",
+      "footerNote": "世界中で同じパズル。今日一番速いのは誰だ？"
     },
     "winnerOnboarding": {
       "topPercentile": {
@@ -3527,6 +3530,42 @@ const ja = {
     "clear": "クリア",
     "gotIt": "了解！"
   },
+  "keyboardShortcuts": {
+    "title": "キーボードショートカット",
+    "wordBuilding": "単語作成",
+    "gridNavigation": "グリッド操作",
+    "desktopShortcuts": "デスクトップ操作",
+    "type": "入力",
+    "typeDesc": "文字を入力開始",
+    "enter": "Enter",
+    "enterDesc": "単語を送信",
+    "escape": "Esc",
+    "escapeDesc": "選択をクリア",
+    "backspace": "⌫",
+    "backspaceDesc": "最後の文字を削除",
+    "arrows": "← ↑ → ↓",
+    "arrowsDesc": "フォーカス移動",
+    "space": "スペース",
+    "spaceDesc": "フォーカス中のセルを選択",
+    "doubleClick": "ダブルクリック",
+    "doubleClickDesc": "単語を送信",
+    "rightClick": "右クリック",
+    "rightClickDesc": "最後のセルを取消",
+    "tip": "文字を入力するとグリッド上のパスが自動で見つかります！",
+    "pressForHelp": "?でショートカット表示"
+  },
+  "keyboardMode": {
+    "navigation": "ナビゲーション",
+    "typing": "入力中",
+    "navigationHint": "矢印キーを使用",
+    "typingHint": "続けて入力..."
+  },
+  "keyboardQuickTip": {
+    "title": "クイックヒント",
+    "message": "単語を入力してみて！",
+    "pressQuestion": "? で全ショートカット表示",
+    "gotIt": "了解！"
+  },
   "emailPreferences": {
     "title": "デイリーパズル通知",
     "sendingTo": "送信先",
@@ -3742,7 +3781,15 @@ const ja = {
     "guestView": {
       "title": "進捗を追跡",
       "description": "サインインして認知パフォーマンスを経時的に追跡し、単語発見スキルに関する詳細な洞察を確認できます。"
-    }
+    },
+    "progressHistory": "進捗履歴",
+    "startTracking": "記録開始",
+    "historyEmptyDesc": "ゲームやドリルをプレイして、ブレインスコアの推移を追跡しよう",
+    "daysTracked": "日数",
+    "currentScore": "現在",
+    "peakScore": "最高",
+    "gamesPlayed": "ゲーム",
+    "drillsCompleted": "ドリル"
   }
 };
 

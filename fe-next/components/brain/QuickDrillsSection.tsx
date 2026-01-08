@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Zap, Brain, Target, Shuffle, BookOpen, Lock, Info, Trophy, BarChart3, Play } from 'lucide-react';
+import { Zap, Brain, Target, Shuffle, BookOpen, Lock, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
@@ -69,9 +69,9 @@ interface QuickDrillsSectionProps {
 
 /**
  * Quick Drills Section
- * Grid of brain training drills with unlock status and player stats.
+ * Grid of brain training drills with unlock status.
  */
-export default function QuickDrillsSection({ drillProgress = [] }: QuickDrillsSectionProps) {
+export default function QuickDrillsSection({ drillProgress: _drillProgress = [] }: QuickDrillsSectionProps) {
   const router = useRouter();
   const { theme } = useTheme();
   const { t, language } = useLanguage();
@@ -80,11 +80,6 @@ export default function QuickDrillsSection({ drillProgress = [] }: QuickDrillsSe
 
   // Get games played count from profile
   const gamesPlayed = profile?.total_games || 0;
-
-  // Helper to get drill progress by drill type
-  const getDrillStats = (drillId: DrillType): DrillProgress | undefined => {
-    return drillProgress.find(p => p.drillType === drillId);
-  };
 
   const handleDrillClick = (drill: Drill, isUnlocked: boolean) => {
     if (isUnlocked) {
@@ -103,12 +98,11 @@ export default function QuickDrillsSection({ drillProgress = [] }: QuickDrillsSe
         </h2>
 
         {/* 2-Column Grid Layout */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2">
           {DRILLS.map((drill, index) => {
             const Icon = drill.icon;
             const isUnlocked = gamesPlayed >= drill.unlockRequirement;
             const gamesRemaining = Math.max(0, drill.unlockRequirement - gamesPlayed);
-            const stats = getDrillStats(drill.id);
 
             const progressPercent = drill.unlockRequirement > 0
               ? Math.min(100, (gamesPlayed / drill.unlockRequirement) * 100)
@@ -123,7 +117,7 @@ export default function QuickDrillsSection({ drillProgress = [] }: QuickDrillsSe
                 onClick={() => handleDrillClick(drill, isUnlocked)}
                 disabled={!isUnlocked}
                 className={cn(
-                  'flex flex-col p-3 rounded-neo border-3 border-neo-black',
+                  'flex flex-col p-2 rounded-neo border-2 border-neo-black',
                   'w-full transition-all relative',
                   isUnlocked
                     ? 'shadow-hard-sm hover:translate-y-[-2px] hover:shadow-hard active:translate-y-[2px] active:shadow-none'
@@ -132,29 +126,29 @@ export default function QuickDrillsSection({ drillProgress = [] }: QuickDrillsSe
                 )}
               >
                 {/* Header row with icon and title */}
-                <div className="flex items-center gap-2 w-full mb-2">
+                <div className="flex items-center gap-1.5 w-full">
                   <div className={cn(
-                    'w-10 h-10 rounded-lg border-2 border-neo-black flex items-center justify-center relative shrink-0',
+                    'w-8 h-8 rounded-md border-2 border-neo-black flex items-center justify-center relative shrink-0',
                     drill.bgColor
                   )}>
-                    <Icon className="w-5 h-5 text-neo-black" />
+                    <Icon className="w-4 h-4 text-neo-black" />
                     {!isUnlocked && (
-                      <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
-                        <Lock className="w-4 h-4 text-white" />
+                      <div className="absolute inset-0 bg-black/50 rounded-md flex items-center justify-center">
+                        <Lock className="w-3 h-3 text-white" />
                       </div>
                     )}
                   </div>
 
                   <div className="flex flex-col items-start min-w-0 flex-1">
                     <p className={cn(
-                      'text-xs font-bold text-left line-clamp-1',
+                      'text-[11px] font-bold text-left line-clamp-1',
                       isDarkMode ? 'text-neo-white' : 'text-neo-black'
                     )}>
                       {t(`brain.drills.${drill.id}.name`)}
                     </p>
 
                     <p className={cn(
-                      'text-[9px] uppercase',
+                      'text-[8px] uppercase',
                       isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
                     )}>
                       {t(`brain.domains.${drill.domain}`)}
@@ -162,96 +156,11 @@ export default function QuickDrillsSection({ drillProgress = [] }: QuickDrillsSe
                   </div>
                 </div>
 
-                {/* Stats section for unlocked drills with progress */}
-                {isUnlocked && stats && stats.totalPlays > 0 && (
-                  <div className={cn(
-                    'w-full pt-2 mt-1 border-t',
-                    isDarkMode ? 'border-slate-600' : 'border-gray-200'
-                  )}>
-                    <div className="grid grid-cols-3 gap-1">
-                      {/* High Score */}
-                      <div className="flex flex-col items-center">
-                        <Trophy className={cn(
-                          'w-3 h-3 mb-0.5',
-                          isDarkMode ? 'text-neo-yellow' : 'text-yellow-500'
-                        )} />
-                        <p className={cn(
-                          'text-[10px] font-black',
-                          isDarkMode ? 'text-neo-white' : 'text-neo-black'
-                        )}>
-                          {stats.highScore}
-                        </p>
-                        <p className={cn(
-                          'text-[8px]',
-                          isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
-                        )}>
-                          {t('brain.drills.stats.best')}
-                        </p>
-                      </div>
-
-                      {/* Average Score */}
-                      <div className="flex flex-col items-center">
-                        <BarChart3 className={cn(
-                          'w-3 h-3 mb-0.5',
-                          isDarkMode ? 'text-neo-cyan' : 'text-cyan-500'
-                        )} />
-                        <p className={cn(
-                          'text-[10px] font-black',
-                          isDarkMode ? 'text-neo-white' : 'text-neo-black'
-                        )}>
-                          {Math.round(stats.avgScore)}
-                        </p>
-                        <p className={cn(
-                          'text-[8px]',
-                          isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
-                        )}>
-                          {t('brain.drills.stats.avg')}
-                        </p>
-                      </div>
-
-                      {/* Total Plays */}
-                      <div className="flex flex-col items-center">
-                        <Play className={cn(
-                          'w-3 h-3 mb-0.5',
-                          isDarkMode ? 'text-neo-green' : 'text-green-500'
-                        )} />
-                        <p className={cn(
-                          'text-[10px] font-black',
-                          isDarkMode ? 'text-neo-white' : 'text-neo-black'
-                        )}>
-                          {stats.totalPlays}
-                        </p>
-                        <p className={cn(
-                          'text-[8px]',
-                          isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
-                        )}>
-                          {t('brain.drills.stats.plays')}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* "Not played yet" for unlocked drills with no progress */}
-                {isUnlocked && (!stats || stats.totalPlays === 0) && (
-                  <div className={cn(
-                    'w-full pt-2 mt-1 border-t text-center',
-                    isDarkMode ? 'border-slate-600' : 'border-gray-200'
-                  )}>
-                    <p className={cn(
-                      'text-[10px] italic',
-                      isDarkMode ? 'text-neo-white/40' : 'text-neo-black/40'
-                    )}>
-                      {t('brain.drills.stats.notPlayed')}
-                    </p>
-                  </div>
-                )}
-
                 {/* Progress indicator for locked drills */}
                 {!isUnlocked && drill.unlockRequirement > 0 && (
-                  <div className="w-full mt-2">
+                  <div className="w-full mt-1.5">
                     <div className={cn(
-                      'h-1.5 rounded-full border border-neo-black overflow-hidden',
+                      'h-1 rounded-full border border-neo-black overflow-hidden',
                       isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
                     )}>
                       <motion.div
@@ -262,7 +171,7 @@ export default function QuickDrillsSection({ drillProgress = [] }: QuickDrillsSe
                       />
                     </div>
                     <p className={cn(
-                      'text-[9px] text-center mt-1 font-bold',
+                      'text-[8px] text-center mt-0.5 font-bold',
                       isDarkMode ? 'text-neo-white/60' : 'text-neo-black/60'
                     )}>
                       {gamesPlayed}/{drill.unlockRequirement} {t('brain.drills.gamesToUnlock')}

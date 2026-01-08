@@ -2,16 +2,14 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Shield, Smartphone, BarChart3, Mail, Eye, EyeOff, Loader2, X } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { Trophy, Shield, Smartphone, BarChart3, Mail, Eye, EyeOff, Loader2, X, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '../ui/button';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { signInWithGoogle, signInWithDiscord, signUpWithEmail, signInWithEmail } from '../../lib/supabase';
 import { cn } from '../../lib/utils';
-import { setPendingDailyResult } from '../../utils/dailyChallenge';
+import { setPendingDailyResult, type WordHuntResult } from '../../utils/dailyChallenge';
 import { validateEmail, validatePassword } from '../../utils/validation';
-import type { WordHuntResult } from '../../utils/dailyChallenge';
 import type { Language } from '@/types';
 
 // Brand icon SVG components
@@ -191,7 +189,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
       {onDismiss && (
         <button
           onClick={onDismiss}
-          className="absolute top-3 right-3 p-1.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+          className="absolute top-3 right-3 rtl:right-auto rtl:left-3 p-1.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
           aria-label="Dismiss"
         >
           <X className="w-4 h-4 text-gray-500" />
@@ -349,7 +347,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
