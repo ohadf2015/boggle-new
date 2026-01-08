@@ -2908,7 +2908,7 @@ export async function syncGuestDailyResultsToAccount(
           continue;
         }
 
-        if (result.solved === undefined || !result.attemptsUsed || !result.targetWord || !Array.isArray(result.attempts)) {
+        if (result.solved === undefined || result.attemptsUsed === undefined || !result.targetWord || !Array.isArray(result.attempts)) {
           console.warn(`[Sync] Skipping malformed result for ${puzzleDate} (${language}):`, {
             solved: result.solved,
             attemptsUsed: result.attemptsUsed,
@@ -2965,7 +2965,8 @@ export async function syncGuestDailyResultsToAccount(
           console.warn(`[Sync] Failed to sync result for ${puzzleDate} (${language}):`, errorText);
         }
       } catch (err) {
-        console.warn(`[Sync] Error syncing result for ${puzzleDate} (${language}):`, err);
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        console.warn(`[Sync] Error syncing result for ${puzzleDate} (${language}):`, errorMessage);
       }
     }
 

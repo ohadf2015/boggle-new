@@ -36,7 +36,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ words });
   } catch (error) {
-    console.error('Error getting random words:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error getting random words:', errorMessage);
     return NextResponse.json(
       { error: 'Failed to get random words' },
       { status: 500 }

@@ -128,12 +128,20 @@ async function fetchRandomWords(
     });
     const response = await fetch(`/api/drills/random-words?${params}`);
     if (!response.ok) {
-      throw new Error('Failed to fetch random words');
+      let errorDetails = '';
+      try {
+        const errorData = await response.json();
+        errorDetails = errorData.error || '';
+      } catch {
+        // Response wasn't JSON
+      }
+      throw new Error(`Failed to fetch random words: ${response.status} ${response.statusText}${errorDetails ? ` - ${errorDetails}` : ''}`);
     }
     const data = await response.json();
     return data.words || [];
   } catch (error) {
-    console.error('Error fetching random words:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error fetching random words:', errorMessage);
     return [];
   }
 }
