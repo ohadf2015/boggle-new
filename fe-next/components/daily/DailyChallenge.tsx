@@ -744,7 +744,15 @@ const DailyChallenge: React.FC = () => {
           </motion.div>
         )}
 
-        {phase === 'ready' && (
+        {phase === 'ready' && !isAuthenticated && (
+          <WordHuntLoginGate
+            puzzleNumber={puzzleNumber}
+            puzzleDate={puzzleDate}
+            onBack={handleBack}
+          />
+        )}
+
+        {phase === 'ready' && isAuthenticated && (
           <DailyReadyScreen
             puzzleNumber={puzzleNumber}
             puzzleDate={puzzleDate}
