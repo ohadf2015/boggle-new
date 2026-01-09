@@ -35,7 +35,7 @@ export function useTvFullscreen({
 
   // Check if fullscreen is supported
   const isSupported = typeof document !== 'undefined' &&
-    (document.fullscreenEnabled ||
+    !!(document.fullscreenEnabled ||
      (document as Document & { webkitFullscreenEnabled?: boolean }).webkitFullscreenEnabled ||
      (document as Document & { mozFullScreenEnabled?: boolean }).mozFullScreenEnabled ||
      (document as Document & { msFullscreenEnabled?: boolean }).msFullscreenEnabled);
