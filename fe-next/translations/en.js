@@ -3889,6 +3889,53 @@ const en = {
   "levelUp": {
     "title": "Level Up!",
     "reached": "You reached level {level}!"
+  },
+  "ui": {
+    "empty": {
+      "noWordsYet": "Start finding words!",
+      "noWordsYetHint": "Swipe across the letters to form words",
+      "waitingForPlayers": "Waiting for players...",
+      "waitingForPlayersHint": "Share the room code to invite friends",
+      "noGamesPlayed": "No games yet",
+      "noGamesPlayedHint": "Play a game to see your stats"
+    },
+    "loading": {
+      "findingWords": "Finding words...",
+      "connectingPlayers": "Connecting players...",
+      "preparingGame": "Preparing game..."
+    },
+    "combo": {
+      "tierUp": {
+        "rare": "RARE COMBO!",
+        "epic": "EPIC COMBO!",
+        "legendary": "LEGENDARY!",
+        "mythic": "MYTHIC!!!"
+      }
+    },
+    "score": {
+      "milestone": {
+        "50": "Nice start!",
+        "100": "Triple digits!",
+        "150": "On fire!",
+        "200": "Word wizard!",
+        "300": "Unstoppable!",
+        "500": "LEGENDARY!"
+      }
+    },
+    "word": {
+      "reject": {
+        "tooShort": "Too short!",
+        "notInDictionary": "Not a word",
+        "alreadyFound": "Already found!",
+        "notOnBoard": "Not on board"
+      }
+    },
+    "results": {
+      "drumRoll": "And the winner is...",
+      "yourScore": "Your Score",
+      "newPersonalBest": "New Personal Best!",
+      "almostThere": "So close! Just {{points}} points away"
+    }
   }
 };
 

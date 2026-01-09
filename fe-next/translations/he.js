@@ -3868,6 +3868,53 @@ const he = {
   "levelUp": {
     "title": "עלית רמה!",
     "reached": "הגעת לרמה {level}!"
+  },
+  "ui": {
+    "empty": {
+      "noWordsYet": "התחילו למצוא מילים!",
+      "noWordsYetHint": "החליקו על האותיות כדי ליצור מילים",
+      "waitingForPlayers": "מחכים לשחקנים...",
+      "waitingForPlayersHint": "שתפו את קוד החדר כדי להזמין חברים",
+      "noGamesPlayed": "עדיין אין משחקים",
+      "noGamesPlayedHint": "שחקו משחק כדי לראות את הסטטיסטיקות"
+    },
+    "loading": {
+      "findingWords": "מחפשים מילים...",
+      "connectingPlayers": "מחברים שחקנים...",
+      "preparingGame": "מכינים את המשחק..."
+    },
+    "combo": {
+      "tierUp": {
+        "rare": "קומבו נדיר!",
+        "epic": "קומבו אפי!",
+        "legendary": "אגדי!",
+        "mythic": "מיתי!!!"
+      }
+    },
+    "score": {
+      "milestone": {
+        "50": "התחלה טובה!",
+        "100": "שלוש ספרות!",
+        "150": "בוערים!",
+        "200": "קוסם מילים!",
+        "300": "בלתי ניתן לעצירה!",
+        "500": "אגדי!"
+      }
+    },
+    "word": {
+      "reject": {
+        "tooShort": "קצר מדי!",
+        "notInDictionary": "לא מילה",
+        "alreadyFound": "כבר נמצאה!",
+        "notOnBoard": "לא על הלוח"
+      }
+    },
+    "results": {
+      "drumRoll": "והמנצח הוא...",
+      "yourScore": "הניקוד שלך",
+      "newPersonalBest": "שיא אישי חדש!",
+      "almostThere": "כמעט! רק {{points}} נקודות"
+    }
   }
 };
 

@@ -3867,6 +3867,53 @@ const sv = {
   "levelUp": {
     "title": "Nivå Upp!",
     "reached": "Du nådde nivå {level}!"
+  },
+  "ui": {
+    "empty": {
+      "noWordsYet": "Börja hitta ord!",
+      "noWordsYetHint": "Svep över bokstäverna för att bilda ord",
+      "waitingForPlayers": "Väntar på spelare...",
+      "waitingForPlayersHint": "Dela rumskoden för att bjuda in vänner",
+      "noGamesPlayed": "Inga spel ännu",
+      "noGamesPlayedHint": "Spela ett spel för att se din statistik"
+    },
+    "loading": {
+      "findingWords": "Letar efter ord...",
+      "connectingPlayers": "Ansluter spelare...",
+      "preparingGame": "Förbereder spelet..."
+    },
+    "combo": {
+      "tierUp": {
+        "rare": "SÄLLSYNT COMBO!",
+        "epic": "EPISK COMBO!",
+        "legendary": "LEGENDARISK!",
+        "mythic": "MYTISK!!!"
+      }
+    },
+    "score": {
+      "milestone": {
+        "50": "Bra start!",
+        "100": "Tresiffriga!",
+        "150": "Du brinner!",
+        "200": "Ordtrollkarl!",
+        "300": "Ostoppbar!",
+        "500": "LEGENDARISK!"
+      }
+    },
+    "word": {
+      "reject": {
+        "tooShort": "För kort!",
+        "notInDictionary": "Inte ett ord",
+        "alreadyFound": "Redan hittad!",
+        "notOnBoard": "Inte på brädet"
+      }
+    },
+    "results": {
+      "drumRoll": "Och vinnaren är...",
+      "yourScore": "Din poäng",
+      "newPersonalBest": "Nytt personligt rekord!",
+      "almostThere": "Så nära! Bara {{points}} poäng kvar"
+    }
   }
 };
 

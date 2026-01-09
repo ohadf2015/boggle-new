@@ -224,6 +224,86 @@ module.exports = {
           "0%": { transform: "translate(0, 0)", boxShadow: "4px 4px 0px rgb(var(--neo-black))" },
           "100%": { transform: "translate(2px, 2px)", boxShadow: "2px 2px 0px rgb(var(--neo-black))" },
         },
+        // Enhanced button press with bounce
+        "neo-press-bounce": {
+          "0%": { transform: "translate(0, 0) rotate(0deg)", boxShadow: "4px 4px 0px rgb(var(--neo-black))" },
+          "40%": { transform: "translate(3px, 3px) rotate(-1deg)", boxShadow: "1px 1px 0px rgb(var(--neo-black))" },
+          "60%": { transform: "translate(1px, 1px) rotate(0.5deg)", boxShadow: "3px 3px 0px rgb(var(--neo-black))" },
+          "100%": { transform: "translate(0, 0) rotate(0deg)", boxShadow: "4px 4px 0px rgb(var(--neo-black))" },
+        },
+        // Floating animation for decorative elements
+        "float": {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        // Gentle bobbing with rotation
+        "bob": {
+          "0%, 100%": { transform: "translateY(0px) rotate(-1deg)" },
+          "50%": { transform: "translateY(-5px) rotate(1deg)" },
+        },
+        // Score pop animation
+        "score-pop": {
+          "0%": { transform: "scale(1)" },
+          "40%": { transform: "scale(1.3)" },
+          "100%": { transform: "scale(1)" },
+        },
+        // Shimmer effect for skeletons
+        "shimmer": {
+          "0%": { backgroundPosition: "200% 0" },
+          "100%": { backgroundPosition: "-200% 0" },
+        },
+        // Screen shake for emphasis
+        "screen-shake": {
+          "0%, 100%": { transform: "translateX(0)" },
+          "20%": { transform: "translateX(-3px)" },
+          "40%": { transform: "translateX(3px)" },
+          "60%": { transform: "translateX(-2px)" },
+          "80%": { transform: "translateX(2px)" },
+        },
+        // Celebration burst
+        "burst": {
+          "0%": { transform: "scale(0)", opacity: "1" },
+          "50%": { transform: "scale(1.2)", opacity: "0.8" },
+          "100%": { transform: "scale(1.5)", opacity: "0" },
+        },
+        // Coin cascade for rewards
+        "coin-fall": {
+          "0%": { transform: "translateY(0) rotate(0deg)", opacity: "1" },
+          "100%": { transform: "translateY(-60px) rotate(180deg)", opacity: "0" },
+        },
+        // Tier flash effect
+        "tier-flash": {
+          "0%": { transform: "scale(0.8)", opacity: "0" },
+          "50%": { transform: "scale(1.3)", opacity: "1" },
+          "100%": { transform: "scale(1)", opacity: "0" },
+        },
+        // Enhanced shake with rotation
+        "shake-rotate": {
+          "0%, 100%": { transform: "translateX(0) rotate(0deg)" },
+          "20%": { transform: "translateX(-8px) rotate(-2deg)" },
+          "40%": { transform: "translateX(8px) rotate(2deg)" },
+          "60%": { transform: "translateX(-5px) rotate(-1deg)" },
+          "80%": { transform: "translateX(5px) rotate(1deg)" },
+        },
+        // Letter bounce for loader
+        "letter-bounce": {
+          "0%, 100%": { transform: "translateY(0) rotate(0deg)" },
+          "30%": { transform: "translateY(-15px) rotate(-5deg)" },
+          "50%": { transform: "translateY(-15px) rotate(5deg)" },
+          "70%": { transform: "translateY(0) rotate(-2deg)" },
+        },
+        // Parallax drift
+        "drift": {
+          "0%, 100%": { transform: "translateX(0) translateY(0)" },
+          "25%": { transform: "translateX(5px) translateY(-3px)" },
+          "50%": { transform: "translateX(0) translateY(-5px)" },
+          "75%": { transform: "translateX(-5px) translateY(-3px)" },
+        },
+        // Sparkle twinkle
+        "twinkle": {
+          "0%, 100%": { opacity: "0.3", transform: "scale(0.8)" },
+          "50%": { opacity: "1", transform: "scale(1.2)" },
+        },
         "neo-wobble": {
           "0%, 100%": { transform: "rotate(-2deg)" },
           "50%": { transform: "rotate(2deg)" },
@@ -296,6 +376,20 @@ module.exports = {
         // Fast animations for landing page optimization
         "fade-in-fast": "fade-in-fast 0.15s ease-out forwards",
         "fade-in-up": "fade-in-up 0.3s ease-out 0.2s both",
+        // Playful UI animations
+        "neo-press-bounce": "neo-press-bounce 0.25s ease-out",
+        "float": "float 3s ease-in-out infinite",
+        "bob": "bob 2.5s ease-in-out infinite",
+        "score-pop": "score-pop 0.3s ease-out",
+        "shimmer": "shimmer 2s linear infinite",
+        "screen-shake": "screen-shake 0.4s ease-in-out",
+        "burst": "burst 0.5s ease-out forwards",
+        "coin-fall": "coin-fall 0.6s ease-out forwards",
+        "tier-flash": "tier-flash 0.4s ease-out forwards",
+        "shake-rotate": "shake-rotate 0.5s ease-in-out",
+        "letter-bounce": "letter-bounce 0.6s ease-in-out infinite",
+        "drift": "drift 6s ease-in-out infinite",
+        "twinkle": "twinkle 2s ease-in-out infinite",
       },
       // Custom rotation values for tilts
       rotate: {

@@ -3866,6 +3866,53 @@ const ja = {
   "levelUp": {
     "title": "レベルアップ!",
     "reached": "レベル{level}に到達!"
+  },
+  "ui": {
+    "empty": {
+      "noWordsYet": "単語を見つけよう!",
+      "noWordsYetHint": "文字をスワイプして単語を作ろう",
+      "waitingForPlayers": "プレイヤーを待っています...",
+      "waitingForPlayersHint": "ルームコードを共有して友達を招待しよう",
+      "noGamesPlayed": "まだゲームがありません",
+      "noGamesPlayedHint": "ゲームをプレイして統計を見よう"
+    },
+    "loading": {
+      "findingWords": "単語を探しています...",
+      "connectingPlayers": "プレイヤーを接続中...",
+      "preparingGame": "ゲームを準備中..."
+    },
+    "combo": {
+      "tierUp": {
+        "rare": "レアコンボ!",
+        "epic": "エピックコンボ!",
+        "legendary": "レジェンダリー!",
+        "mythic": "ミシック!!!"
+      }
+    },
+    "score": {
+      "milestone": {
+        "50": "いい調子!",
+        "100": "3桁突破!",
+        "150": "絶好調!",
+        "200": "言葉の魔術師!",
+        "300": "止められない!",
+        "500": "レジェンダリー!"
+      }
+    },
+    "word": {
+      "reject": {
+        "tooShort": "短すぎます!",
+        "notInDictionary": "単語ではありません",
+        "alreadyFound": "既に見つかっています!",
+        "notOnBoard": "ボードにありません"
+      }
+    },
+    "results": {
+      "drumRoll": "そして勝者は...",
+      "yourScore": "あなたのスコア",
+      "newPersonalBest": "自己ベスト更新!",
+      "almostThere": "惜しい！あと{{points}}ポイント"
+    }
   }
 };
 

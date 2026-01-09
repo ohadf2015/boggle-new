@@ -1,22 +1,76 @@
 'use client';
 
-import React, { useEffect, useState, lazy, Suspense } from 'react';
+import React, { useEffect, useState, lazy, Suspense, memo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
-import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Sparkles, Star } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { useMouseParallax } from '@/hooks/useTiltEffect';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import ModeCard from './ModeCard';
 import TutorialPrompt from './TutorialPrompt';
 import Header from '@/components/Header';
 import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
+
+/**
+ * Floating decorative elements for visual playfulness
+ * Performance-gated - only renders on capable devices
+ */
+const FloatingDecorations = memo(function FloatingDecorations() {
+  const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
+
+  if (prefersReducedMotion || !enableComplexAnimations) return null;
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-0" aria-hidden="true">
+      {/* Floating stars */}
+      <motion.div
+        className="absolute top-[15%] left-[10%] text-neo-yellow/30"
+        animate={{ y: [0, -10, 0], rotate: [0, 10, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        <Star className="w-6 h-6 fill-current" />
+      </motion.div>
+      <motion.div
+        className="absolute top-[25%] right-[15%] text-neo-pink/30"
+        animate={{ y: [0, -8, 0], rotate: [0, -15, 0] }}
+        transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+      >
+        <Sparkles className="w-5 h-5" />
+      </motion.div>
+      <motion.div
+        className="absolute bottom-[30%] left-[8%] text-neo-cyan/25"
+        animate={{ y: [0, -12, 0], rotate: [0, 20, 0] }}
+        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+      >
+        <Star className="w-4 h-4 fill-current" />
+      </motion.div>
+      <motion.div
+        className="absolute top-[40%] right-[8%] text-neo-yellow/20"
+        animate={{ y: [0, -6, 0], scale: [1, 1.1, 1] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
+      >
+        <Sparkles className="w-4 h-4" />
+      </motion.div>
+      <motion.div
+        className="absolute bottom-[20%] right-[20%] text-neo-pink/20"
+        animate={{ y: [0, -10, 0], rotate: [0, -10, 0] }}
+        transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+      >
+        <Star className="w-5 h-5 fill-current" />
+      </motion.div>
+    </div>
+  );
+});
 
 // Lazy load DailyChallengeBanner - not critical for initial paint
 const DailyChallengeBanner = lazy(() => import('@/components/daily/DailyChallengeBanner'));
@@ -42,6 +96,9 @@ const LandingView: React.FC = () => {
   const { isAuthenticated, needsProfileCustomization, profile, updateProfile } = useAuth();
   const isLandscape = useMobileLandscape();
   const liveRoomStats = useLiveRoomStats();
+
+  // Mouse-based parallax for hero section
+  const mouseParallax = useMouseParallax(15);
 
   // Pull-to-refresh for room stats
   const { pullToRefreshHandlers, pullState } = usePullToRefresh({
@@ -148,6 +205,9 @@ const LandingView: React.FC = () => {
       className={`flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative ${isLandscape ? 'landscape-full-height' : ''}`}
       {...pullToRefreshHandlers}
     >
+      {/* Floating decorative elements */}
+      {!isLandscape && <FloatingDecorations />}
+
       {/* Pull-to-refresh indicator */}
       <PullToRefreshIndicator
         pullDistance={pullState.pullDistance}
@@ -174,14 +234,19 @@ const LandingView: React.FC = () => {
       <main className={`w-full max-w-7xl mx-auto overflow-x-hidden ${isLandscape ? 'flex-1 flex flex-col justify-center px-4 py-2' : 'px-2 sm:px-3 lg:px-6 xl:px-8 py-2 sm:py-3 lg:py-6 pb-40 lg:pb-6'}`}>
         {/* Hero section - compact (hidden in landscape) - CSS animation for instant paint */}
         {!isLandscape && (
-          <div className="text-center mb-2 sm:mb-3 lg:mb-6 xl:mb-8 animate-fade-in-fast">
+          <motion.div
+            className="text-center mb-2 sm:mb-3 lg:mb-6 xl:mb-8 animate-fade-in-fast relative z-10"
+            style={{
+              transform: `translate(${mouseParallax.x * 0.3}px, ${mouseParallax.y * 0.3}px)`,
+            }}
+          >
             <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl xl:text-6xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white mb-1 sm:mb-2 lg:mb-3">
               {t('landing.chooseMode') || 'Choose Your Mode'}
             </h1>
             <p className="text-sm sm:text-base lg:text-xl xl:text-2xl font-medium text-neo-black/80 dark:text-neo-white/85">
               {t('landing.subtitleSimple') || 'Practice solo or challenge friends'}
             </p>
-          </div>
+          </motion.div>
         )}
 
         {/* Tutorial Prompt - Non-intrusive banner for first-time visitors (hidden in landscape) */}

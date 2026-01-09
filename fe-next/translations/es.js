@@ -3864,6 +3864,53 @@ const es = {
   "levelUp": {
     "title": "¡Subiste de Nivel!",
     "reached": "¡Llegaste al nivel {level}!"
+  },
+  "ui": {
+    "empty": {
+      "noWordsYet": "¡Empieza a encontrar palabras!",
+      "noWordsYetHint": "Desliza sobre las letras para formar palabras",
+      "waitingForPlayers": "Esperando jugadores...",
+      "waitingForPlayersHint": "Comparte el código de la sala para invitar amigos",
+      "noGamesPlayed": "Aún no hay juegos",
+      "noGamesPlayedHint": "Juega una partida para ver tus estadísticas"
+    },
+    "loading": {
+      "findingWords": "Buscando palabras...",
+      "connectingPlayers": "Conectando jugadores...",
+      "preparingGame": "Preparando el juego..."
+    },
+    "combo": {
+      "tierUp": {
+        "rare": "¡COMBO RARO!",
+        "epic": "¡COMBO ÉPICO!",
+        "legendary": "¡LEGENDARIO!",
+        "mythic": "¡¡¡MÍTICO!!!"
+      }
+    },
+    "score": {
+      "milestone": {
+        "50": "¡Buen comienzo!",
+        "100": "¡Tres dígitos!",
+        "150": "¡En llamas!",
+        "200": "¡Mago de las palabras!",
+        "300": "¡Imparable!",
+        "500": "¡LEGENDARIO!"
+      }
+    },
+    "word": {
+      "reject": {
+        "tooShort": "¡Muy corta!",
+        "notInDictionary": "No es una palabra",
+        "alreadyFound": "¡Ya la encontraste!",
+        "notOnBoard": "No está en el tablero"
+      }
+    },
+    "results": {
+      "drumRoll": "Y el ganador es...",
+      "yourScore": "Tu puntuación",
+      "newPersonalBest": "¡Nuevo récord personal!",
+      "almostThere": "¡Tan cerca! Solo {{points}} puntos más"
+    }
   }
 };
 
