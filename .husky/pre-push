@@ -14,7 +14,7 @@ LINT_FILES=$(git -C .. diff --name-only --diff-filter=d origin/master...HEAD 2>/
 if [ -z "$LINT_FILES" ]; then
   echo "ℹ️  No relevant file changes detected, skipping lint"
 else
-  if ! npx eslint $LINT_FILES --max-warnings=0 2>/dev/null; then
+  if ! npx eslint $LINT_FILES --fix --max-warnings=0 2>/dev/null; then
     echo ""
     echo "❌ Lint failed. Please fix the issues above before pushing."
     exit 1

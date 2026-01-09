@@ -91,6 +91,7 @@ export function XpBarAnimated({
   const [isLevelingUp, setIsLevelingUp] = useState(false);
   const prevLevelRef = useRef(level);
   const animationRef = useRef<number | null>(null);
+  const displayXpRef = useRef(displayXp);
 
   const colors = COLOR_SCHEMES[colorScheme];
   const percentage = Math.min((displayXp / maxXp) * 100, 100);
@@ -106,10 +107,11 @@ export function XpBarAnimated({
   useEffect(() => {
     if (prefersReducedMotion) {
       setDisplayXp(currentXp);
+      displayXpRef.current = currentXp;
       return;
     }
 
-    const startXp = displayXp;
+    const startXp = displayXpRef.current;
     const diff = currentXp - startXp;
     if (diff === 0) return;
 
@@ -127,7 +129,9 @@ export function XpBarAnimated({
       const progress = Math.min(elapsed / duration, 1);
       const easeProgress = 1 - Math.pow(1 - progress, 3);
 
-      setDisplayXp(Math.round(startXp + diff * easeProgress));
+      const newValue = Math.round(startXp + diff * easeProgress);
+      setDisplayXp(newValue);
+      displayXpRef.current = newValue;
 
       if (progress < 1) {
         animationRef.current = requestAnimationFrame(animate);

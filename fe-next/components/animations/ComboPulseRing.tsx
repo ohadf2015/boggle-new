@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, memo } from 'react';
+import React, { useEffect, useState, memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
@@ -81,7 +81,7 @@ export const ComboPulseRing = memo(function ComboPulseRing({
   const config = INTENSITY_CONFIG[intensity];
   const actualRingCount = ringCount ?? config.ringCount;
   const actualMaxRadius = maxRadius ?? config.maxRadius;
-  const colors = color ? [color] : config.colors;
+  const colors = useMemo(() => color ? [color] : config.colors, [color, config.colors]);
 
   // Generate rings on trigger
   useEffect(() => {

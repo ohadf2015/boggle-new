@@ -36,26 +36,20 @@ export function useTvFullscreen({
   // Check if fullscreen is supported
   const isSupported = typeof document !== 'undefined' &&
     (document.fullscreenEnabled ||
-     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-     (document as any).webkitFullscreenEnabled ||
-     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-     (document as any).mozFullScreenEnabled ||
-     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-     (document as any).msFullscreenEnabled);
+     (document as Document & { webkitFullscreenEnabled?: boolean }).webkitFullscreenEnabled ||
+     (document as Document & { mozFullScreenEnabled?: boolean }).mozFullScreenEnabled ||
+     (document as Document & { msFullscreenEnabled?: boolean }).msFullscreenEnabled);
 
   // Get the fullscreen element (cross-browser)
   const getFullscreenElement = useCallback((): Element | null => {
     if (typeof document === 'undefined') return null;
-    return (
-      document.fullscreenElement ||
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (document as any).webkitFullscreenElement ||
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (document as any).mozFullScreenElement ||
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (document as any).msFullscreenElement ||
-      null
-    );
+    type FullscreenDocument = Document & {
+      webkitFullscreenElement?: Element;
+      mozFullScreenElement?: Element;
+      msFullscreenElement?: Element;
+    };
+    const doc = document as FullscreenDocument;
+    return doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement || null;
   }, []);
 
   // Update state based on actual fullscreen status
@@ -70,22 +64,22 @@ export function useTvFullscreen({
     if (!enabled || !isSupported) return;
 
     const element = containerRef.current || document.documentElement;
+    type FullscreenElement = HTMLElement & {
+      webkitRequestFullscreen?: () => Promise<void>;
+      mozRequestFullScreen?: () => Promise<void>;
+      msRequestFullscreen?: () => Promise<void>;
+    };
+    const el = element as FullscreenElement;
 
     try {
-      if (element.requestFullscreen) {
-        await element.requestFullscreen();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } else if ((element as any).webkitRequestFullscreen) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (element as any).webkitRequestFullscreen();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } else if ((element as any).mozRequestFullScreen) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (element as any).mozRequestFullScreen();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } else if ((element as any).msRequestFullscreen) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (element as any).msRequestFullscreen();
+      if (el.requestFullscreen) {
+        await el.requestFullscreen();
+      } else if (el.webkitRequestFullscreen) {
+        await el.webkitRequestFullscreen();
+      } else if (el.mozRequestFullScreen) {
+        await el.mozRequestFullScreen();
+      } else if (el.msRequestFullscreen) {
+        await el.msRequestFullscreen();
       }
     } catch (error) {
       console.error('Failed to enter fullscreen:', error);
@@ -96,21 +90,22 @@ export function useTvFullscreen({
   const exitFullscreen = useCallback(async () => {
     if (!enabled) return;
 
+    type FullscreenDocument = Document & {
+      webkitExitFullscreen?: () => Promise<void>;
+      mozCancelFullScreen?: () => Promise<void>;
+      msExitFullscreen?: () => Promise<void>;
+    };
+    const doc = document as FullscreenDocument;
+
     try {
-      if (document.exitFullscreen) {
-        await document.exitFullscreen();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } else if ((document as any).webkitExitFullscreen) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (document as any).webkitExitFullscreen();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } else if ((document as any).mozCancelFullScreen) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (document as any).mozCancelFullScreen();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } else if ((document as any).msExitFullscreen) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (document as any).msExitFullscreen();
+      if (doc.exitFullscreen) {
+        await doc.exitFullscreen();
+      } else if (doc.webkitExitFullscreen) {
+        await doc.webkitExitFullscreen();
+      } else if (doc.mozCancelFullScreen) {
+        await doc.mozCancelFullScreen();
+      } else if (doc.msExitFullscreen) {
+        await doc.msExitFullscreen();
       }
     } catch (error) {
       console.error('Failed to exit fullscreen:', error);
