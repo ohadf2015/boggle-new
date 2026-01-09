@@ -27,7 +27,7 @@ jest.mock('../../../contexts/LanguageContext', () => ({
 // Mock framer-motion - comprehensive mock for all motion components
 jest.mock('framer-motion', () => {
   const createMotionComponent = (Tag: string) => {
-    return React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<Element>) => {
+    const Component = React.forwardRef(({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>, ref: React.Ref<Element>) => {
       // Filter out framer-motion specific props
       const {
         animate, initial, exit, transition, whileHover, whileTap, variants,
@@ -38,6 +38,8 @@ jest.mock('framer-motion', () => {
       const cleanStyle = typeof style === 'object' ? style : undefined;
       return React.createElement(Tag, { ...domProps, style: cleanStyle, ref }, children);
     });
+    Component.displayName = `motion.${Tag}`;
+    return Component;
   };
 
   return {
