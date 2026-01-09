@@ -79,7 +79,8 @@ describe('QuickDrillsSection', () => {
       const { container } = render(<QuickDrillsSection />);
 
       // Icon containers should have responsive sizing (md:w-12 or similar)
-      const iconContainers = container.querySelectorAll('.border-neo-black.flex.items-center.justify-center');
+      // Use rounded-md selector to target drill icons specifically (not DrillUnlockProgress which uses rounded-neo)
+      const iconContainers = container.querySelectorAll('.rounded-md.border-neo-black.flex.items-center.justify-center');
       expect(iconContainers.length).toBeGreaterThan(0);
 
       const firstIconContainer = iconContainers[0];
