@@ -133,6 +133,8 @@ const ja = {
     "advancedSettings": "その他",
     "yourScore": "あなたのスコア",
     "tapToDismiss": "タップで閉じる",
+    "tapToClose": "タップで続行",
+    "tapToContinue": "タップで次へ",
     "copied": "コピー完了！",
     "copy": "コピー",
     "copyCode": "コピー",
@@ -827,6 +829,8 @@ const ja = {
     "earthquake": "地震!",
     "fireRound": "ファイアラウンド",
     "twoXPoints": "2倍ポイント",
+    "enterFullscreen": "フルスクリーンに切替",
+    "exitFullscreen": "フルスクリーン終了",
     "host": "ホスト",
     "hostBadge": "このプレイヤーはホストです",
     "moreNotifications": "+{{count}}件",
@@ -1213,6 +1217,7 @@ const ja = {
     "bestScore": "最高",
     "average": "平均",
     "games": "ゲーム",
+    "trend": "トレンド",
     "trendUp": "上達中！",
     "trendDown": "頑張れ！",
     "trendStable": "安定",
@@ -3566,6 +3571,13 @@ const ja = {
     "pressQuestion": "? で全ショートカット表示",
     "gotIt": "了解！"
   },
+  "keyboardDesktopBadge": {
+    "typeWords": "単語を入力",
+    "pressQuestion": "? でショートカット"
+  },
+  "enterKeyHint": {
+    "pressEnter": "Enterで送信"
+  },
   "emailPreferences": {
     "title": "デイリーパズル通知",
     "sendingTo": "送信先",
@@ -3672,6 +3684,7 @@ const ja = {
     "radarChart": "認知レーダー",
     "currentScores": "現在のスコア",
     "gamesAnalyzed": "分析ゲーム数",
+    "activitiesAnalyzed": "アクティビティ",
     "toNextTier": "まで",
     "newBadge": "新着!",
     "firstGameComplete": "認知ベースライン確立！",
@@ -3681,6 +3694,7 @@ const ja = {
     "playAgain": "もう一度",
     "drills": {
       "title": "脳トレドリル",
+      "brainTraining": "脳トレ",
       "round": "ラウンド",
       "level": "レベル",
       "start": "スタート",
@@ -3790,6 +3804,10 @@ const ja = {
     "peakScore": "最高",
     "gamesPlayed": "ゲーム",
     "drillsCompleted": "ドリル"
+  },
+  "levelUp": {
+    "title": "レベルアップ!",
+    "reached": "レベル{level}に到達!"
   }
 };
 

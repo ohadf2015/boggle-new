@@ -238,6 +238,7 @@ export async function POST(request: NextRequest) {
         tier: newTier,
         domainScores: currentDomainScores,
         scoreDelta: newOverallScore - currentBrainScore.overall_score,
+        targetDomain,
       };
     } else {
       // Create new brain score with only the target domain set
@@ -280,6 +281,7 @@ export async function POST(request: NextRequest) {
         tier: newTier,
         domainScores: initialDomainScores,
         scoreDelta: newOverallScore,
+        targetDomain,
       };
     }
 

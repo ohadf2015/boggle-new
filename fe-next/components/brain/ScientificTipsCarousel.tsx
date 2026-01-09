@@ -29,8 +29,9 @@ export default function ScientificTipsCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const { theme } = useTheme();
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const isDarkMode = theme === 'dark';
+  const isRTL = dir === 'rtl';
 
   // Auto-rotate every 5 seconds
   useEffect(() => {
@@ -123,7 +124,7 @@ export default function ScientificTipsCarousel() {
           isDarkMode ? 'bg-slate-800/50' : 'bg-neo-cream/50'
         )}>
           <button
-            onClick={goToPrevious}
+            onClick={isRTL ? goToNext : goToPrevious}
             className={cn(
               'p-1.5 rounded-lg border-2 border-neo-black transition-all',
               'hover:translate-y-[-1px] hover:shadow-hard-sm active:translate-y-[1px]',
@@ -137,21 +138,21 @@ export default function ScientificTipsCarousel() {
           </button>
 
           {/* Dots */}
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-1.5">
             {TIPS.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setActiveIndex(index)}
                 aria-label={`Go to tip ${index + 1}`}
                 className={cn(
-                  'w-2.5 h-2.5 rounded-full border-2 border-neo-black transition-all duration-300',
+                  'w-1.5 h-1.5 rounded-full border border-neo-black transition-all duration-300',
                   index === activeIndex
                     ? cn(
-                        'scale-125 shadow-[2px_2px_0px_rgb(0,0,0)]',
+                        'scale-150 shadow-[1px_1px_0px_rgb(0,0,0)]',
                         isDarkMode ? 'bg-neo-yellow' : 'bg-neo-purple'
                       )
                     : cn(
-                        'hover:scale-110',
+                        'hover:scale-125',
                         isDarkMode ? 'bg-slate-600 hover:bg-slate-500' : 'bg-gray-300 hover:bg-gray-400'
                       )
                 )}
@@ -160,7 +161,7 @@ export default function ScientificTipsCarousel() {
           </div>
 
           <button
-            onClick={goToNext}
+            onClick={isRTL ? goToPrevious : goToNext}
             className={cn(
               'p-1.5 rounded-lg border-2 border-neo-black transition-all',
               'hover:translate-y-[-1px] hover:shadow-hard-sm active:translate-y-[1px]',

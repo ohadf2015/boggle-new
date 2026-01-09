@@ -12,6 +12,7 @@ interface BrainScoreHeroProps {
   tier: 'novice' | 'apprentice' | 'intermediate' | 'advanced' | 'expert' | 'master';
   tierProgress: number;
   gamesAnalyzed: number;
+  drillsCompleted?: number;
 }
 
 const TIER_CONFIG = {
@@ -31,13 +32,17 @@ export default function BrainScoreHero({
   score,
   tier,
   tierProgress,
-  gamesAnalyzed
+  gamesAnalyzed,
+  drillsCompleted = 0
 }: BrainScoreHeroProps) {
   const { theme } = useTheme();
   const { t } = useLanguage();
   const isDarkMode = theme === 'dark';
   const tierConfig = TIER_CONFIG[tier];
   const nextTier = tierConfig.next;
+
+  // Total activities combines both games and drills for brain score
+  const totalActivities = gamesAnalyzed + drillsCompleted;
 
   return (
     <div className={cn(
@@ -95,7 +100,7 @@ export default function BrainScoreHero({
           </div>
         </div>
 
-        {/* Games Analyzed Badge */}
+        {/* Activities Analyzed Badge */}
         <div className={cn(
           'text-right px-4 py-2 rounded-neo border-2 border-neo-black',
           isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
@@ -104,13 +109,13 @@ export default function BrainScoreHero({
             'text-xs font-bold uppercase',
             isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
           )}>
-            {t('brain.gamesAnalyzed')}
+            {t('brain.activitiesAnalyzed')}
           </p>
           <p className={cn(
             'text-2xl font-black',
             isDarkMode ? 'text-neo-cyan' : 'text-neo-purple'
           )}>
-            {gamesAnalyzed}
+            {totalActivities}
           </p>
         </div>
       </div>

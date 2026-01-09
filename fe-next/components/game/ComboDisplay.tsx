@@ -66,8 +66,8 @@ const Sparkle = memo<{
 Sparkle.displayName = 'Sparkle';
 
 /**
- * ComboDisplay - Notification-style combo indicator
- * Shows current combo level with gradient pill shape and fire effects
+ * ComboDisplay - Text-based combo indicator with emoji
+ * Shows current combo level as "🔥 x3 Combo" with gradient text and glow effects
  * Memoized to prevent unnecessary re-renders
  */
 const ComboDisplay = memo<ComboDisplayProps>(({
@@ -141,7 +141,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
             />
           ))}
 
-          {/* Main pill badge - notification style */}
+          {/* Main combo text - clean text-based display without badge */}
           <motion.div
             animate={
               isDanger
@@ -172,65 +172,44 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                 : undefined
             }
             className={cn(
-              'rounded-full font-bold backdrop-blur-sm relative overflow-hidden',
-              'border-2',
-              // Rainbow mode uses black text for better contrast, others use white
-              isRainbow ? 'text-neo-black' : 'text-white',
-              // Subtle border color shift in danger state
-              isDanger ? 'border-orange-400/70' : 'border-white/40',
-              compact ? 'px-3 py-1.5 text-base' : 'px-4 py-2 text-lg',
-              !isRainbow && 'bg-gradient-to-r from-orange-600 via-red-600 to-pink-600',
-              // High contrast mode for light backgrounds (landscape panels)
-              highContrast && 'border-neo-black/60'
+              'relative',
+              compact ? 'text-lg' : 'text-xl'
             )}
-            style={{
-              filter: isRainbow
-                ? 'drop-shadow(0 0 12px rgba(255, 255, 255, 0.8))'
-                : isDanger
-                ? 'drop-shadow(0 0 8px rgba(251, 146, 60, 0.8))'
-                : `drop-shadow(0 0 ${isHighCombo ? '10px' : '6px'} rgba(251, 146, 60, 0.6))`,
-              // Enhanced text shadow for better contrast on light backgrounds
-              textShadow: highContrast && !isRainbow
-                ? '1px 1px 2px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.5)'
-                : undefined,
-              ...(isRainbow && {
-                background: 'linear-gradient(90deg, #dc2626, #ea580c, #ca8a04, #16a34a, #0891b2, #2563eb, #7c3aed, #db2777, #dc2626)',
-                backgroundSize: '300% 100%',
-                animation: 'rainbow-shift 1.5s linear infinite',
-                textShadow: highContrast
-                  ? '1px 1px 2px rgba(0,0,0,0.6), -1px -1px 2px rgba(0,0,0,0.6), 0 0 3px rgba(0,0,0,0.4)'
-                  : '1px 1px 0 rgba(255,255,255,0.8), -1px -1px 0 rgba(255,255,255,0.8), 1px -1px 0 rgba(255,255,255,0.8), -1px 1px 0 rgba(255,255,255,0.8)',
-              }),
-            }}
           >
-            {/* Shimmer effect - skip on low-end devices */}
-            {!skipSparkles && (
-              <motion.div
-                className="absolute inset-0 rounded-full pointer-events-none overflow-hidden"
-                style={{ zIndex: 5 }}
-              >
-                <motion.div
-                  className="absolute inset-0"
-                  style={{
-                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)',
-                    width: '200%',
-                    marginLeft: '-100%',
-                  }}
-                  animate={{ marginLeft: ['-100%', '100%'] }}
-                  transition={{
-                    duration: 1.2,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                    repeatDelay: 1.5, // Longer pause for less GPU work
-                  }}
-                />
-              </motion.div>
-            )}
-
-            {/* Content */}
-            <div className="flex items-center gap-1.5 relative z-10">
+            {/* Content - text with emoji */}
+            <div
+              className={cn(
+                'flex items-center gap-1 relative z-10 font-black',
+                // Text color with gradient effect
+                'text-transparent bg-clip-text',
+                isRainbow
+                  ? ''
+                  : 'bg-gradient-to-r from-orange-400 via-red-400 to-pink-400'
+              )}
+              style={{
+                // Enhanced text shadow for visibility
+                WebkitTextStroke: highContrast ? '1px rgba(0,0,0,0.3)' : undefined,
+                ...(isRainbow && {
+                  background: 'linear-gradient(90deg, #dc2626, #ea580c, #ca8a04, #16a34a, #0891b2, #2563eb, #7c3aed, #db2777, #dc2626)',
+                  backgroundSize: '300% 100%',
+                  animation: 'rainbow-shift 1.5s linear infinite',
+                  WebkitBackgroundClip: 'text',
+                  backgroundClip: 'text',
+                }),
+              }}
+            >
               {/* Fire emoji - simplified animation for performance */}
               <motion.span
+                className="text-[1.1em]"
+                style={{
+                  // Reset text styles for emoji to show properly
+                  WebkitTextFillColor: 'initial',
+                  filter: isRainbow
+                    ? 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.6))'
+                    : isDanger
+                    ? 'drop-shadow(0 0 6px rgba(251, 146, 60, 0.7))'
+                    : `drop-shadow(0 0 ${isHighCombo ? '8px' : '4px'} rgba(251, 146, 60, 0.5))`,
+                }}
                 animate={
                   skipSparkles
                     ? undefined // No animation on low-end devices
@@ -249,23 +228,55 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                 {isRainbow ? '🌈' : '🔥'}
               </motion.span>
 
-              {/* COMBO word - only in non-compact mode */}
-              {!compact && (
-                <span className="font-black uppercase tracking-wide">
-                  Combo
-                </span>
-              )}
-
               {/* Combo count */}
               <motion.span
                 key={`level-${comboLevel}`}
                 initial={{ scale: 1.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="font-black"
+                className="tabular-nums"
+                style={{
+                  textShadow: highContrast
+                    ? '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(0,0,0,0.7)'
+                    : '1px 1px 3px rgba(0,0,0,0.5), 0 0 8px rgba(251, 146, 60, 0.4)',
+                }}
               >
                 x{comboLevel}
               </motion.span>
+
+              {/* COMBO word - always visible now */}
+              <span
+                style={{
+                  textShadow: highContrast
+                    ? '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(0,0,0,0.7)'
+                    : '1px 1px 3px rgba(0,0,0,0.5), 0 0 8px rgba(251, 146, 60, 0.4)',
+                }}
+              >
+                Combo
+              </span>
             </div>
+
+            {/* Glow effect behind text - replaces badge background */}
+            {!skipSparkles && (
+              <motion.div
+                className="absolute inset-0 pointer-events-none -z-10"
+                animate={{
+                  opacity: [0.3, 0.5, 0.3],
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+                style={{
+                  background: isRainbow
+                    ? 'linear-gradient(90deg, #dc2626, #ea580c, #ca8a04, #16a34a, #0891b2)'
+                    : 'linear-gradient(90deg, #f97316, #ef4444, #ec4899)',
+                  filter: 'blur(12px)',
+                  transform: 'scale(1.5)',
+                  borderRadius: '50%',
+                }}
+              />
+            )}
           </motion.div>
 
           {/* Status text below for high combos */}

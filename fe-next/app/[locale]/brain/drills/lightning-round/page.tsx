@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -9,8 +9,9 @@ import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigation } from '@/contexts/NavigationContext';
 import LightningRound from '@/components/drills/LightningRound';
+import DrillProgressionOverlay from '@/components/brain/DrillProgressionOverlay';
 import { useDrillGrid } from '@/hooks/useDrillGrid';
-import { useSaveDrillResult } from '@/hooks/useSaveDrillResult';
+import { useSaveDrillResult, DrillBrainScoreUpdate } from '@/hooks/useSaveDrillResult';
 
 /**
  * Lightning Round Drill Page
@@ -25,6 +26,10 @@ export default function LightningRoundPage() {
   const { setIsInGame } = useNavigation();
   const isDarkMode = theme === 'dark';
   const { saveDrillResult } = useSaveDrillResult();
+
+  // State for progression overlay
+  const [showProgressionOverlay, setShowProgressionOverlay] = useState(false);
+  const [brainScoreUpdate, setBrainScoreUpdate] = useState<DrillBrainScoreUpdate | null>(null);
 
   // Generate drill grid
   const { grid, availableWords, isLoading } = useDrillGrid(5, language);
@@ -42,7 +47,7 @@ export default function LightningRoundPage() {
     level: number;
     wordsPerMinute: number;
   }) => {
-    await saveDrillResult({
+    const saveResult = await saveDrillResult({
       drillType: 'lightning-round',
       level: result.level,
       score: result.score,
@@ -52,6 +57,12 @@ export default function LightningRoundPage() {
         wordsPerMinute: result.wordsPerMinute,
       },
     });
+
+    // Show progression overlay if we got brainScore data back
+    if (saveResult.success && saveResult.brainScore) {
+      setBrainScoreUpdate(saveResult.brainScore);
+      setShowProgressionOverlay(true);
+    }
   }, [saveDrillResult]);
 
   const handleExit = useCallback(() => {
@@ -125,6 +136,19 @@ export default function LightningRoundPage() {
           onExit={handleExit}
         />
       </div>
+
+      {/* Brain Score Progression Overlay */}
+      {brainScoreUpdate && (
+        <DrillProgressionOverlay
+          isOpen={showProgressionOverlay}
+          onClose={() => setShowProgressionOverlay(false)}
+          targetDomain={brainScoreUpdate.targetDomain}
+          newDomainScore={brainScoreUpdate.domainScores[brainScoreUpdate.targetDomain]}
+          scoreDelta={brainScoreUpdate.scoreDelta}
+          overallScore={brainScoreUpdate.overallScore}
+          tier={brainScoreUpdate.tier}
+        />
+      )}
     </div>
   );
 }

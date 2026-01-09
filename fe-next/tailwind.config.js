@@ -18,8 +18,9 @@ module.exports = {
       padding: {
         DEFAULT: "0.5rem",
         sm: "0.75rem",
-        lg: "1rem",
-        xl: "1rem",
+        lg: "1.5rem",
+        xl: "2rem",
+        "2xl": "2.5rem",
       },
       screens: {
         "2xl": "2400px",
@@ -313,8 +314,12 @@ module.exports = {
       // Additional spacing for better component composition
       spacing: {
         '18': '4.5rem',
+        '22': '5.5rem',
+        '26': '6.5rem',
         '88': '22rem',
         '128': '32rem',
+        '144': '36rem',
+        '160': '40rem',
       },
       // Z-index scale for better layering
       zIndex: {

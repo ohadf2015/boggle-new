@@ -2,7 +2,7 @@
 
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
-import { RotateCw, Settings, Home, Play, DoorOpen, Star, Check, ArrowRight, BarChart3 } from 'lucide-react';
+import { RotateCw, Play, DoorOpen, Star, Check, ArrowRight, ArrowLeft, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -83,26 +83,15 @@ export const SinglePlayerActions: React.FC<SinglePlayerActionsProps> = memo(({
             </Button>
           </motion.div>
         )}
-        <div className="flex gap-2">
-          <Button
-            variant="cyan"
-            size="sm"
-            className="flex-1 py-2 font-bold text-xs border-2 border-neo-black"
-            onClick={onPlayAgain}
-          >
-            <Settings className="me-1 text-xs" />
-            {t('common.settings') || 'Settings'}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1 py-2 font-bold text-xs border-2 border-neo-black"
-            onClick={onBackToLobby}
-          >
-            <Home className="me-1 text-xs" />
-            {t('common.lobby') || 'Lobby'}
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full py-2 font-bold text-xs border-2 border-neo-black"
+          onClick={onBackToLobby}
+        >
+          <ArrowLeft className="me-1 w-3.5 h-3.5 rtl:rotate-180" />
+          {t('common.back') || 'Back'}
+        </Button>
       </div>
     );
   }
@@ -168,27 +157,16 @@ export const SinglePlayerActions: React.FC<SinglePlayerActionsProps> = memo(({
         </motion.div>
       )}
 
-      {/* Secondary Actions */}
-      <div className="flex gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="flex-1 py-2 text-xs text-neo-black/70 dark:text-white/70 hover:text-neo-black dark:hover:text-white hover:bg-neo-cream/50 dark:hover:bg-slate-700/50 border border-neo-black/20 dark:border-white/20"
-          onClick={onPlayAgain}
-        >
-          <Settings className="me-1 w-3.5 h-3.5" />
-          {t('common.settings') || 'Settings'}
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="flex-1 py-2 text-xs text-neo-black/70 dark:text-white/70 hover:text-neo-black dark:hover:text-white hover:bg-neo-cream/50 dark:hover:bg-slate-700/50 border border-neo-black/20 dark:border-white/20"
-          onClick={onBackToLobby}
-        >
-          <Home className="me-1 w-3.5 h-3.5" />
-          {t('common.lobby') || 'Lobby'}
-        </Button>
-      </div>
+      {/* Back Button */}
+      <Button
+        variant="ghost"
+        size="sm"
+        className="w-full py-2 text-xs text-neo-black/70 dark:text-white/70 hover:text-neo-black dark:hover:text-white hover:bg-neo-cream/50 dark:hover:bg-slate-700/50 border border-neo-black/20 dark:border-white/20"
+        onClick={onBackToLobby}
+      >
+        <ArrowLeft className="me-1 w-3.5 h-3.5 rtl:rotate-180" />
+        {t('common.back') || 'Back'}
+      </Button>
     </div>
   );
 });

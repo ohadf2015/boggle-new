@@ -138,6 +138,8 @@ const en = {
     "advancedSettings": "More Options",
     "yourScore": "Your Score",
     "tapToDismiss": "Tap to close",
+    "tapToClose": "Tap to continue",
+    "tapToContinue": "Tap to continue",
     "copied": "Copied!",
     "copy": "Copy",
     "copyCode": "Copy",
@@ -832,6 +834,8 @@ const en = {
     "earthquake": "EARTHQUAKE!",
     "fireRound": "FIRE ROUND",
     "twoXPoints": "2X POINTS",
+    "enterFullscreen": "Enter fullscreen",
+    "exitFullscreen": "Exit fullscreen",
     "host": "HOST",
     "hostBadge": "This player is the host",
     "moreNotifications": "+{{count}} more",
@@ -1220,6 +1224,7 @@ const en = {
     "bestScore": "Best",
     "average": "Avg",
     "games": "Games",
+    "trend": "Trend",
     "trendUp": "Improving!",
     "trendDown": "Keep trying!",
     "trendStable": "Consistent",
@@ -3480,6 +3485,13 @@ const en = {
     "pressQuestion": "Press ? for all shortcuts",
     "gotIt": "Got it!"
   },
+  "keyboardDesktopBadge": {
+    "typeWords": "Type words",
+    "pressQuestion": "Press ? for shortcuts"
+  },
+  "enterKeyHint": {
+    "pressEnter": "Press Enter to submit"
+  },
   "wizard": {
     "selectMode": "Select Game Mode",
     "chooseDifficulty": "Choose Difficulty",
@@ -3686,6 +3698,7 @@ const en = {
     "radarChart": "Cognitive Radar",
     "currentScores": "Current Scores",
     "gamesAnalyzed": "Games Analyzed",
+    "activitiesAnalyzed": "Activities",
     "toNextTier": "to",
     "newBadge": "NEW!",
     "firstGameComplete": "Cognitive Baseline Established!",
@@ -3695,6 +3708,7 @@ const en = {
     "playAgain": "Play Again",
     "drills": {
       "title": "Brain Drills",
+      "brainTraining": "Brain Training",
       "round": "Round",
       "level": "Level",
       "start": "Start",
@@ -3804,6 +3818,10 @@ const en = {
     "peakScore": "Peak",
     "gamesPlayed": "games",
     "drillsCompleted": "drills"
+  },
+  "levelUp": {
+    "title": "Level Up!",
+    "reached": "You reached level {level}!"
   }
 };
 

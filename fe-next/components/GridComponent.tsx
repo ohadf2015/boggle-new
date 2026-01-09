@@ -356,10 +356,11 @@ const GridComponent = memo<GridComponentProps>(({
   const comboColors = useMemo(() => getComboColors(comboLevel), [comboLevel]);
 
   // Memoize grid dimensions to prevent recalculations
+  // Gap increased slightly for easier swiping without accidental adjacent touches
   const gridDimensions = useMemo(() => ({
     cols: grid[0]?.length || 4,
     rows: grid.length || 4,
-    gap: isLargeGrid ? "gap-1 sm:gap-1" : "gap-1.5 sm:gap-2",
+    gap: isLargeGrid ? "gap-1.5 sm:gap-1.5" : "gap-2 sm:gap-2.5",
   }), [grid, isLargeGrid]);
 
   return (

@@ -661,11 +661,14 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         />
       </div>
 
-      {/* Compact Stats - Matching multiplayer pattern */}
+      {/* Compact Stats - Unified with coins, brain points, and sparkline */}
       <CompactResultsStats
         wordCount={validWordCount}
         accuracy={accuracy}
         archetype={playerArchetype}
+        coinReward={coinReward}
+        brainPointsReward={brainPointsReward}
+        currentScore={results.playerScore}
       />
 
       {/* Bonus Badges */}
@@ -673,12 +676,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         comboBonus={totalComboBonus}
         fireRoundBonus={totalFireRoundBonus}
       />
-
-      {/* Coins Earned - Compact */}
-      <CoinRewardDisplay reward={coinReward} variant="compact" />
-
-      {/* Brain Points - Compact */}
-      <BrainPointsDisplay reward={brainPointsReward} variant="compact" />
 
       {/* Compact Top 3 Leaderboard */}
       {mode === 'solo-bots' && results.botScores.length > 0 && (
@@ -954,18 +951,18 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               showConfetti={shouldShowConfetti}
             />
 
-            {/* Compact Stats - Matching multiplayer pattern */}
+            {/* Compact Stats - Unified with coins, brain points, and sparkline */}
             <CompactResultsStats
               wordCount={validWordCount}
               accuracy={accuracy}
               archetype={playerArchetype}
+              coinReward={coinReward}
+              brainPointsReward={brainPointsReward}
+              currentScore={results.playerScore}
             />
 
             {/* Bonus Badges */}
             <BonusBadgesRow comboBonus={totalComboBonus} fireRoundBonus={totalFireRoundBonus} />
-
-            {/* Coins Earned */}
-            <CoinRewardDisplay reward={coinReward} variant="compact" />
 
             {/* Leaderboard (solo-bots mode) */}
             {mode === 'solo-bots' && results.botScores.length > 0 && (

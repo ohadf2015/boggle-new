@@ -133,6 +133,8 @@ const es = {
     "advancedSettings": "Más Opciones",
     "yourScore": "Tu Puntuación",
     "tapToDismiss": "Toca para cerrar",
+    "tapToClose": "Toca para continuar",
+    "tapToContinue": "Toca para seguir",
     "copied": "¡Copiado!",
     "copy": "Copiar",
     "copyCode": "Copiar",
@@ -824,6 +826,8 @@ const es = {
     "earthquake": "¡TERREMOTO!",
     "fireRound": "RONDA DE FUEGO",
     "twoXPoints": "2X PUNTOS",
+    "enterFullscreen": "Pantalla completa",
+    "exitFullscreen": "Salir de pantalla completa",
     "host": "ANFITRIÓN",
     "hostBadge": "Este jugador es el anfitrión",
     "moreNotifications": "+{{count}} más",
@@ -1211,6 +1215,7 @@ const es = {
     "bestScore": "Mejor",
     "average": "Prom",
     "games": "Juegos",
+    "trend": "Tendencia",
     "trendUp": "¡Mejorando!",
     "trendDown": "¡Sigue intentando!",
     "trendStable": "Constante",
@@ -3428,6 +3433,13 @@ const es = {
     },
     "dismiss": "¡Entendido!"
   },
+  "keyboardDesktopBadge": {
+    "typeWords": "Escribe palabras",
+    "pressQuestion": "Presiona ? para atajos"
+  },
+  "enterKeyHint": {
+    "pressEnter": "Presiona Enter para enviar"
+  },
   "wizard": {
     "selectMode": "Seleccionar Modo de Juego",
     "chooseDifficulty": "Elegir Dificultad",
@@ -3670,6 +3682,7 @@ const es = {
     "radarChart": "Radar cognitivo",
     "currentScores": "Puntuaciones actuales",
     "gamesAnalyzed": "Juegos Analizados",
+    "activitiesAnalyzed": "Actividades",
     "toNextTier": "para",
     "newBadge": "¡NUEVO!",
     "firstGameComplete": "¡Base Cognitiva Establecida!",
@@ -3679,6 +3692,7 @@ const es = {
     "playAgain": "Jugar de Nuevo",
     "drills": {
       "title": "Ejercicios Mentales",
+      "brainTraining": "Entrena tu Mente",
       "round": "Ronda",
       "level": "Nivel",
       "start": "Iniciar",
@@ -3788,6 +3802,10 @@ const es = {
     "peakScore": "Máximo",
     "gamesPlayed": "partidas",
     "drillsCompleted": "ejercicios"
+  },
+  "levelUp": {
+    "title": "¡Subiste de Nivel!",
+    "reached": "¡Llegaste al nivel {level}!"
   }
 };
 

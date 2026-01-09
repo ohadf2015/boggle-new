@@ -102,7 +102,9 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
         const rect = buttonRef.current.getBoundingClientRect();
         setDropdownPosition({
           top: rect.bottom + 8, // 8px = mt-2
-          left: isRTL ? window.innerWidth - rect.right : undefined!,
+          // RTL: align dropdown's left edge with button's left edge
+          // LTR: align dropdown's right edge with button's right edge
+          left: isRTL ? rect.left : undefined!,
           right: isRTL ? undefined! : window.innerWidth - rect.right,
         });
       }

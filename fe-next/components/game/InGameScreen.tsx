@@ -52,6 +52,7 @@ import KeyboardHintTooltip from './KeyboardHintTooltip';
 import TapToDragTooltip from './TapToDragTooltip';
 import { KeyboardShortcutsOverlay, KeyboardModeIndicator, KeyboardQuickTip } from '../keyboard';
 import CompactLeaderboard, { type CompactPlayer } from './CompactLeaderboard';
+import { shouldShowKeyboardTrails } from './keyboardTrailsUtils';
 
 // ==================== Types ====================
 
@@ -119,6 +120,10 @@ interface InGameScreenProps {
 
   // Board theme (date-themed words indicator)
   boardTheme?: BoardTheme | null;
+
+  // Player experience - used to determine if keyboard trails should be shown
+  // New players (0-1 games) see trails to help them learn, experienced players don't
+  totalGamesPlayed?: number;
 }
 
 // ==================== Component ====================
@@ -178,6 +183,9 @@ const InGameScreen = memo<InGameScreenProps>(({
 
   // Board theme
   boardTheme,
+
+  // Player experience
+  totalGamesPlayed,
 }) => {
   const {
     playWordAcceptedSound,
@@ -812,7 +820,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                 largeText
                 fireRoundActive={fireRoundActive}
                 earthquakeShaking={earthquakeState === 'shaking'}
-                highlightedPath={keyboardInput.isTypingMode ? keyboardInput.highlightedCells : []}
+                highlightedPath={shouldShowKeyboardTrails(keyboardInput.isTypingMode, totalGamesPlayed) ? keyboardInput.highlightedCells : []}
                 onSingleTapDetected={tapDragGuidance.handleSingleTapDetected}
                 language={gameLanguage || 'en'}
               />
@@ -1129,7 +1137,7 @@ const InGameScreen = memo<InGameScreenProps>(({
               hideWordPreview={true}
               fireRoundActive={fireRoundActive}
               earthquakeShaking={earthquakeState === 'shaking'}
-              highlightedPath={keyboardInput.isTypingMode ? keyboardInput.highlightedCells : []}
+              highlightedPath={shouldShowKeyboardTrails(keyboardInput.isTypingMode, totalGamesPlayed) ? keyboardInput.highlightedCells : []}
               onSingleTapDetected={tapDragGuidance.handleSingleTapDetected}
               language={gameLanguage || 'en'}
             />

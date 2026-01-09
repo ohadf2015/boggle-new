@@ -2,6 +2,8 @@
 
 import React, { memo, useMemo } from 'react';
 import type { Socket } from 'socket.io-client';
+import { Maximize, Minimize } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import TvJoinBar from './tv-broadcast/TvJoinBar';
 import TvGameHeader from './tv-broadcast/TvGameHeader';
 import TvGrid from './tv-broadcast/TvGrid';
@@ -10,6 +12,7 @@ import TvNotificationQueue from './tv-broadcast/TvNotificationQueue';
 import { useTvPlayerCombos } from '../hooks/useTvPlayerCombos';
 import { useTvNotifications } from '../hooks/useTvNotifications';
 import { useTvSounds } from '../hooks/useTvSounds';
+import { useTvFullscreen } from '../hooks/useTvFullscreen';
 import type { Language, LetterGrid, Avatar as AvatarType } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 
@@ -84,6 +87,11 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   fireRoundActive = false,
   fireRoundRemaining = 0,
 }) => {
+  // Fullscreen mode
+  const { isFullscreen, toggleFullscreen, isSupported: isFullscreenSupported } = useTvFullscreen({
+    enabled: true,
+  });
+
   // Track player combos
   const { playerCombos } = useTvPlayerCombos({
     socket,
@@ -134,24 +142,66 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   const isEarthquakeShaking = earthquakeState === 'shaking';
 
   return (
-    <div className="h-screen bg-gradient-to-b from-slate-100 via-slate-50 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col overflow-hidden">
-      {/* Join Bar (Kahoot-style) */}
-      <TvJoinBar
-        gameCode={gameCode}
-        roomName={roomName}
-        playerCount={playersReady.length}
-        t={t}
-      />
+    <div className="h-screen bg-gradient-to-b from-slate-100 via-slate-50 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col overflow-hidden relative">
+      {/* Fullscreen Toggle Button */}
+      {isFullscreenSupported && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={toggleFullscreen}
+          className="absolute top-4 right-4 z-50 bg-neo-black/80 hover:bg-neo-black text-neo-cream p-3 rounded-neo border-2 border-neo-cream/30 shadow-hard-sm transition-colors"
+          title={isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')}
+          aria-label={isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')}
+        >
+          {isFullscreen ? (
+            <Minimize className="w-6 h-6" />
+          ) : (
+            <Maximize className="w-6 h-6" />
+          )}
+        </motion.button>
+      )}
 
-      {/* Game Header with Timer */}
-      <TvGameHeader
-        remainingTime={remainingTime}
-        timerValue={timerValue}
-        fireRoundActive={fireRoundActive}
-        fireRoundRemaining={fireRoundRemaining}
-        earthquakeState={earthquakeState}
-        t={t}
-      />
+      {/* Join Bar (Kahoot-style) - Hidden in fullscreen */}
+      <AnimatePresence>
+        {!isFullscreen && (
+          <motion.div
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -100, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          >
+            <TvJoinBar
+              gameCode={gameCode}
+              roomName={roomName}
+              playerCount={playersReady.length}
+              t={t}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Game Header with Timer - Hidden in fullscreen */}
+      <AnimatePresence>
+        {!isFullscreen && (
+          <motion.div
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -50, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          >
+            <TvGameHeader
+              remainingTime={remainingTime}
+              timerValue={timerValue}
+              fireRoundActive={fireRoundActive}
+              fireRoundRemaining={fireRoundRemaining}
+              earthquakeState={earthquakeState}
+              t={t}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Content: Grid + Leaderboard (50/50) */}
       <div className="flex-1 min-h-0 flex flex-col md:flex-row gap-4 p-4 max-w-[2000px] mx-auto w-full">

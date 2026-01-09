@@ -330,6 +330,7 @@ export default function BrainTrainingPage() {
             tier={brainScore.tier}
             tierProgress={brainScore.tierProgress}
             gamesAnalyzed={brainScore.gamesAnalyzed}
+            drillsCompleted={brainScore.drillsCompleted}
           />
         </motion.div>
 

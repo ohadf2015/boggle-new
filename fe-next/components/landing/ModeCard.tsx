@@ -67,7 +67,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
   const styles = variantStyles[variant];
 
   return (
-    <Link href={href} className="block w-full group">
+    <Link href={href} className={cn('block w-full h-full group', className)}>
       <div
         className={cn(
           // Neo-Brutalist card base
@@ -77,6 +77,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
           'cq-container',
           'cursor-pointer',
           'relative overflow-hidden',
+          // Full height to fill grid cell
+          'h-full',
           // Colors
           styles.bg,
           styles.hoverBg,
@@ -90,16 +92,15 @@ const ModeCard: React.FC<ModeCardProps> = ({
           isRTL
             ? 'active:translate-x-[-1px] active:translate-y-[1px]'
             : 'active:translate-x-[1px] active:translate-y-[1px]',
-          'active:shadow-hard-pressed',
-          className
+          'active:shadow-hard-pressed'
         )}
         style={{
-          // Container-relative padding using cqw
-          padding: 'clamp(0.75rem, 3cqw, 1rem)',
+          // Container-relative padding using cqw - larger max for desktop
+          padding: 'clamp(0.75rem, 4cqw, 1.5rem)',
         }}
       >
         {/* Header with icon, title, and arrow in one row */}
-        <div className="flex items-center gap-2 sm:gap-3" style={{ marginBottom: 'clamp(0.25rem, 1cqw, 0.5rem)' }}>
+        <div className="flex items-center gap-2 sm:gap-3 lg:gap-4" style={{ marginBottom: 'clamp(0.25rem, 1.5cqw, 0.75rem)' }}>
           {/* Icon - container-relative sizing */}
           <div
             className={cn(
@@ -109,11 +110,11 @@ const ModeCard: React.FC<ModeCardProps> = ({
               styles.iconBg
             )}
             style={{
-              width: 'clamp(2rem, 10cqw, 3rem)',
-              height: 'clamp(2rem, 10cqw, 3rem)',
+              width: 'clamp(2rem, 10cqw, 3.5rem)',
+              height: 'clamp(2rem, 10cqw, 3.5rem)',
             }}
           >
-            <span className={styles.iconText} style={{ fontSize: 'clamp(1rem, 5cqw, 1.5rem)' }}>
+            <span className={styles.iconText} style={{ fontSize: 'clamp(1rem, 5cqw, 1.75rem)' }}>
               {icon}
             </span>
           </div>
@@ -123,7 +124,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
           <h2
             className="font-black uppercase tracking-tight text-neo-black flex-1 min-w-0 drop-shadow-lg"
             style={{
-              fontSize: 'clamp(1rem, 5cqw, 1.5rem)',
+              fontSize: 'clamp(1rem, 5cqw, 1.75rem)',
             }}
           >
             {title}
@@ -140,8 +141,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
               styles.arrow
             )}
             style={{
-              width: 'clamp(2.25rem, 8cqw, 2.75rem)',
-              height: 'clamp(2.25rem, 8cqw, 2.75rem)',
+              width: 'clamp(2.25rem, 8cqw, 3.25rem)',
+              height: 'clamp(2.25rem, 8cqw, 3.25rem)',
             }}
           >
             <ArrowIcon style={{ fontSize: 'clamp(0.75rem, 3.5cqw, 1rem)' }} />
@@ -153,8 +154,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
         <p
           className="font-medium text-neo-black drop-shadow-md"
           style={{
-            fontSize: 'clamp(0.7rem, 3cqw, 1rem)',
-            marginBottom: 'clamp(0.375rem, 1.5cqw, 0.75rem)',
+            fontSize: 'clamp(0.75rem, 3cqw, 1.125rem)',
+            marginBottom: 'clamp(0.375rem, 2cqw, 1rem)',
           }}
         >
           {description}

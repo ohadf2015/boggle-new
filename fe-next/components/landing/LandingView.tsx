@@ -171,14 +171,14 @@ const LandingView: React.FC = () => {
       <Header />
 
       {/* Main content */}
-      <main className={`w-full max-w-6xl mx-auto overflow-x-hidden ${isLandscape ? 'flex-1 flex flex-col justify-center px-4 py-2' : 'px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-4 pb-40 lg:pb-4'}`}>
+      <main className={`w-full max-w-7xl mx-auto overflow-x-hidden ${isLandscape ? 'flex-1 flex flex-col justify-center px-4 py-2' : 'px-2 sm:px-3 lg:px-6 xl:px-8 py-2 sm:py-3 lg:py-6 pb-40 lg:pb-6'}`}>
         {/* Hero section - compact (hidden in landscape) - CSS animation for instant paint */}
         {!isLandscape && (
-          <div className="text-center mb-1 sm:mb-2 lg:mb-3 animate-fade-in-fast">
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white mb-0.5 sm:mb-1 lg:mb-2">
+          <div className="text-center mb-2 sm:mb-3 lg:mb-6 xl:mb-8 animate-fade-in-fast">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl xl:text-6xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white mb-1 sm:mb-2 lg:mb-3">
               {t('landing.chooseMode') || 'Choose Your Mode'}
             </h1>
-            <p className="text-sm sm:text-base lg:text-lg xl:text-xl font-medium text-neo-black/80 dark:text-neo-white/85">
+            <p className="text-sm sm:text-base lg:text-xl xl:text-2xl font-medium text-neo-black/80 dark:text-neo-white/85">
               {t('landing.subtitleSimple') || 'Practice solo or challenge friends'}
             </p>
           </div>
@@ -194,7 +194,7 @@ const LandingView: React.FC = () => {
         )}
 
         {/* Daily Challenge Banner - Lazy loaded with skeleton fallback */}
-        <div className={`w-full ${isLandscape ? 'mb-2' : 'mb-1 sm:mb-2 lg:mb-3'}`}>
+        <div className={`w-full ${isLandscape ? 'mb-2' : 'mb-2 sm:mb-3 lg:mb-4 xl:mb-6'}`}>
           <Suspense fallback={
             <div className="w-full p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-yellow animate-pulse">
               <div className="flex items-center gap-3">
@@ -210,10 +210,10 @@ const LandingView: React.FC = () => {
           </Suspense>
         </div>
 
-        {/* Mode cards grid - horizontal in landscape, vertical on portrait */}
+        {/* Mode cards grid - horizontal in landscape, featured hero layout on desktop */}
         {/* Using CSS animation for instant paint without JS overhead */}
-        <div className={`w-full animate-fade-in-fast ${isLandscape ? 'flex gap-3 flex-1 min-h-0' : 'grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-2 lg:gap-3'}`}>
-          {/* Multiplayer Card */}
+        <div className={`w-full animate-fade-in-fast ${isLandscape ? 'flex gap-3 flex-1 min-h-0' : 'grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-2 sm:gap-3 lg:gap-4 xl:gap-5 md:min-h-[320px] lg:min-h-[420px] xl:min-h-[480px]'}`}>
+          {/* Multiplayer Card - Featured (spans 2 cols and 2 rows on desktop) */}
           {isLandscape ? (
             <Link
               href={`/${language}/multiplayer`}
@@ -240,6 +240,7 @@ const LandingView: React.FC = () => {
                 roomsLabel: t('landing.openRooms') || 'open rooms',
                 playersLabel: t('landing.playersLive') || 'playing now',
               }}
+              className="md:col-span-2 md:row-span-2"
             />
           )}
 

@@ -9,6 +9,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
+import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import type { LetterGrid, Language } from '@/types';
 
 // Level configurations
@@ -69,6 +71,15 @@ export default function PatternSwitcher({
   const [currentFeedback, setCurrentFeedback] = useState<WordFeedback | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const wordsFoundSetRef = useRef<Set<string>>(new Set());
+
+  // Keyboard support for desktop users
+  const keyboard = useDrillKeyboardSupport({
+    grid,
+    language,
+    enabled: phase === 'playing',
+    onWordSubmit: (word: string) => handleWordSubmit(word),
+    minWordLength: 2,
+  });
 
   // Generate available lengths from words
   const availableLengths = [...new Set(availableWords.map(w => w.word.length))].sort();
@@ -320,8 +331,8 @@ export default function PatternSwitcher({
             {/* Word feedback area - shows validation results */}
             <div className="flex justify-center">
               <WordFormingArea
-                word=""
-                letterCount={0}
+                word={keyboard.isTypingMode ? keyboard.typedWord : ""}
+                letterCount={keyboard.isTypingMode ? keyboard.typedWord.length : 0}
                 feedback={currentFeedback}
                 compact={false}
               />
@@ -331,9 +342,28 @@ export default function PatternSwitcher({
               grid={grid}
               interactive={phase === 'playing'}
               onWordSubmit={handleWordSubmit}
+              highlightedPath={keyboard.isTypingMode ? keyboard.highlightedCells : []}
               hideWordPreview={false}
+              language={language}
               className="w-full"
             />
+
+            {/* Keyboard UI - Desktop only */}
+            {keyboard.isDesktop && (
+              <>
+                <KeyboardDesktopBadge t={t} position="bottom-right" />
+                <EnterKeyHint
+                  isVisible={keyboard.showEnterHint}
+                  t={t}
+                  position="bottom-center"
+                />
+                <KeyboardQuickTip
+                  isVisible={keyboard.showQuickTip}
+                  onDismiss={keyboard.dismissQuickTip}
+                  t={t}
+                />
+              </>
+            )}
           </div>
         )}
 

@@ -307,27 +307,43 @@ body {
   /* Letter Tile Gradient - Modern smooth 3D effect for grid cells */
   .letter-tile-gradient {
     background:
-      radial-gradient(ellipse 80% 60% at 30% 25%,
-        rgba(255, 255, 255, 0.9) 0%,
-        transparent 50%),
+      /* Subtle inner glow for depth */
+      radial-gradient(ellipse 70% 50% at 35% 30%,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(255, 255, 255, 0.4) 35%,
+        transparent 60%),
+      /* Soft edge highlight */
+      linear-gradient(145deg,
+        rgba(255, 255, 255, 0.6) 0%,
+        transparent 25%),
+      /* Main gradient - warm cream with subtle depth */
       linear-gradient(165deg,
-        #ffffff 0%,
-        #fdfcf8 35%,
-        #f9f8f3 65%,
-        #f5f4ef 100%);
+        #fffef9 0%,
+        #fcfbf4 25%,
+        #f7f5ed 50%,
+        #f3f0e6 75%,
+        #eeebe0 100%);
   }
 
   /* Letter Tile Gradient (Cream variant) - For onboarding grids */
   .letter-tile-gradient-cream {
     background:
-      radial-gradient(ellipse 80% 60% at 30% 25%,
-        rgba(255, 255, 253, 0.85) 0%,
-        transparent 50%),
+      /* Subtle inner glow for depth */
+      radial-gradient(ellipse 70% 50% at 35% 30%,
+        rgba(255, 255, 253, 0.9) 0%,
+        rgba(255, 255, 253, 0.35) 35%,
+        transparent 60%),
+      /* Soft edge highlight */
+      linear-gradient(145deg,
+        rgba(255, 255, 255, 0.5) 0%,
+        transparent 25%),
+      /* Main gradient - warm cream with subtle depth */
       linear-gradient(165deg,
         #fffef8 0%,
-        #fcfbf4 35%,
-        #f8f7f0 65%,
-        #f3f2eb 100%);
+        #fcfbf4 25%,
+        #f8f7f0 50%,
+        #f4f2ea 75%,
+        #f0ede4 100%);
   }
 
   /* Texture Overlays */
@@ -533,7 +549,8 @@ body {
     box-shadow: var(--shadow-xl);
     border-radius: var(--radius-lg);
     /* No rotation - keep grid perfectly straight */
-    padding: 10px;
+    /* Consolidated padding: 6px base, maximizing grid cell space */
+    padding: 6px;
     /* Simplified sizing using vmin to prevent layout shift on orientation change */
     /* Max height leaves room for timer, stats, and word forming area above grid */
     width: min(80vmin, calc(100vw - 32px), calc(100dvh - 220px));
@@ -578,7 +595,8 @@ body {
   /* On smaller screens, maximize board size with minimal margins */
   @media (max-width: 768px) {
     .game-board-frame {
-      padding: 3px;
+      /* Minimal padding to maximize grid space on mobile */
+      padding: 4px;
       /* Maximize width: full screen minus tiny 8px total margin (4px each side) */
       width: calc(100vw - 8px);
       /* Height: square but capped to leave room for header/UI and safe area (home indicator) */
@@ -679,14 +697,19 @@ body {
     container-type: size;
   }
 
-  /* Container-relative responsive padding */
+  /* Container-relative responsive padding - scales with container width */
   .cq-p-responsive {
-    padding: clamp(0.75rem, 3cqw, 1.5rem);
+    padding: clamp(0.75rem, 4cqw, 2rem);
+  }
+
+  /* Larger container-relative padding for desktop emphasis */
+  .cq-p-responsive-lg {
+    padding: clamp(1rem, 5cqw, 2.5rem);
   }
 
   /* Container-relative responsive gap */
   .cq-gap-responsive {
-    gap: clamp(0.5rem, 2cqw, 1rem);
+    gap: clamp(0.5rem, 2.5cqw, 1.5rem);
   }
 
   /* Container-relative responsive text */

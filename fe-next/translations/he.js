@@ -133,6 +133,8 @@ const he = {
     "advancedSettings": "עוד אפשרויות",
     "yourScore": "הניקוד שלך",
     "tapToDismiss": "הקש לסגירה",
+    "tapToClose": "הקש להמשיך",
+    "tapToContinue": "הקש להמשיך 👆",
     "copied": "הועתק!",
     "copy": "העתק",
     "copyCode": "העתק",
@@ -828,6 +830,8 @@ const he = {
     "earthquake": "רעידת אדמה!",
     "fireRound": "סיבוב אש",
     "twoXPoints": "נקודות X2",
+    "enterFullscreen": "מעבר למסך מלא",
+    "exitFullscreen": "יציאה ממסך מלא",
     "host": "מארח",
     "hostBadge": "שחקן זה הוא המארח",
     "moreNotifications": "+{{count}} נוספים",
@@ -1215,6 +1219,7 @@ const he = {
     "bestScore": "הכי טוב",
     "average": "ממוצע",
     "games": "משחקים",
+    "trend": "מגמה",
     "trendUp": "משתפרים!",
     "trendDown": "להמשיך לנסות!",
     "trendStable": "עקביים",
@@ -3568,6 +3573,13 @@ const he = {
     "pressQuestion": "לחץ ? לכל הקיצורים",
     "gotIt": "הבנתי!"
   },
+  "keyboardDesktopBadge": {
+    "typeWords": "הקלד מילים",
+    "pressQuestion": "לחץ ? לקיצורים"
+  },
+  "enterKeyHint": {
+    "pressEnter": "לחץ Enter לשליחה"
+  },
   "emailPreferences": {
     "title": "התראות פאזל יומי",
     "sendingTo": "נשלח אל",
@@ -3674,6 +3686,7 @@ const he = {
     "radarChart": "רדאר קוגניטיבי",
     "currentScores": "ציונים נוכחיים",
     "gamesAnalyzed": "משחקים נותחו",
+    "activitiesAnalyzed": "פעילויות",
     "toNextTier": "ל",
     "newBadge": "חדש!",
     "firstGameComplete": "קו הבסיס הקוגניטיבי הוקם!",
@@ -3683,6 +3696,7 @@ const he = {
     "playAgain": "שחק שוב",
     "drills": {
       "title": "תרגילי מוח",
+      "brainTraining": "אימון מוח",
       "round": "סיבוב",
       "level": "רמה",
       "start": "התחל",
@@ -3792,6 +3806,10 @@ const he = {
     "peakScore": "שיא",
     "gamesPlayed": "משחקים",
     "drillsCompleted": "תרגילים"
+  },
+  "levelUp": {
+    "title": "עלית רמה!",
+    "reached": "הגעת לרמה {level}!"
   }
 };
 

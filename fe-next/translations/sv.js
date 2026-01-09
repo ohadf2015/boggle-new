@@ -133,6 +133,8 @@ const sv = {
     "advancedSettings": "Fler alternativ",
     "yourScore": "Din poäng",
     "tapToDismiss": "Tryck för att stänga",
+    "tapToClose": "Tryck för att fortsätta",
+    "tapToContinue": "Tryck för att fortsätta",
     "copied": "Kopierad!",
     "copy": "Kopiera",
     "copyCode": "Kopiera",
@@ -827,6 +829,8 @@ const sv = {
     "earthquake": "JORDBÄVNING!",
     "fireRound": "ELDRUNDA",
     "twoXPoints": "2X POÄNG",
+    "enterFullscreen": "Helskärm",
+    "exitFullscreen": "Avsluta helskärm",
     "host": "VÄRD",
     "hostBadge": "Denna spelare är värden",
     "moreNotifications": "+{{count}} till",
@@ -1214,6 +1218,7 @@ const sv = {
     "bestScore": "Bäst",
     "average": "Snitt",
     "games": "Spel",
+    "trend": "Trend",
     "trendUp": "Förbättras!",
     "trendDown": "Fortsätt försöka!",
     "trendStable": "Stabil",
@@ -3567,6 +3572,13 @@ const sv = {
     "pressQuestion": "Tryck ? för alla genvägar",
     "gotIt": "Fattat!"
   },
+  "keyboardDesktopBadge": {
+    "typeWords": "Skriv ord",
+    "pressQuestion": "Tryck ? för genvägar"
+  },
+  "enterKeyHint": {
+    "pressEnter": "Tryck Enter för att skicka"
+  },
   "emailPreferences": {
     "title": "Dagliga pusselaviseringar",
     "sendingTo": "Skickas till",
@@ -3673,6 +3685,7 @@ const sv = {
     "radarChart": "Kognitiv radar",
     "currentScores": "Nuvarande poäng",
     "gamesAnalyzed": "Analyserade spel",
+    "activitiesAnalyzed": "Aktiviteter",
     "toNextTier": "till",
     "newBadge": "NYT!",
     "firstGameComplete": "Kognitiv baslinje etablerad!",
@@ -3682,6 +3695,7 @@ const sv = {
     "playAgain": "Spela igen",
     "drills": {
       "title": "Hjärnövningar",
+      "brainTraining": "Hjärnträning",
       "round": "Runda",
       "level": "Nivå",
       "start": "Starta",
@@ -3791,6 +3805,10 @@ const sv = {
     "peakScore": "Toppnotering",
     "gamesPlayed": "spel",
     "drillsCompleted": "övningar"
+  },
+  "levelUp": {
+    "title": "Nivå Upp!",
+    "reached": "Du nådde nivå {level}!"
   }
 };
 

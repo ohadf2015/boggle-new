@@ -11,6 +11,7 @@ import TournamentStandings from '../../components/TournamentStandings';
 import InGameScreen from '../../components/game/InGameScreen';
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
 import type { BoardTheme } from '@/shared/types/socket';
+import { useAuth } from '@/contexts/AuthContext';
 
 // ==================== Hint Types ====================
 
@@ -164,6 +165,8 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Board theme
   boardTheme,
 }): React.ReactElement => {
+  // Get player's game history for trail display logic
+  const { profile } = useAuth();
 
   // Memoized handler for closing tournament standings
   const handleCloseTournamentStandings = useCallback(() => {
@@ -263,6 +266,9 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
         // Board theme
         boardTheme={boardTheme}
+
+        // Player experience (for keyboard trail display)
+        totalGamesPlayed={profile?.total_games}
       />
 
       {/* Tournament Standings Modal */}

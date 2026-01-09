@@ -9,6 +9,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
 import { isWordOnBoard } from '@/utils/utils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
+import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import type { LetterGrid, Language } from '@/types';
 
 // Level configurations
@@ -94,6 +96,15 @@ export default function RareGems({
     () => new Set(availableWords.map(w => w.word.toUpperCase())),
     [availableWords]
   );
+
+  // Keyboard support for desktop users
+  const keyboard = useDrillKeyboardSupport({
+    grid,
+    language,
+    enabled: phase === 'playing',
+    onWordSubmit: (word: string) => handleWordSubmit(word),
+    minWordLength: 2,
+  });
 
   const rareWordsFound = wordsFound.filter(w =>
     w.rarity === 'rare' || w.rarity === 'legendary'
@@ -306,10 +317,24 @@ export default function RareGems({
 
         {phase === 'playing' && (
           <div className="w-full max-w-md space-y-4 relative">
+            {/* Keyboard typed word display */}
+            {keyboard.isTypingMode && keyboard.typedWord && (
+              <div className="flex justify-center">
+                <div className={cn(
+                  'px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-lg',
+                  isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-white text-neo-black'
+                )}>
+                  {keyboard.typedWord.toUpperCase()}
+                </div>
+              </div>
+            )}
+
             <GridComponent
               grid={grid}
               interactive={true}
               onWordSubmit={handleWordSubmit}
+              highlightedPath={keyboard.isTypingMode ? keyboard.highlightedCells : []}
+              language={language}
               className="w-full"
             />
 
@@ -373,6 +398,23 @@ export default function RareGems({
                   </span>
                 ))}
               </div>
+            )}
+
+            {/* Keyboard UI - Desktop only */}
+            {keyboard.isDesktop && (
+              <>
+                <KeyboardDesktopBadge t={t} position="bottom-right" />
+                <EnterKeyHint
+                  isVisible={keyboard.showEnterHint}
+                  t={t}
+                  position="bottom-center"
+                />
+                <KeyboardQuickTip
+                  isVisible={keyboard.showQuickTip}
+                  onDismiss={keyboard.dismissQuickTip}
+                  t={t}
+                />
+              </>
             )}
           </div>
         )}

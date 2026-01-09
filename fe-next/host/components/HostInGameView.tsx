@@ -6,6 +6,7 @@ import InGameScreen from '../../components/game/InGameScreen';
 import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { BoardTheme } from '@/shared/types/socket';
+import { useAuth } from '@/contexts/AuthContext';
 
 // ==================== Types ====================
 
@@ -102,6 +103,9 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
   // Theme
   boardTheme,
 }): React.ReactElement => {
+  // Get player's game history for trail display logic
+  const { profile } = useAuth();
+
   // Build leaderboard from players data
   const leaderboard = useMemo(() => {
     return [...playersReady].map(player => {
@@ -170,6 +174,9 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
 
       // Theme
       boardTheme={boardTheme}
+
+      // Player experience (for keyboard trail display)
+      totalGamesPlayed={profile?.total_games}
     />
   );
 };

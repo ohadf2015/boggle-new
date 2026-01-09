@@ -57,7 +57,7 @@ const StatsGrid: React.FC<StatsGridProps> = memo(({
 
   return (
     <div className={cn(
-      'grid gap-1.5 sm:gap-2',
+      'grid gap-1.5 sm:gap-2 lg:gap-3 xl:gap-4',
       mobileColumns === 2 && smColumns === 3 && 'grid-cols-2 sm:grid-cols-3',
       mobileColumns === 3 && smColumns === 3 && 'grid-cols-3',
       mobileColumns === 2 && smColumns === 2 && 'grid-cols-2',
@@ -70,22 +70,22 @@ const StatsGrid: React.FC<StatsGridProps> = memo(({
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: index * 0.05 }}
           className={cn(
-            'bg-white/10 rounded-neo border border-white/20 p-1.5 sm:p-2 text-center',
+            'bg-white/10 rounded-neo border border-white/20 p-1.5 sm:p-2 lg:p-3 xl:p-4 text-center',
             stat.hiddenOnMobile && 'hidden sm:block'
           )}
         >
-          <div className="flex justify-center mb-0.5 sm:mb-1">
+          <div className="flex justify-center mb-0.5 sm:mb-1 lg:mb-2">
             <div className={cn(
-              'w-5 h-5 sm:w-6 sm:h-6 rounded border border-neo-black flex items-center justify-center',
+              'w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 xl:w-10 xl:h-10 rounded border border-neo-black flex items-center justify-center',
               stat.iconBg
             )}>
               {stat.icon}
             </div>
           </div>
-          <div className="text-lg sm:text-xl font-black text-white truncate">
+          <div className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-black text-white truncate">
             {stat.value}
           </div>
-          <div className="text-[8px] sm:text-[9px] font-bold uppercase text-white/60 truncate">
+          <div className="text-[8px] sm:text-[9px] lg:text-xs xl:text-sm font-bold uppercase text-white/60 truncate">
             {stat.label}
           </div>
         </motion.div>

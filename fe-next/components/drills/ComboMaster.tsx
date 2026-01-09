@@ -9,6 +9,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
 import { isWordOnBoard } from '@/utils/utils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
+import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import type { LetterGrid, Language } from '@/types';
 
 // Level configurations
@@ -78,6 +80,15 @@ export default function ComboMaster({
     [availableWords]
   );
   const MAX_COMBO_BREAKS = 3;
+
+  // Keyboard support for desktop users
+  const keyboard = useDrillKeyboardSupport({
+    grid,
+    language,
+    enabled: phase === 'playing',
+    onWordSubmit: (word: string) => handleWordSubmit(word),
+    minWordLength: 2,
+  });
 
   // Start combo timer
   const startComboTimer = useCallback(() => {
@@ -354,10 +365,27 @@ export default function ComboMaster({
               interactive={true}
               onWordSubmit={handleWordSubmit}
               onPathSubmit={handlePathSubmit}
-              highlightedPath={highlightedPath}
+              highlightedPath={keyboard.isTypingMode ? keyboard.highlightedCells : highlightedPath}
               comboLevel={combo}
+              language={language}
               className="w-full"
             />
+
+            {/* Keyboard typed word display */}
+            {keyboard.isTypingMode && keyboard.typedWord && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={cn(
+                  'text-center px-4 py-2 rounded-neo border-2 border-neo-black font-black text-lg uppercase',
+                  keyboard.isValidOnGrid
+                    ? 'bg-neo-cyan text-neo-black'
+                    : 'bg-neo-red/50 text-neo-black'
+                )}
+              >
+                {keyboard.typedWord}
+              </motion.div>
+            )}
 
             {/* Feedback message */}
             <AnimatePresence>
@@ -377,6 +405,23 @@ export default function ComboMaster({
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {/* Keyboard UI - Desktop only */}
+            {keyboard.isDesktop && (
+              <>
+                <KeyboardDesktopBadge t={t} position="bottom-right" />
+                <EnterKeyHint
+                  isVisible={keyboard.showEnterHint}
+                  t={t}
+                  position="bottom-center"
+                />
+                <KeyboardQuickTip
+                  isVisible={keyboard.showQuickTip}
+                  onDismiss={keyboard.dismissQuickTip}
+                  t={t}
+                />
+              </>
+            )}
           </div>
         )}
 

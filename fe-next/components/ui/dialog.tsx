@@ -58,7 +58,7 @@ const DialogContent = React.forwardRef<
         "fixed z-50 grid w-[calc(100%-1rem)] max-w-[95vw]",
         // Positioning
         "left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]",
-        "sm:max-w-lg",
+        "sm:max-w-lg lg:max-w-xl xl:max-w-2xl",
         // Height constraints - prevent overflow
         "max-h-[90vh] sm:max-h-[85vh]",
         // Neo-Brutalist styling
@@ -122,7 +122,7 @@ const DialogHeader = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex flex-col space-y-1.5 p-4 sm:p-6",
+      "flex flex-col space-y-1.5 p-4 sm:p-6 lg:p-8",
       "bg-neo-yellow border-b-3 border-neo-black",
       "text-center sm:text-left",
       className
@@ -139,8 +139,8 @@ const DialogFooter = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "flex flex-col-reverse sm:flex-row sm:justify-end gap-2",
-      "p-4 sm:p-6 pt-0 sm:pt-0",
+      "flex flex-col-reverse sm:flex-row sm:justify-end gap-2 lg:gap-3",
+      "p-4 sm:p-6 lg:p-8 pt-0 sm:pt-0 lg:pt-0",
       className
     )}
     {...props}
@@ -158,7 +158,7 @@ const DialogTitle = React.forwardRef<
     ref={ref}
     dir="auto"
     className={cn(
-      "text-xl sm:text-2xl font-black uppercase tracking-tight",
+      "text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-tight",
       "text-neo-black",
       className
     )}
@@ -192,7 +192,7 @@ const DialogBody = ({
 }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     className={cn(
-      "p-4 sm:p-6",
+      "p-4 sm:p-6 lg:p-8",
       className
     )}
     {...props}

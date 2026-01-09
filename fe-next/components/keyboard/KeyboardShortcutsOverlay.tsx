@@ -109,7 +109,7 @@ export function KeyboardShortcutsOverlay({
             )}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b-4 border-neo-black bg-neo-pink">
+            <div className="flex items-center justify-between p-4 border-b-4 border-neo-black bg-neo-pink text-neo-white">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-neo-yellow text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center">
                   <Keyboard className="w-6 h-6" />
