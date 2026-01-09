@@ -81,3 +81,7 @@ export type { RankBadgeProps } from './RankBadge';
 
 export { TryAnotherLanguage } from './TryAnotherLanguage';
 export { SharePanel } from './SharePanel';
+export { LeaderboardTeaser } from './LeaderboardTeaser';
+export type { LeaderboardTeaserProps } from './LeaderboardTeaser';
+export { GuestBrainScorePreview } from './GuestBrainScorePreview';
+export type { GuestBrainScorePreviewProps } from './GuestBrainScorePreview';

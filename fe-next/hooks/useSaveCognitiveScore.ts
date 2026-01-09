@@ -131,19 +131,41 @@ export function useSaveCognitiveScore() {
       });
 
       // Save game cognitive score to database
-      // Note: game_session_id must be a valid UUID or undefined
+      // Note: game_session_id must be a valid UUID that exists in game_sessions table
       // Non-UUID formats like "mp_PLW9X5_1767889799004" are filtered out
-      const validGameSessionId = getValidUUIDOrUndefined(input.gameSessionId);
+      let verifiedGameSessionId: string | undefined = getValidUUIDOrUndefined(input.gameSessionId);
+
+      // Verify game session exists in database to avoid foreign key constraint errors
+      if (verifiedGameSessionId) {
+        const { data: sessionExists } = await supabase
+          .from('game_sessions')
+          .select('id')
+          .eq('id', verifiedGameSessionId)
+          .single();
+
+        if (!sessionExists) {
+          console.log('[useSaveCognitiveScore] Game session not found in database, skipping session link');
+          verifiedGameSessionId = undefined;
+        }
+      }
+
+      // Ensure all domain scores are integers (handle any floating point edge cases)
+      const safeProcessingSpeed = Math.round(gameScores.processingSpeed);
+      const safeWorkingMemory = Math.round(gameScores.workingMemory);
+      const safeAttention = Math.round(gameScores.attention);
+      const safeFlexibility = Math.round(gameScores.flexibility);
+      const safeVocabulary = Math.round(gameScores.vocabulary);
+
       const { error: insertError } = await supabase
         .from('game_cognitive_scores')
         .insert({
           user_id: userId,
-          game_session_id: validGameSessionId,
-          processing_speed: gameScores.processingSpeed,
-          working_memory: gameScores.workingMemory,
-          attention: gameScores.attention,
-          flexibility: gameScores.flexibility,
-          vocabulary: gameScores.vocabulary,
+          game_session_id: verifiedGameSessionId,
+          processing_speed: safeProcessingSpeed,
+          working_memory: safeWorkingMemory,
+          attention: safeAttention,
+          flexibility: safeFlexibility,
+          vocabulary: safeVocabulary,
           words_per_minute: gameScores.wordsPerMinute,
           avg_word_length: gameScores.avgWordLength,
           max_combo: gameScores.maxCombo,
@@ -156,7 +178,32 @@ export function useSaveCognitiveScore() {
         });
 
       if (insertError) {
-        console.error('[useSaveCognitiveScore] Failed to insert game score:', insertError);
+        // Handle foreign key constraint error gracefully - retry without session ID
+        if (insertError.code === '23503' && verifiedGameSessionId) {
+          console.log('[useSaveCognitiveScore] Session not found, retrying without session link');
+          await supabase
+            .from('game_cognitive_scores')
+            .insert({
+              user_id: userId,
+              game_session_id: null,
+              processing_speed: safeProcessingSpeed,
+              working_memory: safeWorkingMemory,
+              attention: safeAttention,
+              flexibility: safeFlexibility,
+              vocabulary: safeVocabulary,
+              words_per_minute: gameScores.wordsPerMinute,
+              avg_word_length: gameScores.avgWordLength,
+              max_combo: gameScores.maxCombo,
+              unique_word_lengths: gameScores.uniqueWordLengths,
+              rare_word_count: gameScores.rareWordCount,
+              legendary_word_count: gameScores.legendaryWordCount,
+              hints_used: gameScores.hintsUsed,
+              grid_size: gameScores.gridSize,
+              game_duration_seconds: gameScores.gameDurationSeconds,
+            });
+        } else {
+          console.error('[useSaveCognitiveScore] Failed to insert game score:', insertError);
+        }
         // Continue to update brain score even if game score insert fails
       }
 
@@ -188,18 +235,18 @@ export function useSaveCognitiveScore() {
           currentBrainScore.games_analyzed
         );
 
-        // Update brain score in database
+        // Update brain score in database (ensure all scores are integers)
         const { error: updateError } = await supabase
           .from('brain_scores')
           .update({
-            processing_speed: updated.domainScores.processingSpeed,
-            working_memory: updated.domainScores.workingMemory,
-            attention: updated.domainScores.attention,
-            flexibility: updated.domainScores.flexibility,
-            vocabulary: updated.domainScores.vocabulary,
-            overall_score: updated.overallScore,
+            processing_speed: Math.round(updated.domainScores.processingSpeed),
+            working_memory: Math.round(updated.domainScores.workingMemory),
+            attention: Math.round(updated.domainScores.attention),
+            flexibility: Math.round(updated.domainScores.flexibility),
+            vocabulary: Math.round(updated.domainScores.vocabulary),
+            overall_score: Math.round(updated.overallScore),
             tier: updated.tier,
-            tier_progress: updated.tierProgress,
+            tier_progress: Math.round(updated.tierProgress),
             games_analyzed: currentBrainScore.games_analyzed + 1,
             last_activity_at: new Date().toISOString(),
           })
@@ -225,61 +272,61 @@ export function useSaveCognitiveScore() {
           .single();
 
         if (existingHistory) {
-          // Update existing entry for today
+          // Update existing entry for today (ensure all scores are integers)
           await supabase
             .from('brain_score_history')
             .update({
-              overall_score: updated.overallScore,
-              processing_speed: updated.domainScores.processingSpeed,
-              working_memory: updated.domainScores.workingMemory,
-              attention: updated.domainScores.attention,
-              flexibility: updated.domainScores.flexibility,
-              vocabulary: updated.domainScores.vocabulary,
+              overall_score: Math.round(updated.overallScore),
+              processing_speed: Math.round(updated.domainScores.processingSpeed),
+              working_memory: Math.round(updated.domainScores.workingMemory),
+              attention: Math.round(updated.domainScores.attention),
+              flexibility: Math.round(updated.domainScores.flexibility),
+              vocabulary: Math.round(updated.domainScores.vocabulary),
               games_played: (existingHistory.games_played || 0) + 1,
             })
             .eq('id', existingHistory.id);
         } else {
-          // Insert new entry for today
+          // Insert new entry for today (ensure all scores are integers)
           await supabase
             .from('brain_score_history')
             .insert({
               user_id: userId,
               period_type: 'daily',
               period_start: today,
-              overall_score: updated.overallScore,
-              processing_speed: updated.domainScores.processingSpeed,
-              working_memory: updated.domainScores.workingMemory,
-              attention: updated.domainScores.attention,
-              flexibility: updated.domainScores.flexibility,
-              vocabulary: updated.domainScores.vocabulary,
+              overall_score: Math.round(updated.overallScore),
+              processing_speed: Math.round(updated.domainScores.processingSpeed),
+              working_memory: Math.round(updated.domainScores.workingMemory),
+              attention: Math.round(updated.domainScores.attention),
+              flexibility: Math.round(updated.domainScores.flexibility),
+              vocabulary: Math.round(updated.domainScores.vocabulary),
               games_played: 1,
               drills_completed: 0,
             });
         }
 
       } else {
-        // Create new brain score
+        // Create new brain score (use safe integer values defined earlier)
         const domainScores = getDomainScoresRecord(gameScores);
-        overallScore = (
-          gameScores.processingSpeed +
-          gameScores.workingMemory +
-          gameScores.attention +
-          gameScores.flexibility +
-          gameScores.vocabulary
-        ) / 5;
+        overallScore = Math.round((
+          safeProcessingSpeed +
+          safeWorkingMemory +
+          safeAttention +
+          safeFlexibility +
+          safeVocabulary
+        ) / 5);
         tier = getTierFromScore(overallScore);
-        tierProgress = calculateTierProgress(overallScore);
+        tierProgress = Math.round(calculateTierProgress(overallScore));
         scoreDelta = overallScore; // First game so all points are new
 
         const { error: createError } = await supabase
           .from('brain_scores')
           .insert({
             user_id: userId,
-            processing_speed: gameScores.processingSpeed,
-            working_memory: gameScores.workingMemory,
-            attention: gameScores.attention,
-            flexibility: gameScores.flexibility,
-            vocabulary: gameScores.vocabulary,
+            processing_speed: safeProcessingSpeed,
+            working_memory: safeWorkingMemory,
+            attention: safeAttention,
+            flexibility: safeFlexibility,
+            vocabulary: safeVocabulary,
             overall_score: overallScore,
             tier,
             tier_progress: tierProgress,
@@ -306,11 +353,11 @@ export function useSaveCognitiveScore() {
             .from('brain_score_history')
             .update({
               overall_score: overallScore,
-              processing_speed: gameScores.processingSpeed,
-              working_memory: gameScores.workingMemory,
-              attention: gameScores.attention,
-              flexibility: gameScores.flexibility,
-              vocabulary: gameScores.vocabulary,
+              processing_speed: safeProcessingSpeed,
+              working_memory: safeWorkingMemory,
+              attention: safeAttention,
+              flexibility: safeFlexibility,
+              vocabulary: safeVocabulary,
               games_played: (existingHistoryNew.games_played || 0) + 1,
             })
             .eq('id', existingHistoryNew.id);
@@ -322,11 +369,11 @@ export function useSaveCognitiveScore() {
               period_type: 'daily',
               period_start: todayDate,
               overall_score: overallScore,
-              processing_speed: gameScores.processingSpeed,
-              working_memory: gameScores.workingMemory,
-              attention: gameScores.attention,
-              flexibility: gameScores.flexibility,
-              vocabulary: gameScores.vocabulary,
+              processing_speed: safeProcessingSpeed,
+              working_memory: safeWorkingMemory,
+              attention: safeAttention,
+              flexibility: safeFlexibility,
+              vocabulary: safeVocabulary,
               games_played: 1,
               drills_completed: 0,
             });

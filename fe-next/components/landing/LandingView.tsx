@@ -210,10 +210,10 @@ const LandingView: React.FC = () => {
           </Suspense>
         </div>
 
-        {/* Mode cards grid - horizontal in landscape, featured hero layout on desktop */}
+        {/* Mode cards grid - horizontal in landscape, balanced 2-column layout on desktop */}
         {/* Using CSS animation for instant paint without JS overhead */}
-        <div className={`w-full animate-fade-in-fast ${isLandscape ? 'flex gap-3 flex-1 min-h-0' : 'grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-2 sm:gap-3 lg:gap-4 xl:gap-5 md:min-h-[320px] lg:min-h-[420px] xl:min-h-[480px]'}`}>
-          {/* Multiplayer Card - Featured (spans 2 cols and 2 rows on desktop) */}
+        <div className={`w-full animate-fade-in-fast ${isLandscape ? 'flex gap-3 flex-1 min-h-0' : 'grid grid-cols-1 md:grid-cols-2 md:grid-rows-2 gap-2 sm:gap-3 lg:gap-4 xl:gap-5 md:min-h-[320px] lg:min-h-[420px] xl:min-h-[480px]'}`}>
+          {/* Multiplayer Card - Featured (spans 2 rows on desktop, 50% width) */}
           {isLandscape ? (
             <Link
               href={`/${language}/multiplayer`}
@@ -240,7 +240,7 @@ const LandingView: React.FC = () => {
                 roomsLabel: t('landing.openRooms') || 'open rooms',
                 playersLabel: t('landing.playersLive') || 'playing now',
               }}
-              className="md:col-span-2 md:row-span-2"
+              className="md:row-span-2"
             />
           )}
 

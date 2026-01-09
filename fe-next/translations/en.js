@@ -2142,6 +2142,8 @@ const en = {
     "noAccount": "Don't have an account? Sign up",
     "invalidCredentials": "Invalid email or password",
     "continueAsGuest": "Play as Guest",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithDiscord": "Continue with Discord",
     "saveProgress": "Save Progress",
     "guestStatsTitle": "Your stats:",
     "claimStats": "Claim Stats",
@@ -3091,6 +3093,14 @@ const en = {
     "signUpToAppear": "Sign up to appear on the leaderboard!",
     "showLeaderboard": "Show Leaderboard",
     "tryAnotherLanguage": "Try the challenge in another language:",
+    "guestModeNotice": "Playing as Guest",
+    "guestModeBenefits": "Sign up to track progress, build streaks, and compete on leaderboards",
+    "brainScoreLocked": "Sign up to track Brain Score",
+    "streakTeaser": "Sign up to build and track streaks",
+    "streakLocked": "Streak tracking requires signup",
+    "historyTeaser": "Sign up to view your improvement over time",
+    "leaderboardLocked": "Sign up to see leaderboard",
+    "leaderboardTeaser": "Compete against players worldwide",
     "carousel": {
       "step1Title": "Swipe to Find Words",
       "step1Desc": "Connect letters in any direction",
@@ -3794,7 +3804,10 @@ const en = {
         "studyPhase": "Memorize!",
         "memorizeHint": "Remember these words:",
         "recallPhase": "Find them!",
-        "remaining": "Remaining"
+        "remaining": "Remaining",
+        "studyTheseWords": "Study these words:",
+        "markInvalid": "Replace",
+        "readyToStart": "I'm Ready!"
       },
       "combo-master": {
         "name": "Combo Master",

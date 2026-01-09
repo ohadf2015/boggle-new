@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Trophy, Clock, ChevronDown, ChevronUp, Sparkles, Crown, Calendar } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { getRankDisplay } from '@/utils/rankingStyles';
 import { getPuzzleNumber } from '@/utils/dailyChallenge';
 import { formatDistanceToNow, getCountryFlag } from '@/shared/utils';
+import Avatar from '@/components/Avatar';
 import type { Language } from '@/types';
 
 // ==========================================
@@ -20,6 +20,7 @@ export interface DailyParticipant {
   display_name: string;
   avatar_emoji: string;
   avatar_color: string;
+  avatar_image?: string | null;
   profile_picture_url?: string | null;
   country_code?: string | null;
   score: number;
@@ -40,6 +41,7 @@ export interface AllTimeParticipant {
   display_name: string;
   avatar_emoji: string;
   avatar_color: string;
+  avatar_image?: string | null;
   profile_picture_url?: string | null;
   country_code?: string | null;
   total_efficiency_score: number;
@@ -133,23 +135,16 @@ const TodayParticipantRow = memo<{
 
       {/* Avatar with Country Flag */}
       <div className="relative">
-        {participant.profile_picture_url ? (
-          <Image
-            src={participant.profile_picture_url}
-            alt={participant.display_name || 'Player'}
-            width={44}
-            height={44}
-            className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl object-cover border-2 border-neo-black/80 shadow-sm"
-            unoptimized
+        <div className="w-9 h-9 sm:w-11 sm:h-11 border-2 border-neo-black/80 shadow-sm rounded-xl overflow-hidden">
+          <Avatar
+            profilePictureUrl={participant.profile_picture_url ?? undefined}
+            avatarImage={participant.avatar_image ?? undefined}
+            avatarEmoji={participant.avatar_emoji}
+            avatarColor={participant.avatar_color}
+            size="md"
+            className="w-full h-full"
           />
-        ) : (
-          <div
-            className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-lg sm:text-xl border-2 border-neo-black/80 shadow-sm"
-            style={{ backgroundColor: participant.avatar_color || '#FFE135' }}
-          >
-            {participant.avatar_emoji || '🎯'}
-          </div>
-        )}
+        </div>
         {/* Country Flag Badge */}
         {countryFlag && (
           <div className="absolute -bottom-1 -right-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>
@@ -266,23 +261,16 @@ const AllTimeParticipantRow = memo<{
 
       {/* Avatar with Country Flag */}
       <div className="relative">
-        {participant.profile_picture_url ? (
-          <Image
-            src={participant.profile_picture_url}
-            alt={participant.display_name || 'Player'}
-            width={44}
-            height={44}
-            className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl object-cover border-2 border-neo-black/80 shadow-sm"
-            unoptimized
+        <div className="w-9 h-9 sm:w-11 sm:h-11 border-2 border-neo-black/80 shadow-sm rounded-xl overflow-hidden">
+          <Avatar
+            profilePictureUrl={participant.profile_picture_url ?? undefined}
+            avatarImage={participant.avatar_image ?? undefined}
+            avatarEmoji={participant.avatar_emoji}
+            avatarColor={participant.avatar_color}
+            size="md"
+            className="w-full h-full"
           />
-        ) : (
-          <div
-            className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-lg sm:text-xl border-2 border-neo-black/80 shadow-sm"
-            style={{ backgroundColor: participant.avatar_color || '#FFE135' }}
-          >
-            {participant.avatar_emoji || '🎯'}
-          </div>
-        )}
+        </div>
         {/* Country Flag Badge */}
         {countryFlag && (
           <div className="absolute -bottom-1 -right-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>

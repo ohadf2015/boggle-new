@@ -1608,9 +1608,11 @@ export function getTodaysWordHuntResult(language: Language): StoredWordHuntResul
 
 /**
  * Save the result of today's Word Hunt
- * Also updates the daily streak for Word Hunt completions
+ * Also updates the daily streak for Word Hunt completions (only for authenticated users)
+ * @param result - The word hunt result to save
+ * @param isAuthenticated - Whether the user is authenticated. Streak only updates for authenticated users.
  */
-export function saveWordHuntResult(result: WordHuntResult): DailyStreak {
+export function saveWordHuntResult(result: WordHuntResult, isAuthenticated: boolean = true): DailyStreak {
   if (typeof window === 'undefined') {
     return { currentStreak: 0, longestStreak: 0, lastPlayedDate: null, totalDailiesCompleted: 0 };
   }
@@ -1628,8 +1630,14 @@ export function saveWordHuntResult(result: WordHuntResult): DailyStreak {
 
   localStorage.setItem(key, JSON.stringify(storedResult));
 
-  // Update the daily streak when completing Word Hunt
-  return updateDailyStreak();
+  // Update the daily streak only for authenticated users
+  // Anonymous users don't get streak tracking - incentive to sign up
+  if (isAuthenticated) {
+    return updateDailyStreak();
+  }
+
+  // Return empty streak for anonymous users
+  return { currentStreak: 0, longestStreak: 0, lastPlayedDate: null, totalDailiesCompleted: 0 };
 }
 
 /**
@@ -2910,13 +2918,9 @@ export async function syncGuestDailyResultsToAccount(
 
         // Validate result has all required fields and attemptsUsed is within valid range (1-10)
         // attemptsUsed < 1 indicates an incomplete/abandoned game that shouldn't be synced
+        // This is expected behavior, not an error - user abandoned game before completing
         if (result.solved === undefined || result.attemptsUsed === undefined || result.attemptsUsed < 1 || !result.targetWord || !Array.isArray(result.attempts)) {
-          console.warn(`[Sync] Skipping malformed result for ${puzzleDate} (${language}):`, {
-            solved: result.solved,
-            attemptsUsed: result.attemptsUsed,
-            targetWord: result.targetWord,
-            hasAttempts: Array.isArray(result.attempts)
-          });
+          console.log(`[Sync] Skipping incomplete/abandoned game for ${puzzleDate} (${language})`);
           continue;
         }
 
@@ -2964,7 +2968,13 @@ export async function syncGuestDailyResultsToAccount(
           console.log(`[Sync] Synced result for ${puzzleDate} (${language})`);
         } else {
           const errorText = await response.text();
-          console.warn(`[Sync] Failed to sync result for ${puzzleDate} (${language}):`, errorText);
+          // Invalid words are expected user behavior, not system errors
+          const isInvalidWordsError = response.status === 400 && errorText.includes('Invalid words');
+          if (isInvalidWordsError) {
+            console.log(`[Sync] Skipping result with invalid words for ${puzzleDate} (${language})`);
+          } else {
+            console.warn(`[Sync] Failed to sync result for ${puzzleDate} (${language}):`, errorText);
+          }
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : String(err);

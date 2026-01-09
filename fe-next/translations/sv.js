@@ -2136,6 +2136,8 @@ const sv = {
     "noAccount": "Har du inget konto? Registrera dig",
     "invalidCredentials": "Ogiltig e-post eller lösenord",
     "continueAsGuest": "Fortsätt som gäst",
+    "continueWithGoogle": "Fortsätt med Google",
+    "continueWithDiscord": "Fortsätt med Discord",
     "saveProgress": "Spara din framsteg",
     "guestStatsTitle": "Din statistik som gäst:",
     "claimStats": "Hämta din statistik",
@@ -3085,6 +3087,14 @@ const sv = {
     "signUpToAppear": "Registrera dig för att synas på topplistan!",
     "showLeaderboard": "Visa topplistan",
     "tryAnotherLanguage": "Prova utmaningen på ett annat språk:",
+    "guestModeNotice": "Spelar som gäst",
+    "guestModeBenefits": "Registrera dig för att spåra framsteg, bygga serier och tävla på topplistor",
+    "brainScoreLocked": "Registrera dig för att spåra hjärnpoäng",
+    "streakTeaser": "Registrera dig för att bygga och spåra serier",
+    "streakLocked": "Seriespårning kräver registrering",
+    "historyTeaser": "Registrera dig för att se din förbättring över tid",
+    "leaderboardLocked": "Registrera dig för att se topplistan",
+    "leaderboardTeaser": "Tävla mot spelare över hela världen",
     "carousel": {
       "step1Title": "Svep för att hitta ord",
       "step1Desc": "Koppla bokstäver i alla riktningar",
@@ -3754,7 +3764,10 @@ const sv = {
         "studyPhase": "Memorera!",
         "memorizeHint": "Kom ihåg dessa ord:",
         "recallPhase": "Hitta dem!",
-        "remaining": "Återstående"
+        "remaining": "Återstående",
+        "studyTheseWords": "Studera dessa ord:",
+        "markInvalid": "Ersätt",
+        "readyToStart": "Jag är redo!"
       },
       "combo-master": {
         "name": "Kombomästare",

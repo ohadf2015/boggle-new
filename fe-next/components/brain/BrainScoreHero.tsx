@@ -124,7 +124,7 @@ export default function BrainScoreHero({
 
           {/* Activities Analyzed Badge */}
           <div className={cn(
-            'text-right px-4 py-2 rounded-neo border-2 border-neo-black',
+            'text-right px-3 py-2 rounded-neo border-2 border-neo-black min-w-[4.5rem] whitespace-nowrap',
             isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
           )}>
             <p className={cn(
@@ -134,7 +134,7 @@ export default function BrainScoreHero({
               {t('brain.activitiesAnalyzed')}
             </p>
             <p className={cn(
-              'text-2xl font-black',
+              'text-xl font-black',
               isDarkMode ? 'text-neo-cyan' : 'text-neo-purple'
             )}>
               {totalActivities}
@@ -173,8 +173,8 @@ export default function BrainScoreHero({
 
         {/* Progress Bar */}
         <div className={cn(
-          'h-3 rounded-full border-2 border-neo-black overflow-hidden',
-          isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+          'h-4 rounded-full border-2 border-neo-black overflow-hidden',
+          isDarkMode ? 'bg-slate-900' : 'bg-gray-200'
         )}>
           <motion.div
             className={cn('h-full', tierConfig.color)}

@@ -72,7 +72,7 @@ describe('QuickDrillsSection', () => {
       expect(buttons.length).toBeGreaterThan(0);
 
       const firstButton = buttons[0];
-      expect(firstButton?.className).toMatch(/md:p-[34]|lg:p-[34]/);
+      expect(firstButton?.className).toMatch(/md:p-[345]|lg:p-[345]/);
     });
 
     it('renders icons with responsive sizing for desktop', () => {
@@ -84,7 +84,7 @@ describe('QuickDrillsSection', () => {
       expect(iconContainers.length).toBeGreaterThan(0);
 
       const firstIconContainer = iconContainers[0];
-      expect(firstIconContainer?.className).toMatch(/md:w-1[012]|lg:w-1[012]/);
+      expect(firstIconContainer?.className).toMatch(/md:w-1[0124]|lg:w-1[0124]/);
     });
 
     it('renders title text with responsive font size for desktop', () => {

@@ -96,12 +96,32 @@ const SinglePlayerView: React.FC = () => {
   const [phase, setPhase] = useState<SinglePlayerPhase>('preset-selection');
   const setIsInGame = useHideNavigation();
 
+  // Track the current isInGame value to prevent redundant updates
+  const isInGameRef = useRef(false);
+  // Track if component is mounted to prevent updates after unmount
+  const isMountedRef = useRef(true);
+
   // Hide bottom navigation during gameplay
   // Note: Using useEffect instead of useLayoutEffect to avoid infinite loop on iOS Chrome
+  // Split into two effects to prevent re-render loops from cleanup cascading
   useEffect(() => {
-    setIsInGame(phase === 'playing' || phase === 'results');
-    return () => setIsInGame(false);
+    const shouldBeInGame = phase === 'playing' || phase === 'results';
+    // Only update if state actually changed and component is still mounted
+    if (isMountedRef.current && isInGameRef.current !== shouldBeInGame) {
+      isInGameRef.current = shouldBeInGame;
+      setIsInGame(shouldBeInGame);
+    }
   }, [phase, setIsInGame]);
+
+  // Separate cleanup effect that only runs on unmount
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      // Reset navigation visibility on unmount
+      setIsInGame(false);
+    };
+  }, [setIsInGame]);
 
   // Check for returnTo param (e.g., returnTo=daily from training suggestion)
   const returnTo = searchParams.get('returnTo');

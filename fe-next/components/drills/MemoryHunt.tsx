@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Heart, Eye, EyeOff, CheckCircle2, XCircle, Trophy, RotateCcw } from 'lucide-react';
+import { Brain, Heart, Eye, EyeOff, CheckCircle2, XCircle, Trophy, RotateCcw, X, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -80,6 +80,8 @@ export default function MemoryHunt({
   const [studyCountdown, setStudyCountdown] = useState(0);
   const [lastFeedback, setLastFeedback] = useState<'correct' | 'wrong' | null>(null);
   const [currentHighlight, setCurrentHighlight] = useState<HighlightedCell[]>([]);
+  const [excludedWords, setExcludedWords] = useState<Set<string>>(new Set());
+  const [showStudyModal, setShowStudyModal] = useState(false);
 
   // Keyboard support for desktop users (only during recall phase)
   const keyboard = useDrillKeyboardSupport({
@@ -90,9 +92,10 @@ export default function MemoryHunt({
     minWordLength: 2,
   });
 
-  // Select random words for this round
-  const selectTargetWords = useCallback(() => {
-    const shuffled = [...availableWords].sort(() => Math.random() - 0.5);
+  // Select random words for this round (excluding marked invalid words)
+  const selectTargetWords = useCallback((currentExcluded: Set<string> = excludedWords) => {
+    const filtered = availableWords.filter(w => !currentExcluded.has(w.word.toUpperCase()));
+    const shuffled = [...filtered].sort(() => Math.random() - 0.5);
     const selected = shuffled.slice(0, levelConfig.wordCount);
 
     return selected.map(w => ({
@@ -100,7 +103,46 @@ export default function MemoryHunt({
       path: w.path.map(p => ({ row: p.row, col: p.col })),
       found: false,
     }));
-  }, [availableWords, levelConfig.wordCount]);
+  }, [availableWords, levelConfig.wordCount, excludedWords]);
+
+  // Replace a word marked as invalid during study phase
+  const replaceInvalidWord = useCallback((wordToReplace: string) => {
+    const upperWord = wordToReplace.toUpperCase();
+
+    // Add to excluded set
+    const newExcluded = new Set(excludedWords);
+    newExcluded.add(upperWord);
+    setExcludedWords(newExcluded);
+
+    // Find a replacement word
+    const currentWordSet = new Set(targetWords.map(tw => tw.word));
+    const availableReplacements = availableWords.filter(w =>
+      !newExcluded.has(w.word.toUpperCase()) &&
+      !currentWordSet.has(w.word.toUpperCase())
+    );
+
+    if (availableReplacements.length > 0) {
+      const replacement = availableReplacements[Math.floor(Math.random() * availableReplacements.length)];
+      const newWord: MemoryWord = {
+        word: replacement.word.toUpperCase(),
+        path: replacement.path.map(p => ({ row: p.row, col: p.col })),
+        found: false,
+      };
+
+      setTargetWords(prev => prev.map(tw =>
+        tw.word === upperWord ? newWord : tw
+      ));
+
+      // Update highlights
+      setCurrentHighlight(prev => {
+        const oldWordPaths = targetWords.find(tw => tw.word === upperWord)?.path || [];
+        const filtered = prev.filter(cell =>
+          !oldWordPaths.some(p => p.row === cell.row && p.col === cell.col)
+        );
+        return [...filtered, ...newWord.path];
+      });
+    }
+  }, [availableWords, targetWords, excludedWords]);
 
   // Ref to track study countdown interval for cleanup
   const studyIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -116,6 +158,7 @@ export default function MemoryHunt({
     const words = selectTargetWords();
     setTargetWords(words);
     setPhase('study');
+    setShowStudyModal(true);
     setStudyCountdown(levelConfig.studyTime / 1000);
 
     // Show all target words highlighted during study phase
@@ -130,6 +173,7 @@ export default function MemoryHunt({
             clearInterval(studyIntervalRef.current);
             studyIntervalRef.current = null;
           }
+          setShowStudyModal(false);
           setPhase('recall');
           setCurrentHighlight([]); // Hide highlights
           return 0;
@@ -138,6 +182,18 @@ export default function MemoryHunt({
       });
     }, 1000);
   }, [selectTargetWords, levelConfig.studyTime]);
+
+  // Skip study phase early (player is ready)
+  const skipStudyPhase = useCallback(() => {
+    if (studyIntervalRef.current) {
+      clearInterval(studyIntervalRef.current);
+      studyIntervalRef.current = null;
+    }
+    setShowStudyModal(false);
+    setPhase('recall');
+    setCurrentHighlight([]);
+    setStudyCountdown(0);
+  }, []);
 
   // Cleanup study interval on unmount
   useEffect(() => {
@@ -360,67 +416,116 @@ export default function MemoryHunt({
         {/* Study Phase */}
         {phase === 'study' && (
           <div className="w-full max-w-md space-y-4">
-            {/* Study indicator */}
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center space-y-2"
-            >
-              <div className="flex items-center justify-center gap-2">
-                <Eye className={cn(
-                  'w-6 h-6',
-                  isDarkMode ? 'text-neo-cyan' : 'text-neo-purple'
-                )} />
-                <span className={cn(
-                  'font-bold text-lg uppercase',
-                  isDarkMode ? 'text-neo-white' : 'text-neo-black'
-                )}>
-                  {t('brain.drills.memory-hunt.studyPhase')}
-                </span>
-              </div>
-              <div className={cn(
-                'text-4xl font-black',
-                isDarkMode ? 'text-neo-yellow' : 'text-neo-orange'
-              )}>
-                {studyCountdown}
-              </div>
-            </motion.div>
-
-            {/* Grid with highlighted words */}
+            {/* Grid with highlighted words (visible behind modal) */}
             <div className="relative">
               <GridComponent
                 grid={grid}
                 interactive={false}
                 highlightedPath={currentHighlight}
-                className="w-full"
+                className="w-full opacity-50"
               />
             </div>
 
-            {/* Word list hint */}
-            <div className={cn(
-              'p-3 rounded-neo border-2 border-neo-black text-center',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
-            )}>
-              <p className={cn(
-                'text-xs font-medium',
-                isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
-              )}>
-                {t('brain.drills.memory-hunt.memorizeHint')}
-              </p>
-              <div className="flex flex-wrap gap-2 justify-center mt-2">
-                {targetWords.map((tw, i) => (
-                  <span
-                    key={i}
+            {/* Study Modal Overlay */}
+            <AnimatePresence>
+              {showStudyModal && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+                >
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.8, opacity: 0 }}
                     className={cn(
-                      'px-2 py-1 rounded border-2 border-neo-black text-sm font-bold',
-                      isDarkMode ? 'bg-neo-purple text-neo-white' : 'bg-neo-yellow text-neo-black'
+                      'w-full max-w-lg p-6 rounded-neo border-4 border-neo-black shadow-hard-lg',
+                      isDarkMode ? 'bg-slate-800' : 'bg-white'
                     )}
                   >
-                    {tw.word}
-                  </span>
-                ))}
-              </div>
-            </div>
+                    {/* Header with countdown */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center gap-2">
+                        <Eye className={cn(
+                          'w-8 h-8',
+                          isDarkMode ? 'text-neo-cyan' : 'text-neo-purple'
+                        )} />
+                        <span className={cn(
+                          'font-black text-xl uppercase',
+                          isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                        )}>
+                          {t('brain.drills.memory-hunt.studyPhase')}
+                        </span>
+                      </div>
+                      <div className={cn(
+                        'px-4 py-2 rounded-neo border-3 border-neo-black text-3xl font-black tabular-nums',
+                        isDarkMode ? 'bg-neo-yellow text-neo-black' : 'bg-neo-orange text-neo-black'
+                      )}>
+                        {studyCountdown}
+                      </div>
+                    </div>
+
+                    {/* Instructions */}
+                    <p className={cn(
+                      'text-center text-lg font-medium mb-4',
+                      isDarkMode ? 'text-neo-white/80' : 'text-neo-black/80'
+                    )}>
+                      {t('brain.drills.memory-hunt.studyTheseWords') || 'Study these words:'}
+                    </p>
+
+                    {/* Words to memorize - LARGE display with mark invalid button */}
+                    <div className="space-y-3 mb-6">
+                      {targetWords.map((tw, i) => (
+                        <motion.div
+                          key={`${tw.word}-${i}`}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.1 }}
+                          className={cn(
+                            'flex items-center justify-between gap-3 px-4 py-3 rounded-neo border-3 border-neo-black',
+                            isDarkMode ? 'bg-neo-purple' : 'bg-neo-yellow'
+                          )}
+                        >
+                          <span className="text-2xl sm:text-3xl font-black text-neo-black tracking-wide">
+                            {tw.word}
+                          </span>
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => replaceInvalidWord(tw.word)}
+                            className={cn(
+                              'flex items-center gap-1 px-2 py-1 rounded-neo border-2 border-neo-black',
+                              'text-xs font-bold uppercase',
+                              'bg-neo-red/20 hover:bg-neo-red/40 text-neo-black',
+                              'transition-colors'
+                            )}
+                            title={t('brain.drills.memory-hunt.markInvalid') || 'Mark Invalid'}
+                          >
+                            <X className="w-4 h-4" />
+                            <RefreshCw className="w-3 h-3" />
+                          </motion.button>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    {/* Ready button to skip study phase */}
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={skipStudyPhase}
+                      className={cn(
+                        'w-full px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard',
+                        'font-bold text-lg uppercase',
+                        'transition-all hover:translate-y-[-2px]',
+                        'bg-neo-green text-neo-black'
+                      )}
+                    >
+                      {t('brain.drills.memory-hunt.readyToStart') || "I'm Ready!"}
+                    </motion.button>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
 
@@ -503,7 +608,7 @@ export default function MemoryHunt({
                   <span
                     key={i}
                     className={cn(
-                      'px-2 py-1 rounded border-2 border-neo-black text-sm font-bold',
+                      'px-3 py-1.5 rounded-neo border-2 border-neo-black text-base font-bold',
                       tw.found
                         ? 'bg-neo-green/30 text-neo-green line-through'
                         : isDarkMode ? 'bg-slate-700 text-neo-white/50' : 'bg-gray-200 text-neo-black/50'

@@ -131,28 +131,35 @@ export default function ScientificTipsCarousel() {
               isDarkMode ? 'bg-slate-700' : 'bg-white'
             )}
           >
-            <ChevronLeft className={cn(
-              'w-4 h-4',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
-            )} />
+            {isRTL ? (
+              <ChevronRight className={cn(
+                'w-4 h-4',
+                isDarkMode ? 'text-neo-white' : 'text-neo-black'
+              )} />
+            ) : (
+              <ChevronLeft className={cn(
+                'w-4 h-4',
+                isDarkMode ? 'text-neo-white' : 'text-neo-black'
+              )} />
+            )}
           </button>
 
           {/* Dots */}
-          <div className="flex items-center justify-center gap-1.5">
+          <div className="flex items-center justify-center gap-2">
             {TIPS.map((_, index) => (
               <button
                 key={index}
                 onClick={() => setActiveIndex(index)}
                 aria-label={`Go to tip ${index + 1}`}
                 className={cn(
-                  'w-1.5 h-1.5 rounded-full border border-neo-black transition-all duration-300',
+                  'w-2 h-2 shrink-0 aspect-square rounded-full border border-neo-black transition-all duration-300',
                   index === activeIndex
                     ? cn(
-                        'scale-150 shadow-[1px_1px_0px_rgb(0,0,0)]',
+                        'scale-125 shadow-[1px_1px_0px_rgb(0,0,0)]',
                         isDarkMode ? 'bg-neo-yellow' : 'bg-neo-purple'
                       )
                     : cn(
-                        'hover:scale-125',
+                        'hover:scale-110',
                         isDarkMode ? 'bg-slate-600 hover:bg-slate-500' : 'bg-gray-300 hover:bg-gray-400'
                       )
                 )}
@@ -168,10 +175,17 @@ export default function ScientificTipsCarousel() {
               isDarkMode ? 'bg-slate-700' : 'bg-white'
             )}
           >
-            <ChevronRight className={cn(
-              'w-4 h-4',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
-            )} />
+            {isRTL ? (
+              <ChevronLeft className={cn(
+                'w-4 h-4',
+                isDarkMode ? 'text-neo-white' : 'text-neo-black'
+              )} />
+            ) : (
+              <ChevronRight className={cn(
+                'w-4 h-4',
+                isDarkMode ? 'text-neo-white' : 'text-neo-black'
+              )} />
+            )}
           </button>
         </div>
       </div>

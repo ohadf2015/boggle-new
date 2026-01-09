@@ -81,8 +81,11 @@ export default function PatternSwitcher({
     minWordLength: 2,
   });
 
-  // Generate available lengths from words
-  const availableLengths = [...new Set(availableWords.map(w => w.word.length))].sort();
+  // Generate available lengths from words (capped at 5 letters max for fair gameplay)
+  const MAX_WORD_LENGTH = 5;
+  const availableLengths = [...new Set(availableWords.map(w => w.word.length))]
+    .filter(len => len <= MAX_WORD_LENGTH)
+    .sort();
 
   // Generate random pattern
   const generatePattern = useCallback(() => {

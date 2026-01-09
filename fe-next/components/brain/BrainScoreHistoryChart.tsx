@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   LineChart,
@@ -17,6 +17,45 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
 import type { BrainScoreHistory } from '@/shared/types/cognitive';
+
+/**
+ * Hook to track container dimensions and only render when valid
+ * Prevents Recharts "width(-1) and height(-1)" warning
+ */
+function useContainerDimensions() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const checkDimensions = () => {
+      if (containerRef.current) {
+        const { clientWidth, clientHeight } = containerRef.current;
+        if (clientWidth > 0 && clientHeight > 0) {
+          setIsReady(true);
+        }
+      }
+    };
+
+    // Check immediately
+    checkDimensions();
+
+    // Also check on next frame in case of layout shift
+    const frameId = requestAnimationFrame(checkDimensions);
+
+    // Set up resize observer for dynamic changes
+    const observer = new ResizeObserver(checkDimensions);
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      observer.disconnect();
+    };
+  }, []);
+
+  return { containerRef, isReady };
+}
 
 interface BrainScoreHistoryChartProps {
   history: BrainScoreHistory[];
@@ -92,6 +131,9 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
   const { t } = useLanguage();
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
+
+  // Track container dimensions to prevent Recharts rendering with invalid size
+  const { containerRef, isReady } = useContainerDimensions();
 
   // Transform history data for chart
   const chartData: ChartDataPoint[] = useMemo(() => {
@@ -244,9 +286,10 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
           )}
         </div>
 
-        {/* Chart */}
-        <div className="w-full h-48">
-          <ResponsiveContainer width="100%" height="100%">
+        {/* Chart - only render ResponsiveContainer when dimensions are valid */}
+        <div ref={containerRef} className="w-full h-48">
+          {isReady && (
+          <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100}>
             <AreaChart
               data={chartData}
               margin={{ top: 10, right: 10, left: 0, bottom: 5 }}
@@ -314,6 +357,7 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
               />
             </AreaChart>
           </ResponsiveContainer>
+          )}
         </div>
 
         {/* Stats Row */}

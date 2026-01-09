@@ -135,9 +135,11 @@ export function getTodaysWordHuntResult(language: Language): StoredWordHuntResul
 
 /**
  * Save the result of today's Word Hunt
- * Also updates the daily streak for Word Hunt completions
+ * Also updates the daily streak for Word Hunt completions (only for authenticated users)
+ * @param result - The word hunt result to save
+ * @param isAuthenticated - Whether the user is authenticated. Streak only updates for authenticated users.
  */
-export function saveWordHuntResult(result: WordHuntResult): DailyStreak {
+export function saveWordHuntResult(result: WordHuntResult, isAuthenticated: boolean = true): DailyStreak {
   if (typeof window === 'undefined') {
     return { currentStreak: 0, longestStreak: 0, lastPlayedDate: null, totalDailiesCompleted: 0 };
   }
@@ -155,8 +157,14 @@ export function saveWordHuntResult(result: WordHuntResult): DailyStreak {
 
   localStorage.setItem(key, JSON.stringify(storedResult));
 
-  // Update the daily streak when completing Word Hunt
-  return updateDailyStreak();
+  // Update the daily streak only for authenticated users
+  // Anonymous users don't get streak tracking - incentive to sign up
+  if (isAuthenticated) {
+    return updateDailyStreak();
+  }
+
+  // Return empty streak for anonymous users
+  return { currentStreak: 0, longestStreak: 0, lastPlayedDate: null, totalDailiesCompleted: 0 };
 }
 
 /**

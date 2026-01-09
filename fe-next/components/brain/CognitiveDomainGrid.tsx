@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Zap, Brain, Target, Shuffle, BookOpen, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -107,11 +107,19 @@ export default function CognitiveDomainGrid({
   const { t } = useLanguage();
   const isDarkMode = theme === 'dark';
 
+  // State to track which tooltip is open (for mobile touch support)
+  const [openTooltip, setOpenTooltip] = useState<string | null>(null);
+
   const domainEntries = Object.entries(domains) as [keyof typeof DOMAIN_CONFIG, DomainScore][];
 
   // Show NEW badge for game 1, delta for game 2, trends for 3+ games
   const showNewBadge = gamesAnalyzed === 1;
   const showDelta = gamesAnalyzed === 2 && recentGameScores.length >= 2;
+
+  // Handle tooltip toggle for mobile
+  const handleTooltipToggle = useCallback((domainKey: string) => {
+    setOpenTooltip(prev => prev === domainKey ? null : domainKey);
+  }, []);
 
   return (
     <TooltipProvider>
@@ -127,14 +135,32 @@ export default function CognitiveDomainGrid({
           {domainEntries.map(([domainKey, domainData], index) => {
             const config = DOMAIN_CONFIG[domainKey];
             const Icon = config.icon;
+            const isOpen = openTooltip === domainKey;
 
             return (
-              <Tooltip key={domainKey} delayDuration={200}>
+              <Tooltip
+                key={domainKey}
+                delayDuration={200}
+                open={isOpen}
+                onOpenChange={(open) => {
+                  if (!open) setOpenTooltip(null);
+                }}
+              >
                 <TooltipTrigger asChild>
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
+                    onClick={() => handleTooltipToggle(domainKey)}
+                    onMouseEnter={() => setOpenTooltip(domainKey)}
+                    onMouseLeave={() => setOpenTooltip(null)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        handleTooltipToggle(domainKey);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
                     className={cn(
                       'rounded-neo border-3 border-neo-black shadow-hard-sm p-2.5',
                       'transition-all hover:translate-y-[-2px] hover:shadow-hard cursor-pointer',

@@ -164,7 +164,13 @@ export function useResultSubmission({
 
           if (!response.ok) {
             const errorText = await response.text();
-            console.error('Failed to submit Word Hunt result:', errorText);
+            // Invalid words are expected user behavior, not system errors - don't log as error
+            const isInvalidWordsError = response.status === 400 && errorText.includes('Invalid words');
+            if (isInvalidWordsError) {
+              console.log('[WordHunt Submit] Submission rejected - contains invalid words:', errorText);
+            } else {
+              console.error('Failed to submit Word Hunt result:', errorText);
+            }
             return;
           }
 

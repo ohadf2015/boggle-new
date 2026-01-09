@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Globe, ChevronDown, Trophy, Target, Check } from 'lucide-react';
+import { ArrowLeft, Globe, ChevronDown, Trophy, Target, Check, UserCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import AutoHideHeader from '@/components/AutoHideHeader';
@@ -15,7 +15,6 @@ import { DailyChallengeTutorial } from './DailyChallengeTutorial';
 import DailyIntroCarousel from './DailyIntroCarousel';
 import { TrainingGatewayModal } from '@/components/training';
 import { shouldShowTrainingGateway, markGatewaySkipped, markGatewaySeen } from '@/utils/trainingProgressStorage';
-import WordHuntLoginGate from '@/components/auth/WordHuntLoginGate';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
@@ -622,8 +621,8 @@ const DailyChallenge: React.FC = () => {
       completedAt: new Date().toISOString(),
     };
 
-    // Save result to localStorage and update streak
-    const updatedStreak = saveWordHuntResult(wordHuntResult);
+    // Save result to localStorage and update streak (only for authenticated users)
+    const updatedStreak = saveWordHuntResult(wordHuntResult, isAuthenticated);
 
     // Update the result with the actual streak
     wordHuntResult.streakDays = updatedStreak.currentStreak;
@@ -638,7 +637,7 @@ const DailyChallenge: React.FC = () => {
     });
 
     setPhase('completed');
-  }, [puzzleNumber, puzzleDate, gameLanguage]);
+  }, [puzzleNumber, puzzleDate, gameLanguage, isAuthenticated]);
 
   // Handle tutorial completion
   const handleTutorialComplete = useCallback(() => {
@@ -760,15 +759,7 @@ const DailyChallenge: React.FC = () => {
           </motion.div>
         )}
 
-        {phase === 'ready' && !isAuthenticated && (
-          <WordHuntLoginGate
-            puzzleNumber={puzzleNumber}
-            puzzleDate={puzzleDate}
-            onBack={handleBack}
-          />
-        )}
-
-        {phase === 'ready' && isAuthenticated && (
+        {phase === 'ready' && (
           <DailyReadyScreen
             puzzleNumber={puzzleNumber}
             puzzleDate={puzzleDate}
@@ -998,6 +989,24 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
 
       {/* Main content - SIMPLIFIED */}
       <div className="max-w-md w-full text-center space-y-5">
+        {/* Guest Mode Notice - Show only for anonymous users */}
+        {!isAuthenticated && (
+          <motion.div
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.05 }}
+            className="w-full max-w-sm mx-auto bg-amber-50 dark:bg-amber-900/20 rounded-neo border-2 border-amber-400 p-3 text-center"
+          >
+            <div className="flex items-center justify-center gap-2 text-amber-700 dark:text-amber-300 text-sm font-bold">
+              <UserCircle2 className="w-4 h-4" />
+              <span>{t('daily.guestModeNotice')}</span>
+            </div>
+            <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+              {t('daily.guestModeBenefits')}
+            </p>
+          </motion.div>
+        )}
+
         {/* Challenge Banner (when arriving via challenge link) */}
         {isValidChallenge && (
           <motion.div

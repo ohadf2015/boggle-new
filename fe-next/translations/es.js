@@ -1799,6 +1799,8 @@ const es = {
     "noAccount": "¿No tienes cuenta? Regístrate",
     "invalidCredentials": "Correo o contraseña inválidos",
     "continueAsGuest": "Continuar como Invitado",
+    "continueWithGoogle": "Continuar con Google",
+    "continueWithDiscord": "Continuar con Discord",
     "saveProgress": "Guarda Tu Progreso",
     "guestStatsTitle": "Tus estadísticas como invitado:",
     "claimStats": "Reclamar Tus Estadísticas",
@@ -3082,6 +3084,14 @@ const es = {
     "signUpToAppear": "¡Regístrate para aparecer en la clasificación!",
     "showLeaderboard": "Mostrar tabla de líderes",
     "tryAnotherLanguage": "Prueba el desafío en otro idioma:",
+    "guestModeNotice": "Jugando como invitado",
+    "guestModeBenefits": "Regístrate para seguir tu progreso, crear rachas y competir en clasificaciones",
+    "brainScoreLocked": "Regístrate para seguir tu puntuación cerebral",
+    "streakTeaser": "Regístrate para crear y seguir rachas",
+    "streakLocked": "El seguimiento de rachas requiere registro",
+    "historyTeaser": "Regístrate para ver tu mejora a lo largo del tiempo",
+    "leaderboardLocked": "Regístrate para ver la clasificación",
+    "leaderboardTeaser": "Compite contra jugadores de todo el mundo",
     "carousel": {
       "step1Title": "Desliza para formar palabras",
       "step1Desc": "Conecta letras en cualquier dirección",
@@ -3751,7 +3761,10 @@ const es = {
         "studyPhase": "¡Memoriza!",
         "memorizeHint": "Recuerda estas palabras:",
         "recallPhase": "¡Encuéntralas!",
-        "remaining": "Restantes"
+        "remaining": "Restantes",
+        "studyTheseWords": "Estudia estas palabras:",
+        "markInvalid": "Reemplazar",
+        "readyToStart": "¡Estoy listo!"
       },
       "combo-master": {
         "name": "Maestro del Combo",

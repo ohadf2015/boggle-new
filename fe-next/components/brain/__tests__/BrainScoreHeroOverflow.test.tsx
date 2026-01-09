@@ -1,0 +1,103 @@
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import BrainScoreHero from '../BrainScoreHero';
+
+// Mock dependencies
+jest.mock('@/utils/ThemeContext', () => ({
+  useTheme: () => ({ theme: 'dark' }),
+}));
+
+jest.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'brain.score': 'Brain Score',
+        'brain.activitiesAnalyzed': 'Activities',
+        'brain.tiers.intermediate': 'Intermediate',
+        'brain.toNextTier': 'to',
+        'brain.tiers.advanced': 'Advanced',
+        'common.share': 'Share',
+      };
+      return translations[key] || key;
+    },
+  }),
+}));
+
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, className, ...props }: React.PropsWithChildren<{ className?: string }>) => (
+      <div className={className} {...props}>{children}</div>
+    ),
+    span: ({ children, className, ...props }: React.PropsWithChildren<{ className?: string }>) => (
+      <span className={className} {...props}>{children}</span>
+    ),
+    button: ({ children, className, onClick, ...props }: React.PropsWithChildren<{ className?: string; onClick?: () => void }>) => (
+      <button className={className} onClick={onClick} {...props}>{children}</button>
+    ),
+  },
+}));
+
+describe('BrainScoreHero UI Fixes', () => {
+  const defaultProps = {
+    score: 47,
+    tier: 'intermediate' as const,
+    tierProgress: 47,
+    gamesAnalyzed: 10,
+    drillsCompleted: 5,
+    onShare: jest.fn(),
+  };
+
+  describe('Activities counter overflow fix', () => {
+    it('should have min-width and nowrap to prevent overflow on activities badge', () => {
+      const { container } = render(<BrainScoreHero {...defaultProps} />);
+
+      // Find the activities badge container (has the activities count)
+      const badges = container.querySelectorAll('[class*="rounded-neo"][class*="border-2"]');
+
+      // Find the one containing the activities text
+      const foundBadge = Array.from(badges).find((badge) =>
+        badge.textContent?.includes('Activities') || badge.textContent?.includes('15')
+      );
+
+      expect(foundBadge).toBeTruthy();
+      // Should have min-w to prevent squishing
+      expect((foundBadge as Element).className).toMatch(/min-w-/);
+      // Should have whitespace-nowrap to prevent text wrapping
+      expect((foundBadge as Element).className).toMatch(/whitespace-nowrap/);
+    });
+
+    it('should use smaller text size for activities count to fit better', () => {
+      const { container } = render(<BrainScoreHero {...defaultProps} />);
+
+      // The activities count should use text-xl instead of text-2xl
+      const activitiesCount = screen.getByText('15');
+      expect(activitiesCount.className).toMatch(/text-xl/);
+      expect(activitiesCount.className).not.toMatch(/text-2xl/);
+    });
+  });
+
+  describe('Progress bar visibility fix', () => {
+    it('should have adequate height for the progress bar', () => {
+      const { container } = render(<BrainScoreHero {...defaultProps} />);
+
+      // Find the progress bar container by looking for the rounded-full element
+      const progressBar = container.querySelector('[class*="rounded-full"][class*="border-2"]');
+      expect(progressBar).toBeTruthy();
+
+      // Should have h-4 or h-5 for better visibility, not h-3
+      expect(progressBar?.className).toMatch(/h-[45]/);
+      expect(progressBar?.className).not.toMatch(/h-3\s|h-3$/);
+    });
+
+    it('should have higher contrast background for progress bar in dark mode', () => {
+      const { container } = render(<BrainScoreHero {...defaultProps} />);
+
+      // Find the progress bar container
+      const progressBar = container.querySelector('[class*="rounded-full"][class*="border-2"]');
+      expect(progressBar).toBeTruthy();
+
+      // Should use darker background (slate-900) for more contrast in dark mode
+      expect(progressBar?.className).toMatch(/bg-slate-900/);
+    });
+  });
+});

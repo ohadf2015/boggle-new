@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   RadarChart,
@@ -15,6 +15,45 @@ import { Brain } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+
+/**
+ * Hook to track container dimensions and only render when valid
+ * Prevents Recharts "width(-1) and height(-1)" warning
+ */
+function useContainerDimensions() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const checkDimensions = () => {
+      if (containerRef.current) {
+        const { clientWidth, clientHeight } = containerRef.current;
+        if (clientWidth > 0 && clientHeight > 0) {
+          setIsReady(true);
+        }
+      }
+    };
+
+    // Check immediately
+    checkDimensions();
+
+    // Also check on next frame in case of layout shift
+    const frameId = requestAnimationFrame(checkDimensions);
+
+    // Set up resize observer for dynamic changes
+    const observer = new ResizeObserver(checkDimensions);
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      observer.disconnect();
+    };
+  }, []);
+
+  return { containerRef, isReady };
+}
 
 interface CognitiveRadarChartProps {
   domains: {
@@ -53,6 +92,9 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
   const { theme } = useTheme();
   const { t } = useLanguage();
   const isDarkMode = theme === 'dark';
+
+  // Track container dimensions to prevent Recharts rendering with invalid size
+  const { containerRef, isReady } = useContainerDimensions();
 
   // Transform data for recharts
   const chartData = [
@@ -133,8 +175,9 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
       </div>
 
       {/* Radar Chart */}
-      <div className="relative z-10 w-full h-[280px] sm:h-[320px]">
-        <ResponsiveContainer width="100%" height="100%">
+      <div ref={containerRef} className="relative z-10 w-full h-[280px] sm:h-[320px]">
+        {isReady && (
+        <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100}>
           <RadarChart data={chartData}>
             <defs>
               <linearGradient id="radarGradient" x1="0" y1="0" x2="0" y2="1">
@@ -209,6 +252,7 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
             />
           </RadarChart>
         </ResponsiveContainer>
+        )}
       </div>
 
       {/* Legend */}

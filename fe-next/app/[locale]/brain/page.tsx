@@ -395,14 +395,16 @@ export default function BrainTrainingPage() {
           <CognitiveRadarChart domains={brainScore.domains} />
         </motion.div>
 
-        {/* Progress History Chart */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.12 }}
-        >
-          <BrainScoreHistoryChart history={brainScoreHistory} />
-        </motion.div>
+        {/* Progress History Chart - only show if there's meaningful history */}
+        {brainScoreHistory.length >= 2 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.12 }}
+          >
+            <BrainScoreHistoryChart history={brainScoreHistory} />
+          </motion.div>
+        )}
 
         {/* Cognitive Domains */}
         <motion.div

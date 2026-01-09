@@ -463,7 +463,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
 
         {/* Chart */}
         <div className={cn('w-full', compact ? 'h-32' : 'h-48')}>
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100}>
             <LineChart
               data={chartData}
               margin={{ top: 10, right: 10, left: 0, bottom: 5 }}

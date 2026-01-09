@@ -56,6 +56,8 @@ import {
   RankBadge,
   TryAnotherLanguage,
   SharePanel,
+  LeaderboardTeaser,
+  GuestBrainScorePreview,
 } from './results';
 
 // ============================================================================
@@ -337,18 +339,25 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         />
       )}
 
-      {/* Leaderboard - compact view */}
-      <TabbedDailyLeaderboard
-        key={leaderboardKey}
-        puzzleDate={puzzleDate}
-        language={language}
-        currentPlayerId={isAuthenticated && profile ? profile.id : null}
-        currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
-        maxVisible={3}
-        compact
-        t={t}
-        defaultTab="today"
-      />
+      {/* Leaderboard - compact view (authenticated) or teasers (anonymous) */}
+      {isAuthenticated ? (
+        <TabbedDailyLeaderboard
+          key={leaderboardKey}
+          puzzleDate={puzzleDate}
+          language={language}
+          currentPlayerId={profile ? profile.id : null}
+          currentGuestFingerprint={null}
+          maxVisible={3}
+          compact
+          t={t}
+          defaultTab="today"
+        />
+      ) : (
+        <div className="space-y-4 md:hidden">
+          <GuestBrainScorePreview t={t} />
+          <LeaderboardTeaser t={t} />
+        </div>
+      )}
 
       {/* FAIL state: Show performance breakdown lower */}
       {!result.solved && (
@@ -368,8 +377,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
       <TryAnotherLanguage currentLanguage={language} onGameLanguageChange={onGameLanguageChange} />
 
-      {/* Inline signup for guest winners */}
-      {!isAuthenticated && result.solved && !inlineSignupDismissed && (
+      {/* Inline signup for all anonymous users */}
+      {!isAuthenticated && !inlineSignupDismissed && (
         <DailyChallengeInlineSignup
           pendingResult={{ result, puzzleNumber, puzzleDate, language }}
           onDismiss={() => setInlineSignupDismissed(true)}
@@ -442,16 +451,23 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           </div>
           <div className={cn("flex-1 min-w-0 max-w-xl space-y-4", isProtected && "blur-xl pointer-events-none select-none")}>
             <DesktopStatsCard stats={stats} t={t} />
-            <TabbedDailyLeaderboard
-              puzzleDate={puzzleDate}
-              language={language}
-              currentPlayerId={isAuthenticated && profile ? profile.id : null}
-              currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
-              maxVisible={3}
-              compact
-              t={t}
-              defaultTab="today"
-            />
+            {isAuthenticated ? (
+              <TabbedDailyLeaderboard
+                puzzleDate={puzzleDate}
+                language={language}
+                currentPlayerId={profile ? profile.id : null}
+                currentGuestFingerprint={null}
+                maxVisible={3}
+                compact
+                t={t}
+                defaultTab="today"
+              />
+            ) : (
+              <>
+                <GuestBrainScorePreview t={t} />
+                <LeaderboardTeaser t={t} />
+              </>
+            )}
           </div>
         </div>
 

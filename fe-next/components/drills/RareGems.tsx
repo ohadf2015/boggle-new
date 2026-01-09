@@ -22,13 +22,13 @@ const LEVEL_CONFIGS = [
   { level: 5, timeLimit: 45, targetRare: 15, targetScore: 500 },
 ];
 
-// Simulate word rarity (in real app, this would come from word data)
+// Word rarity based on length (adjusted for fair gameplay - max 5 letters for rare)
 const getWordRarity = (word: string): 'common' | 'uncommon' | 'rare' | 'legendary' => {
   const len = word.length;
-  if (len >= 8) return 'legendary';
-  if (len >= 6) return 'rare';
-  if (len >= 5) return 'uncommon';
-  return 'common';
+  if (len >= 6) return 'legendary';  // 6+ letters = legendary
+  if (len >= 5) return 'rare';       // 5 letters = rare
+  if (len >= 4) return 'uncommon';   // 4 letters = uncommon
+  return 'common';                   // 3 letters = common
 };
 
 const RARITY_COLORS = {
@@ -383,14 +383,14 @@ export default function RareGems({
             {/* Found words */}
             {wordsFound.length > 0 && (
               <div className={cn(
-                'flex flex-wrap gap-1 justify-center p-2 rounded-neo border-2 border-neo-black max-h-24 overflow-y-auto',
+                'flex flex-wrap gap-2 justify-center p-3 rounded-neo border-2 border-neo-black max-h-32 overflow-y-auto',
                 isDarkMode ? 'bg-slate-800' : 'bg-white'
               )}>
                 {wordsFound.slice(-15).map((w, i) => (
                   <span
                     key={i}
                     className={cn(
-                      'px-2 py-0.5 rounded text-xs font-bold text-neo-black',
+                      'px-3 py-1 rounded-neo border border-neo-black/30 text-sm font-bold text-neo-black',
                       RARITY_COLORS[w.rarity as keyof typeof RARITY_COLORS]
                     )}
                   >

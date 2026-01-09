@@ -102,7 +102,7 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = [] 
         <DrillUnlockProgress gamesPlayed={gamesPlayed} />
 
         {/* 2-Column Grid Layout */}
-        <div className="grid grid-cols-2 gap-2 md:gap-4">
+        <div className="grid grid-cols-2 gap-3 md:gap-4">
           {DRILLS.map((drill, index) => {
             const Icon = drill.icon;
             const isUnlocked = gamesPlayed >= drill.unlockRequirement;
@@ -121,7 +121,7 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = [] 
                 onClick={() => handleDrillClick(drill, isUnlocked)}
                 disabled={!isUnlocked}
                 className={cn(
-                  'flex flex-col p-2 md:p-4 rounded-neo border-2 border-neo-black',
+                  'flex flex-col p-3 md:p-5 rounded-neo border-2 border-neo-black',
                   'w-full transition-all relative',
                   isUnlocked
                     ? 'shadow-hard-sm hover:translate-y-[-2px] hover:shadow-hard active:translate-y-[2px] active:shadow-none'
@@ -130,12 +130,12 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = [] 
                 )}
               >
                 {/* Header row with icon and title */}
-                <div className="flex items-center gap-1.5 md:gap-3 w-full">
+                <div className="flex items-center gap-2 md:gap-4 w-full">
                   <div className={cn(
-                    'w-8 h-8 md:w-12 md:h-12 rounded-md border-2 border-neo-black flex items-center justify-center relative shrink-0',
+                    'w-10 h-10 md:w-14 md:h-14 rounded-md border-2 border-neo-black flex items-center justify-center relative shrink-0',
                     drill.bgColor
                   )}>
-                    <Icon className="w-4 h-4 md:w-6 md:h-6 text-neo-black" />
+                    <Icon className="w-5 h-5 md:w-7 md:h-7 text-neo-black" />
                     {!isUnlocked && (
                       <div className="absolute inset-0 bg-black/50 rounded-md flex items-center justify-center">
                         <Lock className="w-3 h-3 md:w-4 md:h-4 text-white" />
@@ -145,14 +145,14 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = [] 
 
                   <div className="flex flex-col items-start min-w-0 flex-1">
                     <p className={cn(
-                      'text-[11px] md:text-sm font-bold text-left line-clamp-1',
+                      'text-sm md:text-base font-bold text-left line-clamp-1',
                       isDarkMode ? 'text-neo-white' : 'text-neo-black'
                     )}>
                       {t(`brain.drills.${drill.id}.name`)}
                     </p>
 
                     <p className={cn(
-                      'text-[8px] md:text-xs uppercase',
+                      'text-[10px] md:text-sm uppercase',
                       isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
                     )}>
                       {t(`brain.domains.${drill.domain}`)}
@@ -162,9 +162,9 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = [] 
 
                 {/* Progress indicator for locked drills */}
                 {!isUnlocked && drill.unlockRequirement > 0 && (
-                  <div className="w-full mt-1.5 md:mt-2">
+                  <div className="w-full mt-2 md:mt-3">
                     <div className={cn(
-                      'h-1 md:h-1.5 rounded-full border border-neo-black overflow-hidden',
+                      'h-1.5 md:h-2 rounded-full border border-neo-black overflow-hidden',
                       isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
                     )}>
                       <motion.div
@@ -175,7 +175,7 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = [] 
                       />
                     </div>
                     <p className={cn(
-                      'text-[8px] md:text-xs text-center mt-0.5 font-bold',
+                      'text-[10px] md:text-xs text-center mt-1 font-bold',
                       isDarkMode ? 'text-neo-white/60' : 'text-neo-black/60'
                     )}>
                       {gamesPlayed}/{drill.unlockRequirement} {t('brain.drills.gamesToUnlock')}

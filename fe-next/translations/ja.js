@@ -2135,6 +2135,8 @@ const ja = {
     "noAccount": "アカウントをお持ちでないですか？新規登録",
     "invalidCredentials": "メールアドレスまたはパスワードが無効です",
     "continueAsGuest": "ゲストとして続ける",
+    "continueWithGoogle": "Googleで続ける",
+    "continueWithDiscord": "Discordで続ける",
     "saveProgress": "進捗を保存",
     "guestStatsTitle": "ゲストとしての統計:",
     "claimStats": "統計を取得",
@@ -3084,6 +3086,14 @@ const ja = {
     "signUpToAppear": "リーダーボードに表示されるには登録してください",
     "showLeaderboard": "リーダーボードを表示",
     "tryAnotherLanguage": "他の言語でチャレンジ：",
+    "guestModeNotice": "ゲストとしてプレイ中",
+    "guestModeBenefits": "登録して進捗を追跡、連続記録を作成、ランキングに参加しましょう",
+    "brainScoreLocked": "登録して脳スコアを追跡",
+    "streakTeaser": "登録して連続記録を作成・追跡",
+    "streakLocked": "連続記録の追跡には登録が必要です",
+    "historyTeaser": "登録して成長の記録を見る",
+    "leaderboardLocked": "登録してリーダーボードを見る",
+    "leaderboardTeaser": "世界中のプレイヤーと競争しよう",
     "carousel": {
       "step1Title": "スワイプで単語を作ろう",
       "step1Desc": "どの方向でも文字を繋げよう",
@@ -3753,7 +3763,10 @@ const ja = {
         "studyPhase": "暗記！",
         "memorizeHint": "これらの単語を覚えよう：",
         "recallPhase": "見つけろ！",
-        "remaining": "残り"
+        "remaining": "残り",
+        "studyTheseWords": "これらの単語を暗記せよ：",
+        "markInvalid": "交換",
+        "readyToStart": "準備完了！"
       },
       "combo-master": {
         "name": "コンボマスター",

@@ -368,14 +368,14 @@ export default function LightningRound({
             {/* Recent words */}
             {wordsFound.length > 0 && (
               <div className={cn(
-                'flex flex-wrap gap-1 justify-center p-2 rounded-neo border-2 border-neo-black max-h-20 overflow-y-auto',
+                'flex flex-wrap gap-2 justify-center p-3 rounded-neo border-2 border-neo-black max-h-28 overflow-y-auto',
                 isDarkMode ? 'bg-slate-800' : 'bg-white'
               )}>
                 {wordsFound.slice(-10).map((word, i) => (
                   <span
                     key={i}
                     className={cn(
-                      'px-2 py-0.5 rounded text-xs font-bold',
+                      'px-3 py-1 rounded-neo text-sm font-bold',
                       'bg-neo-green/20 text-neo-green border border-neo-green/30'
                     )}
                   >

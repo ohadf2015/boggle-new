@@ -2137,6 +2137,8 @@ const he = {
     "noAccount": "אין לך חשבון? הירשם",
     "invalidCredentials": "אימייל או סיסמה שגויים",
     "continueAsGuest": "המשך כאורח",
+    "continueWithGoogle": "המשך עם Google",
+    "continueWithDiscord": "המשך עם Discord",
     "saveProgress": "שמור את ההתקדמות שלך",
     "guestStatsTitle": "הסטטיסטיקה שלך כאורח:",
     "claimStats": "קבל את הנקודות שלך",
@@ -3086,6 +3088,14 @@ const he = {
     "signUpToAppear": "הירשמו כדי להופיע בטבלה!",
     "showLeaderboard": "הצג לוח מובילים",
     "tryAnotherLanguage": "נסו את האתגר בשפה אחרת:",
+    "guestModeNotice": "משחק כאורח",
+    "guestModeBenefits": "הירשמו כדי לעקוב אחר התקדמות, לבנות רצף ולהתחרות בטבלאות",
+    "brainScoreLocked": "הירשמו לעקוב אחר ציון המוח",
+    "streakTeaser": "הירשמו לבנות ולעקוב אחר רצפים",
+    "streakLocked": "מעקב רצף דורש הרשמה",
+    "historyTeaser": "הירשמו לצפות בהתקדמות לאורך זמן",
+    "leaderboardLocked": "הירשמו לצפות בטבלה",
+    "leaderboardTeaser": "התחרו נגד שחקנים מכל העולם",
     "carousel": {
       "step1Title": "החליקו למילים",
       "step1Desc": "חברו אותיות בכל כיוון",
@@ -3755,7 +3765,10 @@ const he = {
         "studyPhase": "שנן!",
         "memorizeHint": "זכור את המילים האלה:",
         "recallPhase": "מצא אותן!",
-        "remaining": "נותרו"
+        "remaining": "נותרו",
+        "studyTheseWords": "שנן את המילים האלה:",
+        "markInvalid": "החלף",
+        "readyToStart": "מוכן!"
       },
       "combo-master": {
         "name": "אלוף הקומבו",
