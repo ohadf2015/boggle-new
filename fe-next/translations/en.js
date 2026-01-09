@@ -1250,7 +1250,10 @@ const en = {
       "hoursAgo": "{count}h ago",
       "yesterday": "Yesterday",
       "daysAgo": "{count}d ago"
-    }
+    },
+    "improving": "Improving",
+    "declining": "Declining",
+    "stable": "Stable"
   },
   "archetypes": {
     "strategist": "The Strategist",
@@ -1270,7 +1273,8 @@ const en = {
     "closer": "The Closer",
     "closerDesc": "Thrives under pressure",
     "trailblazer": "The Trailblazer",
-    "trailblazerDesc": "Goes for the big wins"
+    "trailblazerDesc": "Goes for the big wins",
+    "hint": "Based on your play style"
   },
   "scoreCard": {
     "title": "Your Score Card",
@@ -3685,10 +3689,51 @@ const en = {
       "toNextTier": "to next tier"
     },
     "recommendation": {
-      "title": "Personalized Tip",
+      "title": "Recommended For You",
       "weakest": "Your {{domain}} could use some work.",
       "tryDrill": "Try the {{drill}} drill to improve!",
-      "startDrill": "Start Drill"
+      "startDrill": "Start Drill",
+      "declining": "Your {{domain}} is declining - time to train!",
+      "low": "Your {{domain}} needs attention.",
+      "improve": "Boost your {{domain}} with targeted practice.",
+      "unlock": "{{games}} games to unlock",
+      "scienceHint": "Targeted practice improves specific cognitive skills"
+    },
+    "welcomeBack": {
+      "title": "Welcome Back!",
+      "longTime": "It's been a while! Your brain is ready to train again.",
+      "twoWeeks": "Good to see you again! Let's pick up where you left off.",
+      "fewDays": "Welcome back! Ready to continue your progress?",
+      "currentScore": "Current",
+      "personalBest": "Best",
+      "bestStreak": "Best Streak",
+      "reachTier": "Let's get you back to {{tier}}!",
+      "beatBest": "Your personal best is {{score}} - let's beat it!",
+      "rebuildStreak": "Time to rebuild your streak!",
+      "keepGrowing": "Let's keep growing your brain power!",
+      "daysAway": "{{days}} days since last activity"
+    },
+    "share": {
+      "title": "My Brain Score",
+      "brainScore": "Brain Score",
+      "tier": "Tier",
+      "gamesPlayed": "Games Played",
+      "games": "games",
+      "trainYourBrain": "Train your brain at",
+      "shareYourScore": "Share Your Score"
+    },
+    "tierUp": {
+      "title": "Tier Up!",
+      "newScore": "Your Score",
+      "message": "Congratulations! You've reached {{tier}} tier!",
+      "continue": "Keep Training"
+    },
+    "unlock": {
+      "newDrillUnlocked": "New Drill Unlocked!",
+      "nowAvailable": "is now available!",
+      "gameLeft": "game left",
+      "gamesLeft": "games left",
+      "almostThere": "Almost there!"
     },
     "quickDrills": "Quick Drills",
     "viewAll": "View All",
@@ -3791,6 +3836,15 @@ const en = {
       "tip3": "Finding rare words activates deeper vocabulary retrieval - a key cognitive skill.",
       "tip4": "Maintaining combos trains sustained attention - crucial for focus in daily life.",
       "tip5": "Switching between word lengths builds cognitive flexibility - mental adaptability."
+    },
+    "share": {
+      "title": "Share Brain Score",
+      "brainScore": "Brain Score",
+      "tier": "Tier",
+      "gamesPlayed": "Games Played",
+      "games": "games",
+      "trainYourBrain": "Train your brain at",
+      "shareYourScore": "Share Your Score"
     },
     "streak": {
       "title": "Training Streak",

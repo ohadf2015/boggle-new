@@ -1244,7 +1244,10 @@ const sv = {
       "hoursAgo": "{count}h sedan",
       "yesterday": "Igår",
       "daysAgo": "{count}d sedan"
-    }
+    },
+    "improving": "Förbättras",
+    "declining": "Sjunker",
+    "stable": "Stabil"
   },
   "archetypes": {
     "strategist": "Strategen",
@@ -1264,7 +1267,8 @@ const sv = {
     "closer": "Avslutaren",
     "closerDesc": "Trivs under press",
     "trailblazer": "Banbrytaren",
-    "trailblazerDesc": "Satsar på stora vinster"
+    "trailblazerDesc": "Satsar på stora vinster",
+    "hint": "Baserat på din spelstil"
   },
   "scoreCard": {
     "title": "Ditt Resultatkort",
@@ -3675,7 +3679,39 @@ const sv = {
       "title": "Personligt tips",
       "weakest": "Din {{domain}} behöver lite arbete.",
       "tryDrill": "Prova {{drill}}-övningen för att förbättra!",
-      "startDrill": "Starta övning"
+      "startDrill": "Starta övning",
+      "declining": "Din {{domain}} sjunker - dags att träna!",
+      "low": "Din {{domain}} behöver uppmärksamhet.",
+      "improve": "Förbättra din {{domain}} med riktad träning.",
+      "unlock": "{{games}} spel kvar för att låsa upp",
+      "scienceHint": "Riktad träning förbättrar specifika kognitiva förmågor"
+    },
+    "welcomeBack": {
+      "title": "Välkommen tillbaka!",
+      "longTime": "Det har gått ett tag! Din hjärna är redo att träna igen.",
+      "twoWeeks": "Kul att se dig! Låt oss fortsätta där vi slutade.",
+      "fewDays": "Välkommen tillbaka! Redo att fortsätta din utveckling?",
+      "currentScore": "Nuvarande",
+      "personalBest": "Bäst",
+      "bestStreak": "Bästa Streak",
+      "reachTier": "Låt oss få dig tillbaka till {{tier}}!",
+      "beatBest": "Ditt personbästa är {{score}} - låt oss slå det!",
+      "rebuildStreak": "Dags att bygga upp din streak igen!",
+      "keepGrowing": "Låt oss fortsätta stärka din hjärna!",
+      "daysAway": "{{days}} dagar sedan senaste aktiviteten"
+    },
+    "tierUp": {
+      "title": "Nivå Upp!",
+      "newScore": "Din poäng",
+      "message": "Grattis! Du har nått {{tier}}-nivån!",
+      "continue": "Fortsätt träna"
+    },
+    "unlock": {
+      "newDrillUnlocked": "Ny övning upplåst!",
+      "nowAvailable": "är nu tillgänglig!",
+      "gameLeft": "spel kvar",
+      "gamesLeft": "spel kvar",
+      "almostThere": "Nästan där!"
     },
     "quickDrills": "Snabba övningar",
     "viewAll": "Visa alla",
@@ -3778,6 +3814,15 @@ const sv = {
       "tip3": "Att hitta sällsynta ord aktiverar djupare ordförrådsåtkomst - en viktig kognitiv förmåga.",
       "tip4": "Att hålla kombos tränar uthållig uppmärksamhet - avgörande för fokus i vardagen.",
       "tip5": "Att växla mellan ordlängder bygger kognitiv flexibilitet - mental anpassningsförmåga."
+    },
+    "share": {
+      "title": "Dela Hjärnpoäng",
+      "brainScore": "Hjärnpoäng",
+      "tier": "Nivå",
+      "gamesPlayed": "Spelade Spel",
+      "games": "spel",
+      "trainYourBrain": "Träna din hjärna på",
+      "shareYourScore": "Dela Din Poäng"
     },
     "streak": {
       "title": "Träningssvit",

@@ -23,6 +23,60 @@ interface ComboDisplayProps {
   highContrast?: boolean;
 }
 
+// Rarity-based color scheme (gaming standard)
+type ComboRarity = 'common' | 'rare' | 'epic' | 'legendary' | 'mythic';
+
+const RARITY_COLORS = {
+  // Level 1-2: Common - Green/Lime
+  common: {
+    gradient: 'bg-gradient-to-r from-emerald-400 via-lime-400 to-green-400',
+    sparkles: ['#34D399', '#A3E635', '#4ADE80', '#BEF264'], // emerald, lime, green
+    glow: 'linear-gradient(90deg, #34D399, #A3E635, #4ADE80)',
+    shadow: 'rgba(52, 211, 153, 0.6)', // emerald
+    burst: '#34D399',
+  },
+  // Level 3: Rare - Blue/Cyan
+  rare: {
+    gradient: 'bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-400',
+    sparkles: ['#22D3EE', '#38BDF8', '#60A5FA', '#06B6D4'], // cyan, sky, blue
+    glow: 'linear-gradient(90deg, #22D3EE, #38BDF8, #60A5FA)',
+    shadow: 'rgba(34, 211, 238, 0.6)', // cyan
+    burst: '#22D3EE',
+  },
+  // Level 4: Epic - Purple/Violet
+  epic: {
+    gradient: 'bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400',
+    sparkles: ['#A78BFA', '#C084FC', '#E879F9', '#8B5CF6'], // violet, purple, fuchsia
+    glow: 'linear-gradient(90deg, #A78BFA, #C084FC, #E879F9)',
+    shadow: 'rgba(167, 139, 250, 0.6)', // violet
+    burst: '#A78BFA',
+  },
+  // Level 5-6: Legendary - Orange/Gold
+  legendary: {
+    gradient: 'bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-400',
+    sparkles: ['#FBBF24', '#FB923C', '#FDE047', '#F59E0B'], // amber, orange, yellow
+    glow: 'linear-gradient(90deg, #FBBF24, #FB923C, #FDE047)',
+    shadow: 'rgba(251, 191, 36, 0.7)', // amber
+    burst: '#FBBF24',
+  },
+  // Level 7+: Mythic - Rainbow (special handling)
+  mythic: {
+    gradient: '', // handled separately with animation
+    sparkles: ['#FF3366', '#FFE135', '#00FFFF', '#FF1493', '#BFFF00'],
+    glow: 'linear-gradient(90deg, #dc2626, #ea580c, #ca8a04, #16a34a, #0891b2)',
+    shadow: 'rgba(255, 255, 255, 0.6)',
+    burst: '#fff',
+  },
+} as const;
+
+function getComboRarity(level: number): ComboRarity {
+  if (level >= 7) return 'mythic';
+  if (level >= 5) return 'legendary';
+  if (level === 4) return 'epic';
+  if (level === 3) return 'rare';
+  return 'common';
+}
+
 // Sparkle particle component - memoized and optimized for smooth animation
 const Sparkle = memo<{
   index: number;
@@ -88,6 +142,10 @@ const ComboDisplay = memo<ComboDisplayProps>(({
   const isMediumCombo = comboLevel >= 3;
   const isRainbow = comboColors.isRainbow;
 
+  // Get rarity-based colors
+  const rarity = getComboRarity(comboLevel);
+  const rarityColors = RARITY_COLORS[rarity];
+
   // Skip sparkle effects on low-end devices for better performance
   const skipSparkles = isLowEnd || !enableComplexAnimations || prefersReducedMotion;
 
@@ -102,9 +160,8 @@ const ComboDisplay = memo<ComboDisplayProps>(({
     }));
   }, [comboLevel, isHighCombo, compact, skipSparkles]);
 
-  const sparkleColors = isRainbow
-    ? ['#FF3366', '#FFE135', '#00FFFF', '#FF1493', '#BFFF00']
-    : ['#FFD700', '#FF6B35', '#FF3366', '#FFE135'];
+  // Use rarity-based sparkle colors
+  const sparkleColors = rarityColors.sparkles;
 
   // Hide combo display only when level is 0 (show from first combo word)
   if (comboLevel < 1) {
@@ -180,11 +237,9 @@ const ComboDisplay = memo<ComboDisplayProps>(({
             <div
               className={cn(
                 'flex items-center gap-1 relative z-10 font-black',
-                // Text color with gradient effect
+                // Text color with rarity-based gradient effect
                 'text-transparent bg-clip-text',
-                isRainbow
-                  ? ''
-                  : 'bg-gradient-to-r from-orange-400 via-red-400 to-pink-400'
+                !isRainbow && rarityColors.gradient
               )}
               style={{
                 // Enhanced text shadow for visibility
@@ -204,11 +259,9 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                 style={{
                   // Reset text styles for emoji to show properly
                   WebkitTextFillColor: 'initial',
-                  filter: isRainbow
-                    ? 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.6))'
-                    : isDanger
-                    ? 'drop-shadow(0 0 6px rgba(251, 146, 60, 0.7))'
-                    : `drop-shadow(0 0 ${isHighCombo ? '8px' : '4px'} rgba(251, 146, 60, 0.5))`,
+                  filter: isDanger
+                    ? `drop-shadow(0 0 6px ${rarityColors.shadow.replace('0.6', '0.8').replace('0.7', '0.9')})`
+                    : `drop-shadow(0 0 ${isHighCombo ? '8px' : '4px'} ${rarityColors.shadow})`,
                 }}
                 animate={
                   skipSparkles
@@ -237,7 +290,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                 style={{
                   textShadow: highContrast
                     ? '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(0,0,0,0.7)'
-                    : '1px 1px 3px rgba(0,0,0,0.5), 0 0 8px rgba(251, 146, 60, 0.4)',
+                    : `1px 1px 3px rgba(0,0,0,0.5), 0 0 10px ${rarityColors.shadow}`,
                 }}
               >
                 x{comboLevel}
@@ -248,7 +301,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                 style={{
                   textShadow: highContrast
                     ? '2px 2px 4px rgba(0,0,0,0.9), -1px -1px 2px rgba(0,0,0,0.7)'
-                    : '1px 1px 3px rgba(0,0,0,0.5), 0 0 8px rgba(251, 146, 60, 0.4)',
+                    : `1px 1px 3px rgba(0,0,0,0.5), 0 0 10px ${rarityColors.shadow}`,
                 }}
               >
                 Combo
@@ -268,9 +321,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
                   ease: 'easeInOut',
                 }}
                 style={{
-                  background: isRainbow
-                    ? 'linear-gradient(90deg, #dc2626, #ea580c, #ca8a04, #16a34a, #0891b2)'
-                    : 'linear-gradient(90deg, #f97316, #ef4444, #ec4899)',
+                  background: rarityColors.glow,
                   filter: 'blur(12px)',
                   transform: 'scale(1.5)',
                   borderRadius: '50%',
@@ -279,23 +330,25 @@ const ComboDisplay = memo<ComboDisplayProps>(({
             )}
           </motion.div>
 
-          {/* Status text below for high combos */}
-          {isVeryHighCombo && (
+          {/* Status text below for high combos - matches rarity */}
+          {isHighCombo && (
             <motion.div
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
               className={cn(
                 'absolute -bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap',
                 'text-[9px] font-black uppercase tracking-wide px-1.5 py-0.5 rounded',
-                isInsaneCombo
-                  ? 'bg-gradient-to-r from-pink-500 to-cyan-500 text-white'
+                rarity === 'mythic'
+                  ? 'bg-gradient-to-r from-pink-500 via-cyan-500 to-yellow-500 text-white'
+                  : rarity === 'legendary'
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white'
                   : 'bg-neo-black text-white'
               )}
               style={{
                 textShadow: '0 1px 2px rgba(0,0,0,0.5)',
               }}
             >
-              {isInsaneCombo ? 'LEGENDARY!' : 'ON FIRE!'}
+              {isInsaneCombo ? 'GODLIKE!' : rarity === 'mythic' ? 'MYTHIC!' : 'LEGENDARY!'}
             </motion.div>
           )}
 
@@ -307,7 +360,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
             animate={{ scale: 2, opacity: 0 }}
             transition={{ duration: 0.4 }}
             style={{
-              border: `2px solid ${isRainbow ? '#fff' : '#FF6B35'}`,
+              border: `2px solid ${rarityColors.burst}`,
             }}
           />
         </motion.div>

@@ -1243,7 +1243,10 @@ const ja = {
       "hoursAgo": "{count}時間前",
       "yesterday": "昨日",
       "daysAgo": "{count}日前"
-    }
+    },
+    "improving": "上昇中",
+    "declining": "下降中",
+    "stable": "安定"
   },
   "archetypes": {
     "strategist": "戦略家",
@@ -1263,7 +1266,8 @@ const ja = {
     "closer": "クローザー",
     "closerDesc": "プレッシャーに強い",
     "trailblazer": "先駆者",
-    "trailblazerDesc": "大きな勝利を狙う"
+    "trailblazerDesc": "大きな勝利を狙う",
+    "hint": "あなたのプレイスタイルに基づく"
   },
   "scoreCard": {
     "title": "スコアカード",
@@ -3674,7 +3678,39 @@ const ja = {
       "title": "パーソナルアドバイス",
       "weakest": "{{domain}}をもう少し鍛えよう。",
       "tryDrill": "{{drill}}ドリルで改善しよう！",
-      "startDrill": "ドリル開始"
+      "startDrill": "ドリル開始",
+      "declining": "{{domain}}が低下中 - トレーニングの時間！",
+      "low": "{{domain}}に注目が必要。",
+      "improve": "ターゲット練習で{{domain}}を強化しよう。",
+      "unlock": "アンロックまであと{{games}}ゲーム",
+      "scienceHint": "ターゲット練習は特定の認知能力を向上させます"
+    },
+    "welcomeBack": {
+      "title": "おかえりなさい！",
+      "longTime": "久しぶり！脳がまたトレーニングする準備ができているよ。",
+      "twoWeeks": "また会えてうれしい！続きから始めよう。",
+      "fewDays": "おかえり！進歩を続ける準備はできた？",
+      "currentScore": "現在",
+      "personalBest": "ベスト",
+      "bestStreak": "最高連続",
+      "reachTier": "{{tier}}に戻ろう！",
+      "beatBest": "自己ベストは{{score}} - 超えよう！",
+      "rebuildStreak": "連続記録を再構築する時！",
+      "keepGrowing": "脳力を高め続けよう！",
+      "daysAway": "最後のアクティビティから{{days}}日"
+    },
+    "tierUp": {
+      "title": "ティアアップ!",
+      "newScore": "あなたのスコア",
+      "message": "おめでとう！{{tier}}ティアに到達しました！",
+      "continue": "トレーニングを続ける"
+    },
+    "unlock": {
+      "newDrillUnlocked": "新しいドリル解放!",
+      "nowAvailable": "が使えるようになりました！",
+      "gameLeft": "ゲーム残り",
+      "gamesLeft": "ゲーム残り",
+      "almostThere": "あと少し！"
     },
     "quickDrills": "クイックドリル",
     "viewAll": "すべて表示",
@@ -3777,6 +3813,15 @@ const ja = {
       "tip3": "珍しい単語を見つけると深い語彙検索が活性化される - 重要な認知スキルだ。",
       "tip4": "コンボを維持すると持続的な注意力が鍛えられる - 日常生活での集中に不可欠。",
       "tip5": "単語の長さを切り替えると認知的柔軟性が養われる - 精神的適応力だ。"
+    },
+    "share": {
+      "title": "ブレインスコアをシェア",
+      "brainScore": "ブレインスコア",
+      "tier": "ティア",
+      "gamesPlayed": "プレイ回数",
+      "games": "ゲーム",
+      "trainYourBrain": "脳をトレーニング",
+      "shareYourScore": "スコアをシェア"
     },
     "streak": {
       "title": "トレーニングストリーク",

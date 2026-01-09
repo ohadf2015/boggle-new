@@ -1245,7 +1245,10 @@ const he = {
       "hoursAgo": "לפני {count} שע׳",
       "yesterday": "אתמול",
       "daysAgo": "לפני {count} ימים"
-    }
+    },
+    "improving": "משתפר",
+    "declining": "יורד",
+    "stable": "יציב"
   },
   "archetypes": {
     "strategist": "האסטרטג",
@@ -1265,7 +1268,8 @@ const he = {
     "closer": "הסוגר",
     "closerDesc": "משגשג תחת לחץ",
     "trailblazer": "הפורץ דרך",
-    "trailblazerDesc": "הולך על הניצחונות הגדולים"
+    "trailblazerDesc": "הולך על הניצחונות הגדולים",
+    "hint": "לפי סגנון המשחק שלך 🎮"
   },
   "scoreCard": {
     "title": "כרטיס הניקוד שלך",
@@ -3676,7 +3680,39 @@ const he = {
       "title": "טיפ אישי",
       "weakest": "ה{{domain}} שלך צריך קצת עבודה.",
       "tryDrill": "נסה את תרגיל ה{{drill}} להשתפר!",
-      "startDrill": "התחל תרגיל"
+      "startDrill": "התחל תרגיל",
+      "declining": "ה{{domain}} שלך יורד - בוא נתאמן! 💪",
+      "low": "ה{{domain}} שלך צריך תשומת לב.",
+      "improve": "שפר את ה{{domain}} עם תרגול ממוקד.",
+      "unlock": "עוד {{games}} משחקים לפתיחה",
+      "scienceHint": "תרגול ממוקד משפר יכולות קוגניטיביות ספציפיות 🧠"
+    },
+    "welcomeBack": {
+      "title": "ברוך הבא חזרה!",
+      "longTime": "עבר הרבה זמן! המוח שלך מוכן להתאמן שוב 🧠",
+      "twoWeeks": "טוב לראות אותך! בוא נמשיך מאיפה שהפסקנו.",
+      "fewDays": "ברוך הבא! מוכן להמשיך להתקדם? 🚀",
+      "currentScore": "נוכחי",
+      "personalBest": "שיא",
+      "bestStreak": "רצף שיא",
+      "reachTier": "בוא נחזיר אותך ל{{tier}}!",
+      "beatBest": "השיא האישי שלך הוא {{score}} - בוא ננצח אותו! 🏆",
+      "rebuildStreak": "זמן לבנות מחדש את הרצף! 🔥",
+      "keepGrowing": "בוא נמשיך לחזק את המוח! 💪",
+      "daysAway": "{{days}} ימים מאז הפעילות האחרונה"
+    },
+    "tierUp": {
+      "title": "עלית דרגה! 🚀",
+      "newScore": "הציון שלך",
+      "message": "כל הכבוד! הגעת לדרגת {{tier}}! 🎉",
+      "continue": "להמשיך להתאמן"
+    },
+    "unlock": {
+      "newDrillUnlocked": "תרגיל חדש נפתח! 🔓",
+      "nowAvailable": "זמין עכשיו!",
+      "gameLeft": "משחק נשאר",
+      "gamesLeft": "משחקים נשארו",
+      "almostThere": "כמעט שם! 💪"
     },
     "quickDrills": "תרגילים מהירים",
     "viewAll": "הצג הכל",
@@ -3779,6 +3815,15 @@ const he = {
       "tip3": "מציאת מילים נדירות מפעילה שליפת אוצר מילים עמוקה יותר - מיומנות קוגניטיבית מפתח.",
       "tip4": "שמירה על קומבו מאמנת קשב מתמשך - חיוני לריכוז בחיי היומיום.",
       "tip5": "מעבר בין אורכי מילים בונה גמישות קוגניטיבית - הסתגלות מנטלית."
+    },
+    "share": {
+      "title": "שתף ציון מוח",
+      "brainScore": "ציון מוח",
+      "tier": "דרגה",
+      "gamesPlayed": "משחקים ששוחקו",
+      "games": "משחקים",
+      "trainYourBrain": "אמן את המוח שלך ב",
+      "shareYourScore": "שתף את הציון שלך 🧠"
     },
     "streak": {
       "title": "רצף אימונים",

@@ -229,7 +229,7 @@ export default function PartyScreen() {
               <QrCode className="w-6 h-6" />
               <h2 className="text-xl font-black uppercase">{t('partyScreen.scanToJoin') || 'Scan to Join'}</h2>
             </div>
-            <div className="bg-white p-4 rounded-neo border-2 border-neo-black inline-block">
+            <div className="bg-white text-black p-4 rounded-neo border-2 border-neo-black inline-block">
               <QRCode value={joinUrl} size={200} level="M" />
             </div>
             <div className="mt-4">

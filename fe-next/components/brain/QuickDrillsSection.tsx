@@ -9,6 +9,7 @@ import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import DrillUnlockProgress from './DrillUnlockProgress';
 import type { DrillProgress, DrillType } from '@/shared/types/cognitive';
 
 interface Drill {
@@ -96,6 +97,9 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = [] 
         )}>
           {t('brain.quickDrills')}
         </h2>
+
+        {/* Drill Unlock Progress Notifications */}
+        <DrillUnlockProgress gamesPlayed={gamesPlayed} />
 
         {/* 2-Column Grid Layout */}
         <div className="grid grid-cols-2 gap-2 md:gap-4">

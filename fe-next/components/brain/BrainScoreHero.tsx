@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Brain, TrendingUp, Sparkles } from 'lucide-react';
+import { Brain, TrendingUp, Sparkles, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -13,6 +13,7 @@ interface BrainScoreHeroProps {
   tierProgress: number;
   gamesAnalyzed: number;
   drillsCompleted?: number;
+  onShare?: () => void;
 }
 
 const TIER_CONFIG = {
@@ -33,7 +34,8 @@ export default function BrainScoreHero({
   tier,
   tierProgress,
   gamesAnalyzed,
-  drillsCompleted = 0
+  drillsCompleted = 0,
+  onShare,
 }: BrainScoreHeroProps) {
   const { theme } = useTheme();
   const { t } = useLanguage();
@@ -100,23 +102,44 @@ export default function BrainScoreHero({
           </div>
         </div>
 
-        {/* Activities Analyzed Badge */}
-        <div className={cn(
-          'text-right px-4 py-2 rounded-neo border-2 border-neo-black',
-          isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
-        )}>
-          <p className={cn(
-            'text-xs font-bold uppercase',
-            isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+        {/* Right side: Activities + Share */}
+        <div className="flex items-center gap-2">
+          {/* Share Button */}
+          {onShare && (
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={onShare}
+              className={cn(
+                'p-3 rounded-neo border-2 border-neo-black',
+                'shadow-hard-sm hover:shadow-hard hover:translate-y-[-2px]',
+                'transition-all',
+                isDarkMode ? 'bg-neo-cyan' : 'bg-neo-cyan',
+                'text-neo-black'
+              )}
+              title={t('common.share')}
+            >
+              <Share2 className="w-5 h-5" />
+            </motion.button>
+          )}
+
+          {/* Activities Analyzed Badge */}
+          <div className={cn(
+            'text-right px-4 py-2 rounded-neo border-2 border-neo-black',
+            isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
           )}>
-            {t('brain.activitiesAnalyzed')}
-          </p>
-          <p className={cn(
-            'text-2xl font-black',
-            isDarkMode ? 'text-neo-cyan' : 'text-neo-purple'
-          )}>
-            {totalActivities}
-          </p>
+            <p className={cn(
+              'text-xs font-bold uppercase',
+              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+            )}>
+              {t('brain.activitiesAnalyzed')}
+            </p>
+            <p className={cn(
+              'text-2xl font-black',
+              isDarkMode ? 'text-neo-cyan' : 'text-neo-purple'
+            )}>
+              {totalActivities}
+            </p>
+          </div>
         </div>
       </div>
 

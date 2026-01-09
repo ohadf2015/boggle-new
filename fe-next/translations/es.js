@@ -1241,7 +1241,10 @@ const es = {
       "hoursAgo": "hace {count}h",
       "yesterday": "Ayer",
       "daysAgo": "hace {count}d"
-    }
+    },
+    "improving": "Mejorando",
+    "declining": "Bajando",
+    "stable": "Estable"
   },
   "archetypes": {
     "strategist": "El Estratega",
@@ -1261,7 +1264,8 @@ const es = {
     "closer": "El Rematador",
     "closerDesc": "Prospera bajo presión",
     "trailblazer": "El Pionero",
-    "trailblazerDesc": "Va por las grandes victorias"
+    "trailblazerDesc": "Va por las grandes victorias",
+    "hint": "Basado en tu estilo de juego"
   },
   "playerTitles": {
     "champion": {
@@ -3672,7 +3676,39 @@ const es = {
       "title": "Consejo Personalizado",
       "weakest": "Tu {{domain}} necesita un poco de trabajo.",
       "tryDrill": "¡Prueba el ejercicio {{drill}} para mejorar!",
-      "startDrill": "Iniciar Ejercicio"
+      "startDrill": "Iniciar Ejercicio",
+      "declining": "Tu {{domain}} está bajando - ¡hora de entrenar!",
+      "low": "Tu {{domain}} necesita atención.",
+      "improve": "Mejora tu {{domain}} con práctica enfocada.",
+      "unlock": "{{games}} juegos para desbloquear",
+      "scienceHint": "La práctica enfocada mejora habilidades cognitivas específicas"
+    },
+    "welcomeBack": {
+      "title": "¡Bienvenido de Nuevo!",
+      "longTime": "¡Ha pasado tiempo! Tu cerebro está listo para entrenar otra vez.",
+      "twoWeeks": "¡Qué bueno verte! Continuemos donde lo dejamos.",
+      "fewDays": "¡Bienvenido de vuelta! ¿Listo para seguir progresando?",
+      "currentScore": "Actual",
+      "personalBest": "Mejor",
+      "bestStreak": "Mejor Racha",
+      "reachTier": "¡Vamos a llevarte de vuelta a {{tier}}!",
+      "beatBest": "Tu récord personal es {{score}} - ¡vamos a superarlo!",
+      "rebuildStreak": "¡Hora de reconstruir tu racha!",
+      "keepGrowing": "¡Sigamos fortaleciendo tu cerebro!",
+      "daysAway": "{{days}} días desde la última actividad"
+    },
+    "tierUp": {
+      "title": "¡Subiste de Nivel!",
+      "newScore": "Tu Puntuación",
+      "message": "¡Felicidades! Alcanzaste el nivel {{tier}}!",
+      "continue": "Seguir Entrenando"
+    },
+    "unlock": {
+      "newDrillUnlocked": "¡Nuevo Ejercicio Desbloqueado!",
+      "nowAvailable": "ya está disponible!",
+      "gameLeft": "juego restante",
+      "gamesLeft": "juegos restantes",
+      "almostThere": "¡Ya casi!"
     },
     "quickDrills": "Ejercicios Rápidos",
     "viewAll": "Ver Todo",
@@ -3775,6 +3811,15 @@ const es = {
       "tip3": "Encontrar palabras raras activa una recuperación más profunda del vocabulario - una habilidad cognitiva clave.",
       "tip4": "Mantener combos entrena la atención sostenida - crucial para el enfoque en la vida diaria.",
       "tip5": "Cambiar entre longitudes de palabras construye flexibilidad cognitiva - adaptabilidad mental."
+    },
+    "share": {
+      "title": "Compartir Puntuación Cerebral",
+      "brainScore": "Puntuación Cerebral",
+      "tier": "Nivel",
+      "gamesPlayed": "Partidas Jugadas",
+      "games": "partidas",
+      "trainYourBrain": "Entrena tu cerebro en",
+      "shareYourScore": "Comparte Tu Puntuación"
     },
     "streak": {
       "title": "Racha de Entrenamiento",

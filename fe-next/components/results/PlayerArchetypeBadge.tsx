@@ -61,8 +61,8 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
       const rect = badgeRef.current.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
       const viewportWidth = window.innerWidth;
-      const tooltipEstimatedHeight = 80;
-      const tooltipEstimatedWidth = 200; // Estimated tooltip width
+      const tooltipEstimatedHeight = 120; // Increased for new layout
+      const tooltipEstimatedWidth = 256; // w-64 = 16rem = 256px
 
       // Check if tooltip would go below viewport
       const spaceBelow = viewportHeight - rect.bottom;
@@ -224,6 +224,19 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
     return BadgeContent;
   }
 
+  // Get translated name and description
+  const archetypeName = (() => {
+    const translationKey = `archetypes.${archetype.id}`;
+    const translated = t(translationKey);
+    return translated !== translationKey ? translated : archetype.name;
+  })();
+
+  const archetypeDesc = (() => {
+    const translationKey = `archetypes.${archetype.id}Desc`;
+    const translated = t(translationKey);
+    return translated !== translationKey ? translated : archetype.description;
+  })();
+
   const tooltipContent = (
     <AnimatePresence>
       {isOpen && isMounted && tooltipPosition && (
@@ -234,9 +247,8 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
           transition={{ duration: 0.15 }}
           className={cn(
             'fixed z-[9999] -translate-x-1/2',
-            'px-3 py-2 rounded-neo border-2 border-neo-black',
-            'bg-neo-cream shadow-hard',
-            'whitespace-nowrap',
+            'w-56 sm:w-64 px-3 py-2.5 rounded-neo border-3 border-neo-black',
+            'bg-neo-cream shadow-hard-lg',
             tooltipPosition.showAbove && '-translate-y-full'
           )}
           style={{
@@ -246,17 +258,43 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
         >
           {/* Arrow - points down when showing above, up when showing below */}
           {tooltipPosition.showAbove ? (
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-neo-cream border-r-2 border-b-2 border-neo-black" />
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-neo-cream border-r-3 border-b-3 border-neo-black" />
           ) : (
-            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-neo-cream border-l-2 border-t-2 border-neo-black" />
+            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-neo-cream border-l-3 border-t-3 border-neo-black" />
           )}
 
-          <p className="text-sm font-bold text-neo-black relative z-10">
-            {(() => {
-              const translationKey = `archetypes.${archetype.id}Desc`;
-              const translated = t(translationKey);
-              return translated !== translationKey ? translated : archetype.description;
-            })()}
+          {/* Header: Icon + Name */}
+          <div className="flex items-center gap-2 mb-1.5 relative z-10">
+            <div className={cn(
+              'w-7 h-7 rounded-neo border-2 border-neo-black flex items-center justify-center flex-shrink-0',
+              bgColor
+            )}>
+              {archetype.icon && !imageError ? (
+                <Image
+                  src={archetype.icon}
+                  alt={archetype.name}
+                  width={20}
+                  height={20}
+                  className="w-5 h-5 object-contain"
+                  unoptimized
+                />
+              ) : (
+                <span className="text-base">{archetype.emoji}</span>
+              )}
+            </div>
+            <span className={cn('font-black text-sm uppercase tracking-wide', textColor === 'text-neo-cream' ? 'text-neo-black' : textColor)}>
+              {archetypeName}
+            </span>
+          </div>
+
+          {/* Description */}
+          <p className="text-xs text-neo-black/80 leading-relaxed relative z-10">
+            {archetypeDesc}
+          </p>
+
+          {/* Hint */}
+          <p className="text-[10px] text-neo-black/50 mt-1.5 pt-1.5 border-t border-neo-black/10 relative z-10">
+            {t('archetypes.hint') || 'Based on your play style'}
           </p>
         </motion.div>
       )}

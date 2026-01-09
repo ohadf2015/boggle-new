@@ -16,6 +16,9 @@ import BrainScoreHistoryChart from '@/components/brain/BrainScoreHistoryChart';
 import QuickDrillsSection from '@/components/brain/QuickDrillsSection';
 import ScientificTipsCarousel from '@/components/brain/ScientificTipsCarousel';
 import FirstGameCelebration from '@/components/brain/FirstGameCelebration';
+import PersonalizedDrillRecommendation from '@/components/brain/PersonalizedDrillRecommendation';
+import WelcomeBackCard from '@/components/brain/WelcomeBackCard';
+import BrainScoreShareCard from '@/components/brain/BrainScoreShareCard';
 import AuthModal from '@/components/auth/AuthModal';
 
 /**
@@ -81,6 +84,9 @@ export default function BrainTrainingPage() {
   // State for auth modal
   const [showAuthModal, setShowAuthModal] = useState(false);
 
+  // State for share modal
+  const [showShareCard, setShowShareCard] = useState(false);
+
   // Show celebration modal for first game (only once per session)
   useEffect(() => {
     if (brainScore && brainScore.gamesAnalyzed === 1 && !hasShownCelebration) {
@@ -96,6 +102,33 @@ export default function BrainTrainingPage() {
   const handleBack = () => {
     router.push(`/${language}`);
   };
+
+  // Calculate welcome back data (for returning users)
+  const [welcomeBackData, setWelcomeBackData] = useState<{
+    show: boolean;
+    daysSinceLastActivity: number;
+    personalBest: number | undefined;
+  }>({ show: false, daysSinceLastActivity: 0, personalBest: undefined });
+
+  useEffect(() => {
+    if (!brainScore?.lastActivityAt) {
+      setWelcomeBackData({ show: false, daysSinceLastActivity: 0, personalBest: undefined });
+      return;
+    }
+
+    const now = Date.now();
+    const lastActivity = new Date(brainScore.lastActivityAt).getTime();
+    const daysSinceLastActivity = Math.floor((now - lastActivity) / (1000 * 60 * 60 * 24));
+    const personalBest = brainScoreHistory.length > 0
+      ? Math.max(...brainScoreHistory.map(h => h.overallScore))
+      : undefined;
+
+    setWelcomeBackData({
+      show: daysSinceLastActivity >= 3,
+      daysSinceLastActivity,
+      personalBest,
+    });
+  }, [brainScore?.lastActivityAt, brainScoreHistory]);
 
   // Loading state
   if (isLoading) {
@@ -331,8 +364,27 @@ export default function BrainTrainingPage() {
             tierProgress={brainScore.tierProgress}
             gamesAnalyzed={brainScore.gamesAnalyzed}
             drillsCompleted={brainScore.drillsCompleted}
+            onShare={() => setShowShareCard(true)}
           />
         </motion.div>
+
+        {/* Welcome Back Card (for returning users after 3+ days) */}
+        {welcomeBackData.show && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.05 }}
+          >
+            <WelcomeBackCard
+              daysSinceLastActivity={welcomeBackData.daysSinceLastActivity}
+              currentScore={brainScore.overallScore}
+              personalBest={welcomeBackData.personalBest}
+              currentTier={brainScore.tier}
+              currentStreak={brainScore.currentStreak}
+              longestStreak={brainScore.longestStreak}
+            />
+          </motion.div>
+        )}
 
         {/* Radar Chart */}
         <motion.div
@@ -364,6 +416,20 @@ export default function BrainTrainingPage() {
             recentGameScores={recentGameScores}
           />
         </motion.div>
+
+        {/* Personalized Drill Recommendation */}
+        {brainScore.gamesAnalyzed >= 1 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.18 }}
+          >
+            <PersonalizedDrillRecommendation
+              domains={brainScore.domains}
+              gamesPlayed={brainScore.gamesAnalyzed}
+            />
+          </motion.div>
+        )}
 
         {/* Quick Drills */}
         <motion.div
@@ -424,6 +490,17 @@ export default function BrainTrainingPage() {
             flexibility: brainScore.domains.flexibility.score,
             vocabulary: brainScore.domains.vocabulary.score,
           }}
+        />
+      )}
+
+      {/* Brain Score Share Card Modal */}
+      {brainScore && showShareCard && (
+        <BrainScoreShareCard
+          score={brainScore.overallScore}
+          tier={brainScore.tier}
+          domains={brainScore.domains}
+          gamesAnalyzed={brainScore.gamesAnalyzed}
+          onClose={() => setShowShareCard(false)}
         />
       )}
     </div>

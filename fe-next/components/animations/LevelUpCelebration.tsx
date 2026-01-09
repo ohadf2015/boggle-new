@@ -190,7 +190,7 @@ export function LevelUpCelebration({
         onClick={onDismiss}
       >
         <div className="text-center">
-          <div className="w-24 h-24 mx-auto rounded-full bg-neo-yellow border-4 border-neo-black flex items-center justify-center mb-4">
+          <div className="w-24 h-24 mx-auto rounded-full bg-neo-yellow text-neo-black border-4 border-neo-black flex items-center justify-center mb-4">
             <span className="text-4xl font-black text-neo-black">{level}</span>
           </div>
           <h2 className="text-2xl font-black text-neo-yellow">

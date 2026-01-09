@@ -1018,16 +1018,9 @@ const InGameScreen = memo<InGameScreenProps>(({
 
         {/* Center Column: Timer, Score, Grid */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden max-h-full">
-          {/* Stats row - Combo | Timer | Score - timer always centered and visible */}
+          {/* Stats row - Timer centered, Combo + Score stacked on side */}
           {remainingTime !== null && (
-            <div ref={gameStatsRef} className="flex items-center justify-center gap-1 md:gap-4 flex-shrink-0 mb-0 md:mb-1" role="status" aria-label="Game status">
-              {/* Combo (left - shows when level >= 2, placeholder otherwise for layout balance) */}
-              {isPlaying && (
-                <div className="min-w-[50px] md:min-w-[90px] flex justify-end">
-                  <ComboDisplay comboLevel={comboLevel} compact />
-                </div>
-              )}
-
+            <div ref={gameStatsRef} className="flex items-center justify-center gap-2 md:gap-4 flex-shrink-0 mb-0 md:mb-1" role="status" aria-label="Game status">
               {/* Timer (center - always visible and prominent) */}
               <motion.div
                 data-tutorial="timer"
@@ -1043,37 +1036,43 @@ const InGameScreen = memo<InGameScreenProps>(({
                 </div>
               </motion.div>
 
-              {/* Score (right position) - vibrant yellow/lime gradient */}
+              {/* Combo + Score stacked (side position - respects RTL) */}
               {isPlaying && (
-                <motion.div
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px]"
-                  style={{
-                    background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
-                  }}
-                >
-                  <div className="text-center">
-                    <motion.div
-                      key={playerData.score}
-                      initial={{ scale: 1.3 }}
-                      animate={{ scale: 1 }}
-                      className="text-lg md:text-2xl lg:text-3xl font-black text-neo-black leading-tight"
-                      style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
-                    >
-                      {playerData.score}
-                    </motion.div>
-                    <div className="text-[9px] md:text-xs lg:text-sm font-bold uppercase tracking-wider text-neo-black">
-                      {t('common.score') || 'Score'}
+                <div className="flex flex-col items-center gap-1 md:gap-2">
+                  {/* Combo - now above score, never hidden behind timer */}
+                  <ComboDisplay comboLevel={comboLevel} compact />
+
+                  {/* Score - vibrant yellow/lime gradient */}
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px]"
+                    style={{
+                      background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
+                    }}
+                  >
+                    <div className="text-center">
+                      <motion.div
+                        key={playerData.score}
+                        initial={{ scale: 1.3 }}
+                        animate={{ scale: 1 }}
+                        className="text-lg md:text-2xl lg:text-3xl font-black text-neo-black leading-tight"
+                        style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
+                      >
+                        {playerData.score}
+                      </motion.div>
+                      <div className="text-[9px] md:text-xs lg:text-sm font-bold uppercase tracking-wider text-neo-black">
+                        {t('common.score') || 'Score'}
+                      </div>
                     </div>
-                  </div>
-                  {/* Rank badge */}
-                  {playerData.rank && playerData.rank > 0 && (
-                    <div className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2 w-5 h-5 md:w-6 md:h-6 bg-neo-pink text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-[10px] md:text-xs font-black shadow-hard-sm">
-                      #{playerData.rank}
-                    </div>
-                  )}
-                </motion.div>
+                    {/* Rank badge */}
+                    {playerData.rank && playerData.rank > 0 && (
+                      <div className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2 w-5 h-5 md:w-6 md:h-6 bg-neo-pink text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-[10px] md:text-xs font-black shadow-hard-sm">
+                        #{playerData.rank}
+                      </div>
+                    )}
+                  </motion.div>
+                </div>
               )}
             </div>
           )}
