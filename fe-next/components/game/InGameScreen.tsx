@@ -1018,15 +1018,15 @@ const InGameScreen = memo<InGameScreenProps>(({
 
         {/* Center Column: Timer, Score, Grid */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden max-h-full">
-          {/* Stats row - Timer centered, Combo + Score stacked on side */}
+          {/* Stats row - Timer centered, Combo + Score absolutely positioned on right */}
           {remainingTime !== null && (
-            <div ref={gameStatsRef} className="flex items-center justify-center gap-2 md:gap-4 flex-shrink-0 mb-0 md:mb-1" role="status" aria-label="Game status">
-              {/* Timer (center - always visible and prominent) */}
+            <div ref={gameStatsRef} className="relative flex items-center justify-center flex-shrink-0 mb-0 md:mb-1" role="status" aria-label="Game status">
+              {/* Timer (center - always visible and prominent, position fixed) */}
               <motion.div
                 data-tutorial="timer"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="relative z-20"
+                className="relative z-20 flex-shrink-0"
               >
                 <div className="hidden lg:block">
                   <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="lg" />
@@ -1036,10 +1036,10 @@ const InGameScreen = memo<InGameScreenProps>(({
                 </div>
               </motion.div>
 
-              {/* Combo + Score stacked (side position - respects RTL) */}
+              {/* Combo + Score - absolutely positioned on right to not shift timer */}
               {isPlaying && (
-                <div className="flex flex-col items-center gap-1 md:gap-2">
-                  {/* Combo - now above score, never hidden behind timer */}
+                <div className="absolute right-0 rtl:right-auto rtl:left-0 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 md:gap-2 z-10">
+                  {/* Combo - positioned on right, never behind timer */}
                   <ComboDisplay comboLevel={comboLevel} compact />
 
                   {/* Score - vibrant yellow/lime gradient */}
