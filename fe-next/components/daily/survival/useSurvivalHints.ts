@@ -36,6 +36,8 @@ export interface HintState {
 
 export interface HintActions {
   buyNextHint: (clueTokens: number, setClueTokens: (fn: (prev: number) => number) => void) => void;
+  getNextAffordableClue: (tokens: number) => ClueShopItem | null;
+  handlePurchase: (item: ClueShopItem, tokens: number, setTokens: (fn: (prev: number) => number) => void, setShowShop?: (show: boolean) => void) => void;
   // Legacy actions kept for compatibility if needed, but buyNextHint is preferred
   autoRevealLetter: () => number;
   revealCategory: () => void;
@@ -212,6 +214,24 @@ export function useSurvivalHints({
   
   // ... re-adding autoRevealLetter etc for internal use if needed
   
+  const getNextAffordableClue = useCallback((tokens: number): ClueShopItem | null => {
+    if (!nextHintItem) return null;
+    return tokens >= nextHintItem.cost ? nextHintItem : null;
+  }, [nextHintItem]);
+
+  const handlePurchase = useCallback((
+    item: ClueShopItem,
+    tokens: number,
+    setTokens: (fn: (prev: number) => number) => void,
+    setShowShop?: (show: boolean) => void
+  ) => {
+    // If the item matches current next item, buy it
+    if (nextHintItem && item.id === nextHintItem.id) {
+        buyNextHint(tokens, setTokens);
+        if (setShowShop) setShowShop(false);
+    }
+  }, [nextHintItem, buyNextHint]);
+
   const autoRevealLetter = useCallback((): number => {
       const unrevealed = [...Array(targetWord.length).keys()].filter(i => !revealedLetters.has(i));
       if (unrevealed.length > 1) {
@@ -240,6 +260,8 @@ export function useSurvivalHints({
 
   const actions: HintActions = {
     buyNextHint,
+    getNextAffordableClue,
+    handlePurchase,
     autoRevealLetter,
     revealCategory,
     revealExample,

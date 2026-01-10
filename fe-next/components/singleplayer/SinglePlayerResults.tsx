@@ -324,6 +324,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   useEffect(() => {
     if (hasSavedCognitiveScoreRef.current) return;
     if (!user?.id) return; // Only for authenticated users
+    if (mode === 'practice') return; // Do not save cognitive scores in practice mode
 
     // Calculate max combo from word data
     const validWords = results.playerWordData?.filter(w => w.isValid) || [];
@@ -358,7 +359,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     });
 
     hasSavedCognitiveScoreRef.current = true;
-  }, [user?.id, results.playerWordData, results.gameDuration, results.grid, results.gameSessionId, saveCognitiveScore]);
+  }, [user?.id, results.playerWordData, results.gameDuration, results.grid, results.gameSessionId, saveCognitiveScore, mode]);
 
   // Show signup prompt for guests who have played 2+ games
   useEffect(() => {

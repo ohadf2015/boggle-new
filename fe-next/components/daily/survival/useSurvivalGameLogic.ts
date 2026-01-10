@@ -236,45 +236,6 @@ export function useSurvivalGameLogic({
     };
   }, [isGameOver, drainRate]);
 
-  // Auto-spend tokens to unlock clues immediately
-  // This replaces the manual shop - clues unlock automatically as tokens are earned
-  useEffect(() => {
-    if (isGameOver || clueTokens < 1) return;
-
-    const nextClue = hintActions.getNextAffordableClue(clueTokens);
-    if (!nextClue) return;
-
-    // Auto-purchase the clue
-    setClueTokens(prev => prev - nextClue.cost);
-
-    // Execute the clue effect based on type
-    switch (nextClue.id) {
-      case 'reveal_letter': {
-        const revealedPosition = hintActions.autoRevealLetter();
-        if (revealedPosition >= 0) {
-          // Clean up yellow clues now that we have a green at this position
-          clueActions.handleCoinRevealedLetter(revealedPosition);
-          // Show celebration toast
-          showToast('valid-word', t('daily.clueUnlocked') || 'Clue Unlocked! 💡');
-          // Trigger clue gain animation
-          clueActions.triggerClueGainAnimation(1);
-          playWordAcceptedSound?.();
-        }
-        break;
-      }
-      case 'reveal_category':
-        hintActions.revealCategory();
-        showToast('valid-word', t('daily.categoryUnlocked') || 'Category Revealed! 🏷️');
-        playWordAcceptedSound?.();
-        break;
-      case 'example_sentence':
-        hintActions.revealExample();
-        showToast('valid-word', t('daily.exampleUnlocked') || 'Example Revealed! 📝');
-        playWordAcceptedSound?.();
-        break;
-    }
-  }, [clueTokens, isGameOver, hintActions, clueActions, playWordAcceptedSound, showToast, t]);
-
   // Cleanup feedback timeout
   useEffect(() => {
     return () => {
@@ -533,6 +494,7 @@ export function useSurvivalGameLogic({
         }, 500);
         return () => clearTimeout(timer);
     }
+    return undefined;
   }, [clueTokens, hintState.nextHintItem, buyNextHint]);
 
   // Keep callback refs in sync
