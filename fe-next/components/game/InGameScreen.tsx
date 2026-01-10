@@ -262,10 +262,12 @@ const InGameScreen = memo<InGameScreenProps>(({
     return () => clearInterval(interval);
   }, [gameActive, isPlaying]);
 
-  // Reset lastWordFoundTime when game starts
+  // Reset lastWordFoundTime to current time when game starts
+  // This ensures keyboard trails don't show immediately - they'll only
+  // appear after the inactivity threshold (10s new players, 30s experienced)
   useEffect(() => {
     if (gameActive && showStartAnimation) {
-      setLastWordFoundTime(0);
+      setLastWordFoundTime(Date.now());
     }
   }, [gameActive, showStartAnimation]);
 
@@ -1068,8 +1070,10 @@ const InGameScreen = memo<InGameScreenProps>(({
               {/* Combo + Score - absolutely positioned on right to not shift timer */}
               {isPlaying && (
                 <div className="absolute right-0 rtl:right-auto rtl:left-0 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 md:gap-2 z-10">
-                  {/* Combo - positioned on right, never behind timer */}
-                  <ComboDisplay comboLevel={comboLevel} compact />
+                  {/* Combo container - fixed height to prevent layout shift when combo appears/disappears */}
+                  <div className="h-[28px] md:h-[32px] flex items-center justify-center">
+                    <ComboDisplay comboLevel={comboLevel} compact />
+                  </div>
 
                   {/* Score - vibrant yellow/lime gradient */}
                   <motion.div

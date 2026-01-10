@@ -561,34 +561,36 @@ body {
     margin: 0 auto;
   }
 
-  /* On desktop screens, make the board smaller to fit with side panels and show other UI */
+  /* On desktop screens, size grid to fill available space between sidebars */
+  /* Each sidebar is ~256-320px, so we subtract ~550px total for both sidebars + gaps */
   @media (min-width: 769px) {
     .game-board-frame {
-      /* Desktop: smaller grid to show timer, stats, leaderboard without scrolling */
-      /* Reduced to 42vmin to prevent letters overlapping - grid must fit comfortably */
-      width: min(42vmin, calc(100vw - 500px), calc(100dvh - 280px));
-      height: min(42vmin, calc(100vw - 500px), calc(100dvh - 280px));
-      max-height: calc(100dvh - 280px);
-      padding: 6px;
+      /* Desktop: larger grid that fills available space between sidebars */
+      /* Priority: vertical space (dvh) first, then horizontal space minus sidebars */
+      width: min(60vmin, calc(100vw - 550px), calc(100dvh - 200px));
+      height: min(60vmin, calc(100vw - 550px), calc(100dvh - 200px));
+      max-height: calc(100dvh - 200px);
+      padding: 8px;
     }
   }
 
-  /* Large desktop screens - comfortable size with more room */
+  /* Large desktop screens - more room, larger grid */
   @media (min-width: 1280px) {
     .game-board-frame {
-      /* Large desktops: moderately constrained */
-      width: min(40vmin, calc(100vw - 600px), calc(100dvh - 300px));
-      height: min(40vmin, calc(100vw - 600px), calc(100dvh - 300px));
-      max-height: calc(100dvh - 300px);
+      /* Large desktops: generous grid size, sidebars are wider (288px each = ~600px) */
+      width: min(65vmin, calc(100vw - 620px), calc(100dvh - 180px));
+      height: min(65vmin, calc(100vw - 620px), calc(100dvh - 180px));
+      max-height: calc(100dvh - 180px);
     }
   }
 
-  /* Extra large desktop screens - still constrained to prevent oversized grid */
+  /* Extra large desktop screens - maximize grid utilization */
   @media (min-width: 1536px) {
     .game-board-frame {
-      width: min(38vmin, calc(100vw - 700px), calc(100dvh - 320px));
-      height: min(38vmin, calc(100vw - 700px), calc(100dvh - 320px));
-      max-height: calc(100dvh - 320px);
+      /* 2xl desktops: sidebars are widest (320px each = ~680px), maximize grid */
+      width: min(70vmin, calc(100vw - 700px), calc(100dvh - 160px));
+      height: min(70vmin, calc(100vw - 700px), calc(100dvh - 160px));
+      max-height: calc(100dvh - 160px);
     }
   }
 

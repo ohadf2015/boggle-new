@@ -380,16 +380,29 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
       {/* Create Your Own Puzzle - only show for winners */}
       {result.solved && (
-        <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-          <Button
-            onClick={() => setShowCreatePuzzle(true)}
-            variant="outline"
-            className="w-full bg-gradient-to-r from-neo-pink/10 to-neo-yellow/10 hover:from-neo-pink/20 hover:to-neo-yellow/20 border-2 border-neo-pink/50 hover:border-neo-pink"
-          >
-            <Wand2 className="w-5 h-5 me-2 text-neo-pink" />
-            {t('customPuzzle.createYourOwn') || 'Create Your Own Puzzle'}
-          </Button>
-        </div>
+        <button
+          onClick={() => setShowCreatePuzzle(true)}
+          className="w-full mt-4 p-4 bg-gradient-to-r from-neo-pink/20 via-neo-orange/20 to-neo-yellow/20 border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all cursor-pointer text-start group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 flex-shrink-0 bg-gradient-to-br from-neo-pink to-neo-orange rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm group-hover:scale-105 transition-transform">
+              <Wand2 className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-base text-white group-hover:text-neo-yellow transition-colors">
+                {t('customPuzzle.createYourOwn') || 'Create Your Own Puzzle'}
+              </h3>
+              <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">
+                {t('customPuzzle.createDescription') || 'Challenge friends with your own word puzzle'}
+              </p>
+            </div>
+            <div className="flex-shrink-0 text-neo-pink group-hover:text-neo-yellow transition-colors">
+              <svg className="w-5 h-5 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+        </button>
       )}
     </div>
   );

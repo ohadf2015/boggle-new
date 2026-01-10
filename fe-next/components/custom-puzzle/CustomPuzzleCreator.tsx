@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Wand2, Share2, Check, Copy, ArrowRight } from 'lucide-react';
+import { X, Wand2, Share2, Check, Copy, ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,17 +11,14 @@ import { buildPuzzleShareUrl } from '@/utils/customPuzzle';
 import type { LetterGrid, Language } from '@/types';
 import DailyWordHuntSurvival from '@/components/daily/DailyWordHuntSurvival';
 import type { SurvivalGameResult } from '@/components/daily/survival';
+import { cn } from '@/lib/utils';
 
-// Sample target words per language (curated list of interesting words)
-const SAMPLE_WORDS: Record<Language, string[]> = {
-  en: ['PUZZLE', 'MAGIC', 'QUEST', 'BRAVE', 'SWIFT', 'CROWN', 'SPARK', 'DREAM', 'FLAME', 'FROST', 'OCEAN', 'STORM'],
-  he: ['חידה', 'קסם', 'מסע', 'אמיץ', 'מהיר', 'כתר', 'ניצוץ', 'חלום', 'להבה', 'קרח', 'אוקיינוס', 'סערה'],
-  sv: ['PUSSEL', 'MAGI', 'SAGAN', 'MODIG', 'SNABB', 'KRONA', 'GNISTA', 'DROM', 'FLAMMA', 'FROST', 'HAVET', 'STORM'],
-  ja: ['パズル', 'マジック', 'クエスト', 'ブレイブ', 'スイフト', 'クラウン', 'スパーク', 'ドリーム', 'フレイム', 'フロスト', 'オーシャン', 'ストーム'],
-  es: ['PUZZLE', 'MAGIA', 'BUSCA', 'BRAVO', 'RAPIDO', 'CORONA', 'CHISPA', 'SUENO', 'LLAMA', 'HIELO', 'OCEANO', 'TORMENTA'],
-  fr: ['PUZZLE', 'MAGIE', 'QUETE', 'BRAVE', 'RAPIDE', 'COURONNE', 'ETINCELLE', 'REVE', 'FLAMME', 'GIVRE', 'OCEAN', 'TEMPETE'],
-  de: ['PUZZLE', 'MAGIE', 'SUCHE', 'TAPFER', 'SCHNELL', 'KRONE', 'FUNKE', 'TRAUM', 'FLAMME', 'FROST', 'OZEAN', 'STURM'],
-};
+// Validation constants
+const MIN_WORD_LENGTH = 3;
+const MAX_WORD_LENGTH = 8;
+const DEBOUNCE_MS = 300;
+
+type ValidationStatus = 'idle' | 'validating' | 'valid' | 'invalid' | 'too-short' | 'too-long';
 
 interface CustomPuzzleCreatorProps {
   isOpen: boolean;
@@ -29,7 +26,7 @@ interface CustomPuzzleCreatorProps {
   language: Language;
 }
 
-type CreatorPhase = 'select-word' | 'play' | 'share';
+type CreatorPhase = 'enter-word' | 'play' | 'share';
 
 const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
   isOpen,
@@ -39,15 +36,12 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
   const { t } = useLanguage();
   const { user, profile } = useAuth();
   const [fingerprint, setFingerprint] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [phase, setPhase] = useState<CreatorPhase>('select-word');
-
-  // Get fingerprint for guest users
-  useEffect(() => {
-    if (!user) {
-      getGuestFingerprint().then(setFingerprint);
-    }
-  }, [user]);
+  const [phase, setPhase] = useState<CreatorPhase>('enter-word');
+  const [inputWord, setInputWord] = useState('');
+  const [validationStatus, setValidationStatus] = useState<ValidationStatus>('idle');
   const [selectedWord, setSelectedWord] = useState<string | null>(null);
   const [generatedGrid, setGeneratedGrid] = useState<LetterGrid | null>(null);
   const [puzzleCode, setPuzzleCode] = useState<string | null>(null);
@@ -55,21 +49,102 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
   const [isCreating, setIsCreating] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  // Get fingerprint for guest users
+  useEffect(() => {
+    if (!user) {
+      getGuestFingerprint().then(setFingerprint);
+    }
+  }, [user]);
+
   // Get display name
   const displayName = profile?.display_name || user?.email?.split('@')[0] || 'Creator';
 
-  // Get random selection of words (shuffled once on mount or language change)
-  const [wordOptions, setWordOptions] = useState<string[]>([]);
+  // Focus input when modal opens
   useEffect(() => {
-    const words = SAMPLE_WORDS[language] || SAMPLE_WORDS.en;
-    const shuffled = [...words].sort(() => Math.random() - 0.5);
-    setWordOptions(shuffled.slice(0, 8));
+    if (isOpen && phase === 'enter-word') {
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }, [isOpen, phase]);
+
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setPhase('enter-word');
+      setInputWord('');
+      setValidationStatus('idle');
+      setSelectedWord(null);
+      setGeneratedGrid(null);
+      setPuzzleCode(null);
+      setCreatorResult(null);
+    }
+  }, [isOpen]);
+
+  // Validate word against dictionary
+  const validateWord = useCallback(async (word: string): Promise<boolean> => {
+    try {
+      const response = await fetch('/api/validate-word', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ word, language }),
+      });
+
+      if (!response.ok) return false;
+
+      const data = await response.json();
+      return data.isValid === true;
+    } catch (error) {
+      console.error('Word validation error:', error);
+      return false;
+    }
   }, [language]);
+
+  // Handle input change with debounced validation
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.toUpperCase();
+    setInputWord(value);
+
+    // Clear previous debounce
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    // Check length first
+    if (value.length === 0) {
+      setValidationStatus('idle');
+      return;
+    }
+
+    if (value.length < MIN_WORD_LENGTH) {
+      setValidationStatus('too-short');
+      return;
+    }
+
+    if (value.length > MAX_WORD_LENGTH) {
+      setValidationStatus('too-long');
+      return;
+    }
+
+    // Set validating status and debounce API call
+    setValidationStatus('validating');
+
+    debounceRef.current = setTimeout(async () => {
+      const isValid = await validateWord(value);
+      setValidationStatus(isValid ? 'valid' : 'invalid');
+    }, DEBOUNCE_MS);
+  }, [validateWord]);
+
+  // Cleanup debounce on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, []);
 
   // Generate grid with target word embedded
   const generateGrid = useCallback(async (targetWord: string): Promise<LetterGrid | null> => {
     try {
-      // Call API to generate grid
       const response = await fetch('/api/grid/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -93,19 +168,21 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
     }
   }, [language]);
 
-  // Handle word selection
-  const handleWordSelect = useCallback(async (word: string) => {
-    setSelectedWord(word);
+  // Handle create puzzle button
+  const handleCreatePuzzle = useCallback(async () => {
+    if (validationStatus !== 'valid' || !inputWord) return;
+
+    setSelectedWord(inputWord);
     setIsCreating(true);
 
-    const grid = await generateGrid(word);
+    const grid = await generateGrid(inputWord);
     if (grid) {
       setGeneratedGrid(grid);
       setPhase('play');
     }
 
     setIsCreating(false);
-  }, [generateGrid]);
+  }, [inputWord, validationStatus, generateGrid]);
 
   // Handle creator's game completion
   const handleCreatorComplete = useCallback(async (result: SurvivalGameResult) => {
@@ -113,7 +190,6 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
 
     if (!selectedWord || !generatedGrid) return;
 
-    // Create puzzle on server
     try {
       const response = await fetch('/api/custom-puzzle/create', {
         method: 'POST',
@@ -143,7 +219,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
 
   // Handle quit during play
   const handleQuit = useCallback(() => {
-    setPhase('select-word');
+    setPhase('enter-word');
     setSelectedWord(null);
     setGeneratedGrid(null);
   }, []);
@@ -181,6 +257,40 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
     }
   }, [puzzleCode, language, t, handleCopyLink]);
 
+  // Get validation message
+  const getValidationMessage = (): string | null => {
+    switch (validationStatus) {
+      case 'validating':
+        return t('customPuzzle.validating') || 'Checking...';
+      case 'valid':
+        return t('customPuzzle.wordValid') || 'Valid word!';
+      case 'invalid':
+        return t('customPuzzle.wordInvalid') || 'Word not in dictionary';
+      case 'too-short':
+        return t('customPuzzle.wordTooShort') || 'Minimum 3 letters';
+      case 'too-long':
+        return t('customPuzzle.wordTooLong') || 'Maximum 8 letters';
+      default:
+        return null;
+    }
+  };
+
+  // Get validation color
+  const getValidationColor = (): string => {
+    switch (validationStatus) {
+      case 'valid':
+        return 'text-green-500';
+      case 'invalid':
+      case 'too-short':
+      case 'too-long':
+        return 'text-red-500';
+      case 'validating':
+        return 'text-neo-yellow';
+      default:
+        return 'text-gray-500';
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -191,8 +301,8 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
       >
-        {/* Word Selection Phase */}
-        {phase === 'select-word' && (
+        {/* Word Input Phase */}
+        {phase === 'enter-word' && (
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -210,31 +320,75 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
             </div>
 
             <p className="text-gray-600 dark:text-gray-300 mb-4">
-              {t('customPuzzle.selectWord') || 'Select a target word for your puzzle:'}
+              {t('customPuzzle.enterWord') || 'Enter your target word'}
             </p>
 
-            <div className="grid grid-cols-2 gap-2 mb-4">
-              {wordOptions.map((word) => (
-                <Button
-                  key={word}
-                  variant="outline"
-                  onClick={() => handleWordSelect(word)}
+            {/* Word Input */}
+            <div className="space-y-3 mb-6">
+              <div className="relative">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={inputWord}
+                  onChange={handleInputChange}
+                  placeholder={t('customPuzzle.enterWordPlaceholder') || 'Type a word...'}
+                  className={cn(
+                    "w-full px-4 py-3 text-xl font-bold text-center uppercase tracking-wider",
+                    "bg-white dark:bg-neo-navy border-3 border-neo-black rounded-neo",
+                    "focus:outline-none focus:ring-2 focus:ring-neo-pink focus:ring-offset-2",
+                    "placeholder:text-gray-400 placeholder:lowercase placeholder:font-normal placeholder:tracking-normal",
+                    validationStatus === 'valid' && "border-green-500 ring-1 ring-green-500",
+                    (validationStatus === 'invalid' || validationStatus === 'too-short' || validationStatus === 'too-long') && "border-red-500 ring-1 ring-red-500"
+                  )}
+                  maxLength={MAX_WORD_LENGTH + 2}
                   disabled={isCreating}
-                  className="h-12 text-lg font-bold hover:bg-neo-pink/20"
-                >
-                  {word}
-                </Button>
-              ))}
+                />
+
+                {/* Validation icon */}
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  {validationStatus === 'validating' && (
+                    <Loader2 className="w-5 h-5 text-neo-yellow animate-spin" />
+                  )}
+                  {validationStatus === 'valid' && (
+                    <Check className="w-5 h-5 text-green-500" />
+                  )}
+                  {(validationStatus === 'invalid' || validationStatus === 'too-short' || validationStatus === 'too-long') && (
+                    <AlertCircle className="w-5 h-5 text-red-500" />
+                  )}
+                </div>
+              </div>
+
+              {/* Validation message */}
+              {getValidationMessage() && (
+                <p className={cn("text-sm text-center font-medium", getValidationColor())}>
+                  {getValidationMessage()}
+                </p>
+              )}
             </div>
 
-            {isCreating && (
-              <div className="text-center py-4">
-                <div className="animate-spin w-8 h-8 border-3 border-neo-pink border-t-transparent rounded-full mx-auto mb-2" />
-                <p className="text-sm text-gray-500">
+            {/* Create Button */}
+            <Button
+              onClick={handleCreatePuzzle}
+              disabled={validationStatus !== 'valid' || isCreating}
+              className={cn(
+                "w-full py-3 text-lg font-black uppercase border-3 rounded-neo transition-all",
+                validationStatus === 'valid' && !isCreating
+                  ? "bg-gradient-to-r from-neo-pink to-neo-orange text-white border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5"
+                  : "bg-gray-300 text-gray-500 border-gray-400 cursor-not-allowed"
+              )}
+            >
+              {isCreating ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                   {t('customPuzzle.generating') || 'Generating puzzle...'}
-                </p>
-              </div>
-            )}
+                </>
+              ) : (
+                <>
+                  <Wand2 className="w-5 h-5 mr-2" />
+                  {t('customPuzzle.createPuzzle') || 'Create Puzzle'}
+                </>
+              )}
+            </Button>
           </motion.div>
         )}
 

@@ -8,20 +8,6 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import CircularTimer from '../CircularTimer';
 
-// Mock LanguageContext
-jest.mock('../../contexts/LanguageContext', () => ({
-  useLanguage: () => ({
-    t: (key: string) => {
-      const translations: Record<string, string> = {
-        'common.hurry': 'HURRY!',
-      };
-      return translations[key] || key;
-    },
-    language: 'en',
-    dir: 'ltr',
-  }),
-}));
-
 // Mock framer-motion
 jest.mock('framer-motion', () => ({
   motion: {
@@ -70,41 +56,50 @@ describe('CircularTimer', () => {
     });
   });
 
-  describe('low time warning', () => {
-    it('shows "HURRY!" badge when time <= 20 seconds', () => {
-      render(<CircularTimer remainingTime={20} />);
+  describe('low time visual indicator', () => {
+    it('changes text color to red when time <= 20 seconds', () => {
+      const { container } = render(<CircularTimer remainingTime={20} />);
 
-      expect(screen.getByText('HURRY!')).toBeInTheDocument();
+      // Timer text should have red color class when low time
+      const timerText = container.querySelector('.text-neo-red');
+      expect(timerText).toBeInTheDocument();
     });
 
-    it('shows warning at exactly 20 seconds', () => {
-      render(<CircularTimer remainingTime={20} />);
+    it('uses red color at exactly 20 seconds', () => {
+      const { container } = render(<CircularTimer remainingTime={20} />);
 
-      expect(screen.getByText('HURRY!')).toBeInTheDocument();
+      const timerText = container.querySelector('.text-neo-red');
+      expect(timerText).toBeInTheDocument();
     });
 
-    it('shows warning at 1 second', () => {
-      render(<CircularTimer remainingTime={1} />);
+    it('uses red color at 1 second', () => {
+      const { container } = render(<CircularTimer remainingTime={1} />);
 
-      expect(screen.getByText('HURRY!')).toBeInTheDocument();
+      const timerText = container.querySelector('.text-neo-red');
+      expect(timerText).toBeInTheDocument();
     });
 
-    it('does not show warning when time > 20 seconds', () => {
-      render(<CircularTimer remainingTime={21} />);
+    it('uses default black color when time > 20 seconds', () => {
+      const { container } = render(<CircularTimer remainingTime={21} />);
 
+      const timerText = container.querySelector('.text-neo-black');
+      expect(timerText).toBeInTheDocument();
+      expect(container.querySelector('.text-neo-red')).not.toBeInTheDocument();
+    });
+
+    it('uses red color at 0 seconds (game ended)', () => {
+      const { container } = render(<CircularTimer remainingTime={0} />);
+
+      // 0 is still <= 20, so red color applies
+      const timerText = container.querySelector('.text-neo-red');
+      expect(timerText).toBeInTheDocument();
+    });
+
+    it('does not show HURRY badge (removed for less distraction)', () => {
+      render(<CircularTimer remainingTime={10} />);
+
+      // Badge was removed to reduce visual distraction
       expect(screen.queryByText('HURRY!')).not.toBeInTheDocument();
-    });
-
-    it('does not show warning at 0 seconds', () => {
-      render(<CircularTimer remainingTime={0} />);
-
-      // Warning badge should not show at 0 (game ended)
-      // The condition is remainingTime <= 20 && remainingTime > 0 implicitly
-      // Actually looking at the code, it's just isLowTime = remainingTime <= 20
-      // So it will show at 0. Let's verify the actual behavior.
-      // From the code: const isLowTime = remainingTime <= 20;
-      // So 0 is <= 20, but the badge still shows
-      expect(screen.getByText('HURRY!')).toBeInTheDocument();
     });
   });
 

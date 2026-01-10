@@ -61,13 +61,14 @@ export function shouldShowKeyboardTrails(
     ? NEW_PLAYER_THRESHOLD_MS
     : EXPERIENCED_PLAYER_THRESHOLD_MS;
 
-  // Never found a word (0, null, undefined) = show trails immediately
-  // This helps players who haven't figured out the game yet
+  // If lastWordFoundTime is not set (0, null, undefined), don't show trails
+  // The caller should set lastWordFoundTime to Date.now() at game start
+  // This ensures there's always a delay before trails appear
   if (!lastWordFoundTime || lastWordFoundTime === 0) {
-    return true;
+    return false;
   }
 
-  // Calculate time since last word was found
+  // Calculate time since last word was found (or game started)
   const timeSinceLastWord = currentTime - lastWordFoundTime;
 
   // If the timestamp is in the future (clock skew), don't show trails

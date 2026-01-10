@@ -154,10 +154,11 @@ export function cleanupConfetti(): void {
 /**
  * Neo-Brutalist confetti colors for each rank (1st, 2nd, 3rd place)
  * Uses bold, high-contrast colors from the design system
+ * All ranks include pink for visual consistency
  */
 export const RANK_COLORS: Record<number, string[]> = {
-  1: ['#FFE135', '#BFFF00', '#00FFFF'], // Gold: yellow, lime, cyan
-  2: ['#C0C0C0', '#00FFFF', '#BFFF00'], // Silver: silver + cyan, lime accents
+  1: ['#FFE135', '#BFFF00', '#00FFFF', '#FF1493'], // Gold: yellow, lime, cyan, pink
+  2: ['#C0C0C0', '#00FFFF', '#BFFF00', '#FF1493'], // Silver: silver, cyan, lime, pink
   3: ['#FF6B35', '#FF1493', '#FFE135'], // Bronze: orange, pink, yellow
 };
 
@@ -178,10 +179,10 @@ export const STREAK_COLORS = ['#FF1493', '#FFE135', '#FF3366', '#00FFFF'];
 
 /**
  * Fire rank-specific confetti burst with neo-brutalist styling
- * More dramatic bursts with chunky square particles
+ * Moderate bursts with chunky square particles
  */
 export function fireRankConfetti(rank: number = 1): void {
-  const count = 120;
+  const count = 40; // Reduced from 120
   const colors = RANK_COLORS[rank] || RANK_COLORS[1];
 
   const defaults: Options = {
@@ -199,14 +200,12 @@ export function fireRankConfetti(rank: number = 1): void {
     });
   }
 
-  // Initial explosive burst
-  fire(0.3, { spread: 30, startVelocity: 60, scalar: 1.4 });
+  // Initial burst
+  fire(0.35, { spread: 30, startVelocity: 60, scalar: 1.4 });
   // Wide spread
-  fire(0.25, { spread: 70, scalar: 1.2 });
-  // Large slow particles for drama
+  fire(0.35, { spread: 70, scalar: 1.2 });
+  // Large slow particles
   fire(0.3, { spread: 100, decay: 0.91, scalar: 1.5, startVelocity: 35 });
-  // Fast outer particles
-  fire(0.15, { spread: 140, startVelocity: 50, scalar: 1.0 });
 }
 
 /**
@@ -215,7 +214,7 @@ export function fireRankConfetti(rank: number = 1): void {
 export function fireGameOverConfetti(): void {
   // Main burst with large particles
   fireConfetti({
-    particleCount: 100,
+    particleCount: 30, // Reduced from 100
     spread: 80,
     origin: { y: 0.6 },
     colors: DEFAULT_COLORS,
@@ -225,7 +224,7 @@ export function fireGameOverConfetti(): void {
   // Secondary smaller burst for depth
   setTimeout(() => {
     fireConfetti({
-      particleCount: 60,
+      particleCount: 20, // Reduced from 60
       spread: 120,
       origin: { y: 0.5 },
       colors: DEFAULT_COLORS,
@@ -235,12 +234,12 @@ export function fireGameOverConfetti(): void {
 }
 
 /**
- * Fire level up celebration confetti - big dramatic burst
+ * Fire level up celebration confetti - moderate dramatic burst
  */
 export function fireLevelUpConfetti(): void {
   // Large chunky particles
   fireConfetti({
-    particleCount: 100,
+    particleCount: 35, // Reduced from 100
     spread: 90,
     origin: { y: 0.5 },
     colors: DEFAULT_COLORS,
@@ -250,7 +249,7 @@ export function fireLevelUpConfetti(): void {
   // Follow-up smaller burst
   setTimeout(() => {
     fireConfetti({
-      particleCount: 80,
+      particleCount: 25, // Reduced from 80
       spread: 140,
       origin: { y: 0.4 },
       colors: DEFAULT_COLORS,
@@ -265,7 +264,7 @@ export function fireLevelUpConfetti(): void {
 export function fireVictoryConfetti(): void {
   // Explosive center burst
   fireConfetti({
-    particleCount: 80,
+    particleCount: 25, // Reduced from 80
     spread: 60,
     origin: { y: 0.6 },
     colors: VICTORY_COLORS,
@@ -275,7 +274,7 @@ export function fireVictoryConfetti(): void {
   // Wider follow-up
   setTimeout(() => {
     fireConfetti({
-      particleCount: 50,
+      particleCount: 15, // Reduced from 50
       spread: 100,
       origin: { y: 0.5 },
       colors: VICTORY_COLORS,
@@ -285,12 +284,12 @@ export function fireVictoryConfetti(): void {
 }
 
 /**
- * Fire streak milestone confetti - intense multi-burst
+ * Fire streak milestone confetti - moderate multi-burst
  */
 export function fireStreakConfetti(): void {
-  // Initial intense burst
+  // Initial burst
   fireConfetti({
-    particleCount: 70,
+    particleCount: 20, // Reduced from 70
     spread: 60,
     origin: { y: 0.6 },
     colors: STREAK_COLORS,
@@ -301,70 +300,64 @@ export function fireStreakConfetti(): void {
   // Secondary wider burst
   setTimeout(() => {
     fireConfetti({
-      particleCount: 50,
+      particleCount: 15, // Reduced from 50
       spread: 110,
       origin: { y: 0.5 },
       colors: STREAK_COLORS,
       scalar: 1.2,
     });
   }, 100);
-
-  // Final accent burst
-  setTimeout(() => {
-    fireConfetti({
-      particleCount: 30,
-      spread: 140,
-      origin: { y: 0.4 },
-      colors: STREAK_COLORS,
-      scalar: 1.0,
-    });
-  }, 200);
 }
 
 /**
- * Fire first win epic celebration (cascading confetti)
+ * Fire first win celebration (cascading confetti)
  * Neo-brutalist style with chunky particles and bold colors
  * @returns Cancel function to stop the animation (call on unmount)
  */
-export function fireFirstWinConfetti(durationMs: number = 4000): () => void {
+export function fireFirstWinConfetti(durationMs: number = 2500): () => void {
   const colors = NEO_BRUTALIST_COLORS;
   const end = Date.now() + durationMs;
   let rafId: number | null = null;
   let cancelled = false;
+  let frameCount = 0;
 
   const frame = () => {
     if (cancelled) return;
+    frameCount++;
 
-    // Left side burst - chunky particles
-    fireConfetti({
-      particleCount: 5,
-      angle: 60,
-      spread: 50,
-      origin: { x: 0, y: 0.6 },
-      colors,
-      startVelocity: 55,
-      gravity: 1.0,
-      ticks: 180,
-      scalar: 1.3,
-    });
-
-    // Right side burst - chunky particles
-    fireConfetti({
-      particleCount: 5,
-      angle: 120,
-      spread: 50,
-      origin: { x: 1, y: 0.6 },
-      colors,
-      startVelocity: 55,
-      gravity: 1.0,
-      ticks: 180,
-      scalar: 1.3,
-    });
-
-    // Center burst occasionally - larger dramatic particles
-    if (Math.random() > 0.7) {
+    // Only fire every 3rd frame to reduce particle count
+    if (frameCount % 3 === 0) {
+      // Left side burst
       fireConfetti({
-        particleCount: 12,
+        particleCount: 2, // Reduced from 5
+        angle: 60,
+        spread: 50,
+        origin: { x: 0, y: 0.6 },
+        colors,
+        startVelocity: 55,
+        gravity: 1.0,
+        ticks: 180,
+        scalar: 1.3,
+      });
+
+      // Right side burst
+      fireConfetti({
+        particleCount: 2, // Reduced from 5
+        angle: 120,
+        spread: 50,
+        origin: { x: 1, y: 0.6 },
+        colors,
+        startVelocity: 55,
+        gravity: 1.0,
+        ticks: 180,
+        scalar: 1.3,
+      });
+    }
+
+    // Center burst occasionally
+    if (Math.random() > 0.85) {
+      fireConfetti({
+        particleCount: 6, // Reduced from 12
         angle: 90,
         spread: 100,
         origin: { x: 0.5, y: 0.5 },

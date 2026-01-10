@@ -39,9 +39,12 @@ describe('KeyboardTrailsDisplay', () => {
         expect(shouldShowKeyboardTrails(isTypingMode, inactiveTime, gamesPlayed as number, now)).toBe(true);
       });
 
-      it('shows trails immediately when player has never found a word (lastWordFoundTime = 0)', () => {
-        expect(shouldShowKeyboardTrails(isTypingMode, 0, 0, now)).toBe(true);
-        expect(shouldShowKeyboardTrails(isTypingMode, undefined, 0, now)).toBe(true);
+      it('hides trails when game just started (lastWordFoundTime = 0 means game start)', () => {
+        // When lastWordFoundTime is 0 (game just started), we don't show trails immediately
+        // The caller should set lastWordFoundTime to Date.now() at game start
+        // This prevents trails from showing right away on desktop
+        expect(shouldShowKeyboardTrails(isTypingMode, 0, 0, now)).toBe(false);
+        expect(shouldShowKeyboardTrails(isTypingMode, undefined, 0, now)).toBe(false);
       });
 
       it('hides trails when player recently found a word', () => {
@@ -64,9 +67,10 @@ describe('KeyboardTrailsDisplay', () => {
       const isTypingMode = true;
       const experiencedGames = NEW_PLAYER_GAMES_THRESHOLD + 1; // 2 games
 
-      it('shows trails immediately when player has never found a word', () => {
-        expect(shouldShowKeyboardTrails(isTypingMode, 0, experiencedGames, now)).toBe(true);
-        expect(shouldShowKeyboardTrails(isTypingMode, undefined, experiencedGames, now)).toBe(true);
+      it('hides trails when game just started (lastWordFoundTime = 0)', () => {
+        // Even experienced players need to wait for threshold before seeing trails
+        expect(shouldShowKeyboardTrails(isTypingMode, 0, experiencedGames, now)).toBe(false);
+        expect(shouldShowKeyboardTrails(isTypingMode, undefined, experiencedGames, now)).toBe(false);
       });
 
       it('hides trails when player recently found a word', () => {

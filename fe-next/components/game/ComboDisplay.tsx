@@ -172,7 +172,8 @@ const ComboDisplay = memo<ComboDisplayProps>(({
     <div
       className={cn(
         'flex items-center justify-center relative overflow-visible',
-        compact ? 'min-w-[70px] max-w-[90px]' : 'min-w-[130px]',
+        // Fixed width to prevent layout shifts when combo appears/changes
+        compact ? 'w-[80px]' : 'w-[130px]',
         className
       )}
     >

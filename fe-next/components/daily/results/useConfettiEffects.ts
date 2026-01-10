@@ -36,10 +36,15 @@ export function useConfettiEffects({
       const end = Date.now() + duration;
       let cancelled = false;
 
+      let frameCount = 0;
       const frame = () => {
         if (cancelled) return;
-        fireConfetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#10B981', '#FFE135', '#00D9FF'] });
-        fireConfetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#10B981', '#FFE135', '#00D9FF'] });
+        frameCount++;
+        // Fire every 4th frame to reduce particle count
+        if (frameCount % 4 === 0) {
+          fireConfetti({ particleCount: 2, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#10B981', '#FFE135', '#00D9FF', '#FF1493'] });
+          fireConfetti({ particleCount: 2, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#10B981', '#FFE135', '#00D9FF', '#FF1493'] });
+        }
         if (Date.now() < end && !cancelled) {
           rafIdRef.current = requestAnimationFrame(frame);
         }
@@ -48,7 +53,7 @@ export function useConfettiEffects({
 
       let bonusTimeout: NodeJS.Timeout | undefined;
       if (attemptsUsed <= 3) {
-        bonusTimeout = setTimeout(() => fireConfetti({ particleCount: 150, spread: 120, origin: { y: 0.6 }, colors: ['#10B981', '#FFE135', '#FF1493'] }), 500);
+        bonusTimeout = setTimeout(() => fireConfetti({ particleCount: 40, spread: 120, origin: { y: 0.6 }, colors: ['#10B981', '#FFE135', '#FF1493'] }), 500);
       }
 
       // Cleanup: cancel RAF and timeout on unmount

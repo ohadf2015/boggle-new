@@ -220,13 +220,12 @@ describe('InGameScreen Combo Layout', () => {
   });
 
   describe('mobile layout constraints', () => {
-    it('combo has compact styling with constrained width', () => {
+    it('combo has compact styling with fixed width', () => {
       render(<FixedStatsRowTestComponent comboLevel={3} />);
 
-      // ComboDisplay in compact mode should have constrained width
-      const comboContainer = screen.getByText(/Combo/).closest('div[class*="min-w-"]');
-      expect(comboContainer).toHaveClass('min-w-[70px]');
-      expect(comboContainer).toHaveClass('max-w-[90px]');
+      // ComboDisplay in compact mode should have fixed width to prevent layout shifts
+      const comboContainer = screen.getByText(/Combo/).closest('div[class*="w-"]');
+      expect(comboContainer).toHaveClass('w-[80px]');
     });
 
     it('combo does not have negative positioning that could overlap timer', () => {

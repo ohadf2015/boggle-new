@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { captureError } from '@/utils/sentry';
 import { translations } from '../../translations';
+import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 
 function isChunkLoadError(error: Error): boolean {
   const message = error.message?.toLowerCase() || '';
@@ -97,11 +98,20 @@ export default function Error({
   const isChunkError = isChunkLoadError(error);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cyan-50 via-lime-50 to-cyan-100 px-4 py-8">
-      <div className="neo-card max-w-lg w-full p-8 text-center animate-neo-pop rotate-[-1deg]">
-        {/* Floating icon with gentle animation */}
-        <div className="text-7xl mb-6 animate-pulse">
-          {isChunkError ? '🔄' : '🌟'}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neo-navy via-neo-navy-light to-neo-navy px-4 py-8">
+      <div className="neo-card max-w-lg w-full p-8 text-center animate-neo-pop rotate-[-1deg] bg-neo-cream border-4 border-neo-black shadow-hard-xl">
+        {/* Interactive Mascot - shows different moods based on error type */}
+        <div className="mb-6">
+          <InteractiveMascot
+            variant={isChunkError ? 'thinking' : 'oops'}
+            size="lg"
+            enableHover
+            enableClick
+            hoverVariant="encouraging"
+            clickVariant={isChunkError ? 'excited' : 'happy'}
+            clickAnimation={isChunkError ? 'spin' : 'shake'}
+            tooltip={isChunkError ? t('errors.refreshPage') : t('common.retry')}
+          />
         </div>
 
         <h2 className="text-3xl font-black text-neo-black mb-3 uppercase tracking-wide font-neo-display">

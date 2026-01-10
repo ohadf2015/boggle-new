@@ -4,6 +4,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, WifiOff, RefreshCw, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { InteractiveMascot, ExtendedMascotVariant } from '@/components/ui/InteractiveMascot';
 
 export type ErrorType = 'network' | 'serverBusy' | 'timeout' | 'sessionExpired' | 'generic';
 
@@ -30,37 +31,45 @@ interface ErrorBannerProps {
   isRetrying?: boolean;
   /** Countdown for auto-retry (in seconds) */
   retryCountdown?: number;
+  /** Show mascot (default: false for compact errors, true for full-page errors) */
+  showMascot?: boolean;
 }
 
 const ERROR_CONFIG: Record<ErrorType, {
   icon: React.ReactNode;
   bgColor: string;
   iconBg: string;
+  mascotVariant: ExtendedMascotVariant;
 }> = {
   network: {
     icon: <WifiOff className="w-5 h-5 sm:w-6 sm:h-6" />,
     bgColor: 'bg-gradient-to-r from-red-500 via-red-600 to-red-500',
     iconBg: 'bg-red-700/30',
+    mascotVariant: 'oops',
   },
   serverBusy: {
     icon: <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />,
     bgColor: 'bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500',
     iconBg: 'bg-orange-700/30',
+    mascotVariant: 'nervous',
   },
   timeout: {
     icon: <RefreshCw className="w-5 h-5 sm:w-6 sm:h-6" />,
     bgColor: 'bg-gradient-to-r from-yellow-500 via-yellow-600 to-yellow-500',
     iconBg: 'bg-yellow-700/30',
+    mascotVariant: 'thinking',
   },
   sessionExpired: {
     icon: <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />,
     bgColor: 'bg-gradient-to-r from-purple-500 via-purple-600 to-purple-500',
     iconBg: 'bg-purple-700/30',
+    mascotVariant: 'sleepy',
   },
   generic: {
     icon: <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6" />,
     bgColor: 'bg-gradient-to-r from-red-500 via-red-600 to-red-500',
     iconBg: 'bg-red-700/30',
+    mascotVariant: 'oops',
   },
 };
 
@@ -79,6 +88,7 @@ export function ErrorBanner({
   onDismiss,
   isRetrying = false,
   retryCountdown,
+  showMascot = false,
 }: ErrorBannerProps) {
   const config = ERROR_CONFIG[type];
 
@@ -106,20 +116,33 @@ export function ErrorBanner({
         >
           <div className="max-w-7xl mx-auto px-3 py-3 sm:px-4 sm:py-4">
             <div className="flex items-start gap-3">
-              {/* Icon */}
-              <div className={cn(
-                'flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12',
-                config.iconBg,
-                'border-2 border-white/40 rounded-neo',
-                'flex items-center justify-center',
-                isRetrying && 'animate-pulse'
-              )}>
-                {isRetrying ? (
-                  <RefreshCw className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" />
-                ) : (
-                  config.icon
-                )}
-              </div>
+              {/* Mascot or Icon */}
+              {showMascot ? (
+                <div className="flex-shrink-0">
+                  <InteractiveMascot
+                    variant={config.mascotVariant}
+                    size="sm"
+                    enableHover
+                    enableClick
+                    clickAnimation="shake"
+                    hoverVariant="encouraging"
+                  />
+                </div>
+              ) : (
+                <div className={cn(
+                  'flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12',
+                  config.iconBg,
+                  'border-2 border-white/40 rounded-neo',
+                  'flex items-center justify-center',
+                  isRetrying && 'animate-pulse'
+                )}>
+                  {isRetrying ? (
+                    <RefreshCw className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" />
+                  ) : (
+                    config.icon
+                  )}
+                </div>
+              )}
 
               {/* Content */}
               <div className="flex-1 min-w-0">

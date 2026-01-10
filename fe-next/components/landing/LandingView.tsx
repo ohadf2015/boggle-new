@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, lazy, Suspense, memo } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
@@ -18,39 +17,33 @@ import { useMouseParallax } from '@/hooks/useTiltEffect';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
+import { InteractiveMascotWithEntrance } from '@/components/ui/InteractiveMascot';
 import ModeCard from './ModeCard';
 import TutorialPrompt from './TutorialPrompt';
 import Header from '@/components/Header';
 import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
 
 /**
- * Mascot component for the hero section
+ * Interactive Mascot component for the hero section
+ * Responds to hover and click with mood changes
  */
 const HeroMascot = memo(function HeroMascot() {
   const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
 
   return (
-    <motion.div
-      className="relative w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 xl:w-32 xl:h-32 mx-auto mb-1"
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-    >
-      <motion.div
-        animate={!prefersReducedMotion && enableComplexAnimations ? {
-          y: [0, -8, 0],
-          rotate: [-2, 2, -2],
-        } : {}}
-        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-      >
-        <Image
-          src="/mascot/lexi-happy.png"
-          alt="Lexi mascot"
-          width={160}
-          height={160}
-          priority
-        />
-      </motion.div>
+    <div className="relative mx-auto mb-1">
+      {/* Interactive Mascot - happy by default, excited on hover, celebrating on click */}
+      <InteractiveMascotWithEntrance
+        variant="happy"
+        size="lg"
+        enableHover
+        enableClick
+        hoverVariant="excited"
+        clickVariant="celebrating"
+        clickAnimation="bounce"
+        priority
+        delay={0.1}
+      />
 
       {/* Sparkle accents around mascot */}
       {enableComplexAnimations && !prefersReducedMotion && (
@@ -78,7 +71,7 @@ const HeroMascot = memo(function HeroMascot() {
           </motion.div>
         </>
       )}
-    </motion.div>
+    </div>
   );
 });
 
@@ -241,7 +234,7 @@ const LandingView: React.FC = () => {
       <Header />
 
       {/* Main content */}
-      <main className={`w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 ${isLandscape ? 'flex-1 flex flex-col justify-center px-4 py-2' : 'px-2 sm:px-3 lg:px-6 xl:px-8 py-2 sm:py-3 lg:py-6 pb-40 lg:pb-6'}`}>
+      <main className={`w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 ${isLandscape ? 'flex-1 flex flex-col justify-center px-4 py-2' : 'px-2 sm:px-3 lg:px-6 xl:px-8 py-2 sm:py-3 lg:py-6 pb-20 lg:pb-6'}`}>
         {/* Hero section with mascot - compact on desktop to maximize card space */}
         {!isLandscape && (
           <motion.div
@@ -371,12 +364,11 @@ const LandingView: React.FC = () => {
 
       {/* Tutorial FAB - Fixed bottom corner button */}
       {/* Z-index 45 ensures it stays below mobile menu backdrop (z-9998) but above other content */}
-      {/* On mobile: positioned 7.5rem from bottom to provide visual separation from cards */}
-      {/* On desktop: positioned above Footer to avoid overlap with "Buy us a coffee" button */}
       <button
         onClick={handleOpenTutorial}
         className="
-          fixed bottom-[calc(7.5rem+max(env(safe-area-inset-bottom),1rem))] lg:bottom-[calc(8.5rem+max(env(safe-area-inset-bottom),1rem))] right-4 z-[45]
+          fixed bottom-4 right-4 z-[45]
+          pb-[env(safe-area-inset-bottom)]
           flex items-center gap-2
           min-w-[48px] min-h-[48px]
           px-4 py-3
@@ -388,7 +380,6 @@ const LandingView: React.FC = () => {
           active:scale-95 active:shadow-hard
           transition-all duration-150
           rtl:right-auto rtl:left-4
-          rtl:ml-[max(env(safe-area-inset-left),0px)]
           animate-fade-in-up
         "
         aria-label={t('landing.tutorial') || 'Tutorial'}
