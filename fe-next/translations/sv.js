@@ -1778,7 +1778,8 @@ const sv = {
       "keepGoing": "Fortsätt!",
       "getStarted": "Nu börjar vi!",
       "ready": "Redo!",
-      "readyForMultiplayer": "Du är redo för multiplayer!"
+      "readyForMultiplayer": "Du är redo för multiplayer!",
+      "tapForDetails": "Tryck för detaljer"
     },
     "unlock": {
       "title": "Färdighet Upplåst!",
@@ -2402,7 +2403,9 @@ const sv = {
     "placement": "Placering",
     "topThreeBonus": "Topp 3 bonus",
     "efficiency": "Effektivitet",
-    "streak": "Svit"
+    "streak": "Svit",
+    "guestTeasing": "Logga in för att tjäna {amount} mynt!",
+    "signInShort": "Logga in"
   },
   "partyScreen": {
     "title": "Partyskärm",
@@ -2861,6 +2864,8 @@ const sv = {
     "fewWordsFoundSingular": "Hittade 1 ord",
     "achievementsNotSaved": "Prestationer i enspelarläge sparas inte till din profil.",
     "botDetails": "Bot-detaljer",
+    "botWordsFound": "Ord botarna hittade",
+    "noWordsToShow": "Orddetaljer ej tillgängliga",
     "difficulty": "Svårighetsgrad",
     "timer": "Timer",
     "totalScore": "Totalpoäng",

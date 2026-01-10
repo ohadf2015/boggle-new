@@ -8,12 +8,15 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Coins, Timer, BarChart3 } from 'lucide-react';
+import { ChevronDown, Coins, Timer, BarChart3, Lock } from 'lucide-react';
 import { getSurvivalBonusMessage } from './constants';
+import type { CoinRewardMode } from '@/components/results/CoinRewardDisplay';
 
 export interface PerformanceSectionProps {
   // Rewards props (from CollapsibleDetails)
   coinReward: { awarded: number; breakdown: { base: number; efficiency: number; streak: number } } | null;
+  /** Coin reward mode: 'earned' for authenticated users, 'teasing' for guests */
+  coinRewardMode?: CoinRewardMode;
   survivalBonusTime: number;
   rarestWord: { word: string; rarity: number; emoji: string; label: string } | null;
   // Score breakdown props (from ScoreBreakdownSection)
@@ -28,6 +31,7 @@ export interface PerformanceSectionProps {
 
 export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
   coinReward,
+  coinRewardMode = 'earned',
   survivalBonusTime,
   rarestWord,
   solved,
@@ -39,6 +43,7 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
   t,
 }) => {
   const [expanded, setExpanded] = useState(false);
+  const isTeasing = coinRewardMode === 'teasing';
 
   // Check if there's anything to show
   const hasRewards = (coinReward && coinReward.awarded > 0) || survivalBonusTime > 0 || (rarestWord && rarestWord.rarity >= 4);
@@ -71,8 +76,13 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
               {hasScore && (
                 <span className="text-xs font-bold text-purple-600 dark:text-purple-400">{Math.round(efficiencyScore)} pts</span>
               )}
-              {coinReward && coinReward.awarded > 0 && (
+              {coinReward && coinReward.awarded > 0 && !isTeasing && (
                 <span className="text-xs font-bold text-amber-600 dark:text-amber-400">+{coinReward.awarded}🪙</span>
+              )}
+              {coinReward && coinReward.awarded > 0 && isTeasing && (
+                <span className="text-xs font-bold text-slate-400 flex items-center gap-0.5">
+                  <Lock className="w-2.5 h-2.5" />+{coinReward.awarded}🪙
+                </span>
               )}
               {survivalBonusTime > 0 && (
                 <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400">+{survivalBonusTime}s</span>
@@ -113,14 +123,28 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
               {/* Rewards Section */}
               {hasRewards && (
                 <div className="space-y-2">
-                  {/* Coin rewards */}
-                  {coinReward && coinReward.awarded > 0 && (
+                  {/* Coin rewards - earned mode */}
+                  {coinReward && coinReward.awarded > 0 && !isTeasing && (
                     <div className="flex items-center justify-between p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
                       <div className="flex items-center gap-2">
                         <Coins className="w-4 h-4 text-amber-600" />
                         <span className="font-bold text-xs text-gray-700 dark:text-gray-200">{t('wordHunt.results.coinsEarned') || 'Coins Earned'}</span>
                       </div>
                       <span className="font-black text-amber-600 dark:text-amber-400">+{coinReward.awarded}</span>
+                    </div>
+                  )}
+
+                  {/* Coin rewards - teasing mode for guests */}
+                  {coinReward && coinReward.awarded > 0 && isTeasing && (
+                    <div className="flex items-center justify-between p-2 bg-slate-100 dark:bg-slate-700/30 rounded-lg border border-slate-300 dark:border-slate-600">
+                      <div className="flex items-center gap-2">
+                        <Lock className="w-3.5 h-3.5 text-amber-500/70" />
+                        <Coins className="w-4 h-4 text-amber-500/60" />
+                        <span className="font-bold text-xs text-slate-600 dark:text-slate-300">
+                          {(t('coins.guestTeasing') || 'Sign in to earn {amount} coins!').replace('{amount}', String(coinReward.awarded))}
+                        </span>
+                      </div>
+                      <span className="font-black text-amber-500/70">+{coinReward.awarded}</span>
                     </div>
                   )}
 

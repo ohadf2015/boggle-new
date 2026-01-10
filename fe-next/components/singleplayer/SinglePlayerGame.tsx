@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { ArrowLeft, Pause, Play, Crown, TrendingUp, Target, Zap, Eye, List } from 'lucide-react';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
@@ -204,14 +204,28 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     isGameActive: !!grid && !isPaused && !isGameOver,
   });
 
+  // Memoize training analysis options to prevent infinite re-render loops
+  // CRITICAL: Inline objects and functions create new references each render,
+  // which causes useEffect dependencies in useTrainingAnalysis to trigger infinitely
+  const trainingGridSize = useMemo(() => ({ rows: 5, cols: 5 }), []);
+  const handleTrainingAnalysisComplete = useCallback(() => {
+    // Player has demonstrated all basic skills
+    // Could show celebration or enable "ready for more" badge
+  }, []);
+
   // Training analysis - tracks player behavior in practice mode for interactive tutorial
-  const trainingAnalysis = useTrainingAnalysis({
+  // Destructure to get stable function references for dependency arrays (prevents infinite loops)
+  const {
+    trackPath: trainingAnalysisTrackPath,
+    trackValidWord: trainingAnalysisTrackValidWord,
+    currentHint: trainingAnalysisCurrentHint,
+    dismissHint: trainingAnalysisDismissHint,
+    finishTraining: trainingAnalysisFinishTraining,
+    hasPassed: trainingAnalysisHasPassed,
+  } = useTrainingAnalysis({
     enabled: settings.mode === 'practice',
-    gridSize: { rows: 5, cols: 5 }, // Standard grid size
-    onTrainingComplete: () => {
-      // Player has demonstrated all basic skills
-      // Could show celebration or enable "ready for more" badge
-    },
+    gridSize: trainingGridSize,
+    onTrainingComplete: handleTrainingAnalysisComplete,
   });
 
   // Memoized callbacks for training progress (prevents infinite re-render loops)
@@ -253,10 +267,11 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     // Track for first-play tutorial (detect mixed-direction usage)
     firstPlayTutorial.trackUserPath(cells);
     // Track for training analysis (only in practice mode)
-    trainingAnalysis.trackPath(cells);
+    trainingAnalysisTrackPath(cells);
     // Track for progress bar (only in practice mode)
     trainingTrackPath(cells);
-  }, [directionGuidance, firstPlayTutorial, trainingAnalysis, trainingTrackPath]);
+    // Use stable function references to avoid infinite re-render loops
+  }, [directionGuidance, firstPlayTutorial, trainingAnalysisTrackPath, trainingTrackPath]);
 
   // Game timer - handles countdown with pause support
   const timer = useGameTimer({
@@ -751,7 +766,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
       // Mark training session as complete (tracks progress for practice mode)
       if (settings.mode === 'practice') {
-        trainingAnalysis.finishTraining();
+        trainingAnalysisFinishTraining();
       }
 
       // Use ref to call onGameEnd - ensures we always have latest callback
@@ -761,7 +776,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
     finalizeAndEndGame();
     // No cleanup needed - we use ref pattern instead of isMounted check
-  }, [isGameOver, settings.bots, settings.language, settings.timerSeconds, combo.maxCombo, settings.mode, trainingAnalysis]);
+    // IMPORTANT: Use trainingAnalysisFinishTraining instead of trainingAnalysis object
+    // to avoid infinite re-render loops (the object reference changes each render)
+  }, [isGameOver, settings.bots, settings.language, settings.timerSeconds, combo.maxCombo, settings.mode, trainingAnalysisFinishTraining]);
 
   // Timer is now handled by useGameTimer hook (lines 126-136)
 
@@ -1084,7 +1101,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           combo.incrementCombo(true);
 
           // Track for training analysis (practice mode only)
-          trainingAnalysis.trackValidWord(normalizedWord.length);
+          trainingAnalysisTrackValidWord(normalizedWord.length);
           // Track for progress bar (practice mode only)
           trainingTrackValidWord(normalizedWord.length);
 
@@ -1130,7 +1147,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           timestamp: Date.now(),
         });
       });
-  }, [settings.language, settings.minWordLength, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getComboBonus, getScoreMultiplier, fireRoundActive, calculateWordScore, trainingAnalysis, trainingTrackValidWord]);
+    // Use trainingAnalysisTrackValidWord (stable function) instead of trainingAnalysis object
+    // to avoid infinite re-render loops
+  }, [settings.language, settings.minWordLength, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getComboBonus, getScoreMultiplier, fireRoundActive, calculateWordScore, trainingAnalysisTrackValidWord, trainingTrackValidWord]);
 
   const handleFinishPractice = useCallback(() => {
     setIsGameOver(true);
@@ -1558,9 +1577,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         {/* Training Hints - shows real-time tips in practice mode */}
         {settings.mode === 'practice' && (
           <TrainingHints
-            currentHint={trainingAnalysis.currentHint}
-            onDismiss={trainingAnalysis.dismissHint}
-            trainingComplete={trainingAnalysis.hasPassed}
+            currentHint={trainingAnalysisCurrentHint}
+            onDismiss={trainingAnalysisDismissHint}
+            trainingComplete={trainingAnalysisHasPassed}
             otherTooltipVisible={directionGuidance.showDirectionGuidance}
           />
         )}
@@ -2016,9 +2035,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       {/* Training Hints - shows real-time tips in practice mode */}
       {settings.mode === 'practice' && (
         <TrainingHints
-          currentHint={trainingAnalysis.currentHint}
-          onDismiss={trainingAnalysis.dismissHint}
-          trainingComplete={trainingAnalysis.hasPassed}
+          currentHint={trainingAnalysisCurrentHint}
+          onDismiss={trainingAnalysisDismissHint}
+          trainingComplete={trainingAnalysisHasPassed}
           otherTooltipVisible={directionGuidance.showDirectionGuidance}
         />
       )}

@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Trophy, Clock, ChevronDown, ChevronUp, Sparkles, Crown, Calendar } from 'lucide-react';
+import { Trophy, Clock, ChevronDown, ChevronUp, Sparkles, Crown, Calendar } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { getRankDisplay } from '@/utils/rankingStyles';
-import { getPuzzleNumber } from '@/utils/dailyChallenge';
 import { formatDistanceToNow, getCountryFlag } from '@/shared/utils';
 import Avatar from '@/components/Avatar';
 import type { Language } from '@/types';
@@ -321,6 +320,61 @@ const AllTimeParticipantRow = memo<{
 AllTimeParticipantRow.displayName = 'AllTimeParticipantRow';
 
 // ==========================================
+// Skeleton Loading Row
+// ==========================================
+
+const SkeletonRow = memo<{ index: number }>(({ index }) => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ delay: index * 0.05 }}
+    className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50"
+  >
+    {/* Rank skeleton */}
+    <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-slate-200 dark:bg-slate-700 animate-pulse" />
+    {/* Avatar skeleton */}
+    <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-slate-200 dark:bg-slate-700 animate-pulse" />
+    {/* Name & stats skeleton */}
+    <div className="flex-1 space-y-2">
+      <div className="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+      <div className="h-3 w-16 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+    </div>
+  </motion.div>
+));
+
+SkeletonRow.displayName = 'SkeletonRow';
+
+// ==========================================
+// Tabs Component (Always Visible)
+// ==========================================
+
+const LeaderboardTabs = memo<{
+  activeTab: LeaderboardTab;
+  onTabChange: (tab: LeaderboardTab) => void;
+  t: (key: string) => string;
+}>(({ activeTab, onTabChange, t }) => (
+  <div className="flex justify-center">
+    <ToggleGroup
+      type="single"
+      value={activeTab}
+      onValueChange={(value) => value && onTabChange(value as LeaderboardTab)}
+      className="bg-slate-100 dark:bg-slate-800 p-1 rounded-neo border-2 border-neo-black"
+    >
+      <ToggleGroupItem value="today" size="sm" className="text-xs px-3">
+        <Calendar className="w-3.5 h-3.5 mr-1.5" />
+        {t('wordHunt.leaderboard.today')}
+      </ToggleGroupItem>
+      <ToggleGroupItem value="alltime" size="sm" className="text-xs px-3">
+        <Crown className="w-3.5 h-3.5 mr-1.5" />
+        {t('wordHunt.leaderboard.allTime')}
+      </ToggleGroupItem>
+    </ToggleGroup>
+  </div>
+));
+
+LeaderboardTabs.displayName = 'LeaderboardTabs';
+
+// ==========================================
 // Main Component
 // ==========================================
 
@@ -514,48 +568,102 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
     : participants.slice(0, maxVisible);
 
   const hasMore = participants.length > maxVisible;
+  const isLoading = loading && participants.length === 0;
+  const isEmpty = !loading && participants.length === 0;
 
-  // Empty state
-  if (!loading && participants.length === 0) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={`
-          bg-gradient-to-br from-white/95 to-slate-50/95 dark:from-slate-800/95 dark:to-slate-900/95
-          rounded-2xl border-2 border-slate-200 dark:border-slate-700
-          ${compact ? 'p-3' : 'p-4 sm:p-5'}
-          shadow-lg backdrop-blur-sm
-        `}
-      >
-        {/* Tabs */}
-        <div className="flex items-center justify-center mb-4">
-          <ToggleGroup
-            type="single"
-            value={activeTab}
-            onValueChange={(value) => value && setActiveTab(value as LeaderboardTab)}
-            className="bg-slate-100 dark:bg-slate-800 p-1 rounded-neo border-2 border-neo-black"
-          >
-            <ToggleGroupItem value="today" size="sm" className="text-xs">
-              <Calendar className="w-3 h-3 mr-1" />
-              {t('wordHunt.leaderboard.today')}
-            </ToggleGroupItem>
-            <ToggleGroupItem value="alltime" size="sm" className="text-xs">
-              <Crown className="w-3 h-3 mr-1" />
-              {t('wordHunt.leaderboard.allTime')}
-            </ToggleGroupItem>
-          </ToggleGroup>
+  // Render content based on state
+  const renderContent = () => {
+    // Loading state - show skeleton rows
+    if (isLoading) {
+      return (
+        <div className="space-y-2">
+          {Array.from({ length: Math.min(maxVisible, 3) }).map((_, index) => (
+            <SkeletonRow key={index} index={index} />
+          ))}
         </div>
+      );
+    }
 
-        <div className="text-center py-8">
+    // Error state
+    if (error) {
+      return (
+        <div className="text-center text-red-500 py-4 text-sm">
+          {error}
+          <button
+            onClick={activeTab === 'today' ? fetchTodayLeaderboard : fetchAllTimeLeaderboard}
+            className="block mx-auto mt-2 text-neo-cyan underline"
+          >
+            {t('common.retry')}
+          </button>
+        </div>
+      );
+    }
+
+    // Empty state
+    if (isEmpty) {
+      return (
+        <div className="text-center py-6">
           <div className="text-4xl mb-3">🏆</div>
           <p className="text-slate-700 dark:text-slate-300 font-bold text-sm sm:text-base">
             {activeTab === 'today' ? t('daily.beFirstToPlay') : t('wordHunt.leaderboard.noPlayersYet')}
           </p>
         </div>
-      </motion.div>
+      );
+    }
+
+    // Participants list
+    return (
+      <div className="space-y-2">
+        <AnimatePresence mode="popLayout">
+          {activeTab === 'today' ? (
+            (visibleParticipants as DailyParticipant[]).map((participant, index) => (
+              <TodayParticipantRow
+                key={participant.player_id || participant.guest_fingerprint || index}
+                participant={participant}
+                index={index}
+                isCurrentUser={isCurrentUserToday(participant)}
+                compact={compact}
+                t={t}
+              />
+            ))
+          ) : (
+            (visibleParticipants as AllTimeParticipant[]).map((participant, index) => (
+              <AllTimeParticipantRow
+                key={participant.player_identifier || index}
+                participant={participant}
+                index={index}
+                isCurrentUser={isCurrentUserAllTime(participant)}
+                compact={compact}
+                t={t}
+              />
+            ))
+          )}
+        </AnimatePresence>
+
+        {/* Show more/less button */}
+        {hasMore && (
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            onClick={() => setExpanded(!expanded)}
+            className="w-full mt-2 py-2.5 text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center justify-center gap-1.5 transition-colors rounded-xl bg-indigo-50/50 dark:bg-indigo-900/20 hover:bg-indigo-100/70 dark:hover:bg-indigo-900/30 border border-indigo-200/50 dark:border-indigo-700/30"
+          >
+            {expanded ? (
+              <>
+                <ChevronUp className="w-4 h-4" />
+                {t('daily.showLess')}
+              </>
+            ) : (
+              <>
+                <ChevronDown className="w-4 h-4" />
+                {t('daily.showMore')} ({participants.length - maxVisible} {t('daily.more')})
+              </>
+            )}
+          </motion.button>
+        )}
+      </div>
     );
-  }
+  };
 
   return (
     <motion.div
@@ -568,135 +676,46 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
         shadow-lg backdrop-blur-sm
       `}
     >
-      {/* Header with Tabs */}
-      <div className="flex flex-col gap-3 mb-4">
-        {/* Title row */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 sm:p-2.5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl border-2 border-indigo-600 shadow-md">
-              <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-amber-300" />
-            </div>
-            <div>
-              <h3 className="font-black text-base sm:text-lg uppercase tracking-wide text-slate-800 dark:text-white">
-                {t('wordHunt.leaderboard.title')}
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
-                {activeTab === 'today' && totalCount > 0 ? (
-                  <>
-                    <span>{totalCount} {t('wordHunt.leaderboard.played')}</span>
-                    <span className="mx-1.5">•</span>
-                    <span className="text-emerald-600 dark:text-emerald-400">{totalSolvedCount} {t('wordHunt.leaderboard.solved')}</span>
-                    {todayGuestCount > 0 && (
-                      <>
-                        <span className="mx-1.5">•</span>
-                        <span className="text-slate-500 dark:text-slate-500">
-                          {todayGuestCount} {todayGuestCount === 1 ? t('daily.guestSingular') || 'guest' : t('daily.guestsPlural') || 'guests'}
-                        </span>
-                      </>
-                    )}
-                  </>
-                ) : (
-                  <>{totalCount} {totalCount === 1 ? t('daily.playerSingular') : t('daily.playersPlural')}</>
-                )}
-              </p>
-            </div>
-          </div>
+      {/* Header - always visible */}
+      <div className="flex items-center gap-3 mb-3">
+        <div className="p-2 sm:p-2.5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl border-2 border-indigo-600 shadow-md">
+          <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-amber-300" />
         </div>
-
-        {/* Tabs */}
-        <div className="flex justify-center">
-          <ToggleGroup
-            type="single"
-            value={activeTab}
-            onValueChange={(value) => value && setActiveTab(value as LeaderboardTab)}
-            className="bg-slate-100 dark:bg-slate-800 p-1 rounded-neo border-2 border-neo-black"
-          >
-            <ToggleGroupItem value="today" size="sm" className="text-xs px-3">
-              <Calendar className="w-3.5 h-3.5 mr-1.5" />
-              {t('wordHunt.leaderboard.today')}
-            </ToggleGroupItem>
-            <ToggleGroupItem value="alltime" size="sm" className="text-xs px-3">
-              <Crown className="w-3.5 h-3.5 mr-1.5" />
-              {t('wordHunt.leaderboard.allTime')}
-            </ToggleGroupItem>
-          </ToggleGroup>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-black text-base sm:text-lg uppercase tracking-wide text-slate-800 dark:text-white">
+            {t('wordHunt.leaderboard.title')}
+          </h3>
+          {!isLoading && (
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium truncate">
+              {activeTab === 'today' && totalCount > 0 ? (
+                <>
+                  <span>{totalCount} {t('wordHunt.leaderboard.played')}</span>
+                  <span className="mx-1.5">•</span>
+                  <span className="text-emerald-600 dark:text-emerald-400">{totalSolvedCount} {t('wordHunt.leaderboard.solved')}</span>
+                  {todayGuestCount > 0 && (
+                    <>
+                      <span className="mx-1.5">•</span>
+                      <span className="text-slate-500 dark:text-slate-500">
+                        {todayGuestCount} {todayGuestCount === 1 ? t('daily.guestSingular') || 'guest' : t('daily.guestsPlural') || 'guests'}
+                      </span>
+                    </>
+                  )}
+                </>
+              ) : (
+                <>{totalCount} {totalCount === 1 ? t('daily.playerSingular') : t('daily.playersPlural')}</>
+              )}
+            </p>
+          )}
         </div>
       </div>
 
-      {/* Loading state */}
-      {loading && participants.length === 0 && (
-        <div className="flex items-center justify-center py-8">
-          <div className="w-8 h-8 border-3 border-neo-purple border-t-transparent rounded-full animate-spin" />
-        </div>
-      )}
+      {/* Tabs - always visible, outside loading area */}
+      <div className="mb-4">
+        <LeaderboardTabs activeTab={activeTab} onTabChange={setActiveTab} t={t} />
+      </div>
 
-      {/* Error state */}
-      {error && (
-        <div className="text-center text-red-500 py-4 text-sm">
-          {error}
-          <button
-            onClick={activeTab === 'today' ? fetchTodayLeaderboard : fetchAllTimeLeaderboard}
-            className="block mx-auto mt-2 text-neo-cyan underline"
-          >
-            {t('common.retry')}
-          </button>
-        </div>
-      )}
-
-      {/* Participants list */}
-      {!error && (
-        <div className="space-y-2">
-          <AnimatePresence mode="popLayout">
-            {activeTab === 'today' ? (
-              // Today's leaderboard
-              (visibleParticipants as DailyParticipant[]).map((participant, index) => (
-                <TodayParticipantRow
-                  key={participant.player_id || participant.guest_fingerprint || index}
-                  participant={participant}
-                  index={index}
-                  isCurrentUser={isCurrentUserToday(participant)}
-                  compact={compact}
-                  t={t}
-                />
-              ))
-            ) : (
-              // All-time leaderboard
-              (visibleParticipants as AllTimeParticipant[]).map((participant, index) => (
-                <AllTimeParticipantRow
-                  key={participant.player_identifier || index}
-                  participant={participant}
-                  index={index}
-                  isCurrentUser={isCurrentUserAllTime(participant)}
-                  compact={compact}
-                  t={t}
-                />
-              ))
-            )}
-          </AnimatePresence>
-
-          {/* Show more/less button */}
-          {hasMore && (
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              onClick={() => setExpanded(!expanded)}
-              className="w-full mt-2 py-2.5 text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center justify-center gap-1.5 transition-colors rounded-xl bg-indigo-50/50 dark:bg-indigo-900/20 hover:bg-indigo-100/70 dark:hover:bg-indigo-900/30 border border-indigo-200/50 dark:border-indigo-700/30"
-            >
-              {expanded ? (
-                <>
-                  <ChevronUp className="w-4 h-4" />
-                  {t('daily.showLess')}
-                </>
-              ) : (
-                <>
-                  <ChevronDown className="w-4 h-4" />
-                  {t('daily.showMore')} ({participants.length - maxVisible} {t('daily.more')})
-                </>
-              )}
-            </motion.button>
-          )}
-        </div>
-      )}
+      {/* Content area - loading/empty/participants */}
+      {renderContent()}
     </motion.div>
   );
 };

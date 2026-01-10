@@ -79,10 +79,10 @@ describe('CircularTimer', () => {
       expect(timerText).toBeInTheDocument();
     });
 
-    it('uses default black color when time > 20 seconds', () => {
+    it('uses default cream color when time > 20 seconds', () => {
       const { container } = render(<CircularTimer remainingTime={21} />);
 
-      const timerText = container.querySelector('.text-neo-black');
+      const timerText = container.querySelector('.text-neo-cream');
       expect(timerText).toBeInTheDocument();
       expect(container.querySelector('.text-neo-red')).not.toBeInTheDocument();
     });
@@ -150,9 +150,11 @@ describe('CircularTimer', () => {
     it('applies neo-brutalist styling classes', () => {
       const { container } = render(<CircularTimer remainingTime={90} />);
 
-      // Check for neo-brutalist class patterns
-      const styledDiv = container.querySelector('.border-neo-black');
-      expect(styledDiv).toBeInTheDocument();
+      // Check for SVG circles with neo-brutalist strokes (no background frame)
+      const svg = container.querySelector('svg');
+      expect(svg).toBeInTheDocument();
+      const circles = container.querySelectorAll('circle');
+      expect(circles.length).toBeGreaterThanOrEqual(3);
     });
 
     it('renders with correct text styling', () => {

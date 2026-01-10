@@ -1784,7 +1784,8 @@ const en = {
       "keepGoing": "Keep going!",
       "getStarted": "Let's get started!",
       "ready": "Ready!",
-      "readyForMultiplayer": "You're ready for multiplayer!"
+      "readyForMultiplayer": "You're ready for multiplayer!",
+      "tapForDetails": "Tap for details"
     },
     "unlock": {
       "title": "Skill Unlocked!",
@@ -2536,7 +2537,9 @@ const en = {
     "placement": "Placement",
     "topThreeBonus": "Top 3 Bonus",
     "efficiency": "Efficiency",
-    "streak": "Streak"
+    "streak": "Streak",
+    "guestTeasing": "Sign in to earn {amount} coins!",
+    "signInShort": "Sign in"
   },
   "partyScreen": {
     "title": "Party Screen",
@@ -2867,6 +2870,8 @@ const en = {
     "fewWordsFoundSingular": "Found 1 word",
     "achievementsNotSaved": "Solo achievements aren't saved to your profile.",
     "botDetails": "Bot Stats",
+    "botWordsFound": "Bot Words Found",
+    "noWordsToShow": "Word details not available",
     "difficulty": "Difficulty",
     "timer": "Timer",
     "totalScore": "Total",

@@ -195,9 +195,9 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
             </DialogTitle>
           </DialogHeader>
 
-          <DialogBody className="space-y-4">
+          <DialogBody className="space-y-5">
             {/* Profile Section */}
-            <div className="flex items-center gap-4 p-4 bg-neo-cream dark:bg-slate-700 rounded-neo border-3 border-neo-black text-neo-black dark:text-neo-white">
+            <div className="flex items-center gap-4 p-4 bg-slate-100 dark:bg-slate-700/50 rounded-neo border-2 border-neo-black/20 dark:border-slate-600">
               {/* Avatar Button */}
               <button
                 type="button"
@@ -205,7 +205,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                 className="relative flex-shrink-0 group"
                 aria-label={t('multiplayerFlow.createModal.changeAvatar') || 'Change avatar'}
               >
-                <div className="w-16 h-16 rounded-full overflow-hidden border-3 border-neo-black shadow-hard group-hover:shadow-hard-lg transition-all">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-3 border-neo-black shadow-hard group-hover:shadow-hard-lg transition-all">
                   {avatarImagePath ? (
                     <Image
                       src={avatarImagePath}
@@ -220,7 +220,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                     </div>
                   )}
                 </div>
-                <div className="absolute -bottom-1 -right-1 rtl:-right-auto rtl:-left-1 w-6 h-6 bg-neo-cyan rounded-full border-2 border-neo-black flex items-center justify-center text-neo-black">
+                <div className="absolute -bottom-1 -right-1 rtl:-right-auto rtl:-left-1 w-6 h-6 bg-neo-cyan rounded-full border-2 border-neo-black flex items-center justify-center">
                   <Pencil className="w-3 h-3 text-neo-black" />
                 </div>
               </button>
@@ -243,14 +243,14 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                     type="button"
                     onClick={() => !isAuthenticated && setIsEditingName(true)}
                     disabled={isAuthenticated}
-                    className={`text-start w-full ${!isAuthenticated ? 'cursor-pointer hover:bg-neo-black/5 rounded px-1 -mx-1' : 'cursor-default'}`}
+                    className={`text-start w-full ${!isAuthenticated ? 'cursor-pointer hover:bg-neo-black/5 dark:hover:bg-white/5 rounded px-2 -mx-2 py-1 -my-1' : 'cursor-default'}`}
                   >
                     <p className="font-bold text-lg text-neo-black dark:text-neo-white truncate flex items-center gap-2">
                       {username || t('multiplayerFlow.createModal.namePlaceholder') || 'Your name'}
-                      {!isAuthenticated && <Pencil className="w-3.5 h-3.5 text-slate-400" />}
+                      {!isAuthenticated && <Pencil className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />}
                     </p>
                     {isAuthenticated && (
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
                         {t('multiplayerFlow.createModal.authenticatedHint') || 'Signed in'}
                       </p>
                     )}
@@ -259,29 +259,28 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
               </div>
             </div>
 
-            {/* Room Name Input */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
-                {t('multiplayerFlow.createModal.roomNameLabel') || 'Room Name'}{' '}
-                <span className="font-normal text-slate-400">
-                  ({t('multiplayerFlow.createModal.optional') || 'optional'})
-                </span>
-              </Label>
-              <Input
-                value={roomName}
-                onChange={(e) => setRoomName(e.target.value)}
-                maxLength={30}
-                placeholder={generateRoomName(username || 'Your')}
-                className="bg-slate-100 dark:bg-slate-700/50"
-              />
-              <p className="text-xs text-slate-500">
-                {t('multiplayerFlow.createModal.roomNameHint') ||
-                  'Leave empty for auto-generated name'}
-              </p>
-            </div>
+            {/* Room Settings */}
+            <div className="space-y-4">
+              {/* Room Name Input */}
+              <div className="space-y-1.5">
+                <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
+                  {t('multiplayerFlow.createModal.roomNameLabel') || 'Room Name'}{' '}
+                  <span className="font-normal text-slate-400">
+                    ({t('multiplayerFlow.createModal.optional') || 'optional'})
+                  </span>
+                </Label>
+                <Input
+                  value={roomName}
+                  onChange={(e) => setRoomName(e.target.value)}
+                  maxLength={30}
+                  placeholder={generateRoomName(username || 'Your')}
+                  className="bg-slate-100 dark:bg-slate-700/50"
+                />
+              </div>
 
-            {/* Language Selector */}
-            <LanguageSelector selectedLanguage={language} onLanguageChange={setLanguage} />
+              {/* Language Selector */}
+              <LanguageSelector selectedLanguage={language} onLanguageChange={setLanguage} />
+            </div>
           </DialogBody>
 
           <DialogFooter>

@@ -2,7 +2,7 @@
 
 import React, { useMemo, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, MoveUpRight, RotateCw, Target, Trophy, Sparkles } from 'lucide-react';
+import { Check, MoveUpRight, RotateCw, Target, Trophy, Sparkles, ChevronDown } from 'lucide-react';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -213,11 +213,6 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
     return undefined;
   }, [justUnlocked, onUnlockAnimationComplete]);
 
-  // Get the next incomplete skill for compact hint
-  const nextIncompleteSkill = useMemo(() => {
-    return TRAINING_SKILLS.find(skill => !completedSkills.has(skill.id));
-  }, [completedSkills]);
-
   // Compact mode for mobile - shows prominent clickable bar
   // min-h-[44px] ensures touch target meets accessibility requirements
   if (compact && !expanded) {
@@ -255,15 +250,19 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
                 transition={{ duration: 0.5 }}
               />
             </div>
-            {/* Show next skill hint */}
-            {nextIncompleteSkill && (
+            {/* Show tap hint with chevron to indicate expandability */}
+            <div className="flex items-center gap-1">
               <span className={cn(
                 'text-xs font-medium whitespace-nowrap',
-                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                isDarkMode ? 'text-gray-400' : 'text-gray-500'
               )}>
-                → {t(nextIncompleteSkill.labelKey) || nextIncompleteSkill.fallbackLabel}
+                {t('training.progress.tapForDetails') || 'Tap for details'}
               </span>
-            )}
+              <ChevronDown className={cn(
+                'w-4 h-4 flex-shrink-0',
+                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+              )} />
+            </div>
           </>
         )}
       </motion.button>

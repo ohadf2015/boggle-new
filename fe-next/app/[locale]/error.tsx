@@ -121,7 +121,7 @@ export default function Error({
         <p className="text-neo-gray text-lg mb-8 leading-relaxed">
           {isChunkError
             ? t('errors.updateMessage')
-            : error.message || t('errors.errorMessage')}
+            : t('errors.errorMessage')}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">

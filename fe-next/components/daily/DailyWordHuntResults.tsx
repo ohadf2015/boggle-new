@@ -316,6 +316,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       {result.solved && (
         <PerformanceSection
           coinReward={coinActions.coinReward}
+          coinRewardMode={isAuthenticated ? 'earned' : 'teasing'}
           survivalBonusTime={survivalBonusTime}
           rarestWord={rarestWord}
           solved={result.solved}
@@ -345,6 +346,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       {!result.solved && (
         <PerformanceSection
           coinReward={coinActions.coinReward}
+          coinRewardMode={isAuthenticated ? 'earned' : 'teasing'}
           survivalBonusTime={survivalBonusTime}
           rarestWord={rarestWord}
           solved={result.solved}

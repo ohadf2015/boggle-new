@@ -20,7 +20,7 @@ export { default as CompactResultsStats } from './CompactResultsStats';
 export { default as BonusBadgesRow } from './BonusBadgesRow';
 
 export { default as CoinRewardDisplay } from './CoinRewardDisplay';
-export type { CoinReward } from './CoinRewardDisplay';
+export type { CoinReward, CoinRewardMode } from './CoinRewardDisplay';
 
 export { SinglePlayerActions, MultiplayerActions } from './ResultsActionButtons';
 

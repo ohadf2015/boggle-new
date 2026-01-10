@@ -51,9 +51,9 @@
   --duration-snap: 100ms;
   --duration-quick: 150ms;
 
-  /* Halftone Pattern (SVG-based) */
-  --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1.5' fill='%23000000' fill-opacity='0.08'/%3E%3C/svg%3E");
-  --halftone-pattern-lg: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='15' cy='15' r='2.5' fill='%23000000' fill-opacity='0.1'/%3E%3C/svg%3E");
+  /* Halftone Pattern (SVG-based) - increased opacity for visibility */
+  --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1.5' fill='%23000000' fill-opacity='0.15'/%3E%3C/svg%3E");
+  --halftone-pattern-lg: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='15' cy='15' r='2.5' fill='%23000000' fill-opacity='0.18'/%3E%3C/svg%3E");
 
   /* Semantic Color Mappings (Dark-only Neo-Brutalist) */
   --background: var(--neo-navy);
@@ -128,8 +128,8 @@
   --neo-navy-light: #e2e8f0;
   --neo-gray: #f8fafc;
 
-  /* Lighter halftone pattern for light mode */
-  --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1.5' fill='%23000000' fill-opacity='0.04'/%3E%3C/svg%3E");
+  /* Lighter halftone pattern for light mode - slightly increased for visibility */
+  --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1.5' fill='%23000000' fill-opacity='0.06'/%3E%3C/svg%3E");
 }
 
 /* Light mode body background */
@@ -386,7 +386,7 @@ body {
     inset: 0;
     background-image: radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px);
     background-size: 12px 12px;
-    opacity: 0.06;
+    opacity: 0.1;
     pointer-events: none;
     z-index: 1;
     border-radius: inherit;
@@ -403,7 +403,7 @@ body {
     inset: 0;
     background-image: radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px);
     background-size: 12px 12px;
-    opacity: 0.04;
+    opacity: 0.07;
     pointer-events: none;
     z-index: 1;
     border-radius: inherit;
@@ -420,7 +420,7 @@ body {
     inset: 0;
     background-image: radial-gradient(circle, rgb(var(--neo-black)) 1.5px, transparent 1.5px);
     background-size: 10px 10px;
-    opacity: 0.08;
+    opacity: 0.12;
     pointer-events: none;
     z-index: 1;
     border-radius: inherit;
@@ -563,13 +563,14 @@ body {
 
   /* On desktop screens, size grid to fill available space between sidebars */
   /* Each sidebar is ~256-320px, so we subtract ~550px total for both sidebars + gaps */
+  /* Vertical space reserved for: timer (~100px), stats/combo (~60px), word area (~40px), gaps (~50px) = ~250px */
   @media (min-width: 769px) {
     .game-board-frame {
       /* Desktop: larger grid that fills available space between sidebars */
       /* Priority: vertical space (dvh) first, then horizontal space minus sidebars */
-      width: min(60vmin, calc(100vw - 550px), calc(100dvh - 200px));
-      height: min(60vmin, calc(100vw - 550px), calc(100dvh - 200px));
-      max-height: calc(100dvh - 200px);
+      width: min(55vmin, calc(100vw - 550px), calc(100dvh - 260px));
+      height: min(55vmin, calc(100vw - 550px), calc(100dvh - 260px));
+      max-height: calc(100dvh - 260px);
       padding: 8px;
     }
   }
@@ -578,9 +579,9 @@ body {
   @media (min-width: 1280px) {
     .game-board-frame {
       /* Large desktops: generous grid size, sidebars are wider (288px each = ~600px) */
-      width: min(65vmin, calc(100vw - 620px), calc(100dvh - 180px));
-      height: min(65vmin, calc(100vw - 620px), calc(100dvh - 180px));
-      max-height: calc(100dvh - 180px);
+      width: min(58vmin, calc(100vw - 620px), calc(100dvh - 250px));
+      height: min(58vmin, calc(100vw - 620px), calc(100dvh - 250px));
+      max-height: calc(100dvh - 250px);
     }
   }
 
@@ -588,9 +589,9 @@ body {
   @media (min-width: 1536px) {
     .game-board-frame {
       /* 2xl desktops: sidebars are widest (320px each = ~680px), maximize grid */
-      width: min(70vmin, calc(100vw - 700px), calc(100dvh - 160px));
-      height: min(70vmin, calc(100vw - 700px), calc(100dvh - 160px));
-      max-height: calc(100dvh - 160px);
+      width: min(62vmin, calc(100vw - 700px), calc(100dvh - 240px));
+      height: min(62vmin, calc(100vw - 700px), calc(100dvh - 240px));
+      max-height: calc(100dvh - 240px);
     }
   }
 

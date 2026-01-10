@@ -2226,7 +2226,9 @@ const es = {
     "placement": "Posición",
     "topThreeBonus": "Bono por top 3",
     "efficiency": "Eficiencia",
-    "streak": "Racha"
+    "streak": "Racha",
+    "guestTeasing": "¡Inicia sesión para ganar {amount} monedas!",
+    "signInShort": "Entrar"
   },
   "partyScreen": {
     "title": "Pantalla de Fiesta",
@@ -2625,7 +2627,8 @@ const es = {
       "keepGoing": "¡Sigue así!",
       "getStarted": "¡Empecemos!",
       "ready": "¡Listo!",
-      "readyForMultiplayer": "¡Estás listo para multijugador!"
+      "readyForMultiplayer": "¡Estás listo para multijugador!",
+      "tapForDetails": "Toca para ver detalles"
     },
     "unlock": {
       "title": "¡Habilidad Desbloqueada!",
@@ -2858,6 +2861,8 @@ const es = {
     "fewWordsFoundSingular": "Encontraste 1 palabra",
     "achievementsNotSaved": "Los logros en modo un jugador no se guardan en tu perfil.",
     "botDetails": "Detalles del bot",
+    "botWordsFound": "Palabras de los bots",
+    "noWordsToShow": "Detalles de palabras no disponibles",
     "difficulty": "Dificultad",
     "timer": "Temporizador",
     "totalScore": "Puntuación total",

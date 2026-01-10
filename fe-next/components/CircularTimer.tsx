@@ -13,12 +13,12 @@ interface CircularTimerProps {
   size?: 'xs' | 'sm' | 'md' | 'lg';
 }
 
-// Size configurations
+// Size configurations - frameClasses removed since we no longer have a background frame
 const SIZES = {
-  xs: { svgSize: 80, radius: 30, strokeWidth: 6, textSize: 'text-xl', frameClasses: 'p-1.5 border-2', badgeClasses: 'hidden' },
-  sm: { svgSize: 100, radius: 38, strokeWidth: 8, textSize: 'text-2xl', frameClasses: 'p-2 border-3', badgeClasses: 'hidden' },
-  md: { svgSize: 120, radius: 45, strokeWidth: 10, textSize: 'text-3xl', frameClasses: 'p-3 border-4', badgeClasses: '' },
-  lg: { svgSize: 140, radius: 52, strokeWidth: 12, textSize: 'text-4xl', frameClasses: 'p-4 border-4', badgeClasses: '' },
+  xs: { svgSize: 80, radius: 30, strokeWidth: 6, textSize: 'text-xl', frameClasses: '', badgeClasses: 'hidden' },
+  sm: { svgSize: 100, radius: 38, strokeWidth: 8, textSize: 'text-2xl', frameClasses: '', badgeClasses: 'hidden' },
+  md: { svgSize: 120, radius: 45, strokeWidth: 10, textSize: 'text-3xl', frameClasses: '', badgeClasses: '' },
+  lg: { svgSize: 140, radius: 52, strokeWidth: 12, textSize: 'text-4xl', frameClasses: '', badgeClasses: '' },
 };
 
 /**
@@ -50,14 +50,10 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
       transition={reduceMotion ? { duration: 0 } : { duration: 0.3, ease: 'easeOut' }}
       className="flex items-center justify-center"
     >
-      {/* Neo-Brutalist frame - clean, no rotation for less distraction */}
+      {/* Neo-Brutalist frame - circular design */}
       <div
         className={`
           relative
-          bg-neo-cream text-neo-black
-          border-neo-black
-          rounded-neo-lg
-          ${size === 'xs' || size === 'sm' ? 'shadow-hard-sm' : size === 'lg' ? 'shadow-hard-lg' : 'shadow-hard'}
           ${config.frameClasses}
         `}
       >
@@ -117,11 +113,11 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
           {/* Timer text in the center - color change only for low time, no animation */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div
-              className={`${config.textSize} font-black ${isLowTime ? 'text-neo-red' : 'text-neo-black'}`}
+              className={`${config.textSize} font-black ${isLowTime ? 'text-neo-red' : 'text-neo-cream'}`}
               style={{
                 textShadow: isLowTime
-                  ? `${size === 'xs' || size === 'sm' ? '1px 1px' : '2px 2px'} 0px rgba(0,0,0,0.2)`
-                  : `${size === 'xs' || size === 'sm' ? '1px 1px' : '2px 2px'} 0px var(--neo-cyan)`,
+                  ? `${size === 'xs' || size === 'sm' ? '1px 1px' : '2px 2px'} 0px rgba(0,0,0,0.3)`
+                  : `${size === 'xs' || size === 'sm' ? '1px 1px' : '2px 2px'} 0px rgba(0,0,0,0.5)`,
                 transition: 'color 0.3s ease',
               }}
             >

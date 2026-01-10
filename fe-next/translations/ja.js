@@ -1777,7 +1777,8 @@ const ja = {
       "keepGoing": "続けて！",
       "getStarted": "始めよう！",
       "ready": "準備完了！",
-      "readyForMultiplayer": "マルチプレイヤーの準備ができました！"
+      "readyForMultiplayer": "マルチプレイヤーの準備ができました！",
+      "tapForDetails": "タップして詳細を見る"
     },
     "unlock": {
       "title": "スキル解放！",
@@ -2401,7 +2402,9 @@ const ja = {
     "placement": "順位",
     "topThreeBonus": "トップ3ボーナス",
     "efficiency": "効率",
-    "streak": "連続"
+    "streak": "連続",
+    "guestTeasing": "ログインして{amount}コインを獲得！",
+    "signInShort": "ログイン"
   },
   "partyScreen": {
     "title": "パーティースクリーン",
@@ -2860,6 +2863,8 @@ const ja = {
     "fewWordsFoundSingular": "1個の単語を発見",
     "achievementsNotSaved": "シングルプレイヤーモードの実績はプロフィールに保存されません。",
     "botDetails": "ボット詳細",
+    "botWordsFound": "ボットが見つけた単語",
+    "noWordsToShow": "単語の詳細は利用できません",
     "difficulty": "難易度",
     "timer": "タイマー",
     "totalScore": "合計スコア",

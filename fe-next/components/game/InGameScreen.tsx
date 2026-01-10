@@ -1051,7 +1051,7 @@ const InGameScreen = memo<InGameScreenProps>(({
         <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden max-h-full">
           {/* Stats row - Timer centered, Combo + Score absolutely positioned on right */}
           {remainingTime !== null && (
-            <div ref={gameStatsRef} className="relative flex items-center justify-center flex-shrink-0 mb-0 md:mb-1" role="status" aria-label="Game status">
+            <div ref={gameStatsRef} className="relative flex items-center justify-center flex-shrink-0 mb-2 md:mb-3" role="status" aria-label="Game status">
               {/* Timer (center - always visible and prominent, position fixed) */}
               <motion.div
                 data-tutorial="timer"

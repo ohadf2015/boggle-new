@@ -1779,7 +1779,8 @@ const he = {
       "keepGoing": "המשך!",
       "getStarted": "בוא נתחיל!",
       "ready": "מוכן!",
-      "readyForMultiplayer": "מוכן לרב משתתפים!"
+      "readyForMultiplayer": "מוכן לרב משתתפים!",
+      "tapForDetails": "הקש לפרטים"
     },
     "unlock": {
       "title": "כישור נפתח!",
@@ -2531,7 +2532,9 @@ const he = {
     "placement": "מיקום",
     "topThreeBonus": "בונוס טופ 3",
     "efficiency": "יעילות",
-    "streak": "רצף"
+    "streak": "רצף",
+    "guestTeasing": "התחבר כדי לקבל {amount} מטבעות!",
+    "signInShort": "התחבר"
   },
   "partyScreen": {
     "title": "מסך מסיבה",
@@ -2772,7 +2775,7 @@ const he = {
     "multiPlayer": "רב משתתפים",
     "multiplayer": "רב משתתפים",
     "multiplayerDesc": "התחרה עם חברים בזמן אמת!",
-    "brainTraining": "אימון מוחי",
+    "brainTraining": "אימון קוגניטיבי",
     "brainTrainingDesc": "עקוב אחר התפתחות קוגניטיבית",
     "feature": {
       "soloVsBots": "נגד בוטים",
@@ -2862,6 +2865,8 @@ const he = {
     "fewWordsFoundSingular": "מצאת מילה אחת",
     "achievementsNotSaved": "הישגים במצב שחקן יחיד לא נשמרים בפרופיל שלך.",
     "botDetails": "פרטי בוט",
+    "botWordsFound": "מילים שהבוטים מצאו",
+    "noWordsToShow": "פרטי מילים לא זמינים",
     "difficulty": "קושי",
     "timer": "טיימר",
     "totalScore": "ניקוד כולל",
@@ -3666,7 +3671,7 @@ const he = {
     "sessionRecorded": "הקלטת הפעלה מצורפת"
   },
   "brain": {
-    "title": "אימון מוחי",
+    "title": "אימון קוגניטיבי",
     "subtitle": "עקוב אחר הביצועים הקוגניטיביים שלך",
     "score": "ציון קוגניטיבי",
     "points": "נקודות קוגניטיביות",
@@ -3759,8 +3764,8 @@ const he = {
     "playMoreForTrends": "שחק עוד {count} משחקים כדי לפתוח מעקב מגמות!",
     "playAgain": "שחק שוב",
     "drills": {
-      "title": "תרגילי מוח",
-      "brainTraining": "אימון מוח",
+      "title": "תרגילים קוגניטיביים",
+      "brainTraining": "אימון קוגניטיבי",
       "round": "סיבוב",
       "level": "רמה",
       "start": "התחל",
