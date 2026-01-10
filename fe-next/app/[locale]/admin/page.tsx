@@ -117,14 +117,14 @@ export default function AdminPage() {
         </div>
 
         {/* Navigation Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           <Card 
             className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
             onClick={() => router.push(`/${language}/admin/players`)}
           >
-            <CardContent className="p-6 flex flex-col items-center justify-center text-center gap-2">
-              <Users className="w-8 h-8 text-blue-500" />
-              <span className="font-semibold text-slate-700 dark:text-slate-200">Players</span>
+            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
+              <Users className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">Players</span>
             </CardContent>
           </Card>
           
@@ -132,9 +132,9 @@ export default function AdminPage() {
             className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
             onClick={() => router.push(`/${language}/admin/dictionary`)}
           >
-            <CardContent className="p-6 flex flex-col items-center justify-center text-center gap-2">
-              <BookOpen className="w-8 h-8 text-green-500" />
-              <span className="font-semibold text-slate-700 dark:text-slate-200">Dictionary</span>
+            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
+              <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-green-500" />
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">Dictionary</span>
             </CardContent>
           </Card>
 
@@ -142,9 +142,9 @@ export default function AdminPage() {
             className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
             onClick={() => router.push(`/${language}/admin/words`)}
           >
-            <CardContent className="p-6 flex flex-col items-center justify-center text-center gap-2">
-              <Calendar className="w-8 h-8 text-amber-500" />
-              <span className="font-semibold text-slate-700 dark:text-slate-200">Daily Challenge</span>
+            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
+              <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500" />
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">Daily Challenge</span>
             </CardContent>
           </Card>
 
@@ -152,9 +152,9 @@ export default function AdminPage() {
             className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
             onClick={() => router.push(`/${language}/admin/web-vitals`)}
           >
-            <CardContent className="p-6 flex flex-col items-center justify-center text-center gap-2">
-              <Activity className="w-8 h-8 text-purple-500" />
-              <span className="font-semibold text-slate-700 dark:text-slate-200">Web Vitals</span>
+            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
+              <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" />
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">Web Vitals</span>
             </CardContent>
           </Card>
         </div>

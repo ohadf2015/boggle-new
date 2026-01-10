@@ -154,6 +154,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       {/* Top bar */}
       <SurvivalHeader
         clueTokens={state.clueTokens}
+        nextHintItem={state.nextHintItem}
+        onBuyNextHint={actions.buyNextHint}
         onQuitClick={() => actions.setShowQuitConfirm(true)}
         t={t}
       />

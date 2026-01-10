@@ -1070,9 +1070,9 @@ const InGameScreen = memo<InGameScreenProps>(({
               {/* Combo + Score - absolutely positioned on right to not shift timer */}
               {/* z-30 ensures combo renders ABOVE timer (z-20), pointer-events-none prevents blocking timer */}
               {isPlaying && (
-                <div className="absolute right-0 rtl:right-auto rtl:left-0 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 md:gap-2 z-30 pointer-events-none">
+                <div className="absolute right-0 rtl:right-auto rtl:left-0 top-1/2 -translate-y-1/2 flex flex-col items-end rtl:items-start gap-1 md:gap-2 z-30 pointer-events-none">
                   {/* Combo container - fixed height to prevent layout shift when combo appears/disappears */}
-                  <div className="h-[28px] md:h-[32px] flex items-center justify-center">
+                  <div className="h-[28px] md:h-[32px] flex items-center justify-end rtl:justify-start">
                     <ComboDisplay comboLevel={comboLevel} compact />
                   </div>
 

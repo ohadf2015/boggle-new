@@ -6,7 +6,7 @@
 
 import type { DailyStreak } from './types';
 import { DAILY_STREAK_KEY } from './constants';
-import { getDailyChallengeDate, getYesterdayDate } from './dateUtils';
+import { getDailyChallengeDate, getYesterdayDate, getPreviousDate } from './dateUtils';
 
 /**
  * Get the current daily streak
@@ -31,13 +31,13 @@ export function getDailyStreak(): DailyStreak {
 /**
  * Update the daily streak after completing a daily challenge
  */
-export function updateDailyStreak(): DailyStreak {
+export function updateDailyStreak(completionDate?: string): DailyStreak {
   if (typeof window === 'undefined') {
     return { currentStreak: 0, longestStreak: 0, lastPlayedDate: null, totalDailiesCompleted: 0 };
   }
 
-  const today = getDailyChallengeDate();
-  const yesterday = getYesterdayDate();
+  const today = completionDate || getDailyChallengeDate();
+  const previousDay = getPreviousDate(today);
   const current = getDailyStreak();
 
   // Already played today - no update needed
@@ -47,7 +47,7 @@ export function updateDailyStreak(): DailyStreak {
 
   let newStreak: number;
 
-  if (current.lastPlayedDate === yesterday) {
+  if (current.lastPlayedDate === previousDay) {
     // Continue the streak
     newStreak = current.currentStreak + 1;
   } else {

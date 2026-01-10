@@ -149,43 +149,60 @@ export function LiveMonitor({ authToken }: LiveMonitorProps) {
   return (
     <div className="space-y-6">
       {/* Stats Bar */}
-      <div className="flex items-center justify-between bg-slate-800/50 rounded-neo border-neo border-black p-4 shadow-hard">
-        <div className="flex items-center gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-800/50 rounded-neo border-neo border-black p-4 shadow-hard">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
           {/* Live Indicator */}
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-            </span>
-            <span className="font-neo-display text-green-400">{t('admin.live.live') || 'Live'}</span>
+          <div className="flex items-center justify-between sm:justify-start w-full sm:w-auto">
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+              </span>
+              <span className="font-neo-display text-green-400">{t('admin.live.live') || 'Live'}</span>
+            </div>
+            
+            {/* Mobile Refresh Button (shown only on mobile) */}
+            <Button
+              onClick={handleManualRefresh}
+              variant="outline"
+              size="sm"
+              className="gap-2 sm:hidden h-8"
+              disabled={loading}
+            >
+              <RefreshCw className={cn('w-3 h-3', loading && 'animate-spin')} />
+              {t('admin.live.refresh') || 'Refresh'}
+            </Button>
           </div>
 
-          {/* Stats */}
-          <div className="flex items-center gap-1.5 text-slate-300">
-            <Gamepad2 className="w-4 h-4" />
-            <span>{stats.activeGames} {t('admin.live.games') || 'games'}</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-slate-300">
-            <Users className="w-4 h-4" />
-            <span>{stats.playersInGames} {t('admin.live.players') || 'players'}</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-slate-300">
-            <Wifi className="w-4 h-4" />
-            <span>{stats.socketConnections} {t('admin.live.sockets') || 'sockets'}</span>
-          </div>
-          {stats.singlePlayerCount > 0 && (
-            <div className="flex items-center gap-1.5 text-slate-300">
-              <User className="w-4 h-4" />
-              <span>{stats.singlePlayerCount} {t('admin.live.singlePlayer') || 'solo'}</span>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-x-4 gap-y-2 text-slate-300">
+            <div className="flex items-center gap-1.5">
+              <Gamepad2 className="w-4 h-4 text-purple-400" />
+              <span className="text-sm">{stats.activeGames} <span className="text-slate-500">{t('admin.live.games') || 'games'}</span></span>
             </div>
-          )}
+            <div className="flex items-center gap-1.5">
+              <Users className="w-4 h-4 text-blue-400" />
+              <span className="text-sm">{stats.playersInGames} <span className="text-slate-500">{t('admin.live.players') || 'players'}</span></span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Wifi className="w-4 h-4 text-green-400" />
+              <span className="text-sm">{stats.socketConnections} <span className="text-slate-500">{t('admin.live.sockets') || 'sockets'}</span></span>
+            </div>
+            {stats.singlePlayerCount > 0 && (
+              <div className="flex items-center gap-1.5">
+                <User className="w-4 h-4 text-amber-400" />
+                <span className="text-sm">{stats.singlePlayerCount} <span className="text-slate-500">{t('admin.live.singlePlayer') || 'solo'}</span></span>
+              </div>
+            )}
+          </div>
         </div>
 
+        {/* Desktop Refresh Button */}
         <Button
           onClick={handleManualRefresh}
           variant="outline"
           size="sm"
-          className="gap-2"
+          className="gap-2 hidden sm:flex"
           disabled={loading}
         >
           <RefreshCw className={cn('w-4 h-4', loading && 'animate-spin')} />

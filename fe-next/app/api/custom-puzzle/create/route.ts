@@ -9,11 +9,11 @@ interface CreatePuzzleRequest {
   grid: LetterGrid;
   displayName: string;
   guestFingerprint?: string;
-  // Creator's first play results
-  creatorSolved: boolean;
-  creatorAttemptsUsed: number;
-  creatorWordsDiscovered: number;
-  creatorLifeRemaining: number;
+  // Creator's first play results - Optional if creating without playing
+  creatorSolved?: boolean;
+  creatorAttemptsUsed?: number;
+  creatorWordsDiscovered?: number;
+  creatorLifeRemaining?: number;
 }
 
 export async function POST(request: Request) {
@@ -78,12 +78,14 @@ export async function POST(request: Request) {
     }
 
     // Calculate creator's efficiency score
-    const creatorEfficiencyScore = calculateCustomPuzzleScore(
-      creatorSolved,
-      creatorAttemptsUsed,
-      creatorWordsDiscovered,
-      creatorLifeRemaining
-    );
+    const creatorEfficiencyScore = creatorSolved !== undefined 
+      ? calculateCustomPuzzleScore(
+        creatorSolved,
+        creatorAttemptsUsed || 0,
+        creatorWordsDiscovered || 0,
+        creatorLifeRemaining || 0
+      )
+      : 0;
 
     // Create the puzzle
     const { data: puzzle, error } = await supabase
@@ -96,8 +98,8 @@ export async function POST(request: Request) {
         language,
         target_word: targetWord.toUpperCase(),
         grid,
-        creator_solved: creatorSolved,
-        creator_attempts_used: creatorAttemptsUsed,
+        creator_solved: creatorSolved || false,
+        creator_attempts_used: creatorAttemptsUsed || 0,
         creator_efficiency_score: creatorEfficiencyScore,
       })
       .select()

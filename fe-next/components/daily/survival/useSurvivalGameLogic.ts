@@ -64,6 +64,8 @@ export interface SurvivalGameState {
   accumulatedClues: Map<number, AccumulatedClue>;
   showCategory: boolean;
   showExample: boolean;
+  hintStage: number;
+  nextHintItem: ClueShopItem | null;
 
   // UI state
   formedWord: string;
@@ -82,6 +84,7 @@ export interface SurvivalGameActions {
   handleWordSubmit: (word: string) => void;
   handleWordChange: (word: string, count: number) => void;
   handlePurchase: (item: ClueShopItem) => void;
+  buyNextHint: () => void;
   showToast: (type: FeedbackType, message: string) => void;
   closeToast: () => void;
   setShowShop: (show: boolean) => void;
@@ -510,6 +513,28 @@ export function useSurvivalGameLogic({
     hintActions.handlePurchase(item, clueTokens, setClueTokens, setShowShop);
   }, [hintActions, clueTokens]);
 
+  const buyNextHint = useCallback(() => {
+    hintActions.buyNextHint(clueTokens, setClueTokens);
+  }, [hintActions, clueTokens]);
+
+  // Auto-Unlock Effect: Check periodically or on token change
+  useEffect(() => {
+    // If next item exists and we have enough tokens, buy it automatically
+    // But we need to be careful about loops or repeatedly trying to buy if it fails (it shouldn't if cost check passes)
+    // Also buyNextHint is wrapped in useCallback with deps [hintActions, clueTokens]
+    
+    const nextItem = hintState.nextHintItem;
+    if (nextItem && clueTokens >= nextItem.cost) {
+        // Auto-unlock!
+        // We use a small timeout to avoid immediate state updates during render or races,
+        // and to give a nice "Ding!" feeling slightly after the coin arrives.
+        const timer = setTimeout(() => {
+             buyNextHint();
+        }, 500);
+        return () => clearTimeout(timer);
+    }
+  }, [clueTokens, hintState.nextHintItem, buyNextHint]);
+
   // Keep callback refs in sync
   useEffect(() => {
     handleGameOverRef.current = handleGameOver;
@@ -544,6 +569,8 @@ export function useSurvivalGameLogic({
     accumulatedClues: clueState.accumulatedClues,
     showCategory: hintState.showCategory,
     showExample: hintState.showExample,
+    hintStage: hintState.hintStage,
+    nextHintItem: hintState.nextHintItem,
     formedWord,
     letterCount,
     showShop,
@@ -558,6 +585,7 @@ export function useSurvivalGameLogic({
     handleWordSubmit,
     handleWordChange,
     handlePurchase,
+    buyNextHint,
     showToast,
     closeToast,
     setShowShop,

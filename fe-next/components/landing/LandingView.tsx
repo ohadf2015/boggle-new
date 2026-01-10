@@ -398,7 +398,7 @@ const LandingView: React.FC = () => {
         className="
           fixed bottom-4 right-4 z-[45]
           pb-[env(safe-area-inset-bottom)]
-          flex items-center gap-2
+          flex items-center justify-center gap-2
           min-w-[48px] min-h-[48px]
           px-4 py-3
           bg-neo-purple text-neo-white

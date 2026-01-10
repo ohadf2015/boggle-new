@@ -64,6 +64,15 @@ export function getYesterdayDate(): string {
 }
 
 /**
+ * Get the date before the given date string
+ */
+export function getPreviousDate(dateString: string): string {
+  const date = new Date(dateString + 'T00:00:00Z');
+  date.setUTCDate(date.getUTCDate() - 1);
+  return date.toISOString().split('T')[0];
+}
+
+/**
  * Format countdown as HH:MM:SS
  * @deprecated Use formatTimeHHMMSS from '@/shared/utils' directly
  */

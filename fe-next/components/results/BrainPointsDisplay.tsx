@@ -40,25 +40,29 @@ const BrainPointsDisplay: React.FC<BrainPointsDisplayProps> = memo(({
 
     const isPositive = reward.scoreDelta > 0;
     const sign = isPositive ? '+' : '';
+    
+    // Use neo-lime (success/progress) for positive scores
     const bgColor = isPositive
-        ? 'bg-gradient-to-r from-neo-purple to-purple-400'
+        ? 'bg-gradient-to-r from-neo-lime to-lime-400'
         : 'bg-gradient-to-r from-neo-red to-red-400';
-
-    const borderColor = 'border-neo-black';
+    
+    const textColor = isPositive ? 'text-neo-black' : 'text-white';
+    const subTextColor = isPositive ? 'text-neo-black/90' : 'text-white/90';
+    const iconColor = isPositive ? 'text-neo-black' : 'text-white';
 
     // Inline variant - small badge for landscape mode
     if (variant === 'inline') {
         return (
             <div className={cn(
                 'border-2 border-neo-black rounded-neo px-3 py-1 text-center',
-                isPositive ? 'bg-neo-purple text-white' : 'bg-neo-red text-white',
+                isPositive ? 'bg-neo-lime' : 'bg-neo-red',
                 className
             )}>
                 <div className="flex items-center justify-center gap-1">
-                    <Brain className="w-3 h-3 text-white" />
-                    <span className="font-black text-white">{sign}{reward.scoreDelta}</span>
+                    <Brain className={cn("w-3 h-3", iconColor)} />
+                    <span className={cn("font-black", textColor)}>{sign}{reward.scoreDelta}</span>
                 </div>
-                <div className="text-[8px] font-bold uppercase text-white/90">
+                <div className={cn("text-[8px] font-bold uppercase", subTextColor)}>
                     {t('brain.points') || 'Brain Pts'}
                 </div>
             </div>
@@ -74,9 +78,9 @@ const BrainPointsDisplay: React.FC<BrainPointsDisplayProps> = memo(({
                 className
             )}>
                 <div className="flex items-center justify-center gap-2">
-                    <Brain className="w-5 h-5 text-white" />
-                    <span className="font-black text-xl text-white">{sign}{reward.scoreDelta}</span>
-                    <span className="text-sm font-bold text-white/90">
+                    <Brain className={cn("w-5 h-5", iconColor)} />
+                    <span className={cn("font-black text-xl", textColor)}>{sign}{reward.scoreDelta}</span>
+                    <span className={cn("text-sm font-bold", subTextColor)}>
                         {t('brain.points') || 'Brain Points'}
                     </span>
                 </div>
@@ -97,9 +101,9 @@ const BrainPointsDisplay: React.FC<BrainPointsDisplayProps> = memo(({
             )}
         >
             <div className="flex items-center justify-center gap-2">
-                <Brain className="w-5 h-5 text-white" />
-                <span className="font-black text-xl text-white">{sign}{reward.scoreDelta}</span>
-                <span className="text-sm font-bold text-white/90">
+                <Brain className={cn("w-5 h-5", iconColor)} />
+                <span className={cn("font-black text-xl", textColor)}>{sign}{reward.scoreDelta}</span>
+                <span className={cn("text-sm font-bold", subTextColor)}>
                     {t('brain.points') || 'Brain Points'}
                 </span>
             </div>

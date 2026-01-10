@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Sparkles, X } from 'lucide-react';
+import { Heart, Sparkles, X, Coins } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import GridComponent from '@/components/GridComponent';
@@ -10,7 +10,7 @@ import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { WordFeedbackToast, type FeedbackType } from '../WordFeedbackToast';
 import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
 import type { LetterGrid } from '@/types';
-import type { HintLevel } from '@/utils/aiHintGenerator';
+import type { HintLevel, ClueShopItem } from '@/utils/aiHintGenerator';
 import type { AccumulatedClue } from './types';
 import { MAX_ATTEMPTS } from './constants';
 
@@ -30,6 +30,8 @@ export interface SurvivalLandscapeLayoutProps {
 
   // Token props
   clueTokens: number;
+  nextHintItem: ClueShopItem | null;
+  onBuyNextHint: () => void;
   isClueGaining: boolean;
 
   // Clue boxes props
@@ -76,6 +78,8 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
 
   // Token props
   clueTokens,
+  nextHintItem,
+  onBuyNextHint,
   isClueGaining,
 
   // Clue boxes props
@@ -130,6 +134,8 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
       {/* Right Side Panel - Tokens */}
       <RightPanel
         clueTokens={clueTokens}
+        nextHintItem={nextHintItem}
+        onBuyNextHint={onBuyNextHint}
         isClueGaining={isClueGaining}
       />
 
@@ -259,28 +265,50 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
 
 interface RightPanelProps {
   clueTokens: number;
+  nextHintItem: ClueShopItem | null;
+  onBuyNextHint: () => void;
   isClueGaining: boolean;
 }
 
 const RightPanel: React.FC<RightPanelProps> = ({
   clueTokens,
+  nextHintItem,
+  onBuyNextHint,
   isClueGaining,
 }) => (
   <div className="absolute right-3 top-1/2 -translate-y-1/2 z-20 landscape-side-panel">
     <div className="landscape-panel flex flex-col items-center gap-4">
-      {/* Clue Tokens - auto-spend as you earn */}
+      {/* Next Hint Progress (Auto-unlocks) */}
+      {nextHintItem && (
+        <div className="flex flex-col items-center justify-center p-2 rounded-neo border-2 border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 w-16 h-16 shadow-inner gap-1">
+          <span className="text-[10px] leading-tight text-center font-bold text-gray-500">
+            Next Hint
+          </span>
+          <span className="flex items-center text-xs font-black text-amber-600">
+            {clueTokens}/{nextHintItem.cost}
+          </span>
+          <div className="w-full h-1 bg-gray-300 rounded overflow-hidden">
+            <div 
+              className="h-full bg-amber-500 transition-all duration-300" 
+              style={{ width: `${Math.min(100, (clueTokens / nextHintItem.cost) * 100)}%` }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Clue Tokens - auto-spend as you earn (wait, now manual?) */}
       <motion.div
         className="flex flex-col items-center px-3 py-2 bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-yellow-900/30 dark:to-amber-900/30 border-2 border-neo-black rounded-neo"
         animate={clueTokens > 0 ? { scale: [1, 1.05, 1] } : {}}
         transition={{ duration: 0.3 }}
       >
         <div className="flex items-center gap-1">
-          <Sparkles
+          <Coins
             className={cn("w-6 h-6 text-amber-500", isClueGaining && "animate-bounce")}
           />
           <span className="landscape-stat-secondary text-neo-black">{clueTokens}</span>
         </div>
-        <div className="landscape-stat-label text-neo-black">TOKENS</div>
+        <div className="landscape-stat-label text-neo-black">COINS</div>
       </motion.div>
     </div>
   </div>
