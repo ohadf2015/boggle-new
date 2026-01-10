@@ -85,7 +85,9 @@ export {
   clearWordHuntResultForRetry,
   markWordHuntResultSubmitted,
   getAllWordHuntResults,
+  mapServerResultToStoredResult,
 } from './storage';
+export type { ServerWordHuntResult } from './storage';
 
 // Streaks
 export {

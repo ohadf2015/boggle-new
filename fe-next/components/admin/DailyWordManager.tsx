@@ -2,31 +2,54 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, AlertTriangle, Plus, Trash2, Copy, Download, Check, Sparkles, Calendar, Loader2, Save, RefreshCw } from 'lucide-react';
+import { Search, AlertTriangle, Plus, Trash2, Copy, Download, Check, Sparkles, Calendar, Loader2, Save, RefreshCw, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/utils/supabase/client';
 import type { Language } from '@/types';
 
-// Import word lists from dailyChallenge (we'll need to export them)
+// Minimum word lengths per language (must match bulk-generate/route.ts)
+const MIN_WORD_LENGTH: Record<Language, number> = {
+  en: 4,
+  he: 3,
+  sv: 3,
+  ja: 2,
+  es: 4,
+  fr: 4,
+  de: 4,
+};
+
+// Word lists for daily challenge - English requires 4+ letters
 const INITIAL_WORD_LISTS: Record<Language, string[]> = {
   en: [
-    'CAT', 'DOG', 'TREE', 'BIRD', 'FISH', 'MOON', 'STAR', 'RAIN', 'WIND', 'SNOW',
-    'BOOK', 'DOOR', 'HAND', 'FOOT', 'HEAD', 'FACE', 'ROCK', 'SAND', 'BOAT', 'GAME',
+    // 4-letter words - interesting and unique (NO 3-letter words for English!)
+    'LYNX', 'APEX', 'FLUX', 'VOID', 'ECHO', 'AURA', 'JADE', 'RUBY', 'ONYX', 'OPAL',
+    'SWAN', 'HAWK', 'WOLF', 'BEAR', 'FROG', 'CRAB', 'SEAL', 'MOTH', 'WASP', 'CROW',
+    'TREE', 'BIRD', 'FISH', 'MOON', 'STAR', 'RAIN', 'WIND', 'SNOW', 'BOOK', 'DOOR',
+    'HAND', 'FOOT', 'HEAD', 'FACE', 'ROCK', 'SAND', 'BOAT', 'GAME', 'GLOW', 'BEAM',
+    'DARK', 'BLUR', 'MIST', 'HAZE', 'DUSK', 'DAWN', 'GUST', 'BOLT', 'SURF', 'WAND',
+    // 5-letter words
     'HOUSE', 'PLANT', 'WATER', 'EARTH', 'SOUND', 'PLACE', 'WORLD', 'GREAT',
-    'SMALL', 'LARGE', 'YOUNG', 'ROUND', 'CLEAR', 'LIGHT', 'DARK', 'FRESH',
-    'CLEAN', 'QUICK', 'QUIET', 'HAPPY', 'READY', 'STRONG', 'SMART', 'BRAVE',
-    'STONE', 'RIVER', 'OCEAN', 'CLOUD', 'STORM', 'FIELD', 'GRASS', 'BEACH',
+    'SMALL', 'LARGE', 'YOUNG', 'ROUND', 'CLEAR', 'LIGHT', 'FRESH', 'BLAZE',
+    'FROST', 'STORM', 'FLAME', 'SPARK', 'FLASH', 'GLEAM', 'SHADE', 'GHOST',
+    'CLEAN', 'QUICK', 'QUIET', 'HAPPY', 'READY', 'BRAVE', 'SMART', 'STONE',
+    'RIVER', 'OCEAN', 'CLOUD', 'FIELD', 'GRASS', 'BEACH', 'REALM', 'TOWER',
+    'CROWN', 'SWORD', 'BLADE', 'ARROW', 'SPEAR', 'QUEST', 'MAGIC', 'SPELL',
+    // 6-letter words
     'CASTLE', 'GARDEN', 'FOREST', 'ISLAND', 'MARKET', 'BRIDGE', 'CORNER',
     'WINDOW', 'SIMPLE', 'MODERN', 'GOLDEN', 'SILVER', 'PURPLE', 'YELLOW',
-    'ORANGE', 'SPRING', 'SUMMER', 'WINTER', 'AUTUMN', 'MONDAY', 'FRIDAY',
-    'DRAGON', 'PLANET', 'NATURE', 'FLOWER', 'BUTTER', 'COFFEE', 'SUNSET',
+    'ORANGE', 'SPRING', 'SUMMER', 'WINTER', 'AUTUMN', 'DRAGON', 'PLANET',
+    'NATURE', 'FLOWER', 'BUTTER', 'COFFEE', 'SUNSET', 'AURORA', 'NEBULA',
+    'COSMOS', 'GALAXY', 'MYSTIC', 'WIZARD', 'KNIGHT', 'PRINCE', 'PALACE',
+    // 7-letter words
     'KITCHEN', 'MORNING', 'EVENING', 'PERFECT', 'NATURAL', 'SPECIAL',
     'AMAZING', 'REGULAR', 'GENERAL', 'CENTRAL', 'EASTERN', 'WESTERN',
     'RAINBOW', 'THUNDER', 'CRYSTAL', 'DIAMOND', 'VANILLA', 'BLANKET',
+    'ECLIPSE', 'HORIZON', 'TEMPEST', 'PHANTOM', 'WARRIOR', 'EMERALD',
+    // 8-letter words
     'MOUNTAIN', 'STANDARD', 'TREASURE', 'QUESTION', 'BUILDING', 'FUNCTION',
-    'PEACEFUL', 'POWERFUL', 'BEAUTIFUL', 'WONDERFUL', 'FANTASTIC', 'ELEPHANT'
+    'PEACEFUL', 'POWERFUL', 'TWILIGHT', 'MIDNIGHT', 'GUARDIAN', 'CHAMPION',
+    'SENTINEL', 'WANDERER', 'EXPLORER', 'AMETHYST', 'SPECTRUM', 'MAJESTIC'
   ],
   he: [
     'בית', 'מים', 'עולם', 'אדם', 'דבר', 'עין', 'ראש', 'ילד', 'ספר', 'שלום',
@@ -86,6 +109,7 @@ interface BulkGenerateState {
   generatedWords: BulkGeneratedWord[];
   existingWords: Array<{ date: string; word: string }>;
   excludedWords: string[];
+  aiConfigured: boolean;
   stats: {
     totalDates: number;
     existingDates: number;
@@ -95,14 +119,61 @@ interface BulkGenerateState {
   error: string | null;
 }
 
+const WORD_LISTS_STORAGE_KEY = 'admin-daily-word-lists';
+
+// Load word lists from localStorage, falling back to initial lists
+function loadWordLists(): Record<Language, string[]> {
+  if (typeof window === 'undefined') return INITIAL_WORD_LISTS;
+
+  try {
+    const stored = localStorage.getItem(WORD_LISTS_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Merge with initial lists to ensure all languages are present
+      return {
+        ...INITIAL_WORD_LISTS,
+        ...parsed,
+      };
+    }
+  } catch (e) {
+    console.error('Failed to load word lists from localStorage:', e);
+  }
+  return INITIAL_WORD_LISTS;
+}
+
+// Save word lists to localStorage
+function saveWordLists(lists: Record<Language, string[]>) {
+  if (typeof window === 'undefined') return;
+
+  try {
+    localStorage.setItem(WORD_LISTS_STORAGE_KEY, JSON.stringify(lists));
+  } catch (e) {
+    console.error('Failed to save word lists to localStorage:', e);
+  }
+}
+
 export const DailyWordManager: React.FC = () => {
-  const { t } = useLanguage();
   const [selectedLang, setSelectedLang] = useState<Language>('en');
-  const [wordLists, setWordLists] = useState(INITIAL_WORD_LISTS);
+  const [wordLists, setWordLists] = useState<Record<Language, string[]>>(INITIAL_WORD_LISTS);
   const [newWord, setNewWord] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [copied, setCopied] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load word lists from localStorage on mount
+  useEffect(() => {
+    const loaded = loadWordLists();
+    setWordLists(loaded);
+    setIsLoaded(true);
+  }, []);
+
+  // Save word lists to localStorage whenever they change (after initial load)
+  useEffect(() => {
+    if (isLoaded) {
+      saveWordLists(wordLists);
+    }
+  }, [wordLists, isLoaded]);
 
   // Fetch access token on mount
   useEffect(() => {
@@ -133,6 +204,7 @@ export const DailyWordManager: React.FC = () => {
     generatedWords: [],
     existingWords: [],
     excludedWords: [],
+    aiConfigured: true, // Assume true until we know otherwise
     stats: null,
     error: null,
   });
@@ -165,8 +237,9 @@ export const DailyWordManager: React.FC = () => {
     const word = newWord.trim().toUpperCase();
     if (!word) return;
 
-    if (word.length < 3) {
-      alert('Words must be at least 3 letters!');
+    const minLength = MIN_WORD_LENGTH[selectedLang] || 3;
+    if (word.length < minLength) {
+      alert(`Words for ${selectedLang.toUpperCase()} must be at least ${minLength} letters!`);
       return;
     }
 
@@ -209,6 +282,12 @@ export const DailyWordManager: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handleResetToDefaults = () => {
+    if (!confirm('Reset all word lists to defaults? This will clear your custom changes.')) return;
+    setWordLists(INITIAL_WORD_LISTS);
+    localStorage.removeItem(WORD_LISTS_STORAGE_KEY);
+  };
+
   // Bulk generation handlers
   const handleBulkGenerate = useCallback(async () => {
     if (!accessToken) {
@@ -245,6 +324,7 @@ export const DailyWordManager: React.FC = () => {
         generatedWords: data.generatedWords || [],
         existingWords: data.existingWords || [],
         excludedWords: data.excludedWords || [],
+        aiConfigured: data.aiConfigured ?? true,
         stats: data.stats || null,
         error: null,
       });
@@ -417,6 +497,14 @@ export const DailyWordManager: React.FC = () => {
                 <div className="p-3 bg-red-100 dark:bg-red-900/30 border border-red-500 rounded-lg text-red-600 dark:text-red-400 text-sm">
                   <AlertTriangle className="w-4 h-4 inline mr-2" />
                   {bulkState.error}
+                </div>
+              )}
+
+              {/* AI Not Configured Warning */}
+              {!bulkState.aiConfigured && bulkState.stats && (
+                <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-500 rounded-lg text-yellow-700 dark:text-yellow-400 text-sm">
+                  <AlertTriangle className="w-4 h-4 inline mr-2" />
+                  <strong>AI not configured:</strong> GEMINI_API_KEY environment variable is not set. Words must be entered manually.
                 </div>
               )}
 
@@ -596,6 +684,15 @@ export const DailyWordManager: React.FC = () => {
                 <Download className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                 JSON
               </Button>
+              <Button
+                onClick={handleResetToDefaults}
+                variant="outline"
+                size="sm"
+                className="flex-1 sm:w-full text-xs sm:text-sm text-orange-600 border-orange-300 hover:bg-orange-50 dark:text-orange-400 dark:border-orange-700 dark:hover:bg-orange-900/20"
+              >
+                <RotateCcw className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                Reset
+              </Button>
             </div>
           </div>
 
@@ -610,7 +707,7 @@ export const DailyWordManager: React.FC = () => {
                     type="text"
                     value={newWord}
                     onChange={(e) => setNewWord(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddWord()}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddWord()}
                     placeholder="Add word (3+ letters)"
                     className="flex-1 px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg font-mono text-sm sm:text-base bg-white dark:bg-slate-700 min-w-0"
                   />

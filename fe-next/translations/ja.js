@@ -70,6 +70,7 @@ const ja = {
     "loading": "文字をシャッフル中...",
     "error": "おっと！",
     "back": "戻る",
+    "backToHome": "ホームに戻る",
     "next": "次へ",
     "confirm": "確認",
     "cancel": "キャンセル",
@@ -2519,6 +2520,7 @@ const ja = {
     "leading": "トップ!",
     "ahead": "先行",
     "toCatch": "pt追い越しまで",
+    "almostThere": "もう少し!",
     "live": "ライブ",
     "backToGame": "ゲームに戻る"
   },
@@ -3685,17 +3687,17 @@ const ja = {
       "title": "進捗",
       "improving": "向上中",
       "stable": "安定",
-      "declining": "要改善",
+      "declining": "レベルアップゾーン！",
       "gamesAnalyzed": "分析ゲーム数",
       "toNextTier": "次のランクまで"
     },
     "recommendation": {
       "title": "パーソナルアドバイス",
-      "weakest": "{{domain}}をもう少し鍛えよう。",
+      "weakest": "{{domain}}をパワーアップしよう！",
       "tryDrill": "{{drill}}ドリルで改善しよう！",
       "startDrill": "ドリル開始",
-      "declining": "{{domain}}が低下中 - トレーニングの時間！",
-      "low": "{{domain}}に注目が必要。",
+      "declining": "{{domain}}をパワーアップ - さあ行こう！",
+      "low": "{{domain}}がレベルアップ準備完了！",
       "improve": "ターゲット練習で{{domain}}を強化しよう。",
       "unlock": "アンロックまであと{{games}}ゲーム",
       "scienceHint": "ターゲット練習は特定の認知能力を向上させます"
@@ -3941,6 +3943,37 @@ const ja = {
       "yourScore": "あなたのスコア",
       "newPersonalBest": "自己ベスト更新!",
       "almostThere": "惜しい！あと{{points}}ポイント"
+    }
+  },
+  "admin": {
+    "dashboard": "管理ダッシュボード",
+    "accessRequired": "管理者アクセスが必要です",
+    "accessDenied": "このページにアクセスするには管理者権限が必要です。",
+    "welcome": "ようこそ、",
+    "live": {
+      "subtitle": "リアルタイムゲーム監視",
+      "live": "ライブ",
+      "games": "ゲーム",
+      "players": "プレイヤー",
+      "sockets": "接続",
+      "singlePlayer": "ソロ",
+      "refresh": "更新",
+      "retry": "再試行",
+      "noGames": "アクティブなゲームはありません",
+      "noGamesHint": "プレイヤーがゲームを開始するとここに表示されます",
+      "activeGames": "アクティブなゲーム",
+      "connectedPlayers": "接続中のプレイヤー",
+      "player": "プレイヤー",
+      "game": "ゲーム",
+      "status": "ステータス",
+      "score": "スコア",
+      "type": "タイプ",
+      "auth": "認証済み",
+      "guest": "ゲスト",
+      "ranked": "ランクマッチ",
+      "left": "残り",
+      "started": "開始",
+      "lastUpdated": "最終更新"
     }
   }
 };

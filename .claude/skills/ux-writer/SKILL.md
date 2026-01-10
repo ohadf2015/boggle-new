@@ -1,11 +1,31 @@
 ---
 name: ux-writer
 description: Write or improve user-facing copy and native translations across all languages without literal translation.
+allowed-tools: Read, Write, Edit, Grep, Glob, mcp__memory__*
 ---
 
 # LexiClash UX Writer
 
 Write playful, concise, action-oriented copy that sounds like a native speaker wrote it.
+
+## Memory Integration
+
+### Before Starting
+Recall past copy decisions and translation patterns:
+```
+mcp__memory__memory_recall(query="copy translation [context] tone")
+```
+
+### After Completing
+Store notable copy patterns:
+```
+mcp__memory__memory_store(
+  content="Copy pattern: [context] - [en copy]. Key translations: [language]: [translation]. Tone: [tone-description].",
+  type="fact",
+  tags=["ux-writing", "copy", "[context]"],
+  importance=5
+)
+```
 
 ## Core Principles
 

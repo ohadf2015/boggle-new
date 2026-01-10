@@ -8,9 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { triggerHaptic } from '@/utils/hapticFeedback';
-
-// Storage key for tracking dismissal
-const KEEP_PLAYING_DISMISSED_KEY = 'lexiclash_keepPlaying_dismissed';
+import { KEEP_PLAYING_DISMISSED_KEY } from '@/utils/dailyChallenge';
 
 /**
  * Check if the user has dismissed the keep playing section today

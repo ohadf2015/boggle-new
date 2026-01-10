@@ -21,7 +21,6 @@ import {
   SurvivalHeader,
   SurvivalLifeBar,
   SurvivalClueBoxes,
-  SurvivalClueShop,
   SurvivalGridSection,
   SurvivalLandscapeLayout,
 } from './survival';
@@ -123,15 +122,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         isLifeGaining={state.isLifeGaining}
         attempts={state.attempts}
         clueTokens={state.clueTokens}
-        showShop={state.showShop}
-        showShopHint={state.showShopHint}
         isClueGaining={state.isClueGaining}
-        onShopClick={() => {
-          actions.setShowShop(!state.showShop);
-          actions.setShowShopHint(false);
-        }}
-        onPurchase={actions.handlePurchase}
-        onShopClose={() => actions.setShowShop(false)}
         currentHint={state.currentHint}
         targetWord={targetWord}
         accumulatedClues={state.accumulatedClues}
@@ -163,13 +154,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       {/* Top bar */}
       <SurvivalHeader
         clueTokens={state.clueTokens}
-        showShop={state.showShop}
-        showShopHint={state.showShopHint}
         onQuitClick={() => actions.setShowQuitConfirm(true)}
-        onShopClick={() => {
-          actions.setShowShop(!state.showShop);
-          actions.setShowShopHint(false);
-        }}
         t={t}
       />
 
@@ -225,15 +210,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         eliminatedLetters={state.eliminatedLetters}
         onWordSubmit={actions.handleWordSubmit}
         onWordChange={actions.handleWordChange}
-        t={t}
-      />
-
-      {/* Clue Shop Modal */}
-      <SurvivalClueShop
-        isOpen={state.showShop}
-        clueTokens={state.clueTokens}
-        onClose={() => actions.setShowShop(false)}
-        onPurchase={actions.handlePurchase}
         t={t}
       />
 

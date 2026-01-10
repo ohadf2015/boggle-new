@@ -9,7 +9,7 @@
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BarChart3, Eye, Trophy } from 'lucide-react';
+import { ArrowLeft, BarChart3, Eye, Trophy, Wand2 } from 'lucide-react';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -21,16 +21,15 @@ import {
   getStreakMilestoneMessage,
   findRarestWord,
   getConversionTrigger,
-  recordSignupModalDismissed,
   type GuestDailyPlayer,
   type ConversionTrigger,
 } from '@/utils/dailyChallenge';
-import DailyChallengeSignupModal from '@/components/auth/DailyChallengeSignupModal';
 import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
 import StreakMilestoneCelebration from './StreakMilestoneCelebration';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import WatchAdButton from './WatchAdButton';
 import KeepPlayingSection from './KeepPlayingSection';
+import CustomPuzzleCreator from '@/components/custom-puzzle/CustomPuzzleCreator';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchGeolocation } from '@/contexts/auth/authUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -56,8 +55,6 @@ import {
   RankBadge,
   TryAnotherLanguage,
   SharePanel,
-  LeaderboardTeaser,
-  GuestBrainScorePreview,
 } from './results';
 
 // ============================================================================
@@ -84,13 +81,14 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [guestPlayer, setGuestPlayer] = useState<GuestDailyPlayer | null>(null);
   const [stats, setStats] = useState<WordHuntStats | null>(null);
   const [showMilestoneCelebration, setShowMilestoneCelebration] = useState(false);
-  const [showSignupModal, setShowSignupModal] = useState(false);
+  // Note: Removed showSignupModal state - using inline signup CTA instead
   const [signupTrigger, setSignupTrigger] = useState<ConversionTrigger | null>(null);
   const [leaderboardKey, setLeaderboardKey] = useState(0);
   const [activeTab, setActiveTab] = useState<ResultTab>('results');
   const [_countryCode, setCountryCode] = useState<string | null>(null);
   const [countryCodeReady, setCountryCodeReady] = useState(false);
   const [inlineSignupDismissed, setInlineSignupDismissed] = useState(false);
+  const [showCreatePuzzle, setShowCreatePuzzle] = useState(false);
 
   // Derived values
   const streakMilestone = getStreakMilestone(result.streakDays);
@@ -217,24 +215,20 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     return undefined;
   }, [isNewCompletion, milestoneMessage]);
 
-  // Show signup modal for failed guests
+  // Note: Removed auto-popup DailyChallengeSignupModal for guests
+  // The inline signup CTA is sufficient and less disruptive
+  // Keep the signupTrigger logic but don't auto-show modal
   useEffect(() => {
-    if (!isNewCompletion || isAuthenticated || user || authLoading || result.solved) return;
-    const timer = setTimeout(() => {
-      const trigger = getConversionTrigger(result, stats?.yourStats?.percentile);
-      if (trigger) { setSignupTrigger(trigger); setShowSignupModal(true); }
-    }, 3000);
-    return () => clearTimeout(timer);
+    if (!isNewCompletion || isAuthenticated || user || authLoading) return;
+    const trigger = getConversionTrigger(result, stats?.yourStats?.percentile);
+    if (trigger) { setSignupTrigger(trigger); }
   }, [isNewCompletion, isAuthenticated, user, authLoading, result, stats?.yourStats?.percentile]);
 
   // ============================================================================
   // HANDLERS
   // ============================================================================
 
-  const handleSignupModalClose = useCallback(() => {
-    setShowSignupModal(false);
-    recordSignupModalDismissed();
-  }, []);
+  // Note: Removed handleSignupModalClose - using inline signup CTA instead
 
   const handleScoreBadgeClick = useCallback(() => {
     if (result.solved) {
@@ -339,25 +333,18 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         />
       )}
 
-      {/* Leaderboard - compact view (authenticated) or teasers (anonymous) */}
-      {isAuthenticated ? (
-        <TabbedDailyLeaderboard
-          key={leaderboardKey}
-          puzzleDate={puzzleDate}
-          language={language}
-          currentPlayerId={profile ? profile.id : null}
-          currentGuestFingerprint={null}
-          maxVisible={3}
-          compact
-          t={t}
-          defaultTab="today"
-        />
-      ) : (
-        <div className="space-y-4 md:hidden">
-          <GuestBrainScorePreview t={t} />
-          <LeaderboardTeaser t={t} />
-        </div>
-      )}
+      {/* Leaderboard - show to all users (guests see it with subtle signup hint in empty state) */}
+      <TabbedDailyLeaderboard
+        key={leaderboardKey}
+        puzzleDate={puzzleDate}
+        language={language}
+        currentPlayerId={isAuthenticated && profile ? profile.id : null}
+        currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
+        maxVisible={3}
+        compact
+        t={t}
+        defaultTab="today"
+      />
 
       {/* FAIL state: Show performance breakdown lower */}
       {!result.solved && (
@@ -390,6 +377,20 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         timeSurvived={result.lifeRemaining !== undefined ? (10 - result.attemptsUsed) * 10 : undefined}
         efficiencyScore={result.efficiencyScore}
       />
+
+      {/* Create Your Own Puzzle - only show for winners */}
+      {result.solved && (
+        <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+          <Button
+            onClick={() => setShowCreatePuzzle(true)}
+            variant="outline"
+            className="w-full bg-gradient-to-r from-neo-pink/10 to-neo-yellow/10 hover:from-neo-pink/20 hover:to-neo-yellow/20 border-2 border-neo-pink/50 hover:border-neo-pink"
+          >
+            <Wand2 className="w-5 h-5 me-2 text-neo-pink" />
+            {t('customPuzzle.createYourOwn') || 'Create Your Own Puzzle'}
+          </Button>
+        </div>
+      )}
     </div>
   );
 
@@ -451,23 +452,17 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           </div>
           <div className={cn("flex-1 min-w-0 max-w-xl space-y-4", isProtected && "blur-xl pointer-events-none select-none")}>
             <DesktopStatsCard stats={stats} t={t} />
-            {isAuthenticated ? (
-              <TabbedDailyLeaderboard
-                puzzleDate={puzzleDate}
-                language={language}
-                currentPlayerId={profile ? profile.id : null}
-                currentGuestFingerprint={null}
-                maxVisible={3}
-                compact
-                t={t}
-                defaultTab="today"
-              />
-            ) : (
-              <>
-                <GuestBrainScorePreview t={t} />
-                <LeaderboardTeaser t={t} />
-              </>
-            )}
+            {/* Leaderboard - show to all users */}
+            <TabbedDailyLeaderboard
+              puzzleDate={puzzleDate}
+              language={language}
+              currentPlayerId={isAuthenticated && profile ? profile.id : null}
+              currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
+              maxVisible={3}
+              compact
+              t={t}
+              defaultTab="today"
+            />
           </div>
         </div>
 
@@ -520,18 +515,14 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           subtitle={milestoneMessage.subtitle}
         />
       )}
-      {signupTrigger && (
-        <DailyChallengeSignupModal
-          isOpen={showSignupModal}
-          onClose={handleSignupModalClose}
-          trigger={signupTrigger}
-          streakDays={result.streakDays}
-          percentile={stats?.yourStats?.percentile}
-          attemptsUsed={result.attemptsUsed}
-          solved={result.solved}
-          pendingResult={{ result, puzzleNumber, puzzleDate, language }}
-        />
-      )}
+      {/* Note: Removed DailyChallengeSignupModal popup - using inline signup CTA instead for less interruption */}
+
+      {/* Custom Puzzle Creator Modal */}
+      <CustomPuzzleCreator
+        isOpen={showCreatePuzzle}
+        onClose={() => setShowCreatePuzzle(false)}
+        language={language}
+      />
     </motion.div>
   );
 };

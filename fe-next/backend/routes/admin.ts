@@ -14,7 +14,7 @@ import { z } from 'zod';
  
 const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
  
-const { getAllGames } = require('../modules/gameStateManager');
+const { getAllGames, getDetailedGames } = require('../modules/gameStateManager');
  
 const { isInProgress } = require('../utils/gameStateMachine');
 import { getActiveSinglePlayerCount } from './singlePlayer';
@@ -916,6 +916,38 @@ router.get('/realtime', async (req: AdminRequest, res: Response): Promise<void> 
     const err = error as Error;
     logger.error('ADMIN_API', `Realtime error: ${err.message}`);
     res.status(500).json({ error: 'Failed to fetch realtime stats' });
+  }
+});
+
+/**
+ * GET /api/admin/live-games
+ * Get detailed live game information for admin monitoring
+ */
+router.get('/live-games', async (req: AdminRequest, res: Response): Promise<void> => {
+  try {
+    const io = req.app.get('io') as SocketIO | undefined;
+    const detailedGames = getDetailedGames();
+    const singlePlayerCount = getActiveSinglePlayerCount();
+
+    // Calculate stats
+    const activeGames = detailedGames.length;
+    const playersInGames = detailedGames.reduce((sum: number, game: { players: unknown[] }) => sum + game.players.length, 0);
+    const socketConnections = io ? io.sockets.sockets.size : 0;
+
+    res.json({
+      games: detailedGames,
+      stats: {
+        activeGames,
+        playersInGames,
+        socketConnections,
+        singlePlayerCount,
+      },
+      timestamp: Date.now(),
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Live games error: ${err.message}`);
+    res.status(500).json({ error: 'Failed to fetch live games' });
   }
 });
 

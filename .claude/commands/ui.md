@@ -1,16 +1,18 @@
 ---
-allowed-tools: Read, Write, Edit, Bash(npx *), Grep
+allowed-tools: Read, Write, Edit, Bash(npx *), Grep, mcp__memory__*
 description: Improve UI - simplify, modernize, align with project design
 ---
 
 ## Process
 
-1. **Understand design system** - Read @src/styles, @tailwind.config, existing components
-2. **Analyze component** - Check nesting depth, repeated styles, visual hierarchy, spacing
-3. **Plan improvements** - Simplify structure, match design tokens, modernize patterns
-4. **Wait for approval** - Present plan before making changes
-5. **Implement** - Flatten structure, use Tailwind consistently, extract components
-6. **Verify** - Visual check (looks cleaner, hierarchy clear), functionality, responsive
+1. **Recall UI patterns** - Search memory for related UI improvements and design decisions
+2. **Understand design system** - Read @src/styles, @tailwind.config, existing components
+3. **Analyze component** - Check nesting depth, repeated styles, visual hierarchy, spacing
+4. **Plan improvements** - Simplify structure, match design tokens, modernize patterns
+5. **Wait for approval** - Present plan before making changes
+6. **Implement** - Flatten structure, use Tailwind consistently, extract components
+7. **Verify** - Visual check (looks cleaner, hierarchy clear), functionality, responsive
+8. **Store decision** - Record UI improvement pattern for future reference
 
 ## Design Principles
 - Simplicity: Remove decorative elements, one primary action
@@ -41,3 +43,20 @@ description: Improve UI - simplify, modernize, align with project design
 - Less is more - remove when unsure
 - Whitespace is friend
 - Ask if unsure about design direction
+
+## Memory Integration
+
+### Recall (Step 1)
+```
+mcp__memory__memory_recall(query="UI improvement [component-type] design pattern")
+```
+
+### Store (Step 8)
+```
+mcp__memory__memory_store(
+  content="UI improvement: [component] - [before] → [after]. Pattern: [pattern applied]. Key change: [main improvement].",
+  type="fact",
+  tags=["ui", "improvement", "[component-type]"],
+  importance=5
+)
+```

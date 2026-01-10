@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { NeoLoader } from '@/components/ui/NeoLoader';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -77,24 +78,11 @@ export function PageStateHandler({
 
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <motion.div
-          className={cn(
-            'w-12 h-12 border-4 rounded-full',
-            isDarkMode
-              ? 'border-cyan-500 border-t-transparent'
-              : 'border-cyan-600 border-t-transparent'
-          )}
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+        <NeoLoader
+          variant="letters"
+          size="md"
+          text={loadingText || t('common.loading') || 'Loading...'}
         />
-        <p
-          className={cn(
-            'mt-4 text-sm',
-            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-          )}
-        >
-          {loadingText || t('common.loading') || 'Loading...'}
-        </p>
       </div>
     );
   }
@@ -154,26 +142,12 @@ export function PageStateHandler({
     }
 
     return (
-      <div className="flex flex-col items-center justify-center py-20">
-        {emptyIcon || (
-          <div
-            className={cn(
-              'w-16 h-16 mb-4 rounded-full flex items-center justify-center',
-              isDarkMode ? 'bg-slate-700' : 'bg-gray-100'
-            )}
-          >
-            <span className="text-3xl">📭</span>
-          </div>
-        )}
-        <p
-          className={cn(
-            'text-lg font-medium',
-            isDarkMode ? 'text-white' : 'text-gray-900'
-          )}
-        >
-          {emptyText || t('common.noData') || 'No data available'}
-        </p>
-      </div>
+      <EmptyState
+        type="no-results"
+        title={emptyText || t('common.noData') || 'No data available'}
+        showMascot
+        mascotVariant="encouraging"
+      />
     );
   }
 

@@ -7,11 +7,46 @@
  * 3. Handles errors gracefully
  */
 
-import confettiLib, { type CreateTypes, type Options } from 'canvas-confetti';
+import confettiLib, { type CreateTypes, type Options, type Shape } from 'canvas-confetti';
 
 // Singleton canvas for confetti
 let confettiCanvas: HTMLCanvasElement | null = null;
 let myConfetti: CreateTypes | null = null;
+let resizeHandler: (() => void) | null = null;
+
+// ==================== Neo-Brutalist Confetti Configuration ====================
+
+/**
+ * Neo-Brutalist color palette matching the design system
+ * Primary: yellow, pink, cyan, lime, red (5 accent colors)
+ */
+export const NEO_BRUTALIST_COLORS = [
+  '#FFE135', // neo-yellow
+  '#FF1493', // neo-pink
+  '#00FFFF', // neo-cyan
+  '#BFFF00', // neo-lime
+  '#FF3366', // neo-red
+];
+
+/**
+ * Neo-Brutalist shapes - squares for that chunky geometric aesthetic
+ * Using mostly squares with occasional circle for variety
+ */
+export const NEO_BRUTALIST_SHAPES: Shape[] = ['square', 'square', 'square', 'circle'];
+
+/**
+ * Default neo-brutalist confetti options
+ * - flat: true removes 3D wobble for cleaner geometric look
+ * - larger scalar for chunkier particles
+ */
+export const NEO_BRUTALIST_DEFAULTS: Partial<Options> = {
+  flat: true,
+  shapes: NEO_BRUTALIST_SHAPES,
+  colors: NEO_BRUTALIST_COLORS,
+  scalar: 1.2,
+  gravity: 1.2,
+  ticks: 150,
+};
 
 /**
  * Get or create the confetti canvas with proper attributes
@@ -48,13 +83,14 @@ function getConfettiCanvas(): HTMLCanvasElement | null {
       useWorker: false,
     });
 
-    // Handle window resize to update canvas dimensions
-    window.addEventListener('resize', () => {
+    // Handle window resize to update canvas dimensions (with cleanup capability)
+    resizeHandler = () => {
       if (confettiCanvas) {
         confettiCanvas.width = window.innerWidth;
         confettiCanvas.height = window.innerHeight;
       }
-    });
+    };
+    window.addEventListener('resize', resizeHandler);
   }
 
   return confettiCanvas;
@@ -62,6 +98,7 @@ function getConfettiCanvas(): HTMLCanvasElement | null {
 
 /**
  * Fire confetti with the centralized canvas
+ * Applies Neo-Brutalist defaults (flat squares, bold colors) unless overridden
  */
 export function fireConfetti(options: Options = {}): Promise<null> | null {
   // Ensure canvas exists
@@ -75,6 +112,7 @@ export function fireConfetti(options: Options = {}): Promise<null> | null {
   try {
     return myConfetti({
       zIndex: 10000,
+      ...NEO_BRUTALIST_DEFAULTS,
       ...options,
     });
   } catch (error) {
@@ -92,42 +130,65 @@ export function resetConfetti(): void {
   }
 }
 
+/**
+ * Cleanup confetti resources (call on unmount/navigation)
+ * Removes resize listener and canvas to prevent memory leaks
+ */
+export function cleanupConfetti(): void {
+  if (resizeHandler) {
+    window.removeEventListener('resize', resizeHandler);
+    resizeHandler = null;
+  }
+  if (myConfetti) {
+    myConfetti.reset();
+    myConfetti = null;
+  }
+  if (confettiCanvas) {
+    confettiCanvas.remove();
+    confettiCanvas = null;
+  }
+}
+
 // ==================== Preset Confetti Effects ====================
 
 /**
- * Confetti colors for each rank (1st, 2nd, 3rd place)
+ * Neo-Brutalist confetti colors for each rank (1st, 2nd, 3rd place)
+ * Uses bold, high-contrast colors from the design system
  */
 export const RANK_COLORS: Record<number, string[]> = {
-  1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'], // Gold
-  2: ['#c0c0c0', '#94a3b8', '#e2e8f0', '#cbd5e1'], // Silver
-  3: ['#cd7f32', '#ea580c', '#f97316', '#fb923c'], // Bronze/Orange
+  1: ['#FFE135', '#BFFF00', '#00FFFF'], // Gold: yellow, lime, cyan
+  2: ['#C0C0C0', '#00FFFF', '#BFFF00'], // Silver: silver + cyan, lime accents
+  3: ['#FF6B35', '#FF1493', '#FFE135'], // Bronze: orange, pink, yellow
 };
 
 /**
- * Default celebration colors
+ * Default celebration colors - Neo-Brutalist 5-accent palette
  */
-export const DEFAULT_COLORS = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#a855f7'];
+export const DEFAULT_COLORS = NEO_BRUTALIST_COLORS;
 
 /**
- * Victory celebration colors (green theme)
+ * Victory celebration colors - emphasis on lime/cyan for success
  */
-export const VICTORY_COLORS = ['#10B981', '#FFE135', '#00D9FF', '#34D399'];
+export const VICTORY_COLORS = ['#BFFF00', '#FFE135', '#00FFFF', '#FF1493'];
 
 /**
- * Streak celebration colors
+ * Streak celebration colors - warm/hot tones for intensity
  */
-export const STREAK_COLORS = ['#FF6B35', '#FFE135', '#FF1493', '#FF8C00'];
+export const STREAK_COLORS = ['#FF1493', '#FFE135', '#FF3366', '#00FFFF'];
 
 /**
- * Fire rank-specific confetti burst
+ * Fire rank-specific confetti burst with neo-brutalist styling
+ * More dramatic bursts with chunky square particles
  */
 export function fireRankConfetti(rank: number = 1): void {
-  const count = 100;
+  const count = 120;
   const colors = RANK_COLORS[rank] || RANK_COLORS[1];
 
   const defaults: Options = {
     origin: { y: 0.7 },
     colors,
+    flat: true,
+    shapes: NEO_BRUTALIST_SHAPES,
   };
 
   function fire(particleRatio: number, opts: Options): void {
@@ -138,123 +199,197 @@ export function fireRankConfetti(rank: number = 1): void {
     });
   }
 
-  fire(0.25, { spread: 26, startVelocity: 55 });
-  fire(0.2, { spread: 60 });
-  fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
-  fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
-  fire(0.1, { spread: 120, startVelocity: 45 });
+  // Initial explosive burst
+  fire(0.3, { spread: 30, startVelocity: 60, scalar: 1.4 });
+  // Wide spread
+  fire(0.25, { spread: 70, scalar: 1.2 });
+  // Large slow particles for drama
+  fire(0.3, { spread: 100, decay: 0.91, scalar: 1.5, startVelocity: 35 });
+  // Fast outer particles
+  fire(0.15, { spread: 140, startVelocity: 50, scalar: 1.0 });
 }
 
 /**
- * Fire game over celebration confetti
+ * Fire game over celebration confetti with neo-brutalist punch
  */
 export function fireGameOverConfetti(): void {
+  // Main burst with large particles
   fireConfetti({
-    particleCount: 150,
+    particleCount: 100,
     spread: 80,
     origin: { y: 0.6 },
     colors: DEFAULT_COLORS,
+    scalar: 1.4,
+    startVelocity: 45,
   });
-}
-
-/**
- * Fire level up celebration confetti
- */
-export function fireLevelUpConfetti(): void {
-  fireConfetti({
-    particleCount: 150,
-    spread: 100,
-    origin: { y: 0.5 },
-    colors: DEFAULT_COLORS,
-  });
-}
-
-/**
- * Fire victory confetti (for wins)
- */
-export function fireVictoryConfetti(): void {
-  fireConfetti({
-    particleCount: 100,
-    spread: 70,
-    origin: { y: 0.6 },
-    colors: VICTORY_COLORS,
-  });
-}
-
-/**
- * Fire streak milestone confetti
- */
-export function fireStreakConfetti(): void {
-  fireConfetti({
-    particleCount: 80,
-    spread: 70,
-    origin: { y: 0.6 },
-    colors: STREAK_COLORS,
-  });
-
-  // Secondary burst
+  // Secondary smaller burst for depth
   setTimeout(() => {
     fireConfetti({
-      particleCount: 40,
+      particleCount: 60,
+      spread: 120,
+      origin: { y: 0.5 },
+      colors: DEFAULT_COLORS,
+      scalar: 1.0,
+    });
+  }, 100);
+}
+
+/**
+ * Fire level up celebration confetti - big dramatic burst
+ */
+export function fireLevelUpConfetti(): void {
+  // Large chunky particles
+  fireConfetti({
+    particleCount: 100,
+    spread: 90,
+    origin: { y: 0.5 },
+    colors: DEFAULT_COLORS,
+    scalar: 1.6,
+    startVelocity: 50,
+  });
+  // Follow-up smaller burst
+  setTimeout(() => {
+    fireConfetti({
+      particleCount: 80,
+      spread: 140,
+      origin: { y: 0.4 },
+      colors: DEFAULT_COLORS,
+      scalar: 1.1,
+    });
+  }, 120);
+}
+
+/**
+ * Fire victory confetti (for wins) - celebratory burst
+ */
+export function fireVictoryConfetti(): void {
+  // Explosive center burst
+  fireConfetti({
+    particleCount: 80,
+    spread: 60,
+    origin: { y: 0.6 },
+    colors: VICTORY_COLORS,
+    scalar: 1.3,
+    startVelocity: 55,
+  });
+  // Wider follow-up
+  setTimeout(() => {
+    fireConfetti({
+      particleCount: 50,
       spread: 100,
       origin: { y: 0.5 },
-      colors: STREAK_COLORS,
+      colors: VICTORY_COLORS,
+      scalar: 1.1,
     });
-  }, 150);
+  }, 80);
+}
+
+/**
+ * Fire streak milestone confetti - intense multi-burst
+ */
+export function fireStreakConfetti(): void {
+  // Initial intense burst
+  fireConfetti({
+    particleCount: 70,
+    spread: 60,
+    origin: { y: 0.6 },
+    colors: STREAK_COLORS,
+    scalar: 1.4,
+    startVelocity: 50,
+  });
+
+  // Secondary wider burst
+  setTimeout(() => {
+    fireConfetti({
+      particleCount: 50,
+      spread: 110,
+      origin: { y: 0.5 },
+      colors: STREAK_COLORS,
+      scalar: 1.2,
+    });
+  }, 100);
+
+  // Final accent burst
+  setTimeout(() => {
+    fireConfetti({
+      particleCount: 30,
+      spread: 140,
+      origin: { y: 0.4 },
+      colors: STREAK_COLORS,
+      scalar: 1.0,
+    });
+  }, 200);
 }
 
 /**
  * Fire first win epic celebration (cascading confetti)
+ * Neo-brutalist style with chunky particles and bold colors
+ * @returns Cancel function to stop the animation (call on unmount)
  */
-export function fireFirstWinConfetti(durationMs: number = 4000): void {
-  const colors = ['#FFE135', '#FF6B35', '#00D9FF', '#FF69B4', '#7C3AED', '#10B981'];
+export function fireFirstWinConfetti(durationMs: number = 4000): () => void {
+  const colors = NEO_BRUTALIST_COLORS;
   const end = Date.now() + durationMs;
+  let rafId: number | null = null;
+  let cancelled = false;
 
   const frame = () => {
-    // Left side burst
+    if (cancelled) return;
+
+    // Left side burst - chunky particles
     fireConfetti({
-      particleCount: 4,
+      particleCount: 5,
       angle: 60,
-      spread: 55,
+      spread: 50,
       origin: { x: 0, y: 0.6 },
       colors,
-      startVelocity: 45,
-      gravity: 0.8,
-      ticks: 200,
+      startVelocity: 55,
+      gravity: 1.0,
+      ticks: 180,
+      scalar: 1.3,
     });
 
-    // Right side burst
+    // Right side burst - chunky particles
     fireConfetti({
-      particleCount: 4,
+      particleCount: 5,
       angle: 120,
-      spread: 55,
+      spread: 50,
       origin: { x: 1, y: 0.6 },
       colors,
-      startVelocity: 45,
-      gravity: 0.8,
-      ticks: 200,
+      startVelocity: 55,
+      gravity: 1.0,
+      ticks: 180,
+      scalar: 1.3,
     });
 
-    // Center burst occasionally
+    // Center burst occasionally - larger dramatic particles
     if (Math.random() > 0.7) {
       fireConfetti({
-        particleCount: 10,
+        particleCount: 12,
         angle: 90,
-        spread: 120,
+        spread: 100,
         origin: { x: 0.5, y: 0.5 },
         colors,
-        startVelocity: 30,
-        gravity: 0.6,
-        ticks: 150,
+        startVelocity: 40,
+        gravity: 0.8,
+        ticks: 140,
+        scalar: 1.5,
       });
     }
 
-    if (Date.now() < end) {
-      requestAnimationFrame(frame);
+    if (Date.now() < end && !cancelled) {
+      rafId = requestAnimationFrame(frame);
     }
   };
 
   frame();
+
+  // Return cleanup function
+  return () => {
+    cancelled = true;
+    if (rafId !== null) {
+      cancelAnimationFrame(rafId);
+    }
+  };
 }
 
 // Export types for consumers

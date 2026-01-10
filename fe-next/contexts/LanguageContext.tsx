@@ -192,13 +192,17 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
             current = (current as Record<string, unknown>)[key];
         }
 
-        // Replace template variables like ${varName} or {varName} with params
+        // Replace template variables like ${varName}, {{varName}}, or {varName} with params
         if (typeof current === 'string' && Object.keys(params).length > 0) {
             // First handle ${varName} format
             let result = current.replace(/\$\{(\w+)\}/g, (match, key) => {
                 return params[key] !== undefined ? String(params[key]) : match;
             });
-            // Then handle {varName} format (for translations with curly braces only)
+            // Then handle {{varName}} format (i18next-style double braces)
+            result = result.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+                return params[key] !== undefined ? String(params[key]) : match;
+            });
+            // Finally handle {varName} format (single braces)
             result = result.replace(/\{(\w+)\}/g, (match, key) => {
                 return params[key] !== undefined ? String(params[key]) : match;
             });

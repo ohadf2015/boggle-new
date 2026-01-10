@@ -16,6 +16,11 @@ interface SelectedCell extends GridPosition {
   index: number;
 }
 
+// Track cells that should shake (wrong cell tapped)
+interface ShakingCell extends GridPosition {
+  id: number; // Unique ID for animation key
+}
+
 interface MiniGridProps {
   size: 3 | 4;
   letters: string[][];
@@ -87,6 +92,8 @@ const MiniGrid: React.FC<MiniGridProps> = ({
   const [selectedCells, setSelectedCells] = useState<SelectedCell[]>([]);
   const [isSelecting, setIsSelecting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [shakingCells, setShakingCells] = useState<ShakingCell[]>([]);
+  const shakeIdRef = useRef(0);
   const gridRef = useRef<HTMLDivElement>(null);
   const gridMeasurementsRef = useRef<GridMeasurements | null>(null);
   const isSelectingRef = useRef(false); // Ref for use in event handlers
@@ -220,6 +227,28 @@ const MiniGrid: React.FC<MiniGridProps> = ({
     return nextCell.row === row && nextCell.col === col;
   }, [selectedCells, demoPath]);
 
+  // Trigger shake animation on a cell (visual feedback for wrong selection)
+  const triggerCellShake = useCallback((row: number, col: number) => {
+    shakeIdRef.current += 1;
+    const shakeCell: ShakingCell = { row, col, id: shakeIdRef.current };
+    setShakingCells(prev => [...prev, shakeCell]);
+
+    // Remove shake after animation completes
+    setTimeout(() => {
+      setShakingCells(prev => prev.filter(c => c.id !== shakeCell.id));
+    }, 500);
+
+    // Haptic feedback for wrong selection
+    if (window.navigator?.vibrate) {
+      window.navigator.vibrate([30, 20, 30]);
+    }
+  }, []);
+
+  // Check if a cell is currently shaking
+  const isCellShaking = useCallback((row: number, col: number): boolean => {
+    return shakingCells.some(c => c.row === row && c.col === col);
+  }, [shakingCells]);
+
   // Handle cell selection
   const selectCell = useCallback(
     (row: number, col: number) => {
@@ -232,21 +261,29 @@ const MiniGrid: React.FC<MiniGridProps> = ({
         // If it's the last cell, allow deselection by removing it
         if (selectedIndex === selectedCells.length - 1) {
           setSelectedCells(selectedCells.slice(0, -1));
+          // Haptic feedback for backtrack
+          if (window.navigator?.vibrate) {
+            window.navigator.vibrate(5);
+          }
         }
         return;
+      }
+
+      // Check adjacency with last selected cell (if any cells are selected)
+      if (selectedCells.length > 0) {
+        const lastCell = selectedCells[selectedCells.length - 1];
+        if (!areAdjacent(lastCell, { row, col })) {
+          // Not adjacent - show shake feedback
+          triggerCellShake(row, col);
+          return;
+        }
       }
 
       // For demo mode, only allow selecting the next correct cell
       if (!isNextCorrectCell(row, col)) {
+        // Wrong cell - show shake feedback
+        triggerCellShake(row, col);
         return;
-      }
-
-      // Check adjacency with last selected cell
-      if (selectedCells.length > 0) {
-        const lastCell = selectedCells[selectedCells.length - 1];
-        if (!areAdjacent(lastCell, { row, col })) {
-          return;
-        }
       }
 
       const newCell: SelectedCell = {
@@ -259,10 +296,15 @@ const MiniGrid: React.FC<MiniGridProps> = ({
       const newSelectedCells = [...selectedCells, newCell];
       setSelectedCells(newSelectedCells);
 
+      // Haptic feedback for successful selection
+      if (window.navigator?.vibrate) {
+        window.navigator.vibrate(12);
+      }
+
       // Check if demo is complete
       if (newSelectedCells.length === demoPath.length) {
-        const formedWord = newSelectedCells.map((c) => c.letter).join('');
-        if (formedWord === demoWord) {
+        const completedWord = newSelectedCells.map((c) => c.letter).join('');
+        if (completedWord === demoWord) {
           setShowSuccess(true);
           // Clear any existing timeout before setting new one
           if (demoCompleteTimeoutRef.current) {
@@ -274,11 +316,12 @@ const MiniGrid: React.FC<MiniGridProps> = ({
         }
       }
     },
-    [selectedCells, letters, demoPath, demoWord, showSuccess, onDemoComplete, isCellSelected, isNextCorrectCell]
+    [selectedCells, letters, demoPath, demoWord, showSuccess, onDemoComplete, isCellSelected, isNextCorrectCell, triggerCellShake]
   );
 
   // Touch/Mouse event handlers - cell-level (for direct cell touches)
   const handleCellTouchStart = (e: React.TouchEvent, row: number, col: number) => {
+    // CRITICAL: Stop propagation to prevent parent swipe gesture from capturing the event
     e.preventDefault();
     e.stopPropagation();
     setIsSelecting(true);
@@ -290,6 +333,9 @@ const MiniGrid: React.FC<MiniGridProps> = ({
 
   // Grid-level touch start - catches touches anywhere in grid area
   const handleGridTouchStart = useCallback((e: React.TouchEvent) => {
+    // CRITICAL: Stop propagation to prevent parent swipe gesture handlers
+    e.stopPropagation();
+
     // Don't double-handle if cell already handled it
     if (isSelectingRef.current) return;
 
@@ -317,7 +363,9 @@ const MiniGrid: React.FC<MiniGridProps> = ({
     }
   }, [getCellAtPosition, selectCell]);
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    // Stop propagation to prevent parent swipe gesture from triggering
+    e.stopPropagation();
     setIsSelecting(false);
     isSelectingRef.current = false;
   };
@@ -390,9 +438,6 @@ const MiniGrid: React.FC<MiniGridProps> = ({
     return getArrowDirection(lastSelected, nextHintCell);
   }, [nextHintCell, selectedCells]);
 
-  // Word preview
-  const formedWord = selectedCells.map((c) => c.letter).join('');
-
   // Get the arrow component for the current direction
   const ArrowIcon = arrowDirection ? ArrowComponents[arrowDirection] : null;
 
@@ -407,6 +452,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
           // Increased container sizes to accommodate larger touch targets
           size === 3 ? 'grid-cols-3 max-w-[280px] sm:max-w-[340px]' : 'grid-cols-4 max-w-[360px] sm:max-w-[420px]'
         )}
+        style={{ touchAction: 'none' }} // Prevent browser default touch behaviors (scroll, zoom)
         onTouchStart={handleGridTouchStart}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -419,6 +465,40 @@ const MiniGrid: React.FC<MiniGridProps> = ({
             const isSelected = selectedIndex !== null;
             const isHint =
               nextHintCell?.row === rowIndex && nextHintCell?.col === colIndex;
+            const isShaking = isCellShaking(rowIndex, colIndex);
+
+            // Determine animation state: shaking > hint pulse > static
+            const getAnimateState = () => {
+              if (isShaking) {
+                // Shake animation for wrong cell tap
+                return {
+                  x: [0, -8, 8, -6, 6, -4, 4, 0],
+                  backgroundColor: ['rgb(255,107,107)', 'rgb(255,230,230)', 'rgb(255,107,107)'],
+                };
+              }
+              if (isHint && !isSelected) {
+                // Pulse animation for hint cell
+                return {
+                  scale: [1, 1.05, 1],
+                  boxShadow: [
+                    '0 0 20px rgba(132,204,22,0.6), 0 0 40px rgba(132,204,22,0.3)',
+                    '0 0 30px rgba(132,204,22,0.8), 0 0 60px rgba(132,204,22,0.5)',
+                    '0 0 20px rgba(132,204,22,0.6), 0 0 40px rgba(132,204,22,0.3)',
+                  ],
+                };
+              }
+              return {};
+            };
+
+            const getTransition = () => {
+              if (isShaking) {
+                return { duration: 0.4, ease: 'easeInOut' as const };
+              }
+              if (isHint && !isSelected) {
+                return { duration: 1.2, repeat: Infinity, ease: 'easeInOut' as const };
+              }
+              return {};
+            };
 
             return (
               <motion.div
@@ -428,33 +508,23 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                 className={cn(
                   'relative aspect-square rounded-neo border-3 sm:border-4 border-neo-black',
                   'flex items-center justify-center font-black text-2xl sm:text-3xl',
-                  'cursor-pointer select-none touch-none transition-all',
+                  'cursor-pointer select-none touch-none transition-colors',
                   // Larger touch targets for better mobile interaction (was 65px/80px)
                   'min-h-[80px] min-w-[80px] sm:min-h-[95px] sm:min-w-[95px]',
                   isSelected
                     ? 'bg-neo-lime shadow-hard-sm scale-95 text-neo-black'
                     : 'letter-tile-gradient-cream shadow-hard-sm sm:shadow-hard',
                   // Enhanced glow for hint cell - bright lime green
-                  isHint && !isSelected && 'ring-4 ring-neo-lime shadow-[0_0_20px_rgba(132,204,22,0.6),0_0_40px_rgba(132,204,22,0.3)]'
+                  isHint && !isSelected && 'ring-4 ring-neo-lime shadow-[0_0_20px_rgba(132,204,22,0.6),0_0_40px_rgba(132,204,22,0.3)]',
+                  // Red border flash for wrong cell
+                  isShaking && 'border-neo-red'
                 )}
                 onTouchStart={(e) => handleCellTouchStart(e, rowIndex, colIndex)}
                 onMouseDown={() => handleMouseDown(rowIndex, colIndex)}
                 whileHover={{ scale: isSelected ? 0.95 : 1.08 }}
                 whileTap={{ scale: 0.9 }}
-                // Pulse animation for hint cell
-                animate={isHint && !isSelected ? {
-                  scale: [1, 1.05, 1],
-                  boxShadow: [
-                    '0 0 20px rgba(132,204,22,0.6), 0 0 40px rgba(132,204,22,0.3)',
-                    '0 0 30px rgba(132,204,22,0.8), 0 0 60px rgba(132,204,22,0.5)',
-                    '0 0 20px rgba(132,204,22,0.6), 0 0 40px rgba(132,204,22,0.3)',
-                  ]
-                } : {}}
-                transition={isHint && !isSelected ? {
-                  duration: 1.2,
-                  repeat: Infinity,
-                  ease: 'easeInOut'
-                } : {}}
+                animate={getAnimateState()}
+                transition={getTransition()}
               >
                 {letter}
 

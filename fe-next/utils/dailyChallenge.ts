@@ -10,6 +10,20 @@ import { formatTimeHHMMSS } from '@/shared/utils';
 import type { Language, LetterGrid } from '@/types';
 import type { LetterFeedback } from './wordHuntFeedback';
 
+// Re-export storage keys from constants file
+export {
+  GAME_LANGUAGE_KEY,
+  TRAINING_GATEWAY_SEEN_KEY,
+  KEEP_PLAYING_DISMISSED_KEY,
+  getWordHuntTutorialKey,
+  getWordHuntResultKey,
+  getDailyCoinAwardKey,
+} from './dailyChallenge/constants';
+
+// Re-export server result mapping utility
+export { mapServerResultToStoredResult } from './dailyChallenge/storage';
+export type { ServerWordHuntResult } from './dailyChallenge/storage';
+
 // ==========================================
 // Constants
 // ==========================================

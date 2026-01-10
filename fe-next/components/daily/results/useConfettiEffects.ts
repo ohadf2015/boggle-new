@@ -1,10 +1,12 @@
 /**
  * Confetti Effects Hook
  * Handles victory and rank confetti animations
+ * Skips confetti on low-end devices for better performance
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { fireConfetti, fireRankConfetti, fireVictoryConfetti } from '@/utils/confettiUtils';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { RANK_CONFETTI_COLORS } from './constants';
 import type { WordHuntStats } from './types';
 
@@ -21,25 +23,51 @@ export function useConfettiEffects({
   attemptsUsed,
   stats,
 }: UseConfettiEffectsProps) {
-  // Fire confetti on victory
+  const { enableComplexAnimations } = useDevicePerformance();
+  const rafIdRef = useRef<number | null>(null);
+
+  // Fire confetti on victory (with RAF cleanup)
   useEffect(() => {
+    // Skip confetti on low-end devices
+    if (!enableComplexAnimations) return;
+
     if (isNewCompletion && solved) {
       const duration = 2500;
       const end = Date.now() + duration;
+      let cancelled = false;
+
       const frame = () => {
+        if (cancelled) return;
         fireConfetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#10B981', '#FFE135', '#00D9FF'] });
         fireConfetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#10B981', '#FFE135', '#00D9FF'] });
-        if (Date.now() < end) requestAnimationFrame(frame);
+        if (Date.now() < end && !cancelled) {
+          rafIdRef.current = requestAnimationFrame(frame);
+        }
       };
       frame();
-      if (attemptsUsed <= 3) {
-        setTimeout(() => fireConfetti({ particleCount: 150, spread: 120, origin: { y: 0.6 }, colors: ['#10B981', '#FFE135', '#FF1493'] }), 500);
-      }
-    }
-  }, [isNewCompletion, solved, attemptsUsed]);
 
-  // Fire rank confetti for top 3
+      let bonusTimeout: NodeJS.Timeout | undefined;
+      if (attemptsUsed <= 3) {
+        bonusTimeout = setTimeout(() => fireConfetti({ particleCount: 150, spread: 120, origin: { y: 0.6 }, colors: ['#10B981', '#FFE135', '#FF1493'] }), 500);
+      }
+
+      // Cleanup: cancel RAF and timeout on unmount
+      return () => {
+        cancelled = true;
+        if (rafIdRef.current !== null) {
+          cancelAnimationFrame(rafIdRef.current);
+          rafIdRef.current = null;
+        }
+        if (bonusTimeout) clearTimeout(bonusTimeout);
+      };
+    }
+    return undefined;
+  }, [isNewCompletion, solved, attemptsUsed, enableComplexAnimations]);
+
+  // Fire rank confetti for top 3 (skip on low-end devices)
   useEffect(() => {
+    if (!enableComplexAnimations) return undefined;
+
     if (isNewCompletion && stats?.yourStats?.solved && stats.yourStats.rank !== undefined && stats.yourStats.rank <= 3) {
       const colors = RANK_CONFETTI_COLORS[stats.yourStats.rank] || RANK_CONFETTI_COLORS[1];
       const count = Math.floor(100 * (1.2 - stats.yourStats.rank * 0.15));
@@ -51,10 +79,12 @@ export function useConfettiEffects({
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [isNewCompletion, stats?.yourStats]);
+  }, [isNewCompletion, stats?.yourStats, enableComplexAnimations]);
 
-  // Handler for badge click confetti
+  // Handler for badge click confetti (skip on low-end devices)
   const handleBadgeClickConfetti = (rank: number | undefined) => {
+    if (!enableComplexAnimations) return;
+
     if (rank && rank <= 3) {
       fireRankConfetti(rank);
     } else {

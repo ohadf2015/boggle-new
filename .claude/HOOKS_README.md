@@ -1,8 +1,37 @@
 # Claude Code Hooks Configuration
 
-This project uses Claude Code hooks to automatically run multiplayer e2e tests when critical files are modified.
+This project uses Claude Code hooks for automatic testing, notifications, and project memory management.
 
 ## Configured Hooks
+
+### UserPromptSubmit Hooks (Memory Recall)
+
+When you start a conversation, the hook automatically recalls relevant project memories to provide context for your request.
+
+**What Runs:**
+- Searches memory for relevant context based on your request
+- Retrieves past decisions, bug fixes, and architectural insights
+
+**Benefits:**
+- Claude remembers past work and decisions
+- Avoids repeating investigations or rediscovering solutions
+- Maintains continuity across sessions
+
+### Stop Hooks (Memory Storage)
+
+When a session ends, Claude reviews the conversation and stores important learnings:
+
+**What Gets Stored:**
+- Bug fixes with root causes and solutions
+- Feature implementations and patterns used
+- Architecture decisions and rationale
+- Investigation findings
+- User preferences discovered
+
+**Memory Types:**
+- `fact`: Discrete information (bugs, features, patterns)
+- `relationship`: Connections between components
+- `self`: User preferences and project conventions
 
 ### PostToolUse Hooks (Automatic Testing)
 
@@ -132,6 +161,57 @@ Expected: 5/6 tests pass. If <5 tests pass, multiplayer synchronization is broke
 - Default timeout is 180 seconds (3 minutes)
 - Increase `timeout` value in hook configuration if needed
 - Check if dev server is running (`npm run dev`)
+
+## Memory Integration
+
+The project uses the Memory MCP server to maintain project knowledge across sessions.
+
+### Commands with Memory Support
+
+The following commands automatically recall and store memories:
+
+| Command | Recall | Store |
+|---------|--------|-------|
+| `/feature` | Related features, patterns | Feature decisions, implementation patterns |
+| `/fix` | Similar bugs and fixes | Bug patterns and solutions |
+| `/investigate` | Past investigations | Investigation findings, architecture insights |
+| `/sentry-bugs` | Similar Sentry errors | Error patterns and fixes |
+| `/backlog` | Related bugs | Bug fixes and solutions |
+| `/refactor` | Refactoring history | Refactoring decisions, architecture changes |
+
+### Memory Types
+
+- **fact**: Discrete information (bugs, features, patterns, decisions)
+- **relationship**: Connections between components (architecture)
+- **entity**: People, places, things (components, services)
+- **self**: User preferences and project conventions
+
+### Manual Memory Operations
+
+You can manually manage memories:
+
+```
+# Recall memories
+mcp__memory__memory_recall(query="search terms", type="fact")
+
+# Store a memory
+mcp__memory__memory_store(
+  content="What to remember",
+  type="fact",
+  tags=["tag1", "tag2"],
+  importance=7
+)
+
+# Forget a memory
+mcp__memory__memory_forget(id="memory-id", reason="Why forgetting")
+```
+
+### Best Practices
+
+1. **Be specific in recalls**: Use relevant keywords from the task
+2. **Tag consistently**: Use standard tags like `bug`, `feature`, `architecture`
+3. **Set appropriate importance**: 1-10 scale (8+ for critical decisions)
+4. **Include context**: Store root causes, not just symptoms
 
 ## Related Documentation
 

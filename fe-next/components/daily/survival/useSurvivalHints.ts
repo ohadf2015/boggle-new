@@ -1,9 +1,16 @@
 'use client';
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import type { Language } from '@/types';
-import { generateProgressiveHints, generateFallbackHints, type HintLevel, type ClueShopItem } from '@/utils/aiHintGenerator';
+import { generateProgressiveHints, generateFallbackHints, CLUE_SHOP_ITEMS, type HintLevel, type ClueShopItem } from '@/utils/aiHintGenerator';
+import { getWordRarity } from '@/utils/dailyChallenge/wordRarity';
 import type { FeedbackType } from '../WordFeedbackToast';
+
+/**
+ * Rarity threshold for auto-revealing first letter
+ * Words with rarity >= 4 (RARE or LEGENDARY) get a free hint
+ */
+const RARE_WORD_THRESHOLD = 4;
 
 export interface UseSurvivalHintsProps {
   targetWord: string;
@@ -26,6 +33,10 @@ export interface HintState {
 
 export interface HintActions {
   handlePurchase: (item: ClueShopItem, clueTokens: number, setClueTokens: (fn: (prev: number) => number) => void, setShowShop: (show: boolean) => void) => void;
+  getNextAffordableClue: (clueTokens: number) => ClueShopItem | null;
+  autoRevealLetter: () => boolean;
+  revealCategory: () => void;
+  revealExample: () => void;
 }
 
 /**
@@ -53,6 +64,14 @@ export function useSurvivalHints({
     return generateFallbackHints(targetWord, language);
   }, [targetWord, language]);
 
+  // Check if target word is rare/legendary (rarity >= 4)
+  const targetWordRarity = useMemo(() => {
+    if (!targetWord || targetWord.length < 2) return 3;
+    return getWordRarity(targetWord, language);
+  }, [targetWord, language]);
+
+  const isRareWord = targetWordRarity >= RARE_WORD_THRESHOLD;
+
   // Set initial hints on mount
   useEffect(() => {
     if (initialHints && initialHints.hints.length > 0 && !currentHint) {
@@ -61,6 +80,20 @@ export function useSurvivalHints({
       setExampleSentence(initialHints.exampleSentence);
     }
   }, [initialHints, currentHint]);
+
+  // Track if we've already shown the rare word hint
+  const hasShownRareWordHint = useRef(false);
+
+  // Auto-reveal first letter for rare/legendary words
+  useEffect(() => {
+    if (isRareWord && targetWord.length > 0 && !hasShownRareWordHint.current) {
+      hasShownRareWordHint.current = true;
+      // Reveal first letter as a free hint for tricky words
+      setRevealedLetters(new Set([0]));
+      // Show toast notification about the hint
+      showToast('valid-word', '💎 Here\'s a hint for this tricky word!');
+    }
+  }, [isRareWord, targetWord, showToast]);
 
   // Load AI-enhanced hints asynchronously
   useEffect(() => {
@@ -125,6 +158,55 @@ export function useSurvivalHints({
     playWordAcceptedSound?.();
   }, [targetWord, revealedLetters, eliminatedLetters, playWordAcceptedSound, showToast, t]);
 
+  // Get next affordable clue based on priority: reveal_letter > reveal_category > example_sentence
+  const getNextAffordableClue = useCallback((clueTokens: number): ClueShopItem | null => {
+    // Priority order: reveal letters first (most useful), then category, then example
+    const priorityOrder = ['reveal_letter', 'reveal_category', 'example_sentence'];
+
+    for (const itemId of priorityOrder) {
+      const item = CLUE_SHOP_ITEMS.find(i => i.id === itemId);
+      if (!item || clueTokens < item.cost) continue;
+
+      // Check if this clue type is still available
+      switch (itemId) {
+        case 'reveal_letter': {
+          // Can reveal if there are at least 2 unrevealed letters
+          const unrevealed = [...Array(targetWord.length).keys()].filter(i => !revealedLetters.has(i));
+          if (unrevealed.length > 1) return item;
+          break;
+        }
+        case 'reveal_category':
+          if (!showCategory) return item;
+          break;
+        case 'example_sentence':
+          if (!showExample) return item;
+          break;
+      }
+    }
+    return null;
+  }, [targetWord.length, revealedLetters, showCategory, showExample]);
+
+  // Auto-reveal a single letter (for auto-spend system)
+  const autoRevealLetter = useCallback((): boolean => {
+    const unrevealed = [...Array(targetWord.length).keys()].filter(i => !revealedLetters.has(i));
+    if (unrevealed.length > 1) {
+      const randomIdx = unrevealed[Math.floor(Math.random() * unrevealed.length)];
+      setRevealedLetters(prev => new Set([...prev, randomIdx]));
+      return true;
+    }
+    return false;
+  }, [targetWord.length, revealedLetters]);
+
+  // Reveal category (for auto-spend system)
+  const revealCategory = useCallback(() => {
+    setShowCategory(true);
+  }, []);
+
+  // Reveal example sentence (for auto-spend system)
+  const revealExample = useCallback(() => {
+    setShowExample(true);
+  }, []);
+
   const state: HintState = {
     currentHint,
     category,
@@ -138,6 +220,10 @@ export function useSurvivalHints({
 
   const actions: HintActions = {
     handlePurchase,
+    getNextAffordableClue,
+    autoRevealLetter,
+    revealCategory,
+    revealExample,
   };
 
   return [state, actions];

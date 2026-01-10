@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useCallback, useMemo } from 'react';
+import React, { useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { X } from 'lucide-react';
@@ -32,14 +32,32 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
   const { isLowEnd, enableComplexAnimations } = useDevicePerformance();
   const skipConfetti = useMemo(() => isLowEnd || !enableComplexAnimations, [isLowEnd, enableComplexAnimations]);
 
-  // Fire confetti celebration
+  // Refs for cleanup
+  const rafIdRef = useRef<number | null>(null);
+  const timeoutsRef = useRef<NodeJS.Timeout[]>([]);
+
+  // Cleanup function
+  const cleanupAnimations = useCallback(() => {
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+    timeoutsRef.current.forEach(clearTimeout);
+    timeoutsRef.current = [];
+  }, []);
+
+  // Fire confetti celebration (with proper cleanup)
   const triggerCelebration = useCallback(() => {
     // Skip confetti entirely on low-end devices
-    if (skipConfetti) return;
+    if (skipConfetti) return cleanupAnimations;
+
+    // Clean up any previous animations
+    cleanupAnimations();
 
     // Reduced duration and particle counts for performance
     const duration = 2000; // Reduced from 3000
     const end = Date.now() + duration;
+    let cancelled = false;
 
     // Color schemes based on milestone
     const colors = streak >= 100
@@ -49,6 +67,8 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
         : ['#10B981', '#34D399', '#6EE7B7', '#A7F3D0']; // Green for 7+
 
     const frame = () => {
+      if (cancelled) return;
+
       fireConfetti({
         particleCount: 3, // Reduced from 5
         angle: 60,
@@ -64,14 +84,15 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
         colors,
       });
 
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
+      if (Date.now() < end && !cancelled) {
+        rafIdRef.current = requestAnimationFrame(frame);
       }
     };
     frame();
 
-    // Extra celebration bursts (reduced particle counts)
-    setTimeout(() => {
+    // Extra celebration bursts (reduced particle counts) - track timeouts for cleanup
+    const t1 = setTimeout(() => {
+      if (cancelled) return;
       fireConfetti({
         particleCount: 80, // Reduced from 150
         spread: 180,
@@ -79,9 +100,11 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
         colors,
       });
     }, 300);
+    timeoutsRef.current.push(t1);
 
     if (streak >= 30) {
-      setTimeout(() => {
+      const t2 = setTimeout(() => {
+        if (cancelled) return;
         fireConfetti({
           particleCount: 100, // Reduced from 200
           spread: 200,
@@ -89,10 +112,12 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
           colors,
         });
       }, 800);
+      timeoutsRef.current.push(t2);
     }
 
     if (streak >= 100) {
-      setTimeout(() => {
+      const t3 = setTimeout(() => {
+        if (cancelled) return;
         fireConfetti({
           particleCount: 150, // Reduced from 300
           spread: 360,
@@ -100,17 +125,31 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
           colors,
         });
       }, 1500);
+      timeoutsRef.current.push(t3);
     }
-  }, [streak, skipConfetti]);
+
+    // Return cleanup function
+    return () => {
+      cancelled = true;
+      cleanupAnimations();
+    };
+  }, [streak, skipConfetti, cleanupAnimations]);
 
   useEffect(() => {
     if (isOpen) {
       // Slight delay to ensure modal is visible
-      const timer = setTimeout(triggerCelebration, 100);
-      return () => clearTimeout(timer);
+      const timer = setTimeout(() => {
+        const cleanup = triggerCelebration();
+        // Store cleanup for when isOpen becomes false
+        return cleanup;
+      }, 100);
+      return () => {
+        clearTimeout(timer);
+        cleanupAnimations();
+      };
     }
     return undefined;
-  }, [isOpen, triggerCelebration]);
+  }, [isOpen, triggerCelebration, cleanupAnimations]);
 
   return (
     <AnimatePresence>

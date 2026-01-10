@@ -94,13 +94,13 @@ export default function LeaderboardPage(): React.ReactNode {
   }
 
   return (
-    <PageLayout onRefresh={handleRefresh} padding="md">
+    <PageLayout onRefresh={handleRefresh} padding="md" maxWidth="4xl">
       <div className={cn('pb-24 lg:pb-8', isLandscape ? 'py-2' : 'py-4')}>
         {/* Page Title */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
+          className="text-center mb-6"
         >
           <h1
             className={cn(
@@ -216,14 +216,14 @@ export default function LeaderboardPage(): React.ReactNode {
             {/* Table Header */}
             <div
               className={cn(
-                'grid grid-cols-12 gap-4 px-4 py-3 text-sm font-semibold',
+                'grid grid-cols-10 gap-3 px-3 py-2 text-sm font-semibold',
                 isDarkMode ? 'bg-slate-700/50 text-gray-300' : 'bg-gray-50 text-gray-600'
               )}
             >
               <div className="col-span-1 text-center">{t('leaderboard.rank')}</div>
               <div className="col-span-5">{t('leaderboard.player')}</div>
-              <div className="col-span-3 text-right">{t('leaderboard.score')}</div>
-              <div className="col-span-3 text-right">{t('leaderboard.games')}</div>
+              <div className="col-span-2 text-right">{t('leaderboard.score')}</div>
+              <div className="col-span-2 text-right">{t('leaderboard.games')}</div>
             </div>
 
             {/* Table Body */}
@@ -236,7 +236,7 @@ export default function LeaderboardPage(): React.ReactNode {
                   <div
                     key={entry.player_id}
                     className={cn(
-                      'grid grid-cols-12 gap-4 px-4 py-3 items-center transition-colors',
+                      'grid grid-cols-10 gap-3 px-3 py-2 items-center transition-colors',
                       isCurrentUser
                         ? isDarkMode
                           ? 'bg-cyan-900/20'
@@ -247,17 +247,17 @@ export default function LeaderboardPage(): React.ReactNode {
                     )}
                   >
                     <div className="col-span-1 text-center">{getRankIcon(rank)}</div>
-                    <div className="col-span-5 flex items-center gap-3">
+                    <div className="col-span-5 flex items-center gap-2">
                       <Avatar
                         profilePictureUrl={entry.profile_picture_url ?? undefined}
                         avatarImage={entry.avatar_image ?? undefined}
                         avatarEmoji={entry.avatar_emoji ?? undefined}
                         avatarColor={entry.avatar_color ?? undefined}
-                        size="md"
+                        size="sm"
                       />
                       <span
                         className={cn(
-                          'font-medium truncate',
+                          'font-medium truncate text-sm',
                           isCurrentUser
                             ? isDarkMode
                               ? 'text-cyan-400'
@@ -272,13 +272,13 @@ export default function LeaderboardPage(): React.ReactNode {
                     </div>
                     <div
                       className={cn(
-                        'col-span-3 text-right font-semibold',
+                        'col-span-2 text-right font-semibold text-sm',
                         isDarkMode ? 'text-white' : 'text-gray-900'
                       )}
                     >
                       {entry.total_score?.toLocaleString() || 0}
                     </div>
-                    <div className={cn('col-span-3 text-right', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>
+                    <div className={cn('col-span-2 text-right text-sm', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>
                       {entry.games_played || 0}
                     </div>
                   </div>

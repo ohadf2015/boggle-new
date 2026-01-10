@@ -70,6 +70,7 @@ const he = {
     "loading": "מערבב אותיות...",
     "error": "אופס!",
     "back": "חזור",
+    "backToHome": "חזרה לדף הבית",
     "next": "הבא",
     "confirm": "אישור",
     "cancel": "ביטול",
@@ -2649,6 +2650,7 @@ const he = {
     "leading": "מוביל!",
     "ahead": "קדימה",
     "toCatch": "נק' לעבור",
+    "almostThere": "כמעט שם!",
     "live": "שידור חי",
     "backToGame": "חזרה למשחק"
   },
@@ -3091,7 +3093,7 @@ const he = {
     "tryAnotherLanguage": "נסו את האתגר בשפה אחרת:",
     "guestModeNotice": "משחק כאורח",
     "guestModeBenefits": "הירשמו כדי לעקוב אחר התקדמות, לבנות רצף ולהתחרות בטבלאות",
-    "brainScoreLocked": "הירשמו לעקוב אחר ציון המוח",
+    "brainScoreLocked": "הירשמו לעקוב אחר הציון הקוגניטיבי",
     "streakTeaser": "הירשמו לבנות ולעקוב אחר רצפים",
     "streakLocked": "מעקב רצף דורש הרשמה",
     "historyTeaser": "הירשמו לצפות בהתקדמות לאורך זמן",
@@ -3655,8 +3657,8 @@ const he = {
   "brain": {
     "title": "אימון מוחי",
     "subtitle": "עקוב אחר הביצועים הקוגניטיביים שלך",
-    "score": "ציון מוח",
-    "points": "נקודות מוח",
+    "score": "ציון קוגניטיבי",
+    "points": "נקודות קוגניטיביות",
     "overall": "כללי",
     "nav": {
       "home": "שחק",
@@ -3687,17 +3689,17 @@ const he = {
       "title": "התקדמות",
       "improving": "משתפר",
       "stable": "יציב",
-      "declining": "דורש עבודה",
+      "declining": "אזור שדרוג!",
       "gamesAnalyzed": "משחקים נותחו",
       "toNextTier": "לדרגה הבאה"
     },
     "recommendation": {
       "title": "טיפ אישי",
-      "weakest": "ה{{domain}} שלך צריך קצת עבודה.",
+      "weakest": "בוא נטעין את ה{{domain}} שלך!",
       "tryDrill": "נסה את תרגיל ה{{drill}} להשתפר!",
       "startDrill": "התחל תרגיל",
-      "declining": "ה{{domain}} שלך יורד - בוא נתאמן! 💪",
-      "low": "ה{{domain}} שלך צריך תשומת לב.",
+      "declining": "בוא נחזק את ה{{domain}} - יאללה!",
+      "low": "ה{{domain}} שלך מוכן לשדרוג!",
       "improve": "שפר את ה{{domain}} עם תרגול ממוקד.",
       "unlock": "עוד {{games}} משחקים לפתיחה",
       "scienceHint": "תרגול ממוקד משפר יכולות קוגניטיביות ספציפיות 🧠"
@@ -3835,8 +3837,8 @@ const he = {
       "tip5": "מעבר בין אורכי מילים בונה גמישות קוגניטיבית - הסתגלות מנטלית."
     },
     "share": {
-      "title": "שתף ציון מוח",
-      "brainScore": "ציון מוח",
+      "title": "שתף ציון קוגניטיבי",
+      "brainScore": "ציון קוגניטיבי",
       "tier": "דרגה",
       "gamesPlayed": "משחקים ששוחקו",
       "games": "משחקים",
@@ -3850,7 +3852,7 @@ const he = {
     },
     "empty": {
       "title": "התחל להתאמן!",
-      "description": "שחק משחקים כדי לבנות את ציון המוח שלך ולעקוב אחר שיפור קוגניטיבי לאורך זמן.",
+      "description": "שחק משחקים כדי לבנות את הציון הקוגניטיבי שלך ולעקוב אחר שיפור לאורך זמן.",
       "playNow": "שחק עכשיו"
     },
     "errors": {
@@ -3863,7 +3865,7 @@ const he = {
     },
     "progressHistory": "היסטוריית התקדמות",
     "startTracking": "התחל לעקוב",
-    "historyEmptyDesc": "שחק משחקים או השלם תרגילים כדי לעקוב אחר ציון המוח שלך לאורך זמן",
+    "historyEmptyDesc": "שחק משחקים או השלם תרגילים כדי לעקוב אחר הציון הקוגניטיבי שלך לאורך זמן",
     "daysTracked": "ימים",
     "currentScore": "נוכחי",
     "peakScore": "שיא",
@@ -3943,6 +3945,37 @@ const he = {
       "yourScore": "הניקוד שלך",
       "newPersonalBest": "שיא אישי חדש!",
       "almostThere": "כמעט! רק {{points}} נקודות"
+    }
+  },
+  "admin": {
+    "dashboard": "לוח בקרה",
+    "accessRequired": "נדרשת הרשאת מנהל",
+    "accessDenied": "יש צורך בהרשאות מנהל כדי לגשת לעמוד זה.",
+    "welcome": "שלום,",
+    "live": {
+      "subtitle": "מעקב משחקים בזמן אמת",
+      "live": "חי",
+      "games": "משחקים",
+      "players": "שחקנים",
+      "sockets": "חיבורים",
+      "singlePlayer": "סולו",
+      "refresh": "רענן",
+      "retry": "נסה שוב",
+      "noGames": "אין משחקים פעילים",
+      "noGamesHint": "משחקים יופיעו כאן כשהשחקנים יתחילו לשחק",
+      "activeGames": "משחקים פעילים",
+      "connectedPlayers": "שחקנים מחוברים",
+      "player": "שחקן",
+      "game": "משחק",
+      "status": "סטטוס",
+      "score": "ניקוד",
+      "type": "סוג",
+      "auth": "רשום",
+      "guest": "אורח",
+      "ranked": "מדורג",
+      "left": "נותר",
+      "started": "התחיל",
+      "lastUpdated": "עודכן לאחרונה"
     }
   }
 };

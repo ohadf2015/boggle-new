@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Star, DoorOpen, Check, ArrowRight, Play, BarChart2, Share2, Users } from 'lucide-react';
 import ExitRoomButton from '@/components/ExitRoomButton';
-import { fireLevelUpConfetti } from '@/utils/confettiUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
@@ -16,7 +15,6 @@ import { useCoinContext } from '@/contexts/CoinContext';
 import { useFirstWinCelebration } from '@/hooks/useFirstWinCelebration';
 import { trackGameCompletion, trackStreakMilestone } from '@/utils/growthTracking';
 import logger from '@/utils/logger';
-import { levelUpToast } from '@/components/NeoToast';
 import { calculateAllPlayerArchetypes, getMissedWords, type PlayerArchetype } from '@/utils/playerArchetypes';
 import type { ResultsPageProps, WordToVote, XpGainedData, LevelUpData } from '@/types/components';
 import type { NearMiss } from '@/components/results/NearMissCard';
@@ -41,6 +39,7 @@ const PerformanceChart = dynamic(() => import('@/components/results/PerformanceC
 const NearMissCard = dynamic(() => import('@/components/results/NearMissCard'), { ssr: false });
 const MysteryRewardPopup = dynamic(() => import('@/components/engagement/MysteryRewardPopup'), { ssr: false });
 const ReferralMilestonePopup = dynamic(() => import('@/components/engagement/ReferralMilestonePopup'), { ssr: false });
+const LevelUpCelebration = dynamic(() => import('@/components/animations/LevelUpCelebration'), { ssr: false });
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 const PlayerArchetypeBadge = dynamic(() => import('@/components/results/PlayerArchetypeBadge'), { ssr: false });
@@ -96,6 +95,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   // XP and Level state (received via socket after game ends)
   const [xpGainedData, setXpGainedData] = useState<XpGainedData | null>(null);
   const [levelUpData, setLevelUpData] = useState<LevelUpData | null>(null);
+  const [showLevelUpCelebration, setShowLevelUpCelebration] = useState<boolean>(false);
 
   // Near-miss notifications (received via socket after game ends)
   const [nearMisses, setNearMisses] = useState<NearMiss[]>([]);
@@ -581,15 +581,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     const handleLevelUp = (data: LevelUpData) => {
       logger.log('[RESULTS] Level up!', data);
       setLevelUpData(data);
-      // Celebratory confetti for level up
-      fireLevelUpConfetti();
-      // Show level up toast notification
-      levelUpToast(data.oldLevel, data.newLevel, {
-        title: t('xp.levelUp') || 'Level Up!',
-        newTitle: data.newTitles?.[0],
-        newTitleLabel: t('xp.titleUnlocked') || 'New Title',
-        duration: 5000
-      });
+      // Show epic level-up celebration (handles its own confetti)
+      setShowLevelUpCelebration(true);
     };
 
     // Near-miss notifications handler
@@ -1549,6 +1542,19 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         isOpen={showReferralMilestone}
         onClose={handleReferralMilestoneClose}
       />
+
+      {/* Epic Level Up Celebration - Full-screen GSAP animation */}
+      {levelUpData && (
+        <LevelUpCelebration
+          level={levelUpData.newLevel}
+          show={showLevelUpCelebration}
+          onDismiss={() => setShowLevelUpCelebration(false)}
+          autoDismissAfter={5000}
+          rewards={{
+            unlocks: levelUpData.newTitles,
+          }}
+        />
+      )}
 
     </div>
   );

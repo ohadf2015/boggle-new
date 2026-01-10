@@ -268,21 +268,30 @@ export default function ProfilePage(): React.ReactNode {
         <PullToRefreshIndicator pullDistance={pullState.pullDistance} isRefreshing={pullState.isRefreshing} threshold={60} />
         <AutoHideHeader />
 
-        <div className={cn('flex-1 max-w-4xl mx-auto px-4 w-full', isLandscape ? 'py-2' : 'py-6')}>
-          <ProfileHeader {...profileHeaderProps} />
-          <ProfileXpSection profile={profile} isDarkMode={isDarkMode} />
-          <ProfileCoinsSection profile={profile} isDarkMode={isDarkMode} />
+        <div className={cn('flex-1 max-w-6xl mx-auto px-4 lg:px-6 w-full', isLandscape ? 'py-2' : 'py-4 lg:py-6')}>
+          {/* Two-column layout on larger screens */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6">
+            {/* Left Column: Identity & Progress */}
+            <div className="space-y-4">
+              <ProfileHeader {...profileHeaderProps} />
+              <ProfileXpSection profile={profile} isDarkMode={isDarkMode} />
+              <ProfileCoinsSection profile={profile} isDarkMode={isDarkMode} />
+              {user && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.11 }}>
+                  <ReferralCard />
+                </motion.div>
+              )}
+            </div>
 
-          {user && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.11 }}>
-              <ReferralCard />
-            </motion.div>
-          )}
+            {/* Right Column: Stats & Achievements */}
+            <div className="space-y-4">
+              <ProfileStatsGrid profile={profile} isDarkMode={isDarkMode} delay={0.15} />
+              <ProfileRankedProgress profile={profile} isDarkMode={isDarkMode} canPlayRanked={canPlayRanked} gamesUntilRanked={gamesUntilRanked} />
+              <ProfileAchievements profile={profile} isDarkMode={isDarkMode} />
+            </div>
+          </div>
 
-          <ProfileStatsGrid profile={profile} isDarkMode={isDarkMode} delay={0.15} />
-          <ProfileRankedProgress profile={profile} isDarkMode={isDarkMode} canPlayRanked={canPlayRanked} gamesUntilRanked={gamesUntilRanked} />
-          <ProfileAchievements profile={profile} isDarkMode={isDarkMode} />
-
+          {/* Full-width sections below */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} className="mt-4">
             <ProfileCollection collectibles={playerCollectibles} isLoading={isLoadingCollectibles} isDarkMode={isDarkMode} />
           </motion.div>

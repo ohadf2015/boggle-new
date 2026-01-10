@@ -10,12 +10,12 @@ import {
   MAX_ATTEMPTS,
   INITIAL_LIFE,
   LIFE_DRAIN_RATE,
+  NEW_PLAYER_LIFE_DRAIN_RATE,
+  NEW_PLAYER_THRESHOLD,
   INVALID_WORD_PENALTY,
   NOT_IN_DICTIONARY_PENALTY,
-  HALF_LIFE_THRESHOLD,
-  MIN_TOKENS_FOR_HINT,
   FEEDBACK_OVERLAY_DURATION,
-  SHOP_HINT_DISMISS_DELAY,
+  getLifeBonusForWord,
 } from './constants';
 import { isWordOnBoard } from '@/utils/clientWordValidator';
 import { formatRewardMessage } from '@/utils/formatRewardMessage';
@@ -23,6 +23,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { logGameStart, logGameEnd, formatWordsForLogging } from '@/utils/gameLogger';
+import { isNewDailyPlayer, incrementDailyChallengesCompleted } from '@/utils/trainingProgressStorage';
 import { useSurvivalClues } from './useSurvivalClues';
 import { useSurvivalHints } from './useSurvivalHints';
 
@@ -111,7 +112,6 @@ export function useSurvivalGameLogic({
   const lifeIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const gameOverRef = useRef(false);
   const feedbackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const shopHintShownRef = useRef(false);
   const gameStartTimeRef = useRef<number>(0);
 
   // Session tracking
@@ -136,9 +136,9 @@ export function useSurvivalGameLogic({
   // UI state
   const [formedWord, setFormedWord] = useState('');
   const [letterCount, setLetterCount] = useState(0);
-  const [showShop, setShowShop] = useState(false);
+  const [showShop, setShowShop] = useState(false); // Kept for backwards compatibility, but shop is disabled
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
-  const [showShopHint, setShowShopHint] = useState(false);
+  const [showShopHint, setShowShopHint] = useState(false); // Deprecated - shop removed
 
   // Toast feedback
   const [feedbackType, setFeedbackType] = useState<FeedbackType | null>(null);
@@ -207,6 +207,10 @@ export function useSurvivalGameLogic({
     fadeToTrack(TRACKS.BOSSA_ARCADE, 500, 800);
   }, [fadeToTrack, TRACKS]);
 
+  // Check if player is new (first 3 daily challenges) - calculated once
+  const isNewPlayer = useRef(isNewDailyPlayer(NEW_PLAYER_THRESHOLD));
+  const drainRate = isNewPlayer.current ? NEW_PLAYER_LIFE_DRAIN_RATE : LIFE_DRAIN_RATE;
+
   // Life drain effect
   useEffect(() => {
     if (isGameOver) {
@@ -216,7 +220,7 @@ export function useSurvivalGameLogic({
 
     lifeIntervalRef.current = setInterval(() => {
       setLifePoints(prev => {
-        const newLife = Math.max(0, prev - LIFE_DRAIN_RATE);
+        const newLife = Math.max(0, prev - drainRate);
         if (newLife === 0 && !gameOverRef.current) {
           handleGameOverRef.current?.(false);
         }
@@ -227,21 +231,42 @@ export function useSurvivalGameLogic({
     return () => {
       if (lifeIntervalRef.current) clearInterval(lifeIntervalRef.current);
     };
-  }, [isGameOver]);
+  }, [isGameOver, drainRate]);
 
-  // Show shop hint when life is low
+  // Auto-spend tokens to unlock clues immediately
+  // This replaces the manual shop - clues unlock automatically as tokens are earned
   useEffect(() => {
-    if (
-      !shopHintShownRef.current &&
-      !isGameOver &&
-      lifePoints <= HALF_LIFE_THRESHOLD &&
-      clueTokens >= MIN_TOKENS_FOR_HINT
-    ) {
-      shopHintShownRef.current = true;
-      setShowShopHint(true);
-      setTimeout(() => setShowShopHint(false), SHOP_HINT_DISMISS_DELAY);
+    if (isGameOver || clueTokens < 1) return;
+
+    const nextClue = hintActions.getNextAffordableClue(clueTokens);
+    if (!nextClue) return;
+
+    // Auto-purchase the clue
+    setClueTokens(prev => prev - nextClue.cost);
+
+    // Execute the clue effect based on type
+    switch (nextClue.id) {
+      case 'reveal_letter':
+        if (hintActions.autoRevealLetter()) {
+          // Show celebration toast
+          showToast('valid-word', t('daily.clueUnlocked') || 'Clue Unlocked! 💡');
+          // Trigger clue gain animation
+          clueActions.triggerClueGainAnimation(1);
+          playWordAcceptedSound?.();
+        }
+        break;
+      case 'reveal_category':
+        hintActions.revealCategory();
+        showToast('valid-word', t('daily.categoryUnlocked') || 'Category Revealed! 🏷️');
+        playWordAcceptedSound?.();
+        break;
+      case 'example_sentence':
+        hintActions.revealExample();
+        showToast('valid-word', t('daily.exampleUnlocked') || 'Example Revealed! 📝');
+        playWordAcceptedSound?.();
+        break;
     }
-  }, [lifePoints, clueTokens, isGameOver]);
+  }, [clueTokens, isGameOver, hintActions, clueActions, playWordAcceptedSound, showToast, t]);
 
   // Cleanup feedback timeout
   useEffect(() => {
@@ -330,6 +355,9 @@ export function useSurvivalGameLogic({
       });
     }
 
+    // Track daily challenge completion for new player detection
+    incrementDailyChallengesCompleted();
+
     onComplete(result);
   }, [attempts, discoveredWords, lifePoints, clueTokens, hintState.tokensSpent, hintState.currentHint, targetWord, onComplete, gameSessionId, fadeToTrack, TRACKS]);
 
@@ -406,7 +434,9 @@ export function useSurvivalGameLogic({
       return;
     }
 
-    const lifeGained = calculateLifeReward(word.length);
+    const baseLifeGained = calculateLifeReward(word.length);
+    const longWordBonus = getLifeBonusForWord(word.length);
+    const lifeGained = baseLifeGained + longWordBonus;
     const tokensGained = calculateTokenReward(word.length);
 
     const discovery: WordDiscovery = {
@@ -435,7 +465,12 @@ export function useSurvivalGameLogic({
       clueActions.triggerClueGainAnimation(cluesRevealed);
     }
 
-    showToast('valid-word', formatRewardMessage({ lifeGained, tokensGained }));
+    // Show reward toast with bonus info for long words
+    const rewardMessage = formatRewardMessage({ lifeGained, tokensGained });
+    const bonusMessage = longWordBonus > 0
+      ? `${rewardMessage} 🔥 +${longWordBonus} long word bonus!`
+      : rewardMessage;
+    showToast('valid-word', bonusMessage);
   }, [discoveredWords, grid, language, playWordAcceptedSound, showToast, t, validateWordInDictionary, clueActions]);
 
   // Handle word submission

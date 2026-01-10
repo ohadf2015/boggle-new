@@ -70,6 +70,7 @@ const sv = {
     "loading": "Blandar bokstäver...",
     "error": "Hoppsan!",
     "back": "Tillbaka",
+    "backToHome": "Tillbaka till startsidan",
     "next": "Nästa",
     "confirm": "Bekräfta",
     "cancel": "Avbryt",
@@ -2520,6 +2521,7 @@ const sv = {
     "leading": "Leder!",
     "ahead": "före",
     "toCatch": "p för att passera",
+    "almostThere": "Nästan där!",
     "live": "Live",
     "backToGame": "Tillbaka till spelet"
   },
@@ -3686,17 +3688,17 @@ const sv = {
       "title": "Framsteg",
       "improving": "Förbättras",
       "stable": "Stabil",
-      "declining": "Behöver arbete",
+      "declining": "Uppgraderingszon!",
       "gamesAnalyzed": "analyserade spel",
       "toNextTier": "till nästa nivå"
     },
     "recommendation": {
       "title": "Personligt tips",
-      "weakest": "Din {{domain}} behöver lite arbete.",
+      "weakest": "Låt oss turboladda din {{domain}}!",
       "tryDrill": "Prova {{drill}}-övningen för att förbättra!",
       "startDrill": "Starta övning",
-      "declining": "Din {{domain}} sjunker - dags att träna!",
-      "low": "Din {{domain}} behöver uppmärksamhet.",
+      "declining": "Power up din {{domain}} - kör hårt!",
+      "low": "Din {{domain}} är redo att levla upp!",
       "improve": "Förbättra din {{domain}} med riktad träning.",
       "unlock": "{{games}} spel kvar för att låsa upp",
       "scienceHint": "Riktad träning förbättrar specifika kognitiva förmågor"
@@ -3942,6 +3944,37 @@ const sv = {
       "yourScore": "Din poäng",
       "newPersonalBest": "Nytt personligt rekord!",
       "almostThere": "Så nära! Bara {{points}} poäng kvar"
+    }
+  },
+  "admin": {
+    "dashboard": "Adminpanel",
+    "accessRequired": "Adminbehörighet krävs",
+    "accessDenied": "Du behöver administratörsbehörighet för att komma åt denna sida.",
+    "welcome": "Välkommen,",
+    "live": {
+      "subtitle": "Spelövervakning i realtid",
+      "live": "Live",
+      "games": "spel",
+      "players": "spelare",
+      "sockets": "anslutningar",
+      "singlePlayer": "solo",
+      "refresh": "Uppdatera",
+      "retry": "Försök igen",
+      "noGames": "Inga aktiva spel",
+      "noGamesHint": "Spel visas här när spelare börjar spela",
+      "activeGames": "Aktiva Spel",
+      "connectedPlayers": "Anslutna Spelare",
+      "player": "Spelare",
+      "game": "Spel",
+      "status": "Status",
+      "score": "Poäng",
+      "type": "Typ",
+      "auth": "Auth",
+      "guest": "Gäst",
+      "ranked": "Rankad",
+      "left": "kvar",
+      "started": "Startad",
+      "lastUpdated": "Senast uppdaterad"
     }
   }
 };

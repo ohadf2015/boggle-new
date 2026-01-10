@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { memo } from 'react';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { Mascot, MascotVariant } from './Mascot';
 
 const LEXI_LETTERS = ['L', 'E', 'X', 'I', 'C', 'L', 'A', 'S', 'H'];
 
@@ -26,6 +27,8 @@ interface NeoLoaderProps {
   size?: 'sm' | 'md' | 'lg';
   /** Show mascot instead of letter tiles */
   variant?: 'letters' | 'mascot' | 'dots';
+  /** Mascot variant for mascot mode (default: 'thinking') */
+  mascotVariant?: MascotVariant;
 }
 
 /**
@@ -36,6 +39,7 @@ export const NeoLoader = memo(function NeoLoader({
   text,
   size = 'md',
   variant = 'letters',
+  mascotVariant = 'thinking',
 }: NeoLoaderProps) {
   const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
 
@@ -87,27 +91,41 @@ export const NeoLoader = memo(function NeoLoader({
   }
 
   if (variant === 'mascot') {
+    // Map size to Mascot component size
+    const mascotSizeMap: Record<'sm' | 'md' | 'lg', 'sm' | 'md' | 'lg'> = {
+      sm: 'sm',
+      md: 'md',
+      lg: 'lg',
+    };
+
     return (
       <div className="flex flex-col items-center justify-center">
-        <motion.div
-          className="relative"
-          animate={{
-            y: [0, -8, 0],
-            rotate: [0, -3, 3, 0],
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/mascot/lexi-thinking.png"
-            alt="Loading"
-            className="w-24 h-24 object-contain"
-          />
-        </motion.div>
+        {/* Thinking dots above mascot */}
+        <div className="flex gap-1.5 mb-2">
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              className="w-2.5 h-2.5 bg-neo-cyan rounded-full"
+              animate={{
+                y: [0, -6, 0],
+                opacity: [0.4, 1, 0.4],
+                scale: [0.8, 1.1, 0.8],
+              }}
+              transition={{
+                duration: 1,
+                delay: i * 0.2,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+            />
+          ))}
+        </div>
+        {/* Animated Mascot using the reusable component */}
+        <Mascot
+          variant={mascotVariant}
+          size={mascotSizeMap[size]}
+          animated={true}
+        />
         {text && (
           <motion.p
             className="text-neo-white/70 text-sm mt-3 font-neo-body"
@@ -161,47 +179,6 @@ export const NeoLoader = memo(function NeoLoader({
           {text}
         </motion.p>
       )}
-    </div>
-  );
-});
-
-/**
- * Skeleton shimmer component for content placeholders
- */
-export const NeoSkeleton = memo(function NeoSkeleton({
-  className = '',
-  width,
-  height,
-}: {
-  className?: string;
-  width?: string | number;
-  height?: string | number;
-}) {
-  const style = {
-    width: typeof width === 'number' ? `${width}px` : width,
-    height: typeof height === 'number' ? `${height}px` : height,
-  };
-
-  return (
-    <div
-      className={`
-        bg-neo-navy-light border-2 border-neo-black/30 rounded-neo
-        relative overflow-hidden ${className}
-      `}
-      style={style}
-    >
-      <div
-        className="absolute inset-0 animate-shimmer"
-        style={{
-          background: `linear-gradient(
-            90deg,
-            transparent 0%,
-            rgba(255, 225, 53, 0.1) 50%,
-            transparent 100%
-          )`,
-          backgroundSize: '200% 100%',
-        }}
-      />
     </div>
   );
 });

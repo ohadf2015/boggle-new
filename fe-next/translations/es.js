@@ -70,6 +70,7 @@ const es = {
     "loading": "Mezclando letras...",
     "error": "¡Ups!",
     "back": "Atrás",
+    "backToHome": "Volver al Inicio",
     "next": "Siguiente",
     "confirm": "Confirmar",
     "cancel": "Cancelar",
@@ -2645,6 +2646,7 @@ const es = {
     "leading": "¡Liderando!",
     "ahead": "adelante",
     "toCatch": "pts para pasar",
+    "almostThere": "¡Ya casi!",
     "live": "En Vivo",
     "backToGame": "Volver al Juego"
   },
@@ -3939,6 +3941,37 @@ const es = {
       "yourScore": "Tu puntuación",
       "newPersonalBest": "¡Nuevo récord personal!",
       "almostThere": "¡Tan cerca! Solo {{points}} puntos más"
+    }
+  },
+  "admin": {
+    "dashboard": "Panel de Administración",
+    "accessRequired": "Acceso de Administrador Requerido",
+    "accessDenied": "Necesitas privilegios de administrador para acceder a esta página.",
+    "welcome": "Bienvenido,",
+    "live": {
+      "subtitle": "Monitoreo de juegos en tiempo real",
+      "live": "En vivo",
+      "games": "juegos",
+      "players": "jugadores",
+      "sockets": "conexiones",
+      "singlePlayer": "individual",
+      "refresh": "Actualizar",
+      "retry": "Reintentar",
+      "noGames": "No hay juegos activos",
+      "noGamesHint": "Los juegos aparecerán aquí cuando los jugadores comiencen a jugar",
+      "activeGames": "Juegos Activos",
+      "connectedPlayers": "Jugadores Conectados",
+      "player": "Jugador",
+      "game": "Juego",
+      "status": "Estado",
+      "score": "Puntuación",
+      "type": "Tipo",
+      "auth": "Auth",
+      "guest": "Invitado",
+      "ranked": "Clasificado",
+      "left": "restante",
+      "started": "Iniciado",
+      "lastUpdated": "Última actualización"
     }
   }
 };

@@ -32,13 +32,13 @@ export default function DeltaDisplay({ delta, className }: DeltaDisplayProps) {
   const colorClass = isPositive
     ? 'bg-neo-green text-neo-black'
     : isNegative
-    ? 'bg-red-500 text-white'
+    ? 'bg-amber-400 text-neo-black'
     : 'bg-gray-400 text-neo-black';
 
   const textColorClass = isPositive
     ? 'text-neo-green'
     : isNegative
-    ? 'text-red-500'
+    ? 'text-amber-400'
     : 'text-gray-400';
 
   return (

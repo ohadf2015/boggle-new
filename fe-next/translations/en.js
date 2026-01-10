@@ -71,6 +71,7 @@ const en = {
     "error": "Whoops!",
     "retry": "Try Again",
     "back": "Back",
+    "backToHome": "Back to Home",
     "next": "Next",
     "confirm": "Confirm",
     "cancel": "Cancel",
@@ -2654,6 +2655,7 @@ const en = {
     "leading": "Leading!",
     "ahead": "ahead",
     "toCatch": "pts to pass",
+    "almostThere": "Almost there!",
     "live": "Live",
     "backToGame": "Back to Game"
   },
@@ -3699,17 +3701,17 @@ const en = {
       "title": "Progress",
       "improving": "Improving",
       "stable": "Stable",
-      "declining": "Needs work",
+      "declining": "Level up zone!",
       "gamesAnalyzed": "games analyzed",
       "toNextTier": "to next tier"
     },
     "recommendation": {
       "title": "Recommended For You",
-      "weakest": "Your {{domain}} could use some work.",
+      "weakest": "Let's supercharge your {{domain}}!",
       "tryDrill": "Try the {{drill}} drill to improve!",
       "startDrill": "Start Drill",
-      "declining": "Your {{domain}} is declining - time to train!",
-      "low": "Your {{domain}} needs attention.",
+      "declining": "Power up your {{domain}} - let's go!",
+      "low": "Your {{domain}} is ready to level up!",
       "improve": "Boost your {{domain}} with targeted practice.",
       "unlock": "{{games}} games to unlock",
       "scienceHint": "Targeted practice improves specific cognitive skills"
@@ -3964,6 +3966,37 @@ const en = {
       "yourScore": "Your Score",
       "newPersonalBest": "New Personal Best!",
       "almostThere": "So close! Just {{points}} points away"
+    }
+  },
+  "admin": {
+    "dashboard": "Admin Dashboard",
+    "accessRequired": "Admin Access Required",
+    "accessDenied": "You need administrator privileges to access this page.",
+    "welcome": "Welcome,",
+    "live": {
+      "subtitle": "Real-time game monitoring",
+      "live": "Live",
+      "games": "games",
+      "players": "players",
+      "sockets": "sockets",
+      "singlePlayer": "solo",
+      "refresh": "Refresh",
+      "retry": "Retry",
+      "noGames": "No active games",
+      "noGamesHint": "Games will appear here when players start playing",
+      "activeGames": "Active Games",
+      "connectedPlayers": "Connected Players",
+      "player": "Player",
+      "game": "Game",
+      "status": "Status",
+      "score": "Score",
+      "type": "Type",
+      "auth": "Auth",
+      "guest": "Guest",
+      "ranked": "Ranked",
+      "left": "left",
+      "started": "Started",
+      "lastUpdated": "Last updated"
     }
   }
 };

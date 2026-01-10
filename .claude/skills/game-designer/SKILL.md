@@ -1,11 +1,41 @@
 ---
 name: game-designer
 description: Analyze game mechanics, propose features, and research competitors to improve LexiClash engagement and virality.
+allowed-tools: Read, Write, Edit, Grep, Glob, WebSearch, mcp__memory__*
 ---
 
 # Game Designer Skill
 
 Design features for LexiClash, a real-time multiplayer word game with neo-brutalist aesthetics.
+
+## Memory Integration
+
+### Before Starting
+Recall past game design decisions and feature analysis:
+```
+mcp__memory__memory_recall(query="game design feature [feature-area] mechanic")
+```
+
+### After Completing
+Store game design decisions and analysis:
+```
+mcp__memory__memory_store(
+  content="Game design: [feature-name] - [description]. Target players: [player-types]. Impact: Fun=[x], Retention=[x], Viral=[x]. Decision: [approved/rejected] because [reason].",
+  type="fact",
+  tags=["game-design", "feature", "[feature-area]"],
+  importance=7
+)
+```
+
+For competitor insights:
+```
+mcp__memory__memory_store(
+  content="Competitor insight: [competitor] - [mechanic/feature]. What works: [analysis]. Applicable to LexiClash: [yes/no/maybe] because [reason].",
+  type="fact",
+  tags=["game-design", "competitor", "[competitor-name]"],
+  importance=6
+)
+```
 
 ## LexiClash Core
 

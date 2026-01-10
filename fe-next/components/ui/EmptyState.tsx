@@ -3,10 +3,9 @@
 import { motion } from 'framer-motion';
 import { memo, ReactNode } from 'react';
 import { ArrowRight, Search, Users, Trophy, Gamepad2 } from 'lucide-react';
-import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { Mascot, MascotVariant } from './Mascot';
 
-type MascotVariant = 'happy' | 'encouraging' | 'thinking' | 'oops' | 'celebrating';
 type EmptyStateType = 'no-words' | 'waiting-players' | 'no-games' | 'no-results' | 'error' | 'custom';
 
 interface EmptyStateProps {
@@ -32,14 +31,6 @@ interface EmptyStateProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-const MASCOT_IMAGES: Record<MascotVariant, string> = {
-  happy: '/mascot/lexi-happy.png',
-  encouraging: '/mascot/lexi-encouraging.png',
-  thinking: '/mascot/lexi-thinking.png',
-  oops: '/mascot/lexi-oops.png',
-  celebrating: '/mascot/lexi-celebrating.png',
-};
-
 const TYPE_CONFIG: Record<EmptyStateType, { icon: ReactNode; mascot: MascotVariant; emoji: string }> = {
   'no-words': { icon: <Search className="w-full h-full" />, mascot: 'encouraging', emoji: '🔎' },
   'waiting-players': { icon: <Users className="w-full h-full" />, mascot: 'happy', emoji: '👋' },
@@ -47,6 +38,13 @@ const TYPE_CONFIG: Record<EmptyStateType, { icon: ReactNode; mascot: MascotVaria
   'no-results': { icon: <Trophy className="w-full h-full" />, mascot: 'thinking', emoji: '📊' },
   'error': { icon: null, mascot: 'oops', emoji: '😅' },
   'custom': { icon: null, mascot: 'happy', emoji: '✨' },
+};
+
+// Map size to mascot size
+const SIZE_TO_MASCOT: Record<'sm' | 'md' | 'lg', 'sm' | 'md' | 'lg'> = {
+  sm: 'sm',
+  md: 'md',
+  lg: 'lg',
 };
 
 /**
@@ -72,9 +70,9 @@ export const EmptyState = memo(function EmptyState({
   const actualIcon = icon || config.icon;
 
   const sizeClasses = {
-    sm: { container: 'p-4', mascot: 'w-16 h-16', icon: 'w-10 h-10', title: 'text-base', desc: 'text-xs' },
-    md: { container: 'p-6', mascot: 'w-24 h-24', icon: 'w-12 h-12', title: 'text-lg', desc: 'text-sm' },
-    lg: { container: 'p-8', mascot: 'w-32 h-32', icon: 'w-16 h-16', title: 'text-xl', desc: 'text-base' },
+    sm: { container: 'p-4', icon: 'w-10 h-10', title: 'text-base', desc: 'text-xs' },
+    md: { container: 'p-6', icon: 'w-12 h-12', title: 'text-lg', desc: 'text-sm' },
+    lg: { container: 'p-8', icon: 'w-16 h-16', title: 'text-xl', desc: 'text-base' },
   };
 
   const arrowRotation = {
@@ -84,7 +82,7 @@ export const EmptyState = memo(function EmptyState({
     down: 'rotate-90',
   };
 
-  // Animation variants
+  // Fallback float animation for icons/emoji
   const floatAnimation = prefersReducedMotion || !enableComplexAnimations
     ? {}
     : {
@@ -110,18 +108,13 @@ export const EmptyState = memo(function EmptyState({
     <div className={`text-center ${sizeClasses[size].container}`}>
       {/* Mascot or Icon */}
       {showMascot ? (
-        <motion.div
-          className={`${sizeClasses[size].mascot} mx-auto mb-4 relative`}
-          {...floatAnimation}
-        >
-          <Image
-            src={MASCOT_IMAGES[actualMascot]}
-            alt="Lexi mascot"
-            fill
-            className="object-contain"
-            priority={false}
+        <div className="flex justify-center mb-4">
+          <Mascot
+            variant={actualMascot}
+            size={SIZE_TO_MASCOT[size]}
+            animated={!prefersReducedMotion && enableComplexAnimations}
           />
-        </motion.div>
+        </div>
       ) : actualIcon ? (
         <motion.div
           className={`${sizeClasses[size].icon} mx-auto mb-4 text-neo-yellow`}
@@ -209,5 +202,8 @@ export const WaitingDots = memo(function WaitingDots({ color = 'neo-cyan' }: { c
     </span>
   );
 });
+
+// Re-export MascotVariant for convenience
+export type { MascotVariant };
 
 export default EmptyState;

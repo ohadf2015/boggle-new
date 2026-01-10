@@ -1,6 +1,6 @@
 ---
-allowed-tools: Read, Write, Edit, Grep, Glob, Bash(npm *), Bash(npx *), Bash(git *), mcp__sentry__*, mcp__notion__*, TodoWrite, Task, Skill
-description: Fetch Sentry errors, enrich with project context, fix bugs, and track in Notion
+allowed-tools: Read, Write, Edit, Grep, Glob, Bash(npm *), Bash(npx *), Bash(git *), mcp__sentry__*, mcp__notion__*, mcp__memory__*, mcp__github__*, TodoWrite, Task, Skill
+description: Fetch Sentry errors, enrich with project context, fix bugs, and track in Notion/GitHub
 ---
 
 # Sentry Bug Processor
@@ -248,9 +248,38 @@ mcp__sentry__add_issue_comment with issue_id: [id], comment: "Fixed in commit [h
 
 ---
 
+## Phase 7.5: GitHub Integration (Optional)
+
+### Create GitHub Issue for Complex Bugs
+For bugs requiring further investigation or team discussion:
+```
+mcp__github__create_issue(
+  title="bug: [error-type] in [component]",
+  body="## Sentry Error\n**Issue ID:** [sentry-id]\n**URL:** [sentry-url]\n\n## Error Details\n- Type: [type]\n- Occurrences: [count]\n- Affected Users: [count]\n\n## Stack Trace\n```\n[stack trace]\n```\n\n## Analysis\n[root cause analysis]\n\n## Proposed Fix\n[fix description]",
+  labels=["bug", "sentry"]
+)
+```
+
+### Link PR to Sentry Issue
+When creating a fix PR, reference the Sentry issue:
+```
+mcp__github__create_pull_request(
+  title="fix: [error-type] in [component]",
+  body="## Sentry Issue\nFixes errors tracked in [sentry-url]\n\n## Changes\n[description]\n\n## Test Plan\n[steps to verify]"
+)
+```
+
+### Check Existing Issues
+Before creating new issues, check for duplicates:
+```
+mcp__github__search_issues(query="[error-type] is:issue")
+```
+
+---
+
 ## Error Handling
 
-- If a Sentry error cannot be fixed, document the blocker in Notion
+- If a Sentry error cannot be fixed, document the blocker in Notion and create a GitHub issue
 - If stack trace points to external/node_modules code, document as "External dependency issue"
 - If Notion update fails, still report all test instructions in chat
 - If build/lint fails after a fix, revert and note the issue
@@ -277,3 +306,35 @@ mcp__sentry__add_issue_comment with issue_id: [id], comment: "Fixed in commit [h
 - `mcp__sentry__update_issue` - Change issue status (resolve, ignore)
 - `mcp__sentry__add_issue_comment` - Add comments to issues
 - `mcp__sentry__get_event` - Get specific error event details
+
+---
+
+## Memory Integration
+
+### Before Processing (Phase 1.5)
+Search for similar past Sentry errors and their fixes:
+```
+mcp__memory__memory_recall(query="sentry error [error-type] [affected-area]")
+```
+
+### After Each Fix (Phase 4.5)
+Store the error pattern and fix for future reference:
+```
+mcp__memory__memory_store(
+  content="Sentry fix: [error-title]. Error type: [type]. Root cause: [cause]. Solution: [solution]. File: [file:line].",
+  type="fact",
+  tags=["sentry", "bug-fix", "[error-type]", "[area]"],
+  importance=7
+)
+```
+
+### For Recurring Patterns
+If you notice a pattern of similar errors:
+```
+mcp__memory__memory_store(
+  content="Recurring error pattern: [pattern description]. Common causes: [causes]. Standard fix approach: [approach].",
+  type="fact",
+  tags=["sentry", "pattern", "[error-type]"],
+  importance=8
+)
+```

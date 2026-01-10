@@ -397,3 +397,64 @@ export function resetSessionSkills(): void {
   // For now, we accumulate across sessions for long-term tracking
   saveTrainingProgress(progress);
 }
+
+// ============================================
+// Daily Challenge Progress Tracking
+// ============================================
+
+const DAILY_CHALLENGE_STORAGE_KEY = 'lexiclash_daily_challenge_progress';
+
+interface DailyChallengeProgress {
+  challengesCompleted: number;
+  lastCompletedDate: string | null;
+}
+
+const DEFAULT_DAILY_PROGRESS: DailyChallengeProgress = {
+  challengesCompleted: 0,
+  lastCompletedDate: null,
+};
+
+/**
+ * Get the number of daily challenges the player has completed
+ */
+export function getDailyChallengesCompleted(): number {
+  if (typeof window === 'undefined') return 0;
+
+  try {
+    const stored = localStorage.getItem(DAILY_CHALLENGE_STORAGE_KEY);
+    if (!stored) return 0;
+    const parsed = JSON.parse(stored) as DailyChallengeProgress;
+    return parsed.challengesCompleted || 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * Check if player is a "new player" (completed fewer than threshold challenges)
+ */
+export function isNewDailyPlayer(threshold: number = 3): boolean {
+  return getDailyChallengesCompleted() < threshold;
+}
+
+/**
+ * Increment the daily challenges completed counter
+ * Called after a player finishes a daily challenge (win or lose)
+ */
+export function incrementDailyChallengesCompleted(): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    const stored = localStorage.getItem(DAILY_CHALLENGE_STORAGE_KEY);
+    const progress: DailyChallengeProgress = stored
+      ? { ...DEFAULT_DAILY_PROGRESS, ...JSON.parse(stored) }
+      : { ...DEFAULT_DAILY_PROGRESS };
+
+    progress.challengesCompleted++;
+    progress.lastCompletedDate = new Date().toISOString();
+
+    localStorage.setItem(DAILY_CHALLENGE_STORAGE_KEY, JSON.stringify(progress));
+  } catch {
+    // Silently fail if localStorage is unavailable
+  }
+}
