@@ -193,7 +193,11 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
           className="max-w-sm sm:max-w-md"
           onInteractOutside={(e) => {
             if (showAvatarPicker) {
-              e.preventDefault();
+              const target = e.target as HTMLElement;
+              const isClickInsideAvatarPicker = target.closest('[role="dialog"][aria-modal="true"]');
+              if (!isClickInsideAvatarPicker) {
+                e.preventDefault();
+              }
             }
           }}
         >
