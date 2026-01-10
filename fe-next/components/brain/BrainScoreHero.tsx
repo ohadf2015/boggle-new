@@ -48,7 +48,7 @@ export default function BrainScoreHero({
 
   return (
     <div className={cn(
-      'rounded-neo border-4 border-neo-black shadow-hard p-4 sm:p-6',
+      'rounded-neo border-4 border-neo-black shadow-hard p-4 sm:p-6 relative overflow-hidden texture-halftone-comic-dense',
       isDarkMode ? 'bg-slate-800' : 'bg-white'
     )}>
       {/* Main Score Display */}

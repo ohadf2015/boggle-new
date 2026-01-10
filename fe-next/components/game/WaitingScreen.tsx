@@ -338,7 +338,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                   hoverVariant="happy"
                   clickVariant="excited"
                   clickAnimation="bounce"
-                  tooltip={t('playerView.clickToWakeUp') || 'Click to wake up!'}
+                  tooltip={t('playerView.clickToWakeUp')}
                 />
               </motion.div>
 

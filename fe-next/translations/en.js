@@ -958,6 +958,7 @@ const en = {
     "exit": "Exit",
     "exitRoom": "Exit Room",
     "waitForGameStart": "Wait for game start",
+    "clickToWakeUp": "Tap to say hi!",
     "players": "Players",
     "yourAchievements": "Your Achievements",
     "letterGrid": "Letter Grid",

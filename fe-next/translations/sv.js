@@ -943,6 +943,7 @@ const sv = {
     "exit": "Avsluta",
     "exitRoom": "Lämna rummet",
     "waitForGameStart": "Vänta på att spelet startar",
+    "clickToWakeUp": "Tryck för att hälsa!",
     "players": "Spelare",
     "yourAchievements": "Dina prestationer",
     "letterGrid": "Bokstavsbräde",

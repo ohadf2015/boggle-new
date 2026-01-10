@@ -85,22 +85,34 @@ describe('InteractiveMascot', () => {
     it('renders mood variant with fallback image', () => {
       render(<InteractiveMascot variant="confused" />);
       const img = screen.getByRole('img');
-      // 'confused' falls back to 'thinking'
+      // 'confused' falls back to 'thinking' (mood variants still use fallbacks)
       expect(img).toHaveAttribute('src', '/mascot/lexi-thinking.png');
     });
 
-    it('renders activity variant with fallback image', () => {
+    it('renders activity variant with dedicated image', () => {
       render(<InteractiveMascot variant="eating_pizza" />);
       const img = screen.getByRole('img');
-      // 'eating_pizza' falls back to 'happy'
-      expect(img).toHaveAttribute('src', '/mascot/lexi-happy.png');
+      // Activity variants now have their own dedicated images
+      expect(img).toHaveAttribute('src', '/mascot/lexi-eating-pizza.png');
     });
 
-    it('renders gaming variant with fallback to excited', () => {
+    it('renders gaming variant with dedicated image', () => {
       render(<InteractiveMascot variant="gaming" />);
       const img = screen.getByRole('img');
-      // 'gaming' falls back to 'excited'
-      expect(img).toHaveAttribute('src', '/mascot/lexi-excited.png');
+      // Activity variants now have their own dedicated images
+      expect(img).toHaveAttribute('src', '/mascot/lexi-gaming.png');
+    });
+
+    it('renders training variant with dedicated image', () => {
+      render(<InteractiveMascot variant="training" />);
+      const img = screen.getByRole('img');
+      expect(img).toHaveAttribute('src', '/mascot/lexi-training.png');
+    });
+
+    it('renders dancing variant with dedicated image', () => {
+      render(<InteractiveMascot variant="dancing" />);
+      const img = screen.getByRole('img');
+      expect(img).toHaveAttribute('src', '/mascot/lexi-dancing.png');
     });
   });
 

@@ -943,6 +943,7 @@ const ja = {
     "exit": "退出",
     "exitRoom": "ルームを退出",
     "waitForGameStart": "ゲーム開始を待つ",
+    "clickToWakeUp": "タップで挨拶！",
     "players": "プレイヤー",
     "yourAchievements": "あなたの実績",
     "letterGrid": "文字グリッド",

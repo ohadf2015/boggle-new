@@ -940,6 +940,7 @@ const es = {
     "exit": "Salir",
     "exitRoom": "Salir de la sala",
     "waitForGameStart": "Espera que inicie el juego",
+    "clickToWakeUp": "¡Toca para saludar!",
     "players": "Jugadores",
     "yourAchievements": "Tus Logros",
     "letterGrid": "Tablero de Letras",

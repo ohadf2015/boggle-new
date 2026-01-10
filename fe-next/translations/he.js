@@ -953,6 +953,7 @@ const he = {
     "exit": "יציאה",
     "exitRoom": "יציאה מהחדר",
     "waitForGameStart": "המתן לתחילת המשחק",
+    "clickToWakeUp": "לחץ להגיד שלום! 👋",
     "players": "שחקנים",
     "yourAchievements": "ההישגים שלך",
     "letterGrid": "לוח האותיות",

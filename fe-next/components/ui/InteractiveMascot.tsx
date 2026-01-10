@@ -7,13 +7,13 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { MASCOT_IMAGES, MascotVariant } from './Mascot';
 
 /**
- * Mood-based variants (emotional states)
+ * Mood-based variants (emotional states) - these use fallback images
  */
 export type MoodVariant = 'confused' | 'proud' | 'nervous' | 'sad' | 'winking';
 
 /**
  * Activity-based variants (mascot doing things)
- * These show Lexi engaged in various activities
+ * These now have their own dedicated images
  */
 export type ActivityVariant =
   | 'eating_pizza'
@@ -27,50 +27,41 @@ export type ActivityVariant =
   | 'holding_trophy'
   | 'holding_sign'
   | 'typing'
-  | 'cheering';
+  | 'cheering'
+  | 'training';
 
 /**
  * Extended mascot variants including interaction states and activities
- * Falls back to existing images for new variants until assets are created
  */
 export type ExtendedMascotVariant = MascotVariant | MoodVariant | ActivityVariant;
 
 /**
- * Fallback mapping for new variants that don't have images yet
+ * Fallback mapping for mood variants that don't have dedicated images
  */
-const VARIANT_FALLBACKS: Record<ExtendedMascotVariant, MascotVariant> = {
-  // Base variants (1:1 mapping)
-  happy: 'happy',
-  encouraging: 'encouraging',
-  thinking: 'thinking',
-  oops: 'oops',
-  celebrating: 'celebrating',
-  victory: 'victory',
-  focused: 'focused',
-  surprised: 'surprised',
-  sleepy: 'sleepy',
-  excited: 'excited',
-  pointing: 'pointing',
-  // Mood variants with fallbacks
+const MOOD_FALLBACKS: Record<MoodVariant, MascotVariant> = {
   confused: 'thinking',
   proud: 'victory',
   nervous: 'oops',
   sad: 'sleepy',
   winking: 'happy',
-  // Activity variants with fallbacks
-  eating_pizza: 'happy',
-  drinking_coffee: 'thinking',
-  reading: 'focused',
-  gaming: 'excited',
-  dancing: 'celebrating',
-  sleeping: 'sleepy',
-  waving: 'happy',
-  thumbs_up: 'encouraging',
-  holding_trophy: 'victory',
-  holding_sign: 'pointing',
-  typing: 'focused',
-  cheering: 'celebrating',
 };
+
+/**
+ * Get the base MascotVariant for any ExtendedMascotVariant
+ * Most activity variants now have direct images
+ */
+function getBaseVariant(variant: ExtendedMascotVariant): MascotVariant {
+  // If it's a mood variant, use fallback
+  if (variant in MOOD_FALLBACKS) {
+    return MOOD_FALLBACKS[variant as MoodVariant];
+  }
+  // For holding_sign (no image yet), fallback to pointing
+  if (variant === 'holding_sign') {
+    return 'pointing';
+  }
+  // All other variants have direct images
+  return variant as MascotVariant;
+}
 
 /**
  * Default state transitions for interactions
@@ -107,6 +98,7 @@ const DEFAULT_HOVER_TRANSITIONS: Partial<Record<ExtendedMascotVariant, ExtendedM
   holding_sign: 'excited',
   typing: 'excited',
   cheering: 'victory',
+  training: 'excited',
 };
 
 const DEFAULT_CLICK_TRANSITIONS: Partial<Record<ExtendedMascotVariant, ExtendedMascotVariant>> = {
@@ -141,6 +133,7 @@ const DEFAULT_CLICK_TRANSITIONS: Partial<Record<ExtendedMascotVariant, ExtendedM
   holding_sign: 'celebrating',
   typing: 'victory',
   cheering: 'victory',
+  training: 'victory',
 };
 
 /**
@@ -231,20 +224,21 @@ interface InteractiveMascotProps {
 }
 
 /**
- * Get the actual image source for a variant, using fallbacks for new variants
+ * Get the actual image source for a variant
+ * Activity variants now have dedicated images, mood variants use fallbacks
  */
 function getImageSource(variant: ExtendedMascotVariant): string {
-  const baseVariant = VARIANT_FALLBACKS[variant];
+  const baseVariant = getBaseVariant(variant);
   return MASCOT_IMAGES[baseVariant];
 }
 
 /**
  * Get idle animation based on variant
+ * Activity variants have their own unique animations
  */
 function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
-  const baseVariant = VARIANT_FALLBACKS[variant];
-
   const animations: Record<MascotVariant, TargetAndTransition> = {
+    // Base emotional variants
     happy: {
       y: [0, -6, 0],
       rotate: [0, -2, 2, 0],
@@ -299,8 +293,96 @@ function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
       rotate: [0, 2, 0],
       transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
     },
+    // Activity variants - expressive animations matching each mood
+    eating_pizza: {
+      // Munching motion - happy satisfied eating
+      y: [0, -4, 0, -2, 0],
+      rotate: [0, -3, 3, -2, 2, 0],
+      scale: [1, 1.05, 0.98, 1.03, 1],
+      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+    },
+    drinking_coffee: {
+      // Cozy sipping - slow, relaxed, content
+      y: [0, -2, 0, -1, 0],
+      rotate: [0, 2, 0, -1, 0],
+      scale: [1, 1.02, 0.99, 1.01, 1],
+      transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
+    },
+    reading: {
+      // Absorbed in book - subtle focused movement
+      y: [0, -1, 0],
+      rotate: [0, 0.5, 0, -0.5, 0],
+      scale: [1, 1.01, 1],
+      transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+    },
+    gaming: {
+      // Intense gaming - quick reactive movements
+      x: [0, -3, 3, -2, 2, -1, 1, 0],
+      y: [0, -5, -2, -4, 0],
+      rotate: [0, -3, 3, -2, 0],
+      transition: { duration: 0.6, repeat: Infinity, ease: 'easeOut' },
+    },
+    dancing: {
+      // Groovy dance - rhythmic bouncy movement
+      y: [0, -12, 0, -8, 0, -10, 0],
+      rotate: [0, -10, 10, -8, 8, -5, 0],
+      scale: [1, 1.08, 0.95, 1.06, 0.97, 1.04, 1],
+      x: [0, 3, -3, 2, -2, 0],
+      transition: { duration: 1.2, repeat: Infinity, ease: 'easeInOut' },
+    },
+    sleeping: {
+      // Peaceful sleep - gentle breathing rhythm
+      y: [0, 3, 0, 2, 0],
+      scale: [1, 0.96, 1, 0.98, 1],
+      rotate: [0, 1, 0, -1, 0],
+      transition: { duration: 5, repeat: Infinity, ease: 'easeInOut' },
+    },
+    waving: {
+      // Friendly wave - energetic greeting
+      rotate: [0, -8, 8, -6, 6, -4, 4, 0],
+      y: [0, -5, -3, -5, -2, -4, 0],
+      scale: [1, 1.05, 1.02, 1.04, 1],
+      transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
+    },
+    thumbs_up: {
+      // Confident approval - proud bounce
+      y: [0, -8, 0, -4, 0],
+      scale: [1, 1.08, 1, 1.04, 1],
+      rotate: [0, -2, 2, 0],
+      transition: { duration: 1.8, repeat: Infinity, ease: 'easeOut' },
+    },
+    holding_trophy: {
+      // Victorious celebration - proud sway with trophy
+      y: [0, -10, 0, -6, 0],
+      rotate: [0, -4, 4, -2, 0],
+      scale: [1, 1.1, 1, 1.05, 1],
+      transition: { duration: 2, repeat: Infinity, ease: 'easeOut' },
+    },
+    typing: {
+      // Focused typing - subtle rapid movements
+      y: [0, -1, 0, -1, 0, -1, 0],
+      scale: [1, 1.01, 1, 1.01, 1],
+      x: [0, 0.5, -0.5, 0],
+      transition: { duration: 0.5, repeat: Infinity, ease: 'linear' },
+    },
+    cheering: {
+      // Enthusiastic cheer - high energy bouncing
+      y: [0, -18, 0, -12, 0, -8, 0],
+      rotate: [0, -8, 8, -6, 6, -3, 0],
+      scale: [1, 1.15, 1, 1.1, 1, 1.05, 1],
+      x: [0, -2, 2, -1, 1, 0],
+      transition: { duration: 1.4, repeat: Infinity, ease: 'easeOut' },
+    },
+    training: {
+      // Workout pump - powerful lifting motion
+      y: [0, -8, -2, -6, 0],
+      scale: [1, 1.12, 1.05, 1.1, 1],
+      rotate: [0, -2, 0, 2, 0],
+      transition: { duration: 1.2, repeat: Infinity, ease: 'easeInOut' },
+    },
   };
 
+  const baseVariant = getBaseVariant(variant);
   return animations[baseVariant];
 }
 
