@@ -101,11 +101,16 @@ export function useSurvivalHints({
     if (!targetWord || targetWord.length < 2) return;
 
     async function loadHints() {
-      const hints = await generateProgressiveHints(targetWord, language);
-      setCategory(hints.category);
-      setExampleSentence(hints.exampleSentence);
-      if (hints.hints.length > 0) {
-        setCurrentHint(hints.hints[0]);
+      try {
+        const hints = await generateProgressiveHints(targetWord, language);
+        setCategory(hints.category);
+        setExampleSentence(hints.exampleSentence);
+        if (hints.hints.length > 0) {
+          setCurrentHint(hints.hints[0]);
+        }
+      } catch (error) {
+        // Fallback to basic hints if AI fails
+        console.error('Failed to load hints:', error);
       }
     }
     loadHints();

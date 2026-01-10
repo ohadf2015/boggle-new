@@ -14,19 +14,43 @@ import { useSurvivalHints } from '../useSurvivalHints';
 import type { Language } from '@/types';
 
 // Mock the AI hint generator to avoid API calls
-jest.mock('@/utils/aiHintGenerator', () => ({
-  ...jest.requireActual('@/utils/aiHintGenerator'),
-  generateProgressiveHints: jest.fn().mockResolvedValue({
-    hints: [{ level: 1, hint: '_ _ _ _ _', unlockCost: 0 }],
-    category: 'Test Category',
-    exampleSentence: 'Test sentence with _____.',
-  }),
-  generateFallbackHints: jest.fn().mockReturnValue({
-    hints: [{ level: 1, hint: '_ _ _ _ _', unlockCost: 0 }],
-    category: 'Unknown',
-    exampleSentence: 'Test sentence.',
-  }),
-}));
+jest.mock('@/utils/aiHintGenerator', () => {
+  return {
+    CLUE_SHOP_ITEMS: [
+      {
+        id: 'reveal_letter',
+        name: 'Reveal Letter',
+        description: 'Reveal a random letter',
+        cost: 1,
+        icon: '💡',
+      },
+      {
+        id: 'reveal_category',
+        name: 'Reveal Category',
+        description: 'Show the word category',
+        cost: 2,
+        icon: '🏷️',
+      },
+      {
+        id: 'example_sentence',
+        name: 'Example Sentence',
+        description: 'See the word used in a sentence',
+        cost: 3,
+        icon: '📝',
+      },
+    ],
+    generateProgressiveHints: jest.fn().mockResolvedValue({
+      hints: [{ level: 1, hint: '_ _ _ _ _', unlockCost: 0 }],
+      category: 'Test Category',
+      exampleSentence: 'Test sentence with _____.',
+    }),
+    generateFallbackHints: jest.fn().mockReturnValue({
+      hints: [{ level: 1, hint: '_ _ _ _ _', unlockCost: 0 }],
+      category: 'Unknown',
+      exampleSentence: 'Test sentence.',
+    }),
+  };
+});
 
 // Mock word rarity to avoid complex calculations
 jest.mock('@/utils/dailyChallenge/wordRarity', () => ({
