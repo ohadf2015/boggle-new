@@ -513,7 +513,7 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
     resetForNewGame,
     resetUrgentMusicRef,
     generateNewTable,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }), [
     settings,
     runtime,
