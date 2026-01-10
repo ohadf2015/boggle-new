@@ -3798,6 +3798,7 @@ const en = {
       "timeLimit": "Time limit",
       "playAgain": "Play Again",
       "exit": "Exit",
+      "finishGame": "Finish Game",
       "points": "pts",
       "wpm": "WPM",
       "letters": "letters",

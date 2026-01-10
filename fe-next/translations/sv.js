@@ -3775,6 +3775,7 @@ const sv = {
       "timeSpent": "Tid",
       "playAgain": "Spela igen",
       "exit": "Avsluta",
+      "finishGame": "Avsluta Spel",
       "lightning-round": {
         "name": "Blixtrundan",
         "description": "Hitta ord så snabbt som möjligt"

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Shuffle, Trophy, RotateCcw } from 'lucide-react';
+import { Shuffle, Trophy, RotateCcw, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -206,6 +206,11 @@ export default function PatternSwitcher({
     }
   }, [phase, availableWords, requiredLength, patternIndex, pattern, lives, generatePattern, playErrorSound, t]);
 
+  // Finish game early (saves progress)
+  const finishGame = useCallback(() => {
+    setPhase('complete');
+  }, []);
+
   // Results
   const getResults = useCallback(() => {
     const timeSpent = startTimeRef.current
@@ -367,6 +372,20 @@ export default function PatternSwitcher({
                 />
               </>
             )}
+
+            {/* Finish Game Button */}
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={finishGame}
+              className={cn(
+                'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black',
+                'font-bold text-sm uppercase',
+                'transition-all hover:translate-y-[-1px]',
+                isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-200 text-neo-black'
+              )}
+            >
+              {t('brain.drills.finishGame') || 'Finish Game'}
+            </motion.button>
           </div>
         )}
 
@@ -376,29 +395,96 @@ export default function PatternSwitcher({
             animate={{ opacity: 1, scale: 1 }}
             className="text-center space-y-6"
           >
-            <Trophy className={cn(
-              'w-20 h-20 mx-auto',
-              patternsCompleted > 0 ? 'text-neo-yellow' : 'text-gray-400'
-            )} />
-            <h2 className={cn(
-              'text-2xl font-black',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
-            )}>
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', damping: 12, delay: 0.2 }}
+            >
+              <Trophy className={cn(
+                'w-20 h-20 mx-auto',
+                patternsCompleted > 0 ? 'text-neo-yellow' : 'text-gray-400'
+              )} />
+            </motion.div>
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className={cn(
+                'text-2xl font-black',
+                isDarkMode ? 'text-neo-white' : 'text-neo-black'
+              )}
+            >
               {lives > 0 ? t('brain.drills.complete') : t('brain.drills.gameOver')}
-            </h2>
-            <div className={cn(
-              'p-4 rounded-neo border-3 border-neo-black space-y-2',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
-            )}>
-              <p className="text-3xl font-black text-neo-cyan">{score} {t('brain.drills.points')}</p>
-              <p className={cn('text-sm', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
-                {t('brain.drills.patterns')}: {patternsCompleted}
-              </p>
-              <p className={cn('text-sm', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
-                {wordsFound.length} {t('brain.drills.wordsFound')}
-              </p>
-            </div>
-            <div className="flex gap-3 justify-center">
+            </motion.h2>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className={cn(
+                'p-4 rounded-neo border-3 border-neo-black space-y-3',
+                isDarkMode ? 'bg-slate-800' : 'bg-white'
+              )}
+            >
+              {/* Animated Score */}
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.7, type: 'spring' }}
+                className="text-3xl font-black text-neo-cyan"
+              >
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.8 }}
+                >
+                  {score}
+                </motion.span> {t('brain.drills.points')}
+              </motion.div>
+              
+              {/* Animated Stats Grid */}
+              <div className="grid grid-cols-2 gap-3 mt-4">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.9 }}
+                  className={cn(
+                    'p-3 rounded-neo border-2 border-neo-black',
+                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+                  )}
+                >
+                  <Shuffle className="w-6 h-6 mx-auto text-neo-cyan mb-1" />
+                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-white' : 'text-neo-black')}>
+                    {patternsCompleted}
+                  </p>
+                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
+                    {t('brain.drills.patterns')}
+                  </p>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 1 }}
+                  className={cn(
+                    'p-3 rounded-neo border-2 border-neo-black',
+                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+                  )}
+                >
+                  <Target className="w-6 h-6 mx-auto text-neo-green mb-1" />
+                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-white' : 'text-neo-black')}>
+                    {wordsFound.length}
+                  </p>
+                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
+                    {t('brain.drills.wordsFound')}
+                  </p>
+                </motion.div>
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2 }}
+              className="flex gap-3 justify-center"
+            >
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setPhase('ready')}
@@ -419,7 +505,7 @@ export default function PatternSwitcher({
                   {t('brain.drills.exit')}
                 </motion.button>
               )}
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </div>

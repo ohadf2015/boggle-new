@@ -3776,6 +3776,7 @@ const he = {
       "timeSpent": "זמן",
       "playAgain": "שחק שוב",
       "exit": "יציאה",
+      "finishGame": "סיים משחק",
       "lightning-round": {
         "name": "סיבוב ברק",
         "description": "מצא מילים הכי מהר שאפשר"

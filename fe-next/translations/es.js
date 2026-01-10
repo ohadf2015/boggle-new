@@ -3772,6 +3772,7 @@ const es = {
       "timeSpent": "Tiempo",
       "playAgain": "Jugar de Nuevo",
       "exit": "Salir",
+      "finishGame": "Terminar Juego",
       "lightning-round": {
         "name": "Ronda Relámpago",
         "description": "Encuentra palabras lo más rápido posible"

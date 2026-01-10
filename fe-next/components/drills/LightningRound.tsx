@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Clock, Trophy, RotateCcw } from 'lucide-react';
+import { Zap, Clock, Trophy, RotateCcw, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -66,10 +66,6 @@ export default function LightningRound({
   const [score, setScore] = useState(0);
   const [lastWordScore, setLastWordScore] = useState<number | null>(null);
   const [feedback, setFeedback] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
-  // Track highlighted cells for visual feedback
-  const [highlightedPath, setHighlightedPath] = useState<{ row: number; col: number }[]>([]);
-  // Track last path submitted by user to use it on successful word submission
-  const [lastSubmittedPath, setLastSubmittedPath] = useState<{ row: number; col: number }[]>([]);
   const startTimeRef = useRef<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -108,10 +104,10 @@ export default function LightningRound({
     }, 1000);
   }, [levelConfig.timeLimit]);
 
-  // Capture the path when user submits a word (called before onWordSubmit)
-  const handlePathSubmit = useCallback((cells: any[]) => {
-    // Convert SelectedCell to simplified path format
-    setLastSubmittedPath(cells.map(c => ({ row: c.row, col: c.col })));
+  // Finish game early (saves progress)
+  const finishGame = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    setPhase('complete');
   }, []);
 
   // Handle word submission
@@ -150,19 +146,12 @@ export default function LightningRound({
     setScore(prev => prev + wordScore);
     setLastWordScore(wordScore);
 
-    // Highlight the valid word on the board
-    if (lastSubmittedPath.length > 0) {
-      setHighlightedPath(lastSubmittedPath);
-      // Keep it highlighted briefly
-      setTimeout(() => setHighlightedPath([]), 1000);
-    }
-
     setFeedback({ message: `+${wordScore} ${t('brain.drills.points')}`, type: 'success' });
     setTimeout(() => {
       setLastWordScore(null);
       setFeedback(null);
     }, 1000);
-  }, [phase, availableWordSet, wordsFound, grid, language, t, playErrorSound, lastSubmittedPath]);
+  }, [phase, availableWordSet, wordsFound, grid, language, t, playErrorSound]);
 
   // Calculate results
   const getResults = useCallback(() => {
@@ -324,8 +313,7 @@ export default function LightningRound({
               grid={grid}
               interactive={true}
               onWordSubmit={handleWordSubmit}
-              onPathSubmit={handlePathSubmit}
-              highlightedPath={keyboard.isTypingMode ? keyboard.highlightedCells : highlightedPath}
+              highlightedPath={keyboard.isTypingMode ? keyboard.highlightedCells : []}
               language={language}
               className="w-full"
             />
@@ -401,6 +389,20 @@ export default function LightningRound({
                 />
               </>
             )}
+
+            {/* Finish Game Button */}
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={finishGame}
+              className={cn(
+                'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black',
+                'font-bold text-sm uppercase',
+                'transition-all hover:translate-y-[-1px]',
+                isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-200 text-neo-black'
+              )}
+            >
+              {t('brain.drills.finishGame') || 'Finish Game'}
+            </motion.button>
           </div>
         )}
 
@@ -411,37 +413,93 @@ export default function LightningRound({
             animate={{ opacity: 1, scale: 1 }}
             className="text-center space-y-6"
           >
-            <Trophy className="w-20 h-20 mx-auto text-neo-yellow" />
-            <h2 className={cn(
-              'text-2xl font-black',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
-            )}>
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', damping: 12, delay: 0.2 }}
+            >
+              <Trophy className="w-20 h-20 mx-auto text-neo-yellow" />
+            </motion.div>
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className={cn(
+                'text-2xl font-black',
+                isDarkMode ? 'text-neo-white' : 'text-neo-black'
+              )}
+            >
               {t('brain.drills.complete')}
-            </h2>
-            <div className={cn(
-              'p-4 rounded-neo border-3 border-neo-black space-y-2',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
-            )}>
-              <p className={cn(
-                'text-3xl font-black',
-                isDarkMode ? 'text-neo-yellow' : 'text-neo-yellow'
-              )}>
-                {score} {t('brain.drills.points')}
-              </p>
-              <p className={cn(
-                'text-sm',
-                isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
-              )}>
-                {wordsFound.length} {t('brain.drills.wordsFound')}
-              </p>
-              <p className={cn(
-                'text-sm font-bold',
-                isDarkMode ? 'text-neo-cyan' : 'text-neo-purple'
-              )}>
-                {getResults().wordsPerMinute} {t('brain.drills.wpm')}
-              </p>
-            </div>
-            <div className="flex gap-3 justify-center">
+            </motion.h2>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className={cn(
+                'p-4 rounded-neo border-3 border-neo-black space-y-3',
+                isDarkMode ? 'bg-slate-800' : 'bg-white'
+              )}
+            >
+              {/* Animated Score */}
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.7, type: 'spring' }}
+                className="text-3xl font-black text-neo-yellow"
+              >
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.8 }}
+                >
+                  {score}
+                </motion.span> {t('brain.drills.points')}
+              </motion.div>
+              
+              {/* Animated Stats Grid */}
+              <div className="grid grid-cols-2 gap-3 mt-4">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.9 }}
+                  className={cn(
+                    'p-3 rounded-neo border-2 border-neo-black',
+                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+                  )}
+                >
+                  <Target className="w-6 h-6 mx-auto text-neo-green mb-1" />
+                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-white' : 'text-neo-black')}>
+                    {wordsFound.length}
+                  </p>
+                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
+                    {t('brain.drills.wordsFound')}
+                  </p>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 1 }}
+                  className={cn(
+                    'p-3 rounded-neo border-2 border-neo-black',
+                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+                  )}
+                >
+                  <Zap className="w-6 h-6 mx-auto text-neo-yellow mb-1" />
+                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-cyan' : 'text-neo-purple')}>
+                    {getResults().wordsPerMinute}
+                  </p>
+                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
+                    {t('brain.drills.wpm')}
+                  </p>
+                </motion.div>
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2 }}
+              className="flex gap-3 justify-center"
+            >
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
