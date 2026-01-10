@@ -24,10 +24,12 @@ jest.mock('framer-motion', () => ({
 // Mock next/image
 jest.mock('next/image', () => ({
   __esModule: true,
-  // eslint-disable-next-line @next/next/no-img-element
-  default: ({ priority, ...props }: Record<string, unknown>) => (
-    <img {...props} data-priority={priority ? 'true' : 'false'} alt="" />
-  ),
+  default: ({ priority, ...props }: Record<string, unknown>) => {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img {...props} data-priority={priority ? 'true' : 'false'} alt="" />
+    );
+  },
 }));
 
 // Mock InteractiveMascot to avoid framer-motion deep mocking issues
