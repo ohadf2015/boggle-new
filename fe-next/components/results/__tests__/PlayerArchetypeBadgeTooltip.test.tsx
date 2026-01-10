@@ -32,9 +32,12 @@ jest.mock('framer-motion', () => ({
 
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: ({ alt, ...props }: { alt: string; [key: string]: unknown }) => (
-    <img alt={alt} {...props} />
-  ),
+  default: ({ alt, ...props }: { alt: string; [key: string]: unknown }) => {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img alt={alt} {...props} />
+    );
+  },
 }));
 
 // Mock createPortal to render inline for testing
