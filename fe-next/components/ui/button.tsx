@@ -63,7 +63,7 @@ const buttonVariants = cva(
       size: {
         // Consistent sizing with proper touch targets (48px minimum)
         default: "h-12 min-h-[48px] px-5 py-3 [&_svg]:w-5 [&_svg]:h-5",
-        sm: "h-10 min-h-[40px] px-4 py-2 text-xs [&_svg]:w-4 [&_svg]:h-4",
+        sm: "h-11 min-h-[44px] px-4 py-2 text-xs [&_svg]:w-4 [&_svg]:h-4",
         lg: "h-14 min-h-[56px] px-8 py-4 text-base [&_svg]:w-6 [&_svg]:h-6",
         // Desktop-optimized larger sizes
         xl: "h-16 min-h-[64px] px-10 py-5 text-lg [&_svg]:w-7 [&_svg]:h-7",

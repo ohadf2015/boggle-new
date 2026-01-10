@@ -31,7 +31,7 @@ const HeroMascot = memo(function HeroMascot() {
 
   return (
     <motion.div
-      className="relative w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 mx-auto mb-2"
+      className="relative w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 xl:w-32 xl:h-32 mx-auto mb-1"
       initial={{ scale: 0.8, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 200, damping: 15 }}
@@ -242,19 +242,19 @@ const LandingView: React.FC = () => {
 
       {/* Main content */}
       <main className={`w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 ${isLandscape ? 'flex-1 flex flex-col justify-center px-4 py-2' : 'px-2 sm:px-3 lg:px-6 xl:px-8 py-2 sm:py-3 lg:py-6 pb-40 lg:pb-6'}`}>
-        {/* Hero section with mascot - dramatic parallax effect */}
+        {/* Hero section with mascot - compact on desktop to maximize card space */}
         {!isLandscape && (
           <motion.div
-            className="text-center mb-2 sm:mb-3 lg:mb-6 xl:mb-8 animate-fade-in-fast relative z-10"
+            className="text-center mb-2 sm:mb-3 lg:mb-4 animate-fade-in-fast relative z-10"
             style={{
               transform: `translate(${mouseParallax.x * 1.2}px, ${mouseParallax.y * 1.2}px)`,
             }}
           >
-            {/* Mascot */}
+            {/* Mascot - smaller on desktop */}
             <HeroMascot />
 
             <motion.h1
-              className="text-xl sm:text-2xl md:text-3xl lg:text-5xl xl:text-6xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white mb-1 sm:mb-2 lg:mb-3"
+              className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white mb-1 sm:mb-1.5 lg:mb-2"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
@@ -262,7 +262,7 @@ const LandingView: React.FC = () => {
               {t('landing.chooseMode') || 'Choose Your Mode'}
             </motion.h1>
             <motion.p
-              className="text-sm sm:text-base lg:text-xl xl:text-2xl font-medium text-neo-black/80 dark:text-neo-white/85"
+              className="text-sm sm:text-base lg:text-lg xl:text-xl font-medium text-neo-black/80 dark:text-neo-white/85"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3 }}
@@ -298,14 +298,14 @@ const LandingView: React.FC = () => {
           </Suspense>
         </div>
 
-        {/* Mode cards grid - horizontal in landscape, balanced 2-column layout on desktop */}
+        {/* Mode cards grid - horizontal in landscape, 3-column layout on desktop for better space usage */}
         {/* Using CSS animation for instant paint without JS overhead */}
-        <div className={`w-full animate-fade-in-fast ${isLandscape ? 'flex gap-3 flex-1 min-h-0' : 'grid grid-cols-1 md:grid-cols-2 md:grid-rows-2 gap-2 sm:gap-3 lg:gap-4 xl:gap-5 md:min-h-[320px] lg:min-h-[420px] xl:min-h-[480px]'}`}>
+        <div className={`w-full animate-fade-in-fast ${isLandscape ? 'flex gap-3 flex-1 min-h-0' : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5'}`}>
           {/* Multiplayer Card - Featured (spans 2 rows on desktop, 50% width) */}
           {isLandscape ? (
             <Link
               href={`/${language}/multiplayer`}
-              className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-pink to-pink-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all min-h-[120px] max-h-[70vh] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy"
+              className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-pink to-pink-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all min-h-[120px] max-h-[70dvh] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy"
               aria-label={`${t('landing.multiplayer') || 'Multiplayer'} - ${t('landing.multiplayerDesc') || 'Compete with friends'}`}
             >
               <Users className="w-10 h-10 text-neo-black" aria-hidden="true" />
@@ -328,7 +328,6 @@ const LandingView: React.FC = () => {
                 roomsLabel: t('landing.openRooms') || 'open rooms',
                 playersLabel: t('landing.playersLive') || 'playing now',
               }}
-              className="md:row-span-2"
             />
           )}
 
@@ -336,7 +335,7 @@ const LandingView: React.FC = () => {
           {isLandscape ? (
             <Link
               href={`/${language}/singleplayer`}
-              className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-cyan to-cyan-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all min-h-[120px] max-h-[70vh] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy"
+              className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-cyan to-cyan-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all min-h-[120px] max-h-[70dvh] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy"
               aria-label={`${t('landing.singlePlayer') || 'Single Player'} - ${t('landing.singlePlayerDesc') || 'Practice at your own pace'}`}
             >
               <User className="w-10 h-10 text-neo-black" aria-hidden="true" />
