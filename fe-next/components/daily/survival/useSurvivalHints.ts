@@ -98,12 +98,28 @@ export function useSurvivalHints({
       hasShownRareWordHint.current = true;
       // Reveal first letter as a free hint for tricky words
       setRevealedLetters(new Set([0]));
-      // Advance stage since level 1 is essentially done
-      setHintStage(1);
-      // Show toast notification about the hint
-      showToast('valid-word', '💎 Here\'s a hint for this tricky word!');
+      // Note: hintStage update is handled by effect below
     }
-  }, [isRareWord, targetWord, showToast]);
+  }, [isRareWord, targetWord]);
+
+  // Determine hint availability based on state
+  const unrevealedCount = useMemo(() => {
+    if (!targetWord) return 0;
+    return targetWord.length - revealedLetters.size;
+  }, [targetWord, revealedLetters]);
+
+  // We can reveal letters until only 1 is left hidden
+  const canRevealLetter = unrevealedCount > 1;
+  const canRevealCategory = !showCategory;
+  const canRevealExample = !showExample;
+
+  // Sync hintStage with availability
+  useEffect(() => {
+    if (canRevealLetter) setHintStage(0);
+    else if (canRevealCategory) setHintStage(1);
+    else if (canRevealExample) setHintStage(2);
+    else setHintStage(3);
+  }, [canRevealLetter, canRevealCategory, canRevealExample]);
 
   // Load AI-enhanced hints asynchronously
   useEffect(() => {
@@ -125,25 +141,19 @@ export function useSurvivalHints({
     loadHints();
   }, [targetWord, language]);
   
-  // Determine next hint item based on stage
+  // Determine next hint item dynamically
   const nextHintItem = useMemo(() => {
-    // Stage 0: Reveal Letter
-    if (hintStage === 0) {
-      // Find 'reveal_letter' item
-      // We manually construct it if needed or find from array
-      return CLUE_SHOP_ITEMS.find(i => i.id === 'reveal_letter') || null;
+    if (canRevealLetter) {
+       return CLUE_SHOP_ITEMS.find(i => i.id === 'reveal_letter') || null;
     }
-    // Stage 1: Reveal Category
-    if (hintStage === 1) {
+    if (canRevealCategory) {
        return CLUE_SHOP_ITEMS.find(i => i.id === 'reveal_category') || null;
     }
-    // Stage 2: Example Sentence
-    if (hintStage === 2) {
+    if (canRevealExample) {
        return CLUE_SHOP_ITEMS.find(i => i.id === 'example_sentence') || null;
     }
-    
-    return null; // No more hints
-  }, [hintStage]);
+    return null;
+  }, [canRevealLetter, canRevealCategory, canRevealExample]);
 
   // Handle buying next hint
   const buyNextHint = useCallback((
@@ -162,20 +172,13 @@ export function useSurvivalHints({
     
     if (nextHintItem.id === 'reveal_letter') {
          const unrevealed = [...Array(targetWord.length).keys()].filter(i => !revealedLetters.has(i));
-        if (unrevealed.length > 0) { // Changed from > 1 to allow last letter if desired? 
-          // Logic said > 1 originally to keep 1 hidden. User says "level 1 clues (revealing a letter)".
-          // Assume revealing ANY random unrevealed letter is fine. 
-          // But original logic enforced keeping 1 hidden. I'll respect that if possible, or relax it.
-          // Let's relax it to > 0 for better UX if it's the "Level 1" hint.
-          // Actually, keeping 1 hidden prevents auto-solve.
-          if (unrevealed.length >= 1) {
+        // Keep 1 letter hidden logic
+        if (unrevealed.length > 1) { 
              const randomIdx = unrevealed[Math.floor(Math.random() * unrevealed.length)];
              setRevealedLetters(prev => new Set([...prev, randomIdx]));
              success = true;
-          } else {
-             // Already fully revealed?
+        } else {
              showToast('invalid-word', 'All letters revealed!');
-          }
         }
     } else if (nextHintItem.id === 'reveal_category') {
         setShowCategory(true);
@@ -188,7 +191,6 @@ export function useSurvivalHints({
     if (success) {
         setClueTokens(prev => prev - nextHintItem.cost);
         setTokensSpent(prev => prev + nextHintItem.cost);
-        setHintStage(prev => prev + 1);
         playWordAcceptedSound?.();
         
         // Show clearer feedback that coins were spent
@@ -196,6 +198,7 @@ export function useSurvivalHints({
     }
     
   }, [nextHintItem, targetWord, revealedLetters, playWordAcceptedSound, showToast, t]);
+
 
   // Auto-Unlock logic
   // "it should auto unlocked"
