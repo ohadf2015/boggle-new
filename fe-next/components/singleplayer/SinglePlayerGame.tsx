@@ -1756,105 +1756,121 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
       {/* Stats row - Combo | Timer | Score - matches multiplayer layout */}
       {/* In practice mode (no timer), score is centered and larger */}
-      <div ref={gameStatsRef} className="flex items-center justify-center gap-1 md:gap-4 flex-shrink-0" role="status" aria-label="Game status">
-        {/* Combo (left - shows when level >= 2, placeholder otherwise for layout balance) */}
-        {/* In practice mode, show empty placeholder to balance right-side combo for centering */}
-        {settings.mode !== 'practice' ? (
-          <div className="min-w-[50px] md:min-w-[90px] flex justify-end">
-            <ComboDisplay
-              comboLevel={combo.comboLevel}
-              compact
-              coinReward={comboCoinReward}
-              onCoinAnimationComplete={() => setComboCoinReward(null)}
-            />
+      <div ref={gameStatsRef} className="flex w-full items-center justify-between px-1 md:px-2 gap-0" role="status" aria-label="Game status">
+        {/* Left Side: Combo (Normal) or Placeholder (Practice) */}
+        <div className="flex-1 flex justify-end pr-2 md:pr-6 pointer-events-none">
+          <div className="pointer-events-auto">
+            {settings.mode !== 'practice' ? (
+              <ComboDisplay
+                comboLevel={combo.comboLevel}
+                compact
+                coinReward={comboCoinReward}
+                onCoinAnimationComplete={() => setComboCoinReward(null)}
+              />
+            ) : (
+              <div className="min-w-[50px] md:min-w-[90px]" aria-hidden="true" />
+            )}
           </div>
-        ) : (
-          <div className="min-w-[50px] md:min-w-[90px]" aria-hidden="true" />
-        )}
+        </div>
 
-        {/* Timer (center - always visible and prominent) */}
-        {settings.mode !== 'practice' && (
-          <AdaptiveMotion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="relative z-20"
-          >
-            <div className="hidden lg:block">
-              <CircularTimer
-                remainingTime={timer.remainingTime}
-                totalTime={settings.timerSeconds}
-                size="lg"
-              />
-            </div>
-            <div className="hidden md:block lg:hidden">
-              <CircularTimer
-                remainingTime={timer.remainingTime}
-                totalTime={settings.timerSeconds}
-                size="md"
-              />
-            </div>
-            <div className="md:hidden">
-              <CircularTimer
-                remainingTime={timer.remainingTime}
-                totalTime={settings.timerSeconds}
-                size="xs"
-              />
-            </div>
-          </AdaptiveMotion.div>
-        )}
-
-        {/* Score - vibrant yellow/lime gradient like multiplayer */}
-        {/* Centered in practice mode (no timer) - sized appropriately for small phones */}
-        <AdaptiveMotion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className={cn(
-            "relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg",
-            settings.mode === 'practice'
-              ? "px-4 sm:px-6 md:px-10 py-1.5 sm:py-2 md:py-4 min-w-[80px] sm:min-w-[120px] md:min-w-[180px]" // Responsive in practice mode
-              : "px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px]"
-          )}
-          style={{
-            background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
-          }}
-        >
-          <div className="text-center">
+        {/* Center: Timer (Normal) or Score (Practice) */}
+        <div className="flex items-center justify-center shrink-0">
+          {settings.mode !== 'practice' ? (
             <AdaptiveMotion.div
-              key={score}
-              initial={{ scale: 1.3 }}
-              animate={{ scale: 1 }}
-              className={cn(
-                "font-black text-neo-black leading-tight",
-                settings.mode === 'practice'
-                  ? "text-2xl sm:text-3xl md:text-4xl" // Smaller on small phones
-                  : "text-lg md:text-2xl"
-              )}
-              style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="relative z-20"
             >
-              {score}
+              <div className="hidden lg:block">
+                <CircularTimer
+                  remainingTime={timer.remainingTime}
+                  totalTime={settings.timerSeconds}
+                  size="lg"
+                />
+              </div>
+              <div className="hidden md:block lg:hidden">
+                <CircularTimer
+                  remainingTime={timer.remainingTime}
+                  totalTime={settings.timerSeconds}
+                  size="md"
+                />
+              </div>
+              <div className="md:hidden">
+                <CircularTimer
+                  remainingTime={timer.remainingTime}
+                  totalTime={settings.timerSeconds}
+                  size="xs"
+                />
+              </div>
             </AdaptiveMotion.div>
-            <div className={cn(
-              "font-bold uppercase tracking-wider text-neo-black/80",
-              settings.mode === 'practice'
-                ? "text-xs sm:text-sm md:text-base" // Smaller label on small phones
-                : "text-[9px] md:text-xs"
-            )}>
-              {t('common.score') || 'Score'}
-            </div>
-          </div>
-        </AdaptiveMotion.div>
+          ) : (
+            /* Score - Centered in practice mode */
+            <AdaptiveMotion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-4 sm:px-6 md:px-10 py-1.5 sm:py-2 md:py-4 min-w-[80px] sm:min-w-[120px] md:min-w-[180px]"
+              style={{
+                background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
+              }}
+            >
+              <div className="text-center">
+                <AdaptiveMotion.div
+                  key={score}
+                  initial={{ scale: 1.3 }}
+                  animate={{ scale: 1 }}
+                  className="font-black text-neo-black leading-tight text-2xl sm:text-3xl md:text-4xl"
+                  style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
+                >
+                  {score}
+                </AdaptiveMotion.div>
+                <div className="font-bold uppercase tracking-wider text-neo-black/80 text-xs sm:text-sm md:text-base">
+                  {t('common.score') || 'Score'}
+                </div>
+              </div>
+            </AdaptiveMotion.div>
+          )}
+        </div>
 
-        {/* Combo (right side in practice mode - shows when score is centered) */}
-        {settings.mode === 'practice' && (
-          <div className="min-w-[50px] md:min-w-[90px] flex justify-start">
-            <ComboDisplay
-              comboLevel={combo.comboLevel}
-              compact
-              coinReward={comboCoinReward}
-              onCoinAnimationComplete={() => setComboCoinReward(null)}
-            />
+        {/* Right Side: Score (Normal) or Combo (Practice) */}
+        <div className="flex-1 flex justify-start pl-2 md:pl-6 pointer-events-none">
+          <div className="pointer-events-auto">
+            {settings.mode !== 'practice' ? (
+              /* Score - Right side in normal mode */
+              <AdaptiveMotion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px]"
+                style={{
+                  background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
+                }}
+              >
+                <div className="text-center">
+                  <AdaptiveMotion.div
+                    key={score}
+                    initial={{ scale: 1.3 }}
+                    animate={{ scale: 1 }}
+                    className="font-black text-neo-black leading-tight text-lg md:text-2xl"
+                    style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
+                  >
+                    {score}
+                  </AdaptiveMotion.div>
+                  <div className="font-bold uppercase tracking-wider text-neo-black/80 text-[9px] md:text-xs">
+                    {t('common.score') || 'Score'}
+                  </div>
+                </div>
+              </AdaptiveMotion.div>
+            ) : (
+              <div className="min-w-[50px] md:min-w-[90px] flex justify-start">
+                <ComboDisplay
+                  comboLevel={combo.comboLevel}
+                  compact
+                  coinReward={comboCoinReward}
+                  onCoinAnimationComplete={() => setComboCoinReward(null)}
+                />
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
       {/* Word Forming Area with feedback - centered below timer (keep timer section clean) */}

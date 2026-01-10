@@ -39,6 +39,7 @@ const SKILL_CONFIGS: Record<TrainingSkillId, SkillConfig> = {
     icon: RotateCw,
     labelKey: 'training.unlock.directionChange',
     fallbackLabel: 'Direction changes unlocked!',
+    emoji: '🔄',
     color: 'text-pink-500',
     bgColor: 'bg-pink-500',
   },
