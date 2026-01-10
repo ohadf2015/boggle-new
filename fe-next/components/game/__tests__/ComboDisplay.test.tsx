@@ -24,7 +24,7 @@ jest.mock('framer-motion', () => ({
 // Mock next/image
 jest.mock('next/image', () => ({
   __esModule: true,
-  // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+  // eslint-disable-next-line @next/next/no-img-element
   default: ({ priority, ...props }: Record<string, unknown>) => (
     <img {...props} data-priority={priority ? 'true' : 'false'} alt="" />
   ),
