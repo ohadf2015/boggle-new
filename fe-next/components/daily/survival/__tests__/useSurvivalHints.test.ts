@@ -86,12 +86,10 @@ describe('useSurvivalHints', () => {
 
       // Reveal letters until only 1 is left (max reveal for 5-letter word is 4)
       // APPLE has 5 letters, can reveal up to 4
-      act(() => {
-        result.current[1].autoRevealLetter(); // 1st reveal
-        result.current[1].autoRevealLetter(); // 2nd reveal
-        result.current[1].autoRevealLetter(); // 3rd reveal
-        result.current[1].autoRevealLetter(); // 4th reveal (now maxed)
-      });
+      act(() => { result.current[1].autoRevealLetter(); });
+      act(() => { result.current[1].autoRevealLetter(); });
+      act(() => { result.current[1].autoRevealLetter(); });
+      act(() => { result.current[1].autoRevealLetter(); });
 
       // Now tier 1 should be exhausted
       // With 2 tokens, should return reveal_category
@@ -104,12 +102,10 @@ describe('useSurvivalHints', () => {
       const { result } = renderHook(() => useSurvivalHints(defaultProps));
 
       // Exhaust tier 1
-      act(() => {
-        result.current[1].autoRevealLetter();
-        result.current[1].autoRevealLetter();
-        result.current[1].autoRevealLetter();
-        result.current[1].autoRevealLetter();
-      });
+      act(() => { result.current[1].autoRevealLetter(); });
+      act(() => { result.current[1].autoRevealLetter(); });
+      act(() => { result.current[1].autoRevealLetter(); });
+      act(() => { result.current[1].autoRevealLetter(); });
 
       // With only 1 token, should return null (saving for tier 2)
       const nextClue = result.current[1].getNextAffordableClue(1);
@@ -120,12 +116,10 @@ describe('useSurvivalHints', () => {
       const { result } = renderHook(() => useSurvivalHints(defaultProps));
 
       // Exhaust tier 1
-      act(() => {
-        result.current[1].autoRevealLetter();
-        result.current[1].autoRevealLetter();
-        result.current[1].autoRevealLetter();
-        result.current[1].autoRevealLetter();
-      });
+      act(() => { result.current[1].autoRevealLetter(); });
+      act(() => { result.current[1].autoRevealLetter(); });
+      act(() => { result.current[1].autoRevealLetter(); });
+      act(() => { result.current[1].autoRevealLetter(); });
 
       // Exhaust tier 2
       act(() => {
@@ -142,17 +136,15 @@ describe('useSurvivalHints', () => {
       const { result } = renderHook(() => useSurvivalHints(defaultProps));
 
       // Exhaust all tiers
-      act(() => {
-        // Tier 1
-        result.current[1].autoRevealLetter();
-        result.current[1].autoRevealLetter();
-        result.current[1].autoRevealLetter();
-        result.current[1].autoRevealLetter();
-        // Tier 2
-        result.current[1].revealCategory();
-        // Tier 3
-        result.current[1].revealExample();
-      });
+      // Tier 1
+      act(() => { result.current[1].autoRevealLetter(); });
+      act(() => { result.current[1].autoRevealLetter(); });
+      act(() => { result.current[1].autoRevealLetter(); });
+      act(() => { result.current[1].autoRevealLetter(); });
+      // Tier 2
+      act(() => { result.current[1].revealCategory(); });
+      // Tier 3
+      act(() => { result.current[1].revealExample(); });
 
       // Should return null regardless of tokens
       expect(result.current[1].getNextAffordableClue(10)).toBeNull();
@@ -164,10 +156,8 @@ describe('useSurvivalHints', () => {
       );
 
       // CAT has 3 letters, can reveal up to 2
-      act(() => {
-        result.current[1].autoRevealLetter(); // 1st reveal
-        result.current[1].autoRevealLetter(); // 2nd reveal (now maxed)
-      });
+      act(() => { result.current[1].autoRevealLetter(); }); // 1st reveal
+      act(() => { result.current[1].autoRevealLetter(); }); // 2nd reveal (now maxed)
 
       // Tier 1 should be exhausted, move to tier 2
       const nextClue = result.current[1].getNextAffordableClue(2);
@@ -191,36 +181,34 @@ describe('useSurvivalHints', () => {
   });
 
   describe('autoRevealLetter', () => {
-    it('should return true and reveal a letter when possible', () => {
+    it('should return revealed index and reveal a letter when possible', () => {
       const { result } = renderHook(() => useSurvivalHints(defaultProps));
 
-      let revealed = false;
+      let revealed = -1;
       act(() => {
         revealed = result.current[1].autoRevealLetter();
       });
 
-      expect(revealed).toBe(true);
+      expect(revealed).toBeGreaterThanOrEqual(0);
       expect(result.current[0].revealedLetters.size).toBe(1);
     });
 
-    it('should return false when max letters are revealed', () => {
+    it('should return -1 when max letters are revealed', () => {
       const { result } = renderHook(() => useSurvivalHints(defaultProps));
 
       // Reveal 4 letters (max for 5-letter word)
-      act(() => {
-        result.current[1].autoRevealLetter();
-        result.current[1].autoRevealLetter();
-        result.current[1].autoRevealLetter();
-        result.current[1].autoRevealLetter();
-      });
+      act(() => { result.current[1].autoRevealLetter(); });
+      act(() => { result.current[1].autoRevealLetter(); });
+      act(() => { result.current[1].autoRevealLetter(); });
+      act(() => { result.current[1].autoRevealLetter(); });
 
       // 5th attempt should fail
-      let revealed = true;
+      let revealed = 0;
       act(() => {
         revealed = result.current[1].autoRevealLetter();
       });
 
-      expect(revealed).toBe(false);
+      expect(revealed).toBe(-1);
       expect(result.current[0].revealedLetters.size).toBe(4);
     });
   });
@@ -277,6 +265,8 @@ describe('useSurvivalHints', () => {
       // Third purchase (still tier 1)
       let clue3 = result.current[1].getNextAffordableClue(1);
       expect(clue3?.id).toBe('reveal_letter');
+
+      act(() => { result.current[1].autoRevealLetter(); });
 
       // After 3 reveals, still have room for 1 more
       expect(result.current[0].revealedLetters.size).toBe(3);

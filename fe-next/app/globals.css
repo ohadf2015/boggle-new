@@ -52,13 +52,13 @@
   --duration-quick: 150ms;
 
   /* Halftone Pattern (SVG-based) - white dots for dark backgrounds */
-  --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1.2' fill='%23FFFFFF' fill-opacity='0.06'/%3E%3C/svg%3E");
-  --halftone-pattern-lg: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='15' cy='15' r='2' fill='%23FFFFFF' fill-opacity='0.08'/%3E%3C/svg%3E");
+  --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1.5' fill='%23FFFFFF' fill-opacity='0.12'/%3E%3C/svg%3E");
+  --halftone-pattern-lg: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='15' cy='15' r='2.5' fill='%23FFFFFF' fill-opacity='0.12'/%3E%3C/svg%3E");
 
   /* Retro Grid Pattern for backgrounds */
   --retro-grid-pattern:
-    linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255,255,255,0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.08) 1px, transparent 1px);
 
   /* Semantic Color Mappings (Dark-only Neo-Brutalist) */
   --background: var(--neo-navy);
@@ -134,10 +134,10 @@
   --neo-gray: #f8fafc;
 
   /* Black dots for light mode backgrounds */
-  --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1.2' fill='%23000000' fill-opacity='0.05'/%3E%3C/svg%3E");
+  --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1.5' fill='%23000000' fill-opacity='0.08'/%3E%3C/svg%3E");
   --retro-grid-pattern:
-    linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px);
+    linear-gradient(to right, rgba(0,0,0,0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,0.08) 1px, transparent 1px);
 }
 
 /* Light mode body background */

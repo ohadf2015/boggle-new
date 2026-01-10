@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, memo, useCallback } from 'react';
+import React, { useState, memo, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
@@ -17,8 +17,69 @@ import type { WordChipProps } from './types';
  */
 const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   const { t } = useLanguage();
-  // State for mobile tooltip - shows on tap
-  const [showMobileTooltip, setShowMobileTooltip] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number; showAbove?: boolean; arrowOffset?: number } | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+  const chipRef = useRef<HTMLDivElement>(null);
+  const isTouchDevice = useRef(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Close tooltip when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent | TouchEvent) => {
+      if (chipRef.current && !chipRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen && isTouchDevice.current) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen && chipRef.current) {
+      const rect = chipRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
+      const tooltipEstimatedHeight = 120;
+      const tooltipEstimatedWidth = 256; // w-64 = 16rem = 256px
+
+      // Check if tooltip would go below viewport
+      const spaceBelow = viewportHeight - rect.bottom;
+      const showAbove = spaceBelow < tooltipEstimatedHeight + 20;
+
+      // Calculate horizontal position - center on chip by default
+      const chipCenter = rect.left + rect.width / 2;
+      let leftPos = chipCenter;
+
+      // Ensure tooltip doesn't overflow horizontally
+      // Leave 16px padding from viewport edges
+      const minLeft = tooltipEstimatedWidth / 2 + 16;
+      const maxLeft = viewportWidth - tooltipEstimatedWidth / 2 - 16;
+      leftPos = Math.max(minLeft, Math.min(maxLeft, leftPos));
+
+      // Calculate arrow offset when tooltip is clamped
+      const tooltipLeft = leftPos - tooltipEstimatedWidth / 2;
+      const arrowOffset = ((chipCenter - tooltipLeft) / tooltipEstimatedWidth) * 100;
+
+      setTooltipPosition({
+        top: showAbove ? rect.top - 8 : rect.bottom + 8,
+        left: leftPos,
+        showAbove,
+        arrowOffset,
+      });
+    } else if (!isOpen) {
+      setTooltipPosition(null);
+    }
+  }, [isOpen]);
 
   const isDuplicate = wordObj.isDuplicate;
   const isValid = wordObj.validated;
@@ -41,20 +102,29 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   // Check if this word should have a touchable tooltip
   const hasInvalidReason = !isValid && !isDuplicate && !isPending && displayReason;
 
-  // Handle touch/click for mobile tooltip
-  const handleTouchStart = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+  const handleTouchStart = () => {
+    isTouchDevice.current = true;
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
     if (hasInvalidReason) {
       e.preventDefault();
       e.stopPropagation();
-      setShowMobileTooltip(true);
+      setIsOpen(!isOpen);
     }
-  }, [hasInvalidReason]);
+  };
 
-  const handleCloseTooltip = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setShowMobileTooltip(false);
-  }, []);
+  const handleMouseEnter = () => {
+    if (!isTouchDevice.current && hasInvalidReason) {
+      setIsOpen(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (!isTouchDevice.current) {
+      setIsOpen(false);
+    }
+  };
 
   // Get color based on score - Neo-Brutalist solid colors
   const getBackgroundColor = (): string => {
@@ -78,198 +148,169 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
     return 'rgb(var(--neo-black))';
   };
 
-  // Render the word chip content
-  const chipContent = (
-    <span
-      className={cn(
-        // Increased padding for 48px minimum touch target to account for borders (WCAG 2.1 AA)
-        "inline-flex items-center gap-1.5 px-4 py-3 min-h-[48px] text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
-        isDuplicate && "line-through opacity-80",
-        !isDuplicate && !isValid && !isPending && "opacity-70",
-        isPending && "animate-pulse",
-        hasInvalidReason && "cursor-pointer active:scale-95"
-      )}
-      style={{
-        backgroundColor: getBackgroundColor(),
-        color: getTextColor(),
-      }}
-      onClick={handleTouchStart}
-      onTouchEnd={handleTouchStart}
-      role={hasInvalidReason ? "button" : undefined}
-      aria-label={hasInvalidReason ? `${displayWord}: ${displayReason}` : undefined}
-      tabIndex={hasInvalidReason ? 0 : undefined}
-    >
-      {label}
-      {/* Show info icon for invalid words with reason - indicates it's tappable */}
-      {hasInvalidReason && (
-        <span className="text-xs w-8 h-8 min-w-[44px] min-h-[44px] flex items-center justify-center bg-neo-cream/20 text-neo-black rounded border border-neo-cream/30 font-black">
-          ℹ️
-        </span>
-      )}
-      {/* Show combo bonus indicator */}
-      {comboBonus > 0 && !isDuplicate && isValid && (
-        <span className="text-xs px-1.5 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black">
-          +{comboBonus}
-        </span>
-      )}
-      {/* Show fire round bonus indicator */}
-      {(wordObj.fireRoundBonus ?? 0) > 0 && !isDuplicate && isValid && (
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="text-xs px-1.5 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded border border-neo-black font-black cursor-help">
-                🔥+{wordObj.fireRoundBonus}
-              </span>
-            </TooltipTrigger>
-            <TooltipContent
-              side="top"
-              className="bg-neo-red text-neo-cream border-2 border-neo-black shadow-hard rounded-neo p-2"
-            >
-              <p className="text-xs font-bold text-neo-black">
-                {t('results.fireRoundBonus') || 'Fire Round Bonus!'}
-                <span className="block text-neo-red mt-1 font-black">
-                  2x {t('results.points') || 'points'} (+{wordObj.fireRoundBonus})
-                </span>
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      )}
-      {/* Show pending validation indicator */}
-      {isPending && !isDuplicate && (
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="text-xs px-1.5 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black cursor-help">
-                ?
-              </span>
-            </TooltipTrigger>
-            <TooltipContent
-              side="top"
-              className="bg-neo-pink text-white border-2 border-neo-black shadow-hard rounded-neo p-2"
-            >
-              <p className="text-xs font-bold text-neo-cream">
-                {t('results.pendingValidation') || 'Pending community validation'}
-                {wordObj.potentialScore && (
-                  <span className="block text-neo-yellow mt-1">
-                    {t('results.potentialScore', { score: String(wordObj.potentialScore) }) || `+${wordObj.potentialScore} pts if approved`}
-                  </span>
-                )}
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      )}
-      {/* Show AI verification indicator with reason tooltip */}
-      {isAiVerified && isValid && !isDuplicate && (
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="text-xs px-1.5 py-0.5 bg-neo-pink text-neo-cream rounded border border-neo-black font-black cursor-help">
-                AI
-              </span>
-            </TooltipTrigger>
-            <TooltipContent
-              side="top"
-              className="bg-neo-pink text-white border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px]"
-            >
-              <p className="text-xs font-bold text-neo-cream">{t('results.aiVerified') || 'Verified by AI'}</p>
-              {aiReason && (
-                <p className="text-xs text-neo-yellow mt-1">{aiReason}</p>
-              )}
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      )}
-    </span>
-  );
+  const validationTooltipContent = (
+    <AnimatePresence>
+      {isOpen && isMounted && tooltipPosition && (
+        <motion.div
+          initial={{ opacity: 0, y: tooltipPosition.showAbove ? -5 : 5, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: tooltipPosition.showAbove ? -5 : 5, scale: 0.95 }}
+          transition={{ duration: 0.15 }}
+          className={cn(
+            'fixed z-[9999] -translate-x-1/2',
+            'w-56 sm:w-64 px-3 py-2.5 rounded-neo border-3 border-neo-black',
+            'bg-neo-red text-neo-cream shadow-hard-lg',
+            tooltipPosition.showAbove && '-translate-y-full'
+          )}
+          style={{
+            top: tooltipPosition.top,
+            left: tooltipPosition.left,
+          }}
+        >
+          {/* Arrow */}
+          {tooltipPosition.showAbove ? (
+            <div
+              className="absolute -bottom-2 -translate-x-1/2 w-3 h-3 rotate-45 bg-neo-red border-r-3 border-b-3 border-neo-black"
+              style={{ left: `${tooltipPosition.arrowOffset ?? 50}%` }}
+            />
+          ) : (
+            <div
+              className="absolute -top-2 -translate-x-1/2 w-3 h-3 rotate-45 bg-neo-red border-l-3 border-t-3 border-neo-black"
+              style={{ left: `${tooltipPosition.arrowOffset ?? 50}%` }}
+            />
+          )}
 
-  return (
-    <div className="relative group">
-      {/* Desktop: Show tooltip on hover for invalid words */}
-      {hasInvalidReason ? (
-        <TooltipProvider delayDuration={0}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              {chipContent}
-            </TooltipTrigger>
-            <TooltipContent
-              side="top"
-              className="bg-neo-red text-neo-cream border-3 border-neo-black shadow-hard p-3 max-w-[200px]"
-            >
-              {isAiVerified && (
-                <p className="font-black text-xs uppercase flex items-center gap-1.5 mb-1.5 text-neo-yellow">
+          {/* Header */}
+          <div className="flex items-center gap-2 mb-1.5 relative z-10">
+             {isAiVerified && (
+                <p className="font-black text-xs uppercase flex items-center gap-1.5 text-neo-yellow">
                   <span className="px-1.5 py-0.5 bg-neo-pink rounded border border-neo-black text-neo-cream">AI</span>
                   {t('results.aiRejected') || 'Rejected by AI'}
                 </p>
               )}
-              <p className="text-sm font-bold">{displayReason}</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      ) : (
-        chipContent
+          </div>
+
+          {/* Description */}
+          <p className="text-sm font-bold relative z-10">
+            {displayReason}
+          </p>
+        </motion.div>
       )}
+    </AnimatePresence>
+  );
 
-      {/* Mobile: Show tooltip popup when tapped */}
-      <AnimatePresence>
-        {showMobileTooltip && hasInvalidReason && (
-          <>
-            {/* Backdrop to close tooltip on tap outside */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[100] bg-black/20"
-              onClick={handleCloseTooltip}
-              onTouchEnd={handleCloseTooltip}
-            />
-            {/* Tooltip popup - positioned in viewport center on mobile */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.15 }}
-              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[101] w-[min(240px,calc(100vw-48px))]"
-            >
-              <div className="bg-neo-red border-3 border-neo-black shadow-hard-lg rounded-neo p-3 relative">
-                {/* Close button */}
-                <button
-                  onClick={handleCloseTooltip}
-                  onTouchEnd={handleCloseTooltip}
-                  className="absolute -top-2 -right-2 w-6 h-6 bg-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm"
-                  aria-label="Close"
-                >
-                  <X className="w-3 h-3 text-neo-black" />
-                </button>
-
-                {/* Word being explained */}
-                <p className="text-sm font-black text-neo-cream uppercase mb-2 border-b border-neo-cream/30 pb-1">
-                  &quot;{displayWord}&quot;
-                </p>
-
-                {/* AI rejection indicator */}
-                {isAiVerified && (
-                  <p className="text-[11px] font-bold text-neo-yellow mb-2 flex items-center gap-1">
-                    <span className="px-1.5 py-0.5 bg-neo-pink rounded border border-neo-black text-neo-cream">AI</span>
-                    {t('results.aiRejected') || 'Rejected by AI'}
-                  </p>
-                )}
-
-                {/* Reason */}
-                <p className="text-sm font-bold text-neo-cream leading-snug">
-                  {displayReason}
-                </p>
-
-                {/* Tap hint */}
-                <p className="text-[10px] text-neo-cream/75 mt-2 text-center">
-                  {t('results.tapToClose') || 'Tap anywhere to close'}
-                </p>
-              </div>
-            </motion.div>
-          </>
+  return (
+    <div
+      ref={chipRef}
+      className="relative group inline-block"
+      onClick={handleClick}
+      onTouchStart={handleTouchStart}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <span
+        className={cn(
+          // Increased padding for 48px minimum touch target to account for borders (WCAG 2.1 AA)
+          "inline-flex items-center gap-1.5 px-4 py-3 min-h-[48px] text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
+          isDuplicate && "line-through opacity-80",
+          !isDuplicate && !isValid && !isPending && "opacity-70",
+          isPending && "animate-pulse",
+          hasInvalidReason && "cursor-pointer active:scale-95"
         )}
-      </AnimatePresence>
+        style={{
+          backgroundColor: getBackgroundColor(),
+          color: getTextColor(),
+        }}
+        role={hasInvalidReason ? "button" : undefined}
+        aria-label={hasInvalidReason ? `${displayWord}: ${displayReason}` : undefined}
+        tabIndex={hasInvalidReason ? 0 : undefined}
+      >
+        {label}
+        {/* Show info icon for invalid words with reason - indicates it's tappable */}
+        {hasInvalidReason && (
+          <span className="text-xs w-8 h-8 min-w-[44px] min-h-[44px] flex items-center justify-center bg-neo-cream/20 text-neo-black rounded border border-neo-cream/30 font-black">
+            ℹ️
+          </span>
+        )}
+        {/* Show combo bonus indicator */}
+        {comboBonus > 0 && !isDuplicate && isValid && (
+          <span className="text-xs px-1.5 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black">
+            +{comboBonus}
+          </span>
+        )}
+        {/* Show fire round bonus indicator */}
+        {(wordObj.fireRoundBonus ?? 0) > 0 && !isDuplicate && isValid && (
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-xs px-1.5 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded border border-neo-black font-black cursor-help">
+                  🔥+{wordObj.fireRoundBonus}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent
+                side="top"
+                className="bg-neo-red text-neo-cream border-2 border-neo-black shadow-hard rounded-neo p-2"
+              >
+                <p className="text-xs font-bold text-neo-black">
+                  {t('results.fireRoundBonus') || 'Fire Round Bonus!'}
+                  <span className="block text-neo-red mt-1 font-black">
+                    2x {t('results.points') || 'points'} (+{wordObj.fireRoundBonus})
+                  </span>
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+        {/* Show pending validation indicator */}
+        {isPending && !isDuplicate && (
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-xs px-1.5 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black cursor-help">
+                  ?
+                </span>
+              </TooltipTrigger>
+              <TooltipContent
+                side="top"
+                className="bg-neo-pink text-white border-2 border-neo-black shadow-hard rounded-neo p-2"
+              >
+                <p className="text-xs font-bold text-neo-cream">
+                  {t('results.pendingValidation') || 'Pending community validation'}
+                  {wordObj.potentialScore && (
+                    <span className="block text-neo-yellow mt-1">
+                      {t('results.potentialScore', { score: String(wordObj.potentialScore) }) || `+${wordObj.potentialScore} pts if approved`}
+                    </span>
+                  )}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+        {/* Show AI verification indicator with reason tooltip */}
+        {isAiVerified && isValid && !isDuplicate && (
+          <TooltipProvider delayDuration={0}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-xs px-1.5 py-0.5 bg-neo-pink text-neo-cream rounded border border-neo-black font-black cursor-help">
+                  AI
+                </span>
+              </TooltipTrigger>
+              <TooltipContent
+                side="top"
+                className="bg-neo-pink text-white border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px]"
+              >
+                <p className="text-xs font-bold text-neo-cream">{t('results.aiVerified') || 'Verified by AI'}</p>
+                {aiReason && (
+                  <p className="text-xs text-neo-yellow mt-1">{aiReason}</p>
+                )}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </span>
+
+      {/* Tooltip rendered via portal */}
+      {isOpen && isMounted && createPortal(validationTooltipContent, document.body)}
 
       {isDuplicate && playerCount > 1 && (
         <span className="absolute -top-2 end-[-8px] bg-neo-black text-neo-cream text-[10px] px-1.5 py-0.5 min-w-[18px] h-[18px] flex items-center justify-center font-black border-2 border-neo-black rounded-neo">

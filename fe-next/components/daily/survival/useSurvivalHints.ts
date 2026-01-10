@@ -166,22 +166,30 @@ export function useSurvivalHints({
 
     for (const itemId of priorityOrder) {
       const item = CLUE_SHOP_ITEMS.find(i => i.id === itemId);
-      if (!item || clueTokens < item.cost) continue;
+      if (!item) continue;
 
       // Check if this clue type is still available
+      let isAvailable = false;
       switch (itemId) {
         case 'reveal_letter': {
           // Can reveal if there are at least 2 unrevealed letters
           const unrevealed = [...Array(targetWord.length).keys()].filter(i => !revealedLetters.has(i));
-          if (unrevealed.length > 1) return item;
+          isAvailable = unrevealed.length > 1;
           break;
         }
         case 'reveal_category':
-          if (!showCategory) return item;
+          isAvailable = !showCategory;
           break;
         case 'example_sentence':
-          if (!showExample) return item;
+          isAvailable = !showExample;
           break;
+      }
+
+      if (isAvailable) {
+        if (clueTokens >= item.cost) {
+          return item;
+        }
+        return null;
       }
     }
     return null;
