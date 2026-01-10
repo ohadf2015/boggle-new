@@ -525,7 +525,7 @@ export default function LightningRound({
                   {t('brain.drills.exit')}
                 </motion.button>
               )}
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </div>
