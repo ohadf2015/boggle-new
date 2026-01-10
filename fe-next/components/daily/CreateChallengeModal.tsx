@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Copy, Check, Share2, Crown, Grid3X3, Grid2X2 } from 'lucide-react';
+import { X, Copy, Check, Share2, Crown, Grid3X3, Grid2X2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { generateRandomTable } from '@/utils/utils';
 import { buildPuzzleShareUrl } from '@/utils/customPuzzle';

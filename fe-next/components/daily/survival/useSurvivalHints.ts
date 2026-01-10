@@ -208,7 +208,7 @@ export function useSurvivalHints({
     // However, clueTokens is state in useSurvivalGameLogic, passed down.
     // If we want auto-unlock logic inside this hook, we need clueTokens as prop.
     // Or, we expose a check function that useSurvivalGameLogic calls in an effect.
-  }, []); // Placeholder comment logic
+  }, [nextHintItem]); // Placeholder comment logic
   
   // ... re-adding autoRevealLetter etc for internal use if needed
   
