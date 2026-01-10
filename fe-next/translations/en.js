@@ -177,7 +177,8 @@ const en = {
     "all": "All",
     "validating": "Checking...",
     "later": "Later",
-    "skip": "Skip"
+    "skip": "Skip",
+    "done": "Done"
   },
   "connection": {
     "reconnecting": "Reconnecting...",
@@ -3132,6 +3133,9 @@ const en = {
     },
     "leaderboard": "Ranks",
     "screenshotProtection": "Return to continue playing",
+    "clueUnlocked": "Clue unlocked!",
+    "categoryUnlocked": "Category revealed!",
+    "exampleUnlocked": "Example unlocked!",
     "trainingSuggestion": {
       "title": "New to LexiClash?",
       "subtitle": "Try a quick training game first to learn the mechanics!",
@@ -3213,6 +3217,7 @@ const en = {
       "pts": "pts"
     },
     "survival": {
+      "tokens": "Tokens",
       "lifePoints": "Life",
       "lifeRemaining": "{points} Life",
       "lifeDraining": "Life draining...",
@@ -3889,6 +3894,30 @@ const en = {
   "levelUp": {
     "title": "Level Up!",
     "reached": "You reached level {level}!"
+  },
+  "customPuzzle": {
+    "title": "Custom Puzzle",
+    "description": "Can you solve this custom word puzzle?",
+    "createTitle": "Create Your Own Puzzle",
+    "createYourOwn": "Create Your Own Puzzle",
+    "selectWord": "Select a target word for your puzzle:",
+    "generating": "Generating puzzle...",
+    "loading": "Loading puzzle...",
+    "created": "Puzzle Created!",
+    "shareWithFriends": "Share with friends to challenge them!",
+    "yourScore": "Your Score to Beat",
+    "share": "Share Puzzle",
+    "shareText": "I created a custom word puzzle. Can you beat my score?",
+    "createdBy": "Created by {name}",
+    "creatorScore": "Creator's Score",
+    "solvedIn": "Solved in {attempts} attempts",
+    "challengeDescription": "Find the hidden word before time runs out. Can you beat the creator?",
+    "play": "Play Challenge",
+    "solved": "You solved it!",
+    "failed": "Better luck next time!",
+    "beatCreator": "You beat the creator!",
+    "leaderboard": "Leaderboard",
+    "playDaily": "Play Daily Challenge"
   },
   "ui": {
     "empty": {

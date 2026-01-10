@@ -176,7 +176,8 @@ const he = {
     "invalid": "לא תקין",
     "validating": "בודק...",
     "later": "אחר כך",
-    "skip": "דלג"
+    "skip": "דלג",
+    "done": "סיום"
   },
   "connection": {
     "reconnecting": "מתחבר מחדש...",
@@ -3127,6 +3128,9 @@ const he = {
     },
     "leaderboard": "דירוג",
     "screenshotProtection": "חזרו כדי להמשיך לשחק",
+    "clueUnlocked": "רמז נפתח!",
+    "categoryUnlocked": "קטגוריה נחשפה!",
+    "exampleUnlocked": "דוגמה נפתחה!",
     "trainingSuggestion": {
       "title": "חדשים ב-LexiClash?",
       "subtitle": "נסו משחק אימון קצר כדי ללמוד את המכניקה!",
@@ -3208,6 +3212,7 @@ const he = {
       "pts": "נק׳"
     },
     "survival": {
+      "tokens": "אסימונים",
       "lifePoints": "חיים",
       "lifeRemaining": "{points} חיים",
       "lifeDraining": "החיים מתרוקנים...",
@@ -3868,6 +3873,30 @@ const he = {
   "levelUp": {
     "title": "עלית רמה!",
     "reached": "הגעת לרמה {level}!"
+  },
+  "customPuzzle": {
+    "title": "פאזל מותאם אישית",
+    "description": "האם תוכלו לפתור את פאזל המילים הזה?",
+    "createTitle": "צרו פאזל משלכם",
+    "createYourOwn": "צרו פאזל משלכם",
+    "selectWord": "בחרו מילת יעד לפאזל:",
+    "generating": "מייצר פאזל...",
+    "loading": "טוען פאזל...",
+    "created": "הפאזל נוצר!",
+    "shareWithFriends": "שתפו עם חברים כדי לאתגר אותם!",
+    "yourScore": "הניקוד שלכם לניצחון",
+    "share": "שתפו פאזל",
+    "shareText": "יצרתי פאזל מילים מותאם אישית. תוכלו לנצח אותי?",
+    "createdBy": "נוצר על ידי {name}",
+    "creatorScore": "ניקוד היוצר",
+    "solvedIn": "נפתר ב-{attempts} ניסיונות",
+    "challengeDescription": "מצאו את המילה הנסתרת לפני שהזמן נגמר. תוכלו לנצח את היוצר?",
+    "play": "שחקו באתגר",
+    "solved": "פתרתם אותו!",
+    "failed": "בפעם הבאה יהיה יותר טוב!",
+    "beatCreator": "ניצחתם את היוצר!",
+    "leaderboard": "טבלת מובילים",
+    "playDaily": "שחקו באתגר היומי"
   },
   "ui": {
     "empty": {

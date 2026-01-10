@@ -176,7 +176,8 @@ const es = {
     "invalid": "Inválido",
     "validating": "Verificando...",
     "later": "Después",
-    "skip": "Omitir"
+    "skip": "Omitir",
+    "done": "Listo"
   },
   "connection": {
     "reconnecting": "Reconectando...",
@@ -3123,6 +3124,9 @@ const es = {
     },
     "leaderboard": "Ranking",
     "screenshotProtection": "Regresa para continuar jugando",
+    "clueUnlocked": "¡Pista desbloqueada!",
+    "categoryUnlocked": "¡Categoría revelada!",
+    "exampleUnlocked": "¡Ejemplo desbloqueado!",
     "trainingSuggestion": {
       "title": "¿Nuevo en LexiClash?",
       "subtitle": "¡Prueba un juego de práctica para aprender la mecánica!",
@@ -3204,6 +3208,7 @@ const es = {
       "pts": "pts"
     },
     "survival": {
+      "tokens": "Tokens",
       "lifePoints": "Vida",
       "lifeRemaining": "{points} Vida",
       "lifeDraining": "La vida se agota...",
@@ -3864,6 +3869,30 @@ const es = {
   "levelUp": {
     "title": "¡Subiste de Nivel!",
     "reached": "¡Llegaste al nivel {level}!"
+  },
+  "customPuzzle": {
+    "title": "Puzzle Personalizado",
+    "description": "¿Puedes resolver este puzzle de palabras?",
+    "createTitle": "Crea Tu Propio Puzzle",
+    "createYourOwn": "Crea Tu Propio Puzzle",
+    "selectWord": "Selecciona una palabra objetivo para tu puzzle:",
+    "generating": "Generando puzzle...",
+    "loading": "Cargando puzzle...",
+    "created": "¡Puzzle Creado!",
+    "shareWithFriends": "¡Comparte con amigos para retarlos!",
+    "yourScore": "Tu Puntuación a Superar",
+    "share": "Compartir Puzzle",
+    "shareText": "Creé un puzzle de palabras personalizado. ¿Puedes superar mi puntuación?",
+    "createdBy": "Creado por {name}",
+    "creatorScore": "Puntuación del Creador",
+    "solvedIn": "Resuelto en {attempts} intentos",
+    "challengeDescription": "Encuentra la palabra oculta antes de que se acabe el tiempo. ¿Puedes vencer al creador?",
+    "play": "Jugar Desafío",
+    "solved": "¡Lo resolviste!",
+    "failed": "¡Mejor suerte la próxima vez!",
+    "beatCreator": "¡Venciste al creador!",
+    "leaderboard": "Clasificación",
+    "playDaily": "Jugar Desafío Diario"
   },
   "ui": {
     "empty": {

@@ -92,7 +92,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
   const styles = variantStyles[variant];
 
   return (
-    <Link href={href} className={cn('block w-full h-full group', className)}>
+    <Link href={href} className={cn('block w-full h-full group focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy rounded-neo-lg', className)}>
       <div
         ref={ref}
         className={cn(
@@ -154,10 +154,10 @@ const ModeCard: React.FC<ModeCardProps> = ({
             {title}
           </h2>
 
-          {/* Arrow indicator - min 44x44px touch target on mobile */}
+          {/* Arrow indicator - min 44x44px touch target for WCAG compliance */}
           <div
             className={cn(
-              'min-w-[40px] min-h-[40px]',
+              'min-w-[44px] min-h-[44px]',
               'rounded-full border-2 border-neo-black',
               'flex items-center justify-center shrink-0',
               'transition-transform duration-200 ease-out',
@@ -165,8 +165,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
               styles.arrow
             )}
             style={{
-              width: 'clamp(2.25rem, 8cqw, 3.25rem)',
-              height: 'clamp(2.25rem, 8cqw, 3.25rem)',
+              width: 'clamp(2.75rem, 8cqw, 3.25rem)',
+              height: 'clamp(2.75rem, 8cqw, 3.25rem)',
             }}
           >
             <ArrowIcon style={{ fontSize: 'clamp(0.75rem, 3.5cqw, 1rem)' }} />

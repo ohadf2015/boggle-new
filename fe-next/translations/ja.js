@@ -176,7 +176,8 @@ const ja = {
     "invalid": "無効",
     "validating": "確認中...",
     "later": "後で",
-    "skip": "スキップ"
+    "skip": "スキップ",
+    "done": "完了"
   },
   "connection": {
     "reconnecting": "再接続中...",
@@ -3125,6 +3126,9 @@ const ja = {
     },
     "leaderboard": "ランキング",
     "screenshotProtection": "続けるには戻ってください",
+    "clueUnlocked": "ヒントが解放されました！",
+    "categoryUnlocked": "カテゴリが明らかに！",
+    "exampleUnlocked": "例が解放されました！",
     "trainingSuggestion": {
       "title": "LexiClashは初めてですか?",
       "subtitle": "まずは練習ゲームで操作を覚えましょう！",
@@ -3206,6 +3210,7 @@ const ja = {
       "pts": "点"
     },
     "survival": {
+      "tokens": "トークン",
       "lifePoints": "ライフ",
       "lifeRemaining": "{points} ライフ",
       "lifeDraining": "ライフが減っています...",
@@ -3866,6 +3871,30 @@ const ja = {
   "levelUp": {
     "title": "レベルアップ!",
     "reached": "レベル{level}に到達!"
+  },
+  "customPuzzle": {
+    "title": "カスタムパズル",
+    "description": "この単語パズルを解けますか?",
+    "createTitle": "オリジナルパズルを作成",
+    "createYourOwn": "オリジナルパズルを作成",
+    "selectWord": "パズルのターゲット単語を選択:",
+    "generating": "パズルを生成中...",
+    "loading": "パズルを読み込み中...",
+    "created": "パズル完成!",
+    "shareWithFriends": "友達と共有してチャレンジしよう!",
+    "yourScore": "あなたのスコア目標",
+    "share": "パズルを共有",
+    "shareText": "カスタム単語パズルを作りました。私のスコアを超えられる?",
+    "createdBy": "{name}が作成",
+    "creatorScore": "作成者のスコア",
+    "solvedIn": "{attempts}回で解決",
+    "challengeDescription": "時間切れ前に隠された単語を見つけよう。作成者に勝てる?",
+    "play": "チャレンジをプレイ",
+    "solved": "解けました!",
+    "failed": "次は頑張ろう!",
+    "beatCreator": "作成者に勝った!",
+    "leaderboard": "リーダーボード",
+    "playDaily": "デイリーチャレンジをプレイ"
   },
   "ui": {
     "empty": {

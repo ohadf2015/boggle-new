@@ -6,8 +6,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Sparkles, Star, Zap, Heart } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Sparkles, Star, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,177 +17,11 @@ import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useMouseParallax } from '@/hooks/useTiltEffect';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
+import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 import ModeCard from './ModeCard';
 import TutorialPrompt from './TutorialPrompt';
 import Header from '@/components/Header';
 import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
-
-/**
- * Parallax background layers - creates depth with scroll
- */
-const ParallaxBackground = memo(function ParallaxBackground() {
-  const { scrollY } = useScroll();
-  const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
-
-  // Parallax transforms for different layers
-  const y1 = useTransform(scrollY, [0, 500], [0, 150]);
-  const y2 = useTransform(scrollY, [0, 500], [0, 100]);
-  const y3 = useTransform(scrollY, [0, 500], [0, 50]);
-  const rotate1 = useTransform(scrollY, [0, 500], [0, 15]);
-  const rotate2 = useTransform(scrollY, [0, 500], [0, -10]);
-
-  if (prefersReducedMotion || !enableComplexAnimations) return null;
-
-  return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0" aria-hidden="true">
-      {/* Grid pattern background */}
-      <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `url('/textures/retro-grid.png')`,
-          backgroundSize: '200px 200px',
-          backgroundRepeat: 'repeat',
-        }}
-      />
-
-      {/* Gradient orbs - parallax layer 1 (slowest) */}
-      <motion.div
-        className="absolute -top-20 -left-20 w-96 h-96 rounded-full bg-neo-pink/20 blur-3xl"
-        style={{ y: y1, rotate: rotate1 }}
-      />
-      <motion.div
-        className="absolute top-1/3 -right-32 w-80 h-80 rounded-full bg-neo-cyan/15 blur-3xl"
-        style={{ y: y2, rotate: rotate2 }}
-      />
-      <motion.div
-        className="absolute bottom-20 left-1/4 w-64 h-64 rounded-full bg-neo-yellow/10 blur-3xl"
-        style={{ y: y3 }}
-      />
-
-      {/* Halftone pattern overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.02] mix-blend-overlay"
-        style={{
-          backgroundImage: `url('/textures/halftone-pattern.png')`,
-          backgroundSize: '300px 300px',
-        }}
-      />
-    </div>
-  );
-});
-
-/**
- * Floating decorative elements - MORE VISIBLE VERSION
- * Performance-gated - only renders on capable devices
- */
-const FloatingDecorations = memo(function FloatingDecorations() {
-  const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
-  const mouseParallax = useMouseParallax(30);
-
-  if (prefersReducedMotion || !enableComplexAnimations) return null;
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none z-10" aria-hidden="true">
-      {/* Large floating stars - HIGH VISIBILITY */}
-      <motion.div
-        className="absolute top-[10%] left-[5%] text-neo-yellow drop-shadow-[0_0_10px_rgba(255,225,53,0.5)]"
-        animate={{
-          y: [0, -20, 0],
-          rotate: [0, 15, 0],
-          scale: [1, 1.1, 1]
-        }}
-        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-        style={{ x: mouseParallax.x * 0.5, y: mouseParallax.y * 0.5 }}
-      >
-        <Star className="w-10 h-10 fill-current" />
-      </motion.div>
-
-      <motion.div
-        className="absolute top-[20%] right-[10%] text-neo-pink drop-shadow-[0_0_10px_rgba(255,107,158,0.5)]"
-        animate={{
-          y: [0, -15, 0],
-          rotate: [0, -20, 0],
-          scale: [1, 1.15, 1]
-        }}
-        transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-        style={{ x: mouseParallax.x * -0.3, y: mouseParallax.y * -0.3 }}
-      >
-        <Sparkles className="w-8 h-8" />
-      </motion.div>
-
-      <motion.div
-        className="absolute top-[35%] left-[3%] text-neo-cyan drop-shadow-[0_0_8px_rgba(0,245,255,0.5)]"
-        animate={{
-          y: [0, -25, 0],
-          rotate: [0, 25, 0]
-        }}
-        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-        style={{ x: mouseParallax.x * 0.7, y: mouseParallax.y * 0.7 }}
-      >
-        <Zap className="w-7 h-7 fill-current" />
-      </motion.div>
-
-      <motion.div
-        className="absolute top-[50%] right-[5%] text-neo-yellow drop-shadow-[0_0_8px_rgba(255,225,53,0.4)]"
-        animate={{
-          y: [0, -12, 0],
-          scale: [1, 1.2, 1]
-        }}
-        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
-        style={{ x: mouseParallax.x * -0.6, y: mouseParallax.y * -0.6 }}
-      >
-        <Star className="w-6 h-6 fill-current" />
-      </motion.div>
-
-      <motion.div
-        className="absolute bottom-[35%] left-[8%] text-neo-pink drop-shadow-[0_0_8px_rgba(255,107,158,0.4)]"
-        animate={{
-          y: [0, -18, 0],
-          rotate: [0, -15, 0]
-        }}
-        transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
-        style={{ x: mouseParallax.x * 0.4, y: mouseParallax.y * 0.4 }}
-      >
-        <Heart className="w-6 h-6 fill-current" />
-      </motion.div>
-
-      <motion.div
-        className="absolute bottom-[25%] right-[15%] text-neo-cyan drop-shadow-[0_0_8px_rgba(0,245,255,0.4)]"
-        animate={{
-          y: [0, -20, 0],
-          rotate: [0, 20, 0],
-          scale: [1, 1.1, 1]
-        }}
-        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-        style={{ x: mouseParallax.x * -0.5, y: mouseParallax.y * -0.5 }}
-      >
-        <Sparkles className="w-7 h-7" />
-      </motion.div>
-
-      {/* Small accent dots scattered around */}
-      <motion.div
-        className="absolute top-[15%] left-[30%] w-3 h-3 rounded-full bg-neo-yellow shadow-[0_0_10px_rgba(255,225,53,0.6)]"
-        animate={{ scale: [1, 1.5, 1], opacity: [0.6, 1, 0.6] }}
-        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-      />
-      <motion.div
-        className="absolute top-[45%] left-[25%] w-2 h-2 rounded-full bg-neo-pink shadow-[0_0_8px_rgba(255,107,158,0.6)]"
-        animate={{ scale: [1, 1.8, 1], opacity: [0.5, 1, 0.5] }}
-        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-      />
-      <motion.div
-        className="absolute top-[60%] right-[30%] w-2 h-2 rounded-full bg-neo-cyan shadow-[0_0_8px_rgba(0,245,255,0.6)]"
-        animate={{ scale: [1, 1.6, 1], opacity: [0.5, 1, 0.5] }}
-        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-      />
-      <motion.div
-        className="absolute bottom-[40%] left-[40%] w-2.5 h-2.5 rounded-full bg-neo-purple shadow-[0_0_8px_rgba(187,134,252,0.6)]"
-        animate={{ scale: [1, 1.7, 1], opacity: [0.6, 1, 0.6] }}
-        transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
-      />
-    </div>
-  );
-});
 
 /**
  * Mascot component for the hero section
@@ -214,7 +48,6 @@ const HeroMascot = memo(function HeroMascot() {
           alt="Lexi mascot"
           width={160}
           height={160}
-          className="drop-shadow-[0_8px_20px_rgba(0,0,0,0.3)]"
           priority
         />
       </motion.div>
@@ -382,11 +215,8 @@ const LandingView: React.FC = () => {
       className={`flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative overflow-hidden ${isLandscape ? 'landscape-full-height' : ''}`}
       {...pullToRefreshHandlers}
     >
-      {/* Parallax background layers */}
-      {!isLandscape && <ParallaxBackground />}
-
-      {/* Floating decorative elements */}
-      {!isLandscape && <FloatingDecorations />}
+      {/* Playful background with parallax and floating elements */}
+      {!isLandscape && <PlayfulBackground intensity="high" colorScheme="default" />}
 
       {/* Pull-to-refresh indicator */}
       <PullToRefreshIndicator
@@ -475,7 +305,7 @@ const LandingView: React.FC = () => {
           {isLandscape ? (
             <Link
               href={`/${language}/multiplayer`}
-              className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-pink to-pink-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all min-h-[120px] max-h-[70vh]"
+              className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-pink to-pink-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all min-h-[120px] max-h-[70vh] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy"
               aria-label={`${t('landing.multiplayer') || 'Multiplayer'} - ${t('landing.multiplayerDesc') || 'Compete with friends'}`}
             >
               <Users className="w-10 h-10 text-neo-black" aria-hidden="true" />
@@ -506,7 +336,7 @@ const LandingView: React.FC = () => {
           {isLandscape ? (
             <Link
               href={`/${language}/singleplayer`}
-              className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-cyan to-cyan-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all min-h-[120px] max-h-[70vh]"
+              className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-cyan to-cyan-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all min-h-[120px] max-h-[70vh] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy"
               aria-label={`${t('landing.singlePlayer') || 'Single Player'} - ${t('landing.singlePlayerDesc') || 'Practice at your own pace'}`}
             >
               <User className="w-10 h-10 text-neo-black" aria-hidden="true" />

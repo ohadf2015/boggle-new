@@ -176,7 +176,8 @@ const sv = {
     "invalid": "Ogiltig",
     "validating": "Kollar...",
     "later": "Senare",
-    "skip": "Hoppa"
+    "skip": "Hoppa",
+    "done": "Klar"
   },
   "connection": {
     "reconnecting": "Återansluter...",
@@ -3126,6 +3127,9 @@ const sv = {
     },
     "leaderboard": "Rankning",
     "screenshotProtection": "Återvänd för att fortsätta spela",
+    "clueUnlocked": "Ledtråd upplåst!",
+    "categoryUnlocked": "Kategori avslöjad!",
+    "exampleUnlocked": "Exempel upplåst!",
     "trainingSuggestion": {
       "title": "Ny på LexiClash?",
       "subtitle": "Prova ett snabbt träningsspel först för att lära dig mekaniken!",
@@ -3207,6 +3211,7 @@ const sv = {
       "pts": "p"
     },
     "survival": {
+      "tokens": "Tokens",
       "lifePoints": "Liv",
       "lifeRemaining": "{points} Liv",
       "lifeDraining": "Livet rinner ut...",
@@ -3867,6 +3872,30 @@ const sv = {
   "levelUp": {
     "title": "Nivå Upp!",
     "reached": "Du nådde nivå {level}!"
+  },
+  "customPuzzle": {
+    "title": "Anpassat Pussel",
+    "description": "Kan du lösa detta ordpussel?",
+    "createTitle": "Skapa Ditt Eget Pussel",
+    "createYourOwn": "Skapa Ditt Eget Pussel",
+    "selectWord": "Välj ett målord för ditt pussel:",
+    "generating": "Skapar pussel...",
+    "loading": "Laddar pussel...",
+    "created": "Pussel Skapat!",
+    "shareWithFriends": "Dela med vänner för att utmana dem!",
+    "yourScore": "Din Poäng att Slå",
+    "share": "Dela Pussel",
+    "shareText": "Jag skapade ett anpassat ordpussel. Kan du slå mitt resultat?",
+    "createdBy": "Skapad av {name}",
+    "creatorScore": "Skaparens Poäng",
+    "solvedIn": "Löst på {attempts} försök",
+    "challengeDescription": "Hitta det dolda ordet innan tiden rinner ut. Kan du slå skaparen?",
+    "play": "Spela Utmaning",
+    "solved": "Du löste det!",
+    "failed": "Bättre lycka nästa gång!",
+    "beatCreator": "Du slog skaparen!",
+    "leaderboard": "Topplista",
+    "playDaily": "Spela Daglig Utmaning"
   },
   "ui": {
     "empty": {

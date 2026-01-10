@@ -43,15 +43,6 @@ export {
   ScaleOnHover,
 } from './PageTransition';
 
-// Loading States (New shimmer variants)
-export {
-  SkeletonShimmer,
-  SkeletonAvatar,
-  SkeletonButton,
-  SkeletonLeaderboardRow,
-  SkeletonGrid,
-} from './SkeletonShimmer';
-
 // Re-export AnimatedCounter from ui
 export { AnimatedCounter, AnimatedCounterWithImpact } from '../ui/AnimatedCounter';
 
