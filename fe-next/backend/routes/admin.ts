@@ -1978,4 +1978,53 @@ router.get('/community-words/stats', async (req: AdminRequest, res: Response): P
   }
 });
 
+/**
+ * GET /api/admin/players
+ * Get all players with pagination and search
+ */
+router.get('/players', async (req: AdminRequest, res: Response): Promise<void> => {
+  try {
+    const supabase = getSupabase();
+    const search = (req.query.search as string) || null;
+    const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
+    const offset = parseInt(req.query.offset as string) || 0;
+    const sortBy = (req.query.sortBy as string) || 'created_at';
+    const sortOrder = (req.query.sortOrder as string) === 'asc' ? true : false;
+
+    let query = supabase
+      .from('profiles')
+      .select('*', { count: 'exact' });
+
+    if (search) {
+      // Search by username or display_name
+      query = query.or(`username.ilike.%${search}%,display_name.ilike.%${search}%`);
+    }
+
+    const validSortFields = ['created_at', 'last_game_at', 'total_games', 'total_score', 'username', 'ranked_mmr'];
+    const sortField = validSortFields.includes(sortBy) ? sortBy : 'created_at';
+    
+    query = query.order(sortField, { ascending: sortOrder });
+    query = query.range(offset, offset + limit - 1);
+
+    const { data: players, error, count } = await query;
+
+    if (error) throw error;
+
+    res.json({
+      players,
+      total: count || 0,
+      pagination: {
+        limit,
+        offset,
+        hasMore: (count || 0) > offset + limit,
+      },
+    });
+
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ADMIN_API', `Get players error: ${err.message}`);
+    res.status(500).json({ error: 'Failed to fetch players' });
+  }
+});
+
 export default router;

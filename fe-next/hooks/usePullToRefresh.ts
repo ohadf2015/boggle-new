@@ -100,8 +100,10 @@ export function usePullToRefresh(options: PullToRefreshOptions) {
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     if (!enabled || isRefreshingRef.current) return;
 
-    const target = e.currentTarget as HTMLElement;
-    containerRef.current = target;
+    // Use target instead of currentTarget to find the actual element being touched
+    // This allows finding nested scrollable elements
+    const target = e.target as HTMLElement;
+    containerRef.current = e.currentTarget as HTMLElement;
 
     const touch = e.touches[0];
     if (!touch) return;
@@ -129,7 +131,8 @@ export function usePullToRefresh(options: PullToRefreshOptions) {
     const deltaY = touch.clientY - touchStartRef.current.y;
 
     // Re-check scroll position on each move (user might have scrolled)
-    const target = e.currentTarget as HTMLElement;
+    // Use target from event which persists from touchstart
+    const target = e.target as HTMLElement;
     const scrollableParent = findScrollableParent(target);
     const currentScrollTop = getScrollTop(target, scrollableParent);
 

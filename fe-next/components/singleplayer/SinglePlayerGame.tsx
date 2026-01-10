@@ -1744,7 +1744,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             completedSkills={trainingCompletedSkills}
             score={score}
             wordsFound={foundWords.filter(fw => fw.isValid === true).length}
-            compact={!progressBarExpanded}
+            compact
             expanded={progressBarExpanded}
             onToggleExpand={() => setProgressBarExpanded(!progressBarExpanded)}
             justUnlocked={trainingJustUnlocked}
@@ -1758,7 +1758,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       {/* In practice mode (no timer), score is centered and larger */}
       <div ref={gameStatsRef} className="flex w-full items-center justify-between px-1 md:px-2 gap-0" role="status" aria-label="Game status">
         {/* Left Side: Combo (Normal) or Placeholder (Practice) */}
-        <div className="flex-1 flex justify-end pr-2 md:pr-6 pointer-events-none">
+        <div className="flex-1 flex justify-end pr-1 md:pr-3 pointer-events-none">
           <div className="pointer-events-auto">
             {settings.mode !== 'practice' ? (
               <ComboDisplay

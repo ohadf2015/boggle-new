@@ -229,8 +229,8 @@ export function LiveMonitor({ authToken }: LiveMonitorProps) {
             <h2 className="text-lg font-neo-display text-neo-white mb-4">
               {t('admin.live.connectedPlayers') || 'Connected Players'}
             </h2>
-            <div className="bg-slate-800/50 rounded-neo border-neo border-black overflow-hidden">
-              <table className="w-full">
+            <div className="bg-slate-800/50 rounded-neo border-neo border-black overflow-hidden overflow-x-auto">
+              <table className="w-full min-w-[600px]">
                 <thead className="bg-slate-700/50">
                   <tr>
                     <th className="px-4 py-3 text-left text-sm font-neo-display text-slate-300">

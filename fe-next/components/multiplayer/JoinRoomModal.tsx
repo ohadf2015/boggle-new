@@ -151,7 +151,15 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent noDescription className="max-w-sm sm:max-w-md">
+        <DialogContent
+          noDescription
+          className="max-w-sm sm:max-w-md"
+          onInteractOutside={(e) => {
+            if (showAvatarPicker) {
+              e.preventDefault();
+            }
+          }}
+        >
           <DialogHeader>
             <DialogTitle>{t('multiplayerFlow.joinModal.title') || 'Join Room'}</DialogTitle>
           </DialogHeader>

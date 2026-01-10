@@ -188,7 +188,15 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent noDescription className="max-w-sm sm:max-w-md">
+        <DialogContent
+          noDescription
+          className="max-w-sm sm:max-w-md"
+          onInteractOutside={(e) => {
+            if (showAvatarPicker) {
+              e.preventDefault();
+            }
+          }}
+        >
           <DialogHeader className="relative pr-14 sm:pr-16 rtl:pr-0 rtl:pl-14 sm:rtl:pl-16">
             <DialogTitle className={cn("text-lg font-black uppercase truncate", dir === 'rtl' ? 'text-right' : 'text-left')}>
               {t('multiplayerFlow.createModal.title') || 'Create Room'}
