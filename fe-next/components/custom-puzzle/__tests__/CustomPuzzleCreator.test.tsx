@@ -6,12 +6,14 @@
  * 2. Validation constants
  * 3. ValidationStatus type coverage
  * 4. Input length constraints
+ * 5. Clean character regex validation (letters only)
  */
 
 import CustomPuzzleCreator from '../CustomPuzzleCreator';
+import { validateCustomPuzzleWord } from '../customPuzzleValidation';
 
 // Validation constants (mirrored from component)
-const MIN_WORD_LENGTH = 3;
+const MIN_WORD_LENGTH = 4;
 const MAX_WORD_LENGTH = 8;
 
 describe('CustomPuzzleCreator', () => {
@@ -35,8 +37,8 @@ describe('CustomPuzzleCreator', () => {
   });
 
   describe('Validation Constants', () => {
-    it('should have minimum word length of 3', () => {
-      expect(MIN_WORD_LENGTH).toBe(3);
+    it('should have minimum word length of 4', () => {
+      expect(MIN_WORD_LENGTH).toBe(4);
     });
 
     it('should have maximum word length of 8', () => {
@@ -156,8 +158,8 @@ describe('CustomPuzzleCreator', () => {
       expect(getExpectedStatus(2)).toBe('too-short');
     });
 
-    it('should validate 3 character words', () => {
-      expect(getExpectedStatus(3)).toBe('needs-validation');
+    it('should return too-short for 3 characters', () => {
+      expect(getExpectedStatus(3)).toBe('too-short');
     });
 
     it('should validate 4-7 character words', () => {
@@ -173,6 +175,63 @@ describe('CustomPuzzleCreator', () => {
     it('should return too-long for 9+ characters', () => {
       expect(getExpectedStatus(9)).toBe('too-long');
       expect(getExpectedStatus(10)).toBe('too-long');
+    });
+  });
+
+  describe('validateCustomPuzzleWord - Regex Validation', () => {
+    it('should accept valid 4-8 letter words', () => {
+      expect(validateCustomPuzzleWord('TEST')).toEqual({ isValid: true, status: 'valid' });
+      expect(validateCustomPuzzleWord('HELLO')).toEqual({ isValid: true, status: 'valid' });
+      expect(validateCustomPuzzleWord('WORD')).toEqual({ isValid: true, status: 'valid' });
+      expect(validateCustomPuzzleWord('ABCDEFGH')).toEqual({ isValid: true, status: 'valid' });
+    });
+
+    it('should accept lowercase letters and convert to uppercase', () => {
+      expect(validateCustomPuzzleWord('test')).toEqual({ isValid: true, status: 'valid' });
+      expect(validateCustomPuzzleWord('Hello')).toEqual({ isValid: true, status: 'valid' });
+    });
+
+    it('should reject words shorter than 4 letters', () => {
+      expect(validateCustomPuzzleWord('ABC')).toEqual({ isValid: false, status: 'too-short' });
+      expect(validateCustomPuzzleWord('AB')).toEqual({ isValid: false, status: 'too-short' });
+      expect(validateCustomPuzzleWord('A')).toEqual({ isValid: false, status: 'too-short' });
+    });
+
+    it('should reject words longer than 8 letters', () => {
+      expect(validateCustomPuzzleWord('ABCDEFGHI')).toEqual({ isValid: false, status: 'too-long' });
+      expect(validateCustomPuzzleWord('VERYLONGWORD')).toEqual({ isValid: false, status: 'too-long' });
+    });
+
+    it('should reject empty strings', () => {
+      expect(validateCustomPuzzleWord('')).toEqual({ isValid: false, status: 'idle' });
+    });
+
+    it('should reject words with numbers', () => {
+      expect(validateCustomPuzzleWord('TEST1')).toEqual({ isValid: false, status: 'invalid' });
+      expect(validateCustomPuzzleWord('1234')).toEqual({ isValid: false, status: 'invalid' });
+      expect(validateCustomPuzzleWord('AB1CD')).toEqual({ isValid: false, status: 'invalid' });
+    });
+
+    it('should reject words with special characters', () => {
+      expect(validateCustomPuzzleWord('TEST!')).toEqual({ isValid: false, status: 'invalid' });
+      expect(validateCustomPuzzleWord('WORD@')).toEqual({ isValid: false, status: 'invalid' });
+      expect(validateCustomPuzzleWord('HE-LLO')).toEqual({ isValid: false, status: 'invalid' });
+      expect(validateCustomPuzzleWord('TEST_')).toEqual({ isValid: false, status: 'invalid' });
+    });
+
+    it('should reject words with spaces', () => {
+      expect(validateCustomPuzzleWord('TEST ')).toEqual({ isValid: false, status: 'invalid' });
+      expect(validateCustomPuzzleWord(' TEST')).toEqual({ isValid: false, status: 'invalid' });
+      expect(validateCustomPuzzleWord('TE ST')).toEqual({ isValid: false, status: 'invalid' });
+    });
+
+    it('should handle Unicode letters for international support', () => {
+      // Hebrew letters
+      expect(validateCustomPuzzleWord('שלום')).toEqual({ isValid: true, status: 'valid' });
+      // Swedish letters
+      expect(validateCustomPuzzleWord('ÅÄÖÖ')).toEqual({ isValid: true, status: 'valid' });
+      // Japanese hiragana
+      expect(validateCustomPuzzleWord('あいうえお')).toEqual({ isValid: true, status: 'valid' });
     });
   });
 });

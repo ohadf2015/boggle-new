@@ -31,7 +31,7 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [imageError, setImageError] = useState(false);
   const badgeRef = useRef<HTMLDivElement>(null);
-  const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number; showAbove?: boolean } | null>(null);
+  const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number; showAbove?: boolean; arrowOffset?: number } | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const isTouchDevice = useRef(false);
 
@@ -69,7 +69,8 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
       const showAbove = spaceBelow < tooltipEstimatedHeight + 20;
 
       // Calculate horizontal position - center on badge by default
-      let leftPos = rect.left + rect.width / 2;
+      const badgeCenter = rect.left + rect.width / 2;
+      let leftPos = badgeCenter;
 
       // Ensure tooltip doesn't overflow horizontally
       // Leave 16px padding from viewport edges
@@ -77,10 +78,17 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
       const maxLeft = viewportWidth - tooltipEstimatedWidth / 2 - 16;
       leftPos = Math.max(minLeft, Math.min(maxLeft, leftPos));
 
+      // Calculate arrow offset when tooltip is clamped
+      // Arrow should still point at the badge center
+      // arrowOffset is the position of badge center relative to tooltip left edge, as percentage
+      const tooltipLeft = leftPos - tooltipEstimatedWidth / 2;
+      const arrowOffset = ((badgeCenter - tooltipLeft) / tooltipEstimatedWidth) * 100;
+
       setTooltipPosition({
         top: showAbove ? rect.top - 8 : rect.bottom + 8,
         left: leftPos,
         showAbove,
+        arrowOffset,
       });
     } else if (!isOpen) {
       setTooltipPosition(null);
@@ -257,10 +265,17 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
           }}
         >
           {/* Arrow - points down when showing above, up when showing below */}
+          {/* Arrow position is dynamic to always point at the badge, even when tooltip is clamped */}
           {tooltipPosition.showAbove ? (
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-neo-cream border-r-3 border-b-3 border-neo-black" />
+            <div
+              className="absolute -bottom-2 -translate-x-1/2 w-3 h-3 rotate-45 bg-neo-cream border-r-3 border-b-3 border-neo-black"
+              style={{ left: `${tooltipPosition.arrowOffset ?? 50}%` }}
+            />
           ) : (
-            <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-neo-cream border-l-3 border-t-3 border-neo-black" />
+            <div
+              className="absolute -top-2 -translate-x-1/2 w-3 h-3 rotate-45 bg-neo-cream border-l-3 border-t-3 border-neo-black"
+              style={{ left: `${tooltipPosition.arrowOffset ?? 50}%` }}
+            />
           )}
 
           {/* Header: Icon + Name */}

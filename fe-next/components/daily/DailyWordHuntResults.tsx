@@ -20,9 +20,7 @@ import {
   getStreakMilestone,
   getStreakMilestoneMessage,
   findRarestWord,
-  getConversionTrigger,
   type GuestDailyPlayer,
-  type ConversionTrigger,
 } from '@/utils/dailyChallenge';
 import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
 import StreakMilestoneCelebration from './StreakMilestoneCelebration';
@@ -73,7 +71,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   onGameLanguageChange,
 }) => {
   const { t } = useLanguage();
-  const { user, profile, isAuthenticated, loading: authLoading } = useAuth();
+  const { user, profile, isAuthenticated } = useAuth();
   const { isProtected } = useScreenshotProtection();
 
   // Local state
@@ -81,8 +79,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [guestPlayer, setGuestPlayer] = useState<GuestDailyPlayer | null>(null);
   const [stats, setStats] = useState<WordHuntStats | null>(null);
   const [showMilestoneCelebration, setShowMilestoneCelebration] = useState(false);
-  // Note: Removed showSignupModal state - using inline signup CTA instead
-  const [signupTrigger, setSignupTrigger] = useState<ConversionTrigger | null>(null);
   const [leaderboardKey, setLeaderboardKey] = useState(0);
   const [activeTab, setActiveTab] = useState<ResultTab>('results');
   const [_countryCode, setCountryCode] = useState<string | null>(null);
@@ -215,15 +211,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     return undefined;
   }, [isNewCompletion, milestoneMessage]);
 
-  // Note: Removed auto-popup DailyChallengeSignupModal for guests
-  // The inline signup CTA is sufficient and less disruptive
-  // Keep the signupTrigger logic but don't auto-show modal
-  useEffect(() => {
-    if (!isNewCompletion || isAuthenticated || user || authLoading) return;
-    const trigger = getConversionTrigger(result, stats?.yourStats?.percentile);
-    if (trigger) { setSignupTrigger(trigger); }
-  }, [isNewCompletion, isAuthenticated, user, authLoading, result, stats?.yourStats?.percentile]);
-
   // ============================================================================
   // HANDLERS
   // ============================================================================
@@ -256,6 +243,14 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
       {/* Rank badge - shows for both WIN and FAIL */}
       {stats && <RankBadge stats={stats} t={t} />}
+
+      {/* Inline signup for guests - positioned after score, before share */}
+      {!isAuthenticated && !inlineSignupDismissed && (
+        <DailyChallengeInlineSignup
+          pendingResult={{ result, puzzleNumber, puzzleDate, language }}
+          onDismiss={() => setInlineSignupDismissed(true)}
+        />
+      )}
 
       {/* Share/Retry Section - order differs by result */}
       <ShareSection
@@ -364,22 +359,14 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
       <TryAnotherLanguage currentLanguage={language} onGameLanguageChange={onGameLanguageChange} />
 
-      {/* Inline signup for all anonymous users */}
-      {!isAuthenticated && !inlineSignupDismissed && (
-        <DailyChallengeInlineSignup
-          pendingResult={{ result, puzzleNumber, puzzleDate, language }}
-          onDismiss={() => setInlineSignupDismissed(true)}
-        />
-      )}
-
       <KeepPlayingSection
         isSuccess={result.solved}
         timeSurvived={result.lifeRemaining !== undefined ? (10 - result.attemptsUsed) * 10 : undefined}
         efficiencyScore={result.efficiencyScore}
       />
 
-      {/* Create Your Own Puzzle - only show for winners */}
-      {result.solved && (
+      {/* Create Your Own Puzzle - only show for authenticated winners */}
+      {result.solved && isAuthenticated && (
         <button
           onClick={() => setShowCreatePuzzle(true)}
           className="w-full mt-4 p-4 bg-gradient-to-r from-neo-pink/20 via-neo-orange/20 to-neo-yellow/20 border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all cursor-pointer text-start group"

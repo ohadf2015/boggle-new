@@ -3899,6 +3899,7 @@ const he = {
     "validating": "בודק...",
     "wordValid": "מילה תקינה!",
     "wordInvalid": "המילה לא במילון",
+    "invalidCharacters": "אותיות בלבד 🔤",
     "wordTooShort": "מינימום 3 אותיות",
     "wordTooLong": "מקסימום 8 אותיות",
     "createPuzzle": "צור פאזל",

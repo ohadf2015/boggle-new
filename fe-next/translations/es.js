@@ -3895,6 +3895,7 @@ const es = {
     "validating": "Verificando...",
     "wordValid": "¡Palabra válida!",
     "wordInvalid": "Palabra no está en el diccionario",
+    "invalidCharacters": "Solo letras",
     "wordTooShort": "Mínimo 3 letras",
     "wordTooLong": "Máximo 8 letras",
     "createPuzzle": "Crear Puzzle",

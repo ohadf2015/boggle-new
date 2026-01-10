@@ -26,6 +26,7 @@ import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardin
 /**
  * Interactive Mascot component for the hero section
  * Responds to hover and click with mood changes
+ * Uses responsive sizing - smaller on mobile for better proportions
  */
 const HeroMascot = memo(function HeroMascot() {
   const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
@@ -33,17 +34,46 @@ const HeroMascot = memo(function HeroMascot() {
   return (
     <div className="relative mx-auto mb-1">
       {/* Interactive Mascot - happy by default, excited on hover, celebrating on click */}
-      <InteractiveMascotWithEntrance
-        variant="happy"
-        size="lg"
-        enableHover
-        enableClick
-        hoverVariant="excited"
-        clickVariant="celebrating"
-        clickAnimation="bounce"
-        priority
-        delay={0.1}
-      />
+      {/* Responsive: sm (64px) on mobile, md (96px) on tablet, lg (128px) on desktop */}
+      <div className="block sm:hidden">
+        <InteractiveMascotWithEntrance
+          variant="happy"
+          size="sm"
+          enableHover
+          enableClick
+          hoverVariant="excited"
+          clickVariant="celebrating"
+          clickAnimation="bounce"
+          priority
+          delay={0.1}
+        />
+      </div>
+      <div className="hidden sm:block lg:hidden">
+        <InteractiveMascotWithEntrance
+          variant="happy"
+          size="md"
+          enableHover
+          enableClick
+          hoverVariant="excited"
+          clickVariant="celebrating"
+          clickAnimation="bounce"
+          priority
+          delay={0.1}
+        />
+      </div>
+      <div className="hidden lg:block">
+        <InteractiveMascotWithEntrance
+          variant="happy"
+          size="lg"
+          enableHover
+          enableClick
+          hoverVariant="excited"
+          clickVariant="celebrating"
+          clickAnimation="bounce"
+          priority
+          delay={0.1}
+        />
+      </div>
 
       {/* Sparkle accents around mascot */}
       {enableComplexAnimations && !prefersReducedMotion && (

@@ -3920,6 +3920,7 @@ const en = {
     "validating": "Checking...",
     "wordValid": "Valid word!",
     "wordInvalid": "Word not in dictionary",
+    "invalidCharacters": "Letters only",
     "wordTooShort": "Minimum 3 letters",
     "wordTooLong": "Maximum 8 letters",
     "createPuzzle": "Create Puzzle",

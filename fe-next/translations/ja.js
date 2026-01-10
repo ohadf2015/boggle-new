@@ -3897,6 +3897,7 @@ const ja = {
     "validating": "確認中...",
     "wordValid": "有効な単語!",
     "wordInvalid": "辞書にない単語です",
+    "invalidCharacters": "文字のみ入力可",
     "wordTooShort": "最低3文字必要",
     "wordTooLong": "最大8文字まで",
     "createPuzzle": "パズルを作成",

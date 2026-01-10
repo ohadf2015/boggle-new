@@ -211,7 +211,7 @@ interface InteractiveMascotProps {
   clickVariant?: ExtendedMascotVariant;
   /** Click animation type */
   clickAnimation?: ClickAnimation;
-  /** Duration to show click variant before returning to base (ms) */
+  /** Duration to show click variant before returning to base (ms) - default 1200ms for smooth perception */
   clickDuration?: number;
   /** Callback when mascot is clicked */
   onClick?: () => void;
@@ -422,7 +422,7 @@ export const InteractiveMascot = memo(function InteractiveMascot({
   hoverVariant,
   clickVariant,
   clickAnimation = 'bounce',
-  clickDuration = 800,
+  clickDuration = 1200,
   onClick,
   onHover,
   tooltip,
@@ -506,13 +506,14 @@ export const InteractiveMascot = memo(function InteractiveMascot({
           animate={shouldAnimate && !isClicked ? idleAnimation : undefined}
         >
           {/* Image with crossfade on variant change */}
+          {/* Slower transition (400ms) for smoother mood changes */}
           <AnimatePresence mode="wait">
             <motion.div
               key={currentVariant}
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.2 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.4, ease: 'easeInOut' }}
               className="w-full h-full"
             >
               <Image
@@ -536,7 +537,7 @@ export const InteractiveMascot = memo(function InteractiveMascot({
               opacity: isHovered ? 0.6 : 0,
               scale: isHovered ? 1.2 : 0.8
             }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
           />
         )}
 

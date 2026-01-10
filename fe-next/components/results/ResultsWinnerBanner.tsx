@@ -112,11 +112,12 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
 
   // Fire confetti on mount - using refs to prevent cleanup issues when deps change
   // IMPORTANT: Set ref INSIDE callback so confetti can retry if cleanup runs before timeout
+  // Uses 'light' intensity for automatic triggers to avoid overwhelming the user
   useEffect(() => {
     if (winner && shouldShowConfetti && !hasFiredConfettiRef.current) {
       confettiTimeoutRef.current = setTimeout(() => {
         hasFiredConfettiRef.current = true;
-        fireRankConfetti(rank);
+        fireRankConfetti(rank, 'light');
         confettiTimeoutRef.current = null;
       }, 400);
     }

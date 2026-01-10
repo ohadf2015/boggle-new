@@ -180,9 +180,12 @@ export const STREAK_COLORS = ['#FF1493', '#FFE135', '#FF3366', '#00FFFF'];
 /**
  * Fire rank-specific confetti burst with neo-brutalist styling
  * Moderate bursts with chunky square particles
+ * @param rank - Player rank (1st, 2nd, 3rd place)
+ * @param intensity - 'full' for manual clicks, 'light' for automatic triggers (default: 'full')
  */
-export function fireRankConfetti(rank: number = 1): void {
-  const count = 40; // Reduced from 120
+export function fireRankConfetti(rank: number = 1, intensity: 'full' | 'light' = 'full'): void {
+  // Light intensity uses 40% of full particles for automatic triggers
+  const count = intensity === 'light' ? 16 : 40;
   const colors = RANK_COLORS[rank] || RANK_COLORS[1];
 
   const defaults: Options = {

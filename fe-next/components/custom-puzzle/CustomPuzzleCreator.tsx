@@ -13,12 +13,12 @@ import DailyWordHuntSurvival from '@/components/daily/DailyWordHuntSurvival';
 import type { SurvivalGameResult } from '@/components/daily/survival';
 import { cn } from '@/lib/utils';
 
-// Validation constants
-const MIN_WORD_LENGTH = 3;
-const MAX_WORD_LENGTH = 8;
-const DEBOUNCE_MS = 300;
-
-type ValidationStatus = 'idle' | 'validating' | 'valid' | 'invalid' | 'too-short' | 'too-long';
+import {
+  validateCustomPuzzleWord,
+  MIN_WORD_LENGTH,
+  MAX_WORD_LENGTH,
+  type ValidationStatus,
+} from './customPuzzleValidation';
 
 interface CustomPuzzleCreatorProps {
   isOpen: boolean;
@@ -37,7 +37,6 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
   const { user, profile } = useAuth();
   const [fingerprint, setFingerprint] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   const [phase, setPhase] = useState<CreatorPhase>('enter-word');
   const [inputWord, setInputWord] = useState('');
@@ -79,67 +78,14 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
     }
   }, [isOpen]);
 
-  // Validate word against dictionary
-  const validateWord = useCallback(async (word: string): Promise<boolean> => {
-    try {
-      const response = await fetch('/api/validate-word', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ word, language }),
-      });
-
-      if (!response.ok) return false;
-
-      const data = await response.json();
-      return data.isValid === true;
-    } catch (error) {
-      console.error('Word validation error:', error);
-      return false;
-    }
-  }, [language]);
-
-  // Handle input change with debounced validation
+  // Handle input change with synchronous regex validation
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toUpperCase();
     setInputWord(value);
 
-    // Clear previous debounce
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-    }
-
-    // Check length first
-    if (value.length === 0) {
-      setValidationStatus('idle');
-      return;
-    }
-
-    if (value.length < MIN_WORD_LENGTH) {
-      setValidationStatus('too-short');
-      return;
-    }
-
-    if (value.length > MAX_WORD_LENGTH) {
-      setValidationStatus('too-long');
-      return;
-    }
-
-    // Set validating status and debounce API call
-    setValidationStatus('validating');
-
-    debounceRef.current = setTimeout(async () => {
-      const isValid = await validateWord(value);
-      setValidationStatus(isValid ? 'valid' : 'invalid');
-    }, DEBOUNCE_MS);
-  }, [validateWord]);
-
-  // Cleanup debounce on unmount
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
-    };
+    // Validate using regex-based validation (no dictionary lookup)
+    const result = validateCustomPuzzleWord(value);
+    setValidationStatus(result.status);
   }, []);
 
   // Generate grid with target word embedded
@@ -260,16 +206,14 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
   // Get validation message
   const getValidationMessage = (): string | null => {
     switch (validationStatus) {
-      case 'validating':
-        return t('customPuzzle.validating') || 'Checking...';
       case 'valid':
         return t('customPuzzle.wordValid') || 'Valid word!';
       case 'invalid':
-        return t('customPuzzle.wordInvalid') || 'Word not in dictionary';
+        return t('customPuzzle.invalidCharacters') || 'Letters only (no numbers or symbols)';
       case 'too-short':
-        return t('customPuzzle.wordTooShort') || 'Minimum 3 letters';
+        return t('customPuzzle.wordTooShort') || `Minimum ${MIN_WORD_LENGTH} letters`;
       case 'too-long':
-        return t('customPuzzle.wordTooLong') || 'Maximum 8 letters';
+        return t('customPuzzle.wordTooLong') || `Maximum ${MAX_WORD_LENGTH} letters`;
       default:
         return null;
     }
@@ -284,8 +228,6 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
       case 'too-short':
       case 'too-long':
         return 'text-red-500';
-      case 'validating':
-        return 'text-neo-yellow';
       default:
         return 'text-gray-500';
     }
@@ -346,9 +288,6 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
 
                 {/* Validation icon */}
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                  {validationStatus === 'validating' && (
-                    <Loader2 className="w-5 h-5 text-neo-yellow animate-spin" />
-                  )}
                   {validationStatus === 'valid' && (
                     <Check className="w-5 h-5 text-green-500" />
                   )}

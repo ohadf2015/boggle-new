@@ -1068,18 +1068,20 @@ const InGameScreen = memo<InGameScreenProps>(({
               </motion.div>
 
               {/* Combo + Score - absolutely positioned on right to not shift timer */}
+              {/* z-30 ensures combo renders ABOVE timer (z-20), pointer-events-none prevents blocking timer */}
               {isPlaying && (
-                <div className="absolute right-0 rtl:right-auto rtl:left-0 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 md:gap-2 z-10">
+                <div className="absolute right-0 rtl:right-auto rtl:left-0 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 md:gap-2 z-30 pointer-events-none">
                   {/* Combo container - fixed height to prevent layout shift when combo appears/disappears */}
                   <div className="h-[28px] md:h-[32px] flex items-center justify-center">
                     <ComboDisplay comboLevel={comboLevel} compact />
                   </div>
 
                   {/* Score - vibrant yellow/lime gradient */}
+                  {/* pointer-events-auto restores interactivity since parent has pointer-events-none */}
                   <motion.div
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px]"
+                    className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px] pointer-events-auto"
                     style={{
                       background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
                     }}

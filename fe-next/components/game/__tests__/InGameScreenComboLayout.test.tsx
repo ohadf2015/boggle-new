@@ -73,51 +73,10 @@ import ComboDisplay from '../ComboDisplay';
 import CircularTimer from '../../CircularTimer';
 
 /**
- * Component that mimics the CURRENT stats row layout from InGameScreen
- * (before the fix) - uses flex with justify-center
- */
-const OldStatsRowTestComponent = ({
-  comboLevel,
-  showCombo = true,
-  score = 100,
-}: {
-  comboLevel: number;
-  showCombo?: boolean;
-  score?: number;
-}) => {
-  return (
-    <div
-      data-testid="stats-row"
-      className="flex items-center justify-center gap-2 md:gap-4"
-    >
-      {/* Timer (center - always visible and prominent) */}
-      <div data-testid="timer-wrapper" className="relative z-20">
-        <CircularTimer remainingTime={60} totalTime={180} size="xs" />
-      </div>
-
-      {/* Combo + Score stacked (side position) */}
-      {showCombo && (
-        <div
-          data-testid="combo-score-wrapper"
-          className="flex flex-col items-center gap-1 md:gap-2"
-        >
-          <ComboDisplay comboLevel={comboLevel} compact />
-          <div
-            data-testid="score-display"
-            className="px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px]"
-          >
-            <div className="text-lg md:text-2xl font-black">{score}</div>
-            <div className="text-xs font-bold uppercase">Score</div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-/**
  * Component that mimics the FIXED stats row layout from InGameScreen
  * - uses relative positioning with timer centered and combo absolutely positioned on right
+ * - combo has z-30 (higher than timer's z-20) to render ABOVE timer
+ * - uses pointer-events-none on container with pointer-events-auto on interactive children
  */
 const FixedStatsRowTestComponent = ({
   comboLevel,
@@ -139,15 +98,17 @@ const FixedStatsRowTestComponent = ({
       </div>
 
       {/* Combo + Score - positioned absolutely on the right to not shift timer */}
+      {/* z-30 ensures combo renders ABOVE timer (z-20), not behind it */}
+      {/* pointer-events-none prevents blocking timer, pointer-events-auto on children restores interactivity */}
       {showCombo && (
         <div
           data-testid="combo-score-wrapper"
-          className="absolute right-0 rtl:right-auto rtl:left-0 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 md:gap-2 z-10"
+          className="absolute right-0 rtl:right-auto rtl:left-0 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 md:gap-2 z-30 pointer-events-none"
         >
           <ComboDisplay comboLevel={comboLevel} compact />
           <div
             data-testid="score-display"
-            className="px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px]"
+            className="px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] pointer-events-auto"
           >
             <div className="text-lg md:text-2xl font-black">{score}</div>
             <div className="text-xs font-bold uppercase">Score</div>
@@ -250,6 +211,35 @@ describe('InGameScreen Combo Layout', () => {
 
       // Timer should still be centered - stats row hasn't changed
       expect(statsRow).toHaveClass('justify-center');
+    });
+  });
+
+  describe('z-index layering - combo must render ABOVE timer', () => {
+    it('combo wrapper has higher z-index than timer to prevent rendering behind it', () => {
+      render(<FixedStatsRowTestComponent comboLevel={3} />);
+
+      const timerWrapper = screen.getByTestId('timer-wrapper');
+      const comboWrapper = screen.getByTestId('combo-score-wrapper');
+
+      // Timer has z-20, combo MUST have z-30 or higher to render above
+      expect(timerWrapper).toHaveClass('z-20');
+      expect(comboWrapper).toHaveClass('z-30');
+    });
+
+    it('combo container uses pointer-events-none to prevent blocking timer interactions', () => {
+      render(<FixedStatsRowTestComponent comboLevel={3} />);
+
+      const comboWrapper = screen.getByTestId('combo-score-wrapper');
+      // Combo should not block pointer events from reaching elements below
+      expect(comboWrapper).toHaveClass('pointer-events-none');
+    });
+
+    it('combo inner elements restore pointer-events for interactivity', () => {
+      render(<FixedStatsRowTestComponent comboLevel={3} />);
+
+      const scoreDisplay = screen.getByTestId('score-display');
+      // Score display should be interactive
+      expect(scoreDisplay).toHaveClass('pointer-events-auto');
     });
   });
 });

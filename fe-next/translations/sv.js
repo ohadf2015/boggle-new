@@ -3898,6 +3898,7 @@ const sv = {
     "validating": "Kontrollerar...",
     "wordValid": "Giltigt ord!",
     "wordInvalid": "Ordet finns inte i ordlistan",
+    "invalidCharacters": "Endast bokstäver",
     "wordTooShort": "Minst 3 bokstäver",
     "wordTooLong": "Max 8 bokstäver",
     "createPuzzle": "Skapa Pussel",
