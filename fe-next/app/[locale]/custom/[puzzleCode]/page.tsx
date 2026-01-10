@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const validLocale = (supportedLocales.includes(locale) ? locale : 'en') as Locale;
   const t = translations[validLocale] as Record<string, unknown>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const customPuzzle = (t as any).customPuzzle || {};
   const title = customPuzzle.title || 'Custom Puzzle';
   const description = customPuzzle.description || 'Can you solve this custom word puzzle?';

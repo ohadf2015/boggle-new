@@ -383,7 +383,8 @@ export function useHostGameEvents({
     resetComboState,
     handleRoomClosedDueToInactivity,
     onGameStart,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  ]); // hostPlaying accessed via hostPlayingRef for event handlers
 
   return { gameSessionIdRef, gameSessionId };
 }

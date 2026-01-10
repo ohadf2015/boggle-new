@@ -41,7 +41,8 @@ const LateJoinerBadge: React.FC<LateJoinerBadgeProps> = ({
     return () => {
       delete (window as any).__hideLateJoinerBadge;
     };
-  }, [onFirstWord]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onFirstWord]); // handleFirstWord is stable, only re-run when onFirstWord changes
 
   return (
     <AnimatePresence>

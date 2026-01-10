@@ -125,7 +125,8 @@ export function useEventListeners<K extends keyof WindowEventMap>(
         targetElement.removeEventListener(eventName, eventListener, options);
       });
     };
-  }, [eventNames.join(','), element, options, enabled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eventNames.join(','), element, options, enabled]); // eventNames.join creates stable comparison for array
 }
 
 export default useEventListener;

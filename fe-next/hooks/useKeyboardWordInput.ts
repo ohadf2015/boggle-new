@@ -339,7 +339,8 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [enabled, minWordLength, submitTypedWord, clearTypedWord]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled, minWordLength, submitTypedWord, clearTypedWord]); // typedWord accessed via ref pattern inside handler
 
   // Clear typed word when grid changes (new game)
   useEffect(() => {

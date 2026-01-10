@@ -54,6 +54,7 @@ export function useStableCallback<T extends (...args: any[]) => any>(
 
   // Return a stable callback that delegates to the ref
   // Note: Empty deps array is intentional - callbackRef.current always has latest value
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   return useCallback(
     ((...args: Parameters<T>) => callbackRef.current(...args)) as T,
     []

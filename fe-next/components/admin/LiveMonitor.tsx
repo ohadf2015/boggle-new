@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, Users, Gamepad2, Wifi, Clock, Crown, Bot, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -407,6 +407,7 @@ function PlayerAvatar({
 
   if (avatar?.avatarImage) {
     return (
+      // eslint-disable-next-line @next/next/no-img-element
       <img
         src={avatar.avatarImage}
         alt=""

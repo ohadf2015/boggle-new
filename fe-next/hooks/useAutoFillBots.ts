@@ -189,7 +189,8 @@ export function useAutoFillBots({
         countdownIntervalRef.current = null;
       }
     };
-  }, [countdown !== null]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countdown !== null]); // Intentional: only react to countdown active state, not value changes
 
   return {
     autoFillEnabled,

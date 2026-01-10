@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useState, useContext, useEffect, ReactNode, useRef, useCallback, useMemo } from 'react';
+import { createContext, useState, useContext, useEffect, useRef, useCallback, useMemo, type ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { translations } from '../translations';
 import { locales, defaultLocale } from '../lib/i18n';
@@ -127,7 +127,8 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
         if (browserLang && browserLang !== currentLang) {
             setLanguageState(browserLang);
         }
-    }, []); // Only run on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Only run on mount - pathname is read once for initialization
 
     // Sync language when pathname or initialLanguage changes (after mount)
     useEffect(() => {
