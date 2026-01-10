@@ -2,11 +2,12 @@
 
 import React, { useEffect, useState, lazy, Suspense, memo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
-import { motion } from 'framer-motion';
-import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Sparkles, Star } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Sparkles, Star, Zap, Heart } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -22,53 +23,229 @@ import Header from '@/components/Header';
 import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
 
 /**
- * Floating decorative elements for visual playfulness
- * Performance-gated - only renders on capable devices
+ * Parallax background layers - creates depth with scroll
  */
-const FloatingDecorations = memo(function FloatingDecorations() {
+const ParallaxBackground = memo(function ParallaxBackground() {
+  const { scrollY } = useScroll();
   const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
+
+  // Parallax transforms for different layers
+  const y1 = useTransform(scrollY, [0, 500], [0, 150]);
+  const y2 = useTransform(scrollY, [0, 500], [0, 100]);
+  const y3 = useTransform(scrollY, [0, 500], [0, 50]);
+  const rotate1 = useTransform(scrollY, [0, 500], [0, 15]);
+  const rotate2 = useTransform(scrollY, [0, 500], [0, -10]);
 
   if (prefersReducedMotion || !enableComplexAnimations) return null;
 
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none z-0" aria-hidden="true">
-      {/* Floating stars */}
+    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0" aria-hidden="true">
+      {/* Grid pattern background */}
+      <div
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: `url('/textures/retro-grid.png')`,
+          backgroundSize: '200px 200px',
+          backgroundRepeat: 'repeat',
+        }}
+      />
+
+      {/* Gradient orbs - parallax layer 1 (slowest) */}
       <motion.div
-        className="absolute top-[15%] left-[10%] text-neo-yellow/30"
-        animate={{ y: [0, -10, 0], rotate: [0, 10, 0] }}
+        className="absolute -top-20 -left-20 w-96 h-96 rounded-full bg-neo-pink/20 blur-3xl"
+        style={{ y: y1, rotate: rotate1 }}
+      />
+      <motion.div
+        className="absolute top-1/3 -right-32 w-80 h-80 rounded-full bg-neo-cyan/15 blur-3xl"
+        style={{ y: y2, rotate: rotate2 }}
+      />
+      <motion.div
+        className="absolute bottom-20 left-1/4 w-64 h-64 rounded-full bg-neo-yellow/10 blur-3xl"
+        style={{ y: y3 }}
+      />
+
+      {/* Halftone pattern overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.02] mix-blend-overlay"
+        style={{
+          backgroundImage: `url('/textures/halftone-pattern.png')`,
+          backgroundSize: '300px 300px',
+        }}
+      />
+    </div>
+  );
+});
+
+/**
+ * Floating decorative elements - MORE VISIBLE VERSION
+ * Performance-gated - only renders on capable devices
+ */
+const FloatingDecorations = memo(function FloatingDecorations() {
+  const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
+  const mouseParallax = useMouseParallax(30);
+
+  if (prefersReducedMotion || !enableComplexAnimations) return null;
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-10" aria-hidden="true">
+      {/* Large floating stars - HIGH VISIBILITY */}
+      <motion.div
+        className="absolute top-[10%] left-[5%] text-neo-yellow drop-shadow-[0_0_10px_rgba(255,225,53,0.5)]"
+        animate={{
+          y: [0, -20, 0],
+          rotate: [0, 15, 0],
+          scale: [1, 1.1, 1]
+        }}
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+        style={{ x: mouseParallax.x * 0.5, y: mouseParallax.y * 0.5 }}
+      >
+        <Star className="w-10 h-10 fill-current" />
+      </motion.div>
+
+      <motion.div
+        className="absolute top-[20%] right-[10%] text-neo-pink drop-shadow-[0_0_10px_rgba(255,107,158,0.5)]"
+        animate={{
+          y: [0, -15, 0],
+          rotate: [0, -20, 0],
+          scale: [1, 1.15, 1]
+        }}
+        transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+        style={{ x: mouseParallax.x * -0.3, y: mouseParallax.y * -0.3 }}
+      >
+        <Sparkles className="w-8 h-8" />
+      </motion.div>
+
+      <motion.div
+        className="absolute top-[35%] left-[3%] text-neo-cyan drop-shadow-[0_0_8px_rgba(0,245,255,0.5)]"
+        animate={{
+          y: [0, -25, 0],
+          rotate: [0, 25, 0]
+        }}
+        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+        style={{ x: mouseParallax.x * 0.7, y: mouseParallax.y * 0.7 }}
+      >
+        <Zap className="w-7 h-7 fill-current" />
+      </motion.div>
+
+      <motion.div
+        className="absolute top-[50%] right-[5%] text-neo-yellow drop-shadow-[0_0_8px_rgba(255,225,53,0.4)]"
+        animate={{
+          y: [0, -12, 0],
+          scale: [1, 1.2, 1]
+        }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
+        style={{ x: mouseParallax.x * -0.6, y: mouseParallax.y * -0.6 }}
       >
         <Star className="w-6 h-6 fill-current" />
       </motion.div>
+
       <motion.div
-        className="absolute top-[25%] right-[15%] text-neo-pink/30"
-        animate={{ y: [0, -8, 0], rotate: [0, -15, 0] }}
-        transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-      >
-        <Sparkles className="w-5 h-5" />
-      </motion.div>
-      <motion.div
-        className="absolute bottom-[30%] left-[8%] text-neo-cyan/25"
-        animate={{ y: [0, -12, 0], rotate: [0, 20, 0] }}
-        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-      >
-        <Star className="w-4 h-4 fill-current" />
-      </motion.div>
-      <motion.div
-        className="absolute top-[40%] right-[8%] text-neo-yellow/20"
-        animate={{ y: [0, -6, 0], scale: [1, 1.1, 1] }}
-        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
-      >
-        <Sparkles className="w-4 h-4" />
-      </motion.div>
-      <motion.div
-        className="absolute bottom-[20%] right-[20%] text-neo-pink/20"
-        animate={{ y: [0, -10, 0], rotate: [0, -10, 0] }}
+        className="absolute bottom-[35%] left-[8%] text-neo-pink drop-shadow-[0_0_8px_rgba(255,107,158,0.4)]"
+        animate={{
+          y: [0, -18, 0],
+          rotate: [0, -15, 0]
+        }}
         transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+        style={{ x: mouseParallax.x * 0.4, y: mouseParallax.y * 0.4 }}
       >
-        <Star className="w-5 h-5 fill-current" />
+        <Heart className="w-6 h-6 fill-current" />
       </motion.div>
+
+      <motion.div
+        className="absolute bottom-[25%] right-[15%] text-neo-cyan drop-shadow-[0_0_8px_rgba(0,245,255,0.4)]"
+        animate={{
+          y: [0, -20, 0],
+          rotate: [0, 20, 0],
+          scale: [1, 1.1, 1]
+        }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+        style={{ x: mouseParallax.x * -0.5, y: mouseParallax.y * -0.5 }}
+      >
+        <Sparkles className="w-7 h-7" />
+      </motion.div>
+
+      {/* Small accent dots scattered around */}
+      <motion.div
+        className="absolute top-[15%] left-[30%] w-3 h-3 rounded-full bg-neo-yellow shadow-[0_0_10px_rgba(255,225,53,0.6)]"
+        animate={{ scale: [1, 1.5, 1], opacity: [0.6, 1, 0.6] }}
+        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <motion.div
+        className="absolute top-[45%] left-[25%] w-2 h-2 rounded-full bg-neo-pink shadow-[0_0_8px_rgba(255,107,158,0.6)]"
+        animate={{ scale: [1, 1.8, 1], opacity: [0.5, 1, 0.5] }}
+        transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+      />
+      <motion.div
+        className="absolute top-[60%] right-[30%] w-2 h-2 rounded-full bg-neo-cyan shadow-[0_0_8px_rgba(0,245,255,0.6)]"
+        animate={{ scale: [1, 1.6, 1], opacity: [0.5, 1, 0.5] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+      />
+      <motion.div
+        className="absolute bottom-[40%] left-[40%] w-2.5 h-2.5 rounded-full bg-neo-purple shadow-[0_0_8px_rgba(187,134,252,0.6)]"
+        animate={{ scale: [1, 1.7, 1], opacity: [0.6, 1, 0.6] }}
+        transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+      />
     </div>
+  );
+});
+
+/**
+ * Mascot component for the hero section
+ */
+const HeroMascot = memo(function HeroMascot() {
+  const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
+
+  return (
+    <motion.div
+      className="relative w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 mx-auto mb-2"
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+    >
+      <motion.div
+        animate={!prefersReducedMotion && enableComplexAnimations ? {
+          y: [0, -8, 0],
+          rotate: [-2, 2, -2],
+        } : {}}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        <Image
+          src="/mascot/lexi-happy.png"
+          alt="Lexi mascot"
+          width={160}
+          height={160}
+          className="drop-shadow-[0_8px_20px_rgba(0,0,0,0.3)]"
+          priority
+        />
+      </motion.div>
+
+      {/* Sparkle accents around mascot */}
+      {enableComplexAnimations && !prefersReducedMotion && (
+        <>
+          <motion.div
+            className="absolute -top-2 -right-2 text-neo-yellow"
+            animate={{ scale: [0, 1, 0], rotate: [0, 180, 360] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0 }}
+          >
+            <Sparkles className="w-5 h-5" />
+          </motion.div>
+          <motion.div
+            className="absolute top-1/2 -left-4 text-neo-pink"
+            animate={{ scale: [0, 1, 0], rotate: [0, -180, -360] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
+          >
+            <Star className="w-4 h-4 fill-current" />
+          </motion.div>
+          <motion.div
+            className="absolute -bottom-1 right-1/4 text-neo-cyan"
+            animate={{ scale: [0, 1, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+          >
+            <Zap className="w-4 h-4 fill-current" />
+          </motion.div>
+        </>
+      )}
+    </motion.div>
   );
 });
 
@@ -202,9 +379,12 @@ const LandingView: React.FC = () => {
 
   return (
     <div
-      className={`flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative ${isLandscape ? 'landscape-full-height' : ''}`}
+      className={`flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative overflow-hidden ${isLandscape ? 'landscape-full-height' : ''}`}
       {...pullToRefreshHandlers}
     >
+      {/* Parallax background layers */}
+      {!isLandscape && <ParallaxBackground />}
+
       {/* Floating decorative elements */}
       {!isLandscape && <FloatingDecorations />}
 
@@ -231,21 +411,34 @@ const LandingView: React.FC = () => {
       <Header />
 
       {/* Main content */}
-      <main className={`w-full max-w-7xl mx-auto overflow-x-hidden ${isLandscape ? 'flex-1 flex flex-col justify-center px-4 py-2' : 'px-2 sm:px-3 lg:px-6 xl:px-8 py-2 sm:py-3 lg:py-6 pb-40 lg:pb-6'}`}>
-        {/* Hero section - compact (hidden in landscape) - CSS animation for instant paint */}
+      <main className={`w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 ${isLandscape ? 'flex-1 flex flex-col justify-center px-4 py-2' : 'px-2 sm:px-3 lg:px-6 xl:px-8 py-2 sm:py-3 lg:py-6 pb-40 lg:pb-6'}`}>
+        {/* Hero section with mascot - dramatic parallax effect */}
         {!isLandscape && (
           <motion.div
             className="text-center mb-2 sm:mb-3 lg:mb-6 xl:mb-8 animate-fade-in-fast relative z-10"
             style={{
-              transform: `translate(${mouseParallax.x * 0.3}px, ${mouseParallax.y * 0.3}px)`,
+              transform: `translate(${mouseParallax.x * 1.2}px, ${mouseParallax.y * 1.2}px)`,
             }}
           >
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl xl:text-6xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white mb-1 sm:mb-2 lg:mb-3">
+            {/* Mascot */}
+            <HeroMascot />
+
+            <motion.h1
+              className="text-xl sm:text-2xl md:text-3xl lg:text-5xl xl:text-6xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white mb-1 sm:mb-2 lg:mb-3"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
               {t('landing.chooseMode') || 'Choose Your Mode'}
-            </h1>
-            <p className="text-sm sm:text-base lg:text-xl xl:text-2xl font-medium text-neo-black/80 dark:text-neo-white/85">
+            </motion.h1>
+            <motion.p
+              className="text-sm sm:text-base lg:text-xl xl:text-2xl font-medium text-neo-black/80 dark:text-neo-white/85"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
               {t('landing.subtitleSimple') || 'Practice solo or challenge friends'}
-            </p>
+            </motion.p>
           </motion.div>
         )}
 
