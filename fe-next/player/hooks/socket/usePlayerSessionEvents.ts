@@ -127,7 +127,6 @@ export function usePlayerSessionEvents({
       intentionalExitRef.current = true;
       clearSessionPreservingUsername(username);
       neoInfoToast(data.message || t('playerView.sessionMovedToAnotherRoom') || 'Session moved to another room', {
-        icon: '🔄',
         duration: 3000
       });
     };

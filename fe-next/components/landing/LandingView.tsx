@@ -140,7 +140,6 @@ const LandingView: React.FC = () => {
       await new Promise((resolve) => setTimeout(resolve, 500));
       toast.success(t('common.refreshed') || 'Refreshed', {
         duration: 2000,
-        icon: '🔄',
       });
     },
     threshold: 60,

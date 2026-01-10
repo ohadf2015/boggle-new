@@ -52,7 +52,6 @@ export default function LeaderboardPage(): React.ReactNode {
     await new Promise((resolve) => setTimeout(resolve, 500));
     toast.success(t('common.refreshed') || 'Refreshed', {
       duration: 2000,
-      icon: '🔄',
     });
   };
 

@@ -12,6 +12,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { useSurvivalHints } from '../useSurvivalHints';
 import type { Language } from '@/types';
+import { generateProgressiveHints, generateFallbackHints } from '@/utils/aiHintGenerator';
 
 // Mock the AI hint generator to avoid API calls
 jest.mock('@/utils/aiHintGenerator', () => {
@@ -68,6 +69,18 @@ describe('useSurvivalHints', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    
+    (generateProgressiveHints as jest.Mock).mockResolvedValue({
+      hints: [{ level: 1, hint: '_ _ _ _ _', unlockCost: 0 }],
+      category: 'Test Category',
+      exampleSentence: 'Test sentence with _____.',
+    });
+    
+    (generateFallbackHints as jest.Mock).mockReturnValue({
+      hints: [{ level: 1, hint: '_ _ _ _ _', unlockCost: 0 }],
+      category: 'Unknown',
+      exampleSentence: 'Test sentence.',
+    });
   });
 
   describe('getNextAffordableClue - Progressive Tier System', () => {

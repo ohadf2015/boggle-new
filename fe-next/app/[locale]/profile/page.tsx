@@ -71,7 +71,6 @@ export default function ProfilePage(): React.ReactNode {
       await refreshProfile();
       toast.success(t('common.refreshed') || 'Refreshed', {
         duration: 2000,
-        icon: '🔄',
       });
     },
     threshold: 60,

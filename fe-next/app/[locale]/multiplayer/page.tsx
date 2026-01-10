@@ -404,7 +404,6 @@ export default function MultiplayerPage(): React.JSX.Element {
           logger.log('[SOCKET.IO] Reconnecting to game:', savedSession.gameCode);
           toast.success(t('common.reconnecting') || 'Reconnecting to game...', {
             duration: 2000,
-            icon: '🔄',
           });
 
           // Build auth context inline for reconnection

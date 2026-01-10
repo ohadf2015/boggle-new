@@ -42,7 +42,6 @@ const RoomListView: React.FC<RoomListViewProps> = ({
       await new Promise((resolve) => setTimeout(resolve, 500));
       toast.success(t('multiplayerFlow.roomList.refreshed') || 'Rooms refreshed', {
         duration: 2000,
-        icon: '🔄',
       });
     },
     threshold: 60,

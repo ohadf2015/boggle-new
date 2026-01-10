@@ -84,7 +84,7 @@ const he = {
     "admin": "מנהל",
     "understood": "יאללה!",
     "refresh": "רענן",
-    "refreshed": "רענון! 🔄",
+    "refreshed": "רענון!",
     "reconnecting": "מתחבר מחדש...",
     "reconnected": "חזרנו!",
     "connectionLost": "החיבור נפל",

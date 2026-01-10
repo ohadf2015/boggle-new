@@ -31,7 +31,6 @@ export default function FriendsPage(): React.JSX.Element {
       await refreshFriends();
       toast.success(t('common.refreshed') || 'Refreshed', {
         duration: 2000,
-        icon: '🔄',
       });
     },
     threshold: 60,
