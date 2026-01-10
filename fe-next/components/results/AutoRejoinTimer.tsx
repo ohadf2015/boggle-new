@@ -115,7 +115,7 @@ const AutoRejoinTimer = memo<AutoRejoinTimerProps>(({
           paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 0px))'
         }}
       >
-        <div className="bg-neo-cyan text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-3 sm:p-4 flex flex-col items-center gap-2 sm:gap-3 mx-4 pointer-events-auto relative overflow-hidden texture-halftone-comic">
+        <div className="bg-neo-cyan text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-3 sm:p-4 flex flex-col items-center gap-2 sm:gap-3 mx-4 pointer-events-auto relative overflow-hidden">
           {/* Comic-style halftone dots */}
           <div
             className="absolute inset-0 pointer-events-none opacity-[0.05]"

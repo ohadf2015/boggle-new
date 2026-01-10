@@ -2,7 +2,7 @@
 
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
-import { RotateCw, Play, DoorOpen, Star, Check, ArrowRight, ArrowLeft, BarChart3 } from 'lucide-react';
+import { Play, DoorOpen, Star, Check, ArrowRight, ArrowLeft, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -72,13 +72,6 @@ export const SinglePlayerActions: React.FC<SinglePlayerActionsProps> = memo(({
               className="relative w-full py-2 bg-gradient-to-r from-neo-yellow to-neo-lime hover:brightness-105 text-neo-black font-bold text-xs border-2 border-neo-black overflow-hidden"
               onClick={onQuickRematch}
             >
-              <motion.span
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="inline-flex"
-              >
-                <RotateCw className="me-1 w-3.5 h-3.5" />
-              </motion.span>
               {t('common.rematch') || 'Rematch'}
             </Button>
           </motion.div>
@@ -138,13 +131,6 @@ export const SinglePlayerActions: React.FC<SinglePlayerActionsProps> = memo(({
               animate={{ x: ['-200%', '200%'] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", repeatDelay: 1 }}
             />
-            <motion.span
-              animate={{ rotate: [0, 360] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className="inline-flex"
-            >
-              <RotateCw className="me-2 w-7 h-7" />
-            </motion.span>
             <span className="relative z-10">{t('common.quickRematch') || 'Quick Rematch'}</span>
             <motion.span
               animate={{ scale: [1, 1.2, 1] }}

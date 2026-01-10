@@ -71,6 +71,7 @@ const en = {
     "error": "Whoops!",
     "retry": "Try Again",
     "back": "Back",
+    "backToHome": "Back to Home",
     "next": "Next",
     "confirm": "Confirm",
     "cancel": "Cancel",
@@ -177,7 +178,8 @@ const en = {
     "all": "All",
     "validating": "Checking...",
     "later": "Later",
-    "skip": "Skip"
+    "skip": "Skip",
+    "done": "Done"
   },
   "connection": {
     "reconnecting": "Reconnecting...",
@@ -956,6 +958,7 @@ const en = {
     "exit": "Exit",
     "exitRoom": "Exit Room",
     "waitForGameStart": "Wait for game start",
+    "clickToWakeUp": "Tap to say hi!",
     "players": "Players",
     "yourAchievements": "Your Achievements",
     "letterGrid": "Letter Grid",
@@ -1781,7 +1784,8 @@ const en = {
       "keepGoing": "Keep going!",
       "getStarted": "Let's get started!",
       "ready": "Ready!",
-      "readyForMultiplayer": "You're ready for multiplayer!"
+      "readyForMultiplayer": "You're ready for multiplayer!",
+      "tapForDetails": "Tap for details"
     },
     "unlock": {
       "title": "Skill Unlocked!",
@@ -2241,8 +2245,8 @@ const en = {
       "showMeLeaderboard": "Show Me On The Leaderboard!"
     },
     "inlineSignup": {
-      "title": "Sign up to appear on the leaderboard",
-      "subtitle": "Save your result and compete globally",
+      "title": "Join the Word Warriors!",
+      "subtitle": "Your score is too good to lose!",
       "orContinueWith": "or continue with email",
       "emailPlaceholder": "Email address",
       "passwordPlaceholder": "Password (8+ characters)",
@@ -2256,6 +2260,16 @@ const en = {
       "passwordRequired": "Password required",
       "passwordTooShort": "Password too short",
       "passwordTooLong": "Password is too long",
+      "skipForNow": "Skip for now",
+      "skipHover": "(Lexi will be sad, but okay...)",
+      "mascotTooltip": "Click me!",
+      "funnyMessages": {
+        "dontLeaveHanging": "Hey! Don't leave me hanging! Sign up and let's climb that leaderboard together!",
+        "scoresTooGood": "Your scores are too good to vanish into the void! Let's make them permanent!",
+        "streakProtector": "I'm basically a streak bodyguard. Sign up and I'll protect yours forever!",
+        "joinWordNerds": "Join the elite club of word nerds who actually remember their scores!",
+        "makeMomProud": "Make your mom proud - show her your name on the leaderboard!"
+      },
       "benefits": {
         "leaderboard": "Claim your spot on the leaderboard",
         "syncDevices": "Sync progress across devices",
@@ -2523,7 +2537,9 @@ const en = {
     "placement": "Placement",
     "topThreeBonus": "Top 3 Bonus",
     "efficiency": "Efficiency",
-    "streak": "Streak"
+    "streak": "Streak",
+    "guestTeasing": "Sign in to earn {amount} coins!",
+    "signInShort": "Sign in"
   },
   "partyScreen": {
     "title": "Party Screen",
@@ -2653,6 +2669,7 @@ const en = {
     "leading": "Leading!",
     "ahead": "ahead",
     "toCatch": "pts to pass",
+    "almostThere": "Almost there!",
     "live": "Live",
     "backToGame": "Back to Game"
   },
@@ -2853,6 +2870,8 @@ const en = {
     "fewWordsFoundSingular": "Found 1 word",
     "achievementsNotSaved": "Solo achievements aren't saved to your profile.",
     "botDetails": "Bot Stats",
+    "botWordsFound": "Bot Words Found",
+    "noWordsToShow": "Word details not available",
     "difficulty": "Difficulty",
     "timer": "Timer",
     "totalScore": "Total",
@@ -3132,6 +3151,9 @@ const en = {
     },
     "leaderboard": "Ranks",
     "screenshotProtection": "Return to continue playing",
+    "clueUnlocked": "Clue unlocked!",
+    "categoryUnlocked": "Category revealed!",
+    "exampleUnlocked": "Example unlocked!",
     "trainingSuggestion": {
       "title": "New to LexiClash?",
       "subtitle": "Try a quick training game first to learn the mechanics!",
@@ -3213,6 +3235,7 @@ const en = {
       "pts": "pts"
     },
     "survival": {
+      "tokens": "Tokens",
       "lifePoints": "Life",
       "lifeRemaining": "{points} Life",
       "lifeDraining": "Life draining...",
@@ -3694,17 +3717,17 @@ const en = {
       "title": "Progress",
       "improving": "Improving",
       "stable": "Stable",
-      "declining": "Needs work",
+      "declining": "Level up zone!",
       "gamesAnalyzed": "games analyzed",
       "toNextTier": "to next tier"
     },
     "recommendation": {
       "title": "Recommended For You",
-      "weakest": "Your {{domain}} could use some work.",
+      "weakest": "Let's supercharge your {{domain}}!",
       "tryDrill": "Try the {{drill}} drill to improve!",
       "startDrill": "Start Drill",
-      "declining": "Your {{domain}} is declining - time to train!",
-      "low": "Your {{domain}} needs attention.",
+      "declining": "Power up your {{domain}} - let's go!",
+      "low": "Your {{domain}} is ready to level up!",
       "improve": "Boost your {{domain}} with targeted practice.",
       "unlock": "{{games}} games to unlock",
       "scienceHint": "Targeted practice improves specific cognitive skills"
@@ -3890,6 +3913,40 @@ const en = {
     "title": "Level Up!",
     "reached": "You reached level {level}!"
   },
+  "customPuzzle": {
+    "title": "Custom Puzzle",
+    "description": "Can you solve this custom word puzzle?",
+    "createTitle": "Create Your Own Puzzle",
+    "createYourOwn": "Create Your Own Puzzle",
+    "createDescription": "Challenge friends with your own word puzzle",
+    "selectWord": "Select a target word for your puzzle:",
+    "enterWord": "Enter your target word",
+    "enterWordPlaceholder": "Type a word...",
+    "validating": "Checking...",
+    "wordValid": "Valid word!",
+    "wordInvalid": "Word not in dictionary",
+    "invalidCharacters": "Letters only",
+    "wordTooShort": "Minimum 3 letters",
+    "wordTooLong": "Maximum 8 letters",
+    "createPuzzle": "Create Puzzle",
+    "generating": "Generating puzzle...",
+    "loading": "Loading puzzle...",
+    "created": "Puzzle Created!",
+    "shareWithFriends": "Share with friends to challenge them!",
+    "yourScore": "Your Score to Beat",
+    "share": "Share Puzzle",
+    "shareText": "I created a custom word puzzle. Can you beat my score?",
+    "createdBy": "Created by {name}",
+    "creatorScore": "Creator's Score",
+    "solvedIn": "Solved in {attempts} attempts",
+    "challengeDescription": "Find the hidden word before time runs out. Can you beat the creator?",
+    "play": "Play Challenge",
+    "solved": "You solved it!",
+    "failed": "Better luck next time!",
+    "beatCreator": "You beat the creator!",
+    "leaderboard": "Leaderboard",
+    "playDaily": "Play Daily Challenge"
+  },
   "ui": {
     "empty": {
       "noWordsYet": "Start finding words!",
@@ -3935,6 +3992,37 @@ const en = {
       "yourScore": "Your Score",
       "newPersonalBest": "New Personal Best!",
       "almostThere": "So close! Just {{points}} points away"
+    }
+  },
+  "admin": {
+    "dashboard": "Admin Dashboard",
+    "accessRequired": "Admin Access Required",
+    "accessDenied": "You need administrator privileges to access this page.",
+    "welcome": "Welcome,",
+    "live": {
+      "subtitle": "Real-time game monitoring",
+      "live": "Live",
+      "games": "games",
+      "players": "players",
+      "sockets": "sockets",
+      "singlePlayer": "solo",
+      "refresh": "Refresh",
+      "retry": "Retry",
+      "noGames": "No active games",
+      "noGamesHint": "Games will appear here when players start playing",
+      "activeGames": "Active Games",
+      "connectedPlayers": "Connected Players",
+      "player": "Player",
+      "game": "Game",
+      "status": "Status",
+      "score": "Score",
+      "type": "Type",
+      "auth": "Auth",
+      "guest": "Guest",
+      "ranked": "Ranked",
+      "left": "left",
+      "started": "Started",
+      "lastUpdated": "Last updated"
     }
   }
 };

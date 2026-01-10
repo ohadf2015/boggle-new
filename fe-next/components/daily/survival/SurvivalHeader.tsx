@@ -1,36 +1,36 @@
 'use client';
 
 import React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { X, Store, Coins } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { X, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 
 export interface SurvivalHeaderProps {
   clueTokens: number;
-  showShop: boolean;
-  showShopHint: boolean;
+  /** @deprecated Shop has been removed - clues auto-unlock now */
+  showShop?: boolean;
+  /** @deprecated Shop has been removed - clues auto-unlock now */
+  showShopHint?: boolean;
   onQuitClick: () => void;
-  onShopClick: () => void;
+  /** @deprecated Shop has been removed - clues auto-unlock now */
+  onShopClick?: () => void;
   t: (key: string) => string;
 }
 
 /**
- * Header bar for survival mode - quit button, tokens, and shop access
+ * Header bar for survival mode - quit button and token display
+ * Shop has been removed - clues now auto-unlock as tokens are earned
  */
 export const SurvivalHeader: React.FC<SurvivalHeaderProps> = ({
   clueTokens,
-  showShop,
-  showShopHint,
   onQuitClick,
-  onShopClick,
   t,
 }) => {
   return (
     <div className="flex items-center justify-between mb-1 px-2 max-w-3xl mx-auto w-full">
       <Button
         variant="ghost"
-        size="sm"
+        size="default"
         onClick={onQuitClick}
         className="text-gray-600 hover:text-red-500"
       >
@@ -38,47 +38,18 @@ export const SurvivalHeader: React.FC<SurvivalHeaderProps> = ({
         {t('common.quit') || 'Quit'}
       </Button>
 
-      {/* Coins + Shop in corner */}
-      <div className="flex items-center gap-2">
-        <div className="flex items-center gap-1 px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 border-2 border-neo-black rounded-neo">
-          <Coins className="w-4 h-4 text-yellow-600" />
-          <span className="font-bold text-sm">{clueTokens}</span>
-        </div>
-        <div className="relative">
-          <Button
-            size="sm"
-            onClick={onShopClick}
-            className={cn(
-              "bg-neo-pink text-white relative hover:bg-neo-pink/80",
-              showShopHint && "animate-pulse ring-2 ring-neo-yellow ring-offset-1"
-            )}
-          >
-            <Store className="w-4 h-4" />
-            {clueTokens > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-neo-yellow text-neo-black text-xs font-bold rounded-full flex items-center justify-center border border-neo-black">
-                !
-              </span>
-            )}
-          </Button>
-
-          {/* Non-intrusive hint tooltip */}
-          <AnimatePresence>
-            {showShopHint && (
-              <motion.div
-                initial={{ opacity: 0, y: 5, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 5, scale: 0.95 }}
-                className="absolute top-full right-0 mt-2 z-50"
-              >
-                <div className="bg-neo-yellow text-neo-black text-xs font-bold px-3 py-1.5 rounded-neo border-2 border-neo-black whitespace-nowrap shadow-hard-sm">
-                  <Coins className="w-3 h-3 inline mr-1" />
-                  {t('wordHunt.survival.spendCoinsHint') || 'Spend coins on clues!'}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
+      {/* Token display - clues auto-unlock as you earn tokens */}
+      <motion.div
+        className="flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-yellow-900/30 dark:to-amber-900/30 border-2 border-neo-black rounded-neo"
+        animate={clueTokens > 0 ? { scale: [1, 1.05, 1] } : {}}
+        transition={{ duration: 0.3 }}
+      >
+        <Sparkles className="w-4 h-4 text-amber-500" />
+        <span className="font-bold text-sm">{clueTokens}</span>
+        <span className="text-xs text-gray-500 hidden sm:inline">
+          {t('wordHunt.survival.tokens') || 'tokens'}
+        </span>
+      </motion.div>
     </div>
   );
 };

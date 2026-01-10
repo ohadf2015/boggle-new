@@ -8,12 +8,13 @@
  * - types.ts                    - All interfaces and types
  * - constants.ts                - Game constants and thresholds
  * - useSurvivalGameLogic.ts     - Custom hook for game state and logic
- * - SurvivalHeader.tsx          - Header with quit, tokens, shop
+ * - SurvivalHeader.tsx          - Header with quit and tokens display
  * - SurvivalLifeBar.tsx         - Life bar with animations
  * - SurvivalClueBoxes.tsx       - Hint boxes with feedback overlay
- * - SurvivalClueShop.tsx        - Shop modal for purchasing hints
  * - SurvivalGridSection.tsx     - Grid wrapper with protection
  * - SurvivalLandscapeLayout.tsx - Landscape mode layout
+ *
+ * Note: Shop has been removed - clues now auto-unlock as tokens are earned
  */
 
 // Types
@@ -58,8 +59,7 @@ export type { SurvivalLifeBarProps } from './SurvivalLifeBar';
 export { SurvivalClueBoxes } from './SurvivalClueBoxes';
 export type { SurvivalClueBoxesProps } from './SurvivalClueBoxes';
 
-export { SurvivalClueShop } from './SurvivalClueShop';
-export type { SurvivalClueShopProps } from './SurvivalClueShop';
+// SurvivalClueShop removed - clues now auto-unlock as tokens are earned
 
 export { SurvivalGridSection } from './SurvivalGridSection';
 export type { SurvivalGridSectionProps } from './SurvivalGridSection';

@@ -1,0 +1,127 @@
+import { NextResponse } from 'next/server';
+import { createClient } from '@/utils/supabase/server';
+import { generatePuzzleCode, calculateCustomPuzzleScore } from '@/utils/customPuzzle';
+import type { LetterGrid, Language } from '@/types';
+
+interface CreatePuzzleRequest {
+  language: Language;
+  targetWord: string;
+  grid: LetterGrid;
+  displayName: string;
+  guestFingerprint?: string;
+  // Creator's first play results
+  creatorSolved: boolean;
+  creatorAttemptsUsed: number;
+  creatorWordsDiscovered: number;
+  creatorLifeRemaining: number;
+}
+
+export async function POST(request: Request) {
+  try {
+    const body: CreatePuzzleRequest = await request.json();
+    const {
+      language,
+      targetWord,
+      grid,
+      displayName,
+      guestFingerprint,
+      creatorSolved,
+      creatorAttemptsUsed,
+      creatorWordsDiscovered,
+      creatorLifeRemaining,
+    } = body;
+
+    // Validate required fields
+    if (!language || !targetWord || !grid || !displayName) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Validate target word length
+    if (targetWord.length < 3 || targetWord.length > 10) {
+      return NextResponse.json(
+        { error: 'Target word must be 3-10 characters' },
+        { status: 400 }
+      );
+    }
+
+    const supabase = await createClient();
+
+    // Get authenticated user if available
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Generate unique puzzle code
+    let puzzleCode = generatePuzzleCode();
+    let attempts = 0;
+    const maxAttempts = 5;
+
+    // Ensure code is unique
+    while (attempts < maxAttempts) {
+      const { data: existing } = await supabase
+        .from('custom_puzzles')
+        .select('id')
+        .eq('puzzle_code', puzzleCode)
+        .single();
+
+      if (!existing) break;
+      puzzleCode = generatePuzzleCode();
+      attempts++;
+    }
+
+    if (attempts >= maxAttempts) {
+      return NextResponse.json(
+        { error: 'Failed to generate unique puzzle code' },
+        { status: 500 }
+      );
+    }
+
+    // Calculate creator's efficiency score
+    const creatorEfficiencyScore = calculateCustomPuzzleScore(
+      creatorSolved,
+      creatorAttemptsUsed,
+      creatorWordsDiscovered,
+      creatorLifeRemaining
+    );
+
+    // Create the puzzle
+    const { data: puzzle, error } = await supabase
+      .from('custom_puzzles')
+      .insert({
+        puzzle_code: puzzleCode,
+        creator_id: user?.id || null,
+        creator_guest_fingerprint: user ? null : guestFingerprint,
+        creator_display_name: displayName,
+        language,
+        target_word: targetWord.toUpperCase(),
+        grid,
+        creator_solved: creatorSolved,
+        creator_attempts_used: creatorAttemptsUsed,
+        creator_efficiency_score: creatorEfficiencyScore,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating puzzle:', error);
+      return NextResponse.json(
+        { error: 'Failed to create puzzle' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      puzzleCode,
+      puzzleId: puzzle.id,
+      creatorEfficiencyScore,
+    });
+  } catch (error) {
+    console.error('Create puzzle error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

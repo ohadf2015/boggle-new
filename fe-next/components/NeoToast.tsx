@@ -100,14 +100,6 @@ interface NeoToastOptions {
   duration?: number;
 }
 
-interface LevelUpOptions {
-  title?: string;
-  newTitle?: string;
-  newTitleLabel?: string;
-  duration?: number;
-}
-
-
 // Neo-Brutalist Word Accepted Toast
 export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {}): string => {
   const { score, comboBonus, comboLevel, fireRoundActive, duration } = options;
@@ -459,82 +451,6 @@ export const neoErrorToast = (message: string, options: NeoToastOptions = {}): s
     ),
     {
       duration: options.duration || 3000,
-      position: 'top-center',
-    }
-  );
-};
-
-// Neo-Brutalist Level Up Toast
-export const levelUpToast = (oldLevel: number, newLevel: number, options: LevelUpOptions = {}): string => {
-  return toast.custom(
-    (t) => (
-      <AnimatePresence>
-        {t.visible && (
-          <motion.div
-            initial={{ y: -50, opacity: 0, scale: 0.5, rotate: -10 }}
-            animate={{
-              y: 0,
-              opacity: 1,
-              scale: 1,
-              rotate: 0,
-            }}
-            exit={{ y: -30, opacity: 0, scale: 0.8 }}
-            transition={{
-              type: 'spring',
-              stiffness: 300,
-              damping: 20
-            }}
-            className="flex flex-col items-center gap-2 px-6 py-4 rounded-neo bg-gradient-to-br from-neo-yellow via-neo-pink to-neo-cyan border-4 border-neo-black shadow-hard-lg"
-            style={{ minWidth: '220px', pointerEvents: 'auto' }}
-          >
-            <motion.div
-              animate={{
-                scale: [1, 1.3, 1],
-                rotate: [0, 10, -10, 0]
-              }}
-              transition={{
-                duration: 0.6,
-                repeat: 2,
-                ease: "easeInOut"
-              }}
-              className="text-4xl"
-            >
-              🎉
-            </motion.div>
-            <span className="font-black uppercase tracking-wide text-neo-black text-lg">
-              {options.title || 'Level Up!'}
-            </span>
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 400 }}
-              className="flex items-center gap-2 bg-neo-black text-neo-cream px-4 py-2 rounded-neo font-black text-xl"
-            >
-              <span>{oldLevel}</span>
-              <motion.span
-                animate={{ x: [0, 5, 0] }}
-                transition={{ duration: 0.5, repeat: Infinity }}
-              >
-                →
-              </motion.span>
-              <span className="text-neo-yellow">{newLevel}</span>
-            </motion.div>
-            {options.newTitle && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="text-xs font-bold text-neo-black/80 bg-neo-cream/50 px-2 py-1 rounded-neo border border-neo-black"
-              >
-                🏅 {options.newTitleLabel || 'New Title'}: {options.newTitle}
-              </motion.div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    ),
-    {
-      duration: options.duration || 4000,
       position: 'top-center',
     }
   );

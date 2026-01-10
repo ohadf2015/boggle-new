@@ -147,7 +147,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
         window.navigator.vibrate(200);
       }
     }
-  }, [username, isHost, messages.length, virtualizer, playMessageSound, onNewMessage]);
+  }, [username, isHost, messages.length, virtualizer, playMessageSound, onNewMessage, announce]);
 
   useEffect(() => {
     if (!socket) return;

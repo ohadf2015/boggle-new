@@ -70,6 +70,7 @@ const es = {
     "loading": "Mezclando letras...",
     "error": "¡Ups!",
     "back": "Atrás",
+    "backToHome": "Volver al Inicio",
     "next": "Siguiente",
     "confirm": "Confirmar",
     "cancel": "Cancelar",
@@ -176,7 +177,8 @@ const es = {
     "invalid": "Inválido",
     "validating": "Verificando...",
     "later": "Después",
-    "skip": "Omitir"
+    "skip": "Omitir",
+    "done": "Listo"
   },
   "connection": {
     "reconnecting": "Reconectando...",
@@ -938,6 +940,7 @@ const es = {
     "exit": "Salir",
     "exitRoom": "Salir de la sala",
     "waitForGameStart": "Espera que inicie el juego",
+    "clickToWakeUp": "¡Toca para saludar!",
     "players": "Jugadores",
     "yourAchievements": "Tus Logros",
     "letterGrid": "Tablero de Letras",
@@ -1898,8 +1901,8 @@ const es = {
       "showMeLeaderboard": "¡Muéstrame en la tabla!"
     },
     "inlineSignup": {
-      "title": "Regístrate para aparecer en la clasificación",
-      "subtitle": "Guarda tu resultado y compite globalmente",
+      "title": "¡Únete a los Guerreros de Palabras!",
+      "subtitle": "¡Tu puntaje es demasiado bueno para perderlo!",
       "orContinueWith": "o continúa con email",
       "emailPlaceholder": "Dirección de email",
       "passwordPlaceholder": "Contraseña (8+ caracteres)",
@@ -1913,6 +1916,16 @@ const es = {
       "passwordRequired": "Contraseña requerida",
       "passwordTooShort": "Contraseña muy corta",
       "passwordTooLong": "La contraseña es muy larga",
+      "skipForNow": "Saltar por ahora",
+      "skipHover": "(Lexi estará triste, pero está bien...)",
+      "mascotTooltip": "¡Haz clic!",
+      "funnyMessages": {
+        "dontLeaveHanging": "¡Oye! ¡No me dejes colgado! ¡Regístrate y subamos juntos en la tabla!",
+        "scoresTooGood": "¡Tus puntajes son demasiado buenos para desaparecer! ¡Hagámoslos permanentes!",
+        "streakProtector": "Soy básicamente un guardaespaldas de rachas. ¡Regístrate y protegeré la tuya para siempre!",
+        "joinWordNerds": "¡Únete al club de nerds de palabras que realmente recuerdan sus puntajes!",
+        "makeMomProud": "¡Haz que tu mamá esté orgullosa - muéstrale tu nombre en la tabla!"
+      },
       "benefits": {
         "leaderboard": "Reclama tu lugar en la tabla",
         "syncDevices": "Sincroniza tu progreso",
@@ -2213,7 +2226,9 @@ const es = {
     "placement": "Posición",
     "topThreeBonus": "Bono por top 3",
     "efficiency": "Eficiencia",
-    "streak": "Racha"
+    "streak": "Racha",
+    "guestTeasing": "¡Inicia sesión para ganar {amount} monedas!",
+    "signInShort": "Entrar"
   },
   "partyScreen": {
     "title": "Pantalla de Fiesta",
@@ -2612,7 +2627,8 @@ const es = {
       "keepGoing": "¡Sigue así!",
       "getStarted": "¡Empecemos!",
       "ready": "¡Listo!",
-      "readyForMultiplayer": "¡Estás listo para multijugador!"
+      "readyForMultiplayer": "¡Estás listo para multijugador!",
+      "tapForDetails": "Toca para ver detalles"
     },
     "unlock": {
       "title": "¡Habilidad Desbloqueada!",
@@ -2644,6 +2660,7 @@ const es = {
     "leading": "¡Liderando!",
     "ahead": "adelante",
     "toCatch": "pts para pasar",
+    "almostThere": "¡Ya casi!",
     "live": "En Vivo",
     "backToGame": "Volver al Juego"
   },
@@ -2844,6 +2861,8 @@ const es = {
     "fewWordsFoundSingular": "Encontraste 1 palabra",
     "achievementsNotSaved": "Los logros en modo un jugador no se guardan en tu perfil.",
     "botDetails": "Detalles del bot",
+    "botWordsFound": "Palabras de los bots",
+    "noWordsToShow": "Detalles de palabras no disponibles",
     "difficulty": "Dificultad",
     "timer": "Temporizador",
     "totalScore": "Puntuación total",
@@ -3123,6 +3142,9 @@ const es = {
     },
     "leaderboard": "Ranking",
     "screenshotProtection": "Regresa para continuar jugando",
+    "clueUnlocked": "¡Pista desbloqueada!",
+    "categoryUnlocked": "¡Categoría revelada!",
+    "exampleUnlocked": "¡Ejemplo desbloqueado!",
     "trainingSuggestion": {
       "title": "¿Nuevo en LexiClash?",
       "subtitle": "¡Prueba un juego de práctica para aprender la mecánica!",
@@ -3204,6 +3226,7 @@ const es = {
       "pts": "pts"
     },
     "survival": {
+      "tokens": "Tokens",
       "lifePoints": "Vida",
       "lifeRemaining": "{points} Vida",
       "lifeDraining": "La vida se agota...",
@@ -3865,6 +3888,40 @@ const es = {
     "title": "¡Subiste de Nivel!",
     "reached": "¡Llegaste al nivel {level}!"
   },
+  "customPuzzle": {
+    "title": "Puzzle Personalizado",
+    "description": "¿Puedes resolver este puzzle de palabras?",
+    "createTitle": "Crea Tu Propio Puzzle",
+    "createYourOwn": "Crea Tu Propio Puzzle",
+    "createDescription": "Desafía a amigos con tu propio puzzle de palabras",
+    "selectWord": "Selecciona una palabra objetivo para tu puzzle:",
+    "enterWord": "Ingresa tu palabra objetivo",
+    "enterWordPlaceholder": "Escribe una palabra...",
+    "validating": "Verificando...",
+    "wordValid": "¡Palabra válida!",
+    "wordInvalid": "Palabra no está en el diccionario",
+    "invalidCharacters": "Solo letras",
+    "wordTooShort": "Mínimo 3 letras",
+    "wordTooLong": "Máximo 8 letras",
+    "createPuzzle": "Crear Puzzle",
+    "generating": "Generando puzzle...",
+    "loading": "Cargando puzzle...",
+    "created": "¡Puzzle Creado!",
+    "shareWithFriends": "¡Comparte con amigos para retarlos!",
+    "yourScore": "Tu Puntuación a Superar",
+    "share": "Compartir Puzzle",
+    "shareText": "Creé un puzzle de palabras personalizado. ¿Puedes superar mi puntuación?",
+    "createdBy": "Creado por {name}",
+    "creatorScore": "Puntuación del Creador",
+    "solvedIn": "Resuelto en {attempts} intentos",
+    "challengeDescription": "Encuentra la palabra oculta antes de que se acabe el tiempo. ¿Puedes vencer al creador?",
+    "play": "Jugar Desafío",
+    "solved": "¡Lo resolviste!",
+    "failed": "¡Mejor suerte la próxima vez!",
+    "beatCreator": "¡Venciste al creador!",
+    "leaderboard": "Clasificación",
+    "playDaily": "Jugar Desafío Diario"
+  },
   "ui": {
     "empty": {
       "noWordsYet": "¡Empieza a encontrar palabras!",
@@ -3910,6 +3967,37 @@ const es = {
       "yourScore": "Tu puntuación",
       "newPersonalBest": "¡Nuevo récord personal!",
       "almostThere": "¡Tan cerca! Solo {{points}} puntos más"
+    }
+  },
+  "admin": {
+    "dashboard": "Panel de Administración",
+    "accessRequired": "Acceso de Administrador Requerido",
+    "accessDenied": "Necesitas privilegios de administrador para acceder a esta página.",
+    "welcome": "Bienvenido,",
+    "live": {
+      "subtitle": "Monitoreo de juegos en tiempo real",
+      "live": "En vivo",
+      "games": "juegos",
+      "players": "jugadores",
+      "sockets": "conexiones",
+      "singlePlayer": "individual",
+      "refresh": "Actualizar",
+      "retry": "Reintentar",
+      "noGames": "No hay juegos activos",
+      "noGamesHint": "Los juegos aparecerán aquí cuando los jugadores comiencen a jugar",
+      "activeGames": "Juegos Activos",
+      "connectedPlayers": "Jugadores Conectados",
+      "player": "Jugador",
+      "game": "Juego",
+      "status": "Estado",
+      "score": "Puntuación",
+      "type": "Tipo",
+      "auth": "Auth",
+      "guest": "Invitado",
+      "ranked": "Clasificado",
+      "left": "restante",
+      "started": "Iniciado",
+      "lastUpdated": "Última actualización"
     }
   }
 };

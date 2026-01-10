@@ -5,6 +5,7 @@
  */
 
 import type { Language } from '@/types';
+import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type {
   DailyChallengeResult,
   StoredDailyResult,
@@ -240,4 +241,69 @@ export function getAllWordHuntResults(language: Language): StoredWordHuntResult[
 
   // Sort by date descending
   return results.sort((a, b) => b.date.localeCompare(a.date));
+}
+
+// ==========================================
+// Server Result Mapping
+// ==========================================
+
+/**
+ * Server result shape from check-played API endpoint
+ * Matches the format returned by /api/daily-challenge/word-hunt/check-played
+ */
+export interface ServerWordHuntResult {
+  solved: boolean;
+  attemptsUsed: number;
+  targetWord: string;
+  attempts?: Array<{
+    word: string;
+    feedback: LetterFeedback[];
+    timestamp: number;
+  }>;
+  wordsDiscovered?: Array<{
+    word: string;
+    timestamp: number;
+    lifeGained: number;
+    tokensGained: number;
+  }>;
+  lifeRemaining?: number;
+  efficiencyScore?: number;
+  completedAt?: string;
+}
+
+/**
+ * Maps server result data to StoredWordHuntResult format
+ * Used when reconstructing local storage from server data (e.g., after localStorage clear)
+ */
+export function mapServerResultToStoredResult(
+  serverResult: ServerWordHuntResult,
+  date: string,
+  puzzleNumber: number,
+  language: Language
+): StoredWordHuntResult {
+  const completedAt = serverResult.completedAt || new Date().toISOString();
+
+  return {
+    date,
+    puzzleNumber,
+    result: {
+      puzzleNumber,
+      puzzleDate: date,
+      language,
+      solved: serverResult.solved,
+      attemptsUsed: serverResult.attemptsUsed,
+      targetWord: serverResult.targetWord,
+      attempts: serverResult.attempts || [],
+      wordsDiscovered: serverResult.wordsDiscovered || [],
+      lifeRemaining: serverResult.lifeRemaining || 0,
+      clueTokensEarned: 0,
+      clueTokensSpent: 0,
+      hintsUnlocked: 0,
+      efficiencyScore: serverResult.efficiencyScore || 0,
+      streakDays: 0,
+      completedAt,
+    },
+    completedAt,
+    submittedToServer: true,
+  };
 }

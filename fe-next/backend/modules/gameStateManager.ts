@@ -161,6 +161,28 @@ export interface GameSummary {
   language: Language;
 }
 
+// Detailed game interface for admin dashboard
+export interface DetailedGamePlayer {
+  username: string;
+  avatar: { emoji?: string; color?: string; avatarImage?: string } | null;
+  isHost: boolean;
+  isBot: boolean;
+  presence: 'active' | 'idle' | 'afk' | 'disconnected';
+  score: number;
+  isAuthenticated: boolean;
+}
+
+export interface DetailedGame {
+  gameCode: string;
+  roomName: string;
+  language: Language;
+  gameState: 'waiting' | 'in-progress' | 'validating' | 'finished';
+  isRanked: boolean;
+  createdAt: number;
+  timerSeconds: number;
+  players: DetailedGamePlayer[];
+}
+
 // State transition result interface
 export interface StateTransitionResult {
   success: boolean;
@@ -850,6 +872,55 @@ function getAllGames(): GameSummary[] {
 }
 
 /**
+ * Get detailed game information for admin dashboard
+ * Includes full player details with presence and scores
+ * @returns Array of detailed game info
+ */
+function getDetailedGames(): DetailedGame[] {
+  return Object.values(games).map(game => {
+    const players: DetailedGamePlayer[] = Object.entries(game.users).map(([username, user]) => {
+      // Determine presence status
+      let presence: 'active' | 'idle' | 'afk' | 'disconnected' = 'active';
+      if (user.disconnected) {
+        presence = 'disconnected';
+      } else if (user.presence?.status === 'afk') {
+        presence = 'afk';
+      } else if (user.presence?.status === 'idle') {
+        presence = 'idle';
+      }
+
+      return {
+        username,
+        avatar: user.avatar,
+        isHost: user.isHost,
+        isBot: user.isBot || false,
+        presence,
+        score: game.playerScores[username] || 0,
+        isAuthenticated: !!user.authUserId,
+      };
+    });
+
+    // Sort players: host first, then by score descending
+    players.sort((a, b) => {
+      if (a.isHost && !b.isHost) return -1;
+      if (!a.isHost && b.isHost) return 1;
+      return b.score - a.score;
+    });
+
+    return {
+      gameCode: game.gameCode,
+      roomName: game.roomName,
+      language: game.language,
+      gameState: game.gameState as 'waiting' | 'in-progress' | 'validating' | 'finished',
+      isRanked: game.isRanked,
+      createdAt: game.createdAt,
+      timerSeconds: game.timerSeconds,
+      players,
+    };
+  });
+}
+
+/**
  * Get active rooms for lobby display
  * Filters out rooms with no human players (bots don't count)
  * @returns Array of room info
@@ -1245,6 +1316,7 @@ export {
 
   // Game queries
   getAllGames,
+  getDetailedGames,
   getActiveRooms,
   getEmptyRooms,
   isRoomEmpty,
@@ -1350,6 +1422,7 @@ module.exports = {
 
   // Game queries
   getAllGames,
+  getDetailedGames,
   getActiveRooms,
   getEmptyRooms,
   isRoomEmpty,

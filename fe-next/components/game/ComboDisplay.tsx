@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { getComboColors } from '../grid/comboColors';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import FloatingCoinAnimation from './FloatingCoinAnimation';
+import { InteractiveMascot } from '../ui/InteractiveMascot';
 
 interface ComboDisplayProps {
   comboLevel: number;
@@ -13,8 +14,6 @@ interface ComboDisplayProps {
   className?: string;
   /** Whether combo timer is in danger zone (<30% remaining) */
   isDanger?: boolean;
-  /** Time remaining as percentage (0-100) */
-  timeRemaining?: number | null;
   /** Coin reward amount to animate (triggers animation when > 0) */
   coinReward?: number | null;
   /** Callback when coin animation completes */
@@ -23,43 +22,43 @@ interface ComboDisplayProps {
   highContrast?: boolean;
 }
 
-// Rarity-based color scheme (gaming standard)
+// Rarity-based color scheme (gaming standard) - NEON colors for maximum vibrancy
 type ComboRarity = 'common' | 'rare' | 'epic' | 'legendary' | 'mythic';
 
 const RARITY_COLORS = {
-  // Level 1-2: Common - Green/Lime
+  // Level 1-2: Common - Neon Green/Lime (electric green)
   common: {
-    gradient: 'bg-gradient-to-r from-emerald-400 via-lime-400 to-green-400',
-    sparkles: ['#34D399', '#A3E635', '#4ADE80', '#BEF264'], // emerald, lime, green
-    glow: 'linear-gradient(90deg, #34D399, #A3E635, #4ADE80)',
-    shadow: 'rgba(52, 211, 153, 0.6)', // emerald
-    burst: '#34D399',
+    gradient: 'bg-gradient-to-r from-[#39FF14] via-[#BFFF00] to-[#00FF7F]',
+    sparkles: ['#39FF14', '#BFFF00', '#00FF7F', '#7FFF00'], // neon green variants
+    glow: 'linear-gradient(90deg, #39FF14, #BFFF00, #00FF7F)',
+    shadow: 'rgba(57, 255, 20, 0.8)', // neon green glow
+    burst: '#39FF14',
   },
-  // Level 3: Rare - Blue/Cyan
+  // Level 3: Rare - Neon Cyan/Electric Blue
   rare: {
-    gradient: 'bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-400',
-    sparkles: ['#22D3EE', '#38BDF8', '#60A5FA', '#06B6D4'], // cyan, sky, blue
-    glow: 'linear-gradient(90deg, #22D3EE, #38BDF8, #60A5FA)',
-    shadow: 'rgba(34, 211, 238, 0.6)', // cyan
-    burst: '#22D3EE',
+    gradient: 'bg-gradient-to-r from-[#00FFFF] via-[#00F5FF] to-[#00BFFF]',
+    sparkles: ['#00FFFF', '#00F5FF', '#00BFFF', '#7DF9FF'], // neon cyan variants
+    glow: 'linear-gradient(90deg, #00FFFF, #00F5FF, #00BFFF)',
+    shadow: 'rgba(0, 255, 255, 0.8)', // neon cyan glow
+    burst: '#00FFFF',
   },
-  // Level 4: Epic - Purple/Violet
+  // Level 4: Epic - Neon Magenta/Hot Pink
   epic: {
-    gradient: 'bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400',
-    sparkles: ['#A78BFA', '#C084FC', '#E879F9', '#8B5CF6'], // violet, purple, fuchsia
-    glow: 'linear-gradient(90deg, #A78BFA, #C084FC, #E879F9)',
-    shadow: 'rgba(167, 139, 250, 0.6)', // violet
-    burst: '#A78BFA',
+    gradient: 'bg-gradient-to-r from-[#FF00FF] via-[#FF1493] to-[#FF00BF]',
+    sparkles: ['#FF00FF', '#FF1493', '#FF00BF', '#FF69B4'], // neon magenta variants
+    glow: 'linear-gradient(90deg, #FF00FF, #FF1493, #FF00BF)',
+    shadow: 'rgba(255, 0, 255, 0.8)', // neon magenta glow
+    burst: '#FF00FF',
   },
-  // Level 5-6: Legendary - Orange/Gold
+  // Level 5-6: Legendary - Neon Yellow/Gold (electric gold)
   legendary: {
-    gradient: 'bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-400',
-    sparkles: ['#FBBF24', '#FB923C', '#FDE047', '#F59E0B'], // amber, orange, yellow
-    glow: 'linear-gradient(90deg, #FBBF24, #FB923C, #FDE047)',
-    shadow: 'rgba(251, 191, 36, 0.7)', // amber
-    burst: '#FBBF24',
+    gradient: 'bg-gradient-to-r from-[#FFE135] via-[#FFFF00] to-[#FFD700]',
+    sparkles: ['#FFE135', '#FFFF00', '#FFD700', '#FFC300'], // neon yellow/gold variants
+    glow: 'linear-gradient(90deg, #FFE135, #FFFF00, #FFD700)',
+    shadow: 'rgba(255, 225, 53, 0.9)', // neon yellow glow
+    burst: '#FFE135',
   },
-  // Level 7+: Mythic - Rainbow (special handling)
+  // Level 7+: Mythic - Rainbow (special handling, unchanged)
   mythic: {
     gradient: '', // handled separately with animation
     sparkles: ['#FF3366', '#FFE135', '#00FFFF', '#FF1493', '#BFFF00'],
@@ -129,7 +128,6 @@ const ComboDisplay = memo<ComboDisplayProps>(({
   compact = false,
   className,
   isDanger = false,
-  timeRemaining,
   coinReward = null,
   onCoinAnimationComplete,
   highContrast = false,
@@ -137,10 +135,11 @@ const ComboDisplay = memo<ComboDisplayProps>(({
   const comboColors = getComboColors(comboLevel);
   const { isLowEnd, enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
   const isHighCombo = comboLevel >= 5;
-  const isVeryHighCombo = comboLevel >= 7;
+  const isMythicCombo = comboLevel >= 7;
   const isInsaneCombo = comboLevel >= 10;
   const isMediumCombo = comboLevel >= 3;
   const isRainbow = comboColors.isRainbow;
+  const showMascot = isHighCombo && !compact;
 
   // Get rarity-based colors
   const rarity = getComboRarity(comboLevel);
@@ -172,7 +171,8 @@ const ComboDisplay = memo<ComboDisplayProps>(({
     <div
       className={cn(
         'flex items-center justify-center relative overflow-visible',
-        compact ? 'min-w-[70px] max-w-[90px]' : 'min-w-[130px]',
+        // Fixed width to prevent layout shifts when combo appears/changes
+        compact ? 'w-[80px]' : 'w-[130px]',
         className
       )}
     >
@@ -363,6 +363,26 @@ const ComboDisplay = memo<ComboDisplayProps>(({
               border: `2px solid ${rarityColors.burst}`,
             }}
           />
+
+          {/* Mascot celebration for high combos (5+) - positioned to the left, doesn't affect layout */}
+          {showMascot && (
+            <motion.div
+              data-testid="combo-mascot"
+              className="absolute -left-10 top-1/2 -translate-y-1/2 pointer-events-none"
+              initial={{ scale: 0, opacity: 0, x: 20 }}
+              animate={{ scale: 1, opacity: 1, x: 0 }}
+              exit={{ scale: 0, opacity: 0, x: 20 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+            >
+              <InteractiveMascot
+                variant={isMythicCombo ? 'cheering' : 'celebrating'}
+                size="xs"
+                animated={!prefersReducedMotion}
+                enableHover={false}
+                enableClick={false}
+              />
+            </motion.div>
+          )}
         </motion.div>
       </AnimatePresence>
 

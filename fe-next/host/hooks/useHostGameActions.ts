@@ -350,7 +350,6 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     setTableData(newTable);
 
     neoInfoToast(t('hostView.boardRegenerated') || 'Board regenerated!', {
-      icon: '🔄',
       duration: 2000,
     });
   }, [socket, difficulty, roomLanguage, wordsForBoard, t, setTableData]);

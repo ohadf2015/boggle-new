@@ -70,6 +70,11 @@ interface HintsState {
   clearHint: () => void;
 }
 
+// ==================== Constants ====================
+
+/** Re-render interval for keyboard trails visibility check */
+const TRAILS_CHECK_INTERVAL_MS = 5000; // Check every 5 seconds
+
 interface InGameScreenProps {
   // Core identity
   username: string;
@@ -121,8 +126,9 @@ interface InGameScreenProps {
   // Board theme (date-themed words indicator)
   boardTheme?: BoardTheme | null;
 
-  // Player experience - used to determine if keyboard trails should be shown
-  // New players (0-1 games) see trails to help them learn, experienced players don't
+  // Player experience - used to determine inactivity threshold for keyboard trails
+  // New players (0-1 games) see trails sooner (10s) as tutorial help
+  // Experienced players (2+ games) see trails later (30s) when truly stuck
   totalGamesPlayed?: number;
 }
 
@@ -242,6 +248,29 @@ const InGameScreen = memo<InGameScreenProps>(({
   // Feedback state (for WordFormingArea)
   const [currentFeedback, setCurrentFeedback] = useState<WordFeedback | null>(null);
 
+  // Track when the last word was found - used for inactivity-based keyboard trail visibility
+  // Trails are shown only when player hasn't found a word for a while (30+ seconds)
+  const [lastWordFoundTime, setLastWordFoundTime] = useState<number>(0);
+
+  // Force re-render periodically to check trail visibility based on time elapsed
+  const [, setTrailsCheckTick] = useState(0);
+  useEffect(() => {
+    if (!gameActive || !isPlaying) return;
+    const interval = setInterval(() => {
+      setTrailsCheckTick(tick => tick + 1);
+    }, TRAILS_CHECK_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [gameActive, isPlaying]);
+
+  // Reset lastWordFoundTime to current time when game starts
+  // This ensures keyboard trails don't show immediately - they'll only
+  // appear after the inactivity threshold (10s new players, 30s experienced)
+  useEffect(() => {
+    if (gameActive && showStartAnimation) {
+      setLastWordFoundTime(Date.now());
+    }
+  }, [gameActive, showStartAnimation]);
+
   // Viewport height detection for very short landscape screens
   const [viewportHeight, setViewportHeight] = useState(0);
 
@@ -343,6 +372,8 @@ const InGameScreen = memo<InGameScreenProps>(({
     if (!socket || !isPlaying) return;
 
     const handleWordAccepted = (data: { word: string; score: number; comboLevel?: number; fireRoundActive?: boolean; fireRoundBonus?: number }) => {
+      // Track when the last word was found for inactivity-based trail visibility
+      setLastWordFoundTime(Date.now());
       setCurrentFeedback({
         id: `accepted-${Date.now()}`,
         type: 'accepted',
@@ -820,7 +851,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                 largeText
                 fireRoundActive={fireRoundActive}
                 earthquakeShaking={earthquakeState === 'shaking'}
-                highlightedPath={shouldShowKeyboardTrails(keyboardInput.isTypingMode, totalGamesPlayed) ? keyboardInput.highlightedCells : []}
+                highlightedPath={shouldShowKeyboardTrails(keyboardInput.isTypingMode, lastWordFoundTime, totalGamesPlayed) ? keyboardInput.highlightedCells : []}
                 onSingleTapDetected={tapDragGuidance.handleSingleTapDetected}
                 language={gameLanguage || 'en'}
               />
@@ -937,7 +968,7 @@ const InGameScreen = memo<InGameScreenProps>(({
         />
       )}
 
-      <div className="flex flex-col lg:flex-row gap-0 md:gap-2 lg:gap-4 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out h-full max-h-[100dvh]">
+      <div className="flex flex-col lg:flex-row gap-0 md:gap-2 lg:gap-3 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out h-full max-h-[100dvh]">
 
         {/* Top Bar - Only on mobile, integrated into parent on desktop */}
         <div className="lg:hidden w-full flex items-center justify-between px-1 flex-shrink-0">
@@ -968,9 +999,9 @@ const InGameScreen = memo<InGameScreenProps>(({
 
         {/* Left Column: Found Words (Desktop only, only when playing, hidden in focus mode) */}
         {isPlaying && !gameplayFocusMode && (
-          <div className="hidden lg:flex lg:flex-col lg:w-80 xl:w-96 2xl:w-[28rem] gap-2 min-h-0">
+          <div className="hidden lg:flex lg:flex-col lg:w-64 xl:w-72 2xl:w-80 gap-2 min-h-0 flex-shrink-0">
             <div
-              className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col min-h-0 max-h-[65vh] lg:max-h-[70vh] overflow-hidden"
+              className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col min-h-0 max-h-[75vh] lg:max-h-[80vh] overflow-hidden"
               style={{ transform: 'rotate(1deg)' }}
             >
               {/* Header */}
@@ -1020,7 +1051,7 @@ const InGameScreen = memo<InGameScreenProps>(({
         <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden max-h-full">
           {/* Stats row - Timer centered, Combo + Score absolutely positioned on right */}
           {remainingTime !== null && (
-            <div ref={gameStatsRef} className="relative flex items-center justify-center flex-shrink-0 mb-0 md:mb-1" role="status" aria-label="Game status">
+            <div ref={gameStatsRef} className="relative flex items-center justify-center flex-shrink-0 mb-2 md:mb-3" role="status" aria-label="Game status">
               {/* Timer (center - always visible and prominent, position fixed) */}
               <motion.div
                 data-tutorial="timer"
@@ -1037,16 +1068,20 @@ const InGameScreen = memo<InGameScreenProps>(({
               </motion.div>
 
               {/* Combo + Score - absolutely positioned on right to not shift timer */}
+              {/* z-30 ensures combo renders ABOVE timer (z-20), pointer-events-none prevents blocking timer */}
               {isPlaying && (
-                <div className="absolute right-0 rtl:right-auto rtl:left-0 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 md:gap-2 z-10">
-                  {/* Combo - positioned on right, never behind timer */}
-                  <ComboDisplay comboLevel={comboLevel} compact />
+                <div className="absolute right-0 rtl:right-auto rtl:left-0 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 md:gap-2 z-30 pointer-events-none">
+                  {/* Combo container - fixed height to prevent layout shift when combo appears/disappears */}
+                  <div className="h-[28px] md:h-[32px] flex items-center justify-center">
+                    <ComboDisplay comboLevel={comboLevel} compact />
+                  </div>
 
                   {/* Score - vibrant yellow/lime gradient */}
+                  {/* pointer-events-auto restores interactivity since parent has pointer-events-none */}
                   <motion.div
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px]"
+                    className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px] pointer-events-auto"
                     style={{
                       background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
                     }}
@@ -1136,7 +1171,7 @@ const InGameScreen = memo<InGameScreenProps>(({
               hideWordPreview={true}
               fireRoundActive={fireRoundActive}
               earthquakeShaking={earthquakeState === 'shaking'}
-              highlightedPath={shouldShowKeyboardTrails(keyboardInput.isTypingMode, totalGamesPlayed) ? keyboardInput.highlightedCells : []}
+              highlightedPath={shouldShowKeyboardTrails(keyboardInput.isTypingMode, lastWordFoundTime, totalGamesPlayed) ? keyboardInput.highlightedCells : []}
               onSingleTapDetected={tapDragGuidance.handleSingleTapDetected}
               language={gameLanguage || 'en'}
             />
@@ -1219,7 +1254,7 @@ const InGameScreen = memo<InGameScreenProps>(({
 
         {/* Right Column: Live Leaderboard (hidden in focus mode) */}
         {!gameplayFocusMode && (
-          <div className="lg:w-80 xl:w-96 2xl:w-[28rem] flex flex-col gap-2">
+          <div className="lg:w-64 xl:w-72 2xl:w-80 flex flex-col gap-2 flex-shrink-0">
             <div
               className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[45vh] lg:max-h-none lg:flex-grow"
               style={{ transform: 'rotate(-1deg)' }}

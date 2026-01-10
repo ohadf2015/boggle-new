@@ -513,6 +513,7 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
     resetForNewGame,
     resetUrgentMusicRef,
     generateNewTable,
+     
   }), [
     settings,
     runtime,
@@ -525,6 +526,7 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
     comboRefs,
     xp,
     refs,
+    setHostPlayingEnabled,
     resolvedRoomLanguage,
     wordsForBoard,
     boardTheme,

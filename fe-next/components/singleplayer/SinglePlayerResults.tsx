@@ -3,8 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Medal, RotateCw, Home, Bot, BarChart3, Crown, Award, Settings, Sparkles, Hash, Target, ChevronDown, TrendingUp, Coins, Users } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Trophy, Medal, Bot, BarChart3, Crown, Award, Hash, TrendingUp } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import PlayerInsights from '@/components/results/PlayerInsights';
 import PlayerArchetypeBadge from '@/components/results/PlayerArchetypeBadge';
@@ -28,7 +27,7 @@ import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { updateGuestStatsAfterGame, getGuestStats } from '@/utils/guestManager';
 import { logGameStart, logGameEnd, formatWordsForLogging } from '@/utils/gameLogger';
 import { getPointColor, getTextColor } from '@/components/results/utils';
-import type { WordObject } from '@/components/results/types';
+// WordObject type used by useResultsData
 import { getRankBgColor } from '@/utils/rankingStyles';
 import { addGameToHistory } from '@/utils/gameHistoryManager';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
@@ -37,7 +36,6 @@ import type { SinglePlayerResultsData, SinglePlayerMode } from './SinglePlayerVi
 import { useResultsData } from './results';
 import { useCoinContext, type CoinRewardResult } from '@/contexts/CoinContext';
 import { TrainingAnalysisModal } from '@/components/training';
-import { getTrainingProgress } from '@/utils/trainingProgressStorage';
 import { useSaveCognitiveScore } from '@/hooks/useSaveCognitiveScore';
 
 // Dynamic import for PerformanceChart (heavy component)
@@ -79,16 +77,10 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const { user, isAuthenticated, profile, updateProfile, loading: authLoading } = useAuth();
   const { awardGameCompletion } = useCoinContext();
   const isLandscape = useMobileLandscape();
-  const [expandedBot, setExpandedBot] = useState<string | null>(null);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [wordValidationQueue, setWordValidationQueue] = useState<string[]>([]);
   const [showTrainingAnalysis, setShowTrainingAnalysis] = useState(false);
   const [showWordValidation, setShowWordValidation] = useState(false);
-
-  // Collapsible section states - matching multiplayer pattern
-  const [showDetails, setShowDetails] = useState(false);
-  const [showWords, setShowWords] = useState(false);
-  const [showAchievements, setShowAchievements] = useState(false);
 
   // Mobile tab navigation state - Consolidated to 2 tabs for reduced cognitive load
   type MobileTab = 'results' | 'details';
@@ -104,7 +96,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const actionButtonsRef = useRef<HTMLDivElement>(null);
 
   // Cognitive scoring hook
-  const { saveCognitiveScore, isSaving: isSavingCognitiveScore } = useSaveCognitiveScore();
+  const { saveCognitiveScore } = useSaveCognitiveScore();
 
   // Coin reward state - uses CoinRewardResult type from unified context
   const [coinReward, setCoinReward] = useState<CoinRewardResult | null>(null);
@@ -510,7 +502,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           )}
 
           {/* Coins earned - compact for landscape */}
-          <CoinRewardDisplay reward={coinReward} variant="inline" />
+          <CoinRewardDisplay reward={coinReward} variant="inline" mode={isAuthenticated ? 'earned' : 'teasing'} />
 
           {/* Brain Points - compact for landscape */}
           <BrainPointsDisplay reward={brainPointsReward} variant="inline" />
@@ -608,10 +600,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const validWordCount = results.playerWordData?.filter(w => w.isValid).length || 0;
   const totalAttempts = results.playerWordData?.length || 0;
   const accuracy = totalAttempts > 0 ? Math.round((validWordCount / totalAttempts) * 100) : 0;
-  const bestWord = results.playerWordData?.filter(w => w.isValid).reduce<{ word: string; score: number } | null>(
-    (best, w) => (!best || (w.score || 0) > best.score) ? { word: w.word, score: w.score || 0 } : best,
-    null
-  );
 
   // Mobile tab configuration - Consolidated to 2 tabs for reduced cognitive load
   const mobileTabs = [
@@ -667,6 +655,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         accuracy={accuracy}
         archetype={playerArchetype}
         coinReward={coinReward}
+        coinRewardMode={isAuthenticated ? 'earned' : 'teasing'}
         brainPointsReward={brainPointsReward}
         currentScore={results.playerScore}
       />
@@ -795,81 +784,73 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         </CollapsibleSection>
       )}
 
-      {/* Bot Words Details */}
+      {/* Bot Words Found - Compact cards showing each bot's words */}
       {mode === 'solo-bots' && botWordDetails.length > 0 && (
         <CollapsibleSection
-          title={t('singlePlayer.botDetails') || 'Bot Performance Details'}
+          title={t('singlePlayer.botWordsFound') || 'Bot Words Found'}
           icon={<Bot className="w-4 h-4" />}
-          badge={botWordDetails.length}
+          badge={botWordDetails.reduce((sum, bot) => sum + bot.totalWords, 0)}
           defaultExpanded={false}
           variant="tertiary"
           className="shadow-hard"
         >
-          <div className="space-y-2">
-            {botWordDetails.map((bot) => (
-              <div
-                key={bot.name}
-                className="border-2 border-neo-black/30 dark:border-slate-500 rounded-neo overflow-hidden"
-              >
-                <button
-                  onClick={() => setExpandedBot(expandedBot === bot.name ? null : bot.name)}
-                  className="w-full flex items-center justify-between p-2 bg-neo-cream/50 dark:bg-slate-700 hover:bg-neo-cream dark:hover:bg-slate-600 transition-colors"
+          <div className="space-y-3">
+            {botWordDetails.map((bot) => {
+              const gameLanguage = results.language || language;
+              return (
+                <div
+                  key={bot.name}
+                  className="bg-slate-800/50 border-2 border-slate-600 rounded-neo p-3"
                 >
-                  <div className="flex items-center gap-2">
-                    <Bot className="w-4 h-4 text-neo-black/70 dark:text-white/70" />
-                    <span className="font-bold text-neo-black dark:text-white text-sm">{bot.name}</span>
-                    <span className="text-[10px] bg-neo-black/10 dark:bg-white/10 px-1.5 py-0.5 rounded-full font-bold">
-                      {bot.totalWords} words
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-black text-neo-black dark:text-white">{bot.score}</span>
-                    <motion.span
-                      animate={{ rotate: expandedBot === bot.name ? 180 : 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <ChevronDown className="w-4 h-4 text-neo-black/70 dark:text-white/70" />
-                    </motion.span>
-                  </div>
-                </button>
-                <AnimatePresence>
-                  {expandedBot === bot.name && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="p-2 bg-white dark:bg-slate-800 border-t border-neo-black/10 dark:border-slate-600 text-neo-black dark:text-white">
-                        {bot.words && bot.words.length > 0 && (
-                          <div className="flex flex-wrap gap-1">
-                            {bot.words.map((word, i) => {
-                              const points = Math.max(word.length - 1, 1);
-                              const gameLanguage = results.language || language;
-                              const displayWord = gameLanguage === 'he' ? applyHebrewFinalLetters(word) : word;
-                              return (
-                                <span
-                                  key={`${word}-${i}`}
-                                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] sm:text-xs font-black uppercase border border-neo-black rounded shadow-sm"
-                                  style={{
-                                    backgroundColor: getPointColor(points),
-                                    color: getTextColor(points)
-                                  }}
-                                >
-                                  {displayWord}
-                                  <span className="opacity-70">+{points}</span>
-                                </span>
-                              );
-                            })}
-                          </div>
-                        )}
+                  {/* Bot header - compact */}
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center">
+                        <Bot className="w-3.5 h-3.5 text-indigo-400" />
                       </div>
-                    </motion.div>
+                      <span className="font-bold text-white text-sm">{bot.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-white/60 font-medium">
+                        {bot.totalWords} {t('singlePlayer.botWords') || 'words'}
+                      </span>
+                      <span className="text-sm font-black text-neo-yellow">{bot.score} pts</span>
+                    </div>
+                  </div>
+                  {/* Words grid - directly visible */}
+                  {bot.words && bot.words.length > 0 ? (
+                    <div className="flex flex-wrap gap-1">
+                      {bot.words.slice(0, 20).map((word, i) => {
+                        const points = Math.max(word.length - 1, 1);
+                        const displayWord = gameLanguage === 'he' ? applyHebrewFinalLetters(word) : word;
+                        return (
+                          <span
+                            key={`${word}-${i}`}
+                            className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-bold uppercase border border-neo-black/50 rounded"
+                            style={{
+                              backgroundColor: getPointColor(points),
+                              color: getTextColor(points)
+                            }}
+                          >
+                            {displayWord}
+                            <span className="opacity-60 text-[9px]">+{points}</span>
+                          </span>
+                        );
+                      })}
+                      {bot.words.length > 20 && (
+                        <span className="text-[10px] text-white/50 font-medium self-center">
+                          +{bot.words.length - 20} more
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-white/40 italic">
+                      {t('singlePlayer.noWordsToShow') || 'Word details not available'}
+                    </p>
                   )}
-                </AnimatePresence>
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </div>
         </CollapsibleSection>
       )}
@@ -957,6 +938,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               accuracy={accuracy}
               archetype={playerArchetype}
               coinReward={coinReward}
+              coinRewardMode={isAuthenticated ? 'earned' : 'teasing'}
               brainPointsReward={brainPointsReward}
               currentScore={results.playerScore}
             />
@@ -1047,70 +1029,73 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               <MissedWords missedWords={missedWords} maxDisplay={5} />
             )}
 
-            {/* Bot Words Details */}
+            {/* Bot Words Found - Compact cards showing each bot's words */}
             {mode === 'solo-bots' && botWordDetails.length > 0 && (
               <CollapsibleSection
-                title={t('singlePlayer.botDetails') || 'Bot Performance Details'}
+                title={t('singlePlayer.botWordsFound') || 'Bot Words Found'}
                 icon={<Bot className="w-4 h-4" />}
-                badge={botWordDetails.length}
+                badge={botWordDetails.reduce((sum, bot) => sum + bot.totalWords, 0)}
                 defaultExpanded={false}
                 variant="tertiary"
                 className="shadow-hard"
               >
-                <div className="space-y-2">
-                  {botWordDetails.map((bot) => (
-                    <div key={bot.name} className="border-2 border-neo-black/30 dark:border-slate-500 rounded-neo overflow-hidden">
-                      <button
-                        onClick={() => setExpandedBot(expandedBot === bot.name ? null : bot.name)}
-                        className="w-full flex items-center justify-between p-2 bg-neo-cream/50 dark:bg-slate-700 hover:bg-neo-cream dark:hover:bg-slate-600 transition-colors"
+                <div className="space-y-3">
+                  {botWordDetails.map((bot) => {
+                    const gameLanguage = results.language || language;
+                    return (
+                      <div
+                        key={bot.name}
+                        className="bg-slate-800/50 border-2 border-slate-600 rounded-neo p-3"
                       >
-                        <div className="flex items-center gap-2">
-                          <Bot className="w-4 h-4 text-neo-black/70 dark:text-white/70" />
-                          <span className="font-bold text-neo-black dark:text-white text-sm">{bot.name}</span>
-                          <span className="text-[10px] bg-neo-black/10 dark:bg-white/10 px-1.5 py-0.5 rounded-full font-bold">{bot.totalWords} words</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg font-black text-neo-black dark:text-white">{bot.score}</span>
-                          <motion.span animate={{ rotate: expandedBot === bot.name ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                            <ChevronDown className="w-4 h-4 text-neo-black/70 dark:text-white/70" />
-                          </motion.span>
-                        </div>
-                      </button>
-                      <AnimatePresence>
-                        {expandedBot === bot.name && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="overflow-hidden"
-                          >
-                            <div className="p-2 bg-white dark:bg-slate-800 border-t border-neo-black/10 dark:border-slate-600 text-neo-black dark:text-white">
-                              {bot.words && bot.words.length > 0 && (
-                                <div className="flex flex-wrap gap-1">
-                                  {bot.words.map((word, i) => {
-                                    const points = Math.max(word.length - 1, 1);
-                                    const gameLanguage = results.language || language;
-                                    const displayWord = gameLanguage === 'he' ? applyHebrewFinalLetters(word) : word;
-                                    return (
-                                      <span
-                                        key={`${word}-${i}`}
-                                        className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] sm:text-xs font-black uppercase border border-neo-black rounded shadow-sm"
-                                        style={{ backgroundColor: getPointColor(points), color: getTextColor(points) }}
-                                      >
-                                        {displayWord}
-                                        <span className="opacity-70">+{points}</span>
-                                      </span>
-                                    );
-                                  })}
-                                </div>
-                              )}
+                        {/* Bot header - compact */}
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center">
+                              <Bot className="w-3.5 h-3.5 text-indigo-400" />
                             </div>
-                          </motion.div>
+                            <span className="font-bold text-white text-sm">{bot.name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-white/60 font-medium">
+                              {bot.totalWords} {t('singlePlayer.botWords') || 'words'}
+                            </span>
+                            <span className="text-sm font-black text-neo-yellow">{bot.score} pts</span>
+                          </div>
+                        </div>
+                        {/* Words grid - directly visible */}
+                        {bot.words && bot.words.length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {bot.words.slice(0, 20).map((word, i) => {
+                              const points = Math.max(word.length - 1, 1);
+                              const displayWord = gameLanguage === 'he' ? applyHebrewFinalLetters(word) : word;
+                              return (
+                                <span
+                                  key={`${word}-${i}`}
+                                  className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-bold uppercase border border-neo-black/50 rounded"
+                                  style={{
+                                    backgroundColor: getPointColor(points),
+                                    color: getTextColor(points)
+                                  }}
+                                >
+                                  {displayWord}
+                                  <span className="opacity-60 text-[9px]">+{points}</span>
+                                </span>
+                              );
+                            })}
+                            {bot.words.length > 20 && (
+                              <span className="text-[10px] text-white/50 font-medium self-center">
+                                +{bot.words.length - 20} more
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <p className="text-xs text-white/40 italic">
+                            {t('singlePlayer.noWordsToShow') || 'Word details not available'}
+                          </p>
                         )}
-                      </AnimatePresence>
-                    </div>
-                  ))}
+                      </div>
+                    );
+                  })}
                 </div>
               </CollapsibleSection>
             )}

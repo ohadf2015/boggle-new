@@ -1,11 +1,31 @@
 ---
 name: ui-component-architect
 description: UI implementation specialist for decomposing designs into reusable components. This skill should be used when implementing new UI features, screens, or components. It ensures maximum reuse of existing components, handles all UI states (loading, error, empty, no-data), and creates pixel-perfect implementations following the project's design system. Use when building new UI, refactoring existing UI, or ensuring consistent component usage across the app.
+allowed-tools: Read, Write, Edit, Grep, Glob, Bash(npm *), mcp__memory__*, mcp__playwright__*
 ---
 
 # UI Component Architect
 
 Specialist skill for implementing UI with maximum component reuse, comprehensive state handling, and pixel-perfect design adherence.
+
+## Memory Integration
+
+### Before Starting
+Recall existing component patterns and past UI decisions:
+```
+mcp__memory__memory_recall(query="UI component [component-type] pattern reuse")
+```
+
+### After Completing
+Store new component patterns for future reuse:
+```
+mcp__memory__memory_store(
+  content="UI pattern: [component-name] - [description]. Location: [path]. Props: [key-props]. Reuse for: [use-cases].",
+  type="fact",
+  tags=["ui", "component", "[component-type]"],
+  importance=6
+)
+```
 
 ## Core Principles
 
@@ -324,6 +344,53 @@ grep -rn "isLoading\|loading\|pending" --include="*.tsx" src/components/ | head 
 grep -rn "isError\|error\|catch" --include="*.tsx" src/components/ | head -20
 ```
 
+## Playwright Visual Testing
+
+After implementing UI components, use Playwright MCP to verify visual correctness.
+
+### Navigate to Component
+```
+mcp__playwright__browser_navigate(url="http://localhost:3000/[page]")
+```
+
+### Take Screenshots at Different Viewports
+```
+# Mobile
+mcp__playwright__browser_resize(width=375, height=667)
+mcp__playwright__browser_screenshot()
+
+# Desktop
+mcp__playwright__browser_resize(width=1920, height=1080)
+mcp__playwright__browser_screenshot()
+```
+
+### Get Accessibility Snapshot
+```
+mcp__playwright__browser_snapshot()
+```
+
+### Test Interactive States
+```
+# Hover state
+mcp__playwright__browser_hover(selector="[data-testid='button']")
+mcp__playwright__browser_screenshot()
+
+# Focus state
+mcp__playwright__browser_click(selector="input[name='field']")
+mcp__playwright__browser_screenshot()
+
+# Active/pressed state
+mcp__playwright__browser_click(selector="[data-testid='button']")
+```
+
+### Visual Verification Checklist
+- [ ] Component renders correctly on mobile (375px)
+- [ ] Component renders correctly on desktop (1920px)
+- [ ] All states visible and correct (loading, error, empty, success)
+- [ ] Interactive states work (hover, focus, active)
+- [ ] Accessibility tree is correct (proper roles, labels)
+- [ ] No visual regressions from existing components
+
 ## Output Expectations
 
 When implementing UI with this skill:
@@ -332,4 +399,5 @@ When implementing UI with this skill:
 2. **Decomposition Plan** - Hierarchy of components needed
 3. **State Matrix** - All states each component must handle
 4. **Implementation** - Pixel-perfect code following conventions
-5. **Reusability Report** - New components created for future reuse
+5. **Visual Verification** - Screenshots from Playwright testing
+6. **Reusability Report** - New components created for future reuse

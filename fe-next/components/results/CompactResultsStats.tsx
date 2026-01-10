@@ -1,13 +1,13 @@
 'use client';
 
 import React, { memo, useEffect, useState, useMemo } from 'react';
-import { Coins, Brain, TrendingUp, TrendingDown, Minus, Hash, Target } from 'lucide-react';
+import { Coins, Brain, TrendingUp, TrendingDown, Minus, Hash, Target, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PlayerArchetypeBadge from './PlayerArchetypeBadge';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
 import { getChartData, calculateTrend, type GameHistoryEntry, type PerformanceTrend } from '@/utils/gameHistoryManager';
-import type { CoinReward } from './CoinRewardDisplay';
+import type { CoinReward, CoinRewardMode } from './CoinRewardDisplay';
 import type { BrainPointsReward } from './BrainPointsDisplay';
 
 interface CompactResultsStatsProps {
@@ -19,6 +19,8 @@ interface CompactResultsStatsProps {
   archetype?: PlayerArchetype | null;
   /** Optional coin reward to display inline */
   coinReward?: CoinReward | null;
+  /** Coin reward mode: 'earned' for authenticated users, 'teasing' for guests */
+  coinRewardMode?: CoinRewardMode;
   /** Optional brain points reward to display inline */
   brainPointsReward?: BrainPointsReward | null;
   /** Current game score for sparkline highlight */
@@ -115,6 +117,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
   accuracy,
   archetype,
   coinReward,
+  coinRewardMode = 'earned',
   brainPointsReward,
   currentScore,
   className,
@@ -139,6 +142,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
 
   // Check if we have coin/brain rewards to show
   const hasCoinReward = coinReward && coinReward.awarded > 0;
+  const isTeasing = coinRewardMode === 'teasing';
   const hasBrainReward = brainPointsReward && brainPointsReward.scoreDelta !== 0;
   const hasSparkline = isClient && sparklineScores.length >= 2;
 
@@ -175,8 +179,8 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
           </div>
         </div>
 
-        {/* Coins */}
-        {hasCoinReward && (
+        {/* Coins - earned mode */}
+        {hasCoinReward && !isTeasing && (
           <div className="bg-neo-yellow/20 rounded-neo border-2 border-neo-yellow/40 p-2 sm:p-3 text-center">
             <div className="flex items-center justify-center gap-1.5 mb-1">
               <Coins className="w-5 h-5 text-neo-yellow" />
@@ -184,6 +188,20 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
             </div>
             <div className="text-[10px] sm:text-xs text-neo-yellow/70 font-bold uppercase">
               {t('reveal.coins') || 'Coins'}
+            </div>
+          </div>
+        )}
+
+        {/* Coins - teasing mode for guests */}
+        {hasCoinReward && isTeasing && (
+          <div className="bg-slate-600/30 rounded-neo border-2 border-slate-500/50 p-2 sm:p-3 text-center">
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <Lock className="w-4 h-4 text-amber-400/70" />
+              <Coins className="w-5 h-5 text-amber-400/50" />
+              <span className="text-xl sm:text-2xl font-black text-amber-400/70">+{coinReward.awarded}</span>
+            </div>
+            <div className="text-[10px] sm:text-xs text-slate-400 font-bold">
+              {t('coins.signInShort') || 'Sign in'}
             </div>
           </div>
         )}

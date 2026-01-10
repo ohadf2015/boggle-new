@@ -51,9 +51,14 @@
   --duration-snap: 100ms;
   --duration-quick: 150ms;
 
-  /* Halftone Pattern (SVG-based) */
-  --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1.5' fill='%23000000' fill-opacity='0.08'/%3E%3C/svg%3E");
-  --halftone-pattern-lg: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='15' cy='15' r='2.5' fill='%23000000' fill-opacity='0.1'/%3E%3C/svg%3E");
+  /* Halftone Pattern (SVG-based) - white dots for dark backgrounds */
+  --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1.5' fill='%23FFFFFF' fill-opacity='0.12'/%3E%3C/svg%3E");
+  --halftone-pattern-lg: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='15' cy='15' r='2.5' fill='%23FFFFFF' fill-opacity='0.12'/%3E%3C/svg%3E");
+
+  /* Retro Grid Pattern for backgrounds */
+  --retro-grid-pattern:
+    linear-gradient(to right, rgba(255,255,255,0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.08) 1px, transparent 1px);
 
   /* Semantic Color Mappings (Dark-only Neo-Brutalist) */
   --background: var(--neo-navy);
@@ -128,8 +133,11 @@
   --neo-navy-light: #e2e8f0;
   --neo-gray: #f8fafc;
 
-  /* Lighter halftone pattern for light mode */
-  --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1.5' fill='%23000000' fill-opacity='0.04'/%3E%3C/svg%3E");
+  /* Black dots for light mode backgrounds */
+  --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1.5' fill='%23000000' fill-opacity='0.08'/%3E%3C/svg%3E");
+  --retro-grid-pattern:
+    linear-gradient(to right, rgba(0,0,0,0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,0.08) 1px, transparent 1px);
 }
 
 /* Light mode body background */
@@ -144,17 +152,17 @@ html {
 }
 
 body {
-  background: #0f172a;
-  /* slate-900 - matches page gradients */
   color: var(--foreground);
   font-family: var(--font-rubik), 'Rubik', Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  /* Halftone texture overlay on body */
-  background-image: var(--halftone-pattern);
+  /* Neo-brutalist background with halftone dots and retro grid */
   background-color: #0f172a;
-  /* slate-900 */
+  background-image:
+    var(--halftone-pattern),
+    var(--retro-grid-pattern);
+  background-size: 20px 20px, 60px 60px;
 }
 
 * {
@@ -386,7 +394,7 @@ body {
     inset: 0;
     background-image: radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px);
     background-size: 12px 12px;
-    opacity: 0.06;
+    opacity: 0.1;
     pointer-events: none;
     z-index: 1;
     border-radius: inherit;
@@ -403,7 +411,7 @@ body {
     inset: 0;
     background-image: radial-gradient(circle, rgb(var(--neo-black)) 1px, transparent 1px);
     background-size: 12px 12px;
-    opacity: 0.04;
+    opacity: 0.07;
     pointer-events: none;
     z-index: 1;
     border-radius: inherit;
@@ -420,7 +428,7 @@ body {
     inset: 0;
     background-image: radial-gradient(circle, rgb(var(--neo-black)) 1.5px, transparent 1.5px);
     background-size: 10px 10px;
-    opacity: 0.08;
+    opacity: 0.12;
     pointer-events: none;
     z-index: 1;
     border-radius: inherit;
@@ -561,34 +569,37 @@ body {
     margin: 0 auto;
   }
 
-  /* On desktop screens, make the board smaller to fit with side panels and show other UI */
+  /* On desktop screens, size grid to fill available space between sidebars */
+  /* Each sidebar is ~256-320px, so we subtract ~550px total for both sidebars + gaps */
+  /* Vertical space reserved for: timer (~100px), stats/combo (~60px), word area (~40px), gaps (~50px) = ~250px */
   @media (min-width: 769px) {
     .game-board-frame {
-      /* Desktop: smaller grid to show timer, stats, leaderboard without scrolling */
-      /* Reduced to 42vmin to prevent letters overlapping - grid must fit comfortably */
-      width: min(42vmin, calc(100vw - 500px), calc(100dvh - 280px));
-      height: min(42vmin, calc(100vw - 500px), calc(100dvh - 280px));
-      max-height: calc(100dvh - 280px);
-      padding: 6px;
+      /* Desktop: larger grid that fills available space between sidebars */
+      /* Priority: vertical space (dvh) first, then horizontal space minus sidebars */
+      width: min(55vmin, calc(100vw - 550px), calc(100dvh - 260px));
+      height: min(55vmin, calc(100vw - 550px), calc(100dvh - 260px));
+      max-height: calc(100dvh - 260px);
+      padding: 8px;
     }
   }
 
-  /* Large desktop screens - comfortable size with more room */
+  /* Large desktop screens - more room, larger grid */
   @media (min-width: 1280px) {
     .game-board-frame {
-      /* Large desktops: moderately constrained */
-      width: min(40vmin, calc(100vw - 600px), calc(100dvh - 300px));
-      height: min(40vmin, calc(100vw - 600px), calc(100dvh - 300px));
-      max-height: calc(100dvh - 300px);
+      /* Large desktops: generous grid size, sidebars are wider (288px each = ~600px) */
+      width: min(58vmin, calc(100vw - 620px), calc(100dvh - 250px));
+      height: min(58vmin, calc(100vw - 620px), calc(100dvh - 250px));
+      max-height: calc(100dvh - 250px);
     }
   }
 
-  /* Extra large desktop screens - still constrained to prevent oversized grid */
+  /* Extra large desktop screens - maximize grid utilization */
   @media (min-width: 1536px) {
     .game-board-frame {
-      width: min(38vmin, calc(100vw - 700px), calc(100dvh - 320px));
-      height: min(38vmin, calc(100vw - 700px), calc(100dvh - 320px));
-      max-height: calc(100dvh - 320px);
+      /* 2xl desktops: sidebars are widest (320px each = ~680px), maximize grid */
+      width: min(62vmin, calc(100vw - 700px), calc(100dvh - 240px));
+      height: min(62vmin, calc(100vw - 700px), calc(100dvh - 240px));
+      max-height: calc(100dvh - 240px);
     }
   }
 

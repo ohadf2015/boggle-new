@@ -70,6 +70,7 @@ const ja = {
     "loading": "文字をシャッフル中...",
     "error": "おっと！",
     "back": "戻る",
+    "backToHome": "ホームに戻る",
     "next": "次へ",
     "confirm": "確認",
     "cancel": "キャンセル",
@@ -176,7 +177,8 @@ const ja = {
     "invalid": "無効",
     "validating": "確認中...",
     "later": "後で",
-    "skip": "スキップ"
+    "skip": "スキップ",
+    "done": "完了"
   },
   "connection": {
     "reconnecting": "再接続中...",
@@ -941,6 +943,7 @@ const ja = {
     "exit": "退出",
     "exitRoom": "ルームを退出",
     "waitForGameStart": "ゲーム開始を待つ",
+    "clickToWakeUp": "タップで挨拶！",
     "players": "プレイヤー",
     "yourAchievements": "あなたの実績",
     "letterGrid": "文字グリッド",
@@ -1774,7 +1777,8 @@ const ja = {
       "keepGoing": "続けて！",
       "getStarted": "始めよう！",
       "ready": "準備完了！",
-      "readyForMultiplayer": "マルチプレイヤーの準備ができました！"
+      "readyForMultiplayer": "マルチプレイヤーの準備ができました！",
+      "tapForDetails": "タップして詳細を見る"
     },
     "unlock": {
       "title": "スキル解放！",
@@ -2234,8 +2238,8 @@ const ja = {
       "showMeLeaderboard": "リーダーボードで私を見せて！"
     },
     "inlineSignup": {
-      "title": "リーダーボードに登場しよう",
-      "subtitle": "結果を保存してグローバルで競争",
+      "title": "ワードウォリアーズに参加しよう！",
+      "subtitle": "このスコアを失うのはもったいない！",
       "orContinueWith": "またはメールで続ける",
       "emailPlaceholder": "メールアドレス",
       "passwordPlaceholder": "パスワード（8文字以上）",
@@ -2249,6 +2253,16 @@ const ja = {
       "passwordRequired": "パスワードを入力してください",
       "passwordTooShort": "パスワードは8文字以上必要です",
       "passwordTooLong": "パスワードが長すぎます",
+      "skipForNow": "今はスキップ",
+      "skipHover": "（レクシーは悲しむけど、いいよ...）",
+      "mascotTooltip": "クリックして！",
+      "funnyMessages": {
+        "dontLeaveHanging": "ねえ！置いていかないで！登録して一緒にリーダーボードを登ろう！",
+        "scoresTooGood": "このスコアを消えさせるのはもったいない！永久保存しよう！",
+        "streakProtector": "僕は連続記録のボディガード。登録すれば永遠に守るよ！",
+        "joinWordNerds": "自分のスコアをちゃんと覚えている言葉オタクのエリートクラブに入ろう！",
+        "makeMomProud": "お母さんを喜ばせよう - リーダーボードで名前を見せてあげて！"
+      },
       "benefits": {
         "leaderboard": "リーダーボードに結果を表示",
         "syncDevices": "デバイス間で進捗を同期",
@@ -2388,7 +2402,9 @@ const ja = {
     "placement": "順位",
     "topThreeBonus": "トップ3ボーナス",
     "efficiency": "効率",
-    "streak": "連続"
+    "streak": "連続",
+    "guestTeasing": "ログインして{amount}コインを獲得！",
+    "signInShort": "ログイン"
   },
   "partyScreen": {
     "title": "パーティースクリーン",
@@ -2518,6 +2534,7 @@ const ja = {
     "leading": "トップ!",
     "ahead": "先行",
     "toCatch": "pt追い越しまで",
+    "almostThere": "もう少し!",
     "live": "ライブ",
     "backToGame": "ゲームに戻る"
   },
@@ -2846,6 +2863,8 @@ const ja = {
     "fewWordsFoundSingular": "1個の単語を発見",
     "achievementsNotSaved": "シングルプレイヤーモードの実績はプロフィールに保存されません。",
     "botDetails": "ボット詳細",
+    "botWordsFound": "ボットが見つけた単語",
+    "noWordsToShow": "単語の詳細は利用できません",
     "difficulty": "難易度",
     "timer": "タイマー",
     "totalScore": "合計スコア",
@@ -3125,6 +3144,9 @@ const ja = {
     },
     "leaderboard": "ランキング",
     "screenshotProtection": "続けるには戻ってください",
+    "clueUnlocked": "ヒントが解放されました！",
+    "categoryUnlocked": "カテゴリが明らかに！",
+    "exampleUnlocked": "例が解放されました！",
     "trainingSuggestion": {
       "title": "LexiClashは初めてですか?",
       "subtitle": "まずは練習ゲームで操作を覚えましょう！",
@@ -3206,6 +3228,7 @@ const ja = {
       "pts": "点"
     },
     "survival": {
+      "tokens": "トークン",
       "lifePoints": "ライフ",
       "lifeRemaining": "{points} ライフ",
       "lifeDraining": "ライフが減っています...",
@@ -3680,17 +3703,17 @@ const ja = {
       "title": "進捗",
       "improving": "向上中",
       "stable": "安定",
-      "declining": "要改善",
+      "declining": "レベルアップゾーン！",
       "gamesAnalyzed": "分析ゲーム数",
       "toNextTier": "次のランクまで"
     },
     "recommendation": {
       "title": "パーソナルアドバイス",
-      "weakest": "{{domain}}をもう少し鍛えよう。",
+      "weakest": "{{domain}}をパワーアップしよう！",
       "tryDrill": "{{drill}}ドリルで改善しよう！",
       "startDrill": "ドリル開始",
-      "declining": "{{domain}}が低下中 - トレーニングの時間！",
-      "low": "{{domain}}に注目が必要。",
+      "declining": "{{domain}}をパワーアップ - さあ行こう！",
+      "low": "{{domain}}がレベルアップ準備完了！",
       "improve": "ターゲット練習で{{domain}}を強化しよう。",
       "unlock": "アンロックまであと{{games}}ゲーム",
       "scienceHint": "ターゲット練習は特定の認知能力を向上させます"
@@ -3867,6 +3890,40 @@ const ja = {
     "title": "レベルアップ!",
     "reached": "レベル{level}に到達!"
   },
+  "customPuzzle": {
+    "title": "カスタムパズル",
+    "description": "この単語パズルを解けますか?",
+    "createTitle": "オリジナルパズルを作成",
+    "createYourOwn": "オリジナルパズルを作成",
+    "createDescription": "オリジナルの単語パズルで友達に挑戦",
+    "selectWord": "パズルのターゲット単語を選択:",
+    "enterWord": "ターゲット単語を入力",
+    "enterWordPlaceholder": "単語を入力...",
+    "validating": "確認中...",
+    "wordValid": "有効な単語!",
+    "wordInvalid": "辞書にない単語です",
+    "invalidCharacters": "文字のみ入力可",
+    "wordTooShort": "最低3文字必要",
+    "wordTooLong": "最大8文字まで",
+    "createPuzzle": "パズルを作成",
+    "generating": "パズルを生成中...",
+    "loading": "パズルを読み込み中...",
+    "created": "パズル完成!",
+    "shareWithFriends": "友達と共有してチャレンジしよう!",
+    "yourScore": "あなたのスコア目標",
+    "share": "パズルを共有",
+    "shareText": "カスタム単語パズルを作りました。私のスコアを超えられる?",
+    "createdBy": "{name}が作成",
+    "creatorScore": "作成者のスコア",
+    "solvedIn": "{attempts}回で解決",
+    "challengeDescription": "時間切れ前に隠された単語を見つけよう。作成者に勝てる?",
+    "play": "チャレンジをプレイ",
+    "solved": "解けました!",
+    "failed": "次は頑張ろう!",
+    "beatCreator": "作成者に勝った!",
+    "leaderboard": "リーダーボード",
+    "playDaily": "デイリーチャレンジをプレイ"
+  },
   "ui": {
     "empty": {
       "noWordsYet": "単語を見つけよう!",
@@ -3912,6 +3969,37 @@ const ja = {
       "yourScore": "あなたのスコア",
       "newPersonalBest": "自己ベスト更新!",
       "almostThere": "惜しい！あと{{points}}ポイント"
+    }
+  },
+  "admin": {
+    "dashboard": "管理ダッシュボード",
+    "accessRequired": "管理者アクセスが必要です",
+    "accessDenied": "このページにアクセスするには管理者権限が必要です。",
+    "welcome": "ようこそ、",
+    "live": {
+      "subtitle": "リアルタイムゲーム監視",
+      "live": "ライブ",
+      "games": "ゲーム",
+      "players": "プレイヤー",
+      "sockets": "接続",
+      "singlePlayer": "ソロ",
+      "refresh": "更新",
+      "retry": "再試行",
+      "noGames": "アクティブなゲームはありません",
+      "noGamesHint": "プレイヤーがゲームを開始するとここに表示されます",
+      "activeGames": "アクティブなゲーム",
+      "connectedPlayers": "接続中のプレイヤー",
+      "player": "プレイヤー",
+      "game": "ゲーム",
+      "status": "ステータス",
+      "score": "スコア",
+      "type": "タイプ",
+      "auth": "認証済み",
+      "guest": "ゲスト",
+      "ranked": "ランクマッチ",
+      "left": "残り",
+      "started": "開始",
+      "lastUpdated": "最終更新"
     }
   }
 };

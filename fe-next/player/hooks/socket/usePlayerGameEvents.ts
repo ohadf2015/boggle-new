@@ -411,7 +411,8 @@ export function usePlayerGameEvents({
       socket.off('fireRoundEnd', handleFireRoundEnd);
       socket.off('totalBoardWords', handleTotalBoardWords);
     };
-    // Setters from context are stable (wrapped in useCallback), no need in deps
+    // Setters from context are stable (wrapped in useCallback)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     socket,
     t,

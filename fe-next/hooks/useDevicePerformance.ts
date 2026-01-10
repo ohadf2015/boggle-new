@@ -42,6 +42,8 @@ export interface DevicePerformanceConfig {
   prefersReducedMotion: boolean;
   /** Connection is slow (2g/3g) or data saver is on */
   isSlowConnection: boolean;
+  /** Device is a mobile/touch device */
+  isMobile: boolean;
 }
 
 // Detect reduced motion preference
@@ -60,6 +62,24 @@ function subscribeToReducedMotion(callback: () => void): () => void {
   return () => mediaQuery.removeEventListener('change', callback);
 }
 
+// Detect if device is mobile/touch
+function detectIsMobile(): boolean {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
+
+  // Check for touch capability
+  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+  // Check user agent for mobile keywords
+  const ua = navigator.userAgent.toLowerCase();
+  const mobileKeywords = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|tablet/i;
+  const isMobileUA = mobileKeywords.test(ua);
+
+  // Check screen size (less reliable but additional signal)
+  const isSmallScreen = window.innerWidth <= 768;
+
+  return hasTouch && (isMobileUA || isSmallScreen);
+}
+
 // Detect low-end device characteristics
 function detectDeviceCapabilities(): Omit<DevicePerformanceConfig, 'prefersReducedMotion'> {
   if (typeof navigator === 'undefined') {
@@ -73,8 +93,11 @@ function detectDeviceCapabilities(): Omit<DevicePerformanceConfig, 'prefersReduc
       reduceParticles: false,
       maxParticles: 20,
       isSlowConnection: false,
+      isMobile: false,
     };
   }
+
+  const isMobile = detectIsMobile();
 
   const nav = navigator as NavigatorWithMemory;
 
@@ -115,6 +138,7 @@ function detectDeviceCapabilities(): Omit<DevicePerformanceConfig, 'prefersReduc
       reduceParticles: true,
       maxParticles: 4,
       isSlowConnection,
+      isMobile,
     };
   }
 
@@ -128,6 +152,7 @@ function detectDeviceCapabilities(): Omit<DevicePerformanceConfig, 'prefersReduc
       reduceParticles: true,
       maxParticles: 8,
       isSlowConnection,
+      isMobile,
     };
   }
 
@@ -141,6 +166,7 @@ function detectDeviceCapabilities(): Omit<DevicePerformanceConfig, 'prefersReduc
     reduceParticles: false,
     maxParticles: 20,
     isSlowConnection,
+    isMobile,
   };
 }
 
@@ -182,12 +208,14 @@ export function useDevicePerformance(): DevicePerformanceConfig {
         enableGlowEffects: false,
         reduceParticles: true,
         maxParticles: 0,
+        isMobile: capabilities.isMobile,
       };
     }
 
     return {
       ...capabilities,
       prefersReducedMotion: false,
+      isMobile: capabilities.isMobile,
     };
   }, [capabilities, prefersReducedMotion]);
 }

@@ -61,35 +61,30 @@ export const HINT_UNLOCK_COSTS = {
 
 /**
  * Clue shop items and their costs (in clue tokens earned from finding words)
+ * Costs are low (1-3 tokens) to enable auto-spending as players discover words
+ * Players earn 1-4 tokens per word found based on length
  */
 export const CLUE_SHOP_ITEMS: ClueShopItem[] = [
   {
     id: 'reveal_letter',
     name: 'Reveal Letter',
     description: 'Reveal a random letter in the target word (keeps 1 letter hidden)',
-    cost: 60,
+    cost: 1,
     icon: '💡',
   },
   {
     id: 'reveal_category',
     name: 'Reveal Category',
     description: 'Show the word category (e.g., "Animals > Mammals")',
-    cost: 120,
+    cost: 2,
     icon: '🏷️',
   },
   {
     id: 'example_sentence',
     name: 'Example Sentence',
     description: 'See the word used in a sentence (word is blank)',
-    cost: 180,
+    cost: 3,
     icon: '📝',
-  },
-  {
-    id: 'eliminate_letters',
-    name: 'Eliminate Wrong Letters',
-    description: 'Remove 3 letters that are NOT in the word (dims them on board)',
-    cost: 300,
-    icon: '❌',
   },
 ];
 

@@ -62,6 +62,27 @@ export const SIGNUP_MODAL_DISMISSED_KEY = 'lexiclash_signup_dismissed';
 export const PENDING_DAILY_RESULT_KEY = 'lexiclash_pending_daily_result';
 export const FIRST_COMPLETION_KEY = 'lexiclash_first_daily_completion';
 export const WINNER_ONBOARDING_KEY = 'lexiclash_winner_onboarding';
+export const GAME_LANGUAGE_KEY = 'lexiclash_daily_game_language';
+export const TRAINING_GATEWAY_SEEN_KEY = 'lexiclash_training_gateway_seen';
+export const KEEP_PLAYING_DISMISSED_KEY = 'lexiclash_keepPlaying_dismissed';
+
+/**
+ * Get storage key for Word Hunt tutorial completion by language
+ */
+export const getWordHuntTutorialKey = (lang: Language): string =>
+  `lexiclash_wordHunt_tutorial_completed_${lang}`;
+
+/**
+ * Get storage key for Word Hunt result by language and date
+ */
+export const getWordHuntResultKey = (lang: Language, date: string): string =>
+  `${WORD_HUNT_STORAGE_KEY}_${lang}_${date}`;
+
+/**
+ * Get storage key for daily coin award by date and language
+ */
+export const getDailyCoinAwardKey = (date: string, lang: Language): string =>
+  `lexiclash_daily_coin_award_${date}_${lang}`;
 
 // ==========================================
 // Share Emojis

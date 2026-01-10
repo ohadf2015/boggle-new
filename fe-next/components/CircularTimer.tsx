@@ -1,6 +1,5 @@
 import { memo } from 'react';
 import { motion } from 'framer-motion';
-import { useLanguage } from '../contexts/LanguageContext';
 import { useReducedMotion } from '../utils/accessibility';
 import { formatTimeMMSS } from '@/shared/utils';
 
@@ -14,12 +13,12 @@ interface CircularTimerProps {
   size?: 'xs' | 'sm' | 'md' | 'lg';
 }
 
-// Size configurations
+// Size configurations - frameClasses removed since we no longer have a background frame
 const SIZES = {
-  xs: { svgSize: 80, radius: 30, strokeWidth: 6, textSize: 'text-xl', frameClasses: 'p-1.5 border-2', badgeClasses: 'hidden' },
-  sm: { svgSize: 100, radius: 38, strokeWidth: 8, textSize: 'text-2xl', frameClasses: 'p-2 border-3', badgeClasses: 'hidden' },
-  md: { svgSize: 120, radius: 45, strokeWidth: 10, textSize: 'text-3xl', frameClasses: 'p-3 border-4', badgeClasses: '' },
-  lg: { svgSize: 140, radius: 52, strokeWidth: 12, textSize: 'text-4xl', frameClasses: 'p-4 border-4', badgeClasses: '' },
+  xs: { svgSize: 80, radius: 30, strokeWidth: 6, textSize: 'text-xl', frameClasses: '', badgeClasses: 'hidden' },
+  sm: { svgSize: 100, radius: 38, strokeWidth: 8, textSize: 'text-2xl', frameClasses: '', badgeClasses: 'hidden' },
+  md: { svgSize: 120, radius: 45, strokeWidth: 10, textSize: 'text-3xl', frameClasses: '', badgeClasses: '' },
+  lg: { svgSize: 140, radius: 52, strokeWidth: 12, textSize: 'text-4xl', frameClasses: '', badgeClasses: '' },
 };
 
 /**
@@ -28,7 +27,6 @@ const SIZES = {
  * Respects prefers-reduced-motion for accessibility
  */
 const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180, size = 'md' }) => {
-  const { t } = useLanguage();
   const reduceMotion = useReducedMotion();
   const config = SIZES[size];
 
@@ -47,24 +45,19 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
 
   return (
     <motion.div
-      initial={reduceMotion ? { opacity: 1 } : { scale: 0, opacity: 0, rotate: -10 }}
-      animate={{ scale: 1, opacity: 1, rotate: 0 }}
-      transition={reduceMotion ? { duration: 0 } : { duration: 0.4, ease: [0.68, -0.55, 0.265, 1.55] }}
+      initial={reduceMotion ? { opacity: 1 } : { scale: 0, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={reduceMotion ? { duration: 0 } : { duration: 0.3, ease: 'easeOut' }}
       className="flex items-center justify-center"
     >
-      {/* Neo-Brutalist frame */}
+      {/* Neo-Brutalist frame - circular design */}
       <div
         className={`
           relative
-          bg-neo-cream text-neo-black
-          border-neo-black
-          rounded-neo-lg
-          ${size === 'xs' || size === 'sm' ? 'shadow-hard-sm' : size === 'lg' ? 'shadow-hard-xl' : 'shadow-hard-lg'}
           ${config.frameClasses}
         `}
-        style={{ transform: size === 'xs' || size === 'sm' ? 'rotate(-1deg)' : 'rotate(-2deg)' }}
       >
-        <div className="relative" style={{ transform: size === 'xs' || size === 'sm' ? 'rotate(1deg)' : 'rotate(2deg)' }}>
+        <div className="relative">
           <svg width={config.svgSize} height={config.svgSize} className="transform -rotate-90">
             {/* Neo-Brutalist: Solid colors instead of gradients */}
 
@@ -117,44 +110,21 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
             />
           </svg>
 
-          {/* Timer text in the center */}
+          {/* Timer text in the center - color change only for low time, no animation */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <motion.div
-              animate={isLowTime && !reduceMotion ? { scale: [1, 1.1, 1] } : {}}
-              transition={{ duration: 0.5, repeat: isLowTime && !reduceMotion ? Infinity : 0 }}
-              className={`${config.textSize} font-black text-neo-black`}
+            <div
+              className={`${config.textSize} font-black ${isLowTime ? 'text-neo-red' : 'text-neo-cream'}`}
               style={{
                 textShadow: isLowTime
-                  ? `${size === 'xs' || size === 'sm' ? '1px 1px' : '2px 2px'} 0px var(--neo-red)`
-                  : `${size === 'xs' || size === 'sm' ? '1px 1px' : '2px 2px'} 0px var(--neo-cyan)`,
+                  ? `${size === 'xs' || size === 'sm' ? '1px 1px' : '2px 2px'} 0px rgba(0,0,0,0.3)`
+                  : `${size === 'xs' || size === 'sm' ? '1px 1px' : '2px 2px'} 0px rgba(0,0,0,0.5)`,
+                transition: 'color 0.3s ease',
               }}
             >
               {formatTimeMMSS(remainingTime)}
-            </motion.div>
+            </div>
           </div>
         </div>
-
-        {/* Low time warning badge - hidden on small size */}
-        {isLowTime && (
-          <motion.div
-            initial={reduceMotion ? { opacity: 1 } : { scale: 0, rotate: -20 }}
-            animate={{ scale: 1, rotate: reduceMotion ? 0 : 12, opacity: 1 }}
-            transition={reduceMotion ? { duration: 0 } : undefined}
-            className={`
-              absolute -top-2 -right-2 z-10
-              px-2 py-1
-              bg-neo-red text-neo-cream
-              text-xs font-black uppercase
-              border-2 border-neo-black
-              rounded-neo
-              shadow-hard-sm
-              whitespace-nowrap
-              ${config.badgeClasses}
-            `}
-          >
-            {t('common.hurry')}
-          </motion.div>
-        )}
       </div>
     </motion.div>
   );

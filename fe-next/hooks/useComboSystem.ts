@@ -20,6 +20,7 @@ import {
   calculateAvailableShields,
   VALID_WORDS_PER_SHIELD,
 } from '@/shared/utils/comboUtils';
+import { getPerformanceConfig } from '@/components/grid/performanceUtils';
 
 // ==================== Types ====================
 
@@ -161,9 +162,12 @@ export function useComboSystem(options: UseComboSystemOptions = {}): ComboSystem
         }
       };
 
-      // Update immediately and then every 50ms for smooth progress
+      // Update immediately and then at adaptive interval for smooth progress
+      // Use 100ms on low-end devices (10fps) vs 50ms on capable devices (20fps)
       updateTimeRemaining();
-      comboTimerIntervalRef.current = setInterval(updateTimeRemaining, 50);
+      const config = getPerformanceConfig();
+      const intervalMs = config.isLowEnd ? 100 : 50;
+      comboTimerIntervalRef.current = setInterval(updateTimeRemaining, intervalMs);
     } else {
       setComboTimeRemaining(null);
       if (isDangerState) {

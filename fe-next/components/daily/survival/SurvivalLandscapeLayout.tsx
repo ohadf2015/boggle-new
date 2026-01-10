@@ -2,16 +2,15 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Heart, Coins, Store, X } from 'lucide-react';
+import { Heart, Sparkles, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import GridComponent from '@/components/GridComponent';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { WordFeedbackToast, type FeedbackType } from '../WordFeedbackToast';
 import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
-import { SurvivalClueShop } from './SurvivalClueShop';
 import type { LetterGrid } from '@/types';
-import type { HintLevel, ClueShopItem } from '@/utils/aiHintGenerator';
+import type { HintLevel } from '@/utils/aiHintGenerator';
 import type { AccumulatedClue } from './types';
 import { MAX_ATTEMPTS } from './constants';
 
@@ -29,14 +28,9 @@ export interface SurvivalLandscapeLayoutProps {
   isLifeGaining: boolean;
   attempts: { word: string; timestamp: number }[];
 
-  // Token/shop props
+  // Token props
   clueTokens: number;
-  showShop: boolean;
-  showShopHint: boolean;
   isClueGaining: boolean;
-  onShopClick: () => void;
-  onPurchase: (item: ClueShopItem) => void;
-  onShopClose: () => void;
 
   // Clue boxes props
   currentHint: HintLevel | null;
@@ -80,14 +74,9 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
   isLifeGaining,
   attempts,
 
-  // Token/shop props
+  // Token props
   clueTokens,
-  showShop,
-  showShopHint,
   isClueGaining,
-  onShopClick,
-  onPurchase,
-  onShopClose,
 
   // Clue boxes props
   currentHint,
@@ -138,12 +127,10 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
         t={t}
       />
 
-      {/* Right Side Panel - Tokens & Shop */}
+      {/* Right Side Panel - Tokens */}
       <RightPanel
         clueTokens={clueTokens}
-        showShopHint={showShopHint}
         isClueGaining={isClueGaining}
-        onShopClick={onShopClick}
       />
 
       {/* Bottom-left: Quit button */}
@@ -159,7 +146,7 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
       </div>
 
       {/* Center: Target Word + Grid */}
-      <div className="flex flex-col items-center justify-center w-full h-full px-[150px] py-2 gap-2 landscape-grid-container">
+      <div className="flex flex-col items-center justify-center w-full h-full px-[80px] sm:px-[100px] md:px-[120px] lg:px-[150px] py-2 gap-2 landscape-grid-container">
         {/* Target word hint boxes - compact for landscape */}
         {currentHint && (
           <LandscapeClueBoxes
@@ -191,16 +178,6 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
           </div>
         </div>
       </div>
-
-      {/* Clue Shop Modal */}
-      <SurvivalClueShop
-        isOpen={showShop}
-        clueTokens={clueTokens}
-        onClose={onShopClose}
-        onPurchase={onPurchase}
-        compact
-        t={t}
-      />
 
       {/* Quit Confirmation Dialog */}
       <ConfirmationDialog
@@ -282,42 +259,29 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
 
 interface RightPanelProps {
   clueTokens: number;
-  showShopHint: boolean;
   isClueGaining: boolean;
-  onShopClick: () => void;
 }
 
 const RightPanel: React.FC<RightPanelProps> = ({
   clueTokens,
-  showShopHint,
   isClueGaining,
-  onShopClick,
 }) => (
   <div className="absolute right-3 top-1/2 -translate-y-1/2 z-20 landscape-side-panel">
     <div className="landscape-panel flex flex-col items-center gap-4">
-      {/* Clue Tokens */}
-      <div className="flex flex-col items-center">
+      {/* Clue Tokens - auto-spend as you earn */}
+      <motion.div
+        className="flex flex-col items-center px-3 py-2 bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-yellow-900/30 dark:to-amber-900/30 border-2 border-neo-black rounded-neo"
+        animate={clueTokens > 0 ? { scale: [1, 1.05, 1] } : {}}
+        transition={{ duration: 0.3 }}
+      >
         <div className="flex items-center gap-1">
-          <Coins
-            className={cn("w-6 h-6", isClueGaining && "animate-bounce text-yellow-500")}
-            style={{ color: '#ca8a04' }}
+          <Sparkles
+            className={cn("w-6 h-6 text-amber-500", isClueGaining && "animate-bounce")}
           />
           <span className="landscape-stat-secondary text-neo-black">{clueTokens}</span>
         </div>
         <div className="landscape-stat-label text-neo-black">TOKENS</div>
-      </div>
-
-      {/* Shop Button */}
-      <Button
-        size="sm"
-        onClick={onShopClick}
-        className={cn(
-          "w-14 h-14 p-0 bg-neo-pink text-white border-3 border-neo-black rounded-neo shadow-hard hover:bg-neo-pink/80",
-          showShopHint && "animate-pulse ring-2 ring-neo-yellow ring-offset-1"
-        )}
-      >
-        <Store className="w-6 h-6" />
-      </Button>
+      </motion.div>
     </div>
   </div>
 );

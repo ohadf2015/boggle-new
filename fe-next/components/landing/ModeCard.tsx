@@ -1,11 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { ArrowRight, ArrowLeft, Users, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTiltEffect } from '@/hooks/useTiltEffect';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 export interface LiveBadgeProps {
   openRooms: number;
@@ -26,7 +28,7 @@ interface ModeCardProps {
 
 /**
  * ModeCard - Large clickable card for game mode selection
- * Clean Neo-Brutalist styling with optional live stats
+ * Clean Neo-Brutalist styling with 3D tilt effect and shine animation
  */
 const ModeCard: React.FC<ModeCardProps> = ({
   title,
@@ -40,13 +42,28 @@ const ModeCard: React.FC<ModeCardProps> = ({
   const { dir } = useLanguage();
   const isRTL = dir === 'rtl';
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
+  const [isHovered, setIsHovered] = useState(false);
+  const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
 
-  // 3D tilt effect on hover
-  const { ref, style: tiltStyle, handlers } = useTiltEffect<HTMLDivElement>({
-    maxTilt: 8,
-    hoverScale: 1.02,
-    perspective: 1000,
+  // 3D tilt effect on hover - MORE DRAMATIC
+  const { ref, style: tiltStyle, handlers: tiltHandlers } = useTiltEffect<HTMLDivElement>({
+    maxTilt: 15,        // Increased from 8
+    hoverScale: 1.04,   // Increased from 1.02
+    perspective: 800,   // Decreased for more dramatic effect
   });
+
+  // Combined handlers
+  const handlers = {
+    ...tiltHandlers,
+    onMouseEnter: () => {
+      setIsHovered(true);
+      tiltHandlers.onMouseEnter();
+    },
+    onMouseLeave: () => {
+      setIsHovered(false);
+      tiltHandlers.onMouseLeave();
+    },
+  };
 
   const variantStyles = {
     cyan: {
@@ -75,7 +92,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
   const styles = variantStyles[variant];
 
   return (
-    <Link href={href} className={cn('block w-full h-full group', className)}>
+    <Link href={href} className={cn('block w-full h-full group focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy rounded-neo-lg', className)}>
       <div
         ref={ref}
         className={cn(
@@ -86,6 +103,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
           'cq-container',
           'cursor-pointer',
           'relative overflow-hidden',
+          // Halftone texture overlay
+          'texture-halftone-comic-light',
           // Full height to fill grid cell
           'h-full',
           // Colors
@@ -137,10 +156,10 @@ const ModeCard: React.FC<ModeCardProps> = ({
             {title}
           </h2>
 
-          {/* Arrow indicator - min 44x44px touch target on mobile */}
+          {/* Arrow indicator - min 44x44px touch target for WCAG compliance */}
           <div
             className={cn(
-              'min-w-[40px] min-h-[40px]',
+              'min-w-[44px] min-h-[44px]',
               'rounded-full border-2 border-neo-black',
               'flex items-center justify-center shrink-0',
               'transition-transform duration-200 ease-out',
@@ -148,8 +167,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
               styles.arrow
             )}
             style={{
-              width: 'clamp(2.25rem, 8cqw, 3.25rem)',
-              height: 'clamp(2.25rem, 8cqw, 3.25rem)',
+              width: 'clamp(2.75rem, 8cqw, 3.25rem)',
+              height: 'clamp(2.75rem, 8cqw, 3.25rem)',
             }}
           >
             <ArrowIcon style={{ fontSize: 'clamp(0.75rem, 3.5cqw, 1rem)' }} />
@@ -200,7 +219,22 @@ const ModeCard: React.FC<ModeCardProps> = ({
             )}
           </div>
         )}
-        {/* Removed decorative blur element */}
+        {/* Shine effect on hover */}
+        {enableComplexAnimations && !prefersReducedMotion && (
+          <motion.div
+            className="absolute inset-0 pointer-events-none overflow-hidden rounded-neo-lg"
+            initial={false}
+            animate={isHovered ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+              initial={{ x: '-100%' }}
+              animate={isHovered ? { x: '200%' } : { x: '-100%' }}
+              transition={{ duration: 0.6, ease: 'easeInOut' }}
+            />
+          </motion.div>
+        )}
       </div>
     </Link>
   );

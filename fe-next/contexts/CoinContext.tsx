@@ -215,6 +215,10 @@ export function CoinProvider({ children }: { children: ReactNode }) {
   /**
    * Award coins for Daily Challenge completion
    * Handles duplicate prevention and auth/guest sync
+   *
+   * IMPORTANT: Guests do NOT receive actual coins - they only see a "teasing"
+   * message showing what they would earn if signed in. This returns the
+   * calculated reward for display purposes, but does not award coins.
    */
   const awardDailyCompletion = useCallback(async (params: {
     puzzleDate: string;
@@ -226,6 +230,25 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     const { puzzleDate, language, solved, efficiencyScore, streakDays } = params;
     const awardKey = `lexiclash_daily_coin_award_${puzzleDate}_${language}`;
 
+    // Calculate reward first (needed for both auth and guest modes)
+    const reward = calculateDailyReward(solved, efficiencyScore, streakDays);
+
+    // Don't show anything if reward is 0
+    if (reward.total <= 0) {
+      return null;
+    }
+
+    // For guests: return the potential reward WITHOUT actually awarding coins
+    // This enables the "teasing" UI showing what they could earn
+    if (!isAuthenticated || !user) {
+      return {
+        awarded: reward.total,
+        breakdown: reward.breakdown,
+        newBalance: 0, // Guests don't have a real balance
+      };
+    }
+
+    // For authenticated users: proceed with actual coin award
     // Check if already awarded
     if (isAlreadyAwarded(awardKey)) {
       return null;
@@ -238,9 +261,6 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     pendingOperationsRef.current.add(awardKey);
 
     try {
-      // Calculate reward
-      const reward = calculateDailyReward(solved, efficiencyScore, streakDays);
-
       // Award coins using unified method
       const newBalance = await addCoins(reward.total, 'Daily Challenge', {
         puzzleDate,
@@ -264,11 +284,15 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     } finally {
       pendingOperationsRef.current.delete(awardKey);
     }
-  }, [addCoins]);
+  }, [isAuthenticated, user, addCoins]);
 
   /**
    * Award coins for game completion (singleplayer/multiplayer)
    * Handles duplicate prevention and auth/guest sync
+   *
+   * IMPORTANT: Guests do NOT receive actual coins - they only see a "teasing"
+   * message showing what they would earn if signed in. This returns the
+   * calculated reward for display purposes, but does not award coins.
    */
   const awardGameCompletion = useCallback(async (params: {
     sessionId: string;
@@ -281,6 +305,25 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     const { sessionId, mode, score, rank, totalPlayers, gameCode } = params;
     const awardKey = `lexiclash_game_coin_award_${sessionId}`;
 
+    // Calculate reward first (needed for both auth and guest modes)
+    const reward = calculateGameReward(score, mode, rank, totalPlayers);
+
+    // Don't show anything if reward is 0
+    if (reward.total <= 0) {
+      return null;
+    }
+
+    // For guests: return the potential reward WITHOUT actually awarding coins
+    // This enables the "teasing" UI showing what they could earn
+    if (!isAuthenticated || !user) {
+      return {
+        awarded: reward.total,
+        breakdown: reward.breakdown,
+        newBalance: 0, // Guests don't have a real balance
+      };
+    }
+
+    // For authenticated users: proceed with actual coin award
     // Check if already awarded
     if (isAlreadyAwarded(awardKey)) {
       return null;
@@ -293,14 +336,6 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     pendingOperationsRef.current.add(awardKey);
 
     try {
-      // Calculate reward
-      const reward = calculateGameReward(score, mode, rank, totalPlayers);
-
-      // Don't award if reward is 0
-      if (reward.total <= 0) {
-        return null;
-      }
-
       // Award coins using unified method
       const reason = mode === 'multiplayer' ? 'Multiplayer Game' : 'Single Player Game';
       const newBalance = await addCoins(reward.total, reason, {
@@ -325,7 +360,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     } finally {
       pendingOperationsRef.current.delete(awardKey);
     }
-  }, [addCoins]);
+  }, [isAuthenticated, user, addCoins]);
 
   /**
    * Award coins for reaching a combo milestone

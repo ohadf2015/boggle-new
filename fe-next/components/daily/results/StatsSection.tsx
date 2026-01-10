@@ -23,7 +23,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
   result,
   t,
 }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
 
   return (
     <div className="rounded-neo border-2 border-neo-black overflow-hidden">

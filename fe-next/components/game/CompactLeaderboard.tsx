@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import { useMemo, useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, Zap, Target, ChevronUp } from 'lucide-react';
+import { Crown, Zap, TrendingUp, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '../Avatar';
 
@@ -25,14 +25,22 @@ interface CompactLeaderboardProps {
   t: (key: string) => string;
 }
 
+// Track previous scores for detecting changes
+interface ScoreChange {
+  username: string;
+  delta: number;
+  timestamp: number;
+}
+
 /**
  * CompactLeaderboard - Race Track Style competitive leaderboard
  *
- * Focused on motivation and competition:
- * - Shows the leader (if not you) with crown
- * - Shows your next target (player directly ahead to beat)
- * - Shows your position with "X pts to catch up" indicator
- * - Animated score gaps and rank changes
+ * Enhanced with visual race track, animations, and live activity indicators:
+ * - Horizontal race lanes showing relative positions
+ * - Animated position changes when ranks swap
+ * - Visual "catching up" effects when gap narrows
+ * - Pulse animations when opponents score
+ * - Rank change indicators (up/down arrows)
  */
 export function CompactLeaderboard({
   players,
@@ -40,7 +48,13 @@ export function CompactLeaderboard({
   className,
   t,
 }: CompactLeaderboardProps) {
-  const { leader, nextTarget, currentUser, totalPlayers, isLeading } = useMemo(() => {
+  // Track previous scores and ranks for animations
+  const prevScoresRef = useRef<Map<string, number>>(new Map());
+  const prevRanksRef = useRef<Map<string, number>>(new Map());
+  const [scoreChanges, setScoreChanges] = useState<ScoreChange[]>([]);
+  const [rankChanges, setRankChanges] = useState<Map<string, 'up' | 'down'>>(new Map());
+
+  const { sortedPlayers, nextTarget, currentUser, totalPlayers, isLeading, maxScore } = useMemo(() => {
     const sorted = [...players].sort((a, b) => b.score - a.score);
 
     // Add ranks
@@ -50,7 +64,7 @@ export function CompactLeaderboard({
 
     const user = sorted.find(p => p.username === currentUsername);
     const userIndex = sorted.findIndex(p => p.username === currentUsername);
-    const leaderPlayer = sorted[0];
+    const highestScore = sorted[0]?.score || 0;
 
     // Next target is the player directly above the current user
     const target = userIndex > 0 ? sorted[userIndex - 1] : null;
@@ -59,13 +73,57 @@ export function CompactLeaderboard({
     const leading = user?.rank === 1;
 
     return {
-      leader: leaderPlayer,
+      sortedPlayers: sorted,
       nextTarget: target,
       currentUser: user || null,
       totalPlayers: sorted.length,
       isLeading: leading,
+      maxScore: highestScore,
     };
   }, [players, currentUsername]);
+
+  // Detect score and rank changes for animations
+  useEffect(() => {
+    const newScoreChanges: ScoreChange[] = [];
+    const newRankChanges = new Map<string, 'up' | 'down'>();
+
+    sortedPlayers.forEach(player => {
+      const prevScore = prevScoresRef.current.get(player.username);
+      const prevRank = prevRanksRef.current.get(player.username);
+
+      // Detect score change
+      if (prevScore !== undefined && player.score > prevScore) {
+        newScoreChanges.push({
+          username: player.username,
+          delta: player.score - prevScore,
+          timestamp: Date.now(),
+        });
+      }
+
+      // Detect rank change
+      if (prevRank !== undefined && player.rank !== prevRank) {
+        newRankChanges.set(player.username, player.rank < prevRank ? 'up' : 'down');
+      }
+
+      // Update refs
+      prevScoresRef.current.set(player.username, player.score);
+      prevRanksRef.current.set(player.username, player.rank);
+    });
+
+    if (newScoreChanges.length > 0) {
+      setScoreChanges(prev => [...prev, ...newScoreChanges]);
+      // Clear old score changes after animation
+      setTimeout(() => {
+        setScoreChanges(prev => prev.filter(c => Date.now() - c.timestamp < 1500));
+      }, 1500);
+    }
+
+    if (newRankChanges.size > 0) {
+      setRankChanges(newRankChanges);
+      // Clear rank changes after animation
+      setTimeout(() => setRankChanges(new Map()), 2000);
+    }
+  }, [sortedPlayers]);
 
   // Calculate points needed to catch next target
   const pointsToTarget = useMemo(() => {
@@ -76,215 +134,261 @@ export function CompactLeaderboard({
   // Calculate points ahead of second place (when leading)
   const pointsAhead = useMemo(() => {
     if (!isLeading || totalPlayers < 2) return 0;
-    const sorted = [...players].sort((a, b) => b.score - a.score);
-    return sorted[0].score - (sorted[1]?.score || 0);
-  }, [isLeading, players, totalPlayers]);
+    return sortedPlayers[0].score - (sortedPlayers[1]?.score || 0);
+  }, [isLeading, sortedPlayers, totalPlayers]);
+
+  // Check if close to overtaking (for pulse animation)
+  const isCloseToOvertaking = pointsToTarget > 0 && pointsToTarget <= 5;
+
+  // Get race position percentage (0-100) for visual track
+  const getRacePosition = (score: number): number => {
+    if (maxScore === 0) return 0;
+    return Math.min(100, (score / maxScore) * 100);
+  };
 
   if (totalPlayers === 0 || !currentUser) return null;
+
+  // Get top 3 players for race visualization (or fewer if less players)
+  const raceParticipants = sortedPlayers.slice(0, Math.min(4, totalPlayers));
+  const userInTop = raceParticipants.some(p => p.username === currentUsername);
+
+  // If user not in top, add them to race view
+  if (!userInTop && currentUser) {
+    raceParticipants.pop(); // Remove last of top 3
+    raceParticipants.push(currentUser);
+  }
 
   return (
     <div className={cn(
       'bg-neo-cream border-3 border-neo-black rounded-neo-lg shadow-hard overflow-hidden',
       className
     )}>
-      {/* Compact Header with Race Track theme */}
+      {/* Header with Race Track theme */}
       <div className="bg-neo-navy text-neo-cream px-2 py-1 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <Zap className="w-3.5 h-3.5 text-neo-yellow" />
+          <motion.div
+            animate={{ rotate: [0, 15, -15, 0] }}
+            transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+          >
+            <Zap className="w-3.5 h-3.5 text-neo-yellow" />
+          </motion.div>
           <span className="text-[10px] font-black uppercase text-neo-cream tracking-wider">
             {t('leaderboard.liveRace') || 'Live Race'}
           </span>
         </div>
-        <span className="text-[10px] font-bold text-neo-cream/70">
-          {totalPlayers} {t('leaderboard.racing') || 'racing'}
-        </span>
+        <div className="flex items-center gap-1">
+          <span className="text-[10px] font-bold text-neo-cream/70">
+            {totalPlayers} {t('leaderboard.racing') || 'racing'}
+          </span>
+        </div>
       </div>
 
-      <div className="p-1.5 space-y-1">
-        {/* LEADER SECTION - Only show if user is NOT leading */}
-        {!isLeading && leader && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-1.5 px-1.5 py-1 rounded-neo bg-gradient-to-r from-neo-yellow to-neo-orange border-2 border-neo-black shadow-hard-sm"
-          >
-            {/* Crown Icon */}
-            <div className="w-7 h-7 rounded-full bg-neo-black text-neo-yellow flex items-center justify-center flex-shrink-0">
-              <Crown className="w-4 h-4" />
-            </div>
+      {/* Race Track Visualization */}
+      <div className="px-2 py-1.5 bg-gradient-to-b from-neo-navy/5 to-transparent">
+        {/* Track lanes */}
+        <div className="relative space-y-1">
+          {raceParticipants.map((player, index) => {
+            const isMe = player.username === currentUsername;
+            const isLeader = player.rank === 1;
+            const position = getRacePosition(player.score);
+            const scoreChange = scoreChanges.find(c => c.username === player.username);
+            const rankChange = rankChanges.get(player.username);
 
-            {/* Avatar */}
-            <Avatar
-              profilePictureUrl={leader.profilePictureUrl ?? undefined}
-              avatarImage={leader.avatarImage}
-              avatarEmoji={leader.avatarEmoji}
-              avatarColor={leader.avatarColor}
-              size="sm"
-            />
+            return (
+              <motion.div
+                key={player.username}
+                layout
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{
+                  layout: { type: 'spring', stiffness: 300, damping: 30 },
+                  delay: index * 0.05
+                }}
+                className={cn(
+                  'relative flex items-center gap-1.5 h-8 rounded-neo overflow-hidden',
+                  isMe
+                    ? 'bg-neo-cyan/30 border-2 border-neo-cyan'
+                    : 'bg-neo-black/5 border border-neo-black/20'
+                )}
+              >
+                {/* Track background with finish line pattern */}
+                <div className="absolute inset-0 opacity-10">
+                  <div className="absolute right-0 top-0 bottom-0 w-2 bg-[repeating-linear-gradient(0deg,#000,#000_2px,#fff_2px,#fff_4px)]" />
+                </div>
 
-            {/* Name */}
-            <div className="flex-1 min-w-0">
-              <span className="text-xs font-black text-neo-black truncate block">
-                {leader.username}
-              </span>
-              <span className="text-[9px] font-bold text-neo-black/70 uppercase">
-                {t('leaderboard.leader') || 'Leader'}
-              </span>
-            </div>
+                {/* Position indicator (race car on track) */}
+                <motion.div
+                  className="absolute top-0 bottom-0 flex items-center"
+                  initial={{ left: '0%' }}
+                  animate={{ left: `${Math.max(0, position - 15)}%` }}
+                  transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+                >
+                  {/* Player marker */}
+                  <div className={cn(
+                    'flex items-center gap-1 px-1.5 py-0.5 rounded-neo',
+                    isLeader
+                      ? 'bg-gradient-to-r from-neo-yellow to-neo-orange border-2 border-neo-black shadow-hard-sm'
+                      : isMe
+                        ? 'bg-neo-cyan border-2 border-neo-black shadow-hard-sm'
+                        : 'bg-neo-cream border border-neo-black/50'
+                  )}>
+                    {/* Rank indicator */}
+                    {isLeader ? (
+                      <Crown className="w-3 h-3 text-neo-black" />
+                    ) : (
+                      <span className="text-[9px] font-black text-neo-black">
+                        #{player.rank}
+                      </span>
+                    )}
 
-            {/* Score */}
-            <motion.div
-              key={leader.score}
-              initial={{ scale: 1.3 }}
-              animate={{ scale: 1 }}
-              className="text-lg font-black text-neo-black tabular-nums"
-            >
-              {leader.score}
-            </motion.div>
-          </motion.div>
-        )}
+                    {/* Avatar - smaller for race view */}
+                    <Avatar
+                      profilePictureUrl={player.profilePictureUrl ?? undefined}
+                      avatarImage={player.avatarImage}
+                      avatarEmoji={player.avatarEmoji}
+                      avatarColor={player.avatarColor}
+                      size="sm"
+                    />
 
-        {/* NEXT TARGET - The player you need to beat (if not the leader) */}
-        {nextTarget && nextTarget.username !== leader?.username && (
-          <motion.div
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.05 }}
-            className="flex items-center gap-1.5 px-1.5 py-0.5 rounded-neo bg-neo-cream border-2 border-neo-black/30"
-          >
-            {/* Target Icon */}
-            <div className="w-6 h-6 rounded-full bg-neo-pink/20 flex items-center justify-center flex-shrink-0">
-              <Target className="w-3.5 h-3.5 text-neo-pink" />
-            </div>
+                    {/* Score */}
+                    <motion.span
+                      key={player.score}
+                      initial={{ scale: 1.3 }}
+                      animate={{ scale: 1 }}
+                      className="text-xs font-black text-neo-black tabular-nums"
+                    >
+                      {player.score}
+                    </motion.span>
 
-            {/* Avatar */}
-            <Avatar
-              profilePictureUrl={nextTarget.profilePictureUrl ?? undefined}
-              avatarImage={nextTarget.avatarImage}
-              avatarEmoji={nextTarget.avatarEmoji}
-              avatarColor={nextTarget.avatarColor}
-              size="sm"
-            />
+                    {/* Rank change indicator */}
+                    <AnimatePresence>
+                      {rankChange && (
+                        <motion.span
+                          initial={{ opacity: 0, y: rankChange === 'up' ? 5 : -5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0 }}
+                          className={cn(
+                            'text-[9px] font-black',
+                            rankChange === 'up' ? 'text-neo-lime' : 'text-neo-red'
+                          )}
+                        >
+                          {rankChange === 'up' ? '▲' : '▼'}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </div>
 
-            {/* Name & Rank */}
-            <div className="flex-1 min-w-0">
-              <span className="text-[11px] font-bold text-neo-black/80 truncate block">
-                #{nextTarget.rank} {nextTarget.username}
-              </span>
-            </div>
+                  {/* Score change floating indicator */}
+                  <AnimatePresence>
+                    {scoreChange && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 0, x: 5 }}
+                        animate={{ opacity: 1, y: -15, x: 5 }}
+                        exit={{ opacity: 0, y: -25 }}
+                        transition={{ duration: 0.8 }}
+                        className="absolute -top-1 left-full text-[10px] font-black text-neo-lime whitespace-nowrap"
+                      >
+                        +{scoreChange.delta}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
 
-            {/* Score */}
-            <span className="text-sm font-black text-neo-black/70 tabular-nums">
-              {nextTarget.score}
-            </span>
-          </motion.div>
-        )}
+                {/* Player name (right side) */}
+                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  <span className={cn(
+                    'text-[10px] font-bold truncate max-w-[60px]',
+                    isMe ? 'text-neo-black' : 'text-neo-black/60'
+                  )}>
+                    {isMe ? (t('leaderboard.you') || 'YOU') : player.username}
+                  </span>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
 
-        {/* YOUR POSITION - Always shown prominently */}
-        {/* Responsive gap and padding for narrow screens (<375px) */}
+      {/* Your Status Bar - Motivational section */}
+      <div className="px-2 pb-1.5">
         <motion.div
-          layout
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
           className={cn(
-            'relative flex items-center gap-1 sm:gap-1.5 px-1 sm:px-1.5 py-1.5 rounded-neo border-3',
-            'min-w-0 w-full', // Ensure flex container respects width
+            'relative flex items-center justify-between px-2 py-1.5 rounded-neo border-2',
             isLeading
-              ? 'bg-gradient-to-r from-neo-yellow to-neo-lime border-neo-black shadow-hard'
-              : 'bg-neo-cyan/20 border-neo-cyan shadow-hard-sm'
+              ? 'bg-gradient-to-r from-neo-yellow/50 to-neo-lime/50 border-neo-black'
+              : isCloseToOvertaking
+                ? 'bg-neo-pink/20 border-neo-pink'
+                : 'bg-neo-cyan/10 border-neo-cyan/50'
           )}
+          animate={isCloseToOvertaking ? {
+            boxShadow: ['0 0 0 0 rgba(255,20,147,0)', '0 0 0 4px rgba(255,20,147,0.3)', '0 0 0 0 rgba(255,20,147,0)']
+          } : {}}
+          transition={{ duration: 1.5, repeat: isCloseToOvertaking ? Infinity : 0 }}
         >
-          {/* Rank Badge */}
-          <div className={cn(
-            'w-8 h-8 rounded-neo flex items-center justify-center font-black text-sm flex-shrink-0 border-2 border-neo-black',
-            isLeading ? 'bg-neo-black text-neo-yellow' : 'bg-neo-cyan text-neo-black'
-          )}>
+          {/* Left side - status */}
+          <div className="flex items-center gap-1.5">
             {isLeading ? (
-              <Crown className="w-4 h-4" />
+              <>
+                <Flame className="w-4 h-4 text-neo-orange" />
+                <span className="text-xs font-black text-neo-black">
+                  {t('leaderboard.leading') || 'Leading!'}
+                </span>
+                {pointsAhead > 0 && (
+                  <span className="text-[10px] font-bold text-neo-black/70">
+                    +{pointsAhead} {t('leaderboard.ahead') || 'ahead'}
+                  </span>
+                )}
+              </>
             ) : (
-              `#${currentUser.rank}`
+              <>
+                <TrendingUp className={cn(
+                  'w-4 h-4',
+                  isCloseToOvertaking ? 'text-neo-pink animate-pulse' : 'text-neo-cyan'
+                )} />
+                <span className={cn(
+                  'text-xs font-black',
+                  isCloseToOvertaking ? 'text-neo-pink' : 'text-neo-black/80'
+                )}>
+                  {isCloseToOvertaking
+                    ? (t('leaderboard.almostThere') || 'Almost there!')
+                    : `${pointsToTarget} ${t('leaderboard.toCatch') || 'pts to pass'}`
+                  }
+                </span>
+              </>
             )}
           </div>
 
-          {/* Avatar */}
-          <Avatar
-            profilePictureUrl={currentUser.profilePictureUrl ?? undefined}
-            avatarImage={currentUser.avatarImage}
-            avatarEmoji={currentUser.avatarEmoji}
-            avatarColor={currentUser.avatarColor}
-            size="sm"
-          />
-
-          {/* Name & Status */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1">
-              <span className="text-xs font-black text-neo-black truncate">
-                {t('leaderboard.you') || 'YOU'}
-              </span>
-              {isLeading && (
-                <span className="text-[9px] font-bold text-neo-black/80 uppercase">
-                  🔥 {t('leaderboard.leading') || 'Leading!'}
-                </span>
-              )}
-            </div>
-
-            {/* Motivational indicator */}
-            <AnimatePresence mode="wait">
-              {isLeading ? (
-                pointsAhead > 0 && (
-                  <motion.span
-                    key="ahead"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="text-[10px] font-bold text-neo-black/70"
-                  >
-                    +{pointsAhead} pts {t('leaderboard.ahead') || 'ahead'}
-                  </motion.span>
-                )
-              ) : (
-                pointsToTarget > 0 && (
-                  <motion.div
-                    key="catchup"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="flex items-center gap-0.5"
-                  >
-                    <ChevronUp className="w-3 h-3 text-neo-pink" />
-                    <span className="text-[10px] font-bold text-neo-pink">
-                      {pointsToTarget} {t('leaderboard.toCatch') || 'pts to pass'}
-                    </span>
-                  </motion.div>
-                )
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Your Score - Animated */}
+          {/* Right side - your score */}
           <motion.div
             key={currentUser.score}
-            initial={{ scale: 1.4, color: '#FF1493' }}
-            animate={{ scale: 1, color: '#000000' }}
+            initial={{ scale: 1.4 }}
+            animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 500, damping: 25 }}
-            className="text-xl font-black tabular-nums"
+            className="flex items-center gap-1"
           >
-            {currentUser.score}
+            <span className="text-[10px] font-bold text-neo-black/60 uppercase">
+              {t('common.score') || 'Score'}
+            </span>
+            <span className="text-lg font-black text-neo-black tabular-nums">
+              {currentUser.score}
+            </span>
           </motion.div>
 
-          {/* Progress indicator line (visual gap to target) */}
-          {!isLeading && nextTarget && pointsToTarget > 0 && (
+          {/* Progress bar to next target */}
+          {!isLeading && nextTarget && (
             <motion.div
-              className="absolute -top-0.5 left-0 right-0 h-1 bg-neo-black/10 rounded-full overflow-hidden"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              className="absolute -bottom-0.5 left-2 right-2 h-1 bg-neo-black/10 rounded-full overflow-hidden"
             >
               <motion.div
-                className="h-full bg-gradient-to-r from-neo-cyan to-neo-pink rounded-full"
+                className={cn(
+                  'h-full rounded-full',
+                  isCloseToOvertaking
+                    ? 'bg-gradient-to-r from-neo-pink to-neo-orange'
+                    : 'bg-gradient-to-r from-neo-cyan to-neo-pink'
+                )}
                 initial={{ width: '0%' }}
                 animate={{
-                  width: `${Math.min(100, Math.max(10, (currentUser.score / (nextTarget.score || 1)) * 100))}%`
+                  width: `${Math.min(100, Math.max(5, (currentUser.score / (nextTarget.score || 1)) * 100))}%`
                 }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
               />

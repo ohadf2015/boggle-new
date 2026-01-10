@@ -136,7 +136,8 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
     });
 
     return () => timers.forEach(timer => clearTimeout(timer));
-  }, [showConfetti, top3.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showConfetti, top3.length]); // Intentionally using length, not full array - only re-fire when count changes
 
   const handleCardClick = useCallback((rank: number) => {
     fireConfettiForRank(rank, 0.7);

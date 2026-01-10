@@ -23,6 +23,8 @@ import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaul
 import { getStoredUsername, setStoredUsername, getStoredAvatarId } from '@/utils/profileStorage';
 import { captureSocketError, addSocketEventBreadcrumb, addGameBreadcrumb, isExpectedError } from '@/utils/sentry';
 import { sanitizeRoomName } from '@/utils/consts';
+import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 
 interface ResultsData {
@@ -67,16 +69,13 @@ const ResultsPage = nextDynamic(() => import('@/components/views/ResultsPage'), 
 
 // QuickJoinView removed - invitation flow now uses MultiplayerFlow with InvitationQuickJoin
 
-// Loading skeleton component
+// Loading skeleton component with playful design
 function ViewLoadingSkeleton() {
   return (
-    <div className="min-h-[60vh] flex items-center justify-center">
-      <div className="text-center">
-        <div className="relative w-12 h-12 mx-auto mb-3">
-          <div className="absolute inset-0 border-4 border-cyan-500/30 rounded-full" />
-          <div className="absolute inset-0 border-4 border-transparent border-t-cyan-500 rounded-full animate-spin" />
-        </div>
-        <p className="text-gray-400 text-sm">Loading game...</p>
+    <div className="min-h-[60vh] flex items-center justify-center bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative overflow-hidden">
+      <PlayfulBackground intensity="medium" colorScheme="game" />
+      <div className="relative z-10">
+        <NeoLoader variant="letters" size="md" text="Loading game..." />
       </div>
     </div>
   );
@@ -405,7 +404,6 @@ export default function MultiplayerPage(): React.JSX.Element {
           logger.log('[SOCKET.IO] Reconnecting to game:', savedSession.gameCode);
           toast.success(t('common.reconnecting') || 'Reconnecting to game...', {
             duration: 2000,
-            icon: '🔄',
           });
 
           // Build auth context inline for reconnection

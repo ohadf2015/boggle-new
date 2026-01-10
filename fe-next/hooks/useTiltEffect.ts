@@ -36,6 +36,9 @@ interface UseTiltEffectReturn<T extends HTMLElement> {
     onMouseMove: (e: React.MouseEvent<T>) => void;
     onMouseEnter: () => void;
     onMouseLeave: () => void;
+    onTouchMove: (e: React.TouchEvent<T>) => void;
+    onTouchStart: () => void;
+    onTouchEnd: () => void;
   };
 }
 
@@ -128,6 +131,42 @@ export function useTiltEffect<T extends HTMLElement = HTMLDivElement>(
     targetTilt.current = { rotateX: 0, rotateY: 0, scale: 1 };
   }, [isDisabled]);
 
+  // Touch handlers for mobile devices
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent<T>) => {
+      if (isDisabled || !ref.current || e.touches.length === 0) return;
+
+      const touch = e.touches[0];
+      const rect = ref.current.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      // Calculate position relative to center (-0.5 to 0.5)
+      const x = (touch.clientX - centerX) / rect.width;
+      const y = (touch.clientY - centerY) / rect.height;
+
+      // Calculate rotation (inverted for natural feel) - reduced intensity for touch
+      targetTilt.current = {
+        rotateX: -y * maxTilt * 0.6, // Reduced intensity for touch
+        rotateY: x * maxTilt * 0.6,
+        scale: hoverScale,
+      };
+    },
+    [maxTilt, hoverScale, isDisabled]
+  );
+
+  const handleTouchStart = useCallback(() => {
+    if (isDisabled) return;
+    setIsHovered(true);
+    targetTilt.current.scale = hoverScale;
+  }, [hoverScale, isDisabled]);
+
+  const handleTouchEnd = useCallback(() => {
+    if (isDisabled) return;
+    setIsHovered(false);
+    targetTilt.current = { rotateX: 0, rotateY: 0, scale: 1 };
+  }, [isDisabled]);
+
   const style: React.CSSProperties = isDisabled
     ? {}
     : {
@@ -152,6 +191,9 @@ export function useTiltEffect<T extends HTMLElement = HTMLDivElement>(
       onMouseMove: handleMouseMove,
       onMouseEnter: handleMouseEnter,
       onMouseLeave: handleMouseLeave,
+      onTouchMove: handleTouchMove,
+      onTouchStart: handleTouchStart,
+      onTouchEnd: handleTouchEnd,
     },
   };
 }

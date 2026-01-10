@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Hand, Check, HelpCircle } from 'lucide-react';
+import { Hand, HelpCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
@@ -103,7 +103,7 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: isRTL ? 30 : -30 }}
             transition={{ duration: 0.25 }}
-            className="p-5"
+            className="absolute inset-0 p-4 flex flex-col"
           >
             {currentStep === 0 && <Step1SwipeDemo isRTL={isRTL} t={t} />}
             {currentStep === 1 && <Step2ColorFeedback t={t} />}
@@ -141,20 +141,20 @@ const Step1SwipeDemo: React.FC<{ isRTL: boolean; t: (key: string) => string }> =
   const highlightedIndices = (t('daily.carousel.step1Highlighted') || '0,1,4,7').split(',').map(Number);
 
   return (
-    <div className="text-center py-2">
-      <div className="text-base font-bold text-neo-pink dark:text-neo-pink-light mb-4">
+    <div className="flex-1 flex flex-col items-center justify-between min-h-0">
+      <div className="text-sm sm:text-base font-bold text-neo-pink dark:text-neo-pink-light">
         {t('daily.carousel.step1Title') || 'Swipe to Find Words'}
       </div>
 
-      {/* Mini Grid with Animated Swipe - Larger cells */}
-      <div className="relative inline-block">
+      {/* Mini Grid with Animated Swipe */}
+      <div className="relative inline-block flex-shrink-0">
         {/* 3x3 Grid */}
-        <div className="grid grid-cols-3 gap-1.5">
+        <div className="grid grid-cols-3 gap-1">
           {letters.map((letter, idx) => (
             <motion.div
               key={idx}
               className={cn(
-                'w-12 h-12 rounded-lg border-2 border-neo-black flex items-center justify-center font-bold text-xl',
+                'w-10 h-10 sm:w-11 sm:h-11 rounded-lg border-2 border-neo-black flex items-center justify-center font-bold text-lg sm:text-xl',
                 highlightedIndices.includes(idx)
                   ? 'bg-neo-lime text-neo-black shadow-[2px_2px_0px_rgb(0,0,0)]'
                   : 'bg-neo-cream dark:bg-gray-700 text-neo-black dark:text-white'
@@ -175,16 +175,13 @@ const Step1SwipeDemo: React.FC<{ isRTL: boolean; t: (key: string) => string }> =
         </div>
 
         {/* Animated Finger - L-shape path following CATS */}
-        {/* Grid: 3x3, each cell w-12 (48px) + gap-1.5 (6px) */}
-        {/* Cell centers: (0,0)=24px, (1,0)=78px, (1,1)=78,78, (2,1)=78,132 */}
         <motion.div
           className="absolute pointer-events-none"
           style={{ top: 0, left: 0 }}
-          initial={{ x: isRTL ? 110 : 10, y: 10, opacity: 0 }}
+          initial={{ x: isRTL ? 95 : 8, y: 8, opacity: 0 }}
           animate={{
-            // L-shape path: C(col0,row0) → A(col1,row0) → T(col1,row1) → S(col1,row2)
-            x: isRTL ? [110, 60, 60, 60] : [10, 60, 60, 60],
-            y: [10, 10, 60, 115],
+            x: isRTL ? [95, 50, 50, 50] : [8, 50, 50, 50],
+            y: [8, 8, 50, 95],
             opacity: [0, 1, 1, 1, 1, 0],
           }}
           transition={{
@@ -194,11 +191,11 @@ const Step1SwipeDemo: React.FC<{ isRTL: boolean; t: (key: string) => string }> =
             ease: 'easeInOut',
           }}
         >
-          <Hand className="w-8 h-8 text-neo-black dark:text-neo-black fill-white dark:fill-neo-cream stroke-[2.5]" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} />
+          <Hand className="w-7 h-7 text-neo-black dark:text-neo-black fill-white dark:fill-neo-cream stroke-[2.5]" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} />
         </motion.div>
       </div>
 
-      <div className="text-sm text-gray-600 dark:text-gray-300 mt-3 font-medium">
+      <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 font-medium">
         {t('daily.carousel.step1Desc') || 'Connect letters in any direction'}
       </div>
     </div>
@@ -212,18 +209,18 @@ const Step2ColorFeedback: React.FC<{ t: (key: string) => string }> = ({ t }) => 
   const colors = (t('daily.carousel.step2Colors') || 'green,yellow,gray,green').split(',');
 
   return (
-    <div className="text-center py-2">
-      <div className="text-base font-bold text-neo-pink dark:text-neo-pink-light mb-4">
+    <div className="flex-1 flex flex-col items-center justify-between min-h-0">
+      <div className="text-sm sm:text-base font-bold text-neo-pink dark:text-neo-pink-light">
         {t('daily.carousel.step2Title') || 'Color Clues'}
       </div>
 
-      {/* Letter tiles with animated color reveal - Larger */}
-      <div className="flex justify-center gap-2 mb-4">
+      {/* Letter tiles with animated color reveal */}
+      <div className="flex justify-center gap-1.5 sm:gap-2 flex-shrink-0">
         {letters.map((letter, idx) => (
           <motion.div
             key={idx}
             className={cn(
-              'w-12 h-12 rounded-lg border-2 border-neo-black flex items-center justify-center font-bold text-xl text-white shadow-[2px_2px_0px_rgb(0,0,0)]',
+              'w-10 h-10 sm:w-11 sm:h-11 rounded-lg border-2 border-neo-black flex items-center justify-center font-bold text-lg sm:text-xl text-white shadow-[2px_2px_0px_rgb(0,0,0)]',
               colors[idx] === 'green' && 'bg-emerald-500',
               colors[idx] === 'yellow' && 'bg-amber-400 text-neo-black',
               colors[idx] === 'gray' && 'bg-gray-400'
@@ -245,18 +242,18 @@ const Step2ColorFeedback: React.FC<{ t: (key: string) => string }> = ({ t }) => 
         ))}
       </div>
 
-      {/* Legend - Larger text */}
-      <div className="flex justify-center gap-4 text-xs">
-        <div className="flex items-center gap-1.5">
-          <div className="w-4 h-4 rounded bg-emerald-500 border-2 border-neo-black" />
+      {/* Legend */}
+      <div className="flex justify-center gap-3 sm:gap-4 text-[10px] sm:text-xs">
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 sm:w-4 sm:h-4 rounded bg-emerald-500 border-2 border-neo-black" />
           <span className="text-gray-700 dark:text-gray-200 font-medium">{t('daily.carousel.step2Green') || 'Right spot'}</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-4 h-4 rounded bg-amber-400 border-2 border-neo-black" />
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 sm:w-4 sm:h-4 rounded bg-amber-400 border-2 border-neo-black" />
           <span className="text-gray-700 dark:text-gray-200 font-medium">{t('daily.carousel.step2Yellow') || 'Wrong spot'}</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-4 h-4 rounded bg-gray-400 border-2 border-neo-black" />
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 sm:w-4 sm:h-4 rounded bg-gray-400 border-2 border-neo-black" />
           <span className="text-gray-700 dark:text-gray-200 font-medium">{t('daily.carousel.step2Gray') || 'Not in word'}</span>
         </div>
       </div>
@@ -273,17 +270,17 @@ const Step3FindWord: React.FC<{ targetWordLength: number; t: (key: string, param
   const displayLength = Math.max(targetWordLength, 4);
 
   return (
-    <div className="text-center py-2">
-      <div className="text-base font-bold text-neo-pink dark:text-neo-pink-light mb-4">
+    <div className="flex-1 flex flex-col items-center justify-between min-h-0">
+      <div className="text-sm sm:text-base font-bold text-neo-pink dark:text-neo-pink-light">
         {t('daily.carousel.step3Title') || 'Find the Hidden Word'}
       </div>
 
-      {/* Target word boxes - Larger, minimum 4 */}
-      <div className="flex justify-center gap-2 mb-4">
+      {/* Target word boxes */}
+      <div className="flex justify-center gap-1.5 sm:gap-2 flex-shrink-0">
         {Array.from({ length: displayLength }).map((_, idx) => (
           <motion.div
             key={idx}
-            className="w-11 h-11 rounded-lg bg-neo-black border-2 border-neo-black flex items-center justify-center text-white font-bold text-lg shadow-[2px_2px_0px_rgb(0,0,0)]"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-neo-black border-2 border-neo-black flex items-center justify-center text-white font-bold text-base sm:text-lg shadow-[2px_2px_0px_rgb(0,0,0)]"
             initial={{ scale: 0, rotateY: 90 }}
             animate={{ scale: 1, rotateY: 0 }}
             transition={{
@@ -302,21 +299,23 @@ const Step3FindWord: React.FC<{ targetWordLength: number; t: (key: string, param
         ))}
       </div>
 
-      {/* Attempts indicator - Larger */}
-      <motion.div
-        className="inline-flex items-center gap-2 px-4 py-2 bg-neo-cream dark:bg-gray-700 rounded-full border-2 border-neo-black shadow-[2px_2px_0px_rgb(0,0,0)]"
-        initial={{ y: 10, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.5 }}
-      >
-        <HelpCircle className="w-5 h-5 text-neo-pink dark:text-neo-pink-light" />
-        <span className="text-sm font-bold text-neo-black dark:text-white">
-          {t('daily.carousel.step3Desc') || '10 tries to crack the code'}
-        </span>
-      </motion.div>
+      {/* Attempts indicator */}
+      <div className="flex flex-col items-center gap-1">
+        <motion.div
+          className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-neo-cream dark:bg-gray-700 rounded-full border-2 border-neo-black shadow-[2px_2px_0px_rgb(0,0,0)]"
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5 text-neo-pink dark:text-neo-pink-light" />
+          <span className="text-xs sm:text-sm font-bold text-neo-black dark:text-white">
+            {t('daily.carousel.step3Desc') || '10 tries to crack the code'}
+          </span>
+        </motion.div>
 
-      <div className="text-xs text-neo-pink dark:text-neo-pink-light font-bold mt-3">
-        {t('daily.carousel.step3Hint', { length: targetWordLength }) || `Guess ${targetWordLength}-letter words to reveal clues`}
+        <div className="text-[10px] sm:text-xs text-neo-pink dark:text-neo-pink-light font-bold">
+          {t('daily.carousel.step3Hint', { length: targetWordLength }) || `Guess ${targetWordLength}-letter words to reveal clues`}
+        </div>
       </div>
     </div>
   );
@@ -325,13 +324,13 @@ const Step3FindWord: React.FC<{ targetWordLength: number; t: (key: string, param
 // Step 4: Clue Revelation from Discovered Words
 const Step4ClueRevelation: React.FC<{ t: (key: string) => string }> = ({ t }) => {
   return (
-    <div className="text-center py-2">
-      <div className="text-base font-bold text-neo-pink dark:text-neo-pink-light mb-4">
+    <div className="flex-1 flex flex-col items-center justify-between min-h-0">
+      <div className="text-sm sm:text-base font-bold text-neo-pink dark:text-neo-pink-light">
         {t('daily.carousel.step4Title') || 'Discover Words, Reveal Clues'}
       </div>
 
       {/* Visual demonstration */}
-      <div className="flex flex-col items-center gap-3 mb-4">
+      <div className="flex flex-col items-center gap-2 flex-shrink-0">
         {/* Example word discovery */}
         <motion.div
           className="flex items-center gap-2"
@@ -343,7 +342,7 @@ const Step4ClueRevelation: React.FC<{ t: (key: string) => string }> = ({ t }) =>
             {['C', 'A', 'T'].map((letter, idx) => (
               <motion.div
                 key={idx}
-                className="w-8 h-8 rounded-lg border-2 border-neo-black bg-neo-lime flex items-center justify-center font-bold text-sm text-neo-black shadow-[2px_2px_0px_rgb(0,0,0)]"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg border-2 border-neo-black bg-neo-lime flex items-center justify-center font-bold text-xs sm:text-sm text-neo-black shadow-[2px_2px_0px_rgb(0,0,0)]"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.3 + idx * 0.1, type: 'spring' }}
@@ -353,7 +352,7 @@ const Step4ClueRevelation: React.FC<{ t: (key: string) => string }> = ({ t }) =>
             ))}
           </div>
           <motion.span
-            className="text-xl"
+            className="text-lg sm:text-xl"
             initial={{ opacity: 0, scale: 0 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.8 }}
@@ -364,7 +363,7 @@ const Step4ClueRevelation: React.FC<{ t: (key: string) => string }> = ({ t }) =>
 
         {/* Arrow */}
         <motion.div
-          className="text-neo-pink dark:text-neo-pink-light text-2xl"
+          className="text-neo-pink dark:text-neo-pink-light text-xl sm:text-2xl leading-none"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
@@ -374,7 +373,7 @@ const Step4ClueRevelation: React.FC<{ t: (key: string) => string }> = ({ t }) =>
 
         {/* Revealed clue boxes */}
         <motion.div
-          className="flex gap-1.5"
+          className="flex gap-1"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.2 }}
@@ -388,7 +387,7 @@ const Step4ClueRevelation: React.FC<{ t: (key: string) => string }> = ({ t }) =>
             <motion.div
               key={idx}
               className={cn(
-                'w-9 h-9 rounded-lg border-2 border-neo-black flex items-center justify-center font-bold text-sm shadow-[2px_2px_0px_rgb(0,0,0)]',
+                'w-8 h-8 sm:w-9 sm:h-9 rounded-lg border-2 border-neo-black flex items-center justify-center font-bold text-xs sm:text-sm shadow-[2px_2px_0px_rgb(0,0,0)]',
                 box.type === 'green' && 'bg-green-500 text-neo-black',
                 box.type === 'yellow' && 'bg-yellow-500 text-neo-black',
                 box.type === 'unknown' && 'bg-neo-black text-white'
@@ -404,7 +403,7 @@ const Step4ClueRevelation: React.FC<{ t: (key: string) => string }> = ({ t }) =>
       </div>
 
       {/* Description */}
-      <div className="text-sm text-gray-600 dark:text-gray-300 mt-3 font-medium">
+      <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 font-medium">
         {t('daily.carousel.step4Desc') || 'Every word 3+ letters reveals clues!'}
       </div>
     </div>

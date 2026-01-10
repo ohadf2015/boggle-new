@@ -127,10 +127,6 @@ jest.mock('@/utils/growthTracking', () => ({
   trackStreakMilestone: jest.fn(),
 }));
 
-jest.mock('@/components/NeoToast', () => ({
-  levelUpToast: jest.fn(),
-}));
-
 jest.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({
     theme: 'light',

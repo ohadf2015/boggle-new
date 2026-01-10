@@ -73,7 +73,7 @@ const TrendIcon = ({ trend }: { trend: TrendType }) => {
     case 'improving':
       return <TrendingUp className="w-4 h-4 text-lime-400" />;
     case 'declining':
-      return <TrendingDown className="w-4 h-4 text-neo-red" />;
+      return <TrendingDown className="w-4 h-4 text-amber-400" />;
     default:
       return <Minus className="w-4 h-4 text-gray-400" />;
   }
@@ -235,7 +235,7 @@ export default function CognitiveDomainGrid({
                       <div className="flex items-center gap-1.5 text-[10px]">
                         <TrendIcon trend={domainData.trend} />
                         <span className={cn(
-                          domainData.trend === 'improving' ? 'text-lime-400' : 'text-neo-red'
+                          domainData.trend === 'improving' ? 'text-lime-400' : 'text-amber-400'
                         )}>
                           {t(`brain.progress.${domainData.trend}`)}
                         </span>

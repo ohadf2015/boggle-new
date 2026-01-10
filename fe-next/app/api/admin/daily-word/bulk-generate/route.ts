@@ -115,8 +115,10 @@ export async function POST(request: Request) {
     const geminiApiKey = process.env.GEMINI_API_KEY;
 
     let generatedWords: Array<{ date: string; word: string; reason: string }> = [];
+    let aiConfigured = false;
 
     if (geminiApiKey) {
+      aiConfigured = true;
       generatedWords = await generateWordsWithAI(
         language as Language,
         datesToGenerate,
@@ -126,15 +128,18 @@ export async function POST(request: Request) {
       );
     } else {
       // Fallback: return empty suggestions, let admin enter manually
+      // Log the issue for debugging
+      console.warn('GEMINI_API_KEY is not configured - AI word generation unavailable');
       generatedWords = datesToGenerate.map(date => ({
         date,
         word: '',
-        reason: 'AI not available - please enter manually',
+        reason: 'GEMINI_API_KEY not configured - enter manually',
       }));
     }
 
     return NextResponse.json({
       success: true,
+      aiConfigured,
       generatedWords,
       existingWords: existingScheduled?.map(e => ({
         date: e.puzzle_date,
@@ -367,7 +372,16 @@ Generate exactly ${dates.length} words. Respond with ONLY valid JSON (no markdow
     );
 
     if (!response.ok) {
-      throw new Error(`Gemini API error: ${response.status}`);
+      const errorBody = await response.text();
+      console.error('Gemini API error response:', errorBody);
+      if (response.status === 400) {
+        throw new Error('Gemini API: Invalid request - check API key configuration');
+      } else if (response.status === 401 || response.status === 403) {
+        throw new Error('Gemini API: Authorization failed - GEMINI_API_KEY may be invalid or expired');
+      } else if (response.status === 429) {
+        throw new Error('Gemini API: Rate limit exceeded - please try again later');
+      }
+      throw new Error(`Gemini API error: ${response.status} - ${response.statusText}`);
     }
 
     const data = await response.json();

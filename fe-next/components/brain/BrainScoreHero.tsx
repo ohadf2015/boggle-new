@@ -48,16 +48,16 @@ export default function BrainScoreHero({
 
   return (
     <div className={cn(
-      'rounded-neo border-4 border-neo-black shadow-hard p-6',
+      'rounded-neo border-4 border-neo-black shadow-hard p-4 sm:p-6 relative overflow-hidden',
       isDarkMode ? 'bg-slate-800' : 'bg-white'
     )}>
       {/* Main Score Display */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
+      <div className="flex items-center justify-between gap-2 mb-4 sm:mb-6">
+        <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
           {/* Animated Brain Icon */}
           <motion.div
             className={cn(
-              'w-16 h-16 rounded-neo border-3 border-neo-black flex items-center justify-center',
+              'w-12 h-12 sm:w-16 sm:h-16 rounded-neo border-3 border-neo-black flex items-center justify-center shrink-0',
               tierConfig.color
             )}
             animate={{
@@ -70,20 +70,20 @@ export default function BrainScoreHero({
               ease: "easeInOut"
             }}
           >
-            <Brain className="w-10 h-10 text-neo-black" />
+            <Brain className="w-7 h-7 sm:w-10 sm:h-10 text-neo-black" />
           </motion.div>
 
-          <div>
+          <div className="min-w-0">
             <p className={cn(
-              'text-sm font-bold uppercase tracking-wide',
+              'text-xs sm:text-sm font-bold uppercase tracking-wide',
               isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
             )}>
               {t('brain.score')}
             </p>
-            <div className="flex items-baseline gap-2">
+            <div className="flex items-baseline gap-1 sm:gap-2">
               <motion.span
                 className={cn(
-                  'text-5xl font-black',
+                  'text-3xl sm:text-5xl font-black',
                   isDarkMode ? 'text-neo-white' : 'text-neo-black'
                 )}
                 initial={{ opacity: 0, y: 20 }}
@@ -93,7 +93,7 @@ export default function BrainScoreHero({
                 {score}
               </motion.span>
               <span className={cn(
-                'text-xl font-bold',
+                'text-base sm:text-xl font-bold',
                 isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
               )}>
                 /100
@@ -103,14 +103,14 @@ export default function BrainScoreHero({
         </div>
 
         {/* Right side: Activities + Share */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Share Button */}
           {onShare && (
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={onShare}
               className={cn(
-                'p-3 rounded-neo border-2 border-neo-black',
+                'p-2 sm:p-3 rounded-neo border-2 border-neo-black',
                 'shadow-hard-sm hover:shadow-hard hover:translate-y-[-2px]',
                 'transition-all',
                 isDarkMode ? 'bg-neo-cyan' : 'bg-neo-cyan',
@@ -118,23 +118,23 @@ export default function BrainScoreHero({
               )}
               title={t('common.share')}
             >
-              <Share2 className="w-5 h-5" />
+              <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
             </motion.button>
           )}
 
           {/* Activities Analyzed Badge */}
           <div className={cn(
-            'text-right px-3 py-2 rounded-neo border-2 border-neo-black min-w-[4.5rem] whitespace-nowrap',
+            'text-right px-2 sm:px-3 py-1.5 sm:py-2 rounded-neo border-2 border-neo-black',
             isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
           )}>
             <p className={cn(
-              'text-xs font-bold uppercase',
+              'text-[10px] sm:text-xs font-bold uppercase leading-tight',
               isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
             )}>
               {t('brain.activitiesAnalyzed')}
             </p>
             <p className={cn(
-              'text-xl font-black',
+              'text-lg sm:text-xl font-black',
               isDarkMode ? 'text-neo-cyan' : 'text-neo-purple'
             )}>
               {totalActivities}

@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Trophy, Shield, Smartphone, BarChart3, Mail, Eye, EyeOff, Loader2, X, type LucideIcon } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Trophy, Shield, Smartphone, BarChart3, Mail, Eye, EyeOff, Loader2, X, Sparkles, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '../ui/button';
+import { InteractiveMascot } from '../ui/InteractiveMascot';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { signInWithGoogle, signInWithDiscord, signUpWithEmail, signInWithEmail } from '../../lib/supabase';
 import { cn } from '../../lib/utils';
@@ -46,12 +47,21 @@ interface Benefit {
 
 type AuthMode = 'signup' | 'signin';
 
+// Funny mascot messages that rotate
+const MASCOT_MESSAGES = [
+  'funnyMessages.dontLeaveHanging',
+  'funnyMessages.scoresTooGood',
+  'funnyMessages.streakProtector',
+  'funnyMessages.joinWordNerds',
+  'funnyMessages.makeMomProud',
+];
+
 export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProps> = ({
   pendingResult,
   onDismiss,
   className,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -64,6 +74,11 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+
+  // Pick a random funny message - use lazy state initializer to run once
+  const [randomMessage] = useState(
+    () => MASCOT_MESSAGES[Math.floor(Math.random() * MASCOT_MESSAGES.length)]
+  );
 
   const handleOAuthSignIn = async (provider: 'google' | 'discord') => {
     setIsLoading(provider);
@@ -180,229 +195,315 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       className={cn(
-        'relative bg-gradient-to-b from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/20',
-        'rounded-neo border-3 border-neo-black shadow-hard p-5',
+        'relative overflow-hidden',
         className
       )}
     >
-      {/* Dismiss button */}
-      {onDismiss && (
-        <button
-          onClick={onDismiss}
-          className="absolute top-3 right-3 rtl:right-auto rtl:left-3 p-1.5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
-          aria-label="Dismiss"
-        >
-          <X className="w-4 h-4 text-gray-500" />
-        </button>
-      )}
-
-      {/* Header */}
-      <div className="text-center mb-4">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1, rotate: [0, 10, -10, 0] }}
-          transition={{ delay: 0.1, type: 'spring' }}
-          className="text-4xl mb-2"
-        >
-          🏆
-        </motion.div>
-        <h3 className="text-lg font-black text-neo-black dark:text-white">
-          {t('auth.inlineSignup.title') || 'Sign up to appear on the leaderboard'}
-        </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-          {t('auth.inlineSignup.subtitle') || 'Save your result and compete globally'}
-        </p>
+      {/* Blurred background layer - mimics content behind */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-neo-navy/95 via-slate-900/95 to-neo-navy/95 backdrop-blur-xl" />
+        {/* Decorative blurred "fake" content shapes */}
+        <div className="absolute top-4 left-4 right-4 h-8 bg-slate-700/30 rounded-lg blur-sm" />
+        <div className="absolute top-16 left-4 w-24 h-24 bg-neo-yellow/10 rounded-full blur-md" />
+        <div className="absolute top-20 right-8 w-16 h-4 bg-slate-600/30 rounded blur-sm" />
+        <div className="absolute bottom-8 left-8 right-8 h-12 bg-slate-700/20 rounded-lg blur-sm" />
       </div>
 
-      {/* Benefits Grid */}
-      <div className="grid grid-cols-2 gap-2 mb-4">
-        {benefits.map((benefit, idx) => (
+      {/* Main card with glass effect */}
+      <div className="relative rounded-neo border-3 border-neo-yellow/50 bg-gradient-to-b from-slate-800/90 to-slate-900/95 shadow-hard-lg p-5 backdrop-blur-sm">
+        {/* Sparkle decorations */}
+        <div className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2">
           <motion.div
-            key={benefit.key}
-            initial={{ x: -10, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.2 + idx * 0.05 }}
-            className="flex items-center gap-2 text-xs"
+            animate={{ rotate: 360, scale: [1, 1.2, 1] }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
           >
-            <benefit.icon className="w-4 h-4 text-neo-pink flex-shrink-0" />
-            <span className="text-gray-700 dark:text-gray-300">
-              {t(`auth.dailyChallenge.benefits.${benefit.key}`) || benefit.key}
-            </span>
+            <Sparkles className="w-6 h-6 text-neo-yellow" />
           </motion.div>
-        ))}
-      </div>
+        </div>
 
-      {/* Success Message */}
-      {success && (
+        {/* Dismiss button */}
+        {onDismiss && (
+          <button
+            onClick={onDismiss}
+            className="absolute top-3 right-3 rtl:right-auto rtl:left-3 p-1.5 rounded-full hover:bg-white/10 transition-colors z-10"
+            aria-label={t('common.dismiss')}
+          >
+            <X className="w-4 h-4 text-gray-400 hover:text-white" />
+          </button>
+        )}
+
+        {/* Mascot with speech bubble */}
+        <div className="flex items-start gap-3 mb-4">
+          {/* Mascot */}
+          <motion.div
+            initial={{ scale: 0, rotate: -20 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+            className="flex-shrink-0"
+          >
+            <InteractiveMascot
+              variant="excited"
+              size="lg"
+              enableHover
+              enableClick
+              clickAnimation="wiggle"
+              tooltip={t('auth.inlineSignup.mascotTooltip') || 'Click me!'}
+            />
+          </motion.div>
+
+          {/* Speech bubble */}
+          <motion.div
+            initial={{ opacity: 0, x: -10, scale: 0.9 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            transition={{ delay: 0.4, type: 'spring' }}
+            className="relative flex-1 bg-neo-yellow rounded-neo border-3 border-neo-black p-3 shadow-hard-sm"
+          >
+            {/* Speech bubble tail */}
+            <div className="absolute left-0 rtl:left-auto rtl:right-0 top-4 -translate-x-2 rtl:translate-x-2 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 rtl:border-r-0 rtl:border-l-8 border-r-neo-black rtl:border-l-neo-black" />
+            <div className="absolute left-0 rtl:left-auto rtl:right-0 top-4 -translate-x-[5px] rtl:translate-x-[5px] w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-r-[6px] rtl:border-r-0 rtl:border-l-[6px] border-r-neo-yellow rtl:border-l-neo-yellow" />
+
+            <p className="text-neo-black font-black text-sm leading-tight">
+              {t(`auth.inlineSignup.${randomMessage}`) || t('auth.inlineSignup.funnyMessages.dontLeaveHanging') || "Hey! Don't leave me hanging! Sign up and let's climb that leaderboard together!"}
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Title */}
         <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="bg-emerald-100 dark:bg-emerald-900/30 border-2 border-emerald-500 rounded-neo p-3 mb-4 text-center"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="text-center mb-4"
         >
-          <p className="text-sm font-bold text-emerald-700 dark:text-emerald-300">{success}</p>
+          <h3 className="text-xl font-black text-white">
+            {t('auth.inlineSignup.title') || 'Join the Word Warriors!'}
+          </h3>
+          <p className="text-sm text-gray-400 mt-1">
+            {t('auth.inlineSignup.subtitle') || 'Your score is too good to lose!'}
+          </p>
         </motion.div>
-      )}
 
-      {/* Error Message */}
-      {error && (
+        {/* Benefits Grid - compact */}
         <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="bg-red-100 dark:bg-red-900/30 border-2 border-red-500 rounded-neo p-3 mb-4 text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="grid grid-cols-2 gap-2 mb-4 p-3 bg-slate-800/50 rounded-lg border border-slate-700/50"
         >
-          <p className="text-sm font-bold text-red-700 dark:text-red-300">{error}</p>
+          {benefits.map((benefit, idx) => (
+            <motion.div
+              key={benefit.key}
+              initial={{ x: -10, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.5 + idx * 0.05 }}
+              className="flex items-center gap-2 text-xs"
+            >
+              <benefit.icon className="w-4 h-4 text-neo-cyan flex-shrink-0" />
+              <span className="text-gray-300">
+                {t(`auth.dailyChallenge.benefits.${benefit.key}`) || benefit.key}
+              </span>
+            </motion.div>
+          ))}
         </motion.div>
-      )}
 
-      {!success && (
-        <>
-          {/* OAuth Buttons */}
-          <div className="space-y-2 mb-4">
-            <Button
-              onClick={() => handleOAuthSignIn('google')}
-              disabled={isAnyLoading}
-              className="w-full py-3 bg-white hover:bg-gray-50 text-gray-800 border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 transition-all font-bold flex items-center justify-center gap-2"
+        {/* Success Message */}
+        <AnimatePresence>
+          {success && (
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-emerald-500/20 border-2 border-emerald-500 rounded-neo p-3 mb-4 text-center"
             >
-              {isLoading === 'google' ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <>
-                  <GoogleIcon className="w-5 h-5" />
-                  <span>Continue with Google</span>
-                </>
-              )}
-            </Button>
+              <p className="text-sm font-bold text-emerald-300">{success}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-            <Button
-              onClick={() => handleOAuthSignIn('discord')}
-              disabled={isAnyLoading}
-              className="w-full py-3 bg-[#5865F2] hover:bg-[#4752C4] text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 transition-all font-bold flex items-center justify-center gap-2"
+        {/* Error Message */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-red-500/20 border-2 border-red-500 rounded-neo p-3 mb-4 text-center"
             >
-              {isLoading === 'discord' ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <>
-                  <DiscordIcon className="w-5 h-5" />
-                  <span>Continue with Discord</span>
-                </>
-              )}
-            </Button>
-          </div>
+              <p className="text-sm font-bold text-red-300">{error}</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-          {/* Email Form Toggle */}
-          {!showEmailForm ? (
-            <button
-              onClick={() => setShowEmailForm(true)}
-              className="w-full text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors flex items-center justify-center gap-2"
+        {!success && (
+          <>
+            {/* OAuth Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="space-y-2 mb-4"
             >
-              <Mail className="w-4 h-4" />
-              <span>{t('auth.inlineSignup.orContinueWith') || 'or continue with email'}</span>
-            </button>
-          ) : (
-            <motion.form
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              onSubmit={handleEmailSubmit}
-              className="space-y-3"
-            >
-              {/* Divider */}
-              <div className="flex items-center gap-2 text-xs text-gray-400">
-                <div className="flex-1 h-px bg-gray-300 dark:bg-gray-600" />
-                <span>{authMode === 'signup' ? 'Create account' : 'Sign in'}</span>
-                <div className="flex-1 h-px bg-gray-300 dark:bg-gray-600" />
-              </div>
-
-              {/* Email Input */}
-              <div>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => handleEmailChange(e.target.value)}
-                  placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
-                  className={cn(
-                    "w-full px-4 py-3 rounded-neo border-2 bg-white dark:bg-gray-800 text-neo-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-neo-pink",
-                    emailError ? "border-red-500" : "border-neo-black"
-                  )}
-                  disabled={isAnyLoading}
-                />
-                {emailError && (
-                  <p className="mt-1 text-xs text-red-500 dark:text-red-400">{emailError}</p>
-                )}
-              </div>
-
-              {/* Password Input */}
-              <div>
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => handlePasswordChange(e.target.value)}
-                    placeholder={t('auth.inlineSignup.passwordPlaceholder') || 'Password (8+ characters)'}
-                    className={cn(
-                      "w-full px-4 py-3 rounded-neo border-2 bg-white dark:bg-gray-800 text-neo-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-neo-pink pr-12",
-                      passwordError ? "border-red-500" : "border-neo-black"
-                    )}
-                    disabled={isAnyLoading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
-                {passwordError && (
-                  <p className="mt-1 text-xs text-red-500 dark:text-red-400">{passwordError}</p>
-                )}
-              </div>
-
-              {/* Submit Button */}
               <Button
-                type="submit"
-                disabled={isAnyLoading || !email || !password || !!emailError || !!passwordError}
-                className="w-full py-3 bg-neo-pink hover:bg-neo-pink/90 text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 transition-all font-bold"
+                onClick={() => handleOAuthSignIn('google')}
+                disabled={isAnyLoading}
+                className="w-full py-3 bg-white hover:bg-gray-100 text-gray-800 border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all font-bold flex items-center justify-center gap-2"
               >
-                {isLoading === 'email' ? (
+                {isLoading === 'google' ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
-                  authMode === 'signup'
-                    ? (t('auth.inlineSignup.signUpButton') || 'Create Account')
-                    : 'Sign In'
+                  <>
+                    <GoogleIcon className="w-5 h-5" />
+                    <span>{t('auth.continueWithGoogle')}</span>
+                  </>
                 )}
               </Button>
 
-              {/* Toggle auth mode */}
-              <button
-                type="button"
-                onClick={() => setAuthMode(authMode === 'signup' ? 'signin' : 'signup')}
-                className="w-full text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              <Button
+                onClick={() => handleOAuthSignIn('discord')}
+                disabled={isAnyLoading}
+                className="w-full py-3 bg-[#5865F2] hover:bg-[#4752C4] text-white border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all font-bold flex items-center justify-center gap-2"
               >
-                {authMode === 'signup'
-                  ? 'Already have an account? Sign in'
-                  : "Don't have an account? Sign up"}
-              </button>
-            </motion.form>
-          )}
+                {isLoading === 'discord' ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <DiscordIcon className="w-5 h-5" />
+                    <span>{t('auth.continueWithDiscord')}</span>
+                  </>
+                )}
+              </Button>
+            </motion.div>
 
-          {/* Continue as Guest */}
-          {onDismiss && (
-            <button
-              onClick={onDismiss}
-              className="w-full mt-4 text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-            >
-              {t('auth.dailyChallenge.continueAsGuest') || 'Continue as guest'}
-            </button>
-          )}
-        </>
-      )}
+            {/* Email Form Toggle */}
+            {!showEmailForm ? (
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7 }}
+                onClick={() => setShowEmailForm(true)}
+                className="w-full text-sm text-gray-400 hover:text-gray-200 transition-colors flex items-center justify-center gap-2 py-2"
+              >
+                <Mail className="w-4 h-4" />
+                <span>{t('auth.inlineSignup.orContinueWith') || 'or continue with email'}</span>
+              </motion.button>
+            ) : (
+              <motion.form
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                onSubmit={handleEmailSubmit}
+                className="space-y-3"
+              >
+                {/* Divider */}
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <div className="flex-1 h-px bg-gray-600" />
+                  <span>{authMode === 'signup' ? t('auth.signUp') : t('auth.signIn')}</span>
+                  <div className="flex-1 h-px bg-gray-600" />
+                </div>
 
-      {/* Terms & Privacy */}
-      <div className="mt-4 text-center text-[10px] text-gray-400 dark:text-gray-500">
-        By signing up, you agree to our{' '}
-        <Link href="/terms" className="underline hover:text-gray-600">Terms</Link>
-        {' & '}
-        <Link href="/privacy" className="underline hover:text-gray-600">Privacy Policy</Link>
+                {/* Email Input */}
+                <div>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => handleEmailChange(e.target.value)}
+                    placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
+                    className={cn(
+                      "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan",
+                      emailError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
+                    )}
+                    disabled={isAnyLoading}
+                  />
+                  {emailError && (
+                    <p className="mt-1 text-xs text-red-400">{emailError}</p>
+                  )}
+                </div>
+
+                {/* Password Input */}
+                <div>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => handlePasswordChange(e.target.value)}
+                      placeholder={t('auth.inlineSignup.passwordPlaceholder') || 'Password (8+ characters)'}
+                      className={cn(
+                        "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan pe-12",
+                        passwordError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
+                      )}
+                      disabled={isAnyLoading}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                  {passwordError && (
+                    <p className="mt-1 text-xs text-red-400">{passwordError}</p>
+                  )}
+                </div>
+
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  disabled={isAnyLoading || !email || !password || !!emailError || !!passwordError}
+                  className="w-full py-3 bg-neo-pink hover:bg-neo-pink/90 text-white border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading === 'email' ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    authMode === 'signup'
+                      ? (t('auth.inlineSignup.signUpButton') || 'Create Account')
+                      : t('auth.signIn')
+                  )}
+                </Button>
+
+                {/* Toggle auth mode */}
+                <button
+                  type="button"
+                  onClick={() => setAuthMode(authMode === 'signup' ? 'signin' : 'signup')}
+                  className="w-full text-xs text-gray-500 hover:text-gray-300"
+                >
+                  {authMode === 'signup'
+                    ? t('auth.alreadyHaveAccount')
+                    : t('auth.noAccount')}
+                </button>
+              </motion.form>
+            )}
+
+            {/* Continue as Guest - more prominent with humor */}
+            {onDismiss && (
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8 }}
+                onClick={onDismiss}
+                className="w-full mt-4 text-sm text-gray-500 hover:text-gray-300 transition-colors group"
+              >
+                <span className="group-hover:hidden">
+                  {t('auth.inlineSignup.skipForNow') || 'Skip for now'}
+                </span>
+                <span className="hidden group-hover:inline text-neo-yellow">
+                  {t('auth.inlineSignup.skipHover') || "(Lexi will be sad, but okay...)"}
+                </span>
+              </motion.button>
+            )}
+          </>
+        )}
+
+        {/* Terms & Privacy */}
+        <div className="mt-4 text-center text-[10px] text-gray-500">
+          {t('auth.termsPrefix')}{' '}
+          <Link href={`/${language}/legal/terms`} className="underline hover:text-gray-300 transition-colors">
+            {t('auth.termsLink')}
+          </Link>
+          {' '}{t('auth.andText')}{' '}
+          <Link href={`/${language}/legal/privacy`} className="underline hover:text-gray-300 transition-colors">
+            {t('auth.privacyLink')}
+          </Link>
+        </div>
       </div>
     </motion.div>
   );

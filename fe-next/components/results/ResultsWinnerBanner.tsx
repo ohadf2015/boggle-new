@@ -4,6 +4,7 @@ import { Crown, Trophy, Medal, Hand } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { fireRankConfetti } from '@/utils/confettiUtils';
 import Avatar from '../Avatar';
+import { MascotWithEntrance, MascotVariant } from '@/components/ui/Mascot';
 import type { PlayerResult } from '@/types/components';
 
 // Winner data - includes username, score, and optional avatar
@@ -111,11 +112,12 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
 
   // Fire confetti on mount - using refs to prevent cleanup issues when deps change
   // IMPORTANT: Set ref INSIDE callback so confetti can retry if cleanup runs before timeout
+  // Uses 'light' intensity for automatic triggers to avoid overwhelming the user
   useEffect(() => {
     if (winner && shouldShowConfetti && !hasFiredConfettiRef.current) {
       confettiTimeoutRef.current = setTimeout(() => {
         hasFiredConfettiRef.current = true;
-        fireRankConfetti(rank);
+        fireRankConfetti(rank, 'light');
         confettiTimeoutRef.current = null;
       }, 400);
     }
@@ -175,6 +177,24 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
   // Select the appropriate icon for this rank
   const RankIcon = rank === 1 ? Crown : rank <= 3 ? Medal : Hand;
 
+  // Select mascot based on rank/outcome (adds personality to results)
+  const getMascotVariant = (): MascotVariant => {
+    // Zero score - oops face
+    if (winner && winner.score === 0) return 'oops';
+
+    // Single player variants
+    if (variant === 'highScore' || variant === 'newRecord') return 'victory';
+    if (variant === 'completion') return 'happy';
+
+    // Multiplayer ranking
+    if (rank === 1) return 'victory'; // Crown celebration
+    if (rank === 2) return 'celebrating'; // Silver happiness
+    if (rank === 3) return 'excited'; // Bronze excitement
+    return 'encouraging'; // Non-podium encouragement
+  };
+
+  const mascotVariant = getMascotVariant();
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -184,7 +204,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
     >
       {/* Neo-Brutalist Main Container - Clickable for confetti */}
       <div
-        className={`relative ${styles.bgClass} border-4 border-neo-black rounded-neo-lg shadow-hard-xl overflow-hidden texture-halftone-comic-dense cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]`}
+        className={`relative ${styles.bgClass} border-4 border-neo-black rounded-neo-lg shadow-hard-xl overflow-hidden cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]`}
         style={{ transform: 'rotate(-1deg)' }}
         onClick={handleConfetti}
       >
@@ -287,6 +307,16 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
               </div>
             </motion.div>
           </div>
+        </div>
+
+        {/* Mascot - Positioned at corner with animation */}
+        <div className="absolute -bottom-2 -right-2 sm:bottom-0 sm:right-0 z-20 pointer-events-none">
+          <MascotWithEntrance
+            variant={mascotVariant}
+            size="sm"
+            delay={0.6}
+            className="drop-shadow-lg"
+          />
         </div>
       </div>
     </motion.div>

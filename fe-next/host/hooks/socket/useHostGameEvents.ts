@@ -357,6 +357,7 @@ export function useHostGameEvents({
       socket.off('fireRoundStart', handleFireRoundStart);
       socket.off('fireRoundEnd', handleFireRoundEnd);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     socket,
     t,
@@ -383,7 +384,7 @@ export function useHostGameEvents({
     resetComboState,
     handleRoomClosedDueToInactivity,
     onGameStart,
-  ]);
+  ]); // hostPlaying accessed via hostPlayingRef for event handlers
 
   return { gameSessionIdRef, gameSessionId };
 }

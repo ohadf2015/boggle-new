@@ -70,6 +70,7 @@ const sv = {
     "loading": "Blandar bokstäver...",
     "error": "Hoppsan!",
     "back": "Tillbaka",
+    "backToHome": "Tillbaka till startsidan",
     "next": "Nästa",
     "confirm": "Bekräfta",
     "cancel": "Avbryt",
@@ -176,7 +177,8 @@ const sv = {
     "invalid": "Ogiltig",
     "validating": "Kollar...",
     "later": "Senare",
-    "skip": "Hoppa"
+    "skip": "Hoppa",
+    "done": "Klar"
   },
   "connection": {
     "reconnecting": "Återansluter...",
@@ -941,6 +943,7 @@ const sv = {
     "exit": "Avsluta",
     "exitRoom": "Lämna rummet",
     "waitForGameStart": "Vänta på att spelet startar",
+    "clickToWakeUp": "Tryck för att hälsa!",
     "players": "Spelare",
     "yourAchievements": "Dina prestationer",
     "letterGrid": "Bokstavsbräde",
@@ -1775,7 +1778,8 @@ const sv = {
       "keepGoing": "Fortsätt!",
       "getStarted": "Nu börjar vi!",
       "ready": "Redo!",
-      "readyForMultiplayer": "Du är redo för multiplayer!"
+      "readyForMultiplayer": "Du är redo för multiplayer!",
+      "tapForDetails": "Tryck för detaljer"
     },
     "unlock": {
       "title": "Färdighet Upplåst!",
@@ -2235,8 +2239,8 @@ const sv = {
       "showMeLeaderboard": "Visa mig på topplistan!"
     },
     "inlineSignup": {
-      "title": "Registrera dig för att synas på topplistan",
-      "subtitle": "Spara ditt resultat och tävla globalt",
+      "title": "Gå med i Ordkrigarna!",
+      "subtitle": "Din poäng är för bra för att förlora!",
       "orContinueWith": "eller fortsätt med e-post",
       "emailPlaceholder": "E-postadress",
       "passwordPlaceholder": "Lösenord (minst 8 tecken)",
@@ -2250,6 +2254,16 @@ const sv = {
       "passwordRequired": "Lösenord krävs",
       "passwordTooShort": "Lösenord för kort",
       "passwordTooLong": "Lösenordet är för långt",
+      "skipForNow": "Hoppa över för nu",
+      "skipHover": "(Lexi blir ledsen, men okej...)",
+      "mascotTooltip": "Klicka på mig!",
+      "funnyMessages": {
+        "dontLeaveHanging": "Hej! Lämna mig inte hängande! Registrera dig så klättrar vi på topplistan tillsammans!",
+        "scoresTooGood": "Dina poäng är för bra för att försvinna! Låt oss göra dem permanenta!",
+        "streakProtector": "Jag är i princip en svit-livvakt. Registrera dig så skyddar jag din för alltid!",
+        "joinWordNerds": "Gå med i elitklubben av ordnördar som faktiskt kommer ihåg sina poäng!",
+        "makeMomProud": "Gör mamma stolt - visa henne ditt namn på topplistan!"
+      },
       "benefits": {
         "leaderboard": "Ta din plats på topplistan",
         "syncDevices": "Synka mellan enheter",
@@ -2389,7 +2403,9 @@ const sv = {
     "placement": "Placering",
     "topThreeBonus": "Topp 3 bonus",
     "efficiency": "Effektivitet",
-    "streak": "Svit"
+    "streak": "Svit",
+    "guestTeasing": "Logga in för att tjäna {amount} mynt!",
+    "signInShort": "Logga in"
   },
   "partyScreen": {
     "title": "Partyskärm",
@@ -2519,6 +2535,7 @@ const sv = {
     "leading": "Leder!",
     "ahead": "före",
     "toCatch": "p för att passera",
+    "almostThere": "Nästan där!",
     "live": "Live",
     "backToGame": "Tillbaka till spelet"
   },
@@ -2847,6 +2864,8 @@ const sv = {
     "fewWordsFoundSingular": "Hittade 1 ord",
     "achievementsNotSaved": "Prestationer i enspelarläge sparas inte till din profil.",
     "botDetails": "Bot-detaljer",
+    "botWordsFound": "Ord botarna hittade",
+    "noWordsToShow": "Orddetaljer ej tillgängliga",
     "difficulty": "Svårighetsgrad",
     "timer": "Timer",
     "totalScore": "Totalpoäng",
@@ -3126,6 +3145,9 @@ const sv = {
     },
     "leaderboard": "Rankning",
     "screenshotProtection": "Återvänd för att fortsätta spela",
+    "clueUnlocked": "Ledtråd upplåst!",
+    "categoryUnlocked": "Kategori avslöjad!",
+    "exampleUnlocked": "Exempel upplåst!",
     "trainingSuggestion": {
       "title": "Ny på LexiClash?",
       "subtitle": "Prova ett snabbt träningsspel först för att lära dig mekaniken!",
@@ -3207,6 +3229,7 @@ const sv = {
       "pts": "p"
     },
     "survival": {
+      "tokens": "Tokens",
       "lifePoints": "Liv",
       "lifeRemaining": "{points} Liv",
       "lifeDraining": "Livet rinner ut...",
@@ -3681,17 +3704,17 @@ const sv = {
       "title": "Framsteg",
       "improving": "Förbättras",
       "stable": "Stabil",
-      "declining": "Behöver arbete",
+      "declining": "Uppgraderingszon!",
       "gamesAnalyzed": "analyserade spel",
       "toNextTier": "till nästa nivå"
     },
     "recommendation": {
       "title": "Personligt tips",
-      "weakest": "Din {{domain}} behöver lite arbete.",
+      "weakest": "Låt oss turboladda din {{domain}}!",
       "tryDrill": "Prova {{drill}}-övningen för att förbättra!",
       "startDrill": "Starta övning",
-      "declining": "Din {{domain}} sjunker - dags att träna!",
-      "low": "Din {{domain}} behöver uppmärksamhet.",
+      "declining": "Power up din {{domain}} - kör hårt!",
+      "low": "Din {{domain}} är redo att levla upp!",
       "improve": "Förbättra din {{domain}} med riktad träning.",
       "unlock": "{{games}} spel kvar för att låsa upp",
       "scienceHint": "Riktad träning förbättrar specifika kognitiva förmågor"
@@ -3868,6 +3891,40 @@ const sv = {
     "title": "Nivå Upp!",
     "reached": "Du nådde nivå {level}!"
   },
+  "customPuzzle": {
+    "title": "Anpassat Pussel",
+    "description": "Kan du lösa detta ordpussel?",
+    "createTitle": "Skapa Ditt Eget Pussel",
+    "createYourOwn": "Skapa Ditt Eget Pussel",
+    "createDescription": "Utmana vänner med ditt eget ordpussel",
+    "selectWord": "Välj ett målord för ditt pussel:",
+    "enterWord": "Ange ditt målord",
+    "enterWordPlaceholder": "Skriv ett ord...",
+    "validating": "Kontrollerar...",
+    "wordValid": "Giltigt ord!",
+    "wordInvalid": "Ordet finns inte i ordlistan",
+    "invalidCharacters": "Endast bokstäver",
+    "wordTooShort": "Minst 3 bokstäver",
+    "wordTooLong": "Max 8 bokstäver",
+    "createPuzzle": "Skapa Pussel",
+    "generating": "Skapar pussel...",
+    "loading": "Laddar pussel...",
+    "created": "Pussel Skapat!",
+    "shareWithFriends": "Dela med vänner för att utmana dem!",
+    "yourScore": "Din Poäng att Slå",
+    "share": "Dela Pussel",
+    "shareText": "Jag skapade ett anpassat ordpussel. Kan du slå mitt resultat?",
+    "createdBy": "Skapad av {name}",
+    "creatorScore": "Skaparens Poäng",
+    "solvedIn": "Löst på {attempts} försök",
+    "challengeDescription": "Hitta det dolda ordet innan tiden rinner ut. Kan du slå skaparen?",
+    "play": "Spela Utmaning",
+    "solved": "Du löste det!",
+    "failed": "Bättre lycka nästa gång!",
+    "beatCreator": "Du slog skaparen!",
+    "leaderboard": "Topplista",
+    "playDaily": "Spela Daglig Utmaning"
+  },
   "ui": {
     "empty": {
       "noWordsYet": "Börja hitta ord!",
@@ -3913,6 +3970,37 @@ const sv = {
       "yourScore": "Din poäng",
       "newPersonalBest": "Nytt personligt rekord!",
       "almostThere": "Så nära! Bara {{points}} poäng kvar"
+    }
+  },
+  "admin": {
+    "dashboard": "Adminpanel",
+    "accessRequired": "Adminbehörighet krävs",
+    "accessDenied": "Du behöver administratörsbehörighet för att komma åt denna sida.",
+    "welcome": "Välkommen,",
+    "live": {
+      "subtitle": "Spelövervakning i realtid",
+      "live": "Live",
+      "games": "spel",
+      "players": "spelare",
+      "sockets": "anslutningar",
+      "singlePlayer": "solo",
+      "refresh": "Uppdatera",
+      "retry": "Försök igen",
+      "noGames": "Inga aktiva spel",
+      "noGamesHint": "Spel visas här när spelare börjar spela",
+      "activeGames": "Aktiva Spel",
+      "connectedPlayers": "Anslutna Spelare",
+      "player": "Spelare",
+      "game": "Spel",
+      "status": "Status",
+      "score": "Poäng",
+      "type": "Typ",
+      "auth": "Auth",
+      "guest": "Gäst",
+      "ranked": "Rankad",
+      "left": "kvar",
+      "started": "Startad",
+      "lastUpdated": "Senast uppdaterad"
     }
   }
 };

@@ -47,8 +47,8 @@ describe('BrainScoreHero UI Fixes', () => {
     onShare: jest.fn(),
   };
 
-  describe('Activities counter overflow fix', () => {
-    it('should have min-width and nowrap to prevent overflow on activities badge', () => {
+  describe('Activities counter responsive design', () => {
+    it('should have responsive padding for mobile-first design', () => {
       const { container } = render(<BrainScoreHero {...defaultProps} />);
 
       // Find the activities badge container (has the activities count)
@@ -60,19 +60,18 @@ describe('BrainScoreHero UI Fixes', () => {
       );
 
       expect(foundBadge).toBeTruthy();
-      // Should have min-w to prevent squishing
-      expect((foundBadge as Element).className).toMatch(/min-w-/);
-      // Should have whitespace-nowrap to prevent text wrapping
-      expect((foundBadge as Element).className).toMatch(/whitespace-nowrap/);
+      // Should have responsive padding classes (mobile-first: px-2, desktop: sm:px-3)
+      expect((foundBadge as Element).className).toMatch(/px-2/);
+      expect((foundBadge as Element).className).toMatch(/sm:px-3/);
     });
 
-    it('should use smaller text size for activities count to fit better', () => {
+    it('should use responsive text sizes for activities count', () => {
       const { container } = render(<BrainScoreHero {...defaultProps} />);
 
-      // The activities count should use text-xl instead of text-2xl
+      // The activities count should use responsive text sizes (mobile: text-lg, desktop: sm:text-xl)
       const activitiesCount = screen.getByText('15');
-      expect(activitiesCount.className).toMatch(/text-xl/);
-      expect(activitiesCount.className).not.toMatch(/text-2xl/);
+      expect(activitiesCount.className).toMatch(/text-lg/);
+      expect(activitiesCount.className).toMatch(/sm:text-xl/);
     });
   });
 

@@ -42,7 +42,6 @@ const RoomListView: React.FC<RoomListViewProps> = ({
       await new Promise((resolve) => setTimeout(resolve, 500));
       toast.success(t('multiplayerFlow.roomList.refreshed') || 'Rooms refreshed', {
         duration: 2000,
-        icon: '🔄',
       });
     },
     threshold: 60,
@@ -86,25 +85,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         </motion.div>
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col px-2 sm:px-3 lg:px-4 pt-2 sm:pt-3 lg:pt-4 pb-24 lg:pb-4 min-h-0 gap-3 lg:gap-4 overflow-hidden">
-          {/* Create Room Button - Above the fold on Desktop */}
-          <motion.div
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1 }}
-            className="hidden lg:flex justify-center flex-shrink-0"
-          >
-            <Button
-              variant="success"
-              size="lg"
-              onClick={onCreateRoom}
-              className="w-auto px-8 lg:px-10 py-4 lg:py-5 text-base lg:text-lg font-bold uppercase"
-            >
-              <Plus className="w-5 h-5 lg:w-6 lg:h-6 me-2" />
-              {t('multiplayerFlow.roomList.createButton') || 'Create Room'}
-            </Button>
-          </motion.div>
-
+        <div className="flex-1 flex flex-col px-2 sm:px-3 lg:px-4 pt-2 sm:pt-3 lg:pt-4 pb-24 lg:pb-28 min-h-0 gap-3 lg:gap-4 overflow-hidden">
           {/* Room List Header */}
           <motion.div
             initial={{ y: -20, opacity: 0 }}
@@ -189,27 +170,41 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 <p className="text-sm lg:text-base text-slate-400 mb-6">
                   {t('multiplayerFlow.roomList.beFirst') || 'Be the first to create one!'}
                 </p>
+                {/* Centered Create Button for Empty State */}
+                <Button
+                  variant="success"
+                  size="lg"
+                  onClick={onCreateRoom}
+                  className="px-8 lg:px-10 py-4 lg:py-5 text-base lg:text-lg font-bold uppercase"
+                >
+                  <Plus className="w-5 h-5 lg:w-6 lg:h-6 me-2" />
+                  {t('multiplayerFlow.roomList.createButton') || 'Create Room'}
+                </Button>
               </motion.div>
             )}
           </div>
 
-          {/* Create Room Button - Mobile only (at bottom) */}
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="lg:hidden flex-shrink-0 pt-2"
-          >
-            <Button
-              variant="success"
-              size="lg"
-              onClick={onCreateRoom}
-              className="w-full py-4 text-base font-bold uppercase"
+          {/* Create Room Button - Fixed at bottom (only when rooms exist) */}
+          {hasRooms && (
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="fixed bottom-4 lg:bottom-6 left-2 right-2 sm:left-3 sm:right-3 lg:left-4 lg:right-4 z-10"
             >
-              <Plus className="w-5 h-5 me-2" />
-              {t('multiplayerFlow.roomList.createButton') || 'Create Room'}
-            </Button>
-          </motion.div>
+              <div className="max-w-2xl mx-auto">
+                <Button
+                  variant="success"
+                  size="lg"
+                  onClick={onCreateRoom}
+                  className="w-full py-4 lg:py-5 text-base lg:text-lg font-bold uppercase shadow-hard-lg"
+                >
+                  <Plus className="w-5 h-5 lg:w-6 lg:h-6 me-2" />
+                  {t('multiplayerFlow.roomList.createButton') || 'Create Room'}
+                </Button>
+              </div>
+            </motion.div>
+          )}
         </div>
       </div>
     </>

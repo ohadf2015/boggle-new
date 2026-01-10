@@ -267,7 +267,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
         // Board theme
         boardTheme={boardTheme}
 
-        // Player experience (for keyboard trail display)
+        // Player experience (for keyboard trail inactivity threshold)
         totalGamesPlayed={profile?.total_games}
       />
 

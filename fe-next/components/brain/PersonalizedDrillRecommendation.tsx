@@ -166,7 +166,7 @@ export default function PersonalizedDrillRecommendation({
         {/* Domain Status */}
         <div className="flex items-center gap-2 mb-3">
           {domainData.trend === 'declining' && (
-            <TrendingDown className="w-4 h-4 text-neo-red" />
+            <TrendingDown className="w-4 h-4 text-amber-400" />
           )}
           <p className={cn(
             'text-xs',

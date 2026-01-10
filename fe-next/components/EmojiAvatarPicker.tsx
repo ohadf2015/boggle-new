@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, X, User } from 'lucide-react';
 import Image from 'next/image';
@@ -57,6 +58,12 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
   currentAvatarImage,
   profileAvatar
 }) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const { theme } = useTheme();
   const { t } = useLanguage();
   const isDarkMode = theme === 'dark';
@@ -133,10 +140,11 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
     return selectedAvatar?.name || 'Your Avatar';
   };
 
-  if (!isOpen) return null;
+  if (!mounted) return null;
 
-  return (
+  return createPortal(
     <AnimatePresence>
+      {isOpen && (
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -359,7 +367,9 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
           </div>
         </motion.div>
       </motion.div>
-    </AnimatePresence>
+      )}
+    </AnimatePresence>,
+    document.body
   );
 };
 

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
-import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Sparkles, Star } from 'lucide-react';
+import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Sparkles, Star, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,58 +16,91 @@ import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useMouseParallax } from '@/hooks/useTiltEffect';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
+import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
+import { InteractiveMascotWithEntrance } from '@/components/ui/InteractiveMascot';
 import ModeCard from './ModeCard';
 import TutorialPrompt from './TutorialPrompt';
 import Header from '@/components/Header';
 import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
 
 /**
- * Floating decorative elements for visual playfulness
- * Performance-gated - only renders on capable devices
+ * Interactive Mascot component for the hero section
+ * Responds to hover and click with mood changes
+ * Uses responsive sizing - smaller on mobile for better proportions
  */
-const FloatingDecorations = memo(function FloatingDecorations() {
+const HeroMascot = memo(function HeroMascot() {
   const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
 
-  if (prefersReducedMotion || !enableComplexAnimations) return null;
-
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none z-0" aria-hidden="true">
-      {/* Floating stars */}
-      <motion.div
-        className="absolute top-[15%] left-[10%] text-neo-yellow/30"
-        animate={{ y: [0, -10, 0], rotate: [0, 10, 0] }}
-        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-      >
-        <Star className="w-6 h-6 fill-current" />
-      </motion.div>
-      <motion.div
-        className="absolute top-[25%] right-[15%] text-neo-pink/30"
-        animate={{ y: [0, -8, 0], rotate: [0, -15, 0] }}
-        transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-      >
-        <Sparkles className="w-5 h-5" />
-      </motion.div>
-      <motion.div
-        className="absolute bottom-[30%] left-[8%] text-neo-cyan/25"
-        animate={{ y: [0, -12, 0], rotate: [0, 20, 0] }}
-        transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-      >
-        <Star className="w-4 h-4 fill-current" />
-      </motion.div>
-      <motion.div
-        className="absolute top-[40%] right-[8%] text-neo-yellow/20"
-        animate={{ y: [0, -6, 0], scale: [1, 1.1, 1] }}
-        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
-      >
-        <Sparkles className="w-4 h-4" />
-      </motion.div>
-      <motion.div
-        className="absolute bottom-[20%] right-[20%] text-neo-pink/20"
-        animate={{ y: [0, -10, 0], rotate: [0, -10, 0] }}
-        transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
-      >
-        <Star className="w-5 h-5 fill-current" />
-      </motion.div>
+    <div className="relative mx-auto mb-1">
+      {/* Interactive Mascot - happy by default, excited on hover, celebrating on click */}
+      {/* Responsive: sm (64px) on mobile, md (96px) on tablet, lg (128px) on desktop */}
+      <div className="block sm:hidden">
+        <InteractiveMascotWithEntrance
+          variant="happy"
+          size="sm"
+          enableHover
+          enableClick
+          hoverVariant="excited"
+          clickVariant="celebrating"
+          clickAnimation="bounce"
+          priority
+          delay={0.1}
+        />
+      </div>
+      <div className="hidden sm:block lg:hidden">
+        <InteractiveMascotWithEntrance
+          variant="happy"
+          size="md"
+          enableHover
+          enableClick
+          hoverVariant="excited"
+          clickVariant="celebrating"
+          clickAnimation="bounce"
+          priority
+          delay={0.1}
+        />
+      </div>
+      <div className="hidden lg:block">
+        <InteractiveMascotWithEntrance
+          variant="happy"
+          size="lg"
+          enableHover
+          enableClick
+          hoverVariant="excited"
+          clickVariant="celebrating"
+          clickAnimation="bounce"
+          priority
+          delay={0.1}
+        />
+      </div>
+
+      {/* Sparkle accents around mascot */}
+      {enableComplexAnimations && !prefersReducedMotion && (
+        <>
+          <motion.div
+            className="absolute -top-2 -right-2 text-neo-yellow"
+            animate={{ scale: [0, 1, 0], rotate: [0, 180, 360] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0 }}
+          >
+            <Sparkles className="w-5 h-5" />
+          </motion.div>
+          <motion.div
+            className="absolute top-1/2 -left-4 text-neo-pink"
+            animate={{ scale: [0, 1, 0], rotate: [0, -180, -360] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
+          >
+            <Star className="w-4 h-4 fill-current" />
+          </motion.div>
+          <motion.div
+            className="absolute -bottom-1 right-1/4 text-neo-cyan"
+            animate={{ scale: [0, 1, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
+          >
+            <Zap className="w-4 h-4 fill-current" />
+          </motion.div>
+        </>
+      )}
     </div>
   );
 });
@@ -107,7 +140,6 @@ const LandingView: React.FC = () => {
       await new Promise((resolve) => setTimeout(resolve, 500));
       toast.success(t('common.refreshed') || 'Refreshed', {
         duration: 2000,
-        icon: '🔄',
       });
     },
     threshold: 60,
@@ -202,11 +234,11 @@ const LandingView: React.FC = () => {
 
   return (
     <div
-      className={`flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative ${isLandscape ? 'landscape-full-height' : ''}`}
+      className={`flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative overflow-hidden ${isLandscape ? 'landscape-full-height' : ''}`}
       {...pullToRefreshHandlers}
     >
-      {/* Floating decorative elements */}
-      {!isLandscape && <FloatingDecorations />}
+      {/* Playful background with parallax and floating elements */}
+      {!isLandscape && <PlayfulBackground intensity="high" colorScheme="default" />}
 
       {/* Pull-to-refresh indicator */}
       <PullToRefreshIndicator
@@ -231,21 +263,34 @@ const LandingView: React.FC = () => {
       <Header />
 
       {/* Main content */}
-      <main className={`w-full max-w-7xl mx-auto overflow-x-hidden ${isLandscape ? 'flex-1 flex flex-col justify-center px-4 py-2' : 'px-2 sm:px-3 lg:px-6 xl:px-8 py-2 sm:py-3 lg:py-6 pb-40 lg:pb-6'}`}>
-        {/* Hero section - compact (hidden in landscape) - CSS animation for instant paint */}
+      <main className={`w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 ${isLandscape ? 'flex-1 flex flex-col justify-center px-4 py-2' : 'px-2 sm:px-3 lg:px-6 xl:px-8 py-2 sm:py-3 lg:py-6 pb-20 lg:pb-6'}`}>
+        {/* Hero section with mascot - compact on desktop to maximize card space */}
         {!isLandscape && (
           <motion.div
-            className="text-center mb-2 sm:mb-3 lg:mb-6 xl:mb-8 animate-fade-in-fast relative z-10"
+            className="text-center mb-2 sm:mb-3 lg:mb-4 animate-fade-in-fast relative z-10"
             style={{
-              transform: `translate(${mouseParallax.x * 0.3}px, ${mouseParallax.y * 0.3}px)`,
+              transform: `translate(${mouseParallax.x * 1.2}px, ${mouseParallax.y * 1.2}px)`,
             }}
           >
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl xl:text-6xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white mb-1 sm:mb-2 lg:mb-3">
+            {/* Mascot - smaller on desktop */}
+            <HeroMascot />
+
+            <motion.h1
+              className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white mb-1 sm:mb-1.5 lg:mb-2"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
               {t('landing.chooseMode') || 'Choose Your Mode'}
-            </h1>
-            <p className="text-sm sm:text-base lg:text-xl xl:text-2xl font-medium text-neo-black/80 dark:text-neo-white/85">
+            </motion.h1>
+            <motion.p
+              className="text-sm sm:text-base lg:text-lg xl:text-xl font-medium text-neo-black/80 dark:text-neo-white/85"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
               {t('landing.subtitleSimple') || 'Practice solo or challenge friends'}
-            </p>
+            </motion.p>
           </motion.div>
         )}
 
@@ -275,14 +320,14 @@ const LandingView: React.FC = () => {
           </Suspense>
         </div>
 
-        {/* Mode cards grid - horizontal in landscape, balanced 2-column layout on desktop */}
+        {/* Mode cards grid - horizontal in landscape, 3-column layout on desktop for better space usage */}
         {/* Using CSS animation for instant paint without JS overhead */}
-        <div className={`w-full animate-fade-in-fast ${isLandscape ? 'flex gap-3 flex-1 min-h-0' : 'grid grid-cols-1 md:grid-cols-2 md:grid-rows-2 gap-2 sm:gap-3 lg:gap-4 xl:gap-5 md:min-h-[320px] lg:min-h-[420px] xl:min-h-[480px]'}`}>
+        <div className={`w-full animate-fade-in-fast ${isLandscape ? 'flex gap-3 flex-1 min-h-0' : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5'}`}>
           {/* Multiplayer Card - Featured (spans 2 rows on desktop, 50% width) */}
           {isLandscape ? (
             <Link
               href={`/${language}/multiplayer`}
-              className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-pink to-pink-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all min-h-[120px] max-h-[70vh]"
+              className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-pink to-pink-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all min-h-[120px] max-h-[70dvh] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy"
               aria-label={`${t('landing.multiplayer') || 'Multiplayer'} - ${t('landing.multiplayerDesc') || 'Compete with friends'}`}
             >
               <Users className="w-10 h-10 text-neo-black" aria-hidden="true" />
@@ -305,7 +350,6 @@ const LandingView: React.FC = () => {
                 roomsLabel: t('landing.openRooms') || 'open rooms',
                 playersLabel: t('landing.playersLive') || 'playing now',
               }}
-              className="md:row-span-2"
             />
           )}
 
@@ -313,7 +357,7 @@ const LandingView: React.FC = () => {
           {isLandscape ? (
             <Link
               href={`/${language}/singleplayer`}
-              className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-cyan to-cyan-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all min-h-[120px] max-h-[70vh]"
+              className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-cyan to-cyan-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all min-h-[120px] max-h-[70dvh] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy"
               aria-label={`${t('landing.singlePlayer') || 'Single Player'} - ${t('landing.singlePlayerDesc') || 'Practice at your own pace'}`}
             >
               <User className="w-10 h-10 text-neo-black" aria-hidden="true" />
@@ -349,11 +393,11 @@ const LandingView: React.FC = () => {
 
       {/* Tutorial FAB - Fixed bottom corner button */}
       {/* Z-index 45 ensures it stays below mobile menu backdrop (z-9998) but above other content */}
-      {/* On desktop, positioned above Footer to avoid overlap with "Buy us a coffee" button */}
       <button
         onClick={handleOpenTutorial}
         className="
-          fixed bottom-[calc(6rem+max(env(safe-area-inset-bottom),1rem))] lg:bottom-[calc(8.5rem+max(env(safe-area-inset-bottom),1rem))] right-4 z-[45]
+          fixed bottom-4 right-4 z-[45]
+          pb-[env(safe-area-inset-bottom)]
           flex items-center gap-2
           min-w-[48px] min-h-[48px]
           px-4 py-3
@@ -365,7 +409,6 @@ const LandingView: React.FC = () => {
           active:scale-95 active:shadow-hard
           transition-all duration-150
           rtl:right-auto rtl:left-4
-          rtl:ml-[max(env(safe-area-inset-left),0px)]
           animate-fade-in-up
         "
         aria-label={t('landing.tutorial') || 'Tutorial'}

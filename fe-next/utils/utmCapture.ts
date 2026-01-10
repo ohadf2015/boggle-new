@@ -205,7 +205,7 @@ export function initUtmCapture(): void {
   });
 }
 
-export default {
+const utmCapture = {
   captureUtmData,
   getStoredUtmData,
   getUtmDataForProfile,
@@ -217,3 +217,5 @@ export default {
   getReferrerUrl,
   clearUtmData,
 };
+
+export default utmCapture;

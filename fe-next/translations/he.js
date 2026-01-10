@@ -70,6 +70,7 @@ const he = {
     "loading": "מערבב אותיות...",
     "error": "אופס!",
     "back": "חזור",
+    "backToHome": "חזרה לדף הבית",
     "next": "הבא",
     "confirm": "אישור",
     "cancel": "ביטול",
@@ -83,7 +84,7 @@ const he = {
     "admin": "מנהל",
     "understood": "יאללה!",
     "refresh": "רענן",
-    "refreshed": "רענון! 🔄",
+    "refreshed": "רענון!",
     "reconnecting": "מתחבר מחדש...",
     "reconnected": "חזרנו!",
     "connectionLost": "החיבור נפל",
@@ -176,7 +177,8 @@ const he = {
     "invalid": "לא תקין",
     "validating": "בודק...",
     "later": "אחר כך",
-    "skip": "דלג"
+    "skip": "דלג",
+    "done": "סיום"
   },
   "connection": {
     "reconnecting": "מתחבר מחדש...",
@@ -951,6 +953,7 @@ const he = {
     "exit": "יציאה",
     "exitRoom": "יציאה מהחדר",
     "waitForGameStart": "המתן לתחילת המשחק",
+    "clickToWakeUp": "לחץ להגיד שלום! 👋",
     "players": "שחקנים",
     "yourAchievements": "ההישגים שלך",
     "letterGrid": "לוח האותיות",
@@ -1776,7 +1779,8 @@ const he = {
       "keepGoing": "המשך!",
       "getStarted": "בוא נתחיל!",
       "ready": "מוכן!",
-      "readyForMultiplayer": "מוכן לרב משתתפים!"
+      "readyForMultiplayer": "מוכן לרב משתתפים!",
+      "tapForDetails": "הקש לפרטים"
     },
     "unlock": {
       "title": "כישור נפתח!",
@@ -2236,8 +2240,8 @@ const he = {
       "showMeLeaderboard": "הראה אותי בטבלת המובילים!"
     },
     "inlineSignup": {
-      "title": "הירשם כדי להופיע בטבלה",
-      "subtitle": "שמור את התוצאה שלך והתחרה גלובלית",
+      "title": "הצטרף ללוחמי המילים!",
+      "subtitle": "הניקוד שלך טוב מדי לאבד!",
       "orContinueWith": "או המשך עם אימייל",
       "emailPlaceholder": "כתובת אימייל",
       "passwordPlaceholder": "סיסמה (8+ תווים)",
@@ -2251,6 +2255,16 @@ const he = {
       "passwordRequired": "נדרשת סיסמה",
       "passwordTooShort": "סיסמה קצרה מדי",
       "passwordTooLong": "סיסמה ארוכה מדי",
+      "skipForNow": "אולי אחר כך",
+      "skipHover": "(לקסי יהיה עצוב, אבל בסדר...)",
+      "mascotTooltip": "לחץ עליי!",
+      "funnyMessages": {
+        "dontLeaveHanging": "היי! אל תשאיר אותי כך! הירשם ובוא נטפס יחד בטבלת המובילים!",
+        "scoresTooGood": "הניקודים שלך טובים מדי להיעלם! בוא נהפוך אותם לקבועים!",
+        "streakProtector": "אני בעצם מאבטח רצפים. הירשם ואני אגן על שלך לנצח!",
+        "joinWordNerds": "הצטרף למועדון הנרדים של המילים שבאמת זוכרים את הניקודים!",
+        "makeMomProud": "תגרום לאמא להתגאות - תראה לה את השם שלך בטבלה!"
+      },
       "benefits": {
         "leaderboard": "תפוס מקום בטבלת המובילים",
         "syncDevices": "סנכרן בין מכשירים",
@@ -2518,7 +2532,9 @@ const he = {
     "placement": "מיקום",
     "topThreeBonus": "בונוס טופ 3",
     "efficiency": "יעילות",
-    "streak": "רצף"
+    "streak": "רצף",
+    "guestTeasing": "התחבר כדי לקבל {amount} מטבעות!",
+    "signInShort": "התחבר"
   },
   "partyScreen": {
     "title": "מסך מסיבה",
@@ -2648,6 +2664,7 @@ const he = {
     "leading": "מוביל!",
     "ahead": "קדימה",
     "toCatch": "נק' לעבור",
+    "almostThere": "כמעט שם!",
     "live": "שידור חי",
     "backToGame": "חזרה למשחק"
   },
@@ -2758,7 +2775,7 @@ const he = {
     "multiPlayer": "רב משתתפים",
     "multiplayer": "רב משתתפים",
     "multiplayerDesc": "התחרה עם חברים בזמן אמת!",
-    "brainTraining": "אימון מוחי",
+    "brainTraining": "אימון קוגניטיבי",
     "brainTrainingDesc": "עקוב אחר התפתחות קוגניטיבית",
     "feature": {
       "soloVsBots": "נגד בוטים",
@@ -2848,6 +2865,8 @@ const he = {
     "fewWordsFoundSingular": "מצאת מילה אחת",
     "achievementsNotSaved": "הישגים במצב שחקן יחיד לא נשמרים בפרופיל שלך.",
     "botDetails": "פרטי בוט",
+    "botWordsFound": "מילים שהבוטים מצאו",
+    "noWordsToShow": "פרטי מילים לא זמינים",
     "difficulty": "קושי",
     "timer": "טיימר",
     "totalScore": "ניקוד כולל",
@@ -3090,7 +3109,7 @@ const he = {
     "tryAnotherLanguage": "נסו את האתגר בשפה אחרת:",
     "guestModeNotice": "משחק כאורח",
     "guestModeBenefits": "הירשמו כדי לעקוב אחר התקדמות, לבנות רצף ולהתחרות בטבלאות",
-    "brainScoreLocked": "הירשמו לעקוב אחר ציון המוח",
+    "brainScoreLocked": "הירשמו לעקוב אחר הציון הקוגניטיבי",
     "streakTeaser": "הירשמו לבנות ולעקוב אחר רצפים",
     "streakLocked": "מעקב רצף דורש הרשמה",
     "historyTeaser": "הירשמו לצפות בהתקדמות לאורך זמן",
@@ -3127,6 +3146,9 @@ const he = {
     },
     "leaderboard": "דירוג",
     "screenshotProtection": "חזרו כדי להמשיך לשחק",
+    "clueUnlocked": "רמז נפתח!",
+    "categoryUnlocked": "קטגוריה נחשפה!",
+    "exampleUnlocked": "דוגמה נפתחה!",
     "trainingSuggestion": {
       "title": "חדשים ב-LexiClash?",
       "subtitle": "נסו משחק אימון קצר כדי ללמוד את המכניקה!",
@@ -3208,6 +3230,7 @@ const he = {
       "pts": "נק׳"
     },
     "survival": {
+      "tokens": "אסימונים",
       "lifePoints": "חיים",
       "lifeRemaining": "{points} חיים",
       "lifeDraining": "החיים מתרוקנים...",
@@ -3648,10 +3671,10 @@ const he = {
     "sessionRecorded": "הקלטת הפעלה מצורפת"
   },
   "brain": {
-    "title": "אימון מוחי",
+    "title": "אימון קוגניטיבי",
     "subtitle": "עקוב אחר הביצועים הקוגניטיביים שלך",
-    "score": "ציון מוח",
-    "points": "נקודות מוח",
+    "score": "ציון קוגניטיבי",
+    "points": "נקודות קוגניטיביות",
     "overall": "כללי",
     "nav": {
       "home": "שחק",
@@ -3682,17 +3705,17 @@ const he = {
       "title": "התקדמות",
       "improving": "משתפר",
       "stable": "יציב",
-      "declining": "דורש עבודה",
+      "declining": "אזור שדרוג!",
       "gamesAnalyzed": "משחקים נותחו",
       "toNextTier": "לדרגה הבאה"
     },
     "recommendation": {
       "title": "טיפ אישי",
-      "weakest": "ה{{domain}} שלך צריך קצת עבודה.",
+      "weakest": "בוא נטעין את ה{{domain}} שלך!",
       "tryDrill": "נסה את תרגיל ה{{drill}} להשתפר!",
       "startDrill": "התחל תרגיל",
-      "declining": "ה{{domain}} שלך יורד - בוא נתאמן! 💪",
-      "low": "ה{{domain}} שלך צריך תשומת לב.",
+      "declining": "בוא נחזק את ה{{domain}} - יאללה!",
+      "low": "ה{{domain}} שלך מוכן לשדרוג!",
       "improve": "שפר את ה{{domain}} עם תרגול ממוקד.",
       "unlock": "עוד {{games}} משחקים לפתיחה",
       "scienceHint": "תרגול ממוקד משפר יכולות קוגניטיביות ספציפיות 🧠"
@@ -3741,8 +3764,8 @@ const he = {
     "playMoreForTrends": "שחק עוד {count} משחקים כדי לפתוח מעקב מגמות!",
     "playAgain": "שחק שוב",
     "drills": {
-      "title": "תרגילי מוח",
-      "brainTraining": "אימון מוח",
+      "title": "תרגילים קוגניטיביים",
+      "brainTraining": "אימון קוגניטיבי",
       "round": "סיבוב",
       "level": "רמה",
       "start": "התחל",
@@ -3830,8 +3853,8 @@ const he = {
       "tip5": "מעבר בין אורכי מילים בונה גמישות קוגניטיבית - הסתגלות מנטלית."
     },
     "share": {
-      "title": "שתף ציון מוח",
-      "brainScore": "ציון מוח",
+      "title": "שתף ציון קוגניטיבי",
+      "brainScore": "ציון קוגניטיבי",
       "tier": "דרגה",
       "gamesPlayed": "משחקים ששוחקו",
       "games": "משחקים",
@@ -3845,7 +3868,7 @@ const he = {
     },
     "empty": {
       "title": "התחל להתאמן!",
-      "description": "שחק משחקים כדי לבנות את ציון המוח שלך ולעקוב אחר שיפור קוגניטיבי לאורך זמן.",
+      "description": "שחק משחקים כדי לבנות את הציון הקוגניטיבי שלך ולעקוב אחר שיפור לאורך זמן.",
       "playNow": "שחק עכשיו"
     },
     "errors": {
@@ -3858,7 +3881,7 @@ const he = {
     },
     "progressHistory": "היסטוריית התקדמות",
     "startTracking": "התחל לעקוב",
-    "historyEmptyDesc": "שחק משחקים או השלם תרגילים כדי לעקוב אחר ציון המוח שלך לאורך זמן",
+    "historyEmptyDesc": "שחק משחקים או השלם תרגילים כדי לעקוב אחר הציון הקוגניטיבי שלך לאורך זמן",
     "daysTracked": "ימים",
     "currentScore": "נוכחי",
     "peakScore": "שיא",
@@ -3868,6 +3891,40 @@ const he = {
   "levelUp": {
     "title": "עלית רמה!",
     "reached": "הגעת לרמה {level}!"
+  },
+  "customPuzzle": {
+    "title": "פאזל מותאם אישית",
+    "description": "האם תוכלו לפתור את פאזל המילים הזה?",
+    "createTitle": "צרו פאזל משלכם",
+    "createYourOwn": "צרו פאזל משלכם",
+    "createDescription": "אתגרו חברים עם פאזל מילים משלכם",
+    "selectWord": "בחרו מילת יעד לפאזל:",
+    "enterWord": "הקלידו את מילת היעד",
+    "enterWordPlaceholder": "הקלידו מילה...",
+    "validating": "בודק...",
+    "wordValid": "מילה תקינה!",
+    "wordInvalid": "המילה לא במילון",
+    "invalidCharacters": "אותיות בלבד 🔤",
+    "wordTooShort": "מינימום 3 אותיות",
+    "wordTooLong": "מקסימום 8 אותיות",
+    "createPuzzle": "צור פאזל",
+    "generating": "מייצר פאזל...",
+    "loading": "טוען פאזל...",
+    "created": "הפאזל נוצר!",
+    "shareWithFriends": "שתפו עם חברים כדי לאתגר אותם!",
+    "yourScore": "הניקוד שלכם לניצחון",
+    "share": "שתפו פאזל",
+    "shareText": "יצרתי פאזל מילים מותאם אישית. תוכלו לנצח אותי?",
+    "createdBy": "נוצר על ידי {name}",
+    "creatorScore": "ניקוד היוצר",
+    "solvedIn": "נפתר ב-{attempts} ניסיונות",
+    "challengeDescription": "מצאו את המילה הנסתרת לפני שהזמן נגמר. תוכלו לנצח את היוצר?",
+    "play": "שחקו באתגר",
+    "solved": "פתרתם אותו!",
+    "failed": "בפעם הבאה יהיה יותר טוב!",
+    "beatCreator": "ניצחתם את היוצר!",
+    "leaderboard": "טבלת מובילים",
+    "playDaily": "שחקו באתגר היומי"
   },
   "ui": {
     "empty": {
@@ -3914,6 +3971,37 @@ const he = {
       "yourScore": "הניקוד שלך",
       "newPersonalBest": "שיא אישי חדש!",
       "almostThere": "כמעט! רק {{points}} נקודות"
+    }
+  },
+  "admin": {
+    "dashboard": "לוח בקרה",
+    "accessRequired": "נדרשת הרשאת מנהל",
+    "accessDenied": "יש צורך בהרשאות מנהל כדי לגשת לעמוד זה.",
+    "welcome": "שלום,",
+    "live": {
+      "subtitle": "מעקב משחקים בזמן אמת",
+      "live": "חי",
+      "games": "משחקים",
+      "players": "שחקנים",
+      "sockets": "חיבורים",
+      "singlePlayer": "סולו",
+      "refresh": "רענן",
+      "retry": "נסה שוב",
+      "noGames": "אין משחקים פעילים",
+      "noGamesHint": "משחקים יופיעו כאן כשהשחקנים יתחילו לשחק",
+      "activeGames": "משחקים פעילים",
+      "connectedPlayers": "שחקנים מחוברים",
+      "player": "שחקן",
+      "game": "משחק",
+      "status": "סטטוס",
+      "score": "ניקוד",
+      "type": "סוג",
+      "auth": "רשום",
+      "guest": "אורח",
+      "ranked": "מדורג",
+      "left": "נותר",
+      "started": "התחיל",
+      "lastUpdated": "עודכן לאחרונה"
     }
   }
 };

@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Write, Edit, Grep, Glob, Bash(npm *), Bash(npx *), Bash(git *), mcp__notion__*, TodoWrite, Task, Skill, AskUserQuestion
+allowed-tools: Read, Write, Edit, Grep, Glob, Bash(npm *), Bash(npx *), Bash(git *), mcp__notion__*, mcp__memory__*, TodoWrite, Task, Skill, AskUserQuestion
 description: Process improvement tasks from Notion - analyze, implement with /feature workflow, and mark for validation
 ---
 
@@ -322,3 +322,24 @@ Output a summary in chat:
 8. Update Notion with validation status
 9. Report all test instructions in chat
 10. Ask questions if requirements are ambiguous
+
+---
+
+## Memory Integration
+
+### Before Processing (Phase 1.5)
+Recall related features and patterns:
+```
+mcp__memory__memory_recall(query="feature [feature-area] implementation pattern")
+```
+
+### After Each Feature (Phase 4.8)
+Store feature implementation for future reference:
+```
+mcp__memory__memory_store(
+  content="Feature: [feature-name]. Implementation: [brief description]. Key files: [files]. Pattern: [pattern used].",
+  type="fact",
+  tags=["feature", "implementation", "[feature-area]"],
+  importance=7
+)
+```

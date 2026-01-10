@@ -157,7 +157,8 @@ export function useSafeSocketEvents({
         socket.off(event, handler);
       }
     };
-  }, [socket, JSON.stringify(events.map(e => ({ event: e.event, enabled: e.enabled ?? true })))]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socket, JSON.stringify(events.map(e => ({ event: e.event, enabled: e.enabled ?? true })))]); // JSON.stringify creates stable comparison for events array
 }
 
 /**
