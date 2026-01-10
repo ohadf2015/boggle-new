@@ -34,7 +34,8 @@ export interface HintState {
 export interface HintActions {
   handlePurchase: (item: ClueShopItem, clueTokens: number, setClueTokens: (fn: (prev: number) => number) => void, setShowShop: (show: boolean) => void) => void;
   getNextAffordableClue: (clueTokens: number) => ClueShopItem | null;
-  autoRevealLetter: () => boolean;
+  /** Reveals a random unrevealed letter. Returns the position revealed, or -1 if none available. */
+  autoRevealLetter: () => number;
   revealCategory: () => void;
   revealExample: () => void;
 }
@@ -187,14 +188,15 @@ export function useSurvivalHints({
   }, [targetWord.length, revealedLetters, showCategory, showExample]);
 
   // Auto-reveal a single letter (for auto-spend system)
-  const autoRevealLetter = useCallback((): boolean => {
+  // Returns the position revealed, or -1 if none available
+  const autoRevealLetter = useCallback((): number => {
     const unrevealed = [...Array(targetWord.length).keys()].filter(i => !revealedLetters.has(i));
     if (unrevealed.length > 1) {
       const randomIdx = unrevealed[Math.floor(Math.random() * unrevealed.length)];
       setRevealedLetters(prev => new Set([...prev, randomIdx]));
-      return true;
+      return randomIdx;
     }
-    return false;
+    return -1;
   }, [targetWord.length, revealedLetters]);
 
   // Reveal category (for auto-spend system)

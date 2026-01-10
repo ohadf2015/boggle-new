@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type { AccumulatedClue } from './types';
 import { fireConfetti } from '@/utils/confettiUtils';
@@ -22,6 +22,7 @@ export interface ClueActions {
   updateCluesFromDiscovery: (word: string) => number;
   updateKnownLettersFromDiscovery: (word: string) => void;
   triggerClueGainAnimation: (cluesRevealed: number) => void;
+  handleCoinRevealedLetter: (position: number) => void;
 }
 
 /**
@@ -268,6 +269,86 @@ export function useSurvivalClues({
     });
   }, [accumulatedClues, targetLetterCounts]);
 
+  // Ref to track pending clue updates for batched calls
+  const pendingCluesRef = useRef<Map<number, AccumulatedClue> | null>(null);
+
+  /**
+   * Handle letter revealed via coin purchase
+   * - Adds a green clue at the revealed position
+   * - Removes any existing yellow clue at that position
+   * - Cleans up knownLetters if all occurrences of the letter are now revealed as green
+   */
+  const handleCoinRevealedLetter = useCallback((position: number) => {
+    if (position < 0 || position >= normalizedTarget.length) return;
+
+    const revealedLetter = normalizedTarget[position];
+
+    // Track updates in a ref to handle batched calls correctly
+    let updatedClues: Map<number, AccumulatedClue>;
+
+    setAccumulatedClues(prev => {
+      // Start from pending or previous state
+      const baseClues = pendingCluesRef.current || prev;
+      updatedClues = new Map(baseClues);
+
+      // Add green clue at the revealed position
+      updatedClues.set(position, { letter: revealedLetter, type: 'green' });
+
+      // Count how many greens we now have for this letter
+      let greenCount = 0;
+      updatedClues.forEach((clue) => {
+        if (clue.letter === revealedLetter && clue.type === 'green') {
+          greenCount++;
+        }
+      });
+
+      // Get target count for this letter
+      const targetCount = targetLetterCounts.get(revealedLetter) || 0;
+
+      // If all occurrences are now green, remove any yellows for this letter
+      if (greenCount >= targetCount) {
+        updatedClues.forEach((clue, pos) => {
+          if (clue.letter === revealedLetter && clue.type === 'yellow') {
+            updatedClues.delete(pos);
+          }
+        });
+      }
+
+      // Store for potential next batched call
+      pendingCluesRef.current = updatedClues;
+
+      // Schedule clearing the ref after this batch of state updates
+      queueMicrotask(() => {
+        pendingCluesRef.current = null;
+      });
+
+      return updatedClues;
+    });
+
+    // Clean up knownLetters if all occurrences are now revealed
+    setKnownLetters(prev => {
+      const updated = new Set(prev);
+
+      // Use the updatedClues we just calculated (via closure)
+      // Count greens for the revealed letter from the updated clues
+      let greenCount = 0;
+      // Access the pending ref since it has the latest state
+      const clues = pendingCluesRef.current || accumulatedClues;
+      clues.forEach((clue) => {
+        if (clue.letter === revealedLetter && clue.type === 'green') {
+          greenCount++;
+        }
+      });
+
+      const targetCount = targetLetterCounts.get(revealedLetter) || 0;
+      if (greenCount >= targetCount) {
+        updated.delete(revealedLetter);
+      }
+
+      return updated;
+    });
+  }, [normalizedTarget, targetLetterCounts, accumulatedClues]);
+
   /**
    * Trigger the clue gain animation with confetti
    */
@@ -307,6 +388,7 @@ export function useSurvivalClues({
     updateCluesFromDiscovery,
     updateKnownLettersFromDiscovery,
     triggerClueGainAnimation,
+    handleCoinRevealedLetter,
   };
 
   return [state, actions];

@@ -184,16 +184,14 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
           "p-3 sm:p-4 border-4 transition-all duration-200 rounded-neo-lg shadow-hard-lg relative overflow-hidden",
           "hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-xl",
           cardStyleClass,
-          isWordsExpanded && "ring-4 ring-neo-cyan",
-          // Add comic-style halftone for winner card (more prominent)
-          index === 0 && "texture-halftone-comic"
+          isWordsExpanded && "ring-4 ring-neo-cyan"
         )}
       >
-        {/* Halftone texture pattern - more prominent for winner, subtle for others */}
+        {/* Halftone texture removed - only on body background */}
         <div
           className={cn(
             "absolute inset-0 pointer-events-none",
-            index === 0 ? "opacity-0" : "opacity-5" // Winner uses CSS class pattern instead
+            "opacity-0" // Texture disabled - only appears on body background
           )}
           style={{
             backgroundImage: `radial-gradient(circle, var(--neo-black) 1px, transparent 1px)`,

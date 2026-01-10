@@ -50,7 +50,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ delay: 0.5, type: 'spring', stiffness: 200, damping: 20 }}
       className={cn(
-        "mt-4 p-4 rounded-neo border-3 border-neo-black shadow-hard relative overflow-hidden texture-halftone-comic-light",
+        "mt-4 p-4 rounded-neo border-3 border-neo-black shadow-hard relative overflow-hidden",
         levelUpData ? "bg-gradient-to-br from-neo-yellow via-neo-yellow to-neo-pink" : "bg-neo-cream dark:bg-slate-700"
       )}
     >

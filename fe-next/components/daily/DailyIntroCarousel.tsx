@@ -95,7 +95,7 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
       {...swipeHandlers}
     >
       {/* Carousel Content */}
-      <div className="relative overflow-hidden rounded-neo-lg border-3 border-neo-black bg-white dark:bg-neo-navy shadow-hard-lg h-[200px] sm:h-[220px] texture-halftone-comic">
+      <div className="relative overflow-hidden rounded-neo-lg border-3 border-neo-black bg-white dark:bg-neo-navy shadow-hard-lg h-[200px] sm:h-[220px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}

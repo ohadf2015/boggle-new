@@ -1,0 +1,285 @@
+/**
+ * Tests for useSurvivalHints hook
+ *
+ * Tests progressive tier-based auto-clue system:
+ * - Tier 1: reveal_letter (cost 1, repeatable until maxed)
+ * - Tier 2: reveal_category (cost 2, one-time)
+ * - Tier 3: example_sentence (cost 3, one-time)
+ *
+ * Key behavior: Must exhaust current tier before moving to next tier.
+ */
+
+import { renderHook, act } from '@testing-library/react';
+import { useSurvivalHints } from '../useSurvivalHints';
+import type { Language } from '@/types';
+
+// Mock the AI hint generator to avoid API calls
+jest.mock('@/utils/aiHintGenerator', () => ({
+  ...jest.requireActual('@/utils/aiHintGenerator'),
+  generateProgressiveHints: jest.fn().mockResolvedValue({
+    hints: [{ level: 1, hint: '_ _ _ _ _', unlockCost: 0 }],
+    category: 'Test Category',
+    exampleSentence: 'Test sentence with _____.',
+  }),
+  generateFallbackHints: jest.fn().mockReturnValue({
+    hints: [{ level: 1, hint: '_ _ _ _ _', unlockCost: 0 }],
+    category: 'Unknown',
+    exampleSentence: 'Test sentence.',
+  }),
+}));
+
+// Mock word rarity to avoid complex calculations
+jest.mock('@/utils/dailyChallenge/wordRarity', () => ({
+  getWordRarity: jest.fn().mockReturnValue(2), // Common word (not rare)
+}));
+
+describe('useSurvivalHints', () => {
+  const defaultProps = {
+    targetWord: 'APPLE',
+    language: 'en' as Language,
+    playWordAcceptedSound: jest.fn(),
+    showToast: jest.fn(),
+    t: (key: string) => key,
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('getNextAffordableClue - Progressive Tier System', () => {
+    it('should return null when tokens are 0', () => {
+      const { result } = renderHook(() => useSurvivalHints(defaultProps));
+
+      const nextClue = result.current[1].getNextAffordableClue(0);
+      expect(nextClue).toBeNull();
+    });
+
+    it('should return reveal_letter when tokens >= 1 and tier 1 available', () => {
+      const { result } = renderHook(() => useSurvivalHints(defaultProps));
+
+      const nextClue = result.current[1].getNextAffordableClue(1);
+      expect(nextClue).not.toBeNull();
+      expect(nextClue?.id).toBe('reveal_letter');
+      expect(nextClue?.cost).toBe(1);
+    });
+
+    it('should return reveal_letter even when tokens >= 2 (stay on tier 1)', () => {
+      const { result } = renderHook(() => useSurvivalHints(defaultProps));
+
+      // Even with 2 tokens, should still return tier 1 clue
+      const nextClue = result.current[1].getNextAffordableClue(2);
+      expect(nextClue?.id).toBe('reveal_letter');
+      expect(nextClue?.cost).toBe(1);
+    });
+
+    it('should return reveal_letter even when tokens >= 3 (stay on tier 1)', () => {
+      const { result } = renderHook(() => useSurvivalHints(defaultProps));
+
+      // Even with 3 tokens, should still return tier 1 clue
+      const nextClue = result.current[1].getNextAffordableClue(3);
+      expect(nextClue?.id).toBe('reveal_letter');
+      expect(nextClue?.cost).toBe(1);
+    });
+
+    it('should move to tier 2 only when tier 1 is exhausted (all letters revealed)', () => {
+      const { result } = renderHook(() => useSurvivalHints(defaultProps));
+
+      // Reveal letters until only 1 is left (max reveal for 5-letter word is 4)
+      // APPLE has 5 letters, can reveal up to 4
+      act(() => {
+        result.current[1].autoRevealLetter(); // 1st reveal
+        result.current[1].autoRevealLetter(); // 2nd reveal
+        result.current[1].autoRevealLetter(); // 3rd reveal
+        result.current[1].autoRevealLetter(); // 4th reveal (now maxed)
+      });
+
+      // Now tier 1 should be exhausted
+      // With 2 tokens, should return reveal_category
+      const nextClue = result.current[1].getNextAffordableClue(2);
+      expect(nextClue?.id).toBe('reveal_category');
+      expect(nextClue?.cost).toBe(2);
+    });
+
+    it('should return null when tier 1 exhausted but tokens < 2 (save for tier 2)', () => {
+      const { result } = renderHook(() => useSurvivalHints(defaultProps));
+
+      // Exhaust tier 1
+      act(() => {
+        result.current[1].autoRevealLetter();
+        result.current[1].autoRevealLetter();
+        result.current[1].autoRevealLetter();
+        result.current[1].autoRevealLetter();
+      });
+
+      // With only 1 token, should return null (saving for tier 2)
+      const nextClue = result.current[1].getNextAffordableClue(1);
+      expect(nextClue).toBeNull();
+    });
+
+    it('should move to tier 3 when tier 1 and 2 are exhausted', () => {
+      const { result } = renderHook(() => useSurvivalHints(defaultProps));
+
+      // Exhaust tier 1
+      act(() => {
+        result.current[1].autoRevealLetter();
+        result.current[1].autoRevealLetter();
+        result.current[1].autoRevealLetter();
+        result.current[1].autoRevealLetter();
+      });
+
+      // Exhaust tier 2
+      act(() => {
+        result.current[1].revealCategory();
+      });
+
+      // Now with 3 tokens, should return example_sentence
+      const nextClue = result.current[1].getNextAffordableClue(3);
+      expect(nextClue?.id).toBe('example_sentence');
+      expect(nextClue?.cost).toBe(3);
+    });
+
+    it('should return null when all tiers are exhausted', () => {
+      const { result } = renderHook(() => useSurvivalHints(defaultProps));
+
+      // Exhaust all tiers
+      act(() => {
+        // Tier 1
+        result.current[1].autoRevealLetter();
+        result.current[1].autoRevealLetter();
+        result.current[1].autoRevealLetter();
+        result.current[1].autoRevealLetter();
+        // Tier 2
+        result.current[1].revealCategory();
+        // Tier 3
+        result.current[1].revealExample();
+      });
+
+      // Should return null regardless of tokens
+      expect(result.current[1].getNextAffordableClue(10)).toBeNull();
+    });
+
+    it('should handle short words (3 letters) with limited reveals', () => {
+      const { result } = renderHook(() =>
+        useSurvivalHints({ ...defaultProps, targetWord: 'CAT' })
+      );
+
+      // CAT has 3 letters, can reveal up to 2
+      act(() => {
+        result.current[1].autoRevealLetter(); // 1st reveal
+        result.current[1].autoRevealLetter(); // 2nd reveal (now maxed)
+      });
+
+      // Tier 1 should be exhausted, move to tier 2
+      const nextClue = result.current[1].getNextAffordableClue(2);
+      expect(nextClue?.id).toBe('reveal_category');
+    });
+
+    it('should handle 2-letter words with only 1 reveal possible', () => {
+      const { result } = renderHook(() =>
+        useSurvivalHints({ ...defaultProps, targetWord: 'GO' })
+      );
+
+      // GO has 2 letters, can reveal only 1
+      act(() => {
+        result.current[1].autoRevealLetter(); // 1st reveal (now maxed)
+      });
+
+      // Tier 1 should be exhausted
+      const nextClue = result.current[1].getNextAffordableClue(2);
+      expect(nextClue?.id).toBe('reveal_category');
+    });
+  });
+
+  describe('autoRevealLetter', () => {
+    it('should return true and reveal a letter when possible', () => {
+      const { result } = renderHook(() => useSurvivalHints(defaultProps));
+
+      let revealed = false;
+      act(() => {
+        revealed = result.current[1].autoRevealLetter();
+      });
+
+      expect(revealed).toBe(true);
+      expect(result.current[0].revealedLetters.size).toBe(1);
+    });
+
+    it('should return false when max letters are revealed', () => {
+      const { result } = renderHook(() => useSurvivalHints(defaultProps));
+
+      // Reveal 4 letters (max for 5-letter word)
+      act(() => {
+        result.current[1].autoRevealLetter();
+        result.current[1].autoRevealLetter();
+        result.current[1].autoRevealLetter();
+        result.current[1].autoRevealLetter();
+      });
+
+      // 5th attempt should fail
+      let revealed = true;
+      act(() => {
+        revealed = result.current[1].autoRevealLetter();
+      });
+
+      expect(revealed).toBe(false);
+      expect(result.current[0].revealedLetters.size).toBe(4);
+    });
+  });
+
+  describe('revealCategory', () => {
+    it('should set showCategory to true', () => {
+      const { result } = renderHook(() => useSurvivalHints(defaultProps));
+
+      expect(result.current[0].showCategory).toBe(false);
+
+      act(() => {
+        result.current[1].revealCategory();
+      });
+
+      expect(result.current[0].showCategory).toBe(true);
+    });
+  });
+
+  describe('revealExample', () => {
+    it('should set showExample to true', () => {
+      const { result } = renderHook(() => useSurvivalHints(defaultProps));
+
+      expect(result.current[0].showExample).toBe(false);
+
+      act(() => {
+        result.current[1].revealExample();
+      });
+
+      expect(result.current[0].showExample).toBe(true);
+    });
+  });
+
+  describe('integration: multiple token spending', () => {
+    it('should allow buying multiple reveals before moving to next tier', () => {
+      const { result } = renderHook(() => useSurvivalHints(defaultProps));
+
+      // Simulate having 3 tokens and buying clues one by one
+      // First purchase
+      let clue1 = result.current[1].getNextAffordableClue(3);
+      expect(clue1?.id).toBe('reveal_letter');
+
+      act(() => {
+        result.current[1].autoRevealLetter();
+      });
+
+      // Second purchase (still tier 1)
+      let clue2 = result.current[1].getNextAffordableClue(2);
+      expect(clue2?.id).toBe('reveal_letter');
+
+      act(() => {
+        result.current[1].autoRevealLetter();
+      });
+
+      // Third purchase (still tier 1)
+      let clue3 = result.current[1].getNextAffordableClue(1);
+      expect(clue3?.id).toBe('reveal_letter');
+
+      // After 3 reveals, still have room for 1 more
+      expect(result.current[0].revealedLetters.size).toBe(3);
+    });
+  });
+});

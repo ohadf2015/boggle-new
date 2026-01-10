@@ -311,7 +311,7 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
           className={cn(
             'mb-3 p-3 rounded-neo border-3 border-neo-black',
             'bg-gradient-to-br from-neo-pink to-neo-pink-light',
-            'shadow-hard relative overflow-hidden texture-halftone-comic-dense'
+            'shadow-hard relative overflow-hidden'
           )}
         >
           {/* Comic-style halftone pattern - subtle for featured card */}

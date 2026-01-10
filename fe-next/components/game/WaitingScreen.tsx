@@ -247,7 +247,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
       <div className="flex flex-col gap-3 sm:gap-4 md:gap-6 w-full max-w-6xl">
 
         {/* Row 1: Room Code + Language + Share Buttons */}
-        <Card className="bg-slate-800/95 text-neo-white p-3 sm:p-4 md:p-6 border-4 border-neo-black shadow-hard-lg relative overflow-hidden texture-halftone-comic">
+        <Card className="bg-slate-800/95 text-neo-white p-3 sm:p-4 md:p-6 border-4 border-neo-black shadow-hard-lg relative overflow-hidden">
           {/* Comic-style halftone dots */}
           <div
             className="absolute inset-0 pointer-events-none opacity-[0.03]"
@@ -376,7 +376,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
           )}
 
           {/* RIGHT SIDE: Players List - Neo-Brutalist Dark */}
-          <Card className="lg:w-[350px] h-auto p-3 sm:p-4 md:p-6 flex flex-col bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg relative overflow-hidden texture-halftone-comic">
+          <Card className="lg:w-[350px] h-auto p-3 sm:p-4 md:p-6 flex flex-col bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg relative overflow-hidden">
             {/* Comic-style halftone dots */}
             <div
               className="absolute inset-0 pointer-events-none opacity-[0.025]"

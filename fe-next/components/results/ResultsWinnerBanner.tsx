@@ -204,7 +204,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
     >
       {/* Neo-Brutalist Main Container - Clickable for confetti */}
       <div
-        className={`relative ${styles.bgClass} border-4 border-neo-black rounded-neo-lg shadow-hard-xl overflow-hidden texture-halftone-comic-dense cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]`}
+        className={`relative ${styles.bgClass} border-4 border-neo-black rounded-neo-lg shadow-hard-xl overflow-hidden cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]`}
         style={{ transform: 'rotate(-1deg)' }}
         onClick={handleConfetti}
       >

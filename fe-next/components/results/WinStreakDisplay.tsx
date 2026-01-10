@@ -115,7 +115,7 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
       transition={{ type: 'spring', damping: 15, stiffness: 200 }}
       className={cn(
         'relative p-4 rounded-neo-lg border-3 border-neo-black overflow-hidden',
-        'shadow-hard texture-halftone-comic-light',
+        'shadow-hard',
         isDarkMode ? 'bg-slate-800' : 'bg-neo-cream'
       )}
     >

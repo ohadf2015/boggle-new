@@ -246,8 +246,11 @@ export function useSurvivalGameLogic({
 
     // Execute the clue effect based on type
     switch (nextClue.id) {
-      case 'reveal_letter':
-        if (hintActions.autoRevealLetter()) {
+      case 'reveal_letter': {
+        const revealedPosition = hintActions.autoRevealLetter();
+        if (revealedPosition >= 0) {
+          // Clean up yellow clues now that we have a green at this position
+          clueActions.handleCoinRevealedLetter(revealedPosition);
           // Show celebration toast
           showToast('valid-word', t('daily.clueUnlocked') || 'Clue Unlocked! 💡');
           // Trigger clue gain animation
@@ -255,6 +258,7 @@ export function useSurvivalGameLogic({
           playWordAcceptedSound?.();
         }
         break;
+      }
       case 'reveal_category':
         hintActions.revealCategory();
         showToast('valid-word', t('daily.categoryUnlocked') || 'Category Revealed! 🏷️');
