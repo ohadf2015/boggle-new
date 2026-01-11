@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import nextDynamic from 'next/dynamic';
-import Script from 'next/script';
 import { translations } from '@/translations';
 import { Providers } from '../providers';
 import Footer from '@/components/Footer';
@@ -665,15 +664,14 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <meta name="apple-mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
                 <meta name="apple-mobile-web-app-title" content="LexiClash" />
-            </head>
-            <body className="antialiased screen-fit" suppressHydrationWarning>
-                {/* Google AdSense - using lazyOnload to prevent data-nscript warning and blocking */}
-                <Script
+                {/* Google AdSense - placed in head to avoid data-nscript warning */}
+                <script
                     async
                     src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1896836706464880"
                     crossOrigin="anonymous"
-                    strategy="lazyOnload"
                 />
+            </head>
+            <body className="antialiased screen-fit" suppressHydrationWarning>
                 {/* Skip to main content link for keyboard/screen reader users */}
                 <a
                     href="#main-content"

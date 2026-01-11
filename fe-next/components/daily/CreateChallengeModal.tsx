@@ -151,6 +151,12 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
       try {
         await navigator.share(shareData);
       } catch (err) {
+        // User canceled the share - this is expected behavior, not an error
+        if (err instanceof Error && err.name === 'AbortError') {
+          // Silently handle user cancellation
+          return;
+        }
+        // Only log actual errors (not user cancellations)
         console.error('Error sharing:', err);
       }
     } else {
@@ -239,12 +245,12 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         whileTap={{ scale: 0.95, y: 0 }}
                         className={`relative p-4 sm:p-5 rounded-xl border-neo-thick transition-all flex flex-col items-center gap-2 ${
                           boardSize === 5
-                            ? 'bg-neo-cyan text-neo-white border-neo-black shadow-hard-lg'
+                            ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard-lg'
                             : 'bg-neo-white text-neo-black border-neo-black/30 hover:border-neo-cyan hover:text-neo-cyan shadow-hard-sm hover:shadow-hard'
                         }`}
                       >
                         <div className={`p-3 rounded-lg ${boardSize === 5 ? 'bg-neo-white/20' : 'bg-neo-cyan/10'}`}>
-                          <Grid2X2 className={`w-8 h-8 sm:w-10 sm:h-10 ${boardSize === 5 ? 'text-neo-white' : 'text-neo-cyan'}`} strokeWidth={2.5} />
+                          <Grid2X2 className={`w-8 h-8 sm:w-10 sm:h-10 ${boardSize === 5 ? 'text-neo-black' : 'text-neo-cyan'}`} strokeWidth={2.5} />
                         </div>
                         <div className="text-center">
                           <span className="font-black text-2xl sm:text-3xl block">5×5</span>
@@ -270,12 +276,12 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         whileTap={{ scale: 0.95, y: 0 }}
                         className={`relative p-4 sm:p-5 rounded-xl border-neo-thick transition-all flex flex-col items-center gap-2 ${
                           boardSize === 7
-                            ? 'bg-neo-orange text-neo-white border-neo-black shadow-hard-lg'
+                            ? 'bg-neo-orange text-neo-black border-neo-black shadow-hard-lg'
                             : 'bg-neo-white text-neo-black border-neo-black/30 hover:border-neo-orange hover:text-neo-orange shadow-hard-sm hover:shadow-hard'
                         }`}
                       >
                         <div className={`p-3 rounded-lg ${boardSize === 7 ? 'bg-neo-white/20' : 'bg-neo-orange/10'}`}>
-                          <Grid3X3 className={`w-8 h-8 sm:w-10 sm:h-10 ${boardSize === 7 ? 'text-neo-white' : 'text-neo-orange'}`} strokeWidth={2.5} />
+                          <Grid3X3 className={`w-8 h-8 sm:w-10 sm:h-10 ${boardSize === 7 ? 'text-neo-black' : 'text-neo-orange'}`} strokeWidth={2.5} />
                         </div>
                         <div className="text-center">
                           <span className="font-black text-2xl sm:text-3xl block">7×7</span>
@@ -336,21 +342,6 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         {wordError}
                       </motion.p>
                     )}
-                  </motion.div>
-
-                  {/* Info Banner */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="bg-gradient-to-br from-neo-yellow/20 to-neo-orange/20 border-3 border-neo-black rounded-xl p-3 text-center"
-                  >
-                    <p className="text-xs sm:text-sm font-bold text-neo-black">
-                      {t('daily.boardWillBeGenerated', {
-                        size: boardSize,
-                        language: language === 'en' ? 'English' : language === 'he' ? 'Hebrew' : language === 'sv' ? 'Swedish' : 'Japanese'
-                      })}
-                    </p>
                   </motion.div>
 
                   {/* Generate Button */}
