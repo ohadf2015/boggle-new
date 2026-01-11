@@ -26,7 +26,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     // Fetch the puzzle with creator info
     const { data: puzzle, error: puzzleError } = await supabase
       .from('custom_puzzles')
-      .select('id, creator_display_name, creator_solved, creator_attempts_used, creator_efficiency_score, created_at')
+      .select('id, creator_id, creator_guest_fingerprint, creator_display_name, creator_solved, creator_attempts_used, creator_efficiency_score, created_at')
       .eq('puzzle_code', puzzleCode.toLowerCase())
       .single();
 
@@ -40,7 +40,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     // Fetch all attempts for this puzzle
     const { data: attempts, error: attemptsError } = await supabase
       .from('custom_puzzle_attempts')
-      .select('display_name, solved, attempts_used, efficiency_score, beat_creator, completed_at')
+      .select('player_id, guest_fingerprint, display_name, solved, attempts_used, efficiency_score, beat_creator, completed_at')
       .eq('puzzle_id', puzzle.id)
       .order('efficiency_score', { ascending: false })
       .limit(50);
@@ -65,16 +65,23 @@ export async function GET(request: Request, { params }: RouteParams) {
         isCreator: true,
         completedAt: puzzle.created_at,
       },
-      // Player attempts
-      ...(attempts || []).map(attempt => ({
-        displayName: attempt.display_name,
-        solved: attempt.solved,
-        attemptsUsed: attempt.attempts_used,
-        efficiencyScore: attempt.efficiency_score,
-        beatCreator: attempt.beat_creator,
-        isCreator: false,
-        completedAt: attempt.completed_at,
-      })),
+      // Player attempts (excluding creator if they appear in attempts)
+      ...(attempts || [])
+        .filter(attempt => {
+          // Filter out any attempt that matches the creator's identity
+          // This is a safeguard in case creator somehow got added to attempts
+          return attempt.player_id !== puzzle.creator_id &&
+                 attempt.guest_fingerprint !== puzzle.creator_guest_fingerprint;
+        })
+        .map(attempt => ({
+          displayName: attempt.display_name,
+          solved: attempt.solved,
+          attemptsUsed: attempt.attempts_used,
+          efficiencyScore: attempt.efficiency_score,
+          beatCreator: attempt.beat_creator,
+          isCreator: false,
+          completedAt: attempt.completed_at,
+        })),
     ];
 
     // Rank the leaderboard

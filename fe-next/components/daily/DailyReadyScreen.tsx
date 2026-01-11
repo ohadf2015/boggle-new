@@ -296,20 +296,41 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           </Button>
         </motion.div>
 
-        {/* Create Challenge Button */}
+        {/* Create Challenge Button - Auth Required */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.35, type: 'spring' }}
         >
-          <Button
-            onClick={() => setShowCreateChallenge(true)}
-            variant="outline"
-            className="w-full py-3 text-lg font-bold bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-yellow/20 hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-sm transition-all flex items-center justify-center gap-2"
-          >
-             <span className="text-xl">🛠️</span>
-             {t('daily.createCustomChallenge')}
-          </Button>
+          {isAuthenticated ? (
+            <Button
+              onClick={() => setShowCreateChallenge(true)}
+              variant="outline"
+              className="w-full py-3 text-lg font-bold bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-yellow/20 hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-sm transition-all flex items-center justify-center gap-2"
+            >
+              <span className="text-xl">🛠️</span>
+              {t('daily.createCustomChallenge')}
+            </Button>
+          ) : (
+            <div className="relative">
+              <Button
+                onClick={() => {
+                  // Redirect to signup/login page with return URL
+                  window.location.href = `/${language}/auth?returnTo=${encodeURIComponent(window.location.pathname)}`;
+                }}
+                variant="outline"
+                className="w-full py-3 text-lg font-bold bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-yellow/20 hover:-translate-y-0.5 transition-all flex flex-col items-center gap-1"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">🛠️</span>
+                  <span>{t('daily.createCustomChallenge')}</span>
+                </div>
+                <span className="text-xs text-gray-600 font-medium">
+                  {t('daily.signUpRequired') || '⭐ Sign up to create challenges'}
+                </span>
+              </Button>
+            </div>
+          )}
         </motion.div>
 
         {/* Secondary Actions - Collapsed */}

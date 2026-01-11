@@ -44,10 +44,10 @@ export async function POST(request: Request, { params }: RouteParams) {
     // Get authenticated user if available
     const { data: { user } } = await supabase.auth.getUser();
 
-    // Fetch the puzzle to get creator's score
+    // Fetch the puzzle to get creator's score and creator info
     const { data: puzzle, error: puzzleError } = await supabase
       .from('custom_puzzles')
-      .select('id, creator_efficiency_score')
+      .select('id, creator_id, creator_guest_fingerprint, creator_efficiency_score')
       .eq('puzzle_code', puzzleCode.toLowerCase())
       .single();
 
@@ -65,6 +65,39 @@ export async function POST(request: Request, { params }: RouteParams) {
       wordsDiscovered,
       lifeRemaining
     );
+
+    // Check if current player is the creator
+    const isCreator = user
+      ? (user.id === puzzle.creator_id)
+      : (guestFingerprint === puzzle.creator_guest_fingerprint);
+
+    if (isCreator) {
+      // Update creator's stats instead of creating attempt
+      const { error: updateError } = await supabase
+        .from('custom_puzzles')
+        .update({
+          creator_solved: solved,
+          creator_attempts_used: attemptsUsed,
+          creator_efficiency_score: efficiencyScore,
+        })
+        .eq('id', puzzle.id);
+
+      if (updateError) {
+        console.error('Error updating creator stats:', updateError);
+        return NextResponse.json(
+          { error: 'Failed to update creator stats' },
+          { status: 500 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        efficiencyScore,
+        beatCreator: false, // Creator can't beat themselves
+        creatorScore: efficiencyScore,
+        isCreator: true,
+      });
+    }
 
     // Check if player beat the creator
     const beatCreator = didBeatCreator(efficiencyScore, puzzle.creator_efficiency_score);

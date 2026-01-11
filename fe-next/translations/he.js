@@ -3113,6 +3113,7 @@ const he = {
     "guestModeNotice": "משחק כאורח",
     "guestModeBenefits": "הירשמו כדי לעקוב אחר התקדמות, לבנות רצף ולהתחרות בטבלאות",
     "createCustomChallenge": "צור אתגר משלך ושתף עם חברים",
+    "signUpRequired": "⭐ הירשם כדי ליצור אתגרים",
     "createChallengeTitle": "יצירת אתגר",
     "chooseBoardSize": "בחרו גודל לוח",
     "generateChallenge": "ייצור אתגר",

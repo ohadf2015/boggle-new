@@ -3111,6 +3111,7 @@ const ja = {
     "guestModeNotice": "ゲストとしてプレイ中",
     "guestModeBenefits": "登録して進捗を追跡、連続記録を作成、ランキングに参加しましょう",
     "createCustomChallenge": "自分のチャレンジを作成して友達と共有",
+    "signUpRequired": "⭐ チャレンジを作成するにはサインアップ",
     "createChallengeTitle": "チャレンジを作成",
     "chooseBoardSize": "ボードサイズを選択",
     "generateChallenge": "チャレンジを生成",

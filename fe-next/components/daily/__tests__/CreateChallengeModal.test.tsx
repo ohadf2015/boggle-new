@@ -24,7 +24,6 @@ describe('CreateChallengeModal - Translation & Responsive Design', () => {
       expect(modalCode).toContain("t('daily.challengeCreatedDesc')");
       expect(modalCode).toContain("t('daily.shareChallenge')");
       expect(modalCode).toContain("t('daily.canPlayYourself')");
-      expect(modalCode).toContain("t('daily.boardWillBeGenerated'");
     });
 
     it('should import useLanguage hook', () => {

@@ -235,7 +235,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       <h3 className="text-lg sm:text-xl font-black mb-1 text-neo-black uppercase tracking-tight">
                         {t('daily.chooseBoardSize')}
                       </h3>
-                      <p className="text-xs sm:text-sm text-gray-600">{t('daily.pickDifficulty')}</p>
+                      <p className="text-xs sm:text-sm text-gray-800">{t('daily.pickDifficulty')}</p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
@@ -325,7 +325,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         min: 4,
                         max: 8
                       })}
-                      className={`w-full px-4 py-3 text-lg font-bold border-neo-thick rounded-xl shadow-hard-sm focus:shadow-hard focus:outline-none transition-all ${
+                      className={`w-full px-4 py-3 text-lg font-bold text-neo-black border-neo-thick rounded-xl shadow-hard-sm focus:shadow-hard focus:outline-none transition-all ${
                         wordError
                           ? 'border-red-500 bg-red-50'
                           : 'border-neo-black bg-neo-white focus:border-neo-cyan'
@@ -491,7 +491,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     <h3 className="font-black text-2xl sm:text-3xl mb-2 text-neo-black uppercase tracking-tight">
                       {t('daily.challengeCreated')}
                     </h3>
-                    <p className="text-base text-gray-700 font-medium">{t('daily.challengeCreatedDesc')}</p>
+                    <p className="text-base text-gray-800 font-medium">{t('daily.challengeCreatedDesc')}</p>
                   </motion.div>
 
                   {/* Share URL Box */}

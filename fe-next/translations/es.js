@@ -3109,6 +3109,7 @@ const es = {
     "guestModeNotice": "Jugando como invitado",
     "guestModeBenefits": "Regístrate para seguir tu progreso, crear rachas y competir en clasificaciones",
     "createCustomChallenge": "Crea tu Propio Desafío y Comparte con Amigos",
+    "signUpRequired": "⭐ Regístrate para crear desafíos",
     "createChallengeTitle": "Crear Desafío",
     "chooseBoardSize": "Elige el Tamaño del Tablero",
     "generateChallenge": "Generar Desafío",
