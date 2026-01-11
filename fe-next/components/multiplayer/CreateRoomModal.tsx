@@ -187,19 +187,15 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <Dialog open={isOpen} onOpenChange={(open) => {
+        // Only allow closing if avatar picker is not open
+        if (!open && !showAvatarPicker) {
+          onClose();
+        }
+      }}>
         <DialogContent
           noDescription
           className="max-w-sm sm:max-w-md"
-          onInteractOutside={(e) => {
-            if (showAvatarPicker) {
-              const target = e.target as HTMLElement;
-              const isClickInsideAvatarPicker = target.closest('[role="dialog"][aria-modal="true"]');
-              if (!isClickInsideAvatarPicker) {
-                e.preventDefault();
-              }
-            }
-          }}
         >
           <DialogHeader className="relative pr-14 sm:pr-16 rtl:pr-0 rtl:pl-14 sm:rtl:pl-16">
             <DialogTitle className={cn("text-lg font-black uppercase truncate", dir === 'rtl' ? 'text-right' : 'text-left')}>

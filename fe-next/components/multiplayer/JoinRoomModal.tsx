@@ -150,19 +150,15 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <Dialog open={isOpen} onOpenChange={(open) => {
+        // Only allow closing if avatar picker is not open
+        if (!open && !showAvatarPicker) {
+          onClose();
+        }
+      }}>
         <DialogContent
           noDescription
           className="max-w-sm sm:max-w-md"
-          onInteractOutside={(e) => {
-            if (showAvatarPicker) {
-              const target = e.target as HTMLElement;
-              const isClickInsideAvatarPicker = target.closest('[role="dialog"][aria-modal="true"]');
-              if (!isClickInsideAvatarPicker) {
-                e.preventDefault();
-              }
-            }
-          }}
         >
           <DialogHeader>
             <DialogTitle>{t('multiplayerFlow.joinModal.title') || 'Join Room'}</DialogTitle>
