@@ -366,35 +366,17 @@ Generate exactly ${dates.length} words. Respond with ONLY valid JSON (no markdow
 }`;
 
   try {
-    // Check if AI service is configured
-    const isConfigured = await gameAIService.isConfigured();
-    if (!isConfigured) {
-      throw new Error('Vertex AI service not configured - GOOGLE_CREDENTIALS_JSON required');
-    }
-
-    // Use Vertex AI through gameAIService
-    // Access the internal model directly for custom generation
-    const status = gameAIService.getStatus();
-    if (!status.vertexAI) {
-      throw new Error('Vertex AI not initialized');
-    }
-
-    // Since gameAIService doesn't have a generic generateContent method,
-    // we'll use the internal model directly through a workaround
+    // Initialize the AI service
+    await gameAIService.initialize();
+    
+    // Access the model through the service
     // @ts-ignore - Access private model for custom prompt
     const model = gameAIService['model'];
     if (!model) {
       throw new Error('Vertex AI model not available');
     }
 
-    const result = await model.generateContent({
-      contents: [{ role: 'user', parts: [{ text: prompt }] }],
-      generationConfig: {
-        temperature: 0.8,
-        maxOutputTokens: 2000,
-        responseMimeType: 'application/json'
-      }
-    });
+    const result = await model.generateContent(prompt);
 
     const response = result.response;
     const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
