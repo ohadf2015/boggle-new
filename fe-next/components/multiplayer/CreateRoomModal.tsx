@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { Pencil } from 'lucide-react';
+import { Pencil, Check } from 'lucide-react';
+import { motion } from 'framer-motion';
 import {
   Dialog,
   DialogContent,
@@ -14,8 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import EmojiAvatarPicker, { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
-import Avatar from '@/components/Avatar';
+import { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
 import { LanguageSelector } from '@/components/join/LanguageSelector';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
@@ -42,17 +42,12 @@ interface CreateRoomModalProps {
   isCreating: boolean;
   onCreate: (config: CreateRoomConfig) => void;
   defaultLanguage: Language;
-
-  // Profile data (pre-populated)
   isAuthenticated: boolean;
   displayName: string | null;
   profilePictureUrl?: string | null;
   profileAvatarId?: string;
 }
 
-/**
- * CreateRoomModal - Simple modal for creating a room with pre-populated profile
- */
 const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   isOpen,
   onClose,
@@ -66,41 +61,32 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
 }) => {
   const { t, dir } = useLanguage();
 
-  // Form state
   const [username, setUsername] = useState<string>('');
   const [avatarId, setAvatarId] = useState<string>('');
   const [roomName, setRoomName] = useState<string>('');
   const [language, setLanguage] = useState<Language>(defaultLanguage);
   const [isEditingName, setIsEditingName] = useState(false);
-  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
-  // Initialize form with stored/profile data when modal opens
   useEffect(() => {
     if (!isOpen) return;
 
-    // Reset language to default
     setLanguage(defaultLanguage);
     setRoomName('');
 
-    // Get initial values from storage or profile
     if (isAuthenticated && displayName) {
       setUsername(displayName);
-      // Prioritize profile picture - use PROFILE_AVATAR_ID to show it
-      // If no profile picture, fall back to profile avatar ID or PROFILE_AVATAR_ID marker
       if (profilePictureUrl) {
         setAvatarId(PROFILE_AVATAR_ID);
       } else {
         setAvatarId(profileAvatarId || PROFILE_AVATAR_ID);
       }
     } else {
-      // Guest user - check localStorage
       const storedUsername = getStoredUsername();
       const storedAvatarId = getStoredAvatarId();
 
       if (storedUsername) {
         setUsername(storedUsername);
       } else {
-        // Generate random name from avatar
         const randomAvatar = getRandomAvatar();
         setUsername(randomAvatar.name);
         setAvatarId(randomAvatar.id);
@@ -109,41 +95,25 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
       if (storedAvatarId) {
         setAvatarId(storedAvatarId);
       } else if (!avatarId) {
-        // If no avatar set yet, use random
         const randomAvatar = getRandomAvatar();
         setAvatarId(randomAvatar.id);
       }
     }
   }, [isOpen, isAuthenticated, displayName, profileAvatarId, profilePictureUrl, defaultLanguage, avatarId]);
 
-  // Handle avatar picker save
-  const handleAvatarSave = useCallback(
-    (selection: { avatarImage: string; emoji?: string; color?: string }) => {
-      setAvatarId(selection.avatarImage);
-      setShowAvatarPicker(false);
-    },
-    []
-  );
-
-  // Generate room name if empty
   const generateRoomName = useCallback((hostName: string): string => {
-    // Sanitize room name - remove apostrophes and special chars
     const sanitized = hostName.replace(/[']/g, '').trim();
     return `${sanitized} Room`;
   }, []);
 
-  // Handle create submission
   const handleCreate = useCallback(() => {
     if (!username.trim() || !avatarId) return;
 
-    // Save to localStorage for guests
     if (!isAuthenticated) {
       setStoredUsername(username.trim());
       setStoredAvatarId(avatarId);
     }
 
-    // Use provided room name or generate one, then sanitize for backend compatibility
-    // Desktop: Allow empty room name (same as mobile) - will use random name logic
     const finalRoomName = roomName.trim() 
       ? sanitizeRoomName(roomName.trim())
       : sanitizeRoomName(generateRoomName(username.trim()));
@@ -156,174 +126,165 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
     });
   }, [username, avatarId, roomName, language, isAuthenticated, onCreate, generateRoomName]);
 
-  // Get avatar display props
-  const getAvatarDisplayProps = () => {
-    if (avatarId === PROFILE_AVATAR_ID) {
-      return {
-        profilePictureUrl: profilePictureUrl || undefined,
-        avatarImage: profileAvatarId,
-      };
-    }
-    return {
-      avatarImage: avatarId,
-    };
-  };
-
-  // Get avatar path for display
-  const getAvatarImagePath = () => {
-    if (avatarId === PROFILE_AVATAR_ID) {
-      if (profilePictureUrl) return profilePictureUrl;
-      if (profileAvatarId) return getAvatarPath(profileAvatarId);
-    }
-    if (avatarId) {
-      const avatar = AVATARS.find((a) => a.id === avatarId);
-      if (avatar) return getAvatarPath(avatar);
-    }
-    return null;
-  };
-
+  const isUsingProfilePicture = avatarId === PROFILE_AVATAR_ID;
+  const hasProfilePicture = !!profilePictureUrl;
   const isValid = username.trim().length >= 2 && avatarId;
-  const avatarImagePath = getAvatarImagePath();
 
   return (
-    <>
-      <Dialog open={isOpen} onOpenChange={(open) => {
-        // Only allow closing if avatar picker is not open
-        if (!open && !showAvatarPicker) {
-          onClose();
-        }
-      }}>
-        <DialogContent
-          noDescription
-          className="max-w-sm sm:max-w-md"
-        >
-          <DialogHeader className="relative pr-14 sm:pr-16 rtl:pr-0 rtl:pl-14 sm:rtl:pl-16">
-            <DialogTitle className={cn("text-lg font-black uppercase truncate", dir === 'rtl' ? 'text-right' : 'text-left')}>
-              {t('multiplayerFlow.createModal.title') || 'Create Room'}
-            </DialogTitle>
-          </DialogHeader>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent noDescription className="max-w-sm sm:max-w-md">
+        <DialogHeader className="relative pr-14 sm:pr-16 rtl:pr-0 rtl:pl-14 sm:rtl:pl-16">
+          <DialogTitle className={cn("text-lg font-black uppercase truncate", dir === 'rtl' ? 'text-right' : 'text-left')}>
+            {t('multiplayerFlow.createModal.title') || 'Create Room'}
+          </DialogTitle>
+        </DialogHeader>
 
-          <DialogBody className="space-y-5">
-            {/* Profile Section */}
-            <div className="flex items-center gap-4 p-4 bg-slate-100 dark:bg-slate-700/50 rounded-neo border-2 border-neo-black/20 dark:border-slate-600">
-              {/* Avatar Button */}
-              <button
-                type="button"
-                onClick={() => setShowAvatarPicker(true)}
-                className="relative flex-shrink-0 group"
-                aria-label={t('multiplayerFlow.createModal.changeAvatar') || 'Change avatar'}
-              >
-                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-3 border-neo-black shadow-hard group-hover:shadow-hard-lg transition-all">
-                  {avatarImagePath ? (
-                    <Image
-                      src={avatarImagePath}
-                      alt="Avatar"
-                      width={64}
-                      height={64}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full">
-                      <Avatar {...getAvatarDisplayProps()} size="xl" />
+        <DialogBody className="space-y-4">
+          <div className="space-y-2">
+            <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
+              {t('profile.chooseAvatar') || 'Choose Avatar'}
+            </Label>
+            <div className="grid grid-cols-6 gap-1.5 sm:gap-2">
+              {hasProfilePicture && (
+                <motion.button
+                  type="button"
+                  onClick={() => setAvatarId(PROFILE_AVATAR_ID)}
+                  className={cn(
+                    'relative aspect-square rounded-neo border-2 overflow-hidden',
+                    'transition-all hover:scale-105 active:scale-95',
+                    'min-h-[40px] min-w-[40px]',
+                    isUsingProfilePicture
+                      ? 'border-neo-cyan ring-2 ring-neo-cyan scale-105'
+                      : 'border-neo-black hover:border-neo-cyan/50'
+                  )}
+                  whileHover={{ scale: isUsingProfilePicture ? 1.05 : 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Image
+                    src={profilePictureUrl!}
+                    alt="Your Profile"
+                    fill
+                    className="object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                  {isUsingProfilePicture && (
+                    <div className="absolute inset-0 bg-neo-cyan/20 flex items-center justify-center">
+                      <div className="bg-neo-cyan text-neo-black border-2 border-neo-black rounded-full w-5 h-5 flex items-center justify-center">
+                        <Check className="w-3 h-3" />
+                      </div>
                     </div>
                   )}
-                </div>
-                <div className="absolute -bottom-1 -right-1 rtl:-right-auto rtl:-left-1 w-6 h-6 bg-neo-cyan rounded-full border-2 border-neo-black flex items-center justify-center">
-                  <Pencil className="w-3 h-3 text-neo-black" />
-                </div>
-              </button>
+                  <div className="absolute bottom-0 left-0 right-0 bg-neo-black/80 text-white text-[7px] font-bold text-center py-0.5">
+                    {t('profile.you') || 'YOU'}
+                  </div>
+                </motion.button>
+              )}
 
-              {/* Name Section */}
-              <div className="flex-1 min-w-0">
-                {isEditingName ? (
-                  <Input
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    onBlur={() => setIsEditingName(false)}
-                    onKeyDown={(e) => e.key === 'Enter' && setIsEditingName(false)}
-                    maxLength={20}
-                    autoFocus
-                    className="font-bold text-lg"
-                    placeholder={t('multiplayerFlow.createModal.namePlaceholder') || 'Your name'}
-                  />
-                ) : (
-                  <button
+              {AVATARS.map((avatar) => {
+                const isSelected = !isUsingProfilePicture && avatar.id === avatarId;
+                return (
+                  <motion.button
+                    key={avatar.id}
                     type="button"
-                    onClick={() => !isAuthenticated && setIsEditingName(true)}
-                    disabled={isAuthenticated}
-                    className={`text-start w-full ${!isAuthenticated ? 'cursor-pointer hover:bg-neo-black/5 dark:hover:bg-white/5 rounded px-2 -mx-2 py-1 -my-1' : 'cursor-default'}`}
-                  >
-                    <p className="font-bold text-lg text-neo-black dark:text-neo-white truncate flex items-center gap-2">
-                      {username || t('multiplayerFlow.createModal.namePlaceholder') || 'Your name'}
-                      {!isAuthenticated && <Pencil className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />}
-                    </p>
-                    {isAuthenticated && (
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        {t('multiplayerFlow.createModal.authenticatedHint') || 'Signed in'}
-                      </p>
+                    onClick={() => setAvatarId(avatar.id)}
+                    className={cn(
+                      'relative aspect-square rounded-neo border-2 overflow-hidden',
+                      'transition-all hover:scale-105 active:scale-95',
+                      'min-h-[40px] min-w-[40px]',
+                      isSelected
+                        ? 'border-neo-cyan ring-2 ring-neo-cyan scale-105'
+                        : 'border-neo-black hover:border-neo-cyan/50'
                     )}
-                  </button>
-                )}
-              </div>
+                    whileHover={{ scale: isSelected ? 1.05 : 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Image
+                      src={getAvatarPath(avatar)}
+                      alt={avatar.name}
+                      fill
+                      className="object-cover"
+                    />
+                    {isSelected && (
+                      <div className="absolute inset-0 bg-neo-cyan/20 flex items-center justify-center">
+                        <div className="bg-neo-cyan text-neo-black border-2 border-neo-black rounded-full w-5 h-5 flex items-center justify-center">
+                          <Check className="w-3 h-3" />
+                        </div>
+                      </div>
+                    )}
+                  </motion.button>
+                );
+              })}
             </div>
+          </div>
 
-            {/* Room Settings */}
-            <div className="space-y-4">
-              {/* Room Name Input */}
-              <div className="space-y-1.5">
-                <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
-                  {t('multiplayerFlow.createModal.roomNameLabel') || 'Room Name'}{' '}
-                  <span className="font-normal text-slate-400">
-                    ({t('multiplayerFlow.createModal.optional') || 'optional'})
-                  </span>
-                </Label>
-                <Input
-                  value={roomName}
-                  onChange={(e) => setRoomName(e.target.value)}
-                  maxLength={30}
-                  placeholder={generateRoomName(username || 'Your')}
-                  className="bg-slate-100 dark:bg-slate-700/50"
-                />
+          <div className="space-y-1.5">
+            <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
+              {t('multiplayerFlow.createModal.yourName') || 'Your Name'}
+            </Label>
+            {isAuthenticated ? (
+              <div className="flex items-center gap-2 px-3 py-2.5 bg-slate-100 dark:bg-slate-700/50 rounded-neo border-2 border-neo-black/20">
+                <span className="font-bold text-neo-black dark:text-neo-white">{username}</span>
+                <span className="text-xs text-slate-500">({t('multiplayerFlow.createModal.authenticatedHint') || 'Signed in'})</span>
               </div>
+            ) : isEditingName ? (
+              <Input
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                onBlur={() => setIsEditingName(false)}
+                onKeyDown={(e) => e.key === 'Enter' && setIsEditingName(false)}
+                maxLength={20}
+                autoFocus
+                className="font-bold"
+                placeholder={t('multiplayerFlow.createModal.namePlaceholder') || 'Your name'}
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsEditingName(true)}
+                className="w-full flex items-center justify-between px-3 py-2.5 bg-slate-100 dark:bg-slate-700/50 rounded-neo border-2 border-neo-black/20 hover:border-neo-cyan/50 transition-colors"
+              >
+                <span className="font-bold text-neo-black dark:text-neo-white truncate">
+                  {username || t('multiplayerFlow.createModal.namePlaceholder') || 'Your name'}
+                </span>
+                <Pencil className="w-4 h-4 text-slate-400 flex-shrink-0" />
+              </button>
+            )}
+          </div>
 
-              {/* Language Selector */}
-              <LanguageSelector selectedLanguage={language} onLanguageChange={setLanguage} />
-            </div>
-          </DialogBody>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
+              {t('multiplayerFlow.createModal.roomNameLabel') || 'Room Name'}{' '}
+              <span className="font-normal text-slate-400">
+                ({t('multiplayerFlow.createModal.optional') || 'optional'})
+              </span>
+            </Label>
+            <Input
+              value={roomName}
+              onChange={(e) => setRoomName(e.target.value)}
+              maxLength={30}
+              placeholder={generateRoomName(username || 'Your')}
+              className="bg-slate-100 dark:bg-slate-700/50"
+            />
+          </div>
 
-          <DialogFooter>
-            <Button
-              variant="success"
-              size="lg"
-              onClick={handleCreate}
-              disabled={!isValid || isCreating}
-              className="w-full font-bold uppercase"
-            >
-              {isCreating
-                ? t('multiplayerFlow.createModal.creating') || 'Creating...'
-                : t('multiplayerFlow.createModal.createButton') || 'Create Room'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          <LanguageSelector selectedLanguage={language} onLanguageChange={setLanguage} />
+        </DialogBody>
 
-      {/* Avatar Picker Modal */}
-      <EmojiAvatarPicker
-        isOpen={showAvatarPicker}
-        onClose={() => setShowAvatarPicker(false)}
-        onSave={handleAvatarSave}
-        currentAvatarImage={avatarId}
-        profileAvatar={
-          isAuthenticated
-            ? {
-                profilePictureUrl,
-                avatarImage: profileAvatarId,
-                displayName: displayName || undefined,
-              }
-            : undefined
-        }
-      />
-    </>
+        <DialogFooter>
+          <Button
+            variant="success"
+            size="lg"
+            onClick={handleCreate}
+            disabled={!isValid || isCreating}
+            className="w-full font-bold uppercase"
+          >
+            {isCreating
+              ? t('multiplayerFlow.createModal.creating') || 'Creating...'
+              : t('multiplayerFlow.createModal.createButton') || 'Create Room'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

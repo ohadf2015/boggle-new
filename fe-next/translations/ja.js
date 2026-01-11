@@ -606,6 +606,7 @@ const ja = {
     "joinModal": {
       "title": "ルームに参加",
       "changeAvatar": "アバター変更",
+      "yourName": "あなたの名前",
       "namePlaceholder": "あなたの名前",
       "authenticatedHint": "ログイン済み",
       "joinButton": "参加",
@@ -614,6 +615,7 @@ const ja = {
     "createModal": {
       "title": "ルーム作成",
       "changeAvatar": "アバター変更",
+      "yourName": "あなたの名前",
       "namePlaceholder": "あなたの名前",
       "authenticatedHint": "ログイン済み",
       "roomNameLabel": "ルーム名",

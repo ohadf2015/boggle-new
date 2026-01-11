@@ -610,6 +610,7 @@ const en = {
     "joinModal": {
       "title": "Join Room",
       "changeAvatar": "Change avatar",
+      "yourName": "Your Name",
       "namePlaceholder": "Your name",
       "authenticatedHint": "Signed in",
       "joinButton": "Join Game",
@@ -618,6 +619,7 @@ const en = {
     "createModal": {
       "title": "Create Room",
       "changeAvatar": "Change avatar",
+      "yourName": "Your Name",
       "namePlaceholder": "Your name",
       "authenticatedHint": "Signed in",
       "roomNameLabel": "Room Name",

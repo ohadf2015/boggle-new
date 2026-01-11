@@ -8,9 +8,44 @@
       "ja": 3201,
       "es": 3202
     },
-    "missingFromEnglish": 0
+    "missingFromEnglish": 2
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "multiplayerFlow.createModal.yourName",
+      "usages": [
+        {
+          "file": "components/multiplayer/CreateRoomModal.tsx",
+          "line": 222
+        },
+        {
+          "file": "components/multiplayer/CreateRoomModal.tsx",
+          "line": 222
+        },
+        {
+          "file": "components/multiplayer/CreateRoomModal.tsx",
+          "line": 222
+        }
+      ]
+    },
+    {
+      "key": "multiplayerFlow.joinModal.yourName",
+      "usages": [
+        {
+          "file": "components/multiplayer/JoinRoomModal.tsx",
+          "line": 204
+        },
+        {
+          "file": "components/multiplayer/JoinRoomModal.tsx",
+          "line": 204
+        },
+        {
+          "file": "components/multiplayer/JoinRoomModal.tsx",
+          "line": 204
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [],
     "sv": [],

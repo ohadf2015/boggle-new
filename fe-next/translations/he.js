@@ -607,6 +607,7 @@ const he = {
     "joinModal": {
       "title": "הצטרף לחדר",
       "changeAvatar": "שנה אווטאר",
+      "yourName": "השם שלך",
       "namePlaceholder": "השם שלך",
       "authenticatedHint": "מחובר",
       "joinButton": "הצטרף למשחק",
@@ -615,6 +616,7 @@ const he = {
     "createModal": {
       "title": "צור חדר",
       "changeAvatar": "שנה אווטאר",
+      "yourName": "השם שלך",
       "namePlaceholder": "השם שלך",
       "authenticatedHint": "מחובר",
       "roomNameLabel": "שם החדר",

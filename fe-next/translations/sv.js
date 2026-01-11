@@ -606,6 +606,7 @@ const sv = {
     "joinModal": {
       "title": "Gå med i rum",
       "changeAvatar": "Byt avatar",
+      "yourName": "Ditt namn",
       "namePlaceholder": "Ditt namn",
       "authenticatedHint": "Inloggad",
       "joinButton": "Gå med",
@@ -614,6 +615,7 @@ const sv = {
     "createModal": {
       "title": "Skapa rum",
       "changeAvatar": "Byt avatar",
+      "yourName": "Ditt namn",
       "namePlaceholder": "Ditt namn",
       "authenticatedHint": "Inloggad",
       "roomNameLabel": "Rumsnamn",

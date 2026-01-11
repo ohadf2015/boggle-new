@@ -603,6 +603,7 @@ const es = {
     "joinModal": {
       "title": "Unirse a sala",
       "changeAvatar": "Cambiar avatar",
+      "yourName": "Tu nombre",
       "namePlaceholder": "Tu nombre",
       "authenticatedHint": "Sesión iniciada",
       "joinButton": "Unirse",
@@ -611,6 +612,7 @@ const es = {
     "createModal": {
       "title": "Crear sala",
       "changeAvatar": "Cambiar avatar",
+      "yourName": "Tu nombre",
       "namePlaceholder": "Tu nombre",
       "authenticatedHint": "Sesión iniciada",
       "roomNameLabel": "Nombre de sala",

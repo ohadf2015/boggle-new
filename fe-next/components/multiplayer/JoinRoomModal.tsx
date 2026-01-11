@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { Pencil, Users } from 'lucide-react';
+import { Pencil, Users, Check } from 'lucide-react';
+import { motion } from 'framer-motion';
 import {
   Dialog,
   DialogContent,
@@ -13,8 +14,8 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import EmojiAvatarPicker, { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
-import Avatar from '@/components/Avatar';
+import { Label } from '@/components/ui/label';
+import { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LANGUAGE_FLAGS } from '@/lib/languageConfig';
 import {
@@ -24,6 +25,7 @@ import {
   setStoredAvatarId,
 } from '@/utils/profileStorage';
 import { AVATARS, getAvatarPath, getRandomAvatar } from '@/utils/avatarConfig';
+import { cn } from '@/lib/utils';
 import type { ActiveRoom } from '@/shared/types/game';
 
 interface JoinRoomModalProps {
@@ -32,17 +34,12 @@ interface JoinRoomModalProps {
   room: ActiveRoom | null;
   isJoining: boolean;
   onJoin: (username: string, avatarId: string) => void;
-
-  // Profile data (pre-populated)
   isAuthenticated: boolean;
   displayName: string | null;
   profilePictureUrl?: string | null;
   profileAvatarId?: string;
 }
 
-/**
- * JoinRoomModal - Simple modal for joining a room with pre-populated profile
- */
 const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
   isOpen,
   onClose,
@@ -56,30 +53,23 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
 }) => {
   const { t } = useLanguage();
 
-  // Form state
   const [username, setUsername] = useState<string>('');
   const [avatarId, setAvatarId] = useState<string>('');
   const [isEditingName, setIsEditingName] = useState(false);
-  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
 
-  // Initialize form with stored/profile data when modal opens
   useEffect(() => {
     if (!isOpen) return;
 
-    // Get initial values from storage or profile
     if (isAuthenticated && displayName) {
       setUsername(displayName);
-      // Use profile avatar ID or special PROFILE_AVATAR_ID marker
       setAvatarId(profileAvatarId || PROFILE_AVATAR_ID);
     } else {
-      // Guest user - check localStorage
       const storedUsername = getStoredUsername();
       const storedAvatarId = getStoredAvatarId();
 
       if (storedUsername) {
         setUsername(storedUsername);
       } else {
-        // Generate random name from avatar
         const randomAvatar = getRandomAvatar();
         setUsername(randomAvatar.name);
         setAvatarId(randomAvatar.id);
@@ -88,27 +78,15 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
       if (storedAvatarId) {
         setAvatarId(storedAvatarId);
       } else if (!avatarId) {
-        // If no avatar set yet, use random
         const randomAvatar = getRandomAvatar();
         setAvatarId(randomAvatar.id);
       }
     }
   }, [isOpen, isAuthenticated, displayName, profileAvatarId, avatarId]);
 
-  // Handle avatar picker save
-  const handleAvatarSave = useCallback(
-    (selection: { avatarImage: string; emoji?: string; color?: string }) => {
-      setAvatarId(selection.avatarImage);
-      setShowAvatarPicker(false);
-    },
-    []
-  );
-
-  // Handle join submission
   const handleJoin = useCallback(() => {
     if (!username.trim() || !avatarId) return;
 
-    // Save to localStorage for guests
     if (!isAuthenticated) {
       setStoredUsername(username.trim());
       setStoredAvatarId(avatarId);
@@ -117,165 +95,160 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
     onJoin(username.trim(), avatarId);
   }, [username, avatarId, isAuthenticated, onJoin]);
 
-  // Get avatar display props
-  const getAvatarDisplayProps = () => {
-    if (avatarId === PROFILE_AVATAR_ID) {
-      return {
-        profilePictureUrl: profilePictureUrl || undefined,
-        avatarImage: profileAvatarId,
-      };
-    }
-    return {
-      avatarImage: avatarId,
-    };
-  };
-
-  // Get avatar path for display
-  const getAvatarImagePath = () => {
-    if (avatarId === PROFILE_AVATAR_ID) {
-      if (profilePictureUrl) return profilePictureUrl;
-      if (profileAvatarId) return getAvatarPath(profileAvatarId);
-    }
-    if (avatarId) {
-      const avatar = AVATARS.find((a) => a.id === avatarId);
-      if (avatar) return getAvatarPath(avatar);
-    }
-    return null;
-  };
-
   if (!room) return null;
 
+  const isUsingProfilePicture = avatarId === PROFILE_AVATAR_ID;
+  const hasProfilePicture = !!profilePictureUrl;
   const isValid = username.trim().length >= 2 && avatarId;
-  const avatarImagePath = getAvatarImagePath();
 
   return (
-    <>
-      <Dialog open={isOpen} onOpenChange={(open) => {
-        // Only allow closing if avatar picker is not open
-        if (!open && !showAvatarPicker) {
-          onClose();
-        }
-      }}>
-        <DialogContent
-          noDescription
-          className="max-w-sm sm:max-w-md"
-        >
-          <DialogHeader>
-            <DialogTitle>{t('multiplayerFlow.joinModal.title') || 'Join Room'}</DialogTitle>
-          </DialogHeader>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent noDescription className="max-w-sm sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{t('multiplayerFlow.joinModal.title') || 'Join Room'}</DialogTitle>
+        </DialogHeader>
 
-          <DialogBody className="space-y-4">
-            {/* Room Info */}
-            <div className="flex items-center gap-3 p-3 bg-slate-100 dark:bg-slate-800 rounded-neo border-2 border-neo-black/20">
-              <span className="text-2xl">{LANGUAGE_FLAGS[room.language] || '🎮'}</span>
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-neo-black dark:text-neo-white truncate">
-                  {room.roomName || room.gameCode}
-                </p>
-                <p className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-1">
-                  <Users className="w-3.5 h-3.5" />
-                  {room.playerCount || 0} {t('joinView.players') || 'players'}
-                </p>
-              </div>
+        <DialogBody className="space-y-4">
+          <div className="flex items-center gap-3 p-3 bg-slate-100 dark:bg-slate-800 rounded-neo border-2 border-neo-black/20">
+            <span className="text-2xl">{LANGUAGE_FLAGS[room.language] || '🎮'}</span>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-neo-black dark:text-neo-white truncate">
+                {room.roomName || room.gameCode}
+              </p>
+              <p className="text-sm text-slate-600 dark:text-slate-300 flex items-center gap-1">
+                <Users className="w-3.5 h-3.5" />
+                {room.playerCount || 0} {t('joinView.players') || 'players'}
+              </p>
             </div>
+          </div>
 
-            {/* Profile Section */}
-            <div className="flex items-center gap-4 p-4 bg-neo-cream dark:bg-slate-700 rounded-neo border-3 border-neo-black text-neo-black dark:text-neo-white">
-              {/* Avatar Button */}
-              <button
-                type="button"
-                onClick={() => setShowAvatarPicker(true)}
-                className="relative flex-shrink-0 group"
-                aria-label={t('multiplayerFlow.joinModal.changeAvatar') || 'Change avatar'}
-              >
-                <div className="w-16 h-16 rounded-full overflow-hidden border-3 border-neo-black shadow-hard group-hover:shadow-hard-lg transition-all">
-                  {avatarImagePath ? (
+          <div className="space-y-2">
+            <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
+              {t('profile.chooseAvatar') || 'Choose Avatar'}
+            </Label>
+            <div className="grid grid-cols-6 gap-1.5 sm:gap-2">
+              {hasProfilePicture && (
+                <motion.button
+                  type="button"
+                  onClick={() => setAvatarId(PROFILE_AVATAR_ID)}
+                  className={cn(
+                    'relative aspect-square rounded-neo border-2 overflow-hidden',
+                    'transition-all hover:scale-105 active:scale-95',
+                    'min-h-[40px] min-w-[40px]',
+                    isUsingProfilePicture
+                      ? 'border-neo-cyan ring-2 ring-neo-cyan scale-105'
+                      : 'border-neo-black hover:border-neo-cyan/50'
+                  )}
+                  whileHover={{ scale: isUsingProfilePicture ? 1.05 : 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Image
+                    src={profilePictureUrl!}
+                    alt="Your Profile"
+                    fill
+                    className="object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                  {isUsingProfilePicture && (
+                    <div className="absolute inset-0 bg-neo-cyan/20 flex items-center justify-center">
+                      <div className="bg-neo-cyan text-neo-black border-2 border-neo-black rounded-full w-5 h-5 flex items-center justify-center">
+                        <Check className="w-3 h-3" />
+                      </div>
+                    </div>
+                  )}
+                  <div className="absolute bottom-0 left-0 right-0 bg-neo-black/80 text-white text-[7px] font-bold text-center py-0.5">
+                    {t('profile.you') || 'YOU'}
+                  </div>
+                </motion.button>
+              )}
+
+              {AVATARS.map((avatar) => {
+                const isSelected = !isUsingProfilePicture && avatar.id === avatarId;
+                return (
+                  <motion.button
+                    key={avatar.id}
+                    type="button"
+                    onClick={() => setAvatarId(avatar.id)}
+                    className={cn(
+                      'relative aspect-square rounded-neo border-2 overflow-hidden',
+                      'transition-all hover:scale-105 active:scale-95',
+                      'min-h-[40px] min-w-[40px]',
+                      isSelected
+                        ? 'border-neo-cyan ring-2 ring-neo-cyan scale-105'
+                        : 'border-neo-black hover:border-neo-cyan/50'
+                    )}
+                    whileHover={{ scale: isSelected ? 1.05 : 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
                     <Image
-                      src={avatarImagePath}
-                      alt="Avatar"
+                      src={getAvatarPath(avatar)}
+                      alt={avatar.name}
                       fill
-                      sizes="64px"
                       className="object-cover"
                     />
-                  ) : (
-                    <Avatar {...getAvatarDisplayProps()} size="xl" />
-                  )}
-                </div>
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-neo-cyan rounded-full border-2 border-neo-black flex items-center justify-center text-neo-black">
-                  <Pencil className="w-3 h-3 text-neo-black" />
-                </div>
-              </button>
-
-              {/* Name Section */}
-              <div className="flex-1 min-w-0">
-                {isEditingName ? (
-                  <Input
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    onBlur={() => setIsEditingName(false)}
-                    onKeyDown={(e) => e.key === 'Enter' && setIsEditingName(false)}
-                    maxLength={20}
-                    autoFocus
-                    className="font-bold text-lg"
-                    placeholder={t('multiplayerFlow.joinModal.namePlaceholder') || 'Your name'}
-                  />
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => !isAuthenticated && setIsEditingName(true)}
-                    disabled={isAuthenticated}
-                    className={`text-left w-full ${!isAuthenticated ? 'cursor-pointer hover:bg-neo-black/5 rounded px-1 -mx-1' : 'cursor-default'}`}
-                  >
-                    <p className="font-bold text-lg text-neo-black dark:text-neo-white truncate flex items-center gap-2">
-                      {username || t('multiplayerFlow.joinModal.namePlaceholder') || 'Your name'}
-                      {!isAuthenticated && (
-                        <Pencil className="w-3.5 h-3.5 text-slate-400" />
-                      )}
-                    </p>
-                    {isAuthenticated && (
-                      <p className="text-xs text-slate-500">
-                        {t('multiplayerFlow.joinModal.authenticatedHint') || 'Signed in'}
-                      </p>
+                    {isSelected && (
+                      <div className="absolute inset-0 bg-neo-cyan/20 flex items-center justify-center">
+                        <div className="bg-neo-cyan text-neo-black border-2 border-neo-black rounded-full w-5 h-5 flex items-center justify-center">
+                          <Check className="w-3 h-3" />
+                        </div>
+                      </div>
                     )}
-                  </button>
-                )}
-              </div>
+                  </motion.button>
+                );
+              })}
             </div>
-          </DialogBody>
+          </div>
 
-          <DialogFooter>
-            <Button
-              variant="default"
-              size="lg"
-              onClick={handleJoin}
-              disabled={!isValid || isJoining}
-              className="w-full bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black font-bold uppercase"
-            >
-              {isJoining
-                ? t('multiplayerFlow.joinModal.joining') || 'Joining...'
-                : t('multiplayerFlow.joinModal.joinButton') || 'Join Game'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
+              {t('multiplayerFlow.joinModal.yourName') || 'Your Name'}
+            </Label>
+            {isAuthenticated ? (
+              <div className="flex items-center gap-2 px-3 py-2.5 bg-slate-100 dark:bg-slate-700/50 rounded-neo border-2 border-neo-black/20">
+                <span className="font-bold text-neo-black dark:text-neo-white">{username}</span>
+                <span className="text-xs text-slate-500">({t('multiplayerFlow.joinModal.authenticatedHint') || 'Signed in'})</span>
+              </div>
+            ) : isEditingName ? (
+              <Input
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                onBlur={() => setIsEditingName(false)}
+                onKeyDown={(e) => e.key === 'Enter' && setIsEditingName(false)}
+                maxLength={20}
+                autoFocus
+                className="font-bold"
+                placeholder={t('multiplayerFlow.joinModal.namePlaceholder') || 'Your name'}
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsEditingName(true)}
+                className="w-full flex items-center justify-between px-3 py-2.5 bg-slate-100 dark:bg-slate-700/50 rounded-neo border-2 border-neo-black/20 hover:border-neo-cyan/50 transition-colors"
+              >
+                <span className="font-bold text-neo-black dark:text-neo-white truncate">
+                  {username || t('multiplayerFlow.joinModal.namePlaceholder') || 'Your name'}
+                </span>
+                <Pencil className="w-4 h-4 text-slate-400 flex-shrink-0" />
+              </button>
+            )}
+          </div>
+        </DialogBody>
 
-      {/* Avatar Picker Modal */}
-      <EmojiAvatarPicker
-        isOpen={showAvatarPicker}
-        onClose={() => setShowAvatarPicker(false)}
-        onSave={handleAvatarSave}
-        currentAvatarImage={avatarId}
-        profileAvatar={
-          isAuthenticated
-            ? {
-                profilePictureUrl,
-                avatarImage: profileAvatarId,
-                displayName: displayName || undefined,
-              }
-            : undefined
-        }
-      />
-    </>
+        <DialogFooter>
+          <Button
+            variant="default"
+            size="lg"
+            onClick={handleJoin}
+            disabled={!isValid || isJoining}
+            className="w-full bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black font-bold uppercase"
+          >
+            {isJoining
+              ? t('multiplayerFlow.joinModal.joining') || 'Joining...'
+              : t('multiplayerFlow.joinModal.joinButton') || 'Join Game'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
