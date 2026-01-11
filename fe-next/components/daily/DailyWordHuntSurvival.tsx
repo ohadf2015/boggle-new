@@ -8,9 +8,11 @@ import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useScreenshotProtection } from '@/hooks/useScreenshotProtection';
 import { useContextualGuidance, useSwipeTipGuidanceTrigger } from '@/hooks/useContextualGuidance';
+import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
+import KeyboardHintTooltip from '@/components/game/KeyboardHintTooltip';
 import { WordFeedbackToast } from './WordFeedbackToast';
 
 import type { LetterGrid, Language } from '@/types';
@@ -96,6 +98,15 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     15
   );
 
+  // Keyboard word input - allows typing words directly instead of swiping
+  const keyboardInput = useKeyboardWordInput({
+    grid,
+    language,
+    enabled: !state.isGameOver,
+    onWordSubmit: actions.handleWordSubmit,
+    minWordLength: 3,
+  });
+
   // Hide bottom navigation during active gameplay
   useEffect(() => {
     setIsInGame(isGameActive);
@@ -118,6 +129,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         eliminatedLetters={state.eliminatedLetters}
         onWordSubmit={actions.handleWordSubmit}
         onWordChange={actions.handleWordChange}
+        highlightedPath={keyboardInput.highlightedCells}
         lifePoints={state.lifePoints}
         isLifeGaining={state.isLifeGaining}
         attempts={state.attempts}
@@ -214,6 +226,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         eliminatedLetters={state.eliminatedLetters}
         onWordSubmit={actions.handleWordSubmit}
         onWordChange={actions.handleWordChange}
+        highlightedPath={keyboardInput.highlightedCells}
         t={t}
       />
 
@@ -223,6 +236,15 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         onDismiss={contextualGuidance.dismissSwipeTip}
         t={t}
       />
+
+      {/* Keyboard Input Hint - Desktop only */}
+      {!state.isGameOver && (
+        <KeyboardHintTooltip
+          delaySeconds={10}
+          desktopOnly={true}
+          t={t}
+        />
+      )}
 
       {/* Word Feedback Toast */}
       <WordFeedbackToast

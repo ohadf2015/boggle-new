@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Heart, Sparkles, X, Coins } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import GridComponent from '@/components/GridComponent';
+import GridComponent, { type HighlightedCell } from '@/components/GridComponent';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { WordFeedbackToast, type FeedbackType } from '../WordFeedbackToast';
 import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
@@ -22,6 +22,7 @@ export interface SurvivalLandscapeLayoutProps {
   eliminatedLetters: Set<string>;
   onWordSubmit: (word: string) => void;
   onWordChange: (word: string, count: number) => void;
+  highlightedPath?: HighlightedCell[];
 
   // Life props
   lifePoints: number;
@@ -70,6 +71,7 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
   eliminatedLetters,
   onWordSubmit,
   onWordChange,
+  highlightedPath,
 
   // Life props
   lifePoints,
@@ -180,6 +182,7 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
               hideComboIndicator
               comboLevel={0}
               eliminatedLetters={eliminatedLetters}
+              highlightedPath={highlightedPath}
             />
           </div>
         </div>

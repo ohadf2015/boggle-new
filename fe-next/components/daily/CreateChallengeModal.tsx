@@ -208,7 +208,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     <Sparkles className="w-4 h-4 text-neo-pink" fill="currentColor" />
                   </motion.div>
                 </div>
-                <h2 className="font-black text-xl sm:text-2xl uppercase tracking-tight text-neo-black drop-shadow-sm">
+                <h2 className="font-white text-xl sm:text-2xl uppercase tracking-tight text-neo-black drop-shadow-sm">
                   {t('daily.createChallengeTitle')}
                 </h2>
               </motion.div>
@@ -232,12 +232,11 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   {/* Board Size Selection */}
                   <div className="space-y-3">
                     <div className="text-center">
-                      <h3 className="text-lg sm:text-xl font-black mb-1 text-neo-black uppercase tracking-tight">
+                      <h3 className="text-lg sm:text-xl font-white mb-1 text-neo-black uppercase tracking-tight">
                         {t('daily.chooseBoardSize')}
                       </h3>
-                      <p className="text-xs sm:text-sm text-gray-800">{t('daily.pickDifficulty')}</p>
+                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">{t('daily.pickDifficulty')}</p>
                     </div>
-
                     <div className="grid grid-cols-2 gap-3">
                       <motion.button
                         onClick={() => setBoardSize(5)}
@@ -491,7 +490,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     <h3 className="font-black text-2xl sm:text-3xl mb-2 text-neo-black uppercase tracking-tight">
                       {t('daily.challengeCreated')}
                     </h3>
-                    <p className="text-base text-gray-800 font-medium">{t('daily.challengeCreatedDesc')}</p>
+                    <p className="text-base text-slate-700 dark:text-slate-300 font-medium">{t('daily.challengeCreatedDesc')}</p>
                   </motion.div>
 
                   {/* Share URL Box */}
@@ -502,7 +501,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     transition={{ delay: 0.4 }}
                   >
                     <div className="flex-1 overflow-hidden">
-                      <p className="text-xs text-gray-500 font-bold uppercase mb-1">{t('daily.challengeLink')}</p>
+                      <p className="text-xs text-slate-600 dark:text-slate-400 font-bold uppercase mb-1">{t('daily.challengeLink')}</p>
                       <p className="text-sm font-mono truncate text-neo-black font-bold">{shareUrl}</p>
                     </div>
                     <motion.button
@@ -541,7 +540,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     <Button
                       variant="ghost"
                       onClick={handleClose}
-                      className="w-full text-base font-bold text-gray-600 hover:text-neo-black hover:bg-gray-100 rounded-lg py-3"
+                      className="w-full text-base font-bold text-slate-600 dark:text-slate-300 hover:text-neo-black hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg py-3"
                     >
                       {t('daily.close')}
                     </Button>
@@ -554,7 +553,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     transition={{ delay: 0.6 }}
                     className="pt-4 border-t-3 border-gray-200"
                   >
-                    <p className="text-sm text-gray-500 font-medium flex items-center justify-center gap-2">
+                    <p className="text-sm text-slate-600 dark:text-slate-400 font-medium flex items-center justify-center gap-2">
                       <Sparkles className="w-4 h-4 text-neo-orange" />
                       {t('daily.canPlayYourself')}
                     </p>

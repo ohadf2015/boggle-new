@@ -103,8 +103,6 @@ const ModeCard: React.FC<ModeCardProps> = ({
           'cq-container',
           'cursor-pointer',
           'relative overflow-hidden',
-          // Halftone texture overlay
-          'texture-halftone-comic-light',
           // Full height to fill grid cell
           'h-full',
           // Colors

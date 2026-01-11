@@ -22,8 +22,10 @@ import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance
 import { useFirstPlayTutorial } from '@/hooks/useFirstPlayTutorial';
 import { useContextualGuidance, useSwipeTipGuidanceTrigger } from '@/hooks/useContextualGuidance';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
+import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
 import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
+import KeyboardHintTooltip from '@/components/game/KeyboardHintTooltip';
 import { cn } from '@/lib/utils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { finalizeWordValidation } from '@/utils/wordValidationAPI';
@@ -360,6 +362,15 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
     wordSubmission.submitWord(word);
   }, [isGameOver, wordSubmission]);
 
+  // Keyboard word input - allows typing words directly instead of swiping
+  const keyboardInput = useKeyboardWordInput({
+    grid,
+    language,
+    enabled: !isGameOver,
+    onWordSubmit: handleWordSubmit,
+    minWordLength: 3,
+  });
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -482,7 +493,10 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           hideComboIndicator={true}
           comboLevel={combo.comboLevel}
           highlightedPath={
-            firstPlayTutorial.tutorialPath
+            // Keyboard typing takes priority over tutorial path
+            keyboardInput.highlightedCells.length > 0
+              ? keyboardInput.highlightedCells
+              : firstPlayTutorial.tutorialPath
               ? firstPlayTutorial.tutorialPath.map(p => ({ row: p.row, col: p.col }))
               : undefined
           }
@@ -514,6 +528,15 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         onDismiss={contextualGuidance.dismissSwipeTip}
         t={t}
       />
+
+      {/* Keyboard Input Hint - Desktop only */}
+      {!isGameOver && (
+        <KeyboardHintTooltip
+          delaySeconds={10}
+          desktopOnly={true}
+          t={t}
+        />
+      )}
 
       {/* Quit Confirmation Dialog */}
       <ConfirmationDialog

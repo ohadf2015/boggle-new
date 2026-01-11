@@ -105,15 +105,21 @@ export async function POST(request: NextRequest) {
 
       const { logGameSession: logFn } = await getLoggers();
 
-      // Ensure guest_sessions record exists for guest players (to satisfy FK constraint)
+      // Ensure guest_sessions record exists for guest players (for analytics tracking)
+      // Note: This is best-effort - game session will still be logged even if this fails
       if (guestSessionId && !userId) {
-        const { getOrCreateGuestSession: createGuestFn } = await getGuestTracker();
-        await createGuestFn({
-          sessionId: guestSessionId,
-          deviceType: deviceType || null,
-          browser: browser || null,
-          language: language || null,
-        });
+        try {
+          const { getOrCreateGuestSession: createGuestFn } = await getGuestTracker();
+          await createGuestFn({
+            sessionId: guestSessionId,
+            deviceType: deviceType || null,
+            browser: browser || null,
+            language: language || null,
+          });
+        } catch (guestError) {
+          // Log error but don't fail the request - guest_sessions is supplementary
+          console.warn('[log-session] Failed to track guest session:', guestError instanceof Error ? guestError.message : 'Unknown error');
+        }
       }
 
       // Log new session

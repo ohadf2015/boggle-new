@@ -23,25 +23,29 @@ from dataclasses import dataclass, asdict
 # Color classifications based on LexiClash theme
 DARK_COLORS = {
     'neo-navy', 'neo-navy-light', 'neo-gray', 'neo-black',
-    'black', 'gray-900', 'gray-800', 'gray-700', 'slate-900', 'slate-800'
+    'black', 'gray-900', 'gray-800', 'gray-700', 'gray-600', 'gray-500',
+    'slate-900', 'slate-800', 'slate-700', 'slate-600', 'slate-500'
 }
 
 LIGHT_COLORS = {
     'neo-cream', 'neo-yellow', 'neo-lime', 'neo-cyan', 'neo-white',
-    'white', 'gray-100', 'gray-200', 'gray-300', 'slate-100', 'slate-200'
+    'white', 'gray-100', 'gray-200', 'gray-300', 'gray-400',
+    'slate-100', 'slate-200', 'slate-300', 'slate-400'
 }
 
 # Colors that work with light text
 DARK_BG_COLORS = {
     'neo-navy', 'neo-navy-light', 'neo-gray', 'neo-black',
     'neo-pink', 'neo-purple', 'neo-red',
-    'black', 'gray-900', 'gray-800', 'slate-900', 'slate-800'
+    'black', 'gray-900', 'gray-800', 'gray-700',
+    'slate-900', 'slate-800', 'slate-700'
 }
 
 # Colors that work with dark text
 LIGHT_BG_COLORS = {
     'neo-cream', 'neo-yellow', 'neo-lime', 'neo-cyan', 'neo-orange', 'neo-white',
-    'white', 'gray-100', 'gray-200', 'slate-100', 'slate-200'
+    'white', 'gray-100', 'gray-200', 'gray-300',
+    'slate-100', 'slate-200', 'slate-300'
 }
 
 
