@@ -766,7 +766,9 @@ function embedMultipleWordsInGrid(
 export function generateDailyPuzzle(
   dateString: string,
   language: Language,
-  preSelectedWord?: string
+  preSelectedWord?: string,
+  customRows?: number,
+  customCols?: number
 ): DailyPuzzle {
   // Create seed from date + language + salt
   const seedString = `${SEED_SALT}-${dateString}-${language}-v2`;
@@ -774,8 +776,8 @@ export function generateDailyPuzzle(
   const random = mulberry32(seed);
 
   // Get grid dimensions
-  const rows = DIFFICULTIES[DEFAULT_DIFFICULTY].rows;
-  const cols = DIFFICULTIES[DEFAULT_DIFFICULTY].cols;
+  const rows = customRows || DIFFICULTIES[DEFAULT_DIFFICULTY].rows;
+  const cols = customCols || DIFFICULTIES[DEFAULT_DIFFICULTY].cols;
 
   // Get letters for the language
   let letters: string[];

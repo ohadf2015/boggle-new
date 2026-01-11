@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
@@ -121,7 +121,8 @@ const SinglePlayerView: React.FC = () => {
       // Reset navigation visibility on unmount
       setIsInGame(false);
     };
-  }, [setIsInGame]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps: only run on mount/unmount, setIsInGame is stable
 
   // Check for returnTo param (e.g., returnTo=daily from training suggestion)
   const returnTo = searchParams.get('returnTo');
@@ -397,6 +398,7 @@ const SinglePlayerView: React.FC = () => {
         {phase === 'results' && resultsData && (
           <>
             <SinglePlayerResults
+              key={resultsData.gameSessionId || `results-${Date.now()}`}
               results={resultsData}
               mode={gameState.mode}
               onPlayAgain={handlePlayAgain}

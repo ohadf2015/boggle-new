@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, memo } from 'react';
+import { useRef, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { applyHebrewFinalLetters } from '../../../utils/utils';
 
@@ -48,19 +48,30 @@ export const FoundWordsList = memo<FoundWordsListProps>(({
             {foundWords.map((foundWordObj, index) => {
               const wordText = foundWordObj.word;
               const isInvalid = foundWordObj.isValid === false;
+              const isPending = foundWordObj.isValid === null || foundWordObj.isValid === undefined;
               const isLatest = index === foundWords.length - 1;
+
+              // Determine styling based on validation state
+              const getWordStyles = () => {
+                if (isInvalid) {
+                  return 'bg-neo-red text-neo-cream shadow-hard-sm line-through opacity-85';
+                }
+                if (isPending) {
+                  return 'bg-neo-cream/70 text-neo-black/70 shadow-hard-sm animate-pulse';
+                }
+                if (isLatest) {
+                  return 'bg-neo-yellow text-neo-black shadow-hard';
+                }
+                return 'bg-neo-cream text-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard';
+              };
+
               return (
                 <motion.div
                   key={`${wordText}-${foundWordObj.timestamp || index}`}
                   initial={{ x: -30, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   exit={{ x: -30, opacity: 0 }}
-                  className={`p-2 text-center font-black uppercase border-3 border-neo-black rounded-neo transition-all
-                    ${isInvalid
-                      ? 'bg-neo-red text-neo-cream shadow-hard-sm line-through opacity-85'
-                      : isLatest
-                        ? 'bg-neo-yellow text-neo-black shadow-hard'
-                        : 'bg-neo-cream text-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard'}`}
+                  className={`p-2 text-center font-black uppercase border-3 border-neo-black rounded-neo transition-all ${getWordStyles()}`}
                 >
                   {applyHebrewFinalLetters(wordText).toUpperCase()}
                 </motion.div>

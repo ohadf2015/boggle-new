@@ -285,11 +285,11 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="bg-neo-pink/20 border-2 border-neo-pink rounded-neo p-3 text-center">
                 <p className="text-xs text-gray-500 mb-1">{t('customPuzzle.yourScore') || 'Your Score'}</p>
-                <p className="text-2xl font-bold">{gameResult.efficiencyScore}</p>
+                <p className="text-2xl font-bold">{Math.round(gameResult.efficiencyScore)}</p>
               </div>
               <div className="bg-neo-yellow/20 border-2 border-neo-yellow rounded-neo p-3 text-center">
                 <p className="text-xs text-gray-500 mb-1">{t('customPuzzle.creatorScore') || 'Creator'}</p>
-                <p className="text-2xl font-bold">{puzzle.creatorEfficiencyScore}</p>
+                <p className="text-2xl font-bold">{Math.round(puzzle.creatorEfficiencyScore)}</p>
               </div>
             </div>
 
@@ -317,7 +317,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
                         <span>{entry.displayName}</span>
                         {entry.isCreator && <Crown className="w-4 h-4 text-neo-yellow" />}
                       </div>
-                      <span className="font-bold">{entry.efficiencyScore}</span>
+                      <span className="font-bold">{Math.round(entry.efficiencyScore)}</span>
                     </div>
                   ))}
                 </div>

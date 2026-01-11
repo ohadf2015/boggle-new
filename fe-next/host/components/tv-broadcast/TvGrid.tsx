@@ -20,8 +20,8 @@ const TvGrid = memo<TvGridProps>(({
   earthquakeShaking = false,
 }) => {
   return (
-    <div className="tv-grid-container w-full h-full flex items-center justify-center p-4">
-      <div className="w-full h-full max-w-[800px] max-h-[800px] aspect-square">
+    <div className="tv-grid-container w-full h-full flex items-center justify-center p-2 md:p-4">
+      <div className="w-full h-full max-w-[min(100%,800px)] max-h-[min(100%,800px)] aspect-square">
         <GridComponent
           grid={grid}
           interactive={false}

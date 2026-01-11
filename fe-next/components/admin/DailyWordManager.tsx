@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, AlertTriangle, Plus, Trash2, Copy, Download, Check, Sparkles, Calendar, Loader2, Save, RefreshCw, RotateCcw } from 'lucide-react';
+import { Search, AlertTriangle, Plus, Trash2, Copy, Download, Check, Sparkles, Calendar, Loader2, Save, RefreshCw, RotateCcw, Edit, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/utils/supabase/client';
@@ -102,6 +102,16 @@ interface BulkGeneratedWord {
   date: string;
   word: string;
   reason: string;
+}
+
+interface DailyTargetWord {
+  id: string;
+  puzzle_date: string;
+  target_word: string;
+  override_word?: string;
+  ai_selected: boolean;
+  ai_reason?: string;
+  language: string;
 }
 
 interface BulkGenerateState {
@@ -209,6 +219,79 @@ export const DailyWordManager: React.FC = () => {
     error: null,
   });
   const [isSaving, setIsSaving] = useState(false);
+
+  // Schedule Management
+  const [schedule, setSchedule] = useState<DailyTargetWord[]>([]);
+  const [loadingSchedule, setLoadingSchedule] = useState(false);
+  const [editingDate, setEditingDate] = useState<string | null>(null);
+  const [editWordValue, setEditWordValue] = useState('');
+
+  const fetchSchedule = useCallback(async () => {
+    if (!accessToken) return;
+    setLoadingSchedule(true);
+    try {
+      const start = new Date();
+      start.setDate(start.getDate() - 5); 
+      const end = new Date();
+      end.setDate(end.getDate() + 35);
+
+      const params = new URLSearchParams({
+        language: selectedLang,
+        startDate: start.toISOString().split('T')[0],
+        endDate: end.toISOString().split('T')[0],
+      });
+
+      const res = await fetch(`/api/admin/daily-word/schedule?${params}`, {
+         headers: { 'Authorization': `Bearer ${accessToken}` }
+      });
+      const data = await res.json();
+      if (data.data) {
+        setSchedule(data.data);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingSchedule(false);
+    }
+  }, [accessToken, selectedLang]);
+
+  useEffect(() => {
+    fetchSchedule();
+  }, [fetchSchedule]);
+
+  const handleEditWord = (date: string, currentWord: string) => {
+    setEditingDate(date);
+    setEditWordValue(currentWord);
+  };
+
+  const handleSaveSingleWord = async (date: string) => {
+    if (!accessToken || !editWordValue.trim()) return;
+    
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/admin/daily-word/bulk-generate', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          language: selectedLang,
+          words: [{ date, word: editWordValue.trim() }],
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update');
+      
+      await fetchSchedule();
+      setEditingDate(null);
+      setEditWordValue('');
+    } catch (e) {
+      alert('Error updating word');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const currentWords = wordLists[selectedLang];
 
@@ -427,6 +510,86 @@ export const DailyWordManager: React.FC = () => {
                 <span className="ml-1 opacity-70">({wordLists[lang.code].length})</span>
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* Schedule Manager Section */}
+        <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-700 p-3 sm:p-4 mb-4 text-gray-900 dark:text-white">
+          <div className="flex items-center justify-between mb-4">
+             <div className="flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-purple-500" />
+                <h3 className="font-bold text-base sm:text-lg">Daily Schedule</h3>
+             </div>
+             <Button size="sm" variant="outline" onClick={fetchSchedule} disabled={loadingSchedule}>
+               <RefreshCw className={cn("w-4 h-4", loadingSchedule && "animate-spin")} />
+             </Button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-h-[400px] overflow-y-auto pr-2">
+            {schedule.map(item => {
+               const dateObj = new Date(item.puzzle_date);
+               const isToday = new Date().toISOString().split('T')[0] === item.puzzle_date;
+               const isPast = dateObj < new Date(new Date().setHours(0,0,0,0)) && !isToday;
+               const activeWord = item.override_word || item.target_word;
+               const isEditing = editingDate === item.puzzle_date;
+
+               return (
+                 <div key={item.id} className={cn(
+                   "p-3 rounded-lg border flex flex-col gap-2 relative",
+                   isToday ? "border-purple-500 bg-purple-50 dark:bg-purple-900/20" : 
+                   isPast ? "border-gray-200 bg-gray-50 dark:border-slate-700 dark:bg-slate-800 opacity-60" :
+                   "border-gray-300 bg-white dark:border-slate-600 dark:bg-slate-700"
+                 )}>
+                    <div className="flex justify-between items-start">
+                      <span className={cn("text-xs font-mono", isToday && "font-bold text-purple-700 dark:text-purple-300")}>
+                        {formatDateDisplay(item.puzzle_date)}
+                      </span>
+                      {item.override_word && (
+                         <span className="text-[10px] px-1.5 py-0.5 bg-orange-100 text-orange-700 rounded-full" title="Manually overridden">
+                           Manual
+                         </span>
+                      )}
+                    </div>
+                    
+                    {isEditing ? (
+                      <div className="flex gap-1">
+                        <input 
+                          autoFocus
+                          className="w-full text-sm px-1 py-1 border rounded uppercase font-mono bg-white text-black"
+                          value={editWordValue}
+                          onChange={e => setEditWordValue(e.target.value)}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') handleSaveSingleWord(item.puzzle_date);
+                            if (e.key === 'Escape') setEditingDate(null);
+                          }}
+                        />
+                        <button onClick={() => handleSaveSingleWord(item.puzzle_date)} className="p-1 text-green-600 hover:text-green-700"><Check className="w-4 h-4" /></button>
+                        <button onClick={() => setEditingDate(null)} className="p-1 text-red-500 hover:text-red-700"><X className="w-4 h-4" /></button>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between items-center group min-h-[28px]">
+                         <span className="font-bold font-mono text-lg">{activeWord}</span>
+                         <button 
+                           onClick={() => handleEditWord(item.puzzle_date, activeWord)}
+                           className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 dark:hover:bg-slate-600 rounded text-gray-500"
+                           title="Edit word"
+                         >
+                           <Edit className="w-4 h-4" />
+                         </button>
+                      </div>
+                    )}
+                    
+                    {item.ai_reason && !item.override_word && (
+                      <p className="text-[10px] text-gray-400 truncate" title={item.ai_reason}>{item.ai_reason}</p>
+                    )}
+                 </div>
+               );
+            })}
+             {schedule.length === 0 && !loadingSchedule && (
+                <div className="col-span-full text-center py-8 text-gray-500">
+                    No words scheduled. Use the Bulk Generator below.
+                </div>
+             )}
           </div>
         </div>
 

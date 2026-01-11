@@ -3,7 +3,7 @@
  * Handles submitting Word Hunt results to the backend
  */
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   getTodaysWordHuntResult,
   markWordHuntResultSubmitted,
@@ -79,10 +79,22 @@ export function useResultSubmission({
 
     // Prevent double submission
     if (canSubmit && !hasSubmittedRef.current) {
-      hasSubmittedRef.current = true;
-
       const submitResult = async () => {
         try {
+          // Validate attemptsUsed BEFORE marking as submitted
+          // Zero attempts means the result was created but never actually attempted
+          // which indicates stale/invalid data that should not be submitted
+          if (result.attemptsUsed < 1 || result.attemptsUsed > 10) {
+            console.warn('[WordHunt Submit] Invalid attempts count:', result.attemptsUsed, '- must be between 1 and 10. Marking as submitted to prevent retries.');
+            // Mark as submitted even though invalid to prevent infinite retry loops
+            hasSubmittedRef.current = true;
+            markWordHuntResultSubmitted(language);
+            return;
+          }
+
+          // Mark as submitted only after validation passes to prevent retries of invalid data
+          hasSubmittedRef.current = true;
+
           const displayName =
             isAuthenticated && profile
               ? profile.display_name || profile.username

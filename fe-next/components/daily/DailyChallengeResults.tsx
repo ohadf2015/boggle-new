@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Trophy, Flame, Target, Clock, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ImageDown, ChevronDown, ChevronUp } from 'lucide-react';
+import { Share2, Trophy, Flame, Target, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ImageDown, ChevronDown, ChevronUp } from 'lucide-react';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 // X/Twitter icon (no lucide equivalent)
@@ -22,7 +22,7 @@ import { Button } from '@/components/ui/button';
 import { hasPlayedToday } from '@/utils/dailyChallenge/storage';
 import { LANGUAGE_OPTIONS } from './results/constants';
 import type { Language } from '@/types';
-import { fireConfetti, fireRankConfetti } from '@/utils/confettiUtils';
+import { fireConfetti } from '@/utils/confettiUtils';
 import {
   generateShareableResult,
   getGuestFingerprint,
@@ -208,7 +208,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               avatarImage,
               profilePictureUrl,
               countryCode,
-              score: result.score,
+              score: Math.round(result.score),
               wordCount: result.wordCount,
               wordsByLength: result.wordsByLength,
               timeSeconds: result.timeSeconds,
@@ -338,7 +338,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
         totalPlayers,
         puzzleNumber: result.puzzleNumber,
         language: result.language,
-        score: result.score,
+        score: Math.round(result.score),
         wordCount: result.wordCount,
         displayName: isAuthenticated && profile
           ? profile.display_name || profile.username
@@ -390,7 +390,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="flex-1 flex flex-col items-center justify-start p-4 overflow-y-auto"
+      className="flex-1 flex flex-col items-center justify-start p-4 pb-24 md:pb-4 overflow-y-auto"
     >
       {/* Back button */}
       <motion.div className="absolute top-24 sm:top-28 start-4">
@@ -443,7 +443,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             {t('daily.puzzleNumber').replace('{number}', String(result.puzzleNumber))}
           </div>
           <div className="text-7xl md:text-8xl font-black text-neo-yellow drop-shadow-[0_0_20px_rgba(255,225,53,0.3)] my-1">
-            {result.score}
+            {Math.round(result.score)}
           </div>
           <div className="text-slate-400 text-sm font-medium">
             {t('common.points')}
@@ -803,7 +803,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={shareImage.dataUrl}
-                  alt={`LexiClash Daily Challenge #${result.puzzleNumber} - Score: ${result.score}`}
+                  alt={`LexiClash Daily Challenge #${result.puzzleNumber} - Score: ${Math.round(result.score)}`}
                   className="w-full h-auto relative"
                   style={{ maxHeight: '50vh', objectFit: 'contain' }}
                 />

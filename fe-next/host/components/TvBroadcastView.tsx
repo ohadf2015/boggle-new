@@ -204,7 +204,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       </AnimatePresence>
 
       {/* Main Content: Grid + Leaderboard (50/50) */}
-      <div className="flex-1 min-h-0 flex flex-col md:flex-row gap-4 p-4 max-w-[2000px] mx-auto w-full">
+      <div className="flex-1 min-h-0 flex flex-col md:flex-row gap-2 md:gap-4 p-2 md:p-4 max-w-[2000px] mx-auto w-full">
         {/* Left: Grid - aspect-square ensures square cells */}
         <div className="flex-1 min-h-0 flex items-center justify-center bg-neo-cream text-neo-black rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden">
           {tableData && Array.isArray(tableData) && tableData.length > 0 && tableData[0] && tableData[0].length > 0 ? (

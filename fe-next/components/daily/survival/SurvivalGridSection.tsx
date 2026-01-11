@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import GridComponent from '@/components/GridComponent';
+import GridComponent, { type HighlightedCell } from '@/components/GridComponent';
 import { cn } from '@/lib/utils';
 import type { LetterGrid } from '@/types';
 
@@ -12,6 +12,7 @@ export interface SurvivalGridSectionProps {
   eliminatedLetters: Set<string>;
   onWordSubmit: (word: string) => void;
   onWordChange: (word: string, count: number) => void;
+  highlightedPath?: HighlightedCell[];
   t: (key: string) => string;
 }
 
@@ -25,6 +26,7 @@ export const SurvivalGridSection: React.FC<SurvivalGridSectionProps> = ({
   eliminatedLetters,
   onWordSubmit,
   onWordChange,
+  highlightedPath,
   t,
 }) => {
   return (
@@ -42,6 +44,7 @@ export const SurvivalGridSection: React.FC<SurvivalGridSectionProps> = ({
           hideComboIndicator
           comboLevel={0}
           eliminatedLetters={eliminatedLetters}
+          highlightedPath={highlightedPath}
         />
       </div>
 

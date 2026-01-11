@@ -76,14 +76,14 @@ export const CLUE_SHOP_ITEMS: ClueShopItem[] = [
     id: 'reveal_category',
     name: 'Reveal Category',
     description: 'Show the word category (e.g., "Animals > Mammals")',
-    cost: 2,
+    cost: 3,
     icon: '🏷️',
   },
   {
     id: 'example_sentence',
     name: 'Example Sentence',
     description: 'See the word used in a sentence (word is blank)',
-    cost: 3,
+    cost: 5,
     icon: '📝',
   },
 ];

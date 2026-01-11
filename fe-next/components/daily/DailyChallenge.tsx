@@ -390,60 +390,64 @@ const DailyChallenge: React.FC = () => {
       const hasCompletedTutorial = typeof window !== 'undefined' && localStorage.getItem(tutorialKey) === 'true';
       setTutorialCompleted(hasCompletedTutorial);
 
-      // Quick check: If localStorage says already played, show results immediately
-      // (Server check below will catch cases where localStorage was cleared)
-      const localResult = getTodaysWordHuntResult(gameLanguage);
-      if (localResult) {
-        if (!isMounted) return;
-        setStoredResult(localResult);
-        setPhase('already-played');
-        return;
-      }
-
-      // Server-side check: Verify with Supabase if player has already played
-      // This catches cases where localStorage was cleared but player already submitted
-      try {
-        const fp = await getGuestFingerprint();
-        const checkParams = new URLSearchParams();
-        if (isAuthenticated && profile) {
-          checkParams.set('playerId', profile.id);
-        } else if (fp) {
-          checkParams.set('guestFingerprint', fp);
+      // Skip "already played" checks if we just reset (paid retry)
+      // The server reset may not have propagated yet, so we trust the reset action
+      if (!wasJustReset) {
+        // Quick check: If localStorage says already played, show results immediately
+        // (Server check below will catch cases where localStorage was cleared)
+        const localResult = getTodaysWordHuntResult(gameLanguage);
+        if (localResult) {
+          if (!isMounted) return;
+          setStoredResult(localResult);
+          setPhase('already-played');
+          return;
         }
 
-        if (checkParams.toString()) {
-          const checkResponse = await fetch(
-            `/api/daily-challenge/word-hunt/check-played/${date}/${gameLanguage}?${checkParams.toString()}`
-          );
+        // Server-side check: Verify with Supabase if player has already played
+        // This catches cases where localStorage was cleared but player already submitted
+        try {
+          const fp = await getGuestFingerprint();
+          const checkParams = new URLSearchParams();
+          if (isAuthenticated && profile) {
+            checkParams.set('playerId', profile.id);
+          } else if (fp) {
+            checkParams.set('guestFingerprint', fp);
+          }
 
-          if (!isMounted) return;
+          if (checkParams.toString()) {
+            const checkResponse = await fetch(
+              `/api/daily-challenge/word-hunt/check-played/${date}/${gameLanguage}?${checkParams.toString()}`
+            );
 
-          if (checkResponse.ok) {
-            const checkData = await checkResponse.json();
-            if (checkData.hasPlayed && checkData.result) {
-              // Player already played - reconstruct stored result from server data
-              const serverResult = mapServerResultToStoredResult(
-                checkData.result,
-                date,
-                number,
-                gameLanguage
-              );
+            if (!isMounted) return;
 
-              // Sync localStorage with server data
-              if (typeof window !== 'undefined') {
-                const storageKey = getWordHuntResultKey(gameLanguage, date);
-                localStorage.setItem(storageKey, JSON.stringify(serverResult));
+            if (checkResponse.ok) {
+              const checkData = await checkResponse.json();
+              if (checkData.hasPlayed && checkData.result) {
+                // Player already played - reconstruct stored result from server data
+                const serverResult = mapServerResultToStoredResult(
+                  checkData.result,
+                  date,
+                  number,
+                  gameLanguage
+                );
+
+                // Sync localStorage with server data
+                if (typeof window !== 'undefined') {
+                  const storageKey = getWordHuntResultKey(gameLanguage, date);
+                  localStorage.setItem(storageKey, JSON.stringify(serverResult));
+                }
+
+                setStoredResult(serverResult);
+                setPhase('already-played');
+                return;
               }
-
-              setStoredResult(serverResult);
-              setPhase('already-played');
-              return;
             }
           }
+        } catch (checkError) {
+          // Log but don't block - if server check fails, fall back to local-only check
+          console.warn('Failed to check server for existing attempt:', checkError);
         }
-      } catch (checkError) {
-        // Log but don't block - if server check fails, fall back to local-only check
-        console.warn('Failed to check server for existing attempt:', checkError);
       }
 
       // Player has not played yet - fetch the puzzle
@@ -685,6 +689,11 @@ const DailyChallenge: React.FC = () => {
       // Reset state for fresh start
       setStoredResult(null);
       setGameResult(null);
+
+      // IMPORTANT: Set wasReset to trigger puzzle re-initialization
+      // This ensures the init effect skips "already played" server checks
+      setWasReset(true);
+
       setPhase('ready');
 
       // Show success feedback

@@ -26,7 +26,9 @@ const {
   upgradeSpectatorToPlayer,
   isSpectator,
   clearSocketMappingsForLeave,
-  restoreGameFromRedis
+  restoreGameFromRedis,
+  getNextEligibleHost,
+  transferHost
 } = require('../modules/gameStateManager');
 
 const {
@@ -246,6 +248,9 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     const game = getGame(gameCode);
     if (!game) return;
 
+    // Check if leaving user is the host
+    const isLeavingUserHost = game.hostUsername === username;
+
     // If game is in progress or finished, mark as disconnected instead of removing
     // This allows the player to rejoin and continue
     if (isInProgress(game.gameState) || game.gameState === 'finished') {
@@ -286,6 +291,37 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       deleteGame(gameCode);
       io.emit('activeRooms', { rooms: getActiveRooms() });
       return;
+    }
+
+    // Handle host transfer if the leaving user was the host
+    if (isLeavingUserHost) {
+      const nextHost = getNextEligibleHost(gameCode, username);
+      if (nextHost) {
+        const transferResult = transferHost(gameCode, nextHost);
+        if (transferResult.success) {
+          logger.info('SOCKET', `Host transferred in game ${gameCode}: ${username} -> ${nextHost} (explicit leave)`);
+
+          // Notify all players about the host transfer
+          broadcastToRoom(io, getGameRoom(gameCode), 'hostTransferred', {
+            previousHost: username,
+            newHost: nextHost,
+            message: `${username} left. ${nextHost} is now the host.`
+          });
+        }
+      } else {
+        // No eligible host found - close the room
+        logger.info('SOCKET', `No eligible host found for game ${gameCode} after host ${username} left - closing room`);
+        timerManager.clearGameTimer(gameCode);
+        cleanupGameBots(gameCode);
+
+        broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', {
+          message: 'Host left and no other players available. Room is closing.'
+        });
+
+        deleteGame(gameCode);
+        io.emit('activeRooms', { rooms: getActiveRooms() });
+        return;
+      }
     }
 
     broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {

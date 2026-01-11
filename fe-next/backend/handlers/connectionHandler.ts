@@ -15,7 +15,9 @@ const {
   getActiveRooms,
   deleteGame,
   updateHostSocketId,
-  isRoomEmpty
+  isRoomEmpty,
+  getNextEligibleHost,
+  transferHost
 } = require('../modules/gameStateManager');
 
 const {
@@ -80,6 +82,7 @@ function registerConnectionHandlers(io: Server, socket: Socket): void {
 
 /**
  * Handle host disconnection
+ * Attempts to transfer host to another player, only closes room if no eligible players
  */
 function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: string, username: string, reason: string): void {
   logger.info('SOCKET', `Host (${username}) disconnected from game ${gameCode}`);
@@ -89,6 +92,49 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
     clearTimeout(game.reconnectionTimeout);
     game.reconnectionTimeout = null;
   }
+
+  // Check if room is now empty (no other players)
+  if (isRoomEmpty(gameCode)) {
+    logger.info('SOCKET', `Room ${gameCode} is empty after host ${username} disconnected - closing immediately`);
+    timerManager.clearGameTimer(gameCode);
+    cleanupGameBots(gameCode);
+    deleteGame(gameCode);
+    io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
+    return;
+  }
+
+  // Try to find a new host from remaining connected players
+  const nextHost = getNextEligibleHost(gameCode, username);
+
+  if (nextHost) {
+    // Transfer host to the next eligible player
+    const transferResult = transferHost(gameCode, nextHost);
+
+    if (transferResult.success) {
+      logger.info('SOCKET', `Host transferred in game ${gameCode}: ${username} -> ${nextHost}`);
+
+      // Notify all players about the host transfer
+      broadcastToRoom(io, getGameRoom(gameCode), 'hostTransferred', {
+        previousHost: username,
+        newHost: nextHost,
+        message: `${username} left. ${nextHost} is now the host.`
+      });
+
+      // Update users list for all clients
+      broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+        users: getGameUsers(gameCode) as GameUser[]
+      });
+
+      // Update active rooms
+      io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
+      return;
+    } else {
+      logger.warn('SOCKET', `Failed to transfer host in game ${gameCode}: ${transferResult.error}`);
+    }
+  }
+
+  // No eligible player found for host transfer - use grace period before closing
+  logger.info('SOCKET', `No eligible host found for game ${gameCode}, starting grace period`);
 
   // Notify players that host disconnected
   broadcastToRoom(io, getGameRoom(gameCode), 'hostDisconnected', {
@@ -103,6 +149,25 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
 
     // Check if host is still disconnected (socket hasn't changed)
     if (currentGame.hostSocketId === socket.id) {
+      // Try one more time to find an eligible host
+      const finalNextHost = getNextEligibleHost(gameCode, username);
+
+      if (finalNextHost) {
+        const finalTransferResult = transferHost(gameCode, finalNextHost);
+        if (finalTransferResult.success) {
+          broadcastToRoom(io, getGameRoom(gameCode), 'hostTransferred', {
+            previousHost: username,
+            newHost: finalNextHost,
+            message: `${username} did not reconnect. ${finalNextHost} is now the host.`
+          });
+          broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+            users: getGameUsers(gameCode) as GameUser[]
+          });
+          io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
+          return;
+        }
+      }
+
       logger.info('SOCKET', `Host reconnection timeout for game ${gameCode} - closing room`);
 
       // Stop timer and bots

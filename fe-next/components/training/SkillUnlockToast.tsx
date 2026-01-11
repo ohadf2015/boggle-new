@@ -108,7 +108,6 @@ const SkillUnlockToast: React.FC<SkillUnlockToastProps> = ({
   const config = SKILL_CONFIGS[skillId];
   if (!config) return null;
 
-  const Icon = config.icon;
   const label = t(config.labelKey) || config.fallbackLabel;
 
   return createPortal(
@@ -150,7 +149,10 @@ const SkillUnlockToast: React.FC<SkillUnlockToastProps> = ({
               <span className="text-xs uppercase tracking-wide text-neo-lime font-bold">
                 {t('training.unlock.title') || 'Skill Unlocked!'}
               </span>
-              <span className="font-bold text-sm">
+              <span className={cn(
+                "font-bold text-sm",
+                isDarkMode ? "text-neo-white" : "text-neo-black"
+              )}>
                 {label} {config.emoji}
               </span>
             </div>

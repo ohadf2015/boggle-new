@@ -324,6 +324,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   useEffect(() => {
     if (hasSavedCognitiveScoreRef.current) return;
     if (!user?.id) return; // Only for authenticated users
+    if (mode === 'practice') return; // Do not save cognitive scores in practice mode
 
     // Calculate max combo from word data
     const validWords = results.playerWordData?.filter(w => w.isValid) || [];
@@ -358,7 +359,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     });
 
     hasSavedCognitiveScoreRef.current = true;
-  }, [user?.id, results.playerWordData, results.gameDuration, results.grid, results.gameSessionId, saveCognitiveScore]);
+  }, [user?.id, results.playerWordData, results.gameDuration, results.grid, results.gameSessionId, saveCognitiveScore, mode]);
 
   // Show signup prompt for guests who have played 2+ games
   useEffect(() => {
@@ -862,7 +863,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       {/* MOBILE VIEW - Tab-based layout (hidden on md+, shown on fold mobiles) */}
       <div className="md:hidden flex flex-col min-h-full">
         {/* Tab Content - Scrollable area */}
-        <div className="flex-1 overflow-y-auto overscroll-contain px-2 pb-20">
+        <div className="flex-1 overflow-y-auto overscroll-contain px-2 pb-28">
           <div className="max-w-lg mx-auto">
             <AnimatePresence mode="wait">
               <motion.div

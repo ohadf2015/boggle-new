@@ -79,7 +79,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             <ArrowLeft className="w-4 h-4 lg:w-5 lg:h-5 xl:w-6 xl:h-6 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
           </Link>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black uppercase text-center text-neo-white">
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black uppercase text-center text-neo-white">
             {t('landing.multiplayer') || 'Multiplayer'}
           </h1>
         </motion.div>

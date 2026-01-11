@@ -143,8 +143,8 @@ export default function FirstGameCelebration({
               ease: "easeInOut"
             }}
           >
-            <div className="w-20 h-20 rounded-neo border-3 border-neo-black bg-neo-purple text-neo-white flex items-center justify-center">
-              <Brain className="w-12 h-12 text-white" />
+            <div className="w-20 h-20 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black flex items-center justify-center">
+              <Brain className="w-12 h-12 text-neo-black" />
             </div>
           </motion.div>
 
@@ -194,7 +194,7 @@ export default function FirstGameCelebration({
               <motion.span
                 className={cn(
                   'text-5xl font-black',
-                  isDarkMode ? 'text-neo-cyan' : 'text-neo-purple'
+                  isDarkMode ? 'text-neo-lime' : 'text-emerald-600'
                 )}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -266,10 +266,10 @@ export default function FirstGameCelebration({
             transition={{ delay: 1.2 }}
             className={cn(
               'p-4 rounded-neo border-2 border-neo-black text-center',
-              'bg-gradient-to-r from-neo-purple to-purple-400'
+              'bg-gradient-to-r from-neo-lime to-lime-400'
             )}
           >
-            <p className="text-sm font-bold text-white mb-2">
+            <p className="text-sm font-bold text-neo-black mb-2">
               🔥 {t('brain.playMoreForTrends', { count: 2 })}
             </p>
             <button

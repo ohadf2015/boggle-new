@@ -1092,12 +1092,12 @@ export default function MultiplayerPage(): React.JSX.Element {
       setUsername(effectiveUsername);
     }
 
-    // Get selected avatar image from localStorage
+    // Get selected avatar image from localStorage (includes user's selection from modal)
     const avatarImageId = getStoredAvatarId();
 
-    // Determine avatar to use: profile > guest state > just-generated > derive from name
+    // Determine avatar to use: prioritize modal selection > profile > guest state > just-generated > derive from name
     const effectiveAvatar = profile
-      ? { emoji: profile.avatar_emoji, color: profile.avatar_color, avatarImage: profile.avatar_image }
+      ? { emoji: profile.avatar_emoji, color: profile.avatar_color, avatarImage: avatarImageId || profile.avatar_image }
       : {
         ...(generatedAvatar || guestAvatar || getAvatarForName(effectiveUsername)),
         avatarImage: avatarImageId || undefined
@@ -1158,9 +1158,9 @@ export default function MultiplayerPage(): React.JSX.Element {
       // Use dash instead of apostrophe to avoid validation issues with special characters
       const finalRoomName = sanitizeRoomName(overrideRoomName || roomName || `${finalHostUsername} Room`);
 
-      // For guest hosts, use the finalHostUsername for avatar generation
+      // For hosts: prioritize modal selection, then profile, then generated/guest avatar
       const hostAvatar = profile
-        ? { emoji: profile.avatar_emoji, color: profile.avatar_color, avatarImage: profile.avatar_image }
+        ? { emoji: profile.avatar_emoji, color: profile.avatar_color, avatarImage: avatarImageId || profile.avatar_image }
         : {
           ...(generatedAvatar || guestAvatar || getAvatarForName(finalHostUsername)),
           avatarImage: avatarImageId || undefined

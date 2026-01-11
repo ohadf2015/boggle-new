@@ -7,6 +7,9 @@ import { ArrowLeft, Globe, ChevronDown, Trophy, Target, Check, UserCircle2 } fro
 import { Button } from '@/components/ui/button';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import DailyIntroCarousel from './DailyIntroCarousel';
+import { CreateChallengeModal } from './CreateChallengeModal';
+import { UnauthenticatedCreateChallengeSection } from './UnauthenticatedCreateChallengeSection';
+import AuthModal from '../auth/AuthModal';
 import { hasPlayedWordHuntToday } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 
@@ -77,6 +80,9 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
   const searchParams = useSearchParams();
   const [showLangDropdown, setShowLangDropdown] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showCreateChallenge, setShowCreateChallenge] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [pendingCreateChallenge, setPendingCreateChallenge] = useState(false);
 
   // Auto-open leaderboard if showLeaderboard query param is present
   useEffect(() => {
@@ -91,6 +97,20 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
       }
     }
   }, [searchParams]);
+
+  // Auto-open CreateChallengeModal after successful authentication
+  useEffect(() => {
+    if (isAuthenticated && pendingCreateChallenge) {
+      setPendingCreateChallenge(false);
+      setShowCreateChallenge(true);
+    }
+  }, [isAuthenticated, pendingCreateChallenge]);
+
+  // Handler for when unauthenticated user tries to create a challenge
+  const handleAuthRequired = () => {
+    setPendingCreateChallenge(true);
+    setShowAuthModal(true);
+  };
 
   // Check if this is a valid challenge (same puzzle number)
   const isValidChallenge = challengeData && challengeData.puzzleNumber === puzzleNumber;
@@ -294,6 +314,26 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           </Button>
         </motion.div>
 
+        {/* Create Challenge Section - Different UI for authenticated vs unauthenticated */}
+        {isAuthenticated ? (
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.35, type: 'spring' }}
+          >
+            <Button
+              onClick={() => setShowCreateChallenge(true)}
+              variant="outline"
+              className="w-full py-3 text-lg font-bold bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-yellow/20 hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-sm transition-all flex items-center justify-center gap-2"
+            >
+              <span className="text-xl">🛠️</span>
+              {t('daily.createCustomChallenge')}
+            </Button>
+          </motion.div>
+        ) : (
+          <UnauthenticatedCreateChallengeSection language={language} t={t} onAuthRequired={handleAuthRequired} />
+        )}
+
         {/* Secondary Actions - Collapsed */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -360,6 +400,18 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           {t('daily.samePuzzle')}
         </motion.p>
       </div>
+
+      <CreateChallengeModal
+        isOpen={showCreateChallenge}
+        onClose={() => setShowCreateChallenge(false)}
+        language={language}
+      />
+
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        initialMode="signup"
+      />
     </motion.div>
   );
 };

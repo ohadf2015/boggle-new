@@ -267,7 +267,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
           {mode === 'challenge' && currentHighScore !== null && (
             <div className="bg-neo-yellow border-3 border-neo-black rounded-neo p-3 text-center shadow-hard">
               <div className="flex items-center justify-center gap-2 mb-1">
-                <Crown className="text-neo-black text-lg" />
+                <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-neo-black" />
                 <span className="font-black text-neo-black text-xl">{currentHighScore.score}</span>
               </div>
               <div className="text-xs font-bold text-neo-black/70 uppercase">{t('challenge.recordToBeat') || 'Record to Beat'}</div>

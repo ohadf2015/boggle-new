@@ -55,15 +55,15 @@ const DialogContent = React.forwardRef<
       aria-describedby={noDescription ? undefined : props['aria-describedby']}
       className={cn(
         // Mobile-first positioning - constrained on mobile, centered modal on desktop
-        "fixed z-50 grid w-[calc(100%-1rem)] max-w-[95vw]",
+        "fixed z-50 grid w-[calc(100%-2rem)] max-w-[95vw]",
         // Positioning
         "left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]",
         "sm:max-w-lg lg:max-w-xl xl:max-w-2xl",
         // Height constraints - prevent overflow
         "max-h-[90vh] sm:max-h-[85vh]",
         // Neo-Brutalist styling
-        "bg-neo-cream text-neo-black",
-        "border-3 sm:border-4 border-neo-black",
+        "bg-neo-cream dark:bg-neo-navy text-neo-black dark:text-neo-white",
+        "border-3 sm:border-4 border-neo-black dark:border-slate-600",
         "rounded-neo sm:rounded-neo-lg",
         "shadow-hard sm:shadow-hard-xl",
         // Spacing

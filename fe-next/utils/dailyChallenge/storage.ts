@@ -145,7 +145,7 @@ export function saveWordHuntResult(result: WordHuntResult, isAuthenticated: bool
     return { currentStreak: 0, longestStreak: 0, lastPlayedDate: null, totalDailiesCompleted: 0 };
   }
 
-  const today = getDailyChallengeDate();
+  const today = result.puzzleDate || getDailyChallengeDate();
   const key = `${WORD_HUNT_STORAGE_KEY}_${result.language}_${today}`;
 
   const storedResult: StoredWordHuntResult = {
@@ -161,7 +161,7 @@ export function saveWordHuntResult(result: WordHuntResult, isAuthenticated: bool
   // Update the daily streak only for authenticated users
   // Anonymous users don't get streak tracking - incentive to sign up
   if (isAuthenticated) {
-    return updateDailyStreak();
+    return updateDailyStreak(today);
   }
 
   // Return empty streak for anonymous users

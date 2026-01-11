@@ -64,6 +64,8 @@ export interface SurvivalGameState {
   accumulatedClues: Map<number, AccumulatedClue>;
   showCategory: boolean;
   showExample: boolean;
+  hintStage: number;
+  nextHintItem: ClueShopItem | null;
 
   // UI state
   formedWord: string;
@@ -82,6 +84,7 @@ export interface SurvivalGameActions {
   handleWordSubmit: (word: string) => void;
   handleWordChange: (word: string, count: number) => void;
   handlePurchase: (item: ClueShopItem) => void;
+  buyNextHint: () => void;
   showToast: (type: FeedbackType, message: string) => void;
   closeToast: () => void;
   setShowShop: (show: boolean) => void;
@@ -232,45 +235,6 @@ export function useSurvivalGameLogic({
       if (lifeIntervalRef.current) clearInterval(lifeIntervalRef.current);
     };
   }, [isGameOver, drainRate]);
-
-  // Auto-spend tokens to unlock clues immediately
-  // This replaces the manual shop - clues unlock automatically as tokens are earned
-  useEffect(() => {
-    if (isGameOver || clueTokens < 1) return;
-
-    const nextClue = hintActions.getNextAffordableClue(clueTokens);
-    if (!nextClue) return;
-
-    // Auto-purchase the clue
-    setClueTokens(prev => prev - nextClue.cost);
-
-    // Execute the clue effect based on type
-    switch (nextClue.id) {
-      case 'reveal_letter': {
-        const revealedPosition = hintActions.autoRevealLetter();
-        if (revealedPosition >= 0) {
-          // Clean up yellow clues now that we have a green at this position
-          clueActions.handleCoinRevealedLetter(revealedPosition);
-          // Show celebration toast
-          showToast('valid-word', t('daily.clueUnlocked') || 'Clue Unlocked! 💡');
-          // Trigger clue gain animation
-          clueActions.triggerClueGainAnimation(1);
-          playWordAcceptedSound?.();
-        }
-        break;
-      }
-      case 'reveal_category':
-        hintActions.revealCategory();
-        showToast('valid-word', t('daily.categoryUnlocked') || 'Category Revealed! 🏷️');
-        playWordAcceptedSound?.();
-        break;
-      case 'example_sentence':
-        hintActions.revealExample();
-        showToast('valid-word', t('daily.exampleUnlocked') || 'Example Revealed! 📝');
-        playWordAcceptedSound?.();
-        break;
-    }
-  }, [clueTokens, isGameOver, hintActions, clueActions, playWordAcceptedSound, showToast, t]);
 
   // Cleanup feedback timeout
   useEffect(() => {
@@ -510,6 +474,29 @@ export function useSurvivalGameLogic({
     hintActions.handlePurchase(item, clueTokens, setClueTokens, setShowShop);
   }, [hintActions, clueTokens]);
 
+  const buyNextHint = useCallback(() => {
+    hintActions.buyNextHint(clueTokens, setClueTokens);
+  }, [hintActions, clueTokens]);
+
+  // Auto-Unlock Effect: Check periodically or on token change
+  useEffect(() => {
+    // If next item exists and we have enough tokens, buy it automatically
+    // But we need to be careful about loops or repeatedly trying to buy if it fails (it shouldn't if cost check passes)
+    // Also buyNextHint is wrapped in useCallback with deps [hintActions, clueTokens]
+    
+    const nextItem = hintState.nextHintItem;
+    if (nextItem && clueTokens >= nextItem.cost) {
+        // Auto-unlock!
+        // We use a small timeout to avoid immediate state updates during render or races,
+        // and to give a nice "Ding!" feeling slightly after the coin arrives.
+        const timer = setTimeout(() => {
+             buyNextHint();
+        }, 500);
+        return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [clueTokens, hintState.nextHintItem, buyNextHint]);
+
   // Keep callback refs in sync
   useEffect(() => {
     handleGameOverRef.current = handleGameOver;
@@ -544,6 +531,8 @@ export function useSurvivalGameLogic({
     accumulatedClues: clueState.accumulatedClues,
     showCategory: hintState.showCategory,
     showExample: hintState.showExample,
+    hintStage: hintState.hintStage,
+    nextHintItem: hintState.nextHintItem,
     formedWord,
     letterCount,
     showShop,
@@ -558,6 +547,7 @@ export function useSurvivalGameLogic({
     handleWordSubmit,
     handleWordChange,
     handlePurchase,
+    buyNextHint,
     showToast,
     closeToast,
     setShowShop,

@@ -1,15 +1,17 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, RefreshCw, Shield } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Shield, Users, BookOpen, Calendar, Activity, Gamepad2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getSession } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { LiveMonitor } from '@/components/admin/LiveMonitor';
+import { TodayGamesHistory } from '@/components/admin/TodayGamesHistory';
 import { PullToRefreshWrapper } from '@/components/ui/PullToRefreshWrapper';
 import { isMobileDevice } from '@/utils/mobileAccessibility';
 
@@ -50,7 +52,7 @@ export default function AdminPage() {
   // Not authenticated or not admin (but only check after profile has loaded)
   if (!authLoading && !isProfileLoading && (!user || !isAdmin)) {
     return (
-      <div className="min-h-screen bg-neo-navy flex items-center justify-center">
+      <div className="min-h-screen bg-neo-navy text-neo-white flex items-center justify-center">
         <div className="text-center">
           <Shield className="w-16 h-16 text-neo-yellow mx-auto mb-4" />
           <h1 className="text-2xl font-neo-display text-neo-white mb-2">
@@ -71,7 +73,7 @@ export default function AdminPage() {
   // Loading state
   if (authLoading || isProfileLoading || !authToken) {
     return (
-      <div className="min-h-screen bg-neo-navy flex items-center justify-center">
+      <div className="min-h-screen bg-neo-navy text-neo-white flex items-center justify-center">
         <div className="text-center">
           <RefreshCw className="w-12 h-12 animate-spin text-neo-yellow mx-auto mb-4" />
           <p className="text-slate-400">{t('common.loading') || 'Loading...'}</p>
@@ -115,8 +117,54 @@ export default function AdminPage() {
           </div>
         </div>
 
+        {/* Navigation Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <Card 
+            className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+            onClick={() => router.push(`/${language}/admin/players`)}
+          >
+            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
+              <Users className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">Players</span>
+            </CardContent>
+          </Card>
+          
+          <Card 
+            className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+            onClick={() => router.push(`/${language}/admin/dictionary`)}
+          >
+            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
+              <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-green-500" />
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">Dictionary</span>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+            onClick={() => router.push(`/${language}/admin/words`)}
+          >
+            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
+              <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500" />
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">Daily Challenge</span>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+            onClick={() => router.push(`/${language}/admin/web-vitals`)}
+          >
+            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
+              <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" />
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">Web Vitals</span>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Live Monitor Component */}
         <LiveMonitor authToken={authToken} />
+
+        {/* Today's Games History */}
+        <TodayGamesHistory authToken={authToken} />
       </main>
     </div>
   );

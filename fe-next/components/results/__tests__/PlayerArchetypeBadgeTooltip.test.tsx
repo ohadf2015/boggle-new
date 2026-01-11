@@ -20,6 +20,16 @@ jest.mock('../../../contexts/LanguageContext', () => ({
   useLanguage: () => mockLanguageContext,
 }));
 
+jest.mock('../../../contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => ({
+    playSound: jest.fn(),
+    playWordAcceptedSound: jest.fn(),
+    playComboSound: jest.fn(),
+    playErrorSound: jest.fn(),
+    setGameActive: jest.fn(),
+  }),
+}));
+
 jest.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {

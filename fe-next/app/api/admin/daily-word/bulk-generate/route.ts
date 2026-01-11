@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import type { Language } from '@/types';
+import { gameAIService } from '@/lib/ai-service';
+
+// Increase timeout for AI generation
+export const maxDuration = 60; // 60 seconds
 
 const SUPPORTED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'] as const;
 const NO_REPEAT_DAYS = 30;
@@ -16,15 +20,6 @@ const WORD_LENGTH_RANGE: Record<Language, { min: number; max: number }> = {
   de: { min: 4, max: 8 },
 };
 
-const LANGUAGE_NAMES: Record<Language, string> = {
-  en: 'English',
-  he: 'Hebrew',
-  sv: 'Swedish',
-  ja: 'Japanese',
-  es: 'Spanish',
-  fr: 'French',
-  de: 'German',
-};
 
 /**
  * POST /api/admin/daily-word/bulk-generate
@@ -112,28 +107,35 @@ export async function POST(request: Request) {
     }
 
     // Use AI to generate words
-    const geminiApiKey = process.env.GEMINI_API_KEY;
-
     let generatedWords: Array<{ date: string; word: string; reason: string }> = [];
     let aiConfigured = false;
 
-    if (geminiApiKey) {
-      aiConfigured = true;
-      generatedWords = await generateWordsWithAI(
-        language as Language,
-        datesToGenerate,
-        recentlyUsedWords,
-        existingWords || [],
-        geminiApiKey
-      );
-    } else {
-      // Fallback: return empty suggestions, let admin enter manually
-      // Log the issue for debugging
-      console.warn('GEMINI_API_KEY is not configured - AI word generation unavailable');
+    // Check if Vertex AI is configured
+    try {
+      aiConfigured = await gameAIService.isConfigured();
+      
+      if (aiConfigured) {
+        generatedWords = await generateWordsWithAI(
+          language as Language,
+          datesToGenerate,
+          recentlyUsedWords,
+          existingWords || []
+        );
+      } else {
+        console.warn('Vertex AI not configured - GOOGLE_CREDENTIALS_JSON required');
+        generatedWords = datesToGenerate.map(date => ({
+          date,
+          word: '',
+          reason: 'Vertex AI not configured - enter manually',
+        }));
+      }
+    } catch (error) {
+      console.error('AI service check failed:', error);
+      aiConfigured = false;
       generatedWords = datesToGenerate.map(date => ({
         date,
         word: '',
-        reason: 'GEMINI_API_KEY not configured - enter manually',
+        reason: 'AI service unavailable - enter manually',
       }));
     }
 
@@ -311,93 +313,23 @@ async function generateWordsWithAI(
   language: Language,
   dates: string[],
   excludedWords: Set<string>,
-  existingWordList: string[],
-  apiKey: string
+  existingWordList: string[]
 ): Promise<Array<{ date: string; word: string; reason: string }>> {
   const lengthRange = WORD_LENGTH_RANGE[language] || { min: 4, max: 8 };
-  const languageName = LANGUAGE_NAMES[language] || 'English';
-
-  const wordLengthDescription = language === 'ja'
-    ? '2-4 character kanji compounds (熟語)'
-    : `${lengthRange.min}-${lengthRange.max} letter words`;
-
-  const exclusionList = Array.from(excludedWords).slice(0, 100).join(', ');
-  const existingListStr = existingWordList.length > 0
-    ? `\n\nYou may use words from this existing list if they fit: ${existingWordList.join(', ')}`
-    : '';
-
-  const prompt = `You are generating daily words for a word puzzle game called "Word Hunt" (similar to Wordle).
-
-LANGUAGE: ${languageName}
-WORD FORMAT: ${wordLengthDescription}
-NUMBER OF WORDS NEEDED: ${dates.length}
-
-REQUIREMENTS:
-1. Generate ${dates.length} unique, interesting ${wordLengthDescription}
-2. Words should be common enough to be guessable but not too basic
-3. Avoid very simple/common words like CAT, DOG, TREE, BOOK
-4. Prefer words with good character variety (avoid repeated letters)
-5. Words should be real, valid words in ${languageName}
-6. NO REPEATS - each word must be different
-7. MIX word lengths - include both shorter (4-5 letter) and longer (6-8 letter) words for variety
-
-EXCLUDED WORDS (recently used, do NOT use these):
-${exclusionList || 'None'}${existingListStr}
-
-GOOD EXAMPLES for English: APEX, LYNX, JADE, CRYSTAL, PHOENIX, THUNDER, GLACIER, ECLIPSE, NEBULA, WHISPER
-AVOID for English: CAT, DOG, TREE, BOOK, HAND, FOOT, BIKE, KITE
-
-Generate exactly ${dates.length} words. Respond with ONLY valid JSON (no markdown):
-{
-  "words": [
-    {"word": "WORD1", "reason": "brief reason (max 30 chars)"},
-    {"word": "WORD2", "reason": "brief reason (max 30 chars)"}
-  ]
-}`;
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.8,
-            maxOutputTokens: 2000
-          }
-        })
-      }
+    // Use the AI service's bulk generation method with retry logic
+    const generatedWords = await gameAIService.generateBulkWords(
+      language,
+      dates.length,
+      excludedWords,
+      existingWordList,
+      lengthRange
     );
-
-    if (!response.ok) {
-      const errorBody = await response.text();
-      console.error('Gemini API error response:', errorBody);
-      if (response.status === 400) {
-        throw new Error('Gemini API: Invalid request - check API key configuration');
-      } else if (response.status === 401 || response.status === 403) {
-        throw new Error('Gemini API: Authorization failed - GEMINI_API_KEY may be invalid or expired');
-      } else if (response.status === 429) {
-        throw new Error('Gemini API: Rate limit exceeded - please try again later');
-      }
-      throw new Error(`Gemini API error: ${response.status} - ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('Could not parse AI response');
-    }
-
-    const parsed = JSON.parse(jsonMatch[0]);
-    const generatedWords = parsed.words || [];
 
     // Map words to dates, ensuring uniqueness
     const usedInBatch = new Set<string>();
-    const result: Array<{ date: string; word: string; reason: string }> = [];
+    const result_words: Array<{ date: string; word: string; reason: string }> = [];
 
     for (let i = 0; i < dates.length; i++) {
       const wordEntry = generatedWords[i];
@@ -406,21 +338,21 @@ Generate exactly ${dates.length} words. Respond with ONLY valid JSON (no markdow
 
         // Skip if already used in this batch or in excluded list
         if (usedInBatch.has(word) || excludedWords.has(word)) {
-          result.push({
+          result_words.push({
             date: dates[i],
             word: '',
             reason: 'AI suggestion was duplicate - please enter manually',
           });
         } else {
           usedInBatch.add(word);
-          result.push({
+          result_words.push({
             date: dates[i],
             word,
             reason: wordEntry.reason || 'AI selected',
           });
         }
       } else {
-        result.push({
+        result_words.push({
           date: dates[i],
           word: '',
           reason: 'No AI suggestion - please enter manually',
@@ -428,13 +360,15 @@ Generate exactly ${dates.length} words. Respond with ONLY valid JSON (no markdow
       }
     }
 
-    return result;
+    return result_words;
   } catch (error) {
     console.error('AI generation failed:', error);
+    const errorMessage = error instanceof Error ? error.message : 'AI generation failed - please enter manually';
+
     return dates.map(date => ({
       date,
       word: '',
-      reason: 'AI generation failed - please enter manually',
+      reason: errorMessage,
     }));
   }
 }
