@@ -223,8 +223,14 @@ describe('CreateRoomModal', () => {
         />
       );
 
-      const nameSection = screen.getByText('AuthUser').closest('button');
-      expect(screen.getByText(/Signed in/i)).toBeInTheDocument();
+      // Authenticated users see a disabled input, not an editable button
+      const nameInput = screen.getByDisplayValue('AuthUser');
+      expect(nameInput).toBeDisabled();
+
+      // Should NOT have a pencil icon
+      const nameContainer = nameInput.closest('div');
+      const pencilIcon = nameContainer?.querySelector('svg');
+      expect(pencilIcon).toBeNull();
     });
   });
 
@@ -283,17 +289,15 @@ describe('CreateRoomModal', () => {
         />
       );
 
-      // Authenticated users see their name in a div (not editable), not a button
-      const nameDisplay = screen.getByText('AuthUser');
-      expect(nameDisplay).toBeInTheDocument();
-
-      // Should show authenticated hint
-      expect(screen.getByText(/Signed in/i)).toBeInTheDocument();
+      // Authenticated users see their name in a disabled input (not editable)
+      const nameInput = screen.getByDisplayValue('AuthUser');
+      expect(nameInput).toBeInTheDocument();
+      expect(nameInput).toBeDisabled();
 
       // Should NOT have a pencil icon (which indicates editability)
-      const nameContainer = nameDisplay.closest('div');
+      const nameContainer = nameInput.closest('div');
       const pencilIcon = nameContainer?.querySelector('svg');
-      expect(pencilIcon).not.toBeInTheDocument();
+      expect(pencilIcon).toBeNull();
     });
   });
 

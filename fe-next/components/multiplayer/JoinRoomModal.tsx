@@ -134,12 +134,11 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
               {t('multiplayerFlow.joinModal.yourName') || 'Your Name'}
             </Label>
             {isAuthenticated ? (
-              <div className="flex items-center gap-2 px-4 py-3 bg-neo-navy/40 rounded-neo border-2 border-neo-black shadow-hard-sm">
-                <span className="font-bold text-neo-white">{username}</span>
-                <span className="text-xs text-neo-cyan/70 font-medium">
-                  ({t('multiplayerFlow.joinModal.authenticatedHint') || 'Signed in'})
-                </span>
-              </div>
+              <Input
+                value={username}
+                disabled
+                className="font-bold bg-neo-navy/40 border-neo-black text-neo-white cursor-not-allowed opacity-90"
+              />
             ) : isEditingName ? (
               <Input
                 value={username}

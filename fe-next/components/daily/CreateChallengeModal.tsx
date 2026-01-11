@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getGuestFingerprint } from '@/utils/dailyChallenge';
 import { neoSuccessToast, neoErrorToast } from '@/components/NeoToast';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Mascot } from '@/components/ui/Mascot';
 
 interface CreateChallengeModalProps {
   isOpen: boolean;
@@ -442,15 +443,29 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ type: 'spring', bounce: 0.4 }}
                 >
-                  {/* Success Icon with Animation */}
-                  <div className="relative">
+                  {/* Success Mascot with 3D effect */}
+                  <div className="relative flex items-center justify-center h-32 sm:h-40">
+                    {/* Background circle */}
                     <motion.div
-                      className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-neo-green to-emerald-400 rounded-full border-neo-thick border-neo-black flex items-center justify-center mx-auto shadow-hard-lg"
-                      initial={{ scale: 0, rotate: -180 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ type: 'spring', bounce: 0.6, duration: 0.8 }}
+                      className="absolute w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-neo-yellow to-neo-orange rounded-full border-neo-thick border-neo-black shadow-hard-lg"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: 'spring', bounce: 0.6, duration: 0.6 }}
+                    />
+
+                    {/* Mascot popping out of circle (3D effect) */}
+                    <motion.div
+                      initial={{ scale: 0, rotate: -180, y: 20 }}
+                      animate={{ scale: 1, rotate: 0, y: -8 }}
+                      transition={{ type: 'spring', bounce: 0.6, duration: 0.8, delay: 0.1 }}
+                      className="relative z-10"
                     >
-                      <Check className="w-10 h-10 sm:w-12 sm:h-12 text-neo-white" strokeWidth={4} />
+                      <Mascot
+                        variant="holding_trophy"
+                        size="2xl"
+                        animated={true}
+                        className="drop-shadow-2xl"
+                      />
                     </motion.div>
 
                     {/* Confetti particles */}

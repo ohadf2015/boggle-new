@@ -58,7 +58,7 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
         )}
       >
         <div className="flex items-center gap-3">
-          <div className="relative w-14 h-14 rounded-neo border-2 border-neo-cyan overflow-hidden flex-shrink-0 shadow-hard-sm">
+          <div className="relative w-14 h-14 rounded-full border-2 border-neo-cyan overflow-hidden flex-shrink-0 shadow-hard-sm">
             <Image
               src={currentAvatarImage}
               alt={currentAvatarName}
@@ -103,7 +103,7 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
                     type="button"
                     onClick={() => handleAvatarSelect(PROFILE_AVATAR_ID)}
                     className={cn(
-                      'relative aspect-square rounded-neo border-2 overflow-hidden',
+                      'relative aspect-square rounded-full border-2 overflow-hidden',
                       'transition-all duration-150',
                       'min-h-[44px] min-w-[44px]',
                       isUsingProfilePicture
@@ -140,7 +140,7 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
                       type="button"
                       onClick={() => handleAvatarSelect(avatar.id)}
                       className={cn(
-                        'relative aspect-square rounded-neo border-2 overflow-hidden',
+                        'relative aspect-square rounded-full border-2 overflow-hidden',
                         'transition-all duration-150',
                         'min-h-[44px] min-w-[44px]',
                         isSelected

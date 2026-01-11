@@ -29,9 +29,8 @@ export default function ScientificTipsCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const { theme } = useTheme();
-  const { t, dir } = useLanguage();
+  const { t } = useLanguage();
   const isDarkMode = theme === 'dark';
-  const isRTL = dir === 'rtl';
 
   // Auto-rotate every 5 seconds
   useEffect(() => {
@@ -124,24 +123,17 @@ export default function ScientificTipsCarousel() {
           isDarkMode ? 'bg-slate-800/50' : 'bg-neo-cream/50'
         )}>
           <button
-            onClick={isRTL ? goToNext : goToPrevious}
+            onClick={goToPrevious}
             className={cn(
               'p-1.5 rounded-lg border-2 border-neo-black transition-all',
               'hover:translate-y-[-1px] hover:shadow-hard-sm active:translate-y-[1px]',
               isDarkMode ? 'bg-slate-700' : 'bg-white'
             )}
           >
-            {isRTL ? (
-              <ChevronRight className={cn(
-                'w-4 h-4',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black'
-              )} />
-            ) : (
-              <ChevronLeft className={cn(
-                'w-4 h-4',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black'
-              )} />
-            )}
+            <ChevronLeft className={cn(
+              'w-4 h-4 rtl:rotate-180',
+              isDarkMode ? 'text-neo-white' : 'text-neo-black'
+            )} />
           </button>
 
           {/* Dots */}
@@ -168,24 +160,17 @@ export default function ScientificTipsCarousel() {
           </div>
 
           <button
-            onClick={isRTL ? goToPrevious : goToNext}
+            onClick={goToNext}
             className={cn(
               'p-1.5 rounded-lg border-2 border-neo-black transition-all',
               'hover:translate-y-[-1px] hover:shadow-hard-sm active:translate-y-[1px]',
               isDarkMode ? 'bg-slate-700' : 'bg-white'
             )}
           >
-            {isRTL ? (
-              <ChevronLeft className={cn(
-                'w-4 h-4',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black'
-              )} />
-            ) : (
-              <ChevronRight className={cn(
-                'w-4 h-4',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black'
-              )} />
-            )}
+            <ChevronRight className={cn(
+              'w-4 h-4 rtl:rotate-180',
+              isDarkMode ? 'text-neo-white' : 'text-neo-black'
+            )} />
           </button>
         </div>
       </div>

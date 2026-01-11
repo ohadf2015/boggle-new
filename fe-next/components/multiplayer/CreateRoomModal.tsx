@@ -58,7 +58,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   profilePictureUrl,
   profileAvatarId,
 }) => {
-  const { t, dir } = useLanguage();
+  const { t } = useLanguage();
 
   const [username, setUsername] = useState<string>('');
   const [avatarId, setAvatarId] = useState<string>('');
@@ -131,8 +131,8 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent noDescription className="max-w-sm sm:max-w-md">
-        <DialogHeader className="relative pr-14 sm:pr-16 rtl:pr-0 rtl:pl-14 sm:rtl:pl-16">
-          <DialogTitle className={cn("text-lg font-black uppercase truncate", dir === 'rtl' ? 'text-right' : 'text-left')}>
+        <DialogHeader>
+          <DialogTitle>
             {t('multiplayerFlow.createModal.title') || 'Create Room'}
           </DialogTitle>
         </DialogHeader>
@@ -151,12 +151,11 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
               {t('multiplayerFlow.createModal.yourName') || 'Your Name'}
             </Label>
             {isAuthenticated ? (
-              <div className="flex items-center gap-2 px-4 py-3 bg-neo-navy/40 rounded-neo border-2 border-neo-black shadow-hard-sm">
-                <span className="font-bold text-neo-white">{username}</span>
-                <span className="text-xs text-neo-cyan/70 font-medium">
-                  ({t('multiplayerFlow.createModal.authenticatedHint') || 'Signed in'})
-                </span>
-              </div>
+              <Input
+                value={username}
+                disabled
+                className="font-bold bg-neo-navy/40 border-neo-black text-neo-white cursor-not-allowed opacity-90"
+              />
             ) : isEditingName ? (
               <Input
                 value={username}
