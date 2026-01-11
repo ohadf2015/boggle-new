@@ -91,7 +91,7 @@ const MissedWords = memo<MissedWordsProps>(({
       <div
         className={cn(
           'rounded-neo-lg border-2 border-neo-black/30 overflow-hidden',
-          'bg-gradient-to-br from-slate-700 to-slate-800'
+          'bg-gray-500'
         )}
       >
         {/* Header - clearer messaging about missed words */}

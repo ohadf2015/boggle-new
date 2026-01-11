@@ -1,15 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody } from '../ui/dialog';
 import { Button as ButtonComponent } from '../ui/button';
 
 const Button = ButtonComponent as any;
 import { useLanguage } from '../../contexts/LanguageContext';
 import { signInWithGoogle, signInWithDiscord } from '../../lib/supabase';
-import { cn } from '../../lib/utils';
 
 // Brand icon SVG components
 const GoogleIcon = ({ className }: { className?: string }) => (
@@ -65,37 +64,19 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
     }
   };
 
-  if (!isOpen) return null;
-  if (typeof document === 'undefined') return null;
-
-  return createPortal(
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        noDescription
+        className="max-w-sm bg-slate-800 border-orange-500/30"
       >
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0, y: 20 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.9, opacity: 0, y: 20 }}
-          transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-          className="w-full max-w-sm rounded-2xl p-6 shadow-2xl bg-slate-800 border border-orange-500/30 relative"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Close button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="absolute top-4 right-4 rtl:right-auto rtl:left-4 rounded-full z-10"
-            asChild={false}
-          >
-            <X size={18} />
-          </Button>
+        <DialogHeader className="bg-transparent border-b-0 p-0">
+          <DialogTitle className="sr-only">
+            {t('auth.wordHunt.loginTitle')}
+          </DialogTitle>
+        </DialogHeader>
 
+        <DialogBody className="p-6 pt-0">
           {/* Content */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -173,10 +154,9 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
               {t('auth.wordHunt.skipCta')}
             </button>
           </motion.div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>,
-    document.body
+        </DialogBody>
+      </DialogContent>
+    </Dialog>
   );
 };
 

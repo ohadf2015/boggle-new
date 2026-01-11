@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Trophy, TrendingUp, Medal, Users } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody } from '../ui/dialog';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -15,7 +15,6 @@ import {
   OAuthButtonGroup,
   AuthTermsFooter,
   AuthErrorMessage,
-  AuthModalCloseButton,
   type AuthBenefit,
 } from './shared';
 import { useOAuthSignIn } from './hooks/useOAuthSignIn';
@@ -68,36 +67,28 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
     return undefined;
   }, [isOpen, isMultiGamesVariant]);
 
-  if (!isOpen) return null;
-  if (typeof document === 'undefined') return null;
-
-  return createPortal(
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        noDescription
+        className={cn(
+          'max-w-md',
+          isDarkMode
+            ? 'bg-gradient-to-b from-slate-800 via-slate-800 to-slate-900 border-yellow-500/30'
+            : 'bg-gradient-to-b from-white via-white to-gray-50 border-yellow-400/50'
+        )}
       >
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0, y: 20 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.8, opacity: 0, y: 20 }}
-          transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-          className={cn(
-            'w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-2xl relative',
-            isDarkMode
-              ? 'bg-gradient-to-b from-slate-800 via-slate-800 to-slate-900 border border-yellow-500/30'
-              : 'bg-gradient-to-b from-white via-white to-gray-50 border border-yellow-400/50'
-          )}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Decorative background glow */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-gradient-to-b from-yellow-500/20 to-transparent rounded-full blur-3xl pointer-events-none" />
+        <DialogHeader className="bg-transparent border-b-0 p-0">
+          <DialogTitle className="sr-only">
+            {isMultiGamesVariant
+              ? t('auth.multiGames.title') || "You're Getting Good!"
+              : t('auth.firstWin.title')}
+          </DialogTitle>
+        </DialogHeader>
 
-          {/* Close button */}
-          <AuthModalCloseButton onClose={onClose} className="z-10" />
+        <DialogBody className="p-6 pt-0 relative">
+          {/* Decorative background glow */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none" />
 
           {/* Trophy animation */}
           <motion.div
@@ -145,14 +136,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
             transition={{ delay: 0.3 }}
             className="text-center mb-6"
           >
-            <h2
-              className={cn(
-                'text-2xl font-bold mb-2',
-                isDarkMode
-                  ? 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-orange-300 to-yellow-400'
-                  : 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-orange-500 to-yellow-600'
-              )}
-            >
+            <h2 className="text-2xl font-bold mb-2 text-neo-yellow">
               {isMultiGamesVariant
                 ? t('auth.multiGames.title') || "You're Getting Good!"
                 : t('auth.firstWin.title')}
@@ -256,10 +240,9 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
 
           {/* Terms */}
           <AuthTermsFooter className="mt-4" />
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>,
-    document.body
+        </DialogBody>
+      </DialogContent>
+    </Dialog>
   );
 };
 

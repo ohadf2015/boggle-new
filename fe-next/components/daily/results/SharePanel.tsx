@@ -95,7 +95,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
             <div className="grid grid-cols-2 gap-3 mb-4">
               <Button
                 onClick={onWhatsApp}
-                className="py-3 bg-[#25D366] text-white border-3 border-neo-black rounded-neo hover:brightness-110"
+                className="py-3 bg-brand-whatsapp text-white border-3 border-neo-black rounded-neo hover:brightness-110"
               >
                 <WhatsAppIcon className="mr-2 w-5 h-5" />
                 WhatsApp
@@ -111,7 +111,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
 
               <Button
                 onClick={onFacebook}
-                className="py-3 bg-[#1877F2] text-white border-3 border-neo-black rounded-neo hover:brightness-110"
+                className="py-3 bg-brand-facebook text-white border-3 border-neo-black rounded-neo hover:brightness-110"
               >
                 <FacebookIcon className="mr-2 w-5 h-5" />
                 Facebook
@@ -156,7 +156,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                   <div className="grid grid-cols-2 gap-3 pt-3">
                     <Button
                       onClick={onLinkedIn}
-                      className="py-3 bg-[#0A66C2] text-white border-3 border-neo-black rounded-neo hover:brightness-110"
+                      className="py-3 bg-brand-linkedin text-white border-3 border-neo-black rounded-neo hover:brightness-110"
                     >
                       <LinkedInIcon className="mr-2 w-5 h-5" />
                       LinkedIn

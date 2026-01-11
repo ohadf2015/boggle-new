@@ -348,7 +348,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
       {/* Landscape mode suggestion banner */}
       <LandscapeIndicator />
 
-      <div dir={dir} className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy flex flex-col">
+      <div dir={dir} className="min-h-screen bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy flex flex-col">
       <div className="w-[94%] max-w-7xl mx-auto py-3 sm:py-4 flex-1 flex flex-col min-h-0">
         {/* Title with back button */}
         <motion.div

@@ -50,7 +50,7 @@ export default function FriendsPage(): React.JSX.Element {
         'min-h-screen relative',
         isDark
           ? 'bg-gradient-to-b from-neo-navy via-neo-navy-light to-neo-navy'
-          : 'bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200'
+          : 'bg-neo-navy'
       )}
       {...pullToRefreshHandlers}
     >

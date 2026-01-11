@@ -115,8 +115,8 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
           showSuccess
             ? "bg-gradient-to-br from-neo-lime to-emerald-500"
             : isDisabled
-              ? "bg-gradient-to-br from-slate-500 to-slate-600 cursor-not-allowed"
-              : "bg-gradient-to-br from-purple-500 to-indigo-600 hover:shadow-hard-lg",
+              ? "bg-gray-500 cursor-not-allowed"
+              : "bg-neo-purple hover:shadow-hard-lg",
           className
         )}
         onClick={!isDisabled ? showAd : undefined}

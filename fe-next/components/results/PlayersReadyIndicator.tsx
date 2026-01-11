@@ -60,7 +60,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className="w-full"
     >
-      <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/95 border-3 border-neo-black rounded-neo-lg shadow-hard-lg overflow-hidden">
+      <div className="bg-neo-navy border-3 border-neo-black rounded-neo-lg shadow-hard-lg overflow-hidden">
         {/* Header with progress bar */}
         <div className="relative">
           {/* Progress bar background */}

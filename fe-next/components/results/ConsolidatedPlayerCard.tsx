@@ -135,7 +135,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
       <div
         className={cn(
           'relative overflow-hidden rounded-neo-lg border-4 border-neo-black shadow-hard-lg',
-          'bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800'
+          'bg-neo-navy'
         )}
         style={{ transform: 'rotate(-0.5deg)' }}
       >

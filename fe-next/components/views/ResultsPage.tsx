@@ -1191,7 +1191,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   );
 
   return (
-    <div className="screen-fit lg:min-h-full lg:h-auto bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors duration-300 relative">
+    <div className="screen-fit lg:min-h-full lg:h-auto bg-neo-navy transition-colors duration-300 relative">
       {/* Neo-brutalist halftone dot pattern overlay */}
       <div
         className="fixed inset-0 pointer-events-none opacity-10 dark:opacity-[0.08]"

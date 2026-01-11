@@ -99,8 +99,8 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
           className={cn(
             'w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-2xl relative',
             isDarkMode
-              ? 'bg-gradient-to-b from-slate-800 via-slate-800 to-slate-900 border border-purple-500/30'
-              : 'bg-gradient-to-b from-white via-white to-gray-50 border border-purple-400/50'
+              ? 'bg-neo-navy border border-purple-500/30'
+              : 'bg-white border border-purple-400/50'
           )}
           onClick={(e) => e.stopPropagation()}
         >

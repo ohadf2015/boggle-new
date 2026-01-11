@@ -44,7 +44,7 @@ describe('ShareButton', () => {
       render(<ShareButton onClick={noop} variant="whatsapp">Share on WhatsApp</ShareButton>);
       const button = screen.getByRole('button');
       // WhatsApp variant uses green background with black text for better contrast
-      expect(button.className).toContain('bg-[#25D366]');
+      expect(button.className).toContain('bg-brand-whatsapp');
       expect(button.className).toContain('text-black');
     });
 
@@ -128,7 +128,7 @@ describe('ShareButton', () => {
       );
       const button = screen.getByRole('button');
       expect(button.className).toContain('custom-class');
-      expect(button.className).toContain('bg-[#25D366]');
+      expect(button.className).toContain('bg-brand-whatsapp');
     });
   });
 

@@ -234,7 +234,7 @@ const LandingView: React.FC = () => {
 
   return (
     <div
-      className={`flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative overflow-hidden ${isLandscape ? 'landscape-full-height' : ''}`}
+      className={`flex flex-col h-full bg-gray-100 dark:bg-gradient-to-b dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative overflow-hidden page-content-safe ${isLandscape ? 'landscape-full-height' : ''}`}
       {...pullToRefreshHandlers}
     >
       {/* Playful background with parallax and floating elements */}
@@ -263,7 +263,7 @@ const LandingView: React.FC = () => {
       <Header />
 
       {/* Main content */}
-      <main className={`w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 ${isLandscape ? 'flex-1 flex flex-col justify-center px-4 py-2' : 'px-2 sm:px-3 lg:px-6 xl:px-8 py-2 sm:py-3 lg:py-6 pb-20 lg:pb-6'}`}>
+      <main className={`w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 flex-1 ${isLandscape ? 'flex flex-col justify-center px-4 py-2' : 'px-2 sm:px-3 lg:px-6 xl:px-8 py-2 sm:py-3 lg:py-4'}`}>
         {/* Hero section with mascot - compact on desktop to maximize card space */}
         {!isLandscape && (
           <motion.div

@@ -140,8 +140,8 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
           className={cn(
             'w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-2xl relative',
             isDarkMode
-              ? 'bg-gradient-to-b from-slate-800 via-slate-800 to-slate-900 border border-slate-600'
-              : 'bg-gradient-to-b from-white via-white to-gray-50 border border-gray-200'
+              ? 'bg-neo-navy border border-slate-600'
+              : 'bg-white border border-gray-200'
           )}
           onClick={(e) => e.stopPropagation()}
         >

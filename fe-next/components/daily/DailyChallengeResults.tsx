@@ -722,7 +722,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               <div className="space-y-3">
                 <Button
                   onClick={handleWhatsApp}
-                  className="w-full py-3 bg-[#25D366] text-white border-3 border-neo-black rounded-neo"
+                  className="w-full py-3 bg-brand-whatsapp text-white border-3 border-neo-black rounded-neo"
                 >
                   <WhatsAppIcon className="mr-2 w-5 h-5" />
                   WhatsApp

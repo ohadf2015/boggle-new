@@ -71,7 +71,7 @@ export default function ScientificTipsCarousel() {
       <div
         className={cn(
           'relative rounded-neo border-3 border-neo-black shadow-hard overflow-hidden',
-          isDarkMode ? 'bg-gradient-to-br from-slate-800 to-slate-900' : 'bg-gradient-to-br from-neo-cream to-white'
+          isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-neo-cream to-white'
         )}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}

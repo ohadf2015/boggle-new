@@ -15,7 +15,7 @@ export interface DesktopStatsCardProps {
 }
 
 export const DesktopStatsCard: React.FC<DesktopStatsCardProps> = ({ stats, t }) => (
-  <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-4 shadow-hard">
+  <div className="bg-neo-navy border-3 border-neo-black rounded-neo p-4 shadow-hard">
     <h3 className="text-sm font-black uppercase text-white mb-3 flex items-center gap-2">
       <BarChart3 className="w-4 h-4 text-neo-cyan" />
       {t('wordHunt.stats.title') || 'Statistics'}

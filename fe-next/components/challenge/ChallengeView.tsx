@@ -138,7 +138,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
   // Render loading state
   if (phase === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
+      <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
         <div className="text-center">
           <div className="relative w-12 h-12 mx-auto mb-3">
             <div className="absolute inset-0 border-4 border-cyan-500/30 rounded-full" />
@@ -153,7 +153,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
   // Render error state
   if (phase === 'error') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy p-4">
+      <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy p-4">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -190,7 +190,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
       : 0;
 
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy p-4">
+      <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy p-4">
         <motion.div
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -215,7 +215,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
             transition={{ delay: 0.1 }}
             className={cn(
               'p-6 rounded-neo border-4 border-neo-black shadow-hard-xl',
-              isDark ? 'bg-gradient-to-br from-slate-800 to-slate-900' : 'bg-gradient-to-br from-white to-gray-50'
+              isDark ? 'bg-neo-navy' : 'bg-white'
             )}
           >
             {/* Header */}

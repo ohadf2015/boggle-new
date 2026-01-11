@@ -112,8 +112,8 @@ export default function ProfilePage(): React.ReactNode {
   if (!loading && !isAuthenticated) {
     return (
       <div className={cn(
-        'flex flex-col min-h-full',
-        isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
+        'flex flex-col h-full page-content-safe',
+        isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
       )}>
         <AutoHideHeader />
         <div className="max-w-4xl mx-auto px-4 py-8">
@@ -160,8 +160,8 @@ export default function ProfilePage(): React.ReactNode {
   if (loading) {
     return (
       <div className={cn(
-        'flex flex-col min-h-full',
-        isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
+        'flex flex-col h-full page-content-safe',
+        isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
       )}>
         <AutoHideHeader />
         <div className="max-w-4xl mx-auto px-4 py-8">
@@ -190,13 +190,13 @@ export default function ProfilePage(): React.ReactNode {
     <>
       {/* ===== MOBILE VIEW ===== */}
       <div className={cn(
-        'md:hidden mobile-viewport relative',
-        isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
+        'md:hidden h-full flex flex-col relative',
+        isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
       )}>
         <AutoHideHeader />
 
         <div
-          className="flex-1 overflow-y-auto overscroll-contain px-3 pt-2 pb-[max(env(safe-area-inset-bottom),100px)] relative"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 pt-2 page-content-safe relative"
           {...pullToRefreshHandlers}
         >
           <PullToRefreshIndicator pullDistance={pullState.pullDistance} isRefreshing={pullState.isRefreshing} threshold={60} />
@@ -259,8 +259,8 @@ export default function ProfilePage(): React.ReactNode {
       {/* ===== DESKTOP VIEW ===== */}
       <div
         className={cn(
-          'hidden md:flex md:flex-col md:min-h-full relative',
-          isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
+          'hidden md:flex md:flex-col md:h-full relative',
+          isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
         )}
         {...pullToRefreshHandlers}
       >

@@ -160,13 +160,13 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
           className={cn(
             'w-full max-w-2xl rounded-2xl p-8 shadow-2xl overflow-hidden relative border-4',
             isDarkMode
-              ? 'bg-gradient-to-br from-slate-800 via-slate-800 to-slate-900 border-amber-500/50'
-              : 'bg-gradient-to-br from-white via-amber-50 to-orange-50 border-amber-400'
+              ? 'bg-neo-navy border-amber-500/50'
+              : 'bg-white border-amber-400'
           )}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Decorative background glow */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-48 bg-gradient-to-b from-amber-500/20 to-transparent rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
           {/* Trophy animation */}
           <motion.div
@@ -195,12 +195,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
             transition={{ delay: 0.3 }}
             className="text-center mb-8"
           >
-            <h1 className={cn(
-              'text-4xl font-black mb-3',
-              isDarkMode
-                ? 'text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-300 to-amber-400'
-                : 'text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-500 to-amber-600'
-            )}>
+            <h1 className="text-4xl font-black mb-3 text-neo-yellow">
               {celebrationMsg.title}
             </h1>
             <p className={cn(
@@ -390,9 +385,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                 'w-full h-14 text-xl font-black rounded-xl border-4 shadow-hard transition-all',
                 'hover:shadow-hard-lg hover:-translate-y-1',
                 'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0',
-                isDarkMode
-                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 border-amber-600 text-white'
-                  : 'bg-gradient-to-r from-amber-400 to-orange-400 border-amber-600 text-neo-black'
+                'bg-neo-yellow border-amber-600 text-neo-black'
               )}
               asChild={false}
             >

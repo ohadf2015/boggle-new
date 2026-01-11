@@ -210,7 +210,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
       </div>
 
       {/* Main card with glass effect */}
-      <div className="relative rounded-neo border-3 border-neo-yellow/50 bg-gradient-to-b from-slate-800/90 to-slate-900/95 shadow-hard-lg p-5 backdrop-blur-sm">
+      <div className="relative rounded-neo border-3 border-neo-yellow/50 bg-neo-navy/90 shadow-hard-lg p-5 backdrop-blur-sm">
         {/* Sparkle decorations */}
         <div className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2">
           <motion.div
@@ -361,7 +361,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
               <Button
                 onClick={() => handleOAuthSignIn('discord')}
                 disabled={isAnyLoading}
-                className="w-full py-3 bg-[#5865F2] hover:bg-[#4752C4] text-white border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all font-bold flex items-center justify-center gap-2"
+                className="w-full py-3 bg-brand-discord hover:bg-brand-discord-hover text-white border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all font-bold flex items-center justify-center gap-2"
               >
                 {isLoading === 'discord' ? (
                   <Loader2 className="w-5 h-5 animate-spin" />

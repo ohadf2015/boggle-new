@@ -471,7 +471,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
                 'transition-all duration-150',
                 'font-bold text-sm uppercase tracking-wide',
-                'bg-[#25D366] text-black',
+                'bg-brand-whatsapp text-black',
                 'focus:outline-none focus:ring-2 focus:ring-neo-yellow focus:ring-offset-2'
               )}
             >
@@ -551,7 +551,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-none active:translate-y-0',
                     'transition-all duration-150',
                     'font-bold text-xs uppercase tracking-wide',
-                    'bg-[#5865F2] text-white',
+                    'bg-brand-discord text-white',
                     'focus:outline-none focus:ring-2 focus:ring-neo-yellow focus:ring-offset-2'
                   )}
                 >

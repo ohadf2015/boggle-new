@@ -714,7 +714,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     <div className="space-y-3">
       {/* Performance Insights - Expanded */}
       {playerInsights && (
-        <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 shadow-hard">
+        <div className="bg-neo-navy border-3 border-neo-black rounded-neo p-3 shadow-hard">
           <div className="flex items-center gap-2 mb-2">
             <BarChart3 className="w-4 h-4 text-neo-cyan" />
             <h3 className="text-sm font-black uppercase text-white">{t('results.performanceDetails') || 'Performance Details'}</h3>
@@ -725,7 +725,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
       {/* Words List - Expanded */}
       {results.playerWordData && results.playerWordData.length > 0 && (
-        <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 shadow-hard">
+        <div className="bg-neo-navy border-3 border-neo-black rounded-neo p-3 shadow-hard">
           <div className="flex items-center gap-2 mb-2">
             <Hash className="w-4 h-4 text-neo-lime" />
             <h3 className="text-sm font-black uppercase text-white">
@@ -989,7 +989,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           <div className="flex-1 min-w-0 max-w-xl space-y-4">
             {/* Performance Insights */}
             {playerInsights && (
-              <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 shadow-hard">
+              <div className="bg-neo-navy border-3 border-neo-black rounded-neo p-3 shadow-hard">
                 <div className="flex items-center gap-2 mb-2">
                   <BarChart3 className="w-4 h-4 text-neo-cyan" />
                   <h3 className="text-sm font-black uppercase text-white">{t('results.performanceDetails') || 'Performance Details'}</h3>
@@ -1000,7 +1000,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
             {/* Words List */}
             {results.playerWordData && results.playerWordData.length > 0 && (
-              <div className="bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 shadow-hard">
+              <div className="bg-neo-navy border-3 border-neo-black rounded-neo p-3 shadow-hard">
                 <div className="flex items-center gap-2 mb-2">
                   <Hash className="w-4 h-4 text-neo-lime" />
                   <h3 className="text-sm font-black uppercase text-white">

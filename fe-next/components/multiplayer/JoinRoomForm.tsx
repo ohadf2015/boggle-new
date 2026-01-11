@@ -115,7 +115,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
     <>
       <LandscapeIndicator />
 
-      <div dir={dir} className="min-h-screen h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy flex flex-col overflow-hidden">
+      <div dir={dir} className="h-full bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy flex flex-col page-content-safe">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

@@ -66,7 +66,7 @@ const YourQuickStats = memo<YourQuickStatsProps>(({
       <div
         className={cn(
           'relative overflow-hidden rounded-neo border-3 border-neo-black shadow-hard',
-          'bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800'
+          'bg-neo-navy'
         )}
         style={{ transform: 'rotate(-0.5deg)' }}
       >

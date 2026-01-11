@@ -66,7 +66,7 @@ export default function ContactPage(): React.ReactNode {
     <div className={cn(
       isLandscape ? 'h-screen overflow-y-auto' : 'min-h-screen',
       isDarkMode
-        ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900'
+        ? 'bg-neo-navy'
         : 'bg-gradient-to-br from-neo-cream via-white to-neo-cream'
     )}>
       <AutoHideHeader />

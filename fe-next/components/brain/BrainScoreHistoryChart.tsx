@@ -186,7 +186,7 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
         className={cn(
           'rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden',
           isDarkMode
-            ? 'bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800'
+            ? 'bg-neo-navy'
             : 'bg-gradient-to-br from-white via-gray-50 to-white',
           className
         )}
@@ -239,7 +239,7 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
       className={cn(
         'rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden',
         isDarkMode
-          ? 'bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800'
+          ? 'bg-neo-navy'
           : 'bg-gradient-to-br from-white via-gray-50 to-white',
         className
       )}

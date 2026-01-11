@@ -351,7 +351,7 @@ const SinglePlayerView: React.FC = () => {
 
   return (
     <div
-      className="flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative"
+      className="flex flex-col min-h-full bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative"
       {...pullToRefreshHandlers}
     >
       {/* Pull-to-refresh indicator - only show when not playing */}

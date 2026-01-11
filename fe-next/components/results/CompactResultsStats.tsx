@@ -148,7 +148,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
 
   return (
     <div className={cn(
-      'bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 sm:p-4 shadow-hard space-y-3',
+      'bg-neo-navy border-3 border-neo-black rounded-neo p-3 sm:p-4 shadow-hard space-y-3',
       className
     )}>
       {/* Row 1: Core Stats + Rewards */}

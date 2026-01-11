@@ -162,7 +162,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
   // Loading state
   if (phase === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
+      <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
         {error ? (
           <div className="text-center p-8">
             <h2 className="text-xl font-bold text-red-500 mb-4">{error}</h2>
@@ -183,7 +183,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
   // Intro screen
   if (phase === 'intro' && puzzle) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -254,7 +254,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
   // Results phase
   if (phase === 'results' && puzzle && gameResult) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
+      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
         <AnimatePresence mode="wait">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}

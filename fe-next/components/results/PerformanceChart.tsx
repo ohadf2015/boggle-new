@@ -328,7 +328,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
         className={cn(
-          'bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800',
+          'bg-neo-navy',
           'border-4 border-neo-black rounded-neo-lg shadow-hard-lg overflow-hidden',
           className
         )}
@@ -449,7 +449,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className={cn(
-        'bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800',
+        'bg-neo-navy',
         'border-4 border-neo-black rounded-neo-lg shadow-hard-lg overflow-hidden',
         className
       )}

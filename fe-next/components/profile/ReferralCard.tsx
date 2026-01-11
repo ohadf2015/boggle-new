@@ -246,7 +246,7 @@ export function ReferralCard() {
         <Button
           onClick={() => handleShare('whatsapp')}
           size="sm"
-          className="flex-1 h-10 bg-[#25D366] hover:bg-[#20BA5A] text-white rounded-xl font-bold"
+          className="flex-1 h-10 bg-brand-whatsapp hover:bg-brand-whatsapp-hover text-white rounded-xl font-bold"
         >
           <WhatsAppIcon className="w-4 h-4 me-1.5" />
           <span className="hidden sm:inline">WhatsApp</span>

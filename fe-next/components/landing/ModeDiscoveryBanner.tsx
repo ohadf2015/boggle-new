@@ -109,7 +109,7 @@ const ModeDiscoveryBanner: React.FC = () => {
                   href={`/${language}/singleplayer`}
                   className="group flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-neo-white/90 hover:bg-neo-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all hover:translate-x-[-2px] hover:translate-y-[-2px]"
                 >
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-400 to-indigo-500 border-2 border-neo-black rounded-full flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-neo-purple border-2 border-neo-black rounded-full flex items-center justify-center shrink-0">
                     <Bot className="w-5 h-5 sm:w-6 sm:h-6 text-neo-black" />
                   </div>
                   <div className="flex-1 min-w-0">

@@ -70,7 +70,7 @@ export const GuestBrainScorePreview: React.FC<GuestBrainScorePreviewProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`relative bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-neo border-2 border-purple-200 dark:border-purple-700 overflow-hidden ${className}`}
+      className={`relative bg-neo-purple dark:from-purple-900/20 dark:to-indigo-900/20 rounded-neo border-2 border-purple-200 dark:border-purple-700 overflow-hidden ${className}`}
     >
       {/* Blurred preview content */}
       <div className="relative p-5">
@@ -105,7 +105,7 @@ export const GuestBrainScorePreview: React.FC<GuestBrainScorePreviewProps> = ({
               onClick={() => handleSignIn('discord')}
               disabled={!!isLoading}
               size="sm"
-              className="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white border-2 border-[#4752C4] rounded-neo shadow-hard-sm"
+              className="w-full bg-brand-discord hover:bg-brand-discord-hover text-white border-2 border-brand-discord-hover rounded-neo shadow-hard-sm"
             >
               {isLoading === 'discord' ? (
                 <span className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />

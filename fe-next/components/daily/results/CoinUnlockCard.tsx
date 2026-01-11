@@ -43,7 +43,7 @@ export const CoinUnlockCard: React.FC<CoinUnlockCardProps> = ({
         "relative overflow-hidden rounded-neo-lg border-3 border-neo-black shadow-hard transition-all",
         canAffordAction
           ? `bg-gradient-to-br ${gradientFrom} ${gradientTo} cursor-pointer hover:shadow-hard-lg`
-          : "bg-gradient-to-br from-slate-600 to-slate-700"
+          : "bg-gray-700"
       )}
       onClick={canAffordAction ? onClick : undefined}
     >

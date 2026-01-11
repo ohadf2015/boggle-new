@@ -94,7 +94,7 @@ export default function LeaderboardPage(): React.ReactNode {
 
   return (
     <PageLayout onRefresh={handleRefresh} padding="md" maxWidth="4xl">
-      <div className={cn('pb-24 lg:pb-8', isLandscape ? 'py-2' : 'py-4')}>
+      <div className={cn(isLandscape ? 'py-2' : 'py-4')}>
         {/* Page Title */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

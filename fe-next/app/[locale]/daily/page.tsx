@@ -23,7 +23,7 @@ interface PageParams {
 
 // Loading fallback component
 const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
+  <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
     <div className="text-center">
       <div className="relative w-12 h-12 mx-auto mb-3">
         <div className="absolute inset-0 border-4 border-neo-yellow/30 rounded-full" />

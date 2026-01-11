@@ -135,7 +135,7 @@ export default function BrainTrainingPage() {
   if (authLoading || isLoading) {
     return (
       <div className={cn(
-        'min-h-screen pb-24',
+        'h-full flex flex-col page-content-safe',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
         <AutoHideHeader />
@@ -177,7 +177,7 @@ export default function BrainTrainingPage() {
   if (error) {
     return (
       <div className={cn(
-        'min-h-screen pb-24',
+        'h-full flex flex-col page-content-safe',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
         <AutoHideHeader />
@@ -230,7 +230,7 @@ export default function BrainTrainingPage() {
   if (!isAuthenticated) {
     return (
       <div className={cn(
-        'min-h-screen pb-24',
+        'h-full flex flex-col page-content-safe',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
         <AutoHideHeader />
@@ -290,7 +290,7 @@ export default function BrainTrainingPage() {
   if (!brainScore) {
     return (
       <div className={cn(
-        'min-h-screen pb-24',
+        'h-full flex flex-col page-content-safe',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
         <AutoHideHeader />
@@ -345,7 +345,7 @@ export default function BrainTrainingPage() {
   // Main dashboard with real data
   return (
     <div className={cn(
-      'min-h-screen pb-24', // Extra padding for bottom nav
+      'h-full flex flex-col page-content-safe', // Extra padding for bottom nav
       isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
     )}>
       <AutoHideHeader />

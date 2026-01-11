@@ -23,6 +23,10 @@ interface PageLayoutProps {
   pullThreshold?: number;
   /** Override dark mode detection */
   forceDarkMode?: boolean;
+  /** Add bottom padding to account for mobile bottom nav. Default: true on mobile */
+  bottomNavAware?: boolean;
+  /** Use full viewport height with no internal scroll. Default: false */
+  fullHeight?: boolean;
 }
 
 const maxWidthClasses = {
@@ -65,6 +69,8 @@ export function PageLayout({
   padding = 'md',
   pullThreshold = 60,
   forceDarkMode,
+  bottomNavAware = true,
+  fullHeight = false,
 }: PageLayoutProps) {
   const { theme } = useTheme();
   const isDarkMode = forceDarkMode ?? theme === 'dark';
@@ -81,9 +87,10 @@ export function PageLayout({
   return (
     <div
       className={cn(
-        'flex flex-col min-h-full relative',
+        'flex flex-col relative',
+        fullHeight ? 'h-full overflow-hidden' : 'min-h-full',
         isDarkMode
-          ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900'
+          ? 'bg-neo-navy'
           : 'bg-gradient-to-br from-blue-50 via-white to-purple-50',
         className
       )}
@@ -105,6 +112,8 @@ export function PageLayout({
       <div
         className={cn(
           'flex-1 mx-auto w-full',
+          fullHeight && 'min-h-0',
+          bottomNavAware && 'page-content-safe',
           maxWidthClasses[maxWidth],
           paddingClasses[padding]
         )}

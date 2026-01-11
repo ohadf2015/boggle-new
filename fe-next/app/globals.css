@@ -1876,6 +1876,92 @@ body {
   bottom: max(var(--safe-area-bottom), 16px);
 }
 
+/* ============================================
+   RESPONSIVE FLEX LAYOUTS - No Scroll Pattern
+   ============================================ */
+
+/* Bottom nav spacing variable */
+:root {
+  --bottom-nav-height: 64px;
+  --bottom-safe-padding: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 16px);
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --bottom-safe-padding: 0px;
+  }
+}
+
+/* Page content with bottom nav awareness */
+.page-content-safe {
+  padding-bottom: var(--bottom-safe-padding);
+}
+
+/* Flex column to row transition at md breakpoint */
+.flex-col-to-row {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 2cqw, 1.5rem);
+}
+
+@media (min-width: 768px) {
+  .flex-col-to-row {
+    flex-direction: row;
+  }
+
+  .flex-col-to-row > * {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* Flex column to row at lg breakpoint */
+.flex-col-to-row-lg {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 2cqw, 1.5rem);
+}
+
+@media (min-width: 1024px) {
+  .flex-col-to-row-lg {
+    flex-direction: row;
+  }
+
+  .flex-col-to-row-lg > * {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* Auto-fit grid for cards */
+.grid-auto-fit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(0.75rem, 2cqw, 1.5rem);
+}
+
+/* Smaller auto-fit grid for compact cards */
+.grid-auto-fit-sm {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: clamp(0.5rem, 1.5cqw, 1rem);
+}
+
+/* Viewport-fit content area (no internal scroll) */
+.viewport-fit {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Scrollable only when needed */
+.scroll-if-needed {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* Mobile-optimized touch targets (minimum 44x44px per WCAG) */
 @layer base {
 
