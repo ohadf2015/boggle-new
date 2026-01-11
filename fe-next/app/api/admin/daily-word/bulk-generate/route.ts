@@ -20,15 +20,6 @@ const WORD_LENGTH_RANGE: Record<Language, { min: number; max: number }> = {
   de: { min: 4, max: 8 },
 };
 
-const LANGUAGE_NAMES: Record<Language, string> = {
-  en: 'English',
-  he: 'Hebrew',
-  sv: 'Swedish',
-  ja: 'Japanese',
-  es: 'Spanish',
-  fr: 'French',
-  de: 'German',
-};
 
 /**
  * POST /api/admin/daily-word/bulk-generate
@@ -325,73 +316,16 @@ async function generateWordsWithAI(
   existingWordList: string[]
 ): Promise<Array<{ date: string; word: string; reason: string }>> {
   const lengthRange = WORD_LENGTH_RANGE[language] || { min: 4, max: 8 };
-  const languageName = LANGUAGE_NAMES[language] || 'English';
-
-  const wordLengthDescription = language === 'ja'
-    ? '2-4 character kanji compounds (熟語)'
-    : `${lengthRange.min}-${lengthRange.max} letter words`;
-
-  const exclusionList = Array.from(excludedWords).slice(0, 100).join(', ');
-  const existingListStr = existingWordList.length > 0
-    ? `\n\nYou may use words from this existing list if they fit: ${existingWordList.join(', ')}`
-    : '';
-
-  const prompt = `You are generating daily words for a word puzzle game called "Word Hunt" (similar to Wordle).
-
-LANGUAGE: ${languageName}
-WORD FORMAT: ${wordLengthDescription}
-NUMBER OF WORDS NEEDED: ${dates.length}
-
-REQUIREMENTS:
-1. Generate ${dates.length} unique, interesting ${wordLengthDescription}
-2. Words should be common enough to be guessable but not too basic
-3. Avoid very simple/common words like CAT, DOG, TREE, BOOK
-4. Prefer words with good character variety (avoid repeated letters)
-5. Words should be real, valid words in ${languageName}
-6. NO REPEATS - each word must be different
-7. MIX word lengths - include both shorter (4-5 letter) and longer (6-8 letter) words for variety
-
-EXCLUDED WORDS (recently used, do NOT use these):
-${exclusionList || 'None'}${existingListStr}
-
-GOOD EXAMPLES for English: APEX, LYNX, JADE, CRYSTAL, PHOENIX, THUNDER, GLACIER, ECLIPSE, NEBULA, WHISPER
-AVOID for English: CAT, DOG, TREE, BOOK, HAND, FOOT, BIKE, KITE
-
-Generate exactly ${dates.length} words. Respond with ONLY valid JSON (no markdown):
-{
-  "words": [
-    {"word": "WORD1", "reason": "brief reason (max 30 chars)"},
-    {"word": "WORD2", "reason": "brief reason (max 30 chars)"}
-  ]
-}`;
 
   try {
-    // Initialize the AI service
-    // @ts-ignore - Access private initialize for admin bulk generation
-    await gameAIService.initialize();
-    
-    // Access the model through the service
-    // @ts-ignore - Access private model for custom prompt
-    const model = gameAIService['model'];
-    if (!model) {
-      throw new Error('Vertex AI model not available');
-    }
-
-    const result = await model.generateContent(prompt);
-
-    const response = result.response;
-    const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-    // Strip markdown code blocks if present
-    const cleanText = text.replace(/```(?:json)?\s*/gi, '').replace(/```\s*/g, '').trim();
-
-    const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('Could not parse AI response');
-    }
-
-    const parsed = JSON.parse(jsonMatch[0]);
-    const generatedWords = parsed.words || [];
+    // Use the AI service's bulk generation method with retry logic
+    const generatedWords = await gameAIService.generateBulkWords(
+      language,
+      dates.length,
+      excludedWords,
+      existingWordList,
+      lengthRange
+    );
 
     // Map words to dates, ensuring uniqueness
     const usedInBatch = new Set<string>();
@@ -430,7 +364,7 @@ Generate exactly ${dates.length} words. Respond with ONLY valid JSON (no markdow
   } catch (error) {
     console.error('AI generation failed:', error);
     const errorMessage = error instanceof Error ? error.message : 'AI generation failed - please enter manually';
-    
+
     return dates.map(date => ({
       date,
       word: '',

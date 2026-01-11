@@ -464,12 +464,20 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
   // Handle quit with confirmation
   const handleQuitRequest = useCallback(() => {
+    // In practice mode, end the game and show results directly (no confirmation)
+    if (settings.mode === 'practice') {
+      // Trigger game over to show results
+      setIsGameOver(true);
+      return;
+    }
+
+    // For other modes, show confirmation if player has scored points
     if (score > 0) {
       setShowQuitConfirm(true);
     } else {
       onQuit();
     }
-  }, [score, onQuit]);
+  }, [score, onQuit, settings.mode]);
 
   // Earthquake timer pause handlers (timer pause is handled by useGameTimer via isExternallyPaused)
   const handleEarthquakeTimerPause = useCallback(() => {

@@ -87,12 +87,6 @@ interface CommunityWord {
   first_approved_at: string;
 }
 
-interface HintRequest {
-  word: string;
-  language: string;
-  foundWords: string[];
-}
-
 interface HintResult {
   hint: string;
   hintType: 'definition' | 'firstLetter' | 'length' | 'category';
@@ -1185,6 +1179,123 @@ Respond JSON only: {"hint":"your hint","difficulty":"${hintLevel === 1 ? 'easy' 
       return await this.generateHint(targetWord, language, hintLevel);
     } catch {
       return this.generateSimpleHint(targetWord, hintLevel);
+    }
+  }
+
+  // ===========================================================================
+  // Feature D: Bulk Daily Word Generation
+  // ===========================================================================
+
+  /**
+   * Generate bulk words for daily challenges using AI.
+   * Uses retry logic and timeout handling to prevent route timeouts.
+   *
+   * @param language - Language code
+   * @param count - Number of words to generate
+   * @param excludedWords - Words to avoid (recently used)
+   * @param existingWordList - Optional list of existing words that can be reused
+   * @param lengthRange - Min/max word length
+   * @returns Array of generated words with reasons
+   */
+  async generateBulkWords(
+    language: string,
+    count: number,
+    excludedWords: Set<string>,
+    existingWordList: string[] = [],
+    lengthRange: { min: number; max: number } = { min: 4, max: 8 }
+  ): Promise<Array<{ word: string; reason: string }>> {
+    await this.initialize();
+
+    if (!this.model) {
+      throw new Error('Vertex AI model not initialized');
+    }
+
+    const languageNames: Record<string, string> = {
+      en: 'English',
+      he: 'Hebrew',
+      sv: 'Swedish',
+      ja: 'Japanese',
+      es: 'Spanish',
+      fr: 'French',
+      de: 'German',
+    };
+
+    const languageName = languageNames[language] || 'English';
+    const wordLengthDescription = language === 'ja'
+      ? '2-4 character kanji compounds (熟語)'
+      : `${lengthRange.min}-${lengthRange.max} letter words`;
+
+    const exclusionList = Array.from(excludedWords).slice(0, 100).join(', ');
+    const existingListStr = existingWordList.length > 0
+      ? `\n\nYou may use words from this existing list if they fit: ${existingWordList.join(', ')}`
+      : '';
+
+    const prompt = `You are generating daily words for a word puzzle game called "Word Hunt" (similar to Wordle).
+
+LANGUAGE: ${languageName}
+WORD FORMAT: ${wordLengthDescription}
+NUMBER OF WORDS NEEDED: ${count}
+
+REQUIREMENTS:
+1. Generate ${count} unique, interesting ${wordLengthDescription}
+2. Words should be common enough to be guessable but not too basic
+3. Avoid very simple/common words like CAT, DOG, TREE, BOOK
+4. Prefer words with good character variety (avoid repeated letters)
+5. Words should be real, valid words in ${languageName}
+6. NO REPEATS - each word must be different
+7. MIX word lengths - include both shorter (4-5 letter) and longer (6-8 letter) words for variety
+
+EXCLUDED WORDS (recently used, do NOT use these):
+${exclusionList || 'None'}${existingListStr}
+
+GOOD EXAMPLES for English: APEX, LYNX, JADE, CRYSTAL, PHOENIX, THUNDER, GLACIER, ECLIPSE, NEBULA, WHISPER
+AVOID for English: CAT, DOG, TREE, BOOK, HAND, FOOT, BIKE, KITE
+
+Generate exactly ${count} words. Respond with ONLY valid JSON (no markdown):
+{
+  "words": [
+    {"word": "WORD1", "reason": "brief reason (max 30 chars)"},
+    {"word": "WORD2", "reason": "brief reason (max 30 chars)"}
+  ]
+}`;
+
+    try {
+      // Use retry logic to handle transient failures
+      const result = await this.withRetry(async () => {
+        return await this.model!.generateContent(prompt);
+      }, 'generateBulkWords');
+
+      const response = result.response;
+      const text = response.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+      // Track token usage
+      const inputTokens = Math.ceil(prompt.length / 4);
+      const outputTokens = Math.ceil(text.length / 4);
+      this.trackTokenUsage(inputTokens, outputTokens);
+
+      // Strip markdown code blocks if present
+      const cleanText = text.replace(/```(?:json)?\s*/gi, '').replace(/```\s*/g, '').trim();
+
+      const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('Could not parse AI response - no JSON found');
+      }
+
+      const parsed = JSON.parse(jsonMatch[0]);
+      const generatedWords = parsed.words || [];
+
+      if (!Array.isArray(generatedWords) || generatedWords.length === 0) {
+        throw new Error('AI returned invalid word array');
+      }
+
+      // Return the words with their reasons
+      return generatedWords.map((entry: { word: string; reason: string }) => ({
+        word: entry.word ? entry.word.toUpperCase() : '',
+        reason: entry.reason || 'AI selected',
+      }));
+    } catch (error) {
+      console.error('[GameAIService] generateBulkWords error:', error);
+      throw error;
     }
   }
 

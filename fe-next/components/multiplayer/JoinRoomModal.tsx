@@ -57,6 +57,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
   const [avatarId, setAvatarId] = useState<string>('');
   const [isEditingName, setIsEditingName] = useState(false);
 
+  // Initialize state when modal opens - only runs when modal opens, not on state changes
   useEffect(() => {
     if (!isOpen) return;
 
@@ -77,12 +78,12 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
 
       if (storedAvatarId) {
         setAvatarId(storedAvatarId);
-      } else if (!avatarId) {
+      } else {
         const randomAvatar = getRandomAvatar();
         setAvatarId(randomAvatar.id);
       }
     }
-  }, [isOpen, isAuthenticated, displayName, profileAvatarId, avatarId]);
+  }, [isOpen, isAuthenticated, displayName, profileAvatarId]);
 
   const handleJoin = useCallback(() => {
     if (!username.trim() || !avatarId) return;
@@ -126,7 +127,8 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
             <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
               {t('profile.chooseAvatar') || 'Choose Avatar'}
             </Label>
-            <div className="grid grid-cols-6 gap-1.5 sm:gap-2">
+            <div className="max-h-32 overflow-y-auto rounded-neo border-2 border-neo-black/20 dark:border-slate-600 p-2 bg-slate-50 dark:bg-slate-800/50">
+              <div className="grid grid-cols-6 gap-1.5 sm:gap-2">
               {hasProfilePicture && (
                 <motion.button
                   type="button"
@@ -196,6 +198,7 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
                   </motion.button>
                 );
               })}
+              </div>
             </div>
           </div>
 

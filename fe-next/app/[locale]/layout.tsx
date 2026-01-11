@@ -667,12 +667,12 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <meta name="apple-mobile-web-app-title" content="LexiClash" />
             </head>
             <body className="antialiased screen-fit" suppressHydrationWarning>
-                {/* Google AdSense - moved to afterInteractive to prevent blocking initial render */}
+                {/* Google AdSense - using lazyOnload to prevent data-nscript warning and blocking */}
                 <Script
                     async
                     src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1896836706464880"
                     crossOrigin="anonymous"
-                    strategy="afterInteractive"
+                    strategy="lazyOnload"
                 />
                 {/* Skip to main content link for keyboard/screen reader users */}
                 <a

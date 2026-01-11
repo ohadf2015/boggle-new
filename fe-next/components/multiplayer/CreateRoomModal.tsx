@@ -67,6 +67,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   const [language, setLanguage] = useState<Language>(defaultLanguage);
   const [isEditingName, setIsEditingName] = useState(false);
 
+  // Initialize state when modal opens - only runs when modal opens, not on state changes
   useEffect(() => {
     if (!isOpen) return;
 
@@ -94,12 +95,12 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
 
       if (storedAvatarId) {
         setAvatarId(storedAvatarId);
-      } else if (!avatarId) {
+      } else {
         const randomAvatar = getRandomAvatar();
         setAvatarId(randomAvatar.id);
       }
     }
-  }, [isOpen, isAuthenticated, displayName, profileAvatarId, profilePictureUrl, defaultLanguage, avatarId]);
+  }, [isOpen, isAuthenticated, displayName, profileAvatarId, profilePictureUrl, defaultLanguage]);
 
   const generateRoomName = useCallback((hostName: string): string => {
     const sanitized = hostName.replace(/[']/g, '').trim();
@@ -144,7 +145,8 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
             <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
               {t('profile.chooseAvatar') || 'Choose Avatar'}
             </Label>
-            <div className="grid grid-cols-6 gap-1.5 sm:gap-2 shadow-hard">
+            <div className="max-h-32 overflow-y-auto rounded-neo border-2 border-neo-black/20 dark:border-slate-600 p-2 bg-slate-50 dark:bg-slate-800/50">
+              <div className="grid grid-cols-6 gap-1.5 sm:gap-2">
               {hasProfilePicture && (
                 <motion.button
                   type="button"
@@ -214,6 +216,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                   </motion.button>
                 );
               })}
+              </div>
             </div>
           </div>
 

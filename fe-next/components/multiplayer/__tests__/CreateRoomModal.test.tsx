@@ -118,13 +118,17 @@ describe('CreateRoomModal', () => {
       expect(profileSection).toBeInTheDocument();
     });
 
-    it('should have avatar grid with shadow-hard base styling', () => {
+    it('should have avatar grid with scrollable container and border styling', () => {
       render(<CreateRoomModal {...defaultProps} />);
 
       const avatarButton = screen.getByAltText('Test Avatar').closest('button');
       const avatarGrid = avatarButton?.parentElement;
+      const scrollableContainer = avatarGrid?.parentElement;
 
-      expect(avatarGrid?.className).toContain('shadow-hard');
+      // Grid should be inside a scrollable container
+      expect(avatarGrid?.className).toContain('grid');
+      expect(scrollableContainer?.className).toMatch(/overflow|max-h/);
+      expect(scrollableContainer?.className).toContain('border');
     });
 
     it('should display username with proper text alignment for RTL', () => {

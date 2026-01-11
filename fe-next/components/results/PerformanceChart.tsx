@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   LineChart,
@@ -22,6 +22,45 @@ import {
   type GameHistoryEntry,
   type PerformanceTrend,
 } from '@/utils/gameHistoryManager';
+
+/**
+ * Hook to track container dimensions and only render when valid
+ * Prevents Recharts "width(-1) and height(-1)" warning
+ */
+function useContainerDimensions() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const checkDimensions = () => {
+      if (containerRef.current) {
+        const { clientWidth, clientHeight } = containerRef.current;
+        if (clientWidth > 0 && clientHeight > 0) {
+          setIsReady(true);
+        }
+      }
+    };
+
+    // Check immediately
+    checkDimensions();
+
+    // Also check on next frame in case of layout shift
+    const frameId = requestAnimationFrame(checkDimensions);
+
+    // Set up resize observer for dynamic changes
+    const observer = new ResizeObserver(checkDimensions);
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      observer.disconnect();
+    };
+  }, []);
+
+  return { containerRef, isReady };
+}
 
 interface PerformanceChartProps {
   /** Current game score to highlight */
@@ -240,6 +279,9 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
   const [chartData, setChartData] = useState<GameHistoryEntry[]>([]);
   const [trend, setTrend] = useState<PerformanceTrend | null>(null);
   const [isClient, setIsClient] = useState(false);
+
+  // Track container dimensions to prevent Recharts rendering with invalid size
+  const { containerRef, isReady } = useContainerDimensions();
 
   // Load data on client side only (localStorage)
   useEffect(() => {
@@ -461,8 +503,9 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
           </motion.div>
         )}
 
-        {/* Chart */}
-        <div className={cn('w-full', compact ? 'h-32' : 'h-48')}>
+        {/* Chart - only render ResponsiveContainer when dimensions are valid */}
+        <div ref={containerRef} className={cn('w-full', compact ? 'h-32' : 'h-48')}>
+          {isReady && (
           <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100}>
             <LineChart
               data={chartData}
@@ -540,6 +583,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
               />
             </LineChart>
           </ResponsiveContainer>
+          )}
         </div>
 
         {/* Stats Row */}

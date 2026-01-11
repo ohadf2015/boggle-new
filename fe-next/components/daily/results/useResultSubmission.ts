@@ -108,6 +108,14 @@ export function useResultSubmission({
             console.warn('Failed to fetch country code:', geoError);
           }
 
+          // Validate attemptsUsed - must be between 1 and 10
+          // Zero attempts means the result was created but never actually attempted
+          // which indicates stale/invalid data that should not be submitted
+          if (result.attemptsUsed < 1 || result.attemptsUsed > 10) {
+            console.error('[WordHunt Submit] Invalid attempts count:', result.attemptsUsed, '- must be between 1 and 10');
+            return;
+          }
+
           const bodyData: Record<string, unknown> = {
             puzzleDate,
             puzzleNumber,

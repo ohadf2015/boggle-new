@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getSession } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { LiveMonitor } from '@/components/admin/LiveMonitor';
+import { TodayGamesHistory } from '@/components/admin/TodayGamesHistory';
 import { PullToRefreshWrapper } from '@/components/ui/PullToRefreshWrapper';
 import { isMobileDevice } from '@/utils/mobileAccessibility';
 
@@ -161,6 +162,9 @@ export default function AdminPage() {
 
         {/* Live Monitor Component */}
         <LiveMonitor authToken={authToken} />
+
+        {/* Today's Games History */}
+        <TodayGamesHistory authToken={authToken} />
       </main>
     </div>
   );
