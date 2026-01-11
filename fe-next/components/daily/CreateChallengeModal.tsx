@@ -4,7 +4,8 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Copy, Check, Share2, Crown, Grid3X3, Grid2X2, Sparkles, Zap, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { generateRandomTable } from '@/utils/utils';
 import { buildPuzzleShareUrl } from '@/utils/customPuzzle';
 import type { Language } from '@/types';
@@ -22,38 +23,79 @@ interface CreateChallengeModalProps {
 export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOpen, onClose, language }) => {
   const [step, setStep] = useState<'config' | 'loading' | 'share'>('config');
   const [boardSize, setBoardSize] = useState<number>(5);
+  const [targetWord, setTargetWord] = useState<string>('');
+  const [wordError, setWordError] = useState<string>('');
   const [shareUrl, setShareUrl] = useState<string>('');
   const [copied, setCopied] = useState(false);
   const { profile, user } = useAuth();
   const { t } = useLanguage();
 
+  // Language-specific letter validation patterns
+  const getLetterPattern = (lang: Language): RegExp => {
+    switch (lang) {
+      case 'he':
+        // Hebrew letters only (aleph to tav, including final forms)
+        return /^[\u05D0-\u05EA]+$/;
+      case 'en':
+        // English letters only
+        return /^[A-Za-z]+$/;
+      case 'sv':
+        // Swedish letters (including å, ä, ö)
+        return /^[A-Za-zÅÄÖåäö]+$/;
+      case 'ja':
+        // Japanese (Hiragana, Katakana, Kanji)
+        return /^[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF\u3400-\u4DBF]+$/;
+      case 'es':
+        // Spanish letters (including ñ, accented vowels)
+        return /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü]+$/;
+      default:
+        return /^[A-Za-z]+$/;
+    }
+  };
+
+  const validateWord = (word: string): string | null => {
+    if (!word || word.trim().length === 0) {
+      return t('daily.errorWordRequired');
+    }
+
+    const trimmed = word.trim();
+    const minLen = boardSize === 5 ? 5 : 6;
+    const maxLen = boardSize === 5 ? 8 : 10;
+
+    if (trimmed.length < minLen) {
+      return t('daily.errorWordTooShort', { minLen });
+    }
+
+    if (trimmed.length > maxLen) {
+      return t('daily.errorWordTooLong', { maxLen });
+    }
+
+    const pattern = getLetterPattern(language);
+    if (!pattern.test(trimmed)) {
+      return t('daily.errorInvalidLetters');
+    }
+
+    return null;
+  };
+
   const handleCreate = async () => {
+    // Validate word before proceeding
+    const error = validateWord(targetWord);
+    if (error) {
+      setWordError(error);
+      return;
+    }
+
+    setWordError('');
     setStep('loading');
     try {
-      // 1. Get random target word
-      // Adjust lengths based on board size
-      const minLen = boardSize === 5 ? 5 : 6;
-      const maxLen = boardSize === 5 ? 8 : 10;
+      // Use the user-provided word
+      const word = targetWord.trim().toUpperCase();
 
-      const wordRes = await fetch(`/api/drills/random-words?count=1&minLength=${minLen}&maxLength=${maxLen}&language=${language}`);
+      // Generate grid with embedded word
+      const grid = generateRandomTable(boardSize, boardSize, language, [word]);
 
-      if (!wordRes.ok) {
-        throw new Error(`API error: ${wordRes.status}`);
-      }
-
-      const wordData = await wordRes.json();
-
-      if (!wordData.words || !Array.isArray(wordData.words) || wordData.words.length === 0) {
-        console.error('Empty words array from API:', wordData);
-        throw new Error('No words available for this language');
-      }
-
-      const targetWord = wordData.words[0].toUpperCase();
-
-      // 2. Generate grid with embedded word
-      const grid = generateRandomTable(boardSize, boardSize, language, [targetWord]);
-
-      // 3. Create puzzle on server
+      // Create puzzle on server
       const displayName = profile?.display_name || user?.email?.split('@')[0] || 'Player';
       const guestFingerprint = !user ? await getGuestFingerprint() : undefined;
 
@@ -64,7 +106,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
         },
         body: JSON.stringify({
           language,
-          targetWord,
+          targetWord: word,
           grid,
           displayName,
           guestFingerprint,
@@ -116,6 +158,8 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
 
   const reset = () => {
     setStep('config');
+    setTargetWord('');
+    setWordError('');
     setShareUrl('');
   };
 
@@ -132,6 +176,11 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
         hideCloseButton
         className="w-[calc(100%-2rem)] max-w-lg p-0 overflow-hidden bg-neo-white border-neo-thick border-neo-black rounded-xl shadow-hard-lg"
       >
+        {/* Visually hidden title for accessibility */}
+        <VisuallyHidden.Root>
+          <DialogTitle>{t('daily.createChallengeTitle')}</DialogTitle>
+        </VisuallyHidden.Root>
+
         <div className="max-h-[90vh] overflow-y-auto">
           {/* Header */}
             <div className="relative flex items-center justify-between p-4 sm:p-5 border-b-neo-thick border-neo-black bg-gradient-to-br from-neo-yellow to-neo-orange sticky top-0 z-10">
@@ -246,11 +295,52 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     </div>
                   </div>
 
-                  {/* Info Banner */}
+                  {/* Word Input */}
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
+                    className="space-y-2"
+                  >
+                    <label htmlFor="target-word" className="block text-sm sm:text-base font-black text-neo-black uppercase tracking-tight">
+                      {t('daily.enterTargetWord')}
+                    </label>
+                    <input
+                      id="target-word"
+                      type="text"
+                      value={targetWord}
+                      onChange={(e) => {
+                        setTargetWord(e.target.value);
+                        if (wordError) setWordError('');
+                      }}
+                      placeholder={t('daily.wordPlaceholder', {
+                        min: boardSize === 5 ? 5 : 6,
+                        max: boardSize === 5 ? 8 : 10
+                      })}
+                      className={`w-full px-4 py-3 text-lg font-bold border-neo-thick rounded-xl shadow-hard-sm focus:shadow-hard focus:outline-none transition-all ${
+                        wordError
+                          ? 'border-red-500 bg-red-50'
+                          : 'border-neo-black bg-neo-white focus:border-neo-cyan'
+                      } ${language === 'he' ? 'text-right' : 'text-left'}`}
+                      dir={language === 'he' ? 'rtl' : 'ltr'}
+                    />
+                    {wordError && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-sm font-bold text-red-600 flex items-center gap-2"
+                      >
+                        <span className="inline-block w-1 h-1 rounded-full bg-red-600" />
+                        {wordError}
+                      </motion.p>
+                    )}
+                  </motion.div>
+
+                  {/* Info Banner */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
                     className="bg-gradient-to-br from-neo-yellow/20 to-neo-orange/20 border-3 border-neo-black rounded-xl p-4 text-center"
                   >
                     <p className="text-sm sm:text-base font-bold text-neo-black">
@@ -265,7 +355,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
+                    transition={{ delay: 0.4 }}
                   >
                     <Button
                       onClick={handleCreate}

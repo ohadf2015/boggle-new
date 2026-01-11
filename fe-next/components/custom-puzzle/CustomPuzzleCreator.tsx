@@ -198,13 +198,12 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
     if (!puzzleCode) return;
 
     const shareUrl = buildPuzzleShareUrl(puzzleCode, language);
-    const shareText = t('customPuzzle.shareText') ||
-      `I created a custom word puzzle. Can you beat my score? ${shareUrl}`;
+    const shareText = t('customPuzzle.shareText');
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: t('customPuzzle.title') || 'Custom Puzzle',
+          title: t('customPuzzle.title'),
           text: shareText,
           url: shareUrl,
         });
@@ -220,13 +219,13 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
   const getValidationMessage = (): string | null => {
     switch (validationStatus) {
       case 'valid':
-        return t('customPuzzle.wordValid') || 'Valid word!';
+        return t('customPuzzle.wordValid');
       case 'invalid':
-        return t('customPuzzle.invalidCharacters') || 'Letters only (no numbers or symbols)';
+        return t('customPuzzle.invalidCharacters');
       case 'too-short':
-        return t('customPuzzle.wordTooShort') || `Minimum ${MIN_WORD_LENGTH} letters`;
+        return t('customPuzzle.wordTooShort');
       case 'too-long':
-        return t('customPuzzle.wordTooLong') || `Maximum ${MAX_WORD_LENGTH} letters`;
+        return t('customPuzzle.wordTooLong');
       default:
         return null;
     }
@@ -292,7 +291,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                     <Wand2 className="w-5 h-5 text-neo-pink" />
                   </motion.div>
                   <h2 className="text-xl font-black text-neo-cream drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]">
-                    {t('customPuzzle.createTitle') || 'Create Your Own Puzzle'}
+                    {t('customPuzzle.createTitle')}
                   </h2>
                 </div>
                 <button
@@ -307,7 +306,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
             <div className="p-5 space-y-5">
               {/* Instructions */}
               <p className="text-neo-black/80 text-center font-medium">
-                {t('customPuzzle.enterWord') || 'Enter your target word'}
+                {t('customPuzzle.enterWord')}
               </p>
 
               {/* Word Input */}
@@ -318,7 +317,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                     type="text"
                     value={inputWord}
                     onChange={handleInputChange}
-                    placeholder={t('customPuzzle.enterWordPlaceholder') || 'Type a word...'}
+                    placeholder={t('customPuzzle.enterWordPlaceholder')}
                     className={cn(
                       "w-full px-4 py-4 text-2xl font-black text-center uppercase tracking-widest",
                       "bg-neo-white border-4 border-neo-black rounded-neo shadow-hard-sm",
@@ -418,12 +417,12 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                   {isCreating ? (
                     <span className="flex items-center justify-center gap-2">
                       <Loader2 className="w-6 h-6 animate-spin" />
-                      {t('customPuzzle.generating') || 'Generating...'}
+                      {t('customPuzzle.generating')}
                     </span>
                   ) : (
                     <span className="flex items-center justify-center gap-2">
                       <Sparkles className="w-6 h-6" />
-                      {t('customPuzzle.createPuzzle') || 'Create Puzzle'}
+                      {t('customPuzzle.createPuzzle')}
                     </span>
                   )}
                 </Button>
@@ -431,7 +430,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
 
               {/* Hint text */}
               <p className="text-xs text-center text-neo-black/50">
-                {t('customPuzzle.createDescription') || 'Challenge friends with your own word puzzle'}
+                {t('customPuzzle.createDescription')}
               </p>
             </div>
           </motion.div>
@@ -486,10 +485,10 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                 <Trophy className="w-10 h-10 text-neo-yellow" />
               </motion.div>
               <h2 className="text-2xl font-black text-neo-black drop-shadow-[1px_1px_0px_white]">
-                {t('customPuzzle.created') || 'Puzzle Created!'}
+                {t('customPuzzle.created')}
               </h2>
               <p className="text-neo-black/70 mt-1 font-medium">
-                {t('customPuzzle.shareWithFriends') || 'Share with friends to challenge them!'}
+                {t('customPuzzle.shareWithFriends')}
               </p>
             </div>
 
@@ -502,7 +501,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                 className="bg-neo-yellow border-3 border-neo-black rounded-neo p-4 shadow-hard text-center"
               >
                 <p className="text-sm text-neo-black/70 font-bold uppercase tracking-wide mb-1">
-                  {t('customPuzzle.yourScore') || 'Your Score to Beat'}
+                  {t('customPuzzle.yourScore')}
                 </p>
                 <p className="text-5xl font-black text-neo-black">{creatorResult.efficiencyScore}</p>
               </motion.div>
@@ -546,7 +545,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                   className="w-full py-4 text-lg font-black uppercase bg-gradient-to-r from-neo-pink to-neo-orange text-neo-cream border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all"
                 >
                   <Share2 className="w-5 h-5 mr-2" />
-                  {t('customPuzzle.share') || 'Share Puzzle'}
+                  {t('customPuzzle.share')}
                 </Button>
 
                 <Button
@@ -554,7 +553,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                   onClick={onClose}
                   className="w-full py-3 text-lg font-bold bg-neo-white text-neo-black border-3 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all"
                 >
-                  {t('common.done') || 'Done'}
+                  {t('common.done')}
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </motion.div>
