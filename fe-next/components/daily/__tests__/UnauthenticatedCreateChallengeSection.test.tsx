@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { UnauthenticatedCreateChallengeSection } from '../UnauthenticatedCreateChallengeSection';
 
@@ -42,9 +42,12 @@ describe('UnauthenticatedCreateChallengeSection', () => {
     return translations[key] || key;
   };
 
+  const mockOnAuthRequired = jest.fn();
+
   const defaultProps = {
     language: 'en' as const,
     t: mockT,
+    onAuthRequired: mockOnAuthRequired,
   };
 
   it('renders the component with all elements', () => {
@@ -107,5 +110,14 @@ describe('UnauthenticatedCreateChallengeSection', () => {
     expect(container.querySelector('.rounded-neo')).toBeInTheDocument();
     expect(container.querySelector('.border-neo-black')).toBeInTheDocument();
     expect(container.querySelector('.shadow-hard-lg')).toBeInTheDocument();
+  });
+
+  it('calls onAuthRequired when CTA button is clicked', () => {
+    render(<UnauthenticatedCreateChallengeSection {...defaultProps} />);
+
+    const button = screen.getByTestId('cta-button');
+    fireEvent.click(button);
+
+    expect(mockOnAuthRequired).toHaveBeenCalledTimes(1);
   });
 });
