@@ -232,7 +232,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   {/* Board Size Selection */}
                   <div className="space-y-3">
                     <div className="text-center">
-                      <h3 className="text-lg sm:text-xl font-bold mb-1 text-neo-black uppercase tracking-tight">
+                      <h3 className="text-lg sm:text-xl font-bold mb-1 text-neo-black dark:text-neo-white uppercase tracking-tight">
                         {t('daily.chooseBoardSize')}
                       </h3>
                       <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">{t('daily.pickDifficulty')}</p>
@@ -309,7 +309,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     transition={{ delay: 0.2 }}
                     className="space-y-2"
                   >
-                    <label htmlFor="target-word" className="block text-sm sm:text-base font-black text-neo-black uppercase tracking-tight">
+                    <label htmlFor="target-word" className="block text-sm sm:text-base font-black text-neo-black dark:text-neo-white uppercase tracking-tight">
                       {t('daily.enterTargetWord')}
                     </label>
                     <input
@@ -394,7 +394,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   {/* Loading Text */}
                   <div className="text-center space-y-2">
                     <motion.p
-                      className="text-lg sm:text-xl font-black text-neo-black uppercase tracking-wide"
+                      className="text-lg sm:text-xl font-black text-neo-black dark:text-neo-white uppercase tracking-wide"
                       animate={{ opacity: [0.5, 1, 0.5] }}
                       transition={{ duration: 1.5, repeat: Infinity }}
                     >
@@ -487,7 +487,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.3 }}
                   >
-                    <h3 className="font-black text-2xl sm:text-3xl mb-2 text-neo-black uppercase tracking-tight">
+                    <h3 className="font-black text-2xl sm:text-3xl mb-2 text-neo-black dark:text-neo-white uppercase tracking-tight">
                       {t('daily.challengeCreated')}
                     </h3>
                     <p className="text-base text-slate-700 dark:text-slate-300 font-medium">{t('daily.challengeCreatedDesc')}</p>
