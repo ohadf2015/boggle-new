@@ -198,11 +198,11 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         className={`relative p-5 sm:p-6 rounded-xl border-neo-thick transition-all flex flex-col items-center gap-3 ${
                           boardSize === 5
                             ? 'bg-neo-cyan text-neo-white border-neo-black shadow-hard-lg'
-                            : 'bg-neo-white border-neo-black/30 hover:border-neo-cyan shadow-hard-sm hover:shadow-hard'
+                            : 'bg-neo-white text-neo-black border-neo-black/30 hover:border-neo-cyan hover:text-neo-cyan shadow-hard-sm hover:shadow-hard'
                         }`}
                       >
                         <div className={`p-3 rounded-lg ${boardSize === 5 ? 'bg-neo-white/20' : 'bg-neo-cyan/10'}`}>
-                          <Grid2X2 className="w-8 h-8 sm:w-10 sm:h-10" strokeWidth={2.5} />
+                          <Grid2X2 className={`w-8 h-8 sm:w-10 sm:h-10 ${boardSize === 5 ? 'text-neo-white' : 'text-neo-cyan'}`} strokeWidth={2.5} />
                         </div>
                         <div className="text-center">
                           <span className="font-black text-2xl sm:text-3xl block">5×5</span>
@@ -229,11 +229,11 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         className={`relative p-5 sm:p-6 rounded-xl border-neo-thick transition-all flex flex-col items-center gap-3 ${
                           boardSize === 7
                             ? 'bg-neo-orange text-neo-white border-neo-black shadow-hard-lg'
-                            : 'bg-neo-white border-neo-black/30 hover:border-neo-orange shadow-hard-sm hover:shadow-hard'
+                            : 'bg-neo-white text-neo-black border-neo-black/30 hover:border-neo-orange hover:text-neo-orange shadow-hard-sm hover:shadow-hard'
                         }`}
                       >
                         <div className={`p-3 rounded-lg ${boardSize === 7 ? 'bg-neo-white/20' : 'bg-neo-orange/10'}`}>
-                          <Grid3X3 className="w-8 h-8 sm:w-10 sm:h-10" strokeWidth={2.5} />
+                          <Grid3X3 className={`w-8 h-8 sm:w-10 sm:h-10 ${boardSize === 7 ? 'text-neo-white' : 'text-neo-orange'}`} strokeWidth={2.5} />
                         </div>
                         <div className="text-center">
                           <span className="font-black text-2xl sm:text-3xl block">7×7</span>

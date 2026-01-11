@@ -3117,7 +3117,7 @@ const en = {
     "tryAnotherLanguage": "Try the challenge in another language:",
     "guestModeNotice": "Playing as Guest",
     "guestModeBenefits": "Sign up to track progress, build streaks, and compete on leaderboards",
-    "createCustomChallenge": "Create Custom Challenge",
+    "createCustomChallenge": "Create Your Own Challenge & Share with Friends",
     "createChallengeTitle": "Create Challenge",
     "chooseBoardSize": "Choose Board Size",
     "generateChallenge": "Generate Challenge",

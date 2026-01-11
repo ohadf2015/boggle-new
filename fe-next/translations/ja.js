@@ -3110,7 +3110,7 @@ const ja = {
     "tryAnotherLanguage": "他の言語でチャレンジ：",
     "guestModeNotice": "ゲストとしてプレイ中",
     "guestModeBenefits": "登録して進捗を追跡、連続記録を作成、ランキングに参加しましょう",
-    "createCustomChallenge": "カスタムチャレンジを作成",
+    "createCustomChallenge": "自分のチャレンジを作成して友達と共有",
     "createChallengeTitle": "チャレンジを作成",
     "chooseBoardSize": "ボードサイズを選択",
     "generateChallenge": "チャレンジを生成",

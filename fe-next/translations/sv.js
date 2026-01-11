@@ -3111,7 +3111,7 @@ const sv = {
     "tryAnotherLanguage": "Prova utmaningen på ett annat språk:",
     "guestModeNotice": "Spelar som gäst",
     "guestModeBenefits": "Registrera dig för att spåra framsteg, bygga serier och tävla på topplistor",
-    "createCustomChallenge": "Skapa anpassad utmaning",
+    "createCustomChallenge": "Skapa din egen utmaning & dela med vänner",
     "createChallengeTitle": "Skapa utmaning",
     "chooseBoardSize": "Välj brädstorlek",
     "generateChallenge": "Generera utmaning",

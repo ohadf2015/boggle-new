@@ -1,11 +1,11 @@
 {
   "summary": {
-    "totalKeysInCode": 1948,
+    "totalKeysInCode": 1958,
     "keyCountByLanguage": {
-      "en": 3235,
-      "he": 3235,
-      "sv": 3235,
-      "ja": 3235,
+      "en": 3245,
+      "he": 3245,
+      "sv": 3245,
+      "ja": 3245,
       "es": 3235
     },
     "missingFromEnglish": 0
@@ -15,7 +15,18 @@
     "he": [],
     "sv": [],
     "ja": [],
-    "es": []
+    "es": [
+      "daily.createCustomChallenge",
+      "daily.createChallengeTitle",
+      "daily.chooseBoardSize",
+      "daily.generateChallenge",
+      "daily.generatingPuzzle",
+      "daily.challengeCreated",
+      "daily.challengeCreatedDesc",
+      "daily.shareChallenge",
+      "daily.boardWillBeGenerated",
+      "daily.canPlayYourself"
+    ]
   },
   "keysNotInEnglish": {
     "he": [],

@@ -3112,7 +3112,7 @@ const he = {
     "tryAnotherLanguage": "נסו את האתגר בשפה אחרת:",
     "guestModeNotice": "משחק כאורח",
     "guestModeBenefits": "הירשמו כדי לעקוב אחר התקדמות, לבנות רצף ולהתחרות בטבלאות",
-    "createCustomChallenge": "יצירת אתגר מותאם",
+    "createCustomChallenge": "צור אתגר משלך ושתף עם חברים",
     "createChallengeTitle": "יצירת אתגר",
     "chooseBoardSize": "בחרו גודל לוח",
     "generateChallenge": "ייצור אתגר",
