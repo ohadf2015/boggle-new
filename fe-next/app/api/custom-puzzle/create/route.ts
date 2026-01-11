@@ -93,7 +93,7 @@ export async function POST(request: Request) {
       .insert({
         puzzle_code: puzzleCode,
         creator_id: user?.id || null,
-        creator_guest_fingerprint: user ? null : guestFingerprint,
+        creator_guest_fingerprint: user ? null : (guestFingerprint || null),
         creator_display_name: displayName,
         language,
         target_word: targetWord.toUpperCase(),

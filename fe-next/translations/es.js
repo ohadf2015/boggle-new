@@ -432,6 +432,13 @@ const es = {
     "connectionLost": "Conexión perdida",
     "notConnected": "Sin conexión"
   },
+  "notFound": {
+    "title": "Página no encontrada",
+    "heading": "¿Perdido en el laberinto de palabras?",
+    "message": "¡Esta página se salió del tablero! Vamos a llevarte de vuelta al juego.",
+    "button": "Volver al juego",
+    "mascotTooltip": "¡Haz clic para obtener direcciones!"
+  },
   "validation": {
     "usernameRequired": "¡Necesitas un nombre para jugar!",
     "hostUsernameRequired": "¿Cómo te llamamos?",
@@ -3110,6 +3117,18 @@ const es = {
     "guestModeBenefits": "Regístrate para seguir tu progreso, crear rachas y competir en clasificaciones",
     "createCustomChallenge": "Crea tu Propio Desafío y Comparte con Amigos",
     "signUpRequired": "⭐ Regístrate para crear desafíos",
+    "createChallengeFeature": {
+      "title": "Crea Desafíos Personalizados de Caza de Palabras",
+      "subtitle": "Diseña tus propios rompecabezas y desafía a amigos",
+      "benefits": {
+        "customPuzzles": "Diseña rompecabezas con tus propias palabras objetivo",
+        "chooseDifficulty": "Elige dificultad de cuadrícula 5×5 o 7×7",
+        "shareInstantly": "Comparte con un enlace - no se necesita app",
+        "trackResults": "Ve quién supera tu desafío"
+      },
+      "ctaButton": "Regístrate para Comenzar a Crear",
+      "socialProof": "Únete a miles creando desafíos"
+    },
     "createChallengeTitle": "Crear Desafío",
     "chooseBoardSize": "Elige el Tamaño del Tablero",
     "generateChallenge": "Generar Desafío",

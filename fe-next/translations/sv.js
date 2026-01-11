@@ -432,6 +432,13 @@ const sv = {
     "connectionLost": "Tappade anslutningen",
     "notConnected": "Inte ansluten"
   },
+  "notFound": {
+    "title": "Sidan hittades inte",
+    "heading": "Vilse i ordlabyrinten?",
+    "message": "Den här sidan har vandrat bort från brädet! Låt oss ta dig tillbaka till spelet.",
+    "button": "Tillbaka till spelet",
+    "mascotTooltip": "Klicka på mig för vägbeskrivning!"
+  },
   "validation": {
     "usernameRequired": "Du behöver ett namn för att spela!",
     "hostUsernameRequired": "Vad ska vi kalla dig?",
@@ -3113,6 +3120,18 @@ const sv = {
     "guestModeBenefits": "Registrera dig för att spåra framsteg, bygga serier och tävla på topplistor",
     "createCustomChallenge": "Skapa din egen utmaning & dela med vänner",
     "signUpRequired": "⭐ Registrera dig för att skapa utmaningar",
+    "createChallengeFeature": {
+      "title": "Skapa anpassade ordjakt-utmaningar",
+      "subtitle": "Designa dina egna pussel och utmana vänner",
+      "benefits": {
+        "customPuzzles": "Designa pussel med dina egna målord",
+        "chooseDifficulty": "Välj 5×5 eller 7×7 rutnät svårighetsgrad",
+        "shareInstantly": "Dela med en länk - ingen app behövs",
+        "trackResults": "Se vem som slår din utmaning"
+      },
+      "ctaButton": "Registrera dig för att börja skapa",
+      "socialProof": "Gå med tusentals som skapar utmaningar"
+    },
     "createChallengeTitle": "Skapa utmaning",
     "chooseBoardSize": "Välj brädstorlek",
     "generateChallenge": "Generera utmaning",

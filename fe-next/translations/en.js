@@ -433,6 +433,13 @@ const en = {
     "connectionLost": "Connection dropped",
     "notConnected": "Not connected"
   },
+  "notFound": {
+    "title": "Page Not Found",
+    "heading": "Lost in the Word Maze?",
+    "message": "This page wandered off the board! Let's get you back to the game.",
+    "button": "Back to Game",
+    "mascotTooltip": "Click me for directions!"
+  },
   "validation": {
     "usernameRequired": "Need a name to play!",
     "roomNameRequired": "Give your room a name",
@@ -3119,6 +3126,18 @@ const en = {
     "guestModeBenefits": "Sign up to track progress, build streaks, and compete on leaderboards",
     "createCustomChallenge": "Create Your Own Challenge & Share with Friends",
     "signUpRequired": "⭐ Sign up to create challenges",
+    "createChallengeFeature": {
+      "title": "Create Custom Word Hunt Challenges",
+      "subtitle": "Design your own puzzles and challenge friends",
+      "benefits": {
+        "customPuzzles": "Design puzzles with your own target words",
+        "chooseDifficulty": "Pick 5×5 or 7×7 grid difficulty",
+        "shareInstantly": "Share with a link - no app needed",
+        "trackResults": "See who beats your challenge"
+      },
+      "ctaButton": "Sign Up to Start Creating",
+      "socialProof": "Join thousands creating challenges"
+    },
     "createChallengeTitle": "Create Challenge",
     "chooseBoardSize": "Choose Board Size",
     "generateChallenge": "Generate Challenge",

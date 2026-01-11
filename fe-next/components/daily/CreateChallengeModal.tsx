@@ -208,7 +208,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     <Sparkles className="w-4 h-4 text-neo-pink" fill="currentColor" />
                   </motion.div>
                 </div>
-                <h2 className="font-white text-xl sm:text-2xl uppercase tracking-tight text-neo-black drop-shadow-sm">
+                <h2 className="font-bold text-xl sm:text-2xl uppercase tracking-tight text-neo-black drop-shadow-sm">
                   {t('daily.createChallengeTitle')}
                 </h2>
               </motion.div>
@@ -232,7 +232,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   {/* Board Size Selection */}
                   <div className="space-y-3">
                     <div className="text-center">
-                      <h3 className="text-lg sm:text-xl font-white mb-1 text-neo-black uppercase tracking-tight">
+                      <h3 className="text-lg sm:text-xl font-bold mb-1 text-neo-black uppercase tracking-tight">
                         {t('daily.chooseBoardSize')}
                       </h3>
                       <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">{t('daily.pickDifficulty')}</p>
@@ -515,9 +515,9 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       }`}
                     >
                       {copied ? (
-                        <Check className="w-5 h-5" strokeWidth={3} />
+                        <Check className="w-5 h-5 text-neo-white" strokeWidth={3} />
                       ) : (
-                        <Copy className="w-5 h-5" strokeWidth={2.5} />
+                        <Copy className="w-5 h-5 text-neo-black" strokeWidth={2.5} />
                       )}
                     </motion.button>
                   </motion.div>

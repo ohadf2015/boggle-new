@@ -432,6 +432,13 @@ const he = {
     "connectionLost": "החיבור נפל",
     "notConnected": "לא מחובר"
   },
+  "notFound": {
+    "title": "הדף לא נמצא",
+    "heading": "אבדת במבוך המילים?",
+    "message": "הדף הזה נדד מהלוח! בוא נחזיר אותך למשחק.",
+    "button": "חזרה למשחק",
+    "mascotTooltip": "לחץ עליי לקבלת הכוונה!"
+  },
   "validation": {
     "usernameRequired": "צריך שם כדי לשחק!",
     "hostUsernameRequired": "איך נקרא לך?",
@@ -3114,6 +3121,18 @@ const he = {
     "guestModeBenefits": "הירשמו כדי לעקוב אחר התקדמות, לבנות רצף ולהתחרות בטבלאות",
     "createCustomChallenge": "צור אתגר משלך ושתף עם חברים",
     "signUpRequired": "⭐ הירשם כדי ליצור אתגרים",
+    "createChallengeFeature": {
+      "title": "צרו אתגרי ציד מילים מותאמים אישית",
+      "subtitle": "עצבו פאזלים משלכם ואתגרו חברים",
+      "benefits": {
+        "customPuzzles": "עצבו פאזלים עם מילות יעד משלכם",
+        "chooseDifficulty": "בחרו רמת קושי - לוח 5×5 או 7×7",
+        "shareInstantly": "שתפו בקישור - ללא צורך באפליקציה",
+        "trackResults": "עקבו אחר מי מנצח את האתגר שלכם"
+      },
+      "ctaButton": "הירשמו כדי להתחיל ליצור",
+      "socialProof": "הצטרפו לאלפים היוצרים אתגרים"
+    },
     "createChallengeTitle": "יצירת אתגר",
     "chooseBoardSize": "בחרו גודל לוח",
     "generateChallenge": "ייצור אתגר",

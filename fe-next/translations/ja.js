@@ -432,6 +432,13 @@ const ja = {
     "connectionLost": "接続切れ",
     "notConnected": "未接続"
   },
+  "notFound": {
+    "title": "ページが見つかりません",
+    "heading": "言葉の迷路で迷子？",
+    "message": "このページはボードから離れてしまいました！ゲームに戻りましょう。",
+    "button": "ゲームに戻る",
+    "mascotTooltip": "クリックして道順を確認！"
+  },
   "validation": {
     "usernameRequired": "名前が必要！",
     "hostUsernameRequired": "なんて呼べばいい？",
@@ -3112,6 +3119,18 @@ const ja = {
     "guestModeBenefits": "登録して進捗を追跡、連続記録を作成、ランキングに参加しましょう",
     "createCustomChallenge": "自分のチャレンジを作成して友達と共有",
     "signUpRequired": "⭐ チャレンジを作成するにはサインアップ",
+    "createChallengeFeature": {
+      "title": "カスタムワードハントチャレンジを作成",
+      "subtitle": "独自のパズルをデザインして友達に挑戦",
+      "benefits": {
+        "customPuzzles": "独自のターゲットワードでパズルをデザイン",
+        "chooseDifficulty": "5×5または7×7グリッドの難易度を選択",
+        "shareInstantly": "リンクで共有 - アプリ不要",
+        "trackResults": "誰があなたのチャレンジに勝ったかを確認"
+      },
+      "ctaButton": "作成を開始するにはサインアップ",
+      "socialProof": "何千人もの人々が参加してチャレンジを作成中"
+    },
     "createChallengeTitle": "チャレンジを作成",
     "chooseBoardSize": "ボードサイズを選択",
     "generateChallenge": "チャレンジを生成",
