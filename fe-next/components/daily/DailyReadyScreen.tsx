@@ -9,6 +9,7 @@ import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import DailyIntroCarousel from './DailyIntroCarousel';
 import { CreateChallengeModal } from './CreateChallengeModal';
 import { UnauthenticatedCreateChallengeSection } from './UnauthenticatedCreateChallengeSection';
+import AuthModal from '../auth/AuthModal';
 import { hasPlayedWordHuntToday } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 
@@ -80,6 +81,8 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
   const [showLangDropdown, setShowLangDropdown] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showCreateChallenge, setShowCreateChallenge] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [pendingCreateChallenge, setPendingCreateChallenge] = useState(false);
 
   // Auto-open leaderboard if showLeaderboard query param is present
   useEffect(() => {
@@ -94,6 +97,20 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
       }
     }
   }, [searchParams]);
+
+  // Auto-open CreateChallengeModal after successful authentication
+  useEffect(() => {
+    if (isAuthenticated && pendingCreateChallenge) {
+      setPendingCreateChallenge(false);
+      setShowCreateChallenge(true);
+    }
+  }, [isAuthenticated, pendingCreateChallenge]);
+
+  // Handler for when unauthenticated user tries to create a challenge
+  const handleAuthRequired = () => {
+    setPendingCreateChallenge(true);
+    setShowAuthModal(true);
+  };
 
   // Check if this is a valid challenge (same puzzle number)
   const isValidChallenge = challengeData && challengeData.puzzleNumber === puzzleNumber;
@@ -314,7 +331,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
             </Button>
           </motion.div>
         ) : (
-          <UnauthenticatedCreateChallengeSection language={language} t={t} />
+          <UnauthenticatedCreateChallengeSection language={language} t={t} onAuthRequired={handleAuthRequired} />
         )}
 
         {/* Secondary Actions - Collapsed */}
@@ -388,6 +405,12 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
         isOpen={showCreateChallenge}
         onClose={() => setShowCreateChallenge(false)}
         language={language}
+      />
+
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        initialMode="signup"
       />
     </motion.div>
   );

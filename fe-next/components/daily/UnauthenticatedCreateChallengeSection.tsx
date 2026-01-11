@@ -10,6 +10,7 @@ import type { Language } from '@/types';
 interface UnauthenticatedCreateChallengeSectionProps {
   language: Language;
   t: (key: string, params?: Record<string, string | number>) => string;
+  onAuthRequired: () => void;
 }
 
 /**
@@ -19,6 +20,7 @@ interface UnauthenticatedCreateChallengeSectionProps {
 export const UnauthenticatedCreateChallengeSection: React.FC<UnauthenticatedCreateChallengeSectionProps> = ({
   language,
   t,
+  onAuthRequired,
 }) => {
   const benefits = [
     { icon: Target, key: 'customPuzzles' },
@@ -28,7 +30,7 @@ export const UnauthenticatedCreateChallengeSection: React.FC<UnauthenticatedCrea
   ];
 
   const handleSignUpClick = () => {
-    window.location.href = `/${language}/auth?returnTo=${encodeURIComponent(window.location.pathname)}`;
+    onAuthRequired();
   };
 
   return (
