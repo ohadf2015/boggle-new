@@ -109,6 +109,25 @@ if (!global.performance) {
 }
 global.performance.now = jest.fn(() => Date.now());
 
+// Mock fetch API with a default implementation
+const mockFetchImplementation = (url, _options) => {
+  // Default response for dictionary check
+  if (url.includes('/api/dictionary/check')) {
+    return Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({ isValid: true, source: 'dictionary' }),
+    });
+  }
+
+  // Default fallback for other endpoints
+  return Promise.resolve({
+    ok: true,
+    json: () => Promise.resolve({}),
+  });
+};
+
+global.fetch = jest.fn(mockFetchImplementation);
+
 // ==========================================
 // Mock Next.js Router
 // ==========================================
@@ -243,7 +262,7 @@ afterAll(() => {
 // ==========================================
 
 afterEach(() => {
-  // Clear all mocks
+  // Clear all mocks (but don't restore fetch - let tests handle their own fetch mocks)
   jest.clearAllMocks();
 
   // Clear localStorage

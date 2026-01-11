@@ -4,6 +4,25 @@ import '@testing-library/jest-dom';
 import DailyChallengeGame from '../DailyChallengeGame';
 import type { LetterGrid } from '@/types';
 
+// Mock framer-motion to avoid matchMedia issues
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
+      const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
+      return <div {...domProps}>{children}</div>;
+    },
+    svg: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
+      const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
+      return <svg {...domProps}>{children}</svg>;
+    },
+    circle: ({ ...props }: Record<string, unknown>) => {
+      const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
+      return <circle {...domProps} />;
+    },
+  },
+  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+}));
+
 // Mock hooks and components
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -57,6 +76,20 @@ describe('DailyChallengeGame - Keyboard Typing', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Restore fetch mock after clearing
+    global.fetch = jest.fn((url: string) => {
+      if (url.includes('/api/dictionary/check')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ isValid: true, source: 'dictionary' }),
+        } as Response);
+      }
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({}),
+      } as Response);
+    });
   });
 
   it('should render KeyboardHintTooltip when game is active', () => {
