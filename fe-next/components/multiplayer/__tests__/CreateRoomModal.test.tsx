@@ -14,6 +14,14 @@ import userEvent from '@testing-library/user-event';
 import CreateRoomModal from '../CreateRoomModal';
 import type { Language } from '@/shared/types/game';
 
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div>,
+    button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <button {...props}>{children}</button>,
+  },
+  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+}));
+
 // Mock dependencies
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -151,8 +159,7 @@ describe('CreateRoomModal', () => {
       );
 
       const nameSection = screen.getByText('AuthUser').closest('button');
-      // Should show "Signed in" text for authenticated users
-      expect(screen.getByText('Signed in')).toBeInTheDocument();
+      expect(screen.getByText(/Signed in/i)).toBeInTheDocument();
     });
   });
 

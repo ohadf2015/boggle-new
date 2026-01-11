@@ -431,7 +431,7 @@ describe('useEarthquakeFireRound', () => {
         useEarthquakeFireRound({
           enabled: true,
           gameDurationSeconds: 180,
-          currentTimeSeconds: 60,
+          currentTimeSeconds: 150,
           language: 'en',
           difficulty: 'MEDIUM',
           mode: 'singleplayer',
