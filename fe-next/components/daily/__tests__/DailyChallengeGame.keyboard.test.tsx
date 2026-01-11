@@ -19,6 +19,14 @@ jest.mock('framer-motion', () => ({
       const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
       return <circle {...domProps} />;
     },
+    path: ({ ...props }: Record<string, unknown>) => {
+      const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
+      return <path {...domProps} />;
+    },
+    span: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
+      const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
+      return <span {...domProps}>{children}</span>;
+    },
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));
@@ -64,6 +72,23 @@ jest.mock('@/hooks/useCrazyGamesLifecycle', () => ({
   useCrazyGamesLifecycle: jest.fn(),
 }));
 
+jest.mock('@/hooks/useDevicePerformance', () => ({
+  useDevicePerformance: () => ({
+    isLowEnd: false,
+    enableComplexAnimations: true,
+    prefersReducedMotion: false,
+  }),
+}));
+
+jest.mock('@/components/game/FloatingCoinAnimation', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
+jest.mock('@/components/ui/InteractiveMascot', () => ({
+  InteractiveMascot: () => null,
+}));
+
 const mockGrid: LetterGrid = [
   ['C', 'A', 'T'],
   ['O', 'R', 'E'],
@@ -76,10 +101,15 @@ describe('DailyChallengeGame - Keyboard Typing', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.useFakeTimers();
+
+    // Clear localStorage for KeyboardHintTooltip
+    localStorage.clear();
 
     // Restore fetch mock after clearing
-    global.fetch = jest.fn((url: string) => {
-      if (url.includes('/api/dictionary/check')) {
+    global.fetch = jest.fn((url: string | URL | Request) => {
+      const urlString = typeof url === 'string' ? url : url.toString();
+      if (urlString.includes('/api/dictionary/check')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ isValid: true, source: 'dictionary' }),
@@ -89,10 +119,14 @@ describe('DailyChallengeGame - Keyboard Typing', () => {
         ok: true,
         json: () => Promise.resolve({}),
       } as Response);
-    });
+    }) as jest.Mock;
   });
 
-  it('should render KeyboardHintTooltip when game is active', () => {
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('should render KeyboardHintTooltip when game is active', async () => {
     render(
       <DailyChallengeGame
         grid={mockGrid}
@@ -104,9 +138,14 @@ describe('DailyChallengeGame - Keyboard Typing', () => {
       />
     );
 
-    // KeyboardHintTooltip is rendered (though may not be visible initially due to delay)
-    // The component itself should be in the DOM
-    expect(document.querySelector('[role="tooltip"]')).toBeInTheDocument();
+    // KeyboardHintTooltip has a 10-second delay before showing
+    // Fast-forward time to trigger the tooltip
+    jest.advanceTimersByTime(10000);
+
+    // The tooltip should now be visible
+    await waitFor(() => {
+      expect(document.querySelector('[role="tooltip"]')).toBeInTheDocument();
+    });
   });
 
   it('should accept keyboard input during active game', async () => {
@@ -214,7 +253,7 @@ describe('DailyChallengeGame - Keyboard Typing', () => {
   });
 
   it('should not accept keyboard input when game is over', () => {
-    const { rerender } = render(
+    render(
       <DailyChallengeGame
         grid={mockGrid}
         puzzleNumber={1}
