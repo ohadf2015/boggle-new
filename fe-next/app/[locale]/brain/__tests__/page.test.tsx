@@ -6,6 +6,9 @@ import { useBrainScore } from '@/hooks/useBrainScore';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { useRouter } from 'next/navigation';
+import { MusicProvider } from '@/contexts/MusicContext';
+import { SoundEffectsProvider } from '@/contexts/SoundEffectsContext';
+import React from 'react';
 
 // Mock all dependencies
 jest.mock('@/contexts/AuthContext');
@@ -31,6 +34,15 @@ describe('BrainTrainingPage - Loading States', () => {
     replace: jest.fn(),
     prefetch: jest.fn(),
   };
+
+  // Wrapper component to provide necessary contexts
+  const AllTheProviders = ({ children }: { children: React.ReactNode }) => (
+    <MusicProvider>
+      <SoundEffectsProvider>
+        {children}
+      </SoundEffectsProvider>
+    </MusicProvider>
+  );
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -97,7 +109,7 @@ describe('BrainTrainingPage - Loading States', () => {
         initializeBrainScore: jest.fn(),
       });
 
-      render(<BrainTrainingPage />);
+      render(<BrainTrainingPage />, { wrapper: AllTheProviders });
 
       // Should show loading skeleton, NOT the "Sign in" message
       const loadingElements = screen.getAllByRole('generic');
@@ -143,7 +155,7 @@ describe('BrainTrainingPage - Loading States', () => {
         initializeBrainScore: jest.fn(),
       });
 
-      render(<BrainTrainingPage />);
+      render(<BrainTrainingPage />, { wrapper: AllTheProviders });
 
       // Should show loading skeleton
       const loadingElements = screen.getAllByRole('generic');
@@ -185,7 +197,7 @@ describe('BrainTrainingPage - Loading States', () => {
         initializeBrainScore: jest.fn(),
       });
 
-      render(<BrainTrainingPage />);
+      render(<BrainTrainingPage />, { wrapper: AllTheProviders });
 
       // Should show "Sign in" message
       await waitFor(() => {
