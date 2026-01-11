@@ -367,6 +367,7 @@ Generate exactly ${dates.length} words. Respond with ONLY valid JSON (no markdow
 
   try {
     // Initialize the AI service
+    // @ts-ignore - Access private initialize for admin bulk generation
     await gameAIService.initialize();
     
     // Access the model through the service
