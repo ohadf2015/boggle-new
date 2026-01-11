@@ -3,6 +3,8 @@
  * Defines all available avatar images with their funny names
  */
 
+import { getAvatarColorVar } from '@/lib/designSystem';
+
 export interface AvatarConfig {
   id: string;
   name: string;
@@ -62,29 +64,32 @@ export function getAvatarPath(avatar: AvatarConfig | string): string {
 /**
  * Map avatar ID to emoji representation (for Word Hunt leaderboard compatibility)
  * Returns an emoji and color that represents the avatar
+ *
+ * @deprecated Prefer using getAvatarColor() from designSystem.ts for Tailwind classes
+ * This function is maintained for backward compatibility with inline styles
  */
 export function getAvatarEmojiAndColor(avatarId: string): { emoji: string; color: string } {
   const avatarToEmojiMap: Record<string, { emoji: string; color: string }> = {
-    'broccoli-bob': { emoji: '🥦', color: '#10b981' },
-    'drippy-drop': { emoji: '💧', color: '#06b6d4' },
-    'sunny-steve': { emoji: '☀️', color: '#f59e0b' },
-    'cloudy-carl': { emoji: '☁️', color: '#94a3b8' },
-    'octo-otto': { emoji: '🐙', color: '#8b5cf6' },
-    'pizza-pete': { emoji: '🍕', color: '#ef4444' },
-    'prickly-pat': { emoji: '🌵', color: '#84cc16' },
-    'melon-molly': { emoji: '🍉', color: '#ec4899' },
-    'avo-alex': { emoji: '🥑', color: '#22c55e' },
-    'frosty-frank': { emoji: '❄️', color: '#60a5fa' },
-    'flaky-fred': { emoji: '❄️', color: '#e0f2fe' },
-    'eggy-ed': { emoji: '🥚', color: '#fef3c7' },
-    'slimy-sam': { emoji: '💚', color: '#4ade80' },
-    'starry-stella': { emoji: '⭐', color: '#fbbf24' },
-    'shroom-shelly': { emoji: '🍄', color: '#f87171' },
-    'donut-danny': { emoji: '🍩', color: '#fb923c' },
-    'jelly-jen': { emoji: '🍇', color: '#c084fc' },
+    'broccoli-bob': { emoji: '🥦', color: getAvatarColorVar('broccoli-bob') },
+    'drippy-drop': { emoji: '💧', color: getAvatarColorVar('drippy-drop') },
+    'sunny-steve': { emoji: '☀️', color: getAvatarColorVar('sunny-steve') },
+    'cloudy-carl': { emoji: '☁️', color: getAvatarColorVar('cloudy-carl') },
+    'octo-otto': { emoji: '🐙', color: getAvatarColorVar('octo-otto') },
+    'pizza-pete': { emoji: '🍕', color: getAvatarColorVar('pizza-pete') },
+    'prickly-pat': { emoji: '🌵', color: getAvatarColorVar('prickly-pat') },
+    'melon-molly': { emoji: '🍉', color: getAvatarColorVar('melon-molly') },
+    'avo-alex': { emoji: '🥑', color: getAvatarColorVar('avo-alex') },
+    'frosty-frank': { emoji: '❄️', color: getAvatarColorVar('frosty-frank') },
+    'flaky-fred': { emoji: '❄️', color: getAvatarColorVar('flaky-fred') },
+    'eggy-ed': { emoji: '🥚', color: getAvatarColorVar('eggy-ed') },
+    'slimy-sam': { emoji: '💚', color: getAvatarColorVar('slimy-sam') },
+    'starry-stella': { emoji: '⭐', color: getAvatarColorVar('starry-stella') },
+    'shroom-shelly': { emoji: '🍄', color: getAvatarColorVar('shroom-shelly') },
+    'donut-danny': { emoji: '🍩', color: getAvatarColorVar('donut-danny') },
+    'jelly-jen': { emoji: '🍇', color: getAvatarColorVar('jelly-jen') },
   };
 
-  return avatarToEmojiMap[avatarId] || { emoji: '🎯', color: '#6366f1' };
+  return avatarToEmojiMap[avatarId] || { emoji: '🎯', color: 'var(--avatar-1)' };
 }
 
 /**

@@ -620,20 +620,11 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
         <html lang={validLocale} dir={dir} className={`${fredoka.variable} ${rubik.variable}`}>
             <head>
                 <meta charSet="utf-8" />
-                {/* Blocking script to set theme before React hydrates - prevents flash */}
+                {/* Minimal blocking script for theme - prevents FOUC (flash of unstyled content) */}
+                {/* Minified for faster parsing - ~200 bytes */}
                 <script
                     dangerouslySetInnerHTML={{
-                        __html: `
-                            (function() {
-                                try {
-                                    const savedTheme = localStorage.getItem('boggle_theme');
-                                    const theme = (savedTheme === 'light' || savedTheme === 'dark') ? savedTheme : 'dark';
-                                    document.documentElement.classList.add(theme);
-                                } catch (e) {
-                                    document.documentElement.classList.add('dark');
-                                }
-                            })();
-                        `,
+                        __html: `try{var t=localStorage.getItem('boggle_theme');document.documentElement.classList.add(t==='light'||t==='dark'?t:'dark')}catch(e){document.documentElement.classList.add('dark')}`,
                     }}
                 />
                 {/* Preconnect hints for faster resource loading on slow connections */}
@@ -664,9 +655,10 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <meta name="apple-mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
                 <meta name="apple-mobile-web-app-title" content="LexiClash" />
-                {/* Google AdSense - placed in head to avoid data-nscript warning */}
+                {/* Google AdSense - defer loading to not compete with critical resources (LCP) */}
+                {/* Using defer instead of async to ensure it loads after critical content */}
                 <script
-                    async
+                    defer
                     src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1896836706464880"
                     crossOrigin="anonymous"
                 />

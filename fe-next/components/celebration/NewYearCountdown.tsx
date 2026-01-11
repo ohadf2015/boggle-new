@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, PartyPopper } from 'lucide-react';
-import { Dialog, DialogContent, DialogBody } from '../ui/dialog';
+import { Dialog, DialogContent, DialogBody, DialogTitle } from '../ui/dialog';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useNewYearDetection, formatTimeRemaining } from '../../hooks/useNewYearDetection';
 import { triggerHaptic } from '../../utils/hapticFeedback';
@@ -133,6 +133,9 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
       {/* Countdown Modal */}
       <Dialog open={showCountdown} onOpenChange={(open) => { if (!open) setShowCountdown(false); }}>
         <DialogContent noDescription className="max-w-md">
+          <DialogTitle className="sr-only">
+            {t('newYear.countdownTitle') || 'New Year Countdown'}
+          </DialogTitle>
           <DialogBody className="text-center py-8">
             <motion.div
               className="flex flex-col items-center gap-6"
@@ -179,6 +182,9 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
       {/* Celebration Modal with Fireworks */}
       <Dialog open={showCelebration} onOpenChange={setShowCelebration}>
         <DialogContent noDescription className="max-w-2xl overflow-hidden">
+          <DialogTitle className="sr-only">
+            {t('newYear.happyNewYear') || 'Happy New Year!'}
+          </DialogTitle>
           <DialogBody className="text-center py-12 relative">
             <motion.div
               className="flex flex-col items-center gap-8"

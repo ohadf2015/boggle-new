@@ -23,7 +23,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
   const { t, language } = useLanguage();
 
   return (
-    <footer className={cn('py-3 px-2 sm:px-3 lg:px-4 mt-auto border-t-4 border-neo-black bg-neo-navy text-white', className)}>
+    <footer className={cn('py-3 px-2 sm:px-3 lg:px-4 mt-auto border-t-4 border-neo-black bg-neo-navy text-white content-visibility-auto-sm', className)}>
       <div className="w-full">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           {/* Copyright */}

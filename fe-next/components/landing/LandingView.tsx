@@ -304,12 +304,16 @@ const LandingView: React.FC = () => {
         )}
 
         {/* Daily Challenge Banner - Lazy loaded with skeleton fallback */}
+        {/* Fixed dimensions prevent CLS - matches DailyChallengeBanner actual height */}
         <div className={`w-full ${isLandscape ? 'mb-2' : 'mb-2 sm:mb-3 lg:mb-4 xl:mb-6'}`}>
           <Suspense fallback={
-            <div className="w-full p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-yellow animate-pulse">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-neo bg-neo-black/20" />
-                <div className="flex-1 space-y-2">
+            <div
+              className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-yellow"
+              style={{ minHeight: isLandscape ? '52px' : '62px' }}
+            >
+              <div className="flex items-center gap-3 animate-pulse">
+                <div className={`${isLandscape ? 'w-8 h-8' : 'w-10 h-10 sm:w-12 sm:h-12'} rounded-neo bg-neo-black/20 shrink-0`} />
+                <div className="flex-1 min-w-0 space-y-2">
                   <div className="h-5 w-32 bg-neo-black/20 rounded" />
                   <div className="h-3 w-20 bg-neo-black/10 rounded" />
                 </div>

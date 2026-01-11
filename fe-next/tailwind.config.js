@@ -61,14 +61,29 @@ module.exports = {
           purple: "var(--neo-purple)",
           "purple-light": "var(--neo-purple-light)",
         },
-        // Brand colors for social auth
+        // Brand colors for social auth - referencing new CSS variables
         brand: {
-          google: "#4285F4",
-          "google-hover": "#3367D6",
-          discord: "#5865F2",
-          "discord-hover": "#4752C4",
-          apple: "#000000",
-          "apple-hover": "#333333",
+          google: "var(--brand-google)",
+          "google-hover": "var(--brand-google-hover)",
+          "google-dark": "var(--brand-google-dark)",
+          discord: "var(--brand-discord)",
+          "discord-hover": "var(--brand-discord-hover)",
+          "discord-dark": "var(--brand-discord-dark)",
+          apple: "var(--brand-apple)",
+          "apple-hover": "var(--brand-apple-hover)",
+          "apple-light": "var(--brand-apple-light)",
+          whatsapp: "var(--brand-whatsapp)",
+          "whatsapp-hover": "var(--brand-whatsapp-hover)",
+          "whatsapp-dark": "var(--brand-whatsapp-dark)",
+          facebook: "var(--brand-facebook)",
+          "facebook-hover": "var(--brand-facebook-hover)",
+          "facebook-dark": "var(--brand-facebook-dark)",
+          twitter: "var(--brand-twitter)",
+          "twitter-hover": "var(--brand-twitter-hover)",
+          "twitter-dark": "var(--brand-twitter-dark)",
+          linkedin: "var(--brand-linkedin)",
+          "linkedin-hover": "var(--brand-linkedin-hover)",
+          "linkedin-dark": "var(--brand-linkedin-dark)",
         },
         // Achievement tier colors
         tier: {
@@ -200,6 +215,20 @@ module.exports = {
         lg: "var(--radius-lg)",
         md: "var(--radius-md)",
         sm: "var(--radius-sm)",
+      },
+      // Gradient Presets - Standard gradient recipes for consistent usage
+      backgroundImage: {
+        // Rank gradients for 1st/2nd/3rd place displays
+        'gradient-rank-first': 'linear-gradient(135deg, var(--gradient-rank-first-from), var(--gradient-rank-first-via), var(--gradient-rank-first-to))',
+        'gradient-rank-second': 'linear-gradient(135deg, var(--gradient-rank-second-from), var(--gradient-rank-second-via), var(--gradient-rank-second-to))',
+        'gradient-rank-third': 'linear-gradient(135deg, var(--gradient-rank-third-from), var(--gradient-rank-third-via), var(--gradient-rank-third-to))',
+        // Performance stat gradients (positive/negative/neutral indicators)
+        'gradient-stat-positive': 'linear-gradient(135deg, var(--gradient-stat-positive-from), var(--gradient-stat-positive-to))',
+        'gradient-stat-negative': 'linear-gradient(135deg, var(--gradient-stat-negative-from), var(--gradient-stat-negative-to))',
+        'gradient-stat-neutral': 'linear-gradient(135deg, var(--gradient-stat-neutral-from), var(--gradient-stat-neutral-to))',
+        // Background gradients (navy base with accent overlays)
+        'gradient-bg-navy': 'linear-gradient(135deg, var(--gradient-bg-navy-from), var(--gradient-bg-navy-to))',
+        'gradient-bg-accent': 'linear-gradient(135deg, var(--gradient-bg-accent-from), var(--gradient-bg-accent-via), var(--gradient-bg-accent-to))',
       },
       // Neo-Brutalist Keyframes
       keyframes: {
@@ -414,6 +443,10 @@ module.exports = {
         '128': '32rem',
         '144': '36rem',
         '160': '40rem',
+        // Semantic gap aliases (based on usage analysis: 771 gap-2, 314 gap-3, 121 gap-4)
+        'gap-tight': '0.5rem',    // Replaces gap-2 - Compact layouts, tight spacing
+        'gap-normal': '0.75rem',  // Replaces gap-3 - Standard spacing
+        'gap-relaxed': '1rem',    // Replaces gap-4 - Generous spacing
       },
       // Z-index scale for better layering
       zIndex: {
@@ -425,5 +458,94 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    // Custom plugin for semantic design token utilities
+    function({ addUtilities }) {
+      addUtilities({
+        // Semantic button utilities with Neo-Brutalist styling
+        '.btn-token-primary': {
+          backgroundColor: 'var(--button-primary)',
+          color: 'var(--button-primary-text)',
+          border: '3px solid rgb(var(--neo-black))',
+          boxShadow: '4px 4px 0px rgb(var(--neo-black))',
+          '&:hover': {
+            backgroundColor: 'var(--button-primary-hover)',
+          },
+          '&:active': {
+            transform: 'translate(2px, 2px)',
+            boxShadow: '2px 2px 0px rgb(var(--neo-black))',
+          },
+        },
+        '.btn-token-secondary': {
+          backgroundColor: 'var(--button-secondary)',
+          color: 'var(--button-secondary-text)',
+          border: '3px solid rgb(var(--neo-black))',
+          boxShadow: '4px 4px 0px rgb(var(--neo-black))',
+          '&:hover': {
+            backgroundColor: 'var(--button-secondary-hover)',
+          },
+          '&:active': {
+            transform: 'translate(2px, 2px)',
+            boxShadow: '2px 2px 0px rgb(var(--neo-black))',
+          },
+        },
+        '.btn-token-destructive': {
+          backgroundColor: 'var(--button-destructive)',
+          color: 'var(--button-destructive-text)',
+          border: '3px solid rgb(var(--neo-black))',
+          boxShadow: '4px 4px 0px rgb(var(--neo-black))',
+          '&:hover': {
+            backgroundColor: 'var(--button-destructive-hover)',
+          },
+          '&:active': {
+            transform: 'translate(2px, 2px)',
+            boxShadow: '2px 2px 0px rgb(var(--neo-black))',
+          },
+        },
+        '.btn-token-success': {
+          backgroundColor: 'var(--button-success)',
+          color: 'var(--button-success-text)',
+          border: '3px solid rgb(var(--neo-black))',
+          boxShadow: '4px 4px 0px rgb(var(--neo-black))',
+          '&:hover': {
+            backgroundColor: 'var(--button-success-hover)',
+          },
+          '&:active': {
+            transform: 'translate(2px, 2px)',
+            boxShadow: '2px 2px 0px rgb(var(--neo-black))',
+          },
+        },
+        // Semantic badge utilities with Neo-Brutalist styling
+        '.badge-token-info': {
+          backgroundColor: 'var(--badge-info)',
+          color: 'var(--badge-info-text)',
+          border: '2px solid rgb(var(--neo-black))',
+          padding: '0.25rem 0.75rem',
+          borderRadius: '4px',
+        },
+        '.badge-token-warning': {
+          backgroundColor: 'var(--badge-warning)',
+          color: 'var(--badge-warning-text)',
+          border: '2px solid rgb(var(--neo-black))',
+          padding: '0.25rem 0.75rem',
+          borderRadius: '4px',
+        },
+        '.badge-token-error': {
+          backgroundColor: 'var(--badge-error)',
+          color: 'var(--badge-error-text)',
+          border: '2px solid rgb(var(--neo-black))',
+          padding: '0.25rem 0.75rem',
+          borderRadius: '4px',
+        },
+        '.badge-token-success': {
+          backgroundColor: 'var(--badge-success)',
+          color: 'var(--badge-success-text)',
+          border: '2px solid rgb(var(--neo-black))',
+          padding: '0.25rem 0.75rem',
+          borderRadius: '4px',
+        },
+      });
+    },
+  ],
 }

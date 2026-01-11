@@ -1,15 +1,21 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Dumbbell, ArrowRight, Zap, Target, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Dumbbell, ArrowRight, Zap, Target, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { triggerHaptic } from '@/utils/hapticFeedback';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogBody,
+} from '@/components/ui/dialog';
 
 interface TrainingSuggestionModalProps {
   isOpen: boolean;
@@ -56,46 +62,30 @@ const TrainingSuggestionModal: React.FC<TrainingSuggestionModalProps> = ({
     { icon: Sparkles, key: 'noPressure' },
   ];
 
-  if (!isOpen) return null;
-  if (typeof document === 'undefined') return null;
-
-  return createPortal(
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        noDescription
+        className={cn(
+          'max-w-md max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl relative',
+          isDarkMode
+            ? 'bg-gradient-to-b from-slate-800 via-slate-800 to-slate-900 border border-cyan-500/30'
+            : 'bg-gradient-to-b from-white via-white to-gray-50 border border-cyan-400/50'
+        )}
       >
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0, y: 20 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.8, opacity: 0, y: 20 }}
-          transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-          className={cn(
-            'w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-2xl relative',
-            isDarkMode
-              ? 'bg-gradient-to-b from-slate-800 via-slate-800 to-slate-900 border border-cyan-500/30'
-              : 'bg-gradient-to-b from-white via-white to-gray-50 border border-cyan-400/50'
-          )}
-          onClick={(e) => e.stopPropagation()}
+        <DialogHeader
+          variant="gradient"
+          customBg="bg-transparent"
+          className="border-b-0 p-0"
         >
+          <DialogTitle className="sr-only">
+            {t('daily.trainingSuggestion.title') || 'New to LexiClash?'}
+          </DialogTitle>
+        </DialogHeader>
+
+        <DialogBody className="relative">
           {/* Decorative background glow */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-gradient-to-b from-cyan-500/20 to-transparent rounded-full blur-3xl pointer-events-none" />
-
-          {/* Close button */}
-          <button
-            onClick={onClose}
-            className={cn(
-              'absolute top-4 right-4 rounded-full p-2 z-10 transition-colors',
-              isDarkMode
-                ? 'hover:bg-slate-700 text-gray-400 hover:text-gray-200'
-                : 'hover:bg-gray-100 text-gray-500 hover:text-gray-700'
-            )}
-          >
-            <X size={18} />
-          </button>
 
           {/* Icon animation */}
           <motion.div
@@ -252,10 +242,9 @@ const TrainingSuggestionModal: React.FC<TrainingSuggestionModalProps> = ({
               {t('daily.trainingSuggestion.skipToDaily') || "Skip, I'll figure it out"}
             </Button>
           </motion.div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>,
-    document.body
+        </DialogBody>
+      </DialogContent>
+    </Dialog>
   );
 };
 

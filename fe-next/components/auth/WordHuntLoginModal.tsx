@@ -1,15 +1,20 @@
 'use client';
 
 import React, { useState } from 'react';
-import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
 import { Button as ButtonComponent } from '../ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogBody,
+} from '@/components/ui/dialog';
 
 const Button = ButtonComponent as any;
 import { useLanguage } from '../../contexts/LanguageContext';
 import { signInWithGoogle, signInWithDiscord } from '../../lib/supabase';
-import { cn } from '../../lib/utils';
 
 // Brand icon SVG components
 const GoogleIcon = ({ className }: { className?: string }) => (

@@ -1,10 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, X, Trophy, Calendar } from 'lucide-react';
+import { Mail, Trophy, Calendar } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { socialEvents } from './SocialMediaPixels';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogBody,
+} from '@/components/ui/dialog';
 
 /**
  * Email Capture Modal for Re-engagement
@@ -140,34 +146,25 @@ export function EmailCaptureModal() {
     localStorage.setItem('email_modal_dismissed_until', dismissedUntil.toString());
   };
 
-  if (!showModal) return null;
-
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[200] p-4"
-        onClick={handleDismiss}
+    <Dialog open={showModal} onOpenChange={(open) => !open && handleDismiss()}>
+      <DialogContent
+        noDescription
+        className="bg-neo-navy border-4 border-neo-black max-w-md"
       >
-        <motion.div
-          initial={{ scale: 0.9, y: 20 }}
-          animate={{ scale: 1, y: 0 }}
-          exit={{ scale: 0.9, y: 20 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          onClick={(e) => e.stopPropagation()}
-          className="bg-neo-navy border-4 border-neo-black rounded-neo shadow-hard-lg max-w-md w-full p-6 md:p-8 relative"
+        <DialogHeader
+          variant="gradient"
+          customBg="bg-neo-navy"
+          className="border-b-0 text-neo-white"
         >
-          {/* Close button */}
-          <button
-            onClick={handleDismiss}
-            className="absolute top-3 right-3 rtl:right-auto rtl:left-3 p-2 hover:bg-neo-white hover:bg-opacity-10 rounded-neo transition-colors"
-            aria-label="Close"
-          >
-            <X size={24} className="text-neo-white" />
-          </button>
+          <DialogTitle className="sr-only">
+            {submitted
+              ? t('email.successTitle') || "You're all set!"
+              : t('email.title') || 'Get Daily Challenges!'}
+          </DialogTitle>
+        </DialogHeader>
 
+        <DialogBody className="text-neo-white">
           {submitted ? (
             /* Success State */
             <div className="text-center">
@@ -247,9 +244,9 @@ export function EmailCaptureModal() {
               </form>
             </>
           )}
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+        </DialogBody>
+      </DialogContent>
+    </Dialog>
   );
 }
 

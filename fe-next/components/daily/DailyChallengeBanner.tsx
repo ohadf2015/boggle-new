@@ -100,13 +100,24 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   const isRTL = dir === 'rtl';
 
   if (!isClient) {
-    // SSR placeholder to prevent hydration mismatch
+    // SSR placeholder to prevent hydration mismatch and CLS
+    // Uses exact same structure as rendered content with fixed dimensions
     return (
       <div className={cn(
-        "w-full p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-yellow",
+        "w-full rounded-neo border-3 border-neo-black shadow-hard bg-neo-yellow",
+        compact ? "p-2" : "p-2 sm:p-3",
         className
       )}>
-        <div className="h-10" />
+        <div className="flex items-center gap-3">
+          <div className={cn(
+            "rounded-neo border-2 border-neo-black bg-neo-black/20 shrink-0",
+            compact ? "w-8 h-8" : "w-10 h-10 sm:w-12 sm:h-12"
+          )} />
+          <div className="flex-1 min-w-0 space-y-2">
+            <div className="h-5 w-32 bg-neo-black/10 rounded" />
+            <div className="h-3 w-20 bg-neo-black/10 rounded" />
+          </div>
+        </div>
       </div>
     );
   }

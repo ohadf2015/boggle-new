@@ -2,10 +2,17 @@
 
 import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ThumbsUp, ThumbsDown, X, Book, CheckCircle, HelpCircle } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Book, CheckCircle, HelpCircle } from 'lucide-react';
 import Avatar from '../Avatar';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { applyHebrewFinalLetters } from '../../utils/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogBody,
+} from '@/components/ui/dialog';
 
 /**
  * Avatar data interface
@@ -211,8 +218,6 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
     return 'bg-neo-cyan';
   };
 
-  if (!isOpen) return null;
-
   // Get vote info for current word
   // Words need 6 points to be prominently valid (added to dictionary)
   // This matches the database is_potentially_valid threshold
@@ -223,24 +228,12 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
   const isValidForScoring = wordVoteInfo?.isValidForScoring || false;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onSkip()}>
+      <DialogContent
+        noDescription
+        className="bg-neo-cream border-4 border-neo-black max-w-md overflow-hidden"
         dir={dir}
       >
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-neo-black/60 text-white"
-          onClick={onSkip}
-        />
-
-        {/* Modal */}
         <motion.div
           key={currentWord.word}
           initial={{ opacity: 0, scale: 0.8, y: 50, rotate: -5 }}
@@ -251,48 +244,24 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
             stiffness: 300,
             damping: 20
           }}
-          className="
-            relative w-full max-w-md
-            bg-neo-cream
-            border-4 border-neo-black
-            rounded-neo-lg
-            shadow-hard-xl
-            overflow-hidden
-          "
         >
-          {/* Header - Dictionary Building Focus */}
-          <div className="
-            bg-neo-pink text-white
-            border-b-4 border-neo-black
-            px-4 py-3
-            flex items-center justify-between
-          ">
-            <h2 className="text-xl font-black uppercase tracking-tight text-neo-cream flex items-center gap-2">
+          <DialogHeader
+            variant="pink"
+            className="flex-row items-center justify-between text-neo-cream"
+          >
+            <DialogTitle className="text-xl font-black uppercase tracking-tight text-neo-cream flex items-center gap-2">
               <Book className="w-5 h-5 text-neo-yellow" />
               {t('wordFeedback.dictionaryTitle') || 'Build Our Dictionary'}
-            </h2>
-            <div className="flex items-center gap-2">
-              {/* Word counter for multi-word queue */}
-              {totalWords > 1 && (
-                <span className="text-neo-cream/80 text-sm font-bold">
-                  {currentWordIndex + 1}/{totalWords}
-                </span>
-              )}
-              <button
-                onClick={onSkip}
-                className="
-                  text-neo-cream hover:text-neo-yellow
-                  transition-colors p-1
-                "
-                aria-label="Close"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
+            </DialogTitle>
+            {/* Word counter for multi-word queue */}
+            {totalWords > 1 && (
+              <span className="text-neo-cream/80 text-sm font-bold">
+                {currentWordIndex + 1}/{totalWords}
+              </span>
+            )}
+          </DialogHeader>
 
-          {/* Content */}
-          <div className="p-6 space-y-4">
+          <DialogBody className="space-y-4">
             {/* Encouragement - Dictionary focused */}
             <motion.p
               initial={{ opacity: 0, y: -10 }}
@@ -483,10 +452,10 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                 </span>
               </div>
             </div>
-          </div>
+          </DialogBody>
         </motion.div>
-      </motion.div>
-    </AnimatePresence>
+      </DialogContent>
+    </Dialog>
   );
 });
 

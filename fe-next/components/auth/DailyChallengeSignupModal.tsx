@@ -1,12 +1,18 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Flame, Trophy, BarChart3, Smartphone, Shield, type LucideIcon } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Flame, Trophy, BarChart3, Smartphone, Shield, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { Button as ButtonComponent } from '../ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogBody,
+} from '@/components/ui/dialog';
 
 // Type assertion for JSX Button component
 const Button = ButtonComponent as any;
@@ -181,44 +187,26 @@ const DailyChallengeSignupModal: React.FC<DailyChallengeSignupModalProps> = ({
     { icon: Trophy, key: 'allTimeLeaderboard' },
   ];
 
-  if (!isOpen) return null;
-  if (typeof document === 'undefined') return null;
-
-  return createPortal(
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        noDescription
+        className={cn(
+          'max-w-md max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl',
+          isDarkMode
+            ? 'bg-gradient-to-b from-slate-800 via-slate-800 to-slate-900 border border-orange-500/30'
+            : 'bg-gradient-to-b from-white via-white to-gray-50 border border-orange-400/50'
+        )}
       >
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0, y: 20 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.8, opacity: 0, y: 20 }}
-          transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-          className={cn(
-            'w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-2xl relative',
-            isDarkMode
-              ? 'bg-gradient-to-b from-slate-800 via-slate-800 to-slate-900 border border-orange-500/30'
-              : 'bg-gradient-to-b from-white via-white to-gray-50 border border-orange-400/50'
-          )}
-          onClick={(e) => e.stopPropagation()}
-        >
+        <DialogHeader variant="gradient" customBg="bg-transparent" className="border-b-0 p-0">
+          <DialogTitle className="sr-only">
+            {titleContent.title}
+          </DialogTitle>
+        </DialogHeader>
+
+        <DialogBody className="relative p-6 pt-0">
           {/* Decorative background glow */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-gradient-to-b from-orange-500/20 to-transparent rounded-full blur-3xl pointer-events-none" />
-
-          {/* Close button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="absolute top-4 right-4 rtl:right-auto rtl:left-4 rounded-full z-10"
-            asChild={false}
-          >
-            <X size={18} />
-          </Button>
 
           {/* Streak/Achievement icon animation */}
           <motion.div
@@ -450,10 +438,9 @@ const DailyChallengeSignupModal: React.FC<DailyChallengeSignupModalProps> = ({
               {t('auth.privacyLink')}
             </Link>
           </p>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>,
-    document.body
+        </DialogBody>
+      </DialogContent>
+    </Dialog>
   );
 };
 

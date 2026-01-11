@@ -436,6 +436,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
   // Hint prompt system - shows subtle prompt after player hasn't found a word for 15+ seconds
   // Resets when player finds a word. Helps players discover hints organically.
+  // Note: showHintPrompt is intentionally NOT in the dependency array to prevent infinite re-renders.
+  // The interval callback reads the current state via a ref pattern.
+  const showHintPromptRef = useRef(showHintPrompt);
+  useEffect(() => {
+    showHintPromptRef.current = showHintPrompt;
+  }, [showHintPrompt]);
+
   useEffect(() => {
     if (isPaused || isGameOver || !grid) return;
 
@@ -448,13 +455,14 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
     const checkInactivity = setInterval(() => {
       const timeSinceLastWord = Date.now() - lastWordFoundTimeRef.current;
-      if (timeSinceLastWord >= HINT_PROMPT_DELAY && !showHintPrompt) {
+      // Use ref to read current showHintPrompt value without adding to dependencies
+      if (timeSinceLastWord >= HINT_PROMPT_DELAY && !showHintPromptRef.current) {
         setShowHintPrompt(true);
       }
     }, 5000); // Check every 5 seconds
 
     return () => clearInterval(checkInactivity);
-  }, [isPaused, isGameOver, grid, showHintPrompt]);
+  }, [isPaused, isGameOver, grid]);
 
   const dismissLandscapeTutorial = useCallback(() => {
     setShowLandscapeTutorial(false);

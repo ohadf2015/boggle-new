@@ -1,14 +1,20 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Bug, X, Send, Loader2, CheckCircle, Globe, Monitor, User } from 'lucide-react';
+import { Bug, Send, Loader2, CheckCircle, Globe, Monitor, User } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { getBugReportContext, submitBugReport, BugReportContext } from '@/utils/bugReport';
 import toast from 'react-hot-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogBody,
+} from '@/components/ui/dialog';
 
 interface BugReportModalProps {
   isOpen: boolean;
@@ -46,17 +52,7 @@ const BugReportModal = memo<BugReportModalProps>(({ isOpen, onClose }) => {
     }
   }, [isOpen, user?.id]);
 
-  // Handle ESC key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen && !isSubmitting) {
-        onClose();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, isSubmitting, onClose]);
+  // ESC key handling is managed by Dialog component
 
   const handleSubmit = useCallback(async () => {
     if (!description.trim() || !context || isSubmitting) return;
@@ -73,56 +69,24 @@ const BugReportModal = memo<BugReportModalProps>(({ isOpen, onClose }) => {
     }
   }, [description, context, isSubmitting, t, onClose]);
 
-  if (!isOpen) return null;
-
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    <Dialog open={isOpen} onOpenChange={(open) => !open && !isSubmitting && onClose()}>
+      <DialogContent
+        noDescription
+        className={cn(
+          'max-w-lg border-4 border-neo-black rounded-neo-lg shadow-hard-xl overflow-hidden',
+          isDarkMode ? 'bg-slate-800' : 'bg-neo-cream'
+        )}
         dir={dir}
       >
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-neo-black/60"
-          onClick={!isSubmitting ? onClose : undefined}
-        />
+        <DialogHeader variant="pink" className="text-neo-white">
+          <DialogTitle className="text-xl font-black uppercase tracking-tight text-neo-cream flex items-center gap-2">
+            <Bug className="w-5 h-5 text-neo-yellow" />
+            {t('bugReport.title') || 'Report a Bug'}
+          </DialogTitle>
+        </DialogHeader>
 
-        {/* Modal */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-          className={cn(
-            'relative w-full max-w-lg',
-            'border-4 border-neo-black rounded-neo-lg shadow-hard-xl overflow-hidden',
-            isDarkMode ? 'bg-slate-800' : 'bg-neo-cream'
-          )}
-        >
-          {/* Header */}
-          <div className="bg-neo-pink border-b-4 border-neo-black px-4 py-3 flex items-center justify-between text-neo-white">
-            <h2 className="text-xl font-black uppercase tracking-tight text-neo-cream flex items-center gap-2">
-              <Bug className="w-5 h-5 text-neo-yellow" />
-              {t('bugReport.title') || 'Report a Bug'}
-            </h2>
-            <button
-              onClick={onClose}
-              disabled={isSubmitting}
-              className="text-neo-cream hover:text-neo-yellow transition-colors p-1 disabled:opacity-50"
-              aria-label={t('common.close') || 'Close'}
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Content */}
-          <div className="p-6 space-y-4">
+        <DialogBody className="space-y-4">
             {/* Description */}
             <p className={cn(
               'text-sm',
@@ -256,10 +220,9 @@ const BugReportModal = memo<BugReportModalProps>(({ isOpen, onClose }) => {
                 )}
               </button>
             </div>
-          </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+        </DialogBody>
+      </DialogContent>
+    </Dialog>
   );
 });
 

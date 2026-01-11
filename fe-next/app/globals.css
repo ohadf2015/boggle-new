@@ -103,6 +103,137 @@
   --avatar-13: #FFB347;
   --avatar-14: #9D84B7;
   --avatar-15: #FF6F61;
+
+  /* ========================================
+     BRAND COLORS - Social OAuth & Sharing
+     ======================================== */
+
+  /* OAuth Providers */
+  --brand-google: #4285F4;
+  --brand-google-hover: #3367D6;
+  --brand-google-dark: #1e4a8f;
+
+  --brand-discord: #5865F2;
+  --brand-discord-hover: #4752C4;
+  --brand-discord-dark: #3c45a5;
+
+  --brand-apple: #000000;
+  --brand-apple-hover: #333333;
+  --brand-apple-light: #f5f5f7;
+
+  /* Social Sharing Platforms */
+  --brand-whatsapp: #25D366;
+  --brand-whatsapp-hover: #1ebe5d;
+  --brand-whatsapp-dark: #128C7E;
+
+  --brand-facebook: #1877F2;
+  --brand-facebook-hover: #166FE5;
+  --brand-facebook-dark: #144a9e;
+
+  --brand-twitter: #1DA1F2;
+  --brand-twitter-hover: #1A91DA;
+  --brand-twitter-dark: #0d7ac2;
+
+  --brand-linkedin: #0A66C2;
+  --brand-linkedin-hover: #094F9B;
+  --brand-linkedin-dark: #073d74;
+
+  /* ========================================
+     AVATAR COLORS - Character-Specific
+     ======================================== */
+
+  /* Semantic character names referencing numeric avatars */
+  --avatar-broccoli-bob: var(--avatar-10);
+  --avatar-drippy-drop: var(--avatar-2);
+  --avatar-sunny-steve: var(--avatar-9);
+  --avatar-cloudy-carl: var(--avatar-8);
+  --avatar-octo-otto: var(--avatar-7);
+  --avatar-pizza-pete: var(--avatar-1);
+  --avatar-prickly-pat: var(--avatar-12);
+  --avatar-melon-molly: var(--avatar-11);
+  --avatar-avo-alex: var(--avatar-10);
+  --avatar-frosty-frank: var(--avatar-3);
+  --avatar-flaky-fred: var(--avatar-8);
+  --avatar-eggy-ed: var(--avatar-6);
+  --avatar-slimy-sam: var(--avatar-12);
+  --avatar-starry-stella: var(--avatar-9);
+  --avatar-shroom-shelly: var(--avatar-15);
+
+  /* ========================================
+     GRADIENT PRESETS - Rank & Stats
+     ======================================== */
+
+  /* First Place Gradients */
+  --gradient-rank-first-from: var(--neo-yellow);
+  --gradient-rank-first-via: #FFD000;
+  --gradient-rank-first-to: var(--neo-yellow);
+
+  /* Second Place Gradients */
+  --gradient-rank-second-from: #cbd5e1;
+  --gradient-rank-second-via: #e2e8f0;
+  --gradient-rank-second-to: #cbd5e1;
+
+  /* Third Place Gradients */
+  --gradient-rank-third-from: #f59e0b;
+  --gradient-rank-third-via: #fbbf24;
+  --gradient-rank-third-to: #f59e0b;
+
+  /* Performance Stats Gradients */
+  --gradient-stat-positive-from: var(--neo-lime);
+  --gradient-stat-positive-to: #84cc16;
+
+  --gradient-stat-negative-from: var(--neo-red);
+  --gradient-stat-negative-to: #dc2626;
+
+  --gradient-stat-neutral-from: #94a3b8;
+  --gradient-stat-neutral-to: #64748b;
+
+  /* Background Decoration Gradients */
+  --gradient-bg-navy-from: var(--neo-navy);
+  --gradient-bg-navy-to: var(--neo-navy-light);
+
+  --gradient-bg-accent-from: var(--neo-pink);
+  --gradient-bg-accent-to: var(--neo-cyan);
+
+  /* ========================================
+     SEMANTIC COMPONENT TOKENS
+     ======================================== */
+
+  /* Button Semantic Mappings */
+  --button-primary: var(--neo-yellow);
+  --button-primary-hover: var(--neo-yellow-hover);
+  --button-primary-text: rgb(var(--neo-black));
+
+  --button-secondary: var(--neo-pink);
+  --button-secondary-hover: var(--neo-pink-light);
+  --button-secondary-text: rgb(var(--neo-white));
+
+  --button-destructive: var(--neo-red);
+  --button-destructive-hover: #dc2626;
+  --button-destructive-text: rgb(var(--neo-white));
+
+  --button-success: var(--neo-lime);
+  --button-success-hover: #84cc16;
+  --button-success-text: rgb(var(--neo-black));
+
+  /* Badge/Tag Semantic Mappings */
+  --badge-info: var(--neo-cyan);
+  --badge-info-text: rgb(var(--neo-black));
+
+  --badge-warning: var(--neo-yellow);
+  --badge-warning-text: rgb(var(--neo-black));
+
+  --badge-error: var(--neo-red);
+  --badge-error-text: rgb(var(--neo-white));
+
+  --badge-success: var(--neo-lime);
+  --badge-success-text: rgb(var(--neo-black));
+
+  /* Status Indicator Mappings */
+  --status-active: var(--neo-lime);
+  --status-inactive: var(--neo-gray);
+  --status-error: var(--neo-red);
+  --status-pending: var(--neo-yellow);
 }
 
 /* Light Mode Variables */
@@ -185,6 +316,47 @@ body {
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* ====================================
+     PERFORMANCE UTILITIES
+     ==================================== */
+
+  /* Content visibility for below-the-fold content - improves LCP */
+  /* Browser can skip rendering until content is near viewport */
+  .content-visibility-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
+  }
+
+  /* Smaller intrinsic size for compact components */
+  .content-visibility-auto-sm {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 200px;
+  }
+
+  /* Large intrinsic size for full-page sections */
+  .content-visibility-auto-lg {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 800px;
+  }
+
+  /* GPU-accelerated transforms for animated elements */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+
+  /* Remove will-change after animation completes to free GPU memory */
+  .will-change-off {
+    will-change: auto;
+  }
+
+  /* Optimize paint for frequently changing elements */
+  .paint-optimized {
+    isolation: isolate;
+    contain: layout style paint;
   }
 
   /* Screen reader only utility class */
@@ -737,6 +909,26 @@ body {
   .cq-icon-responsive {
     width: clamp(2rem, 10cqw, 4rem);
     height: clamp(2rem, 10cqw, 4rem);
+  }
+
+  /* Additional container query padding utilities for component consolidation */
+  .cq-p-tight {
+    padding: clamp(0.5rem, 2cqw, 1rem);
+  }
+
+  .cq-p-generous {
+    padding: clamp(1.5rem, 6cqw, 3rem);
+  }
+
+  /* Directional container padding for complex layouts */
+  .cq-px-responsive {
+    padding-left: clamp(0.75rem, 4cqw, 2rem);
+    padding-right: clamp(0.75rem, 4cqw, 2rem);
+  }
+
+  .cq-py-responsive {
+    padding-top: clamp(0.75rem, 4cqw, 2rem);
+    padding-bottom: clamp(0.75rem, 4cqw, 2rem);
   }
 }
 

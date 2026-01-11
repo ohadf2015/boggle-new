@@ -115,21 +115,38 @@ const DialogContent = React.forwardRef<
 ));
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
-// Neo-Brutalist Header: Yellow background strip
+// Neo-Brutalist Header: Customizable background with variants
+interface DialogHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: 'yellow' | 'pink' | 'cyan' | 'gradient';
+  customBg?: string; // For custom gradients like PrestigeModal
+}
+
 const DialogHeader = ({
   className,
+  variant = 'yellow',
+  customBg,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    className={cn(
-      "flex flex-col space-y-1.5 p-4 sm:p-6 lg:p-8",
-      "bg-neo-yellow border-b-3 border-neo-black",
-      "text-center sm:text-left",
-      className
-    )}
-    {...props}
-  />
-);
+}: DialogHeaderProps) => {
+  const bgClass = customBg || {
+    yellow: 'bg-neo-yellow',
+    pink: 'bg-neo-pink',
+    cyan: 'bg-neo-cyan',
+    gradient: '', // Use customBg for gradients
+  }[variant];
+
+  return (
+    <div
+      className={cn(
+        "flex flex-col space-y-1.5 p-4 sm:p-6 lg:p-8",
+        bgClass,
+        "border-b-3 border-neo-black",
+        "text-center sm:text-left",
+        className
+      )}
+      {...props}
+    />
+  );
+};
 DialogHeader.displayName = "DialogHeader";
 
 // Neo-Brutalist Footer
