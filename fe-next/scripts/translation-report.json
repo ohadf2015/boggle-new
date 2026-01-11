@@ -1,11 +1,11 @@
 {
   "summary": {
-    "totalKeysInCode": 1958,
+    "totalKeysInCode": 1964,
     "keyCountByLanguage": {
-      "en": 3245,
-      "he": 3245,
-      "sv": 3245,
-      "ja": 3245,
+      "en": 3251,
+      "he": 3251,
+      "sv": 3251,
+      "ja": 3251,
       "es": 3245
     },
     "missingFromEnglish": 0
@@ -15,7 +15,14 @@
     "he": [],
     "sv": [],
     "ja": [],
-    "es": []
+    "es": [
+      "daily.enterTargetWord",
+      "daily.wordPlaceholder",
+      "daily.errorWordRequired",
+      "daily.errorWordTooShort",
+      "daily.errorWordTooLong",
+      "daily.errorInvalidLetters"
+    ]
   },
   "keysNotInEnglish": {
     "he": [],

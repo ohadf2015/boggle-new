@@ -208,7 +208,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               avatarImage,
               profilePictureUrl,
               countryCode,
-              score: result.score,
+              score: Math.round(result.score),
               wordCount: result.wordCount,
               wordsByLength: result.wordsByLength,
               timeSeconds: result.timeSeconds,
@@ -338,7 +338,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
         totalPlayers,
         puzzleNumber: result.puzzleNumber,
         language: result.language,
-        score: result.score,
+        score: Math.round(result.score),
         wordCount: result.wordCount,
         displayName: isAuthenticated && profile
           ? profile.display_name || profile.username
@@ -443,7 +443,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             {t('daily.puzzleNumber').replace('{number}', String(result.puzzleNumber))}
           </div>
           <div className="text-7xl md:text-8xl font-black text-neo-yellow drop-shadow-[0_0_20px_rgba(255,225,53,0.3)] my-1">
-            {result.score}
+            {Math.round(result.score)}
           </div>
           <div className="text-slate-400 text-sm font-medium">
             {t('common.points')}
@@ -803,7 +803,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={shareImage.dataUrl}
-                  alt={`LexiClash Daily Challenge #${result.puzzleNumber} - Score: ${result.score}`}
+                  alt={`LexiClash Daily Challenge #${result.puzzleNumber} - Score: ${Math.round(result.score)}`}
                   className="w-full h-auto relative"
                   style={{ maxHeight: '50vh', objectFit: 'contain' }}
                 />

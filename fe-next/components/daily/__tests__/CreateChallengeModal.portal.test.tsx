@@ -13,8 +13,8 @@ describe('CreateChallengeModal - Portal Rendering', () => {
   const modalPath = path.join(__dirname, '../CreateChallengeModal.tsx');
   const modalCode = fs.readFileSync(modalPath, 'utf-8');
 
-  it('should import Dialog and DialogContent from ui/dialog', () => {
-    expect(modalCode).toContain("import { Dialog, DialogContent } from '@/components/ui/dialog'");
+  it('should import Dialog, DialogContent, and DialogTitle from ui/dialog', () => {
+    expect(modalCode).toContain("import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'");
   });
 
   it('should NOT import AnimatePresence (removed)', () => {

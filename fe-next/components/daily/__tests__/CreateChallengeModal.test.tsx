@@ -53,8 +53,8 @@ describe('CreateChallengeModal - Translation & Responsive Design', () => {
       expect(modalCode).toContain('w-[calc(100%-2rem)]');
     });
 
-    it('should have responsive padding (p-5 sm:p-8)', () => {
-      expect(modalCode).toContain('p-5 sm:p-8');
+    it('should have responsive padding (p-4 sm:p-6 for compactness)', () => {
+      expect(modalCode).toContain('p-4 sm:p-6');
     });
 
     it('should have sticky header to stay visible when scrolling', () => {

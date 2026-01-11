@@ -59,8 +59,9 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
     }
 
     const trimmed = word.trim();
-    const minLen = boardSize === 5 ? 5 : 6;
-    const maxLen = boardSize === 5 ? 8 : 10;
+    // Custom challenges accept 4-8 letter words regardless of board size
+    const minLen = 4;
+    const maxLen = 8;
 
     if (trimmed.length < minLen) {
       return t('daily.errorWordTooShort', { minLen });
@@ -126,7 +127,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
 
     } catch (error) {
       console.error('Error creating challenge:', error);
-      neoErrorToast('Failed to create challenge. Please try again.');
+      neoErrorToast(t('daily.createChallengeFailed'));
       setStep('config');
     }
   };
@@ -135,7 +136,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
     navigator.clipboard.writeText(shareUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-    neoSuccessToast('Link copied to clipboard!');
+    neoSuccessToast(t('daily.linkCopied'));
   };
 
   const handleNativeShare = async () => {
@@ -183,7 +184,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
 
         <div className="max-h-[90vh] overflow-y-auto">
           {/* Header */}
-            <div className="relative flex items-center justify-between p-4 sm:p-5 border-b-neo-thick border-neo-black bg-gradient-to-br from-neo-yellow to-neo-orange sticky top-0 z-10">
+            <div className="relative flex items-center justify-between p-3 sm:p-4 border-b-neo-thick border-neo-black bg-gradient-to-br from-neo-yellow to-neo-orange sticky top-0 z-10">
               <motion.div
                 className="flex items-center gap-3"
                 initial={{ x: -20, opacity: 0 }}
@@ -213,29 +214,29 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
             </div>
 
             {/* Content */}
-            <div className="p-5 sm:p-8 overflow-y-auto max-h-[calc(90vh-80px)]">
+            <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
               {step === 'config' && (
                 <motion.div
-                  className="space-y-6"
+                  className="space-y-4"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.1 }}
                 >
                   {/* Board Size Selection */}
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <div className="text-center">
-                      <h3 className="text-lg sm:text-xl font-black mb-2 text-neo-black uppercase tracking-tight">
+                      <h3 className="text-lg sm:text-xl font-black mb-1 text-neo-black uppercase tracking-tight">
                         {t('daily.chooseBoardSize')}
                       </h3>
-                      <p className="text-sm text-gray-600">Pick your difficulty level</p>
+                      <p className="text-xs sm:text-sm text-gray-600">{t('daily.pickDifficulty')}</p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                       <motion.button
                         onClick={() => setBoardSize(5)}
                         whileHover={{ scale: 1.05, y: -4 }}
                         whileTap={{ scale: 0.95, y: 0 }}
-                        className={`relative p-5 sm:p-6 rounded-xl border-neo-thick transition-all flex flex-col items-center gap-3 ${
+                        className={`relative p-4 sm:p-5 rounded-xl border-neo-thick transition-all flex flex-col items-center gap-2 ${
                           boardSize === 5
                             ? 'bg-neo-cyan text-neo-white border-neo-black shadow-hard-lg'
                             : 'bg-neo-white text-neo-black border-neo-black/30 hover:border-neo-cyan hover:text-neo-cyan shadow-hard-sm hover:shadow-hard'
@@ -246,7 +247,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         </div>
                         <div className="text-center">
                           <span className="font-black text-2xl sm:text-3xl block">5×5</span>
-                          <span className="text-xs sm:text-sm font-bold uppercase tracking-wide">Classic</span>
+                          <span className="text-xs sm:text-sm font-bold uppercase tracking-wide">{t('daily.classic')}</span>
                         </div>
                         {boardSize === 5 && (
                           <motion.div
@@ -266,7 +267,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         onClick={() => setBoardSize(7)}
                         whileHover={{ scale: 1.05, y: -4 }}
                         whileTap={{ scale: 0.95, y: 0 }}
-                        className={`relative p-5 sm:p-6 rounded-xl border-neo-thick transition-all flex flex-col items-center gap-3 ${
+                        className={`relative p-4 sm:p-5 rounded-xl border-neo-thick transition-all flex flex-col items-center gap-2 ${
                           boardSize === 7
                             ? 'bg-neo-orange text-neo-white border-neo-black shadow-hard-lg'
                             : 'bg-neo-white text-neo-black border-neo-black/30 hover:border-neo-orange hover:text-neo-orange shadow-hard-sm hover:shadow-hard'
@@ -277,7 +278,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         </div>
                         <div className="text-center">
                           <span className="font-black text-2xl sm:text-3xl block">7×7</span>
-                          <span className="text-xs sm:text-sm font-bold uppercase tracking-wide">Pro</span>
+                          <span className="text-xs sm:text-sm font-bold uppercase tracking-wide">{t('daily.pro')}</span>
                         </div>
                         {boardSize === 7 && (
                           <motion.div
@@ -314,8 +315,8 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         if (wordError) setWordError('');
                       }}
                       placeholder={t('daily.wordPlaceholder', {
-                        min: boardSize === 5 ? 5 : 6,
-                        max: boardSize === 5 ? 8 : 10
+                        min: 4,
+                        max: 8
                       })}
                       className={`w-full px-4 py-3 text-lg font-bold border-neo-thick rounded-xl shadow-hard-sm focus:shadow-hard focus:outline-none transition-all ${
                         wordError
@@ -341,9 +342,9 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="bg-gradient-to-br from-neo-yellow/20 to-neo-orange/20 border-3 border-neo-black rounded-xl p-4 text-center"
+                    className="bg-gradient-to-br from-neo-yellow/20 to-neo-orange/20 border-3 border-neo-black rounded-xl p-3 text-center"
                   >
-                    <p className="text-sm sm:text-base font-bold text-neo-black">
+                    <p className="text-xs sm:text-sm font-bold text-neo-black">
                       {t('daily.boardWillBeGenerated', {
                         size: boardSize,
                         language: language === 'en' ? 'English' : language === 'he' ? 'Hebrew' : language === 'sv' ? 'Swedish' : 'Japanese'
@@ -495,7 +496,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     transition={{ delay: 0.4 }}
                   >
                     <div className="flex-1 overflow-hidden">
-                      <p className="text-xs text-gray-500 font-bold uppercase mb-1">Your Challenge Link</p>
+                      <p className="text-xs text-gray-500 font-bold uppercase mb-1">{t('daily.challengeLink')}</p>
                       <p className="text-sm font-mono truncate text-neo-black font-bold">{shareUrl}</p>
                     </div>
                     <motion.button
