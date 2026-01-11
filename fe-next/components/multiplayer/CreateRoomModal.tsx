@@ -15,7 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import EmojiAvatarPicker, { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
+import { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
 import { LanguageSelector } from '@/components/join/LanguageSelector';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
@@ -66,7 +66,6 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   const [roomName, setRoomName] = useState<string>('');
   const [language, setLanguage] = useState<Language>(defaultLanguage);
   const [isEditingName, setIsEditingName] = useState(false);
-  const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -145,90 +144,77 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
             <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
               {t('profile.chooseAvatar') || 'Choose Avatar'}
             </Label>
-            <button
-              type="button"
-              aria-label={t('multiplayerFlow.createModal.changeAvatar') || 'Change avatar'}
-              className="w-full"
-              onClick={() => setIsAvatarPickerOpen(true)}
-            >
-              <div className="grid grid-cols-6 gap-1.5 sm:gap-2 shadow-hard">
-                {hasProfilePicture && (
+            <div className="grid grid-cols-6 gap-1.5 sm:gap-2 shadow-hard">
+              {hasProfilePicture && (
+                <motion.button
+                  type="button"
+                  onClick={() => setAvatarId(PROFILE_AVATAR_ID)}
+                  className={cn(
+                    'relative aspect-square rounded-neo border-2 overflow-hidden',
+                    'transition-all hover:scale-105 active:scale-95',
+                    'min-h-[40px] min-w-[40px]',
+                    isUsingProfilePicture
+                      ? 'border-neo-cyan ring-2 ring-neo-cyan scale-105'
+                      : 'border-neo-black hover:border-neo-cyan/50'
+                  )}
+                  whileHover={{ scale: isUsingProfilePicture ? 1.05 : 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Image
+                    src={profilePictureUrl!}
+                    alt="Your Profile"
+                    fill
+                    className="object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                  {isUsingProfilePicture && (
+                    <div className="absolute inset-0 bg-neo-cyan/20 flex items-center justify-center">
+                      <div className="bg-neo-cyan text-neo-black border-2 border-neo-black rounded-full w-5 h-5 flex items-center justify-center">
+                        <Check className="w-3 h-3" />
+                      </div>
+                    </div>
+                  )}
+                  <div className="absolute bottom-0 left-0 right-0 bg-neo-black/80 text-white text-[7px] font-bold text-center py-0.5">
+                    {t('profile.you') || 'YOU'}
+                  </div>
+                </motion.button>
+              )}
+
+              {AVATARS.map((avatar) => {
+                const isSelected = !isUsingProfilePicture && avatar.id === avatarId;
+                return (
                   <motion.button
+                    key={avatar.id}
                     type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setAvatarId(PROFILE_AVATAR_ID);
-                    }}
+                    onClick={() => setAvatarId(avatar.id)}
                     className={cn(
                       'relative aspect-square rounded-neo border-2 overflow-hidden',
                       'transition-all hover:scale-105 active:scale-95',
                       'min-h-[40px] min-w-[40px]',
-                      isUsingProfilePicture
+                      isSelected
                         ? 'border-neo-cyan ring-2 ring-neo-cyan scale-105'
                         : 'border-neo-black hover:border-neo-cyan/50'
                     )}
-                    whileHover={{ scale: isUsingProfilePicture ? 1.05 : 1.1 }}
+                    whileHover={{ scale: isSelected ? 1.05 : 1.1 }}
                     whileTap={{ scale: 0.95 }}
                   >
                     <Image
-                      src={profilePictureUrl!}
-                      alt="Your Profile"
+                      src={getAvatarPath(avatar)}
+                      alt={avatar.name}
                       fill
                       className="object-cover"
-                      referrerPolicy="no-referrer"
                     />
-                    {isUsingProfilePicture && (
+                    {isSelected && (
                       <div className="absolute inset-0 bg-neo-cyan/20 flex items-center justify-center">
                         <div className="bg-neo-cyan text-neo-black border-2 border-neo-black rounded-full w-5 h-5 flex items-center justify-center">
                           <Check className="w-3 h-3" />
                         </div>
                       </div>
                     )}
-                    <div className="absolute bottom-0 left-0 right-0 bg-neo-black/80 text-white text-[7px] font-bold text-center py-0.5">
-                      {t('profile.you') || 'YOU'}
-                    </div>
                   </motion.button>
-                )}
-
-                {AVATARS.map((avatar) => {
-                  const isSelected = !isUsingProfilePicture && avatar.id === avatarId;
-                  return (
-                    <motion.button
-                      key={avatar.id}
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setAvatarId(avatar.id);
-                      }}
-                      className={cn(
-                        'relative aspect-square rounded-neo border-2 overflow-hidden',
-                        'transition-all hover:scale-105 active:scale-95',
-                        'min-h-[40px] min-w-[40px]',
-                        isSelected
-                          ? 'border-neo-cyan ring-2 ring-neo-cyan scale-105'
-                          : 'border-neo-black hover:border-neo-cyan/50'
-                      )}
-                      whileHover={{ scale: isSelected ? 1.05 : 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Image
-                        src={getAvatarPath(avatar)}
-                        alt={avatar.name}
-                        fill
-                        className="object-cover"
-                      />
-                      {isSelected && (
-                        <div className="absolute inset-0 bg-neo-cyan/20 flex items-center justify-center">
-                          <div className="bg-neo-cyan text-neo-black border-2 border-neo-black rounded-full w-5 h-5 flex items-center justify-center">
-                            <Check className="w-3 h-3" />
-                          </div>
-                        </div>
-                      )}
-                    </motion.button>
-                  );
-                })}
-              </div>
-            </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="space-y-1.5">
@@ -302,11 +288,6 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
           </Button>
         </DialogFooter>
       </DialogContent>
-
-      <EmojiAvatarPicker
-        isOpen={isAvatarPickerOpen}
-        onClose={() => setIsAvatarPickerOpen(false)}
-      />
     </Dialog>
   );
 };

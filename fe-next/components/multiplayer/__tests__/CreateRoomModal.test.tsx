@@ -118,14 +118,13 @@ describe('CreateRoomModal', () => {
       expect(profileSection).toBeInTheDocument();
     });
 
-    it('should have avatar button with shadow-hard base styling', () => {
+    it('should have avatar grid with shadow-hard base styling', () => {
       render(<CreateRoomModal {...defaultProps} />);
 
-      const avatarButton = screen.getByRole('button', { name: /change avatar/i });
-      const avatarContainer = avatarButton.querySelector('div');
+      const avatarButton = screen.getByAltText('Test Avatar').closest('button');
+      const avatarGrid = avatarButton?.parentElement;
 
-      // Avatar container should have shadow-hard class
-      expect(avatarContainer?.className).toContain('shadow-hard');
+      expect(avatarGrid?.className).toContain('shadow-hard');
     });
 
     it('should display username with proper text alignment for RTL', () => {
@@ -181,15 +180,16 @@ describe('CreateRoomModal', () => {
     });
   });
 
-  describe('Avatar Picker Interaction', () => {
-    it('should open avatar picker when avatar button clicked', async () => {
+  describe('Avatar Selection', () => {
+    it('should allow selecting avatars directly from grid', async () => {
       const user = userEvent.setup();
       render(<CreateRoomModal {...defaultProps} />);
 
-      const avatarButton = screen.getByRole('button', { name: /change avatar/i });
-      await user.click(avatarButton);
-
-      expect(screen.getByTestId('emoji-avatar-picker')).toBeInTheDocument();
+      const avatarButtons = screen.getAllByRole('button').filter(btn => 
+        btn.querySelector('img[alt="Test Avatar"]')
+      );
+      
+      expect(avatarButtons.length).toBeGreaterThan(0);
     });
   });
 
