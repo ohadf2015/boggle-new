@@ -1,6 +1,28 @@
+import React from 'react';
 import { render } from '@testing-library/react';
 import TvBroadcastView from '@/host/components/TvBroadcastView';
 import type { Socket } from 'socket.io-client';
+
+// Mock framer-motion to avoid matchMedia issues
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
+      const { initial, animate, exit, whileHover, whileTap, transition, ...domProps } = props as Record<string, unknown>;
+      return <div {...domProps}>{children}</div>;
+    },
+    button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
+      const { initial, animate, exit, whileHover, whileTap, transition, ...domProps } = props as Record<string, unknown>;
+      return <button {...domProps}>{children}</button>;
+    },
+  },
+  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+}));
+
+// Mock lucide-react icons
+jest.mock('lucide-react', () => ({
+  Maximize: () => <div data-testid="maximize-icon">Maximize</div>,
+  Minimize: () => <div data-testid="minimize-icon">Minimize</div>,
+}));
 
 // Mock the subcomponents
 jest.mock('@/host/components/tv-broadcast/TvJoinBar', () => ({
@@ -112,10 +134,9 @@ describe('TvBroadcastView Layout Issues', () => {
     expect(mainContent).toHaveClass('gap-2');
     expect(mainContent).toHaveClass('md:gap-4');
 
-    // Check that flex layout is properly configured
-    const computedStyle = window.getComputedStyle(rootDiv);
-    expect(computedStyle.display).toBe('flex');
-    expect(computedStyle.flexDirection).toBe('column');
+    // Check that flex layout is properly configured (check classes, not computed styles in JSDOM)
+    expect(rootDiv).toHaveClass('flex');
+    expect(rootDiv).toHaveClass('flex-col');
   });
 
   it('should properly handle fullscreen layout with hidden headers', () => {

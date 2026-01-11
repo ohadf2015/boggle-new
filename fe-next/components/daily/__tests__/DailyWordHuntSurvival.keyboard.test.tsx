@@ -4,6 +4,17 @@ import '@testing-library/jest-dom';
 import DailyWordHuntSurvival from '../DailyWordHuntSurvival';
 import type { LetterGrid } from '@/types';
 
+// Mock framer-motion to avoid matchMedia issues
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
+      const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
+      return <div {...domProps}>{children}</div>;
+    },
+  },
+  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+}));
+
 // Mock hooks and components
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -15,6 +26,31 @@ jest.mock('@/contexts/LanguageContext', () => ({
 
 jest.mock('@/contexts/NavigationContext', () => ({
   useHideNavigation: () => jest.fn(),
+}));
+
+jest.mock('@/contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => ({
+    playWordAcceptedSound: jest.fn(),
+    playComboSound: jest.fn(),
+    playErrorSound: jest.fn(),
+    setGameActive: jest.fn(),
+    playSound: jest.fn(),
+  }),
+}));
+
+jest.mock('@/contexts/MusicContext', () => ({
+  useMusic: () => ({
+    playMusic: jest.fn(),
+    stopMusic: jest.fn(),
+    fadeToTrack: jest.fn(),
+    isMuted: false,
+    toggleMute: jest.fn(),
+    TRACKS: {
+      BOSSA_ARCADE: 'bossa_arcade',
+      MENU: 'menu',
+      GAME: 'game',
+    },
+  }),
 }));
 
 jest.mock('@/hooks/useMobileLandscape', () => ({
