@@ -287,8 +287,8 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
         </div>
 
         {/* Chart - only render ResponsiveContainer when dimensions are valid */}
-        <div ref={containerRef} className="w-full h-48">
-          {isReady && (
+        <div ref={containerRef} className="w-full h-48 min-h-[12rem]">
+          {isReady ? (
           <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100}>
             <AreaChart
               data={chartData}
@@ -357,6 +357,15 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
               />
             </AreaChart>
           </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <div className={cn(
+                'text-sm font-bold',
+                isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+              )}>
+                {t('common.loading')}
+              </div>
+            </div>
           )}
         </div>
 
