@@ -42,7 +42,7 @@ export default function PlayersPage() {
   // Not authenticated or not admin
   if (!authLoading && !isProfileLoading && (!user || !isAdmin)) {
     return (
-      <div className="min-h-screen bg-neo-navy flex items-center justify-center">
+      <div className="min-h-screen bg-neo-navy text-neo-white flex items-center justify-center">
         <div className="text-center">
           <Shield className="w-16 h-16 text-neo-yellow mx-auto mb-4" />
           <h1 className="text-2xl font-neo-display text-neo-white mb-2">
@@ -60,7 +60,7 @@ export default function PlayersPage() {
   // Loading
   if (authLoading || isProfileLoading || !authToken) {
     return (
-      <div className="min-h-screen bg-neo-navy flex items-center justify-center">
+      <div className="min-h-screen bg-neo-navy text-neo-white flex items-center justify-center">
         <div className="text-center">
           <RefreshCw className="w-12 h-12 animate-spin text-neo-yellow mx-auto mb-4" />
           <p className="text-slate-400">Loading...</p>

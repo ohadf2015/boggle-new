@@ -98,15 +98,15 @@ describe('ScientificTipsCarousel', () => {
       });
     });
 
-    it('renders dots with proper sizing classes', () => {
+    it('renders dots with proper sizing classes - smaller circles for better appearance', () => {
       const { container } = render(<ScientificTipsCarousel />);
 
       const dots = container.querySelectorAll('button.rounded-full');
       dots.forEach((dot) => {
         const className = dot.className;
-        // Should have width and height classes
-        expect(className).toMatch(/w-2/);
-        expect(className).toMatch(/h-2/);
+        // Should have smaller width and height classes (w-1.5 h-1.5 = 6px)
+        expect(className).toMatch(/w-1\.5/);
+        expect(className).toMatch(/h-1\.5/);
       });
     });
   });

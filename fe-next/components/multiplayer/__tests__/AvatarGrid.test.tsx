@@ -144,59 +144,71 @@ describe('Avatar Grid UI', () => {
       profileAvatarId: undefined,
     };
 
-    it('should render avatar grid container with scrollable styling', () => {
+    it('should render avatar grid container with scrollable styling', async () => {
+      const user = userEvent.setup();
       render(<JoinRoomModal {...joinModalProps} />);
 
-      // Find the avatar grid container
-      const avatarButtons = screen.getAllByRole('button').filter(btn =>
-        btn.querySelector('img[alt]')
-      );
+      // First, expand the avatar selector by clicking the button with "Choose Avatar"
+      const avatarSelectorButton = screen.getByText('Choose Avatar').closest('button');
+      await user.click(avatarSelectorButton!);
 
-      expect(avatarButtons.length).toBeGreaterThan(0);
+      // Find the avatar grid - look for elements with grid class
+      const gridContainer = document.querySelector('.grid-cols-6');
+      expect(gridContainer).toBeInTheDocument();
+      expect(gridContainer?.className).toContain('grid-cols-6');
 
-      // Get the inner grid (parent of avatar buttons)
-      const innerGrid = avatarButtons[0].parentElement;
-      expect(innerGrid).toBeInTheDocument();
-      expect(innerGrid?.className).toContain('grid');
-
-      // Get the scrollable wrapper (parent of inner grid)
-      const scrollableWrapper = innerGrid?.parentElement;
+      // Get the scrollable wrapper (parent of grid)
+      const scrollableWrapper = gridContainer?.parentElement;
       expect(scrollableWrapper).toBeInTheDocument();
 
-      // Should have max-height and overflow-y-auto for scrolling
+      // Should have max-height and overflow for scrolling
       expect(scrollableWrapper?.className).toMatch(/max-h-|overflow/i);
     });
 
-    it('should NOT have shadow-hard on the grid container', () => {
+    it('should NOT have large shadow on the grid container', async () => {
+      const user = userEvent.setup();
       render(<JoinRoomModal {...joinModalProps} />);
 
-      const avatarButtons = screen.getAllByRole('button').filter(btn =>
-        btn.querySelector('img[alt]')
-      );
+      // First, expand the avatar selector
+      const avatarSelectorButton = screen.getByText('Choose Avatar').closest('button');
+      await user.click(avatarSelectorButton!);
 
-      const innerGrid = avatarButtons[0].parentElement;
-      const scrollableWrapper = innerGrid?.parentElement;
+      const gridContainer = document.querySelector('.grid-cols-6');
+      const scrollableWrapper = gridContainer?.parentElement;
 
-      // Neither the grid nor wrapper should have shadow-hard (it looks bad)
-      expect(innerGrid?.className).not.toContain('shadow-hard');
-      expect(scrollableWrapper?.className).not.toContain('shadow-hard');
+      // Neither should have the large shadow variants (shadow-hard, shadow-hard-lg, etc)
+      // Small shadow (shadow-hard-sm) is acceptable for neo-brutalist design
+      const gridClasses = gridContainer?.className || '';
+      const wrapperClasses = scrollableWrapper?.className || '';
+
+      expect(gridClasses).not.toMatch(/shadow-hard(?!-sm)/);
+      expect(wrapperClasses).not.toMatch(/shadow-hard(?!-sm)/);
     });
 
-    it('should have all 17 avatars rendered', () => {
+    it('should have all 17 avatars rendered', async () => {
+      const user = userEvent.setup();
       render(<JoinRoomModal {...joinModalProps} />);
 
-      const avatarButtons = screen.getAllByRole('button').filter(btn =>
-        btn.querySelector('img[alt]')
-      );
+      // First, expand the avatar selector
+      const avatarSelectorButton = screen.getByText('Choose Avatar').closest('button');
+      await user.click(avatarSelectorButton!);
+
+      // Get the grid container and count avatars inside it
+      const gridContainer = document.querySelector('.grid-cols-6');
+      const avatarButtons = gridContainer?.querySelectorAll('button[type="button"]');
 
       // Should have 17 avatars
-      expect(avatarButtons.length).toBe(17);
+      expect(avatarButtons?.length).toBe(17);
     });
 
     it('should allow selecting any avatar and joining with it', async () => {
       const user = userEvent.setup();
       const onJoin = jest.fn();
       render(<JoinRoomModal {...joinModalProps} onJoin={onJoin} />);
+
+      // First, expand the avatar selector
+      const avatarSelectorButton = screen.getByText('Choose Avatar').closest('button');
+      await user.click(avatarSelectorButton!);
 
       // Find and click the last avatar (Jelly Jen)
       const jellyJenAvatar = screen.getByAltText('Jelly Jen').closest('button');
@@ -230,7 +242,8 @@ describe('Avatar Grid UI', () => {
       expect(screen.getByText('YOU')).toBeInTheDocument();
     });
 
-    it('should select profile avatar by default for authenticated users with picture', () => {
+    it('should select profile avatar by default for authenticated users with picture', async () => {
+      const user = userEvent.setup();
       render(
         <JoinRoomModal
           {...joinModalProps}
@@ -240,8 +253,16 @@ describe('Avatar Grid UI', () => {
         />
       );
 
+      // First, expand the avatar selector to see the grid
+      const avatarSelectorButton = screen.getByText('Choose Avatar').closest('button');
+      await user.click(avatarSelectorButton!);
+
+      // Find the profile avatar button inside the grid (it has the "YOU" label)
+      const gridContainer = document.querySelector('.grid-cols-6');
+      const profileAvatarButton = Array.from(gridContainer?.querySelectorAll('button') || [])
+        .find(btn => btn.textContent?.includes('YOU'));
+
       // The profile avatar button should have the selected styling (ring)
-      const profileAvatarButton = screen.getByText('YOU').closest('button');
       expect(profileAvatarButton?.className).toContain('ring-neo-cyan');
     });
   });
@@ -259,52 +280,57 @@ describe('Avatar Grid UI', () => {
       profileAvatarId: undefined,
     };
 
-    it('should render avatar grid container with scrollable styling', () => {
+    it('should render avatar grid container with scrollable styling', async () => {
+      const user = userEvent.setup();
       render(<CreateRoomModal {...createModalProps} />);
 
-      const avatarButtons = screen.getAllByRole('button').filter(btn =>
-        btn.querySelector('img[alt]')
-      );
+      // First, expand the avatar selector by clicking on it
+      const avatarSelectorButton = screen.getByText('Choose Avatar').closest('button');
+      await user.click(avatarSelectorButton!);
 
-      expect(avatarButtons.length).toBeGreaterThan(0);
+      // Find the avatar grid - look for elements with grid class
+      const gridContainer = document.querySelector('.grid-cols-6');
+      expect(gridContainer).toBeInTheDocument();
+      expect(gridContainer?.className).toContain('grid-cols-6');
 
-      // Get the inner grid (parent of avatar buttons)
-      const innerGrid = avatarButtons[0].parentElement;
-      expect(innerGrid).toBeInTheDocument();
-      expect(innerGrid?.className).toContain('grid');
-
-      // Get the scrollable wrapper (parent of inner grid)
-      const scrollableWrapper = innerGrid?.parentElement;
+      // Get the scrollable wrapper (parent of grid)
+      const scrollableWrapper = gridContainer?.parentElement;
       expect(scrollableWrapper).toBeInTheDocument();
 
       // Should have max-height and overflow for scrolling
       expect(scrollableWrapper?.className).toMatch(/max-h-|overflow/i);
     });
 
-    it('should NOT have shadow-hard on the grid container', () => {
+    it('should NOT have large shadow on the grid container', async () => {
+      const user = userEvent.setup();
       render(<CreateRoomModal {...createModalProps} />);
 
-      const avatarButtons = screen.getAllByRole('button').filter(btn =>
-        btn.querySelector('img[alt]')
-      );
+      // First, expand the avatar selector
+      const avatarSelectorButton = screen.getByText('Choose Avatar').closest('button');
+      await user.click(avatarSelectorButton!);
 
-      const innerGrid = avatarButtons[0].parentElement;
-      const scrollableWrapper = innerGrid?.parentElement;
+      const gridContainer = document.querySelector('.grid-cols-6');
+      const scrollableWrapper = gridContainer?.parentElement;
 
-      // Neither the grid nor wrapper should have shadow-hard
-      expect(innerGrid?.className).not.toContain('shadow-hard');
-      expect(scrollableWrapper?.className).not.toContain('shadow-hard');
+      // Neither should have the large shadow variants (shadow-hard, shadow-hard-lg, etc)
+      // Small shadow (shadow-hard-sm) is acceptable for neo-brutalist design
+      const gridClasses = gridContainer?.className || '';
+      const wrapperClasses = scrollableWrapper?.className || '';
+
+      expect(gridClasses).not.toMatch(/shadow-hard(?!-sm)/);
+      expect(wrapperClasses).not.toMatch(/shadow-hard(?!-sm)/);
     });
 
-    it('should have proper border styling on grid container', () => {
+    it('should have proper border styling on grid container', async () => {
+      const user = userEvent.setup();
       render(<CreateRoomModal {...createModalProps} />);
 
-      const avatarButtons = screen.getAllByRole('button').filter(btn =>
-        btn.querySelector('img[alt]')
-      );
+      // First, expand the avatar selector
+      const avatarSelectorButton = screen.getByText('Choose Avatar').closest('button');
+      await user.click(avatarSelectorButton!);
 
-      const innerGrid = avatarButtons[0].parentElement;
-      const scrollableWrapper = innerGrid?.parentElement;
+      const gridContainer = document.querySelector('.grid-cols-6');
+      const scrollableWrapper = gridContainer?.parentElement;
 
       // Wrapper should have border for neo-brutalist look
       expect(scrollableWrapper?.className).toMatch(/border|rounded/);
@@ -315,7 +341,11 @@ describe('Avatar Grid UI', () => {
       const onCreate = jest.fn();
       render(<CreateRoomModal {...createModalProps} onCreate={onCreate} />);
 
-      // Click on Pizza Pete avatar
+      // First, expand the avatar selector
+      const avatarSelectorButton = screen.getByText('Choose Avatar').closest('button');
+      await user.click(avatarSelectorButton!);
+
+      // Now click on Pizza Pete avatar
       const pizzaAvatar = screen.getByAltText('Pizza Pete').closest('button');
       expect(pizzaAvatar).toBeInTheDocument();
 

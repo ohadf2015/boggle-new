@@ -74,7 +74,7 @@ export default function BrainTrainingPage() {
   const { t, language } = useLanguage();
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const { brainScore, recentGameScores, drillProgress, brainScoreHistory, isLoading, error, refresh, initializeBrainScore } = useBrainScore();
 
   // State for first game celebration
@@ -130,8 +130,8 @@ export default function BrainTrainingPage() {
     });
   }, [brainScore?.lastActivityAt, brainScoreHistory]);
 
-  // Loading state
-  if (isLoading) {
+  // Loading state - show skeleton while auth is validating OR while brain score is loading
+  if (authLoading || isLoading) {
     return (
       <div className={cn(
         'min-h-screen pb-24',

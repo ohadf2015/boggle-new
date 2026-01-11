@@ -152,7 +152,7 @@ export default function ScientificTipsCarousel() {
                 onClick={() => setActiveIndex(index)}
                 aria-label={`Go to tip ${index + 1}`}
                 className={cn(
-                  'w-2 h-2 shrink-0 aspect-square rounded-full border border-neo-black transition-all duration-300',
+                  'w-1.5 h-1.5 shrink-0 aspect-square rounded-full border border-neo-black transition-all duration-300',
                   index === activeIndex
                     ? cn(
                         'scale-125 shadow-[1px_1px_0px_rgb(0,0,0)]',

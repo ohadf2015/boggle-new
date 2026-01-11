@@ -179,7 +179,7 @@ export function CommunityWordsManager({ authToken }: { authToken: string }) {
       )}
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm">
+      <div className="flex flex-col sm:flex-row gap-4 bg-white dark:bg-slate-800 text-black dark:text-white p-4 rounded-lg shadow-sm">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <Input 

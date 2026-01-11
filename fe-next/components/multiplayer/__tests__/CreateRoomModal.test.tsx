@@ -22,6 +22,22 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));
 
+// Mock Dialog components from Radix UI
+jest.mock('@/components/ui/dialog', () => ({
+  Dialog: ({ children, open }: { children: React.ReactNode; open?: boolean; onOpenChange?: (open: boolean) => void }) =>
+    open ? <div data-testid="dialog">{children}</div> : null,
+  DialogContent: ({ children, className }: { children: React.ReactNode; className?: string; noDescription?: boolean }) =>
+    <div className={className} data-testid="dialog-content">{children}</div>,
+  DialogHeader: ({ children, className }: { children: React.ReactNode; className?: string }) =>
+    <div className={className} data-testid="dialog-header">{children}</div>,
+  DialogTitle: ({ children, className }: { children: React.ReactNode; className?: string }) =>
+    <h2 className={className} data-testid="dialog-title">{children}</h2>,
+  DialogBody: ({ children, className }: { children: React.ReactNode; className?: string }) =>
+    <div className={className} data-testid="dialog-body">{children}</div>,
+  DialogFooter: ({ children, className }: { children: React.ReactNode; className?: string }) =>
+    <div className={className} data-testid="dialog-footer">{children}</div>,
+}));
+
 // Mock dependencies
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -60,6 +76,14 @@ jest.mock('@/utils/avatarConfig', () => {
   };
 });
 
+jest.mock('@/utils/consts', () => ({
+  sanitizeRoomName: jest.fn((name: string) => name),
+}));
+
+jest.mock('@/lib/utils', () => ({
+  cn: (...classes: (string | undefined)[]) => classes.filter(Boolean).join(' '),
+}));
+
 jest.mock('@/components/EmojiAvatarPicker', () => {
   const MockEmojiAvatarPicker = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
     isOpen ? (
@@ -77,6 +101,49 @@ jest.mock('@/components/EmojiAvatarPicker', () => {
 jest.mock('@/components/Avatar', () => ({
   __esModule: true,
   default: () => <div data-testid="avatar-component" />,
+}));
+
+// Mock UI components
+jest.mock('@/components/ui/button', () => ({
+  Button: ({ children, onClick, disabled, className, variant, size }: React.PropsWithChildren<{
+    onClick?: () => void;
+    disabled?: boolean;
+    className?: string;
+    variant?: string;
+    size?: string;
+  }>) => (
+    <button onClick={onClick} disabled={disabled} className={className}>
+      {children}
+    </button>
+  ),
+}));
+
+jest.mock('@/components/ui/input', () => {
+  const MockInput = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
+    (props, ref) => <input ref={ref} {...props} />
+  );
+  MockInput.displayName = 'MockInput';
+  return { Input: MockInput };
+});
+
+jest.mock('@/components/ui/label', () => ({
+  Label: ({ children, className }: React.PropsWithChildren<{ className?: string }>) =>
+    <label className={className}>{children}</label>,
+}));
+
+jest.mock('@/components/multiplayer/AvatarSelector', () => ({
+  AvatarSelector: ({ selectedAvatarId, onAvatarChange }: {
+    selectedAvatarId: string;
+    onAvatarChange: (id: string) => void;
+    profilePictureUrl?: string | null;
+  }) => (
+    <div data-testid="avatar-selector">
+      <button onClick={() => onAvatarChange('new-avatar')}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img alt="Test Avatar" src="/avatars/test.png" />
+      </button>
+    </div>
+  ),
 }));
 
 jest.mock('@/components/join/LanguageSelector', () => ({
@@ -118,17 +185,12 @@ describe('CreateRoomModal', () => {
       expect(profileSection).toBeInTheDocument();
     });
 
-    it('should have avatar grid with scrollable container and border styling', () => {
+    it('should render AvatarSelector component', () => {
       render(<CreateRoomModal {...defaultProps} />);
 
-      const avatarButton = screen.getByAltText('Test Avatar').closest('button');
-      const avatarGrid = avatarButton?.parentElement;
-      const scrollableContainer = avatarGrid?.parentElement;
-
-      // Grid should be inside a scrollable container
-      expect(avatarGrid?.className).toContain('grid');
-      expect(scrollableContainer?.className).toMatch(/overflow|max-h/);
-      expect(scrollableContainer?.className).toContain('border');
+      // Since AvatarSelector is mocked, we just verify it renders
+      expect(screen.getByTestId('avatar-selector')).toBeInTheDocument();
+      expect(screen.getByAltText('Test Avatar')).toBeInTheDocument();
     });
 
     it('should display username with proper text alignment for RTL', () => {
@@ -146,9 +208,9 @@ describe('CreateRoomModal', () => {
     it('should show pencil icon for guest users on name', () => {
       render(<CreateRoomModal {...defaultProps} />);
 
-      const nameSection = screen.getByText('Test Avatar').closest('button');
+      const nameButton = screen.getByText('Test Avatar').closest('button');
       // Pencil icon should be present (the SVG from lucide-react)
-      const pencilIcon = nameSection?.querySelector('svg');
+      const pencilIcon = nameButton?.querySelector('svg');
       expect(pencilIcon).toBeInTheDocument();
     });
 
@@ -185,14 +247,13 @@ describe('CreateRoomModal', () => {
   });
 
   describe('Avatar Selection', () => {
-    it('should allow selecting avatars directly from grid', async () => {
-      const user = userEvent.setup();
+    it('should allow selecting avatars directly from grid', () => {
       render(<CreateRoomModal {...defaultProps} />);
 
-      const avatarButtons = screen.getAllByRole('button').filter(btn => 
+      const avatarButtons = screen.getAllByRole('button').filter(btn =>
         btn.querySelector('img[alt="Test Avatar"]')
       );
-      
+
       expect(avatarButtons.length).toBeGreaterThan(0);
     });
   });
@@ -213,8 +274,7 @@ describe('CreateRoomModal', () => {
       expect(input.tagName).toBe('INPUT');
     });
 
-    it('should not allow authenticated users to edit name', async () => {
-      const user = userEvent.setup();
+    it('should not allow authenticated users to edit name', () => {
       render(
         <CreateRoomModal
           {...defaultProps}
@@ -223,8 +283,17 @@ describe('CreateRoomModal', () => {
         />
       );
 
-      const nameButton = screen.getByText('AuthUser').closest('button');
-      expect(nameButton).toBeDisabled();
+      // Authenticated users see their name in a div (not editable), not a button
+      const nameDisplay = screen.getByText('AuthUser');
+      expect(nameDisplay).toBeInTheDocument();
+
+      // Should show authenticated hint
+      expect(screen.getByText(/Signed in/i)).toBeInTheDocument();
+
+      // Should NOT have a pencil icon (which indicates editability)
+      const nameContainer = nameDisplay.closest('div');
+      const pencilIcon = nameContainer?.querySelector('svg');
+      expect(pencilIcon).not.toBeInTheDocument();
     });
   });
 
