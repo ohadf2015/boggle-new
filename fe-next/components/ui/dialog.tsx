@@ -62,8 +62,8 @@ const DialogContent = React.forwardRef<
         // Height constraints - prevent overflow
         "max-h-[90vh] sm:max-h-[85vh]",
         // Neo-Brutalist styling
-        "bg-neo-cream text-neo-black",
-        "border-3 sm:border-4 border-neo-black",
+        "bg-neo-cream dark:bg-neo-navy text-neo-black dark:text-neo-white",
+        "border-3 sm:border-4 border-neo-black dark:border-slate-600",
         "rounded-neo sm:rounded-neo-lg",
         "shadow-hard sm:shadow-hard-xl",
         // Spacing

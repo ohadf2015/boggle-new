@@ -87,10 +87,11 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
   const handleJoin = useCallback(() => {
     if (!username.trim() || !avatarId) return;
 
+    // Always store avatar selection (even for authenticated users) so it's available when joining
     if (!isAuthenticated) {
       setStoredUsername(username.trim());
-      setStoredAvatarId(avatarId);
     }
+    setStoredAvatarId(avatarId);
 
     onJoin(username.trim(), avatarId);
   }, [username, avatarId, isAuthenticated, onJoin]);

@@ -109,12 +109,13 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   const handleCreate = useCallback(() => {
     if (!username.trim() || !avatarId) return;
 
+    // Always store avatar selection (even for authenticated users) so it's available when joining
     if (!isAuthenticated) {
       setStoredUsername(username.trim());
-      setStoredAvatarId(avatarId);
     }
+    setStoredAvatarId(avatarId);
 
-    const finalRoomName = roomName.trim() 
+    const finalRoomName = roomName.trim()
       ? sanitizeRoomName(roomName.trim())
       : sanitizeRoomName(generateRoomName(username.trim()));
 
@@ -147,7 +148,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
 
           {/* Username Input */}
           <div className="space-y-2">
-            <Label className="text-xs font-bold uppercase text-neo-cyan">
+            <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-300">
               {t('multiplayerFlow.createModal.yourName') || 'Your Name'}
             </Label>
             {isAuthenticated ? (
@@ -192,9 +193,9 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
 
           {/* Room Name Input */}
           <div className="space-y-2">
-            <Label className="text-xs font-bold uppercase text-neo-cyan">
+            <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-300">
               {t('multiplayerFlow.createModal.roomNameLabel') || 'Room Name'}{' '}
-              <span className="font-normal text-neo-cyan/50">
+              <span className="font-normal text-slate-400 dark:text-slate-500">
                 ({t('multiplayerFlow.createModal.optional') || 'optional'})
               </span>
             </Label>

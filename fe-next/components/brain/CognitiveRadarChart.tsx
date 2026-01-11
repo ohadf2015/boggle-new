@@ -175,8 +175,8 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
       </div>
 
       {/* Radar Chart */}
-      <div ref={containerRef} className="relative z-10 w-full h-[280px] sm:h-[320px]">
-        {isReady && (
+      <div ref={containerRef} className="relative z-10 w-full h-[280px] sm:h-[320px] min-h-[280px]">
+        {isReady ? (
         <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100}>
           <RadarChart data={chartData}>
             <defs>
@@ -252,6 +252,15 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
             />
           </RadarChart>
         </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <div className={cn(
+              'text-sm font-bold',
+              isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+            )}>
+              {t('common.loading')}
+            </div>
+          </div>
         )}
       </div>
 

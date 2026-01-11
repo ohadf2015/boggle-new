@@ -205,8 +205,16 @@ function registerWordHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      if (!gameCode || !username || !word) {
-        emitError(socket, ErrorMessages.INVALID_WORD_SUBMISSION);
+      if (!gameCode || !username) {
+        emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
+        return;
+      }
+
+      if (!word) {
+        emitError(socket, ErrorCodes.VALIDATION_MISSING_FIELD, {
+          message: 'Word is required',
+          details: { field: 'word' }
+        });
         return;
       }
 
