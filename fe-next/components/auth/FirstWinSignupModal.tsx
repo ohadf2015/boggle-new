@@ -74,7 +74,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
         className={cn(
           'max-w-md',
           isDarkMode
-            ? 'bg-gradient-to-b from-slate-800 via-slate-800 to-slate-900 border-yellow-500/30'
+            ? 'bg-neo-navy border-yellow-500/30'
             : 'bg-gradient-to-b from-white via-white to-gray-50 border-yellow-400/50'
         )}
       >

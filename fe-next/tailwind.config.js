@@ -65,10 +65,14 @@ module.exports = {
         brand: {
           google: "#4285F4",
           "google-hover": "#3367D6",
-          discord: "#5865F2",
-          "discord-hover": "#4752C4",
+          discord: "var(--brand-discord)",
+          "discord-hover": "var(--brand-discord-hover)",
           apple: "#000000",
           "apple-hover": "#333333",
+          whatsapp: "var(--brand-whatsapp)",
+          "whatsapp-hover": "var(--brand-whatsapp-hover)",
+          facebook: "var(--brand-facebook)",
+          linkedin: "var(--brand-linkedin)",
         },
         // Achievement tier colors
         tier: {

@@ -103,6 +103,14 @@
   --avatar-13: #FFB347;
   --avatar-14: #9D84B7;
   --avatar-15: #FF6F61;
+
+  /* Brand Colors for Social Platforms */
+  --brand-whatsapp: #25D366;
+  --brand-whatsapp-hover: #20BA5A;
+  --brand-discord: #5865F2;
+  --brand-discord-hover: #4752C4;
+  --brand-facebook: #1877F2;
+  --brand-linkedin: #0A66C2;
 }
 
 /* Light Mode Variables */
