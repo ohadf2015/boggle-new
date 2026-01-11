@@ -1,9 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import Image from 'next/image';
-import { Pencil, Check } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Pencil } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -15,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { AvatarSelector } from '@/components/multiplayer/AvatarSelector';
 import { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
 import { LanguageSelector } from '@/components/join/LanguageSelector';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -24,7 +23,7 @@ import {
   setStoredUsername,
   setStoredAvatarId,
 } from '@/utils/profileStorage';
-import { AVATARS, getAvatarPath, getRandomAvatar } from '@/utils/avatarConfig';
+import { getRandomAvatar } from '@/utils/avatarConfig';
 import { sanitizeRoomName } from '@/utils/consts';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/shared/types/game';
@@ -127,8 +126,6 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
     });
   }, [username, avatarId, roomName, language, isAuthenticated, onCreate, generateRoomName]);
 
-  const isUsingProfilePicture = avatarId === PROFILE_AVATAR_ID;
-  const hasProfilePicture = !!profilePictureUrl;
   const isValid = username.trim().length >= 2 && avatarId;
 
   return (
@@ -140,99 +137,26 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
           </DialogTitle>
         </DialogHeader>
 
-        <DialogBody className="space-y-4">
+        <DialogBody className="space-y-6">
+          {/* Avatar Selector */}
+          <AvatarSelector
+            selectedAvatarId={avatarId}
+            onAvatarChange={setAvatarId}
+            profilePictureUrl={profilePictureUrl}
+          />
+
+          {/* Username Input */}
           <div className="space-y-2">
-            <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
-              {t('profile.chooseAvatar') || 'Choose Avatar'}
-            </Label>
-            <div className="max-h-32 overflow-y-auto rounded-neo border-2 border-neo-black/20 dark:border-slate-600 p-2 bg-slate-50 dark:bg-slate-800/50">
-              <div className="grid grid-cols-6 gap-1.5 sm:gap-2">
-              {hasProfilePicture && (
-                <motion.button
-                  type="button"
-                  onClick={() => setAvatarId(PROFILE_AVATAR_ID)}
-                  className={cn(
-                    'relative aspect-square rounded-neo border-2 overflow-hidden',
-                    'transition-all hover:scale-105 active:scale-95',
-                    'min-h-[40px] min-w-[40px]',
-                    isUsingProfilePicture
-                      ? 'border-neo-cyan ring-2 ring-neo-cyan scale-105'
-                      : 'border-neo-black hover:border-neo-cyan/50'
-                  )}
-                  whileHover={{ scale: isUsingProfilePicture ? 1.05 : 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Image
-                    src={profilePictureUrl!}
-                    alt="Your Profile"
-                    fill
-                    className="object-cover"
-                    referrerPolicy="no-referrer"
-                  />
-                  {isUsingProfilePicture && (
-                    <div className="absolute inset-0 bg-neo-cyan/20 flex items-center justify-center">
-                      <div className="bg-neo-cyan text-neo-black border-2 border-neo-black rounded-full w-5 h-5 flex items-center justify-center">
-                        <Check className="w-3 h-3" />
-                      </div>
-                    </div>
-                  )}
-                  <div className="absolute bottom-0 left-0 right-0 bg-neo-black/80 text-white text-[7px] font-bold text-center py-0.5">
-                    {t('profile.you') || 'YOU'}
-                  </div>
-                </motion.button>
-              )}
-
-              {AVATARS.map((avatar) => {
-                const isSelected = !isUsingProfilePicture && avatar.id === avatarId;
-                return (
-                  <motion.button
-                    key={avatar.id}
-                    type="button"
-                    onClick={() => setAvatarId(avatar.id)}
-                    className={cn(
-                      'relative aspect-square rounded-neo border-2 overflow-hidden',
-                      'transition-all hover:scale-105 active:scale-95',
-                      'min-h-[40px] min-w-[40px]',
-                      isSelected
-                        ? 'border-neo-cyan ring-2 ring-neo-cyan scale-105'
-                        : 'border-neo-black hover:border-neo-cyan/50'
-                    )}
-                    whileHover={{ scale: isSelected ? 1.05 : 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Image
-                      src={getAvatarPath(avatar)}
-                      alt={avatar.name}
-                      fill
-                      className="object-cover"
-                    />
-                    {isSelected && (
-                      <div className="absolute inset-0 bg-neo-cyan/20 flex items-center justify-center">
-                        <div className="bg-neo-cyan text-neo-black border-2 border-neo-black rounded-full w-5 h-5 flex items-center justify-center">
-                          <Check className="w-3 h-3" />
-                        </div>
-                      </div>
-                    )}
-                  </motion.button>
-                );
-              })}
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
+            <Label className="text-xs font-bold uppercase text-neo-cyan">
               {t('multiplayerFlow.createModal.yourName') || 'Your Name'}
             </Label>
             {isAuthenticated ? (
-              <button
-                type="button"
-                disabled
-                className="w-full flex items-center gap-2 px-3 py-2.5 bg-slate-100 dark:bg-slate-700/50 rounded-neo border-2 border-neo-black/20 text-start"
-              >
-                <span className="font-bold text-neo-black dark:text-neo-white">{username}</span>
-                <span className="text-xs text-slate-500">({t('multiplayerFlow.createModal.authenticatedHint') || 'Signed in'})</span>
-              </button>
+              <div className="flex items-center gap-2 px-4 py-3 bg-neo-navy/40 rounded-neo border-2 border-neo-black shadow-hard-sm">
+                <span className="font-bold text-neo-white">{username}</span>
+                <span className="text-xs text-neo-cyan/70 font-medium">
+                  ({t('multiplayerFlow.createModal.authenticatedHint') || 'Signed in'})
+                </span>
+              </div>
             ) : isEditingName ? (
               <Input
                 value={username}
@@ -241,27 +165,37 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                 onKeyDown={(e) => e.key === 'Enter' && setIsEditingName(false)}
                 maxLength={20}
                 autoFocus
-                className="font-bold"
+                className="font-bold bg-neo-navy/40 border-neo-black text-neo-white placeholder:text-neo-white/50"
                 placeholder={t('multiplayerFlow.createModal.namePlaceholder') || 'Your name'}
               />
             ) : (
               <button
                 type="button"
                 onClick={() => setIsEditingName(true)}
-                className="w-full flex items-center justify-between px-3 py-2.5 bg-slate-100 dark:bg-slate-700/50 rounded-neo border-2 border-neo-black/20 hover:border-neo-cyan/50 transition-colors text-start"
+                className={cn(
+                  'w-full flex items-center justify-between px-4 py-3',
+                  'bg-neo-navy/40 hover:bg-neo-navy/60',
+                  'rounded-neo border-2 border-neo-black',
+                  'shadow-hard-sm hover:shadow-hard',
+                  'hover:translate-x-[-1px] hover:translate-y-[-1px]',
+                  'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
+                  'transition-all duration-200',
+                  'text-start'
+                )}
               >
-                <span className="font-bold text-neo-black dark:text-neo-white truncate">
+                <span className="font-bold text-neo-white truncate">
                   {username || t('multiplayerFlow.createModal.namePlaceholder') || 'Your name'}
                 </span>
-                <Pencil className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                <Pencil className="w-4 h-4 text-neo-cyan flex-shrink-0" />
               </button>
             )}
           </div>
 
-          <div className="space-y-1.5">
-            <Label className="text-xs font-bold uppercase text-slate-600 dark:text-slate-400">
+          {/* Room Name Input */}
+          <div className="space-y-2">
+            <Label className="text-xs font-bold uppercase text-neo-cyan">
               {t('multiplayerFlow.createModal.roomNameLabel') || 'Room Name'}{' '}
-              <span className="font-normal text-slate-400">
+              <span className="font-normal text-neo-cyan/50">
                 ({t('multiplayerFlow.createModal.optional') || 'optional'})
               </span>
             </Label>
@@ -270,10 +204,11 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
               onChange={(e) => setRoomName(e.target.value)}
               maxLength={30}
               placeholder={generateRoomName(username || 'Your')}
-              className="bg-slate-100 dark:bg-slate-700/50"
+              className="bg-neo-navy/40 border-neo-black text-neo-white placeholder:text-neo-white/50"
             />
           </div>
 
+          {/* Language Selector */}
           <LanguageSelector selectedLanguage={language} onLanguageChange={setLanguage} />
         </DialogBody>
 

@@ -130,7 +130,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
       <DialogContent
         noDescription
         hideCloseButton
-        className="max-w-lg p-0 overflow-hidden bg-neo-white border-neo-thick border-neo-black rounded-xl shadow-hard-lg"
+        className="w-[calc(100%-2rem)] max-w-lg p-0 overflow-hidden bg-neo-white border-neo-thick border-neo-black rounded-xl shadow-hard-lg"
       >
         <div className="max-h-[90vh] overflow-y-auto">
           {/* Header */}

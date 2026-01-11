@@ -55,7 +55,7 @@ const DialogContent = React.forwardRef<
       aria-describedby={noDescription ? undefined : props['aria-describedby']}
       className={cn(
         // Mobile-first positioning - constrained on mobile, centered modal on desktop
-        "fixed z-50 grid w-[calc(100%-1rem)] max-w-[95vw]",
+        "fixed z-50 grid w-[calc(100%-2rem)] max-w-[95vw]",
         // Positioning
         "left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]",
         "sm:max-w-lg lg:max-w-xl xl:max-w-2xl",
