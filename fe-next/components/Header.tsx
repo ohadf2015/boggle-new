@@ -217,23 +217,25 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         </Link>
                     )}
 
-                    {/* Profile Link */}
-                    <Link
-                        href={`/${language}/profile`}
-                        className={cn(
-                            "flex items-center justify-center",
-                            "w-10 h-10",
-                            "bg-neo-cream text-neo-black",
-                            "border-2 border-neo-black",
-                            "rounded-neo shadow-hard-sm",
-                            "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-cyan/30",
-                            "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
-                            "transition-all duration-100"
-                        )}
-                        aria-label={t('brain.nav.profile') || 'Profile'}
-                    >
-                        <User size={20} />
-                    </Link>
+                    {/* Profile Link - only show for authenticated users */}
+                    {isAuthenticated && profile && (
+                        <Link
+                            href={`/${language}/profile`}
+                            className={cn(
+                                "flex items-center justify-center",
+                                "w-10 h-10",
+                                "bg-neo-cream text-neo-black",
+                                "border-2 border-neo-black",
+                                "rounded-neo shadow-hard-sm",
+                                "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-cyan/30",
+                                "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+                                "transition-all duration-100"
+                            )}
+                            aria-label={t('brain.nav.profile') || 'Profile'}
+                        >
+                            <User size={20} />
+                        </Link>
+                    )}
 
                     <MusicControls />
                     <AuthButton />
@@ -398,7 +400,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                             {/* Divider */}
                                             <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
 
-                                            <div className="flex flex-col gap-3">
+                                            <div className="flex flex-col gap-2">
                                                 <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
                                                     {t('common.admin') || 'Admin'}
                                                 </span>

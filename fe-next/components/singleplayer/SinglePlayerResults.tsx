@@ -863,7 +863,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       {/* MOBILE VIEW - Tab-based layout (hidden on md+, shown on fold mobiles) */}
       <div className="md:hidden flex flex-col min-h-full">
         {/* Tab Content - Scrollable area */}
-        <div className="flex-1 overflow-y-auto overscroll-contain px-2 pb-20">
+        <div className="flex-1 overflow-y-auto overscroll-contain px-2 pb-28">
           <div className="max-w-lg mx-auto">
             <AnimatePresence mode="wait">
               <motion.div

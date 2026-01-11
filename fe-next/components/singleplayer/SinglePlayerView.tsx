@@ -398,6 +398,7 @@ const SinglePlayerView: React.FC = () => {
         {phase === 'results' && resultsData && (
           <>
             <SinglePlayerResults
+              key={resultsData.gameSessionId || `results-${Date.now()}`}
               results={resultsData}
               mode={gameState.mode}
               onPlayAgain={handlePlayAgain}

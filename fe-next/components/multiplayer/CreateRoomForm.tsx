@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Crown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -119,7 +119,7 @@ const CreateRoomForm: React.FC<CreateRoomFormProps> = ({
         </motion.div>
 
         {/* Main Content */}
-        <div className="flex-1 flex items-start justify-center px-4 sm:px-6 pt-4 pb-6 min-h-0 overflow-y-auto">
+        <div className="flex-1 flex items-start justify-center px-4 sm:px-6 pt-4 pb-24 min-h-0 overflow-y-auto">
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -128,7 +128,7 @@ const CreateRoomForm: React.FC<CreateRoomFormProps> = ({
           >
             <Card className="border-3 border-neo-black dark:border-slate-600 shadow-hard">
               <CardContent className="p-6 sm:p-8">
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form id="create-room-form" onSubmit={handleSubmit} className="space-y-6">
                   {/* Profile Badge */}
                   <div className="space-y-2">
                     <Label className="text-sm font-bold uppercase text-slate-600 dark:text-slate-400">
@@ -192,25 +192,30 @@ const CreateRoomForm: React.FC<CreateRoomFormProps> = ({
                       {t('multiplayerFlow.createForm.languageHint') || 'Players will find words in this language'}
                     </p>
                   </div>
-
-                  {/* Create Button */}
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    variant="success"
-                    size="lg"
-                    className="w-full h-16 text-xl font-black uppercase"
-                  >
-                    <Crown className="mr-3 w-6 h-6" />
-                    {isSubmitting
-                      ? (t('multiplayerFlow.createForm.creating') || 'Creating...')
-                      : (t('multiplayerFlow.createForm.createButton') || 'Create Room')
-                    }
-                  </Button>
                 </form>
               </CardContent>
             </Card>
           </motion.div>
+        </div>
+
+        {/* Sticky Create Button - always visible at bottom */}
+        <div className="flex-shrink-0 px-4 sm:px-6 pb-6 pt-2 bg-gradient-to-t from-slate-100 via-slate-100 to-transparent dark:from-neo-navy dark:via-neo-navy dark:to-transparent">
+          <div className="w-full max-w-md mx-auto">
+            <Button
+              type="submit"
+              form="create-room-form"
+              disabled={isSubmitting}
+              variant="success"
+              size="lg"
+              className="w-full h-16 text-xl font-black uppercase"
+            >
+              <Crown className="mr-3 w-6 h-6" />
+              {isSubmitting
+                ? (t('multiplayerFlow.createForm.creating') || 'Creating...')
+                : (t('multiplayerFlow.createForm.createButton') || 'Create Room')
+              }
+            </Button>
+          </div>
         </div>
       </div>
     </>

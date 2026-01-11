@@ -152,12 +152,12 @@ export default function TierUpCelebration({
             'bg-gradient-to-r p-6 text-center text-white',
             newTierConfig.bgGradient
           )}>
-            {/* Close Button */}
+            {/* Close Button - minimum 44px touch target for accessibility */}
             <button
               onClick={onClose}
-              className="absolute top-3 right-3 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+              className="absolute top-2 right-2 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors"
             >
-              <X className="w-4 h-4 text-white" />
+              <X className="w-5 h-5 text-white" />
             </button>
 
             {/* Animated Tier Badge */}

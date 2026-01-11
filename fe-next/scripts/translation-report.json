@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 1975,
+    "totalKeysInCode": 1987,
     "keyCountByLanguage": {
-      "en": 3271,
-      "he": 3271,
-      "sv": 3271,
-      "ja": 3271,
-      "es": 3259
+      "en": 3283,
+      "he": 3283,
+      "sv": 3283,
+      "ja": 3283,
+      "es": 3283
     },
     "missingFromEnglish": 0
   },
@@ -15,20 +15,7 @@
     "he": [],
     "sv": [],
     "ja": [],
-    "es": [
-      "daily.enterTargetWord",
-      "daily.wordPlaceholder",
-      "daily.errorWordRequired",
-      "daily.errorWordTooShort",
-      "daily.errorWordTooLong",
-      "daily.errorInvalidLetters",
-      "daily.pickDifficulty",
-      "daily.classic",
-      "daily.pro",
-      "daily.challengeLink",
-      "daily.createChallengeFailed",
-      "daily.linkCopied"
-    ]
+    "es": []
   },
   "keysNotInEnglish": {
     "he": [],

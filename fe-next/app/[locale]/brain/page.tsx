@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Brain, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -20,6 +20,7 @@ import PersonalizedDrillRecommendation from '@/components/brain/PersonalizedDril
 import WelcomeBackCard from '@/components/brain/WelcomeBackCard';
 import BrainScoreShareCard from '@/components/brain/BrainScoreShareCard';
 import AuthModal from '@/components/auth/AuthModal';
+import AutoHideHeader from '@/components/AutoHideHeader';
 
 /**
  * Header component for Brain Training page
@@ -75,7 +76,7 @@ export default function BrainTrainingPage() {
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const { brainScore, recentGameScores, drillProgress, brainScoreHistory, isLoading, error, refresh, initializeBrainScore } = useBrainScore();
+  const { brainScore, recentGameScores, drillProgress, brainScoreHistory, isLoading, error, refresh } = useBrainScore();
 
   // State for first game celebration
   const [showCelebration, setShowCelebration] = useState(false);
@@ -137,6 +138,7 @@ export default function BrainTrainingPage() {
         'min-h-screen pb-24',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
+        <AutoHideHeader />
         <Header
           isDarkMode={isDarkMode}
           onBack={handleBack}
@@ -178,6 +180,7 @@ export default function BrainTrainingPage() {
         'min-h-screen pb-24',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
+        <AutoHideHeader />
         <Header
           isDarkMode={isDarkMode}
           onBack={handleBack}
@@ -230,6 +233,7 @@ export default function BrainTrainingPage() {
         'min-h-screen pb-24',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
+        <AutoHideHeader />
         <Header
           isDarkMode={isDarkMode}
           onBack={handleBack}
@@ -289,6 +293,7 @@ export default function BrainTrainingPage() {
         'min-h-screen pb-24',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
+        <AutoHideHeader />
         <Header
           isDarkMode={isDarkMode}
           onBack={handleBack}
@@ -343,6 +348,7 @@ export default function BrainTrainingPage() {
       'min-h-screen pb-24', // Extra padding for bottom nav
       isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
     )}>
+      <AutoHideHeader />
       <Header
         isDarkMode={isDarkMode}
         onBack={handleBack}

@@ -528,6 +528,82 @@ function updateHostSocketId(gameCode: string, newSocketId: string): void {
   userManager.updateHostSocketId(game as unknown as GameBase, newSocketId);
 }
 
+/**
+ * Find the next eligible player to become host
+ * Prioritizes connected, non-bot players
+ * @param gameCode - Game code
+ * @param excludeUsername - Username to exclude (e.g., current host leaving)
+ * @returns Username of next eligible host, or null if none found
+ */
+function getNextEligibleHost(gameCode: string, excludeUsername?: string): string | null {
+  const game = games[gameCode];
+  if (!game) return null;
+
+  // Find connected, non-bot players (excluding the specified user)
+  const eligiblePlayers = Object.entries(game.users)
+    .filter(([username, user]) => {
+      if (excludeUsername && username === excludeUsername) return false;
+      if (user.isBot) return false;
+      if (user.disconnected) return false;
+      return true;
+    })
+    .map(([username]) => username);
+
+  // Return the first eligible player (they joined earliest)
+  return eligiblePlayers.length > 0 ? eligiblePlayers[0] : null;
+}
+
+/**
+ * Transfer host role to another player
+ * @param gameCode - Game code
+ * @param newHostUsername - Username of new host
+ * @returns Transfer result with old and new host info
+ */
+function transferHost(gameCode: string, newHostUsername: string): { success: boolean; previousHost?: string; newHost?: string; error?: string } {
+  const game = games[gameCode];
+  if (!game) {
+    return { success: false, error: 'Game not found' };
+  }
+
+  const newHostUser = game.users[newHostUsername];
+  if (!newHostUser) {
+    return { success: false, error: 'New host user not found in game' };
+  }
+
+  if (newHostUser.isBot) {
+    return { success: false, error: 'Cannot transfer host to a bot' };
+  }
+
+  if (newHostUser.disconnected) {
+    return { success: false, error: 'Cannot transfer host to a disconnected player' };
+  }
+
+  const previousHost = game.hostUsername ?? undefined;
+
+  // Update previous host's isHost flag
+  if (previousHost && game.users[previousHost]) {
+    game.users[previousHost].isHost = false;
+  }
+
+  // Update new host
+  game.hostUsername = newHostUsername;
+  game.hostSocketId = newHostUser.socketId;
+  newHostUser.isHost = true;
+
+  // Clear any reconnection timeout since we transferred host instead
+  if (game.reconnectionTimeout) {
+    clearTimeout(game.reconnectionTimeout);
+    game.reconnectionTimeout = null;
+  }
+
+  logger.info('HOST', `Host transferred in game ${gameCode}: ${previousHost ?? 'unknown'} -> ${newHostUsername}`);
+
+  // Persist to Redis
+  persistGameState(gameCode);
+
+  return { success: true, previousHost, newHost: newHostUsername };
+}
+
 interface AuthUserConnection {
   gameCode: string;
   username: string;
@@ -1431,6 +1507,8 @@ module.exports = {
   // Host management
   isHost,
   updateHostSocketId,
+  getNextEligibleHost,
+  transferHost,
 
   // Game state transitions (state machine)
   transitionGameState,

@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Copy, Check, Share2, Crown, Grid3X3, Grid2X2, Sparkles, Zap, X } from 'lucide-react';
+import { Copy, Check, Share2, Crown, Grid3X3, Grid2X2, Sparkles, Zap, X, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
-import { generateRandomTable } from '@/utils/utils';
+import { generateCustomChallengeGrid } from '@/utils/customChallengeGrid';
 import { buildPuzzleShareUrl } from '@/utils/customPuzzle';
 import type { Language } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,6 +14,7 @@ import { getGuestFingerprint } from '@/utils/dailyChallenge';
 import { neoSuccessToast, neoErrorToast } from '@/components/NeoToast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Mascot } from '@/components/ui/Mascot';
+import { CustomChallengeStats } from '@/components/daily/CustomChallengeStats';
 
 interface CreateChallengeModalProps {
   isOpen: boolean;
@@ -22,11 +23,12 @@ interface CreateChallengeModalProps {
 }
 
 export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOpen, onClose, language }) => {
-  const [step, setStep] = useState<'config' | 'loading' | 'share'>('config');
+  const [step, setStep] = useState<'config' | 'loading' | 'share' | 'stats'>('config');
   const [boardSize, setBoardSize] = useState<number>(5);
   const [targetWord, setTargetWord] = useState<string>('');
   const [wordError, setWordError] = useState<string>('');
   const [shareUrl, setShareUrl] = useState<string>('');
+  const [puzzleCode, setPuzzleCode] = useState<string>('');
   const [copied, setCopied] = useState(false);
   const { profile, user } = useAuth();
   const { t } = useLanguage();
@@ -94,8 +96,9 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
       // Use the user-provided word
       const word = targetWord.trim().toUpperCase();
 
-      // Generate grid with embedded word
-      const grid = generateRandomTable(boardSize, boardSize, language, [word]);
+      // Generate grid with GUARANTEED embedded word
+      // This uses the proven algorithm that always places the target word
+      const grid = generateCustomChallengeGrid(boardSize, boardSize, language, word);
 
       // Create puzzle on server
       const displayName = profile?.display_name || user?.email?.split('@')[0] || 'Player';
@@ -124,6 +127,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
 
       const url = buildPuzzleShareUrl(createData.puzzleCode, language);
       setShareUrl(url);
+      setPuzzleCode(createData.puzzleCode);
       setStep('share');
 
     } catch (error) {
@@ -538,6 +542,14 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     </Button>
 
                     <Button
+                      onClick={() => setStep('stats')}
+                      className="w-full h-14 sm:h-16 text-lg sm:text-xl font-black bg-gradient-to-br from-neo-purple to-purple-600 hover:from-neo-purple/90 hover:to-purple-600/90 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide"
+                    >
+                      <BarChart3 className="w-6 h-6 mr-2" strokeWidth={2.5} />
+                      {t('daily.viewStats')}
+                    </Button>
+
+                    <Button
                       variant="ghost"
                       onClick={handleClose}
                       className="w-full text-base font-bold text-slate-600 dark:text-slate-300 hover:text-neo-black hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg py-3"
@@ -558,6 +570,19 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       {t('daily.canPlayYourself')}
                     </p>
                   </motion.div>
+                </motion.div>
+              )}
+
+              {step === 'stats' && puzzleCode && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="space-y-4"
+                >
+                  <CustomChallengeStats
+                    puzzleCode={puzzleCode}
+                    onClose={() => setStep('share')}
+                  />
                 </motion.div>
               )}
             </div>

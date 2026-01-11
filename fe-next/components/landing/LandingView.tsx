@@ -392,11 +392,11 @@ const LandingView: React.FC = () => {
       </main>
 
       {/* Tutorial FAB - Fixed bottom corner button */}
-      {/* Z-index 45 ensures it stays below mobile menu backdrop (z-9998) but above other content */}
+      {/* Z-index 45 on mobile, higher on desktop to clear any overlapping elements */}
       <button
         onClick={handleOpenTutorial}
         className="
-          fixed bottom-4 right-4 z-[45]
+          fixed bottom-4 right-4 z-[45] lg:bottom-8 lg:right-8 lg:z-[100]
           pb-[env(safe-area-inset-bottom)]
           flex items-center justify-center gap-2
           min-w-[48px] min-h-[48px]

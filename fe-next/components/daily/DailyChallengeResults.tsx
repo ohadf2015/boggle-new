@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Trophy, Flame, Target, Clock, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ImageDown, ChevronDown, ChevronUp } from 'lucide-react';
+import { Share2, Trophy, Flame, Target, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ImageDown, ChevronDown, ChevronUp } from 'lucide-react';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 // X/Twitter icon (no lucide equivalent)
@@ -22,7 +22,7 @@ import { Button } from '@/components/ui/button';
 import { hasPlayedToday } from '@/utils/dailyChallenge/storage';
 import { LANGUAGE_OPTIONS } from './results/constants';
 import type { Language } from '@/types';
-import { fireConfetti, fireRankConfetti } from '@/utils/confettiUtils';
+import { fireConfetti } from '@/utils/confettiUtils';
 import {
   generateShareableResult,
   getGuestFingerprint,
@@ -390,7 +390,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="flex-1 flex flex-col items-center justify-start p-4 overflow-y-auto"
+      className="flex-1 flex flex-col items-center justify-start p-4 pb-24 md:pb-4 overflow-y-auto"
     >
       {/* Back button */}
       <motion.div className="absolute top-24 sm:top-28 start-4">
