@@ -2,50 +2,15 @@
   "summary": {
     "totalKeysInCode": 1917,
     "keyCountByLanguage": {
-      "en": 3202,
-      "he": 3202,
-      "sv": 3202,
-      "ja": 3201,
-      "es": 3202
+      "en": 3204,
+      "he": 3204,
+      "sv": 3204,
+      "ja": 3203,
+      "es": 3204
     },
-    "missingFromEnglish": 2
+    "missingFromEnglish": 0
   },
-  "missingFromEnglish": [
-    {
-      "key": "multiplayerFlow.createModal.yourName",
-      "usages": [
-        {
-          "file": "components/multiplayer/CreateRoomModal.tsx",
-          "line": 222
-        },
-        {
-          "file": "components/multiplayer/CreateRoomModal.tsx",
-          "line": 222
-        },
-        {
-          "file": "components/multiplayer/CreateRoomModal.tsx",
-          "line": 222
-        }
-      ]
-    },
-    {
-      "key": "multiplayerFlow.joinModal.yourName",
-      "usages": [
-        {
-          "file": "components/multiplayer/JoinRoomModal.tsx",
-          "line": 204
-        },
-        {
-          "file": "components/multiplayer/JoinRoomModal.tsx",
-          "line": 204
-        },
-        {
-          "file": "components/multiplayer/JoinRoomModal.tsx",
-          "line": 204
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [],
     "sv": [],
