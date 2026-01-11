@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Copy, Check, Share2, Crown, Grid3X3, Grid2X2, Sparkles, Zap } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Copy, Check, Share2, Crown, Grid3X3, Grid2X2, Sparkles, Zap, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { generateRandomTable } from '@/utils/utils';
 import { buildPuzzleShareUrl } from '@/utils/customPuzzle';
 import type { Language } from '@/types';
@@ -22,7 +23,6 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
   const [step, setStep] = useState<'config' | 'loading' | 'share'>('config');
   const [boardSize, setBoardSize] = useState<number>(5);
   const [shareUrl, setShareUrl] = useState<string>('');
-  const [shareCode, setShareCode] = useState<string>('');
   const [copied, setCopied] = useState(false);
   const { profile, user } = useAuth();
   const { t } = useLanguage();
@@ -34,14 +34,20 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
       // Adjust lengths based on board size
       const minLen = boardSize === 5 ? 5 : 6;
       const maxLen = boardSize === 5 ? 8 : 10;
-      
+
       const wordRes = await fetch(`/api/drills/random-words?count=1&minLength=${minLen}&maxLength=${maxLen}&language=${language}`);
-      const wordData = await wordRes.json();
-      
-      if (!wordData.words || wordData.words.length === 0) {
-        throw new Error('Failed to get target word');
+
+      if (!wordRes.ok) {
+        throw new Error(`API error: ${wordRes.status}`);
       }
-      
+
+      const wordData = await wordRes.json();
+
+      if (!wordData.words || !Array.isArray(wordData.words) || wordData.words.length === 0) {
+        console.error('Empty words array from API:', wordData);
+        throw new Error('No words available for this language');
+      }
+
       const targetWord = wordData.words[0].toUpperCase();
 
       // 2. Generate grid with embedded word
@@ -74,7 +80,6 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
 
       const url = buildPuzzleShareUrl(createData.puzzleCode, language);
       setShareUrl(url);
-      setShareCode(createData.puzzleCode);
       setStep('share');
 
     } catch (error) {
@@ -112,7 +117,6 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
   const reset = () => {
     setStep('config');
     setShareUrl('');
-    setShareCode('');
   };
 
   const handleClose = () => {
@@ -122,27 +126,14 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={handleClose}
-            className="fixed inset-0 bg-black/50 z-[100] backdrop-blur-sm"
-          />
-
-          {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 30 }}
-            transition={{ type: 'spring', bounce: 0.3, duration: 0.5 }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-lg max-h-[90vh] bg-neo-white border-neo-thick border-neo-black rounded-xl shadow-hard-lg z-[101] overflow-hidden"
-          >
-            {/* Header */}
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+      <DialogContent
+        noDescription
+        hideCloseButton
+        className="max-w-lg p-0 overflow-hidden bg-neo-white border-neo-thick border-neo-black rounded-xl shadow-hard-lg"
+      >
+        <div className="max-h-[90vh] overflow-y-auto">
+          {/* Header */}
             <div className="relative flex items-center justify-between p-4 sm:p-5 border-b-neo-thick border-neo-black bg-gradient-to-br from-neo-yellow to-neo-orange sticky top-0 z-10">
               <motion.div
                 className="flex items-center gap-3"
@@ -474,9 +465,8 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                 </motion.div>
               )}
             </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };

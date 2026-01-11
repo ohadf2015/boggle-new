@@ -110,11 +110,16 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
       });
 
       if (!response.ok) {
-        console.error('Failed to generate grid');
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Failed to generate grid:', response.status, errorData);
         return null;
       }
 
       const data = await response.json();
+      if (!data.grid || !Array.isArray(data.grid)) {
+        console.error('Invalid grid data received:', data);
+        return null;
+      }
       return data.grid;
     } catch (error) {
       console.error('Grid generation error:', error);

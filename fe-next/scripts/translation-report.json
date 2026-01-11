@@ -6,7 +6,7 @@
       "he": 3245,
       "sv": 3245,
       "ja": 3245,
-      "es": 3235
+      "es": 3245
     },
     "missingFromEnglish": 0
   },
@@ -15,18 +15,7 @@
     "he": [],
     "sv": [],
     "ja": [],
-    "es": [
-      "daily.createCustomChallenge",
-      "daily.createChallengeTitle",
-      "daily.chooseBoardSize",
-      "daily.generateChallenge",
-      "daily.generatingPuzzle",
-      "daily.challengeCreated",
-      "daily.challengeCreatedDesc",
-      "daily.shareChallenge",
-      "daily.boardWillBeGenerated",
-      "daily.canPlayYourself"
-    ]
+    "es": []
   },
   "keysNotInEnglish": {
     "he": [],
