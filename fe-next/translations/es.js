@@ -91,6 +91,8 @@ const es = {
     "connectionLost": "Conexión perdida",
     "notConnected": "Sin conexión",
     "connected": "Conectado",
+    "left": "restante",
+    "processing": "Procesando...",
     "offline": "sin conexión",
     "online": "en línea",
     "sending": "Enviando...",
@@ -1122,6 +1124,9 @@ const es = {
     "viewDetails": "Ver desglose",
     "viewAllWords": "Todas las Palabras",
     "viewXpBreakdown": "Desglose XP",
+    "rewardsEarned": "Recompensas Ganadas",
+    "achievementUnlocked": "Logro Desbloqueado",
+    "achievementsUnlocked": "Logros Desbloqueados",
     "summary": "Resumen",
     "details": "Detalles",
     "performanceDetails": "Detalles de Rendimiento",
@@ -2260,7 +2265,22 @@ const es = {
     "efficiency": "Eficiencia",
     "streak": "Racha",
     "guestTeasing": "¡Inicia sesión para ganar {amount} monedas!",
-    "signInShort": "Entrar"
+    "signInShort": "Entrar",
+    "notEnough": "No hay suficientes monedas",
+    "signInToEarn": "Inicia sesión para ganar"
+  },
+  "streak": {
+    "protection": "Protección de Racha",
+    "protectionApplied": "¡Protección Aplicada!",
+    "atRisk": "¡Racha en Riesgo!",
+    "atRiskDesc": "¡Gana hoy para mantener tu racha de {count} días!",
+    "canRecover": "Recupera Tu Racha",
+    "recoverDesc": "¡Tu racha de {count} días puede ser restaurada!",
+    "recoverFor": "Recuperar por {cost} monedas",
+    "freezes": "Congelaciones de Racha",
+    "freezeDesc": "Usa una congelación para proteger tu racha por un día sin ganar.",
+    "useFreeze": "Usar Congelación de Racha",
+    "noFreezes": "No hay congelaciones disponibles. ¡Gana 1 congelación gratis por semana!"
   },
   "partyScreen": {
     "title": "Pantalla de Fiesta",
@@ -3454,6 +3474,22 @@ const es = {
       "saveTokens": "Ahorra fichas usando menos pistas",
       "exploreGrid": "Explora el tablero para palabras bonus",
       "strategicGuessing": "Usa las pistas antes de adivinar"
+    },
+    "score": {
+      "title": "Tu Puntuación",
+      "speed": "Velocidad",
+      "accuracy": "Precisión",
+      "exploration": "Exploración",
+      "perfect": "¡Puntuación Perfecta!",
+      "lifeLeft": "vida restante",
+      "firstTry": "¡Primer intento!",
+      "guesses": "intentos",
+      "wordsFound": "palabras encontradas",
+      "improve": {
+        "speed": "Termina más rápido para mejorar",
+        "accuracy": "Usa menos intentos",
+        "exploration": "Encuentra más palabras"
+      }
     },
     "ad": {
       "watchAd": "Ver Anuncio",

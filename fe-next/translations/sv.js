@@ -91,6 +91,8 @@ const sv = {
     "connectionLost": "Förlorade anslutningen",
     "notConnected": "Offline",
     "connected": "Ansluten",
+    "left": "kvar",
+    "processing": "Bearbetar...",
     "coins": "mynt",
     "chat": "Chatt",
     "connecting": "Ansluter...",
@@ -1125,6 +1127,9 @@ const sv = {
     "viewDetails": "Se uppdelningen",
     "viewAllWords": "Alla ord",
     "viewXpBreakdown": "XP-uppdelning",
+    "rewardsEarned": "Belöningar intjänade",
+    "achievementUnlocked": "Prestation upplåst",
+    "achievementsUnlocked": "Prestationer upplåsta",
     "summary": "Sammanfattning",
     "details": "Detaljer",
     "performanceDetails": "Prestandadetaljer",
@@ -2437,7 +2442,22 @@ const sv = {
     "efficiency": "Effektivitet",
     "streak": "Svit",
     "guestTeasing": "Logga in för att tjäna {amount} mynt!",
-    "signInShort": "Logga in"
+    "signInShort": "Logga in",
+    "notEnough": "Inte tillräckligt med mynt",
+    "signInToEarn": "Logga in för att tjäna"
+  },
+  "streak": {
+    "protection": "Svitskydd",
+    "protectionApplied": "Skydd aktiverat!",
+    "atRisk": "Svit i fara!",
+    "atRiskDesc": "Vinn idag för att behålla din {count}-dagars svit!",
+    "canRecover": "Återställ din svit",
+    "recoverDesc": "Din {count}-dagars svit kan återställas!",
+    "recoverFor": "Återställ för {cost} mynt",
+    "freezes": "Svitfrysningar",
+    "freezeDesc": "Använd en frysning för att skydda din svit en dag utan att vinna.",
+    "useFreeze": "Använd svitfrysning",
+    "noFreezes": "Inga frysningar tillgängliga. Tjäna 1 gratis frysning per vecka!"
   },
   "partyScreen": {
     "title": "Partyskärm",

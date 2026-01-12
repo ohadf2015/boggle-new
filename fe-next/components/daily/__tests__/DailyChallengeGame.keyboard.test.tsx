@@ -27,6 +27,10 @@ jest.mock('framer-motion', () => ({
       const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
       return <span {...domProps}>{children}</span>;
     },
+    kbd: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
+      const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
+      return <kbd {...domProps}>{children}</kbd>;
+    },
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));

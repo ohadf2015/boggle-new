@@ -91,6 +91,8 @@ const ja = {
     "connectionLost": "接続切れ",
     "notConnected": "オフライン",
     "connected": "接続済み",
+    "left": "残り",
+    "processing": "処理中...",
     "offline": "オフライン",
     "online": "オンライン",
     "sending": "送信中...",
@@ -1124,6 +1126,9 @@ const ja = {
     "viewDetails": "詳細を見る",
     "viewAllWords": "すべての単語",
     "viewXpBreakdown": "XP内訳",
+    "rewardsEarned": "獲得報酬",
+    "achievementUnlocked": "アチーブメント解除",
+    "achievementsUnlocked": "アチーブメント解除",
     "summary": "サマリー",
     "details": "詳細",
     "performanceDetails": "パフォーマンス詳細",
@@ -2434,7 +2439,22 @@ const ja = {
     "efficiency": "効率",
     "streak": "連続",
     "guestTeasing": "ログインして{amount}コインを獲得！",
-    "signInShort": "ログイン"
+    "signInShort": "ログイン",
+    "notEnough": "コインが足りません",
+    "signInToEarn": "ログインして獲得"
+  },
+  "streak": {
+    "protection": "連続記録保護",
+    "protectionApplied": "保護が適用されました！",
+    "atRisk": "連続記録が危険！",
+    "atRiskDesc": "今日勝って{count}日間の連続記録を守ろう！",
+    "canRecover": "連続記録を復活",
+    "recoverDesc": "{count}日間の連続記録を復活できます！",
+    "recoverFor": "{cost}コインで復活",
+    "freezes": "連続記録凍結",
+    "freezeDesc": "凍結を使って、勝たなくても1日連続記録を保護できます。",
+    "useFreeze": "凍結を使用",
+    "noFreezes": "凍結がありません。週に1回無料の凍結を獲得できます！"
   },
   "partyScreen": {
     "title": "パーティースクリーン",
