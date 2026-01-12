@@ -184,13 +184,11 @@ export function useEarthquakeFireRound(
 
   // Trigger earthquake sequence
   const triggerEarthquake = useCallback((force = false) => {
-    if (!force && earthquakeTriggeredRef.current) {
-      return;
-    }
-
-    // Prevent triggering if earthquake is already in progress
-    if (earthquakeState !== 'idle') {
-      return;
+    // Non-force triggers: check if already triggered or in progress
+    if (!force) {
+      if (earthquakeTriggeredRef.current || earthquakeState !== 'idle') {
+        return;
+      }
     }
 
     earthquakeTriggeredRef.current = true;
