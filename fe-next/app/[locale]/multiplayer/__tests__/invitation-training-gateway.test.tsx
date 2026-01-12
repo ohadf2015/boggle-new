@@ -10,23 +10,41 @@ import { render, waitFor } from '@testing-library/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import MultiplayerPage from '../page';
 
+// Mock matchMedia for Framer Motion (stable mock that persists across resetMocks)
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: (query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(),
+    removeListener: jest.fn(),
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  }),
+});
+
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
   useSearchParams: jest.fn(),
 }));
 
-// Mock SocketContext
+// Mock SocketContext - Create stable mock object that persists across resetMocks
+const mockSocket = {
+  connected: true,
+  on: jest.fn(),
+  off: jest.fn(),
+  emit: jest.fn(),
+  id: 'mock-socket-id',
+};
+
 jest.mock('@/utils/SocketContext', () => ({
-  getSharedSocket: jest.fn(() => ({
-    connected: true,
-    on: jest.fn(),
-    off: jest.fn(),
-    emit: jest.fn(),
-  })),
+  getSharedSocket: () => mockSocket,
   releaseSharedSocket: jest.fn(),
-  getSharedSocketIfExists: jest.fn(() => null),
-  getSocketURL: jest.fn(() => 'http://localhost:3000'),
+  getSharedSocketIfExists: () => null,
+  getSocketURL: () => 'http://localhost:3000',
   SocketContext: {
     Provider: ({ children }: any) => children,
   },
@@ -113,6 +131,10 @@ describe('TrainingGatewayModal - Invitation Join Behavior', () => {
     jest.clearAllMocks();
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
     MockTrainingGatewayModal.mockClear();
+    // Clear socket mock calls
+    mockSocket.on.mockClear();
+    mockSocket.off.mockClear();
+    mockSocket.emit.mockClear();
   });
 
   it('should NOT show TrainingGatewayModal when joining via invitation link (room parameter present)', async () => {
