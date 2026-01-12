@@ -11,7 +11,7 @@ import { validateUsername, validateGameCode, sanitizeInput } from '@/utils/valid
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
 import AvatarSelectorButton from './AvatarSelectorButton';
 import EmojiAvatarPicker, { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
-import { AVATARS, getAvatarById, type AvatarConfig } from '@/utils/avatarConfig';
+import { getAvatarById, type AvatarConfig } from '@/utils/avatarConfig';
 import { useAuth } from '@/contexts/AuthContext';
 import Avatar from '@/components/Avatar';
 import { getStoredAvatarId, setStoredAvatarId, setStoredUsername } from '@/utils/profileStorage';
@@ -87,6 +87,7 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
       }, 100);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [isAuthenticated]);
 
   // Handle avatar selection

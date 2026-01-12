@@ -96,6 +96,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
       }, 100);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [isAuthenticated, isProfileLoading]);
 
   // Handle avatar selection

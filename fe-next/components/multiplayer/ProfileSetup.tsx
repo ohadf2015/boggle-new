@@ -11,7 +11,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { validateUsername, sanitizeInput } from '@/utils/validation';
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
 import EmojiAvatarPicker, { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
-import { getAvatarById, getAvatarPath, type AvatarConfig } from '@/utils/avatarConfig';
+import { AVATARS, getAvatarById, getAvatarPath, type AvatarConfig } from '@/utils/avatarConfig';
 import LandscapeIndicator from '@/components/LandscapeIndicator';
 import { cn } from '@/lib/utils';
 import { getStoredUsername, getStoredAvatarId, setStoredUsername, setStoredAvatarId } from '@/utils/profileStorage';
@@ -99,6 +99,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
       }, 100);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [isAuthenticated]);
 
   // Real-time validation
