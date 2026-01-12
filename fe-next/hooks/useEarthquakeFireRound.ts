@@ -183,8 +183,8 @@ export function useEarthquakeFireRound(
   ]);
 
   // Trigger earthquake sequence
-  const triggerEarthquake = useCallback(() => {
-    if (earthquakeTriggeredRef.current) {
+  const triggerEarthquake = useCallback((force = false) => {
+    if (!force && earthquakeTriggeredRef.current) {
       return;
     }
 
@@ -233,7 +233,7 @@ export function useEarthquakeFireRound(
   // Force earthquake (for testing/debugging)
   const forceEarthquake = useCallback(() => {
     earthquakeTriggeredRef.current = false; // Reset flag
-    triggerEarthquake();
+    triggerEarthquake(true); // Force trigger, bypassing the guard
   }, [triggerEarthquake]);
 
   return {

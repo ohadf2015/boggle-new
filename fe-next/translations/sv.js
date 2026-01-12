@@ -2801,6 +2801,7 @@ const sv = {
     "brainTrainingDesc": "Spåra kognitiv tillväxt",
     "brainDrills": "Snabbövningar",
     "brainDrillsDesc": "Fokuserade minispel",
+    "signInToUnlock": "Logga in för att låsa upp",
     "feature": {
       "soloVsBots": "Solo mot bottar",
       "practiceMode": "Övningsläge",

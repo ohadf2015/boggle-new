@@ -2807,6 +2807,7 @@ const en = {
     "brainTrainingDesc": "Track cognitive growth",
     "brainDrills": "Quick Drills",
     "brainDrillsDesc": "Focused mini-games",
+    "signInToUnlock": "Sign in to unlock",
     "feature": {
       "soloVsBots": "vs AI",
       "practiceMode": "Practice",

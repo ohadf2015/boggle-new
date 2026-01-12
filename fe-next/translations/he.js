@@ -2802,6 +2802,7 @@ const he = {
     "brainTrainingDesc": "עקוב אחר התפתחות קוגניטיבית",
     "brainDrills": "תרגולים מהירים",
     "brainDrillsDesc": "משחקונים ממוקדים",
+    "signInToUnlock": "התחבר כדי לפתוח",
     "feature": {
       "soloVsBots": "נגד בוטים",
       "practiceMode": "מצב אימון",

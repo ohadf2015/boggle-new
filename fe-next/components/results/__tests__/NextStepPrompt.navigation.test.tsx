@@ -3,27 +3,20 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import NextStepPrompt from '../NextStepPrompt';
 
-// Track clicks on Link
+// Track navigation
 const mockRouterPush = jest.fn();
 
-// Mock next/link to track actual link clicks
-jest.mock('next/link', () => {
-  return function MockLink({ children, href, onClick, ...props }: { children: React.ReactNode; href: string; onClick?: () => void }) {
-    return (
-      <a
-        href={href}
-        onClick={(e) => {
-          e.preventDefault();
-          mockRouterPush(href);
-          onClick?.();
-        }}
-        {...props}
-      >
-        {children}
-      </a>
-    );
-  };
-});
+// Mock next/navigation (for useRouter)
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockRouterPush,
+  }),
+}));
+
+// Mock session utility
+jest.mock('@/utils/session', () => ({
+  clearSessionPreservingUsername: jest.fn(),
+}));
 
 // Mock LanguageContext
 jest.mock('@/contexts/LanguageContext', () => ({
@@ -69,7 +62,7 @@ describe('NextStepPrompt Navigation', () => {
   });
 
   describe('Mobile variant click navigation', () => {
-    it('should navigate when mobile link card is clicked', async () => {
+    it('should navigate when mobile button card is clicked', async () => {
       const user = userEvent.setup();
 
       render(
@@ -80,14 +73,14 @@ describe('NextStepPrompt Navigation', () => {
         />
       );
 
-      // The mobile Link is the whole card area
-      const linkElement = screen.getByRole('link');
-      await user.click(linkElement);
+      // The mobile button is the whole card area
+      const buttonElement = screen.getByText('Challenge the Bots!');
+      await user.click(buttonElement);
 
       expect(mockRouterPush).toHaveBeenCalledWith('/en/singleplayer?preset=bots');
     });
 
-    it('should navigate when clicking on title text inside mobile link', async () => {
+    it('should navigate when clicking on title text inside mobile button', async () => {
       const user = userEvent.setup();
 
       render(
@@ -98,7 +91,7 @@ describe('NextStepPrompt Navigation', () => {
         />
       );
 
-      // Click specifically on the title text inside the link
+      // Click specifically on the title text inside the button
       const titleElement = screen.getByText('Daily Challenge');
       await user.click(titleElement);
 
@@ -107,7 +100,7 @@ describe('NextStepPrompt Navigation', () => {
   });
 
   describe('Landscape variant click navigation', () => {
-    it('should navigate when landscape link is clicked', async () => {
+    it('should navigate when landscape button is clicked', async () => {
       const user = userEvent.setup();
 
       render(
@@ -118,8 +111,8 @@ describe('NextStepPrompt Navigation', () => {
         />
       );
 
-      const linkElement = screen.getByRole('link');
-      await user.click(linkElement);
+      const buttonElement = screen.getByText('Go Multiplayer!');
+      await user.click(buttonElement);
 
       expect(mockRouterPush).toHaveBeenCalledWith('/en/multiplayer');
     });
@@ -137,9 +130,9 @@ describe('NextStepPrompt Navigation', () => {
         />
       );
 
-      // In desktop, the CTA is a Link with "Let's Go!" text
-      const linkElement = screen.getByRole('link', { name: /let's go/i });
-      await user.click(linkElement);
+      // In desktop, the CTA is a button with "Let's Go!" text
+      const buttonElement = screen.getByRole('button', { name: /let's go/i });
+      await user.click(buttonElement);
 
       expect(mockRouterPush).toHaveBeenCalledWith('/en/brain');
     });
@@ -165,13 +158,13 @@ describe('NextStepPrompt Navigation', () => {
 
   describe('All modes navigate correctly', () => {
     const testCases = [
-      { mode: 'practice' as const, expectedHref: '/en/singleplayer?preset=bots' },
-      { mode: 'solo-bots' as const, expectedHref: '/en/daily' },
-      { mode: 'daily' as const, expectedHref: '/en/multiplayer' },
-      { mode: 'multiplayer-bots' as const, expectedHref: '/en/brain' },
+      { mode: 'practice' as const, expectedHref: '/en/singleplayer?preset=bots', titleText: 'Challenge the Bots!' },
+      { mode: 'solo-bots' as const, expectedHref: '/en/daily', titleText: 'Daily Challenge' },
+      { mode: 'daily' as const, expectedHref: '/en/multiplayer', titleText: 'Go Multiplayer!' },
+      { mode: 'multiplayer-bots' as const, expectedHref: '/en/brain', titleText: 'Train Your Brain' },
     ];
 
-    testCases.forEach(({ mode, expectedHref }) => {
+    testCases.forEach(({ mode, expectedHref, titleText }) => {
       it(`should navigate to ${expectedHref} for ${mode} mode (mobile variant)`, async () => {
         const user = userEvent.setup();
 
@@ -183,8 +176,8 @@ describe('NextStepPrompt Navigation', () => {
           />
         );
 
-        const linkElement = screen.getByRole('link');
-        await user.click(linkElement);
+        const buttonElement = screen.getByText(titleText);
+        await user.click(buttonElement);
 
         expect(mockRouterPush).toHaveBeenCalledWith(expectedHref);
       });

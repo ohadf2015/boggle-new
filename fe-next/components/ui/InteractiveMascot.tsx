@@ -28,7 +28,10 @@ export type ActivityVariant =
   | 'holding_sign'
   | 'typing'
   | 'cheering'
-  | 'training';
+  | 'training'
+  | 'playing_ball'
+  | 'skateboarding'
+  | 'juggling';
 
 /**
  * Extended mascot variants including interaction states and activities
@@ -99,6 +102,9 @@ const DEFAULT_HOVER_TRANSITIONS: Partial<Record<ExtendedMascotVariant, ExtendedM
   typing: 'excited',
   cheering: 'victory',
   training: 'excited',
+  playing_ball: 'celebrating',
+  skateboarding: 'excited',
+  juggling: 'focused',
 };
 
 const DEFAULT_CLICK_TRANSITIONS: Partial<Record<ExtendedMascotVariant, ExtendedMascotVariant>> = {
@@ -134,6 +140,9 @@ const DEFAULT_CLICK_TRANSITIONS: Partial<Record<ExtendedMascotVariant, ExtendedM
   typing: 'victory',
   cheering: 'victory',
   training: 'victory',
+  playing_ball: 'victory',
+  skateboarding: 'victory',
+  juggling: 'celebrating',
 };
 
 /**
@@ -188,7 +197,7 @@ const CLICK_ANIMATIONS: Record<ClickAnimation, TargetAndTransition> = {
   },
 };
 
-interface InteractiveMascotProps {
+export interface InteractiveMascotProps {
   /** Base variant to display */
   variant: ExtendedMascotVariant;
   /** Size of the mascot */
@@ -379,6 +388,30 @@ function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
       scale: [1, 1.12, 1.05, 1.1, 1],
       rotate: [0, -2, 0, 2, 0],
       transition: { duration: 1.2, repeat: Infinity, ease: 'easeInOut' },
+    },
+    playing_ball: {
+      // Bouncy ball juggling motion - playful ball tracking
+      y: [0, -12, 0, -8, 0, -10, 0],
+      x: [0, 2, -2, 1, -1, 0],
+      rotate: [0, -4, 4, -3, 3, 0],
+      scale: [1, 1.05, 0.98, 1.03, 0.99, 1.02, 1],
+      transition: { duration: 1.8, repeat: Infinity, ease: 'easeInOut' },
+    },
+    skateboarding: {
+      // Dynamic rolling motion - cool skateboarding vibes
+      x: [0, 3, -3, 2, -2, 0],
+      y: [0, -6, -2, -5, -1, -3, 0],
+      rotate: [0, -6, 6, -4, 4, -2, 0],
+      scale: [1, 1.06, 1.02, 1.04, 1],
+      transition: { duration: 1.6, repeat: Infinity, ease: 'easeOut' },
+    },
+    juggling: {
+      // Rhythmic up-down ball tracking - focused juggling
+      y: [0, -8, -4, -10, -2, -6, 0],
+      x: [0, -2, 2, -1, 1, 0],
+      rotate: [0, 3, -3, 2, -2, 0],
+      scale: [1, 1.04, 1.02, 1.05, 1.01, 1.03, 1],
+      transition: { duration: 2.2, repeat: Infinity, ease: 'easeInOut' },
     },
   };
 

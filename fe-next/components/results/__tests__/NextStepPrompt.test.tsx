@@ -3,12 +3,17 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import NextStepPrompt from '../NextStepPrompt';
 
-// Mock next/link
-jest.mock('next/link', () => {
-  return function MockLink({ children, href }: { children: React.ReactNode; href: string }) {
-    return <a href={href}>{children}</a>;
-  };
-});
+// Mock next/navigation
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+  }),
+}));
+
+// Mock session utility
+jest.mock('@/utils/session', () => ({
+  clearSessionPreservingUsername: jest.fn(),
+}));
 
 // Mock LanguageContext
 jest.mock('@/contexts/LanguageContext', () => ({
@@ -64,18 +69,6 @@ describe('NextStepPrompt', () => {
       expect(screen.getByText('Challenge the Bots!')).toBeInTheDocument();
       expect(screen.getByText('Test your skills against AI opponents')).toBeInTheDocument();
     });
-
-    it('links to singleplayer page with bots preset', () => {
-      render(
-        <NextStepPrompt
-          currentMode="practice"
-          onBackToLobby={mockOnBackToLobby}
-        />
-      );
-
-      const link = screen.getByRole('link', { name: /let's go/i });
-      expect(link).toHaveAttribute('href', '/en/singleplayer?preset=bots');
-    });
   });
 
   describe('Solo-Bots Mode', () => {
@@ -89,18 +82,6 @@ describe('NextStepPrompt', () => {
 
       expect(screen.getByText('Daily Challenge')).toBeInTheDocument();
       expect(screen.getByText('Same puzzle as everyone worldwide')).toBeInTheDocument();
-    });
-
-    it('links to daily challenge page', () => {
-      render(
-        <NextStepPrompt
-          currentMode="solo-bots"
-          onBackToLobby={mockOnBackToLobby}
-        />
-      );
-
-      const link = screen.getByRole('link', { name: /let's go/i });
-      expect(link).toHaveAttribute('href', '/en/daily');
     });
   });
 
@@ -116,18 +97,6 @@ describe('NextStepPrompt', () => {
       expect(screen.getByText('Go Multiplayer!')).toBeInTheDocument();
       expect(screen.getByText('Compete with real players')).toBeInTheDocument();
     });
-
-    it('links to multiplayer page', () => {
-      render(
-        <NextStepPrompt
-          currentMode="daily"
-          onBackToLobby={mockOnBackToLobby}
-        />
-      );
-
-      const link = screen.getByRole('link', { name: /let's go/i });
-      expect(link).toHaveAttribute('href', '/en/multiplayer');
-    });
   });
 
   describe('Multiplayer-Bots Mode', () => {
@@ -141,18 +110,6 @@ describe('NextStepPrompt', () => {
 
       expect(screen.getByText('Train Your Brain')).toBeInTheDocument();
       expect(screen.getByText('Track your cognitive growth')).toBeInTheDocument();
-    });
-
-    it('links to brain training page', () => {
-      render(
-        <NextStepPrompt
-          currentMode="multiplayer-bots"
-          onBackToLobby={mockOnBackToLobby}
-        />
-      );
-
-      const link = screen.getByRole('link', { name: /let's go/i });
-      expect(link).toHaveAttribute('href', '/en/brain');
     });
   });
 

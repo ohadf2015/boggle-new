@@ -172,7 +172,8 @@ const ComboDisplay = memo<ComboDisplayProps>(({
       className={cn(
         'flex items-center justify-center relative overflow-hidden',
         // Fixed width to prevent layout shifts when combo appears/changes
-        compact ? 'w-[80px]' : 'w-[130px]',
+        // Increased compact width to fit full text without cutoff
+        compact ? 'w-[100px]' : 'w-[130px]',
         className
       )}
     >
@@ -236,7 +237,9 @@ const ComboDisplay = memo<ComboDisplayProps>(({
             {/* Content - text with emoji */}
             <div
               className={cn(
-                'flex items-center gap-1 relative z-10 font-black',
+                'flex items-center relative z-10 font-black',
+                // Reduced gap in compact mode to fit within 80px width
+                compact ? 'gap-0.5' : 'gap-1',
                 // Text color with rarity-based gradient effect
                 'text-transparent bg-clip-text',
                 !isRainbow && rarityColors.gradient

@@ -24,6 +24,7 @@ import ModeCard from './ModeCard';
 import TutorialPrompt from './TutorialPrompt';
 import Header from '@/components/Header';
 import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
+import AuthModal from '@/components/auth/AuthModal';
 
 /**
  * Interactive Mascot component for the hero section
@@ -152,6 +153,9 @@ const LandingView: React.FC = () => {
   // Onboarding modal state (opened when user clicks to start tutorial)
   const [showOnboarding, setShowOnboarding] = useState(false);
 
+  // Auth modal state (opened when user clicks locked feature)
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
   // Note: Profile customization is now handled globally in ProfileCustomizationWrapper
 
   // Check for room parameter and redirect to multiplayer page
@@ -233,6 +237,9 @@ const LandingView: React.FC = () => {
       {/* Onboarding Modal */}
       <OnboardingModal isOpen={showOnboarding} onClose={() => setShowOnboarding(false)} />
 
+      {/* Auth Modal - for locked features */}
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
+
       {/* Note: ProfileCustomizationModal is now rendered globally by ProfileCustomizationWrapper */}
 
       {/* Header - compact in landscape via CSS */}
@@ -240,9 +247,9 @@ const LandingView: React.FC = () => {
 
       {/* Main content */}
       <main className={cn(
-        'w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 flex-1',
-        (isLandscape || isMobilePortrait) && 'flex flex-col justify-center px-2 sm:px-4 py-2',
-        !isLandscape && !isMobilePortrait && 'px-2 sm:px-3 lg:px-6 xl:px-8 py-2 sm:py-3 lg:py-4'
+        'w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 flex-1 flex flex-col',
+        (isLandscape || isMobilePortrait) && 'justify-center px-2 sm:px-4 py-2',
+        !isLandscape && !isMobilePortrait && 'justify-center px-2 sm:px-3 lg:px-6 xl:px-8 py-2 sm:py-3 lg:py-4'
       )}>
         {/* Hero section with mascot - hidden on mobile portrait and landscape */}
         {!isLandscape && !isMobilePortrait && (
@@ -415,6 +422,9 @@ const LandingView: React.FC = () => {
                 icon={<Target className="w-5 h-5" />}
                 variant="orange"
                 secondary
+                locked={!isAuthenticated}
+                lockedMessage={t('landing.signInToUnlock') || 'Sign in to unlock'}
+                onLockedClick={() => setShowAuthModal(true)}
               />
             </div>
           </div>

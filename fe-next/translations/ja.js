@@ -2800,6 +2800,7 @@ const ja = {
     "brainTrainingDesc": "認知成長を追跡",
     "brainDrills": "クイックドリル",
     "brainDrillsDesc": "集中ミニゲーム",
+    "signInToUnlock": "ログインして解除",
     "feature": {
       "soloVsBots": "ボット対戦",
       "practiceMode": "練習モード",

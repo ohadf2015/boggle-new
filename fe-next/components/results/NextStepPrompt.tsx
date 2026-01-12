@@ -1,12 +1,13 @@
 'use client';
 
-import React, { memo } from 'react';
-import Link from 'next/link';
+import React, { memo, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Bot, Calendar, Users, Brain, ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { clearSessionPreservingUsername } from '@/utils/session';
 
 export type NextStepMode = 'practice' | 'solo-bots' | 'daily' | 'multiplayer-bots';
 
@@ -48,6 +49,14 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
   const { t, language, dir } = useLanguage();
   const isRTL = dir === 'rtl';
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
+  const router = useRouter();
+
+  // Handle navigation with session cleanup
+  const handleNavigate = useCallback((href: string) => {
+    // Clear current session before navigating to prevent being stuck on results page
+    clearSessionPreservingUsername();
+    router.push(href);
+  }, [router]);
 
   // Configure next step based on current mode
   const getNextStepConfig = (): ModeConfig => {
@@ -100,8 +109,8 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
   if (variant === 'landscape') {
     return (
       <div className={cn('flex flex-col gap-2', className)}>
-        <Link
-          href={config.href}
+        <button
+          onClick={() => handleNavigate(config.href)}
           className={cn(
             'relative flex items-center gap-3 p-3',
             'bg-gradient-to-r', config.gradient,
@@ -120,7 +129,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
             </span>
           </div>
           <ArrowIcon className="w-5 h-5 text-neo-black shrink-0" />
-        </Link>
+        </button>
         <Button
           variant="ghost"
           size="sm"
@@ -138,8 +147,8 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
   if (variant === 'mobile') {
     return (
       <div className={cn('flex flex-col gap-3', className)}>
-        <Link
-          href={config.href}
+        <button
+          onClick={() => handleNavigate(config.href)}
           className={cn(
             'relative block p-4',
             'bg-gradient-to-br', config.gradient,
@@ -149,7 +158,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
             'transition-all duration-150 overflow-hidden'
           )}
         >
-          {/* Shine effect - pointer-events-none to allow link clicks */}
+          {/* Shine effect - pointer-events-none to allow button clicks */}
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 pointer-events-none"
             animate={{ x: ['-200%', '200%'] }}
@@ -178,7 +187,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
               <ArrowIcon className="w-6 h-6 text-neo-black" />
             </motion.div>
           </div>
-        </Link>
+        </button>
 
         <Button
           variant="ghost"
@@ -252,8 +261,8 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
         </div>
 
         {/* Primary CTA Button */}
-        <Link
-          href={config.href}
+        <button
+          onClick={() => handleNavigate(config.href)}
           className={cn(
             'relative inline-flex items-center justify-center gap-3',
             'w-full sm:w-auto min-w-[200px]',
@@ -268,7 +277,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
             'group overflow-hidden'
           )}
         >
-          {/* Button shine effect - pointer-events-none to allow link clicks */}
+          {/* Button shine effect - pointer-events-none to allow button clicks */}
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 pointer-events-none"
             animate={{ x: ['-200%', '200%'] }}
@@ -282,7 +291,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           >
             <ArrowIcon className="w-5 h-5 sm:w-6 sm:h-6" />
           </motion.span>
-        </Link>
+        </button>
 
         {/* Secondary Back Button */}
         <button

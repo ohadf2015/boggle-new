@@ -71,7 +71,7 @@ describe('ComboDisplay Overflow Prevention', () => {
       const { container } = render(<ComboDisplay comboLevel={5} compact />);
 
       const comboContainer = container.firstChild as HTMLElement;
-      expect(comboContainer).toHaveClass('w-[80px]');
+      expect(comboContainer).toHaveClass('w-[100px]');
     });
   });
 
@@ -127,7 +127,7 @@ describe('ComboDisplay Overflow Prevention', () => {
       expect(wrapper).toHaveClass('right-2');
 
       // ComboDisplay should fit within this constraint
-      const comboDisplay = wrapper.querySelector('[class*="w-[80px]"]');
+      const comboDisplay = wrapper.querySelector('[class*="w-[100px]"]');
       expect(comboDisplay).toBeInTheDocument();
     });
   });

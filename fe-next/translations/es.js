@@ -2798,6 +2798,7 @@ const es = {
     "brainTrainingDesc": "Sigue tu crecimiento cognitivo",
     "brainDrills": "Ejercicios Rápidos",
     "brainDrillsDesc": "Minijuegos enfocados",
+    "signInToUnlock": "Inicia sesión para desbloquear",
     "feature": {
       "soloVsBots": "Solo vs Bots",
       "practiceMode": "Modo Práctica",
