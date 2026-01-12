@@ -128,7 +128,7 @@ const LandingView: React.FC = () => {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { playTrack, TRACKS } = useMusic();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const isLandscape = useMobileLandscape();
   const isMobilePortrait = useMobilePortrait();
   const liveRoomStats = useLiveRoomStats();
@@ -338,9 +338,11 @@ const LandingView: React.FC = () => {
 
         {/* Mode cards - horizontal in landscape/mobile portrait, centered grid on desktop */}
         {/* Using CSS animation for instant paint without JS overhead */}
+        {/* Wrapper ensures cards are vertically centered in remaining viewport space */}
+        <div className="flex-1 flex items-center justify-center min-h-0">
         {(isLandscape || isMobilePortrait) ? (
-          /* Landscape/Mobile Portrait: Horizontal layout */
-          <div className="w-full animate-fade-in-fast flex gap-2 sm:gap-3 flex-1 min-h-0">
+          /* Landscape/Mobile Portrait: 2-column grid layout */
+          <div className="w-full animate-fade-in-fast grid grid-cols-2 gap-2 sm:gap-3 min-h-0 auto-rows-fr content-center">
             {/* Multiplayer Card - Compact */}
             <Link
               href={`/${language}/multiplayer`}
@@ -393,19 +395,37 @@ const LandingView: React.FC = () => {
               )}
             </Link>
 
-            {/* Brain Training Card - Compact */}
-            {isAuthenticated ? (
+            {/* Brain Training Card - Compact, spans both columns */}
+            {/* Show loading state during auth check to prevent UI flicker */}
+            {authLoading ? (
+              <div
+                className={cn(
+                  'col-span-2 flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
+                  'bg-gradient-to-br from-neo-purple to-purple-400',
+                  'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
+                  'transition-all min-h-[80px] sm:min-h-[100px]',
+                  isMobilePortrait && 'max-h-[20dvh]',
+                  isLandscape && 'max-h-[50dvh]',
+                  'cursor-wait'
+                )}
+                aria-label={`${t('landing.brainTraining') || 'Brain Training'} - Loading`}
+                aria-busy="true"
+              >
+                <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black animate-pulse" aria-hidden="true" />
+                <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.brainTraining') || 'Brain Training'}</span>
+              </div>
+            ) : isAuthenticated ? (
               <Link
                 href={`/${language}/brain`}
                 className={cn(
-                  'flex-1 flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
+                  'col-span-2 flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
                   'bg-gradient-to-br from-neo-purple to-purple-400',
                   'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
                   'hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px]',
                   'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm',
-                  'transition-all min-h-[100px] sm:min-h-[120px]',
-                  isMobilePortrait && 'max-h-[30dvh]',
-                  isLandscape && 'max-h-[70dvh]',
+                  'transition-all min-h-[80px] sm:min-h-[100px]',
+                  isMobilePortrait && 'max-h-[20dvh]',
+                  isLandscape && 'max-h-[50dvh]',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                 )}
                 aria-label={`${t('landing.brainTraining') || 'Brain Training'} - ${t('landing.brainTrainingDesc') || 'Track cognitive growth'}`}
@@ -417,14 +437,14 @@ const LandingView: React.FC = () => {
               <button
                 onClick={() => setShowAuthModal(true)}
                 className={cn(
-                  'flex-1 flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4 relative',
+                  'col-span-2 flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4 relative',
                   'bg-gradient-to-br from-neo-purple/40 to-purple-400/40',
                   'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
                   'hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px]',
                   'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm',
-                  'transition-all min-h-[100px] sm:min-h-[120px]',
-                  isMobilePortrait && 'max-h-[30dvh]',
-                  isLandscape && 'max-h-[70dvh]',
+                  'transition-all min-h-[80px] sm:min-h-[100px]',
+                  isMobilePortrait && 'max-h-[20dvh]',
+                  isLandscape && 'max-h-[50dvh]',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                   'cursor-not-allowed'
                 )}
@@ -474,6 +494,7 @@ const LandingView: React.FC = () => {
                 icon={<Brain className="w-6 h-6" />}
                 variant="purple"
                 secondary
+                loading={authLoading}
                 locked={!isAuthenticated}
                 lockedMessage={t('landing.signInToUnlock') || 'Sign in to unlock'}
                 onLockedClick={() => setShowAuthModal(true)}
@@ -481,9 +502,9 @@ const LandingView: React.FC = () => {
             </div>
           </div>
         )}
+        </div>
           </>
-        )
-        }
+        )}
       </main>
 
       {/* Tutorial FAB - Fixed bottom corner button */}

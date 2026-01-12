@@ -35,6 +35,8 @@ python3 .claude/skills/contrast-fixer/scripts/detect-contrast-issues.py --path f
 5. **Missing-Dark-Mode-Override**: Dark text without `dark:text-*` when dark mode background exists
 6. **Low-Opacity-Dark-Mode-Text**: Dark mode text with low opacity (<=50%)
 7. **Missing Foreground**: Colored background without explicit text color
+8. **Low-Opacity-Light-Text-on-Dark**: Light text with low opacity (<=80%) on dark backgrounds (e.g., `text-neo-cream/80`)
+9. **Low-Opacity-Dark-Text-on-Light**: Dark text with low opacity (<=75%) on light backgrounds (e.g., `text-neo-black/70`)
 
 ## Examples
 
@@ -73,11 +75,22 @@ python3 .claude/skills/contrast-fixer/scripts/detect-contrast-issues.py --path f
 </div>
 ```
 
-**Fix low opacity:**
+**Fix low opacity light text on dark backgrounds:**
 ```tsx
 // Before
 <p className="dark:text-neo-cream/50">Barely visible</p>
 
 // After
-<p className="dark:text-slate-400">Readable</p>
+<p className="text-neo-white">Readable</p>
+```
+
+**Fix low opacity dark text on light backgrounds:**
+```tsx
+// Before - Hard to read on cream/lime/yellow backgrounds
+<p className="text-neo-black/70">Almost invisible</p>
+<span className="text-neo-black/75">Poor contrast</span>
+
+// After - Use solid color for better readability
+<p className="text-neo-gray">Readable</p>
+<span className="text-neo-gray">Good contrast</span>
 ```

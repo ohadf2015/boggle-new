@@ -5,6 +5,9 @@
  * Compares submitted words against the target word and returns position-based feedback.
  */
 
+import type { Language } from '@/types';
+import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
+
 export type FeedbackType = 'green' | 'yellow' | 'gray';
 
 export interface LetterFeedback {
@@ -42,39 +45,56 @@ export interface LetterFeedback {
  */
 export function getLetterFeedback(
   submittedWord: string,
-  targetWord: string
+  targetWord: string,
+  language?: Language
 ): LetterFeedback[] {
   const submitted = submittedWord.toUpperCase();
   const target = targetWord.toUpperCase();
 
   const feedback: LetterFeedback[] = [];
+
+  // For Hebrew, normalize final letters to regular forms for comparison
+  // This ensures ם matches מ, ך matches כ, etc.
+  const normalizeForComparison = (letter: string): string => {
+    if (language === 'he') {
+      return normalizeHebrewLetter(letter);
+    }
+    return letter;
+  };
+
   const targetLetters = target.split('');
   const submittedLetters = submitted.split('');
+
+  // Create normalized versions for comparison
+  const targetNormalized = targetLetters.map(normalizeForComparison);
+  const submittedNormalized = submittedLetters.map(normalizeForComparison);
 
   // Track which letters in target have been "used" for feedback
   const targetUsed: boolean[] = new Array(targetLetters.length).fill(false);
   const submittedProcessed: FeedbackType[] = new Array(submittedLetters.length).fill('gray');
 
   // First pass: Mark all exact position matches as GREEN
-  for (let i = 0; i < submittedLetters.length; i++) {
-    if (i < targetLetters.length && submittedLetters[i] === targetLetters[i]) {
+  // Use normalized letters for comparison to handle Hebrew final letters
+  for (let i = 0; i < submittedNormalized.length; i++) {
+    if (i < targetNormalized.length && submittedNormalized[i] === targetNormalized[i]) {
       submittedProcessed[i] = 'green';
       targetUsed[i] = true;
     }
   }
 
   // Second pass: Mark yellows for letters that exist elsewhere
-  for (let i = 0; i < submittedLetters.length; i++) {
+  for (let i = 0; i < submittedNormalized.length; i++) {
     // Skip if already marked green
     if (submittedProcessed[i] === 'green') {
       continue;
     }
 
-    const letter = submittedLetters[i];
+    const normalizedLetter = submittedNormalized[i];
 
     // Find if this letter exists in target (at a position that hasn't been used)
-    const targetIndex = targetLetters.findIndex(
-      (targetLetter, idx) => targetLetter === letter && !targetUsed[idx]
+    // Use normalized comparison for Hebrew final letter support
+    const targetIndex = targetNormalized.findIndex(
+      (targetLetter, idx) => targetLetter === normalizedLetter && !targetUsed[idx]
     );
 
     if (targetIndex !== -1) {

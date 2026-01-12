@@ -195,15 +195,33 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
               </Card>
             )}
 
-            {/* Custom game button - simplified and smaller */}
+            {/* Or divider + Advanced Settings button */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
+              className="space-y-3"
             >
+              {/* Or divider */}
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px bg-slate-600" />
+                <span className="text-xs font-bold uppercase text-slate-500">
+                  {t('common.or') || 'or'}
+                </span>
+                <div className="flex-1 h-px bg-slate-600" />
+              </div>
+
+              {/* Advanced Settings button */}
               <button
                 onClick={onCustomGame}
-                className="w-full py-3 text-sm font-medium text-slate-400 hover:text-slate-300 transition-colors flex items-center justify-center gap-2"
+                className={cn(
+                  'w-full py-3 px-4 rounded-neo border-3 border-slate-600',
+                  'bg-slate-700/50',
+                  'shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]',
+                  'active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed',
+                  'transition-all flex items-center justify-center gap-2',
+                  'text-sm font-bold text-slate-300 hover:text-neo-white'
+                )}
               >
                 <Settings className="w-4 h-4" />
                 {t('singlePlayer.preset.advanced') || 'Advanced Settings'}
@@ -307,18 +325,35 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           </motion.div>
         )}
 
-        {/* Custom game button - simplified and smaller */}
+        {/* Or divider + Advanced Settings button */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className="mt-4"
+          className="mt-4 space-y-3"
         >
+          {/* Or divider */}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-neo-black/20 dark:bg-slate-600" />
+            <span className="text-xs font-bold uppercase text-neo-black/50 dark:text-slate-500">
+              {t('common.or') || 'or'}
+            </span>
+            <div className="flex-1 h-px bg-neo-black/20 dark:bg-slate-600" />
+          </div>
+
+          {/* Advanced Settings button */}
           <button
             onClick={onCustomGame}
-            className="w-full py-2 text-xs font-medium text-neo-black/60 dark:text-slate-400 hover:text-neo-black dark:hover:text-slate-300 transition-colors flex items-center justify-center gap-1.5"
+            className={cn(
+              'w-full py-3 px-4 rounded-neo border-3 border-neo-black/30 dark:border-slate-600',
+              'bg-neo-cream/50 dark:bg-slate-700/50',
+              'shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]',
+              'active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed',
+              'transition-all flex items-center justify-center gap-2',
+              'text-sm font-bold text-neo-black/70 dark:text-slate-300 hover:text-neo-black dark:hover:text-neo-white'
+            )}
           >
-            <Settings className="w-3 h-3" />
+            <Settings className="w-4 h-4" />
             {t('singlePlayer.preset.advanced') || 'Advanced Settings'}
           </button>
         </motion.div>

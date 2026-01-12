@@ -241,7 +241,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                             initial={{ scale: 0, opacity: 0, x: -10 }}
                             animate={{ scale: 1, opacity: 1, x: 0 }}
                             transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
-                            className="flex items-center gap-1 cursor-help bg-neo-pink/10 text-white px-1.5 py-0.5 rounded-neo border border-neo-black w-fit"
+                            className="flex items-center gap-1 cursor-help bg-neo-black px-1.5 py-0.5 rounded-neo border border-neo-black w-fit"
                           >
                             <span className="text-sm">{player.title.icon}</span>
                             <span className="text-xs font-black text-neo-pink uppercase tracking-wide">

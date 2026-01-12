@@ -10,35 +10,52 @@ const path = require('path');
 
 // Replacement rules: from -> to
 const REPLACEMENTS = [
-  // Fix /30 opacity (very low) to /60
-  { from: /text-neo-cream\/30/g, to: 'text-neo-cream/60' },
-  { from: /text-neo-white\/30/g, to: 'text-neo-white/60' },
-  { from: /text-neo-black\/30/g, to: 'text-neo-black/60' },
-  { from: /text-white\/30/g, to: 'text-white/60' },
-  { from: /text-black\/30/g, to: 'text-black/60' },
+  // === LOW OPACITY LIGHT TEXT ON DARK BACKGROUNDS ===
+  // Fix /30 opacity (very low) to solid color
+  { from: /text-neo-cream\/30/g, to: 'text-neo-white' },
+  { from: /text-neo-white\/30/g, to: 'text-neo-white' },
+  { from: /text-white\/30/g, to: 'text-white' },
+
+  // Fix /40 opacity to solid or near-solid
+  { from: /text-neo-cream\/40/g, to: 'text-neo-white' },
+  { from: /text-neo-white\/40/g, to: 'text-neo-white' },
+  { from: /text-white\/40/g, to: 'text-white' },
+
+  // Fix /50 opacity to /80 or solid
+  { from: /text-neo-cream\/50/g, to: 'text-neo-white' },
+  { from: /text-neo-white\/50/g, to: 'text-neo-white' },
+  { from: /text-white\/50/g, to: 'text-white/80' },
+
+  // Fix /60 opacity to /80
+  { from: /text-neo-cream\/60/g, to: 'text-neo-white' },
+  { from: /text-neo-white\/60/g, to: 'text-neo-white' },
+  { from: /text-white\/60/g, to: 'text-white/80' },
+
+  // Fix /80 cream to solid white (borderline readability)
+  { from: /text-neo-cream\/80/g, to: 'text-neo-white' },
+
+  // === LOW OPACITY DARK TEXT ON LIGHT BACKGROUNDS ===
+  // Fix /30-50 dark text to solid neo-gray (more readable)
+  { from: /text-neo-black\/30/g, to: 'text-neo-gray' },
+  { from: /text-black\/30/g, to: 'text-neo-gray' },
+  { from: /text-neo-black\/40/g, to: 'text-neo-gray' },
+  { from: /text-black\/40/g, to: 'text-neo-gray' },
+  { from: /text-neo-black\/50/g, to: 'text-neo-gray' },
+  { from: /text-black\/50/g, to: 'text-neo-gray' },
+
+  // Fix /60 dark text to neo-gray
+  { from: /text-neo-black\/60/g, to: 'text-neo-gray' },
+  { from: /text-black\/60/g, to: 'text-neo-gray' },
+
+  // Fix /70-75 dark text to neo-gray (borderline but often hard to read)
+  { from: /text-neo-black\/70/g, to: 'text-neo-gray' },
+  { from: /text-black\/70/g, to: 'text-neo-gray' },
+  { from: /text-neo-black\/75/g, to: 'text-neo-gray' },
+  { from: /text-black\/75/g, to: 'text-neo-gray' },
+
+  // === CYAN TEXT ===
   { from: /text-neo-cyan\/30/g, to: 'text-neo-cyan/60' },
-
-  // Fix /40 opacity to /60 (minimum for decorative)
-  { from: /text-neo-cream\/40/g, to: 'text-neo-cream/60' },
-  { from: /text-neo-white\/40/g, to: 'text-neo-white/60' },
-  { from: /text-neo-black\/40/g, to: 'text-neo-black/70' },
-  { from: /text-white\/40/g, to: 'text-white/60' },
-  { from: /text-black\/40/g, to: 'text-black/70' },
-
-  // Fix /50 opacity to /70
-  { from: /text-neo-cream\/50/g, to: 'text-neo-cream/70' },
-  { from: /text-neo-white\/50/g, to: 'text-neo-white/70' },
-  { from: /text-neo-black\/50/g, to: 'text-neo-black/70' },
-  { from: /text-white\/50/g, to: 'text-white/70' },
-  { from: /text-black\/50/g, to: 'text-black/70' },
   { from: /text-neo-cyan\/50/g, to: 'text-neo-cyan/70' },
-
-  // Fix /60 opacity to /75 for text (borderline -> acceptable)
-  { from: /text-neo-cream\/60/g, to: 'text-neo-cream/75' },
-  { from: /text-neo-white\/60/g, to: 'text-neo-white/75' },
-  { from: /text-neo-black\/60/g, to: 'text-neo-black/75' },
-  { from: /text-white\/60/g, to: 'text-white/75' },
-  { from: /text-black\/60/g, to: 'text-black/75' },
 
   // Fix dark mode variants
   { from: /dark:text-neo-cream\/30/g, to: 'dark:text-neo-cream/60' },

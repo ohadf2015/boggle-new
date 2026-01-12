@@ -69,9 +69,9 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
 
   // Rank-specific styling
   const rankColors: Record<number, { bg: string; text: string }> = {
-    1: { bg: 'bg-neo-lime', text: 'text-neo-black' },
+    1: { bg: 'bg-amber-400', text: 'text-neo-black' },
     2: { bg: 'bg-slate-200', text: 'text-slate-900' },
-    3: { bg: 'bg-neo-lime', text: 'text-neo-black' },
+    3: { bg: 'bg-amber-500', text: 'text-neo-black' },
   };
   const rankStyle = rankColors[rank] || { bg: 'bg-neo-cream', text: 'text-neo-black' };
 

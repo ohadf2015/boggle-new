@@ -18,7 +18,7 @@ import {
   FEEDBACK_OVERLAY_DURATION,
   getLifeBonusForWord,
 } from './constants';
-import { isWordOnBoard } from '@/utils/clientWordValidator';
+import { isWordOnBoard, normalizeWord } from '@/utils/clientWordValidator';
 import { formatRewardMessage } from '@/utils/formatRewardMessage';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -369,12 +369,15 @@ export function useSurvivalGameLogic({
 
   // Handle target attempt
   const handleTargetAttempt = useCallback((word: string, target: string) => {
-    if (attempts.some(a => a.word === word)) {
+    // Use normalized comparison for duplicate check to handle Hebrew final letters
+    const normalizedWord = normalizeWord(word, language);
+    if (attempts.some(a => normalizeWord(a.word, language) === normalizedWord)) {
       showToast('duplicate', t('wordHunt.alreadyGuessed') || 'Already guessed!');
       return;
     }
 
-    const feedback = getLetterFeedback(word, target);
+    // Pass language to enable Hebrew final letter normalization
+    const feedback = getLetterFeedback(word, target, language);
     const newAttempt: TargetAttempt = {
       word,
       feedback,
@@ -413,7 +416,7 @@ export function useSurvivalGameLogic({
       if (feedbackTimeoutRef.current) clearTimeout(feedbackTimeoutRef.current);
       handleGameOverRef.current?.(false, newAttempts);
     }
-  }, [attempts, playWordAcceptedSound, t, showToast, clueActions]);
+  }, [attempts, playWordAcceptedSound, t, showToast, clueActions, language]);
 
   // Handle word discovery
   const handleWordDiscovery = useCallback(async (word: string) => {
@@ -483,27 +486,32 @@ export function useSurvivalGameLogic({
   const handleWordSubmit = useCallback((word: string) => {
     if (isGameOver) return;
 
-    const normalizedWord = word.toUpperCase();
-    const normalizedTarget = targetWord.toUpperCase();
+    // Keep original uppercase for display
+    const displayWord = word.toUpperCase();
+    // Normalize words for comparison (handles Hebrew final letters, Spanish accents, etc.)
+    const normalizedWord = normalizeWord(displayWord, language);
+    const normalizedTarget = normalizeWord(targetWord.toUpperCase(), language);
 
     if (normalizedWord === normalizedTarget) {
-      handleTargetAttemptRef.current?.(normalizedWord, normalizedTarget);
+      // Pass display word for UI, target word as-is (getLetterFeedback will normalize internally)
+      handleTargetAttemptRef.current?.(displayWord, targetWord.toUpperCase());
     } else if (normalizedWord.length === normalizedTarget.length) {
-      if (attempts.some(a => a.word === normalizedWord)) {
+      // Check for duplicates using normalized comparison
+      if (attempts.some(a => normalizeWord(a.word, language) === normalizedWord)) {
         showToast('duplicate', t('wordHunt.alreadyGuessed') || 'Already guessed!');
         return;
       }
 
-      if (isWordOnBoard(normalizedWord, grid, language)) {
-        handleWordDiscoveryRef.current?.(normalizedWord);
-        handleTargetAttemptRef.current?.(normalizedWord, normalizedTarget);
+      if (isWordOnBoard(displayWord, grid, language)) {
+        handleWordDiscoveryRef.current?.(displayWord);
+        handleTargetAttemptRef.current?.(displayWord, targetWord.toUpperCase());
       } else {
         setLifePoints(prev => Math.max(0, prev - INVALID_WORD_PENALTY));
         showToast('not-on-board', t('wordHunt.feedback.notFormablePenalty') || `Not on board -${INVALID_WORD_PENALTY}`);
-        handleTargetAttemptRef.current?.(normalizedWord, normalizedTarget);
+        handleTargetAttemptRef.current?.(displayWord, targetWord.toUpperCase());
       }
     } else {
-      handleWordDiscoveryRef.current?.(normalizedWord);
+      handleWordDiscoveryRef.current?.(displayWord);
     }
   }, [isGameOver, targetWord, attempts, grid, language, showToast, t]);
 

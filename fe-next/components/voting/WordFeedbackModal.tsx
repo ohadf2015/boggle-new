@@ -255,7 +255,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
             </DialogTitle>
             {/* Word counter for multi-word queue */}
             {totalWords > 1 && (
-              <span className="text-neo-cream/80 text-sm font-bold">
+              <span className="text-neo-white text-sm font-bold">
                 {currentWordIndex + 1}/{totalWords}
               </span>
             )}
@@ -281,7 +281,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               <motion.div
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="flex items-center justify-center gap-2 text-neo-black/70"
+                className="flex items-center justify-center gap-2 text-neo-gray"
               >
                 {currentWord.submitterAvatar && (
                   <Avatar
@@ -318,7 +318,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               {/* Vote Progress Bar - Simplified */}
               {wordVoteInfo && (
                 <div className="mt-4 space-y-1">
-                  <div className="h-2 bg-neo-black/20 text-white rounded-full overflow-hidden">
+                  <div className="h-2 bg-neo-black/20 rounded-full overflow-hidden">
                     <motion.div
                       className={`h-full ${isValidForScoring ? 'bg-neo-cyan' : 'bg-neo-lime'}`}
                       initial={{ width: 0 }}
@@ -326,7 +326,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                       transition={{ duration: 0.5 }}
                     />
                   </div>
-                  <p className="text-xs font-semibold text-neo-black/70 flex items-center justify-center gap-1">
+                  <p className="text-xs font-semibold text-neo-gray flex items-center justify-center gap-1">
                     <CheckCircle className={`w-3 h-3 ${isValidForScoring ? 'text-neo-cyan' : 'text-neo-lime'}`} />
                     {votesNeeded > 0
                       ? `${votesNeeded} ${t('wordFeedback.votesNeededShort') || 'more votes'}`
@@ -441,7 +441,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               </div>
 
               {/* Footer */}
-              <div className="flex justify-between items-center text-xs text-neo-black/75">
+              <div className="flex justify-between items-center text-xs text-neo-gray">
                 <span>
                   {t('wordFeedback.skipHint') || 'Press ESC to skip'}
                 </span>

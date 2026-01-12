@@ -33,6 +33,7 @@ interface ResultsWinnerBannerProps {
 // Styling configuration for each rank
 const RANK_STYLES: Record<number, {
   bgClass: string;
+  textClass: string; // Main text color for contrast against bgClass
   iconBgClass: string;
   iconTextClass: string;
   messageBgClass: string;
@@ -41,9 +42,10 @@ const RANK_STYLES: Record<number, {
   trophyShadowColor: string;
 }> = {
   1: {
-    bgClass: 'bg-neo-lime',
+    bgClass: 'bg-gradient-to-br from-amber-400 via-yellow-400 to-amber-500',
+    textClass: 'text-neo-black', // Dark text on light amber background
     iconBgClass: 'bg-neo-cream',
-    iconTextClass: 'text-neo-lime',
+    iconTextClass: 'text-amber-500',
     messageBgClass: 'bg-neo-pink',
     messageTextClass: 'text-neo-cream',
     nameShadowColor: 'var(--neo-cyan)',
@@ -51,6 +53,7 @@ const RANK_STYLES: Record<number, {
   },
   2: {
     bgClass: 'bg-neo-navy',
+    textClass: 'text-white', // Light text on dark navy background
     iconBgClass: 'bg-slate-100',
     iconTextClass: 'text-slate-400',
     messageBgClass: 'bg-slate-600',
@@ -60,6 +63,7 @@ const RANK_STYLES: Record<number, {
   },
   3: {
     bgClass: 'bg-gradient-to-br from-neo-pink via-orange-400 to-neo-pink',
+    textClass: 'text-neo-black', // Dark text on light pink/orange background
     iconBgClass: 'bg-orange-100',
     iconTextClass: 'text-neo-pink',
     messageBgClass: 'bg-amber-700',
@@ -70,6 +74,7 @@ const RANK_STYLES: Record<number, {
   // 4+ place: Purple encouraging banner for non-winners
   4: {
     bgClass: 'bg-gradient-to-br from-neo-pink via-purple-500 to-neo-pink',
+    textClass: 'text-white', // Light text on dark purple background
     iconBgClass: 'bg-purple-100',
     iconTextClass: 'text-neo-pink',
     messageBgClass: 'bg-purple-700',
@@ -294,7 +299,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
                 </motion.span>
                 {/* Username - Smaller */}
                 <h1
-                  className="text-xl sm:text-2xl md:text-3xl font-black text-neo-black uppercase leading-tight"
+                  className={`text-xl sm:text-2xl md:text-3xl font-black ${styles.textClass} uppercase leading-tight`}
                   style={{
                     textShadow: `2px 2px 0px ${styles.nameShadowColor}`,
                   }}
@@ -302,7 +307,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
                   {winner.username}
                 </h1>
                 {/* Announcement Text - Smaller */}
-                <p className="text-xs sm:text-sm font-bold text-neo-black/80 uppercase">
+                <p className={`text-xs sm:text-sm font-bold ${styles.textClass} opacity-80 uppercase`}>
                   {getAnnouncementText()}
                 </p>
               </div>
@@ -316,7 +321,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
               className="flex items-center gap-2 flex-shrink-0"
             >
               <Trophy
-                className="text-xl sm:text-2xl text-neo-black hidden sm:block"
+                className={`text-xl sm:text-2xl ${styles.textClass} hidden sm:block`}
                 style={{ filter: `drop-shadow(1px 1px 0px ${styles.trophyShadowColor})` }}
               />
               <div className="bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo px-3 py-1.5 sm:px-4 sm:py-2 shadow-hard">

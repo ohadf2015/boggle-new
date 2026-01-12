@@ -19,11 +19,7 @@ jest.mock('@/contexts/MusicContext', () => ({
   }),
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => ({
-    isAuthenticated: false,
-  }),
-}));
+// Auth mock is defined inside describe block to allow dynamic values
 
 jest.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => false,
@@ -121,8 +117,14 @@ jest.mock('@/components/daily/DailyChallengeBanner', () => {
 });
 
 jest.mock('../ModeCard', () => {
-  return function MockModeCard({ title }: { title: string }) {
-    return <div data-testid={`mode-card-${title}`}>{title}</div>;
+  return function MockModeCard({ title, locked, loading, lockedMessage }: { title: string; locked?: boolean; loading?: boolean; lockedMessage?: string }) {
+    return (
+      <div data-testid={`mode-card-${title}`}>
+        {title}
+        {loading && <span data-testid="loading-indicator">Loading...</span>}
+        {locked && !loading && <span data-testid="locked-indicator">{lockedMessage || 'Locked'}</span>}
+      </div>
+    );
   };
 });
 
@@ -138,9 +140,25 @@ jest.mock('@/components/auth/AuthModal', () => {
   };
 });
 
+// Store mock values to be changed between tests
+let mockAuthState = {
+  isAuthenticated: false,
+  loading: false,
+};
+
+// Reset mock to use dynamic values
+jest.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => mockAuthState,
+}));
+
 describe('LandingView Loading State', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset to default unauthenticated state
+    mockAuthState = {
+      isAuthenticated: false,
+      loading: false,
+    };
   });
 
   it('should render loading skeleton initially', () => {
@@ -199,6 +217,67 @@ describe('LandingView Loading State', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('mode-card-landing.brainTraining')).toBeInTheDocument();
+    });
+  });
+
+  describe('Brain Training auth loading state', () => {
+    it('should show loading state for Brain Training card while auth is loading', async () => {
+      // Set auth to loading state
+      mockAuthState = {
+        isAuthenticated: false,
+        loading: true,
+      };
+
+      render(<LandingView />);
+
+      await waitFor(() => {
+        // When auth is loading, Brain Training card should show loading state, not locked state
+        const brainCard = screen.getByTestId('mode-card-landing.brainTraining');
+        expect(brainCard).toBeInTheDocument();
+      });
+
+      // Should show loading indicator, NOT locked indicator
+      expect(screen.getByTestId('loading-indicator')).toBeInTheDocument();
+      expect(screen.queryByTestId('locked-indicator')).not.toBeInTheDocument();
+    });
+
+    it('should show locked state for Brain Training card when auth finishes and user is not authenticated', async () => {
+      // Auth finished loading, user not authenticated
+      mockAuthState = {
+        isAuthenticated: false,
+        loading: false,
+      };
+
+      render(<LandingView />);
+
+      await waitFor(() => {
+        // When not authenticated, should show locked state
+        const brainCard = screen.getByTestId('mode-card-landing.brainTraining');
+        expect(brainCard).toBeInTheDocument();
+      });
+
+      // Should show locked indicator, NOT loading indicator
+      expect(screen.getByTestId('locked-indicator')).toBeInTheDocument();
+      expect(screen.queryByTestId('loading-indicator')).not.toBeInTheDocument();
+    });
+
+    it('should show unlocked Brain Training card when user is authenticated', async () => {
+      // User is authenticated
+      mockAuthState = {
+        isAuthenticated: true,
+        loading: false,
+      };
+
+      render(<LandingView />);
+
+      await waitFor(() => {
+        const brainCard = screen.getByTestId('mode-card-landing.brainTraining');
+        expect(brainCard).toBeInTheDocument();
+      });
+
+      // Should NOT show locked or loading state
+      expect(screen.queryByTestId('locked-indicator')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('loading-indicator')).not.toBeInTheDocument();
     });
   });
 });

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowRight, ArrowLeft, Users, LayoutGrid, Lock } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Users, LayoutGrid, Lock, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTiltEffect } from '@/hooks/useTiltEffect';
@@ -28,6 +28,8 @@ interface ModeCardProps {
   secondary?: boolean;
   /** Shows lock icon and prevents navigation - for features requiring auth */
   locked?: boolean;
+  /** Shows loading state - prevents showing locked state prematurely during auth loading */
+  loading?: boolean;
   /** Message shown when card is locked */
   lockedMessage?: string;
   /** Callback when locked card is clicked */
@@ -48,6 +50,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
   liveBadge,
   secondary = false,
   locked = false,
+  loading = false,
   lockedMessage,
   onLockedClick,
 }) => {
@@ -196,7 +199,9 @@ const ModeCard: React.FC<ModeCardProps> = ({
             height: secondary ? 'clamp(2rem, 6cqw, 2.5rem)' : 'clamp(2.75rem, 8cqw, 3.25rem)',
           }}
         >
-          {locked ? (
+          {loading ? (
+            <Loader2 className="animate-spin" style={{ fontSize: secondary ? 'clamp(0.625rem, 3cqw, 0.875rem)' : 'clamp(0.75rem, 3.5cqw, 1rem)' }} />
+          ) : locked ? (
             <Lock style={{ fontSize: secondary ? 'clamp(0.625rem, 3cqw, 0.875rem)' : 'clamp(0.75rem, 3.5cqw, 1rem)' }} />
           ) : (
             <ArrowIcon style={{ fontSize: secondary ? 'clamp(0.625rem, 3cqw, 0.875rem)' : 'clamp(0.75rem, 3.5cqw, 1rem)' }} />
@@ -273,8 +278,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
         </motion.div>
       )}
 
-      {/* Locked overlay with message badge */}
-      {locked && lockedMessage && (
+      {/* Locked overlay with message badge - hidden during loading to prevent flicker */}
+      {locked && !loading && lockedMessage && (
         <div className="absolute bottom-2 left-2 right-2">
           <span
             className={cn(
@@ -292,7 +297,20 @@ const ModeCard: React.FC<ModeCardProps> = ({
     </div>
   );
 
-  // Render as button when locked, Link when not locked
+  // Render as button when locked (but not loading), Link when not locked
+  // During loading, render as div to prevent interaction
+  if (loading) {
+    return (
+      <div
+        className={cn(wrapperClassName, 'cursor-wait')}
+        aria-label={`${title} - Loading`}
+        aria-busy="true"
+      >
+        {cardContent}
+      </div>
+    );
+  }
+
   if (locked) {
     return (
       <button
