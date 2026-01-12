@@ -81,29 +81,73 @@ export function getValidAvatarId(id: string | undefined | null): string {
 }
 
 /**
+ * Map emoji to avatar configuration
+ * Used for emoji-based avatar selection
+ */
+export function mapEmojiToAvatar(emoji: string): AvatarConfig {
+  const emojiMap: Record<string, string> = {
+    '🐶': 'prickly-pat',
+    '🐱': 'slimy-sam',
+    '🐭': 'starry-stella',
+    '🐹': 'sunny-steve',
+    '🐰': 'cloudy-carl',
+    '🦊': 'pizza-pete',
+    '🐻': 'broccoli-bob',
+    '🐼': 'octo-otto',
+    '🐨': 'melon-molly',
+    '🐯': 'avo-alex',
+    '🦁': 'frosty-frank',
+    '🐮': 'flaky-fred',
+    '🐷': 'eggy-ed',
+    '🐸': 'shroom-shelly',
+    '🐵': 'donut-danny',
+    '🐔': 'jelly-jen',
+    '🐧': 'drippy-drop',
+    '🐦': 'sunny-steve',
+    '🐤': 'cloudy-carl',
+    '🦆': 'melon-molly',
+    '🦅': 'starry-stella',
+    '🦉': 'broccoli-bob',
+    '🦇': 'octo-otto',
+    '🐺': 'slimy-sam',
+    '🐗': 'prickly-pat',
+    '🐴': 'pizza-pete',
+    '🦄': 'jelly-jen',
+    '🐝': 'sunny-steve',
+    '🐛': 'slimy-sam',
+    '🦋': 'jelly-jen',
+    '🐌': 'slimy-sam',
+    '🐞': 'prickly-pat',
+  };
+
+  const avatarId = emojiMap[emoji] || getRandomAvatar().id;
+  return getAvatarById(avatarId) || getRandomAvatar();
+}
+
+/**
  * Avatar emoji and color mappings for leaderboard display
  */
 const AVATAR_EMOJI_COLOR_MAP: Record<string, { emoji: string; color: string }> = {
-  'broccoli-bob': { emoji: '🥦', color: '#10b981' },
-  'drippy-drop': { emoji: '💧', color: '#3b82f6' },
-  'sunny-steve': { emoji: '☀️', color: '#f59e0b' },
-  'cloudy-carl': { emoji: '☁️', color: '#94a3b8' },
-  'octo-otto': { emoji: '🐙', color: '#8b5cf6' },
-  'pizza-pete': { emoji: '🍕', color: '#ef4444' },
-  'prickly-pat': { emoji: '🌵', color: '#22c55e' },
-  'melon-molly': { emoji: '🍉', color: '#f472b6' },
-  'avo-alex': { emoji: '🥑', color: '#84cc16' },
-  'frosty-frank': { emoji: '🧊', color: '#06b6d4' },
-  'flaky-fred': { emoji: '🥐', color: '#d97706' },
-  'eggy-ed': { emoji: '🥚', color: '#fbbf24' },
-  'slimy-sam': { emoji: '🦠', color: '#a3e635' },
-  'starry-stella': { emoji: '⭐', color: '#fcd34d' },
-  'shroom-shelly': { emoji: '🍄', color: '#dc2626' },
-  'donut-danny': { emoji: '🍩', color: '#ec4899' },
-  'jelly-jen': { emoji: '🪼', color: '#c084fc' },
+  'broccoli-bob': { emoji: '🥦', color: getAvatarColorVar('broccoli-bob') },
+  'drippy-drop': { emoji: '💧', color: getAvatarColorVar('drippy-drop') },
+  'sunny-steve': { emoji: '☀️', color: getAvatarColorVar('sunny-steve') },
+  'cloudy-carl': { emoji: '☁️', color: getAvatarColorVar('cloudy-carl') },
+  'octo-otto': { emoji: '🐙', color: getAvatarColorVar('octo-otto') },
+  'pizza-pete': { emoji: '🍕', color: getAvatarColorVar('pizza-pete') },
+  'prickly-pat': { emoji: '🌵', color: getAvatarColorVar('prickly-pat') },
+  'melon-molly': { emoji: '🍉', color: getAvatarColorVar('melon-molly') },
+  'avo-alex': { emoji: '🥑', color: getAvatarColorVar('avo-alex') },
+  'frosty-frank': { emoji: '🧊', color: getAvatarColorVar('frosty-frank') },
+  'flaky-fred': { emoji: '🥐', color: getAvatarColorVar('flaky-fred') },
+  'eggy-ed': { emoji: '🥚', color: getAvatarColorVar('eggy-ed') },
+  'slimy-sam': { emoji: '🦠', color: getAvatarColorVar('slimy-sam') },
+  'starry-stella': { emoji: '⭐', color: getAvatarColorVar('starry-stella') },
+  'shroom-shelly': { emoji: '🍄', color: getAvatarColorVar('shroom-shelly') },
+  'donut-danny': { emoji: '🍩', color: getAvatarColorVar('donut-danny') },
+  'jelly-jen': { emoji: '🪼', color: getAvatarColorVar('jelly-jen') },
 };
 
-const DEFAULT_EMOJI_COLOR = { emoji: '🎯', color: '#6366f1' };
+const DEFAULT_EMOJI_COLOR = { emoji: '🎯', color: 'var(--avatar-1)' };
 
 /**
  * Get emoji and color for an avatar ID
