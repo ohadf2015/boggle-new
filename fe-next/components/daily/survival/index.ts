@@ -24,6 +24,8 @@ export type {
   TargetAttempt,
   SurvivalGameResult,
   AccumulatedClue,
+  ScoreEvent,
+  AutoClueNotificationData,
 } from './types';
 
 // Constants
@@ -66,3 +68,12 @@ export type { SurvivalGridSectionProps } from './SurvivalGridSection';
 
 export { SurvivalLandscapeLayout } from './SurvivalLandscapeLayout';
 export type { SurvivalLandscapeLayoutProps } from './SurvivalLandscapeLayout';
+
+export { AccumulatedScoreDisplay } from './AccumulatedScoreDisplay';
+export type { AccumulatedScoreDisplayProps } from './AccumulatedScoreDisplay';
+
+export { AutoClueNotification } from './AutoClueNotification';
+export type { AutoClueNotificationProps } from './AutoClueNotification';
+
+export { useLiveScoreTracker } from './useLiveScoreTracker';
+export type { LiveScoreState, LiveScoreActions, UseLiveScoreTrackerProps } from './useLiveScoreTracker';

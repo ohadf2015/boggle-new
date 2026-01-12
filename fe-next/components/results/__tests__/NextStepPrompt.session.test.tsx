@@ -136,7 +136,7 @@ describe('NextStepPrompt - Session Cleanup on Navigation', () => {
   describe('Session cleanup for all navigation modes', () => {
     const testCases = [
       { mode: 'practice' as const, expectedHref: '/en/singleplayer?preset=bots' },
-      { mode: 'solo-bots' as const, expectedHref: '/en/daily' },
+      { mode: 'solo-bots' as const, expectedHref: '/en/singleplayer?preset=bots' },
       { mode: 'daily' as const, expectedHref: '/en/multiplayer' },
       { mode: 'multiplayer-bots' as const, expectedHref: '/en/brain' },
     ];

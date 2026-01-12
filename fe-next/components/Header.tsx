@@ -102,6 +102,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
         <header
             className={cn(
                 "w-full mb-1 sm:mb-2 lg:mb-3 px-2 sm:px-3 lg:px-4 pt-2 sm:pt-2 lg:pt-3 pb-1 lg:pb-2 sticky top-0 z-[60] bg-slate-50 dark:bg-slate-900",
+                // Min-height prevents CLS (Cumulative Layout Shift) on page load
+                // Header reserves space even before content hydrates
+                "min-h-[60px] sm:min-h-[70px] lg:min-h-[80px]",
                 className
             )}
         >
@@ -177,9 +180,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         </span>
                     </h1>
 
-                    {/* Lime lightning bolt - right */}
+                    {/* Cyan lightning bolt - right */}
                     <svg
-                        className="w-4 h-5 xs:w-5 xs:h-6 sm:w-6 sm:h-7 lg:w-7 lg:h-8 xl:w-8 xl:h-10 flex-shrink-0 text-neo-lime animate-lightning-right"
+                        className="w-4 h-5 xs:w-5 xs:h-6 sm:w-6 sm:h-7 lg:w-7 lg:h-8 xl:w-8 xl:h-10 flex-shrink-0 text-neo-cyan-light animate-lightning-right"
                         viewBox="0 0 24 32"
                         fill="none"
                         style={{ transform: 'rotate(15deg)' }}

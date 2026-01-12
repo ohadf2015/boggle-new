@@ -5,7 +5,8 @@ import type { LetterGrid, Language } from '@/types';
 import { getLetterFeedback, isTargetWordFound, type LetterFeedback } from '@/utils/wordHuntFeedback';
 import { calculateLifeReward, calculateTokenReward, calculateEfficiencyScore, type ClueShopItem, type HintLevel } from '@/utils/aiHintGenerator';
 import type { FeedbackType } from '../WordFeedbackToast';
-import type { WordDiscovery, TargetAttempt, SurvivalGameResult, AccumulatedClue } from './types';
+import type { WordDiscovery, TargetAttempt, SurvivalGameResult, AccumulatedClue, ScoreEvent, AutoClueNotificationData } from './types';
+import { useLiveScoreTracker } from './useLiveScoreTracker';
 import {
   MAX_ATTEMPTS,
   INITIAL_LIFE,
@@ -67,6 +68,15 @@ export interface SurvivalGameState {
   hintStage: number;
   nextHintItem: ClueShopItem | null;
 
+  // Score tracking (new)
+  liveScore: number;
+  lastScoreIncrement: number | null;
+  isScoreAnimating: boolean;
+  scoreHistory: ScoreEvent[];
+
+  // Notifications (new)
+  activeNotifications: AutoClueNotificationData[];
+
   // UI state
   formedWord: string;
   letterCount: number;
@@ -91,6 +101,8 @@ export interface SurvivalGameActions {
   setShowShopHint: (show: boolean) => void;
   setShowQuitConfirm: (show: boolean) => void;
   setLifeGainAmount: (amount: number | null) => void;
+  showAutoClueNotification: (clueType: string) => void;
+  dismissNotification: (id: string) => void;
   gameDir: 'ltr' | 'rtl';
   clueContainerRef: React.RefObject<HTMLDivElement | null>;
 }
@@ -147,6 +159,9 @@ export function useSurvivalGameLogic({
   const [feedbackType, setFeedbackType] = useState<FeedbackType | null>(null);
   const [feedbackMessage, setFeedbackMessage] = useState('');
 
+  // Notification state
+  const [activeNotifications, setActiveNotifications] = useState<AutoClueNotificationData[]>([]);
+
   // Toast helpers
   const showToast = useCallback((type: FeedbackType, message: string) => {
     setFeedbackType(type);
@@ -156,6 +171,29 @@ export function useSurvivalGameLogic({
   const closeToast = useCallback(() => {
     setFeedbackType(null);
     setFeedbackMessage('');
+  }, []);
+
+  // Live score tracking
+  const [liveScoreState] = useLiveScoreTracker({
+    lifePoints,
+    clueTokens,
+    discoveredWords,
+    attempts,
+    isGameOver,
+  });
+
+  // Notification actions
+  const showAutoClueNotification = useCallback((clueType: string) => {
+    const notification: AutoClueNotificationData = {
+      id: `${Date.now()}-${clueType}`,
+      clueType: clueType as 'reveal_letter' | 'reveal_category' | 'example_sentence',
+      timestamp: Date.now(),
+    };
+    setActiveNotifications(prev => [...prev, notification]);
+  }, []);
+
+  const dismissNotification = useCallback((id: string) => {
+    setActiveNotifications(prev => prev.filter(n => n.id !== id));
   }, []);
 
   // Use extracted clue hook
@@ -483,7 +521,7 @@ export function useSurvivalGameLogic({
     // If next item exists and we have enough tokens, buy it automatically
     // But we need to be careful about loops or repeatedly trying to buy if it fails (it shouldn't if cost check passes)
     // Also buyNextHint is wrapped in useCallback with deps [hintActions, clueTokens]
-    
+
     const nextItem = hintState.nextHintItem;
     if (nextItem && clueTokens >= nextItem.cost) {
         // Auto-unlock!
@@ -491,11 +529,13 @@ export function useSurvivalGameLogic({
         // and to give a nice "Ding!" feeling slightly after the coin arrives.
         const timer = setTimeout(() => {
              buyNextHint();
+             // Show notification after successful unlock
+             showAutoClueNotification(nextItem.id);
         }, 500);
         return () => clearTimeout(timer);
     }
     return undefined;
-  }, [clueTokens, hintState.nextHintItem, buyNextHint]);
+  }, [clueTokens, hintState.nextHintItem, buyNextHint, showAutoClueNotification]);
 
   // Keep callback refs in sync
   useEffect(() => {
@@ -533,6 +573,11 @@ export function useSurvivalGameLogic({
     showExample: hintState.showExample,
     hintStage: hintState.hintStage,
     nextHintItem: hintState.nextHintItem,
+    liveScore: liveScoreState.currentScore,
+    lastScoreIncrement: liveScoreState.lastIncrement,
+    isScoreAnimating: liveScoreState.isScoreAnimating,
+    scoreHistory: liveScoreState.scoreHistory,
+    activeNotifications,
     formedWord,
     letterCount,
     showShop,
@@ -554,6 +599,8 @@ export function useSurvivalGameLogic({
     setShowShopHint,
     setShowQuitConfirm,
     setLifeGainAmount,
+    showAutoClueNotification,
+    dismissNotification,
     gameDir,
     clueContainerRef,
   };

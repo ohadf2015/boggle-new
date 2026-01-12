@@ -33,6 +33,14 @@ LIGHT_COLORS = {
     'slate-100', 'slate-200', 'slate-300', 'slate-400'
 }
 
+# Problematic low opacity patterns (60% and below)
+LOW_OPACITY_PATTERNS = {
+    'text-white/60', 'text-white/50', 'text-white/40', 'text-white/30', 'text-white/20', 'text-white/10',
+    'text-neo-white/60', 'text-neo-white/50', 'text-neo-white/40', 'text-neo-white/30',
+    'text-neo-cream/60', 'text-neo-cream/50', 'text-neo-cream/40', 'text-neo-cream/30',
+    'text-slate-300', 'text-slate-400'  # These can be borderline on dark backgrounds
+}
+
 # Colors that work with light text
 DARK_BG_COLORS = {
     'neo-navy', 'neo-navy-light', 'neo-gray', 'neo-black',
@@ -127,6 +135,22 @@ class ContrastDetector:
         bg_color = None
         text_color = None
         dark_bg_color = None
+
+        # Check for problematic low opacity patterns on dark backgrounds
+        for cls in classes:
+            # Check if using white/cream with 60% or lower opacity on dark bg
+            if any(pattern in cls for pattern in ['text-white/60', 'text-white/50', 'text-white/40', 'text-white/30',
+                                                    'text-neo-white/60', 'text-neo-white/50', 'text-neo-white/40',
+                                                    'text-neo-cream/60', 'text-neo-cream/50', 'text-neo-cream/40']):
+                issues.append(ContrastIssue(
+                    file=file_path,
+                    line=line_num,
+                    severity='warning',
+                    issue_type='low-opacity-on-dark',
+                    description=f'Low opacity text "{cls}" may have poor contrast on dark backgrounds',
+                    code_snippet=line_content.strip(),
+                    fix_suggestion='Use text-slate-300 or text-slate-400 for better contrast on dark backgrounds'
+                ))
 
         for cls in classes:
             if 'bg-' in cls and not cls.startswith('dark:'):

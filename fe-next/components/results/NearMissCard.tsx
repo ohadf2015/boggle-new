@@ -177,7 +177,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
 
                   {/* Hint */}
                   {nearMiss.hint && !compact && (
-                    <p className="mt-1.5 text-[10px] text-white/50 italic">
+                    <p className="mt-1.5 text-[10px] text-slate-300 italic">
                       {t('nearMiss.tip') || 'Tip'}: {nearMiss.hint}
                     </p>
                   )}
@@ -227,7 +227,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
       {/* Motivational footer */}
       {!compact && displayMisses.length > 0 && (
         <div className="px-3 py-2 bg-white/5 border-t border-white/10">
-          <p className="text-[10px] text-white/50 text-center">
+          <p className="text-[10px] text-slate-300 text-center">
             {t('nearMiss.soClose') || "You're so close! One more game could do it."}
           </p>
         </div>

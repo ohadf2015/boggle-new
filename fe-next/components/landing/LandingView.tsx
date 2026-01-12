@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
-import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Sparkles, Star, Zap, Target } from 'lucide-react';
+import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Sparkles, Star, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -148,16 +148,14 @@ const LandingLoadingSkeleton: React.FC<{ isLandscape: boolean; isMobilePortrait:
         <div className="w-full flex gap-2 sm:gap-3 flex-1 min-h-0">
           <div className="flex-1 min-h-[100px] sm:min-h-[120px] bg-neo-pink/50 border-3 border-neo-black rounded-neo shadow-hard" />
           <div className="flex-1 min-h-[100px] sm:min-h-[120px] bg-neo-cyan/50 border-3 border-neo-black rounded-neo shadow-hard" />
+          <div className="flex-1 min-h-[100px] sm:min-h-[120px] bg-neo-purple/50 border-3 border-neo-black rounded-neo shadow-hard" />
         </div>
       ) : (
         <div className="w-full flex flex-col items-center justify-center gap-4 sm:gap-5 lg:gap-6">
-          <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 lg:gap-6">
+          <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
             <div className="h-48 bg-neo-pink/50 border-3 border-neo-black rounded-neo-lg shadow-hard-lg" />
             <div className="h-48 bg-neo-cyan/50 border-3 border-neo-black rounded-neo-lg shadow-hard-lg" />
-          </div>
-          <div className="w-full max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <div className="h-32 bg-neo-purple/50 border-2 border-neo-black rounded-neo-lg shadow-hard" />
-            <div className="h-32 bg-neo-orange/50 border-2 border-neo-black rounded-neo-lg shadow-hard" />
+            <div className="h-48 bg-neo-purple/50 border-3 border-neo-black rounded-neo-lg shadow-hard-lg" />
           </div>
         </div>
       )}
@@ -437,12 +435,57 @@ const LandingView: React.FC = () => {
                 </div>
               )}
             </Link>
+
+            {/* Brain Training Card - Compact */}
+            {isAuthenticated ? (
+              <Link
+                href={`/${language}/brain`}
+                className={cn(
+                  'flex-1 flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
+                  'bg-gradient-to-br from-neo-purple to-purple-400',
+                  'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
+                  'hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px]',
+                  'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm',
+                  'transition-all min-h-[100px] sm:min-h-[120px]',
+                  isMobilePortrait && 'max-h-[30dvh]',
+                  isLandscape && 'max-h-[70dvh]',
+                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
+                )}
+                aria-label={`${t('landing.brainTraining') || 'Brain Training'} - ${t('landing.brainTrainingDesc') || 'Track cognitive growth'}`}
+              >
+                <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
+                <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.brainTraining') || 'Brain Training'}</span>
+              </Link>
+            ) : (
+              <button
+                onClick={() => setShowAuthModal(true)}
+                className={cn(
+                  'flex-1 flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4 relative',
+                  'bg-gradient-to-br from-neo-purple/60 to-purple-400/60',
+                  'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
+                  'hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px]',
+                  'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm',
+                  'transition-all min-h-[100px] sm:min-h-[120px]',
+                  isMobilePortrait && 'max-h-[30dvh]',
+                  isLandscape && 'max-h-[70dvh]',
+                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
+                  'cursor-not-allowed opacity-75'
+                )}
+                aria-label={`${t('landing.brainTraining') || 'Brain Training'} - ${t('landing.signInToUnlock') || 'Sign in to unlock'}`}
+              >
+                <div className="absolute top-1 right-1 bg-neo-yellow text-neo-black px-1.5 py-0.5 rounded-neo text-xs font-bold border-2 border-neo-black">
+                  🔒 {t('landing.locked') || 'Locked'}
+                </div>
+                <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black/50" aria-hidden="true" />
+                <span className="text-sm sm:text-lg font-black uppercase text-neo-black/60 text-center">{t('landing.brainTraining') || 'Brain Training'}</span>
+              </button>
+            )}
           </div>
         ) : (
           /* Desktop: Centered grid layout */
           <div className="w-full animate-fade-in-fast flex flex-col items-center justify-center gap-4 sm:gap-5 lg:gap-6">
-            {/* Primary cards - 2 columns, centered */}
-            <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 lg:gap-6">
+            {/* Primary cards - 3 columns, centered */}
+            <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
               <ModeCard
                 title={t('landing.multiplayer') || 'Multiplayer'}
                 description={t('landing.multiplayerDesc') || 'Compete with friends in real-time!'}
@@ -463,25 +506,12 @@ const LandingView: React.FC = () => {
                 icon={<User className="w-6 h-6" />}
                 variant="cyan"
               />
-            </div>
-
-            {/* Secondary cards - 2 columns, centered, smaller */}
-            <div className="w-full max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <ModeCard
                 title={t('landing.brainTraining') || 'Brain Training'}
                 description={t('landing.brainTrainingDesc') || 'Track cognitive growth'}
                 href={`/${language}/brain`}
-                icon={<Brain className="w-5 h-5" />}
+                icon={<Brain className="w-6 h-6" />}
                 variant="purple"
-                secondary
-              />
-              <ModeCard
-                title={t('landing.brainDrills') || 'Quick Drills'}
-                description={t('landing.brainDrillsDesc') || 'Focused mini-games'}
-                href={`/${language}/brain`}
-                icon={<Target className="w-5 h-5" />}
-                variant="orange"
-                secondary
                 locked={!isAuthenticated}
                 lockedMessage={t('landing.signInToUnlock') || 'Sign in to unlock'}
                 onLockedClick={() => setShowAuthModal(true)}

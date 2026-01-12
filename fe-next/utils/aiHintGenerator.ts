@@ -61,7 +61,7 @@ export const HINT_UNLOCK_COSTS = {
 
 /**
  * Clue shop items and their costs (in clue tokens earned from finding words)
- * Costs are low (1-3 tokens) to enable auto-spending as players discover words
+ * Costs increased 3x for score-first UI (auto-unlocks are hidden, so difficulty increased)
  * Players earn 1-4 tokens per word found based on length
  */
 export const CLUE_SHOP_ITEMS: ClueShopItem[] = [
@@ -69,21 +69,21 @@ export const CLUE_SHOP_ITEMS: ClueShopItem[] = [
     id: 'reveal_letter',
     name: 'Reveal Letter',
     description: 'Reveal a random letter in the target word (keeps 1 letter hidden)',
-    cost: 1,
+    cost: 3, // Increased from 1 (3x harder)
     icon: '💡',
   },
   {
     id: 'reveal_category',
     name: 'Reveal Category',
     description: 'Show the word category (e.g., "Animals > Mammals")',
-    cost: 3,
+    cost: 9, // Increased from 3 (3x harder)
     icon: '🏷️',
   },
   {
     id: 'example_sentence',
     name: 'Example Sentence',
     description: 'See the word used in a sentence (word is blank)',
-    cost: 5,
+    cost: 15, // Increased from 5 (3x harder)
     icon: '📝',
   },
 ];

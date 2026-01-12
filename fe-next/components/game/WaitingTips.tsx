@@ -87,7 +87,7 @@ export function WaitingTips({ t, className, rotationInterval = 5000 }: WaitingTi
         <div className="bg-neo-lime p-1.5 rounded border-2 border-neo-black text-neo-black">
           <Lightbulb className="w-4 h-4 text-neo-black" />
         </div>
-        <span className="text-sm font-bold uppercase tracking-wide text-neo-cream/80">
+        <span className="text-sm font-bold uppercase tracking-wide text-neo-white">
           {t('tips.header') || 'Pro Tips'}
         </span>
       </div>

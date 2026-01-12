@@ -3,7 +3,7 @@
 import React, { memo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Bot, Calendar, Users, Brain, ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
+import { Bot, Users, Brain, ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -16,6 +16,8 @@ interface NextStepPromptProps {
   currentMode: NextStepMode;
   /** Callback when user wants to return to lobby */
   onBackToLobby: () => void;
+  /** Optional callback for direct action (e.g., quick rematch) instead of navigation */
+  onAction?: () => void;
   /** Display variant */
   variant?: 'desktop' | 'mobile' | 'landscape';
   /** Additional CSS classes */
@@ -43,6 +45,7 @@ interface ModeConfig {
 const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
   currentMode,
   onBackToLobby,
+  onAction,
   variant = 'desktop',
   className,
 }) => {
@@ -51,12 +54,17 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
   const router = useRouter();
 
-  // Handle navigation with session cleanup
+  // Handle navigation with session cleanup OR direct action callback
   const handleNavigate = useCallback((href: string) => {
+    // If onAction callback is provided, use it instead of navigation
+    if (onAction) {
+      onAction();
+      return;
+    }
     // Clear current session before navigating to prevent being stuck on results page
     clearSessionPreservingUsername();
     router.push(href);
-  }, [router]);
+  }, [router, onAction]);
 
   // Configure next step based on current mode
   const getNextStepConfig = (): ModeConfig => {
@@ -72,12 +80,12 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
         };
       case 'solo-bots':
         return {
-          titleKey: 'nextStep.dailyChallenge',
-          descKey: 'nextStep.dailyChallengeDesc',
-          href: `/${language}/daily`,
-          icon: <Calendar className="w-6 h-6 sm:w-7 sm:h-7" />,
-          gradient: 'from-neo-lime to-neo-lime-dark',
-          iconBg: 'bg-neo-navy text-neo-lime',
+          titleKey: 'nextStep.challengeBotsAgain',
+          descKey: 'nextStep.challengeBotsAgainDesc',
+          href: `/${language}/singleplayer?preset=bots`,
+          icon: <Bot className="w-6 h-6 sm:w-7 sm:h-7" />,
+          gradient: 'from-neo-cyan to-neo-cyan-dark',
+          iconBg: 'bg-neo-navy text-neo-cyan',
         };
       case 'daily':
         return {
@@ -226,7 +234,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
 
       {/* Sparkle decorations */}
       <motion.div
-        className="absolute top-4 right-4 text-neo-black/30"
+        className="absolute top-4 right-4 text-neo-black/50"
         animate={{ scale: [1, 1.2, 1], rotate: [0, 180, 360] }}
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
       >

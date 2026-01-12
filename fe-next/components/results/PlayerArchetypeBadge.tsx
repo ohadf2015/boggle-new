@@ -308,7 +308,7 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
           </p>
 
           {/* Hint */}
-          <p className="text-[10px] text-neo-black/50 mt-1.5 pt-1.5 border-t border-neo-black/10 relative z-10">
+          <p className="text-[10px] text-neo-black/70 mt-1.5 pt-1.5 border-t border-neo-black/10 relative z-10">
             {t('archetypes.hint') || 'Based on your play style'}
           </p>
         </motion.div>

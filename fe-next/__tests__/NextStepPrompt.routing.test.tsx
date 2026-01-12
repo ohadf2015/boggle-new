@@ -74,7 +74,7 @@ describe('NextStepPrompt - Routing Bug', () => {
     });
   });
 
-  it('should navigate to daily challenge when clicking the card in solo-bots mode', async () => {
+  it('should navigate to challenge bots again when clicking the card in solo-bots mode', async () => {
     const { container } = renderComponent('solo-bots');
 
     const buttons = container.querySelectorAll('button');
@@ -82,7 +82,7 @@ describe('NextStepPrompt - Routing Bug', () => {
     fireEvent.click(nextStepButton);
 
     await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/en/daily');
+      expect(mockPush).toHaveBeenCalledWith('/en/singleplayer?preset=bots');
     });
   });
 

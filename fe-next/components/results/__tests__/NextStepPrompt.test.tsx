@@ -21,6 +21,8 @@ jest.mock('@/contexts/LanguageContext', () => ({
     const translations: Record<string, string> = {
       'nextStep.challengeBots': 'Challenge the Bots!',
       'nextStep.challengeBotsDesc': 'Test your skills against AI opponents',
+      'nextStep.challengeBotsAgain': 'Play Again!',
+      'nextStep.challengeBotsAgainDesc': 'Start a new game with bots',
       'nextStep.dailyChallenge': 'Daily Challenge',
       'nextStep.dailyChallengeDesc': 'Same puzzle as everyone worldwide',
       'nextStep.goMultiplayer': 'Go Multiplayer!',
@@ -72,7 +74,7 @@ describe('NextStepPrompt', () => {
   });
 
   describe('Solo-Bots Mode', () => {
-    it('renders Daily Challenge CTA for solo-bots mode', () => {
+    it('renders Play Again CTA for solo-bots mode', () => {
       render(
         <NextStepPrompt
           currentMode="solo-bots"
@@ -80,8 +82,27 @@ describe('NextStepPrompt', () => {
         />
       );
 
-      expect(screen.getByText('Daily Challenge')).toBeInTheDocument();
-      expect(screen.getByText('Same puzzle as everyone worldwide')).toBeInTheDocument();
+      expect(screen.getByText('Play Again!')).toBeInTheDocument();
+      expect(screen.getByText('Start a new game with bots')).toBeInTheDocument();
+    });
+
+    it('calls onAction callback when provided instead of navigating', async () => {
+      const user = userEvent.setup();
+      const mockOnAction = jest.fn();
+
+      render(
+        <NextStepPrompt
+          currentMode="solo-bots"
+          onBackToLobby={mockOnBackToLobby}
+          onAction={mockOnAction}
+        />
+      );
+
+      // Click the "Let's Go!" button
+      await user.click(screen.getByText("Let's Go!"));
+
+      // Verify onAction callback was called
+      expect(mockOnAction).toHaveBeenCalledTimes(1);
     });
   });
 

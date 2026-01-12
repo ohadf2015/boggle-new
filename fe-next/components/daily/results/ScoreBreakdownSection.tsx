@@ -28,7 +28,7 @@ export const ScoreBreakdownSection: React.FC<ScoreBreakdownSectionProps> = ({
   guessesUsed,
   t,
 }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true); // Changed: expanded by default for score-first UI
 
   // Calculate individual contributions (ensure whole numbers)
   const lifeContribution = Math.round(Math.max(0, lifeRemaining) * 10);

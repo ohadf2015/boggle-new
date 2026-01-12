@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -25,6 +25,7 @@ import {
   SurvivalClueBoxes,
   SurvivalGridSection,
   SurvivalLandscapeLayout,
+  AutoClueNotification,
 } from './survival';
 
 // Re-export types for backwards compatibility
@@ -133,10 +134,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         lifePoints={state.lifePoints}
         isLifeGaining={state.isLifeGaining}
         attempts={state.attempts}
-        clueTokens={state.clueTokens}
-        nextHintItem={state.nextHintItem}
-        onBuyNextHint={actions.buyNextHint}
-        isClueGaining={state.isClueGaining}
+        liveScore={state.liveScore}
+        lastScoreIncrement={state.lastScoreIncrement}
+        isScoreAnimating={state.isScoreAnimating}
         currentHint={state.currentHint}
         targetWord={targetWord}
         accumulatedClues={state.accumulatedClues}
@@ -151,6 +151,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         onCloseToast={actions.closeToast}
         showSwipeTip={contextualGuidance.showSwipeTip}
         onDismissSwipeTip={contextualGuidance.dismissSwipeTip}
+        activeNotifications={state.activeNotifications}
+        onDismissNotification={actions.dismissNotification}
         t={t}
       />
     );
@@ -167,9 +169,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     >
       {/* Top bar */}
       <SurvivalHeader
-        clueTokens={state.clueTokens}
-        nextHintItem={state.nextHintItem}
-        onBuyNextHint={actions.buyNextHint}
+        liveScore={state.liveScore}
+        lastScoreIncrement={state.lastScoreIncrement}
+        isScoreAnimating={state.isScoreAnimating}
         onQuitClick={() => actions.setShowQuitConfirm(true)}
         t={t}
       />
@@ -252,6 +254,19 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         message={state.feedbackMessage}
         onClose={actions.closeToast}
       />
+
+      {/* Auto-Clue Notifications */}
+      <AnimatePresence>
+        {state.activeNotifications.map((notification) => (
+          <AutoClueNotification
+            key={notification.id}
+            clueType={notification.clueType}
+            onDismiss={() => actions.dismissNotification(notification.id)}
+            direction={actions.gameDir}
+            t={t}
+          />
+        ))}
+      </AnimatePresence>
 
       {/* Quit Confirmation Dialog */}
       <ConfirmationDialog

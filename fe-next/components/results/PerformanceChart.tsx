@@ -408,8 +408,8 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
                   <Flame className="w-3 h-3 text-neo-lime/70" />
                 </div>
               </div>
-              <div className="text-lg font-black text-white/30">--</div>
-              <div className="text-[9px] font-bold uppercase text-white/40">
+              <div className="text-lg font-black text-slate-400">--</div>
+              <div className="text-[9px] font-bold uppercase text-slate-300">
                 {t('chart.bestScore') || 'Best'}
               </div>
             </div>
@@ -419,8 +419,8 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
                   <Target className="w-3 h-3 text-neo-cyan/70" />
                 </div>
               </div>
-              <div className="text-lg font-black text-white/30">--</div>
-              <div className="text-[9px] font-bold uppercase text-white/40">
+              <div className="text-lg font-black text-slate-400">--</div>
+              <div className="text-[9px] font-bold uppercase text-slate-300">
                 {t('chart.average') || 'Avg'}
               </div>
             </div>
@@ -430,8 +430,8 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
                   <Trophy className="w-3 h-3 text-neo-lime/70" />
                 </div>
               </div>
-              <div className="text-lg font-black text-white/30">{gamesPlayed}</div>
-              <div className="text-[9px] font-bold uppercase text-white/40">
+              <div className="text-lg font-black text-slate-400">{gamesPlayed}</div>
+              <div className="text-[9px] font-bold uppercase text-slate-300">
                 {t('chart.games') || 'Games'}
               </div>
             </div>
@@ -585,7 +585,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
           </ResponsiveContainer>
           ) : (
             <div className="flex items-center justify-center h-full">
-              <div className="text-sm font-bold text-white/50">
+              <div className="text-sm font-bold text-slate-300">
                 {t('common.loading')}
               </div>
             </div>

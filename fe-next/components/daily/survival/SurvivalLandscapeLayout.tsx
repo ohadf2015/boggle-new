@@ -1,16 +1,17 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Heart, Sparkles, X, Coins } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Heart, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import GridComponent, { type HighlightedCell } from '@/components/GridComponent';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { WordFeedbackToast, type FeedbackType } from '../WordFeedbackToast';
 import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
+import { AutoClueNotification } from './AutoClueNotification';
 import type { LetterGrid } from '@/types';
-import type { HintLevel, ClueShopItem } from '@/utils/aiHintGenerator';
+import type { HintLevel } from '@/utils/aiHintGenerator';
 import type { AccumulatedClue } from './types';
 import { MAX_ATTEMPTS } from './constants';
 
@@ -29,11 +30,10 @@ export interface SurvivalLandscapeLayoutProps {
   isLifeGaining: boolean;
   attempts: { word: string; timestamp: number }[];
 
-  // Token props
-  clueTokens: number;
-  nextHintItem: ClueShopItem | null;
-  onBuyNextHint: () => void;
-  isClueGaining: boolean;
+  // Score props (replaces token props)
+  liveScore: number;
+  lastScoreIncrement: number | null;
+  isScoreAnimating: boolean;
 
   // Clue boxes props
   currentHint: HintLevel | null;
@@ -57,6 +57,10 @@ export interface SurvivalLandscapeLayoutProps {
   showSwipeTip: boolean;
   onDismissSwipeTip: () => void;
 
+  // Notification props
+  activeNotifications: Array<{ id: string; clueType: 'reveal_letter' | 'reveal_category' | 'example_sentence'; timestamp: number }>;
+  onDismissNotification: (id: string) => void;
+
   t: (key: string) => string;
 }
 
@@ -78,11 +82,10 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
   isLifeGaining,
   attempts,
 
-  // Token props
-  clueTokens,
-  nextHintItem,
-  onBuyNextHint,
-  isClueGaining,
+  // Score props
+  liveScore,
+  lastScoreIncrement,
+  isScoreAnimating,
 
   // Clue boxes props
   currentHint,
@@ -105,6 +108,10 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
   // Guidance props
   showSwipeTip,
   onDismissSwipeTip,
+
+  // Notification props
+  activeNotifications,
+  onDismissNotification,
 
   t,
 }) => {
@@ -133,12 +140,12 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
         t={t}
       />
 
-      {/* Right Side Panel - Tokens */}
+      {/* Right Side Panel - Score */}
       <RightPanel
-        clueTokens={clueTokens}
-        nextHintItem={nextHintItem}
-        onBuyNextHint={onBuyNextHint}
-        isClueGaining={isClueGaining}
+        liveScore={liveScore}
+        lastScoreIncrement={lastScoreIncrement}
+        isScoreAnimating={isScoreAnimating}
+        t={t}
       />
 
       {/* Bottom-left: Quit button */}
@@ -187,6 +194,19 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
           </div>
         </div>
       </div>
+
+      {/* Auto-Clue Notifications */}
+      <AnimatePresence>
+        {activeNotifications.map((notification) => (
+          <AutoClueNotification
+            key={notification.id}
+            clueType={notification.clueType}
+            onDismiss={() => onDismissNotification(notification.id)}
+            direction={gameDir}
+            t={t}
+          />
+        ))}
+      </AnimatePresence>
 
       {/* Quit Confirmation Dialog */}
       <ConfirmationDialog
@@ -267,51 +287,49 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
 );
 
 interface RightPanelProps {
-  clueTokens: number;
-  nextHintItem: ClueShopItem | null;
-  onBuyNextHint: () => void;
-  isClueGaining: boolean;
+  liveScore: number;
+  lastScoreIncrement: number | null;
+  isScoreAnimating: boolean;
+  t: (key: string) => string;
 }
 
 const RightPanel: React.FC<RightPanelProps> = ({
-  clueTokens,
-  nextHintItem,
-  onBuyNextHint,
-  isClueGaining,
+  liveScore,
+  lastScoreIncrement,
+  isScoreAnimating,
+  t,
 }) => (
   <div className="absolute right-3 top-1/2 -translate-y-1/2 z-20 landscape-side-panel">
     <div className="landscape-panel flex flex-col items-center gap-4">
-      {/* Next Hint Progress (Auto-unlocks) */}
-      {nextHintItem && (
-        <div className="flex flex-col items-center justify-center p-2 rounded-neo border-2 border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 w-16 h-16 shadow-inner gap-1">
-          <span className="text-[10px] leading-tight text-center font-bold text-gray-500">
-            Next Hint
-          </span>
-          <span className="flex items-center text-xs font-black text-amber-600">
-            {clueTokens}/{nextHintItem.cost}
-          </span>
-          <div className="w-full h-1 bg-gray-300 rounded overflow-hidden">
-            <div 
-              className="h-full bg-amber-500 transition-all duration-300" 
-              style={{ width: `${Math.min(100, (clueTokens / nextHintItem.cost) * 100)}%` }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Clue Tokens - auto-spend as you earn (wait, now manual?) */}
+      {/* Live Score Display */}
       <motion.div
-        className="flex flex-col items-center px-3 py-2 bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-yellow-900/30 dark:to-amber-900/30 border-2 border-neo-black rounded-neo"
-        animate={clueTokens > 0 ? { scale: [1, 1.05, 1] } : {}}
-        transition={{ duration: 0.3 }}
+        className="flex flex-col items-center px-4 py-3 bg-neo-yellow border-neo border-neo-black rounded-neo shadow-hard-sm"
+        animate={isScoreAnimating ? { scale: [1, 1.15, 1] } : { scale: 1 }}
+        transition={{
+          duration: 0.4,
+          type: 'spring',
+          damping: 15,
+          stiffness: 300,
+        }}
       >
-        <div className="flex items-center gap-1">
-          <Coins
-            className={cn("w-6 h-6 text-amber-500", isClueGaining && "animate-bounce")}
-          />
-          <span className="landscape-stat-secondary text-neo-black">{clueTokens}</span>
+        <div className="landscape-stat-label text-neo-black mb-1">
+          {t('wordHunt.survival.accumulatedScore') || 'SCORE'}
         </div>
-        <div className="landscape-stat-label text-neo-black">COINS</div>
+        <div className="landscape-stat-primary text-neo-black font-black">
+          {Math.max(0, Math.round(liveScore))}
+        </div>
+
+        {/* Last increment badge */}
+        {lastScoreIncrement !== null && lastScoreIncrement > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="text-[10px] font-bold text-green-600"
+          >
+            +{Math.round(lastScoreIncrement)}
+          </motion.div>
+        )}
       </motion.div>
     </div>
   </div>

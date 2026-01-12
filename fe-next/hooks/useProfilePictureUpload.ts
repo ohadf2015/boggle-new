@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { uploadProfilePicture, removeProfilePicture } from '@/lib/supabase';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { PROFILE_AVATAR_ID } from '@/components/Avatar';
 import type { ProfileData } from '@/contexts/auth/authTypes';
 
 interface UseProfilePictureUploadOptions {
@@ -56,7 +57,8 @@ export function useProfilePictureUpload({
 
       await updateProfile({
         profile_picture_url: url,
-        profile_picture_provider: 'custom'
+        profile_picture_provider: 'custom',
+        avatar_image: PROFILE_AVATAR_ID
       });
 
       await refreshProfile();

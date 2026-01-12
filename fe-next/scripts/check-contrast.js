@@ -14,7 +14,10 @@ const PROBLEMATIC_PATTERNS = [
   // CRITICAL: Text with very low opacity (50% or below) - definitely problematic
   { pattern: /text-[a-z-]+\/[1-5]0(?!\d)/g, severity: 'high', desc: 'Text with opacity 50% or below - fix required' },
 
-  // Text with 60% opacity is borderline - flag for review
+  // Text with 60% opacity is borderline - flag for review (especially white on dark bg)
+  { pattern: /text-white\/60(?!\d)/g, severity: 'high', desc: 'White text with 60% opacity - use text-slate-300 instead' },
+  { pattern: /text-neo-white\/60(?!\d)/g, severity: 'high', desc: 'Neo-white text with 60% opacity - use text-slate-300 instead' },
+  { pattern: /text-neo-cream\/60(?!\d)/g, severity: 'high', desc: 'Neo-cream text with 60% opacity - use text-slate-300 instead' },
   { pattern: /text-[a-z-]+\/60(?!\d)/g, severity: 'medium', desc: 'Text with 60% opacity - borderline contrast' },
 
   // Element opacity is often intentional (disabled states, decorative backgrounds)

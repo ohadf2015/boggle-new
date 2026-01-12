@@ -55,10 +55,10 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
         animate={{ y: 0, opacity: 1 }}
         className="text-center space-y-1"
       >
-        <h2 className="text-xl sm:text-2xl font-black text-neo-black uppercase">
+        <h2 className="text-xl sm:text-2xl font-black text-neo-white uppercase">
           {t('onboarding.quickTips.title') || 'Quick Tips'}
         </h2>
-        <p className="text-xs sm:text-sm text-neo-black/70">
+        <p className="text-xs sm:text-sm text-neo-white/70">
           {t('onboarding.quickTips.subtitle') || 'A few things to know before you start'}
         </p>
       </motion.div>

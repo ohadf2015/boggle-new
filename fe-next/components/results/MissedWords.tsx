@@ -151,7 +151,7 @@ const MissedWords = memo<MissedWordsProps>(({
                   {hasPath && (
                     <Grid3X3 className={cn(
                       'w-3 h-3',
-                      isSelected ? 'text-neo-lime' : 'text-white/40'
+                      isSelected ? 'text-neo-lime' : 'text-slate-400'
                     )} />
                   )}
                 </motion.button>
