@@ -164,9 +164,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         >
                             {t('logo.lexi')}
                         </span>
-                        {/* CLASH - Supporting text: smaller, lime-dark for contrast */}
+                        {/* CLASH - Supporting text: smaller, cyan-muted for subtle contrast */}
                         <span
-                            className="text-base xs:text-lg sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl text-neo-lime-dark relative landscape:text-base landscape:xs:text-lg landscape:sm:text-xl"
+                            className="text-base xs:text-lg sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl text-neo-cyan-muted relative landscape:text-base landscape:xs:text-lg landscape:sm:text-xl"
                             style={{
                                 WebkitTextStroke: '1.5px #1a365d',
                                 paintOrder: 'stroke fill',
