@@ -182,7 +182,8 @@ const ja = {
     "validating": "確認中...",
     "later": "後で",
     "skip": "スキップ",
-    "done": "完了"
+    "done": "完了",
+    "clear": "クリア"
   },
   "connection": {
     "reconnecting": "戻しています...",
@@ -654,7 +655,8 @@ const ja = {
       "usingGameAvatar": "ゲームアバター",
       "tapToChange": "タップで変更",
       "continueButton": "続ける",
-      "saveButton": "保存"
+      "saveButton": "保存",
+      "selectAvatar": "アバターを選択"
     },
     "createForm": {
       "title": "作成",
@@ -2942,7 +2944,8 @@ const ja = {
       "personalBestDesc": "スタンダードチャレンジ - 進捗を追跡",
       "ultra": "ウルトラチャレンジ",
       "ultraDesc": "究極のハイスコアチャレンジ",
-      "letters": "文字"
+      "letters": "文字",
+      "advanced": "上級"
     },
     "wizard": {
       "selectMode": "ゲームモードを選択",

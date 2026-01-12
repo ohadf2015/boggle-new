@@ -6,7 +6,6 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Settings, Play, Crown, Bot, Book, Trophy, Target } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { type PresetConfig, getDefaultPreset, getPresetById } from './presetConfig';
@@ -196,21 +195,19 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
               </Card>
             )}
 
-            {/* Custom game button */}
+            {/* Custom game button - simplified and smaller */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              <Button
-                variant="outline"
-                size="lg"
+              <button
                 onClick={onCustomGame}
-                className="w-full h-14 border-3 border-slate-600 bg-slate-800 hover:bg-slate-700 text-neo-white font-bold uppercase gap-2"
+                className="w-full py-3 text-sm font-medium text-slate-400 hover:text-slate-300 transition-colors flex items-center justify-center gap-2"
               >
                 <Settings className="w-4 h-4" />
-                {t('singlePlayer.preset.customGame') || 'Custom Game Setup'}
-              </Button>
+                {t('singlePlayer.preset.advanced') || 'Advanced Settings'}
+              </button>
             </motion.div>
           </div>
         </div>
@@ -310,36 +307,21 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           </motion.div>
         )}
 
-        {/* Divider */}
-        <div className="flex items-center gap-3 my-2">
-          <div className="flex-1 h-[2px] bg-neo-black/10 dark:bg-neo-white/10 rounded" />
-          <span className="text-xs font-bold uppercase text-neo-black/50 dark:text-slate-400">
-            {t('common.or') || 'or'}
-          </span>
-          <div className="flex-1 h-[2px] bg-neo-black/10 dark:bg-neo-white/10 rounded" />
-        </div>
-
-        {/* Custom game button */}
+        {/* Custom game button - simplified and smaller */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
+          className="mt-4"
         >
-          <Button
-            variant="outline"
-            size="lg"
+          <button
             onClick={onCustomGame}
-            className="w-full h-12 border-3 border-neo-black/30 dark:border-slate-600 bg-neo-cream dark:bg-slate-700 hover:bg-neo-cream/80 dark:hover:bg-slate-600 text-neo-black dark:text-neo-white font-bold uppercase gap-2"
+            className="w-full py-2 text-xs font-medium text-neo-black/60 dark:text-slate-400 hover:text-neo-black dark:hover:text-slate-300 transition-colors flex items-center justify-center gap-1.5"
           >
-            <Settings className="w-4 h-4" />
-            {t('singlePlayer.preset.customGame') || 'Custom Game Setup'}
-          </Button>
+            <Settings className="w-3 h-3" />
+            {t('singlePlayer.preset.advanced') || 'Advanced Settings'}
+          </button>
         </motion.div>
-
-        {/* Hint text */}
-        <p className="text-center text-xs text-neo-black/50 dark:text-slate-400 pb-4">
-          {t('singlePlayer.preset.hint') || 'Tap any preset for instant play, or customize your game'}
-        </p>
       </motion.div>
     </>
   );

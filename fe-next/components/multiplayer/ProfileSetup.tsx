@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Check, Pencil } from 'lucide-react';
+import { ArrowLeft, Check, Pencil, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -11,10 +11,11 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { validateUsername, sanitizeInput } from '@/utils/validation';
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
 import EmojiAvatarPicker, { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
-import { AVATARS, getAvatarById, getAvatarPath, type AvatarConfig } from '@/utils/avatarConfig';
+import { getAvatarById, getAvatarPath, type AvatarConfig } from '@/utils/avatarConfig';
 import LandscapeIndicator from '@/components/LandscapeIndicator';
 import { cn } from '@/lib/utils';
 import { getStoredUsername, getStoredAvatarId, setStoredUsername, setStoredAvatarId } from '@/utils/profileStorage';
+import AvatarSelectorButton from '@/components/join/AvatarSelectorButton';
 
 export interface ProfileData {
   username: string;
@@ -62,6 +63,9 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
   const [avatarError, setAvatarError] = useState(false);
   const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
 
+  // Ref for auto-focus on username input
+  const usernameInputRef = useRef<HTMLInputElement>(null);
+
   // Load from localStorage on mount (only for guests)
   useEffect(() => {
     if (typeof window !== 'undefined' && !isAuthenticated) {
@@ -85,6 +89,17 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Only run when auth state changes
   }, [isAuthenticated, displayName]);
+
+  // Auto-focus username input
+  useEffect(() => {
+    if (usernameInputRef.current && !isAuthenticated) {
+      // Small delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        usernameInputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthenticated]);
 
   // Real-time validation
   const usernameValidation = useDebouncedValidation(username, {
@@ -290,45 +305,29 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                       <span className="text-red-500 ms-1">*</span>
                     </Label>
 
-                    {/* Scrollable avatar grid - shows all avatars */}
+                    {/* Compact avatar selector button */}
                     <div className={cn(
-                      "max-h-48 overflow-y-auto rounded-lg border-2 p-3 bg-white/50 dark:bg-slate-700/50 transition-colors",
+                      "p-3 rounded-lg border-2 transition-colors flex items-center gap-3",
                       avatarError
                         ? "border-red-500 bg-red-50 dark:bg-red-900/20"
-                        : "border-slate-200 dark:border-slate-600"
+                        : "border-slate-200 dark:border-slate-600 bg-white/50 dark:bg-slate-700/50"
                     )}>
-                      <div className="grid grid-cols-5 sm:grid-cols-6 gap-2">
-                        {AVATARS.map((avatar) => {
-                          const isSelected = selectedAvatarId === avatar.id;
-                          const avatarConfig = getAvatarById(avatar.id);
+                      <AvatarSelectorButton
+                        selectedAvatarId={selectedAvatarId}
+                        onAvatarSelect={handleAvatarSelect}
+                        t={t}
+                        size="lg"
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-slate-700 dark:text-slate-200">
+                          {selectedAvatarId ? getAvatarById(selectedAvatarId)?.name : (t('multiplayerFlow.profileSetup.selectAvatar') || 'Select your avatar')}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          {t('multiplayerFlow.profileSetup.tapToChange') || 'Tap to change'}
+                        </p>
+                      </div>
+                    </div>
 
-                        return (
-                          <button
-                            key={avatar.id}
-                            type="button"
-                            onClick={() => handleAvatarSelect(avatar)}
-                            className={cn(
-                              "aspect-square rounded-full border-3 shadow-hard-sm transition-all overflow-hidden",
-                              isSelected
-                                ? "border-neo-cyan scale-110 shadow-hard ring-2 ring-neo-cyan ring-offset-1"
-                                : "border-neo-black hover:scale-105"
-                            )}
-                            aria-label={`Select ${avatar.name} avatar`}
-                            aria-pressed={isSelected}
-                          >
-                            {avatarConfig && (
-                              /* eslint-disable-next-line @next/next/no-img-element */
-                              <img
-                                src={getAvatarPath(avatarConfig)}
-                                alt={avatar.name}
-                                className="w-full h-full object-cover"
-                              />
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                    </div>
                     {/* Hint or error message */}
                     {avatarError ? (
                       <p className="text-xs text-red-500 font-medium" role="alert">
@@ -357,28 +356,47 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                       </p>
                     </div>
                   ) : (
-                    // Guest user - editable input
+                    // Guest user - editable input with clear button
                     <>
-                      <Input
-                        id="profile-username"
-                        value={username}
-                        onChange={(e) => {
-                          setUsername(sanitizeInput(e.target.value, 20));
-                          if (usernameError) setUsernameError(false);
-                        }}
-                        required
-                        aria-invalid={showUsernameError ? 'true' : undefined}
-                        aria-describedby={showUsernameError ? 'username-error' : 'username-hint'}
-                        className={cn(
-                          "h-14 text-lg bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-500",
-                          getValidationClasses(
-                            usernameError ? 'invalid' : usernameValidation.state,
-                            showUsernameError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
-                          )
+                      <div className="relative">
+                        <Input
+                          ref={usernameInputRef}
+                          id="profile-username"
+                          value={username}
+                          onChange={(e) => {
+                            setUsername(sanitizeInput(e.target.value, 20));
+                            if (usernameError) setUsernameError(false);
+                          }}
+                          required
+                          aria-invalid={showUsernameError ? 'true' : undefined}
+                          aria-describedby={showUsernameError ? 'username-error' : 'username-hint'}
+                          className={cn(
+                            "h-14 text-lg pr-12 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-500",
+                            getValidationClasses(
+                              usernameError ? 'invalid' : usernameValidation.state,
+                              showUsernameError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
+                            )
+                          )}
+                          placeholder={t('multiplayerFlow.profileSetup.usernamePlaceholder') || 'Enter your name'}
+                          maxLength={20}
+                        />
+                        {username && (
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => {
+                              setUsername('');
+                              if (usernameError) setUsernameError(false);
+                              usernameInputRef.current?.focus();
+                            }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                            aria-label={t('common.clear') || 'Clear'}
+                          >
+                            <X className="h-5 w-5" />
+                          </Button>
                         )}
-                        placeholder={t('multiplayerFlow.profileSetup.usernamePlaceholder') || 'Enter your name'}
-                        maxLength={20}
-                      />
+                      </div>
                       <p id="username-hint" className="text-xs text-slate-500 dark:text-slate-400">
                         {t('multiplayerFlow.profileSetup.usernameHint') || '2-20 characters, letters and numbers'}
                       </p>

@@ -30,12 +30,12 @@ export interface RankConfig {
  */
 export const RANK_CONFIG: Record<1 | 2 | 3, RankConfig> = {
   1: {
-    bg: 'bg-neo-yellow',
-    border: 'border-neo-yellow',
+    bg: 'bg-amber-400',
+    border: 'border-amber-400',
     text: 'text-neo-black',
-    rankText: 'text-neo-yellow dark:text-neo-yellow',
+    rankText: 'text-amber-400 dark:text-amber-400',
     icon: Crown,
-    iconColor: 'text-neo-yellow',
+    iconColor: 'text-amber-400',
   },
   2: {
     bg: 'bg-slate-300',
@@ -60,7 +60,7 @@ export const RANK_CONFIG: Record<1 | 2 | 3, RankConfig> = {
  * Used by ConsolidatedPlayerCard, ResultsPlayerCard
  */
 export const RANK_COLORS_SIMPLE: Record<number, { bg: string; text: string }> = {
-  1: { bg: 'bg-neo-yellow', text: 'text-neo-black' },
+  1: { bg: 'bg-amber-400', text: 'text-neo-black' },
   2: { bg: 'bg-slate-300', text: 'text-slate-800' },
   3: { bg: 'bg-amber-500', text: 'text-neo-black' },
 };
@@ -123,7 +123,7 @@ export function getRankDisplay(rank: number): string {
  * @returns Tailwind classes for background, text, and border
  */
 export function getRankStyle(index: number): string {
-  if (index === 0) return 'bg-neo-yellow text-neo-black border-neo-black';
+  if (index === 0) return 'bg-amber-400 text-neo-black border-neo-black';
   if (index === 1) return 'bg-slate-300 text-neo-black border-neo-black';
   if (index === 2) return 'bg-amber-500 text-neo-black border-neo-black';
   return 'bg-neo-cream text-neo-black border-neo-black';
@@ -135,7 +135,7 @@ export function getRankStyle(index: number): string {
  * @returns Tailwind classes for the rank indicator box
  */
 export function getRankBoxStyle(index: number): string {
-  if (index === 0) return 'bg-neo-yellow border-neo-black';
+  if (index === 0) return 'bg-amber-400 border-neo-black';
   if (index === 1) return 'bg-slate-300 border-neo-black';
   if (index === 2) return 'bg-amber-500 border-neo-black';
   return 'bg-neo-cream border-neo-black';
@@ -147,7 +147,7 @@ export function getRankBoxStyle(index: number): string {
  * @returns Tailwind classes for the card wrapper
  */
 export function getCardStyle(index: number): string {
-  if (index === 0) return 'bg-neo-yellow border-neo-black';
+  if (index === 0) return 'bg-amber-400 border-neo-black';
   if (index === 1) return 'bg-slate-200 border-neo-black';
   if (index === 2) return 'bg-amber-500 border-neo-black';
   return 'bg-neo-cream border-neo-black';
@@ -166,10 +166,10 @@ export function getCardStyle(index: number): string {
  */
 export function getRankBgColor(rank: number, isPlayer: boolean): string {
   if (isPlayer) {
-    if (rank === 1) return 'bg-gradient-to-r from-neo-yellow to-yellow-300 border-neo-yellow';
+    if (rank === 1) return 'bg-gradient-to-r from-amber-400 to-amber-300 border-amber-400';
     return 'bg-neo-cyan/20 dark:bg-neo-cyan/30 border-neo-cyan';
   }
-  if (rank === 1) return 'bg-gradient-to-r from-neo-yellow/30 to-yellow-200/30 dark:from-neo-yellow/20 dark:to-yellow-200/20 border-neo-yellow/50';
+  if (rank === 1) return 'bg-gradient-to-r from-amber-400/30 to-amber-300/30 dark:from-amber-400/20 dark:to-amber-300/20 border-amber-400/50';
   if (rank === 2) return 'bg-gradient-to-r from-gray-200 to-gray-100 dark:from-slate-600 dark:to-slate-700 border-gray-300 dark:border-slate-500';
   if (rank === 3) return 'bg-gradient-to-r from-amber-200/50 to-amber-100/50 dark:from-amber-800/30 dark:to-amber-700/30 border-amber-300 dark:border-amber-600';
   return 'border-neo-black/20 dark:border-slate-500 bg-white dark:bg-slate-700';
@@ -187,7 +187,7 @@ export function getRankBgColor(rank: number, isPlayer: boolean): string {
  */
 export function getWaitingResultsRankStyle(index: number): string {
   if (index === 0) {
-    return 'bg-gradient-to-r from-neo-yellow via-yellow-300 to-neo-yellow text-neo-black font-black border-2 border-neo-black shadow-hard-sm';
+    return 'bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 text-neo-black font-black border-2 border-neo-black shadow-hard-sm';
   }
   if (index === 1) {
     return 'bg-gradient-to-r from-slate-300 via-slate-200 to-slate-300 text-neo-black font-bold border border-slate-400';

@@ -183,7 +183,8 @@ const en = {
     "done": "Done",
     "offline": "Offline",
     "online": "Online",
-    "sending": "Sending..."
+    "sending": "Sending...",
+    "clear": "Clear"
   },
   "connection": {
     "reconnecting": "Reconnecting...",
@@ -658,7 +659,8 @@ const en = {
       "usingGameAvatar": "Game avatar",
       "tapToChange": "Tap to change",
       "continueButton": "Continue",
-      "saveButton": "Save"
+      "saveButton": "Save",
+      "selectAvatar": "Select Avatar"
     },
     "createForm": {
       "title": "Create",
@@ -2949,7 +2951,8 @@ const en = {
       "personalBestDesc": "Standard challenge - track your progress",
       "ultra": "Ultra Challenge",
       "ultraDesc": "Ultimate high score challenge",
-      "letters": "letters"
+      "letters": "letters",
+      "advanced": "Advanced"
     },
     "wizard": {
       "selectMode": "Select Game Mode",

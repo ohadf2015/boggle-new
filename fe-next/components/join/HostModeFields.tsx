@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Dices, Pencil } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Dices, Pencil, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ import { validateUsername, validateGameCode, sanitizeInput } from '@/utils/valid
 import { useDebouncedValidation, getValidationClasses } from '@/hooks/useDebouncedValidation';
 import AvatarSelectorButton from './AvatarSelectorButton';
 import EmojiAvatarPicker, { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
-import { AVATARS, getAvatarById, type AvatarConfig } from '@/utils/avatarConfig';
+import { getAvatarById, type AvatarConfig } from '@/utils/avatarConfig';
 import { useAuth } from '@/contexts/AuthContext';
 import Avatar from '@/components/Avatar';
 import { getStoredAvatarId, setStoredAvatarId, setStoredUsername } from '@/utils/profileStorage';
@@ -62,6 +62,9 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
   const [selectedAvatarId, setSelectedAvatarId] = useState<string | undefined>(undefined);
   const [isAuthAvatarPickerOpen, setIsAuthAvatarPickerOpen] = useState(false);
 
+  // Ref for auto-focus on host username input
+  const hostUsernameInputRef = useRef<HTMLInputElement>(null);
+
   // Load avatar from profile (for auth users) or localStorage (for guests) on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -84,10 +87,16 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
     }
   }, [isAuthenticated, profile?.avatar_image]);
 
-  // Check if a name is one of the avatar default names
-  const isAvatarDefaultName = (name: string): boolean => {
-    return AVATARS.some(a => a.name === name);
-  };
+  // Auto-focus host username input for guests
+  useEffect(() => {
+    if (!isAuthenticated && !isProfileLoading && hostUsernameInputRef.current) {
+      // Small delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        hostUsernameInputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthenticated, isProfileLoading]);
 
   // Handle avatar selection
   const handleAvatarSelect = async (avatar: AvatarConfig) => {
@@ -233,26 +242,45 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
               onAvatarSelect={handleAvatarSelect}
               t={t}
             />
-            <Input
-              id="hostUsername"
-              value={hostUsername}
-              onChange={(e) => {
-                setHostUsername(sanitizeInput(e.target.value, 20));
-                if (hostUsernameError) setHostUsernameError(false);
-              }}
-              required
-              aria-invalid={showHostUsernameError ? 'true' : undefined}
-              aria-describedby={showHostUsernameError ? 'hostUsername-error' : undefined}
-              className={cn(
-                "flex-1 h-10 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 transition-colors",
-                getValidationClasses(
-                  hostUsernameError ? 'invalid' : hostUsernameValidation.state,
-                  showHostUsernameError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
-                )
+            <div className="relative flex-1">
+              <Input
+                ref={hostUsernameInputRef}
+                id="hostUsername"
+                value={hostUsername}
+                onChange={(e) => {
+                  setHostUsername(sanitizeInput(e.target.value, 20));
+                  if (hostUsernameError) setHostUsernameError(false);
+                }}
+                required
+                aria-invalid={showHostUsernameError ? 'true' : undefined}
+                aria-describedby={showHostUsernameError ? 'hostUsername-error' : undefined}
+                className={cn(
+                  "h-10 pr-10 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 transition-colors",
+                  getValidationClasses(
+                    hostUsernameError ? 'invalid' : hostUsernameValidation.state,
+                    showHostUsernameError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
+                  )
+                )}
+                placeholder={t('joinView.hostPlayerNamePlaceholder')}
+                maxLength={20}
+              />
+              {hostUsername && (
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => {
+                    setHostUsername('');
+                    if (hostUsernameError) setHostUsernameError(false);
+                    hostUsernameInputRef.current?.focus();
+                  }}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  aria-label={t('common.clear') || 'Clear'}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               )}
-              placeholder={t('joinView.hostPlayerNamePlaceholder')}
-              maxLength={20}
-            />
+            </div>
           </div>
           {showHostUsernameError && (
             <p id="hostUsername-error" className="text-xs text-red-400" role="alert">

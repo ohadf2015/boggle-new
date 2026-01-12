@@ -182,7 +182,8 @@ const he = {
     "validating": "בודק...",
     "later": "אחר כך",
     "skip": "דלג",
-    "done": "סיום"
+    "done": "סיום",
+    "clear": "נקה"
   },
   "connection": {
     "reconnecting": "מתחבר מחדש...",
@@ -655,7 +656,8 @@ const he = {
       "usingGameAvatar": "אווטאר משחק",
       "tapToChange": "לחץ לשינוי",
       "continueButton": "המשך",
-      "saveButton": "שמור"
+      "saveButton": "שמור",
+      "selectAvatar": "בחר אווטאר"
     },
     "createForm": {
       "title": "צור",
@@ -2957,7 +2959,8 @@ const he = {
       "personalBestDesc": "אתגר רגיל - עקוב אחר ההתקדמות",
       "ultra": "אתגר אולטימטיבי",
       "ultraDesc": "אתגר השיא הגבוה האולטימטיבי",
-      "letters": "אותיות"
+      "letters": "אותיות",
+      "advanced": "מתקדם"
     },
     "wizard": {
       "selectMode": "בחר מצב משחק",

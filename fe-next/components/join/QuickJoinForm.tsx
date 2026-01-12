@@ -2,7 +2,7 @@
 
 import React, { useRef, FormEvent } from 'react';
 import { motion } from 'framer-motion';
-import { Gamepad2, RefreshCw } from 'lucide-react';
+import { Gamepad2, RefreshCw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -112,23 +112,41 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
                   <Label htmlFor="username" className="text-base font-black uppercase text-neo-cream">
                     {t('joinView.enterNameToPlay')}
                   </Label>
-                  <Input
-                    ref={usernameInputRef}
-                    id="username"
-                    value={username}
-                    onChange={(e) => {
-                      setUsername(sanitizeInput(e.target.value, 20));
-                      if (usernameError) setUsernameError(false);
-                    }}
-                    required
-                    autoFocus
-                    className={cn(
-                      "h-14 text-lg bg-neo-cream text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm placeholder:text-neo-black/50 focus:border-neo-cyan focus:ring-0",
-                      usernameError && "border-neo-pink bg-neo-pink/20 text-neo-pink"
+                  <div className="relative">
+                    <Input
+                      ref={usernameInputRef}
+                      id="username"
+                      value={username}
+                      onChange={(e) => {
+                        setUsername(sanitizeInput(e.target.value, 20));
+                        if (usernameError) setUsernameError(false);
+                      }}
+                      required
+                      autoFocus
+                      className={cn(
+                        "h-14 text-lg pr-12 bg-neo-cream text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm placeholder:text-neo-black/50 focus:border-neo-cyan focus:ring-0",
+                        usernameError && "border-neo-pink bg-neo-pink/20 text-neo-pink"
+                      )}
+                      placeholder={t('joinView.playerNamePlaceholder')}
+                      maxLength={20}
+                    />
+                    {username && (
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => {
+                          setUsername('');
+                          if (usernameError) setUsernameError(false);
+                          usernameInputRef.current?.focus();
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 text-neo-black/50 hover:text-neo-black"
+                        aria-label={t('common.clear') || 'Clear'}
+                      >
+                        <X className="h-5 w-5" />
+                      </Button>
                     )}
-                    placeholder={t('joinView.playerNamePlaceholder')}
-                    maxLength={20}
-                  />
+                  </div>
                   {usernameError && (
                     <p className="text-sm text-neo-pink font-bold uppercase">
                       {t(usernameErrorKey || 'validation.usernameRequired')}

@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { ClipboardPaste, Pencil } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ClipboardPaste, Pencil, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -53,6 +53,9 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
   const [selectedAvatarId, setSelectedAvatarId] = useState<string | undefined>(undefined);
   const [isAuthAvatarPickerOpen, setIsAuthAvatarPickerOpen] = useState(false);
 
+  // Ref for auto-focus on username input
+  const usernameInputRef = useRef<HTMLInputElement>(null);
+
   // Load avatar from profile (for auth users) or localStorage (for guests) on mount
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -75,10 +78,16 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
     }
   }, [isAuthenticated, profile?.avatar_image]);
 
-  // Check if a name is one of the avatar default names
-  const isAvatarDefaultName = (name: string): boolean => {
-    return AVATARS.some(a => a.name === name);
-  };
+  // Auto-focus username input for guests
+  useEffect(() => {
+    if (!isAuthenticated && usernameInputRef.current) {
+      // Small delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        usernameInputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthenticated]);
 
   // Handle avatar selection
   const handleAvatarSelect = async (avatar: AvatarConfig) => {
@@ -279,26 +288,45 @@ const JoinModeFields: React.FC<JoinModeFieldsProps> = ({
               onAvatarSelect={handleAvatarSelect}
               t={t}
             />
-            <Input
-              id="username-main"
-              value={username}
-              onChange={(e) => {
-                setUsername(sanitizeInput(e.target.value, 20));
-                if (usernameError) setUsernameError(false);
-              }}
-              required
-              aria-invalid={showUsernameError ? 'true' : undefined}
-              aria-describedby={showUsernameError ? 'username-error' : undefined}
-              className={cn(
-                "flex-1 h-10 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 transition-colors",
-                getValidationClasses(
-                  usernameError ? 'invalid' : usernameValidation.state,
-                  showUsernameError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
-                )
+            <div className="relative flex-1">
+              <Input
+                ref={usernameInputRef}
+                id="username-main"
+                value={username}
+                onChange={(e) => {
+                  setUsername(sanitizeInput(e.target.value, 20));
+                  if (usernameError) setUsernameError(false);
+                }}
+                required
+                aria-invalid={showUsernameError ? 'true' : undefined}
+                aria-describedby={showUsernameError ? 'username-error' : undefined}
+                className={cn(
+                  "h-10 pr-10 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-slate-400 transition-colors",
+                  getValidationClasses(
+                    usernameError ? 'invalid' : usernameValidation.state,
+                    showUsernameError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
+                  )
+                )}
+                placeholder={t('joinView.playerNamePlaceholder')}
+                maxLength={20}
+              />
+              {username && (
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => {
+                    setUsername('');
+                    if (usernameError) setUsernameError(false);
+                    usernameInputRef.current?.focus();
+                  }}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  aria-label={t('common.clear') || 'Clear'}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               )}
-              placeholder={t('joinView.playerNamePlaceholder')}
-              maxLength={20}
-            />
+            </div>
           </div>
           {showUsernameError && (
             <p id="username-error" className="text-xs text-red-400" role="alert">

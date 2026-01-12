@@ -182,7 +182,8 @@ const es = {
     "validating": "Verificando...",
     "later": "Después",
     "skip": "Omitir",
-    "done": "Listo"
+    "done": "Listo",
+    "clear": "Limpiar"
   },
   "connection": {
     "reconnecting": "Te regresamos...",
@@ -651,7 +652,8 @@ const es = {
       "usingGameAvatar": "Avatar del juego",
       "tapToChange": "Cambiar",
       "continueButton": "Continuar",
-      "saveButton": "Guardar"
+      "saveButton": "Guardar",
+      "selectAvatar": "Seleccionar Avatar"
     },
     "createForm": {
       "title": "Crear Sala",
@@ -2942,7 +2944,8 @@ const es = {
       "personalBestDesc": "Desafío estándar - sigue tu progreso",
       "ultra": "Desafío Ultra",
       "ultraDesc": "Desafío definitivo de puntuación",
-      "letters": "letras"
+      "letters": "letras",
+      "advanced": "Avanzado"
     },
     "wizard": {
       "selectMode": "Seleccionar modo de juego",

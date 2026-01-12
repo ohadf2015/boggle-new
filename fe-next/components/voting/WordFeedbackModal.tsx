@@ -247,9 +247,9 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
         >
           <DialogHeader
             variant="pink"
-            className="flex-row items-center justify-between text-neo-cream"
+            className="flex-row items-center justify-between"
           >
-            <DialogTitle className="text-xl font-black uppercase tracking-tight text-neo-cream flex items-center gap-2">
+            <DialogTitle className="text-xl font-black uppercase tracking-tight text-white flex items-center gap-2">
               <Book className="w-5 h-5 text-neo-yellow" />
               {t('wordFeedback.dictionaryTitle') || 'Build Our Dictionary'}
             </DialogTitle>

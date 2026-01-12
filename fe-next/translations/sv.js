@@ -182,7 +182,8 @@ const sv = {
     "done": "Klar",
     "offline": "offline",
     "online": "online",
-    "sending": "Skickar..."
+    "sending": "Skickar...",
+    "clear": "Rensa"
   },
   "connection": {
     "reconnecting": "Återansluter...",
@@ -654,7 +655,8 @@ const sv = {
       "usingGameAvatar": "Spelavatar",
       "tapToChange": "Tryck för att ändra",
       "continueButton": "Fortsätt",
-      "saveButton": "Spara"
+      "saveButton": "Spara",
+      "selectAvatar": "Välj Avatar"
     },
     "createForm": {
       "title": "Skapa",
@@ -2945,7 +2947,8 @@ const sv = {
       "personalBestDesc": "Standardutmaning - följ dina framsteg",
       "ultra": "Ultra utmaning",
       "ultraDesc": "Ultimat högpoängsutmaning",
-      "letters": "bokstäver"
+      "letters": "bokstäver",
+      "advanced": "Avancerad"
     },
     "wizard": {
       "selectMode": "Välj spelläge",
