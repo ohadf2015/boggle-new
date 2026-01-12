@@ -2796,6 +2796,8 @@ const es = {
     "multiplayerDesc": "¡Compite con amigos en tiempo real!",
     "brainTraining": "Entrenamiento Cerebral",
     "brainTrainingDesc": "Sigue tu crecimiento cognitivo",
+    "brainDrills": "Ejercicios Rápidos",
+    "brainDrillsDesc": "Minijuegos enfocados",
     "feature": {
       "soloVsBots": "Solo vs Bots",
       "practiceMode": "Modo Práctica",

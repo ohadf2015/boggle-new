@@ -2805,6 +2805,8 @@ const en = {
     "multiplayerDesc": "Live word battles!",
     "brainTraining": "Brain Training",
     "brainTrainingDesc": "Track cognitive growth",
+    "brainDrills": "Quick Drills",
+    "brainDrillsDesc": "Focused mini-games",
     "feature": {
       "soloVsBots": "vs AI",
       "practiceMode": "Practice",

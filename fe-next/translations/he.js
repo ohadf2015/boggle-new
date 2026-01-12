@@ -2800,6 +2800,8 @@ const he = {
     "multiplayerDesc": "התחרה עם חברים בזמן אמת!",
     "brainTraining": "אימון קוגניטיבי",
     "brainTrainingDesc": "עקוב אחר התפתחות קוגניטיבית",
+    "brainDrills": "תרגולים מהירים",
+    "brainDrillsDesc": "משחקונים ממוקדים",
     "feature": {
       "soloVsBots": "נגד בוטים",
       "practiceMode": "מצב אימון",

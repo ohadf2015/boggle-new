@@ -2799,6 +2799,8 @@ const sv = {
     "multiplayerDesc": "Tävla med vänner i realtid!",
     "brainTraining": "Hjärnträning",
     "brainTrainingDesc": "Spåra kognitiv tillväxt",
+    "brainDrills": "Snabbövningar",
+    "brainDrillsDesc": "Fokuserade minispel",
     "feature": {
       "soloVsBots": "Solo mot bottar",
       "practiceMode": "Övningsläge",

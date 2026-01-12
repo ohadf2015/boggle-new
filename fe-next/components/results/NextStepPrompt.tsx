@@ -149,9 +149,9 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
             'transition-all duration-150 overflow-hidden'
           )}
         >
-          {/* Shine effect */}
+          {/* Shine effect - pointer-events-none to allow link clicks */}
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 pointer-events-none"
             animate={{ x: ['-200%', '200%'] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', repeatDelay: 2 }}
           />
@@ -268,9 +268,9 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
             'group overflow-hidden'
           )}
         >
-          {/* Button shine effect */}
+          {/* Button shine effect - pointer-events-none to allow link clicks */}
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 pointer-events-none"
             animate={{ x: ['-200%', '200%'] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1 }}
           />

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
-import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Sparkles, Star, Zap } from 'lucide-react';
+import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Sparkles, Star, Zap, Target } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -314,16 +314,12 @@ const LandingView: React.FC = () => {
           </Suspense>
         </div>
 
-        {/* Mode cards grid - horizontal in landscape/mobile portrait, 3-column layout on desktop */}
+        {/* Mode cards - horizontal in landscape/mobile portrait, centered grid on desktop */}
         {/* Using CSS animation for instant paint without JS overhead */}
-        <div className={cn(
-          'w-full animate-fade-in-fast',
-          (isLandscape || isMobilePortrait)
-            ? 'flex gap-2 sm:gap-3 flex-1 min-h-0'
-            : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5'
-        )}>
-          {/* Multiplayer Card - Featured */}
-          {(isLandscape || isMobilePortrait) ? (
+        {(isLandscape || isMobilePortrait) ? (
+          /* Landscape/Mobile Portrait: Horizontal layout */
+          <div className="w-full animate-fade-in-fast flex gap-2 sm:gap-3 flex-1 min-h-0">
+            {/* Multiplayer Card - Compact */}
             <Link
               href={`/${language}/multiplayer`}
               className={cn(
@@ -341,7 +337,6 @@ const LandingView: React.FC = () => {
             >
               <Users className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
               <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.multiplayer') || 'Multiplayer'}</span>
-              {/* Hide badges on mobile portrait for space */}
               {!isMobilePortrait && (
                 <div className="flex gap-2 text-xs" aria-hidden="true">
                   <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><LayoutGrid className="inline w-3 h-3 mr-1" />Rooms</span>
@@ -349,24 +344,8 @@ const LandingView: React.FC = () => {
                 </div>
               )}
             </Link>
-          ) : (
-            <ModeCard
-              title={t('landing.multiplayer') || 'Multiplayer'}
-              description={t('landing.multiplayerDesc') || 'Compete with friends in real-time!'}
-              href={`/${language}/multiplayer`}
-              icon={<Users className="w-6 h-6" />}
-              variant="pink"
-              liveBadge={{
-                openRooms: liveRoomStats.openRooms,
-                totalPlayers: liveRoomStats.totalPlayers,
-                roomsLabel: t('landing.openRooms') || 'open rooms',
-                playersLabel: t('landing.playersLive') || 'playing now',
-              }}
-            />
-          )}
 
-          {/* Single Player Card */}
-          {(isLandscape || isMobilePortrait) ? (
+            {/* Single Player Card - Compact */}
             <Link
               href={`/${language}/singleplayer`}
               className={cn(
@@ -384,7 +363,6 @@ const LandingView: React.FC = () => {
             >
               <User className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
               <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.singlePlayer') || 'Single Player'}</span>
-              {/* Hide badges on mobile portrait for space */}
               {!isMobilePortrait && (
                 <div className="flex gap-2 text-xs" aria-hidden="true">
                   <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Bot className="inline w-3 h-3 mr-1" />Bots</span>
@@ -392,37 +370,65 @@ const LandingView: React.FC = () => {
                 </div>
               )}
             </Link>
-          ) : (
-            <ModeCard
-              title={t('landing.singlePlayer') || 'Single Player'}
-              description={t('landing.singlePlayerDesc') || 'Practice at your own pace or challenge yourself!'}
-              href={`/${language}/singleplayer`}
-              icon={<User className="w-6 h-6" />}
-              variant="cyan"
-            />
-          )}
+          </div>
+        ) : (
+          /* Desktop: Centered grid layout */
+          <div className="w-full animate-fade-in-fast flex flex-col items-center gap-4 sm:gap-5 lg:gap-6">
+            {/* Primary cards - 2 columns, centered */}
+            <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 lg:gap-6">
+              <ModeCard
+                title={t('landing.multiplayer') || 'Multiplayer'}
+                description={t('landing.multiplayerDesc') || 'Compete with friends in real-time!'}
+                href={`/${language}/multiplayer`}
+                icon={<Users className="w-6 h-6" />}
+                variant="pink"
+                liveBadge={{
+                  openRooms: liveRoomStats.openRooms,
+                  totalPlayers: liveRoomStats.totalPlayers,
+                  roomsLabel: t('landing.openRooms') || 'open rooms',
+                  playersLabel: t('landing.playersLive') || 'playing now',
+                }}
+              />
+              <ModeCard
+                title={t('landing.singlePlayer') || 'Single Player'}
+                description={t('landing.singlePlayerDesc') || 'Practice at your own pace or challenge yourself!'}
+                href={`/${language}/singleplayer`}
+                icon={<User className="w-6 h-6" />}
+                variant="cyan"
+              />
+            </div>
 
-          {/* Brain Training Card - Hidden on landscape and mobile portrait */}
-          {!isLandscape && !isMobilePortrait && (
-            <ModeCard
-              title={t('landing.brainTraining') || 'Brain Training'}
-              description={t('landing.brainTrainingDesc') || 'Track cognitive growth'}
-              href={`/${language}/brain`}
-              icon={<Brain className="w-6 h-6" />}
-              variant="purple"
-            />
-          )}
-        </div>
+            {/* Secondary cards - 2 columns, centered, smaller */}
+            <div className="w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <ModeCard
+                title={t('landing.brainTraining') || 'Brain Training'}
+                description={t('landing.brainTrainingDesc') || 'Track cognitive growth'}
+                href={`/${language}/brain`}
+                icon={<Brain className="w-5 h-5" />}
+                variant="purple"
+                secondary
+              />
+              <ModeCard
+                title={t('landing.brainDrills') || 'Quick Drills'}
+                description={t('landing.brainDrillsDesc') || 'Focused mini-games'}
+                href={`/${language}/brain#drills`}
+                icon={<Target className="w-5 h-5" />}
+                variant="orange"
+                secondary
+              />
+            </div>
+          </div>
+        )}
 
       </main>
 
       {/* Tutorial FAB - Fixed bottom corner button */}
       {/* Z-index 45 on mobile, higher on desktop to clear any overlapping elements */}
+      {/* Position uses max() to ensure button clears safe area on devices with home indicators */}
       <button
         onClick={handleOpenTutorial}
         className="
-          fixed bottom-4 right-4 z-[45] lg:bottom-8 lg:right-8 lg:z-[100]
-          pb-[env(safe-area-inset-bottom)]
+          fixed bottom-[max(env(safe-area-inset-bottom,0px),1rem)] right-4 z-[45] lg:bottom-8 lg:right-8 lg:z-[100]
           flex items-center justify-center gap-2
           min-w-[48px] min-h-[48px]
           px-4 py-3

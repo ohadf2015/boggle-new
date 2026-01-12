@@ -21,9 +21,11 @@ interface ModeCardProps {
   description: string;
   href: string;
   icon: React.ReactNode;
-  variant: 'cyan' | 'pink' | 'purple';
+  variant: 'cyan' | 'pink' | 'purple' | 'orange';
   className?: string;
   liveBadge?: LiveBadgeProps;
+  /** Secondary cards are smaller and less prominent */
+  secondary?: boolean;
 }
 
 /**
@@ -38,6 +40,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
   variant,
   className,
   liveBadge,
+  secondary = false,
 }) => {
   const { dir } = useLanguage();
   const isRTL = dir === 'rtl';
@@ -87,6 +90,13 @@ const ModeCard: React.FC<ModeCardProps> = ({
       iconText: 'text-neo-purple-light',
       arrow: 'bg-neo-navy text-neo-purple',
     },
+    orange: {
+      bg: 'bg-gradient-to-br from-neo-orange to-amber-600',
+      hoverBg: 'hover:from-amber-400 hover:to-neo-orange',
+      iconBg: 'bg-neo-navy',
+      iconText: 'text-amber-400',
+      arrow: 'bg-neo-navy text-neo-orange',
+    },
   };
 
   const styles = variantStyles[variant];
@@ -97,8 +107,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
         ref={ref}
         className={cn(
           // Neo-Brutalist card base
-          'rounded-neo-lg border-3 border-neo-black',
-          'shadow-hard-lg',
+          'rounded-neo-lg border-neo-black',
+          secondary ? 'border-2 shadow-hard' : 'border-3 shadow-hard-lg',
           // Container query setup for responsive children
           'cq-container',
           'cursor-pointer',
@@ -117,28 +127,28 @@ const ModeCard: React.FC<ModeCardProps> = ({
           'active:shadow-hard-pressed'
         )}
         style={{
-          // Container-relative padding using cqw - larger max for desktop
-          padding: 'clamp(0.75rem, 4cqw, 1.5rem)',
+          // Container-relative padding using cqw - smaller for secondary
+          padding: secondary ? 'clamp(0.5rem, 3cqw, 1rem)' : 'clamp(0.75rem, 4cqw, 1.5rem)',
           ...tiltStyle,
         }}
         {...handlers}
       >
         {/* Header with icon, title, and arrow in one row */}
-        <div className="flex items-center gap-2 sm:gap-3 lg:gap-4" style={{ marginBottom: 'clamp(0.25rem, 1.5cqw, 0.75rem)' }}>
+        <div className={cn('flex items-center', secondary ? 'gap-2' : 'gap-2 sm:gap-3 lg:gap-4')} style={{ marginBottom: secondary ? 'clamp(0.125rem, 1cqw, 0.5rem)' : 'clamp(0.25rem, 1.5cqw, 0.75rem)' }}>
           {/* Icon - container-relative sizing */}
           <div
             className={cn(
-              'rounded-neo border-2 border-neo-black',
-              'shadow-hard-sm',
+              'rounded-neo border-neo-black',
+              secondary ? 'border shadow-hard-xs' : 'border-2 shadow-hard-sm',
               'flex items-center justify-center shrink-0',
               styles.iconBg
             )}
             style={{
-              width: 'clamp(2rem, 10cqw, 3.5rem)',
-              height: 'clamp(2rem, 10cqw, 3.5rem)',
+              width: secondary ? 'clamp(1.5rem, 8cqw, 2.5rem)' : 'clamp(2rem, 10cqw, 3.5rem)',
+              height: secondary ? 'clamp(1.5rem, 8cqw, 2.5rem)' : 'clamp(2rem, 10cqw, 3.5rem)',
             }}
           >
-            <span className={styles.iconText} style={{ fontSize: 'clamp(1rem, 5cqw, 1.75rem)' }}>
+            <span className={styles.iconText} style={{ fontSize: secondary ? 'clamp(0.75rem, 4cqw, 1.25rem)' : 'clamp(1rem, 5cqw, 1.75rem)' }}>
               {icon}
             </span>
           </div>
@@ -146,8 +156,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
           {/* Title - container-relative font size */}
           {/* drop-shadow-lg added for WCAG AA contrast compliance on gradient backgrounds */}
           <h2
-            className="font-black uppercase tracking-tight text-neo-black flex-1 min-w-0 drop-shadow-lg"
-            style={{
+            className={cn('font-black uppercase tracking-tight text-neo-black flex-1 min-w-0 drop-shadow-lg', secondary && 'text-sm sm:text-base')}
+            style={secondary ? undefined : {
               fontSize: 'clamp(1rem, 5cqw, 1.75rem)',
             }}
           >
@@ -157,37 +167,42 @@ const ModeCard: React.FC<ModeCardProps> = ({
           {/* Arrow indicator - min 44x44px touch target for WCAG compliance */}
           <div
             className={cn(
-              'min-w-[44px] min-h-[44px]',
-              'rounded-full border-2 border-neo-black',
+              secondary ? 'min-w-[36px] min-h-[36px]' : 'min-w-[44px] min-h-[44px]',
+              'rounded-full border-neo-black',
+              secondary ? 'border' : 'border-2',
               'flex items-center justify-center shrink-0',
               'transition-transform duration-200 ease-out',
               isRTL ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1',
               styles.arrow
             )}
             style={{
-              width: 'clamp(2.75rem, 8cqw, 3.25rem)',
-              height: 'clamp(2.75rem, 8cqw, 3.25rem)',
+              width: secondary ? 'clamp(2rem, 6cqw, 2.5rem)' : 'clamp(2.75rem, 8cqw, 3.25rem)',
+              height: secondary ? 'clamp(2rem, 6cqw, 2.5rem)' : 'clamp(2.75rem, 8cqw, 3.25rem)',
             }}
           >
-            <ArrowIcon style={{ fontSize: 'clamp(0.75rem, 3.5cqw, 1rem)' }} />
+            <ArrowIcon style={{ fontSize: secondary ? 'clamp(0.625rem, 3cqw, 0.875rem)' : 'clamp(0.75rem, 3.5cqw, 1rem)' }} />
           </div>
         </div>
 
         {/* Description - container-relative font size */}
         {/* drop-shadow-md added for WCAG AA contrast compliance on gradient backgrounds */}
-        <p
-          className="font-medium text-neo-black drop-shadow-md"
-          style={{
-            fontSize: 'clamp(0.75rem, 3cqw, 1.125rem)',
-            marginBottom: 'clamp(0.375rem, 2cqw, 1rem)',
-          }}
-        >
-          {description}
-        </p>
+        {/* Hide description for secondary cards to keep them compact */}
+        {!secondary && (
+          <p
+            className="font-medium text-neo-black drop-shadow-md"
+            style={{
+              fontSize: 'clamp(0.75rem, 3cqw, 1.125rem)',
+              marginBottom: 'clamp(0.375rem, 2cqw, 1rem)',
+            }}
+          >
+            {description}
+          </p>
+        )}
 
         {/* Live Badge - shows open rooms and players only when meaningful (> 5) */}
         {/* Using bg-neo-cream for WCAG AA compliant contrast (19.8:1 vs neo-black) */}
-        {liveBadge && (liveBadge.openRooms > 5 || liveBadge.totalPlayers > 5) && (
+        {/* Hide live badge for secondary cards */}
+        {!secondary && liveBadge && (liveBadge.openRooms > 5 || liveBadge.totalPlayers > 5) && (
           <div className="flex flex-wrap" style={{ gap: 'clamp(0.375rem, 1.5cqw, 0.5rem)' }}>
             {liveBadge.openRooms > 5 && (
               <span

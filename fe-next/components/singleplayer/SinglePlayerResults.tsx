@@ -687,22 +687,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         />
       )}
 
-      {/* Achievements - Inline badges */}
-      {results.achievements && results.achievements.length > 0 && (
-        <div className="flex flex-wrap gap-2 justify-center">
-          {results.achievements.slice(0, 4).map((ach, i) => (
-            <AchievementBadge key={ach.key} achievement={ach} index={i} />
-          ))}
-          {results.achievements.length > 4 && (
-            <button
-              onClick={() => setMobileActiveTab('details')}
-              className="text-xs text-neo-cyan underline font-bold"
-            >
-              +{results.achievements.length - 4} more
-            </button>
-          )}
-        </div>
-      )}
+      {/* Achievements moved to Details tab for mobile - see renderDetailsTab() */}
 
       {/* Action Buttons */}
       <NextStepPrompt

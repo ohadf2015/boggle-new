@@ -2798,6 +2798,8 @@ const ja = {
     "multiplayerDesc": "リアルタイムで友達と対戦！",
     "brainTraining": "脳トレーニング",
     "brainTrainingDesc": "認知成長を追跡",
+    "brainDrills": "クイックドリル",
+    "brainDrillsDesc": "集中ミニゲーム",
     "feature": {
       "soloVsBots": "ボット対戦",
       "practiceMode": "練習モード",
