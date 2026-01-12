@@ -23,15 +23,21 @@ import {
 jest.mock('@radix-ui/react-dialog', () => {
   const React = require('react');
 
-  const MockOverlay = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-    ({ className, ...props }, ref) => (
+  const MockOverlay = React.forwardRef(
+    (
+      { className, ...props }: React.HTMLAttributes<HTMLDivElement>,
+      ref: React.Ref<HTMLDivElement>
+    ) => (
       <div ref={ref} className={className} data-testid="dialog-overlay" {...props} />
     )
   );
   MockOverlay.displayName = 'MockOverlay';
 
-  const MockContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-    ({ className, children, ...props }, ref) => (
+  const MockContent = React.forwardRef(
+    (
+      { className, children, ...props }: React.HTMLAttributes<HTMLDivElement>,
+      ref: React.Ref<HTMLDivElement>
+    ) => (
       <div ref={ref} className={className} data-testid="dialog-content" {...props}>
         {children}
       </div>
@@ -39,8 +45,11 @@ jest.mock('@radix-ui/react-dialog', () => {
   );
   MockContent.displayName = 'MockContent';
 
-  const MockTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
-    ({ className, children, ...props }, ref) => (
+  const MockTitle = React.forwardRef(
+    (
+      { className, children, ...props }: React.HTMLAttributes<HTMLHeadingElement>,
+      ref: React.Ref<HTMLHeadingElement>
+    ) => (
       <h2 ref={ref} className={className} data-testid="dialog-title" {...props}>
         {children}
       </h2>
@@ -48,8 +57,11 @@ jest.mock('@radix-ui/react-dialog', () => {
   );
   MockTitle.displayName = 'MockTitle';
 
-  const MockDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
-    ({ className, children, ...props }, ref) => (
+  const MockDescription = React.forwardRef(
+    (
+      { className, children, ...props }: React.HTMLAttributes<HTMLParagraphElement>,
+      ref: React.Ref<HTMLParagraphElement>
+    ) => (
       <p ref={ref} className={className} data-testid="dialog-description" {...props}>
         {children}
       </p>

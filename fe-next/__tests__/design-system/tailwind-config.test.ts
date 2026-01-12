@@ -7,8 +7,13 @@
 
 import tailwindConfig from '../../tailwind.config';
 
+type ColorObject = Record<string, string>;
+type BackgroundImageObject = Record<string, string>;
+type BoxShadowObject = Record<string, string | string[]>;
+
 describe('Tailwind Configuration - Brand Colors', () => {
-  const brandColors = tailwindConfig.theme?.extend?.colors?.brand;
+  const colors = tailwindConfig.theme?.extend?.colors;
+  const brandColors = (typeof colors === 'function' ? undefined : colors?.brand) as ColorObject | undefined;
 
   test('Brand colors should be defined', () => {
     expect(brandColors).toBeDefined();
@@ -62,7 +67,8 @@ describe('Tailwind Configuration - Brand Colors', () => {
 });
 
 describe('Tailwind Configuration - Gradient Presets', () => {
-  const gradients = tailwindConfig.theme?.extend?.backgroundImage;
+  const backgroundImage = tailwindConfig.theme?.extend?.backgroundImage;
+  const gradients = (typeof backgroundImage === 'function' ? undefined : backgroundImage) as BackgroundImageObject | undefined;
 
   test('Gradient presets should be defined', () => {
     expect(gradients).toBeDefined();
@@ -126,7 +132,8 @@ describe('Tailwind Configuration - Custom Plugin', () => {
 
 describe('Tailwind Configuration - Backward Compatibility', () => {
   test('Neo-Brutalist color palette should still exist', () => {
-    const neoColors = tailwindConfig.theme?.extend?.colors?.neo;
+    const colors = tailwindConfig.theme?.extend?.colors;
+    const neoColors = (typeof colors === 'function' ? undefined : colors?.neo) as ColorObject | undefined;
     expect(neoColors).toBeDefined();
     expect(neoColors?.yellow).toBe('var(--neo-yellow)');
     expect(neoColors?.pink).toBe('var(--neo-pink)');
@@ -134,7 +141,8 @@ describe('Tailwind Configuration - Backward Compatibility', () => {
   });
 
   test('Avatar numeric colors should still exist', () => {
-    const avatarColors = tailwindConfig.theme?.extend?.colors?.avatar;
+    const colors = tailwindConfig.theme?.extend?.colors;
+    const avatarColors = (typeof colors === 'function' ? undefined : colors?.avatar) as ColorObject | undefined;
     expect(avatarColors).toBeDefined();
     expect(avatarColors?.['1']).toBeDefined();
     expect(avatarColors?.['10']).toBeDefined();
@@ -142,7 +150,8 @@ describe('Tailwind Configuration - Backward Compatibility', () => {
   });
 
   test('Hard shadow utilities should still exist', () => {
-    const shadows = tailwindConfig.theme?.extend?.boxShadow;
+    const boxShadow = tailwindConfig.theme?.extend?.boxShadow;
+    const shadows = (typeof boxShadow === 'function' ? undefined : boxShadow) as BoxShadowObject | undefined;
     expect(shadows).toBeDefined();
     expect(shadows?.['hard']).toBeDefined();
     expect(shadows?.['hard-lg']).toBeDefined();
