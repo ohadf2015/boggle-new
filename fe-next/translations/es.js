@@ -91,6 +91,9 @@ const es = {
     "connectionLost": "Conexión perdida",
     "notConnected": "Sin conexión",
     "connected": "Conectado",
+    "offline": "sin conexión",
+    "online": "en línea",
+    "sending": "Enviando...",
     "coins": "monedas",
     "chat": "Chat",
     "connecting": "Conectando...",
@@ -1202,7 +1205,7 @@ const es = {
     "ready": "¡Listo!",
     "waiting": "Esperando...",
     "allPlayersReady": "¡Todos los jugadores están listos! El anfitrión puede comenzar la siguiente ronda.",
-    "imReady": "¡Estoy listo!",
+    "imReady": "Listo para el siguiente",
     "youAreReady": "¡Estás listo!",
     "waitingForOthersToReady": "Esperando a que otros se marquen como listos...",
     "waitingForHostToStart": "Esperando a que el anfitrión inicie la siguiente ronda...",
@@ -2116,7 +2119,9 @@ const es = {
       "comboBonus": "Bonus de Combo",
       "fireBonus": "Bonus de Fuego",
       "uniqueWords": "Palabras Únicas",
-      "avgWordLength": "Long. Promedio de Palabra"
+      "avgWordLength": "Long. Promedio de Palabra",
+      "games": "partidas",
+      "level": "nivel"
     }
   },
   "profile": {
@@ -3583,7 +3588,64 @@ const es = {
     "multiplayer": "Multijugador"
   },
   "friends": {
-    "title": "Amigos"
+    "title": "Amigos",
+    "add": "Agregar",
+    "addFriend": "Agregar Amigo",
+    "addFriendsToChallenge": "Agrega amigos para desafiarlos",
+    "challenge": "Desafiar",
+    "friend": "amigo",
+    "noFriendsYet": "Aún no tienes amigos",
+    "noPendingRequests": "No hay solicitudes pendientes",
+    "noUsersFound": "No encontramos usuarios",
+    "pending": "Pendiente",
+    "pendingRequests": "Solicitudes Pendientes",
+    "remove": "Eliminar",
+    "requests": "Solicitudes",
+    "searchByUsername": "Busca por nombre de usuario",
+    "sentRequests": "Solicitudes Enviadas",
+    "signInRequired": "Debes iniciar sesión",
+    "typeAtLeast2Chars": "Escribe al menos 2 caracteres",
+    "messages": "Mensajes",
+    "noMessages": "Aún no hay mensajes",
+    "startConversation": "¡Inicia una conversación!",
+    "typeMessage": "Escribe un mensaje...",
+    "sendMessage": "Enviar",
+    "messageLimit": "{current}/{max} caracteres",
+
+    "challenges": {
+      "send": "Enviar Desafío",
+      "accept": "Aceptar",
+      "decline": "Rechazar",
+      "pending": "Desafío Pendiente",
+      "expired": "Desafío Expirado",
+      "inviteMessage": "¡{username} te desafía a un juego!",
+      "settings": "Configuración del Juego",
+      "customMessage": "Añade un mensaje (opcional)",
+      "created": "¡Desafío enviado!",
+      "accepted": "¡{username} aceptó tu desafío!"
+    },
+
+    "notifications": {
+      "newMessage": "Nuevo mensaje de {username}",
+      "newChallenge": "¡{username} te envió un desafío!",
+      "challengeAccepted": "¡{username} aceptó tu desafío!"
+    },
+
+    "errors": {
+      "sendFailed": "Error al enviar mensaje",
+      "notFriends": "Debes ser amigo para enviar mensajes",
+      "rateLimited": "¡Despacio! Demasiados mensajes",
+      "messageEmpty": "El mensaje no puede estar vacío",
+      "messageTooLong": "El mensaje es demasiado largo"
+    }
+  },
+  "multiplayer": {
+    "mode": "Modo",
+    "timer": "Tiempo"
+  },
+  "stats": {
+    "games": "partidas",
+    "level": "nivel"
   },
   "reveal": {
     "revealWord": "Revelar",

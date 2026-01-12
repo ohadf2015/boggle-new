@@ -179,9 +179,17 @@ export default function MultiplayerPage(): React.JSX.Element {
 
   // Check if we should show the training gateway for new players
   // Only show on initial load, not when returning from an active game
+  // IMPORTANT: Don't show when joining via invitation link - let them join directly
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (isActive || showResults) return; // Don't show during/after game
+
+    // Check if player is joining via invitation link
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomFromUrl = urlParams.get('room');
+
+    // Skip training gateway if joining via invitation - let them join directly
+    if (roomFromUrl) return;
 
     // Check if player should see training gateway
     const shouldShow = shouldShowTrainingGateway();
@@ -372,11 +380,11 @@ export default function MultiplayerPage(): React.JSX.Element {
 
     // For existing connected sockets, set state immediately and request active rooms
     if (isReusingSocket) {
-      Promise.resolve().then(() => {
-        setSocket(socketInstance);
-        setIsConnected(true);
-        socketInstance.emit('getActiveRooms');
-      });
+      // Set state synchronously to avoid race condition with handleJoin
+      setSocket(socketInstance);
+      setIsConnected(true);
+      // Emit after state is set (can be sync since socket is already connected)
+      socketInstance.emit('getActiveRooms');
     }
 
     // Remove any existing listeners before adding new ones (prevents duplicates on re-mount)

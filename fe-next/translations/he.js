@@ -95,6 +95,9 @@ const he = {
     "chat": "צ'אט",
     "connecting": "מתחבר...",
     "signIn": "התחבר",
+    "online": "מחובר 🟢",
+    "offline": "לא מחובר",
+    "sending": "שולח...",
     "connectedToServer": "מוכן לקרב!",
     "connectingToServer": "מתחמם...",
     "duplicateWarning": "מילים משותפות = אפס נקודות!",
@@ -707,6 +710,14 @@ const he = {
       "joining": "מצטרף..."
     }
   },
+  "multiplayer": {
+    "mode": "מצב משחק",
+    "timer": "טיימר"
+  },
+  "stats": {
+    "games": "משחקים",
+    "level": "רמה"
+  },
   "hostView": {
     "waitingForPlayers": "ממתין...",
     "startGame": "התחל",
@@ -728,6 +739,7 @@ const he = {
     "min": "דק׳",
     "difficulty": "רמת קושי",
     "timer": "טיימר",
+    "mode": "מצב משחק",
     "roundDuration": "משך סיבוב",
     "minutes": "דקות",
     "playerJoinedLate": "הצטרף למשחק באמצע!",
@@ -1206,7 +1218,7 @@ const he = {
     "ready": "מוכן!",
     "waiting": "ממתין...",
     "allPlayersReady": "כל השחקנים מוכנים! המארח יכול להתחיל סיבוב חדש.",
-    "imReady": "אני מוכן!",
+    "imReady": "מוכן למשחק הבא",
     "youAreReady": "אתה מוכן!",
     "waitingForOthersToReady": "ממתין לאחרים לסמן מוכן...",
     "waitingForHostToStart": "ממתין למארח להתחיל את הסיבוב הבא...",
@@ -1328,7 +1340,9 @@ const he = {
       "comboBonus": "בונוס קומבו",
       "fireBonus": "בונוס אש",
       "uniqueWords": "מילים ייחודיות",
-      "avgWordLength": "אורך מילה ממוצע"
+      "avgWordLength": "אורך מילה ממוצע",
+      "games": "משחקים",
+      "level": "רמה"
     }
   },
   "playerTitles": {
@@ -2434,6 +2448,8 @@ const he = {
     "stats": "סטטיסטיקה",
     "memberSince": "חבר מאז",
     "totalGames": "משחקים",
+    "games": "משחקים",
+    "level": "רמה",
     "wins": "ניצחונות",
     "wordsFound": "מילים שנמצאו",
     "totalScore": "ניקוד כולל",
@@ -3580,7 +3596,57 @@ const he = {
     "multiplayer": "מרובה משתתפים"
   },
   "friends": {
-    "title": "חברים"
+    "title": "חברים",
+    "messages": "הודעות",
+    "noMessages": "עדיין אין הודעות",
+    "startConversation": "התחל שיחה!",
+    "typeMessage": "כתוב הודעה...",
+    "sendMessage": "שלח",
+    "messageLimit": "{current}/{max} תווים",
+
+    "add": "הוסף",
+    "addFriend": "הוסף חבר",
+    "addFriendsToChallenge": "הוסף חברים כדי לאתגר",
+    "challenge": "אתגר",
+    "friend": "חבר",
+    "noFriendsYet": "עוד אין לך חברים",
+    "noPendingRequests": "אין בקשות ממתינות",
+    "noUsersFound": "לא נמצאו משתמשים",
+    "pending": "ממתין",
+    "pendingRequests": "בקשות ממתינות",
+    "remove": "הסר",
+    "requests": "בקשות",
+    "searchByUsername": "חפש לפי שם משתמש",
+    "sentRequests": "בקשות שנשלחו",
+    "signInRequired": "צריך להתחבר כדי לראות חברים",
+    "typeAtLeast2Chars": "הקלד לפחות 2 תווים",
+
+    "challenges": {
+      "send": "שלח אתגר",
+      "accept": "קבל",
+      "decline": "דחה",
+      "pending": "אתגר ממתין",
+      "expired": "אתגר פג תוקף",
+      "inviteMessage": "{username} מאתגר אותך למשחק!",
+      "settings": "הגדרות משחק",
+      "customMessage": "הוסף הודעה (אופציונלי)",
+      "created": "אתגר נשלח!",
+      "accepted": "{username} קיבל את האתגר שלך!"
+    },
+
+    "notifications": {
+      "newMessage": "הודעה חדשה מ-{username}",
+      "newChallenge": "{username} שלח לך אתגר!",
+      "challengeAccepted": "{username} קיבל את האתגר שלך!"
+    },
+
+    "errors": {
+      "sendFailed": "שליחת ההודעה נכשלה",
+      "notFriends": "אתה חייב להיות חבר כדי לשלוח הודעות",
+      "rateLimited": "תרגע! יותר מדי הודעות",
+      "messageEmpty": "ההודעה לא יכולה להיות ריקה",
+      "messageTooLong": "ההודעה ארוכה מדי"
+    }
   },
   "reveal": {
     "revealWord": "חשוף",

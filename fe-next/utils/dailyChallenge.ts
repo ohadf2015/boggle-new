@@ -2938,9 +2938,13 @@ export async function syncGuestDailyResultsToAccount(
           continue;
         }
 
+        // Recalculate puzzle number from date to ensure consistency
+        // Stored puzzle numbers might be stale or calculated with different logic
+        const validatedPuzzleNumber = getPuzzleNumber(puzzleDate);
+
         const bodyData: Record<string, unknown> = {
           puzzleDate,
-          puzzleNumber,
+          puzzleNumber: validatedPuzzleNumber,
           language,
           playerId: userId,
           guestFingerprint: null, // Now authenticated, use player ID

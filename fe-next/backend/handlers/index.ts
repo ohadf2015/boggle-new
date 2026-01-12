@@ -12,6 +12,9 @@ const { registerChatHandlers } = require('./chatHandler');
 const { registerBotHandlers } = require('./botHandler');
 const { registerTournamentHandlers } = require('./tournamentHandler');
 const { registerPresenceHandlers, startConnectionHealthCheck } = require('./presenceHandler');
+const { registerFriendsHandlers } = require('./friendsHandler');
+const { registerFriendMessagingHandlers } = require('./friendMessagingHandler');
+const { registerFriendChallengeHandlers } = require('./friendChallengeHandler');
 const { registerHostHandlers } = require('./hostHandler');
 const { registerConnectionHandlers } = require('./connectionHandler');
 const { registerHintHandlers } = require('./hintHandler');
@@ -42,6 +45,9 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   registerBotHandlers(io, socket);
   registerTournamentHandlers(io, socket);
   registerPresenceHandlers(io, socket);
+  registerFriendsHandlers(io, socket);
+  registerFriendMessagingHandlers(io, socket);
+  registerFriendChallengeHandlers(io, socket);
   registerHostHandlers(io, socket);
   registerConnectionHandlers(io, socket);
   registerHintHandlers(io, socket);
@@ -61,6 +67,9 @@ module.exports = {
   registerBotHandlers,
   registerTournamentHandlers,
   registerPresenceHandlers,
+  registerFriendsHandlers,
+  registerFriendMessagingHandlers,
+  registerFriendChallengeHandlers,
   registerHostHandlers,
   registerConnectionHandlers,
   registerHintHandlers,
@@ -93,6 +102,9 @@ export {
   registerBotHandlers,
   registerTournamentHandlers,
   registerPresenceHandlers,
+  registerFriendsHandlers,
+  registerFriendMessagingHandlers,
+  registerFriendChallengeHandlers,
   registerHostHandlers,
   registerConnectionHandlers,
   registerHintHandlers,

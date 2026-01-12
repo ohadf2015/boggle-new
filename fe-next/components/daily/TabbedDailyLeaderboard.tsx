@@ -666,7 +666,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className={`
-        bg-white/95 dark:bg-neo-navy/95
+        bg-white/95 dark:bg-slate-800/95
         rounded-2xl border-2 border-slate-200 dark:border-slate-700
         ${compact ? 'p-3' : 'p-4 sm:p-5'}
         shadow-lg backdrop-blur-sm
@@ -691,7 +691,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
                   {todayGuestCount > 0 && (
                     <>
                       <span className="mx-1.5">•</span>
-                      <span className="text-slate-500 dark:text-slate-500">
+                      <span className="text-slate-500 dark:text-slate-400">
                         {todayGuestCount} {todayGuestCount === 1 ? t('daily.guestSingular') || 'guest' : t('daily.guestsPlural') || 'guests'}
                       </span>
                     </>

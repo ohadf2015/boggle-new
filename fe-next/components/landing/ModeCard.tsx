@@ -121,20 +121,21 @@ const ModeCard: React.FC<ModeCardProps> = ({
         secondary ? 'border-2 shadow-hard' : 'border-3 shadow-hard-lg',
         // Container query setup for responsive children
         'cq-container',
-        'cursor-pointer',
+        locked ? 'cursor-not-allowed' : 'cursor-pointer',
         'relative overflow-hidden',
         // Full height to fill grid cell
         'h-full',
-        // Colors
+        // Colors - dimmed when locked with reduced opacity for accessibility
+        locked ? 'opacity-90' : '',
         styles.bg,
-        styles.hoverBg,
+        !locked && styles.hoverBg,
         // Transitions - improved easing
         'transition-shadow duration-200 ease-out',
-        // Active effect - press down
-        isRTL
+        // Active effect - press down (only when not locked)
+        !locked && (isRTL
           ? 'active:translate-x-[-1px] active:translate-y-[1px]'
-          : 'active:translate-x-[1px] active:translate-y-[1px]',
-        'active:shadow-hard-pressed'
+          : 'active:translate-x-[1px] active:translate-y-[1px]'),
+        !locked && 'active:shadow-hard-pressed'
       )}
       style={{
         // Container-relative padding using cqw - smaller for secondary
@@ -165,8 +166,13 @@ const ModeCard: React.FC<ModeCardProps> = ({
 
         {/* Title - container-relative font size */}
         {/* drop-shadow-lg added for WCAG AA contrast compliance on gradient backgrounds */}
+        {/* White text for locked state for better contrast on dimmed purple background */}
         <h2
-          className={cn('font-black uppercase tracking-tight text-neo-black flex-1 min-w-0 drop-shadow-lg', secondary && 'text-sm sm:text-base')}
+          className={cn(
+            'font-black uppercase tracking-tight flex-1 min-w-0 drop-shadow-lg',
+            locked ? 'text-neo-white' : 'text-neo-black',
+            secondary && 'text-sm sm:text-base'
+          )}
           style={secondary ? undefined : {
             fontSize: 'clamp(1rem, 5cqw, 1.75rem)',
           }}
@@ -200,10 +206,14 @@ const ModeCard: React.FC<ModeCardProps> = ({
 
       {/* Description - container-relative font size */}
       {/* drop-shadow-md added for WCAG AA contrast compliance on gradient backgrounds */}
+      {/* White text for locked state for better contrast */}
       {/* Hide description for secondary cards to keep them compact */}
       {!secondary && (
         <p
-          className="font-medium text-neo-black drop-shadow-md"
+          className={cn(
+            'font-medium drop-shadow-md',
+            locked ? 'text-neo-white' : 'text-neo-black'
+          )}
           style={{
             fontSize: 'clamp(0.75rem, 3cqw, 1.125rem)',
             marginBottom: 'clamp(0.375rem, 2cqw, 1rem)',
@@ -269,8 +279,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
           <span
             className={cn(
               'inline-flex items-center gap-1.5 px-2 py-1',
-              'bg-neo-black/90 text-neo-white font-bold rounded-neo',
-              'border border-neo-white/20',
+              'bg-neo-lime text-neo-black font-bold rounded-neo',
+              'border-2 border-neo-black shadow-hard-xs',
               'text-xs sm:text-sm'
             )}
           >

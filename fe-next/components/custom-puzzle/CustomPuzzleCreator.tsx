@@ -96,7 +96,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
     setValidationStatus(result.status);
   }, []);
 
-  // Generate grid with target word embedded
+  // Generate grid with target word embedded (always 7x7 for custom puzzles)
   const generateGrid = useCallback(async (targetWord: string): Promise<LetterGrid | null> => {
     try {
       const response = await fetch('/api/grid/generate', {
@@ -105,7 +105,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
         body: JSON.stringify({
           language,
           targetWord,
-          gridSize: { rows: 4, cols: 4 },
+          gridSize: { rows: 7, cols: 7 },
         }),
       });
 

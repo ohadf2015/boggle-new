@@ -1,17 +1,19 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Users, Plus, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Users, Plus, RefreshCw, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LANGUAGE_FLAGS } from '@/lib/languageConfig';
 import type { ActiveRoom } from '@/shared/types/game';
 import LandscapeIndicator from '@/components/LandscapeIndicator';
+import HowToPlay from '@/components/HowToPlay';
 
 interface RoomListViewProps {
   activeRooms: ActiveRoom[];
@@ -33,6 +35,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
   onCreateRoom,
 }) => {
   const { t, dir } = useLanguage();
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   // Pull-to-refresh for room list
   const { pullToRefreshHandlers, pullState } = usePullToRefresh({
@@ -184,7 +187,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             )}
           </div>
 
-          {/* Create Room Button - Fixed at bottom (only when rooms exist) */}
+          {/* Action Buttons - Fixed at bottom (only when rooms exist) */}
           {hasRooms && (
             <motion.div
               initial={{ y: 20, opacity: 0 }}
@@ -192,12 +195,25 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               transition={{ delay: 0.3 }}
               className="fixed bottom-4 lg:bottom-6 left-2 right-2 sm:left-3 sm:right-3 lg:left-4 lg:right-4 z-10"
             >
-              <div className="max-w-2xl mx-auto">
+              <div className="max-w-2xl mx-auto flex gap-2 lg:gap-3">
+                {/* How to Play Button */}
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => setShowHowToPlay(true)}
+                  className="py-4 lg:py-5 text-base lg:text-lg font-bold uppercase shadow-hard-lg border-3 lg:border-4 border-neo-black bg-neo-purple hover:bg-neo-purple/90 text-neo-white"
+                  aria-label={t('landing.tutorial') || 'How to Play'}
+                >
+                  <HelpCircle className="w-5 h-5 lg:w-6 lg:h-6" />
+                  <span className="hidden sm:inline ms-2">{t('landing.tutorial') || 'How to Play'}</span>
+                </Button>
+
+                {/* Create Room Button */}
                 <Button
                   variant="success"
                   size="lg"
                   onClick={onCreateRoom}
-                  className="w-full py-4 lg:py-5 text-base lg:text-lg font-bold uppercase shadow-hard-lg"
+                  className="flex-1 py-4 lg:py-5 text-base lg:text-lg font-bold uppercase shadow-hard-lg"
                 >
                   <Plus className="w-5 h-5 lg:w-6 lg:h-6 me-2" />
                   {t('multiplayerFlow.roomList.createButton') || 'Create Room'}
@@ -206,6 +222,18 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             </motion.div>
           )}
         </div>
+
+        {/* How to Play Dialog */}
+        <Dialog open={showHowToPlay} onOpenChange={setShowHowToPlay}>
+          <DialogContent noDescription className="max-w-3xl max-h-[90vh] overflow-hidden p-0">
+            <DialogHeader className="sr-only">
+              <DialogTitle>{t('landing.tutorial') || 'How to Play'}</DialogTitle>
+            </DialogHeader>
+            <div className="overflow-y-auto max-h-[85vh]">
+              <HowToPlay onClose={() => setShowHowToPlay(false)} />
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </>
   );

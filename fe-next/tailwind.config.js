@@ -396,6 +396,36 @@ module.exports = {
             boxShadow: "0 0 10px rgba(139, 92, 246, 0.5), 0 0 20px rgba(139, 92, 246, 0.25), 4px 4px 0 #000",
           },
         },
+        // Blink animation for hint trail (quick flash effect)
+        "hint-blink": {
+          "0%, 100%": {
+            opacity: "1",
+            transform: "scale(1)",
+          },
+          "25%": {
+            opacity: "0.4",
+            transform: "scale(0.98)",
+          },
+          "50%": {
+            opacity: "1",
+            transform: "scale(1)",
+          },
+          "75%": {
+            opacity: "0.5",
+            transform: "scale(0.99)",
+          },
+        },
+        // Fade out animation for hint trail
+        "hint-fadeout": {
+          "0%": {
+            opacity: "1",
+            transform: "scale(1)",
+          },
+          "100%": {
+            opacity: "0",
+            transform: "scale(0.95)",
+          },
+        },
         // Fast fade-in for instant paint optimization
         "fade-in-fast": {
           "0%": { opacity: "0.6" },
@@ -420,6 +450,8 @@ module.exports = {
         "neo-shake": "neo-shake 0.4s ease-in-out",
         "pulse-subtle": "pulse-subtle 2s ease-in-out infinite",
         "hint-glow": "hint-glow 2.5s ease-in-out infinite",
+        "hint-blink": "hint-blink 1.5s ease-in-out 2",
+        "hint-fadeout": "hint-fadeout 1s ease-out forwards",
         "keyboard-focus": "keyboard-focus 1.5s ease-in-out infinite",
         // Fast animations for landing page optimization
         "fade-in-fast": "fade-in-fast 0.15s ease-out forwards",

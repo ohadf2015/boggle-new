@@ -1,23 +1,19 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users,
   UserPlus,
   Search,
-  Check,
-  X,
   Loader2,
   Target,
-  Trophy,
   Circle,
   Bell,
-  ChevronRight,
   MessageCircle,
   UserMinus,
 } from 'lucide-react';
 import { useFriends } from '@/hooks/useFriends';
+import { useFriendMessages } from '@/hooks/useFriendMessages';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -25,7 +21,14 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Avatar from '@/components/Avatar';
-import type { Friend, FriendRequest, FriendChallenge } from '@/utils/friends';
+import { FriendRow } from './FriendRow';
+import { RequestRow } from './RequestRow';
+import { ChallengeRow } from './ChallengeRow';
+import { MessageThreadList } from './messaging/MessageThreadList';
+import { MessageThread } from './messaging/MessageThread';
+import { ChallengeInviteDialog } from './ChallengeInviteDialog';
+import type { Friend } from '@/utils/friends';
+import type { MessageThread as MessageThreadType } from '@/shared/types/friends';
 
 interface FriendsListProps {
   onChallengeClick?: (friend: Friend) => void;
@@ -33,14 +36,16 @@ interface FriendsListProps {
   className?: string;
 }
 
+type TabType = 'friends' | 'requests' | 'messages';
+
 /**
  * FriendsList - Comprehensive friend management component
  *
  * Features:
+ * - Tab navigation: Friends, Requests, Messages
  * - Friends list with online status indicators
  * - Pending friend requests (incoming/outgoing)
- * - Direct challenge notifications
- * - Search and add friends
+ * - Direct messaging with real-time updates
  * - Challenge friends directly
  */
 const FriendsList: React.FC<FriendsListProps> = ({
@@ -48,9 +53,9 @@ const FriendsList: React.FC<FriendsListProps> = ({
   compact = false,
   className,
 }) => {
-  const { language } = useLanguage();
+  const { t, language } = useLanguage();
   const { theme } = useTheme();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, profile } = useAuth();
   const isDark = theme === 'dark';
 
   const {
@@ -64,16 +69,28 @@ const FriendsList: React.FC<FriendsListProps> = ({
     declineRequest,
     unfriend,
     search,
-    refresh,
   } = useFriends();
 
+  const {
+    threads,
+    messages,
+    unreadCount,
+    sendMessage,
+    loadMessages,
+    markAsRead,
+    sendChallenge,
+  } = useFriendMessages();
+
   // Local state
+  const [activeTab, setActiveTab] = useState<TabType>('friends');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Friend[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showAddFriend, setShowAddFriend] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [selectedThread, setSelectedThread] = useState<MessageThreadType | null>(null);
+  const [challengeFriend, setChallengeFriend] = useState<Friend | null>(null);
 
   // Debounced search
   useEffect(() => {
@@ -123,6 +140,36 @@ const FriendsList: React.FC<FriendsListProps> = ({
     setSelectedFriend(null);
   }, [unfriend]);
 
+  // Handle thread click
+  const handleThreadClick = useCallback((thread: MessageThreadType) => {
+    setSelectedThread(thread);
+    loadMessages(thread.friendUserId);
+  }, [loadMessages]);
+
+  // Handle send message
+  const handleSendMessage = useCallback((text: string) => {
+    if (selectedThread) {
+      sendMessage(selectedThread.friendUserId, text);
+    }
+  }, [selectedThread, sendMessage]);
+
+  // Handle mark messages as read
+  const handleMarkAsRead = useCallback(() => {
+    if (selectedThread && messages.length > 0) {
+      const lastMessage = messages[0];
+      markAsRead(selectedThread.friendUserId, lastMessage.messageId);
+    }
+  }, [selectedThread, messages, markAsRead]);
+
+  // Handle send challenge
+  const handleSendChallenge = useCallback(async (
+    friendId: string,
+    challengeType: 'new_game' | 'join_room'
+  ) => {
+    await sendChallenge(friendId, challengeType);
+    setChallengeFriend(null);
+  }, [sendChallenge]);
+
   // Notification count
   const notificationCount = pendingRequests.length + pendingChallenges.length;
 
@@ -136,7 +183,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
       )}>
         <Users className="w-8 h-8 mx-auto mb-2 text-gray-400" />
         <p className={cn('text-sm', isDark ? 'text-gray-400' : 'text-gray-500')}>
-          {language === 'he' ? 'התחבר כדי להוסיף חברים' : 'Sign in to add friends'}
+          {t('friends.signInRequired')}
         </p>
       </div>
     );
@@ -164,7 +211,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
           <div className="flex items-center gap-2">
             <Users className={cn('w-4 h-4', isDark ? 'text-cyan-400' : 'text-cyan-600')} />
             <span className={cn('font-bold text-sm', isDark ? 'text-white' : 'text-gray-900')}>
-              {language === 'he' ? 'חברים' : 'Friends'}
+              {t('friends.title')}
             </span>
             {friends.length > 0 && (
               <span className={cn(
@@ -175,9 +222,9 @@ const FriendsList: React.FC<FriendsListProps> = ({
               </span>
             )}
           </div>
-          {notificationCount > 0 && (
+          {(notificationCount > 0 || unreadCount > 0) && (
             <span className="flex items-center justify-center w-5 h-5 text-xs font-bold bg-neo-pink text-white rounded-full">
-              {notificationCount}
+              {notificationCount + unreadCount > 9 ? '9+' : notificationCount + unreadCount}
             </span>
           )}
         </div>
@@ -195,7 +242,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
 
         {friends.length === 0 && (
           <p className={cn('text-xs text-center py-2', isDark ? 'text-gray-400' : 'text-gray-500')}>
-            {language === 'he' ? 'אין חברים עדיין' : 'No friends yet'}
+            {t('friends.noFriendsYet')}
           </p>
         )}
       </div>
@@ -210,11 +257,11 @@ const FriendsList: React.FC<FriendsListProps> = ({
         <div className="flex items-center gap-2">
           <Users className={cn('w-5 h-5', isDark ? 'text-cyan-400' : 'text-cyan-600')} />
           <h2 className={cn('font-black text-lg uppercase', isDark ? 'text-white' : 'text-gray-900')}>
-            {language === 'he' ? 'חברים' : 'Friends'}
+            {t('friends.title')}
           </h2>
-          {notificationCount > 0 && (
+          {(notificationCount > 0 || unreadCount > 0) && (
             <span className="flex items-center justify-center w-6 h-6 text-xs font-bold bg-neo-pink text-white rounded-full animate-pulse">
-              {notificationCount}
+              {notificationCount + unreadCount > 9 ? '9+' : notificationCount + unreadCount}
             </span>
           )}
         </div>
@@ -228,88 +275,213 @@ const FriendsList: React.FC<FriendsListProps> = ({
           )}
         >
           <UserPlus className="w-4 h-4" />
-          {language === 'he' ? 'הוסף' : 'Add'}
+          {t('friends.add')}
         </Button>
       </div>
 
-      {/* Pending Requests */}
-      {pendingRequests.length > 0 && (
-        <div className={cn(
-          'p-3 rounded-neo border-2',
-          isDark ? 'bg-neo-pink/20 border-neo-pink/40' : 'bg-pink-50 border-pink-300'
-        )}>
-          <div className="flex items-center gap-2 mb-2">
-            <Bell className="w-4 h-4 text-neo-pink" />
-            <span className={cn('font-bold text-sm', isDark ? 'text-white' : 'text-gray-900')}>
-              {language === 'he' ? 'בקשות ממתינות' : 'Friend Requests'}
+      {/* Tab Navigation */}
+      <div className="flex gap-2 border-b-2 border-neo-black">
+        <button
+          onClick={() => setActiveTab('friends')}
+          className={cn(
+            'flex items-center gap-2 px-4 py-2 font-bold text-sm transition-all',
+            activeTab === 'friends'
+              ? 'bg-neo-cyan text-neo-black border-2 border-neo-black border-b-0 -mb-0.5'
+              : isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+          )}
+        >
+          <Users className="w-4 h-4" />
+          {t('friends.title')}
+          {friends.length > 0 && (
+            <span className={cn(
+              'text-xs px-1.5 py-0.5 rounded-full',
+              activeTab === 'friends'
+                ? 'bg-neo-black text-neo-cyan'
+                : isDark ? 'bg-white/10 text-gray-300' : 'bg-gray-200 text-gray-600'
+            )}>
+              {friends.length}
             </span>
-          </div>
-          <div className="space-y-2">
-            {pendingRequests.map(request => (
-              <RequestRow
-                key={request.id}
-                request={request}
-                isDark={isDark}
-                isLoading={actionLoading === request.id}
-                onAccept={() => handleAccept(request.id)}
-                onDecline={() => handleDecline(request.id)}
-                language={language}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+          )}
+        </button>
 
-      {/* Pending Challenges */}
-      {pendingChallenges.length > 0 && (
-        <div className={cn(
-          'p-3 rounded-neo border-2',
-          isDark ? 'bg-neo-lime/20 border-neo-lime/40' : 'bg-yellow-50 border-yellow-300'
-        )}>
-          <div className="flex items-center gap-2 mb-2">
-            <Target className="w-4 h-4 text-neo-lime" />
-            <span className={cn('font-bold text-sm', isDark ? 'text-white' : 'text-gray-900')}>
-              {language === 'he' ? 'אתגרים' : 'Challenges'}
+        <button
+          onClick={() => setActiveTab('requests')}
+          className={cn(
+            'flex items-center gap-2 px-4 py-2 font-bold text-sm transition-all',
+            activeTab === 'requests'
+              ? 'bg-neo-cyan text-neo-black border-2 border-neo-black border-b-0 -mb-0.5'
+              : isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+          )}
+        >
+          <Bell className="w-4 h-4" />
+          {t('friends.requests')}
+          {notificationCount > 0 && (
+            <span className="flex items-center justify-center w-5 h-5 text-xs font-bold bg-neo-pink text-white rounded-full">
+              {notificationCount}
             </span>
-          </div>
-          <div className="space-y-2">
-            {pendingChallenges.map(challenge => (
-              <ChallengeRow
-                key={challenge.id}
-                challenge={challenge}
-                isDark={isDark}
-                language={language}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+          )}
+        </button>
 
-      {/* Friends List */}
-      <div className="space-y-2">
-        {friends.length > 0 ? (
-          friends.map(friend => (
-            <FriendRow
-              key={friend.id}
-              friend={friend}
-              isDark={isDark}
-              onChallengeClick={onChallengeClick}
-              onClick={() => setSelectedFriend(friend)}
-            />
-          ))
-        ) : (
-          <div className={cn(
-            'text-center py-8 rounded-neo border-2',
-            isDark ? 'bg-slate-800/50 border-white/10' : 'bg-gray-50 border-gray-200'
-          )}>
-            <Users className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-            <p className={cn('font-bold', isDark ? 'text-gray-300' : 'text-gray-600')}>
-              {language === 'he' ? 'אין חברים עדיין' : 'No friends yet'}
-            </p>
-            <p className={cn('text-sm mt-1', isDark ? 'text-gray-400' : 'text-gray-500')}>
-              {language === 'he' ? 'הוסיפו חברים כדי לאתגר אותם!' : 'Add friends to challenge them!'}
-            </p>
+        <button
+          onClick={() => setActiveTab('messages')}
+          className={cn(
+            'flex items-center gap-2 px-4 py-2 font-bold text-sm transition-all',
+            activeTab === 'messages'
+              ? 'bg-neo-cyan text-neo-black border-2 border-neo-black border-b-0 -mb-0.5'
+              : isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+          )}
+        >
+          <MessageCircle className="w-4 h-4" />
+          {t('friends.messages')}
+          {unreadCount > 0 && (
+            <span className="flex items-center justify-center w-5 h-5 text-xs font-bold bg-neo-pink text-white rounded-full">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      <div className="min-h-[400px]">
+        {/* Friends Tab */}
+        {activeTab === 'friends' && (
+          <div className="space-y-4">
+            {/* Pending Challenges */}
+            {pendingChallenges.length > 0 && (
+              <div className={cn(
+                'p-3 rounded-neo border-2',
+                isDark ? 'bg-neo-lime/20 border-neo-lime/40' : 'bg-yellow-50 border-yellow-300'
+              )}>
+                <div className="flex items-center gap-2 mb-2">
+                  <Target className="w-4 h-4 text-neo-lime" />
+                  <span className={cn('font-bold text-sm', isDark ? 'text-white' : 'text-gray-900')}>
+                    {t('friends.challenges.pending')}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {pendingChallenges.map(challenge => (
+                    <ChallengeRow
+                      key={challenge.id}
+                      challenge={challenge}
+                      isDark={isDark}
+                      language={language}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Friends List */}
+            <div className="space-y-2">
+              {friends.length > 0 ? (
+                friends.map(friend => (
+                  <FriendRow
+                    key={friend.id}
+                    friend={friend}
+                    isDark={isDark}
+                    onChallengeClick={() => setChallengeFriend(friend)}
+                    onClick={() => setSelectedFriend(friend)}
+                  />
+                ))
+              ) : (
+                <div className={cn(
+                  'text-center py-8 rounded-neo border-2',
+                  isDark ? 'bg-slate-800/50 border-white/10' : 'bg-gray-50 border-gray-200'
+                )}>
+                  <Users className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                  <p className={cn('font-bold', isDark ? 'text-gray-300' : 'text-gray-600')}>
+                    {t('friends.noFriendsYet')}
+                  </p>
+                  <p className={cn('text-sm mt-1', isDark ? 'text-gray-400' : 'text-gray-500')}>
+                    {t('friends.addFriendsToChallenge')}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
+        )}
+
+        {/* Requests Tab */}
+        {activeTab === 'requests' && (
+          <div className="space-y-4">
+            {/* Pending Requests */}
+            {pendingRequests.length > 0 && (
+              <div className={cn(
+                'p-3 rounded-neo border-2',
+                isDark ? 'bg-neo-pink/20 border-neo-pink/40' : 'bg-pink-50 border-pink-300'
+              )}>
+                <div className="flex items-center gap-2 mb-2">
+                  <Bell className="w-4 h-4 text-neo-pink" />
+                  <span className={cn('font-bold text-sm', isDark ? 'text-white' : 'text-gray-900')}>
+                    {t('friends.pendingRequests')}
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {pendingRequests.map(request => (
+                    <RequestRow
+                      key={request.id}
+                      request={request}
+                      isDark={isDark}
+                      isLoading={actionLoading === request.id}
+                      onAccept={() => handleAccept(request.id)}
+                      onDecline={() => handleDecline(request.id)}
+                      language={language}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Outgoing Requests */}
+            {outgoingRequests.length > 0 && (
+              <div className={cn(
+                'p-3 rounded-neo border-2',
+                isDark ? 'bg-slate-700/50 border-white/10' : 'bg-gray-50 border-gray-200'
+              )}>
+                <p className={cn('text-xs font-bold mb-2', isDark ? 'text-gray-300' : 'text-gray-600')}>
+                  {t('friends.sentRequests')}
+                </p>
+                <div className="space-y-2">
+                  {outgoingRequests.map(req => (
+                    <div key={req.id} className="flex items-center gap-2 text-sm">
+                      <Avatar
+                        avatarImage={req.fromAvatarImage}
+                        size="sm"
+                      />
+                      <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>
+                        {req.fromUsername}
+                      </span>
+                      <span className={cn('text-xs', isDark ? 'text-gray-500' : 'text-gray-400')}>
+                        ({t('friends.pending')})
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {pendingRequests.length === 0 && outgoingRequests.length === 0 && (
+              <div className={cn(
+                'text-center py-8 rounded-neo border-2',
+                isDark ? 'bg-slate-800/50 border-white/10' : 'bg-gray-50 border-gray-200'
+              )}>
+                <Bell className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                <p className={cn('font-bold', isDark ? 'text-gray-300' : 'text-gray-600')}>
+                  {t('friends.noPendingRequests')}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Messages Tab */}
+        {activeTab === 'messages' && (
+          <MessageThreadList
+            threads={threads}
+            isLoading={false}
+            unreadCount={unreadCount}
+            onThreadClick={handleThreadClick}
+          />
         )}
       </div>
 
@@ -325,7 +497,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <UserPlus className="w-5 h-5" />
-              {language === 'he' ? 'הוסף חבר' : 'Add Friend'}
+              {t('friends.addFriend')}
             </DialogTitle>
           </DialogHeader>
 
@@ -340,7 +512,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={language === 'he' ? 'חפש לפי שם משתמש...' : 'Search by username...'}
+                placeholder={t('friends.searchByUsername')}
                 className={cn(
                   'w-full pl-10 pr-4 py-2 rounded-neo border-2 font-medium',
                   isDark
@@ -355,9 +527,9 @@ const FriendsList: React.FC<FriendsListProps> = ({
 
             {/* Search results */}
             <div className="space-y-2 max-h-64 overflow-y-auto">
-              {searchResults.map(user => (
+              {searchResults.map(searchUser => (
                 <div
-                  key={user.id}
+                  key={searchUser.id}
                   className={cn(
                     'flex items-center justify-between p-3 rounded-neo border-2',
                     isDark ? 'bg-slate-700/50 border-white/10' : 'bg-gray-50 border-gray-200'
@@ -365,49 +537,49 @@ const FriendsList: React.FC<FriendsListProps> = ({
                 >
                   <div className="flex items-center gap-3">
                     <Avatar
-                      avatarImage={user.avatarImage}
+                      avatarImage={searchUser.avatarImage}
                       size="md"
                     />
                     <div>
                       <p className={cn('font-bold', isDark ? 'text-white' : 'text-gray-900')}>
-                        {user.displayName || user.username}
+                        {searchUser.displayName || searchUser.username}
                       </p>
                       <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-500')}>
-                        @{user.username}
+                        @{searchUser.username}
                       </p>
                     </div>
                   </div>
 
-                  {user.status === 'accepted' ? (
+                  {searchUser.status === 'accepted' ? (
                     <span className={cn(
                       'text-xs font-bold px-2 py-1 rounded',
                       isDark ? 'bg-green-500/20 text-green-400' : 'bg-green-100 text-green-600'
                     )}>
-                      {language === 'he' ? 'חבר' : 'Friend'}
+                      {t('friends.friend')}
                     </span>
-                  ) : user.status === 'pending' ? (
+                  ) : searchUser.status === 'pending' ? (
                     <span className={cn(
                       'text-xs font-bold px-2 py-1 rounded',
                       isDark ? 'bg-yellow-500/20 text-yellow-400' : 'bg-yellow-100 text-yellow-600'
                     )}>
-                      {language === 'he' ? 'ממתין' : 'Pending'}
+                      {t('friends.pending')}
                     </span>
                   ) : (
                     <Button
                       size="sm"
-                      onClick={() => handleSendRequest(user.odUserId)}
-                      disabled={actionLoading === user.odUserId}
+                      onClick={() => handleSendRequest(searchUser.odUserId)}
+                      disabled={actionLoading === searchUser.odUserId}
                       className={cn(
                         'px-3 py-1 rounded-neo border-2 border-neo-black shadow-hard-sm',
                         'bg-neo-lime text-neo-black font-bold text-sm'
                       )}
                     >
-                      {actionLoading === user.odUserId ? (
+                      {actionLoading === searchUser.odUserId ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
                         <>
                           <UserPlus className="w-3 h-3 mr-1" />
-                          {language === 'he' ? 'הוסף' : 'Add'}
+                          {t('friends.add')}
                         </>
                       )}
                     </Button>
@@ -417,43 +589,16 @@ const FriendsList: React.FC<FriendsListProps> = ({
 
               {searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
                 <p className={cn('text-center py-4 text-sm', isDark ? 'text-gray-400' : 'text-gray-500')}>
-                  {language === 'he' ? 'לא נמצאו תוצאות' : 'No users found'}
+                  {t('friends.noUsersFound')}
                 </p>
               )}
 
               {searchQuery.length < 2 && (
                 <p className={cn('text-center py-4 text-sm', isDark ? 'text-gray-400' : 'text-gray-500')}>
-                  {language === 'he' ? 'הקלידו לפחות 2 תווים' : 'Type at least 2 characters'}
+                  {t('friends.typeAtLeast2Chars')}
                 </p>
               )}
             </div>
-
-            {/* Outgoing requests */}
-            {outgoingRequests.length > 0 && (
-              <div className={cn(
-                'p-3 rounded-neo border-2',
-                isDark ? 'bg-slate-700/50 border-white/10' : 'bg-gray-50 border-gray-200'
-              )}>
-                <p className={cn('text-xs font-bold mb-2', isDark ? 'text-gray-300' : 'text-gray-600')}>
-                  {language === 'he' ? 'בקשות שנשלחו' : 'Sent Requests'}
-                </p>
-                {outgoingRequests.map(req => (
-                  <div key={req.id} className="flex items-center gap-2 text-sm">
-                    <Avatar
-                      avatarImage={req.fromAvatarImage}
-                      size="sm"
-                      className="w-6 h-6 text-xs"
-                    />
-                    <span className={isDark ? 'text-gray-300' : 'text-gray-600'}>
-                      {req.fromUsername}
-                    </span>
-                    <span className={cn('text-xs', isDark ? 'text-gray-500' : 'text-gray-400')}>
-                      ({language === 'he' ? 'ממתין' : 'pending'})
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </DialogContent>
       </Dialog>
@@ -493,9 +638,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                     className={cn('w-3 h-3', selectedFriend.isOnline ? 'text-green-500 fill-green-500' : 'text-gray-400')}
                   />
                   <span className={cn('text-sm', isDark ? 'text-gray-300' : 'text-gray-600')}>
-                    {selectedFriend.isOnline
-                      ? (language === 'he' ? 'מחובר עכשיו' : 'Online now')
-                      : (language === 'he' ? 'לא מחובר' : 'Offline')}
+                    {selectedFriend.isOnline ? t('common.online') : t('common.offline')}
                   </span>
                 </div>
 
@@ -509,7 +652,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                       {selectedFriend.totalGames || 0}
                     </p>
                     <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-500')}>
-                      {language === 'he' ? 'משחקים' : 'Games'}
+                      {t('stats.games')}
                     </p>
                   </div>
                   <div className={cn(
@@ -520,29 +663,27 @@ const FriendsList: React.FC<FriendsListProps> = ({
                       {selectedFriend.currentLevel || 1}
                     </p>
                     <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-500')}>
-                      {language === 'he' ? 'רמה' : 'Level'}
+                      {t('stats.level')}
                     </p>
                   </div>
                 </div>
 
                 {/* Actions */}
                 <div className="flex gap-2">
-                  {onChallengeClick && (
-                    <Button
-                      onClick={() => {
-                        onChallengeClick(selectedFriend);
-                        setSelectedFriend(null);
-                      }}
-                      className={cn(
-                        'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-neo',
-                        'border-2 border-neo-black shadow-hard-sm',
-                        'bg-neo-lime text-neo-black font-bold'
-                      )}
-                    >
-                      <Target className="w-4 h-4" />
-                      {language === 'he' ? 'אתגר' : 'Challenge'}
-                    </Button>
-                  )}
+                  <Button
+                    onClick={() => {
+                      setChallengeFriend(selectedFriend);
+                      setSelectedFriend(null);
+                    }}
+                    className={cn(
+                      'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-neo',
+                      'border-2 border-neo-black shadow-hard-sm',
+                      'bg-neo-lime text-neo-black font-bold'
+                    )}
+                  >
+                    <Target className="w-4 h-4" />
+                    {t('friends.challenge')}
+                  </Button>
                   <Button
                     onClick={() => handleUnfriend(selectedFriend.odUserId)}
                     disabled={actionLoading === selectedFriend.odUserId}
@@ -557,7 +698,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                     ) : (
                       <>
                         <UserMinus className="w-4 h-4" />
-                        {language === 'he' ? 'הסר' : 'Remove'}
+                        {t('friends.remove')}
                       </>
                     )}
                   </Button>
@@ -567,177 +708,37 @@ const FriendsList: React.FC<FriendsListProps> = ({
           )}
         </DialogContent>
       </Dialog>
-    </div>
-  );
-};
 
-// Helper components
-
-interface FriendRowProps {
-  friend: Friend;
-  isDark: boolean;
-  compact?: boolean;
-  onChallengeClick?: (friend: Friend) => void;
-  onClick?: () => void;
-}
-
-const FriendRow: React.FC<FriendRowProps> = ({
-  friend,
-  isDark,
-  compact,
-  onChallengeClick,
-  onClick,
-}) => {
-  return (
-    <motion.div
-      whileHover={{ x: compact ? 0 : 2 }}
-      onClick={onClick}
-      className={cn(
-        'flex items-center gap-3 p-2 rounded-neo border-2 cursor-pointer transition-colors',
-        isDark
-          ? 'bg-slate-700/50 border-white/10 hover:border-cyan-500/50'
-          : 'bg-white border-gray-200 hover:border-cyan-400',
-        compact && 'p-1.5'
-      )}
-    >
-      <div className="relative">
-        <Avatar
-          avatarImage={friend.avatarImage}
-          size={compact ? 'sm' : 'md'}
-        />
-        <Circle
-          className={cn(
-            'absolute -bottom-0.5 -right-0.5 w-3 h-3',
-            friend.isOnline ? 'text-green-500 fill-green-500' : 'text-gray-400 fill-gray-400'
-          )}
-        />
-      </div>
-
-      <div className="flex-1 min-w-0">
-        <p className={cn(
-          'font-bold truncate',
-          compact ? 'text-xs' : 'text-sm',
-          isDark ? 'text-white' : 'text-gray-900'
-        )}>
-          {friend.displayName || friend.username}
-        </p>
-        {!compact && (
-          <p className={cn('text-xs truncate', isDark ? 'text-gray-400' : 'text-gray-500')}>
-            {friend.isOnline ? 'Online' : 'Offline'}
-          </p>
-        )}
-      </div>
-
-      {onChallengeClick && !compact && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onChallengeClick(friend);
-          }}
-          className={cn(
-            'p-1.5 rounded-full transition-colors',
-            isDark ? 'hover:bg-white/10' : 'hover:bg-gray-100'
-          )}
-        >
-          <Target className="w-4 h-4 text-neo-lime" />
-        </button>
-      )}
-
-      {!compact && <ChevronRight className={cn('w-4 h-4 rtl:rotate-180', isDark ? 'text-gray-500' : 'text-gray-400')} />}
-    </motion.div>
-  );
-};
-
-interface RequestRowProps {
-  request: FriendRequest;
-  isDark: boolean;
-  isLoading: boolean;
-  onAccept: () => void;
-  onDecline: () => void;
-  language: string;
-}
-
-const RequestRow: React.FC<RequestRowProps> = ({
-  request,
-  isDark,
-  isLoading,
-  onAccept,
-  onDecline,
-  language,
-}) => {
-  return (
-    <div className={cn(
-      'flex items-center gap-3 p-2 rounded-neo',
-      isDark ? 'bg-black/20' : 'bg-white/50'
-    )}>
-      <Avatar
-        avatarImage={request.fromAvatarImage}
-        size="sm"
+      {/* Message Thread Dialog */}
+      <MessageThread
+        thread={selectedThread}
+        messages={messages}
+        isLoading={false}
+        isOpen={!!selectedThread}
+        onClose={() => setSelectedThread(null)}
+        onSendMessage={handleSendMessage}
+        onChallenge={selectedThread ? () => {
+          const friend = friends.find(f => f.odUserId === selectedThread.friendUserId);
+          if (friend) {
+            setChallengeFriend(friend);
+            setSelectedThread(null);
+          }
+        } : undefined}
+        onMarkAsRead={handleMarkAsRead}
+        currentUserId={profile?.id || ''}
       />
-      <div className="flex-1 min-w-0">
-        <p className={cn('font-bold text-sm truncate', isDark ? 'text-white' : 'text-gray-900')}>
-          {request.fromUsername}
-        </p>
-      </div>
-      <div className="flex gap-1">
-        <button
-          onClick={onAccept}
-          disabled={isLoading}
-          className={cn(
-            'p-1.5 rounded-full transition-colors',
-            'bg-green-500 text-white hover:bg-green-600'
-          )}
-        >
-          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-        </button>
-        <button
-          onClick={onDecline}
-          disabled={isLoading}
-          className={cn(
-            'p-1.5 rounded-full transition-colors',
-            isDark ? 'bg-red-500/20 text-red-400 hover:bg-red-500/40' : 'bg-red-100 text-red-600 hover:bg-red-200'
-          )}
-        >
-          <X className="w-4 h-4" />
-        </button>
-      </div>
-    </div>
-  );
-};
 
-interface ChallengeRowProps {
-  challenge: FriendChallenge;
-  isDark: boolean;
-  language: string;
-}
-
-const ChallengeRow: React.FC<ChallengeRowProps> = ({
-  challenge,
-  isDark,
-  language,
-}) => {
-  return (
-    <a
-      href={`/challenge/${challenge.challengeCode}`}
-      className={cn(
-        'flex items-center gap-3 p-2 rounded-neo transition-colors',
-        isDark ? 'bg-black/20 hover:bg-black/40' : 'bg-white/50 hover:bg-white/80'
+      {/* Challenge Invite Dialog */}
+      {challengeFriend && (
+        <ChallengeInviteDialog
+          isOpen={!!challengeFriend}
+          friendUsername={challengeFriend.displayName || challengeFriend.username}
+          friendId={challengeFriend.odUserId}
+          onClose={() => setChallengeFriend(null)}
+          onSendChallenge={handleSendChallenge}
+        />
       )}
-    >
-      <Avatar
-        avatarImage={challenge.challengerAvatarImage}
-        size="sm"
-      />
-      <div className="flex-1 min-w-0">
-        <p className={cn('font-bold text-sm truncate', isDark ? 'text-white' : 'text-gray-900')}>
-          {challenge.challengerUsername}
-        </p>
-        <p className={cn('text-xs truncate', isDark ? 'text-yellow-300' : 'text-yellow-600')}>
-          {challenge.message || (language === 'he' ? 'מזמין אותך לאתגר!' : 'challenges you!')}
-        </p>
-      </div>
-      <Target className="w-5 h-5 text-neo-lime" />
-    </a>
+    </div>
   );
 };
 

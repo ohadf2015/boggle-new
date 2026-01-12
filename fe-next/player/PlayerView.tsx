@@ -424,6 +424,9 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     logger.log('[PLAYER] Exit confirmed, closing connection');
     intentionalExitRef.current = true;
 
+    // Disable navigation guard BEFORE navigation to prevent native browser prompt
+    setGameActive(false);
+
     try {
       if (socket && gameCode && username) {
         logger.log('[PLAYER] Emitting leaveRoom event');

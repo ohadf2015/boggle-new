@@ -243,7 +243,11 @@ export function useGameTimer(options: UseGameTimerOptions): GameTimerReturn {
     const clampedTime = Math.max(0, time);
 
     // Reset timestamp tracking to match the new time
-    startTimestampRef.current = null;
+    // CRITICAL: If timer is running, reset to current time instead of null
+    // Setting to null would break the animation loop (tick early-exits on null)
+    if (startTimestampRef.current !== null) {
+      startTimestampRef.current = performance.now();
+    }
     accumulatedTimeRef.current = initialTime - clampedTime;
     lastDisplayedSecondRef.current = clampedTime;
 

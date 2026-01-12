@@ -97,7 +97,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
           guestFingerprint: user ? null : fingerprint,
           solved: result.solved,
           attemptsUsed: result.attemptsUsed,
-          wordsDiscovered: result.wordsDiscovered.length,
+          wordsDiscovered: result.wordsDiscovered?.length || 0,
           lifeRemaining: result.lifeRemaining,
         }),
       });

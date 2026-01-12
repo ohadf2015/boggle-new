@@ -167,21 +167,27 @@ export function GoogleAdsProvider({ children }: { children: ReactNode }) {
       overlay.appendChild(adContainer);
       document.body.appendChild(overlay);
 
-      // Push the ad
-      try {
-        const adsbygoogle = window.adsbygoogle || [] as unknown as AdsByGoogleArray;
-        window.adsbygoogle = adsbygoogle;
-        adsbygoogle.push({});
+      // Push the ad after a small delay to ensure DOM is fully rendered
+      // This prevents the "no_div" error from AdSense trying to render before container is ready
+      setTimeout(() => {
+        try {
+          const adsbygoogle = window.adsbygoogle || [] as unknown as AdsByGoogleArray;
+          window.adsbygoogle = adsbygoogle;
+          adsbygoogle.push({});
 
-        // Show close button after 3 seconds (simulates watching the ad)
-        setTimeout(() => {
-          closeContainer.style.opacity = '1';
-        }, 3000);
-      } catch (adError) {
-        console.error('AdSense push error:', adError);
-        document.body.removeChild(overlay);
-        onAdError?.('Failed to load ad');
-      }
+          // Show close button after 3 seconds (simulates watching the ad)
+          setTimeout(() => {
+            closeContainer.style.opacity = '1';
+          }, 3000);
+        } catch (adError) {
+          console.error('AdSense push error:', adError);
+          // Clean up overlay if it still exists
+          if (overlay.parentNode) {
+            document.body.removeChild(overlay);
+          }
+          onAdError?.('Failed to load ad');
+        }
+      }, 100);
     } catch (error) {
       console.error('Error showing rewarded ad:', error);
       onAdError?.('Failed to show ad');

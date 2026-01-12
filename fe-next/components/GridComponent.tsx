@@ -101,6 +101,10 @@ const GridComponent = memo<GridComponentProps>(({
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
   const gridRef = useRef<HTMLDivElement>(null);
 
+  // Hint animation state: 'blink' -> 'fadeout' -> null
+  const [hintAnimationPhase, setHintAnimationPhase] = useState<'blink' | 'fadeout' | null>(null);
+  const hintTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Accessibility settings
   const disableFireRoundLights = useDisableFireRoundLights();
   const disableEarthquakeEffects = useDisableEarthquakeEffects();
@@ -208,6 +212,39 @@ const GridComponent = memo<GridComponentProps>(({
       orderMap.set(key, index + 1); // 1-indexed for display
     });
     return { highlightedCellsSet: set, highlightedCellOrder: orderMap };
+  }, [highlightedPath]);
+
+  // Hint animation sequence: blink for 1.5s, then fade out for 1s
+  useEffect(() => {
+    // Clear any existing timers
+    if (hintTimeoutRef.current) {
+      clearTimeout(hintTimeoutRef.current);
+    }
+
+    // When highlightedPath changes and has cells, start blink animation
+    if (highlightedPath.length > 0) {
+      setHintAnimationPhase('blink');
+
+      // After blink duration (1.5s), transition to fadeout
+      hintTimeoutRef.current = setTimeout(() => {
+        setHintAnimationPhase('fadeout');
+
+        // After fadeout duration (1s), clear the animation phase
+        hintTimeoutRef.current = setTimeout(() => {
+          setHintAnimationPhase(null);
+        }, 1000);
+      }, 1500);
+    } else {
+      // No highlighted path, clear animation state
+      setHintAnimationPhase(null);
+    }
+
+    // Cleanup on unmount or when highlightedPath changes
+    return () => {
+      if (hintTimeoutRef.current) {
+        clearTimeout(hintTimeoutRef.current);
+      }
+    };
   }, [highlightedPath]);
 
   // OPTIMIZED: Earthquake animation using dedicated hook
@@ -573,7 +610,11 @@ const GridComponent = memo<GridComponentProps>(({
                         ? `${comboColors.textColor || 'text-neo-black'} ${comboColors.border} z-10 ${comboColors.shadow}`
                         : `${comboColors.bg} ${comboColors.textColor || 'text-neo-black'} border-3 ${comboColors.border} z-10 ${comboColors.shadow}`
                       : isHighlighted
-                        ? "bg-neo-lime text-neo-black border-3 border-neo-black z-10 shadow-[0_0_20px_rgba(255,225,53,0.8),_0_0_40px_rgba(255,225,53,0.4)]"
+                        ? `bg-neo-lime text-neo-black border-3 border-neo-black z-10 shadow-[0_0_20px_rgba(255,225,53,0.8),_0_0_40px_rgba(255,225,53,0.4)] ${
+                            hintAnimationPhase === 'blink' ? 'animate-hint-blink' :
+                            hintAnimationPhase === 'fadeout' ? 'animate-hint-fadeout' :
+                            ''
+                          }`
                         : isEliminated
                           ? "bg-gray-400/60 text-gray-500/50 border-3 border-gray-400/40 shadow-none cursor-not-allowed"
                           : "letter-tile-gradient text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed",

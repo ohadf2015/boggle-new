@@ -410,7 +410,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
                 {totalAttempts} {totalAttempts === 1 ? t('daily.playerSingular') : t('daily.playersPlural')} {t('daily.tookChallenge') || 'took the challenge'}
                 {guestPlayerCount > 0 && (
-                  <span className="text-slate-500 dark:text-slate-500">
+                  <span className="text-slate-500 dark:text-slate-400">
                     {' '}({guestPlayerCount} {guestPlayerCount === 1 ? t('daily.guestSingular') || 'guest' : t('daily.guestsPlural') || 'guests'})
                   </span>
                 )}

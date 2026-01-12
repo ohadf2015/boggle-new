@@ -229,13 +229,17 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
 
   const confirmExitRoom = useCallback(() => {
     intentionalExitRef.current = true;
+
+    // Disable navigation guard BEFORE navigation to prevent native browser prompt
+    setGameStarted(false);
+
     clearSessionPreservingUsername(username);
     socket?.emit('closeRoom', { gameCode });
     setTimeout(() => {
       socket?.disconnect();
       window.location.reload();
     }, 100);
-  }, [socket, gameCode, username, intentionalExitRef]);
+  }, [socket, gameCode, username, intentionalExitRef, setGameStarted]);
 
   const handleCancelTournament = useCallback(() => {
     if (!socket || !tournamentData) return;

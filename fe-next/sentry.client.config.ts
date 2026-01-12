@@ -70,6 +70,9 @@ Sentry.init({
     /from module \d+/i,
     /^Uncaught \(in promise\)/,
     /^Unhandled \(rejection\)/,
+    // AdSense errors (external library)
+    "no_div",
+    /adsbygoogle/i,
   ],
 
   denyUrls: [
@@ -80,6 +83,8 @@ Sentry.init({
     /^safari-extension:\/\//i,
     /webkit-masked-url/i,
     /^resource:\/\//i,
+    // Ignore AdSense errors (external)
+    /pagead.*googlesyndication\.com/i,
   ],
 
   integrations: [

@@ -179,7 +179,10 @@ const sv = {
     "validating": "Kollar...",
     "later": "Senare",
     "skip": "Hoppa",
-    "done": "Klar"
+    "done": "Klar",
+    "offline": "offline",
+    "online": "online",
+    "sending": "Skickar..."
   },
   "connection": {
     "reconnecting": "Återansluter...",
@@ -1205,7 +1208,7 @@ const sv = {
     "ready": "Redo!",
     "waiting": "Väntar...",
     "allPlayersReady": "Alla spelare är redo! Värden kan starta nästa runda.",
-    "imReady": "Jag är redo!",
+    "imReady": "Redo för nästa spel",
     "youAreReady": "Du är redo!",
     "waitingForOthersToReady": "Väntar på att andra ska markera sig redo...",
     "waitingForHostToStart": "Väntar på att värden ska starta nästa runda...",
@@ -1327,7 +1330,9 @@ const sv = {
       "comboBonus": "Kombo Bonus",
       "fireBonus": "Eld Bonus",
       "uniqueWords": "Unika Ord",
-      "avgWordLength": "Genomsnittlig Ordlängd"
+      "avgWordLength": "Genomsnittlig Ordlängd",
+      "games": "Matcher",
+      "level": "Nivå"
     }
   },
   "playerTitles": {
@@ -3579,7 +3584,64 @@ const sv = {
     "multiplayer": "Flerspelare"
   },
   "friends": {
-    "title": "Vänner"
+    "title": "Vänner",
+    "messages": "Meddelanden",
+    "noMessages": "Inga meddelanden än",
+    "startConversation": "Starta en konversation!",
+    "typeMessage": "Skriv ett meddelande...",
+    "sendMessage": "Skicka",
+    "messageLimit": "{current}/{max} tecken",
+    "add": "Lägg till",
+    "addFriend": "Lägg till vän",
+    "addFriendsToChallenge": "Lägg till vänner för att utmana",
+    "challenge": "Utmana",
+    "friend": "Vän",
+    "noFriendsYet": "Inga vänner än",
+    "noPendingRequests": "Inga väntande förfrågningar",
+    "noUsersFound": "Inga användare hittades",
+    "pending": "Väntar",
+    "pendingRequests": "Väntande förfrågningar",
+    "remove": "Ta bort",
+    "requests": "Förfrågningar",
+    "searchByUsername": "Sök efter användarnamn...",
+    "sentRequests": "Skickade förfrågningar",
+    "signInRequired": "Logga in för att se vänner",
+    "typeAtLeast2Chars": "Skriv minst 2 tecken",
+
+    "challenges": {
+      "send": "Skicka Utmaning",
+      "accept": "Acceptera",
+      "decline": "Avvisa",
+      "pending": "Väntande Utmaning",
+      "expired": "Utmaning Utgått",
+      "inviteMessage": "{username} utmanar dig till ett spel!",
+      "settings": "Spelinställningar",
+      "customMessage": "Lägg till ett meddelande (valfritt)",
+      "created": "Utmaning skickad!",
+      "accepted": "{username} accepterade din utmaning!"
+    },
+
+    "notifications": {
+      "newMessage": "Nytt meddelande från {username}",
+      "newChallenge": "{username} skickade dig en utmaning!",
+      "challengeAccepted": "{username} accepterade din utmaning!"
+    },
+
+    "errors": {
+      "sendFailed": "Misslyckades att skicka meddelande",
+      "notFriends": "Du måste vara vän för att skicka meddelanden",
+      "rateLimited": "Lugna ner dig! För många meddelanden",
+      "messageEmpty": "Meddelandet kan inte vara tomt",
+      "messageTooLong": "Meddelandet är för långt"
+    }
+  },
+  "multiplayer": {
+    "mode": "Läge",
+    "timer": "Timer"
+  },
+  "stats": {
+    "games": "Matcher",
+    "level": "Nivå"
   },
   "reveal": {
     "revealWord": "Avslöja",

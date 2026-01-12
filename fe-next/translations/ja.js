@@ -91,6 +91,9 @@ const ja = {
     "connectionLost": "接続切れ",
     "notConnected": "オフライン",
     "connected": "接続済み",
+    "offline": "オフライン",
+    "online": "オンライン",
+    "sending": "送信中...",
     "coins": "コイン",
     "chat": "チャット",
     "connecting": "接続中...",
@@ -1204,7 +1207,7 @@ const ja = {
     "ready": "準備完了！",
     "waiting": "待機中...",
     "allPlayersReady": "全員準備完了！ホストは次のラウンドを開始できます。",
-    "imReady": "準備OK！",
+    "imReady": "次のゲーム準備完了",
     "youAreReady": "準備完了！",
     "waitingForOthersToReady": "他のプレイヤーの準備を待っています...",
     "waitingForHostToStart": "ホストが次のラウンドを開始するのを待っています...",
@@ -3577,8 +3580,65 @@ const ja = {
     "singlePlayer": "シングルプレイヤー",
     "multiplayer": "マルチプレイヤー"
   },
+  "multiplayer": {
+    "mode": "モード",
+    "timer": "タイマー"
+  },
+  "stats": {
+    "games": "ゲーム",
+    "level": "レベル"
+  },
   "friends": {
-    "title": "フレンド"
+    "title": "フレンド",
+    "add": "追加",
+    "addFriend": "フレンドを追加",
+    "addFriendsToChallenge": "フレンドを追加してチャレンジしよう",
+    "challenge": "チャレンジ",
+    "friend": "フレンド",
+    "noFriendsYet": "まだフレンドがいません",
+    "noPendingRequests": "保留中のリクエストはありません",
+    "noUsersFound": "ユーザーが見つかりません",
+    "pending": "保留中",
+    "pendingRequests": "保留中のリクエスト",
+    "remove": "削除",
+    "requests": "リクエスト",
+    "searchByUsername": "ユーザー名で検索",
+    "sentRequests": "送信済みリクエスト",
+    "signInRequired": "サインインが必要です",
+    "typeAtLeast2Chars": "2文字以上入力してください",
+    "messages": "メッセージ",
+    "noMessages": "まだメッセージはありません",
+    "startConversation": "会話を始めよう！",
+    "typeMessage": "メッセージを入力...",
+    "sendMessage": "送信",
+    "messageLimit": "{current}/{max} 文字",
+
+    "challenges": {
+      "send": "チャレンジを送信",
+      "accept": "承諾",
+      "decline": "辞退",
+      "pending": "チャレンジ保留中",
+      "expired": "チャレンジ期限切れ",
+      "inviteMessage": "{username} があなたにゲームで挑戦！",
+      "settings": "ゲーム設定",
+      "customMessage": "メッセージを追加（任意）",
+      "created": "チャレンジを送信しました！",
+      "accepted": "{username} があなたのチャレンジを承諾しました！"
+    },
+
+    "notifications": {
+      "newMessage": "{username} から新しいメッセージ",
+      "newChallenge": "{username} がチャレンジを送りました！",
+      "challengeAccepted": "{username} があなたのチャレンジを承諾しました！"
+    },
+
+    "errors": {
+      "sendFailed": "メッセージの送信に失敗しました",
+      "notFriends": "メッセージを送信するにはフレンドである必要があります",
+      "rateLimited": "落ち着いて！メッセージが多すぎます",
+      "messageEmpty": "メッセージを空にすることはできません",
+      "messageTooLong": "メッセージが長すぎます"
+    }
   },
   "reveal": {
     "revealWord": "表示",

@@ -180,7 +180,10 @@ const en = {
     "validating": "Checking...",
     "later": "Later",
     "skip": "Skip",
-    "done": "Done"
+    "done": "Done",
+    "offline": "Offline",
+    "online": "Online",
+    "sending": "Sending..."
   },
   "connection": {
     "reconnecting": "Reconnecting...",
@@ -1211,7 +1214,7 @@ const en = {
     "ready": "Ready!",
     "waiting": "Waiting...",
     "allPlayersReady": "Everyone's ready!",
-    "imReady": "Ready!",
+    "imReady": "Ready for Next Game",
     "youAreReady": "You're ready!",
     "waitingForOthersToReady": "Waiting...",
     "waitingForHostToStart": "Waiting for host...",
@@ -3634,8 +3637,65 @@ const en = {
     "singlePlayer": "Single Player",
     "multiplayer": "Multiplayer"
   },
+  "multiplayer": {
+    "mode": "Mode",
+    "timer": "Timer"
+  },
+  "stats": {
+    "games": "Games",
+    "level": "Level"
+  },
   "friends": {
-    "title": "Friends"
+    "title": "Friends",
+    "add": "Add",
+    "addFriend": "Add Friend",
+    "addFriendsToChallenge": "Add Friends",
+    "challenge": "Challenge",
+    "friend": "Friend",
+    "noFriendsYet": "No friends yet!",
+    "noPendingRequests": "All caught up!",
+    "noUsersFound": "No players found",
+    "pending": "Pending",
+    "pendingRequests": "Pending Requests",
+    "remove": "Remove",
+    "requests": "Requests",
+    "searchByUsername": "Search by username...",
+    "sentRequests": "Sent Requests",
+    "signInRequired": "Sign in to add friends",
+    "typeAtLeast2Chars": "Type at least 2 characters",
+    "messages": "Messages",
+    "noMessages": "No messages yet",
+    "startConversation": "Start a conversation!",
+    "typeMessage": "Type a message...",
+    "sendMessage": "Send",
+    "messageLimit": "{current}/{max} characters",
+
+    "challenges": {
+      "send": "Send Challenge",
+      "accept": "Accept",
+      "decline": "Decline",
+      "pending": "Challenge Pending",
+      "expired": "Challenge Expired",
+      "inviteMessage": "{username} challenges you to a game!",
+      "settings": "Game Settings",
+      "customMessage": "Add a message (optional)",
+      "created": "Challenge sent!",
+      "accepted": "{username} accepted your challenge!"
+    },
+
+    "notifications": {
+      "newMessage": "New message from {username}",
+      "newChallenge": "{username} sent you a challenge!",
+      "challengeAccepted": "{username} accepted your challenge!"
+    },
+
+    "errors": {
+      "sendFailed": "Failed to send message",
+      "notFriends": "You must be friends to send messages",
+      "rateLimited": "Slow down! Too many messages",
+      "messageEmpty": "Message cannot be empty",
+      "messageTooLong": "Message is too long"
+    }
   },
   "reveal": {
     "revealWord": "Reveal",

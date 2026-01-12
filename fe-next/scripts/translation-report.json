@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 1998,
+    "totalKeysInCode": 2032,
     "keyCountByLanguage": {
-      "en": 3310,
-      "he": 3310,
-      "sv": 3310,
-      "ja": 3310,
-      "es": 3310
+      "en": 3357,
+      "he": 3362,
+      "sv": 3359,
+      "ja": 3357,
+      "es": 3359
     },
     "missingFromEnglish": 0
   },
@@ -18,9 +18,21 @@
     "es": []
   },
   "keysNotInEnglish": {
-    "he": [],
-    "sv": [],
+    "he": [
+      "hostView.mode",
+      "scoreCard.stats.games",
+      "scoreCard.stats.level",
+      "profile.games",
+      "profile.level"
+    ],
+    "sv": [
+      "scoreCard.stats.games",
+      "scoreCard.stats.level"
+    ],
     "ja": [],
-    "es": []
+    "es": [
+      "scoreCard.stats.games",
+      "scoreCard.stats.level"
+    ]
   }
 }

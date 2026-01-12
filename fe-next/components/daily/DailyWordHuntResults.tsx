@@ -359,14 +359,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         />
       )}
 
-      <TryAnotherLanguage currentLanguage={language} onGameLanguageChange={onGameLanguageChange} />
-
-      <KeepPlayingSection
-        isSuccess={result.solved}
-        timeSurvived={result.lifeRemaining !== undefined ? (10 - result.attemptsUsed) * 10 : undefined}
-        efficiencyScore={result.efficiencyScore}
-      />
-
       {/* Create Your Own Puzzle - only show for authenticated winners */}
       {result.solved && isAuthenticated && (
         <button
@@ -393,6 +385,14 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           </div>
         </button>
       )}
+
+      <TryAnotherLanguage currentLanguage={language} onGameLanguageChange={onGameLanguageChange} />
+
+      <KeepPlayingSection
+        isSuccess={result.solved}
+        timeSurvived={result.lifeRemaining !== undefined ? (10 - result.attemptsUsed) * 10 : undefined}
+        efficiencyScore={result.efficiencyScore}
+      />
     </div>
   );
 

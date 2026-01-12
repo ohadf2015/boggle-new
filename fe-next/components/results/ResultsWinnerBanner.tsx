@@ -156,6 +156,13 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
     return t('results.betterLuckNextTime') || 'Better luck next time!';
   };
 
+  // Get ordinal suffix for rank display (1st, 2nd, 3rd, 4th, etc.)
+  const getOrdinalSuffix = (n: number): string => {
+    const s = ['th', 'st', 'nd', 'rd'];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  };
+
   // Get the appropriate announcement text
   const getAnnouncementText = () => {
     if (customAnnouncement) return customAnnouncement;
@@ -165,11 +172,12 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
     if (variant === 'newRecord') return t('challenge.firstRecord') || 'First Record Set!';
     if (variant === 'completion') return t('singlePlayer.practiceComplete') || 'Practice Complete';
 
-    // Multiplayer ranking
+    // Multiplayer ranking - More placement-focused
     if (rank === 1) return t('results.winnerAnnouncement');
     if (rank === 2) return t('results.silverMedalist') || 'Silver Medalist';
     if (rank === 3) return t('results.bronzeMedalist') || 'Bronze Medalist';
-    return t('results.yourPlace', { rank }) || `${rank}th Place`;
+    // For 4th+ place, show placement explicitly
+    return t('results.yourPlace', { rank }) || `You finished ${getOrdinalSuffix(rank)}`;
   };
 
   if (!winner) return null;
@@ -221,13 +229,13 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
         <div className="relative z-10 p-3 sm:p-4 md:p-5 text-center">
           {/* Compact horizontal layout: Icon + Content */}
           <div className="flex items-center justify-center gap-3 sm:gap-4">
-            {/* Animated Icon - Smaller */}
+            {/* Animated Icon + Placement Badge - Smaller */}
             <motion.div
               initial={{ scale: 0, rotate: -15 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ delay: 0.3, duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
               whileHover={{ scale: 1.1, transition: { duration: 0.2 } }}
-              className="flex-shrink-0"
+              className="flex-shrink-0 relative"
             >
               <div className={`${styles.iconBgClass} border-3 border-neo-black rounded-neo p-2 shadow-hard inline-block`}>
                 <RankIcon
@@ -237,6 +245,19 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
                   }}
                 />
               </div>
+              {/* Prominent Placement Badge - Only for multiplayer ranking */}
+              {variant === 'ranking' && (
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.5, duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
+                  className="absolute -top-2 -right-2 bg-neo-black text-neo-cream border-3 border-neo-cream rounded-full w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center shadow-hard-lg"
+                >
+                  <span className="text-lg sm:text-xl font-black">
+                    {getOrdinalSuffix(rank)}
+                  </span>
+                </motion.div>
+              )}
             </motion.div>
 
             {/* Center content: Avatar + Name + Message */}
