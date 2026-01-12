@@ -42,10 +42,12 @@ describe('useRandomMascotActivity', () => {
     expect(result.current.isDoingActivity).toBe(false);
   });
 
-  it('should trigger random activity after interval', async () => {
+  it('should trigger first activity after initial delay (shorter than regular interval)', async () => {
     const { result } = renderHook(() =>
       useRandomMascotActivity({
         baseVariant: 'happy',
+        initialDelayMin: 2000,
+        initialDelayMax: 2000,
         minInterval: 10000,
         maxInterval: 10000,
         activityDuration: 2000,
@@ -55,9 +57,9 @@ describe('useRandomMascotActivity', () => {
     // Initially at base
     expect(result.current.currentVariant).toBe('happy');
 
-    // Fast-forward to trigger activity
+    // Fast-forward to trigger first activity (uses initial delay of 2s, not regular 10s)
     act(() => {
-      jest.advanceTimersByTime(10000);
+      jest.advanceTimersByTime(2000);
     });
 
     await waitFor(() => {
@@ -73,6 +75,53 @@ describe('useRandomMascotActivity', () => {
     await waitFor(() => {
       expect(result.current.currentVariant).toBe('happy');
       expect(result.current.isDoingActivity).toBe(false);
+    });
+  });
+
+  it('should use regular interval for subsequent activities', async () => {
+    const { result } = renderHook(() =>
+      useRandomMascotActivity({
+        baseVariant: 'happy',
+        initialDelayMin: 1000,
+        initialDelayMax: 1000,
+        minInterval: 5000,
+        maxInterval: 5000,
+        activityDuration: 1000,
+      })
+    );
+
+    // Fast-forward to trigger first activity (initial delay: 1s)
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+
+    await waitFor(() => {
+      expect(result.current.isDoingActivity).toBe(true);
+    });
+
+    // Wait for activity to complete (1s duration)
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+
+    await waitFor(() => {
+      expect(result.current.isDoingActivity).toBe(false);
+    });
+
+    // Second activity should not trigger at 1s (initial delay) but at 5s (regular interval)
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+
+    expect(result.current.isDoingActivity).toBe(false);
+
+    // Now wait for regular interval (5s total from after first activity)
+    act(() => {
+      jest.advanceTimersByTime(4000);
+    });
+
+    await waitFor(() => {
+      expect(result.current.isDoingActivity).toBe(true);
     });
   });
 

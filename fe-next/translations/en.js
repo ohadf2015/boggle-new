@@ -97,6 +97,8 @@ const en = {
     "connectionLost": "Lost connection",
     "notConnected": "Offline",
     "connected": "Connected",
+    "left": "left",
+    "processing": "Processing...",
     "coins": "coins",
     "chat": "Chat",
     "connecting": "Connecting...",
@@ -1131,6 +1133,9 @@ const en = {
     "viewDetails": "Details",
     "viewAllWords": "Words",
     "viewXpBreakdown": "XP",
+    "rewardsEarned": "Rewards Earned",
+    "achievementUnlocked": "Achievement Unlocked",
+    "achievementsUnlocked": "Achievements Unlocked",
     "summary": "Summary",
     "details": "Details",
     "performanceDetails": "Performance Details",
@@ -2569,7 +2574,22 @@ const en = {
     "efficiency": "Efficiency",
     "streak": "Streak",
     "guestTeasing": "Sign in to earn {amount} coins!",
-    "signInShort": "Sign in"
+    "signInShort": "Sign in",
+    "notEnough": "Not enough coins",
+    "signInToEarn": "Sign in to earn"
+  },
+  "streak": {
+    "protection": "Streak Protection",
+    "protectionApplied": "Protection Applied!",
+    "atRisk": "Streak at Risk!",
+    "atRiskDesc": "Win today to keep your {count}-day streak!",
+    "canRecover": "Recover Your Streak",
+    "recoverDesc": "Your {count}-day streak can be restored!",
+    "recoverFor": "Recover for {cost} coins",
+    "freezes": "Streak Freezes",
+    "freezeDesc": "Use a freeze to protect your streak for one day without winning.",
+    "useFreeze": "Use Streak Freeze",
+    "noFreezes": "No freezes available. Earn 1 free freeze per week!"
   },
   "partyScreen": {
     "title": "Party Screen",
@@ -2701,7 +2721,16 @@ const en = {
     "toCatch": "pts to pass",
     "almostThere": "Almost there!",
     "live": "Live",
-    "backToGame": "Back to Game"
+    "backToGame": "Back to Game",
+    "yourProgress": "Your Progress",
+    "percentile": "Percentile",
+    "nextRank": "Next Rank",
+    "pointsToGo": "points to go",
+    "beat": "Beat",
+    "youAreFirst": "You're #1!",
+    "keepItUp": "Keep playing to maintain your lead",
+    "nearbyPlayers": "Nearby Players",
+    "points": "pts"
   },
   "ranked": {
     "title": "Ranked Mode",
@@ -3453,6 +3482,22 @@ const en = {
       "exploreGrid": "Explore the grid for bonus words",
       "strategicGuessing": "Use clues wisely before guessing"
     },
+    "score": {
+      "title": "Your Score",
+      "speed": "Speed",
+      "accuracy": "Accuracy",
+      "exploration": "Exploration",
+      "perfect": "Perfect Score!",
+      "lifeLeft": "life left",
+      "firstTry": "First try!",
+      "guesses": "guesses",
+      "wordsFound": "words found",
+      "improve": {
+        "speed": "Finish faster to improve",
+        "accuracy": "Use fewer guesses",
+        "exploration": "Find more words"
+      }
+    },
     "ad": {
       "watchAd": "Watch Ad",
       "needMoreCoins": "Need more coins?",
@@ -3948,6 +3993,7 @@ const en = {
       "playAgain": "Play Again",
       "exit": "Exit",
       "finishGame": "Finish Game",
+      "useHint": "Use Hint",
       "points": "pts",
       "wpm": "WPM",
       "letters": "letters",

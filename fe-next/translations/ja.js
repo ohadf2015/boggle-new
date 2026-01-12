@@ -2566,7 +2566,16 @@ const ja = {
     "toCatch": "pt追い越しまで",
     "almostThere": "もう少し!",
     "live": "ライブ",
-    "backToGame": "ゲームに戻る"
+    "backToGame": "ゲームに戻る",
+    "yourProgress": "あなたの進捗",
+    "percentile": "パーセンタイル",
+    "nextRank": "次のランク",
+    "pointsToGo": "ポイント差",
+    "beat": "追い越す",
+    "youAreFirst": "あなたが1位!",
+    "keepItUp": "プレイを続けてリードを守ろう",
+    "nearbyPlayers": "近いプレイヤー",
+    "points": "pt"
   },
   "ranked": {
     "title": "ランクマッチ",
@@ -3446,6 +3455,22 @@ const ja = {
       "exploreGrid": "グリッドでボーナス単語を探そう",
       "strategicGuessing": "推測する前にヒントを活用しよう"
     },
+    "score": {
+      "title": "あなたのスコア",
+      "speed": "スピード",
+      "accuracy": "正確さ",
+      "exploration": "探索",
+      "perfect": "パーフェクト！",
+      "lifeLeft": "ライフ残り",
+      "firstTry": "一発正解！",
+      "guesses": "回推測",
+      "wordsFound": "単語発見",
+      "improve": {
+        "speed": "もっと速くクリアしよう",
+        "accuracy": "推測回数を減らそう",
+        "exploration": "もっと単語を見つけよう"
+      }
+    },
     "ad": {
       "watchAd": "広告を見る",
       "needMoreCoins": "コインが足りない？",
@@ -3924,6 +3949,7 @@ const ja = {
       "playAgain": "もう一度",
       "exit": "終了",
       "finishGame": "ゲーム終了",
+      "useHint": "ヒントを使う",
       "lightning-round": {
         "name": "ライトニングラウンド",
         "description": "できるだけ速く単語を見つけろ"

@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Heart, Eye, EyeOff, CheckCircle2, XCircle, Trophy, RotateCcw, X, RefreshCw, Clock, Target } from 'lucide-react';
+import { Brain, Heart, Eye, EyeOff, CheckCircle2, XCircle, Trophy, RotateCcw, X, RefreshCw, Clock, Target, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -82,6 +82,8 @@ export default function MemoryHunt({
   const [currentHighlight, setCurrentHighlight] = useState<HighlightedCell[]>([]);
   const [excludedWords, setExcludedWords] = useState<Set<string>>(new Set());
   const [showStudyModal, setShowStudyModal] = useState(false);
+  const [hintsRemaining, setHintsRemaining] = useState(2);
+  const [isHintActive, setIsHintActive] = useState(false);
 
   // Keyboard support for desktop users (only during recall phase)
   const keyboard = useDrillKeyboardSupport({
@@ -219,9 +221,30 @@ export default function MemoryHunt({
     setLives(levelConfig.lives);
     setScore(0);
     setRound(1);
+    setHintsRemaining(2);
     setStartTime(Date.now());
     startRound();
   }, [levelConfig.lives, startRound]);
+
+  // Use hint to briefly reveal one unfound word
+  const useHint = useCallback(() => {
+    if (hintsRemaining <= 0 || phase !== 'recall' || isHintActive) return;
+
+    // Find first unfound word
+    const unfoundWord = targetWords.find(tw => !tw.found);
+    if (!unfoundWord) return;
+
+    // Briefly highlight the word's path
+    setIsHintActive(true);
+    setCurrentHighlight(unfoundWord.path);
+    setHintsRemaining(prev => prev - 1);
+
+    // Clear highlight after 1.5 seconds
+    setTimeout(() => {
+      setCurrentHighlight([]);
+      setIsHintActive(false);
+    }, 1500);
+  }, [hintsRemaining, phase, targetWords, isHintActive]);
 
   // Handle word submission
   const handleWordSubmit = useCallback((word: string) => {
@@ -643,19 +666,42 @@ export default function MemoryHunt({
               </>
             )}
 
-            {/* Finish Game Button */}
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={finishGame}
-              className={cn(
-                'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black',
-                'font-bold text-sm uppercase',
-                'transition-all hover:translate-y-[-1px]',
-                isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-200 text-neo-black'
+            {/* Action Buttons Row */}
+            <div className="flex gap-3 mt-4">
+              {/* Hint Button */}
+              {hintsRemaining > 0 && (
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={useHint}
+                  disabled={isHintActive}
+                  className={cn(
+                    'flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-black',
+                    'font-bold text-sm uppercase',
+                    'transition-all hover:translate-y-[-1px]',
+                    isHintActive
+                      ? 'bg-neo-lime text-neo-black cursor-not-allowed'
+                      : 'bg-neo-yellow text-neo-black hover:bg-neo-lime'
+                  )}
+                >
+                  <Lightbulb className="w-4 h-4" />
+                  {t('brain.drills.useHint') || 'Hint'} ({hintsRemaining})
+                </motion.button>
               )}
-            >
-              {t('brain.drills.finishGame') || 'Finish Game'}
-            </motion.button>
+
+              {/* Finish Game Button */}
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={finishGame}
+                className={cn(
+                  'flex-1 px-4 py-2 rounded-neo border-2 border-neo-black',
+                  'font-bold text-sm uppercase',
+                  'transition-all hover:translate-y-[-1px]',
+                  isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-200 text-neo-black'
+                )}
+              >
+                {t('brain.drills.finishGame') || 'Finish Game'}
+              </motion.button>
+            </div>
           </div>
         )}
 

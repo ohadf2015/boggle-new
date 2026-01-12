@@ -15,6 +15,7 @@ import { useLeaderboard, useUserRank } from '@/hooks/useSupabaseRealtime';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
+import NearRankIndicator from '@/components/leaderboard/NearRankIndicator';
 
 interface LeaderboardEntry {
   player_id: string;
@@ -151,42 +152,53 @@ export default function LeaderboardPage(): React.ReactNode {
 
         {/* User's Rank Card (if authenticated) */}
         {profile && userRank && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className={cn(
-              'mb-6 p-4 rounded-xl border-2',
-              isDarkMode
-                ? 'bg-gradient-to-r from-cyan-900/30 to-blue-900/30 border-cyan-500/30'
-                : 'bg-gradient-to-r from-cyan-50 to-blue-50 border-cyan-200'
-            )}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <Avatar
-                  profilePictureUrl={profile.profile_picture_url ?? undefined}
-                  avatarImage={profile.avatar_image ?? undefined}
-                  size="lg"
-                />
-                <div>
+          <div className="space-y-4 mb-6">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className={cn(
+                'p-4 rounded-xl border-2',
+                isDarkMode
+                  ? 'bg-gradient-to-r from-cyan-900/30 to-blue-900/30 border-cyan-500/30'
+                  : 'bg-gradient-to-r from-cyan-50 to-blue-50 border-cyan-200'
+              )}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <Avatar
+                    profilePictureUrl={profile.profile_picture_url ?? undefined}
+                    avatarImage={profile.avatar_image ?? undefined}
+                    size="lg"
+                  />
+                  <div>
+                    <p className={cn('text-sm', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>
+                      {t('leaderboard.yourRank')}
+                    </p>
+                    <p className={cn('text-2xl font-bold', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}>
+                      #{userRank.rank_position || '—'}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
                   <p className={cn('text-sm', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>
-                    {t('leaderboard.yourRank')}
+                    {t('leaderboard.score')}
                   </p>
-                  <p className={cn('text-2xl font-bold', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}>
-                    #{userRank.rank_position || '—'}
+                  <p className={cn('text-2xl font-bold', isDarkMode ? 'text-white' : 'text-gray-900')}>
+                    {userRank.total_score?.toLocaleString() || 0}
                   </p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className={cn('text-sm', isDarkMode ? 'text-gray-600' : 'text-gray-600')}>
-                  {t('leaderboard.score')}
-                </p>
-                <p className={cn('text-2xl font-bold', isDarkMode ? 'text-white' : 'text-gray-900')}>
-                  {userRank.total_score?.toLocaleString() || 0}
-                </p>
-              </div>
-            </div>
-          </motion.div>
+            </motion.div>
+
+            {/* Near-Rank Progress Indicator */}
+            <NearRankIndicator
+              leaderboard={leaderboard}
+              userRank={userRank}
+              userId={user?.id}
+              totalPlayers={leaderboard.length}
+              nearbyRange={100}
+            />
+          </div>
         )}
 
         {/* Content with loading/error states */}

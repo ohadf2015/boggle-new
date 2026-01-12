@@ -610,44 +610,115 @@ export function calculateTokenReward(wordLength: number): number {
 }
 
 /**
- * Calculate efficiency score for leaderboard
+ * Score breakdown for UI display
+ */
+export interface ScoreBreakdown {
+  /** Speed score: life remaining × 4, capped at 400 */
+  speed: number;
+  /** Accuracy score: 400 - (guesses - 1) × 40, min 0 */
+  accuracy: number;
+  /** Exploration bonus: words × 10, capped at 200 */
+  exploration: number;
+  /** Total efficiency score (0-1000) */
+  total: number;
+  /** Maximum possible score */
+  maxScore: 1000;
+  /** Raw values for display */
+  raw: {
+    lifeRemaining: number;
+    guessesUsed: number;
+    wordsFound: number;
+  };
+}
+
+/**
+ * Calculate efficiency score breakdown for leaderboard
  *
- * The efficiency score rewards:
- * - Keeping life remaining (survival skill)
- * - Saving tokens (not using hints)
- * - Finding many words (exploration)
- * - Using fewer guesses (precision)
+ * New balanced formula (Season 2):
+ * - Speed (40%): min(life, 100) × 4 = max 400 pts
+ * - Accuracy (40%): max(0, 400 - (guesses - 1) × 40) = max 400 pts
+ * - Exploration (20%): min(words, 20) × 10 = max 200 pts
  *
- * Formula: (life * 10) + (tokens * 5) + (words * 3) - (guesses * 2)
+ * Total max: 1000 points (perfect game: 100+ life, 1 guess, 20+ words)
  *
  * @param lifeRemaining - Life points at end of game
- * @param unusedTokens - Clue tokens not spent
  * @param guessesUsed - Number of target word attempts
  * @param wordsFound - Number of words discovered
  * @param solved - Whether the target was found
- * @returns Efficiency score (0 if not solved)
+ * @returns Score breakdown with individual components
+ */
+export function getScoreBreakdown(
+  lifeRemaining: number,
+  guessesUsed: number,
+  wordsFound: number,
+  solved: boolean
+): ScoreBreakdown {
+  if (!solved) {
+    return {
+      speed: 0,
+      accuracy: 0,
+      exploration: 0,
+      total: 0,
+      maxScore: 1000,
+      raw: { lifeRemaining: 0, guessesUsed: 0, wordsFound: 0 },
+    };
+  }
+
+  // Ensure non-negative inputs
+  const life = Math.max(0, lifeRemaining);
+  const guesses = Math.max(1, guessesUsed); // At least 1 guess to solve
+  const words = Math.max(0, wordsFound);
+
+  // Speed: life × 4, capped at 100 life = 400 pts
+  const speed = Math.min(life, 100) * 4;
+
+  // Accuracy: 400 pts for 1 guess, -40 per additional guess, min 0
+  const accuracy = Math.max(0, 400 - (guesses - 1) * 40);
+
+  // Exploration: 10 pts per word, capped at 20 words = 200 pts
+  const exploration = Math.min(words, 20) * 10;
+
+  const total = speed + accuracy + exploration;
+
+  return {
+    speed: Math.round(speed),
+    accuracy: Math.round(accuracy),
+    exploration: Math.round(exploration),
+    total: Math.round(total),
+    maxScore: 1000,
+    raw: {
+      lifeRemaining: Math.round(life),
+      guessesUsed: guesses,
+      wordsFound: words,
+    },
+  };
+}
+
+/**
+ * Calculate efficiency score for leaderboard
+ *
+ * New balanced formula (Season 2):
+ * - Speed (40%): min(life, 100) × 4 = max 400 pts
+ * - Accuracy (40%): max(0, 400 - (guesses - 1) × 40) = max 400 pts
+ * - Exploration (20%): min(words, 20) × 10 = max 200 pts
+ *
+ * Total max: 1000 points (perfect game: 100+ life, 1 guess, 20+ words)
+ *
+ * @param lifeRemaining - Life points at end of game
+ * @param unusedTokens - DEPRECATED: No longer used in scoring (kept for API compatibility)
+ * @param guessesUsed - Number of target word attempts
+ * @param wordsFound - Number of words discovered
+ * @param solved - Whether the target was found
+ * @returns Efficiency score (0 if not solved, 0-1000 if solved)
  */
 export function calculateEfficiencyScore(
   lifeRemaining: number,
-  unusedTokens: number,
+  _unusedTokens: number, // DEPRECATED: No longer used in scoring (kept for API compatibility)
   guessesUsed: number,
   wordsFound: number,
   solved: boolean
 ): number {
-  if (!solved) return 0;
-
-  // Ensure non-negative inputs
-  const life = Math.max(0, lifeRemaining);
-  const tokens = Math.max(0, unusedTokens);
-  const words = Math.max(0, wordsFound);
-  const guesses = Math.max(0, guessesUsed);
-
-  return (
-    (life * 10) +
-    (tokens * 5) +
-    (words * 3) -
-    (guesses * 2)
-  );
+  return getScoreBreakdown(lifeRemaining, guessesUsed, wordsFound, solved).total;
 }
 
 // ============================================

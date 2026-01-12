@@ -42,16 +42,28 @@ describe('IdleMascot', () => {
     });
   });
 
-  it('should render with base variant', () => {
+  it('should render with base variant and default timing', () => {
     render(<IdleMascot baseVariant="happy" />);
 
     const mascot = screen.getByTestId('interactive-mascot');
     expect(mascot).toBeInTheDocument();
     expect(mascot).toHaveAttribute('data-variant', 'happy');
+
+    // Verify default timing values are passed (2-5s initial delay)
+    expect(mockUseRandomMascotActivity).toHaveBeenCalledWith(
+      expect.objectContaining({
+        initialDelayMin: 2000,
+        initialDelayMax: 5000,
+        minInterval: 10000,
+        maxInterval: 30000,
+      })
+    );
   });
 
   it('should pass props to useRandomMascotActivity hook', () => {
     const activities: ActivityVariant[] = ['eating_pizza', 'gaming'];
+    const initialDelayMin = 1000;
+    const initialDelayMax = 3000;
     const minInterval = 15000;
     const maxInterval = 45000;
     const activityDuration = 5000;
@@ -60,6 +72,8 @@ describe('IdleMascot', () => {
       <IdleMascot
         baseVariant="thinking"
         activities={activities}
+        initialDelayMin={initialDelayMin}
+        initialDelayMax={initialDelayMax}
         minInterval={minInterval}
         maxInterval={maxInterval}
         activityDuration={activityDuration}
@@ -69,6 +83,8 @@ describe('IdleMascot', () => {
     expect(mockUseRandomMascotActivity).toHaveBeenCalledWith({
       baseVariant: 'thinking',
       activities,
+      initialDelayMin,
+      initialDelayMax,
       minInterval,
       maxInterval,
       activityDuration,

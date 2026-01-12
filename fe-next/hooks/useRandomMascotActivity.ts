@@ -22,9 +22,13 @@ interface UseRandomMascotActivityOptions {
   baseVariant: ExtendedMascotVariant;
   /** List of activities to randomly choose from */
   activities?: ActivityVariant[];
-  /** Min interval between activities in ms (default: 10000 = 10s) */
+  /** Min delay before first activity in ms (default: 2000 = 2s) */
+  initialDelayMin?: number;
+  /** Max delay before first activity in ms (default: 5000 = 5s) */
+  initialDelayMax?: number;
+  /** Min interval between subsequent activities in ms (default: 10000 = 10s) */
   minInterval?: number;
-  /** Max interval between activities in ms (default: 30000 = 30s) */
+  /** Max interval between subsequent activities in ms (default: 30000 = 30s) */
   maxInterval?: number;
   /** How long to show activity before returning to base in ms (default: 4000 = 4s) */
   activityDuration?: number;
@@ -67,6 +71,8 @@ interface UseRandomMascotActivityReturn {
 export function useRandomMascotActivity({
   baseVariant,
   activities = DEFAULT_IDLE_ACTIVITIES,
+  initialDelayMin = 2000,
+  initialDelayMax = 5000,
   minInterval = 10000,
   maxInterval = 30000,
   activityDuration = 4000,
@@ -79,6 +85,7 @@ export function useRandomMascotActivity({
   const nextActivityTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const activityResetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scheduleNextActivityRef = useRef<(() => void) | null>(null);
+  const isFirstActivityRef = useRef(true);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
@@ -101,17 +108,23 @@ export function useRandomMascotActivity({
   }, [activities]);
 
   /**
-   * Get random interval between min and max
+   * Get random interval - uses shorter delay for first activity
    */
   const getRandomInterval = useCallback((): number => {
+    if (isFirstActivityRef.current) {
+      return Math.floor(Math.random() * (initialDelayMax - initialDelayMin + 1)) + initialDelayMin;
+    }
     return Math.floor(Math.random() * (maxInterval - minInterval + 1)) + minInterval;
-  }, [minInterval, maxInterval]);
+  }, [initialDelayMin, initialDelayMax, minInterval, maxInterval]);
 
   /**
    * Trigger a random activity
    */
   const triggerActivity = useCallback(() => {
     if (isDoingActivity || prefersReducedMotion) return;
+
+    // Mark first activity as done
+    isFirstActivityRef.current = false;
 
     const randomActivity = getRandomActivity();
     setCurrentVariant(randomActivity);

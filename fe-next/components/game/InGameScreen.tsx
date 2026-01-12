@@ -35,15 +35,6 @@ import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
 import { WordsRemaining } from '@/player/components/in-game/WordsRemaining';
 import { getPerformanceConfig } from '../grid/performanceUtils';
-import ContextualTooltip from './ContextualTooltip';
-import DirectionGuidanceTooltip from './DirectionGuidanceTooltip';
-import {
-  useContextualGuidance,
-  useComboGuidanceTrigger,
-  useEarthquakeGuidanceTrigger,
-  useFireRoundGuidanceTrigger,
-} from '@/hooks/useContextualGuidance';
-import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
 import { useTapToDragGuidance } from '@/hooks/useTapToDragGuidance';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
@@ -283,17 +274,6 @@ const InGameScreen = memo<InGameScreenProps>(({
     isLandscape,
     showStartAnimation,
   });
-
-  // Contextual guidance for first-time players
-  const guidance = useContextualGuidance();
-
-  // Auto-trigger guidance based on game events
-  useComboGuidanceTrigger(comboLevel, guidance.triggerComboGuidance);
-  useEarthquakeGuidanceTrigger(earthquakeState, guidance.triggerEarthquakeGuidance);
-  useFireRoundGuidanceTrigger(fireRoundActive, guidance.triggerFireRoundGuidance);
-
-  // Direction pattern guidance - shows when player only uses straight-line directions
-  const directionGuidance = useDirectionPatternGuidance();
 
   // Tap-to-drag guidance - shows when player taps single letter without dragging
   const tapDragGuidance = useTapToDragGuidance();
@@ -619,36 +599,13 @@ const InGameScreen = memo<InGameScreenProps>(({
           remainingSeconds={fireRoundRemaining}
         />
 
-        {/* Contextual Guidance Tooltips - First-time player education */}
-        <ContextualTooltip
-          type="combo"
-          isVisible={guidance.showComboTip}
-          onDismiss={guidance.dismissComboTip}
-          t={t}
-        />
-        <ContextualTooltip
-          type="earthquake"
-          isVisible={guidance.showEarthquakeTip}
-          onDismiss={guidance.dismissEarthquakeTip}
-          t={t}
-        />
-        <ContextualTooltip
-          type="fireRound"
-          isVisible={guidance.showFireRoundTip}
-          onDismiss={guidance.dismissFireRoundTip}
-          t={t}
-        />
-        <DirectionGuidanceTooltip
-          isVisible={directionGuidance.showDirectionGuidance}
-          onDismiss={directionGuidance.dismissDirectionGuidance}
-          t={t}
-          dir={dir}
-        />
+        {/* Tap-to-drag guidance - shows when player taps single letter without dragging */}
         <TapToDragTooltip
           isVisible={tapDragGuidance.showDragTutorial}
           onDismiss={tapDragGuidance.dismissDragTutorial}
           t={t}
           dir={dir}
+          language={gameLanguage || 'en'}
         />
 
         {/* Keyboard Input Hint - Desktop only (legacy fallback) */}
@@ -847,7 +804,6 @@ const InGameScreen = memo<InGameScreenProps>(({
                 interactive={isPlaying && !showStartAnimation}
                 animateOnMount={!hasAnimatedRef.current}
                 onWordSubmit={handleGridWordSubmit}
-                onPathSubmit={directionGuidance.trackWordPath}
                 onWordChange={handleWordChange}
                 comboLevel={comboLevel}
                 hideComboIndicator={true}
@@ -903,36 +859,13 @@ const InGameScreen = memo<InGameScreenProps>(({
         remainingSeconds={fireRoundRemaining}
       />
 
-      {/* Contextual Guidance Tooltips - First-time player education */}
-      <ContextualTooltip
-        type="combo"
-        isVisible={guidance.showComboTip}
-        onDismiss={guidance.dismissComboTip}
-        t={t}
-      />
-      <ContextualTooltip
-        type="earthquake"
-        isVisible={guidance.showEarthquakeTip}
-        onDismiss={guidance.dismissEarthquakeTip}
-        t={t}
-      />
-      <ContextualTooltip
-        type="fireRound"
-        isVisible={guidance.showFireRoundTip}
-        onDismiss={guidance.dismissFireRoundTip}
-        t={t}
-      />
-      <DirectionGuidanceTooltip
-        isVisible={directionGuidance.showDirectionGuidance}
-        onDismiss={directionGuidance.dismissDirectionGuidance}
-        t={t}
-        dir={dir}
-      />
+      {/* Tap-to-drag guidance - shows when player taps single letter without dragging */}
       <TapToDragTooltip
         isVisible={tapDragGuidance.showDragTutorial}
         onDismiss={tapDragGuidance.dismissDragTutorial}
         t={t}
         dir={dir}
+        language={gameLanguage || 'en'}
       />
 
       {/* Keyboard Input Hint - Desktop only (legacy fallback) */}
@@ -1168,7 +1101,6 @@ const InGameScreen = memo<InGameScreenProps>(({
               interactive={isPlaying && !showStartAnimation}
               animateOnMount={!hasAnimatedRef.current}
               onWordSubmit={handleGridWordSubmit}
-              onPathSubmit={directionGuidance.trackWordPath}
               onWordChange={handleWordChange}
               comboLevel={comboLevel}
               hideComboIndicator={true}

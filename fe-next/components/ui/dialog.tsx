@@ -140,7 +140,7 @@ const DialogHeader = ({
         "flex flex-col space-y-1.5 p-4 sm:p-6 lg:p-8",
         bgClass,
         "border-b-3 border-neo-black",
-        "text-center sm:text-left",
+        "text-center",
         className
       )}
       {...props}

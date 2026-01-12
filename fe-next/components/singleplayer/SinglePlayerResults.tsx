@@ -18,6 +18,8 @@ import CompactResultsStats from '@/components/results/CompactResultsStats';
 import BonusBadgesRow from '@/components/results/BonusBadgesRow';
 import CoinRewardDisplay from '@/components/results/CoinRewardDisplay';
 import BrainPointsDisplay from '@/components/results/BrainPointsDisplay';
+import RewardsSummary from '@/components/results/RewardsSummary';
+import { useWinStreak } from '@/hooks/useWinStreak';
 import NextStepPrompt, { type NextStepMode } from '@/components/results/NextStepPrompt';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -105,6 +107,20 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   // Cognitive scoring hook
   const { saveCognitiveScore } = useSaveCognitiveScore();
+
+  // Win streak tracking
+  const {
+    currentStreak,
+    bestStreak,
+    recordWin,
+  } = useWinStreak();
+  const [winStreakData, setWinStreakData] = useState<{
+    currentStreak: number;
+    bestStreak: number;
+    isNewMilestone: boolean;
+    previousStreak: number;
+  } | null>(null);
+  const hasRecordedWinRef = useRef(false);
 
   // Coin reward state - uses CoinRewardResult type from unified context
   const [coinReward, setCoinReward] = useState<CoinRewardResult | null>(null);
@@ -327,6 +343,34 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
     void awardCoins();
   }, [awardGameCompletion, results.playerScore, results.gameSessionId, playerRank, allParticipants.length]);
+
+  // Record win for streak tracking (solo-bots mode only, when player wins)
+  useEffect(() => {
+    if (hasRecordedWinRef.current) return;
+    if (mode !== 'solo-bots') return; // Only track wins in competitive mode
+    if (!isWinner) return; // Only record actual wins
+
+    hasRecordedWinRef.current = true;
+
+    // Store previous streak before recording
+    const previousStreak = currentStreak;
+
+    // Record the win
+    recordWin();
+
+    // Calculate if this is a new milestone (streak tier change)
+    const newStreak = previousStreak + 1;
+    const tierThresholds = [3, 7, 14, 30];
+    const isNewMilestone = tierThresholds.some(t => newStreak === t);
+
+    // Update win streak data for display
+    setWinStreakData({
+      currentStreak: newStreak,
+      bestStreak: Math.max(bestStreak, newStreak),
+      isNewMilestone,
+      previousStreak,
+    });
+  }, [mode, isWinner, currentStreak, bestStreak, recordWin]);
 
   // Save cognitive scores for brain training (authenticated users only)
   useEffect(() => {
@@ -657,6 +701,17 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         />
       </div>
 
+      {/* Rewards Summary - Shows win streak prominently for winners */}
+      {mode === 'solo-bots' && winStreakData && winStreakData.currentStreak > 0 && (
+        <RewardsSummary
+          coinReward={coinReward}
+          isAuthenticated={isAuthenticated}
+          winStreak={winStreakData}
+          achievementsUnlocked={results.achievements?.length || 0}
+          isWinner={isWinner}
+        />
+      )}
+
       {/* Compact Stats - Unified with coins, brain points, and sparkline */}
       <CompactResultsStats
         wordCount={validWordCount}
@@ -923,6 +978,17 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               }
               showConfetti={shouldShowConfetti}
             />
+
+            {/* Rewards Summary - Shows win streak prominently for winners */}
+            {mode === 'solo-bots' && winStreakData && winStreakData.currentStreak > 0 && (
+              <RewardsSummary
+                coinReward={coinReward}
+                isAuthenticated={isAuthenticated}
+                winStreak={winStreakData}
+                achievementsUnlocked={results.achievements?.length || 0}
+                isWinner={isWinner}
+              />
+            )}
 
             {/* Compact Stats - Unified with coins, brain points, and sparkline */}
             <CompactResultsStats

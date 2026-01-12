@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Shuffle, Trophy, RotateCcw, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -278,7 +278,7 @@ export default function PatternSwitcher({
       {phase !== 'ready' && phase !== 'complete' && (
         <div className={cn(
           'flex items-center justify-center gap-2 py-2 border-b-2 border-neo-black',
-          isDarkMode ? 'bg-slate-800/50' : 'bg-white/50'
+          isDarkMode ? 'bg-slate-800' : 'bg-white'
         )}>
           {pattern.map((len, i) => (
             <div

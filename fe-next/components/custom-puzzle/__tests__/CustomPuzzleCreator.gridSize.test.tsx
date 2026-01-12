@@ -11,9 +11,12 @@ jest.mock('@/utils/dailyChallenge', () => ({
   getGuestFingerprint: jest.fn().mockResolvedValue('test-fingerprint'),
 }));
 
+// Mock efficiency score that can be changed per test
+let mockEfficiencyScore = 95;
+
 // Mock DailyWordHuntSurvival component
 jest.mock('@/components/daily/DailyWordHuntSurvival', () => {
-  return function MockDailyWordHuntSurvival({ onComplete }: any) {
+  return function MockDailyWordHuntSurvival({ onComplete }: { onComplete: (result: any) => void }) {
     return (
       <div data-testid="game-component">
         <button onClick={() => onComplete({
@@ -21,7 +24,7 @@ jest.mock('@/components/daily/DailyWordHuntSurvival', () => {
           attemptsUsed: 3,
           wordsDiscovered: ['WORD', 'TEST'],
           lifeRemaining: 5,
-          efficiencyScore: 95,
+          efficiencyScore: mockEfficiencyScore,
         })}>Complete Game</button>
       </div>
     );
@@ -34,6 +37,7 @@ describe('CustomPuzzleCreator - Grid Size', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockEfficiencyScore = 95; // Reset to default
 
     (useLanguage as jest.Mock).mockReturnValue({
       t: mockT,
@@ -164,5 +168,46 @@ describe('CustomPuzzleCreator - Grid Size', () => {
     // Verify share functionality is displayed
     expect(screen.getByRole('button', { name: /customPuzzle.share/i })).toBeInTheDocument();
     expect(screen.getByText(/TEST123/)).toBeInTheDocument(); // Puzzle code should be visible
+  });
+
+  it('should display efficiency score as whole number without decimals', async () => {
+    // Set mock to return decimal efficiency score
+    mockEfficiencyScore = 87.456789;
+
+    const user = userEvent.setup();
+
+    render(
+      <CustomPuzzleCreator
+        isOpen={true}
+        onClose={mockOnClose}
+        language="en"
+      />
+    );
+
+    // Enter a valid word
+    const input = screen.getByPlaceholderText(/customPuzzle.enterWordPlaceholder/i);
+    await user.type(input, 'TESTING');
+
+    // Click create puzzle button
+    const createButton = screen.getByRole('button', { name: /customPuzzle.createPuzzle/i });
+    await user.click(createButton);
+
+    // Wait for game component to appear
+    await waitFor(() => {
+      expect(screen.getByTestId('game-component')).toBeInTheDocument();
+    });
+
+    // Complete the game
+    const completeButton = screen.getByText('Complete Game');
+    await user.click(completeButton);
+
+    // Wait for share phase
+    await waitFor(() => {
+      expect(screen.getByText(/customPuzzle.created/i)).toBeInTheDocument();
+    });
+
+    // Score should be displayed as whole number (87), not with decimals (87.456789)
+    expect(screen.getByText('87')).toBeInTheDocument();
+    expect(screen.queryByText(/87\.456/)).not.toBeInTheDocument();
   });
 });

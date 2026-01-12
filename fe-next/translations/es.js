@@ -2694,7 +2694,16 @@ const es = {
     "toCatch": "pts para pasar",
     "almostThere": "¡Ya casi!",
     "live": "En Vivo",
-    "backToGame": "Volver al Juego"
+    "backToGame": "Volver al Juego",
+    "yourProgress": "Tu Progreso",
+    "percentile": "Percentil",
+    "nextRank": "Siguiente Puesto",
+    "pointsToGo": "puntos restantes",
+    "beat": "Superar",
+    "youAreFirst": "¡Eres el #1!",
+    "keepItUp": "Sigue jugando para mantener tu liderazgo",
+    "nearbyPlayers": "Jugadores Cercanos",
+    "points": "pts"
   },
   "ranked": {
     "title": "Modo Clasificatorio",
@@ -3924,6 +3933,7 @@ const es = {
       "playAgain": "Jugar de Nuevo",
       "exit": "Salir",
       "finishGame": "Terminar Juego",
+      "useHint": "Usar Pista",
       "lightning-round": {
         "name": "Ronda Relámpago",
         "description": "Encuentra palabras lo más rápido posible"

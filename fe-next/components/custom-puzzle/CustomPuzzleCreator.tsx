@@ -503,7 +503,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                 <p className="text-sm text-neo-black/70 font-bold uppercase tracking-wide mb-1">
                   {t('customPuzzle.yourScore')}
                 </p>
-                <p className="text-5xl font-black text-neo-black">{creatorResult.efficiencyScore}</p>
+                <p className="text-5xl font-black text-neo-black">{Math.round(creatorResult.efficiencyScore)}</p>
               </motion.div>
 
               {/* Share URL */}

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Header from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
@@ -37,18 +37,18 @@ jest.mock('@/utils/ThemeContext', () => ({
   ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 jest.mock('framer-motion', () => {
-  const stripFramerProps = (props: any) => {
+  const stripFramerProps = (props: Record<string, unknown>) => {
     const { whileHover, whileTap, animate, initial, exit, transition, variants, ...rest } = props;
     return rest;
   };
   return {
     motion: {
-      div: ({ children, ...props }: any) => <div {...stripFramerProps(props)}>{children}</div>,
-      span: ({ children, ...props }: any) => <span {...stripFramerProps(props)}>{children}</span>,
-      button: ({ children, ...props }: any) => <button {...stripFramerProps(props)}>{children}</button>,
-      nav: ({ children, ...props }: any) => <nav {...stripFramerProps(props)}>{children}</nav>,
+      div: ({ children, ...props }: { children?: React.ReactNode } & Record<string, unknown>) => <div {...stripFramerProps(props)}>{children}</div>,
+      span: ({ children, ...props }: { children?: React.ReactNode } & Record<string, unknown>) => <span {...stripFramerProps(props)}>{children}</span>,
+      button: ({ children, ...props }: { children?: React.ReactNode } & Record<string, unknown>) => <button {...stripFramerProps(props)}>{children}</button>,
+      nav: ({ children, ...props }: { children?: React.ReactNode } & Record<string, unknown>) => <nav {...stripFramerProps(props)}>{children}</nav>,
     },
-    AnimatePresence: ({ children }: any) => <>{children}</>,
+    AnimatePresence: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
   };
 });
 jest.mock('@/components/MusicControls', () => ({
@@ -67,7 +67,7 @@ jest.mock('@/components/Avatar', () => ({
   __esModule: true,
   default: ({ avatarImage, profilePictureUrl }: { avatarImage?: string; profilePictureUrl?: string }) => (
     <div
-      data-testid="avatar"
+      data-testid="header-avatar"
       data-avatar-image={avatarImage}
       data-profile-picture-url={profilePictureUrl}
     >
@@ -81,8 +81,7 @@ const mockPush = jest.fn();
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockUseLanguage = useLanguage as jest.MockedFunction<typeof useLanguage>;
 
-// TODO: Implement avatar display in Header mobile menu before enabling these tests
-describe.skip('Header - Avatar Display', () => {
+describe('Header - Avatar Display', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (useRouter as jest.Mock).mockReturnValue({
@@ -103,13 +102,13 @@ describe.skip('Header - Avatar Display', () => {
     } as ReturnType<typeof useLanguage>);
   });
 
-  describe('Mobile menu avatar display', () => {
-    it('should show selected avatar image in mobile menu when user has chosen a character avatar', async () => {
+  describe('Mobile hamburger button avatar display', () => {
+    it('should show avatar on hamburger button when authenticated user has a character avatar', () => {
       const profile: ProfileData = {
         id: 'user-123',
         username: 'testuser',
         display_name: 'Test User',
-        avatar_image: 'broccoli-bob', // User selected a character avatar
+        avatar_image: 'broccoli-bob',
         profile_picture_url: 'https://example.com/profile.jpg',
         total_coins: 100,
         total_xp: 500,
@@ -125,23 +124,19 @@ describe.skip('Header - Avatar Display', () => {
 
       render(<Header />);
 
-      // Open mobile menu
-      const menuButton = screen.getByRole('button', { name: /menu/i });
-      fireEvent.click(menuButton);
-
-      await waitFor(() => {
-        const avatar = screen.getByTestId('avatar');
-        expect(avatar).toHaveAttribute('data-avatar-image', 'broccoli-bob');
-        expect(avatar).toHaveAttribute('data-profile-picture-url', 'https://example.com/profile.jpg');
-      });
+      // Avatar should be visible on the hamburger button (before clicking)
+      const avatar = screen.getByTestId('header-avatar');
+      expect(avatar).toBeInTheDocument();
+      expect(avatar).toHaveAttribute('data-avatar-image', 'broccoli-bob');
+      expect(avatar).toHaveAttribute('data-profile-picture-url', 'https://example.com/profile.jpg');
     });
 
-    it('should show profile picture in mobile menu when user has chosen profile picture option', async () => {
+    it('should show avatar with PROFILE_AVATAR_ID when user has selected their profile picture', () => {
       const profile: ProfileData = {
         id: 'user-123',
         username: 'testuser',
         display_name: 'Test User',
-        avatar_image: PROFILE_AVATAR_ID, // User explicitly selected profile picture
+        avatar_image: PROFILE_AVATAR_ID,
         profile_picture_url: 'https://example.com/profile.jpg',
         total_coins: 100,
         total_xp: 500,
@@ -157,25 +152,20 @@ describe.skip('Header - Avatar Display', () => {
 
       render(<Header />);
 
-      // Open mobile menu
-      const menuButton = screen.getByRole('button', { name: /menu/i });
-      fireEvent.click(menuButton);
-
-      await waitFor(() => {
-        const avatar = screen.getByTestId('avatar');
-        expect(avatar).toHaveAttribute('data-avatar-image', PROFILE_AVATAR_ID);
-        expect(avatar).toHaveAttribute('data-profile-picture-url', 'https://example.com/profile.jpg');
-      });
+      const avatar = screen.getByTestId('header-avatar');
+      expect(avatar).toBeInTheDocument();
+      expect(avatar).toHaveAttribute('data-avatar-image', PROFILE_AVATAR_ID);
+      expect(avatar).toHaveAttribute('data-profile-picture-url', 'https://example.com/profile.jpg');
     });
 
-    it('should not show random avatar when user has selected specific avatar', async () => {
-      const selectedAvatarId = 'captain-carrot';
+    it('should show user-selected avatar, not a random one', () => {
+      const selectedAvatarId = 'pizza-pete';
       const profile: ProfileData = {
         id: 'user-123',
         username: 'testuser',
         display_name: 'Test User',
         avatar_image: selectedAvatarId,
-        profile_picture_url: 'https://example.com/profile.jpg',
+        profile_picture_url: null,
         total_coins: 100,
         total_xp: 500,
       } as ProfileData;
@@ -190,15 +180,37 @@ describe.skip('Header - Avatar Display', () => {
 
       render(<Header />);
 
-      // Open mobile menu
-      const menuButton = screen.getByRole('button', { name: /menu/i });
-      fireEvent.click(menuButton);
+      const avatar = screen.getByTestId('header-avatar');
+      expect(avatar).toHaveAttribute('data-avatar-image', selectedAvatarId);
+    });
 
-      await waitFor(() => {
-        const avatar = screen.getByTestId('avatar');
-        // Should show the user's selected avatar, not a different one
-        expect(avatar).toHaveAttribute('data-avatar-image', selectedAvatarId);
-      });
+    it('should NOT show avatar when user is not authenticated (show Menu icon instead)', () => {
+      mockUseAuth.mockReturnValue({
+        isAuthenticated: false,
+        profile: null,
+        isSupabaseEnabled: true,
+        loading: false,
+        isAdmin: false,
+      } as ReturnType<typeof useAuth>);
+
+      render(<Header />);
+
+      // Avatar should NOT be in the document
+      expect(screen.queryByTestId('header-avatar')).not.toBeInTheDocument();
+    });
+
+    it('should NOT show avatar when profile is null (show Menu icon instead)', () => {
+      mockUseAuth.mockReturnValue({
+        isAuthenticated: true,
+        profile: null,
+        isSupabaseEnabled: true,
+        loading: false,
+        isAdmin: false,
+      } as ReturnType<typeof useAuth>);
+
+      render(<Header />);
+
+      expect(screen.queryByTestId('header-avatar')).not.toBeInTheDocument();
     });
   });
 });

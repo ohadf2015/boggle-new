@@ -59,12 +59,12 @@ import ComboDisplay from '../ComboDisplay';
 
 describe('ComboDisplay Overflow Prevention', () => {
   describe('container overflow settings', () => {
-    it('uses overflow-hidden to prevent content from extending beyond bounds', () => {
+    it('uses overflow-visible to allow glow effect to extend beyond bounds', () => {
       const { container } = render(<ComboDisplay comboLevel={5} compact />);
 
-      // The outermost div should have overflow-hidden, not overflow-visible
+      // The outermost div should have overflow-visible to allow glow to render fully
       const comboContainer = container.firstChild as HTMLElement;
-      expect(comboContainer).toHaveClass('overflow-hidden');
+      expect(comboContainer).toHaveClass('overflow-visible');
     });
 
     it('has fixed width in compact mode to prevent layout shifts', () => {

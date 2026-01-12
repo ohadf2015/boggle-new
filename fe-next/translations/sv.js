@@ -2569,7 +2569,16 @@ const sv = {
     "toCatch": "p för att passera",
     "almostThere": "Nästan där!",
     "live": "Live",
-    "backToGame": "Tillbaka till spelet"
+    "backToGame": "Tillbaka till spelet",
+    "yourProgress": "Dina framsteg",
+    "percentile": "Percentil",
+    "nextRank": "Nästa rank",
+    "pointsToGo": "poäng kvar",
+    "beat": "Slå",
+    "youAreFirst": "Du är #1!",
+    "keepItUp": "Fortsätt spela för att behålla ledningen",
+    "nearbyPlayers": "Närliggande spelare",
+    "points": "poäng"
   },
   "ranked": {
     "title": "Rankat läge",
@@ -3449,6 +3458,22 @@ const sv = {
       "exploreGrid": "Utforska rutnätet för bonusord",
       "strategicGuessing": "Använd ledtrådar innan du gissar"
     },
+    "score": {
+      "title": "Din Poäng",
+      "speed": "Hastighet",
+      "accuracy": "Precision",
+      "exploration": "Utforskning",
+      "perfect": "Perfekt Poäng!",
+      "lifeLeft": "liv kvar",
+      "firstTry": "Första försöket!",
+      "guesses": "gissningar",
+      "wordsFound": "ord hittade",
+      "improve": {
+        "speed": "Bli snabbare",
+        "accuracy": "Använd färre gissningar",
+        "exploration": "Hitta fler ord"
+      }
+    },
     "ad": {
       "watchAd": "Titta på Annons",
       "needMoreCoins": "Behöver fler mynt?",
@@ -3927,6 +3952,7 @@ const sv = {
       "playAgain": "Spela igen",
       "exit": "Avsluta",
       "finishGame": "Avsluta Spel",
+      "useHint": "Använd Tips",
       "lightning-round": {
         "name": "Blixtrundan",
         "description": "Hitta ord så snabbt som möjligt"

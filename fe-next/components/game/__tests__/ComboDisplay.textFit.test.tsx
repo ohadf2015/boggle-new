@@ -73,9 +73,9 @@ describe('ComboDisplay Text Fitting', () => {
   it('text content fits within container without overflow', () => {
     const { container } = render(<ComboDisplay comboLevel={5} compact />);
 
-    // Check that container has overflow-hidden
+    // Check that container allows glow overflow with overflow-visible
     const outerContainer = container.firstChild as HTMLElement;
-    expect(outerContainer).toHaveClass('overflow-hidden');
+    expect(outerContainer).toHaveClass('overflow-visible');
 
     // All text elements should be present and visible
     expect(screen.getByText(/x5/)).toBeInTheDocument();
@@ -104,8 +104,8 @@ describe('ComboDisplay Text Fitting', () => {
     expect(screen.getByText(/x10/)).toBeInTheDocument();
     expect(screen.getByText(/Combo/)).toBeInTheDocument();
 
-    // Container should not overflow
+    // Container should allow glow overflow with overflow-visible
     const outerContainer = container.firstChild as HTMLElement;
-    expect(outerContainer).toHaveClass('overflow-hidden');
+    expect(outerContainer).toHaveClass('overflow-visible');
   });
 });

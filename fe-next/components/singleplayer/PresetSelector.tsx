@@ -224,7 +224,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
                 )}
               >
                 <Settings className="w-4 h-4" />
-                {t('singlePlayer.preset.advanced') || 'Advanced Settings'}
+                {t('singlePlayer.preset.customGame') || 'Custom Game Setup'}
               </button>
             </motion.div>
           </div>
@@ -354,7 +354,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
             )}
           >
             <Settings className="w-4 h-4" />
-            {t('singlePlayer.preset.advanced') || 'Advanced Settings'}
+            {t('singlePlayer.preset.customGame') || 'Custom Game Setup'}
           </button>
         </motion.div>
       </motion.div>

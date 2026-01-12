@@ -91,6 +91,8 @@ const he = {
     "connectionLost": "איבדנו חיבור",
     "notConnected": "לא מחובר",
     "connected": "מחובר",
+    "left": "נותרו",
+    "processing": "מעבד...",
     "coins": "מטבעות",
     "chat": "צ'אט",
     "connecting": "מתחבר...",
@@ -1135,6 +1137,9 @@ const he = {
     "viewDetails": "ראו פירוט",
     "viewAllWords": "כל המילים",
     "viewXpBreakdown": "פירוט XP",
+    "rewardsEarned": "פרסים שנצברו",
+    "achievementUnlocked": "הישג נפתח",
+    "achievementsUnlocked": "הישגים נפתחו",
     "summary": "סיכום",
     "details": "פרטים",
     "performanceDetails": "פרטי ביצועים",
@@ -2577,7 +2582,22 @@ const he = {
     "efficiency": "יעילות",
     "streak": "רצף",
     "guestTeasing": "התחבר כדי לקבל {amount} מטבעות!",
-    "signInShort": "התחבר"
+    "signInShort": "התחבר",
+    "notEnough": "אין מספיק מטבעות",
+    "signInToEarn": "התחבר כדי לצבור"
+  },
+  "streak": {
+    "protection": "הגנת רצף",
+    "protectionApplied": "הגנה הופעלה!",
+    "atRisk": "רצף בסכנה!",
+    "atRiskDesc": "נצח היום כדי לשמור על רצף של {count} ימים!",
+    "canRecover": "שחזר את הרצף שלך",
+    "recoverDesc": "אפשר לשחזר את הרצף של {count} ימים שלך!",
+    "recoverFor": "שחזר תמורת {cost} מטבעות",
+    "freezes": "הקפאות רצף",
+    "freezeDesc": "השתמש בהקפאה כדי להגן על הרצף שלך ליום אחד בלי לנצח.",
+    "useFreeze": "השתמש בהקפאת רצף",
+    "noFreezes": "אין הקפאות זמינות. קבל הקפאה חינם בכל שבוע!"
   },
   "partyScreen": {
     "title": "מסך מסיבה",
@@ -2709,7 +2729,16 @@ const he = {
     "toCatch": "נק' לעבור",
     "almostThere": "כמעט שם!",
     "live": "שידור חי",
-    "backToGame": "חזרה למשחק"
+    "backToGame": "חזרה למשחק",
+    "yourProgress": "ההתקדמות שלך",
+    "percentile": "אחוזון",
+    "nextRank": "הדירוג הבא",
+    "pointsToGo": "נקודות נשארו",
+    "beat": "לנצח",
+    "youAreFirst": "אתה #1!",
+    "keepItUp": "המשך לשחק כדי לשמור על המובילות",
+    "nearbyPlayers": "שחקנים קרובים",
+    "points": "נק'"
   },
   "ranked": {
     "title": "מצב מדורג",
@@ -3461,6 +3490,22 @@ const he = {
       "exploreGrid": "חפשו בלוח מילים בונוס",
       "strategicGuessing": "השתמשו ברמזים לפני שמנחשים"
     },
+    "score": {
+      "title": "הניקוד שלך",
+      "speed": "מהירות",
+      "accuracy": "דיוק",
+      "exploration": "חקירה",
+      "perfect": "ניקוד מושלם!",
+      "lifeLeft": "חיים נותרו",
+      "firstTry": "בניסיון ראשון!",
+      "guesses": "ניחושים",
+      "wordsFound": "מילים נמצאו",
+      "improve": {
+        "speed": "סיימו מהר יותר",
+        "accuracy": "נחשו פחות פעמים",
+        "exploration": "מצאו עוד מילים"
+      }
+    },
     "ad": {
       "watchAd": "צפה בפרסומת",
       "needMoreCoins": "צריכים עוד מטבעות?",
@@ -3932,6 +3977,7 @@ const he = {
       "playAgain": "שחק שוב",
       "exit": "יציאה",
       "finishGame": "סיים משחק",
+      "useHint": "השתמש ברמז",
       "lightning-round": {
         "name": "סיבוב ברק",
         "description": "מצא מילים הכי מהר שאפשר"

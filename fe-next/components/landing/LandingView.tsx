@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
-import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Sparkles, Star, Zap } from 'lucide-react';
+import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Lock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,7 +16,6 @@ import { cn } from '@/lib/utils';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useMouseParallax } from '@/hooks/useTiltEffect';
-import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 import { InteractiveMascotWithEntrance } from '@/components/ui/InteractiveMascot';
@@ -33,8 +32,6 @@ import LoadingComponent from '@/app/[locale]/loading';
  * Uses responsive sizing - smaller on mobile for better proportions
  */
 const HeroMascot = memo(function HeroMascot() {
-  const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
-
   return (
     <div className="relative mx-auto mb-1">
       {/* Interactive Mascot - happy by default, excited on hover, celebrating on click */}
@@ -79,32 +76,6 @@ const HeroMascot = memo(function HeroMascot() {
         />
       </div>
 
-      {/* Sparkle accents around mascot - lime family unified */}
-      {enableComplexAnimations && !prefersReducedMotion && (
-        <>
-          <motion.div
-            className="absolute -top-2 -right-2 text-neo-lime"
-            animate={{ scale: [0, 1, 0], rotate: [0, 180, 360] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0 }}
-          >
-            <Sparkles className="w-5 h-5" />
-          </motion.div>
-          <motion.div
-            className="absolute top-1/2 -left-4 text-neo-lime-light"
-            animate={{ scale: [0, 1, 0], rotate: [0, -180, -360] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
-          >
-            <Star className="w-4 h-4 fill-current" />
-          </motion.div>
-          <motion.div
-            className="absolute -bottom-1 right-1/4 text-neo-lime-muted"
-            animate={{ scale: [0, 1, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
-          >
-            <Zap className="w-4 h-4 fill-current" />
-          </motion.div>
-        </>
-      )}
     </div>
   );
 });
@@ -306,7 +277,7 @@ const LandingView: React.FC = () => {
 
         {/* Daily Challenge Banner - Lazy loaded with skeleton fallback */}
         {/* Fixed dimensions prevent CLS - matches DailyChallengeBanner actual height */}
-        <div className={`w-full ${isLandscape ? 'mb-2' : 'mb-2 sm:mb-3 lg:mb-4 xl:mb-6'}`}>
+        <div className={`w-full ${isLandscape ? 'mb-2' : 'mb-2 sm:mb-2 lg:mb-3'}`}>
           <Suspense fallback={
             <div
               className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-yellow"
@@ -438,23 +409,26 @@ const LandingView: React.FC = () => {
                 onClick={() => setShowAuthModal(true)}
                 className={cn(
                   'col-span-2 flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4 relative',
-                  'bg-gradient-to-br from-neo-purple/40 to-purple-400/40',
+                  'bg-gradient-to-br from-neo-purple to-purple-400 grayscale',
                   'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
                   'hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px]',
                   'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm',
                   'transition-all min-h-[80px] sm:min-h-[100px]',
                   isMobilePortrait && 'max-h-[20dvh]',
                   isLandscape && 'max-h-[50dvh]',
-                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
-                  'cursor-not-allowed'
+                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                 )}
                 aria-label={`${t('landing.brainTraining') || 'Brain Training'} - ${t('landing.signInToUnlock') || 'Sign in to unlock'}`}
               >
-                <div className="absolute top-1 right-1 bg-neo-lime text-neo-black px-1.5 py-0.5 rounded-neo text-xs font-bold border-2 border-neo-black shadow-hard-xs">
-                  🔒 {t('landing.locked') || 'Locked'}
+                {/* Centered lock badge */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                  <span className="inline-flex items-center gap-2 px-3 py-2 bg-neo-navy text-neo-white font-bold rounded-neo border-3 border-neo-black shadow-hard text-sm transform -rotate-3">
+                    <Lock className="w-4 h-4" />
+                    {t('landing.signInToUnlock') || 'Sign in to unlock'}
+                  </span>
                 </div>
-                <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-neo-white drop-shadow-lg" aria-hidden="true" />
-                <span className="text-sm sm:text-lg font-black uppercase text-neo-white drop-shadow-lg text-center">{t('landing.brainTraining') || 'Brain Training'}</span>
+                <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
+                <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.brainTraining') || 'Brain Training'}</span>
               </button>
             )}
           </div>
@@ -508,12 +482,12 @@ const LandingView: React.FC = () => {
       </main>
 
       {/* Tutorial FAB - Fixed bottom corner button */}
-      {/* Z-index 45 on mobile, higher on desktop to clear any overlapping elements */}
       {/* Position uses max() to ensure button clears safe area on devices with home indicators */}
+      {/* z-[110] on desktop ensures button appears above footer (z-10) in layout */}
       <button
         onClick={handleOpenTutorial}
         className="
-          fixed bottom-[max(env(safe-area-inset-bottom,0px),1rem)] right-4 z-[45] lg:bottom-8 lg:right-8 lg:z-[100]
+          fixed bottom-[max(env(safe-area-inset-bottom,0px),1rem)] right-4 z-[45] lg:bottom-8 lg:right-8 lg:z-[110]
           flex items-center justify-center gap-2
           min-w-[48px] min-h-[48px]
           px-4 py-3

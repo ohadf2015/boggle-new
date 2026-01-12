@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, Gem, Star, Trophy, RotateCcw, Clock, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -269,7 +269,7 @@ export default function RareGems({
         <div className={cn(
           'flex items-center justify-center gap-3 py-2 text-xs',
           'border-b-2 border-neo-black',
-          isDarkMode ? 'bg-slate-800/50' : 'bg-white/50'
+          isDarkMode ? 'bg-slate-800' : 'bg-white'
         )}>
           {Object.entries(RARITY_COLORS).map(([rarity, color]) => (
             <div key={rarity} className="flex items-center gap-1">

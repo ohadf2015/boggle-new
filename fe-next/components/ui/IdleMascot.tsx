@@ -13,9 +13,13 @@ interface IdleMascotProps extends Omit<InteractiveMascotProps, 'variant'> {
   baseVariant: ExtendedMascotVariant;
   /** List of activities to randomly choose from (defaults to all fun activities) */
   activities?: ActivityVariant[];
-  /** Min interval between activities in ms (default: 10000 = 10s) */
+  /** Min delay before first activity in ms (default: 2000 = 2s) */
+  initialDelayMin?: number;
+  /** Max delay before first activity in ms (default: 5000 = 5s) */
+  initialDelayMax?: number;
+  /** Min interval between subsequent activities in ms (default: 10000 = 10s) */
   minInterval?: number;
-  /** Max interval between activities in ms (default: 30000 = 30s) */
+  /** Max interval between subsequent activities in ms (default: 30000 = 30s) */
   maxInterval?: number;
   /** How long to show activity before returning to base in ms (default: 4000 = 4s) */
   activityDuration?: number;
@@ -57,6 +61,8 @@ interface IdleMascotProps extends Omit<InteractiveMascotProps, 'variant'> {
 export const IdleMascot = memo(function IdleMascot({
   baseVariant,
   activities = DEFAULT_IDLE_ACTIVITIES,
+  initialDelayMin = 2000,
+  initialDelayMax = 5000,
   minInterval = 10000,
   maxInterval = 30000,
   activityDuration = 4000,
@@ -67,6 +73,8 @@ export const IdleMascot = memo(function IdleMascot({
   const { currentVariant, triggerActivity } = useRandomMascotActivity({
     baseVariant,
     activities,
+    initialDelayMin,
+    initialDelayMax,
     minInterval,
     maxInterval,
     activityDuration,

@@ -128,8 +128,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
         'relative overflow-hidden',
         // Full height to fill grid cell
         'h-full',
-        // Colors - dimmed when locked with reduced opacity for accessibility
-        locked ? 'opacity-90' : '',
+        // Colors - grayscale filter when locked for visual distinction
+        locked ? 'grayscale' : '',
         styles.bg,
         !locked && styles.hoverBg,
         // Transitions - improved easing
@@ -280,16 +280,17 @@ const ModeCard: React.FC<ModeCardProps> = ({
 
       {/* Locked overlay with message badge - hidden during loading to prevent flicker */}
       {locked && !loading && lockedMessage && (
-        <div className="absolute bottom-2 left-2 right-2">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <span
             className={cn(
-              'inline-flex items-center gap-1.5 px-2 py-1',
-              'bg-neo-lime text-neo-black font-bold rounded-neo',
-              'border-2 border-neo-black shadow-hard-xs',
-              'text-xs sm:text-sm'
+              'inline-flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5',
+              'bg-neo-navy text-neo-white font-bold rounded-neo',
+              'border-3 border-neo-black shadow-hard',
+              'text-sm sm:text-base',
+              'transform -rotate-3'
             )}
           >
-            <Lock className="w-3 h-3" />
+            <Lock className="w-4 h-4 sm:w-5 sm:h-5" />
             {lockedMessage}
           </span>
         </div>

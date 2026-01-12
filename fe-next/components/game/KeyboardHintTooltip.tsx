@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Keyboard, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -76,17 +76,17 @@ export function KeyboardHintTooltip({
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          initial={{ opacity: 0, y: 20, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 20, scale: 0.9 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+          initial={{ opacity: 0, x: -20, scale: 0.9 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          exit={{ opacity: 0, x: -20, scale: 0.9 }}
+          transition={{ type: 'spring', stiffness: 350, damping: 28 }}
           className={cn(
-            'fixed bottom-20 right-4 z-50',
-            'max-w-[280px] sm:max-w-[320px]',
-            'bg-neo-pink text-white',
-            'border-4 border-neo-black',
-            'rounded-neo-lg shadow-hard-xl',
-            'p-4'
+            'fixed top-20 left-4 z-40',
+            'max-w-[220px]',
+            'bg-neo-pink/95 backdrop-blur-md text-white',
+            'border-3 border-neo-black',
+            'rounded-neo-lg shadow-hard-lg',
+            'p-3'
           )}
           role="tooltip"
           aria-live="polite"
@@ -94,67 +94,68 @@ export function KeyboardHintTooltip({
           {/* Close button */}
           <button
             onClick={handleDismiss}
-            className="absolute top-2 right-2 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-neo border-2 border-white/30 transition-colors"
+            className="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full border-2 border-white/30 transition-colors"
             aria-label="Dismiss hint"
           >
-            <X className="w-5 h-5" />
+            <X className="w-3 h-3" />
           </button>
 
           {/* Content */}
-          <div className="flex items-start gap-3 pr-6">
-            {/* Icon */}
-            <div className="flex-shrink-0 w-10 h-10 bg-neo-lime text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center">
-              <Keyboard className="w-6 h-6" />
-            </div>
+          <div className="flex items-start gap-2">
+            {/* Icon with pulse animation */}
+            <motion.div
+              className="flex-shrink-0 w-7 h-7 bg-neo-lime text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center"
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <Keyboard className="w-4 h-4" />
+            </motion.div>
 
             {/* Text */}
-            <div className="flex-1 min-w-0">
-              <div className="font-black text-sm uppercase mb-1">
-                💡 {t('keyboardHint.title') || 'Pro Tip'}
+            <div className="flex-1 min-w-0 pr-2">
+              <div className="font-black text-xs uppercase mb-0.5">
+                {t('keyboardHint.title') || 'Type!'}
               </div>
-              <p className="text-sm leading-snug mb-3">
-                {t('keyboardHint.message') || 'You can type words on your keyboard! Just start typing and press Enter to submit.'}
+              <p className="text-[11px] leading-snug mb-2">
+                {t('keyboardHint.message') || 'Type words & press Enter'}
               </p>
 
-              {/* Keyboard shortcuts */}
-              <div className="flex flex-wrap gap-1.5 text-xs">
-                <kbd className="px-2 py-1 bg-neo-black/30 rounded border border-white/20 font-mono">
-                  {t('keyboardHint.type') || 'Type'}
-                </kbd>
-                <span className="text-white/70">+</span>
-                <kbd className="px-2 py-1 bg-neo-black/30 rounded border border-white/20 font-mono">
+              {/* Keyboard shortcuts with animation */}
+              <div className="flex flex-wrap gap-1 text-[10px]">
+                <motion.kbd
+                  className="px-1.5 py-0.5 bg-neo-black/30 rounded border border-white/20 font-mono"
+                  animate={{ y: [0, -2, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0 }}
+                >
+                  Type
+                </motion.kbd>
+                <span className="text-white/70">→</span>
+                <motion.kbd
+                  className="px-1.5 py-0.5 bg-neo-black/30 rounded border border-white/20 font-mono"
+                  animate={{ y: [0, -2, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
+                >
                   Enter
-                </kbd>
-                <span className="text-white/70 mx-1">·</span>
-                <kbd className="px-2 py-1 bg-neo-black/30 rounded border border-white/20 font-mono">
-                  Esc
-                </kbd>
-                <span className="text-xs text-white/70">
-                  {t('keyboardHint.clear') || 'to clear'}
-                </span>
+                </motion.kbd>
               </div>
             </div>
           </div>
 
-          {/* Got it button */}
+          {/* Compact dismiss button */}
           <button
             onClick={handleDismiss}
             className={cn(
-              'w-full mt-3 px-4 py-2',
+              'w-full mt-2 px-3 py-1.5',
               'bg-neo-lime text-neo-black',
-              'border-3 border-neo-black rounded-neo',
-              'font-bold text-sm uppercase',
-              'shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg',
+              'border-2 border-neo-black rounded-neo',
+              'font-bold text-[11px] uppercase',
+              'shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard',
               'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
               'transition-all'
             )}
           >
             {t('keyboardHint.gotIt') || 'Got it!'}
           </button>
-
-          {/* Pointer arrow */}
-          <div className="absolute bottom-[-12px] right-8 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[12px] border-t-neo-black" />
-          <div className="absolute bottom-[-8px] right-[34px] w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-neo-pink" />
         </motion.div>
       )}
     </AnimatePresence>

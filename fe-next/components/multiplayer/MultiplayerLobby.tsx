@@ -6,9 +6,7 @@ import Link from 'next/link';
 import { Crown, User, ArrowLeft } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
@@ -348,52 +346,50 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
       {/* Landscape mode suggestion banner */}
       <LandscapeIndicator />
 
-      <div dir={dir} className="min-h-screen bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy flex flex-col">
+      <div dir={dir} className="min-h-screen bg-neo-navy flex flex-col">
       <div className="w-[94%] max-w-7xl mx-auto py-3 sm:py-4 flex-1 flex flex-col min-h-0">
-        {/* Title with back button */}
+        {/* Compact Header: back button + title inline */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative flex items-center justify-center mb-2 sm:mb-3 flex-shrink-0"
+          className="flex items-center gap-3 mb-3 flex-shrink-0"
         >
           <Link
             href="/"
-            className="absolute start-0 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all text-neo-black dark:text-neo-white text-sm font-bold"
+            className="flex items-center justify-center w-10 h-10 rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg transition-all text-neo-black"
           >
             <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
-            <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
           </Link>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase text-center text-neo-black dark:text-neo-white">
+          <h1 className="text-xl sm:text-2xl font-black uppercase text-neo-white flex-1">
             {t('landing.multiplayer') || 'Multiplayer'}
           </h1>
         </motion.div>
 
-        {/* On mobile: show room list first (top) when rooms exist, form first when empty */}
+        {/* Desktop: Single row layout - Form | Rooms side by side without scroll */}
+        {/* Mobile: Stack vertically, rooms first when available */}
         <div className={cn(
-          "flex gap-3 sm:gap-4 lg:gap-6 lg:flex-row",
+          "flex-1 flex gap-4 lg:gap-6 lg:flex-row lg:items-stretch",
           activeRooms.length > 0 ? "flex-col-reverse" : "flex-col"
         )}>
-          {/* Main Form */}
+          {/* Main Form - No Card wrapper, direct styling */}
           <motion.div
             initial={{ x: -30, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="w-full lg:flex-1"
+            className="w-full lg:w-[45%] lg:max-w-md flex flex-col"
           >
-            <Card>
-              <CardHeader className="pb-4">
-                {/* Mode Selector */}
-                <ModeSelector mode={mode} onModeChange={handleModeChange} />
-              </CardHeader>
+            <div className="rounded-neo border-3 border-neo-black bg-slate-800 shadow-hard p-4 flex flex-col h-full">
+              {/* Mode Selector - direct, no header wrapper */}
+              <ModeSelector mode={mode} onModeChange={handleModeChange} />
 
-              <CardContent className="space-y-4">
-                {/* Error Alert */}
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
+              {/* Error Alert */}
+              {error && (
+                <Alert variant="destructive" className="mt-3">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="flex-1 flex flex-col mt-3 space-y-3">
+                <div className="flex-1 space-y-3">
                   {mode === 'host' ? (
                     <>
                       <HostModeFields
@@ -419,68 +415,54 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
                         t={t}
                       />
 
-                      {/* Language Selector */}
+                      {/* Language Selector - no label, inline */}
                       <LanguageSelector
                         selectedLanguage={roomLanguage}
                         onLanguageChange={setRoomLanguage}
+                        hideLabel
                       />
-
-                      {/* Create Room Button */}
-                      <Button
-                        type="submit"
-                        variant="success"
-                        className="w-full"
-                        size="lg"
-                        disabled={isJoining}
-                      >
-                        <Crown className="mr-2" />
-                        {isJoining
-                          ? t('joinView.creating') || 'Creating...'
-                          : t('joinView.createRoom') || 'Create Room'}
-                      </Button>
                     </>
                   ) : (
-                    <>
-                      <JoinModeFields
-                        gameCode={gameCode}
-                        setGameCode={setGameCode}
-                        gameCodeError={gameCodeError}
-                        setGameCodeError={setGameCodeError}
-                        gameCodeErrorKey={gameCodeErrorKey}
-                        username={username}
-                        setUsername={setUsername}
-                        usernameError={usernameError}
-                        setUsernameError={setUsernameError}
-                        usernameErrorKey={usernameErrorKey}
-                        isAuthenticated={isAuthenticated}
-                        displayName={displayName}
-                        t={t}
-                      />
-
-                      {/* Join Button */}
-                      <Button
-                        type="submit"
-                        className="w-full"
-                        size="lg"
-                        disabled={isJoining || isAutoJoining || !gameCode}
-                      >
-                        <User className="mr-2" />
-                        {isJoining || isAutoJoining
-                          ? t('joinView.joining') || 'Joining...'
-                          : t('joinView.joinGame') || 'Join Game'}
-                      </Button>
-                    </>
+                    <JoinModeFields
+                      gameCode={gameCode}
+                      setGameCode={setGameCode}
+                      gameCodeError={gameCodeError}
+                      setGameCodeError={setGameCodeError}
+                      gameCodeErrorKey={gameCodeErrorKey}
+                      username={username}
+                      setUsername={setUsername}
+                      usernameError={usernameError}
+                      setUsernameError={setUsernameError}
+                      usernameErrorKey={usernameErrorKey}
+                      isAuthenticated={isAuthenticated}
+                      displayName={displayName}
+                      t={t}
+                    />
                   )}
-                </form>
-              </CardContent>
-            </Card>
+                </div>
+
+                {/* Submit Button - fixed at bottom */}
+                <Button
+                  type="submit"
+                  variant={mode === 'host' ? 'success' : 'default'}
+                  className="w-full mt-auto"
+                  size="lg"
+                  disabled={isJoining || (mode === 'join' && (isAutoJoining || !gameCode))}
+                >
+                  {mode === 'host' ? <Crown className="mr-2" /> : <User className="mr-2" />}
+                  {mode === 'host'
+                    ? (isJoining ? t('joinView.creating') || 'Creating...' : t('joinView.createRoom') || 'Create Room')
+                    : (isJoining || isAutoJoining ? t('joinView.joining') || 'Joining...' : t('joinView.joinGame') || 'Join Game')}
+                </Button>
+              </form>
+            </div>
           </motion.div>
 
-          {/* Room List */}
+          {/* Room List - Takes remaining space on desktop */}
           <motion.div
             initial={{ x: 30, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="w-full lg:flex-1"
+            className="w-full lg:flex-1 lg:min-w-0"
           >
             <RoomList
               activeRooms={activeRooms}
@@ -492,6 +474,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
               isJoinMode={mode === 'join'}
               mobileExpanded={mobileRoomsExpanded}
               onToggleMobileExpand={() => setMobileRoomsExpanded(!mobileRoomsExpanded)}
+              compact
             />
           </motion.div>
         </div>

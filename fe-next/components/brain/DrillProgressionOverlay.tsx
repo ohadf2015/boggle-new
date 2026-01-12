@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, Brain, Target, Shuffle, BookOpen, TrendingUp, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -67,20 +67,32 @@ const DOMAIN_CONFIG: Record<CognitiveDomain, {
 
 /**
  * Animated counter component for score display
+ * Animates from startValue to endValue for satisfying progression feedback
  */
-function AnimatedScore({ value, duration = 1500 }: { value: number; duration?: number }) {
-  const [displayValue, setDisplayValue] = useState(0);
+function AnimatedScore({
+  value,
+  startValue = 0,
+  duration = 1500
+}: {
+  value: number;
+  startValue?: number;
+  duration?: number;
+}) {
+  const [displayValue, setDisplayValue] = useState(startValue);
 
   useEffect(() => {
     let startTime: number;
     let animationFrame: number;
+    const from = startValue;
+    const to = value;
+    const delta = to - from;
 
     const animate = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
       // Easing function for smooth animation
       const easeOut = 1 - Math.pow(1 - progress, 3);
-      setDisplayValue(Math.round(easeOut * value));
+      setDisplayValue(Math.round(from + (delta * easeOut)));
 
       if (progress < 1) {
         animationFrame = requestAnimationFrame(animate);
@@ -92,7 +104,7 @@ function AnimatedScore({ value, duration = 1500 }: { value: number; duration?: n
     return () => {
       if (animationFrame) cancelAnimationFrame(animationFrame);
     };
-  }, [value, duration]);
+  }, [value, startValue, duration]);
 
   return <span>{displayValue}</span>;
 }
@@ -262,7 +274,7 @@ export default function DrillProgressionOverlay({
                       'text-5xl font-black',
                       isDarkMode ? 'text-neo-white' : 'text-neo-black'
                     )}>
-                      <AnimatedScore value={newDomainScore} />
+                      <AnimatedScore value={newDomainScore} startValue={previousDomainScore} />
                     </span>
                     <span className={cn(
                       'text-xl font-bold',
@@ -288,25 +300,22 @@ export default function DrillProgressionOverlay({
               )}
             </AnimatePresence>
 
-            {/* Delta Display */}
+            {/* Delta Display - Only show positive gains with upward arrow */}
             <AnimatePresence>
-              {showDelta && scoreDelta !== 0 && (
+              {showDelta && scoreDelta > 0 && (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0, scale: 0.5, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ type: 'spring', damping: 15 }}
                   className="flex justify-center mb-4"
                 >
                   <div className={cn(
                     'inline-flex items-center gap-2 px-4 py-2 rounded-neo border-3 border-neo-black',
-                    scoreDelta > 0 ? 'bg-neo-green' : 'bg-red-400'
+                    'bg-neo-green'
                   )}>
-                    <TrendingUp className={cn(
-                      'w-5 h-5 text-neo-black',
-                      scoreDelta < 0 && 'rotate-180'
-                    )} />
+                    <TrendingUp className="w-5 h-5 text-neo-black" />
                     <span className="text-lg font-black text-neo-black">
-                      {scoreDelta > 0 ? '+' : ''}{scoreDelta}
+                      +{scoreDelta}
                     </span>
                   </div>
                 </motion.div>

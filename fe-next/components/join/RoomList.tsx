@@ -21,6 +21,8 @@ interface RoomListProps {
   isJoinMode: boolean;
   mobileExpanded: boolean;
   onToggleMobileExpand: () => void;
+  /** Compact mode - minimal header, fills container height */
+  compact?: boolean;
 }
 
 /**
@@ -36,6 +38,7 @@ export const RoomList: React.FC<RoomListProps> = ({
   isJoinMode,
   mobileExpanded,
   onToggleMobileExpand,
+  compact = false,
 }) => {
   const { t } = useLanguage();
 
@@ -59,6 +62,109 @@ export const RoomList: React.FC<RoomListProps> = ({
     }
   };
 
+  // Compact mode: No Card wrapper, minimal header
+  if (compact) {
+    return (
+      <div className="h-full flex flex-col rounded-neo border-3 border-neo-black bg-slate-800 shadow-hard overflow-hidden">
+        {/* Compact header - inline title + badge + refresh */}
+        <div
+          className="flex items-center justify-between gap-2 p-3 border-b-2 border-neo-black/30 cursor-pointer md:cursor-default"
+          onClick={onToggleMobileExpand}
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="font-black text-neo-white text-sm uppercase truncate">
+              {t('joinView.roomsList')}
+            </span>
+            {activeRooms.length > 0 && (
+              <Badge className="bg-neo-lime text-neo-black border-2 border-neo-black text-xs shrink-0">
+                {activeRooms.reduce((sum, room) => sum + (room.playerCount || 0), 0)} {t('joinView.playersOnline')}
+              </Badge>
+            )}
+            <span className="md:hidden text-slate-400 text-xs shrink-0">
+              {mobileExpanded ? '▲' : '▼'}
+            </span>
+          </div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRefresh();
+                  }}
+                  className="h-8 w-8 p-0"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t('common.refresh')}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+
+        {/* Content */}
+        <div className={cn(
+          "flex-1 overflow-auto p-3 transition-all duration-300",
+          "md:block",
+          mobileExpanded ? "block" : "hidden md:block"
+        )}>
+          {roomsLoading ? (
+            <LoadingSkeleton />
+          ) : activeRooms.length === 0 ? (
+            <EmptyRoomsState
+              isJoinMode={isJoinMode}
+              onSwitchToHostMode={onSwitchToHostMode}
+              t={t}
+            />
+          ) : (
+            <div className="space-y-2">
+              {activeRooms.map((room) => (
+                <button
+                  key={room.gameCode}
+                  onClick={() => onRoomSelect(room.gameCode)}
+                  className={cn(
+                    "w-full p-2.5 rounded-neo text-left transition-all duration-100 border-3",
+                    selectedGameCode === room.gameCode
+                      ? "bg-neo-cyan border-neo-cyan text-neo-black shadow-hard"
+                      : "bg-neo-navy border-neo-cream/50 text-neo-cream shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:border-neo-cyan"
+                  )}
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-xl" title={getLanguageLabel(room.language || 'en')}>
+                        {getLanguageFlag(room.language || 'en')}
+                      </span>
+                      <div className="min-w-0">
+                        <div className={cn(
+                          "font-black text-base truncate",
+                          selectedGameCode === room.gameCode ? "text-neo-black" : "text-neo-cream"
+                        )}>
+                          {room.roomName || room.gameCode}
+                        </div>
+                        <div className={cn(
+                          "text-xs font-bold",
+                          selectedGameCode === room.gameCode ? "text-neo-black/90" : "text-neo-cream/90"
+                        )}>
+                          {room.gameCode}
+                        </div>
+                      </div>
+                    </div>
+                    <Badge className="bg-neo-cyan text-neo-black border-2 border-neo-black text-xs shrink-0">
+                      {room.playerCount}
+                    </Badge>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Original full mode with Card wrapper
   return (
     <motion.div
       initial={{ x: -50, opacity: 0, rotate: 2 }}
