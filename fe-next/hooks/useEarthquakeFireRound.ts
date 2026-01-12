@@ -188,6 +188,11 @@ export function useEarthquakeFireRound(
       return;
     }
 
+    // Prevent triggering if earthquake is already in progress
+    if (earthquakeState !== 'idle') {
+      return;
+    }
+
     earthquakeTriggeredRef.current = true;
 
     // For multiplayer hosts, emit socket event instead of executing locally
@@ -202,7 +207,7 @@ export function useEarthquakeFireRound(
 
     // Single-player or non-host: Execute earthquake sequence locally
     executeEarthquakeSequence();
-  }, [mode, isHost, socket, gameSessionId, currentTimeSeconds, executeEarthquakeSequence]);
+  }, [mode, isHost, socket, gameSessionId, currentTimeSeconds, executeEarthquakeSequence, earthquakeState]);
 
   // Monitor time remaining and trigger earthquake at the right moment
   useEffect(() => {
