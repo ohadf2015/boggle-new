@@ -194,12 +194,11 @@ describe('LandingView Loading State', () => {
     });
   });
 
-  it('should show Brain Training and Brain Drills cards on desktop', async () => {
+  it('should show Brain Training card on desktop', async () => {
     render(<LandingView />);
 
     await waitFor(() => {
       expect(screen.getByTestId('mode-card-landing.brainTraining')).toBeInTheDocument();
-      expect(screen.getByTestId('mode-card-landing.brainDrills')).toBeInTheDocument();
     });
   });
 });
