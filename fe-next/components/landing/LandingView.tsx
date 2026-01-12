@@ -120,6 +120,52 @@ const OnboardingModal = dynamic(() => import('@/components/OnboardingModal'), {
 // (see app/components/ProfileCustomizationWrapper.tsx)
 
 /**
+ * Loading skeleton that matches the actual content layout
+ * Prevents FOUC (flash of unstyled content) on initial load
+ */
+const LandingLoadingSkeleton: React.FC<{ isLandscape: boolean; isMobilePortrait: boolean }> = ({ isLandscape, isMobilePortrait }) => {
+  return (
+    <div className="w-full animate-pulse">
+      {/* Hero section skeleton - only on desktop */}
+      {!isLandscape && !isMobilePortrait && (
+        <div className="text-center mb-2 sm:mb-3 lg:mb-4">
+          <div className="w-24 h-24 mx-auto mb-2 bg-neo-black/10 dark:bg-neo-white/10 rounded-neo" />
+          <div className="h-8 w-48 mx-auto mb-2 bg-neo-black/10 dark:bg-neo-white/10 rounded" />
+          <div className="h-4 w-64 mx-auto bg-neo-black/10 dark:bg-neo-white/10 rounded" />
+        </div>
+      )}
+
+      {/* Daily challenge skeleton */}
+      <div className={`w-full ${isLandscape ? 'mb-2' : 'mb-2 sm:mb-3 lg:mb-4 xl:mb-6'}`}>
+        <div
+          className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-yellow/50"
+          style={{ minHeight: isLandscape ? '52px' : '62px' }}
+        />
+      </div>
+
+      {/* Cards skeleton */}
+      {(isLandscape || isMobilePortrait) ? (
+        <div className="w-full flex gap-2 sm:gap-3 flex-1 min-h-0">
+          <div className="flex-1 min-h-[100px] sm:min-h-[120px] bg-neo-pink/50 border-3 border-neo-black rounded-neo shadow-hard" />
+          <div className="flex-1 min-h-[100px] sm:min-h-[120px] bg-neo-cyan/50 border-3 border-neo-black rounded-neo shadow-hard" />
+        </div>
+      ) : (
+        <div className="w-full flex flex-col items-center justify-center gap-4 sm:gap-5 lg:gap-6">
+          <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 lg:gap-6">
+            <div className="h-48 bg-neo-pink/50 border-3 border-neo-black rounded-neo-lg shadow-hard-lg" />
+            <div className="h-48 bg-neo-cyan/50 border-3 border-neo-black rounded-neo-lg shadow-hard-lg" />
+          </div>
+          <div className="w-full max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="h-32 bg-neo-purple/50 border-2 border-neo-black rounded-neo-lg shadow-hard" />
+            <div className="h-32 bg-neo-orange/50 border-2 border-neo-black rounded-neo-lg shadow-hard" />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/**
  * LandingView - Main landing page with game mode selection
  * Two prominent cards: Single Player and Multiplayer
  */
@@ -131,6 +177,9 @@ const LandingView: React.FC = () => {
   const isLandscape = useMobileLandscape();
   const isMobilePortrait = useMobilePortrait();
   const liveRoomStats = useLiveRoomStats();
+
+  // Track initial mount to show skeleton
+  const [isMounted, setIsMounted] = useState(false);
 
   // Mouse-based parallax for hero section
   const mouseParallax = useMouseParallax(15);
@@ -207,6 +256,11 @@ const LandingView: React.FC = () => {
     setShowOnboarding(true);
   };
 
+  // Track mount state to prevent flash of unstyled content
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   // Play lobby music on landing page (same as multiplayer lobby)
   // Note: We always call playTrack even if audio isn't unlocked yet
   // The MusicContext will queue the request and play when user interacts
@@ -251,8 +305,13 @@ const LandingView: React.FC = () => {
         (isLandscape || isMobilePortrait) && 'justify-center px-2 sm:px-4 py-2',
         !isLandscape && !isMobilePortrait && 'justify-center px-2 sm:px-3 lg:px-6 xl:px-8 py-2 sm:py-3 lg:py-4'
       )}>
-        {/* Hero section with mascot - hidden on mobile portrait and landscape */}
-        {!isLandscape && !isMobilePortrait && (
+        {/* Show loading skeleton before content is mounted */}
+        {!isMounted ? (
+          <LandingLoadingSkeleton isLandscape={isLandscape} isMobilePortrait={isMobilePortrait} />
+        ) : (
+          <>
+            {/* Hero section with mascot - hidden on mobile portrait and landscape */}
+            {!isLandscape && !isMobilePortrait && (
           <motion.div
             className="text-center mb-2 sm:mb-3 lg:mb-4 animate-fade-in-fast relative z-10"
             style={{
@@ -381,9 +440,9 @@ const LandingView: React.FC = () => {
           </div>
         ) : (
           /* Desktop: Centered grid layout */
-          <div className="w-full animate-fade-in-fast flex flex-col items-center gap-4 sm:gap-5 lg:gap-6">
+          <div className="w-full animate-fade-in-fast flex flex-col items-center justify-center gap-4 sm:gap-5 lg:gap-6">
             {/* Primary cards - 2 columns, centered */}
-            <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 lg:gap-6">
+            <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 lg:gap-6">
               <ModeCard
                 title={t('landing.multiplayer') || 'Multiplayer'}
                 description={t('landing.multiplayerDesc') || 'Compete with friends in real-time!'}
@@ -407,7 +466,7 @@ const LandingView: React.FC = () => {
             </div>
 
             {/* Secondary cards - 2 columns, centered, smaller */}
-            <div className="w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="w-full max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <ModeCard
                 title={t('landing.brainTraining') || 'Brain Training'}
                 description={t('landing.brainTrainingDesc') || 'Track cognitive growth'}
@@ -430,7 +489,9 @@ const LandingView: React.FC = () => {
             </div>
           </div>
         )}
-
+          </>
+        )
+        }
       </main>
 
       {/* Tutorial FAB - Fixed bottom corner button */}

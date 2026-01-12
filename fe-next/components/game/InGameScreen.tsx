@@ -742,7 +742,7 @@ const InGameScreen = memo<InGameScreenProps>(({
             </div>
           </div>
 
-          {/* Right Side Panel - Score & Combo */}
+          {/* Right Side Panel - Score only */}
           {/* Using clamp to prevent panel overlap on very narrow/short screens */}
           {isPlaying && (
             <div className={cn(
@@ -769,9 +769,6 @@ const InGameScreen = memo<InGameScreenProps>(({
                     {t('common.score') || 'SCORE'}
                   </div>
                 </div>
-
-                {/* Combo Display - High contrast for light panel background */}
-                <ComboDisplay comboLevel={comboLevel} highContrast compact />
               </div>
             </div>
           )}
@@ -779,25 +776,32 @@ const InGameScreen = memo<InGameScreenProps>(({
 
           {/* Bottom action bar - safe from side panel overlap */}
           <div
-            className="absolute bottom-2 left-0 right-0 z-30 flex justify-between items-center"
+            className="absolute bottom-2 left-0 right-0 z-30 flex justify-between items-end"
             style={{
               paddingInline: 'clamp(100px, 18vw, 150px)',
               paddingBottom: 'env(safe-area-inset-bottom, 0px)'
             }}
           >
-            {/* Exit button - positioned safely inside side panels */}
-            {onExitRoom && (
-              <ExitRoomButton
-                onClick={onExitRoom}
-                label={t('playerView.exit')}
-                className="w-12 h-12"
-              />
-            )}
+            {/* Left side: Exit button with combo below it */}
+            <div className="flex flex-col items-start gap-1">
+              {/* Exit button - positioned safely inside side panels */}
+              {onExitRoom && (
+                <ExitRoomButton
+                  onClick={onExitRoom}
+                  label={t('playerView.exit')}
+                  className="w-12 h-12"
+                />
+              )}
 
-            {/* Spacer for when no exit button */}
-            {!onExitRoom && <div />}
+              {/* Combo Display - static space below exit button */}
+              {isPlaying && comboLevel > 0 && (
+                <div className="w-[100px]">
+                  <ComboDisplay comboLevel={comboLevel} highContrast compact />
+                </div>
+              )}
+            </div>
 
-            {/* Hint Button - Single Player Mode Only */}
+            {/* Right side: Hint Button - Single Player Mode Only */}
             {hints && hints.isSinglePlayer && (
               <HintButton
                 hint={hints.hint}
