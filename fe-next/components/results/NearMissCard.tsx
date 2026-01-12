@@ -214,7 +214,7 @@ const NearMissCard: React.FC<NearMissCardProps> = ({
             whileTap={{ scale: 0.98 }}
             className={cn(
               'w-full mt-2 py-2.5 rounded-lg border-2 border-neo-black shadow-hard-sm',
-              'bg-gradient-to-r from-neo-yellow to-neo-lime',
+              'bg-gradient-to-r from-neo-lime to-neo-lime',
               'text-neo-black font-black uppercase text-sm',
               'hover:shadow-hard-md hover:-translate-y-0.5 transition-all'
             )}

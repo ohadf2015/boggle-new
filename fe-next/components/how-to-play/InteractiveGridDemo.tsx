@@ -150,7 +150,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
-            <Badge className="bg-neo-yellow text-neo-black border sm:border-2 border-neo-black font-bold text-[10px] sm:text-sm px-1.5 sm:px-2 py-0.5 shadow-hard-sm">
+            <Badge className="bg-neo-lime text-neo-black border sm:border-2 border-neo-black font-bold text-[10px] sm:text-sm px-1.5 sm:px-2 py-0.5 shadow-hard-sm">
               {totalScore} pts
             </Badge>
           </motion.div>
@@ -174,7 +174,7 @@ export const InteractiveGridDemo: React.FC<InteractiveGridDemoProps> = ({ t, dir
                     rounded-lg sm:rounded-xl border-2 sm:border-3 border-neo-black
                     cursor-default select-none
                     ${isSelected
-                      ? 'bg-neo-yellow text-neo-black shadow-[0_0_20px_rgba(255,235,59,0.6)] z-10'
+                      ? 'bg-neo-lime text-neo-black shadow-[0_0_20px_rgba(255,235,59,0.6)] z-10'
                       : 'bg-neo-cream text-neo-black shadow-hard-sm hover:shadow-hard'
                     }
                   `}

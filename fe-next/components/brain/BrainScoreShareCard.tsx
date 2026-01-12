@@ -36,7 +36,7 @@ const TIER_CONFIG: Record<BrainTier, { color: string; bgGradient: string; emoji:
   intermediate: { color: 'text-neo-cyan', bgGradient: 'from-cyan-500 to-cyan-600', emoji: '⚡' },
   advanced: { color: 'text-neo-purple', bgGradient: 'from-purple-500 to-purple-600', emoji: '🔥' },
   expert: { color: 'text-neo-orange', bgGradient: 'from-orange-500 to-orange-600', emoji: '🏆' },
-  master: { color: 'text-neo-yellow', bgGradient: 'from-yellow-400 to-amber-500', emoji: '👑' },
+  master: { color: 'text-neo-lime', bgGradient: 'from-yellow-400 to-amber-500', emoji: '👑' },
 };
 
 const DOMAIN_ICONS = {

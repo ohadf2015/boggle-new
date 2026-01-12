@@ -174,7 +174,7 @@ export const CoinCounterAnimated = forwardRef<HTMLDivElement, CoinCounterAnimate
         <AnimatePresence>
           {showPulse && enableGlowEffects && !isLowEnd && (
             <motion.div
-              className="absolute inset-0 rounded-neo-lg border-2 border-neo-yellow"
+              className="absolute inset-0 rounded-neo-lg border-2 border-neo-lime"
               initial={{ scale: 1, opacity: 0.8 }}
               animate={{ scale: 1.5, opacity: 0 }}
               exit={{ opacity: 0 }}

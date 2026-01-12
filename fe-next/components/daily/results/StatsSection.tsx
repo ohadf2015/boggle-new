@@ -91,7 +91,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
 
                   return (
                     <div key={attemptNum} className="flex items-center gap-1.5">
-                      <span className={cn("text-[10px] font-bold w-4", isYourAttempt ? "text-neo-yellow" : "text-gray-600 dark:text-gray-400")}>
+                      <span className={cn("text-[10px] font-bold w-4", isYourAttempt ? "text-neo-lime" : "text-gray-600 dark:text-gray-400")}>
                         {attemptNum}
                       </span>
                       <div className="flex-1 h-4 bg-gray-200 dark:bg-gray-700 rounded-sm overflow-hidden">
@@ -105,7 +105,7 @@ export const StatsSection: React.FC<StatsSectionProps> = ({
                           {count > 0 && <span>{count}</span>}
                         </div>
                       </div>
-                      {isYourAttempt && <span className="text-[10px] font-bold text-neo-yellow">{t('common.you').toUpperCase()}</span>}
+                      {isYourAttempt && <span className="text-[10px] font-bold text-neo-lime">{t('common.you').toUpperCase()}</span>}
                     </div>
                   );
                 })}

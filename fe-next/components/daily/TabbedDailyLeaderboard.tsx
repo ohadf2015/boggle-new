@@ -138,8 +138,6 @@ const TodayParticipantRow = memo<{
           <Avatar
             profilePictureUrl={participant.profile_picture_url ?? undefined}
             avatarImage={participant.avatar_image ?? undefined}
-            avatarEmoji={participant.avatar_emoji}
-            avatarColor={participant.avatar_color}
             size="md"
             className="w-full h-full"
           />
@@ -264,8 +262,6 @@ const AllTimeParticipantRow = memo<{
           <Avatar
             profilePictureUrl={participant.profile_picture_url ?? undefined}
             avatarImage={participant.avatar_image ?? undefined}
-            avatarEmoji={participant.avatar_emoji}
-            avatarColor={participant.avatar_color}
             size="md"
             className="w-full h-full"
           />

@@ -296,7 +296,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                 </div>
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 bg-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm hover:bg-neo-yellow transition-colors"
+                  className="w-8 h-8 bg-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm hover:bg-neo-lime transition-colors"
                 >
                   <X className="w-4 h-4 text-neo-black" />
                 </button>
@@ -482,7 +482,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                 transition={{ type: 'spring', damping: 10, delay: 0.2 }}
                 className="w-20 h-20 bg-neo-cream border-4 border-neo-black rounded-full flex items-center justify-center mx-auto mb-3 shadow-hard"
               >
-                <Trophy className="w-10 h-10 text-neo-yellow" />
+                <Trophy className="w-10 h-10 text-neo-lime" />
               </motion.div>
               <h2 className="text-2xl font-black text-neo-black drop-shadow-[1px_1px_0px_white]">
                 {t('customPuzzle.created')}
@@ -498,7 +498,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="bg-neo-yellow border-3 border-neo-black rounded-neo p-4 shadow-hard text-center"
+                className="bg-neo-lime border-3 border-neo-black rounded-neo p-4 shadow-hard text-center"
               >
                 <p className="text-sm text-neo-black/70 font-bold uppercase tracking-wide mb-1">
                   {t('customPuzzle.yourScore')}

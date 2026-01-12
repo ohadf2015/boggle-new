@@ -1223,6 +1223,18 @@ const sv = {
     "readyForNextRound": "Redo för nästa runda?",
     "hostStartDescription": "Starta ett nytt spel när alla är redo!"
   },
+  "nextStep": {
+    "challengeBots": "Utmana Bottarna!",
+    "challengeBotsDesc": "Testa dina färdigheter mot AI-motståndare",
+    "dailyChallenge": "Daglig Utmaning",
+    "dailyChallengeDesc": "Samma pussel för alla världen över",
+    "goMultiplayer": "Spela Multiplayer!",
+    "goMultiplayerDesc": "Tävla mot riktiga spelare",
+    "brainTraining": "Hjärnträning",
+    "brainTrainingDesc": "Följ din kognitiva tillväxt",
+    "backToLobby": "Tillbaka till Lobbyn",
+    "letsGo": "Kör!"
+  },
   "chart": {
     "yourProgress": "Din Utveckling",
     "needMoreGames": "Spela fler spel!",
@@ -2303,6 +2315,7 @@ const sv = {
     "chooseAvatar": "Välj din avatar",
     "selectAvatar": "Välj",
     "useProfileAvatar": "Använd din profilbild",
+    "yourAvatar": "Din avatar",
     "you": "DU",
     "username": "Användarnamn",
     "saveChanges": "Spara ändringar",

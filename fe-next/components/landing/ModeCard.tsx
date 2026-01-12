@@ -67,24 +67,24 @@ const ModeCard: React.FC<ModeCardProps> = ({
 
   const variantStyles = {
     cyan: {
-      bg: 'bg-gradient-to-br from-neo-cyan to-cyan-400',
-      hoverBg: 'hover:from-neo-cyan hover:to-cyan-300',
+      bg: 'bg-gradient-to-br from-neo-cyan to-neo-cyan-dark',
+      hoverBg: 'hover:from-neo-cyan-light hover:to-neo-cyan',
       iconBg: 'bg-neo-navy',
-      iconText: 'text-neo-cyan',
+      iconText: 'text-neo-cyan-light',
       arrow: 'bg-neo-navy text-neo-cyan',
     },
     pink: {
-      bg: 'bg-gradient-to-br from-neo-pink to-pink-400',
-      hoverBg: 'hover:from-neo-pink hover:to-pink-300',
+      bg: 'bg-gradient-to-br from-neo-pink to-neo-pink-dark',
+      hoverBg: 'hover:from-neo-pink-light hover:to-neo-pink',
       iconBg: 'bg-neo-navy',
-      iconText: 'text-neo-pink',
+      iconText: 'text-neo-pink-light',
       arrow: 'bg-neo-navy text-neo-pink',
     },
     purple: {
-      bg: 'bg-gradient-to-br from-neo-purple to-purple-400',
-      hoverBg: 'hover:from-neo-purple hover:to-purple-300',
+      bg: 'bg-gradient-to-br from-neo-purple to-neo-purple-dark',
+      hoverBg: 'hover:from-neo-purple-light hover:to-neo-purple',
       iconBg: 'bg-neo-navy',
-      iconText: 'text-neo-purple',
+      iconText: 'text-neo-purple-light',
       arrow: 'bg-neo-navy text-neo-purple',
     },
   };
@@ -92,7 +92,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
   const styles = variantStyles[variant];
 
   return (
-    <Link href={href} className={cn('block w-full h-full group focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy rounded-neo-lg', className)}>
+    <Link href={href} className={cn('block w-full h-full group focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy rounded-neo-lg', className)}>
       <div
         ref={ref}
         className={cn(

@@ -26,7 +26,7 @@ const LateJoinerWelcome: React.FC<LateJoinerWelcomeProps> = ({
   const { t, dir } = useLanguage();
 
   const tips = [
-    { icon: Rocket, text: t('lateJoiner.quickTip1'), color: 'bg-neo-yellow' },
+    { icon: Rocket, text: t('lateJoiner.quickTip1'), color: 'bg-neo-lime' },
     { icon: Clock, text: t('lateJoiner.quickTip2'), color: 'bg-neo-pink' },
     { icon: Trophy, text: t('lateJoiner.quickTip3'), color: 'bg-neo-lime' },
   ];
@@ -64,7 +64,7 @@ const LateJoinerWelcome: React.FC<LateJoinerWelcomeProps> = ({
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
-              className="bg-neo-yellow rounded-neo border-2 border-neo-black p-2 sm:p-3 shadow-hard-sm"
+              className="bg-neo-lime rounded-neo border-2 border-neo-black p-2 sm:p-3 shadow-hard-sm"
             >
               <div className="flex items-center gap-2 mb-1">
                 <Clock className="text-neo-black" />

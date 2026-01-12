@@ -121,7 +121,7 @@ export function CoinBurstSource({
           className={cn('fixed pointer-events-none z-[200]', className)}
           style={{ left: position.x, top: position.y, transform: 'translate(-50%, -50%)' }}
         >
-          <div className="px-4 py-2 rounded-neo bg-neo-yellow border-3 border-neo-black shadow-hard">
+          <div className="px-4 py-2 rounded-neo bg-neo-lime border-3 border-neo-black shadow-hard">
             <span className="font-black text-neo-black text-xl">+{amount}</span>
           </div>
         </div>
@@ -141,7 +141,7 @@ export function CoinBurstSource({
       {enableGlowEffects && !isLowEnd && (
         <>
           <motion.div
-            className="absolute rounded-full border-4 border-neo-yellow"
+            className="absolute rounded-full border-4 border-neo-lime"
             style={{
               left: '50%',
               top: '50%',

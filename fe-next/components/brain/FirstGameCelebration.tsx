@@ -78,7 +78,7 @@ export default function FirstGameCelebration({
                 key={i}
                 className={cn(
                   'absolute w-2 h-2 rounded-full',
-                  i % 5 === 0 ? 'bg-neo-yellow' :
+                  i % 5 === 0 ? 'bg-neo-lime' :
                   i % 5 === 1 ? 'bg-neo-cyan' :
                   i % 5 === 2 ? 'bg-neo-purple' :
                   i % 5 === 3 ? 'bg-neo-green' :
@@ -248,7 +248,7 @@ export default function FirstGameCelebration({
                   )}>
                     {value}
                   </span>
-                  <div className="flex items-center gap-1 px-1.5 py-0.5 rounded border border-neo-black bg-neo-yellow text-neo-black">
+                  <div className="flex items-center gap-1 px-1.5 py-0.5 rounded border border-neo-black bg-neo-lime text-neo-black">
                     <Sparkles className="w-2.5 h-2.5 text-neo-black" />
                     <span className="text-[9px] font-black text-neo-black uppercase">
                       {t('brain.newBadge')}

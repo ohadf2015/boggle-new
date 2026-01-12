@@ -86,7 +86,7 @@ const HintButton = memo<HintButtonProps>(({
           flex items-center gap-1.5 px-2 py-1.5 max-w-[120px]
           ${isLoading ? 'animate-pulse' : ''}
           ${hintsRemaining > 0
-            ? 'bg-neo-yellow border-neo-black text-neo-black hover:bg-neo-pink hover:shadow-hard-sm'
+            ? 'bg-neo-lime border-neo-black text-neo-black hover:bg-neo-pink hover:shadow-hard-sm'
             : 'bg-gray-300 border-gray-400 text-gray-600 cursor-not-allowed'}
           border-3 rounded-neo font-bold text-sm transition-all shadow-hard-sm
         `}
@@ -132,7 +132,7 @@ const HintButton = memo<HintButtonProps>(({
             >
               {/* Header */}
               <div className="flex items-center gap-2 mb-2">
-                <Lightbulb className="w-5 h-5 text-neo-yellow" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />
+                <Lightbulb className="w-5 h-5 text-neo-lime" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />
                 <span className="font-black text-neo-black uppercase text-sm">
                   {t('hints.hint') || 'Hint'}
                 </span>

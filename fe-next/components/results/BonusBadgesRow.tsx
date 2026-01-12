@@ -114,7 +114,7 @@ const BonusBadgesRow: React.FC<BonusBadgesRowProps> = memo(({
           animate={{ scale: 1, rotate: 0 }}
           transition={{ delay: 0.3, type: 'spring', stiffness: 300 }}
           className={cn(
-            'bg-neo-yellow border-neo-black rounded-neo shadow-hard-sm text-neo-black font-black',
+            'bg-neo-lime border-neo-black rounded-neo shadow-hard-sm text-neo-black font-black',
             sizeClasses
           )}
         >

@@ -93,12 +93,10 @@ export default function ProfilePage(): React.ReactNode {
   }, []);
 
   // Handle avatar save
-  const handleSaveEmojiAvatar = async ({ avatarImage, emoji, color }: { avatarImage: string; emoji?: string; color?: string }): Promise<void> => {
+  const handleSaveEmojiAvatar = async ({ avatarImage }: { avatarImage: string }): Promise<void> => {
     try {
       await updateProfile({
         avatar_image: avatarImage,
-        avatar_emoji: emoji || '🎮',
-        avatar_color: color || '#4ECDC4'
       });
       await refreshProfile();
       toast.success(t('profile.saved') || 'Avatar updated!');
@@ -244,13 +242,9 @@ export default function ProfilePage(): React.ReactNode {
           onClose={() => setShowEmojiPicker(false)}
           onSave={handleSaveEmojiAvatar}
           currentAvatarImage={profile?.avatar_image}
-          currentEmoji={profile?.avatar_emoji}
-          currentColor={profile?.avatar_color}
           profileAvatar={{
             profilePictureUrl: profile?.profile_picture_url,
             avatarImage: profile?.avatar_image,
-            avatarEmoji: profile?.avatar_emoji,
-            avatarColor: profile?.avatar_color,
             displayName: profile?.display_name,
           }}
         />
@@ -309,13 +303,9 @@ export default function ProfilePage(): React.ReactNode {
           onClose={() => setShowEmojiPicker(false)}
           onSave={handleSaveEmojiAvatar}
           currentAvatarImage={profile?.avatar_image}
-          currentEmoji={profile?.avatar_emoji}
-          currentColor={profile?.avatar_color}
           profileAvatar={{
             profilePictureUrl: profile?.profile_picture_url,
             avatarImage: profile?.avatar_image,
-            avatarEmoji: profile?.avatar_emoji,
-            avatarColor: profile?.avatar_color,
             displayName: profile?.display_name,
           }}
         />

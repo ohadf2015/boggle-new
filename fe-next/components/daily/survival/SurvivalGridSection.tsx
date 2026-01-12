@@ -51,7 +51,7 @@ export const SurvivalGridSection: React.FC<SurvivalGridSectionProps> = ({
       {/* Screenshot protection overlay */}
       {isProtected && (
         <div className="absolute inset-0 flex items-center justify-center z-10">
-          <div className="bg-neo-black/80 text-white px-6 py-4 rounded-neo border-3 border-neo-yellow shadow-hard text-center">
+          <div className="bg-neo-black/80 text-white px-6 py-4 rounded-neo border-3 border-neo-lime shadow-hard text-center">
             <div className="text-2xl mb-2">👀</div>
             <div className="font-bold text-sm">
               {t('daily.screenshotProtection') || 'Click here to continue'}

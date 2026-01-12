@@ -170,7 +170,7 @@ export function CompactLeaderboard({
             animate={{ rotate: [0, 15, -15, 0] }}
             transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
           >
-            <Zap className="w-3.5 h-3.5 text-neo-yellow" />
+            <Zap className="w-3.5 h-3.5 text-neo-lime" />
           </motion.div>
           <span className="text-[10px] font-black uppercase text-neo-cream tracking-wider">
             {t('leaderboard.liveRace') || 'Live Race'}
@@ -227,7 +227,7 @@ export function CompactLeaderboard({
                   <div className={cn(
                     'flex items-center gap-1 px-1.5 py-0.5 rounded-neo',
                     isLeader
-                      ? 'bg-gradient-to-r from-neo-yellow to-neo-orange border-2 border-neo-black shadow-hard-sm'
+                      ? 'bg-gradient-to-r from-neo-lime to-neo-orange border-2 border-neo-black shadow-hard-sm'
                       : isMe
                         ? 'bg-neo-cyan border-2 border-neo-black shadow-hard-sm'
                         : 'bg-neo-cream border border-neo-black/50'
@@ -245,8 +245,6 @@ export function CompactLeaderboard({
                     <Avatar
                       profilePictureUrl={player.profilePictureUrl ?? undefined}
                       avatarImage={player.avatarImage}
-                      avatarEmoji={player.avatarEmoji}
-                      avatarColor={player.avatarColor}
                       size="sm"
                     />
 
@@ -315,7 +313,7 @@ export function CompactLeaderboard({
           className={cn(
             'relative flex items-center justify-between px-2 py-1.5 rounded-neo border-2',
             isLeading
-              ? 'bg-gradient-to-r from-neo-yellow/50 to-neo-lime/50 border-neo-black'
+              ? 'bg-gradient-to-r from-neo-lime/50 to-neo-lime/50 border-neo-black'
               : isCloseToOvertaking
                 ? 'bg-neo-pink/20 border-neo-pink'
                 : 'bg-neo-cyan/10 border-neo-cyan/50'

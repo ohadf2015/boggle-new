@@ -43,7 +43,7 @@ export const ScoreBadge: React.FC<ScoreBadgeProps> = ({
       </div>
     )}
     {solved && targetWord && (
-      <span className="font-black text-neo-yellow text-sm">
+      <span className="font-black text-neo-lime text-sm">
         {language === 'he' ? applyHebrewFinalLetters(targetWord) : targetWord.toUpperCase()}
       </span>
     )}

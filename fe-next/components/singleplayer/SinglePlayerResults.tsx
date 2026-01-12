@@ -18,7 +18,7 @@ import CompactResultsStats from '@/components/results/CompactResultsStats';
 import BonusBadgesRow from '@/components/results/BonusBadgesRow';
 import CoinRewardDisplay from '@/components/results/CoinRewardDisplay';
 import BrainPointsDisplay from '@/components/results/BrainPointsDisplay';
-import { SinglePlayerActions } from '@/components/results/ResultsActionButtons';
+import NextStepPrompt, { type NextStepMode } from '@/components/results/NextStepPrompt';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -69,15 +69,23 @@ interface SinglePlayerResultsProps {
 const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   results,
   mode,
-  onPlayAgain,
-  onQuickRematch,
+  onPlayAgain: _onPlayAgain,
+  onQuickRematch: _onQuickRematch,
   onBackToLobby,
 }) => {
+  // Note: _onPlayAgain and _onQuickRematch are kept for interface compatibility
+  // but replaced by NextStepPrompt which guides users to next game mode
+  void _onPlayAgain;
+  void _onQuickRematch;
   const { t, language } = useLanguage();
   const { user, isAuthenticated, profile, updateProfile, loading: authLoading } = useAuth();
   const { awardGameCompletion } = useCoinContext();
   const isLandscape = useMobileLandscape();
   const [showSignupModal, setShowSignupModal] = useState(false);
+
+  // Map SinglePlayerMode to NextStepMode for progression prompts
+  // 'practice' -> suggests bots, 'solo-bots'/'challenge' -> suggests daily
+  const nextStepMode: NextStepMode = mode === 'practice' ? 'practice' : 'solo-bots';
   const [wordValidationQueue, setWordValidationQueue] = useState<string[]>([]);
   const [showTrainingAnalysis, setShowTrainingAnalysis] = useState(false);
   const [showWordValidation, setShowWordValidation] = useState(false);
@@ -426,7 +434,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   // getRankIcon returns React elements - kept local as it's component-specific
   const getRankIcon = (rank: number) => {
-    if (rank === 1) return <Trophy className="text-neo-yellow text-xl" />;
+    if (rank === 1) return <Trophy className="text-neo-lime text-xl" />;
     if (rank === 2) return <Medal className="text-slate-500 dark:text-slate-300 text-xl" />;
     if (rank === 3) return <Medal className="text-amber-600 text-xl" />;
     return <span className="text-neo-black/70 dark:text-white/70 font-bold">#{rank}</span>;
@@ -449,7 +457,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             (results.playerScore === 0 || validWordCount === 0)
               ? 'bg-neo-cream dark:bg-slate-700'
               : (isWinner || results.isNewHighScore)
-                ? 'bg-gradient-to-r from-neo-yellow to-yellow-300'
+                ? 'bg-gradient-to-r from-neo-lime to-yellow-300'
                 : 'bg-neo-cream dark:bg-slate-700'
           )}>
             <div className="flex items-center justify-center gap-2">
@@ -478,7 +486,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
           {/* Score display - compact */}
           <div className="flex items-center gap-4">
-            <div className="bg-neo-yellow border-2 border-neo-black rounded-neo px-4 py-2 text-center shadow-hard-sm">
+            <div className="bg-neo-lime border-2 border-neo-black rounded-neo px-4 py-2 text-center shadow-hard-sm">
               <div className="text-2xl font-black text-neo-black">{results.playerScore}</div>
               <div className="text-[10px] sm:text-xs font-bold uppercase text-neo-black/70">{t('common.score') || 'Score'}</div>
             </div>
@@ -570,11 +578,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           )}
 
           {/* Action buttons - landscape compact layout */}
-          <SinglePlayerActions
-            onQuickRematch={onQuickRematch}
-            onPlayAgain={onPlayAgain}
+          <NextStepPrompt
+            currentMode={nextStepMode}
             onBackToLobby={onBackToLobby}
-            onViewTrainingProgress={mode === 'practice' ? () => setShowTrainingAnalysis(true) : undefined}
             variant="landscape"
             className="mt-auto"
           />
@@ -699,11 +705,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       )}
 
       {/* Action Buttons */}
-      <SinglePlayerActions
-        onQuickRematch={onQuickRematch}
-        onPlayAgain={onPlayAgain}
+      <NextStepPrompt
+        currentMode={nextStepMode}
         onBackToLobby={onBackToLobby}
-        onViewTrainingProgress={mode === 'practice' ? () => setShowTrainingAnalysis(true) : undefined}
         variant="mobile"
       />
     </div>
@@ -815,7 +819,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                       <span className="text-xs text-white/60 font-medium">
                         {bot.totalWords} {t('singlePlayer.botWords') || 'words'}
                       </span>
-                      <span className="text-sm font-black text-neo-yellow">{bot.score} pts</span>
+                      <span className="text-sm font-black text-neo-lime">{bot.score} pts</span>
                     </div>
                   </div>
                   {/* Words grid - directly visible */}
@@ -975,11 +979,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
             {/* Action Buttons */}
             <div ref={actionButtonsRef}>
-              <SinglePlayerActions
-                onQuickRematch={onQuickRematch}
-                onPlayAgain={onPlayAgain}
+              <NextStepPrompt
+                currentMode={nextStepMode}
                 onBackToLobby={onBackToLobby}
-                onViewTrainingProgress={mode === 'practice' ? () => setShowTrainingAnalysis(true) : undefined}
                 variant="desktop"
               />
             </div>
@@ -1060,7 +1062,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                             <span className="text-xs text-white/60 font-medium">
                               {bot.totalWords} {t('singlePlayer.botWords') || 'words'}
                             </span>
-                            <span className="text-sm font-black text-neo-yellow">{bot.score} pts</span>
+                            <span className="text-sm font-black text-neo-lime">{bot.score} pts</span>
                           </div>
                         </div>
                         {/* Words grid - directly visible */}

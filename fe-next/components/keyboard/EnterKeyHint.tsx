@@ -113,7 +113,7 @@ export function EnterKeyHint({
             className={cn(
               'flex items-center gap-2 px-4 py-2.5',
               'rounded-neo border-3 border-neo-black',
-              'bg-neo-yellow text-neo-black',
+              'bg-neo-lime text-neo-black',
               'shadow-hard'
             )}
           >
@@ -123,7 +123,7 @@ export function EnterKeyHint({
             <kbd
               className={cn(
                 'px-2 py-1 min-w-[50px] text-center',
-                'bg-neo-black text-neo-yellow',
+                'bg-neo-black text-neo-lime',
                 'rounded border-2 border-neo-black',
                 'font-mono font-bold text-sm',
                 'shadow-[inset_0_-2px_0_rgba(0,0,0,0.3)]'

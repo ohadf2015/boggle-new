@@ -126,7 +126,7 @@ function VolumeSlider({ value, onChange, isMuted, onToggleMute, isDarkMode }: Vo
           'w-24 h-2 rounded-full appearance-none cursor-pointer',
           isMuted ? 'opacity-50' : '',
           isDarkMode ? 'bg-slate-600' : 'bg-gray-300',
-          '[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-neo-yellow [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-neo-black [&::-webkit-slider-thumb]:cursor-pointer'
+          '[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-neo-lime [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-neo-black [&::-webkit-slider-thumb]:cursor-pointer'
         )}
       />
     </div>
@@ -206,7 +206,7 @@ export default function SettingsPage(): React.ReactNode {
             </h2>
             <div className="space-y-3">
               <SettingRow
-                icon={isDarkMode ? <Moon className="w-5 h-5 text-neo-pink" /> : <Sun className="w-5 h-5 text-neo-yellow" />}
+                icon={isDarkMode ? <Moon className="w-5 h-5 text-neo-pink" /> : <Sun className="w-5 h-5 text-neo-lime" />}
                 label={t('settings.theme') || 'Theme'}
                 description={isDarkMode ? t('settings.dark') || 'Dark' : t('settings.light') || 'Light'}
                 isDarkMode={isDarkMode}
@@ -270,7 +270,7 @@ export default function SettingsPage(): React.ReactNode {
               </SettingRow>
 
               <SettingRow
-                icon={<Bell className="w-5 h-5 text-neo-yellow" />}
+                icon={<Bell className="w-5 h-5 text-neo-lime" />}
                 label={t('settings.soundEffects') || 'Sound Effects'}
                 isDarkMode={isDarkMode}
               >
@@ -321,7 +321,7 @@ export default function SettingsPage(): React.ReactNode {
               </SettingRow>
 
               <SettingRow
-                icon={<Zap className="w-5 h-5 text-neo-yellow" />}
+                icon={<Zap className="w-5 h-5 text-neo-lime" />}
                 label={t('settings.fireRoundLights') || 'Fire Round Lights'}
                 description={t('settings.fireRoundLightsDescription') || 'Rainbow glow effects'}
                 isDarkMode={isDarkMode}

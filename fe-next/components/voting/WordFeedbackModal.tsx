@@ -268,7 +268,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
             flex items-center justify-between
           ">
             <h2 className="text-xl font-black uppercase tracking-tight text-neo-cream flex items-center gap-2">
-              <Book className="w-5 h-5 text-neo-yellow" />
+              <Book className="w-5 h-5 text-neo-lime" />
               {t('wordFeedback.dictionaryTitle') || 'Build Our Dictionary'}
             </h2>
             <div className="flex items-center gap-2">
@@ -281,7 +281,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               <button
                 onClick={onSkip}
                 className="
-                  text-neo-cream hover:text-neo-yellow
+                  text-neo-cream hover:text-neo-lime
                   transition-colors p-1
                 "
                 aria-label="Close"
@@ -316,8 +316,6 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               >
                 {currentWord.submitterAvatar && (
                   <Avatar
-                    avatarEmoji={currentWord.submitterAvatar.emoji}
-                    avatarColor={currentWord.submitterAvatar.color}
                     profilePictureUrl={currentWord.submitterAvatar.profilePictureUrl}
                     size="sm"
                   />
@@ -335,7 +333,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               animate={{ scale: 1, y: 0 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 20 }}
               className="
-                bg-neo-yellow
+                bg-neo-lime
                 border-3 border-neo-black
                 rounded-neo-lg
                 shadow-hard-lg

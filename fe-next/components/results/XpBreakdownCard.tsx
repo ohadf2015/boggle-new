@@ -51,7 +51,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
       transition={{ delay: 0.5, type: 'spring', stiffness: 200, damping: 20 }}
       className={cn(
         "mt-4 p-4 rounded-neo border-3 border-neo-black shadow-hard relative overflow-hidden",
-        levelUpData ? "bg-gradient-to-br from-neo-yellow via-neo-yellow to-neo-pink" : "bg-neo-cream dark:bg-slate-700"
+        levelUpData ? "bg-gradient-to-br from-neo-lime via-neo-lime to-neo-pink" : "bg-neo-cream dark:bg-slate-700"
       )}
     >
       {/* Comic-style halftone dots */}
@@ -96,7 +96,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
             transition={{ delay: 0.6 + index * 0.1 }}
             className={cn(
               "flex items-center justify-between px-2 py-1 rounded-neo border-2 border-neo-black/30 dark:border-neo-cream/30",
-              item.highlight ? "bg-neo-yellow" : "bg-neo-cream/50 dark:bg-slate-600/50"
+              item.highlight ? "bg-neo-lime" : "bg-neo-cream/50 dark:bg-slate-600/50"
             )}
           >
             <span className="flex items-center gap-2 text-sm font-bold text-neo-black dark:text-neo-cream">
@@ -124,7 +124,7 @@ const XpBreakdownCard = memo<XpBreakdownCardProps>(({ xpGainedData, levelUpData,
           initial={{ opacity: 0, scale: 0.8, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ delay: 0.9, type: 'spring', stiffness: 200 }}
-          className="mt-3 p-3 bg-neo-yellow border-3 border-neo-black rounded-neo shadow-hard-sm text-center relative z-10"
+          className="mt-3 p-3 bg-neo-lime border-3 border-neo-black rounded-neo shadow-hard-sm text-center relative z-10"
         >
           <motion.div
             animate={{ scale: [1, 1.1, 1] }}

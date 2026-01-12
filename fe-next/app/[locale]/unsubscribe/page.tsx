@@ -82,7 +82,7 @@ export default function UnsubscribePage() {
                     'flex-1 px-6 py-3 rounded-neo border-3 border-neo-black font-black uppercase tracking-wide transition-all',
                     'shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg',
                     'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
-                    'bg-neo-yellow text-neo-black hover:bg-neo-yellow/90'
+                    'bg-neo-lime text-neo-black hover:bg-neo-lime/90'
                   )}
                 >
                   <ArrowLeft className="me-2 rtl:rotate-180" />
@@ -138,7 +138,7 @@ export default function UnsubscribePage() {
         {/* Logo */}
         <div className="text-center mt-8">
           <h2 className="text-xl font-black">
-            <span className="text-neo-yellow">Lexi</span>
+            <span className="text-neo-lime">Lexi</span>
             <span className="text-neo-orange">Clash</span>
           </h2>
         </div>

@@ -1028,7 +1028,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                           ${isInvalid
                               ? 'bg-neo-red text-neo-cream shadow-hard-sm line-through opacity-70'
                               : isLatest
-                                ? 'bg-neo-yellow text-neo-black shadow-hard'
+                                ? 'bg-neo-lime text-neo-black shadow-hard'
                                 : 'bg-neo-cream text-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard'}`}
                         >
                           {applyHebrewFinalLetters(wordText).toUpperCase()}
@@ -1234,7 +1234,7 @@ const InGameScreen = memo<InGameScreenProps>(({
                           className={`inline-block px-2 py-1 text-xs font-bold uppercase rounded-neo border-2 border-neo-black ${wordObj.isValid === false
                             ? 'bg-neo-red text-neo-cream line-through opacity-70'
                             : index === 0
-                              ? 'bg-neo-yellow text-neo-black'
+                              ? 'bg-neo-lime text-neo-black'
                               : 'bg-white text-neo-black'
                             }`}
                         >
@@ -1262,7 +1262,7 @@ const InGameScreen = memo<InGameScreenProps>(({
               {/* Header */}
               <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-pink text-white">
                 <h3 className="flex items-center gap-2 text-neo-cream text-base uppercase tracking-widest font-black">
-                  <Trophy className="w-4 h-4 text-neo-yellow" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
+                  <Trophy className="w-4 h-4 text-neo-lime" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
                   {t('playerView.leaderboard')}
                 </h3>
               </div>
@@ -1287,15 +1287,13 @@ const InGameScreen = memo<InGameScreenProps>(({
                       {/* Avatar */}
                       <Avatar
                         profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
-                        avatarEmoji={player.avatar?.emoji}
                         avatarImage={player.avatar?.avatarImage}
-                        avatarColor={player.avatar?.color}
                         size="xl"
                       />
                       {/* Player info */}
                       <div className="flex-1 min-w-0">
                         <div className={`font-black truncate text-sm flex items-center gap-1 text-neo-black ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                          {player.isHost && <Crown className="w-4 h-4 text-neo-yellow flex-shrink-0" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />}
+                          {player.isHost && <Crown className="w-4 h-4 text-neo-lime flex-shrink-0" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />}
                           <span className="truncate" title={player.username}>{player.username}</span>
                           {player.isMe && (
                             <span className="text-xs bg-neo-black text-neo-cream px-1.5 py-0.5 rounded-neo font-bold flex-shrink-0">

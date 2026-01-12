@@ -1220,6 +1220,18 @@ const es = {
     "readyForNextRound": "¿Listos para la siguiente ronda?",
     "hostStartDescription": "¡Inicia una nueva partida cuando todos estén listos!"
   },
+  "nextStep": {
+    "challengeBots": "¡Desafía a los Bots!",
+    "challengeBotsDesc": "Pon a prueba tus habilidades contra la IA",
+    "dailyChallenge": "Desafío Diario",
+    "dailyChallengeDesc": "El mismo puzzle para todo el mundo",
+    "goMultiplayer": "¡Juega Multijugador!",
+    "goMultiplayerDesc": "Compite con jugadores reales",
+    "brainTraining": "Entrena tu Cerebro",
+    "brainTrainingDesc": "Sigue tu crecimiento cognitivo",
+    "backToLobby": "Volver al Lobby",
+    "letsGo": "¡Vamos!"
+  },
   "chart": {
     "yourProgress": "Tu Progreso",
     "needMoreGames": "¡Juega más partidas!",
@@ -2126,6 +2138,7 @@ const es = {
     "chooseAvatar": "Elige tu Avatar",
     "selectAvatar": "Elegir",
     "useProfileAvatar": "Usar tu foto de perfil",
+    "yourAvatar": "Tu avatar",
     "you": "TÚ",
     "username": "Nombre de Usuario",
     "saveChanges": "Guardar Cambios",

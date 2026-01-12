@@ -178,7 +178,7 @@ const AutoRejoinTimer = memo<AutoRejoinTimerProps>(({
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleRejoinNow}
-                className="flex items-center gap-1 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-neo-yellow border-3 border-neo-black rounded-neo shadow-hard-sm font-bold text-neo-black text-xs sm:text-sm uppercase hover:shadow-hard transition-all"
+                className="flex items-center gap-1 px-2.5 sm:px-3 py-1 sm:py-1.5 bg-neo-lime border-3 border-neo-black rounded-neo shadow-hard-sm font-bold text-neo-black text-xs sm:text-sm uppercase hover:shadow-hard transition-all"
               >
                 <Play className="text-xs" />
                 <span>{t('results.rejoinNow') || 'Rejoin Now'}</span>

@@ -44,11 +44,20 @@ export interface GridPosition {
 
 // ==================== User Types ====================
 
+/**
+ * Avatar data structure
+ * Primary fields: avatarImage (character avatar ID) and profilePictureUrl (OAuth profile picture)
+ * The emoji and color fields are deprecated but kept for backward compatibility
+ */
 export interface Avatar {
-  emoji: string;
-  color: string;
+  /** Primary: Avatar image ID (e.g., 'broccoli-bob', 'pizza-pete') or '__profile_avatar__' for profile picture */
+  avatarImage?: string;
+  /** Profile picture URL from OAuth provider (Google, Discord, etc.) */
   profilePictureUrl?: string | null;
-  avatarImage?: string; // Avatar image ID (e.g., 'broccoli-bob', 'pizza-pete')
+  /** @deprecated - kept for backward compatibility, will be removed */
+  emoji?: string;
+  /** @deprecated - kept for backward compatibility, will be removed */
+  color?: string;
 }
 
 export interface BaseUser {

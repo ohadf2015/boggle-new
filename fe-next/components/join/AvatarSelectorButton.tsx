@@ -85,7 +85,7 @@ const AvatarSelectorButton: React.FC<AvatarSelectorButtonProps> = ({
         <div className={`
           absolute bottom-0 right-0
           ${iconSizeClasses[size]}
-          bg-neo-yellow border-2 border-neo-black
+          bg-neo-lime border-2 border-neo-black
           rounded-full
           flex items-center justify-center
           shadow-hard-sm

@@ -531,7 +531,7 @@ export const InteractiveMascot = memo(function InteractiveMascot({
         {/* Hover glow effect */}
         {isInteractive && shouldAnimate && (
           <motion.div
-            className="absolute inset-0 rounded-full bg-neo-yellow/20 blur-xl -z-10"
+            className="absolute inset-0 rounded-full bg-neo-lime/20 blur-xl -z-10"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{
               opacity: isHovered ? 0.6 : 0,
@@ -547,7 +547,7 @@ export const InteractiveMascot = memo(function InteractiveMascot({
             {[...Array(6)].map((_, i) => (
               <motion.div
                 key={i}
-                className="absolute w-2 h-2 bg-neo-yellow rounded-full"
+                className="absolute w-2 h-2 bg-neo-lime rounded-full"
                 style={{
                   top: '50%',
                   left: '50%',

@@ -35,8 +35,8 @@ describe('ShareButton', () => {
     it('applies primary variant styles by default', () => {
       render(<ShareButton onClick={noop}>Copy Link</ShareButton>);
       const button = screen.getByRole('button');
-      // Primary variant uses neo-yellow
-      expect(button.className).toContain('bg-neo-yellow');
+      // Primary variant uses neo-lime (Phase 2 color migration: yellow -> lime)
+      expect(button.className).toContain('bg-neo-lime');
       expect(button.className).toContain('text-neo-black');
     });
 
@@ -60,7 +60,8 @@ describe('ShareButton', () => {
       // @ts-expect-error - Testing invalid variant
       render(<ShareButton onClick={noop} variant="invalid">Test</ShareButton>);
       const button = screen.getByRole('button');
-      expect(button.className).toContain('bg-neo-yellow');
+      // Falls back to primary (neo-lime)
+      expect(button.className).toContain('bg-neo-lime');
     });
   });
 

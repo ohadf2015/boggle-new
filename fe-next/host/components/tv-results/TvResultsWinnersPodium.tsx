@@ -227,10 +227,8 @@ const PodiumCard = memo<PodiumCardProps>(({ rank, player, t, isWinner }) => {
         )}
       >
         <Avatar
-          avatarEmoji={player.avatar?.emoji}
-          avatarImage={player.avatar?.avatarImage}
-          avatarColor={player.avatar?.color}
           profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
+          avatarImage={player.avatar?.avatarImage}
           size={isWinner ? 'xl' : 'lg'}
           className="border-4 border-neo-black shadow-hard"
         />

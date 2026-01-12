@@ -98,7 +98,7 @@ export default function DrillUnlockProgress({
 
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-neo-yellow" />
+                <Sparkles className="w-4 h-4 text-neo-lime" />
                 <p className={cn(
                   'text-sm font-black uppercase',
                   isDarkMode ? 'text-neo-white' : 'text-neo-black'
@@ -147,7 +147,7 @@ export default function DrillUnlockProgress({
               <div className={cn(
                 'absolute -top-1 -right-1 w-5 h-5 rounded-full border border-neo-black',
                 'flex items-center justify-center text-[10px] font-black',
-                'bg-neo-yellow text-neo-black'
+                'bg-neo-lime text-neo-black'
               )}>
                 {gamesLeft}
               </div>

@@ -56,7 +56,7 @@ const DailyQuickLink: React.FC<DailyQuickLinkProps> = ({
           "font-bold text-sm",
           hasPlayed
             ? "bg-neo-lime/20 border-neo-lime text-neo-black dark:text-white"
-            : "bg-gradient-to-r from-neo-pink/20 to-neo-yellow/20 border-neo-pink text-neo-black dark:text-white",
+            : "bg-gradient-to-r from-neo-pink/20 to-neo-lime/20 border-neo-pink text-neo-black dark:text-white",
           "hover:shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px]",
           className
         )}
@@ -107,7 +107,7 @@ const DailyQuickLink: React.FC<DailyQuickLinkProps> = ({
         "transition-all duration-100",
         hasPlayed
           ? "bg-neo-lime"
-          : "bg-gradient-to-br from-neo-pink to-neo-yellow",
+          : "bg-gradient-to-br from-neo-pink to-neo-lime",
         className
       )}
       aria-label={`${t('daily.badge') || 'Daily Challenge'}${streak > 0 ? ` - ${streak} ${t('daily.streak') || 'streak'}` : ''}`}

@@ -36,18 +36,36 @@ module.exports = {
     },
     extend: {
       colors: {
-        // Neo-Brutalist Color Palette - Simplified to 5 accent colors
-        // Primary: yellow, Secondary: pink, Tertiary: cyan, Error: red, Success: lime
+        // Neo-Brutalist Color Palette - 4 Primary Colors with Tonal Variations
+        // Primary: lime, Secondary: pink, Tertiary: cyan, Quaternary: purple
         neo: {
-          // Primary accent colors (use these)
-          yellow: "var(--neo-yellow)",
-          "yellow-hover": "var(--neo-yellow-hover)",
+          // LIME Family (Primary - Replaces Yellow)
+          lime: "var(--neo-lime)",
+          "lime-light": "var(--neo-lime-light)",
+          "lime-muted": "var(--neo-lime-muted)",
+          "lime-dark": "var(--neo-lime-dark)",
+
+          // PINK Family (Multiplayer)
           pink: "var(--neo-pink)",
           "pink-light": "var(--neo-pink-light)",
+          "pink-muted": "var(--neo-pink-muted)",
+          "pink-dark": "var(--neo-pink-dark)",
+
+          // CYAN Family (Single Player)
           cyan: "var(--neo-cyan)",
+          "cyan-light": "var(--neo-cyan-light)",
           "cyan-muted": "var(--neo-cyan-muted)",
+          "cyan-dark": "var(--neo-cyan-dark)",
+
+          // PURPLE Family (Brain Training)
+          purple: "var(--neo-purple)",
+          "purple-light": "var(--neo-purple-light)",
+          "purple-muted": "var(--neo-purple-muted)",
+          "purple-dark": "var(--neo-purple-dark)",
+
+          // Error color
           red: "var(--neo-red)",
-          lime: "var(--neo-lime)",
+
           // Structural colors
           navy: "var(--neo-navy)",
           "navy-light": "var(--neo-navy-light)",
@@ -55,11 +73,12 @@ module.exports = {
           black: "rgb(var(--neo-black) / <alpha-value>)",
           white: "rgb(var(--neo-white) / <alpha-value>)",
           gray: "var(--neo-gray)",
-          // Deprecated - migrate to 5 accent palette (yellow, pink, cyan, red, lime)
+
+          // DEPRECATED - Keep for backward compatibility during migration
+          yellow: "var(--neo-yellow)",
+          "yellow-hover": "var(--neo-yellow-hover)",
           orange: "var(--neo-orange)",
           "orange-hover": "var(--neo-orange-hover)",
-          purple: "var(--neo-purple)",
-          "purple-light": "var(--neo-purple-light)",
         },
         // Brand colors for social auth
         brand: {

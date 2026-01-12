@@ -41,7 +41,7 @@ const DRILL_CONFIG: Record<DrillType, {
 }> = {
   'lightning-round': {
     icon: Zap,
-    color: 'text-neo-yellow',
+    color: 'text-neo-lime',
     bgColor: 'bg-yellow-400',
     unlockRequirement: 0,
   },
@@ -146,7 +146,7 @@ export default function PersonalizedDrillRecommendation({
       <div className="flex items-center gap-2 mb-3">
         <div className={cn(
           'w-8 h-8 rounded-lg border-2 border-neo-black flex items-center justify-center',
-          'bg-neo-yellow'
+          'bg-neo-lime'
         )}>
           <Lightbulb className="w-5 h-5 text-neo-black" />
         </div>

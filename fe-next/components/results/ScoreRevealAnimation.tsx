@@ -38,7 +38,7 @@ interface ScoreRevealAnimationProps {
 
 // Rank styling configuration
 const RANK_STYLES: Record<number, { bg: string; text: string; icon: typeof Crown }> = {
-  1: { bg: 'bg-neo-yellow', text: 'text-neo-black', icon: Crown },
+  1: { bg: 'bg-neo-lime', text: 'text-neo-black', icon: Crown },
   2: { bg: 'bg-slate-300', text: 'text-slate-700', icon: Medal },
   3: { bg: 'bg-orange-400', text: 'text-neo-black', icon: Medal },
 };
@@ -230,9 +230,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
         {/* Avatar */}
         <Avatar
           profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
-          avatarEmoji={player.avatar?.emoji}
           avatarImage={player.avatar?.avatarImage}
-          avatarColor={player.avatar?.color}
           size="sm"
           className="border-2 border-neo-black"
         />
@@ -273,7 +271,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
               exit={{ opacity: 0, scale: 0.5 }}
               className="absolute end-0 -top-2"
             >
-              <Zap className="w-4 h-4 text-neo-yellow" />
+              <Zap className="w-4 h-4 text-neo-lime" />
             </motion.div>
           )}
         </AnimatePresence>
@@ -291,7 +289,7 @@ const ScoreRevealAnimation = memo<ScoreRevealAnimationProps>(({
           className="h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mb-3"
         >
           <motion.div
-            className="h-full bg-neo-yellow"
+            className="h-full bg-neo-lime"
             initial={{ width: '0%' }}
             animate={{ width: '100%' }}
             transition={{ duration: clampedDuration / 1000, ease: 'easeOut' }}

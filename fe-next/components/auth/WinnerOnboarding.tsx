@@ -195,7 +195,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
             transition={{ delay: 0.3 }}
             className="text-center mb-8"
           >
-            <h1 className="text-4xl font-black mb-3 text-neo-yellow">
+            <h1 className="text-4xl font-black mb-3 text-neo-lime">
               {celebrationMsg.title}
             </h1>
             <p className={cn(
@@ -385,7 +385,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
                 'w-full h-14 text-xl font-black rounded-xl border-4 shadow-hard transition-all',
                 'hover:shadow-hard-lg hover:-translate-y-1',
                 'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0',
-                'bg-neo-yellow border-amber-600 text-neo-black'
+                'bg-neo-lime border-amber-600 text-neo-black'
               )}
               asChild={false}
             >

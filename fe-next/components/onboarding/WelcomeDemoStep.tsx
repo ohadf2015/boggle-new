@@ -117,10 +117,10 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
         transition={{ delay: 0.1 }}
         className="text-center space-y-1"
       >
-        <h2 className="text-xl sm:text-2xl font-black text-neo-black uppercase">
+        <h2 className="text-xl sm:text-2xl font-black text-neo-white uppercase">
           {t('onboarding.welcome.title')}
         </h2>
-        <p className="text-xs sm:text-sm text-neo-black/70">
+        <p className="text-xs sm:text-sm text-neo-white/80">
           {t('onboarding.welcome.subtitle')}
         </p>
       </motion.div>
@@ -131,7 +131,7 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="bg-neo-yellow border-3 border-neo-black rounded-neo p-2.5 sm:p-4 shadow-hard-md max-w-sm text-center"
+          className="bg-neo-lime border-3 border-neo-black rounded-neo p-2.5 sm:p-4 shadow-hard-md max-w-sm text-center"
         >
           <div className="flex items-center justify-center gap-2 mb-1">
             <Pointer className="text-xl text-neo-black animate-bounce" />

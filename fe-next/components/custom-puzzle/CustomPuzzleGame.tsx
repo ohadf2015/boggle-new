@@ -190,7 +190,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
           className="max-w-md w-full bg-white dark:bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard p-6 text-center"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Crown className="w-6 h-6 text-neo-yellow" />
+            <Crown className="w-6 h-6 text-neo-lime" />
             <h1 className="text-2xl font-bold">{t('customPuzzle.title') || 'Custom Puzzle'}</h1>
           </div>
 
@@ -199,7 +199,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
               `Created by ${puzzle.creatorDisplayName}`}
           </p>
 
-          <div className="bg-neo-yellow/20 border-2 border-neo-yellow rounded-neo p-4 mb-6">
+          <div className="bg-neo-lime/20 border-2 border-neo-lime rounded-neo p-4 mb-6">
             <p className="text-sm font-medium">
               {t('customPuzzle.creatorScore') || 'Creator\'s Score'}:{' '}
               <span className="font-bold text-neo-navy dark:text-neo-cream">
@@ -273,7 +273,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="inline-flex items-center gap-2 bg-neo-yellow text-neo-black px-4 py-2 rounded-neo font-bold"
+                  className="inline-flex items-center gap-2 bg-neo-lime text-neo-black px-4 py-2 rounded-neo font-bold"
                 >
                   <Trophy className="w-5 h-5" />
                   {t('customPuzzle.beatCreator') || 'You beat the creator!'}
@@ -287,7 +287,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
                 <p className="text-xs text-gray-500 mb-1">{t('customPuzzle.yourScore') || 'Your Score'}</p>
                 <p className="text-2xl font-bold">{Math.round(gameResult.efficiencyScore)}</p>
               </div>
-              <div className="bg-neo-yellow/20 border-2 border-neo-yellow rounded-neo p-3 text-center">
+              <div className="bg-neo-lime/20 border-2 border-neo-lime rounded-neo p-3 text-center">
                 <p className="text-xs text-gray-500 mb-1">{t('customPuzzle.creatorScore') || 'Creator'}</p>
                 <p className="text-2xl font-bold">{Math.round(puzzle.creatorEfficiencyScore)}</p>
               </div>
@@ -297,7 +297,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
             {leaderboard.length > 0 && (
               <div className="mb-6">
                 <h3 className="text-sm font-bold mb-2 flex items-center gap-2">
-                  <Trophy className="w-4 h-4 text-neo-yellow" />
+                  <Trophy className="w-4 h-4 text-neo-lime" />
                   {t('customPuzzle.leaderboard') || 'Leaderboard'}
                 </h3>
                 <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -306,7 +306,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
                       key={`${entry.displayName}-${entry.rank}`}
                       className={`flex items-center justify-between p-2 rounded-neo text-sm ${
                         entry.isCreator
-                          ? 'bg-neo-yellow/20 border border-neo-yellow'
+                          ? 'bg-neo-lime/20 border border-neo-lime'
                           : entry.displayName === displayName
                             ? 'bg-neo-pink/20 border border-neo-pink'
                             : 'bg-gray-100 dark:bg-neo-navy'
@@ -315,7 +315,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
                       <div className="flex items-center gap-2">
                         <span className="font-bold w-6">#{entry.rank}</span>
                         <span>{entry.displayName}</span>
-                        {entry.isCreator && <Crown className="w-4 h-4 text-neo-yellow" />}
+                        {entry.isCreator && <Crown className="w-4 h-4 text-neo-lime" />}
                       </div>
                       <span className="font-bold">{Math.round(entry.efficiencyScore)}</span>
                     </div>

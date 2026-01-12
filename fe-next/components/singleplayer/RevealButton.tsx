@@ -136,7 +136,7 @@ const RevealButton = memo<RevealButtonProps>(({
                 <Star
                   key={i}
                   className={`w-3 h-3 ${i < freeRevealsRemaining
-                      ? 'text-neo-yellow fill-neo-yellow'
+                      ? 'text-neo-lime fill-neo-lime'
                       : 'text-gray-400 opacity-40'
                     }`}
                 />
@@ -144,7 +144,7 @@ const RevealButton = memo<RevealButtonProps>(({
             ) : (
               // Show coin cost
               <div className="flex items-center gap-0.5">
-                <Coins className="w-3 h-3 text-neo-yellow" />
+                <Coins className="w-3 h-3 text-neo-lime" />
                 <span className="text-xs">{revealCost}</span>
               </div>
             )}
@@ -179,7 +179,7 @@ const RevealButton = memo<RevealButtonProps>(({
 
       {/* Coin balance indicator (when paid reveals) */}
       {!isFreeReveal && (
-        <div className="absolute -top-2 -right-2 bg-neo-yellow text-neo-black text-xs font-bold px-1.5 py-0.5 rounded-full border-2 border-neo-black shadow-hard-sm">
+        <div className="absolute -top-2 -right-2 bg-neo-lime text-neo-black text-xs font-bold px-1.5 py-0.5 rounded-full border-2 border-neo-black shadow-hard-sm">
           <div className="flex items-center gap-0.5">
             <Coins className="w-2.5 h-2.5" />
             <span>{coins}</span>

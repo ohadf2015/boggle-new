@@ -41,7 +41,7 @@ export function WaitingProgressBar({ currentPlayers, t, className }: WaitingProg
         <div className="h-3 bg-neo-black/30 rounded-full border-2 border-neo-black/50 overflow-hidden">
           {/* Fill */}
           <motion.div
-            className="h-full bg-gradient-to-r from-neo-yellow via-neo-orange to-neo-pink"
+            className="h-full bg-gradient-to-r from-neo-lime via-neo-orange to-neo-pink"
             initial={{ width: 0 }}
             animate={{ width: `${progressPercent}%` }}
             transition={{ duration: 0.5, ease: "easeOut" }}
@@ -73,7 +73,7 @@ export function WaitingProgressBar({ currentPlayers, t, className }: WaitingProg
                   className={cn(
                     "w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold transition-colors",
                     isReached
-                      ? "bg-neo-yellow border-neo-black text-neo-black"
+                      ? "bg-neo-lime border-neo-black text-neo-black"
                       : "bg-slate-700 border-slate-500 text-slate-400"
                   )}
                 >
@@ -98,7 +98,7 @@ export function WaitingProgressBar({ currentPlayers, t, className }: WaitingProg
               key={milestone.count}
               className={cn(
                 "text-center transition-colors",
-                isReached ? "text-neo-yellow" : "text-neo-cream/50"
+                isReached ? "text-neo-lime" : "text-neo-cream/50"
               )}
             >
               {milestone.label}
@@ -123,7 +123,7 @@ export function WaitingProgressBar({ currentPlayers, t, className }: WaitingProg
             </div>
           )}
           {currentPlayers === 1 && (
-            <div className="flex items-center justify-center gap-2 text-neo-yellow">
+            <div className="flex items-center justify-center gap-2 text-neo-lime">
               <Sparkles className="w-4 h-4" />
               <span className="text-sm font-bold">{t('waiting.oneMoreNeeded') || 'Invite friends to get started!'}</span>
             </div>

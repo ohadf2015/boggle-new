@@ -23,7 +23,7 @@ export default function NewBadge({ className }: NewBadgeProps) {
     <motion.div
       className={cn(
         'inline-flex items-center gap-1 px-2 py-0.5 rounded-neo border-2 border-neo-black',
-        'bg-neo-yellow',
+        'bg-neo-lime',
         className
       )}
       animate={{ scale: [1, 1.1, 1] }}

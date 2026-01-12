@@ -165,7 +165,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
                   initial={{ x: 10, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.15 }}
-                  className="text-sm font-black uppercase text-neo-yellow truncate"
+                  className="text-sm font-black uppercase text-neo-lime truncate"
                 >
                   {localizedAchievement.name}
                 </motion.h3>

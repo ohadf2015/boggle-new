@@ -117,7 +117,7 @@ export const EmptyState = memo(function EmptyState({
         </div>
       ) : actualIcon ? (
         <motion.div
-          className={`${sizeClasses[size].icon} mx-auto mb-4 text-neo-yellow`}
+          className={`${sizeClasses[size].icon} mx-auto mb-4 text-neo-lime`}
           {...floatAnimation}
         >
           {actualIcon}
@@ -132,7 +132,7 @@ export const EmptyState = memo(function EmptyState({
       )}
 
       {/* Title */}
-      <h3 className={`${sizeClasses[size].title} font-neo-display font-black text-neo-yellow uppercase mb-2`}>
+      <h3 className={`${sizeClasses[size].title} font-neo-display font-black text-neo-lime uppercase mb-2`}>
         {title}
       </h3>
 

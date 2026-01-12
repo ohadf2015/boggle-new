@@ -174,7 +174,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
           </p>
           <Button
             onClick={() => router.push('/')}
-            className="w-full bg-neo-yellow text-neo-black border-3 border-neo-black rounded-neo shadow-hard-md hover:shadow-hard-lg hover:-translate-y-1 transition-all font-bold"
+            className="w-full bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo shadow-hard-md hover:shadow-hard-lg hover:-translate-y-1 transition-all font-bold"
           >
             {language === 'he' ? 'חזרה לדף הבית' : 'Back to Home'}
           </Button>
@@ -224,7 +224,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.2, type: 'spring' }}
-                className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-neo-yellow border-3 border-neo-black shadow-hard-md mb-3"
+                className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-neo-lime border-3 border-neo-black shadow-hard-md mb-3"
               >
                 <Target className="w-8 h-8 text-neo-black" />
               </motion.div>
@@ -266,7 +266,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
             {/* Score to Beat */}
             <div className={cn(
               'text-center p-6 rounded-neo border-3 mb-4',
-              'bg-gradient-to-br from-neo-yellow/20 to-orange-500/20 border-neo-yellow'
+              'bg-gradient-to-br from-neo-lime/20 to-orange-500/20 border-neo-lime'
             )}>
               <p className={cn(
                 'text-sm font-bold uppercase tracking-wide mb-2',

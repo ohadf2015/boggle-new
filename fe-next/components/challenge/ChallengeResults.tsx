@@ -346,7 +346,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
                 'font-bold uppercase rounded-neo',
                 'border-2 border-neo-black shadow-hard-sm',
                 'hover:shadow-hard-md hover:-translate-y-0.5 transition-all',
-                copied ? 'bg-neo-lime text-neo-black' : 'bg-neo-yellow text-neo-black'
+                copied ? 'bg-neo-lime text-neo-black' : 'bg-neo-lime text-neo-black'
               )}
             >
               {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}

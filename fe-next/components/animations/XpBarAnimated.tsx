@@ -39,7 +39,7 @@ const COLOR_SCHEMES = {
   gold: {
     bar: 'from-amber-400 via-yellow-400 to-amber-500',
     glow: '#FFD700',
-    text: 'text-neo-yellow',
+    text: 'text-neo-lime',
   },
   purple: {
     bar: 'from-purple-500 via-fuchsia-500 to-pink-500',
@@ -168,7 +168,7 @@ export function XpBarAnimated({
           <motion.div
             className={cn(
               'flex items-center justify-center rounded-neo border-3 border-neo-black shadow-hard',
-              'bg-gradient-to-br from-neo-yellow to-amber-500 font-black text-neo-black',
+              'bg-gradient-to-br from-neo-lime to-amber-500 font-black text-neo-black',
               sizeConfig[size].levelBadge
             )}
             animate={

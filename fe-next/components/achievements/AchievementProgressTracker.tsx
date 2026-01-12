@@ -260,7 +260,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
               <span className="text-xs font-bold text-neo-cream">
                 {progress.current}/{progress.target}
               </span>
-              <span className="text-xs font-bold text-neo-yellow">
+              <span className="text-xs font-bold text-neo-lime">
                 {Math.round(progress.percentage)}%
               </span>
             </div>

@@ -179,7 +179,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
               className={cn(
                 'text-xs font-bold flex items-center gap-1',
                 canPrestige
-                  ? 'text-neo-yellow animate-pulse cursor-pointer hover:underline'
+                  ? 'text-neo-lime animate-pulse cursor-pointer hover:underline'
                   : 'text-neo-pink'
               )}
             >

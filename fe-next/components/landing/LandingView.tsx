@@ -11,6 +11,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import { useMobilePortrait } from '@/hooks/useMobilePortrait';
+import { cn } from '@/lib/utils';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useMouseParallax } from '@/hooks/useTiltEffect';
@@ -75,25 +77,25 @@ const HeroMascot = memo(function HeroMascot() {
         />
       </div>
 
-      {/* Sparkle accents around mascot */}
+      {/* Sparkle accents around mascot - lime family unified */}
       {enableComplexAnimations && !prefersReducedMotion && (
         <>
           <motion.div
-            className="absolute -top-2 -right-2 text-neo-yellow"
+            className="absolute -top-2 -right-2 text-neo-lime"
             animate={{ scale: [0, 1, 0], rotate: [0, 180, 360] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0 }}
           >
             <Sparkles className="w-5 h-5" />
           </motion.div>
           <motion.div
-            className="absolute top-1/2 -left-4 text-neo-pink"
+            className="absolute top-1/2 -left-4 text-neo-lime-light"
             animate={{ scale: [0, 1, 0], rotate: [0, -180, -360] }}
             transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
           >
             <Star className="w-4 h-4 fill-current" />
           </motion.div>
           <motion.div
-            className="absolute -bottom-1 right-1/4 text-neo-cyan"
+            className="absolute -bottom-1 right-1/4 text-neo-lime-muted"
             animate={{ scale: [0, 1, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
           >
@@ -113,10 +115,8 @@ const OnboardingModal = dynamic(() => import('@/components/OnboardingModal'), {
   ssr: false,
 });
 
-// Dynamic import for ProfileCustomizationModal
-const ProfileCustomizationModal = dynamic(() => import('@/components/ProfileCustomizationModal'), {
-  ssr: false,
-});
+// Note: ProfileCustomizationModal is now handled globally in ProfileCustomizationWrapper
+// (see app/components/ProfileCustomizationWrapper.tsx)
 
 /**
  * LandingView - Main landing page with game mode selection
@@ -126,8 +126,9 @@ const LandingView: React.FC = () => {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { playTrack, TRACKS } = useMusic();
-  const { isAuthenticated, needsProfileCustomization, profile, updateProfile } = useAuth();
+  const { isAuthenticated } = useAuth();
   const isLandscape = useMobileLandscape();
+  const isMobilePortrait = useMobilePortrait();
   const liveRoomStats = useLiveRoomStats();
 
   // Mouse-based parallax for hero section
@@ -151,8 +152,7 @@ const LandingView: React.FC = () => {
   // Onboarding modal state (opened when user clicks to start tutorial)
   const [showOnboarding, setShowOnboarding] = useState(false);
 
-  // Profile customization state (for authenticated users who haven't customized)
-  const [showProfileCustomization, setShowProfileCustomization] = useState(false);
+  // Note: Profile customization is now handled globally in ProfileCustomizationWrapper
 
   // Check for room parameter and redirect to multiplayer page
   // This handles shared links (WhatsApp, barcode scan, copy link)
@@ -203,28 +203,6 @@ const LandingView: React.FC = () => {
     setShowOnboarding(true);
   };
 
-  // Show profile customization modal for authenticated users who haven't customized
-  useEffect(() => {
-    if (!needsProfileCustomization || showOnboarding) {
-      return;
-    }
-    // Small delay to let the page settle after auth redirect
-    const timer = setTimeout(() => {
-      setShowProfileCustomization(true);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [needsProfileCustomization, showOnboarding]);
-
-  // Handle profile customization save
-  const handleProfileCustomizationSave = async (name: string, avatarId: string) => {
-    await updateProfile({
-      display_name: name,
-      username: name,
-      avatar_image: avatarId,
-      has_customized_profile: true,
-    });
-  };
-
   // Play lobby music on landing page (same as multiplayer lobby)
   // Note: We always call playTrack even if audio isn't unlocked yet
   // The MusicContext will queue the request and play when user interacts
@@ -234,11 +212,16 @@ const LandingView: React.FC = () => {
 
   return (
     <div
-      className={`flex flex-col h-full bg-gray-100 dark:bg-gradient-to-b dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative overflow-hidden page-content-safe ${isLandscape ? 'landscape-full-height' : ''}`}
+      className={cn(
+        'flex flex-col bg-gray-100 dark:bg-neo-navy relative overflow-hidden page-content-safe',
+        isLandscape && 'landscape-full-height',
+        isMobilePortrait && 'h-[100dvh] max-h-[100dvh]',
+        !isLandscape && !isMobilePortrait && 'h-full'
+      )}
       {...pullToRefreshHandlers}
     >
-      {/* Playful background with parallax and floating elements */}
-      {!isLandscape && <PlayfulBackground intensity="high" colorScheme="default" />}
+      {/* Playful background with parallax and floating elements - hidden on mobile portrait for performance */}
+      {!isLandscape && !isMobilePortrait && <PlayfulBackground intensity="high" colorScheme="default" />}
 
       {/* Pull-to-refresh indicator */}
       <PullToRefreshIndicator
@@ -250,22 +233,19 @@ const LandingView: React.FC = () => {
       {/* Onboarding Modal */}
       <OnboardingModal isOpen={showOnboarding} onClose={() => setShowOnboarding(false)} />
 
-      {/* Profile Customization Modal (for authenticated users who haven't customized) */}
-      <ProfileCustomizationModal
-        isOpen={showProfileCustomization}
-        onClose={() => setShowProfileCustomization(false)}
-        defaultName={profile?.display_name || profile?.username || ''}
-        profilePictureUrl={profile?.profile_picture_url ?? undefined}
-        onSave={handleProfileCustomizationSave}
-      />
+      {/* Note: ProfileCustomizationModal is now rendered globally by ProfileCustomizationWrapper */}
 
       {/* Header - compact in landscape via CSS */}
       <Header />
 
       {/* Main content */}
-      <main className={`w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 flex-1 ${isLandscape ? 'flex flex-col justify-center px-4 py-2' : 'px-2 sm:px-3 lg:px-6 xl:px-8 py-2 sm:py-3 lg:py-4'}`}>
-        {/* Hero section with mascot - compact on desktop to maximize card space */}
-        {!isLandscape && (
+      <main className={cn(
+        'w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 flex-1',
+        (isLandscape || isMobilePortrait) && 'flex flex-col justify-center px-2 sm:px-4 py-2',
+        !isLandscape && !isMobilePortrait && 'px-2 sm:px-3 lg:px-6 xl:px-8 py-2 sm:py-3 lg:py-4'
+      )}>
+        {/* Hero section with mascot - hidden on mobile portrait and landscape */}
+        {!isLandscape && !isMobilePortrait && (
           <motion.div
             className="text-center mb-2 sm:mb-3 lg:mb-4 animate-fade-in-fast relative z-10"
             style={{
@@ -294,8 +274,8 @@ const LandingView: React.FC = () => {
           </motion.div>
         )}
 
-        {/* Tutorial Prompt - Non-intrusive banner for first-time visitors (hidden in landscape) */}
-        {!isLandscape && (
+        {/* Tutorial Prompt - Non-intrusive banner for first-time visitors (hidden in landscape and mobile portrait) */}
+        {!isLandscape && !isMobilePortrait && (
           <TutorialPrompt
             isVisible={showTutorialPrompt}
             onStartTutorial={handleStartTutorial}
@@ -304,9 +284,12 @@ const LandingView: React.FC = () => {
         )}
 
         {/* Daily Challenge Banner - Lazy loaded with skeleton fallback */}
-        <div className={`w-full ${isLandscape ? 'mb-2' : 'mb-2 sm:mb-3 lg:mb-4 xl:mb-6'}`}>
+        <div className={cn(
+          'w-full',
+          (isLandscape || isMobilePortrait) ? 'mb-2' : 'mb-2 sm:mb-3 lg:mb-4 xl:mb-6'
+        )}>
           <Suspense fallback={
-            <div className="w-full p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-yellow animate-pulse">
+            <div className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-lime animate-pulse">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-neo bg-neo-black/20" />
                 <div className="flex-1 space-y-2">
@@ -316,26 +299,55 @@ const LandingView: React.FC = () => {
               </div>
             </div>
           }>
-            <DailyChallengeBanner compact={isLandscape} />
+            <DailyChallengeBanner
+              compact={isLandscape || isMobilePortrait}
+              mascot={isMobilePortrait ? (
+                <InteractiveMascotWithEntrance
+                  variant="happy"
+                  size="xs"
+                  enableClick
+                  clickVariant="celebrating"
+                  clickAnimation="bounce"
+                />
+              ) : undefined}
+            />
           </Suspense>
         </div>
 
-        {/* Mode cards grid - horizontal in landscape, 3-column layout on desktop for better space usage */}
+        {/* Mode cards grid - horizontal in landscape/mobile portrait, 3-column layout on desktop */}
         {/* Using CSS animation for instant paint without JS overhead */}
-        <div className={`w-full animate-fade-in-fast ${isLandscape ? 'flex gap-3 flex-1 min-h-0' : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5'}`}>
-          {/* Multiplayer Card - Featured (spans 2 rows on desktop, 50% width) */}
-          {isLandscape ? (
+        <div className={cn(
+          'w-full animate-fade-in-fast',
+          (isLandscape || isMobilePortrait)
+            ? 'flex gap-2 sm:gap-3 flex-1 min-h-0'
+            : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5'
+        )}>
+          {/* Multiplayer Card - Featured */}
+          {(isLandscape || isMobilePortrait) ? (
             <Link
               href={`/${language}/multiplayer`}
-              className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-pink to-pink-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all min-h-[120px] max-h-[70dvh] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy"
+              className={cn(
+                'flex-1 flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
+                'bg-gradient-to-br from-neo-pink to-pink-400',
+                'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
+                'hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px]',
+                'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm',
+                'transition-all min-h-[100px] sm:min-h-[120px]',
+                isMobilePortrait && 'max-h-[30dvh]',
+                isLandscape && 'max-h-[70dvh]',
+                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
+              )}
               aria-label={`${t('landing.multiplayer') || 'Multiplayer'} - ${t('landing.multiplayerDesc') || 'Compete with friends'}`}
             >
-              <Users className="w-10 h-10 text-neo-black" aria-hidden="true" />
-              <span className="text-lg font-black uppercase text-neo-black text-center">{t('landing.multiplayer') || 'Multiplayer'}</span>
-              <div className="flex gap-2 text-xs" aria-hidden="true">
-                <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><LayoutGrid className="inline w-3 h-3 mr-1" />Rooms</span>
-                <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Crown className="inline w-3 h-3 mr-1" />Host</span>
-              </div>
+              <Users className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
+              <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.multiplayer') || 'Multiplayer'}</span>
+              {/* Hide badges on mobile portrait for space */}
+              {!isMobilePortrait && (
+                <div className="flex gap-2 text-xs" aria-hidden="true">
+                  <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><LayoutGrid className="inline w-3 h-3 mr-1" />Rooms</span>
+                  <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Crown className="inline w-3 h-3 mr-1" />Host</span>
+                </div>
+              )}
             </Link>
           ) : (
             <ModeCard
@@ -354,18 +366,31 @@ const LandingView: React.FC = () => {
           )}
 
           {/* Single Player Card */}
-          {isLandscape ? (
+          {(isLandscape || isMobilePortrait) ? (
             <Link
               href={`/${language}/singleplayer`}
-              className="flex-1 flex flex-col items-center justify-center gap-2 p-4 bg-gradient-to-br from-neo-cyan to-cyan-400 border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm transition-all min-h-[120px] max-h-[70dvh] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-yellow focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy"
+              className={cn(
+                'flex-1 flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
+                'bg-gradient-to-br from-neo-cyan to-cyan-400',
+                'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
+                'hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px]',
+                'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm',
+                'transition-all min-h-[100px] sm:min-h-[120px]',
+                isMobilePortrait && 'max-h-[30dvh]',
+                isLandscape && 'max-h-[70dvh]',
+                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
+              )}
               aria-label={`${t('landing.singlePlayer') || 'Single Player'} - ${t('landing.singlePlayerDesc') || 'Practice at your own pace'}`}
             >
-              <User className="w-10 h-10 text-neo-black" aria-hidden="true" />
-              <span className="text-lg font-black uppercase text-neo-black text-center">{t('landing.singlePlayer') || 'Single Player'}</span>
-              <div className="flex gap-2 text-xs" aria-hidden="true">
-                <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Bot className="inline w-3 h-3 mr-1" />Bots</span>
-                <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Trophy className="inline w-3 h-3 mr-1" />Challenges</span>
-              </div>
+              <User className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
+              <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.singlePlayer') || 'Single Player'}</span>
+              {/* Hide badges on mobile portrait for space */}
+              {!isMobilePortrait && (
+                <div className="flex gap-2 text-xs" aria-hidden="true">
+                  <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Bot className="inline w-3 h-3 mr-1" />Bots</span>
+                  <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Trophy className="inline w-3 h-3 mr-1" />Challenges</span>
+                </div>
+              )}
             </Link>
           ) : (
             <ModeCard
@@ -377,8 +402,8 @@ const LandingView: React.FC = () => {
             />
           )}
 
-          {/* Brain Training Card - Only on non-landscape */}
-          {!isLandscape && (
+          {/* Brain Training Card - Hidden on landscape and mobile portrait */}
+          {!isLandscape && !isMobilePortrait && (
             <ModeCard
               title={t('landing.brainTraining') || 'Brain Training'}
               description={t('landing.brainTrainingDesc') || 'Track cognitive growth'}

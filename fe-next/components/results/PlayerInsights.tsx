@@ -278,8 +278,8 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
       label: t('insights.avgWordLength') || 'Avg Length',
       value: insights.averageWordLength,
       subValue: t('insights.letters') || 'letters',
-      color: 'var(--neo-yellow)',
-      bgColor: 'var(--neo-yellow)',
+      color: 'var(--neo-lime)',
+      bgColor: 'var(--neo-lime)',
     },
     {
       icon: Target,
@@ -335,7 +335,7 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
               <h3 className="text-lg font-black text-neo-cream uppercase tracking-wide">
                 {playerStory.headline}
               </h3>
-              <Sparkles className="w-4 h-4 text-neo-yellow ml-auto" />
+              <Sparkles className="w-4 h-4 text-neo-lime ml-auto" />
             </div>
             <p className="text-sm font-bold text-neo-cream leading-relaxed">
               {playerStory.story}
@@ -432,7 +432,7 @@ const PlayerInsights: React.FC<PlayerInsightsProps> = ({ insights }) => {
               {t('insights.mid') || 'M'}: {insights.midGameWords}
             </span>
             <span
-              className="px-1.5 py-0.5 rounded border border-gray-400 bg-neo-yellow/50 text-neo-black"
+              className="px-1.5 py-0.5 rounded border border-gray-400 bg-neo-lime/50 text-neo-black"
               title={t('insights.late') || 'Late'}
             >
               {t('insights.late') || 'L'}: {insights.lateGameWords}

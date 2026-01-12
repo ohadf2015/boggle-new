@@ -46,7 +46,7 @@ const variantStyles: Record<ConfirmationDialogVariant, {
   },
   warning: {
     content: 'bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo shadow-hard max-w-sm',
-    confirm: 'flex-1 bg-neo-yellow border-2 border-neo-black rounded-neo font-bold text-neo-black hover:brightness-110',
+    confirm: 'flex-1 bg-neo-lime border-2 border-neo-black rounded-neo font-bold text-neo-black hover:brightness-110',
   },
   default: {
     content: 'bg-white text-neo-black dark:bg-slate-800 dark:text-white border-red-500/30',

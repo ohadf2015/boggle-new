@@ -121,8 +121,6 @@ const ParticipantRow = memo<{
           <Avatar
             profilePictureUrl={participant.profile_picture_url ?? undefined}
             avatarImage={participant.avatar_image ?? undefined}
-            avatarEmoji={participant.avatar_emoji}
-            avatarColor={participant.avatar_color}
             size="md"
             className="w-full h-full"
           />
@@ -512,8 +510,6 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
                   <Avatar
                     profilePictureUrl={currentUserData.profile_picture_url ?? undefined}
                     avatarImage={currentUserData.avatar_image ?? undefined}
-                    avatarEmoji={currentUserData.avatar_emoji}
-                    avatarColor={currentUserData.avatar_color}
                     size="sm"
                     className="w-full h-full"
                   />

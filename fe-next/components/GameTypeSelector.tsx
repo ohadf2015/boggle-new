@@ -119,7 +119,7 @@ const GameTypeSelector = memo<GameTypeSelectorProps>(({
               <Minus size={10} aria-hidden="true" />
             </motion.button>
 
-            <span className="text-xl font-black text-neo-yellow w-6 text-center">
+            <span className="text-xl font-black text-neo-lime w-6 text-center">
               {tournamentRounds}
             </span>
 

@@ -183,7 +183,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
           {/* Header */}
           <div className="flex items-center gap-2 mb-1.5 relative z-10">
              {isAiVerified && (
-                <p className="font-black text-xs uppercase flex items-center gap-1.5 text-neo-yellow">
+                <p className="font-black text-xs uppercase flex items-center gap-1.5 text-neo-lime">
                   <span className="px-1.5 py-0.5 bg-neo-pink rounded border border-neo-black text-neo-cream">AI</span>
                   {t('results.aiRejected') || 'Rejected by AI'}
                 </p>
@@ -234,7 +234,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
         )}
         {/* Show combo bonus indicator */}
         {comboBonus > 0 && !isDuplicate && isValid && (
-          <span className="text-xs px-1.5 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black">
+          <span className="text-xs px-1.5 py-0.5 bg-neo-lime text-neo-black rounded border border-neo-black font-black">
             +{comboBonus}
           </span>
         )}
@@ -266,7 +266,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="text-xs px-1.5 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black cursor-help">
+                <span className="text-xs px-1.5 py-0.5 bg-neo-lime text-neo-black rounded border border-neo-black font-black cursor-help">
                   ?
                 </span>
               </TooltipTrigger>
@@ -277,7 +277,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
                 <p className="text-xs font-bold text-neo-cream">
                   {t('results.pendingValidation') || 'Pending community validation'}
                   {wordObj.potentialScore && (
-                    <span className="block text-neo-yellow mt-1">
+                    <span className="block text-neo-lime mt-1">
                       {t('results.potentialScore', { score: String(wordObj.potentialScore) }) || `+${wordObj.potentialScore} pts if approved`}
                     </span>
                   )}
@@ -301,7 +301,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
               >
                 <p className="text-xs font-bold text-neo-cream">{t('results.aiVerified') || 'Verified by AI'}</p>
                 {aiReason && (
-                  <p className="text-xs text-neo-yellow mt-1">{aiReason}</p>
+                  <p className="text-xs text-neo-lime mt-1">{aiReason}</p>
                 )}
               </TooltipContent>
             </Tooltip>

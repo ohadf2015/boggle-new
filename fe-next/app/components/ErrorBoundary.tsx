@@ -94,7 +94,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             </p>
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <details className="mb-4 text-left bg-neo-navy p-3 rounded-neo border-3 border-neo-black text-xs">
-                <summary className="cursor-pointer mb-2 text-neo-yellow font-bold">
+                <summary className="cursor-pointer mb-2 text-neo-lime font-bold">
                   {t('errors.errorDetails')}
                 </summary>
                 <pre className="overflow-x-auto text-neo-red m-0">

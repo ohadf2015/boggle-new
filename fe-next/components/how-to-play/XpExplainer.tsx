@@ -29,7 +29,7 @@ interface XpExplainerProps {
 export const XpExplainer: React.FC<XpExplainerProps> = ({ t }) => {
   const xpBreakdown: XpBreakdownItem[] = [
     { key: 'base', icon: Gamepad2, value: 50, color: 'bg-neo-cyan' },
-    { key: 'score', icon: Star, value: 25, color: 'bg-neo-yellow' },
+    { key: 'score', icon: Star, value: 25, color: 'bg-neo-lime' },
     { key: 'win', icon: Trophy, value: 100, color: 'bg-neo-lime' },
     { key: 'achievement', icon: Medal, value: 30, color: 'bg-neo-pink' },
   ];
@@ -78,7 +78,7 @@ export const XpExplainer: React.FC<XpExplainerProps> = ({ t }) => {
       </div>
 
       {/* Level Titles */}
-      <div className="bg-gradient-to-br from-neo-pink/20 to-neo-yellow/20 rounded-neo border-3 border-neo-black p-4">
+      <div className="bg-gradient-to-br from-neo-pink/20 to-neo-lime/20 rounded-neo border-3 border-neo-black p-4">
         <h4 className="font-bold text-neo-black mb-3">
           {t('howToPlay.xp.unlockTitles')}
         </h4>

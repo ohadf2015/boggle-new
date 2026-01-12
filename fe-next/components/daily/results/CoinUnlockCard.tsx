@@ -48,7 +48,7 @@ export const CoinUnlockCard: React.FC<CoinUnlockCardProps> = ({
       onClick={canAffordAction ? onClick : undefined}
     >
       {/* Cost badge */}
-      <div className="absolute top-2 end-2 flex items-center gap-1 px-2.5 py-1 bg-neo-yellow rounded-full border-2 border-neo-black shadow-hard-sm text-neo-black">
+      <div className="absolute top-2 end-2 flex items-center gap-1 px-2.5 py-1 bg-neo-lime rounded-full border-2 border-neo-black shadow-hard-sm text-neo-black">
         <Coins className="w-4 h-4 text-neo-black" />
         <span className="font-black text-sm text-neo-black">{cost}</span>
       </div>
@@ -86,7 +86,7 @@ export const CoinUnlockCard: React.FC<CoinUnlockCardProps> = ({
               initial={{ width: 0 }}
               animate={{ width: `${Math.min((currentCoins / cost) * 100, 100)}%` }}
               transition={{ duration: 0.5 }}
-              className={cn("h-full rounded-full", canAffordAction ? "bg-neo-yellow" : "bg-neo-yellow/70")}
+              className={cn("h-full rounded-full", canAffordAction ? "bg-neo-lime" : "bg-neo-lime/70")}
             />
           </div>
           {!canAffordAction && (

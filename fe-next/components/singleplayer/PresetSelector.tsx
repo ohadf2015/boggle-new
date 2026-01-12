@@ -53,7 +53,7 @@ const MODE_CONFIG: Record<Exclude<SinglePlayerMode, 'daily'>, {
     nameKey: 'singlePlayer.mode.challenge',
     descKey: 'singlePlayer.mode.challengeDesc',
     Icon: Trophy,
-    color: 'from-neo-yellow to-yellow-400',
+    color: 'from-neo-lime to-yellow-400',
   },
 };
 
@@ -180,16 +180,16 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           <div className="w-[70%] flex flex-col gap-3 justify-center">
             {/* Challenge high score preview */}
             {challengeInfo.highScore !== null && (
-              <Card className="border-3 border-neo-yellow shadow-hard bg-gradient-to-br from-neo-yellow/20 to-neo-red/10">
+              <Card className="border-3 border-neo-lime shadow-hard bg-gradient-to-br from-neo-lime/20 to-neo-red/10">
                 <CardContent className="p-4 flex items-center gap-4">
                   <div className="flex items-center gap-2">
-                    <Crown className="text-neo-yellow text-xl" />
+                    <Crown className="text-neo-lime text-xl" />
                     <span className="font-black text-neo-white text-sm uppercase">
                       {t('challenge.yourRecord') || 'Your Record'}
                     </span>
                   </div>
                   <div className="flex-1 text-right">
-                    <span className="text-2xl font-black text-neo-yellow">{challengeInfo.highScore}</span>
+                    <span className="text-2xl font-black text-neo-lime">{challengeInfo.highScore}</span>
                     <span className="text-sm text-neo-white/70 ml-2">{t('common.points') || 'pts'}</span>
                   </div>
                 </CardContent>
@@ -294,15 +294,15 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <Card className="border-3 border-neo-yellow dark:border-neo-yellow/60 shadow-hard bg-gradient-to-r from-neo-yellow/10 to-neo-red/10">
+            <Card className="border-3 border-neo-lime dark:border-neo-lime/60 shadow-hard bg-gradient-to-r from-neo-lime/10 to-neo-red/10">
               <CardContent className="p-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Crown className="text-neo-yellow text-lg" />
+                  <Crown className="text-neo-lime text-lg" />
                   <span className="font-bold text-sm text-neo-black dark:text-neo-white">
                     {t('challenge.yourRecord') || 'Your Record'}
                   </span>
                 </div>
-                <Badge className="bg-neo-yellow text-neo-black font-black border-0">
+                <Badge className="bg-neo-lime text-neo-black font-black border-0">
                   {challengeInfo.highScore} {t('common.points') || 'pts'}
                 </Badge>
               </CardContent>

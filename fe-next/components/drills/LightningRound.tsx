@@ -189,7 +189,7 @@ export default function LightningRound({
   const getTimeColor = () => {
     if (timeRemaining <= 5) return 'text-neo-red';
     if (timeRemaining <= 10) return 'text-neo-orange';
-    return isDarkMode ? 'text-neo-yellow' : 'text-neo-purple';
+    return isDarkMode ? 'text-neo-lime' : 'text-neo-purple';
   };
 
   return (
@@ -228,7 +228,7 @@ export default function LightningRound({
         <div className="relative">
           <div className={cn(
             'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
-            isDarkMode ? 'bg-neo-yellow text-neo-black' : 'bg-neo-yellow text-neo-black'
+            isDarkMode ? 'bg-neo-lime text-neo-black' : 'bg-neo-lime text-neo-black'
           )}>
             {score} {t('brain.drills.points')}
           </div>
@@ -260,7 +260,7 @@ export default function LightningRound({
           >
             <Zap className={cn(
               'w-20 h-20 mx-auto',
-              isDarkMode ? 'text-neo-yellow' : 'text-neo-yellow'
+              isDarkMode ? 'text-neo-lime' : 'text-neo-lime'
             )} />
             <h2 className={cn(
               'text-2xl font-black',
@@ -288,7 +288,7 @@ export default function LightningRound({
                 'px-8 py-3 rounded-neo border-3 border-neo-black shadow-hard',
                 'font-bold text-lg uppercase',
                 'transition-all hover:translate-y-[-2px] hover:shadow-hard-lg',
-                'bg-neo-yellow text-neo-black'
+                'bg-neo-lime text-neo-black'
               )}
             >
               {t('brain.drills.start')}
@@ -300,7 +300,7 @@ export default function LightningRound({
         {phase === 'playing' && (
           <div className="w-full max-w-md space-y-4">
             <div className="flex items-center justify-center gap-2">
-              <Zap className="w-5 h-5 text-neo-yellow animate-pulse" />
+              <Zap className="w-5 h-5 text-neo-lime animate-pulse" />
               <span className={cn(
                 'font-bold uppercase',
                 isDarkMode ? 'text-neo-white' : 'text-neo-black'
@@ -418,7 +418,7 @@ export default function LightningRound({
               animate={{ scale: 1 }}
               transition={{ type: 'spring', damping: 12, delay: 0.2 }}
             >
-              <Trophy className="w-20 h-20 mx-auto text-neo-yellow" />
+              <Trophy className="w-20 h-20 mx-auto text-neo-lime" />
             </motion.div>
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
@@ -445,7 +445,7 @@ export default function LightningRound({
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.7, type: 'spring' }}
-                className="text-3xl font-black text-neo-yellow"
+                className="text-3xl font-black text-neo-lime"
               >
                 <motion.span
                   initial={{ opacity: 0 }}
@@ -484,7 +484,7 @@ export default function LightningRound({
                     isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
                   )}
                 >
-                  <Zap className="w-6 h-6 mx-auto text-neo-yellow mb-1" />
+                  <Zap className="w-6 h-6 mx-auto text-neo-lime mb-1" />
                   <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-cyan' : 'text-neo-purple')}>
                     {getResults().wordsPerMinute}
                   </p>
@@ -520,7 +520,7 @@ export default function LightningRound({
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={onExit}
-                  className="px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase bg-neo-yellow text-neo-black"
+                  className="px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase bg-neo-lime text-neo-black"
                 >
                   {t('brain.drills.exit')}
                 </motion.button>

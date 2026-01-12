@@ -83,7 +83,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
               variant="ghost"
               size="sm"
               onClick={() => copyJoinUrl(gameCode, t)}
-              className="w-full h-12 min-h-[48px] p-0 bg-neo-yellow/90 hover:bg-neo-yellow border-3 border-neo-black rounded-neo flex items-center justify-center shadow-hard"
+              className="w-full h-12 min-h-[48px] p-0 bg-neo-lime/90 hover:bg-neo-lime border-3 border-neo-black rounded-neo flex items-center justify-center shadow-hard"
               title={t('hostView.copyLink')}
             >
               <Link className="w-4 h-4" />
@@ -179,16 +179,14 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                 <Badge
                   key={playerUsername}
                   className={`text-xs font-bold px-2 py-2 w-full truncate border-3 border-neo-black shadow-hard-sm ${
-                    playerIsHost ? "bg-neo-yellow text-neo-black" : "bg-neo-cream text-neo-black"
+                    playerIsHost ? "bg-neo-lime text-neo-black" : "bg-neo-cream text-neo-black"
                   }`}
                   style={avatar?.color && !playerIsHost ? { backgroundColor: avatar.color } : {}}
                 >
                   <div className="flex items-center gap-2 w-full truncate">
                     <Avatar
                       profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
-                      avatarEmoji={avatar?.emoji}
                       avatarImage={avatar?.avatarImage}
-                      avatarColor={avatar?.color}
                       size="xl"
                       className="flex-shrink-0"
                     />
@@ -269,7 +267,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
               <div className="flex items-center gap-3">
                 <div className="text-center sm:text-left">
                   <p className="text-sm text-neo-cyan font-bold uppercase">{t('hostView.roomCode')}:</p>
-                  <h2 className="text-3xl sm:text-4xl font-black tracking-wide text-neo-yellow">
+                  <h2 className="text-3xl sm:text-4xl font-black tracking-wide text-neo-lime">
                     {gameCode}
                   </h2>
                 </div>
@@ -327,7 +325,7 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                 {/* Decorative background shapes */}
                 <div className="absolute -top-4 -right-6 w-20 h-20 bg-neo-pink text-white border-4 border-neo-black rotate-12 -z-10" />
                 <div className="absolute -bottom-4 -left-6 w-16 h-16 bg-neo-cyan text-neo-black border-4 border-neo-black -rotate-6 -z-10" />
-                <div className="absolute top-1/2 -right-10 w-10 h-10 bg-neo-yellow text-neo-black border-3 border-neo-black rotate-45 -z-10" />
+                <div className="absolute top-1/2 -right-10 w-10 h-10 bg-neo-lime text-neo-black border-3 border-neo-black rotate-45 -z-10" />
 
                 {/* Interactive Mascot - Sleepy while waiting, excited on hover/click */}
                 <InteractiveMascot
@@ -406,20 +404,18 @@ const WaitingScreen: React.FC<WaitingScreenProps> = ({
                   >
                     <Badge
                       className={`font-black px-3 py-3 text-base w-full justify-between border-3 border-neo-black shadow-hard-sm ${
-                        playerIsHost ? "bg-neo-yellow text-neo-black" : "bg-neo-cream text-neo-black"
+                        playerIsHost ? "bg-neo-lime text-neo-black" : "bg-neo-cream text-neo-black"
                       }`}
                       style={avatar?.color && !playerIsHost ? { backgroundColor: avatar.color } : {}}
                     >
                       <div className="flex items-center gap-3">
                         <Avatar
                           profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
-                          avatarEmoji={avatar?.emoji}
                           avatarImage={avatar?.avatarImage}
-                          avatarColor={avatar?.color}
                           size="2xl"
                           className="flex-shrink-0"
                         />
-                        {playerIsHost && <Crown className="w-4 h-4 text-neo-yellow" />}
+                        {playerIsHost && <Crown className="w-4 h-4 text-neo-lime" />}
                         <SlotMachineText text={playerUsername} />
                         {isMe && (
                           <span className="text-xs bg-neo-black/20 px-2 py-0.5 rounded-neo font-bold">

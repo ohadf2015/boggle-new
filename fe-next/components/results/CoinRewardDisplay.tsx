@@ -94,7 +94,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
   if (variant === 'inline') {
     return (
       <div className={cn(
-        'bg-neo-yellow border-2 border-neo-black rounded-neo px-3 py-1 text-center',
+        'bg-neo-lime border-2 border-neo-black rounded-neo px-3 py-1 text-center',
         className
       )}>
         <div className="flex items-center justify-center gap-1">
@@ -112,7 +112,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
   if (variant === 'compact') {
     return (
       <div className={cn(
-        'bg-gradient-to-r from-neo-yellow to-amber-400 rounded-neo border-3 border-neo-black shadow-hard px-4 py-2',
+        'bg-gradient-to-r from-neo-lime to-amber-400 rounded-neo border-3 border-neo-black shadow-hard px-4 py-2',
         className
       )}>
         <div className="flex items-center justify-center gap-2">
@@ -133,7 +133,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
       animate={{ scale: 1, opacity: 1 }}
       transition={{ delay: 0.3, type: 'spring' }}
       className={cn(
-        'px-4 py-3 bg-gradient-to-r from-neo-yellow to-amber-400 rounded-neo border-3 border-neo-black shadow-hard',
+        'px-4 py-3 bg-gradient-to-r from-neo-lime to-amber-400 rounded-neo border-3 border-neo-black shadow-hard',
         className
       )}
     >

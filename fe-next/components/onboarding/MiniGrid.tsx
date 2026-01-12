@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowDown, ArrowUp, ArrowLeft, ArrowRight, ArrowDownLeft, ArrowDownRight, ArrowUpLeft, ArrowUpRight, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { WordPathTrail } from '@/components/animations/WordPathTrail';
 
 export interface GridPosition {
   row: number;
@@ -98,6 +99,27 @@ const MiniGrid: React.FC<MiniGridProps> = ({
   const gridMeasurementsRef = useRef<GridMeasurements | null>(null);
   const isSelectingRef = useRef(false); // Ref for use in event handlers
   const demoCompleteTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Trail visibility state
+  const [hasUserTouched, setHasUserTouched] = useState(false);
+  const [hasTimePassed, setHasTimePassed] = useState(false);
+  const [showTrail, setShowTrail] = useState(false);
+
+  // Set up 8-second timer for trail visibility
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setHasTimePassed(true);
+    }, 8000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Show trail when BOTH conditions are met
+  useEffect(() => {
+    if (hasUserTouched && hasTimePassed) {
+      setShowTrail(true);
+    }
+  }, [hasUserTouched, hasTimePassed]);
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -326,6 +348,8 @@ const MiniGrid: React.FC<MiniGridProps> = ({
     e.stopPropagation();
     setIsSelecting(true);
     isSelectingRef.current = true;
+    // Mark that user has touched the board (for trail visibility)
+    setHasUserTouched(true);
     // Pre-measure grid for smooth subsequent touches
     measureGrid();
     selectCell(row, col);
@@ -345,6 +369,8 @@ const MiniGrid: React.FC<MiniGridProps> = ({
 
     setIsSelecting(true);
     isSelectingRef.current = true;
+    // Mark that user has touched the board (for trail visibility)
+    setHasUserTouched(true);
     measureGrid();
 
     const cell = getCellAtPosition(touch.clientX, touch.clientY);
@@ -373,6 +399,8 @@ const MiniGrid: React.FC<MiniGridProps> = ({
   const handleMouseDown = (row: number, col: number) => {
     setIsSelecting(true);
     isSelectingRef.current = true;
+    // Mark that user has touched the board (for trail visibility)
+    setHasUserTouched(true);
     measureGrid();
     selectCell(row, col);
   };
@@ -441,6 +469,50 @@ const MiniGrid: React.FC<MiniGridProps> = ({
   // Get the arrow component for the current direction
   const ArrowIcon = arrowDirection ? ArrowComponents[arrowDirection] : null;
 
+  // Convert selected cells to path points for trail
+  const pathPoints = useMemo(() => {
+    if (!gridRef.current || selectedCells.length === 0) return [];
+
+    // Use a stable base timestamp derived from the selection count
+    const baseTimestamp = selectedCells.length * 1000;
+
+    return selectedCells.map((cell) => {
+      const cellElement = gridRef.current?.querySelector(
+        `[data-row="${cell.row}"][data-col="${cell.col}"]`
+      );
+      if (!cellElement) {
+        // Fallback to mathematical calculation if element not found (e.g., in tests)
+        const measurements = gridMeasurementsRef.current || measureGrid();
+        if (!measurements) return null;
+
+        const {
+          cellWidth,
+          cellHeight,
+          gridPaddingLeft,
+          gridPaddingTop,
+          cellWithGapWidth,
+          cellWithGapHeight,
+        } = measurements;
+
+        return {
+          x: gridPaddingLeft + cell.col * cellWithGapWidth + cellWidth / 2,
+          y: gridPaddingTop + cell.row * cellWithGapHeight + cellHeight / 2,
+          timestamp: baseTimestamp + cell.index * 100,
+        };
+      }
+
+      const rect = cellElement.getBoundingClientRect();
+      const gridRect = gridRef.current?.getBoundingClientRect();
+      if (!gridRect) return null;
+
+      return {
+        x: rect.left + rect.width / 2 - gridRect.left,
+        y: rect.top + rect.height / 2 - gridRect.top,
+        timestamp: baseTimestamp + cell.index * 100, // Stagger timestamps
+      };
+    }).filter((p): p is { x: number; y: number; timestamp: number } => p !== null);
+  }, [selectedCells, measureGrid]);
+
   return (
     <div className={cn('relative', className)}>
       {/* Grid - always LTR to ensure consistent touch coordinates */}
@@ -507,12 +579,12 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                 data-col={colIndex}
                 className={cn(
                   'relative aspect-square rounded-neo border-3 sm:border-4 border-neo-black',
-                  'flex items-center justify-center font-black text-2xl sm:text-3xl',
+                  'flex items-center justify-center font-black text-2xl sm:text-3xl text-neo-black',
                   'cursor-pointer select-none touch-none transition-colors',
                   // Larger touch targets for better mobile interaction (was 65px/80px)
                   'min-h-[80px] min-w-[80px] sm:min-h-[95px] sm:min-w-[95px]',
                   isSelected
-                    ? 'bg-neo-lime shadow-hard-sm scale-95 text-neo-black'
+                    ? 'bg-neo-lime shadow-hard-sm scale-95'
                     : 'letter-tile-gradient-cream shadow-hard-sm sm:shadow-hard',
                   // Enhanced glow for hint cell - bright lime green
                   isHint && !isSelected && 'ring-4 ring-neo-lime shadow-[0_0_20px_rgba(132,204,22,0.6),0_0_40px_rgba(132,204,22,0.3)]',
@@ -535,7 +607,7 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       exit={{ scale: 0 }}
-                      className="absolute -top-2 -right-2 sm:-top-2.5 sm:-right-2.5 w-6 h-6 sm:w-7 sm:h-7 bg-neo-yellow border-2 border-neo-black rounded-full flex items-center justify-center text-xs sm:text-sm font-black shadow-hard-sm"
+                      className="absolute -top-2 -right-2 sm:-top-2.5 sm:-right-2.5 w-6 h-6 sm:w-7 sm:h-7 bg-neo-lime border-2 border-neo-black rounded-full flex items-center justify-center text-xs sm:text-sm font-black shadow-hard-sm"
                     >
                       {selectedIndex + 1}
                     </motion.div>
@@ -561,8 +633,8 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                       }}
                       className="absolute -top-8 sm:-top-10 left-1/2 -translate-x-1/2 z-10"
                     >
-                      <div className="bg-neo-lime border-2 border-neo-black rounded-full p-1.5 sm:p-2 shadow-hard">
-                        <ArrowIcon className="w-4 h-4 sm:w-5 sm:h-5 text-neo-black" strokeWidth={3} />
+                      <div className="bg-neo-lime text-neo-black border-2 border-neo-black rounded-full p-1.5 sm:p-2 shadow-hard">
+                        <ArrowIcon className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={3} />
                       </div>
                     </motion.div>
                   )}
@@ -601,6 +673,18 @@ const MiniGrid: React.FC<MiniGridProps> = ({
           {selectedCells.length}/{demoWord.length} letters selected
         </div>
       </motion.div>
+
+      {/* Word trail - shown only after 8 seconds AND user has touched */}
+      {showTrail && pathPoints.length >= 2 && (
+        <div className="absolute inset-0 pointer-events-none" data-testid="word-path-trail">
+          <WordPathTrail
+            points={pathPoints}
+            isValid={selectedCells.length <= demoPath.length}
+            showParticles
+            showGlow
+          />
+        </div>
+      )}
 
       {/* Success animation */}
       <AnimatePresence>

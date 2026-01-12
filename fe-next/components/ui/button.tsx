@@ -29,7 +29,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         // Primary: Electric Yellow - main CTA
-        default: "bg-neo-yellow text-neo-black hover:bg-neo-yellow-hover",
+        default: "bg-neo-lime text-neo-black hover:bg-neo-lime-hover",
         // Destructive: Red for danger actions
         destructive: "bg-neo-red text-neo-white hover:brightness-110",
         // Outline: Transparent with border

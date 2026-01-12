@@ -707,7 +707,7 @@ const DailyChallenge: React.FC = () => {
   // Render based on phase
   return (
     <div
-      className="flex flex-col h-full bg-gray-100 dark:bg-gradient-to-b dark:from-transparent dark:via-neo-navy-light dark:to-neo-navy relative page-content-safe"
+      className="flex flex-col h-full bg-gray-100 dark:bg-neo-navy relative page-content-safe"
       {...pullToRefreshHandlers}
     >
       {/* Pull-to-refresh indicator - only show when not playing */}
@@ -732,8 +732,8 @@ const DailyChallenge: React.FC = () => {
           >
             <div className="text-center">
               <div className="relative w-12 h-12 mx-auto mb-3">
-                <div className="absolute inset-0 border-4 border-neo-yellow/30 rounded-full" />
-                <div className="absolute inset-0 border-4 border-transparent border-t-neo-yellow rounded-full animate-spin" />
+                <div className="absolute inset-0 border-4 border-neo-lime/30 rounded-full" />
+                <div className="absolute inset-0 border-4 border-transparent border-t-neo-lime rounded-full animate-spin" />
               </div>
               <p className="text-gray-600 dark:text-gray-300 text-sm">{t('daily.loading')}</p>
             </div>

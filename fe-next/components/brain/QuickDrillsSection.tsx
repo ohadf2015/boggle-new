@@ -26,7 +26,7 @@ const DRILLS: Drill[] = [
     id: 'lightning-round',
     icon: Zap,
     domain: 'processingSpeed',
-    color: 'text-neo-yellow',
+    color: 'text-neo-lime',
     bgColor: 'bg-yellow-400',
     unlockRequirement: 0, // Always unlocked
   },

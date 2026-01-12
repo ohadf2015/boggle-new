@@ -86,7 +86,7 @@ export function CalendarButton({ className, variant = 'icon' }: CalendarButtonPr
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0 }}
-              className="absolute -top-1 -right-1 w-4 h-4 bg-neo-yellow rounded-full border-2 border-neo-black flex items-center justify-center"
+              className="absolute -top-1 -right-1 w-4 h-4 bg-neo-lime rounded-full border-2 border-neo-black flex items-center justify-center"
             >
               <Gift className="w-2.5 h-2.5 text-neo-black" />
             </motion.div>
@@ -96,7 +96,7 @@ export function CalendarButton({ className, variant = 'icon' }: CalendarButtonPr
         {/* Pulse animation when reward available */}
         {hasUnclaimedReward && (
           <motion.div
-            className="absolute inset-0 rounded-neo border-2 border-neo-yellow"
+            className="absolute inset-0 rounded-neo border-2 border-neo-lime"
             animate={{
               opacity: [0, 0.5, 0],
               scale: [1, 1.1, 1.2],

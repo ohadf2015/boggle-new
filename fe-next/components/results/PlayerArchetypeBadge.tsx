@@ -151,7 +151,7 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
   // Background color mapping for neo-brutalist style
   const bgColorMap: Record<string, string> = {
     strategist: 'bg-neo-cyan',
-    speedster: 'bg-neo-yellow',
+    speedster: 'bg-neo-lime',
     scholar: 'bg-neo-pink',
     explorer: 'bg-neo-red',
     perfectionist: 'bg-neo-pink',

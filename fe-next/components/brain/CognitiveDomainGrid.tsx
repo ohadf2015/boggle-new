@@ -33,8 +33,8 @@ interface CognitiveDomainGridProps {
 const DOMAIN_CONFIG = {
   processingSpeed: {
     icon: Zap,
-    iconBg: 'bg-neo-yellow',
-    progressBar: 'bg-neo-yellow',
+    iconBg: 'bg-neo-lime',
+    progressBar: 'bg-neo-lime',
     bgLight: 'bg-yellow-100',
     bgDark: 'bg-yellow-900/30',
   },

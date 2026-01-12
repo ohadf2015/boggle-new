@@ -1512,7 +1512,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                   key={`${fw.word}-${fw.timestamp}`}
                   className={cn(
                     "px-3 py-1 text-sm font-bold uppercase rounded-full border border-neo-black/30",
-                    i === 0 ? "bg-neo-yellow text-neo-black" : "bg-neo-cream text-neo-black/80",
+                    i === 0 ? "bg-neo-lime text-neo-black" : "bg-neo-cream text-neo-black/80",
                     fw.isValid === false && "line-through opacity-60 bg-neo-red/20"
                   )}
                 >
@@ -1904,7 +1904,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               score > targetHighScore
                 ? 'bg-gradient-to-r from-neo-lime to-lime-300 border-neo-lime'
                 : score === targetHighScore
-                  ? 'bg-gradient-to-r from-neo-yellow to-yellow-300 border-neo-yellow'
+                  ? 'bg-gradient-to-r from-neo-lime to-yellow-300 border-neo-lime'
                   : 'bg-neo-cream dark:bg-slate-700 border-neo-black dark:border-slate-500'
             )}>
               <div className="flex items-center justify-between">
@@ -1925,7 +1925,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
                     </>
                   ) : (
                     <>
-                      <Crown className="w-3.5 h-3.5 md:w-4 md:h-4 text-neo-yellow" />
+                      <Crown className="w-3.5 h-3.5 md:w-4 md:h-4 text-neo-lime" />
                       <span className="font-bold text-xs md:text-sm text-neo-black/70 dark:text-neo-white/70">
                         {t('challenge.recordToBeat') || 'Record'}: <span className="font-black text-neo-black dark:text-neo-white">{targetHighScore}</span>
                       </span>

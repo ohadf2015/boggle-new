@@ -366,7 +366,7 @@ const JoinView: React.FC<JoinViewProps> = ({
               )}
             </div>
 
-            <Button type="submit" disabled={isJoining} className="w-full h-11 min-h-[44px] font-bold uppercase bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-2 border-neo-black">
+            <Button type="submit" disabled={isJoining} className="w-full h-11 min-h-[44px] font-bold uppercase bg-neo-lime hover:bg-neo-lime/90 text-neo-black border-2 border-neo-black">
               {mode === 'host' ? <Crown className="mr-2 w-4 h-4" /> : <User className="mr-2 w-4 h-4" />}
               {isJoining ? (t('common.loading') || 'Loading...') : mode === 'host' ? (t('joinView.createRoom') || 'Create') : (t('joinView.joinRoom') || 'Join')}
             </Button>

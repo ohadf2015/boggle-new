@@ -89,7 +89,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                 'transition-all duration-150',
                 'active:scale-95', // CSS-based tap animation (replaces whileTap)
                 isActive
-                  ? 'text-neo-yellow'
+                  ? 'text-neo-lime'
                   : 'text-neo-white/60 hover:text-neo-white/80'
               )}
             >
@@ -102,7 +102,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
                 {tab.icon}
                 {isActive && (
                   <div
-                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-neo-yellow rounded-full"
+                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-neo-lime rounded-full"
                   />
                 )}
               </div>

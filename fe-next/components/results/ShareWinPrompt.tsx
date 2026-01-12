@@ -316,7 +316,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
               'flex items-center gap-1.5 px-4 py-2 font-bold text-sm rounded-neo',
               'border-2 border-neo-black shadow-hard-sm',
               'hover:shadow-hard-md hover:-translate-y-0.5 transition-all',
-              'bg-neo-yellow text-neo-black',
+              'bg-neo-lime text-neo-black',
               'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
             )}
             aria-label={language === 'he' ? 'שתף' : 'Share'}
@@ -481,7 +481,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             'border-4 border-neo-black shadow-hard-lg',
             'hover:shadow-hard-xl active:shadow-hard-sm',
             'transition-all duration-150',
-            'bg-neo-yellow text-neo-black',
+            'bg-neo-lime text-neo-black',
             'focus:outline-none focus:ring-4 focus:ring-neo-cyan focus:ring-offset-2'
           )}
         >

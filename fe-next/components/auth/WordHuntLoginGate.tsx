@@ -85,12 +85,12 @@ const WordHuntLoginGate: React.FC<WordHuntLoginGateProps> = ({
         className={cn(
           'w-full max-w-sm rounded-2xl p-6 sm:p-8',
           'bg-neo-navy',
-          'border-4 border-neo-yellow shadow-hard-lg'
+          'border-4 border-neo-lime shadow-hard-lg'
         )}
       >
         {/* Puzzle badge */}
         <div className="flex justify-center mb-5">
-          <div className="bg-neo-yellow text-black px-4 py-1.5 rounded-full font-bold text-sm shadow-hard-sm">
+          <div className="bg-neo-lime text-black px-4 py-1.5 rounded-full font-bold text-sm shadow-hard-sm">
             {t('daily.puzzleNumber', { number: puzzleNumber })}
           </div>
         </div>

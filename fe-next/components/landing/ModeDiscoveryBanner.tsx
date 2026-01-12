@@ -53,7 +53,7 @@ const ModeDiscoveryBanner: React.FC = () => {
           dir={dir}
           className="relative w-full max-w-3xl lg:max-w-4xl xl:max-w-5xl mx-auto mb-4"
         >
-          <div className="bg-gradient-to-r from-neo-cyan via-neo-lime to-neo-yellow border-3 border-neo-black rounded-neo shadow-hard overflow-hidden">
+          <div className="bg-gradient-to-r from-neo-cyan via-neo-lime to-neo-lime border-3 border-neo-black rounded-neo shadow-hard overflow-hidden">
             {/* Dismiss button */}
             <button
               onClick={handleDismiss}

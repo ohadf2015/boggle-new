@@ -134,7 +134,7 @@ const SocialProof: React.FC<SocialProofProps> = ({
           <Users className="w-3.5 h-3.5" />
           <span className="font-bold">{displayStats.playersOnline}</span>
         </div>
-        <div className="flex items-center gap-1.5 text-neo-yellow">
+        <div className="flex items-center gap-1.5 text-neo-lime">
           <Gamepad2 className="w-3.5 h-3.5" />
           <span className="font-bold">{displayStats.gamesActive}</span>
           <span className="text-neo-white/90">{t('social.games') || 'games'}</span>
@@ -172,7 +172,7 @@ const SocialProof: React.FC<SocialProofProps> = ({
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-lime text-neo-black opacity-75" />
             <span className="relative inline-flex rounded-full h-3 w-3 bg-neo-lime text-neo-black border border-neo-black" />
           </span>
-          <Users className="text-neo-yellow w-4 h-4" />
+          <Users className="text-neo-lime w-4 h-4" />
           <span className="font-black text-neo-white">
             {displayStats.playersOnline}
           </span>
@@ -191,7 +191,7 @@ const SocialProof: React.FC<SocialProofProps> = ({
           transition={{ delay: 0.2, type: 'spring' }}
           className="flex items-center gap-2"
         >
-          <Flame className="text-neo-yellow w-4 h-4 animate-pulse" />
+          <Flame className="text-neo-lime w-4 h-4 animate-pulse" />
           <span className="font-black text-neo-white">
             {displayStats.gamesActive}
           </span>
@@ -211,11 +211,11 @@ const SocialProof: React.FC<SocialProofProps> = ({
                 exit={{ opacity: 0, x: -20 }}
                 className="hidden md:flex items-center gap-2"
               >
-                <Trophy className="text-neo-yellow w-4 h-4" />
+                <Trophy className="text-neo-lime w-4 h-4" />
                 <span className="text-neo-white/90 font-bold text-sm">
                   {t('social.newRecord') || 'New record:'}
                 </span>
-                <span className="font-black text-neo-yellow">
+                <span className="font-black text-neo-lime">
                   {displayStats.recentHighScore.score}
                 </span>
                 <span className="text-neo-white/90 text-sm">

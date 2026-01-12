@@ -311,7 +311,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
             <Button
               type="submit"
               disabled={isJoining}
-              className="w-full h-12 font-black uppercase text-base bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg transition-all flex-shrink-0"
+              className="w-full h-12 font-black uppercase text-base bg-neo-lime hover:bg-neo-lime/90 text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg transition-all flex-shrink-0"
             >
               {mode === 'host' ? <Crown className="mr-2 w-5 h-5" /> : <User className="mr-2 w-5 h-5" />}
               {isJoining ? (t('common.loading') || 'Loading...') : mode === 'host' ? (t('joinView.createRoom') || 'Create Room') : (t('joinView.joinRoom') || 'Join Room')}

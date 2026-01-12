@@ -19,6 +19,7 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 import { Button } from '@/components/ui/button';
+import NextStepPrompt from '@/components/results/NextStepPrompt';
 import { hasPlayedToday } from '@/utils/dailyChallenge/storage';
 import { LANGUAGE_OPTIONS } from './results/constants';
 import type { Language } from '@/types';
@@ -442,7 +443,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           <div className="text-xs text-slate-500 uppercase font-bold tracking-wider">
             {t('daily.puzzleNumber').replace('{number}', String(result.puzzleNumber))}
           </div>
-          <div className="text-7xl md:text-8xl font-black text-neo-yellow drop-shadow-[0_0_20px_rgba(255,225,53,0.3)] my-1">
+          <div className="text-7xl md:text-8xl font-black text-neo-lime drop-shadow-[0_0_20px_rgba(255,225,53,0.3)] my-1">
             {Math.round(result.score)}
           </div>
           <div className="text-slate-400 text-sm font-medium">
@@ -596,6 +597,20 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           </AnimatePresence>
         </motion.div>
 
+        {/* Next Step - Suggest Multiplayer */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.55 }}
+          className="pt-4"
+        >
+          <NextStepPrompt
+            currentMode="daily"
+            onBackToLobby={onBack}
+            variant="mobile"
+          />
+        </motion.div>
+
         {/* Try Another Language */}
         {availableLanguages.length > 0 && onGameLanguageChange && (
           <motion.div
@@ -685,7 +700,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
                         key={i}
                         className={`px-2 py-1 text-xs font-medium rounded-md ${
                           word === longestWord
-                            ? 'bg-neo-yellow/20 text-neo-yellow border border-neo-yellow/30'
+                            ? 'bg-neo-lime/20 text-neo-lime border border-neo-lime/30'
                             : 'bg-slate-800 text-slate-300 border border-slate-700'
                         }`}
                       >

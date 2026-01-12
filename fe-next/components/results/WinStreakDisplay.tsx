@@ -17,7 +17,7 @@ interface WinStreakDisplayProps {
 }
 
 const STREAK_TIERS = [
-  { min: 1, emoji: '✨', icon: Star, bg: 'bg-neo-yellow', text: 'text-neo-black', bar: 'bg-neo-yellow', name: 'Starting' },
+  { min: 1, emoji: '✨', icon: Star, bg: 'bg-neo-lime', text: 'text-neo-black', bar: 'bg-neo-lime', name: 'Starting' },
   { min: 3, emoji: '⚡', icon: Zap, bg: 'bg-neo-cyan', text: 'text-neo-black', bar: 'bg-neo-cyan', name: 'Hot' },
   { min: 7, emoji: '🔥', icon: Flame, bg: 'bg-neo-red', text: 'text-neo-black', bar: 'bg-neo-red', name: 'On Fire' },
   { min: 14, emoji: '💎', icon: Gem, bg: 'bg-neo-pink', text: 'text-neo-cream', bar: 'bg-neo-pink', name: 'Epic' },
@@ -148,7 +148,7 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
             }}
             className={cn(
               'p-2 rounded-neo border-2 border-neo-black shadow-hard-sm',
-              tier?.bg || 'bg-neo-yellow'
+              tier?.bg || 'bg-neo-lime'
             )}
           >
             <Icon className={cn('w-6 h-6', tier?.text || 'text-neo-black')} />
@@ -178,7 +178,7 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
                 <span>{tier.emoji}</span>
                 <span className="uppercase tracking-wide">{tier.name}</span>
                 {isNewBest && (
-                  <span className="ml-1 px-1.5 py-0.5 bg-neo-yellow text-neo-black border border-neo-black rounded-neo text-[10px] uppercase font-black">
+                  <span className="ml-1 px-1.5 py-0.5 bg-neo-lime text-neo-black border border-neo-black rounded-neo text-[10px] uppercase font-black">
                     {t('growth.newBest') || 'New Best!'}
                   </span>
                 )}
@@ -246,7 +246,7 @@ const WinStreakDisplay: React.FC<WinStreakDisplayProps> = ({
                 transition={{ duration: 0.4 }}
                 className={cn(
                   'inline-block text-4xl mb-2 p-3 rounded-neo-lg border-3 border-neo-black shadow-hard',
-                  isNewBest ? 'bg-neo-yellow' : tier?.bg
+                  isNewBest ? 'bg-neo-lime' : tier?.bg
                 )}
               >
                 {isNewBest ? '🏆' : tier?.emoji}

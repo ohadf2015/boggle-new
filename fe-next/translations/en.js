@@ -1229,6 +1229,18 @@ const en = {
     "readyForNextRound": "Ready?",
     "hostStartDescription": "Start anytime!"
   },
+  "nextStep": {
+    "challengeBots": "Challenge the Bots!",
+    "challengeBotsDesc": "Test your skills against AI opponents",
+    "dailyChallenge": "Daily Challenge",
+    "dailyChallengeDesc": "Same puzzle as everyone worldwide",
+    "goMultiplayer": "Go Multiplayer!",
+    "goMultiplayerDesc": "Compete with real players",
+    "brainTraining": "Train Your Brain",
+    "brainTrainingDesc": "Track your cognitive growth",
+    "backToLobby": "Back to Lobby",
+    "letsGo": "Let's Go!"
+  },
   "chart": {
     "yourProgress": "Progress",
     "needMoreGames": "Play More!",
@@ -2437,6 +2449,7 @@ const en = {
     "chooseAvatar": "Choose Your Avatar",
     "selectAvatar": "Select",
     "useProfileAvatar": "Use your profile avatar",
+    "yourAvatar": "Your Avatar",
     "you": "YOU",
     "username": "Username",
     "saveChanges": "Save Changes",

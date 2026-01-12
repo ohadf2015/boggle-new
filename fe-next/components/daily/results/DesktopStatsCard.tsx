@@ -24,7 +24,7 @@ export const DesktopStatsCard: React.FC<DesktopStatsCardProps> = ({ stats, t }) 
       <div className="space-y-3">
         {stats.yourStats && (
           <div className="text-center">
-            <span className="text-3xl font-black text-neo-yellow">{stats.yourStats.percentile}%</span>
+            <span className="text-3xl font-black text-neo-lime">{stats.yourStats.percentile}%</span>
             <span className="text-white/70 text-sm block">{t('wordHunt.stats.betterThan')}</span>
           </div>
         )}

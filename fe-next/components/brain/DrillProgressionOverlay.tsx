@@ -35,8 +35,8 @@ const DOMAIN_CONFIG: Record<CognitiveDomain, {
 }> = {
   processingSpeed: {
     icon: Zap,
-    color: 'text-neo-yellow',
-    bgColor: 'bg-neo-yellow',
+    color: 'text-neo-lime',
+    bgColor: 'bg-neo-lime',
     borderColor: 'border-yellow-600',
   },
   workingMemory: {

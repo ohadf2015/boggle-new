@@ -102,7 +102,7 @@ export const ValidatedInput = forwardRef<HTMLInputElement, ValidatedInputProps>(
         case 'validating':
           return (
             <Loader2
-              className="w-4 h-4 text-neo-yellow animate-spin"
+              className="w-4 h-4 text-neo-lime animate-spin"
               aria-label={t('common.validating') || 'Validating...'}
             />
           );

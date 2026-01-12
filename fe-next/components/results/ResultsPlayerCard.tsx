@@ -206,9 +206,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
             <div className="flex items-center gap-2 min-w-0 flex-1">
               <Avatar
                 profilePictureUrl={avatar?.profilePictureUrl}
-                avatarEmoji={avatar?.emoji}
                 avatarImage={avatar?.avatarImage}
-                avatarColor={avatar?.color}
                 size="2xl"
                 className="flex-shrink-0"
               />
@@ -278,7 +276,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                   initial={{ scale: 0, rotate: -10 }}
                   animate={{ scale: 1, rotate: 3 }}
                   transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
-                  className="bg-neo-yellow border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-black flex items-center gap-1"
+                  className="bg-neo-lime border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-black flex items-center gap-1"
                 >
                   <span className="text-xs font-black">⚡ +{totalComboBonus}</span>
                 </motion.div>
@@ -405,7 +403,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
             <button
               onClick={() => setShowAchievements(!showAchievements)}
               aria-expanded={showAchievements}
-              className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-black text-neo-black dark:text-neo-cream uppercase border-2 border-neo-black bg-neo-yellow/20 dark:bg-neo-yellow/10 shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard transition-all"
+              className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-black text-neo-black dark:text-neo-cream uppercase border-2 border-neo-black bg-neo-lime/20 dark:bg-neo-lime/10 shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard transition-all"
             >
               <span className="flex items-center gap-2">
                 <Award className="w-4 h-4 text-neo-pink" />

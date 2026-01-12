@@ -232,7 +232,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
                   <Button
                     onClick={handleClaimReward}
                     disabled={isClaiming}
-                    className="w-full bg-neo-yellow text-neo-black font-black uppercase text-sm sm:text-base md:text-lg py-3 sm:py-4 border-2 sm:border-3 border-neo-black shadow-hard hover:shadow-hard-lg"
+                    className="w-full bg-neo-lime text-neo-black font-black uppercase text-sm sm:text-base md:text-lg py-3 sm:py-4 border-2 sm:border-3 border-neo-black shadow-hard hover:shadow-hard-lg"
                   >
                     {isClaiming ? (
                       <div className="animate-spin w-5 h-5 border-2 border-neo-black border-t-transparent rounded-full" />
@@ -266,7 +266,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
                 </h4>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
                   <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
-                    <Zap className="w-3 h-3 text-neo-yellow flex-shrink-0" />
+                    <Zap className="w-3 h-3 text-neo-lime flex-shrink-0" />
                     <span>XP Bonus</span>
                   </div>
                   <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
@@ -286,7 +286,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
                     <span>Exclusive Title</span>
                   </div>
                   <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
-                    <Flame className="w-3 h-3 text-neo-yellow flex-shrink-0" />
+                    <Flame className="w-3 h-3 text-neo-lime flex-shrink-0" />
                     <span>Milestone</span>
                   </div>
                 </div>

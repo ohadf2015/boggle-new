@@ -105,7 +105,7 @@ const GameRoomHeader: React.FC<GameRoomHeaderProps> = ({
             </button>
 
             <div className="flex items-center gap-1.5">
-              <span className="text-lg sm:text-xl font-black tracking-wide text-neo-yellow">
+              <span className="text-lg sm:text-xl font-black tracking-wide text-neo-lime">
                 {gameCode}
               </span>
             </div>

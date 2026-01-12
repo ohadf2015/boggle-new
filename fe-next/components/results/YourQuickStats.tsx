@@ -49,9 +49,9 @@ const YourQuickStats = memo<YourQuickStatsProps>(({
 
   // Rank-specific styling
   const rankColors: Record<number, { bg: string; text: string; border: string }> = {
-    1: { bg: 'bg-neo-yellow', text: 'text-neo-black', border: 'border-neo-black' },
+    1: { bg: 'bg-neo-lime', text: 'text-neo-black', border: 'border-neo-black' },
     2: { bg: 'bg-slate-300', text: 'text-slate-800', border: 'border-neo-black' },
-    3: { bg: 'bg-neo-yellow', text: 'text-neo-black', border: 'border-neo-black' },
+    3: { bg: 'bg-neo-lime', text: 'text-neo-black', border: 'border-neo-black' },
   };
 
   const rankStyle = rankColors[rank] || { bg: 'bg-neo-cream', text: 'text-neo-black', border: 'border-neo-black' };

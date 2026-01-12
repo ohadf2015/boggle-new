@@ -126,7 +126,7 @@ export default function AccessibilitySettingsPage() {
         t('accessibility.disableSounds.description') ||
         'Turn off all sound effects. Music controls are still available in the header.',
       enabled: disableSounds,
-      iconColor: 'text-neo-yellow',
+      iconColor: 'text-neo-lime',
     },
     {
       id: 'highContrast',

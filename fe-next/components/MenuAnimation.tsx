@@ -132,7 +132,7 @@ const PopExplosion: React.FC<PopExplosionProps> = ({ x, y, color, onComplete }) 
 // Neo-Brutalist color palette - uses CSS variables from theme for consistency
 // These map to the neo-* colors defined in globals.css and tailwind.config.js
 const BRUTALIST_COLORS: ColorScheme[] = [
-  { bg: 'var(--neo-yellow)', border: 'var(--neo-black)' },
+  { bg: 'var(--neo-lime)', border: 'var(--neo-black)' },
   { bg: 'var(--neo-pink)', border: 'var(--neo-black)' },
   { bg: 'var(--neo-lime)', border: 'var(--neo-black)' },
   { bg: 'var(--neo-cyan)', border: 'var(--neo-black)' },

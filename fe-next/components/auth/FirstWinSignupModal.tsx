@@ -136,7 +136,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
             transition={{ delay: 0.3 }}
             className="text-center mb-6"
           >
-            <h2 className="text-2xl font-bold mb-2 text-neo-yellow">
+            <h2 className="text-2xl font-bold mb-2 text-neo-lime">
               {isMultiGamesVariant
                 ? t('auth.multiGames.title') || "You're Getting Good!"
                 : t('auth.firstWin.title')}

@@ -62,7 +62,7 @@ export function MobileDrawer({
           >
             {/* Header */}
             {title && (
-              <div className="flex items-center justify-between px-4 py-3 border-b-4 border-neo-black bg-neo-yellow text-neo-black">
+              <div className="flex items-center justify-between px-4 py-3 border-b-4 border-neo-black bg-neo-lime text-neo-black">
                 <h3 className="font-bold uppercase tracking-wide text-neo-black">
                   {title}
                 </h3>

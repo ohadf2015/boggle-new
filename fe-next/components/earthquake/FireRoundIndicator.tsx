@@ -59,7 +59,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
               {[...Array(3)].map((_, i) => (
                 <motion.div
                   key={i}
-                  className="absolute bottom-0 w-8 h-12 bg-neo-yellow"
+                  className="absolute bottom-0 w-8 h-12 bg-neo-lime"
                   style={{
                     left: `${20 + i * 30}%`,
                     clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)',
@@ -102,7 +102,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
                 <span className="text-sm font-black uppercase tracking-wide text-neo-cream leading-none">
                   {t('earthquake.fireRound') || 'Fire Round'}
                 </span>
-                <span className="text-xs font-bold text-neo-yellow leading-none mt-0.5">
+                <span className="text-xs font-bold text-neo-lime leading-none mt-0.5">
                   {t('earthquake.multiplier') || '2× Multiplier'}
                 </span>
               </div>
@@ -130,7 +130,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
                   return (
                     <motion.div
                       key={i}
-                      className="absolute w-2 h-2 rounded-full bg-neo-yellow border border-neo-black"
+                      className="absolute w-2 h-2 rounded-full bg-neo-lime border border-neo-black"
                       style={{
                         left: '50%',
                         top: '50%',
@@ -157,7 +157,7 @@ export const FireRoundIndicator: React.FC<FireRoundIndicatorProps> = ({
           {/* Urgency indicator for last 5 seconds */}
           {remainingSeconds > 0 && remainingSeconds <= 5 && (
             <motion.div
-              className="absolute -inset-1 border-2 border-neo-yellow rounded-neo-lg pointer-events-none"
+              className="absolute -inset-1 border-2 border-neo-lime rounded-neo-lg pointer-events-none"
               animate={{
                 opacity: [0.3, 0.8, 0.3],
                 scale: [0.98, 1.02, 0.98],

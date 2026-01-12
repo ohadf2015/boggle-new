@@ -65,14 +65,14 @@ export function ProfileCoinsSection({
           <p className={cn('text-xs font-medium mt-1', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
             {t('coins.perGame') || 'Per Game'}
           </p>
-          <p className="font-bold text-neo-yellow text-sm">+10-15</p>
+          <p className="font-bold text-neo-lime text-sm">+10-15</p>
         </div>
         <div className="text-center">
           <span className="text-lg">🏆</span>
           <p className={cn('text-xs font-medium mt-1', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
             {t('coins.winBonus') || 'Win Bonus'}
           </p>
-          <p className="font-bold text-neo-yellow text-sm">+25</p>
+          <p className="font-bold text-neo-lime text-sm">+25</p>
         </div>
         {!compact && (
           <>
@@ -81,14 +81,14 @@ export function ProfileCoinsSection({
               <p className={cn('text-xs font-medium mt-1', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
                 {t('coins.scoreBonus') || 'Score Bonus'}
               </p>
-              <p className="font-bold text-neo-yellow text-sm">+score/10</p>
+              <p className="font-bold text-neo-lime text-sm">+score/10</p>
             </div>
             <div className="text-center">
               <span className="text-lg">🎯</span>
               <p className={cn('text-xs font-medium mt-1', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
                 {t('coins.dailyChallenge') || 'Daily'}
               </p>
-              <p className="font-bold text-neo-yellow text-sm">+25-95</p>
+              <p className="font-bold text-neo-lime text-sm">+25-95</p>
             </div>
           </>
         )}
@@ -102,7 +102,7 @@ export function ProfileCoinsSection({
         <p className={cn('text-sm', isDarkMode ? 'text-gray-500' : 'text-gray-500')}>
           {t('coins.lifetimeEarned') || 'Lifetime coins earned'}:
         </p>
-        <span className="font-bold text-neo-yellow">
+        <span className="font-bold text-neo-lime">
           {(profile?.lifetime_coins_earned || 0).toLocaleString()} 💰
         </span>
       </div>

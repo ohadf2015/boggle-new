@@ -45,7 +45,7 @@ export function CollapsibleSection({
         )}
       >
         <div className="flex items-center gap-3">
-          {icon && <span className="text-neo-yellow">{icon}</span>}
+          {icon && <span className="text-neo-lime">{icon}</span>}
           <span className="font-bold uppercase tracking-wide">{title}</span>
           {badge}
         </div>

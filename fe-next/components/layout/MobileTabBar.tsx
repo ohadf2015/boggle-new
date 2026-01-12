@@ -45,7 +45,7 @@ export function MobileTabBar({
               'flex flex-col items-center justify-center px-4 py-2 min-w-[64px]',
               'transition-all duration-100',
               isActive
-                ? 'text-neo-yellow scale-110'
+                ? 'text-neo-lime scale-110'
                 : 'text-neo-white/70 hover:text-neo-white'
             )}
           >

@@ -28,7 +28,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           // Disabled state
           "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-neo-cream/50 dark:disabled:bg-slate-600/50",
           // File input styling
-          "file:border-0 file:bg-neo-yellow file:text-neo-black file:font-bold file:uppercase file:text-xs file:mr-3 file:px-3 file:py-1 file:rounded-neo",
+          "file:border-0 file:bg-neo-lime file:text-neo-black file:font-bold file:uppercase file:text-xs file:mr-3 file:px-3 file:py-1 file:rounded-neo",
           // Transition
           "transition-shadow duration-100",
           className

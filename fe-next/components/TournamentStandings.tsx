@@ -52,11 +52,11 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
   const getPlacementColor = (placement: number): string => {
     switch (placement) {
       case 1:
-        return 'bg-neo-yellow text-neo-black';
+        return 'bg-neo-lime text-neo-black';
       case 2:
         return 'bg-slate-300 text-neo-black';
       case 3:
-        return 'bg-neo-yellow text-neo-black';
+        return 'bg-neo-lime text-neo-black';
       default:
         return 'bg-neo-pink text-neo-cream';
     }
@@ -184,7 +184,7 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
             initial={{ scale: 0, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', duration: 0.5 }}
-            className="text-center p-4 bg-neo-yellow rounded-lg shadow-xl border-3 border-neo-black"
+            className="text-center p-4 bg-neo-lime rounded-lg shadow-xl border-3 border-neo-black"
           >
             <Star className="text-neo-black text-3xl mx-auto mb-2 animate-pulse" />
             <p className="text-sm font-medium text-neo-black">

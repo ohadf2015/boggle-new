@@ -355,7 +355,7 @@ export default function RulesPage(): React.JSX.Element {
                                 font-bold text-sm sm:text-base
                                 border-2 sm:border-3 border-neo-black
                                 rounded-lg sm:rounded-xl shadow-hard
-                                hover:bg-neo-yellow
+                                hover:bg-neo-lime
                                 transition-colors duration-100
                             "
                         >

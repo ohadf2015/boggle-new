@@ -166,8 +166,6 @@ export default function LeaderboardPage(): React.ReactNode {
                 <Avatar
                   profilePictureUrl={profile.profile_picture_url ?? undefined}
                   avatarImage={profile.avatar_image ?? undefined}
-                  avatarEmoji={profile.avatar_emoji ?? undefined}
-                  avatarColor={profile.avatar_color ?? undefined}
                   size="lg"
                 />
                 <div>
@@ -250,8 +248,6 @@ export default function LeaderboardPage(): React.ReactNode {
                       <Avatar
                         profilePictureUrl={entry.profile_picture_url ?? undefined}
                         avatarImage={entry.avatar_image ?? undefined}
-                        avatarEmoji={entry.avatar_emoji ?? undefined}
-                        avatarColor={entry.avatar_color ?? undefined}
                         size="sm"
                       />
                       <span

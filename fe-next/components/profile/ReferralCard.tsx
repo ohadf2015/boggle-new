@@ -196,7 +196,7 @@ export function ReferralCard() {
             </div>
           </div>
           <div className="text-center">
-            <div className="text-lg font-bold text-neo-yellow">
+            <div className="text-lg font-bold text-neo-lime">
               {referralData.referralRewardXp}
             </div>
             <div className={cn('text-[10px]', isDarkMode ? 'text-gray-500' : 'text-gray-500')}>

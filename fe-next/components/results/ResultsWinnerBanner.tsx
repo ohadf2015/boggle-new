@@ -41,9 +41,9 @@ const RANK_STYLES: Record<number, {
   trophyShadowColor: string;
 }> = {
   1: {
-    bgClass: 'bg-neo-yellow',
+    bgClass: 'bg-neo-lime',
     iconBgClass: 'bg-neo-cream',
-    iconTextClass: 'text-neo-yellow',
+    iconTextClass: 'text-neo-lime',
     messageBgClass: 'bg-neo-pink',
     messageTextClass: 'text-neo-cream',
     nameShadowColor: 'var(--neo-cyan)',
@@ -257,8 +257,6 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
                   <Avatar
                     profilePictureUrl={winner.avatar.profilePictureUrl ?? undefined}
                     avatarImage={winner.avatar.avatarImage}
-                    avatarEmoji={winner.avatar.emoji}
-                    avatarColor={winner.avatar.color}
                     size="lg"
                   />
                 </motion.div>
