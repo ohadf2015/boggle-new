@@ -78,6 +78,7 @@ export function useRandomMascotActivity({
 
   const nextActivityTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const activityResetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scheduleNextActivityRef = useRef<(() => void) | null>(null);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
@@ -152,10 +153,15 @@ export function useRandomMascotActivity({
       triggerActivity();
       // Schedule the next one after this activity completes
       setTimeout(() => {
-        scheduleNextActivity();
+        scheduleNextActivityRef.current?.();
       }, activityDuration);
     }, interval);
   }, [enabled, prefersReducedMotion, getRandomInterval, triggerActivity, activityDuration]);
+
+  // Update ref whenever callback changes
+  useEffect(() => {
+    scheduleNextActivityRef.current = scheduleNextActivity;
+  }, [scheduleNextActivity]);
 
   // Start scheduling when enabled
   useEffect(() => {
