@@ -94,7 +94,7 @@ export default function LeaderboardPage(): React.ReactNode {
 
   return (
     <PageLayout onRefresh={handleRefresh} padding="md" maxWidth="4xl">
-      <div className={cn('pb-24 lg:pb-8', isLandscape ? 'py-2' : 'py-4')}>
+      <div className={cn(isLandscape ? 'py-2' : 'py-4')}>
         {/* Page Title */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -166,8 +166,6 @@ export default function LeaderboardPage(): React.ReactNode {
                 <Avatar
                   profilePictureUrl={profile.profile_picture_url ?? undefined}
                   avatarImage={profile.avatar_image ?? undefined}
-                  avatarEmoji={profile.avatar_emoji ?? undefined}
-                  avatarColor={profile.avatar_color ?? undefined}
                   size="lg"
                 />
                 <div>
@@ -250,8 +248,6 @@ export default function LeaderboardPage(): React.ReactNode {
                       <Avatar
                         profilePictureUrl={entry.profile_picture_url ?? undefined}
                         avatarImage={entry.avatar_image ?? undefined}
-                        avatarEmoji={entry.avatar_emoji ?? undefined}
-                        avatarColor={entry.avatar_color ?? undefined}
                         size="sm"
                       />
                       <span

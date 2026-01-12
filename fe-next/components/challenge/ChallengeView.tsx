@@ -138,7 +138,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
   // Render loading state
   if (phase === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
+      <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
         <div className="text-center">
           <div className="relative w-12 h-12 mx-auto mb-3">
             <div className="absolute inset-0 border-4 border-cyan-500/30 rounded-full" />
@@ -153,7 +153,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
   // Render error state
   if (phase === 'error') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy p-4">
+      <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy p-4">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -174,7 +174,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
           </p>
           <Button
             onClick={() => router.push('/')}
-            className="w-full bg-neo-yellow text-neo-black border-3 border-neo-black rounded-neo shadow-hard-md hover:shadow-hard-lg hover:-translate-y-1 transition-all font-bold"
+            className="w-full bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo shadow-hard-md hover:shadow-hard-lg hover:-translate-y-1 transition-all font-bold"
           >
             {language === 'he' ? 'חזרה לדף הבית' : 'Back to Home'}
           </Button>
@@ -190,7 +190,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
       : 0;
 
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy p-4">
+      <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy p-4">
         <motion.div
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -215,7 +215,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
             transition={{ delay: 0.1 }}
             className={cn(
               'p-6 rounded-neo border-4 border-neo-black shadow-hard-xl',
-              isDark ? 'bg-gradient-to-br from-slate-800 to-slate-900' : 'bg-gradient-to-br from-white to-gray-50'
+              isDark ? 'bg-neo-navy' : 'bg-white'
             )}
           >
             {/* Header */}
@@ -224,7 +224,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.2, type: 'spring' }}
-                className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-neo-yellow border-3 border-neo-black shadow-hard-md mb-3"
+                className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-neo-lime border-3 border-neo-black shadow-hard-md mb-3"
               >
                 <Target className="w-8 h-8 text-neo-black" />
               </motion.div>
@@ -266,7 +266,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
             {/* Score to Beat */}
             <div className={cn(
               'text-center p-6 rounded-neo border-3 mb-4',
-              'bg-gradient-to-br from-neo-yellow/20 to-orange-500/20 border-neo-yellow'
+              'bg-gradient-to-br from-neo-lime/20 to-orange-500/20 border-neo-lime'
             )}>
               <p className={cn(
                 'text-sm font-bold uppercase tracking-wide mb-2',

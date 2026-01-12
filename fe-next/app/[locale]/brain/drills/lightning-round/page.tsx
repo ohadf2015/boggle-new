@@ -84,7 +84,7 @@ export default function LightningRoundPage() {
           transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
           className={cn(
             'w-12 h-12 border-4 border-t-transparent rounded-full',
-            isDarkMode ? 'border-neo-yellow' : 'border-neo-yellow'
+            isDarkMode ? 'border-neo-lime' : 'border-neo-lime'
           )}
         />
       </div>

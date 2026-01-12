@@ -41,13 +41,19 @@ jest.mock('framer-motion', () => ({
 
 // Mock avatar config utilities
 jest.mock('@/utils/avatarConfig', () => ({
+  AVATARS: [
+    { id: 'broccoli-bob', name: 'Broccoli Bob', filename: 'broccoli-bob.png' },
+    { id: 'shroom-shelly', name: 'Shroom Shelly', filename: 'shroom-shelly.png' },
+    { id: 'pizza-pete', name: 'Pizza Pete', filename: 'pizza-pete.png' },
+  ],
+  PROFILE_AVATAR_ID: '__profile_avatar__',
   getAvatarPath: (avatar: { id: string; filename: string } | string) => {
     if (typeof avatar === 'string') {
       return `/avatars/${avatar}.png`;
     }
     return `/avatars/${avatar.filename}`;
   },
-  mapEmojiToAvatar: () => ({ id: 'broccoli-bob', name: 'Broccoli Bob', filename: 'broccoli-bob.png' }),
+  getRandomAvatar: () => ({ id: 'broccoli-bob', name: 'Broccoli Bob', filename: 'broccoli-bob.png' }),
 }));
 
 // Mock shared utils
@@ -183,7 +189,7 @@ describe('TabbedDailyLeaderboard', () => {
       expect(hasCustomAvatar).toBe(true);
     });
 
-    it('should render profile picture when profile_picture_url is provided', async () => {
+    it('should render profile picture when avatar_image is PROFILE_AVATAR_ID', async () => {
       (global.fetch as jest.Mock).mockImplementation((url: string) => {
         if (url.includes('/word-hunt/leaderboard')) {
           return Promise.resolve({
@@ -191,7 +197,7 @@ describe('TabbedDailyLeaderboard', () => {
             json: () => Promise.resolve({
               data: [createMockParticipant({
                 profile_picture_url: 'https://example.com/profile.jpg',
-                avatar_image: 'shroom-shelly',
+                avatar_image: '__profile_avatar__',  // Use profile picture
               })],
               totalParticipants: 1,
               totalPlayers: 1,
@@ -215,7 +221,7 @@ describe('TabbedDailyLeaderboard', () => {
 
       await screen.findByText('TestPlayer');
 
-      // Should render the profile picture URL
+      // Should render the profile picture URL when avatar_image is PROFILE_AVATAR_ID
       const avatarImages = screen.getAllByTestId('avatar-image');
       const hasProfilePicture = avatarImages.some(
         img => img.getAttribute('src')?.includes('example.com/profile.jpg')

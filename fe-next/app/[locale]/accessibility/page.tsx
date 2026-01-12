@@ -126,7 +126,7 @@ export default function AccessibilitySettingsPage() {
         t('accessibility.disableSounds.description') ||
         'Turn off all sound effects. Music controls are still available in the header.',
       enabled: disableSounds,
-      iconColor: 'text-neo-yellow',
+      iconColor: 'text-neo-lime',
     },
     {
       id: 'highContrast',
@@ -151,7 +151,7 @@ export default function AccessibilitySettingsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-neo-navy">
       <Header />
       <div className="max-w-3xl mx-auto px-4 py-8 md:py-12 pb-24 lg:pb-12">
         {/* Page Title */}

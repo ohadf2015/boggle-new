@@ -133,7 +133,7 @@ const TutorialTooltip: React.FC<TutorialTooltipProps> = ({
       {/* Main tooltip card */}
       <div className="bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg">
         {/* Header with icon and skip button */}
-        <div className="bg-neo-yellow border-b-3 border-neo-black px-4 py-3 flex items-center justify-between text-neo-black overflow-visible">
+        <div className="bg-neo-lime border-b-3 border-neo-black px-4 py-3 flex items-center justify-between text-neo-black overflow-visible">
           <div className="flex items-center gap-2">
             {IconComponent && (
               <div className="w-8 h-8 bg-neo-white border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm">

@@ -166,7 +166,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
     <>
       <LandscapeIndicator />
 
-      <div dir={dir} className="min-h-screen h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy flex flex-col overflow-hidden">
+      <div dir={dir} className="h-full bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy flex flex-col page-content-safe">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -252,7 +252,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                           ) : null}
                         </div>
                         {/* Edit indicator */}
-                        <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-neo-yellow text-neo-black border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm group-hover:scale-110 transition-transform">
+                        <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-neo-lime text-neo-black border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm group-hover:scale-110 transition-transform">
                           <Pencil className="w-2 h-2" />
                         </div>
                       </div>
@@ -277,9 +277,6 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                       currentAvatarImage={selectedAvatarId}
                       profileAvatar={{
                         profilePictureUrl: profilePictureUrl,
-                        // Use initialAvatarId to show the profile's avatar_image in the picker
-                        avatarEmoji: undefined,
-                        avatarColor: undefined,
                         displayName: displayName || undefined,
                         // Pass the profile's avatar_image so it can be displayed as the "profile" option
                         avatarImage: initialAvatarId,

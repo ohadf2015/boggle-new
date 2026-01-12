@@ -276,7 +276,7 @@ export default function ComboMaster({
             className={cn(
               'h-full',
               comboBarPercent > 50 ? 'bg-neo-green' :
-                comboBarPercent > 25 ? 'bg-neo-yellow' : 'bg-neo-red'
+                comboBarPercent > 25 ? 'bg-neo-lime' : 'bg-neo-red'
             )}
             animate={{ width: `${comboBarPercent}%` }}
             transition={{ duration: 0.3 }}
@@ -440,7 +440,7 @@ export default function ComboMaster({
             >
               <Trophy className={cn(
                 'w-20 h-20 mx-auto',
-                maxCombo >= levelConfig.targetCombo ? 'text-neo-yellow' : 'text-gray-400'
+                maxCombo >= levelConfig.targetCombo ? 'text-neo-lime' : 'text-gray-400'
               )} />
             </motion.div>
             <motion.h2

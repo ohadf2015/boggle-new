@@ -275,7 +275,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                 <div className="absolute -bottom-1 -left-1 w-8 h-8 bg-neo-cyan text-neo-black border-2 border-neo-black -rotate-6 -z-10" />
 
                 {/* Main icon container - smaller */}
-                <div className="bg-neo-yellow text-neo-black border-2 border-neo-black shadow-hard-sm p-2 rotate-[-2deg]">
+                <div className="bg-neo-lime text-neo-black border-2 border-neo-black shadow-hard-sm p-2 rotate-[-2deg]">
                   <MessageSquare className="text-2xl text-neo-black" />
                 </div>
               </motion.div>

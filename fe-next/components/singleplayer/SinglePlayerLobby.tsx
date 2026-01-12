@@ -57,14 +57,14 @@ const MODE_CONFIG = {
   },
   'challenge': {
     Icon: Trophy,
-    color: 'from-neo-yellow to-yellow-400',
-    selectedBorder: 'border-neo-yellow',
+    color: 'from-neo-lime to-yellow-400',
+    selectedBorder: 'border-neo-lime',
     labelKey: 'singlePlayer.challengeMode',
     descKey: 'singlePlayer.challengeModeDesc',
   },
   'daily': {
     Icon: CalendarDays,
-    color: 'from-neo-pink via-neo-yellow to-neo-cyan',
+    color: 'from-neo-pink via-neo-lime to-neo-cyan',
     selectedBorder: 'border-neo-pink',
     labelKey: 'daily.badge',
     descKey: 'daily.bannerSubtitle',
@@ -73,7 +73,7 @@ const MODE_CONFIG = {
 
 const BOT_DIFFICULTY_CONFIG: Record<BotDifficulty, { labelKey: string; color: string; icon: string }> = {
   easy: { labelKey: 'bots.easy', color: 'bg-neo-cyan', icon: '🤖' },
-  medium: { labelKey: 'bots.medium', color: 'bg-neo-yellow', icon: '⚙️' },
+  medium: { labelKey: 'bots.medium', color: 'bg-neo-lime', icon: '⚙️' },
   hard: { labelKey: 'bots.hard', color: 'bg-neo-pink text-white', icon: '💀' },
 };
 
@@ -84,7 +84,7 @@ const DIFFICULTY_ICON_CONFIG: Record<DifficultyLevel, {
   selectedColor: string;
 }> = {
   EASY: { Icon: Sparkles, bgColor: 'bg-neo-lime', selectedColor: 'bg-neo-lime text-neo-black' },
-  MEDIUM: { Icon: Zap, bgColor: 'bg-neo-yellow', selectedColor: 'bg-neo-yellow text-neo-black' },
+  MEDIUM: { Icon: Zap, bgColor: 'bg-neo-lime', selectedColor: 'bg-neo-lime text-neo-black' },
   HARD: { Icon: Skull, bgColor: 'bg-neo-red', selectedColor: 'bg-neo-red text-white' },
 };
 
@@ -265,7 +265,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
 
           {/* Challenge mode high score */}
           {mode === 'challenge' && currentHighScore !== null && (
-            <div className="bg-neo-yellow border-3 border-neo-black rounded-neo p-3 text-center shadow-hard">
+            <div className="bg-neo-lime border-3 border-neo-black rounded-neo p-3 text-center shadow-hard">
               <div className="flex items-center justify-center gap-2 mb-1">
                 <Crown className="w-5 h-5 sm:w-6 sm:h-6 text-neo-black" />
                 <span className="font-black text-neo-black text-xl">{currentHighScore.score}</span>
@@ -276,7 +276,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
 
           {/* Daily mode info */}
           {mode === 'daily' && (
-            <div className="bg-gradient-to-r from-neo-pink via-neo-yellow to-neo-cyan border-3 border-neo-black rounded-neo p-3 text-center shadow-hard">
+            <div className="bg-gradient-to-r from-neo-pink via-neo-lime to-neo-cyan border-3 border-neo-black rounded-neo p-3 text-center shadow-hard">
               <div className="flex items-center justify-center gap-2 mb-1">
                 <Target className="text-neo-black w-5 h-5" />
                 <span className="font-black text-neo-black">#{dailyPuzzleNumber}</span>
@@ -436,7 +436,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
           {/* Start Button - fixed at bottom */}
           <Button
             onClick={handleStartGame}
-            className="w-full h-14 font-black uppercase text-lg bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-4 border-neo-black shadow-hard hover:shadow-hard-lg transition-all flex-shrink-0"
+            className="w-full h-14 font-black uppercase text-lg bg-neo-lime hover:bg-neo-lime/90 text-neo-black border-4 border-neo-black shadow-hard hover:shadow-hard-lg transition-all flex-shrink-0"
           >
             <Play className="mr-2 w-6 h-6" />
             {t('singlePlayer.startGame') || 'Start Game'}
@@ -833,7 +833,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
 
           {/* Daily Challenge Info Panel - Simplified */}
           {mode === 'daily' && (
-            <div className="mb-2 sm:mb-3 p-3 bg-gradient-to-r from-neo-pink via-neo-yellow to-neo-cyan rounded-neo-lg border-3 border-neo-black shadow-hard">
+            <div className="mb-2 sm:mb-3 p-3 bg-gradient-to-r from-neo-pink via-neo-lime to-neo-cyan rounded-neo-lg border-3 border-neo-black shadow-hard">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Target className="w-5 h-5 text-neo-black" />
@@ -865,7 +865,7 @@ const SinglePlayerLobby: React.FC<SinglePlayerLobbyProps> = ({
           {mode === 'challenge' && (
             <div className="mb-2 sm:mb-3">
               {currentHighScore ? (
-                <div className="p-3 bg-neo-yellow rounded-neo-lg border-3 border-neo-black shadow-hard">
+                <div className="p-3 bg-neo-lime rounded-neo-lg border-3 border-neo-black shadow-hard">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Crown className="text-neo-black w-5 h-5" />

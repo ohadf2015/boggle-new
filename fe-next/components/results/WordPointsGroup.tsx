@@ -85,7 +85,7 @@ const SimpleWordSpan = memo<{
       )}
       {/* Show combo bonus indicator */}
       {(wordObj.comboBonus ?? 0) > 0 && (
-        <span className="text-[10px] px-1 py-0.5 bg-neo-yellow text-neo-black rounded border border-neo-black font-black">
+        <span className="text-[10px] px-1 py-0.5 bg-neo-lime text-neo-black rounded border border-neo-black font-black">
           +{wordObj.comboBonus}
         </span>
       )}

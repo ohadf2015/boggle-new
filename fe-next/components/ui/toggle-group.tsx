@@ -24,7 +24,7 @@ const toggleVariants = cva(
     // Transition
     "transition-all duration-100",
     // Active (selected) state - yellow with shadow
-    "data-[state=on]:bg-neo-yellow data-[state=on]:shadow-hard",
+    "data-[state=on]:bg-neo-lime data-[state=on]:shadow-hard",
     // Hover effect (non-selected)
     "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
   ].join(" "),

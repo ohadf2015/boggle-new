@@ -11,23 +11,45 @@
   --font-fredoka: 'Fredoka', sans-serif;
   --font-rubik: 'Rubik', sans-serif;
 
-  /* Neo-Brutalist Color Palette - Simplified to 5 accent colors */
-  /* Primary: yellow, Secondary: pink, Tertiary: cyan, Error: red, Success: lime */
-  --neo-yellow: #FFE135;
-  --neo-yellow-hover: #FFD000;
-  --neo-pink: #FF1493;
-  --neo-pink-light: #FF69B4;
-  --neo-cyan: #00FFFF;
-  --neo-cyan-muted: #4dd9d9;
+  /* Neo-Brutalist Color Palette - 4 Primary Colors with Tonal Variations */
+  /* Primary: lime, Secondary: pink, Tertiary: cyan, Quaternary: purple */
+
+  /* LIME Family (Primary - Replaces Yellow) */
+  --neo-lime: #BFFF00;              /* HSL(76, 100%, 50%) - electric, energetic */
+  --neo-lime-light: #D9FF66;        /* HSL(76, 70%, 65%) - soft highlight */
+  --neo-lime-muted: #A6D900;        /* HSL(76, 60%, 50%) - subtle accent */
+  --neo-lime-dark: #8FB300;         /* HSL(76, 80%, 35%) - grounded tone */
+
+  /* PINK Family (Multiplayer) */
+  --neo-pink: #FF1493;              /* HSL(328, 100%, 54%) - vibrant, playful */
+  --neo-pink-light: #FF6BB8;        /* HSL(328, 70%, 69%) - friendly accent */
+  --neo-pink-muted: #D9428F;        /* HSL(328, 60%, 54%) - muted energy */
+  --neo-pink-dark: #B30066;         /* HSL(328, 80%, 35%) - deep emphasis */
+
+  /* CYAN Family (Single Player) */
+  --neo-cyan: #00FFFF;              /* HSL(180, 100%, 50%) - cool, focused */
+  --neo-cyan-light: #66FFFF;        /* HSL(180, 70%, 65%) - calm highlight */
+  --neo-cyan-muted: #4DD9D9;        /* HSL(180, 60%, 50%) - subtle presence */
+  --neo-cyan-dark: #00B3B3;         /* HSL(180, 80%, 35%) - strong anchor */
+
+  /* PURPLE Family (Brain Training) */
+  --neo-purple: #8B5CF6;            /* HSL(258, 90%, 66%) - intelligent, premium */
+  --neo-purple-light: #A78BFA;      /* HSL(258, 60%, 76%) - gentle guidance */
+  --neo-purple-muted: #7C4FCC;      /* HSL(258, 50%, 56%) - understated depth */
+  --neo-purple-dark: #5B21B6;       /* HSL(258, 70%, 42%) - authoritative */
+
+  /* Error color */
   --neo-red: #FF3366;
-  --neo-lime: #BFFF00;
+
+  /* Structural colors */
   --neo-navy: #1a1a2e;
   --neo-navy-light: #16213e;
-  /* Deprecated colors - kept for backwards compatibility, migrate to 5 accent palette */
-  --neo-orange: #FF6B35;
-  --neo-orange-hover: #FF5722;
-  --neo-purple: #8b5cf6;
-  --neo-purple-light: #a78bfa;
+
+  /* DEPRECATED - Keep for backward compatibility during migration */
+  --neo-yellow: #FFE135;            /* DEPRECATED - USE neo-lime */
+  --neo-yellow-hover: #FFD000;      /* DEPRECATED - USE neo-lime-light */
+  --neo-orange: #FF6B35;            /* DEPRECATED - USE neo-lime-dark */
+  --neo-orange-hover: #FF5722;      /* DEPRECATED - USE neo-lime-dark */
   --neo-cream: #FFFEF0;
   --neo-black: 0 0 0;
   --neo-white: 255 255 255;
@@ -2066,6 +2088,92 @@ body {
 /* Fixed bottom elements with safe area */
 .fixed-bottom-safe {
   bottom: max(var(--safe-area-bottom), 16px);
+}
+
+/* ============================================
+   RESPONSIVE FLEX LAYOUTS - No Scroll Pattern
+   ============================================ */
+
+/* Bottom nav spacing variable */
+:root {
+  --bottom-nav-height: 64px;
+  --bottom-safe-padding: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + 16px);
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --bottom-safe-padding: 0px;
+  }
+}
+
+/* Page content with bottom nav awareness */
+.page-content-safe {
+  padding-bottom: var(--bottom-safe-padding);
+}
+
+/* Flex column to row transition at md breakpoint */
+.flex-col-to-row {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 2cqw, 1.5rem);
+}
+
+@media (min-width: 768px) {
+  .flex-col-to-row {
+    flex-direction: row;
+  }
+
+  .flex-col-to-row > * {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* Flex column to row at lg breakpoint */
+.flex-col-to-row-lg {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 2cqw, 1.5rem);
+}
+
+@media (min-width: 1024px) {
+  .flex-col-to-row-lg {
+    flex-direction: row;
+  }
+
+  .flex-col-to-row-lg > * {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* Auto-fit grid for cards */
+.grid-auto-fit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(0.75rem, 2cqw, 1.5rem);
+}
+
+/* Smaller auto-fit grid for compact cards */
+.grid-auto-fit-sm {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: clamp(0.5rem, 1.5cqw, 1rem);
+}
+
+/* Viewport-fit content area (no internal scroll) */
+.viewport-fit {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Scrollable only when needed */
+.scroll-if-needed {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Mobile-optimized touch targets (minimum 44x44px per WCAG) */

@@ -27,7 +27,7 @@ interface ComboIntensityBadgeProps {
 const INTENSITY_LEVELS = {
   none: { threshold: 0, color: 'bg-neutral-600', glow: 'transparent', icon: null },
   low: { threshold: 2, color: 'bg-neo-cyan', glow: '#00FFFF', icon: Zap },
-  medium: { threshold: 5, color: 'bg-neo-yellow', glow: '#FFE135', icon: Flame },
+  medium: { threshold: 5, color: 'bg-neo-lime', glow: '#FFE135', icon: Flame },
   high: { threshold: 10, color: 'bg-neo-orange', glow: '#FF6B35', icon: Star },
   max: { threshold: 20, color: 'bg-neo-pink', glow: '#FF1493', icon: Crown },
 };
@@ -178,7 +178,7 @@ export function ComboIntensityBadge({
                 ? 'border-neo-pink'
                 : combo >= 10
                   ? 'border-neo-orange'
-                  : 'border-neo-yellow'
+                  : 'border-neo-lime'
             )}
             animate={{
               scale: [1, 1.5, 1.8],

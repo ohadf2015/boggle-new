@@ -11,10 +11,10 @@ export default function NotFound() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neo-navy via-neo-navy-light to-neo-navy px-4 relative overflow-hidden">
       {/* Animated background decoration - floating letters */}
       <div className="absolute inset-0 pointer-events-none opacity-10">
-        <div className="absolute top-[10%] left-[10%] text-6xl font-black text-neo-yellow animate-float font-neo-display">?</div>
+        <div className="absolute top-[10%] left-[10%] text-6xl font-black text-neo-lime animate-float font-neo-display">?</div>
         <div className="absolute top-[20%] right-[15%] text-5xl font-black text-neo-pink animate-bob font-neo-display" style={{ animationDelay: '0.5s' }}>4</div>
         <div className="absolute bottom-[25%] left-[15%] text-4xl font-black text-neo-cyan animate-float font-neo-display" style={{ animationDelay: '1s' }}>0</div>
-        <div className="absolute bottom-[15%] right-[20%] text-5xl font-black text-neo-yellow animate-bob font-neo-display" style={{ animationDelay: '1.5s' }}>4</div>
+        <div className="absolute bottom-[15%] right-[20%] text-5xl font-black text-neo-lime animate-bob font-neo-display" style={{ animationDelay: '1.5s' }}>4</div>
       </div>
 
       <div className="text-center max-w-md relative z-10">
@@ -34,12 +34,12 @@ export default function NotFound() {
         </div>
 
         {/* 404 Number with enhanced gradient and animation */}
-        <div className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neo-cyan via-neo-pink to-neo-yellow mb-6 font-neo-display animate-gradient-x" style={{ backgroundSize: '200% auto' }}>
+        <div className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neo-cyan via-neo-pink to-neo-lime mb-6 font-neo-display animate-gradient-x" style={{ backgroundSize: '200% auto' }}>
           404
         </div>
 
         {/* Heading with neo-brutalist card style */}
-        <div className="bg-neo-yellow border-4 border-neo-black rounded-neo shadow-hard-lg p-6 mb-6 transform hover:shadow-hard-xl hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all">
+        <div className="bg-neo-lime border-4 border-neo-black rounded-neo shadow-hard-lg p-6 mb-6 transform hover:shadow-hard-xl hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all">
           <h1 className="text-3xl font-black text-neo-black mb-3 uppercase font-neo-display leading-tight">
             {t('notFound.heading')}
           </h1>

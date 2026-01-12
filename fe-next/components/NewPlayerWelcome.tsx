@@ -54,7 +54,7 @@ const NewPlayerWelcome: React.FC<NewPlayerWelcomeProps> = ({
 
   // Simplified 3-point quick intro
   const quickTips: FeatureItem[] = [
-    { icon: Star, label: t('howToPlay.quickTip.findWords') || 'Find words in the grid', color: 'bg-neo-yellow' },
+    { icon: Star, label: t('howToPlay.quickTip.findWords') || 'Find words in the grid', color: 'bg-neo-lime' },
     { icon: Zap, label: t('howToPlay.quickTip.chainWords') || 'Chain words for combos', color: 'bg-neo-orange' },
     { icon: Trophy, label: t('howToPlay.quickTip.beatOpponents') || 'Beat your opponents!', color: 'bg-neo-pink' },
   ];

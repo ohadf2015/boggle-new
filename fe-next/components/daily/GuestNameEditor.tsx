@@ -124,7 +124,7 @@ const GuestNameEditor: React.FC<GuestNameEditorProps> = ({
         ) : (
           <button
             onClick={() => setIsEditing(true)}
-            className="flex items-center gap-2 px-3 py-1.5 bg-neo-cream dark:bg-slate-700 rounded-neo border-2 border-neo-black dark:border-slate-500 hover:bg-neo-yellow/20 transition-colors group"
+            className="flex items-center gap-2 px-3 py-1.5 bg-neo-cream dark:bg-slate-700 rounded-neo border-2 border-neo-black dark:border-slate-500 hover:bg-neo-lime/20 transition-colors group"
           >
             <div
               className="w-6 h-6 rounded-full flex items-center justify-center text-sm border-2 border-neo-black"

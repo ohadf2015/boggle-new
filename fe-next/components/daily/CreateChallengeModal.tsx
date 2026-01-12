@@ -195,7 +195,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
 
         <div className="max-h-[90vh] overflow-y-auto">
           {/* Header */}
-            <div className="relative flex items-center justify-between p-3 sm:p-4 border-b-neo-thick border-neo-black bg-gradient-to-br from-neo-yellow to-neo-orange sticky top-0 z-10">
+            <div className="relative flex items-center justify-between p-3 sm:p-4 border-b-neo-thick border-neo-black bg-gradient-to-br from-neo-lime to-neo-orange sticky top-0 z-10">
               <motion.div
                 className="flex items-center gap-3"
                 initial={{ x: -20, opacity: 0 }}
@@ -441,7 +441,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   <div className="relative flex items-center justify-center h-32 sm:h-40">
                     {/* Background circle */}
                     <motion.div
-                      className="absolute w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-neo-yellow to-neo-orange rounded-full border-neo-thick border-neo-black shadow-hard-lg"
+                      className="absolute w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-neo-lime to-neo-orange rounded-full border-neo-thick border-neo-black shadow-hard-lg"
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: 'spring', bounce: 0.6, duration: 0.6 }}
@@ -477,7 +477,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       >
                         <Sparkles
                           className={`w-4 h-4 ${
-                            i % 3 === 0 ? 'text-neo-yellow' : i % 3 === 1 ? 'text-neo-pink' : 'text-neo-cyan'
+                            i % 3 === 0 ? 'text-neo-lime' : i % 3 === 1 ? 'text-neo-pink' : 'text-neo-cyan'
                           }`}
                           fill="currentColor"
                         />
@@ -515,7 +515,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       className={`shrink-0 p-3 rounded-lg border-3 border-neo-black transition-all ${
                         copied
                           ? 'bg-neo-green text-neo-white shadow-hard-sm'
-                          : 'bg-neo-white hover:bg-neo-yellow shadow-hard-sm hover:shadow-hard'
+                          : 'bg-neo-white hover:bg-neo-lime shadow-hard-sm hover:shadow-hard'
                       }`}
                     >
                       {copied ? (

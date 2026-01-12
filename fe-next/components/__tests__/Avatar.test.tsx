@@ -39,7 +39,11 @@ jest.mock('@/utils/avatarConfig', () => ({
     }
     return `/avatars/${avatar.filename}`;
   },
-  mapEmojiToAvatar: () => ({ id: 'broccoli-bob', name: 'Broccoli Bob', filename: 'broccoli-bob.png' }),
+  getRandomAvatar: () => ({ id: 'broccoli-bob', name: 'Broccoli Bob', filename: 'broccoli-bob.png' }),
+  AVATARS: [
+    { id: 'broccoli-bob', name: 'Broccoli Bob', filename: 'broccoli-bob.png' },
+    { id: 'pizza-pete', name: 'Pizza Pete', filename: 'pizza-pete.png' },
+  ],
 }));
 
 describe('Avatar', () => {
@@ -52,26 +56,19 @@ describe('Avatar', () => {
       expect(img).toHaveAttribute('src', '/avatars/pizza-pete.png');
     });
 
-    it('renders image avatar when emoji is provided (mapped to image)', () => {
-      render(<Avatar avatarEmoji="🦊" />);
+    it('renders fallback avatar when no avatarImage is provided', () => {
+      render(<Avatar />);
 
-      // Emoji gets mapped to an image avatar via mapEmojiToAvatar mock
+      // Without avatarImage, component shows first avatar from AVATARS list
       const img = screen.getByTestId('avatar-image');
       expect(img).toBeInTheDocument();
       expect(img).toHaveAttribute('src', '/avatars/broccoli-bob.png');
     });
-
-    it('renders emoji fallback when nothing provided (no avatarImage)', () => {
-      render(<Avatar />);
-
-      // Without avatarImage or avatarEmoji, component shows emoji fallback directly
-      expect(screen.getByText('🐶')).toBeInTheDocument();
-    });
   });
 
-  describe('emoji fallback (backwards compatibility)', () => {
-    it('falls back to emoji when avatar image fails to load', async () => {
-      render(<Avatar avatarEmoji="🦊" />);
+  describe('fallback behavior', () => {
+    it('shows user icon fallback when avatar image fails to load', async () => {
+      render(<Avatar avatarImage="broccoli-bob" />);
 
       // First the avatar image is shown
       const img = screen.getByTestId('avatar-image');
@@ -79,28 +76,18 @@ describe('Avatar', () => {
       // Trigger image error
       fireEvent.error(img);
 
-      // Should show emoji fallback after image error
+      // Should show user icon fallback after image error
       await waitFor(() => {
-        expect(screen.getByText('🦊')).toBeInTheDocument();
+        expect(screen.getByTestId('avatar-fallback-icon')).toBeInTheDocument();
       });
     });
 
-    it('applies custom avatar color in emoji fallback (no avatarImage)', () => {
-      // When no avatarImage provided, component renders emoji directly
-      const { container } = render(<Avatar avatarColor="#FF5733" />);
-
-      const emojiContainer = container.querySelector('[style*="background-color"]');
-      expect(emojiContainer).toBeInTheDocument();
-      expect(emojiContainer).toHaveTextContent('🐶');
-    });
-
-    it('uses default teal color in emoji fallback (no avatarImage)', () => {
-      // When no avatarImage provided, component renders emoji directly
+    it('renders fallback avatar when no props provided', () => {
       const { container } = render(<Avatar />);
 
-      const emojiContainer = container.querySelector('[style*="background-color"]');
-      expect(emojiContainer).toBeInTheDocument();
-      expect(emojiContainer).toHaveTextContent('🐶');
+      // Should show fallback avatar from AVATARS list
+      const img = screen.getByTestId('avatar-image');
+      expect(img).toBeInTheDocument();
     });
   });
 
@@ -114,10 +101,11 @@ describe('Avatar', () => {
     });
 
     it('falls back to avatar image on profile picture error', async () => {
+      // When profilePictureUrl is provided without avatarImage (or with PROFILE_AVATAR_ID),
+      // it shows profile picture first, then falls back to default avatar on error
       render(
         <Avatar
           profilePictureUrl="https://example.com/broken.jpg"
-          avatarEmoji="🐱"
         />
       );
 
@@ -126,18 +114,17 @@ describe('Avatar', () => {
       // Simulate image load error
       fireEvent.error(img);
 
-      // Should try avatar image next (mapped from emoji)
+      // Should try fallback avatar next (first in AVATARS list)
       await waitFor(() => {
         const newImg = screen.getByTestId('avatar-image');
         expect(newImg).toHaveAttribute('src', '/avatars/broccoli-bob.png');
       });
     });
 
-    it('falls back to emoji after both profile picture and avatar image fail', async () => {
+    it('falls back to user icon after both profile picture and fallback avatar fail', async () => {
       render(
         <Avatar
           profilePictureUrl="https://example.com/broken.jpg"
-          avatarEmoji="🐱"
         />
       );
 
@@ -145,19 +132,33 @@ describe('Avatar', () => {
       let img = screen.getByTestId('avatar-image');
       fireEvent.error(img);
 
-      // Wait for avatar image to be attempted
+      // Wait for fallback avatar to be attempted
       await waitFor(() => {
         img = screen.getByTestId('avatar-image');
         expect(img).toHaveAttribute('src', '/avatars/broccoli-bob.png');
       });
 
-      // Second error - avatar image fails too
+      // Second error - fallback avatar fails too
       fireEvent.error(img);
 
-      // Should now show emoji fallback
+      // Should now show user icon fallback
       await waitFor(() => {
-        expect(screen.getByText('🐱')).toBeInTheDocument();
+        expect(screen.getByTestId('avatar-fallback-icon')).toBeInTheDocument();
       });
+    });
+
+    it('prioritizes avatarImage over profilePictureUrl when both provided', () => {
+      // When both profilePictureUrl and avatarImage are provided (and avatarImage != PROFILE_AVATAR_ID),
+      // the avatarImage takes priority
+      render(
+        <Avatar
+          profilePictureUrl="https://example.com/profile.jpg"
+          avatarImage="pizza-pete"
+        />
+      );
+
+      const img = screen.getByTestId('avatar-image');
+      expect(img).toHaveAttribute('src', '/avatars/pizza-pete.png');
     });
 
     it('has alt text for accessibility', () => {
@@ -226,29 +227,28 @@ describe('Avatar', () => {
       const { rerender } = render(
         <Avatar
           profilePictureUrl="https://example.com/broken.jpg"
-          avatarEmoji="🐱"
         />
       );
 
-      // Trigger errors to fall back to emoji
+      // Trigger errors to fall back to user icon
       let img = screen.getByTestId('avatar-image');
       fireEvent.error(img);
 
       await waitFor(() => {
         img = screen.getByTestId('avatar-image');
+        expect(img).toHaveAttribute('src', '/avatars/broccoli-bob.png');
       });
       fireEvent.error(img);
 
-      // Should show emoji after errors
+      // Should show fallback icon after errors
       await waitFor(() => {
-        expect(screen.getByText('🐱')).toBeInTheDocument();
+        expect(screen.getByTestId('avatar-fallback-icon')).toBeInTheDocument();
       });
 
-      // Update with new profile picture URL
+      // Update with new profile picture URL - should reset error state
       rerender(
         <Avatar
           profilePictureUrl="https://example.com/new-avatar.jpg"
-          avatarEmoji="🐱"
         />
       );
 
@@ -260,11 +260,12 @@ describe('Avatar', () => {
 
   describe('edge cases', () => {
     it('handles empty string profile picture URL', () => {
-      render(<Avatar profilePictureUrl="" avatarEmoji="🦁" />);
+      render(<Avatar profilePictureUrl="" avatarImage="pizza-pete" />);
 
-      // Empty string should be falsy, show avatar image (mapped from emoji)
+      // Empty string should be falsy, show avatar image
       const img = screen.getByTestId('avatar-image');
       expect(img).toBeInTheDocument();
+      expect(img).toHaveAttribute('src', '/avatars/pizza-pete.png');
     });
 
     it('handles undefined values gracefully', () => {
@@ -272,8 +273,7 @@ describe('Avatar', () => {
         render(
           <Avatar
             profilePictureUrl={undefined}
-            avatarEmoji={undefined}
-            avatarColor={undefined}
+            avatarImage={undefined}
             size={undefined}
           />
         )

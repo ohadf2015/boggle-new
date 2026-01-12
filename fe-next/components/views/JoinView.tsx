@@ -366,7 +366,7 @@ const JoinView: React.FC<JoinViewProps> = ({
               )}
             </div>
 
-            <Button type="submit" disabled={isJoining} className="w-full h-11 min-h-[44px] font-bold uppercase bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-2 border-neo-black">
+            <Button type="submit" disabled={isJoining} className="w-full h-11 min-h-[44px] font-bold uppercase bg-neo-lime hover:bg-neo-lime/90 text-neo-black border-2 border-neo-black">
               {mode === 'host' ? <Crown className="mr-2 w-4 h-4" /> : <User className="mr-2 w-4 h-4" />}
               {isJoining ? (t('common.loading') || 'Loading...') : mode === 'host' ? (t('joinView.createRoom') || 'Create') : (t('joinView.joinRoom') || 'Join')}
             </Button>
@@ -396,7 +396,7 @@ const JoinView: React.FC<JoinViewProps> = ({
 
   // Main join/host form
   return (
-    <div dir={dir} className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 pt-4 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center justify-start md:justify-center p-2 sm:p-4 md:p-6 overflow-auto transition-colors duration-300">
+    <div dir={dir} className="min-h-screen bg-neo-navy pt-4 flex flex-col items-center justify-start md:justify-center p-2 sm:p-4 md:p-6 overflow-auto transition-colors duration-300">
       {/* SEO H1 - visible on landing page for search engines */}
       <h1 className="sr-only">LexiClash: Real-Time Word Battle</h1>
       <div className="flex flex-col md:flex-row gap-4 sm:gap-6 w-full max-w-6xl relative z-10 px-2 sm:px-4 md:px-6">

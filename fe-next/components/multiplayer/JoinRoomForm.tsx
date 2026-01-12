@@ -115,7 +115,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
     <>
       <LandscapeIndicator />
 
-      <div dir={dir} className="min-h-screen h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy flex flex-col overflow-hidden">
+      <div dir={dir} className="h-full bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy flex flex-col page-content-safe">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -211,7 +211,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                               size="icon"
                               variant="outline"
                               onClick={handlePaste}
-                              className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-neo-cream text-neo-black hover:bg-neo-yellow"
+                              className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-neo-cream text-neo-black hover:bg-neo-lime"
                               aria-label={t('joinView.pasteCode') || 'Paste room code'}
                             >
                               <ClipboardPaste className="w-4 h-4" />

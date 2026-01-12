@@ -72,7 +72,7 @@ export const ConfigWizardNav: React.FC<ConfigWizardNavProps> = ({
                   "relative flex items-center justify-center rounded-full transition-all",
                   "w-8 h-8 sm:w-10 sm:h-10",
                   "border-3 font-black text-sm",
-                  isActive && "bg-neo-yellow border-neo-black shadow-hard-sm scale-110 text-neo-black",
+                  isActive && "bg-neo-lime border-neo-black shadow-hard-sm scale-110 text-neo-black",
                   isCompleted && "bg-neo-lime border-neo-black cursor-pointer hover:scale-105 text-neo-black",
                   isUpcoming && "bg-slate-200 dark:bg-slate-600 border-slate-300 dark:border-slate-500 text-slate-400 dark:text-slate-400 cursor-not-allowed"
                 )}
@@ -174,7 +174,7 @@ export const WizardNavigationButtons: React.FC<WizardNavigationButtonsProps> = (
           disabled={!canAdvance}
           className={cn(
             "flex-1 min-h-[48px] gap-2 font-bold",
-            "bg-neo-yellow hover:bg-neo-yellow/90 text-neo-black border-3 border-neo-black",
+            "bg-neo-lime hover:bg-neo-lime/90 text-neo-black border-3 border-neo-black",
             !canAdvance && "opacity-50 cursor-not-allowed"
           )}
         >

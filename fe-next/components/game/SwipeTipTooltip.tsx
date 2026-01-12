@@ -243,7 +243,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
                               select-none
                               ${
                                 isSelected
-                                  ? 'bg-neo-yellow text-neo-black shadow-[0_0_12px_rgba(255,235,59,0.6)] z-10'
+                                  ? 'bg-neo-lime text-neo-black shadow-[0_0_12px_rgba(255,235,59,0.6)] z-10'
                                   : 'bg-white text-neo-black shadow-hard-sm'
                               }
                             `}

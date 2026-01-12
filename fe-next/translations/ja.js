@@ -1222,6 +1222,18 @@ const ja = {
     "readyForNextRound": "次のラウンドの準備はいい？",
     "hostStartDescription": "全員の準備ができたら新しいゲームを始めよう！"
   },
+  "nextStep": {
+    "challengeBots": "ボットに挑戦!",
+    "challengeBotsDesc": "AIの対戦相手とスキルを試そう",
+    "dailyChallenge": "デイリーチャレンジ",
+    "dailyChallengeDesc": "世界中みんな同じパズル",
+    "goMultiplayer": "マルチプレイヤーへ!",
+    "goMultiplayerDesc": "本物のプレイヤーと競争",
+    "brainTraining": "脳トレーニング",
+    "brainTrainingDesc": "認知能力の成長を追跡",
+    "backToLobby": "ロビーに戻る",
+    "letsGo": "レッツゴー!"
+  },
   "chart": {
     "yourProgress": "あなたの進捗",
     "needMoreGames": "もっとプレイしよう！",
@@ -2302,6 +2314,7 @@ const ja = {
     "chooseAvatar": "アバターを選ぼう",
     "selectAvatar": "選択",
     "useProfileAvatar": "プロフィール画像を使う",
+    "yourAvatar": "あなたのアバター",
     "you": "あなた",
     "username": "ユーザー名",
     "saveChanges": "変更を保存",
@@ -2785,6 +2798,9 @@ const ja = {
     "multiplayerDesc": "リアルタイムで友達と対戦！",
     "brainTraining": "脳トレーニング",
     "brainTrainingDesc": "認知成長を追跡",
+    "brainDrills": "クイックドリル",
+    "brainDrillsDesc": "集中ミニゲーム",
+    "signInToUnlock": "ログインして解除",
     "feature": {
       "soloVsBots": "ボット対戦",
       "practiceMode": "練習モード",

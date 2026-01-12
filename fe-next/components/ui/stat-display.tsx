@@ -102,8 +102,7 @@ const statCardVariants = cva(
     "rounded-neo border-2",
     "p-3 text-center",
     "cursor-default select-none",
-    "bg-gradient-to-b from-white/80 to-slate-50/80",
-    "dark:from-slate-800/80 dark:to-slate-900/80",
+    "bg-white/80 dark:bg-neo-navy/80",
     // Key difference: no shadow, subtle border
   ].join(" "),
   {

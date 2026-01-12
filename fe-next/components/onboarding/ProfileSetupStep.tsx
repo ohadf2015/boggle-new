@@ -155,7 +155,7 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
         <div className="flex items-start gap-3 sm:gap-4">
           {/* Avatar preview */}
           <div className="flex flex-col items-center gap-2 shrink-0">
-            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-3 border-neo-black shadow-hard-sm bg-neo-yellow text-neo-black">
+            <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-3 border-neo-black shadow-hard-sm bg-neo-lime text-neo-black">
               <Image
                 src={getAvatarPath(selectedAvatar)}
                 alt={selectedAvatar.name}

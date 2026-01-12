@@ -81,8 +81,6 @@ export const LiveLeaderboard = memo<LiveLeaderboardProps>(({
       <Avatar
         profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
         avatarImage={player.avatar?.avatarImage}
-        avatarEmoji={player.avatar?.emoji}
-        avatarColor={player.avatar?.color}
         size="md"
       />
       <div className="flex-1 min-w-0">

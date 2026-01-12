@@ -18,7 +18,7 @@ export function getComboColors(level: number): ComboColors {
   if (level === 0) {
     // No combo - Electric Yellow (Neo-Brutalist primary)
     return {
-      bg: 'bg-neo-yellow',
+      bg: 'bg-neo-lime',
       border: 'border-neo-black',
       shadow: 'shadow-hard',
       text: null, // Don't show +0

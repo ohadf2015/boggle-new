@@ -35,7 +35,7 @@ const indicatorVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-neo-yellow",
+        default: "bg-neo-lime",
         success: "bg-neo-lime",
         warning: "bg-neo-orange",
         danger: "bg-neo-red",

@@ -60,7 +60,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className="w-full"
     >
-      <div className="bg-gradient-to-br from-slate-800/90 to-slate-900/95 border-3 border-neo-black rounded-neo-lg shadow-hard-lg overflow-hidden">
+      <div className="bg-neo-navy border-3 border-neo-black rounded-neo-lg shadow-hard-lg overflow-hidden">
         {/* Header with progress bar */}
         <div className="relative">
           {/* Progress bar background */}
@@ -71,7 +71,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
             className={`absolute inset-y-0 left-0 ${
               allReady
                 ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
-                : 'bg-gradient-to-r from-neo-yellow/80 to-amber-500/80'
+                : 'bg-gradient-to-r from-neo-lime/80 to-amber-500/80'
             }`}
             initial={{ width: 0 }}
             animate={{ width: `${progressPercent}%` }}
@@ -88,7 +88,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                 {allReady ? (
                   <span className="text-lg">🎉</span>
                 ) : (
-                  <Hourglass className="text-neo-yellow text-sm" />
+                  <Hourglass className="text-neo-lime text-sm" />
                 )}
               </motion.div>
               <h3 className="font-black text-sm uppercase tracking-wide text-white">
@@ -97,7 +97,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
             </div>
 
             <div className="flex items-center gap-1.5">
-              <span className={`font-black text-lg ${allReady ? 'text-emerald-400' : 'text-neo-yellow'}`}>
+              <span className={`font-black text-lg ${allReady ? 'text-emerald-400' : 'text-neo-lime'}`}>
                 {effectiveReadyCount}
               </span>
               <span className="text-slate-400 font-bold">/</span>
@@ -133,7 +133,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                         ? 'bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border-emerald-500/60'
                         : 'bg-slate-700/30 border-slate-600/40'
                       }
-                      ${isCurrentUser ? 'ring-2 ring-neo-yellow ring-offset-1 ring-offset-slate-900' : ''}
+                      ${isCurrentUser ? 'ring-2 ring-neo-lime ring-offset-1 ring-offset-slate-900' : ''}
                     `}
                   >
                     {/* Ready indicator badge */}
@@ -169,9 +169,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                         <div className={`transition-all duration-300 ${!isReady ? 'opacity-50 grayscale' : ''}`}>
                           <Avatar
                             profilePictureUrl={player.avatar?.profilePictureUrl}
-                            avatarEmoji={player.avatar?.emoji}
                             avatarImage={player.avatar?.avatarImage}
-                            avatarColor={player.avatar?.color}
                             size="lg"
                             className={`border-2 ${isReady ? 'border-emerald-400' : 'border-slate-500'}`}
                           />
@@ -198,7 +196,7 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
                       <span className={`
                         text-xs font-bold truncate max-w-full text-center flex items-center justify-center gap-1
                         ${isReady ? 'text-white' : 'text-slate-400'}
-                        ${isCurrentUser ? 'text-neo-yellow' : ''}
+                        ${isCurrentUser ? 'text-neo-lime' : ''}
                       `}>
                         {isBot && <Bot className="text-neo-cyan text-xs shrink-0" />}
                         {player.username}

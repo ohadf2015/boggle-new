@@ -29,7 +29,7 @@ export default function LegalPageLayout({
   return (
     <div className={cn(
       'min-h-screen',
-      isDarkMode ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
+      isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
     )}>
       <Header />
 

@@ -79,14 +79,14 @@ describe('ComboDisplay', () => {
     it('has fixed width to prevent layout shifts', () => {
       const { container } = render(<ComboDisplay comboLevel={3} />);
       const outerDiv = container.firstChild as HTMLElement;
-      // Compact mode: w-[80px], non-compact: w-[130px]
+      // Compact mode: w-[100px], non-compact: w-[130px]
       expect(outerDiv.className).toContain('w-[130px]');
     });
 
     it('has fixed width in compact mode', () => {
       const { container } = render(<ComboDisplay comboLevel={3} compact />);
       const outerDiv = container.firstChild as HTMLElement;
-      expect(outerDiv.className).toContain('w-[80px]');
+      expect(outerDiv.className).toContain('w-[100px]');
     });
   });
 
@@ -186,7 +186,7 @@ describe('ComboDisplay', () => {
     it('uses smaller sizing in compact mode', () => {
       const { container } = render(<ComboDisplay comboLevel={3} compact />);
       const outerDiv = container.firstChild as HTMLElement;
-      expect(outerDiv.className).toContain('w-[80px]');
+      expect(outerDiv.className).toContain('w-[100px]');
     });
   });
 });

@@ -101,8 +101,8 @@ export const PlayfulBackground = memo(function PlayfulBackground({
     default: {
       orb1: 'bg-neo-pink/20',
       orb2: 'bg-neo-cyan/15',
-      orb3: 'bg-neo-yellow/10',
-      icon1: 'text-neo-yellow',
+      orb3: 'bg-neo-lime/10',
+      icon1: 'text-neo-lime',
       icon2: 'text-neo-pink',
       icon3: 'text-neo-cyan',
       icon4: 'text-neo-purple',
@@ -114,16 +114,16 @@ export const PlayfulBackground = memo(function PlayfulBackground({
       icon1: 'text-neo-cyan',
       icon2: 'text-neo-purple',
       icon3: 'text-neo-pink',
-      icon4: 'text-neo-yellow',
+      icon4: 'text-neo-lime',
     },
     celebration: {
-      orb1: 'bg-neo-yellow/25',
+      orb1: 'bg-neo-lime/25',
       orb2: 'bg-neo-pink/25',
       orb3: 'bg-neo-cyan/20',
-      icon1: 'text-neo-yellow',
+      icon1: 'text-neo-lime',
       icon2: 'text-neo-pink',
       icon3: 'text-neo-cyan',
-      icon4: 'text-neo-yellow',
+      icon4: 'text-neo-lime',
     },
   };
 
@@ -145,7 +145,7 @@ export const PlayfulBackground = memo(function PlayfulBackground({
           }}
         />
         {/* Static dots for visual interest */}
-        <div className={`absolute top-[12%] left-[35%] w-3 h-3 rounded-full bg-neo-yellow opacity-40`} />
+        <div className={`absolute top-[12%] left-[35%] w-3 h-3 rounded-full bg-neo-lime opacity-40`} />
         <div className={`absolute top-[48%] left-[20%] w-2.5 h-2.5 rounded-full bg-neo-pink opacity-30`} />
         <div className={`absolute top-[65%] right-[25%] w-2.5 h-2.5 rounded-full bg-neo-cyan opacity-30`} />
         <div className={`absolute bottom-[35%] left-[45%] w-3 h-3 rounded-full bg-neo-purple opacity-35`} />
@@ -289,7 +289,7 @@ export const PlayfulBackground = memo(function PlayfulBackground({
 
           {/* Pulsing dots - Neo-Brutalist solid colors without glow */}
           <motion.div
-            className={`absolute top-[12%] left-[35%] w-2.5 h-2.5 sm:w-4 sm:h-4 rounded-full bg-neo-yellow`}
+            className={`absolute top-[12%] left-[35%] w-2.5 h-2.5 sm:w-4 sm:h-4 rounded-full bg-neo-lime`}
             animate={{ scale: [1, 1.8, 1], opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           />

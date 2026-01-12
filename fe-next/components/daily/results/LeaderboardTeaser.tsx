@@ -57,7 +57,7 @@ export const LeaderboardTeaser: React.FC<LeaderboardTeaserProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-neo border-2 border-indigo-200 dark:border-indigo-700 p-5 ${className}`}
+      className={`bg-neo-purple dark:from-indigo-900/20 dark:to-purple-900/20 rounded-neo border-2 border-indigo-200 dark:border-indigo-700 p-5 ${className}`}
     >
       {/* Lock overlay header */}
       <div className="flex items-center justify-center gap-2 mb-4">
@@ -119,7 +119,7 @@ export const LeaderboardTeaser: React.FC<LeaderboardTeaserProps> = ({
         <Button
           onClick={() => handleSignIn('discord')}
           disabled={!!isLoading}
-          className="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white border-2 border-[#4752C4] rounded-neo shadow-hard-sm"
+          className="w-full bg-brand-discord hover:bg-brand-discord-hover text-white border-2 border-brand-discord-hover rounded-neo shadow-hard-sm"
         >
           {isLoading === 'discord' ? (
             <span className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />

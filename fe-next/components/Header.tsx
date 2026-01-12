@@ -111,8 +111,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     "w-full mx-auto",
                     "flex items-center justify-between",
                     "px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-2.5",
-                    "bg-gradient-to-r from-slate-800/85 via-slate-700/80 to-slate-800/85",
-                    "dark:from-slate-700/85 dark:via-slate-600/80 dark:to-slate-700/85",
+                    "bg-neo-navy/85",
                     "backdrop-blur-md",
                     "border-4 lg:border-4 xl:border-4 2xl:border-4 border-neo-black",
                     "shadow-hard-lg xl:shadow-hard-lg 2xl:shadow-hard-lg",
@@ -129,14 +128,14 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     whileTap={{ scale: 0.98 }}
                     aria-label={t('common.goToHome') || 'Go to home page'}
                 >
-                    {/* Small yellow sparkle - top left decorative */}
-                    <svg className="w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3 absolute -top-1 xs:-top-2 left-2 xs:left-4 text-neo-yellow hidden xs:block animate-sparkle-left" viewBox="0 0 24 24" fill="currentColor">
+                    {/* Small lime sparkle - top left decorative */}
+                    <svg className="w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3 absolute -top-1 xs:-top-2 left-2 xs:left-4 text-neo-lime hidden xs:block animate-sparkle-left" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 0L14 10L24 12L14 14L12 24L10 14L0 12L10 10L12 0Z" />
                     </svg>
 
-                    {/* Pink lightning bolt - left */}
+                    {/* Lime-light lightning bolt - left */}
                     <svg
-                        className="w-4 h-5 xs:w-5 xs:h-6 sm:w-6 sm:h-7 lg:w-7 lg:h-8 xl:w-8 xl:h-10 flex-shrink-0 text-neo-pink animate-lightning-left"
+                        className="w-4 h-5 xs:w-5 xs:h-6 sm:w-6 sm:h-7 lg:w-7 lg:h-8 xl:w-8 xl:h-10 flex-shrink-0 text-neo-lime-light animate-lightning-left"
                         viewBox="0 0 24 32"
                         fill="none"
                         style={{ transform: 'rotate(-15deg)' }}
@@ -154,9 +153,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         className="font-black uppercase tracking-tight flex items-center gap-0.5 whitespace-nowrap"
                         style={{ fontFamily }}
                     >
-                        {/* LEXI - Hero text: larger, bolder, with subtle glow */}
+                        {/* LEXI - Hero text: larger, bolder, lime primary */}
                         <span
-                            className="text-xl xs:text-2xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl text-neo-cyan relative animate-lexi-glow landscape:text-xl landscape:xs:text-2xl landscape:sm:text-3xl"
+                            className="text-xl xs:text-2xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl text-neo-lime relative animate-lexi-glow landscape:text-xl landscape:xs:text-2xl landscape:sm:text-3xl"
                             style={{
                                 WebkitTextStroke: '3px #1a365d',
                                 paintOrder: 'stroke fill',
@@ -165,9 +164,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         >
                             {t('logo.lexi')}
                         </span>
-                        {/* CLASH - Supporting text: smaller, softer */}
+                        {/* CLASH - Supporting text: smaller, lime-dark for contrast */}
                         <span
-                            className="text-base xs:text-lg sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl text-neo-yellow relative landscape:text-base landscape:xs:text-lg landscape:sm:text-xl"
+                            className="text-base xs:text-lg sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl text-neo-lime-dark relative landscape:text-base landscape:xs:text-lg landscape:sm:text-xl"
                             style={{
                                 WebkitTextStroke: '1.5px #1a365d',
                                 paintOrder: 'stroke fill',
@@ -178,9 +177,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         </span>
                     </h1>
 
-                    {/* Yellow lightning bolt - right */}
+                    {/* Lime lightning bolt - right */}
                     <svg
-                        className="w-4 h-5 xs:w-5 xs:h-6 sm:w-6 sm:h-7 lg:w-7 lg:h-8 xl:w-8 xl:h-10 flex-shrink-0 text-neo-yellow animate-lightning-right"
+                        className="w-4 h-5 xs:w-5 xs:h-6 sm:w-6 sm:h-7 lg:w-7 lg:h-8 xl:w-8 xl:h-10 flex-shrink-0 text-neo-lime animate-lightning-right"
                         viewBox="0 0 24 32"
                         fill="none"
                         style={{ transform: 'rotate(15deg)' }}
@@ -194,8 +193,8 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         />
                     </svg>
 
-                    {/* Small pink sparkle - top right decorative */}
-                    <svg className="w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3 absolute -top-1 xs:-top-2 right-0 xs:right-2 text-neo-pink hidden xs:block animate-sparkle-right" viewBox="0 0 24 24" fill="currentColor">
+                    {/* Small lime-light sparkle - top right decorative */}
+                    <svg className="w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3 absolute -top-1 xs:-top-2 right-0 xs:right-2 text-neo-lime-light hidden xs:block animate-sparkle-right" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 0L14 10L24 12L14 14L12 24L10 14L0 12L10 10L12 0Z" />
                     </svg>
                 </motion.button>
@@ -338,7 +337,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                     onClick={() => setShowMobileMenu(false)}
                                                     className={cn(
                                                         "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
-                                                        "bg-white dark:bg-slate-700 hover:bg-neo-yellow/30 dark:hover:bg-slate-600 text-neo-black dark:text-white",
+                                                        "bg-white dark:bg-slate-700 hover:bg-neo-lime/30 dark:hover:bg-slate-600 text-neo-black dark:text-white",
                                                         "shadow-hard-sm hover:shadow-hard"
                                                     )}
                                                 >
@@ -457,7 +456,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                     "shadow-hard-sm hover:shadow-hard"
                                                 )}
                                             >
-                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-yellow border-2 border-neo-black text-neo-black">
+                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-lime border-2 border-neo-black text-neo-black">
                                                     <Trophy className="w-4 h-4" />
                                                 </span>
                                                 <span>{t('footer.leaderboard') || 'Leaderboard'}</span>
@@ -467,7 +466,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 onClick={() => setShowMobileMenu(false)}
                                                 className={cn(
                                                     "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
-                                                    "bg-white dark:bg-slate-700 hover:bg-neo-yellow/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
+                                                    "bg-white dark:bg-slate-700 hover:bg-neo-lime/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
                                                     "shadow-hard-sm hover:shadow-hard"
                                                 )}
                                             >
@@ -481,7 +480,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 onClick={() => setShowMobileMenu(false)}
                                                 className={cn(
                                                     "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
-                                                    "bg-white dark:bg-slate-700 hover:bg-neo-yellow/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
+                                                    "bg-white dark:bg-slate-700 hover:bg-neo-lime/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
                                                     "shadow-hard-sm hover:shadow-hard"
                                                 )}
                                             >

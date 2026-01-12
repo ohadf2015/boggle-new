@@ -27,14 +27,14 @@ const rarityColors = {
   common: 'from-neo-gray to-neo-navy-light',
   rare: 'from-neo-cyan to-neo-navy-light',
   epic: 'from-neo-pink to-neo-pink',
-  legendary: 'from-neo-yellow to-neo-yellow',
+  legendary: 'from-neo-lime to-neo-lime',
 };
 
 const rarityBorders = {
   common: 'border-neo-gray',
   rare: 'border-neo-cyan',
   epic: 'border-neo-pink',
-  legendary: 'border-neo-yellow',
+  legendary: 'border-neo-lime',
 };
 
 const rarityGlows = {
@@ -48,13 +48,13 @@ function getRewardIcon(type: CalendarReward['type'], rarity?: string) {
   const iconClass = "w-3 h-3 sm:w-4 sm:h-4";
   switch (type) {
     case 'xp':
-      return <Zap className={cn(iconClass, "text-neo-yellow")} />;
+      return <Zap className={cn(iconClass, "text-neo-lime")} />;
     case 'hints':
       return <Sparkles className={cn(iconClass, "text-neo-cyan")} />;
     case 'streak_freeze':
       return <Shield className={cn(iconClass, "text-neo-lime")} />;
     case 'mystery_box':
-      return <Gift className={cn(iconClass, rarity === 'legendary' ? 'text-neo-yellow' : rarity === 'epic' ? 'text-neo-pink' : rarity === 'rare' ? 'text-neo-cyan' : 'text-neo-black/70')} />;
+      return <Gift className={cn(iconClass, rarity === 'legendary' ? 'text-neo-lime' : rarity === 'epic' ? 'text-neo-pink' : rarity === 'rare' ? 'text-neo-cyan' : 'text-neo-black/70')} />;
     case 'exclusive_title':
       return <Crown className={cn(iconClass, "text-neo-pink")} />;
     default:
@@ -113,7 +113,7 @@ export function CalendarRewardCard({
         ],
         isToday && !canClaim && "bg-neo-lime/20 border-neo-lime/50",
         // Milestone styles
-        isMilestone && !isClaimed && !isPast && "border-neo-yellow",
+        isMilestone && !isClaimed && !isPast && "border-neo-lime",
       )}
       whileTap={canClaim ? { scale: 0.95 } : undefined}
     >
@@ -154,12 +154,12 @@ export function CalendarRewardCard({
 
       {/* Milestone indicator */}
       {isMilestone && !isClaimed && (
-        <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-2 h-2 sm:w-3 sm:h-3 bg-neo-yellow rounded-full border border-neo-black" />
+        <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-2 h-2 sm:w-3 sm:h-3 bg-neo-lime rounded-full border border-neo-black" />
       )}
 
       {/* Today badge */}
       {isToday && (
-        <div className="absolute -bottom-0.5 sm:-bottom-1 left-1/2 -translate-x-1/2 bg-neo-yellow text-neo-black text-[6px] sm:text-[8px] font-black px-1 sm:px-1.5 py-0 sm:py-0.5 rounded-neo border border-neo-black whitespace-nowrap">
+        <div className="absolute -bottom-0.5 sm:-bottom-1 left-1/2 -translate-x-1/2 bg-neo-lime text-neo-black text-[6px] sm:text-[8px] font-black px-1 sm:px-1.5 py-0 sm:py-0.5 rounded-neo border border-neo-black whitespace-nowrap">
           TODAY
         </div>
       )}

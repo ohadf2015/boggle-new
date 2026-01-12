@@ -82,7 +82,7 @@ export function WordPathTrail({
     if (color) return color;
     if (wasSubmitted && isValid) return '#BFFF00'; // neo-lime for success
     if (isValid) return '#00FFFF'; // neo-cyan for valid
-    return '#FFE135'; // neo-yellow default
+    return '#BFFF00'; // neo-lime default
   }, [color, isValid, wasSubmitted]);
 
   // Handle submit flash

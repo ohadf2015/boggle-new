@@ -107,8 +107,6 @@ export function ProfileHeader({
           <Avatar
             profilePictureUrl={profile?.profile_picture_url ?? undefined}
             avatarImage={profile?.avatar_image ?? undefined}
-            avatarEmoji={profile?.avatar_emoji ?? undefined}
-            avatarColor={profile?.avatar_color ?? undefined}
             size={compact ? 'md' : 'xl'}
             className="shadow-lg"
           />

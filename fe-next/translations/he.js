@@ -1224,6 +1224,18 @@ const he = {
     "readyForNextRound": "מוכנים לסיבוב הבא?",
     "hostStartDescription": "התחילו משחק חדש כשכולם מוכנים!"
   },
+  "nextStep": {
+    "challengeBots": "אתגרו את הבוטים!",
+    "challengeBotsDesc": "בדקו את הכישורים שלכם מול יריבים מלאכותיים",
+    "dailyChallenge": "אתגר יומי",
+    "dailyChallengeDesc": "אותו פאזל לכולם בעולם",
+    "goMultiplayer": "למולטיפלייר!",
+    "goMultiplayerDesc": "התחרו נגד שחקנים אמיתיים",
+    "brainTraining": "אימון מוח",
+    "brainTrainingDesc": "עקבו אחר הצמיחה הקוגניטיבית",
+    "backToLobby": "חזרה ללובי",
+    "letsGo": "יאללה!"
+  },
   "chart": {
     "yourProgress": "ההתקדמות שלך",
     "needMoreGames": "שחקו עוד משחקים!",
@@ -2432,6 +2444,7 @@ const he = {
     "chooseAvatar": "בחר את האווטאר שלך",
     "selectAvatar": "בחר",
     "useProfileAvatar": "השתמש בתמונת הפרופיל שלך",
+    "yourAvatar": "האווטר שלך",
     "you": "אתה",
     "username": "שם משתמש",
     "saveChanges": "שמור שינויים",
@@ -2787,6 +2800,9 @@ const he = {
     "multiplayerDesc": "התחרה עם חברים בזמן אמת!",
     "brainTraining": "אימון קוגניטיבי",
     "brainTrainingDesc": "עקוב אחר התפתחות קוגניטיבית",
+    "brainDrills": "תרגולים מהירים",
+    "brainDrillsDesc": "משחקונים ממוקדים",
+    "signInToUnlock": "התחבר כדי לפתוח",
     "feature": {
       "soloVsBots": "נגד בוטים",
       "practiceMode": "מצב אימון",

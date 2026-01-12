@@ -22,7 +22,7 @@ const TIER_CONFIG = {
   intermediate: { color: 'bg-neo-cyan', next: 'advanced', min: 40, max: 59 },
   advanced: { color: 'bg-neo-purple', next: 'expert', min: 60, max: 79 },
   expert: { color: 'bg-neo-orange', next: 'master', min: 80, max: 89 },
-  master: { color: 'bg-neo-yellow', next: null, min: 90, max: 100 },
+  master: { color: 'bg-neo-lime', next: null, min: 90, max: 100 },
 };
 
 /**
@@ -149,7 +149,7 @@ export default function BrainScoreHero({
           <div className="flex items-center gap-2">
             <Sparkles className={cn(
               'w-4 h-4',
-              isDarkMode ? 'text-neo-yellow' : 'text-neo-orange'
+              isDarkMode ? 'text-neo-lime' : 'text-neo-orange'
             )} />
             <span className={cn(
               'text-sm font-bold uppercase',

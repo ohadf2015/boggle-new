@@ -4,7 +4,7 @@
  */
 
 import type { Server, Socket } from 'socket.io';
-import type { Game, GameUser, LetterGrid, Language, TournamentStanding, GridPosition } from '@/shared/types';
+import type { Game, GameUser, LetterGrid, Language, TournamentStanding, GridPosition, Avatar } from '@/shared/types';
 
 const {
   getGame,
@@ -42,7 +42,7 @@ interface Tournament {
 interface TournamentPlayer {
   socketId: string;
   username: string;
-  avatar: { emoji: string; color: string; profilePictureUrl?: string | null };
+  avatar: Avatar;
 }
 
 /**

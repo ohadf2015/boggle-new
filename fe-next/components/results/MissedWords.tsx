@@ -29,7 +29,7 @@ const getWordLengthColor = (length: number): string => {
   if (length === 6) return 'bg-neo-pink text-white';
   if (length === 5) return 'bg-neo-cyan text-neo-black';
   if (length === 4) return 'bg-neo-lime text-neo-black';
-  return 'bg-neo-yellow text-neo-black';
+  return 'bg-neo-lime text-neo-black';
 };
 
 /**
@@ -91,18 +91,18 @@ const MissedWords = memo<MissedWordsProps>(({
       <div
         className={cn(
           'rounded-neo-lg border-2 border-neo-black/30 overflow-hidden',
-          'bg-gradient-to-br from-slate-700 to-slate-800'
+          'bg-gray-500'
         )}
       >
         {/* Header - clearer messaging about missed words */}
         <div className="flex items-center justify-between gap-2 px-3 py-2 bg-slate-600 border-b-2 border-neo-black/20">
           <div className={cn("flex items-center gap-2", dir === 'rtl' && 'flex-row-reverse')}>
-            <EyeOff className="w-4 h-4 text-neo-yellow" />
+            <EyeOff className="w-4 h-4 text-neo-lime" />
             <span className="font-bold text-xs uppercase text-white">
               {t('results.missedOnBoard') || 'Words You Missed on the Board'}
             </span>
           </div>
-          <span className="text-xs font-black bg-neo-yellow px-2 py-0.5 rounded-full text-neo-black">
+          <span className="text-xs font-black bg-neo-lime px-2 py-0.5 rounded-full text-neo-black">
             +{showAll ? allTotalPoints : totalPoints} {t('results.points') || 'pts'}
           </span>
         </div>
@@ -129,7 +129,7 @@ const MissedWords = memo<MissedWordsProps>(({
                     'border-2 transition-all duration-150',
                     hasPath && 'cursor-pointer hover:scale-105',
                     isSelected
-                      ? 'border-neo-yellow bg-neo-yellow/30 ring-2 ring-neo-yellow/50'
+                      ? 'border-neo-lime bg-neo-lime/30 ring-2 ring-neo-lime/50'
                       : 'border-slate-500 bg-slate-600 hover:bg-slate-500'
                   )}
                 >
@@ -143,7 +143,7 @@ const MissedWords = memo<MissedWordsProps>(({
                   {/* Word - high contrast white text */}
                   <span className={cn(
                     'font-bold uppercase',
-                    isSelected ? 'text-neo-yellow' : 'text-white'
+                    isSelected ? 'text-neo-lime' : 'text-white'
                   )}>
                     {language === 'he' ? applyHebrewFinalLetters(wordData.word) : wordData.word}
                   </span>
@@ -151,7 +151,7 @@ const MissedWords = memo<MissedWordsProps>(({
                   {hasPath && (
                     <Grid3X3 className={cn(
                       'w-3 h-3',
-                      isSelected ? 'text-neo-yellow' : 'text-white/40'
+                      isSelected ? 'text-neo-lime' : 'text-white/40'
                     )} />
                   )}
                 </motion.button>

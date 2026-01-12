@@ -313,10 +313,10 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                               <p className="text-xs text-white/50 truncate">{reward.description}</p>
                             </div>
                             {reward.type === 'multiplier' && (
-                              <Zap className={cn('w-4 h-4', canPrestige ? 'text-neo-yellow' : 'text-white/30')} />
+                              <Zap className={cn('w-4 h-4', canPrestige ? 'text-neo-lime' : 'text-white/30')} />
                             )}
                             {reward.type === 'title' && (
-                              <Crown className={cn('w-4 h-4', canPrestige ? 'text-neo-yellow' : 'text-white/30')} />
+                              <Crown className={cn('w-4 h-4', canPrestige ? 'text-neo-lime' : 'text-white/30')} />
                             )}
                           </motion.div>
                         ))}

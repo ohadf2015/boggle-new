@@ -170,9 +170,10 @@ const ComboDisplay = memo<ComboDisplayProps>(({
   return (
     <div
       className={cn(
-        'flex items-center justify-center relative overflow-visible',
+        'flex items-center justify-center relative overflow-hidden',
         // Fixed width to prevent layout shifts when combo appears/changes
-        compact ? 'w-[80px]' : 'w-[130px]',
+        // Increased compact width to fit full text without cutoff
+        compact ? 'w-[100px]' : 'w-[130px]',
         className
       )}
     >
@@ -236,7 +237,9 @@ const ComboDisplay = memo<ComboDisplayProps>(({
             {/* Content - text with emoji */}
             <div
               className={cn(
-                'flex items-center gap-1 relative z-10 font-black',
+                'flex items-center relative z-10 font-black',
+                // Reduced gap in compact mode to fit within 80px width
+                compact ? 'gap-0.5' : 'gap-1',
                 // Text color with rarity-based gradient effect
                 'text-transparent bg-clip-text',
                 !isRainbow && rarityColors.gradient
@@ -331,7 +334,8 @@ const ComboDisplay = memo<ComboDisplayProps>(({
           </motion.div>
 
           {/* Status text below for high combos - matches rarity */}
-          {isHighCombo && (
+          {/* Hidden in compact mode to prevent overflow */}
+          {isHighCombo && !compact && (
             <motion.div
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}

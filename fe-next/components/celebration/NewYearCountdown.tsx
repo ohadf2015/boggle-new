@@ -142,7 +142,7 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
             >
-              <Sparkles className="w-16 h-16 text-neo-yellow" />
+              <Sparkles className="w-16 h-16 text-neo-lime" />
 
               <div>
                 <h2 className="text-2xl font-black uppercase mb-2 text-neo-black">
@@ -162,7 +162,7 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
                 transition={{ type: 'spring', damping: 10 }}
               >
                 <div
-                  className="text-9xl font-black text-neo-pink border-8 border-neo-black rounded-neo-xl shadow-hard-2xl bg-neo-yellow w-48 h-48 flex items-center justify-center"
+                  className="text-9xl font-black text-neo-pink border-8 border-neo-black rounded-neo-xl shadow-hard-2xl bg-neo-lime w-48 h-48 flex items-center justify-center"
                   style={{
                     textShadow: '4px 4px 0px rgb(0, 0, 0)',
                   }}
@@ -199,7 +199,7 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
                 <motion.h1
                   className="text-6xl sm:text-7xl md:text-8xl font-black uppercase tracking-tight"
                   style={{
-                    background: 'linear-gradient(135deg, var(--neo-yellow) 0%, var(--neo-red) 25%, var(--neo-pink) 50%, var(--neo-pink) 75%, var(--neo-cyan) 100%)',
+                    background: 'linear-gradient(135deg, var(--neo-lime) 0%, var(--neo-red) 25%, var(--neo-pink) 50%, var(--neo-pink) 75%, var(--neo-cyan) 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',

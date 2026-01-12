@@ -32,7 +32,10 @@ export type MascotVariant =
   | 'holding_trophy'
   | 'typing'
   | 'cheering'
-  | 'training';
+  | 'training'
+  | 'playing_ball'
+  | 'skateboarding'
+  | 'juggling';
 
 /**
  * Mascot image paths mapping
@@ -63,6 +66,9 @@ export const MASCOT_IMAGES: Record<MascotVariant, string> = {
   typing: '/mascot/lexi-typing.png',
   cheering: '/mascot/lexi-cheering.png',
   training: '/mascot/lexi-training.png',
+  playing_ball: '/mascot/lexi-playing-ball.png',
+  skateboarding: '/mascot/lexi-skateboarding.png',
+  juggling: '/mascot/lexi-juggling.png',
 };
 
 /**
@@ -402,6 +408,48 @@ function getAnimationVariants(variant: MascotVariant): Variants {
         rotate: [0, -2, 0, 2, 0],
         transition: {
           duration: 1.2,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        },
+      },
+    },
+    // Activity: Playing ball - bouncy ball juggling motion
+    playing_ball: {
+      animate: {
+        y: [0, -12, 0, -8, 0, -10, 0],
+        x: [0, 2, -2, 1, -1, 0],
+        rotate: [0, -4, 4, -3, 3, 0],
+        scale: [1, 1.05, 0.98, 1.03, 0.99, 1.02, 1],
+        transition: {
+          duration: 1.8,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        },
+      },
+    },
+    // Activity: Skateboarding - dynamic rolling motion
+    skateboarding: {
+      animate: {
+        x: [0, 3, -3, 2, -2, 0],
+        y: [0, -6, -2, -5, -1, -3, 0],
+        rotate: [0, -6, 6, -4, 4, -2, 0],
+        scale: [1, 1.06, 1.02, 1.04, 1],
+        transition: {
+          duration: 1.6,
+          repeat: Infinity,
+          ease: 'easeOut',
+        },
+      },
+    },
+    // Activity: Juggling - rhythmic up-down ball tracking
+    juggling: {
+      animate: {
+        y: [0, -8, -4, -10, -2, -6, 0],
+        x: [0, -2, 2, -1, 1, 0],
+        rotate: [0, 3, -3, 2, -2, 0],
+        scale: [1, 1.04, 1.02, 1.05, 1.01, 1.03, 1],
+        transition: {
+          duration: 2.2,
           repeat: Infinity,
           ease: 'easeInOut',
         },

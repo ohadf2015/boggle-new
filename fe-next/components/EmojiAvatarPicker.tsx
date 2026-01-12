@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, X, User } from 'lucide-react';
 import Image from 'next/image';
-import { AVATARS, getAvatarPath, mapEmojiToAvatar, type AvatarConfig } from '@/utils/avatarConfig';
+import { AVATARS, getAvatarPath, type AvatarConfig } from '@/utils/avatarConfig';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -14,12 +14,10 @@ import { cn } from '@/lib/utils';
 export const PROFILE_AVATAR_ID = '__profile_avatar__';
 
 /**
- * Avatar selection result
+ * Avatar selection result - simplified without emoji/color
  */
-interface AvatarSelection {
-  avatarImage: string; // Avatar image ID or PROFILE_AVATAR_ID
-  emoji?: string; // Deprecated: kept for backward compatibility
-  color?: string; // Deprecated: kept for backward compatibility
+export interface AvatarSelection {
+  avatarImage: string; // Avatar image ID (e.g., 'broccoli-bob') or PROFILE_AVATAR_ID
 }
 
 /**
@@ -27,34 +25,31 @@ interface AvatarSelection {
  */
 interface ProfileAvatarInfo {
   profilePictureUrl?: string | null;
-  avatarEmoji?: string;
-  avatarColor?: string;
   displayName?: string;
-  avatarImage?: string; // Profile's avatar_image ID
+  avatarImage?: string; // Profile's current avatar_image ID
 }
 
 /**
- * EmojiAvatarPicker Props (renamed but kept for backward compatibility)
+ * AvatarPicker Props
  */
-interface EmojiAvatarPickerProps {
+interface AvatarPickerProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (selection: AvatarSelection) => void;
-  currentEmoji?: string; // Deprecated: will be mapped to avatar image
-  currentColor?: string; // Deprecated: no longer used
-  currentAvatarImage?: string; // New: current avatar image ID
+  currentAvatarImage?: string; // Current avatar image ID
   profileAvatar?: ProfileAvatarInfo; // Profile avatar for authenticated users
 }
 
 /**
  * AvatarPicker - Modal for selecting avatar image
- * (Previously EmojiAvatarPicker - renamed but kept export name for compatibility)
+ * Supports:
+ * 1. Profile picture from OAuth provider (if available)
+ * 2. Custom character avatars (17 options)
  */
-const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
+const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
   isOpen,
   onClose,
   onSave,
-  currentEmoji,
   currentAvatarImage,
   profileAvatar
 }) => {
@@ -68,66 +63,54 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
   const { t } = useLanguage();
   const isDarkMode = theme === 'dark';
 
-  // Check if profile avatar is available (user has profile picture, avatar image, or emoji)
-  const hasProfileAvatar = profileAvatar && (profileAvatar.profilePictureUrl || profileAvatar.avatarImage || profileAvatar.avatarEmoji);
+  // Check if profile picture is available (user has OAuth profile picture)
+  const hasProfilePicture = !!profileAvatar?.profilePictureUrl;
 
   // Check if currently using profile avatar
-  const isUsingProfileAvatar = currentAvatarImage === PROFILE_AVATAR_ID ||
-    (!currentAvatarImage && !!hasProfileAvatar);
+  const isUsingProfileAvatar = currentAvatarImage === PROFILE_AVATAR_ID;
 
   // Determine initial avatar selection
-  const getInitialAvatar = React.useCallback((): AvatarConfig | null => {
+  const getInitialAvatar = useCallback((): AvatarConfig | null => {
     // If using profile avatar, return null to indicate profile selection
-    if (isUsingProfileAvatar) {
+    if (isUsingProfileAvatar && hasProfilePicture) {
       return null;
     }
     if (currentAvatarImage && currentAvatarImage !== PROFILE_AVATAR_ID) {
       const found = AVATARS.find(a => a.id === currentAvatarImage || a.filename === currentAvatarImage);
       if (found) return found;
     }
-    if (currentEmoji) {
-      return mapEmojiToAvatar(currentEmoji);
-    }
-    // Default to first avatar if no profile avatar available
-    return hasProfileAvatar ? null : AVATARS[0];
-  }, [isUsingProfileAvatar, currentAvatarImage, currentEmoji, hasProfileAvatar]);
+    // Default to first avatar if no profile picture available
+    return hasProfilePicture ? null : AVATARS[0];
+  }, [isUsingProfileAvatar, currentAvatarImage, hasProfilePicture]);
 
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarConfig | null>(getInitialAvatar());
-  const [useProfileAvatar, setUseProfileAvatar] = useState<boolean>(isUsingProfileAvatar);
+  const [useProfileAvatar, setUseProfileAvatar] = useState<boolean>(isUsingProfileAvatar && hasProfilePicture);
 
   // Reset state when modal opens to reflect current profile state
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen) {
       setSelectedAvatar(getInitialAvatar());
-      setUseProfileAvatar(isUsingProfileAvatar);
+      setUseProfileAvatar(isUsingProfileAvatar && hasProfilePicture);
     }
-  }, [isOpen, getInitialAvatar, isUsingProfileAvatar]);
+  }, [isOpen, getInitialAvatar, isUsingProfileAvatar, hasProfilePicture]);
 
-  // Handle selecting a regular avatar
+  // Handle selecting a character avatar
   const handleSelectAvatar = (avatar: AvatarConfig) => {
     setSelectedAvatar(avatar);
     setUseProfileAvatar(false);
   };
 
-  // Handle selecting profile avatar
-  const handleSelectProfileAvatar = () => {
+  // Handle selecting profile picture
+  const handleSelectProfilePicture = () => {
     setSelectedAvatar(null);
     setUseProfileAvatar(true);
   };
 
   const handleSave = () => {
-    if (useProfileAvatar && hasProfileAvatar) {
-      onSave({
-        avatarImage: PROFILE_AVATAR_ID,
-        emoji: profileAvatar?.avatarEmoji || '🎮',
-        color: profileAvatar?.avatarColor || '#4ECDC4'
-      });
+    if (useProfileAvatar && hasProfilePicture) {
+      onSave({ avatarImage: PROFILE_AVATAR_ID });
     } else if (selectedAvatar) {
-      onSave({
-        avatarImage: selectedAvatar.id,
-        emoji: '🎮',
-        color: '#4ECDC4'
-      });
+      onSave({ avatarImage: selectedAvatar.id });
     }
     onClose();
   };
@@ -137,7 +120,7 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
     if (useProfileAvatar && profileAvatar?.displayName) {
       return profileAvatar.displayName;
     }
-    return selectedAvatar?.name || 'Your Avatar';
+    return selectedAvatar?.name || t('profile.yourAvatar') || 'Your Avatar';
   };
 
   if (!mounted) return null;
@@ -189,33 +172,15 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
               'w-20 h-20 rounded-full overflow-hidden border-4 mb-2 relative',
               isDarkMode ? 'border-slate-600' : 'border-gray-300'
             )}>
-              {useProfileAvatar ? (
-                profileAvatar?.profilePictureUrl ? (
-                  <Image
-                    src={profileAvatar.profilePictureUrl}
-                    alt={profileAvatar.displayName || 'Profile'}
-                    fill
-                    sizes="80px"
-                    className="object-cover"
-                    priority
-                  />
-                ) : profileAvatar?.avatarImage ? (
-                  <Image
-                    src={getAvatarPath(AVATARS.find(a => a.id === profileAvatar.avatarImage) || AVATARS[0])}
-                    alt={profileAvatar.displayName || 'Profile Avatar'}
-                    fill
-                    sizes="80px"
-                    className="object-cover"
-                    priority
-                  />
-                ) : (
-                  <div
-                    className="w-full h-full flex items-center justify-center text-3xl"
-                    style={{ backgroundColor: profileAvatar?.avatarColor || '#4ECDC4' }}
-                  >
-                    {profileAvatar?.avatarEmoji || '🎮'}
-                  </div>
-                )
+              {useProfileAvatar && profileAvatar?.profilePictureUrl ? (
+                <Image
+                  src={profileAvatar.profilePictureUrl}
+                  alt={profileAvatar.displayName || 'Profile'}
+                  fill
+                  sizes="80px"
+                  className="object-cover"
+                  priority
+                />
               ) : selectedAvatar ? (
                 <Image
                   src={getAvatarPath(selectedAvatar)}
@@ -245,11 +210,11 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
           {/* Avatar Gallery Grid */}
           <div className="p-4">
             <div className="grid grid-cols-5 gap-2 max-h-64 overflow-y-auto">
-              {/* Profile Avatar Option (if available) */}
-              {hasProfileAvatar && (
+              {/* Profile Picture Option (if available) */}
+              {hasProfilePicture && (
                 <button
-                  onClick={handleSelectProfileAvatar}
-                  aria-label={t('profile.useProfileAvatar') || 'Use your profile avatar'}
+                  onClick={handleSelectProfilePicture}
+                  aria-label={t('profile.useProfileAvatar') || 'Use your profile picture'}
                   aria-pressed={useProfileAvatar}
                   className={cn(
                     'relative aspect-square rounded-xl overflow-hidden transition-all duration-150',
@@ -262,32 +227,14 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
                     isDarkMode ? 'ring-offset-slate-800' : 'ring-offset-white'
                   )}
                 >
-                  {profileAvatar?.profilePictureUrl ? (
-                    <Image
-                      src={profileAvatar.profilePictureUrl}
-                      alt={profileAvatar.displayName || 'Profile'}
-                      fill
-                      sizes="64px"
-                      className="object-cover"
-                      loading="lazy"
-                    />
-                  ) : profileAvatar?.avatarImage ? (
-                    <Image
-                      src={getAvatarPath(AVATARS.find(a => a.id === profileAvatar.avatarImage) || AVATARS[0])}
-                      alt={profileAvatar.displayName || 'Profile Avatar'}
-                      fill
-                      sizes="64px"
-                      className="object-cover"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div
-                      className="w-full h-full flex items-center justify-center text-xl"
-                      style={{ backgroundColor: profileAvatar?.avatarColor || '#4ECDC4' }}
-                    >
-                      {profileAvatar?.avatarEmoji || '🎮'}
-                    </div>
-                  )}
+                  <Image
+                    src={profileAvatar!.profilePictureUrl!}
+                    alt={profileAvatar?.displayName || 'Profile'}
+                    fill
+                    sizes="64px"
+                    className="object-cover"
+                    loading="lazy"
+                  />
                   {/* "Profile" label */}
                   <div className="absolute bottom-0 left-0 right-0 bg-neo-black/80 text-white text-[7px] font-bold text-center py-0.5">
                     {t('profile.you') || 'YOU'}
@@ -301,7 +248,7 @@ const EmojiAvatarPicker: React.FC<EmojiAvatarPickerProps> = ({
                 </button>
               )}
 
-              {/* Regular Avatars */}
+              {/* Character Avatars */}
               {AVATARS.map((avatar) => {
                 const isSelected = !useProfileAvatar && selectedAvatar?.id === avatar.id;
                 return (

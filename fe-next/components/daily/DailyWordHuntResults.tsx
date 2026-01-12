@@ -277,7 +277,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             {coinActions.targetWordRevealed ? (
               <div className="space-y-2 text-center">
                 <div className="text-sm text-gray-600 dark:text-gray-400">{t('wordHunt.results.theTargetWordWas')}</div>
-                <div className="text-3xl font-black text-neo-yellow tracking-wider">
+                <div className="text-3xl font-black text-neo-lime tracking-wider">
                   {language === 'he' ? applyHebrewFinalLetters(result.targetWord) : result.targetWord.toUpperCase()}
                 </div>
               </div>
@@ -371,21 +371,21 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       {result.solved && isAuthenticated && (
         <button
           onClick={() => setShowCreatePuzzle(true)}
-          className="w-full mt-4 p-4 bg-gradient-to-r from-neo-pink/20 via-neo-orange/20 to-neo-yellow/20 border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all cursor-pointer text-start group"
+          className="w-full mt-4 p-4 bg-gradient-to-r from-neo-pink/20 via-neo-orange/20 to-neo-lime/20 border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all cursor-pointer text-start group"
         >
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 flex-shrink-0 bg-gradient-to-br from-neo-pink to-neo-orange rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm group-hover:scale-105 transition-transform">
               <Wand2 className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-base text-white group-hover:text-neo-yellow transition-colors">
+              <h3 className="font-bold text-base text-white group-hover:text-neo-lime transition-colors">
                 {t('customPuzzle.createYourOwn') || 'Create Your Own Puzzle'}
               </h3>
               <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">
                 {t('customPuzzle.createDescription') || 'Challenge friends with your own word puzzle'}
               </p>
             </div>
-            <div className="flex-shrink-0 text-neo-pink group-hover:text-neo-yellow transition-colors">
+            <div className="flex-shrink-0 text-neo-pink group-hover:text-neo-lime transition-colors">
               <svg className="w-5 h-5 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
@@ -440,7 +440,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         {/* Screenshot protection */}
         {isProtected && (
           <div className="absolute inset-0 flex items-center justify-center z-20 bg-black/40">
-            <div className="bg-neo-black/80 text-white px-6 py-4 rounded-neo border-3 border-neo-yellow shadow-hard text-center">
+            <div className="bg-neo-black/80 text-white px-6 py-4 rounded-neo border-3 border-neo-lime shadow-hard text-center">
               <div className="text-2xl mb-2">👀</div>
               <div className="font-bold text-sm">{t('daily.screenshotProtection') || 'Click here to continue'}</div>
             </div>

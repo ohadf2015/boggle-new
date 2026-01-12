@@ -183,14 +183,13 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
                 </div>
               ) : (
                 <Avatar
-                  avatarEmoji={profile?.avatar_emoji}
-                  avatarColor={profile?.avatar_color}
+                  avatarImage={profile?.avatar_image}
                   size="lg"
                   className="border-3 border-neo-black shadow-hard-sm group-hover:border-neo-magenta transition-colors"
                 />
               )}
               {/* Edit indicator */}
-              <div className="absolute -bottom-0.5 -right-0.5 rtl:-right-auto rtl:-left-0.5 w-5 h-5 bg-neo-yellow text-neo-black border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm group-hover:scale-110 transition-transform">
+              <div className="absolute -bottom-0.5 -right-0.5 rtl:-right-auto rtl:-left-0.5 w-5 h-5 bg-neo-lime text-neo-black border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm group-hover:scale-110 transition-transform">
                 <Pencil className="w-2 h-2" />
               </div>
             </button>
@@ -217,8 +216,7 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
         currentAvatarImage={selectedAvatarId}
         profileAvatar={isAuthenticated ? {
           profilePictureUrl: profile?.profile_picture_url,
-          avatarEmoji: profile?.avatar_emoji,
-          avatarColor: profile?.avatar_color,
+          avatarImage: profile?.avatar_image,
           displayName: displayName,
         } : undefined}
       />

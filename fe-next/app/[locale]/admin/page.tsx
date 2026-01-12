@@ -54,7 +54,7 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen bg-neo-navy text-neo-white flex items-center justify-center">
         <div className="text-center">
-          <Shield className="w-16 h-16 text-neo-yellow mx-auto mb-4" />
+          <Shield className="w-16 h-16 text-neo-lime mx-auto mb-4" />
           <h1 className="text-2xl font-neo-display text-neo-white mb-2">
             {t('admin.accessRequired') || 'Admin Access Required'}
           </h1>
@@ -75,7 +75,7 @@ export default function AdminPage() {
     return (
       <div className="min-h-screen bg-neo-navy text-neo-white flex items-center justify-center">
         <div className="text-center">
-          <RefreshCw className="w-12 h-12 animate-spin text-neo-yellow mx-auto mb-4" />
+          <RefreshCw className="w-12 h-12 animate-spin text-neo-lime mx-auto mb-4" />
           <p className="text-slate-400">{t('common.loading') || 'Loading...'}</p>
         </div>
       </div>

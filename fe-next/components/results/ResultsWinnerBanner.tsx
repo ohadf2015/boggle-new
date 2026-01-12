@@ -41,16 +41,16 @@ const RANK_STYLES: Record<number, {
   trophyShadowColor: string;
 }> = {
   1: {
-    bgClass: 'bg-neo-yellow',
+    bgClass: 'bg-neo-lime',
     iconBgClass: 'bg-neo-cream',
-    iconTextClass: 'text-neo-yellow',
+    iconTextClass: 'text-neo-lime',
     messageBgClass: 'bg-neo-pink',
     messageTextClass: 'text-neo-cream',
     nameShadowColor: 'var(--neo-cyan)',
     trophyShadowColor: 'var(--neo-pink)',
   },
   2: {
-    bgClass: 'bg-gradient-to-br from-slate-300 via-slate-200 to-slate-300',
+    bgClass: 'bg-neo-navy',
     iconBgClass: 'bg-slate-100',
     iconTextClass: 'text-slate-400',
     messageBgClass: 'bg-slate-600',
@@ -257,8 +257,6 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
                   <Avatar
                     profilePictureUrl={winner.avatar.profilePictureUrl ?? undefined}
                     avatarImage={winner.avatar.avatarImage}
-                    avatarEmoji={winner.avatar.emoji}
-                    avatarColor={winner.avatar.color}
                     size="lg"
                   />
                 </motion.div>

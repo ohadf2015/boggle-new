@@ -402,7 +402,7 @@ export default function PatternSwitcher({
             >
               <Trophy className={cn(
                 'w-20 h-20 mx-auto',
-                patternsCompleted > 0 ? 'text-neo-yellow' : 'text-gray-400'
+                patternsCompleted > 0 ? 'text-neo-lime' : 'text-gray-400'
               )} />
             </motion.div>
             <motion.h2

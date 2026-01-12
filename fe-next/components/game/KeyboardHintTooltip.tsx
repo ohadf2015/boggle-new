@@ -103,7 +103,7 @@ export function KeyboardHintTooltip({
           {/* Content */}
           <div className="flex items-start gap-3 pr-6">
             {/* Icon */}
-            <div className="flex-shrink-0 w-10 h-10 bg-neo-yellow text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center">
+            <div className="flex-shrink-0 w-10 h-10 bg-neo-lime text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center">
               <Keyboard className="w-6 h-6" />
             </div>
 
@@ -141,7 +141,7 @@ export function KeyboardHintTooltip({
             onClick={handleDismiss}
             className={cn(
               'w-full mt-3 px-4 py-2',
-              'bg-neo-yellow text-neo-black',
+              'bg-neo-lime text-neo-black',
               'border-3 border-neo-black rounded-neo',
               'font-bold text-sm uppercase',
               'shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg',

@@ -186,7 +186,7 @@ describe('InGameScreen Combo Layout', () => {
 
       // ComboDisplay in compact mode should have fixed width to prevent layout shifts
       const comboContainer = screen.getByText(/Combo/).closest('div[class*="w-"]');
-      expect(comboContainer).toHaveClass('w-[80px]');
+      expect(comboContainer).toHaveClass('w-[100px]');
     });
 
     it('combo does not have negative positioning that could overlap timer', () => {

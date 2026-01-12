@@ -183,9 +183,12 @@ export function useEarthquakeFireRound(
   ]);
 
   // Trigger earthquake sequence
-  const triggerEarthquake = useCallback(() => {
-    if (earthquakeTriggeredRef.current) {
-      return;
+  const triggerEarthquake = useCallback((force = false) => {
+    // Non-force triggers: check if already triggered or in progress
+    if (!force) {
+      if (earthquakeTriggeredRef.current || earthquakeState !== 'idle') {
+        return;
+      }
     }
 
     earthquakeTriggeredRef.current = true;
@@ -202,7 +205,7 @@ export function useEarthquakeFireRound(
 
     // Single-player or non-host: Execute earthquake sequence locally
     executeEarthquakeSequence();
-  }, [mode, isHost, socket, gameSessionId, currentTimeSeconds, executeEarthquakeSequence]);
+  }, [mode, isHost, socket, gameSessionId, currentTimeSeconds, executeEarthquakeSequence, earthquakeState]);
 
   // Monitor time remaining and trigger earthquake at the right moment
   useEffect(() => {
@@ -233,7 +236,7 @@ export function useEarthquakeFireRound(
   // Force earthquake (for testing/debugging)
   const forceEarthquake = useCallback(() => {
     earthquakeTriggeredRef.current = false; // Reset flag
-    triggerEarthquake();
+    triggerEarthquake(true); // Force trigger, bypassing the guard
   }, [triggerEarthquake]);
 
   return {

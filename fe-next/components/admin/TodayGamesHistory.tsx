@@ -85,7 +85,7 @@ const LANGUAGE_FLAGS: Record<string, string> = {
 };
 
 const GAME_TYPE_ICONS: Record<string, React.ReactNode> = {
-  ranked: <Trophy className="w-4 h-4 text-neo-yellow" />,
+  ranked: <Trophy className="w-4 h-4 text-neo-lime" />,
   casual: <Gamepad2 className="w-4 h-4 text-blue-400" />,
   word_hunt: <Target className="w-4 h-4 text-green-400" />,
   daily_challenge: <Puzzle className="w-4 h-4 text-purple-400" />,
@@ -241,7 +241,7 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
   if (loading && !data) {
     return (
       <div className="flex items-center justify-center h-48">
-        <RefreshCw className="w-8 h-8 animate-spin text-neo-yellow" />
+        <RefreshCw className="w-8 h-8 animate-spin text-neo-lime" />
       </div>
     );
   }
@@ -262,7 +262,7 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
       {/* Section Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Calendar className="w-6 h-6 text-neo-yellow" />
+          <Calendar className="w-6 h-6 text-neo-lime" />
           <h2 className="text-xl font-neo-display text-neo-white">
             {t('admin.todayGames.title') || "Today's Games"}
           </h2>
@@ -284,7 +284,7 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
         <StatCard
           label={t('admin.todayGames.totalGames') || 'Total'}
           value={stats.total}
-          icon={<Gamepad2 className="w-5 h-5 text-neo-yellow" />}
+          icon={<Gamepad2 className="w-5 h-5 text-neo-lime" />}
         />
         <StatCard
           label={t('admin.todayGames.multiplayer') || 'Multiplayer'}
@@ -493,10 +493,10 @@ function SortableHeader({
         {label}
         <ArrowUpDown className={cn(
           'w-3 h-3',
-          isActive ? 'text-neo-yellow' : 'text-slate-500'
+          isActive ? 'text-neo-lime' : 'text-slate-500'
         )} />
         {isActive && (
-          <span className="text-xs text-neo-yellow">
+          <span className="text-xs text-neo-lime">
             {sortOrder === 'desc' ? '↓' : '↑'}
           </span>
         )}
@@ -543,7 +543,7 @@ function GameRow({ game, t }: { game: UnifiedGame; t: (key: string) => string })
           {game.is_guest ? (
             <User className="w-4 h-4 text-slate-400" />
           ) : game.placement === 1 ? (
-            <Crown className="w-4 h-4 text-neo-yellow" />
+            <Crown className="w-4 h-4 text-neo-lime" />
           ) : (
             <PlayerAvatar
               emoji={game.profiles?.avatar_emoji}

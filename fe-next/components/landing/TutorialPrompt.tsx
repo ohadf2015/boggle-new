@@ -46,7 +46,7 @@ const TutorialPrompt: React.FC<TutorialPromptProps> = ({
             <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 p-3 sm:p-4 pe-10 sm:pe-12">
               {/* Icon */}
               <div className="flex-shrink-0 p-2 sm:p-3 bg-white/20 rounded-neo">
-                <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-neo-yellow" />
+                <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-neo-lime" />
               </div>
 
               {/* Text content */}
@@ -69,7 +69,7 @@ const TutorialPrompt: React.FC<TutorialPromptProps> = ({
                 </button>
                 <button
                   onClick={onStartTutorial}
-                  className="flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 bg-neo-yellow text-neo-black font-bold text-xs sm:text-sm uppercase border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                  className="flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 bg-neo-lime text-neo-black font-bold text-xs sm:text-sm uppercase border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                 >
                   <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   {t('tutorialPrompt.start') || 'Start'}
@@ -78,7 +78,7 @@ const TutorialPrompt: React.FC<TutorialPromptProps> = ({
             </div>
 
             {/* Decorative accent line */}
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-neo-yellow" />
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-neo-lime" />
           </div>
         </motion.div>
       )}

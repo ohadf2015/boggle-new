@@ -190,10 +190,10 @@ export function LevelUpCelebration({
         onClick={onDismiss}
       >
         <div className="text-center">
-          <div className="w-24 h-24 mx-auto rounded-full bg-neo-yellow text-neo-black border-4 border-neo-black flex items-center justify-center mb-4">
+          <div className="w-24 h-24 mx-auto rounded-full bg-neo-lime text-neo-black border-4 border-neo-black flex items-center justify-center mb-4">
             <span className="text-4xl font-black text-neo-black">{level}</span>
           </div>
-          <h2 className="text-2xl font-black text-neo-yellow">
+          <h2 className="text-2xl font-black text-neo-lime">
             {t('levelUp.title') || 'Level Up!'}
           </h2>
           {rewards?.coins && (
@@ -224,7 +224,7 @@ export function LevelUpCelebration({
 
           {/* Flash overlay */}
           <div
-            className="level-flash absolute inset-0 bg-neo-yellow opacity-0 pointer-events-none"
+            className="level-flash absolute inset-0 bg-neo-lime opacity-0 pointer-events-none"
           />
 
           {/* Radial glow */}
@@ -249,7 +249,7 @@ export function LevelUpCelebration({
               {/* Rotating ring */}
               {!isLowEnd && (
                 <motion.div
-                  className="absolute inset-0 rounded-full border-4 border-dashed border-neo-yellow/50"
+                  className="absolute inset-0 rounded-full border-4 border-dashed border-neo-lime/50"
                   style={{ margin: -8 }}
                   animate={{ rotate: 360 }}
                   transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
@@ -285,7 +285,7 @@ export function LevelUpCelebration({
                     return (
                       <motion.div
                         key={i}
-                        className="absolute w-3 h-3 bg-neo-yellow border-2 border-neo-black"
+                        className="absolute w-3 h-3 bg-neo-lime border-2 border-neo-black"
                         style={{
                           left: '50%',
                           top: '50%',
@@ -313,7 +313,7 @@ export function LevelUpCelebration({
             </div>
 
             {/* Title */}
-            <h2 className="level-title text-3xl md:text-4xl font-black text-neo-yellow mb-2 drop-shadow-[0_4px_0_black]">
+            <h2 className="level-title text-3xl md:text-4xl font-black text-neo-lime mb-2 drop-shadow-[0_4px_0_black]">
               {t('levelUp.title') || 'Level Up!'}
             </h2>
 

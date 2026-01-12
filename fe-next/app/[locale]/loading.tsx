@@ -4,10 +4,10 @@
  */
 export default function Loading() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
+    <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
       <div className="flex items-center gap-2">
         <div
-          className="w-3 h-3 bg-neo-yellow rounded-full animate-bounce"
+          className="w-3 h-3 bg-neo-lime rounded-full animate-bounce"
           style={{ animationDelay: '0ms', animationDuration: '600ms' }}
         />
         <div

@@ -147,7 +147,7 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
-              className="w-12 h-12 rounded-neo bg-neo-yellow border-3 border-neo-black shadow-hard flex items-center justify-center"
+              className="w-12 h-12 rounded-neo bg-neo-lime border-3 border-neo-black shadow-hard flex items-center justify-center"
             >
               <span className="text-2xl">{encouragement.emoji}</span>
             </motion.div>
@@ -213,7 +213,7 @@ const NoWordsFoundView: React.FC<NoWordsFoundViewProps> = ({ isCurrentPlayer, pl
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.6 }}
-        className="mt-2 p-2 rounded-neo border-2 border-neo-black bg-neo-yellow shadow-hard-sm"
+        className="mt-2 p-2 rounded-neo border-2 border-neo-black bg-neo-lime shadow-hard-sm"
       >
         <p className="text-[10px] font-black text-neo-black text-center uppercase tracking-wide">
           💡 {t('noWords.funFact') || 'Fun fact: The average player misses 70% of possible words!'}

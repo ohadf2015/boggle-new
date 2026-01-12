@@ -68,7 +68,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               className="
                 min-h-[44px] px-2 flex items-center
                 text-sm font-bold uppercase tracking-wide
-                text-neo-cream/90 hover:text-neo-yellow
+                text-neo-cream/90 hover:text-neo-lime
                 transition-colors duration-100
                 hover:underline underline-offset-4 decoration-2
               "
@@ -81,7 +81,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               className="
                 min-h-[44px] px-2 flex items-center
                 text-sm font-bold uppercase tracking-wide
-                text-neo-cream/90 hover:text-neo-yellow
+                text-neo-cream/90 hover:text-neo-lime
                 transition-colors duration-100
                 hover:underline underline-offset-4 decoration-2
               "
@@ -110,7 +110,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               className="
                 min-h-[44px] px-2 inline-flex items-center gap-1.5
                 text-sm font-bold uppercase tracking-wide
-                text-neo-pink hover:text-neo-yellow
+                text-neo-pink hover:text-neo-lime
                 transition-colors duration-100
                 hover:underline underline-offset-4 decoration-2
                 group

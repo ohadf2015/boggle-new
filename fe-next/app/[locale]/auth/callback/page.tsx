@@ -20,7 +20,7 @@ import {
 // Loading UI component
 function LoadingUI(): React.ReactNode {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-purple-900 to-purple-950">
+    <div className="min-h-screen flex items-center justify-center bg-neo-purple">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-400 border-t-transparent mx-auto mb-4"></div>
         <p className="text-white text-lg">Completing sign in...</p>

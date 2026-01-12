@@ -264,10 +264,10 @@ const FriendsList: React.FC<FriendsListProps> = ({
       {pendingChallenges.length > 0 && (
         <div className={cn(
           'p-3 rounded-neo border-2',
-          isDark ? 'bg-neo-yellow/20 border-neo-yellow/40' : 'bg-yellow-50 border-yellow-300'
+          isDark ? 'bg-neo-lime/20 border-neo-lime/40' : 'bg-yellow-50 border-yellow-300'
         )}>
           <div className="flex items-center gap-2 mb-2">
-            <Target className="w-4 h-4 text-neo-yellow" />
+            <Target className="w-4 h-4 text-neo-lime" />
             <span className={cn('font-bold text-sm', isDark ? 'text-white' : 'text-gray-900')}>
               {language === 'he' ? 'אתגרים' : 'Challenges'}
             </span>
@@ -366,8 +366,6 @@ const FriendsList: React.FC<FriendsListProps> = ({
                   <div className="flex items-center gap-3">
                     <Avatar
                       avatarImage={user.avatarImage}
-                      avatarEmoji={user.avatarEmoji}
-                      avatarColor={user.avatarColor}
                       size="md"
                     />
                     <div>
@@ -443,8 +441,6 @@ const FriendsList: React.FC<FriendsListProps> = ({
                   <div key={req.id} className="flex items-center gap-2 text-sm">
                     <Avatar
                       avatarImage={req.fromAvatarImage}
-                      avatarEmoji={req.fromAvatarEmoji}
-                      avatarColor={req.fromAvatarColor}
                       size="sm"
                       className="w-6 h-6 text-xs"
                     />
@@ -477,8 +473,6 @@ const FriendsList: React.FC<FriendsListProps> = ({
                 <div className="flex items-center gap-3">
                   <Avatar
                     avatarImage={selectedFriend.avatarImage}
-                    avatarEmoji={selectedFriend.avatarEmoji}
-                    avatarColor={selectedFriend.avatarColor}
                     size="lg"
                   />
                   <div>
@@ -542,7 +536,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                       className={cn(
                         'flex-1 flex items-center justify-center gap-2 py-2.5 rounded-neo',
                         'border-2 border-neo-black shadow-hard-sm',
-                        'bg-neo-yellow text-neo-black font-bold'
+                        'bg-neo-lime text-neo-black font-bold'
                       )}
                     >
                       <Target className="w-4 h-4" />
@@ -609,8 +603,6 @@ const FriendRow: React.FC<FriendRowProps> = ({
       <div className="relative">
         <Avatar
           avatarImage={friend.avatarImage}
-          avatarEmoji={friend.avatarEmoji}
-          avatarColor={friend.avatarColor}
           size={compact ? 'sm' : 'md'}
         />
         <Circle
@@ -647,7 +639,7 @@ const FriendRow: React.FC<FriendRowProps> = ({
             isDark ? 'hover:bg-white/10' : 'hover:bg-gray-100'
           )}
         >
-          <Target className="w-4 h-4 text-neo-yellow" />
+          <Target className="w-4 h-4 text-neo-lime" />
         </button>
       )}
 
@@ -680,8 +672,6 @@ const RequestRow: React.FC<RequestRowProps> = ({
     )}>
       <Avatar
         avatarImage={request.fromAvatarImage}
-        avatarEmoji={request.fromAvatarEmoji}
-        avatarColor={request.fromAvatarColor}
         size="sm"
       />
       <div className="flex-1 min-w-0">
@@ -736,8 +726,6 @@ const ChallengeRow: React.FC<ChallengeRowProps> = ({
     >
       <Avatar
         avatarImage={challenge.challengerAvatarImage}
-        avatarEmoji={challenge.challengerAvatarEmoji}
-        avatarColor={challenge.challengerAvatarColor}
         size="sm"
       />
       <div className="flex-1 min-w-0">
@@ -748,7 +736,7 @@ const ChallengeRow: React.FC<ChallengeRowProps> = ({
           {challenge.message || (language === 'he' ? 'מזמין אותך לאתגר!' : 'challenges you!')}
         </p>
       </div>
-      <Target className="w-5 h-5 text-neo-yellow" />
+      <Target className="w-5 h-5 text-neo-lime" />
     </a>
   );
 };

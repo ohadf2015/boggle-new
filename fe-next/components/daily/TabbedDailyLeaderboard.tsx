@@ -138,8 +138,6 @@ const TodayParticipantRow = memo<{
           <Avatar
             profilePictureUrl={participant.profile_picture_url ?? undefined}
             avatarImage={participant.avatar_image ?? undefined}
-            avatarEmoji={participant.avatar_emoji}
-            avatarColor={participant.avatar_color}
             size="md"
             className="w-full h-full"
           />
@@ -264,8 +262,6 @@ const AllTimeParticipantRow = memo<{
           <Avatar
             profilePictureUrl={participant.profile_picture_url ?? undefined}
             avatarImage={participant.avatar_image ?? undefined}
-            avatarEmoji={participant.avatar_emoji}
-            avatarColor={participant.avatar_color}
             size="md"
             className="w-full h-full"
           />
@@ -670,7 +666,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className={`
-        bg-gradient-to-br from-white/95 to-slate-50/95 dark:from-slate-800/95 dark:to-slate-900/95
+        bg-white/95 dark:bg-neo-navy/95
         rounded-2xl border-2 border-slate-200 dark:border-slate-700
         ${compact ? 'p-3' : 'p-4 sm:p-5'}
         shadow-lg backdrop-blur-sm

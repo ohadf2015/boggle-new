@@ -396,7 +396,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
           {t('common.quit') || 'Quit'}
         </Button>
         {/* Puzzle number badge */}
-        <span className="px-2 py-0.5 bg-neo-yellow/20 text-neo-black dark:text-neo-yellow text-xs font-bold rounded-full">
+        <span className="px-2 py-0.5 bg-neo-lime/20 text-neo-black dark:text-neo-lime text-xs font-bold rounded-full">
           #{puzzleNumber}
         </span>
       </div>
@@ -508,7 +508,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         <span className="text-sm text-gray-600">
           {t('daily.wordsFound').replace('{count}', String(wordSubmission.validWordCount))}
           {wordSubmission.foundWords.filter(w => w.isValid === null).length > 0 && (
-            <span className="text-neo-yellow ml-1">
+            <span className="text-neo-lime ml-1">
               (+{wordSubmission.foundWords.filter(w => w.isValid === null).length} {t('common.pending') || 'pending'})
             </span>
           )}

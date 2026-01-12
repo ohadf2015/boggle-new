@@ -112,7 +112,7 @@ const AchievementDock = ({ achievements = [], className }: AchievementDockProps)
         transition={{ duration: 0.4, ease: 'easeInOut' }}
         className={cn(
           'relative w-14 h-14 rounded-lg flex items-center justify-center',
-          'bg-neo-yellow border-4 border-neo-black',
+          'bg-neo-lime border-4 border-neo-black',
           'shadow-hard',
           'hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg',
           'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',

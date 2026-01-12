@@ -573,12 +573,12 @@ const GridComponent = memo<GridComponentProps>(({
                         ? `${comboColors.textColor || 'text-neo-black'} ${comboColors.border} z-10 ${comboColors.shadow}`
                         : `${comboColors.bg} ${comboColors.textColor || 'text-neo-black'} border-3 ${comboColors.border} z-10 ${comboColors.shadow}`
                       : isHighlighted
-                        ? "bg-neo-yellow text-neo-black border-3 border-neo-black z-10 shadow-[0_0_20px_rgba(255,225,53,0.8),_0_0_40px_rgba(255,225,53,0.4)]"
+                        ? "bg-neo-lime text-neo-black border-3 border-neo-black z-10 shadow-[0_0_20px_rgba(255,225,53,0.8),_0_0_40px_rgba(255,225,53,0.4)]"
                         : isEliminated
                           ? "bg-gray-400/60 text-gray-500/50 border-3 border-gray-400/40 shadow-none cursor-not-allowed"
                           : "letter-tile-gradient text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed",
                     // Adjacent cell hint - subtle glow indicating valid next selection
-                    isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-2 ring-neo-yellow/70 ring-offset-1 ring-offset-neo-cream",
+                    isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-2 ring-neo-lime/70 ring-offset-1 ring-offset-neo-cream",
                     // Desktop hover on adjacent hint - stronger glow when hovering over valid next cell
                     isHovered && isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-4 ring-neo-cyan/90 ring-offset-2 scale-105 z-10",
                     // Hover on last selected cell - hint to click again to submit
@@ -790,7 +790,7 @@ const GridComponent = memo<GridComponentProps>(({
                   {/* Path order indicator for highlighted cells */}
                   {isHighlighted && highlightedOrder !== undefined && (
                     <span
-                      className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center bg-neo-black text-neo-yellow text-[10px] font-black rounded-full border-2 border-neo-yellow shadow-[0_0_8px_rgba(255,225,53,0.6)]"
+                      className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center bg-neo-black text-neo-lime text-[10px] font-black rounded-full border-2 border-neo-lime shadow-[0_0_8px_rgba(255,225,53,0.6)]"
                       aria-hidden="true"
                     >
                       {highlightedOrder}

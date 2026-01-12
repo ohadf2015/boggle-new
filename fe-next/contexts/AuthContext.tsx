@@ -34,7 +34,6 @@ import {
 import {
   fetchGeolocation,
   fetchRandomPlayerName,
-  fetchRandomGenericAvatar,
   isRefreshTokenError,
   isNetworkError,
   isRecoverableError,
@@ -228,34 +227,30 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       // Generate username and avatar: use OAuth first name if available, otherwise get a fun random name
       let username: string;
-      let avatarEmoji: string;
-      let avatarColor: string;
       let displayName: string;
 
-      // Always assign a random character avatar for new users
+      // Always assign a random character avatar for new users as fallback
       const randomAvatar = getRandomAvatar();
       const avatarImage = randomAvatar.id;
 
       if (oauthFirstName) {
-        // OAuth provided a display name - use first name with a generic avatar
-        // Generic avatars are neutral and work with any name (unlike themed player names)
+        // OAuth provided a display name - use first name
         username = oauthFirstName;
         displayName = oauthFirstName;
-        const genericAvatar = await fetchRandomGenericAvatar();
-        avatarEmoji = genericAvatar.emoji;
-        avatarColor = genericAvatar.color;
       } else {
-        // No OAuth display name - generate a fun random name with suited avatar
+        // No OAuth display name - generate a fun random name
         const randomData = await fetchRandomPlayerName();
         username = randomData.name;
         displayName = randomData.name;
-        avatarEmoji = randomData.avatar.emoji;
-        avatarColor = randomData.avatar.color;
       }
 
-      // Determine the avatar_image: use PROFILE_AVATAR_ID if we have a profile picture,
-      // otherwise use the random character avatar
+      // Determine the avatar_image:
+      // If OAuth provided a profile picture, default to using it (PROFILE_AVATAR_ID)
+      // Otherwise use the random character avatar
       const finalAvatarImage = profilePictureUrl ? '__profile_avatar__' : avatarImage;
+
+      // Get legacy emoji/color from the character avatar (for backward compatibility with DB)
+      const { emoji: avatarEmoji, color: avatarColor } = getAvatarEmojiAndColor(avatarImage);
 
       const { data: newProfile, error: createError } = await createProfile({
         id: userId,

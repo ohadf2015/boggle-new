@@ -26,6 +26,7 @@ import { linkLogRocketSession } from '@/utils/sentry';
 import { initSessionTracking } from '@/utils/sessionTracking';
 import { initConsoleOverride } from '@/utils/consoleOverride';
 import WinnerOnboardingWrapper from './components/WinnerOnboardingWrapper';
+import ProfileCustomizationWrapper from './components/ProfileCustomizationWrapper';
 
 import type { Language } from '@/shared/types/game';
 
@@ -194,6 +195,7 @@ export function Providers({ children, lang }: ProvidersProps) {
                                                 <NavigationProvider>
                                                     {children}
                                                     <WinnerOnboardingWrapper />
+                                                    <ProfileCustomizationWrapper />
                                                 </NavigationProvider>
                                             </GameProviders>
                                         </AudioProviders>

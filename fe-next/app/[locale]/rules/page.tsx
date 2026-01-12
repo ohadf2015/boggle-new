@@ -93,7 +93,7 @@ export default function RulesPage(): React.JSX.Element {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(howToPlaySchema) }}
             />
-            <div dir={dir} className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+            <div dir={dir} className="min-h-screen bg-neo-navy">
                 <Header />
 
             <main className="max-w-4xl mx-auto px-2 sm:px-6 py-3 sm:py-10 pb-24 lg:pb-10">
@@ -355,7 +355,7 @@ export default function RulesPage(): React.JSX.Element {
                                 font-bold text-sm sm:text-base
                                 border-2 sm:border-3 border-neo-black
                                 rounded-lg sm:rounded-xl shadow-hard
-                                hover:bg-neo-yellow
+                                hover:bg-neo-lime
                                 transition-colors duration-100
                             "
                         >

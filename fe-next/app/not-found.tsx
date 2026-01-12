@@ -3,7 +3,7 @@ import Link from 'next/link';
 export default function GlobalNotFound() {
   return (
     <html lang="en">
-      <body className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      <body className="bg-neo-navy">
         <div className="min-h-screen flex items-center justify-center px-4">
           <div className="text-center max-w-md">
             <div className="text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-4">

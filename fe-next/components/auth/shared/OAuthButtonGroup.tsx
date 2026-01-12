@@ -40,7 +40,7 @@ export function OAuthButtonGroup({
       id: 'discord',
       icon: DiscordIcon,
       label: 'Discord',
-      color: 'bg-[#5865F2] text-white hover:bg-[#4752C4]',
+      color: 'bg-brand-discord text-white hover:bg-brand-discord-hover',
     },
   ];
 

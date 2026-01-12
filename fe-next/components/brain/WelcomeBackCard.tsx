@@ -135,7 +135,7 @@ export default function WelcomeBackCard({
           )}
         >
           {/* Decorative top bar */}
-          <div className="h-1.5 bg-gradient-to-r from-neo-purple via-neo-cyan to-neo-yellow" />
+          <div className="h-1.5 bg-gradient-to-r from-neo-purple via-neo-cyan to-neo-lime" />
 
           <div className="p-4">
             {/* Header with dismiss button */}
@@ -147,7 +147,7 @@ export default function WelcomeBackCard({
                 >
                   <Sparkles className={cn(
                     'w-6 h-6',
-                    isDarkMode ? 'text-neo-yellow' : 'text-neo-purple'
+                    isDarkMode ? 'text-neo-lime' : 'text-neo-purple'
                   )} />
                 </motion.div>
                 <h3 className={cn(
@@ -202,10 +202,10 @@ export default function WelcomeBackCard({
               {hasPersonalBest && (
                 <div className={cn(
                   'p-2 rounded-neo border-2 border-neo-black text-center',
-                  'bg-neo-yellow/20'
+                  'bg-neo-lime/20'
                 )}>
                   <div className="flex items-center justify-center gap-1 mb-0.5">
-                    <Trophy className="w-3 h-3 text-neo-yellow" />
+                    <Trophy className="w-3 h-3 text-neo-lime" />
                     <p className={cn(
                       'text-[10px] font-bold uppercase',
                       isDarkMode ? 'text-neo-white/60' : 'text-neo-black/60'
@@ -214,7 +214,7 @@ export default function WelcomeBackCard({
                     </p>
                   </div>
                   <p className={cn(
-                    'text-xl font-black text-neo-yellow'
+                    'text-xl font-black text-neo-lime'
                   )}>
                     {personalBest}
                   </p>

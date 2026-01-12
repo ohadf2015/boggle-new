@@ -58,7 +58,7 @@ export default function ScientificTipsCarousel() {
       <div className="flex items-center gap-2">
         <Lightbulb className={cn(
           'w-5 h-5',
-          isDarkMode ? 'text-neo-yellow' : 'text-neo-orange'
+          isDarkMode ? 'text-neo-lime' : 'text-neo-orange'
         )} />
         <h2 className={cn(
           'text-lg font-bold uppercase tracking-wide',
@@ -71,7 +71,7 @@ export default function ScientificTipsCarousel() {
       <div
         className={cn(
           'relative rounded-neo border-3 border-neo-black shadow-hard overflow-hidden',
-          isDarkMode ? 'bg-gradient-to-br from-slate-800 to-slate-900' : 'bg-gradient-to-br from-neo-cream to-white'
+          isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-neo-cream to-white'
         )}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
@@ -148,7 +148,7 @@ export default function ScientificTipsCarousel() {
                   index === activeIndex
                     ? cn(
                         'scale-125 shadow-[1px_1px_0px_rgb(0,0,0)]',
-                        isDarkMode ? 'bg-neo-yellow' : 'bg-neo-purple'
+                        isDarkMode ? 'bg-neo-lime' : 'bg-neo-purple'
                       )
                     : cn(
                         'hover:scale-110',

@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useIsDesktop } from '@/hooks/useMediaQuery';
 
 interface CollapsibleSectionProps {
   title: string;
@@ -40,6 +41,7 @@ const variantStyles = {
  * Reusable Collapsible Section Component
  * Neo-Brutalist style with smooth animations
  * Supports ARIA attributes for accessibility
+ * On desktop (>=768px), sections are collapsed by default regardless of defaultExpanded prop
  */
 const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   title,
@@ -53,7 +55,12 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   headerClassName,
   contentClassName,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const isDesktop = useIsDesktop();
+
+  // On desktop, sections should be collapsed by default regardless of defaultExpanded
+  const [isExpanded, setIsExpanded] = useState(() => {
+    return isDesktop ? false : defaultExpanded;
+  });
   const styles = variantStyles[variant];
 
   const handleToggle = () => {

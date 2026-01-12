@@ -110,7 +110,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-br from-neo-yellow to-neo-orange p-6 rounded-xl border-neo-thick border-neo-black shadow-hard-lg">
+      <div className="bg-gradient-to-br from-neo-lime to-neo-orange p-6 rounded-xl border-neo-thick border-neo-black shadow-hard-lg">
         <div className="flex items-start justify-between">
           <div>
             <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-neo-black mb-2">
@@ -227,7 +227,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
       {leaderboard.length > 0 && (
         <div className="bg-neo-white border-neo-thick border-neo-black rounded-xl p-6 shadow-hard-sm">
           <h3 className="text-xl font-black uppercase mb-4 text-neo-black flex items-center gap-2">
-            <Trophy className="w-6 h-6 text-neo-yellow" strokeWidth={2.5} />
+            <Trophy className="w-6 h-6 text-neo-lime" strokeWidth={2.5} />
             {t('daily.topPerformers')}
           </h3>
           <div className="space-y-2">

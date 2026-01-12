@@ -30,7 +30,7 @@ interface MysteryRewardPopupProps {
  */
 const RARITY_STYLES = {
   common: {
-    bg: 'bg-gradient-to-br from-slate-600 to-slate-800',
+    bg: 'bg-gray-500',
     border: 'border-slate-500',
     text: 'text-slate-200',
     glow: 'shadow-[0_0_30px_rgba(100,116,139,0.5)]',
@@ -51,7 +51,7 @@ const RARITY_STYLES = {
     particle: '#3b82f6',
   },
   epic: {
-    bg: 'bg-gradient-to-br from-purple-600 to-purple-900',
+    bg: 'bg-neo-purple',
     border: 'border-purple-400',
     text: 'text-purple-200',
     glow: 'shadow-[0_0_60px_rgba(168,85,247,0.6)]',

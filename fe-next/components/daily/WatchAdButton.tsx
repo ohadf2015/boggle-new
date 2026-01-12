@@ -115,14 +115,14 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
           showSuccess
             ? "bg-gradient-to-br from-neo-lime to-emerald-500"
             : isDisabled
-              ? "bg-gradient-to-br from-slate-500 to-slate-600 cursor-not-allowed"
-              : "bg-gradient-to-br from-purple-500 to-indigo-600 hover:shadow-hard-lg",
+              ? "bg-gray-500 cursor-not-allowed"
+              : "bg-neo-purple hover:shadow-hard-lg",
           className
         )}
         onClick={!isDisabled ? showAd : undefined}
       >
         {/* Reward badge */}
-        <div className="absolute top-2 end-2 flex items-center gap-1 px-2.5 py-1 bg-neo-yellow rounded-full border-2 border-neo-black shadow-hard-sm text-neo-black">
+        <div className="absolute top-2 end-2 flex items-center gap-1 px-2.5 py-1 bg-neo-lime rounded-full border-2 border-neo-black shadow-hard-sm text-neo-black">
           <Coins className="w-4 h-4" />
           <span className="font-black text-sm">+{rewardAmount}</span>
         </div>
@@ -179,7 +179,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
             {content.icon}
             <span>{content.text}</span>
             {!showSuccess && status === 'idle' && (
-              <span className="flex items-center gap-0.5 text-neo-yellow">
+              <span className="flex items-center gap-0.5 text-neo-lime">
                 <Coins className="w-4 h-4" />
                 <span className="text-xs font-bold">+{rewardAmount}</span>
               </span>

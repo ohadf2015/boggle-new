@@ -365,7 +365,7 @@ export default function MemoryHunt({
         {/* Score */}
         <div className={cn(
           'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
-          isDarkMode ? 'bg-neo-purple text-neo-white' : 'bg-neo-yellow text-neo-black'
+          isDarkMode ? 'bg-neo-purple text-neo-white' : 'bg-neo-lime text-neo-black'
         )}>
           {score} {t('brain.drills.points')}
         </div>
@@ -466,7 +466,7 @@ export default function MemoryHunt({
                       </div>
                       <div className={cn(
                         'px-4 py-2 rounded-neo border-3 border-neo-black text-3xl font-black tabular-nums',
-                        isDarkMode ? 'bg-neo-yellow text-neo-black' : 'bg-neo-orange text-neo-black'
+                        isDarkMode ? 'bg-neo-lime text-neo-black' : 'bg-neo-orange text-neo-black'
                       )}>
                         {studyCountdown}
                       </div>
@@ -490,7 +490,7 @@ export default function MemoryHunt({
                           transition={{ delay: i * 0.1 }}
                           className={cn(
                             'flex items-center justify-between gap-3 px-4 py-3 rounded-neo border-3 border-neo-black',
-                            isDarkMode ? 'bg-neo-purple' : 'bg-neo-yellow'
+                            isDarkMode ? 'bg-neo-purple' : 'bg-neo-lime'
                           )}
                         >
                           <span className="text-2xl sm:text-3xl font-black text-neo-black tracking-wide">
@@ -673,7 +673,7 @@ export default function MemoryHunt({
             >
               <Trophy className={cn(
                 'w-20 h-20 mx-auto',
-                results.wordsFound > 0 ? 'text-neo-yellow' : 'text-gray-400'
+                results.wordsFound > 0 ? 'text-neo-lime' : 'text-gray-400'
               )} />
             </motion.div>
             <motion.h2

@@ -308,10 +308,8 @@ const TvResultsAwards = memo<TvResultsAwardsProps>(({
                 {/* Recipient */}
                 <div className="flex items-center gap-3">
                   <Avatar
-                    avatarEmoji={award.recipient.avatar?.emoji}
-                    avatarImage={award.recipient.avatar?.avatarImage}
-                    avatarColor={award.recipient.avatar?.color}
                     profilePictureUrl={award.recipient.avatar?.profilePictureUrl ?? undefined}
+                    avatarImage={award.recipient.avatar?.avatarImage}
                     size="md"
                     className="border-3 border-neo-black shadow-hard-sm"
                   />

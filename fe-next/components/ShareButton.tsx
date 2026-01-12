@@ -52,12 +52,12 @@ const ShareButton: React.FC<ShareButtonProps> = ({
   // Neo-brutalist styling - hard shadows, no glow effects
   const variantStyles: Record<ShareButtonVariant, VariantStyle> = {
     primary: {
-      base: 'bg-neo-yellow text-neo-black border-neo-black',
-      hover: 'hover:shadow-hard-md hover:-translate-y-0.5 active:shadow-hard-sm active:translate-y-0',
+      base: 'bg-neo-lime text-neo-black border-neo-black',
+      hover: 'hover:shadow-hard-md hover:-translate-y-0.5 hover:bg-neo-lime-light active:shadow-hard-sm active:translate-y-0',
     },
     whatsapp: {
-      base: 'bg-[#25D366] text-black border-neo-black',
-      hover: 'hover:shadow-hard-md hover:-translate-y-0.5 hover:bg-[#1ebe5d] active:shadow-hard-sm active:translate-y-0',
+      base: 'bg-brand-whatsapp text-black border-neo-black',
+      hover: 'hover:shadow-hard-md hover:-translate-y-0.5 hover:bg-brand-whatsapp-hover active:shadow-hard-sm active:translate-y-0',
     },
     secondary: {
       base: 'bg-neo-cyan text-neo-black border-neo-black',

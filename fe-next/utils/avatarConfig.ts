@@ -1,6 +1,6 @@
 /**
  * Avatar Configuration
- * Defines all available avatar images with their funny names
+ * Defines all available character avatar images
  */
 
 import { getAvatarColorVar } from '@/lib/designSystem';
@@ -11,8 +11,11 @@ export interface AvatarConfig {
   filename: string;
 }
 
+// Special constant for "use profile avatar" selection
+export const PROFILE_AVATAR_ID = '__profile_avatar__';
+
 /**
- * All available avatars - compressed character images
+ * All available avatars - 17 character images
  */
 export const AVATARS: AvatarConfig[] = [
   { id: 'broccoli-bob', name: 'Broccoli Bob', filename: 'broccoli-bob.png' },
@@ -62,76 +65,50 @@ export function getAvatarPath(avatar: AvatarConfig | string): string {
 }
 
 /**
- * Map avatar ID to emoji representation (for Word Hunt leaderboard compatibility)
- * Returns an emoji and color that represents the avatar
- *
- * @deprecated Prefer using getAvatarColor() from designSystem.ts for Tailwind classes
- * This function is maintained for backward compatibility with inline styles
+ * Check if an avatar ID is valid (exists in AVATARS or is PROFILE_AVATAR_ID)
  */
-export function getAvatarEmojiAndColor(avatarId: string): { emoji: string; color: string } {
-  const avatarToEmojiMap: Record<string, { emoji: string; color: string }> = {
-    'broccoli-bob': { emoji: '🥦', color: getAvatarColorVar('broccoli-bob') },
-    'drippy-drop': { emoji: '💧', color: getAvatarColorVar('drippy-drop') },
-    'sunny-steve': { emoji: '☀️', color: getAvatarColorVar('sunny-steve') },
-    'cloudy-carl': { emoji: '☁️', color: getAvatarColorVar('cloudy-carl') },
-    'octo-otto': { emoji: '🐙', color: getAvatarColorVar('octo-otto') },
-    'pizza-pete': { emoji: '🍕', color: getAvatarColorVar('pizza-pete') },
-    'prickly-pat': { emoji: '🌵', color: getAvatarColorVar('prickly-pat') },
-    'melon-molly': { emoji: '🍉', color: getAvatarColorVar('melon-molly') },
-    'avo-alex': { emoji: '🥑', color: getAvatarColorVar('avo-alex') },
-    'frosty-frank': { emoji: '❄️', color: getAvatarColorVar('frosty-frank') },
-    'flaky-fred': { emoji: '❄️', color: getAvatarColorVar('flaky-fred') },
-    'eggy-ed': { emoji: '🥚', color: getAvatarColorVar('eggy-ed') },
-    'slimy-sam': { emoji: '💚', color: getAvatarColorVar('slimy-sam') },
-    'starry-stella': { emoji: '⭐', color: getAvatarColorVar('starry-stella') },
-    'shroom-shelly': { emoji: '🍄', color: getAvatarColorVar('shroom-shelly') },
-    'donut-danny': { emoji: '🍩', color: getAvatarColorVar('donut-danny') },
-    'jelly-jen': { emoji: '🍇', color: getAvatarColorVar('jelly-jen') },
-  };
-
-  return avatarToEmojiMap[avatarId] || { emoji: '🎯', color: 'var(--avatar-1)' };
+export function isValidAvatarId(id: string): boolean {
+  return id === PROFILE_AVATAR_ID || AVATARS.some(avatar => avatar.id === id);
 }
 
 /**
- * Map emoji to avatar (for migration from emoji-based avatars)
- * Maps the most commonly used emojis to similar avatar images
+ * Get avatar ID with fallback to random if invalid
  */
-export function mapEmojiToAvatar(emoji: string): AvatarConfig {
-  const emojiMap: Record<string, string> = {
-    '🐶': 'prickly-pat',
-    '🐱': 'slimy-sam',
-    '🐭': 'starry-stella',
-    '🐹': 'sunny-steve',
-    '🐰': 'cloudy-carl',
-    '🦊': 'pizza-pete',
-    '🐻': 'broccoli-bob',
-    '🐼': 'octo-otto',
-    '🐨': 'melon-molly',
-    '🐯': 'avo-alex',
-    '🦁': 'frosty-frank',
-    '🐮': 'flaky-fred',
-    '🐷': 'eggy-ed',
-    '🐸': 'shroom-shelly',
-    '🐵': 'donut-danny',
-    '🐔': 'jelly-jen',
-    '🐧': 'drippy-drop',
-    '🐦': 'sunny-steve',
-    '🐤': 'cloudy-carl',
-    '🦆': 'melon-molly',
-    '🦅': 'starry-stella',
-    '🦉': 'broccoli-bob',
-    '🦇': 'octo-otto',
-    '🐺': 'slimy-sam',
-    '🐗': 'prickly-pat',
-    '🐴': 'pizza-pete',
-    '🦄': 'jelly-jen',
-    '🐝': 'sunny-steve',
-    '🐛': 'slimy-sam',
-    '🦋': 'jelly-jen',
-    '🐌': 'slimy-sam',
-    '🐞': 'prickly-pat',
-  };
+export function getValidAvatarId(id: string | undefined | null): string {
+  if (!id) return getRandomAvatar().id;
+  if (isValidAvatarId(id)) return id;
+  return getRandomAvatar().id;
+}
 
-  const avatarId = emojiMap[emoji] || getRandomAvatar().id;
-  return getAvatarById(avatarId) || getRandomAvatar();
+/**
+ * Avatar emoji and color mappings for leaderboard display
+ */
+const AVATAR_EMOJI_COLOR_MAP: Record<string, { emoji: string; color: string }> = {
+  'broccoli-bob': { emoji: '🥦', color: '#10b981' },
+  'drippy-drop': { emoji: '💧', color: '#3b82f6' },
+  'sunny-steve': { emoji: '☀️', color: '#f59e0b' },
+  'cloudy-carl': { emoji: '☁️', color: '#94a3b8' },
+  'octo-otto': { emoji: '🐙', color: '#8b5cf6' },
+  'pizza-pete': { emoji: '🍕', color: '#ef4444' },
+  'prickly-pat': { emoji: '🌵', color: '#22c55e' },
+  'melon-molly': { emoji: '🍉', color: '#f472b6' },
+  'avo-alex': { emoji: '🥑', color: '#84cc16' },
+  'frosty-frank': { emoji: '🧊', color: '#06b6d4' },
+  'flaky-fred': { emoji: '🥐', color: '#d97706' },
+  'eggy-ed': { emoji: '🥚', color: '#fbbf24' },
+  'slimy-sam': { emoji: '🦠', color: '#a3e635' },
+  'starry-stella': { emoji: '⭐', color: '#fcd34d' },
+  'shroom-shelly': { emoji: '🍄', color: '#dc2626' },
+  'donut-danny': { emoji: '🍩', color: '#ec4899' },
+  'jelly-jen': { emoji: '🪼', color: '#c084fc' },
+};
+
+const DEFAULT_EMOJI_COLOR = { emoji: '🎯', color: '#6366f1' };
+
+/**
+ * Get emoji and color for an avatar ID
+ * Used for leaderboard display when avatar images can't be shown
+ */
+export function getAvatarEmojiAndColor(avatarId: string): { emoji: string; color: string } {
+  return AVATAR_EMOJI_COLOR_MAP[avatarId] ?? DEFAULT_EMOJI_COLOR;
 }

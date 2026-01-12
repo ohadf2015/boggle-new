@@ -103,7 +103,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
   }, [challenge, language, handleCopyLink]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy p-4">
+    <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy p-4">
       <motion.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -120,7 +120,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
             beatCreator
               ? 'bg-gradient-to-br from-green-400 to-emerald-500'
               : isDark
-              ? 'bg-gradient-to-br from-slate-700 to-slate-800'
+              ? 'bg-gray-500'
               : 'bg-gradient-to-br from-gray-100 to-gray-200'
           )}
         >
@@ -346,7 +346,7 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
                 'font-bold uppercase rounded-neo',
                 'border-2 border-neo-black shadow-hard-sm',
                 'hover:shadow-hard-md hover:-translate-y-0.5 transition-all',
-                copied ? 'bg-neo-lime text-neo-black' : 'bg-neo-yellow text-neo-black'
+                copied ? 'bg-neo-lime text-neo-black' : 'bg-neo-lime text-neo-black'
               )}
             >
               {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}

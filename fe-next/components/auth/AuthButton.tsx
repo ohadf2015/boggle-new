@@ -214,8 +214,6 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
             <Avatar
               profilePictureUrl={profile.profile_picture_url ?? undefined}
               avatarImage={profile.avatar_image}
-              avatarEmoji={profile.avatar_emoji}
-              avatarColor={profile.avatar_color}
               size="sm"
             />
             <span className="text-neo-black truncate flex-1">
@@ -297,8 +295,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
         >
           <Avatar
             profilePictureUrl={profile.profile_picture_url ?? undefined}
-            avatarEmoji={profile.avatar_emoji}
-            avatarColor={profile.avatar_color}
+            avatarImage={profile.avatar_image}
             size="sm"
           />
           <span className="hidden sm:inline max-w-[80px] truncate font-medium">
@@ -438,12 +435,12 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                 <div className="relative">
                   <Calendar size={14} aria-hidden="true" />
                   {hasUnclaimedReward && (
-                    <div className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-2.5 h-2.5 bg-neo-yellow rounded-full border border-neo-black" />
+                    <div className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-2.5 h-2.5 bg-neo-lime rounded-full border border-neo-black" />
                   )}
                 </div>
                 <span>{t('calendar.title') || 'Daily Rewards'}</span>
                 {hasUnclaimedReward && (
-                  <Gift size={12} className="ms-auto text-neo-yellow" aria-label={t('calendar.rewardAvailable') || 'Reward available'} />
+                  <Gift size={12} className="ms-auto text-neo-lime" aria-label={t('calendar.rewardAvailable') || 'Reward available'} />
                 )}
               </Button>
 

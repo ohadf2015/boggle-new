@@ -91,10 +91,8 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
       {/* Avatar */}
       <div className="relative flex-shrink-0">
         <Avatar
-          avatarEmoji={avatar?.emoji}
-          avatarImage={avatar?.avatarImage}
-          avatarColor={avatar?.color}
           profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
+          avatarImage={avatar?.avatarImage}
           size="lg"
           className="border-2 border-neo-black"
         />

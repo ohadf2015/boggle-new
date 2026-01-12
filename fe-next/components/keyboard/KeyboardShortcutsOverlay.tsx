@@ -111,7 +111,7 @@ export function KeyboardShortcutsOverlay({
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b-4 border-neo-black bg-neo-pink text-neo-white">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-neo-yellow text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center">
+                <div className="w-10 h-10 bg-neo-lime text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center">
                   <Keyboard className="w-6 h-6" />
                 </div>
                 <h2
@@ -130,7 +130,7 @@ export function KeyboardShortcutsOverlay({
                   'bg-white/20 hover:bg-white/30',
                   'rounded-neo border-2 border-white/30',
                   'transition-colors',
-                  'focus:outline-none focus:ring-2 focus:ring-neo-yellow focus:ring-offset-2 focus:ring-offset-neo-pink'
+                  'focus:outline-none focus:ring-2 focus:ring-neo-lime focus:ring-offset-2 focus:ring-offset-neo-pink'
                 )}
                 aria-label="Close keyboard shortcuts"
               >
@@ -224,8 +224,8 @@ function ShortcutSection({ icon, title, children }: ShortcutSectionProps) {
   return (
     <div>
       <div className="flex items-center gap-2 mb-3">
-        <div className="text-neo-yellow">{icon}</div>
-        <h3 className="font-black text-sm uppercase tracking-wide text-neo-yellow">
+        <div className="text-neo-lime">{icon}</div>
+        <h3 className="font-black text-sm uppercase tracking-wide text-neo-lime">
           {title}
         </h3>
       </div>

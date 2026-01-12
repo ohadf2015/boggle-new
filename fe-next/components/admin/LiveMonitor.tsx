@@ -128,7 +128,7 @@ export function LiveMonitor({ authToken }: LiveMonitorProps) {
   if (loading && !data) {
     return (
       <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-8 h-8 animate-spin text-neo-yellow" />
+        <RefreshCw className="w-8 h-8 animate-spin text-neo-lime" />
       </div>
     );
   }
@@ -316,7 +316,7 @@ function GameCard({ game, t }: { game: LiveGame; t: (key: string) => string }) {
         </div>
         <div className="flex items-center gap-2">
           {game.isRanked && (
-            <span className="px-2 py-0.5 text-xs bg-neo-yellow text-black rounded font-bold">
+            <span className="px-2 py-0.5 text-xs bg-neo-lime text-black rounded font-bold">
               {t('admin.live.ranked') || 'Ranked'}
             </span>
           )}
@@ -331,7 +331,7 @@ function GameCard({ game, t }: { game: LiveGame; t: (key: string) => string }) {
         {game.players.map((player) => (
           <div key={player.username} className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              {player.isHost && <Crown className="w-4 h-4 text-neo-yellow" />}
+              {player.isHost && <Crown className="w-4 h-4 text-neo-lime" />}
               {player.isBot && <Bot className="w-4 h-4 text-blue-400" />}
               {!player.isHost && !player.isBot && <User className="w-4 h-4 text-slate-400" />}
               <PlayerAvatar avatar={player.avatar} size="sm" />
@@ -379,7 +379,7 @@ function PlayerRow({
     <tr className="hover:bg-slate-700/30 transition-colors">
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">
-          {player.isHost && <Crown className="w-4 h-4 text-neo-yellow" />}
+          {player.isHost && <Crown className="w-4 h-4 text-neo-lime" />}
           {player.isBot && <Bot className="w-4 h-4 text-blue-400" />}
           <PlayerAvatar avatar={player.avatar} size="sm" />
           <span className="text-sm text-neo-white">{player.username}</span>

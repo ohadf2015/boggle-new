@@ -63,13 +63,13 @@ export const SinglePlayerActions: React.FC<SinglePlayerActionsProps> = memo(({
         {onQuickRematch && (
           <motion.div className="relative">
             <motion.div
-              className="absolute -inset-0.5 rounded-neo bg-gradient-to-r from-neo-yellow via-neo-lime to-neo-yellow opacity-60 blur-[2px]"
+              className="absolute -inset-0.5 rounded-neo bg-gradient-to-r from-neo-lime via-neo-lime to-neo-lime opacity-60 blur-[2px]"
               animate={{ opacity: [0.4, 0.7, 0.4] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             />
             <Button
               size="sm"
-              className="relative w-full py-2 bg-gradient-to-r from-neo-yellow to-neo-lime hover:brightness-105 text-neo-black font-bold text-xs border-2 border-neo-black overflow-hidden"
+              className="relative w-full py-2 bg-gradient-to-r from-neo-lime to-neo-lime hover:brightness-105 text-neo-black font-bold text-xs border-2 border-neo-black overflow-hidden"
               onClick={onQuickRematch}
             >
               {t('common.rematch') || 'Rematch'}
@@ -112,7 +112,7 @@ export const SinglePlayerActions: React.FC<SinglePlayerActionsProps> = memo(({
         >
           {/* Pulsing glow behind button */}
           <motion.div
-            className="absolute -inset-1 rounded-neo-lg bg-gradient-to-r from-neo-yellow via-neo-lime to-neo-yellow opacity-75 blur-sm"
+            className="absolute -inset-1 rounded-neo-lg bg-gradient-to-r from-neo-lime via-neo-lime to-neo-lime opacity-75 blur-sm"
             animate={{
               opacity: [0.5, 0.8, 0.5],
               scale: [1, 1.02, 1]
@@ -121,7 +121,7 @@ export const SinglePlayerActions: React.FC<SinglePlayerActionsProps> = memo(({
           />
           <Button
             size="lg"
-            className="relative w-full py-5 text-xl shadow-hard-xl hover:shadow-hard-2xl border-4 border-neo-black bg-gradient-to-r from-neo-yellow via-neo-lime to-neo-yellow text-neo-black font-black uppercase tracking-wider overflow-hidden group"
+            className="relative w-full py-5 text-xl shadow-hard-xl hover:shadow-hard-2xl border-4 border-neo-black bg-gradient-to-r from-neo-lime via-neo-lime to-neo-lime text-neo-black font-black uppercase tracking-wider overflow-hidden group"
             onClick={onQuickRematch}
             style={{ textShadow: '1px 1px 0px var(--neo-cyan)' }}
           >
@@ -250,7 +250,7 @@ export const MultiplayerActions: React.FC<MultiplayerActionsProps> = memo(({
           <>
             <button
               onClick={onMarkReady}
-              className="flex-1 bg-neo-yellow text-neo-black font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
+              className="flex-1 bg-neo-lime text-neo-black font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-1"
             >
               <Star className="w-3 h-3" />
               {t('results.imReady')}
@@ -293,7 +293,7 @@ export const MultiplayerActions: React.FC<MultiplayerActionsProps> = memo(({
         ) : (
           <button
             onClick={onMarkReady}
-            className="w-full bg-neo-yellow text-neo-black font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2 transition-transform active:scale-[0.98] hover:scale-[1.01]"
+            className="w-full bg-neo-lime text-neo-black font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2 transition-transform active:scale-[0.98] hover:scale-[1.01]"
           >
             <Star className="w-6 h-6" />
             {t('results.imReady')}
@@ -493,7 +493,7 @@ const DesktopNotReadyActions: React.FC<DesktopNotReadyActionsProps> = memo(({
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: 0.2, duration: 0.4, type: 'spring' }}
-      className={cn('bg-neo-yellow text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-6 sm:p-8 relative overflow-hidden', className)}
+      className={cn('bg-neo-lime text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-xl p-6 sm:p-8 relative overflow-hidden', className)}
     >
       {/* Attention-grabbing pattern */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.08]" style={{

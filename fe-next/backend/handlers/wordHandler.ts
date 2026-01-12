@@ -4,7 +4,7 @@
  */
 
 import type { Server, Socket } from 'socket.io';
-import type { Game, LeaderboardEntry, WordDetail, Language } from '@/shared/types';
+import type { Game, LeaderboardEntry, WordDetail, Language, Avatar } from '@/shared/types';
 
 const {
   getGame,
@@ -100,7 +100,7 @@ interface Achievement {
 interface GameUserData {
   socketId?: string;
   authUserId?: string | null;
-  avatar?: { emoji: string; color: string };
+  avatar?: Avatar;
 }
 
 /**

@@ -217,9 +217,7 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
                   ) : (
                     <Avatar
                       profilePictureUrl={participant.avatar?.profilePictureUrl ?? undefined}
-                      avatarEmoji={participant.avatar?.emoji}
                       avatarImage={participant.avatar?.avatarImage}
-                      avatarColor={participant.avatar?.color}
                       size="sm"
                       className={cn('border-2 border-neo-black', compact ? 'w-8 h-8' : 'w-10 h-10')}
                     />

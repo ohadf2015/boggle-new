@@ -148,7 +148,7 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
 
   return (
     <div className={cn(
-      'bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 border-3 border-neo-black rounded-neo p-3 sm:p-4 shadow-hard space-y-3',
+      'bg-neo-navy border-3 border-neo-black rounded-neo p-3 sm:p-4 shadow-hard space-y-3',
       className
     )}>
       {/* Row 1: Core Stats + Rewards */}
@@ -181,12 +181,12 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
 
         {/* Coins - earned mode */}
         {hasCoinReward && !isTeasing && (
-          <div className="bg-neo-yellow/20 rounded-neo border-2 border-neo-yellow/40 p-2 sm:p-3 text-center">
+          <div className="bg-neo-lime/20 rounded-neo border-2 border-neo-lime/40 p-2 sm:p-3 text-center">
             <div className="flex items-center justify-center gap-1.5 mb-1">
-              <Coins className="w-5 h-5 text-neo-yellow" />
-              <span className="text-xl sm:text-2xl font-black text-neo-yellow">+{coinReward.awarded}</span>
+              <Coins className="w-5 h-5 text-neo-lime" />
+              <span className="text-xl sm:text-2xl font-black text-neo-lime">+{coinReward.awarded}</span>
             </div>
-            <div className="text-[10px] sm:text-xs text-neo-yellow/70 font-bold uppercase">
+            <div className="text-[10px] sm:text-xs text-neo-lime/70 font-bold uppercase">
               {t('reveal.coins') || 'Coins'}
             </div>
           </div>

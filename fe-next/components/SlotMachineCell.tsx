@@ -187,7 +187,7 @@ const SlotMachineCell: React.FC<SlotMachineCellProps> = memo(({
         font-black overflow-hidden
         ${/* NEO-BRUTALIST: Clean white tiles with hard shadows */ ''}
         ${isHighlighted
-          ? 'bg-neo-yellow text-neo-black border-3 border-neo-black shadow-hard'
+          ? 'bg-neo-lime text-neo-black border-3 border-neo-black shadow-hard'
           : 'letter-tile-gradient text-neo-black border-3 border-neo-black shadow-hard-sm'
         }
       `}

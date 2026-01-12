@@ -89,7 +89,7 @@ export function HelpPanel({ isOpen, onClose }: HelpPanelProps) {
               </section>
 
               {/* Scoring */}
-              <section className="bg-neo-yellow/20 text-neo-black border-2 border-neo-yellow rounded-neo p-3">
+              <section className="bg-neo-lime/20 text-neo-black border-2 border-neo-lime rounded-neo p-3">
                 <h3 className="font-black text-neo-black uppercase flex items-center gap-2 mb-2">
                   <Trophy className="w-4 h-4" />
                   {t('help.scoring') || 'Scoring'}
@@ -128,7 +128,7 @@ export function HelpPanel({ isOpen, onClose }: HelpPanelProps) {
                   {t('help.comboExplanation') || 'Find words quickly in a row to build combos! Each combo level adds bonus points to your words.'}
                 </p>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  <span className="px-2 py-1 bg-neo-yellow text-neo-black text-xs font-bold rounded-neo border border-neo-black">
+                  <span className="px-2 py-1 bg-neo-lime text-neo-black text-xs font-bold rounded-neo border border-neo-black">
                     x2 = +1
                   </span>
                   <span className="px-2 py-1 bg-neo-red text-neo-cream text-xs font-bold rounded-neo border border-neo-black">

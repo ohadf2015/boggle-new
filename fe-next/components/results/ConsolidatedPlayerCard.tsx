@@ -69,9 +69,9 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
 
   // Rank-specific styling
   const rankColors: Record<number, { bg: string; text: string }> = {
-    1: { bg: 'bg-neo-yellow', text: 'text-neo-black' },
+    1: { bg: 'bg-neo-lime', text: 'text-neo-black' },
     2: { bg: 'bg-slate-300', text: 'text-slate-800' },
-    3: { bg: 'bg-neo-yellow', text: 'text-neo-black' },
+    3: { bg: 'bg-neo-lime', text: 'text-neo-black' },
   };
   const rankStyle = rankColors[rank] || { bg: 'bg-neo-cream', text: 'text-neo-black' };
 
@@ -135,7 +135,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
       <div
         className={cn(
           'relative overflow-hidden rounded-neo-lg border-4 border-neo-black shadow-hard-lg',
-          'bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800'
+          'bg-neo-navy'
         )}
         style={{ transform: 'rotate(-0.5deg)' }}
       >
@@ -180,9 +180,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
             {player.avatar && (
               <Avatar
                 profilePictureUrl={player.avatar.profilePictureUrl}
-                avatarEmoji={player.avatar.emoji}
                 avatarImage={player.avatar.avatarImage}
-                avatarColor={player.avatar.color}
                 size="xl"
                 className="flex-shrink-0 border-2 border-neo-black w-12 h-12 sm:w-14 sm:h-14"
               />
@@ -406,7 +404,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
               <button
                 onClick={() => setShowAchievements(!showAchievements)}
                 aria-expanded={showAchievements}
-                className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border sm:border-2 border-neo-yellow/50 bg-neo-yellow/10 hover:bg-neo-yellow/20 transition-colors"
+                className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border sm:border-2 border-neo-lime/50 bg-neo-lime/10 hover:bg-neo-lime/20 transition-colors"
               >
                 <span className="flex items-center gap-1.5 sm:gap-2">
                   <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

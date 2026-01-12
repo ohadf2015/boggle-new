@@ -100,7 +100,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
       id: 'grid',
       icon: Pointer,
       title: t('howToPlay.steps.grid.title'),
-      color: 'bg-neo-yellow'
+      color: 'bg-neo-lime'
     },
     {
       id: 'scoring',
@@ -139,7 +139,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
                   transition={{ delay: index * 0.1 }}
                   className="flex gap-2 sm:gap-3 items-start"
                 >
-                  <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-neo-yellow text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
+                  <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-neo-lime text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
                     <item.icon className="text-neo-black text-sm sm:text-base" />
                   </div>
                   <div className="min-w-0">
@@ -164,7 +164,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="bg-neo-yellow border-3 border-neo-black rounded-neo p-2.5 sm:p-3 shadow-hard-md text-center"
+                className="bg-neo-lime border-3 border-neo-black rounded-neo p-2.5 sm:p-3 shadow-hard-md text-center"
               >
                 <div className="flex items-center justify-center gap-2 mb-1">
                   <Pointer className="text-lg text-neo-black animate-bounce" />
@@ -208,7 +208,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
               </motion.div>
             )}
 
-            <div className="bg-neo-yellow/30 text-neo-black rounded-neo border-2 border-neo-black p-2 sm:p-3">
+            <div className="bg-neo-lime/30 text-neo-black rounded-neo border-2 border-neo-black p-2 sm:p-3">
               <p className="text-xs sm:text-sm font-medium text-neo-black flex items-center gap-2">
                 <Lightbulb className="text-neo-red flex-shrink-0" />
                 {t('howToPlay.findWordsNote')}
@@ -235,7 +235,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
                   { letters: '5', points: 4 },
                   { letters: '7+', points: '6+' },
                 ].map((item, index) => (
-                  <div key={index} className="bg-neo-yellow text-neo-black rounded-neo border-2 border-neo-black px-3 py-1 sm:px-4 sm:py-2">
+                  <div key={index} className="bg-neo-lime text-neo-black rounded-neo border-2 border-neo-black px-3 py-1 sm:px-4 sm:py-2">
                     <span className="font-bold text-neo-black text-sm sm:text-base">
                       {item.letters} {t('howToPlay.letters')} = {item.points} {t('howToPlay.pts')}
                     </span>
@@ -352,7 +352,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           <Button
             variant="outline"
             onClick={nextStep}
-            className="bg-neo-yellow text-sm sm:text-base px-2 sm:px-4"
+            className="bg-neo-lime text-sm sm:text-base px-2 sm:px-4"
           >
             <span className="hidden xs:inline">{t('common.next') || 'Next'}</span>
             <span className="xs:hidden">{t('common.next') || 'Next'}</span>
@@ -370,7 +370,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           className="mt-4 bg-neo-pink/20 rounded-neo border-2 border-neo-black p-3"
         >
           <h4 className="font-bold text-neo-black mb-2 flex items-center gap-2 text-sm">
-            <Lightbulb className="text-neo-yellow" />
+            <Lightbulb className="text-neo-lime" />
             {t('howToPlay.tipsTitle')}
           </h4>
           <ul className="space-y-1 text-xs text-neo-black">

@@ -285,8 +285,6 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               >
                 {currentWord.submitterAvatar && (
                   <Avatar
-                    avatarEmoji={currentWord.submitterAvatar.emoji}
-                    avatarColor={currentWord.submitterAvatar.color}
                     profilePictureUrl={currentWord.submitterAvatar.profilePictureUrl}
                     size="sm"
                   />
@@ -304,7 +302,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               animate={{ scale: 1, y: 0 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 20 }}
               className="
-                bg-neo-yellow
+                bg-neo-lime
                 border-3 border-neo-black
                 rounded-neo-lg
                 shadow-hard-lg

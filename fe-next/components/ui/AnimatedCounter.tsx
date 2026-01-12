@@ -184,7 +184,7 @@ export function AnimatedCounter({
   // Variant classes
   const variantClasses = {
     default: 'text-neo-white',
-    gold: 'text-neo-yellow',
+    gold: 'text-neo-lime',
     success: 'text-neo-lime',
     danger: 'text-red-400',
   };
@@ -259,7 +259,7 @@ export function AnimatedCounterWithImpact({
       {/* Impact ring effect */}
       {showImpact && (
         <motion.div
-          className="absolute inset-0 rounded-full border-2 border-neo-yellow"
+          className="absolute inset-0 rounded-full border-2 border-neo-lime"
           initial={{ scale: 1, opacity: 0.8 }}
           animate={{ scale: 2.5, opacity: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}

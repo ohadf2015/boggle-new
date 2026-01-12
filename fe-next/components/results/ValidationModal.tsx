@@ -97,7 +97,7 @@ const ValidationModal: React.FC<ValidationModalProps> = ({
     <Dialog open={isOpen} modal>
       <DialogContent
         noDescription
-        className="bg-neo-yellow border-4 border-neo-black shadow-hard-lg p-0 max-w-sm sm:max-w-md"
+        className="bg-neo-lime border-4 border-neo-black shadow-hard-lg p-0 max-w-sm sm:max-w-md"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
         hideCloseButton

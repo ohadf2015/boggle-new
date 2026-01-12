@@ -36,7 +36,7 @@ export const CollapsibleDetails: React.FC<CollapsibleDetailsProps> = ({
         className="w-full flex items-center justify-between p-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
       >
         <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-neo-yellow" />
+          <Sparkles className="w-4 h-4 text-neo-lime" />
           <span className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
             {t('wordHunt.results.details') || 'Details & Rewards'}
           </span>

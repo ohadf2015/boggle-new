@@ -73,7 +73,7 @@ export const EffectsPreferencePrompt: React.FC<EffectsPreferencePromptProps> = (
         >
           {/* Header */}
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-neo-yellow border-2 border-neo-black flex items-center justify-center text-neo-black">
+            <div className="w-8 h-8 rounded-lg bg-neo-lime border-2 border-neo-black flex items-center justify-center text-neo-black">
               <Sparkles className="w-4 h-4" />
             </div>
             <div>

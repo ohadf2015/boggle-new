@@ -39,7 +39,7 @@ const NewYearFireworks = memo(({ active, count = 8, duration = 5000 }: NewYearFi
           id: i,
           x: 20 + Math.random() * 60, // 20-80% of screen width
           y: 20 + Math.random() * 40, // 20-60% of screen height
-          color: ['neo-yellow', 'neo-pink', 'neo-cyan', 'neo-purple', 'neo-orange'][i % 5],
+          color: ['neo-lime', 'neo-pink', 'neo-cyan', 'neo-purple'][i % 4],
           delay: (i * duration) / (count * 2), // Stagger launches
           size: 80 + Math.random() * 60, // 80-140px diameter
         }))

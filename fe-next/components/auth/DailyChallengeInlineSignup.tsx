@@ -204,20 +204,20 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
         <div className="absolute inset-0 bg-gradient-to-br from-neo-navy/95 via-slate-900/95 to-neo-navy/95 backdrop-blur-xl" />
         {/* Decorative blurred "fake" content shapes */}
         <div className="absolute top-4 left-4 right-4 h-8 bg-slate-700/30 rounded-lg blur-sm" />
-        <div className="absolute top-16 left-4 w-24 h-24 bg-neo-yellow/10 rounded-full blur-md" />
+        <div className="absolute top-16 left-4 w-24 h-24 bg-neo-lime/10 rounded-full blur-md" />
         <div className="absolute top-20 right-8 w-16 h-4 bg-slate-600/30 rounded blur-sm" />
         <div className="absolute bottom-8 left-8 right-8 h-12 bg-slate-700/20 rounded-lg blur-sm" />
       </div>
 
       {/* Main card with glass effect */}
-      <div className="relative rounded-neo border-3 border-neo-yellow/50 bg-gradient-to-b from-slate-800/90 to-slate-900/95 shadow-hard-lg p-5 backdrop-blur-sm">
+      <div className="relative rounded-neo border-3 border-neo-lime/50 bg-neo-navy/90 shadow-hard-lg p-5 backdrop-blur-sm">
         {/* Sparkle decorations */}
         <div className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2">
           <motion.div
             animate={{ rotate: 360, scale: [1, 1.2, 1] }}
             transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
           >
-            <Sparkles className="w-6 h-6 text-neo-yellow" />
+            <Sparkles className="w-6 h-6 text-neo-lime" />
           </motion.div>
         </div>
 
@@ -256,11 +256,11 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
             initial={{ opacity: 0, x: -10, scale: 0.9 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             transition={{ delay: 0.4, type: 'spring' }}
-            className="relative flex-1 bg-neo-yellow rounded-neo border-3 border-neo-black p-3 shadow-hard-sm"
+            className="relative flex-1 bg-neo-lime rounded-neo border-3 border-neo-black p-3 shadow-hard-sm"
           >
             {/* Speech bubble tail */}
             <div className="absolute left-0 rtl:left-auto rtl:right-0 top-4 -translate-x-2 rtl:translate-x-2 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 rtl:border-r-0 rtl:border-l-8 border-r-neo-black rtl:border-l-neo-black" />
-            <div className="absolute left-0 rtl:left-auto rtl:right-0 top-4 -translate-x-[5px] rtl:translate-x-[5px] w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-r-[6px] rtl:border-r-0 rtl:border-l-[6px] border-r-neo-yellow rtl:border-l-neo-yellow" />
+            <div className="absolute left-0 rtl:left-auto rtl:right-0 top-4 -translate-x-[5px] rtl:translate-x-[5px] w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-r-[6px] rtl:border-r-0 rtl:border-l-[6px] border-r-neo-lime rtl:border-l-neo-lime" />
 
             <p className="text-neo-black font-black text-sm leading-tight">
               {t(`auth.inlineSignup.${randomMessage}`) || t('auth.inlineSignup.funnyMessages.dontLeaveHanging') || "Hey! Don't leave me hanging! Sign up and let's climb that leaderboard together!"}
@@ -361,7 +361,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
               <Button
                 onClick={() => handleOAuthSignIn('discord')}
                 disabled={isAnyLoading}
-                className="w-full py-3 bg-[#5865F2] hover:bg-[#4752C4] text-white border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all font-bold flex items-center justify-center gap-2"
+                className="w-full py-3 bg-brand-discord hover:bg-brand-discord-hover text-white border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all font-bold flex items-center justify-center gap-2"
               >
                 {isLoading === 'discord' ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -485,7 +485,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                 <span className="group-hover:hidden">
                   {t('auth.inlineSignup.skipForNow') || 'Skip for now'}
                 </span>
-                <span className="hidden group-hover:inline text-neo-yellow">
+                <span className="hidden group-hover:inline text-neo-lime">
                   {t('auth.inlineSignup.skipHover') || "(Lexi will be sad, but okay...)"}
                 </span>
               </motion.button>

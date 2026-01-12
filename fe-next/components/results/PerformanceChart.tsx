@@ -104,7 +104,7 @@ const CustomDot = (props: {
           cx={cx}
           cy={cy}
           r={12}
-          fill="var(--neo-yellow)"
+          fill="var(--neo-lime)"
           opacity={0.3}
           className="animate-ping"
         />
@@ -112,7 +112,7 @@ const CustomDot = (props: {
           cx={cx}
           cy={cy}
           r={8}
-          fill="var(--neo-yellow)"
+          fill="var(--neo-lime)"
           stroke="rgb(var(--neo-black))"
           strokeWidth={3}
         />
@@ -120,7 +120,7 @@ const CustomDot = (props: {
           x={cx}
           y={cy - 16}
           textAnchor="middle"
-          fill="var(--neo-yellow)"
+          fill="var(--neo-lime)"
           className="text-xs font-black"
         >
           NOW
@@ -328,7 +328,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
         className={cn(
-          'bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800',
+          'bg-neo-navy',
           'border-4 border-neo-black rounded-neo-lg shadow-hard-lg overflow-hidden',
           className
         )}
@@ -353,8 +353,8 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
               </h3>
             </div>
             {/* Progress badge */}
-            <div className="flex items-center gap-1.5 bg-neo-yellow/20 rounded-neo px-2 py-1 border border-neo-yellow/40">
-              <span className="text-xs font-black text-neo-yellow">
+            <div className="flex items-center gap-1.5 bg-neo-lime/20 rounded-neo px-2 py-1 border border-neo-lime/40">
+              <span className="text-xs font-black text-neo-lime">
                 {gamesPlayed}/2
               </span>
             </div>
@@ -426,8 +426,8 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
             </div>
             <div className="bg-white/5 rounded-neo border border-white/10 p-2 text-center">
               <div className="flex justify-center mb-1">
-                <div className="w-5 h-5 rounded bg-neo-yellow/30 border border-neo-yellow/50 flex items-center justify-center">
-                  <Trophy className="w-3 h-3 text-neo-yellow/70" />
+                <div className="w-5 h-5 rounded bg-neo-lime/30 border border-neo-lime/50 flex items-center justify-center">
+                  <Trophy className="w-3 h-3 text-neo-lime/70" />
                 </div>
               </div>
               <div className="text-lg font-black text-white/30">{gamesPlayed}</div>
@@ -449,7 +449,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className={cn(
-        'bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800',
+        'bg-neo-navy',
         'border-4 border-neo-black rounded-neo-lg shadow-hard-lg overflow-hidden',
         className
       )}
@@ -576,7 +576,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
                 )}
                 activeDot={{
                   r: 8,
-                  fill: 'var(--neo-yellow)',
+                  fill: 'var(--neo-lime)',
                   stroke: 'rgb(var(--neo-black))',
                   strokeWidth: 3,
                 }}
@@ -619,7 +619,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
             </div>
             <div className="bg-white/10 rounded-neo border border-white/20 p-2 text-center">
               <div className="flex justify-center mb-1">
-                <div className="w-5 h-5 rounded bg-neo-yellow border border-neo-black flex items-center justify-center text-neo-black">
+                <div className="w-5 h-5 rounded bg-neo-lime border border-neo-black flex items-center justify-center text-neo-black">
                   <Trophy className="w-3 h-3" />
                 </div>
               </div>

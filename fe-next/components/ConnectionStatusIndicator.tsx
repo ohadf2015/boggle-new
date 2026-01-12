@@ -263,7 +263,7 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className })
                   className={cn(
                     'w-4 h-4 rounded-full border-2 border-neo-black',
                     status === 'reconnecting' && 'bg-neo-yellow',
-                    status === 'disconnected' && 'bg-neo-yellow',
+                    status === 'disconnected' && 'bg-neo-red',
                     status === 'connecting' && 'bg-neo-yellow'
                   )}
                 />
@@ -297,7 +297,7 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className })
               <div className="hidden sm:flex flex-1 max-w-[200px] items-center gap-2">
                 <div className="flex-1 h-2 bg-neo-black/30 rounded-full overflow-hidden">
                   <motion.div
-                    className="h-full bg-neo-yellow"
+                    className="h-full bg-neo-lime"
                     initial={{ width: 0 }}
                     animate={{ width: `${(reconnectAttempt / maxReconnectAttempts) * 100}%` }}
                     transition={{ duration: 0.3 }}
@@ -311,7 +311,7 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className })
               onClick={manualReconnect}
               className={cn(
                 'px-4 py-2 rounded-neo',
-                'bg-neo-yellow text-neo-black',
+                'bg-neo-lime text-neo-black',
                 'font-bold text-sm uppercase tracking-wide',
                 'border-2 border-neo-black shadow-hard-sm',
                 'hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]',

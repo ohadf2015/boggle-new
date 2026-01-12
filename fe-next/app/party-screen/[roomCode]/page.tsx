@@ -184,13 +184,13 @@ export default function PartyScreen() {
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-6 py-4 border-b-4 border-neo-cream/20">
         <div className="flex items-center gap-4">
-          <Monitor className="w-8 h-8 text-neo-yellow" />
+          <Monitor className="w-8 h-8 text-neo-lime" />
           <div>
             <h1 className="text-2xl font-black uppercase tracking-tight">
               {t('partyScreen.title') || 'Party Screen'}
             </h1>
             <p className="text-sm text-neo-cream/60">
-              {t('partyScreen.room') || 'Room'}: <span className="font-bold text-neo-yellow">{roomCode}</span>
+              {t('partyScreen.room') || 'Room'}: <span className="font-bold text-neo-lime">{roomCode}</span>
             </p>
           </div>
         </div>
@@ -271,7 +271,7 @@ export default function PartyScreen() {
               )}
 
               {gameState.phase === 'countdown' && (
-                <div className="text-9xl font-black text-neo-yellow animate-bounce">
+                <div className="text-9xl font-black text-neo-lime animate-bounce">
                   {gameState.timeRemaining}
                 </div>
               )}
@@ -280,10 +280,10 @@ export default function PartyScreen() {
                 <div className="space-y-6">
                   {/* Large timer */}
                   <div className="flex items-center justify-center gap-4">
-                    <Clock className="w-12 h-12 text-neo-yellow" />
+                    <Clock className="w-12 h-12 text-neo-lime" />
                     <span className={cn(
                       'text-8xl font-black',
-                      gameState.timeRemaining <= 10 ? 'text-neo-red animate-pulse' : 'text-neo-yellow'
+                      gameState.timeRemaining <= 10 ? 'text-neo-red animate-pulse' : 'text-neo-lime'
                     )}>
                       {formatTime(gameState.timeRemaining)}
                     </span>
@@ -294,8 +294,8 @@ export default function PartyScreen() {
               {gameState.phase === 'results' && (
                 <div className="space-y-6">
                   <div className="text-center">
-                    <Trophy className="w-24 h-24 text-neo-yellow mx-auto" />
-                    <p className="text-4xl font-black text-neo-yellow uppercase mt-4">
+                    <Trophy className="w-24 h-24 text-neo-lime mx-auto" />
+                    <p className="text-4xl font-black text-neo-lime uppercase mt-4">
                       {t('partyScreen.gameOver') || 'Game Over!'}
                     </p>
                   </div>
@@ -317,7 +317,7 @@ export default function PartyScreen() {
                               className="flex items-center justify-between bg-neo-cream/5 px-3 py-2 rounded-neo"
                             >
                               <span className="font-bold text-neo-cream">{event.username}</span>
-                              <span className="font-black text-neo-yellow uppercase">{event.word}</span>
+                              <span className="font-black text-neo-lime uppercase">{event.word}</span>
                               <span className="text-neo-green font-bold">+{event.score}</span>
                             </motion.div>
                           ))}
@@ -334,7 +334,7 @@ export default function PartyScreen() {
         {/* Right column: Leaderboard */}
         <div className="w-96 bg-neo-cream/5 border-2 border-neo-cream/20 rounded-neo-lg p-4 flex flex-col">
           <div className="flex items-center gap-2 mb-4">
-            <Trophy className="w-6 h-6 text-neo-yellow" />
+            <Trophy className="w-6 h-6 text-neo-lime" />
             <h2 className="text-xl font-black uppercase">{t('partyScreen.leaderboard') || 'Leaderboard'}</h2>
           </div>
 
@@ -349,7 +349,7 @@ export default function PartyScreen() {
                   exit={{ opacity: 0, x: -20 }}
                   className={cn(
                     'flex items-center gap-3 p-3 rounded-neo border-2',
-                    index === 0 ? 'bg-neo-yellow text-neo-black border-neo-black' :
+                    index === 0 ? 'bg-neo-lime text-neo-black border-neo-black' :
                     index === 1 ? 'bg-slate-300 text-neo-black border-neo-black' :
                     index === 2 ? 'bg-orange-400 text-neo-black border-neo-black' :
                     'bg-neo-cream/10 border-neo-cream/30'
@@ -383,7 +383,7 @@ export default function PartyScreen() {
                   {/* Score */}
                   <div className={cn(
                     'text-2xl font-black',
-                    index < 3 ? 'text-neo-black' : 'text-neo-yellow'
+                    index < 3 ? 'text-neo-black' : 'text-neo-lime'
                   )}>
                     {player.score}
                   </div>

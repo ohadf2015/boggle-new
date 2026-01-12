@@ -3,18 +3,12 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, TrendingUp, Medal, Users } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody } from '../ui/dialog';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getGuestStatsSummary } from '@/utils/guestManager';
 import { cn } from '@/lib/utils';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogBody,
-} from '@/components/ui/dialog';
 
 // Shared auth components
 import {
@@ -96,6 +90,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
           {/* Decorative background glow */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-gradient-to-b from-yellow-500/20 to-transparent rounded-full blur-3xl pointer-events-none" />
 
+
           {/* Trophy animation */}
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
@@ -142,14 +137,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
             transition={{ delay: 0.3 }}
             className="text-center mb-6"
           >
-            <h2
-              className={cn(
-                'text-2xl font-bold mb-2',
-                isDarkMode
-                  ? 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-orange-300 to-yellow-400'
-                  : 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-orange-500 to-yellow-600'
-              )}
-            >
+            <h2 className="text-2xl font-bold mb-2 text-neo-lime">
               {isMultiGamesVariant
                 ? t('auth.multiGames.title') || "You're Getting Good!"
                 : t('auth.firstWin.title')}

@@ -66,7 +66,7 @@ export default function ContactPage(): React.ReactNode {
     <div className={cn(
       isLandscape ? 'h-screen overflow-y-auto' : 'min-h-screen',
       isDarkMode
-        ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900'
+        ? 'bg-neo-navy'
         : 'bg-gradient-to-br from-neo-cream via-white to-neo-cream'
     )}>
       <AutoHideHeader />
@@ -203,7 +203,7 @@ export default function ContactPage(): React.ReactNode {
               </p>
               <Button
                 onClick={() => setStatus('idle')}
-                className="mt-4 rounded-neo border-3 border-neo-black bg-neo-yellow text-neo-black font-bold shadow-hard hover:shadow-hard-lg"
+                className="mt-4 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black font-bold shadow-hard hover:shadow-hard-lg"
               >
                 {t('contact.sendAnother') || 'Send Another Message'}
               </Button>
@@ -305,7 +305,7 @@ export default function ContactPage(): React.ReactNode {
                 disabled={!isValid || status === 'submitting'}
                 className={cn(
                   'w-full rounded-neo border-3 border-neo-black font-bold text-lg py-6',
-                  'bg-neo-yellow text-neo-black shadow-hard',
+                  'bg-neo-lime text-neo-black shadow-hard',
                   'hover:bg-neo-orange hover:shadow-hard-lg',
                   'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-hard',
                   'transition-all duration-150'

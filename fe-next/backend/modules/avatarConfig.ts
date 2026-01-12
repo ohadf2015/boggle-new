@@ -1,6 +1,6 @@
 /**
  * Avatar Configuration (Backend)
- * Defines all available avatar images with their funny names
+ * Defines all available character avatar images
  * This is the TypeScript version for backend use
  */
 
@@ -10,8 +10,11 @@ export interface AvatarConfig {
   filename: string;
 }
 
+// Special constant for "use profile avatar" selection
+export const PROFILE_AVATAR_ID = '__profile_avatar__';
+
 /**
- * All available avatars - compressed character images
+ * All available avatars - 17 character images
  */
 export const AVATARS: AvatarConfig[] = [
   { id: 'broccoli-bob', name: 'Broccoli Bob', filename: 'broccoli-bob.png' },
@@ -56,54 +59,28 @@ export function getAvatarPath(avatar: string | AvatarConfig): string {
 }
 
 /**
- * Map emoji to avatar (for migration from emoji-based avatars)
- * Maps the most commonly used emojis to similar avatar images
+ * Check if an avatar ID is valid (exists in AVATARS or is PROFILE_AVATAR_ID)
  */
-export function mapEmojiToAvatar(emoji: string): AvatarConfig {
-  const emojiMap: Record<string, string> = {
-    '🐶': 'prickly-pat',
-    '🐱': 'slimy-sam',
-    '🐭': 'starry-stella',
-    '🐹': 'sunny-steve',
-    '🐰': 'cloudy-carl',
-    '🦊': 'pizza-pete',
-    '🐻': 'broccoli-bob',
-    '🐼': 'octo-otto',
-    '🐨': 'melon-molly',
-    '🐯': 'avo-alex',
-    '🦁': 'frosty-frank',
-    '🐮': 'flaky-fred',
-    '🐷': 'eggy-ed',
-    '🐸': 'shroom-shelly',
-    '🐵': 'donut-danny',
-    '🐔': 'jelly-jen',
-    '🐧': 'drippy-drop',
-    '🐦': 'sunny-steve',
-    '🐤': 'cloudy-carl',
-    '🦆': 'melon-molly',
-    '🦅': 'starry-stella',
-    '🦉': 'broccoli-bob',
-    '🦇': 'octo-otto',
-    '🐺': 'slimy-sam',
-    '🐗': 'prickly-pat',
-    '🐴': 'pizza-pete',
-    '🦄': 'jelly-jen',
-    '🐝': 'sunny-steve',
-    '🐛': 'slimy-sam',
-    '🦋': 'jelly-jen',
-    '🐌': 'slimy-sam',
-    '🐞': 'prickly-pat',
-  };
+export function isValidAvatarId(id: string): boolean {
+  return id === PROFILE_AVATAR_ID || AVATARS.some(avatar => avatar.id === id);
+}
 
-  const avatarId = emojiMap[emoji] || getRandomAvatar().id;
-  return getAvatarById(avatarId) || getRandomAvatar();
+/**
+ * Get avatar ID with fallback to random if invalid
+ */
+export function getValidAvatarId(id: string | undefined | null): string {
+  if (!id) return getRandomAvatar().id;
+  if (isValidAvatarId(id)) return id;
+  return getRandomAvatar().id;
 }
 
 // CommonJS exports for backward compatibility
 module.exports = {
   AVATARS,
+  PROFILE_AVATAR_ID,
   getAvatarById,
   getRandomAvatar,
   getAvatarPath,
-  mapEmojiToAvatar,
+  isValidAvatarId,
+  getValidAvatarId,
 };

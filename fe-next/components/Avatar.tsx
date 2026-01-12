@@ -2,11 +2,11 @@
 
 import { useState, useEffect, memo } from 'react';
 import Image from 'next/image';
-import { Bot } from 'lucide-react';
-import { getAvatarPath, mapEmojiToAvatar } from '@/utils/avatarConfig';
+import { User } from 'lucide-react';
+import { getAvatarPath, getRandomAvatar, AVATARS } from '@/utils/avatarConfig';
 
-// Special constant for "use profile avatar" selection - indicates profile picture/emoji should be used
-const PROFILE_AVATAR_ID = '__profile_avatar__';
+// Special constant for "use profile avatar" selection - indicates profile picture should be used
+export const PROFILE_AVATAR_ID = '__profile_avatar__';
 
 /**
  * Avatar size type
@@ -18,7 +18,7 @@ type AvatarSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
  */
 interface SizeConfig {
   container: string;
-  text: string;
+  icon: string;
   px: number;
 }
 
@@ -26,10 +26,8 @@ interface SizeConfig {
  * Avatar Props
  */
 interface AvatarProps {
-  profilePictureUrl?: string;
-  avatarEmoji?: string;
-  avatarImage?: string; // New: Avatar image filename or ID
-  avatarColor?: string; // Deprecated: kept for backward compatibility
+  profilePictureUrl?: string | null;
+  avatarImage?: string; // Avatar image ID (e.g., 'broccoli-bob') or PROFILE_AVATAR_ID
   size?: AvatarSize;
   className?: string;
 }
@@ -38,22 +36,21 @@ interface AvatarProps {
  * Size configuration map
  */
 const SIZE_CONFIG: Record<AvatarSize, SizeConfig> = {
-  sm: { container: 'w-6 h-6', text: 'text-sm', px: 24 },
-  md: { container: 'w-8 h-8', text: 'text-base', px: 32 },
-  lg: { container: 'w-12 h-12', text: 'text-2xl', px: 48 },
-  xl: { container: 'w-20 h-20', text: 'text-5xl', px: 80 },
-  '2xl': { container: 'w-28 h-28', text: 'text-6xl', px: 112 }
+  sm: { container: 'w-6 h-6', icon: 'w-4 h-4', px: 24 },
+  md: { container: 'w-8 h-8', icon: 'w-5 h-5', px: 32 },
+  lg: { container: 'w-12 h-12', icon: 'w-8 h-8', px: 48 },
+  xl: { container: 'w-20 h-20', icon: 'w-12 h-12', px: 80 },
+  '2xl': { container: 'w-28 h-28', icon: 'w-16 h-16', px: 112 }
 };
 
 /**
- * Unified Avatar Component - Displays profile pictures or image avatar fallback
+ * Unified Avatar Component - Displays profile pictures or character avatar images
+ * No emoji fallback - only supports custom character avatars or profile pictures
  * Memoized to prevent unnecessary re-renders in lists
  */
 const Avatar = memo<AvatarProps>(({
   profilePictureUrl,
-  avatarEmoji,
   avatarImage,
-  avatarColor,
   size = 'md',
   className = ''
 }) => {
@@ -67,8 +64,12 @@ const Avatar = memo<AvatarProps>(({
     setAvatarError(false);
   }, [profilePictureUrl, avatarImage]);
 
-  // 1. Show profile picture if available and hasn't errored
-  if (profilePictureUrl && !imageError) {
+  // 1. Show profile picture if available and using PROFILE_AVATAR_ID or explicitly provided
+  const shouldShowProfilePicture = profilePictureUrl &&
+    (avatarImage === PROFILE_AVATAR_ID || !avatarImage) &&
+    !imageError;
+
+  if (shouldShowProfilePicture) {
     return (
       <div
         className={`relative rounded-full overflow-hidden flex-shrink-0 ${config.container} ${className}`}
@@ -88,26 +89,21 @@ const Avatar = memo<AvatarProps>(({
     );
   }
 
-  // 2. Show avatar image if provided (either directly or via emoji migration)
-  // Skip if avatarImage is PROFILE_AVATAR_ID - that means use profile picture/emoji fallback
-  let avatarPath: string | undefined;
+  // 2. Show character avatar image if provided and valid
+  if (avatarImage && avatarImage !== PROFILE_AVATAR_ID && !avatarError) {
+    // Check if it's a valid avatar ID
+    const isValidAvatar = AVATARS.some(a => a.id === avatarImage);
+    const avatarPath = avatarImage.includes('/') ? avatarImage : getAvatarPath(avatarImage);
 
-  if (avatarImage && avatarImage !== PROFILE_AVATAR_ID) {
-    // Direct avatar image provided (not the special profile marker)
-    avatarPath = avatarImage.includes('/') ? avatarImage : getAvatarPath(avatarImage);
-  } else if (avatarEmoji) {
-    // Legacy emoji avatar - map to image avatar
-    const mappedAvatar = mapEmojiToAvatar(avatarEmoji);
-    avatarPath = getAvatarPath(mappedAvatar);
-  }
+    // If avatar ID is invalid, use a random one
+    const finalPath = isValidAvatar ? avatarPath : getAvatarPath(getRandomAvatar());
 
-  if (avatarPath && !avatarError) {
     return (
       <div
         className={`relative rounded-full overflow-hidden flex-shrink-0 ${config.container} ${className}`}
       >
         <Image
-          src={avatarPath}
+          src={finalPath}
           alt="Avatar"
           fill
           sizes={`(max-width: 768px) ${config.px}px, ${config.px}px`}
@@ -120,18 +116,32 @@ const Avatar = memo<AvatarProps>(({
     );
   }
 
-  // 3. Fallback to emoji if all else fails (backward compatibility)
-  // Special case: show FaRobot icon for robot emoji to maintain flat icon consistency
-  const isRobotEmoji = avatarEmoji === '🤖';
-  const fallbackEmoji = avatarEmoji || '🐶';
-  const fallbackColor = avatarColor || '#4ECDC4';
+  // 3. Fallback: Show default avatar (first in the list)
+  // This handles cases where avatarImage is PROFILE_AVATAR_ID but no profile picture exists
+  const fallbackAvatar = AVATARS[0];
 
   return (
     <div
-      className={`rounded-full flex items-center justify-center flex-shrink-0 ${config.container} ${config.text} ${className}`}
-      style={{ backgroundColor: fallbackColor }}
+      className={`relative rounded-full overflow-hidden flex-shrink-0 ${config.container} ${className}`}
     >
-      {isRobotEmoji ? <Bot className="text-neo-cream" style={{ fontSize: '0.7em' }} /> : fallbackEmoji}
+      <Image
+        src={getAvatarPath(fallbackAvatar)}
+        alt="Avatar"
+        fill
+        sizes={`(max-width: 768px) ${config.px}px, ${config.px}px`}
+        className="object-cover"
+        onError={() => {
+          // If even fallback fails, show a generic user icon
+          setAvatarError(true);
+        }}
+        loading="lazy"
+        priority={false}
+      />
+      {avatarError && (
+        <div className="absolute inset-0 bg-neo-navy/80 flex items-center justify-center" data-testid="avatar-fallback-icon">
+          <User className={`${config.icon} text-neo-cyan`} />
+        </div>
+      )}
     </div>
   );
 });

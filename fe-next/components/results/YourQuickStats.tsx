@@ -49,9 +49,9 @@ const YourQuickStats = memo<YourQuickStatsProps>(({
 
   // Rank-specific styling
   const rankColors: Record<number, { bg: string; text: string; border: string }> = {
-    1: { bg: 'bg-neo-yellow', text: 'text-neo-black', border: 'border-neo-black' },
+    1: { bg: 'bg-neo-lime', text: 'text-neo-black', border: 'border-neo-black' },
     2: { bg: 'bg-slate-300', text: 'text-slate-800', border: 'border-neo-black' },
-    3: { bg: 'bg-neo-yellow', text: 'text-neo-black', border: 'border-neo-black' },
+    3: { bg: 'bg-neo-lime', text: 'text-neo-black', border: 'border-neo-black' },
   };
 
   const rankStyle = rankColors[rank] || { bg: 'bg-neo-cream', text: 'text-neo-black', border: 'border-neo-black' };
@@ -66,7 +66,7 @@ const YourQuickStats = memo<YourQuickStatsProps>(({
       <div
         className={cn(
           'relative overflow-hidden rounded-neo border-3 border-neo-black shadow-hard',
-          'bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800'
+          'bg-neo-navy'
         )}
         style={{ transform: 'rotate(-0.5deg)' }}
       >

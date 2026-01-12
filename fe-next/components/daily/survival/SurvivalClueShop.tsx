@@ -121,7 +121,7 @@ const ShopItem: React.FC<ShopItemProps> = ({
         className={cn(
           "w-full flex items-center justify-between p-2 rounded-neo border-2 transition-all text-left",
           canAfford
-            ? "bg-neo-yellow hover:shadow-hard border-neo-black"
+            ? "bg-neo-lime hover:shadow-hard border-neo-black"
             : "border-gray-300 bg-gray-100 opacity-50 cursor-not-allowed"
         )}
       >
@@ -144,7 +144,7 @@ const ShopItem: React.FC<ShopItemProps> = ({
       className={cn(
         "w-full p-3 rounded-neo border-2 border-neo-black text-left transition-all",
         canAfford
-          ? "bg-neo-yellow hover:shadow-hard cursor-pointer"
+          ? "bg-neo-lime hover:shadow-hard cursor-pointer"
           : "bg-gray-200 opacity-50 cursor-not-allowed"
       )}
     >

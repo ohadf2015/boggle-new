@@ -134,7 +134,7 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
         'rounded-neo border-4 border-neo-black shadow-hard-lg p-4 sm:p-6',
         'relative overflow-hidden',
         isDarkMode
-          ? 'bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800'
+          ? 'bg-neo-navy'
           : 'bg-gradient-to-br from-white via-gray-50 to-white'
       )}
     >

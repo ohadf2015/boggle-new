@@ -27,7 +27,7 @@ const TIER_CONFIG: Record<BrainTier, {
   intermediate: { color: 'text-neo-cyan', bgGradient: 'from-cyan-500 to-cyan-600', emoji: '⚡', icon: TrendingUp },
   advanced: { color: 'text-neo-purple', bgGradient: 'from-purple-500 to-purple-600', emoji: '🔥', icon: TrendingUp },
   expert: { color: 'text-neo-orange', bgGradient: 'from-orange-500 to-orange-600', emoji: '🏆', icon: Crown },
-  master: { color: 'text-neo-yellow', bgGradient: 'from-yellow-400 to-amber-500', emoji: '👑', icon: Crown },
+  master: { color: 'text-neo-lime', bgGradient: 'from-yellow-400 to-amber-500', emoji: '👑', icon: Crown },
 };
 
 const TIER_ORDER: BrainTier[] = ['novice', 'apprentice', 'intermediate', 'advanced', 'expert', 'master'];

@@ -35,7 +35,7 @@ const RARITY_COLORS = {
   common: 'bg-gray-400',
   uncommon: 'bg-neo-green',
   rare: 'bg-neo-purple',
-  legendary: 'bg-neo-yellow',
+  legendary: 'bg-neo-lime',
 };
 
 const RARITY_POINTS = {
@@ -452,7 +452,7 @@ export default function RareGems({
             >
               <Trophy className={cn(
                 'w-20 h-20 mx-auto',
-                rareWordsFound >= levelConfig.targetRare ? 'text-neo-yellow' : 'text-gray-400'
+                rareWordsFound >= levelConfig.targetRare ? 'text-neo-lime' : 'text-gray-400'
               )} />
             </motion.div>
             <motion.h2

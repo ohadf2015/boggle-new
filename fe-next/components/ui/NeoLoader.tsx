@@ -9,15 +9,15 @@ const LEXI_LETTERS = ['L', 'E', 'X', 'I', 'C', 'L', 'A', 'S', 'H'];
 
 // Color variants for letters
 const LETTER_COLORS = [
-  'bg-neo-yellow',
+  'bg-neo-lime',
   'bg-neo-cyan',
   'bg-neo-pink',
-  'bg-neo-yellow',
+  'bg-neo-lime',
   'bg-neo-cyan',
   'bg-neo-pink',
-  'bg-neo-yellow',
+  'bg-neo-lime',
   'bg-neo-cyan',
-  'bg-neo-yellow',
+  'bg-neo-lime',
 ];
 
 interface NeoLoaderProps {
@@ -54,7 +54,7 @@ export const NeoLoader = memo(function NeoLoader({
     return (
       <div className="flex flex-col items-center justify-center">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-neo-yellow rounded-full animate-pulse" />
+          <div className="w-3 h-3 bg-neo-lime rounded-full animate-pulse" />
           <div className="w-3 h-3 bg-neo-cyan rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
           <div className="w-3 h-3 bg-neo-pink rounded-full animate-pulse" style={{ animationDelay: '0.4s' }} />
         </div>

@@ -4,7 +4,6 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Pointer, Star, Zap, Play, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { cn } from '@/lib/utils';
 
 interface QuickTipsStepProps {
   selectedMode: 'single' | 'multi' | 'daily' | null;
@@ -135,9 +134,9 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="bg-neo-yellow/30 border-2 border-neo-black/20 rounded-neo px-4 py-2"
+        className="bg-neo-lime/30 border-2 border-neo-black/20 rounded-neo px-4 py-2"
       >
-        <p className="text-center font-bold text-xs text-neo-black/70">
+        <p className="text-center font-bold text-xs text-neo-black dark:text-neo-white">
           {t('onboarding.training.hint') || 'More game modes will unlock as you play!'}
         </p>
       </motion.div>

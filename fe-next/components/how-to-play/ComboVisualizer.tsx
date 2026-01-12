@@ -29,7 +29,7 @@ export const ComboVisualizer: React.FC<ComboVisualizerProps> = ({ t }) => {
     { level: '0', multiplier: '1.0x', color: 'bg-gray-400', bonus: t('howToPlay.combo.noBonus') },
     { level: '1-2', multiplier: '+1-2', color: 'bg-neo-cyan', bonus: '+1-2' },
     { level: '3-4', multiplier: '+3-4', color: 'bg-neo-lime', bonus: '+3-4' },
-    { level: '5-6', multiplier: '+5-6', color: 'bg-neo-yellow text-neo-black', bonus: '+5-6' },
+    { level: '5-6', multiplier: '+5-6', color: 'bg-neo-lime text-neo-black', bonus: '+5-6' },
     { level: '7-8', multiplier: '+7-8', color: 'bg-neo-red', bonus: '+7-8' },
     { level: '9+', multiplier: '+10', color: 'bg-neo-pink', bonus: '+10 max' },
   ];
@@ -128,7 +128,7 @@ export const ComboVisualizer: React.FC<ComboVisualizerProps> = ({ t }) => {
         variant="outline"
         onClick={simulateCombo}
         disabled={isAnimating}
-        className="w-full bg-neo-yellow hover:bg-neo-red"
+        className="w-full bg-neo-lime hover:bg-neo-red"
       >
         <Zap className="mr-2 h-4 w-4" />
         {isAnimating ? t('howToPlay.combo.building') : t('howToPlay.combo.tryIt')}

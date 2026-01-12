@@ -71,9 +71,7 @@ export const PlayersListPanel = memo<PlayersListPanelProps>(({
                   <div className="flex items-center gap-2.5">
                     <Avatar
                       profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
-                      avatarEmoji={avatar?.emoji}
                       avatarImage={avatar?.avatarImage}
-                      avatarColor={avatar?.color}
                       size="lg"
                     />
                     <span className="font-medium text-neo-cream/90">
