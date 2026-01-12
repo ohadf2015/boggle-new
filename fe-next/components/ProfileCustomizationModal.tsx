@@ -7,7 +7,6 @@ import { Check, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useTheme } from '@/utils/ThemeContext';
 import { AVATARS, getAvatarPath, getAvatarById, getRandomAvatar } from '@/utils/avatarConfig';
 import { cn } from '@/lib/utils';
 import { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
@@ -32,8 +31,6 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
   onSave,
 }) => {
   const { t, dir } = useLanguage();
-  const { theme } = useTheme();
-  const isDarkMode = theme === 'dark';
 
   // Pre-select profile picture if available, otherwise random avatar
   const [selectedAvatarId, setSelectedAvatarId] = useState<string>(() =>
@@ -122,7 +119,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
             <label className="block text-xs font-bold uppercase text-slate-600 dark:text-slate-400 mb-2">
               {t('profileCustomization.avatarLabel') || 'Pick your character'}
             </label>
-            <div className="grid grid-cols-6 gap-1.5 sm:gap-2">
+            <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 sm:gap-2">
               {/* Profile Picture Option (if available) */}
               {profilePictureUrl && (
                 <motion.button
@@ -130,7 +127,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                   className={cn(
                     'relative aspect-square rounded-neo border-2 overflow-hidden',
                     'transition-all hover:scale-105 active:scale-95',
-                    'min-h-[40px] min-w-[40px]',
+                    'min-h-[48px] min-w-[48px] sm:min-h-[40px] sm:min-w-[40px]',
                     isUsingProfilePicture
                       ? 'border-neo-cyan shadow-hard-sm scale-105 ring-2 ring-neo-pink'
                       : 'border-neo-black shadow-hard-sm hover:shadow-hard-md'
@@ -180,7 +177,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                     className={cn(
                       'relative aspect-square rounded-neo border-2 overflow-hidden',
                       'transition-all hover:scale-105 active:scale-95',
-                      'min-h-[40px] min-w-[40px]',
+                      'min-h-[48px] min-w-[48px] sm:min-h-[40px] sm:min-w-[40px]',
                       isSelected
                         ? 'border-neo-cyan shadow-hard-sm scale-105 ring-2 ring-neo-pink'
                         : 'border-neo-black shadow-hard-sm hover:shadow-hard-md'
@@ -221,7 +218,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
             <div className="flex items-start gap-3">
               {/* Avatar preview */}
               <div className="flex flex-col items-center gap-1 shrink-0">
-                <div className="relative w-14 h-14 rounded-full overflow-hidden border-3 border-neo-black dark:border-slate-500 shadow-hard-sm">
+                <div className="relative w-16 h-16 sm:w-14 sm:h-14 rounded-full overflow-hidden border-3 border-neo-black dark:border-slate-500 shadow-hard-sm">
                   {isUsingProfilePicture && profilePictureUrl ? (
                     <Image
                       src={profilePictureUrl}

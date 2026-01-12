@@ -3,7 +3,7 @@
 import { useState, useEffect, memo } from 'react';
 import Image from 'next/image';
 import { User } from 'lucide-react';
-import { getAvatarPath, getRandomAvatar, AVATARS } from '@/utils/avatarConfig';
+import { getAvatarPath, AVATARS } from '@/utils/avatarConfig';
 
 // Special constant for "use profile avatar" selection - indicates profile picture should be used
 export const PROFILE_AVATAR_ID = '__profile_avatar__';
@@ -95,8 +95,8 @@ const Avatar = memo<AvatarProps>(({
     const isValidAvatar = AVATARS.some(a => a.id === avatarImage);
     const avatarPath = avatarImage.includes('/') ? avatarImage : getAvatarPath(avatarImage);
 
-    // If avatar ID is invalid, use a random one
-    const finalPath = isValidAvatar ? avatarPath : getAvatarPath(getRandomAvatar());
+    // If avatar ID is invalid, use the first avatar as consistent fallback
+    const finalPath = isValidAvatar ? avatarPath : getAvatarPath(AVATARS[0]);
 
     return (
       <div

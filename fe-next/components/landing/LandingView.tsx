@@ -419,7 +419,7 @@ const LandingView: React.FC = () => {
               <ModeCard
                 title={t('landing.brainDrills') || 'Quick Drills'}
                 description={t('landing.brainDrillsDesc') || 'Focused mini-games'}
-                href={`/${language}/brain#drills`}
+                href={`/${language}/brain`}
                 icon={<Target className="w-5 h-5" />}
                 variant="orange"
                 secondary
