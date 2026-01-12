@@ -441,8 +441,8 @@ const LandingView: React.FC = () => {
         ) : (
           /* Desktop: Centered grid layout with visual hierarchy */
           <div className="w-full animate-fade-in-fast flex flex-col items-center justify-center gap-4 sm:gap-5 lg:gap-6">
-            {/* Primary cards - 2 columns for main modes */}
-            <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 lg:gap-6">
+            {/* Primary cards - 2 columns max for main modes */}
+            <div className="w-full max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 lg:gap-6 justify-items-center">
               <ModeCard
                 title={t('landing.multiplayer') || 'Multiplayer'}
                 description={t('landing.multiplayerDesc') || 'Compete with friends in real-time!'}
@@ -466,7 +466,7 @@ const LandingView: React.FC = () => {
             </div>
 
             {/* Secondary card - Brain Training centered below */}
-            <div className="w-full max-w-2xl mx-auto">
+            <div className="w-full max-w-4xl mx-auto grid justify-items-center">
               <ModeCard
                 title={t('landing.brainTraining') || 'Brain Training'}
                 description={t('landing.brainTrainingDesc') || 'Track cognitive growth'}

@@ -251,7 +251,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
                 <div className="flex-1">
                   <div className="font-bold text-neo-black">{entry.display_name}</div>
                   <div className="text-xs text-slate-600">
-                    {entry.attempts_used} {t('daily.attempts')} • {entry.efficiency_score} {t('daily.points')}
+                    {entry.attempts_used} {t('daily.attempts')} • {Math.round(entry.efficiency_score)} {t('daily.points')}
                   </div>
                 </div>
               </motion.div>

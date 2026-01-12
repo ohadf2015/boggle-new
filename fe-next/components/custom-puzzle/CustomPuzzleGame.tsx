@@ -7,6 +7,7 @@ import { getGuestFingerprint } from '@/utils/dailyChallenge';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Share2, Trophy, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 import Link from 'next/link';
 import DailyWordHuntSurvival from '@/components/daily/DailyWordHuntSurvival';
 import type { SurvivalGameResult } from '@/components/daily/survival';
@@ -261,6 +262,17 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
             animate={{ opacity: 1, scale: 1 }}
             className="max-w-md w-full bg-white dark:bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard p-6"
           >
+            {/* Mascot - Celebration or encouragement based on result */}
+            <div className="flex justify-center mb-4">
+              <InteractiveMascot
+                variant={gameResult.solved ? 'holding_trophy' : 'encouraging'}
+                size="lg"
+                animated
+                enableHover
+                enableClick
+              />
+            </div>
+
             {/* Result Header */}
             <div className="text-center mb-6">
               <h2 className="text-2xl font-bold mb-2">
