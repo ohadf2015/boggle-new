@@ -20,39 +20,55 @@ import {
 } from '../dialog';
 
 // Mock Radix UI Dialog primitives
-jest.mock('@radix-ui/react-dialog', () => ({
-  Root: ({ children, open }: { children: React.ReactNode; open?: boolean }) =>
-    open ? <div data-testid="dialog-root">{children}</div> : null,
-  Trigger: ({ children }: { children: React.ReactNode }) => <button>{children}</button>,
-  Portal: ({ children }: { children: React.ReactNode }) => <div data-testid="dialog-portal">{children}</div>,
-  Overlay: React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+jest.mock('@radix-ui/react-dialog', () => {
+  const React = require('react');
+
+  const MockOverlay = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
     ({ className, ...props }, ref) => (
       <div ref={ref} className={className} data-testid="dialog-overlay" {...props} />
     )
-  ),
-  Content: React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  );
+  MockOverlay.displayName = 'MockOverlay';
+
+  const MockContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
     ({ className, children, ...props }, ref) => (
       <div ref={ref} className={className} data-testid="dialog-content" {...props}>
         {children}
       </div>
     )
-  ),
-  Title: React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
+  );
+  MockContent.displayName = 'MockContent';
+
+  const MockTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
     ({ className, children, ...props }, ref) => (
       <h2 ref={ref} className={className} data-testid="dialog-title" {...props}>
         {children}
       </h2>
     )
-  ),
-  Description: React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
+  );
+  MockTitle.displayName = 'MockTitle';
+
+  const MockDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
     ({ className, children, ...props }, ref) => (
       <p ref={ref} className={className} data-testid="dialog-description" {...props}>
         {children}
       </p>
     )
-  ),
-  Close: ({ children }: { children: React.ReactNode }) => <button data-testid="dialog-close">{children}</button>,
-}));
+  );
+  MockDescription.displayName = 'MockDescription';
+
+  return {
+    Root: ({ children, open }: { children: React.ReactNode; open?: boolean }) =>
+      open ? <div data-testid="dialog-root">{children}</div> : null,
+    Trigger: ({ children }: { children: React.ReactNode }) => <button>{children}</button>,
+    Portal: ({ children }: { children: React.ReactNode }) => <div data-testid="dialog-portal">{children}</div>,
+    Overlay: MockOverlay,
+    Content: MockContent,
+    Title: MockTitle,
+    Description: MockDescription,
+    Close: ({ children }: { children: React.ReactNode }) => <button data-testid="dialog-close">{children}</button>,
+  };
+});
 
 describe('Dialog Component', () => {
   describe('DialogHeader Variants', () => {
