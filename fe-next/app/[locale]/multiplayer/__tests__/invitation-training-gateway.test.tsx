@@ -72,9 +72,8 @@ jest.mock('@/utils/trainingProgressStorage', () => ({
 }));
 
 // Mock TrainingGatewayModal
-const MockTrainingGatewayModal = jest.fn(() => null);
 jest.mock('@/components/training', () => ({
-  TrainingGatewayModal: MockTrainingGatewayModal,
+  TrainingGatewayModal: jest.fn(() => null),
 }));
 
 // Mock other components
@@ -102,6 +101,9 @@ jest.mock('@/components/SpectatorBanner', () => ({
 }));
 
 describe('TrainingGatewayModal - Invitation Join Behavior', () => {
+  // Import the mocked component inside the describe block
+  const { TrainingGatewayModal: MockTrainingGatewayModal } = jest.requireMock('@/components/training');
+
   const mockRouter = {
     push: jest.fn(),
     replace: jest.fn(),
