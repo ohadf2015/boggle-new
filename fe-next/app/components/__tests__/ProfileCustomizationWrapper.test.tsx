@@ -240,7 +240,7 @@ describe('Integration: Profile Customization Flow', () => {
       username: 'SunnyPlayer',
       avatar_image: 'sunny-steve',
       avatar_emoji: '☀️',
-      avatar_color: '#f59e0b',
+      avatar_color: 'var(--avatar-9)', // Using CSS variable from design system
       has_customized_profile: true,
     });
   });

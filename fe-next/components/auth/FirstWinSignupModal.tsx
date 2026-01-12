@@ -74,8 +74,8 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
         className={cn(
           'max-w-md max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl',
           isDarkMode
-            ? 'bg-gradient-to-b from-slate-800 via-slate-800 to-slate-900 border border-yellow-500/30'
-            : 'bg-gradient-to-b from-white via-white to-gray-50 border border-yellow-400/50'
+            ? 'bg-neo-navy border border-yellow-500/30'
+            : 'bg-white border border-yellow-400/50'
         )}
       >
         <DialogHeader variant="gradient" customBg="bg-transparent" className="border-b-0 p-0">

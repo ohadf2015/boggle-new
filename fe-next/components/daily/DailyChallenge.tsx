@@ -707,7 +707,7 @@ const DailyChallenge: React.FC = () => {
   // Render based on phase
   return (
     <div
-      className="flex flex-col min-h-full bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-transparent dark:via-neo-navy-light dark:to-neo-navy relative overflow-hidden"
+      className="flex flex-col min-h-full bg-gray-100 dark:bg-neo-navy relative overflow-hidden"
       {...pullToRefreshHandlers}
     >
       {/* Pull-to-refresh indicator - only show when not playing */}
