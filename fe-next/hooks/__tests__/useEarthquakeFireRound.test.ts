@@ -31,15 +31,24 @@ jest.mock('../../utils/consts', () => ({
 }));
 
 describe('useEarthquakeFireRound', () => {
+  // Store original Math.random
+  const originalRandom = Math.random;
+
   beforeEach(() => {
     jest.clearAllMocks();
     jest.clearAllTimers();
     jest.useFakeTimers();
+    // Mock Math.random to return 0.9 consistently
+    // This ensures triggerTimeRef.current is ~24s (low), preventing auto-trigger
+    // when currentTimeSeconds is 60+ (higher than trigger threshold)
+    Math.random = () => 0.9;
   });
 
   afterEach(() => {
     jest.clearAllTimers();
     jest.useRealTimers();
+    // Restore original Math.random
+    Math.random = originalRandom;
   });
 
   describe('timer pause/resume behavior', () => {
@@ -380,7 +389,7 @@ describe('useEarthquakeFireRound', () => {
       expect(callArgs).toBeDefined();
       expect(callArgs.length).toBe(2);
 
-      const [grid, embeddedWords] = callArgs;
+      const [_grid, embeddedWords] = callArgs;
       // Grid might be undefined if generateRandomTable mock isn't working
       // Just verify the callback was called with 2 arguments
       expect(embeddedWords).toEqual([]);
