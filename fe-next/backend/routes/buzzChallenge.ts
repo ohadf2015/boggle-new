@@ -3,11 +3,77 @@
  * RESTful endpoints for trend-based daily word challenges
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { generateDailyBuzz, getDailyBuzz } from '../services/buzzGenerator';
 import { fetchGoogleTrends } from '../services/serpApiClient';
 
+const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
+import logger from '../utils/logger';
+
 const router = Router();
+
+// ==================== Admin Authentication Middleware ====================
+
+interface AdminUser {
+  id: string;
+  email: string;
+  username?: string;
+}
+
+interface AdminRequest extends Request {
+  adminUser?: AdminUser;
+}
+
+/**
+ * Admin authentication middleware for Buzz admin routes
+ * Verifies JWT token and checks for admin role
+ */
+async function buzzAdminAuth(req: AdminRequest, res: Response, next: NextFunction): Promise<void> {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    logger.warn('BUZZ_ADMIN', 'Missing auth header');
+    res.status(401).json({ error: 'Missing authorization header' });
+    return;
+  }
+
+  const token = authHeader.substring(7);
+  if (!isSupabaseConfigured()) {
+    res.status(503).json({ error: 'Auth service not available' });
+    return;
+  }
+
+  try {
+    const supabase = getSupabase();
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      logger.warn('BUZZ_ADMIN', 'Invalid token');
+      res.status(401).json({ error: 'Invalid token' });
+      return;
+    }
+
+    // Check if user is admin
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('is_admin, username')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError || !profile?.is_admin) {
+      logger.warn('BUZZ_ADMIN', `Non-admin access attempt by ${user.email}`);
+      res.status(403).json({ error: 'Admin access required' });
+      return;
+    }
+
+    req.adminUser = { id: user.id, email: user.email!, username: profile.username };
+    logger.debug('BUZZ_ADMIN', `Admin access: ${user.email} -> ${req.method} ${req.path}`);
+    next();
+  } catch (error) {
+    const err = error as Error;
+    logger.error('BUZZ_ADMIN', `Auth error: ${err.message}`);
+    res.status(500).json({ error: 'Authentication failed' });
+  }
+}
 
 /**
  * Map backend challenge types to frontend-expected types
@@ -553,9 +619,9 @@ router.get(
  */
 router.post(
   '/buzz/admin/generate',
-  async (req: Request, res: Response): Promise<void> => {
+  buzzAdminAuth,
+  async (req: AdminRequest, res: Response): Promise<void> => {
     try {
-      // TODO: Add admin authentication middleware
       const { date, language, force } = req.body;
 
       if (!date || !language) {
@@ -606,9 +672,9 @@ router.post(
  */
 router.get(
   '/buzz/admin/trends/:region',
-  async (req: Request, res: Response): Promise<void> => {
+  buzzAdminAuth,
+  async (req: AdminRequest, res: Response): Promise<void> => {
     try {
-      // TODO: Add admin authentication middleware
       const { region } = req.params;
       const language = req.query.language as string;
 

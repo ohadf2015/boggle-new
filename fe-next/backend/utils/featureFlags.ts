@@ -41,12 +41,12 @@ export async function getFeatureFlag(flagName: string): Promise<FeatureFlag | nu
 
 /**
  * Check if user can access a specific feature based on feature flags
- * @param userId User ID to check
+ * @param userId User ID to check (optional - null for guest users)
  * @param flagName Feature flag name
  * @returns True if user has access, false otherwise
  */
 export async function canAccessFeature(
-  userId: string,
+  userId: string | null,
   flagName: string
 ): Promise<boolean> {
   try {
@@ -61,6 +61,12 @@ export async function canAccessFeature(
     if (!flag.enabled) {
       // Feature is disabled globally
       return false;
+    }
+
+    // If no user ID (guest user), check if feature is publicly available
+    if (!userId) {
+      // Guest users can only access if: not admin_only AND 100% rollout
+      return !flag.admin_only && flag.rollout_percentage === 100;
     }
 
     // Check if user is admin
@@ -210,9 +216,9 @@ export async function listFeatureFlags(): Promise<FeatureFlag[]> {
 
 /**
  * Specific helper for Daily Buzz images feature
- * @param userId User ID to check
+ * @param userId User ID to check (optional - null for guest users)
  * @returns True if user can see Daily Buzz images
  */
-export async function canAccessDailyBuzzImages(userId: string): Promise<boolean> {
+export async function canAccessDailyBuzzImages(userId: string | null): Promise<boolean> {
   return canAccessFeature(userId, 'daily_buzz_images');
 }

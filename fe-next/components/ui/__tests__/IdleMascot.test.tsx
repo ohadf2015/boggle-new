@@ -36,6 +36,7 @@ describe('IdleMascot', () => {
     jest.clearAllMocks();
     mockUseRandomMascotActivity.mockReturnValue({
       currentVariant: 'happy',
+      currentBaseVariant: 'happy',
       isDoingActivity: false,
       triggerActivity: mockTriggerActivity,
       resetToBase: mockResetToBase,
@@ -49,13 +50,14 @@ describe('IdleMascot', () => {
     expect(mascot).toBeInTheDocument();
     expect(mascot).toHaveAttribute('data-variant', 'happy');
 
-    // Verify default timing values are passed (2-5s initial delay)
+    // Verify default timing values are passed (2-5s initial delay, 8-20s interval)
     expect(mockUseRandomMascotActivity).toHaveBeenCalledWith(
       expect.objectContaining({
         initialDelayMin: 2000,
         initialDelayMax: 5000,
-        minInterval: 10000,
-        maxInterval: 30000,
+        minInterval: 8000,
+        maxInterval: 20000,
+        cycleBaseVariants: true,
       })
     );
   });
@@ -80,21 +82,25 @@ describe('IdleMascot', () => {
       />
     );
 
-    expect(mockUseRandomMascotActivity).toHaveBeenCalledWith({
-      baseVariant: 'thinking',
-      activities,
-      initialDelayMin,
-      initialDelayMax,
-      minInterval,
-      maxInterval,
-      activityDuration,
-      enabled: true,
-    });
+    expect(mockUseRandomMascotActivity).toHaveBeenCalledWith(
+      expect.objectContaining({
+        baseVariant: 'thinking',
+        activities,
+        initialDelayMin,
+        initialDelayMax,
+        minInterval,
+        maxInterval,
+        activityDuration,
+        enabled: true,
+        cycleBaseVariants: true,
+      })
+    );
   });
 
   it('should display current variant from hook', () => {
     mockUseRandomMascotActivity.mockReturnValue({
       currentVariant: 'eating_pizza',
+      currentBaseVariant: 'happy',
       isDoingActivity: true,
       triggerActivity: mockTriggerActivity,
       resetToBase: mockResetToBase,

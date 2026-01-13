@@ -8,6 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { hasPlayedToday } from '@/utils/dailyChallenge/storage';
 import type { Language } from '@/types';
 import { cn } from '@/lib/utils';
+import { useMascotImageAnimation, type MascotAnimationPreset } from '@/hooks/useMascotImageAnimation';
 
 interface DailyChallengeLandingProps {
   onSelectWordHunt: () => void;
@@ -105,12 +106,14 @@ export function DailyChallengeLanding({
                 : t('daily.play')
           }
           delay={0.1}
+          initialAnimation="bounce"
+          animationCycle={['bounce', 'hop', 'float', 'pulse', 'sway']}
         />
 
         {/* Daily Buzz Card */}
         <CompactChallengeCard
           mascotSrc="/mascot/lexi-daily-buzz.png"
-          mascotAlt="Lexi reading trending news"
+          mascotAlt="Lexi showing trending news"
           title={t('buzz.title')}
           subtitle={t('buzz.subtitle')}
           tagline={t('buzz.tagline')}
@@ -126,6 +129,8 @@ export function DailyChallengeLanding({
                 : t('daily.play')
           }
           delay={0.2}
+          initialAnimation="wiggle"
+          animationCycle={['wiggle', 'dance', 'nod', 'pulse', 'sway']}
         />
       </div>
 
@@ -162,6 +167,10 @@ interface CompactChallengeCardProps {
   buttonText: string;
   badge?: string;
   delay?: number;
+  /** Initial animation preset for variety */
+  initialAnimation?: MascotAnimationPreset;
+  /** Animation presets to cycle through */
+  animationCycle?: MascotAnimationPreset[];
 }
 
 function CompactChallengeCard({
@@ -176,7 +185,16 @@ function CompactChallengeCard({
   buttonText,
   badge,
   delay = 0,
+  initialAnimation = 'bounce',
+  animationCycle = ['bounce', 'wiggle', 'float', 'pulse', 'sway', 'hop', 'dance', 'nod'],
 }: CompactChallengeCardProps) {
+  const { animate, transition } = useMascotImageAnimation({
+    initialPreset: initialAnimation,
+    presets: animationCycle,
+    minInterval: 6000,
+    maxInterval: 12000,
+  });
+
   const colorStyles = {
     orange: {
       bg: 'bg-neo-orange',
@@ -223,8 +241,12 @@ function CompactChallengeCard({
         ) : null}
       </div>
 
-      {/* Mascot Image */}
-      <div className="relative w-20 h-20 sm:w-24 sm:h-24 mb-2">
+      {/* Mascot Image with Cycling Animations */}
+      <motion.div
+        className="relative w-20 h-20 sm:w-24 sm:h-24 mb-2"
+        animate={animate}
+        transition={transition}
+      >
         <Image
           src={mascotSrc}
           alt={mascotAlt}
@@ -232,7 +254,7 @@ function CompactChallengeCard({
           className="object-contain"
           priority
         />
-      </div>
+      </motion.div>
 
       {/* Title & Subtitle */}
       <h2 className={cn('text-xl sm:text-2xl font-neo-display font-black', styles.text)}>

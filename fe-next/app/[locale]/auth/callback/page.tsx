@@ -16,15 +16,13 @@ import {
   initCrossTabAuthSync,
   type AuthSyncMessage,
 } from '@/utils/crossTabAuthSync';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 
 // Loading UI component
 function LoadingUI(): React.ReactNode {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neo-purple">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-purple-400 border-t-transparent mx-auto mb-4"></div>
-        <p className="text-white text-lg">Completing sign in...</p>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-neo-navy">
+      <NeoLoader variant="mascot-letters" size="lg" text="Completing sign in..." />
     </div>
   );
 }

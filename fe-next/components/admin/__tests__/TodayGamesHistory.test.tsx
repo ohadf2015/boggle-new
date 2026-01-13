@@ -141,8 +141,8 @@ describe('TodayGamesHistory', () => {
 
     render(<TodayGamesHistory authToken={mockAuthToken} />);
 
-    // Should show loading spinner (RefreshCw with animate-spin)
-    const loadingElement = document.querySelector('.animate-spin');
+    // Should show loading indicator (NeoLoader dots variant)
+    const loadingElement = document.querySelector('.bg-neo-cyan.rounded-full');
     expect(loadingElement).toBeInTheDocument();
   });
 

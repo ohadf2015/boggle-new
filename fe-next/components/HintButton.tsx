@@ -7,6 +7,7 @@ import React, { memo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Lightbulb, Star } from 'lucide-react';
 import { Button } from './ui/button';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 
 interface HintButtonProps {
   hint: string | null;
@@ -91,7 +92,7 @@ const HintButton = memo<HintButtonProps>(({
           border-3 rounded-neo font-bold text-sm transition-all shadow-hard-sm
         `}
       >
-        <Lightbulb className={`w-4 h-4 flex-shrink-0 ${isLoading ? 'animate-spin' : ''}`} aria-hidden="true" />
+        {isLoading ? <NeoLoader variant="dots" size="sm" aria-hidden="true" /> : <Lightbulb className="w-4 h-4 flex-shrink-0" aria-hidden="true" />}
         <div className="flex flex-col items-start min-w-0">
           <span className="text-[10px] opacity-80 whitespace-nowrap overflow-hidden text-ellipsis max-w-[70px]" aria-hidden="true">
             {isLoading

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, RefreshCw, Shield } from 'lucide-react';
+import { ArrowLeft, Shield } from 'lucide-react';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -11,6 +11,7 @@ import { getSession } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { PlayerManager } from '@/components/admin/PlayerManager';
 import { useTheme } from '@/utils/ThemeContext';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 
 export default function PlayersPage() {
   const router = useRouter();
@@ -61,10 +62,7 @@ export default function PlayersPage() {
   if (authLoading || isProfileLoading || !authToken) {
     return (
       <div className="min-h-screen bg-neo-navy text-neo-white flex items-center justify-center">
-        <div className="text-center">
-          <RefreshCw className="w-12 h-12 animate-spin text-neo-lime mx-auto mb-4" />
-          <p className="text-slate-400">Loading...</p>
-        </div>
+        <NeoLoader variant="letters" size="lg" text="Loading..." />
       </div>
     );
   }

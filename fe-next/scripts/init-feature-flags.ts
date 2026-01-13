@@ -38,9 +38,9 @@ const FEATURE_FLAGS: FeatureFlagConfig[] = [
   {
     flag_name: 'daily_buzz_images',
     enabled: true,
-    admin_only: true,
-    rollout_percentage: 0,
-    description: 'Enable AI-generated hero images for Daily Buzz challenges (admin-only by default)',
+    admin_only: false, // Images now visible to all users
+    rollout_percentage: 100, // 100% rollout
+    description: 'Enable AI-generated hero images for Daily Buzz challenges',
   },
 ];
 

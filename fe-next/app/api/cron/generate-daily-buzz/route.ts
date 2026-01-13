@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generateDailyBuzz } from '@/backend/services/buzzGenerator';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 
+// Increase timeout for AI generation (SERP API + Gemini AI + image generation + DB storage)
+// Single language: ~20-30s, All 5 languages: ~60-90s
+// Using 120s to provide safety margin
+export const maxDuration = 120;
+
 /**
  * Cron Job: Generate Daily Buzz Challenges
  * Runs daily at 00:00 UTC to generate challenges for all 5 languages
@@ -98,7 +103,18 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json().catch(() => ({}));
-    const { date, language } = body;
+    const { date, language, ...extraParams } = body;
+
+    // SECURITY: Reject any extra parameters to prevent partial overrides
+    // Full regeneration (including fresh trend fetching) is the only allowed operation
+    const disallowedParams = Object.keys(extraParams);
+    if (disallowedParams.length > 0) {
+      console.warn(`[Admin] Rejected request with disallowed params: ${disallowedParams.join(', ')}`);
+      return NextResponse.json(
+        { error: `Disallowed parameters: ${disallowedParams.join(', ')}. Only 'date' and 'language' are allowed.` },
+        { status: 400 }
+      );
+    }
 
     // Determine target date and languages
     const targetDate = date ? new Date(date) : new Date();

@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { FileText, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { scrollInputIntoView } from '@/hooks/useMobileKeyboard';
 
 interface FillBlankChallengeProps {
   challenge: {
@@ -28,6 +29,12 @@ export default function FillBlankChallenge({
 }: FillBlankChallengeProps) {
   const { t } = useLanguage();
   const [userAnswer, setUserAnswer] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Handle input focus - scroll into view for mobile keyboard
+  const handleFocus = useCallback(() => {
+    scrollInputIntoView(inputRef.current);
+  }, []);
 
   const handleSubmit = useCallback(() => {
     if (userAnswer.trim()) {
@@ -35,7 +42,7 @@ export default function FillBlankChallenge({
     }
   }, [userAnswer, onAnswer]);
 
-  const handleKeyPress = useCallback(
+  const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === 'Enter' && userAnswer.trim()) {
         handleSubmit();
@@ -90,10 +97,12 @@ export default function FillBlankChallenge({
         transition={{ delay: 0.2 }}
       >
         <input
+          ref={inputRef}
           type="text"
           value={userAnswer}
           onChange={(e) => setUserAnswer(e.target.value)}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyDown}
+          onFocus={handleFocus}
           placeholder={t('buzz.fillTheBlank') || 'Fill the blank'}
           autoFocus
           className="w-full px-6 py-4 text-xl font-bold text-center text-white bg-slate-800 border-3 border-neo-black rounded-xl shadow-hard focus:border-neo-yellow focus:shadow-hard-lg outline-none transition-all"

@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Check, X, Loader2 } from 'lucide-react';
+import { Check, X } from 'lucide-react';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
 import type { FriendRequest } from '@/utils/friends';
@@ -55,7 +56,7 @@ export const RequestRow: React.FC<RequestRowProps> = ({
             'bg-green-500 text-white hover:bg-green-600'
           )}
         >
-          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+          {isLoading ? <NeoLoader variant="dots" size="sm" /> : <Check className="w-4 h-4" />}
         </button>
         <button
           onClick={onDecline}

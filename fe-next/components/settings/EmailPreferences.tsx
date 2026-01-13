@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Bell, BellOff, Globe, Check, Loader2 } from 'lucide-react';
+import { Mail, Bell, BellOff, Globe, Check } from 'lucide-react';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -154,7 +155,7 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
         )}
       >
         <div className="flex items-center justify-center py-4">
-          <Loader2 className="w-6 h-6 animate-spin text-neo-cyan" />
+          <NeoLoader variant="dots" size="md" />
         </div>
       </motion.div>
     );
@@ -236,7 +237,7 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
             )}
           >
             {isSaving ? (
-              <Loader2 className="w-3 h-3 animate-spin" />
+              <NeoLoader variant="dots" size="sm" />
             ) : dailyEmailSubscribed ? (
               <Check className="w-3 h-3 text-neo-lime" />
             ) : null}

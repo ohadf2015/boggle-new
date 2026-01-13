@@ -1,10 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Play, RefreshCw, Check, X, Clock, Sparkles } from 'lucide-react';
+import { Play, Check, X, Clock, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { getSession } from '@/lib/supabase';
+
+// Client-side timeout matches server maxDuration (120s) with buffer
+const CLIENT_TIMEOUT_MS = 130_000;
 
 interface GenerationResult {
   success: boolean;
@@ -28,6 +32,24 @@ export default function DailyBuzzAdminPanel() {
   const [selectedDate, setSelectedDate] = useState<string>(
     new Date().toISOString().split('T')[0]
   );
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const startTimeRef = useRef<number>(0);
+
+  // Update elapsed time during generation
+  useEffect(() => {
+    if (!isGenerating) {
+      setElapsedTime(0);
+      return;
+    }
+
+    startTimeRef.current = Date.now();
+    const interval = setInterval(() => {
+      setElapsedTime(Math.floor((Date.now() - startTimeRef.current) / 1000));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isGenerating]);
 
   const languages = [
     { code: 'all', label: 'All Languages' },
@@ -42,6 +64,12 @@ export default function DailyBuzzAdminPanel() {
     setIsGenerating(true);
     setResult(null);
 
+    // Create abort controller for timeout
+    abortControllerRef.current = new AbortController();
+    const timeoutId = setTimeout(() => {
+      abortControllerRef.current?.abort();
+    }, CLIENT_TIMEOUT_MS);
+
     try {
       // Get user's JWT token from session
       const { data: { session } } = await getSession();
@@ -49,7 +77,7 @@ export default function DailyBuzzAdminPanel() {
         throw new Error('No active session. Please refresh the page.');
       }
 
-      const body: any = { date: selectedDate };
+      const body: Record<string, string> = { date: selectedDate };
       if (selectedLanguage !== 'all') {
         body.language = selectedLanguage;
       }
@@ -61,6 +89,7 @@ export default function DailyBuzzAdminPanel() {
           Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify(body),
+        signal: abortControllerRef.current.signal,
       });
 
       const data = await response.json();
@@ -71,14 +100,27 @@ export default function DailyBuzzAdminPanel() {
 
       setResult(data);
     } catch (error) {
-      setResult({
-        success: false,
-        results: {},
-        duration: 0,
-        date: selectedDate,
-        message: error instanceof Error ? error.message : 'Unknown error',
-      });
+      // Handle abort differently from other errors
+      if (error instanceof Error && error.name === 'AbortError') {
+        setResult({
+          success: false,
+          results: {},
+          duration: 0,
+          date: selectedDate,
+          message: 'Request timed out. The generation may still complete server-side. Check back in a minute.',
+        });
+      } else {
+        setResult({
+          success: false,
+          results: {},
+          duration: 0,
+          date: selectedDate,
+          message: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
     } finally {
+      clearTimeout(timeoutId);
+      abortControllerRef.current = null;
       setIsGenerating(false);
     }
   };
@@ -152,8 +194,8 @@ export default function DailyBuzzAdminPanel() {
         >
           {isGenerating ? (
             <>
-              <RefreshCw className="w-5 h-5 me-2 animate-spin" />
-              Generating...
+              <NeoLoader variant="dots" size="sm" className="me-2" />
+              Generating... {elapsedTime > 0 && `(${elapsedTime}s)`}
             </>
           ) : (
             <>
@@ -164,7 +206,10 @@ export default function DailyBuzzAdminPanel() {
         </Button>
 
         <p className="text-xs text-slate-500 text-center">
-          This will generate challenges for {selectedLanguage === 'all' ? 'all languages' : selectedLanguage} on {selectedDate}
+          {isGenerating
+            ? 'AI generation in progress. This may take 30-90 seconds depending on languages selected.'
+            : `This will generate challenges for ${selectedLanguage === 'all' ? 'all languages' : selectedLanguage} on ${selectedDate}`
+          }
         </p>
       </div>
 

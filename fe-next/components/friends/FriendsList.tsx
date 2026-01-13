@@ -5,13 +5,13 @@ import {
   Users,
   UserPlus,
   Search,
-  Loader2,
   Target,
   Circle,
   Bell,
   MessageCircle,
   UserMinus,
 } from 'lucide-react';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { useFriends } from '@/hooks/useFriends';
 import { useFriendMessages } from '@/hooks/useFriendMessages';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -197,7 +197,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
         isDark ? 'bg-slate-800 border-white/10' : 'bg-gray-50 border-gray-200',
         className
       )}>
-        <Loader2 className="w-6 h-6 animate-spin text-cyan-500" />
+        <NeoLoader variant="dots" size="md" />
       </div>
     );
   }
@@ -521,7 +521,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                 )}
               />
               {isSearching && (
-                <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-cyan-500" />
+                <NeoLoader variant="dots" size="sm" className="absolute right-3 top-1/2 -translate-y-1/2" />
               )}
             </div>
 
@@ -575,7 +575,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                       )}
                     >
                       {actionLoading === searchUser.odUserId ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <NeoLoader variant="dots" size="sm" />
                       ) : (
                         <>
                           <UserPlus className="w-3 h-3 mr-1" />
@@ -694,7 +694,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                     )}
                   >
                     {actionLoading === selectedFriend.odUserId ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <NeoLoader variant="dots" size="sm" />
                     ) : (
                       <>
                         <UserMinus className="w-4 h-4" />

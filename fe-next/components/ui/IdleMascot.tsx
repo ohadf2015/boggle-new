@@ -6,11 +6,14 @@ import InteractiveMascot, {
   type ActivityVariant,
   type InteractiveMascotProps,
 } from './InteractiveMascot';
-import { useRandomMascotActivity, DEFAULT_IDLE_ACTIVITIES } from '@/hooks/useRandomMascotActivity';
+import type { MascotVariant } from './Mascot';
+import { useRandomMascotActivity, DEFAULT_IDLE_ACTIVITIES, DEFAULT_BASE_VARIANTS } from '@/hooks/useRandomMascotActivity';
 
 interface IdleMascotProps extends Omit<InteractiveMascotProps, 'variant'> {
   /** Base variant when not doing activities */
   baseVariant: ExtendedMascotVariant;
+  /** Additional base variants to cycle through for variety */
+  baseVariants?: MascotVariant[];
   /** List of activities to randomly choose from (defaults to all fun activities) */
   activities?: ActivityVariant[];
   /** Min delay before first activity in ms (default: 2000 = 2s) */
@@ -25,6 +28,8 @@ interface IdleMascotProps extends Omit<InteractiveMascotProps, 'variant'> {
   activityDuration?: number;
   /** Whether to enable random activities (default: true) */
   enableIdleActivities?: boolean;
+  /** Enable cycling through different base variants (default: true for maximum variety) */
+  cycleBaseVariants?: boolean;
 }
 
 /**
@@ -60,18 +65,21 @@ interface IdleMascotProps extends Omit<InteractiveMascotProps, 'variant'> {
  */
 export const IdleMascot = memo(function IdleMascot({
   baseVariant,
+  baseVariants = DEFAULT_BASE_VARIANTS,
   activities = DEFAULT_IDLE_ACTIVITIES,
   initialDelayMin = 2000,
   initialDelayMax = 5000,
-  minInterval = 10000,
-  maxInterval = 30000,
+  minInterval = 8000,
+  maxInterval = 20000,
   activityDuration = 4000,
   enableIdleActivities = true,
+  cycleBaseVariants = true,
   onClick,
   ...interactiveMascotProps
 }: IdleMascotProps) {
   const { currentVariant, triggerActivity } = useRandomMascotActivity({
     baseVariant,
+    baseVariants,
     activities,
     initialDelayMin,
     initialDelayMax,
@@ -79,6 +87,7 @@ export const IdleMascot = memo(function IdleMascot({
     maxInterval,
     activityDuration,
     enabled: enableIdleActivities,
+    cycleBaseVariants,
   });
 
   const handleClick = () => {

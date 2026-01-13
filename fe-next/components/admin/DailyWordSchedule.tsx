@@ -8,6 +8,7 @@ import {
   ChevronLeft, ChevronRight, Copy, AlertTriangle, Link, Shuffle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/utils/supabase/client';
 import type { Language } from '@/types';
@@ -787,7 +788,7 @@ export const DailyWordSchedule: React.FC = () => {
             className="bg-neo-pink hover:bg-neo-pink/90 text-white"
           >
             {triggerLoading ? (
-              <RefreshCw className="w-4 h-4 sm:mr-2 animate-spin" />
+              <NeoLoader variant="dots" size="sm" className="sm:mr-2" />
             ) : (
               <Sparkles className="w-4 h-4 sm:mr-2" />
             )}
@@ -892,7 +893,7 @@ export const DailyWordSchedule: React.FC = () => {
       {/* Scheduled Words - Grid View */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <RefreshCw className="w-8 h-8 animate-spin text-neo-pink" />
+          <NeoLoader variant="dots" size="md" />
         </div>
       ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
@@ -1012,7 +1013,7 @@ export const DailyWordSchedule: React.FC = () => {
                     title="Shuffle board (regenerate with new letters)"
                   >
                     {regeneratingBoard === dateStr ? (
-                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <NeoLoader variant="dots" size="sm" />
                     ) : (
                       <Shuffle className="w-4 h-4" />
                     )}
@@ -1235,7 +1236,7 @@ export const DailyWordSchedule: React.FC = () => {
                             title="Regenerate board with new letter arrangement (keeps same target word)"
                           >
                             {regeneratingBoard === dateStr ? (
-                              <RefreshCw className="w-4 h-4 animate-spin sm:mr-1" />
+                              <NeoLoader variant="dots" size="sm" className="sm:mr-1" />
                             ) : (
                               <Shuffle className="w-4 h-4 sm:mr-1" />
                             )}
@@ -1331,7 +1332,7 @@ export const DailyWordSchedule: React.FC = () => {
                       {/* Attempts List */}
                       {attemptsLoading ? (
                         <div className="flex justify-center py-6 sm:py-8">
-                          <RefreshCw className="w-5 h-5 sm:w-6 sm:h-6 animate-spin text-neo-pink" />
+                          <NeoLoader variant="dots" size="md" />
                         </div>
                       ) : filteredAttempts.length === 0 ? (
                         <div className="text-center py-6 sm:py-8 text-gray-500">
@@ -1493,7 +1494,7 @@ export const DailyWordSchedule: React.FC = () => {
                     className="flex-1 bg-red-500 hover:bg-red-600 text-white sm:text-base"
                   >
                     {saving ? (
-                      <RefreshCw className="w-4 h-4 sm:mr-2 animate-spin" />
+                      <NeoLoader variant="dots" size="sm" className="sm:mr-2" />
                     ) : (
                       <RotateCcw className="w-4 h-4 sm:mr-2" />
                     )}
@@ -1581,7 +1582,7 @@ export const DailyWordSchedule: React.FC = () => {
                     className="flex-1 bg-green-500 hover:bg-green-600 text-white sm:text-base"
                   >
                     {saving ? (
-                      <RefreshCw className="w-4 h-4 sm:mr-2 animate-spin" />
+                      <NeoLoader variant="dots" size="sm" className="sm:mr-2" />
                     ) : (
                       <Check className="w-4 h-4 sm:mr-2" />
                     )}
@@ -1692,7 +1693,7 @@ export const DailyWordSchedule: React.FC = () => {
                     className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold sm:text-lg py-2 sm:py-3"
                   >
                     {saving ? (
-                      <RefreshCw className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-2 animate-spin" />
+                      <NeoLoader variant="dots" size="sm" className="sm:mr-2" />
                     ) : (
                       <Check className="w-4 h-4 sm:w-5 sm:h-5 sm:mr-2" />
                     )}

@@ -3,6 +3,7 @@
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { GoogleIcon, DiscordIcon } from './icons/BrandIcons';
 import { cn } from '@/lib/utils';
 import type { OAuthProvider } from './types';
@@ -59,7 +60,7 @@ export function OAuthButtonGroup({
           )}
         >
           {loadingProvider === provider.id ? (
-            <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            <NeoLoader variant="dots" size="sm" />
           ) : (
             <provider.icon className="w-5 h-5" />
           )}

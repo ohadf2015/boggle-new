@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { ExtendedMascotVariant, ActivityVariant } from '@/components/ui/InteractiveMascot';
+import type { MascotVariant } from '@/components/ui/Mascot';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 /**
@@ -17,9 +18,23 @@ export const DEFAULT_IDLE_ACTIVITIES: ActivityVariant[] = [
   'thumbs_up',
 ];
 
+/**
+ * Default emotional base variants to cycle through for variety
+ */
+export const DEFAULT_BASE_VARIANTS: MascotVariant[] = [
+  'happy',
+  'encouraging',
+  'excited',
+  'thinking',
+  'focused',
+  'pointing',
+];
+
 interface UseRandomMascotActivityOptions {
-  /** Base variant to return to after activity */
+  /** Base variant to return to after activity (or primary variant if cycling) */
   baseVariant: ExtendedMascotVariant;
+  /** Additional base variants to cycle through for variety (optional) */
+  baseVariants?: MascotVariant[];
   /** List of activities to randomly choose from */
   activities?: ActivityVariant[];
   /** Min delay before first activity in ms (default: 2000 = 2s) */
@@ -34,11 +49,15 @@ interface UseRandomMascotActivityOptions {
   activityDuration?: number;
   /** Whether to enable random activities (default: true) */
   enabled?: boolean;
+  /** Enable cycling through different base variants (default: false) */
+  cycleBaseVariants?: boolean;
 }
 
 interface UseRandomMascotActivityReturn {
   /** Current mascot variant (base or activity) */
   currentVariant: ExtendedMascotVariant;
+  /** Current base variant (may cycle if cycleBaseVariants is enabled) */
+  currentBaseVariant: ExtendedMascotVariant;
   /** Whether currently showing an activity */
   isDoingActivity: boolean;
   /** Manually trigger a random activity */
@@ -70,6 +89,7 @@ interface UseRandomMascotActivityReturn {
  */
 export function useRandomMascotActivity({
   baseVariant,
+  baseVariants,
   activities = DEFAULT_IDLE_ACTIVITIES,
   initialDelayMin = 2000,
   initialDelayMax = 5000,
@@ -77,15 +97,18 @@ export function useRandomMascotActivity({
   maxInterval = 30000,
   activityDuration = 4000,
   enabled = true,
+  cycleBaseVariants = false,
 }: UseRandomMascotActivityOptions): UseRandomMascotActivityReturn {
   const { prefersReducedMotion } = useDevicePerformance();
   const [currentVariant, setCurrentVariant] = useState<ExtendedMascotVariant>(baseVariant);
+  const [currentBaseVariant, setCurrentBaseVariant] = useState<ExtendedMascotVariant>(baseVariant);
   const [isDoingActivity, setIsDoingActivity] = useState(false);
 
   const nextActivityTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const activityResetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scheduleNextActivityRef = useRef<(() => void) | null>(null);
   const isFirstActivityRef = useRef(true);
+  const lastBaseIndexRef = useRef(0);
 
   // Cleanup timeouts on unmount
   useEffect(() => {
@@ -106,6 +129,31 @@ export function useRandomMascotActivity({
     const randomIndex = Math.floor(Math.random() * activities.length);
     return activities[randomIndex];
   }, [activities]);
+
+  /**
+   * Get a different random base variant from the list (avoids repeating the current one)
+   */
+  const getNextBaseVariant = useCallback((): ExtendedMascotVariant => {
+    if (!cycleBaseVariants || !baseVariants || baseVariants.length === 0) {
+      return baseVariant;
+    }
+
+    // Create combined list including the primary baseVariant
+    const allVariants = [baseVariant, ...baseVariants.filter(v => v !== baseVariant)];
+
+    if (allVariants.length <= 1) {
+      return baseVariant;
+    }
+
+    // Pick a different index than the last one
+    let newIndex: number;
+    do {
+      newIndex = Math.floor(Math.random() * allVariants.length);
+    } while (newIndex === lastBaseIndexRef.current && allVariants.length > 1);
+
+    lastBaseIndexRef.current = newIndex;
+    return allVariants[newIndex];
+  }, [cycleBaseVariants, baseVariants, baseVariant]);
 
   /**
    * Get random interval - uses shorter delay for first activity
@@ -130,16 +178,18 @@ export function useRandomMascotActivity({
     setCurrentVariant(randomActivity);
     setIsDoingActivity(true);
 
-    // Reset to base after activity duration
+    // Reset to (potentially new) base after activity duration
     activityResetTimeoutRef.current = setTimeout(() => {
-      setCurrentVariant(baseVariant);
+      const nextBase = getNextBaseVariant();
+      setCurrentBaseVariant(nextBase);
+      setCurrentVariant(nextBase);
       setIsDoingActivity(false);
     }, activityDuration);
   }, [
     isDoingActivity,
     prefersReducedMotion,
     getRandomActivity,
-    baseVariant,
+    getNextBaseVariant,
     activityDuration,
   ]);
 
@@ -150,9 +200,9 @@ export function useRandomMascotActivity({
     if (activityResetTimeoutRef.current) {
       clearTimeout(activityResetTimeoutRef.current);
     }
-    setCurrentVariant(baseVariant);
+    setCurrentVariant(currentBaseVariant);
     setIsDoingActivity(false);
-  }, [baseVariant]);
+  }, [currentBaseVariant]);
 
   /**
    * Schedule next random activity
@@ -189,15 +239,17 @@ export function useRandomMascotActivity({
     };
   }, [enabled, prefersReducedMotion, activities.length, scheduleNextActivity]);
 
-  // Update current variant when base variant changes
+  // Update current base variant when baseVariant prop changes
   useEffect(() => {
     if (!isDoingActivity) {
+      setCurrentBaseVariant(baseVariant);
       setCurrentVariant(baseVariant);
     }
   }, [baseVariant, isDoingActivity]);
 
   return {
     currentVariant,
+    currentBaseVariant,
     isDoingActivity,
     triggerActivity,
     resetToBase,

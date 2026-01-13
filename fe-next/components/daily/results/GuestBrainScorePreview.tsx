@@ -11,6 +11,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Brain, Lock, TrendingUp, Zap, Target, Lightbulb, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { signInWithGoogle, signInWithDiscord } from '@/lib/supabase';
 
 export interface GuestBrainScorePreviewProps {
@@ -95,7 +96,7 @@ export const GuestBrainScorePreview: React.FC<GuestBrainScorePreviewProps> = ({
               className="w-full bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 rounded-neo shadow-hard-sm"
             >
               {isLoading === 'google' ? (
-                <span className="animate-spin w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full" />
+                <NeoLoader variant="dots" size="sm" />
               ) : (
                 <GoogleIcon className="w-4 h-4 me-2" />
               )}
@@ -108,7 +109,7 @@ export const GuestBrainScorePreview: React.FC<GuestBrainScorePreviewProps> = ({
               className="w-full bg-brand-discord hover:bg-brand-discord-hover text-white border-2 border-brand-discord-hover rounded-neo shadow-hard-sm"
             >
               {isLoading === 'discord' ? (
-                <span className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />
+                <NeoLoader variant="dots" size="sm" />
               ) : (
                 <DiscordIcon className="w-4 h-4 me-2" />
               )}

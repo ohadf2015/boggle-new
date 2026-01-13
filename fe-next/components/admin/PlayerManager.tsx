@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-  Search, User, Calendar, Trophy, Gamepad2, 
-  MoreVertical, ChevronLeft, ChevronRight, Loader2
+import {
+  Search, User, Calendar, Trophy, Gamepad2,
+  MoreVertical, ChevronLeft, ChevronRight
 } from 'lucide-react';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -133,7 +134,7 @@ export function PlayerManager({ authToken }: { authToken: string }) {
       {/* Players List */}
       {loading && players.length === 0 ? (
         <div className="flex justify-center py-12">
-          <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+          <NeoLoader variant="dots" size="md" />
         </div>
       ) : players.length === 0 ? (
         <div className="text-center py-12 text-slate-500">

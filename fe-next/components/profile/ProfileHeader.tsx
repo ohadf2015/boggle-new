@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Camera, X, Edit, Check, Globe } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { Input } from '@/components/ui/input';
 import Avatar from '@/components/Avatar';
 import { CountrySelector } from '@/components/settings/CountrySelector';
@@ -132,7 +133,7 @@ export function ProfileHeader({
               aria-label={t('profile.uploadPhoto') || 'Upload Photo'}
             >
               {isUploading ? (
-                <div className="border-2 border-current border-t-transparent rounded-full animate-spin w-5 h-5" />
+                <NeoLoader variant="dots" size="sm" />
               ) : (
                 <Camera size={20} />
               )}
@@ -202,7 +203,7 @@ export function ProfileHeader({
                 disabled={isSaving}
                 className="bg-green-600 hover:bg-green-500"
               >
-                {isSaving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <Check />}
+                {isSaving ? <NeoLoader variant="dots" size="sm" /> : <Check />}
               </Button>
               <Button
                 size="sm"

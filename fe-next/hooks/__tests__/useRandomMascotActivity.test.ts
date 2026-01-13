@@ -1,5 +1,9 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useRandomMascotActivity, DEFAULT_IDLE_ACTIVITIES } from '../useRandomMascotActivity';
+import {
+  useRandomMascotActivity,
+  DEFAULT_IDLE_ACTIVITIES,
+  DEFAULT_BASE_VARIANTS,
+} from '../useRandomMascotActivity';
 import { useDevicePerformance } from '../useDevicePerformance';
 
 // Mock device performance hook
@@ -39,6 +43,7 @@ describe('useRandomMascotActivity', () => {
     );
 
     expect(result.current.currentVariant).toBe('happy');
+    expect(result.current.currentBaseVariant).toBe('happy');
     expect(result.current.isDoingActivity).toBe(false);
   });
 
@@ -284,5 +289,106 @@ describe('useRandomMascotActivity', () => {
 
     const pendingTimersAfter = jest.getTimerCount();
     expect(pendingTimersAfter).toBe(0);
+  });
+
+  describe('base variant cycling', () => {
+    it('should cycle through base variants when enabled', () => {
+      const { result } = renderHook(() =>
+        useRandomMascotActivity({
+          baseVariant: 'happy',
+          baseVariants: ['excited', 'thinking', 'focused'],
+          cycleBaseVariants: true,
+          activityDuration: 1000,
+        })
+      );
+
+      // Start with happy
+      expect(result.current.currentBaseVariant).toBe('happy');
+
+      // Trigger activity
+      act(() => {
+        result.current.triggerActivity();
+      });
+
+      // During activity
+      expect(result.current.isDoingActivity).toBe(true);
+      expect(DEFAULT_IDLE_ACTIVITIES).toContain(result.current.currentVariant);
+
+      // Complete activity - should cycle to a new base
+      act(() => {
+        jest.advanceTimersByTime(1000);
+      });
+
+      expect(result.current.isDoingActivity).toBe(false);
+      // New base should be from the combined list (original + baseVariants)
+      const allVariants = ['happy', 'excited', 'thinking', 'focused'];
+      expect(allVariants).toContain(result.current.currentBaseVariant);
+      expect(result.current.currentVariant).toBe(result.current.currentBaseVariant);
+    });
+
+    it('should NOT cycle base variants when cycleBaseVariants is false', () => {
+      const { result } = renderHook(() =>
+        useRandomMascotActivity({
+          baseVariant: 'happy',
+          baseVariants: ['excited', 'thinking'],
+          cycleBaseVariants: false,
+          activityDuration: 1000,
+        })
+      );
+
+      // Trigger multiple activities and verify base stays the same
+      for (let i = 0; i < 3; i++) {
+        act(() => {
+          result.current.triggerActivity();
+        });
+        act(() => {
+          jest.advanceTimersByTime(1000);
+        });
+
+        expect(result.current.currentBaseVariant).toBe('happy');
+        expect(result.current.currentVariant).toBe('happy');
+      }
+    });
+
+    it('should export DEFAULT_BASE_VARIANTS array', () => {
+      expect(DEFAULT_BASE_VARIANTS).toBeDefined();
+      expect(Array.isArray(DEFAULT_BASE_VARIANTS)).toBe(true);
+      expect(DEFAULT_BASE_VARIANTS.length).toBeGreaterThan(0);
+      expect(DEFAULT_BASE_VARIANTS).toContain('happy');
+      expect(DEFAULT_BASE_VARIANTS).toContain('excited');
+    });
+
+    it('should use currentBaseVariant when resetting', () => {
+      const { result } = renderHook(() =>
+        useRandomMascotActivity({
+          baseVariant: 'happy',
+          baseVariants: ['excited'],
+          cycleBaseVariants: true,
+          activityDuration: 1000,
+        })
+      );
+
+      // Trigger and complete activity to potentially cycle base
+      act(() => {
+        result.current.triggerActivity();
+      });
+      act(() => {
+        jest.advanceTimersByTime(1000);
+      });
+
+      const currentBase = result.current.currentBaseVariant;
+
+      // Trigger another activity
+      act(() => {
+        result.current.triggerActivity();
+      });
+
+      // Reset should go to current base (not original)
+      act(() => {
+        result.current.resetToBase();
+      });
+
+      expect(result.current.currentVariant).toBe(currentBase);
+    });
   });
 });

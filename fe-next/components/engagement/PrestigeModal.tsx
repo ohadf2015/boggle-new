@@ -4,7 +4,8 @@ import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { cn } from '@/lib/utils';
-import { Sparkles, Star, Crown, Zap, AlertTriangle, Check, Loader2 } from 'lucide-react';
+import { Sparkles, Star, Crown, Zap, AlertTriangle, Check } from 'lucide-react';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 
 interface PrestigeReward {
   type: 'title' | 'multiplier' | 'border' | 'icon';
@@ -219,7 +220,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                     )}
                   >
                     {isLoading ? (
-                      <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+                      <NeoLoader variant="dots" size="sm" className="mx-auto" />
                     ) : (
                       <>
                         <Check className="w-4 h-4 inline mr-1" />

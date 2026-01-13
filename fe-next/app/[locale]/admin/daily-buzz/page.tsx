@@ -2,6 +2,7 @@
 
 import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 
 // Dynamic import for admin panel (client component)
 const DailyBuzzAdminPanel = dynamic(
@@ -9,11 +10,8 @@ const DailyBuzzAdminPanel = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="text-4xl mb-4">⏳</div>
-          <p className="text-slate-400">Loading admin panel...</p>
-        </div>
+      <div className="flex items-center justify-center min-h-screen bg-neo-navy">
+        <NeoLoader variant="letters" size="lg" text="Loading admin panel..." />
       </div>
     ),
   }
@@ -34,11 +32,8 @@ export default function DailyBuzzAdminPage() {
     <div className="min-h-screen bg-neo-navy py-12 px-4">
       <Suspense
         fallback={
-          <div className="flex items-center justify-center min-h-screen">
-            <div className="text-center">
-              <div className="text-4xl mb-4">⏳</div>
-              <p className="text-slate-400">Loading...</p>
-            </div>
+          <div className="flex items-center justify-center min-h-screen bg-neo-navy">
+            <NeoLoader variant="letters" size="lg" text="Loading..." />
           </div>
         }
       >

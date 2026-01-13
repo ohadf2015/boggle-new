@@ -8,7 +8,7 @@ import { canAccessFeature } from '@/backend/utils/featureFlags';
  * Body:
  * {
  *   flagName: string,
- *   userId: string
+ *   userId: string | null (null for guest users)
  * }
  */
 export async function POST(request: NextRequest) {
@@ -24,15 +24,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!userId) {
-      return NextResponse.json(
-        { enabled: false },
-        { status: 200 }
-      );
-    }
-
-    // Check if user can access feature
-    const enabled = await canAccessFeature(userId, flagName);
+    // Check if user can access feature (supports null userId for guest users)
+    const enabled = await canAccessFeature(userId || null, flagName);
 
     return NextResponse.json({
       success: true,

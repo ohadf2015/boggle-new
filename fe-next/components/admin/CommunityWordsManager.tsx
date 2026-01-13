@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Check, X, Search, Filter, ThumbsUp, ThumbsDown, 
-  AlertCircle, Loader2, Globe, Calendar, User
+import {
+  Check, X, Search, Filter, ThumbsUp, ThumbsDown,
+  AlertCircle, Globe, Calendar, User
 } from 'lucide-react';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -391,7 +392,7 @@ export function CommunityWordsManager({ authToken }: { authToken: string }) {
                   disabled={bulkProcessing}
                 >
                   {bulkProcessing ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <NeoLoader variant="dots" size="sm" />
                   ) : (
                     <>
                       <Check className="w-4 h-4 mr-2" /> Approve Selected
@@ -406,7 +407,7 @@ export function CommunityWordsManager({ authToken }: { authToken: string }) {
                   disabled={bulkProcessing}
                 >
                   {bulkProcessing ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <NeoLoader variant="dots" size="sm" />
                   ) : (
                     <>
                       <X className="w-4 h-4 mr-2" /> Reject Selected
@@ -422,7 +423,7 @@ export function CommunityWordsManager({ authToken }: { authToken: string }) {
       {/* Words List */}
       {loading ? (
         <div className="flex justify-center py-12">
-          <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+          <NeoLoader variant="dots" size="md" />
         </div>
       ) : words.length === 0 ? (
         <div className="text-center py-12 text-slate-500">
@@ -490,7 +491,7 @@ export function CommunityWordsManager({ authToken }: { authToken: string }) {
                       disabled={!!processing}
                     >
                       {processing === `${word.word}-${word.language}` ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <NeoLoader variant="dots" size="sm" />
                       ) : (
                         <>
                           <X className="w-4 h-4 mr-2" /> Reject
@@ -506,7 +507,7 @@ export function CommunityWordsManager({ authToken }: { authToken: string }) {
                       disabled={!!processing}
                     >
                       {processing === `${word.word}-${word.language}` ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <NeoLoader variant="dots" size="sm" />
                       ) : (
                         <>
                           <Check className="w-4 h-4 mr-2" /> Approve

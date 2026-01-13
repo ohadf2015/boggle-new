@@ -1,10 +1,8 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import { useAuth } from '@/contexts/AuthContext';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import DailyChallengeRouter from '../DailyChallengeRouter';
 
 // Mock dependencies
-jest.mock('@/contexts/AuthContext');
 jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     language: 'en',
@@ -13,9 +11,16 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 jest.mock('../DailyChallengeLanding', () => ({
-  DailyChallengeLanding: ({ onSelectWordHunt }: { onSelectWordHunt: () => void }) => (
+  DailyChallengeLanding: ({
+    onSelectWordHunt,
+    onSelectBuzz
+  }: {
+    onSelectWordHunt: () => void;
+    onSelectBuzz: () => void;
+  }) => (
     <div data-testid="daily-challenge-landing">
-      <button onClick={onSelectWordHunt}>Select Word Hunt</button>
+      <button onClick={onSelectWordHunt} data-testid="select-word-hunt">Select Word Hunt</button>
+      <button onClick={onSelectBuzz} data-testid="select-buzz">Select Buzz</button>
     </div>
   ),
 }));
@@ -27,7 +32,12 @@ jest.mock('../DailyChallenge', () => ({
 
 jest.mock('../../buzz/BuzzChallenge', () => ({
   __esModule: true,
-  default: () => <div data-testid="buzz-challenge">Buzz Challenge</div>,
+  default: ({ onBack }: { onBack: () => void }) => (
+    <div data-testid="buzz-challenge">
+      Buzz Challenge
+      <button onClick={onBack} data-testid="buzz-back">Back</button>
+    </div>
+  ),
 }));
 
 jest.mock('../../Header', () => ({
@@ -38,70 +48,74 @@ jest.mock('../../Header', () => ({
 jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   motion: {
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    div: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode }) => <div {...props}>{children}</div>,
   },
 }));
 
-const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-
-describe('DailyChallengeRouter - Admin vs Non-Admin Routing', () => {
+describe('DailyChallengeRouter - All Users See Landing Page', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('admin users see the landing page with dual challenge selection', () => {
-    // Setup: Admin user
-    mockUseAuth.mockReturnValue({
-      isAdmin: true,
-      user: { id: 'admin-123' } as any,
-      profile: { is_admin: true } as any,
-      loading: false,
-    } as any);
-
+  test('all users see the landing page with dual challenge selection', () => {
     render(<DailyChallengeRouter />);
 
-    // Admin should see the landing page with challenge selection
+    // All users should see the landing page with challenge selection
     expect(screen.getByTestId('daily-challenge-landing')).toBeInTheDocument();
+    expect(screen.getByTestId('header')).toBeInTheDocument();
     expect(screen.queryByTestId('daily-challenge-game')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('buzz-challenge')).not.toBeInTheDocument();
   });
 
-  test('non-admin users skip landing and go directly to Word Hunt', async () => {
-    // Setup: Regular (non-admin) user
-    mockUseAuth.mockReturnValue({
-      isAdmin: false,
-      user: { id: 'user-123' } as any,
-      profile: { is_admin: false } as any,
-      loading: false,
-    } as any);
-
+  test('selecting Word Hunt navigates to Word Hunt game', async () => {
     render(<DailyChallengeRouter />);
 
-    // Non-admin should NOT see the landing page
-    expect(screen.queryByTestId('daily-challenge-landing')).not.toBeInTheDocument();
+    // Start on landing
+    expect(screen.getByTestId('daily-challenge-landing')).toBeInTheDocument();
 
-    // Non-admin should see Word Hunt game directly
+    // Select Word Hunt
+    fireEvent.click(screen.getByTestId('select-word-hunt'));
+
+    // Should navigate to Word Hunt game
     await waitFor(() => {
       expect(screen.getByTestId('daily-challenge-game')).toBeInTheDocument();
     });
+    expect(screen.queryByTestId('daily-challenge-landing')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('header')).not.toBeInTheDocument();
   });
 
-  test('guest users (not logged in) skip landing and go directly to Word Hunt', async () => {
-    // Setup: Guest user (no auth)
-    mockUseAuth.mockReturnValue({
-      isAdmin: false,
-      user: null,
-      profile: null,
-      loading: false,
-    } as any);
-
+  test('selecting Buzz navigates to Buzz challenge', async () => {
     render(<DailyChallengeRouter />);
 
-    // Guest should NOT see the landing page
-    expect(screen.queryByTestId('daily-challenge-landing')).not.toBeInTheDocument();
+    // Start on landing
+    expect(screen.getByTestId('daily-challenge-landing')).toBeInTheDocument();
 
-    // Guest should see Word Hunt game directly
+    // Select Buzz
+    fireEvent.click(screen.getByTestId('select-buzz'));
+
+    // Should navigate to Buzz challenge
     await waitFor(() => {
-      expect(screen.getByTestId('daily-challenge-game')).toBeInTheDocument();
+      expect(screen.getByTestId('buzz-challenge')).toBeInTheDocument();
     });
+    expect(screen.queryByTestId('daily-challenge-landing')).not.toBeInTheDocument();
+  });
+
+  test('back button from Buzz returns to landing page', async () => {
+    render(<DailyChallengeRouter />);
+
+    // Navigate to Buzz
+    fireEvent.click(screen.getByTestId('select-buzz'));
+    await waitFor(() => {
+      expect(screen.getByTestId('buzz-challenge')).toBeInTheDocument();
+    });
+
+    // Click back
+    fireEvent.click(screen.getByTestId('buzz-back'));
+
+    // Should return to landing
+    await waitFor(() => {
+      expect(screen.getByTestId('daily-challenge-landing')).toBeInTheDocument();
+    });
+    expect(screen.queryByTestId('buzz-challenge')).not.toBeInTheDocument();
   });
 });

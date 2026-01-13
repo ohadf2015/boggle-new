@@ -1,4 +1,4 @@
-// Svenska translations
+// Sv translations
 const sv = {
   "flag": "🇸🇪",
   "name": "Svenska",
@@ -77,9 +77,7 @@ const sv = {
     "cancel": "Avbryt",
     "dismiss": "Stäng",
     "info": "Info",
-    "selectUILanguage": "Språk",
     "close": "Stäng",
-    "changeLanguage": "Byt Språk",
     "adminDashboard": "Administratörspanel",
     "awesome": "Fantastiskt!",
     "admin": "Admin",
@@ -99,84 +97,56 @@ const sv = {
     "signIn": "Logga in",
     "connectedToServer": "Redo för strid!",
     "connectingToServer": "Värmer upp...",
-    "duplicateWarning": "Delade ord = inga poäng!",
     "gameStarted": "KÖR!",
     "joinedGame": "Du är med!",
     "newGameReady": "Runda startar!",
     "lightMode": "Ljust läge",
     "darkMode": "Mörkt läge",
-    "hurry": "SKYNDA!",
     "goToHome": "Hem",
-    "comboBonus": "kombo!",
     "pending": "Kollar...",
     "selected": "Vald",
     "xpGained": "XP",
     "score": "Poäng",
     "points": "pts",
     "pts": "P",
-    "combo": "Kombo",
     "quit": "Avsluta",
-    "foundWords": "Hittade",
     "words": "ord",
     "wordsFound": "Ord",
-    "leaderboard": "Ranking",
     "you": "Du",
-    "playAgain": "Igen!",
     "quickRematch": "Returmatch",
-    "changeSettings": "Inställningar",
-    "settingsAndPlay": "Justera & Spela",
-    "backToLobby": "Lobby",
     "attempts": "Försök",
-    "games": "spel",
     "share": "Dela",
-    "xp": "XP",
-    "settings": "Inställningar",
-    "lobby": "Lobby",
-    "viewGrid": "Visa rutnät",
-    "min": "min",
     "minutes": "min",
     "advancedSettings": "Fler alternativ",
-    "yourScore": "Din poäng",
     "tapToDismiss": "Tryck för att stänga",
     "tapToClose": "Tryck för att fortsätta",
     "tapToContinue": "Tryck för att fortsätta",
     "copied": "Kopierad!",
     "copy": "Kopiera",
-    "copyCode": "Kopiera",
     "noData": "Inget här än",
     "rotateLandscape": "Vänd telefonen!",
     "dontShowAgain": "Förstått",
-    "landscapeMode": "Liggande",
     "rank": "Rank",
     "menu": "Meny",
-    "showControls": "Tryck för kontroller",
     "showPreview": "Visa förhandsgranskning",
     "hidePreview": "Dölj förhandsgranskning",
     "loadingProfile": "Gör klart...",
     "rematch": "Returmatch",
     "roomFull": "Fullt rum - du tittar på nu",
-    "selectLanguage": "Språk",
     "gotIt": "Förstått",
-    "help": "Hjälp",
     "pause": "Pausa",
     "resume": "Fortsätt",
     "save": "Spara",
     "edit": "Redigera",
     "retry": "Försök igen",
-    "newGame": "Nytt spel",
     "join": "Gå med",
     "showLess": "Mindre",
     "showMore": "Mer",
     "collapse": "Minimera",
-    "moreOptions": "Mer",
-    "moreShareOptions": "Fler delningsalternativ",
     "or": "eller",
     "closeMenu": "Stäng",
     "openMenu": "Meny",
-    "language": "Språk",
-    "controls": "Kontroller",
     "account": "Konto",
-    "all": "Alla",
     "valid": "Giltig",
     "invalid": "Ogiltig",
     "validating": "Kollar...",
@@ -194,51 +164,9 @@ const sv = {
     "attempt": "Försök",
     "checkConnection": "Kontrollera din internetanslutning",
     "retry": "Försök igen",
-    "retryNow": "Försök nu",
-    "connectionRestored": "Anslutning återställd!"
-  },
-  "theme": {
-    "sundayFunday": "Kul Söndag",
-    "mondayMotivation": "Måndagsmotivation",
-    "tuesdayTrivia": "Tisdagstrivia",
-    "wednesdayWisdom": "Onsdagsvisdom",
-    "thursdayThrowback": "Torsdags Nostalgi",
-    "funFriday": "Kul Fredag",
-    "saturdayAdventure": "Lördagsäventyr",
-    "newYear": "Nyår",
-    "valentines": "Alla hjärtans dag",
-    "stPatricks": "Sankt Patricks dag",
-    "easter": "Påsk",
-    "independence": "Självständighetsdagen",
-    "halloween": "Halloween",
-    "thanksgiving": "Tacksägelsedag",
-    "christmas": "Jul",
-    "hanukkah": "Chanukka",
-    "roshHashana": "Rosh Hashanah",
-    "yomKippur": "Yom Kippur",
-    "sukkot": "Sukkot",
-    "purim": "Purim",
-    "passover": "Pesach",
-    "shavuot": "Shavuot",
-    "yomHaatzmaut": "Israels nationaldag",
-    "midsummer": "Midsommar",
-    "lucia": "Lucia",
-    "threeKings": "Trettondagen",
-    "dayOfDead": "De dödas dag",
-    "setsubun": "Setsubun",
-    "hinamatsuri": "Flickornas dag",
-    "sakura": "Körsbärsblomning",
-    "goldenWeek": "Gyllene veckan",
-    "tanabata": "Tanabata",
-    "obon": "Obon",
-    "autumnLeaves": "Höstlöv"
+    "retryNow": "Försök nu"
   },
   "game": {
-    "swipeToForm": "Svep bokstäver",
-    "wordAlreadyFound": "Redan hittad!",
-    "wordNotOnBoard": "Finns inte på brädet!",
-    "wordTooShort": "För kort!",
-    "boardTheme": "Brädtema",
     "comboHint": "Hitta ord snabbt för kombo!"
   },
   "help": {
@@ -275,7 +203,6 @@ const sv = {
   },
   "combo": {
     "shieldUsed": "Skölden räddade din streak!",
-    "shieldEarned": "Sköld upplåst!",
     "explanationTitle": "Kombokraft!",
     "explanationText": "Kedja ord snabbt för att bygga kombos. Högre kombo = större multiplikatorer. Tappa den inte!"
   },
@@ -305,38 +232,19 @@ const sv = {
   },
   "bots": {
     "title": "AI-motståndare",
-    "easy": "Nybörjare",
-    "medium": "Skicklig",
-    "hard": "Expert",
-    "easyDesc": "Korta ord, lugnt tempo",
-    "mediumDesc": "Balanserad utmaning",
-    "hardDesc": "Långa ord, blixtsnabb",
-    "selectDifficulty": "Nivå",
-    "addBot": "Lägg till bot",
-    "adding": "Lägger till...",
-    "remove": "Ta bort",
     "removeError": "Kunde inte ta bort",
     "currentBots": "Dina motståndare:",
-    "maxBots": "Rummet fullt!",
-    "quickAdd": "Lägg till",
-    "add": "Lägg till",
     "emptyState": "Inga motståndare än. Lägg till bottar för att öva!",
-    "helpText": "Bottar tävlar mot dig i realtid.",
     "autoFill": "Fyll rummet",
     "autoFillDesc": "Lägg till AI-motståndare automatiskt",
     "orAddManually": "Eller välj dina motståndare:",
-    "addBotsManually": "Lägg till bottar",
-    "selectDifficultyPrompt": "Välj nivå:",
     "roomFull": "Rummet fullt!",
     "autoStart": "Auto-start om 30s",
-    "autoStartDesc": "Spelet startar automatiskt",
     "startingIn": "Startar om...",
     "cancel": "Avbryt",
-    "waitingForPlayers": "Behöver 2+ spelare...",
-    "maxReached": "Max antal bottar nått"
+    "waitingForPlayers": "Behöver 2+ spelare..."
   },
   "music": {
-    "volume": "Volym",
     "musicVolume": "Musik",
     "sfxVolume": "Ljud",
     "mute": "Tyst",
@@ -385,28 +293,17 @@ const sv = {
     "room": "Rum",
     "code": "Kod",
     "joinViaLink": "Tryck för att gå med",
-    "copyLinkButton": "Kopiera",
-    "whatsappButton": "WhatsApp",
-    "qrCodeButton": "QR",
     "qrCodeTitle": "Skanna för Strid",
-    "shareTitle": "Hämta Förstärkning",
     "codeCopied": "Kod kopierad! 🎯",
     "codeCopyError": "Kunde inte kopiera",
     "buttonLabel": "Bjud in",
     "modalTitle": "Samla Gänget",
-    "scanQR": "Skanna för att gå med",
-    "orShareVia": "Eller skicka via:",
     "copyLink": "Kopiera",
     "whatsapp": "WhatsApp",
-    "telegram": "Telegram",
     "more": "Mer",
     "inviteTitle": "Ordkrig pågår! 🎮",
-    "copied": "Kopierad!",
     "shareVictory": "Skryt!",
     "scanToJoin": "Skanna för action",
-    "challengeFriends": "Ta med dina bästa vänner 😈",
-    "beatMyScore": "Tror du att du kan slå detta? 👀",
-    "canYouBeatMe": "Slå det. Jag utmanar dig. 🎯",
     "twitter": "X",
     "discord": "Discord",
     "email": "E-post",
@@ -428,7 +325,6 @@ const sv = {
     "unexpectedError": "Liten bugg - men ditt spel är helt säkert!",
     "errorDetails": "Detaljer",
     "refreshPage": "Uppdatera",
-    // Error page specific copy
     "errorHeading": "Vi Fixar Det!",
     "errorMessage": "Litet fel, men oroa dig inte - alla ord är sparade!",
     "errorProgress": "Allt sparat!",
@@ -442,34 +338,15 @@ const sv = {
     "notConnected": "Kan inte nå servern"
   },
   "notFound": {
-    "title": "Sidan hittades inte",
     "heading": "Vilse i ordlabyrinten?",
     "message": "Den här sidan har vandrat bort från brädet! Låt oss ta dig tillbaka till spelet.",
     "button": "Tillbaka till spelet",
     "mascotTooltip": "Klicka på mig för vägbeskrivning!"
   },
   "validation": {
-    "usernameRequired": "Välj ett namn så kör vi!",
-    "hostUsernameRequired": "Vad ska vi kalla dig?",
-    "roomNameRequired": "Ge rummet ett namn!",
-    "enterNameToJoin": "Ditt stridsnamn",
-    "enterRoomName": "Namnge din arena",
     "enterGameCode": "Har du en kod? Ange den här",
-    "codeHelper": "Dela denna för att bjuda in vänner",
-    "fourDigitCode": "4-siffrig kod",
-    "enterFourDigitCode": "Ange koden",
     "usernameTooShort": "Behöver minst 2 tecken",
     "usernameTooLong": "Max 20 tecken",
-    "usernameInvalidChars": "Bokstäver, siffror, mellanslag och understreck funkar bra",
-    "roomNameTooShort": "Behöver minst 2 tecken",
-    "roomNameTooLong": "Max 30 tecken",
-    "roomNameInvalidChars": "Bokstäver, siffror, mellanslag och understreck funkar bra",
-    "gameCodeRequired": "Behöver en kod för att gå med",
-    "gameCodeInvalid": "Hittade inte koden - dubbelkolla och försök igen",
-    "wordRequired": "Skriv ett ord",
-    "wordTooLong": "Alldeles för långt",
-    "wordInvalidChars": "Bara bokstäver",
-    "gameCodeHint": "Be din vän om koden",
     "invalidEmail": "E-postformatet ser konstigt ut - kolla efter stavfel",
     "invalidCharacters": "Bara bokstäver"
   },
@@ -494,25 +371,11 @@ const sv = {
     "master": "Mästare"
   },
   "joinView": {
-    "title": "LexiClash",
     "createRoom": "Skapa",
     "joinRoom": "Gå med",
-    "joinDesc": "Ange kod",
-    "hostDesc": "Starta nytt spel",
-    "roomNamePlaceholder": "Rumsnamn",
-    "roomNameLabel": "Rum",
-    "roomNameHelper": "Visas i lobbyn",
-    "roomNameHelperOptional": "Valfritt",
-    "optional": "valfritt",
-    "roomNameExample": "t.ex. Spelkväll",
     "hostPlayerName": "Ditt namn",
     "hostPlayerNamePlaceholder": "Namn",
-    "hostPlayerNameHelper": "Visas i spelet",
     "playerNamePlaceholder": "Namn",
-    "yourName": "Namn",
-    "enterYourName": "Ditt namn",
-    "pleaseEnterYourName": "Ange namn",
-    "playerAndRoomName": "Ditt namn",
     "selectLanguage": "Språk",
     "language": "Språk",
     "activeRooms": "Rum",
@@ -521,7 +384,6 @@ const sv = {
     "players": "spelare",
     "host": "Rum",
     "joiningRoom": "Går med",
-    "roomLabel": "Rum",
     "wantToHostOrJoinOther": "Annat rum?",
     "clearAndRestart": "Börja om",
     "english": "English",
@@ -530,23 +392,15 @@ const sv = {
     "japanese": "日本語",
     "spanish": "Español",
     "generateNewCode": "Ny kod",
-    "createGameInstructions": "Dela kod med vänner!",
     "createNewRoom": "Skapa ett rum!",
     "howToPlay": "Hur spelar man",
-    "howToPlayTitle": "Hur man spelar",
     "qrCodeTitle": "Skanna för att gå med",
     "scanToJoin": "Skanna eller använd kod",
-    "copyLink": "Kopiera",
-    "shareWhatsapp": "WhatsApp",
-    "shareEmail": "E-post",
     "inviteTitle": "Gå med",
     "enterNameToPlay": "Ange namn",
-    "playButton": "Spela",
-    "joiningRoomNumber": "Rum",
     "room": "Rum",
     "welcomeBack": "Välkommen",
     "connectingToRoom": "Ansluter...",
-    "enterRoom": "Gå in",
     "joinGame": "Gå med",
     "pasteCode": "Klistra",
     "joiningAs": "som",
@@ -556,10 +410,9 @@ const sv = {
     "creating": "Skapar...",
     "playersOnline": "online",
     "loadingProfile": "Gör klart...",
-    "nickname": "Namn",
-    "nicknamePlaceholder": "Namn",
-    "roomCode": "Kod",
     "changeAvatar": "Byt",
+    "selectAvatar": "Välj en avatar",
+    "playingAs": "Spelar som",
     "defaultPlayerNames": [
       "Smyg Gurka",
       "Disco Potatis",
@@ -587,31 +440,9 @@ const sv = {
       "Vild Tvättbjörn",
       "Fräsig Räv",
       "Glad Flodhäst"
-    ],
-    "chooseAvatar": "Välj din avatar",
-    "selectAvatar": "Välj en avatar",
-    "tapToChange": "Tryck för att ändra",
-    "tapToSelect": "Tryck för att välja",
-    "playingAs": "Spelar som",
-    "changeProfile": "Ändra profil eller gå med i ett annat rum"
+    ]
   },
   "multiplayerFlow": {
-    "selector": {
-      "createCard": {
-        "title": "Skapa",
-        "description": "Var värd",
-        "button": "Skapa"
-      },
-      "joinCard": {
-        "title": "Gå med",
-        "description": "Bläddra bland rum",
-        "button": "Bläddra"
-      },
-      "activeRoomsPreview": "Rum",
-      "playersOnline": "online",
-      "noRooms": "Inga rum - skapa ett!",
-      "roomsRefreshed": "Rum uppdaterade"
-    },
     "roomList": {
       "activeRooms": "Aktiva rum",
       "online": "online",
@@ -622,34 +453,25 @@ const sv = {
     },
     "joinModal": {
       "title": "Gå med i rum",
-      "changeAvatar": "Byt avatar",
       "yourName": "Ditt namn",
       "namePlaceholder": "Ditt namn",
-      "authenticatedHint": "Inloggad",
       "joinButton": "Gå med",
       "joining": "Går med..."
     },
     "createModal": {
       "title": "Skapa rum",
-      "changeAvatar": "Byt avatar",
       "yourName": "Ditt namn",
       "namePlaceholder": "Ditt namn",
-      "authenticatedHint": "Inloggad",
       "roomNameLabel": "Rumsnamn",
       "optional": "valfritt",
-      "roomNameHint": "Lämna tomt för automatiskt namn",
       "createButton": "Skapa rum",
       "creating": "Skapar..."
     },
-    "editProfile": "Redigera",
     "profileSetup": {
       "title": "Inställning",
-      "editTitle": "Redigera",
       "progress": "1 av 2",
-      "editingProgress": "Redigerar",
       "forCreate": "Ställ in för att skapa rum",
       "forJoin": "Ställ in för att gå med",
-      "forEdit": "Uppdatera profil",
       "usernameLabel": "Namn",
       "usernamePlaceholder": "Namn",
       "usernameHint": "2-20 tecken",
@@ -660,7 +482,6 @@ const sv = {
       "usingGameAvatar": "Spelavatar",
       "tapToChange": "Tryck för att ändra",
       "continueButton": "Fortsätt",
-      "saveButton": "Spara",
       "selectAvatar": "Välj Avatar"
     },
     "createForm": {
@@ -686,63 +507,20 @@ const sv = {
       "noRooms": "Inga rum. Få en kod!",
       "joinButton": "Gå med",
       "joining": "Går med..."
-    },
-    "createSetup": {
-      "title": "Skapa Rum",
-      "nameLabel": "Ditt namn",
-      "namePlaceholder": "Ange ditt namn",
-      "avatarLabel": "Välj avatar",
-      "avatarRequired": "Välj en avatar",
-      "roomNameLabel": "Rumsnamn",
-      "roomNamePlaceholder": "Mitt rum",
-      "roomNameHint": "Visas för andra spelare",
-      "languageHint": "Spelare hittar ord på detta språk",
-      "createButton": "Skapa Rum",
-      "creating": "Skapar..."
-    },
-    "joinSetup": {
-      "title": "Gå Med i Rum",
-      "nameLabel": "Ditt namn",
-      "namePlaceholder": "Ange ditt namn",
-      "avatarLabel": "Välj avatar",
-      "avatarRequired": "Välj en avatar",
-      "codeLabel": "Rumskod",
-      "codePlaceholder": "ABC123",
-      "codeHint": "Fråga din vän om rumskoden",
-      "roomsLabel": "Eller välj ett rum",
-      "refreshButton": "Uppdatera",
-      "noRooms": "Inga aktiva rum",
-      "joinButton": "Gå Med",
-      "joining": "Går med..."
     }
   },
   "hostView": {
     "waitingForPlayers": "Väntar...",
     "startGame": "Starta",
-    "stopGame": "Stoppa",
     "roomCode": "Kod",
     "playersJoined": "Spelare",
     "gameSettings": "Inställningar",
     "quickSetup": "Förval",
-    "presetEasy": "Lätt",
-    "presetEasyDesc": "5x5 bräde, 2 min",
-    "presetFast": "Blixt",
-    "presetFastDesc": "7x7 bräde, 1 min",
-    "presetQuick": "Snabb",
-    "presetQuickDesc": "7x7 bräde, 1 min",
-    "presetParty": "Fest",
-    "presetPartyDesc": "7x7 bräde, 2 min",
-    "presetChallenge": "Utmaning",
-    "presetChallengeDesc": "9x9 bräde, 3 min",
     "min": "min",
     "difficulty": "Svårighetsgrad",
-    "timer": "Timer",
     "roundDuration": "Rundans längd",
     "minutes": "minuter",
     "playerJoinedLate": "gick med sent!",
-    "playerFoundWord": "hittade",
-    "validateWords": "Granska och validera ord",
-    "validationComplete": "Validering klar!",
     "gameStopped": "Spelet stoppat",
     "confirmExit": "Är du säker på att du vill avsluta? Rummet förblir öppet och en annan spelare blir värd.",
     "exitWarning": "Denna åtgärd stänger rummet för alla spelare. Är du säker på att du vill avsluta?",
@@ -753,8 +531,6 @@ const sv = {
     "waitingForPlayersToReady": "Väntar på att spelare ska bekräfta att de är redo...",
     "allPlayersReady": "Alla spelare är redo! Starta nästa runda.",
     "validation": "Ordvalidering",
-    "validateIntro": "Markera giltiga ord. Omarkerade ord tas bort.",
-    "totalWords": "Totalt antal ord att validera",
     "submitValidation": "Skicka validering",
     "finalScores": "Slutresultat",
     "words": "Ord",
@@ -764,26 +540,16 @@ const sv = {
     "shareWhatsapp": "Dela WhatsApp",
     "qrCode": "QR-kod",
     "scanQr": "Skanna QR-kod för att gå med eller använd kod",
-    "autoValidated": "Automatiskt validerat",
-    "clickToShow": "Klicka för att visa",
-    "clickToHide": "Klicka för att dölja",
     "hostPlays": "Jag vill spela",
-    "spectatorMode": "Åskådarläge - titta på brädet",
     "broadcastModeTitle": "TV/Projektorläge",
     "broadcastModeDescription": "Visa spelet på stor skärm medan du tittar på (du spelar inte)",
     "broadcastModeHint": "Perfekt för 4+ spelare! Aktivera för att visa på TV",
     "broadcastSuggestion": "Har du 4+ spelare? Prova TV-läge för att visa spelet på stor skärm!",
     "advancedSettings": "Avancerade inställningar",
-    "autoValidatedCount": "ord automatiskt validerade",
     "roomClosedInactivity": "Rummet stängt på grund av inaktivitet",
     "gameOverCheckScores": "Spelet slut! Kolla slutresultaten",
-    "validatingWords": "Kollar ord...",
     "youAreNowHost": "Du är nu värden!",
     "newHostAssigned": "är nu värden",
-    "hostLeft": "Värden lämnade rummet",
-    "liveResults": "Liveresultat",
-    "spectatingInfo": "Du tittar på - ord är dolda tills spelet slutar",
-    "autoSubmittingValidation": "Skickar automatisk validering på grund av inaktivitet",
     "tournamentMode": "Turneringsläge",
     "rounds": "Omgångar",
     "tournamentRound": "Omgång",
@@ -791,35 +557,21 @@ const sv = {
     "tournamentComplete": "Turnering slutförd!",
     "tournamentWinner": "Turneringsvinnare",
     "totalScore": "Totalpoäng",
-    "nextRound": "Nästa omgång",
     "tournamentProgress": "Turneringsframsteg",
     "tournamentCreated": "Turnering skapad!",
     "tournamentCancelled": "Turnering avbruten",
     "gameComplete": "Spelet avslutat!",
     "wonTournament": "vann turneringen",
     "tournamentCreateFailed": "Misslyckades med att skapa turnering. Försök igen.",
-    "autoValidationCompleted": "Automatisk validering slutförd",
     "cancelTournament": "Avbryt turnering",
     "confirmCancelTournament": "Avbryt turnering?",
     "cancelTournamentWarning": "Är du säker på att du vill avbryta turneringen? Alla framsteg går förlorade och detta kan inte ångras.",
     "minWordLength": "Minsta ordlängd",
-    "minWordLength2": "2 bokstäver",
-    "minWordLength3": "3 bokstäver",
-    "minWordLength4": "4 bokstäver",
-    "difficultyTooltipGrid": "{{rows}}×{{cols}} bokstavsrutnät",
-    "difficultyTooltipTimer": "{{minutes}} min rekommenderas",
-    "allWordsAutoValidated": "Alla ord automatiskt validerade!",
     "wordsAutoValidated": "ord automatiskt validerade",
     "gameTypeSelector": "Välj spelläge",
     "regularGame": "Vanligt spel",
-    "regularGameDesc": "Snabb enkelomgång för avslappnat spel",
     "tournament": "Turnering",
-    "tournamentDesc": "Flerrundskonkurrens för mästare",
-    "comingSoon": "Kommer snart",
     "numberOfRounds": "Antal omgångar",
-    "betweenRoundsStandings": "Aktuell ställning",
-    "nextRoundIn": "Nästa omgång börjar om",
-    "startNow": "Starta nu",
     "creatingTournament": "Skapar turnering...",
     "increaseRounds": "Öka antal omgångar",
     "decreaseRounds": "Minska antal omgångar",
@@ -827,19 +579,24 @@ const sv = {
     "decreaseTimer": "Minska timer",
     "increaseTimer": "Öka timer",
     "moreSettings": "Fler inställningar",
-    "playersReadyForNextGame": "spelare redo för nästa spel",
-    "hostPlaysShort": "Värd spelar",
-    "hostSpectates": "Åskådar",
     "letters": "bokstäver",
     "players": "spelare",
-    "letterMinimum": "bokstäver minimum",
     "chat": "Chatt",
     "settings": "Inställningar",
     "regenerateBoard": "Regenerera bräda",
     "boardRegenerated": "Brädan har regenererats!",
     "noPlayers": "Inga spelare i lobbyn",
     "connectionLost": "Anslutningen förlorades. Vänligen uppdatera.",
-    "mode": "Spelläge"
+    "presetFast": "Snabb",
+    "presetFastDesc": "1 min snabbt spel",
+    "presetEasy": "Lätt",
+    "presetEasyDesc": "2 min på lätt bräda",
+    "presetParty": "Party",
+    "presetPartyDesc": "2 min partyläge",
+    "presetChallenge": "Utmaning",
+    "presetChallengeDesc": "3 min svårt läge",
+    "difficultyTooltipGrid": "Rutnätets storlek påverkar svårigheten",
+    "difficultyTooltipTimer": "Längre tid = fler ord hittade"
   },
   "tvBroadcast": {
     "joinAt": "Gå med på",
@@ -856,7 +613,6 @@ const sv = {
     "exitFullscreen": "Avsluta helskärm",
     "host": "VÄRD",
     "hostBadge": "Denna spelare är värden",
-    "moreNotifications": "+{{count}} till",
     "notifications": {
       "longWord": "ORDKRAFT!",
       "epicWord": "MONSTERORD!",
@@ -889,13 +645,11 @@ const sv = {
       "bothFound": "Båda hittade",
       "secondsLeft": "sekunder kvar!",
       "gridShuffle": "Rutnätet blandas!"
-    }
+    },
+    "moreNotifications": "+{count} till"
   },
   "tvResults": {
     "title": "VI HAR EN VINNARE!",
-    "champion": "MÄSTARE!",
-    "runnerUp": "2A PLATS",
-    "bronze": "3E PLATS",
     "wordsFound": "Totalt Ord",
     "longestWord": "Största Ordet",
     "firstStrike": "Första Träff",
@@ -918,8 +672,6 @@ const sv = {
     "specialAwards": "🏆 Specialpriser",
     "words": "ord",
     "pts": "poäng",
-    "andMore": "...och {{count}} spelare till",
-    "andMorePlural": "...och {{count}} spelare till",
     "letters": "bokstäver",
     "legendary": "LEGENDARISK!",
     "amazing": "OTROLIGT!",
@@ -932,33 +684,21 @@ const sv = {
     "bestComboStreak": "Ostoppbar serie!",
     "mostUniqueFinds": "Hittade ord ingen annan såg!",
     "strongFinisher": "Dominerade sista sekunderna!",
-    "roundOf": "Omgång {{current}} av {{total}}"
+    "andMore": "och {count} spelare till",
+    "andMorePlural": "och {count} spelare till"
   },
   "playerView": {
-    "waitingForHost": "Väntar på att värden ska starta...",
-    "submitWord": "Skicka",
-    "clear": "Rensa",
-    "timeRemaining": "Tid kvar",
-    "score": "Poäng",
     "wordsFound": "Ord hittade",
     "wordsOnBoard": "Ord på brädet",
     "wordsRemaining": "ord kvar",
-    "longWordsLabel": "{{min}}+ bokstäver",
-    "longWordsOnBoard": "{{min}}+ bokstävers ord",
-    "longWordsRemaining": "{{min}}+ bokstavsord kvar",
     "remaining": "Kvar",
     "found": "hittade",
     "total": "totalt",
-    "gameOver": "Spelet slut! 🏁",
     "wordAlreadyFound": "Ordet redan hittat! ❌",
     "foundByOther": "Hittades av ${player}",
     "wordNotOnBoard": "Ordet finns inte på brädet! 🚫",
     "wordNotInList": "Ordet är inte tillgängligt",
-    "wordRejected": "Inte ett giltigt ord! ❌",
-    "newWord": "Nytt ord!",
-    "scoresReady": "Resultat klara! ✅",
     "roomClosed": "Rummet stängt",
-    "onlyLanguageWords": "Endast ord på valt språk! 🚫",
     "exitConfirmation": "Lämna rummet?",
     "exitWarning": "Är du säker på att du vill lämna? Du kommer att förlora ditt framsteg i det aktuella spelet.",
     "exit": "Avsluta",
@@ -966,38 +706,18 @@ const sv = {
     "waitForGameStart": "Vänta på att spelet startar",
     "clickToWakeUp": "Tryck för att hälsa!",
     "getReadyHint": "Läs tipsen nedan för att lära dig spela!",
-    "players": "Spelare",
-    "yourAchievements": "Dina prestationer",
-    "letterGrid": "Bokstavsbräde",
-    "longWordsLabel": "${min}+ bokstäver",
-    "longWordsOnBoard": "${min}+ bokstavsord",
-    "longWordsRemaining": "${min}+ bokstavsord kvar",
-    "waitingForGame": "Väntar på spel...",
-    "add": "Lägg till",
-    "enterWord": "Ange ord...",
-    "waitingForResults": "Väntar på resultat...",
     "calculatingScores": "Beräknar poäng...",
     "aiValidating": "AI kontrollerar...",
     "leaderboard": "Topplista",
     "noPlayersYet": "Inga spelare ännu",
-    "wordSubmitted": "Skickat",
     "wordTooShort": "Ordet för kort! (min 2 bokstäver)",
     "wordTooShortMin": "Ordet för kort! (min ${min} bokstäver)",
     "errorOccurred": "Ett fel inträffade",
     "tooFast": "Sakta ner! Skickar för snabbt",
-    "wordCount": "ord",
-    "longestWord": "Längsta",
-    "hostValidating": "Värden validerar ord...",
-    "clickToSelect": "Klicka på bokstäver för att välja ord",
     "me": "Jag",
     "noWordsYet": "Inga ord hittade ännu",
-    "swipeHintWithMin": "Svep över sammankopplade bokstäver ({min}+ bokstäver)",
     "swipeHintShort": "Svep över bokstäver för att hitta ord!",
-    "shuffle": "Blanda",
-    "swipeToFormWords": "Svep på brädet för att bilda ord",
-    "inviteFriends": "Bjud in vänner",
     "waitingForHostToStart": "Väntar på att värden ska starta spelet...",
-    "notInDictionary": "Finns inte i ordlistan",
     "hostDisconnected": "Värden kopplades bort. Väntar på återanslutning...",
     "isNowHost": "är nu värd",
     "disconnected": "kopplades bort. Väntar på återanslutning...",
@@ -1008,13 +728,6 @@ const sv = {
     "sessionMovedToAnotherTab": "Sessionen flyttades till en annan flik",
     "sessionMovedToAnotherRoom": "Sessionen flyttades till ett annat rum",
     "validatingWord": "Kontrollerar:",
-    "validation": {
-      "scanning": "Skannar ord...",
-      "checking": "Kollar ordbok...",
-      "verifying": "AI verifierar...",
-      "scoring": "Beräknar poäng...",
-      "finalizing": "Slutför resultat..."
-    },
     "rankings": "Rankningar",
     "showLeaderboard": "Visa topplistan",
     "slowDown": "Sakta ner! Ord bearbetas.",
@@ -1023,18 +736,11 @@ const sv = {
     "alreadyFound": "Redan hittad",
     "invalidWord": "Ogiltigt ord",
     "pendingValidation": "Kollas...",
-    "longWordsLabel": "${min}+ bokstäver",
-    "longWordsOnBoard": "${min}+ bokstävers ord",
-    "longWordsRemaining": "${min}+ bokstävers ord kvar",
     "letterWords": "bokstavsord",
-    "maxTier": "Legend!",
-    "tierstarter": "Startad",
-    "tierbronze": "Brons",
-    "tiersilver": "Silver",
-    "tiergold": "Guld",
-    "tierstar": "Stjärna",
-    "tierfire": "I Elden",
-    "tierlegend": "Legend"
+    "swipeHintWithMin": "Svep bokstäver för att hitta ord! (minst {min} bokstäver)",
+    "longWordsLabel": "Långa ord",
+    "longWordsOnBoard": "{count} långa ord på brädan",
+    "longWordsRemaining": "{found}/{total} hittade"
   },
   "waiting": {
     "milestoneFirst": "Första spelaren!",
@@ -1058,28 +764,48 @@ const sv = {
     "header": "Snabbguide",
     "skip": "Hoppa över",
     "letsPlay": "Nu kör vi!",
-    "step1Title": "Svep över bokstäver",
-    "step1Text": "Dra över anslutna bokstäver för att bilda ord. Släpp för att skicka!",
-    "step2Title": "Samla poäng",
-    "step2Text": "Längre ord = mycket mer poäng. Försök hitta ord med 5+ bokstäver!",
-    "step3Title": "Bygg kombos",
-    "step3Text": "Hitta ord snabbt i rad för att bygga kombomultiplikatorer!",
-    "step4Title": "Var unik",
-    "step4Text": "Ord som hittats av andra ger noll. Tänk kreativt!",
-    "timingHint": "De första 10 sekunderna är avgörande!"
+    "timingHint": "De första 10 sekunderna är avgörande!",
+    "welcome": {
+      "title": "Välkommen till LexiClash!",
+      "subtitle": "Svep bokstäver. Bilda ord. Dominera.",
+      "demoInstruction": "Testa! Svep för att stava:",
+      "demoWord": "SOL",
+      "demoHint": "Koppla ihop angränsande bokstäver",
+      "demoSuccess": "Perfekt!",
+      "demoComplete": "Du förstår! Nu vet du hur man spelar."
+    },
+    "name": {
+      "placeholder": "Ange ditt namn",
+      "errorInvalid": "Endast bokstäver, siffror och mellanslag",
+      "errorTooShort": "För kort! 2+ tecken",
+      "errorTooLong": "För långt! Max 20",
+      "characterCount": "tecken"
+    },
+    "profile": {
+      "title": "Skapa Din Profil",
+      "subtitle": "Avatar + namn = redo för strid"
+    },
+    "quickTips": {
+      "title": "Proffstips",
+      "subtitle": "Resten lär du dig genom att spela"
+    },
+    "training": {
+      "title": "Träningsläge",
+      "description": "Öva i din egen takt utan press. Perfekt för nybörjare!",
+      "ready": "Du är redo att spela!",
+      "hint": "Fler spellägen låses upp när du spelar!"
+    },
+    "navigation": {
+      "back": "Tillbaka",
+      "next": "Nästa",
+      "letsPlay": "Kör!",
+      "title": "Välkommen",
+      "description": "Lär dig spela LexiClash"
+    },
+    "swipeHint": "← Svep för att navigera →"
   },
   "tips": {
     "header": "Pro Tips",
-    "swipeTitle": "Svep för att koppla",
-    "swipeText": "Dra fingret över bokstäver för att bilda ord. Du kan röra dig i vilken riktning som helst!",
-    "longerTitle": "Längre = Bättre",
-    "longerText": "Längre ord ger mycket mer poäng. Ett 6-bokstavsord slår två 3-bokstavsord!",
-    "comboTitle": "Bygg Kombos",
-    "comboText": "Kedja ord snabbt för att bygga kombomultiplikatorer för bonuspoäng!",
-    "uniqueTitle": "Var Unik",
-    "uniqueText": "Delade ord ger noll poäng! Tänk kreativt för att hitta unika ord.",
-    "bonusTitle": "Bonusrundor",
-    "bonusText": "Håll utkik efter eldrundor med 2x poäng! Perfekt timing kan vända spelet.",
     "tryIt": "Testa!"
   },
   "lateJoiner": {
@@ -1091,20 +817,11 @@ const sv = {
     "quickTip2": "Släpp för att skicka",
     "quickTip3": "Längre ord = fler poäng!",
     "gotIt": "Jag fattar, låt oss spela!",
-    "badge": "Sen anslutning",
-    "joinedMidGame": "gick med mitt i spelet"
+    "badge": "Sen anslutning"
   },
   "spectator": {
-    "watching": "Tittar som åskådare",
-    "roomFull": "Rummet är fullt ({{current}}/{{max}} spelare)",
-    "joinWhenAvailable": "Gå med när en plats öppnas",
-    "joinGame": "Gå med i spelet",
-    "slotAvailable": "{{count}} plats tillgänglig",
-    "slotsAvailable": "{{count}} platser tillgängliga",
     "upgraded": "Du är med! Kör!",
     "youAreSpectating": "Tittar på matchen!",
-    "watchingGame": "Tittar på spelet...",
-    "waitForSlot": "Väntar på spelarplats...",
     "status": "👀 ÅSKÅDAR",
     "explanation": "Rummet är fullt! Du tittar bara nu, men ett ställe kanske öppnas.",
     "requestToPlay": "Be om att spela",
@@ -1112,30 +829,12 @@ const sv = {
   },
   "hints": {
     "hint": "Ledtråd",
-    "getHint": "Få ledtråd",
-    "freeHints": "Gratis Ledtrådar",
     "loading": "Hämtar ledtråd...",
-    "noHints": "Inga ledtrådar kvar",
     "noHintsLeft": "Inga ledtrådar kvar",
-    "requestHint": "Begär ledtråd, {remaining} kvar",
-    "noWordsLeft": "Inga fler ord att hitta!",
-    "noLongWordsLeft": "Inga fler 5+ bokstävers ord att hitta!",
-    "lookFor": "Leta efter ett",
-    "letterWord": "bokstävers ord",
     "letters": "bokstäver",
     "startsWith": "börjar med",
-    "tapToDismiss": "Tryck för att stänga",
     "tapOrEscToDismiss": "Tryck eller Escape för att stänga",
-    "with": "med",
-    "inMiddle": "i mitten",
-    "vowels": "vokaler",
-    "withDoubles": "med dubbla bokstäver",
-    "longerWord": "Ett längre ord",
-    "shortWord": "Kort ord"
-  },
-  "achievementPopup": {
-    "unlocked": "Prestation upplåst!",
-    "tapToDismiss": "Tryck för att stänga"
+    "requestHint": "Få en ledtråd"
   },
   "achievementDock": {
     "title": "Dina prestationer"
@@ -1165,13 +864,10 @@ const sv = {
     "rewardsEarned": "Belöningar intjänade",
     "achievementUnlocked": "Prestation upplåst",
     "achievementsUnlocked": "Prestationer upplåsta",
-    "summary": "Sammanfattning",
     "details": "Detaljer",
     "performanceDetails": "Prestandadetaljer",
-    "play": "Spela",
     "badges": "Märken",
     "xp": "XP",
-    "gameOver": "Tiden är ute!",
     "winner": "Vinnare",
     "winnerAnnouncement": "Vinnare",
     "youWon": "SEGER!",
@@ -1180,7 +876,6 @@ const sv = {
     "silverMedalist": "Silvermedaljör",
     "bronzeMedalist": "Bronsmedaljör",
     "points": "poäng",
-    "pointWords": "${points} poäng ord",
     "invalid": "Ogiltiga",
     "exitRoom": "Lämna",
     "exitWarning": "Gå nu? Du kan stanna för nästa runda.",
@@ -1188,30 +883,15 @@ const sv = {
     "celebrate": "Fira",
     "celebrateAgain": "Igen!",
     "finalScores": "Slutresultat",
-    "returnToRoom": "Tillbaka till rum",
-    "cancelAutoReturn": "Avbryt",
-    "valid": "giltiga",
     "validWords": "Giltiga Ord",
     "playAgainQuestion": "Mer?",
-    "playAgainDescription": "Häng kvar för nästa runda",
-    "stayInRoom": "Stanna",
     "leaveRoom": "Lämna",
     "shared": "Delad",
-    "comboBonus": "Kombobonus",
-    "basePoints": "Bas",
-    "totalScore": "Totalt",
     "noPoints": "Inga poäng",
-    "otherPlayers": "Andra spelare",
-    "needsVerification": "Behöver Verifiering",
-    "autoVerified": "Automatiskt Verifierad",
     "aiVerified": "Verifierad av AI",
     "aiRejected": "Avvisad av AI",
-    "tapToClose": "Tryck var som helst för att stänga",
-    "startNewGame": "Starta nytt spel",
     "levelUp": "Nivå upp!",
     "pendingValidation": "Väntar på gemenskapens validering",
-    "potentialScore": "+${score} poäng om godkänt",
-    "wordValidated": "Ordet validerat! Du fick ${score} poäng!",
     "autoRejoinIn": "Automatiskt återansluter om",
     "rejoinNow": "Återanslut nu",
     "largeRoomMode": "Stort rumsläge",
@@ -1222,37 +902,17 @@ const sv = {
     "yourWords": "Dina ord",
     "fireRoundBonus": "Eldrunda",
     "time": "Tid",
-    "viewResults": "Visa resultat",
     "place": "Plats",
     "words": "Ord",
     "bestWord": "Bästa",
-    "pointsFromFirst": "Bara {points} poäng från 1:a plats!",
     "missedWords": "Ord du missade",
-    "missedWordsHint": "Höga poäng ord som andra hittade",
-    "missedWordsMotivation": "Lär dig dessa till nästa gång!",
-    "foundByOpponents": "Hittades av motståndare",
-    "foundByOpponentsHint": "Ord som motståndarna upptäckte först",
-    "foundByOpponentsMotivation": "Lär dig dessa till nästa gång!",
-    "topMissed": "Toppord att lära sig",
     "missedOnBoard": "Ord du missade på brädet",
-    "bonusWordsForNextTime": "Bonusord för nästa gång",
-    "almostPerfect": "Nästan perfekt!",
-    "greatJob": "Bra jobbat!",
-    "strongGame": "Starkt spel!",
-    "treasureAwaits": "Skatter väntar!",
-    "topGems": "Topp:",
-    "more": "mer",
-    "tapToSeeOnGrid": "Tryck på ord för att se dem på brädet!",
-    "showMoreWords": "Visa {count} till",
-    "players": "spelare",
     "everyoneReady": "Alla redo!",
     "waitingForPlayers": "Väntar på spelare",
     "ready": "Redo!",
     "waiting": "Väntar...",
-    "allPlayersReady": "Alla spelare är redo! Värden kan starta nästa runda.",
     "imReady": "Redo för nästa spel",
     "youAreReady": "Du är redo!",
-    "waitingForOthersToReady": "Väntar på att andra ska markera sig redo...",
     "waitingForHostToStart": "Väntar på att värden ska starta nästa runda...",
     "markReadyDescription": "Tryck på knappen för att markera dig redo för nästa spel",
     "allReadyHostCanStart": "🎉 Alla spelare redo! Du kan starta nästa runda.",
@@ -1262,27 +922,18 @@ const sv = {
     "goToLobby": "Gå till lobby",
     "you": "(Du)",
     "betterLuckNextTime": "Bättre lycka nästa gång!",
-    "yourPlace": "{rank}:e plats",
-    "tryAgainEncouragement": "Fortsätt spela för att förbättra dig!",
     "of": "av",
     "readyForNextRound": "Redo för nästa runda?",
     "hostStartDescription": "Starta ett nytt spel när alla är redo!",
     "readyExplanation": "Tryck för att visa att du vill köra igen",
     "scoringTip": "Poängtips",
     "scoringTipText": "Hitta ord snabbt i rad för kombobonus (⚡). Längre ord ger mycket mer poäng!",
-    "sharedWordsExplanation": "Dessa ord hittades av andra spelare också, så de ger 0 poäng. Försök hitta unika ord!"
+    "sharedWordsExplanation": "Dessa ord hittades av andra spelare också, så de ger 0 poäng. Försök hitta unika ord!",
+    "yourPlace": "{place} av {total}",
+    "pointsFromFirst": "{points} poäng från 1:a",
+    "potentialScore": "+{points} möjliga poäng"
   },
   "nextStep": {
-    "challengeBots": "Utmana Bottarna!",
-    "challengeBotsDesc": "Testa dina färdigheter mot AI-motståndare",
-    "challengeBotsAgain": "Spela Igen!",
-    "challengeBotsAgainDesc": "Starta ett nytt spel med bottar",
-    "dailyChallenge": "Daglig Utmaning",
-    "dailyChallengeDesc": "Samma pussel för alla världen över",
-    "goMultiplayer": "Spela Multiplayer!",
-    "goMultiplayerDesc": "Tävla mot riktiga spelare",
-    "brainTraining": "Hjärnträning",
-    "brainTrainingDesc": "Följ din kognitiva tillväxt",
     "backToLobby": "Tillbaka till Lobbyn",
     "letsGo": "Kör!"
   },
@@ -1294,208 +945,40 @@ const sv = {
     "bestScore": "Bäst",
     "average": "Snitt",
     "games": "Spel",
-    "trend": "Trend",
-    "trendUp": "Förbättras!",
-    "trendDown": "Fortsätt försöka!",
-    "trendStable": "Stabil",
-    "milestones": {
-      "wordWizard": "Ordtrollkarl",
-      "onFire": "På gång!",
-      "nice": "Snyggt!",
-      "warmingUp": "Värmer upp"
-    },
-    "funMessages": {
-      "crushing": "Du krossar det! 🔥",
-      "domination": "På väg mot orddominans! 📈",
-      "steadyImprovement": "Stadig förbättring, snyggt! 👆",
-      "roughDay": "Tuff dag? Vi har alla sådana! 💪",
-      "comeback": "Värmer upp för comeback! 🎯",
-      "tinyDip": "Liten dipp, inga problem! 🌊",
-      "holdingSteady": "Håller stabil som ett proffs! ⚖️",
-      "playMore": "Spela mer för att se din trend!"
-    },
     "timeAgo": {
       "justNow": "Just nu",
-      "minutesAgo": "{count}m sedan",
-      "hoursAgo": "{count}h sedan",
       "yesterday": "Igår",
-      "daysAgo": "{count}d sedan"
+      "minutesAgo": "{minutes}m sedan",
+      "hoursAgo": "{hours}t sedan",
+      "daysAgo": "{days}d sedan"
     },
     "improving": "Förbättras",
     "declining": "Sjunker",
     "stable": "Stabil"
   },
   "archetypes": {
-    "strategist": "Strategen",
-    "strategistDesc": "Du planerar tre drag framåt medan andra fortfarande hittar sitt första ord",
-    "speedster": "Snabbis",
-    "speedsterDesc": "Dina fingrar rör sig snabbare än dina motståndare kan tänka",
-    "scholar": "Akademikern",
-    "scholarDesc": "Du ser 'långrandigt ord' där andra ser 'långt ord'",
-    "explorer": "Upptäckaren",
-    "explorerDesc": "Medan andra håller sig till det uppenbara, upptäcker du gömda pärlor",
-    "perfectionist": "Perfektionisten",
-    "perfectionistDesc": "Inga bortkastade drag. Varje svep är avsiktligt.",
-    "maverick": "Rebellen",
-    "maverickDesc": "Regler är förslag. Du spelar ditt eget spel.",
-    "workhorse": "Arbetshästen",
-    "workhorseDesc": "Du hittar fortfarande ord när alla andra har gett upp",
-    "closer": "Avslutaren",
-    "closerDesc": "Sista 10 sekunderna? Det är när du lyser.",
-    "trailblazer": "Banbrytaren",
-    "trailblazerDesc": "Säkra spel tråkar ut dig. Du går efter omöjliga ord.",
     "hint": "Baserat på din spelstil"
   },
-  "scoreCard": {
-    "title": "Ditt Resultatkort",
-    "rank": {
-      "position": "#{rank} av {total}",
-      "percentile": "Topp {percentile}%",
-      "winner": "Vinnare!",
-      "pointsFromWinner": "{points} från vinnaren",
-      "pointsFromNext": "{points} från nästa"
-    },
-    "score": "Poäng",
-    "wordsFound": "Ord Hittade",
-    "accuracy": "Noggrannhet",
-    "longestWord": "Längsta Ordet",
-    "maxCombo": "Max Kombo",
-    "uniqueWords": "Unika Ord",
-    "topWords": "Bästa Orden",
-    "achievements": "Prestationer",
-    "shareResults": "Dela Resultat",
-    "downloadImage": "Ladda Ner Bild",
-    "errorGenerating": "Kunde inte skapa resultatkort",
-    "loading": "Skapar resultatkort...",
-    "stats": {
-      "totalWords": "Totalt Ord",
-      "validWords": "Giltiga Ord",
-      "accuracy": "Noggrannhet",
-      "longestWord": "Längsta Ordet",
-      "maxCombo": "Max Kombo",
-      "comboBonus": "Kombo Bonus",
-      "fireBonus": "Eld Bonus",
-      "uniqueWords": "Unika Ord",
-      "avgWordLength": "Genomsnittlig Ordlängd",
-      "games": "Matcher",
-      "level": "Nivå"
-    }
-  },
-  "playerTitles": {
-    "champion": {
-      "name": "Mästare",
-      "icon": "👑",
-      "description": "Spelets vinnare"
-    },
-    "perfectionist": {
-      "name": "Perfektionisten",
-      "icon": "✨",
-      "description": "Högsta träffsäkerhet - alla ord giltiga"
-    },
-    "speedster": {
-      "name": "Blixtsnabb",
-      "icon": "⚡",
-      "description": "Flest ord per minut"
-    },
-    "wordsmith": {
-      "name": "Ordsmeden",
-      "icon": "📝",
-      "description": "Hittade flest ord"
-    },
-    "scholar": {
-      "name": "Den Lärde",
-      "icon": "🎓",
-      "description": "Hittade det längsta ordet"
-    },
-    "explorer": {
-      "name": "Utforskaren",
-      "icon": "🧭",
-      "description": "Mest varierade ordlängder"
-    },
-    "sniper": {
-      "name": "Prickskytten",
-      "icon": "🎯",
-      "description": "Bästa träffsäkerhet (minst ogiltiga ord)"
-    },
-    "comboMaster": {
-      "name": "Kombomästare",
-      "icon": "🔥",
-      "description": "Högsta intjänad kombobonus"
-    },
-    "earlyBird": {
-      "name": "Morgonfågeln",
-      "icon": "🐦",
-      "description": "Flest ord under första minuten"
-    },
-    "clutchPlayer": {
-      "name": "Avgörande Spelaren",
-      "icon": "⏰",
-      "description": "Flest ord under sista 30 sekunderna"
-    },
-    "bigWordHunter": {
-      "name": "Storordsjägare",
-      "icon": "🦁",
-      "description": "Flest ord med 6+ bokstäver"
-    },
-    "consistentPlayer": {
-      "name": "Den Stadige",
-      "icon": "📊",
-      "description": "Mest konsekvent ordinlämning"
-    }
-  },
   "scorePage": {
-    "title": "🏆 Spelresultat",
-    "leaderboard": "Topplista",
-    "points": "Poäng",
-    "pts": "poäng",
-    "congratulations": "Grattis"
+    "pts": "poäng"
   },
   "howToPlay": {
-    "title": "Hur spelar man LexiClash?",
     "description": "LexiClash är ett snabbt ordspel där du tävlar mot klockan för att hitta så många ord som möjligt på ett bokstavsrutnät. Ju längre ord, desto fler poäng!",
-    "descriptionNote": "Ord måste vara minst 2 bokstäver långa. Namn, platser och kända akronymer är tillåtna!",
     "createOrJoinTitle": "Skapa eller gå med i ett spel",
     "createOrJoinDesc": "Värden skapar ett rum och delar koden. Spelare går med med koden.",
     "hostStartsTitle": "Värden startar spelet",
     "hostStartsDesc": "När alla är redo startar värden timern och bokstäverna visas!",
-    "findWordsTitle": "Hitta ord på brädet",
-    "findWordsDesc": "Koppla bokstäver i alla riktningar (diagonaler också!) för att bilda ord.",
     "findWordsNote": "Obs: Du kan inte återanvända samma bokstav i ett enda ord!",
     "earnPointsTitle": "Tjäna poäng och prestationer",
     "earnPointsDesc": "Ju längre ord, desto fler poäng! Plus, lås upp speciella prestationer för imponerande bedrifter.",
-    "earnPointsNote": "Speciella prestationer kan ge dig en fin poängboost!",
     "scoringSystemTitle": "Poängsystem 🎯",
     "scoringTable": {
-      "letters2": "2 bokstäver: 1 poäng",
-      "letters3": "3 bokstäver: 2 poäng",
-      "letters4": "4 bokstäver: 3 poäng",
-      "letters5": "5 bokstäver: 4 poäng",
-      "letters6": "6 bokstäver: 5 poäng",
-      "letters7": "7 bokstäver: 6 poäng",
-      "letters8plus": "8+ bokstäver: 7+ poäng",
       "formula": "Snabb matte: ordlängd minus 1"
     },
-    "achievementsTitle": "Speciella prestationer 🏆",
     "achievements": {
-      "speedDemon": "⚡ Hastighetsdemon - Första spelaren att hitta 5 ord",
-      "wordWizard": "🎩 Ordtrollkarl - Hitta 20+ ord",
-      "vocabularyKing": "👑 Ordförrådskung - Hitta 30+ ord",
-      "longWordMaster": "📏 Långordsmästare - Hitta ett ord med 7+ bokstäver",
-      "perfectionist": "💎 Perfektionist - 100% av dina ord är giltiga",
-      "earlyBird": "🐦 Morgonpiggen - Hitta 3 ord på första minuten",
       "examples": "Exempel på prestationer"
     },
     "tipsTitle": "Tips för att vinna 💡",
-    "gameFeaturesTitle": "Spelfunktioner",
-    "tips": {
-      "tip1": "Börja med korta ord och utöka dem (t.ex. \"katt\" → \"katter\")",
-      "tip2": "Leta efter vanliga bokstavskombinationer",
-      "tip3": "Skanna systematiskt - hoppa inte runt slumpmässigt",
-      "tip4": "Hastighet är viktigt! Hitta ord snabbt för att låsa upp prestationer",
-      "tip5": "Kom ihåg - endast giltiga ord på det valda språket räknas"
-    },
-    "readyToPlay": "Redo? Låt oss börja spela! 🎮",
-    "funForFamily": "Ett engagerande och roligt spel för hela familjen - helt gratis!",
     "letters": "bokstäver",
     "pts": "poäng",
     "steps": {
@@ -1512,26 +995,12 @@ const sv = {
         "description": "Längre ord ger fler poäng! Varje bokstav utöver den första ger en poäng till din totala poäng."
       },
       "combo": {
-        "title": "Kombosystem",
         "description": "Skicka ord snabbt för att bygga kombomultiplikatorer! Ju snabbare du hittar ord, desto större bonus."
-      },
-      "xp": {
-        "title": "XP & Nivåer",
-        "description": "Tjäna XP från varje spel för att stiga i nivå och låsa upp nya titlar. Vinstbonusar och prestationer ökar din XP!"
-      },
-      "achievements": {
-        "title": "Prestationer",
-        "description": "Lås upp prestationer för speciella bedrifter! Varje prestation kan tjänas flera gånger för att uppgradera dess nivå."
       }
     },
     "demo": {
-      "watchAnimation": "Se hur ord bildas på rutnätet",
-      "autoPlay": "Auto",
       "pause": "Pausa",
       "replay": "Spela om",
-      "tryIt": "Prova att dra bokstäver själv!",
-      "gridExample": "Exempel på att spåra ett ord på rutnätet",
-      "traceExample": "Spåra bokstäver för att bilda ord - T→O→N→D",
       "play": "Spela demo"
     },
     "combo": {
@@ -1544,10 +1013,6 @@ const sv = {
     },
     "xp": {
       "howToEarn": "Hur man tjänar XP",
-      "base": "Slutför ett spel",
-      "score": "Få poäng",
-      "win": "Vinn spelet",
-      "achievement": "Lås upp prestationer",
       "unlockTitles": "Lås upp titlar när du stiger i nivå"
     },
     "quickTip": {
@@ -1557,121 +1022,9 @@ const sv = {
     },
     "newPlayer": {
       "welcomeTitle": "Välkommen till LexiClash!",
-      "welcomeMessage": "Det verkar som att det här är din första gång här. Vill du ha en snabb genomgång av hur man spelar?",
-      "showTutorial": "Visa mig hur",
-      "skipTutorial": "Jag klarar mig",
       "dontShowAgain": "Visa inte detta igen",
       "letsPlay": "Nu kör vi!"
     }
-  },
-  "onboarding": {
-    "header": "Snabbguide",
-    "skip": "Hoppa över",
-    "letsPlay": "Nu kör vi!",
-    "step1Title": "Svep över bokstäver",
-    "step1Text": "Dra över anslutna bokstäver för att bilda ord. Släpp för att skicka!",
-    "step2Title": "Samla poäng",
-    "step2Text": "Längre ord = mycket mer poäng. Försök hitta ord med 5+ bokstäver!",
-    "step3Title": "Bygg kombos",
-    "step3Text": "Hitta ord snabbt i rad för att bygga kombomultiplikatorer!",
-    "step4Title": "Var unik",
-    "step4Text": "Ord som hittats av andra ger noll. Tänk kreativt!",
-    "timingHint": "De första 10 sekunderna är avgörande!",
-    "welcome": {
-      "title": "Välkommen till LexiClash!",
-      "subtitle": "Svep bokstäver. Bilda ord. Dominera.",
-      "demoInstruction": "Testa! Svep för att stava:",
-      "demoWord": "SOL",
-      "demoHint": "Koppla ihop angränsande bokstäver",
-      "demoSuccess": "Perfekt!",
-      "demoComplete": "Du förstår! Nu vet du hur man spelar.",
-      "clickNext": "Nästa →"
-    },
-    "combo": {
-      "title": "Kombokraft",
-      "subtitle": "Kedja ord för massiva multiplikatorer",
-      "explanation": "Hitta ord snabbt för att bygga kombos. Högre kombo = högre poäng. Tappar du? Kombo nollställs!",
-      "tip": "Håll kedjan vid liv!",
-      "example1": "Första ordet",
-      "example2": "2x!",
-      "example3": "3x!"
-    },
-    "specialRounds": {
-      "title": "Kaosrundor",
-      "subtitle": "När spelet blir vilt",
-      "earthquake": {
-        "title": "Jordbävning",
-        "description": "Bokstäverna blandas mitt i spelet. Anpassa snabbt!",
-        "tip": "Nytt bräde, nya möjligheter"
-      },
-      "fireRound": {
-        "title": "Eldrunda",
-        "description": "DUBBLA POÄNG. Ge allt!",
-        "tip": "Detta är ditt ögonblick"
-      }
-    },
-    "avatar": {
-      "title": "Välj Din Look",
-      "subtitle": "Visa din stil",
-      "selected": "Vald"
-    },
-    "name": {
-      "title": "Vad Kallar Vi Dig?",
-      "subtitle": "Ditt stridsnamn",
-      "placeholder": "Ange ditt namn",
-      "errorInvalid": "Endast bokstäver, siffror och mellanslag",
-      "errorTooShort": "För kort! 2+ tecken",
-      "errorTooLong": "För långt! Max 20",
-      "characterCount": "tecken",
-      "proTip": "Välj ett namn som ser bra ut på topplistan"
-    },
-    "profile": {
-      "title": "Skapa Din Profil",
-      "subtitle": "Avatar + namn = redo för strid"
-    },
-    "quickTips": {
-      "title": "Proffstips",
-      "subtitle": "Resten lär du dig genom att spela",
-      "tip1Title": "Svep för att Koppla",
-      "tip1Text": "Dra genom bokstäver för att bilda ord",
-      "tip2Title": "Långa Ord = Stora Poäng",
-      "tip2Text": "6+ bokstavsord är värda jakten",
-      "tip3Title": "Håll Utkik efter Bonusrundor",
-      "tip3Text": "Dubbla poäng när elden slår till!"
-    },
-    "training": {
-      "title": "Träningsläge",
-      "description": "Öva i din egen takt utan press. Perfekt för nybörjare!",
-      "ready": "Du är redo att spela!",
-      "hint": "Fler spellägen låses upp när du spelar!"
-    },
-    "mode": {
-      "title": "Hur Vill Du Spela?",
-      "subtitle": "Välj din slagfält",
-      "singlePlayer": {
-        "title": "Sololäge",
-        "description": "Öva mot bottar eller slå dina egna rekord"
-      },
-      "multiPlayer": {
-        "title": "Multiplayer",
-        "description": "Ordstrider i realtid med vänner"
-      },
-      "dailyPlayer": {
-        "title": "Daglig Utmaning",
-        "description": "Samma pussel världen över. En chans per dag."
-      },
-      "encouragement": "Kör! Din ordresa börjar nu."
-    },
-    "navigation": {
-      "skip": "Hoppa över",
-      "back": "Tillbaka",
-      "next": "Nästa",
-      "letsPlay": "Kör!",
-      "title": "Välkommen",
-      "description": "Lär dig spela LexiClash"
-    },
-    "skipHint": "ESC eller Hoppa över för att komma till spelet 🎮",
-    "swipeHint": "← Svep för att navigera →"
   },
   "tutorialPrompt": {
     "title": "Första gången här?",
@@ -1680,52 +1033,15 @@ const sv = {
     "later": "Senare"
   },
   "tutorial": {
-    "stepLabel": "{current}/{total}",
     "skip": "Hoppa över",
     "prev": "Tillbaka",
     "next": "Nästa",
     "finish": "Fattar!",
     "tapToContinue": "Tryck eller svep för att navigera",
-    "welcome": {
-      "title": "Kör igång!",
-      "description": "Snabb tutorial - 30 sekunder och du är redo att dominera."
-    },
-    "grid": {
-      "title": "Slagfältet",
-      "description": "Ditt uppdrag: hitta ord genom att koppla ihop bokstäver. Fler ord = fler poäng."
-    },
-    "swipe": {
-      "title": "Svep för Vinst",
-      "description": "Dra genom bokstäver (diagonaler också). Släpp för att skicka. Längre = mer poäng."
-    },
-    "combo": {
-      "title": "Kombomultiplikatorer",
-      "description": "Kedja ord snabbt för kombobonusar. Varje ord ökar din multiplikator. Bryt inte serien!"
-    },
-    "timer": {
-      "title": "Slå Klockan",
-      "description": "Tiden tickar. När den blir röd är det crunch time. Varje sekund räknas!"
-    },
-    "leaderboard": {
-      "title": "Klättra i Rank",
-      "description": "Se din position i realtid. Längre ord = snabbare klättring."
-    },
-    "ready": {
-      "title": "Redo!",
-      "description": "Det var allt! Nu kör vi - visa vem som bestämmer."
-    },
     "wordHunt": {
       "welcome": {
         "title": "Word Hunt",
         "description": "Knäck det dolda ordet på 10 försök eller mindre.",
-        "next": "Nästa"
-      },
-      "colorFeedback": {
-        "title": "Färgkoder",
-        "tryGuessing": "Varje gissning avslöjar ledtrådar:",
-        "green": "Grön = Prickat! (rätt plats)",
-        "yellow": "Gul = Nära (fel plats)",
-        "gray": "Grå = Inte i ordet",
         "next": "Nästa"
       },
       "lifeSystem": {
@@ -1733,20 +1049,9 @@ const sv = {
         "description": "Hitta bonusord på brädet för extra liv!",
         "swipeToGain": "Svep för att tjäna",
         "tryIt": "Fattar!",
-        "clueMerge": "Ledtrådar staplas!",
-        "clueMergeDesc": "Varje gissning avslöjar fler bokstäver",
-        "greenReveal": "🟩 Rätt plats = förblir grön",
-        "yellowKnown": "🟨 Fel plats = förblir gul",
         "lifeBarLabel": "Livstake",
         "clueTokensLabel": "Ledtrådspoletter",
         "wordFound": "Ord hittat!"
-      },
-      "minLength": {
-        "title": "ENDAST 3+ BOKSTÄVER",
-        "description": "Ord behöver minst 3 bokstäver",
-        "example1": "3 bokstäver ✓",
-        "example2": "2 bokstäver ✗",
-        "gotIt": "Fattar!"
       },
       "triesRule": {
         "title": "Vad Räknas Som Försök?",
@@ -1761,15 +1066,7 @@ const sv = {
       },
       "letterFeedback": {
         "title": "Läsa Ledtrådarna",
-        "description": "Varje bokstav berättar något:",
-        "green": "Grön",
-        "greenDesc": "Rätt bokstav, rätt plats",
-        "yellow": "Gul",
-        "yellowDesc": "Rätt bokstav, fel plats",
-        "gray": "Grå",
-        "grayDesc": "Inte i ordet",
         "example": "Exempel: Målet är \"BEACH\"",
-        "exampleDesc": "E är grön (korrekt), A är gul (fel plats)",
         "gotIt": "Fattar!",
         "legendGreen": "Rätt plats",
         "legendYellow": "Fel plats",
@@ -1777,17 +1074,12 @@ const sv = {
       },
       "complete": {
         "title": "Redo att Jaga!",
-        "remember": "Snabbregler:",
-        "rule1": "10 försök att hitta målet",
-        "rule2": "Hitta andra ord för liv",
-        "rule3": "Minimum 3 bokstäver",
-        "ruleColors": "🟩 = rätt, 🟨 = fel plats, ⬜ = inte i ordet",
-        "rule4": "Samma pussel världen över",
         "sameChallenge": "Samma pussel för alla i världen – jämför din poäng!",
         "start": "Kör!"
       }
     },
-    "swipeHint": "← Svep för att navigera →"
+    "swipeHint": "← Svep för att navigera →",
+    "stepLabel": "Steg {current} av {total}"
   },
   "training": {
     "gateway": {
@@ -1795,11 +1087,6 @@ const sv = {
       "subtitle": "En snabb träning hjälper dig bemästra kontrollerna!",
       "demoHint": "Svep i valfri riktning - även diagonalt!",
       "benefitsTitle": "Träningen lär dig:",
-      "benefits": {
-        "learnControls": "Svepkontroller",
-        "masterDirections": "Riktningsbyten",
-        "noPressure": "Ingen timer, inga motståndare"
-      },
       "returnNote": "Efter träningen är du redo för riktiga utmaningen!",
       "startTraining": "Börja Träna",
       "skipAnyway": "Hoppa över, jag kan spela",
@@ -1820,33 +1107,15 @@ const sv = {
     },
     "analysis": {
       "titleComplete": "Träning Klar!",
-      "completion": {
-        "title": "Bra gjort!",
-        "message": "Du har bemästrat spelet! Du kan fortsätta öva eller avsluta och starta en riktig match.",
-        "finish": "Avsluta",
-        "continuePractice": "Fortsätt Öva"
-      },
       "titleProgress": "Fortsätt Öva!",
       "subtitleComplete": "Du har bemästrat grunderna!",
       "subtitleProgress": "Några fler kunskaper att låsa upp",
       "progress": "Kunskapsframsteg",
-      "skills": {
-        "diagonal": "Diagonala Drag",
-        "directionChange": "Riktningsbyten",
-        "gridCoverage": "Rutnätsutforskning",
-        "longWords": "Långa Ord"
-      },
       "stats": "Din Statistik",
       "wordsFound": "Ord",
       "longestWord": "Längsta",
       "dirChanges": "Riktningsbyten",
       "tips": "Tips till nästa gång:",
-      "tip": {
-        "diagonal": "Svep diagonalt för att hitta fler ord",
-        "directionChange": "Byt riktning mitt i ordet för längre ord",
-        "gridCoverage": "Kolla hörn och kanter för dolda ord",
-        "longWords": "Hitta 5+ bokstavsord för bonuspoäng"
-      },
       "multiplayer": "Flerspelare",
       "daily": "Daglig",
       "practiceMore": "Öva Mer",
@@ -1855,11 +1124,6 @@ const sv = {
     },
     "progress": {
       "title": "Träningsframsteg",
-      "firstWord": "Hitta Första Ordet",
-      "diagonal": "Svep Diagonalt",
-      "directionChange": "Byt Riktning",
-      "targetScore": "Nå 15 Poäng",
-      "fiveWords": "Hitta 5 Ord",
       "complete": "Du är Redo!",
       "almostThere": "Nästan där!",
       "keepGoing": "Fortsätt!",
@@ -1869,12 +1133,7 @@ const sv = {
       "tapForDetails": "Tryck för detaljer"
     },
     "unlock": {
-      "title": "Färdighet Upplåst!",
-      "firstWord": "Första ordet hittat!",
-      "diagonal": "Diagonal rörelse upplåst!",
-      "directionChange": "Riktningsändring upplåst!",
-      "targetScore": "15 poäng uppnått!",
-      "fiveWords": "5 ord hittade!"
+      "title": "Färdighet Upplåst!"
     },
     "viewProgress": "Se Framsteg"
   },
@@ -2053,7 +1312,6 @@ const sv = {
     "maxTier": "Max nivå nådd!"
   },
   "insights": {
-    "yourPerformance": "Din Prestation",
     "yourStats": "Din Statistik",
     "longestWord": "Längsta Ordet",
     "wordsPerMinute": "Ord/Min",
@@ -2156,12 +1414,9 @@ const sv = {
     "title": "Spelarnivå",
     "level": "Nivå",
     "maxLevel": "Max Nivå",
-    "xpProgress": "XP-framsteg",
     "totalXpEarned": "Total XP intjänad",
-    "xpToNextLevel": "XP till nästa nivå",
     "xpGained": "XP intjänad",
     "levelUp": "Nivå upp!",
-    "youReached": "Du nådde",
     "titleUnlocked": "Titel upplåst",
     "baseXp": "Bas-XP",
     "scoreBonus": "Poängbonus",
@@ -2173,30 +1428,9 @@ const sv = {
       "vocabularian": "Ordförrådsexpert",
       "wordsmith": "Ordsmed",
       "lexiconAdept": "Lexikonadept",
-      "grammarGuardian": "Grammatikväktare",
-      "syntaxSage": "Syntaxvis",
-      "eloquentElite": "Vältalande Elit",
-      "linguisticLegend": "Lingvistisk Legend",
-      "lexiClashChampion": "LexiClash-mästare"
+      "linguisticLegend": "Lingvistisk Legend"
     },
-    "canPrestige": "Prestige tillgänglig!",
-    "prestige": {
-      "title": "Prestige-system",
-      "currentLevel": "Nuvarande nivå",
-      "prestigeLevel": "Prestige",
-      "xpMultiplier": "XP-multiplikator",
-      "rewards": "Belöningar",
-      "confirm": "Bekräfta Prestige",
-      "cancel": "Avbryt",
-      "warning": "Varning!",
-      "warningText": "Detta återställer dig till nivå 1. All nuvarande XP nollställs, men du får alla belöningar nedan.",
-      "success": "Prestige uppnådd!",
-      "rewardsUnlocked": "Dina belöningar har låsts upp!",
-      "reachLevel": "Nå nivå 100 för att Prestige",
-      "levelsRemaining": "nivåer kvar",
-      "maxPrestige": "Maximal Prestige!",
-      "maxPrestigeText": "Du har nått den högsta nivån. Du är en legend!"
-    }
+    "canPrestige": "Prestige tillgänglig!"
   },
   "nearMiss": {
     "almostThere": "Nästan där!",
@@ -2226,18 +1460,13 @@ const sv = {
     "signUp": "Registrera",
     "loginCrazyGames": "Logga in",
     "userMenu": "Användarmeny",
-    "signInWith": "Fortsätt med ${provider}",
     "alreadyHaveAccount": "Har du redan ett konto? Logga in",
     "noAccount": "Har du inget konto? Registrera dig",
     "invalidCredentials": "Ogiltig e-post eller lösenord",
     "continueAsGuest": "Fortsätt som gäst",
     "continueWithGoogle": "Fortsätt med Google",
     "continueWithDiscord": "Fortsätt med Discord",
-    "saveProgress": "Spara din framsteg",
     "guestStatsTitle": "Din statistik som gäst:",
-    "claimStats": "Hämta din statistik",
-    "statsClaimedSuccess": "Statistik sparad!",
-    "termsAgreement": "Genom att fortsätta godkänner du våra användarvillkor",
     "termsPrefix": "Genom att fortsätta godkänner du våra",
     "termsLink": "Användarvillkor",
     "andText": "och",
@@ -2247,23 +1476,13 @@ const sv = {
       "title": "Grattis till din första vinst!",
       "subtitle": "Du har talang! Skapa ett konto för att fortsätta din vinstsvit.",
       "benefitsTitle": "Registrera dig för att låsa upp:",
-      "benefits": {
-        "trackProgress": "Följ din statistik, vinster och prestationer",
-        "leaderboard": "Tävla på den globala topplistan",
-        "playWithFriends": "Utmana vänner och bygg ditt rykte"
-      },
-      "statsTeaser": "Du har spelat ${games} spel och fått ${score} poäng!",
-      "maybeLater": "Kanske senare"
+      "maybeLater": "Kanske senare",
+      "statsTeaser": "{games} spel • {score} poäng väntar på att sparas!"
     },
+    "signInWith": "Logga in med {provider}",
     "multiGames": {
       "title": "Du blir bättre!",
-      "subtitle": "Registrera dig för att spara din framsteg och följa dina prestationer!",
-      "features": {
-        "leaderboard": "Tävla på den globala topplistan",
-        "playWithFriends": "Utmana vänner och bygg ditt rykte"
-      },
-      "statsTeaser": "Du har spelat ${games} spel och fått ${score} poäng!",
-      "maybeLater": "Kanske senare"
+      "subtitle": "Registrera dig för att spara din framsteg och följa dina prestationer!"
     },
     "dailyChallenge": {
       "streakAtRisk": {
@@ -2285,26 +1504,15 @@ const sv = {
       "dayStreak": "Dagars svit",
       "atRiskWarning": "Utan ett konto kan du förlora din svit!",
       "benefitsTitle": "Registrera dig för att:",
-      "benefits": {
-        "protectStreak": "Hålla din svit säker på alla enheter",
-        "syncDevices": "Synkronisera framsteg på alla dina enheter",
-        "trackStats": "Följa din dagliga utmaningsstatistik",
-        "allTimeLeaderboard": "Visas på den allra bästa topplistan"
-      },
       "autoSaveNote": "Ditt resultat sparas automatiskt efter registrering",
-      "maybeLater": "Kanske senare",
-      "continueAsGuest": "Fortsätt som gäst"
+      "maybeLater": "Kanske senare"
     },
     "wordHunt": {
       "loginTitle": "Snabb inloggning, sen kör vi!",
       "loginSubtitle": "Tar 10 sekunder – din streak tackar dig",
       "skipCta": "Hoppa över för nu",
       "gateTitle": "Ett litet steg till dagens pussel",
-      "gateSubtitle": "Vi behöver veta vem som krossar det",
-      "benefit1": "Behåll din streak på alla enheter",
-      "benefit2": "Se var du hamnar globalt",
-      "benefit3": "Fortsätt där du slutade, var som helst",
-      "footerNote": "Samma pussel, alla, världen över. Vem är snabbast idag?"
+      "gateSubtitle": "Vi behöver veta vem som krossar det"
     },
     "winnerOnboarding": {
       "topPercentile": {
@@ -2336,30 +1544,13 @@ const sv = {
       "emailPlaceholder": "E-postadress",
       "passwordPlaceholder": "Lösenord (minst 8 tecken)",
       "signUpButton": "Skapa konto",
-      "signingUp": "Skapar...",
       "checkEmail": "Kolla din e-post för att verifiera ditt konto!",
       "emailInUse": "Denna e-post är redan registrerad",
-      "weakPassword": "Lösenordet måste innehålla minst 8 tecken",
-      "invalidEmail": "Ange en giltig e-postadress",
-      "emailRequired": "E-post krävs",
-      "passwordRequired": "Lösenord krävs",
-      "passwordTooShort": "Lösenord för kort",
-      "passwordTooLong": "Lösenordet är för långt",
       "skipForNow": "Hoppa över för nu",
       "skipHover": "(Lexi blir ledsen, men okej...)",
       "mascotTooltip": "Klicka på mig!",
       "funnyMessages": {
-        "dontLeaveHanging": "Hej! Lämna mig inte hängande! Registrera dig så klättrar vi på topplistan tillsammans!",
-        "scoresTooGood": "Dina poäng är för bra för att försvinna! Låt oss göra dem permanenta!",
-        "streakProtector": "Jag är i princip en svit-livvakt. Registrera dig så skyddar jag din för alltid!",
-        "joinWordNerds": "Gå med i elitklubben av ordnördar som faktiskt kommer ihåg sina poäng!",
-        "makeMomProud": "Gör mamma stolt - visa henne ditt namn på topplistan!"
-      },
-      "benefits": {
-        "leaderboard": "Ta din plats på topplistan",
-        "syncDevices": "Synka mellan enheter",
-        "protectStreak": "Skydda din svit",
-        "trackStats": "Följ statistik & rankning"
+        "dontLeaveHanging": "Hej! Lämna mig inte hängande! Registrera dig så klättrar vi på topplistan tillsammans!"
       }
     }
   },
@@ -2379,15 +1570,11 @@ const sv = {
     "achievements": "Prestationer",
     "hallOfFame": "Hall of Fame",
     "hallOfFameDescription": "Elitprestationer som kräver exceptionell skicklighet eller hängivenhet",
-    "editProfile": "Redigera profil",
-    "changeAvatar": "Ändra avatar",
     "chooseAvatar": "Välj din avatar",
     "selectAvatar": "Välj",
     "useProfileAvatar": "Använd din profilbild",
     "yourAvatar": "Din avatar",
     "you": "DU",
-    "username": "Användarnamn",
-    "saveChanges": "Spara ändringar",
     "uploadPhoto": "Ladda upp foto",
     "removePhoto": "Ta bort foto",
     "imageTooLarge": "Bilden måste vara mindre än 2MB",
@@ -2400,7 +1587,6 @@ const sv = {
     "saveError": "Kunde inte spara",
     "editName": "Redigera namn",
     "chooseEmoji": "Välj emoji",
-    "chooseColor": "Välj färg",
     "backToGame": "Tillbaka till spelet",
     "backToRoom": "Tillbaka till rummet",
     "backToLobby": "Tillbaka till lobbyn",
@@ -2410,10 +1596,7 @@ const sv = {
     "referralReward": "Bjud in vänner",
     "referralDescription": "Tjäna belöningar när vänner går med!",
     "referralsCount": "Vänner",
-    "xp": "XP tjänat",
-    "activeReferrals": "Aktiva",
     "yourReferralCode": "Din remiss-kod",
-    "shareWith": "Dela din länk",
     "referralRewards": "Remiss-belöningar",
     "yourReferrals": "Dina remisser",
     "noReferralsYet": "Inga remisser än. Börja dela!",
@@ -2424,9 +1607,7 @@ const sv = {
     "addCountry": "Lägg till land",
     "changeCountry": "Ändra land",
     "countrySaved": "Land uppdaterat!",
-    "countryError": "Kunde inte uppdatera land",
-    "games": "Matcher",
-    "level": "Nivå"
+    "countryError": "Kunde inte uppdatera land"
   },
   "calendar": {
     "title": "Dagliga Belöningar",
@@ -2438,64 +1619,24 @@ const sv = {
     "comeBackTomorrow": "Kom tillbaka imorgon för fler belöningar",
     "claimError": "Kunde inte hämta belöning",
     "rewardTypes": "Belöningstyper",
-    "day": "Dag",
-    "today": "Idag",
-    "claimed": "Hämtad",
-    "locked": "Låst",
-    "available": "Tillgänglig",
-    "rewards": {
-      "xp": "XP",
-      "hint": "Ledtråd",
-      "hints": "Ledtrådar",
-      "streakFreeze": "Svitfrys",
-      "mysteryBox": "Mystisk låda",
-      "title": "Titel",
-      "exclusiveTitle": "Exklusiv Titel"
-    },
-    "rarity": {
-      "common": "Vanlig",
-      "uncommon": "Ovanlig",
-      "rare": "Sällsynt",
-      "epic": "Episk",
-      "legendary": "Legendarisk"
-    },
-    "milestone": "Milstolpsbelöning",
-    "claimSuccess": "Du fick {reward}!",
-    "streakBonus": "Svitbonus: +{percent}%",
     "loginRequired": "Inloggning krävs",
     "loginToClaimRewards": "Logga in för att hämta dina dagliga belöningar och följa din framgång!",
     "rewardAvailable": "Belöning tillgänglig"
   },
   "referral": {
     "milestoneTitle": "Vänmilstolpe!",
-    "milestone_first_game_played": "spelade sitt första spel!",
-    "milestone_five_games_played": "har spelat 5 spel!",
-    "milestone_ten_games_played": "har spelat 10 spel!",
     "milestoneMessage": "Fortsätt bjuda in vänner för fler belöningar!"
   },
   "coins": {
     "title": "Mynt & Belöningar",
     "description": "Tjäna mynt genom att spela, vinna och låsa upp prestationer. Använd dem för att samla speciella föremål!",
-    "balance": "Saldo",
     "perGame": "Per spel",
     "winBonus": "Vinstbonus",
-    "achievement": "Prestation",
-    "levelUp": "Nivå upp",
     "scoreBonus": "Poängbonus",
     "dailyChallenge": "Daglig bonus",
     "lifetimeEarned": "Totalt intjänade mynt",
-    "earned": "Intjänat",
-    "spent": "Spenderat",
-    "earnMore": "Spela spel för att tjäna fler mynt!",
-    "reward": {
-      "GAME_COMPLETED": "Spel slutfört",
-      "GAME_WON": "Vinstbonus",
-      "ACHIEVEMENT": "Prestation upplåst",
-      "LEVEL_UP": "Nivåbonus"
-    },
     "score": "Poäng",
     "placement": "Placering",
-    "topThreeBonus": "Topp 3 bonus",
     "efficiency": "Effektivitet",
     "streak": "Svit",
     "guestTeasing": "Logga in för att tjäna {amount} mynt!",
@@ -2631,16 +1772,13 @@ const sv = {
     "player": "Spelare",
     "score": "Poäng",
     "games": "Spel",
-    "winRate": "Vinstprocent",
     "yourRank": "Din rank",
     "topPercent": "Topp ${percent}%",
     "noRankYet": "Spela för att bli rankad!",
     "viewLeaderboard": "Visa topplista",
     "you": "DU",
-    "players": "spelare",
     "liveRace": "Live Race",
     "racing": "tävlar",
-    "leader": "Ledare",
     "leading": "Leder!",
     "ahead": "före",
     "toCatch": "p för att passera",
@@ -2661,19 +1799,8 @@ const sv = {
   },
   "ranked": {
     "title": "Rankat läge",
-    "locked": "Låst",
     "unlocked": "Upplåst",
-    "unlockProgress": "${current}/${required} spel för att låsa upp",
-    "playMoreToUnlock": "Spela ${count} fler casual spel för att låsa upp!",
-    "benefits": "Fördelar",
-    "benefitFairPlay": "Fasta spelinställningar för rättvist spel",
-    "benefitLeaderboard": "Global rankad topplista",
-    "benefitAchievements": "Exklusiva prestationer",
-    "playCasualInstead": "Spela casual istället",
-    "queueing": "Söker match...",
-    "playersInQueue": "${count} spelare i kö",
-    "matchFound": "Match hittad!",
-    "requiresAuth": "Logga in för att få tillgång till rankat läge"
+    "unlockProgress": "{current}/{required} spel för att låsa upp"
   },
   "legal": {
     "termsOfService": "Användarvillkor",
@@ -2681,72 +1808,13 @@ const sv = {
     "backToGame": "Tillbaka till spelet",
     "lastUpdated": "Senast uppdaterad",
     "copyright": "© 2025 LexiClash Ltd. Alla rättigheter förbehållna.",
-    "allRightsReserved": "Alla rättigheter förbehållna.",
     "index": {
       "title": "Juridisk information",
-      "intro": "Granska våra juridiska dokument för att förstå dina rättigheter och hur vi skyddar dina data när du använder LexiClash.",
-      "termsDescription": "Läs våra användarvillkor för att förstå reglerna och riktlinjerna för att använda LexiClash.",
-      "privacyDescription": "Lär dig hur vi samlar in, använder och skyddar din personliga information."
+      "intro": "Granska våra juridiska dokument för att förstå dina rättigheter och hur vi skyddar dina data när du använder LexiClash."
     },
     "terms": {
       "title": "Användarvillkor",
-      "intro": "Välkommen till LexiClash. Dessa användarvillkor reglerar din användning av vår multiplayer-ordspelsplattform på lexiclash.live.",
-      "acceptance": {
-        "title": "1. Godkännande av villkor",
-        "content": "Genom att använda LexiClash godkänner du dessa användarvillkor. Om du inte godkänner dessa villkor, vänligen använd inte vår tjänst."
-      },
-      "service": {
-        "title": "2. Beskrivning av tjänsten",
-        "content": "LexiClash är ett gratis multiplayer-ordspel där spelare tävlar om att hitta ord på ett bokstavsrutnät i realtid. Tjänsten inkluderar användarkonton, topplistor, prestationer och multiplayer-funktioner."
-      },
-      "accounts": {
-        "title": "3. Användarkonton",
-        "content": "Du kan använda LexiClash som gäst eller skapa ett konto med Google eller Discord-autentisering. Du ansvarar för att hålla dina kontouppgifter säkra. Vi lagrar inte dina lösenord - autentisering hanteras säkert via OAuth-leverantörer."
-      },
-      "conduct": {
-        "title": "4. Användaruppförande",
-        "content": "Du samtycker till att använda LexiClash rättvist och respektfullt. Förbjudna aktiviteter inkluderar: användning av stötande eller diskriminerande visningsnamn, fusk eller utnyttjande av buggar, användning av automatiserade bottar eller skript, trakassering av andra spelare, och alla försök att störa tjänsten eller manipulera topplistor."
-      },
-      "contentLicense": {
-        "title": "5. Licens för användarinnehåll",
-        "content": "Genom att använda LexiClash ger du oss en världsomspännande, royaltyfri, icke-exklusiv licens att visa ditt användarnamn, avatar och spelstatistik på topplistor, i spelet och inom tjänsten. Denna licens tillåter oss att driva spelet och visa spelarinformation för andra användare."
-      },
-      "intellectualProperty": {
-        "title": "6. Immateriella rättigheter",
-        "content": "LexiClash, inklusive dess namn, logotyp, spelmekanik, kod och allt innehåll, ägs av LexiClash Ltd. Alla rättigheter förbehållna. Du får inte kopiera, modifiera, distribuera eller skapa härledda verk utan vårt uttryckliga skriftliga tillstånd."
-      },
-      "disclaimers": {
-        "title": "7. Friskrivningar",
-        "content": "LexiClash tillhandahålls \"i befintligt skick\" och \"som tillgängligt\" utan garantier av något slag, varken uttryckliga eller underförstådda. Vi garanterar inte att tjänsten kommer att vara oavbruten, felfri eller säker. Vi ansvarar inte för förlust av data, inklusive spelframsteg eller statistik."
-      },
-      "liability": {
-        "title": "8. Ansvarsbegränsning",
-        "content": "I den utsträckning lagen tillåter ska LexiClash Ltd inte hållas ansvarig för indirekta, tillfälliga, speciella, följd- eller straffskador som uppstår från din användning av tjänsten, inklusive men inte begränsat till förlust av vinst, data eller goodwill."
-      },
-      "indemnification": {
-        "title": "9. Skadeersättning",
-        "content": "Du samtycker till att hålla LexiClash Ltd skadeslöst från alla anspråk, skador, förluster eller kostnader som uppstår från din överträdelse av dessa villkor, din användning av tjänsten eller din kränkning av någon annan parts rättigheter."
-      },
-      "termination": {
-        "title": "10. Uppsägning",
-        "content": "Vi kan suspendera eller avsluta din åtkomst till LexiClash när som helst, med eller utan orsak, och med eller utan förvarning. Vid uppsägning upphör din rätt att använda tjänsten omedelbart och dina kontodata kan raderas."
-      },
-      "modifications": {
-        "title": "11. Ändringar av villkor",
-        "content": "Vi förbehåller oss rätten att ändra dessa användarvillkor när som helst. Ändringar träder i kraft vid publicering på webbplatsen. Din fortsatta användning av LexiClash efter ändringar utgör godkännande av de nya villkoren."
-      },
-      "governingLaw": {
-        "title": "12. Tillämplig lag",
-        "content": "Dessa användarvillkor ska styras av och tolkas i enlighet med lagarna i staten Israel, utan hänsyn till dess lagvalsregler."
-      },
-      "disputes": {
-        "title": "13. Tvistlösning",
-        "content": "Alla tvister som uppstår från dessa villkor eller din användning av LexiClash ska först försöka lösas informellt. Om detta misslyckas ska tvister lösas exklusivt i domstolar i Israel, och du samtycker till sådan domstols personliga jurisdiktion."
-      },
-      "severability": {
-        "title": "14. Avskiljbarhet",
-        "content": "Om någon bestämmelse i dessa användarvillkor befinns vara icke verkställbar eller ogiltig, ska den bestämmelsen begränsas eller elimineras i minsta nödvändiga utsträckning, och de återstående bestämmelserna ska fortsätta gälla fullt ut."
-      }
+      "intro": "Välkommen till LexiClash. Dessa användarvillkor reglerar din användning av vår multiplayer-ordspelsplattform på lexiclash.live."
     },
     "privacy": {
       "title": "Integritetspolicy",
@@ -2804,79 +1872,33 @@ const sv = {
     }
   },
   "growth": {
-    "shareYourResult": "Dela ditt resultat",
-    "shareVictory": "🎉 Dela din seger!",
-    "shareResult": "Dela ditt spel",
-    "bragToFriends": "Låt dina vänner veta att du vann!",
-    "inviteFriendsToPlay": "Bjud in vänner att utmana dig",
-    "viralPrompt": "Utmana dina vänner att slå ditt resultat!",
-    "share": "Dela",
     "dayStreak": "dagars svit",
     "winsAway": "vinster kvar",
     "nextTier": "Nästa nivå",
     "newBest": "Nytt rekord!",
     "newPersonalBest": "Nytt personligt rekord!",
-    "streakUnlocked": "Svit upplåst!",
-    "streakAtRisk": "Din svit är i fara! Spela idag för att behålla den.",
-    "keepStreakAlive": "Håll din svit vid liv!",
-    "streakStarting": "Start",
-    "streakHot": "Het",
-    "streakOnFire": "I brand",
-    "streakEpic": "Episk",
-    "streakLegendary": "Legendarisk",
-    "referFriend": "Rekommendera en vän",
-    "referralReward": "Få belöningar för att bjuda in vänner!",
-    "yourReferralLink": "Din rekommendationslänk",
-    "referralsCount": "Rekommenderade vänner",
-    "dailyChallenge": "Daglig utmaning",
-    "dailyChallengeDesc": "Ny utmaning varje dag!",
-    "todaysChallenge": "Dagens utmaning",
-    "challengeCompleted": "Utmaning slutförd!",
-    "nextChallengeIn": "Nästa utmaning om",
-    "welcomeBack": "Välkommen tillbaka!",
-    "missedYou": "Vi saknade dig! Redo för en ny runda?",
-    "playNow": "Spela nu",
-    "firstWin": "Första vinst!",
-    "tenWins": "10 vinster!",
-    "hundredWins": "100 vinster!",
-    "milestoneUnlocked": "Milstolpe upplåst!"
+    "streakUnlocked": "Svit upplåst!"
   },
   "wordFeedback": {
-    "title": "Ordjury",
     "dictionaryTitle": "Bygg vår ordbok",
-    "question": "Är detta ett riktigt ord?",
     "submittedBy": "Skickad av",
-    "thumbsUp": "Giltig!",
-    "thumbsDown": "Nej",
     "skipHint": "Tryck ESC för att hoppa över",
     "thankYou": "Tack för hjälpen!",
-    "witty1": "{player} påstår att \"{word}\" är ett riktigt ord...",
-    "witty2": "Riktigt ord eller kreativt geni? Du bestämmer!",
-    "witty3": "{player} hittade \"{word}\" i sin hjärnordbok",
-    "witty4": "Svenska Akademien ringde, de vill veta om \"{word}\"",
-    "witty5": "Låter legit... eller?",
-    "witty6": "Är \"{word}\" ett genidrag eller galenskap?",
-    "witty7": "{player} svär att detta är ett riktigt ord!",
-    "witty8": "Ordbokskommittén väntar på din dom över \"{word}\"",
     "nowValid": "är nu ett giltigt ord!",
-    "dictionary1": "Hjälp oss bygga en bättre ordbok!",
-    "dictionary2": "Din röst gör ord officiella!",
-    "dictionary3": "Varje röst förbättrar spelet!",
-    "dictionary4": "Var orddomaren!",
-    "dictionary5": "Forma vår ordbok tillsammans!",
     "notAWord": "Inte ett ord",
     "realWord": "Riktigt ord!",
     "dontKnow": "Vet inte",
     "nextWord": "Nästa ord...",
     "almostApproved": "Nästan där!",
-    "votesNeeded": "{count} röster till för att godkänna",
     "votesNeededShort": "fler röster",
-    "validForScoring": "Räknas som giltigt! Hjälp till att lägga till i ordboken.",
-    "moreForDictionary": "mer till ordbok"
-  },
-  "achievement": {
-    "dailyDouble": "🏆 DUBBELDAGLIG",
-    "dailyDouble.desc": "Klarade båda dagens utmaningar!"
+    "witty1": "{player} påstår att \"{word}\" är ett riktigt ord...",
+    "witty2": "Riktigt ord eller kreativt geni? Du bestämmer!",
+    "witty3": "{player} hittade \"{word}\" i sin hjärnas ordbok",
+    "witty4": "SAOL ringde, de vill veta om \"{word}\"",
+    "witty5": "Låter legit... eller?",
+    "witty6": "Är \"{word}\" genialiskt eller galet?",
+    "witty7": "{player} svär på att detta är ett riktigt ord!",
+    "witty8": "Ordlistan väntar på din dom om \"{word}\""
   },
   "footer": {
     "aboutGame": "Om Spelet",
@@ -2885,16 +1907,12 @@ const sv = {
     "interactiveTutorial": "Interaktiv handledning"
   },
   "support": {
-    "kofiWinner": "Känn dig generös, mästare?",
     "kofiFooter": "Köp oss en kaffe",
     "kofiTooltip": "Stöd LexiClash-utveckling"
   },
   "landing": {
     "welcomeTitle": "Redo att spela?",
     "welcomeSubtitle": "Välj din utmaning!",
-    "chooseMode": "Välj spelläge",
-    "subtitle": "Spela ensam för att öva och slå dina rekord, eller tävla med vänner i realtid!",
-    "subtitleSimple": "Öva ensam eller utmana vänner",
     "singlePlayer": "Enspelarläge",
     "singlePlayerDesc": "Öva i din egen takt eller utmana dig själv!",
     "multiPlayer": "Flerspelarläge",
@@ -2902,43 +1920,10 @@ const sv = {
     "multiplayerDesc": "Tävla med vänner i realtid!",
     "brainTraining": "Hjärnträning",
     "brainTrainingDesc": "Spåra kognitiv tillväxt",
-    "brainDrills": "Snabbövningar",
-    "brainDrillsDesc": "Fokuserade minispel",
     "signInToUnlock": "Logga in för att låsa upp",
-    "locked": "Låst",
-    "feature": {
-      "soloVsBots": "Solo mot bottar",
-      "practiceMode": "Övningsläge",
-      "challenges": "Utmaningar & Rekord",
-      "joinRooms": "Gå med i rum",
-      "hostGames": "Skapa spel",
-      "tournaments": "Turneringar"
-    },
-    "hint": "Ny i spelet? Börja med enspelarläge för att lära dig!",
     "openRooms": "öppna rum",
     "playersLive": "spelar nu",
-    "tutorial": "Handledning",
-    "seoHeadline": "Gratis Multiplayer Ordspel",
-    "seoSubheadline": "Som Wordle möter Boggle - men spela med vänner i realtid!",
-    "valueProps": {
-      "realTime": "Realtidsstrider",
-      "realTimeDesc": "Tävla mot vänner live",
-      "noDownload": "Spela Direkt",
-      "noDownloadDesc": "Ingen nedladdning behövs",
-      "freeForever": "100% Gratis",
-      "freeForeverDesc": "Inga prenumerationer",
-      "multiLanguage": "5 Språk",
-      "multiLanguageDesc": "EN, HE, SV, JA, ES"
-    },
-    "socialProof": {
-      "playersDaily": "1 000+",
-      "playersDailyLabel": "dagliga spelare",
-      "wordsFound": "500K+",
-      "wordsFoundLabel": "ord hittade",
-      "rating": "4.8★",
-      "ratingLabel": "spelarens betyg"
-    },
-    "altComparison": "Bästa gratisalternativet till Boggle, Scrabble och Wordle för grupper"
+    "tutorial": "Handledning"
   },
   "modeDiscovery": {
     "title": "Redo för mer?",
@@ -2954,117 +1939,74 @@ const sv = {
     "maybeLater": "Kanske senare"
   },
   "singlePlayer": {
-    "title": "Enspelarläge",
     "quickPlay": "Snabbspel",
     "quickPlayDesc": "7×7 • 1 min • mot Bot",
-    "selectMode": "Välj läge",
     "chooseMode": "Välj ditt läge",
-    "mode": {
-      "soloBots": "Solo mot Botar",
-      "soloBotsDesc": "Tävla mot AI-motståndare",
-      "practice": "Träning",
-      "practiceDesc": "Ingen timer, inget tryck",
-      "challenge": "Utmaning",
-      "challengeDesc": "Slå dina högsta poäng",
-      "noTimer": "Ingen timer"
-    },
-    "soloVsBots": "Solo mot bottar",
-    "soloVsBotsDesc": "Tävla mot AI-motståndare",
-    "practiceMode": "Övning",
-    "practiceModeDesc": "Ingen timer, upptäck ord i din takt",
-    "challengeMode": "Utmaning",
-    "challengeModeDesc": "Slå dina rekord",
     "selectDifficulty": "Rutstorlek",
     "gameTime": "Speltid",
     "opponents": "Bottmotståndare",
     "noBots": "Inga bottar tillagda. Lägg till motståndare att tävla mot!",
     "startGame": "Starta spel",
     "finish": "Avsluta",
-    "noWordsYet": "Inga ord hittade än. Börja svep!",
     "victory": "Seger!",
     "gameOver": "Spelet slut",
     "verifyingWords": "Verifierar ord...",
     "practiceComplete": "Övning slutförd!",
     "newHighScore": "Nytt rekord!",
-    "challengeComplete": "Utmaning slutförd",
     "noWordsFound": "Inga ord hittade",
     "tryAgain": "Försök igen!",
     "keepPracticing": "Fortsätt öva!",
     "fewWordsFound": "Hittade {count} ord",
     "fewWordsFoundSingular": "Hittade 1 ord",
     "achievementsNotSaved": "Prestationer i enspelarläge sparas inte till din profil.",
-    "botDetails": "Bot-detaljer",
     "botWordsFound": "Ord botarna hittade",
     "noWordsToShow": "Orddetaljer ej tillgängliga",
     "difficulty": "Svårighetsgrad",
     "timer": "Timer",
-    "totalScore": "Totalpoäng",
-    "wordsByLength": "Ord efter längd",
     "quitConfirmTitle": "Avsluta spelet?",
     "quitConfirmMessage": "Du kommer förlora dina framsteg. Är du säker på att du vill avsluta?",
     "imSure": "Jag är säker",
     "gamePaused": "Spelet pausat",
     "needHint": "Behöver du en ledtråd?",
     "botWords": "Hittade ord",
-    "aiOpponents": "AI-motståndare",
-    "autoFillDesc": "Fyller rummet med {count} AI-motståndare",
-    "addBotsPrompt": "Lägg till AI-motståndare att tävla mot!",
-    "addBotsHint": "Använd autofyll eller klicka på knapparna ovan",
     "beatYourRecord": "Du slog ditt rekord!",
     "preset": {
-      "recommended": "Bäst",
-      "tapToPlay": "Tryck för att spela",
       "customGame": "Anpassat Spel",
-      "hint": "Tryck på valfri förinställning för snabbstart, eller anpassa ditt spel",
-      "quickStart": "Snabbstart",
-      "quick": "Snabbspel",
-      "quickDesc": "Snabbt 1-minuts spel på litet bräde",
+      "quick": "Snabb",
+      "quickDesc": "Snabbt 1-minutsspel",
       "standard": "Standard",
-      "standardDesc": "Klassisk Boggle-upplevelse",
+      "standardDesc": "Klassiskt 2-minutersspel",
       "intense": "Intensivt",
-      "intenseDesc": "Stort bräde, mer tid, hårdare konkurrens",
-      "friendly": "Vänskapsmatch",
-      "friendlyDesc": "Avslappnat spel med lätta motståndare",
+      "intenseDesc": "Stort bräda, 3 minuter",
+      "friendly": "Vänlig",
+      "friendlyDesc": "Lätt läge med en bot",
       "competitive": "Tävling",
-      "competitiveDesc": "Balanserad utmaning mot skickliga bottar",
-      "battle": "Battle Royale",
-      "battleDesc": "Ultimat test mot expertbottar",
-      "explorer": "Bokstavsutforskare",
-      "explorerDesc": "Litet bräde, ta din tid",
-      "hunter": "Ordjägare",
-      "hunterDesc": "Hitta alla ord i din egen takt",
-      "mastery": "Ordförrådsträning",
-      "masteryDesc": "Stort bräde för omfattande övning",
-      "warmup": "Daglig uppvärmning",
-      "warmupDesc": "Snabb uppvärmning för att slå ditt rekord",
+      "competitiveDesc": "Medel mot 2 bottar",
+      "battle": "Strid",
+      "battleDesc": "Svårt mot 3 bottar",
+      "explorer": "Utforskare",
+      "explorerDesc": "Ingen timer, lätt bräda",
+      "hunter": "Jägare",
+      "hunterDesc": "Ingen timer, medel bräda",
+      "mastery": "Mästare",
+      "masteryDesc": "Ingen timer, svår bräda",
+      "warmup": "Uppvärmning",
+      "warmupDesc": "1-minuts lätt utmaning",
       "personalBest": "Personbästa",
-      "personalBestDesc": "Standardutmaning - följ dina framsteg",
-      "ultra": "Ultra utmaning",
-      "ultraDesc": "Ultimat högpoängsutmaning",
-      "letters": "bokstäver",
-      "advanced": "Avancerad"
+      "personalBestDesc": "Slå ditt rekord",
+      "ultra": "Ultra",
+      "ultraDesc": "3-minuters svår utmaning"
     },
-    "wizard": {
-      "selectMode": "Välj spelläge",
-      "chooseDifficulty": "Välj svårighetsgrad",
-      "gridPreview": "Förhandsgranskning av rutnät",
-      "configureOptions": "Spelalternativ",
-      "reviewSettings": "Granska & Starta",
-      "stepOf": "Steg {current} av {total}",
-      "showAll": "Visa alla",
-      "useSteps": "Använd steg",
-      "editMode": "Redigera läge",
-      "editSettings": "Redigera inställningar",
-      "stepMode": "Läge",
-      "stepDifficulty": "Svårighet",
-      "stepOptions": "Alternativ",
-      "stepReview": "Granska"
+    "mode": {
+      "soloBots": "Solo mot bottar",
+      "soloBotsDesc": "Tävla mot AI-motståndare",
+      "practice": "Träna",
+      "practiceDesc": "Ingen timer, lär i din takt",
+      "challenge": "Utmaning",
+      "challengeDesc": "Slå klockan, sätt rekord"
     }
   },
   "practice": {
-    "tips": "Övningstips",
-    "noTimer": "Ingen tidsgräns - spela i din egen takt",
-    "exploreTip": "Utforska och hitta så många ord som möjligt",
     "header": "Övningsläge",
     "instructions": "Svep över bokstäver för att bilda ord (3+ bokstäver)",
     "found": "Snyggt! Ord hittat!",
@@ -3075,32 +2017,29 @@ const sv = {
     "backToTips": "Tillbaka till Tips"
   },
   "wizard": {
-    "stepOf": "Steg {current} av {total}"
+    "selectMode": "Välj spelläge",
+    "chooseDifficulty": "Välj svårighetsgrad",
+    "reviewSettings": "Granska & Starta",
+    "stepMode": "Läge",
+    "stepDifficulty": "Svårighetsgrad",
+    "stepOf": "Steg {current} av {total}",
+    "gameSettings": "Spelinställningar"
   },
   "landscape": {
     "tutorialTitle": "Landskapskontroller",
     "tutorialPause": "Nere till vänster: Pausa/Återuppta spel",
     "tutorialQuit": "Nere till höger: Avsluta spel",
-    "tutorialHelp": "Uppe till höger: Hjälp & regler",
     "tutorialKeyboard": "Tangentbord: Mellanslag = Pausa, Esc = Avsluta, ? = Hjälp"
   },
   "challenge": {
-    "record": "Rekord",
     "yourRecord": "Ditt rekord",
-    "beatIt": "Kan du slå det?",
     "noRecord": "Inget rekord än",
-    "setFirst": "Sätt ditt första rekord och börja tävla mot dig själv!",
-    "recordsSet": "rekord satta",
-    "gamesPlayed": "spel spelade",
-    "allTimeBest": "Bästa någonsin",
-    "longest": "längsta",
     "newRecord": "Nytt rekord!",
     "tied": "Oavgjort!",
     "recordToBeat": "Rekord",
     "toGo": "poäng kvar till rekord",
     "settingFirst": "Sätter ditt första rekord!",
     "allTimeRecord": "Bästa någonsin!",
-    "improvement": "förbättring",
     "firstRecord": "Första rekord satt!",
     "shortOf": "{diff} poäng från ditt rekord",
     "settingRecord": "Sätter ditt första rekord!",
@@ -3110,58 +2049,27 @@ const sv = {
   },
   "rules": {
     "pageTitle": "LexiClash: Ordstrid i Realtid",
-    "pageSubtitle": "Bemästra konsten att hitta ord i detta snabba multiplayer-strategispel",
-    "playNowFree": "Spela nu - Det är gratis!",
     "gameModes": "Spellägen",
     "readyToTest": "Redo att testa dina ordkunskaper?",
     "readyToTestDesc": "Gå med tusentals spelare i den ultimata ordstridsupplevelsen. Skapa ett rum, bjud in dina vänner och se vem som har det bästa ordförrådet!",
     "startPlaying": "Börja spela nu",
     "backToHome": "Tillbaka till startsidan",
-    "howToPlayIntro": "LexiClash är ett multiplayer-ordspel i realtid där spelare tävlar om att hitta så många ord som möjligt från ett rutnät av bokstäver. Tänk på det som en tävlingsinriktad, digital version av klassiska ordletningsspel, men med en modern twist som låter dig spela med vänner var som helst i världen.",
-    "joinOrCreate": "Gå med eller skapa ett rum",
     "joinOrCreateDesc": "Skapa ditt eget spelrum eller gå med i ett befintligt med en rumskod. Dela koden med vänner för att bjuda in dem direkt.",
-    "raceAgainstTime": "Tävla mot klockan",
     "raceAgainstTimeDesc": "När spelet startar har du begränsad tid (vanligtvis 90 sekunder) att hitta så många giltiga ord som möjligt från bokstavsrutnätet.",
-    "swipeToForm": "Svep för att bilda ord",
-    "swipeToFormDesc": "Koppla ihop intilliggande bokstäver genom att svepa eller klicka för att bilda ord. Bokstäver måste vara sammankopplade horisontellt, vertikalt eller diagonalt.",
-    "competeAndWin": "Tävla & Vinn",
     "competeAndWinDesc": "Spelaren med högst poäng när tiden är slut vinner! Spela flera omgångar för att avgöra den ultimata ordmästaren.",
-    "scoringIntro": "I LexiClash ger längre ord fler poäng. Poängsystemet belönar strategiska spelare som letar efter längre, mer komplexa ord istället för att bara skicka in många korta ord.",
     "wordLength": "Ordlängd",
     "points": "Poäng",
     "example": "Exempel",
     "proTip": "Proffstips",
     "proTipText": "Fokusera på att hitta ord med 5-7 bokstäver för bästa poäng-till-tid-förhållandet. Medan ord med 8+ bokstäver ger massiva poäng är de sällsynta och tidskrävande att hitta!",
-    "strategiesIntro": "Att bli en LexiClash-mästare kräver mer än bara ett bra ordförråd. Här är beprövade strategier som används av toppspelare för att dominera sina motståndare och klättra på topplistan.",
     "scanPrefixes": "Skanna efter prefix och suffix",
     "scanPrefixesDesc": "Leta efter vanliga orddelar som \"för-\", \"om-\", \"-ing\", \"-ade\" och \"-tion\". Dessa kan hjälpa dig att snabbt identifiera längre ord som gömmer sig i rutnätet.",
-    "startFromVowels": "Börja från vokaler",
-    "startFromVowelsDesc": "De flesta ord innehåller vokaler. Börja med att lokalisera A, E, I, O, U, Y, Ä, Ö på rutnätet och bygg ord runt dem för snabbare ordupptäckt.",
     "thinkWordFamilies": "Tänk i ordfamiljer",
     "thinkWordFamiliesDesc": "När du hittar ett ord som \"SPELA\", kontrollera omedelbart variationer: \"SPELAR\", \"SPELAD\", \"SPELANDE\", \"SPELARE\". Denna teknik kan snabbt multiplicera din poäng.",
     "dontOverthink": "Övertänk inte korta ord",
     "dontOverthinkDesc": "Skicka in uppenbara ord med 3-4 bokstäver snabbt utan att tveka. De läggs ihop snabbt och ger dig en solid grund medan du letar efter längre, högre poänggivande ord.",
-    "practicePatterns": "Öva mönsterigenkänning",
-    "practicePatternsDesc": "Ju mer du spelar, desto snabbare kommer du att känna igen vanliga bokstavsmönster. Regelbunden övning tränar din hjärna att upptäcka ord nästan omedelbart, vilket ger dig en betydande fördel.",
-    "multiLanguage": "Flerspråksstöd",
-    "multiLanguageDesc": "Spela på engelska, hebreiska, svenska eller japanska. Perfekt för språkinlärare!",
-    "realTimeMultiplayer": "Multiplayer i realtid",
-    "realTimeMultiplayerDesc": "Tävla mot vänner eller spelare världen över i ordstrider i realtid.",
-    "achievementsLevels": "Prestationer & Nivåer",
-    "achievementsLevelsDesc": "Tjäna XP, lås upp prestationer och klättra i rankerna när du förbättras.",
-    "leaderboards": "Topplistor",
-    "leaderboardsDesc": "Följ din utveckling och se hur du rankar mot andra spelare globalt.",
-    "noDownload": "Ingen nedladdning krävs",
-    "noDownloadDesc": "Spela direkt i din webbläsare på vilken enhet som helst - dator, surfplatta eller mobil.",
-    "qrSharing": "QR-koddelning",
-    "qrSharingDesc": "Generera QR-koder för att omedelbart bjuda in vänner till ditt spelrum.",
-    "singlePlayerTitle": "Enspelarlägen",
-    "singlePlayerIntro": "Öva på egen hand eller utmana dig själv mot AI-motståndare!",
-    "soloVsBots": "Solo mot bottar",
     "soloVsBotsDesc": "Tävla mot AI-motståndare på olika svårighetsgrader. Perfekt för att öva strategier innan du utmanar riktiga spelare.",
-    "practiceMode": "Övningsläge",
     "practiceModeDesc": "Ta din tid utan timer. Perfekt för att lära dig nya ord och utforska rutnätet utan press.",
-    "challengeMode": "Utmaningsläge",
     "challengeModeDesc": "Slå dina personliga rekord och följ din förbättring över tid. Tävla mot dig själv!"
   },
   "social": {
@@ -3175,17 +2083,13 @@ const sv = {
     "title": "Daglig utmaning",
     "badge": "DAGLIG UTMANING",
     "puzzleNumber": "Daglig #{number}",
-    "timeLimit": "Tidsgräns",
-    "attempt": "Försök",
     "playButton": "Spela dagens pussel",
     "nextPuzzleIn": "Nästa pussel om:",
     "samePuzzle": "Samma pussel för alla världen över. Dela dina resultat för att utmana vänner!",
     "alreadyPlayed": "Redan spelat idag",
-    "yourScore": "Din poäng",
     "completed": "Klart!",
     "chooseQuest": "Välj Din Dagliga Quest",
     "chooseChallengeHint": "Välj din utmaning för idag. Klara båda för bonusXP!",
-    "new": "NYTT",
     "play": "SPELA NU",
     "viewResults": "VISA RESULTAT",
     "wordHunt": "Ordjakt",
@@ -3207,8 +2111,6 @@ const sv = {
     "copiedToClipboard": "Kopierad till urklipp!",
     "home": "Hem",
     "close": "Stäng",
-    "bannerTitle": "Daglig #{number}",
-    "bannerSubtitle": "Samma pussel för alla. Dela din poäng!",
     "oneAttempt": "Ett försök per dag - samma pussel för alla!",
     "dayStreak": "dagars streak",
     "daysStreak": "dagars streak",
@@ -3220,26 +2122,21 @@ const sv = {
     "playersPlural": "spelare",
     "guestSingular": "gast",
     "guestsPlural": "gaster",
-    "tookChallenge": "spelade utmaningen",
-    "signUpToAppear": "Registrera dig for att synas pa tavlan!",
+    "tookChallenge": "tog utmaningen",
+    "signUpToAppear": "Registrera dig för att synas på topplistan!",
     "totalAttempts": "försök",
-    "yourRank": "Din placering",
     "yourPosition": "Din position",
     "showMore": "Visa mer",
     "showLess": "Visa mindre",
     "more": "mer",
-    "maxAttempts": "Max Försök",
-    "huntDescription": "Jaga det dolda ordet med färgkodad feedback!",
     "shareImage": "Dela som bild",
     "shareImageHint": "Dela din prestation med vänner!",
     "download": "Spara som bild",
     "downloadImage": "Spara delningsbild",
-    "generatingImage": "Skapar bild...",
     "playingAs": "Spelar som",
     "guestPlayer": "Gästspelare",
     "enterName": "Ange ditt namn",
     "characters": "tecken",
-    "streakAtRisk": "Spela idag för att behålla din streak!",
     "attemptReset": "Försök återställt! Du kan spela igen",
     "retryLinkUsed": "Länken aktiverad! Du kan spela igen",
     "retryLinkReady": "Länken klar! Lycka till!",
@@ -3249,27 +2146,13 @@ const sv = {
     "retryLinkError": "Kunde inte verifiera länken",
     "retryFailed": "Återställning misslyckades. Försök igen!",
     "howToPlay": "Hur man spelar",
-    "firstTime": "(Ny?)",
     "canYouBeatMyScore": "Kan du slå mitt resultat?",
-    "targetWordLength": "Hitta det dolda ordet:",
-    "onlyMatchingLength": "Endast ord med {length} bokstäver använder dina försök!",
-    "tookChallenge": "tog utmaningen",
-    "signUpToAppear": "Registrera dig för att synas på topplistan!",
-    "showLeaderboard": "Visa topplistan",
-    "tryAnotherLanguage": "Prova utmaningen på ett annat språk:",
     "guestModeNotice": "Spelar som gäst",
     "guestModeBenefits": "Registrera dig för att spåra framsteg, bygga serier och tävla på topplistor",
     "createCustomChallenge": "Skapa din egen utmaning & dela med vänner",
-    "signUpRequired": "⭐ Registrera dig för att skapa utmaningar",
     "createChallengeFeature": {
       "title": "Skapa anpassade ordjakt-utmaningar",
       "subtitle": "Designa dina egna pussel och utmana vänner",
-      "benefits": {
-        "customPuzzles": "Designa pussel med dina egna målord",
-        "chooseDifficulty": "Välj 5×5 eller 7×7 rutnät svårighetsgrad",
-        "shareInstantly": "Dela med en länk - ingen app behövs",
-        "trackResults": "Se vem som slår din utmaning"
-      },
       "ctaButton": "Registrera dig för att börja skapa",
       "socialProof": "Gå med tusentals som skapar utmaningar"
     },
@@ -3280,12 +2163,8 @@ const sv = {
     "challengeCreated": "Utmaning skapad!",
     "challengeCreatedDesc": "Dela denna länk med vänner för att utmana dem.",
     "shareChallenge": "Dela utmaning",
-    "boardWillBeGenerated": "Ett unikt {size}x{size} bräde kommer att genereras med {language} ordbok.",
     "enterTargetWord": "Ange ditt utmaningsord",
-    "wordPlaceholder": "{min}-{max} bokstäver",
     "errorWordRequired": "Vänligen ange ett ord",
-    "errorWordTooShort": "Ordet måste vara minst {minLen} bokstäver",
-    "errorWordTooLong": "Ordet får vara högst {maxLen} bokstäver",
     "errorInvalidLetters": "Använd endast giltiga bokstäver för detta språk",
     "canPlayYourself": "Du kan spela denna utmaning själv också om du följer länken!",
     "pickDifficulty": "Välj din svårighetsgrad",
@@ -3307,54 +2186,40 @@ const sv = {
     "attempts": "försök",
     "points": "poäng",
     "brainScoreLocked": "Registrera dig för att spåra hjärnpoäng",
-    "streakTeaser": "Registrera dig för att bygga och spåra serier",
-    "streakLocked": "Seriespårning kräver registrering",
     "historyTeaser": "Registrera dig för att se din förbättring över tid",
     "leaderboardLocked": "Registrera dig för att se topplistan",
     "leaderboardTeaser": "Tävla mot spelare över hela världen",
     "carousel": {
       "step1Title": "Svep för att hitta ord",
-      "step1Desc": "Koppla bokstäver i alla riktningar",
       "step1Grid": "K,A,O,G,T,E,D,T,R",
       "step1Highlighted": "0,1,4,7",
-      "step2Title": "Färgledtrådar",
       "step2Green": "Rätt plats",
       "step2Yellow": "Fel plats",
       "step2Gray": "Inte i ordet",
-      "step2Letters": "O,R,D,S",
-      "step2Colors": "green,yellow,gray,green",
       "step3Title": "Hitta det gömda ordet",
       "step3Desc": "10 försök att knäcka koden",
-      "step3Hint": "Gissa ord med {length} bokstäver för ledtrådar",
-      "step4Title": "Hitta ord, avslöja ledtrådar",
       "step4Desc": "Varje ord på 3+ bokstäver ger ledtrådar!",
       "goToStep": "Gå till steg {step}"
     },
     "share": {
-      "header": "LexiClash Daily #{number}",
-      "stats": "{score} poäng | {words} ord",
-      "streak": "{days} dagars streak!",
-      "streakMilestone7": "{days} dagars streak! 💪",
-      "streakMilestone30": "{days} dagars streak! 🏆",
       "bragDomination": "Total orddominans 👑",
       "bragCrushed": "Brädet hade ingen chans",
       "bragSolid": "Stabil ordjakt idag",
-      "cta": "Tror du att du kan slå det här? 🎮"
+      "cta": "Tror du att du kan slå det här? 🎮",
+      "header": "LexiClash Daglig #{number}",
+      "stats": "{words} ord • {score} poäng",
+      "streak": "🔥 {days} dagars streak!",
+      "streakMilestone7": "🔥 En veckas streak! Kan du fortsätta?",
+      "streakMilestone30": "🔥 30 dagars streak! Legendarisk!"
     },
-    "leaderboard": "Rankning",
+    "errorWordTooShort": "Ordet måste ha minst {min} bokstäver",
+    "errorWordTooLong": "Ordet får ha max {max} bokstäver",
+    "wordPlaceholder": "Skriv ett ord...",
     "screenshotProtection": "Återvänd för att fortsätta spela",
-    "clueUnlocked": "Ledtråd upplåst!",
-    "categoryUnlocked": "Kategori avslöjad!",
-    "exampleUnlocked": "Exempel upplåst!",
     "trainingSuggestion": {
       "title": "Ny på LexiClash?",
       "subtitle": "Prova ett snabbt träningsspel först för att lära dig mekaniken!",
       "benefitsTitle": "Träning hjälper dig:",
-      "benefits": {
-        "learnMechanics": "Lär dig hur man sveper och bildar ord",
-        "practiceSwipes": "Öva utan press",
-        "noPressure": "Bli bekväm med spelet"
-      },
       "returnNote": "Efter träningen kommer du automatiskt tillbaka till daglig utmaning!",
       "startTraining": "Starta träning",
       "skipToDaily": "Hoppa över, jag klarar mig",
@@ -3365,130 +2230,80 @@ const sv = {
     "title": "Daily Buzz",
     "tagline": "Ordutmaningar från dagens trender",
     "subtitle": "Vad buzzer idag?",
-    "icon": "📰🔥",
     "badge": "🔥 NYHET",
     "betaPreview": "✨ BETA",
     "challenges": "Utmaningar",
     "connectingWord": "KOPPLINGSORDET",
     "error": "Ajdå!",
-    "feature1": "Riktiga trendämnen",
-    "feature2": "5-7 miniutmaningar",
-    "feature3": "Lokalt innehåll",
     "fillTheBlank": "Fyll i luckan",
     "finish": "KLART",
     "helpText": "Lös ordutmaningar från dagens trender. Ingen tidsgräns!",
     "loading": "Laddar Daily Buzz...",
     "maxScore": "Max Poäng",
     "noTimeLimit": "Ingen Timer",
-    "preview.play": "STARTA BUZZ",
-    "preview.subtitle": "Utmaningar med...",
-    "preview.title": "DAGENS ÄMNEN",
+    "preview": {
+      "title": "DAGENS ÄMNEN",
+      "subtitle": "Utmaningar med...",
+      "play": "STARTA BUZZ"
+    },
     "quitConfirm": "Dina framsteg sparas, men ofullständiga utmaningar räknas inte i din poäng.",
     "quitConfirmTitle": "Avsluta Daily Buzz?",
-    "results.perfect": "🔥 PERFEKT POÄNG!",
     "searches": "sökningar",
     "topicIs": "Ämne: {topic}",
     "total": "TOTALT",
-    "trio.hint": "Hitta ordet som kopplar alla tre ämnen",
+    "trio": {
+      "hint": "Hitta ordet som kopplar alla tre ämnen"
+    },
     "viewResults": "VISA RESULTAT",
     "yourAnswer": "DITT SVAR",
     "yourScore": "DIN POÄNG",
     "type": {
       "scrambled": "BLANDAD",
-      "scrambledDesc": "Lös det blandade trendordet",
       "fillBlank": "FYLL I",
-      "fillBlankDesc": "Komplettera trendfrasen",
       "chain": "KEDJA",
-      "chainDesc": "Länka ord, en bokstav i taget",
       "spotOn": "RÄTT PÅ",
-      "spotOnDesc": "Matcha ord med betydelse",
-      "trio": "TRIO",
-      "trioDesc": "Hitta ordet som kopplar alla 3 trender"
+      "trio": "TRIO"
     },
     "challenge": "{number}/{total}",
-    "score": "{score}",
-    "trend": "{topic}",
     "correct": "RÄTT!",
-    "incorrect": "NEJ",
-    "close": "NÄRA",
-    "perfect": "PERFEKT",
     "hint": "LEDTRÅD?",
     "skip": "HOPPA",
     "submit": "SKICKA",
-    "next": "NÄSTA",
-    "context": "Om denna trend:",
-    "learnMore": "Läs mer",
-    "intro": {
-      "title": "Välkommen till Daily Buzz",
-      "screen1": "Ordpussel från dagens trender",
-      "screen2": "Ingen tidsgräns. Ingen press. Bara du mot nyheterna.",
-      "screen3": "Nya utmaningar varje dag",
-      "start": "STARTA BUZZ",
-      "skip": "HOPPA INTRO"
-    },
     "results": {
       "title": "KLART!",
-      "score": "{score}/100",
-      "scorePerfect": "100/100 PERFEKT",
+      "perfect": "🔥 PERFEKT POÄNG!",
       "trending": "Dagens trender:",
       "share": "DELA POÄNG",
-      "playAgain": "IMORGON",
-      "viewLeaderboard": "TOPPLISTA"
+      "reviewTitle": "UTMANINGSÖVERSIKT",
+      "yourAnswer": "Du svarade:",
+      "correctAnswer": "Svar:",
+      "skipped": "HOPPADE ÖVER"
     },
-    "streak": {
-      "current": "{count}-dagars streak",
-      "lost": "Streak förlorad! Börja om idag",
-      "milestone": "MILSTOLPE: {count} dagar! 🔥"
-    },
-    "stats": {
-      "completed": "{count} totalt",
-      "avgScore": "Medel: {score}"
+    "feedback": {
+      "correct": "RÄTT!",
+      "incorrect": "FEL",
+      "answerWas": "Svaret var:"
     },
     "share": {
-      "text": "Daily Buzz: {topic} | {score}/100 | Klarar du det? 🔥",
-      "textPerfect": "Daily Buzz: PERFEKT POÄNG 💯 | Kan du? 🔥",
-      "textStreakMilestone": "{count}-dagars Buzz streak! 🔥 Gå med?"
+      "text": "Daily Buzz: {topic} | {score}/100 | Klarar du det? 🔥"
     },
     "error.loading": "Laddar dagens buzz...",
     "error.failed": "Kunde inte ladda. Försök igen?",
     "error.noInternet": "Ingen anslutning. Kolla din internetanslutning.",
-    "alreadyPlayed": "Redan spelat idag! Kom tillbaka imorgon.",
-    "comingSoon": "Morgondagens buzz släpps vid midnatt"
+    "alreadyPlayed": "Redan spelat idag! Kom tillbaka imorgon."
   },
   "wordHunt": {
     "title": "Ordjakt",
-    "attemptsRemaining": "Försök {current} av {max}",
-    "wrongLength": "Ordet måste vara {expected} bokstäver (du skrev {got})",
     "alreadyGuessed": "Du har redan gissat det ordet!",
-    "victory": "🎉 Du hittade det!",
-    "defeat": "Spelet är slut! Ordet var: {word}",
-    "keepGoing": "Fortsätt jaga! Använd feedbacken för att vägleda nästa gissning",
-    "formWord": "Bilda ett ord från brädet...",
-    "letterKnowledge": "Bokstavskunskap",
-    "targetLength": "Målordet längd: {length} bokstäver",
-    "greenMeaning": "🟩 = Bokstav på rätt plats",
-    "yellowMeaning": "🟨 = Bokstaven finns men fel plats",
-    "grayMeaning": "⬜ = Bokstaven finns inte i ordet",
-    "howToPlay": "Jaga det dolda {length}-bokstavs ordet med hjälp av feedback! Du har {max} försök att hitta det.",
     "shareResult": "Dela resultat",
-    "shareAttempt": "Dela försök",
-    "shareChallengeFriends": "Utmana dina vänner",
-    "playAgainTomorrow": "Kom tillbaka imorgon för ett nytt pussel!",
-    "tryAnotherLanguage": "Prova ett annat språk",
-    "playDifferentLanguage": "Utmana dig själv på ett annat språk!",
     "quitConfirmTitle": "Lämna jakten?",
     "quitConfirmMessage": "Du förlorar dina framsteg!",
     "feedback": {
       "tooShort": "📏 Minst 3 bokstäver",
       "duplicate": "🔁 Redan hittat!",
-      "notOnBoard": "⚠️ Kan inte bilda detta på brädet",
       "notOnBoardPenalty": "⚠️ Inte på brädet -5 ❤️",
       "notFormablePenalty": "⚠️ Inte på brädet -5 ❤️",
       "notInDictionary": "📖 Inte ett ord -4 ❤️",
-      "invalidWord": "❌ Inte ett giltigt ord",
-      "validWord": "✓ Ord hittades!",
-      "targetAttempt": "🎯 Fortsätt!",
-      "targetFound": "🎉 DU HITTADE DET!",
       "correct": "Korrekt",
       "wrongPlace": "Fel plats",
       "notInWord": "Inte i ordet"
@@ -3499,47 +2314,12 @@ const sv = {
       "solveRate": "Lösningsgrad",
       "avgAttempts": "Genomsnittliga försök",
       "distribution": "Fördelning av försök",
-      "yourPercentile": "Du gjorde det bättre än {percentile}% av spelarna!",
-      "firstToSolve": "🌟 Först att lösa idag!",
-      "youSolved": "Du löste det!",
-      "youFailed": "Du löste det inte den här gången",
-      "attemptsUsed": "Försök använda: {count}",
       "top": "Topp",
       "solved": "löste",
       "betterThan": "bättre än andra spelare"
     },
-    "ranking": {
-      "howItWorks": "Hur rankning fungerar",
-      "title": "Rankningssystem",
-      "explanation": "Spelare rankas efter färre försök. Vid lika avgör effektivitetspoäng din position.",
-      "efficiencyTitle": "Din Effektivitetspoäng",
-      "life": "Liv",
-      "tokens": "Poletter",
-      "words": "Ord",
-      "guesses": "Gissningar",
-      "total": "Totalt",
-      "pts": "p"
-    },
     "survival": {
-      "tokens": "Tokens",
-      "lifePoints": "Liv",
-      "lifeRemaining": "{points} Liv",
-      "lifeDraining": "Livet rinner ut...",
-      "clueTokens": "Ledtrådspoletter",
-      "tokensAvailable": "{count} poletter",
-      "wordsDiscovered": "Ord hittade",
-      "wordsCount": "{count} ord hittade",
-      "hints": "Ledtrådar",
-      "aiHint": "AI Ledtråd",
-      "hintLevel": "Ledtråd {level}/5",
-      "hintUnlocked": "Ledtråd upplåst!",
-      "hintCost": "Kostnad: {cost} ord",
-      "needMoreWords": "Hitta {count} fler ord för att låsa upp",
-      "oneMoreWord": "1 ord kvar!",
-      "nextHint": "Nästa ledtråd",
-      "allHintsUnlocked": "Alla ledtrådar upplåsta!",
       "shop": "Ledtrådsbutik",
-      "shopTitle": "Spendera ledtrådspoletter",
       "revealLetter": "Avslöja bokstav",
       "revealLetterDesc": "Avslöja en slumpmässig bokstav i målordet",
       "eliminateLetters": "Eliminera felaktiga bokstäver",
@@ -3548,31 +2328,12 @@ const sv = {
       "exampleSentenceDesc": "Se ordet använt i en mening (ordet är tomt)",
       "revealCategory": "Avslöja kategori",
       "revealCategoryDesc": "Visa ordkategorin (t.ex. \"Djur > Däggdjur\")",
-      "purchase": "Köp ({cost} poletter)",
-      "purchased": "Köpt",
       "notEnoughTokens": "Inte tillräckligt med poletter",
-      "efficiency": "Effektivitet",
-      "efficiencyScore": "Effektivitetspoäng: {score}",
-      "wordDiscovery": "+{life} Liv, +{tokens} Poletter",
-      "gameOver": "Slut på liv!",
-      "youWon": "Du överlevde och hittade ordet!",
       "category": "Kategori: {category}",
-      "targetWordGuess": "Målordsgissning",
-      "gridWordDiscovery": "Rutnätsupptäckt",
-      "cannotRevealMore": "Kan inte avslöja fler bokstäver",
       "wordsLabel": "Ord",
-      "attemptsLabel": "Försök",
       "triesLeft": "försök kvar",
-      "onlyMatchingLengthHint": "Endast ord med {length} bokstäver använder försök",
       "knownLetters": "Fel plats:",
-      "findOnBoard": "Hitta detta ord på brädet!",
-      "traceLetters": "Följ bokstäverna på rutnätet för att stava det",
-      "needHelp": "Behöver du hjälp? Prova en ledtråd!",
-      "spendCoinsHint": "Spendera mynt på ledtrådar!",
-      "yourGuess": "Ditt svar",
-      "targetWord": "Hitta detta ord",
       "accumulatedScore": "Poäng",
-      "scoreIncrement": "+{amount}",
       "autoClueUnlocked": "Ledtråd upplåst!",
       "clueRevealLetter": "Bokstav avslöjad!",
       "clueRevealCategory": "Kategori upplåst!",
@@ -3582,26 +2343,13 @@ const sv = {
     },
     "results": {
       "targetWord": "Målordet",
-      "tokensEarned": "poletter tjänade",
       "betterLuckNextTime": "Bättre lycka nästa gång!",
       "nextChallengeIn": "Nästa utmaning om",
-      "tryAgainTomorrow": "Kom tillbaka imorgon för ett nytt pussel!",
       "rankOutOf": "#{rank} av {total} spelare",
-      "rankingsFor": "Rankning för {language} pussel",
       "survivalMetrics": "Överlevnadsstatistik",
       "avgLifeLeft": "Genomsnittligt liv",
-      "avgWordsFound": "Genomsnittliga ord",
       "avgEfficiency": "Genomsnittlig effektivitet",
-      "bestEfficiency": "Bästa effektivitet",
-      "yourEfficiency": "Din effektivitet: {score} poäng",
-      "efficiencyPercentile": "Bättre än {percentile}% av spelarna!",
-      "rarestFind": "Sällsyntaste fyndet",
-      "legendary": "LEGENDARISK",
-      "rare": "SÄLLSYNT",
-      "uncommon": "OVANLIG",
-      "common": "VANLIG",
       "challengeTitle": "Utmaning från en vän!",
-      "theyScored": "De fick",
       "attempts": "försök",
       "beatTheirScore": "Kan du slå deras poäng?",
       "tryAnotherLanguage": "Prova ett annat språk",
@@ -3609,13 +2357,8 @@ const sv = {
       "theTargetWordWas": "Målordet var:",
       "revealTargetWord": "Avslöja målord",
       "yourCoins": "Dina mynt:",
-      "notEnoughCoins": "inte tillräckligt med mynt",
       "seeTheAnswer": "Se vad du letade efter",
       "earnMoreHint": "Vinn utmaningar för att tjäna fler mynt!",
-      "wantToRetry": "Vill du försöka igen?",
-      "retryChallenge": "Försök igen",
-      "needMoreCoins": "behöver {amount} till",
-      "retryExplanation": "Full återställning - börja om med nya försök",
       "find": "FYND",
       "share": "Dela",
       "retry": "Försök igen",
@@ -3623,39 +2366,10 @@ const sv = {
       "details": "Detaljer & Belöningar",
       "coinsEarned": "Intjänade mynt",
       "survivalBonus": "Överlevnadsbonus",
-      "survivalTier": {
-        "legendary": "Legendarisk Överlevare!",
-        "excellent": "Utmärkt Uthållighet!",
-        "good": "Bra Ihärdighet!",
-        "nice": "Bra Insats!",
-        "start": "Varje Sekund Räknas!"
-      },
-      "scoreBreakdown": "Poängfördelning",
-      "efficiencyScore": "Effektivitetspoäng",
-      "howItsCalculated": "Så räknas det",
-      "lifeRemaining": "Liv",
-      "tokensSaved": "Polletter",
-      "wordsFound": "Ord",
-      "guessesPenalty": "Gissningar",
-      "wordValues": "Ordvärden för Liv",
-      "letters": "bokstäver",
-      "tipsToImprove": "Tips att Förbättra",
       "generating": "Skapar...",
       "previewImage": "Förhandsgranska bild",
       "moreOptions": "Fler delningsalternativ",
-      "lessOptions": "Färre alternativ",
-      "performanceRewards": "Prestanda & Belöningar",
-      "tryAgain": "Försök igen",
-      "yourFinalScore": "Din Slutpoäng",
-      "scoreEmphasis": "Effektivitetspoäng"
-    },
-    "scoreTips": {
-      "solveFirst": "Lös pusslet för att få poäng!",
-      "findMoreWords": "Hitta fler ord för att få liv",
-      "longerWords": "Längre ord (5+ bokstäver) ger mer liv",
-      "saveTokens": "Spara polletter genom att använda färre ledtrådar",
-      "exploreGrid": "Utforska rutnätet för bonusord",
-      "strategicGuessing": "Använd ledtrådar innan du gissar"
+      "lessOptions": "Färre alternativ"
     },
     "score": {
       "title": "Din Poäng",
@@ -3676,30 +2390,12 @@ const sv = {
     "ad": {
       "watchAd": "Titta på Annons",
       "needMoreCoins": "Behöver fler mynt?",
-      "coinsNeeded": "{current} / {needed} mynt",
       "coinsEarned": "mynt intjänade!",
       "loading": "Förbereder annons...",
       "watching": "Tittar på annons...",
       "almostDone": "Nästan klart!",
       "error": "Annonsen misslyckades",
-      "tryAgain": "Försök igen senare",
-      "earnCoins": "Tjäna Mynt",
-      "watchToEarn": "Titta på en kort video för att tjäna mynt"
-    },
-    "shareCTA": {
-      "canYouSolve": "Kan du lösa det?",
-      "beatAttempts": "Slå {count} försök?",
-      "dayStreak": "{count} dagars streak!"
-    },
-    "streak": {
-      "milestoneTitle": "Seriemilstolpe!",
-      "weekStreak": "1 VECKA I RAD!",
-      "twoWeekStreak": "2 VECKOR STARK!",
-      "monthStreak": "MÅNADSMÄSTARE!",
-      "fiftyDayStreak": "LEGENDARISK SERIE!",
-      "centuryStreak": "ÅRHUNDRADETS MÄSTARE!",
-      "yearStreak": "ÅRETS KRIGARE!",
-      "keepGoing": "Håll serien igång!"
+      "tryAgain": "Försök igen senare"
     },
     "leaderboard": {
       "title": "Topplista",
@@ -3721,32 +2417,7 @@ const sv = {
     "shareMessage": {
       "header": "LexiClash Ordjakt #{number}",
       "solvedIn": "Löst på {attempts}/10",
-      "failedAttempt": "X/10 - så nära!",
-      "genius1": "🧠 För lätt!",
-      "genius2": "🔥 Svettades inte ens",
-      "genius3": "⚡ Finns det ett lättläge?",
-      "genius4": "👑 Buga er, dödliga!",
-      "great1": "⚡ Krossade det!",
-      "great2": "💥 Det var tillfredsställande",
-      "great3": "🎯 Träff idag!",
-      "great4": "✨ Känner mig vass!",
-      "good1": "✨ Fixade det!",
-      "good2": "💫 Hjärnan fungerar fortfarande!",
-      "good3": "🙌 Inte illa!",
-      "good4": "👏 Det duger!",
-      "close1": "😅 Det var FÖR nära!",
-      "close2": "💫 Klarade det knappt!",
-      "close3": "🎉 Överlevnadsläge: aktiverat!",
-      "close4": "😮‍💨 Puh!",
-      "fail1": "💪 Nästa gång!",
-      "fail2": "🔄 Imorgon är min!",
-      "fail3": "😤 Det ordet var orättvist!",
-      "fail4": "🎲 Dåligt bräde!",
-      "cta1": "Kan du slå det?",
-      "cta2": "Din tur.",
-      "cta3": "Slå det då.",
-      "cta4": "Du klarar det inte.",
-      "cta5": "Våga försöka."
+      "failedAttempt": "X/10 - så nära!"
     }
   },
   "keepPlaying": {
@@ -3765,18 +2436,6 @@ const sv = {
     "dismiss": "Inte nu"
   },
   "guidance": {
-    "combo": {
-      "title": "Kombobonus!",
-      "text": "Hitta ord snabbt för att bygga kombinationer och multiplicera din poäng! Håll farten uppe!"
-    },
-    "earthquake": {
-      "title": "Jordbävning på väg!",
-      "text": "Bokstäverna blandas snart - hitta ord snabbt innan de flyttas! Eldrundan börjar härnäst!"
-    },
-    "fireRound": {
-      "title": "Eldrunda - Dubbla poäng!",
-      "text": "Alla poäng DUBBLERAS de nästa 15 sekunderna - hitta så många ord du kan!"
-    },
     "directionPattern": {
       "title": "Prova V & L-former!",
       "text": "Dra V-former, L-former eller sicksack! Din väg kan byta riktning när som helst - gå höger, sedan ner, sedan diagonalt, allt i ett ord."
@@ -3786,8 +2445,7 @@ const sv = {
       "text": "Dra fingret över bokstäverna för att bilda ord. Koppla ihop angränsande bokstäver i valfri riktning!"
     },
     "dragTutorial": {
-      "title": "Dra för att koppla!",
-      "text": "Dra fingret över bokstäverna för att bilda ord"
+      "title": "Dra för att koppla!"
     },
     "dismiss": "Förstått!"
   },
@@ -3797,21 +2455,6 @@ const sv = {
     "letters": "bokstäver",
     "pts": "p",
     "longerWordsTip": "Längre ord = mycket mer poäng!"
-  },
-  "wizard": {
-    "selectMode": "Välj spelläge",
-    "chooseDifficulty": "Välj svårighetsgrad",
-    "gridPreview": "rutnät",
-    "configureOptions": "Spelalternativ",
-    "reviewSettings": "Granska & Starta",
-    "stepMode": "Läge",
-    "stepSettings": "Inställningar",
-    "stepStart": "Starta",
-    "stepDifficulty": "Svårighetsgrad",
-    "stepOf": "Steg {current} av {total}",
-    "stepOptions": "Alternativ",
-    "stepReview": "Granska",
-    "gameSettings": "Spelinställningar"
   },
   "home": {
     "singlePlayer": "Enspelare",
@@ -3824,7 +2467,6 @@ const sv = {
     "startConversation": "Starta en konversation!",
     "typeMessage": "Skriv ett meddelande...",
     "sendMessage": "Skicka",
-    "messageLimit": "{current}/{max} tecken",
     "add": "Lägg till",
     "addFriend": "Lägg till vän",
     "addFriendsToChallenge": "Lägg till vänner för att utmana",
@@ -3841,32 +2483,15 @@ const sv = {
     "sentRequests": "Skickade förfrågningar",
     "signInRequired": "Logga in för att se vänner",
     "typeAtLeast2Chars": "Skriv minst 2 tecken",
-
     "challenges": {
       "send": "Skicka Utmaning",
-      "accept": "Acceptera",
-      "decline": "Avvisa",
       "pending": "Väntande Utmaning",
-      "expired": "Utmaning Utgått",
-      "inviteMessage": "{username} utmanar dig till ett spel!",
-      "settings": "Spelinställningar",
       "customMessage": "Lägg till ett meddelande (valfritt)",
-      "created": "Utmaning skickad!",
-      "accepted": "{username} accepterade din utmaning!"
+      "inviteMessage": "Utmaning från {name}! Kan du slå deras poäng?"
     },
-
-    "notifications": {
-      "newMessage": "Nytt meddelande från {username}",
-      "newChallenge": "{username} skickade dig en utmaning!",
-      "challengeAccepted": "{username} accepterade din utmaning!"
-    },
-
+    "messageLimit": "{current}/{max} tecken",
     "errors": {
-      "sendFailed": "Misslyckades att skicka meddelande",
-      "notFriends": "Du måste vara vän för att skicka meddelanden",
-      "rateLimited": "Lugna ner dig! För många meddelanden",
-      "messageEmpty": "Meddelandet kan inte vara tomt",
-      "messageTooLong": "Meddelandet är för långt"
+      "sendFailed": "Misslyckades att skicka meddelande"
     }
   },
   "multiplayer": {
@@ -3880,16 +2505,14 @@ const sv = {
   "reveal": {
     "revealWord": "Avslöja",
     "finding": "Söker...",
-    "revealFree": "Avslöja ett ord, {remaining} gratis kvar",
-    "revealCost": "Avslöja ett ord för {cost} mynt",
     "noWordsLeft": "Inga 5+ bokstavsord kvar att avslöja",
     "notEnoughCoins": "Behöver {cost} mynt (har {balance})",
     "gameNotActive": "Spelet är inte aktivt",
     "coins": "Mynt",
     "base": "Bas",
-    "efficiency": "Effektivitet",
-    "streak": "Svit",
-    "usedForReveals": "Använd mynt för att avslöja ord i enspelarspel!"
+    "usedForReveals": "Använd mynt för att avslöja ord i enspelarspel!",
+    "revealFree": "Gratis avslöjande!",
+    "revealCost": "Avslöja ({cost} mynt)"
   },
   "accessibility": {
     "title": "Tillgänglighet",
@@ -3922,16 +2545,12 @@ const sv = {
   },
   "email": {
     "title": "Få dagliga utmaningar!",
-    "description": "Håll dig skarp med dagliga ordutmaningar levererade till din inkorg. Plus, svitpåminnelser så att du aldrig förlorar din framgång!",
     "placeholder": "din@email.com",
     "submit": "Prenumerera",
     "submitting": "Prenumererar...",
     "successTitle": "Allt är klart!",
     "successMessage": "Vi skickar dig dagliga utmaningar och svitpåminnelser. Kolla din inkorg!",
     "privacy": "Vi respekterar din integritet. Avsluta prenumeration när som helst. Inget spam, vi lovar.",
-    "benefit1": "Dagliga curaterade ordutmaningar",
-    "benefit2": "Svitskyddspåminnelser",
-    "benefit3": "Exklusiva tips och strategier",
     "benefitShort1": "Svitpåminnelser",
     "benefitShort2": "Dagliga pussel"
   },
@@ -3951,8 +2570,6 @@ const sv = {
   "keyboardHint": {
     "title": "⚡ Snabbtips",
     "message": "Skriv ord med tangentbordet! Börja bara skriva och tryck Enter. Mycket snabbare än att svepa!",
-    "type": "Skriv",
-    "clear": "för att rensa",
     "gotIt": "Fattat!"
   },
   "keyboardShortcuts": {
@@ -3976,8 +2593,7 @@ const sv = {
     "doubleClickDesc": "Skicka ord",
     "rightClick": "Högerklick",
     "rightClickDesc": "Ångra sista cellen",
-    "tip": "Börja skriva vilken bokstav som helst för att hitta vägar i rutnätet!",
-    "pressForHelp": "Tryck ? för genvägar"
+    "tip": "Börja skriva vilken bokstav som helst för att hitta vägar i rutnätet!"
   },
   "keyboardMode": {
     "navigation": "NAVIGERING",
@@ -3986,10 +2602,7 @@ const sv = {
     "typingHint": "Fortsätt..."
   },
   "keyboardQuickTip": {
-    "title": "Snabbtips",
-    "message": "Prova att skriva ett ord!",
-    "pressQuestion": "Tryck ? för alla genvägar",
-    "gotIt": "Fattat!"
+    "message": "Prova att skriva ett ord!"
   },
   "keyboardDesktopBadge": {
     "typeWords": "Skriv ord",
@@ -4053,53 +2666,26 @@ const sv = {
   },
   "brain": {
     "title": "Hjärnträning",
-    "subtitle": "Följ dina kognitiva prestationer",
     "score": "Hjärnpoäng",
     "points": "Hjärnpoäng",
-    "overall": "Totalt",
     "nav": {
-      "home": "Spela",
-      "brain": "Hjärna",
       "profile": "Profil"
     },
     "domains": {
       "processingSpeed": "Bearbetningshastighet",
-      "processingSpeedDesc": "Hur snabbt du hittar ord",
       "workingMemory": "Arbetsminne",
-      "workingMemoryDesc": "Förmåga att hålla och bearbeta information",
       "attention": "Uppmärksamhet",
-      "attentionDesc": "Uthållig koncentration och kombinationer",
       "flexibility": "Flexibilitet",
-      "flexibilityDesc": "Mental anpassningsförmåga och variation",
-      "vocabulary": "Ordförråd",
-      "vocabularyDesc": "Djupet av ordkunskap"
-    },
-    "tiers": {
-      "novice": "Nybörjare",
-      "apprentice": "Lärling",
-      "intermediate": "Mellanliggande",
-      "advanced": "Avancerad",
-      "expert": "Expert",
-      "master": "Mästare"
-    },
-    "progress": {
-      "title": "Framsteg",
-      "improving": "Förbättras",
-      "stable": "Stabil",
-      "declining": "Uppgraderingszon!",
-      "gamesAnalyzed": "analyserade spel",
-      "toNextTier": "till nästa nivå"
+      "vocabulary": "Ordförråd"
     },
     "recommendation": {
       "title": "Personligt tips",
-      "weakest": "Låt oss turboladda din {{domain}}!",
-      "tryDrill": "Prova {{drill}}-övningen för att förbättra!",
       "startDrill": "Starta övning",
-      "declining": "Power up din {{domain}} - kör hårt!",
-      "low": "Din {{domain}} är redo att levla upp!",
-      "improve": "Förbättra din {{domain}} med riktad träning.",
-      "unlock": "{{games}} spel kvar för att låsa upp",
-      "scienceHint": "Riktad träning förbättrar specifika kognitiva förmågor"
+      "scienceHint": "Riktad träning förbättrar specifika kognitiva förmågor",
+      "declining": "Din {domain} har sjunkit. Denna övning kan hjälpa!",
+      "low": "Din {domain} behöver träning. Övning ger färdighet!",
+      "improve": "Fortsätt bygga dina {domain}-färdigheter!",
+      "unlock": "Spela {games} spel till för att låsa upp"
     },
     "welcomeBack": {
       "title": "Välkommen tillbaka!",
@@ -4109,40 +2695,37 @@ const sv = {
       "currentScore": "Nuvarande",
       "personalBest": "Bäst",
       "bestStreak": "Bästa Streak",
-      "reachTier": "Låt oss få dig tillbaka till {{tier}}!",
-      "beatBest": "Ditt personbästa är {{score}} - låt oss slå det!",
       "rebuildStreak": "Dags att bygga upp din streak igen!",
       "keepGrowing": "Låt oss fortsätta stärka din hjärna!",
-      "daysAway": "{{days}} dagar sedan senaste aktiviteten"
+      "reachTier": "Kan du nå {tier}-nivå igen?",
+      "beatBest": "Ditt bästa är {score}. Kan du slå det?",
+      "daysAway": "{days} dagar sedan senaste spelet"
     },
     "tierUp": {
       "title": "Nivå Upp!",
       "newScore": "Din poäng",
-      "message": "Grattis! Du har nått {{tier}}-nivån!",
-      "continue": "Fortsätt träna"
+      "continue": "Fortsätt träna",
+      "message": "Du har nått {tier}-nivån!"
     },
+    "playMoreForTrends": "Spela {count} spel till för att se trender",
     "unlock": {
       "newDrillUnlocked": "Ny övning upplåst!",
       "nowAvailable": "är nu tillgänglig!",
       "gameLeft": "spel kvar",
-      "gamesLeft": "spel kvar",
-      "almostThere": "Nästan där!"
+      "gamesLeft": "spel kvar"
     },
     "quickDrills": "Snabba övningar",
-    "viewAll": "Visa alla",
     "cognitiveProfile": "Kognitiv profil",
     "scientificTips": "Visste du?",
     "learnMore": "Läs mer",
     "radarChart": "Kognitiv radar",
     "currentScores": "Nuvarande poäng",
-    "gamesAnalyzed": "Analyserade spel",
     "activitiesAnalyzed": "Aktiviteter",
     "toNextTier": "till",
     "newBadge": "NYT!",
     "firstGameComplete": "Kognitiv baslinje etablerad!",
     "baselineEstablished": "Din kognitiva profil är klar. Spela fler spel för att följa din förbättring!",
     "overallScore": "Totalpoäng",
-    "playMoreForTrends": "Spela {count} fler spel för att låsa upp trendspårning!",
     "playAgain": "Spela igen",
     "drills": {
       "title": "Hjärnövningar",
@@ -4227,14 +2810,6 @@ const sv = {
         "notInTarget": "Inte målord"
       }
     },
-    "tips": {
-      "title": "Visste du?",
-      "tip1": "Arbetsminneskapaciteten ökar med 15% efter bara 2 veckors daglig ordspelsträning.",
-      "tip2": "Bearbetningshastigheten toppar med daglig träning - hjärnan skapar snabbare nervbanor.",
-      "tip3": "Att hitta sällsynta ord aktiverar djupare ordförrådsåtkomst - en viktig kognitiv förmåga.",
-      "tip4": "Att hålla kombos tränar uthållig uppmärksamhet - avgörande för fokus i vardagen.",
-      "tip5": "Att växla mellan ordlängder bygger kognitiv flexibilitet - mental anpassningsförmåga."
-    },
     "share": {
       "title": "Dela Hjärnpoäng",
       "brainScore": "Hjärnpoäng",
@@ -4243,11 +2818,6 @@ const sv = {
       "games": "spel",
       "trainYourBrain": "Träna din hjärna på",
       "shareYourScore": "Dela Din Poäng"
-    },
-    "streak": {
-      "title": "Träningssvit",
-      "days": "dagar",
-      "best": "Personligt rekord"
     },
     "empty": {
       "title": "Börja träna!",
@@ -4277,16 +2847,12 @@ const sv = {
   },
   "customPuzzle": {
     "title": "Anpassat Pussel",
-    "description": "Kan du lösa detta ordpussel?",
     "createTitle": "Skapa Ditt Eget Pussel",
     "createYourOwn": "Skapa Ditt Eget Pussel",
     "createDescription": "Utmana vänner med ditt eget ordpussel",
-    "selectWord": "Välj ett målord för ditt pussel:",
     "enterWord": "Ange ditt målord",
     "enterWordPlaceholder": "Skriv ett ord...",
-    "validating": "Kontrollerar...",
     "wordValid": "Giltigt ord!",
-    "wordInvalid": "Ordet finns inte i ordlistan",
     "invalidCharacters": "Endast bokstäver",
     "wordTooShort": "Minst 3 bokstäver",
     "wordTooLong": "Max 8 bokstäver",
@@ -4308,53 +2874,6 @@ const sv = {
     "beatCreator": "Du slog skaparen!",
     "leaderboard": "Topplista",
     "playDaily": "Spela Daglig Utmaning"
-  },
-  "ui": {
-    "empty": {
-      "noWordsYet": "Börja hitta ord!",
-      "noWordsYetHint": "Svep över bokstäverna för att bilda ord",
-      "waitingForPlayers": "Väntar på spelare...",
-      "waitingForPlayersHint": "Dela rumskoden för att bjuda in vänner",
-      "noGamesPlayed": "Inga spel ännu",
-      "noGamesPlayedHint": "Spela ett spel för att se din statistik"
-    },
-    "loading": {
-      "findingWords": "Letar efter ord...",
-      "connectingPlayers": "Ansluter spelare...",
-      "preparingGame": "Förbereder spelet..."
-    },
-    "combo": {
-      "tierUp": {
-        "rare": "SÄLLSYNT COMBO!",
-        "epic": "EPISK COMBO!",
-        "legendary": "LEGENDARISK!",
-        "mythic": "MYTISK!!!"
-      }
-    },
-    "score": {
-      "milestone": {
-        "50": "Bra start!",
-        "100": "Tresiffriga!",
-        "150": "Du brinner!",
-        "200": "Ordtrollkarl!",
-        "300": "Ostoppbar!",
-        "500": "LEGENDARISK!"
-      }
-    },
-    "word": {
-      "reject": {
-        "tooShort": "För kort!",
-        "notInDictionary": "Inte ett ord",
-        "alreadyFound": "Redan hittad!",
-        "notOnBoard": "Inte på brädet"
-      }
-    },
-    "results": {
-      "drumRoll": "Och vinnaren är...",
-      "yourScore": "Din poäng",
-      "newPersonalBest": "Nytt personligt rekord!",
-      "almostThere": "Så nära! Bara {{points}} poäng kvar"
-    }
   },
   "admin": {
     "dashboard": "Adminpanel",
@@ -4418,6 +2937,42 @@ const sv = {
       "of": "av",
       "lastUpdated": "Senast uppdaterad"
     }
+  },
+  "theme": {
+    "sundayFunday": "Söndagsmys",
+    "mondayMotivation": "Måndagsmotivation",
+    "tuesdayTrivia": "Tisdagstrivia",
+    "wednesdayWisdom": "Onsdagsvisdom",
+    "thursdayThrowback": "Torsdagsminnen",
+    "funFriday": "Rolig fredag",
+    "saturdayAdventure": "Lördagsäventyr",
+    "newYear": "Nyår",
+    "roshHashana": "Rosh Hashanah",
+    "yomKippur": "Yom Kippur",
+    "sukkot": "Sukkot",
+    "hanukkah": "Chanukka",
+    "purim": "Purim",
+    "passover": "Pesach",
+    "yomHaatzmaut": "Yom Ha'atzmaut",
+    "shavuot": "Shavuot",
+    "valentines": "Alla hjärtans dag",
+    "stPatricks": "St. Patrick's Day",
+    "threeKings": "Trettondagen",
+    "setsubun": "Setsubun",
+    "hinamatsuri": "Hinamatsuri",
+    "easter": "Påsk",
+    "sakura": "Körsbärsblom",
+    "goldenWeek": "Gyllene veckan",
+    "midsummer": "Midsommar",
+    "independence": "Nationaldagen",
+    "tanabata": "Tanabata",
+    "obon": "Obon",
+    "halloween": "Halloween",
+    "dayOfDead": "De dödas dag",
+    "autumnLeaves": "Höstlöv",
+    "thanksgiving": "Thanksgiving",
+    "lucia": "Lucia",
+    "christmas": "Jul"
   }
 };
 

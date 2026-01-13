@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { Trophy, Medal, ArrowLeft, RefreshCw } from 'lucide-react';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { PageLayout } from '@/components/layout/PageLayout';
@@ -139,13 +140,16 @@ export default function LeaderboardPage(): React.ReactNode {
               )}
               title="Refresh"
             >
-              <RefreshCw
-                className={cn(
-                  'w-3 h-3',
-                  loading && 'animate-spin',
-                  isDarkMode ? 'text-gray-600' : 'text-gray-600'
-                )}
-              />
+              {loading ? (
+                <NeoLoader variant="dots" size="sm" />
+              ) : (
+                <RefreshCw
+                  className={cn(
+                    'w-3 h-3',
+                    isDarkMode ? 'text-gray-600' : 'text-gray-600'
+                  )}
+                />
+              )}
             </Button>
           </div>
         </motion.div>

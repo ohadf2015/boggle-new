@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { RotateCcw, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { scrollInputIntoView } from '@/hooks/useMobileKeyboard';
 
 interface ScrambledChallengeProps {
   challenge: {
@@ -28,6 +29,12 @@ export default function ScrambledChallenge({
 }: ScrambledChallengeProps) {
   const { t } = useLanguage();
   const [userAnswer, setUserAnswer] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Handle input focus - scroll into view for mobile keyboard
+  const handleFocus = useCallback(() => {
+    scrollInputIntoView(inputRef.current);
+  }, []);
 
   const handleSubmit = useCallback(() => {
     if (userAnswer.trim()) {
@@ -90,10 +97,12 @@ export default function ScrambledChallenge({
         transition={{ delay: 0.2 }}
       >
         <input
+          ref={inputRef}
           type="text"
           value={userAnswer}
           onChange={(e) => setUserAnswer(e.target.value.toUpperCase())}
           onKeyDown={handleKeyDown}
+          onFocus={handleFocus}
           placeholder={t('buzz.yourAnswer') || 'YOUR ANSWER'}
           autoFocus
           className="w-full px-6 py-4 text-2xl font-black text-center text-white bg-slate-800 border-3 border-neo-black rounded-xl shadow-hard focus:border-neo-orange focus:shadow-hard-lg outline-none transition-all uppercase tracking-wider"

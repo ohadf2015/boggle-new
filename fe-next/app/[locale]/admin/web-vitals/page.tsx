@@ -4,8 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   Activity, ArrowLeft, RefreshCw, Monitor, Smartphone, Tablet,
-  Wifi, WifiOff, TrendingUp, TrendingDown, AlertCircle, CheckCircle,
-  Clock, Eye, Download
+  Wifi, WifiOff, TrendingDown, AlertCircle, CheckCircle
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
@@ -16,6 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 
 interface WebVital {
   id: string;
@@ -236,11 +236,8 @@ export default function WebVitalsPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-500" />
-          <p className="text-gray-600">Loading Web Vitals...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-neo-navy">
+        <NeoLoader variant="letters" size="lg" text="Loading Web Vitals..." />
       </div>
     );
   }

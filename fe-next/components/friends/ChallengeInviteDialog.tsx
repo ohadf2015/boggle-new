@@ -2,7 +2,8 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Target, Loader2 } from 'lucide-react';
+import { X, Target } from 'lucide-react';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
@@ -306,7 +307,7 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <NeoLoader variant="dots" size="sm" />
                       {t('common.sending')}
                     </>
                   ) : (

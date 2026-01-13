@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Coins, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
+import { Play, Coins, CheckCircle, AlertCircle } from 'lucide-react';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { Button } from '@/components/ui/button';
 import { useRewardedAd, AdStatus } from '@/hooks/useRewardedAd';
 import { useCoinContext } from '@/contexts/CoinContext';
@@ -77,7 +78,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
     switch (status) {
       case 'loading':
         return {
-          icon: <Loader2 className="w-5 h-5 animate-spin" />,
+          icon: <NeoLoader variant="dots" size="sm" />,
           text: t('wordHunt.ad.loading') || 'Loading ad...',
           subtext: null,
         };

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Gift, Users, Copy, Check, Share2, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 
 // Brand icon SVG components
 const WhatsAppIcon = ({ className }: { className?: string }) => (
@@ -134,7 +135,7 @@ export function ReferralCard() {
         isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
       )}>
         <div className="flex items-center justify-center py-6">
-          <div className="w-6 h-6 border-3 border-neo-pink border-t-transparent rounded-full animate-spin" />
+          <NeoLoader variant="dots" size="md" />
         </div>
       </div>
     );

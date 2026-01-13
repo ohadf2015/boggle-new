@@ -50,10 +50,17 @@ const REGION_MAP: Record<string, string> = {
 
 // Vertex AI Gemini configuration (using existing project credentials)
 // Using most advanced model for high-quality puzzle generation
-const GEMINI_MODEL = process.env.VERTEX_AI_MODEL || 'gemini-3.0-pro';
+const GEMINI_MODEL = process.env.VERTEX_AI_MODEL || 'gemini-2.5-pro';
 
 /**
  * Generate Daily Buzz challenge for a specific date and language
+ *
+ * @param date - Target date for the challenge
+ * @param language - Language code (en, he, sv, ja, es)
+ * @param cachedTrends - INTERNAL USE ONLY. Pre-fetched trends for batch processing.
+ *                       DO NOT expose this parameter through any API endpoint.
+ *                       Allowing external callers to pass custom trends would enable
+ *                       partial overrides and bypass the trend fetching security model.
  */
 export async function generateDailyBuzz(
   date: Date,

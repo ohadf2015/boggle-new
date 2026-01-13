@@ -2,8 +2,9 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Wand2, Share2, Check, Copy, ArrowRight, AlertCircle, Loader2, Sparkles, Trophy } from 'lucide-react';
+import { X, Wand2, Share2, Check, Copy, ArrowRight, AlertCircle, Sparkles, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getGuestFingerprint } from '@/utils/dailyChallenge';
@@ -416,7 +417,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
                 >
                   {isCreating ? (
                     <span className="flex items-center justify-center gap-2">
-                      <Loader2 className="w-6 h-6 animate-spin" />
+                      <NeoLoader variant="dots" size="md" />
                       {t('customPuzzle.generating')}
                     </span>
                   ) : (

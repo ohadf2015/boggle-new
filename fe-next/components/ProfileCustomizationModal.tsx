@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Check, X } from 'lucide-react';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -325,7 +326,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
             className="flex-1 bg-neo-lime hover:bg-neo-lime/90 text-neo-black font-bold border-3 border-neo-black shadow-hard"
           >
             {isSaving ? (
-              <div className="w-5 h-5 border-2 border-neo-black border-t-transparent rounded-full animate-spin" />
+              <NeoLoader variant="dots" size="sm" />
             ) : (
               <>
                 <Check className="w-5 h-5 me-2" />

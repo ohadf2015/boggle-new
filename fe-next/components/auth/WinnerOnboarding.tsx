@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy, Sparkles, Check } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '../ui/button';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { useTheme } from '../../utils/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
@@ -391,7 +392,7 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
             >
               {isSubmitting ? (
                 <div className="flex items-center justify-center gap-3">
-                  <div className="w-6 h-6 border-3 border-current border-t-transparent rounded-full animate-spin" />
+                  <NeoLoader variant="dots" size="sm" />
                   <span>{t('auth.winnerOnboarding.saving') || 'Saving...'}</span>
                 </div>
               ) : (

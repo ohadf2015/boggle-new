@@ -9,6 +9,7 @@ import React, { memo, useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, Star, Coins } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { COIN_COSTS, FREE_REVEALS_PER_GAME } from '@/utils/coinManager';
 import type { PathCell } from '@/utils/wordPathFinder';
@@ -121,7 +122,7 @@ const RevealButton = memo<RevealButtonProps>(({
           border-3 rounded-neo font-bold text-sm transition-all shadow-hard-sm
         `}
       >
-        <Eye className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} aria-hidden="true" />
+        {isLoading ? <NeoLoader variant="dots" size="sm" aria-hidden="true" /> : <Eye className="w-4 h-4" aria-hidden="true" />}
         <div className="flex flex-col items-start" aria-hidden="true">
           <span className="text-xs opacity-80">
             {isLoading

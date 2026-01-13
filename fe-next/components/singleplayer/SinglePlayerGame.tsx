@@ -47,6 +47,7 @@ import {
 import { finalizeWordValidation } from '@/utils/wordValidationAPI';
 import type { SinglePlayerGameState, SinglePlayerResultsData, BotOpponent } from './SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 
 interface SinglePlayerGameProps {
   settings: SinglePlayerGameState;
@@ -1275,15 +1276,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   if (!grid) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <div className="relative w-12 h-12 mx-auto mb-3">
-            <div className="absolute inset-0 border-4 border-cyan-500/30 rounded-full" />
-            <div className="absolute inset-0 border-4 border-transparent border-t-cyan-500 rounded-full animate-spin" />
-          </div>
-          <p className="text-gray-600 dark:text-gray-300 text-sm">
-            {t('common.loading') || 'Loading...'}
-          </p>
-        </div>
+        <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading') || 'Loading...'} />
       </div>
     );
   }
@@ -1315,13 +1308,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               className="absolute inset-0 z-50 flex items-center justify-center bg-neo-navy/90 backdrop-blur-sm"
             >
               <div className="flex flex-col items-center gap-4 p-6 bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard-lg text-neo-black">
-                <div className="relative w-12 h-12">
-                  <div className="absolute inset-0 border-4 border-neo-cyan/30 rounded-full" />
-                  <div className="absolute inset-0 border-4 border-transparent border-t-neo-cyan rounded-full animate-spin" />
-                </div>
-                <p className="text-neo-black font-bold text-lg">
-                  {t('singlePlayer.verifyingWords') || 'Verifying words...'}
-                </p>
+                <NeoLoader variant="dots" size="md" text={t('singlePlayer.verifyingWords') || 'Verifying words...'} />
               </div>
             </AdaptiveMotion.div>
           )}
@@ -1701,13 +1688,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/90 backdrop-blur-sm"
           >
             <div className="flex flex-col items-center gap-4 p-6 bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard-lg text-neo-black">
-              <div className="relative w-12 h-12">
-                <div className="absolute inset-0 border-4 border-neo-cyan/30 rounded-full" />
-                <div className="absolute inset-0 border-4 border-transparent border-t-neo-cyan rounded-full animate-spin" />
-              </div>
-              <p className="text-neo-black font-bold text-lg">
-                {t('singlePlayer.verifyingWords') || 'Verifying words...'}
-              </p>
+              <NeoLoader variant="dots" size="md" text={t('singlePlayer.verifyingWords') || 'Verifying words...'} />
             </div>
           </AdaptiveMotion.div>
         )}

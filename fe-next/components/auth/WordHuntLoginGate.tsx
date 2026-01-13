@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Target, Loader2 } from 'lucide-react';
+import { ArrowLeft, Target } from 'lucide-react';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { signInWithGoogle, signInWithDiscord } from '@/lib/supabase';
@@ -125,7 +126,7 @@ const WordHuntLoginGate: React.FC<WordHuntLoginGateProps> = ({
             )}
           >
             {isLoading === 'google' ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <NeoLoader variant="dots" size="sm" />
             ) : (
               <GoogleIcon className="w-5 h-5" />
             )}
@@ -143,7 +144,7 @@ const WordHuntLoginGate: React.FC<WordHuntLoginGateProps> = ({
             )}
           >
             {isLoading === 'discord' ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <NeoLoader variant="dots" size="sm" />
             ) : (
               <DiscordIcon className="w-5 h-5" />
             )}

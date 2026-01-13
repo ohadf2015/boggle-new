@@ -9,6 +9,7 @@ import { CalendarRewardCard, CalendarReward } from './CalendarRewardCard';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'react-hot-toast';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 
 interface CalendarStatus {
   month: number;
@@ -163,7 +164,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
           {/* Loading state */}
           {isLoading && (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin w-8 h-8 border-4 border-neo-cyan border-t-transparent rounded-full" />
+              <NeoLoader variant="mascot" size="sm" />
             </div>
           )}
 
@@ -235,7 +236,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
                     className="w-full bg-neo-lime text-neo-black font-black uppercase text-sm sm:text-base md:text-lg py-3 sm:py-4 border-2 sm:border-3 border-neo-black shadow-hard hover:shadow-hard-lg"
                   >
                     {isClaiming ? (
-                      <div className="animate-spin w-5 h-5 border-2 border-neo-black border-t-transparent rounded-full" />
+                      <NeoLoader variant="dots" size="sm" />
                     ) : (
                       <>
                         <Gift className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />

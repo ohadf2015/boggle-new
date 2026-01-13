@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { memo } from 'react';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { Mascot, MascotVariant } from './Mascot';
+import { cn } from '@/lib/utils';
 
 const LEXI_LETTERS = ['L', 'E', 'X', 'I', 'C', 'L', 'A', 'S', 'H'] as const;
 
@@ -28,6 +29,8 @@ interface NeoLoaderProps {
   variant?: 'letters' | 'mascot' | 'dots' | 'mascot-letters';
   /** Mascot variant for mascot mode (default: 'thinking') */
   mascotVariant?: MascotVariant;
+  /** Optional className for the wrapper element */
+  className?: string;
 }
 
 /**
@@ -39,6 +42,7 @@ export const NeoLoader = memo(function NeoLoader({
   size = 'md',
   variant = 'letters',
   mascotVariant = 'thinking',
+  className,
 }: NeoLoaderProps) {
   const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
 
@@ -51,7 +55,7 @@ export const NeoLoader = memo(function NeoLoader({
   // Simplified loader for reduced motion or low-end devices
   if (prefersReducedMotion || !enableComplexAnimations) {
     return (
-      <div className="flex flex-col items-center justify-center">
+      <div className={cn("flex flex-col items-center justify-center", className)}>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 bg-neo-lime rounded-full animate-pulse" />
           <div className="w-3 h-3 bg-neo-cyan rounded-full animate-pulse" style={{ animationDelay: '0.2s' }} />
@@ -66,7 +70,7 @@ export const NeoLoader = memo(function NeoLoader({
 
   if (variant === 'dots') {
     return (
-      <div className="flex flex-col items-center justify-center">
+      <div className={cn("flex flex-col items-center justify-center", className)}>
         <div className="flex items-center gap-2">
           {[0, 1, 2].map((i) => (
             <motion.div
@@ -91,7 +95,7 @@ export const NeoLoader = memo(function NeoLoader({
 
   if (variant === 'mascot') {
     return (
-      <div className="flex flex-col items-center justify-center">
+      <div className={cn("flex flex-col items-center justify-center", className)}>
         {/* Animated Mascot using the reusable component */}
         <Mascot
           variant={mascotVariant}
@@ -121,7 +125,7 @@ export const NeoLoader = memo(function NeoLoader({
     };
 
     return (
-      <div className="flex flex-col items-center justify-center gap-4">
+      <div className={cn("flex flex-col items-center justify-center gap-4", className)}>
         {/* Spinner ring with mascot inside */}
         <div className={`${spinnerSizes[size].ring} relative`}>
           {/* Background ring */}
@@ -163,7 +167,7 @@ export const NeoLoader = memo(function NeoLoader({
 
   // Letter tiles variant (default)
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className={cn("flex flex-col items-center justify-center", className)}>
       <div className={`flex ${sizeClasses[size].gap}`}>
         {LEXI_LETTERS.map((letter, i) => (
           <motion.div

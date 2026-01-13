@@ -6,6 +6,7 @@ import { RefreshCw, Users, Gamepad2, Wifi, Clock, Crown, Bot, User } from 'lucid
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 
 // Types matching backend DetailedGame and DetailedGamePlayer
 interface LivePlayer {
@@ -128,7 +129,7 @@ export function LiveMonitor({ authToken }: LiveMonitorProps) {
   if (loading && !data) {
     return (
       <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-8 h-8 animate-spin text-neo-lime" />
+        <NeoLoader variant="letters" size="md" />
       </div>
     );
   }
@@ -169,7 +170,11 @@ export function LiveMonitor({ authToken }: LiveMonitorProps) {
               className="gap-2 sm:hidden h-8"
               disabled={loading}
             >
-              <RefreshCw className={cn('w-3 h-3', loading && 'animate-spin')} />
+              {loading ? (
+                <NeoLoader variant="dots" size="sm" />
+              ) : (
+                <RefreshCw className="w-3 h-3" />
+              )}
               {t('admin.live.refresh') || 'Refresh'}
             </Button>
           </div>
@@ -205,7 +210,11 @@ export function LiveMonitor({ authToken }: LiveMonitorProps) {
           className="gap-2 hidden sm:flex"
           disabled={loading}
         >
-          <RefreshCw className={cn('w-4 h-4', loading && 'animate-spin')} />
+          {loading ? (
+            <NeoLoader variant="dots" size="sm" />
+          ) : (
+            <RefreshCw className="w-4 h-4" />
+          )}
           {t('admin.live.refresh') || 'Refresh'}
         </Button>
       </div>

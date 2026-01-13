@@ -2,8 +2,9 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, AlertTriangle, Plus, Trash2, Copy, Download, Check, Sparkles, Calendar, Loader2, Save, RefreshCw, RotateCcw, Edit, X } from 'lucide-react';
+import { Search, AlertTriangle, Plus, Trash2, Copy, Download, Check, Sparkles, Calendar, Save, RefreshCw, RotateCcw, Edit, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/utils/supabase/client';
 import type { Language } from '@/types';
@@ -521,7 +522,11 @@ export const DailyWordManager: React.FC = () => {
                 <h3 className="font-bold text-base sm:text-lg">Daily Schedule</h3>
              </div>
              <Button size="sm" variant="outline" onClick={fetchSchedule} disabled={loadingSchedule}>
-               <RefreshCw className={cn("w-4 h-4", loadingSchedule && "animate-spin")} />
+               {loadingSchedule ? (
+                 <NeoLoader variant="dots" size="sm" />
+               ) : (
+                 <RefreshCw className="w-4 h-4" />
+               )}
              </Button>
           </div>
 
@@ -642,7 +647,7 @@ export const DailyWordManager: React.FC = () => {
                   >
                     {bulkState.isLoading ? (
                       <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        <span className="mr-2"><NeoLoader variant="dots" size="sm" /></span>
                         Generating...
                       </>
                     ) : (
@@ -745,7 +750,7 @@ export const DailyWordManager: React.FC = () => {
                     >
                       {isSaving ? (
                         <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          <span className="mr-2"><NeoLoader variant="dots" size="sm" /></span>
                           Saving...
                         </>
                       ) : (

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowRight, Lightbulb, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import FillBlankChallenge from './challenges/FillBlankChallenge';
 import ChainChallenge from './challenges/ChainChallenge';
 import SpotOnChallenge from './challenges/SpotOnChallenge';
 import TrioChallenge from './challenges/TrioChallenge';
+import AnswerFeedbackModal from './AnswerFeedbackModal';
 
 interface BuzzGameScreenProps {
   challengeData: {
@@ -34,7 +35,7 @@ interface BuzzGameScreenProps {
     score: number;
     challengesSolved: Array<{
       challengeIndex: number;
-      answer: string;
+      userAnswer: string;
       correct: boolean;
       timeTakenSeconds: number;
     }>;
@@ -58,12 +59,23 @@ export default function BuzzGameScreen({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [answers, setAnswers] = useState<
-    Array<{ challengeIndex: number; answer: string; correct: boolean; timeTakenSeconds: number }>
+    Array<{ challengeIndex: number; userAnswer: string; correct: boolean; timeTakenSeconds: number }>
   >([]);
   const [showHint, setShowHint] = useState(false);
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
   const [startTime] = useState(() => Date.now());
   const [challengeStartTime, setChallengeStartTime] = useState(() => Date.now());
+
+  // Feedback modal state
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackData, setFeedbackData] = useState<{
+    isCorrect: boolean;
+    correctAnswer: string;
+    userAnswer: string;
+    points: number;
+    trendingContext?: string;
+  } | null>(null);
+  const [pendingNextAction, setPendingNextAction] = useState<'next' | 'complete' | null>(null);
 
   const currentChallenge = challengeData.challenges[currentIndex];
   const isLastChallenge = currentIndex === challengeData.challenges.length - 1;
@@ -98,26 +110,22 @@ export default function BuzzGameScreen({
       // Record answer
       const answerRecord = {
         challengeIndex: currentIndex,
-        answer: userAnswer,
+        userAnswer: userAnswer,
         correct,
         timeTakenSeconds: timeTaken,
       };
       setAnswers((prev) => [...prev, answerRecord]);
 
-      // Move to next challenge or complete
-      if (isLastChallenge) {
-        // Complete the game
-        const totalTime = Math.floor((Date.now() - startTime) / 1000);
-        onComplete({
-          challengeId: challengeData.id,
-          score: score + points,
-          challengesSolved: [...answers, answerRecord],
-          completionTimeSeconds: totalTime,
-        });
-      } else {
-        // Move to next
-        setCurrentIndex((prev) => prev + 1);
-      }
+      // Show feedback modal instead of immediately moving to next
+      setFeedbackData({
+        isCorrect: correct,
+        correctAnswer: currentChallenge.answer,
+        userAnswer: userAnswer,
+        points: points,
+        trendingContext: currentChallenge.trendingContext,
+      });
+      setShowFeedback(true);
+      setPendingNextAction(isLastChallenge ? 'complete' : 'next');
     },
     [
       currentChallenge,
@@ -125,15 +133,31 @@ export default function BuzzGameScreen({
       isLastChallenge,
       showHint,
       challengeStartTime,
-      score,
-      answers,
-      startTime,
-      challengeData.id,
-      onComplete,
       playWordAcceptedSound,
       playErrorSound,
     ]
   );
+
+  // Handle feedback modal close - proceed to next challenge or complete
+  const handleFeedbackClose = useCallback(() => {
+    setShowFeedback(false);
+    setFeedbackData(null);
+
+    if (pendingNextAction === 'complete') {
+      // Complete the game
+      const totalTime = Math.floor((Date.now() - startTime) / 1000);
+      onComplete({
+        challengeId: challengeData.id,
+        score: score,
+        challengesSolved: answers,
+        completionTimeSeconds: totalTime,
+      });
+    } else if (pendingNextAction === 'next') {
+      // Move to next challenge
+      setCurrentIndex((prev) => prev + 1);
+    }
+    setPendingNextAction(null);
+  }, [pendingNextAction, startTime, challengeData.id, score, answers, onComplete]);
 
   // Handle skip challenge
   const handleSkip = useCallback(() => {
@@ -319,6 +343,19 @@ export default function BuzzGameScreen({
         onConfirm={handleConfirmQuit}
         variant="danger"
       />
+
+      {/* Answer Feedback Modal */}
+      {feedbackData && (
+        <AnswerFeedbackModal
+          isOpen={showFeedback}
+          isCorrect={feedbackData.isCorrect}
+          correctAnswer={feedbackData.correctAnswer}
+          userAnswer={feedbackData.userAnswer}
+          points={feedbackData.points}
+          trendingContext={feedbackData.trendingContext}
+          onClose={handleFeedbackClose}
+        />
+      )}
     </motion.div>
   );
 }

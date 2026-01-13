@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import BuzzReadyScreen from './BuzzReadyScreen';
 import BuzzGameScreen from './BuzzGameScreen';
 import BuzzResultsScreen from './BuzzResultsScreen';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import type { Language } from '@/types';
 
 interface BuzzChallengeProps {
@@ -42,7 +43,7 @@ interface BuzzResultData {
   score: number;
   challengesSolved: Array<{
     challengeIndex: number;
-    answer: string;
+    userAnswer: string;
     correct: boolean;
     timeTakenSeconds: number;
   }>;
@@ -126,12 +127,7 @@ export default function BuzzChallenge({ language, onBack }: BuzzChallengeProps) 
             exit={{ opacity: 0 }}
             className="flex-1 flex items-center justify-center"
           >
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 border-4 border-neo-yellow border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-neo-yellow font-bold">
-                {t('buzz.loading') || 'Loading Daily Buzz...'}
-              </p>
-            </div>
+            <NeoLoader variant="mascot-letters" size="lg" text={t('buzz.loading') || 'Loading Daily Buzz...'} />
           </motion.div>
         )}
 

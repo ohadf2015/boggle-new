@@ -40,14 +40,7 @@ export function useFeatureFlag(
         setLoading(true);
         setError(null);
 
-        // If no user ID, feature is disabled (guest users)
-        if (!userId) {
-          setEnabled(false);
-          setLoading(false);
-          return;
-        }
-
-        // Call backend API to check feature flag
+        // Call backend API to check feature flag (supports guest users with null userId)
         const response = await fetch(`/api/feature-flags/check`, {
           method: 'POST',
           headers: {
@@ -55,7 +48,7 @@ export function useFeatureFlag(
           },
           body: JSON.stringify({
             flagName,
-            userId,
+            userId: userId || null, // Explicitly pass null for guest users
           }),
         });
 

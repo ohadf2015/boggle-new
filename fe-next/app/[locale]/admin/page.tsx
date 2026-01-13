@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, RefreshCw, Shield, Users, BookOpen, Calendar, Activity, Sparkles } from 'lucide-react';
+import { ArrowLeft, Shield, Users, BookOpen, Calendar, Activity, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ import { LiveMonitor } from '@/components/admin/LiveMonitor';
 import { TodayGamesHistory } from '@/components/admin/TodayGamesHistory';
 import { PullToRefreshWrapper } from '@/components/ui/PullToRefreshWrapper';
 import { isMobileDevice } from '@/utils/mobileAccessibility';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -74,10 +75,7 @@ export default function AdminPage() {
   if (authLoading || isProfileLoading || !authToken) {
     return (
       <div className="min-h-screen bg-neo-navy text-neo-white flex items-center justify-center">
-        <div className="text-center">
-          <RefreshCw className="w-12 h-12 animate-spin text-neo-lime mx-auto mb-4" />
-          <p className="text-slate-400">{t('common.loading') || 'Loading...'}</p>
-        </div>
+        <NeoLoader variant="letters" size="lg" text={t('common.loading') || 'Loading...'} />
       </div>
     );
   }

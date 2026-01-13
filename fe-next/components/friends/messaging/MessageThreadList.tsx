@@ -2,8 +2,9 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { MessageCircle, Loader2 } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
@@ -66,7 +67,7 @@ export const MessageThreadList: React.FC<MessageThreadListProps> = ({
   if (isLoading) {
     return (
       <div className={cn('flex flex-col items-center justify-center py-12', className)}>
-        <Loader2 className="w-8 h-8 animate-spin text-cyan-400" />
+        <NeoLoader variant="dots" size="md" />
         <p className={cn('mt-3 text-sm font-medium', isDark ? 'text-gray-400' : 'text-gray-600')}>
           {t('common.loading')}
         </p>

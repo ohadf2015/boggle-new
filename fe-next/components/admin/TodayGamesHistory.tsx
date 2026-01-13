@@ -17,6 +17,7 @@ import {
   Puzzle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -241,7 +242,7 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
   if (loading && !data) {
     return (
       <div className="flex items-center justify-center h-48">
-        <RefreshCw className="w-8 h-8 animate-spin text-neo-lime" />
+        <NeoLoader variant="letters" size="md" />
       </div>
     );
   }
@@ -274,7 +275,11 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
           className="gap-2"
           disabled={loading}
         >
-          <RefreshCw className={cn('w-4 h-4', loading && 'animate-spin')} />
+          {loading ? (
+            <NeoLoader variant="dots" size="sm" />
+          ) : (
+            <RefreshCw className="w-4 h-4" />
+          )}
           {t('admin.todayGames.refresh') || 'Refresh'}
         </Button>
       </div>

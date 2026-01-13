@@ -2,7 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Target, Loader2, ChevronLeft } from 'lucide-react';
+import { X, Target, ChevronLeft } from 'lucide-react';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
@@ -182,7 +183,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
           >
             {isLoading ? (
               <div className="flex flex-col items-center justify-center h-full">
-                <Loader2 className="w-8 h-8 animate-spin text-cyan-400" />
+                <NeoLoader variant="dots" size="md" />
                 <p className={cn('mt-3 text-sm font-medium', isDark ? 'text-gray-400' : 'text-gray-600')}>
                   {t('common.loading')}
                 </p>

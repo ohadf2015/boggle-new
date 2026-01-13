@@ -1,7 +1,8 @@
 'use client';
 
 import React, { forwardRef, useMemo } from 'react';
-import { Check, AlertCircle, Loader2 } from 'lucide-react';
+import { Check, AlertCircle } from 'lucide-react';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { Input, type InputProps } from './input';
 import {
   useDebouncedValidation,
@@ -101,8 +102,9 @@ export const ValidatedInput = forwardRef<HTMLInputElement, ValidatedInputProps>(
       switch (state) {
         case 'validating':
           return (
-            <Loader2
-              className="w-4 h-4 text-neo-lime animate-spin"
+            <NeoLoader
+              variant="dots"
+              size="sm"
               aria-label={t('common.validating') || 'Validating...'}
             />
           );

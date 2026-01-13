@@ -7,6 +7,7 @@ import { Mail, CheckCircle, XCircle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 
 /**
  * Unsubscribe Confirmation Page
@@ -54,12 +55,7 @@ export default function UnsubscribePage() {
       >
         <div className="bg-slate-800/50 border-4 border-neo-black rounded-neo shadow-hard-lg p-8 text-center">
           {status === 'loading' ? (
-            <>
-              <div className="w-16 h-16 border-4 border-neo-cyan border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-neo-cream">
-                {t('unsubscribe.processing') || 'Processing...'}
-              </p>
-            </>
+            <NeoLoader variant="mascot" size="md" text={t('unsubscribe.processing') || 'Processing...'} />
           ) : status === 'success' ? (
             <>
               <div className="inline-flex items-center justify-center w-20 h-20 bg-neo-lime border-4 border-neo-black rounded-full mb-6 text-neo-black">

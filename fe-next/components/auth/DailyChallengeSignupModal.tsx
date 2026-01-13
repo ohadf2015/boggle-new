@@ -6,6 +6,7 @@ import { Flame, Trophy, BarChart3, Smartphone, Shield, type LucideIcon } from 'l
 import Link from 'next/link';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { Button as ButtonComponent } from '../ui/button';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import {
   Dialog,
   DialogContent,
@@ -374,7 +375,7 @@ const DailyChallengeSignupModal: React.FC<DailyChallengeSignupModalProps> = ({
                 asChild={false}
               >
                 {isLoading === provider.id ? (
-                  <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  <NeoLoader variant="dots" size="sm" />
                 ) : (
                   <provider.icon className="w-5 h-5" />
                 )}

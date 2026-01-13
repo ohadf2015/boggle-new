@@ -128,8 +128,8 @@ async function getSupabaseClient() {
 }
 
 /**
- * Build neo-brutalist image prompt that shows ABSTRACT concepts only
- * CRITICAL: Images must NOT reveal the actual words from the challenge
+ * Build neo-brutalist image prompt that shows the VISUAL SCENE of trending topics
+ * Shows recognizable imagery that hints at the news without revealing specific words
  */
 function buildImagePrompt(
   topic: string,
@@ -137,126 +137,201 @@ function buildImagePrompt(
   _language: string
 ): string {
   const primaryColor = COLOR_MAP[category] || COLOR_MAP.general;
+  const secondaryColor = getSecondaryColor(category);
   const mood = MOOD_MAP[category] || MOOD_MAP.general;
 
-  // Extract abstract concept from topic (remove specific names/words)
-  // For example: "Bitcoin $150K" → "cryptocurrency concept", "Oscars 2026" → "awards ceremony concept"
-  const abstractConcept = extractAbstractConcept(topic, category);
+  // Build a concrete visual scene from the trend
+  const visualScene = buildVisualScene(topic, category);
 
-  return `Create a neo-brutalist graphic illustration representing the ABSTRACT CONCEPT of ${abstractConcept}.
+  return `Create a bold, eye-catching neo-brutalist illustration showing: ${visualScene}
 
-CRITICAL CONSTRAINT: This is for a word game puzzle. The image must show the GENERAL CONCEPT ONLY, without revealing any specific words, names, or text. Show the essence or theme, not literal representations.
+ART STYLE (LexiClash Game Style - MUST FOLLOW):
+- Neo-brutalist "Jackbox Party Pack" aesthetic
+- BOLD, chunky shapes with hard black outlines (4-6px thick)
+- FLAT colors with NO gradients, NO soft shadows
+- High contrast, vibrant palette:
+  * Primary: ${primaryColor}
+  * Secondary: ${secondaryColor}
+  * Accent: Black (#000000) for outlines
+  * Background: Dark navy (#1a1a2e) or white for contrast
+- Playful, exaggerated proportions
+- Asymmetric composition with dynamic angles
+- Halftone dot texture overlays for retro feel
 
-Visual Style:
-- Neo-brutalist aesthetic with BOLD geometric shapes
-- Flat design with NO gradients, NO shadows on main elements
-- Hard black borders (4px thick) around major shapes
-- Primary color: ${primaryColor}
-- Maximum 3 colors total (primary + black + white)
-- Chunky, angular shapes and forms
-- Asymmetric composition
-- Clean negative space
-- Icon-style illustration
+SCENE REQUIREMENTS:
+- Show the VISUAL ESSENCE of the news topic
+- Include recognizable objects, symbols, or scenes that represent the trend
+- Make it immediately clear what the image is about
+- Should feel like a news headline illustration
 
-Mood: ${mood}
-
-Technical Specs:
+CONSTRAINTS:
+- NO text, words, letters, or numbers in the image
+- NO real human faces or photorealistic people
+- Use silhouettes or stylized characters if needed
 - Square format (1024×1024px)
-- Abstract, symbolic representation
-- Simple, recognizable silhouettes
-- NO text, NO words, NO letters
-- NO photorealistic elements
-- NO specific brand logos or identifiable marks
-- Focus on shapes, symbols, and geometric forms
+- Clean, poster-style composition
 
-Example abstraction:
-- If topic is about sports → generic sports equipment shapes
-- If topic is about weather → geometric weather symbols
-- If topic is about entertainment → abstract stage/screen shapes
-- If topic is about technology → circuit-like patterns
+MOOD: ${mood}
 
-Remember: This image should evoke the concept without revealing the specific words players need to find.`;
+The image should make viewers think "I know what this is about!" without needing to read any text.`;
 }
 
 /**
- * Extract abstract concept from trending topic
- * This ensures we don't reveal specific words that might be in the puzzle
+ * Get secondary color for the category
  */
-function extractAbstractConcept(topic: string, category: string): string {
-  // Map topic to abstract concepts based on category
+function getSecondaryColor(category: string): string {
+  const secondaryMap: Record<string, string> = {
+    sports: '#FFE135', // yellow pairs with orange
+    finance: '#00FFFF', // cyan pairs with yellow
+    entertainment: '#FFE135', // yellow pairs with pink
+    technology: '#FF1493', // pink pairs with cyan
+    weather: '#FF6B35', // orange pairs with cyan
+    politics: '#FFE135', // yellow pairs with navy
+    general: '#FF6B35', // orange pairs with yellow
+  };
+  return secondaryMap[category] || secondaryMap.general;
+}
+
+/**
+ * Build a concrete visual scene description from the trending topic
+ * Creates imagery that's recognizable but doesn't reveal puzzle words
+ */
+function buildVisualScene(topic: string, category: string): string {
   const lowercaseTopic = topic.toLowerCase();
 
-  // Sports abstractions
+  // Sports - show specific sports imagery
   if (category === 'sports') {
-    if (lowercaseTopic.includes('championship') || lowercaseTopic.includes('finals')) {
-      return 'championship competition';
+    if (lowercaseTopic.includes('super bowl') || lowercaseTopic.includes('nfl') || lowercaseTopic.includes('football')) {
+      return 'An American football flying through goalposts with stadium lights and cheering crowd silhouettes';
     }
-    if (lowercaseTopic.includes('olympics') || lowercaseTopic.includes('games')) {
-      return 'international sports event';
+    if (lowercaseTopic.includes('basketball') || lowercaseTopic.includes('nba')) {
+      return 'A basketball swooshing through a hoop with dynamic action lines and court floor pattern';
     }
-    return 'athletic competition';
+    if (lowercaseTopic.includes('soccer') || lowercaseTopic.includes('world cup') || lowercaseTopic.includes('fifa')) {
+      return 'A soccer ball flying into a goal net with stadium and excited crowd silhouettes';
+    }
+    if (lowercaseTopic.includes('tennis') || lowercaseTopic.includes('wimbledon')) {
+      return 'Tennis racket hitting a ball across the net with court markings visible';
+    }
+    if (lowercaseTopic.includes('olympics')) {
+      return 'Olympic torch flames with rings symbol and athletic figures in action poses';
+    }
+    if (lowercaseTopic.includes('golf')) {
+      return 'Golf ball trajectory toward a flag on a green with dramatic sunset sky';
+    }
+    if (lowercaseTopic.includes('boxing') || lowercaseTopic.includes('ufc') || lowercaseTopic.includes('fight')) {
+      return 'Boxing ring with dramatic spotlights and silhouetted fighters in action';
+    }
+    return 'Dynamic sports action scene with multiple sports equipment and excited crowd energy';
   }
 
-  // Finance abstractions
+  // Finance - show market/money imagery
   if (category === 'finance') {
-    if (lowercaseTopic.includes('crypto') || lowercaseTopic.includes('bitcoin')) {
-      return 'digital currency';
+    if (lowercaseTopic.includes('bitcoin') || lowercaseTopic.includes('crypto') || lowercaseTopic.includes('ethereum')) {
+      return 'Rising crypto chart with bitcoin symbol, digital circuits, and rocket launching upward';
     }
-    if (lowercaseTopic.includes('stock') || lowercaseTopic.includes('market')) {
-      return 'financial markets';
+    if (lowercaseTopic.includes('stock') || lowercaseTopic.includes('market') || lowercaseTopic.includes('dow') || lowercaseTopic.includes('nasdaq')) {
+      return 'Stock market chart with dramatic upward arrow, trading floor energy, and bull symbol';
     }
-    return 'economic trends';
+    if (lowercaseTopic.includes('fed') || lowercaseTopic.includes('rate') || lowercaseTopic.includes('inflation')) {
+      return 'Federal reserve building silhouette with interest rate arrow and money symbols';
+    }
+    return 'Financial chart with dramatic movement arrows, coins, and market energy';
   }
 
-  // Entertainment abstractions
+  // Entertainment - show specific entertainment imagery
   if (category === 'entertainment') {
-    if (lowercaseTopic.includes('awards') || lowercaseTopic.includes('oscars') || lowercaseTopic.includes('grammy')) {
-      return 'awards ceremony';
+    if (lowercaseTopic.includes('oscar') || lowercaseTopic.includes('academy award')) {
+      return 'Golden Oscar statuette on red carpet with spotlights and film strip decorations';
     }
-    if (lowercaseTopic.includes('movie') || lowercaseTopic.includes('film')) {
-      return 'cinema and film';
+    if (lowercaseTopic.includes('grammy') || lowercaseTopic.includes('music award')) {
+      return 'Grammy gramophone trophy with musical notes, microphone, and stage lights';
     }
-    if (lowercaseTopic.includes('music') || lowercaseTopic.includes('concert')) {
-      return 'musical performance';
+    if (lowercaseTopic.includes('movie') || lowercaseTopic.includes('film') || lowercaseTopic.includes('box office')) {
+      return 'Movie theater marquee with film reel, popcorn, and dramatic spotlights';
     }
-    return 'entertainment event';
+    if (lowercaseTopic.includes('concert') || lowercaseTopic.includes('tour') || lowercaseTopic.includes('album')) {
+      return 'Concert stage with massive speakers, microphone, screaming crowd silhouettes, and light beams';
+    }
+    if (lowercaseTopic.includes('streaming') || lowercaseTopic.includes('netflix') || lowercaseTopic.includes('show')) {
+      return 'TV screen showing play button with couch, popcorn, and binge-watching atmosphere';
+    }
+    if (lowercaseTopic.includes('game') || lowercaseTopic.includes('video game') || lowercaseTopic.includes('gaming')) {
+      return 'Gaming controller with screen showing action, pixel hearts, and excited gamer energy';
+    }
+    return 'Entertainment stage with spotlights, stars, and excited audience silhouettes';
   }
 
-  // Technology abstractions
+  // Technology - show tech imagery
   if (category === 'technology') {
-    if (lowercaseTopic.includes('ai') || lowercaseTopic.includes('artificial intelligence')) {
-      return 'artificial intelligence';
+    if (lowercaseTopic.includes('ai') || lowercaseTopic.includes('chatgpt') || lowercaseTopic.includes('artificial intelligence')) {
+      return 'Robot brain with neural network patterns, glowing circuits, and futuristic interface';
     }
-    if (lowercaseTopic.includes('smartphone') || lowercaseTopic.includes('phone')) {
-      return 'mobile technology';
+    if (lowercaseTopic.includes('apple') || lowercaseTopic.includes('iphone') || lowercaseTopic.includes('ios')) {
+      return 'Sleek smartphone silhouette with app icons floating around it and notification bubbles';
     }
-    return 'technology innovation';
+    if (lowercaseTopic.includes('space') || lowercaseTopic.includes('spacex') || lowercaseTopic.includes('nasa') || lowercaseTopic.includes('rocket')) {
+      return 'Rocket launching into starry space with Earth below and dramatic exhaust flames';
+    }
+    if (lowercaseTopic.includes('tesla') || lowercaseTopic.includes('ev') || lowercaseTopic.includes('electric car')) {
+      return 'Sleek electric car silhouette with charging bolt and futuristic city backdrop';
+    }
+    if (lowercaseTopic.includes('social media') || lowercaseTopic.includes('twitter') || lowercaseTopic.includes('meta') || lowercaseTopic.includes('instagram')) {
+      return 'Social media notification bubbles, like buttons, and connected network of people icons';
+    }
+    return 'Futuristic tech devices with digital circuits, screens, and innovation energy';
   }
 
-  // Weather abstractions
+  // Weather - show weather imagery
   if (category === 'weather') {
-    if (lowercaseTopic.includes('storm') || lowercaseTopic.includes('hurricane')) {
-      return 'severe weather';
+    if (lowercaseTopic.includes('hurricane') || lowercaseTopic.includes('tropical storm')) {
+      return 'Massive hurricane spiral viewed from above with dramatic eye and rain bands';
     }
-    if (lowercaseTopic.includes('heat') || lowercaseTopic.includes('temperature')) {
-      return 'weather conditions';
+    if (lowercaseTopic.includes('tornado') || lowercaseTopic.includes('severe storm')) {
+      return 'Tornado funnel touching down with dark storm clouds and lightning strikes';
     }
-    return 'weather patterns';
+    if (lowercaseTopic.includes('flood') || lowercaseTopic.includes('rain')) {
+      return 'Dramatic rainstorm with flooding waters, storm clouds, and umbrella silhouettes';
+    }
+    if (lowercaseTopic.includes('heat') || lowercaseTopic.includes('hot') || lowercaseTopic.includes('temperature')) {
+      return 'Giant thermometer bursting with heat waves, sun blazing, and melting ice';
+    }
+    if (lowercaseTopic.includes('snow') || lowercaseTopic.includes('blizzard') || lowercaseTopic.includes('winter')) {
+      return 'Blizzard scene with massive snowflakes, frozen landscape, and bundled-up figures';
+    }
+    return 'Dramatic sky with multiple weather elements - clouds, sun, rain, and lightning';
   }
 
-  // Politics abstractions
+  // Politics - show political imagery
   if (category === 'politics') {
-    if (lowercaseTopic.includes('election') || lowercaseTopic.includes('vote')) {
-      return 'democratic process';
+    if (lowercaseTopic.includes('election') || lowercaseTopic.includes('vote') || lowercaseTopic.includes('ballot')) {
+      return 'Ballot box with voting checkmark, American flags, and patriotic stars';
     }
-    if (lowercaseTopic.includes('summit') || lowercaseTopic.includes('meeting')) {
-      return 'political gathering';
+    if (lowercaseTopic.includes('white house') || lowercaseTopic.includes('president')) {
+      return 'White House silhouette with dramatic sky, flags waving, and presidential seal';
     }
-    return 'political event';
+    if (lowercaseTopic.includes('congress') || lowercaseTopic.includes('senate') || lowercaseTopic.includes('house')) {
+      return 'Capitol building dome with gavel, debate podiums, and legislative imagery';
+    }
+    if (lowercaseTopic.includes('supreme court') || lowercaseTopic.includes('ruling')) {
+      return 'Scales of justice with courthouse columns and gavel striking down';
+    }
+    return 'Government building silhouette with flags, podium, and democratic symbols';
   }
 
-  // General fallback - extract core concept
-  return `${category} topic`;
+  // General/News - show news imagery based on keywords
+  if (lowercaseTopic.includes('breaking') || lowercaseTopic.includes('news')) {
+    return 'Breaking news banner with globe, microphones, and urgent notification symbols';
+  }
+  if (lowercaseTopic.includes('celebrity') || lowercaseTopic.includes('star')) {
+    return 'Red carpet with spotlights, camera flashes, and star-shaped decorations';
+  }
+  if (lowercaseTopic.includes('viral') || lowercaseTopic.includes('trending')) {
+    return 'Smartphone screen with viral content, share buttons, and explosion of likes';
+  }
+
+  // Default: Create imagery based on the topic words themselves
+  return `Visual representation of trending topic "${topic}" with bold iconic imagery, recognizable symbols, and dynamic composition`;
 }
 
 /**

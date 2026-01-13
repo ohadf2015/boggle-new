@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import { Bug, Send, Loader2, CheckCircle, Globe, Monitor, User } from 'lucide-react';
+import { Bug, Send, CheckCircle, Globe, Monitor, User } from 'lucide-react';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -134,7 +135,7 @@ const BugReportModal = memo<BugReportModalProps>(({ isOpen, onClose }) => {
 
               {isLoadingContext ? (
                 <div className="flex items-center gap-2 text-sm text-gray-400">
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <NeoLoader variant="dots" size="sm" />
                   {t('common.loading') || 'Loading...'}
                 </div>
               ) : context ? (
@@ -209,7 +210,7 @@ const BugReportModal = memo<BugReportModalProps>(({ isOpen, onClose }) => {
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <NeoLoader variant="dots" size="sm" />
                     {t('bugReport.submitting') || 'Submitting...'}
                   </>
                 ) : (

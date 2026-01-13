@@ -6,6 +6,7 @@ import { Gift } from 'lucide-react';
 import { CollectionGrid } from '@/components/CollectionGrid';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import type { PlayerCollectible } from '@/contexts/auth/authTypes';
 
 interface ProfileCollectionProps {
@@ -53,7 +54,7 @@ export function ProfileCollection({
 
       {isLoading ? (
         <div className="flex justify-center py-6">
-          <div className="w-6 h-6 border-3 border-neo-pink border-t-transparent rounded-full animate-spin" />
+          <NeoLoader variant="dots" size="md" />
         </div>
       ) : (
         <CollectionGrid collectibles={collectibles} />

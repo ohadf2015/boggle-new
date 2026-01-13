@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { Button as ButtonComponent } from '../ui/button';
 import {
   Dialog,
@@ -113,7 +113,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
               asChild={false}
             >
               {isLoading === 'google' ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <NeoLoader variant="dots" size="sm" />
               ) : (
                 <GoogleIcon className="w-5 h-5" />
               )}
@@ -127,7 +127,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
               asChild={false}
             >
               {isLoading === 'discord' ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <NeoLoader variant="dots" size="sm" />
               ) : (
                 <DiscordIcon className="w-5 h-5" />
               )}

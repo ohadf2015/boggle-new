@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, LogOut, Trophy, ChevronDown, Sun, Moon, Users, Settings, Calendar, Gift, Shield } from 'lucide-react';
 import { Button } from '../ui/button';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { useTheme } from '../../utils/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -265,7 +266,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
             )}
           >
             {isSigningOut ? (
-              <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+              <NeoLoader variant="dots" size="sm" />
             ) : (
               <LogOut size={14} />
             )}
@@ -577,7 +578,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                 )}
               >
                 {isSigningOut ? (
-                  <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" aria-label={t('common.loading') || 'Loading'} />
+                  <NeoLoader variant="dots" size="sm" aria-label={t('common.loading') || 'Loading'} />
                 ) : (
                   <LogOut size={14} aria-hidden="true" />
                 )}
@@ -639,7 +640,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                   )}
                 >
                   {isCrazyGamesLoggingIn ? (
-                    <div className="w-4 h-4 border-2 border-neo-black border-t-transparent rounded-full animate-spin" />
+                    <NeoLoader variant="dots" size="sm" />
                   ) : (
                     <User size={14} className="text-neo-black" />
                   )}
@@ -800,7 +801,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
           )}
         >
           {isCrazyGamesLoggingIn ? (
-            <div className="w-4 h-4 border-2 border-neo-black border-t-transparent rounded-full animate-spin" />
+            <NeoLoader variant="dots" size="sm" />
           ) : (
             <User size={14} />
           )}

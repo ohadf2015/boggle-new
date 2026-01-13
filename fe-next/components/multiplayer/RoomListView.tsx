@@ -14,6 +14,7 @@ import { LANGUAGE_FLAGS } from '@/lib/languageConfig';
 import type { ActiveRoom } from '@/shared/types/game';
 import LandscapeIndicator from '@/components/LandscapeIndicator';
 import HowToPlay from '@/components/HowToPlay';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 
 interface RoomListViewProps {
   activeRooms: ActiveRoom[];
@@ -111,9 +112,11 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               className="p-2 lg:p-3 rounded-neo border-2 border-slate-600 bg-slate-700/50 hover:bg-neo-cyan/20 hover:border-neo-cyan transition-all disabled:opacity-50"
               aria-label={t('common.refresh') || 'Refresh'}
             >
-              <RefreshCw
-                className={`w-4 h-4 lg:w-5 lg:h-5 text-neo-cream ${roomsLoading ? 'animate-spin' : ''}`}
-              />
+              {roomsLoading ? (
+                <NeoLoader variant="dots" size="sm" />
+              ) : (
+                <RefreshCw className="w-4 h-4 lg:w-5 lg:h-5 text-neo-cream" />
+              )}
             </button>
           </motion.div>
 
@@ -121,7 +124,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           <div className="flex-1 overflow-y-auto min-h-0">
             {roomsLoading && activeRooms.length === 0 ? (
               <div className="h-32 flex items-center justify-center">
-                <div className="animate-spin w-8 h-8 lg:w-10 lg:h-10 border-3 lg:border-4 border-neo-cyan border-t-transparent rounded-full" />
+                <NeoLoader variant="letters" size="md" />
               </div>
             ) : hasRooms ? (
               <motion.div

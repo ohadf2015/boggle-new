@@ -13,6 +13,7 @@ import { shouldShowTrainingGateway, markGatewaySkipped, markGatewaySeen } from '
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import {
   generateDailyPuzzle,
   getDailyChallengeDate,
@@ -730,13 +731,7 @@ const DailyChallenge: React.FC = () => {
             exit={{ opacity: 0 }}
             className="flex-1 flex items-center justify-center"
           >
-            <div className="text-center">
-              <div className="relative w-12 h-12 mx-auto mb-3">
-                <div className="absolute inset-0 border-4 border-neo-lime/30 rounded-full" />
-                <div className="absolute inset-0 border-4 border-transparent border-t-neo-lime rounded-full animate-spin" />
-              </div>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">{t('daily.loading')}</p>
-            </div>
+            <NeoLoader variant="mascot-letters" size="lg" text={t('daily.loading')} />
           </motion.div>
         )}
 

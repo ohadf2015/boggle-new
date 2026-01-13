@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { getGuestSessionId } from '@/utils/guestManager';
 import { cn } from '@/lib/utils';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import type { SinglePlayerGameState, SinglePlayerResultsData, BotOpponent } from '@/components/singleplayer/SinglePlayerView';
 import type { LetterGrid, Language, DifficultyLevel } from '@/shared/types/game';
 
@@ -138,14 +139,8 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
   // Render loading state
   if (phase === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
-        <div className="text-center">
-          <div className="relative w-12 h-12 mx-auto mb-3">
-            <div className="absolute inset-0 border-4 border-cyan-500/30 rounded-full" />
-            <div className="absolute inset-0 border-4 border-transparent border-t-cyan-500 rounded-full animate-spin" />
-          </div>
-          <p className="text-gray-600 dark:text-gray-300 text-sm">Loading challenge...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-neo-navy">
+        <NeoLoader variant="mascot-letters" size="lg" text="Loading challenge..." />
       </div>
     );
   }

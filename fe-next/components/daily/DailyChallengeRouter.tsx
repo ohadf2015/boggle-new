@@ -7,22 +7,19 @@ import DailyChallenge from './DailyChallenge';
 import BuzzChallenge from '../buzz/BuzzChallenge';
 import Header from '../Header';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
 import type { Language } from '@/types';
 
 type ChallengeMode = 'landing' | 'wordHunt' | 'buzz';
 
 /**
  * DailyChallengeRouter - Routes between dual daily challenges
- * Admin users: Landing → Word Hunt Survival OR Daily Buzz
- * Non-admin users: Go directly to Word Hunt (skip landing)
+ * All users: Landing page → Choose Word Hunt Survival OR Daily Buzz
  */
 export default function DailyChallengeRouter() {
   const { language } = useLanguage();
-  const { isAdmin } = useAuth();
 
-  // Non-admin users skip the landing page and go directly to Word Hunt
-  const [mode, setMode] = useState<ChallengeMode>(isAdmin ? 'landing' : 'wordHunt');
+  // All users start at the landing page to choose their challenge
+  const [mode, setMode] = useState<ChallengeMode>('landing');
 
   const handleSelectWordHunt = () => {
     setMode('wordHunt');
