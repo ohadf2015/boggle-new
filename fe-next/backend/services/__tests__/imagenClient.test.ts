@@ -193,7 +193,7 @@ describe('Imagen Client - Retry Logic', () => {
 
     // Verify error was thrown after retries
     expect(caughtError).not.toBeNull();
-    expect(caughtError?.message).toBe(errorMsg);
+    expect(caughtError!.message).toBe(errorMsg);
     // Initial attempt + 5 retries = 6 calls
     expect(mockGenerateContent).toHaveBeenCalledTimes(6);
   });
