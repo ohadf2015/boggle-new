@@ -51,12 +51,14 @@ export function useLiveScoreTracker({
   const previousScoreRef = useRef(0);
 
   // Calculate current score based on game state
+  // During gameplay, show potential score (what you'd get if you solved now)
+  // Pass `true` for solved to show live potential score, not 0
   const calculatedScore = calculateEfficiencyScore(
     lifePoints,
     clueTokens,
     attempts.length,
     discoveredWords.length,
-    isGameOver
+    true // Always calculate as if solved to show potential score
   );
 
   // Update score when calculated score changes

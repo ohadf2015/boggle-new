@@ -23,6 +23,23 @@ interface BuzzChallenge {
   options?: string[]; // For multiple choice challenges
 }
 
+// Hebrew letter normalization - final letters to regular form (same as dictionary.ts)
+const hebrewFinalLetters: Record<string, string> = {
+  'ך': 'כ',
+  'ם': 'מ',
+  'ן': 'נ',
+  'ף': 'פ',
+  'ץ': 'צ',
+};
+
+function normalizeHebrewLetter(letter: string): string {
+  return hebrewFinalLetters[letter] || letter;
+}
+
+function normalizeHebrewWord(word: string): string {
+  return word.split('').map(normalizeHebrewLetter).join('');
+}
+
 interface DailyBuzzData {
   puzzle_date: string;
   language: string;
@@ -589,6 +606,18 @@ function isBrandOrProperNoun(word: string): boolean {
 }
 
 /**
+ * Normalize word for dictionary lookup based on language
+ */
+function normalizeForDictionary(word: string, language: string): string {
+  if (language === 'he') {
+    // Hebrew: normalize final letters and use as-is (Hebrew has no case)
+    return normalizeHebrewWord(word);
+  }
+  // Other languages: use uppercase
+  return word.toUpperCase();
+}
+
+/**
  * Validate challenges against game dictionary
  */
 async function validateChallenges(
@@ -599,7 +628,7 @@ async function validateChallenges(
   const dictionary = await loadDictionary(language);
 
   const validatedChallenges = challenges.filter((challenge) => {
-    const answer = challenge.answer.toUpperCase();
+    const answer = normalizeForDictionary(challenge.answer, language);
 
     // Filter out brand names and proper nouns
     if (isBrandOrProperNoun(answer)) {
@@ -622,8 +651,8 @@ async function validateChallenges(
     // Validate options for multiple choice (also check for brands)
     if (challenge.options) {
       const allValid = challenge.options.every((option) => {
-        const upperOption = option.toUpperCase();
-        return dictionary.has(upperOption) && !isBrandOrProperNoun(option);
+        const normalizedOption = normalizeForDictionary(option, language);
+        return dictionary.has(normalizedOption) && !isBrandOrProperNoun(option);
       });
       if (!allValid) {
         console.warn(`[BUZZ] Invalid options for: ${challenge.prompt}`);
@@ -677,8 +706,9 @@ async function loadDictionary(language: string): Promise<Set<string>> {
             fs.readFile(hebrewFilePath, 'utf-8').catch(() => ''),
             fs.readFile(hebrewApprovedPath, 'utf-8').catch(() => ''),
           ]);
-          const mainWords = mainContent.split('\n').filter((w) => w.length > 0);
-          const approvedWords = approvedContent.split('\n').filter((w) => w.length > 0);
+          // Normalize Hebrew words (convert final letters to regular form)
+          const mainWords = mainContent.split('\n').filter((w) => w.length > 0).map(normalizeHebrewWord);
+          const approvedWords = approvedContent.split('\n').filter((w) => w.length > 0).map(normalizeHebrewWord);
           words = [...mainWords, ...approvedWords];
           console.log(`[BUZZ] Loaded ${mainWords.length} Hebrew words + ${approvedWords.length} approved`);
         } catch {
@@ -717,6 +747,11 @@ async function loadDictionary(language: string): Promise<Set<string>> {
       return new Set();
     }
 
+    // Hebrew and Japanese are already normalized during loading
+    // English, Spanish, Swedish need uppercase conversion
+    if (language === 'he' || language === 'ja') {
+      return new Set(words);
+    }
     return new Set(words.map((w) => w.toUpperCase()));
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
