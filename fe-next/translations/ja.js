@@ -2262,7 +2262,14 @@ const ja = {
       "fillBlank": "穴埋め",
       "chain": "チェーン",
       "spotOn": "ピタリ",
-      "trio": "トリオ"
+      "trio": "トリオ",
+      "wordle": "ワードル"
+    },
+    "wordle": {
+      "instruction": "5文字の単語を当てよう",
+      "attemptsLeft": "回残り",
+      "solved": "正解！",
+      "failed": "残念、チャンスなし"
     },
     "challenge": "{number}/{total}",
     "correct": "できた!",
@@ -2668,6 +2675,7 @@ const ja = {
     "title": "脳トレ",
     "score": "ブレインスコア",
     "points": "ブレインポイント",
+    "loading": "脳トレを読み込み中...",
     "nav": {
       "profile": "プロフィール"
     },

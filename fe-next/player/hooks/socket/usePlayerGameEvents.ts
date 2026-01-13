@@ -117,6 +117,14 @@ export function usePlayerGameEvents({
     onShowResultsRef.current = onShowResults;
   }, [onShowResults]);
 
+  // CRITICAL: Store gameTimer in a ref to avoid socket listener re-registration
+  // The gameTimer object is new on every render, but its methods (setTime, reset) are stable
+  // By using a ref, we prevent the useEffect from re-running on every render
+  const gameTimerRef = useRef(gameTimer);
+  useEffect(() => {
+    gameTimerRef.current = gameTimer;
+  }, [gameTimer]);
+
   // Use refs to avoid socket listener re-registration race conditions
   const gameActiveRef = useRef(false);
   const wasInActiveGameRef = useRef(false);
@@ -151,9 +159,10 @@ export function usePlayerGameEvents({
         setRemainingTime(data.timerSeconds);
         if (totalGameTimeRef) totalGameTimeRef.current = data.timerSeconds;
         // Sync timer with game start time
-        if (gameTimer) {
-          gameTimer.reset();
-          gameTimer.setTime(data.timerSeconds);
+        // Use ref to get latest timer methods (avoids socket listener re-registration)
+        if (gameTimerRef.current) {
+          gameTimerRef.current.reset();
+          gameTimerRef.current.setTime(data.timerSeconds);
         }
       }
       if (data.language) setGameLanguage(data.language);
@@ -201,8 +210,9 @@ export function usePlayerGameEvents({
 
       // CRITICAL: Sync timer with server time to prevent drift
       // The local timer counts down smoothly, but server updates keep it accurate
-      if (gameTimer && data.remainingTime !== undefined) {
-        gameTimer.setTime(data.remainingTime);
+      // Use ref to get latest timer methods (avoids socket listener re-registration)
+      if (gameTimerRef.current && data.remainingTime !== undefined) {
+        gameTimerRef.current.setTime(data.remainingTime);
       }
       setRemainingTime(data.remainingTime);
 
@@ -293,8 +303,9 @@ export function usePlayerGameEvents({
       waitingStartTimeRef.current = null;
 
       // Reset timer for next game
-      if (gameTimer) {
-        gameTimer.reset();
+      // Use ref to get latest timer methods (avoids socket listener re-registration)
+      if (gameTimerRef.current) {
+        gameTimerRef.current.reset();
       }
 
       // Reset combo state using shared utility
@@ -446,7 +457,8 @@ export function usePlayerGameEvents({
     setEarthquakeState,
     setFireRoundActive,
     setFireRoundRemaining,
-    gameTimer,
+    // NOTE: gameTimer is intentionally NOT in deps - we use gameTimerRef to access it
+    // This prevents socket listener re-registration on every render
     handleHostLeftRoomClosing,
     onGameStart,
   ]);

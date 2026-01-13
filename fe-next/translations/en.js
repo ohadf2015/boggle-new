@@ -2256,7 +2256,14 @@ const en = {
       "fillBlank": "FILL IT",
       "chain": "CHAIN",
       "spotOn": "SPOT ON",
-      "trio": "TRIO"
+      "trio": "TRIO",
+      "wordle": "WORDLE"
+    },
+    "wordle": {
+      "instruction": "Guess the 5-letter word",
+      "attemptsLeft": "attempts left",
+      "solved": "Solved!",
+      "failed": "Out of attempts"
     },
     "trio": {
       "hint": "What connects these 3?"
@@ -2671,6 +2678,7 @@ const en = {
     "title": "Brain Training",
     "score": "Brain Score",
     "points": "Brain Points",
+    "loading": "Loading Brain Training...",
     "nav": {
       "profile": "Profile"
     },

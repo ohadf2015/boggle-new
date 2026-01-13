@@ -1,10 +1,8 @@
 'use client';
 
-import React, { useMemo, useState, useRef, useEffect } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   Tooltip,
@@ -244,16 +242,7 @@ export default function BrainScoreHistoryChart({ history, className }: BrainScor
         className
       )}
     >
-      {/* Halftone texture overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.04]"
-        style={{
-          backgroundImage: `radial-gradient(circle, ${isDarkMode ? 'white' : 'black'} 1px, transparent 1px)`,
-          backgroundSize: '8px 8px',
-        }}
-      />
-
-      <div className="relative z-10 p-4">
+      <div className="p-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">

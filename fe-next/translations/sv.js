@@ -2262,7 +2262,14 @@ const sv = {
       "fillBlank": "FYLL I",
       "chain": "KEDJA",
       "spotOn": "RÄTT PÅ",
-      "trio": "TRIO"
+      "trio": "TRIO",
+      "wordle": "WORDLE"
+    },
+    "wordle": {
+      "instruction": "Gissa ordet på 5 bokstäver",
+      "attemptsLeft": "försök kvar",
+      "solved": "Löst!",
+      "failed": "Inga försök kvar"
     },
     "challenge": "{number}/{total}",
     "correct": "RÄTT!",
@@ -2668,6 +2675,7 @@ const sv = {
     "title": "Hjärnträning",
     "score": "Hjärnpoäng",
     "points": "Hjärnpoäng",
+    "loading": "Laddar hjärnträning...",
     "nav": {
       "profile": "Profil"
     },

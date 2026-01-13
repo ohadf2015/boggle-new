@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { motion } from 'framer-motion';
 import { Brain, TrendingUp, Sparkles, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -17,13 +16,41 @@ interface BrainScoreHeroProps {
 }
 
 const TIER_CONFIG = {
-  novice: { color: 'bg-slate-400', next: 'apprentice', min: 0, max: 19 },
-  apprentice: { color: 'bg-neo-green', next: 'intermediate', min: 20, max: 39 },
-  intermediate: { color: 'bg-neo-cyan', next: 'advanced', min: 40, max: 59 },
-  advanced: { color: 'bg-neo-purple', next: 'expert', min: 60, max: 79 },
-  expert: { color: 'bg-neo-orange', next: 'master', min: 80, max: 89 },
-  master: { color: 'bg-neo-lime', next: null, min: 90, max: 100 },
+  novice: { next: 'apprentice', min: 0, max: 19 },
+  apprentice: { next: 'intermediate', min: 20, max: 39 },
+  intermediate: { next: 'advanced', min: 40, max: 59 },
+  advanced: { next: 'expert', min: 60, max: 79 },
+  expert: { next: 'master', min: 80, max: 89 },
+  master: { next: null, min: 90, max: 100 },
 };
+
+/**
+ * Get progress bar gradient based on score
+ * Creates a vibrant gradient that evolves with brain score
+ * Low: Pink->Red, Medium: Orange->Yellow, High: Lime->Cyan
+ */
+function getProgressBarGradient(score: number): string {
+  if (score < 20) return 'bg-gradient-to-r from-neo-pink to-neo-red';
+  if (score < 40) return 'bg-gradient-to-r from-neo-red to-neo-orange';
+  if (score < 60) return 'bg-gradient-to-r from-neo-orange to-neo-yellow';
+  if (score < 80) return 'bg-gradient-to-r from-neo-yellow to-neo-lime';
+  return 'bg-gradient-to-r from-neo-lime to-neo-cyan';
+}
+
+/**
+ * Get tier badge color
+ */
+function getTierBadgeColor(tier: string): string {
+  switch (tier) {
+    case 'novice': return 'bg-slate-400';
+    case 'apprentice': return 'bg-neo-green';
+    case 'intermediate': return 'bg-neo-cyan';
+    case 'advanced': return 'bg-neo-purple';
+    case 'expert': return 'bg-neo-orange';
+    case 'master': return 'bg-neo-lime';
+    default: return 'bg-slate-400';
+  }
+}
 
 /**
  * Brain Score Hero Component
@@ -42,6 +69,8 @@ export default function BrainScoreHero({
   const isDarkMode = theme === 'dark';
   const tierConfig = TIER_CONFIG[tier];
   const nextTier = tierConfig.next;
+  const progressBarGradient = getProgressBarGradient(score);
+  const tierBadgeColor = getTierBadgeColor(tier);
 
   // Total activities combines both games and drills for brain score
   const totalActivities = gamesAnalyzed + drillsCompleted;
@@ -58,7 +87,7 @@ export default function BrainScoreHero({
           <motion.div
             className={cn(
               'w-12 h-12 sm:w-16 sm:h-16 rounded-neo border-3 border-neo-black flex items-center justify-center shrink-0',
-              tierConfig.color
+              tierBadgeColor
             )}
             animate={{
               scale: [1, 1.05, 1],
@@ -171,13 +200,13 @@ export default function BrainScoreHero({
           )}
         </div>
 
-        {/* Progress Bar */}
+        {/* Progress Bar - more visible with dynamic colors */}
         <div className={cn(
           'h-4 rounded-full border-2 border-neo-black overflow-hidden',
-          isDarkMode ? 'bg-slate-900' : 'bg-gray-200'
+          isDarkMode ? 'bg-slate-700' : 'bg-gray-300'
         )}>
           <motion.div
-            className={cn('h-full', tierConfig.color)}
+            className={cn('h-full', progressBarGradient)}
             initial={{ width: 0 }}
             animate={{ width: `${tierProgress}%` }}
             transition={{ duration: 0.8, ease: "easeOut" }}

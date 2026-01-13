@@ -9,12 +9,29 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }: React.PropsWithChildren<object>) => <div {...props}>{children}</div>,
-    tr: ({ children, ...props }: React.PropsWithChildren<object>) => <tr {...props}>{children}</tr>,
-  },
-  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+jest.mock('framer-motion', () => {
+  const stripFramerProps = (props: Record<string, unknown>) => {
+    const { whileHover, whileTap, animate, initial, exit, transition, variants, ...rest } = props;
+    return rest;
+  };
+  return {
+    motion: {
+      div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...stripFramerProps(props)}>{children}</div>,
+      tr: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <tr {...stripFramerProps(props)}>{children}</tr>,
+      p: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <p {...stripFramerProps(props)}>{children}</p>,
+    },
+    AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+  };
+});
+
+// Mock useDevicePerformance hook to allow NeoLoader to render properly
+jest.mock('@/hooks/useDevicePerformance', () => ({
+  useDevicePerformance: () => ({
+    prefersReducedMotion: true,
+    enableComplexAnimations: false,
+    enableParticles: false,
+    devicePerformance: 'low',
+  }),
 }));
 
 // Mock LanguageContext

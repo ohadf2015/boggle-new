@@ -12,6 +12,7 @@ import FillBlankChallenge from './challenges/FillBlankChallenge';
 import ChainChallenge from './challenges/ChainChallenge';
 import SpotOnChallenge from './challenges/SpotOnChallenge';
 import TrioChallenge from './challenges/TrioChallenge';
+import WordleChallenge from './challenges/WordleChallenge';
 import AnswerFeedbackModal from './AnswerFeedbackModal';
 
 interface BuzzGameScreenProps {
@@ -20,7 +21,7 @@ interface BuzzGameScreenProps {
     puzzleDate: string;
     language: string;
     challenges: Array<{
-      type: 'scrambled' | 'fillBlank' | 'chain' | 'spotOn' | 'trio';
+      type: 'scrambled' | 'fillBlank' | 'chain' | 'spotOn' | 'trio' | 'wordle';
       trendTopic: string;
       prompt: string;
       answer: string;
@@ -192,6 +193,8 @@ export default function BuzzGameScreen({
         return <SpotOnChallenge {...props} />;
       case 'trio':
         return <TrioChallenge {...props} />;
+      case 'wordle':
+        return <WordleChallenge {...props} />;
       default:
         return <div>Unknown challenge type</div>;
     }

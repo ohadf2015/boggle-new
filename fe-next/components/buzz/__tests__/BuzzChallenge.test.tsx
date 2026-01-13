@@ -11,13 +11,20 @@ import { AuthProvider } from '@/contexts/AuthContext';
 // Mock fetch
 global.fetch = jest.fn();
 
-// Mock framer-motion
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-  },
-  AnimatePresence: ({ children }: any) => <>{children}</>,
-}));
+// Mock framer-motion with all elements used by NeoLoader
+jest.mock('framer-motion', () => {
+  const stripFramerProps = (props: Record<string, unknown>) => {
+    const { whileHover, whileTap, animate, initial, exit, transition, variants, ...rest } = props;
+    return rest;
+  };
+  return {
+    motion: {
+      div: ({ children, ...props }: { children?: React.ReactNode } & Record<string, unknown>) => <div {...stripFramerProps(props)}>{children}</div>,
+      p: ({ children, ...props }: { children?: React.ReactNode } & Record<string, unknown>) => <p {...stripFramerProps(props)}>{children}</p>,
+    },
+    AnimatePresence: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
+  };
+});
 
 // Mock translations
 jest.mock('@/contexts/LanguageContext', () => ({

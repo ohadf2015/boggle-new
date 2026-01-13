@@ -2244,7 +2244,14 @@ const he = {
       "fillBlank": "השלם",
       "chain": "שרשרת",
       "spotOn": "נכון",
-      "trio": "שלישייה"
+      "trio": "שלישייה",
+      "wordle": "וורדל"
+    },
+    "wordle": {
+      "instruction": "נחשו את המילה בת 5 אותיות",
+      "attemptsLeft": "ניסיונות נותרו",
+      "solved": "פתרתם!",
+      "failed": "נגמרו הניסיונות"
     },
     "challenge": "{number}/{total}",
     "correct": "יש!",
@@ -2669,6 +2676,7 @@ const he = {
     "title": "אימון קוגניטיבי",
     "score": "ציון קוגניטיבי",
     "points": "נקודות קוגניטיביות",
+    "loading": "טוען אימון קוגניטיבי...",
     "nav": {
       "profile": "פרופיל"
     },

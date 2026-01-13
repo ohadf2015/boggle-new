@@ -169,4 +169,126 @@ describe('useGameTimer - Multiplayer Synchronization', () => {
     expect(result.current.remainingTime).toBe(55);
     expect(result.current.isRunning).toBe(false);
   });
+
+  it('should resume correctly after pause → setTime → unpause sequence', async () => {
+    /**
+     * BUG REPRODUCTION SCENARIO (GitHub issue: timer stuck for players)
+     *
+     * 1. Timer is running (gameActive = true)
+     * 2. Brief pause (gameActive flickers to false due to state update race)
+     * 3. Server sends timeUpdate, setTime() is called while paused
+     * 4. Game unpauses (gameActive = true again)
+     * 5. BUG: Timer remains stuck because setTime() didn't restart animation loop
+     *
+     * Root cause: setTime() only resets startTimestampRef if it's not null,
+     * but pausing sets it to null. The effect should restart the loop on unpause,
+     * but accumulated time calculation may be incorrect.
+     */
+    const { result, rerender } = renderHook(
+      ({ isPaused }) =>
+        useGameTimer({
+          initialTime: 120,
+          isPaused,
+          autoStart: true,
+        }),
+      { initialProps: { isPaused: false } }
+    );
+
+    // Step 1: Timer is running
+    expect(result.current.isRunning).toBe(true);
+    expect(result.current.remainingTime).toBe(120);
+
+    // Let it count down to 115
+    act(() => {
+      jest.advanceTimersByTime(5100);
+    });
+    expect(result.current.remainingTime).toBe(115);
+
+    // Step 2: Brief pause (simulates gameActive flicker)
+    rerender({ isPaused: true });
+    expect(result.current.isRunning).toBe(false);
+
+    // Step 3: Server sends timeUpdate while paused
+    act(() => {
+      result.current.setTime(110); // Server says 110 seconds
+    });
+    expect(result.current.remainingTime).toBe(110);
+
+    // Step 4: Game unpauses
+    rerender({ isPaused: false });
+    expect(result.current.isRunning).toBe(true);
+
+    // Step 5: Timer should continue counting down from 110
+    act(() => {
+      jest.advanceTimersByTime(3100);
+    });
+
+    // EXPECTED: 110 - 3 = 107
+    // BUG (before fix): Timer remains stuck at 110
+    expect(result.current.remainingTime).toBe(107);
+    expect(result.current.isRunning).toBe(true);
+  });
+
+  it('should handle rapid pause/unpause cycles with server syncs', async () => {
+    /**
+     * Tests network jitter scenario where game state flickers rapidly
+     * while server continues sending timeUpdate events
+     */
+    const { result, rerender } = renderHook(
+      ({ isPaused }) =>
+        useGameTimer({
+          initialTime: 180,
+          isPaused,
+          autoStart: true,
+        }),
+      { initialProps: { isPaused: false } }
+    );
+
+    expect(result.current.remainingTime).toBe(180);
+
+    // Run for 10 seconds
+    act(() => {
+      jest.advanceTimersByTime(10100);
+    });
+    expect(result.current.remainingTime).toBe(170);
+
+    // First flicker: pause → sync → unpause
+    rerender({ isPaused: true });
+    act(() => {
+      result.current.setTime(168);
+    });
+    rerender({ isPaused: false });
+
+    act(() => {
+      jest.advanceTimersByTime(2100);
+    });
+    expect(result.current.remainingTime).toBe(166);
+
+    // Second flicker: pause → sync → unpause
+    rerender({ isPaused: true });
+    act(() => {
+      result.current.setTime(160);
+    });
+    rerender({ isPaused: false });
+
+    act(() => {
+      jest.advanceTimersByTime(5100);
+    });
+    expect(result.current.remainingTime).toBe(155);
+
+    // Third flicker: rapid double-pause
+    rerender({ isPaused: true });
+    rerender({ isPaused: false });
+    rerender({ isPaused: true });
+    act(() => {
+      result.current.setTime(150);
+    });
+    rerender({ isPaused: false });
+
+    act(() => {
+      jest.advanceTimersByTime(3100);
+    });
+    expect(result.current.remainingTime).toBe(147);
+    expect(result.current.isRunning).toBe(true);
+  });
 });

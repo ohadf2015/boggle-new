@@ -88,6 +88,7 @@ function mapChallengeType(backendType: string): string {
     definition_match: 'spotOn',
     trending_trio: 'trio',
     riddle: 'scrambled', // Riddles use the scrambled UI with a clue
+    wordle_guess: 'wordle', // Wordle-style 5-letter word guessing
   };
   return typeMap[backendType] || backendType;
 }

@@ -17,6 +17,12 @@ jest.setTimeout(45000);
 describe('Game Lifecycle Handler', () => {
   let env;
 
+  // Preload dictionary BEFORE enabling fake timers to avoid I/O conflicts
+  beforeAll(async () => {
+    const { ensureLanguageLoaded } = require('../../dictionary');
+    await ensureLanguageLoaded('en');
+  });
+
   beforeEach(() => {
     env = createTestEnvironment();
     jest.useFakeTimers({ advanceTimers: true });
@@ -510,6 +516,12 @@ describe('Room Management Handler', () => {
 
 describe('Handler Integration', () => {
   let env;
+
+  // Preload dictionary BEFORE enabling fake timers to avoid I/O conflicts
+  beforeAll(async () => {
+    const { ensureLanguageLoaded } = require('../../dictionary');
+    await ensureLanguageLoaded('en');
+  });
 
   beforeEach(() => {
     env = createTestEnvironment();

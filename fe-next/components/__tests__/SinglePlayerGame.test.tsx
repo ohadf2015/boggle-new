@@ -4,6 +4,14 @@
  * Tests for word submission, scoring, and game flow
  */
 
+// Mock crypto.randomUUID for Node.js 18 environment
+Object.defineProperty(globalThis, 'crypto', {
+  value: {
+    ...globalThis.crypto,
+    randomUUID: () => 'test-uuid-1234-5678-9012',
+  },
+});
+
 jest.mock('@/utils/consts', () => ({
   DIFFICULTIES: {
     easy: { rows: 4, cols: 4 },
@@ -79,6 +87,9 @@ jest.mock('framer-motion', () => ({
     ),
     span: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <span {...props}>{children}</span>
+    ),
+    p: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
+      <p {...props}>{children}</p>
     ),
     circle: (props: Record<string, unknown>) => <circle {...props} />,
     button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (

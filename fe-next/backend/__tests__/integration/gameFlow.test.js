@@ -21,6 +21,12 @@ jest.setTimeout(45000);
 describe('Game Flow Integration', () => {
   let env;
 
+  // Preload dictionary BEFORE enabling fake timers to avoid I/O conflicts
+  beforeAll(async () => {
+    const { ensureLanguageLoaded } = require('../../dictionary');
+    await ensureLanguageLoaded('en');
+  });
+
   beforeEach(() => {
     env = createTestEnvironment();
     // Clear rate limiter state between tests

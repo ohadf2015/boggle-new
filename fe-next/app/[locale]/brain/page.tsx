@@ -21,6 +21,7 @@ import WelcomeBackCard from '@/components/brain/WelcomeBackCard';
 import BrainScoreShareCard from '@/components/brain/BrainScoreShareCard';
 import AuthModal from '@/components/auth/AuthModal';
 import AutoHideHeader from '@/components/AutoHideHeader';
+import PageLoader from '@/components/ui/PageLoader';
 
 /**
  * Header component for Brain Training page
@@ -131,45 +132,15 @@ export default function BrainTrainingPage() {
     });
   }, [brainScore?.lastActivityAt, brainScoreHistory]);
 
-  // Loading state - show skeleton while auth is validating OR while brain score is loading
+  // Loading state - show PageLoader while auth is validating OR while brain score is loading
   if (authLoading || isLoading) {
     return (
-      <div className={cn(
-        'h-full flex flex-col page-content-safe',
-        isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
-      )}>
-        <AutoHideHeader />
-        <Header
-          isDarkMode={isDarkMode}
-          onBack={handleBack}
-          title={t('brain.title')}
-          backText={t('common.back')}
-        />
-        <main className="px-4 py-6 space-y-6 max-w-4xl mx-auto">
-          {/* Loading skeleton */}
-          <div className="space-y-6 animate-pulse">
-            <div className={cn(
-              'h-48 rounded-neo border-3 border-neo-black',
-              isDarkMode ? 'bg-slate-800' : 'bg-gray-200'
-            )} />
-            <div className={cn(
-              'h-64 rounded-neo border-3 border-neo-black',
-              isDarkMode ? 'bg-slate-800' : 'bg-gray-200'
-            )} />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div
-                  key={i}
-                  className={cn(
-                    'h-32 rounded-neo border-3 border-neo-black',
-                    isDarkMode ? 'bg-slate-800' : 'bg-gray-200'
-                  )}
-                />
-              ))}
-            </div>
-          </div>
-        </main>
-      </div>
+      <PageLoader
+        variant="mascot-letters"
+        size="lg"
+        text={t('brain.loading')}
+        mascotVariant="thinking"
+      />
     );
   }
 

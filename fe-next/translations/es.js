@@ -2232,7 +2232,14 @@ const es = {
       "fillBlank": "COMPLETA",
       "chain": "CADENA",
       "spotOn": "ADIVINA",
-      "trio": "TRÍO"
+      "trio": "TRÍO",
+      "wordle": "WORDLE"
+    },
+    "wordle": {
+      "instruction": "Adivina la palabra de 5 letras",
+      "attemptsLeft": "intentos restantes",
+      "solved": "¡Resuelto!",
+      "failed": "Sin intentos"
     },
     "challenge": "{number}/{total}",
     "correct": "¡ESO!",
@@ -2665,6 +2672,7 @@ const es = {
     "title": "Entrenamiento Mental",
     "score": "Puntuación Cerebral",
     "points": "Puntos Cerebrales",
+    "loading": "Cargando entrenamiento mental...",
     "nav": {
       "profile": "Perfil"
     },
