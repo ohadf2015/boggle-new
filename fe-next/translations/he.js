@@ -116,6 +116,7 @@ const he = {
     "xpGained": "XP",
     "score": "ניקוד",
     "points": "נק׳",
+    "pts": "נק׳",
     "combo": "קומבו",
     "quit": "יציאה",
     "foundWords": "נמצאו",
@@ -1118,6 +1119,10 @@ const he = {
   },
   "achievementDock": {
     "title": "ההישגים שלך"
+  },
+  "achievement": {
+    "dailyDouble": "דאבל יומי 🏆",
+    "dailyDouble.desc": "השלמתם את שני האתגרים היומיים!"
   },
   "chat": {
     "title": "צ'אט החדר",
@@ -3288,7 +3293,18 @@ const he = {
       "startTraining": "התחילו אימון",
       "skipToDaily": "דלגו, אני אסתדר",
       "redirecting": "בדרך לאתגר היומי..."
-    }
+    },
+    "chooseQuest": "בחרו את המשימה היומית שלכם",
+    "chooseChallengeHint": "בחרו את האתגר להיום. השלימו את שניהם לבונוס XP! 🎯",
+    "new": "חדש",
+    "play": "שחקו עכשיו",
+    "viewResults": "צפו בתוצאות",
+    "wordHunt": "ציד מילים",
+    "wordHunt.subtitle": "מצב הישרדות",
+    "wordHunt.desc": "חפשו מילים בלחץ זמן. כמה תספיקו עד שהזמן נגמר?",
+    "wordHunt.feature1": "90 שניות",
+    "wordHunt.feature2": "מערכת קומבו",
+    "wordHunt.feature3": "דירוג עולמי"
   },
   "buzz": {
     "title": "באזז יומי",
@@ -3351,13 +3367,38 @@ const he = {
       "textPerfect": "באזז יומי: ציון מושלם 💯 | תצליח? 🔥",
       "textStreakMilestone": "רצף של {count} ימים בבאזז! 🔥 מצטרפים?"
     },
-    "error": {
-      "loading": "טוען את הבאזז של היום...",
-      "failed": "לא הצלחנו לטעון. לנסות שוב?",
-      "noInternet": "אין חיבור. בדקו את האינטרנט."
-    },
+    "error": "אופס!",
+    "error.loading": "טוען את הבאזז של היום...",
+    "error.failed": "לא הצלחנו לטעון. לנסות שוב?",
+    "error.noInternet": "אין חיבור. בדקו את האינטרנט.",
     "alreadyPlayed": "כבר שיחקת היום! חזרו מחר.",
-    "comingSoon": "הבאזז של מחר יצא בחצות"
+    "comingSoon": "הבאזז של מחר יצא בחצות",
+    "badge": "חדש 🔥",
+    "betaPreview": "גרסת ביתא ✨",
+    "challenges": "אתגרים",
+    "connectingWord": "המילה המקשרת",
+    "feature1": "נושאים טרנדיים אמיתיים",
+    "feature2": "5-7 אתגרי מיני",
+    "feature3": "תוכן מקומי",
+    "fillTheBlank": "מלא את החסר",
+    "finish": "סיים",
+    "helpText": "פתרו אתגרי מילים מהטרנדים של היום. בלי לחץ זמן!",
+    "loading": "טוען באזז יומי...",
+    "maxScore": "ניקוד מקסימלי",
+    "noTimeLimit": "ללא טיימר",
+    "preview.title": "הנושאים של היום",
+    "preview.subtitle": "האתגרים מציגים...",
+    "preview.play": "התחל באזז",
+    "quitConfirm": "ההתקדמות שלך תישמר, אבל אתגרים לא גמורים לא ייספרו בניקוד.",
+    "quitConfirmTitle": "לצאת מהבאזז?",
+    "results.perfect": "ציון מושלם! 🔥",
+    "searches": "חיפושים",
+    "topicIs": "הנושא: {topic}",
+    "total": "סה\"כ",
+    "trio.hint": "מצאו את המילה שמחברת את שלושת הנושאים",
+    "viewResults": "צפה בתוצאות",
+    "yourAnswer": "התשובה שלך",
+    "yourScore": "הניקוד שלך"
   },
   "wordHunt": {
     "title": "ציד מילים",
@@ -3652,6 +3693,10 @@ const he = {
       "cta4": "אין סיכוי שתעברו",
       "cta5": "בהצלחה 😏"
     }
+  },
+  "achievement": {
+    "dailyDouble": "דאבל יומי 🏆",
+    "dailyDouble.desc": "השלמתם את שני האתגרים היומיים!"
   },
   "keepPlaying": {
     "succeeded": {

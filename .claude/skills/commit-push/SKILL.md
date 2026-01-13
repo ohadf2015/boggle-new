@@ -1,6 +1,6 @@
 ---
 name: commit-push
-description: Fully autonomous commit and push workflow. Verifies translations, linting, types, tests, and build - fixes any issues automatically - then commits and pushes. NO user confirmation required at any step.
+description: Fully autonomous commit and push workflow. Verifies linting, types, tests, and build - fixes any issues automatically - then commits and pushes. NO user confirmation required at any step.
 ---
 
 # Commit Push (Fully Autonomous)
@@ -36,27 +36,17 @@ This skill provides a **fully autonomous** pre-commit workflow that requires **Z
 
 ### Phase 1: Parallel Verification
 
-**Run ALL FOUR verification steps in parallel using Task agents in a SINGLE message.**
+**Run ALL THREE verification steps in parallel using Task agents in a SINGLE message.**
 
-Launch four agents simultaneously with ONE message containing FOUR Task tool calls:
+Launch three agents simultaneously with ONE message containing THREE Task tool calls:
 
 ```
-Task 1: Translation Agent (subagent_type: general-purpose)
-Task 2: Linting Agent (subagent_type: Bash)
-Task 3: Type Checking Agent (subagent_type: Bash)
-Task 4: Test Agent (subagent_type: Bash)
+Task 1: Linting Agent (subagent_type: Bash)
+Task 2: Type Checking Agent (subagent_type: Bash)
+Task 3: Test Agent (subagent_type: Bash)
 ```
 
-#### Agent 1: Translation Verification
-**Prompt:**
-```
-Run the complete-translation skill by invoking: Skill(complete-translation)
-Then verify all translations are complete. If any issues, fix them immediately.
-Report: translations status and any fixes applied.
-Do NOT ask for user permission - fix everything automatically.
-```
-
-#### Agent 2: ESLint Verification
+#### Agent 1: ESLint Verification
 **Prompt:**
 ```
 cd /Users/ohadfisher/git/boggle-new/fe-next
@@ -68,7 +58,7 @@ Report: linting status and any fixes applied.
 Do NOT ask for user permission - fix everything automatically.
 ```
 
-#### Agent 3: Type Checking Verification
+#### Agent 2: Type Checking Verification
 **Prompt:**
 ```
 cd /Users/ohadfisher/git/boggle-new/fe-next
@@ -79,7 +69,7 @@ Report: type checking status and any fixes applied.
 Do NOT ask for user permission - fix everything automatically.
 ```
 
-#### Agent 4: Test Verification
+#### Agent 3: Test Verification
 **Prompt:**
 ```
 cd /Users/ohadfisher/git/boggle-new/fe-next
@@ -90,7 +80,7 @@ Report: test status and any fixes applied.
 Do NOT ask for user permission - fix everything automatically.
 ```
 
-**Wait for all four agents to complete.**
+**Wait for all three agents to complete.**
 
 ### Phase 2: Build Verification
 
@@ -159,24 +149,19 @@ git pull --rebase && git push
 When executing Phase 1, use this exact pattern:
 
 ```
-[Send ONE message with FOUR Task tool calls]
+[Send ONE message with THREE Task tool calls]
 
 Task 1:
-  subagent_type: general-purpose
-  description: "Verify translations"
-  prompt: [Translation agent prompt]
-
-Task 2:
   subagent_type: Bash
   description: "Run linting"
   prompt: [Linting agent prompt]
 
-Task 3:
+Task 2:
   subagent_type: Bash
   description: "Check types"
   prompt: [Type checking agent prompt]
 
-Task 4:
+Task 3:
   subagent_type: Bash
   description: "Run tests"
   prompt: [Test agent prompt]
@@ -184,7 +169,6 @@ Task 4:
 
 ## Error Handling (Autonomous)
 
-- **Translation issues**: Fix immediately, add missing keys
 - **Lint errors**: Run --fix, then manual fixes
 - **Type errors**: Fix types properly (no `any`)
 - **Test failures**: Fix the code, not the tests
@@ -195,7 +179,6 @@ Task 4:
 
 ## Success Criteria
 
-- ✅ All translations complete
 - ✅ ESLint passes (zero errors)
 - ✅ TypeScript passes (zero errors)
 - ✅ All tests pass
@@ -211,7 +194,6 @@ After ALL steps complete, provide this summary:
 ✅ Commit and Push Complete
 
 Verification Results:
-- Translations: [Status] [Fixed X issues if any]
 - Linting: [Status] [Fixed X issues if any]
 - Type checking: [Status] [Fixed X errors if any]
 - Tests: [Status] [Fixed X failures if any]

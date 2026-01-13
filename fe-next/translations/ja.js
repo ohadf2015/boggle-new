@@ -185,7 +185,8 @@ const ja = {
     "later": "後で",
     "skip": "スキップ",
     "done": "完了",
-    "clear": "クリア"
+    "clear": "クリア",
+    "pts": "pt"
   },
   "connection": {
     "reconnecting": "戻しています...",
@@ -835,7 +836,8 @@ const ja = {
     "regenerateBoard": "ボード再生成",
     "boardRegenerated": "ボードが再生成されました！",
     "noPlayers": "ロビーにプレイヤーがいません",
-    "connectionLost": "接続が切断されました。更新してください。"
+    "connectionLost": "接続が切断されました。更新してください。",
+    "mode": "ゲームモード"
   },
   "tvBroadcast": {
     "joinAt": "参加URL",
@@ -1109,6 +1111,10 @@ const ja = {
   "achievementDock": {
     "title": "あなたの実績"
   },
+  "achievement": {
+    "dailyDouble": "🏆 デイリーダブル",
+    "dailyDouble.desc": "両方のデイリーチャレンジをクリア！"
+  },
   "chat": {
     "title": "ルームチャット",
     "placeholder": "メッセージを入力...",
@@ -1336,7 +1342,9 @@ const ja = {
       "comboBonus": "コンボボーナス",
       "fireBonus": "ファイヤーボーナス",
       "uniqueWords": "ユニーク単語",
-      "avgWordLength": "平均単語長"
+      "avgWordLength": "平均単語長",
+      "games": "ゲーム",
+      "level": "レベル"
     }
   },
   "playerTitles": {
@@ -1823,6 +1831,10 @@ const ja = {
       "fiveWords": "5つの単語を見つけた！"
     },
     "viewProgress": "進捗を見る"
+  },
+  "achievement": {
+    "dailyDouble": "🏆 デイリーダブル",
+    "dailyDouble.desc": "両方のデイリーチャレンジをクリア！"
   },
   "achievements": {
     "FIRST_BLOOD": {
@@ -2366,7 +2378,9 @@ const ja = {
     "addCountry": "国を追加",
     "changeCountry": "国を変更",
     "countrySaved": "国が更新されました！",
-    "countryError": "国の更新に失敗しました"
+    "countryError": "国の更新に失敗しました",
+    "games": "ゲーム",
+    "level": "レベル"
   },
   "calendar": {
     "title": "デイリー報酬",
@@ -3099,6 +3113,17 @@ const ja = {
   },
   "daily": {
     "title": "デイリーチャレンジ",
+    "chooseQuest": "今日のクエストを選ぼう",
+    "chooseChallengeHint": "挑戦を選んで！両方クリアでボーナスXP獲得！",
+    "new": "NEW",
+    "play": "プレイ",
+    "viewResults": "結果を見る",
+    "wordHunt": "ワードハント",
+    "wordHunt.subtitle": "サバイバルモード",
+    "wordHunt.desc": "時間との勝負！制限時間内にできるだけ多くの単語を見つけよう！",
+    "wordHunt.feature1": "90秒",
+    "wordHunt.feature2": "コンボシステム",
+    "wordHunt.feature3": "グローバルランキング",
     "badge": "デイリーチャレンジ",
     "puzzleNumber": "デイリー #{number}",
     "timeLimit": "制限時間",
@@ -3280,6 +3305,36 @@ const ja = {
     "tagline": "今日のトレンドで言葉パズル",
     "subtitle": "今日のバズは？",
     "icon": "📰🔥",
+    "badge": "🔥 NEW",
+    "betaPreview": "✨ BETA",
+    "feature1": "リアルなトレンド話題",
+    "feature2": "5〜7つのミニチャレンジ",
+    "feature3": "ローカライズコンテンツ",
+    "challenges": "チャレンジ",
+    "noTimeLimit": "タイマーなし",
+    "maxScore": "最高スコア",
+    "searches": "検索",
+    "preview": {
+      "title": "今日のトピック",
+      "subtitle": "チャレンジ内容...",
+      "play": "バズスタート"
+    },
+    "viewResults": "結果を見る",
+    "helpText": "今日のトレンドで言葉パズル。時間制限なし！",
+    "loading": "チャレンジ読み込み中...",
+    "error": "チャレンジの読み込みに失敗",
+    "topicIs": "今日のトピック",
+    "yourAnswer": "あなたの答え",
+    "yourScore": "あなたのスコア",
+    "total": "合計",
+    "finish": "完了",
+    "quitConfirmTitle": "デイリーバズを終了？",
+    "quitConfirm": "本当に終了しますか？",
+    "fillTheBlank": "空欄を埋める",
+    "connectingWord": "つなぐ単語",
+    "trio": {
+      "hint": "この3つの単語をつなぐものを見つけよう"
+    },
     "type": {
       "scrambled": "バラバラ",
       "scrambledDesc": "トレンド単語を並び替え",
@@ -3317,6 +3372,7 @@ const ja = {
       "title": "クリア！",
       "score": "{score}/100",
       "scorePerfect": "100/100 パーフェクト",
+      "perfect": "パーフェクトスコア！",
       "trending": "今日のトレンド:",
       "share": "スコアをシェア",
       "playAgain": "明日",
@@ -3336,11 +3392,10 @@ const ja = {
       "textPerfect": "デイリーバズ: パーフェクトスコア 💯 | できる？🔥",
       "textStreakMilestone": "{count}日連続バズ記録! 🔥 参加する?"
     },
-    "error": {
-      "loading": "今日のバズを読み込み中...",
-      "failed": "読み込めませんでした。もう一度？",
-      "noInternet": "接続なし。インターネットを確認してください。"
-    },
+    "error": "エラー！",
+    "error.loading": "今日のバズを読み込み中...",
+    "error.failed": "読み込めませんでした。もう一度試しますか？",
+    "error.noInternet": "接続がありません。インターネット接続を確認してください。",
     "alreadyPlayed": "今日はもうプレイしました！明日また来てください。",
     "comingSoon": "明日のバズは深夜にリリース"
   },

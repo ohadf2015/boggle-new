@@ -3360,16 +3360,18 @@ const es = {
       "textPerfect": "Daily Buzz: PUNTAJE PERFECTO 💯 | ¿Puedes? 🔥",
       "textStreakMilestone": "¡Racha de {count} días en Buzz! 🔥 ¿Te unes?"
     },
-    "error": "¡Ups!",
-    "error.loading": "Cargando el buzz de hoy...",
-    "error.failed": "No se pudo cargar. ¿Intentar de nuevo?",
-    "error.noInternet": "Sin conexión. Revisa tu internet.",
+    "error": {
+      "loading": "Cargando el buzz de hoy...",
+      "failed": "No se pudo cargar. ¿Reintentar?",
+      "noInternet": "Sin conexión. Revisa tu internet."
+    },
     "alreadyPlayed": "¡Ya jugaste hoy! Vuelve mañana.",
     "comingSoon": "El buzz de mañana sale a medianoche",
     "badge": "🔥 NUEVO",
     "betaPreview": "✨ BETA",
     "challenges": "Retos",
     "connectingWord": "PALABRA CONECTORA",
+    "error": "¡Ups!",
     "feature1": "Topics reales en tendencia",
     "feature2": "5-7 mini retos",
     "feature3": "Contenido localizado",

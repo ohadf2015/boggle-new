@@ -101,68 +101,85 @@ export function ProfileHeader({
         isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
       )}
     >
-      <div className={cn('flex items-center', compact ? 'gap-3' : 'gap-6')}>
-        {/* Avatar with upload/edit controls */}
-        <div className="relative">
-          <Avatar
-            profilePictureUrl={profile?.profile_picture_url ?? undefined}
-            avatarImage={profile?.avatar_image ?? undefined}
-            size={compact ? 'md' : 'xl'}
-            className="shadow-lg"
-          />
-
-          {/* Upload Button (camera icon) */}
-          <label
-            className={cn(
-              'absolute bottom-0 right-0 rounded-full flex items-center justify-center shadow-md cursor-pointer transition-colors min-w-[44px] min-h-[44px]',
-              compact ? 'w-8 h-8' : 'w-10 h-10',
-              isDarkMode ? 'bg-slate-700 text-gray-300 hover:bg-slate-600' : 'bg-white text-gray-600 hover:bg-gray-100'
-            )}
-            title={t('profile.uploadPhoto') || 'Upload Photo'}
-          >
-            {isUploading ? (
-              <div className={cn('border-2 border-current border-t-transparent rounded-full animate-spin', compact ? 'w-3 h-3' : 'w-4 h-4')} />
-            ) : (
-              <Camera size={compact ? 12 : 14} />
-            )}
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              onChange={onProfilePictureUpload}
-              className="hidden"
-              disabled={isUploading}
+      <div className={cn('flex', compact ? 'flex-col gap-3 items-start' : 'flex-row gap-6 items-center')}>
+        {/* Avatar with upload/edit controls - Improved mobile layout */}
+        <div className={cn('flex', compact ? 'flex-col gap-2' : 'flex-row gap-4 items-center')}>
+          {/* Avatar */}
+          <div className="flex-shrink-0">
+            <Avatar
+              profilePictureUrl={profile?.profile_picture_url ?? undefined}
+              avatarImage={profile?.avatar_image ?? undefined}
+              size={compact ? 'md' : 'xl'}
+              className="shadow-lg"
             />
-          </label>
+          </div>
 
-          {/* Remove profile picture button */}
-          {profile?.profile_picture_url && (
-            <button
-              onClick={onRemoveProfilePicture}
+          {/* Avatar Controls - Stacked for mobile, horizontal for desktop */}
+          <div className={cn(
+            'flex gap-2',
+            compact ? 'flex-row' : 'flex-col'
+          )}>
+            {/* Upload Button (camera icon) */}
+            <label
               className={cn(
-                'absolute -top-1 -right-1 rounded-full flex items-center justify-center shadow-md transition-colors min-w-[44px] min-h-[44px]',
-                compact ? 'w-8 h-8' : 'w-9 h-9',
-                isDarkMode ? 'bg-red-600 text-white hover:bg-red-500' : 'bg-red-500 text-white hover:bg-red-400'
+                'rounded-full flex items-center justify-center shadow-md cursor-pointer transition-colors',
+                'min-w-[44px] min-h-[44px] w-11 h-11',
+                isDarkMode ? 'bg-slate-700 text-gray-300 hover:bg-slate-600' : 'bg-white text-gray-600 hover:bg-gray-100',
+                'border-2',
+                isDarkMode ? 'border-slate-600' : 'border-gray-200'
               )}
-              title={t('profile.removePhoto') || 'Remove Photo'}
+              title={t('profile.uploadPhoto') || 'Upload Photo'}
+              aria-label={t('profile.uploadPhoto') || 'Upload Photo'}
             >
-              <X size={compact ? 12 : 14} />
-            </button>
-          )}
+              {isUploading ? (
+                <div className="border-2 border-current border-t-transparent rounded-full animate-spin w-5 h-5" />
+              ) : (
+                <Camera size={20} />
+              )}
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={onProfilePictureUpload}
+                className="hidden"
+                disabled={isUploading}
+                aria-label={t('profile.uploadPhoto') || 'Upload Photo'}
+              />
+            </label>
 
-          {/* Edit emoji button (only show if no profile picture) */}
-          {!profile?.profile_picture_url && (
-            <button
-              onClick={onShowEmojiPicker}
-              className={cn(
-                'absolute -top-1 -right-1 rounded-full flex items-center justify-center shadow-md transition-colors min-w-[44px] min-h-[44px]',
-                compact ? 'w-8 h-8' : 'w-9 h-9',
-                isDarkMode ? 'bg-slate-600 text-gray-300 hover:bg-slate-500' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-              )}
-              title={t('profile.chooseEmoji') || 'Change Emoji'}
-            >
-              <Edit size={compact ? 12 : 14} />
-            </button>
-          )}
+            {/* Remove profile picture button */}
+            {profile?.profile_picture_url && (
+              <button
+                onClick={onRemoveProfilePicture}
+                className={cn(
+                  'rounded-full flex items-center justify-center shadow-md transition-colors',
+                  'min-w-[44px] min-h-[44px] w-11 h-11',
+                  'border-2 border-red-600',
+                  isDarkMode ? 'bg-red-600 text-white hover:bg-red-500' : 'bg-red-500 text-white hover:bg-red-400'
+                )}
+                title={t('profile.removePhoto') || 'Remove Photo'}
+                aria-label={t('profile.removePhoto') || 'Remove Photo'}
+              >
+                <X size={20} />
+              </button>
+            )}
+
+            {/* Edit emoji button (only show if no profile picture) */}
+            {!profile?.profile_picture_url && (
+              <button
+                onClick={onShowEmojiPicker}
+                className={cn(
+                  'rounded-full flex items-center justify-center shadow-md transition-colors',
+                  'min-w-[44px] min-h-[44px] w-11 h-11',
+                  'border-2',
+                  isDarkMode ? 'bg-slate-600 text-gray-300 hover:bg-slate-500 border-slate-500' : 'bg-gray-200 text-gray-600 hover:bg-gray-300 border-gray-300'
+                )}
+                title={t('profile.chooseEmoji') || 'Change Emoji'}
+                aria-label={t('profile.chooseEmoji') || 'Change Emoji'}
+              >
+                <Edit size={20} />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* User Info */}

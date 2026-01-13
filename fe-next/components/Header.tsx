@@ -11,7 +11,6 @@ import AuthButton from './auth/AuthButton';
 import MusicControls from './MusicControls';
 import { CoinBalance } from './CoinBalance';
 import AuthModal from './auth/AuthModal';
-import Avatar from './Avatar';
 
 /**
  * Header Props
@@ -249,7 +248,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     {/* Sound controls */}
                     <MusicControls />
 
-                    {/* Hamburger menu button - shows avatar for authenticated users */}
+                    {/* Hamburger menu button - always shows Menu/X icon */}
                     <button
                         onClick={() => setShowMobileMenu(!showMobileMenu)}
                         className={cn(
@@ -260,22 +259,13 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             "rounded-neo shadow-hard-sm",
                             "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
                             "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
-                            "transition-all duration-100",
-                            // Remove padding when showing avatar for proper fit
-                            isAuthenticated && profile && "p-0 overflow-hidden"
+                            "transition-all duration-100"
                         )}
                         aria-label={showMobileMenu ? (t('common.closeMenu') || 'Close menu') : (t('common.openMenu') || 'Open menu')}
                         aria-expanded={showMobileMenu}
                     >
                         {showMobileMenu ? (
                             <X size={18} />
-                        ) : isAuthenticated && profile ? (
-                            <Avatar
-                                profilePictureUrl={profile.profile_picture_url ?? undefined}
-                                avatarImage={profile.avatar_image}
-                                size="md"
-                                className="w-full h-full"
-                            />
                         ) : (
                             <Menu size={18} />
                         )}

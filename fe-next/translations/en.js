@@ -119,6 +119,7 @@ const en = {
     "xpGained": "XP",
     "score": "Score",
     "points": "pts",
+    "pts": "pts",
     "combo": "Combo",
     "quit": "Quit",
     "foundWords": "Found",
@@ -840,7 +841,8 @@ const en = {
     "regenerateBoard": "Regenerate Board",
     "boardRegenerated": "Board regenerated!",
     "noPlayers": "No players in lobby",
-    "connectionLost": "Connection lost. Please refresh."
+    "connectionLost": "Connection lost. Please refresh.",
+    "mode": "Game Mode"
   },
   "tvBroadcast": {
     "joinAt": "Join at",
@@ -1115,6 +1117,10 @@ const en = {
   "achievementDock": {
     "title": "Your Achievements"
   },
+  "achievement": {
+    "dailyDouble": "🏆 DAILY DOUBLE",
+    "dailyDouble.desc": "Completed both daily challenges!"
+  },
   "chat": {
     "title": "Room Chat",
     "placeholder": "Type a message...",
@@ -1343,7 +1349,9 @@ const en = {
       "comboBonus": "Combo Bonus",
       "fireBonus": "Fire Bonus",
       "uniqueWords": "Unique Words",
-      "avgWordLength": "Avg Word Length"
+      "avgWordLength": "Avg Word Length",
+      "games": "Games",
+      "level": "Level"
     }
   },
   "playerTitles": {
@@ -1991,6 +1999,10 @@ const en = {
     "LOYAL_PLAYER": {
       "name": "Loyalist",
       "description": "30-day warrior"
+    },
+    "DAILY_DOUBLE": {
+      "name": "Daily Double",
+      "description": "Crushed both challenges today"
     }
   },
   "achievementTiers": {
@@ -2501,7 +2513,9 @@ const en = {
     "addCountry": "Add country",
     "changeCountry": "Change country",
     "countrySaved": "Country updated!",
-    "countryError": "Failed to update country"
+    "countryError": "Failed to update country",
+    "games": "Games",
+    "level": "Level"
   },
   "calendar": {
     "title": "Daily Rewards",
@@ -3107,6 +3121,11 @@ const en = {
   "daily": {
     "title": "Daily Challenge",
     "badge": "DAILY",
+    "new": "NEW",
+    "chooseChallengeHint": "Pick your quest",
+    "chooseQuest": "Choose Your Quest",
+    "play": "PLAY",
+    "viewResults": "VIEW RESULTS",
     "puzzleNumber": "Daily #{number}",
     "timeLimit": "Time",
     "attempt": "Try",
@@ -3280,13 +3299,41 @@ const en = {
       "startTraining": "Start Training",
       "skipToDaily": "Skip, I'll figure it out",
       "redirecting": "Heading to Daily Challenge..."
-    }
+    },
+    "wordHunt": "Word Hunt",
+    "wordHunt.title": "Word Hunt",
+    "wordHunt.subtitle": "Survival Mode",
+    "wordHunt.desc": "Find words. Stay alive.",
+    "wordHunt.feature1": "90 seconds",
+    "wordHunt.feature2": "Combo system",
+    "wordHunt.feature3": "Global leaderboard"
   },
   "buzz": {
     "title": "Daily Buzz",
     "tagline": "Word challenges from today's trends",
     "subtitle": "What's buzzing today?",
     "icon": "📰🔥",
+    "badge": "NEW",
+    "betaPreview": "BETA",
+    "challenges": "challenges",
+    "connectingWord": "Connecting word",
+    "fillTheBlank": "Fill in the blank",
+    "finish": "FINISH",
+    "helpText": "Quick word puzzles based on what's trending today. No timer, just think!",
+    "loading": "Loading buzz...",
+    "maxScore": "100 pts max",
+    "noTimeLimit": "No time limit",
+    "topicIs": "Topic:",
+    "total": "Total",
+    "yourAnswer": "Your answer...",
+    "yourScore": "Your Score",
+    "feature1": "Real trending topics",
+    "feature2": "5-7 mini challenges",
+    "feature3": "Localized content",
+    "searches": "searches",
+    "quitConfirm": "Your progress will be lost!",
+    "quitConfirmTitle": "Quit Daily Buzz?",
+    "viewResults": "VIEW RESULTS",
     "type": {
       "scrambled": "SCRAMBLED",
       "scrambledDesc": "Unscramble the trending word",
@@ -3298,6 +3345,14 @@ const en = {
       "spotOnDesc": "Match word to meaning",
       "trio": "TRIO",
       "trioDesc": "Find the word connecting all 3 trends"
+    },
+    "trio": {
+      "hint": "What connects these 3?"
+    },
+    "preview": {
+      "title": "Today's Topics",
+      "subtitle": "Trending now",
+      "play": "START BUZZ"
     },
     "challenge": "{number}/{total}",
     "score": "{score}",
@@ -3324,6 +3379,7 @@ const en = {
       "title": "BUZZ COMPLETE",
       "score": "{score}/100",
       "scorePerfect": "100/100 PERFECT",
+      "perfect": "FLAWLESS! 💯",
       "trending": "Today's trends:",
       "share": "SHARE SCORE",
       "playAgain": "TOMORROW",
@@ -3343,11 +3399,10 @@ const en = {
       "textPerfect": "Daily Buzz: PERFECT SCORE 💯 | Think you can? 🔥",
       "textStreakMilestone": "{count}-day Buzz streak! 🔥 Join me?"
     },
-    "error": {
-      "loading": "Loading today's buzz...",
-      "failed": "Couldn't load buzz. Try again?",
-      "noInternet": "No connection. Check your internet."
-    },
+    "error": "Oops!",
+    "error.loading": "Loading today's buzz...",
+    "error.failed": "Couldn't load buzz. Try again?",
+    "error.noInternet": "No connection. Check your internet.",
     "alreadyPlayed": "Already played today! Come back tomorrow.",
     "comingSoon": "Tomorrow's buzz drops at midnight"
   },

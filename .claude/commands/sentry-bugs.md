@@ -202,12 +202,7 @@ Output a summary in chat:
 | [Error 1] | [count] | [users] | Fixed |
 | [Error 2] | [count] | [users] | Fixed |
 
-### Verification Commands
-```bash
-npm run build
-npm run lint
-npx tsc --noEmit
-```
+**Next Step:** Run `/commit-push` to verify all checks and push to remote.
 
 ### How to Test Each Fix
 
@@ -316,7 +311,7 @@ Search for similar past Sentry errors and their fixes:
 mcp__memory__memory_recall(query="sentry error [error-type] [affected-area]")
 ```
 
-### After Each Fix (Phase 4.5)
+### After Each Fix (Phase 4.4)
 Store the error pattern and fix for future reference:
 ```
 mcp__memory__memory_store(

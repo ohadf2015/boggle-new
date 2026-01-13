@@ -66,18 +66,14 @@ jest.mock('@/components/auth/AuthButton', () => ({
     </div>
   ),
 }));
-jest.mock('@/components/Avatar', () => ({
-  __esModule: true,
-  default: ({ avatarImage, profilePictureUrl }: { avatarImage?: string; profilePictureUrl?: string }) => (
-    <div
-      data-testid="header-avatar"
-      data-avatar-image={avatarImage}
-      data-profile-picture-url={profilePictureUrl}
-    >
-      Avatar
-    </div>
+jest.mock('@/components/CoinBalance', () => ({
+  CoinBalance: ({ coins }: { coins: number }) => (
+    <div data-testid="coin-balance">{coins}</div>
   ),
-  PROFILE_AVATAR_ID: '__profile_avatar__',
+}));
+jest.mock('@/components/auth/AuthModal', () => ({
+  __esModule: true,
+  default: () => <div data-testid="auth-modal">AuthModal</div>,
 }));
 
 const mockPush = jest.fn();
@@ -85,7 +81,7 @@ const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockUseLanguage = useLanguage as jest.MockedFunction<typeof useLanguage>;
 const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
 
-describe('Header - Mobile Menu Avatar Bug', () => {
+describe('Header - Hamburger Menu Avatar Bugs', () => {
   beforeEach(() => {
     mockPush.mockClear();
     mockUseRouter.mockReturnValue({
@@ -106,8 +102,8 @@ describe('Header - Mobile Menu Avatar Bug', () => {
     } as any);
   });
 
-  it('FIXED: hamburger menu should ALWAYS show Menu icon, not avatar (authenticated user with profile picture)', () => {
-    // Setup: User with custom profile picture uploaded
+  it('BUG 1: hamburger menu should ALWAYS show Menu icon, never avatar for authenticated players', () => {
+    // Setup: Authenticated user with profile picture
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       isAdmin: false,
@@ -115,39 +111,7 @@ describe('Header - Mobile Menu Avatar Bug', () => {
         id: 'test-user',
         username: 'TestUser',
         profile_picture_url: 'https://example.com/custom-profile.jpg',
-        avatar_image: PROFILE_AVATAR_ID, // Special ID indicating use profile picture
-        total_coins: 100,
-      },
-      loading: false,
-      signIn: jest.fn(),
-      signUp: jest.fn(),
-      signOut: jest.fn(),
-      refreshProfile: jest.fn(),
-    } as any);
-
-    render(<Header />);
-
-    // Find the hamburger button (should ALWAYS show Menu icon, never avatar)
-    const hamburgerButton = screen.getByLabelText(/menu/i);
-
-    // FIXED: Hamburger button should NOT show avatar
-    const avatar = hamburgerButton.querySelector('[data-testid="header-avatar"]');
-    expect(avatar).not.toBeInTheDocument();
-
-    // Should show Menu icon
-    expect(hamburgerButton).toBeInTheDocument();
-  });
-
-  it('FIXED: hamburger menu should ALWAYS show Menu icon, not avatar (authenticated user with character avatar)', () => {
-    // Setup: User with custom profile picture but avatarImage explicitly set to character avatar
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: true,
-      isAdmin: false,
-      profile: {
-        id: 'test-user',
-        username: 'TestUser',
-        profile_picture_url: 'https://example.com/custom-profile.jpg',
-        avatar_image: 'broccoli-bob', // User explicitly wants character avatar
+        avatar_image: PROFILE_AVATAR_ID,
         total_coins: 100,
       },
       loading: false,
@@ -162,11 +126,47 @@ describe('Header - Mobile Menu Avatar Bug', () => {
     // Find the hamburger button
     const hamburgerButton = screen.getByLabelText(/menu/i);
 
-    // FIXED: Hamburger button should NOT show avatar
+    // BUG: Currently shows avatar, but should ALWAYS show Menu icon
+    // Expected: Menu icon should be shown
+    // Actual: Avatar is shown
+    const avatar = hamburgerButton.querySelector('[data-testid="header-avatar"]');
+    expect(avatar).not.toBeInTheDocument(); // Should NOT show avatar
+
+    // Should show Menu icon instead
+    const menuIcon = hamburgerButton.querySelector('svg');
+    expect(menuIcon).toBeInTheDocument();
+  });
+
+  it('BUG 1: hamburger menu should show Menu icon for authenticated player with character avatar', () => {
+    // Setup: Authenticated user with character avatar
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: true,
+      isAdmin: false,
+      profile: {
+        id: 'test-user',
+        username: 'TestUser',
+        profile_picture_url: null,
+        avatar_image: 'broccoli-bob', // Character avatar
+        total_coins: 100,
+      },
+      loading: false,
+      signIn: jest.fn(),
+      signUp: jest.fn(),
+      signOut: jest.fn(),
+      refreshProfile: jest.fn(),
+    } as any);
+
+    render(<Header />);
+
+    // Find the hamburger button
+    const hamburgerButton = screen.getByLabelText(/menu/i);
+
+    // Should ALWAYS show Menu icon, not avatar
     const avatar = hamburgerButton.querySelector('[data-testid="header-avatar"]');
     expect(avatar).not.toBeInTheDocument();
 
     // Should show Menu icon
-    expect(hamburgerButton).toBeInTheDocument();
+    const menuIcon = hamburgerButton.querySelector('svg');
+    expect(menuIcon).toBeInTheDocument();
   });
 });

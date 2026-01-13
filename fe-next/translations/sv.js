@@ -113,6 +113,7 @@ const sv = {
     "xpGained": "XP",
     "score": "Poäng",
     "points": "pts",
+    "pts": "P",
     "combo": "Kombo",
     "quit": "Avsluta",
     "foundWords": "Hittade",
@@ -835,7 +836,8 @@ const sv = {
     "regenerateBoard": "Regenerera bräda",
     "boardRegenerated": "Brädan har regenererats!",
     "noPlayers": "Inga spelare i lobbyn",
-    "connectionLost": "Anslutningen förlorades. Vänligen uppdatera."
+    "connectionLost": "Anslutningen förlorades. Vänligen uppdatera.",
+    "mode": "Spelläge"
   },
   "tvBroadcast": {
     "joinAt": "Gå med på",
@@ -1108,6 +1110,10 @@ const sv = {
   },
   "achievementDock": {
     "title": "Dina prestationer"
+  },
+  "achievement": {
+    "dailyDouble": "🏆 DUBBELDAGLIG",
+    "dailyDouble.desc": "Klarade båda dagens utmaningar!"
   },
   "chat": {
     "title": "Rumschatt",
@@ -2369,7 +2375,9 @@ const sv = {
     "addCountry": "Lägg till land",
     "changeCountry": "Ändra land",
     "countrySaved": "Land uppdaterat!",
-    "countryError": "Kunde inte uppdatera land"
+    "countryError": "Kunde inte uppdatera land",
+    "games": "Matcher",
+    "level": "Nivå"
   },
   "calendar": {
     "title": "Dagliga Belöningar",
@@ -2815,6 +2823,10 @@ const sv = {
     "validForScoring": "Räknas som giltigt! Hjälp till att lägga till i ordboken.",
     "moreForDictionary": "mer till ordbok"
   },
+  "achievement": {
+    "dailyDouble": "🏆 DUBBELDAGLIG",
+    "dailyDouble.desc": "Klarade båda dagens utmaningar!"
+  },
   "footer": {
     "aboutGame": "Om Spelet",
     "leaderboard": "Topplista",
@@ -3112,6 +3124,17 @@ const sv = {
     "alreadyPlayed": "Redan spelat idag",
     "yourScore": "Din poäng",
     "completed": "Klart!",
+    "chooseQuest": "Välj Din Dagliga Quest",
+    "chooseChallengeHint": "Välj din utmaning för idag. Klara båda för bonusXP!",
+    "new": "NYTT",
+    "play": "SPELA NU",
+    "viewResults": "VISA RESULTAT",
+    "wordHunt": "Ordjakt",
+    "wordHunt.subtitle": "Överlevnadsläge",
+    "wordHunt.desc": "Snabb ordjakt mot klockan. Hitta så många ord du kan innan tiden rinner ut!",
+    "wordHunt.feature1": "90 sekunder",
+    "wordHunt.feature2": "Kombosystem",
+    "wordHunt.feature3": "Global topplista",
     "quitConfirm": "Är du säker på att du vill avsluta? Dina framsteg går förlorade och du kommer inte kunna spela dagens pussel igen.",
     "quitConfirmTitle": "Avsluta utmaning?",
     "imSure": "Jag är säker",
@@ -3283,6 +3306,33 @@ const sv = {
     "tagline": "Ordutmaningar från dagens trender",
     "subtitle": "Vad buzzer idag?",
     "icon": "📰🔥",
+    "badge": "🔥 NYHET",
+    "betaPreview": "✨ BETA",
+    "challenges": "Utmaningar",
+    "connectingWord": "KOPPLINGSORDET",
+    "error": "Ajdå!",
+    "feature1": "Riktiga trendämnen",
+    "feature2": "5-7 miniutmaningar",
+    "feature3": "Lokalt innehåll",
+    "fillTheBlank": "Fyll i luckan",
+    "finish": "KLART",
+    "helpText": "Lös ordutmaningar från dagens trender. Ingen tidsgräns!",
+    "loading": "Laddar Daily Buzz...",
+    "maxScore": "Max Poäng",
+    "noTimeLimit": "Ingen Timer",
+    "preview.play": "STARTA BUZZ",
+    "preview.subtitle": "Utmaningar med...",
+    "preview.title": "DAGENS ÄMNEN",
+    "quitConfirm": "Dina framsteg sparas, men ofullständiga utmaningar räknas inte i din poäng.",
+    "quitConfirmTitle": "Avsluta Daily Buzz?",
+    "results.perfect": "🔥 PERFEKT POÄNG!",
+    "searches": "sökningar",
+    "topicIs": "Ämne: {topic}",
+    "total": "TOTALT",
+    "trio.hint": "Hitta ordet som kopplar alla tre ämnen",
+    "viewResults": "VISA RESULTAT",
+    "yourAnswer": "DITT SVAR",
+    "yourScore": "DIN POÄNG",
     "type": {
       "scrambled": "BLANDAD",
       "scrambledDesc": "Lös det blandade trendordet",
@@ -3339,11 +3389,9 @@ const sv = {
       "textPerfect": "Daily Buzz: PERFEKT POÄNG 💯 | Kan du? 🔥",
       "textStreakMilestone": "{count}-dagars Buzz streak! 🔥 Gå med?"
     },
-    "error": {
-      "loading": "Laddar dagens buzz...",
-      "failed": "Kunde inte ladda. Försök igen?",
-      "noInternet": "Ingen anslutning. Kolla din internetuppkoppling."
-    },
+    "error.loading": "Laddar dagens buzz...",
+    "error.failed": "Kunde inte ladda. Försök igen?",
+    "error.noInternet": "Ingen anslutning. Kolla din internetanslutning.",
     "alreadyPlayed": "Redan spelat idag! Kom tillbaka imorgon.",
     "comingSoon": "Morgondagens buzz släpps vid midnatt"
   },

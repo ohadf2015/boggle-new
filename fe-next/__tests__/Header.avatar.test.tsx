@@ -102,8 +102,8 @@ describe('Header - Avatar Display', () => {
     } as ReturnType<typeof useLanguage>);
   });
 
-  describe('Mobile hamburger button avatar display', () => {
-    it('should show avatar on hamburger button when authenticated user has a character avatar', () => {
+  describe('Mobile hamburger button display', () => {
+    it('should ALWAYS show Menu icon on hamburger button, never avatar (authenticated user with character avatar)', () => {
       const profile: ProfileData = {
         id: 'user-123',
         username: 'testuser',
@@ -124,14 +124,15 @@ describe('Header - Avatar Display', () => {
 
       render(<Header />);
 
-      // Avatar should be visible on the hamburger button (before clicking)
-      const avatar = screen.getByTestId('header-avatar');
-      expect(avatar).toBeInTheDocument();
-      expect(avatar).toHaveAttribute('data-avatar-image', 'broccoli-bob');
-      expect(avatar).toHaveAttribute('data-profile-picture-url', 'https://example.com/profile.jpg');
+      // Hamburger button should ALWAYS show Menu icon, never avatar
+      expect(screen.queryByTestId('header-avatar')).not.toBeInTheDocument();
+
+      // Menu icon should be present
+      const menuButton = screen.getByLabelText(/menu/i);
+      expect(menuButton).toBeInTheDocument();
     });
 
-    it('should show avatar with PROFILE_AVATAR_ID when user has selected their profile picture', () => {
+    it('should ALWAYS show Menu icon on hamburger button, never avatar (authenticated user with profile picture)', () => {
       const profile: ProfileData = {
         id: 'user-123',
         username: 'testuser',
@@ -152,13 +153,15 @@ describe('Header - Avatar Display', () => {
 
       render(<Header />);
 
-      const avatar = screen.getByTestId('header-avatar');
-      expect(avatar).toBeInTheDocument();
-      expect(avatar).toHaveAttribute('data-avatar-image', PROFILE_AVATAR_ID);
-      expect(avatar).toHaveAttribute('data-profile-picture-url', 'https://example.com/profile.jpg');
+      // Hamburger button should ALWAYS show Menu icon, never avatar
+      expect(screen.queryByTestId('header-avatar')).not.toBeInTheDocument();
+
+      // Menu icon should be present
+      const menuButton = screen.getByLabelText(/menu/i);
+      expect(menuButton).toBeInTheDocument();
     });
 
-    it('should show user-selected avatar, not a random one', () => {
+    it('should ALWAYS show Menu icon on hamburger button (any authenticated user)', () => {
       const selectedAvatarId = 'pizza-pete';
       const profile: ProfileData = {
         id: 'user-123',
@@ -180,11 +183,15 @@ describe('Header - Avatar Display', () => {
 
       render(<Header />);
 
-      const avatar = screen.getByTestId('header-avatar');
-      expect(avatar).toHaveAttribute('data-avatar-image', selectedAvatarId);
+      // Hamburger button should ALWAYS show Menu icon, never avatar
+      expect(screen.queryByTestId('header-avatar')).not.toBeInTheDocument();
+
+      // Menu icon should be present
+      const menuButton = screen.getByLabelText(/menu/i);
+      expect(menuButton).toBeInTheDocument();
     });
 
-    it('should NOT show avatar when user is not authenticated (show Menu icon instead)', () => {
+    it('should show Menu icon when user is not authenticated', () => {
       mockUseAuth.mockReturnValue({
         isAuthenticated: false,
         profile: null,
@@ -197,9 +204,13 @@ describe('Header - Avatar Display', () => {
 
       // Avatar should NOT be in the document
       expect(screen.queryByTestId('header-avatar')).not.toBeInTheDocument();
+
+      // Menu icon should be present
+      const menuButton = screen.getByLabelText(/menu/i);
+      expect(menuButton).toBeInTheDocument();
     });
 
-    it('should NOT show avatar when profile is null (show Menu icon instead)', () => {
+    it('should show Menu icon when profile is null', () => {
       mockUseAuth.mockReturnValue({
         isAuthenticated: true,
         profile: null,
@@ -211,6 +222,10 @@ describe('Header - Avatar Display', () => {
       render(<Header />);
 
       expect(screen.queryByTestId('header-avatar')).not.toBeInTheDocument();
+
+      // Menu icon should be present
+      const menuButton = screen.getByLabelText(/menu/i);
+      expect(menuButton).toBeInTheDocument();
     });
   });
 });

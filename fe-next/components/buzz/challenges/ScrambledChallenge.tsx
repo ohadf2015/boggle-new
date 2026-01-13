@@ -35,7 +35,7 @@ export default function ScrambledChallenge({
     }
   }, [userAnswer, onAnswer]);
 
-  const handleKeyPress = useCallback(
+  const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === 'Enter' && userAnswer.trim()) {
         handleSubmit();
@@ -93,7 +93,7 @@ export default function ScrambledChallenge({
           type="text"
           value={userAnswer}
           onChange={(e) => setUserAnswer(e.target.value.toUpperCase())}
-          onKeyPress={handleKeyPress}
+          onKeyDown={handleKeyDown}
           placeholder={t('buzz.yourAnswer') || 'YOUR ANSWER'}
           autoFocus
           className="w-full px-6 py-4 text-2xl font-black text-center text-white bg-slate-800 border-3 border-neo-black rounded-xl shadow-hard focus:border-neo-orange focus:shadow-hard-lg outline-none transition-all uppercase tracking-wider"

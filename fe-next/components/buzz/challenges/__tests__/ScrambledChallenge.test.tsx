@@ -2,31 +2,15 @@
  * @jest-environment jsdom
  */
 
-// Mock framer-motion BEFORE imports (hoisted)
-jest.mock('framer-motion', () => {
-  const React = require('react');
-  const FRAMER_PROPS = [
-    'initial', 'animate', 'exit', 'transition', 'whileHover', 'whileTap',
-    'whileInView', 'viewport', 'layout', 'layoutId', 'drag', 'dragConstraints',
-    'dragElastic', 'dragMomentum', 'dragTransition', 'onDrag', 'onDragStart',
-    'onDragEnd', 'variants', 'custom'
-  ];
-
-  return {
-    motion: new Proxy({}, {
-      get: (_target, prop) => {
-        const Component = React.forwardRef(({ children, ...props }: any, ref: any) => {
-          const htmlProps = { ...props };
-          FRAMER_PROPS.forEach(frameProp => delete htmlProps[frameProp]);
-          return React.createElement(prop as string, { ...htmlProps, ref }, children);
-        });
-        Component.displayName = `motion.${String(prop)}`;
-        return Component;
-      }
-    }),
-    AnimatePresence: ({ children }: any) => <>{children}</>,
-  };
-});
+// Mock framer-motion BEFORE imports
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, initial, animate, exit, transition, whileHover, whileTap, whileInView, viewport, layout, layoutId, drag, dragConstraints, dragElastic, dragMomentum, dragTransition, onDrag, onDragStart, onDragEnd, variants, custom, ...props }: any) => <div {...props}>{children}</div>,
+    h2: ({ children, initial, animate, exit, transition, whileHover, whileTap, whileInView, viewport, layout, layoutId, drag, dragConstraints, dragElastic, dragMomentum, dragTransition, onDrag, onDragStart, onDragEnd, variants, custom, ...props }: any) => <h2 {...props}>{children}</h2>,
+    button: ({ children, initial, animate, exit, transition, whileHover, whileTap, whileInView, viewport, layout, layoutId, drag, dragConstraints, dragElastic, dragMomentum, dragTransition, onDrag, onDragStart, onDragEnd, variants, custom, ...props }: any) => <button {...props}>{children}</button>,
+  },
+  AnimatePresence: ({ children }: any) => <>{children}</>,
+}));
 
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -114,7 +98,7 @@ describe('ScrambledChallenge', () => {
 
   it('converts input to uppercase', async () => {
     const user = userEvent.setup();
-
+    
     render(
       <LanguageProvider>
         <ScrambledChallenge
@@ -125,11 +109,11 @@ describe('ScrambledChallenge', () => {
       </LanguageProvider>
     );
 
-    const input = screen.getByPlaceholderText('YOUR ANSWER') as HTMLInputElement;
+    const input = screen.getByPlaceholderText('YOUR ANSWER');
 
     await user.type(input, 'test');
 
-    expect(input.value).toBe('TEST');
+    expect(input).toHaveValue('TEST');
   });
 
   it('calls onAnswer with user input when submit button is clicked', async () => {
@@ -148,7 +132,7 @@ describe('ScrambledChallenge', () => {
     const input = screen.getByPlaceholderText('YOUR ANSWER');
     const submitButton = screen.getByText('SUBMIT');
 
-    await user.type(input, 'TEST');
+    await user.type(input, 'test');    
     await user.click(submitButton);
 
     expect(mockOnAnswer).toHaveBeenCalledWith('TEST');
@@ -172,7 +156,7 @@ describe('ScrambledChallenge', () => {
 
   it('submit button is enabled when input has text', async () => {
     const user = userEvent.setup();
-
+    
     render(
       <LanguageProvider>
         <ScrambledChallenge
@@ -186,7 +170,7 @@ describe('ScrambledChallenge', () => {
     const input = screen.getByPlaceholderText('YOUR ANSWER');
     const submitButton = screen.getByText('SUBMIT');
 
-    await user.type(input, 'TEST');
+    await user.type(input, 'test');
 
     expect(submitButton).not.toBeDisabled();
   });

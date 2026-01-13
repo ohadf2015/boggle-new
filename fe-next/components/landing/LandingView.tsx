@@ -448,29 +448,30 @@ const LandingView: React.FC = () => {
           </div>
         ) : (
           /* Desktop: Centered grid layout with visual hierarchy */
-          <div className="w-full animate-fade-in-fast flex flex-col items-center justify-center gap-3 sm:gap-4 lg:gap-5">
-            {/* Daily Challenge Banner - inside container for tighter spacing */}
-            <div className="w-full max-w-4xl mx-auto">
-              <Suspense fallback={
-                <div
-                  className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-lime"
-                  style={{ minHeight: '62px' }}
-                >
-                  <div className="flex items-center gap-3 animate-pulse">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-neo bg-neo-black/20 shrink-0" />
-                    <div className="flex-1 min-w-0 space-y-2">
-                      <div className="h-5 w-32 bg-neo-black/20 rounded" />
-                      <div className="h-3 w-20 bg-neo-black/10 rounded" />
+          <div className="w-full animate-fade-in-fast flex flex-col items-center justify-center">
+            {/* Cards container - Daily Challenge Banner + Mode Cards in single grid */}
+            <div className="w-full max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-5 justify-items-center">
+              {/* Daily Challenge Banner - spans full width */}
+              <div className="col-span-1 sm:col-span-2 w-full">
+                <Suspense fallback={
+                  <div
+                    className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-lime"
+                    style={{ minHeight: '62px' }}
+                  >
+                    <div className="flex items-center gap-3 animate-pulse">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-neo bg-neo-black/20 shrink-0" />
+                      <div className="flex-1 min-w-0 space-y-2">
+                        <div className="h-5 w-32 bg-neo-black/20 rounded" />
+                        <div className="h-3 w-20 bg-neo-black/10 rounded" />
+                      </div>
                     </div>
                   </div>
-                </div>
-              }>
-                <DailyChallengeBanner />
-              </Suspense>
-            </div>
+                }>
+                  <DailyChallengeBanner />
+                </Suspense>
+              </div>
 
-            {/* Primary cards - 2 columns max for main modes */}
-            <div className="w-full max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-5 justify-items-center">
+              {/* Primary cards - Multiplayer and Single Player */}
               <ModeCard
                 title={t('landing.multiplayer') || 'Multiplayer'}
                 description={t('landing.multiplayerDesc') || 'Compete with friends in real-time!'}
@@ -491,22 +492,22 @@ const LandingView: React.FC = () => {
                 icon={<User className="w-6 h-6" />}
                 variant="cyan"
               />
-            </div>
 
-            {/* Secondary card - Brain Training centered below */}
-            <div className="w-full max-w-4xl mx-auto grid justify-items-center">
-              <ModeCard
-                title={t('landing.brainTraining') || 'Brain Training'}
-                description={t('landing.brainTrainingDesc') || 'Track cognitive growth'}
-                href={`/${language}/brain`}
-                icon={<Brain className="w-6 h-6" />}
-                variant="purple"
-                secondary
-                loading={authLoading}
-                locked={!isAuthenticated}
-                lockedMessage={t('landing.signInToUnlock') || 'Sign in to unlock'}
-                onLockedClick={() => setShowAuthModal(true)}
-              />
+              {/* Brain Training card - centered below primary cards */}
+              <div className="col-span-1 sm:col-span-2 flex justify-center w-full">
+                <ModeCard
+                  title={t('landing.brainTraining') || 'Brain Training'}
+                  description={t('landing.brainTrainingDesc') || 'Track cognitive growth'}
+                  href={`/${language}/brain`}
+                  icon={<Brain className="w-6 h-6" />}
+                  variant="purple"
+                  secondary
+                  loading={authLoading}
+                  locked={!isAuthenticated}
+                  lockedMessage={t('landing.signInToUnlock') || 'Sign in to unlock'}
+                  onLockedClick={() => setShowAuthModal(true)}
+                />
+              </div>
             </div>
           </div>
         )}
