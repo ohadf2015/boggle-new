@@ -210,7 +210,7 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
       </div>
 
       {/* Main content - SIMPLIFIED */}
-      <div className="max-w-md w-full text-center space-y-5">
+      <div className="max-w-md w-full text-center space-y-5 mt-16 sm:mt-20">
         {/* Guest Mode Notice - Show only for anonymous users */}
         {!isAuthenticated && (
           <motion.div
