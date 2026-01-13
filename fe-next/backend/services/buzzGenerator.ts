@@ -52,6 +52,9 @@ const REGION_MAP: Record<string, string> = {
 // Using most advanced model for high-quality puzzle generation
 const GEMINI_MODEL = process.env.VERTEX_AI_MODEL || 'gemini-2.5-pro';
 
+// Thinking budget for extended reasoning (0 = disabled, max = 32768 for 2.5-pro, 24576 for 2.5-flash)
+const THINKING_BUDGET = parseInt(process.env.VERTEX_AI_THINKING_BUDGET || '8192', 10);
+
 /**
  * Generate Daily Buzz challenge for a specific date and language
  *
@@ -287,6 +290,23 @@ async function generateChallengesWithAI(
   const prompt = buildAIPrompt(trends, language, region);
 
   try {
+    // Build generation config with optional thinking for extended reasoning
+    // thinkingConfig is supported by Gemini 2.5+ models but not typed in deprecated SDK
+    const generationConfig: Record<string, unknown> = {
+      temperature: 0.8, // Creative but not too random
+      maxOutputTokens: 8000, // Increased to prevent truncation (Hebrew/Japanese responses are longer)
+      topP: 0.9,
+      topK: 40,
+    };
+
+    // Add thinking config for enhanced reasoning if budget > 0
+    if (THINKING_BUDGET > 0) {
+      generationConfig.thinkingConfig = {
+        thinkingBudget: THINKING_BUDGET,
+      };
+      console.log(`[BUZZ] Using thinking budget: ${THINKING_BUDGET} tokens`);
+    }
+
     const result = await model.generateContent({
       contents: [
         {
@@ -294,13 +314,8 @@ async function generateChallengesWithAI(
           parts: [{ text: prompt }],
         },
       ],
-      generationConfig: {
-        temperature: 0.8, // Creative but not too random
-        maxOutputTokens: 8000, // Increased to prevent truncation (Hebrew/Japanese responses are longer)
-        topP: 0.9,
-        topK: 40,
-      },
-    });
+      generationConfig,
+    } as Parameters<typeof model.generateContent>[0]);
 
     // Parse AI response
     const response = result.response;

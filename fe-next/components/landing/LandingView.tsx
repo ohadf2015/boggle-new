@@ -37,13 +37,13 @@ interface HeroMascotProps {
  * Uses responsive sizing - xs on mobile portrait, sm/md/lg on other viewports
  */
 const HeroMascot = memo(function HeroMascot({ isMobilePortrait = false }: HeroMascotProps) {
-  // Mobile portrait: use xs size (40px) with tap interaction
+  // Mobile portrait: use sm size (64px) with tap interaction
   if (isMobilePortrait) {
     return (
-      <div className="relative mx-auto mb-0.5">
+      <div className="relative mx-auto mb-0">
         <InteractiveMascotWithEntrance
           variant="happy"
-          size="xs"
+          size="sm"
           enableHover={false}
           enableClick
           clickVariant="celebrating"
@@ -265,7 +265,7 @@ const LandingView: React.FC = () => {
           <motion.div
             className={cn(
               "text-center animate-fade-in-fast relative z-10",
-              isMobilePortrait ? "mb-1" : "mb-2 sm:mb-3 lg:mb-4"
+              isMobilePortrait ? "mb-0" : "mb-2 sm:mb-3 lg:mb-4"
             )}
             style={!isMobilePortrait ? {
               transform: `translate(${mouseParallax.x * 1.2}px, ${mouseParallax.y * 1.2}px)`,
