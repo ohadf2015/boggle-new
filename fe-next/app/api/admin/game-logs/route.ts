@@ -344,14 +344,14 @@ export async function GET(request: NextRequest) {
         dailyChallengeCount = 0;
       } else {
         if (startDate) {
-          dailyQuery = dailyQuery.gte('created_at', startDate);
+          dailyQuery = dailyQuery.gte('completed_at', startDate);
         }
 
         if (endDate) {
-          dailyQuery = dailyQuery.lte('created_at', `${endDate}T23:59:59.999Z`);
+          dailyQuery = dailyQuery.lte('completed_at', `${endDate}T23:59:59.999Z`);
         }
 
-        dailyQuery = dailyQuery.order('created_at', { ascending });
+        dailyQuery = dailyQuery.order('completed_at', { ascending });
 
         const { data: dailyData, error: dailyError, count: dcCount } = await dailyQuery;
 
@@ -373,7 +373,7 @@ export async function GET(request: NextRequest) {
             mode: 'daily_challenge',
             language: attempt.language || 'en',
             time_played: attempt.time_seconds || 0,
-            created_at: attempt.completed_at || attempt.created_at,
+            created_at: attempt.completed_at,
             profiles: attempt.profiles || null,
           }));
         }

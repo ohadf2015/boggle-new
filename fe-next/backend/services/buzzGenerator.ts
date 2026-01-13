@@ -49,7 +49,7 @@ const REGION_MAP: Record<string, string> = {
 
 // Vertex AI Gemini configuration (using existing project credentials)
 // Using most advanced model for high-quality puzzle generation
-const GEMINI_MODEL = 'gemini-2.0-flash-thinking-exp-01-21'; // Most advanced Gemini model with extended thinking
+const GEMINI_MODEL = process.env.VERTEX_AI_MODEL || 'gemini-3.0-pro';
 
 /**
  * Generate Daily Buzz challenge for a specific date and language

@@ -223,7 +223,7 @@ export async function generateChallengeImage(
     // Initialize Vertex AI client
     const vertexAI = getVertexAIClient();
     const generativeModel = vertexAI.getGenerativeModel({
-      model: 'imagen-3.0-generate-001',
+      model: process.env.VERTEX_AI_IMAGE_MODEL || 'imagen-3.0-generate-001',
     });
 
     // Generate image
