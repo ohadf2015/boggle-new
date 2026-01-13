@@ -290,7 +290,7 @@ const LandingView: React.FC = () => {
         {/* Daily Challenge Banner for mobile/landscape - Lazy loaded with skeleton fallback */}
         {/* On desktop, the banner is inside the cards container for tighter spacing */}
         {(isLandscape || isMobilePortrait) && (
-          <div className="w-full mb-2">
+          <div className="w-full mb-4">
             <Suspense fallback={
               <div
                 className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-yellow"

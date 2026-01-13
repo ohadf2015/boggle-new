@@ -444,5 +444,119 @@ npm run db:migrate:check        # Dry-run validation
 
 ---
 
-**Last Updated**: 2026-01-11
+## Verdent Command System
+
+**Location**: `.verdent/` directory
+
+This project includes a comprehensive Verdent-specific command and workflow system adapted from Claude Code patterns. The `.verdent/` directory provides structured workflows, specialized agents, reusable skills, and task patterns optimized for Verdent.
+
+### Quick Access
+
+- **README**: `.verdent/README.md` - Complete system overview
+- **Quick Reference**: `.verdent/QUICK_REFERENCE.md` - Cheat sheet for common tasks
+- **Config**: `.verdent/config.json` - Verdent-specific configuration
+
+### Command Workflows
+
+Core development workflows in `.verdent/commands/`:
+
+| Command | Purpose | Key Steps |
+|---------|---------|-----------|
+| **feature.md** | New feature implementation | Context → Questions → Plan → Test-first → Implement → Verify |
+| **fix.md** | Bug fixing | Parse → Reproduce → Test → Fix → Verify |
+| **investigate.md** | Deep investigation | Map flow → Analyze → Evidence → Report (NO fixes) |
+| **refactor.md** | Code quality improvement | Baseline → Refactor incrementally → Keep tests green |
+| **e2e-test.md** | E2E testing | Navigate → Interact → Capture → Verify |
+| **complete-translation.md** | Translation management | Check 4 languages → Add keys → Verify |
+| **ui.md** | UI component work | Neo-Brutalist → Hard shadows → RTL check |
+
+**Usage**: Commands are workflow guides. Read the command file in `.verdent/commands/` and follow the process steps using Verdent's available tools.
+
+### Specialized Agents
+
+Expert guidance in `.verdent/agents/`:
+
+- **ultrathink-debugger.md** - Complex debugging, root cause analysis
+- **react-wizard.md** - React 19 patterns, hooks, performance
+- **code-quality-pragmatist.md** - DRY, SOLID, anti-slop enforcement
+- **next-js-architect.md** - Next.js 16 best practices
+- **tailwind-master.md** - Neo-Brutalist design system
+- **supabase-master.md** - Database and backend expertise
+- **game-designer.md** - Game mechanics and UX
+
+**Usage**: Consult agent files when you need expert guidance in their specialty area. Each agent provides philosophy, best practices, and LexiClash-specific patterns.
+
+### Reusable Skills
+
+Skill modules in `.verdent/skills/`:
+
+- **commit-push/** - Autonomous verification and commit workflow
+- **senior-qa/** - Test generation and coverage analysis
+- **ux-writer/** - Translation management and consistency
+- **contrast-fixer/** - WCAG accessibility compliance
+
+**Usage**: Skills provide reusable workflows for common tasks with step-by-step processes.
+
+### Verdent Tools Available
+
+When working with Verdent, you have access to:
+
+- **File operations**: `file_read`, `file_edit`, `file_write`
+- **Search**: `glob`, `grep_content`, `grep_file`
+- **Execution**: `bash`, `spawn_subagent`
+- **Interaction**: `clarification_tool`, `todo_update`
+- **Web**: `web_search`, `web_fetch`
+
+**Subagent types**:
+- `verifier` - Code verification (lint, type-check, tests)
+- `general` - Multi-step tasks, research
+- `code-reviewer` - Pre-commit code review
+- `file-navigator` - Fast codebase exploration
+
+### Integration with Project Standards
+
+All Verdent commands and workflows are designed to:
+- Enforce `.verdent/claude.md` coding standards
+- Respect translation-first development (4 languages)
+- Follow Neo-Brutalist design system
+- Maintain type safety (no `any` types)
+- Ensure modular file structure (<500 lines)
+- Require mandatory testing
+- Apply DRY and SOLID principles
+
+### Example Workflow
+
+**Implementing a new feature:**
+1. Read `.verdent/commands/feature.md`
+2. Follow the workflow steps
+3. Use `spawn_subagent` with `file-navigator` to find similar patterns
+4. Use `clarification_tool` for ambiguous requirements
+5. Present plan, wait for approval
+6. Write tests first
+7. Implement following `.verdent/agents/react-wizard.md` guidance
+8. Verify with `.verdent/agents/code-quality-pragmatist.md` standards
+9. Run full verification suite
+
+**Debugging a complex issue:**
+1. Read `.verdent/commands/investigate.md`
+2. Apply `.verdent/agents/ultrathink-debugger.md` methodology
+3. Map execution flow systematically
+4. Build evidence-based hypothesis
+5. Present investigation report
+6. Wait for approval before fixes
+
+### Getting Started
+
+New to the Verdent system? Start here:
+1. Read `.verdent/README.md` for complete overview
+2. Check `.verdent/QUICK_REFERENCE.md` for quick commands
+3. Review `.verdent/config.json` for available tools
+4. Choose a command based on your task
+5. Follow the workflow using Verdent tools
+6. Consult agents for specialized guidance
+
+---
+
+**Last Updated**: 2026-01-13
 **Primary Reference**: Always read `fe-next/CLAUDE.md` before making changes - it contains detailed coding standards and design system specifications.
+**Verdent System**: See `.verdent/README.md` for command workflows and agent guidance.

@@ -5,7 +5,7 @@
  */
 
 import { VertexAI } from '@google-cloud/vertexai';
-import { getTrendsFromDbCache } from './serpApiClient';
+import { getTrendsFromDbCache, fetchGoogleTrends } from './serpApiClient';
 import {
   generateChallengeImage,
   checkImageCache,
@@ -74,14 +74,27 @@ export async function generateDailyBuzz(
 
   const region = REGION_MAP[language] || 'US';
 
-  // Step 1: Get trending topics (from DB cache or passed in)
+  // Step 1: Get trending topics (from passed in, DB cache, or fresh fetch)
   let trends = cachedTrends;
 
   if (!trends) {
+    // Try DB cache first
     trends = (await getTrendsFromDbCache(region, date)) ?? undefined;
+
+    // If no cache, fetch fresh from SERP API
     if (!trends || trends.length === 0) {
-      console.error('[BUZZ] No cached trends available');
-      throw new Error('No trending topics available for this date');
+      console.log('[BUZZ] No cached trends, fetching fresh from SERP API...');
+      try {
+        trends = await fetchGoogleTrends(region, language);
+        if (!trends || trends.length === 0) {
+          console.error('[BUZZ] No trends returned from SERP API');
+          throw new Error('No trending topics available for this date');
+        }
+        console.log(`[BUZZ] Fetched ${trends.length} fresh trends from SERP API`);
+      } catch (error: any) {
+        console.error('[BUZZ] Failed to fetch trends from SERP API:', error.message);
+        throw new Error('No trending topics available for this date');
+      }
     }
   }
 
@@ -159,7 +172,7 @@ export async function generateDailyBuzz(
 /**
  * Filter trending topics for family-friendly, word-game-suitable content
  */
-function filterTrends(trends: TrendingTopic[], language: string): TrendingTopic[] {
+function filterTrends(trends: TrendingTopic[], _language: string): TrendingTopic[] {
   // NSFW keywords to filter out (add more as needed)
   const bannedKeywords = [
     'porn',
