@@ -203,7 +203,7 @@ export default function BrainScoreHero({
         {/* Progress Bar - more visible with dynamic colors */}
         <div className={cn(
           'h-4 rounded-full border-2 border-neo-black overflow-hidden',
-          isDarkMode ? 'bg-slate-700' : 'bg-gray-300'
+          isDarkMode ? 'bg-slate-900' : 'bg-gray-300'
         )}>
           <motion.div
             className={cn('h-full', progressBarGradient)}

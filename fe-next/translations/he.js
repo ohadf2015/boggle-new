@@ -1561,6 +1561,11 @@ const he = {
       "funnyMessages": {
         "dontLeaveHanging": "היי! אל תשאיר אותי כך! הירשם ובוא נטפס יחד בטבלת המובילים!"
       }
+    },
+    "callback": {
+      "completingSignIn": "משלים התחברות...",
+      "takingTooLong": "זה לוקח יותר זמן מהצפוי. לנסות שוב?",
+      "tryAgain": "נסה שוב"
     }
   },
   "legal": {

@@ -1555,6 +1555,11 @@ const en = {
       "funnyMessages": {
         "dontLeaveHanging": "Hey! Don't leave me hanging! Sign up and let's climb that leaderboard together!"
       }
+    },
+    "callback": {
+      "completingSignIn": "Completing sign in...",
+      "takingTooLong": "This is taking longer than expected. Try again?",
+      "tryAgain": "Try Again"
     }
   },
   "legal": {

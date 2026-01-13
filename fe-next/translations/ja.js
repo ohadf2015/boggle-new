@@ -1552,6 +1552,11 @@ const ja = {
       "funnyMessages": {
         "dontLeaveHanging": "ねえ！置いていかないで！登録して一緒にリーダーボードを登ろう！"
       }
+    },
+    "callback": {
+      "completingSignIn": "サインイン中...",
+      "takingTooLong": "予想より時間がかかっています。もう一度試しますか？",
+      "tryAgain": "もう一度試す"
     }
   },
   "profile": {

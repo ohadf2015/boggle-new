@@ -1552,6 +1552,11 @@ const sv = {
       "funnyMessages": {
         "dontLeaveHanging": "Hej! Lämna mig inte hängande! Registrera dig så klättrar vi på topplistan tillsammans!"
       }
+    },
+    "callback": {
+      "completingSignIn": "Slutför inloggning...",
+      "takingTooLong": "Det tar längre tid än väntat. Försök igen?",
+      "tryAgain": "Försök igen"
     }
   },
   "profile": {

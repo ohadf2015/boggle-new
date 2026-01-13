@@ -78,7 +78,7 @@ describe('BrainTrainingPage - Loading States', () => {
   });
 
   describe('Auth Loading State', () => {
-    it('should show loading skeleton while auth is validating (auth loading)', () => {
+    it('should show PageLoader while auth is validating (auth loading)', () => {
       // Auth is still loading
       mockUseAuth.mockReturnValue({
         user: null,
@@ -111,20 +111,15 @@ describe('BrainTrainingPage - Loading States', () => {
 
       render(<BrainTrainingPage />, { wrapper: AllTheProviders });
 
-      // Should show loading skeleton, NOT the "Sign in" message
-      const loadingElements = screen.getAllByRole('generic');
-      const hasLoadingSkeleton = loadingElements.some(el =>
-        el.className.includes('animate-pulse')
-      );
-
-      expect(hasLoadingSkeleton).toBe(true);
+      // Should show PageLoader, NOT the "Sign in" message
+      expect(screen.getByTestId('page-loader')).toBeInTheDocument();
 
       // Should NOT show "Sign in to see your progress" message
       expect(screen.queryByText('brain.guestView.title')).not.toBeInTheDocument();
       expect(screen.queryByText('common.signIn')).not.toBeInTheDocument();
     });
 
-    it('should show loading skeleton while brain score is loading', () => {
+    it('should show PageLoader while brain score is loading', () => {
       // Auth is done loading, user is authenticated
       mockUseAuth.mockReturnValue({
         user: { id: 'user-1' } as any,
@@ -157,13 +152,8 @@ describe('BrainTrainingPage - Loading States', () => {
 
       render(<BrainTrainingPage />, { wrapper: AllTheProviders });
 
-      // Should show loading skeleton
-      const loadingElements = screen.getAllByRole('generic');
-      const hasLoadingSkeleton = loadingElements.some(el =>
-        el.className.includes('animate-pulse')
-      );
-
-      expect(hasLoadingSkeleton).toBe(true);
+      // Should show PageLoader
+      expect(screen.getByTestId('page-loader')).toBeInTheDocument();
     });
 
     it('should show "Sign in" message only after auth is done loading and user is not authenticated', async () => {

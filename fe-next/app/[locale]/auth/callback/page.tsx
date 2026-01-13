@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, Suspense, useCallback } from 'react';
+import { useEffect, useRef, Suspense, useCallback, useState } from 'react';
 import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
@@ -17,19 +17,92 @@ import {
   type AuthSyncMessage,
 } from '@/utils/crossTabAuthSync';
 import { NeoLoader } from '@/components/ui/NeoLoader';
+import { useLanguage } from '@/contexts/LanguageContext';
+import Cookies from 'js-cookie';
 
-// Loading UI component
-function LoadingUI(): React.ReactNode {
+// Timeout constants
+const CODE_EXCHANGE_TIMEOUT = 15000; // 15 seconds timeout for code exchange
+const RETRY_TIMEOUT_SECONDS = 6; // Show retry button after 6 seconds
+
+/**
+ * Clears all Supabase auth-related cookies and storage from the browser.
+ * This allows the user to start fresh with a new sign-in attempt.
+ */
+function clearSupabaseAuthData(): void {
+  // Clear all cookies that start with 'sb-' (Supabase auth cookies)
+  const allCookies = Cookies.get();
+  Object.keys(allCookies).forEach((cookieName) => {
+    if (cookieName.startsWith('sb-')) {
+      Cookies.remove(cookieName, { path: '/' });
+      // Also try removing with domain variations
+      Cookies.remove(cookieName);
+    }
+  });
+
+  // Clear Supabase-related items from localStorage and sessionStorage
+  if (typeof window !== 'undefined') {
+    const storageKeys = Object.keys(localStorage);
+    storageKeys.forEach((key) => {
+      if (key.startsWith('sb-') || key.includes('supabase')) {
+        localStorage.removeItem(key);
+      }
+    });
+
+    const sessionKeys = Object.keys(sessionStorage);
+    sessionKeys.forEach((key) => {
+      if (key.startsWith('sb-') || key.includes('supabase')) {
+        sessionStorage.removeItem(key);
+      }
+    });
+  }
+
+  logger.log('Auth callback: Cleared Supabase auth data from browser');
+}
+
+interface LoadingUIProps {
+  secondsRemaining: number;
+  showRetry: boolean;
+  onRetry: () => void;
+  locale: string;
+}
+
+// Loading UI component with countdown and retry
+function LoadingUI({ secondsRemaining, showRetry, onRetry, locale }: LoadingUIProps): React.ReactNode {
+  const { t } = useLanguage();
+  const isRtl = locale === 'he';
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neo-navy">
-      <NeoLoader variant="mascot-letters" size="lg" text="Completing sign in..." />
+    <div className="min-h-screen flex items-center justify-center bg-neo-navy" dir={isRtl ? 'rtl' : 'ltr'}>
+      <div className="flex flex-col items-center gap-6">
+        <NeoLoader variant="mascot-letters" size="lg" text={t('auth.callback.completingSignIn')} />
+
+        {!showRetry && secondsRemaining > 0 && (
+          <p className="text-neo-white/60 text-sm">
+            {secondsRemaining}...
+          </p>
+        )}
+
+        {showRetry && (
+          <div className="flex flex-col items-center gap-3 animate-neo-pop">
+            <p className="text-neo-white/80 text-sm text-center max-w-xs">
+              {t('auth.callback.takingTooLong')}
+            </p>
+            <button
+              onClick={onRetry}
+              className="px-6 py-3 bg-neo-orange text-neo-white font-neo-display font-bold
+                         rounded-neo border-neo-thick border-black shadow-hard
+                         hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px]
+                         active:shadow-none active:translate-x-[4px] active:translate-y-[4px]
+                         transition-all duration-150"
+            >
+              {t('auth.callback.tryAgain')}
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
-
-// Timeout for code exchange
-const CODE_EXCHANGE_TIMEOUT = 15000; // 15 seconds timeout for code exchange
-const MAX_CALLBACK_TIMEOUT = 30000; // 30 seconds max total time on callback page
 
 // Helper to wrap a promise with a timeout
 function withTimeout<T>(promise: Promise<T>, ms: number, errorMessage: string): Promise<T> {
@@ -49,6 +122,36 @@ function AuthCallbackContent(): React.ReactNode {
 
   // Get locale from URL params, fallback to default
   const locale = (params?.locale as string) || defaultLocale;
+
+  // State for countdown timer and retry button
+  const [secondsRemaining, setSecondsRemaining] = useState(RETRY_TIMEOUT_SECONDS);
+  const [showRetry, setShowRetry] = useState(false);
+
+  // Countdown timer effect
+  useEffect(() => {
+    const countdownInterval = setInterval(() => {
+      setSecondsRemaining((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdownInterval);
+          setShowRetry(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    cleanupFunctions.current.push(() => clearInterval(countdownInterval));
+
+    return () => clearInterval(countdownInterval);
+  }, []);
+
+  // Handle retry - clear cookies and redirect to sign-in
+  const handleRetry = useCallback(() => {
+    clearSupabaseAuthData();
+    // Clear URL params and redirect to home with auth error
+    window.history.replaceState(null, '', window.location.pathname);
+    router.replace(`/${locale}?auth_error=true&reason=timeout`);
+  }, [router, locale]);
 
   // Helper to get redirect URL
   const getRedirectUrl = useCallback(() => {
@@ -159,28 +262,8 @@ function AuthCallbackContent(): React.ReactNode {
     // Initialize cross-tab sync
     initCrossTabAuthSync();
 
-    // Global safety timeout - ensures we never stay stuck on callback page
-    const safetyTimeout = setTimeout(async () => {
-      if (hasNavigated.current) return;
-      logger.warn('Auth callback: Global safety timeout reached, attempting recovery');
-
-      // Try one final session check before giving up
-      if (supabase) {
-        const { data } = await supabase.auth.getSession();
-        if (data?.session) {
-          logger.log('Auth callback: Session found in safety timeout, redirecting');
-          safeRedirect(getRedirectUrl());
-          return;
-        }
-      }
-
-      // No session found, redirect with error
-      logger.error('Auth callback: Safety timeout reached with no session');
-      safeRedirect(`/${locale}?auth_error=true&reason=timeout`);
-    }, MAX_CALLBACK_TIMEOUT);
-
-    // Store cleanup for safety timeout
-    cleanupFunctions.current.push(() => clearTimeout(safetyTimeout));
+    // Note: User-facing retry button handles timeout instead of automatic redirect.
+    // After RETRY_TIMEOUT_SECONDS, user sees "Try Again" button to manually retry.
 
     const handleCallback = async (): Promise<void> => {
       const next = getRedirectUrl();
@@ -385,13 +468,29 @@ function AuthCallbackContent(): React.ReactNode {
     };
   }, [router, searchParams, locale, getRedirectUrl, safeRedirect, waitForSessionFromOtherTab]);
 
-  return <LoadingUI />;
+  return (
+    <LoadingUI
+      secondsRemaining={secondsRemaining}
+      showRetry={showRetry}
+      onRetry={handleRetry}
+      locale={locale}
+    />
+  );
+}
+
+// Simple fallback for Suspense - no retry logic needed during initial load
+function SuspenseFallback(): React.ReactNode {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-neo-navy">
+      <NeoLoader variant="mascot-letters" size="lg" text="Loading..." />
+    </div>
+  );
 }
 
 // Main export with Suspense boundary - required for useSearchParams in Next.js App Router
 export default function AuthCallbackPage(): React.ReactNode {
   return (
-    <Suspense fallback={<LoadingUI />}>
+    <Suspense fallback={<SuspenseFallback />}>
       <AuthCallbackContent />
     </Suspense>
   );

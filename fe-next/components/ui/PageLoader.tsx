@@ -36,7 +36,7 @@ export const PageLoader = memo(function PageLoader({
   mascotVariant = 'thinking',
 }: PageLoaderProps) {
   return (
-    <div className="screen-fit flex items-center justify-center bg-neo-navy">
+    <div className="screen-fit flex items-center justify-center bg-neo-navy" data-testid="page-loader">
       <NeoLoader
         variant={variant}
         size={size}
