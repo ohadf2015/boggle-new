@@ -849,8 +849,10 @@ const he = {
     "title": "ההישגים שלך"
   },
   "achievement": {
-    "dailyDouble": "דאבל יומי 🏆",
-    "dailyDouble.desc": "השלמתם את שני האתגרים היומיים!"
+    "dailyDouble": {
+      "name": "דאבל יומי 🏆",
+      "desc": "השלמתם את שני האתגרים היומיים!"
+    }
   },
   "chat": {
     "title": "צ'אט החדר",
@@ -966,7 +968,25 @@ const he = {
     "stable": "יציב"
   },
   "archetypes": {
-    "hint": "לפי סגנון המשחק שלך 🎮"
+    "hint": "לפי סגנון המשחק שלך 🎮",
+    "strategist": "האסטרטג",
+    "strategistDesc": "מהלכים מחושבים, השפעה מקסימלית",
+    "speedster": "המהיר",
+    "speedsterDesc": "רפלקסים מהירים כברק",
+    "scholar": "המלומד",
+    "scholarDesc": "שולט באוצר מילים מורכב",
+    "explorer": "החוקר",
+    "explorerDesc": "מוצא מה שאחרים מפספסים",
+    "perfectionist": "הפרפקציוניסט",
+    "perfectionistDesc": "כל מילה חשובה",
+    "maverick": "הייחודי",
+    "maverickDesc": "נועז ולא שגרתי",
+    "workhorse": "העמלן",
+    "workhorseDesc": "בלתי נלאה ובלתי נעצר",
+    "closer": "המסיים",
+    "closerDesc": "פורח תחת לחץ",
+    "trailblazer": "הפורץ דרך",
+    "trailblazerDesc": "שואף לניצחונות גדולים"
   },
   "scorePage": {
     "pts": "נק׳"
@@ -1485,6 +1505,11 @@ const he = {
       "title": "מזל טוב על הניצחון הראשון!",
       "subtitle": "יש לך כישרון! צור חשבון כדי להמשיך את רצף הניצחונות.",
       "benefitsTitle": "הירשם כדי לקבל:",
+      "benefits": {
+        "trackProgress": "עקוב אחר ההתקדמות שלך",
+        "leaderboard": "התחרה בטבלאות המובילים",
+        "playWithFriends": "שחק עם חברים"
+      },
       "maybeLater": "אולי אחר כך",
       "statsTeaser": "{games} משחקים • {score} נק' מחכים להישמר!"
     },
@@ -2232,13 +2257,14 @@ const he = {
     "chooseChallengeHint": "בחרו את האתגר להיום. השלימו את שניהם לבונוס XP! 🎯",
     "play": "שחקו עכשיו",
     "viewResults": "צפו בתוצאות",
-    "wordHunt": "ציד מילים",
-    "wordHunt.title": "ציד מילים 🎯",
-    "wordHunt.subtitle": "מצב הישרדות",
-    "wordHunt.desc": "חפשו מילים בלחץ זמן. כמה תספיקו עד שהזמן נגמר?",
-    "wordHunt.feature1": "90 שניות",
-    "wordHunt.feature2": "מערכת קומבו",
-    "wordHunt.feature3": "דירוג עולמי"
+"wordHunt": {
+      "title": "ציד מילים",
+      "subtitle": "מצב הישרדות",
+      "desc": "חפשו מילים בלחץ זמן. כמה תספיקו עד שהזמן נגמר?",
+      "feature1": "90 שניות",
+      "feature2": "מערכת קומבו",
+      "feature3": "דירוג עולמי"
+    }
   },
   "buzz": {
     "title": "באזז יומי",
@@ -2289,10 +2315,12 @@ const he = {
     "share": {
       "text": "באזז יומי: {topic} | {score}/100 | תנסה לנצח 🔥"
     },
-    "error": "אופס!",
-    "error.loading": "טוען את הבאזז של היום...",
-    "error.failed": "לא הצלחנו לטעון. לנסות שוב?",
-    "error.noInternet": "אין חיבור. בדקו את האינטרנט.",
+    "error": {
+      "title": "אופס!",
+      "loading": "טוען את הבאזז של היום...",
+      "failed": "לא הצלחנו לטעון. לנסות שוב?",
+      "noInternet": "אין חיבור. בדקו את האינטרנט."
+    },
     "alreadyPlayed": "כבר שיחקת היום! חזרו מחר.",
     "badge": "חדש 🔥",
     "betaPreview": "גרסת ביתא ✨",

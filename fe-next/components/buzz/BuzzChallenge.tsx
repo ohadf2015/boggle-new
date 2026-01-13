@@ -170,7 +170,7 @@ export default function BuzzChallenge({ language, onBack }: BuzzChallengeProps) 
             <div className="text-center space-y-4 max-w-md">
               <div className="text-6xl">😞</div>
               <h2 className="text-2xl font-black text-neo-red">
-                {t('buzz.error') || 'Oops!'}
+                {t('buzz.error.title') || 'Oops!'}
               </h2>
               <p className="text-slate-400">{errorMessage}</p>
               <button

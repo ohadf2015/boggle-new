@@ -2,24 +2,28 @@
   "summary": {
     "totalKeysInCode": 2147,
     "keyCountByLanguage": {
-      "en": 2348,
-      "he": 2348,
-      "sv": 2348,
-      "ja": 2348,
-      "es": 2345
+      "en": 2368,
+      "he": 2368,
+      "sv": 2368,
+      "ja": 2368,
+      "es": 2368
     },
-    "missingFromEnglish": 0
+    "missingFromEnglish": 0,
+    "problematicFlatKeys": 0
+  },
+  "problematicFlatKeys": {
+    "en": [],
+    "he": [],
+    "sv": [],
+    "ja": [],
+    "es": []
   },
   "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [],
     "sv": [],
     "ja": [],
-    "es": [
-      "auth.callback.completingSignIn",
-      "auth.callback.takingTooLong",
-      "auth.callback.tryAgain"
-    ]
+    "es": []
   },
   "keysNotInEnglish": {
     "he": [],

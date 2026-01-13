@@ -843,8 +843,10 @@ const en = {
     "title": "Your Achievements"
   },
   "achievement": {
-    "dailyDouble": "🏆 DAILY DOUBLE",
-    "dailyDouble.desc": "Completed both daily challenges!"
+    "dailyDouble": {
+      "name": "🏆 DAILY DOUBLE",
+      "desc": "Completed both daily challenges!"
+    }
   },
   "chat": {
     "title": "Room Chat",
@@ -960,7 +962,25 @@ const en = {
     "stable": "Stable"
   },
   "archetypes": {
-    "hint": "Based on your play style"
+    "hint": "Based on your play style",
+    "strategist": "The Strategist",
+    "strategistDesc": "Calculated moves, maximum impact",
+    "speedster": "The Speedster",
+    "speedsterDesc": "Lightning fast reflexes",
+    "scholar": "The Scholar",
+    "scholarDesc": "Master of complex vocabulary",
+    "explorer": "The Explorer",
+    "explorerDesc": "Finds what others miss",
+    "perfectionist": "The Perfectionist",
+    "perfectionistDesc": "Every word counts",
+    "maverick": "The Maverick",
+    "maverickDesc": "Bold and unconventional",
+    "workhorse": "The Workhorse",
+    "workhorseDesc": "Relentless and tireless",
+    "closer": "The Closer",
+    "closerDesc": "Thrives under pressure",
+    "trailblazer": "The Trailblazer",
+    "trailblazerDesc": "Goes for the big wins"
   },
   "scorePage": {
     "pts": "pts"
@@ -1479,6 +1499,11 @@ const en = {
       "title": "First Victory! 🎉",
       "subtitle": "You've got game! Sign up to keep winning.",
       "benefitsTitle": "Unlock:",
+      "benefits": {
+        "trackProgress": "Track your progress",
+        "leaderboard": "Compete on leaderboards",
+        "playWithFriends": "Play with friends"
+      },
       "maybeLater": "Later",
       "statsTeaser": "{games} games • {score} pts waiting to be saved!"
     },
@@ -2226,13 +2251,14 @@ const en = {
       "skipToDaily": "Skip, I'll figure it out",
       "redirecting": "Heading to Daily Challenge..."
     },
-    "wordHunt": "Word Hunt",
-    "wordHunt.title": "Word Hunt",
-    "wordHunt.subtitle": "Survival Mode",
-    "wordHunt.desc": "Find words. Stay alive.",
-    "wordHunt.feature1": "90 seconds",
-    "wordHunt.feature2": "Combo system",
-    "wordHunt.feature3": "Global leaderboard"
+"wordHunt": {
+      "title": "Word Hunt",
+      "subtitle": "Survival Mode",
+      "desc": "Find words. Stay alive.",
+      "feature1": "90 seconds",
+      "feature2": "Combo system",
+      "feature3": "Global leaderboard"
+    }
   },
   "buzz": {
     "title": "Daily Buzz",
@@ -2301,10 +2327,12 @@ const en = {
     "share": {
       "text": "Daily Buzz: {topic} | {score}/100 | Beat this? 🔥"
     },
-    "error": "Oops!",
-    "error.loading": "Loading today's buzz...",
-    "error.failed": "Couldn't load buzz. Try again?",
-    "error.noInternet": "No connection. Check your internet.",
+    "error": {
+      "title": "Oops!",
+      "loading": "Loading today's buzz...",
+      "failed": "Couldn't load buzz. Try again?",
+      "noInternet": "No connection. Check your internet."
+    },
     "alreadyPlayed": "Already played today! Come back tomorrow."
   },
   "wordHunt": {

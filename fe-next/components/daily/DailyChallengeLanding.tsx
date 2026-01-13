@@ -92,7 +92,7 @@ export function DailyChallengeLanding({
         <CompactChallengeCard
           mascotSrc="/mascot/lexi-word-hunt.png"
           mascotAlt="Lexi running with stopwatch"
-          title={t('daily.wordHunt')}
+          title={t('daily.wordHunt.title')}
           subtitle={t('daily.wordHunt.subtitle')}
           tagline={t('daily.wordHunt.desc')}
           color="orange"
@@ -145,7 +145,7 @@ export function DailyChallengeLanding({
           <div className="flex items-center gap-2">
             <Trophy className="w-5 h-5 text-neo-lime" />
             <span className="font-black text-neo-lime text-sm">
-              {t('achievement.dailyDouble')}
+              {t('achievement.dailyDouble.name')}
             </span>
           </div>
         </motion.div>

@@ -242,7 +242,7 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
   if (loading && !data) {
     return (
       <div className="flex items-center justify-center h-48">
-        <NeoLoader variant="letters" size="md" />
+        <NeoLoader variant="mascot-letters" size="md" />
       </div>
     );
   }

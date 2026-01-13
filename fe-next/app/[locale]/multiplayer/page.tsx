@@ -76,7 +76,7 @@ function ViewLoadingSkeleton() {
     <div className="min-h-[60vh] flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative overflow-hidden">
       <PlayfulBackground intensity="medium" colorScheme="game" />
       <div className="relative z-10">
-        <NeoLoader variant="letters" size="md" text="Loading game..." />
+        <NeoLoader variant="mascot-letters" size="md" text="Loading game..." />
       </div>
     </div>
   );

@@ -237,7 +237,7 @@ export default function WebVitalsPage() {
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-neo-navy">
-        <NeoLoader variant="letters" size="lg" text="Loading Web Vitals..." />
+        <NeoLoader variant="mascot-letters" size="lg" text="Loading Web Vitals..." />
       </div>
     );
   }

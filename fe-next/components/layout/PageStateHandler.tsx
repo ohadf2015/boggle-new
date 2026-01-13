@@ -79,7 +79,7 @@ export function PageStateHandler({
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <NeoLoader
-          variant="letters"
+          variant="mascot-letters"
           size="md"
           text={loadingText || t('common.loading') || 'Loading...'}
         />

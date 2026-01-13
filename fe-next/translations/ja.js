@@ -840,8 +840,10 @@ const ja = {
     "title": "あなたの実績"
   },
   "achievement": {
-    "dailyDouble": "🏆 デイリーダブル",
-    "dailyDouble.desc": "両方のデイリーチャレンジをクリア！"
+    "dailyDouble": {
+      "name": "🏆 デイリーダブル",
+      "desc": "両方のデイリーチャレンジをクリア！"
+    }
   },
   "chat": {
     "title": "ルームチャット",
@@ -957,7 +959,25 @@ const ja = {
     "stable": "安定"
   },
   "archetypes": {
-    "hint": "あなたのプレイスタイルに基づく"
+    "hint": "あなたのプレイスタイルに基づく",
+    "strategist": "戦略家",
+    "strategistDesc": "計算された動き、最大の効果",
+    "speedster": "スピードスター",
+    "speedsterDesc": "電光石火の反射神経",
+    "scholar": "学者",
+    "scholarDesc": "複雑な語彙のマスター",
+    "explorer": "探検家",
+    "explorerDesc": "他の人が見逃すものを見つける",
+    "perfectionist": "完璧主義者",
+    "perfectionistDesc": "すべての単語が重要",
+    "maverick": "異端児",
+    "maverickDesc": "大胆で型破り",
+    "workhorse": "働き者",
+    "workhorseDesc": "粘り強く不屈",
+    "closer": "クローザー",
+    "closerDesc": "プレッシャーの中で輝く",
+    "trailblazer": "先駆者",
+    "trailblazerDesc": "大きな勝利を目指す"
   },
   "scorePage": {
     "pts": "pts"
@@ -1476,6 +1496,11 @@ const ja = {
       "title": "初勝利おめでとうございます!",
       "subtitle": "才能がありますね!アカウントを作成して連勝を続けましょう。",
       "benefitsTitle": "登録して以下をアンロック:",
+      "benefits": {
+        "trackProgress": "進捗を追跡",
+        "leaderboard": "ランキングで競争",
+        "playWithFriends": "友達と遊ぶ"
+      },
       "maybeLater": "また今度",
       "statsTeaser": "{games}ゲーム・{score}点を保存しよう！"
     },
@@ -2090,13 +2115,14 @@ const ja = {
     "chooseChallengeHint": "挑戦を選んで！両方クリアでボーナスXP獲得！",
     "play": "プレイ",
     "viewResults": "結果を見る",
-    "wordHunt": "ワードハント",
-    "wordHunt.title": "ワードハント",
-    "wordHunt.subtitle": "サバイバルモード",
-    "wordHunt.desc": "時間との勝負！制限時間内にできるだけ多くの単語を見つけよう！",
-    "wordHunt.feature1": "90秒",
-    "wordHunt.feature2": "コンボシステム",
-    "wordHunt.feature3": "グローバルランキング",
+"wordHunt": {
+      "title": "ワードハント",
+      "subtitle": "サバイバルモード",
+      "desc": "時間との勝負！制限時間内にできるだけ多くの単語を見つけよう！",
+      "feature1": "90秒",
+      "feature2": "コンボシステム",
+      "feature3": "グローバルランキング"
+    },
     "badge": "デイリーチャレンジ",
     "puzzleNumber": "デイリー #{number}",
     "playButton": "今日のパズルをプレイ",
@@ -2249,7 +2275,12 @@ const ja = {
     "viewResults": "結果を見る",
     "helpText": "今日のトレンドで言葉パズル。時間制限なし！",
     "loading": "チャレンジ読み込み中...",
-    "error": "エラー！",
+    "error": {
+      "title": "エラー！",
+      "loading": "今日のバズを読み込み中...",
+      "failed": "読み込めませんでした。もう一度試しますか？",
+      "noInternet": "接続がありません。インターネット接続を確認してください。"
+    },
     "topicIs": "今日のトピック",
     "yourAnswer": "あなたの答え",
     "yourScore": "あなたのスコア",
@@ -2299,9 +2330,6 @@ const ja = {
     "share": {
       "text": "デイリーバズ: {topic} | {score}/100 | 挑戦する？🔥"
     },
-    "error.loading": "今日のバズを読み込み中...",
-    "error.failed": "読み込めませんでした。もう一度試しますか？",
-    "error.noInternet": "接続がありません。インターネット接続を確認してください。",
     "alreadyPlayed": "今日はもうプレイしました！明日また来てください。"
   },
   "wordHunt": {

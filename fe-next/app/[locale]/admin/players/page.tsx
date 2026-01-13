@@ -62,7 +62,7 @@ export default function PlayersPage() {
   if (authLoading || isProfileLoading || !authToken) {
     return (
       <div className="min-h-screen bg-neo-navy text-neo-white flex items-center justify-center">
-        <NeoLoader variant="letters" size="lg" text="Loading..." />
+        <NeoLoader variant="mascot-letters" size="lg" text="Loading..." />
       </div>
     );
   }

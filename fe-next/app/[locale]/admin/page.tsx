@@ -75,7 +75,7 @@ export default function AdminPage() {
   if (authLoading || isProfileLoading || !authToken) {
     return (
       <div className="min-h-screen bg-neo-navy text-neo-white flex items-center justify-center">
-        <NeoLoader variant="letters" size="lg" text={t('common.loading') || 'Loading...'} />
+        <NeoLoader variant="mascot-letters" size="lg" text={t('common.loading') || 'Loading...'} />
       </div>
     );
   }

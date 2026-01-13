@@ -840,8 +840,10 @@ const sv = {
     "title": "Dina prestationer"
   },
   "achievement": {
-    "dailyDouble": "🏆 DUBBELDAGLIG",
-    "dailyDouble.desc": "Klarade båda dagens utmaningar!"
+    "dailyDouble": {
+      "name": "🏆 DUBBELDAGLIG",
+      "desc": "Klarade båda dagens utmaningar!"
+    }
   },
   "chat": {
     "title": "Rumschatt",
@@ -957,7 +959,25 @@ const sv = {
     "stable": "Stabil"
   },
   "archetypes": {
-    "hint": "Baserat på din spelstil"
+    "hint": "Baserat på din spelstil",
+    "strategist": "Strategen",
+    "strategistDesc": "Beräknade drag, maximal effekt",
+    "speedster": "Snabbingen",
+    "speedsterDesc": "Blixtsnabba reflexer",
+    "scholar": "Akademikern",
+    "scholarDesc": "Mästare på komplexa ord",
+    "explorer": "Utforskaren",
+    "explorerDesc": "Hittar det andra missar",
+    "perfectionist": "Perfektionisten",
+    "perfectionistDesc": "Varje ord räknas",
+    "maverick": "Individualisten",
+    "maverickDesc": "Djärv och okonventionell",
+    "workhorse": "Arbetshästen",
+    "workhorseDesc": "Outtröttlig och ihärdig",
+    "closer": "Avslutaren",
+    "closerDesc": "Blomstrar under press",
+    "trailblazer": "Banbrytaren",
+    "trailblazerDesc": "Siktar på stora vinster"
   },
   "scorePage": {
     "pts": "poäng"
@@ -1476,6 +1496,11 @@ const sv = {
       "title": "Grattis till din första vinst!",
       "subtitle": "Du har talang! Skapa ett konto för att fortsätta din vinstsvit.",
       "benefitsTitle": "Registrera dig för att låsa upp:",
+      "benefits": {
+        "trackProgress": "Följ din framsteg",
+        "leaderboard": "Tävla på topplistor",
+        "playWithFriends": "Spela med vänner"
+      },
       "maybeLater": "Kanske senare",
       "statsTeaser": "{games} spel • {score} poäng väntar på att sparas!"
     },
@@ -2097,13 +2122,14 @@ const sv = {
     "chooseChallengeHint": "Välj din utmaning för idag. Klara båda för bonusXP!",
     "play": "SPELA NU",
     "viewResults": "VISA RESULTAT",
-    "wordHunt": "Ordjakt",
-    "wordHunt.title": "Ordjakt",
-    "wordHunt.subtitle": "Överlevnadsläge",
-    "wordHunt.desc": "Snabb ordjakt mot klockan. Hitta så många ord du kan innan tiden rinner ut!",
-    "wordHunt.feature1": "90 sekunder",
-    "wordHunt.feature2": "Kombosystem",
-    "wordHunt.feature3": "Global topplista",
+"wordHunt": {
+      "title": "Ordjakt",
+      "subtitle": "Överlevnadsläge",
+      "desc": "Snabb ordjakt mot klockan. Hitta så många ord du kan innan tiden rinner ut!",
+      "feature1": "90 sekunder",
+      "feature2": "Kombosystem",
+      "feature3": "Global topplista"
+    },
     "quitConfirm": "Är du säker på att du vill avsluta? Dina framsteg går förlorade och du kommer inte kunna spela dagens pussel igen.",
     "quitConfirmTitle": "Avsluta utmaning?",
     "imSure": "Jag är säker",
@@ -2239,7 +2265,12 @@ const sv = {
     "betaPreview": "✨ BETA",
     "challenges": "Utmaningar",
     "connectingWord": "KOPPLINGSORDET",
-    "error": "Ajdå!",
+    "error": {
+      "title": "Ajdå!",
+      "loading": "Laddar dagens buzz...",
+      "failed": "Kunde inte ladda. Försök igen?",
+      "noInternet": "Ingen anslutning. Kolla din internetanslutning."
+    },
     "fillTheBlank": "Fyll i luckan",
     "finish": "KLART",
     "helpText": "Lös ordutmaningar från dagens trender. Ingen tidsgräns!",
@@ -2299,9 +2330,6 @@ const sv = {
     "share": {
       "text": "Daily Buzz: {topic} | {score}/100 | Klarar du det? 🔥"
     },
-    "error.loading": "Laddar dagens buzz...",
-    "error.failed": "Kunde inte ladda. Försök igen?",
-    "error.noInternet": "Ingen anslutning. Kolla din internetanslutning.",
     "alreadyPlayed": "Redan spelat idag! Kom tillbaka imorgon."
   },
   "wordHunt": {

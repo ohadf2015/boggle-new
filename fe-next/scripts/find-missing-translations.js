@@ -41,6 +41,38 @@ function extractTranslationKeys(obj, prefix = '') {
   return keys;
 }
 
+/**
+ * Detect keys that contain dots - these won't work with the t() function
+ * which splits by '.' and traverses nested objects.
+ *
+ * Example: { daily: { "wordHunt.subtitle": "value" } }
+ * - Script extracts as: "daily.wordHunt.subtitle" (looks correct)
+ * - Runtime t("daily.wordHunt.subtitle") fails because it looks for:
+ *   translations.daily.wordHunt.subtitle (nested objects)
+ *   but finds: translations.daily["wordHunt.subtitle"] (flat key)
+ */
+function findProblematicFlatKeys(obj, prefix = '', problematic = []) {
+  for (const [key, value] of Object.entries(obj)) {
+    const fullPath = prefix ? `${prefix}.${key}` : key;
+
+    // Check if this key contains a dot - this is problematic!
+    if (key.includes('.')) {
+      problematic.push({
+        flatKey: key,
+        parentPath: prefix,
+        appearsAs: fullPath,
+        value: typeof value === 'string' ? value.substring(0, 50) : '[object]'
+      });
+    }
+
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      findProblematicFlatKeys(value, fullPath, problematic);
+    }
+  }
+
+  return problematic;
+}
+
 function getTranslationKeysFromFile() {
   console.log('Reading translations file...');
 
@@ -57,10 +89,12 @@ function getTranslationKeysFromFile() {
       const translations = translationsModule.translations;
 
       const result = {};
+      const problematicByLanguage = {};
       for (const lang of Object.keys(translations)) {
         result[lang] = extractTranslationKeys(translations[lang]);
+        problematicByLanguage[lang] = findProblematicFlatKeys(translations[lang]);
       }
-      return { translations, keysByLanguage: result };
+      return { translations, keysByLanguage: result, problematicByLanguage };
     } catch (e) {
       console.error('Failed to parse translations file:', e.message);
       process.exit(1);
@@ -72,11 +106,13 @@ function getTranslationKeysFromFile() {
   const translations = translationsModule.translations;
 
   const result = {};
+  const problematicByLanguage = {};
   for (const lang of Object.keys(translations)) {
     result[lang] = extractTranslationKeys(translations[lang]);
+    problematicByLanguage[lang] = findProblematicFlatKeys(translations[lang]);
   }
 
-  return { translations, keysByLanguage: result };
+  return { translations, keysByLanguage: result, problematicByLanguage };
 }
 
 // ============================================
@@ -186,7 +222,7 @@ function extractAllTFunctionCalls() {
 // PART 3: Compare and generate report
 // ============================================
 
-function generateReport(keysByLanguage, tCalls, translations) {
+function generateReport(keysByLanguage, tCalls, problematicByLanguage = {}) {
   console.log('\n========================================');
   console.log('TRANSLATION KEY ANALYSIS REPORT');
   console.log('========================================\n');
@@ -203,6 +239,39 @@ function generateReport(keysByLanguage, tCalls, translations) {
   console.log('\nKeys defined per language:');
   for (const lang of languages) {
     console.log(`  ${lang}: ${keysByLanguage[lang].length} keys`);
+  }
+
+  // ========================================
+  // Section 0: CRITICAL - Problematic flat keys (keys with dots that break t() function)
+  // ========================================
+  const totalProblematic = Object.values(problematicByLanguage).reduce((sum, arr) => sum + arr.length, 0);
+  if (totalProblematic > 0) {
+    console.log('\n========================================');
+    console.log('⚠️  CRITICAL: FLAT KEYS WITH DOTS (WILL BREAK AT RUNTIME)');
+    console.log('========================================\n');
+    console.log('These keys contain dots but are stored as flat strings, not nested objects.');
+    console.log('The t() function splits by "." and traverses nested objects, so these WILL FAIL.\n');
+    console.log('Example: { daily: { "wordHunt.subtitle": "value" } }');
+    console.log('  - Script sees: "daily.wordHunt.subtitle" ✓');
+    console.log('  - Runtime t("daily.wordHunt.subtitle") looks for: daily.wordHunt.subtitle');
+    console.log('  - But actual structure is: daily["wordHunt.subtitle"] ✗\n');
+    console.log('FIX: Convert flat keys to nested objects:\n');
+    console.log('  WRONG: { daily: { "wordHunt.subtitle": "value" } }');
+    console.log('  RIGHT: { daily: { wordHunt: { subtitle: "value" } } }\n');
+
+    for (const lang of languages) {
+      const problematic = problematicByLanguage[lang] || [];
+      if (problematic.length > 0) {
+        console.log(`${lang.toUpperCase()}: ${problematic.length} problematic flat keys`);
+        for (const p of problematic.slice(0, 10)) {
+          console.log(`  - "${p.parentPath}.${p.flatKey}" → should be nested under "${p.parentPath}"`);
+        }
+        if (problematic.length > 10) {
+          console.log(`  ... and ${problematic.length - 10} more`);
+        }
+        console.log('');
+      }
+    }
   }
 
   // Use English as the reference language
@@ -379,6 +448,8 @@ function generateReport(keysByLanguage, tCalls, translations) {
   // ========================================
   // Section 5: JSON output for further processing
   // ========================================
+  const totalProblematicCount = Object.values(problematicByLanguage).reduce((sum, arr) => sum + arr.length, 0);
+
   const jsonReport = {
     summary: {
       totalKeysInCode: uniqueKeysInCode.length,
@@ -386,7 +457,19 @@ function generateReport(keysByLanguage, tCalls, translations) {
         languages.map(l => [l, keysByLanguage[l].length])
       ),
       missingFromEnglish: missingFromEnglish.length,
+      problematicFlatKeys: totalProblematicCount,
     },
+    problematicFlatKeys: Object.fromEntries(
+      languages.map(lang => [
+        lang,
+        (problematicByLanguage[lang] || []).map(p => ({
+          flatKey: p.flatKey,
+          parentPath: p.parentPath,
+          appearsAs: p.appearsAs,
+          fix: `Convert "${p.parentPath}.${p.flatKey}" to nested: ${p.parentPath}.${p.flatKey.split('.').join('.')}`
+        }))
+      ])
+    ),
     missingFromEnglish: missingFromEnglish.map(m => ({
       key: m.key,
       usages: m.usages.map(u => ({ file: u.file, line: u.line }))
@@ -423,20 +506,26 @@ function main() {
   console.log('Translation Key Analysis Tool');
   console.log('==============================\n');
 
-  // Step 1: Extract translation keys
-  const { translations, keysByLanguage } = getTranslationKeysFromFile();
+  // Step 1: Extract translation keys and detect problematic flat keys
+  const { keysByLanguage, problematicByLanguage } = getTranslationKeysFromFile();
 
   // Step 2: Extract t() calls
   const tCalls = extractAllTFunctionCalls();
 
   // Step 3: Generate report
-  const report = generateReport(keysByLanguage, tCalls, translations);
+  const report = generateReport(keysByLanguage, tCalls, problematicByLanguage);
 
   console.log('\n==============================');
   console.log('Analysis complete!');
   console.log('==============================');
 
-  // Return exit code based on missing keys
+  // Return exit code based on issues found
+  const totalProblematic = Object.values(problematicByLanguage).reduce((sum, arr) => sum + arr.length, 0);
+  if (totalProblematic > 0) {
+    console.log(`\n⚠️  CRITICAL: ${totalProblematic} flat keys with dots found - these WILL BREAK at runtime!`);
+    return 1;
+  }
+
   if (report.missingFromEnglish.length > 0) {
     console.log(`\nWARNING: ${report.missingFromEnglish.length} translation keys are used but not defined!`);
     return 1;

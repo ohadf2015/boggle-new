@@ -124,7 +124,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           <div className="flex-1 overflow-y-auto min-h-0">
             {roomsLoading && activeRooms.length === 0 ? (
               <div className="h-32 flex items-center justify-center">
-                <NeoLoader variant="letters" size="md" />
+                <NeoLoader variant="mascot-letters" size="md" />
               </div>
             ) : hasRooms ? (
               <motion.div

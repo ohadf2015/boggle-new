@@ -774,8 +774,10 @@ const es = {
     "title": "Tus Logros"
   },
   "achievement": {
-    "dailyDouble": "🏆 DOBLE DIARIO",
-    "dailyDouble.desc": "¡Completaste ambos retos diarios!"
+    "dailyDouble": {
+      "name": "🏆 DOBLE DIARIO",
+      "desc": "¡Completaste ambos retos diarios!"
+    }
   },
   "lateJoiner": {
     "welcomeTitle": "¡Juego en Progreso!",
@@ -910,7 +912,25 @@ const es = {
     "stable": "Estable"
   },
   "archetypes": {
-    "hint": "Basado en tu estilo de juego"
+    "hint": "Basado en tu estilo de juego",
+    "strategist": "El Estratega",
+    "strategistDesc": "Movimientos calculados, máximo impacto",
+    "speedster": "El Veloz",
+    "speedsterDesc": "Reflejos ultrarrápidos",
+    "scholar": "El Erudito",
+    "scholarDesc": "Domina el vocabulario complejo",
+    "explorer": "El Explorador",
+    "explorerDesc": "Encuentra lo que otros pasan por alto",
+    "perfectionist": "El Perfeccionista",
+    "perfectionistDesc": "Cada palabra cuenta",
+    "maverick": "El Rebelde",
+    "maverickDesc": "Audaz y poco convencional",
+    "workhorse": "El Incansable",
+    "workhorseDesc": "Imparable y persistente",
+    "closer": "El Finalizador",
+    "closerDesc": "Brilla bajo presión",
+    "trailblazer": "El Pionero",
+    "trailblazerDesc": "Va por las grandes victorias"
   },
   "scorePage": {
     "pts": "pts"
@@ -1318,6 +1338,11 @@ const es = {
       "title": "¡Felicitaciones por Tu Primera Victoria!",
       "subtitle": "¡Tienes habilidades! Crea una cuenta para mantener tu racha ganadora.",
       "benefitsTitle": "Regístrate para desbloquear:",
+      "benefits": {
+        "trackProgress": "Seguir tu progreso",
+        "leaderboard": "Competir en clasificaciones",
+        "playWithFriends": "Jugar con amigos"
+      },
       "maybeLater": "Quizás después",
       "statsTeaser": "¡{games} partidas • {score} pts esperando ser guardados!"
     },
@@ -1394,6 +1419,11 @@ const es = {
       "funnyMessages": {
         "dontLeaveHanging": "¡Oye! ¡No me dejes colgado! ¡Regístrate y subamos juntos en la tabla!"
       }
+    },
+    "callback": {
+      "completingSignIn": "Completando inicio de sesión...",
+      "takingTooLong": "Esto está tardando más de lo esperado. ¿Intentar de nuevo?",
+      "tryAgain": "Intentar de nuevo"
     }
   },
   "legal": {
@@ -2212,13 +2242,14 @@ const es = {
     "chooseChallengeHint": "¡Escoge tu desafío de hoy. Completa ambos para XP extra!",
     "play": "JUGAR AHORA",
     "viewResults": "VER RESULTADOS",
-    "wordHunt": "Caza Palabras",
-    "wordHunt.title": "Caza Palabras",
-    "wordHunt.subtitle": "Modo Supervivencia",
-    "wordHunt.desc": "Encuentra palabras contra el reloj. ¡Halla todas las que puedas antes de que se acabe el tiempo!",
-    "wordHunt.feature1": "90 segundos",
-    "wordHunt.feature2": "Sistema de combos",
-    "wordHunt.feature3": "Tabla global",
+"wordHunt": {
+      "title": "Caza Palabras",
+      "subtitle": "Modo Supervivencia",
+      "desc": "Encuentra palabras contra el reloj. ¡Halla todas las que puedas antes de que se acabe el tiempo!",
+      "feature1": "90 segundos",
+      "feature2": "Sistema de combos",
+      "feature3": "Tabla global"
+    },
     "errorWordTooShort": "La palabra debe tener al menos {min} letras",
     "errorWordTooLong": "La palabra debe tener máximo {max} letras",
     "wordPlaceholder": "Escribe una palabra..."
@@ -2264,10 +2295,12 @@ const es = {
     "share": {
       "text": "Daily Buzz: {topic} | {score}/100 | ¿Le entras? 🔥"
     },
-    "error": "¡Ups!",
-    "error.loading": "Cargando el buzz de hoy...",
-    "error.failed": "No se pudo cargar. ¿Intentar de nuevo?",
-    "error.noInternet": "Sin conexión. Revisa tu internet.",
+    "error": {
+      "title": "¡Ups!",
+      "loading": "Cargando el buzz de hoy...",
+      "failed": "No se pudo cargar. ¿Intentar de nuevo?",
+      "noInternet": "Sin conexión. Revisa tu internet."
+    },
     "alreadyPlayed": "¡Ya jugaste hoy! Vuelve mañana.",
     "badge": "🔥 NUEVO",
     "betaPreview": "✨ BETA",
