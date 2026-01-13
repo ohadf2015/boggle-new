@@ -3,10 +3,10 @@ import * as fsp from 'fs/promises';
 import * as path from 'path';
 import { promisify } from 'util';
 import type { Language } from '@/shared/types';
+import logger from './utils/logger';
+import { getThemedWords, getCurrentTheme } from './data/dateThemedWords';
 
 const appendFileAsync = promisify(fs.appendFile);
-const logger = require('./utils/logger');
-const { getThemedWords, getCurrentTheme } = require('./data/dateThemedWords');
 
 // Hebrew letter normalization - final letters
 const hebrewFinalLetters: Record<string, string> = {

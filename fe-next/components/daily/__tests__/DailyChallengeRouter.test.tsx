@@ -30,6 +30,11 @@ jest.mock('../../buzz/BuzzChallenge', () => ({
   default: () => <div data-testid="buzz-challenge">Buzz Challenge</div>,
 }));
 
+jest.mock('../../Header', () => ({
+  __esModule: true,
+  default: () => <header data-testid="header">Header</header>,
+}));
+
 jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   motion: {

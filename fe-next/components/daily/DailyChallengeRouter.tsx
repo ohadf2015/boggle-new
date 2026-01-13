@@ -5,6 +5,7 @@ import { AnimatePresence } from 'framer-motion';
 import { DailyChallengeLanding } from './DailyChallengeLanding';
 import DailyChallenge from './DailyChallenge';
 import BuzzChallenge from '../buzz/BuzzChallenge';
+import Header from '../Header';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Language } from '@/types';
@@ -37,6 +38,9 @@ export default function DailyChallengeRouter() {
 
   return (
     <div className="min-h-screen flex flex-col bg-neo-navy">
+      {/* Show Header on landing page */}
+      {mode === 'landing' && <Header />}
+
       <AnimatePresence mode="wait">
         {mode === 'landing' && (
           <DailyChallengeLanding
