@@ -217,4 +217,85 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
     );
     expect(hasGenericTopics).toBe(true);
   });
+
+  it('should repair and parse truncated JSON responses', async () => {
+    // Simulate a truncated JSON response (common with maxOutputTokens limits)
+    const truncatedResponse = `{
+  "date": "2026-01-13",
+  "language": "he",
+  "trending_summary": "מגמות מובילות",
+  "challenges": [
+    {
+      "type": "anagram",
+      "trend_topic": "ישראל",
+      "prompt": "פתרו: לארשי",
+      "answer": "ישראל",
+      "hint": "שם מדינה",
+      "difficulty": "easy",
+      "trending_context": "ישראל בחדשות"
+    },
+    {
+      "type": "fill_blank",
+      "trend_topic": "טכנולוגיה",
+      "prompt": "השלימו: טכ_ _ _ _ _ _",
+      "answer": "טכנולוגיה",
+      "hint": "חדשנות",
+      "difficulty": "medium",
+      "trending_context": "חדשות טכנולוגיה"
+    },
+    {
+      "type": "definition_match",
+      "trend_topic": "ספורט",
+      "prompt": "התאימו את המילה",
+      "answer": "ספורט",
+      "options": ["ספורט", "משחק", "פעילות", "ריצה"],
+      "hint": "פעילות גופנית",
+      "difficulty": "medium",
+      "trending_context": "אירועי ספורט"
+    },
+    {
+      "type": "anagram",
+      "trend_topic": "רקורד",
+      "prompt": "פתרו: דרוקר",
+      "answer": "רקורד",
+      "hint": "הישג",
+      "difficulty": "easy",
+      "trending_context": "רקורד חדש"
+    },
+    {
+      "type": "fill_blank",
+      "trend_topic": "שחקנית",
+      "prompt": "השלימו: שח_ _ _ _",
+      "answer": "שחקנית",
+      "hint": "אמנית",
+      "difficulty": "easy",
+      "trending_context": "חדשות סלבריטאים"
+    },
+    {
+      "type": "defi`;  // Intentionally truncated mid-word
+
+    // Update mock to return truncated response
+    mockGenerateContent.mockResolvedValueOnce({
+      response: {
+        candidates: [
+          {
+            content: {
+              parts: [{ text: truncatedResponse }],
+            },
+          },
+        ],
+      },
+    });
+
+    const today = new Date();
+    const language = 'he';
+
+    // Should NOT throw - should repair and use valid challenges
+    const result = await generateDailyBuzz(today, language);
+
+    // Verify we got at least 5 valid challenges (the repair logic should salvage complete ones)
+    expect(result).toBeDefined();
+    expect(result.challenges).toBeDefined();
+    expect(result.challenges.length).toBeGreaterThanOrEqual(5);
+  });
 });

@@ -13,7 +13,7 @@ import {
 } from './imagenClient';
 
 interface BuzzChallenge {
-  type: 'anagram' | 'fill_blank' | 'word_chain' | 'definition_match' | 'trending_trio';
+  type: 'anagram' | 'fill_blank' | 'word_chain' | 'definition_match' | 'trending_trio' | 'riddle';
   trend_topic: string;
   prompt: string;
   answer: string;
@@ -288,7 +288,7 @@ async function generateChallengesWithAI(
       ],
       generationConfig: {
         temperature: 0.8, // Creative but not too random
-        maxOutputTokens: 4000,
+        maxOutputTokens: 8000, // Increased to prevent truncation (Hebrew/Japanese responses are longer)
         topP: 0.9,
         topK: 40,
       },
@@ -340,67 +340,89 @@ function buildAIPrompt(
 **Region**: ${region}
 **Date**: ${new Date().toISOString().split('T')[0]}
 
-**Trending Topics** (from Google Trends):
+**Trending Topics** (from Google Trends - use as INSPIRATION for categories only):
 ${trendsContext}
 
 **Your Task**:
-Create 5-7 word mini-challenges based on these trending topics. Each challenge should:
-1. Use words EXTRACTED FROM or RELATED TO the trending topics
-2. Be appropriate for family audiences (no profanity, violence, or sensitive topics)
-3. Mix different puzzle formats (see types below)
-4. Teach players about the trend while being fun
-5. Have difficulty ranging from easy to medium
-6. Work well in ${language} (culturally appropriate)
+Create 5-7 word mini-challenges. Use trending topics as INSPIRATION to identify CATEGORIES, then choose COMMON VOCABULARY WORDS that anyone would know - even people who don't follow news.
+
+**CRITICAL - Word Selection Rules**:
+1. NEVER use brand names (no "Nike", "Apple", "Netflix", "Isrotel", "Tesla", etc.)
+2. NEVER use celebrity names, company names, or proper nouns as answers
+3. NEVER use promotional or commercial content
+4. ONLY use COMMON DICTIONARY WORDS from everyday vocabulary
+5. Words must be known by people who DON'T follow news, trends, or commercials
+6. Think: "What universal word relates to this category?"
+
+**How to Extract Categories from Trends**:
+- Trend: "Isrotel hotels" → Category: Travel → Use: HOTEL, BEACH, VACATION, RESORT
+- Trend: "iPhone 16" → Category: Technology → Use: PHONE, SCREEN, CAMERA, DEVICE
+- Trend: "Taylor Swift" → Category: Music → Use: SINGER, CONCERT, ALBUM, MELODY
+- Trend: "World Cup" → Category: Sports → Use: SOCCER, GOAL, STADIUM, TROPHY
+- Trend: "Winter storm" → Category: Weather → Use: SNOW, COLD, FROST, WINTER
 
 **Challenge Types** (use variety):
-1. **anagram**: Unscramble a word related to the trend
-2. **fill_blank**: Complete a phrase about the trend (show blanks as underscores)
-3. **word_chain**: Connect two trend-related words by changing one letter at a time
-4. **definition_match**: Match the word to its meaning (provide 4 options)
-5. **trending_trio**: Find the word that connects all 3 trends
+1. **anagram**: Give a CLUE that hints at the answer, plus scrambled letters. The clue makes it fun!
+   - Format: "Clue: [riddle/hint] | Letters: HCAEB" → Answer: BEACH
+   - The clue should be clever/playful, not just a definition
+   - Example: "Clue: Where sandcastles live | Letters: HCAEB" → BEACH
+2. **fill_blank**: Complete a universal phrase (e.g., "Pack your bags for _ _ _ _ _ _ _ _" → VACATION)
+3. **word_chain**: Connect two common words by changing one letter at a time
+4. **definition_match**: Match a common word to its meaning (provide 4 options)
+5. **riddle**: A clever riddle where the answer is a common word
+   - Example: "I have hands but cannot clap. What am I?" → CLOCK
 
 **Critical Requirements**:
-- ALL answers must be SINGLE WORDS (no phrases or multi-word answers)
-- Words should be 4-12 letters long
-- Provide a helpful hint for each challenge
-- Include trending context to educate players
-- Neo-brutalist tone: bold, playful, punchy (avoid corporate speak)
+- ALL answers must be SINGLE, COMMON DICTIONARY WORDS
+- Words should be 4-10 letters, universally known
+- NO brand names, company names, celebrity names, or jargon
+- Hints must help anyone guess without requiring news knowledge
+- Prompts should be timeless, not tied to specific current events
+- Neo-brutalist tone: bold, playful, punchy
 
 **Output Format** (JSON only, no markdown):
 {
   "date": "${new Date().toISOString().split('T')[0]}",
   "language": "${language}",
-  "trending_summary": "Brief summary of top trends (max 60 chars)",
+  "trending_summary": "Today's theme: [general category] (max 60 chars)",
   "challenges": [
     {
       "type": "anagram",
-      "trend_topic": "Name of trending topic",
-      "prompt": "Unscramble tonight's golden word: TRSACE",
-      "answer": "ACTRESS",
-      "hint": "She walks the red carpet",
+      "trend_topic": "Travel & Leisure",
+      "prompt": "Where sandcastles call home | Letters: HCAEB",
+      "answer": "BEACH",
+      "hint": "Think sun and waves",
       "difficulty": "easy",
-      "trending_context": "The 98th Academy Awards ceremony is tonight"
+      "trending_context": "Perfect weather for relaxation"
+    },
+    {
+      "type": "riddle",
+      "trend_topic": "Time",
+      "prompt": "I have hands but cannot clap. I have a face but cannot smile. What am I?",
+      "answer": "CLOCK",
+      "hint": "Tick tock",
+      "difficulty": "easy",
+      "trending_context": "Time flies when you're having fun"
     },
     {
       "type": "fill_blank",
-      "trend_topic": "Bitcoin hits record high",
-      "prompt": "Bitcoin reached a _ _ _ _ _ _ milestone",
-      "answer": "RECORD",
-      "hint": "Never seen before",
-      "difficulty": "medium",
-      "trending_context": "Bitcoin surpassed $150K for the first time"
+      "trend_topic": "Technology",
+      "prompt": "Capture moments with your _ _ _ _ _ _",
+      "answer": "CAMERA",
+      "hint": "Click to take a photo",
+      "difficulty": "easy",
+      "trending_context": "Everyone loves taking pictures"
     },
     {
       "type": "definition_match",
-      "trend_topic": "Polar Vortex",
-      "prompt": "Which word describes the Arctic blast?",
-      "answer": "VORTEX",
-      "options": ["BREEZE", "VORTEX", "WARM", "CALM"],
-      "hint": "Spinning weather pattern",
-      "difficulty": "medium",
-      "trending_context": "Record-breaking cold sweeps the Northeast"
+      "trend_topic": "Weather",
+      "prompt": "What falls from winter clouds?",
+      "answer": "SNOW",
+      "options": ["RAIN", "SNOW", "LEAF", "DUST"],
+      "hint": "Cold and white",
+      "difficulty": "easy",
+      "trending_context": "Winter weather patterns"
     }
-    // ... 4-6 more challenges
   ]
 }
 
@@ -408,45 +430,162 @@ Create 5-7 word mini-challenges based on these trending topics. Each challenge s
 }
 
 /**
+ * Attempt to repair truncated JSON by closing open structures
+ * This handles cases where AI response is cut off mid-generation
+ */
+function repairTruncatedJson(jsonText: string): string {
+  // Count open braces/brackets
+  let openBraces = 0;
+  let openBrackets = 0;
+  let inString = false;
+  let escapeNext = false;
+
+  for (const char of jsonText) {
+    if (escapeNext) {
+      escapeNext = false;
+      continue;
+    }
+    if (char === '\\') {
+      escapeNext = true;
+      continue;
+    }
+    if (char === '"') {
+      inString = !inString;
+      continue;
+    }
+    if (inString) continue;
+
+    if (char === '{') openBraces++;
+    if (char === '}') openBraces--;
+    if (char === '[') openBrackets++;
+    if (char === ']') openBrackets--;
+  }
+
+  // If we ended inside a string, close it
+  if (inString) {
+    jsonText += '"';
+  }
+
+  // Find last complete challenge object by looking for last complete "trending_context"
+  const lastCompleteChallenge = jsonText.lastIndexOf('"trending_context"');
+  if (lastCompleteChallenge > 0) {
+    // Find the end of this challenge's value
+    const afterContext = jsonText.indexOf('"', lastCompleteChallenge + 18); // Skip past "trending_context": "
+    if (afterContext > 0) {
+      const closingQuote = jsonText.indexOf('"', afterContext + 1);
+      if (closingQuote > 0) {
+        // Truncate to end of last complete challenge
+        const afterClosingQuote = closingQuote + 1;
+        // Find next } that closes the challenge object
+        let braceCount = 0;
+        let foundClose = -1;
+        for (let i = afterClosingQuote; i < jsonText.length; i++) {
+          if (jsonText[i] === '{') braceCount++;
+          if (jsonText[i] === '}') {
+            if (braceCount === 0) {
+              foundClose = i;
+              break;
+            }
+            braceCount--;
+          }
+        }
+        if (foundClose > 0) {
+          jsonText = jsonText.substring(0, foundClose + 1) + ']}';
+          console.log('[BUZZ] Repaired truncated JSON by finding last complete challenge');
+          return jsonText;
+        }
+      }
+    }
+  }
+
+  // Fallback: close remaining brackets/braces
+  jsonText += ']'.repeat(Math.max(0, openBrackets));
+  jsonText += '}'.repeat(Math.max(0, openBraces));
+
+  console.log('[BUZZ] Repaired truncated JSON with bracket closing');
+  return jsonText;
+}
+
+/**
  * Parse AI response into structured challenges
  */
 function parseAIResponse(responseText: string): BuzzChallenge[] {
-  try {
-    // Remove markdown code blocks if present
-    let jsonText = responseText.trim();
-    if (jsonText.startsWith('```')) {
-      jsonText = jsonText.replace(/```json?\n?/g, '').replace(/```\n?$/g, '');
-    }
-
-    const parsed = JSON.parse(jsonText);
-
-    if (!parsed.challenges || !Array.isArray(parsed.challenges)) {
-      throw new Error('Invalid response format: missing challenges array');
-    }
-
-    // Validate each challenge
-    const validChallenges = parsed.challenges.filter((challenge: Record<string, unknown>) => {
-      return (
-        challenge.type &&
-        challenge.trend_topic &&
-        challenge.prompt &&
-        challenge.answer &&
-        challenge.difficulty &&
-        challenge.trending_context
-      );
-    });
-
-    if (validChallenges.length < 5) {
-      throw new Error('Insufficient valid challenges generated');
-    }
-
-    return validChallenges;
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[BUZZ] Failed to parse AI response:', errorMessage);
-    console.error('[BUZZ] Raw response:', responseText.substring(0, 500));
-    throw new Error('Failed to parse AI-generated challenges');
+  // Remove markdown code blocks if present
+  let jsonText = responseText.trim();
+  if (jsonText.startsWith('```')) {
+    jsonText = jsonText.replace(/```json?\n?/g, '').replace(/```\n?$/g, '');
   }
+
+  // First attempt: direct parse
+  let parsed: { challenges?: BuzzChallenge[] };
+  try {
+    parsed = JSON.parse(jsonText);
+  } catch (firstError: unknown) {
+    const firstErrorMsg = firstError instanceof Error ? firstError.message : 'Unknown error';
+    console.warn('[BUZZ] Initial JSON parse failed:', firstErrorMsg);
+
+    // Check if it's a truncation error
+    if (firstErrorMsg.includes('Unterminated') || firstErrorMsg.includes('Unexpected end')) {
+      console.log('[BUZZ] Attempting to repair truncated JSON...');
+      const repaired = repairTruncatedJson(jsonText);
+
+      try {
+        parsed = JSON.parse(repaired);
+        console.log('[BUZZ] Successfully parsed repaired JSON');
+      } catch (repairError: unknown) {
+        const repairErrorMsg = repairError instanceof Error ? repairError.message : 'Unknown error';
+        console.error('[BUZZ] Failed to parse repaired JSON:', repairErrorMsg);
+        console.error('[BUZZ] Raw response (first 500 chars):', responseText.substring(0, 500));
+        throw new Error(`Failed to parse AI-generated challenges: ${firstErrorMsg}`);
+      }
+    } else {
+      console.error('[BUZZ] Failed to parse AI response:', firstErrorMsg);
+      console.error('[BUZZ] Raw response (first 500 chars):', responseText.substring(0, 500));
+      throw new Error(`Failed to parse AI-generated challenges: ${firstErrorMsg}`);
+    }
+  }
+
+  if (!parsed.challenges || !Array.isArray(parsed.challenges)) {
+    throw new Error('Invalid response format: missing challenges array');
+  }
+
+  // Validate each challenge
+  const validChallenges = parsed.challenges.filter((challenge: Partial<BuzzChallenge>) => {
+    return (
+      challenge.type &&
+      challenge.trend_topic &&
+      challenge.prompt &&
+      challenge.answer &&
+      challenge.difficulty &&
+      challenge.trending_context
+    );
+  }) as BuzzChallenge[];
+
+  if (validChallenges.length < 5) {
+    throw new Error(`Insufficient valid challenges: got ${validChallenges.length}, need 5`);
+  }
+
+  return validChallenges;
+}
+
+// Common brand names and proper nouns to filter out (case-insensitive)
+const BANNED_BRAND_WORDS = new Set([
+  'APPLE', 'GOOGLE', 'AMAZON', 'NETFLIX', 'TESLA', 'NIKE', 'ADIDAS',
+  'FACEBOOK', 'INSTAGRAM', 'TIKTOK', 'TWITTER', 'YOUTUBE', 'SPOTIFY',
+  'MICROSOFT', 'SAMSUNG', 'SONY', 'NINTENDO', 'PLAYSTATION', 'XBOX',
+  'IPHONE', 'IPAD', 'MACBOOK', 'ANDROID', 'WINDOWS',
+  'ISROTEL', 'HILTON', 'MARRIOTT', 'AIRBNB',
+  'MCDONALDS', 'STARBUCKS', 'COCA', 'COLA', 'PEPSI',
+  'DISNEY', 'MARVEL', 'PIXAR', 'WARNER', 'HBO', 'CNN', 'BBC',
+  'BITCOIN', 'ETHEREUM', 'CRYPTO',
+]);
+
+/**
+ * Check if a word looks like a proper noun (capitalized brand/name)
+ */
+function isBrandOrProperNoun(word: string): boolean {
+  const upper = word.toUpperCase();
+  return BANNED_BRAND_WORDS.has(upper);
 }
 
 /**
@@ -462,6 +601,12 @@ async function validateChallenges(
   const validatedChallenges = challenges.filter((challenge) => {
     const answer = challenge.answer.toUpperCase();
 
+    // Filter out brand names and proper nouns
+    if (isBrandOrProperNoun(answer)) {
+      console.warn(`[BUZZ] Rejected brand/proper noun: ${answer}`);
+      return false;
+    }
+
     // Check if answer exists in dictionary
     if (!dictionary.has(answer)) {
       console.warn(`[BUZZ] Word not in dictionary: ${answer}`);
@@ -474,11 +619,12 @@ async function validateChallenges(
       return false;
     }
 
-    // Validate options for multiple choice
+    // Validate options for multiple choice (also check for brands)
     if (challenge.options) {
-      const allValid = challenge.options.every((option) =>
-        dictionary.has(option.toUpperCase())
-      );
+      const allValid = challenge.options.every((option) => {
+        const upperOption = option.toUpperCase();
+        return dictionary.has(upperOption) && !isBrandOrProperNoun(option);
+      });
       if (!allValid) {
         console.warn(`[BUZZ] Invalid options for: ${challenge.prompt}`);
         return false;
