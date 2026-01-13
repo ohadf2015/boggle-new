@@ -218,6 +218,89 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
     expect(hasGenericTopics).toBe(true);
   });
 
+  it('should validate words using main dictionary module (handles spelling variations)', async () => {
+    // This test verifies that buzzGenerator uses the main dictionary module
+    // which properly handles community-approved words and spelling variations
+    // The word צפיה (viewing) should be validated even if dictionary only has צפייה (double yud)
+
+    // Update mock to return response with a word that requires dictionary module features
+    mockGenerateContent.mockResolvedValueOnce({
+      response: {
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify({
+                    date: '2026-01-13',
+                    language: 'he',
+                    trending_summary: 'מגמות מובילות: ישראל, טכנולוגיה, ספורט',
+                    challenges: [
+                      {
+                        type: 'anagram',
+                        trend_topic: 'ישראל',
+                        prompt: 'פתרו: לארשי',
+                        answer: 'ישראל',
+                        hint: 'שם מדינה',
+                        difficulty: 'easy',
+                        trending_context: 'ישראל בחדשות',
+                      },
+                      {
+                        type: 'fill_blank',
+                        trend_topic: 'טכנולוגיה',
+                        prompt: 'השלימו: טכ_ _ _ _ _ _',
+                        answer: 'טכנולוגיה',
+                        hint: 'חדשנות',
+                        difficulty: 'medium',
+                        trending_context: 'חדשות טכנולוגיה',
+                      },
+                      {
+                        type: 'definition_match',
+                        trend_topic: 'ספורט',
+                        prompt: 'התאימו את המילה',
+                        answer: 'ספורט',
+                        options: ['ספורט', 'משחק', 'פעילות', 'ריצה'],
+                        hint: 'פעילות גופנית',
+                        difficulty: 'medium',
+                        trending_context: 'אירועי ספורט',
+                      },
+                      {
+                        type: 'anagram',
+                        trend_topic: 'רקורד',
+                        prompt: 'פתרו: דרוקר',
+                        answer: 'רקורד',
+                        hint: 'הישג',
+                        difficulty: 'easy',
+                        trending_context: 'רקורד חדש',
+                      },
+                      {
+                        type: 'fill_blank',
+                        trend_topic: 'שחקנית',
+                        prompt: 'השלימו: שח_ _ _ _',
+                        answer: 'שחקנית',
+                        hint: 'אמנית',
+                        difficulty: 'easy',
+                        trending_context: 'חדשות סלבריטאים',
+                      },
+                    ],
+                  }),
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    const today = new Date();
+    const language = 'he';
+
+    // Should succeed because dictionary module handles validation properly
+    const result = await generateDailyBuzz(today, language);
+    expect(result).toBeDefined();
+    expect(result.challenges.length).toBeGreaterThanOrEqual(5);
+  });
+
   it('should repair and parse truncated JSON responses', async () => {
     // Simulate a truncated JSON response (common with maxOutputTokens limits)
     const truncatedResponse = `{

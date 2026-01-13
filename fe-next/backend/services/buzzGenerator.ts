@@ -11,6 +11,8 @@ import {
   checkImageCache,
   categorizeTopic,
 } from './imagenClient';
+import { ensureLanguageLoaded, isValidWord } from '../dictionary';
+import type { Language } from '@/shared/types/game';
 
 interface BuzzChallenge {
   type: 'anagram' | 'fill_blank' | 'word_chain' | 'definition_match' | 'trending_trio' | 'riddle';
@@ -21,23 +23,6 @@ interface BuzzChallenge {
   difficulty: 'easy' | 'medium' | 'hard';
   trending_context: string;
   options?: string[]; // For multiple choice challenges
-}
-
-// Hebrew letter normalization - final letters to regular form (same as dictionary.ts)
-const hebrewFinalLetters: Record<string, string> = {
-  'ך': 'כ',
-  'ם': 'מ',
-  'ן': 'נ',
-  'ף': 'פ',
-  'ץ': 'צ',
-};
-
-function normalizeHebrewLetter(letter: string): string {
-  return hebrewFinalLetters[letter] || letter;
-}
-
-function normalizeHebrewWord(word: string): string {
-  return word.split('').map(normalizeHebrewLetter).join('');
 }
 
 interface DailyBuzzData {
@@ -609,39 +594,22 @@ function isBrandOrProperNoun(word: string): boolean {
 }
 
 /**
- * Normalize word for dictionary lookup based on language
- */
-function normalizeForDictionary(word: string, language: string): string {
-  if (language === 'he') {
-    // Hebrew: normalize final letters and use as-is (Hebrew has no case)
-    return normalizeHebrewWord(word);
-  }
-  // Other languages: use uppercase
-  return word.toUpperCase();
-}
-
-/**
  * Validate challenges against game dictionary
+ * Uses the main dictionary module for proper word validation
  */
 async function validateChallenges(
   challenges: BuzzChallenge[],
   language: string
 ): Promise<BuzzChallenge[]> {
-  // Load dictionary for language
-  const dictionary = await loadDictionary(language);
+  // Ensure language dictionary is loaded using the main dictionary module
+  await ensureLanguageLoaded(language as Language);
 
   const validatedChallenges = challenges.filter((challenge) => {
-    const answer = normalizeForDictionary(challenge.answer, language);
+    const answer = challenge.answer;
 
     // Filter out brand names and proper nouns
     if (isBrandOrProperNoun(answer)) {
       console.warn(`[BUZZ] Rejected brand/proper noun: ${answer}`);
-      return false;
-    }
-
-    // Check if answer exists in dictionary
-    if (!dictionary.has(answer)) {
-      console.warn(`[BUZZ] Word not in dictionary: ${answer}`);
       return false;
     }
 
@@ -651,11 +619,19 @@ async function validateChallenges(
       return false;
     }
 
+    // Check if answer exists in dictionary using main dictionary module
+    // This handles normalization, community-approved words, and spelling variations
+    const isValid = isValidWord(answer, language as Language);
+    if (!isValid) {
+      console.warn(`[BUZZ] Word not in dictionary: ${answer}`);
+      return false;
+    }
+
     // Validate options for multiple choice (also check for brands)
     if (challenge.options) {
       const allValid = challenge.options.every((option) => {
-        const normalizedOption = normalizeForDictionary(option, language);
-        return dictionary.has(normalizedOption) && !isBrandOrProperNoun(option);
+        const optionValid = isValidWord(option, language as Language);
+        return optionValid && !isBrandOrProperNoun(option);
       });
       if (!allValid) {
         console.warn(`[BUZZ] Invalid options for: ${challenge.prompt}`);
@@ -672,96 +648,6 @@ async function validateChallenges(
   }
 
   return validatedChallenges;
-}
-
-/**
- * Load game dictionary for validation
- */
-async function loadDictionary(language: string): Promise<Set<string>> {
-  try {
-    let words: string[] = [];
-
-    switch (language) {
-      case 'en': {
-        const enWords = await import('an-array-of-english-words');
-        words = (enWords as { default?: string[] }).default || (enWords as unknown as string[]) || [];
-        break;
-      }
-      case 'es': {
-        const esWords = await import('an-array-of-spanish-words');
-        words = (esWords as { default?: string[] }).default || (esWords as unknown as string[]) || [];
-        break;
-      }
-      case 'sv': {
-        const svWords = await import('@arvidbt/swedish-words');
-        // Swedish words package exports as named export 'words', not default
-        words = (svWords as { words?: string[] }).words || (svWords as unknown as string[]) || [];
-        break;
-      }
-      case 'he': {
-        // Load Hebrew words from main dictionary files (same as dictionary.ts)
-        const fs = await import('fs/promises');
-        const path = await import('path');
-        const hebrewFilePath = path.join(process.cwd(), 'backend', 'hebrew_words.txt');
-        const hebrewApprovedPath = path.join(process.cwd(), 'backend', 'hebrew_words_approved.txt');
-        try {
-          const [mainContent, approvedContent] = await Promise.all([
-            fs.readFile(hebrewFilePath, 'utf-8').catch(() => ''),
-            fs.readFile(hebrewApprovedPath, 'utf-8').catch(() => ''),
-          ]);
-          // Normalize Hebrew words (convert final letters to regular form)
-          const mainWords = mainContent.split('\n').filter((w) => w.length > 0).map(normalizeHebrewWord);
-          const approvedWords = approvedContent.split('\n').filter((w) => w.length > 0).map(normalizeHebrewWord);
-          words = [...mainWords, ...approvedWords];
-          console.log(`[BUZZ] Loaded ${mainWords.length} Hebrew words + ${approvedWords.length} approved`);
-        } catch {
-          console.warn(`[BUZZ] Dictionary file not found for ${language}, using empty set`);
-          words = [];
-        }
-        break;
-      }
-      case 'ja': {
-        // Load Japanese Kanji compounds (same as dictionary.ts)
-        const fs = await import('fs/promises');
-        const path = await import('path');
-        const kanjiFilePath = path.join(process.cwd(), 'backend', 'kanji_compounds.txt');
-        const japaneseApprovedPath = path.join(process.cwd(), 'backend', 'japanese_words_approved.txt');
-        try {
-          const [kanjiContent, approvedContent] = await Promise.all([
-            fs.readFile(kanjiFilePath, 'utf-8').catch(() => ''),
-            fs.readFile(japaneseApprovedPath, 'utf-8').catch(() => ''),
-          ]);
-          const kanjiWords = kanjiContent.split('\n').filter((w) => w.length > 0);
-          const approvedWords = approvedContent.split('\n').filter((w) => w.length > 0);
-          words = [...kanjiWords, ...approvedWords];
-          console.log(`[BUZZ] Loaded ${kanjiWords.length} Japanese Kanji + ${approvedWords.length} approved`);
-        } catch {
-          console.warn(`[BUZZ] Dictionary file not found for ${language}, using empty set`);
-          words = [];
-        }
-        break;
-      }
-      default:
-        throw new Error(`Unsupported language: ${language}`);
-    }
-
-    if (!Array.isArray(words) || words.length === 0) {
-      console.warn(`[BUZZ] No words loaded for language: ${language}`);
-      return new Set();
-    }
-
-    // Hebrew and Japanese are already normalized during loading
-    // English, Spanish, Swedish need uppercase conversion
-    if (language === 'he' || language === 'ja') {
-      return new Set(words);
-    }
-    return new Set(words.map((w) => w.toUpperCase()));
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[BUZZ] Failed to load dictionary:', errorMessage);
-    // Return empty set to fail validation gracefully
-    return new Set();
-  }
 }
 
 /**
