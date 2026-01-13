@@ -68,12 +68,9 @@ interface UseGridInteractionReturn {
 }
 
 // Selection threshold - must be within this % of cell center to select
-// IMPROVED: More lenient thresholds for easier touch selection on mobile
-const CELL_SELECTION_THRESHOLD = 1.0;  // Was 0.85 - allow selection anywhere within cell bounds
-// Diagonal selection threshold - more lenient for diagonal movement (larger hit area)
-const DIAGONAL_SELECTION_THRESHOLD = 1.15;  // Was 0.95 - diagonal moves need more forgiveness
-// Extended touch area beyond cell bounds for edge-to-edge swiping
-const TOUCH_EXTENSION_FACTOR = 1.2;  // 20% larger effective touch area
+const CELL_SELECTION_THRESHOLD = 0.85;
+// Diagonal selection threshold - slightly more lenient for diagonal movement
+const DIAGONAL_SELECTION_THRESHOLD = 0.95;
 // Velocity calculation - samples to average
 const VELOCITY_SAMPLES = 3;
 
@@ -249,7 +246,6 @@ export function useGridInteraction({
   }, [grid, gridRef]);
 
   // Get cell at touch position with cell center distance info (uses cached measurements)
-  // IMPROVED: Better handling for edge touches and RTL layouts
   const getCellAtPosition = useCallback((touchX: number, touchY: number): CellPosition | null => {
     if (!gridRef.current) return null;
 
@@ -275,57 +271,32 @@ export function useGridInteraction({
       cellWithGapHeight,
     } = measurements;
 
-    // Calculate position relative to grid content area
-    // Note: The grid element uses dir="ltr" regardless of page direction,
-    // so coordinates are always calculated left-to-right
     const adjustedX = touchX - gridRect.left - gridPaddingLeft;
     const adjustedY = touchY - gridRect.top - gridPaddingTop;
 
-    // IMPROVED: Calculate exact cell including fractional position for better hit detection
-    const exactCol = adjustedX / cellWithGapWidth;
-    const exactRow = adjustedY / cellWithGapHeight;
+    const col = Math.floor(adjustedX / cellWithGapWidth);
+    const row = Math.floor(adjustedY / cellWithGapHeight);
 
-    // Round to nearest cell for touches near cell boundaries (more forgiving)
-    // This helps with edge-to-edge swiping where touch lands between cells
-    const col = Math.round(exactCol - 0.5 + 0.5);  // Equivalent to Math.floor but clearer intent
-    const row = Math.round(exactRow - 0.5 + 0.5);
+    if (row < 0 || row >= rows || col < 0 || col >= cols) return null;
 
-    // IMPROVED: Allow slight overshoot beyond grid bounds for edge cells
-    // This makes selecting corner/edge cells easier
-    const EDGE_TOLERANCE = 0.3;  // Allow 30% overshoot beyond grid bounds
-    const minCol = -EDGE_TOLERANCE;
-    const maxCol = cols - 1 + EDGE_TOLERANCE;
-    const minRow = -EDGE_TOLERANCE;
-    const maxRow = rows - 1 + EDGE_TOLERANCE;
-
-    // Clamp to valid cell range after applying tolerance
-    const clampedCol = Math.max(0, Math.min(cols - 1, col));
-    const clampedRow = Math.max(0, Math.min(rows - 1, row));
-
-    // Reject if touch is too far outside the grid
-    if (exactCol < minCol || exactCol > maxCol || exactRow < minRow || exactRow > maxRow) {
-      return null;
-    }
-
-    const gridRow = grid[clampedRow];
-    const letter = gridRow?.[clampedCol];
+    const gridRow = grid[row];
+    const letter = gridRow?.[col];
     if (!letter) return null;
 
     // Calculate cell center for distance checking
-    const cellCenterX = clampedCol * cellWithGapWidth + cellWidth / 2;
-    const cellCenterY = clampedRow * cellWithGapHeight + cellHeight / 2;
+    const cellCenterX = col * cellWithGapWidth + cellWidth / 2;
+    const cellCenterY = row * cellWithGapHeight + cellHeight / 2;
     const distanceFromCenter = Math.sqrt(
       Math.pow(adjustedX - cellCenterX, 2) +
       Math.pow(adjustedY - cellCenterY, 2)
     );
 
     return {
-      row: clampedRow,
-      col: clampedCol,
+      row,
+      col,
       letter,
       distanceFromCenter,
-      // IMPROVED: Use larger effective cell radius for better touch targets
-      cellRadius: Math.max(cellWidth, cellHeight) / 2  // Was Math.min - now use max for larger hit area
+      cellRadius: Math.min(cellWidth, cellHeight) / 2
     };
   }, [grid, gridRef, measureGrid]);
 
@@ -550,12 +521,9 @@ export function useGridInteraction({
     const selectionThreshold = currentCell.cellRadius * threshold;
 
     // Anti-accident: must be close enough to cell center
-    // Fast swipes get significantly more lenient threshold
-    // IMPROVED: More generous velocity scaling for smoother swiping
-    const velocityBonus = velocity > 0.5 ? 0.3 : velocity > 0.3 ? 0.2 : velocity > 0.1 ? 0.1 : 0;
-    // Apply touch extension factor for larger effective hit areas
-    const effectiveThreshold = selectionThreshold * TOUCH_EXTENSION_FACTOR * (1 + velocityBonus);
-    if (currentCell.distanceFromCenter > effectiveThreshold) {
+    // Fast swipes get more lenient threshold
+    const velocityBonus = velocity > 0.3 ? 0.1 : 0;
+    if (currentCell.distanceFromCenter > selectionThreshold * (1 + velocityBonus)) {
       return;
     }
 
