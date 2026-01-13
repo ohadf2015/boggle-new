@@ -2307,6 +2307,12 @@ const he = {
     "trio": {
       "hint": "מצאו את המילה שמחברת את שלושת הנושאים"
     },
+    "scrambled": {
+      "unscramble": "סדרו את האותיות!"
+    },
+    "chain": {
+      "instruction": "השלימו את שרשרת המילים!"
+    },
     "feedback": {
       "correct": "נכון!",
       "incorrect": "לא נכון",
@@ -2325,6 +2331,7 @@ const he = {
     "badge": "חדש 🔥",
     "betaPreview": "גרסת ביתא ✨",
     "challenges": "אתגרים",
+    "letters": "אותיות",
     "connectingWord": "המילה המקשרת",
     "fillTheBlank": "מלא את החסר",
     "finish": "סיים",

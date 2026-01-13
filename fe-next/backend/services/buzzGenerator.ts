@@ -14,7 +14,7 @@ import {
 // Dictionary imports removed - Buzz challenges don't validate against game dictionary
 
 interface BuzzChallenge {
-  type: 'anagram' | 'fill_blank' | 'word_chain' | 'definition_match' | 'trending_trio' | 'riddle';
+  type: 'anagram' | 'fill_blank' | 'word_chain' | 'definition_match' | 'trending_trio' | 'riddle' | 'wordle_guess';
   trend_topic: string;
   prompt: string;
   answer: string;
@@ -357,20 +357,64 @@ function buildAIPrompt(
     })
     .join('\n\n');
 
-  // Language-specific examples
+  // Language-specific examples and rules
   const langExamples = language === 'he' ? `
 **Hebrew Word Examples by Trend**:
 - Trend about Iran/conflict → מלחמה (war), שלום (peace), הגנה (defense), טיל (missile), התקפה (attack), צבא (army)
 - Trend about weather → גשם (rain), שלג (snow), קור (cold), סערה (storm), רוח (wind)
-- Trend about sports → כדורגל (soccer), נצחון (victory), גביע (trophy), שער (goal)
+- Trend about sports → כדורגל (soccer), נצחון (victory), גביע (trophy), גול (goal - NOT שער!)
 - Trend about politics → בחירות (elections), ממשלה (government), חוק (law), מדינה (state)
-- Trend about economy → כסף (money), בנק (bank), מחיר (price), שוק (market)` : `
+- Trend about economy → כסף (money), בנק (bank), מחיר (price), שוק (market)
+
+**HEBREW WORD POPULARITY - USE MODERN COLLOQUIAL TERMS**:
+In Hebrew, ALWAYS prefer the word Israelis actually USE in daily speech over formal/literary alternatives:
+- גול (goal) NOT שער (gate) for soccer scoring
+- סלפי (selfie) NOT צילום עצמי (self-photo)
+- אינטרנט (internet) NOT מרשתת (network)
+- קליק (click) NOT הקלקה (formal click)
+- לייק (like) NOT אהבתי (I liked)
+- פוסט (post) NOT פרסום (publication)
+- אפליקציה or אפ (app) NOT יישומון (application)
+- Think: "What would an Israeli teenager type?" - that's usually the right answer
+
+**CRITICAL HEBREW LANGUAGE RULES**:
+1. ALL text in prompts and answers MUST use ONLY Hebrew characters (א-ת)
+2. NEVER include English letters, Arabic letters (ا-ي), or any non-Hebrew script
+3. NEVER mix scripts - if the answer is Hebrew, ALL text must be Hebrew
+4. Numbers can be Hebrew numerals or spelled out in Hebrew words
+5. Verify EVERY character is valid Hebrew before outputting
+
+**HEBREW SCRAMBLED LETTER RULES (CRITICAL)**:
+When creating anagram/scrambled challenges, you MUST convert final letters (sofiot) to their regular forms:
+- ך (final kaf) → כ (regular kaf)
+- ם (final mem) → מ (regular mem)
+- ן (final nun) → נ (regular nun)
+- ף (final pe) → פ (regular pe)
+- ץ (final tsadi) → צ (regular tsadi)
+
+This prevents giving away that a letter is at the end of the word!
+
+Example:
+- Word שלום (shalom) with final ם
+- WRONG scrambled: "מולש" (using ם reveals it's the ending)
+- CORRECT scrambled: "מולש" should be "מולש" with מ not ם
+- The scrambled letters should be: ש,ל,ו,מ (using מ instead of ם)` : `
 **Word Examples by Trend**:
 - Trend about conflict/war → WAR, PEACE, DEFENSE, MISSILE, ATTACK, ARMY, BATTLE, TREATY
 - Trend about weather → RAIN, SNOW, COLD, STORM, WIND, HEAT, FLOOD, FREEZE
 - Trend about sports → SOCCER, VICTORY, TROPHY, GOAL, MATCH, SCORE, CHAMPION
 - Trend about politics → ELECTION, VOTE, LAW, STATE, LEADER, DEBATE, POLICY
-- Trend about economy → MONEY, BANK, PRICE, MARKET, TRADE, STOCK, PROFIT`;
+- Trend about economy → MONEY, BANK, PRICE, MARKET, TRADE, STOCK, PROFIT
+
+**WORD POPULARITY - CHOOSE THE OBVIOUS WORD**:
+Always pick the word that 90% of native speakers would guess FIRST:
+- For "what you win" → PRIZE (not AWARD, TROPHY, or MEDAL - unless context is specific)
+- For "scoring in soccer" → GOAL (not SCORE or POINT)
+- For "the end of life" → DEATH (not DEMISE, PASSING, or EXPIRY)
+- For "very happy" → HAPPY or JOY (not ELATED, EUPHORIC, or BLISSFUL)
+- For "a place to sleep" → BED (not COT, BUNK, or MATTRESS)
+- Test yourself: "What would most people type first?" - that's your answer
+- Avoid synonyms that are less common even if technically correct`;
 
   return `Generate a Daily Buzz word challenge for LexiClash, a neo-brutalist word game.
 
@@ -391,21 +435,36 @@ Create 5-7 word mini-challenges that are DIRECTLY CONNECTED to today's trending 
 4. The "trending_context" should explain WHY this trend is popular NOW
 ${langExamples}
 
-**Word Selection Rules**:
+**Word Selection Rules (CRITICAL)**:
 1. NEVER use brand names (no "Nike", "Apple", "Netflix", "Tesla", etc.)
 2. NEVER use celebrity names, company names, or country names AS ANSWERS
 3. Answers must be COMMON DICTIONARY WORDS (nouns, verbs, adjectives)
-4. Words should be 3-12 letters
+4. Words should be 3-12 letters (5 letters EXACTLY for wordle_guess type)
 5. You CAN reference proper nouns in CLUES, just not as answers
    - Good: "Clue: What nations seek after conflict | Answer: PEACE"
    - Bad: "Answer: IRAN" (proper noun)
+
+**WORD POPULARITY REQUIREMENT (CRITICAL FOR PLAYER SUCCESS)**:
+- The answer MUST be the word that 90% of players would guess FIRST
+- Think: "What word would most people type immediately for this clue?"
+- If there are synonyms, ALWAYS choose the most commonly used one
+- Players will guess the obvious/popular answer - make that your answer!
+- Example: For "opposite of war" → PEACE (not HARMONY, TRANQUILITY, or SERENITY)
+- Example: For "what you win in competition" → PRIZE (not TROPHY, AWARD, or MEDAL unless specifically about medals)
+- Example: For "where you sleep" → BED (not COT, MATTRESS, or BUNK)
+- Test yourself: "If I asked 100 people, what would most say?" - that's your answer
+- NEVER use a less-common synonym when a popular word exists
 
 **Challenge Types** (use variety):
 1. **anagram**: CLUE that references the trend + scrambled letters
    - Format: "[Trend-related clue] | Letters: XXXXX"
    - Example for Iran trend: "What diplomats negotiate for | Letters: EACEP" → PEACE
 2. **fill_blank**: Phrase connected to trending news
-   - Example: "Nations called for immediate _ _ _ _ _ _ _ _" → CEASEFIRE
+   - Use EXACTLY as many underscores as letters in the answer (one underscore per letter)
+   - Format: "Phrase with _____ (N letters)" where N is the letter count
+   - Example: "Nations called for immediate _________ (9 letters)" → CEASEFIRE
+   - Example: "The weather forecast predicts _____ (5 letters)" → STORM
+   - This helps players know the word length and type the right answer
 3. **word_chain**: Connect two trend-related words
 4. **definition_match**: Trend-related word with 4 options
 5. **riddle**: SOPHISTICATED riddles requiring LATERAL THINKING (this is the premium challenge type!)
@@ -427,6 +486,17 @@ ${langExamples}
    - "I can topple governments without touching them, spread across borders without papers, and change minds without speaking. What am I?" → NEWS
    - "I am invisible but measured, wasted by many but saved by none. Leaders fear my passage. What am I?" → TIME
    - "I fly without wings, destroy without hands, and nations fear my launch. Born from science, I bring only fire. What am I?" → MISSILE
+
+6. **wordle_guess**: Wordle-style 5-letter word guessing challenge
+   - The answer MUST be EXACTLY 5 letters (no more, no less)
+   - The prompt describes the word without giving it away directly
+   - Players will have 6 attempts to guess the word with color-coded feedback
+   - Format: "[Clue that describes the 5-letter word]"
+   - Example: "A formal agreement between nations (5 letters)" → PEACE
+   - Example: "What athletes compete for (5 letters)" → MEDAL
+   - Example: "The opposite of silence (5 letters)" → NOISE
+   - For Hebrew: The word must be exactly 5 Hebrew letters
+   - Include 1-2 wordle_guess challenges per set for variety
 
 **Output Format** (JSON only, no markdown):
 {

@@ -2264,6 +2264,7 @@ const ja = {
     "badge": "🔥 NEW",
     "betaPreview": "✨ BETA",
     "challenges": "チャレンジ",
+    "letters": "文字",
     "noTimeLimit": "タイマーなし",
     "maxScore": "最高スコア",
     "searches": "検索",
@@ -2292,6 +2293,12 @@ const ja = {
     "connectingWord": "つなぐ単語",
     "trio": {
       "hint": "この3つの単語をつなぐものを見つけよう"
+    },
+    "scrambled": {
+      "unscramble": "文字を並べ替えよう！"
+    },
+    "chain": {
+      "instruction": "単語チェーンを完成させよう！"
     },
     "type": {
       "scrambled": "バラバラ",

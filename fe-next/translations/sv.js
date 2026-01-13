@@ -2264,6 +2264,7 @@ const sv = {
     "badge": "🔥 NYHET",
     "betaPreview": "✨ BETA",
     "challenges": "Utmaningar",
+    "letters": "bokstäver",
     "connectingWord": "KOPPLINGSORDET",
     "error": {
       "title": "Ajdå!",
@@ -2289,6 +2290,12 @@ const sv = {
     "total": "TOTALT",
     "trio": {
       "hint": "Hitta ordet som kopplar alla tre ämnen"
+    },
+    "scrambled": {
+      "unscramble": "Rätta till bokstäverna!"
+    },
+    "chain": {
+      "instruction": "Slutför ordkedjan!"
     },
     "viewResults": "VISA RESULTAT",
     "yourAnswer": "DITT SVAR",

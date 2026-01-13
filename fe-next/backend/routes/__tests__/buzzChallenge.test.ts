@@ -106,6 +106,7 @@ describe('Buzz Challenge API - Response Format', () => {
           { type: 'definition_match', trend_topic: 'Test', prompt: 'p4', answer: 'a4', difficulty: 'easy', trending_context: 'c4', options: ['a', 'b', 'c', 'd'] },
           { type: 'trending_trio', trend_topic: 'Test', prompt: 'p5', answer: 'a5', difficulty: 'easy', trending_context: 'c5' },
           { type: 'riddle', trend_topic: 'Test', prompt: 'p6', answer: 'a6', difficulty: 'easy', trending_context: 'c6' },
+          { type: 'wordle_guess', trend_topic: 'Test', prompt: 'p7', answer: 'PEACE', difficulty: 'medium', trending_context: 'c7' },
         ],
         ai_model: 'gemini-3.0-pro',
         image_url: null,
@@ -125,6 +126,7 @@ describe('Buzz Challenge API - Response Format', () => {
       expect(challenges[3].type).toBe('spotOn');     // definition_match -> spotOn
       expect(challenges[4].type).toBe('trio');       // trending_trio -> trio
       expect(challenges[5].type).toBe('scrambled');  // riddle -> scrambled
+      expect(challenges[6].type).toBe('wordle');     // wordle_guess -> wordle
     });
 
     it('should return error for invalid date format', async () => {

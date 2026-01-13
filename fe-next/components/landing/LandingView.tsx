@@ -315,7 +315,10 @@ const LandingView: React.FC = () => {
         {/* Mode cards - horizontal in landscape/mobile portrait, centered grid on desktop */}
         {/* Using CSS animation for instant paint without JS overhead */}
         {/* Wrapper ensures cards are vertically centered in remaining viewport space */}
-        <div className="flex-1 flex items-center gap-2 sm:gap-4 justify-center min-h-0">
+        <div className={cn(
+          "flex items-center gap-2 sm:gap-4 justify-center min-h-0",
+          !isMobilePortrait && "flex-1"
+        )}>
         {(isLandscape || isMobilePortrait) ? (
           <div className='flex flex-col w-full'>
             {/* Landscape-only: Show compact welcome text (mobile portrait shows hero section above) */}

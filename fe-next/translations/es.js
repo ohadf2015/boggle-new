@@ -2305,6 +2305,7 @@ const es = {
     "badge": "🔥 NUEVO",
     "betaPreview": "✨ BETA",
     "challenges": "Retos",
+    "letters": "letras",
     "connectingWord": "PALABRA CONECTORA",
     "fillTheBlank": "Completa el espacio",
     "finish": "TERMINAR",
@@ -2324,6 +2325,12 @@ const es = {
     "total": "TOTAL",
     "trio": {
       "hint": "Encuentra la palabra que conecta los tres topics"
+    },
+    "scrambled": {
+      "unscramble": "¡Ordena las letras!"
+    },
+    "chain": {
+      "instruction": "¡Completa la cadena de palabras!"
     },
     "viewResults": "VER RESULTADOS",
     "yourAnswer": "TU RESPUESTA",

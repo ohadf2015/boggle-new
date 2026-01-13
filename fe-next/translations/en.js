@@ -2267,6 +2267,7 @@ const en = {
     "badge": "NEW",
     "betaPreview": "BETA",
     "challenges": "challenges",
+    "letters": "letters",
     "connectingWord": "Connecting word",
     "fillTheBlank": "Fill in the blank",
     "finish": "FINISH",
@@ -2298,6 +2299,12 @@ const en = {
     },
     "trio": {
       "hint": "What connects these 3?"
+    },
+    "scrambled": {
+      "unscramble": "Unscramble the letters!"
+    },
+    "chain": {
+      "instruction": "Complete the word chain!"
     },
     "preview": {
       "title": "Today's Topics",
