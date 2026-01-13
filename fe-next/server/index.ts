@@ -11,6 +11,9 @@
  * - lifecycle.ts - Startup initialization and graceful shutdown
  */
 
+// IMPORTANT: Must be first import - sets up globalThis.AsyncLocalStorage for Next.js 16+
+import './preload';
+
 import 'dotenv/config';
 import express, { Application, Request, Response } from 'express';
 import * as http from 'http';

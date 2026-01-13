@@ -26,16 +26,39 @@ import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardin
 import AuthModal from '@/components/auth/AuthModal';
 import LoadingComponent from '@/app/[locale]/loading';
 
+interface HeroMascotProps {
+  /** Whether in mobile portrait mode - uses smaller size */
+  isMobilePortrait?: boolean;
+}
+
 /**
  * Interactive Mascot component for the hero section
  * Responds to hover and click with mood changes
- * Uses responsive sizing - smaller on mobile for better proportions
+ * Uses responsive sizing - xs on mobile portrait, sm/md/lg on other viewports
  */
-const HeroMascot = memo(function HeroMascot() {
+const HeroMascot = memo(function HeroMascot({ isMobilePortrait = false }: HeroMascotProps) {
+  // Mobile portrait: use xs size (40px) with tap interaction
+  if (isMobilePortrait) {
+    return (
+      <div className="relative mx-auto mb-0.5">
+        <InteractiveMascotWithEntrance
+          variant="happy"
+          size="xs"
+          enableHover={false}
+          enableClick
+          clickVariant="celebrating"
+          clickAnimation="bounce"
+          priority
+          delay={0.1}
+        />
+      </div>
+    );
+  }
+
+  // Desktop/tablet: responsive sizes with hover+click
   return (
     <div className="relative mx-auto mb-1">
-      {/* Interactive Mascot - happy by default, excited on hover, celebrating on click */}
-      {/* Responsive: sm (64px) on mobile, md (96px) on tablet, lg (128px) on desktop */}
+      {/* sm (64px) on small screens */}
       <div className="block sm:hidden">
         <InteractiveMascotWithEntrance
           variant="happy"
@@ -49,6 +72,7 @@ const HeroMascot = memo(function HeroMascot() {
           delay={0.1}
         />
       </div>
+      {/* md (96px) on tablet */}
       <div className="hidden sm:block lg:hidden">
         <InteractiveMascotWithEntrance
           variant="happy"
@@ -62,6 +86,7 @@ const HeroMascot = memo(function HeroMascot() {
           delay={0.1}
         />
       </div>
+      {/* lg (128px) on desktop */}
       <div className="hidden lg:block">
         <InteractiveMascotWithEntrance
           variant="happy"
@@ -75,7 +100,6 @@ const HeroMascot = memo(function HeroMascot() {
           delay={0.1}
         />
       </div>
-
     </div>
   );
 });
@@ -236,19 +260,27 @@ const LandingView: React.FC = () => {
           <LoadingComponent />
         ) : (
           <>
-            {/* Hero section with mascot - hidden on mobile portrait and landscape */}
-            {!isLandscape && !isMobilePortrait && (
+            {/* Hero section with mascot - hidden in landscape only, shown on mobile portrait and desktop */}
+            {!isLandscape && (
           <motion.div
-            className="text-center mb-2 sm:mb-3 lg:mb-4 animate-fade-in-fast relative z-10"
-            style={{
+            className={cn(
+              "text-center animate-fade-in-fast relative z-10",
+              isMobilePortrait ? "mb-1" : "mb-2 sm:mb-3 lg:mb-4"
+            )}
+            style={!isMobilePortrait ? {
               transform: `translate(${mouseParallax.x * 1.2}px, ${mouseParallax.y * 1.2}px)`,
-            }}
+            } : undefined}
           >
-            {/* Mascot - smaller on desktop */}
-            <HeroMascot />
+            {/* Mascot - responsive sizing: xs on mobile portrait, sm on small screens, md on tablet, lg on desktop */}
+            <HeroMascot isMobilePortrait={isMobilePortrait} />
 
             <motion.h1
-              className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white mb-1 sm:mb-1.5 lg:mb-2"
+              className={cn(
+                "font-black uppercase tracking-tight text-neo-black dark:text-neo-white",
+                isMobilePortrait
+                  ? "text-lg mb-0.5"
+                  : "text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl mb-1 sm:mb-1.5 lg:mb-2"
+              )}
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
@@ -256,7 +288,10 @@ const LandingView: React.FC = () => {
               {t('landing.welcomeTitle') || 'Ready to Play?'}
             </motion.h1>
             <motion.p
-              className="text-sm sm:text-base lg:text-lg xl:text-xl font-medium text-neo-black/80 dark:text-neo-white/85"
+              className={cn(
+                "font-medium text-neo-black/80 dark:text-neo-white/85",
+                isMobilePortrait ? "text-xs" : "text-sm sm:text-base lg:text-lg xl:text-xl"
+              )}
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3 }}
@@ -275,7 +310,6 @@ const LandingView: React.FC = () => {
           />
         )}
 
-        {/* Welcome text for mobile/landscape - compact version without mascot */}
         {/* Daily Challenge Banner for mobile/landscape - Lazy loaded with skeleton fallback */}
         {/* On desktop, the banner is inside the cards container for tighter spacing */}
         {/* Mode cards - horizontal in landscape/mobile portrait, centered grid on desktop */}
@@ -283,15 +317,18 @@ const LandingView: React.FC = () => {
         {/* Wrapper ensures cards are vertically centered in remaining viewport space */}
         <div className="flex-1 flex items-center gap-2 sm:gap-4 justify-center min-h-0">
         {(isLandscape || isMobilePortrait) ? (
-          <div className='flex flex-col w-full'>   
-             <div className="text-center mb-2 animate-fade-in-fast">
-            <h1 className="text-lg sm:text-xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white">
-              {t('landing.welcomeTitle') || 'Ready to Play?'}
-            </h1>
-            <p className="text-xs sm:text-sm font-medium text-neo-black/80 dark:text-neo-white/85">
-              {t('landing.welcomeSubtitle') || 'Pick your challenge!'}
-            </p>
-          </div>     
+          <div className='flex flex-col w-full'>
+            {/* Landscape-only: Show compact welcome text (mobile portrait shows hero section above) */}
+            {isLandscape && (
+              <div className="text-center mb-2 animate-fade-in-fast">
+                <h1 className="text-lg sm:text-xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white">
+                  {t('landing.welcomeTitle') || 'Ready to Play?'}
+                </h1>
+                <p className="text-xs sm:text-sm font-medium text-neo-black/80 dark:text-neo-white/85">
+                  {t('landing.welcomeSubtitle') || 'Pick your challenge!'}
+                </p>
+              </div>
+            )}
             <div className="w-full mb-4">
             <Suspense fallback={
               <div
@@ -307,18 +344,7 @@ const LandingView: React.FC = () => {
                 </div>
               </div>
             }>
-              <DailyChallengeBanner
-                compact
-                mascot={isMobilePortrait ? (
-                  <InteractiveMascotWithEntrance
-                    variant="happy"
-                    size="xs"
-                    enableClick
-                    clickVariant="celebrating"
-                    clickAnimation="bounce"
-                  />
-                ) : undefined}
-              />
+              <DailyChallengeBanner compact />
             </Suspense>
           </div>
           {/* Landscape/Mobile Portrait: 2-column grid layout */}

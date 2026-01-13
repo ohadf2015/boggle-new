@@ -1,11 +1,11 @@
 {
   "summary": {
-    "totalKeysInCode": 2144,
+    "totalKeysInCode": 2147,
     "keyCountByLanguage": {
-      "en": 2345,
-      "he": 2345,
-      "sv": 2345,
-      "ja": 2345,
+      "en": 2348,
+      "he": 2348,
+      "sv": 2348,
+      "ja": 2348,
       "es": 2345
     },
     "missingFromEnglish": 0
@@ -15,7 +15,11 @@
     "he": [],
     "sv": [],
     "ja": [],
-    "es": []
+    "es": [
+      "auth.callback.completingSignIn",
+      "auth.callback.takingTooLong",
+      "auth.callback.tryAgain"
+    ]
   },
   "keysNotInEnglish": {
     "he": [],

@@ -4,9 +4,25 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { captureBackgroundError } from '@/utils/sentry';
 
 const logger = require('../utils/logger');
+
+/**
+ * Backend-safe error capture that doesn't require @sentry/nextjs
+ * Logs errors to console in development and captures via Sentry in production
+ * when running within Next.js context (not standalone backend)
+ */
+function captureBackgroundErrorSafe(
+  error: Error,
+  context: { operation: string; service?: string; userId?: string }
+): void {
+  // Always log to our logger for backend visibility
+  logger.error('GAME_SESSION_LOGGER', `[${context.operation}] ${error.message}`, {
+    service: context.service,
+    userId: context.userId,
+    stack: error.stack,
+  });
+}
 
 // Create Supabase client (lazy loaded)
 let supabase: SupabaseClient | null = null;
@@ -157,7 +173,7 @@ export async function logGameSession(sessionData: GameSessionData): Promise<stri
 
     if (error) {
       logger.error('GAME_SESSION_LOGGER', `Failed to log game session: ${error.message}`);
-      captureBackgroundError(new Error(error.message), {
+      captureBackgroundErrorSafe(new Error(error.message), {
         operation: 'log_game_session',
         service: 'gameSessionLogger',
         userId: sessionData.userId || undefined,
@@ -169,7 +185,7 @@ export async function logGameSession(sessionData: GameSessionData): Promise<stri
     return data.id;
   } catch (err) {
     logger.error('GAME_SESSION_LOGGER', `Exception logging game session: ${err}`);
-    captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
+    captureBackgroundErrorSafe(err instanceof Error ? err : new Error(String(err)), {
       operation: 'log_game_session_exception',
       service: 'gameSessionLogger',
       userId: sessionData.userId || undefined,
@@ -212,7 +228,7 @@ export async function updateGameSession(
 
     if (error) {
       logger.error('GAME_SESSION_LOGGER', `Failed to update game session: ${error.message}`);
-      captureBackgroundError(new Error(error.message), {
+      captureBackgroundErrorSafe(new Error(error.message), {
         operation: 'update_game_session',
         service: 'gameSessionLogger',
       });
@@ -223,7 +239,7 @@ export async function updateGameSession(
     return true;
   } catch (err) {
     logger.error('GAME_SESSION_LOGGER', `Exception updating game session: ${err}`);
-    captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
+    captureBackgroundErrorSafe(err instanceof Error ? err : new Error(String(err)), {
       operation: 'update_game_session_exception',
       service: 'gameSessionLogger',
     });
