@@ -206,23 +206,46 @@ function filterTrends(trends: TrendingTopic[], _language: string): TrendingTopic
     .slice(0, 10); // Keep top 10 filtered trends
 }
 
+interface GoogleCredentials {
+  project_id: string;
+  private_key: string;
+  client_email: string;
+}
+
 /**
  * Get Vertex AI credentials from environment
  */
-function getVertexAICredentials() {
+function getVertexAICredentials(): GoogleCredentials & { location: string } {
   const credentialsJson = process.env.GOOGLE_CREDENTIALS_JSON;
   if (!credentialsJson) {
     throw new Error('GOOGLE_CREDENTIALS_JSON environment variable is not set');
   }
 
   try {
-    const credentials = JSON.parse(credentialsJson);
+    const credentials = JSON.parse(credentialsJson) as GoogleCredentials;
+
+    // Validate required fields
+    const requiredFields: (keyof GoogleCredentials)[] = ['project_id', 'private_key', 'client_email'];
+    for (const field of requiredFields) {
+      if (!credentials[field]) {
+        throw new Error(`Missing required field in credentials: ${field}`);
+      }
+    }
+
+    // Handle escaped newlines in private_key (common when pasting JSON)
+    if (credentials.private_key.includes('\\n')) {
+      credentials.private_key = credentials.private_key.replace(/\\n/g, '\n');
+    }
+
     return {
-      project_id: credentials.project_id,
+      ...credentials,
       location: process.env.GOOGLE_CLOUD_LOCATION || 'us-central1',
     };
-  } catch {
-    throw new Error('Failed to parse GOOGLE_CREDENTIALS_JSON');
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      throw new Error(`Failed to parse GOOGLE_CREDENTIALS_JSON: ${error.message}`);
+    }
+    throw error;
   }
 }
 
@@ -234,12 +257,19 @@ async function generateChallengesWithAI(
   language: string,
   region: string
 ): Promise<BuzzChallenge[]> {
-  const { project_id, location } = getVertexAICredentials();
+  const credentials = getVertexAICredentials();
 
-  // Initialize Vertex AI client (reuses existing credentials)
+  // Initialize Vertex AI client with explicit credentials (required for Railway/serverless deployment)
   const vertexAI = new VertexAI({
-    project: project_id,
-    location,
+    project: credentials.project_id,
+    location: credentials.location,
+    googleAuthOptions: {
+      credentials: {
+        client_email: credentials.client_email,
+        private_key: credentials.private_key,
+      },
+      projectId: credentials.project_id,
+    },
   });
 
   const model = vertexAI.getGenerativeModel({
