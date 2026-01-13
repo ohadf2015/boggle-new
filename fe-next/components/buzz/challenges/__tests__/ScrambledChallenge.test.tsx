@@ -159,18 +159,11 @@ describe('ScrambledChallenge', () => {
     // Challenge type badge should be visible
     expect(screen.getByText('SCRAMBLED')).toBeInTheDocument();
 
-    // Count unique letters in the prompt
-    const letterCounts: Record<string, number> = {};
-    mockChallenge.prompt.split('').forEach((letter) => {
-      letterCounts[letter] = (letterCounts[letter] || 0) + 1;
-    });
+    // Scrambled prompt should be displayed as plain text
+    expect(screen.getByText(mockChallenge.prompt)).toBeInTheDocument();
 
-    // Each scrambled letter should be displayed in individual boxes
-    // Use getAllByText for letters that appear multiple times
-    Object.entries(letterCounts).forEach(([letter, count]) => {
-      const elements = screen.getAllByText(letter);
-      expect(elements.length).toBeGreaterThanOrEqual(count);
-    });
+    // Instruction text should be shown
+    expect(screen.getByText('Unscramble the letters!')).toBeInTheDocument();
   });
 
   it('shows hint when showHint is true', () => {

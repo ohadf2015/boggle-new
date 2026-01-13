@@ -2113,6 +2113,8 @@ const ja = {
     "title": "デイリーチャレンジ",
     "chooseQuest": "今日のクエストを選ぼう",
     "chooseChallengeHint": "挑戦を選んで！両方クリアでボーナスXP獲得！",
+    "timed90Seconds": "スピード勝負",
+    "takeYourTime": "時間無制限",
     "play": "プレイ",
     "viewResults": "結果を見る",
 "wordHunt": {
@@ -2887,7 +2889,22 @@ const ja = {
     "peakScore": "最高",
     "gamesPlayed": "ゲーム",
     "drillsCompleted": "ドリル",
-    "playMoreForTrends": "トレンドを見るにはあと{count}ゲーム"
+    "playMoreForTrends": "トレンドを見るにはあと{count}ゲーム",
+    "tiers": {
+      "novice": "初心者",
+      "apprentice": "見習い",
+      "intermediate": "中級者",
+      "advanced": "上級者",
+      "expert": "エキスパート",
+      "master": "マスター"
+    },
+    "tips": {
+      "tip1": "作業記憶容量は、毎日の単語ゲーム練習をわずか2週間行うだけで15%増加する可能性があります。",
+      "tip2": "処理速度は一貫した毎日の練習でピークに達します - 脳がより速い神経経路を形成します。",
+      "tip3": "珍しい単語を見つけることは、より深い語彙検索を活性化します - 重要な認知スキルです。",
+      "tip4": "コンボを維持することは持続的注意を訓練します - 日常生活での集中に不可欠です。",
+      "tip5": "単語の長さを切り替えることは認知的柔軟性を構築します - 精神的適応力です。"
+    }
   },
   "levelUp": {
     "title": "レベルアップ!",

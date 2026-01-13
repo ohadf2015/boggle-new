@@ -265,7 +265,7 @@ const LandingView: React.FC = () => {
           <motion.div
             className={cn(
               "text-center animate-fade-in-fast relative z-10",
-              isMobilePortrait ? "mb-0" : "mb-2 sm:mb-3 lg:mb-4"
+              isMobilePortrait ? "mb-2" : "mb-4 sm:mb-6 lg:mb-8"
             )}
             style={!isMobilePortrait ? {
               transform: `translate(${mouseParallax.x * 1.2}px, ${mouseParallax.y * 1.2}px)`,

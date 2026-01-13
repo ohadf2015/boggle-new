@@ -26,7 +26,7 @@ interface BuzzChallengeData {
     newsSnippet?: string;
   }>;
   challenges: Array<{
-    type: 'scrambled' | 'fillBlank' | 'chain' | 'spotOn' | 'trio';
+    type: 'scrambled' | 'fillBlank' | 'chain' | 'spotOn' | 'trio' | 'wordle';
     trendTopic: string;
     prompt: string;
     answer: string;

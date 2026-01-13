@@ -2120,6 +2120,8 @@ const sv = {
     "completed": "Klart!",
     "chooseQuest": "Välj Din Dagliga Quest",
     "chooseChallengeHint": "Välj din utmaning för idag. Klara båda för bonusXP!",
+    "timed90Seconds": "Snabbt Tempo",
+    "takeYourTime": "Ingen Timer",
     "play": "SPELA NU",
     "viewResults": "VISA RESULTAT",
 "wordHunt": {
@@ -2887,7 +2889,22 @@ const sv = {
     "currentScore": "Nuvarande",
     "peakScore": "Toppnotering",
     "gamesPlayed": "spel",
-    "drillsCompleted": "övningar"
+    "drillsCompleted": "övningar",
+    "tiers": {
+      "novice": "Nybörjare",
+      "apprentice": "Lärling",
+      "intermediate": "Mellanliggande",
+      "advanced": "Avancerad",
+      "expert": "Expert",
+      "master": "Mästare"
+    },
+    "tips": {
+      "tip1": "Arbetsminneskapaciteten kan öka med 15% med bara 2 veckors daglig ordspelsträning.",
+      "tip2": "Bearbetningshastigheten når sin topp med konsekvent daglig träning - din hjärna bildar snabbare nervbanor.",
+      "tip3": "Att hitta sällsynta ord aktiverar djupare ordförrådsåterhämtning - en viktig kognitiv färdighet.",
+      "tip4": "Att upprätthålla kombos tränar uthållig uppmärksamhet - avgörande för fokus i vardagen.",
+      "tip5": "Att växla mellan ordlängder bygger kognitiv flexibilitet - mental anpassningsförmåga."
+    }
   },
   "levelUp": {
     "title": "Nivå Upp!",

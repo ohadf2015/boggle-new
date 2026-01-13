@@ -2240,6 +2240,8 @@ const es = {
     },
     "chooseQuest": "Elige Tu Reto Diario",
     "chooseChallengeHint": "¡Escoge tu desafío de hoy. Completa ambos para XP extra!",
+    "timed90Seconds": "Ritmo Rápido",
+    "takeYourTime": "Sin Límite",
     "play": "JUGAR AHORA",
     "viewResults": "VER RESULTADOS",
 "wordHunt": {
@@ -2884,7 +2886,22 @@ const es = {
     "peakScore": "Máximo",
     "gamesPlayed": "partidas",
     "drillsCompleted": "ejercicios",
-    "playMoreForTrends": "Juega {count} partidas más para ver tendencias"
+    "playMoreForTrends": "Juega {count} partidas más para ver tendencias",
+    "tiers": {
+      "novice": "Novato",
+      "apprentice": "Aprendiz",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado",
+      "expert": "Experto",
+      "master": "Maestro"
+    },
+    "tips": {
+      "tip1": "La capacidad de memoria de trabajo puede aumentar un 15% con solo 2 semanas de práctica diaria de juegos de palabras.",
+      "tip2": "La velocidad de procesamiento alcanza su máximo con práctica diaria constante - tu cerebro forma vías neuronales más rápidas.",
+      "tip3": "Encontrar palabras raras activa una recuperación más profunda del vocabulario - una habilidad cognitiva clave.",
+      "tip4": "Mantener combos entrena la atención sostenida - crucial para el enfoque en la vida diaria.",
+      "tip5": "Cambiar entre longitudes de palabras construye flexibilidad cognitiva - adaptabilidad mental."
+    }
   },
   "levelUp": {
     "title": "¡Subiste de Nivel!",

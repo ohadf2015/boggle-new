@@ -1,14 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy } from 'lucide-react';
-import Image from 'next/image';
+import { Trophy, Timer, Hourglass } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { hasPlayedToday } from '@/utils/dailyChallenge/storage';
 import type { Language } from '@/types';
 import { cn } from '@/lib/utils';
-import { useMascotImageAnimation, type MascotAnimationPreset } from '@/hooks/useMascotImageAnimation';
 
 interface DailyChallengeLandingProps {
   onSelectWordHunt: () => void;
@@ -21,9 +19,14 @@ interface ChallengeStatus {
   buzz: 'new' | 'done' | 'loading';
 }
 
+interface BuzzPreviewData {
+  imageUrl?: string;
+  trendingSummary?: string;
+}
+
 /**
  * DailyChallengeLanding - Compact dual challenge selection screen
- * Mobile-first design with mascot images, no scrolling required
+ * Mobile-first design with clear differentiation between timed and relaxed modes
  */
 export function DailyChallengeLanding({
   onSelectWordHunt,
@@ -35,15 +38,16 @@ export function DailyChallengeLanding({
     wordHunt: 'loading',
     buzz: 'loading',
   });
+  const [buzzPreview, setBuzzPreview] = useState<BuzzPreviewData>({});
 
-  // Check completion status for both challenges
+  // Check completion status for both challenges and fetch buzz preview
   useEffect(() => {
     const checkStatus = async () => {
       const wordHuntPlayed = hasPlayedToday(currentLanguage);
+      const today = new Date().toISOString().split('T')[0];
 
       let buzzPlayed = false;
       try {
-        const today = new Date().toISOString().split('T')[0];
         const response = await fetch(
           `/api/buzz/check-played/${today}/${currentLanguage}`
         );
@@ -53,6 +57,22 @@ export function DailyChallengeLanding({
         }
       } catch (err) {
         console.error('Failed to check buzz status:', err);
+      }
+
+      // Fetch buzz preview data for image display
+      try {
+        const buzzResponse = await fetch(`/api/buzz/${today}/${currentLanguage}`);
+        if (buzzResponse.ok) {
+          const buzzData = await buzzResponse.json();
+          if (buzzData.success && buzzData.data) {
+            setBuzzPreview({
+              imageUrl: buzzData.data.imageUrl,
+              trendingSummary: buzzData.data.trendingSummary,
+            });
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch buzz preview:', err);
       }
 
       setStatus({
@@ -88,16 +108,16 @@ export function DailyChallengeLanding({
 
       {/* Challenge Cards - Compact Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
-        {/* Word Hunt Card */}
+        {/* Word Hunt Card - TIMED */}
         <CompactChallengeCard
-          mascotSrc="/mascot/lexi-word-hunt.png"
-          mascotAlt="Lexi running with stopwatch"
+          icon={<Timer className="w-8 h-8 sm:w-10 sm:h-10" />}
           title={t('daily.wordHunt.title')}
-          subtitle={t('daily.wordHunt.subtitle')}
           tagline={t('daily.wordHunt.desc')}
           color="orange"
           status={status.wordHunt}
           onPlay={onSelectWordHunt}
+          timeMode="timed"
+          timeModeLabel={t('daily.timed90Seconds')}
           buttonText={
             status.wordHunt === 'done'
               ? t('daily.viewResults')
@@ -106,20 +126,18 @@ export function DailyChallengeLanding({
                 : t('daily.play')
           }
           delay={0.1}
-          initialAnimation="bounce"
-          animationCycle={['bounce', 'hop', 'float', 'pulse', 'sway']}
         />
 
-        {/* Daily Buzz Card */}
+        {/* Daily Buzz Card - NO TIMER */}
         <CompactChallengeCard
-          mascotSrc="/mascot/lexi-daily-buzz.png"
-          mascotAlt="Lexi showing trending news"
+          icon={<Hourglass className="w-8 h-8 sm:w-10 sm:h-10" />}
           title={t('buzz.title')}
-          subtitle={t('buzz.subtitle')}
           tagline={t('buzz.tagline')}
           color="yellow"
           status={status.buzz}
           onPlay={onSelectBuzz}
+          timeMode="relaxed"
+          timeModeLabel={t('daily.takeYourTime')}
           badge={t('buzz.badge')}
           buttonText={
             status.buzz === 'done'
@@ -129,8 +147,8 @@ export function DailyChallengeLanding({
                 : t('daily.play')
           }
           delay={0.2}
-          initialAnimation="wiggle"
-          animationCycle={['wiggle', 'dance', 'nod', 'pulse', 'sway']}
+          previewImageUrl={buzzPreview.imageUrl}
+          previewImageAlt={buzzPreview.trendingSummary}
         />
       </div>
 
@@ -156,56 +174,54 @@ export function DailyChallengeLanding({
 
 // Compact Challenge Card Component
 interface CompactChallengeCardProps {
-  mascotSrc: string;
-  mascotAlt: string;
+  icon: ReactNode;
   title: string;
-  subtitle: string;
   tagline: string;
   color: 'orange' | 'yellow';
   status: 'new' | 'done' | 'loading';
   onPlay: () => void;
   buttonText: string;
+  timeMode: 'timed' | 'relaxed';
+  timeModeLabel: string;
   badge?: string;
   delay?: number;
-  /** Initial animation preset for variety */
-  initialAnimation?: MascotAnimationPreset;
-  /** Animation presets to cycle through */
-  animationCycle?: MascotAnimationPreset[];
+  /** AI-generated preview image URL for visual appeal */
+  previewImageUrl?: string;
+  /** Alt text for the preview image */
+  previewImageAlt?: string;
 }
 
 function CompactChallengeCard({
-  mascotSrc,
-  mascotAlt,
+  icon,
   title,
-  subtitle,
   tagline,
   color,
   status,
   onPlay,
   buttonText,
+  timeMode,
+  timeModeLabel,
   badge,
   delay = 0,
-  initialAnimation = 'bounce',
-  animationCycle = ['bounce', 'wiggle', 'float', 'pulse', 'sway', 'hop', 'dance', 'nod'],
+  previewImageUrl,
+  previewImageAlt,
 }: CompactChallengeCardProps) {
-  const { animate, transition } = useMascotImageAnimation({
-    initialPreset: initialAnimation,
-    presets: animationCycle,
-    minInterval: 6000,
-    maxInterval: 12000,
-  });
+  const [imageError, setImageError] = useState(false);
+
+  // Show image only if URL exists and hasn't errored
+  const showImage = previewImageUrl && !imageError;
 
   const colorStyles = {
     orange: {
       bg: 'bg-neo-orange',
       text: 'text-neo-orange',
-      border: 'border-neo-orange/30',
+      iconBg: 'bg-neo-orange/20',
       glow: 'hover:shadow-[0_0_20px_rgba(255,107,53,0.3)]',
     },
     yellow: {
       bg: 'bg-neo-yellow',
       text: 'text-neo-yellow',
-      border: 'border-neo-yellow/30',
+      iconBg: 'bg-neo-yellow/20',
       glow: 'hover:shadow-[0_0_20px_rgba(255,225,53,0.3)]',
     },
   };
@@ -220,7 +236,7 @@ function CompactChallengeCard({
       onClick={onPlay}
       disabled={status === 'loading'}
       className={cn(
-        'relative w-full bg-slate-900/90 rounded-xl border-3 border-neo-black p-3 sm:p-4',
+        'relative w-full bg-slate-900/90 rounded-xl border-3 border-neo-black p-4 sm:p-5',
         'shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all duration-200',
         'flex flex-col items-center text-center cursor-pointer',
         'disabled:opacity-50 disabled:cursor-not-allowed',
@@ -241,38 +257,63 @@ function CompactChallengeCard({
         ) : null}
       </div>
 
-      {/* Mascot Image with Cycling Animations */}
-      <motion.div
-        className="relative w-20 h-20 sm:w-24 sm:h-24 mb-2"
-        animate={animate}
-        transition={transition}
+      {/* Time Mode Badge - Prominent at top */}
+      <div
+        className={cn(
+          'flex items-center gap-1.5 px-3 py-1.5 rounded-full mb-3',
+          'border-2 font-bold text-sm uppercase tracking-wide',
+          timeMode === 'timed'
+            ? 'bg-neo-orange/20 border-neo-orange text-neo-orange'
+            : 'bg-neo-cyan/20 border-neo-cyan text-neo-cyan'
+        )}
       >
-        <Image
-          src={mascotSrc}
-          alt={mascotAlt}
-          fill
-          className="object-contain"
-          priority
-        />
-      </motion.div>
+        {timeMode === 'timed' ? (
+          <Timer className="w-4 h-4" />
+        ) : (
+          <Hourglass className="w-4 h-4" />
+        )}
+        <span>{timeModeLabel}</span>
+      </div>
 
-      {/* Title & Subtitle */}
-      <h2 className={cn('text-xl sm:text-2xl font-neo-display font-black', styles.text)}>
+      {/* Preview Image or Icon */}
+      {showImage ? (
+        <div className="relative w-full h-24 sm:h-32 rounded-lg overflow-hidden mb-3 border-2 border-neo-black">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={previewImageUrl}
+            alt={previewImageAlt || title}
+            className="w-full h-full object-cover"
+            onError={() => setImageError(true)}
+          />
+          {/* Subtle gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent" />
+        </div>
+      ) : (
+        <div
+          className={cn(
+            'flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-xl mb-3',
+            styles.iconBg,
+            styles.text
+          )}
+        >
+          {icon}
+        </div>
+      )}
+
+      {/* Title */}
+      <h2 className={cn('text-xl sm:text-2xl font-neo-display font-black mb-1', styles.text)}>
         {title}
       </h2>
-      <p className="text-xs sm:text-sm text-slate-400 font-medium mb-1">
-        {subtitle}
-      </p>
 
-      {/* Tagline - Single line */}
-      <p className="text-xs text-slate-500 mb-3 line-clamp-2 px-2">
+      {/* Tagline */}
+      <p className="text-xs sm:text-sm text-slate-400 mb-4 line-clamp-2 px-2">
         {tagline}
       </p>
 
       {/* Play Button */}
       <div
         className={cn(
-          'w-full py-2 sm:py-2.5 text-sm sm:text-base font-black uppercase rounded-lg',
+          'w-full py-2.5 sm:py-3 text-sm sm:text-base font-black uppercase rounded-lg',
           styles.bg,
           'text-neo-black border-2 border-neo-black shadow-hard-sm',
           'group-hover:shadow-hard transition-all'

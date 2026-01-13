@@ -35,9 +35,6 @@ export default function ScrambledChallenge({
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const isRTL = language === 'he';
 
-  // Parse scrambled letters from prompt (the scrambled word to unscramble)
-  const scrambledLetters = challenge.prompt.toUpperCase().split('');
-
   // Focus the first box on mount
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -140,42 +137,21 @@ export default function ScrambledChallenge({
           </span>
         </motion.div>
 
-        {/* Scrambled Letters Display */}
-        <motion.div
+        {/* Scrambled Letters Display - Plain text like before */}
+        <motion.h2
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.1 }}
-          className="flex justify-center gap-2 sm:gap-3 mb-4 flex-wrap"
-          dir={isRTL ? 'rtl' : 'ltr'}
+          className="text-3xl md:text-4xl font-black text-white mb-2"
         >
-          {scrambledLetters.map((letter, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: -20, rotate: -10 }}
-              animate={{
-                opacity: 1,
-                y: 0,
-                rotate: [0, -5, 5, 0],
-              }}
-              transition={{
-                delay: 0.15 + index * 0.05,
-                rotate: {
-                  duration: 0.5,
-                  delay: 0.3 + index * 0.05,
-                }
-              }}
-              className="w-10 h-12 sm:w-12 sm:h-14 flex items-center justify-center text-xl sm:text-2xl font-black text-neo-orange bg-neo-orange/20 border-3 border-neo-orange/50 rounded-lg shadow-hard-sm"
-            >
-              {letter}
-            </motion.div>
-          ))}
-        </motion.div>
+          {challenge.prompt}
+        </motion.h2>
 
         {/* Shuffle instruction */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.25 }}
+          transition={{ delay: 0.15 }}
           className="flex items-center justify-center gap-2 text-sm text-slate-400 mb-2"
         >
           <Shuffle className="w-4 h-4" />

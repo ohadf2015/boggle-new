@@ -2117,6 +2117,8 @@ const en = {
     "badge": "DAILY",
     "chooseChallengeHint": "Pick your quest",
     "chooseQuest": "Choose Your Quest",
+    "timed90Seconds": "Fast Pace",
+    "takeYourTime": "No Timer",
     "play": "PLAY",
     "viewResults": "VIEW RESULTS",
     "puzzleNumber": "Daily #{number}",
@@ -2890,7 +2892,22 @@ const en = {
     "currentScore": "Current",
     "peakScore": "Peak",
     "gamesPlayed": "games",
-    "drillsCompleted": "drills"
+    "drillsCompleted": "drills",
+    "tiers": {
+      "novice": "Novice",
+      "apprentice": "Apprentice",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "expert": "Expert",
+      "master": "Master"
+    },
+    "tips": {
+      "tip1": "Working memory capacity can increase 15% with just 2 weeks of daily word game practice.",
+      "tip2": "Processing speed peaks with consistent daily practice - your brain forms faster neural pathways.",
+      "tip3": "Finding rare words activates deeper vocabulary retrieval - a key cognitive skill.",
+      "tip4": "Maintaining combos trains sustained attention - crucial for real-world focus.",
+      "tip5": "Switching between word lengths builds cognitive flexibility - mental adaptability."
+    }
   },
   "levelUp": {
     "title": "Level Up!",
