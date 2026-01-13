@@ -58,6 +58,8 @@ export function CommunityWordsManager({ authToken }: { authToken: string }) {
   const [stats, setStats] = useState<CommunityStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState<string | null>(null);
+  const [selectedWords, setSelectedWords] = useState<Set<string>>(new Set());
+  const [bulkProcessing, setBulkProcessing] = useState(false);
   
   // Filters
   const [statusFilter, setStatusFilter] = useState<string>('pending_review');
@@ -111,12 +113,21 @@ export function CommunityWordsManager({ authToken }: { authToken: string }) {
       if (!response.ok) throw new Error('Failed to approve');
 
       toast.success(`Approved "${word}"`);
-      // Update local state instead of full reload
+      // Optimistic UI update - remove word from list
       setWords(prev => prev.filter(w => !(w.word === word && w.language === language)));
-      // Refresh stats in background
-      fetchWords();
+      // Update stats optimistically
+      if (stats) {
+        setStats({
+          ...stats,
+          validated: stats.validated + 1,
+          pendingReview: Math.max(0, stats.pendingReview - 1),
+          total: stats.total
+        });
+      }
     } catch (error) {
       toast.error('Failed to approve word');
+      // Reload on error to show accurate state
+      fetchWords();
     } finally {
       setProcessing(null);
     }
@@ -137,12 +148,150 @@ export function CommunityWordsManager({ authToken }: { authToken: string }) {
       if (!response.ok) throw new Error('Failed to reject');
 
       toast.success(`Rejected "${word}"`);
+      // Optimistic UI update - remove word from list
       setWords(prev => prev.filter(w => !(w.word === word && w.language === language)));
-      fetchWords();
+      // Update stats optimistically
+      if (stats) {
+        setStats({
+          ...stats,
+          rejected: stats.rejected + 1,
+          pendingReview: Math.max(0, stats.pendingReview - 1),
+          total: stats.total
+        });
+      }
     } catch (error) {
       toast.error('Failed to reject word');
+      // Reload on error to show accurate state
+      fetchWords();
     } finally {
       setProcessing(null);
+    }
+  };
+
+  const handleBulkApprove = async () => {
+    if (selectedWords.size === 0) {
+      toast.error('No words selected');
+      return;
+    }
+
+    try {
+      setBulkProcessing(true);
+      const wordsToApprove = words.filter(w => selectedWords.has(`${w.word}-${w.language}`));
+
+      // Process in parallel
+      const results = await Promise.allSettled(
+        wordsToApprove.map(w =>
+          fetch('/api/admin/community-words/approve', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ word: w.word, language: w.language, addToDictionary: true })
+          })
+        )
+      );
+
+      const succeeded = results.filter(r => r.status === 'fulfilled').length;
+      const failed = results.filter(r => r.status === 'rejected').length;
+
+      // Remove approved words from list
+      setWords(prev => prev.filter(w => !selectedWords.has(`${w.word}-${w.language}`)));
+      setSelectedWords(new Set());
+
+      if (failed === 0) {
+        toast.success(`Approved ${succeeded} word${succeeded !== 1 ? 's' : ''}`);
+      } else {
+        toast.error(`Approved ${succeeded}, failed ${failed}`);
+      }
+
+      // Update stats
+      if (stats) {
+        setStats({
+          ...stats,
+          validated: stats.validated + succeeded,
+          pendingReview: Math.max(0, stats.pendingReview - succeeded),
+        });
+      }
+    } catch (error) {
+      toast.error('Failed to bulk approve');
+      fetchWords();
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
+
+  const handleBulkReject = async () => {
+    if (selectedWords.size === 0) {
+      toast.error('No words selected');
+      return;
+    }
+
+    try {
+      setBulkProcessing(true);
+      const wordsToReject = words.filter(w => selectedWords.has(`${w.word}-${w.language}`));
+
+      // Process in parallel
+      const results = await Promise.allSettled(
+        wordsToReject.map(w =>
+          fetch('/api/admin/community-words/disapprove', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ word: w.word, language: w.language, blacklist: true })
+          })
+        )
+      );
+
+      const succeeded = results.filter(r => r.status === 'fulfilled').length;
+      const failed = results.filter(r => r.status === 'rejected').length;
+
+      // Remove rejected words from list
+      setWords(prev => prev.filter(w => !selectedWords.has(`${w.word}-${w.language}`)));
+      setSelectedWords(new Set());
+
+      if (failed === 0) {
+        toast.success(`Rejected ${succeeded} word${succeeded !== 1 ? 's' : ''}`);
+      } else {
+        toast.error(`Rejected ${succeeded}, failed ${failed}`);
+      }
+
+      // Update stats
+      if (stats) {
+        setStats({
+          ...stats,
+          rejected: stats.rejected + succeeded,
+          pendingReview: Math.max(0, stats.pendingReview - succeeded),
+        });
+      }
+    } catch (error) {
+      toast.error('Failed to bulk reject');
+      fetchWords();
+    } finally {
+      setBulkProcessing(false);
+    }
+  };
+
+  const toggleWordSelection = (word: string, language: string) => {
+    const key = `${word}-${language}`;
+    setSelectedWords(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(key)) {
+        newSet.delete(key);
+      } else {
+        newSet.add(key);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedWords.size === words.length) {
+      setSelectedWords(new Set());
+    } else {
+      setSelectedWords(new Set(words.map(w => `${w.word}-${w.language}`)));
     }
   };
 
@@ -178,44 +327,96 @@ export function CommunityWordsManager({ authToken }: { authToken: string }) {
         </div>
       )}
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 bg-white dark:bg-slate-800 text-black dark:text-white p-4 rounded-lg shadow-sm">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <Input 
-            placeholder="Search words..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-        
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="pending_review">Pending Review</SelectItem>
-            <SelectItem value="validated">Validated</SelectItem>
-            <SelectItem value="rejected">Rejected</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-          </SelectContent>
-        </Select>
+      {/* Filters and Bulk Actions */}
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4 bg-white dark:bg-slate-800 text-black dark:text-white p-4 rounded-lg shadow-sm">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Input
+              placeholder="Search words..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9"
+            />
+          </div>
 
-        <Select value={langFilter} onValueChange={setLangFilter}>
-          <SelectTrigger className="w-full sm:w-[150px]">
-            <SelectValue placeholder="Language" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Languages</SelectItem>
-            {LANGUAGES.map(lang => (
-              <SelectItem key={lang.code} value={lang.code}>
-                {lang.flag} {lang.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="pending_review">Pending Review</SelectItem>
+              <SelectItem value="validated">Validated</SelectItem>
+              <SelectItem value="rejected">Rejected</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={langFilter} onValueChange={setLangFilter}>
+            <SelectTrigger className="w-full sm:w-[150px]">
+              <SelectValue placeholder="Language" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Languages</SelectItem>
+              {LANGUAGES.map(lang => (
+                <SelectItem key={lang.code} value={lang.code}>
+                  {lang.flag} {lang.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Bulk Actions */}
+        {words.length > 0 && (
+          <div className="flex items-center gap-4 bg-white dark:bg-slate-800 text-black dark:text-white p-4 rounded-lg shadow-sm">
+            <input
+              type="checkbox"
+              checked={selectedWords.size === words.length && words.length > 0}
+              onChange={toggleSelectAll}
+              className="w-4 h-4 rounded border-slate-300"
+              aria-label="Select all words"
+            />
+            <span className="text-sm text-slate-600 dark:text-slate-400">
+              {selectedWords.size > 0 ? `${selectedWords.size} selected` : 'Select all'}
+            </span>
+            {selectedWords.size > 0 && (
+              <div className="flex gap-2 ml-auto">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                  onClick={handleBulkApprove}
+                  disabled={bulkProcessing}
+                >
+                  {bulkProcessing ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <Check className="w-4 h-4 mr-2" /> Approve Selected
+                    </>
+                  )}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  onClick={handleBulkReject}
+                  disabled={bulkProcessing}
+                >
+                  {bulkProcessing ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <X className="w-4 h-4 mr-2" /> Reject Selected
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Words List */}
@@ -240,14 +441,21 @@ export function CommunityWordsManager({ authToken }: { authToken: string }) {
               >
                 <Card className="h-full flex flex-col">
                   <CardHeader className="pb-2">
-                    <div className="flex justify-between items-start">
-                      <div>
+                    <div className="flex justify-between items-start gap-2">
+                      <input
+                        type="checkbox"
+                        checked={selectedWords.has(`${word.word}-${word.language}`)}
+                        onChange={() => toggleWordSelection(word.word, word.language)}
+                        className="w-4 h-4 mt-1 rounded border-slate-300 flex-shrink-0"
+                        aria-label={`Select ${word.word}`}
+                      />
+                      <div className="flex-1">
                         <CardTitle className="text-xl">{word.word}</CardTitle>
                         <div className="flex items-center gap-2 mt-1">
                           <Badge variant="outline" className="text-xs font-normal">
                             {LANGUAGES.find(l => l.code === word.language)?.flag} {word.language.toUpperCase()}
                           </Badge>
-                          <Badge 
+                          <Badge
                             variant={word.net_score >= 0 ? "default" : "destructive"}
                             className={cn(word.net_score >= 10 ? "bg-green-500" : word.net_score >= 3 ? "bg-amber-500" : "")}
                           >
@@ -255,7 +463,7 @@ export function CommunityWordsManager({ authToken }: { authToken: string }) {
                           </Badge>
                         </div>
                       </div>
-                      <div className="flex flex-col text-xs text-slate-400 text-right">
+                      <div className="flex flex-col text-xs text-slate-400 text-right flex-shrink-0">
                         <span><ThumbsUp className="w-3 h-3 inline mr-1 text-green-500"/>{word.likes_count}</span>
                         <span><ThumbsDown className="w-3 h-3 inline mr-1 text-red-500"/>{word.dislikes_count}</span>
                       </div>

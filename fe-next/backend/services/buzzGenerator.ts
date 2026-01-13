@@ -5,23 +5,12 @@
  */
 
 import { VertexAI } from '@google-cloud/vertexai';
-import { getTrendsFromDbCache, fetchGoogleTrends } from './serpApiClient';
+import { getTrendsFromDbCache, fetchGoogleTrends, TrendingTopic } from './serpApiClient';
 import {
   generateChallengeImage,
   checkImageCache,
   categorizeTopic,
 } from './imagenClient';
-
-interface TrendingTopic {
-  query: string;
-  volume?: string;
-  news_articles?: Array<{
-    title: string;
-    snippet: string;
-    source: string;
-  }>;
-  related_queries?: string[];
-}
 
 interface BuzzChallenge {
   type: 'anagram' | 'fill_blank' | 'word_chain' | 'definition_match' | 'trending_trio';
@@ -42,7 +31,7 @@ interface DailyBuzzData {
   trending_topics: TrendingTopic[];
   challenges: BuzzChallenge[];
   ai_model: string;
-  serp_api_response: any;
+  serp_api_response: unknown;
   image_url: string | null;
   image_prompt: string | null;
   image_category: string | null;
@@ -87,13 +76,16 @@ export async function generateDailyBuzz(
       try {
         trends = await fetchGoogleTrends(region, language);
         if (!trends || trends.length === 0) {
-          console.error('[BUZZ] No trends returned from SERP API');
-          throw new Error('No trending topics available for this date');
+          console.warn('[BUZZ] No trends returned from SERP API, will use fallback topics');
+          trends = getFallbackTopics(language);
+        } else {
+          console.log(`[BUZZ] Fetched ${trends.length} fresh trends from SERP API`);
         }
-        console.log(`[BUZZ] Fetched ${trends.length} fresh trends from SERP API`);
-      } catch (error: any) {
-        console.error('[BUZZ] Failed to fetch trends from SERP API:', error.message);
-        throw new Error('No trending topics available for this date');
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        console.error('[BUZZ] Failed to fetch trends from SERP API:', errorMessage);
+        console.log('[BUZZ] Using fallback topics');
+        trends = getFallbackTopics(language);
       }
     }
   }
@@ -142,8 +134,9 @@ export async function generateDailyBuzz(
         console.log(`[BUZZ] Generated new image for: ${topTrend.query}`);
       }
     }
-  } catch (error: any) {
-    console.error('[BUZZ] Image generation failed:', error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('[BUZZ] Image generation failed:', errorMessage);
     // Continue without image - not critical
   }
 
@@ -228,7 +221,7 @@ function getVertexAICredentials() {
       project_id: credentials.project_id,
       location: process.env.GOOGLE_CLOUD_LOCATION || 'us-central1',
     };
-  } catch (error) {
+  } catch {
     throw new Error('Failed to parse GOOGLE_CREDENTIALS_JSON');
   }
 }
@@ -282,14 +275,15 @@ async function generateChallengesWithAI(
     const challenges = parseAIResponse(responseText);
 
     return challenges;
-  } catch (error: any) {
-    console.error('[BUZZ] AI generation failed:', error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('[BUZZ] AI generation failed:', errorMessage);
     throw new Error('Failed to generate challenges with AI');
   }
 }
 
 /**
- * Build prompt for Claude Opus to generate word challenges
+ * Build prompt for Gemini to generate word challenges
  */
 function buildAIPrompt(
   trends: TrendingTopic[],
@@ -299,8 +293,14 @@ function buildAIPrompt(
   const trendsContext = trends
     .slice(0, 5) // Use top 5 trends
     .map((trend, idx) => {
-      const newsContext = trend.news_articles?.[0]?.snippet || 'No context available';
-      return `${idx + 1}. "${trend.query}" - ${trend.volume || 'trending'} searches\n   Context: ${newsContext}`;
+      // Use trend_breakdown for context, or category names as fallback
+      const contextParts = trend.trend_breakdown?.slice(0, 3).join(', ') ||
+        trend.categories?.map(c => c.name).join(', ') ||
+        'Currently trending';
+      const volumeDisplay = trend.search_volume
+        ? `${(trend.search_volume / 1000).toFixed(0)}K+`
+        : 'trending';
+      return `${idx + 1}. "${trend.query}" - ${volumeDisplay} searches\n   Context: ${contextParts}`;
     })
     .join('\n\n');
 
@@ -395,7 +395,7 @@ function parseAIResponse(responseText: string): BuzzChallenge[] {
     }
 
     // Validate each challenge
-    const validChallenges = parsed.challenges.filter((challenge: any) => {
+    const validChallenges = parsed.challenges.filter((challenge: Record<string, unknown>) => {
       return (
         challenge.type &&
         challenge.trend_topic &&
@@ -411,8 +411,9 @@ function parseAIResponse(responseText: string): BuzzChallenge[] {
     }
 
     return validChallenges;
-  } catch (error: any) {
-    console.error('[BUZZ] Failed to parse AI response:', error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('[BUZZ] Failed to parse AI response:', errorMessage);
     console.error('[BUZZ] Raw response:', responseText.substring(0, 500));
     throw new Error('Failed to parse AI-generated challenges');
   }
@@ -475,18 +476,18 @@ async function loadDictionary(language: string): Promise<Set<string>> {
     switch (language) {
       case 'en': {
         const enWords = await import('an-array-of-english-words');
-        words = (enWords as any).default || enWords || [];
+        words = (enWords as { default?: string[] }).default || (enWords as unknown as string[]) || [];
         break;
       }
       case 'es': {
         const esWords = await import('an-array-of-spanish-words');
-        words = (esWords as any).default || esWords || [];
+        words = (esWords as { default?: string[] }).default || (esWords as unknown as string[]) || [];
         break;
       }
       case 'sv': {
         const svWords = await import('@arvidbt/swedish-words');
         // Swedish words package exports as named export 'words', not default
-        words = (svWords as any).words || svWords || [];
+        words = (svWords as { words?: string[] }).words || (svWords as unknown as string[]) || [];
         break;
       }
       case 'he':
@@ -503,7 +504,7 @@ async function loadDictionary(language: string): Promise<Set<string>> {
         try {
           const content = await fs.readFile(dictPath, 'utf-8');
           words = content.split('\n').filter((w) => w.length > 0);
-        } catch (err) {
+        } catch {
           console.warn(`[BUZZ] Dictionary file not found for ${language}, using empty set`);
           words = [];
         }
@@ -519,8 +520,9 @@ async function loadDictionary(language: string): Promise<Set<string>> {
     }
 
     return new Set(words.map((w) => w.toUpperCase()));
-  } catch (error: any) {
-    console.error('[BUZZ] Failed to load dictionary:', error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('[BUZZ] Failed to load dictionary:', errorMessage);
     // Return empty set to fail validation gracefully
     return new Set();
   }
@@ -599,10 +601,59 @@ async function storeDailyBuzz(buzzData: DailyBuzzData): Promise<void> {
     }
 
     console.log(`[BUZZ] Stored Daily Buzz for ${buzzData.puzzle_date} (${buzzData.language})`);
-  } catch (error: any) {
-    console.error('[BUZZ] Failed to store Daily Buzz:', error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('[BUZZ] Failed to store Daily Buzz:', errorMessage);
     throw error;
   }
+}
+
+/**
+ * Get fallback topics when SERP API fails or returns no results
+ * Returns generic, family-friendly topics for word challenges
+ * Uses correct SERP API response structure
+ */
+function getFallbackTopics(_language: string): TrendingTopic[] {
+  const fallbackTopics: TrendingTopic[] = [
+    {
+      query: 'technology',
+      search_volume: 100000,
+      active: true,
+      categories: [{ id: 5, name: 'Science & Technology' }],
+      trend_breakdown: ['innovation', 'digital', 'software', 'computer']
+    },
+    {
+      query: 'nature',
+      search_volume: 80000,
+      active: true,
+      categories: [{ id: 8, name: 'Science' }],
+      trend_breakdown: ['environment', 'wildlife', 'forest', 'ocean']
+    },
+    {
+      query: 'music',
+      search_volume: 90000,
+      active: true,
+      categories: [{ id: 3, name: 'Entertainment' }],
+      trend_breakdown: ['melody', 'rhythm', 'concert', 'artist']
+    },
+    {
+      query: 'science',
+      search_volume: 75000,
+      active: true,
+      categories: [{ id: 8, name: 'Science' }],
+      trend_breakdown: ['discovery', 'research', 'experiment', 'theory']
+    },
+    {
+      query: 'travel',
+      search_volume: 85000,
+      active: true,
+      categories: [{ id: 6, name: 'Travel' }],
+      trend_breakdown: ['journey', 'destination', 'adventure', 'explore']
+    }
+  ];
+
+  console.log(`[BUZZ] Using ${fallbackTopics.length} fallback topics`);
+  return fallbackTopics;
 }
 
 /**
@@ -634,8 +685,9 @@ export async function getDailyBuzz(
     }
 
     return data as DailyBuzzData;
-  } catch (error: any) {
-    console.error('[BUZZ] Failed to get Daily Buzz:', error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('[BUZZ] Failed to get Daily Buzz:', errorMessage);
     return null;
   }
 }

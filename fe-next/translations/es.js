@@ -1653,6 +1653,10 @@ const es = {
     "LOYAL_PLAYER": {
       "name": "Jugador Leal",
       "description": "Jugó en 30 días diferentes"
+    },
+    "DAILY_DOUBLE": {
+      "name": "Doble Diario",
+      "description": "Aplastaste ambos retos de hoy"
     }
   },
   "achievementTiers": {
@@ -3288,6 +3292,7 @@ const es = {
     "play": "JUGAR AHORA",
     "viewResults": "VER RESULTADOS",
     "wordHunt": "Caza Palabras",
+    "wordHunt.title": "Caza Palabras",
     "wordHunt.subtitle": "Modo Supervivencia",
     "wordHunt.desc": "Encuentra palabras contra el reloj. ¡Halla todas las que puedas antes de que se acabe el tiempo!",
     "wordHunt.feature1": "90 segundos",

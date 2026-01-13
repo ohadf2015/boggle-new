@@ -2002,6 +2002,10 @@ const he = {
     "LOYAL_PLAYER": {
       "name": "שחקן נאמן",
       "description": "שיחק ב-30 ימים שונים"
+    },
+    "DAILY_DOUBLE": {
+      "name": "דאבל יומי 🏆",
+      "description": "ריסקת את שני האתגרים היום!"
     }
   },
   "achievementTiers": {
@@ -3300,6 +3304,7 @@ const he = {
     "play": "שחקו עכשיו",
     "viewResults": "צפו בתוצאות",
     "wordHunt": "ציד מילים",
+    "wordHunt.title": "ציד מילים 🎯",
     "wordHunt.subtitle": "מצב הישרדות",
     "wordHunt.desc": "חפשו מילים בלחץ זמן. כמה תספיקו עד שהזמן נגמר?",
     "wordHunt.feature1": "90 שניות",

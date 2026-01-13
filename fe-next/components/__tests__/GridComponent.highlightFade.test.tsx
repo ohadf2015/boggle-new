@@ -148,7 +148,7 @@ describe('GridComponent - Highlighted Path Animation and Fade-out', () => {
 
     // Should have the lime background and glow effect
     expect(cellA).toHaveClass('bg-neo-lime');
-    expect(cellA?.className).toMatch(/shadow-\[0_0_20px/); // Glow shadow
+    expect(cellA?.className).toMatch(/shadow-\[0_0_12px/); // Glow shadow
   });
 
   it('should handle empty highlighted path without errors', () => {

@@ -259,9 +259,8 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
               )}
             </AnimatePresence>
 
-            {/* Word display - morphs content */}
-            <motion.span
-              layout
+            {/* Word display - no layout animation to prevent letter wrap during changes */}
+            <span
               className={cn(
                 'font-black uppercase tracking-wide',
                 compact ? 'text-base' : 'text-xl',
@@ -275,7 +274,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   : showFeedback && visibleFeedback?.type === 'foundByOther'
                     ? (visibleFeedback.message || `Found by ${visibleFeedback.foundBy || 'another player'}`)
                     : displayWord}
-            </motion.span>
+            </span>
 
             {/* Letter count - only when forming */}
             <AnimatePresence mode="popLayout">

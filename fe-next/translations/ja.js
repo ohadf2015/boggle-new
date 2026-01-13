@@ -1670,7 +1670,7 @@ const ja = {
     },
     "wordHunt": {
       "welcome": {
-        "title": "Word Hunt",
+        "title": "ワードハント",
         "description": "隠された単語を10回以内で解読せよ。",
         "next": "次へ"
       },
@@ -1996,6 +1996,10 @@ const ja = {
     "LOYAL_PLAYER": {
       "name": "忠実なプレイヤー",
       "description": "30日間にわたってプレイ"
+    },
+    "DAILY_DOUBLE": {
+      "name": "デイリー・ダブル",
+      "description": "今日の2つのチャレンジを完全制覇！"
     }
   },
   "achievementTiers": {
@@ -3119,6 +3123,7 @@ const ja = {
     "play": "プレイ",
     "viewResults": "結果を見る",
     "wordHunt": "ワードハント",
+    "wordHunt.title": "ワードハント",
     "wordHunt.subtitle": "サバイバルモード",
     "wordHunt.desc": "時間との勝負！制限時間内にできるだけ多くの単語を見つけよう！",
     "wordHunt.feature1": "90秒",

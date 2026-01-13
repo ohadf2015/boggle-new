@@ -134,14 +134,16 @@ export const getRecommendedTimer = (difficulty: string): number => {
 };
 
 // Adaptive deadzone threshold for directional locking
-// Smaller threshold for more responsive selection
+// IMPROVED: Smaller thresholds for more responsive swipe detection
+// Deadzones prevent accidental selections but should be small enough
+// to not delay intentional swipes during onboarding/gameplay
 export const getDeadzoneThreshold = (): number => {
-  if (typeof window === 'undefined') return 10;
+  if (typeof window === 'undefined') return 8;
   const screenWidth = window.innerWidth;
-  if (screenWidth < 375) return 14;  // Small phones (iPhone SE)
-  if (screenWidth < 414) return 12;  // Regular phones
-  if (screenWidth < 768) return 10;  // Large phones
-  return 8;                           // Tablets and desktop
+  if (screenWidth < 375) return 10;  // Small phones (iPhone SE) - was 14
+  if (screenWidth < 414) return 8;   // Regular phones - was 12
+  if (screenWidth < 768) return 6;   // Large phones - was 10
+  return 5;                          // Tablets and desktop - was 8
 };
 
 // Minimum word length options

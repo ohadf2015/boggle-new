@@ -1,37 +1,21 @@
 {
   "summary": {
-    "totalKeysInCode": 2103,
+    "totalKeysInCode": 2102,
     "keyCountByLanguage": {
       "en": 3504,
-      "he": 3501,
-      "sv": 3501,
-      "ja": 3501,
-      "es": 3501
+      "he": 3504,
+      "sv": 3504,
+      "ja": 3504,
+      "es": 3504
     },
     "missingFromEnglish": 0
   },
   "missingFromEnglish": [],
   "missingByLanguage": {
-    "he": [
-      "achievements.DAILY_DOUBLE.name",
-      "achievements.DAILY_DOUBLE.description",
-      "daily.wordHunt.title"
-    ],
-    "sv": [
-      "achievements.DAILY_DOUBLE.name",
-      "achievements.DAILY_DOUBLE.description",
-      "daily.wordHunt.title"
-    ],
-    "ja": [
-      "achievements.DAILY_DOUBLE.name",
-      "achievements.DAILY_DOUBLE.description",
-      "daily.wordHunt.title"
-    ],
-    "es": [
-      "achievements.DAILY_DOUBLE.name",
-      "achievements.DAILY_DOUBLE.description",
-      "daily.wordHunt.title"
-    ]
+    "he": [],
+    "sv": [],
+    "ja": [],
+    "es": []
   },
   "keysNotInEnglish": {
     "he": [],

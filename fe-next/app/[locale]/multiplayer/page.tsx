@@ -421,19 +421,19 @@ export default function MultiplayerPage(): React.JSX.Element {
               // (user state may not be set yet during reconnect, so check session directly)
               const { data: { session } } = await getSupabaseSession();
               if (session?.user?.id) {
-                return { authUserId: session.user.id, guestTokenHash: null };
+                return { authUserId: session.user.id, guestTokenHash: null, guestSessionId: null };
               }
 
               // Fall back to guest token
               const guestSessionId = getGuestSessionId();
               if (guestSessionId) {
                 const hash = await hashToken(guestSessionId);
-                return { authUserId: null, guestTokenHash: hash };
+                return { authUserId: null, guestTokenHash: hash, guestSessionId };
               }
-              return { authUserId: null, guestTokenHash: null };
+              return { authUserId: null, guestTokenHash: null, guestSessionId: null };
             } catch (error) {
               logger.error('[AUTH] Failed to build auth context during reconnection:', error);
-              return { authUserId: null, guestTokenHash: null };
+              return { authUserId: null, guestTokenHash: null, guestSessionId: null };
             }
           };
 

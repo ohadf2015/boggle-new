@@ -131,11 +131,6 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     whileTap={{ scale: 0.98 }}
                     aria-label={t('common.goToHome') || 'Go to home page'}
                 >
-                    {/* Small lime sparkle - top left decorative */}
-                    <svg className="w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3 absolute -top-1 xs:-top-2 left-2 xs:left-4 text-neo-lime hidden xs:block animate-sparkle-left" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 0L14 10L24 12L14 14L12 24L10 14L0 12L10 10L12 0Z" />
-                    </svg>
-
                     {/* Lime-light lightning bolt - left */}
                     <svg
                         className="w-4 h-5 xs:w-5 xs:h-6 sm:w-6 sm:h-7 lg:w-7 lg:h-8 xl:w-8 xl:h-10 flex-shrink-0 text-neo-lime-light animate-lightning-left"
@@ -194,11 +189,6 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             strokeWidth="2"
                             strokeLinejoin="round"
                         />
-                    </svg>
-
-                    {/* Small lime-light sparkle - top right decorative */}
-                    <svg className="w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3 absolute -top-1 xs:-top-2 right-0 xs:right-2 text-neo-lime-light hidden xs:block animate-sparkle-right" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 0L14 10L24 12L14 14L12 24L10 14L0 12L10 10L12 0Z" />
                     </svg>
                 </motion.button>
 

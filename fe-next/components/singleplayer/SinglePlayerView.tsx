@@ -13,7 +13,7 @@ import { useGameMusic, type GamePhase } from '@/hooks/useGameMusic';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { incrementTrainingGames } from '@/utils/playerProgressStorage';
-import { getMinWordLength, getDefaultPreset, type PresetConfig } from './presetConfig';
+import { getMinWordLength, getDefaultPreset, getPresetById, type PresetConfig } from './presetConfig';
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 
@@ -88,6 +88,28 @@ const BOT_NAMES = [
   'CleverBot', 'QuickBot', 'SmartBot', 'ProBot', 'MasterBot'
 ];
 
+/**
+ * Generate bot opponents for a preset
+ * Standalone function to be used in useEffect without dependency issues
+ */
+function generateBotsForPreset(count: number, difficulty: 'easy' | 'medium' | 'hard'): BotOpponent[] {
+  const bots: BotOpponent[] = [];
+  const availableNames = [...BOT_NAMES];
+
+  for (let i = 0; i < count && availableNames.length > 0; i++) {
+    const randomIndex = Math.floor(Math.random() * availableNames.length);
+    const botName = availableNames.splice(randomIndex, 1)[0];
+    bots.push({
+      id: `bot-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
+      name: botName,
+      difficulty,
+      score: 0,
+      wordsFound: [],
+    });
+  }
+  return bots;
+}
+
 const SinglePlayerView: React.FC = () => {
   const { language: uiLanguage, t } = useLanguage();
   const router = useRouter();
@@ -128,6 +150,8 @@ const SinglePlayerView: React.FC = () => {
   const returnTo = searchParams.get('returnTo');
   // Check for autoStart param (e.g., autoStart=practice from onboarding)
   const autoStart = searchParams.get('autoStart');
+  // Check for preset param (e.g., preset=bots from NextStepPrompt after practice)
+  const presetParam = searchParams.get('preset');
 
   const [gameState, setGameState] = useState<SinglePlayerGameState>(() => ({
     mode: 'solo-bots',
@@ -204,6 +228,69 @@ const SinglePlayerView: React.FC = () => {
     }
   }, [autoStart, phase, uiLanguage]);
 
+  // Auto-start with preset when preset param is provided (e.g., preset=bots from NextStepPrompt)
+  // This handles navigation from practice mode results to "Challenge Bots"
+  useEffect(() => {
+    // Don't run if autoStart is handling the start
+    if (autoStart) return;
+    // Only run once and only from preset-selection phase
+    if (!presetParam || phase !== 'preset-selection' || hasAutoStartedRef.current) return;
+
+    hasAutoStartedRef.current = true;
+
+    // Handle special "bots" preset which means solo-bots mode with default settings
+    if (presetParam === 'bots') {
+      const botsPreset = getDefaultPreset('solo-bots');
+      if (botsPreset) {
+        const minWordLength = getMinWordLength(uiLanguage, botsPreset.settings.difficulty);
+        const bots = botsPreset.settings.bots > 0
+          ? generateBotsForPreset(botsPreset.settings.bots, botsPreset.settings.botDifficulty)
+          : [];
+        setGameState(prev => ({
+          ...prev,
+          mode: 'solo-bots',
+          difficulty: botsPreset.settings.difficulty,
+          timerSeconds: botsPreset.settings.timerSeconds,
+          bots,
+          language: uiLanguage as Language,
+          grid: null,
+          minWordLength,
+        }));
+        setPhase('playing');
+      }
+      return;
+    }
+
+    // Try to find preset by ID
+    const preset = getPresetById(presetParam);
+    if (preset) {
+      // Determine mode based on preset settings
+      let mode: SinglePlayerMode = 'solo-bots';
+      if (preset.settings.bots === 0 && preset.settings.timerSeconds === 0) {
+        mode = 'practice';
+      } else if (preset.settings.bots === 0 && preset.settings.timerSeconds > 0) {
+        mode = 'challenge';
+      }
+
+      const minWordLength = getMinWordLength(uiLanguage, preset.settings.difficulty);
+      const bots = preset.settings.bots > 0
+        ? generateBotsForPreset(preset.settings.bots, preset.settings.botDifficulty)
+        : [];
+
+      setGameState(prev => ({
+        ...prev,
+        mode,
+        difficulty: preset.settings.difficulty,
+        timerSeconds: preset.settings.timerSeconds,
+        bots,
+        language: uiLanguage as Language,
+        grid: null,
+        minWordLength,
+      }));
+      setPhase('playing');
+    }
+  }, [presetParam, autoStart, phase, uiLanguage]);
+
   // Get current high score for challenge mode
   const currentHighScore = useMemo(() => {
     if (gameState.mode !== 'challenge') return null;
@@ -219,7 +306,7 @@ const SinglePlayerView: React.FC = () => {
       const randomIndex = Math.floor(Math.random() * availableNames.length);
       const botName = availableNames.splice(randomIndex, 1)[0];
       bots.push({
-        id: `bot-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `bot-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
         name: botName,
         difficulty,
         score: 0,

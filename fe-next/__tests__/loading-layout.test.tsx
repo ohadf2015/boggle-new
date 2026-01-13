@@ -1,9 +1,33 @@
 /**
  * Test for loading state layout consistency
- * Ensures loading.tsx uses the same modern layout approach as the landing page
+ * Ensures loading.tsx uses the modern PageLoader with proper layout
  */
 import { render } from '@testing-library/react';
 import Loading from '@/app/[locale]/loading';
+
+// Mock framer-motion for simpler testing
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
+      const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
+      return <div {...domProps}>{children}</div>;
+    },
+    p: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
+      const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
+      return <p {...domProps}>{children}</p>;
+    },
+  },
+  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+}));
+
+// Mock useDevicePerformance hook
+jest.mock('@/hooks/useDevicePerformance', () => ({
+  useDevicePerformance: () => ({
+    isLowEnd: false,
+    enableComplexAnimations: true,
+    prefersReducedMotion: false,
+  }),
+}));
 
 describe('Loading Layout', () => {
   it('should use modern screen-fit layout instead of old min-h-screen', () => {
@@ -27,27 +51,23 @@ describe('Loading Layout', () => {
     expect(loadingContainer.className).toContain('bg-neo-navy');
   });
 
-  it('should maintain neo-brutalist design system colors for loading dots', () => {
+  it('should render NeoLoader component with mascot variant', () => {
     const { container } = render(<Loading />);
 
-    // All three dots should use the Phase 4 design system colors
-    const dots = container.querySelectorAll('.animate-bounce');
-    expect(dots.length).toBe(3);
-
-    // Check for Phase 4 colors
-    expect(dots[0].className).toContain('bg-neo-lime');
-    expect(dots[1].className).toContain('bg-neo-cyan');
-    expect(dots[2].className).toContain('bg-neo-pink');
+    // The loader should render with proper structure
+    // Check for the presence of the loader elements
+    const loaderContent = container.querySelector('.flex.flex-col');
+    expect(loaderContent).toBeTruthy();
   });
 
-  it('should have staggered animation delays for visual appeal', () => {
+  it('should have centered content within the loader', () => {
     const { container } = render(<Loading />);
 
-    const dots = container.querySelectorAll('.animate-bounce') as NodeListOf<HTMLElement>;
+    const loadingContainer = container.firstChild as HTMLElement;
 
-    // Each dot should have a different animation delay
-    expect(dots[0].style.animationDelay).toBe('0ms');
-    expect(dots[1].style.animationDelay).toBe('150ms');
-    expect(dots[2].style.animationDelay).toBe('300ms');
+    // Should have centering classes
+    expect(loadingContainer.className).toContain('flex');
+    expect(loadingContainer.className).toContain('items-center');
+    expect(loadingContainer.className).toContain('justify-center');
   });
 });

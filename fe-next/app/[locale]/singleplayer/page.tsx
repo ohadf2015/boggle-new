@@ -10,7 +10,7 @@ const LoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative overflow-hidden">
     <PlayfulBackground intensity="medium" colorScheme="game" />
     <div className="relative z-10">
-      <NeoLoader variant="letters" size="md" text="Loading single player..." />
+      <NeoLoader variant="mascot-letters" size="lg" text="Loading single player..." />
     </div>
   </div>
 );

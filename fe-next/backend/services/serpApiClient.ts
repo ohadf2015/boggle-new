@@ -6,20 +6,26 @@
 import axios from 'axios';
 import { getRedisClient } from '../redisClient';
 
-interface TrendingTopic {
+/**
+ * TrendingTopic interface matching actual SERP API response
+ * @see https://serpapi.com/google-trends-trending-now
+ */
+export interface TrendingTopic {
   query: string;
-  volume?: string;
-  news_articles?: Array<{
-    title: string;
-    snippet: string;
-    source: string;
-  }>;
-  related_queries?: string[];
+  start_timestamp?: number;
+  end_timestamp?: number;
+  active?: boolean;
+  search_volume?: number;
+  increase_percentage?: number;
+  categories?: Array<{ id: number; name: string }>;
+  trend_breakdown?: string[];
+  serpapi_google_trends_link?: string;
+  serpapi_news_link?: string;
 }
 
 interface SerpApiResponse {
   trending_searches: TrendingTopic[];
-  serpapi_pagination?: any;
+  serpapi_pagination?: unknown;
 }
 
 const CACHE_TTL = 86400; // 24 hours in seconds
@@ -58,8 +64,8 @@ export async function fetchGoogleTrends(
     const response = await axios.get<SerpApiResponse>('https://serpapi.com/search.json', {
       params: {
         engine: 'google_trends_trending_now',
-        frequency: 'realtime',
         geo: region,
+        hours: 24, // Get trends from last 24 hours for fresh daily content
         ...(language && { hl: language }),
         api_key: process.env.SERPAPI_KEY
       },
@@ -86,11 +92,12 @@ export async function fetchGoogleTrends(
     console.log(`[SERP] Fetched ${trends.length} trends for ${region} in ${apiResponseTime}ms`);
     return trends;
 
-  } catch (error: any) {
-    console.error(`[SERP] Error fetching trends for ${region}:`, error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`[SERP] Error fetching trends for ${region}:`, errorMessage);
 
     // Log error to database
-    await logSerpApiRequest(region, 0, 0, false, error.message).catch(err =>
+    await logSerpApiRequest(region, 0, 0, false, errorMessage).catch(err =>
       console.error('[SERP] Failed to log error:', err)
     );
 
@@ -233,7 +240,7 @@ function getYesterdayDate(): string {
 export async function checkSerpApiHealth(): Promise<{
   healthy: boolean;
   message: string;
-  quotaInfo?: any;
+  quotaInfo?: unknown;
 }> {
   try {
     // Make a minimal test request
@@ -249,10 +256,11 @@ export async function checkSerpApiHealth(): Promise<{
       message: 'SERP API is healthy',
       quotaInfo: response.data
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return {
       healthy: false,
-      message: `SERP API health check failed: ${error.message}`
+      message: `SERP API health check failed: ${errorMessage}`
     };
   }
 }

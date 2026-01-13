@@ -103,6 +103,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const keyboardInput = useKeyboardWordInput({
     grid,
     language,
+    gameLanguage: language,
     enabled: !state.isGameOver,
     onWordSubmit: actions.handleWordSubmit,
     minWordLength: 3,

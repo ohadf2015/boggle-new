@@ -13,9 +13,13 @@
  */
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import toast from 'react-hot-toast';
 import { couldBeOnBoard, normalizeWord } from '@/utils/clientWordValidator';
+import { detectInputLanguage, getLanguageName } from '@/utils/languageDetection';
+import { useIsDesktop } from '@/hooks/useMediaQuery';
 import type { LetterGrid } from '@/types';
 import type { HighlightedCell } from '@/components/GridComponent';
+import type { Language } from '@/shared/types/game';
 
 // ==================== Types ====================
 
@@ -24,6 +28,8 @@ export interface UseKeyboardWordInputOptions {
   grid: LetterGrid;
   /** Language for normalization */
   language: string;
+  /** Board language (for desktop keyboard mismatch notifications) */
+  gameLanguage?: Language | null;
   /** Whether keyboard input is enabled */
   enabled: boolean;
   /** Callback when word is submitted */
@@ -224,6 +230,7 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
   const {
     grid,
     language,
+    gameLanguage,
     enabled,
     onWordSubmit,
     onTypedWordChange,
@@ -233,6 +240,8 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
   const [typedWord, setTypedWord] = useState('');
   const [isTypingMode, setIsTypingMode] = useState(false);
   const typedWordRef = useRef('');
+  const languageMismatchNotifiedRef = useRef(false);
+  const isDesktop = useIsDesktop();
 
   // Keep ref in sync with state
   useEffect(() => {
@@ -330,6 +339,26 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
       // Check if it's a single printable character (letter)
       if (key.length === 1 && /[\p{L}]/u.test(key)) {
         e.preventDefault();
+
+        // Desktop only: Check for language mismatch and show notification once per session
+        if (isDesktop && gameLanguage && !languageMismatchNotifiedRef.current) {
+          const inputLanguage = detectInputLanguage(key);
+
+          // If input language detected and doesn't match board language
+          if (inputLanguage && inputLanguage !== gameLanguage) {
+            const boardLanguageName = getLanguageName(gameLanguage);
+            toast.error(
+              `Please switch to ${boardLanguageName} keyboard to match the board language`,
+              {
+                duration: 5000,
+                position: 'top-center',
+                icon: '⌨️',
+              }
+            );
+            languageMismatchNotifiedRef.current = true;
+          }
+        }
+
         setTypedWord(prev => prev + key.toUpperCase());
         setIsTypingMode(true);
       }
@@ -342,10 +371,11 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, minWordLength, submitTypedWord, clearTypedWord]); // typedWord accessed via ref pattern inside handler
 
-  // Clear typed word when grid changes (new game)
+  // Clear typed word when grid changes (new game) and reset notification flag
   useEffect(() => {
     setTypedWord('');
     setIsTypingMode(false);
+    languageMismatchNotifiedRef.current = false;
   }, [grid]);
 
   return {

@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
 import { translations } from '@/translations';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 type Locale = keyof typeof translations;
 
@@ -9,18 +10,8 @@ interface PageParams {
   params: Promise<{ locale: string; puzzleCode: string }>;
 }
 
-// Loading fallback component
-const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
-    <div className="text-center">
-      <div className="relative w-12 h-12 mx-auto mb-3">
-        <div className="absolute inset-0 border-4 border-neo-pink/30 rounded-full" />
-        <div className="absolute inset-0 border-4 border-transparent border-t-neo-pink rounded-full animate-spin" />
-      </div>
-      <p className="text-gray-600 dark:text-gray-300 text-sm">Loading Custom Puzzle...</p>
-    </div>
-  </div>
-);
+// Loading fallback component using unified PageLoader
+const LoadingFallback = () => <PageLoader text="Loading Custom Puzzle..." />;
 
 // Dynamic import for code splitting (client component)
 const CustomPuzzleGame = dynamicImport(() => import('@/components/custom-puzzle/CustomPuzzleGame'), {

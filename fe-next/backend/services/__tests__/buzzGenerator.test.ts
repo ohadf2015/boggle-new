@@ -155,40 +155,28 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
     // Mock getTrendsFromDbCache to return null (no cached trends)
     (serpApiClient.getTrendsFromDbCache as jest.Mock).mockResolvedValue(null);
 
-    // Mock fetchGoogleTrends to return sample trends
+    // Mock fetchGoogleTrends to return sample trends matching SERP API structure
     (serpApiClient.fetchGoogleTrends as jest.Mock).mockResolvedValue([
       {
         query: 'ישראל',
-        volume: '500K+',
-        news_articles: [
-          {
-            title: 'Breaking News',
-            snippet: 'Important news about Israel',
-            source: 'News Source',
-          },
-        ],
+        search_volume: 500000,
+        active: true,
+        categories: [{ id: 1, name: 'News' }],
+        trend_breakdown: ['Breaking News', 'Important news about Israel'],
       },
       {
         query: 'טכנולוגיה',
-        volume: '200K+',
-        news_articles: [
-          {
-            title: 'Tech Update',
-            snippet: 'New technology trends',
-            source: 'Tech Magazine',
-          },
-        ],
+        search_volume: 200000,
+        active: true,
+        categories: [{ id: 5, name: 'Science & Technology' }],
+        trend_breakdown: ['Tech Update', 'New technology trends'],
       },
       {
         query: 'ספורט',
-        volume: '150K+',
-        news_articles: [
-          {
-            title: 'Sports News',
-            snippet: 'Latest sports updates',
-            source: 'Sports Network',
-          },
-        ],
+        search_volume: 150000,
+        active: true,
+        categories: [{ id: 7, name: 'Sports' }],
+        trend_breakdown: ['Sports News', 'Latest sports updates'],
       },
     ]);
   });
@@ -204,7 +192,7 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
     expect(serpApiClient.fetchGoogleTrends).toHaveBeenCalledWith('IL', expect.anything());
   });
 
-  it('should throw descriptive error only when SERP API also returns no trends', async () => {
+  it('should use fallback topics when SERP API returns no trends', async () => {
     // Mock both cache and SERP API to return empty
     (serpApiClient.getTrendsFromDbCache as jest.Mock).mockResolvedValue(null);
     (serpApiClient.fetchGoogleTrends as jest.Mock).mockResolvedValue([]);
@@ -212,8 +200,21 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
     const today = new Date();
     const language = 'he';
 
-    await expect(generateDailyBuzz(today, language)).rejects.toThrow(
-      'No trending topics available for this date'
+    // Should NOT throw - should use fallback topics instead
+    const result = await generateDailyBuzz(today, language);
+
+    // Verify result is valid
+    expect(result).toBeDefined();
+    expect(result.challenges).toBeDefined();
+    expect(result.challenges.length).toBeGreaterThan(0);
+    expect(result.trending_topics).toBeDefined();
+    expect(result.trending_topics.length).toBeGreaterThan(0);
+
+    // Verify fallback topics were used (check for generic topics)
+    const topicQueries = result.trending_topics.map(t => t.query.toLowerCase());
+    const hasGenericTopics = topicQueries.some(q =>
+      ['technology', 'nature', 'music', 'science', 'travel'].includes(q)
     );
+    expect(hasGenericTopics).toBe(true);
   });
 });

@@ -182,11 +182,13 @@ describe('useEarthquakeFireRound', () => {
     it('should transition from idle → warning → shaking → fire-round', async () => {
       // Use a stable gameSessionId computed once (not inside callback to avoid re-render resets)
       const stableSessionId = Date.now();
+      // Use currentTimeSeconds: 120 (meaning 60 seconds elapsed = 33% elapsed)
+      // This is well before the 65% trigger window, so earthquake won't auto-trigger
       const { result } = renderHook(() =>
         useEarthquakeFireRound({
           enabled: true,
           gameDurationSeconds: 180,
-          currentTimeSeconds: 60,
+          currentTimeSeconds: 120,
           language: 'en',
           difficulty: 'MEDIUM',
           mode: 'singleplayer',

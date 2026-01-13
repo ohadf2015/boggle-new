@@ -276,21 +276,23 @@ const LandingView: React.FC = () => {
         )}
 
         {/* Welcome text for mobile/landscape - compact version without mascot */}
-        {(isLandscape || isMobilePortrait) && (
-          <div className="text-center mb-2 animate-fade-in-fast">
+        {/* Daily Challenge Banner for mobile/landscape - Lazy loaded with skeleton fallback */}
+        {/* On desktop, the banner is inside the cards container for tighter spacing */}
+        {/* Mode cards - horizontal in landscape/mobile portrait, centered grid on desktop */}
+        {/* Using CSS animation for instant paint without JS overhead */}
+        {/* Wrapper ensures cards are vertically centered in remaining viewport space */}
+        <div className="flex-1 flex items-center gap-2 sm:gap-4 justify-center min-h-0">
+        {(isLandscape || isMobilePortrait) ? (
+          <div className='flex flex-col w-full'>   
+             <div className="text-center mb-2 animate-fade-in-fast">
             <h1 className="text-lg sm:text-xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white">
               {t('landing.welcomeTitle') || 'Ready to Play?'}
             </h1>
             <p className="text-xs sm:text-sm font-medium text-neo-black/80 dark:text-neo-white/85">
               {t('landing.welcomeSubtitle') || 'Pick your challenge!'}
             </p>
-          </div>
-        )}
-
-        {/* Daily Challenge Banner for mobile/landscape - Lazy loaded with skeleton fallback */}
-        {/* On desktop, the banner is inside the cards container for tighter spacing */}
-        {(isLandscape || isMobilePortrait) && (
-          <div className="w-full mb-4">
+          </div>     
+            <div className="w-full mb-4">
             <Suspense fallback={
               <div
                 className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-yellow"
@@ -319,14 +321,7 @@ const LandingView: React.FC = () => {
               />
             </Suspense>
           </div>
-        )}
-
-        {/* Mode cards - horizontal in landscape/mobile portrait, centered grid on desktop */}
-        {/* Using CSS animation for instant paint without JS overhead */}
-        {/* Wrapper ensures cards are vertically centered in remaining viewport space */}
-        <div className="flex-1 flex items-center justify-center min-h-0">
-        {(isLandscape || isMobilePortrait) ? (
-          /* Landscape/Mobile Portrait: 2-column grid layout */
+          {/* Landscape/Mobile Portrait: 2-column grid layout */}
           <div className="w-full animate-fade-in-fast grid grid-cols-2 gap-2 sm:gap-3 min-h-0 auto-rows-fr content-center">
             {/* Multiplayer Card - Compact */}
             <Link
@@ -446,6 +441,7 @@ const LandingView: React.FC = () => {
               </button>
             )}
           </div>
+          </div>
         ) : (
           /* Desktop: Centered grid layout with visual hierarchy */
           <div className="w-full animate-fade-in-fast flex flex-col items-center justify-center">
@@ -518,11 +514,11 @@ const LandingView: React.FC = () => {
 
       {/* Tutorial FAB - Fixed bottom corner button */}
       {/* Position uses max() to ensure button clears safe area on devices with home indicators */}
-      {/* z-[110] on desktop ensures button appears above footer (z-10) in layout */}
+      {/* sm:bottom-24 clears the footer (visible at sm:) which is ~72px tall */}
       <button
         onClick={handleOpenTutorial}
         className="
-          fixed bottom-[max(env(safe-area-inset-bottom,0px),1rem)] right-4 z-[45] lg:bottom-8 lg:right-8 lg:z-[110]
+          fixed bottom-[max(env(safe-area-inset-bottom,0px),1rem)] right-4 z-[45] sm:bottom-24 sm:right-6 lg:right-8
           flex items-center justify-center gap-2
           min-w-[48px] min-h-[48px]
           px-4 py-3
@@ -533,7 +529,7 @@ const LandingView: React.FC = () => {
           hover:scale-105 hover:shadow-hard-xl
           active:scale-95 active:shadow-hard
           transition-all duration-150
-          rtl:right-auto rtl:left-4
+          rtl:right-auto rtl:left-4 sm:rtl:left-6 lg:rtl:left-8
           animate-fade-in-up
         "
         aria-label={t('landing.tutorial') || 'Tutorial'}

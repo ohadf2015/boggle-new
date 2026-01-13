@@ -506,25 +506,12 @@ body {
     animation: earthquake-shake 0.6s ease-in-out;
   }
 
-  /* Letter Tile Gradient - Modern smooth 3D effect for grid cells */
+  /* Letter Tile Gradient - Clean minimal design with subtle depth */
   .letter-tile-gradient {
-    background:
-      /* Subtle inner glow for depth */
-      radial-gradient(ellipse 70% 50% at 35% 30%,
-        rgba(255, 255, 255, 0.95) 0%,
-        rgba(255, 255, 255, 0.4) 35%,
-        transparent 60%),
-      /* Soft edge highlight */
-      linear-gradient(145deg,
-        rgba(255, 255, 255, 0.6) 0%,
-        transparent 25%),
-      /* Main gradient - warm cream with subtle depth */
-      linear-gradient(165deg,
-        #fffef9 0%,
-        #fcfbf4 25%,
-        #f7f5ed 50%,
-        #f3f0e6 75%,
-        #eeebe0 100%);
+    background: linear-gradient(165deg,
+      #ffffff 0%,
+      #fafaf9 40%,
+      #f5f5f3 100%);
   }
 
   /* Letter Tile Gradient (Cream variant) - For onboarding grids */
@@ -743,16 +730,18 @@ body {
     z-index: 1;
   }
 
-  /* Game Board Frame (Clipboard aesthetic) */
+  /* Game Board Frame (Neo-Brutalist design with hard shadows) */
   .game-board-frame {
     position: relative;
     background: var(--neo-cream);
-    border: var(--border-neo-thick) solid rgb(var(--neo-black));
-    box-shadow: var(--shadow-xl);
+    /* Neo-Brutalist: thick black border */
+    border: 4px solid rgb(var(--neo-black));
+    /* Neo-Brutalist: hard shadow (NO blur) */
+    box-shadow: 6px 6px 0px rgb(var(--neo-black));
     border-radius: var(--radius-lg);
     /* No rotation - keep grid perfectly straight */
-    /* Consolidated padding: 6px base, maximizing grid cell space */
-    padding: 6px;
+    /* Padding for breathing room around the grid */
+    padding: 12px;
     /* Simplified sizing using vmin to prevent layout shift on orientation change */
     /* Max height leaves room for timer, stats, and word forming area above grid */
     width: min(80vmin, calc(100vw - 32px), calc(100dvh - 220px));
@@ -773,7 +762,7 @@ body {
       width: min(55vmin, calc(100vw - 550px), calc(100dvh - 260px));
       height: min(55vmin, calc(100vw - 550px), calc(100dvh - 260px));
       max-height: calc(100dvh - 260px);
-      padding: 8px;
+      padding: 14px;
     }
   }
 
@@ -800,8 +789,8 @@ body {
   /* On smaller screens, maximize board size with minimal margins */
   @media (max-width: 768px) {
     .game-board-frame {
-      /* Minimal padding to maximize grid space on mobile */
-      padding: 4px;
+      /* Some padding for breathing room on mobile */
+      padding: 8px;
       /* Maximize width: full screen minus tiny 8px total margin (4px each side) */
       width: calc(100vw - 8px);
       /* Height: square but capped to leave room for header/UI and safe area (home indicator) */
@@ -815,6 +804,11 @@ body {
   /* Note: Removed position: relative override that was breaking absolute-positioned grid children */
   .game-board-frame>* {
     z-index: 10;
+  }
+
+  /* RTL-aware hard shadow for game board frame */
+  [dir="rtl"] .game-board-frame {
+    box-shadow: -6px 6px 0px rgb(var(--neo-black));
   }
 
   /* Clipboard clip at top */
@@ -3212,6 +3206,72 @@ html.reduce-motion *::after {
 .low-end-device .game-board-frame [role="gridcell"]:active {
   transform: scale(0.98) !important;
   transition: none !important;
+}
+
+/* ==================== Enhanced Touch Interaction Styles ==================== */
+/* Improved touch targets and feedback for onboarding and general gameplay */
+
+/* Larger effective touch area via padding trick - apply to all devices */
+.game-board-frame [role="gridcell"] {
+  /* Use position relative for pseudo-element touch area expansion */
+  position: relative;
+  /* Prevent text selection during swipe */
+  user-select: none;
+  -webkit-user-select: none;
+  /* Ensure touch events are captured */
+  touch-action: none;
+}
+
+/* Expand touch target beyond visible bounds */
+.game-board-frame [role="gridcell"]::before {
+  content: '';
+  position: absolute;
+  /* Expand by 15% beyond cell bounds on all sides */
+  inset: -15%;
+  z-index: -1;
+  /* Invisible but captures touch events */
+  background: transparent;
+}
+
+/* Visual feedback during active touch/swipe on adjacent cells */
+.game-board-frame [role="gridcell"].ring-neo-lime\/70 {
+  /* Adjacent hint cells - pulse subtly to show they're valid targets */
+  animation: adjacentPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes adjacentPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/* RTL support: Ensure swipe gestures work correctly in both directions */
+/* The grid itself uses dir="ltr" but we ensure touch feedback is consistent */
+[dir="rtl"] .game-board-frame {
+  /* Touch coordinates are handled in JS, but visual feedback should be RTL-aware */
+}
+
+/* Mobile-specific: Increase touch target for better swipe accuracy */
+@media (hover: none) and (pointer: coarse) {
+  .game-board-frame [role="gridcell"]::before {
+    /* Even larger touch expansion on touch devices */
+    inset: -20%;
+  }
+
+  /* Smoother transitions during swipe for better perceived responsiveness */
+  .game-board-frame [role="gridcell"] {
+    transition: transform 80ms ease-out, background-color 80ms ease-out;
+    will-change: transform;
+  }
+
+  /* Immediate visual feedback on touch */
+  .game-board-frame [role="gridcell"]:active {
+    transform: scale(0.95);
+    transition: transform 0ms;
+  }
 }
 
 /* ==================== TV Broadcast Mode Grid ==================== */

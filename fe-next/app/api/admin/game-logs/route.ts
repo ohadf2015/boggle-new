@@ -233,7 +233,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Fetch Word Hunt games from daily_word_hunt_attempts
+    // Fetch Daily Word games from daily_word_hunt_attempts (Wordle-like game)
     let wordHuntGames: any[] = [];
     let wordHuntCount = 0;
 
@@ -242,15 +242,18 @@ export async function GET(request: NextRequest) {
         .from('daily_word_hunt_attempts')
         .select(`
           id,
-          user_id,
-          guest_token,
+          player_id,
+          guest_fingerprint,
           language,
-          score,
-          words_found,
-          longest_word,
-          duration_seconds,
+          puzzle_number,
+          solved,
+          attempts_used,
+          target_word,
+          words_discovered,
+          efficiency_score,
+          completed_at,
           created_at,
-          profiles:user_id (
+          profiles:player_id (
             username,
             display_name,
             avatar_emoji,
@@ -286,18 +289,20 @@ export async function GET(request: NextRequest) {
           wordHuntCount = whCount || 0;
           wordHuntGames = (wordHuntData || []).map((attempt: any) => ({
             id: attempt.id,
-            player_id: attempt.user_id,
-            guest_session_id: attempt.guest_token,
-            game_code: 'word_hunt',
-            score: attempt.score || 0,
-            word_count: Array.isArray(attempt.words_found) ? attempt.words_found.length : 0,
-            longest_word: attempt.longest_word || null,
+            player_id: attempt.player_id,
+            guest_session_id: attempt.guest_fingerprint,
+            game_code: `daily_word_${attempt.puzzle_number}`,
+            score: attempt.efficiency_score || 0,
+            word_count: Array.isArray(attempt.words_discovered) ? attempt.words_discovered.length : 0,
+            longest_word: attempt.target_word || null,
             placement: null,
             is_ranked: false,
-            is_guest: !attempt.user_id,
-            mode: 'word_hunt',
+            is_guest: !attempt.player_id,
+            mode: 'daily_word',
+            solved: attempt.solved,
+            attempts_used: attempt.attempts_used,
             language: attempt.language,
-            time_played: attempt.duration_seconds || 0,
+            time_played: 0, // Duration not tracked for this game type
             created_at: attempt.created_at,
             profiles: attempt.profiles || null,
           }));
@@ -307,7 +312,7 @@ export async function GET(request: NextRequest) {
       console.error('[admin/game-logs] Word Hunt fetch error:', error);
     }
 
-    // Fetch Daily Challenge games from daily_puzzle_attempts
+    // Fetch Daily Challenge games from daily_puzzle_attempts (Word Hunt daily puzzles)
     let dailyChallengeGames: any[] = [];
     let dailyChallengeCount = 0;
 
@@ -316,15 +321,16 @@ export async function GET(request: NextRequest) {
         .from('daily_puzzle_attempts')
         .select(`
           id,
-          user_id,
-          guest_token,
+          player_id,
+          guest_fingerprint,
           puzzle_number,
+          language,
           score,
-          words_found,
-          completed,
-          duration_seconds,
-          created_at,
-          profiles:user_id (
+          word_count,
+          time_seconds,
+          longest_word,
+          completed_at,
+          profiles:player_id (
             username,
             display_name,
             avatar_emoji,
@@ -355,19 +361,19 @@ export async function GET(request: NextRequest) {
           dailyChallengeCount = dcCount || 0;
           dailyChallengeGames = (dailyData || []).map((attempt: any) => ({
             id: attempt.id,
-            player_id: attempt.user_id,
-            guest_session_id: attempt.guest_token,
-            game_code: `daily_${attempt.puzzle_number}`,
+            player_id: attempt.player_id,
+            guest_session_id: attempt.guest_fingerprint,
+            game_code: `daily_puzzle_${attempt.puzzle_number}`,
             score: attempt.score || 0,
-            word_count: Array.isArray(attempt.words_found) ? attempt.words_found.length : 0,
-            longest_word: null,
+            word_count: attempt.word_count || 0,
+            longest_word: attempt.longest_word || null,
             placement: null,
             is_ranked: false,
-            is_guest: !attempt.user_id,
+            is_guest: !attempt.player_id,
             mode: 'daily_challenge',
-            language: 'en', // Daily puzzles are typically English
-            time_played: attempt.duration_seconds || 0,
-            created_at: attempt.created_at,
+            language: attempt.language || 'en',
+            time_played: attempt.time_seconds || 0,
+            created_at: attempt.completed_at || attempt.created_at,
             profiles: attempt.profiles || null,
           }));
         }

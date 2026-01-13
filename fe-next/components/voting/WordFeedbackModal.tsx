@@ -270,12 +270,6 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
             >
               {encouragementSentence}
             </motion.p>
-
-            {/* Question */}
-            <p className="text-center text-neo-black font-bold text-lg">
-              {t('wordFeedback.question') || 'Is this a real word?'}
-            </p>
-
             {/* Submitter Info - Shows who found this word */}
             {currentWord.submittedBy && (
               <motion.div
@@ -289,7 +283,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                     size="sm"
                   />
                 )}
-                <span className="text-sm font-semibold">
+                <span className="text-sm text-white font-semibold">
                   {t('wordFeedback.submittedBy') || 'Submitted by'}: <span className="font-bold text-neo-pink">{currentWord.submittedBy}</span>
                 </span>
               </motion.div>

@@ -450,7 +450,9 @@ router.get(
         trending_summary: challenge.trending_summary,
         topics: challenge.trending_topics.slice(0, 3).map((topic) => ({
           query: topic.query,
-          volume: topic.volume || 'trending',
+          volume: topic.search_volume
+            ? `${(topic.search_volume / 1000).toFixed(0)}K+`
+            : 'trending',
         })),
         total_challenges: challenge.challenges.length,
       };

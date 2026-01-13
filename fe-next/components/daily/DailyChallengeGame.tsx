@@ -366,6 +366,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   const keyboardInput = useKeyboardWordInput({
     grid,
     language,
+    gameLanguage: language,
     enabled: !isGameOver,
     onWordSubmit: handleWordSubmit,
     minWordLength: 3,

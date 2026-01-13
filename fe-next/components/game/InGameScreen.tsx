@@ -241,7 +241,8 @@ const InGameScreen = memo<InGameScreenProps>(({
 
   // Track when the last word was found - used for inactivity-based keyboard trail visibility
   // Trails are shown only when player hasn't found a word for a while (30+ seconds)
-  const [lastWordFoundTime, setLastWordFoundTime] = useState<number>(0);
+  // Initialize to Date.now() if game is already active to prevent trails from showing immediately
+  const [lastWordFoundTime, setLastWordFoundTime] = useState<number>(() => gameActive ? Date.now() : 0);
 
   // Force re-render periodically to check trail visibility based on time elapsed
   const [, setTrailsCheckTick] = useState(0);
@@ -253,14 +254,14 @@ const InGameScreen = memo<InGameScreenProps>(({
     return () => clearInterval(interval);
   }, [gameActive, isPlaying]);
 
-  // Reset lastWordFoundTime to current time when game starts
+  // Reset lastWordFoundTime to current time when game starts or becomes active
   // This ensures keyboard trails don't show immediately - they'll only
   // appear after the inactivity threshold (10s new players, 30s experienced)
   useEffect(() => {
-    if (gameActive && showStartAnimation) {
+    if (gameActive) {
       setLastWordFoundTime(Date.now());
     }
-  }, [gameActive, showStartAnimation]);
+  }, [gameActive]);
 
   // Viewport height detection for very short landscape screens
   const [viewportHeight, setViewportHeight] = useState(0);
@@ -550,6 +551,7 @@ const InGameScreen = memo<InGameScreenProps>(({
   const keyboardInput = useKeyboardWordInput({
     grid: letterGrid,
     language: gameLanguage || 'en',
+    gameLanguage: gameLanguage,
     enabled: isPlaying && gameActive && !showStartAnimation,
     onWordSubmit: handleGridWordSubmit,
     minWordLength,
@@ -986,9 +988,37 @@ const InGameScreen = memo<InGameScreenProps>(({
 
         {/* Center Column: Timer, Score, Grid */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden max-h-full">
-          {/* Stats row - Timer centered, Combo + Score absolutely positioned on right */}
+          {/* Stats row - Timer centered, Exit+Hint on left (desktop), Combo+Score on right */}
           {remainingTime !== null && (
             <div ref={gameStatsRef} className="relative flex items-center justify-center flex-shrink-0 mb-2 md:mb-3" role="status" aria-label="Game status">
+              {/* Exit + Hint - absolutely positioned on left (desktop only) */}
+              <div className="absolute left-2 rtl:left-auto rtl:right-2 md:left-4 md:rtl:right-4 top-1/2 -translate-y-1/2 hidden lg:flex items-center gap-2 z-30">
+                {onExitRoom && (
+                  <ExitRoomButton
+                    onClick={onExitRoom}
+                    label={t('playerView.exit')}
+                    className="w-10 h-10 md:w-12 md:h-12"
+                  />
+                )}
+                {hints && hints.isSinglePlayer && (
+                  <HintButton
+                    hint={hints.hint}
+                    hintType={hints.hintType}
+                    hintsRemaining={hints.hintsRemaining}
+                    wordLength={hints.wordLength}
+                    firstLetter={hints.firstLetter}
+                    isLoading={hints.isLoading}
+                    error={hints.error}
+                    isAvailable={hints.isAvailable}
+                    isSinglePlayer={hints.isSinglePlayer}
+                    gameActive={gameActive}
+                    onRequestHint={hints.requestHint}
+                    onClearHint={hints.clearHint}
+                    t={t}
+                  />
+                )}
+              </div>
+
               {/* Timer (center - always visible and prominent, position fixed) */}
               <motion.div
                 data-tutorial="timer"

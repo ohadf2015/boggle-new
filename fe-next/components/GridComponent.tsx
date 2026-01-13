@@ -389,16 +389,15 @@ const GridComponent = memo<GridComponentProps>(({
     setPerformanceMode(getPerformanceMode());
   }, []);
 
-  const isLargeGrid = useMemo(() => (grid[0]?.length || 0) > 8, [grid]);
   const comboColors = useMemo(() => getComboColors(comboLevel), [comboLevel]);
 
   // Memoize grid dimensions to prevent recalculations
-  // Gap increased slightly for easier swiping without accidental adjacent touches
+  // Responsive gaps: tighter on mobile, more spacing on larger screens
   const gridDimensions = useMemo(() => ({
     cols: grid[0]?.length || 4,
     rows: grid.length || 4,
-    gap: isLargeGrid ? "gap-1.5 sm:gap-1.5" : "gap-2 sm:gap-2.5",
-  }), [grid, isLargeGrid]);
+    gap: "gap-0.5 sm:gap-1 md:gap-1.5 lg:gap-2", // Responsive gap: 2px -> 4px -> 6px -> 8px
+  }), [grid]);
 
   return (
     <div className="relative w-full h-full flex items-center justify-center">
@@ -475,7 +474,7 @@ const GridComponent = memo<GridComponentProps>(({
           className={cn(
             "grid touch-none select-none absolute rounded-neo",
             gridDimensions.gap,
-            "bg-neo-cream border-2 border-neo-black/20",
+            "bg-neo-cream",
             earthquakeShaking && "earthquake-shake",
             // Desktop cursor styles based on interaction state
             interactive && isSelecting && "cursor-crosshair",
@@ -484,9 +483,9 @@ const GridComponent = memo<GridComponentProps>(({
           )}
           style={{
             inset: '0',
+            padding: '0.4rem',
             gridTemplateColumns: `repeat(${gridDimensions.cols}, minmax(0, 1fr))`,
             gridTemplateRows: `repeat(${gridDimensions.rows}, minmax(0, 1fr))`,
-            backgroundImage: 'var(--halftone-pattern)',
             backgroundColor: 'var(--neo-cream)',
             ['--cell-font-size' as string]: `calc((100cqw / ${gridDimensions.cols}) * ${effectiveLargeText ? 0.70 : 0.50})`,
             containerType: 'size',
@@ -607,17 +606,17 @@ const GridComponent = memo<GridComponentProps>(({
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan",
                     isSelected
                       ? comboColors.isRainbow
-                        ? `${comboColors.textColor || 'text-neo-black'} ${comboColors.border} z-10 ${comboColors.shadow}`
-                        : `${comboColors.bg} ${comboColors.textColor || 'text-neo-black'} border-3 ${comboColors.border} z-10 ${comboColors.shadow}`
+                        ? `${comboColors.textColor || 'text-neo-black'} border-2 border-neo-black/60 z-10`
+                        : `${comboColors.bg} ${comboColors.textColor || 'text-neo-black'} border-2 border-neo-black/60 z-10`
                       : isHighlighted
-                        ? `bg-neo-lime text-neo-black border-3 border-neo-black z-10 shadow-[0_0_20px_rgba(255,225,53,0.8),_0_0_40px_rgba(255,225,53,0.4)] ${
+                        ? `bg-neo-lime text-neo-black border-2 border-neo-black/60 z-10 shadow-[0_0_12px_rgba(255,225,53,0.5)] ${
                             hintAnimationPhase === 'blink' ? 'animate-hint-blink' :
                             hintAnimationPhase === 'fadeout' ? 'animate-hint-fadeout' :
                             ''
                           }`
                         : isEliminated
-                          ? "bg-gray-400/60 text-gray-500/50 border-3 border-gray-400/40 shadow-none cursor-not-allowed"
-                          : "letter-tile-gradient text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed",
+                          ? "bg-gray-400/60 text-gray-500/50 border border-gray-400/30 shadow-none cursor-not-allowed"
+                          : "letter-tile-gradient text-neo-black border-2 border-neo-black/30 shadow-sm hover:shadow-md hover:border-neo-black/50 active:shadow-none",
                     // Adjacent cell hint - subtle glow indicating valid next selection
                     isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-2 ring-neo-lime/70 ring-offset-1 ring-offset-neo-cream",
                     // Desktop hover on adjacent hint - stronger glow when hovering over valid next cell
@@ -634,24 +633,22 @@ const GridComponent = memo<GridComponentProps>(({
                   style={{
                     borderRadius: '6px',
                     fontSize: 'var(--cell-font-size)',
-                    // Rainbow dance floor effect during fire round (no solid fill)
+                    // Rainbow dance floor effect during fire round (subtle glow)
                     ...(isGlowing && fireRoundActive && !isSelected && !isHighlighted && {
                       background: glowColor,
-                      boxShadow: `0 0 8px ${glowColor}60, 0 0 16px ${glowColor}30, 4px 4px 0 #000`,
+                      boxShadow: `0 0 6px ${glowColor}40`,
                       animation: 'rainbow-pulse 1.5s ease-in-out infinite',
                       willChange: 'transform, box-shadow',
                     }),
-                    // Dynamic glow based on combo level - ENHANCED for more prominent feedback
+                    // Subtle glow for selected cells - clean minimal design
                     ...(isSelected && {
                       boxShadow: comboColors.isRainbow
-                        ? '0 0 25px rgba(255, 51, 102, 0.8), 0 0 50px rgba(0, 255, 255, 0.5), 0 0 75px rgba(255, 51, 102, 0.3), 6px 6px 0 #000'
-                        : comboLevel >= 7
-                          ? '0 0 22px rgba(255, 51, 102, 0.8), 0 0 40px rgba(255, 107, 53, 0.5), 0 0 60px rgba(255, 51, 102, 0.3), 5px 5px 0 #000'
-                          : comboLevel >= 5
-                            ? '0 0 18px rgba(255, 107, 53, 0.8), 0 0 35px rgba(255, 51, 102, 0.5), 5px 5px 0 #000'
-                            : comboLevel >= 3
-                              ? '0 0 15px rgba(255, 107, 53, 0.7), 0 0 25px rgba(255, 150, 50, 0.4), 4px 4px 0 #000'
-                              : '0 0 12px rgba(255, 200, 100, 0.6), 0 0 20px rgba(255, 150, 50, 0.3), 4px 4px 0 #000',
+                        ? '0 0 12px rgba(255, 51, 102, 0.4), 0 0 20px rgba(0, 255, 255, 0.2)'
+                        : comboLevel >= 5
+                          ? '0 0 10px rgba(255, 107, 53, 0.4)'
+                          : comboLevel >= 3
+                            ? '0 0 8px rgba(255, 150, 50, 0.3)'
+                            : '0 0 6px rgba(255, 200, 100, 0.3)',
                     }),
                     ...(isSelected && comboColors.isRainbow ? {
                       background: 'linear-gradient(135deg, #FF3366, #FF6B35, #FFE135, #BFFF00, #00FFFF, #FF1493, #8B5CF6)',

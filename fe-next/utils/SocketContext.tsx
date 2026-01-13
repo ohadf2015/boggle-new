@@ -354,8 +354,14 @@ export function useGameSocket(): GameSocketOperations {
   }, [emit]);
 
   // Join game
-  const joinGame = useCallback((gameCode: string, username: string, playerId: string, avatar: Avatar) => {
-    return emit('join', { gameCode, username, playerId, avatar });
+  const joinGame = useCallback((
+    gameCode: string,
+    username: string,
+    playerId: string,
+    avatar: Avatar,
+    authContext?: { authUserId?: string | null; guestTokenHash?: string | null; guestSessionId?: string | null }
+  ) => {
+    return emit('join', { gameCode, username, playerId, avatar, ...authContext });
   }, [emit]);
 
   // Start game

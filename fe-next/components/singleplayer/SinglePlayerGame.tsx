@@ -38,6 +38,7 @@ import { useTrainingProgress } from '@/hooks/useTrainingProgress';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import DirectionGuidanceTooltip from '@/components/game/DirectionGuidanceTooltip';
 import KeyboardHintTooltip from '@/components/game/KeyboardHintTooltip';
+import { shouldShowKeyboardTrails } from '@/components/game/keyboardTrailsUtils';
 import { TrainingHints, TrainingProgressBar, SkillUnlockToast } from '@/components/training';
 import {
   calculateFinalAchievements,
@@ -1182,6 +1183,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const keyboardInput = useKeyboardWordInput({
     grid: grid || ([] as LetterGrid),
     language: settings.language,
+    gameLanguage: settings.language,
     enabled: !!grid && !isPaused && !isGameOver,
     onWordSubmit: handleWordSubmit,
     minWordLength: settings.minWordLength ?? 3,
@@ -1495,7 +1497,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
               fireRoundActive={fireRoundActive}
               earthquakeShaking={earthquakeState === 'shaking'}
               highlightedPath={
-                keyboardInput.isTypingMode
+                shouldShowKeyboardTrails(keyboardInput.isTypingMode, lastWordFoundTimeRef.current, undefined)
                   ? keyboardInput.highlightedCells
                   : firstPlayTutorial.tutorialPath
                     ? firstPlayTutorial.tutorialPath.map(p => ({ row: p.row, col: p.col }))
@@ -1995,7 +1997,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           fireRoundActive={fireRoundActive}
           earthquakeShaking={earthquakeState === 'shaking'}
           highlightedPath={
-            keyboardInput.isTypingMode
+            shouldShowKeyboardTrails(keyboardInput.isTypingMode, lastWordFoundTimeRef.current, undefined)
               ? keyboardInput.highlightedCells
               : firstPlayTutorial.tutorialPath
                 ? firstPlayTutorial.tutorialPath.map(p => ({ row: p.row, col: p.col }))

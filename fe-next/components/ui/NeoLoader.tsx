@@ -5,9 +5,8 @@ import { memo } from 'react';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { Mascot, MascotVariant } from './Mascot';
 
-const LEXI_LETTERS = ['L', 'E', 'X', 'I', 'C', 'L', 'A', 'S', 'H'];
+const LEXI_LETTERS = ['L', 'E', 'X', 'I', 'C', 'L', 'A', 'S', 'H'] as const;
 
-// Color variants for letters
 const LETTER_COLORS = [
   'bg-neo-lime',
   'bg-neo-cyan',
@@ -18,15 +17,15 @@ const LETTER_COLORS = [
   'bg-neo-lime',
   'bg-neo-cyan',
   'bg-neo-lime',
-];
+] as const;
 
 interface NeoLoaderProps {
   /** Optional text to show below the animation */
   text?: string;
   /** Size variant */
   size?: 'sm' | 'md' | 'lg';
-  /** Show mascot instead of letter tiles */
-  variant?: 'letters' | 'mascot' | 'dots';
+  /** Loading animation variant */
+  variant?: 'letters' | 'mascot' | 'dots' | 'mascot-letters';
   /** Mascot variant for mascot mode (default: 'thinking') */
   mascotVariant?: MascotVariant;
 }
@@ -91,44 +90,63 @@ export const NeoLoader = memo(function NeoLoader({
   }
 
   if (variant === 'mascot') {
-    // Map size to Mascot component size
-    const mascotSizeMap: Record<'sm' | 'md' | 'lg', 'sm' | 'md' | 'lg'> = {
-      sm: 'sm',
-      md: 'md',
-      lg: 'lg',
-    };
-
     return (
       <div className="flex flex-col items-center justify-center">
-        {/* Thinking dots above mascot */}
-        <div className="flex gap-1.5 mb-2">
-          {[0, 1, 2].map((i) => (
-            <motion.div
-              key={i}
-              className="w-2.5 h-2.5 bg-neo-cyan rounded-full"
-              animate={{
-                y: [0, -6, 0],
-                opacity: [0.4, 1, 0.4],
-                scale: [0.8, 1.1, 0.8],
-              }}
-              transition={{
-                duration: 1,
-                delay: i * 0.2,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-            />
-          ))}
-        </div>
         {/* Animated Mascot using the reusable component */}
         <Mascot
           variant={mascotVariant}
-          size={mascotSizeMap[size]}
+          size={size}
           animated={true}
+          priority={true}
         />
         {text && (
           <motion.p
             className="text-neo-white/70 text-sm mt-3 font-neo-body"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            {text}
+          </motion.p>
+        )}
+      </div>
+    );
+  }
+
+  // Combined mascot with spinner variant
+  if (variant === 'mascot-letters') {
+    const spinnerSizes = {
+      sm: 'w-12 h-12',
+      md: 'w-16 h-16',
+      lg: 'w-20 h-20',
+    };
+
+    return (
+      <div className="flex flex-col items-center justify-center gap-6">
+        {/* Animated Mascot */}
+        <Mascot
+          variant={mascotVariant}
+          size={size}
+          animated={true}
+          priority={true}
+        />
+        {/* Simple spinner */}
+        <div className={`${spinnerSizes[size]} relative`}>
+          <motion.div
+            className="absolute inset-0 rounded-full border-4 border-neo-cyan/20"
+          />
+          <motion.div
+            className="absolute inset-0 rounded-full border-4 border-transparent border-t-neo-cyan border-r-neo-pink"
+            animate={{ rotate: 360 }}
+            transition={{
+              duration: 1,
+              repeat: Infinity,
+              ease: 'linear',
+            }}
+          />
+        </div>
+        {text && (
+          <motion.p
+            className="text-neo-white/70 text-sm font-neo-body"
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >

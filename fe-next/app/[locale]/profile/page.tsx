@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, ArrowLeft, BarChart2, Award, Gift } from 'lucide-react';
+import { NeoLoader } from '@/components/ui/NeoLoader';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -162,10 +163,8 @@ export default function ProfilePage(): React.ReactNode {
         isDarkMode ? 'bg-neo-navy' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'
       )}>
         <AutoHideHeader />
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="flex justify-center py-12">
-            <div className="w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin" />
-          </div>
+        <div className="flex-1 flex items-center justify-center">
+          <NeoLoader variant="mascot-letters" size="lg" />
         </div>
       </div>
     );

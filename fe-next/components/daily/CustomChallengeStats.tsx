@@ -227,7 +227,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
       {leaderboard.length > 0 && (
         <div className="bg-neo-white border-neo-thick border-neo-black rounded-xl p-6 shadow-hard-sm">
           <h3 className="text-xl font-black uppercase mb-4 text-neo-black flex items-center gap-2">
-            <Trophy className="w-6 h-6 text-neo-lime" strokeWidth={2.5} />
+            <Trophy className="w-6 h-6 text-amber-600" strokeWidth={2.5} />
             {t('daily.topPerformers')}
           </h3>
           <div className="space-y-2">

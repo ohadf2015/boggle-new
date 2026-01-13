@@ -1993,6 +1993,10 @@ const sv = {
     "LOYAL_PLAYER": {
       "name": "Lojal spelare",
       "description": "Spelade på 30 olika dagar"
+    },
+    "DAILY_DOUBLE": {
+      "name": "Dubbel Daglig",
+      "description": "Klarade båda utmaningarna idag"
     }
   },
   "achievementTiers": {
@@ -3130,6 +3134,7 @@ const sv = {
     "play": "SPELA NU",
     "viewResults": "VISA RESULTAT",
     "wordHunt": "Ordjakt",
+    "wordHunt.title": "Ordjakt",
     "wordHunt.subtitle": "Överlevnadsläge",
     "wordHunt.desc": "Snabb ordjakt mot klockan. Hitta så många ord du kan innan tiden rinner ut!",
     "wordHunt.feature1": "90 sekunder",

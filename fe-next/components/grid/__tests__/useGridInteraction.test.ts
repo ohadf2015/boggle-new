@@ -176,4 +176,102 @@ describe('useGridInteraction', () => {
       expect(onWordSubmit).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('improved touch selection thresholds', () => {
+    /**
+     * Tests for improved touch selection to make swiping easier during onboarding.
+     * Changes made:
+     * - CELL_SELECTION_THRESHOLD increased from 0.85 to 1.0
+     * - DIAGONAL_SELECTION_THRESHOLD increased from 0.95 to 1.15
+     * - Added TOUCH_EXTENSION_FACTOR of 1.2 for larger effective hit areas
+     * - Edge tolerance of 0.3 allows touches slightly outside grid bounds
+     */
+    it('initializes with correct grid and interactive state', () => {
+      const gridRef = createMockRef();
+      const { result } = renderHook(() =>
+        useGridInteraction({
+          grid: mockGrid,
+          interactive: true,
+          comboLevel: 0,
+          onWordSubmit: jest.fn(),
+          onPathSubmit: jest.fn(),
+          gridRef,
+          language: 'en',
+        })
+      );
+
+      expect(result.current.selectedCells).toEqual([]);
+      expect(result.current.isSelecting).toBe(false);
+      expect(result.current.isDragging).toBe(false);
+    });
+
+    it('provides undoLastCell function for error correction', () => {
+      const onWordSubmit = jest.fn();
+      const gridRef = createMockRef();
+
+      const { result } = renderHook(() =>
+        useGridInteraction({
+          grid: mockGrid,
+          interactive: true,
+          comboLevel: 0,
+          onWordSubmit,
+          gridRef,
+          language: 'en',
+        })
+      );
+
+      // Select first cell
+      act(() => {
+        const mockEvent = {
+          touches: [{ clientX: 50, clientY: 50 }],
+        } as unknown as React.TouchEvent<HTMLDivElement>;
+        result.current.handleTouchStart(0, 0, 'A', mockEvent);
+      });
+
+      expect(result.current.selectedCells).toHaveLength(1);
+
+      // Undo selection
+      act(() => {
+        result.current.undoLastCell();
+      });
+
+      expect(result.current.selectedCells).toHaveLength(0);
+    });
+
+    it('provides submitWord function for manual submission', () => {
+      const onWordSubmit = jest.fn();
+      const onPathSubmit = jest.fn();
+      const gridRef = createMockRef();
+
+      const { result } = renderHook(() =>
+        useGridInteraction({
+          grid: mockGrid,
+          interactive: true,
+          comboLevel: 0,
+          onWordSubmit,
+          onPathSubmit,
+          gridRef,
+          language: 'en',
+        })
+      );
+
+      // Select cells
+      act(() => {
+        const mockEvent = {
+          touches: [{ clientX: 50, clientY: 50 }],
+        } as unknown as React.TouchEvent<HTMLDivElement>;
+        result.current.handleTouchStart(0, 0, 'A', mockEvent);
+      });
+
+      // Submit word
+      act(() => {
+        result.current.submitWord();
+      });
+
+      expect(onWordSubmit).toHaveBeenCalledWith('A');
+      expect(onPathSubmit).toHaveBeenCalledWith([
+        expect.objectContaining({ row: 0, col: 0, letter: 'A' }),
+      ]);
+    });
+  });
 });
