@@ -1046,6 +1046,27 @@ const en = {
     "readyToStart": "Ready to start! More players = more fun!",
     "fullHouse": "Full house! Let the battle begin!"
   },
+  "roomCode": {
+    "label": "Room Code",
+    "inviteFriends": "Invite friends with code:",
+    "tapToCopy": "Tap to copy",
+    "copied": "Code copied!",
+    "linkCopied": "Link copied!",
+    "copyLink": "Copy link"
+  },
+  "onboarding": {
+    "header": "Quick Start Guide",
+    "skip": "Skip",
+    "letsPlay": "Let's Play!",
+    "step1Title": "Swipe Letters",
+    "step1Text": "Drag across connected letters to form words. Release to submit!",
+    "step2Title": "Score Points",
+    "step2Text": "Longer words = way more points. Try to find 5+ letter words!",
+    "step3Title": "Build Combos",
+    "step3Text": "Find words quickly in a row to build combo multipliers!",
+    "step4Title": "Be Unique",
+    "step4Text": "Words found by others score zero. Think creatively!"
+  },
   "tips": {
     "header": "Pro Tips",
     "swipeTitle": "Swipe to Connect",
@@ -1538,6 +1559,17 @@ const en = {
     }
   },
   "onboarding": {
+    "header": "Quick Start Guide",
+    "skip": "Skip",
+    "letsPlay": "Let's Play!",
+    "step1Title": "Swipe Letters",
+    "step1Text": "Drag across connected letters to form words. Release to submit!",
+    "step2Title": "Score Points",
+    "step2Text": "Longer words = way more points. Try to find 5+ letter words!",
+    "step3Title": "Build Combos",
+    "step3Text": "Find words quickly in a row to build combo multipliers!",
+    "step4Title": "Be Unique",
+    "step4Text": "Words found by others score zero. Think creatively!",
     "welcome": {
       "title": "Welcome to LexiClash!",
       "subtitle": "Swipe. Spell. Dominate.",

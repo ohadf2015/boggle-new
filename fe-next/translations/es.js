@@ -1037,6 +1037,14 @@ const es = {
     "readyToStart": "¡Listos para empezar! ¡Más jugadores = más diversión!",
     "fullHouse": "¡Casa llena! ¡Que comience la batalla!"
   },
+  "roomCode": {
+    "label": "Código de Sala",
+    "inviteFriends": "Invita amigos con el código:",
+    "tapToCopy": "Toca para copiar",
+    "copied": "¡Código copiado!",
+    "linkCopied": "¡Enlace copiado!",
+    "copyLink": "Copiar enlace"
+  },
   "tips": {
     "header": "Tips Pro",
     "swipeTitle": "Desliza para Conectar",
@@ -2403,6 +2411,17 @@ const es = {
     }
   },
   "onboarding": {
+    "header": "Guía Rápida",
+    "skip": "Omitir",
+    "letsPlay": "¡A Jugar!",
+    "step1Title": "Desliza las Letras",
+    "step1Text": "Arrastra sobre letras conectadas para formar palabras. ¡Suelta para enviar!",
+    "step2Title": "Gana Puntos",
+    "step2Text": "Palabras más largas = muchos más puntos. ¡Intenta encontrar palabras de 5+ letras!",
+    "step3Title": "Construye Combos",
+    "step3Text": "¡Encuentra palabras rápidamente seguidas para construir multiplicadores de combo!",
+    "step4Title": "Sé Único",
+    "step4Text": "Las palabras encontradas por otros valen cero. ¡Piensa creativamente!",
     "welcome": {
       "title": "¡Bienvenido a LexiClash!",
       "subtitle": "Desliza letras. Forma palabras. Domina.",

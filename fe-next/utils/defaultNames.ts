@@ -7,11 +7,20 @@ import { translations } from '@/translations';
 
 type SupportedLanguage = 'en' | 'he' | 'sv' | 'ja';
 
+// Character avatar image IDs for random assignment when no keyword match
+const AVATAR_IMAGE_IDS: string[] = [
+  'broccoli-bob', 'drippy-drop', 'sunny-steve', 'cloudy-carl',
+  'octo-otto', 'pizza-pete', 'prickly-pat', 'melon-molly',
+  'avo-alex', 'frosty-frank', 'flaky-fred', 'eggy-ed',
+  'slimy-sam', 'starry-stella', 'shroom-shelly', 'donut-danny', 'jelly-jen'
+];
+
 export interface NameWithAvatar {
   name: string;
   avatar: {
     emoji: string;
     color: string;
+    avatarImage: string;
   };
 }
 
@@ -180,33 +189,42 @@ const DEFAULT_EMOJIS = [
 ];
 
 /**
- * Get an avatar (emoji + color) that matches a given name
- * Looks for keywords in the name and returns matching emoji
+ * Get an avatar (emoji, color, avatarImage) that matches a given name
+ * Looks for keywords in the name and returns matching avatar
+ * avatarImage is required for the Avatar component to display character images
  */
-export function getAvatarForName(name: string): { emoji: string; color: string } {
+export function getAvatarForName(name: string): { emoji: string; color: string; avatarImage: string } {
   const lowerName = name.toLowerCase();
 
-  // Check each keyword against the name
-  for (const [keyword, avatar] of Object.entries(KEYWORD_EMOJI_MAP)) {
-    if (lowerName.includes(keyword.toLowerCase())) {
-      return avatar;
-    }
-  }
-
-  // No match found - generate a deterministic "random" avatar based on name hash
-  // This ensures the same name always gets the same avatar
+  // Generate a deterministic hash for consistent avatar assignment
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
     hash = ((hash << 5) - hash) + name.charCodeAt(i);
     hash = hash & hash;
   }
 
+  // Check each keyword against the name
+  for (const [keyword, avatar] of Object.entries(KEYWORD_EMOJI_MAP)) {
+    if (lowerName.includes(keyword.toLowerCase())) {
+      // Keyword match - use deterministic avatarImage based on hash
+      const avatarImageIndex = Math.abs(hash) % AVATAR_IMAGE_IDS.length;
+      return {
+        ...avatar,
+        avatarImage: AVATAR_IMAGE_IDS[avatarImageIndex],
+      };
+    }
+  }
+
+  // No keyword match - generate deterministic avatar based on name hash
+  // This ensures the same name always gets the same avatar
   const emojiIndex = Math.abs(hash) % DEFAULT_EMOJIS.length;
   const colorIndex = Math.abs(hash >> 4) % DEFAULT_COLORS.length;
+  const avatarImageIndex = Math.abs(hash >> 2) % AVATAR_IMAGE_IDS.length;
 
   return {
     emoji: DEFAULT_EMOJIS[emojiIndex],
     color: DEFAULT_COLORS[colorIndex],
+    avatarImage: AVATAR_IMAGE_IDS[avatarImageIndex],
   };
 }
 

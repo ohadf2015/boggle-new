@@ -170,6 +170,14 @@ export const AVATAR_EMOJIS: string[] = [
   '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞'
 ];
 
+// Character avatar image IDs - must match utils/avatarConfig.ts AVATARS
+export const AVATAR_IMAGE_IDS: string[] = [
+  'broccoli-bob', 'drippy-drop', 'sunny-steve', 'cloudy-carl',
+  'octo-otto', 'pizza-pete', 'prickly-pat', 'melon-molly',
+  'avo-alex', 'frosty-frank', 'flaky-fred', 'eggy-ed',
+  'slimy-sam', 'starry-stella', 'shroom-shelly', 'donut-danny', 'jelly-jen'
+];
+
 // Neo-Brutalist color mapping based on word points
 // Used for visual hierarchy in word displays
 export const POINT_COLORS: Record<number, string> = {

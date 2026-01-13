@@ -1,4 +1,4 @@
-import { hebrewLetters, swedishLetters, spanishLetters, japaneseLetters, kanjiCompounds, DIFFICULTIES, DEFAULT_DIFFICULTY, AVATAR_COLORS, AVATAR_EMOJIS } from "./consts";
+import { hebrewLetters, swedishLetters, spanishLetters, japaneseLetters, kanjiCompounds, DIFFICULTIES, DEFAULT_DIFFICULTY, AVATAR_COLORS, AVATAR_EMOJIS, AVATAR_IMAGE_IDS } from "./consts";
 import type { Language, LetterGrid, GridPosition, Avatar } from "@/types";
 
 // Import and re-export word normalization functions from shared module
@@ -150,12 +150,13 @@ export function generateRandomRoomName(): string {
 }
 
 /**
- * Generate a random avatar with emoji and color
+ * Generate a random avatar with character image and legacy emoji/color
  */
 export function generateRandomAvatar(): Avatar {
   return {
     color: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)] ?? '#FF6B6B',
-    emoji: AVATAR_EMOJIS[Math.floor(Math.random() * AVATAR_EMOJIS.length)] ?? '🎮'
+    emoji: AVATAR_EMOJIS[Math.floor(Math.random() * AVATAR_EMOJIS.length)] ?? '🎮',
+    avatarImage: AVATAR_IMAGE_IDS[Math.floor(Math.random() * AVATAR_IMAGE_IDS.length)]
   };
 }
 

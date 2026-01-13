@@ -1040,6 +1040,27 @@ const sv = {
     "readyToStart": "Redo att starta! Fler spelare = mer kul!",
     "fullHouse": "Fullsatt! Låt striden börja!"
   },
+  "roomCode": {
+    "label": "Rumskod",
+    "inviteFriends": "Bjud in vänner med kod:",
+    "tapToCopy": "Tryck för att kopiera",
+    "copied": "Koden kopierad!",
+    "linkCopied": "Länken kopierad!",
+    "copyLink": "Kopiera länk"
+  },
+  "onboarding": {
+    "header": "Snabbguide",
+    "skip": "Hoppa över",
+    "letsPlay": "Nu kör vi!",
+    "step1Title": "Svep över bokstäver",
+    "step1Text": "Dra över anslutna bokstäver för att bilda ord. Släpp för att skicka!",
+    "step2Title": "Samla poäng",
+    "step2Text": "Längre ord = mycket mer poäng. Försök hitta ord med 5+ bokstäver!",
+    "step3Title": "Bygg kombos",
+    "step3Text": "Hitta ord snabbt i rad för att bygga kombomultiplikatorer!",
+    "step4Title": "Var unik",
+    "step4Text": "Ord som hittats av andra ger noll. Tänk kreativt!"
+  },
   "tips": {
     "header": "Pro Tips",
     "swipeTitle": "Svep för att koppla",
@@ -1532,6 +1553,17 @@ const sv = {
     }
   },
   "onboarding": {
+    "header": "Snabbguide",
+    "skip": "Hoppa över",
+    "letsPlay": "Nu kör vi!",
+    "step1Title": "Svep över bokstäver",
+    "step1Text": "Dra över anslutna bokstäver för att bilda ord. Släpp för att skicka!",
+    "step2Title": "Samla poäng",
+    "step2Text": "Längre ord = mycket mer poäng. Försök hitta ord med 5+ bokstäver!",
+    "step3Title": "Bygg kombos",
+    "step3Text": "Hitta ord snabbt i rad för att bygga kombomultiplikatorer!",
+    "step4Title": "Var unik",
+    "step4Text": "Ord som hittats av andra ger noll. Tänk kreativt!",
     "welcome": {
       "title": "Välkommen till LexiClash!",
       "subtitle": "Svep bokstäver. Bilda ord. Dominera.",

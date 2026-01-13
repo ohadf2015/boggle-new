@@ -351,99 +351,102 @@ function buildAIPrompt(
     })
     .join('\n\n');
 
+  // Language-specific examples
+  const langExamples = language === 'he' ? `
+**Hebrew Word Examples by Trend**:
+- Trend about Iran/conflict → מלחמה (war), שלום (peace), הגנה (defense), טיל (missile), התקפה (attack), צבא (army)
+- Trend about weather → גשם (rain), שלג (snow), קור (cold), סערה (storm), רוח (wind)
+- Trend about sports → כדורגל (soccer), נצחון (victory), גביע (trophy), שער (goal)
+- Trend about politics → בחירות (elections), ממשלה (government), חוק (law), מדינה (state)
+- Trend about economy → כסף (money), בנק (bank), מחיר (price), שוק (market)` : `
+**Word Examples by Trend**:
+- Trend about conflict/war → WAR, PEACE, DEFENSE, MISSILE, ATTACK, ARMY, BATTLE, TREATY
+- Trend about weather → RAIN, SNOW, COLD, STORM, WIND, HEAT, FLOOD, FREEZE
+- Trend about sports → SOCCER, VICTORY, TROPHY, GOAL, MATCH, SCORE, CHAMPION
+- Trend about politics → ELECTION, VOTE, LAW, STATE, LEADER, DEBATE, POLICY
+- Trend about economy → MONEY, BANK, PRICE, MARKET, TRADE, STOCK, PROFIT`;
+
   return `Generate a Daily Buzz word challenge for LexiClash, a neo-brutalist word game.
 
 **Target Language**: ${language}
 **Region**: ${region}
 **Date**: ${new Date().toISOString().split('T')[0]}
 
-**Trending Topics** (from Google Trends - use as INSPIRATION for categories only):
+**TODAY'S TRENDING TOPICS** (from Google Trends - DIRECTLY USE these for challenges):
 ${trendsContext}
 
 **Your Task**:
-Create 5-7 word mini-challenges. Use trending topics as INSPIRATION to identify CATEGORIES, then choose COMMON VOCABULARY WORDS that anyone would know - even people who don't follow news.
+Create 5-7 word mini-challenges that are DIRECTLY CONNECTED to today's trending topics. Players should feel "this is what everyone is talking about today!"
 
-**CRITICAL - Word Selection Rules**:
-1. NEVER use brand names (no "Nike", "Apple", "Netflix", "Isrotel", "Tesla", etc.)
-2. NEVER use celebrity names, company names, or proper nouns as answers
-3. NEVER use promotional or commercial content
-4. ONLY use COMMON DICTIONARY WORDS from everyday vocabulary
-5. Words must be known by people who DON'T follow news, trends, or commercials
-6. Think: "What universal word relates to this category?"
+**CRITICAL - Connect Challenges to ACTUAL Trends**:
+1. Each challenge MUST relate to one of the trending topics above
+2. Use COMMON DICTIONARY WORDS that are semantically connected to the trend
+3. The clue/prompt should REFERENCE the trending topic or current event
+4. The "trending_context" should explain WHY this trend is popular NOW
+${langExamples}
 
-**How to Extract Categories from Trends**:
-- Trend: "Isrotel hotels" → Category: Travel → Use: HOTEL, BEACH, VACATION, RESORT
-- Trend: "iPhone 16" → Category: Technology → Use: PHONE, SCREEN, CAMERA, DEVICE
-- Trend: "Taylor Swift" → Category: Music → Use: SINGER, CONCERT, ALBUM, MELODY
-- Trend: "World Cup" → Category: Sports → Use: SOCCER, GOAL, STADIUM, TROPHY
-- Trend: "Winter storm" → Category: Weather → Use: SNOW, COLD, FROST, WINTER
+**Word Selection Rules**:
+1. NEVER use brand names (no "Nike", "Apple", "Netflix", "Tesla", etc.)
+2. NEVER use celebrity names, company names, or country names AS ANSWERS
+3. Answers must be COMMON DICTIONARY WORDS (nouns, verbs, adjectives)
+4. Words should be 3-12 letters
+5. You CAN reference proper nouns in CLUES, just not as answers
+   - Good: "Clue: What nations seek after conflict | Answer: PEACE"
+   - Bad: "Answer: IRAN" (proper noun)
 
 **Challenge Types** (use variety):
-1. **anagram**: Give a CLUE that hints at the answer, plus scrambled letters. The clue makes it fun!
-   - Format: "Clue: [riddle/hint] | Letters: HCAEB" → Answer: BEACH
-   - The clue should be clever/playful, not just a definition
-   - Example: "Clue: Where sandcastles live | Letters: HCAEB" → BEACH
-2. **fill_blank**: Complete a universal phrase (e.g., "Pack your bags for _ _ _ _ _ _ _ _" → VACATION)
-3. **word_chain**: Connect two common words by changing one letter at a time
-4. **definition_match**: Match a common word to its meaning (provide 4 options)
-5. **riddle**: A clever riddle where the answer is a common word
-   - Example: "I have hands but cannot clap. What am I?" → CLOCK
+1. **anagram**: CLUE that references the trend + scrambled letters
+   - Format: "[Trend-related clue] | Letters: XXXXX"
+   - Example for Iran trend: "What diplomats negotiate for | Letters: EACEP" → PEACE
+2. **fill_blank**: Phrase connected to trending news
+   - Example: "Nations called for immediate _ _ _ _ _ _ _ _" → CEASEFIRE
+3. **word_chain**: Connect two trend-related words
+4. **definition_match**: Trend-related word with 4 options
+5. **riddle**: SOPHISTICATED riddles requiring LATERAL THINKING (this is the premium challenge type!)
+   - Use paradoxes, contradictions, and clever word associations
+   - Incorporate double meanings, metaphors, and abstract concepts
+   - The riddle should make the solver THINK deeply, not just recall definitions
+   - Connect to current trends through metaphor, not literal description
 
-**Critical Requirements**:
-- ALL answers must be SINGLE, COMMON DICTIONARY WORDS
-- Words should be 4-10 letters, universally known
-- NO brand names, company names, celebrity names, or jargon
-- Hints must help anyone guess without requiring news knowledge
-- Prompts should be timeless, not tied to specific current events
-- Neo-brutalist tone: bold, playful, punchy
+   **Riddle Techniques to Use**:
+   - Personification: Give abstract concepts human traits ("I am born in conflict...")
+   - Paradox: Seemingly contradictory statements ("I grow stronger when broken...")
+   - Sensory misdirection: Describe one sense to mean another ("I speak without a mouth...")
+   - Time/space manipulation: Play with temporal concepts ("I exist before I arrive...")
+   - Dual meaning: Words that work on multiple levels
+
+   **Sophisticated Riddle Examples**:
+   - "I am the child of two enemies, yet I end their fight. Nations celebrate my birth, but work hard for my life. What am I?" → PEACE
+   - "I travel faster than sound, carry words without speaking, and connect strangers instantly. Yet I have no body. What am I?" → SIGNAL
+   - "I can topple governments without touching them, spread across borders without papers, and change minds without speaking. What am I?" → NEWS
+   - "I am invisible but measured, wasted by many but saved by none. Leaders fear my passage. What am I?" → TIME
+   - "I fly without wings, destroy without hands, and nations fear my launch. Born from science, I bring only fire. What am I?" → MISSILE
 
 **Output Format** (JSON only, no markdown):
 {
   "date": "${new Date().toISOString().split('T')[0]}",
   "language": "${language}",
-  "trending_summary": "Today's theme: [general category] (max 60 chars)",
+  "trending_summary": "Today: [actual trending theme] (max 60 chars)",
   "challenges": [
     {
       "type": "anagram",
-      "trend_topic": "Travel & Leisure",
-      "prompt": "Where sandcastles call home | Letters: HCAEB",
-      "answer": "BEACH",
-      "hint": "Think sun and waves",
-      "difficulty": "easy",
-      "trending_context": "Perfect weather for relaxation"
-    },
-    {
-      "type": "riddle",
-      "trend_topic": "Time",
-      "prompt": "I have hands but cannot clap. I have a face but cannot smile. What am I?",
-      "answer": "CLOCK",
-      "hint": "Tick tock",
-      "difficulty": "easy",
-      "trending_context": "Time flies when you're having fun"
-    },
-    {
-      "type": "fill_blank",
-      "trend_topic": "Technology",
-      "prompt": "Capture moments with your _ _ _ _ _ _",
-      "answer": "CAMERA",
-      "hint": "Click to take a photo",
-      "difficulty": "easy",
-      "trending_context": "Everyone loves taking pictures"
-    },
-    {
-      "type": "definition_match",
-      "trend_topic": "Weather",
-      "prompt": "What falls from winter clouds?",
-      "answer": "SNOW",
-      "options": ["RAIN", "SNOW", "LEAF", "DUST"],
-      "hint": "Cold and white",
-      "difficulty": "easy",
-      "trending_context": "Winter weather patterns"
+      "trend_topic": "[Actual trend from above]",
+      "prompt": "[Trend-connected clue] | Letters: XXXXX",
+      "answer": "[DICTIONARY WORD]",
+      "hint": "[Brief hint]",
+      "difficulty": "easy|medium|hard",
+      "trending_context": "[Why this trend matters TODAY]"
     }
   ]
 }
 
-**Important**: Return ONLY the JSON object, no markdown formatting or code blocks.`;
+**Important**:
+- Return ONLY the JSON object, no markdown formatting or code blocks
+- Make challenges feel CURRENT and RELEVANT to today's news
+- The trending_context should explain the actual current event
+- Include AT LEAST 2 sophisticated riddles per challenge set
+- Riddles should be the HIGHLIGHT - make them clever enough to be memorable
+- Think step-by-step when crafting riddles: what paradox or metaphor captures this concept?`;
 }
 
 /**

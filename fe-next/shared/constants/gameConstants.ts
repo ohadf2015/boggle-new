@@ -93,13 +93,22 @@ export const AVATAR_EMOJIS: string[] = [
   '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞'
 ];
 
+// Character avatar image IDs - must match utils/avatarConfig.ts AVATARS
+export const AVATAR_IMAGE_IDS: string[] = [
+  'broccoli-bob', 'drippy-drop', 'sunny-steve', 'cloudy-carl',
+  'octo-otto', 'pizza-pete', 'prickly-pat', 'melon-molly',
+  'avo-alex', 'frosty-frank', 'flaky-fred', 'eggy-ed',
+  'slimy-sam', 'starry-stella', 'shroom-shelly', 'donut-danny', 'jelly-jen'
+];
+
 /**
- * Generate a random avatar with emoji and color
+ * Generate a random avatar with character image and legacy emoji/color
  */
-export function generateRandomAvatar(): { emoji: string; color: string } {
+export function generateRandomAvatar(): { emoji: string; color: string; avatarImage: string } {
   return {
     color: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)] ?? '#FF6B6B',
-    emoji: AVATAR_EMOJIS[Math.floor(Math.random() * AVATAR_EMOJIS.length)] ?? '🎮'
+    emoji: AVATAR_EMOJIS[Math.floor(Math.random() * AVATAR_EMOJIS.length)] ?? '🎮',
+    avatarImage: AVATAR_IMAGE_IDS[Math.floor(Math.random() * AVATAR_IMAGE_IDS.length)]
   };
 }
 

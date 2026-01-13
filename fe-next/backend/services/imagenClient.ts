@@ -45,20 +45,50 @@ const MOOD_MAP: Record<string, string> = {
   general: 'engaging and vibrant',
 };
 
-/**
- * Initialize Vertex AI client
- */
-function getVertexAIClient(): VertexAI {
-  const projectId = process.env.GOOGLE_CLOUD_PROJECT;
-  const location = process.env.GOOGLE_CLOUD_LOCATION || 'us-central1';
+interface GoogleCredentials {
+  project_id: string;
+  private_key: string;
+  client_email: string;
+}
 
-  if (!projectId) {
-    throw new Error('GOOGLE_CLOUD_PROJECT environment variable is required');
+/**
+ * Get Vertex AI credentials from environment (shared approach with buzzGenerator)
+ */
+function getVertexAICredentials(): GoogleCredentials & { location: string } {
+  const credentialsJson = process.env.GOOGLE_CREDENTIALS_JSON;
+  if (!credentialsJson) {
+    throw new Error('GOOGLE_CREDENTIALS_JSON environment variable is not set');
   }
 
+  const credentials = JSON.parse(credentialsJson) as GoogleCredentials;
+
+  // Handle escaped newlines in private_key
+  if (credentials.private_key?.includes('\\n')) {
+    credentials.private_key = credentials.private_key.replace(/\\n/g, '\n');
+  }
+
+  return {
+    ...credentials,
+    location: process.env.GOOGLE_CLOUD_LOCATION || 'us-central1',
+  };
+}
+
+/**
+ * Initialize Vertex AI client with explicit credentials
+ */
+function getVertexAIClient(): VertexAI {
+  const credentials = getVertexAICredentials();
+
   return new VertexAI({
-    project: projectId,
-    location,
+    project: credentials.project_id,
+    location: credentials.location,
+    googleAuthOptions: {
+      credentials: {
+        client_email: credentials.client_email,
+        private_key: credentials.private_key,
+      },
+      projectId: credentials.project_id,
+    },
   });
 }
 
@@ -80,7 +110,7 @@ async function getSupabaseClient() {
 function buildImagePrompt(
   topic: string,
   category: string,
-  language: string
+  _language: string
 ): string {
   const primaryColor = COLOR_MAP[category] || COLOR_MAP.general;
   const mood = MOOD_MAP[category] || MOOD_MAP.general;
@@ -278,7 +308,7 @@ export async function generateChallengeImage(
  */
 async function postProcessImage(
   imageBuffer: Buffer,
-  category: string
+  _category: string
 ): Promise<Buffer> {
   try {
     let img = sharp(imageBuffer);
@@ -445,7 +475,7 @@ async function uploadToSupabase(
   const fileName = `buzz/${timestamp}-${sanitizedTopic}.webp`;
 
   // Upload to Supabase Storage
-  const { data, error } = await supabase.storage
+  const { error } = await supabase.storage
     .from('daily-challenges')
     .upload(fileName, imageBuffer, {
       contentType: 'image/webp',

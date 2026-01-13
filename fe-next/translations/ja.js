@@ -1040,6 +1040,27 @@ const ja = {
     "readyToStart": "開始準備完了！プレイヤーが多いほど楽しい！",
     "fullHouse": "満員御礼！バトル開始！"
   },
+  "roomCode": {
+    "label": "ルームコード",
+    "inviteFriends": "コードで友達を招待:",
+    "tapToCopy": "タップしてコピー",
+    "copied": "コードをコピーしました！",
+    "linkCopied": "リンクをコピーしました！",
+    "copyLink": "リンクをコピー"
+  },
+  "onboarding": {
+    "header": "クイックスタートガイド",
+    "skip": "スキップ",
+    "letsPlay": "プレイ開始！",
+    "step1Title": "文字をスワイプ",
+    "step1Text": "隣接する文字をドラッグして単語を作成。離すと送信！",
+    "step2Title": "ポイントを獲得",
+    "step2Text": "長い単語 = もっとポイント。5文字以上の単語を見つけよう！",
+    "step3Title": "コンボを構築",
+    "step3Text": "素早く連続で単語を見つけてコンボ倍率アップ！",
+    "step4Title": "ユニークに",
+    "step4Text": "他の人が見つけた単語は0点。創造的に考えよう！"
+  },
   "tips": {
     "header": "プロのコツ",
     "swipeTitle": "スワイプで接続",
@@ -1531,6 +1552,17 @@ const ja = {
     }
   },
   "onboarding": {
+    "header": "クイックスタートガイド",
+    "skip": "スキップ",
+    "letsPlay": "プレイ開始！",
+    "step1Title": "文字をスワイプ",
+    "step1Text": "隣接する文字をドラッグして単語を作成。離すと送信！",
+    "step2Title": "ポイントを獲得",
+    "step2Text": "長い単語 = より多くのポイント。5文字以上の単語を見つけよう！",
+    "step3Title": "コンボを作ろう",
+    "step3Text": "連続して単語を見つけてコンボ倍率を上げよう！",
+    "step4Title": "ユニークに",
+    "step4Text": "他の人が見つけた単語は0点。創造的に考えよう！",
     "welcome": {
       "title": "LexiClashへようこそ！",
       "subtitle": "文字をスワイプ。単語を作る。制覇する。",
