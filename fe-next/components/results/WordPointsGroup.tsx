@@ -251,6 +251,10 @@ export const SharedWordsSection = memo<SharedWordsSectionProps>(({
         <span className="bg-neo-red text-neo-black px-2 py-0.5 rounded-neo border-2 border-neo-black">👥</span>
         {t('results.shared') || 'Shared Words'} ({duplicateWords.length})
       </div>
+      {/* Explanation for new players */}
+      <p className="text-[10px] text-neo-black/60 dark:text-neo-cream/50 mb-2 leading-tight">
+        {t('results.sharedWordsExplanation') || 'These words were found by other players too, so they score 0 points. Try to find unique words!'}
+      </p>
       <div className="flex flex-wrap gap-1">
         {duplicateWords.map((wordObj, i) => (
           <WordChip

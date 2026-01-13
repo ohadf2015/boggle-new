@@ -20,9 +20,17 @@ interface CachedImage {
 }
 
 // Cost tracking
-const IMAGEN_3_COST = 0.03; // $0.03 per image
+const IMAGEN_4_COST = 0.04; // $0.04 per image (Imagen 4)
 const CACHE_TTL = 86400; // 24 hours in seconds
 const REDIS_IMAGE_PREFIX = 'buzz:image:';
+
+// Retry configuration for 429 Resource Exhausted errors
+const RETRY_CONFIG = {
+  maxRetries: 5,
+  initialDelayMs: 1000, // Start at 1 second
+  maxDelayMs: 32000, // Cap at 32 seconds
+  backoffMultiplier: 2, // Double each retry
+};
 
 // Neo-brutalist color palette
 const COLOR_MAP: Record<string, string> = {
@@ -69,7 +77,8 @@ function getVertexAICredentials(): GoogleCredentials & { location: string } {
 
   return {
     ...credentials,
-    location: process.env.GOOGLE_CLOUD_LOCATION || 'us-central1',
+    // Use global endpoint for maximum capacity and availability
+    location: process.env.GOOGLE_CLOUD_LOCATION || 'global',
   };
 }
 
@@ -236,8 +245,32 @@ function extractAbstractConcept(topic: string, category: string): string {
 }
 
 /**
- * Generate challenge image using Google Vertex AI Imagen 3
+ * Sleep utility for retry delays
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Check if error is a retryable 429 Resource Exhausted error
+ */
+function isRetryableError(error: unknown): boolean {
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase();
+    return (
+      message.includes('429') ||
+      message.includes('resource exhausted') ||
+      message.includes('quota') ||
+      message.includes('rate limit')
+    );
+  }
+  return false;
+}
+
+/**
+ * Generate challenge image using Google Vertex AI Imagen 4
  * Returns Supabase Storage public URL
+ * Includes retry mechanism with exponential backoff for 429 errors
  */
 export async function generateChallengeImage(
   trendingTopic: string,
@@ -249,58 +282,81 @@ export async function generateChallengeImage(
   // Build abstract prompt
   const prompt = buildImagePrompt(trendingTopic, category, language);
 
-  try {
-    // Initialize Vertex AI client
-    const vertexAI = getVertexAIClient();
-    const generativeModel = vertexAI.getGenerativeModel({
-      model: process.env.VERTEX_AI_IMAGE_MODEL || 'imagen-3.0-generate-001',
-    });
+  let lastError: Error | null = null;
+  let delayMs = RETRY_CONFIG.initialDelayMs;
 
-    // Generate image
-    const result = await generativeModel.generateContent({
-      contents: [{
-        role: 'user',
-        parts: [{
-          text: prompt,
+  for (let attempt = 0; attempt <= RETRY_CONFIG.maxRetries; attempt++) {
+    try {
+      if (attempt > 0) {
+        console.log(`[IMAGEN] Retry attempt ${attempt}/${RETRY_CONFIG.maxRetries} after ${delayMs}ms delay`);
+        await sleep(delayMs);
+      }
+
+      // Initialize Vertex AI client
+      const vertexAI = getVertexAIClient();
+      const generativeModel = vertexAI.getGenerativeModel({
+        // Use Imagen 4 model for better quality and availability
+        model: process.env.VERTEX_AI_IMAGE_MODEL || 'imagen-4.0-generate-001',
+      });
+
+      // Generate image
+      const result = await generativeModel.generateContent({
+        contents: [{
+          role: 'user',
+          parts: [{
+            text: prompt,
+          }],
         }],
-      }],
-      generationConfig: {
-        temperature: 0.7,
-        candidateCount: 1,
-      },
-    });
+        generationConfig: {
+          temperature: 0.7,
+          candidateCount: 1,
+        },
+      });
 
-    const response = result.response;
-    const imageData = response.candidates?.[0]?.content?.parts?.[0];
+      const response = result.response;
+      const imageData = response.candidates?.[0]?.content?.parts?.[0];
 
-    if (!imageData || !imageData.inlineData?.data) {
-      throw new Error('No image data returned from Vertex AI');
+      if (!imageData || !imageData.inlineData?.data) {
+        throw new Error('No image data returned from Vertex AI');
+      }
+
+      // Convert base64 to buffer
+      const rawImageBuffer = Buffer.from(imageData.inlineData.data, 'base64');
+
+      // Post-process image with Sharp (add neo-brutalist effects)
+      const processedImage = await postProcessImage(rawImageBuffer, category);
+
+      // Upload to Supabase Storage
+      const imageUrl = await uploadToSupabase(processedImage, trendingTopic);
+
+      // Cache image for reuse
+      await cacheImage(trendingTopic, category, imageUrl, prompt);
+
+      console.log(`[IMAGEN] Image generated and uploaded: ${imageUrl}`);
+
+      return {
+        url: imageUrl,
+        prompt,
+        category,
+        cost: IMAGEN_4_COST,
+      };
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      lastError = error instanceof Error ? error : new Error(errorMessage);
+
+      if (isRetryableError(error) && attempt < RETRY_CONFIG.maxRetries) {
+        console.warn(`[IMAGEN] Retryable error (attempt ${attempt + 1}): ${errorMessage}`);
+        // Exponential backoff with cap
+        delayMs = Math.min(delayMs * RETRY_CONFIG.backoffMultiplier, RETRY_CONFIG.maxDelayMs);
+      } else {
+        console.error('[IMAGEN] Error generating image:', errorMessage);
+        throw lastError;
+      }
     }
-
-    // Convert base64 to buffer
-    const rawImageBuffer = Buffer.from(imageData.inlineData.data, 'base64');
-
-    // Post-process image with Sharp (add neo-brutalist effects)
-    const processedImage = await postProcessImage(rawImageBuffer, category);
-
-    // Upload to Supabase Storage
-    const imageUrl = await uploadToSupabase(processedImage, trendingTopic);
-
-    // Cache image for reuse
-    await cacheImage(trendingTopic, category, imageUrl, prompt);
-
-    console.log(`[IMAGEN] Image generated and uploaded: ${imageUrl}`);
-
-    return {
-      url: imageUrl,
-      prompt,
-      category,
-      cost: IMAGEN_3_COST,
-    };
-  } catch (error: any) {
-    console.error('[IMAGEN] Error generating image:', error.message);
-    throw error;
   }
+
+  // Should not reach here, but TypeScript needs this
+  throw lastError || new Error('Max retries exceeded for image generation');
 }
 
 /**

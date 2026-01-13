@@ -566,7 +566,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     broadcastToRoom(io, getGameRoom(gameCode), 'playersReadyUpdate', {
       readyCount: result.readyCount,
       totalPlayers: result.totalPlayers,
-      username // Who just confirmed
+      readyUsernames: result.readyUsernames
     });
   });
 

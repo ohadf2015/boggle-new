@@ -73,6 +73,10 @@ interface PlayerInGameViewProps {
   minWordLength: number;
   comboLevel: number;
   comboLevelRef: React.MutableRefObject<number>;
+  /** Time remaining for combo as percentage (0-100), null when no active combo */
+  comboTimeRemaining?: number | null;
+  /** Whether combo timer is in danger zone (<30% remaining) */
+  comboDanger?: boolean;
 
   // Player data
   foundWords: FoundWord[];
@@ -106,6 +110,9 @@ interface PlayerInGameViewProps {
 
   // Board theme
   boardTheme?: BoardTheme | null;
+
+  // Tutorial callback
+  onShowTutorial?: () => void;
 }
 
 // ==================== Component ====================
@@ -132,6 +139,8 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   minWordLength,
   comboLevel,
   comboLevelRef,
+  comboTimeRemaining,
+  comboDanger,
 
   // Player data
   foundWords,
@@ -164,6 +173,9 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
   // Board theme
   boardTheme,
+
+  // Tutorial callback
+  onShowTutorial,
 }): React.ReactElement => {
   // Get player's game history for trail display logic
   const { profile } = useAuth();
@@ -242,6 +254,8 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
         minWordLength={minWordLength}
         comboLevel={comboLevel}
         comboLevelRef={comboLevelRef}
+        comboTimeRemaining={comboTimeRemaining}
+        comboDanger={comboDanger}
 
         // Player data
         foundWords={foundWords}
@@ -269,6 +283,9 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
         // Player experience (for keyboard trail inactivity threshold)
         totalGamesPlayed={profile?.total_games}
+
+        // Tutorial callback
+        onShowTutorial={onShowTutorial}
       />
 
       {/* Tournament Standings Modal */}

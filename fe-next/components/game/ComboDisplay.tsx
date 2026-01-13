@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, memo } from 'react';
+import { useMemo, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { getComboColors } from '../grid/comboColors';
@@ -14,6 +14,8 @@ interface ComboDisplayProps {
   className?: string;
   /** Whether combo timer is in danger zone (<30% remaining) */
   isDanger?: boolean;
+  /** Time remaining as percentage (0-100), null when no active combo */
+  timeRemaining?: number | null;
   /** Coin reward amount to animate (triggers animation when > 0) */
   coinReward?: number | null;
   /** Callback when coin animation completes */
@@ -128,6 +130,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
   compact = false,
   className,
   isDanger = false,
+  timeRemaining = null,
   coinReward = null,
   onCoinAnimationComplete,
   highContrast = false,
@@ -198,6 +201,57 @@ const ComboDisplay = memo<ComboDisplayProps>(({
               delay={data.delay}
             />
           ))}
+
+          {/* Combo Timer Arc - shows time remaining before combo expires */}
+          {timeRemaining !== null && timeRemaining > 0 && !skipSparkles && (
+            <div
+              className={cn(
+                'absolute pointer-events-none',
+                compact ? '-left-3 -top-2' : '-left-4 -top-2'
+              )}
+            >
+              <svg
+                className={cn(
+                  compact ? 'w-6 h-6' : 'w-7 h-7'
+                )}
+                viewBox="0 0 36 36"
+              >
+                {/* Background arc (darker) */}
+                <circle
+                  cx="18"
+                  cy="18"
+                  r="15"
+                  fill="none"
+                  stroke="rgba(0,0,0,0.3)"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                />
+                {/* Foreground arc (progress) */}
+                <motion.circle
+                  cx="18"
+                  cy="18"
+                  r="15"
+                  fill="none"
+                  stroke={
+                    isDanger
+                      ? '#FF4444' // Red when danger
+                      : timeRemaining < 50
+                      ? '#FFB800' // Yellow when < 50%
+                      : rarityColors.burst // Rarity color otherwise
+                  }
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeDasharray={`${(timeRemaining / 100) * 94.25} 94.25`}
+                  transform="rotate(-90 18 18)"
+                  animate={isDanger ? { opacity: [1, 0.6, 1] } : undefined}
+                  transition={isDanger ? { duration: 0.5, repeat: Infinity } : undefined}
+                  style={{
+                    filter: `drop-shadow(0 0 4px ${isDanger ? '#FF4444' : rarityColors.shadow})`,
+                  }}
+                />
+              </svg>
+            </div>
+          )}
 
           {/* Main combo text - clean text-based display without badge */}
           <motion.div

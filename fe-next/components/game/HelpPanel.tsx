@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, HelpCircle, Zap, Trophy, Target, Keyboard, Eye } from 'lucide-react';
+import { X, HelpCircle, Zap, Trophy, Target, Keyboard, Eye, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
@@ -10,13 +10,14 @@ import { useAccessibility } from '@/contexts/AccessibilityContext';
 interface HelpPanelProps {
   isOpen: boolean;
   onClose: () => void;
+  onShowTutorial?: () => void;
 }
 
 /**
  * HelpPanel - In-game help bottom sheet with quick reference for game rules
  * Neo-Brutalist design matching the Jackbox Party Pack theme
  */
-export function HelpPanel({ isOpen, onClose }: HelpPanelProps) {
+export function HelpPanel({ isOpen, onClose, onShowTutorial }: HelpPanelProps) {
   const { t } = useLanguage();
   const { settings, toggleFireRoundLights, toggleLargeLetters } = useAccessibility();
 
@@ -74,6 +75,22 @@ export function HelpPanel({ isOpen, onClose }: HelpPanelProps) {
 
             {/* Content */}
             <div className="p-4 space-y-4">
+              {/* View Tutorial Button */}
+              {onShowTutorial && (
+                <button
+                  onClick={() => {
+                    onShowTutorial();
+                    onClose();
+                  }}
+                  className="w-full bg-neo-pink border-3 border-neo-black rounded-neo p-3 flex items-center justify-center gap-2 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px] transition-all"
+                >
+                  <GraduationCap className="w-5 h-5 text-neo-cream" />
+                  <span className="font-black text-neo-cream uppercase">
+                    {t('help.viewTutorial') || 'View Tutorial'}
+                  </span>
+                </button>
+              )}
+
               {/* How to Play */}
               <section className="bg-neo-cyan/10 text-neo-black border-2 border-neo-cyan rounded-neo p-3">
                 <h3 className="font-black text-neo-black uppercase flex items-center gap-2 mb-2">

@@ -40,6 +40,8 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
 
   // Determine color based on remaining time (20 seconds to match music transition)
   const isLowTime = remainingTime <= 20;
+  // Even more urgent at 10 seconds
+  const isVeryLowTime = remainingTime <= 10 && remainingTime > 0;
 
   const svgCenter = config.svgSize / 2;
 
@@ -110,10 +112,18 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
             />
           </svg>
 
-          {/* Timer text in the center - color change only for low time, no animation */}
+          {/* Timer text in the center - color change only for low time, pulse at very low time */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div
+            <motion.div
               className={`${config.textSize} font-black ${isLowTime ? 'text-neo-red' : 'text-neo-cream'}`}
+              animate={isVeryLowTime && !reduceMotion ? {
+                scale: [1, 1.1, 1],
+              } : {}}
+              transition={isVeryLowTime ? {
+                duration: 0.5,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              } : {}}
               style={{
                 textShadow: isLowTime
                   ? `${size === 'xs' || size === 'sm' ? '1px 1px' : '2px 2px'} 0px rgba(0,0,0,0.3)`
@@ -122,7 +132,7 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
               }}
             >
               {formatTimeMMSS(remainingTime)}
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>

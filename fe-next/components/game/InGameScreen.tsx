@@ -3,7 +3,7 @@
 import React, { ReactNode, useRef, useEffect, useCallback, useMemo, memo, useState, useTransition, useDeferredValue } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { Trophy, Crown } from 'lucide-react';
+import { Trophy, Crown, HelpCircle, Users } from 'lucide-react';
 import type { Socket } from 'socket.io-client';
 import { Badge } from '../ui/badge';
 import { Card, CardContent } from '../ui/card';
@@ -44,6 +44,7 @@ import TapToDragTooltip from './TapToDragTooltip';
 import { KeyboardShortcutsOverlay, KeyboardModeIndicator, KeyboardQuickTip } from '../keyboard';
 import CompactLeaderboard, { type CompactPlayer } from './CompactLeaderboard';
 import { shouldShowKeyboardTrails } from './keyboardTrailsUtils';
+import ScoreBreakdownTooltip from './ScoreBreakdownTooltip';
 
 // ==================== Types ====================
 
@@ -86,6 +87,10 @@ interface InGameScreenProps {
   minWordLength?: number;
   comboLevel?: number;
   comboLevelRef?: React.MutableRefObject<number>;
+  /** Time remaining for combo as percentage (0-100), null when no active combo */
+  comboTimeRemaining?: number | null;
+  /** Whether combo timer is in danger zone (<30% remaining) */
+  comboDanger?: boolean;
 
   // Player data
   foundWords?: FoundWord[] | string[];
@@ -121,6 +126,9 @@ interface InGameScreenProps {
   // New players (0-1 games) see trails sooner (10s) as tutorial help
   // Experienced players (2+ games) see trails later (30s) when truly stuck
   totalGamesPlayed?: number;
+
+  // Tutorial callback - opens onboarding tutorial
+  onShowTutorial?: () => void;
 }
 
 // ==================== Component ====================
@@ -150,6 +158,8 @@ const InGameScreen = memo<InGameScreenProps>(({
   minWordLength = 2,
   comboLevel = 0,
   comboLevelRef,
+  comboTimeRemaining = null,
+  comboDanger = false,
 
   // Player data
   foundWords = [],
@@ -183,6 +193,9 @@ const InGameScreen = memo<InGameScreenProps>(({
 
   // Player experience
   totalGamesPlayed,
+
+  // Tutorial callback
+  onShowTutorial,
 }) => {
   const {
     playWordAcceptedSound,
@@ -416,8 +429,21 @@ const InGameScreen = memo<InGameScreenProps>(({
       });
     };
 
+    const handleWordAlreadyFoundByOther = (data: { word: string; foundBy: string; foundByAvatar?: { emoji?: string; color?: string; avatarImage?: string } | null }) => {
+      setCurrentFeedback({
+        id: `foundByOther-${Date.now()}`,
+        type: 'foundByOther',
+        word: data.word,
+        message: t('playerView.foundByOther')?.replace('${player}', data.foundBy) || `Found by ${data.foundBy}`,
+        foundBy: data.foundBy,
+        foundByAvatar: data.foundByAvatar,
+        timestamp: Date.now(),
+      });
+    };
+
     socket.on('wordAccepted', handleWordAccepted);
     socket.on('wordAlreadyFound', handleWordAlreadyFound);
+    socket.on('wordAlreadyFoundByOther', handleWordAlreadyFoundByOther);
     socket.on('wordNeedsValidation', handleWordNeedsValidation);
     socket.on('wordRejected', handleWordRejected);
     socket.on('wordNotOnBoard', handleWordNotOnBoard);
@@ -426,6 +452,7 @@ const InGameScreen = memo<InGameScreenProps>(({
     return () => {
       socket.off('wordAccepted', handleWordAccepted);
       socket.off('wordAlreadyFound', handleWordAlreadyFound);
+      socket.off('wordAlreadyFoundByOther', handleWordAlreadyFoundByOther);
       socket.off('wordNeedsValidation', handleWordNeedsValidation);
       socket.off('wordRejected', handleWordRejected);
       socket.off('wordNotOnBoard', handleWordNotOnBoard);
@@ -724,8 +751,9 @@ const InGameScreen = memo<InGameScreenProps>(({
                   >
                     {playerData.score}
                   </motion.div>
-                  <div className="landscape-stat-label text-neo-black">
+                  <div className="landscape-stat-label text-neo-black flex items-center gap-0.5">
                     {t('common.score') || 'SCORE'}
+                    <ScoreBreakdownTooltip t={t} minWordLength={minWordLength} />
                   </div>
                 </div>
               </div>
@@ -741,21 +769,44 @@ const InGameScreen = memo<InGameScreenProps>(({
               paddingBottom: 'env(safe-area-inset-bottom, 0px)'
             }}
           >
-            {/* Left side: Exit button with combo below it */}
+            {/* Left side: Exit button + Help button with combo below */}
             <div className="flex flex-col items-start gap-1">
-              {/* Exit button - positioned safely inside side panels */}
-              {onExitRoom && (
-                <ExitRoomButton
-                  onClick={onExitRoom}
-                  label={t('playerView.exit')}
-                  className="w-12 h-12"
-                />
-              )}
+              {/* Exit button + Help button row */}
+              <div className="flex items-center gap-2">
+                {onExitRoom && (
+                  <ExitRoomButton
+                    onClick={onExitRoom}
+                    label={t('playerView.exit')}
+                    className="w-12 h-12"
+                  />
+                )}
+                {onShowTutorial && (
+                  <motion.button
+                    onClick={onShowTutorial}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-10 h-10 bg-neo-pink/90 border-2 border-neo-black rounded-full shadow-hard flex items-center justify-center hover:bg-neo-pink transition-colors"
+                    aria-label={t('help.viewTutorial') || 'View Tutorial'}
+                  >
+                    <HelpCircle className="w-5 h-5 text-neo-cream" />
+                  </motion.button>
+                )}
+              </div>
 
               {/* Combo Display - static space below exit button */}
-              {isPlaying && comboLevel > 0 && (
+              {isPlaying && (
                 <div className="w-[100px]">
-                  <ComboDisplay comboLevel={comboLevel} highContrast compact />
+                  {comboLevel > 0 ? (
+                    <ComboDisplay comboLevel={comboLevel} highContrast compact timeRemaining={comboTimeRemaining} isDanger={comboDanger} />
+                  ) : (
+                    /* Hint for new players when no combo active */
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 0.6 }}
+                      className="text-[10px] text-neo-cream/50 text-center leading-tight"
+                    >
+                      <span className="text-neo-cyan">⚡</span> {t('game.comboHint') || 'Find words fast for combo!'}
+                    </motion.div>
+                  )}
                 </div>
               )}
             </div>
@@ -911,9 +962,21 @@ const InGameScreen = memo<InGameScreenProps>(({
 
         {/* Top Bar - Only on mobile, integrated into parent on desktop */}
         <div className="lg:hidden w-full flex items-center justify-between px-1 flex-shrink-0">
-          {onExitRoom && (
-            <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} className="relative z-50" />
-          )}
+          <div className="flex items-center gap-2">
+            {onExitRoom && (
+              <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} className="relative z-50" />
+            )}
+            {onShowTutorial && (
+              <motion.button
+                onClick={onShowTutorial}
+                whileTap={{ scale: 0.95 }}
+                className="w-9 h-9 bg-neo-pink/90 border-2 border-neo-black rounded-full shadow-hard flex items-center justify-center"
+                aria-label={t('help.viewTutorial') || 'View Tutorial'}
+              >
+                <HelpCircle className="w-4 h-4 text-neo-cream" />
+              </motion.button>
+            )}
+          </div>
 
           {/* Hint Button - Single Player Mode Only */}
           {hints && hints.isSinglePlayer && (
@@ -976,9 +1039,14 @@ const InGameScreen = memo<InGameScreenProps>(({
                     })}
                   </AnimatePresence>
                   {normalizedFoundWords.length === 0 && (
-                    <p className="text-center text-neo-black py-6 text-sm font-bold">
-                      {t('playerView.noWordsYet') || 'No words found yet'}
-                    </p>
+                    <div className="text-center py-6">
+                      <p className="text-neo-black/90 text-sm font-bold mb-2">
+                        {t('playerView.noWordsYet') || 'No words found yet'}
+                      </p>
+                      <p className="text-neo-black/60 text-xs px-2">
+                        {t('playerView.swipeHintWithMin', { min: minWordLength }) || `Swipe connected letters (${minWordLength}+ letters)`}
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>
@@ -991,7 +1059,7 @@ const InGameScreen = memo<InGameScreenProps>(({
           {/* Stats row - Timer centered, Exit+Hint on left (desktop), Combo+Score on right */}
           {remainingTime !== null && (
             <div ref={gameStatsRef} className="relative flex items-center justify-center flex-shrink-0 mb-2 md:mb-3" role="status" aria-label="Game status">
-              {/* Exit + Hint - absolutely positioned on left (desktop only) */}
+              {/* Exit + Help + Hint - absolutely positioned on left (desktop only) */}
               <div className="absolute left-2 rtl:left-auto rtl:right-2 md:left-4 md:rtl:right-4 top-1/2 -translate-y-1/2 hidden lg:flex items-center gap-2 z-30">
                 {onExitRoom && (
                   <ExitRoomButton
@@ -999,6 +1067,16 @@ const InGameScreen = memo<InGameScreenProps>(({
                     label={t('playerView.exit')}
                     className="w-10 h-10 md:w-12 md:h-12"
                   />
+                )}
+                {onShowTutorial && (
+                  <motion.button
+                    onClick={onShowTutorial}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-9 h-9 md:w-10 md:h-10 bg-neo-pink/90 border-2 border-neo-black rounded-full shadow-hard flex items-center justify-center hover:bg-neo-pink transition-colors"
+                    aria-label={t('help.viewTutorial') || 'View Tutorial'}
+                  >
+                    <HelpCircle className="w-4 h-4 md:w-5 md:h-5 text-neo-cream" />
+                  </motion.button>
                 )}
                 {hints && hints.isSinglePlayer && (
                   <HintButton
@@ -1032,6 +1110,18 @@ const InGameScreen = memo<InGameScreenProps>(({
                 <div className="lg:hidden">
                   <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="xs" />
                 </div>
+
+                {/* Player count indicator - mobile only, shows below timer */}
+                {leaderboard && leaderboard.length > 1 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="lg:hidden absolute -bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2 py-0.5 bg-neo-navy/90 rounded-full border border-neo-cream/20"
+                  >
+                    <Users className="w-3 h-3 text-neo-cream/70" />
+                    <span className="text-[10px] font-bold text-neo-cream/70">{leaderboard.length}</span>
+                  </motion.div>
+                )}
               </motion.div>
 
               {/* Combo + Score - absolutely positioned on right to not shift timer */}
@@ -1040,7 +1130,18 @@ const InGameScreen = memo<InGameScreenProps>(({
                 <div className="absolute right-2 rtl:right-auto rtl:left-2 md:right-4 md:rtl:left-4 top-1/2 -translate-y-1/2 flex flex-col items-end rtl:items-start gap-1 md:gap-2 z-30 pointer-events-none">
                   {/* Combo container - fixed height to prevent layout shift when combo appears/disappears */}
                   <div className="h-[28px] md:h-[32px] flex items-center justify-end rtl:justify-start">
-                    <ComboDisplay comboLevel={comboLevel} compact />
+                    {comboLevel > 0 ? (
+                      <ComboDisplay comboLevel={comboLevel} compact timeRemaining={comboTimeRemaining} isDanger={comboDanger} />
+                    ) : (
+                      /* Subtle hint for new players */
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 0.5 }}
+                        className="text-[9px] md:text-[10px] text-neo-cream/40 text-right rtl:text-left leading-tight max-w-[80px]"
+                      >
+                        <span className="text-neo-cyan/60">⚡</span> {t('game.comboHint') || 'Find words fast!'}
+                      </motion.div>
+                    )}
                   </div>
 
                   {/* Score - vibrant yellow/lime gradient */}
@@ -1063,8 +1164,9 @@ const InGameScreen = memo<InGameScreenProps>(({
                       >
                         {playerData.score}
                       </motion.div>
-                      <div className="text-[9px] md:text-xs lg:text-sm font-bold uppercase tracking-wider text-neo-black">
+                      <div className="text-[9px] md:text-xs lg:text-sm font-bold uppercase tracking-wider text-neo-black flex items-center justify-center gap-0.5">
                         {t('common.score') || 'Score'}
+                        <ScoreBreakdownTooltip t={t} minWordLength={minWordLength} />
                       </div>
                     </div>
                     {/* Rank badge */}
@@ -1186,8 +1288,8 @@ const InGameScreen = memo<InGameScreenProps>(({
                 </div>
                 <div className="max-h-[50px] overflow-hidden">
                   {normalizedFoundWords.length === 0 ? (
-                    <p className="text-center text-neo-black/90 py-2 text-sm font-bold">
-                      {t('playerView.noWordsYet') || 'No words found yet'}
+                    <p className="text-center text-neo-black/70 py-1 text-[10px]">
+                      {t('playerView.swipeHintShort') || 'Swipe letters to find words!'}
                     </p>
                   ) : (
                     <div className="flex flex-wrap gap-1">

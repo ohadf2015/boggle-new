@@ -281,6 +281,23 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
             className="mb-2 sm:mb-3"
           />
 
+          {/* Scoring Tips for new players - only show if no bonuses earned */}
+          {totalComboBonus === 0 && totalFireRoundBonus === 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="mb-2 sm:mb-3 p-2 bg-neo-cyan/10 rounded-neo border border-neo-cyan/30"
+            >
+              <div className="text-[10px] sm:text-xs text-neo-cyan font-bold flex items-center gap-1.5 mb-1">
+                💡 {t('results.scoringTip') || 'Scoring Tip'}
+              </div>
+              <p className="text-[9px] sm:text-[10px] text-neo-cream/70 leading-relaxed">
+                {t('results.scoringTipText') || 'Find words quickly in a row for combo bonuses (⚡). Longer words score way more points!'}
+              </p>
+            </motion.div>
+          )}
+
           {/* Collapsible: Performance Details */}
           <button
             onClick={() => setShowDetails(!showDetails)}

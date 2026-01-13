@@ -238,10 +238,12 @@ const ja = {
     "wordAlreadyFound": "既に発見済み！",
     "wordNotOnBoard": "ボードにありません！",
     "wordTooShort": "短すぎます！",
-    "boardTheme": "ボードテーマ"
+    "boardTheme": "ボードテーマ",
+    "comboHint": "素早く単語を見つけてコンボ！"
   },
   "help": {
     "title": "クイックヘルプ",
+    "viewTutorial": "チュートリアルを見る",
     "howToPlay": "遊び方",
     "swipeLetters": "つながる文字をスワイプして単語を作る",
     "diagonalWorks": "斜めもOK！",
@@ -988,8 +990,11 @@ const ja = {
     "clickToSelect": "文字をクリックして単語を選択",
     "me": "自分",
     "noWordsYet": "まだ単語が見つかりません",
+    "swipeHintWithMin": "つながった文字をスワイプして単語を作ろう（{min}文字以上）",
+    "swipeHintShort": "文字をスワイプして単語を見つけよう！",
     "shuffle": "シャッフル",
     "swipeToFormWords": "ボードをスワイプして単語を作ります",
+    "getReadyHint": "下のコツを読んで遊び方をマスターしよう！",
     "inviteFriends": "友達を招待",
     "waitingForHostToStart": "ホストがゲームを開始するのを待っています...",
     "notInDictionary": "辞書にありません",
@@ -1046,7 +1051,8 @@ const ja = {
     "tapToCopy": "タップしてコピー",
     "copied": "コードをコピーしました！",
     "linkCopied": "リンクをコピーしました！",
-    "copyLink": "リンクをコピー"
+    "copyLink": "リンクをコピー",
+    "code": "コード:"
   },
   "onboarding": {
     "header": "クイックスタートガイド",
@@ -1072,7 +1078,8 @@ const ja = {
     "uniqueTitle": "ユニークに",
     "uniqueText": "共有した単語は0点！創造的にユニークな単語を見つけよう。",
     "bonusTitle": "ボーナスラウンド",
-    "bonusText": "2倍ポイントのファイアラウンドに注目！完璧なタイミングでゲームを逆転できます。"
+    "bonusText": "2倍ポイントのファイアラウンドに注目！完璧なタイミングでゲームを逆転できます。",
+    "tryIt": "やってみよう！"
   },
   "lateJoiner": {
     "welcomeTitle": "ゲーム進行中！",
@@ -1257,7 +1264,11 @@ const ja = {
     "tryAgainEncouragement": "続けてプレイして上達しよう！",
     "of": "/",
     "readyForNextRound": "次のラウンドの準備はいい？",
-    "hostStartDescription": "全員の準備ができたら新しいゲームを始めよう！"
+    "hostStartDescription": "全員の準備ができたら新しいゲームを始めよう！",
+    "readyExplanation": "タップしてホストに「もう一回やりたい！」を伝えよう",
+    "scoringTip": "スコアのコツ",
+    "scoringTipText": "連続で単語を見つけてコンボボーナス(⚡)ゲット！長い単語はポイント爆上げだよ！",
+    "sharedWordsExplanation": "これらは他のプレイヤーも見つけた単語だから0点。ユニークな単語を狙おう！"
   },
   "nextStep": {
     "challengeBots": "ボットに挑戦!",
@@ -1657,7 +1668,8 @@ const ja = {
       "description": "LexiClashの遊び方を学ぶ"
     },
     "skipHint": "ESCかスキップでゲームへ 🎮",
-    "swipeHint": "← スワイプで移動 →"
+    "swipeHint": "← スワイプで移動 →",
+    "timingHint": "ゲーム開始を待ちながら遊び方を覚えよう！"
   },
   "tutorialPrompt": {
     "title": "初めてですか？",
@@ -2645,7 +2657,9 @@ const ja = {
     "youAreFirst": "あなたが1位!",
     "keepItUp": "プレイを続けてリードを守ろう",
     "nearbyPlayers": "近いプレイヤー",
-    "points": "pt"
+    "points": "pt",
+    "hint": "💡 もっと単語を見つけて順位を上げよう！",
+    "multiplayerTip": "ユニークな単語を見つけてスコア！他の人とかぶると0点だよ。"
   },
   "ranked": {
     "title": "ランクマッチ",
@@ -3048,7 +3062,15 @@ const ja = {
   "practice": {
     "tips": "練習のコツ",
     "noTimer": "時間制限なし - 自分のペースでプレイ",
-    "exploreTip": "探索してできるだけ多くの単語を見つけよう"
+    "exploreTip": "探索してできるだけ多くの単語を見つけよう",
+    "header": "練習モード",
+    "instructions": "文字をスワイプして単語を作ろう（3文字以上）",
+    "found": "ナイス！見つけた！",
+    "duplicate": "もう見つけたよ！",
+    "invalid": "単語じゃないよ、もう一回！",
+    "reset": "リセット",
+    "wordsFound": "発見した単語:",
+    "backToTips": "コツに戻る"
   },
   "wizard": {
     "stepOf": "ステップ {current} / {total}"
@@ -3771,6 +3793,13 @@ const ja = {
       "text": "文字の上で指をドラッグして単語を作ります"
     },
     "dismiss": "了解！"
+  },
+  "scoring": {
+    "howItWorks": "スコアの仕組み",
+    "pointsPerWord": "単語ごとのポイント",
+    "letters": "文字",
+    "pts": "点",
+    "longerWordsTip": "長い単語 = より多くのポイント！"
   },
   "wizard": {
     "selectMode": "ゲームモードを選択",

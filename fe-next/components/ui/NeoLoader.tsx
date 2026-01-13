@@ -112,28 +112,23 @@ export const NeoLoader = memo(function NeoLoader({
     );
   }
 
-  // Combined mascot with spinner variant
+  // Combined mascot with spinner variant - mascot inside the ring
   if (variant === 'mascot-letters') {
     const spinnerSizes = {
-      sm: 'w-12 h-12',
-      md: 'w-16 h-16',
-      lg: 'w-20 h-20',
+      sm: { ring: 'w-20 h-20', mascot: 'xs' as const },
+      md: { ring: 'w-28 h-28', mascot: 'sm' as const },
+      lg: { ring: 'w-36 h-36', mascot: 'md' as const },
     };
 
     return (
-      <div className="flex flex-col items-center justify-center gap-6">
-        {/* Animated Mascot */}
-        <Mascot
-          variant={mascotVariant}
-          size={size}
-          animated={true}
-          priority={true}
-        />
-        {/* Simple spinner */}
-        <div className={`${spinnerSizes[size]} relative`}>
+      <div className="flex flex-col items-center justify-center gap-4">
+        {/* Spinner ring with mascot inside */}
+        <div className={`${spinnerSizes[size].ring} relative`}>
+          {/* Background ring */}
           <motion.div
             className="absolute inset-0 rounded-full border-4 border-neo-cyan/20"
           />
+          {/* Animated spinner ring */}
           <motion.div
             className="absolute inset-0 rounded-full border-4 border-transparent border-t-neo-cyan border-r-neo-pink"
             animate={{ rotate: 360 }}
@@ -143,6 +138,15 @@ export const NeoLoader = memo(function NeoLoader({
               ease: 'linear',
             }}
           />
+          {/* Mascot centered inside the ring */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Mascot
+              variant={mascotVariant}
+              size={spinnerSizes[size].mascot}
+              animated={true}
+              priority={true}
+            />
+          </div>
         </div>
         {text && (
           <motion.p

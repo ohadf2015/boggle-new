@@ -238,10 +238,12 @@ const sv = {
     "wordAlreadyFound": "Redan hittad!",
     "wordNotOnBoard": "Finns inte på brädet!",
     "wordTooShort": "För kort!",
-    "boardTheme": "Brädtema"
+    "boardTheme": "Brädtema",
+    "comboHint": "Hitta ord snabbt för kombo!"
   },
   "help": {
     "title": "Snabbhjälp",
+    "viewTutorial": "Visa handledning",
     "howToPlay": "Hur man spelar",
     "swipeLetters": "Svep över kopplade bokstäver för att bygga ord",
     "diagonalWorks": "Diagonaler fungerar också!",
@@ -963,6 +965,7 @@ const sv = {
     "exitRoom": "Lämna rummet",
     "waitForGameStart": "Vänta på att spelet startar",
     "clickToWakeUp": "Tryck för att hälsa!",
+    "getReadyHint": "Läs tipsen nedan för att lära dig spela!",
     "players": "Spelare",
     "yourAchievements": "Dina prestationer",
     "letterGrid": "Bokstavsbräde",
@@ -988,6 +991,8 @@ const sv = {
     "clickToSelect": "Klicka på bokstäver för att välja ord",
     "me": "Jag",
     "noWordsYet": "Inga ord hittade ännu",
+    "swipeHintWithMin": "Svep över sammankopplade bokstäver ({min}+ bokstäver)",
+    "swipeHintShort": "Svep över bokstäver för att hitta ord!",
     "shuffle": "Blanda",
     "swipeToFormWords": "Svep på brädet för att bilda ord",
     "inviteFriends": "Bjud in vänner",
@@ -1046,7 +1051,8 @@ const sv = {
     "tapToCopy": "Tryck för att kopiera",
     "copied": "Koden kopierad!",
     "linkCopied": "Länken kopierad!",
-    "copyLink": "Kopiera länk"
+    "copyLink": "Kopiera länk",
+    "code": "Kod:"
   },
   "onboarding": {
     "header": "Snabbguide",
@@ -1059,7 +1065,8 @@ const sv = {
     "step3Title": "Bygg kombos",
     "step3Text": "Hitta ord snabbt i rad för att bygga kombomultiplikatorer!",
     "step4Title": "Var unik",
-    "step4Text": "Ord som hittats av andra ger noll. Tänk kreativt!"
+    "step4Text": "Ord som hittats av andra ger noll. Tänk kreativt!",
+    "timingHint": "De första 10 sekunderna är avgörande!"
   },
   "tips": {
     "header": "Pro Tips",
@@ -1072,7 +1079,8 @@ const sv = {
     "uniqueTitle": "Var Unik",
     "uniqueText": "Delade ord ger noll poäng! Tänk kreativt för att hitta unika ord.",
     "bonusTitle": "Bonusrundor",
-    "bonusText": "Håll utkik efter eldrundor med 2x poäng! Perfekt timing kan vända spelet."
+    "bonusText": "Håll utkik efter eldrundor med 2x poäng! Perfekt timing kan vända spelet.",
+    "tryIt": "Testa!"
   },
   "lateJoiner": {
     "welcomeTitle": "Spelet pågår!",
@@ -1258,7 +1266,11 @@ const sv = {
     "tryAgainEncouragement": "Fortsätt spela för att förbättra dig!",
     "of": "av",
     "readyForNextRound": "Redo för nästa runda?",
-    "hostStartDescription": "Starta ett nytt spel när alla är redo!"
+    "hostStartDescription": "Starta ett nytt spel när alla är redo!",
+    "readyExplanation": "Tryck för att visa att du vill köra igen",
+    "scoringTip": "Poängtips",
+    "scoringTipText": "Hitta ord snabbt i rad för kombobonus (⚡). Längre ord ger mycket mer poäng!",
+    "sharedWordsExplanation": "Dessa ord hittades av andra spelare också, så de ger 0 poäng. Försök hitta unika ord!"
   },
   "nextStep": {
     "challengeBots": "Utmana Bottarna!",
@@ -1564,6 +1576,7 @@ const sv = {
     "step3Text": "Hitta ord snabbt i rad för att bygga kombomultiplikatorer!",
     "step4Title": "Var unik",
     "step4Text": "Ord som hittats av andra ger noll. Tänk kreativt!",
+    "timingHint": "De första 10 sekunderna är avgörande!",
     "welcome": {
       "title": "Välkommen till LexiClash!",
       "subtitle": "Svep bokstäver. Bilda ord. Dominera.",
@@ -2642,7 +2655,9 @@ const sv = {
     "youAreFirst": "Du är #1!",
     "keepItUp": "Fortsätt spela för att behålla ledningen",
     "nearbyPlayers": "Närliggande spelare",
-    "points": "poäng"
+    "points": "poäng",
+    "hint": "💡 Hitta fler ord för att klättra!",
+    "multiplayerTip": "Hitta unika ord för att poänga! Delade ord ger 0."
   },
   "ranked": {
     "title": "Rankat läge",
@@ -3049,7 +3064,15 @@ const sv = {
   "practice": {
     "tips": "Övningstips",
     "noTimer": "Ingen tidsgräns - spela i din egen takt",
-    "exploreTip": "Utforska och hitta så många ord som möjligt"
+    "exploreTip": "Utforska och hitta så många ord som möjligt",
+    "header": "Övningsläge",
+    "instructions": "Svep över bokstäver för att bilda ord (3+ bokstäver)",
+    "found": "Snyggt! Ord hittat!",
+    "duplicate": "Det där hittade du redan!",
+    "invalid": "Inte ett ord - testa igen!",
+    "reset": "Börja om",
+    "wordsFound": "Ord hittade:",
+    "backToTips": "Tillbaka till Tips"
   },
   "wizard": {
     "stepOf": "Steg {current} av {total}"
@@ -3767,6 +3790,13 @@ const sv = {
       "text": "Dra fingret över bokstäverna för att bilda ord"
     },
     "dismiss": "Förstått!"
+  },
+  "scoring": {
+    "howItWorks": "Hur poängen räknas",
+    "pointsPerWord": "Poäng per ord",
+    "letters": "bokstäver",
+    "pts": "p",
+    "longerWordsTip": "Längre ord = mycket mer poäng!"
   },
   "wizard": {
     "selectMode": "Välj spelläge",

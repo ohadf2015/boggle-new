@@ -25,6 +25,7 @@ import { captureSocketError, addSocketEventBreadcrumb, addGameBreadcrumb, isExpe
 import { sanitizeRoomName } from '@/utils/consts';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
+import { useConnectionToasts } from '@/hooks/useConnectionToasts';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 
 interface ResultsData {
@@ -136,6 +137,9 @@ export default function MultiplayerPage(): React.JSX.Element {
   const gameDurationRef = useRef<number | null>(null);
   const wasConnectedRef = useRef<boolean>(false);
   const showResultsRef = useRef<boolean>(showResults);
+
+  // Connection status toast notifications for better UX
+  useConnectionToasts();
 
   const { t, language } = useLanguage();
   const { user, isAuthenticated, isSupabaseEnabled, profile, loading, refreshProfile } = useAuth();
@@ -1263,6 +1267,10 @@ export default function MultiplayerPage(): React.JSX.Element {
   const handleShowResults = useCallback((data: unknown) => {
     setResultsData(data as ResultsData);
     setShowResults(true);
+    // Track multiplayer game completion for new player badge
+    import('@/utils/multiplayerProgressStorage').then(({ recordGameCompleted }) => {
+      recordGameCompleted();
+    });
   }, []);
 
   // Calculate and store game duration when results are first shown

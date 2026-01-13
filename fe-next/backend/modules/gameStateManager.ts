@@ -1177,7 +1177,7 @@ function clearAllGames(): number {
  * @param username - Username
  * @returns Object with ready count and total player count
  */
-function markPlayerReadyForNextGame(gameCode: string, username: string): { readyCount: number; totalPlayers: number } | null {
+function markPlayerReadyForNextGame(gameCode: string, username: string): { readyCount: number; totalPlayers: number; readyUsernames: string[] } | null {
   const game = games[gameCode];
   if (!game) return null;
 
@@ -1191,11 +1191,12 @@ function markPlayerReadyForNextGame(gameCode: string, username: string): { ready
   game.lastActivity = Date.now();
   persistGameState(gameCode);
 
-  const readyCount = Object.keys(game.playersReadyForNextGame).length;
+  const readyUsernames = Object.keys(game.playersReadyForNextGame);
+  const readyCount = readyUsernames.length;
   // Count non-bot, non-host users who are currently connected (host clicks Start, not Ready)
   const totalPlayers = Object.values(game.users).filter(u => !u.isBot && !u.disconnected && !u.isHost).length;
 
-  return { readyCount, totalPlayers };
+  return { readyCount, totalPlayers, readyUsernames };
 }
 
 /**

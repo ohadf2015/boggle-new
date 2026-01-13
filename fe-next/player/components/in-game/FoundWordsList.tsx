@@ -18,6 +18,8 @@ interface FoundWordsListProps {
   t: (key: string, params?: Record<string, string | number>) => string;
   /** Optional: compact mode for mobile drawer */
   compact?: boolean;
+  /** Minimum word length for the current game (default: 3) */
+  minWordLength?: number;
 }
 
 /**
@@ -29,6 +31,7 @@ export const FoundWordsList = memo<FoundWordsListProps>(({
   gameActive,
   t,
   compact = false,
+  minWordLength = 3,
 }) => {
   const wordListRef = useRef<HTMLDivElement | null>(null);
 
@@ -79,9 +82,14 @@ export const FoundWordsList = memo<FoundWordsListProps>(({
             })}
           </AnimatePresence>
           {foundWords.length === 0 && gameActive && (
-            <p className="text-center text-neo-black/90 py-6 text-sm font-bold">
-              {t('playerView.noWordsYet') || 'No words found yet'}
-            </p>
+            <div className="text-center py-6">
+              <p className="text-neo-black/90 text-sm font-bold mb-2">
+                {t('playerView.noWordsYet') || 'No words found yet'}
+              </p>
+              <p className="text-neo-black/60 text-xs px-2">
+                {t('playerView.swipeHintWithMin', { min: minWordLength }) || `Swipe across connected letters to form words (${minWordLength}+ letters)`}
+              </p>
+            </div>
           )}
         </div>
       </div>

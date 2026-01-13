@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import type { Socket } from 'socket.io-client';
 import { Maximize, Minimize } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -182,7 +182,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         )}
       </AnimatePresence>
 
-      {/* Game Header with Timer - Hidden in fullscreen */}
+      {/* Game Header with Timer - Hidden in fullscreen (but show compact timer) */}
       <AnimatePresence>
         {!isFullscreen && (
           <motion.div
@@ -203,8 +203,29 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         )}
       </AnimatePresence>
 
+      {/* Compact Timer for Fullscreen Mode */}
+      <AnimatePresence>
+        {isFullscreen && remainingTime !== null && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            className="absolute top-4 left-4 z-50 bg-neo-black/90 text-neo-cream px-4 py-2 rounded-neo border-2 border-neo-cream/30 shadow-hard-sm"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-black tabular-nums">
+                {Math.floor(remainingTime / 60)}:{String(remainingTime % 60).padStart(2, '0')}
+              </span>
+              {fireRoundActive && (
+                <span className="text-neo-orange animate-pulse">🔥</span>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Main Content: Grid + Leaderboard (50/50) */}
-      <div className="flex-1 min-h-0 flex flex-col md:flex-row gap-2 md:gap-4 p-2 md:p-4 max-w-[2000px] mx-auto w-full">
+      <div className={`flex-1 min-h-0 flex flex-col md:flex-row gap-2 md:gap-4 mx-auto w-full ${isFullscreen ? 'p-4' : 'p-2 md:p-4 max-w-[2000px]'}`}>
         {/* Left: Grid - aspect-square ensures square cells */}
         <div className="flex-1 min-h-0 flex items-center justify-center bg-neo-cream text-neo-black rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden">
           {tableData && Array.isArray(tableData) && tableData.length > 0 && tableData[0] && tableData[0].length > 0 ? (

@@ -48,6 +48,11 @@ jest.mock('@/utils/SocketContext', () => ({
   SocketContext: {
     Provider: ({ children }: any) => children,
   },
+  useSocketOptional: () => ({
+    isConnected: true,
+    isReconnecting: false,
+    connectionError: null,
+  }),
 }));
 
 // Mock LanguageContext

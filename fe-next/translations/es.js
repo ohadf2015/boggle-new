@@ -238,10 +238,12 @@ const es = {
     "wordAlreadyFound": "¡Ya la tienes!",
     "wordNotOnBoard": "No está en el tablero",
     "wordTooShort": "Mínimo 3 letras",
-    "boardTheme": "Tema del tablero"
+    "boardTheme": "Tema del tablero",
+    "comboHint": "¡Rápido! Encadena palabras"
   },
   "help": {
     "title": "Ayuda Rápida",
+    "viewTutorial": "Ver Tutorial",
     "howToPlay": "Cómo Jugar",
     "swipeLetters": "Desliza sobre letras conectadas para formar palabras",
     "diagonalWorks": "¡Las diagonales también!",
@@ -985,6 +987,9 @@ const es = {
     "clickToSelect": "Haz clic en las letras para seleccionar palabras",
     "me": "Yo",
     "noWordsYet": "Aún no hay palabras encontradas",
+    "swipeHintWithMin": "Desliza letras conectadas ({min}+ letras)",
+    "swipeHintShort": "¡Desliza para formar palabras!",
+    "getReadyHint": "¡Prepárate para la batalla!",
     "shuffle": "Mezclar",
     "swipeToFormWords": "Desliza en el tablero para formar palabras",
     "inviteFriends": "Invitar Amigos",
@@ -1039,6 +1044,7 @@ const es = {
   },
   "roomCode": {
     "label": "Código de Sala",
+    "code": "Código",
     "inviteFriends": "Invita amigos con el código:",
     "tapToCopy": "Toca para copiar",
     "copied": "¡Código copiado!",
@@ -1047,6 +1053,7 @@ const es = {
   },
   "tips": {
     "header": "Tips Pro",
+    "tryIt": "¡Pruébalo!",
     "swipeTitle": "Desliza para Conectar",
     "swipeText": "Arrastra el dedo sobre las letras para formar palabras. ¡Puedes moverte en cualquier dirección!",
     "longerTitle": "Más Largo = Mejor",
@@ -1242,6 +1249,10 @@ const es = {
     "tryAgainEncouragement": "¡Sigue jugando para mejorar!",
     "of": "de",
     "readyForNextRound": "¿Listos para la siguiente ronda?",
+    "readyExplanation": "Marca listo para la siguiente ronda",
+    "scoringTip": "Tip de puntuación",
+    "scoringTipText": "Palabras más largas = más puntos",
+    "sharedWordsExplanation": "Las palabras repetidas no dan puntos",
     "hostStartDescription": "¡Inicia una nueva partida cuando todos estén listos!"
   },
   "nextStep": {
@@ -2414,6 +2425,7 @@ const es = {
     "header": "Guía Rápida",
     "skip": "Omitir",
     "letsPlay": "¡A Jugar!",
+    "timingHint": "¡La velocidad da combos!",
     "step1Title": "Desliza las Letras",
     "step1Text": "Arrastra sobre letras conectadas para formar palabras. ¡Suelta para enviar!",
     "step2Title": "Gana Puntos",
@@ -2754,7 +2766,9 @@ const es = {
     "youAreFirst": "¡Eres el #1!",
     "keepItUp": "Sigue jugando para mantener tu liderazgo",
     "nearbyPlayers": "Jugadores Cercanos",
-    "points": "pts"
+    "points": "pts",
+    "hint": "Sigue subiendo posiciones",
+    "multiplayerTip": "¡En multijugador, la velocidad importa!"
   },
   "ranked": {
     "title": "Modo Clasificatorio",
@@ -3029,7 +3043,15 @@ const es = {
   "practice": {
     "tips": "Consejos de práctica",
     "noTimer": "Sin límite de tiempo - juega a tu ritmo",
-    "exploreTip": "Explora y encuentra tantas palabras como puedas"
+    "exploreTip": "Explora y encuentra tantas palabras como puedas",
+    "header": "Practica",
+    "instructions": "Desliza para formar palabras",
+    "wordsFound": "Encontradas",
+    "found": "¡Encontrada!",
+    "duplicate": "¡Ya la tienes!",
+    "invalid": "No es válida",
+    "reset": "Reiniciar",
+    "backToTips": "Volver a tips"
   },
   "wizard": {
     "stepOf": "Paso {current} de {total}"
@@ -3755,6 +3777,13 @@ const es = {
       "text": "Arrastra el dedo sobre las letras para formar palabras"
     },
     "dismiss": "¡Entendido!"
+  },
+  "scoring": {
+    "howItWorks": "Cómo funciona la puntuación",
+    "pointsPerWord": "Puntos por palabra",
+    "letters": "letras",
+    "pts": "pts",
+    "longerWordsTip": "¡Palabras largas = muchos más puntos!"
   },
   "keyboardDesktopBadge": {
     "typeWords": "Escribe palabras",

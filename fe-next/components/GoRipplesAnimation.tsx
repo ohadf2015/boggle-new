@@ -4,13 +4,15 @@ import { useSoundEffects } from '../contexts/SoundEffectsContext';
 
 interface GoRipplesAnimationProps {
   onComplete?: () => void;
+  /** Translation function for hints */
+  t?: (key: string) => string;
 }
 
 /**
  * Minimal & calm pre-game countdown with smooth animations
  * Clean 3-2-1-GO with soft cyan glow - easy on the eyes
  */
-const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete }) => {
+const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [count, setCount] = useState(3);
   const [isFadingOut, setIsFadingOut] = useState(false);
@@ -127,6 +129,21 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete }) =
             {count > 0 ? count : 'GO!'}
           </span>
         </motion.div>
+      </AnimatePresence>
+
+      {/* Quick tip hint during countdown */}
+      <AnimatePresence>
+        {count > 0 && !isFadingOut && (
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ delay: 0.3, duration: 0.3 }}
+            className="absolute bottom-[25%] text-center text-neo-cream/90 text-sm sm:text-base font-bold px-4"
+          >
+            {t?.('countdown.hint') || 'Swipe letters to form words!'}
+          </motion.p>
+        )}
       </AnimatePresence>
     </motion.div>
   );

@@ -183,6 +183,18 @@ export function CompactLeaderboard({
         </div>
       </div>
 
+      {/* First-time hint - shows briefly */}
+      {totalPlayers > 1 && (
+        <motion.div
+          initial={{ opacity: 1, height: 'auto' }}
+          animate={{ opacity: 0, height: 0 }}
+          transition={{ delay: 5, duration: 0.5 }}
+          className="px-2 py-1 bg-neo-cyan/20 text-[9px] text-neo-black font-medium text-center overflow-hidden"
+        >
+          {t('leaderboard.hint') || '💡 Score more points to pass other players!'}
+        </motion.div>
+      )}
+
       {/* Race Track Visualization */}
       <div className="px-2 py-1.5 bg-gradient-to-b from-neo-navy/5 to-transparent">
         {/* Track lanes */}

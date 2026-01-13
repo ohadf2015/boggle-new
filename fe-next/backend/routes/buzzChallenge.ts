@@ -10,6 +10,58 @@ import { fetchGoogleTrends } from '../services/serpApiClient';
 const router = Router();
 
 /**
+ * Transform database response (snake_case) to frontend format (camelCase)
+ * Only transforms top-level keys that the frontend expects
+ */
+interface BuzzApiResponse {
+  id?: number;
+  puzzleDate: string;
+  language: string;
+  trendingSummary: string;
+  trendingTopics: Array<{
+    query: string;
+    volume?: number;
+    newsSnippet?: string;
+  }>;
+  challenges: Array<{
+    type: string;
+    trendTopic: string;
+    prompt: string;
+    answer: string;
+    hint?: string;
+    difficulty: string;
+    trendingContext?: string;
+    options?: string[];
+  }>;
+  imageUrl?: string;
+}
+
+function transformBuzzResponse(dbData: Record<string, unknown>): BuzzApiResponse {
+  return {
+    id: dbData.id as number | undefined,
+    puzzleDate: dbData.puzzle_date as string,
+    language: dbData.language as string,
+    trendingSummary: dbData.trending_summary as string,
+    trendingTopics: (dbData.trending_topics as Array<Record<string, unknown>> || []).map((topic) => ({
+      query: topic.query as string,
+      volume: topic.search_volume as number | undefined,
+      newsSnippet: topic.news_snippet as string | undefined,
+    })),
+    challenges: (dbData.challenges as Array<Record<string, unknown>> || []).map((challenge) => ({
+      type: challenge.type as string,
+      trendTopic: challenge.trend_topic as string,
+      prompt: challenge.prompt as string,
+      answer: challenge.answer as string,
+      hint: challenge.hint as string | undefined,
+      difficulty: challenge.difficulty as string,
+      trendingContext: challenge.trending_context as string | undefined,
+      options: challenge.options as string[] | undefined,
+    })),
+    imageUrl: dbData.image_url as string | undefined,
+  };
+}
+
+/**
  * GET /buzz/:date/:language
  * Fetch daily buzz challenge for a specific date and language
  */
@@ -43,9 +95,12 @@ router.get(
         challenge = await generateDailyBuzz(new Date(date), language);
       }
 
+      // Transform snake_case database response to camelCase for frontend
+      const transformedData = transformBuzzResponse(challenge as unknown as Record<string, unknown>);
+
       res.json({
         success: true,
-        data: challenge,
+        data: transformedData,
       });
     } catch (error: any) {
       console.error('[BUZZ] Error fetching challenge:', error.message);

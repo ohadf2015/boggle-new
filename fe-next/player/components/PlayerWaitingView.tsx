@@ -1,7 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, QrCode, Crown, Bot, Info, MessageCircle } from 'lucide-react';
+import { Users, QrCode, Crown, Bot, Info, MessageCircle, Copy, Check } from 'lucide-react';
+import { NewPlayerBadge } from '@/components/game/NewPlayerBadge';
+import { isNewPlayer } from '@/utils/multiplayerProgressStorage';
 import { QRCodeSVG } from 'qrcode.react';
+import toast from 'react-hot-toast';
 import { Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
@@ -61,60 +64,118 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 }): React.ReactElement => {
   // Mobile tab state: 'info' | 'players' | 'chat'
   const [mobileTab, setMobileTab] = useState<'info' | 'players' | 'chat'>('info');
+  const [codeCopied, setCodeCopied] = useState(false);
+  const [isCurrentUserNew, setIsCurrentUserNew] = useState(false);
+
+  // Check if current user is a new player (client-side only)
+  useEffect(() => {
+    setIsCurrentUserNew(isNewPlayer());
+  }, []);
 
   // Memoized handlers
   const handleCloseQR = useCallback(() => {
     setShowQR(false);
   }, [setShowQR]);
 
+  // Copy room code handler
+  const handleCopyCode = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(gameCode);
+      setCodeCopied(true);
+      toast.success(t('roomCode.copied') || 'Code copied!', {
+        duration: 1500,
+        icon: '📋',
+      });
+      setTimeout(() => setCodeCopied(false), 2000);
+    } catch {
+      toast.error(t('common.error') || 'Failed to copy');
+    }
+  }, [gameCode, t]);
+
   // Waiting Info Card Content - render function to avoid static component warning
   const renderWaitingInfoCard = () => (
     <Card className="flex-1 p-4 sm:p-5 md:p-6 bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg flex flex-col gap-5">
-      {/* Header with hourglass */}
-      <div className="flex items-center justify-center gap-4">
-        <motion.div
-          initial={{ scale: 0.9, rotate: -3 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          className="relative flex-shrink-0"
-          aria-hidden="true"
+      {/* Prominent Room Code - Easy to share */}
+      <div className="flex flex-col items-center gap-2 pb-4 border-b-2 border-neo-cream/10">
+        <span className="text-xs font-bold uppercase tracking-wider text-neo-cream/60">
+          {t('roomCode.inviteFriends') || 'Invite friends with code:'}
+        </span>
+        <motion.button
+          onClick={handleCopyCode}
+          whileTap={{ scale: 0.95 }}
+          className={cn(
+            "flex items-center gap-3 px-5 py-3",
+            "bg-neo-navy/60 hover:bg-neo-navy/80",
+            "rounded-neo border-3 border-neo-black shadow-hard",
+            "transition-all cursor-pointer"
+          )}
+          title={t('roomCode.tapToCopy') || 'Tap to copy'}
         >
-          {/* Neo-Brutalist Hourglass - Compact */}
+          <span className="text-3xl font-black tracking-[0.25em] text-neo-lime">
+            {gameCode}
+          </span>
+          <motion.span
+            initial={false}
+            animate={codeCopied ? { scale: [1, 1.3, 1] } : {}}
+            className="inline-flex"
+          >
+            {codeCopied ? (
+              <Check className="w-5 h-5 text-neo-lime" />
+            ) : (
+              <Copy className="w-5 h-5 text-neo-cream/50" />
+            )}
+          </motion.span>
+        </motion.button>
+        <span className="text-[10px] text-neo-cream/40">
+          {t('roomCode.tapToCopy') || 'Tap to copy'}
+        </span>
+      </div>
+
+      {/* Status message with "Get Ready" prompt */}
+      <div className="flex flex-col items-center gap-3">
+        <div className="flex items-center justify-center gap-3">
           <motion.div
             animate={{ rotate: [0, 10, -10, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="bg-neo-yellow border-3 border-neo-black shadow-hard p-2 rotate-[2deg]"
+            className="bg-neo-yellow border-2 border-neo-black shadow-hard-sm p-1.5 rotate-[2deg]"
+            aria-hidden="true"
           >
-            <div className="relative w-6 h-10 flex flex-col items-center">
-              <div className="w-0 h-0 border-l-[10px] border-r-[10px] border-t-[14px] border-l-transparent border-r-transparent border-t-neo-black" />
+            <div className="relative w-4 h-7 flex flex-col items-center">
+              <div className="w-0 h-0 border-l-[7px] border-r-[7px] border-t-[10px] border-l-transparent border-r-transparent border-t-neo-black" />
               <div className="w-0.5 h-0.5 bg-neo-black -my-[1px] z-10" />
-              <div className="w-0 h-0 border-l-[10px] border-r-[10px] border-b-[14px] border-l-transparent border-r-transparent border-b-neo-black" />
-              <motion.div
-                animate={{ y: [0, 14, 0], opacity: [1, 1, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                className="absolute top-[18px] w-0.5 h-1.5 bg-neo-pink"
-              />
+              <div className="w-0 h-0 border-l-[7px] border-r-[7px] border-b-[10px] border-l-transparent border-r-transparent border-b-neo-black" />
             </div>
           </motion.div>
-        </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
-          role="status"
-          aria-live="polite"
-        >
-          <div className="bg-neo-black text-neo-white px-4 py-2 font-black uppercase text-sm md:text-base tracking-wider rotate-[1deg] shadow-hard border-2 border-neo-black">
-            {t('playerView.waitForGameStart')}
-          </div>
-          <motion.p
-            animate={{ opacity: [0.6, 1, 0.6] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="text-neo-cream/80 font-bold text-xs mt-1 uppercase tracking-wide text-center"
+          <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            role="status"
+            aria-live="polite"
+            className="text-center"
           >
-            {t('playerView.waitingForHostToStart') || 'Waiting for host to start the game...'}
-          </motion.p>
+            <motion.p
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="text-neo-cream/90 font-bold text-sm uppercase tracking-wide"
+            >
+              {t('playerView.waitingForHostToStart') || 'Waiting for host to start...'}
+            </motion.p>
+          </motion.div>
+        </div>
+
+        {/* Get Ready hint for new players */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="flex items-center gap-2 px-4 py-2 bg-neo-cyan/20 rounded-neo border border-neo-cyan/30"
+        >
+          <span className="text-neo-cyan text-lg">💡</span>
+          <span className="text-xs text-neo-cyan/90 font-medium">
+            {t('playerView.getReadyHint') || 'Read the tips below to learn how to play!'}
+          </span>
         </motion.div>
       </div>
 
@@ -176,6 +237,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                     </span>
                     {isHostPlayer && <Crown className="text-neo-yellow/80 text-sm" />}
                     {isBot && <Bot className="text-neo-cyan/70 text-sm" />}
+                    {isMe && isCurrentUserNew && <NewPlayerBadge t={t} size="xs" />}
                     {isMe && (
                       <span className="text-xs text-neo-cream/70 font-medium">
                         ({t('playerView.me')})
@@ -243,6 +305,33 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
       {/* Mobile Layout: Tab-based */}
       <div className="lg:hidden">
+        {/* Sticky Room Code Banner - Always visible on mobile when not on info tab */}
+        {mobileTab !== 'info' && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-3 p-2 bg-slate-800/95 rounded-neo border-2 border-neo-black shadow-hard-sm flex items-center justify-center gap-2"
+          >
+            <span className="text-xs font-bold uppercase tracking-wide text-neo-cream/60">
+              {t('roomCode.code') || 'Code:'}
+            </span>
+            <motion.button
+              onClick={handleCopyCode}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center gap-2 px-3 py-1 bg-neo-navy/60 hover:bg-neo-navy/80 rounded-neo border-2 border-neo-black transition-all"
+            >
+              <span className="text-xl font-black tracking-[0.2em] text-neo-lime">
+                {gameCode}
+              </span>
+              {codeCopied ? (
+                <Check className="w-4 h-4 text-neo-lime" />
+              ) : (
+                <Copy className="w-4 h-4 text-neo-cream/50" />
+              )}
+            </motion.button>
+          </motion.div>
+        )}
+
         {mobileTab === 'info' && (
           <motion.div
             key="info"

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { memo, useMemo, useCallback, useEffect, useRef } from 'react';
+import { memo, useMemo, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Maximize, Minimize } from 'lucide-react';
 import TvResultsWinnersPodium from './TvResultsWinnersPodium';
 import TvResultsStatsGrid from './TvResultsStatsGrid';
 import TvResultsAwards from './TvResultsAwards';
@@ -10,6 +11,7 @@ import TvResultsControls from './TvResultsControls';
 import TournamentStandings from '../../../components/TournamentStandings';
 import PlayersReadyIndicator from '../../../components/results/PlayersReadyIndicator';
 import { useTvResultsAnimation, type SoundType } from './useTvResultsAnimation';
+import { useTvFullscreen } from '../../hooks/useTvFullscreen';
 import { cn } from '../../../lib/utils';
 import { useSoundEffects } from '../../../contexts/SoundEffectsContext';
 import { useMusic } from '../../../contexts/MusicContext';
@@ -48,6 +50,7 @@ interface TvResultsViewProps {
   onStartNewGame: () => void;
   onNextRound: () => void;
   onShowQR: () => void;
+  /** Optional close handler - reserved for future use */
   onClose?: () => void;
   t: (path: string, params?: Record<string, string | number>) => string;
 }
@@ -66,12 +69,17 @@ const TvResultsView = memo<TvResultsViewProps>(({
   onStartNewGame,
   onNextRound,
   onShowQR,
-  onClose,
+  onClose: _onClose,
   t,
 }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { sfxMuted, sfxVolume } = useSoundEffects();
   const { isMuted: musicMuted, audioUnlocked } = useMusic();
+
+  // Fullscreen mode support
+  const { isFullscreen, toggleFullscreen, isSupported: isFullscreenSupported } = useTvFullscreen({
+    enabled: true,
+  });
 
   // Filter out host from results (they're not playing in broadcast mode)
   const filteredScores = useMemo(() => {
@@ -176,6 +184,26 @@ const TvResultsView = memo<TvResultsViewProps>(({
 
   return (
     <div className="fixed inset-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 z-50 overflow-hidden">
+      {/* Fullscreen Toggle Button */}
+      {isFullscreenSupported && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={toggleFullscreen}
+          className="absolute top-4 right-4 z-[60] bg-neo-black/80 hover:bg-neo-black text-neo-cream p-3 rounded-neo border-2 border-neo-cream/30 shadow-hard-sm transition-colors"
+          title={isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')}
+          aria-label={isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')}
+        >
+          {isFullscreen ? (
+            <Minimize className="w-6 h-6" />
+          ) : (
+            <Maximize className="w-6 h-6" />
+          )}
+        </motion.button>
+      )}
+
       {/* Main Content */}
       <div className="relative h-full flex flex-col">
         {/* Header */}

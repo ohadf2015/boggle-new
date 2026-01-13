@@ -212,6 +212,24 @@ export function usePlayerWordEvents({
     resetCombo();
   }, [setFoundWords, resetCombo, customHaptic]);
 
+  const handleWordAlreadyFoundByOther = useCallback((data: { word: string; foundBy: string; foundByAvatar?: unknown }) => {
+    // Haptic feedback for word found by someone else (same as duplicate)
+    customHaptic(GAME_HAPTICS.invalidWord);
+
+    // Remove from found words if it was pending validation
+    if (data?.word) {
+      setFoundWords(prev => prev.filter(fw => {
+        if (fw.word.toLowerCase() === data.word.toLowerCase() && !fw.validated) {
+          return false;
+        }
+        return true;
+      }));
+    }
+    // Reset combo - found by someone else doesn't extend combo
+    resetCombo();
+    logger.log('[PLAYER] Word already found by another player:', data.foundBy);
+  }, [setFoundWords, resetCombo, customHaptic]);
+
   const handleWordNotOnBoard = useCallback((data: any) => {
     // Haptic feedback for invalid word
     customHaptic(GAME_HAPTICS.invalidWord);
@@ -330,6 +348,7 @@ export function usePlayerWordEvents({
     { event: 'wordNeedsValidation', handler: handleWordNeedsValidation as (data: unknown) => void },
     { event: 'wordValidatingWithAI', handler: handleWordValidatingWithAI as (data: unknown) => void },
     { event: 'wordAlreadyFound', handler: handleWordAlreadyFound as (data: unknown) => void },
+    { event: 'wordAlreadyFoundByOther', handler: handleWordAlreadyFoundByOther as (data: unknown) => void },
     { event: 'wordNotOnBoard', handler: handleWordNotOnBoard as (data: unknown) => void },
     { event: 'wordTooShort', handler: handleWordTooShort as (data: unknown) => void },
     { event: 'wordRejected', handler: handleWordRejected as (data: unknown) => void },
@@ -347,6 +366,7 @@ export function usePlayerWordEvents({
     handleWordNeedsValidation,
     handleWordValidatingWithAI,
     handleWordAlreadyFound,
+    handleWordAlreadyFoundByOther,
     handleWordNotOnBoard,
     handleWordTooShort,
     handleWordRejected,

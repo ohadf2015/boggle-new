@@ -239,10 +239,12 @@ const en = {
     "wordAlreadyFound": "Already got it!",
     "wordNotOnBoard": "Letters aren't connected!",
     "wordTooShort": "3+ letters!",
-    "boardTheme": "Board Style"
+    "boardTheme": "Board Style",
+    "comboHint": "Find words fast for combo!"
   },
   "help": {
     "title": "Quick Help",
+    "viewTutorial": "View Tutorial",
     "howToPlay": "How to Play",
     "swipeLetters": "Swipe connecting letters to build words",
     "diagonalWorks": "Diagonals work too!",
@@ -939,6 +941,7 @@ const en = {
   },
   "playerView": {
     "waitingForHost": "Waiting for host to start...",
+    "getReadyHint": "Scan the grid now!",
     "submitWord": "Submit",
     "clear": "Clear",
     "timeRemaining": "Time Remaining",
@@ -1003,6 +1006,8 @@ const en = {
     "clickToSelect": "Click letters to select words",
     "me": "Me",
     "noWordsYet": "No words found yet",
+    "swipeHintWithMin": "Swipe connected letters to form words ({min}+ letters)",
+    "swipeHintShort": "Swipe letters to find words!",
     "shuffle": "Shuffle",
     "swipeToFormWords": "Swipe on the board to form words",
     "inviteFriends": "Invite Friends",
@@ -1048,6 +1053,7 @@ const en = {
   },
   "roomCode": {
     "label": "Room Code",
+    "code": "Code",
     "inviteFriends": "Invite friends with code:",
     "tapToCopy": "Tap to copy",
     "copied": "Code copied!",
@@ -1065,7 +1071,8 @@ const en = {
     "step3Title": "Build Combos",
     "step3Text": "Find words quickly in a row to build combo multipliers!",
     "step4Title": "Be Unique",
-    "step4Text": "Words found by others score zero. Think creatively!"
+    "step4Text": "Words found by others score zero. Think creatively!",
+    "timingHint": "First 10 seconds matter most!"
   },
   "tips": {
     "header": "Pro Tips",
@@ -1078,7 +1085,8 @@ const en = {
     "uniqueTitle": "Stay Unique",
     "uniqueText": "Shared words score zero! Think creatively to find unique words.",
     "bonusTitle": "Bonus Rounds",
-    "bonusText": "Watch for fire rounds with 2x points! Perfect timing can turn the game around."
+    "bonusText": "Watch for fire rounds with 2x points! Perfect timing can turn the game around.",
+    "tryIt": "Try It!"
   },
   "lateJoiner": {
     "welcomeTitle": "Game in Progress!",
@@ -1264,7 +1272,11 @@ const en = {
     "tryAgainEncouragement": "Keep going!",
     "of": "of",
     "readyForNextRound": "Ready?",
-    "hostStartDescription": "Start anytime!"
+    "hostStartDescription": "Start anytime!",
+    "readyExplanation": "Ready up to show you're in!",
+    "scoringTip": "Scoring Tip",
+    "scoringTipText": "Longer words = bigger points!",
+    "sharedWordsExplanation": "Words others found too score zero."
   },
   "nextStep": {
     "challengeBots": "Challenge the Bots!",
@@ -1570,6 +1582,7 @@ const en = {
     "step3Text": "Find words quickly in a row to build combo multipliers!",
     "step4Title": "Be Unique",
     "step4Text": "Words found by others score zero. Think creatively!",
+    "timingHint": "First 10 seconds matter most!",
     "welcome": {
       "title": "Welcome to LexiClash!",
       "subtitle": "Swipe. Spell. Dominate.",
@@ -2776,7 +2789,9 @@ const en = {
     "youAreFirst": "You're #1!",
     "keepItUp": "Keep playing to maintain your lead",
     "nearbyPlayers": "Nearby Players",
-    "points": "pts"
+    "points": "pts",
+    "hint": "Tap names to see their words!",
+    "multiplayerTip": "Unique words score more!"
   },
   "ranked": {
     "title": "Ranked Mode",
@@ -3051,7 +3066,15 @@ const en = {
   "practice": {
     "tips": "Practice Tips",
     "noTimer": "No time limit - play at your own pace",
-    "exploreTip": "Explore and find as many words as possible"
+    "exploreTip": "Explore and find as many words as possible",
+    "header": "Practice Mode",
+    "instructions": "Swipe letters to find words. No rush!",
+    "wordsFound": "Words Found",
+    "found": "Found!",
+    "invalid": "Not a word",
+    "duplicate": "Already found",
+    "reset": "Reset",
+    "backToTips": "Back to Tips"
   },
   "wizard": {
     "stepOf": "Step {current} of {total}"
@@ -3773,6 +3796,13 @@ const en = {
       "text": "Drag your finger across letters to form words"
     },
     "dismiss": "Got it!"
+  },
+  "scoring": {
+    "howItWorks": "How scoring works",
+    "pointsPerWord": "Points per Word",
+    "letters": "letters",
+    "pts": "pts",
+    "longerWordsTip": "Longer words = way more points!"
   },
   "keyboardHint": {
     "title": "Pro Tip",

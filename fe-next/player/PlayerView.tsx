@@ -24,10 +24,13 @@ import type {
 import PlayerWaitingView from './components/PlayerWaitingView';
 import PlayerInGameView from './components/PlayerInGameView';
 import ValidationModal from '../components/results/ValidationModal';
+import NewPlayerOnboarding from '../components/game/NewPlayerOnboarding';
+import FirstTimeAchievement, { useFirstTimeAchievement } from '../components/game/FirstTimeAchievement';
+import { isNewPlayer } from '@/utils/multiplayerProgressStorage';
 
 // Custom hooks
 import usePlayerSocketEvents from './hooks/usePlayerSocketEvents';
-import { resetComboState } from '@/shared/utils/comboUtils';
+import { resetComboState, calculateComboChainWindow } from '@/shared/utils/comboUtils';
 import { useGameStateContext } from '@/contexts/GameStateContext';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useHideNavigation } from '@/contexts/NavigationContext';
@@ -169,6 +172,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // UI state
   const [showQR, setShowQR] = useState<boolean>(false);
   const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
 
   // Track active game session
   const [wasInActiveGame, setWasInActiveGame] = useState<boolean>(false);
@@ -194,6 +198,12 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   // Combo shield system
   const comboShieldsUsedRef = useRef<number>(0);
 
+  // Combo timer tracking for visual feedback
+  const [comboTimeRemaining, setComboTimeRemaining] = useState<number | null>(null);
+  const [comboDanger, setComboDanger] = useState(false);
+  const comboTimerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const DANGER_THRESHOLD = 30; // 30% remaining = danger
+
   // Tournament state
   const [tournamentData, setTournamentData] = useState<TournamentData | null>(null);
   const [tournamentStandings, setTournamentStandings] = useState<TournamentStanding[]>([]);
@@ -211,6 +221,10 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   const [earthquakeState, setEarthquakeState] = useState<'idle' | 'warning' | 'shaking' | 'fire-round'>('idle');
   const [fireRoundActive, setFireRoundActive] = useState(false);
   const [fireRoundRemaining, setFireRoundRemaining] = useState(0);
+
+  // First-time achievement tracking (only for new players)
+  const { pendingAchievement, triggerAchievement, clearAchievement } = useFirstTimeAchievement();
+  const isNewPlayerRef = useRef(isNewPlayer()); // Check once on mount
 
   // Music refs
   const hasTriggeredUrgentMusicRef = useRef<boolean>(false);
@@ -321,6 +335,45 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     lastWordTimeRef.current = lastWordTime;
   }, [lastWordTime]);
 
+  // Combo timer visual feedback - tracks time remaining for combo window
+  useEffect(() => {
+    // Clear any existing interval
+    if (comboTimerIntervalRef.current) {
+      clearInterval(comboTimerIntervalRef.current);
+      comboTimerIntervalRef.current = null;
+    }
+
+    // Only track time if we have an active combo
+    if (comboLevel > 0 && lastWordTime !== null) {
+      const comboWindow = calculateComboChainWindow(comboLevel);
+
+      const updateTimeRemaining = () => {
+        const now = Date.now();
+        const elapsed = now - (lastWordTimeRef.current ?? now);
+        const remaining = Math.max(0, 100 - (elapsed / comboWindow) * 100);
+
+        setComboTimeRemaining(remaining);
+
+        // Check danger state
+        const isNowDanger = remaining <= DANGER_THRESHOLD && remaining > 0;
+        setComboDanger(isNowDanger);
+      };
+
+      // Update immediately and then at 50ms intervals for smooth progress
+      updateTimeRemaining();
+      comboTimerIntervalRef.current = setInterval(updateTimeRemaining, 50);
+    } else {
+      setComboTimeRemaining(null);
+      setComboDanger(false);
+    }
+
+    return () => {
+      if (comboTimerIntervalRef.current) {
+        clearInterval(comboTimerIntervalRef.current);
+      }
+    };
+  }, [comboLevel, lastWordTime]);
+
   // Activate game when countdown animation completes
   useEffect(() => {
     if (!showStartAnimation && letterGrid && remainingTime && remainingTime > 0 && !gameActive && !waitingForResults) {
@@ -336,6 +389,63 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       setHighlightedCells([]);
     }
   }, [gameActive, setShufflingGrid]);
+
+  // Show onboarding for first-time players during WAITING phase (not during gameplay)
+  // This gives players time to learn before the game starts
+  useEffect(() => {
+    // Only show during waiting phase (not gameActive) and when connected
+    if (!gameActive && !showOnboarding && socket) {
+      const hasSeenOnboarding = localStorage.getItem('lexiclash_seen_onboarding');
+      if (!hasSeenOnboarding) {
+        // Small delay to let the waiting view render first
+        const timer = setTimeout(() => {
+          setShowOnboarding(true);
+        }, 1000);
+        return () => clearTimeout(timer);
+      }
+    }
+    return undefined;
+  }, [gameActive, showOnboarding, socket]);
+
+  // Handle onboarding dismissal
+  const handleOnboardingDismiss = useCallback(() => {
+    setShowOnboarding(false);
+    localStorage.setItem('lexiclash_seen_onboarding', 'true');
+  }, []);
+
+  // Track first-time achievements for new players
+  const prevFoundWordsCountRef = useRef(0);
+  const prevComboLevelRef = useRef(0);
+
+  useEffect(() => {
+    // Only track for new players during active game
+    if (!isNewPlayerRef.current || !gameActive) return;
+
+    // Check for first word achievement
+    const validWords = foundWords.filter(w => w.validated !== false);
+    if (validWords.length > 0 && prevFoundWordsCountRef.current === 0) {
+      triggerAchievement('firstWord');
+    }
+
+    // Check for first long word (5+ letters)
+    const hasLongWord = validWords.some(w => w.word.length >= 5);
+    if (hasLongWord && !validWords.slice(0, prevFoundWordsCountRef.current).some(w => w.word.length >= 5)) {
+      triggerAchievement('firstLongWord');
+    }
+
+    prevFoundWordsCountRef.current = validWords.length;
+  }, [foundWords, gameActive, triggerAchievement]);
+
+  // Track first combo achievement
+  useEffect(() => {
+    if (!isNewPlayerRef.current || !gameActive) return;
+
+    // Trigger on first combo (level 2 or higher)
+    if (comboLevel >= 2 && prevComboLevelRef.current < 2) {
+      triggerAchievement('firstCombo');
+    }
+    prevComboLevelRef.current = comboLevel;
+  }, [comboLevel, gameActive, triggerAchievement]);
 
   // Clear game state on mount and cleanup
   useEffect(() => {
@@ -545,6 +655,21 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
       {showStartAnimation && (
         <GoRipplesAnimation onComplete={() => setShowStartAnimation(false)} />
       )}
+      {showOnboarding && (
+        <NewPlayerOnboarding
+          t={t}
+          onDismiss={handleOnboardingDismiss}
+        />
+      )}
+      {/* First-time achievement celebrations for new players */}
+      {isNewPlayerRef.current && (
+        <FirstTimeAchievement
+          achievementType={pendingAchievement}
+          onDismiss={clearAchievement}
+          position="top"
+        />
+      )}
+
       <PlayerInGameView
         username={username}
         gameCode={gameCode}
@@ -560,6 +685,8 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         minWordLength={minWordLength}
         comboLevel={comboLevel}
         comboLevelRef={comboLevelRef}
+        comboTimeRemaining={comboTimeRemaining}
+        comboDanger={comboDanger}
         foundWords={mappedFoundWords}
         leaderboard={leaderboard}
         totalBoardWords={totalBoardWords}
@@ -579,6 +706,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
         fireRoundActive={fireRoundActive}
         fireRoundRemaining={fireRoundRemaining}
         boardTheme={boardTheme}
+        onShowTutorial={() => setShowOnboarding(true)}
       />
     </>
   );

@@ -2,13 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lightbulb, ArrowRight, Star, Zap, Target, Trophy } from 'lucide-react';
+import { Lightbulb, ArrowRight, Star, Zap, Target, Trophy, Gamepad2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import PracticeGridPreview from './PracticeGridPreview';
 
 interface WaitingTipsProps {
   t: (path: string, params?: Record<string, string | number>) => string;
   className?: string;
   rotationInterval?: number; // ms
+  /** Show practice mode toggle */
+  showPracticeMode?: boolean;
 }
 
 interface GameTip {
@@ -57,8 +60,9 @@ const TIPS: GameTip[] = [
   },
 ];
 
-export function WaitingTips({ t, className, rotationInterval = 5000 }: WaitingTipsProps) {
+export function WaitingTips({ t, className, rotationInterval = 5000, showPracticeMode = true }: WaitingTipsProps) {
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
+  const [viewMode, setViewMode] = useState<'tips' | 'practice'>('tips');
 
   // Shuffle tips on mount for variety (lazy initializer runs once)
   const [shuffledTips] = useState(() => {
@@ -71,25 +75,58 @@ export function WaitingTips({ t, className, rotationInterval = 5000 }: WaitingTi
   });
 
   useEffect(() => {
+    // Only rotate tips when in tips view
+    if (viewMode !== 'tips') return;
+
     const timer = setInterval(() => {
       setCurrentTipIndex((prev) => (prev + 1) % shuffledTips.length);
     }, rotationInterval);
 
     return () => clearInterval(timer);
-  }, [shuffledTips.length, rotationInterval]);
+  }, [shuffledTips.length, rotationInterval, viewMode]);
 
   const currentTip = shuffledTips[currentTipIndex];
 
+  // Show practice mode
+  if (viewMode === 'practice') {
+    return (
+      <div className={cn('w-full', className)}>
+        <PracticeGridPreview t={t} />
+        {/* Back to tips button */}
+        <button
+          onClick={() => setViewMode('tips')}
+          className="mt-3 w-full py-2 text-xs font-bold uppercase tracking-wide text-neo-cream/60 hover:text-neo-cream transition-colors flex items-center justify-center gap-2"
+        >
+          <Lightbulb className="w-3 h-3" />
+          {t('practice.backToTips') || 'Back to Tips'}
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className={cn("w-full", className)}>
-      {/* Header */}
-      <div className="flex items-center gap-2 mb-3">
-        <div className="bg-neo-lime p-1.5 rounded border-2 border-neo-black text-neo-black">
-          <Lightbulb className="w-4 h-4 text-neo-black" />
+      {/* Header with practice toggle */}
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <div className="bg-neo-lime p-1.5 rounded border-2 border-neo-black text-neo-black">
+            <Lightbulb className="w-4 h-4 text-neo-black" />
+          </div>
+          <span className="text-sm font-bold uppercase tracking-wide text-neo-white">
+            {t('tips.header') || 'Pro Tips'}
+          </span>
         </div>
-        <span className="text-sm font-bold uppercase tracking-wide text-neo-white">
-          {t('tips.header') || 'Pro Tips'}
-        </span>
+        {showPracticeMode && (
+          <motion.button
+            onClick={() => setViewMode('practice')}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-neo-pink/20 hover:bg-neo-pink/30 rounded-neo border border-neo-pink/40 text-neo-pink text-xs font-bold uppercase transition-colors"
+          >
+            <Gamepad2 className="w-3.5 h-3.5" />
+            {t('tips.tryIt') || 'Try It!'}
+          </motion.button>
+        )}
       </div>
 
       {/* Tip card */}

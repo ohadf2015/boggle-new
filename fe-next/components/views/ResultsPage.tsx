@@ -853,13 +853,18 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                 ) : (
                   /* PLAYER: Not ready state */
                   <>
-                    <button
-                      onClick={handleMarkReady}
-                      className="w-full bg-neo-lime text-neo-black font-black text-base py-3 px-4 uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2 animate-pulse"
-                    >
-                      <Star className="w-5 h-5" />
-                      {t('results.imReady')}
-                    </button>
+                    <div className="space-y-1">
+                      <button
+                        onClick={handleMarkReady}
+                        className="w-full bg-neo-lime text-neo-black font-black text-base py-3 px-4 uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2 animate-pulse"
+                      >
+                        <Star className="w-5 h-5" />
+                        {t('results.imReady')}
+                      </button>
+                      <p className="text-center text-[10px] text-neo-cream/50">
+                        {t('results.readyExplanation') || 'Tap to let the host know you want to play again'}
+                      </p>
+                    </div>
                     <button
                       onClick={handleExitRoom}
                       className="w-full bg-neo-red text-neo-cream font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
@@ -1053,15 +1058,20 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                   <p className="text-center text-sm text-white/80 mt-1">{t('results.waitingForHostToStart') || 'Waiting for host...'}</p>
                 </div>
               ) : (
-                <motion.button
-                  onClick={handleMarkReady}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full bg-neo-lime text-neo-black font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
-                >
-                  <Star className="w-6 h-6" />
-                  {t('results.imReady')}
-                </motion.button>
+                <div className="space-y-1.5">
+                  <motion.button
+                    onClick={handleMarkReady}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full bg-neo-lime text-neo-black font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
+                  >
+                    <Star className="w-6 h-6" />
+                    {t('results.imReady')}
+                  </motion.button>
+                  <p className="text-center text-xs text-neo-cream/60">
+                    {t('results.readyExplanation') || 'Tap to let the host know you want to play again'}
+                  </p>
+                </div>
               )}
             </div>
 
@@ -1368,15 +1378,20 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                         <p className="text-center text-sm text-white/80 mt-1">{t('results.waitingForHostToStart') || 'Waiting for host...'}</p>
                       </div>
                     ) : (
-                      <motion.button
-                        onClick={handleMarkReady}
-                        whileHover={{ scale: 1.01 }}
-                        whileTap={{ scale: 0.98 }}
-                        className="w-full bg-neo-lime text-neo-black font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
-                      >
-                        <Star className="w-6 h-6" />
-                        {t('results.imReady')}
-                      </motion.button>
+                      <div className="space-y-1.5">
+                        <motion.button
+                          onClick={handleMarkReady}
+                          whileHover={{ scale: 1.01 }}
+                          whileTap={{ scale: 0.98 }}
+                          className="w-full bg-neo-lime text-neo-black font-black text-lg px-6 py-4 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg flex items-center justify-center gap-2"
+                        >
+                          <Star className="w-6 h-6" />
+                          {t('results.imReady')}
+                        </motion.button>
+                        <p className="text-center text-xs text-neo-cream/60">
+                          {t('results.readyExplanation') || 'Tap to let the host know you want to play again'}
+                        </p>
+                      </div>
                     )}
                   </div>
 

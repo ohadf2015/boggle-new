@@ -136,6 +136,15 @@ const MobileLeaderboard = memo<MobileLeaderboardProps>(({
         title={t('playerView.leaderboard') || 'Leaderboard'}
         height="half"
       >
+        {/* Helpful tip for new players */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-xs text-neo-black/60 text-center mb-3 px-2"
+        >
+          {t('leaderboard.multiplayerTip') || 'Find unique words to score! Words others find count as 0.'}
+        </motion.p>
+
         <div className="space-y-2">
           {leaderboard.map((player, index) => (
             <motion.div
