@@ -10,6 +10,23 @@ import { fetchGoogleTrends } from '../services/serpApiClient';
 const router = Router();
 
 /**
+ * Map backend challenge types to frontend-expected types
+ * Backend (AI-generated): anagram, fill_blank, word_chain, definition_match, trending_trio, riddle
+ * Frontend (components): scrambled, fillBlank, chain, spotOn, trio
+ */
+function mapChallengeType(backendType: string): string {
+  const typeMap: Record<string, string> = {
+    anagram: 'scrambled',
+    fill_blank: 'fillBlank',
+    word_chain: 'chain',
+    definition_match: 'spotOn',
+    trending_trio: 'trio',
+    riddle: 'scrambled', // Riddles use the scrambled UI with a clue
+  };
+  return typeMap[backendType] || backendType;
+}
+
+/**
  * Transform database response (snake_case) to frontend format (camelCase)
  * Only transforms top-level keys that the frontend expects
  */
@@ -48,7 +65,7 @@ function transformBuzzResponse(dbData: Record<string, unknown>): BuzzApiResponse
       newsSnippet: topic.news_snippet as string | undefined,
     })),
     challenges: (dbData.challenges as Array<Record<string, unknown>> || []).map((challenge) => ({
-      type: challenge.type as string,
+      type: mapChallengeType(challenge.type as string),
       trendTopic: challenge.trend_topic as string,
       prompt: challenge.prompt as string,
       answer: challenge.answer as string,

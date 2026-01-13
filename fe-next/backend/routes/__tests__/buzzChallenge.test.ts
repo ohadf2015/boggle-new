@@ -80,10 +80,51 @@ describe('Buzz Challenge API - Response Format', () => {
       expect(data.trendingTopics.length).toBe(3);
       expect(data.trendingTopics[0].query).toBe('Technology');
 
+      // Challenge type should be mapped from backend to frontend format
+      // Backend: 'anagram' -> Frontend: 'scrambled'
+      expect(data.challenges[0].type).toBe('scrambled');
+
       // snake_case keys should NOT exist in response
       expect(data.puzzle_date).toBeUndefined();
       expect(data.trending_summary).toBeUndefined();
       expect(data.trending_topics).toBeUndefined();
+    });
+
+    it('should map all backend challenge types to frontend types', async () => {
+      // Mock database response with all backend challenge types
+      const mockDbResponse = {
+        id: 1,
+        puzzle_date: '2026-01-13',
+        language: 'en',
+        region: 'US',
+        trending_summary: 'Test all types',
+        trending_topics: [{ query: 'Test', search_volume: 1000 }],
+        challenges: [
+          { type: 'anagram', trend_topic: 'Test', prompt: 'p1', answer: 'a1', difficulty: 'easy', trending_context: 'c1' },
+          { type: 'fill_blank', trend_topic: 'Test', prompt: 'p2', answer: 'a2', difficulty: 'easy', trending_context: 'c2' },
+          { type: 'word_chain', trend_topic: 'Test', prompt: 'p3', answer: 'a3', difficulty: 'easy', trending_context: 'c3' },
+          { type: 'definition_match', trend_topic: 'Test', prompt: 'p4', answer: 'a4', difficulty: 'easy', trending_context: 'c4', options: ['a', 'b', 'c', 'd'] },
+          { type: 'trending_trio', trend_topic: 'Test', prompt: 'p5', answer: 'a5', difficulty: 'easy', trending_context: 'c5' },
+          { type: 'riddle', trend_topic: 'Test', prompt: 'p6', answer: 'a6', difficulty: 'easy', trending_context: 'c6' },
+        ],
+        ai_model: 'gemini-3.0-pro',
+        image_url: null,
+      };
+
+      mockGetDailyBuzz.mockResolvedValue(mockDbResponse as any);
+
+      const response = await request(app).get('/api/buzz/2026-01-13/en');
+
+      expect(response.status).toBe(200);
+      const challenges = response.body.data.challenges;
+
+      // Verify all types are mapped correctly
+      expect(challenges[0].type).toBe('scrambled');  // anagram -> scrambled
+      expect(challenges[1].type).toBe('fillBlank');  // fill_blank -> fillBlank
+      expect(challenges[2].type).toBe('chain');      // word_chain -> chain
+      expect(challenges[3].type).toBe('spotOn');     // definition_match -> spotOn
+      expect(challenges[4].type).toBe('trio');       // trending_trio -> trio
+      expect(challenges[5].type).toBe('scrambled');  // riddle -> scrambled
     });
 
     it('should return error for invalid date format', async () => {
