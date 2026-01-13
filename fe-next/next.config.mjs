@@ -196,6 +196,16 @@ const nextConfig = {
   // Enable Turbopack configuration (required for Next.js 16+)
   turbopack: {
     root: __dirname,
+    resolveAlias: {
+      '@arvidbt/swedish-words': '@arvidbt/swedish-words/out/index.js',
+    },
+  },
+
+  // Webpack configuration - alias for swedish-words package
+  webpack: (config) => {
+    // Alias the TypeScript index to the compiled JavaScript version
+    config.resolve.alias['@arvidbt/swedish-words'] = path.resolve(__dirname, 'node_modules/@arvidbt/swedish-words/out/index.js');
+    return config;
   },
 };
 

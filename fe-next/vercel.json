@@ -1,0 +1,11 @@
+{
+  "_comment": "This file is only used if deploying to Vercel. Railway does not use vercel.json.",
+  "_comment2": "For Railway, use external cron service, GitHub Actions, or node-cron instead.",
+  "_comment3": "See DAILY_BUZZ_README.md for Railway cron setup instructions.",
+  "crons": [
+    {
+      "path": "/api/cron/generate-daily-buzz",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}

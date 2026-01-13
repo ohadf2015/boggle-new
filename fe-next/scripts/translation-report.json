@@ -1,16 +1,682 @@
 {
   "summary": {
-    "totalKeysInCode": 2044,
+    "totalKeysInCode": 2103,
     "keyCountByLanguage": {
-      "en": 3400,
-      "he": 3405,
-      "sv": 3402,
-      "ja": 3400,
-      "es": 3402
+      "en": 3455,
+      "he": 3460,
+      "sv": 3457,
+      "ja": 3455,
+      "es": 3457
     },
-    "missingFromEnglish": 0
+    "missingFromEnglish": 41
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "achievement.dailyDouble",
+      "usages": [
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 218
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 218
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 218
+        }
+      ]
+    },
+    {
+      "key": "achievement.dailyDouble.desc",
+      "usages": [
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 221
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 221
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 221
+        }
+      ]
+    },
+    {
+      "key": "buzz.badge",
+      "usages": [
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 156
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 156
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 156
+        }
+      ]
+    },
+    {
+      "key": "buzz.betaPreview",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 94
+        },
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 94
+        },
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 94
+        }
+      ]
+    },
+    {
+      "key": "buzz.challenges",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 164
+        },
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 164
+        },
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 164
+        }
+      ]
+    },
+    {
+      "key": "buzz.connectingWord",
+      "usages": [
+        {
+          "file": "components/buzz/challenges/TrioChallenge.tsx",
+          "line": 106
+        },
+        {
+          "file": "components/buzz/challenges/TrioChallenge.tsx",
+          "line": 106
+        },
+        {
+          "file": "components/buzz/challenges/TrioChallenge.tsx",
+          "line": 106
+        }
+      ]
+    },
+    {
+      "key": "buzz.error",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzChallenge.tsx",
+          "line": 177
+        },
+        {
+          "file": "components/buzz/BuzzChallenge.tsx",
+          "line": 177
+        },
+        {
+          "file": "components/buzz/BuzzChallenge.tsx",
+          "line": 177
+        }
+      ]
+    },
+    {
+      "key": "buzz.feature1",
+      "usages": [
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 162
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 162
+        }
+      ]
+    },
+    {
+      "key": "buzz.feature2",
+      "usages": [
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 166
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 166
+        }
+      ]
+    },
+    {
+      "key": "buzz.feature3",
+      "usages": [
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 170
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 170
+        }
+      ]
+    },
+    {
+      "key": "buzz.fillTheBlank",
+      "usages": [
+        {
+          "file": "components/buzz/challenges/FillBlankChallenge.tsx",
+          "line": 97
+        },
+        {
+          "file": "components/buzz/challenges/FillBlankChallenge.tsx",
+          "line": 97
+        },
+        {
+          "file": "components/buzz/challenges/FillBlankChallenge.tsx",
+          "line": 97
+        }
+      ]
+    },
+    {
+      "key": "buzz.finish",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzGameScreen.tsx",
+          "line": 296
+        },
+        {
+          "file": "components/buzz/BuzzGameScreen.tsx",
+          "line": 296
+        },
+        {
+          "file": "components/buzz/BuzzGameScreen.tsx",
+          "line": 296
+        }
+      ]
+    },
+    {
+      "key": "buzz.helpText",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 220
+        },
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 220
+        },
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 220
+        }
+      ]
+    },
+    {
+      "key": "buzz.loading",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzChallenge.tsx",
+          "line": 132
+        },
+        {
+          "file": "components/buzz/BuzzChallenge.tsx",
+          "line": 132
+        },
+        {
+          "file": "components/buzz/BuzzChallenge.tsx",
+          "line": 132
+        }
+      ]
+    },
+    {
+      "key": "buzz.maxScore",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 176
+        },
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 176
+        },
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 176
+        }
+      ]
+    },
+    {
+      "key": "buzz.noTimeLimit",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 170
+        },
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 170
+        },
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 170
+        }
+      ]
+    },
+    {
+      "key": "buzz.preview.play",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 209
+        },
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 209
+        }
+      ]
+    },
+    {
+      "key": "buzz.preview.subtitle",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 126
+        },
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 126
+        },
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 126
+        }
+      ]
+    },
+    {
+      "key": "buzz.preview.title",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 110
+        },
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 110
+        },
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 110
+        }
+      ]
+    },
+    {
+      "key": "buzz.quitConfirm",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzGameScreen.tsx",
+          "line": 314
+        },
+        {
+          "file": "components/buzz/BuzzGameScreen.tsx",
+          "line": 314
+        }
+      ]
+    },
+    {
+      "key": "buzz.quitConfirmTitle",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzGameScreen.tsx",
+          "line": 312
+        },
+        {
+          "file": "components/buzz/BuzzGameScreen.tsx",
+          "line": 312
+        },
+        {
+          "file": "components/buzz/BuzzGameScreen.tsx",
+          "line": 312
+        }
+      ]
+    },
+    {
+      "key": "buzz.results.perfect",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzResultsScreen.tsx",
+          "line": 188
+        },
+        {
+          "file": "components/buzz/BuzzResultsScreen.tsx",
+          "line": 188
+        },
+        {
+          "file": "components/buzz/BuzzResultsScreen.tsx",
+          "line": 188
+        }
+      ]
+    },
+    {
+      "key": "buzz.searches",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 143
+        },
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 143
+        },
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 143
+        }
+      ]
+    },
+    {
+      "key": "buzz.topicIs",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzGameScreen.tsx",
+          "line": 249
+        }
+      ]
+    },
+    {
+      "key": "buzz.total",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzResultsScreen.tsx",
+          "line": 211
+        },
+        {
+          "file": "components/buzz/BuzzResultsScreen.tsx",
+          "line": 211
+        },
+        {
+          "file": "components/buzz/BuzzResultsScreen.tsx",
+          "line": 211
+        }
+      ]
+    },
+    {
+      "key": "buzz.trio.hint",
+      "usages": [
+        {
+          "file": "components/buzz/challenges/TrioChallenge.tsx",
+          "line": 77
+        },
+        {
+          "file": "components/buzz/challenges/TrioChallenge.tsx",
+          "line": 77
+        },
+        {
+          "file": "components/buzz/challenges/TrioChallenge.tsx",
+          "line": 77
+        }
+      ]
+    },
+    {
+      "key": "buzz.viewResults",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 208
+        },
+        {
+          "file": "components/buzz/BuzzReadyScreen.tsx",
+          "line": 208
+        }
+      ]
+    },
+    {
+      "key": "buzz.yourAnswer",
+      "usages": [
+        {
+          "file": "components/buzz/challenges/ChainChallenge.tsx",
+          "line": 97
+        },
+        {
+          "file": "components/buzz/challenges/ChainChallenge.tsx",
+          "line": 97
+        },
+        {
+          "file": "components/buzz/challenges/ChainChallenge.tsx",
+          "line": 97
+        },
+        {
+          "file": "components/buzz/challenges/ScrambledChallenge.tsx",
+          "line": 97
+        },
+        {
+          "file": "components/buzz/challenges/ScrambledChallenge.tsx",
+          "line": 97
+        },
+        {
+          "file": "components/buzz/challenges/ScrambledChallenge.tsx",
+          "line": 97
+        }
+      ]
+    },
+    {
+      "key": "buzz.yourScore",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzResultsScreen.tsx",
+          "line": 170
+        },
+        {
+          "file": "components/buzz/BuzzResultsScreen.tsx",
+          "line": 170
+        },
+        {
+          "file": "components/buzz/BuzzResultsScreen.tsx",
+          "line": 170
+        }
+      ]
+    },
+    {
+      "key": "common.pts",
+      "usages": [
+        {
+          "file": "components/buzz/BuzzGameScreen.tsx",
+          "line": 203
+        },
+        {
+          "file": "components/buzz/BuzzGameScreen.tsx",
+          "line": 203
+        },
+        {
+          "file": "components/buzz/BuzzGameScreen.tsx",
+          "line": 203
+        },
+        {
+          "file": "components/buzz/BuzzGameScreen.tsx",
+          "line": 284
+        },
+        {
+          "file": "components/buzz/BuzzGameScreen.tsx",
+          "line": 284
+        },
+        {
+          "file": "components/buzz/BuzzGameScreen.tsx",
+          "line": 284
+        }
+      ]
+    },
+    {
+      "key": "daily.chooseChallengeHint",
+      "usages": [
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 94
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 94
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 94
+        }
+      ]
+    },
+    {
+      "key": "daily.chooseQuest",
+      "usages": [
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 91
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 91
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 91
+        }
+      ]
+    },
+    {
+      "key": "daily.new",
+      "usages": [
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 297
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 297
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 297
+        }
+      ]
+    },
+    {
+      "key": "daily.play",
+      "usages": [
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 346
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 346
+        }
+      ]
+    },
+    {
+      "key": "daily.viewResults",
+      "usages": [
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 343
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 343
+        }
+      ]
+    },
+    {
+      "key": "daily.wordHunt",
+      "usages": [
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 109
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 109
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 109
+        }
+      ]
+    },
+    {
+      "key": "daily.wordHunt.desc",
+      "usages": [
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 112
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 112
+        }
+      ]
+    },
+    {
+      "key": "daily.wordHunt.feature1",
+      "usages": [
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 121
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 121
+        }
+      ]
+    },
+    {
+      "key": "daily.wordHunt.feature2",
+      "usages": [
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 125
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 125
+        }
+      ]
+    },
+    {
+      "key": "daily.wordHunt.feature3",
+      "usages": [
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 129
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 129
+        }
+      ]
+    },
+    {
+      "key": "daily.wordHunt.subtitle",
+      "usages": [
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 110
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 110
+        },
+        {
+          "file": "components/daily/DailyChallengeLanding.tsx",
+          "line": 110
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "he": [],
     "sv": [],

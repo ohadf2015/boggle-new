@@ -119,18 +119,10 @@ Update the todo status to `in_progress`
 4. **Apply minimal fix** - no unrelated changes
 5. **Check if fix resolves** related errors
 
-### 4.3 Verify Fix
-Run relevant checks:
-```bash
-npx tsc --noEmit     # TypeScript errors
-npm run lint         # Linting
-npm run build        # Build verification
-```
-
-### 4.4 Mark as Completed
+### 4.3 Mark as Completed
 Update the todo status to `completed`
 
-### 4.5 Document Test Instructions
+### 4.4 Document Test Instructions
 For each fix:
 ```markdown
 ## Testing: [Error Title]
@@ -189,7 +181,14 @@ Use `mcp__notion__notion-update-page` with `command: "insert_content_after"` to 
 
 ---
 
-## Phase 6: Report to User
+## Phase 6: Commit & Push (Optional)
+
+If the user requests to commit the changes, use `/commit-push` to:
+- Run all verification checks (translations, linting, type checking, tests, build)
+- Fix any issues found
+- Commit and push to remote
+
+## Phase 7: Report to User
 
 Output a summary in chat:
 
@@ -232,23 +231,23 @@ npx tsc --noEmit
 
 ---
 
-## Phase 7: Sentry Issue Management (Optional)
+## Phase 8: Sentry Issue Management (Optional)
 
 If fixes are confirmed working:
 
-### 7.1 Resolve Issues in Sentry
+### 8.1 Resolve Issues in Sentry
 ```
 mcp__sentry__update_issue with issue_id: [id], status: "resolved"
 ```
 
-### 7.2 Add Resolution Comment
+### 8.2 Add Resolution Comment
 ```
 mcp__sentry__add_issue_comment with issue_id: [id], comment: "Fixed in commit [hash]"
 ```
 
 ---
 
-## Phase 7.5: GitHub Integration (Optional)
+## Phase 9: GitHub Integration (Optional)
 
 ### Create GitHub Issue for Complex Bugs
 For bugs requiring further investigation or team discussion:

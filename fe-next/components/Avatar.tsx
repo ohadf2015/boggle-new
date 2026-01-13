@@ -73,6 +73,9 @@ const Avatar = memo<AvatarProps>(({
     return (
       <div
         className={`relative rounded-full overflow-hidden flex-shrink-0 ${config.container} ${className}`}
+        data-testid="header-avatar"
+        data-avatar-image={avatarImage || PROFILE_AVATAR_ID}
+        data-profile-picture-url={profilePictureUrl}
       >
         <Image
           src={profilePictureUrl}
@@ -101,6 +104,9 @@ const Avatar = memo<AvatarProps>(({
     return (
       <div
         className={`relative rounded-full overflow-hidden flex-shrink-0 ${config.container} ${className}`}
+        data-testid="header-avatar"
+        data-avatar-image={avatarImage}
+        data-profile-picture-url={profilePictureUrl || ''}
       >
         <Image
           src={finalPath}
@@ -123,6 +129,9 @@ const Avatar = memo<AvatarProps>(({
   return (
     <div
       className={`relative rounded-full overflow-hidden flex-shrink-0 ${config.container} ${className}`}
+      data-testid="header-avatar"
+      data-avatar-image={avatarImage || ''}
+      data-profile-picture-url={profilePictureUrl || ''}
     >
       <Image
         src={getAvatarPath(fallbackAvatar)}

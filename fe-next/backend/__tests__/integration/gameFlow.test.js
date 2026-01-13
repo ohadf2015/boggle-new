@@ -14,6 +14,9 @@ const { createTestEnvironment, customMatchers } = require('../helpers/socketTest
 // Add custom matchers
 expect.extend(customMatchers);
 
+// Increase timeout for dictionary loading during parallel test execution
+jest.setTimeout(20000);
+
 describe('Game Flow Integration', () => {
   let env;
 

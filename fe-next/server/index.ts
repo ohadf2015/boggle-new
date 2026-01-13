@@ -40,6 +40,7 @@ import dictionaryRoutes from '../backend/routes/dictionary';
 import solveGridRoutes from '../backend/routes/solveGrid';
 import singlePlayerRoutes from '../backend/routes/singlePlayer';
 import dailyChallengeRoutes from '../backend/routes/dailyChallenge';
+import buzzChallengeRoutes from '../backend/routes/buzzChallenge';
 import aiHintsRoutes from '../backend/routes/aiHints';
 
 // Configuration
@@ -90,6 +91,7 @@ async function start(): Promise<void> {
   app.use('/api/solve-grid', solveGridRoutes);
   app.use('/api/single-player', singlePlayerRoutes);
   app.use('/api/daily-challenge', dailyChallengeRoutes);
+  app.use('/api', buzzChallengeRoutes);
   app.use('/api', aiHintsRoutes);
 
   // Next.js request handler (catch-all)

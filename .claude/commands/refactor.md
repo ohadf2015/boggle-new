@@ -9,8 +9,8 @@ description: Intelligently refactor and improve code quality
 2. Analyze code and refactoring needs
 3. Test baseline before changes
 4. Refactor incrementally with tests passing
-5. Verify with `npm run lint` and `npx tsc --noEmit`
-6. **Store decision** - Record refactoring rationale for future reference
+5. **Store decision** - Record refactoring rationale for future reference
+6. **Commit & push** - Use `/commit-push` to verify all checks and push to remote (if user requests commit)
 
 ## Rules
 - Preserve external behavior
@@ -25,7 +25,7 @@ Search for related refactoring history:
 mcp__memory__memory_recall(query="refactor [component] [area] pattern")
 ```
 
-### Store (Step 6)
+### Store (Step 5)
 Record significant refactoring decisions:
 ```
 mcp__memory__memory_store(

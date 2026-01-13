@@ -35,7 +35,7 @@ const LoadingFallback = () => (
 );
 
 // Dynamic import for code splitting (client component)
-const DailyChallenge = dynamicImport(() => import('@/components/daily/DailyChallenge'), {
+const DailyChallengeRouter = dynamicImport(() => import('@/components/daily/DailyChallengeRouter'), {
   loading: LoadingFallback,
 });
 
@@ -284,7 +284,7 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
 export default function DailyChallengePage(): React.JSX.Element {
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <DailyChallenge />
+      <DailyChallengeRouter />
     </Suspense>
   );
 }
