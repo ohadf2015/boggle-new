@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import Script from 'next/script';
 import nextDynamic from 'next/dynamic';
 import { translations } from '@/translations';
 import { Providers } from '../providers';
@@ -655,15 +656,15 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <meta name="apple-mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
                 <meta name="apple-mobile-web-app-title" content="LexiClash" />
-                {/* Google AdSense - defer loading to not compete with critical resources (LCP) */}
-                {/* Using defer instead of async to ensure it loads after critical content */}
-                <script
-                    defer
-                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1896836706464880"
-                    crossOrigin="anonymous"
-                />
             </head>
             <body className="antialiased screen-fit" suppressHydrationWarning>
+                {/* Google AdSense - defer loading to not compete with critical resources (LCP) */}
+                {/* Using afterInteractive strategy to ensure it loads after critical content */}
+                <Script
+                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1896836706464880"
+                    strategy="afterInteractive"
+                    crossOrigin="anonymous"
+                />
                 {/* Skip to main content link for keyboard/screen reader users */}
                 <a
                     href="#main-content"

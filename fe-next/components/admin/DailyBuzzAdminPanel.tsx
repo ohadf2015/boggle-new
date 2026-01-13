@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Play, RefreshCw, Check, X, Clock, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { getSession } from '@/lib/supabase';
 
 interface GenerationResult {
   success: boolean;
@@ -42,10 +43,10 @@ export default function DailyBuzzAdminPanel() {
     setResult(null);
 
     try {
-      const adminSecret = prompt('Enter ADMIN_SECRET:');
-      if (!adminSecret) {
-        setIsGenerating(false);
-        return;
+      // Get user's JWT token from session
+      const { data: { session } } = await getSession();
+      if (!session?.access_token) {
+        throw new Error('No active session. Please refresh the page.');
       }
 
       const body: any = { date: selectedDate };
@@ -57,7 +58,7 @@ export default function DailyBuzzAdminPanel() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${adminSecret}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify(body),
       });

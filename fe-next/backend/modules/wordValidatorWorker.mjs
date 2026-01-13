@@ -211,7 +211,7 @@ if (isBun) {
   });
 }
 
-// ES module exports for testing
+// ES module exports
 export {
   isWordOnBoard,
   getWordPath,
@@ -219,14 +219,3 @@ export {
   normalizeHebrewLetter,
   normalizeHebrewWord
 };
-
-// CommonJS exports for backward compatibility (Node.js)
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    isWordOnBoard,
-    getWordPath,
-    makePositionsMap,
-    normalizeHebrewLetter,
-    normalizeHebrewWord
-  };
-}

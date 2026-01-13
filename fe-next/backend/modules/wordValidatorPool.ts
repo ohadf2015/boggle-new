@@ -78,7 +78,7 @@ export class WordValidatorPool {
 
   private async _initWorkers(): Promise<void> {
     // Worker file must be JavaScript as worker_threads don't support TypeScript directly
-    const workerPath = path.join(__dirname, 'wordValidatorWorker.js');
+    const workerPath = path.join(__dirname, 'wordValidatorWorker.mjs');
     const runtime = isBun ? 'Bun' : 'Node.js';
     console.log(`[WORKER POOL] Initializing with ${runtime} runtime...`);
 

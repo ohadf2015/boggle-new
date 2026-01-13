@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateDailyBuzz } from '@/backend/services/buzzGenerator';
+import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 
 /**
  * Cron Job: Generate Daily Buzz Challenges
@@ -80,6 +81,8 @@ export async function GET(request: NextRequest) {
  * POST endpoint for manual trigger (admin only)
  * Useful for testing or regenerating a specific date
  *
+ * Authentication: Requires valid admin JWT token in Authorization header
+ *
  * Body:
  * {
  *   date?: string,      // ISO date string (default: today)
@@ -88,12 +91,10 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    // Admin authentication check
-    const authHeader = request.headers.get('authorization');
-    const adminSecret = process.env.ADMIN_SECRET;
-
-    if (!adminSecret || authHeader !== `Bearer ${adminSecret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Admin authentication check (JWT-based, not ADMIN_SECRET)
+    const authResult = await verifyAdminAuth(request);
+    if (!authResult.success) {
+      return authResult.response!;
     }
 
     const body = await request.json().catch(() => ({}));
