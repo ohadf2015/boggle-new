@@ -13,11 +13,18 @@ import { setEventLoopLag } from '../backend/utils/metrics';
 import { setupRedisAdapter, cleanupRedisAdapter, type ExtendedSocketServer } from './redisAdapter';
 import { clearCleanupTimers } from './socketSetup';
 import * as gameStateManager from '../backend/modules/gameStateManager';
+import { startDailyBuzzCron, stopDailyBuzzCron } from '../backend/services/cronScheduler';
+import type { ScheduledTask } from 'node-cron';
 
 /**
  * Shutdown handler function type
  */
 export type ShutdownHandler = () => Promise<void>;
+
+/**
+ * Daily Buzz cron task (stored for cleanup)
+ */
+let dailyBuzzCronTask: ScheduledTask | null = null;
 
 /**
  * Initialize all server components
@@ -51,6 +58,15 @@ export async function initializeServer(io: Server): Promise<void> {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.warn('[WORKER POOL] Failed to warm up:', errorMessage);
+  }
+
+  // Start Daily Buzz cron scheduler
+  try {
+    dailyBuzzCronTask = startDailyBuzzCron();
+    console.log('[STARTUP] Daily Buzz cron scheduler started');
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[STARTUP] Failed to start Daily Buzz cron:', errorMessage);
   }
 }
 
@@ -133,6 +149,17 @@ export function createShutdownHandler(httpServer: HttpServer, io: Server): Shutd
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
       console.error('[SHUTDOWN] Error closing worker pool:', errorMessage);
+    }
+
+    // Stop Daily Buzz cron scheduler
+    try {
+      if (dailyBuzzCronTask) {
+        stopDailyBuzzCron(dailyBuzzCronTask);
+        console.log('[SHUTDOWN] Daily Buzz cron scheduler stopped');
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      console.error('[SHUTDOWN] Error stopping Daily Buzz cron:', errorMessage);
     }
 
     // Close socket connections
