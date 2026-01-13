@@ -2831,6 +2831,8 @@ const en = {
     "kofiTooltip": "Support LexiClash development"
   },
   "landing": {
+    "welcomeTitle": "Ready to Play?",
+    "welcomeSubtitle": "Pick your challenge!",
     "chooseMode": "Choose Your Arena",
     "subtitle": "Train solo or battle friends live!",
     "subtitleSimple": "Solo or battle?",
@@ -3279,6 +3281,75 @@ const en = {
       "skipToDaily": "Skip, I'll figure it out",
       "redirecting": "Heading to Daily Challenge..."
     }
+  },
+  "buzz": {
+    "title": "Daily Buzz",
+    "tagline": "Word challenges from today's trends",
+    "subtitle": "What's buzzing today?",
+    "icon": "📰🔥",
+    "type": {
+      "scrambled": "SCRAMBLED",
+      "scrambledDesc": "Unscramble the trending word",
+      "fillBlank": "FILL IT",
+      "fillBlankDesc": "Complete the trending phrase",
+      "chain": "CHAIN",
+      "chainDesc": "Link words, one letter at a time",
+      "spotOn": "SPOT ON",
+      "spotOnDesc": "Match word to meaning",
+      "trio": "TRIO",
+      "trioDesc": "Find the word connecting all 3 trends"
+    },
+    "challenge": "{number}/{total}",
+    "score": "{score}",
+    "trend": "{topic}",
+    "correct": "GOT IT",
+    "incorrect": "NOT QUITE",
+    "close": "CLOSE",
+    "perfect": "PERFECT",
+    "hint": "HINT?",
+    "skip": "SKIP",
+    "submit": "SUBMIT",
+    "next": "NEXT",
+    "context": "About this trend:",
+    "learnMore": "Learn more",
+    "intro": {
+      "title": "Welcome to Daily Buzz",
+      "screen1": "Word puzzles from today's trends",
+      "screen2": "No timer. No pressure. Just you vs. the news.",
+      "screen3": "New challenges every day",
+      "start": "START BUZZ",
+      "skip": "SKIP INTRO"
+    },
+    "results": {
+      "title": "BUZZ COMPLETE",
+      "score": "{score}/100",
+      "scorePerfect": "100/100 PERFECT",
+      "trending": "Today's trends:",
+      "share": "SHARE SCORE",
+      "playAgain": "TOMORROW",
+      "viewLeaderboard": "LEADERBOARD"
+    },
+    "streak": {
+      "current": "{count}-day streak",
+      "lost": "Streak lost! Start fresh today",
+      "milestone": "MILESTONE: {count} days! 🔥"
+    },
+    "stats": {
+      "completed": "{count} total",
+      "avgScore": "Avg: {score}"
+    },
+    "share": {
+      "text": "Daily Buzz: {topic} | {score}/100 | Beat this? 🔥",
+      "textPerfect": "Daily Buzz: PERFECT SCORE 💯 | Think you can? 🔥",
+      "textStreakMilestone": "{count}-day Buzz streak! 🔥 Join me?"
+    },
+    "error": {
+      "loading": "Loading today's buzz...",
+      "failed": "Couldn't load buzz. Try again?",
+      "noInternet": "No connection. Check your internet."
+    },
+    "alreadyPlayed": "Already played today! Come back tomorrow.",
+    "comingSoon": "Tomorrow's buzz drops at midnight"
   },
   "wordHunt": {
     "title": "Word Hunt",

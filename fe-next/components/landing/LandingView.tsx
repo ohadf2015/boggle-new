@@ -253,7 +253,7 @@ const LandingView: React.FC = () => {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              {t('landing.chooseMode') || 'Choose Your Mode'}
+              {t('landing.welcomeTitle') || 'Ready to Play?'}
             </motion.h1>
             <motion.p
               className="text-sm sm:text-base lg:text-lg xl:text-xl font-medium text-neo-black/80 dark:text-neo-white/85"
@@ -261,7 +261,7 @@ const LandingView: React.FC = () => {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3 }}
             >
-              {t('landing.subtitleSimple') || 'Practice solo or challenge friends'}
+              {t('landing.welcomeSubtitle') || 'Pick your challenge!'}
             </motion.p>
           </motion.div>
         )}
@@ -275,37 +275,51 @@ const LandingView: React.FC = () => {
           />
         )}
 
-        {/* Daily Challenge Banner - Lazy loaded with skeleton fallback */}
-        {/* Fixed dimensions prevent CLS - matches DailyChallengeBanner actual height */}
-        <div className={`w-full ${isLandscape ? 'mb-2' : 'mb-2 sm:mb-2 lg:mb-3'}`}>
-          <Suspense fallback={
-            <div
-              className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-yellow"
-              style={{ minHeight: isLandscape ? '52px' : '62px' }}
-            >
-              <div className="flex items-center gap-3 animate-pulse">
-                <div className={`${isLandscape ? 'w-8 h-8' : 'w-10 h-10 sm:w-12 sm:h-12'} rounded-neo bg-neo-black/20 shrink-0`} />
-                <div className="flex-1 min-w-0 space-y-2">
-                  <div className="h-5 w-32 bg-neo-black/20 rounded" />
-                  <div className="h-3 w-20 bg-neo-black/10 rounded" />
+        {/* Welcome text for mobile/landscape - compact version without mascot */}
+        {(isLandscape || isMobilePortrait) && (
+          <div className="text-center mb-2 animate-fade-in-fast">
+            <h1 className="text-lg sm:text-xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white">
+              {t('landing.welcomeTitle') || 'Ready to Play?'}
+            </h1>
+            <p className="text-xs sm:text-sm font-medium text-neo-black/80 dark:text-neo-white/85">
+              {t('landing.welcomeSubtitle') || 'Pick your challenge!'}
+            </p>
+          </div>
+        )}
+
+        {/* Daily Challenge Banner for mobile/landscape - Lazy loaded with skeleton fallback */}
+        {/* On desktop, the banner is inside the cards container for tighter spacing */}
+        {(isLandscape || isMobilePortrait) && (
+          <div className="w-full mb-2">
+            <Suspense fallback={
+              <div
+                className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-yellow"
+                style={{ minHeight: '52px' }}
+              >
+                <div className="flex items-center gap-3 animate-pulse">
+                  <div className="w-8 h-8 rounded-neo bg-neo-black/20 shrink-0" />
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <div className="h-5 w-32 bg-neo-black/20 rounded" />
+                    <div className="h-3 w-20 bg-neo-black/10 rounded" />
+                  </div>
                 </div>
               </div>
-            </div>
-          }>
-            <DailyChallengeBanner
-              compact={isLandscape || isMobilePortrait}
-              mascot={isMobilePortrait ? (
-                <InteractiveMascotWithEntrance
-                  variant="happy"
-                  size="xs"
-                  enableClick
-                  clickVariant="celebrating"
-                  clickAnimation="bounce"
-                />
-              ) : undefined}
-            />
-          </Suspense>
-        </div>
+            }>
+              <DailyChallengeBanner
+                compact
+                mascot={isMobilePortrait ? (
+                  <InteractiveMascotWithEntrance
+                    variant="happy"
+                    size="xs"
+                    enableClick
+                    clickVariant="celebrating"
+                    clickAnimation="bounce"
+                  />
+                ) : undefined}
+              />
+            </Suspense>
+          </div>
+        )}
 
         {/* Mode cards - horizontal in landscape/mobile portrait, centered grid on desktop */}
         {/* Using CSS animation for instant paint without JS overhead */}
@@ -434,9 +448,29 @@ const LandingView: React.FC = () => {
           </div>
         ) : (
           /* Desktop: Centered grid layout with visual hierarchy */
-          <div className="w-full animate-fade-in-fast flex flex-col items-center justify-center gap-4 sm:gap-5 lg:gap-6">
+          <div className="w-full animate-fade-in-fast flex flex-col items-center justify-center gap-3 sm:gap-4 lg:gap-5">
+            {/* Daily Challenge Banner - inside container for tighter spacing */}
+            <div className="w-full max-w-4xl mx-auto">
+              <Suspense fallback={
+                <div
+                  className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-lime"
+                  style={{ minHeight: '62px' }}
+                >
+                  <div className="flex items-center gap-3 animate-pulse">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-neo bg-neo-black/20 shrink-0" />
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <div className="h-5 w-32 bg-neo-black/20 rounded" />
+                      <div className="h-3 w-20 bg-neo-black/10 rounded" />
+                    </div>
+                  </div>
+                </div>
+              }>
+                <DailyChallengeBanner />
+              </Suspense>
+            </div>
+
             {/* Primary cards - 2 columns max for main modes */}
-            <div className="w-full max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 lg:gap-6 justify-items-center">
+            <div className="w-full max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 lg:gap-5 justify-items-center">
               <ModeCard
                 title={t('landing.multiplayer') || 'Multiplayer'}
                 description={t('landing.multiplayerDesc') || 'Compete with friends in real-time!'}

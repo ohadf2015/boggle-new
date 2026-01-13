@@ -2824,6 +2824,8 @@ const ja = {
     "kofiTooltip": "LexiClashの開発を応援"
   },
   "landing": {
+    "welcomeTitle": "準備OK？",
+    "welcomeSubtitle": "チャレンジを選ぼう！",
     "chooseMode": "モードを選択",
     "subtitle": "ソロでハイスコアを目指して練習するか、リアルタイムで友達と対戦！",
     "subtitleSimple": "ソロで練習か友達と対戦",
@@ -3272,6 +3274,75 @@ const ja = {
       "skipToDaily": "スキップして始める",
       "redirecting": "デイリーチャレンジに移動中..."
     }
+  },
+  "buzz": {
+    "title": "デイリーバズ",
+    "tagline": "今日のトレンドで言葉パズル",
+    "subtitle": "今日のバズは？",
+    "icon": "📰🔥",
+    "type": {
+      "scrambled": "バラバラ",
+      "scrambledDesc": "トレンド単語を並び替え",
+      "fillBlank": "穴埋め",
+      "fillBlankDesc": "トレンドフレーズを完成",
+      "chain": "チェーン",
+      "chainDesc": "一文字ずつ単語を繋ぐ",
+      "spotOn": "ピタリ",
+      "spotOnDesc": "単語と意味を合わせる",
+      "trio": "トリオ",
+      "trioDesc": "3つのトレンドを繋ぐ単語を見つける"
+    },
+    "challenge": "{number}/{total}",
+    "score": "{score}",
+    "trend": "{topic}",
+    "correct": "できた!",
+    "incorrect": "ちがう",
+    "close": "おしい",
+    "perfect": "パーフェクト",
+    "hint": "ヒント?",
+    "skip": "スキップ",
+    "submit": "送信",
+    "next": "次へ",
+    "context": "このトレンドについて:",
+    "learnMore": "もっと詳しく",
+    "intro": {
+      "title": "デイリーバズへようこそ",
+      "screen1": "今日のトレンドから言葉パズル",
+      "screen2": "タイマーなし。プレッシャーなし。あなたvsニュース。",
+      "screen3": "毎日新しいチャレンジ",
+      "start": "バズを始める",
+      "skip": "イントロをスキップ"
+    },
+    "results": {
+      "title": "クリア！",
+      "score": "{score}/100",
+      "scorePerfect": "100/100 パーフェクト",
+      "trending": "今日のトレンド:",
+      "share": "スコアをシェア",
+      "playAgain": "明日",
+      "viewLeaderboard": "ランキング"
+    },
+    "streak": {
+      "current": "{count}日連続",
+      "lost": "連続記録途切れた！今日から再スタート",
+      "milestone": "マイルストーン: {count}日! 🔥"
+    },
+    "stats": {
+      "completed": "合計{count}",
+      "avgScore": "平均: {score}"
+    },
+    "share": {
+      "text": "デイリーバズ: {topic} | {score}/100 | 挑戦する？🔥",
+      "textPerfect": "デイリーバズ: パーフェクトスコア 💯 | できる？🔥",
+      "textStreakMilestone": "{count}日連続バズ記録! 🔥 参加する?"
+    },
+    "error": {
+      "loading": "今日のバズを読み込み中...",
+      "failed": "読み込めませんでした。もう一度？",
+      "noInternet": "接続なし。インターネットを確認してください。"
+    },
+    "alreadyPlayed": "今日はもうプレイしました！明日また来てください。",
+    "comingSoon": "明日のバズは深夜にリリース"
   },
   "wordHunt": {
     "title": "ワードハント",

@@ -2824,6 +2824,8 @@ const es = {
     "kofiTooltip": "Apoya el desarrollo de LexiClash"
   },
   "landing": {
+    "welcomeTitle": "¿Listos para jugar?",
+    "welcomeSubtitle": "¡Elige tu desafío!",
     "chooseMode": "Elige Tu Modo",
     "subtitle": "¡Juega solo para practicar y superar tus récords, o compite con amigos en multijugador en tiempo real!",
     "subtitleSimple": "Practica solo o desafía a amigos",
@@ -3272,6 +3274,75 @@ const es = {
       "skipToDaily": "Saltar, ya aprenderé",
       "redirecting": "Yendo al Desafío Diario..."
     }
+  },
+  "buzz": {
+    "title": "Daily Buzz",
+    "tagline": "Retos de lo que está trending",
+    "subtitle": "¿Qué está buzzeando hoy?",
+    "icon": "📰🔥",
+    "type": {
+      "scrambled": "REVUELTO",
+      "scrambledDesc": "Desarma la palabra trending",
+      "fillBlank": "COMPLETA",
+      "fillBlankDesc": "Completa la frase trending",
+      "chain": "CADENA",
+      "chainDesc": "Conecta palabras, letra por letra",
+      "spotOn": "ADIVINA",
+      "spotOnDesc": "Conecta palabra con significado",
+      "trio": "TRÍO",
+      "trioDesc": "Encuentra la palabra que conecta los 3 trends"
+    },
+    "challenge": "{number}/{total}",
+    "score": "{score}",
+    "trend": "{topic}",
+    "correct": "¡ESO!",
+    "incorrect": "NO VA",
+    "close": "CASI",
+    "perfect": "PERFECTO",
+    "hint": "¿PISTA?",
+    "skip": "SALTAR",
+    "submit": "ENVIAR",
+    "next": "SIGUIENTE",
+    "context": "Sobre este trend:",
+    "learnMore": "Saber más",
+    "intro": {
+      "title": "Bienvenido a Daily Buzz",
+      "screen1": "Puzzles de palabras de los trends de hoy",
+      "screen2": "Sin tiempo. Sin presión. Solo tú vs. las noticias.",
+      "screen3": "Nuevos retos cada día",
+      "start": "EMPEZAR BUZZ",
+      "skip": "SALTAR INTRO"
+    },
+    "results": {
+      "title": "¡BUZZ COMPLETO!",
+      "score": "{score}/100",
+      "scorePerfect": "100/100 PERFECTO",
+      "trending": "Trends de hoy:",
+      "share": "COMPARTIR",
+      "playAgain": "MAÑANA",
+      "viewLeaderboard": "TABLA"
+    },
+    "streak": {
+      "current": "Racha de {count} días",
+      "lost": "¡Racha perdida! Empieza hoy",
+      "milestone": "¡MILESTONE: {count} días! 🔥"
+    },
+    "stats": {
+      "completed": "{count} total",
+      "avgScore": "Promedio: {score}"
+    },
+    "share": {
+      "text": "Daily Buzz: {topic} | {score}/100 | ¿Le entras? 🔥",
+      "textPerfect": "Daily Buzz: PUNTAJE PERFECTO 💯 | ¿Puedes? 🔥",
+      "textStreakMilestone": "¡Racha de {count} días en Buzz! 🔥 ¿Te unes?"
+    },
+    "error": {
+      "loading": "Cargando el buzz de hoy...",
+      "failed": "No se pudo cargar. ¿Reintentar?",
+      "noInternet": "Sin conexión. Revisa tu internet."
+    },
+    "alreadyPlayed": "¡Ya jugaste hoy! Vuelve mañana.",
+    "comingSoon": "El buzz de mañana sale a medianoche"
   },
   "wordHunt": {
     "title": "Caza de Palabras",

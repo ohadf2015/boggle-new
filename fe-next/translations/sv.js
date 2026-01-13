@@ -2827,6 +2827,8 @@ const sv = {
     "kofiTooltip": "Stöd LexiClash-utveckling"
   },
   "landing": {
+    "welcomeTitle": "Redo att spela?",
+    "welcomeSubtitle": "Välj din utmaning!",
     "chooseMode": "Välj spelläge",
     "subtitle": "Spela ensam för att öva och slå dina rekord, eller tävla med vänner i realtid!",
     "subtitleSimple": "Öva ensam eller utmana vänner",
@@ -3275,6 +3277,75 @@ const sv = {
       "skipToDaily": "Hoppa över, jag klarar mig",
       "redirecting": "På väg till daglig utmaning..."
     }
+  },
+  "buzz": {
+    "title": "Daily Buzz",
+    "tagline": "Ordutmaningar från dagens trender",
+    "subtitle": "Vad buzzer idag?",
+    "icon": "📰🔥",
+    "type": {
+      "scrambled": "BLANDAD",
+      "scrambledDesc": "Lös det blandade trendordet",
+      "fillBlank": "FYLL I",
+      "fillBlankDesc": "Komplettera trendfrasen",
+      "chain": "KEDJA",
+      "chainDesc": "Länka ord, en bokstav i taget",
+      "spotOn": "RÄTT PÅ",
+      "spotOnDesc": "Matcha ord med betydelse",
+      "trio": "TRIO",
+      "trioDesc": "Hitta ordet som kopplar alla 3 trender"
+    },
+    "challenge": "{number}/{total}",
+    "score": "{score}",
+    "trend": "{topic}",
+    "correct": "RÄTT!",
+    "incorrect": "NEJ",
+    "close": "NÄRA",
+    "perfect": "PERFEKT",
+    "hint": "LEDTRÅD?",
+    "skip": "HOPPA",
+    "submit": "SKICKA",
+    "next": "NÄSTA",
+    "context": "Om denna trend:",
+    "learnMore": "Läs mer",
+    "intro": {
+      "title": "Välkommen till Daily Buzz",
+      "screen1": "Ordpussel från dagens trender",
+      "screen2": "Ingen tidsgräns. Ingen press. Bara du mot nyheterna.",
+      "screen3": "Nya utmaningar varje dag",
+      "start": "STARTA BUZZ",
+      "skip": "HOPPA INTRO"
+    },
+    "results": {
+      "title": "KLART!",
+      "score": "{score}/100",
+      "scorePerfect": "100/100 PERFEKT",
+      "trending": "Dagens trender:",
+      "share": "DELA POÄNG",
+      "playAgain": "IMORGON",
+      "viewLeaderboard": "TOPPLISTA"
+    },
+    "streak": {
+      "current": "{count}-dagars streak",
+      "lost": "Streak förlorad! Börja om idag",
+      "milestone": "MILSTOLPE: {count} dagar! 🔥"
+    },
+    "stats": {
+      "completed": "{count} totalt",
+      "avgScore": "Medel: {score}"
+    },
+    "share": {
+      "text": "Daily Buzz: {topic} | {score}/100 | Klarar du det? 🔥",
+      "textPerfect": "Daily Buzz: PERFEKT POÄNG 💯 | Kan du? 🔥",
+      "textStreakMilestone": "{count}-dagars Buzz streak! 🔥 Gå med?"
+    },
+    "error": {
+      "loading": "Laddar dagens buzz...",
+      "failed": "Kunde inte ladda. Försök igen?",
+      "noInternet": "Ingen anslutning. Kolla din internetuppkoppling."
+    },
+    "alreadyPlayed": "Redan spelat idag! Kom tillbaka imorgon.",
+    "comingSoon": "Morgondagens buzz släpps vid midnatt"
   },
   "wordHunt": {
     "title": "Ordjakt",

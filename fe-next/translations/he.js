@@ -2839,6 +2839,8 @@ const he = {
     "kofiTooltip": "תמוך בפיתוח לקסיקלאש"
   },
   "landing": {
+    "welcomeTitle": "מוכנים לשחק?",
+    "welcomeSubtitle": "בחרו את האתגר שלכם!",
     "chooseMode": "בחר מצב משחק",
     "subtitle": "שחק לבד כדי להתאמן ולשבור שיאים, או התחרה עם חברים במשחק רב-משתתפים!",
     "subtitleSimple": "התאמן לבד או אתגר חברים",
@@ -3287,6 +3289,75 @@ const he = {
       "skipToDaily": "דלגו, אני אסתדר",
       "redirecting": "בדרך לאתגר היומי..."
     }
+  },
+  "buzz": {
+    "title": "באזז יומי",
+    "tagline": "אתגרי מילים מהטרנדים של היום",
+    "subtitle": "מה באזז היום?",
+    "icon": "🔥📰",
+    "type": {
+      "scrambled": "מעורבב",
+      "scrambledDesc": "פתרו את המילה הטרנדית",
+      "fillBlank": "השלם",
+      "fillBlankDesc": "השלימו את הביטוי הטרנדי",
+      "chain": "שרשרת",
+      "chainDesc": "חברו מילים, אות אחת בכל פעם",
+      "spotOn": "נכון",
+      "spotOnDesc": "התאימו מילה למשמעות",
+      "trio": "שלישייה",
+      "trioDesc": "מצאו את המילה המחברת את 3 הטרנדים"
+    },
+    "challenge": "{number}/{total}",
+    "score": "{score}",
+    "trend": "{topic}",
+    "correct": "יש!",
+    "incorrect": "לא ממש",
+    "close": "קרוב",
+    "perfect": "מושלם",
+    "hint": "רמז?",
+    "skip": "דלג",
+    "submit": "שלח",
+    "next": "הבא",
+    "context": "על הטרנד הזה:",
+    "learnMore": "למד עוד",
+    "intro": {
+      "title": "ברוכים הבאים לבאזז יומי",
+      "screen1": "חידות מילים מהטרנדים של היום",
+      "screen2": "בלי טיימר. בלי לחץ. רק אתם מול החדשות.",
+      "screen3": "אתגרים חדשים כל יום",
+      "start": "התחל באזז",
+      "skip": "דלג על המבוא"
+    },
+    "results": {
+      "title": "סיימת!",
+      "score": "{score}/100",
+      "scorePerfect": "100/100 מושלם",
+      "trending": "טרנדים של היום:",
+      "share": "שתף ציון",
+      "playAgain": "מחר",
+      "viewLeaderboard": "דירוג"
+    },
+    "streak": {
+      "current": "רצף של {count} ימים",
+      "lost": "הרצף נפסק! התחילו מחדש היום",
+      "milestone": "אבן דרך: {count} ימים! 🔥"
+    },
+    "stats": {
+      "completed": "סה\"כ {count}",
+      "avgScore": "ממוצע: {score}"
+    },
+    "share": {
+      "text": "באזז יומי: {topic} | {score}/100 | תנסה לנצח 🔥",
+      "textPerfect": "באזז יומי: ציון מושלם 💯 | תצליח? 🔥",
+      "textStreakMilestone": "רצף של {count} ימים בבאזז! 🔥 מצטרפים?"
+    },
+    "error": {
+      "loading": "טוען את הבאזז של היום...",
+      "failed": "לא הצלחנו לטעון. לנסות שוב?",
+      "noInternet": "אין חיבור. בדקו את האינטרנט."
+    },
+    "alreadyPlayed": "כבר שיחקת היום! חזרו מחר.",
+    "comingSoon": "הבאזז של מחר יצא בחצות"
   },
   "wordHunt": {
     "title": "ציד מילים",
