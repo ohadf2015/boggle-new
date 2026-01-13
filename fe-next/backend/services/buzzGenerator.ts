@@ -666,20 +666,42 @@ async function loadDictionary(language: string): Promise<Set<string>> {
         words = (svWords as { words?: string[] }).words || (svWords as unknown as string[]) || [];
         break;
       }
-      case 'he':
-      case 'ja': {
-        // Load from custom dictionaries
+      case 'he': {
+        // Load Hebrew words from main dictionary files (same as dictionary.ts)
         const fs = await import('fs/promises');
         const path = await import('path');
-        const dictPath = path.join(
-          process.cwd(),
-          'backend',
-          'dictionaries',
-          `${language}.txt`
-        );
+        const hebrewFilePath = path.join(process.cwd(), 'backend', 'hebrew_words.txt');
+        const hebrewApprovedPath = path.join(process.cwd(), 'backend', 'hebrew_words_approved.txt');
         try {
-          const content = await fs.readFile(dictPath, 'utf-8');
-          words = content.split('\n').filter((w) => w.length > 0);
+          const [mainContent, approvedContent] = await Promise.all([
+            fs.readFile(hebrewFilePath, 'utf-8').catch(() => ''),
+            fs.readFile(hebrewApprovedPath, 'utf-8').catch(() => ''),
+          ]);
+          const mainWords = mainContent.split('\n').filter((w) => w.length > 0);
+          const approvedWords = approvedContent.split('\n').filter((w) => w.length > 0);
+          words = [...mainWords, ...approvedWords];
+          console.log(`[BUZZ] Loaded ${mainWords.length} Hebrew words + ${approvedWords.length} approved`);
+        } catch {
+          console.warn(`[BUZZ] Dictionary file not found for ${language}, using empty set`);
+          words = [];
+        }
+        break;
+      }
+      case 'ja': {
+        // Load Japanese Kanji compounds (same as dictionary.ts)
+        const fs = await import('fs/promises');
+        const path = await import('path');
+        const kanjiFilePath = path.join(process.cwd(), 'backend', 'kanji_compounds.txt');
+        const japaneseApprovedPath = path.join(process.cwd(), 'backend', 'japanese_words_approved.txt');
+        try {
+          const [kanjiContent, approvedContent] = await Promise.all([
+            fs.readFile(kanjiFilePath, 'utf-8').catch(() => ''),
+            fs.readFile(japaneseApprovedPath, 'utf-8').catch(() => ''),
+          ]);
+          const kanjiWords = kanjiContent.split('\n').filter((w) => w.length > 0);
+          const approvedWords = approvedContent.split('\n').filter((w) => w.length > 0);
+          words = [...kanjiWords, ...approvedWords];
+          console.log(`[BUZZ] Loaded ${kanjiWords.length} Japanese Kanji + ${approvedWords.length} approved`);
         } catch {
           console.warn(`[BUZZ] Dictionary file not found for ${language}, using empty set`);
           words = [];
