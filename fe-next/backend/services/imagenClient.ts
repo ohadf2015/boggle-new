@@ -1,9 +1,12 @@
 /**
  * Google Vertex AI Imagen Client for Abstract Concept Images
  * Generates neo-brutalist style images that show concepts WITHOUT revealing actual words
+ *
+ * IMPORTANT: Imagen models use the :predict REST API endpoint, NOT the
+ * generateContent API used by Gemini text models.
  */
 
-import { VertexAI } from '@google-cloud/vertexai';
+import { GoogleAuth } from 'google-auth-library';
 import sharp from 'sharp';
 import { getRedisClient } from '../redisClient';
 
@@ -78,27 +81,39 @@ function getVertexAICredentials(): GoogleCredentials & { location: string } {
   return {
     ...credentials,
     // Use global endpoint for maximum capacity and availability
-    location: process.env.GOOGLE_CLOUD_LOCATION || 'global',
+    location: process.env.GCP_LOCATION || process.env.GOOGLE_CLOUD_LOCATION || 'us-central1',
   };
 }
 
 /**
- * Initialize Vertex AI client with explicit credentials
+ * Get Google Auth client for Imagen API calls
  */
-function getVertexAIClient(): VertexAI {
+function getGoogleAuthClient(): GoogleAuth {
   const credentials = getVertexAICredentials();
 
-  return new VertexAI({
-    project: credentials.project_id,
-    location: credentials.location,
-    googleAuthOptions: {
-      credentials: {
-        client_email: credentials.client_email,
-        private_key: credentials.private_key,
-      },
-      projectId: credentials.project_id,
+  return new GoogleAuth({
+    credentials: {
+      client_email: credentials.client_email,
+      private_key: credentials.private_key,
     },
+    projectId: credentials.project_id,
+    scopes: ['https://www.googleapis.com/auth/cloud-platform'],
   });
+}
+
+/**
+ * Get access token for Imagen API
+ */
+async function getAccessToken(): Promise<string> {
+  const auth = getGoogleAuthClient();
+  const client = await auth.getClient();
+  const tokenResponse = await client.getAccessToken();
+
+  if (!tokenResponse.token) {
+    throw new Error('Failed to get Google Cloud access token');
+  }
+
+  return tokenResponse.token;
 }
 
 /**
@@ -268,9 +283,81 @@ function isRetryableError(error: unknown): boolean {
 }
 
 /**
+ * Build Imagen API endpoint URL
+ */
+function getImagenApiUrl(): string {
+  const credentials = getVertexAICredentials();
+  const model = process.env.VERTEX_AI_IMAGE_MODEL || 'imagen-4.0-generate-001';
+
+  // Imagen uses the :predict endpoint, NOT generateContent
+  // https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/imagen-api
+  return `https://${credentials.location}-aiplatform.googleapis.com/v1/projects/${credentials.project_id}/locations/${credentials.location}/publishers/google/models/${model}:predict`;
+}
+
+/**
+ * Call Imagen API with proper REST endpoint
+ */
+async function callImagenApi(prompt: string): Promise<Buffer> {
+  const url = getImagenApiUrl();
+  const accessToken = await getAccessToken();
+
+  const requestBody = {
+    instances: [
+      {
+        prompt,
+      },
+    ],
+    parameters: {
+      sampleCount: 1,
+      aspectRatio: '1:1',
+      addWatermark: false, // We add our own neo-brutalist styling
+    },
+  };
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(requestBody),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+
+    // Check if we got HTML (error page) instead of JSON
+    if (errorText.startsWith('<!DOCTYPE') || errorText.startsWith('<html')) {
+      throw new Error(`Imagen API returned HTML error page (status ${response.status}). This usually means the model or endpoint is incorrect.`);
+    }
+
+    // Try to parse as JSON error
+    try {
+      const errorJson = JSON.parse(errorText);
+      throw new Error(`Imagen API error: ${errorJson.error?.message || response.statusText}`);
+    } catch {
+      throw new Error(`Imagen API error (${response.status}): ${errorText.substring(0, 200)}`);
+    }
+  }
+
+  const data = await response.json();
+
+  // Imagen API returns predictions array with bytesBase64Encoded
+  const prediction = data.predictions?.[0];
+  if (!prediction?.bytesBase64Encoded) {
+    throw new Error('No image data returned from Imagen API');
+  }
+
+  return Buffer.from(prediction.bytesBase64Encoded, 'base64');
+}
+
+/**
  * Generate challenge image using Google Vertex AI Imagen 4
  * Returns Supabase Storage public URL
  * Includes retry mechanism with exponential backoff for 429 errors
+ *
+ * IMPORTANT: Uses the Imagen :predict REST API, not the generateContent API
+ * which is only for Gemini text models.
  */
 export async function generateChallengeImage(
   trendingTopic: string,
@@ -292,36 +379,8 @@ export async function generateChallengeImage(
         await sleep(delayMs);
       }
 
-      // Initialize Vertex AI client
-      const vertexAI = getVertexAIClient();
-      const generativeModel = vertexAI.getGenerativeModel({
-        // Use Imagen 4 model for better quality and availability
-        model: process.env.VERTEX_AI_IMAGE_MODEL || 'imagen-4.0-generate-001',
-      });
-
-      // Generate image
-      const result = await generativeModel.generateContent({
-        contents: [{
-          role: 'user',
-          parts: [{
-            text: prompt,
-          }],
-        }],
-        generationConfig: {
-          temperature: 0.7,
-          candidateCount: 1,
-        },
-      });
-
-      const response = result.response;
-      const imageData = response.candidates?.[0]?.content?.parts?.[0];
-
-      if (!imageData || !imageData.inlineData?.data) {
-        throw new Error('No image data returned from Vertex AI');
-      }
-
-      // Convert base64 to buffer
-      const rawImageBuffer = Buffer.from(imageData.inlineData.data, 'base64');
+      // Call Imagen API with proper :predict endpoint
+      const rawImageBuffer = await callImagenApi(prompt);
 
       // Post-process image with Sharp (add neo-brutalist effects)
       const processedImage = await postProcessImage(rawImageBuffer, category);

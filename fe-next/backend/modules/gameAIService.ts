@@ -768,14 +768,50 @@ export class GameAIService {
     const result = await withRetry(async () => {
       const response = await this.model!.generateContent(prompt);
       const candidate = response.response?.candidates?.[0];
-      
-      // Check if response was truncated
-      if (candidate?.finishReason === 'MAX_TOKENS' || candidate?.finishReason === 'OTHER') {
-        const error = new Error('AI response truncated');
-        error.name = 'TruncatedResponseError';
-        throw error;
+      const finishReason = candidate?.finishReason;
+      const partialText = candidate?.content?.parts?.[0]?.text || '';
+
+      // Log and handle non-successful finish reasons
+      if (finishReason && finishReason !== 'STOP') {
+        logger.warn('AI_SERVICE', `Non-standard finish reason for "${word}": ${finishReason}, partial: ${partialText.substring(0, 100)}`);
+
+        // MAX_TOKENS: Response was cut off - retry
+        if (finishReason === 'MAX_TOKENS') {
+          const error = new Error('AI response truncated due to MAX_TOKENS');
+          error.name = 'TruncatedResponseError';
+          throw error;
+        }
+
+        // SAFETY/RECITATION/OTHER: Try to recover, don't retry indefinitely
+        if (finishReason === 'SAFETY' || finishReason === 'RECITATION' || finishReason === 'OTHER') {
+          if (partialText) {
+            const partialMatch = partialText.match(/"isValid"\s*:\s*(true|false)/i);
+            if (partialMatch) {
+              logger.info('AI_SERVICE', `Recovered from ${finishReason} for "${word}"`);
+              // Return a synthetic response that will be parsed
+              return {
+                response: {
+                  candidates: [{
+                    content: { parts: [{ text: `{"isValid": ${partialMatch[1]}, "reason": "Partial response", "confidence": 65}` }] },
+                    finishReason: 'STOP'
+                  }]
+                }
+              } as unknown as typeof response;
+            }
+          }
+          // Cannot recover - return rejection
+          logger.warn('AI_SERVICE', `Cannot recover from ${finishReason} for "${word}", returning rejection`);
+          return {
+            response: {
+              candidates: [{
+                content: { parts: [{ text: '{"isValid": false, "reason": "AI validation inconclusive", "confidence": 0}' }] },
+                finishReason: 'STOP'
+              }]
+            }
+          } as unknown as typeof response;
+        }
       }
-      
+
       return response;
     }, `validateWithAI("${word}")`);
 
@@ -914,14 +950,24 @@ export class GameAIService {
     const result = await withRetry(async () => {
       const response = await this.batchModel!.generateContent(prompt);
       const candidate = response.response?.candidates?.[0];
-      
-      // Check if response was truncated
-      if (candidate?.finishReason === 'MAX_TOKENS' || candidate?.finishReason === 'OTHER') {
-        const error = new Error('AI response truncated');
-        error.name = 'TruncatedResponseError';
-        throw error;
+      const finishReason = candidate?.finishReason;
+      const partialText = candidate?.content?.parts?.[0]?.text || '';
+
+      // Log and handle non-successful finish reasons
+      if (finishReason && finishReason !== 'STOP') {
+        logger.warn('AI_SERVICE', `Batch validation non-standard finish: ${finishReason}, partial: ${partialText.substring(0, 100)}`);
+
+        // MAX_TOKENS: Response was cut off - retry
+        if (finishReason === 'MAX_TOKENS') {
+          const error = new Error('AI response truncated due to MAX_TOKENS');
+          error.name = 'TruncatedResponseError';
+          throw error;
+        }
+
+        // SAFETY/RECITATION/OTHER: Don't retry, return what we have
+        // The downstream code will handle partial responses
       }
-      
+
       return response;
     }, `batchValidateWithAI(${words.length} words)`);
 

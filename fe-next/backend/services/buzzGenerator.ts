@@ -256,7 +256,7 @@ function getVertexAICredentials(): GoogleCredentials & { location: string } {
 
     return {
       ...credentials,
-      location: process.env.GOOGLE_CLOUD_LOCATION || 'us-central1',
+      location: process.env.GCP_LOCATION || process.env.GOOGLE_CLOUD_LOCATION || 'us-central1',
     };
   } catch (error) {
     if (error instanceof SyntaxError) {

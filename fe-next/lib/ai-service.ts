@@ -639,11 +639,40 @@ Respond with ONLY valid JSON (no markdown):
       const response = result.response;
       const candidate = response.candidates?.[0];
       
-      // Check if response was truncated
-      if (candidate?.finishReason === 'MAX_TOKENS' || candidate?.finishReason === 'OTHER') {
-        const error = new Error('AI response truncated');
-        error.name = 'TruncatedResponseError';
-        throw error;
+      // Log finish reason for debugging
+      const finishReason = candidate?.finishReason;
+      const partialText = candidate?.content?.parts?.[0]?.text || '';
+
+      // Handle non-successful finish reasons
+      if (finishReason && finishReason !== 'STOP') {
+        console.warn(`[GameAIService] Non-standard finish reason for "${word}": ${finishReason}, partial text: ${partialText.substring(0, 100)}`);
+
+        // MAX_TOKENS: Response was cut off - retry with hope of better luck
+        if (finishReason === 'MAX_TOKENS') {
+          const error = new Error('AI response truncated due to MAX_TOKENS');
+          error.name = 'TruncatedResponseError';
+          throw error;
+        }
+
+        // SAFETY/RECITATION/OTHER: Content policy issue - try to extract what we can
+        if (finishReason === 'SAFETY' || finishReason === 'RECITATION' || finishReason === 'OTHER') {
+          // Try to recover partial response before giving up
+          if (partialText) {
+            const partialMatch = partialText.match(/"isValid"\s*:\s*(true|false)/i);
+            if (partialMatch) {
+              const isValid = partialMatch[1].toLowerCase() === 'true';
+              console.log(`[GameAIService] Recovered from ${finishReason} finish reason: isValid=${isValid}`);
+              return {
+                isValid,
+                reason: `Word ${isValid ? 'accepted' : 'rejected'} (partial response)`,
+                confidence: isValid ? 70 : 60
+              };
+            }
+          }
+          // No recovery possible, return safe default
+          console.warn(`[GameAIService] Cannot recover from ${finishReason}, rejecting word "${word}"`);
+          return { isValid: false, reason: 'AI validation inconclusive', confidence: 0 };
+        }
       }
       
       let text = candidate?.content?.parts?.[0]?.text || '';
