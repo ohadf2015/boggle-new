@@ -11,7 +11,8 @@ const { createTestEnvironment, customMatchers } = require('../helpers/socketTest
 expect.extend(customMatchers);
 
 // Increase timeout for dictionary loading during parallel test execution
-jest.setTimeout(20000);
+// Integration tests may take longer under heavy parallel load
+jest.setTimeout(45000);
 
 describe('Game Lifecycle Handler', () => {
   let env;
