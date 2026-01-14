@@ -118,9 +118,9 @@ async function getSupabaseClient() {
 }
 
 /**
- * Build neo-brutalist image prompt that shows the VISUAL SCENE of trending topics
- * Shows recognizable imagery that hints at the news without revealing specific words
- * Uses LexiClash's signature bold, vibrant game aesthetic
+ * Build cute animated style image prompt that shows trending topics
+ * Shows recognizable, adorable characters/scenes that hint at the news
+ * Uses a kawaii-inspired, friendly cartoon aesthetic with LexiClash colors
  */
 function buildImagePrompt(
   topic: string,
@@ -132,193 +132,197 @@ function buildImagePrompt(
   // Build a concrete visual scene from the trend
   const visualScene = buildVisualScene(topic, category);
 
-  return `Create an EXPLOSIVE, ULTRA-BOLD neo-brutalist game illustration for LexiClash word game.
+  return `Create a CUTE, CHARMING animated illustration for LexiClash word game.
 
 SUBJECT: ${visualScene}
 
-=== CRITICAL: LEXICLASH GAME VISUAL IDENTITY ===
+=== CRITICAL: ADORABLE CARTOON STYLE ===
 
-COLOR PALETTE (MANDATORY - Use these EXACT vibrant colors):
-- PRIMARY: Electric Yellow (#FFE135) - THE signature LexiClash color
-- SECONDARY: Hot Orange (#FF6B35) - for energy and action
-- ACCENT 1: Shocking Pink (#FF1493) - for excitement
-- ACCENT 2: Neon Cyan (#00FFFF) - for highlights
-- ACCENT 3: Lime Green (#32CD32) - for success/positive elements
-- BACKGROUND: Deep Navy (#1a1a2e) - dark, moody base
-- OUTLINES: Pure Black (#000000) - THICK 4-6px chunky borders
+ART STYLE - "PIXAR MEETS KAWAII":
+- Cute, rounded cartoon characters with BIG expressive eyes
+- Chibi-style proportions: oversized heads, small bodies, tiny hands
+- Soft, friendly expressions - always cheerful and inviting
+- Smooth, clean vector-style rendering
+- Gentle shading with soft highlights (NOT harsh shadows)
+- Rounded corners on EVERYTHING - nothing sharp or angular
+- Characters should look huggable and approachable
+- Think: Pixar short films, Animal Crossing, Pusheen, LINE Friends
 
-The image MUST be DOMINATED by these bright neon colors on the dark navy background.
-Think: arcade cabinet art, party game splash screen, mobile game hero banner.
-
-ART STYLE - "JACKBOX PARTY PACK MEETS ARCADE CABINET":
-- BOLD, chunky geometric shapes (NO thin lines, NO delicate details)
-- HARD BLACK OUTLINES on EVERYTHING (4-6px thick minimum)
-- FLAT color fills with ZERO gradients, ZERO soft shadows
-- HARD-EDGE shadows (8px offset, pure black, NO blur)
-- Halftone dot patterns (Ben-Day dots) for retro pop art feel
-- Exaggerated, PLAYFUL proportions (big heads, tiny bodies OK)
-- Dynamic diagonal compositions with explosive energy
-- MAXIMUM SATURATION - nothing muted or subtle
+COLOR PALETTE (Bright & Friendly):
+- PRIMARY: Sunny Yellow (#FFE135) - warm and cheerful
+- SECONDARY: Coral Orange (#FF7F50) - friendly warmth
+- ACCENT 1: Bubblegum Pink (#FF69B4) - sweet and playful
+- ACCENT 2: Sky Cyan (#87CEEB) - fresh and light
+- ACCENT 3: Mint Green (#98FB98) - soft and calming
+- BACKGROUND: Soft gradient from light lavender to soft blue
+- Subtle pastel tones to complement main colors
 
 VISUAL REQUIREMENTS:
-- Central iconic object/symbol that represents the trend at 60-70% of frame
-- Radiating action lines or starburst patterns in background
-- At least 3 of the palette colors must be prominently visible
-- Dark navy (#1a1a2e) as background anchoring the bright colors
+- Central cute character or mascot representing the trend (60-70% of frame)
+- Character should have a clear emotion (happy, excited, curious)
+- Soft, dreamy background with subtle sparkles or bubbles
+- At least one adorable mascot-style element (animal, object with face, etc.)
+- Clean composition with clear focal point
+
+CHARACTER GUIDELINES:
+- If showing people: chibi-style with round faces, dot eyes, small mouths
+- If showing animals: ultra-cute, plump, with expressive features
+- If showing objects: give them cute faces and personality
+- All characters should look friendly and non-threatening
+
+MOOD: ${mood}, ADORABLE, FRIENDLY, WHOLESOME
 
 ABSOLUTE CONSTRAINTS:
 - NO text, NO words, NO letters, NO numbers anywhere
-- NO realistic human faces (use silhouettes or cartoon characters)
-- NO photography, NO photorealism
-- NO gradients, NO soft shadows, NO blur effects
-- ONLY flat colors with hard edges
+- NO scary, dark, or intimidating elements
+- NO realistic human faces
+- NO sharp edges or aggressive styling
+- Keep it family-friendly and universally appealing
 
-OUTPUT: Square 1024×1024px poster-style illustration
-MOOD: ${mood}, ENERGETIC, FUN, GAME-LIKE
-
-The final image should look like it belongs on the splash screen of a vibrant party video game.`;
+OUTPUT: Square 1024×1024px illustration
+The final image should make people smile and feel happy - like a sticker you'd want to collect.`;
 }
 
 /**
- * Build a concrete visual scene description from the trending topic
- * Creates imagery that's recognizable but doesn't reveal puzzle words
+ * Build a cute, animated visual scene description from the trending topic
+ * Creates adorable mascot-style imagery that hints at the topic
  */
 function buildVisualScene(topic: string, category: string): string {
   const lowercaseTopic = topic.toLowerCase();
 
-  // Sports - show specific sports imagery
+  // Sports - show cute sports mascots
   if (category === 'sports') {
     if (lowercaseTopic.includes('super bowl') || lowercaseTopic.includes('nfl') || lowercaseTopic.includes('football')) {
-      return 'An American football flying through goalposts with stadium lights and cheering crowd silhouettes';
+      return 'An adorable chibi football player mascot with oversized helmet, hugging a cute smiling football, surrounded by confetti and tiny cheerleader animals';
     }
     if (lowercaseTopic.includes('basketball') || lowercaseTopic.includes('nba')) {
-      return 'A basketball swooshing through a hoop with dynamic action lines and court floor pattern';
+      return 'A cute round basketball character with happy face bouncing joyfully, with tiny chibi players cheering around it and sparkles';
     }
     if (lowercaseTopic.includes('soccer') || lowercaseTopic.includes('world cup') || lowercaseTopic.includes('fifa')) {
-      return 'A soccer ball flying into a goal net with stadium and excited crowd silhouettes';
+      return 'An adorable soccer ball mascot with big sparkly eyes and tiny legs, celebrating with cute animal fans waving flags';
     }
     if (lowercaseTopic.includes('tennis') || lowercaseTopic.includes('wimbledon')) {
-      return 'Tennis racket hitting a ball across the net with court markings visible';
+      return 'A cute fluffy tennis ball character with blushing cheeks and a tiny racket, surrounded by strawberries and cream';
     }
     if (lowercaseTopic.includes('olympics')) {
-      return 'Olympic torch flames with rings symbol and athletic figures in action poses';
+      return 'Adorable chibi athletes as cute animals (bunny, bear, cat) holding hands around Olympic rings, with sparkles and medals';
     }
     if (lowercaseTopic.includes('golf')) {
-      return 'Golf ball trajectory toward a flag on a green with dramatic sunset sky';
+      return 'A tiny cute golf ball character with a happy face rolling toward a flag, with fluffy clouds and a rainbow';
     }
     if (lowercaseTopic.includes('boxing') || lowercaseTopic.includes('ufc') || lowercaseTopic.includes('fight')) {
-      return 'Boxing ring with dramatic spotlights and silhouetted fighters in action';
+      return 'Two adorable plush toy-style boxers (like teddy bears) playfully sparring with oversized gloves, hearts floating around';
     }
-    return 'Dynamic sports action scene with multiple sports equipment and excited crowd energy';
+    return 'Cute chibi athletes as adorable animals playing sports together, with confetti, stars, and happy expressions';
   }
 
-  // Finance - show market/money imagery
+  // Finance - show cute money mascots
   if (category === 'finance') {
     if (lowercaseTopic.includes('bitcoin') || lowercaseTopic.includes('crypto') || lowercaseTopic.includes('ethereum')) {
-      return 'Rising crypto chart with bitcoin symbol, digital circuits, and rocket launching upward';
+      return 'An adorable golden coin character with sparkly eyes riding a cute rocket ship through stars and rainbow trails';
     }
     if (lowercaseTopic.includes('stock') || lowercaseTopic.includes('market') || lowercaseTopic.includes('dow') || lowercaseTopic.includes('nasdaq')) {
-      return 'Stock market chart with dramatic upward arrow, trading floor energy, and bull symbol';
+      return 'Cute piggy bank mascot with a happy face next to a smiling chart arrow going up, surrounded by floating coins with faces';
     }
     if (lowercaseTopic.includes('fed') || lowercaseTopic.includes('rate') || lowercaseTopic.includes('inflation')) {
-      return 'Federal reserve building silhouette with interest rate arrow and money symbols';
+      return 'An adorable owl wearing tiny glasses looking at cute smiling dollar bills, with a cozy library background';
     }
-    return 'Financial chart with dramatic movement arrows, coins, and market energy';
+    return 'Happy coin characters with cute faces stacking together, surrounded by sparkles and a cheerful piggy bank';
   }
 
-  // Entertainment - show specific entertainment imagery
+  // Entertainment - show cute entertainment mascots
   if (category === 'entertainment') {
     if (lowercaseTopic.includes('oscar') || lowercaseTopic.includes('academy award')) {
-      return 'Golden Oscar statuette on red carpet with spotlights and film strip decorations';
+      return 'An adorable golden Oscar statuette character with big eyes and a shy smile, surrounded by cute star plushies and film reels';
     }
     if (lowercaseTopic.includes('grammy') || lowercaseTopic.includes('music award')) {
-      return 'Grammy gramophone trophy with musical notes, microphone, and stage lights';
+      return 'A cute gramophone mascot with musical notes as tiny floating friends, surrounded by chibi musicians and sparkles';
     }
     if (lowercaseTopic.includes('movie') || lowercaseTopic.includes('film') || lowercaseTopic.includes('box office')) {
-      return 'Movie theater marquee with film reel, popcorn, and dramatic spotlights';
+      return 'Adorable popcorn bucket mascot with happy face watching a cute film reel character, with tiny 3D glasses and stars';
     }
     if (lowercaseTopic.includes('concert') || lowercaseTopic.includes('tour') || lowercaseTopic.includes('album')) {
-      return 'Concert stage with massive speakers, microphone, screaming crowd silhouettes, and light beams';
+      return 'A cute microphone character with sparkly eyes singing, surrounded by dancing musical notes and hearts';
     }
     if (lowercaseTopic.includes('streaming') || lowercaseTopic.includes('netflix') || lowercaseTopic.includes('show')) {
-      return 'TV screen showing play button with couch, popcorn, and binge-watching atmosphere';
+      return 'Adorable TV character with a cozy blanket, surrounded by cute snack mascots (popcorn, chips) with happy faces';
     }
     if (lowercaseTopic.includes('game') || lowercaseTopic.includes('video game') || lowercaseTopic.includes('gaming')) {
-      return 'Gaming controller with screen showing action, pixel hearts, and excited gamer energy';
+      return 'A cute game controller character with big eyes, surrounded by pixel heart friends and tiny chibi gamers';
     }
-    return 'Entertainment stage with spotlights, stars, and excited audience silhouettes';
+    return 'Adorable stage with cute star mascots performing, surrounded by hearts, musical notes, and sparkles';
   }
 
-  // Technology - show tech imagery
+  // Technology - show cute tech mascots
   if (category === 'technology') {
     if (lowercaseTopic.includes('ai') || lowercaseTopic.includes('chatgpt') || lowercaseTopic.includes('artificial intelligence')) {
-      return 'Robot brain with neural network patterns, glowing circuits, and futuristic interface';
+      return 'An adorable friendly robot mascot with big round eyes and blushing cheeks, surrounded by floating cute emoji helpers';
     }
     if (lowercaseTopic.includes('apple') || lowercaseTopic.includes('iphone') || lowercaseTopic.includes('ios')) {
-      return 'Sleek smartphone silhouette with app icons floating around it and notification bubbles';
+      return 'A cute smartphone character with a happy face, surrounded by tiny app icon friends with cute expressions';
     }
     if (lowercaseTopic.includes('space') || lowercaseTopic.includes('spacex') || lowercaseTopic.includes('nasa') || lowercaseTopic.includes('rocket')) {
-      return 'Rocket launching into starry space with Earth below and dramatic exhaust flames';
+      return 'An adorable chibi rocket with a smiling face blasting off, surrounded by cute planet characters and twinkly stars';
     }
     if (lowercaseTopic.includes('tesla') || lowercaseTopic.includes('ev') || lowercaseTopic.includes('electric car')) {
-      return 'Sleek electric car silhouette with charging bolt and futuristic city backdrop';
+      return 'A cute electric car mascot with happy headlight eyes, charging from an adorable lightning bolt character';
     }
     if (lowercaseTopic.includes('social media') || lowercaseTopic.includes('twitter') || lowercaseTopic.includes('meta') || lowercaseTopic.includes('instagram')) {
-      return 'Social media notification bubbles, like buttons, and connected network of people icons';
+      return 'Adorable notification bubble characters with cute faces, surrounded by heart and like button friends';
     }
-    return 'Futuristic tech devices with digital circuits, screens, and innovation energy';
+    return 'Cute robot mascot with big sparkly eyes surrounded by floating gadget friends, all with happy expressions';
   }
 
-  // Weather - show weather imagery
+  // Weather - show cute weather mascots
   if (category === 'weather') {
     if (lowercaseTopic.includes('hurricane') || lowercaseTopic.includes('tropical storm')) {
-      return 'Massive hurricane spiral viewed from above with dramatic eye and rain bands';
+      return 'A cute swirly cloud character with determined expression, surrounded by tiny raindrop friends with umbrellas';
     }
     if (lowercaseTopic.includes('tornado') || lowercaseTopic.includes('severe storm')) {
-      return 'Tornado funnel touching down with dark storm clouds and lightning strikes';
+      return 'An adorable spinning wind mascot with a playful expression, with cute leaf and cloud friends swirling around';
     }
     if (lowercaseTopic.includes('flood') || lowercaseTopic.includes('rain')) {
-      return 'Dramatic rainstorm with flooding waters, storm clouds, and umbrella silhouettes';
+      return 'Cute raindrop characters with happy faces falling from a fluffy cloud mascot, with tiny umbrella friends below';
     }
     if (lowercaseTopic.includes('heat') || lowercaseTopic.includes('hot') || lowercaseTopic.includes('temperature')) {
-      return 'Giant thermometer bursting with heat waves, sun blazing, and melting ice';
+      return 'An adorable sun mascot wearing tiny sunglasses, with cute ice cream and popsicle friends enjoying summer';
     }
     if (lowercaseTopic.includes('snow') || lowercaseTopic.includes('blizzard') || lowercaseTopic.includes('winter')) {
-      return 'Blizzard scene with massive snowflakes, frozen landscape, and bundled-up figures';
+      return 'Cute snowflake characters with happy faces falling around an adorable snowman mascot with a cozy scarf';
     }
-    return 'Dramatic sky with multiple weather elements - clouds, sun, rain, and lightning';
+    return 'Adorable weather mascots (sun, cloud, raindrop) as friends hanging out together with happy expressions';
   }
 
-  // Politics - show political imagery
+  // Politics - show cute civic mascots
   if (category === 'politics') {
     if (lowercaseTopic.includes('election') || lowercaseTopic.includes('vote') || lowercaseTopic.includes('ballot')) {
-      return 'Ballot box with voting checkmark, American flags, and patriotic stars';
+      return 'An adorable ballot box mascot with a friendly smile, surrounded by cute checkmark characters and tiny patriotic stars';
     }
     if (lowercaseTopic.includes('white house') || lowercaseTopic.includes('president')) {
-      return 'White House silhouette with dramatic sky, flags waving, and presidential seal';
+      return 'A cute miniature White House as a cozy dollhouse, with adorable eagle mascot and tiny flag friends';
     }
     if (lowercaseTopic.includes('congress') || lowercaseTopic.includes('senate') || lowercaseTopic.includes('house')) {
-      return 'Capitol building dome with gavel, debate podiums, and legislative imagery';
+      return 'Adorable Capitol building as a cute castle, with chibi owl characters representing wisdom and books';
     }
     if (lowercaseTopic.includes('supreme court') || lowercaseTopic.includes('ruling')) {
-      return 'Scales of justice with courthouse columns and gavel striking down';
+      return 'A cute scales of justice mascot with balanced happy faces, surrounded by tiny book and gavel friends';
     }
-    return 'Government building silhouette with flags, podium, and democratic symbols';
+    return 'Adorable civic mascots (flag, liberty bell, eagle) as cute friends with happy expressions';
   }
 
-  // General/News - show news imagery based on keywords
+  // General/News - show cute news mascots
   if (lowercaseTopic.includes('breaking') || lowercaseTopic.includes('news')) {
-    return 'Breaking news banner with globe, microphones, and urgent notification symbols';
+    return 'An adorable newspaper mascot with big sparkly eyes, surrounded by cute microphone and camera friends';
   }
   if (lowercaseTopic.includes('celebrity') || lowercaseTopic.includes('star')) {
-    return 'Red carpet with spotlights, camera flashes, and star-shaped decorations';
+    return 'Cute star mascots with happy faces on a tiny red carpet, with adorable camera flashes as sparkle friends';
   }
   if (lowercaseTopic.includes('viral') || lowercaseTopic.includes('trending')) {
-    return 'Smartphone screen with viral content, share buttons, and explosion of likes';
+    return 'An adorable smartphone character showing hearts and likes with happy faces, surrounded by sparkles and confetti';
   }
 
-  // Default: Create imagery based on the topic words themselves
-  return `Visual representation of trending topic "${topic}" with bold iconic imagery, recognizable symbols, and dynamic composition`;
+  // Default: Create cute mascot based on the topic
+  return `An adorable, cute mascot character representing "${topic}" with big sparkly eyes, happy expression, surrounded by tiny friendly companions and sparkles`;
 }
 
 /**

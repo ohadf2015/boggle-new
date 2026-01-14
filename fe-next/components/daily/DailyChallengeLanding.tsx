@@ -367,7 +367,7 @@ function CompactChallengeCard({
 
       {/* Preview Image or Icon */}
       {showImage ? (
-        <div className="relative w-full h-24 sm:h-32 rounded-lg overflow-hidden mb-3 border-2 border-neo-black">
+        <div className="relative w-full aspect-square max-h-48 sm:max-h-56 rounded-xl overflow-hidden mb-3 border-3 border-neo-black shadow-hard">
           <Image
             src={previewImageUrl}
             alt={previewImageAlt || title}
@@ -375,9 +375,13 @@ function CompactChallengeCard({
             sizes="(max-width: 640px) 100vw, 50vw"
             className="object-cover"
             onError={() => setImageError(true)}
+            priority
           />
-          {/* Subtle gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent" />
+          {/* Neo-brutalist corner accents */}
+          <div className="absolute top-0 start-0 w-6 h-6 bg-neo-yellow border-e-2 border-b-2 border-neo-black" />
+          <div className="absolute bottom-0 end-0 w-6 h-6 bg-neo-pink border-s-2 border-t-2 border-neo-black" />
+          {/* Subtle gradient for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent" />
         </div>
       ) : (
         <div
