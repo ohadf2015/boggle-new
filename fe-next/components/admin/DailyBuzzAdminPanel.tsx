@@ -30,8 +30,9 @@ import { getSession } from '@/lib/supabase';
 // Client-side timeout matches server maxDuration (120s) with buffer
 const CLIENT_TIMEOUT_MS = 130_000;
 
-// Regeneration timeout (60s API + buffer)
-const REGENERATE_TIMEOUT_MS = 70_000;
+// Regeneration timeout (70s API maxDuration + buffer)
+// Server has 50s internal AI timeout + processing time
+const REGENERATE_TIMEOUT_MS = 80_000;
 
 interface GenerationResult {
   success: boolean;
@@ -233,9 +234,14 @@ export default function DailyBuzzAdminPanel() {
       setEditingChallengeIndex(null);
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        setRegenerateError('Request timed out. AI generation may still be in progress.');
+        setRegenerateError(
+          'Request timed out after 80 seconds. The AI model may be overloaded. ' +
+          'Please try again in a few minutes.'
+        );
       } else {
-        setRegenerateError(error instanceof Error ? error.message : 'Failed to regenerate');
+        const errorMsg = error instanceof Error ? error.message : 'Failed to regenerate';
+        // Preserve server-side timeout messages which are more descriptive
+        setRegenerateError(errorMsg);
       }
     } finally {
       setIsRegenerating(false);
@@ -294,15 +300,16 @@ export default function DailyBuzzAdminPanel() {
           results: {},
           duration: 0,
           date: selectedDate,
-          message: 'Request timed out. The generation may still complete server-side. Check back in a minute.',
+          message: 'Request timed out after 130 seconds. The AI model may be overloaded. Please try again in a few minutes.',
         });
       } else {
+        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
         setResult({
           success: false,
           results: {},
           duration: 0,
           date: selectedDate,
-          message: error instanceof Error ? error.message : 'Unknown error',
+          message: errorMsg,
         });
       }
     } finally {

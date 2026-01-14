@@ -55,6 +55,41 @@ const GEMINI_MODEL = process.env.VERTEX_AI_MODEL || 'gemini-2.5-pro';
 // Thinking budget for extended reasoning (0 = disabled, max = 32768 for 2.5-pro, 24576 for 2.5-flash)
 const THINKING_BUDGET = parseInt(process.env.VERTEX_AI_THINKING_BUDGET || '8192', 10);
 
+// Timeout for AI generation requests (in milliseconds)
+// Must be less than API route maxDuration to allow for proper error handling
+const AI_GENERATION_TIMEOUT_MS = 90_000; // 90 seconds for full generation
+const AI_SINGLE_CHALLENGE_TIMEOUT_MS = 50_000; // 50 seconds for single challenge regeneration
+
+/**
+ * Wraps a promise with a timeout
+ * Throws a descriptive error if the operation exceeds the specified duration
+ */
+async function withTimeout<T>(
+  promise: Promise<T>,
+  timeoutMs: number,
+  operationName: string
+): Promise<T> {
+  let timeoutId: NodeJS.Timeout;
+
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(new Error(
+        `${operationName} timed out after ${timeoutMs / 1000}s. ` +
+        `The AI model may be overloaded. Please try again in a few minutes.`
+      ));
+    }, timeoutMs);
+  });
+
+  try {
+    const result = await Promise.race([promise, timeoutPromise]);
+    clearTimeout(timeoutId!);
+    return result;
+  } catch (error) {
+    clearTimeout(timeoutId!);
+    throw error;
+  }
+}
+
 /**
  * Generate Daily Buzz challenge for a specific date and language
  *
@@ -327,7 +362,7 @@ async function generateChallengesWithAI(
       console.log(`[BUZZ] Using thinking budget: ${THINKING_BUDGET} tokens`);
     }
 
-    const result = await model.generateContent({
+    const generatePromise = model.generateContent({
       contents: [
         {
           role: 'user',
@@ -336,6 +371,13 @@ async function generateChallengesWithAI(
       ],
       generationConfig,
     } as Parameters<typeof model.generateContent>[0]);
+
+    // Apply timeout to prevent hanging on slow AI responses
+    const result = await withTimeout(
+      generatePromise,
+      AI_GENERATION_TIMEOUT_MS,
+      'AI challenge generation'
+    );
 
     // Parse AI response
     const response = result.response;
@@ -351,6 +393,10 @@ async function generateChallengesWithAI(
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('[BUZZ] AI generation failed:', errorMessage);
+    // Preserve timeout error messages for better UX
+    if (errorMessage.includes('timed out')) {
+      throw new Error(errorMessage);
+    }
     throw new Error('Failed to generate challenges with AI');
   }
 }
@@ -968,6 +1014,9 @@ function isBrandOrProperNoun(word: string): boolean {
   return BANNED_BRAND_WORDS.has(upper);
 }
 
+// Wordle challenge requires exactly 5-letter words (matches WORD_LENGTH in WordleChallenge.tsx)
+const WORDLE_WORD_LENGTH = 5;
+
 /**
  * Validate challenges for basic sanity checks
  * NOTE: Dictionary validation removed - Buzz challenges use trending topic words
@@ -987,10 +1036,18 @@ function validateChallenges(
       return false;
     }
 
-    // Check word length
-    if (answer.length < 3 || answer.length > 15) {
-      console.warn(`[BUZZ] Word length invalid: ${answer} (${answer.length} letters)`);
-      return false;
+    // Special validation for wordle_guess: must be exactly 5 letters
+    if (challenge.type === 'wordle_guess') {
+      if (answer.length !== WORDLE_WORD_LENGTH) {
+        console.warn(`[BUZZ] Wordle answer must be exactly ${WORDLE_WORD_LENGTH} letters: "${answer}" (${answer.length} letters)`);
+        return false;
+      }
+    } else {
+      // Check word length for non-wordle challenges (3-15 letters)
+      if (answer.length < 3 || answer.length > 15) {
+        console.warn(`[BUZZ] Word length invalid: ${answer} (${answer.length} letters)`);
+        return false;
+      }
     }
 
     // Validate options for multiple choice (check for brands only)
@@ -1031,10 +1088,18 @@ function validateSingleChallenge(
     return false;
   }
 
-  // Check word length
-  if (answer.length < 3 || answer.length > 15) {
-    console.warn(`[BUZZ] Word length invalid: ${answer} (${answer.length} letters)`);
-    return false;
+  // Special validation for wordle_guess: must be exactly 5 letters
+  if (challenge.type === 'wordle_guess') {
+    if (answer.length !== WORDLE_WORD_LENGTH) {
+      console.warn(`[BUZZ] Wordle answer must be exactly ${WORDLE_WORD_LENGTH} letters: "${answer}" (${answer.length} letters)`);
+      return false;
+    }
+  } else {
+    // Check word length for non-wordle challenges (3-15 letters)
+    if (answer.length < 3 || answer.length > 15) {
+      console.warn(`[BUZZ] Word length invalid: ${answer} (${answer.length} letters)`);
+      return false;
+    }
   }
 
   // Validate options for multiple choice (check for brands only)
@@ -1362,7 +1427,7 @@ async function generateSingleChallengeWithAI(
 
   const model = vertexAI.getGenerativeModel({ model: GEMINI_MODEL });
 
-  const result = await model.generateContent({
+  const generatePromise = model.generateContent({
     contents: [{ role: 'user', parts: [{ text: prompt }] }],
     generationConfig: {
       temperature: 0.7,
@@ -1370,6 +1435,13 @@ async function generateSingleChallengeWithAI(
       topP: 0.9,
     },
   });
+
+  // Apply timeout to prevent hanging on slow AI responses
+  const result = await withTimeout(
+    generatePromise,
+    AI_SINGLE_CHALLENGE_TIMEOUT_MS,
+    'Single challenge regeneration'
+  );
 
   const responseText = result.response.candidates?.[0]?.content?.parts?.[0]?.text || '';
 

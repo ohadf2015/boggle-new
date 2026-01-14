@@ -13,8 +13,9 @@ import {
   storePromptExample,
 } from '@/backend/services/buzzGenerator';
 
-// AI generation can take time
-export const maxDuration = 60;
+// AI generation can take time - increased to 70s to accommodate timeout handling
+// The buzzGenerator has a 50s internal timeout, so 70s gives buffer for response processing
+export const maxDuration = 70;
 
 interface RegenerateRequestBody {
   date: string;

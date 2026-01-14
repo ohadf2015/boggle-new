@@ -386,3 +386,222 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
 // Note: Tests for getPromptExamples, storePromptExample, and regenerateSingleChallenge
 // require complex dynamic import mocking that conflicts with existing Supabase mock setup.
 // These functions are tested through E2E integration tests instead.
+
+describe('Wordle challenge validation', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    // Mock environment variables
+    process.env.GOOGLE_CREDENTIALS_JSON = JSON.stringify({
+      project_id: 'test-project',
+      private_key: 'test-key',
+      client_email: 'test@test.com',
+    });
+    process.env.GOOGLE_CLOUD_LOCATION = 'us-central1';
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key';
+
+    // Mock getTrendsFromDbCache to return null (no cached trends)
+    (serpApiClient.getTrendsFromDbCache as jest.Mock).mockResolvedValue(null);
+
+    // Mock fetchGoogleTrends to return sample trends
+    (serpApiClient.fetchGoogleTrends as jest.Mock).mockResolvedValue([
+      {
+        query: 'technology',
+        search_volume: 500000,
+        active: true,
+        categories: [{ id: 5, name: 'Science & Technology' }],
+        trend_breakdown: ['Tech news'],
+      },
+      {
+        query: 'sports',
+        search_volume: 200000,
+        active: true,
+        categories: [{ id: 7, name: 'Sports' }],
+        trend_breakdown: ['Sports news'],
+      },
+      {
+        query: 'music',
+        search_volume: 150000,
+        active: true,
+        categories: [{ id: 3, name: 'Entertainment' }],
+        trend_breakdown: ['Music news'],
+      },
+    ]);
+  });
+
+  it('should reject wordle_guess challenges with non-5-letter answers', async () => {
+    // AI returns a wordle_guess challenge with 6 letters (SNACKS instead of SNACK)
+    mockGenerateContent.mockResolvedValueOnce({
+      response: {
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify({
+                    date: '2026-01-14',
+                    language: 'en',
+                    trending_summary: 'Tech & Sports',
+                    challenges: [
+                      {
+                        type: 'anagram',
+                        trend_topic: 'technology',
+                        prompt: 'Unscramble: CHEYT',
+                        answer: 'TECHY',
+                        hint: 'Tech savvy',
+                        difficulty: 'easy',
+                        trending_context: 'Tech trends',
+                      },
+                      {
+                        type: 'fill_blank',
+                        trend_topic: 'sports',
+                        prompt: 'The team scored a _____ (4 letters)',
+                        answer: 'GOAL',
+                        hint: 'Point in soccer',
+                        difficulty: 'easy',
+                        trending_context: 'Sports news',
+                      },
+                      {
+                        type: 'wordle_guess',
+                        trend_topic: 'Super Bowl',
+                        prompt: 'What fans eat during the big game',
+                        answer: 'SNACKS', // 6 letters - should be rejected!
+                        hint: 'Munchies',
+                        difficulty: 'easy',
+                        trending_context: 'Super Bowl party',
+                      },
+                      {
+                        type: 'riddle',
+                        trend_topic: 'music',
+                        prompt: 'I have keys but no locks',
+                        answer: 'PIANO',
+                        hint: 'Musical instrument',
+                        difficulty: 'medium',
+                        trending_context: 'Music trending',
+                      },
+                      {
+                        type: 'definition_match',
+                        trend_topic: 'technology',
+                        prompt: 'A device for computing',
+                        answer: 'COMPUTER',
+                        options: ['COMPUTER', 'PHONE', 'TABLET', 'WATCH'],
+                        hint: 'Desktop or laptop',
+                        difficulty: 'easy',
+                        trending_context: 'Tech news',
+                      },
+                      {
+                        type: 'word_chain',
+                        trend_topic: 'sports',
+                        prompt: 'BALL → ? → NET',
+                        answer: 'GAME',
+                        hint: 'Competition',
+                        difficulty: 'medium',
+                        trending_context: 'Sports chain',
+                      },
+                    ],
+                  }),
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    const today = new Date();
+    const result = await generateDailyBuzz(today, 'en');
+
+    // The wordle_guess with 6-letter answer should be filtered out
+    const wordleChallenges = result.challenges.filter(c => c.type === 'wordle_guess');
+
+    // Verify no wordle_guess challenges have non-5-letter answers
+    for (const challenge of wordleChallenges) {
+      expect(challenge.answer.length).toBe(5);
+    }
+
+    // The invalid 6-letter SNACKS should not be in the final results
+    const hasSnacks = result.challenges.some(c => c.answer === 'SNACKS');
+    expect(hasSnacks).toBe(false);
+  });
+
+  it('should accept wordle_guess challenges with exactly 5-letter answers', async () => {
+    // AI returns a wordle_guess challenge with correct 5 letters
+    mockGenerateContent.mockResolvedValueOnce({
+      response: {
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify({
+                    date: '2026-01-14',
+                    language: 'en',
+                    trending_summary: 'Tech & Sports',
+                    challenges: [
+                      {
+                        type: 'anagram',
+                        trend_topic: 'technology',
+                        prompt: 'Unscramble: CHEYT',
+                        answer: 'TECHY',
+                        hint: 'Tech savvy',
+                        difficulty: 'easy',
+                        trending_context: 'Tech trends',
+                      },
+                      {
+                        type: 'fill_blank',
+                        trend_topic: 'sports',
+                        prompt: 'The team scored a _____ (4 letters)',
+                        answer: 'GOAL',
+                        hint: 'Point in soccer',
+                        difficulty: 'easy',
+                        trending_context: 'Sports news',
+                      },
+                      {
+                        type: 'wordle_guess',
+                        trend_topic: 'Super Bowl',
+                        prompt: 'What fans eat during the big game',
+                        answer: 'SNACK', // Exactly 5 letters - should be accepted!
+                        hint: 'Munchies',
+                        difficulty: 'easy',
+                        trending_context: 'Super Bowl party',
+                      },
+                      {
+                        type: 'riddle',
+                        trend_topic: 'music',
+                        prompt: 'I have keys but no locks',
+                        answer: 'PIANO',
+                        hint: 'Musical instrument',
+                        difficulty: 'medium',
+                        trending_context: 'Music trending',
+                      },
+                      {
+                        type: 'definition_match',
+                        trend_topic: 'technology',
+                        prompt: 'A device for computing',
+                        answer: 'COMPUTER',
+                        options: ['COMPUTER', 'PHONE', 'TABLET', 'WATCH'],
+                        hint: 'Desktop or laptop',
+                        difficulty: 'easy',
+                        trending_context: 'Tech news',
+                      },
+                    ],
+                  }),
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    const today = new Date();
+    const result = await generateDailyBuzz(today, 'en');
+
+    // The wordle_guess with 5-letter answer should be included
+    const wordleChallenges = result.challenges.filter(c => c.type === 'wordle_guess');
+    expect(wordleChallenges.length).toBe(1);
+    expect(wordleChallenges[0].answer).toBe('SNACK');
+    expect(wordleChallenges[0].answer.length).toBe(5);
+  });
+});
