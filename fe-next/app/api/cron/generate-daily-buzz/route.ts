@@ -167,10 +167,11 @@ export async function POST(request: NextRequest) {
     const results: Record<string, { success: boolean; error?: string }> = {};
 
     // Generate for each language
+    // Admin regeneration always deletes existing challenge first for a clean slate
     for (const lang of targetLanguages) {
       try {
         console.log(`[Admin] Generating buzz for ${lang}...`);
-        await generateDailyBuzz(targetDate, lang);
+        await generateDailyBuzz(targetDate, lang, { deleteBeforeRegenerate: true });
         results[lang] = { success: true };
         console.log(`[Admin] ✅ Generated buzz for ${lang}`);
       } catch (err: any) {

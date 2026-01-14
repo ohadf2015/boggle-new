@@ -605,3 +605,285 @@ describe('Wordle challenge validation', () => {
     expect(wordleChallenges[0].answer.length).toBe(5);
   });
 });
+
+describe('generateDailyBuzz with deleteBeforeRegenerate option', () => {
+  // Store original mock
+  const originalMock = jest.requireMock('@supabase/supabase-js');
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    // Mock environment variables
+    process.env.GOOGLE_CREDENTIALS_JSON = JSON.stringify({
+      project_id: 'test-project',
+      private_key: 'test-key',
+      client_email: 'test@test.com',
+    });
+    process.env.GOOGLE_CLOUD_LOCATION = 'us-central1';
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key';
+
+    // Update Supabase mock to handle delete operations
+    originalMock.createClient.mockImplementation(() => ({
+      from: jest.fn((table: string) => {
+        if (table === 'daily_buzz_challenges') {
+          return {
+            upsert: jest.fn(() => ({ error: null })),
+            select: jest.fn(() => ({
+              eq: jest.fn(() => ({
+                eq: jest.fn(() => ({
+                  eq: jest.fn(() => ({
+                    single: jest.fn(() => ({ data: { id: 1 }, error: null })),
+                  })),
+                })),
+              })),
+            })),
+            delete: jest.fn(() => ({
+              eq: jest.fn(() => ({ error: null })),
+            })),
+          };
+        }
+        if (table === 'daily_buzz_attempts') {
+          return {
+            delete: jest.fn(() => ({
+              eq: jest.fn(() => ({ error: null })),
+            })),
+          };
+        }
+        if (table === 'feature_flags') {
+          return {
+            select: jest.fn(() => ({
+              eq: jest.fn(() => ({
+                single: jest.fn(() => ({ data: { enabled: false }, error: null })),
+              })),
+            })),
+          };
+        }
+        if (table === 'buzz_prompt_examples') {
+          return {
+            select: jest.fn(() => ({
+              eq: jest.fn(() => ({
+                eq: jest.fn(() => ({
+                  order: jest.fn(() => ({
+                    limit: jest.fn(() => ({ data: [], error: null })),
+                  })),
+                })),
+              })),
+            })),
+          };
+        }
+        return {
+          select: jest.fn(() => ({
+            eq: jest.fn(() => ({
+              single: jest.fn(() => ({ data: null, error: null })),
+            })),
+          })),
+          upsert: jest.fn(() => ({ error: null })),
+          insert: jest.fn(() => ({ error: null })),
+        };
+      }),
+    }));
+
+    // Mock getTrendsFromDbCache to return sample trends
+    (serpApiClient.getTrendsFromDbCache as jest.Mock).mockResolvedValue([
+      {
+        query: 'technology',
+        search_volume: 500000,
+        active: true,
+        categories: [{ id: 5, name: 'Science & Technology' }],
+        trend_breakdown: ['Tech news'],
+      },
+      {
+        query: 'sports',
+        search_volume: 200000,
+        active: true,
+        categories: [{ id: 7, name: 'Sports' }],
+        trend_breakdown: ['Sports news'],
+      },
+      {
+        query: 'music',
+        search_volume: 150000,
+        active: true,
+        categories: [{ id: 3, name: 'Entertainment' }],
+        trend_breakdown: ['Music news'],
+      },
+    ]);
+  });
+
+  it('should accept options object with deleteBeforeRegenerate', async () => {
+    mockGenerateContent.mockResolvedValueOnce({
+      response: {
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify({
+                    date: '2026-01-14',
+                    language: 'en',
+                    trending_summary: 'Tech & Sports',
+                    challenges: [
+                      {
+                        type: 'anagram',
+                        trend_topic: 'technology',
+                        prompt: 'Unscramble: CHEYT',
+                        answer: 'TECHY',
+                        hint: 'Tech savvy',
+                        difficulty: 'easy',
+                        trending_context: 'Tech trends',
+                      },
+                      {
+                        type: 'fill_blank',
+                        trend_topic: 'sports',
+                        prompt: 'The team scored a _____ (4 letters)',
+                        answer: 'GOAL',
+                        hint: 'Point in soccer',
+                        difficulty: 'easy',
+                        trending_context: 'Sports news',
+                      },
+                      {
+                        type: 'riddle',
+                        trend_topic: 'music',
+                        prompt: 'I have keys but no locks',
+                        answer: 'PIANO',
+                        hint: 'Musical instrument',
+                        difficulty: 'medium',
+                        trending_context: 'Music trending',
+                      },
+                      {
+                        type: 'definition_match',
+                        trend_topic: 'technology',
+                        prompt: 'A device for computing',
+                        answer: 'COMPUTER',
+                        options: ['COMPUTER', 'PHONE', 'TABLET', 'WATCH'],
+                        hint: 'Desktop or laptop',
+                        difficulty: 'easy',
+                        trending_context: 'Tech news',
+                      },
+                      {
+                        type: 'word_chain',
+                        trend_topic: 'sports',
+                        prompt: 'BALL → ? → NET',
+                        answer: 'GAME',
+                        hint: 'Competition',
+                        difficulty: 'medium',
+                        trending_context: 'Sports chain',
+                      },
+                    ],
+                  }),
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    const today = new Date();
+
+    // Should accept options object
+    const result = await generateDailyBuzz(today, 'en', { deleteBeforeRegenerate: true });
+    expect(result).toBeDefined();
+    expect(result.challenges.length).toBeGreaterThanOrEqual(5);
+  });
+
+  it('should still support legacy cachedTrends array parameter', async () => {
+    mockGenerateContent.mockResolvedValueOnce({
+      response: {
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify({
+                    date: '2026-01-14',
+                    language: 'en',
+                    trending_summary: 'Tech & Sports',
+                    challenges: [
+                      {
+                        type: 'anagram',
+                        trend_topic: 'technology',
+                        prompt: 'Unscramble: CHEYT',
+                        answer: 'TECHY',
+                        hint: 'Tech savvy',
+                        difficulty: 'easy',
+                        trending_context: 'Tech trends',
+                      },
+                      {
+                        type: 'fill_blank',
+                        trend_topic: 'sports',
+                        prompt: 'The team scored a _____ (4 letters)',
+                        answer: 'GOAL',
+                        hint: 'Point in soccer',
+                        difficulty: 'easy',
+                        trending_context: 'Sports news',
+                      },
+                      {
+                        type: 'riddle',
+                        trend_topic: 'music',
+                        prompt: 'I have keys but no locks',
+                        answer: 'PIANO',
+                        hint: 'Musical instrument',
+                        difficulty: 'medium',
+                        trending_context: 'Music trending',
+                      },
+                      {
+                        type: 'definition_match',
+                        trend_topic: 'technology',
+                        prompt: 'A device for computing',
+                        answer: 'COMPUTER',
+                        options: ['COMPUTER', 'PHONE', 'TABLET', 'WATCH'],
+                        hint: 'Desktop or laptop',
+                        difficulty: 'easy',
+                        trending_context: 'Tech news',
+                      },
+                      {
+                        type: 'word_chain',
+                        trend_topic: 'sports',
+                        prompt: 'BALL → ? → NET',
+                        answer: 'GAME',
+                        hint: 'Competition',
+                        difficulty: 'medium',
+                        trending_context: 'Sports chain',
+                      },
+                    ],
+                  }),
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    const today = new Date();
+    const legacyTrends = [
+      {
+        query: 'custom',
+        search_volume: 100000,
+        active: true,
+        categories: [{ id: 1, name: 'Custom' }],
+        trend_breakdown: ['Custom trend'],
+      },
+      {
+        query: 'trends',
+        search_volume: 90000,
+        active: true,
+        categories: [{ id: 1, name: 'Custom' }],
+        trend_breakdown: ['More trends'],
+      },
+      {
+        query: 'test',
+        search_volume: 80000,
+        active: true,
+        categories: [{ id: 1, name: 'Custom' }],
+        trend_breakdown: ['Test trend'],
+      },
+    ];
+
+    // Should accept array directly (legacy signature)
+    const result = await generateDailyBuzz(today, 'en', legacyTrends);
+    expect(result).toBeDefined();
+    expect(result.challenges.length).toBeGreaterThanOrEqual(5);
+  });
+});

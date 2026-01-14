@@ -45,6 +45,11 @@ jest.mock('@/contexts/AuthContext', () => ({
   }),
 }));
 
+// Mock guest manager to avoid crypto.randomUUID in tests
+jest.mock('@/utils/guestManager', () => ({
+  getGuestFingerprint: () => 'test-fingerprint-12345',
+}));
+
 // Mock child components
 jest.mock('../BuzzReadyScreen', () => ({
   __esModule: true,
@@ -113,7 +118,7 @@ describe('BuzzChallenge', () => {
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ played: false }),
+        json: async () => ({ success: true, data: { played: false } }),
       });
 
     render(

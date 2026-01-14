@@ -23,7 +23,8 @@ export async function POST(request: NextRequest) {
     const data: WebVitalPayload = await request.json();
 
     // Validate required fields
-    if (!data.metric_name || !data.metric_value || !data.metric_rating) {
+    // Note: metric_value can be 0 (valid for CLS), so use typeof check
+    if (!data.metric_name || typeof data.metric_value !== 'number' || !data.metric_rating) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }

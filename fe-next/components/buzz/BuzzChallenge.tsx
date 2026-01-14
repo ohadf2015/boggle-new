@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { getGuestFingerprint } from '@/utils/guestManager';
 import BuzzReadyScreen from './BuzzReadyScreen';
 import BuzzGameScreen from './BuzzGameScreen';
 import BuzzResultsScreen from './BuzzResultsScreen';
@@ -58,7 +59,7 @@ type BuzzPhase = 'loading' | 'ready' | 'playing' | 'results' | 'error';
  */
 export default function BuzzChallenge({ language, onBack }: BuzzChallengeProps) {
   const { t } = useLanguage();
-  const { profile, isAuthenticated } = useAuth();
+  const { profile } = useAuth();
 
   const [phase, setPhase] = useState<BuzzPhase>('loading');
   const [challengeData, setChallengeData] = useState<BuzzChallengeData | null>(null);
@@ -83,12 +84,24 @@ export default function BuzzChallenge({ language, onBack }: BuzzChallengeProps) 
           setChallengeData(data.data);
 
           // Check if already played today
-          const checkResponse = await fetch(
-            `/api/buzz/check-played/${today}/${language}`
-          );
-          if (checkResponse.ok) {
-            const checkData = await checkResponse.json();
-            setHasPlayedToday(checkData.played || false);
+          const checkParams = new URLSearchParams();
+          if (profile?.id) {
+            checkParams.set('player_id', profile.id);
+          } else {
+            const fingerprint = getGuestFingerprint();
+            if (fingerprint) {
+              checkParams.set('guest_fingerprint', fingerprint);
+            }
+          }
+
+          if (checkParams.toString()) {
+            const checkResponse = await fetch(
+              `/api/buzz/check-played/${today}/${language}?${checkParams.toString()}`
+            );
+            if (checkResponse.ok) {
+              const checkData = await checkResponse.json();
+              setHasPlayedToday(checkData.data?.played || false);
+            }
           }
 
           setPhase('ready');
@@ -103,7 +116,7 @@ export default function BuzzChallenge({ language, onBack }: BuzzChallengeProps) 
     };
 
     fetchChallenge();
-  }, [language]);
+  }, [language, profile?.id]);
 
   // Handle start game
   const handleStart = () => {

@@ -78,12 +78,25 @@ export function DailyChallengeLanding({
 
       let buzzPlayed = false;
       try {
-        const response = await fetch(
-          `/api/buzz/check-played/${today}/${currentLanguage}`
-        );
-        if (response.ok) {
-          const data = await response.json();
-          buzzPlayed = data.played || false;
+        // Build query params for user identification
+        const checkParams = new URLSearchParams();
+        if (user?.id) {
+          checkParams.set('player_id', user.id);
+        } else {
+          const fingerprint = getGuestFingerprint();
+          if (fingerprint) {
+            checkParams.set('guest_fingerprint', fingerprint);
+          }
+        }
+
+        if (checkParams.toString()) {
+          const response = await fetch(
+            `/api/buzz/check-played/${today}/${currentLanguage}?${checkParams.toString()}`
+          );
+          if (response.ok) {
+            const data = await response.json();
+            buzzPlayed = data.data?.played || false;
+          }
         }
       } catch (err) {
         console.error('Failed to check buzz status:', err);
@@ -115,7 +128,7 @@ export function DailyChallengeLanding({
     checkStatus();
     // Reset request state when language changes
     setRequestState('idle');
-  }, [currentLanguage]);
+  }, [currentLanguage, user?.id]);
 
   // Handle requesting a buzz challenge
   const handleRequestChallenge = async () => {

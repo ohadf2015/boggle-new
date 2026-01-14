@@ -111,12 +111,22 @@ export default function DailyBuzzAdminPanel() {
   const [showChallenges, setShowChallenges] = useState(false);
   const [viewLanguage, setViewLanguage] = useState<string>('en');
 
-  // Edit dialog state
+  // Edit dialog state (single challenge)
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingChallengeIndex, setEditingChallengeIndex] = useState<number | null>(null);
   const [feedback, setFeedback] = useState('');
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [regenerateError, setRegenerateError] = useState<string | null>(null);
+
+  // Regenerate by type dialog state
+  const [typeDialogOpen, setTypeDialogOpen] = useState(false);
+  const [selectedType, setSelectedType] = useState<string>('');
+  const [typeFeedback, setTypeFeedback] = useState('');
+  const [isRegeneratingType, setIsRegeneratingType] = useState(false);
+  const [typeRegenerateError, setTypeRegenerateError] = useState<string | null>(null);
+
+  // Success message state
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const languages = [
     { code: 'all', label: 'All Languages' },
@@ -180,6 +190,70 @@ export default function DailyBuzzAdminPanel() {
     }
   }, [selectedDate, viewLanguage]);
 
+  // Handle regenerating all challenges of a specific type
+  const handleRegenerateByType = async () => {
+    if (!selectedType || !challengeData || !typeFeedback.trim()) return;
+
+    setIsRegeneratingType(true);
+    setTypeRegenerateError(null);
+
+    try {
+      const { data: { session } } = await getSession();
+      if (!session?.access_token) {
+        throw new Error('No active session');
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), REGENERATE_TIMEOUT_MS);
+
+      const response = await fetch('/api/admin/buzz/regenerate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          date: challengeData.puzzle_date,
+          language: challengeData.language,
+          challengeType: selectedType,
+          feedback: typeFeedback.trim(),
+          saveFeedback: false, // No original challenge to store for type-based regen
+        }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Regeneration failed');
+      }
+
+      const data = await response.json();
+      setChallengeData(data.data);
+      setTypeDialogOpen(false);
+      setTypeFeedback('');
+
+      // Show success message
+      setSuccessMessage(`All ${selectedType.replace(/_/g, ' ')} challenges regenerated successfully!`);
+      setTimeout(() => setSuccessMessage(null), 5000);
+
+      setSelectedType('');
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        setTypeRegenerateError(
+          'Request timed out after 80 seconds. The AI model may be overloaded. ' +
+          'Please try again in a few minutes.'
+        );
+      } else {
+        const errorMsg = error instanceof Error ? error.message : 'Failed to regenerate';
+        setTypeRegenerateError(errorMsg);
+      }
+    } finally {
+      setIsRegeneratingType(false);
+    }
+  };
+
   // Handle regenerating a single challenge
   const handleRegenerate = async () => {
     if (editingChallengeIndex === null || !challengeData || !feedback.trim()) return;
@@ -232,6 +306,10 @@ export default function DailyBuzzAdminPanel() {
       setEditDialogOpen(false);
       setFeedback('');
       setEditingChallengeIndex(null);
+
+      // Show success message
+      setSuccessMessage('Challenge regenerated successfully! Your feedback has been saved for AI improvement.');
+      setTimeout(() => setSuccessMessage(null), 5000);
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
         setRegenerateError(
@@ -499,6 +577,29 @@ export default function DailyBuzzAdminPanel() {
         </motion.div>
       )}
 
+      {/* Success Message Toast */}
+      <AnimatePresence>
+        {successMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-4 right-4 z-50 max-w-md"
+          >
+            <div className="bg-green-900/90 border-2 border-green-500 rounded-xl p-4 shadow-lg flex items-center gap-3">
+              <Check className="w-5 h-5 text-green-400 shrink-0" />
+              <p className="text-green-200 text-sm">{successMessage}</p>
+              <button
+                onClick={() => setSuccessMessage(null)}
+                className="text-green-400 hover:text-green-200 shrink-0"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Today's Challenges Section */}
       <div className="bg-slate-800/50 border-2 border-slate-700 rounded-xl p-6 space-y-4">
         <button
@@ -559,6 +660,22 @@ export default function DailyBuzzAdminPanel() {
                     <RefreshCw className="w-4 h-4" />
                   )}
                 </button>
+                {/* Regenerate by Type button */}
+                {challengeData && (
+                  <button
+                    onClick={() => {
+                      setTypeDialogOpen(true);
+                      setTypeFeedback('');
+                      setSelectedType('');
+                      setTypeRegenerateError(null);
+                    }}
+                    className="ms-auto px-3 py-1.5 rounded-lg border-2 border-neo-orange text-neo-orange hover:bg-neo-orange/10 font-medium text-sm transition-colors flex items-center gap-1.5"
+                    title="Regenerate all challenges of a specific type"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    Regenerate by Type
+                  </button>
+                )}
               </div>
 
               {/* Challenges list */}
@@ -758,6 +875,109 @@ export default function DailyBuzzAdminPanel() {
                 <>
                   <RefreshCw className="w-4 h-4" />
                   Regenerate
+                </>
+              )}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Regenerate by Type Dialog */}
+      <Dialog open={typeDialogOpen} onOpenChange={setTypeDialogOpen}>
+        <DialogContent className="sm:max-w-xl" noDescription>
+          <DialogHeader variant="yellow">
+            <DialogTitle className="flex items-center justify-center gap-2">
+              <RefreshCw className="w-5 h-5" />
+              Regenerate by Challenge Type
+            </DialogTitle>
+          </DialogHeader>
+          <DialogBody className="space-y-4">
+            {challengeData && (
+              <>
+                {/* Challenge type selector */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                    Select challenge type to regenerate
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {Object.entries(CHALLENGE_TYPE_ICONS).map(([type, icon]) => {
+                      const count = challengeData.challenges.filter(c => c.type === type).length;
+                      return (
+                        <button
+                          key={type}
+                          onClick={() => setSelectedType(type)}
+                          disabled={count === 0 || isRegeneratingType}
+                          className={`px-3 py-2 rounded-lg border-2 font-medium text-sm transition-colors flex items-center gap-2 ${
+                            selectedType === type
+                              ? 'bg-neo-orange/20 border-neo-orange text-neo-orange'
+                              : count > 0
+                              ? 'bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500'
+                              : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400 cursor-not-allowed'
+                          }`}
+                        >
+                          <span className="text-lg">{icon}</span>
+                          <span className="flex-1 text-start">{type.replace(/_/g, ' ')}</span>
+                          <span className="text-xs opacity-60">({count})</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Feedback textarea */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                    What is wrong with these {selectedType.replace(/_/g, ' ')} challenges?
+                  </label>
+                  <textarea
+                    value={typeFeedback}
+                    onChange={(e) => setTypeFeedback(e.target.value)}
+                    placeholder="e.g., All wordle answers are too difficult, The anagram clues are too easy, Wrong language register..."
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-700 rounded-lg text-neo-black dark:text-white focus:border-neo-orange focus:outline-none resize-none"
+                    rows={3}
+                    disabled={isRegeneratingType || !selectedType}
+                  />
+                  <p className="mt-1 text-xs text-slate-500">
+                    This will regenerate ALL challenges of the selected type.
+                  </p>
+                </div>
+
+                {/* Error display */}
+                {typeRegenerateError && (
+                  <div className="p-3 bg-red-900/30 border border-red-500 rounded-lg">
+                    <p className="text-sm text-red-400">{typeRegenerateError}</p>
+                  </div>
+                )}
+              </>
+            )}
+          </DialogBody>
+          <DialogFooter>
+            <button
+              onClick={() => {
+                setTypeDialogOpen(false);
+                setTypeFeedback('');
+                setSelectedType('');
+                setTypeRegenerateError(null);
+              }}
+              disabled={isRegeneratingType}
+              className="px-4 py-2 rounded-lg border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:border-slate-400 disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleRegenerateByType}
+              disabled={isRegeneratingType || !selectedType || typeFeedback.trim().length < 5}
+              className="px-4 py-2 rounded-lg bg-neo-orange text-neo-black font-bold border-2 border-neo-black shadow-hard-sm hover:shadow-hard disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {isRegeneratingType ? (
+                <>
+                  <NeoLoader variant="dots" size="sm" />
+                  Regenerating...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-4 h-4" />
+                  Regenerate All {selectedType.replace(/_/g, ' ')}
                 </>
               )}
             </button>

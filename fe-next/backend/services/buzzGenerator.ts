@@ -90,27 +90,52 @@ async function withTimeout<T>(
   }
 }
 
+interface GenerateDailyBuzzOptions {
+  /**
+   * INTERNAL USE ONLY. Pre-fetched trends for batch processing.
+   * DO NOT expose this parameter through any API endpoint.
+   * Allowing external callers to pass custom trends would enable
+   * partial overrides and bypass the trend fetching security model.
+   */
+  cachedTrends?: TrendingTopic[];
+  /**
+   * If true, deletes the existing challenge and all related attempts
+   * before generating a new one. Use for full regeneration when you
+   * want a clean slate (not just an overwrite).
+   */
+  deleteBeforeRegenerate?: boolean;
+}
+
 /**
  * Generate Daily Buzz challenge for a specific date and language
  *
  * @param date - Target date for the challenge
  * @param language - Language code (en, he, sv, ja, es)
- * @param cachedTrends - INTERNAL USE ONLY. Pre-fetched trends for batch processing.
- *                       DO NOT expose this parameter through any API endpoint.
- *                       Allowing external callers to pass custom trends would enable
- *                       partial overrides and bypass the trend fetching security model.
+ * @param options - Generation options (cachedTrends, deleteBeforeRegenerate)
  */
 export async function generateDailyBuzz(
   date: Date,
   language: string,
-  cachedTrends?: TrendingTopic[]
+  options?: GenerateDailyBuzzOptions | TrendingTopic[]
 ): Promise<DailyBuzzData> {
-  console.log(`[BUZZ] Generating Daily Buzz for ${date.toISOString().split('T')[0]}, language: ${language}`);
+  // Handle legacy signature: generateDailyBuzz(date, language, cachedTrends)
+  const opts: GenerateDailyBuzzOptions = Array.isArray(options)
+    ? { cachedTrends: options }
+    : options || {};
+
+  const dateStr = date.toISOString().split('T')[0];
+  console.log(`[BUZZ] Generating Daily Buzz for ${dateStr}, language: ${language}`);
 
   const region = REGION_MAP[language] || 'US';
 
+  // Step 0: Delete existing challenge if requested (for clean regeneration)
+  if (opts.deleteBeforeRegenerate) {
+    console.log(`[BUZZ] Deleting existing challenge before regeneration...`);
+    await deleteDailyBuzz(dateStr, language);
+  }
+
   // Step 1: Get trending topics (from passed in, DB cache, or fresh fetch)
-  let trends = cachedTrends;
+  let trends = opts.cachedTrends;
 
   if (!trends) {
     // Try DB cache first
@@ -1539,7 +1564,150 @@ export async function regenerateSingleChallenge(
   return updatedData;
 }
 
+/**
+ * Regenerate all challenges of a specific type within an existing Daily Buzz
+ * Uses admin feedback to guide the regeneration
+ *
+ * @param date - Puzzle date (YYYY-MM-DD)
+ * @param language - Language code
+ * @param challengeType - Type of challenge to regenerate (e.g., 'wordle_guess', 'anagram')
+ * @param feedback - Admin feedback about what was wrong
+ * @returns Updated DailyBuzzData
+ */
+export async function regenerateChallengesByType(
+  date: string,
+  language: string,
+  challengeType: string,
+  feedback: string
+): Promise<DailyBuzzData> {
+  console.log(`[BUZZ] Regenerating all ${challengeType} challenges for ${date}/${language}`);
+
+  // 1. Fetch existing challenge data
+  const existing = await getDailyBuzz(date, language);
+  if (!existing) {
+    throw new Error(`No challenge found for ${date} (${language})`);
+  }
+
+  // 2. Find all challenges of the specified type
+  const indicesToRegenerate: number[] = [];
+  existing.challenges.forEach((challenge, index) => {
+    if (challenge.type === challengeType) {
+      indicesToRegenerate.push(index);
+    }
+  });
+
+  if (indicesToRegenerate.length === 0) {
+    throw new Error(`No challenges of type "${challengeType}" found in the daily buzz`);
+  }
+
+  console.log(`[BUZZ] Found ${indicesToRegenerate.length} ${challengeType} challenge(s) to regenerate`);
+
+  // 3. Regenerate each challenge of the specified type
+  const updatedChallenges = [...existing.challenges];
+
+  for (const index of indicesToRegenerate) {
+    const badChallenge = existing.challenges[index];
+    console.log(`[BUZZ] Regenerating ${challengeType} at index ${index}: "${badChallenge.answer}"`);
+
+    // Build targeted regeneration prompt
+    const regenerationPrompt = buildSingleChallengePrompt(
+      badChallenge,
+      feedback,
+      language,
+      existing.trending_topics
+    );
+
+    // Generate replacement via AI
+    const newChallenge = await generateSingleChallengeWithAI(regenerationPrompt);
+    console.log(`[BUZZ] New ${challengeType} generated: "${newChallenge.answer}"`);
+
+    // Validate the new challenge
+    if (!validateSingleChallenge(newChallenge, language)) {
+      throw new Error(`Regenerated ${challengeType} challenge failed validation - try different feedback`);
+    }
+
+    updatedChallenges[index] = newChallenge;
+  }
+
+  // 4. Update in database
+  const updatedData: DailyBuzzData = {
+    ...existing,
+    challenges: updatedChallenges,
+  };
+
+  await storeDailyBuzz(updatedData);
+
+  console.log(`[BUZZ] Regenerated ${indicesToRegenerate.length} ${challengeType} challenge(s) successfully`);
+  return updatedData;
+}
+
 // ==================== Database Functions ====================
+
+/**
+ * Delete Daily Buzz challenge from database
+ * This will cascade delete related attempts if FK constraint is set up
+ * Used when admin wants a clean regeneration (not just overwrite)
+ *
+ * @param date - Puzzle date (YYYY-MM-DD)
+ * @param language - Language code
+ * @returns true if deleted, false if not found
+ */
+export async function deleteDailyBuzz(
+  date: string,
+  language: string
+): Promise<boolean> {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const region = REGION_MAP[language] || 'US';
+
+    // First get the challenge ID to delete related attempts
+    const { data: existing, error: fetchError } = await supabase
+      .from('daily_buzz_challenges')
+      .select('id')
+      .eq('puzzle_date', date)
+      .eq('language', language)
+      .eq('region', region)
+      .single();
+
+    if (fetchError || !existing) {
+      console.log(`[BUZZ] No existing challenge found to delete for ${date} (${language})`);
+      return false;
+    }
+
+    // Delete related attempts first (in case no cascade)
+    const { error: attemptsError } = await supabase
+      .from('daily_buzz_attempts')
+      .delete()
+      .eq('challenge_id', existing.id);
+
+    if (attemptsError) {
+      console.warn(`[BUZZ] Failed to delete attempts: ${attemptsError.message}`);
+      // Continue with challenge deletion anyway
+    }
+
+    // Delete the challenge
+    const { error: deleteError } = await supabase
+      .from('daily_buzz_challenges')
+      .delete()
+      .eq('id', existing.id);
+
+    if (deleteError) {
+      throw new Error(`Failed to delete Daily Buzz: ${deleteError.message}`);
+    }
+
+    console.log(`[BUZZ] Deleted Daily Buzz for ${date} (${language}) with ID ${existing.id}`);
+    return true;
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('[BUZZ] Failed to delete Daily Buzz:', errorMessage);
+    throw error;
+  }
+}
 
 /**
  * Get Daily Buzz for a specific date and language

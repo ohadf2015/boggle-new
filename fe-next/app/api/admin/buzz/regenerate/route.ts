@@ -1,8 +1,11 @@
 /**
- * Admin API: Regenerate Single Buzz Challenge
+ * Admin API: Regenerate Buzz Challenge(s)
  * POST /api/admin/buzz/regenerate
  *
- * Regenerates a single challenge with admin feedback.
+ * Supports two modes:
+ * 1. Single challenge: Provide challengeIndex to regenerate one specific challenge
+ * 2. By type: Provide challengeType to regenerate all challenges of that type
+ *
  * Stores feedback in buzz_prompt_examples for future AI improvements.
  */
 
@@ -10,6 +13,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import {
   regenerateSingleChallenge,
+  regenerateChallengesByType,
   storePromptExample,
 } from '@/backend/services/buzzGenerator';
 
@@ -20,7 +24,8 @@ export const maxDuration = 70;
 interface RegenerateRequestBody {
   date: string;
   language: string;
-  challengeIndex: number;
+  challengeIndex?: number; // For single challenge mode
+  challengeType?: string; // For by-type mode (e.g., 'wordle_guess', 'anagram')
   feedback: string;
   originalChallenge?: {
     type: string;
@@ -32,6 +37,16 @@ interface RegenerateRequestBody {
 }
 
 const SUPPORTED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'];
+
+const VALID_CHALLENGE_TYPES = [
+  'anagram',
+  'fill_blank',
+  'word_chain',
+  'definition_match',
+  'trending_trio',
+  'riddle',
+  'wordle_guess',
+];
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   // Verify admin authentication
@@ -54,15 +69,31 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     date,
     language,
     challengeIndex,
+    challengeType,
     feedback,
     originalChallenge,
     saveFeedback = true,
   } = body;
 
-  // Validation
-  if (!date || !language || challengeIndex === undefined || !feedback) {
+  // Base validation
+  if (!date || !language || !feedback) {
     return NextResponse.json(
-      { error: 'Missing required fields: date, language, challengeIndex, feedback' },
+      { error: 'Missing required fields: date, language, feedback' },
+      { status: 400 }
+    );
+  }
+
+  // Must provide either challengeIndex OR challengeType (but not both)
+  if (challengeIndex === undefined && !challengeType) {
+    return NextResponse.json(
+      { error: 'Must provide either challengeIndex (for single challenge) or challengeType (for all of that type)' },
+      { status: 400 }
+    );
+  }
+
+  if (challengeIndex !== undefined && challengeType) {
+    return NextResponse.json(
+      { error: 'Cannot provide both challengeIndex and challengeType. Choose one mode.' },
       { status: 400 }
     );
   }
@@ -83,10 +114,18 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
-  // Validate challenge index
-  if (typeof challengeIndex !== 'number' || challengeIndex < 0) {
+  // Validate challengeIndex if provided
+  if (challengeIndex !== undefined && (typeof challengeIndex !== 'number' || challengeIndex < 0)) {
     return NextResponse.json(
       { error: 'challengeIndex must be a non-negative number' },
+      { status: 400 }
+    );
+  }
+
+  // Validate challengeType if provided
+  if (challengeType && !VALID_CHALLENGE_TYPES.includes(challengeType)) {
+    return NextResponse.json(
+      { error: `Invalid challengeType. Use: ${VALID_CHALLENGE_TYPES.join(', ')}` },
       { status: 400 }
     );
   }
@@ -101,7 +140,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   try {
     // 1. Store the feedback example (before regeneration) for AI learning
-    if (saveFeedback && originalChallenge) {
+    // Only store for single challenge mode where we have originalChallenge
+    if (saveFeedback && originalChallenge && challengeIndex !== undefined) {
       try {
         await storePromptExample(
           language,
@@ -119,17 +159,34 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       }
     }
 
-    // 2. Regenerate the challenge
-    const updatedData = await regenerateSingleChallenge(
-      date,
-      language,
-      challengeIndex,
-      feedback.trim()
-    );
+    // 2. Regenerate challenge(s) based on mode
+    let updatedData;
+    let message: string;
+
+    if (challengeIndex !== undefined) {
+      // Single challenge mode
+      updatedData = await regenerateSingleChallenge(
+        date,
+        language,
+        challengeIndex,
+        feedback.trim()
+      );
+      message = 'Challenge regenerated successfully';
+    } else {
+      // By-type mode
+      updatedData = await regenerateChallengesByType(
+        date,
+        language,
+        challengeType!,
+        feedback.trim()
+      );
+      const count = updatedData.challenges.filter(c => c.type === challengeType).length;
+      message = `Regenerated ${count} ${challengeType} challenge(s) successfully`;
+    }
 
     return NextResponse.json({
       success: true,
-      message: 'Challenge regenerated successfully',
+      message,
       data: updatedData,
     });
   } catch (error) {
