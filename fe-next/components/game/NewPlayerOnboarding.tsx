@@ -32,7 +32,8 @@ const SwipeDemo = () => (
           className={cn(
             'w-11 h-11 flex items-center justify-center rounded-md',
             'text-lg font-bold',
-            i <= 2 ? 'bg-neo-cyan/30 text-neo-cyan border border-neo-cyan/50' : 'bg-slate-700/50 text-neo-cream/50'
+            // Highlighted letters: bright cyan bg with dark text for high contrast
+            i <= 2 ? 'bg-neo-cyan text-neo-black border-2 border-neo-black shadow-hard-sm' : 'bg-slate-700/50 text-neo-cream/50 border border-slate-600'
           )}
           animate={i <= 2 ? { scale: [1, 1.1, 1] } : undefined}
           transition={{ delay: i * 0.3, duration: 0.4, repeat: i <= 2 ? Infinity : 0, repeatDelay: 1.5 }}
@@ -49,7 +50,7 @@ const SwipeDemo = () => (
       <motion.path
         d="M 24 24 L 72 24 L 24 72"
         fill="none"
-        stroke="#00FFFF"
+        stroke="#1a1a2e"
         strokeWidth="3"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -65,11 +66,11 @@ const SwipeDemo = () => (
 const ScoringAndTipsVisual = () => (
   <div className="space-y-3 mt-2">
     {/* Scoring chart */}
-    <div className="flex items-end justify-center gap-1">
+    <div className="flex items-end justify-center gap-1.5">
       {[
-        { letters: 3, points: 1, color: 'bg-slate-500' },
-        { letters: 4, points: 2, color: 'bg-neo-cyan/70' },
-        { letters: 5, points: 4, color: 'bg-neo-lime/80' },
+        { letters: 3, points: 1, color: 'bg-slate-400' },
+        { letters: 4, points: 2, color: 'bg-neo-cyan' },
+        { letters: 5, points: 4, color: 'bg-neo-lime' },
         { letters: 6, points: 8, color: 'bg-neo-yellow' },
         { letters: '7+', points: '16+', color: 'bg-neo-orange' },
       ].map((item, i) => (
@@ -80,24 +81,24 @@ const ScoringAndTipsVisual = () => (
           transition={{ delay: i * 0.1, type: 'spring', stiffness: 300 }}
           className="flex flex-col items-center origin-bottom"
         >
-          <span className="text-[10px] font-bold text-neo-cream/90 mb-0.5">+{item.points}</span>
+          <span className="text-[10px] font-bold text-neo-cream mb-0.5">+{item.points}</span>
           <div
-            className={cn('w-7 rounded-t-sm border border-neo-black/30', item.color)}
+            className={cn('w-7 rounded-t-sm border-2 border-neo-black/50', item.color)}
             style={{ height: `${18 + i * 6}px` }}
           />
-          <span className="text-[9px] font-medium text-neo-cream/60 mt-0.5">{item.letters}</span>
+          <span className="text-[9px] font-bold text-neo-cream/80 mt-0.5">{item.letters}</span>
         </motion.div>
       ))}
     </div>
-    {/* Tips row */}
+    {/* Tips row - improved contrast */}
     <div className="flex justify-center gap-4 text-[10px]">
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 bg-neo-yellow/20 px-2 py-1 rounded-neo">
         <Zap className="w-3 h-3 text-neo-yellow" />
-        <span className="text-neo-cream/70">Fast = Combo</span>
+        <span className="text-neo-cream font-bold">Fast = Combo</span>
       </div>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 bg-neo-pink/20 px-2 py-1 rounded-neo">
         <Target className="w-3 h-3 text-neo-pink" />
-        <span className="text-neo-cream/70">Unique = Points</span>
+        <span className="text-neo-cream font-bold">Unique = Points</span>
       </div>
     </div>
   </div>

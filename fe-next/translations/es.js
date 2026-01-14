@@ -91,6 +91,7 @@ const es = {
     "notConnected": "Sin conexión",
     "connected": "Conectado",
     "left": "restante",
+    "optional": "opcional",
     "processing": "Procesando...",
     "offline": "sin conexión",
     "online": "en línea",
@@ -2417,6 +2418,8 @@ const es = {
     "alreadyPlayed": "¡Ya jugaste hoy! Vuelve mañana.",
     "badge": "🔥 NUEVO",
     "betaPreview": "✨ BETA",
+    "breaking": "ÚLTIMA HORA",
+    "tapToCelebrate": "Toca para celebrar",
     "challenges": "Retos",
     "letters": "letras",
     "connectingWord": "PALABRA CONECTORA",
@@ -3121,6 +3124,19 @@ const es = {
       "left": "restante",
       "started": "Iniciado",
       "lastUpdated": "Última actualización"
+    },
+    "email": {
+      "title": "Prueba de Email",
+      "recipientEmail": "Email del destinatario",
+      "recipientName": "Nombre del destinatario",
+      "sendTest": "Enviar email de prueba",
+      "sending": "Enviando...",
+      "errorNoEmail": "Por favor ingresa una dirección de email",
+      "showPreview": "Vista previa",
+      "hidePreview": "Ocultar vista previa",
+      "preview": "Vista previa del email",
+      "previewNote": "La vista previa muestra cómo se verá el email en la bandeja de entrada de los destinatarios.",
+      "info": "Los emails de prueba se envían con el prefijo [TEST] en el asunto. Usan la misma plantilla que los emails del desafío diario de producción."
     },
     "todayGames": {
       "title": "Juegos de Hoy",

@@ -87,7 +87,7 @@ interface EmailRecipient {
  * Get subscribed users who should receive emails at the current hour
  * Filters by timezone to send at approximately 8 AM local time
  */
-export async function getEligibleRecipients(targetHourUTC: number): Promise<EmailRecipient[]> {
+export async function getEligibleRecipients(_targetHourUTC: number): Promise<EmailRecipient[]> {
   const supabase = getSupabaseAdmin();
   if (!supabase) {
     console.error('[Email] Supabase admin client not available');
@@ -192,9 +192,9 @@ function getLocalHour(timezone: string): number {
  */
 const SUBJECT_LINES = [
   (n: number) => `🔥 Daily #${n} just dropped`,
-  (n: number) => `Your puzzle awaits, Word Hunter`,
+  (_n: number) => `Your puzzle awaits, Word Hunter`,
   (n: number) => `Daily #${n} - Can you crack it?`,
-  (n: number) => `⚡ Fresh puzzle. Same grid. Beat everyone.`,
+  (_n: number) => `⚡ Fresh puzzle. Same grid. Beat everyone.`,
   (n: number) => `Daily #${n} is live - don't miss out`,
 ];
 
@@ -208,6 +208,7 @@ function getSubjectLine(puzzleNumber: number): string {
 
 /**
  * Generate the HTML email content for daily challenge
+ * Uses Neo-Brutalist design: hard shadows, thick borders, bold colors
  */
 function generateDailyChallengeEmail(
   recipientName: string,
@@ -215,10 +216,25 @@ function generateDailyChallengeEmail(
   unsubscribeUrl: string,
   playUrl: string,
   baseUrl: string,
-  language: string = 'en'
+  _language: string = 'en'
 ): { subject: string; html: string; text: string } {
   const subject = getSubjectLine(puzzleNumber);
   const logoUrl = `${baseUrl}/logos/lexiclash_logo_english-min.png`;
+  const bannerUrl = `${baseUrl}/email/daily-banner.png`;
+
+  // Neo-brutalist color palette
+  const colors = {
+    navy: '#1a1a2e',
+    navyLight: '#252545',
+    lime: '#CCFF00',
+    pink: '#FF1493',
+    cyan: '#00FFFF',
+    orange: '#FF6B35',
+    white: '#FFFFFF',
+    black: '#000000',
+    gray: '#666666',
+    grayLight: '#888888',
+  };
 
   const html = `
 <!DOCTYPE html>
@@ -226,72 +242,144 @@ function generateDailyChallengeEmail(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <meta name="supported-color-schemes" content="dark">
   <title>${subject}</title>
+  <!--[if mso]>
+  <style type="text/css">
+    body, table, td { font-family: Arial, sans-serif !important; }
+  </style>
+  <![endif]-->
 </head>
-<body style="margin: 0; padding: 0; background-color: #1a1a2e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
-  <table role="presentation" style="width: 100%; border-collapse: collapse;">
+<body style="margin: 0; padding: 0; background-color: ${colors.navy}; font-family: 'Fredoka', 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <!-- Preheader text (hidden) -->
+  <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all;">
+    Daily #${puzzleNumber} is here - same grid, one shot, beat everyone! &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
+  </div>
+
+  <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: ${colors.navy};">
     <tr>
-      <td align="center" style="padding: 40px 20px;">
-        <table role="presentation" style="max-width: 480px; width: 100%; border-collapse: collapse;">
-          <!-- Logo -->
+      <td align="center" style="padding: 32px 16px;">
+        <table role="presentation" style="max-width: 520px; width: 100%; border-collapse: collapse;">
+
+          <!-- Logo Row -->
           <tr>
-            <td align="center" style="padding-bottom: 24px;">
+            <td align="center" style="padding-bottom: 20px;">
               <a href="${baseUrl}" style="text-decoration: none;">
-                <img src="${logoUrl}" alt="LexiClash" width="180" style="display: block; max-width: 180px; height: auto;" />
+                <img src="${logoUrl}" alt="LexiClash" width="160" style="display: block; max-width: 160px; height: auto;" />
+              </a>
+            </td>
+          </tr>
+
+          <!-- Hero Banner -->
+          <tr>
+            <td style="padding-bottom: 0;">
+              <a href="${playUrl}" style="text-decoration: none;">
+                <img src="${bannerUrl}" alt="Daily Challenge" width="520" style="display: block; width: 100%; max-width: 520px; height: auto; border: 4px solid ${colors.black}; border-bottom: 0; border-radius: 16px 16px 0 0; box-shadow: 6px 0 0 ${colors.black};" />
               </a>
             </td>
           </tr>
 
           <!-- Main Card -->
           <tr>
-            <td style="background: linear-gradient(180deg, #2a2a4e 0%, #1f1f3a 100%); border: 4px solid #000; border-radius: 12px; padding: 28px 24px; box-shadow: 8px 8px 0px #000;">
-              <!-- Daily Number Badge -->
-              <table role="presentation" style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <td style="background: linear-gradient(180deg, ${colors.navyLight} 0%, ${colors.navy} 100%); border: 4px solid ${colors.black}; border-top: 0; border-radius: 0 0 16px 16px; padding: 24px 28px 28px; box-shadow: 6px 6px 0px ${colors.black};">
+
+              <!-- Puzzle Number Badge -->
+              <table role="presentation" style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
                 <tr>
                   <td align="center">
-                    <span style="display: inline-block; background-color: #FFE135; color: #000; font-size: 14px; font-weight: 900; padding: 6px 16px; border: 3px solid #000; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">
-                      Daily #${puzzleNumber}
+                    <span style="display: inline-block; background-color: ${colors.lime}; color: ${colors.black}; font-size: 13px; font-weight: 900; padding: 8px 20px; border: 3px solid ${colors.black}; border-radius: 50px; text-transform: uppercase; letter-spacing: 2px; box-shadow: 3px 3px 0 ${colors.black};">
+                      ⚡ Puzzle #${puzzleNumber}
                     </span>
                   </td>
                 </tr>
               </table>
 
               <!-- Greeting -->
-              <h1 style="color: #ffffff; font-size: 24px; margin: 0 0 12px 0; font-weight: 800; text-align: center; line-height: 1.3;">
-                ${recipientName}, it's go time! ⚡
+              <h1 style="color: ${colors.white}; font-size: 26px; margin: 0 0 8px 0; font-weight: 800; text-align: center; line-height: 1.2;">
+                ${recipientName}, ready to play?
               </h1>
 
-              <!-- Short Punchy Message -->
-              <p style="color: #00FFFF; font-size: 16px; line-height: 1.5; margin: 0 0 24px 0; text-align: center; font-weight: 600;">
-                One grid. One shot. Beat the world.
+              <!-- Tagline -->
+              <p style="color: ${colors.cyan}; font-size: 18px; line-height: 1.4; margin: 0 0 20px 0; text-align: center; font-weight: 700;">
+                Today's grid is live. Think you can beat it?
               </p>
 
-              <!-- CTA Button - Large and Bold -->
+              <!-- Value Props (compact grid) -->
+              <table role="presentation" style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+                <tr>
+                  <td width="33%" align="center" style="padding: 8px 4px;">
+                    <div style="background: rgba(204, 255, 0, 0.1); border: 2px solid ${colors.lime}; border-radius: 8px; padding: 12px 8px;">
+                      <div style="font-size: 20px; margin-bottom: 4px;">🎯</div>
+                      <div style="color: ${colors.lime}; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Same Grid</div>
+                      <div style="color: ${colors.grayLight}; font-size: 9px; margin-top: 2px;">Fair play</div>
+                    </div>
+                  </td>
+                  <td width="33%" align="center" style="padding: 8px 4px;">
+                    <div style="background: rgba(255, 20, 147, 0.1); border: 2px solid ${colors.pink}; border-radius: 8px; padding: 12px 8px;">
+                      <div style="font-size: 20px; margin-bottom: 4px;">⚡</div>
+                      <div style="color: ${colors.pink}; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">One Shot</div>
+                      <div style="color: ${colors.grayLight}; font-size: 9px; margin-top: 2px;">No retries</div>
+                    </div>
+                  </td>
+                  <td width="33%" align="center" style="padding: 8px 4px;">
+                    <div style="background: rgba(0, 255, 255, 0.1); border: 2px solid ${colors.cyan}; border-radius: 8px; padding: 12px 8px;">
+                      <div style="font-size: 20px; margin-bottom: 4px;">🏆</div>
+                      <div style="color: ${colors.cyan}; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Climb Up</div>
+                      <div style="color: ${colors.grayLight}; font-size: 9px; margin-top: 2px;">Leaderboard</div>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- CTA Button - Neo-Brutalist style -->
               <table role="presentation" style="width: 100%; border-collapse: collapse;">
                 <tr>
                   <td align="center">
-                    <a href="${playUrl}" style="display: block; width: 100%; max-width: 280px; background-color: #FFE135; color: #000; font-size: 22px; font-weight: 900; text-decoration: none; padding: 18px 32px; border: 4px solid #000; border-radius: 12px; box-shadow: 6px 6px 0px #000; text-transform: uppercase; letter-spacing: 2px; text-align: center;">
-                      🎯 PLAY NOW
+                    <!--[if mso]>
+                    <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${playUrl}" style="height:60px;v-text-anchor:middle;width:280px;" arcsize="17%" stroke="t" strokecolor="${colors.black}" strokeweight="4px" fillcolor="${colors.lime}">
+                      <w:anchorlock/>
+                      <center style="color:${colors.black};font-family:Arial,sans-serif;font-size:20px;font-weight:bold;">PLAY NOW</center>
+                    </v:roundrect>
+                    <![endif]-->
+                    <!--[if !mso]><!-->
+                    <a href="${playUrl}" style="display: inline-block; background-color: ${colors.lime}; color: ${colors.black}; font-size: 20px; font-weight: 900; text-decoration: none; padding: 16px 48px; border: 4px solid ${colors.black}; border-radius: 12px; box-shadow: 5px 5px 0px ${colors.black}; text-transform: uppercase; letter-spacing: 3px; transition: all 0.1s ease;">
+                      🎮 PLAY NOW
                     </a>
+                    <!--<![endif]-->
                   </td>
                 </tr>
               </table>
 
               <!-- Streak Reminder -->
-              <p style="color: #FF6B35; font-size: 15px; margin: 20px 0 0 0; text-align: center; font-weight: 700;">
-                🔥 Don't break your streak!
-              </p>
+              <table role="presentation" style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <tr>
+                  <td align="center">
+                    <div style="background: linear-gradient(90deg, rgba(255, 107, 53, 0.15) 0%, rgba(255, 107, 53, 0.05) 100%); border-left: 4px solid ${colors.orange}; border-radius: 0 8px 8px 0; padding: 12px 16px;">
+                      <span style="color: ${colors.orange}; font-size: 15px; font-weight: 700;">
+                        🔥 Your streak is on the line — don't let it slip!
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
 
           <!-- Footer -->
           <tr>
-            <td style="padding-top: 20px; text-align: center;">
-              <p style="color: #666; font-size: 11px; margin: 0; line-height: 1.6;">
-                <a href="${unsubscribeUrl}" style="color: #888; text-decoration: underline;">Unsubscribe</a>
+            <td style="padding-top: 24px; text-align: center;">
+              <p style="color: ${colors.gray}; font-size: 12px; margin: 0 0 8px 0; line-height: 1.6;">
+                You're receiving this because you subscribed to daily challenges.
+              </p>
+              <p style="color: ${colors.grayLight}; font-size: 11px; margin: 0; line-height: 1.6;">
+                <a href="${unsubscribeUrl}" style="color: ${colors.grayLight}; text-decoration: underline;">Unsubscribe</a>
+                &nbsp;•&nbsp;
+                <a href="${baseUrl}" style="color: ${colors.grayLight}; text-decoration: underline;">Visit LexiClash</a>
               </p>
             </td>
           </tr>
+
         </table>
       </td>
     </tr>
@@ -301,18 +389,25 @@ function generateDailyChallengeEmail(
 `;
 
   const text = `
-${recipientName}, it's go time!
+${recipientName}, ready to play?
 
-DAILY #${puzzleNumber}
+═══════════════════════════
+   DAILY CHALLENGE #${puzzleNumber}
+═══════════════════════════
 
-One grid. One shot. Beat the world.
+Today's grid is live. Think you can beat it?
 
-🎯 PLAY NOW: ${playUrl}
+🎯 Same Grid (Fair play)
+⚡ One Shot (No retries)
+🏆 Climb the Leaderboard
 
-🔥 Don't break your streak!
+▶ PLAY NOW: ${playUrl}
+
+🔥 Your streak is on the line — don't let it slip!
 
 ---
 Unsubscribe: ${unsubscribeUrl}
+Visit: ${baseUrl}
 `;
 
   return { subject, html, text };

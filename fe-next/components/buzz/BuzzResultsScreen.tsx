@@ -2,7 +2,20 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Share2, Trophy, ArrowLeft, Copy, Check, Flame, CheckCircle2, XCircle } from 'lucide-react';
+import {
+  Share2,
+  Trophy,
+  ArrowLeft,
+  Copy,
+  Check,
+  Flame,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  Target,
+  Sparkles,
+  ChevronDown,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fireConfetti } from '@/utils/confettiUtils';
@@ -128,204 +141,299 @@ export default function BuzzResultsScreen({
     }
   }, [shareText, handleCopy]);
 
+  // State for collapsible challenge review
+  const [isReviewExpanded, setIsReviewExpanded] = useState(true);
+
+  // Calculate score percentage for visual feedback
+  const scorePercentage = resultData.score;
+  const getScoreColor = () => {
+    if (scorePercentage >= 80) return 'neo-lime';
+    if (scorePercentage >= 60) return 'neo-yellow';
+    if (scorePercentage >= 40) return 'neo-orange';
+    return 'neo-pink';
+  };
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      className="flex-1 flex flex-col items-center justify-start p-4 pb-24 md:pb-4 overflow-y-auto"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="flex-1 flex flex-col items-center justify-start p-4 pb-24 md:pb-4 overflow-y-auto relative"
     >
-      {/* Back button - now in document flow with spacing */}
-      <div className="w-full max-w-md mb-4">
+      {/* Celebration background effect for high scores */}
+      {scorePercentage >= 60 && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute inset-0 opacity-[0.03]">
+            <div
+              className="absolute inset-0 animate-pulse"
+              style={{
+                backgroundImage: `radial-gradient(circle at 50% 30%, var(--neo-yellow) 0%, transparent 50%)`,
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Back button */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="w-full max-w-lg mb-4"
+      >
         <Button variant="ghost" size="sm" onClick={onBack}>
           <ArrowLeft className="w-4 h-4 me-2 rtl:rotate-180" />
           {t('daily.home') || 'Home'}
         </Button>
-      </div>
+      </motion.div>
 
       {/* Main content */}
-      <div className="max-w-md w-full text-center space-y-5">
+      <div className="max-w-lg w-full text-center space-y-5 relative z-10">
         {/* Completion badge */}
         <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', delay: 0.1 }}
+          initial={{ scale: 0, rotate: -10 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: 'spring', stiffness: 300, delay: 0.1 }}
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-neo-cyan/20 rounded-full border border-neo-cyan/40">
-            <Trophy className="w-4 h-4 text-neo-cyan" />
-            <span className="font-bold text-neo-cyan text-sm uppercase tracking-wide">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-neo-cyan/15 rounded-neo-lg border-2 border-neo-cyan/40 shadow-hard-sm">
+            <Trophy className="w-5 h-5 text-neo-cyan" />
+            <span className="font-black text-neo-cyan text-sm uppercase tracking-wide">
               {t('buzz.results.title') || 'BUZZ COMPLETE!'}
             </span>
           </div>
         </motion.div>
 
-        {/* Score */}
+        {/* Score Display - Hero Section */}
         <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
+          initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] py-2"
-          onClick={() =>
-            fireConfetti({
-              particleCount: 30,
-              spread: 80,
-              origin: { y: 0.6 },
-            })
-          }
+          transition={{ delay: 0.2, type: 'spring' }}
+          className="relative py-4"
         >
-          <div className="text-xs text-slate-500 uppercase font-bold tracking-wider">
-            {t('buzz.yourScore') || 'YOUR SCORE'}
+          {/* Decorative rings */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className={`w-40 h-40 rounded-full border-4 border-${getScoreColor()}/20 animate-ping`} style={{ animationDuration: '2s' }} />
           </div>
-          <div className="text-7xl md:text-8xl font-black text-neo-yellow drop-shadow-[0_0_20px_rgba(255,225,53,0.3)] my-1">
-            {resultData.score}
-          </div>
-          <div className="text-slate-400 text-sm font-medium">/100</div>
+
+          {/* Score container */}
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="relative cursor-pointer"
+            onClick={() =>
+              fireConfetti({
+                particleCount: 40,
+                spread: 90,
+                origin: { y: 0.5 },
+                colors: ['#FFE135', '#00FF00', '#00FFFF', '#FF1493'],
+              })
+            }
+          >
+            <div className="text-xs text-slate-500 uppercase font-black tracking-widest mb-2">
+              {t('buzz.yourScore') || 'YOUR SCORE'}
+            </div>
+
+            {/* Main score number */}
+            <div className="relative inline-block">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className={`text-7xl sm:text-8xl md:text-9xl font-black text-${getScoreColor()} leading-none`}
+                style={{
+                  textShadow: `0 0 40px var(--${getScoreColor()})`,
+                }}
+              >
+                {resultData.score}
+              </motion.div>
+              <div className="text-slate-400 text-lg font-bold mt-1">/100</div>
+            </div>
+
+            {/* Tap to celebrate hint */}
+            <p className="text-xs text-slate-600 mt-2">
+              {t('buzz.tapToCelebrate') || 'Tap to celebrate'}
+            </p>
+          </motion.div>
         </motion.div>
 
         {/* Perfect score badge */}
         {isPerfect && (
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', delay: 0.3 }}
-            className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-full border border-amber-500/40"
+            initial={{ scale: 0, rotate: -5 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: 'spring', delay: 0.35 }}
+            className="relative"
           >
-            <Flame className="w-5 h-5 text-amber-400" />
-            <span className="font-black text-amber-400">
-              {t('buzz.results.perfect') || '🔥 PERFECT SCORE!'}
-            </span>
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500/25 to-orange-500/25 rounded-neo-lg border-3 border-amber-500/50 shadow-hard-sm">
+              <Flame className="w-6 h-6 text-amber-400 animate-pulse" />
+              <span className="font-black text-amber-400 text-lg">
+                {t('buzz.results.perfect') || 'PERFECT SCORE!'}
+              </span>
+              <Flame className="w-6 h-6 text-amber-400 animate-pulse" />
+            </div>
           </motion.div>
         )}
 
-        {/* Stats */}
+        {/* Stats Cards */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="bg-slate-800/50 rounded-xl border border-slate-700/50 p-3"
+          className="grid grid-cols-3 gap-2"
         >
-          <div className="flex items-center justify-around">
-            <div className="text-center px-3">
-              <div className="text-2xl font-black text-white">{correctCount}</div>
-              <div className="text-xs text-slate-400 font-medium">
-                {t('buzz.correct') || 'CORRECT'}
-              </div>
+          {/* Correct */}
+          <div className="bg-slate-900/80 rounded-neo-lg border-2 border-slate-700 p-3">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <Target className="w-4 h-4 text-neo-lime" />
             </div>
-            <div className="w-px h-8 bg-slate-700" />
-            <div className="text-center px-3">
-              <div className="text-2xl font-black text-white">{totalChallenges}</div>
-              <div className="text-xs text-slate-400 font-medium">
-                {t('buzz.total') || 'TOTAL'}
-              </div>
+            <div className="text-2xl sm:text-3xl font-black text-white">{correctCount}</div>
+            <div className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase">
+              {t('buzz.correct') || 'CORRECT'}
             </div>
-            <div className="w-px h-8 bg-slate-700" />
-            <div className="text-center px-3">
-              <div className="text-2xl font-black text-white">
-                {Math.floor(resultData.completionTimeSeconds / 60)}:
-                {(resultData.completionTimeSeconds % 60).toString().padStart(2, '0')}
-              </div>
-              <div className="text-xs text-slate-400 font-medium">
-                {t('results.time') || 'TIME'}
-              </div>
+          </div>
+
+          {/* Total */}
+          <div className="bg-slate-900/80 rounded-neo-lg border-2 border-slate-700 p-3">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <Sparkles className="w-4 h-4 text-neo-cyan" />
+            </div>
+            <div className="text-2xl sm:text-3xl font-black text-white">{totalChallenges}</div>
+            <div className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase">
+              {t('buzz.total') || 'TOTAL'}
+            </div>
+          </div>
+
+          {/* Time */}
+          <div className="bg-slate-900/80 rounded-neo-lg border-2 border-slate-700 p-3">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <Clock className="w-4 h-4 text-neo-yellow" />
+            </div>
+            <div className="text-2xl sm:text-3xl font-black text-white tabular-nums">
+              {Math.floor(resultData.completionTimeSeconds / 60)}:
+              {(resultData.completionTimeSeconds % 60).toString().padStart(2, '0')}
+            </div>
+            <div className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase">
+              {t('results.time') || 'TIME'}
             </div>
           </div>
         </motion.div>
 
-        {/* Challenge Review Section - Expanded by default */}
+        {/* Challenge Review Section - Collapsible */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.45 }}
-          className="bg-slate-900/50 rounded-xl border border-slate-700 p-4 text-left"
+          className="bg-slate-900/60 rounded-neo-lg border-2 border-slate-700 overflow-hidden"
         >
-          <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-3">
-            {t('buzz.results.reviewTitle') || 'CHALLENGE REVIEW'}
-          </div>
-          <div className="space-y-3">
-            {resultData.challengesSolved.map((solved, index) => {
-              const challenge = challengeData.challenges[solved.challengeIndex];
-              if (!challenge) return null;
+          {/* Collapsible Header */}
+          <button
+            onClick={() => setIsReviewExpanded(!isReviewExpanded)}
+            className="w-full flex items-center justify-between p-4 hover:bg-slate-800/50 transition-colors text-left"
+          >
+            <span className="text-xs text-slate-400 uppercase font-black tracking-wider">
+              {t('buzz.results.reviewTitle') || 'CHALLENGE REVIEW'}
+            </span>
+            <motion.div
+              animate={{ rotate: isReviewExpanded ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ChevronDown className="w-5 h-5 text-slate-400" />
+            </motion.div>
+          </button>
 
-              const isSkipped = !solved.userAnswer || solved.userAnswer.trim() === '';
+          {/* Collapsible Content */}
+          <motion.div
+            initial={false}
+            animate={{
+              height: isReviewExpanded ? 'auto' : 0,
+              opacity: isReviewExpanded ? 1 : 0,
+            }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className="px-4 pb-4 space-y-2">
+              {resultData.challengesSolved.map((solved, index) => {
+                const challenge = challengeData.challenges[solved.challengeIndex];
+                if (!challenge) return null;
 
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
-                  className={`
-                    p-3 rounded-lg border-2 transition-colors
-                    ${solved.correct
-                      ? 'bg-emerald-900/30 border-emerald-700/50'
-                      : 'bg-red-900/30 border-red-700/50'
-                    }
-                  `}
-                >
-                  {/* Challenge number and status */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-slate-400 font-medium">
-                      #{index + 1}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      {solved.correct ? (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                      ) : (
-                        <XCircle className="w-4 h-4 text-red-400" />
-                      )}
-                      <span className={`text-xs font-bold ${solved.correct ? 'text-emerald-400' : 'text-red-400'}`}>
-                        {solved.correct
-                          ? (t('buzz.feedback.correct') || 'CORRECT')
-                          : isSkipped
-                            ? (t('buzz.results.skipped') || 'SKIPPED')
-                            : (t('buzz.feedback.incorrect') || 'INCORRECT')
-                        }
-                      </span>
-                    </div>
-                  </div>
+                const isSkipped = !solved.userAnswer || solved.userAnswer.trim() === '';
 
-                  {/* Challenge prompt */}
-                  <p className="text-white text-sm font-medium mb-2 leading-relaxed">
-                    {challenge.prompt}
-                  </p>
-
-                  {/* Answer comparison */}
-                  <div className="space-y-1">
-                    {/* Correct answer */}
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-slate-400 min-w-[80px]">
-                        {t('buzz.results.correctAnswer') || 'Answer:'}
-                      </span>
-                      <span className="text-sm font-bold text-emerald-300 uppercase">
-                        {challenge.answer}
-                      </span>
-                    </div>
-
-                    {/* User's answer (if different and not skipped) */}
-                    {!solved.correct && !isSkipped && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-slate-400 min-w-[80px]">
-                          {t('buzz.results.yourAnswer') || 'You said:'}
-                        </span>
-                        <span className="text-sm text-red-300 line-through uppercase">
-                          {solved.userAnswer}
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 + index * 0.05 }}
+                    className={`
+                      p-3 rounded-neo border-2 transition-colors
+                      ${
+                        solved.correct
+                          ? 'bg-emerald-900/20 border-emerald-700/40'
+                          : 'bg-red-900/20 border-red-700/40'
+                      }
+                    `}
+                  >
+                    {/* Challenge number and status */}
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs text-slate-500 font-bold">#{index + 1}</span>
+                      <div className="flex items-center gap-1.5">
+                        {solved.correct ? (
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        ) : (
+                          <XCircle className="w-4 h-4 text-red-400" />
+                        )}
+                        <span
+                          className={`text-xs font-black ${solved.correct ? 'text-emerald-400' : 'text-red-400'}`}
+                        >
+                          {solved.correct
+                            ? t('buzz.feedback.correct') || 'CORRECT'
+                            : isSkipped
+                              ? t('buzz.results.skipped') || 'SKIPPED'
+                              : t('buzz.feedback.incorrect') || 'INCORRECT'}
                         </span>
                       </div>
-                    )}
-                  </div>
-
-                  {/* Trending context explanation */}
-                  {challenge.trendingContext && (
-                    <div className="mt-2 pt-2 border-t border-slate-700/50">
-                      <p className="text-xs text-slate-400 leading-relaxed">
-                        {challenge.trendingContext}
-                      </p>
                     </div>
-                  )}
-                </motion.div>
-              );
-            })}
-          </div>
+
+                    {/* Challenge prompt */}
+                    <p className="text-white text-sm font-medium mb-2 leading-relaxed text-left">
+                      {challenge.prompt}
+                    </p>
+
+                    {/* Answer comparison */}
+                    <div className="space-y-1 text-left">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-slate-500 min-w-[70px]">
+                          {t('buzz.results.correctAnswer') || 'Answer:'}
+                        </span>
+                        <span className="text-sm font-black text-emerald-300 uppercase">
+                          {challenge.answer}
+                        </span>
+                      </div>
+
+                      {!solved.correct && !isSkipped && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-slate-500 min-w-[70px]">
+                            {t('buzz.results.yourAnswer') || 'You said:'}
+                          </span>
+                          <span className="text-sm text-red-300/80 line-through uppercase">
+                            {solved.userAnswer}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Trending context */}
+                    {challenge.trendingContext && (
+                      <div className="mt-2 pt-2 border-t border-slate-700/40">
+                        <p className="text-xs text-slate-400 leading-relaxed text-left">
+                          {challenge.trendingContext}
+                        </p>
+                      </div>
+                    )}
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
         </motion.div>
 
         {/* Trending Summary */}
@@ -333,14 +441,15 @@ export default function BuzzResultsScreen({
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="bg-slate-900/50 rounded-lg border border-slate-700 p-4 text-left"
+          className="bg-slate-900/50 rounded-neo-lg border-2 border-slate-700 p-4 text-left"
         >
-          <div className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">
-            {t('buzz.results.trending') || "TODAY'S TOPICS"}
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles className="w-4 h-4 text-neo-cyan" />
+            <span className="text-xs text-slate-500 uppercase font-black tracking-wider">
+              {t('buzz.results.trending') || "TODAY'S TOPICS"}
+            </span>
           </div>
-          <p className="text-white text-sm leading-relaxed">
-            {challengeData.trendingSummary}
-          </p>
+          <p className="text-white text-sm leading-relaxed">{challengeData.trendingSummary}</p>
         </motion.div>
 
         {/* Share Section */}
@@ -348,14 +457,16 @@ export default function BuzzResultsScreen({
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="space-y-3"
+          className="space-y-3 pt-2"
         >
           {/* Primary CTA */}
           <Button
             onClick={handleNativeShare}
-            className="w-full py-4 text-base font-black uppercase bg-neo-cyan text-neo-black border-3 border-neo-black rounded-xl shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all duration-150"
+            className="group relative w-full py-4 text-base font-black uppercase bg-neo-cyan text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all overflow-hidden"
           >
-            <Share2 className="mr-2 w-5 h-5" />
+            {/* Shine effect */}
+            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+            <Share2 className="me-2 w-5 h-5" />
             {t('buzz.results.share') || 'SHARE YOUR BUZZ'}
           </Button>
 
@@ -363,12 +474,12 @@ export default function BuzzResultsScreen({
           <Button
             onClick={handleCopy}
             variant="outline"
-            className="w-full bg-slate-800 border-2 border-slate-600 hover:border-neo-cyan"
+            className="w-full py-3 bg-slate-900/80 border-2 border-slate-600 hover:border-neo-cyan hover:bg-neo-cyan/10 rounded-neo font-bold transition-all"
           >
             {copied ? (
               <>
-                <Check className="w-4 h-4 me-2 text-neo-cyan" />
-                {t('common.copied') || 'COPIED!'}
+                <Check className="w-4 h-4 me-2 text-neo-lime" />
+                <span className="text-neo-lime">{t('common.copied') || 'COPIED!'}</span>
               </>
             ) : (
               <>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, Shield, Users, BookOpen, Calendar, Activity, Sparkles } from 'lucide-react';
+import { ArrowLeft, Shield, Users, BookOpen, Calendar, Activity, Sparkles, Mail } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import { getSession } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { LiveMonitor } from '@/components/admin/LiveMonitor';
 import { TodayGamesHistory } from '@/components/admin/TodayGamesHistory';
+import { EmailTestPanel } from '@/components/admin/EmailTestPanel';
 import { PullToRefreshWrapper } from '@/components/ui/PullToRefreshWrapper';
 import { isMobileDevice } from '@/utils/mobileAccessibility';
 import { NeoLoader } from '@/components/ui/NeoLoader';
@@ -116,7 +117,7 @@ export default function AdminPage() {
         </div>
 
         {/* Navigation Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-6 sm:mb-8">
           <Card
             className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
             onClick={() => router.push(`/${language}/admin/players`)}
@@ -166,6 +167,19 @@ export default function AdminPage() {
               <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">Web Vitals</span>
             </CardContent>
           </Card>
+
+          <Card
+            className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors border-2 border-neo-pink/30"
+            onClick={() => {
+              const emailSection = document.getElementById('email-testing');
+              emailSection?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
+              <Mail className="w-6 h-6 sm:w-8 sm:h-8 text-neo-pink" />
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">Email</span>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Live Monitor Component */}
@@ -173,6 +187,15 @@ export default function AdminPage() {
 
         {/* Today's Games History */}
         <TodayGamesHistory authToken={authToken} />
+
+        {/* Email Testing Section */}
+        <div id="email-testing" className="mt-8">
+          <EmailTestPanel
+            authToken={authToken}
+            userEmail={user?.email}
+            userName={profile?.display_name || profile?.username}
+          />
+        </div>
       </main>
     </div>
   );

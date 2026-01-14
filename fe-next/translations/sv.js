@@ -91,6 +91,7 @@ const sv = {
     "notConnected": "Offline",
     "connected": "Ansluten",
     "left": "kvar",
+    "optional": "valfritt",
     "processing": "Bearbetar...",
     "coins": "mynt",
     "chat": "Chatt",
@@ -2371,6 +2372,8 @@ const sv = {
     "subtitle": "Vad buzzer idag?",
     "badge": "🔥 NYHET",
     "betaPreview": "✨ BETA",
+    "breaking": "JUST NU",
+    "tapToCelebrate": "Tryck för att fira",
     "challenges": "Utmaningar",
     "letters": "bokstäver",
     "connectingWord": "KOPPLINGSORDET",
@@ -3124,6 +3127,19 @@ const sv = {
       "left": "kvar",
       "started": "Startad",
       "lastUpdated": "Senast uppdaterad"
+    },
+    "email": {
+      "title": "E-posttestning",
+      "recipientEmail": "Mottagarens e-post",
+      "recipientName": "Mottagarens namn",
+      "sendTest": "Skicka testmail",
+      "sending": "Skickar...",
+      "errorNoEmail": "Ange en e-postadress",
+      "showPreview": "Förhandsgranska",
+      "hidePreview": "Dölj förhandsgranskning",
+      "preview": "E-postförhandsgranskning",
+      "previewNote": "Förhandsgranskningen visar hur e-postmeddelandet kommer att se ut i mottagarnas inkorg.",
+      "info": "Testmail skickas med prefixet [TEST] i ämnesraden. De använder samma mall som produktionens dagliga utmaningsmail."
     },
     "todayGames": {
       "title": "Dagens Spel",

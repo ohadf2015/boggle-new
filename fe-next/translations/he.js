@@ -91,6 +91,7 @@ const he = {
     "notConnected": "לא מחובר",
     "connected": "מחובר",
     "left": "נותרו",
+    "optional": "אופציונלי",
     "processing": "מעבד...",
     "coins": "מטבעות",
     "chat": "צ'אט",
@@ -2444,6 +2445,8 @@ const he = {
     "alreadyPlayed": "כבר שיחקת היום! חזרו מחר.",
     "badge": "חדש 🔥",
     "betaPreview": "גרסת ביתא ✨",
+    "breaking": "חדשות חמות",
+    "tapToCelebrate": "לחצו לחגוג",
     "challenges": "אתגרים",
     "letters": "אותיות",
     "connectingWord": "המילה המקשרת",
@@ -3125,6 +3128,19 @@ const he = {
       "left": "נותר",
       "started": "התחיל",
       "lastUpdated": "עודכן לאחרונה"
+    },
+    "email": {
+      "title": "בדיקת אימייל",
+      "recipientEmail": "אימייל הנמען",
+      "recipientName": "שם הנמען",
+      "sendTest": "שלח אימייל בדיקה",
+      "sending": "שולח...",
+      "errorNoEmail": "נא להזין כתובת אימייל",
+      "showPreview": "תצוגה מקדימה",
+      "hidePreview": "הסתר תצוגה מקדימה",
+      "preview": "תצוגה מקדימה של האימייל",
+      "previewNote": "התצוגה המקדימה מציגה כיצד האימייל יראה בתיבת הדואר של הנמענים.",
+      "info": "אימיילי בדיקה נשלחים עם קידומת [TEST] בכותרת. הם משתמשים באותה תבנית כמו אימיילי האתגר היומי."
     },
     "todayGames": {
       "title": "משחקי היום",

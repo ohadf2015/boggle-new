@@ -91,6 +91,7 @@ const ja = {
     "notConnected": "オフライン",
     "connected": "接続済み",
     "left": "残り",
+    "optional": "任意",
     "processing": "処理中...",
     "offline": "オフライン",
     "online": "オンライン",
@@ -2371,6 +2372,8 @@ const ja = {
     "subtitle": "今日のバズは？",
     "badge": "🔥 NEW",
     "betaPreview": "✨ BETA",
+    "breaking": "速報",
+    "tapToCelebrate": "タップしてお祝い",
     "challenges": "チャレンジ",
     "letters": "文字",
     "noTimeLimit": "タイマーなし",
@@ -3191,6 +3194,19 @@ const ja = {
       "left": "残り",
       "started": "開始",
       "lastUpdated": "最終更新"
+    },
+    "email": {
+      "title": "メールテスト",
+      "recipientEmail": "受信者メール",
+      "recipientName": "受信者名",
+      "sendTest": "テストメール送信",
+      "sending": "送信中...",
+      "errorNoEmail": "メールアドレスを入力してください",
+      "showPreview": "プレビュー",
+      "hidePreview": "プレビューを隠す",
+      "preview": "メールプレビュー",
+      "previewNote": "プレビューは受信者の受信トレイでメールがどのように表示されるかを示します。",
+      "info": "テストメールは件名に[TEST]プレフィックスが付いて送信されます。本番のデイリーチャレンジメールと同じテンプレートを使用します。"
     },
     "todayGames": {
       "title": "今日のゲーム",

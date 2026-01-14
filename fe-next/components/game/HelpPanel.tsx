@@ -53,7 +53,7 @@ export function HelpPanel({ isOpen, onClose, onShowTutorial }: HelpPanelProps) {
           >
             {/* Drag Handle */}
             <div className="flex justify-center pt-3 pb-2">
-              <div className="w-12 h-1 bg-neo-black/30 text-white rounded-full" />
+              <div className="w-12 h-1 bg-neo-black/30 rounded-full" />
             </div>
 
             {/* Header */}
@@ -231,7 +231,7 @@ export function HelpPanel({ isOpen, onClose, onShowTutorial }: HelpPanelProps) {
               </section>
 
               {/* Keyboard Shortcuts - Desktop only */}
-              <section className="bg-neo-pink/10 text-white border-2 border-neo-pink rounded-neo p-3 hidden sm:block">
+              <section className="bg-neo-pink/10 border-2 border-neo-pink rounded-neo p-3 hidden sm:block">
                 <h3 className="font-black text-neo-pink uppercase flex items-center gap-2 mb-2">
                   <Keyboard className="w-4 h-4" />
                   {t('help.keyboardShortcuts') || 'Keyboard Shortcuts'}

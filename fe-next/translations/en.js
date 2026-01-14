@@ -96,6 +96,7 @@ const en = {
     "notConnected": "Offline",
     "connected": "Connected",
     "left": "left",
+    "optional": "optional",
     "processing": "Processing...",
     "coins": "coins",
     "chat": "Chat",
@@ -2374,6 +2375,8 @@ const en = {
     "subtitle": "What's buzzing today?",
     "badge": "NEW",
     "betaPreview": "BETA",
+    "breaking": "BREAKING",
+    "tapToCelebrate": "Tap to celebrate",
     "challenges": "challenges",
     "letters": "letters",
     "connectingWord": "Connecting word",
@@ -3127,6 +3130,19 @@ const en = {
       "left": "left",
       "started": "Started",
       "lastUpdated": "Last updated"
+    },
+    "email": {
+      "title": "Email Testing",
+      "recipientEmail": "Recipient Email",
+      "recipientName": "Recipient Name",
+      "sendTest": "Send Test Email",
+      "sending": "Sending...",
+      "errorNoEmail": "Please enter an email address",
+      "showPreview": "Preview",
+      "hidePreview": "Hide Preview",
+      "preview": "Email Preview",
+      "previewNote": "Preview shows how the email will appear in recipients' inboxes.",
+      "info": "Test emails are sent with [TEST] prefix in the subject line. They use the same template as production daily challenge emails."
     },
     "todayGames": {
       "title": "Today's Games",

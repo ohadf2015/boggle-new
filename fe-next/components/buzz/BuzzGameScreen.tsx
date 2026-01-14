@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowRight, Lightbulb, Sparkles } from 'lucide-react';
+import { X, ArrowRight, Lightbulb, Sparkles, TrendingUp, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -205,92 +205,146 @@ export default function BuzzGameScreen({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex-1 flex flex-col p-4 overflow-hidden"
+      className="flex-1 flex flex-col p-4 overflow-hidden relative"
     >
-      {/* Top bar - Quit button */}
-      <div className="flex items-center justify-between mb-4">
+      {/* Subtle background texture */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.02]">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`,
+            backgroundSize: '24px 24px',
+          }}
+        />
+      </div>
+
+      {/* Top bar - Score and Quit */}
+      <div className="flex items-center justify-between mb-3 relative z-10">
         <Button
           variant="destructive"
           size="sm"
           onClick={handleQuitClick}
-          className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-none font-bold"
+          className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-none active:translate-x-0.5 active:translate-y-0.5 font-bold transition-all"
         >
           <X className="w-4 h-4 me-1" />
           {t('common.quit') || 'QUIT'}
         </Button>
 
-        {/* Score */}
+        {/* Animated Score Display */}
         <motion.div
           key={score}
-          initial={{ scale: 1.2 }}
-          animate={{ scale: 1 }}
-          className="px-4 py-2 bg-neo-yellow/20 border-2 border-neo-yellow rounded-lg"
+          initial={{ scale: 1.3, rotate: -5 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+          className="relative"
         >
-          <span className="font-black text-neo-yellow text-lg">
-            {score} {t('common.pts') || 'PTS'}
-          </span>
+          <div className="px-4 py-2 bg-neo-yellow/15 border-3 border-neo-yellow rounded-neo-lg shadow-hard-sm">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-neo-yellow" />
+              <span className="font-black text-neo-yellow text-lg tabular-nums">
+                {score}
+              </span>
+              <span className="text-xs font-bold text-neo-yellow/70 uppercase">
+                {t('common.pts') || 'PTS'}
+              </span>
+            </div>
+          </div>
         </motion.div>
       </div>
 
-      {/* Progress indicator */}
-      <div className="mb-4">
+      {/* Progress Section */}
+      <div className="mb-4 relative z-10">
+        {/* Challenge counter and type */}
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-slate-400 font-medium">
-            {(() => {
-              const template = t('buzz.challenge');
-              if (template && template.includes('{number}')) {
-                return template
-                  .replace('{number}', String(currentIndex + 1))
-                  .replace('{total}', String(challengeData.challenges.length));
-              }
-              return `Challenge ${currentIndex + 1} of ${challengeData.challenges.length}`;
-            })()}
-          </span>
-          <span className="text-xs text-neo-yellow font-bold uppercase">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-slate-300 font-bold">
+              {(() => {
+                const template = t('buzz.challenge');
+                if (template && template.includes('{number}')) {
+                  return template
+                    .replace('{number}', String(currentIndex + 1))
+                    .replace('{total}', String(challengeData.challenges.length));
+                }
+                return `Challenge ${currentIndex + 1} of ${challengeData.challenges.length}`;
+              })()}
+            </span>
+          </div>
+          <motion.span
+            key={currentChallenge.type}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="px-2.5 py-1 bg-neo-cyan/20 border border-neo-cyan/40 rounded-neo text-xs text-neo-cyan font-black uppercase tracking-wide"
+          >
             {(() => {
               const typeKey = `buzz.type.${currentChallenge.type}`;
               return t(typeKey) || currentChallenge.type;
             })()}
-          </span>
+          </motion.span>
         </div>
 
-        {/* Progress bar */}
-        <div className="h-2 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{
-              width: `${((currentIndex + 1) / challengeData.challenges.length) * 100}%`,
-            }}
-            transition={{ duration: 0.5 }}
-            className="h-full bg-neo-yellow"
-          />
+        {/* Segmented Progress Bar */}
+        <div className="flex gap-1">
+          {challengeData.challenges.map((_, i) => (
+            <motion.div
+              key={i}
+              initial={i === currentIndex ? { scale: 0.8 } : {}}
+              animate={i === currentIndex ? { scale: 1 } : {}}
+              className={`
+                h-2 flex-1 rounded-full transition-colors duration-300
+                ${
+                  i < currentIndex
+                    ? 'bg-neo-lime'
+                    : i === currentIndex
+                      ? 'bg-neo-yellow'
+                      : 'bg-slate-700'
+                }
+              `}
+            />
+          ))}
         </div>
       </div>
 
-      {/* Trending Topic Badge */}
-      <div className="mb-4 flex items-center justify-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/50 rounded-full border border-slate-700">
-          <Sparkles className="w-4 h-4 text-neo-cyan" />
-          <span className="text-sm font-medium text-slate-300">
-            {(() => {
-              const template = t('buzz.topicIs');
-              if (template && template.includes('{topic}')) {
-                return template.replace('{topic}', currentChallenge.trendTopic);
-              }
-              return `Topic: ${currentChallenge.trendTopic}`;
-            })()}
-          </span>
-        </div>
-      </div>
+      {/* Trending Topic Badge - Animated */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentChallenge.trendTopic}
+          initial={{ opacity: 0, y: -20, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 20, scale: 0.95 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+          className="mb-4 flex items-center justify-center relative z-10"
+        >
+          <div className="relative inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900/80 rounded-neo-lg border-2 border-slate-600 shadow-hard-sm">
+            {/* Decorative glow */}
+            <div className="absolute inset-0 bg-neo-cyan/5 rounded-neo-lg blur-sm" />
+
+            <div className="relative flex items-center gap-2">
+              <div className="p-1 bg-neo-cyan/20 rounded-neo">
+                <TrendingUp className="w-4 h-4 text-neo-cyan" />
+              </div>
+              <span className="text-sm font-bold text-white">
+                {(() => {
+                  const template = t('buzz.topicIs');
+                  if (template && template.includes('{topic}')) {
+                    return template.replace('{topic}', currentChallenge.trendTopic);
+                  }
+                  return `Topic: ${currentChallenge.trendTopic}`;
+                })()}
+              </span>
+            </div>
+          </div>
+        </motion.div>
+      </AnimatePresence>
 
       {/* Challenge Container */}
-      <div className="flex-1 flex flex-col items-center justify-center">
+      <div className="flex-1 flex flex-col items-center justify-center relative z-10">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: 60, scale: 0.98 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: -60, scale: 0.98 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             className="w-full max-w-2xl"
           >
             {renderChallenge()}
@@ -299,24 +353,32 @@ export default function BuzzGameScreen({
       </div>
 
       {/* Bottom actions */}
-      <div className="mt-4 space-y-3">
+      <div className="mt-4 space-y-2 relative z-10">
         {/* Hint button */}
         {currentChallenge.hint && !showHint && (
-          <Button
-            onClick={() => setShowHint(true)}
-            variant="ghost"
-            className="w-full border-2 border-slate-600 hover:border-neo-cyan"
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
           >
-            <Lightbulb className="w-4 h-4 me-2" />
-            {t('buzz.hint') || 'Show Hint'} (-5 {t('common.pts') || 'PTS'})
-          </Button>
+            <Button
+              onClick={() => setShowHint(true)}
+              variant="ghost"
+              className="w-full py-3 border-2 border-slate-600 hover:border-neo-purple hover:bg-neo-purple/10 rounded-neo transition-all"
+            >
+              <Lightbulb className="w-4 h-4 me-2 text-neo-purple" />
+              <span className="font-bold">{t('buzz.hint') || 'Show Hint'}</span>
+              <span className="ms-2 text-xs text-slate-400">
+                (-5 {t('common.pts') || 'PTS'})
+              </span>
+            </Button>
+          </motion.div>
         )}
 
         {/* Skip button */}
         <Button
           onClick={handleSkip}
           variant="outline"
-          className="w-full bg-slate-800 border-2 border-slate-600 hover:border-neo-pink"
+          className="w-full py-3 bg-slate-900/80 border-2 border-slate-600 hover:border-neo-pink hover:bg-neo-pink/10 rounded-neo font-bold transition-all"
         >
           {isLastChallenge ? (
             <>
