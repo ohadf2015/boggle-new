@@ -78,6 +78,7 @@ const he = {
     "dismiss": "סגור",
     "info": "מידע",
     "close": "סגור",
+    "exit": "יציאה",
     "adminDashboard": "לוח בקרה",
     "awesome": "מדהים!",
     "admin": "מנהל",
@@ -450,7 +451,8 @@ const he = {
       "noRooms": "אין חדרים פעילים",
       "beFirst": "היה הראשון ליצור אחד!",
       "createButton": "צור חדר",
-      "refreshed": "החדרים רועננו"
+      "refreshed": "החדרים רועננו",
+      "quickPlay": "משחק מהיר"
     },
     "joinModal": {
       "title": "הצטרף לחדר",
@@ -526,6 +528,7 @@ const he = {
     "gameSettings": "הגדרות",
     "quickSetup": "תבניות",
     "min": "דק׳",
+    "timer": "טיימר",
     "difficulty": "רמת קושי",
     "roundDuration": "משך סיבוב",
     "minutes": "דקות",
@@ -2284,7 +2287,8 @@ const he = {
       "instruction": "נחשו את המילה בת 5 אותיות",
       "attemptsLeft": "ניסיונות נותרו",
       "solved": "פתרתם!",
-      "failed": "נגמרו הניסיונות"
+      "failed": "נגמרו הניסיונות",
+      "useDeviceKeyboard": "הקישו להקלדה"
     },
     "challenge": "{number}/{total}",
     "correct": "יש!",

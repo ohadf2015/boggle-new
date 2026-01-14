@@ -78,6 +78,7 @@ const es = {
     "dismiss": "Cerrar",
     "info": "Info",
     "close": "Cerrar",
+    "exit": "Salir",
     "adminDashboard": "Panel de administración",
     "awesome": "¡Genial!",
     "admin": "Admin",
@@ -446,7 +447,8 @@ const es = {
       "noRooms": "Sin salas activas",
       "beFirst": "¡Sé el primero en crear una!",
       "createButton": "Crear sala",
-      "refreshed": "¡Salas actualizadas!"
+      "refreshed": "¡Salas actualizadas!",
+      "quickPlay": "Juego rápido"
     },
     "joinModal": {
       "title": "Unirse a sala",
@@ -514,6 +516,7 @@ const es = {
     "gameSettings": "Configuración",
     "quickSetup": "Presets",
     "min": "min",
+    "timer": "Tiempo",
     "difficulty": "Dificultad",
     "roundDuration": "Duración",
     "minutes": "min",
@@ -2272,7 +2275,8 @@ const es = {
       "instruction": "Adivina la palabra de 5 letras",
       "attemptsLeft": "intentos restantes",
       "solved": "¡Resuelto!",
-      "failed": "Sin intentos"
+      "failed": "Sin intentos",
+      "useDeviceKeyboard": "Toca para escribir"
     },
     "challenge": "{number}/{total}",
     "correct": "¡ESO!",

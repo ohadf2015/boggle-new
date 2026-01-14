@@ -78,6 +78,7 @@ const ja = {
     "dismiss": "閉じる",
     "info": "情報",
     "close": "閉じる",
+    "exit": "退出",
     "adminDashboard": "管理ダッシュボード",
     "awesome": "最高！",
     "admin": "管理者",
@@ -449,7 +450,8 @@ const ja = {
       "noRooms": "アクティブなルームなし",
       "beFirst": "最初に作成しよう！",
       "createButton": "ルーム作成",
-      "refreshed": "ルーム更新完了"
+      "refreshed": "ルーム更新完了",
+      "quickPlay": "クイックプレイ"
     },
     "joinModal": {
       "title": "ルームに参加",
@@ -517,6 +519,7 @@ const ja = {
     "gameSettings": "設定",
     "quickSetup": "プリセット",
     "min": "分",
+    "timer": "タイマー",
     "difficulty": "難易度",
     "roundDuration": "ラウンド時間",
     "minutes": "分",
@@ -2314,7 +2317,8 @@ const ja = {
       "instruction": "5文字の単語を当てよう",
       "attemptsLeft": "回残り",
       "solved": "正解！",
-      "failed": "残念、チャンスなし"
+      "failed": "残念、チャンスなし",
+      "useDeviceKeyboard": "タップして入力"
     },
     "challenge": "{number}/{total}",
     "correct": "できた!",

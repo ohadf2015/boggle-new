@@ -175,6 +175,7 @@ export async function generateDailyBuzz(
 
 /**
  * Filter trending topics for family-friendly, word-game-suitable content
+ * PRIORITIZES rising trends (highest increase_percentage) over static popular trends
  */
 function filterTrends(trends: TrendingTopic[], _language: string): TrendingTopic[] {
   // NSFW keywords to filter out (add more as needed)
@@ -193,28 +194,47 @@ function filterTrends(trends: TrendingTopic[], _language: string): TrendingTopic
     'war crime',
   ];
 
-  return trends
-    .filter((trend) => {
-      const query = trend.query.toLowerCase();
+  const filtered = trends.filter((trend) => {
+    const query = trend.query.toLowerCase();
 
-      // Filter out NSFW content
-      if (bannedKeywords.some((keyword) => query.includes(keyword))) {
-        return false;
-      }
+    // Filter out NSFW content
+    if (bannedKeywords.some((keyword) => query.includes(keyword))) {
+      return false;
+    }
 
-      // Filter out topics with insufficient context
-      if (query.length < 3) {
-        return false;
-      }
+    // Filter out topics with insufficient context
+    if (query.length < 3) {
+      return false;
+    }
 
-      // Filter out pure numbers or very short phrases
-      if (/^\d+$/.test(query)) {
-        return false;
-      }
+    // Filter out pure numbers or very short phrases
+    if (/^\d+$/.test(query)) {
+      return false;
+    }
 
-      return true;
-    })
-    .slice(0, 10); // Keep top 10 filtered trends
+    return true;
+  });
+
+  // Sort by increase_percentage (rising trends first), then by search_volume as tiebreaker
+  // This prioritizes "breaking" trends over static popular topics
+  const sorted = filtered.sort((a, b) => {
+    const aIncrease = a.increase_percentage ?? 0;
+    const bIncrease = b.increase_percentage ?? 0;
+
+    // Primary: highest increase percentage (most rising)
+    if (bIncrease !== aIncrease) {
+      return bIncrease - aIncrease;
+    }
+
+    // Secondary: higher search volume
+    return (b.search_volume ?? 0) - (a.search_volume ?? 0);
+  });
+
+  console.log(`[BUZZ] Filtered trends sorted by rise velocity: ${sorted.slice(0, 5).map(t =>
+    `${t.query} (+${t.increase_percentage ?? 0}%)`
+  ).join(', ')}`);
+
+  return sorted.slice(0, 10); // Keep top 10 filtered trends
 }
 
 interface GoogleCredentials {
@@ -336,24 +356,72 @@ async function generateChallengesWithAI(
 }
 
 /**
+ * Select trends for challenge generation
+ * Freely chooses from available trends, prioritizing rising trends
+ * while maintaining diversity across categories
+ */
+function selectTrendsForChallenge(trends: TrendingTopic[]): TrendingTopic[] {
+  if (trends.length <= 5) return trends;
+
+  const selected: TrendingTopic[] = [];
+  const usedCategories = new Set<string>();
+
+  // First pass: prioritize fastest-rising trends (increase_percentage > 100%)
+  const risingFast = trends.filter(t => (t.increase_percentage ?? 0) > 100);
+  for (const trend of risingFast) {
+    if (selected.length >= 5) break;
+    const category = trend.categories?.[0]?.name ?? 'General';
+    if (!usedCategories.has(category) || selected.length < 3) {
+      selected.push(trend);
+      usedCategories.add(category);
+    }
+  }
+
+  // Second pass: fill remaining slots with rising trends (any increase_percentage > 0)
+  const rising = trends.filter(t =>
+    (t.increase_percentage ?? 0) > 0 && !selected.includes(t)
+  );
+  for (const trend of rising) {
+    if (selected.length >= 5) break;
+    selected.push(trend);
+  }
+
+  // Third pass: fill with any remaining if needed
+  for (const trend of trends) {
+    if (selected.length >= 5) break;
+    if (!selected.includes(trend)) {
+      selected.push(trend);
+    }
+  }
+
+  return selected;
+}
+
+/**
  * Build prompt for Gemini to generate word challenges
+ * Uses sophisticated lateral thinking approach for unpredictable connections
  */
 function buildAIPrompt(
   trends: TrendingTopic[],
   language: string,
   region: string
 ): string {
-  const trendsContext = trends
-    .slice(0, 5) // Use top 5 trends
+  // Select trends freely - prioritize rising trends (already sorted by increase_percentage)
+  // Take variety: mix of fastest-rising and high-volume for diversity
+  const selectedTrends = selectTrendsForChallenge(trends);
+
+  const trendsContext = selectedTrends
     .map((trend, idx) => {
-      // Use trend_breakdown for context, or category names as fallback
       const contextParts = trend.trend_breakdown?.slice(0, 3).join(', ') ||
         trend.categories?.map(c => c.name).join(', ') ||
         'Currently trending';
       const volumeDisplay = trend.search_volume
         ? `${(trend.search_volume / 1000).toFixed(0)}K+`
         : 'trending';
-      return `${idx + 1}. "${trend.query}" - ${volumeDisplay} searches\n   Context: ${contextParts}`;
+      const riseIndicator = trend.increase_percentage
+        ? ` 🔥 RISING +${trend.increase_percentage}%`
+        : '';
+      return `${idx + 1}. "${trend.query}" - ${volumeDisplay} searches${riseIndicator}\n   Context: ${contextParts}`;
     })
     .join('\n\n');
 
@@ -416,113 +484,158 @@ Always pick the word that 90% of native speakers would guess FIRST:
 - Test yourself: "What would most people type first?" - that's your answer
 - Avoid synonyms that are less common even if technically correct`;
 
-  return `Generate a Daily Buzz word challenge for LexiClash, a neo-brutalist word game.
+  return `You are a master puzzle designer for LexiClash, a neo-brutalist word game. Your mission: create word challenges that surprise and delight players with UNEXPECTED yet satisfying connections to trending topics.
 
 **Target Language**: ${language}
 **Region**: ${region}
 **Date**: ${new Date().toISOString().split('T')[0]}
 
-**TODAY'S TRENDING TOPICS** (from Google Trends - DIRECTLY USE these for challenges):
+**TODAY'S TRENDING TOPICS** (prioritized by rise velocity - 🔥 = fastest rising):
 ${trendsContext}
 
-**Your Task**:
-Create 5-7 word mini-challenges that are DIRECTLY CONNECTED to today's trending topics. Players should feel "this is what everyone is talking about today!"
+---
 
-**CRITICAL - Connect Challenges to ACTUAL Trends**:
-1. Each challenge MUST relate to one of the trending topics above
-2. Use COMMON DICTIONARY WORDS that are semantically connected to the trend
-3. The clue/prompt should REFERENCE the trending topic or current event
-4. The "trending_context" should explain WHY this trend is popular NOW
+## 🎯 THE CREATIVE PHILOSOPHY: SURPRISING CONNECTIONS
+
+**AVOID the obvious.** Players expect predictable word-trend pairings. Your job is to CREATE UNEXPECTED DELIGHT.
+
+**THE PREDICTABILITY PROBLEM** (what NOT to do):
+- Trend: "Super Bowl" → Answer: FOOTBALL ❌ Too obvious
+- Trend: "Climate Summit" → Answer: WARMING ❌ First thing anyone thinks
+- Trend: "Stock Market Crash" → Answer: MONEY ❌ Boring, expected
+
+**THE LATERAL THINKING SOLUTION** (what TO do):
+- Trend: "Super Bowl" → Answer: SNACK (everyone eats chips watching) ✅
+- Trend: "Super Bowl" → Answer: COUCH (where fans gather) ✅
+- Trend: "Super Bowl" → Answer: WINGS (the real star of the party) ✅
+- Trend: "Climate Summit" → Answer: DELEGATE (who actually attends) ✅
+- Trend: "Stock Market" → Answer: SWEAT (what traders experience) ✅
+
+**CONNECTION TECHNIQUES**:
+1. **Adjacent Domain**: Move to a related but unexpected domain
+   - Sports event → FOOD (what people eat), COUCH (where they sit), JERSEY (what fans wear)
+   - Tech launch → QUEUE (people waiting), HYPE (the atmosphere), CRASH (what servers do)
+   - Political event → SUIT (what politicians wear), SPIN (how news is framed)
+
+2. **Cause/Effect Chain**: Think 2-3 steps removed
+   - War → REFUGEE (consequence) → CAMP (where they go) → TENT (what they live in)
+   - Rain → FLOOD (result) → RESCUE (response) → BOAT (the tool)
+
+3. **Sensory/Emotional**: What do people FEEL or EXPERIENCE?
+   - Earthquake → SHAKE (physical), FEAR (emotion), DUST (what rises)
+   - Victory → ROAR (crowd sound), TEARS (reaction), EMBRACE (celebration)
+
+4. **Everyday Objects**: The mundane items involved
+   - Election → BOOTH, BALLOT, PEN, LINE, STICKER
+   - Wedding (celebrity) → CAKE, DRESS, RING, TOAST, VEIL
+
+5. **Metaphorical Leap**: Abstract the concept
+   - AI technology → BRAIN (metaphor), DREAM (what it represents), GHOST (unseen helper)
+   - Scandal → SHADOW (hidden things), MASK (false appearances), SMOKE (where there's fire)
+
+---
+
+## 📋 CHALLENGE REQUIREMENTS
+
+**Your Task**: Create 5-7 word mini-challenges using the rising trends above. PRIORITIZE the 🔥 rising trends - they're what's exploding RIGHT NOW.
+
+**Word Selection Rules**:
+1. NEVER use brand names, celebrity names, or country names AS ANSWERS
+2. Answers must be COMMON DICTIONARY WORDS that 90% of people know
+3. Words should be 3-12 letters (EXACTLY 5 letters for wordle_guess)
+4. The answer must be GUESSABLE - when players see the clue + trend context, the word should "click"
+5. You CAN reference proper nouns in CLUES, just not as answers
 ${langExamples}
 
-**Word Selection Rules (CRITICAL)**:
-1. NEVER use brand names (no "Nike", "Apple", "Netflix", "Tesla", etc.)
-2. NEVER use celebrity names, company names, or country names AS ANSWERS
-3. Answers must be COMMON DICTIONARY WORDS (nouns, verbs, adjectives)
-4. Words should be 3-12 letters (5 letters EXACTLY for wordle_guess type)
-5. You CAN reference proper nouns in CLUES, just not as answers
-   - Good: "Clue: What nations seek after conflict | Answer: PEACE"
-   - Bad: "Answer: IRAN" (proper noun)
+**WORD POPULARITY still matters**:
+- Choose words people use DAILY, not obscure synonyms
+- Test: "Would a 12-year-old know this word?" → If yes, good choice
+- Avoid jargon, technical terms, or literary vocabulary
 
-**WORD POPULARITY REQUIREMENT (CRITICAL FOR PLAYER SUCCESS)**:
-- The answer MUST be the word that 90% of players would guess FIRST
-- Think: "What word would most people type immediately for this clue?"
-- If there are synonyms, ALWAYS choose the most commonly used one
-- Players will guess the obvious/popular answer - make that your answer!
-- Example: For "opposite of war" → PEACE (not HARMONY, TRANQUILITY, or SERENITY)
-- Example: For "what you win in competition" → PRIZE (not TROPHY, AWARD, or MEDAL unless specifically about medals)
-- Example: For "where you sleep" → BED (not COT, MATTRESS, or BUNK)
-- Test yourself: "If I asked 100 people, what would most say?" - that's your answer
-- NEVER use a less-common synonym when a popular word exists
+---
 
-**Challenge Types** (use variety):
-1. **anagram**: CLUE that references the trend + scrambled letters
-   - Format: "[Trend-related clue] | Letters: XXXXX"
-   - Example for Iran trend: "What diplomats negotiate for | Letters: EACEP" → PEACE
-2. **fill_blank**: Phrase connected to trending news
-   - Use EXACTLY as many underscores as letters in the answer (one underscore per letter)
-   - Format: "Phrase with _____ (N letters)" where N is the letter count
-   - Example: "Nations called for immediate _________ (9 letters)" → CEASEFIRE
-   - Example: "The weather forecast predicts _____ (5 letters)" → STORM
-   - This helps players know the word length and type the right answer
-3. **word_chain**: Connect two trend-related words
-4. **definition_match**: Trend-related word with 4 options
-5. **riddle**: SOPHISTICATED riddles requiring LATERAL THINKING (this is the premium challenge type!)
-   - Use paradoxes, contradictions, and clever word associations
-   - Incorporate double meanings, metaphors, and abstract concepts
-   - The riddle should make the solver THINK deeply, not just recall definitions
-   - Connect to current trends through metaphor, not literal description
+## 🎮 CHALLENGE TYPES (with lateral thinking examples)
 
-   **Riddle Techniques to Use**:
-   - Personification: Give abstract concepts human traits ("I am born in conflict...")
-   - Paradox: Seemingly contradictory statements ("I grow stronger when broken...")
-   - Sensory misdirection: Describe one sense to mean another ("I speak without a mouth...")
-   - Time/space manipulation: Play with temporal concepts ("I exist before I arrive...")
-   - Dual meaning: Words that work on multiple levels
+1. **anagram**: Trend-connected clue + scrambled letters
+   - Format: "[Unexpected angle on trend] | Letters: XXXXX"
+   - Trend "Olympics" → "Where fans crush together | Letters: DOWCR" → CROWD
+   - Trend "AI Summit" → "What nervous speakers do | Letters: TSAEW" → SWEAT
 
-   **Sophisticated Riddle Examples**:
-   - "I am the child of two enemies, yet I end their fight. Nations celebrate my birth, but work hard for my life. What am I?" → PEACE
-   - "I travel faster than sound, carry words without speaking, and connect strangers instantly. Yet I have no body. What am I?" → SIGNAL
-   - "I can topple governments without touching them, spread across borders without papers, and change minds without speaking. What am I?" → NEWS
-   - "I am invisible but measured, wasted by many but saved by none. Leaders fear my passage. What am I?" → TIME
-   - "I fly without wings, destroy without hands, and nations fear my launch. Born from science, I bring only fire. What am I?" → MISSILE
+2. **fill_blank**: Phrase with unexpected angle on trend
+   - Format: "Phrase with _____ (N letters)" - one underscore per letter
+   - Trend "Election" → "Voters stood in _____ for hours (4 letters)" → LINE
+   - Trend "Heat Wave" → "People escaped to the _____ (5 letters)" → SHADE
 
-6. **wordle_guess**: Wordle-style 5-letter word guessing challenge
-   - The answer MUST be EXACTLY 5 letters (no more, no less)
-   - The prompt describes the word without giving it away directly
-   - Players will have 6 attempts to guess the word with color-coded feedback
-   - Format: "[Clue that describes the 5-letter word]"
-   - Example: "A formal agreement between nations (5 letters)" → PEACE
-   - Example: "What athletes compete for (5 letters)" → MEDAL
-   - Example: "The opposite of silence (5 letters)" → NOISE
-   - For Hebrew: The word must be exactly 5 Hebrew letters
-   - Include 1-2 wordle_guess challenges per set for variety
+3. **word_chain**: Connect two unexpectedly related words
+   - Trend "Tech Layoffs" → OFFICE → ? → BOX (packing up desks)
+   - Trend "World Cup" → GRASS → ? → SLIDE (tackle move)
 
-**Output Format** (JSON only, no markdown):
+4. **definition_match**: Word from unexpected angle, 4 options
+   - Trend "Wildfire" → Word for "people who leave their homes": EVACUEE, REFUGEE, MIGRANT, NOMAD
+
+5. **riddle**: THE PREMIUM CHALLENGE - Deeply metaphorical, 2-3 steps removed from literal
+
+   **Riddle Philosophy**: The best riddles work on MULTIPLE LEVELS simultaneously. They describe the answer literally while also connecting metaphorically to the trend.
+
+   **WEAK riddle** (too literal):
+   - Trend "Peace Talks" → "I am the opposite of war" → PEACE ❌
+
+   **STRONG riddle** (layered metaphor):
+   - Trend "Peace Talks" → "I am weightless yet heavy on hearts. Countries bargain for me like gold, yet I cannot be bought. I am signed but never written. What am I?" → TREATY ✅
+
+   **Advanced Riddle Techniques**:
+   - **Paradox**: "I grow shorter as I grow older" (CANDLE)
+   - **Inversion**: "I have cities without houses, forests without trees" (MAP)
+   - **Personification**: "I have teeth but cannot bite" (COMB, ZIPPER)
+   - **Sensory confusion**: "I can be cracked, told, and made, but never touched" (JOKE)
+   - **Time paradox**: "The more you take, the more you leave behind" (STEPS)
+
+   **Sophisticated Trend-Connected Riddles**:
+   - Trend "Stock Market": "I rise and fall without legs, panic follows my descent, yet I am only made of belief. What am I?" → VALUE
+   - Trend "Solar Eclipse": "I arrive by blocking the light, yet millions travel to witness my shadow. I am born from alignment. What am I?" → ECLIPSE
+   - Trend "Viral Video": "I spread without legs, infect without germs, and can make strangers famous overnight. What am I?" → MEME
+   - Trend "AI Chatbot": "I have answers but no brain, remember nothing yet recall everything, exist everywhere yet nowhere. What am I?" → CLOUD
+
+6. **wordle_guess**: 5-letter word with unexpected connection
+   - Format: "[Clue from unusual angle]"
+   - Trend "Marathon" → "What winners break at the end (5 letters)" → SWEAT (not TAPE)
+   - Trend "Concert" → "What you lose after the show (5 letters)" → VOICE
+
+---
+
+## 📤 OUTPUT FORMAT (JSON only, no markdown)
+
 {
   "date": "${new Date().toISOString().split('T')[0]}",
   "language": "${language}",
-  "trending_summary": "Today: [actual trending theme] (max 60 chars)",
+  "trending_summary": "Today: [creative theme summary] (max 60 chars)",
   "challenges": [
     {
-      "type": "anagram",
-      "trend_topic": "[Actual trend from above]",
-      "prompt": "[Trend-connected clue] | Letters: XXXXX",
-      "answer": "[DICTIONARY WORD]",
-      "hint": "[Brief hint]",
+      "type": "anagram|fill_blank|word_chain|definition_match|riddle|wordle_guess",
+      "trend_topic": "[Actual trending topic used]",
+      "prompt": "[The creative, unexpected clue]",
+      "answer": "[COMMON DICTIONARY WORD - all caps]",
+      "hint": "[Brief helpful hint]",
       "difficulty": "easy|medium|hard",
-      "trending_context": "[Why this trend matters TODAY]"
+      "trending_context": "[1 sentence: why this trend is hot TODAY]"
     }
   ]
 }
 
-**Important**:
-- Return ONLY the JSON object, no markdown formatting or code blocks
-- Make challenges feel CURRENT and RELEVANT to today's news
-- The trending_context should explain the actual current event
-- Include AT LEAST 2 sophisticated riddles per challenge set
-- Riddles should be the HIGHLIGHT - make them clever enough to be memorable
-- Think step-by-step when crafting riddles: what paradox or metaphor captures this concept?`;
+---
+
+## ⚠️ FINAL CHECKLIST
+
+Before outputting, verify each challenge:
+- [ ] Is the connection SURPRISING but SATISFYING? (Not the first word anyone would think)
+- [ ] Is the answer a COMMON word people use daily?
+- [ ] Does the clue make players go "Aha!" when they get it?
+- [ ] For riddles: Does it work on multiple levels (literal + metaphorical)?
+- [ ] Have I prioritized the 🔥 RISING trends over static ones?
+- [ ] Are there at least 2 sophisticated riddles in the set?
+- [ ] Would this challenge make someone want to share it with friends?
+
+Return ONLY the JSON object. Make every challenge feel fresh, clever, and connected to TODAY.`;
 }
 
 /**

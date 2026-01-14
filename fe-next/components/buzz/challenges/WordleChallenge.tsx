@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Grid3X3, Delete } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -21,11 +21,65 @@ interface WordleChallengeProps {
 const WORD_LENGTH = 5;
 const MAX_ATTEMPTS = 6;
 
-const KEYBOARD_ROWS = [
-  ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
-  ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
-  ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE'],
-];
+/**
+ * Language-specific keyboard layouts
+ * Each layout follows the standard keyboard arrangement for that language
+ */
+const KEYBOARD_LAYOUTS: Record<string, string[][]> = {
+  en: [
+    ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+    ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+    ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE'],
+  ],
+  he: [
+    ['ק', 'ר', 'א', 'ט', 'ו', 'ן', 'ם', 'פ'],
+    ['ש', 'ד', 'ג', 'כ', 'ע', 'י', 'ח', 'ל', 'ך', 'ף'],
+    ['ENTER', 'ז', 'ס', 'ב', 'ה', 'נ', 'מ', 'צ', 'ת', 'ץ', 'BACKSPACE'],
+  ],
+  sv: [
+    ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'Å'],
+    ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ö', 'Ä'],
+    ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE'],
+  ],
+  ja: [
+    // Japanese uses hiragana - simplified layout for 5-letter words
+    ['あ', 'い', 'う', 'え', 'お', 'か', 'き', 'く', 'け', 'こ'],
+    ['さ', 'し', 'す', 'せ', 'そ', 'た', 'ち', 'つ', 'て', 'と'],
+    ['ENTER', 'な', 'に', 'ぬ', 'ね', 'の', 'は', 'ひ', 'ふ', 'へ', 'ほ', 'BACKSPACE'],
+  ],
+  es: [
+    ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+    ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ñ'],
+    ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE'],
+  ],
+};
+
+/**
+ * Get keyboard layout for a given language
+ * Falls back to English if language not supported
+ */
+function getKeyboardLayout(language: string): string[][] {
+  return KEYBOARD_LAYOUTS[language] || KEYBOARD_LAYOUTS.en;
+}
+
+/**
+ * Regular expression to match valid letters for each language
+ */
+const LANGUAGE_LETTER_PATTERNS: Record<string, RegExp> = {
+  en: /^[A-Za-z]$/,
+  he: /^[\u0590-\u05FF]$/,
+  sv: /^[A-Za-zÅÄÖåäö]$/i,
+  ja: /^[\u3040-\u309F\u30A0-\u30FF]$/,
+  es: /^[A-Za-zÑñ]$/,
+};
+
+/**
+ * Check if a character is a valid letter for the current language
+ */
+function isValidLetter(char: string, language: string): boolean {
+  const pattern = LANGUAGE_LETTER_PATTERNS[language] || LANGUAGE_LETTER_PATTERNS.en;
+  return pattern.test(char);
+}
 
 /**
  * Calculate letter states for a guess compared to the answer
@@ -67,7 +121,7 @@ export default function WordleChallenge({
   onAnswer,
   showHint,
 }: WordleChallengeProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [guesses, setGuesses] = useState<string[]>([]);
   const [currentGuess, setCurrentGuess] = useState('');
   const [gameStatus, setGameStatus] = useState<'playing' | 'won' | 'lost'>(
@@ -76,9 +130,11 @@ export default function WordleChallenge({
   const [keyboardStates, setKeyboardStates] = useState<
     Record<string, LetterState>
   >({});
+  const nativeInputRef = useRef<HTMLInputElement>(null);
 
   const attemptsLeft = MAX_ATTEMPTS - guesses.length;
   const currentRow = guesses.length;
+  const keyboardRows = getKeyboardLayout(language);
 
   // Handle keyboard input
   const handleKeyPress = useCallback(
@@ -124,8 +180,10 @@ export default function WordleChallenge({
         }
       } else if (key === 'BACKSPACE') {
         setCurrentGuess((prev) => prev.slice(0, -1));
-      } else if (/^[A-Z]$/i.test(key) && currentGuess.length < WORD_LENGTH) {
-        setCurrentGuess((prev) => prev + key.toUpperCase());
+      } else if (isValidLetter(key, language) && currentGuess.length < WORD_LENGTH) {
+        // Uppercase for Latin scripts, keep as-is for others (Hebrew, Japanese)
+        const normalizedKey = /^[a-zA-ZÅÄÖåäöÑñ]$/.test(key) ? key.toUpperCase() : key;
+        setCurrentGuess((prev) => prev + normalizedKey);
       }
     },
     [
@@ -135,6 +193,7 @@ export default function WordleChallenge({
       challenge.answer,
       keyboardStates,
       onAnswer,
+      language,
     ]
   );
 
@@ -143,20 +202,24 @@ export default function WordleChallenge({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
 
+      // Ignore if typing in the native input (it handles its own events)
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT') return;
+
       if (e.key === 'Enter') {
         e.preventDefault();
         handleKeyPress('ENTER');
       } else if (e.key === 'Backspace') {
         e.preventDefault();
         handleKeyPress('BACKSPACE');
-      } else if (/^[a-zA-Z]$/.test(e.key)) {
-        handleKeyPress(e.key.toUpperCase());
+      } else if (isValidLetter(e.key, language)) {
+        handleKeyPress(e.key);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyPress]);
+  }, [handleKeyPress, language]);
 
   // Render a single cell in the grid
   const renderCell = (
@@ -319,6 +382,42 @@ export default function WordleChallenge({
         </motion.div>
       )}
 
+      {/* Hidden input for native device keyboard support */}
+      <input
+        ref={nativeInputRef}
+        data-testid="wordle-native-input"
+        type="text"
+        inputMode="text"
+        autoComplete="off"
+        autoCapitalize="characters"
+        className="sr-only"
+        value={currentGuess}
+        onChange={(e) => {
+          if (gameStatus !== 'playing') return;
+          const newValue = e.target.value;
+          // Handle input changes from native keyboard
+          if (newValue.length > currentGuess.length) {
+            // New character(s) added
+            const newChars = newValue.slice(currentGuess.length);
+            for (const char of newChars) {
+              if (isValidLetter(char, language) && currentGuess.length < WORD_LENGTH) {
+                handleKeyPress(char);
+              }
+            }
+          } else if (newValue.length < currentGuess.length) {
+            // Character deleted
+            handleKeyPress('BACKSPACE');
+          }
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            handleKeyPress('ENTER');
+          }
+        }}
+        aria-label={t('buzz.wordle.useDeviceKeyboard') || 'Tap to type'}
+      />
+
       {/* On-screen Keyboard */}
       <motion.div
         data-testid="wordle-keyboard"
@@ -327,9 +426,9 @@ export default function WordleChallenge({
         transition={{ delay: 0.3 }}
         className="flex flex-col gap-1.5 items-center"
       >
-        {KEYBOARD_ROWS.map((row, rowIndex) => (
-          <div key={rowIndex} className="flex gap-1">
-            {row.map((key) => renderKey(key))}
+        {keyboardRows.map((row: string[], rowIndex: number) => (
+          <div key={rowIndex} className="flex gap-1 flex-wrap justify-center">
+            {row.map((key: string) => renderKey(key))}
           </div>
         ))}
       </motion.div>

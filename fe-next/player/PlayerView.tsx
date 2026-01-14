@@ -610,15 +610,14 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     // Don't render PlayerWaitingView underneath to avoid double loaders
     if (showStartAnimation) {
       return (
-        <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
+        <div className="h-[100dvh] bg-neo-navy flex items-center justify-center overflow-hidden">
           <GoRipplesAnimation onComplete={() => setShowStartAnimation(false)} />
         </div>
       );
     }
 
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-2 sm:p-4 md:p-6 lg:p-8 overflow-auto transition-colors duration-300">
-        <PlayerWaitingView
+      <PlayerWaitingView
           gameCode={gameCode}
           gameLanguage={gameLanguage || roomLanguage || null}
           username={username}
@@ -633,7 +632,6 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
           onExitRoom={handleExitRoom}
           onConfirmExit={confirmExitRoom}
         />
-      </div>
     );
   }
 

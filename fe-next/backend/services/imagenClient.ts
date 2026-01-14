@@ -35,17 +35,7 @@ const RETRY_CONFIG = {
   backoffMultiplier: 2, // Double each retry
 };
 
-// Neo-brutalist color palette
-const COLOR_MAP: Record<string, string> = {
-  sports: '#FF6B35', // neo-orange
-  finance: '#FFE135', // neo-yellow
-  entertainment: '#FF1493', // neo-pink
-  technology: '#00FFFF', // neo-cyan
-  weather: '#00FFFF', // neo-cyan
-  politics: '#1a1a2e', // neo-navy
-  general: '#FFE135', // neo-yellow (default)
-};
-
+// Category mood descriptors for image generation
 const MOOD_MAP: Record<string, string> = {
   sports: 'energetic and dynamic',
   finance: 'bold and confident',
@@ -130,66 +120,63 @@ async function getSupabaseClient() {
 /**
  * Build neo-brutalist image prompt that shows the VISUAL SCENE of trending topics
  * Shows recognizable imagery that hints at the news without revealing specific words
+ * Uses LexiClash's signature bold, vibrant game aesthetic
  */
 function buildImagePrompt(
   topic: string,
   category: string,
   _language: string
 ): string {
-  const primaryColor = COLOR_MAP[category] || COLOR_MAP.general;
-  const secondaryColor = getSecondaryColor(category);
   const mood = MOOD_MAP[category] || MOOD_MAP.general;
 
   // Build a concrete visual scene from the trend
   const visualScene = buildVisualScene(topic, category);
 
-  return `Create a bold, eye-catching neo-brutalist illustration showing: ${visualScene}
+  return `Create an EXPLOSIVE, ULTRA-BOLD neo-brutalist game illustration for LexiClash word game.
 
-ART STYLE (LexiClash Game Style - MUST FOLLOW):
-- Neo-brutalist "Jackbox Party Pack" aesthetic
-- BOLD, chunky shapes with hard black outlines (4-6px thick)
-- FLAT colors with NO gradients, NO soft shadows
-- High contrast, vibrant palette:
-  * Primary: ${primaryColor}
-  * Secondary: ${secondaryColor}
-  * Accent: Black (#000000) for outlines
-  * Background: Dark navy (#1a1a2e) or white for contrast
-- Playful, exaggerated proportions
-- Asymmetric composition with dynamic angles
-- Halftone dot texture overlays for retro feel
+SUBJECT: ${visualScene}
 
-SCENE REQUIREMENTS:
-- Show the VISUAL ESSENCE of the news topic
-- Include recognizable objects, symbols, or scenes that represent the trend
-- Make it immediately clear what the image is about
-- Should feel like a news headline illustration
+=== CRITICAL: LEXICLASH GAME VISUAL IDENTITY ===
 
-CONSTRAINTS:
-- NO text, words, letters, or numbers in the image
-- NO real human faces or photorealistic people
-- Use silhouettes or stylized characters if needed
-- Square format (1024×1024px)
-- Clean, poster-style composition
+COLOR PALETTE (MANDATORY - Use these EXACT vibrant colors):
+- PRIMARY: Electric Yellow (#FFE135) - THE signature LexiClash color
+- SECONDARY: Hot Orange (#FF6B35) - for energy and action
+- ACCENT 1: Shocking Pink (#FF1493) - for excitement
+- ACCENT 2: Neon Cyan (#00FFFF) - for highlights
+- ACCENT 3: Lime Green (#32CD32) - for success/positive elements
+- BACKGROUND: Deep Navy (#1a1a2e) - dark, moody base
+- OUTLINES: Pure Black (#000000) - THICK 4-6px chunky borders
 
-MOOD: ${mood}
+The image MUST be DOMINATED by these bright neon colors on the dark navy background.
+Think: arcade cabinet art, party game splash screen, mobile game hero banner.
 
-The image should make viewers think "I know what this is about!" without needing to read any text.`;
-}
+ART STYLE - "JACKBOX PARTY PACK MEETS ARCADE CABINET":
+- BOLD, chunky geometric shapes (NO thin lines, NO delicate details)
+- HARD BLACK OUTLINES on EVERYTHING (4-6px thick minimum)
+- FLAT color fills with ZERO gradients, ZERO soft shadows
+- HARD-EDGE shadows (8px offset, pure black, NO blur)
+- Halftone dot patterns (Ben-Day dots) for retro pop art feel
+- Exaggerated, PLAYFUL proportions (big heads, tiny bodies OK)
+- Dynamic diagonal compositions with explosive energy
+- MAXIMUM SATURATION - nothing muted or subtle
 
-/**
- * Get secondary color for the category
- */
-function getSecondaryColor(category: string): string {
-  const secondaryMap: Record<string, string> = {
-    sports: '#FFE135', // yellow pairs with orange
-    finance: '#00FFFF', // cyan pairs with yellow
-    entertainment: '#FFE135', // yellow pairs with pink
-    technology: '#FF1493', // pink pairs with cyan
-    weather: '#FF6B35', // orange pairs with cyan
-    politics: '#FFE135', // yellow pairs with navy
-    general: '#FF6B35', // orange pairs with yellow
-  };
-  return secondaryMap[category] || secondaryMap.general;
+VISUAL REQUIREMENTS:
+- Central iconic object/symbol that represents the trend at 60-70% of frame
+- Radiating action lines or starburst patterns in background
+- At least 3 of the palette colors must be prominently visible
+- Dark navy (#1a1a2e) as background anchoring the bright colors
+
+ABSOLUTE CONSTRAINTS:
+- NO text, NO words, NO letters, NO numbers anywhere
+- NO realistic human faces (use silhouettes or cartoon characters)
+- NO photography, NO photorealism
+- NO gradients, NO soft shadows, NO blur effects
+- ONLY flat colors with hard edges
+
+OUTPUT: Square 1024×1024px poster-style illustration
+MOOD: ${mood}, ENERGETIC, FUN, GAME-LIKE
+
+The final image should look like it belongs on the splash screen of a vibrant party video game.`;
 }
 
 /**

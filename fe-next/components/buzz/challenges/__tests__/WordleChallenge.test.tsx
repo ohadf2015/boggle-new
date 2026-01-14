@@ -111,6 +111,9 @@ import '@testing-library/jest-dom';
 import WordleChallenge from '../WordleChallenge';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 
+// Create a mutable language state for tests
+let mockLanguage = 'en';
+
 // Mock translations
 jest.mock('@/contexts/LanguageContext', () => ({
   ...jest.requireActual('@/contexts/LanguageContext'),
@@ -124,12 +127,18 @@ jest.mock('@/contexts/LanguageContext', () => ({
         'buzz.wordle.solved': 'Solved!',
         'buzz.wordle.failed': 'Out of attempts',
         'buzz.submit': 'SUBMIT',
+        'buzz.wordle.useDeviceKeyboard': 'Tap to type',
       };
       return translations[key] || key;
     },
-    language: 'en',
+    language: mockLanguage,
   }),
 }));
+
+// Helper to change mock language
+const setMockLanguage = (lang: string) => {
+  mockLanguage = lang;
+};
 
 describe('WordleChallenge', () => {
   const mockChallenge = {
@@ -577,5 +586,125 @@ describe('WordleChallenge', () => {
     expect(cells[2]).toHaveTextContent('L');
     expect(cells[3]).toHaveTextContent('L');
     expect(cells[4]).toHaveTextContent('O');
+  });
+
+  describe('language-specific keyboard', () => {
+    beforeEach(() => {
+      setMockLanguage('en');
+    });
+
+    it('renders Hebrew keyboard layout when language is Hebrew', () => {
+      setMockLanguage('he');
+
+      const hebrewChallenge = {
+        prompt: 'נושא טרנדי: קולנוע',
+        answer: 'סרטים',
+        hint: 'טקס פרסים',
+      };
+
+      const { unmount } = render(
+        <LanguageProvider>
+          <WordleChallenge
+            challenge={hebrewChallenge}
+            onAnswer={mockOnAnswer}
+            showHint={false}
+          />
+        </LanguageProvider>
+      );
+
+      const keyboard = screen.getByTestId('wordle-keyboard');
+      expect(keyboard).toBeInTheDocument();
+
+      // Hebrew keyboard should have Hebrew letters
+      expect(screen.getByTestId('key-ק')).toBeInTheDocument();
+      expect(screen.getByTestId('key-ש')).toBeInTheDocument();
+      expect(screen.getByTestId('key-א')).toBeInTheDocument();
+
+      unmount();
+    });
+
+    it('renders English keyboard layout when language is English', () => {
+      setMockLanguage('en');
+
+      render(
+        <LanguageProvider>
+          <WordleChallenge
+            challenge={mockChallenge}
+            onAnswer={mockOnAnswer}
+            showHint={false}
+          />
+        </LanguageProvider>
+      );
+
+      // English keyboard should have Q, W, E, R, T, Y, etc.
+      expect(screen.getByTestId('key-Q')).toBeInTheDocument();
+      expect(screen.getByTestId('key-W')).toBeInTheDocument();
+      expect(screen.getByTestId('key-E')).toBeInTheDocument();
+    });
+
+    it('renders Swedish keyboard layout when language is Swedish', () => {
+      setMockLanguage('sv');
+
+      render(
+        <LanguageProvider>
+          <WordleChallenge
+            challenge={mockChallenge}
+            onAnswer={mockOnAnswer}
+            showHint={false}
+          />
+        </LanguageProvider>
+      );
+
+      // Swedish keyboard should have Å, Ä, Ö
+      expect(screen.getByTestId('key-Å')).toBeInTheDocument();
+      expect(screen.getByTestId('key-Ä')).toBeInTheDocument();
+      expect(screen.getByTestId('key-Ö')).toBeInTheDocument();
+    });
+  });
+
+  describe('native device keyboard support', () => {
+    it('renders hidden input for mobile keyboard support', () => {
+      render(
+        <LanguageProvider>
+          <WordleChallenge
+            challenge={mockChallenge}
+            onAnswer={mockOnAnswer}
+            showHint={false}
+          />
+        </LanguageProvider>
+      );
+
+      const hiddenInput = screen.getByTestId('wordle-native-input');
+      expect(hiddenInput).toBeInTheDocument();
+      expect(hiddenInput.tagName).toBe('INPUT');
+    });
+
+    it('accepts input from native keyboard via hidden input', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <LanguageProvider>
+          <WordleChallenge
+            challenge={mockChallenge}
+            onAnswer={mockOnAnswer}
+            showHint={false}
+          />
+        </LanguageProvider>
+      );
+
+      const hiddenInput = screen.getByTestId('wordle-native-input');
+
+      // Focus and type into the hidden input
+      await user.click(hiddenInput);
+      await user.type(hiddenInput, 'HELLO');
+
+      // Should show in the grid
+      const cells = screen.getAllByTestId(/^wordle-cell-0-/);
+      expect(cells[0]).toHaveTextContent('H');
+      expect(cells[1]).toHaveTextContent('E');
+      expect(cells[2]).toHaveTextContent('L');
+      expect(cells[3]).toHaveTextContent('L');
+      expect(cells[4]).toHaveTextContent('O');
+    });
   });
 });

@@ -83,6 +83,7 @@ const en = {
     "valid": "Valid",
     "invalid": "Invalid",
     "close": "Close",
+    "exit": "Exit",
     "adminDashboard": "Admin Dashboard",
     "awesome": "Awesome!",
     "admin": "Admin",
@@ -452,7 +453,8 @@ const en = {
       "noRooms": "No active rooms",
       "beFirst": "Be the first to create one!",
       "createButton": "Create Room",
-      "refreshed": "Rooms refreshed"
+      "refreshed": "Rooms refreshed",
+      "quickPlay": "Quick Play"
     },
     "joinModal": {
       "title": "Join Room",
@@ -520,6 +522,7 @@ const en = {
     "gameSettings": "Settings",
     "quickSetup": "Presets",
     "min": "min",
+    "timer": "Timer",
     "difficulty": "Difficulty",
     "roundDuration": "Round Duration",
     "minutes": "minutes",
@@ -2297,7 +2300,8 @@ const en = {
       "instruction": "Guess the 5-letter word",
       "attemptsLeft": "attempts left",
       "solved": "Solved!",
-      "failed": "Out of attempts"
+      "failed": "Out of attempts",
+      "useDeviceKeyboard": "Tap to type"
     },
     "trio": {
       "hint": "What connects these 3?"

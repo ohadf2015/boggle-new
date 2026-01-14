@@ -217,6 +217,25 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     [handleJoin, setGameCode, setRoomName, setHostUsername, setUsername]
   );
 
+  // Handle quick play - dual mode with sensible defaults
+  const handleQuickPlay = useCallback(() => {
+    // Get or generate username for quick play
+    const quickPlayUsername = isAuthenticated && displayName
+      ? displayName
+      : getStoredUsername() || `Player${Math.floor(Math.random() * 1000)}`;
+
+    const gameCode = generateGameCode();
+    const roomName = `${quickPlayUsername} Room`;
+
+    setGameCode(gameCode);
+    setRoomName(roomName);
+    setHostUsername(quickPlayUsername);
+    setUsername(quickPlayUsername);
+
+    // Create room immediately with host playing (dual mode)
+    handleJoin(true, defaultLanguage, gameCode, roomName);
+  }, [isAuthenticated, displayName, defaultLanguage, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername]);
+
   // Always show RoomListView as base, with modals as overlays
   return (
     <>
@@ -226,6 +245,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
         onRefreshRooms={refreshRooms}
         onRoomClick={handleRoomClick}
         onCreateRoom={handleCreateClick}
+        onQuickPlay={handleQuickPlay}
       />
 
       {/* Join Room Modal */}

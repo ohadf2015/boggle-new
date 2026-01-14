@@ -78,6 +78,7 @@ const sv = {
     "dismiss": "Stäng",
     "info": "Info",
     "close": "Stäng",
+    "exit": "Avsluta",
     "adminDashboard": "Administratörspanel",
     "awesome": "Fantastiskt!",
     "admin": "Admin",
@@ -449,7 +450,8 @@ const sv = {
       "noRooms": "Inga aktiva rum",
       "beFirst": "Var först med att skapa ett!",
       "createButton": "Skapa rum",
-      "refreshed": "Rum uppdaterade"
+      "refreshed": "Rum uppdaterade",
+      "quickPlay": "Snabbspel"
     },
     "joinModal": {
       "title": "Gå med i rum",
@@ -517,6 +519,7 @@ const sv = {
     "gameSettings": "Inställningar",
     "quickSetup": "Förval",
     "min": "min",
+    "timer": "Timer",
     "difficulty": "Svårighetsgrad",
     "roundDuration": "Rundans längd",
     "minutes": "minuter",
@@ -2314,7 +2317,8 @@ const sv = {
       "instruction": "Gissa ordet på 5 bokstäver",
       "attemptsLeft": "försök kvar",
       "solved": "Löst!",
-      "failed": "Inga försök kvar"
+      "failed": "Inga försök kvar",
+      "useDeviceKeyboard": "Tryck för att skriva"
     },
     "challenge": "{number}/{total}",
     "correct": "RÄTT!",

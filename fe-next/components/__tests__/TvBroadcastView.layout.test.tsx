@@ -119,7 +119,7 @@ describe('TvBroadcastView Layout Issues', () => {
     const rootDiv = container.firstChild as HTMLElement;
 
     // Check root has proper height constraint
-    expect(rootDiv).toHaveClass('h-screen');
+    expect(rootDiv).toHaveClass('h-[100dvh]');
     expect(rootDiv).toHaveClass('overflow-hidden');
 
     // Main content should use flex-1 and min-h-0 to prevent overflow
@@ -154,7 +154,7 @@ describe('TvBroadcastView Layout Issues', () => {
     // In fullscreen, header and join bar should not be rendered (AnimatePresence exit)
     // This test verifies the layout still works when these elements are hidden
     const rootDiv = container.firstChild as HTMLElement;
-    expect(rootDiv).toHaveClass('h-screen');
+    expect(rootDiv).toHaveClass('h-[100dvh]');
 
     // The main content area should expand to fill available space
     const mainContent = container.querySelector('.flex-1.min-h-0');

@@ -142,7 +142,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   const isEarthquakeShaking = earthquakeState === 'shaking';
 
   return (
-    <div className="h-screen bg-gradient-to-b from-slate-100 via-slate-50 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col overflow-hidden relative">
+    <div className="h-[100dvh] bg-neo-navy flex flex-col overflow-hidden relative">
       {/* Fullscreen Toggle Button */}
       {isFullscreenSupported && (
         <motion.button

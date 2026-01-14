@@ -74,20 +74,23 @@ export default function BuzzReadyScreen({
           </p>
         </motion.div>
 
-        {/* Hero Image (admin-only via feature flag) */}
+        {/* Hero Image - Full Size Display (admin-only via feature flag) */}
         {challengeData.imageUrl && showImages && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="relative rounded-xl overflow-hidden border-4 border-neo-black shadow-hard-lg"
+            className="relative w-full max-w-lg mx-auto rounded-xl overflow-hidden border-4 border-neo-black shadow-hard-lg"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={challengeData.imageUrl}
               alt={challengeData.trendingSummary}
-              className="w-full h-64 object-cover"
+              className="w-full aspect-square object-cover"
             />
+            {/* Neo-brutalist corner accent */}
+            <div className="absolute top-0 start-0 w-8 h-8 bg-neo-yellow border-e-4 border-b-4 border-neo-black" />
+            <div className="absolute bottom-0 end-0 w-8 h-8 bg-neo-pink border-s-4 border-t-4 border-neo-black" />
             {/* Beta badge for admin preview */}
             <div className="absolute top-3 end-3 px-3 py-1 bg-neo-pink/90 backdrop-blur-sm rounded-full border-2 border-neo-black">
               <span className="text-xs font-black text-neo-white">

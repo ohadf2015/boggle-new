@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Users, Plus, RefreshCw, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Users, Plus, RefreshCw, HelpCircle, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
@@ -22,6 +22,7 @@ interface RoomListViewProps {
   onRefreshRooms: () => void;
   onRoomClick: (room: ActiveRoom) => void;
   onCreateRoom: () => void;
+  onQuickPlay?: () => void; // For dual mode - quick start with defaults
 }
 
 /**
@@ -34,6 +35,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
   onRefreshRooms,
   onRoomClick,
   onCreateRoom,
+  onQuickPlay,
 }) => {
   const { t, dir } = useLanguage();
   const [showHowToPlay, setShowHowToPlay] = useState(false);
@@ -198,29 +200,45 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               transition={{ delay: 0.3 }}
               className="fixed bottom-4 lg:bottom-6 left-2 right-2 sm:left-3 sm:right-3 lg:left-4 lg:right-4 z-10"
             >
-              <div className="max-w-2xl mx-auto flex gap-2 lg:gap-3">
-                {/* How to Play Button */}
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => setShowHowToPlay(true)}
-                  className="py-4 lg:py-5 text-base lg:text-lg font-bold uppercase shadow-hard-lg border-3 lg:border-4 border-neo-black bg-neo-purple hover:bg-neo-purple/90 text-neo-white"
-                  aria-label={t('landing.tutorial') || 'How to Play'}
-                >
-                  <HelpCircle className="w-5 h-5 lg:w-6 lg:h-6" />
-                  <span className="hidden sm:inline ms-2">{t('landing.tutorial') || 'How to Play'}</span>
-                </Button>
+              <div className="max-w-2xl mx-auto flex flex-col gap-2 lg:gap-3">
+                {/* Main Actions Row */}
+                <div className="flex gap-2 lg:gap-3">
+                  {/* How to Play Button */}
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => setShowHowToPlay(true)}
+                    className="py-4 lg:py-5 text-base lg:text-lg font-bold uppercase shadow-hard-lg border-3 lg:border-4 border-neo-black bg-neo-purple hover:bg-neo-purple/90 text-neo-white"
+                    aria-label={t('landing.tutorial') || 'How to Play'}
+                  >
+                    <HelpCircle className="w-5 h-5 lg:w-6 lg:h-6" />
+                    <span className="hidden sm:inline ms-2">{t('landing.tutorial') || 'How to Play'}</span>
+                  </Button>
 
-                {/* Create Room Button */}
-                <Button
-                  variant="success"
-                  size="lg"
-                  onClick={onCreateRoom}
-                  className="flex-1 py-4 lg:py-5 text-base lg:text-lg font-bold uppercase shadow-hard-lg"
-                >
-                  <Plus className="w-5 h-5 lg:w-6 lg:h-6 me-2" />
-                  {t('multiplayerFlow.roomList.createButton') || 'Create Room'}
-                </Button>
+                  {/* Create Room Button */}
+                  <Button
+                    variant="success"
+                    size="lg"
+                    onClick={onCreateRoom}
+                    className="flex-1 py-4 lg:py-5 text-base lg:text-lg font-bold uppercase shadow-hard-lg"
+                  >
+                    <Plus className="w-5 h-5 lg:w-6 lg:h-6 me-2" />
+                    {t('multiplayerFlow.roomList.createButton') || 'Create Room'}
+                  </Button>
+                </div>
+
+                {/* Quick Play Button - For dual mode */}
+                {onQuickPlay && (
+                  <Button
+                    variant="default"
+                    size="lg"
+                    onClick={onQuickPlay}
+                    className="w-full py-4 lg:py-5 text-base lg:text-lg font-bold uppercase shadow-hard-lg border-3 lg:border-4 border-neo-black bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black"
+                  >
+                    <Zap className="w-5 h-5 lg:w-6 lg:h-6 me-2" />
+                    {t('multiplayerFlow.roomList.quickPlay') || 'Quick Play'}
+                  </Button>
+                )}
               </div>
             </motion.div>
           )}
