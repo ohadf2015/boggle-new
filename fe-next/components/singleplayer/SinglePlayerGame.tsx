@@ -1343,155 +1343,145 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           </div>
         )}
 
-        {/* Left Side Panel - Timer & Score */}
         <div
-          className="absolute top-1/2 -translate-y-1/2 z-20 landscape-side-panel"
-          style={{ left: 'clamp(4px, 1vw, 12px)' }}
-        >
-          <div className="landscape-panel flex flex-col items-center gap-3">
-            {/* Timer - Large and prominent (hidden in practice mode) */}
-            {settings.mode !== 'practice' && (
-              <CircularTimer
-                remainingTime={timer.remainingTime}
-                totalTime={settings.timerSeconds}
-                size="lg"
-              />
-            )}
-
-            {/* Score - Primary stat (sized appropriately in practice mode) */}
-            <div className="flex flex-col items-center">
-              <AdaptiveMotion.div
-                key={score}
-                initial={{ scale: 1.2 }}
-                animate={{ scale: 1 }}
-                className={cn(
-                  "text-neo-black font-black",
-                  settings.mode === 'practice'
-                    ? "text-3xl sm:text-4xl leading-none" // Responsive for small phones
-                    : "landscape-stat-primary"
-                )}
-              >
-                {score}
-              </AdaptiveMotion.div>
-              <div className={cn(
-                "text-neo-black font-bold uppercase tracking-wider",
-                settings.mode === 'practice'
-                  ? "text-xs sm:text-sm mt-0.5" // Smaller label for small phones
-                  : "landscape-stat-label"
-              )}>
-                {t('common.score') || 'SCORE'}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Side Panel - Words & Combo */}
-        <div
-          className="absolute top-1/2 -translate-y-1/2 z-20 landscape-side-panel"
-          style={{ right: 'clamp(4px, 1vw, 12px)' }}
-        >
-          <div className="landscape-panel flex flex-col items-center gap-3">
-            {/* Words Found Count */}
-            <div className="flex flex-col items-center">
-              <div className="landscape-stat-secondary text-neo-black">
-                {validWordCount}
-              </div>
-              <div className="landscape-stat-label text-neo-black">
-                {t('common.words') || 'WORDS'}
-              </div>
-            </div>
-
-            {/* Combo Display - High contrast for light panel background */}
-            <ComboDisplay
-              comboLevel={combo.comboLevel}
-              coinReward={comboCoinReward}
-              onCoinAnimationComplete={() => setComboCoinReward(null)}
-              highContrast
-              compact
-            />
-          </div>
-        </div>
-
-        {/* Bottom action bar - safe from side panel overlap */}
-        <div
-          className="absolute bottom-2 left-0 right-0 z-30 flex justify-between items-center"
+          className="grid w-full h-full grid-rows-[1fr_auto] items-center"
           style={{
-            paddingInline: 'clamp(100px, 18vw, 150px)',
-            paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+            gridTemplateColumns: 'clamp(70px, 14vw, 110px) minmax(0, 1fr) clamp(70px, 14vw, 110px)',
           }}
         >
-          {/* Pause/Finish button (primary action - easy thumb reach) */}
-          {settings.mode !== 'practice' ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsPaused(!isPaused)}
-              aria-label={isPaused ? (t('common.resume') || 'Resume') : (t('common.pause') || 'Pause')}
-              aria-pressed={isPaused}
-              className="w-12 h-12 p-0 bg-neo-cream hover:brightness-110 border-2 border-neo-black rounded-neo flex items-center justify-center shadow-hard-sm"
-            >
-              {isPaused ? <Play className="text-lg text-neo-black" /> : <Pause className="text-lg text-neo-black" />}
-            </Button>
-          ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleFinishPractice}
-              aria-label={t('singlePlayer.finish') || 'Finish'}
-              className="px-3 sm:px-4 h-10 sm:h-12 min-h-[44px] bg-neo-lime hover:brightness-110 border-2 border-neo-black rounded-neo text-xs sm:text-sm font-bold text-neo-black shadow-hard-sm"
-            >
-              {t('singlePlayer.finish') || 'Finish'}
-            </Button>
-          )}
+          {/* Left Side Panel - Timer & Score */}
+          <div className="row-start-1 col-start-1 flex justify-start ps-1">
+            <div className="landscape-panel flex flex-col items-center gap-3">
+              {settings.mode !== 'practice' && (
+                <CircularTimer
+                  remainingTime={timer.remainingTime}
+                  totalTime={settings.timerSeconds}
+                  size="lg"
+                />
+              )}
 
-          {/* Quit button (secondary - requires confirmation if score > 0) */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleQuitRequest}
-            aria-label={t('common.quit') || 'Quit game'}
-            className="w-12 h-12 p-0 bg-neo-red hover:brightness-110 border-2 border-neo-black rounded-neo flex items-center justify-center shadow-hard-sm"
-          >
-            <ArrowLeft className="text-lg text-neo-cream rtl:rotate-180" />
-          </Button>
-        </div>
-
-        {/* Center: Word Forming Area + Grid - with responsive padding for side panels */}
-        <div
-          className="flex flex-col items-center justify-center w-full h-full py-1 gap-1.5 landscape-grid-container"
-          style={{ paddingInline: 'clamp(100px, 18vw, 150px)' }}
-        >
-          {/* Word Forming Area - Permanent space above grid (keep timer section clear) */}
-          <div className="flex items-center justify-center mb-0.5">
-            <WordFormingArea
-              word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
-              letterCount={keyboardInput.isTypingMode ? keyboardInput.typedWord.length : letterCount}
-              feedback={currentFeedback}
-              compact
-            />
+              <div className="flex flex-col items-center">
+                <AdaptiveMotion.div
+                  key={score}
+                  initial={{ scale: 1.2 }}
+                  animate={{ scale: 1 }}
+                  className={cn(
+                    "text-neo-black font-black",
+                    settings.mode === 'practice'
+                      ? "text-3xl sm:text-4xl leading-none"
+                      : "landscape-stat-primary"
+                  )}
+                >
+                  {score}
+                </AdaptiveMotion.div>
+                <div className={cn(
+                  "text-neo-black font-bold uppercase tracking-wider",
+                  settings.mode === 'practice'
+                    ? "text-xs sm:text-sm mt-0.5"
+                    : "landscape-stat-label"
+                )}>
+                  {t('common.score') || 'SCORE'}
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="flex-1 flex items-center justify-center game-board-frame-landscape" style={{ aspectRatio: '1/1' }}>
-            <GridComponent
-              grid={grid}
-              interactive={!isPaused}
-              onWordSubmit={handleWordSubmit}
-              onPathSubmit={handlePathSubmit}
-              onWordChange={handleWordChange}
-              hideWordPreview
-              hideComboIndicator={true}
-              comboLevel={combo.comboLevel}
-              largeText
-              fireRoundActive={fireRoundActive}
-              earthquakeShaking={earthquakeState === 'shaking'}
-              highlightedPath={
-                shouldShowKeyboardTrails(keyboardInput.isTypingMode, lastWordFoundTimeRef.current, undefined)
-                  ? keyboardInput.highlightedCells
-                  : firstPlayTutorial.tutorialPath
-                    ? firstPlayTutorial.tutorialPath.map(p => ({ row: p.row, col: p.col }))
-                    : revealState.highlightedPath
-              }
-              language={settings.language}
-            />
+
+          {/* Center: Word Forming Area + Grid */}
+          <div className="row-start-1 col-start-2 flex flex-col items-center justify-center w-full h-full py-1 gap-1.5 landscape-grid-container min-w-0">
+            <div className="flex items-center justify-center mb-0.5">
+              <WordFormingArea
+                word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
+                letterCount={keyboardInput.isTypingMode ? keyboardInput.typedWord.length : letterCount}
+                feedback={currentFeedback}
+                compact
+              />
+            </div>
+            <div className="flex-1 flex items-center justify-center game-board-frame-landscape min-w-0" style={{ aspectRatio: '1/1' }}>
+              <GridComponent
+                grid={grid}
+                interactive={!isPaused}
+                onWordSubmit={handleWordSubmit}
+                onPathSubmit={handlePathSubmit}
+                onWordChange={handleWordChange}
+                hideWordPreview
+                hideComboIndicator={true}
+                comboLevel={combo.comboLevel}
+                largeText
+                fireRoundActive={fireRoundActive}
+                earthquakeShaking={earthquakeState === 'shaking'}
+                highlightedPath={
+                  shouldShowKeyboardTrails(keyboardInput.isTypingMode, lastWordFoundTimeRef.current, undefined)
+                    ? keyboardInput.highlightedCells
+                    : firstPlayTutorial.tutorialPath
+                      ? firstPlayTutorial.tutorialPath.map(p => ({ row: p.row, col: p.col }))
+                      : revealState.highlightedPath
+                }
+                language={settings.language}
+              />
+            </div>
+          </div>
+
+          {/* Right Side Panel - Words & Combo */}
+          <div className="row-start-1 col-start-3 flex justify-end pe-1">
+            <div className="landscape-panel flex flex-col items-center gap-3">
+              <div className="flex flex-col items-center">
+                <div className="landscape-stat-secondary text-neo-black">
+                  {validWordCount}
+                </div>
+                <div className="landscape-stat-label text-neo-black">
+                  {t('common.words') || 'WORDS'}
+                </div>
+              </div>
+
+              <ComboDisplay
+                comboLevel={combo.comboLevel}
+                coinReward={comboCoinReward}
+                onCoinAnimationComplete={() => setComboCoinReward(null)}
+                highContrast
+                compact
+              />
+            </div>
+          </div>
+
+          {/* Bottom action bar */}
+          <div
+            className="row-start-2 col-span-3 z-30 flex justify-between items-center px-2 pb-2"
+            style={{
+              paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+            }}
+          >
+            {settings.mode !== 'practice' ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsPaused(!isPaused)}
+                aria-label={isPaused ? (t('common.resume') || 'Resume') : (t('common.pause') || 'Pause')}
+                aria-pressed={isPaused}
+                className="w-12 h-12 p-0 bg-neo-cream hover:brightness-110 border-2 border-neo-black rounded-neo flex items-center justify-center shadow-hard-sm"
+              >
+                {isPaused ? <Play className="text-lg text-neo-black" /> : <Pause className="text-lg text-neo-black" />}
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleFinishPractice}
+                aria-label={t('singlePlayer.finish') || 'Finish'}
+                className="px-3 sm:px-4 h-10 sm:h-12 min-h-[44px] bg-neo-lime hover:brightness-110 border-2 border-neo-black rounded-neo text-xs sm:text-sm font-bold text-neo-black shadow-hard-sm"
+              >
+                {t('singlePlayer.finish') || 'Finish'}
+              </Button>
+            )}
+
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleQuitRequest}
+              aria-label={t('common.quit') || 'Quit game'}
+              className="w-12 h-12 p-0 bg-neo-red hover:brightness-110 border-2 border-neo-black rounded-neo flex items-center justify-center shadow-hard-sm"
+            >
+              <ArrowLeft className="text-lg text-neo-cream rtl:rotate-180" />
+            </Button>
           </div>
         </div>
 

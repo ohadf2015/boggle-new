@@ -2451,7 +2451,11 @@ const es = {
     "notAvailable": "No Disponible",
     "unavailableTagline": "Aún no disponible para este idioma",
     "requestChallenge": "Solicitar Desafío",
-    "requestSent": "¡Solicitud Enviada!"
+    "requestSent": "¡Solicitud Enviada!",
+    "skipToAnswers": "Saltar a las respuestas",
+    "skipConfirmTitle": "¿Saltar los desafíos?",
+    "skipConfirmMessage": "Verás las respuestas sin jugar. Tu puntuación será 0.",
+    "skipConfirm": "Saltar a las respuestas"
   },
   "wordHunt": {
     "title": "Caza de Palabras",

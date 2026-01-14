@@ -57,7 +57,7 @@ const ModeDiscoveryBanner: React.FC = () => {
             {/* Dismiss button */}
             <button
               onClick={handleDismiss}
-              className="absolute top-2 right-2 rtl:right-auto rtl:left-2 sm:top-3 sm:right-3 sm:rtl:right-auto sm:rtl:left-3 w-7 h-7 sm:w-8 sm:h-8 bg-neo-white/80 hover:bg-neo-white border-2 border-neo-black rounded-full flex items-center justify-center transition-colors z-10"
+              className="absolute top-2 right-2 rtl:right-auto rtl:left-2 sm:top-3 sm:right-3 sm:rtl:right-auto sm:rtl:left-3 w-11 h-11 min-w-[44px] min-h-[44px] bg-neo-white/80 hover:bg-neo-white border-2 border-neo-black rounded-full flex items-center justify-center transition-colors z-10"
               aria-label={t('common.dismiss') || 'Dismiss'}
             >
               <X className="w-4 h-4 text-neo-black" />

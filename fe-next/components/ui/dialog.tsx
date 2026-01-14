@@ -20,7 +20,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-neo-black/85",
+      "fixed inset-0 z-90 bg-neo-black/85",
       "data-[state=open]:animate-in data-[state=closed]:animate-out",
       "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className
@@ -55,7 +55,7 @@ const DialogContent = React.forwardRef<
       aria-describedby={noDescription ? undefined : props['aria-describedby']}
       className={cn(
         // Mobile-first positioning - constrained on mobile, centered modal on desktop
-        "fixed z-50 grid w-[calc(100%-2rem)] max-w-[95vw]",
+        "fixed z-90 grid w-[calc(100%-2rem)] max-w-[95vw]",
         // Positioning
         "left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]",
         "sm:max-w-lg lg:max-w-xl xl:max-w-2xl",

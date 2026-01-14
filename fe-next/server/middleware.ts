@@ -9,6 +9,7 @@ import express, { Application, Request, Response, NextFunction, RequestHandler }
 import { geolocationMiddleware } from '../backend/utils/geolocation';
 
 const dev: boolean = process.env.NODE_ENV !== 'production';
+const EXPRESS_API_ROUTES: string[] = ['/api/leaderboard', '/api/geolocation', '/api/analytics', '/api/admin', '/api/dictionary', '/api/solve-grid', '/api/single-player', '/api/daily-challenge', '/api/generate-word-hints'];
 
 /**
  * Middleware configuration options
@@ -106,7 +107,11 @@ function cacheHeaders(): RequestHandler {
     
     if (path.startsWith('/_next/static/') || path.match(/\.(js|css|woff2?|ttf|otf|png|jpg|jpeg|svg|ico|webp|avif)$/)) {
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-    } else if (path.startsWith('/_next/') || path.startsWith('/api/')) {
+    } else if (path.startsWith('/_next/')) {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    } else if (EXPRESS_API_ROUTES.some((route) => path.startsWith(route))) {
       res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
@@ -132,6 +137,56 @@ function requestTimeout(): RequestHandler {
     res.on('finish', () => clearTimeout(timer));
     res.on('close', () => clearTimeout(timer));
     
+    next();
+  };
+}
+
+function perfVariantCookie(isDev: boolean): RequestHandler {
+  const maxAgeSeconds = 60 * 60 * 24 * 30;
+  const rolloutPercent = Math.max(0, Math.min(100, parseInt(process.env.PERF_VARIANT_PERCENT || '100', 10)));
+
+  return (req: Request, res: Response, next: NextFunction): void => {
+    if (req.method !== 'GET') {
+      next();
+      return;
+    }
+
+    const accept = req.headers.accept || '';
+    const isHtml = accept.includes('text/html');
+    if (!isHtml) {
+      next();
+      return;
+    }
+
+    const path = req.path;
+    if (path.startsWith('/_next/') || path.startsWith('/api/') || path.match(/\.(js|css|woff2?|ttf|otf|png|jpg|jpeg|svg|ico|webp|avif)$/)) {
+      next();
+      return;
+    }
+
+    // Use a fixed base URL - we only need the pathname and query params, not the actual host
+    const url = new URL(req.originalUrl, 'http://localhost');
+    const override = url.searchParams.get('perf_variant');
+    const cookiesHeader = req.headers.cookie || '';
+    const hasVariant = /(?:^|;\s*)perf_variant=/.test(cookiesHeader);
+
+    let variant: string | null = null;
+    if (override === 'control' || override === 'perf_v1') {
+      variant = override;
+    } else if (!hasVariant) {
+      variant = Math.random() * 100 < rolloutPercent ? 'perf_v1' : 'control';
+    }
+
+    if (variant) {
+      res.cookie('perf_variant', variant, {
+        httpOnly: false,
+        secure: !isDev,
+        sameSite: 'lax',
+        maxAge: maxAgeSeconds * 1000,
+        path: '/',
+      });
+    }
+
     next();
   };
 }
@@ -187,9 +242,8 @@ export function configureMiddleware(app: Application, { corsOrigin, isDev }: Mid
 
   // JSON body parsing - only for Express-handled API routes
   // Next.js App Router API routes handle their own body parsing
-  const expressApiRoutes: string[] = ['/api/leaderboard', '/api/geolocation', '/api/analytics', '/api/admin', '/api/dictionary', '/api/solve-grid', '/api/single-player', '/api/daily-challenge', '/api/generate-word-hints'];
   app.use((req: Request, res: Response, next: NextFunction): void => {
-    const isExpressRoute = expressApiRoutes.some(route => req.path.startsWith(route));
+    const isExpressRoute = EXPRESS_API_ROUTES.some(route => req.path.startsWith(route));
     if (isExpressRoute) {
       express.json({ limit: '1mb', strict: true })(req, res, next);
       return;
@@ -202,6 +256,8 @@ export function configureMiddleware(app: Application, { corsOrigin, isDev }: Mid
 
   // Caching headers
   app.use(cacheHeaders());
+
+  app.use(perfVariantCookie(isDev));
 
   // Security headers
   app.use(securityHeaders(isDev));

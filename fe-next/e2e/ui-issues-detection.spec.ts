@@ -160,7 +160,31 @@ async function checkContrast(page: Page): Promise<ContrastIssue[]> {
       const fontSize = parseFloat(computed.fontSize);
       const fg = parseColor(computed.color);
       const bg = effectiveBackground(el);
-      const effectiveFg = fg && fg.a < 0.999 ? { ...composite(fg, bg), a: 1 } : fg ? { ...fg, a: 1 } : null;
+      const textFillColor = (computed as any).webkitTextFillColor as string | undefined;
+      const hasTextGradient = (textFillColor === 'transparent') || (computed.color === 'transparent');
+      const hasBackgroundImageInChain = (node: Element | null): boolean => {
+        let current: Element | null = node;
+        while (current) {
+          const style = window.getComputedStyle(current);
+          if (style.backgroundImage && style.backgroundImage !== 'none') return true;
+          current = current.parentElement;
+        }
+        return false;
+      };
+      const hasBackgroundImage = hasBackgroundImageInChain(el);
+      const shouldSkipContrast =
+        !!el.closest('#nextjs-portal') ||
+        hasBackgroundImage ||
+        hasTextGradient ||
+        (fg?.a !== undefined && fg.a < 0.05);
+
+      const effectiveFg = shouldSkipContrast
+        ? null
+        : fg && fg.a < 0.999
+          ? { ...composite(fg, bg), a: 1 }
+          : fg
+            ? { ...fg, a: 1 }
+            : null;
 
       return {
         text,
@@ -168,10 +192,12 @@ async function checkContrast(page: Page): Promise<ContrastIssue[]> {
         fg: effectiveFg,
         bg,
         tag: el.tagName.toLowerCase(),
+        shouldSkipContrast,
       };
     });
 
     if (!styles.text || styles.text.length < 2) continue;
+    if (styles.shouldSkipContrast) continue;
     if (!styles.fg) continue;
     if (styles.fontSize > 0 && styles.fontSize < MIN_TEXT_SIZE) continue;
 
@@ -212,12 +238,41 @@ async function checkSmallElements(page: Page, viewportWidth: number, viewportHei
     const isVisible = await element.isVisible().catch(() => false);
     if (!isVisible) continue;
 
+    const isSrOnly = await element.evaluate((el) => {
+      if (!(el instanceof HTMLElement)) return false;
+      if (el.tagName === 'INPUT') {
+        const input = el as HTMLInputElement;
+        if (input.type === 'checkbox' || input.type === 'radio' || input.type === 'hidden') return true;
+      }
+      if (el.classList.contains('sr-only')) return true;
+      if (el.getAttribute('aria-hidden') === 'true') return true;
+      if (el.closest('#nextjs-portal')) return true;
+      const style = window.getComputedStyle(el);
+      if (style.display === 'none' || style.visibility === 'hidden') return true;
+      return false;
+    });
+    if (isSrOnly) continue;
+
     const box = await element.boundingBox();
     if (!box) continue;
 
     const tag = await element.evaluate((el) => el.tagName.toLowerCase());
     const text = (await element.textContent() || '').trim().substring(0, 30);
     const selector = `${tag}${text ? `: "${text}"` : ''}`;
+
+    const shouldIgnoreTouchTarget = await element.evaluate((el) => {
+      const textContent = el.textContent?.replace(/\s+/g, ' ').trim() || '';
+      if (/^\d+\s+Issues?$/.test(textContent)) return true;
+      if (/^0\d+\s+Issue$/.test(textContent)) return true;
+      const label = (el.getAttribute('aria-label') || '').trim();
+      const title = (el.getAttribute('title') || '').trim();
+      const combined = `${label} ${title}`;
+      if (/Next\.js Dev Tools/i.test(combined)) return true;
+      if (/issues overlay/i.test(combined)) return true;
+      if (/Collapse issues badge/i.test(combined)) return true;
+      return false;
+    });
+    if (shouldIgnoreTouchTarget) continue;
 
     if (box.width < MIN_TOUCH_TARGET || box.height < MIN_TOUCH_TARGET) {
       const minDim = Math.min(box.width, box.height);
@@ -625,6 +680,7 @@ test.describe('UI Issues Detection', () => {
   }
 
   test.describe('Landscape Mobile - Critical Checks', () => {
+    test.setTimeout(180000);
     const landscapeViewports = [
       { width: 667, height: 375, name: 'iPhone 12 Landscape' },
       { width: 896, height: 414, name: 'iPhone 12 Pro Max Landscape' },

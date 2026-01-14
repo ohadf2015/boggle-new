@@ -85,6 +85,8 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                   <img
                     src={ogImageUrl}
                     alt="Share preview"
+                    width={1200}
+                    height={630}
                     className={`w-full h-auto ${imageLoaded ? 'block' : 'hidden'}`}
                     onLoad={() => setImageLoaded(true)}
                   />

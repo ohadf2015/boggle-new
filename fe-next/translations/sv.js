@@ -2454,7 +2454,11 @@ const sv = {
     "notAvailable": "Ej tillgängligt",
     "unavailableTagline": "Inte tillgängligt för detta språk ännu",
     "requestChallenge": "Begär utmaning",
-    "requestSent": "Begäran skickad!"
+    "requestSent": "Begäran skickad!",
+    "skipToAnswers": "Hoppa till svaren",
+    "skipConfirmTitle": "Hoppa över utmaningarna?",
+    "skipConfirmMessage": "Du ser svaren utan att spela. Din poäng blir 0.",
+    "skipConfirm": "Hoppa till svaren"
   },
   "wordHunt": {
     "title": "Ordjakt",

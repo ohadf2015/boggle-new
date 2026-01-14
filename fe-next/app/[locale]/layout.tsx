@@ -19,10 +19,17 @@ const EmailCaptureModal = nextDynamic(() => import('@/components/EmailCaptureMod
   loading: () => null,
 });
 
-// Force dynamic rendering - prevent static generation
-export const dynamic = 'force-dynamic';
-export const dynamicParams = true;
-export const runtime = 'nodejs';
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+    return [
+        { locale: 'en' },
+        { locale: 'he' },
+        { locale: 'sv' },
+        { locale: 'ja' },
+        { locale: 'es' },
+    ];
+}
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
@@ -153,9 +160,6 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
         },
     };
 }
-
-// Removed generateStaticParams to prevent static generation
-// The app uses dynamic rendering with WebSocket connections
 
 export default async function LocaleLayout({ children, params }: LocaleLayoutProps): Promise<ReactNode> {
     const { locale } = await params;

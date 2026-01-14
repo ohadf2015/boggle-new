@@ -2463,7 +2463,11 @@ const he = {
     "notAvailable": "לא זמין",
     "unavailableTagline": "עדיין לא זמין בשפה זו",
     "requestChallenge": "בקש אתגר",
-    "requestSent": "הבקשה נשלחה!"
+    "requestSent": "הבקשה נשלחה!",
+    "skipToAnswers": "דלג לתשובות",
+    "skipConfirmTitle": "לדלג על האתגרים?",
+    "skipConfirmMessage": "תראו את התשובות בלי לשחק. הניקוד שלכם יהיה 0.",
+    "skipConfirm": "דלג לתשובות"
   },
   "wordHunt": {
     "title": "ציד מילים",

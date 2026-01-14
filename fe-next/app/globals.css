@@ -791,11 +791,11 @@ body {
     .game-board-frame {
       /* Some padding for breathing room on mobile */
       padding: 8px;
-      /* Maximize width: full screen minus tiny 8px total margin (4px each side) */
-      width: calc(100vw - 8px);
+      /* Leave room for hard shadow/borders to avoid horizontal overflow */
+      width: min(calc(100dvw - 32px), 100%);
       /* Height: square but capped to leave room for header/UI and safe area (home indicator) */
-      height: min(calc(100vw - 8px), calc(100dvh - 190px - env(safe-area-inset-bottom, 0px)));
-      max-width: calc(100vw - 8px);
+      height: min(calc(100dvw - 32px), calc(100dvh - 190px - env(safe-area-inset-bottom, 0px)));
+      max-width: calc(100dvw - 32px);
       /* Ensure board shrinks properly in flex containers on very short phones */
       max-height: 100%;
     }

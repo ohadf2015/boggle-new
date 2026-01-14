@@ -85,7 +85,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
               onClick={() => handleNavigation(tab)}
               className={cn(
                 'flex flex-col items-center justify-center',
-                'px-6 py-2 min-w-[72px]',
+                'h-16 px-4 min-w-[72px]',
                 'transition-all duration-150',
                 'active:scale-95', // CSS-based tap animation (replaces whileTap)
                 isActive

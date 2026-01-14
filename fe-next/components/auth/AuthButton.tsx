@@ -326,7 +326,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                 role="menu"
                 aria-label={t('auth.userMenu') || 'User menu'}
                 className={cn(
-                  'min-w-[180px] rounded-lg shadow-xl z-[10000]',
+                  'min-w-[180px] rounded-lg shadow-xl z-80',
                   isDarkMode
                     ? 'bg-slate-800 border border-slate-700'
                     : 'bg-white border border-gray-200'
@@ -753,7 +753,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                 role="menu"
                 aria-label={t('auth.userMenu') || 'User menu'}
                 className={cn(
-                  'absolute top-full mt-2 min-w-[180px] rounded-lg shadow-xl z-[10000]',
+                  'absolute top-full mt-2 min-w-[180px] rounded-lg shadow-xl z-80',
                   isRTL ? 'left-0' : 'right-0',
                   isDarkMode
                     ? 'bg-slate-800 border border-slate-700'

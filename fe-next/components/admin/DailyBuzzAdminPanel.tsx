@@ -1,14 +1,37 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { Play, Check, X, Clock, Sparkles } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Play,
+  Check,
+  X,
+  Clock,
+  Sparkles,
+  Eye,
+  Edit2,
+  RefreshCw,
+  ChevronDown,
+  ChevronUp,
+  MessageSquare,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NeoLoader } from '@/components/ui/NeoLoader';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogBody,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { getSession } from '@/lib/supabase';
 
 // Client-side timeout matches server maxDuration (120s) with buffer
 const CLIENT_TIMEOUT_MS = 130_000;
+
+// Regeneration timeout (60s API + buffer)
+const REGENERATE_TIMEOUT_MS = 70_000;
 
 interface GenerationResult {
   success: boolean;
@@ -18,14 +41,59 @@ interface GenerationResult {
   message?: string;
 }
 
+interface BuzzChallengeAdmin {
+  type: string;
+  trend_topic: string;
+  prompt: string;
+  answer: string;
+  hint?: string;
+  difficulty: string;
+  trending_context?: string;
+  options?: string[];
+}
+
+interface TrendingTopicAdmin {
+  query: string;
+  search_volume?: number;
+}
+
+interface DailyBuzzDataAdmin {
+  puzzle_date: string;
+  language: string;
+  trending_summary: string;
+  challenges: BuzzChallengeAdmin[];
+  trending_topics: TrendingTopicAdmin[];
+}
+
+const CHALLENGE_LANGUAGES = [
+  { code: 'en', label: 'EN' },
+  { code: 'he', label: 'HE' },
+  { code: 'sv', label: 'SV' },
+  { code: 'ja', label: 'JA' },
+  { code: 'es', label: 'ES' },
+];
+
+const CHALLENGE_TYPE_ICONS: Record<string, string> = {
+  anagram: '🔀',
+  fill_blank: '📝',
+  word_chain: '🔗',
+  definition_match: '🎯',
+  trending_trio: '3️⃣',
+  riddle: '🧩',
+  wordle_guess: '🟩',
+};
+
 /**
  * DailyBuzzAdminPanel - Admin control panel for Daily Buzz
  * Features:
  * - Manual generation trigger (all languages or single)
  * - Generation status display
+ * - View and edit today's challenges
+ * - Regenerate individual challenges with feedback
  * - Feature flag management link
  */
 export default function DailyBuzzAdminPanel() {
+  // Generation state
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<GenerationResult | null>(null);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
@@ -35,6 +103,28 @@ export default function DailyBuzzAdminPanel() {
   const [elapsedTime, setElapsedTime] = useState(0);
   const abortControllerRef = useRef<AbortController | null>(null);
   const startTimeRef = useRef<number>(0);
+
+  // Challenge viewer state
+  const [challengeData, setChallengeData] = useState<DailyBuzzDataAdmin | null>(null);
+  const [loadingChallenges, setLoadingChallenges] = useState(false);
+  const [showChallenges, setShowChallenges] = useState(false);
+  const [viewLanguage, setViewLanguage] = useState<string>('en');
+
+  // Edit dialog state
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingChallengeIndex, setEditingChallengeIndex] = useState<number | null>(null);
+  const [feedback, setFeedback] = useState('');
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [regenerateError, setRegenerateError] = useState<string | null>(null);
+
+  const languages = [
+    { code: 'all', label: 'All Languages' },
+    { code: 'en', label: 'English' },
+    { code: 'he', label: 'Hebrew' },
+    { code: 'sv', label: 'Swedish' },
+    { code: 'ja', label: 'Japanese' },
+    { code: 'es', label: 'Spanish' },
+  ];
 
   // Update elapsed time during generation
   useEffect(() => {
@@ -51,14 +141,106 @@ export default function DailyBuzzAdminPanel() {
     return () => clearInterval(interval);
   }, [isGenerating]);
 
-  const languages = [
-    { code: 'all', label: 'All Languages' },
-    { code: 'en', label: 'English' },
-    { code: 'he', label: 'Hebrew' },
-    { code: 'sv', label: 'Swedish' },
-    { code: 'ja', label: 'Japanese' },
-    { code: 'es', label: 'Spanish' },
-  ];
+  // Fetch challenges for viewing/editing
+  const fetchChallenges = useCallback(async (lang?: string) => {
+    const targetLanguage = lang || viewLanguage;
+    setLoadingChallenges(true);
+
+    try {
+      const { data: { session } } = await getSession();
+      if (!session?.access_token) {
+        throw new Error('No active session');
+      }
+
+      const response = await fetch(
+        `/api/admin/buzz/challenges?date=${selectedDate}&language=${targetLanguage}`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          setChallengeData(null);
+          return;
+        }
+        throw new Error('Failed to fetch challenges');
+      }
+
+      const data = await response.json();
+      setChallengeData(data.data);
+    } catch (error) {
+      console.error('Error fetching challenges:', error);
+      setChallengeData(null);
+    } finally {
+      setLoadingChallenges(false);
+    }
+  }, [selectedDate, viewLanguage]);
+
+  // Handle regenerating a single challenge
+  const handleRegenerate = async () => {
+    if (editingChallengeIndex === null || !challengeData || !feedback.trim()) return;
+
+    setIsRegenerating(true);
+    setRegenerateError(null);
+
+    try {
+      const { data: { session } } = await getSession();
+      if (!session?.access_token) {
+        throw new Error('No active session');
+      }
+
+      const originalChallenge = challengeData.challenges[editingChallengeIndex];
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), REGENERATE_TIMEOUT_MS);
+
+      const response = await fetch('/api/admin/buzz/regenerate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          date: challengeData.puzzle_date,
+          language: challengeData.language,
+          challengeIndex: editingChallengeIndex,
+          feedback: feedback.trim(),
+          originalChallenge: {
+            type: originalChallenge.type,
+            prompt: originalChallenge.prompt,
+            answer: originalChallenge.answer,
+            trend_topic: originalChallenge.trend_topic,
+          },
+          saveFeedback: true,
+        }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Regeneration failed');
+      }
+
+      const data = await response.json();
+      setChallengeData(data.data);
+      setEditDialogOpen(false);
+      setFeedback('');
+      setEditingChallengeIndex(null);
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        setRegenerateError('Request timed out. AI generation may still be in progress.');
+      } else {
+        setRegenerateError(error instanceof Error ? error.message : 'Failed to regenerate');
+      }
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
 
   const handleGenerate = async () => {
     setIsGenerating(true);
@@ -99,6 +281,11 @@ export default function DailyBuzzAdminPanel() {
       }
 
       setResult(data);
+
+      // Refresh challenges if viewer is open
+      if (showChallenges) {
+        fetchChallenges();
+      }
     } catch (error) {
       // Handle abort differently from other errors
       if (error instanceof Error && error.name === 'AbortError') {
@@ -122,6 +309,23 @@ export default function DailyBuzzAdminPanel() {
       clearTimeout(timeoutId);
       abortControllerRef.current = null;
       setIsGenerating(false);
+    }
+  };
+
+  const getChallengeTypeIcon = (type: string): string => {
+    return CHALLENGE_TYPE_ICONS[type] || '❓';
+  };
+
+  const getDifficultyColor = (difficulty: string): string => {
+    switch (difficulty) {
+      case 'easy':
+        return 'bg-green-900/50 text-green-400';
+      case 'medium':
+        return 'bg-yellow-900/50 text-yellow-400';
+      case 'hard':
+        return 'bg-red-900/50 text-red-400';
+      default:
+        return 'bg-slate-700 text-slate-400';
     }
   };
 
@@ -288,6 +492,153 @@ export default function DailyBuzzAdminPanel() {
         </motion.div>
       )}
 
+      {/* Today's Challenges Section */}
+      <div className="bg-slate-800/50 border-2 border-slate-700 rounded-xl p-6 space-y-4">
+        <button
+          onClick={() => {
+            setShowChallenges(!showChallenges);
+            if (!showChallenges && !challengeData) {
+              fetchChallenges();
+            }
+          }}
+          className="w-full flex items-center justify-between"
+        >
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <Eye className="w-5 h-5 text-neo-cyan" />
+            View & Edit Challenges
+          </h2>
+          {showChallenges ? (
+            <ChevronUp className="w-5 h-5 text-slate-400" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-slate-400" />
+          )}
+        </button>
+
+        <AnimatePresence>
+          {showChallenges && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="space-y-4 overflow-hidden"
+            >
+              {/* Language selector for viewing */}
+              <div className="flex gap-2 flex-wrap items-center">
+                {CHALLENGE_LANGUAGES.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => {
+                      setViewLanguage(lang.code);
+                      fetchChallenges(lang.code);
+                    }}
+                    className={`px-3 py-1.5 rounded-lg border-2 font-medium text-sm transition-colors ${
+                      viewLanguage === lang.code
+                        ? 'bg-neo-cyan/20 border-neo-cyan text-neo-cyan'
+                        : 'bg-slate-900 border-slate-700 text-slate-400 hover:border-slate-600'
+                    }`}
+                  >
+                    {lang.label}
+                  </button>
+                ))}
+                <button
+                  onClick={() => fetchChallenges()}
+                  disabled={loadingChallenges}
+                  className="p-2 rounded-lg border-2 border-slate-700 text-slate-400 hover:border-neo-cyan hover:text-neo-cyan transition-colors disabled:opacity-50"
+                  title="Refresh challenges"
+                >
+                  {loadingChallenges ? (
+                    <NeoLoader variant="dots" size="sm" />
+                  ) : (
+                    <RefreshCw className="w-4 h-4" />
+                  )}
+                </button>
+              </div>
+
+              {/* Challenges list */}
+              {loadingChallenges ? (
+                <div className="flex justify-center py-8">
+                  <NeoLoader variant="dots" size="lg" />
+                </div>
+              ) : challengeData ? (
+                <div className="space-y-3">
+                  <div className="text-sm text-slate-400">
+                    <span className="font-medium text-neo-yellow">{challengeData.trending_summary}</span>
+                    {' · '}
+                    {challengeData.puzzle_date}
+                    {' · '}
+                    {challengeData.challenges.length} challenges
+                  </div>
+
+                  {challengeData.challenges.map((challenge, index) => (
+                    <div
+                      key={index}
+                      className="bg-slate-900/50 border border-slate-700 rounded-lg p-4 space-y-2"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-2xl" title={challenge.type}>
+                            {getChallengeTypeIcon(challenge.type)}
+                          </span>
+                          <span className="text-xs px-2 py-0.5 bg-slate-700 rounded text-slate-300">
+                            {challenge.type}
+                          </span>
+                          <span className={`text-xs px-2 py-0.5 rounded ${getDifficultyColor(challenge.difficulty)}`}>
+                            {challenge.difficulty}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setEditingChallengeIndex(index);
+                            setFeedback('');
+                            setRegenerateError(null);
+                            setEditDialogOpen(true);
+                          }}
+                          className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-neo-yellow transition-colors shrink-0"
+                          title="Edit / Regenerate"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      <div className="text-white">
+                        <span className="text-slate-500 text-sm">Prompt: </span>
+                        {challenge.prompt}
+                      </div>
+
+                      <div className="flex flex-wrap gap-4 text-sm">
+                        <div>
+                          <span className="text-slate-500">Answer: </span>
+                          <span className="font-mono font-bold text-neo-yellow">
+                            {challenge.answer}
+                          </span>
+                        </div>
+                        {challenge.hint && (
+                          <div>
+                            <span className="text-slate-500">Hint: </span>
+                            <span className="text-slate-300">{challenge.hint}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="text-xs text-slate-500">
+                        Trend: {challenge.trend_topic}
+                        {challenge.trending_context && (
+                          <span className="text-slate-600"> · {challenge.trending_context}</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-slate-500">
+                  No challenges found for {selectedDate} ({viewLanguage}). Generate them first.
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
       {/* Quick Links */}
       <div className="bg-slate-800/50 border-2 border-slate-700 rounded-xl p-6 space-y-3">
         <h2 className="text-lg font-bold text-white mb-3">Quick Links</h2>
@@ -298,7 +649,7 @@ export default function DailyBuzzAdminPanel() {
             rel="noopener noreferrer"
             className="block px-4 py-2 bg-slate-900 border-2 border-slate-700 rounded-lg text-slate-300 hover:border-neo-cyan hover:text-neo-cyan transition-colors"
           >
-            📋 Manage Feature Flags (API)
+            Manage Feature Flags (API)
           </a>
           <a
             href="/api/buzz/stats"
@@ -306,10 +657,106 @@ export default function DailyBuzzAdminPanel() {
             rel="noopener noreferrer"
             className="block px-4 py-2 bg-slate-900 border-2 border-slate-700 rounded-lg text-slate-300 hover:border-neo-cyan hover:text-neo-cyan transition-colors"
           >
-            📊 View Statistics (API)
+            View Statistics (API)
           </a>
         </div>
       </div>
+
+      {/* Edit Challenge Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="sm:max-w-xl" noDescription>
+          <DialogHeader variant="cyan">
+            <DialogTitle className="flex items-center justify-center gap-2">
+              <MessageSquare className="w-5 h-5" />
+              Edit Challenge #{editingChallengeIndex !== null ? editingChallengeIndex + 1 : ''}
+            </DialogTitle>
+          </DialogHeader>
+          <DialogBody className="space-y-4">
+            {editingChallengeIndex !== null && challengeData && (
+              <>
+                {/* Original challenge display */}
+                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4 space-y-2">
+                  <div className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                    Current Challenge:
+                  </div>
+                  <div className="text-neo-black dark:text-white font-medium">
+                    {challengeData.challenges[editingChallengeIndex].prompt}
+                  </div>
+                  <div className="flex flex-wrap gap-4 text-sm">
+                    <span>
+                      Answer:{' '}
+                      <strong className="text-neo-orange">
+                        {challengeData.challenges[editingChallengeIndex].answer}
+                      </strong>
+                    </span>
+                    <span>
+                      Type: {challengeData.challenges[editingChallengeIndex].type}
+                    </span>
+                    <span>
+                      Trend: {challengeData.challenges[editingChallengeIndex].trend_topic}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Feedback textarea */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                    What is wrong with this challenge?
+                  </label>
+                  <textarea
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
+                    placeholder="e.g., The word is too obscure, The clue gives away the answer, Wrong language/culture reference, Answer does not fit the trend..."
+                    className="w-full px-4 py-3 bg-white dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-700 rounded-lg text-neo-black dark:text-white focus:border-neo-cyan focus:outline-none resize-none"
+                    rows={4}
+                    disabled={isRegenerating}
+                  />
+                  <p className="mt-1 text-xs text-slate-500">
+                    This feedback will be saved and used to improve future AI generations.
+                  </p>
+                </div>
+
+                {/* Error display */}
+                {regenerateError && (
+                  <div className="p-3 bg-red-900/30 border border-red-500 rounded-lg">
+                    <p className="text-sm text-red-400">{regenerateError}</p>
+                  </div>
+                )}
+              </>
+            )}
+          </DialogBody>
+          <DialogFooter>
+            <button
+              onClick={() => {
+                setEditDialogOpen(false);
+                setFeedback('');
+                setRegenerateError(null);
+              }}
+              disabled={isRegenerating}
+              className="px-4 py-2 rounded-lg border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:border-slate-400 disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleRegenerate}
+              disabled={isRegenerating || feedback.trim().length < 5}
+              className="px-4 py-2 rounded-lg bg-neo-cyan text-neo-black font-bold border-2 border-neo-black shadow-hard-sm hover:shadow-hard disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {isRegenerating ? (
+                <>
+                  <NeoLoader variant="dots" size="sm" />
+                  Regenerating...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-4 h-4" />
+                  Regenerate
+                </>
+              )}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }

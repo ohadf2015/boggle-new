@@ -1,12 +1,12 @@
 'use client';
 
 import React from 'react';
-import dynamic from 'next/dynamic';
+import nextDynamic from 'next/dynamic';
 import { useParams } from 'next/navigation';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 
 // Dynamic import for code splitting
-const ChallengeView = dynamic(() => import('@/components/challenge/ChallengeView'), {
+const ChallengeView = nextDynamic(() => import('@/components/challenge/ChallengeView'), {
   loading: () => (
     <div className="min-h-screen flex items-center justify-center bg-neo-navy">
       <NeoLoader variant="mascot-letters" size="lg" text="Loading challenge..." />
@@ -15,8 +15,7 @@ const ChallengeView = dynamic(() => import('@/components/challenge/ChallengeView
   ssr: false,
 });
 
-// Force dynamic rendering
-export const dynamic_config = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 
 /**
  * Challenge page route

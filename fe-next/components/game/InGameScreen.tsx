@@ -674,224 +674,194 @@ const InGameScreen = memo<InGameScreenProps>(({
           />
         )}
 
-        {/* Full-screen landscape container with grid centered - uses full viewport, no scroll */}
-        <div className="relative flex items-center justify-center w-full h-screen max-h-[100dvh] overflow-hidden bg-slate-900 text-white landscape-full-height">
-
-          {/* Left Side Panel - Timer, Rank, Words Count */}
-          {/* Using clamp to prevent panel overlap on very narrow/short screens */}
-          <div className={cn(
-            "absolute top-1/2 -translate-y-1/2 z-40 landscape-side-panel",
-            isExtremelyShortLandscape ? "left-1" : "left-2"
-          )}
-            style={{
-              left: 'clamp(4px, 1.5vw, 12px)',
-              maxWidth: 'clamp(70px, 14vw, 110px)'
-            }}
-          >
-            <div className="landscape-panel flex flex-col items-center gap-2">
-              {/* Timer - Large and prominent */}
-              {remainingTime !== null && (
-                <CircularTimer
-                  remainingTime={remainingTime}
-                  totalTime={timerValue * 60}
-                  size={isExtremelyShortLandscape ? "md" : "lg"}
-                />
-              )}
-
-              {/* Rank Badge (if in multiplayer) */}
-              {isPlaying && playerData.rank && playerData.rank > 0 && leaderboard.length > 1 && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="flex flex-col items-center"
-                >
-                  <div className="landscape-stat-secondary text-white">
-                    #{playerData.rank}
-                  </div>
-                  <div className="landscape-stat-label text-white">
-                    {t('common.rank') || 'RANK'}
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Words Found Count */}
-              {isPlaying && (
-                <div className="flex flex-col items-center">
-                  <div className="landscape-stat-secondary text-white">
-                    {normalizedFoundWords.length}
-                  </div>
-                  <div className="landscape-stat-label text-white">
-                    {t('common.words') || 'WORDS'}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Right Side Panel - Score only */}
-          {/* Using clamp to prevent panel overlap on very narrow/short screens */}
-          {isPlaying && (
-            <div className={cn(
-              "absolute top-1/2 -translate-y-1/2 z-40 landscape-side-panel",
-              isExtremelyShortLandscape ? "right-1" : "right-2"
-            )}
-              style={{
-                right: 'clamp(4px, 1.5vw, 12px)',
-                maxWidth: 'clamp(70px, 14vw, 110px)'
-              }}
-            >
-              <div className="landscape-panel flex flex-col items-center gap-2">
-                {/* Score - Primary stat, large and animated */}
-                <div className="flex flex-col items-center">
-                  <motion.div
-                    key={playerData.score}
-                    initial={{ scale: 1.3 }}
-                    animate={{ scale: 1 }}
-                    className="landscape-stat-primary text-neo-black"
-                  >
-                    {playerData.score}
-                  </motion.div>
-                  <div className="landscape-stat-label text-neo-black flex items-center gap-0.5">
-                    {t('common.score') || 'SCORE'}
-                    <ScoreBreakdownTooltip t={t} minWordLength={minWordLength} />
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-
-          {/* Bottom action bar - safe from side panel overlap */}
+        {/* Full-screen landscape container - grid prevents side-panel overlap */}
+        <div className="relative w-full h-screen max-h-[100dvh] overflow-hidden bg-slate-900 text-white landscape-full-height">
           <div
-            className="absolute bottom-2 left-0 right-0 z-30 flex justify-between items-end"
+            className="grid w-full h-full grid-rows-[1fr_auto] items-center"
             style={{
-              paddingInline: 'clamp(100px, 18vw, 150px)',
-              paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+              gridTemplateColumns: 'clamp(70px, 14vw, 110px) minmax(0, 1fr) clamp(70px, 14vw, 110px)',
             }}
           >
-            {/* Left side: Exit button + Help button with combo below */}
-            <div className="flex flex-col items-start gap-1">
-              {/* Exit button + Help button row */}
-              <div className="flex items-center gap-2">
-                {onExitRoom && (
-                  <ExitRoomButton
-                    onClick={onExitRoom}
-                    label={t('playerView.exit')}
-                    className="w-12 h-12"
+            {/* Left Side Panel */}
+            <div className="row-start-1 col-start-1 flex justify-start ps-1">
+              <div className="landscape-panel flex flex-col items-center gap-2">
+                {remainingTime !== null && (
+                  <CircularTimer
+                    remainingTime={remainingTime}
+                    totalTime={timerValue * 60}
+                    size={isExtremelyShortLandscape ? "md" : "lg"}
                   />
                 )}
-                {onShowTutorial && (
-                  <motion.button
-                    onClick={onShowTutorial}
-                    whileTap={{ scale: 0.95 }}
-                    className="w-10 h-10 bg-neo-pink/90 border-2 border-neo-black rounded-full shadow-hard flex items-center justify-center hover:bg-neo-pink transition-colors"
-                    aria-label={t('help.viewTutorial') || 'View Tutorial'}
+
+                {isPlaying && playerData.rank && playerData.rank > 0 && leaderboard.length > 1 && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="flex flex-col items-center"
                   >
-                    <HelpCircle className="w-5 h-5 text-neo-cream" />
-                  </motion.button>
+                    <div className="landscape-stat-secondary text-white">
+                      #{playerData.rank}
+                    </div>
+                    <div className="landscape-stat-label text-white">
+                      {t('common.rank') || 'RANK'}
+                    </div>
+                  </motion.div>
+                )}
+
+                {isPlaying && (
+                  <div className="flex flex-col items-center">
+                    <div className="landscape-stat-secondary text-white">
+                      {normalizedFoundWords.length}
+                    </div>
+                    <div className="landscape-stat-label text-white">
+                      {t('common.words') || 'WORDS'}
+                    </div>
+                  </div>
                 )}
               </div>
+            </div>
 
-              {/* Combo Display - static space below exit button */}
+            {/* Center: Word Forming Area + Grid */}
+            <div className={cn(
+              "row-start-1 col-start-2 flex flex-col items-center justify-center w-full h-full min-w-0",
+              "gap-1.5 py-1"
+            )}>
               {isPlaying && (
-                <div className="w-[100px]">
-                  {comboLevel > 0 ? (
-                    <ComboDisplay comboLevel={comboLevel} highContrast compact timeRemaining={comboTimeRemaining} isDanger={comboDanger} />
-                  ) : (
-                    /* Hint for new players when no combo active */
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 0.6 }}
-                      className="text-[10px] text-neo-cream/50 text-center leading-tight"
-                    >
-                      <span className="text-neo-cyan">⚡</span> {t('game.comboHint') || 'Find words fast for combo!'}
-                    </motion.div>
-                  )}
+                <WordFormingArea
+                  word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
+                  letterCount={keyboardInput.isTypingMode ? keyboardInput.typedWord.length : letterCount}
+                  feedback={currentFeedback}
+                  compact
+                  className="mb-1 flex-shrink-0 z-50"
+                />
+              )}
+              <div className="flex-1 flex items-center justify-center game-board-frame-landscape min-w-0" style={{ aspectRatio: '1/1' }}>
+                <GridComponent
+                  key={isPlaying ? 'playing-grid-landscape' : 'spectating-grid-landscape'}
+                  grid={letterGrid}
+                  interactive={isPlaying && !showStartAnimation}
+                  animateOnMount={!hasAnimatedRef.current}
+                  onWordSubmit={handleGridWordSubmit}
+                  onWordChange={handleWordChange}
+                  comboLevel={comboLevel}
+                  hideComboIndicator={true}
+                  hideWordPreview={true}
+                  largeText
+                  fireRoundActive={fireRoundActive}
+                  earthquakeShaking={earthquakeState === 'shaking'}
+                  highlightedPath={shouldShowKeyboardTrails(keyboardInput.isTypingMode, lastWordFoundTime, totalGamesPlayed) ? keyboardInput.highlightedCells : []}
+                  onSingleTapDetected={tapDragGuidance.handleSingleTapDetected}
+                  language={gameLanguage || 'en'}
+                />
+              </div>
+
+              {isPlaying && leaderboard.length > 1 && (
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30 w-auto max-w-[280px]">
+                  <CompactLeaderboard
+                    players={leaderboard.map((p, index) => ({
+                      username: p.username,
+                      score: p.score,
+                      rank: index + 1,
+                      isCurrentUser: p.username === username,
+                      profilePictureUrl: p.avatar?.profilePictureUrl,
+                      avatarImage: p.avatar?.avatarImage,
+                      avatarEmoji: p.avatar?.emoji,
+                      avatarColor: p.avatar?.color,
+                    }))}
+                    currentUsername={username}
+                    t={t}
+                    className="text-xs"
+                  />
                 </div>
               )}
             </div>
 
-            {/* Right side: Hint Button - Single Player Mode Only */}
-            {hints && hints.isSinglePlayer && (
-              <HintButton
-                hint={hints.hint}
-                hintType={hints.hintType}
-                hintsRemaining={hints.hintsRemaining}
-                wordLength={hints.wordLength}
-                firstLetter={hints.firstLetter}
-                isLoading={hints.isLoading}
-                error={hints.error}
-                isAvailable={hints.isAvailable}
-                isSinglePlayer={hints.isSinglePlayer}
-                gameActive={gameActive}
-                onRequestHint={hints.requestHint}
-                onClearHint={hints.clearHint}
-                t={t}
-              />
-            )}
-          </div>
+            {/* Right Side Panel */}
+            <div className="row-start-1 col-start-3 flex justify-end pe-1">
+              {isPlaying && (
+                <div className="landscape-panel flex flex-col items-center gap-2">
+                  <div className="flex flex-col items-center">
+                    <motion.div
+                      key={playerData.score}
+                      initial={{ scale: 1.3 }}
+                      animate={{ scale: 1 }}
+                      className="landscape-stat-primary text-neo-black"
+                    >
+                      {playerData.score}
+                    </motion.div>
+                    <div className="landscape-stat-label text-neo-black flex items-center gap-0.5">
+                      {t('common.score') || 'SCORE'}
+                      <ScoreBreakdownTooltip t={t} minWordLength={minWordLength} />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
 
-          {/* Center: Word Forming Area + Grid - with responsive padding for side panels */}
-          <div className={cn(
-            "flex flex-col items-center justify-center w-full h-full landscape-grid-container",
-            "gap-1.5 py-1"
-          )}
-            style={{
-              paddingInline: 'clamp(120px, 18vw, 180px)'
-            }}>
-            {/* Word Forming Area with integrated feedback - flex-shrink-0 prevents squishing, z-50 keeps it visible */}
-            {/* Shows typed word when in keyboard mode, otherwise shows swiped word */}
-            {isPlaying && (
-              <WordFormingArea
-                word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
-                letterCount={keyboardInput.isTypingMode ? keyboardInput.typedWord.length : letterCount}
-                feedback={currentFeedback}
-                compact
-                className="mb-1 flex-shrink-0 z-50"
-              />
-            )}
-            <div className="flex-1 flex items-center justify-center game-board-frame-landscape" style={{ aspectRatio: '1/1' }}>
-              <GridComponent
-                key={isPlaying ? 'playing-grid-landscape' : 'spectating-grid-landscape'}
-                grid={letterGrid}
-                interactive={isPlaying && !showStartAnimation}
-                animateOnMount={!hasAnimatedRef.current}
-                onWordSubmit={handleGridWordSubmit}
-                onWordChange={handleWordChange}
-                comboLevel={comboLevel}
-                hideComboIndicator={true}
-                hideWordPreview={true}
-                largeText
-                fireRoundActive={fireRoundActive}
-                earthquakeShaking={earthquakeState === 'shaking'}
-                highlightedPath={shouldShowKeyboardTrails(keyboardInput.isTypingMode, lastWordFoundTime, totalGamesPlayed) ? keyboardInput.highlightedCells : []}
-                onSingleTapDetected={tapDragGuidance.handleSingleTapDetected}
-                language={gameLanguage || 'en'}
-              />
+            {/* Bottom action bar */}
+            <div
+              className="row-start-2 col-span-3 z-30 flex justify-between items-end px-2 pb-2"
+              style={{
+                paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+              }}
+            >
+              <div className="flex flex-col items-start gap-1">
+                <div className="flex items-center gap-2">
+                  {onExitRoom && (
+                    <ExitRoomButton
+                      onClick={onExitRoom}
+                      label={t('playerView.exit')}
+                      className="w-12 h-12"
+                    />
+                  )}
+                  {onShowTutorial && (
+                    <motion.button
+                      onClick={onShowTutorial}
+                      whileTap={{ scale: 0.95 }}
+                      className="w-11 h-11 min-w-[44px] min-h-[44px] bg-neo-pink/90 border-2 border-neo-black rounded-full shadow-hard flex items-center justify-center hover:bg-neo-pink transition-colors"
+                      aria-label={t('help.viewTutorial') || 'View Tutorial'}
+                    >
+                      <HelpCircle className="w-5 h-5 text-neo-cream" />
+                    </motion.button>
+                  )}
+                </div>
+
+                {isPlaying && (
+                  <div className="w-[100px]">
+                    {comboLevel > 0 ? (
+                      <ComboDisplay comboLevel={comboLevel} highContrast compact timeRemaining={comboTimeRemaining} isDanger={comboDanger} />
+                    ) : (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 0.6 }}
+                        className="text-[10px] text-neo-cream/50 text-center leading-tight"
+                      >
+                        <span className="text-neo-cyan">⚡</span> {t('game.comboHint') || 'Find words fast for combo!'}
+                      </motion.div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {hints && hints.isSinglePlayer && (
+                <HintButton
+                  hint={hints.hint}
+                  hintType={hints.hintType}
+                  hintsRemaining={hints.hintsRemaining}
+                  wordLength={hints.wordLength}
+                  firstLetter={hints.firstLetter}
+                  isLoading={hints.isLoading}
+                  error={hints.error}
+                  isAvailable={hints.isAvailable}
+                  isSinglePlayer={hints.isSinglePlayer}
+                  gameActive={gameActive}
+                  onRequestHint={hints.requestHint}
+                  onClearHint={hints.clearHint}
+                  t={t}
+                />
+              )}
             </div>
           </div>
-
-          {/* Compact Leaderboard - Top center in landscape multiplayer */}
-          {isPlaying && leaderboard.length > 1 && (
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30 w-auto max-w-[280px]">
-              <CompactLeaderboard
-                players={leaderboard.map((p, index) => ({
-                  username: p.username,
-                  score: p.score,
-                  rank: index + 1,
-                  isCurrentUser: p.username === username,
-                  profilePictureUrl: p.avatar?.profilePictureUrl,
-                  avatarImage: p.avatar?.avatarImage,
-                  avatarEmoji: p.avatar?.emoji,
-                  avatarColor: p.avatar?.color,
-                }))}
-                currentUsername={username}
-                t={t}
-                className="text-xs"
-              />
-            </div>
-          )}
-
         </div>
 
         {/* Achievement dock */}

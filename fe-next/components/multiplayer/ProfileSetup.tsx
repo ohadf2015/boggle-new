@@ -191,7 +191,7 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
         >
           <button
             onClick={onBack}
-            className="absolute start-4 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all text-neo-black dark:text-neo-white text-sm font-bold"
+            className="absolute start-4 flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] min-w-[44px] rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all text-neo-black dark:text-neo-white text-sm font-bold"
           >
             <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
@@ -249,6 +249,8 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                             <img
                               src={getAvatarPath(getAvatarById(selectedAvatarId) || AVATARS[0])}
                               alt={displayName || 'Avatar'}
+                              width={56}
+                              height={56}
                               className="w-full h-full object-cover"
                             />
                           ) : profilePictureUrl ? (
@@ -256,6 +258,8 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                             <img
                               src={profilePictureUrl}
                               alt={displayName || 'Profile'}
+                              width={56}
+                              height={56}
                               className="w-full h-full object-cover"
                             />
                           ) : initialAvatarId ? (
@@ -263,6 +267,8 @@ const ProfileSetup: React.FC<ProfileSetupProps> = ({
                             <img
                               src={getAvatarPath(getAvatarById(initialAvatarId) || AVATARS[0])}
                               alt={displayName || 'Avatar'}
+                              width={56}
+                              height={56}
                               className="w-full h-full object-cover"
                             />
                           ) : null}

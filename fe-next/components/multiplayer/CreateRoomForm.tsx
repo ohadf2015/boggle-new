@@ -97,7 +97,7 @@ const CreateRoomForm: React.FC<CreateRoomFormProps> = ({
           <button
             onClick={onBack}
             disabled={isSubmitting}
-            className="absolute start-4 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all text-neo-black dark:text-neo-white text-sm font-bold disabled:opacity-50"
+            className="absolute start-4 flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] min-w-[44px] rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all text-neo-black dark:text-neo-white text-sm font-bold disabled:opacity-50"
           >
             <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>

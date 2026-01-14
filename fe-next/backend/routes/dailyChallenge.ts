@@ -6,6 +6,8 @@
 import express, { Request, Response, Router } from 'express';
 
 const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
+const { getCachedDailyPuzzle, cacheDailyPuzzle, getCachedDailyLeaderboard, cacheDailyLeaderboard } = require('../redisClient');
+const { coalesce } = require('../utils/requestCoalescing');
 import logger from '../utils/logger';
 import { generateDailyPuzzle, generateDailyPuzzleAsync, getPuzzleNumber } from '../../utils/dailyChallenge';
 import { isDictionaryWord } from '../dictionary';
@@ -62,6 +64,8 @@ interface LeaderboardEntry {
 interface LeaderboardResponse {
   data: LeaderboardEntry[];
   totalParticipants: number;
+  totalAttempts?: number;
+  guestPlayerCount?: number;
   date: string;
   language: string;
   error?: string;
@@ -173,16 +177,32 @@ router.get('/puzzle/:date/:language', async (req: Request<LeaderboardParams>, re
       return;
     }
 
-    // Generate puzzle with async version (checks DB for AI-selected word)
-    const puzzle = await generateDailyPuzzleAsync(date, language as Language);
+    res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');
 
-    res.json({
-      grid: puzzle.grid,
-      targetWord: puzzle.targetWord,
-      puzzleDate: puzzle.puzzleDate,
-      puzzleNumber: puzzle.puzzleNumber,
-      language: puzzle.language
+    const cached = await getCachedDailyPuzzle(date, language);
+    if (cached) {
+      res.json(cached);
+      return;
+    }
+
+    const result = await coalesce(`daily:puzzle:${language}:${date}`, async () => {
+      const recheck = await getCachedDailyPuzzle(date, language);
+      if (recheck) return recheck;
+
+      const puzzle = await generateDailyPuzzleAsync(date, language as Language);
+      const payload = {
+        grid: puzzle.grid,
+        targetWord: puzzle.targetWord,
+        puzzleDate: puzzle.puzzleDate,
+        puzzleNumber: puzzle.puzzleNumber,
+        language: puzzle.language,
+      };
+
+      await cacheDailyPuzzle(date, language, payload);
+      return payload;
     });
+
+    res.json(result);
   } catch (error) {
     const err = error as Error;
     logger.error('API', `Daily puzzle error: ${err.message}`);
@@ -233,74 +253,86 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       return;
     }
 
-    const supabase = getSupabase();
+    res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
 
-    // Fetch leaderboard from the view
-    // Filter: only show authenticated users (no guests)
-    const { data, error } = await supabase
-      .from('daily_puzzle_leaderboard')
-      .select('*')
-      .eq('puzzle_date', date)
-      .eq('language', language)
-      .not('player_id', 'is', null)
-      .order('rank_position', { ascending: true })
-      .limit(limit);
-
-    if (error) {
-      logger.error('API', `Daily leaderboard error: ${error.message}`);
-      res.status(500).json({ error: 'Failed to fetch leaderboard' });
+    const cached = await getCachedDailyLeaderboard(date, language, limit);
+    if (cached) {
+      res.json(cached);
       return;
     }
 
-    // Get total participant count (only authenticated users for leaderboard)
-    const { count, error: countError } = await supabase
-      .from('daily_puzzle_attempts')
-      .select('*', { count: 'exact', head: true })
-      .eq('puzzle_date', date)
-      .eq('language', language)
-      .not('player_id', 'is', null);
+    const result = await coalesce(`daily:lb:${language}:${date}:${limit}`, async (): Promise<LeaderboardResponse> => {
+      const recheck = await getCachedDailyLeaderboard(date, language, limit);
+      if (recheck) {
+        return recheck as LeaderboardResponse;
+      }
 
-    if (countError) {
-      logger.warn('API', `Daily leaderboard count error: ${countError.message}`);
-    }
+      const supabase = getSupabase();
 
-    // Get total attempts count (including guests and all attempts)
-    const { count: totalCount, error: totalCountError } = await supabase
-      .from('daily_puzzle_attempts')
-      .select('*', { count: 'exact', head: true })
-      .eq('puzzle_date', date)
-      .eq('language', language);
+      const { data, error } = await supabase
+        .from('daily_puzzle_leaderboard')
+        .select('*')
+        .eq('puzzle_date', date)
+        .eq('language', language)
+        .not('player_id', 'is', null)
+        .order('rank_position', { ascending: true })
+        .limit(limit);
 
-    if (totalCountError) {
-      logger.warn('API', `Daily leaderboard total count error: ${totalCountError.message}`);
-    }
+      if (error) {
+        throw new Error(`Daily leaderboard fetch error: ${error.message}`);
+      }
 
-    // Get guest player count (players who solved but are not authenticated)
-    const { count: guestCount, error: guestCountError } = await supabase
-      .from('daily_puzzle_attempts')
-      .select('*', { count: 'exact', head: true })
-      .eq('puzzle_date', date)
-      .eq('language', language)
-      .is('player_id', null)
-      .not('guest_fingerprint', 'is', null);
+      const { count, error: countError } = await supabase
+        .from('daily_puzzle_attempts')
+        .select('*', { count: 'exact', head: true })
+        .eq('puzzle_date', date)
+        .eq('language', language)
+        .not('player_id', 'is', null);
 
-    if (guestCountError) {
-      logger.warn('API', `Daily leaderboard guest count error: ${guestCountError.message}`);
-    }
+      if (countError) {
+        logger.warn('API', `Daily leaderboard count error: ${countError.message}`);
+      }
 
-    // Calculate participant count - ensure we show at least as many as we have data rows
-    const dataLength = data?.length || 0;
-    const queryCount = count ?? 0;
-    const totalParticipants = Math.max(queryCount, dataLength);
+      const { count: totalCount, error: totalCountError } = await supabase
+        .from('daily_puzzle_attempts')
+        .select('*', { count: 'exact', head: true })
+        .eq('puzzle_date', date)
+        .eq('language', language);
 
-    res.json({
-      data: data || [],
-      totalParticipants,
-      totalAttempts: totalCount ?? 0,
-      guestPlayerCount: guestCount ?? 0,
-      date,
-      language
-    } as LeaderboardResponse);
+      if (totalCountError) {
+        logger.warn('API', `Daily leaderboard total count error: ${totalCountError.message}`);
+      }
+
+      const { count: guestCount, error: guestCountError } = await supabase
+        .from('daily_puzzle_attempts')
+        .select('*', { count: 'exact', head: true })
+        .eq('puzzle_date', date)
+        .eq('language', language)
+        .is('player_id', null)
+        .not('guest_fingerprint', 'is', null);
+
+      if (guestCountError) {
+        logger.warn('API', `Daily leaderboard guest count error: ${guestCountError.message}`);
+      }
+
+      const dataLength = data?.length || 0;
+      const queryCount = count ?? 0;
+      const totalParticipants = Math.max(queryCount, dataLength);
+
+      const payload: LeaderboardResponse = {
+        data: data || [],
+        totalParticipants,
+        totalAttempts: totalCount ?? 0,
+        guestPlayerCount: guestCount ?? 0,
+        date,
+        language,
+      };
+
+      await cacheDailyLeaderboard(date, language, limit, payload);
+      return payload;
+    });
+
+    res.json(result);
   } catch (error) {
     const err = error as Error;
     logger.error('API', `Daily leaderboard error: ${err.message}`);

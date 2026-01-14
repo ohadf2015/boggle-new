@@ -1,7 +1,7 @@
 'use client';
 
 import React, { Suspense } from 'react';
-import dynamic from 'next/dynamic';
+import nextDynamic from 'next/dynamic';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 
@@ -16,13 +16,12 @@ const LoadingFallback = () => (
 );
 
 // Dynamic import for code splitting
-const SinglePlayerView = dynamic(() => import('@/components/singleplayer/SinglePlayerView'), {
+const SinglePlayerView = nextDynamic(() => import('@/components/singleplayer/SinglePlayerView'), {
   loading: LoadingFallback,
   ssr: false,
 });
 
-// Force dynamic rendering
-export const dynamic_config = 'force-dynamic';
+export const dynamic = 'force-dynamic';
 
 /**
  * Single Player page route

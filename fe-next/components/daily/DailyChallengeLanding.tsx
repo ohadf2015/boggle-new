@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Trophy, Timer, Hourglass, Bell, Check, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -367,11 +368,12 @@ function CompactChallengeCard({
       {/* Preview Image or Icon */}
       {showImage ? (
         <div className="relative w-full h-24 sm:h-32 rounded-lg overflow-hidden mb-3 border-2 border-neo-black">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={previewImageUrl}
             alt={previewImageAlt || title}
-            className="w-full h-full object-cover"
+            fill
+            sizes="(max-width: 640px) 100vw, 50vw"
+            className="object-cover"
             onError={() => setImageError(true)}
           />
           {/* Subtle gradient overlay */}

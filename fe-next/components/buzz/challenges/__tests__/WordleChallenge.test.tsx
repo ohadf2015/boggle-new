@@ -623,6 +623,75 @@ describe('WordleChallenge', () => {
       unmount();
     });
 
+    it('Hebrew keyboard should NOT contain final letters (sofit)', () => {
+      setMockLanguage('he');
+
+      const hebrewChallenge = {
+        prompt: 'נושא טרנדי: קולנוע',
+        answer: 'סרטים',
+        hint: 'טקס פרסים',
+      };
+
+      const { unmount } = render(
+        <LanguageProvider>
+          <WordleChallenge
+            challenge={hebrewChallenge}
+            onAnswer={mockOnAnswer}
+            showHint={false}
+          />
+        </LanguageProvider>
+      );
+
+      // Final letters (sofit) should NOT be in the keyboard
+      // ך (final kaf), ם (final mem), ן (final nun), ף (final pe), ץ (final tsadi)
+      expect(screen.queryByTestId('key-ך')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('key-ם')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('key-ן')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('key-ף')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('key-ץ')).not.toBeInTheDocument();
+
+      // Regular forms of these letters SHOULD be present
+      expect(screen.getByTestId('key-כ')).toBeInTheDocument();
+      expect(screen.getByTestId('key-מ')).toBeInTheDocument();
+      expect(screen.getByTestId('key-נ')).toBeInTheDocument();
+      expect(screen.getByTestId('key-פ')).toBeInTheDocument();
+      expect(screen.getByTestId('key-צ')).toBeInTheDocument();
+
+      unmount();
+    });
+
+    it('Hebrew keyboard should have all 22 Hebrew letters in standard layout order', () => {
+      setMockLanguage('he');
+
+      const hebrewChallenge = {
+        prompt: 'נושא טרנדי: קולנוע',
+        answer: 'סרטים',
+        hint: 'טקס פרסים',
+      };
+
+      const { unmount } = render(
+        <LanguageProvider>
+          <WordleChallenge
+            challenge={hebrewChallenge}
+            onAnswer={mockOnAnswer}
+            showHint={false}
+          />
+        </LanguageProvider>
+      );
+
+      // All 22 Hebrew letters (regular forms only, no finals)
+      const hebrewLetters = [
+        'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י', 'כ',
+        'ל', 'מ', 'נ', 'ס', 'ע', 'פ', 'צ', 'ק', 'ר', 'ש', 'ת'
+      ];
+
+      for (const letter of hebrewLetters) {
+        expect(screen.getByTestId(`key-${letter}`)).toBeInTheDocument();
+      }
+
+      unmount();
+    });
+
     it('renders English keyboard layout when language is English', () => {
       setMockLanguage('en');
 

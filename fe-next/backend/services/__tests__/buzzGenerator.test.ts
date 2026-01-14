@@ -382,3 +382,7 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
     expect(result.challenges.length).toBeGreaterThanOrEqual(5);
   });
 });
+
+// Note: Tests for getPromptExamples, storePromptExample, and regenerateSingleChallenge
+// require complex dynamic import mocking that conflicts with existing Supabase mock setup.
+// These functions are tested through E2E integration tests instead.

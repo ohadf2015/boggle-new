@@ -187,7 +187,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
         {/* Arrow/Lock indicator - min 44x44px touch target for WCAG compliance */}
         <div
           className={cn(
-            secondary ? 'min-w-[36px] min-h-[36px]' : 'min-w-[44px] min-h-[44px]',
+            'min-w-[44px] min-h-[44px]',
             'rounded-full border-neo-black',
             secondary ? 'border' : 'border-2',
             'flex items-center justify-center shrink-0',
@@ -196,8 +196,8 @@ const ModeCard: React.FC<ModeCardProps> = ({
             locked ? 'bg-neo-black/80 text-neo-white' : styles.arrow
           )}
           style={{
-            width: secondary ? 'clamp(2rem, 6cqw, 2.5rem)' : 'clamp(2.75rem, 8cqw, 3.25rem)',
-            height: secondary ? 'clamp(2rem, 6cqw, 2.5rem)' : 'clamp(2.75rem, 8cqw, 3.25rem)',
+            width: secondary ? 'clamp(2.75rem, 6cqw, 3.25rem)' : 'clamp(2.75rem, 8cqw, 3.25rem)',
+            height: secondary ? 'clamp(2.75rem, 6cqw, 3.25rem)' : 'clamp(2.75rem, 8cqw, 3.25rem)',
           }}
         >
           {loading ? (

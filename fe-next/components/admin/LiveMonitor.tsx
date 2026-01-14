@@ -437,6 +437,8 @@ function PlayerAvatar({
       <img
         src={avatar.avatarImage}
         alt=""
+        width={size === 'sm' ? 24 : 32}
+        height={size === 'sm' ? 24 : 32}
         className={cn('rounded-full', sizeClasses)}
       />
     );

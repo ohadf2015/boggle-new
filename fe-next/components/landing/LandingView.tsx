@@ -4,7 +4,6 @@ import React, { useEffect, useState, lazy, Suspense, memo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Lock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -17,14 +16,13 @@ import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useMouseParallax } from '@/hooks/useTiltEffect';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
-import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 import { InteractiveMascotWithEntrance } from '@/components/ui/InteractiveMascot';
 import ModeCard from './ModeCard';
 import TutorialPrompt from './TutorialPrompt';
 import Header from '@/components/Header';
 import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
+import { getPerfVariant } from '@/utils/perfVariant';
 import AuthModal from '@/components/auth/AuthModal';
-import LoadingComponent from '@/app/[locale]/loading';
 
 interface HeroMascotProps {
   /** Whether in mobile portrait mode - uses smaller size */
@@ -112,6 +110,11 @@ const OnboardingModal = dynamic(() => import('@/components/OnboardingModal'), {
   ssr: false,
 });
 
+const PlayfulBackground = dynamic(
+  () => import('@/components/ui/PlayfulBackground').then((m) => m.PlayfulBackground),
+  { ssr: false }
+);
+
 // Note: ProfileCustomizationModal is now handled globally in ProfileCustomizationWrapper
 // (see app/components/ProfileCustomizationWrapper.tsx)
 
@@ -128,9 +131,6 @@ const LandingView: React.FC = () => {
   const isMobilePortrait = useMobilePortrait();
   const liveRoomStats = useLiveRoomStats();
 
-  // Track initial mount to show skeleton
-  const [isMounted, setIsMounted] = useState(false);
-
   // Mouse-based parallax for hero section
   const mouseParallax = useMouseParallax(15);
 
@@ -139,6 +139,7 @@ const LandingView: React.FC = () => {
     onRefresh: async () => {
       liveRoomStats.refresh();
       await new Promise((resolve) => setTimeout(resolve, 500));
+      const { default: toast } = await import('react-hot-toast');
       toast.success(t('common.refreshed') || 'Refreshed', {
         duration: 2000,
       });
@@ -206,7 +207,14 @@ const LandingView: React.FC = () => {
     setShowOnboarding(true);
   };
 
-  // Track mount state to prevent flash of unstyled content
+  const [enableHeavyBackground, setEnableHeavyBackground] = useState(false);
+
+  useEffect(() => {
+    setEnableHeavyBackground(getPerfVariant() === 'control');
+  }, []);
+
+  const [isMounted, setIsMounted] = useState(false);
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -229,7 +237,7 @@ const LandingView: React.FC = () => {
       {...pullToRefreshHandlers}
     >
       {/* Playful background with parallax and floating elements - hidden on mobile portrait for performance */}
-      {!isLandscape && !isMobilePortrait && <PlayfulBackground intensity="high" colorScheme="default" />}
+      {enableHeavyBackground && !isLandscape && !isMobilePortrait && <PlayfulBackground intensity="high" colorScheme="default" />}
 
       {/* Pull-to-refresh indicator */}
       <PullToRefreshIndicator
@@ -255,11 +263,7 @@ const LandingView: React.FC = () => {
         (isLandscape || isMobilePortrait) && 'justify-center px-2 sm:px-4 py-2',
         !isLandscape && !isMobilePortrait && 'justify-center px-2 sm:px-3 lg:px-6 xl:px-8 py-2 sm:py-3 lg:py-4'
       )}>
-        {/* Show loading spinner before content is mounted */}
-        {!isMounted ? (
-          <LoadingComponent />
-        ) : (
-          <>
+        <>
             {/* Hero section with mascot - hidden in landscape only, shown on mobile portrait and desktop */}
             {!isLandscape && (
           <motion.div
@@ -537,8 +541,7 @@ const LandingView: React.FC = () => {
           </div>
         )}
         </div>
-          </>
-        )}
+        </>
       </main>
 
       {/* Tutorial FAB - Fixed bottom corner button */}
@@ -547,7 +550,7 @@ const LandingView: React.FC = () => {
       <button
         onClick={handleOpenTutorial}
         className="
-          fixed bottom-[max(env(safe-area-inset-bottom,0px),1rem)] right-4 z-[45] sm:bottom-24 sm:right-6 lg:right-8
+          fixed bottom-[max(env(safe-area-inset-bottom,0px),1rem)] right-[max(env(safe-area-inset-right,0px),1rem)] z-[45] sm:bottom-24 sm:right-6 lg:right-8
           flex items-center justify-center gap-2
           min-w-[48px] min-h-[48px]
           px-4 py-3
@@ -558,7 +561,7 @@ const LandingView: React.FC = () => {
           hover:scale-105 hover:shadow-hard-xl
           active:scale-95 active:shadow-hard
           transition-all duration-150
-          rtl:right-auto rtl:left-4 sm:rtl:left-6 lg:rtl:left-8
+          rtl:right-auto rtl:left-[max(env(safe-area-inset-left,0px),1rem)] sm:rtl:left-6 lg:rtl:left-8
           animate-fade-in-up
         "
         aria-label={t('landing.tutorial') || 'Tutorial'}

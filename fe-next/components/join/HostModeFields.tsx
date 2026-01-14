@@ -188,6 +188,8 @@ const HostModeFields: React.FC<HostModeFieldsProps> = ({
                   <img
                     src={profile.profile_picture_url}
                     alt={displayName}
+                    width={48}
+                    height={48}
                     className="w-full h-full object-cover"
                   />
                 </div>

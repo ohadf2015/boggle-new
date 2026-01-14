@@ -16,6 +16,8 @@ const TTL_CONFIG = {
   TOURNAMENT: parseInt(process.env.REDIS_TOURNAMENT_TTL || '10800'),    // 3 hours
   LEADERBOARD_TOP: parseInt(process.env.REDIS_LEADERBOARD_TTL || '900'), // 15 minutes (was 5 - 66% reduction in DB queries)
   LEADERBOARD_USER: 120,                                               // 2 minutes (was 1 minute)
+  DAILY_PUZZLE: parseInt(process.env.REDIS_DAILY_PUZZLE_TTL || '86400'),
+  DAILY_LEADERBOARD: parseInt(process.env.REDIS_DAILY_LEADERBOARD_TTL || '60'),
 };
 
 // Performance Configuration
@@ -143,6 +145,8 @@ const KEYS = {
   wordApproval: (lang: string, word: string): string => `${REDIS_PREFIX}:${REDIS_VERSION}:word:${lang}:${word}`,
   leaderboardTop: (): string => `${REDIS_PREFIX}:${REDIS_VERSION}:lb:top100`,
   leaderboardUser: (userId: string): string => `${REDIS_PREFIX}:${REDIS_VERSION}:lb:user:${userId}`,
+  dailyPuzzle: (date: string, language: string): string => `${REDIS_PREFIX}:${REDIS_VERSION}:daily:puzzle:${language}:${date}`,
+  dailyLeaderboard: (date: string, language: string, limit: number): string => `${REDIS_PREFIX}:${REDIS_VERSION}:daily:lb:${language}:${date}:${limit}`,
 };
 
 // Key patterns for SCAN operations
@@ -1001,6 +1005,74 @@ async function cacheUserRank(userId: string, rankData: unknown): Promise<void> {
   }
 }
 
+async function getCachedDailyPuzzle(date: string, language: string): Promise<unknown | null> {
+  if (!_isRedisAvailable || !_redisClient) {
+    return null;
+  }
+
+  try {
+    const data = await circuitBreaker.execute(() => _redisClient!.get(KEYS.dailyPuzzle(date, language)));
+    return data ? JSON.parse(data) : null;
+  } catch (error: unknown) {
+    const err = error as Error;
+    logger.error('REDIS', `Error getting cached daily puzzle: ${err.message}`);
+    return null;
+  }
+}
+
+async function cacheDailyPuzzle(date: string, language: string, puzzle: unknown): Promise<void> {
+  if (!_isRedisAvailable || !_redisClient) {
+    return;
+  }
+
+  try {
+    await circuitBreaker.execute(() =>
+      _redisClient!.setex(
+        KEYS.dailyPuzzle(date, language),
+        getTTLWithJitter(TTL_CONFIG.DAILY_PUZZLE),
+        JSON.stringify(puzzle)
+      )
+    );
+  } catch (error: unknown) {
+    const err = error as Error;
+    logger.error('REDIS', `Error caching daily puzzle: ${err.message}`);
+  }
+}
+
+async function getCachedDailyLeaderboard(date: string, language: string, limit: number): Promise<unknown | null> {
+  if (!_isRedisAvailable || !_redisClient) {
+    return null;
+  }
+
+  try {
+    const data = await circuitBreaker.execute(() => _redisClient!.get(KEYS.dailyLeaderboard(date, language, limit)));
+    return data ? JSON.parse(data) : null;
+  } catch (error: unknown) {
+    const err = error as Error;
+    logger.error('REDIS', `Error getting cached daily leaderboard: ${err.message}`);
+    return null;
+  }
+}
+
+async function cacheDailyLeaderboard(date: string, language: string, limit: number, leaderboard: unknown): Promise<void> {
+  if (!_isRedisAvailable || !_redisClient) {
+    return;
+  }
+
+  try {
+    await circuitBreaker.execute(() =>
+      _redisClient!.setex(
+        KEYS.dailyLeaderboard(date, language, limit),
+        getTTLWithJitter(TTL_CONFIG.DAILY_LEADERBOARD),
+        JSON.stringify(leaderboard)
+      )
+    );
+  } catch (error: unknown) {
+    const err = error as Error;
+    logger.error('REDIS', `Error caching daily leaderboard: ${err.message}`);
+  }
+}
+
 async function invalidateLeaderboardCaches(): Promise<void> {
   if (!_isRedisAvailable || !_redisClient) {
     return;
@@ -1341,6 +1413,10 @@ export {
   getCachedUserRank,
   cacheUserRank,
   invalidateLeaderboardCaches,
+  getCachedDailyPuzzle,
+  cacheDailyPuzzle,
+  getCachedDailyLeaderboard,
+  cacheDailyLeaderboard,
 
   // Health and monitoring
   healthCheck,
@@ -1397,6 +1473,10 @@ module.exports = {
   getCachedUserRank,
   cacheUserRank,
   invalidateLeaderboardCaches,
+  getCachedDailyPuzzle,
+  cacheDailyPuzzle,
+  getCachedDailyLeaderboard,
+  cacheDailyLeaderboard,
 
   // Health and monitoring
   healthCheck,

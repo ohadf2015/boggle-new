@@ -36,6 +36,7 @@ const initReactScan = async () => {
     if (reactScanInitialized) return;
     if (typeof window === 'undefined') return;
     if (process.env.NODE_ENV !== 'development') return;
+    if (process.env.NEXT_PUBLIC_ENABLE_REACT_SCAN !== 'true') return;
 
     reactScanInitialized = true;
     const { scan } = await import('react-scan');
@@ -45,7 +46,7 @@ const initReactScan = async () => {
     });
 };
 
-if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_ENABLE_REACT_SCAN === 'true') {
     initReactScan();
 }
 

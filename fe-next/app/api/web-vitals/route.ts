@@ -15,11 +15,7 @@ interface WebVitalPayload {
   navigation_type: string | null;
   session_id: string;
   user_agent: string;
-  metadata: {
-    id: string;
-    navigationType: string;
-    delta: number;
-  };
+  metadata: Record<string, unknown>;
 }
 
 export async function POST(request: NextRequest) {

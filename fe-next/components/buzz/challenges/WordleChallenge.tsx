@@ -31,10 +31,13 @@ const KEYBOARD_LAYOUTS: Record<string, string[][]> = {
     ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
     ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACKSPACE'],
   ],
+  // Hebrew keyboard follows standard Israeli keyboard layout (no final letters)
+  // Final letters (sofit) are excluded - they appear automatically at word end in typing
+  // Layout mirrors Hebrew keyboard positions without finals: ך→כ, ם→מ, ן→נ, ף→פ, ץ→צ
   he: [
-    ['ק', 'ר', 'א', 'ט', 'ו', 'ן', 'ם', 'פ'],
-    ['ש', 'ד', 'ג', 'כ', 'ע', 'י', 'ח', 'ל', 'ך', 'ף'],
-    ['ENTER', 'ז', 'ס', 'ב', 'ה', 'נ', 'מ', 'צ', 'ת', 'ץ', 'BACKSPACE'],
+    ['ק', 'ר', 'א', 'ט', 'ו', 'נ', 'מ', 'פ'],
+    ['ש', 'ד', 'ג', 'כ', 'ע', 'י', 'ח', 'ל'],
+    ['ENTER', 'ז', 'ס', 'ב', 'ה', 'צ', 'ת', 'BACKSPACE'],
   ],
   sv: [
     ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'Å'],

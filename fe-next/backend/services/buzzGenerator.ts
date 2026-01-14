@@ -307,7 +307,7 @@ async function generateChallengesWithAI(
     model: GEMINI_MODEL,
   });
 
-  const prompt = buildAIPrompt(trends, language, region);
+  const prompt = await buildAIPrompt(trends, language, region);
 
   try {
     // Build generation config with optional thinking for extended reasoning
@@ -488,12 +488,13 @@ function selectTrendsForChallenge(trends: TrendingTopic[]): TrendingTopic[] {
 /**
  * Build prompt for Gemini to generate word challenges
  * Uses sophisticated lateral thinking approach for unpredictable connections
+ * Includes improvement examples from admin feedback to guide AI
  */
-function buildAIPrompt(
+async function buildAIPrompt(
   trends: TrendingTopic[],
   language: string,
   region: string
-): string {
+): Promise<string> {
   // Select trends freely - prioritize rising trends (already sorted by increase_percentage)
   // Take variety: mix of fastest-rising and high-volume for diversity
   const selectedTrends = selectTrendsForChallenge(trends);
@@ -575,7 +576,7 @@ Always pick the word that 90% of native speakers would guess FIRST:
   // Language-specific persona and tone guidance
   const languageToneGuide = getLanguageToneGuide(language);
 
-  return `You are a witty puzzle-crafter for LexiClash, a neo-brutalist word game that doesn't take itself too seriously. Think of yourself as that clever friend who always has the perfect pun at parties—the one who makes people groan AND laugh at the same time.
+  const basePrompt = `You are a witty puzzle-crafter for LexiClash, a neo-brutalist word game that doesn't take itself too seriously. Think of yourself as that clever friend who always has the perfect pun at parties—the one who makes people groan AND laugh at the same time.
 
 Your mission? Create word challenges that make players go "Ohhh, NICE!" when they get it. We're going for that sweet spot between clever and accessible—the kind of wordplay you'd share in a group chat, not present at an academic conference.
 
@@ -758,6 +759,54 @@ Before outputting, verify each challenge:
 - [ ] **Native Speaker Test**: Would a ${language === 'he' ? 'Israeli' : language === 'sv' ? 'Swede' : language === 'ja' ? 'Japanese person' : language === 'es' ? 'Spanish speaker' : 'native speaker'} say this?
 
 Return ONLY the JSON object. Make every challenge feel fresh, clever, and connected to TODAY—like it was written by a witty friend, not a corporate chatbot.`;
+
+  // Fetch and append improvement examples from admin feedback
+  const examples = await getPromptExamples(language, 20);
+
+  if (examples.length > 0) {
+    const examplesSection = buildImprovementExamplesSection(examples);
+    return basePrompt + examplesSection;
+  }
+
+  return basePrompt;
+}
+
+/**
+ * Build the improvement examples section for the AI prompt
+ * Shows rejected challenges with feedback to help AI avoid similar mistakes
+ */
+function buildImprovementExamplesSection(examples: PromptExample[]): string {
+  const formattedExamples = examples.slice(0, 15).map((ex, i) => {
+    let example = `
+**Example ${i + 1}** (${ex.challenge_type}):
+- REJECTED: "${ex.original_prompt}" → "${ex.original_answer}"
+- ISSUE: ${ex.feedback}`;
+
+    if (ex.improved_prompt && ex.improved_answer) {
+      example += `
+- BETTER: "${ex.improved_prompt}" → "${ex.improved_answer}"`;
+    }
+
+    return example;
+  }).join('\n');
+
+  return `
+
+---
+
+## 🚫 IMPROVEMENT EXAMPLES (Learn from past mistakes)
+
+These challenges were rejected by admins. Study the feedback and AVOID similar issues:
+
+${formattedExamples}
+
+**Key Takeaways**: Review the patterns above. Common issues include:
+- Words that are too obscure or literary (use everyday vocabulary)
+- Clues that give away the answer too easily
+- Cultural references that don't translate well
+- Answers that are too predictable or too obscure
+- Prompts that sound robotic instead of conversational
+`;
 }
 
 /**
@@ -967,6 +1016,40 @@ function validateChallenges(
 }
 
 /**
+ * Validate a single challenge without minimum count requirement
+ * Used for regenerating individual challenges
+ */
+function validateSingleChallenge(
+  challenge: BuzzChallenge,
+  _language: string
+): boolean {
+  const answer = challenge.answer;
+
+  // Filter out brand names and proper nouns
+  if (isBrandOrProperNoun(answer)) {
+    console.warn(`[BUZZ] Rejected brand/proper noun: ${answer}`);
+    return false;
+  }
+
+  // Check word length
+  if (answer.length < 3 || answer.length > 15) {
+    console.warn(`[BUZZ] Word length invalid: ${answer} (${answer.length} letters)`);
+    return false;
+  }
+
+  // Validate options for multiple choice (check for brands only)
+  if (challenge.options) {
+    const allValid = challenge.options.every((option) => !isBrandOrProperNoun(option));
+    if (!allValid) {
+      console.warn(`[BUZZ] Invalid options contain brand names for: ${challenge.prompt}`);
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/**
  * Generate trending summary from topics
  */
 function generateTrendingSummary(trends: TrendingTopic[]): string {
@@ -1093,6 +1176,298 @@ function getFallbackTopics(_language: string): TrendingTopic[] {
   console.log(`[BUZZ] Using ${fallbackTopics.length} fallback topics`);
   return fallbackTopics;
 }
+
+// ==================== Prompt Example Functions ====================
+
+/**
+ * Interface for prompt improvement examples
+ */
+interface PromptExample {
+  challenge_type: string;
+  original_prompt: string;
+  original_answer: string;
+  feedback: string;
+  improved_prompt?: string;
+  improved_answer?: string;
+  trend_topic?: string;
+}
+
+/**
+ * Retrieve prompt improvement examples from database
+ * Used to enhance the main AI prompt with learned corrections
+ */
+export async function getPromptExamples(
+  language: string,
+  limit: number = 30
+): Promise<PromptExample[]> {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const { data, error } = await supabase
+      .from('buzz_prompt_examples')
+      .select('challenge_type, original_prompt, original_answer, feedback, improved_prompt, improved_answer, trend_topic')
+      .eq('language', language)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.warn('[BUZZ] Failed to fetch prompt examples:', error.message);
+      return [];
+    }
+
+    return (data || []) as PromptExample[];
+  } catch (err) {
+    console.error('[BUZZ] Error fetching prompt examples:', err);
+    return [];
+  }
+}
+
+/**
+ * Store a new prompt example when admin provides feedback
+ */
+export async function storePromptExample(
+  language: string,
+  challengeType: string,
+  originalPrompt: string,
+  originalAnswer: string,
+  feedback: string,
+  createdBy: string,
+  trendTopic?: string,
+  improvedPrompt?: string,
+  improvedAnswer?: string
+): Promise<void> {
+  const { createClient } = await import('@supabase/supabase-js');
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { error } = await supabase.from('buzz_prompt_examples').insert({
+    language,
+    challenge_type: challengeType,
+    original_prompt: originalPrompt,
+    original_answer: originalAnswer,
+    feedback,
+    improved_prompt: improvedPrompt || null,
+    improved_answer: improvedAnswer || null,
+    trend_topic: trendTopic || null,
+    created_by: createdBy,
+  });
+
+  if (error) {
+    console.error('[BUZZ] Failed to store prompt example:', error);
+    throw new Error('Failed to store feedback');
+  }
+
+  console.log(`[BUZZ] Stored prompt example for ${language}/${challengeType}`);
+}
+
+// ==================== Single Challenge Regeneration ====================
+
+/**
+ * Build a focused prompt for regenerating a single challenge
+ */
+function buildSingleChallengePrompt(
+  original: BuzzChallenge,
+  feedback: string,
+  language: string,
+  trends: TrendingTopic[]
+): string {
+  const trendContext = trends
+    .slice(0, 5)
+    .map(t => `- ${t.query}`)
+    .join('\n');
+
+  const languageToneGuide = getLanguageToneGuide(language);
+
+  return `You need to create a REPLACEMENT ${original.type} challenge for LexiClash, a word game.
+
+**Language**: ${language}
+**Challenge Type**: ${original.type}
+
+---
+
+## TONE GUIDE
+${languageToneGuide}
+
+---
+
+## ORIGINAL CHALLENGE (REJECTED)
+- Type: ${original.type}
+- Trend: ${original.trend_topic}
+- Prompt: "${original.prompt}"
+- Answer: "${original.answer}"
+- Hint: "${original.hint || 'None'}"
+- Difficulty: ${original.difficulty}
+
+---
+
+## ADMIN FEEDBACK (WHAT WAS WRONG)
+${feedback}
+
+---
+
+## AVAILABLE TRENDS
+${trendContext}
+
+---
+
+## YOUR TASK
+Generate ONE replacement challenge that:
+1. **Addresses the feedback** - Fix the specific issue mentioned above
+2. **Same type** - Must be "${original.type}"
+3. **Can use same or different trend** - Pick whichever makes a better challenge
+4. **Common dictionary word** - 3-12 letters (5 for wordle_guess), known by 90% of people
+5. **Natural language** - Sound human, not robotic
+
+---
+
+## OUTPUT FORMAT (JSON only, no markdown)
+{
+  "type": "${original.type}",
+  "trend_topic": "the trend you're using",
+  "prompt": "the creative clue",
+  "answer": "WORD_IN_CAPS",
+  "hint": "a helpful nudge",
+  "difficulty": "easy|medium|hard",
+  "trending_context": "1 sentence: why this matters today"
+}
+
+Return ONLY the JSON object.`;
+}
+
+/**
+ * Generate a single challenge using Gemini
+ */
+async function generateSingleChallengeWithAI(
+  prompt: string
+): Promise<BuzzChallenge> {
+  const credentials = getVertexAICredentials();
+  const vertexAI = new VertexAI({
+    project: credentials.project_id,
+    location: credentials.location,
+    googleAuthOptions: {
+      credentials: {
+        client_email: credentials.client_email,
+        private_key: credentials.private_key,
+      },
+      projectId: credentials.project_id,
+    },
+  });
+
+  const model = vertexAI.getGenerativeModel({ model: GEMINI_MODEL });
+
+  const result = await model.generateContent({
+    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    generationConfig: {
+      temperature: 0.7,
+      maxOutputTokens: 1500,
+      topP: 0.9,
+    },
+  });
+
+  const responseText = result.response.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+  if (!responseText) {
+    throw new Error('No response from Gemini for single challenge');
+  }
+
+  // Parse single challenge JSON
+  let jsonText = responseText.trim();
+
+  // Remove markdown code blocks if present
+  if (jsonText.startsWith('```')) {
+    jsonText = jsonText.replace(/```json?\n?/g, '').replace(/```\n?$/g, '');
+  }
+
+  // Find JSON object boundaries
+  const startIdx = jsonText.indexOf('{');
+  const endIdx = jsonText.lastIndexOf('}');
+  if (startIdx === -1 || endIdx === -1) {
+    throw new Error('Invalid JSON structure from AI');
+  }
+  jsonText = jsonText.substring(startIdx, endIdx + 1);
+
+  const challenge = JSON.parse(jsonText) as BuzzChallenge;
+
+  // Validate structure
+  if (!challenge.type || !challenge.prompt || !challenge.answer) {
+    throw new Error('Invalid challenge structure from AI');
+  }
+
+  return challenge;
+}
+
+/**
+ * Regenerate a single challenge within an existing Daily Buzz
+ * Uses admin feedback to guide the regeneration
+ *
+ * @param date - Puzzle date (YYYY-MM-DD)
+ * @param language - Language code
+ * @param challengeIndex - Index of challenge to replace (0-based)
+ * @param feedback - Admin feedback about what was wrong
+ * @returns Updated DailyBuzzData
+ */
+export async function regenerateSingleChallenge(
+  date: string,
+  language: string,
+  challengeIndex: number,
+  feedback: string
+): Promise<DailyBuzzData> {
+  console.log(`[BUZZ] Regenerating challenge ${challengeIndex} for ${date}/${language}`);
+
+  // 1. Fetch existing challenge data
+  const existing = await getDailyBuzz(date, language);
+  if (!existing) {
+    throw new Error(`No challenge found for ${date} (${language})`);
+  }
+
+  if (challengeIndex < 0 || challengeIndex >= existing.challenges.length) {
+    throw new Error(`Invalid challenge index: ${challengeIndex}. Valid range: 0-${existing.challenges.length - 1}`);
+  }
+
+  const badChallenge = existing.challenges[challengeIndex];
+  console.log(`[BUZZ] Original challenge: ${badChallenge.type} - "${badChallenge.answer}"`);
+
+  // 2. Build targeted regeneration prompt
+  const regenerationPrompt = buildSingleChallengePrompt(
+    badChallenge,
+    feedback,
+    language,
+    existing.trending_topics
+  );
+
+  // 3. Generate replacement via AI
+  const newChallenge = await generateSingleChallengeWithAI(regenerationPrompt);
+  console.log(`[BUZZ] New challenge generated: ${newChallenge.type} - "${newChallenge.answer}"`);
+
+  // 4. Validate the new challenge (single-item validation)
+  if (!validateSingleChallenge(newChallenge, language)) {
+    throw new Error('Regenerated challenge failed validation - try different feedback');
+  }
+
+  // 5. Replace in the challenges array
+  const updatedChallenges = [...existing.challenges];
+  updatedChallenges[challengeIndex] = newChallenge;
+
+  // 6. Update in database
+  const updatedData: DailyBuzzData = {
+    ...existing,
+    challenges: updatedChallenges,
+  };
+
+  await storeDailyBuzz(updatedData);
+
+  console.log(`[BUZZ] Challenge ${challengeIndex} regenerated successfully`);
+  return updatedData;
+}
+
+// ==================== Database Functions ====================
 
 /**
  * Get Daily Buzz for a specific date and language

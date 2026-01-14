@@ -2457,7 +2457,11 @@ const en = {
     "notAvailable": "Not Available",
     "unavailableTagline": "Not available for this language yet",
     "requestChallenge": "Request Challenge",
-    "requestSent": "Request Sent!"
+    "requestSent": "Request Sent!",
+    "skipToAnswers": "Skip to Answers",
+    "skipConfirmTitle": "Skip Challenges?",
+    "skipConfirmMessage": "You'll see the answers without playing. Your score will be 0.",
+    "skipConfirm": "Skip to Answers"
   },
   "wordHunt": {
     "title": "Word Hunt",

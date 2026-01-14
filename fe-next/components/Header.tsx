@@ -234,7 +234,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 </div>
 
                 {/* Mobile: Volume + Hamburger - simplified grouping */}
-                <div className="sm:hidden flex items-center gap-1.5 min-w-0 flex-shrink-0" ref={mobileMenuRef}>
+                <div className="sm:hidden flex items-center gap-2 min-w-0 flex-shrink-0" ref={mobileMenuRef}>
                     {/* Sound controls */}
                     <MusicControls />
 
@@ -243,7 +243,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         onClick={() => setShowMobileMenu(!showMobileMenu)}
                         className={cn(
                             "flex items-center justify-center flex-shrink-0",
-                            "w-9 h-9",
+                            "w-11 h-11 min-w-[44px] min-h-[44px]",
                             "bg-neo-cream text-neo-black",
                             "border-2 border-neo-black",
                             "rounded-neo shadow-hard-sm",
@@ -275,7 +275,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: 0.2 }}
-                                className="fixed inset-0 bg-neo-black/50 z-[9998] sm:hidden"
+                                className="fixed inset-0 bg-neo-black/50 z-70 sm:hidden"
                                 onClick={() => setShowMobileMenu(false)}
                             />
                             {/* Slide-out pane - slides from right in LTR, left in RTL */}
@@ -286,7 +286,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 exit={{ x: language === 'he' ? '-100%' : '100%' }}
                                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                                 className={cn(
-                                    "fixed top-0 bottom-0 w-[280px] max-w-[85vw] z-[9999] sm:hidden",
+                                    "fixed top-0 bottom-0 w-[280px] max-w-[85vw] z-80 sm:hidden",
                                     "bg-neo-cream dark:bg-slate-800 border-neo-black dark:border-slate-600",
                                     "shadow-hard-xl overflow-y-auto",
                                     "pb-[max(env(safe-area-inset-bottom),1rem)]",

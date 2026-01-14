@@ -170,15 +170,16 @@ export default function RulesPage(): React.JSX.Element {
                                         </li>
                                     </ul>
                                     <div className="mt-2 sm:mt-4">
-                                        <Link href={`/${language}/multiplayer`}>
-                                            <Button
-                                                size="sm"
-                                                className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold w-full text-xs sm:text-sm py-1.5 sm:py-2"
-                                            >
+                                        <Button
+                                            asChild
+                                            size="sm"
+                                            className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold w-full text-xs sm:text-sm py-1.5 sm:py-2 min-h-[44px]"
+                                        >
+                                            <Link href={`/${language}/multiplayer`}>
                                                 <Users className={`w-3 h-3 sm:w-4 sm:h-4 ${dir === 'rtl' ? 'ml-1 sm:ml-2' : 'mr-1 sm:mr-2'}`} />
                                                 {t('landing.multiPlayer')}
-                                            </Button>
-                                        </Link>
+                                            </Link>
+                                        </Button>
                                     </div>
                                 </div>
 
@@ -203,15 +204,16 @@ export default function RulesPage(): React.JSX.Element {
                                         </li>
                                     </ul>
                                     <div className="mt-2 sm:mt-4">
-                                        <Link href={`/${language}/singleplayer`}>
-                                            <Button
-                                                size="sm"
-                                                className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold w-full text-xs sm:text-sm py-1.5 sm:py-2"
-                                            >
+                                        <Button
+                                            asChild
+                                            size="sm"
+                                            className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold w-full text-xs sm:text-sm py-1.5 sm:py-2 min-h-[44px]"
+                                        >
+                                            <Link href={`/${language}/singleplayer`}>
                                                 <Bot className={`w-3 h-3 sm:w-4 sm:h-4 ${dir === 'rtl' ? 'ml-1 sm:ml-2' : 'mr-1 sm:mr-2'}`} />
                                                 {t('landing.singlePlayer')}
-                                            </Button>
-                                        </Link>
+                                            </Link>
+                                        </Button>
                                     </div>
                                 </div>
                             </div>
@@ -320,36 +322,42 @@ export default function RulesPage(): React.JSX.Element {
                         {t('rules.readyToTestDesc')}
                     </p>
                     <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
-                        <Link href={`/${language}`}>
-                            <Button
-                                size="lg"
-                                className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold text-sm sm:text-lg px-4 sm:px-6 py-2.5 sm:py-5 w-full sm:w-auto"
-                            >
+                        <Button
+                            asChild
+                            size="lg"
+                            className="bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 font-bold text-sm sm:text-lg px-4 sm:px-6 py-2.5 sm:py-5 w-full sm:w-auto"
+                        >
+                            <Link href={`/${language}`}>
                                 <Play className={`w-4 h-4 sm:w-5 sm:h-5 ${dir === 'rtl' ? 'ml-1 sm:ml-2' : 'mr-1 sm:mr-2'}`} />
                                 {t('rules.startPlaying')}
-                            </Button>
-                        </Link>
-                        <Link href={`/${language}/leaderboard`}>
-                            <Button
-                                size="lg"
-                                variant="outline"
-                                className="border-2 sm:border-3 border-neo-black font-bold text-sm sm:text-lg px-4 sm:px-6 py-2.5 sm:py-5 w-full sm:w-auto"
-                            >
+                            </Link>
+                        </Button>
+                        <Button
+                            asChild
+                            size="lg"
+                            variant="outline"
+                            className="border-2 sm:border-3 border-neo-black font-bold text-sm sm:text-lg px-4 sm:px-6 py-2.5 sm:py-5 w-full sm:w-auto"
+                        >
+                            <Link href={`/${language}/leaderboard`}>
                                 <Trophy className={`w-4 h-4 sm:w-5 sm:h-5 ${dir === 'rtl' ? 'ml-1 sm:ml-2' : 'mr-1 sm:mr-2'}`} />
                                 {t('leaderboard.viewLeaderboard')}
-                            </Button>
-                        </Link>
+                            </Link>
+                        </Button>
                     </div>
                 </motion.div>
 
                 {/* Back to Home Button */}
                 <div className="text-center pb-3 sm:pb-6">
-                    <Link href={`/${language}`}>
-                        <motion.button
-                            whileHover={{ x: dir === 'rtl' ? 4 : -4 }}
-                            whileTap={{ scale: 0.95 }}
+                    <motion.div
+                        whileHover={{ x: dir === 'rtl' ? 4 : -4 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="inline-flex"
+                    >
+                        <Link
+                            href={`/${language}`}
                             className="
                                 inline-flex items-center gap-1.5 sm:gap-2
+                                min-h-[44px]
                                 px-3 sm:px-5 py-2 sm:py-2.5
                                 bg-neo-cream text-neo-black
                                 font-bold text-sm sm:text-base
@@ -361,8 +369,8 @@ export default function RulesPage(): React.JSX.Element {
                         >
                             <ArrowLeft className={`w-4 h-4 sm:w-5 sm:h-5 ${dir === 'rtl' ? 'rotate-180' : ''}`} />
                             {t('rules.backToHome')}
-                        </motion.button>
-                    </Link>
+                        </Link>
+                    </motion.div>
                 </div>
             </main>
             </div>

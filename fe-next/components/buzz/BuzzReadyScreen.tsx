@@ -1,9 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Newspaper, Play, ArrowLeft, Sparkles } from 'lucide-react';
+import { Play, ArrowLeft, Sparkles, FastForward } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDailyBuzzImages } from '@/hooks/useFeatureFlag';
@@ -21,6 +23,7 @@ interface BuzzReadyScreenProps {
   };
   hasPlayedToday: boolean;
   onStart: () => void;
+  onSkipAll: () => void;
   onBack: () => void;
 }
 
@@ -32,11 +35,13 @@ export default function BuzzReadyScreen({
   challengeData,
   hasPlayedToday,
   onStart,
+  onSkipAll,
   onBack,
 }: BuzzReadyScreenProps) {
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const { enabled: showImages } = useDailyBuzzImages(user?.id);
+  const [showSkipConfirm, setShowSkipConfirm] = useState(false);
 
   // Icon for Hebrew RTL: 🔥📰 (reversed)
   const icon = language === 'he' ? '🔥📰' : '📰🔥';
@@ -80,13 +85,15 @@ export default function BuzzReadyScreen({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="relative w-full max-w-lg mx-auto rounded-xl overflow-hidden border-4 border-neo-black shadow-hard-lg"
+            className="relative w-full max-w-lg mx-auto aspect-square rounded-xl overflow-hidden border-4 border-neo-black shadow-hard-lg"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src={challengeData.imageUrl}
               alt={challengeData.trendingSummary}
-              className="w-full aspect-square object-cover"
+              fill
+              priority
+              sizes="(max-width: 640px) 100vw, 512px"
+              className="object-cover"
             />
             {/* Neo-brutalist corner accent */}
             <div className="absolute top-0 start-0 w-8 h-8 bg-neo-yellow border-e-4 border-b-4 border-neo-black" />
@@ -200,6 +207,7 @@ export default function BuzzReadyScreen({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9 }}
+          className="space-y-3"
         >
           <Button
             onClick={onStart}
@@ -211,7 +219,34 @@ export default function BuzzReadyScreen({
               ? t('buzz.viewResults') || 'VIEW RESULTS'
               : t('buzz.preview.play') || 'START BUZZ'}
           </Button>
+
+          {/* Skip to Answers Button - only show if not already played */}
+          {!hasPlayedToday && (
+            <Button
+              onClick={() => setShowSkipConfirm(true)}
+              variant="ghost"
+              className="w-full py-3 text-sm font-medium text-slate-400 hover:text-neo-pink border-2 border-transparent hover:border-slate-600 transition-all"
+            >
+              <FastForward className="w-4 h-4 me-2" />
+              {t('buzz.skipToAnswers') || 'Skip to Answers'}
+            </Button>
+          )}
         </motion.div>
+
+        {/* Skip Confirmation Dialog */}
+        <ConfirmationDialog
+          open={showSkipConfirm}
+          onOpenChange={setShowSkipConfirm}
+          title={t('buzz.skipConfirmTitle') || 'Skip Challenges?'}
+          description={
+            t('buzz.skipConfirmMessage') ||
+            "You'll see the answers without playing. Your score will be 0."
+          }
+          confirmText={t('buzz.skipConfirm') || 'Skip to Answers'}
+          cancelText={t('common.cancel') || 'Cancel'}
+          onConfirm={onSkipAll}
+          variant="warning"
+        />
 
         {/* Help Text */}
         <motion.p

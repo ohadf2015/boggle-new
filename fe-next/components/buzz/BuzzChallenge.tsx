@@ -110,6 +110,25 @@ export default function BuzzChallenge({ language, onBack }: BuzzChallengeProps) 
     setPhase('playing');
   };
 
+  // Handle skip all challenges - go directly to results with empty answers
+  const handleSkipAll = () => {
+    if (!challengeData) return;
+
+    const skippedResult: BuzzResultData = {
+      challengeId: challengeData.id,
+      score: 0,
+      challengesSolved: challengeData.challenges.map((_, index) => ({
+        challengeIndex: index,
+        userAnswer: '',
+        correct: false,
+        timeTakenSeconds: 0,
+      })),
+      completionTimeSeconds: 0,
+    };
+    setResultData(skippedResult);
+    setPhase('results');
+  };
+
   // Handle game completion
   const handleComplete = (result: BuzzResultData) => {
     setResultData(result);
@@ -137,6 +156,7 @@ export default function BuzzChallenge({ language, onBack }: BuzzChallengeProps) 
             challengeData={challengeData}
             hasPlayedToday={hasPlayedToday}
             onStart={handleStart}
+            onSkipAll={handleSkipAll}
             onBack={onBack}
           />
         )}

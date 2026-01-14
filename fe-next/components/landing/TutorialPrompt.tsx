@@ -37,7 +37,7 @@ const TutorialPrompt: React.FC<TutorialPromptProps> = ({
             {/* Dismiss button */}
             <button
               onClick={onDismiss}
-              className="absolute top-2 right-2 rtl:right-auto rtl:left-2 sm:top-3 sm:right-3 sm:rtl:right-auto sm:rtl:left-3 p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-neo transition-colors z-10"
+              className="absolute top-2 right-2 rtl:right-auto rtl:left-2 sm:top-3 sm:right-3 sm:rtl:right-auto sm:rtl:left-3 w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-white/80 hover:text-white hover:bg-white/20 rounded-neo transition-colors z-10"
               aria-label={t('common.dismiss') || 'Dismiss'}
             >
               <X className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -63,13 +63,13 @@ const TutorialPrompt: React.FC<TutorialPromptProps> = ({
               <div className="flex gap-2 sm:gap-3 flex-shrink-0">
                 <button
                   onClick={onDismiss}
-                  className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold text-white/90 hover:text-white hover:bg-white/10 rounded-neo transition-colors"
+                  className="px-3 sm:px-4 py-2 min-h-[44px] text-xs sm:text-sm font-bold text-white/90 hover:text-white hover:bg-white/10 rounded-neo transition-colors"
                 >
                   {t('tutorialPrompt.later') || 'Later'}
                 </button>
                 <button
                   onClick={onStartTutorial}
-                  className="flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 bg-neo-lime text-neo-black font-bold text-xs sm:text-sm uppercase border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                  className="flex items-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-2 min-h-[44px] bg-neo-lime text-neo-black font-bold text-xs sm:text-sm uppercase border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                 >
                   <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   {t('tutorialPrompt.start') || 'Start'}

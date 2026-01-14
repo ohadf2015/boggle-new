@@ -2454,7 +2454,11 @@ const ja = {
     "notAvailable": "利用不可",
     "unavailableTagline": "この言語ではまだ利用できません",
     "requestChallenge": "チャレンジをリクエスト",
-    "requestSent": "リクエスト送信済み！"
+    "requestSent": "リクエスト送信済み！",
+    "skipToAnswers": "答えにスキップ",
+    "skipConfirmTitle": "チャレンジをスキップしますか？",
+    "skipConfirmMessage": "プレイせずに答えを見ます。スコアは0になります。",
+    "skipConfirm": "答えにスキップ"
   },
   "wordHunt": {
     "title": "ワードハント",
