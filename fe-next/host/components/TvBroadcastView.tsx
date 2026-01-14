@@ -1,9 +1,10 @@
 'use client';
 
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState, useEffect } from 'react';
 import type { Socket } from 'socket.io-client';
 import { Maximize, Minimize } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
+import TvTutorialOverlay, { isTvTutorialComplete, TvHelpButton } from './tv-broadcast/TvTutorialOverlay';
 import TvJoinBar from './tv-broadcast/TvJoinBar';
 import TvGameHeader from './tv-broadcast/TvGameHeader';
 import TvGrid from './tv-broadcast/TvGrid';
@@ -92,6 +93,24 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
     enabled: true,
   });
 
+  // Tutorial state - show on first visit
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  useEffect(() => {
+    // Check if tutorial should be shown (first visit)
+    if (!isTvTutorialComplete()) {
+      setShowTutorial(true);
+    }
+  }, []);
+
+  const handleTutorialComplete = () => {
+    setShowTutorial(false);
+  };
+
+  const handleShowTutorial = () => {
+    setShowTutorial(true);
+  };
+
   // Track player combos
   const { playerCombos } = useTvPlayerCombos({
     socket,
@@ -143,25 +162,31 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
 
   return (
     <div className="h-[100dvh] bg-neo-navy flex flex-col overflow-hidden relative">
-      {/* Fullscreen Toggle Button */}
-      {isFullscreenSupported && (
-        <motion.button
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={toggleFullscreen}
-          className="absolute top-4 right-4 z-50 bg-neo-black/80 hover:bg-neo-black text-neo-cream p-3 rounded-neo border-2 border-neo-cream/30 shadow-hard-sm transition-colors"
-          title={isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')}
-          aria-label={isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')}
-        >
-          {isFullscreen ? (
-            <Minimize className="w-6 h-6" />
-          ) : (
-            <Maximize className="w-6 h-6" />
-          )}
-        </motion.button>
-      )}
+      {/* Top Right Controls: Help + Fullscreen */}
+      <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+        {/* Tutorial Help Button */}
+        <TvHelpButton onClick={handleShowTutorial} t={t} />
+
+        {/* Fullscreen Toggle Button */}
+        {isFullscreenSupported && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={toggleFullscreen}
+            className="bg-neo-black/80 hover:bg-neo-black text-neo-cream p-3 rounded-neo border-2 border-neo-cream/30 shadow-hard-sm transition-colors"
+            title={isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')}
+            aria-label={isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')}
+          >
+            {isFullscreen ? (
+              <Minimize className="w-6 h-6" />
+            ) : (
+              <Maximize className="w-6 h-6" />
+            )}
+          </motion.button>
+        )}
+      </div>
 
       {/* Join Bar (Kahoot-style) - Hidden in fullscreen */}
       <AnimatePresence>
@@ -258,6 +283,14 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         onDismiss={dismissNotification}
         maxVisible={1}
         t={t}
+      />
+
+      {/* Tutorial Overlay - shown on first visit or when help button clicked */}
+      <TvTutorialOverlay
+        onComplete={handleTutorialComplete}
+        onSkip={handleTutorialComplete}
+        t={t}
+        forceShow={showTutorial}
       />
     </div>
   );

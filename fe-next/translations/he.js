@@ -452,7 +452,8 @@ const he = {
       "beFirst": "היה הראשון ליצור אחד!",
       "createButton": "צור חדר",
       "refreshed": "החדרים רועננו",
-      "quickPlay": "משחק מהיר"
+      "quickPlay": "משחק מהיר",
+      "orJoinRoom": "או הצטרף לחדר"
     },
     "joinModal": {
       "title": "הצטרף לחדר",
@@ -521,6 +522,7 @@ const he = {
     "level": "רמה"
   },
   "hostView": {
+    "lobby": "לובי",
     "waitingForPlayers": "ממתין...",
     "startGame": "התחל",
     "roomCode": "קוד",
@@ -2352,7 +2354,11 @@ const he = {
     "total": "סה\"כ",
     "viewResults": "צפה בתוצאות",
     "yourAnswer": "התשובה שלך",
-    "yourScore": "הניקוד שלך"
+    "yourScore": "הניקוד שלך",
+    "notAvailable": "לא זמין",
+    "unavailableTagline": "עדיין לא זמין בשפה זו",
+    "requestChallenge": "בקש אתגר",
+    "requestSent": "הבקשה נשלחה!"
   },
   "wordHunt": {
     "title": "ציד מילים",
@@ -3007,6 +3013,37 @@ const he = {
       "of": "מתוך",
       "lastUpdated": "עודכן לאחרונה"
     }
+  },
+  "tvTutorial": {
+    "welcome": {
+      "title": "ברוכים הבאים למצב TV",
+      "description": "מושלם למסיבות! שדרו למסך גדול ותנו לכולם לשחק."
+    },
+    "qr": {
+      "title": "קוד QR וקוד חדר",
+      "description": "שחקנים סורקים את קוד ה-QR או מזינים את קוד החדר להצטרפות מיידית."
+    },
+    "grid": {
+      "title": "לוח המשחק",
+      "description": "לוח האותיות מוצג כאן לעיני כולם. המילים מופיעות כשהשחקנים מוצאים אותן."
+    },
+    "leaderboard": {
+      "title": "טבלת המובילים",
+      "description": "ניקוד ודירוגים בזמן אמת. צפו בתחרות מתלהטת!"
+    },
+    "timer": {
+      "title": "טיימר המשחק",
+      "description": "הספירה לאחור מראה כמה זמן נותר. סיבובי אש מוסיפים התרגשות!"
+    },
+    "letsGo": "בואו נתחיל!",
+    "ariaLabel": "מדריך מצב TV",
+    "help": "הצג מדריך"
+  },
+  "quickPlay": {
+    "title": "משחק מהיר",
+    "creating": "יוצר...",
+    "hostAndPlay": "ארח ושחק",
+    "subtitle": "חדר מיידי • חברים מצטרפים בסריקת QR"
   },
   "theme": {
     "sundayFunday": "כיף של יום ראשון",

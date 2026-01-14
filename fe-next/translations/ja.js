@@ -451,7 +451,8 @@ const ja = {
       "beFirst": "最初に作成しよう！",
       "createButton": "ルーム作成",
       "refreshed": "ルーム更新完了",
-      "quickPlay": "クイックプレイ"
+      "quickPlay": "クイックプレイ",
+      "orJoinRoom": "またはルームに参加"
     },
     "joinModal": {
       "title": "ルームに参加",
@@ -512,6 +513,7 @@ const ja = {
     }
   },
   "hostView": {
+    "lobby": "ロビー",
     "waitingForPlayers": "待機中...",
     "startGame": "開始",
     "roomCode": "コード",
@@ -2343,7 +2345,11 @@ const ja = {
     "share": {
       "text": "デイリーバズ: {topic} | {score}/100 | 挑戦する？🔥"
     },
-    "alreadyPlayed": "今日はもうプレイしました！明日また来てください。"
+    "alreadyPlayed": "今日はもうプレイしました！明日また来てください。",
+    "notAvailable": "利用不可",
+    "unavailableTagline": "この言語ではまだ利用できません",
+    "requestChallenge": "チャレンジをリクエスト",
+    "requestSent": "リクエスト送信済み！"
   },
   "wordHunt": {
     "title": "ワードハント",
@@ -2943,6 +2949,37 @@ const ja = {
     "beatCreator": "作成者に勝った!",
     "leaderboard": "リーダーボード",
     "playDaily": "デイリーチャレンジをプレイ"
+  },
+  "tvTutorial": {
+    "welcome": {
+      "title": "TVモードへようこそ",
+      "description": "パーティーに最適！大画面にキャストして皆で楽しもう。"
+    },
+    "qr": {
+      "title": "QRコード＆ルームコード",
+      "description": "QRコードをスキャンするかルームコードを入力して、すぐに参加できます。"
+    },
+    "grid": {
+      "title": "ゲームグリッド",
+      "description": "文字グリッドがここに表示されます。プレイヤーが単語を見つけると表示されます。"
+    },
+    "leaderboard": {
+      "title": "リアルタイムリーダーボード",
+      "description": "リアルタイムでスコアとランキングを表示。白熱の競争をご覧ください！"
+    },
+    "timer": {
+      "title": "ゲームタイマー",
+      "description": "カウントダウンで残り時間を確認。ファイアラウンドで盛り上がろう！"
+    },
+    "letsGo": "さあ始めよう！",
+    "ariaLabel": "TVモードチュートリアル",
+    "help": "チュートリアルを表示"
+  },
+  "quickPlay": {
+    "title": "クイックプレイ",
+    "creating": "作成中...",
+    "hostAndPlay": "ホスト＆プレイ",
+    "subtitle": "即座にルーム作成 • QRで友達が参加"
   },
   "theme": {
     "sundayFunday": "日曜日のお楽しみ",

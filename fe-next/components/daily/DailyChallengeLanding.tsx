@@ -2,9 +2,11 @@
 
 import { useEffect, useState, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Timer, Hourglass } from 'lucide-react';
+import { Trophy, Timer, Hourglass, Bell, Check, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { hasPlayedToday } from '@/utils/dailyChallenge/storage';
+import { getGuestFingerprint } from '@/utils/guestManager';
 import type { Language } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -16,12 +18,13 @@ interface DailyChallengeLandingProps {
 
 interface ChallengeStatus {
   wordHunt: 'new' | 'done' | 'loading';
-  buzz: 'new' | 'done' | 'loading';
+  buzz: 'new' | 'done' | 'loading' | 'unavailable';
 }
 
 interface BuzzPreviewData {
   imageUrl?: string;
   trendingSummary?: string;
+  available?: boolean;
 }
 
 /**
@@ -34,17 +37,43 @@ export function DailyChallengeLanding({
   currentLanguage,
 }: DailyChallengeLandingProps) {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const [status, setStatus] = useState<ChallengeStatus>({
     wordHunt: 'loading',
     buzz: 'loading',
   });
   const [buzzPreview, setBuzzPreview] = useState<BuzzPreviewData>({});
+  const [requestState, setRequestState] = useState<'idle' | 'loading' | 'sent'>('idle');
 
   // Check completion status for both challenges and fetch buzz preview
   useEffect(() => {
     const checkStatus = async () => {
       const wordHuntPlayed = hasPlayedToday(currentLanguage);
       const today = new Date().toISOString().split('T')[0];
+
+      // First check if buzz challenge is available for this language
+      let buzzAvailable = true;
+      try {
+        const availabilityResponse = await fetch(
+          `/api/buzz/check-availability/${currentLanguage}`
+        );
+        if (availabilityResponse.ok) {
+          const availabilityData = await availabilityResponse.json();
+          buzzAvailable = availabilityData.available;
+        }
+      } catch (err) {
+        console.error('Failed to check buzz availability:', err);
+      }
+
+      // If not available, set status and skip further checks
+      if (!buzzAvailable) {
+        setStatus({
+          wordHunt: wordHuntPlayed ? 'done' : 'new',
+          buzz: 'unavailable',
+        });
+        setBuzzPreview({ available: false });
+        return;
+      }
 
       let buzzPlayed = false;
       try {
@@ -68,6 +97,7 @@ export function DailyChallengeLanding({
             setBuzzPreview({
               imageUrl: buzzData.data.imageUrl,
               trendingSummary: buzzData.data.trendingSummary,
+              available: true,
             });
           }
         }
@@ -82,7 +112,37 @@ export function DailyChallengeLanding({
     };
 
     checkStatus();
+    // Reset request state when language changes
+    setRequestState('idle');
   }, [currentLanguage]);
+
+  // Handle requesting a buzz challenge
+  const handleRequestChallenge = async () => {
+    if (requestState !== 'idle') return;
+
+    setRequestState('loading');
+    try {
+      const response = await fetch('/api/buzz/request-challenge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          language: currentLanguage,
+          player_id: user?.id || null,
+          guest_fingerprint: !user?.id ? getGuestFingerprint() : null,
+        }),
+      });
+
+      if (response.ok) {
+        setRequestState('sent');
+      } else {
+        setRequestState('idle');
+        console.error('Failed to request challenge');
+      }
+    } catch (err) {
+      setRequestState('idle');
+      console.error('Error requesting challenge:', err);
+    }
+  };
 
   const bothCompleted = status.wordHunt === 'done' && status.buzz === 'done';
 
@@ -132,23 +192,30 @@ export function DailyChallengeLanding({
         <CompactChallengeCard
           icon={<Hourglass className="w-8 h-8 sm:w-10 sm:h-10" />}
           title={t('buzz.title')}
-          tagline={t('buzz.tagline')}
+          tagline={status.buzz === 'unavailable'
+            ? t('buzz.unavailableTagline') || 'Not available for this language yet'
+            : t('buzz.tagline')
+          }
           color="yellow"
           status={status.buzz}
           onPlay={onSelectBuzz}
           timeMode="relaxed"
           timeModeLabel={t('daily.takeYourTime')}
-          badge={t('buzz.badge')}
+          badge={status.buzz !== 'unavailable' ? t('buzz.badge') : undefined}
           buttonText={
             status.buzz === 'done'
               ? t('daily.viewResults')
               : status.buzz === 'loading'
                 ? t('common.loading')
-                : t('daily.play')
+                : status.buzz === 'unavailable'
+                  ? t('buzz.requestChallenge') || 'Request Challenge'
+                  : t('daily.play')
           }
           delay={0.2}
           previewImageUrl={buzzPreview.imageUrl}
           previewImageAlt={buzzPreview.trendingSummary}
+          onRequestChallenge={handleRequestChallenge}
+          requestState={requestState}
         />
       </div>
 
@@ -178,7 +245,7 @@ interface CompactChallengeCardProps {
   title: string;
   tagline: string;
   color: 'orange' | 'yellow';
-  status: 'new' | 'done' | 'loading';
+  status: 'new' | 'done' | 'loading' | 'unavailable';
   onPlay: () => void;
   buttonText: string;
   timeMode: 'timed' | 'relaxed';
@@ -189,6 +256,10 @@ interface CompactChallengeCardProps {
   previewImageUrl?: string;
   /** Alt text for the preview image */
   previewImageAlt?: string;
+  /** Handler for requesting a challenge when unavailable */
+  onRequestChallenge?: () => void;
+  /** State of the request (for UI feedback) */
+  requestState?: 'idle' | 'loading' | 'sent';
 }
 
 function CompactChallengeCard({
@@ -205,11 +276,15 @@ function CompactChallengeCard({
   delay = 0,
   previewImageUrl,
   previewImageAlt,
+  onRequestChallenge,
+  requestState = 'idle',
 }: CompactChallengeCardProps) {
+  const { t } = useLanguage();
   const [imageError, setImageError] = useState(false);
 
   // Show image only if URL exists and hasn't errored
   const showImage = previewImageUrl && !imageError;
+  const isUnavailable = status === 'unavailable';
 
   const colorStyles = {
     orange: {
@@ -228,20 +303,30 @@ function CompactChallengeCard({
 
   const styles = colorStyles[color];
 
+  // Handle click based on status
+  const handleClick = () => {
+    if (isUnavailable && onRequestChallenge) {
+      onRequestChallenge();
+    } else if (!isUnavailable) {
+      onPlay();
+    }
+  };
+
   return (
     <motion.button
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      onClick={onPlay}
-      disabled={status === 'loading'}
+      onClick={handleClick}
+      disabled={status === 'loading' || requestState === 'loading'}
       className={cn(
         'relative w-full bg-slate-900/90 rounded-xl border-3 border-neo-black p-4 sm:p-5',
         'shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all duration-200',
         'flex flex-col items-center text-center cursor-pointer',
         'disabled:opacity-50 disabled:cursor-not-allowed',
         styles.glow,
-        status === 'done' && 'opacity-80'
+        status === 'done' && 'opacity-80',
+        isUnavailable && 'opacity-60'
       )}
     >
       {/* Status Badge - Top Right */}
@@ -249,6 +334,10 @@ function CompactChallengeCard({
         {status === 'done' ? (
           <span className="text-xs font-bold bg-neo-lime/20 text-neo-lime px-2 py-0.5 rounded-full border border-neo-lime/40">
             ✓
+          </span>
+        ) : isUnavailable ? (
+          <span className="text-xs font-bold bg-slate-700/50 text-slate-400 px-2 py-0.5 rounded-full border border-slate-600/40">
+            {t('buzz.notAvailable') || 'Not Available'}
           </span>
         ) : badge ? (
           <span className="text-xs font-bold bg-neo-pink/20 text-neo-pink px-2 py-0.5 rounded-full border border-neo-pink/30">
@@ -310,17 +399,47 @@ function CompactChallengeCard({
         {tagline}
       </p>
 
-      {/* Play Button */}
-      <div
-        className={cn(
-          'w-full py-2.5 sm:py-3 text-sm sm:text-base font-black uppercase rounded-lg',
-          styles.bg,
-          'text-neo-black border-2 border-neo-black shadow-hard-sm',
-          'group-hover:shadow-hard transition-all'
-        )}
-      >
-        {buttonText}
-      </div>
+      {/* Play/Request Button */}
+      {isUnavailable ? (
+        <div
+          className={cn(
+            'w-full py-2.5 sm:py-3 text-sm sm:text-base font-black uppercase rounded-lg',
+            'flex items-center justify-center gap-2',
+            requestState === 'sent'
+              ? 'bg-neo-lime/20 text-neo-lime border-2 border-neo-lime'
+              : 'bg-slate-700 text-slate-200 border-2 border-slate-600',
+            'shadow-hard-sm transition-all'
+          )}
+        >
+          {requestState === 'loading' ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              {t('common.loading') || 'Loading...'}
+            </>
+          ) : requestState === 'sent' ? (
+            <>
+              <Check className="w-4 h-4" />
+              {t('buzz.requestSent') || 'Request Sent!'}
+            </>
+          ) : (
+            <>
+              <Bell className="w-4 h-4" />
+              {t('buzz.requestChallenge') || 'Request Challenge'}
+            </>
+          )}
+        </div>
+      ) : (
+        <div
+          className={cn(
+            'w-full py-2.5 sm:py-3 text-sm sm:text-base font-black uppercase rounded-lg',
+            styles.bg,
+            'text-neo-black border-2 border-neo-black shadow-hard-sm',
+            'group-hover:shadow-hard transition-all'
+          )}
+        >
+          {buttonText}
+        </div>
+      )}
     </motion.button>
   );
 }

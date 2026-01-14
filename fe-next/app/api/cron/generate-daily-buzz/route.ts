@@ -8,6 +8,36 @@ import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 export const maxDuration = 120;
 
 /**
+ * Languages enabled for automatic Daily Buzz generation via cron job.
+ * Only these languages will have challenges generated automatically.
+ * Other languages can be generated manually via admin panel.
+ *
+ * Configure via BUZZ_ENABLED_LANGUAGES env var (comma-separated)
+ * Default: 'en' only
+ */
+const ALL_SUPPORTED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+
+function getBuzzEnabledLanguages(): readonly string[] {
+  const envValue = process.env.BUZZ_ENABLED_LANGUAGES;
+  if (!envValue) {
+    // Default to English only
+    return ['en'];
+  }
+
+  const requestedLanguages = envValue.split(',').map(l => l.trim().toLowerCase());
+  const validLanguages = requestedLanguages.filter(l =>
+    ALL_SUPPORTED_LANGUAGES.includes(l as typeof ALL_SUPPORTED_LANGUAGES[number])
+  );
+
+  if (validLanguages.length === 0) {
+    console.warn('[Cron] No valid languages in BUZZ_ENABLED_LANGUAGES, defaulting to "en"');
+    return ['en'];
+  }
+
+  return validLanguages;
+}
+
+/**
  * Cron Job: Generate Daily Buzz Challenges
  * Runs daily at 00:00 UTC to generate challenges for all 5 languages
  *
@@ -38,11 +68,12 @@ export async function GET(request: NextRequest) {
 
     console.log('[Cron] Starting daily buzz generation...');
     const today = new Date();
-    const languages = ['en', 'he', 'sv', 'ja', 'es'] as const;
+    const enabledLanguages = getBuzzEnabledLanguages();
+    console.log(`[Cron] Enabled languages: ${enabledLanguages.join(', ')}`);
     const results: Record<string, { success: boolean; error?: string }> = {};
 
-    // Generate challenges for all 5 languages
-    for (const language of languages) {
+    // Generate challenges only for enabled languages
+    for (const language of enabledLanguages) {
       try {
         console.log(`[Cron] Generating buzz for ${language}...`);
         await generateDailyBuzz(today, language);
@@ -65,6 +96,7 @@ export async function GET(request: NextRequest) {
         success: allSuccess,
         message: 'Daily buzz generation complete',
         date: today.toISOString().split('T')[0],
+        enabledLanguages: [...enabledLanguages],
         results,
       },
       { status }

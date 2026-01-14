@@ -448,7 +448,8 @@ const es = {
       "beFirst": "¡Sé el primero en crear una!",
       "createButton": "Crear sala",
       "refreshed": "¡Salas actualizadas!",
-      "quickPlay": "Juego rápido"
+      "quickPlay": "Juego rápido",
+      "orJoinRoom": "o únete a una sala"
     },
     "joinModal": {
       "title": "Unirse a sala",
@@ -509,6 +510,7 @@ const es = {
     }
   },
   "hostView": {
+    "lobby": "Sala",
     "waitingForPlayers": "Esperando...",
     "startGame": "Iniciar",
     "roomCode": "Código",
@@ -2340,7 +2342,11 @@ const es = {
     },
     "viewResults": "VER RESULTADOS",
     "yourAnswer": "TU RESPUESTA",
-    "yourScore": "TU PUNTAJE"
+    "yourScore": "TU PUNTAJE",
+    "notAvailable": "No Disponible",
+    "unavailableTagline": "Aún no disponible para este idioma",
+    "requestChallenge": "Solicitar Desafío",
+    "requestSent": "¡Solicitud Enviada!"
   },
   "wordHunt": {
     "title": "Caza de Palabras",
@@ -3003,6 +3009,37 @@ const es = {
       "of": "de",
       "lastUpdated": "Última actualización"
     }
+  },
+  "tvTutorial": {
+    "welcome": {
+      "title": "Bienvenido al modo TV",
+      "description": "¡Perfecto para fiestas! Transmite a una pantalla grande y que todos jueguen."
+    },
+    "qr": {
+      "title": "Código QR y código de sala",
+      "description": "Los jugadores escanean el código QR o ingresan el código de sala para unirse al instante."
+    },
+    "grid": {
+      "title": "Cuadrícula del juego",
+      "description": "La cuadrícula de letras se muestra aquí para que todos la vean. Las palabras aparecen cuando los jugadores las encuentran."
+    },
+    "leaderboard": {
+      "title": "Tabla de líderes en vivo",
+      "description": "Puntajes y clasificaciones en tiempo real. ¡Mira cómo se calienta la competencia!"
+    },
+    "timer": {
+      "title": "Temporizador del juego",
+      "description": "La cuenta regresiva muestra cuánto tiempo queda. ¡Las rondas de fuego añaden emoción!"
+    },
+    "letsGo": "¡Vamos!",
+    "ariaLabel": "Tutorial del modo TV",
+    "help": "Mostrar tutorial"
+  },
+  "quickPlay": {
+    "title": "Juego rápido",
+    "creating": "Creando...",
+    "hostAndPlay": "Crear y jugar",
+    "subtitle": "Sala instantánea • Amigos se unen via QR"
   },
   "theme": {
     "sundayFunday": "Domingo de diversión",

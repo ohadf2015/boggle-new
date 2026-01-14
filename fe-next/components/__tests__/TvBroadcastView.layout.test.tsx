@@ -22,6 +22,15 @@ jest.mock('framer-motion', () => ({
 jest.mock('lucide-react', () => ({
   Maximize: () => <div data-testid="maximize-icon">Maximize</div>,
   Minimize: () => <div data-testid="minimize-icon">Minimize</div>,
+  HelpCircle: () => <div data-testid="help-icon">?</div>,
+  ChevronRight: () => <span data-testid="chevron-right">→</span>,
+  ChevronLeft: () => <span data-testid="chevron-left">←</span>,
+  X: () => <span data-testid="x-icon">✕</span>,
+  Tv: () => <span data-testid="tv-icon">TV</span>,
+  QrCode: () => <span data-testid="qr-icon">QR</span>,
+  LayoutGrid: () => <span data-testid="grid-icon">Grid</span>,
+  Trophy: () => <span data-testid="trophy-icon">Trophy</span>,
+  Timer: () => <span data-testid="timer-icon">Timer</span>,
 }));
 
 // Mock the subcomponents
@@ -48,6 +57,15 @@ jest.mock('@/host/components/tv-broadcast/TvLeaderboard', () => ({
 jest.mock('@/host/components/tv-broadcast/TvNotificationQueue', () => ({
   __esModule: true,
   default: () => <div data-testid="tv-notification-queue">TvNotificationQueue</div>,
+}));
+
+jest.mock('@/host/components/tv-broadcast/TvTutorialOverlay', () => ({
+  __esModule: true,
+  default: () => <div data-testid="tv-tutorial-overlay">TvTutorialOverlay</div>,
+  isTvTutorialComplete: () => true,
+  TvHelpButton: ({ onClick }: { onClick: () => void }) => (
+    <button data-testid="tv-help-button" onClick={onClick}>Help</button>
+  ),
 }));
 
 // Mock hooks using jest.fn() pattern in factory

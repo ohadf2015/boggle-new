@@ -611,6 +611,139 @@ router.get(
 );
 
 // ==========================================
+// Challenge Request Routes
+// ==========================================
+
+/**
+ * POST /buzz/request-challenge
+ * Request a Daily Buzz challenge for a specific language.
+ * Used when a language doesn't have a challenge available.
+ * Stores request in database and optionally notifies admins.
+ */
+router.post(
+  '/buzz/request-challenge',
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { language, player_id, guest_fingerprint, reason } = req.body;
+
+      // Validate language
+      const supportedLanguages = ['en', 'he', 'sv', 'ja', 'es'];
+      if (!language || !supportedLanguages.includes(language)) {
+        res.status(400).json({ error: 'Valid language required (en, he, sv, ja, es)' });
+        return;
+      }
+
+      // Need either player_id or guest_fingerprint
+      if (!player_id && !guest_fingerprint) {
+        res.status(400).json({ error: 'player_id or guest_fingerprint required' });
+        return;
+      }
+
+      if (!isSupabaseConfigured()) {
+        res.status(503).json({ error: 'Database service unavailable' });
+        return;
+      }
+
+      const supabase = getSupabase();
+      const today = new Date().toISOString().split('T')[0];
+
+      // Check for duplicate request (same user, same language, same day)
+      const duplicateQuery = supabase
+        .from('buzz_challenge_requests')
+        .select('id')
+        .eq('language', language)
+        .eq('request_date', today);
+
+      if (player_id) {
+        duplicateQuery.eq('player_id', player_id);
+      } else {
+        duplicateQuery.eq('guest_fingerprint', guest_fingerprint);
+      }
+
+      const { data: existingRequest } = await duplicateQuery.single();
+
+      if (existingRequest) {
+        res.json({
+          success: true,
+          message: 'Request already submitted for this language today',
+          alreadyRequested: true,
+        });
+        return;
+      }
+
+      // Store the request
+      const { error: insertError } = await supabase.from('buzz_challenge_requests').insert({
+        language,
+        player_id: player_id || null,
+        guest_fingerprint: guest_fingerprint || null,
+        reason: reason || null,
+        request_date: today,
+        status: 'pending',
+      });
+
+      if (insertError) {
+        logger.error('BUZZ_REQUEST', `Failed to store request: ${insertError.message}`);
+        res.status(500).json({ error: 'Failed to store request' });
+        return;
+      }
+
+      // Get count of requests for this language today (for admin visibility)
+      const { count: requestCount } = await supabase
+        .from('buzz_challenge_requests')
+        .select('*', { count: 'exact', head: true })
+        .eq('language', language)
+        .eq('request_date', today);
+
+      logger.info('BUZZ_REQUEST', `Challenge requested for ${language} (total today: ${requestCount})`);
+
+      res.json({
+        success: true,
+        message: 'Challenge request submitted successfully',
+        requestCount: requestCount || 1,
+      });
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error('BUZZ_REQUEST', `Error processing request: ${err.message}`);
+      res.status(500).json({ error: 'Failed to process request' });
+    }
+  }
+);
+
+/**
+ * GET /buzz/check-availability/:language
+ * Check if a Daily Buzz challenge is available for a specific language today.
+ * Used by UI to determine whether to show "Play" or "Request Challenge" button.
+ */
+router.get(
+  '/buzz/check-availability/:language',
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { language } = req.params;
+
+      // Validate language
+      const supportedLanguages = ['en', 'he', 'sv', 'ja', 'es'];
+      if (!supportedLanguages.includes(language)) {
+        res.status(400).json({ error: 'Unsupported language' });
+        return;
+      }
+
+      const today = new Date().toISOString().split('T')[0];
+      const challenge = await getDailyBuzz(today, language);
+
+      res.json({
+        available: !!challenge,
+        language,
+        date: today,
+      });
+    } catch (error: unknown) {
+      const err = error as Error;
+      logger.error('BUZZ', `Error checking availability: ${err.message}`);
+      res.status(500).json({ error: 'Failed to check availability' });
+    }
+  }
+);
+
+// ==========================================
 // Admin Routes
 // ==========================================
 

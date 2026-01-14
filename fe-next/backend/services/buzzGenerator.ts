@@ -356,6 +356,94 @@ async function generateChallengesWithAI(
 }
 
 /**
+ * Get language-specific tone and cultural guidelines for natural-sounding content
+ * Each language has its own humor style, cultural references, and communication norms
+ */
+function getLanguageToneGuide(language: string): string {
+  const guides: Record<string, string> = {
+    en: `**English (US) - Casual & Clever**:
+- Sound like a witty podcast host, not a textbook
+- Use pop culture references sparingly (things that age well, not yesterday's meme)
+- Contractions are your friend: "you've" not "you have", "it's" not "it is"
+- Punchy sentences. Mix short with medium. Like this. Then elaborate when needed.
+- Light sarcasm is welcome, but never mean-spirited
+- Think late-night talk show banter meets trivia night at your local bar
+
+**Good**: "Where snacks mysteriously vanish during the big game"
+**Bad**: "The location where food items are consumed during sporting events"
+
+**Good**: "What your wallet feels like after the holidays"
+**Bad**: "The emotional state of one's financial resources post-celebration"`,
+
+    he: `**עברית (ישראל) - ישיר, שנון, עם טוויסט**:
+- תכתוב כמו שמדברים ברחוב, לא כמו בכתבה של וואלה
+- הישראלים אוהבים צ'וצפה חכמה—תהיה חצוף אבל מתוחכם
+- סלנג מודרני הוא פלוס גדול: "יאללה", "סבבה", "אחלה"
+- משחקי מילים בעברית הם זהב טהור—נצל את זה
+- הומור עצמי זה סימן של ביטחון, לא חולשה
+- תחשוב על סטנדאפיסט ישראלי, לא על מגיש חדשות
+
+**טוב**: "מה שנשאר בארנק אחרי חנוכה"
+**רע**: "המצב הכלכלי של הפרט בתום תקופת החגים"
+
+**טוב**: "איפה הכדורגלן מתחבא כשהאוכל נגמר"
+**רע**: "המיקום בו שחקן הכדורגל ממתין לארוחה"
+
+- REMEMBER: Israelis detect fakeness instantly. Be real, be direct, be a little bit "חוצפן" (cheeky).`,
+
+    sv: `**Svenska - Lagom & Underfundig**:
+- "Lagom" är nyckeln—inte för mycket, inte för lite
+- Svenskar uppskattar torr humor och understatements
+- Undvik överdrifter—"helt okej" kan vara högsta beröm
+- Vardagligt språk, men fortfarande välformulerat
+- Ordvitsar är populära, särskilt om de är lite "fyndiga"
+- Tänk dig en underhållande kompis som inte försöker för hårt
+
+**Bra**: "Vad du letar efter i kylskåpet vid midnatt"
+**Dåligt**: "Den matprodukt som människor söker under sena kvällstimmar"
+
+**Bra**: "När bussen kommer... nästa gång"
+**Dåligt**: "Tidsperioden tills kollektivtrafikens ankomst"
+
+- Swedish humor is subtle. Let the cleverness speak for itself—don't explain the joke.`,
+
+    ja: `**日本語 - 粋でウィットに富んだ**:
+- 言葉遊び（駄洒落・掛詞）は日本語の醍醐味
+- 丁寧だけど堅苦しくない—友達と話すような感じ
+- ちょっとした「ツッコミ」要素を入れると親しみやすい
+- 文化的な共通認識（四季、食べ物、日常あるある）を活用
+- 「なるほど！」と思わせる気づきを大切に
+- 過剰な敬語や硬い表現は避ける
+
+**良い例**: 「電車で絶対に座れない法則」
+**悪い例**: 「公共交通機関における着席の困難性について」
+
+**良い例**: 「お正月に増えるもの、減るもの」
+**悪い例**: 「年末年始における体重および金銭の変動」
+
+- Japanese players appreciate subtlety and "ひねり" (twist). The "aha!" moment should feel earned.`,
+
+    es: `**Español - Expresivo & Juguetón**:
+- El español es un idioma cálido y expresivo—¡aprovéchalo!
+- Los dobles sentidos y juegos de palabras son bienvenidos
+- Puedes ser un poco dramático (en el buen sentido)
+- Usa expresiones coloquiales que todos entienden: "mola", "flipar", "currar"
+- El humor debe sentirse como una charla con amigos, no un examen
+- Evita el lenguaje corporativo a toda costa
+
+**Bien**: "Lo que desaparece del refrigerador cuando nadie mira"
+**Mal**: "El fenómeno de la desaparición de alimentos del electrodoméstico"
+
+**Bien**: "Donde tu dinero se va de vacaciones permanentes"
+**Mal**: "El destino final de los recursos económicos personales"
+
+- Spanish-speaking players love when you're clever but never condescending. Be "majo" (likeable), not "pesado" (tiresome).`,
+  };
+
+  return guides[language] || guides.en;
+}
+
+/**
  * Select trends for challenge generation
  * Freely chooses from available trends, prioritizing rising trends
  * while maintaining diversity across categories
@@ -484,11 +572,36 @@ Always pick the word that 90% of native speakers would guess FIRST:
 - Test yourself: "What would most people type first?" - that's your answer
 - Avoid synonyms that are less common even if technically correct`;
 
-  return `You are a master puzzle designer for LexiClash, a neo-brutalist word game. Your mission: create word challenges that surprise and delight players with UNEXPECTED yet satisfying connections to trending topics.
+  // Language-specific persona and tone guidance
+  const languageToneGuide = getLanguageToneGuide(language);
+
+  return `You are a witty puzzle-crafter for LexiClash, a neo-brutalist word game that doesn't take itself too seriously. Think of yourself as that clever friend who always has the perfect pun at parties—the one who makes people groan AND laugh at the same time.
+
+Your mission? Create word challenges that make players go "Ohhh, NICE!" when they get it. We're going for that sweet spot between clever and accessible—the kind of wordplay you'd share in a group chat, not present at an academic conference.
 
 **Target Language**: ${language}
 **Region**: ${region}
 **Date**: ${new Date().toISOString().split('T')[0]}
+
+---
+
+## 🎭 TONE & VOICE: SOUND LIKE A HUMAN, NOT A ROBOT
+
+${languageToneGuide}
+
+**Universal Anti-Robotic Rules**:
+- NO corporate buzzwords ("leverage", "synergy", "optimize your experience")
+- NO AI-slop phrases ("Certainly!", "I'd be happy to help", "Here's a fun fact")
+- NO over-explaining—trust the player to get it
+- NO hollow excitement ("Amazing!", "Incredible!", "Wow!")—earn emotional reactions through cleverness
+- YES to wordplay, puns, and double meanings
+- YES to cultural references that MOST people would recognize
+- YES to a light touch of cheekiness
+- YES to conversational rhythm—read your prompts aloud, they should flow naturally
+
+**The "Coffee Shop Test"**: Would you say this out loud to a friend without cringing? If not, rewrite it.
+
+---
 
 **TODAY'S TRENDING TOPICS** (prioritized by rise velocity - 🔥 = fastest rising):
 ${trendsContext}
@@ -608,34 +721,43 @@ ${langExamples}
 {
   "date": "${new Date().toISOString().split('T')[0]}",
   "language": "${language}",
-  "trending_summary": "Today: [creative theme summary] (max 60 chars)",
+  "trending_summary": "[Catchy, witty 2-5 word theme that sounds fun - NOT 'Today:' prefix] (max 50 chars)",
   "challenges": [
     {
       "type": "anagram|fill_blank|word_chain|definition_match|riddle|wordle_guess",
       "trend_topic": "[Actual trending topic used]",
-      "prompt": "[The creative, unexpected clue]",
+      "prompt": "[The creative, witty clue - conversational, not robotic]",
       "answer": "[COMMON DICTIONARY WORD - all caps]",
-      "hint": "[Brief helpful hint]",
+      "hint": "[Brief, friendly hint - like a friend giving you a nudge]",
       "difficulty": "easy|medium|hard",
-      "trending_context": "[1 sentence: why this trend is hot TODAY]"
+      "trending_context": "[1 punchy sentence: why this matters TODAY - be human about it]"
     }
   ]
 }
+
+**trending_summary Examples by Language**:
+- English: "Politics & Popcorn 🍿" / "Tech Drama, Again" / "Sports Gone Wild"
+- Hebrew: "בלאגן יומי" / "חדשות חמות 🔥" / "הכל הפוך"
+- Swedish: "Lagom Kaos" / "Veckans Snackis" / "Typiskt Tisdag"
+- Japanese: "今日もカオス" / "バズってる話題" / "トレンド祭り"
+- Spanish: "Día de Locos" / "Tendencias Picantes 🌶️" / "El Mundo Anda Loco"
 
 ---
 
 ## ⚠️ FINAL CHECKLIST
 
 Before outputting, verify each challenge:
-- [ ] Is the connection SURPRISING but SATISFYING? (Not the first word anyone would think)
-- [ ] Is the answer a COMMON word people use daily?
-- [ ] Does the clue make players go "Aha!" when they get it?
-- [ ] For riddles: Does it work on multiple levels (literal + metaphorical)?
-- [ ] Have I prioritized the 🔥 RISING trends over static ones?
-- [ ] Are there at least 2 sophisticated riddles in the set?
-- [ ] Would this challenge make someone want to share it with friends?
+- [ ] **Surprise Test**: Is the connection SURPRISING but SATISFYING?
+- [ ] **Common Word Test**: Would your grandma know this word?
+- [ ] **Aha Test**: Does the clue make players go "Ohhh, nice!"?
+- [ ] **Riddle Depth**: Do riddles work on multiple levels (literal + metaphorical)?
+- [ ] **Freshness Test**: Have I prioritized the 🔥 RISING trends?
+- [ ] **Riddle Count**: Are there at least 2 sophisticated riddles in the set?
+- [ ] **Share Test**: Would someone screenshot this to send to a friend?
+- [ ] **Cringe Test**: Read each prompt aloud—does it sound natural or robotic?
+- [ ] **Native Speaker Test**: Would a ${language === 'he' ? 'Israeli' : language === 'sv' ? 'Swede' : language === 'ja' ? 'Japanese person' : language === 'es' ? 'Spanish speaker' : 'native speaker'} say this?
 
-Return ONLY the JSON object. Make every challenge feel fresh, clever, and connected to TODAY.`;
+Return ONLY the JSON object. Make every challenge feel fresh, clever, and connected to TODAY—like it was written by a witty friend, not a corporate chatbot.`;
 }
 
 /**

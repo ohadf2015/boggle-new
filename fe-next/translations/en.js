@@ -454,7 +454,8 @@ const en = {
       "beFirst": "Be the first to create one!",
       "createButton": "Create Room",
       "refreshed": "Rooms refreshed",
-      "quickPlay": "Quick Play"
+      "quickPlay": "Quick Play",
+      "orJoinRoom": "or join a room"
     },
     "joinModal": {
       "title": "Join Room",
@@ -515,6 +516,7 @@ const en = {
     }
   },
   "hostView": {
+    "lobby": "Lobby",
     "waitingForPlayers": "Waiting...",
     "startGame": "Start",
     "roomCode": "Code",
@@ -2346,7 +2348,11 @@ const en = {
       "failed": "Couldn't load buzz. Try again?",
       "noInternet": "No connection. Check your internet."
     },
-    "alreadyPlayed": "Already played today! Come back tomorrow."
+    "alreadyPlayed": "Already played today! Come back tomorrow.",
+    "notAvailable": "Not Available",
+    "unavailableTagline": "Not available for this language yet",
+    "requestChallenge": "Request Challenge",
+    "requestSent": "Request Sent!"
   },
   "wordHunt": {
     "title": "Word Hunt",
@@ -3009,6 +3015,37 @@ const en = {
       "of": "of",
       "lastUpdated": "Last updated"
     }
+  },
+  "tvTutorial": {
+    "welcome": {
+      "title": "Welcome to TV Mode",
+      "description": "Perfect for parties! Cast to a big screen and let everyone play."
+    },
+    "qr": {
+      "title": "QR Code & Room Code",
+      "description": "Players scan the QR code or enter the room code to join instantly."
+    },
+    "grid": {
+      "title": "Game Grid",
+      "description": "The letter grid displays here for everyone to see. Words appear as players find them."
+    },
+    "leaderboard": {
+      "title": "Live Leaderboard",
+      "description": "Real-time scores and rankings. Watch the competition heat up!"
+    },
+    "timer": {
+      "title": "Game Timer",
+      "description": "The countdown shows how much time is left. Fire rounds add extra excitement!"
+    },
+    "letsGo": "Let's Go!",
+    "ariaLabel": "TV Mode Tutorial",
+    "help": "Show Tutorial"
+  },
+  "quickPlay": {
+    "title": "Quick Play",
+    "creating": "Creating...",
+    "hostAndPlay": "Host & Play",
+    "subtitle": "Instant room • Friends join via QR"
   },
   "theme": {
     "sundayFunday": "Sunday Funday",

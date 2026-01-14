@@ -451,7 +451,8 @@ const sv = {
       "beFirst": "Var först med att skapa ett!",
       "createButton": "Skapa rum",
       "refreshed": "Rum uppdaterade",
-      "quickPlay": "Snabbspel"
+      "quickPlay": "Snabbspel",
+      "orJoinRoom": "eller gå med i ett rum"
     },
     "joinModal": {
       "title": "Gå med i rum",
@@ -512,6 +513,7 @@ const sv = {
     }
   },
   "hostView": {
+    "lobby": "Lobby",
     "waitingForPlayers": "Väntar...",
     "startGame": "Starta",
     "roomCode": "Kod",
@@ -2343,7 +2345,11 @@ const sv = {
     "share": {
       "text": "Daily Buzz: {topic} | {score}/100 | Klarar du det? 🔥"
     },
-    "alreadyPlayed": "Redan spelat idag! Kom tillbaka imorgon."
+    "alreadyPlayed": "Redan spelat idag! Kom tillbaka imorgon.",
+    "notAvailable": "Ej tillgängligt",
+    "unavailableTagline": "Inte tillgängligt för detta språk ännu",
+    "requestChallenge": "Begär utmaning",
+    "requestSent": "Begäran skickad!"
   },
   "wordHunt": {
     "title": "Ordjakt",
@@ -3006,6 +3012,37 @@ const sv = {
       "of": "av",
       "lastUpdated": "Senast uppdaterad"
     }
+  },
+  "tvTutorial": {
+    "welcome": {
+      "title": "Välkommen till TV-läge",
+      "description": "Perfekt för fester! Strömma till en stor skärm och låt alla spela."
+    },
+    "qr": {
+      "title": "QR-kod & Rumskod",
+      "description": "Spelare skannar QR-koden eller anger rumskoden för att gå med direkt."
+    },
+    "grid": {
+      "title": "Spelrutnät",
+      "description": "Bokstavsrutnätet visas här för alla att se. Ord visas när spelare hittar dem."
+    },
+    "leaderboard": {
+      "title": "Livescore",
+      "description": "Poäng och placeringar i realtid. Se tävlingen hettas upp!"
+    },
+    "timer": {
+      "title": "Speltimer",
+      "description": "Nedräkningen visar hur mycket tid som återstår. Eldrundor ger extra spänning!"
+    },
+    "letsGo": "Kör igång!",
+    "ariaLabel": "TV-läge handledning",
+    "help": "Visa handledning"
+  },
+  "quickPlay": {
+    "title": "Snabbspel",
+    "creating": "Skapar...",
+    "hostAndPlay": "Skapa & Spela",
+    "subtitle": "Direkt rum • Vänner går med via QR"
   },
   "theme": {
     "sundayFunday": "Söndagsmys",
