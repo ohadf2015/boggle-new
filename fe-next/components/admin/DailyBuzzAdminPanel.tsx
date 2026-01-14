@@ -13,7 +13,6 @@ import {
   RefreshCw,
   ChevronDown,
   ChevronUp,
-  MessageSquare,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NeoLoader } from '@/components/ui/NeoLoader';
@@ -26,6 +25,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { getSession } from '@/lib/supabase';
+import RegenerationDialog from './buzz/RegenerationDialog';
+import type { DailyBuzzDataAdmin } from './buzz/types';
 
 // Client-side timeout matches server maxDuration (120s) with buffer
 const CLIENT_TIMEOUT_MS = 130_000;
@@ -40,30 +41,6 @@ interface GenerationResult {
   duration: number;
   date: string;
   message?: string;
-}
-
-interface BuzzChallengeAdmin {
-  type: string;
-  trend_topic: string;
-  prompt: string;
-  answer: string;
-  hint?: string;
-  difficulty: string;
-  trending_context?: string;
-  options?: string[];
-}
-
-interface TrendingTopicAdmin {
-  query: string;
-  search_volume?: number;
-}
-
-interface DailyBuzzDataAdmin {
-  puzzle_date: string;
-  language: string;
-  trending_summary: string;
-  challenges: BuzzChallengeAdmin[];
-  trending_topics: TrendingTopicAdmin[];
 }
 
 const CHALLENGE_LANGUAGES = [
@@ -111,12 +88,9 @@ export default function DailyBuzzAdminPanel() {
   const [showChallenges, setShowChallenges] = useState(false);
   const [viewLanguage, setViewLanguage] = useState<string>('en');
 
-  // Edit dialog state (single challenge)
+  // Edit dialog state (single challenge) - uses new RegenerationDialog component
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingChallengeIndex, setEditingChallengeIndex] = useState<number | null>(null);
-  const [feedback, setFeedback] = useState('');
-  const [isRegenerating, setIsRegenerating] = useState(false);
-  const [regenerateError, setRegenerateError] = useState<string | null>(null);
 
   // Regenerate by type dialog state
   const [typeDialogOpen, setTypeDialogOpen] = useState(false);
@@ -254,77 +228,13 @@ export default function DailyBuzzAdminPanel() {
     }
   };
 
-  // Handle regenerating a single challenge
-  const handleRegenerate = async () => {
-    if (editingChallengeIndex === null || !challengeData || !feedback.trim()) return;
-
-    setIsRegenerating(true);
-    setRegenerateError(null);
-
-    try {
-      const { data: { session } } = await getSession();
-      if (!session?.access_token) {
-        throw new Error('No active session');
-      }
-
-      const originalChallenge = challengeData.challenges[editingChallengeIndex];
-
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), REGENERATE_TIMEOUT_MS);
-
-      const response = await fetch('/api/admin/buzz/regenerate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({
-          date: challengeData.puzzle_date,
-          language: challengeData.language,
-          challengeIndex: editingChallengeIndex,
-          feedback: feedback.trim(),
-          originalChallenge: {
-            type: originalChallenge.type,
-            prompt: originalChallenge.prompt,
-            answer: originalChallenge.answer,
-            trend_topic: originalChallenge.trend_topic,
-          },
-          saveFeedback: true,
-        }),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Regeneration failed');
-      }
-
-      const data = await response.json();
-      setChallengeData(data.data);
-      setEditDialogOpen(false);
-      setFeedback('');
-      setEditingChallengeIndex(null);
-
-      // Show success message
-      setSuccessMessage('Challenge regenerated successfully! Your feedback has been saved for AI improvement.');
-      setTimeout(() => setSuccessMessage(null), 5000);
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        setRegenerateError(
-          'Request timed out after 80 seconds. The AI model may be overloaded. ' +
-          'Please try again in a few minutes.'
-        );
-      } else {
-        const errorMsg = error instanceof Error ? error.message : 'Failed to regenerate';
-        // Preserve server-side timeout messages which are more descriptive
-        setRegenerateError(errorMsg);
-      }
-    } finally {
-      setIsRegenerating(false);
-    }
-  };
+  // Handle successful regeneration from the RegenerationDialog
+  const handleRegenerateSuccess = useCallback((updatedData: DailyBuzzDataAdmin, message: string) => {
+    setChallengeData(updatedData);
+    setEditingChallengeIndex(null);
+    setSuccessMessage(message);
+    setTimeout(() => setSuccessMessage(null), 5000);
+  }, []);
 
   const handleGenerate = async () => {
     setIsGenerating(true);
@@ -713,8 +623,6 @@ export default function DailyBuzzAdminPanel() {
                         <button
                           onClick={() => {
                             setEditingChallengeIndex(index);
-                            setFeedback('');
-                            setRegenerateError(null);
                             setEditDialogOpen(true);
                           }}
                           className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-neo-yellow transition-colors shrink-0"
@@ -786,101 +694,14 @@ export default function DailyBuzzAdminPanel() {
         </div>
       </div>
 
-      {/* Edit Challenge Dialog */}
-      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="sm:max-w-xl" noDescription>
-          <DialogHeader variant="cyan">
-            <DialogTitle className="flex items-center justify-center gap-2">
-              <MessageSquare className="w-5 h-5" />
-              Edit Challenge #{editingChallengeIndex !== null ? editingChallengeIndex + 1 : ''}
-            </DialogTitle>
-          </DialogHeader>
-          <DialogBody className="space-y-4">
-            {editingChallengeIndex !== null && challengeData && (
-              <>
-                {/* Original challenge display */}
-                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-4 space-y-2">
-                  <div className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                    Current Challenge:
-                  </div>
-                  <div className="text-neo-black dark:text-white font-medium">
-                    {challengeData.challenges[editingChallengeIndex].prompt}
-                  </div>
-                  <div className="flex flex-wrap gap-4 text-sm">
-                    <span>
-                      Answer:{' '}
-                      <strong className="text-neo-orange">
-                        {challengeData.challenges[editingChallengeIndex].answer}
-                      </strong>
-                    </span>
-                    <span>
-                      Type: {challengeData.challenges[editingChallengeIndex].type}
-                    </span>
-                    <span>
-                      Trend: {challengeData.challenges[editingChallengeIndex].trend_topic}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Feedback textarea */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
-                    What is wrong with this challenge?
-                  </label>
-                  <textarea
-                    value={feedback}
-                    onChange={(e) => setFeedback(e.target.value)}
-                    placeholder="e.g., The word is too obscure, The clue gives away the answer, Wrong language/culture reference, Answer does not fit the trend..."
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-700 rounded-lg text-neo-black dark:text-white focus:border-neo-cyan focus:outline-none resize-none"
-                    rows={4}
-                    disabled={isRegenerating}
-                  />
-                  <p className="mt-1 text-xs text-slate-500">
-                    This feedback will be saved and used to improve future AI generations.
-                  </p>
-                </div>
-
-                {/* Error display */}
-                {regenerateError && (
-                  <div className="p-3 bg-red-900/30 border border-red-500 rounded-lg">
-                    <p className="text-sm text-red-400">{regenerateError}</p>
-                  </div>
-                )}
-              </>
-            )}
-          </DialogBody>
-          <DialogFooter>
-            <button
-              onClick={() => {
-                setEditDialogOpen(false);
-                setFeedback('');
-                setRegenerateError(null);
-              }}
-              disabled={isRegenerating}
-              className="px-4 py-2 rounded-lg border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:border-slate-400 disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleRegenerate}
-              disabled={isRegenerating || feedback.trim().length < 5}
-              className="px-4 py-2 rounded-lg bg-neo-cyan text-neo-black font-bold border-2 border-neo-black shadow-hard-sm hover:shadow-hard disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              {isRegenerating ? (
-                <>
-                  <NeoLoader variant="dots" size="sm" />
-                  Regenerating...
-                </>
-              ) : (
-                <>
-                  <RefreshCw className="w-4 h-4" />
-                  Regenerate
-                </>
-              )}
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Edit Challenge Dialog - uses new multi-step RegenerationDialog */}
+      <RegenerationDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        challengeIndex={editingChallengeIndex}
+        challengeData={challengeData}
+        onRegenerateSuccess={handleRegenerateSuccess}
+      />
 
       {/* Regenerate by Type Dialog */}
       <Dialog open={typeDialogOpen} onOpenChange={setTypeDialogOpen}>

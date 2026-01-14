@@ -25,34 +25,38 @@ interface PresetSelectorProps {
   challengeInfo: ChallengeInfo;
 }
 
-// Mode configuration for the mode selector
+// Mode configuration for the mode selector - premium gradients and glow
 const MODE_CONFIG: Record<Exclude<SinglePlayerMode, 'daily'>, {
   id: SinglePlayerMode;
   nameKey: string;
   descKey: string;
   Icon: any;
   color: string;
+  glowColor: string;
 }> = {
   'solo-bots': {
     id: 'solo-bots',
     nameKey: 'singlePlayer.mode.soloBots',
     descKey: 'singlePlayer.mode.soloBotsDesc',
     Icon: Bot,
-    color: 'from-purple-400 to-indigo-500',
+    color: 'from-purple-400 via-purple-500 to-indigo-500',
+    glowColor: 'rgba(139, 92, 246, 0.4)',
   },
   'practice': {
     id: 'practice',
     nameKey: 'singlePlayer.mode.practice',
     descKey: 'singlePlayer.mode.practiceDesc',
     Icon: Book,
-    color: 'from-neo-lime to-lime-400',
+    color: 'from-neo-lime via-lime-400 to-lime-500',
+    glowColor: 'rgba(154, 255, 0, 0.4)',
   },
   'challenge': {
     id: 'challenge',
     nameKey: 'singlePlayer.mode.challenge',
     descKey: 'singlePlayer.mode.challengeDesc',
     Icon: Trophy,
-    color: 'from-neo-lime to-yellow-400',
+    color: 'from-neo-lime via-lime-300 to-yellow-400',
+    glowColor: 'rgba(255, 225, 53, 0.5)',
   },
 };
 
@@ -86,29 +90,45 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: index * 0.05 }}
+        whileHover={{
+          scale: 1.05,
+          boxShadow: `0 0 25px ${config.glowColor}, 0 0 50px ${config.glowColor}, 6px 6px 0px rgb(var(--neo-black))`,
+        }}
+        whileTap={{ scale: 0.98 }}
         onClick={() => handleModeSelect(mode)}
         className={cn(
-          'group relative p-3 sm:p-4 rounded-neo border-4 transition-all',
-          'flex flex-col items-center text-center',
-          'shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px]',
-          'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
+          'group relative p-3 sm:p-4 rounded-neo-lg border-4 transition-colors',
+          'flex flex-col items-center text-center overflow-hidden',
+          'shadow-hard',
           'border-neo-black',
           `bg-gradient-to-br ${config.color}`
         )}
         aria-label={t(config.nameKey) || mode}
       >
-        {/* Icon */}
-        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-1 text-neo-black">
+        {/* Shine effect overlay */}
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent pointer-events-none"
+          initial={{ x: '-100%' }}
+          whileHover={{ x: '200%' }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+        />
+
+        {/* Icon with bounce on hover */}
+        <motion.div
+          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mb-1 text-neo-black bg-white/20 border-2 border-neo-black/20"
+          whileHover={{ rotate: [0, -10, 10, 0] }}
+          transition={{ duration: 0.4 }}
+        >
           <IconComponent className="w-5 h-5 sm:w-6 sm:h-6" />
-        </div>
+        </motion.div>
 
         {/* Name */}
-        <h3 className="text-xs sm:text-sm font-black uppercase leading-tight text-neo-black">
+        <h3 className="text-xs sm:text-sm font-black uppercase leading-tight text-neo-black relative z-10">
           {t(config.nameKey) || mode}
         </h3>
 
         {/* Description */}
-        <p className="text-[9px] sm:text-[10px] font-bold mt-0.5 line-clamp-2 text-neo-black/80">
+        <p className="text-[9px] sm:text-[10px] font-bold mt-0.5 line-clamp-2 text-neo-black/80 relative z-10">
           {t(config.descKey) || ''}
         </p>
       </motion.button>
@@ -137,21 +157,32 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
             </div>
 
             {/* Quick Play Button - Primary CTA */}
-            <button
+            <motion.button
               onClick={() => {
                 const quickPreset = getPresetById('quick');
                 if (quickPreset) onSelectPreset(quickPreset);
               }}
               className={cn(
-                'p-3 rounded-neo border-4 border-neo-black transition-all',
+                'p-3 rounded-neo border-4 border-neo-black transition-all relative overflow-hidden',
                 'flex items-center gap-3',
-                'shadow-hard-lg hover:shadow-hard-xl hover:translate-x-[-2px] hover:translate-y-[-2px]',
-                'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
+                'shadow-hard-lg',
                 'bg-gradient-to-r from-neo-lime via-neo-cyan to-neo-lime'
               )}
+              whileHover={{
+                scale: 1.02,
+                boxShadow: '0 0 25px rgba(154, 255, 0, 0.5), 0 0 50px rgba(154, 255, 0, 0.3), 6px 6px 0px black'
+              }}
+              whileTap={{ scale: 0.98 }}
             >
-              <Play className="w-6 h-6 text-neo-black" fill="currentColor" />
-              <div className="flex-1 text-left">
+              {/* Animated shine effect */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none"
+                initial={{ x: '-100%' }}
+                animate={{ x: '200%' }}
+                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3, ease: 'easeInOut' }}
+              />
+              <Play className="w-6 h-6 text-neo-black relative z-10" fill="currentColor" />
+              <div className="flex-1 text-left relative z-10">
                 <h4 className="text-sm font-black uppercase text-neo-black">
                   {t('singlePlayer.quickPlay') || 'Quick Play'}
                 </h4>
@@ -159,7 +190,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
                   {t('singlePlayer.quickPlayDesc') || '7×7 • 2 min • vs Bot'}
                 </p>
               </div>
-            </button>
+            </motion.button>
 
             {/* Mode Selector */}
             <div className="space-y-2">
@@ -263,21 +294,32 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.05 }}
+          whileHover={{
+            scale: 1.03,
+            boxShadow: '0 0 30px rgba(154, 255, 0, 0.5), 0 0 60px rgba(154, 255, 0, 0.3), 8px 8px 0px black'
+          }}
+          whileTap={{ scale: 0.98 }}
           onClick={() => {
             const quickPreset = getPresetById('quick');
             if (quickPreset) onSelectPreset(quickPreset);
           }}
           className={cn(
-            'group relative p-4 sm:p-5 rounded-neo-lg border-4 border-neo-black transition-all w-full',
+            'group relative p-4 sm:p-5 rounded-neo-lg border-4 border-neo-black transition-all w-full overflow-hidden',
             'flex items-center justify-center gap-3',
-            'shadow-hard-lg hover:shadow-hard-xl hover:translate-x-[-4px] hover:translate-y-[-4px]',
-            'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed',
+            'shadow-hard-lg',
             'bg-gradient-to-r from-neo-lime via-neo-cyan to-neo-lime'
           )}
           aria-label={t('singlePlayer.quickPlay') || 'Quick Play'}
         >
-          <Play className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" fill="currentColor" />
-          <div className="text-left">
+          {/* Animated shine effect */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none"
+            initial={{ x: '-100%' }}
+            animate={{ x: '200%' }}
+            transition={{ duration: 2, repeat: Infinity, repeatDelay: 3, ease: 'easeInOut' }}
+          />
+          <Play className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black relative z-10" fill="currentColor" />
+          <div className="text-left relative z-10">
             <h2 className="text-xl sm:text-2xl font-black uppercase text-neo-black">
               {t('singlePlayer.quickPlay') || 'Quick Play'}
             </h2>

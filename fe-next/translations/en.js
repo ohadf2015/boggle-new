@@ -2702,7 +2702,8 @@ const en = {
   },
   "multiplayer": {
     "mode": "Mode",
-    "timer": "Timer"
+    "timer": "Timer",
+    "subtitle": "Compete with friends in real-time"
   },
   "stats": {
     "games": "Games",

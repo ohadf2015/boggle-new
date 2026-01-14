@@ -2693,7 +2693,8 @@ const es = {
   },
   "multiplayer": {
     "mode": "Modo",
-    "timer": "Tiempo"
+    "timer": "Tiempo",
+    "subtitle": "Compite con amigos en tiempo real"
   },
   "stats": {
     "games": "partidas",

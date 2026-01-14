@@ -348,21 +348,27 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
 
       <div dir={dir} className="min-h-screen bg-neo-navy flex flex-col">
       <div className="w-[94%] max-w-7xl mx-auto py-3 sm:py-4 flex-1 flex flex-col min-h-0">
-        {/* Compact Header: back button + title inline */}
+        {/* Compact Header: back button + title inline with premium gradient accent */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-3 mb-3 flex-shrink-0"
+          className="flex items-center gap-3 mb-4 flex-shrink-0"
         >
           <Link
             href="/"
-            className="flex items-center justify-center w-10 h-10 rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg transition-all text-neo-black"
+            className="flex items-center justify-center w-10 h-10 rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed transition-all text-neo-black"
           >
             <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
           </Link>
-          <h1 className="text-xl sm:text-2xl font-black uppercase text-neo-white flex-1">
-            {t('landing.multiplayer') || 'Multiplayer'}
-          </h1>
+          <div className="flex-1">
+            <h1 className="text-xl sm:text-2xl font-black uppercase text-neo-white flex items-center gap-2">
+              <span className="inline-block w-3 h-6 bg-gradient-to-b from-neo-pink to-neo-pink-dark rounded-sm" />
+              {t('landing.multiplayer') || 'Multiplayer'}
+            </h1>
+            <p className="text-neo-white/60 text-xs sm:text-sm font-medium mt-0.5">
+              {t('multiplayer.subtitle') || 'Compete with friends in real-time'}
+            </p>
+          </div>
         </motion.div>
 
         {/* Desktop: Single row layout - Form | Rooms side by side without scroll */}
@@ -371,13 +377,15 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
           "flex-1 flex gap-4 lg:gap-6 lg:flex-row lg:items-stretch",
           activeRooms.length > 0 ? "flex-col-reverse" : "flex-col"
         )}>
-          {/* Main Form - No Card wrapper, direct styling */}
+          {/* Main Form - Premium card styling with gradient accent */}
           <motion.div
             initial={{ x: -30, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             className="w-full lg:w-[45%] lg:max-w-md flex flex-col"
           >
-            <div className="rounded-neo border-3 border-neo-black bg-slate-800 shadow-hard p-4 flex flex-col h-full">
+            <div className="rounded-neo-lg border-4 border-neo-black bg-gradient-to-b from-slate-800 to-slate-900 shadow-hard-lg p-4 flex flex-col h-full relative overflow-hidden">
+              {/* Decorative top accent bar */}
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-neo-pink via-neo-lime to-neo-cyan" />
               {/* Mode Selector - direct, no header wrapper */}
               <ModeSelector mode={mode} onModeChange={handleModeChange} />
 

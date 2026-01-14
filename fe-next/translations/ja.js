@@ -2655,7 +2655,8 @@ const ja = {
   },
   "multiplayer": {
     "mode": "モード",
-    "timer": "タイマー"
+    "timer": "タイマー",
+    "subtitle": "友達とリアルタイムで競争"
   },
   "stats": {
     "games": "ゲーム",

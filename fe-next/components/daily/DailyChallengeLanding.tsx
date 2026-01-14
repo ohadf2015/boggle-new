@@ -3,11 +3,12 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Trophy, Timer, Hourglass, Bell, Check, Loader2 } from 'lucide-react';
+import { Trophy, Timer, Hourglass, Bell, Check, Loader2, Clock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { hasPlayedToday } from '@/utils/dailyChallenge/storage';
 import { getGuestFingerprint } from '@/utils/guestManager';
+import { getSecondsUntilNextDaily, formatCountdown } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -45,6 +46,19 @@ export function DailyChallengeLanding({
   });
   const [buzzPreview, setBuzzPreview] = useState<BuzzPreviewData>({});
   const [requestState, setRequestState] = useState<'idle' | 'loading' | 'sent'>('idle');
+  const [countdown, setCountdown] = useState<string>('');
+
+  // Update countdown timer every second
+  useEffect(() => {
+    const updateCountdown = () => {
+      const seconds = getSecondsUntilNextDaily();
+      setCountdown(formatCountdown(seconds));
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Check completion status for both challenges and fetch buzz preview
   useEffect(() => {
@@ -166,6 +180,23 @@ export function DailyChallengeLanding({
       animate={{ opacity: 1 }}
       className="flex-1 flex flex-col items-center justify-center px-3 py-4 sm:p-6 max-w-2xl mx-auto w-full"
     >
+      {/* Urgency Countdown Banner */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="mb-3 sm:mb-4"
+      >
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-neo-navy-light border-2 border-neo-lime/40 rounded-neo shadow-hard-sm">
+          <Clock className="w-4 h-4 text-neo-lime animate-pulse" />
+          <span className="text-xs sm:text-sm font-bold text-neo-lime/80">
+            {t('daily.nextPuzzleIn')}:
+          </span>
+          <span className="text-sm sm:text-base font-black text-neo-lime tabular-nums min-w-[5em]">
+            {countdown}
+          </span>
+        </div>
+      </motion.div>
+
       {/* Compact Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}

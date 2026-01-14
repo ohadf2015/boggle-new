@@ -3,7 +3,7 @@
 import React, { ReactNode, useRef, useEffect, useCallback, useMemo, memo, useState, useTransition, useDeferredValue } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { Trophy, Crown, HelpCircle, Users } from 'lucide-react';
+import { Trophy, Crown, HelpCircle } from 'lucide-react';
 import type { Socket } from 'socket.io-client';
 import { Badge } from '../ui/badge';
 import { Card, CardContent } from '../ui/card';
@@ -1026,9 +1026,9 @@ const InGameScreen = memo<InGameScreenProps>(({
 
         {/* Center Column: Timer, Score, Grid */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden max-h-full">
-          {/* Stats row - Mobile: flexbox layout to prevent overflow; Desktop: absolute positioning */}
+          {/* Stats row - Mobile: tight layout like single player; Desktop: absolute positioning */}
           {remainingTime !== null && (
-            <div ref={gameStatsRef} className="relative flex items-center justify-between lg:justify-center flex-shrink-0 mb-2 md:mb-3 px-1 lg:px-0 overflow-hidden" role="status" aria-label="Game status">
+            <div ref={gameStatsRef} className="relative flex w-full items-center justify-between lg:justify-center flex-shrink-0 px-1 md:px-2 lg:px-0 gap-0 overflow-hidden" role="status" aria-label="Game status">
               {/* Exit + Help + Hint - hidden on mobile (shown in top bar), visible on desktop */}
               <div className="absolute left-2 rtl:left-auto rtl:right-2 md:left-4 md:rtl:right-4 top-1/2 -translate-y-1/2 hidden lg:flex items-center gap-2 z-30">
                 {onExitRoom && (
@@ -1067,42 +1067,33 @@ const InGameScreen = memo<InGameScreenProps>(({
                 )}
               </div>
 
-              {/* Mobile spacer - takes space where combo would be on left for balance */}
-              <div className="lg:hidden flex-shrink-0 w-[60px]" />
+              {/* Left side placeholder - matches single player layout (Combo | Timer | Score) */}
+              <div className="flex-1 flex justify-end pr-1 md:pr-3 pointer-events-none lg:hidden" />
 
-              {/* Timer (center - always visible and prominent) */}
+              {/* Timer (center - always visible and prominent, tighter layout like single player) */}
               <motion.div
                 data-tutorial="timer"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="relative z-20 flex-shrink-0"
+                className="relative z-20 shrink-0"
               >
                 <div className="hidden lg:block">
                   <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="lg" />
                 </div>
-                <div className="lg:hidden">
+                <div className="hidden md:block lg:hidden">
+                  <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" />
+                </div>
+                <div className="md:hidden">
                   <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="xs" />
                 </div>
-
-                {/* Player count indicator - mobile only, shows below timer */}
-                {leaderboard && leaderboard.length > 1 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="lg:hidden absolute -bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2 py-0.5 bg-neo-navy/90 rounded-full border border-neo-cream/20"
-                  >
-                    <Users className="w-3 h-3 text-neo-cream/70" />
-                    <span className="text-[10px] font-bold text-neo-cream/70">{leaderboard.length}</span>
-                  </motion.div>
-                )}
               </motion.div>
 
-              {/* Combo + Score - Mobile: flexbox child; Desktop: absolutely positioned */}
+              {/* Combo + Score - Mobile: flex-1 like single player; Desktop: absolutely positioned */}
               {isPlaying && (
                 <div className={`
-                  flex flex-col items-end rtl:items-start gap-0.5 md:gap-2 z-30
-                  lg:absolute lg:right-4 lg:rtl:right-auto lg:rtl:left-4 lg:top-1/2 lg:-translate-y-1/2
-                  flex-shrink-0
+                  flex-1 flex flex-col items-end rtl:items-start gap-0.5 md:gap-2 z-30
+                  lg:flex-none lg:absolute lg:right-4 lg:rtl:right-auto lg:rtl:left-4 lg:top-1/2 lg:-translate-y-1/2
+                  pl-1 md:pl-3 pointer-events-none lg:pointer-events-auto lg:pl-0
                 `}>
                   {/* Combo container - fixed height to prevent layout shift */}
                   <div className="h-[24px] md:h-[32px] flex items-center justify-end rtl:justify-start">
@@ -1120,15 +1111,18 @@ const InGameScreen = memo<InGameScreenProps>(({
                     )}
                   </div>
 
-                  {/* Score - compact on mobile to prevent overflow */}
+                  {/* Score - compact on mobile to prevent overflow - Premium gradient */}
                   <motion.div
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1 md:px-4 py-0.5 md:py-1.5 min-w-[44px] md:min-w-[90px]"
+                    className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px] pointer-events-auto overflow-hidden"
                     style={{
-                      background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
+                      background: 'linear-gradient(135deg, #BFFF00 0%, #9AFF00 50%, #FFE135 100%)',
                     }}
+                    whileHover={{ scale: 1.05 }}
                   >
+                    {/* Subtle shine effect on score card */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_3s_ease-in-out_infinite]" />
                     <div className="text-center">
                       <motion.div
                         key={playerData.score}
@@ -1199,9 +1193,8 @@ const InGameScreen = memo<InGameScreenProps>(({
             </motion.div>
           )}
 
-          {/* Grid - Direct connection to timer row */}
-          {/* Removed extra padding to prevent scroll - safe area handled by parent */}
-          <div className="flex-1 flex items-start justify-center min-h-0 overflow-hidden">
+          {/* Grid - Direct connection to timer row, centered like single player */}
+          <div className="flex-1 flex items-center justify-center min-h-0 overflow-hidden">
             <GridComponent
               key={isPlaying ? 'playing-grid' : 'spectating-grid'}
               grid={letterGrid}
@@ -1298,14 +1291,22 @@ const InGameScreen = memo<InGameScreenProps>(({
         {/* Right Column: Live Leaderboard (hidden in focus mode) */}
         {!gameplayFocusMode && (
           <div className="lg:w-64 xl:w-72 2xl:w-80 flex flex-col gap-2 flex-shrink-0">
-            <div
-              className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[45vh] lg:max-h-none lg:flex-grow"
+            <motion.div
+              className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[45vh] lg:max-h-none lg:flex-grow relative"
               style={{ transform: 'rotate(-1deg)' }}
+              initial={{ x: 50, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
             >
-              {/* Header */}
-              <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-pink text-white">
-                <h3 className="flex items-center gap-2 text-neo-cream text-base uppercase tracking-widest font-black">
-                  <Trophy className="w-4 h-4 text-neo-lime" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
+              {/* Header with gradient accent */}
+              <div className="py-3 px-4 border-b-4 border-neo-black bg-gradient-to-r from-neo-pink via-neo-pink to-neo-pink-dark text-white relative overflow-hidden">
+                {/* Animated sparkle effect */}
+                <div className="absolute inset-0 opacity-30">
+                  <div className="absolute top-1 right-8 w-2 h-2 bg-white rounded-full animate-twinkle" />
+                  <div className="absolute top-3 right-4 w-1 h-1 bg-white rounded-full animate-twinkle delay-500" />
+                </div>
+                <h3 className="flex items-center gap-2 text-neo-cream text-base uppercase tracking-widest font-black relative z-10">
+                  <Trophy className="w-5 h-5 text-neo-lime animate-bounce" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))', animationDuration: '2s' }} />
                   {t('playerView.leaderboard')}
                 </h3>
               </div>
@@ -1374,17 +1375,22 @@ const InGameScreen = memo<InGameScreenProps>(({
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Chat Component - Desktop only */}
-            <div className="hidden lg:block">
+            <motion.div
+              className="hidden lg:block"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
               <RoomChat
                 username={isHost ? "Host" : username}
                 isHost={isHost}
                 gameCode={gameCode}
                 className="max-h-[200px]"
               />
-            </div>
+            </motion.div>
           </div>
         )}
       </div>

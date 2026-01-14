@@ -521,7 +521,8 @@ const he = {
   },
   "multiplayer": {
     "mode": "מצב משחק",
-    "timer": "טיימר"
+    "timer": "טיימר",
+    "subtitle": "התחרו עם חברים בזמן אמת"
   },
   "stats": {
     "games": "משחקים",

@@ -14,7 +14,10 @@ import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import {
   regenerateSingleChallenge,
   regenerateChallengesByType,
+  regeneratePartialChallenge,
   storePromptExample,
+  type RegenerableField,
+  type PartialRegenerationOptions,
 } from '@/backend/services/buzzGenerator';
 
 // AI generation can take time - increased to 70s to accommodate timeout handling
@@ -34,6 +37,9 @@ interface RegenerateRequestBody {
     trend_topic?: string;
   };
   saveFeedback?: boolean;
+  // Partial regeneration fields
+  fieldsToRegenerate?: RegenerableField[]; // Which fields to regenerate (default: ['all'])
+  customPromptOverride?: string; // Admin-edited AI prompt
 }
 
 const SUPPORTED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'];
@@ -73,6 +79,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     feedback,
     originalChallenge,
     saveFeedback = true,
+    fieldsToRegenerate = ['all'],
+    customPromptOverride,
   } = body;
 
   // Base validation
@@ -138,6 +146,31 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
   }
 
+  // Validate fieldsToRegenerate if provided
+  const validFields: RegenerableField[] = ['prompt', 'answer', 'hint', 'options', 'all'];
+  if (!Array.isArray(fieldsToRegenerate) || fieldsToRegenerate.length === 0) {
+    return NextResponse.json(
+      { error: 'fieldsToRegenerate must be a non-empty array' },
+      { status: 400 }
+    );
+  }
+  for (const field of fieldsToRegenerate) {
+    if (!validFields.includes(field)) {
+      return NextResponse.json(
+        { error: `Invalid field in fieldsToRegenerate: ${field}. Valid fields: ${validFields.join(', ')}` },
+        { status: 400 }
+      );
+    }
+  }
+
+  // Validate customPromptOverride if provided
+  if (customPromptOverride !== undefined && typeof customPromptOverride !== 'string') {
+    return NextResponse.json(
+      { error: 'customPromptOverride must be a string' },
+      { status: 400 }
+    );
+  }
+
   try {
     // 1. Store the feedback example (before regeneration) for AI learning
     // Only store for single challenge mode where we have originalChallenge
@@ -163,17 +196,40 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     let updatedData;
     let message: string;
 
+    // Determine if this is a partial regeneration (specific fields vs full)
+    const isPartialRegeneration = !fieldsToRegenerate.includes('all');
+
     if (challengeIndex !== undefined) {
       // Single challenge mode
-      updatedData = await regenerateSingleChallenge(
-        date,
-        language,
-        challengeIndex,
-        feedback.trim()
-      );
-      message = 'Challenge regenerated successfully';
+      if (isPartialRegeneration || customPromptOverride) {
+        // Use partial regeneration for field-specific or custom prompt regeneration
+        const options: PartialRegenerationOptions = {
+          fields: fieldsToRegenerate,
+          customPrompt: customPromptOverride,
+        };
+        updatedData = await regeneratePartialChallenge(
+          date,
+          language,
+          challengeIndex,
+          feedback.trim(),
+          options
+        );
+        const fieldsList = fieldsToRegenerate.join(', ');
+        message = isPartialRegeneration
+          ? `Regenerated ${fieldsList} field(s) successfully`
+          : 'Challenge regenerated with custom prompt successfully';
+      } else {
+        // Full regeneration - use existing function for backward compatibility
+        updatedData = await regenerateSingleChallenge(
+          date,
+          language,
+          challengeIndex,
+          feedback.trim()
+        );
+        message = 'Challenge regenerated successfully';
+      }
     } else {
-      // By-type mode
+      // By-type mode (always full regeneration)
       updatedData = await regenerateChallengesByType(
         date,
         language,

@@ -61,11 +61,11 @@ const ModeCard: React.FC<ModeCardProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
 
-  // 3D tilt effect on hover - MORE DRAMATIC
+  // 3D tilt effect on hover - DRAMATIC for premium game feel
   const { ref, style: tiltStyle, handlers: tiltHandlers } = useTiltEffect<HTMLDivElement>({
-    maxTilt: 15,        // Increased from 8
-    hoverScale: 1.04,   // Increased from 1.02
-    perspective: 800,   // Decreased for more dramatic effect
+    maxTilt: 18,        // More dramatic tilt for game-like feel
+    hoverScale: 1.06,   // Noticeable scale-up on hover
+    perspective: 700,   // Strong 3D effect
   });
 
   // Combined handlers
@@ -83,32 +83,36 @@ const ModeCard: React.FC<ModeCardProps> = ({
 
   const variantStyles = {
     cyan: {
-      bg: 'bg-gradient-to-br from-neo-cyan to-neo-cyan-dark',
-      hoverBg: 'hover:from-neo-cyan-light hover:to-neo-cyan',
+      bg: 'bg-gradient-to-br from-neo-cyan via-cyan-400 to-neo-cyan-dark',
+      hoverBg: 'hover:from-neo-cyan-light hover:via-neo-cyan hover:to-neo-cyan-dark',
       iconBg: 'bg-neo-navy',
       iconText: 'text-neo-cyan-light',
       arrow: 'bg-neo-navy text-neo-cyan',
+      glowColor: 'rgba(0, 255, 255, 0.4)',
     },
     pink: {
-      bg: 'bg-gradient-to-br from-neo-pink to-neo-pink-dark',
-      hoverBg: 'hover:from-neo-pink-light hover:to-neo-pink',
+      bg: 'bg-gradient-to-br from-neo-pink via-pink-400 to-neo-pink-dark',
+      hoverBg: 'hover:from-neo-pink-light hover:via-neo-pink hover:to-neo-pink-dark',
       iconBg: 'bg-neo-navy',
       iconText: 'text-neo-pink-light',
       arrow: 'bg-neo-navy text-neo-pink',
+      glowColor: 'rgba(255, 20, 147, 0.4)',
     },
     purple: {
-      bg: 'bg-gradient-to-br from-neo-purple to-neo-purple-dark',
-      hoverBg: 'hover:from-neo-purple-light hover:to-neo-purple',
+      bg: 'bg-gradient-to-br from-neo-purple via-purple-400 to-neo-purple-dark',
+      hoverBg: 'hover:from-neo-purple-light hover:via-neo-purple hover:to-neo-purple-dark',
       iconBg: 'bg-neo-navy',
       iconText: 'text-neo-purple-light',
       arrow: 'bg-neo-navy text-neo-purple',
+      glowColor: 'rgba(139, 92, 246, 0.4)',
     },
     orange: {
-      bg: 'bg-gradient-to-br from-neo-orange to-amber-600',
-      hoverBg: 'hover:from-amber-400 hover:to-neo-orange',
+      bg: 'bg-gradient-to-br from-neo-orange via-amber-500 to-amber-600',
+      hoverBg: 'hover:from-amber-400 hover:via-neo-orange hover:to-amber-600',
       iconBg: 'bg-neo-navy',
       iconText: 'text-amber-400',
       arrow: 'bg-neo-navy text-neo-orange',
+      glowColor: 'rgba(255, 107, 53, 0.4)',
     },
   };
 
@@ -144,6 +148,10 @@ const ModeCard: React.FC<ModeCardProps> = ({
       style={{
         // Container-relative padding using cqw - smaller for secondary
         padding: secondary ? 'clamp(0.5rem, 3cqw, 1rem)' : 'clamp(0.75rem, 4cqw, 1.5rem)',
+        // Hover glow effect for premium feel
+        boxShadow: isHovered && !locked
+          ? `0 0 30px ${styles.glowColor}, 0 0 60px ${styles.glowColor}, 6px 6px 0px rgb(var(--neo-black))`
+          : undefined,
         ...tiltStyle,
       }}
       {...handlers}
@@ -262,21 +270,36 @@ const ModeCard: React.FC<ModeCardProps> = ({
           )}
         </div>
       )}
-      {/* Shine effect on hover */}
+      {/* Premium animated effects */}
       {enableComplexAnimations && !prefersReducedMotion && (
-        <motion.div
-          className="absolute inset-0 pointer-events-none overflow-hidden rounded-neo-lg"
-          initial={false}
-          animate={isHovered ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.3 }}
-        >
+        <>
+          {/* Shine effect on hover */}
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-            initial={{ x: '-100%' }}
-            animate={isHovered ? { x: '200%' } : { x: '-100%' }}
-            transition={{ duration: 0.6, ease: 'easeInOut' }}
-          />
-        </motion.div>
+            className="absolute inset-0 pointer-events-none overflow-hidden rounded-neo-lg"
+            initial={false}
+            animate={isHovered ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+              initial={{ x: '-100%' }}
+              animate={isHovered ? { x: '200%' } : { x: '-100%' }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+            />
+          </motion.div>
+
+          {/* Decorative corner accent */}
+          <motion.div
+            className="absolute top-0 right-0 w-16 h-16 pointer-events-none overflow-hidden rounded-neo-lg"
+            initial={false}
+          >
+            <motion.div
+              className="absolute -top-8 -right-8 w-16 h-16 bg-white/10 rotate-45"
+              animate={isHovered ? { scale: 1.2, opacity: 0.15 } : { scale: 1, opacity: 0.08 }}
+              transition={{ duration: 0.3 }}
+            />
+          </motion.div>
+        </>
       )}
 
       {/* Locked overlay with message badge - hidden during loading to prevent flicker */}

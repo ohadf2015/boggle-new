@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Target, Flame, Check, Clock } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Target, Flame, Check, Clock, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import {
@@ -107,7 +108,7 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
     // Uses exact same structure as rendered content with fixed dimensions
     return (
       <div className={cn(
-        "w-full rounded-neo border-3 border-neo-black shadow-hard bg-neo-yellow",
+        "w-full rounded-neo border-3 border-neo-black shadow-hard bg-gradient-to-r from-neo-lime via-lime-300 to-yellow-300",
         compact ? "p-2" : "p-2 sm:p-3",
         className
       )}>
@@ -127,10 +128,10 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
 
   return (
     <Link href={`/${language}/daily`} className="block w-full group">
-      <div
+      <motion.div
         className={cn(
           // Base card styles matching ModeCard
-          "relative w-full rounded-neo border-3 border-neo-black shadow-hard transition-all cursor-pointer",
+          "relative w-full rounded-neo border-3 border-neo-black shadow-hard transition-all cursor-pointer overflow-hidden",
           // Hover/active effects matching ModeCard
           isRTL
             ? 'hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[-4px_4px_0px_black]'
@@ -139,28 +140,56 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
             ? 'active:translate-x-[-1px] active:translate-y-[1px]'
             : 'active:translate-x-[1px] active:translate-y-[1px]',
           'active:shadow-hard-pressed',
-          // Solid neo-lime for clean neo-brutalist look
-          "bg-neo-lime",
-          // Subtle glow effect for visual distinction - lime-dark ring when not played
+          // Vibrant gradient for premium daily challenge look
+          hasPlayed
+            ? "bg-gradient-to-r from-neo-lime via-lime-400 to-neo-lime"
+            : "bg-gradient-to-r from-neo-lime via-lime-300 to-yellow-300",
+          // Pulsing glow when not played to attract attention
           !hasPlayed && "ring-2 ring-neo-lime-dark/60 ring-offset-2 ring-offset-transparent",
           compact ? "p-2" : "p-2 sm:p-3",
           className
         )}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
       >
-        <div className="flex items-center gap-3">
+        {/* Animated sparkles for unplayed state */}
+        {!hasPlayed && (
+          <motion.div
+            className="absolute top-1 right-12"
+            animate={{
+              rotate: [0, 15, -15, 0],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            <Sparkles className="w-4 h-4 text-yellow-600/70" />
+          </motion.div>
+        )}
+
+        <div className="flex items-center gap-3 relative z-10">
           {/* Icon or Mascot */}
           {mascot ? (
             <div className="flex-shrink-0">{mascot}</div>
           ) : (
-            <div className={cn(
-              "flex items-center justify-center rounded-neo border-2 border-neo-black bg-neo-black",
-              compact ? "w-8 h-8" : "w-10 h-10 sm:w-12 sm:h-12"
-            )}>
+            <motion.div
+              className={cn(
+                "flex items-center justify-center rounded-neo border-2 border-neo-black bg-neo-black",
+                compact ? "w-8 h-8" : "w-10 h-10 sm:w-12 sm:h-12"
+              )}
+              animate={!hasPlayed ? {
+                boxShadow: ['0 0 0px rgba(191, 255, 0, 0)', '0 0 15px rgba(191, 255, 0, 0.5)', '0 0 0px rgba(191, 255, 0, 0)']
+              } : undefined}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
               <Target className={cn(
                 "text-neo-lime",
                 compact ? "w-4 h-4" : "w-5 h-5 sm:w-6 sm:h-6"
               )} />
-            </div>
+            </motion.div>
           )}
 
           {/* Content */}
@@ -176,10 +205,14 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
                 #{puzzleNumber}
               </span>
               {streak > 0 && (
-                <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-neo-black/15 text-neo-black">
-                  <Flame className="w-3 h-3" />
+                <motion.span
+                  className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-neo-black/15 text-neo-black"
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 3 }}
+                >
+                  <Flame className="w-3 h-3 text-orange-600" />
                   <span className="text-xs font-bold">{streak}</span>
-                </span>
+                </motion.span>
               )}
             </div>
             <div className="flex items-center gap-1.5 text-xs text-neo-black/70 font-medium mt-0.5">
@@ -194,13 +227,26 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
           </div>
 
           {/* Completion indicator */}
-          {hasPlayed && (
-            <div className="flex items-center justify-center w-8 h-8 bg-neo-lime-light rounded-full border-2 border-neo-black text-neo-black">
+          {hasPlayed ? (
+            <motion.div
+              className="flex items-center justify-center w-8 h-8 bg-neo-lime-light rounded-full border-2 border-neo-black text-neo-black"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 500, damping: 20 }}
+            >
               <Check className="w-4 h-4 text-neo-black" strokeWidth={3} />
-            </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              className="text-neo-black font-bold text-xs uppercase px-2 py-1 bg-neo-black/10 rounded-neo"
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              {t('daily.playNow') || 'Play!'}
+            </motion.div>
           )}
         </div>
-      </div>
+      </motion.div>
     </Link>
   );
 };

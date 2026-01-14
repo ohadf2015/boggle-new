@@ -153,7 +153,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               <button
                 onClick={onRefreshRooms}
                 disabled={roomsLoading}
-                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded border border-slate-600 bg-slate-700/30 hover:bg-neo-cyan/20 transition-all disabled:opacity-50"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo border-2 border-neo-black bg-slate-700/50 shadow-hard-sm hover:shadow-hard hover:bg-neo-cyan/20 hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all disabled:opacity-50"
                 aria-label={t('common.refresh')}
               >
                 {roomsLoading ? (
@@ -184,7 +184,9 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                       animate={{ x: 0, opacity: 1 }}
                       transition={{ delay: 0.1 + index * 0.03 }}
                       onClick={() => onRoomClick(room)}
-                      className="flex items-center gap-3 p-3 rounded-neo border-2 border-slate-600 bg-slate-700/40 hover:bg-neo-cyan/15 hover:border-neo-cyan/50 transition-all text-left group"
+                      whileHover={{ scale: 1.02, x: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="flex items-center gap-3 p-3 rounded-neo border-2 border-neo-black bg-slate-700/60 shadow-hard-sm hover:shadow-hard hover:bg-neo-cyan/15 hover:border-neo-cyan transition-all text-left group"
                     >
                       <span className="text-xl">
                         {LANGUAGE_FLAGS[room.language] || '🎮'}
@@ -197,27 +199,27 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                           {room.playerCount || 0} {t('joinView.players')}
                         </p>
                       </div>
-                      <span className="px-3 py-1.5 text-xs font-bold text-neo-black bg-neo-cyan rounded border-2 border-neo-black shadow-hard-sm group-hover:shadow-hard transition-all">
+                      <span className="px-3 py-1.5 text-xs font-bold text-neo-black bg-neo-cyan rounded-neo border-2 border-neo-black shadow-hard-sm group-hover:shadow-hard group-hover:-translate-y-0.5 transition-all">
                         {t('common.join')}
                       </span>
                     </motion.button>
                   ))}
                 </motion.div>
               ) : (
-                /* Empty State - Simplified */
+                /* Empty State - Enhanced Neo-Brutalist */
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.25 }}
                   className="flex flex-col items-center justify-center text-center py-6"
                 >
-                  <div className="w-12 h-12 rounded-full bg-slate-700/50 border-2 border-slate-600 flex items-center justify-center mb-3">
-                    <Users className="w-6 h-6 text-slate-400" />
+                  <div className="w-14 h-14 rounded-neo bg-slate-700/70 border-2 border-neo-black shadow-hard flex items-center justify-center mb-3">
+                    <Users className="w-7 h-7 text-neo-cyan" />
                   </div>
-                  <p className="text-sm text-neo-cream/60 mb-1">
+                  <p className="text-sm font-bold text-neo-cream/80 mb-1">
                     {t('multiplayerFlow.roomList.noRooms')}
                   </p>
-                  <p className="text-xs text-slate-500 mb-4">
+                  <p className="text-xs text-slate-400 mb-4">
                     {t('multiplayerFlow.roomList.beFirst')}
                   </p>
                 </motion.div>

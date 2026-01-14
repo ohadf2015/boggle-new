@@ -339,7 +339,7 @@ const LandingView: React.FC = () => {
             <div className="w-full mb-4">
             <Suspense fallback={
               <div
-                className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-yellow"
+                className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard bg-gradient-to-r from-neo-lime via-lime-300 to-yellow-300"
                 style={{ minHeight: '52px' }}
               >
                 <div className="flex items-center gap-3 animate-pulse">
@@ -356,57 +356,71 @@ const LandingView: React.FC = () => {
           </div>
           {/* Landscape/Mobile Portrait: 2-column grid layout */}
           <div className="w-full animate-fade-in-fast grid grid-cols-2 gap-2 sm:gap-3 min-h-0 auto-rows-fr content-center">
-            {/* Multiplayer Card - Compact */}
-            <Link
-              href={`/${language}/multiplayer`}
-              className={cn(
-                'flex-1 flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
-                'bg-gradient-to-br from-neo-pink to-pink-400',
-                'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                'hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px]',
-                'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm',
-                'transition-all min-h-[100px] sm:min-h-[120px]',
-                isMobilePortrait && 'max-h-[30dvh]',
-                isLandscape && 'max-h-[70dvh]',
-                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
-              )}
-              aria-label={`${t('landing.multiplayer') || 'Multiplayer'} - ${t('landing.multiplayerDesc') || 'Compete with friends'}`}
+            {/* Multiplayer Card - Compact with glow */}
+            <motion.div
+              whileHover={{
+                scale: 1.03,
+                boxShadow: '0 0 25px rgba(255, 20, 147, 0.5), 0 0 50px rgba(255, 20, 147, 0.3), 6px 6px 0px black'
+              }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.2 }}
             >
-              <Users className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
-              <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.multiplayer') || 'Multiplayer'}</span>
-              {!isMobilePortrait && (
-                <div className="flex gap-2 text-xs" aria-hidden="true">
-                  <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><LayoutGrid className="inline w-3 h-3 mr-1" />Rooms</span>
-                  <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Crown className="inline w-3 h-3 mr-1" />Host</span>
-                </div>
-              )}
-            </Link>
+              <Link
+                href={`/${language}/multiplayer`}
+                className={cn(
+                  'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
+                  'bg-gradient-to-br from-neo-pink to-pink-400',
+                  'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
+                  'transition-all min-h-[100px] sm:min-h-[120px]',
+                  isMobilePortrait && 'max-h-[30dvh]',
+                  isLandscape && 'max-h-[70dvh]',
+                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
+                )}
+                aria-label={`${t('landing.multiplayer') || 'Multiplayer'} - ${t('landing.multiplayerDesc') || 'Compete with friends'}`}
+              >
+                <Users className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
+                <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.multiplayer') || 'Multiplayer'}</span>
+                {!isMobilePortrait && (
+                  <div className="flex gap-2 text-xs" aria-hidden="true">
+                    <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><LayoutGrid className="inline w-3 h-3 mr-1" />Rooms</span>
+                    <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Crown className="inline w-3 h-3 mr-1" />Host</span>
+                  </div>
+                )}
+              </Link>
+            </motion.div>
 
-            {/* Single Player Card - Compact */}
-            <Link
-              href={`/${language}/singleplayer`}
-              className={cn(
-                'flex-1 flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
-                'bg-gradient-to-br from-neo-cyan to-cyan-400',
-                'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                'hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px]',
-                'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm',
-                'transition-all min-h-[100px] sm:min-h-[120px]',
-                isMobilePortrait && 'max-h-[30dvh]',
-                isLandscape && 'max-h-[70dvh]',
-                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
-              )}
-              aria-label={`${t('landing.singlePlayer') || 'Single Player'} - ${t('landing.singlePlayerDesc') || 'Practice at your own pace'}`}
+            {/* Single Player Card - Compact with glow */}
+            <motion.div
+              whileHover={{
+                scale: 1.03,
+                boxShadow: '0 0 25px rgba(0, 255, 255, 0.5), 0 0 50px rgba(0, 255, 255, 0.3), 6px 6px 0px black'
+              }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.2 }}
             >
-              <User className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
-              <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.singlePlayer') || 'Single Player'}</span>
-              {!isMobilePortrait && (
-                <div className="flex gap-2 text-xs" aria-hidden="true">
-                  <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Bot className="inline w-3 h-3 mr-1" />Bots</span>
-                  <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Trophy className="inline w-3 h-3 mr-1" />Challenges</span>
-                </div>
-              )}
-            </Link>
+              <Link
+                href={`/${language}/singleplayer`}
+                className={cn(
+                  'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
+                  'bg-gradient-to-br from-neo-cyan to-cyan-400',
+                  'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
+                  'transition-all min-h-[100px] sm:min-h-[120px]',
+                  isMobilePortrait && 'max-h-[30dvh]',
+                  isLandscape && 'max-h-[70dvh]',
+                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
+                )}
+                aria-label={`${t('landing.singlePlayer') || 'Single Player'} - ${t('landing.singlePlayerDesc') || 'Practice at your own pace'}`}
+              >
+                <User className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
+                <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.singlePlayer') || 'Single Player'}</span>
+                {!isMobilePortrait && (
+                  <div className="flex gap-2 text-xs" aria-hidden="true">
+                    <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Bot className="inline w-3 h-3 mr-1" />Bots</span>
+                    <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Trophy className="inline w-3 h-3 mr-1" />Challenges</span>
+                  </div>
+                )}
+              </Link>
+            </motion.div>
 
             {/* Brain Training Card - Compact, spans both columns */}
             {/* Show loading state during auth check to prevent UI flicker */}
@@ -428,38 +442,46 @@ const LandingView: React.FC = () => {
                 <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.brainTraining') || 'Brain Training'}</span>
               </div>
             ) : isAuthenticated ? (
-              <Link
-                href={`/${language}/brain`}
-                className={cn(
-                  'col-span-2 flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
-                  'bg-gradient-to-br from-neo-purple to-purple-400',
-                  'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                  'hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px]',
-                  'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm',
-                  'transition-all min-h-[80px] sm:min-h-[100px]',
-                  isMobilePortrait && 'max-h-[20dvh]',
-                  isLandscape && 'max-h-[50dvh]',
-                  'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
-                )}
-                aria-label={`${t('landing.brainTraining') || 'Brain Training'} - ${t('landing.brainTrainingDesc') || 'Track cognitive growth'}`}
+              <motion.div
+                className="col-span-2"
+                whileHover={{
+                  scale: 1.02,
+                  boxShadow: '0 0 25px rgba(139, 92, 246, 0.5), 0 0 50px rgba(139, 92, 246, 0.3), 6px 6px 0px black'
+                }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.2 }}
               >
-                <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
-                <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.brainTraining') || 'Brain Training'}</span>
-              </Link>
+                <Link
+                  href={`/${language}/brain`}
+                  className={cn(
+                    'flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
+                    'bg-gradient-to-br from-neo-purple to-purple-400',
+                    'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
+                    'transition-all min-h-[80px] sm:min-h-[100px]',
+                    isMobilePortrait && 'max-h-[20dvh]',
+                    isLandscape && 'max-h-[50dvh]',
+                    'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
+                  )}
+                  aria-label={`${t('landing.brainTraining') || 'Brain Training'} - ${t('landing.brainTrainingDesc') || 'Track cognitive growth'}`}
+                >
+                  <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
+                  <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.brainTraining') || 'Brain Training'}</span>
+                </Link>
+              </motion.div>
             ) : (
-              <button
+              <motion.button
                 onClick={() => setShowAuthModal(true)}
                 className={cn(
                   'col-span-2 flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4 relative',
                   'bg-gradient-to-br from-neo-purple to-purple-400 grayscale',
                   'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                  'hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px]',
-                  'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm',
                   'transition-all min-h-[80px] sm:min-h-[100px]',
                   isMobilePortrait && 'max-h-[20dvh]',
                   isLandscape && 'max-h-[50dvh]',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                 )}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 aria-label={`${t('landing.brainTraining') || 'Brain Training'} - ${t('landing.signInToUnlock') || 'Sign in to unlock'}`}
               >
                 {/* Centered lock badge */}
@@ -471,7 +493,7 @@ const LandingView: React.FC = () => {
                 </div>
                 <Brain className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
                 <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.brainTraining') || 'Brain Training'}</span>
-              </button>
+              </motion.button>
             )}
           </div>
           </div>
@@ -484,7 +506,7 @@ const LandingView: React.FC = () => {
               <div className="col-span-1 sm:col-span-2 w-full">
                 <Suspense fallback={
                   <div
-                    className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-lime"
+                    className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard bg-gradient-to-r from-neo-lime via-lime-300 to-yellow-300"
                     style={{ minHeight: '62px' }}
                   >
                     <div className="flex items-center gap-3 animate-pulse">
@@ -547,7 +569,7 @@ const LandingView: React.FC = () => {
       {/* Tutorial FAB - Fixed bottom corner button */}
       {/* Position uses max() to ensure button clears safe area on devices with home indicators */}
       {/* sm:bottom-24 clears the footer (visible at sm:) which is ~72px tall */}
-      <button
+      <motion.button
         onClick={handleOpenTutorial}
         className="
           fixed bottom-[max(env(safe-area-inset-bottom,0px),1rem)] right-[max(env(safe-area-inset-right,0px),1rem)] z-[45] sm:bottom-24 sm:right-6 lg:right-8
@@ -562,13 +584,29 @@ const LandingView: React.FC = () => {
           active:scale-95 active:shadow-hard
           transition-all duration-150
           rtl:right-auto rtl:left-[max(env(safe-area-inset-left,0px),1rem)] sm:rtl:left-6 lg:rtl:left-8
-          animate-fade-in-up
         "
+        initial={{ opacity: 0, y: 20 }}
+        animate={{
+          opacity: 1,
+          y: 0,
+          boxShadow: [
+            '4px 4px 0px black, 0 0 0px rgba(139, 92, 246, 0)',
+            '4px 4px 0px black, 0 0 20px rgba(139, 92, 246, 0.6)',
+            '4px 4px 0px black, 0 0 0px rgba(139, 92, 246, 0)',
+          ]
+        }}
+        transition={{
+          opacity: { duration: 0.3 },
+          y: { duration: 0.3 },
+          boxShadow: { duration: 2, repeat: Infinity, ease: 'easeInOut' }
+        }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         aria-label={t('landing.tutorial') || 'Tutorial'}
       >
         <GraduationCap className="w-5 h-5" />
         <span className="hidden sm:inline">{t('landing.tutorial') || 'Tutorial'}</span>
-      </button>
+      </motion.button>
     </div>
   );
 };

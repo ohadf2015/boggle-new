@@ -1641,6 +1641,281 @@ export async function regenerateChallengesByType(
   return updatedData;
 }
 
+// ==================== Partial Regeneration Functions ====================
+
+/**
+ * Valid fields that can be partially regenerated
+ */
+export type RegenerableField = 'prompt' | 'answer' | 'hint' | 'options' | 'all';
+
+/**
+ * Options for partial regeneration
+ */
+export interface PartialRegenerationOptions {
+  fields: RegenerableField[];
+  customPrompt?: string;
+  additionalExampleIds?: string[];
+}
+
+/**
+ * Build a specialized prompt for partial regeneration
+ * Instructs AI to ONLY change specified fields while keeping others intact
+ */
+function buildPartialChallengePrompt(
+  original: BuzzChallenge,
+  feedback: string,
+  language: string,
+  fieldsToRegenerate: RegenerableField[],
+  trends: TrendingTopic[],
+  examples: PromptExample[]
+): string {
+  const isFullRegeneration = fieldsToRegenerate.includes('all');
+  const trendContext = trends
+    .slice(0, 5)
+    .map(t => `- ${t.query}`)
+    .join('\n');
+
+  const languageToneGuide = getLanguageToneGuide(language);
+
+  // Format "do not do" examples
+  const examplesSection = examples.length > 0
+    ? `
+---
+
+## LEARN FROM PAST MISTAKES (Do NOT repeat these)
+${examples.slice(0, 10).map((ex, i) => `
+### Bad Example ${i + 1} (${ex.challenge_type})
+- Prompt: "${ex.original_prompt}"
+- Answer: "${ex.original_answer}"
+- Problem: ${ex.feedback}${ex.improved_prompt ? `\n- Better prompt: "${ex.improved_prompt}"` : ''}${ex.improved_answer ? `\n- Better answer: "${ex.improved_answer}"` : ''}
+`).join('')}
+`
+    : '';
+
+  // Build field-specific instructions
+  let fieldInstructions: string;
+  let preserveInstructions: string;
+
+  if (isFullRegeneration) {
+    fieldInstructions = `Generate a completely NEW replacement challenge that addresses the feedback.`;
+    preserveInstructions = '';
+  } else {
+    const fieldsToChange = fieldsToRegenerate.join(', ');
+    const fieldsToKeep = ['type', 'trend_topic', 'prompt', 'answer', 'hint', 'difficulty', 'trending_context', 'options']
+      .filter(f => !fieldsToRegenerate.includes(f as RegenerableField) && f !== 'type')
+      .join(', ');
+
+    fieldInstructions = `Generate ONLY new values for: **${fieldsToChange}**`;
+    preserveInstructions = `
+**IMPORTANT - PRESERVE EXACTLY (copy verbatim):**
+${!fieldsToRegenerate.includes('prompt') ? `- prompt: "${original.prompt}"` : ''}
+${!fieldsToRegenerate.includes('answer') ? `- answer: "${original.answer}"` : ''}
+${!fieldsToRegenerate.includes('hint') && original.hint ? `- hint: "${original.hint}"` : ''}
+${original.options && !fieldsToRegenerate.includes('options') ? `- options: ${JSON.stringify(original.options)}` : ''}
+- type: "${original.type}" (always keep)
+- trend_topic: "${original.trend_topic}" (always keep)
+- difficulty: "${original.difficulty}" (always keep)
+- trending_context: "${original.trending_context}" (always keep)
+`;
+  }
+
+  return `You need to ${isFullRegeneration ? 'create a REPLACEMENT' : 'PARTIALLY UPDATE a'} ${original.type} challenge for LexiClash, a word game.
+
+**Language**: ${language}
+**Challenge Type**: ${original.type}
+
+---
+
+## TONE GUIDE
+${languageToneGuide}
+
+---
+
+## CURRENT CHALLENGE${isFullRegeneration ? ' (REJECTED - replace entirely)' : ' (update specific fields only)'}
+- Type: ${original.type}
+- Trend: ${original.trend_topic}
+- Prompt: "${original.prompt}"
+- Answer: "${original.answer}"
+- Hint: "${original.hint || 'None'}"
+- Difficulty: ${original.difficulty}
+- Trending Context: "${original.trending_context}"
+${original.options ? `- Options: ${JSON.stringify(original.options)}` : ''}
+
+---
+
+## ADMIN FEEDBACK
+${feedback}
+${preserveInstructions}
+---
+
+## AVAILABLE TRENDS
+${trendContext}
+${examplesSection}
+---
+
+## YOUR TASK
+${fieldInstructions}
+
+**Requirements:**
+1. **Address the feedback** - Fix the specific issue mentioned above
+2. **Same type** - Must be "${original.type}"
+3. **Common dictionary word** - 3-12 letters (5 for wordle_guess), known by 90% of people
+4. **Natural language** - Sound human, not robotic
+
+---
+
+## OUTPUT FORMAT (JSON only, no markdown)
+{
+  "type": "${original.type}",
+  "trend_topic": "${original.trend_topic}",
+  "prompt": "${isFullRegeneration || fieldsToRegenerate.includes('prompt') ? 'your new creative clue' : original.prompt}",
+  "answer": "${isFullRegeneration || fieldsToRegenerate.includes('answer') ? 'NEW_ANSWER_IN_CAPS' : original.answer}",
+  "hint": "${isFullRegeneration || fieldsToRegenerate.includes('hint') ? 'your new helpful nudge' : (original.hint || '')}",
+  "difficulty": "${original.difficulty}",
+  "trending_context": "${original.trending_context}"${original.options ? `,
+  "options": ${isFullRegeneration || fieldsToRegenerate.includes('options') ? '["new", "options", "array"]' : JSON.stringify(original.options)}` : ''}
+}
+
+Return ONLY the JSON object.`;
+}
+
+/**
+ * Get a preview of the AI prompt that would be sent for regeneration
+ * Used by admin UI to show/edit the prompt before sending
+ */
+export async function getPromptPreview(
+  date: string,
+  language: string,
+  challengeIndex: number,
+  feedback: string,
+  fieldsToRegenerate: RegenerableField[] = ['all']
+): Promise<{ prompt: string; examples: PromptExample[] }> {
+  // Fetch existing challenge data
+  const existing = await getDailyBuzz(date, language);
+  if (!existing) {
+    throw new Error(`No challenge found for ${date} (${language})`);
+  }
+
+  if (challengeIndex < 0 || challengeIndex >= existing.challenges.length) {
+    throw new Error(`Invalid challenge index: ${challengeIndex}`);
+  }
+
+  const challenge = existing.challenges[challengeIndex];
+
+  // Fetch "do not do" examples
+  const examples = await getPromptExamples(language, 20);
+
+  // Build the prompt
+  const prompt = buildPartialChallengePrompt(
+    challenge,
+    feedback,
+    language,
+    fieldsToRegenerate,
+    existing.trending_topics,
+    examples
+  );
+
+  return { prompt, examples };
+}
+
+/**
+ * Regenerate specific fields of a challenge within an existing Daily Buzz
+ * Uses admin feedback and partial field targeting
+ *
+ * @param date - Puzzle date (YYYY-MM-DD)
+ * @param language - Language code
+ * @param challengeIndex - Index of challenge to update (0-based)
+ * @param feedback - Admin feedback about what was wrong
+ * @param options - Partial regeneration options
+ * @returns Updated DailyBuzzData
+ */
+export async function regeneratePartialChallenge(
+  date: string,
+  language: string,
+  challengeIndex: number,
+  feedback: string,
+  options: PartialRegenerationOptions
+): Promise<DailyBuzzData> {
+  const { fields = ['all'], customPrompt } = options;
+  const isFullRegeneration = fields.includes('all');
+
+  console.log(`[BUZZ] ${isFullRegeneration ? 'Full' : 'Partial'} regeneration for challenge ${challengeIndex} (${date}/${language}), fields: ${fields.join(', ')}`);
+
+  // 1. Fetch existing challenge data
+  const existing = await getDailyBuzz(date, language);
+  if (!existing) {
+    throw new Error(`No challenge found for ${date} (${language})`);
+  }
+
+  if (challengeIndex < 0 || challengeIndex >= existing.challenges.length) {
+    throw new Error(`Invalid challenge index: ${challengeIndex}. Valid range: 0-${existing.challenges.length - 1}`);
+  }
+
+  const originalChallenge = existing.challenges[challengeIndex];
+  console.log(`[BUZZ] Original challenge: ${originalChallenge.type} - "${originalChallenge.answer}"`);
+
+  // 2. Build or use custom prompt
+  let regenerationPrompt: string;
+
+  if (customPrompt) {
+    regenerationPrompt = customPrompt;
+    console.log(`[BUZZ] Using custom prompt override`);
+  } else {
+    // Fetch "do not do" examples
+    const examples = await getPromptExamples(language, 20);
+
+    regenerationPrompt = buildPartialChallengePrompt(
+      originalChallenge,
+      feedback,
+      language,
+      fields,
+      existing.trending_topics,
+      examples
+    );
+  }
+
+  // 3. Generate via AI
+  const newChallenge = await generateSingleChallengeWithAI(regenerationPrompt);
+  console.log(`[BUZZ] New challenge generated: ${newChallenge.type} - "${newChallenge.answer}"`);
+
+  // 4. Validate the new challenge
+  if (!validateSingleChallenge(newChallenge, language)) {
+    throw new Error('Regenerated challenge failed validation - try different feedback');
+  }
+
+  // 5. For partial regeneration, merge with original (in case AI didn't preserve fields correctly)
+  let finalChallenge: BuzzChallenge;
+
+  if (isFullRegeneration) {
+    finalChallenge = newChallenge;
+  } else {
+    // Merge: keep original fields that weren't supposed to change
+    finalChallenge = {
+      ...originalChallenge, // Start with original
+      // Only override fields that were supposed to change
+      ...(fields.includes('prompt') ? { prompt: newChallenge.prompt } : {}),
+      ...(fields.includes('answer') ? { answer: newChallenge.answer } : {}),
+      ...(fields.includes('hint') ? { hint: newChallenge.hint } : {}),
+      ...(fields.includes('options') && newChallenge.options ? { options: newChallenge.options } : {}),
+    };
+  }
+
+  // 6. Replace in the challenges array
+  const updatedChallenges = [...existing.challenges];
+  updatedChallenges[challengeIndex] = finalChallenge;
+
+  // 7. Update in database
+  const updatedData: DailyBuzzData = {
+    ...existing,
+    challenges: updatedChallenges,
+  };
+
+  await storeDailyBuzz(updatedData);
+
+  console.log(`[BUZZ] Challenge ${challengeIndex} ${isFullRegeneration ? 'fully' : 'partially'} regenerated successfully`);
+  return updatedData;
+}
+
 // ==================== Database Functions ====================
 
 /**
