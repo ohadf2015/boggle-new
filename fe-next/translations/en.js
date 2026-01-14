@@ -1248,7 +1248,12 @@ const en = {
       "tapForDetails": "Tap for details"
     },
     "unlock": {
-      "title": "Skill Unlocked!"
+      "title": "Skill Unlocked!",
+      "firstWord": "First Word Found",
+      "diagonal": "Diagonal Movement Unlocked",
+      "directionChange": "Direction Changes Unlocked",
+      "targetScore": "50 Points Reached",
+      "fiveWords": "5 Words Found"
     },
     "viewProgress": "View Progress"
   },
@@ -2273,6 +2278,12 @@ const en = {
     "createChallengeFeature": {
       "title": "Create Custom Word Hunt Challenges",
       "subtitle": "Design your own puzzles and challenge friends",
+      "benefits": {
+        "customPuzzles": "Design puzzles with your own target words",
+        "chooseDifficulty": "Pick 5×5 or 7×7 grid difficulty",
+        "shareInstantly": "Share with a link - no app needed",
+        "trackResults": "See who beats your challenge"
+      },
       "ctaButton": "Sign Up to Start Creating",
       "socialProof": "Join thousands creating challenges"
     },

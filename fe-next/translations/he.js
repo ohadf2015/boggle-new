@@ -1254,7 +1254,12 @@ const he = {
       "tapForDetails": "הקש לפרטים"
     },
     "unlock": {
-      "title": "כישור נפתח!"
+      "title": "מיומנות נפתחה",
+      "firstWord": "המילה הראשונה נמצאה",
+      "diagonal": "תנועת אלכסון נפתחה",
+      "directionChange": "החלפות כיוון נפתחו",
+      "targetScore": "50 נקודות הושגו",
+      "fiveWords": "נמצאו 5 מילים"
     },
     "viewProgress": "צפה בהתקדמות"
   },
@@ -2251,6 +2256,18 @@ const he = {
     "more": "עוד",
     "shareImage": "שתף כתמונה",
     "shareImageHint": "שתפו את ההישג שלכם עם חברים!",
+    "createChallengeFeature": {
+      "title": "צרו אתגרי ציד מילים מותאמים אישית",
+      "subtitle": "עצבו חידות משלכם ואתגרו חברים",
+      "benefits": {
+        "customPuzzles": "עיצוב חידות עם מילות יעד משלכם",
+        "chooseDifficulty": "בחרו קושי: לוח 5×5 או 7×7",
+        "shareInstantly": "שתפו בקישור — בלי אפליקציה",
+        "trackResults": "ראו מי מנצח באתגר שלכם"
+      },
+      "ctaButton": "הירשמו והתחילו ליצור",
+      "socialProof": "הצטרפו לאלפים שיוצרים אתגרים"
+    },
     "download": "שמור כתמונה",
     "downloadImage": "שמור תמונה לשיתוף",
     "playingAs": "משחק בתור",
@@ -2270,12 +2287,6 @@ const he = {
     "guestModeNotice": "משחק כאורח",
     "guestModeBenefits": "הירשמו כדי לעקוב אחר התקדמות, לבנות רצף ולהתחרות בטבלאות",
     "createCustomChallenge": "צור אתגר משלך ושתף עם חברים",
-    "createChallengeFeature": {
-      "title": "צרו אתגרי ציד מילים מותאמים אישית",
-      "subtitle": "עצבו פאזלים משלכם ואתגרו חברים",
-      "ctaButton": "הירשמו כדי להתחיל ליצור",
-      "socialProof": "הצטרפו לאלפים היוצרים אתגרים"
-    },
     "createChallengeTitle": "יצירת אתגר",
     "chooseBoardSize": "בחרו גודל לוח",
     "generateChallenge": "ייצור אתגר",

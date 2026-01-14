@@ -1230,7 +1230,12 @@ const sv = {
       "tapForDetails": "Tryck för detaljer"
     },
     "unlock": {
-      "title": "Färdighet Upplåst!"
+      "title": "Färdighet upplåst",
+      "firstWord": "Första ordet hittat",
+      "diagonal": "Diagonalrörelse upplåst",
+      "directionChange": "Riktningsbyten upplåsta",
+      "targetScore": "50 poäng uppnådda",
+      "fiveWords": "5 ord hittade"
     },
     "viewProgress": "Se Framsteg"
   },
@@ -2241,6 +2246,18 @@ const sv = {
     "more": "mer",
     "shareImage": "Dela som bild",
     "shareImageHint": "Dela din prestation med vänner!",
+    "createChallengeFeature": {
+      "title": "Skapa egna ordjaktsutmaningar",
+      "subtitle": "Designa dina pussel och utmana vänner",
+      "benefits": {
+        "customPuzzles": "Skapa pussel med egna målord",
+        "chooseDifficulty": "Välj svårighet: 5×5 eller 7×7",
+        "shareInstantly": "Dela med länk – ingen app behövs",
+        "trackResults": "Se vem som klarar din utmaning"
+      },
+      "ctaButton": "Registrera dig och börja skapa",
+      "socialProof": "Gå med i tusentals som skapar utmaningar"
+    },
     "download": "Spara som bild",
     "downloadImage": "Spara delningsbild",
     "playingAs": "Spelar som",
@@ -2260,12 +2277,6 @@ const sv = {
     "guestModeNotice": "Spelar som gäst",
     "guestModeBenefits": "Registrera dig för att spåra framsteg, bygga serier och tävla på topplistor",
     "createCustomChallenge": "Skapa din egen utmaning & dela med vänner",
-    "createChallengeFeature": {
-      "title": "Skapa anpassade ordjakt-utmaningar",
-      "subtitle": "Designa dina egna pussel och utmana vänner",
-      "ctaButton": "Registrera dig för att börja skapa",
-      "socialProof": "Gå med tusentals som skapar utmaningar"
-    },
     "createChallengeTitle": "Skapa utmaning",
     "chooseBoardSize": "Välj brädstorlek",
     "generateChallenge": "Generera utmaning",

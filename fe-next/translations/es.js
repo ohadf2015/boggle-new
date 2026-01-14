@@ -1934,7 +1934,12 @@ const es = {
       "tapForDetails": "Toca para ver detalles"
     },
     "unlock": {
-      "title": "¡Habilidad Desbloqueada!"
+      "title": "Habilidad desbloqueada",
+      "firstWord": "Primera palabra encontrada",
+      "diagonal": "Movimiento diagonal desbloqueado",
+      "directionChange": "Cambios de dirección desbloqueados",
+      "targetScore": "50 puntos alcanzados",
+      "fiveWords": "5 palabras encontradas"
     },
     "viewProgress": "Ver Progreso"
   },
@@ -2226,6 +2231,18 @@ const es = {
     "shareImageHint": "¡Comparte tu logro con amigos!",
     "download": "Guardar como Imagen",
     "downloadImage": "Guardar imagen para compartir",
+    "createChallengeFeature": {
+      "title": "Crea desafíos de búsqueda de palabras personalizados",
+      "subtitle": "Diseña tus propios rompecabezas y reta a amigos",
+      "benefits": {
+        "customPuzzles": "Diseña rompecabezas con tus palabras objetivo",
+        "chooseDifficulty": "Elige dificultad 5×5 o 7×7",
+        "shareInstantly": "Comparte con un enlace, sin app",
+        "trackResults": "Ve quién supera tu desafío"
+      },
+      "ctaButton": "Regístrate para empezar a crear",
+      "socialProof": "Únete a miles creando desafíos"
+    },
     "playingAs": "Jugando como",
     "guestPlayer": "Jugador invitado",
     "enterName": "Ingresa tu nombre",
@@ -2243,12 +2260,6 @@ const es = {
     "guestModeNotice": "Jugando como invitado",
     "guestModeBenefits": "Regístrate para seguir tu progreso, crear rachas y competir en clasificaciones",
     "createCustomChallenge": "Crea tu Propio Desafío y Comparte con Amigos",
-    "createChallengeFeature": {
-      "title": "Crea Desafíos Personalizados de Caza de Palabras",
-      "subtitle": "Diseña tus propios rompecabezas y desafía a amigos",
-      "ctaButton": "Regístrate para Comenzar a Crear",
-      "socialProof": "Únete a miles creando desafíos"
-    },
     "createChallengeTitle": "Crear Desafío",
     "chooseBoardSize": "Elige el Tamaño del Tablero",
     "generateChallenge": "Generar Desafío",

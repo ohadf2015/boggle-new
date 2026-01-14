@@ -660,9 +660,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             <body className="antialiased screen-fit" suppressHydrationWarning>
                 {/* Google AdSense - defer loading to not compete with critical resources (LCP) */}
                 {/* Using afterInteractive strategy to ensure it loads after critical content */}
-                <Script
+                <script
+                    async
                     src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1896836706464880"
-                    strategy="afterInteractive"
                     crossOrigin="anonymous"
                 />
                 {/* Skip to main content link for keyboard/screen reader users */}

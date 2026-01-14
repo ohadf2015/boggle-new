@@ -1230,7 +1230,12 @@ const ja = {
       "tapForDetails": "タップして詳細を見る"
     },
     "unlock": {
-      "title": "スキル解放！"
+      "title": "スキルをアンロック",
+      "firstWord": "最初の単語を発見",
+      "diagonal": "斜め移動が解禁",
+      "directionChange": "方向変更が解禁",
+      "targetScore": "50点に到達",
+      "fiveWords": "5単語を見つけた"
     },
     "viewProgress": "進捗を見る"
   },
@@ -2218,6 +2223,18 @@ const ja = {
     "shareScore": "スコアをシェア",
     "copyToClipboard": "クリップボードにコピー",
     "copyLink": "リンクをコピー",
+    "createChallengeFeature": {
+      "title": "カスタム単語ハントのチャレンジを作成",
+      "subtitle": "自作パズルで友だちに挑戦しよう",
+      "benefits": {
+        "customPuzzles": "ターゲット単語を設定してパズルを作成",
+        "chooseDifficulty": "難易度を選択：5×5 または 7×7",
+        "shareInstantly": "リンクで即共有 — アプリ不要",
+        "trackResults": "誰があなたのチャレンジを突破したかを確認"
+      },
+      "ctaButton": "登録して作成を開始",
+      "socialProof": "何千人もの作成者に参加しよう"
+    },
     "copiedToClipboard": "コピーしました！",
     "home": "ホーム",
     "close": "閉じる",
@@ -2260,12 +2277,6 @@ const ja = {
     "guestModeNotice": "ゲストとしてプレイ中",
     "guestModeBenefits": "登録して進捗を追跡、連続記録を作成、ランキングに参加しましょう",
     "createCustomChallenge": "自分のチャレンジを作成して友達と共有",
-    "createChallengeFeature": {
-      "title": "カスタムワードハントチャレンジを作成",
-      "subtitle": "独自のパズルをデザインして友達に挑戦",
-      "ctaButton": "作成を開始するにはサインアップ",
-      "socialProof": "何千人もの人々が参加してチャレンジを作成中"
-    },
     "createChallengeTitle": "チャレンジを作成",
     "chooseBoardSize": "ボードサイズを選択",
     "generateChallenge": "チャレンジを生成",

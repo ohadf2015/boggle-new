@@ -162,6 +162,22 @@ function extractTFunctionCalls(filePath) {
     /\b(?:nameKey|description|label|title|message|text|placeholder|tooltip|header|buttonText|errorMessage|successMessage):\s*['"]([^'"]+)['"]/g,
   ];
 
+  // Heuristic: detect template literal t(`namespace.${var}`) cases and expand when possible
+  // Specifically handles patterns like: t(`daily.createChallengeFeature.benefits.${benefit.key}`)
+  const templatePattern = /\bt\(\s*`([^`]+)`\s*\)/g;
+  // Collect local arrays of the form: const benefits = [ { key: '...' }, ... ]
+  const benefitsArrayPattern = /const\s+benefits\s*=\s*\[\s*([\s\S]*?)\s*\]/m;
+  const objectKeyPattern = /\{\s*[^}]*?\bkey\s*:\s*['"]([^'"]+)['"][^}]*?\}/g;
+  let benefitsKeys = [];
+  const benefitsMatch = content.match(benefitsArrayPattern);
+  if (benefitsMatch) {
+    let m;
+    while ((m = objectKeyPattern.exec(benefitsMatch[1])) !== null) {
+      benefitsKeys.push(m[1]);
+    }
+    benefitsKeys = [...new Set(benefitsKeys)];
+  }
+
   for (let lineNum = 0; lineNum < lines.length; lineNum++) {
     const line = lines[lineNum];
 
@@ -193,6 +209,36 @@ function extractTFunctionCalls(filePath) {
           line: lineNum + 1,
           context: line.trim().substring(0, 100)
         });
+      }
+    }
+
+    // Handle template literals
+    templatePattern.lastIndex = 0;
+    let tpl;
+    while ((tpl = templatePattern.exec(line)) !== null) {
+      const raw = tpl[1];
+      // If there's no interpolation, treat as a normal key
+      if (!raw.includes('${')) {
+        calls.push({
+          key: raw,
+          file: path.relative(PROJECT_ROOT, filePath),
+          line: lineNum + 1,
+          context: line.trim().substring(0, 100)
+        });
+        continue;
+      }
+      // Expand known pattern for daily.createChallengeFeature.benefits.${benefit.key}
+      const prefixMatch = raw.match(/^(daily\.createChallengeFeature\.benefits\.)\$\{benefit\.key\}$/);
+      if (prefixMatch && benefitsKeys.length > 0) {
+        const prefix = prefixMatch[1];
+        for (const k of benefitsKeys) {
+          calls.push({
+            key: `${prefix}${k}`,
+            file: path.relative(PROJECT_ROOT, filePath),
+            line: lineNum + 1,
+            context: `template:${raw} -> ${prefix}${k}`.substring(0, 100)
+          });
+        }
       }
     }
   }
