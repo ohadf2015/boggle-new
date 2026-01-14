@@ -170,6 +170,9 @@ const ja = {
   "game": {
     "comboHint": "素早く単語を見つけてコンボ！"
   },
+  "countdown": {
+    "hint": "スワイプして単語を作ろう！"
+  },
   "help": {
     "title": "クイックヘルプ",
     "viewTutorial": "チュートリアルを見る",
@@ -243,7 +246,10 @@ const ja = {
     "autoStart": "30秒で自動開始",
     "startingIn": "開始まで...",
     "cancel": "キャンセル",
-    "waitingForPlayers": "2人以上必要..."
+    "waitingForPlayers": "2人以上必要...",
+    "easy": "かんたん",
+    "medium": "ふつう",
+    "hard": "むずかしい"
   },
   "music": {
     "musicVolume": "音楽",
@@ -745,7 +751,14 @@ const ja = {
     "swipeHintWithMin": "スワイプして単語を探そう！（{min}文字以上）",
     "longWordsLabel": "長い単語",
     "longWordsOnBoard": "ボード上の長い単語: {count}個",
-    "longWordsRemaining": "{found}/{total}発見"
+    "longWordsRemaining": "{found}/{total}発見",
+    "validation": {
+      "scanning": "単語をスキャン中...",
+      "checking": "辞書を確認中...",
+      "verifying": "AIで検証中...",
+      "scoring": "スコア計算中...",
+      "finalizing": "結果をまとめ中..."
+    }
   },
   "waiting": {
     "milestoneFirst": "最初のプレイヤー！",
@@ -942,7 +955,12 @@ const ja = {
   },
   "nextStep": {
     "backToLobby": "ロビーに戻る",
-    "letsGo": "レッツゴー!"
+    "letsGo": "レッツゴー!",
+    "challengeBotsAgain": "もう一度！",
+    "challengeBotsAgainDesc": "ボットと新しいゲームを開始"
+  },
+  "player": {
+    "new": "NEW"
   },
   "chart": {
     "yourProgress": "あなたの進捗",
@@ -2396,7 +2414,11 @@ const ja = {
       "chain": "チェーン",
       "spotOn": "ピタリ",
       "trio": "トリオ",
-      "wordle": "ワードル"
+      "wordle": "ワードル",
+      "definition_match": "定義",
+      "anagram": "アナグラム",
+      "riddle": "なぞなぞ",
+      "fill_blank": "空欄"
     },
     "wordle": {
       "instruction": "5文字の単語を当てよう",
@@ -2559,7 +2581,32 @@ const ja = {
     "shareMessage": {
       "header": "LexiClash ワードハント #{number}",
       "solvedIn": "{attempts}/10で解決",
-      "failedAttempt": "X/10 - 惜しい！"
+      "failedAttempt": "X/10 - 惜しい！",
+      "genius1": "楽勝！",
+      "genius2": "汗ひとつかかなかった",
+      "genius3": "これ、イージー？",
+      "genius4": "みんな、ひれ伏しな！",
+      "great1": "余裕でクリア！",
+      "great2": "気持ちいい！",
+      "great3": "今日はキレてる！",
+      "great4": "冴えてる！",
+      "good1": "よし、できた！",
+      "good2": "脳、まだ動く！",
+      "good3": "悪くない！",
+      "good4": "十分だね！",
+      "close1": "ギリギリすぎ！",
+      "close2": "すべり込みセーフ！",
+      "close3": "サバイバルモード起動！",
+      "close4": "ふぅ…！",
+      "fail1": "次こそ！",
+      "fail2": "明日は私の番！",
+      "fail3": "その単語、反則！",
+      "fail4": "盤面が悪い！",
+      "cta1": "もっと上手くできる？",
+      "cta2": "次はあなた。",
+      "cta3": "超えてみて。",
+      "cta4": "挑戦してみな。",
+      "cta5": "これを超えるのは難しいよ！"
     }
   },
   "keepPlaying": {
@@ -2816,10 +2863,20 @@ const ja = {
     },
     "domains": {
       "processingSpeed": "処理速度",
+      "processingSpeedDesc": "情報を処理して反応するスピード",
       "workingMemory": "ワーキングメモリ",
+      "workingMemoryDesc": "短時間で情報を保持し、処理する力",
       "attention": "注意力",
+      "attentionDesc": "集中して取り組み続ける力",
       "flexibility": "柔軟性",
-      "vocabulary": "語彙力"
+      "flexibilityDesc": "状況に応じて切り替え、適応する力",
+      "vocabulary": "語彙力",
+      "vocabularyDesc": "言葉の引き出しの多さと単語の取り出しやすさ"
+    },
+    "progress": {
+      "improving": "上昇中",
+      "declining": "下降中",
+      "stable": "安定"
     },
     "recommendation": {
       "title": "パーソナルアドバイス",

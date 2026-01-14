@@ -16,6 +16,8 @@ const MIN_TEXT_SIZE = 16;
 const WCAG_AA_CONTRAST = 4.5;
 const WCAG_AAA_CONTRAST = 7;
 
+type ThemeMode = 'dark' | 'light';
+
 interface ContrastIssue {
   element: string;
   foreground: string;
@@ -82,53 +84,123 @@ function getContrastRatio(color1: string, color2: string): number {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
+function toHexByte(value: number): string {
+  return Math.max(0, Math.min(255, Math.round(value))).toString(16).padStart(2, '0');
+}
+
+function rgbToHex(rgb: { r: number; g: number; b: number }): string {
+  return `#${toHexByte(rgb.r)}${toHexByte(rgb.g)}${toHexByte(rgb.b)}`;
+}
+
 async function checkContrast(page: Page): Promise<ContrastIssue[]> {
   const issues: ContrastIssue[] = [];
 
-  const elements = await page.locator('*').all();
-  
-  for (const element of elements.slice(0, 200)) {
+  const elements = await page
+    .locator('p, span, a, button, label, li, h1, h2, h3, h4, h5, h6, td, th, [role="button"]')
+    .all();
+
+  for (const element of elements.slice(0, 600)) {
     const isVisible = await element.isVisible().catch(() => false);
     if (!isVisible) continue;
 
     const styles = await element.evaluate((el) => {
+      type Rgba = { r: number; g: number; b: number; a: number };
+
+      const clamp255 = (n: number) => Math.max(0, Math.min(255, Math.round(n)));
+
+      const parseColor = (value: string | null): Rgba | null => {
+        if (!value) return null;
+        const rgbMatch = value.match(/^rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
+        if (rgbMatch) {
+          return {
+            r: clamp255(parseInt(rgbMatch[1], 10)),
+            g: clamp255(parseInt(rgbMatch[2], 10)),
+            b: clamp255(parseInt(rgbMatch[3], 10)),
+            a: 1,
+          };
+        }
+
+        const rgbaMatch = value.match(/^rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([0-9.]+)\s*\)$/i);
+        if (rgbaMatch) {
+          return {
+            r: clamp255(parseInt(rgbaMatch[1], 10)),
+            g: clamp255(parseInt(rgbaMatch[2], 10)),
+            b: clamp255(parseInt(rgbaMatch[3], 10)),
+            a: Math.max(0, Math.min(1, parseFloat(rgbaMatch[4]))),
+          };
+        }
+
+        return null;
+      };
+
+      const composite = (fg: Rgba, bg: Rgba): Rgba => {
+        const a = fg.a + bg.a * (1 - fg.a);
+        if (a === 0) return { r: 0, g: 0, b: 0, a: 0 };
+        const r = (fg.r * fg.a + bg.r * bg.a * (1 - fg.a)) / a;
+        const g = (fg.g * fg.a + bg.g * bg.a * (1 - fg.a)) / a;
+        const b = (fg.b * fg.a + bg.b * bg.a * (1 - fg.a)) / a;
+        return { r: clamp255(r), g: clamp255(g), b: clamp255(b), a };
+      };
+
+      const isEffectivelyTransparent = (rgba: Rgba | null): boolean => !rgba || rgba.a <= 0.001;
+
+      const effectiveBackground = (node: Element | null): Rgba => {
+        if (!node) return { r: 255, g: 255, b: 255, a: 1 };
+        const computed = window.getComputedStyle(node);
+        const bg = parseColor(computed.backgroundColor);
+        const parentBg = node.parentElement ? effectiveBackground(node.parentElement) : { r: 255, g: 255, b: 255, a: 1 };
+        if (isEffectivelyTransparent(bg)) return parentBg;
+        if (!bg) return parentBg;
+        if (bg.a >= 0.999) return { ...bg, a: 1 };
+        return { ...composite(bg, parentBg), a: 1 };
+      };
+
       const computed = window.getComputedStyle(el);
-      const text = el.textContent?.trim() || '';
+      const text = el.textContent?.replace(/\s+/g, ' ').trim() || '';
+      const fontSize = parseFloat(computed.fontSize);
+      const fg = parseColor(computed.color);
+      const bg = effectiveBackground(el);
+      const effectiveFg = fg && fg.a < 0.999 ? { ...composite(fg, bg), a: 1 } : fg ? { ...fg, a: 1 } : null;
+
       return {
-        color: computed.color,
-        backgroundColor: computed.backgroundColor,
-        fontSize: computed.fontSize,
         text,
+        fontSize,
+        fg: effectiveFg,
+        bg,
+        tag: el.tagName.toLowerCase(),
       };
     });
 
     if (!styles.text || styles.text.length < 2) continue;
-    if (parseFloat(styles.fontSize) < MIN_TEXT_SIZE) continue;
+    if (!styles.fg) continue;
+    if (styles.fontSize > 0 && styles.fontSize < MIN_TEXT_SIZE) continue;
 
-    const fgColor = styles.color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-    const bgColor = styles.backgroundColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-
-    if (!fgColor || !bgColor) continue;
-
-    const fgHex = `#${parseInt(fgColor[1]).toString(16).padStart(2, '0')}${parseInt(fgColor[2]).toString(16).padStart(2, '0')}${parseInt(fgColor[3]).toString(16).padStart(2, '0')}`;
-    const bgHex = `#${parseInt(bgColor[1]).toString(16).padStart(2, '0')}${parseInt(bgColor[2]).toString(16).padStart(2, '0')}${parseInt(bgColor[3]).toString(16).padStart(2, '0')}`;
-
+    const fgHex = rgbToHex(styles.fg);
+    const bgHex = rgbToHex(styles.bg);
     const contrast = getContrastRatio(fgHex, bgHex);
 
     if (contrast < WCAG_AA_CONTRAST) {
-      const tag = await element.evaluate((el) => el.tagName.toLowerCase());
-      const text = styles.text.substring(0, 30);
       issues.push({
-        element: `${tag}: "${text}"`,
+        element: `${styles.tag}: "${styles.text.substring(0, 30)}"`,
         foreground: fgHex,
         background: bgHex,
         contrast: Math.round(contrast * 100) / 100,
-        level: contrast < 3 ? 'FAIL' : 'AA',
+        level: 'FAIL',
       });
     }
   }
 
   return issues;
+}
+
+async function gotoWithTheme(page: Page, path: string, theme: ThemeMode): Promise<void> {
+  await page.goto(path);
+  await page.evaluate((t) => {
+    window.localStorage.setItem('boggle_theme', t);
+  }, theme);
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.waitForSelector('body');
+  await page.waitForTimeout(1500);
 }
 
 async function checkSmallElements(page: Page, viewportWidth: number, viewportHeight: number): Promise<SizeIssue[]> {
@@ -403,149 +475,152 @@ test.describe('UI Issues Detection', () => {
 
   for (const viewport of criticalViewports) {
     test.describe(`${viewport.name} (${viewport.width}x${viewport.height})`, () => {
-      test('Landing page - Check all issues', async ({ page }) => {
-        await page.setViewportSize({ width: viewport.width, height: viewport.height });
-        await page.goto('/en');
-        await page.waitForLoadState('networkidle');
-        await page.waitForTimeout(2000);
+      for (const theme of ['dark', 'light'] as const) {
+        test(`${theme} - Landing page - Check all issues`, async ({ page }) => {
+          await page.setViewportSize({ width: viewport.width, height: viewport.height });
+          await gotoWithTheme(page, '/en', theme);
 
-        const contrastIssues = await checkContrast(page);
-        const sizeIssues = await checkSmallElements(page, viewport.width, viewport.height);
-        const layoutIssues = await checkLayoutIssues(page, viewport.width, viewport.height);
-        const efficiencyIssues = await checkSizeEfficiency(page, viewport.width, viewport.height);
+          const contrastIssues = await checkContrast(page);
+          const sizeIssues = await checkSmallElements(page, viewport.width, viewport.height);
+          const layoutIssues = await checkLayoutIssues(page, viewport.width, viewport.height);
+          const efficiencyIssues = await checkSizeEfficiency(page, viewport.width, viewport.height);
 
-        console.log(`\n=== ${viewport.name} - Landing Page ===`);
-        console.log(`Contrast issues: ${contrastIssues.length}`);
-        console.log(`Small element issues: ${sizeIssues.length}`);
-        console.log(`Layout issues: ${layoutIssues.length}`);
-        console.log(`Size efficiency issues: ${efficiencyIssues.length}`);
+          console.log(`\n=== ${viewport.name} - ${theme} - Landing Page ===`);
+          console.log(`Contrast issues: ${contrastIssues.length}`);
+          console.log(`Small element issues: ${sizeIssues.length}`);
+          console.log(`Layout issues: ${layoutIssues.length}`);
+          console.log(`Size efficiency issues: ${efficiencyIssues.length}`);
 
-        if (contrastIssues.length > 0) {
-          console.log('\nContrast Issues:');
-          contrastIssues.slice(0, 10).forEach((issue) => {
-            console.log(`  - ${issue.element}: ${issue.contrast}:1 (${issue.level})`);
+          if (contrastIssues.length > 0) {
+            console.log('\nContrast Issues:');
+            contrastIssues.slice(0, 15).forEach((issue) => {
+              console.log(`  - ${issue.element}: ${issue.foreground} on ${issue.background} = ${issue.contrast}:1`);
+            });
+          }
+
+          if (sizeIssues.length > 0) {
+            console.log('\nSmall Element Issues:');
+            sizeIssues.slice(0, 10).forEach((issue) => {
+              console.log(`  - ${issue.element}: ${issue.type} ${issue.actualSize}px (min: ${issue.requiredSize}px)`);
+            });
+          }
+
+          if (layoutIssues.length > 0) {
+            console.log('\nLayout Issues:');
+            layoutIssues.slice(0, 10).forEach((issue) => {
+              console.log(`  - ${issue.element}: ${issue.type} - ${issue.details}`);
+            });
+          }
+
+          await page.screenshot({
+            path: `test-results/issues-${theme}-landing-${viewport.name.replace(/\s+/g, '-')}.png`,
+            fullPage: true,
           });
-        }
 
-        if (sizeIssues.length > 0) {
-          console.log('\nSmall Element Issues:');
-          sizeIssues.slice(0, 10).forEach((issue) => {
-            console.log(`  - ${issue.element}: ${issue.type} ${issue.actualSize}px (min: ${issue.requiredSize}px)`);
-          });
-        }
-
-        if (layoutIssues.length > 0) {
-          console.log('\nLayout Issues:');
-          layoutIssues.slice(0, 10).forEach((issue) => {
-            console.log(`  - ${issue.element}: ${issue.type} - ${issue.details}`);
-          });
-        }
-
-        await page.screenshot({
-          path: `test-results/issues-landing-${viewport.name.replace(/\s+/g, '-')}.png`,
-          fullPage: true,
+          expect(contrastIssues.length).toBe(0);
+          expect(sizeIssues.filter((i) => i.type === 'touch-target').length).toBeLessThan(5);
         });
 
-        expect(contrastIssues.filter((i) => i.level === 'FAIL').length).toBe(0);
-        expect(sizeIssues.filter((i) => i.type === 'touch-target').length).toBeLessThan(5);
-      });
+        test(`${theme} - Single Player Game - Check all issues`, async ({ page }) => {
+          await page.setViewportSize({ width: viewport.width, height: viewport.height });
+          await gotoWithTheme(page, '/en/singleplayer', theme);
 
-      test('Single Player Game - Check all issues', async ({ page }) => {
-        await page.setViewportSize({ width: viewport.width, height: viewport.height });
-        await page.goto('/en/singleplayer');
-        await page.waitForLoadState('networkidle');
-        await page.waitForTimeout(2000);
+          const startButton = page.locator('button:has-text("Start"), button:has-text("Start Game")').first();
+          const buttonVisible = await startButton.isVisible().catch(() => false);
 
-        const startButton = page.locator('button:has-text("Start"), button:has-text("Start Game")').first();
-        const buttonVisible = await startButton.isVisible().catch(() => false);
-        
-        if (buttonVisible) {
-          await startButton.click();
-          await page.waitForTimeout(3000);
-        }
+          if (buttonVisible) {
+            await startButton.click();
+            await page.waitForTimeout(3000);
+          }
 
-        const contrastIssues = await checkContrast(page);
-        const sizeIssues = await checkSmallElements(page, viewport.width, viewport.height);
-        const layoutIssues = await checkLayoutIssues(page, viewport.width, viewport.height);
-        const efficiencyIssues = await checkSizeEfficiency(page, viewport.width, viewport.height);
+          const contrastIssues = await checkContrast(page);
+          const sizeIssues = await checkSmallElements(page, viewport.width, viewport.height);
+          const layoutIssues = await checkLayoutIssues(page, viewport.width, viewport.height);
+          const efficiencyIssues = await checkSizeEfficiency(page, viewport.width, viewport.height);
 
-        console.log(`\n=== ${viewport.name} - Single Player Game ===`);
-        console.log(`Contrast issues: ${contrastIssues.length}`);
-        console.log(`Small element issues: ${sizeIssues.length}`);
-        console.log(`Layout issues: ${layoutIssues.length}`);
-        console.log(`Size efficiency issues: ${efficiencyIssues.length}`);
+          console.log(`\n=== ${viewport.name} - ${theme} - Single Player Game ===`);
+          console.log(`Contrast issues: ${contrastIssues.length}`);
+          console.log(`Small element issues: ${sizeIssues.length}`);
+          console.log(`Layout issues: ${layoutIssues.length}`);
+          console.log(`Size efficiency issues: ${efficiencyIssues.length}`);
 
-        if (contrastIssues.length > 0) {
-          console.log('\nContrast Issues:');
-          contrastIssues.slice(0, 10).forEach((issue) => {
-            console.log(`  - ${issue.element}: ${issue.contrast}:1 (${issue.level})`);
+          if (contrastIssues.length > 0) {
+            console.log('\nContrast Issues:');
+            contrastIssues.slice(0, 15).forEach((issue) => {
+              console.log(`  - ${issue.element}: ${issue.foreground} on ${issue.background} = ${issue.contrast}:1`);
+            });
+          }
+
+          if (sizeIssues.length > 0) {
+            console.log('\nSmall Element Issues:');
+            sizeIssues.slice(0, 10).forEach((issue) => {
+              console.log(`  - ${issue.element}: ${issue.type} ${issue.actualSize}px (min: ${issue.requiredSize}px)`);
+            });
+          }
+
+          if (layoutIssues.length > 0) {
+            console.log('\nLayout Issues:');
+            layoutIssues.slice(0, 10).forEach((issue) => {
+              console.log(`  - ${issue.element}: ${issue.type} - ${issue.details}`);
+            });
+          }
+
+          if (efficiencyIssues.length > 0) {
+            console.log('\nSize Efficiency Issues:');
+            efficiencyIssues.slice(0, 15).forEach((issue) => {
+              console.log(`  - ${issue.element}: ${issue.type}`);
+              console.log(`    Element: ${Math.round(issue.elementSize.width)}x${Math.round(issue.elementSize.height)}px`);
+              console.log(`    Content: ${Math.round(issue.contentSize.width)}x${Math.round(issue.contentSize.height)}px`);
+              console.log(`    Efficiency: ${Math.round(issue.efficiency)}%`);
+              console.log(`    ${issue.details}`);
+            });
+          }
+
+          await page.screenshot({
+            path: `test-results/issues-${theme}-game-${viewport.name.replace(/\s+/g, '-')}.png`,
+            fullPage: true,
           });
-        }
-
-        if (sizeIssues.length > 0) {
-          console.log('\nSmall Element Issues:');
-          sizeIssues.slice(0, 10).forEach((issue) => {
-            console.log(`  - ${issue.element}: ${issue.type} ${issue.actualSize}px (min: ${issue.requiredSize}px)`);
-          });
-        }
-
-        if (layoutIssues.length > 0) {
-          console.log('\nLayout Issues:');
-          layoutIssues.slice(0, 10).forEach((issue) => {
-            console.log(`  - ${issue.element}: ${issue.type} - ${issue.details}`);
-          });
-        }
-
-        if (efficiencyIssues.length > 0) {
-          console.log('\nSize Efficiency Issues:');
-          efficiencyIssues.slice(0, 15).forEach((issue) => {
-            console.log(`  - ${issue.element}: ${issue.type}`);
-            console.log(`    Element: ${Math.round(issue.elementSize.width)}x${Math.round(issue.elementSize.height)}px`);
-            console.log(`    Content: ${Math.round(issue.contentSize.width)}x${Math.round(issue.contentSize.height)}px`);
-            console.log(`    Efficiency: ${Math.round(issue.efficiency)}%`);
-            console.log(`    ${issue.details}`);
-          });
-        }
-
-        await page.screenshot({
-          path: `test-results/issues-game-${viewport.name.replace(/\s+/g, '-')}.png`,
-          fullPage: true,
         });
-      });
 
-      test('Multiplayer Lobby - Check all issues', async ({ page }) => {
-        await page.setViewportSize({ width: viewport.width, height: viewport.height });
-        await page.goto('/en/multiplayer');
-        await page.waitForLoadState('networkidle');
-        await page.waitForTimeout(2000);
+        test(`${theme} - Multiplayer Lobby - Check all issues`, async ({ page }) => {
+          await page.setViewportSize({ width: viewport.width, height: viewport.height });
+          await gotoWithTheme(page, '/en/multiplayer', theme);
 
-        const contrastIssues = await checkContrast(page);
-        const sizeIssues = await checkSmallElements(page, viewport.width, viewport.height);
-        const layoutIssues = await checkLayoutIssues(page, viewport.width, viewport.height);
-        const efficiencyIssues = await checkSizeEfficiency(page, viewport.width, viewport.height);
+          const contrastIssues = await checkContrast(page);
+          const sizeIssues = await checkSmallElements(page, viewport.width, viewport.height);
+          const layoutIssues = await checkLayoutIssues(page, viewport.width, viewport.height);
+          const efficiencyIssues = await checkSizeEfficiency(page, viewport.width, viewport.height);
 
-        console.log(`\n=== ${viewport.name} - Multiplayer Lobby ===`);
-        console.log(`Contrast issues: ${contrastIssues.length}`);
-        console.log(`Small element issues: ${sizeIssues.length}`);
-        console.log(`Layout issues: ${layoutIssues.length}`);
-        console.log(`Size efficiency issues: ${efficiencyIssues.length}`);
+          console.log(`\n=== ${viewport.name} - ${theme} - Multiplayer Lobby ===`);
+          console.log(`Contrast issues: ${contrastIssues.length}`);
+          console.log(`Small element issues: ${sizeIssues.length}`);
+          console.log(`Layout issues: ${layoutIssues.length}`);
+          console.log(`Size efficiency issues: ${efficiencyIssues.length}`);
 
-        if (efficiencyIssues.length > 0) {
-          console.log('\nSize Efficiency Issues:');
-          efficiencyIssues.slice(0, 15).forEach((issue) => {
-            console.log(`  - ${issue.element}: ${issue.type}`);
-            console.log(`    Element: ${Math.round(issue.elementSize.width)}x${Math.round(issue.elementSize.height)}px`);
-            console.log(`    Content: ${Math.round(issue.contentSize.width)}x${Math.round(issue.contentSize.height)}px`);
-            console.log(`    Efficiency: ${Math.round(issue.efficiency)}%`);
-            console.log(`    ${issue.details}`);
+          if (contrastIssues.length > 0) {
+            console.log('\nContrast Issues:');
+            contrastIssues.slice(0, 15).forEach((issue) => {
+              console.log(`  - ${issue.element}: ${issue.foreground} on ${issue.background} = ${issue.contrast}:1`);
+            });
+          }
+
+          if (efficiencyIssues.length > 0) {
+            console.log('\nSize Efficiency Issues:');
+            efficiencyIssues.slice(0, 15).forEach((issue) => {
+              console.log(`  - ${issue.element}: ${issue.type}`);
+              console.log(`    Element: ${Math.round(issue.elementSize.width)}x${Math.round(issue.elementSize.height)}px`);
+              console.log(`    Content: ${Math.round(issue.contentSize.width)}x${Math.round(issue.contentSize.height)}px`);
+              console.log(`    Efficiency: ${Math.round(issue.efficiency)}%`);
+              console.log(`    ${issue.details}`);
+            });
+          }
+
+          await page.screenshot({
+            path: `test-results/issues-${theme}-multiplayer-${viewport.name.replace(/\s+/g, '-')}.png`,
+            fullPage: true,
           });
-        }
-
-        await page.screenshot({
-          path: `test-results/issues-multiplayer-${viewport.name.replace(/\s+/g, '-')}.png`,
-          fullPage: true,
         });
-      });
+      }
     });
   }
 
@@ -571,53 +646,53 @@ test.describe('UI Issues Detection', () => {
         
         const allIssues: Record<string, any> = {};
 
-        for (const { path, name } of pages) {
-          try {
-            await page.goto(path);
-            await page.waitForLoadState('networkidle');
-            await page.waitForTimeout(2000);
+        for (const theme of ['dark', 'light'] as const) {
+          for (const { path, name } of pages) {
+            try {
+              await gotoWithTheme(page, path, theme);
 
-            const contrastIssues = await checkContrast(page);
-            const sizeIssues = await checkSmallElements(page, viewport.width, viewport.height);
-            const layoutIssues = await checkLayoutIssues(page, viewport.width, viewport.height);
-            const efficiencyIssues = await checkSizeEfficiency(page, viewport.width, viewport.height);
+              const contrastIssues = await checkContrast(page);
+              const sizeIssues = await checkSmallElements(page, viewport.width, viewport.height);
+              const layoutIssues = await checkLayoutIssues(page, viewport.width, viewport.height);
+              const efficiencyIssues = await checkSizeEfficiency(page, viewport.width, viewport.height);
 
-            allIssues[name] = {
-              contrast: contrastIssues,
-              size: sizeIssues,
-              layout: layoutIssues,
-              efficiency: efficiencyIssues,
-            };
+              allIssues[`${theme}-${name}`] = {
+                contrast: contrastIssues,
+                size: sizeIssues,
+                layout: layoutIssues,
+                efficiency: efficiencyIssues,
+              };
 
-            const hasHorizontalScroll = layoutIssues.some(issue => 
-              issue.type === 'viewport' && issue.details.includes('Horizontal scroll')
-            );
-
-            console.log(`\n=== ${viewport.name} - ${name} (${path}) ===`);
-            console.log(`Contrast issues: ${contrastIssues.length}`);
-            console.log(`Small element issues: ${sizeIssues.length}`);
-            console.log(`Layout issues: ${layoutIssues.length}`);
-            console.log(`Size efficiency issues: ${efficiencyIssues.length}`);
-            console.log(`Horizontal scroll: ${hasHorizontalScroll ? '⚠️ YES' : '✓ No'}`);
-
-            if (hasHorizontalScroll) {
-              console.warn(`⚠️  CRITICAL: Horizontal scroll detected on ${path}`);
-            }
-
-            if (sizeIssues.filter(i => i.type === 'touch-target').length > 0) {
-              console.warn(`⚠️  Small touch targets found:`, 
-                sizeIssues.filter(i => i.type === 'touch-target').slice(0, 5).map(i => 
-                  `${i.element} (${i.actualSize}px)`
-                )
+              const hasHorizontalScroll = layoutIssues.some(issue => 
+                issue.type === 'viewport' && issue.details.includes('Horizontal scroll')
               );
-            }
 
-            await page.screenshot({
-              path: `test-results/landscape-${viewport.name.replace(/\s+/g, '-')}-${name}.png`,
-              fullPage: true,
-            });
-          } catch (error) {
-            console.error(`Error testing ${path}:`, error);
+              console.log(`\n=== ${viewport.name} - ${theme} - ${name} (${path}) ===`);
+              console.log(`Contrast issues: ${contrastIssues.length}`);
+              console.log(`Small element issues: ${sizeIssues.length}`);
+              console.log(`Layout issues: ${layoutIssues.length}`);
+              console.log(`Size efficiency issues: ${efficiencyIssues.length}`);
+              console.log(`Horizontal scroll: ${hasHorizontalScroll ? '⚠️ YES' : '✓ No'}`);
+
+              if (hasHorizontalScroll) {
+                console.warn(`⚠️  CRITICAL: Horizontal scroll detected on ${path}`);
+              }
+
+              if (sizeIssues.filter(i => i.type === 'touch-target').length > 0) {
+                console.warn(`⚠️  Small touch targets found:`, 
+                  sizeIssues.filter(i => i.type === 'touch-target').slice(0, 5).map(i => 
+                    `${i.element} (${i.actualSize}px)`
+                  )
+                );
+              }
+
+              await page.screenshot({
+                path: `test-results/landscape-${theme}-${viewport.name.replace(/\s+/g, '-')}-${name}.png`,
+                fullPage: true,
+              });
+            } catch (error) {
+              console.error(`Error testing ${path}:`, error);
+            }
           }
         }
 
@@ -675,4 +750,3 @@ test.describe('UI Issues Detection', () => {
     });
   });
 });
-

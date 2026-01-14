@@ -170,6 +170,9 @@ const en = {
   "game": {
     "comboHint": "Find words fast for combo!"
   },
+  "countdown": {
+    "hint": "Swipe letters to form words!"
+  },
   "help": {
     "title": "Quick Help",
     "viewTutorial": "View Tutorial",

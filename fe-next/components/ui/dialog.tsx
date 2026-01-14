@@ -95,7 +95,7 @@ const DialogContent = React.forwardRef<
             w-11 h-11 sm:w-12 sm:h-12
             min-w-[44px] min-h-[44px]
             flex items-center justify-center
-            bg-neo-red text-neo-white
+            bg-neo-red text-neo-black
             border-2 sm:border-3 border-neo-black
             rounded-neo
             shadow-hard-sm
@@ -140,6 +140,7 @@ const DialogHeader = ({
         "flex flex-col space-y-1.5 p-4 sm:p-6 lg:p-8",
         bgClass,
         "border-b-3 border-neo-black",
+        "text-neo-black",
         "text-center",
         className
       )}
@@ -176,7 +177,6 @@ const DialogTitle = React.forwardRef<
     dir="auto"
     className={cn(
       "text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-tight",
-      "text-neo-black",
       className
     )}
     {...props}
@@ -194,7 +194,7 @@ const DialogDescription = React.forwardRef<
     ref={ref}
     dir="auto"
     className={cn(
-      "text-sm font-medium text-neo-black/70",
+      "text-sm font-medium text-current/80",
       className
     )}
     {...props}

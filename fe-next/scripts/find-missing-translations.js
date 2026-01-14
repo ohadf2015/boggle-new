@@ -12,6 +12,12 @@
 
 const fs = require('fs');
 const path = require('path');
+let ts = null;
+try {
+  ts = require('typescript');
+} catch (e) {
+  ts = null;
+}
 
 // Configuration
 const PROJECT_ROOT = path.resolve(__dirname, '..');
@@ -140,8 +146,135 @@ function getAllFiles(dir, files = []) {
   return files;
 }
 
+function getScriptKind(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  if (ext === '.tsx') return ts ? ts.ScriptKind.TSX : undefined;
+  if (ext === '.ts') return ts ? ts.ScriptKind.TS : undefined;
+  if (ext === '.jsx') return ts ? ts.ScriptKind.JSX : undefined;
+  if (ext === '.js') return ts ? ts.ScriptKind.JS : undefined;
+  return ts ? ts.ScriptKind.Unknown : undefined;
+}
+
+function extractTFunctionCallsWithTypeScript(filePath, content) {
+  if (!ts) return null;
+  if (!content.includes('t(') && !content.includes('`') && !content.includes('nameKey')) return null;
+
+  const indirectPropertyNames = new Set([
+    'nameKey',
+    'description',
+    'label',
+    'title',
+    'message',
+    'text',
+    'placeholder',
+    'tooltip',
+    'header',
+    'buttonText',
+    'errorMessage',
+    'successMessage',
+  ]);
+
+  const benefitsArrayPattern = /const\s+benefits\s*=\s*\[\s*([\s\S]*?)\s*\]/m;
+  const objectKeyPattern = /\{\s*[^}]*?\bkey\s*:\s*['"]([^'"]+)['"][^}]*?\}/g;
+  let benefitsKeys = [];
+  const benefitsMatch = content.match(benefitsArrayPattern);
+  if (benefitsMatch) {
+    let m;
+    while ((m = objectKeyPattern.exec(benefitsMatch[1])) !== null) {
+      benefitsKeys.push(m[1]);
+    }
+    benefitsKeys = [...new Set(benefitsKeys)];
+  }
+
+  const sourceFile = ts.createSourceFile(
+    filePath,
+    content,
+    ts.ScriptTarget.Latest,
+    true,
+    getScriptKind(filePath)
+  );
+
+  const calls = [];
+
+  function pushKey(key, node, context) {
+    if (!key) return;
+    if (key.includes('://') || key.startsWith('.') || key.endsWith('.')) return;
+    if (key.includes(' ') || key.startsWith('#') || key.startsWith('/') || key.includes('(')) return;
+    const pos = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile));
+    calls.push({
+      key,
+      file: path.relative(PROJECT_ROOT, filePath),
+      line: pos.line + 1,
+      context: (context || content.split('\n')[pos.line] || '').trim().substring(0, 100),
+    });
+  }
+
+  function getPropertyNameText(nameNode) {
+    if (!nameNode) return null;
+    if (ts.isIdentifier(nameNode)) return nameNode.text;
+    if (ts.isStringLiteral(nameNode) || ts.isNoSubstitutionTemplateLiteral(nameNode)) return nameNode.text;
+    return null;
+  }
+
+  function isTCallExpression(expr) {
+    if (ts.isIdentifier(expr)) return expr.text === 't';
+    if (ts.isPropertyAccessExpression(expr)) return expr.name?.text === 't';
+    return false;
+  }
+
+  function tryExtractKeyFromTemplateExpression(templateExpr, nodeForLocation) {
+    const headText = templateExpr.head.text;
+    if (!templateExpr.templateSpans?.length) return;
+    if (templateExpr.templateSpans.length !== 1) return;
+    const span = templateExpr.templateSpans[0];
+    const tailText = span.literal?.text ?? '';
+    if (tailText !== '') return;
+    const expr = span.expression;
+    if (
+      headText === 'daily.createChallengeFeature.benefits.' &&
+      ts.isPropertyAccessExpression(expr) &&
+      ts.isIdentifier(expr.expression) &&
+      expr.expression.text === 'benefit' &&
+      expr.name.text === 'key' &&
+      benefitsKeys.length > 0
+    ) {
+      for (const k of benefitsKeys) {
+        pushKey(`${headText}${k}`, nodeForLocation, `template:${headText}\${benefit.key} -> ${headText}${k}`);
+      }
+    }
+  }
+
+  function visit(node) {
+    if (ts.isCallExpression(node) && isTCallExpression(node.expression) && node.arguments?.length) {
+      const firstArg = node.arguments[0];
+      if (ts.isStringLiteral(firstArg) || ts.isNoSubstitutionTemplateLiteral(firstArg)) {
+        pushKey(firstArg.text, node);
+      } else if (ts.isTemplateExpression(firstArg)) {
+        tryExtractKeyFromTemplateExpression(firstArg, node);
+      }
+    }
+
+    if (ts.isPropertyAssignment(node)) {
+      const propName = getPropertyNameText(node.name);
+      if (propName && indirectPropertyNames.has(propName)) {
+        const init = node.initializer;
+        if (ts.isStringLiteral(init) || ts.isNoSubstitutionTemplateLiteral(init)) {
+          if (init.text.includes('.')) pushKey(init.text, node);
+        }
+      }
+    }
+
+    ts.forEachChild(node, visit);
+  }
+
+  visit(sourceFile);
+  return calls;
+}
+
 function extractTFunctionCalls(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8');
+  const astCalls = extractTFunctionCallsWithTypeScript(filePath, content);
+  if (astCalls && astCalls.length > 0) return astCalls;
   const lines = content.split('\n');
   const calls = [];
 

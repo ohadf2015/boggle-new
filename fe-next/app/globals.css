@@ -228,11 +228,11 @@
 
   --button-secondary: var(--neo-pink);
   --button-secondary-hover: var(--neo-pink-light);
-  --button-secondary-text: rgb(var(--neo-white));
+  --button-secondary-text: rgb(var(--neo-black));
 
   --button-destructive: var(--neo-red);
   --button-destructive-hover: #dc2626;
-  --button-destructive-text: rgb(var(--neo-white));
+  --button-destructive-text: rgb(var(--neo-black));
 
   --button-success: var(--neo-lime);
   --button-success-hover: #84cc16;
@@ -246,7 +246,7 @@
   --badge-warning-text: rgb(var(--neo-black));
 
   --badge-error: var(--neo-red);
-  --badge-error-text: rgb(var(--neo-white));
+  --badge-error-text: rgb(var(--neo-black));
 
   --badge-success: var(--neo-lime);
   --badge-success-text: rgb(var(--neo-black));
@@ -270,13 +270,13 @@
   --primary: var(--neo-yellow);
   --primary-foreground: rgb(var(--neo-black));
   --secondary: var(--neo-pink);
-  --secondary-foreground: rgb(var(--neo-white));
+  --secondary-foreground: rgb(var(--neo-black));
   --muted: #e2e8f0;
   --muted-foreground: #475569;
   --accent: var(--neo-pink);
-  --accent-foreground: rgb(var(--neo-white));
+  --accent-foreground: rgb(var(--neo-black));
   --destructive: var(--neo-red);
-  --destructive-foreground: rgb(var(--neo-white));
+  --destructive-foreground: rgb(var(--neo-black));
   --border: rgb(var(--neo-black));
   --input: #e2e8f0;
   --ring: var(--neo-cyan);

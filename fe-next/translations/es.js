@@ -170,6 +170,9 @@ const es = {
   "game": {
     "comboHint": "¡Rápido! Encadena palabras"
   },
+  "countdown": {
+    "hint": "¡Desliza letras para formar palabras!"
+  },
   "help": {
     "title": "Ayuda Rápida",
     "viewTutorial": "Ver Tutorial",
@@ -243,7 +246,10 @@ const es = {
     "autoStart": "Auto-iniciar en 30s",
     "startingIn": "Comenzando en...",
     "cancel": "Cancelar",
-    "waitingForPlayers": "Necesitas 2+ jugadores..."
+    "waitingForPlayers": "Necesitas 2+ jugadores...",
+    "easy": "Fácil",
+    "medium": "Medio",
+    "hard": "Difícil"
   },
   "music": {
     "musicVolume": "Música",
@@ -742,7 +748,14 @@ const es = {
     "swipeHintWithMin": "¡Desliza letras para encontrar palabras! (mín {min} letras)",
     "longWordsLabel": "Palabras largas",
     "longWordsOnBoard": "{count} palabras largas en el tablero",
-    "longWordsRemaining": "{found}/{total} encontradas"
+    "longWordsRemaining": "{found}/{total} encontradas",
+    "validation": {
+      "scanning": "Escaneando palabras...",
+      "checking": "Revisando el diccionario...",
+      "verifying": "Verificando con IA...",
+      "scoring": "Calculando puntajes...",
+      "finalizing": "Finalizando resultados..."
+    }
   },
   "waiting": {
     "milestoneFirst": "¡Primer jugador!",
@@ -895,7 +908,12 @@ const es = {
   },
   "nextStep": {
     "backToLobby": "Volver al Lobby",
-    "letsGo": "¡Vamos!"
+    "letsGo": "¡Vamos!",
+    "challengeBotsAgain": "¡Jugar otra vez!",
+    "challengeBotsAgainDesc": "Inicia una nueva partida con bots"
+  },
+  "player": {
+    "new": "NUEVO"
   },
   "chart": {
     "yourProgress": "Tu Progreso",
@@ -2354,7 +2372,11 @@ const es = {
       "chain": "CADENA",
       "spotOn": "ADIVINA",
       "trio": "TRÍO",
-      "wordle": "WORDLE"
+      "wordle": "WORDLE",
+      "definition_match": "DEFINICIÓN",
+      "anagram": "ANAGRAMA",
+      "riddle": "ACERTIJO",
+      "fill_blank": "LLENA EL HUECO"
     },
     "wordle": {
       "instruction": "Adivina la palabra de 5 letras",
@@ -2556,7 +2578,32 @@ const es = {
     "shareMessage": {
       "header": "LexiClash Caza de Palabras #{number}",
       "solvedIn": "Resuelto en {attempts}/10",
-      "failedAttempt": "X/10 - ¡tan cerca!"
+      "failedAttempt": "X/10 - ¡tan cerca!",
+      "genius1": "¡Demasiado fácil!",
+      "genius2": "Ni sudé",
+      "genius3": "¿Esto está en modo fácil?",
+      "genius4": "¡Inclínense, mortales!",
+      "great1": "¡Lo reventé!",
+      "great2": "Qué satisfactorio",
+      "great3": "Hoy estoy fino",
+      "great4": "¡Me siento afilado!",
+      "good1": "¡Listo!",
+      "good2": "¡El cerebro sigue funcionando!",
+      "good3": "¡Nada mal!",
+      "good4": "¡Sirve!",
+      "close1": "¡Fue DEMASIADO justo!",
+      "close2": "¡Por los pelos!",
+      "close3": "Modo supervivencia: activado",
+      "close4": "¡Uf!",
+      "fail1": "¡La próxima!",
+      "fail2": "¡Mañana es mío!",
+      "fail3": "¡Esa palabra era injusta!",
+      "fail4": "¡Mal tablero!",
+      "cta1": "¿Crees que puedes hacerlo mejor?",
+      "cta2": "Tu turno.",
+      "cta3": "Supéralo.",
+      "cta4": "A ver si te animas.",
+      "cta5": "¡Suerte superando esto!"
     }
   },
   "keepPlaying": {
@@ -2813,10 +2860,20 @@ const es = {
     },
     "domains": {
       "processingSpeed": "Velocidad de Procesamiento",
+      "processingSpeedDesc": "Qué tan rápido tu cerebro procesa información y reacciona",
       "workingMemory": "Memoria de Trabajo",
+      "workingMemoryDesc": "Capacidad de mantener y procesar información a corto plazo",
       "attention": "Atención",
+      "attentionDesc": "Capacidad de enfocarte y mantenerte alerta durante tareas",
       "flexibility": "Flexibilidad",
-      "vocabulary": "Vocabulario"
+      "flexibilityDesc": "Capacidad de adaptarte y cambiar entre tareas",
+      "vocabulary": "Vocabulario",
+      "vocabularyDesc": "Riqueza del vocabulario y facilidad para encontrar palabras"
+    },
+    "progress": {
+      "improving": "Mejorando",
+      "declining": "Bajando",
+      "stable": "Estable"
     },
     "recommendation": {
       "title": "Consejo Personalizado",

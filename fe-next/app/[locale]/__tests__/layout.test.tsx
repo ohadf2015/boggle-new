@@ -1,5 +1,4 @@
 import { render } from '@testing-library/react';
-import LocaleLayout from '../layout';
 
 // Mock next/dynamic
 jest.mock('next/dynamic', () => ({
@@ -71,11 +70,13 @@ jest.mock('../../fonts', () => ({
 
 describe('LocaleLayout Hydration', () => {
     it('should not cause hydration mismatch with AdSense script', async () => {
+        const LocaleLayout = (await import('../layout')).default;
+
         // Spy on console.error to catch React hydration warnings
         const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
 
         const params = Promise.resolve({ locale: 'en' });
-        const { container } = render(
+        render(
             await LocaleLayout({
                 children: <div>Test Content</div>,
                 params,
@@ -83,7 +84,7 @@ describe('LocaleLayout Hydration', () => {
         );
 
         // Check that body contains script tags (Next.js Script renders in body)
-        const scripts = container.querySelectorAll('script');
+        const scripts = document.querySelectorAll('script');
 
         // Verify AdSense script is present and properly configured
         const adsenseScript = Array.from(scripts).find(s =>

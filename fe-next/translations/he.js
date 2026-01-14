@@ -170,6 +170,9 @@ const he = {
   "game": {
     "comboHint": "מצא מילים מהר לקומבו!"
   },
+  "countdown": {
+    "hint": "גררו אותיות כדי ליצור מילים!"
+  },
   "help": {
     "title": "עזרה מהירה",
     "viewTutorial": "צפה במדריך",

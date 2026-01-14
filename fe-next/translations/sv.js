@@ -170,6 +170,9 @@ const sv = {
   "game": {
     "comboHint": "Hitta ord snabbt för kombo!"
   },
+  "countdown": {
+    "hint": "Svep bokstäver för att bilda ord!"
+  },
   "help": {
     "title": "Snabbhjälp",
     "viewTutorial": "Visa handledning",
@@ -243,7 +246,10 @@ const sv = {
     "autoStart": "Auto-start om 30s",
     "startingIn": "Startar om...",
     "cancel": "Avbryt",
-    "waitingForPlayers": "Behöver 2+ spelare..."
+    "waitingForPlayers": "Behöver 2+ spelare...",
+    "easy": "Lätt",
+    "medium": "Medel",
+    "hard": "Svår"
   },
   "music": {
     "musicVolume": "Musik",
@@ -745,7 +751,14 @@ const sv = {
     "swipeHintWithMin": "Svep bokstäver för att hitta ord! (minst {min} bokstäver)",
     "longWordsLabel": "Långa ord",
     "longWordsOnBoard": "{count} långa ord på brädan",
-    "longWordsRemaining": "{found}/{total} hittade"
+    "longWordsRemaining": "{found}/{total} hittade",
+    "validation": {
+      "scanning": "Skannar ord...",
+      "checking": "Kollar ordbok...",
+      "verifying": "Verifierar med AI...",
+      "scoring": "Räknar poäng...",
+      "finalizing": "Slutför resultat..."
+    }
   },
   "waiting": {
     "milestoneFirst": "Första spelaren!",
@@ -942,7 +955,12 @@ const sv = {
   },
   "nextStep": {
     "backToLobby": "Tillbaka till Lobbyn",
-    "letsGo": "Kör!"
+    "letsGo": "Kör!",
+    "challengeBotsAgain": "Spela igen!",
+    "challengeBotsAgainDesc": "Starta en ny match med bottar"
+  },
+  "player": {
+    "new": "NY"
   },
   "chart": {
     "yourProgress": "Din Utveckling",
@@ -2396,7 +2414,11 @@ const sv = {
       "chain": "KEDJA",
       "spotOn": "RÄTT PÅ",
       "trio": "TRIO",
-      "wordle": "WORDLE"
+      "wordle": "WORDLE",
+      "definition_match": "DEFINITION",
+      "anagram": "ANAGRAM",
+      "riddle": "GÅTA",
+      "fill_blank": "FYLL LUCKAN"
     },
     "wordle": {
       "instruction": "Gissa ordet på 5 bokstäver",
@@ -2559,7 +2581,32 @@ const sv = {
     "shareMessage": {
       "header": "LexiClash Ordjakt #{number}",
       "solvedIn": "Löst på {attempts}/10",
-      "failedAttempt": "X/10 - så nära!"
+      "failedAttempt": "X/10 - så nära!",
+      "genius1": "För lätt!",
+      "genius2": "Svettades knappt",
+      "genius3": "Är det här easy mode?",
+      "genius4": "Buga er, dödliga!",
+      "great1": "Krossade det!",
+      "great2": "Det där satt fint",
+      "great3": "På topp idag!",
+      "great4": "Känner mig skarp!",
+      "good1": "Klart!",
+      "good2": "Hjärnan funkar fortfarande!",
+      "good3": "Inte illa!",
+      "good4": "Det duger!",
+      "close1": "Det var SJUKT nära!",
+      "close2": "Klarade mig med nöd och näppe!",
+      "close3": "Överlevnadsläge: aktiverat!",
+      "close4": "Puh!",
+      "fail1": "Nästa gång!",
+      "fail2": "Imorgon är min!",
+      "fail3": "Det ordet var orättvist!",
+      "fail4": "Dålig bräda!",
+      "cta1": "Tror du att du kan bättre?",
+      "cta2": "Din tur.",
+      "cta3": "Slå det.",
+      "cta4": "Jag vågar dig.",
+      "cta5": "Lycka till att toppa det här!"
     }
   },
   "keepPlaying": {
@@ -2816,10 +2863,20 @@ const sv = {
     },
     "domains": {
       "processingSpeed": "Bearbetningshastighet",
+      "processingSpeedDesc": "Hur snabbt din hjärna bearbetar information och reagerar",
       "workingMemory": "Arbetsminne",
+      "workingMemoryDesc": "Förmågan att hålla och bearbeta information på kort sikt",
       "attention": "Uppmärksamhet",
+      "attentionDesc": "Förmågan att fokusera och vara alert under uppgifter",
       "flexibility": "Flexibilitet",
-      "vocabulary": "Ordförråd"
+      "flexibilityDesc": "Förmågan att anpassa sig och växla mellan olika uppgifter",
+      "vocabulary": "Ordförråd",
+      "vocabularyDesc": "Bredden i ditt ordförråd och hur lätt du hittar ord"
+    },
+    "progress": {
+      "improving": "Förbättras",
+      "declining": "Sjunker",
+      "stable": "Stabil"
     },
     "recommendation": {
       "title": "Personligt tips",

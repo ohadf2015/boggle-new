@@ -449,8 +449,9 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                 {/* Submit Button */}
                 <Button
                   type="submit"
+                  variant="secondary"
                   disabled={isAnyLoading || !email || !password || !!emailError || !!passwordError}
-                  className="w-full py-3 bg-neo-pink hover:bg-neo-pink/90 text-white border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full"
                 >
                   {isLoading === 'email' ? (
                     <NeoLoader variant="dots" size="sm" />
