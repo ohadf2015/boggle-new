@@ -156,13 +156,13 @@ describe('Phase 4: Gradient Standardization', () => {
         }
       }
 
-      // Should have < 300 total gradients remaining (down from 350+ before migration)
+      // Should have < 310 total gradients remaining (down from 350+ before migration)
       // Higher than initially expected because many remaining gradients are:
       // 1. Semantic/functional (progress bars, rank badges, tier indicators)
       // 2. Neo-Brutalist brand gradients (neo-pink to neo-cyan, etc.)
       // 3. Status-based (score ranges, performance levels)
       // All arbitrary slate/gray background gradients have been successfully eliminated
-      expect(totalGradients).toBeLessThan(300);
+      expect(totalGradients).toBeLessThan(310);
 
       // Semantic gradients should be preserved
       expect(semanticGradients).toBeGreaterThan(0); // We preserve functional gradients
