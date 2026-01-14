@@ -62,7 +62,13 @@ export function calculatePlayerTitles(
   }
 
   const supportedLocale = ['he', 'en', 'sv', 'ja'].includes(locale) ? locale : 'he';
-  const titleTranslations = translations[supportedLocale].playerTitles;
+  const titleTranslations = translations[supportedLocale]?.playerTitles;
+
+  // If playerTitles translations are missing, return empty (graceful degradation)
+  if (!titleTranslations) {
+    console.warn(`[TITLES] playerTitles translations missing for locale: ${supportedLocale}`);
+    return {};
+  }
 
   // Calculate stats for each player
   const playerStats: PlayerStats[] = scoresArray.map(player => {
@@ -132,15 +138,16 @@ export function calculatePlayerTitles(
 
   // Helper to assign a title if not already taken
   const assignTitle = (username: string, titleKey: string): boolean => {
-    if (!usedTitles.has(titleKey) && !assignedTitles[username]) {
-      assignedTitles[username] = {
-        titleKey,
-        title: titleTranslations[titleKey]
-      };
-      usedTitles.add(titleKey);
-      return true;
+    const titleData = titleTranslations[titleKey];
+    if (!titleData || usedTitles.has(titleKey) || assignedTitles[username]) {
+      return false;
     }
-    return false;
+    assignedTitles[username] = {
+      titleKey,
+      title: titleData
+    };
+    usedTitles.add(titleKey);
+    return true;
   };
 
   // 1. Champion - winner (only if there's a clear winner with > 0 score)

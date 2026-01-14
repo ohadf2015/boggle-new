@@ -243,7 +243,10 @@ const en = {
     "autoStart": "Auto-starts in 30s",
     "startingIn": "Starting...",
     "cancel": "Cancel",
-    "waitingForPlayers": "Need 2+ to start..."
+    "waitingForPlayers": "Need 2+ to start...",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
   },
   "music": {
     "musicVolume": "Music",
@@ -748,7 +751,14 @@ const en = {
     "submittingTooFast": "You're submitting words too fast",
     "words": "Words",
     "invalidWord": "Invalid word",
-    "pendingValidation": "Being checked..."
+    "pendingValidation": "Being checked...",
+    "validation": {
+      "scanning": "Scanning words...",
+      "checking": "Checking dictionary...",
+      "verifying": "Verifying with AI...",
+      "scoring": "Calculating scores...",
+      "finalizing": "Finalizing results..."
+    }
   },
   "waiting": {
     "milestoneFirst": "First player!",
@@ -945,7 +955,12 @@ const en = {
   },
   "nextStep": {
     "backToLobby": "Back to Lobby",
-    "letsGo": "Let's Go!"
+    "letsGo": "Let's Go!",
+    "challengeBotsAgain": "Play Again!",
+    "challengeBotsAgainDesc": "Start a new game with bots"
+  },
+  "player": {
+    "new": "NEW"
   },
   "chart": {
     "yourProgress": "Progress",
@@ -987,6 +1002,68 @@ const en = {
     "trailblazer": "The Trailblazer",
     "trailblazerDesc": "Goes for the big wins"
   },
+  "playerTitles": {
+    "champion": {
+      "name": "Champion",
+      "icon": "👑",
+      "description": "Winner of the game"
+    },
+    "perfectionist": {
+      "name": "Perfectionist",
+      "icon": "✨",
+      "description": "Highest accuracy - all valid words"
+    },
+    "speedster": {
+      "name": "Speed Demon",
+      "icon": "⚡",
+      "description": "Fastest words per minute"
+    },
+    "wordsmith": {
+      "name": "Wordsmith",
+      "icon": "📝",
+      "description": "Found the most words"
+    },
+    "scholar": {
+      "name": "Scholar",
+      "icon": "🎓",
+      "description": "Found the longest word"
+    },
+    "explorer": {
+      "name": "Explorer",
+      "icon": "🧭",
+      "description": "Most diverse word lengths"
+    },
+    "sniper": {
+      "name": "Sniper",
+      "icon": "🎯",
+      "description": "Best accuracy (fewer invalid words)"
+    },
+    "comboMaster": {
+      "name": "Combo Master",
+      "icon": "🔥",
+      "description": "Highest combo bonus earned"
+    },
+    "earlyBird": {
+      "name": "Early Bird",
+      "icon": "🐦",
+      "description": "Most words in the first minute"
+    },
+    "clutchPlayer": {
+      "name": "Clutch Player",
+      "icon": "⏰",
+      "description": "Most words in final 30 seconds"
+    },
+    "bigWordHunter": {
+      "name": "Big Word Hunter",
+      "icon": "🦁",
+      "description": "Most 6+ letter words"
+    },
+    "consistentPlayer": {
+      "name": "Steady Eddie",
+      "icon": "📊",
+      "description": "Most consistent word submissions"
+    }
+  },
   "scorePage": {
     "pts": "pts"
   },
@@ -1007,6 +1084,11 @@ const en = {
       "examples": "Example Achievements"
     },
     "tipsTitle": "Pro Tips",
+    "tips": {
+      "tip1": "Start with short words to build momentum!",
+      "tip2": "Swipe diagonally for more letter combinations!",
+      "tip4": "Long words score exponentially more points!"
+    },
     "letters": "letters",
     "pts": "pts",
     "steps": {
@@ -1115,6 +1197,11 @@ const en = {
       "subtitle": "A quick training will help you master the controls!",
       "demoHint": "Swipe in any direction - even diagonally!",
       "benefitsTitle": "Training helps you:",
+      "benefits": {
+        "learnControls": "Learn the swipe controls",
+        "masterDirections": "Master all 8 directions",
+        "noPressure": "Practice without time pressure"
+      },
       "returnNote": "After training, you'll be ready for the real challenge!",
       "startTraining": "Start Training",
       "skipAnyway": "Skip, I know how to play",
@@ -2296,7 +2383,11 @@ const en = {
       "chain": "CHAIN",
       "spotOn": "SPOT ON",
       "trio": "TRIO",
-      "wordle": "WORDLE"
+      "wordle": "WORDLE",
+      "definition_match": "DEFINITION",
+      "anagram": "ANAGRAM",
+      "riddle": "RIDDLE",
+      "fill_blank": "FILL BLANK"
     },
     "wordle": {
       "instruction": "Guess the 5-letter word",
@@ -2479,7 +2570,32 @@ const en = {
     "shareMessage": {
       "header": "LexiClash Word Hunt #{number}",
       "solvedIn": "Solved in {attempts}/10",
-      "failedAttempt": "X/10 - so close!"
+      "failedAttempt": "X/10 - so close!",
+      "genius1": "Too easy!",
+      "genius2": "Didn't even break a sweat",
+      "genius3": "Is this thing on easy mode?",
+      "genius4": "Bow down, peasants!",
+      "great1": "Crushed it!",
+      "great2": "That was satisfying",
+      "great3": "On point today!",
+      "great4": "Feeling sharp!",
+      "good1": "Got there!",
+      "good2": "Brain still works!",
+      "good3": "Not bad!",
+      "good4": "That'll do!",
+      "close1": "That was TOO close!",
+      "close2": "Squeaked through!",
+      "close3": "Survival mode: activated!",
+      "close4": "Phew!",
+      "fail1": "Next time!",
+      "fail2": "Tomorrow's mine!",
+      "fail3": "This word was unfair!",
+      "fail4": "Bad board!",
+      "cta1": "Think you can do better?",
+      "cta2": "Your turn.",
+      "cta3": "Beat that.",
+      "cta4": "I dare you to try.",
+      "cta5": "Good luck topping this!"
     }
   },
   "keepPlaying": {
@@ -2736,10 +2852,20 @@ const en = {
     },
     "domains": {
       "processingSpeed": "Processing Speed",
+      "processingSpeedDesc": "How quickly your brain processes information and reacts",
       "workingMemory": "Working Memory",
+      "workingMemoryDesc": "Ability to hold and process information in the short term",
       "attention": "Attention",
+      "attentionDesc": "Ability to focus and stay alert during tasks",
       "flexibility": "Flexibility",
-      "vocabulary": "Vocabulary"
+      "flexibilityDesc": "Ability to adapt and switch between different tasks",
+      "vocabulary": "Vocabulary",
+      "vocabularyDesc": "Richness of vocabulary and word retrieval ability"
+    },
+    "progress": {
+      "improving": "Improving",
+      "declining": "Declining",
+      "stable": "Stable"
     },
     "recommendation": {
       "title": "Recommended For You",

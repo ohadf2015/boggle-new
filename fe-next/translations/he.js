@@ -243,7 +243,10 @@ const he = {
     "autoStart": "התחלה אוטומטית ב-30 שניות",
     "startingIn": "מתחיל בעוד...",
     "cancel": "ביטול",
-    "waitingForPlayers": "צריך 2+ שחקנים..."
+    "waitingForPlayers": "צריך 2+ שחקנים...",
+    "easy": "קל",
+    "medium": "בינוני",
+    "hard": "קשה"
   },
   "music": {
     "musicVolume": "מוזיקה",
@@ -754,7 +757,14 @@ const he = {
     "swipeHintWithMin": "החליקו על אותיות למציאת מילים! (מינימום {min} אותיות)",
     "longWordsLabel": "מילים ארוכות",
     "longWordsOnBoard": "{count} מילים ארוכות על הלוח",
-    "longWordsRemaining": "{found}/{total} נמצאו"
+    "longWordsRemaining": "{found}/{total} נמצאו",
+    "validation": {
+      "scanning": "סורק מילים...",
+      "checking": "בודק במילון...",
+      "verifying": "מאמת עם AI...",
+      "scoring": "מחשב ניקוד...",
+      "finalizing": "מסיים את התוצאות..."
+    }
   },
   "waiting": {
     "milestoneFirst": "שחקן ראשון!",
@@ -951,7 +961,12 @@ const he = {
   },
   "nextStep": {
     "backToLobby": "חזרה ללובי",
-    "letsGo": "יאללה!"
+    "letsGo": "יאללה!",
+    "challengeBotsAgain": "שחק שוב!",
+    "challengeBotsAgainDesc": "התחל משחק חדש עם בוטים"
+  },
+  "player": {
+    "new": "חדש"
   },
   "chart": {
     "yourProgress": "ההתקדמות שלך",
@@ -993,6 +1008,68 @@ const he = {
     "trailblazer": "הפורץ דרך",
     "trailblazerDesc": "שואף לניצחונות גדולים"
   },
+  "playerTitles": {
+    "champion": {
+      "name": "אלוף",
+      "icon": "👑",
+      "description": "מנצח המשחק"
+    },
+    "perfectionist": {
+      "name": "פרפקציוניסט",
+      "icon": "✨",
+      "description": "דיוק מושלם - כל המילים תקינות"
+    },
+    "speedster": {
+      "name": "שד מהירות",
+      "icon": "⚡",
+      "description": "הכי הרבה מילים לדקה"
+    },
+    "wordsmith": {
+      "name": "צורף מילים",
+      "icon": "📝",
+      "description": "מצא הכי הרבה מילים"
+    },
+    "scholar": {
+      "name": "למדן",
+      "icon": "🎓",
+      "description": "מצא את המילה הארוכה ביותר"
+    },
+    "explorer": {
+      "name": "מגלה",
+      "icon": "🧭",
+      "description": "מגוון אורכי מילים"
+    },
+    "sniper": {
+      "name": "צלף",
+      "icon": "🎯",
+      "description": "דיוק גבוה (פחות שגיאות)"
+    },
+    "comboMaster": {
+      "name": "מאסטר קומבו",
+      "icon": "🔥",
+      "description": "הכי הרבה בונוס קומבו"
+    },
+    "earlyBird": {
+      "name": "ציפור מוקדמת",
+      "icon": "🐦",
+      "description": "הכי הרבה מילים בדקה הראשונה"
+    },
+    "clutchPlayer": {
+      "name": "שחקן לחץ",
+      "icon": "⏰",
+      "description": "הכי הרבה מילים ב-30 שניות אחרונות"
+    },
+    "bigWordHunter": {
+      "name": "צייד מילים גדולות",
+      "icon": "🦁",
+      "description": "הכי הרבה מילים של 6+ אותיות"
+    },
+    "consistentPlayer": {
+      "name": "שחקן עקבי",
+      "icon": "📊",
+      "description": "שליחת מילים בקצב קבוע"
+    }
+  },
   "scorePage": {
     "pts": "נק׳"
   },
@@ -1013,6 +1090,11 @@ const he = {
       "examples": "דוגמאות להישגים"
     },
     "tipsTitle": "טיפים מקצועיים",
+    "tips": {
+      "tip1": "התחילו עם מילים קצרות כדי לצבור מומנטום!",
+      "tip2": "החליקו באלכסון ליותר צירופי אותיות!",
+      "tip4": "מילים ארוכות מניבות יותר נקודות!"
+    },
     "letters": "אותיות",
     "pts": "נק׳",
     "steps": {
@@ -1121,6 +1203,11 @@ const he = {
       "subtitle": "אימון קצר ותשלוט בשליטות!",
       "demoHint": "החלק לכל כיוון - גם באלכסון!",
       "benefitsTitle": "האימון יעזור לך:",
+      "benefits": {
+        "learnControls": "ללמוד את השליטה בהחלקה",
+        "masterDirections": "לשלוט בכל 8 הכיוונים",
+        "noPressure": "לתרגל בלי לחץ זמן"
+      },
       "returnNote": "אחרי האימון, תהיה מוכן לאתגר האמיתי!",
       "startTraining": "יאללה לאימון",
       "skipAnyway": "דלג, אני יודע לשחק",
@@ -2283,7 +2370,11 @@ const he = {
       "chain": "שרשרת",
       "spotOn": "נכון",
       "trio": "שלישייה",
-      "wordle": "וורדל"
+      "wordle": "וורדל",
+      "definition_match": "הגדרה",
+      "anagram": "אנגרמה",
+      "riddle": "חידה",
+      "fill_blank": "השלם את החסר"
     },
     "wordle": {
       "instruction": "נחשו את המילה בת 5 אותיות",
@@ -2485,7 +2576,32 @@ const he = {
     "shareMessage": {
       "header": "LexiClash ציד מילים #{number}",
       "solvedIn": "פתרתי ב-{attempts}/10",
-      "failedAttempt": "X/10 - כמעט!"
+      "failedAttempt": "X/10 - כמעט!",
+      "genius1": "קל מדי!",
+      "genius2": "אפילו לא התאמצתי",
+      "genius3": "זה על מצב קל?",
+      "genius4": "תשתחוו!",
+      "great1": "מעולה!",
+      "great2": "זה היה מספק",
+      "great3": "בנקודה היום!",
+      "great4": "חדים היום!",
+      "good1": "הגעתי לשם!",
+      "good2": "המוח עדיין עובד!",
+      "good3": "לא רע!",
+      "good4": "יצאנו בסדר!",
+      "close1": "היה צמוד מדי!",
+      "close2": "חמקתי!",
+      "close3": "מצב הישרדות: מופעל!",
+      "close4": "פיו!",
+      "fail1": "בפעם הבאה!",
+      "fail2": "מחר זה שלי!",
+      "fail3": "המילה הזו לא הוגנת!",
+      "fail4": "לוח גרוע!",
+      "cta1": "חושבים שתצליחו יותר?",
+      "cta2": "תורכם.",
+      "cta3": "תנסו לנצח.",
+      "cta4": "אני מאתגר אתכם.",
+      "cta5": "בהצלחה לנצח את זה!"
     }
   },
   "keepPlaying": {
@@ -2734,10 +2850,20 @@ const he = {
     },
     "domains": {
       "processingSpeed": "מהירות עיבוד",
+      "processingSpeedDesc": "המהירות שבה המוח שלך מעבד מידע ומגיב",
       "workingMemory": "זיכרון עבודה",
+      "workingMemoryDesc": "היכולת לשמור ולעבד מידע בטווח הקצר",
       "attention": "קשב",
+      "attentionDesc": "היכולת להתמקד ולהישאר ערני במהלך משימות",
       "flexibility": "גמישות",
-      "vocabulary": "אוצר מילים"
+      "flexibilityDesc": "היכולת להתאים ולעבור בין משימות שונות",
+      "vocabulary": "אוצר מילים",
+      "vocabularyDesc": "עושר אוצר המילים והיכולת לשלוף מילים"
+    },
+    "progress": {
+      "improving": "משתפר",
+      "declining": "יורד",
+      "stable": "יציב"
     },
     "recommendation": {
       "title": "טיפ אישי",

@@ -937,6 +937,68 @@ const es = {
     "trailblazer": "El Pionero",
     "trailblazerDesc": "Va por las grandes victorias"
   },
+  "playerTitles": {
+    "champion": {
+      "name": "Campeón",
+      "icon": "👑",
+      "description": "Ganador del juego"
+    },
+    "perfectionist": {
+      "name": "Perfeccionista",
+      "icon": "✨",
+      "description": "Mayor precisión - todas las palabras válidas"
+    },
+    "speedster": {
+      "name": "Demonio de la Velocidad",
+      "icon": "⚡",
+      "description": "Palabras más rápidas por minuto"
+    },
+    "wordsmith": {
+      "name": "Artesano de Palabras",
+      "icon": "📝",
+      "description": "Encontró más palabras"
+    },
+    "scholar": {
+      "name": "Erudito",
+      "icon": "🎓",
+      "description": "Encontró la palabra más larga"
+    },
+    "explorer": {
+      "name": "Explorador",
+      "icon": "🧭",
+      "description": "Más diversidad en longitudes de palabras"
+    },
+    "sniper": {
+      "name": "Francotirador",
+      "icon": "🎯",
+      "description": "Mejor precisión (menos palabras inválidas)"
+    },
+    "comboMaster": {
+      "name": "Maestro del Combo",
+      "icon": "🔥",
+      "description": "Mayor bonus de combo ganado"
+    },
+    "earlyBird": {
+      "name": "Madrugador",
+      "icon": "🐦",
+      "description": "Más palabras en el primer minuto"
+    },
+    "clutchPlayer": {
+      "name": "Jugador Clutch",
+      "icon": "⏰",
+      "description": "Más palabras en los últimos 30 segundos"
+    },
+    "bigWordHunter": {
+      "name": "Cazador de Palabras Grandes",
+      "icon": "🦁",
+      "description": "Más palabras de 6+ letras"
+    },
+    "consistentPlayer": {
+      "name": "Eddie Constante",
+      "icon": "📊",
+      "description": "Envíos de palabras más consistentes"
+    }
+  },
   "scorePage": {
     "pts": "pts"
   },
@@ -957,6 +1019,11 @@ const es = {
       "examples": "Ejemplos de Logros"
     },
     "tipsTitle": "Consejos para Ganar",
+    "tips": {
+      "tip1": "¡Empieza con palabras cortas para ganar impulso!",
+      "tip2": "¡Desliza en diagonal para más combinaciones de letras!",
+      "tip4": "¡Las palabras largas dan exponencialmente más puntos!"
+    },
     "letters": "letras",
     "pts": "pts",
     "steps": {
@@ -1816,6 +1883,11 @@ const es = {
       "subtitle": "¡Un entrenamiento rápido te ayudará a dominar los controles!",
       "demoHint": "¡Desliza en cualquier dirección - incluso diagonal!",
       "benefitsTitle": "El entrenamiento te ayuda a:",
+      "benefits": {
+        "learnControls": "Aprender los controles de deslizamiento",
+        "masterDirections": "Dominar las 8 direcciones",
+        "noPressure": "Practicar sin presión de tiempo"
+      },
       "returnNote": "¡Después del entrenamiento estarás listo para el reto real!",
       "startTraining": "Empezar Entrenamiento",
       "skipAnyway": "Saltar, ya sé jugar",

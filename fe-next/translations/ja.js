@@ -984,6 +984,68 @@ const ja = {
     "trailblazer": "先駆者",
     "trailblazerDesc": "大きな勝利を目指す"
   },
+  "playerTitles": {
+    "champion": {
+      "name": "チャンピオン",
+      "icon": "👑",
+      "description": "ゲームの勝者"
+    },
+    "perfectionist": {
+      "name": "完璧主義者",
+      "icon": "✨",
+      "description": "最高の正確さ - すべて有効な単語"
+    },
+    "speedster": {
+      "name": "スピードスター",
+      "icon": "⚡",
+      "description": "1分あたり最多の単語数"
+    },
+    "wordsmith": {
+      "name": "言葉の匠",
+      "icon": "📝",
+      "description": "最も多くの単語を発見"
+    },
+    "scholar": {
+      "name": "学者",
+      "icon": "🎓",
+      "description": "最も長い単語を発見"
+    },
+    "explorer": {
+      "name": "探検家",
+      "icon": "🧭",
+      "description": "最も多様な単語の長さ"
+    },
+    "sniper": {
+      "name": "スナイパー",
+      "icon": "🎯",
+      "description": "最高の正確さ（無効な単語が少ない）"
+    },
+    "comboMaster": {
+      "name": "コンボマスター",
+      "icon": "🔥",
+      "description": "最高のコンボボーナス獲得"
+    },
+    "earlyBird": {
+      "name": "早起き鳥",
+      "icon": "🐦",
+      "description": "最初の1分で最多の単語"
+    },
+    "clutchPlayer": {
+      "name": "クラッチプレイヤー",
+      "icon": "⏰",
+      "description": "最後の30秒で最多の単語"
+    },
+    "bigWordHunter": {
+      "name": "大物ハンター",
+      "icon": "🦁",
+      "description": "6文字以上の単語が最多"
+    },
+    "consistentPlayer": {
+      "name": "安定プレイヤー",
+      "icon": "📊",
+      "description": "最も安定した単語提出"
+    }
+  },
   "scorePage": {
     "pts": "pts"
   },
@@ -1004,6 +1066,11 @@ const ja = {
       "examples": "実績の例"
     },
     "tipsTitle": "勝つためのヒント 💡",
+    "tips": {
+      "tip1": "短い単語から始めて勢いをつけよう！",
+      "tip2": "斜めにスワイプで文字の組み合わせを増やそう！",
+      "tip4": "長い単語は指数関数的に高得点！"
+    },
     "letters": "文字",
     "pts": "ポイント",
     "steps": {
@@ -1112,6 +1179,11 @@ const ja = {
       "subtitle": "簡単なトレーニングで操作をマスター！",
       "demoHint": "どの方向にもスワイプ - 斜めもOK！",
       "benefitsTitle": "トレーニングで学べること：",
+      "benefits": {
+        "learnControls": "スワイプ操作を学ぶ",
+        "masterDirections": "8方向すべてをマスター",
+        "noPressure": "時間制限なしで練習"
+      },
       "returnNote": "トレーニング後、本番の挑戦へ！",
       "startTraining": "トレーニング開始",
       "skipAnyway": "スキップ、遊び方知ってる",

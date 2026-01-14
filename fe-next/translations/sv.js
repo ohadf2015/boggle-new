@@ -984,6 +984,68 @@ const sv = {
     "trailblazer": "Banbrytaren",
     "trailblazerDesc": "Siktar på stora vinster"
   },
+  "playerTitles": {
+    "champion": {
+      "name": "Mästare",
+      "icon": "👑",
+      "description": "Vinnare av spelet"
+    },
+    "perfectionist": {
+      "name": "Perfektionist",
+      "icon": "✨",
+      "description": "Högsta precision - alla ord giltiga"
+    },
+    "speedster": {
+      "name": "Snabbfotad",
+      "icon": "⚡",
+      "description": "Flest ord per minut"
+    },
+    "wordsmith": {
+      "name": "Ordsmed",
+      "icon": "📝",
+      "description": "Hittade flest ord"
+    },
+    "scholar": {
+      "name": "Lärd",
+      "icon": "🎓",
+      "description": "Hittade längsta ordet"
+    },
+    "explorer": {
+      "name": "Utforskare",
+      "icon": "🧭",
+      "description": "Mest variation i ordlängder"
+    },
+    "sniper": {
+      "name": "Prickskytt",
+      "icon": "🎯",
+      "description": "Bäst precision (färre ogiltiga ord)"
+    },
+    "comboMaster": {
+      "name": "Kombomästare",
+      "icon": "🔥",
+      "description": "Högsta kombobonus"
+    },
+    "earlyBird": {
+      "name": "Morgonpiggen",
+      "icon": "🐦",
+      "description": "Flest ord första minuten"
+    },
+    "clutchPlayer": {
+      "name": "Clutchspelare",
+      "icon": "⏰",
+      "description": "Flest ord sista 30 sekunderna"
+    },
+    "bigWordHunter": {
+      "name": "Storviltsjägare",
+      "icon": "🦁",
+      "description": "Flest ord med 6+ bokstäver"
+    },
+    "consistentPlayer": {
+      "name": "Stadig Sansen",
+      "icon": "📊",
+      "description": "Mest jämna ordinlämningar"
+    }
+  },
   "scorePage": {
     "pts": "poäng"
   },
@@ -1004,6 +1066,11 @@ const sv = {
       "examples": "Exempel på prestationer"
     },
     "tipsTitle": "Tips för att vinna 💡",
+    "tips": {
+      "tip1": "Börja med korta ord för att bygga momentum!",
+      "tip2": "Svep diagonalt för fler bokstavskombinationer!",
+      "tip4": "Långa ord ger exponentiellt mer poäng!"
+    },
     "letters": "bokstäver",
     "pts": "poäng",
     "steps": {
@@ -1112,6 +1179,11 @@ const sv = {
       "subtitle": "En snabb träning hjälper dig bemästra kontrollerna!",
       "demoHint": "Svep i valfri riktning - även diagonalt!",
       "benefitsTitle": "Träningen lär dig:",
+      "benefits": {
+        "learnControls": "Lära dig svepkontrollerna",
+        "masterDirections": "Bemästra alla 8 riktningar",
+        "noPressure": "Öva utan tidspress"
+      },
       "returnNote": "Efter träningen är du redo för riktiga utmaningen!",
       "startTraining": "Börja Träna",
       "skipAnyway": "Hoppa över, jag kan spela",
