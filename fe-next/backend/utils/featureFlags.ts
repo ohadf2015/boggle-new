@@ -1,10 +1,18 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Lazy initialization to avoid build-time errors when env vars are missing
+let supabase: SupabaseClient | null = null;
+
+function getSupabase(): SupabaseClient | null {
+  if (!supabase && process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+  }
+  return supabase;
+}
 
 export interface FeatureFlag {
   flag_name: string;
@@ -20,8 +28,14 @@ export interface FeatureFlag {
  * @returns Feature flag configuration or null if not found
  */
 export async function getFeatureFlag(flagName: string): Promise<FeatureFlag | null> {
+  const client = getSupabase();
+  if (!client) {
+    console.warn('Supabase not configured - feature flags unavailable');
+    return null;
+  }
+
   try {
-    const { data, error } = await supabase
+    const { data, error } = await client
       .from('feature_flags')
       .select('*')
       .eq('flag_name', flagName)
@@ -105,8 +119,11 @@ export async function canAccessFeature(
  * @returns True if user is admin
  */
 async function checkIsAdmin(userId: string): Promise<boolean> {
+  const client = getSupabase();
+  if (!client) return false;
+
   try {
-    const { data, error } = await supabase
+    const { data, error } = await client
       .from('profiles')
       .select('is_admin')
       .eq('id', userId)
@@ -145,8 +162,14 @@ export async function setFeatureFlag(
   flagName: string,
   config: Partial<Omit<FeatureFlag, 'flag_name' | 'created_at'>>
 ): Promise<boolean> {
+  const client = getSupabase();
+  if (!client) {
+    console.error('Supabase not configured - cannot set feature flags');
+    return false;
+  }
+
   try {
-    const { error } = await supabase
+    const { error } = await client
       .from('feature_flags')
       .upsert({
         flag_name: flagName,
@@ -173,8 +196,14 @@ export async function setFeatureFlag(
  * @returns True if successful
  */
 export async function deleteFeatureFlag(flagName: string): Promise<boolean> {
+  const client = getSupabase();
+  if (!client) {
+    console.error('Supabase not configured - cannot delete feature flags');
+    return false;
+  }
+
   try {
-    const { error } = await supabase
+    const { error } = await client
       .from('feature_flags')
       .delete()
       .eq('flag_name', flagName);
@@ -196,8 +225,14 @@ export async function deleteFeatureFlag(flagName: string): Promise<boolean> {
  * @returns Array of all feature flags
  */
 export async function listFeatureFlags(): Promise<FeatureFlag[]> {
+  const client = getSupabase();
+  if (!client) {
+    console.warn('Supabase not configured - feature flags unavailable');
+    return [];
+  }
+
   try {
-    const { data, error } = await supabase
+    const { data, error } = await client
       .from('feature_flags')
       .select('*')
       .order('flag_name');
