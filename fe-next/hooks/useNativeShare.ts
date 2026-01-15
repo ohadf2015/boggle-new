@@ -71,10 +71,16 @@ export function useNativeShare(): UseNativeShareReturn {
       // AbortError = user cancelled (normal)
       // NotAllowedError = permission denied
       // TypeError = invalid data
-      if (error instanceof Error && error.name === 'AbortError') {
-        // User cancelled - this is fine
+      const errorName = error instanceof Error || error instanceof DOMException
+        ? error.name
+        : String(error);
+
+      if (errorName === 'AbortError') {
+        // User cancelled - this is normal behavior, don't log as error
         return false;
       }
+
+      // Only log actual errors (not user cancellations)
       console.error('Share failed:', error);
       return false;
     }

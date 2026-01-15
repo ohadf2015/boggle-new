@@ -170,6 +170,9 @@ const EXPECTED_ERROR_PATTERNS = [
   // Socket reconnection (normal lifecycle)
   /transport close/i,
   /ping timeout/i,
+  /websocket error/i,
+  /connect_error/i,
+  /polling error/i,
 ];
 
 /**

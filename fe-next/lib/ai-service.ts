@@ -402,7 +402,12 @@ class GameAIService {
         message.includes('truncated') ||
         message.includes('429') ||
         message.includes('503') ||
-        message.includes('unavailable')
+        message.includes('unavailable') ||
+        // Handle HTML error responses (rate limits, auth errors)
+        message.includes('unexpected token') ||
+        message.includes('<!doctype') ||
+        message.includes('is not valid json') ||
+        message.includes('syntaxerror')
       );
     }
     return false;

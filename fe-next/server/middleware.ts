@@ -223,9 +223,15 @@ export function configureMiddleware(app: Application, { corsOrigin, isDev }: Mid
   app.use(wwwRedirect());
 
   // Compression middleware (gzip/brotli)
+  // Skip compression for Socket.IO paths to prevent chunked encoding errors
   app.use(compression({
     filter: (req: Request, res: Response) => {
       if (req.headers['x-no-compression']) {
+        return false;
+      }
+      // Skip compression for Socket.IO long-polling requests
+      // Prevents ERR_INCOMPLETE_CHUNKED_ENCODING errors
+      if (req.url?.startsWith('/socket.io')) {
         return false;
       }
       return compression.filter(req, res);
