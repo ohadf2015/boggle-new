@@ -114,7 +114,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     "w-full mx-auto",
                     "flex items-center justify-between",
                     "px-2 sm:px-3 lg:px-4 py-2 sm:py-2 lg:py-2.5",
-                    "bg-neo-navy/85",
+                    "bg-neo-white/90 dark:bg-neo-navy",
                     "backdrop-blur-md",
                     "border-4 lg:border-4 xl:border-4 2xl:border-4 border-neo-black",
                     "shadow-hard-lg xl:shadow-hard-lg 2xl:shadow-hard-lg",
@@ -133,7 +133,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 >
                     {/* Lime-light lightning bolt - left */}
                     <svg
-                        className="w-4 h-5 xs:w-5 xs:h-6 sm:w-6 sm:h-7 lg:w-7 lg:h-8 xl:w-8 xl:h-10 flex-shrink-0 text-neo-lime-light animate-lightning-left"
+                        className="w-4 h-5 xs:w-5 xs:h-6 sm:w-6 sm:h-7 lg:w-7 lg:h-8 xl:w-8 xl:h-10 flex-shrink-0 text-neo-black dark:text-neo-lime-light animate-lightning-left"
                         viewBox="0 0 24 32"
                         fill="none"
                         style={{ transform: 'rotate(-15deg)' }}
@@ -153,7 +153,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                     >
                         {/* LEXI - Hero text: larger, bolder, lime primary */}
                         <span
-                            className="text-xl xs:text-2xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl text-neo-lime relative animate-lexi-glow landscape:text-xl landscape:xs:text-2xl landscape:sm:text-3xl"
+                            className="text-xl xs:text-2xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl text-neo-black dark:text-neo-lime relative animate-lexi-glow landscape:text-xl landscape:xs:text-2xl landscape:sm:text-3xl"
                             style={{
                                 WebkitTextStroke: '3px #1a365d',
                                 paintOrder: 'stroke fill',
@@ -164,7 +164,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         </span>
                         {/* CLASH - Supporting text: smaller, cyan-muted for subtle contrast */}
                         <span
-                            className="text-base xs:text-lg sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl text-neo-cyan-muted relative landscape:text-base landscape:xs:text-lg landscape:sm:text-xl"
+                            className="text-base xs:text-lg sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl text-slate-800 dark:text-neo-cyan-muted relative landscape:text-base landscape:xs:text-lg landscape:sm:text-xl"
                             style={{
                                 WebkitTextStroke: '1.5px #1a365d',
                                 paintOrder: 'stroke fill',
@@ -177,7 +177,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
 
                     {/* Cyan lightning bolt - right */}
                     <svg
-                        className="w-4 h-5 xs:w-5 xs:h-6 sm:w-6 sm:h-7 lg:w-7 lg:h-8 xl:w-8 xl:h-10 flex-shrink-0 text-neo-cyan-light animate-lightning-right"
+                        className="w-4 h-5 xs:w-5 xs:h-6 sm:w-6 sm:h-7 lg:w-7 lg:h-8 xl:w-8 xl:h-10 flex-shrink-0 text-neo-black dark:text-neo-cyan-light animate-lightning-right"
                         viewBox="0 0 24 32"
                         fill="none"
                         style={{ transform: 'rotate(15deg)' }}

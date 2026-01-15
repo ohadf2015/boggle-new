@@ -11,11 +11,10 @@ export const DEFAULT_IDLE_ACTIVITIES: ActivityVariant[] = [
   'drinking_coffee',
   'gaming',
   'dancing',
-  'playing_ball',
   'skateboarding',
-  'juggling',
   'waving',
-  'thumbs_up',
+  'holding_trophy',
+  'cheering',
 ];
 
 /**

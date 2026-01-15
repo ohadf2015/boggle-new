@@ -23,19 +23,12 @@ export type MascotVariant =
   // Activity variants
   | 'eating_pizza'
   | 'drinking_coffee'
-  | 'reading'
   | 'gaming'
   | 'dancing'
-  | 'sleeping'
   | 'waving'
-  | 'thumbs_up'
   | 'holding_trophy'
-  | 'typing'
   | 'cheering'
-  | 'training'
-  | 'playing_ball'
-  | 'skateboarding'
-  | 'juggling';
+  | 'skateboarding';
 
 /**
  * Mascot image paths mapping
@@ -56,19 +49,12 @@ export const MASCOT_IMAGES: Record<MascotVariant, string> = {
   // Activity variants
   eating_pizza: '/mascot/lexi-eating-pizza.png',
   drinking_coffee: '/mascot/lexi-drinking-coffee.png',
-  reading: '/mascot/lexi-reading.png',
   gaming: '/mascot/lexi-gaming.png',
   dancing: '/mascot/lexi-dancing.png',
-  sleeping: '/mascot/lexi-sleeping.png',
   waving: '/mascot/lexi-waving.png',
-  thumbs_up: '/mascot/lexi-thumbs-up.png',
   holding_trophy: '/mascot/lexi-holding-trophy.png',
-  typing: '/mascot/lexi-typing.png',
   cheering: '/mascot/lexi-cheering.png',
-  training: '/mascot/lexi-training.png',
-  playing_ball: '/mascot/lexi-playing-ball.png',
   skateboarding: '/mascot/lexi-skateboarding.png',
-  juggling: '/mascot/lexi-juggling.png',
 };
 
 /**
@@ -281,19 +267,6 @@ function getAnimationVariants(variant: MascotVariant): Variants {
         },
       },
     },
-    // Activity: Reading - absorbed in book
-    reading: {
-      animate: {
-        y: [0, -1, 0],
-        rotate: [0, 0.5, 0, -0.5, 0],
-        scale: [1, 1.01, 1],
-        transition: {
-          duration: 3,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        },
-      },
-    },
     // Activity: Gaming - intense reactive motion
     gaming: {
       animate: {
@@ -321,19 +294,6 @@ function getAnimationVariants(variant: MascotVariant): Variants {
         },
       },
     },
-    // Activity: Sleeping - peaceful breathing
-    sleeping: {
-      animate: {
-        y: [0, 3, 0, 2, 0],
-        scale: [1, 0.96, 1, 0.98, 1],
-        rotate: [0, 1, 0, -1, 0],
-        transition: {
-          duration: 5,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        },
-      },
-    },
     // Activity: Waving - energetic greeting
     waving: {
       animate: {
@@ -347,19 +307,6 @@ function getAnimationVariants(variant: MascotVariant): Variants {
         },
       },
     },
-    // Activity: Thumbs up - confident approval
-    thumbs_up: {
-      animate: {
-        y: [0, -8, 0, -4, 0],
-        scale: [1, 1.08, 1, 1.04, 1],
-        rotate: [0, -2, 2, 0],
-        transition: {
-          duration: 1.8,
-          repeat: Infinity,
-          ease: 'easeOut',
-        },
-      },
-    },
     // Activity: Holding trophy - victorious celebration
     holding_trophy: {
       animate: {
@@ -370,19 +317,6 @@ function getAnimationVariants(variant: MascotVariant): Variants {
           duration: 2,
           repeat: Infinity,
           ease: 'easeOut',
-        },
-      },
-    },
-    // Activity: Typing - focused rapid work
-    typing: {
-      animate: {
-        y: [0, -1, 0, -1, 0, -1, 0],
-        scale: [1, 1.01, 1, 1.01, 1],
-        x: [0, 0.5, -0.5, 0],
-        transition: {
-          duration: 0.5,
-          repeat: Infinity,
-          ease: 'linear',
         },
       },
     },
@@ -400,33 +334,6 @@ function getAnimationVariants(variant: MascotVariant): Variants {
         },
       },
     },
-    // Activity: Training - powerful workout pump
-    training: {
-      animate: {
-        y: [0, -8, -2, -6, 0],
-        scale: [1, 1.12, 1.05, 1.1, 1],
-        rotate: [0, -2, 0, 2, 0],
-        transition: {
-          duration: 1.2,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        },
-      },
-    },
-    // Activity: Playing ball - bouncy ball juggling motion
-    playing_ball: {
-      animate: {
-        y: [0, -12, 0, -8, 0, -10, 0],
-        x: [0, 2, -2, 1, -1, 0],
-        rotate: [0, -4, 4, -3, 3, 0],
-        scale: [1, 1.05, 0.98, 1.03, 0.99, 1.02, 1],
-        transition: {
-          duration: 1.8,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        },
-      },
-    },
     // Activity: Skateboarding - dynamic rolling motion
     skateboarding: {
       animate: {
@@ -438,20 +345,6 @@ function getAnimationVariants(variant: MascotVariant): Variants {
           duration: 1.6,
           repeat: Infinity,
           ease: 'easeOut',
-        },
-      },
-    },
-    // Activity: Juggling - rhythmic up-down ball tracking
-    juggling: {
-      animate: {
-        y: [0, -8, -4, -10, -2, -6, 0],
-        x: [0, -2, 2, -1, 1, 0],
-        rotate: [0, 3, -3, 2, -2, 0],
-        scale: [1, 1.04, 1.02, 1.05, 1.01, 1.03, 1],
-        transition: {
-          duration: 2.2,
-          repeat: Infinity,
-          ease: 'easeInOut',
         },
       },
     },

@@ -103,10 +103,10 @@ describe('InteractiveMascot', () => {
       expect(img).toHaveAttribute('src', '/mascot/lexi-gaming.png');
     });
 
-    it('renders training variant with dedicated image', () => {
-      render(<InteractiveMascot variant="training" />);
+    it('renders skateboarding variant with dedicated image', () => {
+      render(<InteractiveMascot variant="skateboarding" />);
       const img = screen.getByRole('img');
-      expect(img).toHaveAttribute('src', '/mascot/lexi-training.png');
+      expect(img).toHaveAttribute('src', '/mascot/lexi-skateboarding.png');
     });
 
     it('renders dancing variant with dedicated image', () => {

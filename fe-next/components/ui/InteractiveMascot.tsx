@@ -18,20 +18,13 @@ export type MoodVariant = 'confused' | 'proud' | 'nervous' | 'sad' | 'winking';
 export type ActivityVariant =
   | 'eating_pizza'
   | 'drinking_coffee'
-  | 'reading'
   | 'gaming'
   | 'dancing'
-  | 'sleeping'
   | 'waving'
-  | 'thumbs_up'
   | 'holding_trophy'
   | 'holding_sign'
-  | 'typing'
   | 'cheering'
-  | 'training'
-  | 'playing_ball'
-  | 'skateboarding'
-  | 'juggling';
+  | 'skateboarding';
 
 /**
  * Extended mascot variants including interaction states and activities
@@ -91,20 +84,13 @@ const DEFAULT_HOVER_TRANSITIONS: Partial<Record<ExtendedMascotVariant, ExtendedM
   // Activity variants - hover shows more energetic version
   eating_pizza: 'excited',
   drinking_coffee: 'happy',
-  reading: 'surprised',
   gaming: 'celebrating',
   dancing: 'cheering',
-  sleeping: 'surprised',
   waving: 'excited',
-  thumbs_up: 'celebrating',
   holding_trophy: 'celebrating',
   holding_sign: 'excited',
-  typing: 'excited',
   cheering: 'victory',
-  training: 'excited',
-  playing_ball: 'celebrating',
   skateboarding: 'excited',
-  juggling: 'focused',
 };
 
 const DEFAULT_CLICK_TRANSITIONS: Partial<Record<ExtendedMascotVariant, ExtendedMascotVariant>> = {
@@ -129,20 +115,13 @@ const DEFAULT_CLICK_TRANSITIONS: Partial<Record<ExtendedMascotVariant, ExtendedM
   // Activity variants - click shows celebratory reaction
   eating_pizza: 'celebrating',
   drinking_coffee: 'excited',
-  reading: 'happy',
   gaming: 'victory',
   dancing: 'victory',
-  sleeping: 'excited',
   waving: 'celebrating',
-  thumbs_up: 'victory',
   holding_trophy: 'victory',
   holding_sign: 'celebrating',
-  typing: 'victory',
   cheering: 'victory',
-  training: 'victory',
-  playing_ball: 'victory',
   skateboarding: 'victory',
-  juggling: 'celebrating',
 };
 
 /**
@@ -317,13 +296,6 @@ function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
       scale: [1, 1.02, 0.99, 1.01, 1],
       transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
     },
-    reading: {
-      // Absorbed in book - subtle focused movement
-      y: [0, -1, 0],
-      rotate: [0, 0.5, 0, -0.5, 0],
-      scale: [1, 1.01, 1],
-      transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
-    },
     gaming: {
       // Intense gaming - quick reactive movements
       x: [0, -3, 3, -2, 2, -1, 1, 0],
@@ -339,13 +311,6 @@ function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
       x: [0, 3, -3, 2, -2, 0],
       transition: { duration: 1.2, repeat: Infinity, ease: 'easeInOut' },
     },
-    sleeping: {
-      // Peaceful sleep - gentle breathing rhythm
-      y: [0, 3, 0, 2, 0],
-      scale: [1, 0.96, 1, 0.98, 1],
-      rotate: [0, 1, 0, -1, 0],
-      transition: { duration: 5, repeat: Infinity, ease: 'easeInOut' },
-    },
     waving: {
       // Friendly wave - energetic greeting
       rotate: [0, -8, 8, -6, 6, -4, 4, 0],
@@ -353,26 +318,12 @@ function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
       scale: [1, 1.05, 1.02, 1.04, 1],
       transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
     },
-    thumbs_up: {
-      // Confident approval - proud bounce
-      y: [0, -8, 0, -4, 0],
-      scale: [1, 1.08, 1, 1.04, 1],
-      rotate: [0, -2, 2, 0],
-      transition: { duration: 1.8, repeat: Infinity, ease: 'easeOut' },
-    },
     holding_trophy: {
       // Victorious celebration - proud sway with trophy
       y: [0, -10, 0, -6, 0],
       rotate: [0, -4, 4, -2, 0],
       scale: [1, 1.1, 1, 1.05, 1],
       transition: { duration: 2, repeat: Infinity, ease: 'easeOut' },
-    },
-    typing: {
-      // Focused typing - subtle rapid movements
-      y: [0, -1, 0, -1, 0, -1, 0],
-      scale: [1, 1.01, 1, 1.01, 1],
-      x: [0, 0.5, -0.5, 0],
-      transition: { duration: 0.5, repeat: Infinity, ease: 'linear' },
     },
     cheering: {
       // Enthusiastic cheer - high energy bouncing
@@ -382,21 +333,6 @@ function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
       x: [0, -2, 2, -1, 1, 0],
       transition: { duration: 1.4, repeat: Infinity, ease: 'easeOut' },
     },
-    training: {
-      // Workout pump - powerful lifting motion
-      y: [0, -8, -2, -6, 0],
-      scale: [1, 1.12, 1.05, 1.1, 1],
-      rotate: [0, -2, 0, 2, 0],
-      transition: { duration: 1.2, repeat: Infinity, ease: 'easeInOut' },
-    },
-    playing_ball: {
-      // Bouncy ball juggling motion - playful ball tracking
-      y: [0, -12, 0, -8, 0, -10, 0],
-      x: [0, 2, -2, 1, -1, 0],
-      rotate: [0, -4, 4, -3, 3, 0],
-      scale: [1, 1.05, 0.98, 1.03, 0.99, 1.02, 1],
-      transition: { duration: 1.8, repeat: Infinity, ease: 'easeInOut' },
-    },
     skateboarding: {
       // Dynamic rolling motion - cool skateboarding vibes
       x: [0, 3, -3, 2, -2, 0],
@@ -404,14 +340,6 @@ function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
       rotate: [0, -6, 6, -4, 4, -2, 0],
       scale: [1, 1.06, 1.02, 1.04, 1],
       transition: { duration: 1.6, repeat: Infinity, ease: 'easeOut' },
-    },
-    juggling: {
-      // Rhythmic up-down ball tracking - focused juggling
-      y: [0, -8, -4, -10, -2, -6, 0],
-      x: [0, -2, 2, -1, 1, 0],
-      rotate: [0, 3, -3, 2, -2, 0],
-      scale: [1, 1.04, 1.02, 1.05, 1.01, 1.03, 1],
-      transition: { duration: 2.2, repeat: Infinity, ease: 'easeInOut' },
     },
   };
 
@@ -539,14 +467,14 @@ export const InteractiveMascot = memo(function InteractiveMascot({
           animate={shouldAnimate && !isClicked ? idleAnimation : undefined}
         >
           {/* Image with crossfade on variant change */}
-          {/* Slower transition (400ms) for smoother mood changes */}
+          {/* Fast transition (200ms) for smoother, less noticeable changes */}
           <AnimatePresence mode="wait">
             <motion.div
               key={currentVariant}
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.4, ease: 'easeInOut' }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
               className="w-full h-full"
             >
               <Image
