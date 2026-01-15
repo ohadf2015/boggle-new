@@ -150,15 +150,20 @@ export default function ChainChallenge({
           </motion.div>
         </motion.div>
 
-        {/* Instruction */}
-        <motion.p
+        {/* Instruction with compound word hint */}
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.25 }}
-          className="text-sm text-slate-400"
+          className="space-y-1"
         >
-          {t('buzz.chain.instruction') || 'Complete the word chain!'}
-        </motion.p>
+          <p className="text-sm text-slate-400">
+            {t('buzz.chain.instruction') || 'Find the connecting word!'}
+          </p>
+          <p className="text-xs text-slate-500">
+            {t('buzz.chain.compoundHint') || 'Forms a compound word with BOTH neighbors'}
+          </p>
+        </motion.div>
       </div>
 
       {/* Hint */}

@@ -1,15 +1,56 @@
 {
   "summary": {
-    "totalKeysInCode": 2172,
+    "totalKeysInCode": 2179,
     "keyCountByLanguage": {
-      "en": 2530,
-      "he": 2530,
-      "sv": 2530,
-      "ja": 2530,
-      "es": 2530
+      "en": 2540,
+      "he": 2540,
+      "sv": 2540,
+      "ja": 2540,
+      "es": 2540
     },
     "missingFromEnglish": 0,
-    "problematicFlatKeys": 0
+    "problematicFlatKeys": 0,
+    "runtimeRisks": {
+      "templateLiterals": 3,
+      "fallbackUsages": 0,
+      "variableKeys": 1
+    }
+  },
+  "runtimeRisks": {
+    "templateLiterals": [
+      {
+        "pattern": "achievements.${achievement.key}.name",
+        "file": "components/achievements/AchievementPopup.tsx",
+        "line": 49,
+        "context": "? t(`achievements.${achievement.key}.name`) || achievement.key",
+        "type": "template_literal"
+      },
+      {
+        "pattern": "achievements.${achievement.key}.name",
+        "file": "components/achievements/AchievementPopup.tsx",
+        "line": 89,
+        "context": "name: t(`achievements.${achievement.key}.name`) || achievement.key,",
+        "type": "template_literal"
+      },
+      {
+        "pattern": "achievements.${achievement.key}.description",
+        "file": "components/achievements/AchievementPopup.tsx",
+        "line": 90,
+        "context": "description: t(`achievements.${achievement.key}.description`) || ''",
+        "type": "template_literal"
+      }
+    ],
+    "fallbackUsages": [],
+    "variableKeys": [
+      {
+        "pattern": "t(titleKey)",
+        "variable": "titleKey",
+        "file": "components/auth/shared/BenefitsList.tsx",
+        "line": 42,
+        "context": "{t(titleKey)}",
+        "type": "variable_key"
+      }
+    ]
   },
   "problematicFlatKeys": {
     "en": [],

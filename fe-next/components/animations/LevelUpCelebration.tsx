@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -144,19 +144,25 @@ export function LevelUpCelebration({
           },
           '-=0.1'
         )
-        // Phase 5: Rewards (if any)
-        .from(
-          '.level-rewards',
-          {
-            y: 20,
-            opacity: 0,
-            duration: 0.4,
-            ease: 'power2.out',
-            onComplete: () => setPhase('rewards'),
-          },
-          '-=0.1'
-        )
+        // Phase 5: Rewards (if any) - only animate if element exists
+        if (rewards && (rewards.coins || rewards.unlocks?.length)) {
+          tl.from(
+            '.level-rewards',
+            {
+              y: 20,
+              opacity: 0,
+              duration: 0.4,
+              ease: 'power2.out',
+              onComplete: () => setPhase('rewards'),
+            },
+            '-=0.1'
+          );
+        } else {
+          // No rewards, just set phase
+          tl.call(() => setPhase('rewards'));
+        }
         // Pulse the badge
+        tl
         .to('.level-badge', {
           scale: 1.05,
           duration: 0.3,
@@ -170,7 +176,7 @@ export function LevelUpCelebration({
       ctx.revert();
       timelineRef.current?.kill();
     };
-  }, [show, prefersReducedMotion, enableComplexAnimations, autoDismissAfter, onDismiss]);
+  }, [show, prefersReducedMotion, enableComplexAnimations, autoDismissAfter, onDismiss, rewards]);
 
   // Auto dismiss
   useEffect(() => {

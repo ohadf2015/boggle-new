@@ -14,6 +14,8 @@ import type { Language } from '@/types';
 interface BuzzChallengeProps {
   language: Language;
   onBack: () => void;
+  /** Optional date to load a specific past challenge (format: YYYY-MM-DD). Defaults to today. */
+  date?: string;
 }
 
 interface BuzzChallengeData {
@@ -56,8 +58,9 @@ type BuzzPhase = 'loading' | 'ready' | 'playing' | 'results' | 'error';
 /**
  * BuzzChallenge - Main orchestrator for Daily Buzz challenge flow
  * Phases: loading → ready → playing → results
+ * Supports playing today's challenge or past challenges via the date prop
  */
-export default function BuzzChallenge({ language, onBack }: BuzzChallengeProps) {
+export default function BuzzChallenge({ language, onBack, date }: BuzzChallengeProps) {
   const { t } = useLanguage();
   const { profile } = useAuth();
 
@@ -67,13 +70,16 @@ export default function BuzzChallenge({ language, onBack }: BuzzChallengeProps) 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [hasPlayedToday, setHasPlayedToday] = useState(false);
 
-  // Fetch today's buzz challenge
+  // Determine which date to fetch (today or specified past date)
+  const targetDate = date || new Date().toISOString().split('T')[0];
+  const isHistorical = date && date !== new Date().toISOString().split('T')[0];
+
+  // Fetch buzz challenge for the target date
   useEffect(() => {
     const fetchChallenge = async () => {
       try {
         setPhase('loading');
-        const today = new Date().toISOString().split('T')[0];
-        const response = await fetch(`/api/buzz/${today}/${language}`);
+        const response = await fetch(`/api/buzz/${targetDate}/${language}`);
 
         if (!response.ok) {
           throw new Error('Failed to fetch daily buzz');
@@ -83,7 +89,7 @@ export default function BuzzChallenge({ language, onBack }: BuzzChallengeProps) 
         if (data.success && data.data) {
           setChallengeData(data.data);
 
-          // Check if already played today
+          // Check if already played this challenge
           const checkParams = new URLSearchParams();
           if (profile?.id) {
             checkParams.set('player_id', profile.id);
@@ -96,7 +102,7 @@ export default function BuzzChallenge({ language, onBack }: BuzzChallengeProps) 
 
           if (checkParams.toString()) {
             const checkResponse = await fetch(
-              `/api/buzz/check-played/${today}/${language}?${checkParams.toString()}`
+              `/api/buzz/check-played/${targetDate}/${language}?${checkParams.toString()}`
             );
             if (checkResponse.ok) {
               const checkData = await checkResponse.json();
@@ -108,15 +114,16 @@ export default function BuzzChallenge({ language, onBack }: BuzzChallengeProps) 
         } else {
           throw new Error('Invalid challenge data');
         }
-      } catch (err: any) {
-        console.error('Failed to fetch buzz challenge:', err);
-        setErrorMessage(err.message || 'Failed to load challenge');
+      } catch (err: unknown) {
+        const errMessage = err instanceof Error ? err.message : 'Unknown error';
+        console.error('Failed to fetch buzz challenge:', errMessage);
+        setErrorMessage(errMessage || 'Failed to load challenge');
         setPhase('error');
       }
     };
 
     fetchChallenge();
-  }, [language, profile?.id]);
+  }, [language, profile?.id, targetDate]);
 
   // Handle start game
   const handleStart = () => {

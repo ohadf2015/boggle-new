@@ -92,6 +92,8 @@ const sv = {
     "connected": "Ansluten",
     "left": "kvar",
     "optional": "valfritt",
+    "today": "Idag",
+    "yesterday": "Igår",
     "processing": "Bearbetar...",
     "coins": "mynt",
     "chat": "Chatt",
@@ -2406,7 +2408,10 @@ const sv = {
       "unscramble": "Rätta till bokstäverna!"
     },
     "chain": {
-      "instruction": "Slutför ordkedjan!"
+      "instruction": "Hitta det sammanbindande ordet!",
+      "compoundHint": "Bildar ett sammansatt ord med BÅDA grannarna",
+      "exampleHint": "Exempel: SOL→BLOMMA→KRUKA (solblomma + blomkruka)",
+      "thinkCompound": "Tänk på sammansatta ord!"
     },
     "viewResults": "VISA RESULTAT",
     "yourAnswer": "DITT SVAR",
@@ -2461,7 +2466,14 @@ const sv = {
     "skipToAnswers": "Hoppa till svaren",
     "skipConfirmTitle": "Hoppa över utmaningarna?",
     "skipConfirmMessage": "Du ser svaren utan att spela. Din poäng blir 0.",
-    "skipConfirm": "Hoppa till svaren"
+    "skipConfirm": "Hoppa till svaren",
+    "history": {
+      "title": "Tidigare utmaningar",
+      "browse": "Bläddra bland tidigare Daily Buzz",
+      "available": "utmaningar tillgängliga",
+      "empty": "Inga tidigare utmaningar ännu",
+      "selectDate": "Välj datum att spela"
+    }
   },
   "wordHunt": {
     "title": "Ordjakt",

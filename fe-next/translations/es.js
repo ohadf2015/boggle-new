@@ -92,6 +92,8 @@ const es = {
     "connected": "Conectado",
     "left": "restante",
     "optional": "opcional",
+    "today": "Hoy",
+    "yesterday": "Ayer",
     "processing": "Procesando...",
     "offline": "sin conexión",
     "online": "en línea",
@@ -2446,7 +2448,10 @@ const es = {
       "unscramble": "¡Ordena las letras!"
     },
     "chain": {
-      "instruction": "¡Completa la cadena de palabras!"
+      "instruction": "¡Encuentra la palabra conectora!",
+      "compoundHint": "Forma una palabra compuesta con AMBOS vecinos",
+      "exampleHint": "Ejemplo: GIRASOL→FLOR→MACETA (girasol + florero)",
+      "thinkCompound": "¡Piensa en palabras compuestas!"
     },
     "viewResults": "VER RESULTADOS",
     "yourAnswer": "TU RESPUESTA",
@@ -2458,7 +2463,14 @@ const es = {
     "skipToAnswers": "Saltar a las respuestas",
     "skipConfirmTitle": "¿Saltar los desafíos?",
     "skipConfirmMessage": "Verás las respuestas sin jugar. Tu puntuación será 0.",
-    "skipConfirm": "Saltar a las respuestas"
+    "skipConfirm": "Saltar a las respuestas",
+    "history": {
+      "title": "Desafíos Anteriores",
+      "browse": "Ver desafíos Daily Buzz anteriores",
+      "available": "desafíos disponibles",
+      "empty": "Aún no hay desafíos anteriores",
+      "selectDate": "Elige una fecha para jugar"
+    }
   },
   "wordHunt": {
     "title": "Caza de Palabras",

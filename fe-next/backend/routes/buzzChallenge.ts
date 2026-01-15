@@ -197,6 +197,66 @@ router.get(
 );
 
 /**
+ * GET /buzz/history/:language
+ * Fetch list of available past buzz challenges for a language (SEO-friendly)
+ * Returns a list of dates with challenges, sorted newest first
+ */
+router.get(
+  '/buzz/history/:language',
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { language } = req.params;
+      const limit = parseInt(req.query.limit as string) || 30; // Default 30 days
+      const offset = parseInt(req.query.offset as string) || 0;
+
+      // Validate language
+      const supportedLanguages = ['en', 'he', 'sv', 'ja', 'es'];
+      if (!supportedLanguages.includes(language)) {
+        res
+          .status(400)
+          .json({ error: 'Unsupported language. Use: en, he, sv, ja, or es' });
+        return;
+      }
+
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      );
+
+      // Fetch available challenges, newest first
+      const { data, error, count } = await supabase
+        .from('daily_buzz_challenges')
+        .select('puzzle_date, trending_summary, image_url', { count: 'exact' })
+        .eq('language', language)
+        .order('puzzle_date', { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (error) {
+        console.error('[BUZZ] Error fetching history:', error.message);
+        res.status(500).json({ error: 'Failed to fetch challenge history' });
+        return;
+      }
+
+      res.json({
+        success: true,
+        data: data || [],
+        pagination: {
+          total: count || 0,
+          limit,
+          offset,
+          hasMore: (count || 0) > offset + limit,
+        },
+      });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('[BUZZ] Error fetching history:', errorMessage);
+      res.status(500).json({ error: 'Failed to fetch challenge history' });
+    }
+  }
+);
+
+/**
  * POST /buzz/submit
  * Submit completed challenge
  */

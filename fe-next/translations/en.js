@@ -97,6 +97,8 @@ const en = {
     "connected": "Connected",
     "left": "left",
     "optional": "optional",
+    "today": "Today",
+    "yesterday": "Yesterday",
     "processing": "Processing...",
     "coins": "coins",
     "chat": "Chat",
@@ -2420,7 +2422,10 @@ const en = {
       "unscramble": "Unscramble the letters!"
     },
     "chain": {
-      "instruction": "Complete the word chain!"
+      "instruction": "Find the connecting word!",
+      "compoundHint": "Forms a compound word with BOTH neighbors",
+      "exampleHint": "Example: SUN→FLOWER→POT (sunflower + flowerpot)",
+      "thinkCompound": "Think compound words!"
     },
     "preview": {
       "title": "Today's Topics",
@@ -2464,7 +2469,14 @@ const en = {
     "skipToAnswers": "Skip to Answers",
     "skipConfirmTitle": "Skip Challenges?",
     "skipConfirmMessage": "You'll see the answers without playing. Your score will be 0.",
-    "skipConfirm": "Skip to Answers"
+    "skipConfirm": "Skip to Answers",
+    "history": {
+      "title": "Past Challenges",
+      "browse": "Browse past Daily Buzz challenges",
+      "available": "challenges available",
+      "empty": "No past challenges yet",
+      "selectDate": "Select a date to play"
+    }
   },
   "wordHunt": {
     "title": "Word Hunt",

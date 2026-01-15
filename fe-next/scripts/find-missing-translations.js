@@ -25,6 +25,9 @@ const TRANSLATIONS_FILE = path.join(PROJECT_ROOT, 'translations/index.js');
 const EXTENSIONS_TO_SCAN = ['.ts', '.tsx', '.js', '.jsx'];
 const DIRS_TO_EXCLUDE = ['node_modules', '.next', 'dist', 'build', '.git', 'playwright-report', 'scripts'];
 
+// Track dynamic/risky translation patterns that might fail at runtime
+const dynamicPatterns = [];
+
 // ============================================
 // PART 1: Extract translation keys from translation file
 // ============================================
@@ -360,6 +363,14 @@ function extractTFunctionCalls(filePath) {
         });
         continue;
       }
+      // Track dynamic pattern for reporting
+      dynamicPatterns.push({
+        pattern: raw,
+        file: path.relative(PROJECT_ROOT, filePath),
+        line: lineNum + 1,
+        context: line.trim().substring(0, 100),
+        type: 'template_literal'
+      });
       // Expand known pattern for daily.createChallengeFeature.benefits.${benefit.key}
       const prefixMatch = raw.match(/^(daily\.createChallengeFeature\.benefits\.)\$\{benefit\.key\}$/);
       if (prefixMatch && benefitsKeys.length > 0) {
@@ -373,6 +384,40 @@ function extractTFunctionCalls(filePath) {
           });
         }
       }
+    }
+
+    // Detect risky patterns: t() with fallback || that might indicate missing key
+    const fallbackPattern = /\bt\(\s*['"]([^'"]+)['"]\s*\)\s*\|\|\s*['"]([^'"]+)['"]/g;
+    fallbackPattern.lastIndex = 0;
+    let fb;
+    while ((fb = fallbackPattern.exec(line)) !== null) {
+      dynamicPatterns.push({
+        pattern: fb[0],
+        key: fb[1],
+        fallback: fb[2],
+        file: path.relative(PROJECT_ROOT, filePath),
+        line: lineNum + 1,
+        context: line.trim().substring(0, 100),
+        type: 'fallback_usage'
+      });
+    }
+
+    // Detect t() calls with variable keys (risky at runtime)
+    const varKeyPattern = /\bt\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\)/g;
+    varKeyPattern.lastIndex = 0;
+    let vk;
+    while ((vk = varKeyPattern.exec(line)) !== null) {
+      const varName = vk[1];
+      // Skip common false positives
+      if (['t', 'key', 'translationKey', 'i18nKey'].includes(varName)) continue;
+      dynamicPatterns.push({
+        pattern: vk[0],
+        variable: varName,
+        file: path.relative(PROJECT_ROOT, filePath),
+        line: lineNum + 1,
+        context: line.trim().substring(0, 100),
+        type: 'variable_key'
+      });
     }
   }
 
@@ -401,7 +446,7 @@ function extractAllTFunctionCalls() {
 // PART 3: Compare and generate report
 // ============================================
 
-function generateReport(keysByLanguage, tCalls, problematicByLanguage = {}) {
+function generateReport(keysByLanguage, tCalls, problematicByLanguage = {}, runtimeRisks = []) {
   console.log('\n========================================');
   console.log('TRANSLATION KEY ANALYSIS REPORT');
   console.log('========================================\n');
@@ -421,7 +466,60 @@ function generateReport(keysByLanguage, tCalls, problematicByLanguage = {}) {
   }
 
   // ========================================
-  // Section 0: CRITICAL - Problematic flat keys (keys with dots that break t() function)
+  // Section 0a: Runtime risk patterns (dynamic keys, fallbacks, variables)
+  // ========================================
+  if (runtimeRisks.length > 0) {
+    console.log('\n========================================');
+    console.log('⚠️  RUNTIME RISK PATTERNS');
+    console.log('========================================\n');
+    console.log('These patterns may cause runtime errors if the dynamic keys don\'t exist.\n');
+
+    const templateLiterals = runtimeRisks.filter(r => r.type === 'template_literal');
+    const fallbackUsages = runtimeRisks.filter(r => r.type === 'fallback_usage');
+    const variableKeys = runtimeRisks.filter(r => r.type === 'variable_key');
+
+    if (templateLiterals.length > 0) {
+      console.log(`TEMPLATE LITERALS (${templateLiterals.length} found):`);
+      console.log('  These use dynamic interpolation - ensure all possible values exist.\n');
+      for (const tl of templateLiterals.slice(0, 5)) {
+        console.log(`  - ${tl.file}:${tl.line}`);
+        console.log(`    Pattern: t(\`${tl.pattern}\`)`);
+      }
+      if (templateLiterals.length > 5) {
+        console.log(`  ... and ${templateLiterals.length - 5} more\n`);
+      }
+      console.log('');
+    }
+
+    if (fallbackUsages.length > 0) {
+      console.log(`FALLBACK PATTERNS (${fallbackUsages.length} found):`);
+      console.log('  t("key") || "fallback" suggests the key might be missing.\n');
+      for (const fb of fallbackUsages.slice(0, 10)) {
+        console.log(`  - ${fb.file}:${fb.line}`);
+        console.log(`    Key: "${fb.key}" -> Fallback: "${fb.fallback}"`);
+      }
+      if (fallbackUsages.length > 10) {
+        console.log(`  ... and ${fallbackUsages.length - 10} more\n`);
+      }
+      console.log('');
+    }
+
+    if (variableKeys.length > 0) {
+      console.log(`VARIABLE KEYS (${variableKeys.length} found):`);
+      console.log('  t(variable) uses a variable as key - verify all possible values exist.\n');
+      for (const vk of variableKeys.slice(0, 10)) {
+        console.log(`  - ${vk.file}:${vk.line}`);
+        console.log(`    Variable: ${vk.variable}`);
+      }
+      if (variableKeys.length > 10) {
+        console.log(`  ... and ${variableKeys.length - 10} more\n`);
+      }
+      console.log('');
+    }
+  }
+
+  // ========================================
+  // Section 0b: CRITICAL - Problematic flat keys (keys with dots that break t() function)
   // ========================================
   const totalProblematic = Object.values(problematicByLanguage).reduce((sum, arr) => sum + arr.length, 0);
   if (totalProblematic > 0) {
@@ -637,6 +735,16 @@ function generateReport(keysByLanguage, tCalls, problematicByLanguage = {}) {
       ),
       missingFromEnglish: missingFromEnglish.length,
       problematicFlatKeys: totalProblematicCount,
+      runtimeRisks: {
+        templateLiterals: runtimeRisks.filter(r => r.type === 'template_literal').length,
+        fallbackUsages: runtimeRisks.filter(r => r.type === 'fallback_usage').length,
+        variableKeys: runtimeRisks.filter(r => r.type === 'variable_key').length,
+      },
+    },
+    runtimeRisks: {
+      templateLiterals: runtimeRisks.filter(r => r.type === 'template_literal'),
+      fallbackUsages: runtimeRisks.filter(r => r.type === 'fallback_usage'),
+      variableKeys: runtimeRisks.filter(r => r.type === 'variable_key'),
     },
     problematicFlatKeys: Object.fromEntries(
       languages.map(lang => [
@@ -685,14 +793,17 @@ function main() {
   console.log('Translation Key Analysis Tool');
   console.log('==============================\n');
 
+  // Clear dynamic patterns from previous runs
+  dynamicPatterns.length = 0;
+
   // Step 1: Extract translation keys and detect problematic flat keys
   const { keysByLanguage, problematicByLanguage } = getTranslationKeysFromFile();
 
-  // Step 2: Extract t() calls
+  // Step 2: Extract t() calls (also populates dynamicPatterns)
   const tCalls = extractAllTFunctionCalls();
 
-  // Step 3: Generate report
-  const report = generateReport(keysByLanguage, tCalls, problematicByLanguage);
+  // Step 3: Generate report with runtime risk patterns
+  const report = generateReport(keysByLanguage, tCalls, problematicByLanguage, dynamicPatterns);
 
   console.log('\n==============================');
   console.log('Analysis complete!');

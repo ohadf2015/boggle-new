@@ -11,6 +11,7 @@ import {
   checkImageCache,
   categorizeTopic,
 } from './imagenClient';
+import { matchesExpectedScript } from '../utils/scriptDetection';
 // Dictionary imports removed - Buzz challenges don't validate against game dictionary
 
 interface BuzzChallenge {
@@ -161,11 +162,20 @@ export async function generateDailyBuzz(
     }
   }
 
-  // Step 2: Filter and select appropriate trends
-  const filteredTrends = filterTrends(trends, language);
+  // Step 2: Fetch recently used trends to avoid repetition
+  const recentlyUsedTrends = await getRecentlyUsedTrends(language, 7);
+
+  // Step 3: Filter and select appropriate trends (excluding recently used)
+  const filteredTrends = filterTrends(trends, language, recentlyUsedTrends);
   if (filteredTrends.length < 3) {
     console.error('[BUZZ] Insufficient trends after filtering');
-    throw new Error('Not enough suitable trends for challenges');
+    // If we filtered out too many, try again without deduplication
+    console.log('[BUZZ] Retrying without deduplication filter...');
+    const fallbackFiltered = filterTrends(trends, language);
+    if (fallbackFiltered.length < 3) {
+      throw new Error('Not enough suitable trends for challenges');
+    }
+    console.log(`[BUZZ] Using fallback filter (${fallbackFiltered.length} trends)`);
   }
 
   // Step 3: Generate challenges with Claude Opus
@@ -236,8 +246,14 @@ export async function generateDailyBuzz(
 /**
  * Filter trending topics for family-friendly, word-game-suitable content
  * PRIORITIZES rising trends (highest increase_percentage) over static popular trends
+ * Also filters out trends that don't match the expected language script
+ * And filters out recently used trends to ensure freshness
  */
-function filterTrends(trends: TrendingTopic[], _language: string): TrendingTopic[] {
+function filterTrends(
+  trends: TrendingTopic[],
+  language: string,
+  recentlyUsedTrends?: Set<string>
+): TrendingTopic[] {
   // NSFW keywords to filter out (add more as needed)
   const bannedKeywords = [
     'porn',
@@ -256,6 +272,19 @@ function filterTrends(trends: TrendingTopic[], _language: string): TrendingTopic
 
   const filtered = trends.filter((trend) => {
     const query = trend.query.toLowerCase();
+    const normalizedQuery = query.trim();
+
+    // Filter by language script (e.g., reject Arabic trends for Hebrew)
+    if (!matchesExpectedScript(trend.query, language)) {
+      console.log(`[BUZZ] Filtered trend "${trend.query}" - script mismatch for ${language}`);
+      return false;
+    }
+
+    // Filter out recently used trends (don't repeat within a week)
+    if (recentlyUsedTrends && recentlyUsedTrends.has(normalizedQuery)) {
+      console.log(`[BUZZ] Filtered trend "${trend.query}" - recently used (within 7 days)`);
+      return false;
+    }
 
     // Filter out NSFW content
     if (bannedKeywords.some((keyword) => query.includes(keyword))) {
@@ -514,46 +543,170 @@ function getLanguageToneGuide(language: string): string {
   return guides[language] || guides.en;
 }
 
+// Categories to deprioritize (sports is often over-represented in trends)
+const LOW_PRIORITY_CATEGORIES = ['Sports', 'Soccer', 'Football', 'Basketball', 'Tennis', 'Baseball'];
+
+/**
+ * Check if a trend belongs to a low-priority category (e.g., sports)
+ */
+function isLowPriorityCategory(trend: TrendingTopic): boolean {
+  const categoryNames = trend.categories?.map(c => c.name) ?? [];
+  return categoryNames.some(name =>
+    LOW_PRIORITY_CATEGORIES.some(lowPri =>
+      name.toLowerCase().includes(lowPri.toLowerCase())
+    )
+  );
+}
+
 /**
  * Select trends for challenge generation
- * Freely chooses from available trends, prioritizing rising trends
- * while maintaining diversity across categories
+ * Prioritizes rising trends while maintaining diversity across categories
+ * Deprioritizes sports and ensures no single category dominates
  */
 function selectTrendsForChallenge(trends: TrendingTopic[]): TrendingTopic[] {
   if (trends.length <= 5) return trends;
 
   const selected: TrendingTopic[] = [];
-  const usedCategories = new Set<string>();
+  const categoryCount = new Map<string, number>();
+  const MAX_PER_CATEGORY = 2; // No category should have more than 2 trends
+  const MAX_SPORTS = 1; // Only 1 sports trend allowed
 
-  // First pass: prioritize fastest-rising trends (increase_percentage > 100%)
-  const risingFast = trends.filter(t => (t.increase_percentage ?? 0) > 100);
-  for (const trend of risingFast) {
-    if (selected.length >= 5) break;
+  /**
+   * Check if we can add a trend based on category limits
+   */
+  function canAddTrend(trend: TrendingTopic): boolean {
     const category = trend.categories?.[0]?.name ?? 'General';
-    if (!usedCategories.has(category) || selected.length < 3) {
-      selected.push(trend);
-      usedCategories.add(category);
+    const currentCount = categoryCount.get(category) ?? 0;
+
+    // Check sports limit
+    if (isLowPriorityCategory(trend)) {
+      const sportsCount = Array.from(categoryCount.entries())
+        .filter(([cat]) => LOW_PRIORITY_CATEGORIES.some(lp =>
+          cat.toLowerCase().includes(lp.toLowerCase())
+        ))
+        .reduce((sum, [, count]) => sum + count, 0);
+      if (sportsCount >= MAX_SPORTS) return false;
+    }
+
+    // Check general category limit
+    return currentCount < MAX_PER_CATEGORY;
+  }
+
+  /**
+   * Add a trend and update category counts
+   */
+  function addTrend(trend: TrendingTopic): void {
+    const category = trend.categories?.[0]?.name ?? 'General';
+    selected.push(trend);
+    categoryCount.set(category, (categoryCount.get(category) ?? 0) + 1);
+  }
+
+  // Separate sports and non-sports trends
+  const nonSportsTrends = trends.filter(t => !isLowPriorityCategory(t));
+  const sportsTrends = trends.filter(t => isLowPriorityCategory(t));
+
+  // First pass: prioritize fastest-rising NON-SPORTS trends (increase_percentage > 100%)
+  const risingFastNonSports = nonSportsTrends.filter(t => (t.increase_percentage ?? 0) > 100);
+  for (const trend of risingFastNonSports) {
+    if (selected.length >= 5) break;
+    if (canAddTrend(trend)) {
+      addTrend(trend);
     }
   }
 
-  // Second pass: fill remaining slots with rising trends (any increase_percentage > 0)
-  const rising = trends.filter(t =>
+  // Second pass: fill with rising non-sports trends
+  const risingNonSports = nonSportsTrends.filter(t =>
     (t.increase_percentage ?? 0) > 0 && !selected.includes(t)
   );
-  for (const trend of rising) {
+  for (const trend of risingNonSports) {
     if (selected.length >= 5) break;
-    selected.push(trend);
+    if (canAddTrend(trend)) {
+      addTrend(trend);
+    }
   }
 
-  // Third pass: fill with any remaining if needed
+  // Third pass: add up to 1 sports trend if we have room and good rising sports
+  const risingSports = sportsTrends.filter(t => (t.increase_percentage ?? 0) > 50);
+  for (const trend of risingSports) {
+    if (selected.length >= 5) break;
+    if (canAddTrend(trend)) {
+      addTrend(trend);
+      break; // Only add 1 sports trend
+    }
+  }
+
+  // Fourth pass: fill remaining slots with any non-sports trends
+  for (const trend of nonSportsTrends) {
+    if (selected.length >= 5) break;
+    if (!selected.includes(trend) && canAddTrend(trend)) {
+      addTrend(trend);
+    }
+  }
+
+  // Final pass: fill with any remaining if still needed (including sports)
   for (const trend of trends) {
     if (selected.length >= 5) break;
     if (!selected.includes(trend)) {
-      selected.push(trend);
+      addTrend(trend);
     }
   }
 
+  console.log(`[BUZZ] Selected trends by category: ${Array.from(categoryCount.entries()).map(([cat, count]) => `${cat}:${count}`).join(', ')}`);
+
   return selected;
+}
+
+/**
+ * Get stop words for filtering by language
+ * These are common words that shouldn't be used as answer candidates
+ */
+function getStopWords(language: string): Set<string> {
+  const stopWordsByLang: Record<string, string[]> = {
+    en: ['the', 'and', 'for', 'that', 'with', 'from', 'this', 'are', 'was', 'been', 'has', 'have', 'about', 'what', 'when', 'where', 'news', 'update', 'latest', 'breaking', 'new', 'first', 'last', 'just', 'now', 'today', 'here', 'there', 'says', 'said', 'after', 'before', 'will', 'how', 'why', 'who', 'more', 'most', 'some', 'other'],
+    he: ['של', 'על', 'את', 'עם', 'זה', 'היא', 'הוא', 'אני', 'לא', 'כי', 'גם', 'אם', 'או', 'יש', 'היום', 'חדשות', 'אחרי', 'לפני', 'עכשיו', 'כאן', 'שם', 'אומר', 'אמר', 'יותר', 'הכי', 'כמה', 'אחר', 'עוד'],
+    sv: ['och', 'det', 'att', 'för', 'med', 'som', 'den', 'har', 'var', 'inte', 'efter', 'före', 'här', 'där', 'säger', 'mer', 'mest', 'annan'],
+    ja: ['の', 'は', 'が', 'を', 'に', 'で', 'と', 'も', 'か', 'です', 'ます', 'した', 'する', 'ある', 'いる', 'これ', 'それ', 'あれ'],
+    es: ['que', 'para', 'con', 'del', 'las', 'los', 'una', 'por', 'más', 'como', 'pero', 'este', 'esta', 'sobre', 'todo', 'también', 'desde', 'entre', 'hasta', 'según', 'dice', 'nuevo', 'nueva'],
+  };
+
+  return new Set(stopWordsByLang[language] || stopWordsByLang.en);
+}
+
+/**
+ * Extract common keywords from trend breakdowns
+ * Parses phrases and extracts meaningful single words that could be answer candidates
+ */
+function extractKeywordsFromBreakdowns(trends: TrendingTopic[], language: string): string[] {
+  const stopWords = getStopWords(language);
+  const keywords = new Map<string, number>(); // word -> frequency
+
+  for (const trend of trends) {
+    if (!trend.trend_breakdown) continue;
+
+    for (const phrase of trend.trend_breakdown) {
+      // Split phrase into words
+      const words = phrase
+        .toLowerCase()
+        .split(/[\s,.\-:;!?"'()]+/)
+        .filter(word =>
+          word.length >= 3 &&
+          word.length <= 12 &&
+          !stopWords.has(word) &&
+          !/^\d+$/.test(word) &&
+          !/^[^a-zA-Zא-ת\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+$/.test(word) // Has actual letters
+        );
+
+      words.forEach(word => {
+        keywords.set(word, (keywords.get(word) ?? 0) + 1);
+      });
+    }
+  }
+
+  // Sort by frequency and return top 20 most common keywords
+  return Array.from(keywords.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 20)
+    .map(([word]) => word);
 }
 
 /**
@@ -570,20 +723,40 @@ async function buildAIPrompt(
   // Take variety: mix of fastest-rising and high-volume for diversity
   const selectedTrends = selectTrendsForChallenge(trends);
 
+  // Extract keywords from ALL trend breakdowns for answer suggestions
+  const extractedKeywords = extractKeywordsFromBreakdowns(selectedTrends, language);
+
   const trendsContext = selectedTrends
     .map((trend, idx) => {
-      const contextParts = trend.trend_breakdown?.slice(0, 3).join(', ') ||
-        trend.categories?.map(c => c.name).join(', ') ||
-        'Currently trending';
+      // Use ALL breakdown items, not just first 3
+      const breakdownItems = trend.trend_breakdown ?? [];
+      const contextParts = breakdownItems.length > 0
+        ? breakdownItems.join(', ')
+        : trend.categories?.map(c => c.name).join(', ') || 'Currently trending';
       const volumeDisplay = trend.search_volume
         ? `${(trend.search_volume / 1000).toFixed(0)}K+`
-        : 'trending';
+        : 'prominent';
       const riseIndicator = trend.increase_percentage
         ? ` 🔥 RISING +${trend.increase_percentage}%`
         : '';
-      return `${idx + 1}. "${trend.query}" - ${volumeDisplay} searches${riseIndicator}\n   Context: ${contextParts}`;
+      return `${idx + 1}. "${trend.query}" - ${volumeDisplay} searches${riseIndicator}\n   Breakdown context: ${contextParts}`;
     })
     .join('\n\n');
+
+  // Build keywords section for AI prompt
+  const keywordsSection = extractedKeywords.length > 0
+    ? `
+---
+
+## SUGGESTED ANSWER WORDS (extracted from trend breakdowns)
+
+These words appear frequently in today's trend context. Consider using them as answer candidates when they fit naturally:
+
+${extractedKeywords.map(kw => `- ${kw.toUpperCase()}`).join('\n')}
+
+**Note**: These are SUGGESTIONS based on trend breakdown analysis. Only use them if they create good, guessable challenges with lateral thinking connections.
+`
+    : '';
 
   // Language-specific examples and rules
   const langExamples = language === 'he' ? `
@@ -677,7 +850,7 @@ ${languageToneGuide}
 
 **TODAY'S TRENDING TOPICS** (prioritized by rise velocity - 🔥 = fastest rising):
 ${trendsContext}
-
+${keywordsSection}
 ---
 
 ## 🎯 THE CREATIVE PHILOSOPHY: SURPRISING CONNECTIONS
@@ -747,13 +920,39 @@ ${langExamples}
    - Trend "AI Summit" → "What nervous speakers do | Letters: TSAEW" → SWEAT
 
 2. **fill_blank**: Phrase with unexpected angle on trend
-   - Format: "Phrase with _____ (N letters)" - one underscore per letter
-   - Trend "Election" → "Voters stood in _____ for hours (4 letters)" → LINE
-   - Trend "Heat Wave" → "People escaped to the _____ (5 letters)" → SHADE
+   - Format: "Phrase with _ _ _ _ _ (N letters)" - USE SPACED UNDERSCORES matching exact word length!
+   - CRITICAL: Count of underscores MUST EQUAL the answer length. Each underscore = one letter.
+   - Trend "Election" → "Voters stood in _ _ _ _ for hours (4 letters)" → LINE (4 letters = 4 underscores)
+   - Trend "Heat Wave" → "People escaped to the _ _ _ _ _ (5 letters)" → SHADE (5 letters = 5 underscores)
+   - WRONG: "Fill in the _____ (6 letters)" → generic underscores don't match!
+   - RIGHT: "Fill in the _ _ _ _ _ _ (6 letters)" → 6 spaced underscores = 6 letters
 
-3. **word_chain**: Connect two unexpectedly related words
-   - Trend "Tech Layoffs" → OFFICE → ? → BOX (packing up desks)
-   - Trend "World Cup" → GRASS → ? → SLIDE (tackle move)
+3. **word_chain**: COMPOUND WORD CHAIN - Answer forms compound words with BOTH neighbors
+   - Format: "WORD1 → ??? → WORD2" - Player must guess the middle word
+   - CRITICAL: The answer MUST create valid compound words on BOTH sides:
+     * WORD1 + ANSWER = compound word
+     * ANSWER + WORD2 = compound word
+
+   **VERIFIED COMPOUND CHAINS (use these patterns)**:
+   - SUN → ??? → POT → FLOWER (sunFLOWER + FLOWERpot) ✅
+   - FIRE → ??? → SHOP → WORK (fireWORK + WORKshop) ✅
+   - BOOK → ??? → DOWN → MARK (bookMARK + MARKdown) ✅
+   - HAND → ??? → UP → MADE (handMADE + MADEup... wait, "madeup" isn't a compound)
+
+   **ACTUALLY VALID CHAINS**:
+   - SUN → FLOWER → POT (SUNflower + FLOWERpot) ✅
+   - FIRE → WORK → SHOP (FIREwork + WORKshop) ✅
+   - BACK → PACK → AGE (BACKpack + PACKage) ✅
+   - DOOR → STEP → CHILD (DOORstep + STEPchild) ✅
+   - TOOTH → PICK → UP (TOOTHpick + PICKup) ✅
+   - DATA → BASE → LINE (DATAbase + BASEline) ✅
+   - GRAND → STAND → STILL (GRANDstand + STANDstill) ✅
+
+   **BEFORE SUBMITTING**: Verify BOTH compound words exist:
+   1. Does WORD1 + ANSWER = real word?
+   2. Does ANSWER + WORD2 = real word?
+
+   - Trend "Technology" → "DATA → ??? → LINE" → BASE (database + baseline) ✅
 
 4. **definition_match**: Word from unexpected angle, 4 options
    - Trend "Wildfire" → Word for "people who leave their homes": EVACUEE, REFUGEE, MIGRANT, NOMAD
@@ -958,6 +1157,55 @@ function repairTruncatedJson(jsonText: string): string {
 }
 
 /**
+ * Normalize fill_blank challenges to have correct underscore count
+ * Replaces generic blanks with properly sized spaced underscores
+ */
+function normalizeBlankSizes(challenges: BuzzChallenge[]): BuzzChallenge[] {
+  return challenges.map(challenge => {
+    if (challenge.type !== 'fill_blank') return challenge;
+
+    const answerLength = challenge.answer.replace(/\s/g, '').length; // Handle answers without spaces
+    const spacedBlanks = Array(answerLength).fill('_').join(' ');
+
+    // Replace various blank patterns with correct size
+    let normalizedPrompt = challenge.prompt
+      // Replace continuous underscores (_____, ____, etc.)
+      .replace(/_{3,}/g, spacedBlanks)
+      // Replace asterisks used as blanks
+      .replace(/\*{3,}/g, spacedBlanks)
+      // Replace dots used as blanks
+      .replace(/\.{3,}/g, spacedBlanks)
+      // Replace already-spaced underscores that might be wrong count
+      .replace(/(\s*_\s*)+/g, (match) => {
+        // Only replace if there are underscores
+        const existingCount = (match.match(/_/g) || []).length;
+        // If the existing count matches, keep it; otherwise replace
+        if (existingCount !== answerLength) {
+          return ` ${spacedBlanks} `;
+        }
+        return match;
+      });
+
+    // Update or add letter count notation
+    const letterCountPattern = /\((\d+)\s*letters?\)/i;
+    if (letterCountPattern.test(normalizedPrompt)) {
+      normalizedPrompt = normalizedPrompt.replace(
+        letterCountPattern,
+        `(${answerLength} letters)`
+      );
+    } else {
+      // Add letter count if not present
+      normalizedPrompt = `${normalizedPrompt.trim()} (${answerLength} letters)`;
+    }
+
+    return {
+      ...challenge,
+      prompt: normalizedPrompt.replace(/\s+/g, ' ').trim() // Clean up extra spaces
+    };
+  });
+}
+
+/**
  * Parse AI response into structured challenges
  */
 function parseAIResponse(responseText: string): BuzzChallenge[] {
@@ -1016,7 +1264,10 @@ function parseAIResponse(responseText: string): BuzzChallenge[] {
     throw new Error(`Insufficient valid challenges: got ${validChallenges.length}, need 5`);
   }
 
-  return validChallenges;
+  // Normalize fill_blank challenges to have correct blank sizes
+  const normalizedChallenges = normalizeBlankSizes(validChallenges);
+
+  return normalizedChallenges;
 }
 
 // Common brand names and proper nouns to filter out (case-insensitive)
@@ -1145,6 +1396,59 @@ function validateSingleChallenge(
 function generateTrendingSummary(trends: TrendingTopic[]): string {
   const topTopics = trends.slice(0, 3).map((t) => t.query);
   return `Top trends: ${topTopics.join(', ')}`.substring(0, 100);
+}
+
+/**
+ * Fetch recently used trend topics to avoid repetition
+ * Returns trend query strings from the last N days
+ */
+async function getRecentlyUsedTrends(
+  language: string,
+  daysBack: number = 7
+): Promise<Set<string>> {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    // Calculate date range
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - daysBack);
+    const startDateStr = startDate.toISOString().split('T')[0];
+
+    const { data, error } = await supabase
+      .from('daily_buzz_challenges')
+      .select('trending_topics')
+      .eq('language', language)
+      .gte('puzzle_date', startDateStr);
+
+    if (error) {
+      console.error('[BUZZ] Failed to fetch recently used trends:', error.message);
+      return new Set();
+    }
+
+    // Extract all trend query strings from the results
+    const usedTrends = new Set<string>();
+    if (data) {
+      for (const row of data) {
+        const topics = row.trending_topics as TrendingTopic[] | null;
+        if (topics) {
+          for (const topic of topics) {
+            // Normalize the query string for comparison
+            usedTrends.add(topic.query.toLowerCase().trim());
+          }
+        }
+      }
+    }
+
+    console.log(`[BUZZ] Found ${usedTrends.size} recently used trends (last ${daysBack} days)`);
+    return usedTrends;
+  } catch (error) {
+    console.error('[BUZZ] Error fetching recently used trends:', error);
+    return new Set();
+  }
 }
 
 /**

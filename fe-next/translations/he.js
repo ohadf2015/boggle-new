@@ -92,6 +92,8 @@ const he = {
     "connected": "מחובר",
     "left": "נותרו",
     "optional": "אופציונלי",
+    "today": "היום",
+    "yesterday": "אתמול",
     "processing": "מעבד...",
     "coins": "מטבעות",
     "chat": "צ'אט",
@@ -2426,7 +2428,10 @@ const he = {
       "unscramble": "סדרו את האותיות!"
     },
     "chain": {
-      "instruction": "השלימו את שרשרת המילים!"
+      "instruction": "מצאו את המילה המחברת!",
+      "compoundHint": "יוצרת מילה מורכבת עם שני השכנים",
+      "exampleHint": "דוגמה: שמש→פרח→עציץ (חמניה + עציץ-פרחים)",
+      "thinkCompound": "חשבו על מילים מורכבות!"
     },
     "feedback": {
       "correct": "נכון!",
@@ -2471,7 +2476,14 @@ const he = {
     "skipToAnswers": "דלג לתשובות",
     "skipConfirmTitle": "לדלג על האתגרים?",
     "skipConfirmMessage": "תראו את התשובות בלי לשחק. הניקוד שלכם יהיה 0.",
-    "skipConfirm": "דלג לתשובות"
+    "skipConfirm": "דלג לתשובות",
+    "history": {
+      "title": "אתגרים קודמים",
+      "browse": "גלשו באתגרי באזז קודמים",
+      "available": "אתגרים זמינים",
+      "empty": "אין עדיין אתגרים קודמים",
+      "selectDate": "בחרו תאריך לשחק"
+    }
   },
   "wordHunt": {
     "title": "ציד מילים",

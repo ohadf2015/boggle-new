@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 interface DailyChallengeLandingProps {
   onSelectWordHunt: () => void;
   onSelectBuzz: () => void;
+  onShowBuzzHistory?: () => void;
   currentLanguage: Language;
 }
 
@@ -36,6 +37,7 @@ interface BuzzPreviewData {
 export function DailyChallengeLanding({
   onSelectWordHunt,
   onSelectBuzz,
+  onShowBuzzHistory,
   currentLanguage,
 }: DailyChallengeLandingProps) {
   const { t } = useLanguage();
@@ -263,6 +265,19 @@ export function DailyChallengeLanding({
           requestState={requestState}
         />
       </div>
+
+      {/* Browse Past Buzz Challenges */}
+      {onShowBuzzHistory && (
+        <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          onClick={onShowBuzzHistory}
+          className="mt-3 text-sm text-slate-400 hover:text-neo-pink transition-colors underline underline-offset-2"
+        >
+          {t('buzz.history.browse') || 'Browse past Daily Buzz challenges'}
+        </motion.button>
+      )}
 
       {/* Daily Double Achievement - Compact */}
       {bothCompleted && (

@@ -92,6 +92,8 @@ const ja = {
     "connected": "接続済み",
     "left": "残り",
     "optional": "任意",
+    "today": "今日",
+    "yesterday": "昨日",
     "processing": "処理中...",
     "offline": "オフライン",
     "online": "オンライン",
@@ -2409,7 +2411,10 @@ const ja = {
       "unscramble": "文字を並べ替えよう！"
     },
     "chain": {
-      "instruction": "単語チェーンを完成させよう！"
+      "instruction": "つなぐ言葉を見つけよう！",
+      "compoundHint": "両隣と複合語を作る言葉",
+      "exampleHint": "例: 太陽→花→鉢（ひまわり + 花鉢）",
+      "thinkCompound": "複合語を考えてみて！"
     },
     "type": {
       "scrambled": "バラバラ",
@@ -2461,7 +2466,14 @@ const ja = {
     "skipToAnswers": "答えにスキップ",
     "skipConfirmTitle": "チャレンジをスキップしますか？",
     "skipConfirmMessage": "プレイせずに答えを見ます。スコアは0になります。",
-    "skipConfirm": "答えにスキップ"
+    "skipConfirm": "答えにスキップ",
+    "history": {
+      "title": "過去のチャレンジ",
+      "browse": "過去のDaily Buzzを見る",
+      "available": "チャレンジあり",
+      "empty": "まだ過去のチャレンジはありません",
+      "selectDate": "日付を選んでプレイ"
+    }
   },
   "wordHunt": {
     "title": "ワードハント",
