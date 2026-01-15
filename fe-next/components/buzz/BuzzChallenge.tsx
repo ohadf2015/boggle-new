@@ -72,7 +72,6 @@ export default function BuzzChallenge({ language, onBack, date }: BuzzChallengeP
 
   // Determine which date to fetch (today or specified past date)
   const targetDate = date || new Date().toISOString().split('T')[0];
-  const isHistorical = date && date !== new Date().toISOString().split('T')[0];
 
   // Fetch buzz challenge for the target date
   useEffect(() => {
@@ -166,7 +165,7 @@ export default function BuzzChallenge({ language, onBack, date }: BuzzChallengeP
             exit={{ opacity: 0 }}
             className="flex-1 flex items-center justify-center"
           >
-            <NeoLoader variant="mascot-letters" size="lg" text={t('buzz.loading') || 'Loading Daily Buzz...'} />
+            <NeoLoader variant="mascot-letters" size="lg" text={t('buzz.loading')} />
           </motion.div>
         )}
 
@@ -210,14 +209,14 @@ export default function BuzzChallenge({ language, onBack, date }: BuzzChallengeP
             <div className="text-center space-y-4 max-w-md">
               <div className="text-6xl">😞</div>
               <h2 className="text-2xl font-black text-neo-red">
-                {t('buzz.error.title') || 'Oops!'}
+                {t('buzz.error.title')}
               </h2>
               <p className="text-slate-400">{errorMessage}</p>
               <button
                 onClick={onBack}
                 className="px-6 py-3 bg-neo-yellow text-neo-black font-bold rounded-xl border-3 border-neo-black shadow-hard hover:shadow-hard-lg transition-all"
               >
-                {t('common.back') || 'Go Back'}
+                {t('common.back')}
               </button>
             </div>
           </motion.div>

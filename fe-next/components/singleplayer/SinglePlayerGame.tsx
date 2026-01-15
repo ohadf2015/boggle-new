@@ -48,6 +48,8 @@ import { finalizeWordValidation } from '@/utils/wordValidationAPI';
 import type { SinglePlayerGameState, SinglePlayerResultsData, BotOpponent } from './SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
 import { NeoLoader } from '@/components/ui/NeoLoader';
+import { useBotSimulation, useSpamDetection } from './game/hooks';
+import { getComboBonus as calculateComboBonus } from '@/shared/utils/scoring';
 
 interface SinglePlayerGameProps {
   settings: SinglePlayerGameState;
@@ -95,8 +97,6 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const [foundWords, setFoundWords] = useState<FoundWord[]>([]);
   const [score, setScore] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [botScores, setBotScores] = useState<Record<string, number>>({});
-  const [botWords, setBotWords] = useState<Record<string, string[]>>({});
   const [isGameOver, setIsGameOver] = useState(false);
   const [isValidatingWords, setIsValidatingWords] = useState(false);
   // Available words from grid solver for bots to use
@@ -105,10 +105,22 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     medium: string[];
     hard: string[];
   } | null>(null);
-  // Track which words each bot has already used
-  const botUsedWordsRef = useRef<Record<string, Set<string>>>({});
   // Ref to access current availableWords in callbacks (avoids stale closure)
   const availableWordsRef = useRef(availableWords);
+
+  // Bot simulation hook - handles bot word finding and scoring
+  const {
+    botScores,
+    botWords,
+    resetBots,
+    initializeBotUsedWords,
+  } = useBotSimulation({
+    mode: settings.mode,
+    bots: settings.bots,
+    isPaused,
+    isGameOver,
+    availableWords,
+  });
 
   // Minimum word length for "Words Remaining" counter and hints
   // Only count/hint words with 5+ letters to reduce overwhelming large numbers
@@ -337,7 +349,6 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   }, [timer.remainingTime, gameActive, announceTimer]);
 
   // Remaining refs (not replaced by hooks)
-  const botIntervalsRef = useRef<NodeJS.Timeout[]>([]);
   const foundWordsSetRef = useRef<Set<string>>(new Set());
   const gameOverCalledRef = useRef(false);
   const gameStartTimeRef = useRef<number>(0); // Track when game started for pace analysis
@@ -355,12 +366,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     };
   }, [setGameActive]);
 
-  // Abuse detection: track submission timestamps (like multiplayer's spamDetector)
-  const submissionTimestampsRef = useRef<number[]>([]);
-  const SPAM_WINDOW_MS = 10000; // 10-second window
-  const SPAM_WARNING_THRESHOLD = 15; // Warn at 15 submissions in 10s
-  const SPAM_COOLDOWN_THRESHOLD = 25; // Block at 25 submissions in 10s
-  const spamCooldownUntilRef = useRef<number>(0);
+  // Spam detection hook (prevents abuse of word submissions)
+  const { checkSubmission, resetSpamDetection } = useSpamDetection();
 
   // Refs for latest values (to avoid stale closures)
   const scoreRef = useRef(score);
@@ -602,23 +609,13 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
     initGrid();
 
-    // Initialize bot scores
-    const initialBotScores: Record<string, number> = {};
-    const initialBotWords: Record<string, string[]> = {};
-    settings.bots.forEach(bot => {
-      initialBotScores[bot.id] = 0;
-      initialBotWords[bot.id] = [];
-    });
-    setBotScores(initialBotScores);
-    setBotWords(initialBotWords);
-
-    // Initialize bot used words tracking
-    const initialBotUsedWords: Record<string, Set<string>> = {};
-    settings.bots.forEach(bot => {
-      initialBotUsedWords[bot.id] = new Set();
-    });
-    botUsedWordsRef.current = initialBotUsedWords;
-  }, [settings.difficulty, settings.language, settings.bots, settings.mode]);
+    // Initialize bot simulation for new game
+    // Bot scores and words are managed by useBotSimulation hook
+    initializeBotUsedWords(settings.bots);
+    resetBots();
+    // Reset spam detection for new game
+    resetSpamDetection();
+  }, [settings.difficulty, settings.language, settings.bots, settings.mode, initializeBotUsedWords, resetBots, resetSpamDetection]);
 
   // Fetch valid words from grid for bots and word progress tracking
   // Runs for ALL modes to support WordsProgress, not just solo-bots
@@ -684,8 +681,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
     gameOverCalledRef.current = true;
 
-    // Clean up bot intervals (timer and combo handled by hooks)
-    botIntervalsRef.current.forEach(clearInterval);
+    // Bot intervals cleaned up by useBotSimulation hook when isGameOver becomes true
 
     // Validate pending words with AI before ending (same as multiplayer)
     // Uses batch API endpoint for efficiency - single request for all pending words
@@ -799,150 +795,18 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   }, [isGameOver, settings.bots, settings.language, settings.timerSeconds, combo.maxCombo, settings.mode, trainingAnalysisFinishTraining]);
 
   // Timer is now handled by useGameTimer hook (lines 126-136)
+  // Bot simulation is now handled by useBotSimulation hook
 
-  // Bot interval helper - use refs for random intervals to avoid impure function in effect
-  const botIntervalsDataRef = useRef<Map<string, number>>(new Map());
-  const getBotInterval = useCallback((difficulty: 'easy' | 'medium' | 'hard', botId: string): number => {
-    // Check if we already have an interval for this bot
-    const cached = botIntervalsDataRef.current.get(botId);
-    if (cached) return cached;
-
-    const baseIntervals = {
-      easy: 6000,
-      medium: 3500,
-      hard: 2000,
-    };
-    const randomFactors = {
-      easy: 4000,
-      medium: 3000,
-      hard: 2000,
-    };
-    const interval = baseIntervals[difficulty] + Math.random() * randomFactors[difficulty];
-    botIntervalsDataRef.current.set(botId, interval);
-    return interval;
-  }, []);
-
-  const simulateBotFindWord = useCallback((bot: BotOpponent) => {
-    // Simple scoring for bots: word length - 1 (no fire round multiplier, no combos)
-    const getBotWordScore = (wordLength: number): number => Math.max(wordLength - 1, 1);
-
-    // Use ref to get current availableWords (avoids stale closure)
-    const currentAvailableWords = availableWordsRef.current;
-
-    // Try to use real words from the grid solver
-    if (currentAvailableWords) {
-      // Get words for this bot's difficulty
-      const wordPool = currentAvailableWords[bot.difficulty] || [];
-      const usedWords = botUsedWordsRef.current[bot.id] || new Set();
-
-      // Find an unused word
-      const unusedWords = wordPool.filter(w => !usedWords.has(w));
-
-      if (unusedWords.length > 0) {
-        // Pick a random unused word
-        const word = unusedWords[Math.floor(Math.random() * unusedWords.length)];
-        const wordScore = getBotWordScore(word.length);
-
-        // Mark word as used by this bot
-        usedWords.add(word);
-        botUsedWordsRef.current[bot.id] = usedWords;
-
-        setBotScores(prev => ({
-          ...prev,
-          [bot.id]: (prev[bot.id] || 0) + wordScore,
-        }));
-
-        setBotWords(prev => ({
-          ...prev,
-          [bot.id]: [...(prev[bot.id] || []), word],
-        }));
-        return;
-      }
-    }
-
-    // Fallback: simulate with random word lengths if no words available
-    const wordLengths = {
-      easy: [3, 4, 5],
-      medium: [4, 5, 6],
-      hard: [5, 6, 7, 8],
-    };
-    const lengths = wordLengths[bot.difficulty];
-    const length = lengths[Math.floor(Math.random() * lengths.length)];
-    const wordScore = getBotWordScore(length);
-
-    setBotScores(prev => ({
-      ...prev,
-      [bot.id]: (prev[bot.id] || 0) + wordScore,
-    }));
-
-    setBotWords(prev => ({
-      ...prev,
-      [bot.id]: [...(prev[bot.id] || []), `word${length}`],
-    }));
-  }, []);
-
-  // Bot simulation effect - wait for availableWords before starting
-  // This ensures bots use actual words from the grid solver instead of placeholders
-  useEffect(() => {
-    if (settings.mode !== 'solo-bots' || isPaused || settings.bots.length === 0 || isGameOver) return;
-    // Wait for availableWords to be fetched before starting bot simulation
-    // This prevents bots from using fallback placeholder words
-    if (!availableWords) return;
-
-    // Clear cached intervals for fresh game
-    botIntervalsDataRef.current.clear();
-
-    settings.bots.forEach(bot => {
-      const interval = getBotInterval(bot.difficulty, bot.id);
-      const botInterval = setInterval(() => {
-        if (!isPaused) {
-          simulateBotFindWord(bot);
-        }
-      }, interval);
-      botIntervalsRef.current.push(botInterval);
-    });
-
-    return () => {
-      botIntervalsRef.current.forEach(clearInterval);
-      botIntervalsRef.current = [];
-      // Clean up highlight timeout
-      if (highlightTimeoutRef.current) {
-        clearTimeout(highlightTimeoutRef.current);
-      }
-    };
-  }, [settings.mode, settings.bots, isPaused, isGameOver, availableWords, getBotInterval, simulateBotFindWord]);
-
-  // Get combo bonus based on combo level and word length - matches backend scoring engine
-  const getComboBonus = useCallback((comboLevel: number, wordLength: number): number => {
-    if (comboLevel <= 0) return 0;
-
-    // Word length factor - longer words get better combo bonuses
-    let wordLengthFactor: number;
-    if (wordLength <= 3) {
-      wordLengthFactor = 0.2;  // Very short words - minimal combo bonus
-    } else if (wordLength === 4) {
-      wordLengthFactor = 0.5;  // Short words - modest combo bonus
-    } else if (wordLength === 5) {
-      wordLengthFactor = 1.0;  // Medium words - full base bonus
-    } else if (wordLength === 6) {
-      wordLengthFactor = 1.5;  // Good words - 1.5x bonus
-    } else {
-      wordLengthFactor = 2.0;  // Long words (7+) - 2x bonus
-    }
-
-    const baseBonus = Math.min(comboLevel, 10);
-    return Math.floor(baseBonus * wordLengthFactor);
-  }, []);
-
+  // Calculate word score using shared scoring utilities for consistency
   const calculateWordScore = useCallback((wordLength: number, currentComboLevel: number): number => {
     // Base score: word length - 1 (matches multiplayer scoring)
     const baseScore = Math.max(wordLength - 1, 1);
-    // Combo bonus based on combo level and word length (matches backend formula)
-    const comboBonus = getComboBonus(currentComboLevel, wordLength);
+    // Combo bonus using shared utility (matches backend formula)
+    const comboBonus = calculateComboBonus(currentComboLevel, wordLength);
     // Fire round multiplier (2x during fire round, 1x otherwise)
     const multiplier = getScoreMultiplier();
     return (baseScore + comboBonus) * multiplier;
-  }, [getComboBonus, getScoreMultiplier]);
+  }, [getScoreMultiplier]);
 
 
   // Memoize word submission handler to prevent recreation on every render
@@ -952,32 +816,24 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     const minWordLength = settings.minWordLength ?? 3;
     const now = Date.now();
 
-    // Abuse detection: check if on cooldown
-    if (spamCooldownUntilRef.current > now) {
-      const remaining = Math.ceil((spamCooldownUntilRef.current - now) / 1000);
-      wordErrorToast(t('playerView.slowDown') || `Slow down! Wait ${remaining}s`, { duration: 1500 });
-      return;
-    }
-
-    // Prune old timestamps and add new one
-    submissionTimestampsRef.current = submissionTimestampsRef.current.filter(
-      ts => now - ts < SPAM_WINDOW_MS
-    );
-    submissionTimestampsRef.current.push(now);
-
-    const submissionCount = submissionTimestampsRef.current.length;
-
-    // Check for spam cooldown
-    if (submissionCount >= SPAM_COOLDOWN_THRESHOLD) {
-      spamCooldownUntilRef.current = now + 3000; // 3-second cooldown
-      wordErrorToast(t('playerView.tooFast') || 'Too fast! 3s cooldown', { duration: 2000 });
-      // Reset combo on spam cooldown
-      combo.resetCombo();
+    // Spam detection check
+    const spamResult = checkSubmission();
+    if (!spamResult.allowed) {
+      if (spamResult.isCooldown) {
+        const msg = spamResult.remainingCooldown
+          ? t('playerView.slowDown') || `Slow down! Wait ${spamResult.remainingCooldown}s`
+          : t('playerView.tooFast') || 'Too fast! 3s cooldown';
+        wordErrorToast(msg, { duration: spamResult.remainingCooldown ? 1500 : 2000 });
+        // Reset combo on spam cooldown (only when entering cooldown, not when already on cooldown)
+        if (!spamResult.remainingCooldown) {
+          combo.resetCombo();
+        }
+      }
       return;
     }
 
     // Warning for approaching limit
-    if (submissionCount === SPAM_WARNING_THRESHOLD) {
+    if (spamResult.isWarning) {
       wordErrorToast(t('playerView.submittingTooFast') || 'Submitting too fast!', { duration: 1500 });
     }
 
@@ -1092,7 +948,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           // Word is in dictionary/community - valid immediately (like multiplayer's handleValidatedWord)
           // Calculate combo bonus and fire round bonus separately using backend-matching formula
           const wordLenScore = Math.max(normalizedWord.length - 1, 1);
-          const comboBonus = getComboBonus(currentCombo, normalizedWord.length);
+          const comboBonus = calculateComboBonus(currentCombo, normalizedWord.length);
           const scoreWithoutMultiplier = wordLenScore + comboBonus;
           const multiplier = getScoreMultiplier();
           // fireRoundBonus is the extra points from doubling (when multiplier is 2x)
@@ -1167,7 +1023,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       });
     // Use trainingAnalysisTrackValidWord (stable function) instead of trainingAnalysis object
     // to avoid infinite re-render loops
-  }, [settings.language, settings.minWordLength, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getComboBonus, getScoreMultiplier, fireRoundActive, calculateWordScore, trainingAnalysisTrackValidWord, trainingTrackValidWord]);
+  }, [settings.language, settings.minWordLength, foundWords, t, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getScoreMultiplier, fireRoundActive, calculateWordScore, trainingAnalysisTrackValidWord, trainingTrackValidWord, checkSubmission]);
 
   const handleFinishPractice = useCallback(() => {
     setIsGameOver(true);

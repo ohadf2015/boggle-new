@@ -23,8 +23,8 @@ export interface DifficultySettings {
  */
 export const DIFFICULTIES: DifficultySettings = {
   EASY: { nameKey: 'difficulty.easy', rows: 5, cols: 5 },
-  MEDIUM: { nameKey: 'difficulty.medium', rows: 7, cols: 7 },
-  HARD: { nameKey: 'difficulty.hard', rows: 9, cols: 9 },
+  MEDIUM: { nameKey: 'difficulty.medium', rows: 6, cols: 6 },
+  HARD: { nameKey: 'difficulty.hard', rows: 7, cols: 7 },
 };
 
 export const DEFAULT_DIFFICULTY = 'MEDIUM' as const;
@@ -40,8 +40,8 @@ export type DifficultyLevel = keyof typeof DIFFICULTIES;
  */
 export const DIFFICULTY_TIMERS: Record<DifficultyLevel, number> = {
   EASY: 60,     // 1 minute - 5x5 board (25 cells)
-  MEDIUM: 120,  // 2 minutes - 7x7 board (49 cells)
-  HARD: 180,    // 3 minutes - 9x9 board (81 cells)
+  MEDIUM: 90,   // 1.5 minutes - 6x6 board (36 cells)
+  HARD: 120,    // 2 minutes - 7x7 board (49 cells)
 };
 
 export const DEFAULT_TIMER = 60; // 1 minute
@@ -116,26 +116,36 @@ export function generateRandomAvatar(): { emoji: string; color: string; avatarIm
 
 /**
  * Word score calculation based on word length
- * Points increase significantly for longer words
+ * @deprecated Import from '@/shared/utils/scoring' instead for canonical scoring
+ *
+ * NOTE: This table had INCORRECT values and has been corrected.
+ * Correct formula: score = wordLength - 1
  */
 export const WORD_SCORES: Record<number, number> = {
-  2: 1,   // 2 letters
-  3: 1,   // 3 letters
-  4: 2,   // 4 letters
-  5: 3,   // 5 letters
-  6: 4,   // 6 letters
-  7: 5,   // 7 letters
-  8: 6,   // 8 letters
-  // 9+ letters: 7 + (length - 9) bonus
+  2: 1,   // 2 letters - 1 = 1
+  3: 2,   // 3 letters - 1 = 2 (CORRECTED from 1)
+  4: 3,   // 4 letters - 1 = 3 (CORRECTED from 2)
+  5: 4,   // 5 letters - 1 = 4 (CORRECTED from 3)
+  6: 5,   // 6 letters - 1 = 5 (CORRECTED from 4)
+  7: 6,   // 7 letters - 1 = 6 (CORRECTED from 5)
+  8: 7,   // 8 letters - 1 = 7 (CORRECTED from 6)
 };
 
 /**
  * Calculate points for a word based on its length
+ * @deprecated Import from '@/shared/utils/scoring' instead
+ *
+ * For new code, use:
+ * ```typescript
+ * import { calculateWordScore, calculateWordScoreByLength } from '@/shared/utils/scoring';
+ * ```
+ *
+ * The shared version includes combo bonuses and fire round multipliers.
  */
 export function calculateWordScore(wordLength: number): number {
   if (wordLength < 2) return 0;
-  if (wordLength <= 8) return WORD_SCORES[wordLength] || 1;
-  return 7 + (wordLength - 9); // Bonus for very long words
+  // Use correct formula: wordLength - 1
+  return wordLength - 1;
 }
 
 // ==================== UI Constants ====================

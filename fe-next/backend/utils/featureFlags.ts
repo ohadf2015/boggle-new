@@ -108,7 +108,7 @@ async function checkIsAdmin(userId: string): Promise<boolean> {
   try {
     const { data, error } = await supabase
       .from('profiles')
-      .select('role')
+      .select('is_admin')
       .eq('id', userId)
       .single();
 
@@ -117,7 +117,7 @@ async function checkIsAdmin(userId: string): Promise<boolean> {
       return false;
     }
 
-    return data?.role === 'admin';
+    return data?.is_admin === true;
   } catch (error) {
     console.error(`Error checking admin status:`, error);
     return false;

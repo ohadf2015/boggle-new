@@ -49,6 +49,11 @@ export function useSurvivalClues({
 
   /**
    * Update clues from target word attempt feedback
+   *
+   * IMPORTANT: Only GREEN letters (exact position matches) are stored in accumulatedClues.
+   * Yellow letters mean "exists but wrong position" - they go to knownLetters instead.
+   * This is because accumulatedClues is keyed by TARGET WORD position, and yellow
+   * feedback means the letter is NOT at the submitted position.
    */
   const updateCluesFromFeedback = useCallback((
     feedback: LetterFeedback[],
@@ -57,48 +62,11 @@ export function useSurvivalClues({
     setAccumulatedClues(prev => {
       const updated = new Map(prev);
 
-      // First pass: add all GREEN letters
+      // Only add GREEN letters - they represent confirmed positions in the target
+      // Yellow letters are NOT stored here (they go to knownLetters only)
       feedback.forEach((fb) => {
         if (fb.feedback === 'green') {
           updated.set(fb.position, { letter: fb.letter.toUpperCase(), type: 'green' });
-        }
-      });
-
-      // Count greens and yellows
-      const greenLetterCounts = new Map<string, number>();
-      const yellowLetterCounts = new Map<string, number>();
-      updated.forEach((clue) => {
-        if (clue.type === 'green') {
-          greenLetterCounts.set(clue.letter, (greenLetterCounts.get(clue.letter) || 0) + 1);
-        } else {
-          yellowLetterCounts.set(clue.letter, (yellowLetterCounts.get(clue.letter) || 0) + 1);
-        }
-      });
-
-      // Second pass: add YELLOW letters
-      feedback.forEach((fb) => {
-        if (fb.feedback === 'yellow') {
-          const upperLetter = fb.letter.toUpperCase();
-          const existing = updated.get(fb.position);
-          const targetCount = targetLetterCounts.get(upperLetter) || 0;
-          const greenCount = greenLetterCounts.get(upperLetter) || 0;
-          const yellowCount = yellowLetterCounts.get(upperLetter) || 0;
-
-          if (!existing && (greenCount + yellowCount) < targetCount) {
-            updated.set(fb.position, { letter: upperLetter, type: 'yellow' });
-            yellowLetterCounts.set(upperLetter, yellowCount + 1);
-          }
-        }
-      });
-
-      // Clean up yellows fully accounted by greens
-      updated.forEach((clue, position) => {
-        if (clue.type === 'yellow') {
-          const targetCount = targetLetterCounts.get(clue.letter) || 0;
-          const greenCount = greenLetterCounts.get(clue.letter) || 0;
-          if (greenCount >= targetCount) {
-            updated.delete(position);
-          }
         }
       });
 
@@ -157,20 +125,9 @@ export function useSurvivalClues({
     setAccumulatedClues(prev => {
       const updated = new Map(prev);
       let newGreens = 0;
-      let newYellows = 0;
 
-      const greenLetterCounts = new Map<string, number>();
-      const yellowLetterCounts = new Map<string, number>();
-
-      updated.forEach((clue) => {
-        if (clue.type === 'green') {
-          greenLetterCounts.set(clue.letter, (greenLetterCounts.get(clue.letter) || 0) + 1);
-        } else {
-          yellowLetterCounts.set(clue.letter, (yellowLetterCounts.get(clue.letter) || 0) + 1);
-        }
-      });
-
-      // First pass: Check for GREEN clues
+      // Only add GREEN clues - exact position matches between discovered word and target
+      // Yellow letters (exist but wrong position) go to knownLetters, not accumulatedClues
       for (let pos = 0; pos < checkLength; pos++) {
         const wordLetter = normalizedWord[pos];
         const targetLetter = normalizedTarget[pos];
@@ -180,50 +137,16 @@ export function useSurvivalClues({
           if (!existing || existing.type !== 'green') {
             updated.set(pos, { letter: wordLetter, type: 'green' });
             newGreens++;
-            greenLetterCounts.set(wordLetter, (greenLetterCounts.get(wordLetter) || 0) + 1);
           }
         }
       }
 
-      // Clean up yellows
-      updated.forEach((clue, position) => {
-        if (clue.type === 'yellow') {
-          const targetCount = targetLetterCounts.get(clue.letter) || 0;
-          const greenCount = greenLetterCounts.get(clue.letter) || 0;
-          if (greenCount >= targetCount) {
-            updated.delete(position);
-            yellowLetterCounts.set(clue.letter, Math.max(0, (yellowLetterCounts.get(clue.letter) || 0) - 1));
-          }
-        }
-      });
-
-      // Second pass: Check for YELLOW clues
-      for (let pos = 0; pos < checkLength; pos++) {
-        const wordLetter = normalizedWord[pos];
-        const targetLetter = normalizedTarget[pos];
-        const existing = updated.get(pos);
-
-        if (wordLetter === targetLetter || existing?.type === 'green') continue;
-
-        const targetCount = targetLetterCounts.get(wordLetter) || 0;
-        const greenCount = greenLetterCounts.get(wordLetter) || 0;
-        const yellowCount = yellowLetterCounts.get(wordLetter) || 0;
-
-        if (targetCount > 0 && (greenCount + yellowCount) < targetCount) {
-          if (!existing) {
-            updated.set(pos, { letter: wordLetter, type: 'yellow' });
-            yellowLetterCounts.set(wordLetter, yellowCount + 1);
-            newYellows++;
-          }
-        }
-      }
-
-      cluesRevealed = newGreens + newYellows;
+      cluesRevealed = newGreens;
       return updated;
     });
 
     return cluesRevealed;
-  }, [normalizedTarget, targetLetterCounts]);
+  }, [normalizedTarget]);
 
   /**
    * Update known letters from word discovery
@@ -275,7 +198,6 @@ export function useSurvivalClues({
   /**
    * Handle letter revealed via coin purchase
    * - Adds a green clue at the revealed position
-   * - Removes any existing yellow clue at that position
    * - Cleans up knownLetters if all occurrences of the letter are now revealed as green
    */
   const handleCoinRevealedLetter = useCallback((position: number) => {
@@ -283,36 +205,13 @@ export function useSurvivalClues({
 
     const revealedLetter = normalizedTarget[position];
 
-    // Track updates in a ref to handle batched calls correctly
-    let updatedClues: Map<number, AccumulatedClue>;
-
     setAccumulatedClues(prev => {
       // Start from pending or previous state
       const baseClues = pendingCluesRef.current || prev;
-      updatedClues = new Map(baseClues);
+      const updatedClues = new Map(baseClues);
 
       // Add green clue at the revealed position
       updatedClues.set(position, { letter: revealedLetter, type: 'green' });
-
-      // Count how many greens we now have for this letter
-      let greenCount = 0;
-      updatedClues.forEach((clue) => {
-        if (clue.letter === revealedLetter && clue.type === 'green') {
-          greenCount++;
-        }
-      });
-
-      // Get target count for this letter
-      const targetCount = targetLetterCounts.get(revealedLetter) || 0;
-
-      // If all occurrences are now green, remove any yellows for this letter
-      if (greenCount >= targetCount) {
-        updatedClues.forEach((clue, pos) => {
-          if (clue.letter === revealedLetter && clue.type === 'yellow') {
-            updatedClues.delete(pos);
-          }
-        });
-      }
 
       // Store for potential next batched call
       pendingCluesRef.current = updatedClues;

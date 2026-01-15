@@ -1,4 +1,42 @@
+/**
+ * Frontend Constants
+ *
+ * Re-exports from shared/constants/gameConstants.ts + frontend-specific constants.
+ * This file maintains backward compatibility for imports but now references
+ * the single source of truth in shared/constants.
+ */
+
 import type { DifficultySettings, MinWordLengthOption } from '@/types';
+
+// ==================== Re-exports from Shared Constants ====================
+// Single source of truth: shared/constants/gameConstants.ts
+
+export {
+  // Difficulty settings
+  DIFFICULTIES,
+  DEFAULT_DIFFICULTY,
+  DIFFICULTY_TIMERS,
+  DEFAULT_TIMER,
+  getRecommendedTimer,
+  // Word length settings
+  MIN_WORD_LENGTH_OPTIONS,
+  DEFAULT_MIN_WORD_LENGTH,
+  // Avatar constants
+  AVATAR_COLORS,
+  AVATAR_EMOJIS,
+  AVATAR_IMAGE_IDS,
+  // Color mapping
+  POINT_COLORS,
+} from '@/shared/constants/gameConstants';
+
+// Type re-exports for convenience
+export type {
+  DifficultyConfig,
+  DifficultyLevel,
+  DifficultySettings as DifficultySettingsType,
+} from '@/shared/constants/gameConstants';
+
+// ==================== Frontend-Specific Constants ====================
 
 export const hebrewLetters: string[] = [
     "א",
@@ -108,31 +146,6 @@ export const kanjiCompounds: string[] = [
   "日本人", "日本国", "大文字", "大中小", "上中下", "生年月", "頭文字", "天地人"
 ];
 
-export const DIFFICULTIES: DifficultySettings = {
-  EASY: { nameKey: 'difficulty.easy', rows: 5, cols: 5 },
-  MEDIUM: { nameKey: 'difficulty.medium', rows: 7, cols: 7 },
-  HARD: { nameKey: 'difficulty.hard', rows: 9, cols: 9 },
-};
-
-export const DEFAULT_DIFFICULTY = 'MEDIUM' as const;
-
-// Recommended timer durations per difficulty (in seconds)
-// Larger boards need more time to explore effectively
-// Timer scales proportionally with board cell count for balanced gameplay
-// Host can override these defaults
-export const DIFFICULTY_TIMERS: Record<string, number> = {
-  EASY: 60,     // 1 minute - 5x5 board (25 cells)
-  MEDIUM: 120,  // 2 minutes - 7x7 board (49 cells)
-  HARD: 180,    // 3 minutes - 9x9 board (81 cells)
-};
-
-export const DEFAULT_TIMER = 60; // 1 minute
-
-// Get recommended timer for a difficulty level
-export const getRecommendedTimer = (difficulty: string): number => {
-  return DIFFICULTY_TIMERS[difficulty] || DEFAULT_TIMER;
-};
-
 // Adaptive deadzone threshold for directional locking
 // IMPROVED: Smaller thresholds for more responsive swipe detection
 // Deadzones prevent accidental selections but should be small enough
@@ -144,51 +157,6 @@ export const getDeadzoneThreshold = (): number => {
   if (screenWidth < 414) return 8;   // Regular phones - was 12
   if (screenWidth < 768) return 6;   // Large phones - was 10
   return 5;                          // Tablets and desktop - was 8
-};
-
-// Minimum word length options
-export const MIN_WORD_LENGTH_OPTIONS: MinWordLengthOption[] = [
-  { value: 2, labelKey: 'hostView.minWordLength2' },
-  { value: 3, labelKey: 'hostView.minWordLength3' },
-  { value: 4, labelKey: 'hostView.minWordLength4' },
-];
-
-export const DEFAULT_MIN_WORD_LENGTH = 2;
-
-// Avatar generation constants
-// Used for fallback avatars when profile picture not available
-export const AVATAR_COLORS: string[] = [
-  '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
-  '#F7DC6F', '#BB8FCE', '#85C1E2', '#F8B739', '#52B788',
-  '#FF8FAB', '#6BCF7F', '#FFB347', '#9D84B7', '#FF6F61'
-];
-
-export const AVATAR_EMOJIS: string[] = [
-  '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼',
-  '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔',
-  '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺',
-  '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞'
-];
-
-// Character avatar image IDs - must match utils/avatarConfig.ts AVATARS
-export const AVATAR_IMAGE_IDS: string[] = [
-  'broccoli-bob', 'drippy-drop', 'sunny-steve', 'cloudy-carl',
-  'octo-otto', 'pizza-pete', 'prickly-pat', 'melon-molly',
-  'avo-alex', 'frosty-frank', 'flaky-fred', 'eggy-ed',
-  'slimy-sam', 'starry-stella', 'shroom-shelly', 'donut-danny', 'jelly-jen'
-];
-
-// Neo-Brutalist color mapping based on word points
-// Used for visual hierarchy in word displays
-export const POINT_COLORS: Record<number, string> = {
-  1: 'var(--neo-gray)',    // 2 letters (neutral, lowest value)
-  2: 'var(--neo-cyan)',    // 3 letters
-  3: 'var(--neo-cyan)',    // 4 letters
-  4: 'var(--neo-orange)',  // 5 letters
-  5: 'var(--neo-purple)',  // 6 letters
-  6: 'var(--neo-purple)',  // 7 letters
-  7: 'var(--neo-pink)',    // 8 letters
-  8: 'var(--neo-pink)',    // 9+ letters (premium/rare)
 };
 
 // ==================== Combo System ====================

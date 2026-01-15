@@ -104,7 +104,7 @@ const HintButton = memo<HintButtonProps>(({
             {/* Visual star tokens */}
             {[...Array(3)].map((_, i) => (
               <Star
-                key={i}
+                key={`hint-star-${i}`}
                 className={`w-3 h-3 ${
                   i < hintsRemaining
                     ? 'text-neo-pink fill-neo-pink'

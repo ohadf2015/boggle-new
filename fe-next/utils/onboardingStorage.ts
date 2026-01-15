@@ -4,6 +4,13 @@
  */
 
 import { setStoredUsername, setStoredAvatarId } from '@/utils/profileStorage';
+import {
+  getFromLocalStorage,
+  saveToLocalStorage,
+  removeFromLocalStorage,
+  getJsonFromLocalStorage,
+  saveJsonToLocalStorage,
+} from '@/utils/storageHelpers';
 
 const STORAGE_KEYS = {
   ONBOARDING_COMPLETED: 'lexiclash_onboarding_completed',
@@ -21,23 +28,20 @@ export interface OnboardingData {
  * Check if user has completed onboarding
  */
 export const hasCompletedOnboarding = (): boolean => {
-  if (typeof window === 'undefined') return false;
-  return localStorage.getItem(STORAGE_KEYS.ONBOARDING_COMPLETED) === 'true';
+  return getFromLocalStorage(STORAGE_KEYS.ONBOARDING_COMPLETED) === 'true';
 };
 
 /**
  * Mark onboarding as completed and save user data
  */
 export const markOnboardingComplete = (data: Omit<OnboardingData, 'completedAt'>): void => {
-  if (typeof window === 'undefined') return;
-
   const completeData: OnboardingData = {
     ...data,
     completedAt: new Date().toISOString(),
   };
 
-  localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, 'true');
-  localStorage.setItem(STORAGE_KEYS.ONBOARDING_DATA, JSON.stringify(completeData));
+  saveToLocalStorage(STORAGE_KEYS.ONBOARDING_COMPLETED, 'true');
+  saveJsonToLocalStorage(STORAGE_KEYS.ONBOARDING_DATA, completeData);
 
   // Also save to keys used by multiplayer flow for profile persistence
   setStoredUsername(data.displayName);
@@ -48,32 +52,21 @@ export const markOnboardingComplete = (data: Omit<OnboardingData, 'completedAt'>
  * Get saved onboarding data
  */
 export const getOnboardingData = (): OnboardingData | null => {
-  if (typeof window === 'undefined') return null;
-
-  const data = localStorage.getItem(STORAGE_KEYS.ONBOARDING_DATA);
-  if (!data) return null;
-
-  try {
-    return JSON.parse(data) as OnboardingData;
-  } catch {
-    return null;
-  }
+  return getJsonFromLocalStorage<OnboardingData | null>(STORAGE_KEYS.ONBOARDING_DATA, null);
 };
 
 /**
  * Clear onboarding data (for testing/debugging)
  */
 export const clearOnboardingData = (): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem(STORAGE_KEYS.ONBOARDING_COMPLETED);
-  localStorage.removeItem(STORAGE_KEYS.ONBOARDING_DATA);
+  removeFromLocalStorage(STORAGE_KEYS.ONBOARDING_COMPLETED);
+  removeFromLocalStorage(STORAGE_KEYS.ONBOARDING_DATA);
 };
 
 /**
  * Mark onboarding as skipped (user dismissed without completing)
  */
 export const markOnboardingSkipped = (): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, 'true');
+  saveToLocalStorage(STORAGE_KEYS.ONBOARDING_COMPLETED, 'true');
   // Don't save data since user skipped
 };

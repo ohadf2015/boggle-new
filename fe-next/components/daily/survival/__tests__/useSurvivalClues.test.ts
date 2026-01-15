@@ -38,7 +38,7 @@ describe('useSurvivalClues', () => {
       expect(clues.get(4)).toEqual({ letter: 'E', type: 'green' });
     });
 
-    it('should add yellow clues for wrong positions', () => {
+    it('should NOT add yellow clues to accumulatedClues (yellows go to knownLetters only)', () => {
       const { result } = renderHook(() =>
         useSurvivalClues({
           targetWord: 'APPLE',
@@ -58,9 +58,16 @@ describe('useSurvivalClues', () => {
         result.current[1].updateCluesFromFeedback(feedback, [{ feedback }]);
       });
 
+      // Yellow clues should NOT be stored in accumulatedClues (position-based map)
+      // They should only go to knownLetters (non-positional set)
       const clues = result.current[0].accumulatedClues;
-      expect(clues.get(0)).toEqual({ letter: 'P', type: 'yellow' });
-      expect(clues.get(1)).toEqual({ letter: 'A', type: 'yellow' });
+      expect(clues.get(0)).toBeUndefined();
+      expect(clues.get(1)).toBeUndefined();
+
+      // But they SHOULD be in knownLetters
+      const knownLetters = result.current[0].knownLetters;
+      expect(knownLetters.has('P')).toBe(true);
+      expect(knownLetters.has('A')).toBe(true);
     });
 
     it('should track known letters from yellow feedback', () => {
@@ -134,8 +141,8 @@ describe('useSurvivalClues', () => {
     });
   });
 
-  describe('handleCoinRevealedLetter - removing yellow clues when green is revealed', () => {
-    it('should remove yellow clue at position when letter is revealed via coins', () => {
+  describe('handleCoinRevealedLetter - adding green clues and cleaning up knownLetters', () => {
+    it('should add green clue when letter is revealed via coins and keep knownLetters if not fully revealed', () => {
       const { result } = renderHook(() =>
         useSurvivalClues({
           targetWord: 'APPLE',
@@ -143,7 +150,7 @@ describe('useSurvivalClues', () => {
         })
       );
 
-      // First, create a yellow clue at position 1 by guessing wrong
+      // First, add P to knownLetters by guessing wrong (yellow feedback)
       const feedback: LetterFeedback[] = [
         { letter: 'P', position: 0, feedback: 'yellow' }, // P is in word but not at 0
         { letter: 'X', position: 1, feedback: 'gray' },
@@ -156,8 +163,8 @@ describe('useSurvivalClues', () => {
         result.current[1].updateCluesFromFeedback(feedback, [{ feedback }]);
       });
 
-      // Verify yellow clue exists at position 0
-      expect(result.current[0].accumulatedClues.get(0)).toEqual({ letter: 'P', type: 'yellow' });
+      // Yellow clues should NOT be in accumulatedClues, only in knownLetters
+      expect(result.current[0].accumulatedClues.get(0)).toBeUndefined();
       expect(result.current[0].knownLetters.has('P')).toBe(true);
 
       // Now simulate coin reveal at position 1 which is 'P' in APPLE
@@ -167,10 +174,10 @@ describe('useSurvivalClues', () => {
 
       // After revealing P at position 1 (first P in APPLE):
       // - Should add green clue at position 1
-      // - Should keep yellow at position 0 since APPLE has 2 Ps
+      // - P should still be in knownLetters since APPLE has 2 Ps and only 1 is revealed
       const cluesAfter = result.current[0].accumulatedClues;
       expect(cluesAfter.get(1)).toEqual({ letter: 'P', type: 'green' });
-      expect(cluesAfter.get(0)).toEqual({ letter: 'P', type: 'yellow' }); // Still yellow, 2nd P not found
+      expect(result.current[0].knownLetters.has('P')).toBe(true); // Still in knownLetters, 2nd P not found
     });
 
     it('should remove letter from knownLetters when all occurrences are revealed as green', () => {
@@ -181,7 +188,7 @@ describe('useSurvivalClues', () => {
         })
       );
 
-      // Create a yellow clue - P is at wrong position
+      // Add P to knownLetters via yellow feedback
       const feedback: LetterFeedback[] = [
         { letter: 'P', position: 0, feedback: 'yellow' },
         { letter: 'X', position: 1, feedback: 'gray' },
@@ -202,10 +209,11 @@ describe('useSurvivalClues', () => {
         result.current[1].handleCoinRevealedLetter(2);
       });
 
-      // P should be removed from knownLetters since all Ps are now revealed
+      // P should be removed from knownLetters since all Ps are now revealed as green
       expect(result.current[0].knownLetters.has('P')).toBe(false);
-      // The yellow clue at position 0 should be removed
-      expect(result.current[0].accumulatedClues.get(0)).toBeUndefined();
+      // Green clues should exist at both P positions
+      expect(result.current[0].accumulatedClues.get(1)).toEqual({ letter: 'P', type: 'green' });
+      expect(result.current[0].accumulatedClues.get(2)).toEqual({ letter: 'P', type: 'green' });
     });
 
     it('should replace yellow clue with green when same position is revealed', () => {
@@ -237,7 +245,7 @@ describe('useSurvivalClues', () => {
       // Reset and try again with a word where we'll have yellow then green at same position
     });
 
-    it('should handle revealing letter at position that already has yellow from same letter', () => {
+    it('should track knownLetters until all occurrences are revealed as green', () => {
       const { result } = renderHook(() =>
         useSurvivalClues({
           targetWord: 'HELLO',
@@ -259,8 +267,8 @@ describe('useSurvivalClues', () => {
         result.current[1].updateCluesFromFeedback(feedback, [{ feedback }]);
       });
 
-      // Should have yellow L at position 0 and L in knownLetters
-      expect(result.current[0].accumulatedClues.get(0)).toEqual({ letter: 'L', type: 'yellow' });
+      // Yellow clues should NOT be in accumulatedClues, only in knownLetters
+      expect(result.current[0].accumulatedClues.get(0)).toBeUndefined();
       expect(result.current[0].knownLetters.has('L')).toBe(true);
 
       // Now reveal position 2 via coins - this is where first L actually is
@@ -270,8 +278,8 @@ describe('useSurvivalClues', () => {
 
       // Should now have green L at position 2
       expect(result.current[0].accumulatedClues.get(2)).toEqual({ letter: 'L', type: 'green' });
-      // Yellow at position 0 should still exist because there are 2 Ls
-      expect(result.current[0].accumulatedClues.get(0)).toEqual({ letter: 'L', type: 'yellow' });
+      // L should still be in knownLetters because there are 2 Ls and only 1 is revealed
+      expect(result.current[0].knownLetters.has('L')).toBe(true);
 
       // Reveal position 3 (second L)
       act(() => {
@@ -280,9 +288,7 @@ describe('useSurvivalClues', () => {
 
       // Now all Ls are revealed as green
       expect(result.current[0].accumulatedClues.get(3)).toEqual({ letter: 'L', type: 'green' });
-      // Yellow at position 0 should be REMOVED since all Ls are found
-      expect(result.current[0].accumulatedClues.get(0)).toBeUndefined();
-      // L should be removed from knownLetters
+      // L should be removed from knownLetters since all are found
       expect(result.current[0].knownLetters.has('L')).toBe(false);
     });
   });

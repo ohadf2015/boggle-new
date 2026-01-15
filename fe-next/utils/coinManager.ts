@@ -6,6 +6,12 @@
  */
 
 import logger from '@/utils/logger';
+import {
+  getJsonFromLocalStorage,
+  saveJsonToLocalStorage,
+  getFromLocalStorage,
+  saveToLocalStorage,
+} from '@/utils/storageHelpers';
 
 const COINS_STORAGE_KEY = 'lexiclash_coins';
 const COINS_HISTORY_KEY = 'lexiclash_coins_history';
@@ -72,74 +78,38 @@ export interface CoinTransaction {
  * Get current coin balance
  */
 export function getCoins(): number {
-  if (typeof window === 'undefined') return 0;
-
-  try {
-    const stored = localStorage.getItem(COINS_STORAGE_KEY);
-    if (!stored) return 0;
-
-    const balance: CoinBalance = JSON.parse(stored);
-    return balance.total || 0;
-  } catch (error) {
-    logger.error('Error reading coins:', error);
-    return 0;
-  }
+  const balance = getJsonFromLocalStorage<CoinBalance | null>(COINS_STORAGE_KEY, null);
+  return balance?.total || 0;
 }
 
 /**
  * Get full coin balance details
  */
 export function getCoinBalance(): CoinBalance {
-  if (typeof window === 'undefined') {
-    return { total: 0, earnedFromDaily: 0, spent: 0, lastUpdated: new Date().toISOString() };
-  }
-
-  try {
-    const stored = localStorage.getItem(COINS_STORAGE_KEY);
-    if (!stored) {
-      return { total: 0, earnedFromDaily: 0, spent: 0, lastUpdated: new Date().toISOString() };
-    }
-
-    return JSON.parse(stored);
-  } catch (error) {
-    logger.error('Error reading coin balance:', error);
-    return { total: 0, earnedFromDaily: 0, spent: 0, lastUpdated: new Date().toISOString() };
-  }
+  const defaultBalance = { total: 0, earnedFromDaily: 0, spent: 0, lastUpdated: new Date().toISOString() };
+  return getJsonFromLocalStorage<CoinBalance>(COINS_STORAGE_KEY, defaultBalance);
 }
 
 /**
  * Save coin balance to storage
  */
 function saveCoinBalance(balance: CoinBalance): void {
-  if (typeof window === 'undefined') return;
-
-  try {
-    localStorage.setItem(COINS_STORAGE_KEY, JSON.stringify(balance));
-  } catch (error) {
-    logger.error('Error saving coin balance:', error);
-  }
+  saveJsonToLocalStorage(COINS_STORAGE_KEY, balance);
 }
 
 /**
  * Add a transaction to history
  */
 function addTransaction(transaction: CoinTransaction): void {
-  if (typeof window === 'undefined') return;
+  const history = getJsonFromLocalStorage<CoinTransaction[]>(COINS_HISTORY_KEY, []);
 
-  try {
-    const stored = localStorage.getItem(COINS_HISTORY_KEY);
-    const history: CoinTransaction[] = stored ? JSON.parse(stored) : [];
-
-    // Keep last 100 transactions
-    history.unshift(transaction);
-    if (history.length > 100) {
-      history.pop();
-    }
-
-    localStorage.setItem(COINS_HISTORY_KEY, JSON.stringify(history));
-  } catch (error) {
-    logger.error('Error saving coin transaction:', error);
+  // Keep last 100 transactions
+  history.unshift(transaction);
+  if (history.length > 100) {
+    history.pop();
   }
+
+  saveJsonToLocalStorage(COINS_HISTORY_KEY, history);
 }
 
 /**
@@ -246,7 +216,7 @@ export function awardDailyCoins(
 
   // Check if already awarded for this puzzle
   const awardKey = `lexiclash_daily_coin_award_${puzzleDate}_${language}`;
-  if (localStorage.getItem(awardKey)) {
+  if (getFromLocalStorage(awardKey)) {
     return null; // Already awarded
   }
 
@@ -261,7 +231,7 @@ export function awardDailyCoins(
   });
 
   // Mark as awarded
-  localStorage.setItem(awardKey, new Date().toISOString());
+  saveToLocalStorage(awardKey, new Date().toISOString());
 
   return {
     awarded: reward.total,
@@ -273,15 +243,7 @@ export function awardDailyCoins(
  * Get transaction history
  */
 export function getCoinHistory(): CoinTransaction[] {
-  if (typeof window === 'undefined') return [];
-
-  try {
-    const stored = localStorage.getItem(COINS_HISTORY_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch (error) {
-    logger.error('Error reading coin history:', error);
-    return [];
-  }
+  return getJsonFromLocalStorage<CoinTransaction[]>(COINS_HISTORY_KEY, []);
 }
 
 /**
@@ -334,7 +296,7 @@ export function awardGameCoins(
 
   // Check if already awarded for this session
   const awardKey = `lexiclash_game_coin_award_${sessionId}`;
-  if (localStorage.getItem(awardKey)) {
+  if (getFromLocalStorage(awardKey)) {
     return null; // Already awarded
   }
 
@@ -355,7 +317,7 @@ export function awardGameCoins(
   });
 
   // Mark as awarded
-  localStorage.setItem(awardKey, new Date().toISOString());
+  saveToLocalStorage(awardKey, new Date().toISOString());
 
   return {
     awarded: reward.total,

@@ -2,13 +2,14 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Users, Crown, Bot, Check, Monitor, MessageSquare, LogOut, Copy, ChevronDown } from 'lucide-react';
+import { Clock, Users, Crown, Bot, Check, Monitor, MessageSquare, LogOut, Copy, ChevronDown, Timer, Grid3X3, Type } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Checkbox } from '../../components/ui/checkbox';
 import Avatar from '../../components/Avatar';
 import RoomChat from '../../components/RoomChat';
 import PresenceIndicator from '../../components/PresenceIndicator';
 import BotControls from '../../components/BotControls';
+import { MobileDrawer } from '../../components/layout/MobileDrawer';
 import { useCrazyGamesInvite } from '../../hooks/useCrazyGamesInvite';
 import { cn } from '../../lib/utils';
 import { useSocket } from '../../utils/SocketContext';
@@ -68,9 +69,9 @@ interface HostPreGameViewProps {
 
 // Simple presets - Fast/Party/Challenge
 const GAME_PRESETS = {
-  fast: { nameKey: 'hostView.presetFast', icon: '⚡', timer: 1, difficulty: 'MEDIUM' as DifficultyLevel },
-  party: { nameKey: 'hostView.presetParty', icon: '🎉', timer: 2, difficulty: 'MEDIUM' as DifficultyLevel },
-  challenge: { nameKey: 'hostView.presetChallenge', icon: '🏆', timer: 3, difficulty: 'HARD' as DifficultyLevel },
+  fast: { nameKey: 'hostView.presetFast', detailsKey: 'hostView.presetFastDetails', icon: '⚡', timer: 1, difficulty: 'MEDIUM' as DifficultyLevel, minWordLength: 2 },
+  party: { nameKey: 'hostView.presetParty', detailsKey: 'hostView.presetPartyDetails', icon: '🎉', timer: 2, difficulty: 'MEDIUM' as DifficultyLevel, minWordLength: 2 },
+  challenge: { nameKey: 'hostView.presetChallenge', detailsKey: 'hostView.presetChallengeDetails', icon: '🏆', timer: 3, difficulty: 'HARD' as DifficultyLevel, minWordLength: 3 },
 } as const;
 
 type PresetKey = keyof typeof GAME_PRESETS;
@@ -101,6 +102,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
   const [unreadChatCount, setUnreadChatCount] = useState(0);
   const [codeCopied, setCodeCopied] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [presetInfoOpen, setPresetInfoOpen] = useState<PresetKey | null>(null);
 
   const { showInviteButton, hideInviteButton, isInviteButtonVisible } = useCrazyGamesInvite();
 
@@ -147,6 +149,20 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
     }
   }, [gameCode, t]);
 
+  // Get board size display text based on difficulty
+  const getBoardSizeText = useCallback((difficulty: DifficultyLevel) => {
+    if (difficulty === 'HARD') {
+      return t('hostView.presetDrawerBoardHard') || '9×9 (Hard)';
+    }
+    return t('hostView.presetDrawerBoardMedium') || '7×7 (Medium)';
+  }, [t]);
+
+  // Handle selecting and applying a preset from the drawer
+  const handleSelectAndApplyPreset = useCallback((key: PresetKey) => {
+    handleApplyPreset(key);
+    setPresetInfoOpen(null);
+  }, [handleApplyPreset]);
+
   // Render Lobby Tab (Settings + Players combined)
   const renderLobbyContent = () => (
     <div className="flex flex-col h-full p-3 gap-3 overflow-y-auto">
@@ -163,7 +179,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
           return (
             <button
               key={key}
-              onClick={() => handleApplyPreset(key)}
+              onClick={() => setPresetInfoOpen(key)}
               className={cn(
                 "flex-1 flex flex-col items-center gap-0.5 p-2 rounded-neo font-bold transition-all border-2 relative",
                 isSelected
@@ -286,7 +302,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
 
   return (
     <div className="h-[100dvh] flex flex-col bg-neo-navy overflow-hidden">
-      {/* Header */}
+      {/* Header - Compact */}
       <header className="flex-shrink-0 px-3 py-2 bg-slate-800/95 border-b-3 border-neo-black">
         <div className="flex items-center justify-between gap-2">
           {/* Room Code */}
@@ -310,17 +326,6 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
             <LogOut className="w-4 h-4" />
           </Button>
         </div>
-
-        {/* Start Game Button */}
-        <Button
-          onClick={onStartGame}
-          disabled={!timerValue || playersReady.length === 0 || tournamentCreating}
-          className="w-full mt-2 h-11 text-base bg-neo-lime text-neo-black font-black uppercase border-3 border-neo-black shadow-hard hover:shadow-hard-lg disabled:opacity-50"
-        >
-          {tournamentCreating ? t('hostView.creatingTournament') : (
-            <>🎮 {t('hostView.startGame')} {playersReady.length > 0 && <span className="ml-1 opacity-70">({playersReady.length})</span>}</>
-          )}
-        </Button>
       </header>
 
       {/* Main Content - 2 Tabs */}
@@ -339,8 +344,21 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
         </AnimatePresence>
       </main>
 
+      {/* Start Game Button - Fixed at bottom */}
+      <div className="flex-shrink-0 px-3 py-2 bg-slate-900/98 border-t-3 border-neo-black">
+        <Button
+          onClick={onStartGame}
+          disabled={!timerValue || playersReady.length === 0 || tournamentCreating}
+          className="w-full h-12 text-base bg-neo-lime text-neo-black font-black uppercase border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed active:translate-y-0.5 disabled:opacity-50 transition-all"
+        >
+          {tournamentCreating ? t('hostView.creatingTournament') : (
+            <>🎮 {t('hostView.startGame')} {playersReady.length > 0 && <span className="ml-1 opacity-70">({playersReady.length})</span>}</>
+          )}
+        </Button>
+      </div>
+
       {/* Bottom Tab Bar - 2 Tabs */}
-      <nav className="flex-shrink-0 bg-slate-900/98 border-t-3 border-neo-black pb-[env(safe-area-inset-bottom)]">
+      <nav className="flex-shrink-0 bg-slate-900/98 border-t border-slate-700 pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center h-12">
           {/* Lobby Tab */}
           <button
@@ -381,6 +399,90 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
           </button>
         </div>
       </nav>
+
+      {/* Preset Info Drawer */}
+      <MobileDrawer
+        isOpen={presetInfoOpen !== null}
+        onClose={() => setPresetInfoOpen(null)}
+        title={presetInfoOpen ? t(GAME_PRESETS[presetInfoOpen].nameKey) : ''}
+        height="auto"
+      >
+        {presetInfoOpen && (
+          <div className="space-y-4">
+            {/* Preset Header */}
+            <div className="flex items-center gap-3">
+              <span className="text-4xl">{GAME_PRESETS[presetInfoOpen].icon}</span>
+              <div>
+                <h3 className="text-lg font-black text-neo-black">
+                  {t(GAME_PRESETS[presetInfoOpen].nameKey)}
+                </h3>
+                <p className="text-sm text-neo-black/70">
+                  {t(`hostView.preset${presetInfoOpen.charAt(0).toUpperCase() + presetInfoOpen.slice(1)}Desc`)}
+                </p>
+              </div>
+            </div>
+
+            {/* Detailed Description */}
+            <p className="text-sm text-neo-black/80 leading-relaxed">
+              {t(GAME_PRESETS[presetInfoOpen].detailsKey)}
+            </p>
+
+            {/* Settings Breakdown */}
+            <div className="bg-neo-black/5 rounded-neo p-3 space-y-2 border-2 border-neo-black/10">
+              <h4 className="text-xs font-black uppercase text-neo-black/60 mb-2">
+                {t('common.settings') || 'Settings'}
+              </h4>
+
+              {/* Timer */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Timer className="w-4 h-4 text-neo-black/60" />
+                  <span className="text-sm font-bold text-neo-black">
+                    {t('hostView.presetDrawerTimer') || 'Timer'}
+                  </span>
+                </div>
+                <span className="text-sm font-black text-neo-black">
+                  {GAME_PRESETS[presetInfoOpen].timer} min
+                </span>
+              </div>
+
+              {/* Board Size */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Grid3X3 className="w-4 h-4 text-neo-black/60" />
+                  <span className="text-sm font-bold text-neo-black">
+                    {t('hostView.presetDrawerBoard') || 'Board Size'}
+                  </span>
+                </div>
+                <span className="text-sm font-black text-neo-black">
+                  {getBoardSizeText(GAME_PRESETS[presetInfoOpen].difficulty)}
+                </span>
+              </div>
+
+              {/* Min Word Length */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Type className="w-4 h-4 text-neo-black/60" />
+                  <span className="text-sm font-bold text-neo-black">
+                    {t('hostView.presetDrawerMinWord') || 'Min Word Length'}
+                  </span>
+                </div>
+                <span className="text-sm font-black text-neo-black">
+                  {GAME_PRESETS[presetInfoOpen].minWordLength} {t('hostView.presetDrawerLetters') || 'letters'}
+                </span>
+              </div>
+            </div>
+
+            {/* Use This Mode Button */}
+            <Button
+              onClick={() => handleSelectAndApplyPreset(presetInfoOpen)}
+              className="w-full h-12 text-base bg-neo-lime text-neo-black font-black uppercase border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed active:translate-y-0.5 transition-all"
+            >
+              {t('hostView.presetDrawerUseMode') || 'Use This Mode'}
+            </Button>
+          </div>
+        )}
+      </MobileDrawer>
     </div>
   );
 };

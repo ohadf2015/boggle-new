@@ -426,7 +426,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                 >
                   <div className="flex flex-wrap gap-2 pt-2">
                     {gameAchievements.map((ach, i) => (
-                      <AchievementBadge key={i} achievement={ach} index={i} />
+                      <AchievementBadge key={ach.key || ach.name || `ach-${i}`} achievement={ach} index={i} />
                     ))}
                   </div>
                 </motion.div>

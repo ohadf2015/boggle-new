@@ -135,7 +135,7 @@ const RevealButton = memo<RevealButtonProps>(({
               // Show free reveal tokens (stars)
               [...Array(FREE_REVEALS_PER_GAME)].map((_, i) => (
                 <Star
-                  key={i}
+                  key={`reveal-star-${i}`}
                   className={`w-3 h-3 ${i < freeRevealsRemaining
                       ? 'text-neo-lime fill-neo-lime'
                       : 'text-gray-400 opacity-40'

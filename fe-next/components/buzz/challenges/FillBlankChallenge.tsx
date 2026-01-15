@@ -135,7 +135,7 @@ export default function FillBlankChallenge({
         >
           <span className="text-xs font-black text-neo-yellow uppercase tracking-wider">
             <FileText className="w-4 h-4 inline me-2" />
-            {t('buzz.type.fillBlank') || 'FILL IT'}
+            {t('buzz.type.fillBlank')}
           </span>
         </motion.div>
 
@@ -158,7 +158,7 @@ export default function FillBlankChallenge({
           <span className="font-bold text-neo-yellow">{filledCount}</span>
           <span className="text-slate-500"> / </span>
           <span className="font-bold text-neo-yellow">{answerLength}</span>
-          {' '}{t('buzz.letters') || 'letters'}
+          {' '}{t('buzz.letters')}
         </motion.div>
       </div>
 
@@ -170,7 +170,7 @@ export default function FillBlankChallenge({
           className="px-4 py-3 bg-neo-cyan/10 border-2 border-neo-cyan/30 rounded-lg"
         >
           <div className="text-xs text-neo-cyan font-bold uppercase mb-1">
-            {t('buzz.hint') || 'HINT'}
+            {t('buzz.hint')}
           </div>
           <p className="text-white text-sm">{challenge.hint}</p>
         </motion.div>
@@ -311,7 +311,7 @@ export default function FillBlankChallenge({
           `}
         >
           <Check className="w-6 h-6 me-2" />
-          {t('buzz.submit') || 'SUBMIT'}
+          {t('buzz.submit')}
         </Button>
       </motion.div>
 

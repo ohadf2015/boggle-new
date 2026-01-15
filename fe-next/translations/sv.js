@@ -122,6 +122,7 @@ const sv = {
     "share": "Dela",
     "minutes": "min",
     "advancedSettings": "Fler alternativ",
+    "settings": "Inställningar",
     "tapToDismiss": "Tryck för att stänga",
     "tapToClose": "Tryck för att fortsätta",
     "tapToContinue": "Tryck för att fortsätta",
@@ -166,7 +167,7 @@ const sv = {
     "reconnecting": "Återansluter...",
     "disconnected": "Anslutning förlorad",
     "attempt": "Försök",
-    "checkConnection": "Kontrollera din internetanslutning",
+    "checkConnection": "Du verkar vara offline!",
     "retry": "Försök igen",
     "retryNow": "Försök nu"
   },
@@ -370,8 +371,8 @@ const sv = {
   },
   "error": {
     "subscriptionFailed": "Prenumerationen misslyckades. Försök igen.",
-    "generic": "Något gick fel",
-    "notAuthenticated": "Logga in för att fortsätta"
+    "generic": "Hoppsan, det funkade inte!",
+    "notAuthenticated": "Logga in för att fortsätta spela!"
   },
   "difficulty": {
     "easy": "Lätt",
@@ -489,7 +490,7 @@ const sv = {
       "usernameHint": "2-20 tecken",
       "avatarLabel": "Avatar",
       "avatarHint": "Välj en avatar som representerar dig",
-      "avatarRequired": "Välj en avatar för att fortsätta",
+      "avatarRequired": "Välj en avatar för att gå med i striden!",
       "usingProfileAvatar": "Profilavatar",
       "usingGameAvatar": "Spelavatar",
       "tapToChange": "Tryck för att ändra",
@@ -609,6 +610,16 @@ const sv = {
     "presetPartyDesc": "2 min partyläge",
     "presetChallenge": "Utmaning",
     "presetChallengeDesc": "3 min svårt läge",
+    "presetFastDetails": "Perfekt för snabba rundor! Tävla mot klockan i ett snabbt spel. Bra för uppvärmning eller när du har ont om tid.",
+    "presetPartyDetails": "Den klassiska partyupplevelsen! Balanserat spel med tillräckligt med tid för att hitta bra ord samtidigt som energin hålls hög. Perfekt för grupper.",
+    "presetChallengeDetails": "För seriösa ordjägare! Större bräda betyder fler ordkombinationer och tuffare konkurrens. Bevisa att du är den ultimata ordmästaren!",
+    "presetDrawerTimer": "Timer",
+    "presetDrawerBoard": "Brädstorlek",
+    "presetDrawerMinWord": "Min ordlängd",
+    "presetDrawerUseMode": "Använd detta läge",
+    "presetDrawerBoardMedium": "7×7 (Medium)",
+    "presetDrawerBoardHard": "9×9 (Svår)",
+    "presetDrawerLetters": "bokstäver",
     "difficultyTooltipGrid": "Rutnätets storlek påverkar svårigheten",
     "difficultyTooltipTimer": "Längre tid = fler ord hittade"
   },
@@ -726,7 +737,7 @@ const sv = {
     "noPlayersYet": "Inga spelare ännu",
     "wordTooShort": "Ordet för kort! (min 2 bokstäver)",
     "wordTooShortMin": "Ordet för kort! (min ${min} bokstäver)",
-    "errorOccurred": "Ett fel inträffade",
+    "errorOccurred": "Hoppsan! Försök igen",
     "tooFast": "Sakta ner! Skickar för snabbt",
     "me": "Jag",
     "noWordsYet": "Inga ord hittade ännu",
@@ -793,7 +804,8 @@ const sv = {
       "demoWord": "SOL",
       "demoHint": "Koppla ihop angränsande bokstäver",
       "demoSuccess": "Perfekt!",
-      "demoComplete": "Du förstår! Nu vet du hur man spelar."
+      "demoComplete": "Du förstår! Nu vet du hur man spelar.",
+      "startHere": "Börja här"
     },
     "name": {
       "placeholder": "Ange ditt namn",
@@ -808,7 +820,13 @@ const sv = {
     },
     "quickTips": {
       "title": "Proffstips",
-      "subtitle": "Resten lär du dig genom att spela"
+      "subtitle": "Resten lär du dig genom att spela",
+      "tip1Title": "Svep bokstäver",
+      "tip1Text": "Dra över angränsande bokstäver för att bilda ord",
+      "tip2Title": "Längre = Bättre",
+      "tip2Text": "Längre ord ger exponentiellt fler poäng",
+      "tip3Title": "Snabbhet räknas",
+      "tip3Text": "Snabba fynd bygger kombos för bonuspoäng"
     },
     "training": {
       "title": "Träningsläge",
@@ -2103,6 +2121,12 @@ const sv = {
     "needHint": "Behöver du en ledtråd?",
     "botWords": "Hittade ord",
     "beatYourRecord": "Du slog ditt rekord!",
+    "soloVsBots": "Solo mot Bottar",
+    "soloVsBotsDesc": "Tävla mot AI-motståndare på olika svårighetsnivåer",
+    "practiceMode": "Öva",
+    "practiceModeDesc": "Ingen timer - lär dig och utforska i din egen takt",
+    "challengeMode": "Utmaning",
+    "challengeModeDesc": "Slå dina personliga rekord och följ din förbättring",
     "preset": {
       "customGame": "Anpassat Spel",
       "quick": "Snabb",
@@ -2282,6 +2306,7 @@ const sv = {
     "download": "Spara som bild",
     "downloadImage": "Spara delningsbild",
     "playingAs": "Spelar som",
+    "keepPlaying": "Kom tillbaka imorgon för ett nytt pussel!",
     "guestPlayer": "Gästspelare",
     "enterName": "Ange ditt namn",
     "characters": "tecken",
@@ -2372,7 +2397,7 @@ const sv = {
     "title": "Daily Buzz",
     "tagline": "Ordutmaningar från dagens trender",
     "subtitle": "Vad buzzer idag?",
-    "badge": "🔥 NYHET",
+    "badge": "BETA",
     "betaPreview": "✨ BETA",
     "breaking": "JUST NU",
     "tapToCelebrate": "Tryck för att fira",
@@ -2534,6 +2559,7 @@ const sv = {
       "avgEfficiency": "Genomsnittlig effektivitet",
       "challengeTitle": "Utmaning från en vän!",
       "attempts": "försök",
+      "attemptsUsed": "använda försök",
       "beatTheirScore": "Kan du slå deras poäng?",
       "tryAnotherLanguage": "Prova ett annat språk",
       "playDifferentLanguage": "Spela dagens pussel på ett annat språk",

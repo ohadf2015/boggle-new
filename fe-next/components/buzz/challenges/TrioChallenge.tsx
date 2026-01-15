@@ -88,7 +88,7 @@ export default function TrioChallenge({
         >
           <span className="text-xs font-black text-neo-lime uppercase tracking-wider">
             <Sparkles className="w-4 h-4 inline me-2" />
-            {t('buzz.type.trio') || 'TRENDING TRIO'}
+            {t('buzz.type.trio')}
           </span>
         </motion.div>
 
@@ -173,7 +173,7 @@ export default function TrioChallenge({
           transition={{ delay: 0.45 }}
           className="text-sm text-slate-400"
         >
-          {t('buzz.trio.hint') || 'Find the word that connects all three topics'}
+          {t('buzz.trio.hint')}
         </motion.p>
       </div>
 
@@ -185,7 +185,7 @@ export default function TrioChallenge({
           className="px-4 py-3 bg-neo-cyan/10 border-2 border-neo-cyan/30 rounded-lg"
         >
           <div className="text-xs text-neo-cyan font-bold uppercase mb-1">
-            {t('buzz.hint') || 'HINT'}
+            {t('buzz.hint')}
           </div>
           <p className="text-white text-sm">{challenge.hint}</p>
         </motion.div>
@@ -204,7 +204,7 @@ export default function TrioChallenge({
           value={userAnswer}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          placeholder={t('buzz.connectingWord') || 'CONNECTING WORD'}
+          placeholder={t('buzz.connectingWord')}
           className={`
             w-full px-6 py-4 text-2xl font-black text-center text-white
             bg-slate-800 border-3 rounded-xl outline-none
@@ -262,7 +262,7 @@ export default function TrioChallenge({
           `}
         >
           <Check className="w-6 h-6 me-2" />
-          {t('buzz.submit') || 'SUBMIT'}
+          {t('buzz.submit')}
         </Button>
       </motion.div>
 

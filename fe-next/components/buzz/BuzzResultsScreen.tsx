@@ -146,12 +146,15 @@ export default function BuzzResultsScreen({
 
   // Calculate score percentage for visual feedback
   const scorePercentage = resultData.score;
-  const getScoreColor = () => {
-    if (scorePercentage >= 80) return 'neo-lime';
-    if (scorePercentage >= 60) return 'neo-yellow';
-    if (scorePercentage >= 40) return 'neo-orange';
-    return 'neo-pink';
-  };
+
+  // Static class mappings for Tailwind to detect at compile time
+  // Dynamic class names like `text-${color}` are NOT included in build output
+  const scoreColorStyles = (() => {
+    if (scorePercentage >= 80) return { text: 'text-neo-lime', border: 'border-neo-lime/20', cssVar: '--neo-lime' };
+    if (scorePercentage >= 60) return { text: 'text-neo-yellow', border: 'border-neo-yellow/20', cssVar: '--neo-yellow' };
+    if (scorePercentage >= 40) return { text: 'text-neo-orange', border: 'border-neo-orange/20', cssVar: '--neo-orange' };
+    return { text: 'text-neo-pink', border: 'border-neo-pink/20', cssVar: '--neo-pink' };
+  })();
 
   return (
     <motion.div
@@ -182,7 +185,7 @@ export default function BuzzResultsScreen({
       >
         <Button variant="ghost" size="sm" onClick={onBack}>
           <ArrowLeft className="w-4 h-4 me-2 rtl:rotate-180" />
-          {t('daily.home') || 'Home'}
+          {t('daily.home')}
         </Button>
       </motion.div>
 
@@ -197,7 +200,7 @@ export default function BuzzResultsScreen({
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-neo-cyan/15 rounded-neo-lg border-2 border-neo-cyan/40 shadow-hard-sm">
             <Trophy className="w-5 h-5 text-neo-cyan" />
             <span className="font-black text-neo-cyan text-sm uppercase tracking-wide">
-              {t('buzz.results.title') || 'BUZZ COMPLETE!'}
+              {t('buzz.results.title')}
             </span>
           </div>
         </motion.div>
@@ -211,7 +214,7 @@ export default function BuzzResultsScreen({
         >
           {/* Decorative rings */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className={`w-40 h-40 rounded-full border-4 border-${getScoreColor()}/20 animate-ping`} style={{ animationDuration: '2s' }} />
+            <div className={`w-40 h-40 rounded-full border-4 ${scoreColorStyles.border} animate-ping`} style={{ animationDuration: '2s' }} />
           </div>
 
           {/* Score container */}
@@ -229,7 +232,7 @@ export default function BuzzResultsScreen({
             }
           >
             <div className="text-xs text-slate-500 uppercase font-black tracking-widest mb-2">
-              {t('buzz.yourScore') || 'YOUR SCORE'}
+              {t('buzz.yourScore')}
             </div>
 
             {/* Main score number */}
@@ -238,9 +241,9 @@ export default function BuzzResultsScreen({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className={`text-7xl sm:text-8xl md:text-9xl font-black text-${getScoreColor()} leading-none`}
+                className={`text-7xl sm:text-8xl md:text-9xl font-black ${scoreColorStyles.text} leading-none`}
                 style={{
-                  textShadow: `0 0 40px var(--${getScoreColor()})`,
+                  textShadow: `0 0 40px var(${scoreColorStyles.cssVar})`,
                 }}
               >
                 {resultData.score}
@@ -250,7 +253,7 @@ export default function BuzzResultsScreen({
 
             {/* Tap to celebrate hint */}
             <p className="text-xs text-slate-600 mt-2">
-              {t('buzz.tapToCelebrate') || 'Tap to celebrate'}
+              {t('buzz.tapToCelebrate')}
             </p>
           </motion.div>
         </motion.div>
@@ -266,7 +269,7 @@ export default function BuzzResultsScreen({
             <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-500/25 to-orange-500/25 rounded-neo-lg border-3 border-amber-500/50 shadow-hard-sm">
               <Flame className="w-6 h-6 text-amber-400 animate-pulse" />
               <span className="font-black text-amber-400 text-lg">
-                {t('buzz.results.perfect') || 'PERFECT SCORE!'}
+                {t('buzz.results.perfect')}
               </span>
               <Flame className="w-6 h-6 text-amber-400 animate-pulse" />
             </div>
@@ -287,7 +290,7 @@ export default function BuzzResultsScreen({
             </div>
             <div className="text-2xl sm:text-3xl font-black text-white">{correctCount}</div>
             <div className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase">
-              {t('buzz.correct') || 'CORRECT'}
+              {t('buzz.correct')}
             </div>
           </div>
 
@@ -298,7 +301,7 @@ export default function BuzzResultsScreen({
             </div>
             <div className="text-2xl sm:text-3xl font-black text-white">{totalChallenges}</div>
             <div className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase">
-              {t('buzz.total') || 'TOTAL'}
+              {t('buzz.total')}
             </div>
           </div>
 
@@ -312,7 +315,7 @@ export default function BuzzResultsScreen({
               {(resultData.completionTimeSeconds % 60).toString().padStart(2, '0')}
             </div>
             <div className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase">
-              {t('results.time') || 'TIME'}
+              {t('results.time')}
             </div>
           </div>
         </motion.div>
@@ -330,7 +333,7 @@ export default function BuzzResultsScreen({
             className="w-full flex items-center justify-between p-4 hover:bg-slate-800/50 transition-colors text-left"
           >
             <span className="text-xs text-slate-400 uppercase font-black tracking-wider">
-              {t('buzz.results.reviewTitle') || 'CHALLENGE REVIEW'}
+              {t('buzz.results.reviewTitle')}
             </span>
             <motion.div
               animate={{ rotate: isReviewExpanded ? 180 : 0 }}
@@ -359,7 +362,7 @@ export default function BuzzResultsScreen({
 
                 return (
                   <motion.div
-                    key={index}
+                    key={`challenge-${solved.challengeIndex}`}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.5 + index * 0.05 }}
@@ -385,10 +388,10 @@ export default function BuzzResultsScreen({
                           className={`text-xs font-black ${solved.correct ? 'text-emerald-400' : 'text-red-400'}`}
                         >
                           {solved.correct
-                            ? t('buzz.feedback.correct') || 'CORRECT'
+                            ? t('buzz.feedback.correct')
                             : isSkipped
-                              ? t('buzz.results.skipped') || 'SKIPPED'
-                              : t('buzz.feedback.incorrect') || 'INCORRECT'}
+                              ? t('buzz.results.skipped')
+                              : t('buzz.feedback.incorrect')}
                         </span>
                       </div>
                     </div>
@@ -402,7 +405,7 @@ export default function BuzzResultsScreen({
                     <div className="space-y-1 text-left">
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-slate-500 min-w-[70px]">
-                          {t('buzz.results.correctAnswer') || 'Answer:'}
+                          {t('buzz.results.correctAnswer')}
                         </span>
                         <span className="text-sm font-black text-emerald-300 uppercase">
                           {challenge.answer}
@@ -412,7 +415,7 @@ export default function BuzzResultsScreen({
                       {!solved.correct && !isSkipped && (
                         <div className="flex items-center gap-2">
                           <span className="text-xs text-slate-500 min-w-[70px]">
-                            {t('buzz.results.yourAnswer') || 'You said:'}
+                            {t('buzz.results.yourAnswer')}
                           </span>
                           <span className="text-sm text-red-300/80 line-through uppercase">
                             {solved.userAnswer}
@@ -446,7 +449,7 @@ export default function BuzzResultsScreen({
           <div className="flex items-center gap-2 mb-2">
             <Sparkles className="w-4 h-4 text-neo-cyan" />
             <span className="text-xs text-slate-500 uppercase font-black tracking-wider">
-              {t('buzz.results.trending') || "TODAY'S TOPICS"}
+              {t('buzz.results.trending')}
             </span>
           </div>
           <p className="text-white text-sm leading-relaxed">{challengeData.trendingSummary}</p>
@@ -467,7 +470,7 @@ export default function BuzzResultsScreen({
             {/* Shine effect */}
             <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
             <Share2 className="me-2 w-5 h-5" />
-            {t('buzz.results.share') || 'SHARE YOUR BUZZ'}
+            {t('buzz.results.share')}
           </Button>
 
           {/* Copy button */}
@@ -479,12 +482,12 @@ export default function BuzzResultsScreen({
             {copied ? (
               <>
                 <Check className="w-4 h-4 me-2 text-neo-lime" />
-                <span className="text-neo-lime">{t('common.copied') || 'COPIED!'}</span>
+                <span className="text-neo-lime">{t('common.copied')}</span>
               </>
             ) : (
               <>
                 <Copy className="w-4 h-4 me-2" />
-                {t('daily.copyToClipboard') || 'COPY TO CLIPBOARD'}
+                {t('daily.copyToClipboard')}
               </>
             )}
           </Button>

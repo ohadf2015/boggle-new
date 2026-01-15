@@ -76,8 +76,14 @@ interface XpInfo {
   newTitles?: string[];
 }
 
+interface LifetimeAchievement {
+  key: string;
+  icon: string;
+}
+
 interface GameResults {
   xpResults?: Record<string, XpInfo>;
+  lifetimeAchievements?: Record<string, LifetimeAchievement[]>;
 }
 
 /**
@@ -537,6 +543,25 @@ async function recordGameResultsToSupabase(io: Server, gameCode: string, scoresA
                 newTitles: xpInfo.newTitles || [],
               });
               logger.info('XP', `Emitted levelUp to ${username}: ${xpInfo.oldLevel} -> ${xpInfo.newLevel}`);
+            }
+          }
+        }
+      }
+    }
+
+    // Emit lifetime achievements to players
+    if (results.lifetimeAchievements) {
+      for (const [username, achievements] of Object.entries(results.lifetimeAchievements)) {
+        if (achievements.length > 0) {
+          // Find the user's socket
+          const userData = game.users?.[username] as { socketId?: string } | undefined;
+          if (userData?.socketId) {
+            const playerSocket = getSocketById(io, userData.socketId);
+            if (playerSocket) {
+              safeEmit(playerSocket, 'lifetimeAchievementsUnlocked', {
+                achievements: achievements,
+              });
+              logger.info('ACHIEVEMENT', `Emitted ${achievements.length} lifetime achievement(s) to ${username}: ${achievements.map(a => a.key).join(', ')}`);
             }
           }
         }

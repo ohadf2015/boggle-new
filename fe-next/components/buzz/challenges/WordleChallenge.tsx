@@ -316,7 +316,7 @@ export default function WordleChallenge({
         >
           <span className="text-xs font-black text-purple-400 uppercase tracking-wider">
             <Grid3X3 className="w-4 h-4 inline me-2" />
-            {t('buzz.type.wordle') || 'WORDLE'}
+            {t('buzz.type.wordle')}
           </span>
         </motion.div>
 
@@ -337,7 +337,7 @@ export default function WordleChallenge({
           className="text-sm text-slate-400"
         >
           <span className="font-bold text-purple-400">{attemptsLeft}</span>{' '}
-          {t('buzz.wordle.attemptsLeft') || 'attempts left'}
+          {t('buzz.wordle.attemptsLeft')}
         </motion.div>
       </div>
 
@@ -349,7 +349,7 @@ export default function WordleChallenge({
           className="px-4 py-3 bg-neo-cyan/10 border-2 border-neo-cyan/30 rounded-lg"
         >
           <div className="text-xs text-neo-cyan font-bold uppercase mb-1">
-            {t('buzz.hint') || 'HINT'}
+            {t('buzz.hint')}
           </div>
           <p className="text-white text-sm">{challenge.hint}</p>
         </motion.div>
@@ -380,8 +380,8 @@ export default function WordleChallenge({
           }`}
         >
           {gameStatus === 'won'
-            ? t('buzz.wordle.solved') || 'Solved!'
-            : `${t('buzz.wordle.failed') || 'Out of attempts'}: ${challenge.answer}`}
+            ? t('buzz.wordle.solved')
+            : `${t('buzz.wordle.failed')}: ${challenge.answer}`}
         </motion.div>
       )}
 
@@ -418,7 +418,7 @@ export default function WordleChallenge({
             handleKeyPress('ENTER');
           }
         }}
-        aria-label={t('buzz.wordle.useDeviceKeyboard') || 'Tap to type'}
+        aria-label={t('buzz.wordle.useDeviceKeyboard')}
       />
 
       {/* On-screen Keyboard */}

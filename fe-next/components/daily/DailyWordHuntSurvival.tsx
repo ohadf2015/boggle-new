@@ -106,7 +106,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     gameLanguage: language,
     enabled: !state.isGameOver,
     onWordSubmit: actions.handleWordSubmit,
-    minWordLength: 3,
+    minWordLength: 2, // Match swipe behavior - needed for Japanese kanji compounds
   });
 
   // Hide bottom navigation during active gameplay

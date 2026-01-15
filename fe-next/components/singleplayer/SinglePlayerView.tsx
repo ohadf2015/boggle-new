@@ -17,7 +17,7 @@ import { getMinWordLength, getDefaultPreset, getPresetById, type PresetConfig } 
 import type { DifficultyLevel, Language, LetterGrid } from '@/shared/types/game';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 
-export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge' | 'daily';
+export type SinglePlayerMode = 'solo-bots' | 'practice' | 'challenge';
 export type SinglePlayerPhase = 'preset-selection' | 'lobby' | 'playing' | 'results';
 
 export interface BotOpponent {
@@ -318,12 +318,6 @@ const SinglePlayerView: React.FC = () => {
 
   // Handle preset selection - quick start with preset settings
   const handleSelectPreset = useCallback((preset: PresetConfig) => {
-    // Daily mode redirects to the dedicated daily challenge page
-    if (preset.id === 'daily' || preset.modes.includes('daily')) {
-      router.push(`/${uiLanguage}/daily`);
-      return;
-    }
-
     // Determine mode based on preset
     let mode: SinglePlayerMode = 'solo-bots';
     if (preset.settings.bots === 0 && preset.settings.timerSeconds === 0) {
@@ -353,7 +347,7 @@ const SinglePlayerView: React.FC = () => {
       minWordLength,
     }));
     setPhase('playing');
-  }, [uiLanguage, router, generateBots]);
+  }, [uiLanguage, generateBots]);
 
   // Handle custom game - go to detailed lobby
   const handleCustomGame = useCallback(() => {

@@ -80,8 +80,8 @@ export default function BuzzHistoryList({
     const isToday = dateStr === today.toISOString().split('T')[0];
     const isYesterday = dateStr === yesterday.toISOString().split('T')[0];
 
-    if (isToday) return t('common.today') || 'Today';
-    if (isYesterday) return t('common.yesterday') || 'Yesterday';
+    if (isToday) return t('common.today');
+    if (isYesterday) return t('common.yesterday');
 
     return date.toLocaleDateString(language === 'he' ? 'he-IL' : 'en-US', {
       weekday: 'short',
@@ -126,10 +126,10 @@ export default function BuzzHistoryList({
               </div>
               <div>
                 <h2 className="text-lg font-black text-white">
-                  {t('buzz.history.title') || 'Past Challenges'}
+                  {t('buzz.history.title')}
                 </h2>
                 <p className="text-xs text-slate-400">
-                  {total} {t('buzz.history.available') || 'challenges available'}
+                  {total} {t('buzz.history.available')}
                 </p>
               </div>
             </div>
@@ -156,7 +156,7 @@ export default function BuzzHistoryList({
             <div className="p-8 text-center">
               <Clock className="w-12 h-12 text-slate-500 mx-auto mb-3" />
               <p className="text-slate-400">
-                {t('buzz.history.empty') || 'No past challenges yet'}
+                {t('buzz.history.empty')}
               </p>
             </div>
           ) : (

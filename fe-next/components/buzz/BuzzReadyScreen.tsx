@@ -76,7 +76,7 @@ export default function BuzzReadyScreen({
       >
         <Button variant="ghost" size="sm" onClick={onBack}>
           <ArrowLeft className="w-4 h-4 me-2 rtl:rotate-180" />
-          {t('daily.home') || 'Home'}
+          {t('daily.home')}
         </Button>
       </motion.div>
 
@@ -101,7 +101,7 @@ export default function BuzzReadyScreen({
               <span className="relative inline-flex rounded-full h-3 w-3 bg-neo-pink" />
             </span>
             <span className="px-3 py-1 bg-neo-pink text-neo-black text-xs font-black uppercase tracking-widest border-2 border-neo-black shadow-hard-sm">
-              {t('buzz.breaking') || 'BREAKING'}
+              {t('buzz.breaking')}
             </span>
           </motion.div>
 
@@ -112,7 +112,7 @@ export default function BuzzReadyScreen({
             transition={{ delay: 0.15, type: 'spring' }}
             className="text-4xl sm:text-5xl md:text-6xl font-neo-display font-black text-neo-yellow leading-tight"
           >
-            {t('buzz.title') || 'Daily Buzz'}
+            {t('buzz.title')}
           </motion.h1>
 
           <motion.p
@@ -121,7 +121,7 @@ export default function BuzzReadyScreen({
             transition={{ delay: 0.25 }}
             className="text-slate-400 text-base sm:text-lg mt-2 font-medium"
           >
-            {t('buzz.subtitle') || "What's Buzzing Today?"}
+            {t('buzz.subtitle')}
           </motion.p>
         </motion.div>
 
@@ -149,7 +149,7 @@ export default function BuzzReadyScreen({
             {/* Beta badge */}
             <div className="absolute top-3 end-3 px-3 py-1 bg-neo-pink/95 rounded-neo border-2 border-neo-black shadow-hard-sm">
               <span className="text-xs font-black text-neo-black">
-                {t('buzz.betaPreview') || '✨ BETA'}
+                {t('buzz.betaPreview')}
               </span>
             </div>
           </motion.div>
@@ -170,7 +170,7 @@ export default function BuzzReadyScreen({
               <Sparkles className="w-4 h-4 text-neo-cyan" />
             </div>
             <h2 className="font-black text-neo-cyan uppercase tracking-wide text-sm">
-              {t('buzz.preview.title') || "TODAY'S TOPICS"}
+              {t('buzz.preview.title')}
             </h2>
           </div>
           <p className="text-white text-lg font-medium leading-relaxed">
@@ -187,7 +187,7 @@ export default function BuzzReadyScreen({
         >
           <div className="flex items-center gap-2 text-sm text-slate-400 font-bold uppercase tracking-wide">
             <TrendingUp className="w-4 h-4" />
-            {t('buzz.preview.subtitle') || 'Challenges feature...'}
+            {t('buzz.preview.subtitle')}
           </div>
 
           <div className="grid grid-cols-1 gap-2">
@@ -214,7 +214,7 @@ export default function BuzzReadyScreen({
                   {topic.volume && (
                     <div className="flex items-center gap-1 text-xs text-slate-400">
                       <Zap className="w-3 h-3 text-neo-orange" />
-                      {formatVolume(topic.volume)} {t('buzz.searches') || 'searches'}
+                      {formatVolume(topic.volume)} {t('buzz.searches')}
                     </div>
                   )}
                 </div>
@@ -235,21 +235,22 @@ export default function BuzzReadyScreen({
           transition={{ delay: 0.6 }}
           className="grid grid-cols-3 gap-2"
         >
+          {/* Static color classes for Tailwind to detect at compile time */}
           {[
             {
               value: challengeData.challenges.length,
-              label: t('buzz.challenges') || 'Challenges',
-              color: 'neo-yellow',
+              label: t('buzz.challenges'),
+              colorClass: 'text-neo-yellow',
             },
             {
               value: '∞',
-              label: t('buzz.noTimeLimit') || 'No Timer',
-              color: 'neo-cyan',
+              label: t('buzz.noTimeLimit'),
+              colorClass: 'text-neo-cyan',
             },
             {
               value: '100',
-              label: t('buzz.maxScore') || 'Max Score',
-              color: 'neo-lime',
+              label: t('buzz.maxScore'),
+              colorClass: 'text-neo-lime',
             },
           ].map((stat, i) => (
             <motion.div
@@ -259,7 +260,7 @@ export default function BuzzReadyScreen({
               transition={{ delay: 0.65 + i * 0.05 }}
               className="text-center p-3 sm:p-4 bg-slate-900/60 rounded-neo-lg border-2 border-slate-700"
             >
-              <div className={`text-2xl sm:text-3xl font-black text-${stat.color}`}>
+              <div className={`text-2xl sm:text-3xl font-black ${stat.colorClass}`}>
                 {stat.value}
               </div>
               <div className="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wide">
@@ -278,7 +279,7 @@ export default function BuzzReadyScreen({
             className="px-4 py-3 bg-neo-cyan/10 border-3 border-neo-cyan rounded-neo-lg text-center"
           >
             <p className="text-sm text-neo-cyan font-bold">
-              {t('buzz.alreadyPlayed') || "You've already completed today's Buzz!"}
+              {t('buzz.alreadyPlayed')}
             </p>
           </motion.div>
         )}
@@ -301,8 +302,8 @@ export default function BuzzReadyScreen({
 
             <Play className="w-5 h-5 sm:w-6 sm:h-6 me-2" />
             {hasPlayedToday
-              ? t('buzz.viewResults') || 'VIEW RESULTS'
-              : t('buzz.preview.play') || 'START BUZZ'}
+              ? t('buzz.viewResults')
+              : t('buzz.preview.play')}
           </Button>
 
           {/* Skip to Answers */}
@@ -313,7 +314,7 @@ export default function BuzzReadyScreen({
               className="w-full py-3 text-sm font-bold text-slate-400 hover:text-neo-pink border-2 border-slate-700 hover:border-neo-pink/50 rounded-neo transition-all"
             >
               <FastForward className="w-4 h-4 me-2" />
-              {t('buzz.skipToAnswers') || 'Skip to Answers'}
+              {t('buzz.skipToAnswers')}
             </Button>
           )}
         </motion.div>
@@ -322,13 +323,10 @@ export default function BuzzReadyScreen({
         <ConfirmationDialog
           open={showSkipConfirm}
           onOpenChange={setShowSkipConfirm}
-          title={t('buzz.skipConfirmTitle') || 'Skip Challenges?'}
-          description={
-            t('buzz.skipConfirmMessage') ||
-            "You'll see the answers without playing. Your score will be 0."
-          }
-          confirmText={t('buzz.skipConfirm') || 'Skip to Answers'}
-          cancelText={t('common.cancel') || 'Cancel'}
+          title={t('buzz.skipConfirmTitle')}
+          description={t('buzz.skipConfirmMessage')}
+          confirmText={t('buzz.skipConfirm')}
+          cancelText={t('common.cancel')}
           onConfirm={onSkipAll}
           variant="warning"
         />
@@ -340,8 +338,7 @@ export default function BuzzReadyScreen({
           transition={{ delay: 0.9 }}
           className="text-center text-xs text-slate-500 leading-relaxed pb-4"
         >
-          {t('buzz.helpText') ||
-            "Solve word challenges based on what's trending today. No time pressure!"}
+          {t('buzz.helpText')}
         </motion.p>
       </div>
     </motion.div>

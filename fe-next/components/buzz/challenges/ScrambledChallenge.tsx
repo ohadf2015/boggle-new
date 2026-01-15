@@ -133,7 +133,7 @@ export default function ScrambledChallenge({
         >
           <span className="text-xs font-black text-neo-orange uppercase tracking-wider">
             <RotateCcw className="w-4 h-4 inline me-2" />
-            {t('buzz.type.scrambled') || 'SCRAMBLED'}
+            {t('buzz.type.scrambled')}
           </span>
         </motion.div>
 
@@ -155,7 +155,7 @@ export default function ScrambledChallenge({
           className="flex items-center justify-center gap-2 text-sm text-slate-400 mb-2"
         >
           <Shuffle className="w-4 h-4" />
-          <span>{t('buzz.scrambled.unscramble') || 'Unscramble the letters!'}</span>
+          <span>{t('buzz.scrambled.unscramble')}</span>
         </motion.div>
 
         {/* Letter count indicator */}
@@ -168,7 +168,7 @@ export default function ScrambledChallenge({
           <span className="font-bold text-neo-orange">{filledCount}</span>
           <span className="text-slate-500"> / </span>
           <span className="font-bold text-neo-orange">{answerLength}</span>
-          {' '}{t('buzz.letters') || 'letters'}
+          {' '}{t('buzz.letters')}
         </motion.div>
       </div>
 
@@ -180,7 +180,7 @@ export default function ScrambledChallenge({
           className="px-4 py-3 bg-neo-cyan/10 border-2 border-neo-cyan/30 rounded-lg"
         >
           <div className="text-xs text-neo-cyan font-bold uppercase mb-1">
-            {t('buzz.hint') || 'HINT'}
+            {t('buzz.hint')}
           </div>
           <p className="text-white text-sm">{challenge.hint}</p>
         </motion.div>
@@ -316,7 +316,7 @@ export default function ScrambledChallenge({
           `}
         >
           <Check className="w-6 h-6 me-2" />
-          {t('buzz.submit') || 'SUBMIT'}
+          {t('buzz.submit')}
         </Button>
       </motion.div>
 

@@ -19,6 +19,12 @@ import {
 } from './constants';
 import { getDailyChallengeDate } from './dateUtils';
 import { updateDailyStreak } from './streaks';
+import {
+  getJsonFromLocalStorage,
+  saveJsonToLocalStorage,
+  removeFromLocalStorage,
+  getFromLocalStorage,
+} from '@/utils/storageHelpers';
 
 // ==========================================
 // Legacy Daily Challenge Storage
@@ -28,38 +34,24 @@ import { updateDailyStreak } from './streaks';
  * Check if user has already played today's daily challenge
  */
 export function hasPlayedToday(language: Language): boolean {
-  if (typeof window === 'undefined') return false;
-
   const today = getDailyChallengeDate();
   const key = `${DAILY_STORAGE_KEY}_${language}_${today}`;
-  return localStorage.getItem(key) !== null;
+  return getFromLocalStorage(key) !== null;
 }
 
 /**
  * Get the stored result for today's daily (if exists)
  */
 export function getTodaysResult(language: Language): StoredDailyResult | null {
-  if (typeof window === 'undefined') return null;
-
   const today = getDailyChallengeDate();
   const key = `${DAILY_STORAGE_KEY}_${language}_${today}`;
-  const stored = localStorage.getItem(key);
-
-  if (!stored) return null;
-
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return null;
-  }
+  return getJsonFromLocalStorage<StoredDailyResult | null>(key, null);
 }
 
 /**
  * Save the result of today's daily challenge
  */
 export function saveDailyResult(result: DailyChallengeResult): void {
-  if (typeof window === 'undefined') return;
-
   const today = getDailyChallengeDate();
   const key = `${DAILY_STORAGE_KEY}_${result.language}_${today}`;
 
@@ -70,7 +62,7 @@ export function saveDailyResult(result: DailyChallengeResult): void {
     completedAt: new Date().toISOString(),
   };
 
-  localStorage.setItem(key, JSON.stringify(storedResult));
+  saveJsonToLocalStorage(key, storedResult);
 }
 
 /**
@@ -82,16 +74,13 @@ export function getAllDailyResults(language: Language): StoredDailyResult[] {
   const results: StoredDailyResult[] = [];
   const prefix = `${DAILY_STORAGE_KEY}_${language}_`;
 
+  // Note: localStorage.key() iteration is a special case not covered by storage helpers
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
     if (key && key.startsWith(prefix)) {
-      const stored = localStorage.getItem(key);
-      if (stored) {
-        try {
-          results.push(JSON.parse(stored));
-        } catch {
-          // Skip invalid entries
-        }
+      const result = getJsonFromLocalStorage<StoredDailyResult | null>(key, null);
+      if (result) {
+        results.push(result);
       }
     }
   }
@@ -108,30 +97,18 @@ export function getAllDailyResults(language: Language): StoredDailyResult[] {
  * Check if user has already played today's Word Hunt
  */
 export function hasPlayedWordHuntToday(language: Language): boolean {
-  if (typeof window === 'undefined') return false;
-
   const today = getDailyChallengeDate();
   const key = `${WORD_HUNT_STORAGE_KEY}_${language}_${today}`;
-  return localStorage.getItem(key) !== null;
+  return getFromLocalStorage(key) !== null;
 }
 
 /**
  * Get the stored Word Hunt result for today (if exists)
  */
 export function getTodaysWordHuntResult(language: Language): StoredWordHuntResult | null {
-  if (typeof window === 'undefined') return null;
-
   const today = getDailyChallengeDate();
   const key = `${WORD_HUNT_STORAGE_KEY}_${language}_${today}`;
-  const stored = localStorage.getItem(key);
-
-  if (!stored) return null;
-
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return null;
-  }
+  return getJsonFromLocalStorage<StoredWordHuntResult | null>(key, null);
 }
 
 /**
@@ -156,7 +133,7 @@ export function saveWordHuntResult(result: WordHuntResult, isAuthenticated: bool
     submittedToServer: false, // Will be set to true after successful API submission
   };
 
-  localStorage.setItem(key, JSON.stringify(storedResult));
+  saveJsonToLocalStorage(key, storedResult);
 
   // Update the daily streak only for authenticated users
   // Anonymous users don't get streak tracking - incentive to sign up
@@ -174,22 +151,16 @@ export function saveWordHuntResult(result: WordHuntResult, isAuthenticated: bool
  * Returns true if successfully cleared
  */
 export function clearWordHuntResultForRetry(language: Language): boolean {
-  if (typeof window === 'undefined') return false;
-
   const today = getDailyChallengeDate();
   const key = `${WORD_HUNT_STORAGE_KEY}_${language}_${today}`;
 
-  try {
-    localStorage.removeItem(key);
+  removeFromLocalStorage(key);
 
-    // Also clear the coin award flag so they can earn coins again
-    const awardKey = `lexiclash_daily_coin_award_${today}_${language}`;
-    localStorage.removeItem(awardKey);
+  // Also clear the coin award flag so they can earn coins again
+  const awardKey = `lexiclash_daily_coin_award_${today}_${language}`;
+  removeFromLocalStorage(awardKey);
 
-    return true;
-  } catch {
-    return false;
-  }
+  return true;
 }
 
 /**
@@ -197,23 +168,16 @@ export function clearWordHuntResultForRetry(language: Language): boolean {
  * Called after the API submission succeeds to prevent duplicate submissions
  */
 export function markWordHuntResultSubmitted(language: Language): boolean {
-  if (typeof window === 'undefined') return false;
-
   const today = getDailyChallengeDate();
   const key = `${WORD_HUNT_STORAGE_KEY}_${language}_${today}`;
 
-  try {
-    const stored = localStorage.getItem(key);
-    if (!stored) return false;
+  const storedResult = getJsonFromLocalStorage<StoredWordHuntResult | null>(key, null);
+  if (!storedResult) return false;
 
-    const storedResult: StoredWordHuntResult = JSON.parse(stored);
-    storedResult.submittedToServer = true;
-    localStorage.setItem(key, JSON.stringify(storedResult));
+  storedResult.submittedToServer = true;
+  saveJsonToLocalStorage(key, storedResult);
 
-    return true;
-  } catch {
-    return false;
-  }
+  return true;
 }
 
 /**
@@ -225,16 +189,13 @@ export function getAllWordHuntResults(language: Language): StoredWordHuntResult[
   const results: StoredWordHuntResult[] = [];
   const prefix = `${WORD_HUNT_STORAGE_KEY}_${language}_`;
 
+  // Note: localStorage.key() iteration is a special case not covered by storage helpers
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
     if (key && key.startsWith(prefix)) {
-      const stored = localStorage.getItem(key);
-      if (stored) {
-        try {
-          results.push(JSON.parse(stored));
-        } catch {
-          // Skip invalid entries
-        }
+      const result = getJsonFromLocalStorage<StoredWordHuntResult | null>(key, null);
+      if (result) {
+        results.push(result);
       }
     }
   }

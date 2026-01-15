@@ -643,11 +643,22 @@ function selectTrendsForChallenge(trends: TrendingTopic[]): TrendingTopic[] {
     }
   }
 
-  // Final pass: fill with any remaining if still needed (including sports)
+  // Final pass: fill with remaining trends while still respecting category limits (including sports limit)
   for (const trend of trends) {
     if (selected.length >= 5) break;
-    if (!selected.includes(trend)) {
+    if (!selected.includes(trend) && canAddTrend(trend)) {
       addTrend(trend);
+    }
+  }
+
+  // Ultra-fallback: if still not enough trends, add ANY remaining (should rarely happen)
+  // This prevents empty challenge sets when all trends are from limited categories
+  if (selected.length < 5) {
+    for (const trend of trends) {
+      if (selected.length >= 5) break;
+      if (!selected.includes(trend)) {
+        addTrend(trend);
+      }
     }
   }
 
@@ -748,13 +759,15 @@ async function buildAIPrompt(
     ? `
 ---
 
-## SUGGESTED ANSWER WORDS (extracted from trend breakdowns)
+## PRIORITY ANSWER WORDS (from trend breakdowns - USE THESE!)
 
-These words appear frequently in today's trend context. Consider using them as answer candidates when they fit naturally:
+These words are extracted from today's trending topic breakdowns. **STRONGLY PREFER** using these as answers because they create timely, relevant challenges:
 
-${extractedKeywords.map(kw => `- ${kw.toUpperCase()}`).join('\n')}
+${extractedKeywords.map(kw => `- **${kw.toUpperCase()}** (trending today)`).join('\n')}
 
-**Note**: These are SUGGESTIONS based on trend breakdown analysis. Only use them if they create good, guessable challenges with lateral thinking connections.
+**REQUIREMENT**: At least 3 of your 5 challenges MUST use a word from this list as the answer. This ensures challenges feel fresh and connected to what's happening RIGHT NOW.
+
+**Exception**: Only deviate if none of these words can create a good guessable challenge with the available prompt types.
 `
     : '';
 
@@ -1610,13 +1623,19 @@ export async function getPromptExamples(
       .limit(limit);
 
     if (error) {
+      // Silently ignore table not found errors - table may not exist if migrations haven't run
+      // In development/initial setup, this is expected
+      if (error.message?.includes('Could not find the table')) {
+        // Migration hasn't run yet, return empty examples
+        return [];
+      }
       console.warn('[BUZZ] Failed to fetch prompt examples:', error.message);
       return [];
     }
 
     return (data || []) as PromptExample[];
   } catch (err) {
-    console.error('[BUZZ] Error fetching prompt examples:', err);
+    // Silently fail - prompt examples are optional for operation
     return [];
   }
 }
@@ -1635,30 +1654,43 @@ export async function storePromptExample(
   improvedPrompt?: string,
   improvedAnswer?: string
 ): Promise<void> {
-  const { createClient } = await import('@supabase/supabase-js');
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
 
-  const { error } = await supabase.from('buzz_prompt_examples').insert({
-    language,
-    challenge_type: challengeType,
-    original_prompt: originalPrompt,
-    original_answer: originalAnswer,
-    feedback,
-    improved_prompt: improvedPrompt || null,
-    improved_answer: improvedAnswer || null,
-    trend_topic: trendTopic || null,
-    created_by: createdBy,
-  });
+    const { error } = await supabase.from('buzz_prompt_examples').insert({
+      language,
+      challenge_type: challengeType,
+      original_prompt: originalPrompt,
+      original_answer: originalAnswer,
+      feedback,
+      improved_prompt: improvedPrompt || null,
+      improved_answer: improvedAnswer || null,
+      trend_topic: trendTopic || null,
+      created_by: createdBy,
+    });
 
-  if (error) {
-    console.error('[BUZZ] Failed to store prompt example:', error);
-    throw new Error('Failed to store feedback');
+    if (error) {
+      // Silently ignore table not found errors - table may not exist if migrations haven't run
+      if (error.message?.includes('Could not find the table')) {
+        console.debug('[BUZZ] Note: buzz_prompt_examples table not available yet (migrations pending)');
+        return;
+      }
+      console.error('[BUZZ] Failed to store prompt example:', error);
+      throw new Error('Failed to store feedback');
+    }
+
+    console.log(`[BUZZ] Stored prompt example for ${language}/${challengeType}`);
+  } catch (err) {
+    // If table doesn't exist, it's okay - we're in early setup
+    if (err instanceof Error && err.message?.includes('Could not find the table')) {
+      return;
+    }
+    throw err;
   }
-
-  console.log(`[BUZZ] Stored prompt example for ${language}/${challengeType}`);
 }
 
 // ==================== Single Challenge Regeneration ====================

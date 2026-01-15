@@ -549,7 +549,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           {results.achievements && results.achievements.length > 0 && (
             <div className="flex flex-wrap gap-1 justify-center">
               {results.achievements.slice(0, 3).map((achievement, i) => (
-                <AchievementBadge key={i} achievement={achievement} index={i} />
+                <AchievementBadge key={achievement.key || `ach-${i}`} achievement={achievement} index={i} />
               ))}
             </div>
           )}

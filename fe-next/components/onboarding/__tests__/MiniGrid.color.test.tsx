@@ -13,6 +13,7 @@ jest.mock('lucide-react', () => ({
   ArrowDownRight: () => <div>ArrowDownRight</div>,
   ArrowUpLeft: () => <div>ArrowUpLeft</div>,
   ArrowUpRight: () => <div>ArrowUpRight</div>,
+  Hand: () => <div>Hand</div>,
 }));
 
 // Mock framer-motion to avoid animation issues in tests

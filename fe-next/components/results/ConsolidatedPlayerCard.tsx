@@ -444,7 +444,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                   >
                     <div className="flex flex-wrap gap-2">
                       {gameAchievements.map((ach, i) => (
-                        <AchievementBadge key={i} achievement={ach} index={i} />
+                        <AchievementBadge key={ach.key || ach.name || `ach-${i}`} achievement={ach} index={i} />
                       ))}
                     </div>
                   </motion.div>

@@ -49,7 +49,7 @@ export default function SpotOnChallenge({
         >
           <span className="text-xs font-black text-neo-cyan uppercase tracking-wider">
             <Target className="w-4 h-4 inline me-2" />
-            {t('buzz.type.spotOn') || 'SPOT ON'}
+            {t('buzz.type.spotOn')}
           </span>
         </motion.div>
 
@@ -71,7 +71,7 @@ export default function SpotOnChallenge({
           className="px-4 py-3 bg-neo-cyan/10 border-2 border-neo-cyan/30 rounded-lg"
         >
           <div className="text-xs text-neo-cyan font-bold uppercase mb-1">
-            {t('buzz.hint') || 'HINT'}
+            {t('buzz.hint')}
           </div>
           <p className="text-white text-sm">{challenge.hint}</p>
         </motion.div>

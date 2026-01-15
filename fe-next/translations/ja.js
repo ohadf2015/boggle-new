@@ -124,6 +124,7 @@ const ja = {
     "share": "共有",
     "minutes": "分",
     "advancedSettings": "その他",
+    "settings": "設定",
     "tapToDismiss": "タップで閉じる",
     "tapToClose": "タップで続行",
     "tapToContinue": "タップで次へ",
@@ -166,7 +167,7 @@ const ja = {
     "reconnecting": "戻しています...",
     "disconnected": "接続が切断されました",
     "attempt": "試行",
-    "checkConnection": "インターネット接続を確認してください",
+    "checkConnection": "オフラインみたい！",
     "retry": "再接続",
     "retryNow": "今すぐ再試行"
   },
@@ -370,8 +371,8 @@ const ja = {
   },
   "error": {
     "subscriptionFailed": "登録に失敗しました。もう一度お試しください。",
-    "generic": "問題が発生しました",
-    "notAuthenticated": "続けるにはログインしてください"
+    "generic": "うまくいかなかった！",
+    "notAuthenticated": "ログインして続けよう！"
   },
   "difficulty": {
     "easy": "簡単",
@@ -489,7 +490,7 @@ const ja = {
       "usernameHint": "2-20文字",
       "avatarLabel": "アバター",
       "avatarHint": "あなたを表すアバターを選んでください",
-      "avatarRequired": "続行するにはアバターを選択してください",
+      "avatarRequired": "アバターを選んでバトルに参加！",
       "usingProfileAvatar": "プロフィールアバター",
       "usingGameAvatar": "ゲームアバター",
       "tapToChange": "タップで変更",
@@ -609,6 +610,16 @@ const ja = {
     "presetPartyDesc": "2分パーティーモード",
     "presetChallenge": "チャレンジ",
     "presetChallengeDesc": "3分ハードモード",
+    "presetFastDetails": "サクッと遊べる！時間との勝負でスピーディーに。ウォームアップや隙間時間にぴったり。",
+    "presetPartyDetails": "定番のパーティー体験！バランスの取れたゲームプレイで、盛り上がりながらしっかり言葉を探せる。グループに最適。",
+    "presetChallengeDetails": "本気の言葉ハンター向け！大きなボードでより多くの組み合わせと激しい競争。究極のワードマスターを証明しよう！",
+    "presetDrawerTimer": "タイマー",
+    "presetDrawerBoard": "ボードサイズ",
+    "presetDrawerMinWord": "最小文字数",
+    "presetDrawerUseMode": "このモードを使う",
+    "presetDrawerBoardMedium": "7×7（ふつう）",
+    "presetDrawerBoardHard": "9×9（むずかしい）",
+    "presetDrawerLetters": "文字",
     "difficultyTooltipGrid": "グリッドサイズで難易度が変わる",
     "difficultyTooltipTimer": "長い時間＝たくさん見つかる"
   },
@@ -725,7 +736,7 @@ const ja = {
     "noPlayersYet": "まだプレイヤーがいません",
     "wordTooShort": "単語が短すぎます！（最低2文字）",
     "wordTooShortMin": "単語が短すぎます！（最低${min}文字）",
-    "errorOccurred": "エラーが発生しました",
+    "errorOccurred": "おっと！もう一回",
     "tooFast": "ゆっくり！送信が速すぎます",
     "me": "自分",
     "noWordsYet": "まだ単語が見つかりません",
@@ -792,7 +803,8 @@ const ja = {
       "demoWord": "CAT",
       "demoHint": "隣接する文字をつなげよう",
       "demoSuccess": "完璧！",
-      "demoComplete": "できた！遊び方がわかったね。"
+      "demoComplete": "できた！遊び方がわかったね。",
+      "startHere": "ここから"
     },
     "name": {
       "placeholder": "名前を入力",
@@ -807,7 +819,13 @@ const ja = {
     },
     "quickTips": {
       "title": "プロのヒント",
-      "subtitle": "残りはプレイしながら学ぼう"
+      "subtitle": "残りはプレイしながら学ぼう",
+      "tip1Title": "文字をスワイプ",
+      "tip1Text": "隣接する文字をドラッグして単語を作ろう",
+      "tip2Title": "長い＝良い",
+      "tip2Text": "長い単語は指数関数的に高得点",
+      "tip3Title": "スピードが大事",
+      "tip3Text": "素早く見つけてコンボでボーナス獲得"
     },
     "training": {
       "title": "トレーニングモード",
@@ -2103,6 +2121,12 @@ const ja = {
     "needHint": "ヒントが必要?",
     "botWords": "発見した単語",
     "beatYourRecord": "記録を更新しました！",
+    "soloVsBots": "ソロ vs ボット",
+    "soloVsBotsDesc": "様々な難易度のAI対戦相手と競争",
+    "practiceMode": "練習",
+    "practiceModeDesc": "タイマーなし - 自分のペースで学んで探索",
+    "challengeMode": "チャレンジ",
+    "challengeModeDesc": "自己ベストを更新して上達を追跡",
     "preset": {
       "customGame": "カスタムゲーム設定",
       "quick": "クイック",
@@ -2282,6 +2306,7 @@ const ja = {
     "download": "画像として保存",
     "downloadImage": "シェア画像を保存",
     "playingAs": "プレイヤー名",
+    "keepPlaying": "明日また新しいパズルに挑戦！",
     "guestPlayer": "ゲストプレイヤー",
     "enterName": "名前を入力",
     "characters": "文字",
@@ -2372,7 +2397,7 @@ const ja = {
     "title": "デイリーバズ",
     "tagline": "今日のトレンドで言葉パズル",
     "subtitle": "今日のバズは？",
-    "badge": "🔥 NEW",
+    "badge": "BETA",
     "betaPreview": "✨ BETA",
     "breaking": "速報",
     "tapToCelebrate": "タップしてお祝い",
@@ -2534,6 +2559,7 @@ const ja = {
       "avgEfficiency": "平均効率",
       "challengeTitle": "友達からの挑戦！",
       "attempts": "試行",
+      "attemptsUsed": "使用した試行回数",
       "beatTheirScore": "相手のスコアを超えられますか？",
       "tryAnotherLanguage": "他の言語で挑戦",
       "playDifferentLanguage": "今日のパズルを別の言語でプレイ",

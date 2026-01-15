@@ -574,7 +574,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       return (
         <div className="space-y-2">
           {Array.from({ length: Math.min(maxVisible, 3) }).map((_, index) => (
-            <SkeletonRow key={index} index={index} />
+            <SkeletonRow key={`skeleton-${index}`} index={index} />
           ))}
         </div>
       );

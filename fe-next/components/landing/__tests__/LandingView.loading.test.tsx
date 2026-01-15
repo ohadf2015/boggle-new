@@ -111,6 +111,10 @@ jest.mock('@/components/ui/InteractiveMascot', () => ({
   InteractiveMascotWithEntrance: () => <div data-testid="mascot">Mascot</div>,
 }));
 
+jest.mock('@/components/ui/IdleMascot', () => ({
+  IdleMascotWithEntrance: () => <div data-testid="idle-mascot">Idle Mascot</div>,
+}));
+
 jest.mock('@/components/daily/DailyChallengeBanner', () => {
   return function MockDailyChallengeBanner() {
     return <div data-testid="daily-challenge-banner">Daily Challenge</div>;

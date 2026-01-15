@@ -1028,7 +1028,7 @@ const InGameScreen = memo<InGameScreenProps>(({
         <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden max-h-full">
           {/* Stats row - Mobile: tight layout like single player; Desktop: absolute positioning */}
           {remainingTime !== null && (
-            <div ref={gameStatsRef} className="relative flex w-full items-center justify-between lg:justify-center flex-shrink-0 px-1 md:px-2 lg:px-0 gap-0 overflow-hidden" role="status" aria-label="Game status">
+            <div ref={gameStatsRef} className="relative flex w-full items-center justify-between lg:justify-center flex-shrink-0 px-1 md:px-2 lg:px-0 gap-0 overflow-visible" role="status" aria-label="Game status">
               {/* Exit + Help + Hint - hidden on mobile (shown in top bar), visible on desktop */}
               <div className="absolute left-2 rtl:left-auto rtl:right-2 md:left-4 md:rtl:right-4 top-1/2 -translate-y-1/2 hidden lg:flex items-center gap-2 z-30">
                 {onExitRoom && (
@@ -1288,9 +1288,9 @@ const InGameScreen = memo<InGameScreenProps>(({
           {children}
         </div>
 
-        {/* Right Column: Live Leaderboard (hidden in focus mode) */}
+        {/* Right Column: Live Leaderboard (hidden in focus mode, desktop only) */}
         {!gameplayFocusMode && (
-          <div className="lg:w-64 xl:w-72 2xl:w-80 flex flex-col gap-2 flex-shrink-0">
+          <div className="hidden lg:flex lg:flex-col lg:w-64 xl:w-72 2xl:w-80 gap-2 flex-shrink-0">
             <motion.div
               className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[45vh] lg:max-h-none lg:flex-grow relative"
               style={{ transform: 'rotate(-1deg)' }}

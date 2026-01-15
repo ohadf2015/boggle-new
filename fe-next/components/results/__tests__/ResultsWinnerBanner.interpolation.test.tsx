@@ -1,0 +1,135 @@
+/**
+ * ResultsWinnerBanner Interpolation Tests
+ *
+ * Tests that the yourPlace translation is called with correct parameters
+ * for 4th+ place players.
+ */
+
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+
+// Capture t() calls to verify interpolation parameters
+const tCalls: Array<{ key: string; params?: Record<string, unknown> }> = [];
+
+// Mock contexts with parameter tracking
+jest.mock('../../../contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string, params?: Record<string, unknown>) => {
+      tCalls.push({ key, params });
+      if (key === 'results.yourPlace' && params) {
+        // Simulate the real translation with interpolation
+        return `${params.place} of ${params.total}`;
+      }
+      return key;
+    },
+    language: 'en',
+    dir: 'ltr',
+  }),
+}));
+
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, className, style, onClick, ...rest }: React.PropsWithChildren<Record<string, unknown>>) => (
+      <div className={className as string} style={style as React.CSSProperties} onClick={onClick as React.MouseEventHandler} {...rest}>
+        {children}
+      </div>
+    ),
+    span: ({ children, className, ...rest }: React.PropsWithChildren<Record<string, unknown>>) => (
+      <span className={className as string} {...rest}>{children}</span>
+    ),
+  },
+  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+}));
+
+jest.mock('next/image', () => ({
+  __esModule: true,
+  default: ({ alt, ...props }: { alt: string; [key: string]: unknown }) => {
+    // eslint-disable-next-line @next/next/no-img-element
+    return <img alt={alt} {...props} />;
+  },
+}));
+
+// Mock confetti utility
+jest.mock('@/utils/confettiUtils', () => ({
+  fireRankConfetti: jest.fn(),
+}));
+
+// Mock Avatar component
+jest.mock('../../Avatar', () => ({
+  __esModule: true,
+  default: () => <div data-testid="avatar">Avatar</div>,
+}));
+
+// Mock lucide-react icons
+jest.mock('lucide-react', () => ({
+  Crown: () => <span data-testid="crown-icon">Crown</span>,
+  Trophy: () => <span data-testid="trophy-icon">Trophy</span>,
+  Medal: () => <span data-testid="medal-icon">Medal</span>,
+  Hand: () => <span data-testid="hand-icon">Hand</span>,
+}));
+
+// Mock Mascot component
+jest.mock('@/components/ui/Mascot', () => ({
+  MascotWithEntrance: () => <div data-testid="mascot">Mascot</div>,
+  MascotVariant: {},
+}));
+
+import ResultsWinnerBanner from '../ResultsWinnerBanner';
+
+const createWinner = (username: string, score: number) => ({
+  username,
+  score,
+  avatar: { emoji: '😀', color: '#FF0000' },
+});
+
+describe('ResultsWinnerBanner Interpolation', () => {
+  beforeEach(() => {
+    tCalls.length = 0;
+  });
+
+  describe('yourPlace translation for 4th+ place', () => {
+    it('should call t() with place and total parameters for 5th place', () => {
+      render(
+        <ResultsWinnerBanner
+          winner={createWinner('Fifth', 50)}
+          isCurrentUserWinner={true}
+          rank={5}
+          totalPlayers={8}
+        />
+      );
+
+      // Find the call to results.yourPlace
+      const yourPlaceCall = tCalls.find(call => call.key === 'results.yourPlace');
+      expect(yourPlaceCall).toBeDefined();
+      expect(yourPlaceCall?.params).toEqual({ place: 5, total: 8 });
+    });
+
+    it('should render the interpolated text correctly', () => {
+      render(
+        <ResultsWinnerBanner
+          winner={createWinner('Fifth', 50)}
+          isCurrentUserWinner={true}
+          rank={5}
+          totalPlayers={8}
+        />
+      );
+
+      // The announcement text should show interpolated "5 of 8"
+      expect(screen.getByText('5 of 8')).toBeInTheDocument();
+    });
+
+    it('should use fallback when totalPlayers is not provided', () => {
+      render(
+        <ResultsWinnerBanner
+          winner={createWinner('Fourth', 60)}
+          isCurrentUserWinner={true}
+          rank={4}
+          // No totalPlayers provided
+        />
+      );
+
+      // Should use the fallback which shows ordinal - look for the announcement text
+      expect(screen.getByText('You finished 4th')).toBeInTheDocument();
+    });
+  });
+});

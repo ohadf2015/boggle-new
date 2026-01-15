@@ -8,6 +8,12 @@
  * 4. Track long-term improvement across sessions
  */
 
+import {
+  getJsonFromLocalStorage,
+  saveJsonToLocalStorage,
+  removeFromLocalStorage,
+} from '@/utils/storageHelpers';
+
 const STORAGE_KEY = 'lexiclash_training_progress';
 
 /**
@@ -87,36 +93,23 @@ const DEFAULT_PROGRESS: TrainingProgress = {
  * Get training progress from localStorage
  */
 export function getTrainingProgress(): TrainingProgress {
-  if (typeof window === 'undefined') {
-    return { ...DEFAULT_PROGRESS, skills: { ...DEFAULT_SKILLS } };
-  }
-
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) {
-      return { ...DEFAULT_PROGRESS, skills: { ...DEFAULT_SKILLS } };
-    }
-    const parsed = JSON.parse(stored);
-    // Merge with defaults to handle schema evolution
-    return {
-      ...DEFAULT_PROGRESS,
-      ...parsed,
-      skills: {
-        ...DEFAULT_SKILLS,
-        ...parsed.skills,
-      },
-    };
-  } catch {
-    return { ...DEFAULT_PROGRESS, skills: { ...DEFAULT_SKILLS } };
-  }
+  const stored = getJsonFromLocalStorage<Partial<TrainingProgress>>(STORAGE_KEY, {});
+  // Merge with defaults to handle schema evolution
+  return {
+    ...DEFAULT_PROGRESS,
+    ...stored,
+    skills: {
+      ...DEFAULT_SKILLS,
+      ...(stored.skills || {}),
+    },
+  };
 }
 
 /**
  * Save training progress to localStorage
  */
 function saveTrainingProgress(progress: TrainingProgress): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+  saveJsonToLocalStorage(STORAGE_KEY, progress);
 }
 
 /**
@@ -383,8 +376,7 @@ export function getSkillSummary(): {
  * Reset training progress (for testing or "restart tutorial")
  */
 export function resetTrainingProgress(): void {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem(STORAGE_KEY);
+  removeFromLocalStorage(STORAGE_KEY);
 }
 
 /**
@@ -418,16 +410,11 @@ const DEFAULT_DAILY_PROGRESS: DailyChallengeProgress = {
  * Get the number of daily challenges the player has completed
  */
 export function getDailyChallengesCompleted(): number {
-  if (typeof window === 'undefined') return 0;
-
-  try {
-    const stored = localStorage.getItem(DAILY_CHALLENGE_STORAGE_KEY);
-    if (!stored) return 0;
-    const parsed = JSON.parse(stored) as DailyChallengeProgress;
-    return parsed.challengesCompleted || 0;
-  } catch {
-    return 0;
-  }
+  const progress = getJsonFromLocalStorage<DailyChallengeProgress>(
+    DAILY_CHALLENGE_STORAGE_KEY,
+    DEFAULT_DAILY_PROGRESS
+  );
+  return progress.challengesCompleted || 0;
 }
 
 /**
@@ -442,19 +429,17 @@ export function isNewDailyPlayer(threshold: number = 3): boolean {
  * Called after a player finishes a daily challenge (win or lose)
  */
 export function incrementDailyChallengesCompleted(): void {
-  if (typeof window === 'undefined') return;
+  const stored = getJsonFromLocalStorage<Partial<DailyChallengeProgress>>(
+    DAILY_CHALLENGE_STORAGE_KEY,
+    {}
+  );
+  const progress: DailyChallengeProgress = {
+    ...DEFAULT_DAILY_PROGRESS,
+    ...stored,
+  };
 
-  try {
-    const stored = localStorage.getItem(DAILY_CHALLENGE_STORAGE_KEY);
-    const progress: DailyChallengeProgress = stored
-      ? { ...DEFAULT_DAILY_PROGRESS, ...JSON.parse(stored) }
-      : { ...DEFAULT_DAILY_PROGRESS };
+  progress.challengesCompleted++;
+  progress.lastCompletedDate = new Date().toISOString();
 
-    progress.challengesCompleted++;
-    progress.lastCompletedDate = new Date().toISOString();
-
-    localStorage.setItem(DAILY_CHALLENGE_STORAGE_KEY, JSON.stringify(progress));
-  } catch {
-    // Silently fail if localStorage is unavailable
-  }
+  saveJsonToLocalStorage(DAILY_CHALLENGE_STORAGE_KEY, progress);
 }

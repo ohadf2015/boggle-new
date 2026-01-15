@@ -546,7 +546,7 @@ const DailyChallenge: React.FC = () => {
           const checkData = await checkResponse.json();
           if (checkData.hasPlayed) {
             // Player already played - redirect to results
-            neoErrorToast(t('daily.alreadyPlayed') || 'You have already played today!', { icon: '🔒', duration: 3000 });
+            neoErrorToast(t('daily.alreadyPlayed'), { icon: '🔒', duration: 3000 });
 
             if (checkData.result) {
               const number = getPuzzleNumber(date);
@@ -679,7 +679,7 @@ const DailyChallenge: React.FC = () => {
       const cleared = clearWordHuntResultForRetry(gameLanguage);
       if (!cleared) {
         console.error('Failed to clear Word Hunt result for retry');
-        neoErrorToast(t('daily.retryFailed') || 'Failed to reset. Please try again.', { icon: '❌', duration: 4000 });
+        neoErrorToast(t('daily.retryFailed'), { icon: '❌', duration: 4000 });
         return;
       }
 
@@ -698,10 +698,10 @@ const DailyChallenge: React.FC = () => {
       setPhase('ready');
 
       // Show success feedback
-      neoSuccessToast(t('daily.attemptReset') || 'Challenge reset! Good luck!', { icon: '🔄', duration: 3000 });
+      neoSuccessToast(t('daily.attemptReset'), { icon: '🔄', duration: 3000 });
     } catch (error) {
       console.error('Retry challenge error:', error);
-      neoErrorToast(t('daily.retryFailed') || 'Failed to reset. Please try again.', { icon: '❌', duration: 4000 });
+      neoErrorToast(t('daily.retryFailed'), { icon: '❌', duration: 4000 });
     }
   }, [gameLanguage, isAuthenticated, profile, t]);
 

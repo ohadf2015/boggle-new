@@ -125,6 +125,7 @@ const es = {
     "share": "Compartir",
     "minutes": "min",
     "advancedSettings": "Más Opciones",
+    "settings": "Configuración",
     "tapToDismiss": "Toca para cerrar",
     "tapToClose": "Toca para continuar",
     "tapToContinue": "Toca para seguir",
@@ -166,7 +167,7 @@ const es = {
     "reconnecting": "Te regresamos...",
     "disconnected": "Conexión perdida",
     "attempt": "Intento",
-    "checkConnection": "Verifica tu conexión a internet",
+    "checkConnection": "¡Parece que estás sin conexión!",
     "retry": "Reintentar",
     "retryNow": "Reintentar ahora"
   },
@@ -370,8 +371,8 @@ const es = {
   },
   "error": {
     "subscriptionFailed": "La suscripción falló. Por favor intenta de nuevo.",
-    "generic": "Algo salió mal",
-    "notAuthenticated": "Inicia sesión para continuar"
+    "generic": "¡Ups, eso no funcionó!",
+    "notAuthenticated": "¡Inicia sesión para seguir jugando!"
   },
   "difficulty": {
     "easy": "Fácil",
@@ -486,7 +487,7 @@ const es = {
       "usernameHint": "2-20 caracteres",
       "avatarLabel": "Elige avatar",
       "avatarHint": "Elige un avatar para representarte",
-      "avatarRequired": "Por favor selecciona un avatar para continuar",
+      "avatarRequired": "¡Elige un avatar para entrar a la batalla!",
       "usingProfileAvatar": "Avatar de perfil",
       "usingGameAvatar": "Avatar del juego",
       "tapToChange": "Cambiar",
@@ -606,6 +607,16 @@ const es = {
     "presetPartyDesc": "2 min modo fiesta",
     "presetChallenge": "Desafío",
     "presetChallengeDesc": "3 min modo difícil",
+    "presetFastDetails": "¡Perfecto para rondas rápidas! Compite contra el reloj en un juego veloz. Ideal para calentar o cuando tienes poco tiempo.",
+    "presetPartyDetails": "¡La experiencia clásica de fiesta! Juego equilibrado con tiempo suficiente para encontrar buenas palabras manteniendo la energía alta. Ideal para grupos.",
+    "presetChallengeDetails": "¡Para cazadores de palabras serios! Un tablero más grande significa más combinaciones y competencia más dura. ¡Demuestra que eres el maestro de las palabras!",
+    "presetDrawerTimer": "Tiempo",
+    "presetDrawerBoard": "Tamaño del tablero",
+    "presetDrawerMinWord": "Longitud mínima",
+    "presetDrawerUseMode": "Usar este modo",
+    "presetDrawerBoardMedium": "7×7 (Medio)",
+    "presetDrawerBoardHard": "9×9 (Difícil)",
+    "presetDrawerLetters": "letras",
     "difficultyTooltipGrid": "El tamaño afecta la dificultad",
     "difficultyTooltipTimer": "Más tiempo = más palabras"
   },
@@ -722,7 +733,7 @@ const es = {
     "noPlayersYet": "Aún no hay jugadores",
     "wordTooShort": "¡Palabra muy corta! (mín 2 letras)",
     "wordTooShortMin": "¡Palabra muy corta! (mín ${min} letras)",
-    "errorOccurred": "Ocurrió un error",
+    "errorOccurred": "¡Ups! Intenta de nuevo",
     "tooFast": "¡Más despacio! Enviando muy rápido",
     "me": "Yo",
     "noWordsYet": "Aún no hay palabras encontradas",
@@ -1811,7 +1822,8 @@ const es = {
       "demoWord": "SOL",
       "demoHint": "Conecta letras adyacentes",
       "demoSuccess": "¡Genial!",
-      "demoComplete": "¡Lo tienes! Ahora sabes cómo jugar."
+      "demoComplete": "¡Lo tienes! Ahora sabes cómo jugar.",
+      "startHere": "Empieza aquí"
     },
     "name": {
       "placeholder": "Ingresa tu nombre",
@@ -1826,7 +1838,13 @@ const es = {
     },
     "quickTips": {
       "title": "Tips Pro",
-      "subtitle": "El resto lo aprenderás jugando"
+      "subtitle": "El resto lo aprenderás jugando",
+      "tip1Title": "Desliza letras",
+      "tip1Text": "Arrastra sobre letras adyacentes para formar palabras",
+      "tip2Title": "Más largo = Mejor",
+      "tip2Text": "Las palabras largas dan exponencialmente más puntos",
+      "tip3Title": "La velocidad importa",
+      "tip3Text": "Hallazgos rápidos crean combos para puntos extra"
     },
     "training": {
       "title": "Modo Entrenamiento",
@@ -2100,6 +2118,12 @@ const es = {
     "needHint": "¿Necesitas una pista?",
     "botWords": "Palabras encontradas",
     "beatYourRecord": "¡Superaste tu récord!",
+    "soloVsBots": "Solo vs Bots",
+    "soloVsBotsDesc": "Compite contra oponentes IA de diferentes niveles",
+    "practiceMode": "Práctica",
+    "practiceModeDesc": "Sin temporizador - aprende y explora a tu ritmo",
+    "challengeMode": "Desafío",
+    "challengeModeDesc": "Supera tus récords personales y sigue tu progreso",
     "preset": {
       "customGame": "Configuración Personalizada",
       "quick": "Rápido",
@@ -2265,6 +2289,7 @@ const es = {
       "socialProof": "Únete a miles creando desafíos"
     },
     "playingAs": "Jugando como",
+    "keepPlaying": "¡Vuelve mañana para un nuevo rompecabezas!",
     "guestPlayer": "Jugador invitado",
     "enterName": "Ingresa tu nombre",
     "characters": "caracteres",
@@ -2418,7 +2443,7 @@ const es = {
       "noInternet": "Sin conexión. Revisa tu internet."
     },
     "alreadyPlayed": "¡Ya jugaste hoy! Vuelve mañana.",
-    "badge": "🔥 NUEVO",
+    "badge": "BETA",
     "betaPreview": "✨ BETA",
     "breaking": "ÚLTIMA HORA",
     "tapToCelebrate": "Toca para celebrar",
@@ -2531,6 +2556,7 @@ const es = {
       "avgEfficiency": "Eficiencia Prom.",
       "challengeTitle": "¡Desafío de un amigo!",
       "attempts": "intentos",
+      "attemptsUsed": "intentos usados",
       "beatTheirScore": "¿Puedes superar su puntuación?",
       "tryAnotherLanguage": "Prueba otro idioma",
       "playDifferentLanguage": "Juega el rompecabezas de hoy en otro idioma",

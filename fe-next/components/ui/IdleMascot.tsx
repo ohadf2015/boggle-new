@@ -1,6 +1,7 @@
 'use client';
 
 import { memo } from 'react';
+import { motion } from 'framer-motion';
 import InteractiveMascot, {
   type ExtendedMascotVariant,
   type ActivityVariant,
@@ -8,6 +9,7 @@ import InteractiveMascot, {
 } from './InteractiveMascot';
 import type { MascotVariant } from './Mascot';
 import { useRandomMascotActivity, DEFAULT_IDLE_ACTIVITIES, DEFAULT_BASE_VARIANTS } from '@/hooks/useRandomMascotActivity';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 interface IdleMascotProps extends Omit<InteractiveMascotProps, 'variant'> {
   /** Base variant when not doing activities */
@@ -102,6 +104,35 @@ export const IdleMascot = memo(function IdleMascot({
       onClick={handleClick}
       {...interactiveMascotProps}
     />
+  );
+});
+
+/**
+ * IdleMascotWithEntrance - IdleMascot with spring entrance animation
+ *
+ * Same as IdleMascot but with a nice pop-in effect on mount.
+ * Perfect for landing pages and sections where the mascot should appear with flair.
+ */
+export const IdleMascotWithEntrance = memo(function IdleMascotWithEntrance({
+  delay = 0,
+  ...props
+}: IdleMascotProps & { delay?: number }) {
+  const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
+  const shouldAnimate = !prefersReducedMotion && enableComplexAnimations;
+
+  return (
+    <motion.div
+      initial={shouldAnimate ? { scale: 0, opacity: 0, y: 20 } : undefined}
+      animate={{ scale: 1, opacity: 1, y: 0 }}
+      transition={{
+        type: 'spring',
+        stiffness: 260,
+        damping: 20,
+        delay,
+      }}
+    >
+      <IdleMascot {...props} />
+    </motion.div>
   );
 });
 

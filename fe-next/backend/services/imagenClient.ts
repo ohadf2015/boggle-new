@@ -118,9 +118,9 @@ async function getSupabaseClient() {
 }
 
 /**
- * Build cute animated style image prompt that shows trending topics
- * Shows recognizable, adorable characters/scenes that hint at the news
- * Uses a kawaii-inspired, friendly cartoon aesthetic with LexiClash colors
+ * Build editorial-style image prompt that shows trending topics
+ * Uses Google Trends visual language with modern illustration style
+ * Combines trending indicators with topic-relevant imagery
  */
 function buildImagePrompt(
   topic: string,
@@ -132,197 +132,200 @@ function buildImagePrompt(
   // Build a concrete visual scene from the trend
   const visualScene = buildVisualScene(topic, category);
 
-  return `Create a CUTE, CHARMING animated illustration for LexiClash word game.
+  return `Create a MODERN, EDITORIAL illustration for a Google Trends-powered word game.
 
 SUBJECT: ${visualScene}
 
-=== CRITICAL: ADORABLE CARTOON STYLE ===
+=== CRITICAL: GOOGLE TRENDS EDITORIAL STYLE ===
 
-ART STYLE - "PIXAR MEETS KAWAII":
-- Cute, rounded cartoon characters with BIG expressive eyes
-- Chibi-style proportions: oversized heads, small bodies, tiny hands
-- Soft, friendly expressions - always cheerful and inviting
-- Smooth, clean vector-style rendering
-- Gentle shading with soft highlights (NOT harsh shadows)
-- Rounded corners on EVERYTHING - nothing sharp or angular
-- Characters should look huggable and approachable
-- Think: Pixar short films, Animal Crossing, Pusheen, LINE Friends
+ART STYLE - "TRENDING NEWS INFOGRAPHIC":
+- Bold, modern vector illustration style
+- Clean geometric shapes with confident lines
+- Stylized but recognizable subjects (NOT realistic, NOT chibi/kawaii)
+- Dynamic composition suggesting movement and momentum
+- Think: The Economist illustrations, Bloomberg graphics, Kurzgesagt, editorial infographics
+- Professional yet playful - sophisticated but accessible
 
-COLOR PALETTE (Bright & Friendly):
-- PRIMARY: Sunny Yellow (#FFE135) - warm and cheerful
-- SECONDARY: Coral Orange (#FF7F50) - friendly warmth
-- ACCENT 1: Bubblegum Pink (#FF69B4) - sweet and playful
-- ACCENT 2: Sky Cyan (#87CEEB) - fresh and light
-- ACCENT 3: Mint Green (#98FB98) - soft and calming
-- BACKGROUND: Soft gradient from light lavender to soft blue
-- Subtle pastel tones to complement main colors
+GOOGLE TRENDS VISUAL ELEMENTS (MUST INCLUDE):
+- Prominent UPWARD TRENDING ARROW somewhere in composition (the iconic Google Trends rising line)
+- Google Trends gradient: Blue (#4285F4) transitioning to Green (#34A853)
+- Search-inspired elements: magnifying glass motif, data visualization hints
+- Sense of "what's hot right now" - dynamic, current, buzzing energy
+
+COLOR PALETTE (Google Trends + Neo-Brutalist):
+- PRIMARY: Google Blue (#4285F4) - trust and data
+- SECONDARY: Google Green (#34A853) - growth and trending up
+- ACCENT 1: Neo Yellow (#FFE135) - energy and attention
+- ACCENT 2: Coral (#FF6B35) - warmth and excitement
+- BACKGROUND: Dark navy (#1a1a2e) or deep purple gradient
+- Bold color blocking with high contrast
 
 VISUAL REQUIREMENTS:
-- Central cute character or mascot representing the trend (60-70% of frame)
-- Character should have a clear emotion (happy, excited, curious)
-- Soft, dreamy background with subtle sparkles or bubbles
-- At least one adorable mascot-style element (animal, object with face, etc.)
-- Clean composition with clear focal point
+- Central subject representing the trending topic (50-60% of frame)
+- MANDATORY: Rising trend line or arrow integrated into design
+- Clean, bold silhouettes - easily readable at small sizes
+- Subtle data/graph elements in background (dots, grid lines, chart hints)
+- Dynamic angles suggesting upward momentum
 
-CHARACTER GUIDELINES:
-- If showing people: chibi-style with round faces, dot eyes, small mouths
-- If showing animals: ultra-cute, plump, with expressive features
-- If showing objects: give them cute faces and personality
-- All characters should look friendly and non-threatening
+ILLUSTRATION GUIDELINES:
+- If showing people: stylized editorial figures (NOT cute/chibi)
+- If showing objects: bold iconic representations
+- If showing concepts: clever visual metaphors
+- Strong focal point with supporting trending elements
 
-MOOD: ${mood}, ADORABLE, FRIENDLY, WHOLESOME
+MOOD: ${mood}, DYNAMIC, CURRENT, NEWSWORTHY
 
 ABSOLUTE CONSTRAINTS:
 - NO text, NO words, NO letters, NO numbers anywhere
-- NO scary, dark, or intimidating elements
-- NO realistic human faces
-- NO sharp edges or aggressive styling
+- NO kawaii/chibi style - this is editorial, not cute
+- NO realistic photography style
 - Keep it family-friendly and universally appealing
+- Must feel like "trending news" not "children's sticker"
 
 OUTPUT: Square 1024×1024px illustration
-The final image should make people smile and feel happy - like a sticker you'd want to collect.`;
+The final image should feel like a premium news app thumbnail - immediately communicating "this is trending right now".`;
 }
 
 /**
- * Build a cute, animated visual scene description from the trending topic
- * Creates adorable mascot-style imagery that hints at the topic
+ * Build an editorial visual scene description from the trending topic
+ * Creates bold, modern imagery with Google Trends visual language
  */
 function buildVisualScene(topic: string, category: string): string {
   const lowercaseTopic = topic.toLowerCase();
 
-  // Sports - show cute sports mascots
+  // Sports - dynamic athletic imagery with trending elements
   if (category === 'sports') {
     if (lowercaseTopic.includes('super bowl') || lowercaseTopic.includes('nfl') || lowercaseTopic.includes('football')) {
-      return 'An adorable chibi football player mascot with oversized helmet, hugging a cute smiling football, surrounded by confetti and tiny cheerleader animals';
+      return 'Bold silhouette of football helmet and ball with dramatic upward trending arrow, stadium lights as data points in background, Google blue-green gradient sweep';
     }
     if (lowercaseTopic.includes('basketball') || lowercaseTopic.includes('nba')) {
-      return 'A cute round basketball character with happy face bouncing joyfully, with tiny chibi players cheering around it and sparkles';
+      return 'Dynamic basketball in motion with trailing trend line arc, hoop as circular graph element, bold geometric court lines, rising arrow trajectory';
     }
     if (lowercaseTopic.includes('soccer') || lowercaseTopic.includes('world cup') || lowercaseTopic.includes('fifa')) {
-      return 'An adorable soccer ball mascot with big sparkly eyes and tiny legs, celebrating with cute animal fans waving flags';
+      return 'Stylized soccer ball with hexagon pattern forming data visualization, goal net as grid graph, upward trending arrow integrated into kick motion';
     }
     if (lowercaseTopic.includes('tennis') || lowercaseTopic.includes('wimbledon')) {
-      return 'A cute fluffy tennis ball character with blushing cheeks and a tiny racket, surrounded by strawberries and cream';
+      return 'Tennis racket and ball creating upward arc trajectory like a trending graph, court lines as data grid, bold geometric composition';
     }
     if (lowercaseTopic.includes('olympics')) {
-      return 'Adorable chibi athletes as cute animals (bunny, bear, cat) holding hands around Olympic rings, with sparkles and medals';
+      return 'Olympic rings reimagined with Google Trends colors (blue to green gradient), medal podium as rising bar chart, torch flame as trending arrow';
     }
     if (lowercaseTopic.includes('golf')) {
-      return 'A tiny cute golf ball character with a happy face rolling toward a flag, with fluffy clouds and a rainbow';
+      return 'Golf ball trajectory forming rising trend line toward flag, course contours as topographic data visualization, clean geometric style';
     }
     if (lowercaseTopic.includes('boxing') || lowercaseTopic.includes('ufc') || lowercaseTopic.includes('fight')) {
-      return 'Two adorable plush toy-style boxers (like teddy bears) playfully sparring with oversized gloves, hearts floating around';
+      return 'Bold boxing gloves silhouette with impact burst forming trend spike, ring ropes as graph lines, dynamic upward momentum';
     }
-    return 'Cute chibi athletes as adorable animals playing sports together, with confetti, stars, and happy expressions';
+    return 'Dynamic athletic figure silhouette with motion lines forming upward trend graph, sports equipment as bold icons, Google blue-green accent colors';
   }
 
-  // Finance - show cute money mascots
+  // Finance - data-driven financial imagery
   if (category === 'finance') {
     if (lowercaseTopic.includes('bitcoin') || lowercaseTopic.includes('crypto') || lowercaseTopic.includes('ethereum')) {
-      return 'An adorable golden coin character with sparkly eyes riding a cute rocket ship through stars and rainbow trails';
+      return 'Stylized crypto coin with blockchain pattern, dramatic rising candlestick chart integrated into design, Google blue-green gradient on trend line';
     }
     if (lowercaseTopic.includes('stock') || lowercaseTopic.includes('market') || lowercaseTopic.includes('dow') || lowercaseTopic.includes('nasdaq')) {
-      return 'Cute piggy bank mascot with a happy face next to a smiling chart arrow going up, surrounded by floating coins with faces';
+      return 'Bold upward trending line chart as hero element, building silhouettes forming bar graph, bull market arrow in Google Trends colors';
     }
     if (lowercaseTopic.includes('fed') || lowercaseTopic.includes('rate') || lowercaseTopic.includes('inflation')) {
-      return 'An adorable owl wearing tiny glasses looking at cute smiling dollar bills, with a cozy library background';
+      return 'Stylized percentage symbol with data flow lines, economic indicators as geometric shapes, prominent trend direction arrow';
     }
-    return 'Happy coin characters with cute faces stacking together, surrounded by sparkles and a cheerful piggy bank';
+    return 'Bold currency symbols with integrated trend line showing upward momentum, data grid background, modern financial infographic style';
   }
 
-  // Entertainment - show cute entertainment mascots
+  // Entertainment - bold showbiz imagery
   if (category === 'entertainment') {
     if (lowercaseTopic.includes('oscar') || lowercaseTopic.includes('academy award')) {
-      return 'An adorable golden Oscar statuette character with big eyes and a shy smile, surrounded by cute star plushies and film reels';
+      return 'Geometric Oscar statuette silhouette with spotlight beams forming rising trend lines, film strip as data timeline, red carpet as color accent';
     }
     if (lowercaseTopic.includes('grammy') || lowercaseTopic.includes('music award')) {
-      return 'A cute gramophone mascot with musical notes as tiny floating friends, surrounded by chibi musicians and sparkles';
+      return 'Stylized gramophone with sound waves forming trending graph, musical notes as data points rising upward, bold geometric composition';
     }
     if (lowercaseTopic.includes('movie') || lowercaseTopic.includes('film') || lowercaseTopic.includes('box office')) {
-      return 'Adorable popcorn bucket mascot with happy face watching a cute film reel character, with tiny 3D glasses and stars';
+      return 'Film reel and clapperboard as bold icons, box office numbers visualized as rising bar chart, spotlight creating upward beam';
     }
     if (lowercaseTopic.includes('concert') || lowercaseTopic.includes('tour') || lowercaseTopic.includes('album')) {
-      return 'A cute microphone character with sparkly eyes singing, surrounded by dancing musical notes and hearts';
+      return 'Microphone silhouette with sound waves forming upward trend, crowd as data visualization dots, stage lights as accent colors';
     }
     if (lowercaseTopic.includes('streaming') || lowercaseTopic.includes('netflix') || lowercaseTopic.includes('show')) {
-      return 'Adorable TV character with a cozy blanket, surrounded by cute snack mascots (popcorn, chips) with happy faces';
+      return 'Play button icon with viewer count rising as trend graph, streaming waves as data flow, bold geometric screen shapes';
     }
     if (lowercaseTopic.includes('game') || lowercaseTopic.includes('video game') || lowercaseTopic.includes('gaming')) {
-      return 'A cute game controller character with big eyes, surrounded by pixel heart friends and tiny chibi gamers';
+      return 'Game controller with player stats rising as trend line, pixel-inspired data visualization, achievement unlock as upward arrow';
     }
-    return 'Adorable stage with cute star mascots performing, surrounded by hearts, musical notes, and sparkles';
+    return 'Spotlight and stage silhouette with audience engagement shown as rising trend graph, entertainment icons in bold geometric style';
   }
 
-  // Technology - show cute tech mascots
+  // Technology - modern tech infographic style
   if (category === 'technology') {
     if (lowercaseTopic.includes('ai') || lowercaseTopic.includes('chatgpt') || lowercaseTopic.includes('artificial intelligence')) {
-      return 'An adorable friendly robot mascot with big round eyes and blushing cheeks, surrounded by floating cute emoji helpers';
+      return 'Neural network nodes forming upward trend pattern, stylized robot/AI brain icon, data flow lines in Google blue-green gradient';
     }
     if (lowercaseTopic.includes('apple') || lowercaseTopic.includes('iphone') || lowercaseTopic.includes('ios')) {
-      return 'A cute smartphone character with a happy face, surrounded by tiny app icon friends with cute expressions';
+      return 'Sleek device silhouette with app grid forming data visualization, usage trend line rising from screen, bold minimalist tech aesthetic';
     }
     if (lowercaseTopic.includes('space') || lowercaseTopic.includes('spacex') || lowercaseTopic.includes('nasa') || lowercaseTopic.includes('rocket')) {
-      return 'An adorable chibi rocket with a smiling face blasting off, surrounded by cute planet characters and twinkly stars';
+      return 'Rocket trajectory forming dramatic upward trend line, orbit paths as data circles, stars as data points, bold space infographic';
     }
     if (lowercaseTopic.includes('tesla') || lowercaseTopic.includes('ev') || lowercaseTopic.includes('electric car')) {
-      return 'A cute electric car mascot with happy headlight eyes, charging from an adorable lightning bolt character';
+      return 'Sleek EV silhouette with charging bolt forming trend arrow, battery level as rising bar chart, clean automotive data viz';
     }
     if (lowercaseTopic.includes('social media') || lowercaseTopic.includes('twitter') || lowercaseTopic.includes('meta') || lowercaseTopic.includes('instagram')) {
-      return 'Adorable notification bubble characters with cute faces, surrounded by heart and like button friends';
+      return 'Social icons with engagement metrics visualized as rising trend, notification bubbles as data points, viral spread pattern';
     }
-    return 'Cute robot mascot with big sparkly eyes surrounded by floating gadget friends, all with happy expressions';
+    return 'Circuit board pattern with data flow forming upward trend, tech device silhouettes as bold icons, Google Trends color gradient';
   }
 
-  // Weather - show cute weather mascots
+  // Weather - dramatic atmospheric visualization
   if (category === 'weather') {
     if (lowercaseTopic.includes('hurricane') || lowercaseTopic.includes('tropical storm')) {
-      return 'A cute swirly cloud character with determined expression, surrounded by tiny raindrop friends with umbrellas';
+      return 'Stylized hurricane spiral as data visualization, storm tracking path as trend line, weather radar aesthetic with bold colors';
     }
     if (lowercaseTopic.includes('tornado') || lowercaseTopic.includes('severe storm')) {
-      return 'An adorable spinning wind mascot with a playful expression, with cute leaf and cloud friends swirling around';
+      return 'Dramatic tornado funnel with wind speed data visualization, storm intensity shown as rising trend, bold weather warning colors';
     }
     if (lowercaseTopic.includes('flood') || lowercaseTopic.includes('rain')) {
-      return 'Cute raindrop characters with happy faces falling from a fluffy cloud mascot, with tiny umbrella friends below';
+      return 'Rain drops forming data points in rising pattern, water level as bar chart rising, cloud and precipitation infographic style';
     }
     if (lowercaseTopic.includes('heat') || lowercaseTopic.includes('hot') || lowercaseTopic.includes('temperature')) {
-      return 'An adorable sun mascot wearing tiny sunglasses, with cute ice cream and popsicle friends enjoying summer';
+      return 'Thermometer as vertical trend graph reaching upward, heat waves as data visualization lines, sun icon with temperature spike';
     }
     if (lowercaseTopic.includes('snow') || lowercaseTopic.includes('blizzard') || lowercaseTopic.includes('winter')) {
-      return 'Cute snowflake characters with happy faces falling around an adorable snowman mascot with a cozy scarf';
+      return 'Snowflake patterns as data points, accumulation shown as rising bar chart, cold temperature trend visualization';
     }
-    return 'Adorable weather mascots (sun, cloud, raindrop) as friends hanging out together with happy expressions';
+    return 'Weather icons (sun, cloud, rain) as bold geometric shapes, atmospheric data as trend lines, meteorological infographic style';
   }
 
-  // Politics - show cute civic mascots
+  // Politics - civic infographic style
   if (category === 'politics') {
     if (lowercaseTopic.includes('election') || lowercaseTopic.includes('vote') || lowercaseTopic.includes('ballot')) {
-      return 'An adorable ballot box mascot with a friendly smile, surrounded by cute checkmark characters and tiny patriotic stars';
+      return 'Ballot box with votes rising as trend graph, checkmark as upward arrow, poll numbers visualization, civic engagement rising';
     }
     if (lowercaseTopic.includes('white house') || lowercaseTopic.includes('president')) {
-      return 'A cute miniature White House as a cozy dollhouse, with adorable eagle mascot and tiny flag friends';
+      return 'White House silhouette with approval/interest trend line, flag as accent element, bold governmental iconography';
     }
     if (lowercaseTopic.includes('congress') || lowercaseTopic.includes('senate') || lowercaseTopic.includes('house')) {
-      return 'Adorable Capitol building as a cute castle, with chibi owl characters representing wisdom and books';
+      return 'Capitol dome silhouette with legislative activity as rising trend, columns forming bar chart, civic institution infographic';
     }
     if (lowercaseTopic.includes('supreme court') || lowercaseTopic.includes('ruling')) {
-      return 'A cute scales of justice mascot with balanced happy faces, surrounded by tiny book and gavel friends';
+      return 'Scales of justice with public interest rising on one side, gavel creating impact spike on trend line, legal iconography';
     }
-    return 'Adorable civic mascots (flag, liberty bell, eagle) as cute friends with happy expressions';
+    return 'Civic symbols (flag, capitol, eagle) as bold geometric icons, public interest shown as rising trend graph';
   }
 
-  // General/News - show cute news mascots
+  // General/News - editorial news style
   if (lowercaseTopic.includes('breaking') || lowercaseTopic.includes('news')) {
-    return 'An adorable newspaper mascot with big sparkly eyes, surrounded by cute microphone and camera friends';
+    return 'Breaking news burst with interest spike visualization, media icons as bold silhouettes, attention trend rising dramatically';
   }
   if (lowercaseTopic.includes('celebrity') || lowercaseTopic.includes('star')) {
-    return 'Cute star mascots with happy faces on a tiny red carpet, with adorable camera flashes as sparkle friends';
+    return 'Star silhouette with fame/interest trend rising, spotlight beams as data rays, red carpet leading upward';
   }
   if (lowercaseTopic.includes('viral') || lowercaseTopic.includes('trending')) {
-    return 'An adorable smartphone character showing hearts and likes with happy faces, surrounded by sparkles and confetti';
+    return 'Share/repost pattern forming exponential trend curve, viral spread visualization, Google Trends upward arrow prominent';
   }
 
-  // Default: Create cute mascot based on the topic
-  return `An adorable, cute mascot character representing "${topic}" with big sparkly eyes, happy expression, surrounded by tiny friendly companions and sparkles`;
+  // Default: Topic-specific with trending elements
+  return `Bold stylized representation of "${topic}" with prominent upward trending arrow, Google Trends blue-to-green gradient, data visualization elements in background, modern editorial infographic style`;
 }
 
 /**

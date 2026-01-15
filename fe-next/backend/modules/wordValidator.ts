@@ -4,72 +4,36 @@
  */
 
 import type { Language, LetterGrid, GridPosition } from '@/shared/types/game';
+import {
+  normalizeHebrewLetter as _normalizeHebrewLetter,
+  normalizeHebrewWord as _normalizeHebrewWord,
+  normalizeSpanishLetter as _normalizeSpanishLetter,
+  normalizeSpanishWord as _normalizeSpanishWord,
+  normalizeLetter,
+  normalizeWord,
+} from '@/shared/utils/wordNormalization';
 
 // Type for position map
 type PositionsMap = Map<string, [number, number][]>;
 
-/**
- * Normalize Hebrew letters - convert final forms to regular forms
- */
-export function normalizeHebrewLetter(letter: string): string {
-  const finalToRegular: Record<string, string> = {
-    'ץ': 'צ',
-    'ך': 'כ',
-    'ם': 'מ',
-    'ן': 'נ',
-    'ף': 'פ'
-  };
-  return finalToRegular[letter] || letter;
-}
+// Re-export shared normalization functions for backwards compatibility
+export const normalizeHebrewLetter = _normalizeHebrewLetter;
+export const normalizeHebrewWord = _normalizeHebrewWord;
+export const normalizeSpanishLetter = _normalizeSpanishLetter;
+export const normalizeSpanishWord = _normalizeSpanishWord;
 
 /**
- * Normalize an entire Hebrew word
- */
-export function normalizeHebrewWord(word: string): string {
-  return word.split('').map(normalizeHebrewLetter).join('');
-}
-
-// Spanish accent normalization - accented vowels to base vowels
-// Note: Ñ is kept as-is since it exists in the dictionary as a distinct letter
-const spanishAccentMap: Record<string, string> = {
-  'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ü': 'u'
-};
-
-/**
- * Normalize Spanish letter - remove accents from vowels
- */
-export function normalizeSpanishLetter(letter: string): string {
-  const lower = letter.toLowerCase();
-  return spanishAccentMap[lower] || lower;
-}
-
-/**
- * Normalize an entire Spanish word
- */
-export function normalizeSpanishWord(word: string): string {
-  return word.split('').map(c => {
-    const lower = c.toLowerCase();
-    return spanishAccentMap[lower] || lower;
-  }).join('');
-}
-
-/**
- * Language-aware letter normalization
+ * Language-aware letter normalization (wrapper for backwards compatibility)
  */
 export function normalizeLetterForLanguage(letter: string, language: Language | string): string {
-  const lower = letter.toLowerCase();
-  if (language === 'he') return normalizeHebrewLetter(lower);
-  if (language === 'es') return normalizeSpanishLetter(lower);
-  return lower;
+  return normalizeLetter(letter, language as Language);
 }
 
 /**
- * Language-aware word normalization
+ * Language-aware word normalization (wrapper for backwards compatibility)
  */
 export function normalizeWordForLanguage(word: string, language: Language | string): string {
-  if (language === 'he') return normalizeHebrewWord(word.toLowerCase());
-  if (language === 'es') return normalizeSpanishWord(word);
-  return word.toLowerCase();
+  return normalizeWord(word, language as Language);
 }
 
 /**

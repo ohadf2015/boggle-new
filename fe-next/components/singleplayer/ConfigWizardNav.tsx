@@ -6,7 +6,7 @@ import { ArrowLeft, ArrowRight, Play, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-export type WizardStep = 1 | 2 | 3;
+export type WizardStep = 1 | 2;
 
 interface StepInfo {
   number: WizardStep;
@@ -14,11 +14,10 @@ interface StepInfo {
   icon?: React.ReactNode;
 }
 
-// Simplified to 3 steps: Mode → Settings → Start
+// Simplified to 2 steps: Mode → Settings & Start
 const STEPS: StepInfo[] = [
   { number: 1, labelKey: 'wizard.stepMode' },
   { number: 2, labelKey: 'wizard.stepSettings' },
-  { number: 3, labelKey: 'wizard.stepStart' },
 ];
 
 interface ConfigWizardNavProps {
@@ -45,9 +44,9 @@ export const ConfigWizardNav: React.FC<ConfigWizardNavProps> = ({
   };
 
   const handleNext = () => {
-    if (currentStep < 3 && canAdvance) {
+    if (currentStep < 2 && canAdvance) {
       onStepChange((currentStep + 1) as WizardStep);
-    } else if (currentStep === 3 && onStart) {
+    } else if (currentStep === 2 && onStart) {
       onStart();
     }
   };
@@ -120,7 +119,7 @@ export const ConfigWizardNav: React.FC<ConfigWizardNavProps> = ({
       {/* Current Step Label (mobile) */}
       <div className="sm:hidden text-center">
         <span className="text-xs font-bold uppercase text-neo-black/70 dark:text-neo-white/70">
-          {t('wizard.stepOf')?.replace('{current}', String(currentStep)).replace('{total}', '3') || `Step ${currentStep} of 3`}
+          {t('wizard.stepOf')?.replace('{current}', String(currentStep)).replace('{total}', '2') || `Step ${currentStep} of 2`}
         </span>
       </div>
     </div>
@@ -166,7 +165,7 @@ export const WizardNavigationButtons: React.FC<WizardNavigationButtonsProps> = (
       </div>
 
       {/* Next/Start Button */}
-      {currentStep < 3 ? (
+      {currentStep < 2 ? (
         <Button
           type="button"
           variant="default"
@@ -186,7 +185,11 @@ export const WizardNavigationButtons: React.FC<WizardNavigationButtonsProps> = (
           type="button"
           variant="success"
           onClick={onStart}
-          className="flex-1 min-h-[56px] gap-2 font-black text-lg shadow-hard hover:shadow-hard-lg"
+          disabled={!canAdvance}
+          className={cn(
+            "flex-1 min-h-[56px] gap-2 font-black text-lg shadow-hard hover:shadow-hard-lg",
+            !canAdvance && "opacity-50 cursor-not-allowed"
+          )}
         >
           <Play />
           <span>{t('singlePlayer.startGame') || 'Start Game'}</span>

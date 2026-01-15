@@ -27,6 +27,15 @@ function getGameSessionLogger() {
   return _logGameSession;
 }
 
+// Lazy import for lifetime achievement checking
+let _checkLifetimeAchievements: ((userStats: any, existingAchievements?: string[]) => { key: string; icon: string }[]) | null = null;
+function getLifetimeAchievementChecker() {
+  if (!_checkLifetimeAchievements) {
+    _checkLifetimeAchievements = require('./achievementManager').checkLifetimeAchievements;
+  }
+  return _checkLifetimeAchievements;
+}
+
 // Lazy import for Redis cache invalidation
 let _invalidateLeaderboardCaches: (() => Promise<void>) | null = null;
 function getLeaderboardCacheInvalidator() {
@@ -216,20 +225,28 @@ export async function recordGameResult(result: GameResultInput): Promise<{ data:
   }
 }
 
+export interface UpdatedUserStats {
+  gamesPlayed: number;
+  gamesWon: number;
+  totalWordsFound: number;
+  totalScore: number;
+  uniqueDaysPlayed: number;
+}
+
 /**
  * Update player profile stats after a game
  */
 export async function updatePlayerStats(
   playerId: string,
   gameStats: GameStats
-): Promise<{ data: unknown; error: { message: string } | null; xpInfo?: XpInfo }> {
+): Promise<{ data: unknown; error: { message: string } | null; xpInfo?: XpInfo; updatedStats?: UpdatedUserStats }> {
   const client = getSupabase();
   if (!client) return { data: null, error: { message: 'Supabase not configured' } };
 
   // First, get current profile (only fields needed for stats update)
   let { data: profile, error: fetchError } = await client
     .from('profiles')
-    .select('id, username, avatar_emoji, avatar_color, total_games, total_score, total_words, casual_games, ranked_games, ranked_wins, casual_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_time_played, total_xp, current_level, player_title, last_game_at, achievement_counts')
+    .select('id, username, avatar_emoji, avatar_color, total_games, total_score, total_words, casual_games, ranked_games, ranked_wins, casual_wins, ranked_mmr, peak_mmr, longest_word, longest_word_length, total_time_played, total_xp, current_level, player_title, last_game_at, achievement_counts, unique_days_played')
     .eq('id', playerId)
     .single();
 
@@ -344,6 +361,18 @@ export async function updatePlayerStats(
     }
   }
 
+  // Track unique days played (for DEDICATION and LOYAL_PLAYER achievements)
+  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  const lastGameDate = profile.last_game_at
+    ? new Date(profile.last_game_at).toISOString().split('T')[0]
+    : null;
+
+  if (lastGameDate !== today) {
+    // It's a new day - increment unique days counter
+    updates.unique_days_played = (profile.unique_days_played || 0) + 1;
+    logger.debug('SUPABASE', `Player ${playerId} played on a new day: ${today} (total: ${updates.unique_days_played})`);
+  }
+
   // Update longest word if this game had a longer one
   if (gameStats.longestWord) {
     const currentLongest = profile.longest_word_length || 0;
@@ -405,6 +434,16 @@ export async function updatePlayerStats(
     }
 
     // Return XP info along with data for socket emission
+    // Also include updated stats for lifetime achievement checking
+    const updatedStats = {
+      gamesPlayed: updates.total_games as number,
+      gamesWon: ((updates.ranked_wins as number | undefined) || (profile.ranked_wins || 0)) +
+                ((updates.casual_wins as number | undefined) || (profile.casual_wins || 0)),
+      totalWordsFound: updates.total_words as number,
+      totalScore: updates.total_score as number,
+      uniqueDaysPlayed: (updates.unique_days_played as number | undefined) || (profile.unique_days_played || 0),
+    };
+
     return {
       data,
       error,
@@ -417,7 +456,8 @@ export async function updatePlayerStats(
         leveledUp: levelUpInfo.leveledUp,
         levelsGained: levelUpInfo.levelsGained,
         newTitles: levelUpInfo.newTitles,
-      }
+      },
+      updatedStats: updatedStats
     };
   } catch (err: unknown) {
     const errorMessage = err instanceof Error ? err.message : 'Unexpected error during profile update';
@@ -594,9 +634,20 @@ export async function updateGuestStats(tokenHash: string, gameStats: GameStats):
   return { data, error };
 }
 
+export interface LifetimeAchievement {
+  key: string;
+  icon: string;
+}
+
+export interface PlayerResultOutput {
+  username: string;
+  xpResult: XpResultWithSocket | null;
+  lifetimeAchievements: LifetimeAchievement[];
+}
+
 /**
  * Process a single player's game results
- * Returns XP info for authenticated users
+ * Returns XP info and lifetime achievements for authenticated users
  */
 async function processPlayerResult(
   playerScore: PlayerScore,
@@ -604,7 +655,7 @@ async function processPlayerResult(
   gameInfo: GameInfo,
   authInfo: UserAuthInfo,
   totalPlayers: number
-): Promise<{ username: string; xpResult: XpResultWithSocket | null }> {
+): Promise<PlayerResultOutput> {
   const gameStats: GameStats = {
     score: playerScore.score,
     wordCount: playerScore.wordCount || 0,
@@ -617,6 +668,7 @@ async function processPlayerResult(
   };
 
   let xpResult: XpResultWithSocket | null = null;
+  let lifetimeAchievements: LifetimeAchievement[] = [];
 
   try {
     if (authInfo.authUserId) {
@@ -649,6 +701,23 @@ async function processPlayerResult(
           socketId: authInfo.socketId,
         };
         logger.debug('XP', `${playerScore.username} earned ${statsRes.xpInfo.xpEarned} XP`);
+      }
+
+      // Check for lifetime achievements based on updated stats
+      if (statsRes.updatedStats) {
+        const checkLifetimeAchievements = getLifetimeAchievementChecker();
+        if (checkLifetimeAchievements) {
+          // Get existing achievement keys from the game achievements (these are per-game)
+          // For lifetime achievements, we need to check against what the user already has
+          // Note: This uses the current game's achievements as "existing" which means
+          // lifetime achievements will be awarded if thresholds are met
+          const existingAchievements = playerScore.achievements || [];
+          const newLifetimeAchievements = checkLifetimeAchievements(statsRes.updatedStats, existingAchievements);
+          if (newLifetimeAchievements.length > 0) {
+            lifetimeAchievements = newLifetimeAchievements;
+            logger.info('ACHIEVEMENT', `${playerScore.username} earned lifetime achievements: ${newLifetimeAchievements.map(a => a.key).join(', ')}`);
+          }
+        }
       }
 
       // Phase 2: Update leaderboard and ranked progress in parallel
@@ -706,7 +775,12 @@ async function processPlayerResult(
     logger.error('SUPABASE', `Error processing result for ${playerScore.username}`, error);
   }
 
-  return { username: playerScore.username, xpResult };
+  return { username: playerScore.username, xpResult, lifetimeAchievements };
+}
+
+export interface GameResultsOutput {
+  xpResults: Record<string, XpResultWithSocket>;
+  lifetimeAchievements: Record<string, LifetimeAchievement[]>;
 }
 
 /**
@@ -718,12 +792,13 @@ export async function processGameResults(
   scores: PlayerScore[],
   gameInfo: GameInfo,
   userAuthMap: Record<string, UserAuthInfo>
-): Promise<{ xpResults: Record<string, XpResultWithSocket> }> {
+): Promise<GameResultsOutput> {
   const xpResults: Record<string, XpResultWithSocket> = {};
+  const lifetimeAchievements: Record<string, LifetimeAchievement[]> = {};
 
   if (!isSupabaseConfigured()) {
     logger.debug('SUPABASE', 'Not configured, skipping game result recording');
-    return { xpResults };
+    return { xpResults, lifetimeAchievements };
   }
 
   logger.info('SUPABASE', `Processing game results for ${gameCode}, ${scores.length} players (parallel)`);
@@ -744,10 +819,13 @@ export async function processGameResults(
   // Wait for all players to be processed in parallel
   const results = await Promise.all(playerPromises);
 
-  // Collect XP results
+  // Collect XP results and lifetime achievements
   for (const result of results) {
     if (result.xpResult) {
       xpResults[result.username] = result.xpResult;
+    }
+    if (result.lifetimeAchievements && result.lifetimeAchievements.length > 0) {
+      lifetimeAchievements[result.username] = result.lifetimeAchievements;
     }
   }
 
@@ -762,7 +840,7 @@ export async function processGameResults(
     logger.warn('SUPABASE', 'Failed to invalidate leaderboard caches', cacheError);
   }
 
-  return { xpResults };
+  return { xpResults, lifetimeAchievements };
 }
 
 /**

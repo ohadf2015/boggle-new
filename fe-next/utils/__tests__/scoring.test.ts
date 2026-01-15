@@ -9,14 +9,15 @@ import { calculateEfficiencyScore, getScoreBreakdown, type ScoreBreakdown } from
 
 describe('Scoring Utilities', () => {
   describe('calculateWordScore (simple version)', () => {
+    // Formula: wordLength - 1 (each letter beyond the first = 1 point)
     it('calculates base score correctly for different word lengths', () => {
-      expect(calculateWordScoreSimple(2)).toBe(1);
-      expect(calculateWordScoreSimple(3)).toBe(1);
-      expect(calculateWordScoreSimple(4)).toBe(2);
-      expect(calculateWordScoreSimple(5)).toBe(3);
-      expect(calculateWordScoreSimple(6)).toBe(4);
-      expect(calculateWordScoreSimple(7)).toBe(5);
-      expect(calculateWordScoreSimple(8)).toBe(6);
+      expect(calculateWordScoreSimple(2)).toBe(1);  // 2-1 = 1
+      expect(calculateWordScoreSimple(3)).toBe(2);  // 3-1 = 2
+      expect(calculateWordScoreSimple(4)).toBe(3);  // 4-1 = 3
+      expect(calculateWordScoreSimple(5)).toBe(4);  // 5-1 = 4
+      expect(calculateWordScoreSimple(6)).toBe(5);  // 6-1 = 5
+      expect(calculateWordScoreSimple(7)).toBe(6);  // 7-1 = 6
+      expect(calculateWordScoreSimple(8)).toBe(7);  // 8-1 = 7
     });
 
     it('returns 0 for single letter words', () => {

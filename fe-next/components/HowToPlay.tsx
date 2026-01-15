@@ -9,7 +9,6 @@ import {
   type LucideIcon
 } from 'lucide-react';
 import { Button } from './ui/button';
-import { Progress } from './ui/progress';
 import { useLanguage } from '../contexts/LanguageContext';
 import MiniGrid, { GridPosition } from './onboarding/MiniGrid';
 
@@ -55,20 +54,19 @@ interface Step {
   id: string;
   icon: LucideIcon;
   title: string;
-  color: string;
+  bgColor: string;
+  activeColor: string;
 }
 
 /**
  * Step item for basics section
  */
 interface StepItem {
+  id: string;
   icon: LucideIcon;
   title: string;
   desc: string;
 }
-
-// NOTE: ComboVisualizer, XpExplainer, and AchievementTiers components
-// have been moved to separate files in components/how-to-play/
 
 /**
  * HowToPlay Props
@@ -76,6 +74,66 @@ interface StepItem {
 interface HowToPlayProps {
   onClose: () => void;
 }
+
+// Step Tab Button Component
+const StepTab: React.FC<{
+  step: Step;
+  index: number;
+  currentStep: number;
+  onClick: () => void;
+}> = ({ step, index, currentStep, onClick }) => {
+  const isActive = index === currentStep;
+  const isCompleted = index < currentStep;
+
+  return (
+    <button
+      onClick={onClick}
+      className={`
+        relative flex-1 min-w-0 py-3 px-2 sm:px-4
+        font-bold text-xs sm:text-sm uppercase tracking-wide
+        transition-all duration-200
+        border-b-4
+        ${isActive
+          ? `${step.activeColor} border-neo-cyan text-neo-white`
+          : isCompleted
+            ? 'bg-slate-700/50 border-neo-lime/60 text-neo-lime'
+            : 'bg-slate-800/50 border-slate-600 text-slate-400 hover:text-slate-300 hover:border-slate-500'
+        }
+        ${index === 0 ? 'rounded-tl-neo' : ''}
+        ${index === 2 ? 'rounded-tr-neo' : ''}
+      `}
+    >
+      <span className="flex items-center justify-center gap-1.5 sm:gap-2">
+        {isCompleted ? (
+          <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+        ) : (
+          <step.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+        )}
+        <span className="hidden sm:inline truncate">{step.title}</span>
+        <span className="sm:hidden">{index + 1}</span>
+      </span>
+    </button>
+  );
+};
+
+// Progress Bar Component
+const ProgressBar: React.FC<{ currentStep: number; totalSteps: number }> = ({
+  currentStep,
+  totalSteps,
+}) => {
+  const progress = ((currentStep + 1) / totalSteps) * 100;
+
+  return (
+    <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+      <motion.div
+        className="h-full bg-gradient-to-r from-neo-cyan to-neo-lime"
+        initial={{ width: 0 }}
+        animate={{ width: `${progress}%` }}
+        transition={{ duration: 0.3, ease: 'easeOut' }}
+      />
+    </div>
+  );
+};
 
 // Main HowToPlay Component
 const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
@@ -88,25 +146,28 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
     return demoConfigs[language] || demoConfigs.en;
   }, [language]);
 
-  // Simplified to 3 main steps for clearer onboarding
+  // Steps with dark-mode optimized colors
   const steps: Step[] = useMemo(() => [
     {
       id: 'basics',
       icon: Gamepad2,
       title: t('howToPlay.steps.basics.title'),
-      color: 'bg-neo-cyan'
+      bgColor: 'bg-neo-cyan',
+      activeColor: 'bg-neo-cyan/20',
     },
     {
       id: 'grid',
       icon: Pointer,
       title: t('howToPlay.steps.grid.title'),
-      color: 'bg-neo-lime'
+      bgColor: 'bg-neo-lime',
+      activeColor: 'bg-neo-lime/20',
     },
     {
       id: 'scoring',
       icon: Star,
       title: t('howToPlay.steps.scoring.title'),
-      color: 'bg-neo-lime'
+      bgColor: 'bg-neo-yellow',
+      activeColor: 'bg-neo-yellow/20',
     },
   ], [t]);
 
@@ -121,30 +182,30 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
     switch (step.id) {
       case 'basics':
         return (
-          <div className="space-y-3 sm:space-y-4">
-            <p className="text-neo-black leading-relaxed text-sm sm:text-base">
+          <div className="space-y-4">
+            <p className="text-neo-cream/90 leading-relaxed text-sm sm:text-base">
               {t('howToPlay.steps.basics.description')}
             </p>
 
-            <div className="space-y-2 sm:space-y-3">
+            <div className="space-y-3">
               {([
-                { icon: Users, title: t('howToPlay.createOrJoinTitle'), desc: t('howToPlay.createOrJoinDesc') },
-                { icon: Clock, title: t('howToPlay.hostStartsTitle'), desc: t('howToPlay.hostStartsDesc') },
-                { icon: Trophy, title: t('howToPlay.earnPointsTitle'), desc: t('howToPlay.earnPointsDesc') },
+                { id: 'create-join', icon: Users, title: t('howToPlay.createOrJoinTitle'), desc: t('howToPlay.createOrJoinDesc') },
+                { id: 'host-starts', icon: Clock, title: t('howToPlay.hostStartsTitle'), desc: t('howToPlay.hostStartsDesc') },
+                { id: 'earn-points', icon: Trophy, title: t('howToPlay.earnPointsTitle'), desc: t('howToPlay.earnPointsDesc') },
               ] as StepItem[]).map((item, index) => (
                 <motion.div
-                  key={index}
+                  key={item.id}
                   initial={{ x: isRTL ? 20 : -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex gap-2 sm:gap-3 items-start"
+                  className="flex gap-3 items-start p-3 rounded-neo bg-slate-800/60 border-2 border-slate-600"
                 >
-                  <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-neo-lime text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
-                    <item.icon className="text-neo-black text-sm sm:text-base" />
+                  <div className="flex-shrink-0 w-10 h-10 bg-neo-cyan text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
+                    <item.icon className="w-5 h-5" />
                   </div>
-                  <div className="min-w-0">
-                    <h4 className="font-bold text-neo-black text-sm sm:text-base">{item.title}</h4>
-                    <p className="text-xs sm:text-sm text-neo-black/70">{item.desc}</p>
+                  <div className="min-w-0 flex-1">
+                    <h4 className="font-bold text-neo-white text-sm sm:text-base">{item.title}</h4>
+                    <p className="text-xs sm:text-sm text-slate-300">{item.desc}</p>
                   </div>
                 </motion.div>
               ))}
@@ -154,8 +215,8 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
 
       case 'grid':
         return (
-          <div className="space-y-3 sm:space-y-4">
-            <p className="text-neo-black leading-relaxed text-sm sm:text-base">
+          <div className="space-y-4">
+            <p className="text-neo-cream/90 leading-relaxed text-sm sm:text-base">
               {t('howToPlay.steps.grid.description')}
             </p>
 
@@ -164,15 +225,15 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="bg-neo-lime border-3 border-neo-black rounded-neo p-2.5 sm:p-3 shadow-hard-md text-center"
+                className="bg-neo-lime border-3 border-neo-black rounded-neo p-3 shadow-hard text-center"
               >
                 <div className="flex items-center justify-center gap-2 mb-1">
-                  <Pointer className="text-lg text-neo-black animate-bounce" />
-                  <span className="font-bold text-neo-black text-xs sm:text-sm">
+                  <Pointer className="w-5 h-5 text-neo-black animate-bounce" />
+                  <span className="font-bold text-neo-black text-sm">
                     {t('onboarding.welcome.demoInstruction') || 'Swipe to form:'}
                   </span>
                 </div>
-                <div className="text-xl sm:text-2xl font-black text-neo-black">
+                <div className="text-2xl font-black text-neo-black">
                   {demoConfig.word}
                 </div>
               </motion.div>
@@ -182,7 +243,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-gradient-to-br from-neo-cyan/20 to-neo-pink/20 rounded-neo border-2 border-neo-black p-3 sm:p-4"
+              className="bg-slate-800/60 rounded-neo border-2 border-slate-600 p-4"
             >
               <MiniGrid
                 size={3}
@@ -199,18 +260,18 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-neo-lime border-3 border-neo-black rounded-neo p-2.5 sm:p-3 shadow-hard-md text-center"
+                className="bg-neo-lime border-3 border-neo-black rounded-neo p-3 shadow-hard text-center"
               >
-                <div className="text-base sm:text-lg font-black text-neo-black flex items-center justify-center gap-2">
-                  <Check className="text-neo-black" />
+                <div className="text-lg font-black text-neo-black flex items-center justify-center gap-2">
+                  <Check className="w-5 h-5" />
                   {t('onboarding.welcome.demoSuccess') || "You've got it!"}
                 </div>
               </motion.div>
             )}
 
-            <div className="bg-neo-lime/30 text-neo-black rounded-neo border-2 border-neo-black p-2 sm:p-3">
-              <p className="text-xs sm:text-sm font-medium text-neo-black flex items-center gap-2">
-                <Lightbulb className="text-neo-red flex-shrink-0" />
+            <div className="flex items-start gap-2 p-3 rounded-neo bg-slate-800/60 border-2 border-slate-600">
+              <Lightbulb className="w-5 h-5 text-neo-yellow flex-shrink-0 mt-0.5" />
+              <p className="text-xs sm:text-sm text-slate-300">
                 {t('howToPlay.findWordsNote')}
               </p>
             </div>
@@ -219,14 +280,14 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
 
       case 'scoring':
         return (
-          <div className="space-y-3 sm:space-y-4">
-            <p className="text-neo-black leading-relaxed text-sm sm:text-base">
+          <div className="space-y-4">
+            <p className="text-neo-cream/90 leading-relaxed text-sm sm:text-base">
               {t('howToPlay.steps.scoring.description')}
             </p>
 
-            {/* Simplified Scoring - Just show the formula and a few examples */}
-            <div className="bg-neo-cream rounded-neo border-2 sm:border-3 border-neo-black p-3 sm:p-4 text-center shadow-hard">
-              <p className="font-black text-neo-black text-base sm:text-lg mb-2">
+            {/* Scoring Card */}
+            <div className="bg-neo-yellow rounded-neo border-3 border-neo-black p-4 text-center shadow-hard">
+              <p className="font-black text-neo-black text-lg mb-3">
                 {t('howToPlay.scoringTable.formula')}
               </p>
               <div className="flex justify-center gap-2 sm:gap-3 flex-wrap">
@@ -234,9 +295,12 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
                   { letters: '3', points: 2 },
                   { letters: '5', points: 4 },
                   { letters: '7+', points: '6+' },
-                ].map((item, index) => (
-                  <div key={index} className="bg-neo-lime text-neo-black rounded-neo border-2 border-neo-black px-3 py-1 sm:px-4 sm:py-2">
-                    <span className="font-bold text-neo-black text-sm sm:text-base">
+                ].map((item) => (
+                  <div
+                    key={`scoring-${item.letters}`}
+                    className="bg-neo-black text-neo-yellow rounded-neo px-3 py-2 sm:px-4"
+                  >
+                    <span className="font-bold text-sm sm:text-base">
                       {item.letters} {t('howToPlay.letters')} = {item.points} {t('howToPlay.pts')}
                     </span>
                   </div>
@@ -245,9 +309,9 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
             </div>
 
             {/* Bonus features mention */}
-            <div className="bg-neo-lime/30 text-neo-black rounded-neo border-2 border-neo-black p-2 sm:p-3">
-              <p className="text-xs sm:text-sm font-medium text-neo-black flex items-center gap-2">
-                <Flame className="text-neo-red flex-shrink-0" />
+            <div className="flex items-start gap-2 p-3 rounded-neo bg-slate-800/60 border-2 border-slate-600">
+              <Flame className="w-5 h-5 text-neo-orange flex-shrink-0 mt-0.5" />
+              <p className="text-xs sm:text-sm text-slate-300">
                 {t('howToPlay.steps.combo.description') || 'Find words quickly for combo bonuses!'}
               </p>
             </div>
@@ -261,80 +325,94 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-2xl mx-auto px-3 sm:px-4 pb-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="w-full bg-neo-navy"
       dir={dir}
     >
-      {/* Progress Indicator - Scrollable on mobile */}
-      <div className="mb-3 sm:mb-4">
-        <div className="flex justify-between gap-1 sm:gap-2 mb-2 overflow-x-auto pb-1">
+      {/* Header with Tabs */}
+      <div className="bg-slate-900 border-b-2 border-slate-700">
+        {/* Tab Navigation */}
+        <div className="flex">
           {steps.map((step, index) => (
-            <button
+            <StepTab
               key={step.id}
+              step={step}
+              index={index}
+              currentStep={currentStep}
               onClick={() => setCurrentStep(index)}
-              className={`
-                w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 rounded-neo border-2 border-neo-black flex items-center justify-center
-                transition-all duration-200 shadow-hard-sm
-                ${index === currentStep
-                  ? `${step.color} scale-105 sm:scale-110 shadow-hard`
-                  : index < currentStep
-                    ? 'bg-neo-lime'
-                    : 'bg-neo-cream'
-                }
-              `}
-            >
-              {index < currentStep ? (
-                <Check className="text-neo-black text-xs sm:text-sm" />
-              ) : (
-                <step.icon className="text-neo-black text-xs sm:text-sm" />
-              )}
-            </button>
+            />
           ))}
         </div>
-        <Progress value={(currentStep / (steps.length - 1)) * 100} variant="accent" />
+        {/* Progress Bar */}
+        <ProgressBar currentStep={currentStep} totalSteps={steps.length} />
       </div>
 
-      {/* Step Title */}
+      {/* Step Title Banner */}
       <motion.div
-        key={currentStep}
-        initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        className={`${activeStep?.color ?? 'bg-neo-cyan'} rounded-neo border-2 sm:border-3 border-neo-black p-3 sm:p-4 mb-3 sm:mb-4 shadow-hard`}
+        key={`title-${currentStep}`}
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`${activeStep.bgColor} p-4 border-b-3 border-neo-black`}
       >
-        <h3 className="text-base sm:text-xl font-black text-neo-black flex items-center gap-2">
-          {activeStep && React.createElement(activeStep.icon, { className: 'text-sm sm:text-base' })}
+        <h3 className="text-lg sm:text-xl font-black text-neo-black flex items-center justify-center gap-2">
+          {activeStep && React.createElement(activeStep.icon, { className: 'w-5 h-5 sm:w-6 sm:h-6' })}
           {activeStep?.title}
         </h3>
       </motion.div>
 
       {/* Step Content */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentStep}
-          initial={{ opacity: 0, x: isRTL ? -50 : 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: isRTL ? 50 : -50 }}
-          transition={{ duration: 0.2 }}
-          className="min-h-[200px] sm:min-h-[300px]"
-        >
-          {renderStepContent()}
-        </motion.div>
-      </AnimatePresence>
+      <div className="p-4 sm:p-6">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentStep}
+            initial={{ opacity: 0, x: isRTL ? -30 : 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: isRTL ? 30 : -30 }}
+            transition={{ duration: 0.2 }}
+            className="min-h-[260px] sm:min-h-[300px]"
+          >
+            {renderStepContent()}
+          </motion.div>
+        </AnimatePresence>
 
-      {/* Navigation - Fixed at bottom on mobile */}
-      <div className="flex justify-between items-center mt-4 sm:mt-6 pt-3 sm:pt-4 border-t-2 border-neo-black/20 gap-2">
+        {/* Quick Tips - Only show on last step */}
+        {currentStep === steps.length - 1 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="mt-4 p-3 rounded-neo bg-neo-pink/15 border-2 border-neo-pink/40"
+          >
+            <h4 className="font-bold text-neo-pink mb-2 flex items-center gap-2 text-sm">
+              <Lightbulb className="w-4 h-4" />
+              {t('howToPlay.tipsTitle')}
+            </h4>
+            <ul className="space-y-1.5 text-xs text-slate-300">
+              {[1, 2, 4].map((num) => (
+                <li key={num} className="flex items-start gap-2">
+                  <Check className="w-3.5 h-3.5 text-neo-lime mt-0.5 flex-shrink-0" />
+                  <span>{t(`howToPlay.tips.tip${num}`)}</span>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Navigation Footer */}
+      <div className="flex justify-between items-center p-4 bg-slate-900/80 border-t-2 border-slate-700 gap-3">
         <Button
           variant="outline"
           onClick={prevStep}
           disabled={currentStep === 0}
-          className="bg-neo-cream text-sm sm:text-base px-2 sm:px-4"
+          className="bg-slate-700 border-slate-600 text-neo-cream hover:bg-slate-600 disabled:opacity-40 text-sm px-3 sm:px-4"
         >
-          <ChevronLeft className="me-1 sm:me-2 rtl:rotate-180" />
-          <span className="hidden xs:inline">{t('common.back')}</span>
+          <ChevronLeft className="w-4 h-4 me-1 rtl:rotate-180" />
+          <span className="hidden sm:inline">{t('common.back')}</span>
         </Button>
 
-        <span className="text-xs sm:text-sm font-bold text-neo-black/75 flex-shrink-0">
+        <span className="text-sm font-bold text-slate-400">
           {currentStep + 1} / {steps.length}
         </span>
 
@@ -342,47 +420,23 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
           <Button
             variant="outline"
             onClick={onClose}
-            className="bg-neo-lime text-sm sm:text-base px-2 sm:px-4"
+            className="bg-neo-lime border-neo-black text-neo-black hover:bg-neo-lime/80 text-sm px-3 sm:px-4 shadow-hard-sm"
           >
-            <span className="hidden xs:inline">{t('common.understood')}</span>
-            <span className="xs:hidden">OK</span>
-            <Check className="ms-1 sm:ms-2" />
+            <span className="hidden sm:inline">{t('common.understood')}</span>
+            <span className="sm:hidden">OK</span>
+            <Check className="w-4 h-4 ms-1" />
           </Button>
         ) : (
           <Button
             variant="outline"
             onClick={nextStep}
-            className="bg-neo-lime text-sm sm:text-base px-2 sm:px-4"
+            className="bg-neo-cyan border-neo-black text-neo-black hover:bg-neo-cyan/80 text-sm px-3 sm:px-4 shadow-hard-sm"
           >
-            <span className="hidden xs:inline">{t('common.next') || 'Next'}</span>
-            <span className="xs:hidden">{t('common.next') || 'Next'}</span>
-            <ChevronRight className="ms-1 sm:ms-2 rtl:rotate-180" />
+            <span>{t('common.next') || 'Next'}</span>
+            <ChevronRight className="w-4 h-4 ms-1 rtl:rotate-180" />
           </Button>
         )}
       </div>
-
-      {/* Quick Tips - Only show on last step */}
-      {currentStep === steps.length - 1 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mt-4 bg-neo-pink/20 rounded-neo border-2 border-neo-black p-3"
-        >
-          <h4 className="font-bold text-neo-black mb-2 flex items-center gap-2 text-sm">
-            <Lightbulb className="text-neo-lime" />
-            {t('howToPlay.tipsTitle')}
-          </h4>
-          <ul className="space-y-1 text-xs text-neo-black">
-            {[1, 2, 4].map((num) => (
-              <li key={num} className="flex items-start gap-2">
-                <Check className="text-neo-lime mt-0.5 flex-shrink-0 text-xs" />
-                <span>{t(`howToPlay.tips.tip${num}`)}</span>
-              </li>
-            ))}
-          </ul>
-        </motion.div>
-      )}
     </motion.div>
   );
 };

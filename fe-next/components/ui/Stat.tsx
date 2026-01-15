@@ -1,0 +1,322 @@
+'use client';
+
+/**
+ * Unified Stat Component
+ *
+ * Consolidates all stat display variants into a single, flexible component.
+ *
+ * Replaces:
+ * - StatBadge (components/ui/StatBadge.tsx)
+ * - StatDisplay (components/ui/stat-display.tsx)
+ * - StatCard (components/ui/stat-display.tsx)
+ * - StatCard (components/profile/StatCard.tsx)
+ *
+ * Key Features:
+ * - Interactive vs non-interactive styling
+ * - Icon in colored box or above value
+ * - Multiple size variants
+ * - Dark mode support
+ * - Gradient backgrounds
+ * - Neo-Brutalist styling
+ *
+ * @module components/ui/Stat
+ */
+
+import React from 'react';
+import { cn } from '@/lib/utils';
+
+// ==================== Types ====================
+
+export type StatVariant =
+  | 'default'    // Standard styling
+  | 'accent'     // Cyan accent
+  | 'success'    // Lime/green success
+  | 'warning'    // Yellow warning
+  | 'info'       // Pink info
+  | 'highlight'; // Gradient highlight
+
+export type StatSize = 'sm' | 'md' | 'lg';
+
+export type StatIconStyle =
+  | 'box'    // Icon in a colored container (StatBadge style)
+  | 'above'  // Icon directly above value (StatDisplay/StatCard style)
+  | 'none';  // No icon
+
+export interface StatProps {
+  /** The main value to display */
+  value: string | number;
+
+  /** Label describing what the value represents */
+  label: string;
+
+  /** Optional icon component or element */
+  icon?: React.ElementType | React.ReactNode;
+
+  /** Visual variant */
+  variant?: StatVariant;
+
+  /** Size of the stat display */
+  size?: StatSize;
+
+  /** How to display the icon */
+  iconStyle?: StatIconStyle;
+
+  /** Background color for icon container (only used with iconStyle="box") */
+  iconBgColor?: string;
+
+  /** Icon color class (Tailwind class) */
+  iconColor?: string;
+
+  /** Whether this stat is interactive (affects styling) */
+  interactive?: boolean;
+
+  /** Optional sub-value text (smaller text below label) */
+  subValue?: string;
+
+  /** Additional CSS classes */
+  className?: string;
+
+  /** Click handler (only applies if interactive=true) */
+  onClick?: () => void;
+
+  /** Accessibility label override */
+  'aria-label'?: string;
+}
+
+// ==================== Variant Configurations ====================
+
+const VARIANT_STYLES: Record<StatVariant, { bg: string; border: string; text: string }> = {
+  default: {
+    bg: 'bg-slate-100/50 dark:bg-slate-800/50',
+    border: 'border-slate-200 dark:border-slate-700',
+    text: 'text-slate-900 dark:text-slate-100',
+  },
+  accent: {
+    bg: 'bg-neo-cyan/10 dark:bg-neo-cyan/20',
+    border: 'border-neo-cyan/40 dark:border-neo-cyan/30',
+    text: 'text-neo-cyan dark:text-neo-cyan-light',
+  },
+  success: {
+    bg: 'bg-neo-lime/10 dark:bg-neo-lime/20',
+    border: 'border-neo-lime/40 dark:border-neo-lime/30',
+    text: 'text-neo-lime-dark dark:text-neo-lime',
+  },
+  warning: {
+    bg: 'bg-neo-yellow/10 dark:bg-neo-yellow/20',
+    border: 'border-neo-yellow/40 dark:border-neo-yellow/30',
+    text: 'text-neo-yellow-dark dark:text-neo-yellow',
+  },
+  info: {
+    bg: 'bg-neo-pink/10 dark:bg-neo-pink/20',
+    border: 'border-neo-pink/40 dark:border-neo-pink/30',
+    text: 'text-neo-pink-dark dark:text-neo-pink',
+  },
+  highlight: {
+    bg: 'bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/30 dark:to-blue-900/30',
+    border: 'border-cyan-200 dark:border-cyan-500/30',
+    text: 'text-cyan-600 dark:text-cyan-400',
+  },
+};
+
+const SIZE_CONFIGS = {
+  sm: {
+    wrapper: 'p-2 gap-0.5',
+    iconContainer: 'w-4 h-4',
+    iconSize: 'w-2.5 h-2.5',
+    value: 'text-sm',
+    label: 'text-[7px]',
+    subValue: 'text-[6px]',
+  },
+  md: {
+    wrapper: 'p-2 sm:p-3 gap-1',
+    iconContainer: 'w-5 h-5 sm:w-6 sm:h-6',
+    iconSize: 'w-3 h-3 sm:w-3.5 sm:h-3.5',
+    value: 'text-lg sm:text-xl',
+    label: 'text-[8px] sm:text-[9px]',
+    subValue: 'text-[7px] sm:text-xs',
+  },
+  lg: {
+    wrapper: 'p-3 sm:p-4 gap-1.5',
+    iconContainer: 'w-6 h-6 sm:w-8 sm:h-8',
+    iconSize: 'w-3.5 h-3.5 sm:w-5 sm:h-5',
+    value: 'text-xl sm:text-2xl',
+    label: 'text-[9px] sm:text-xs',
+    subValue: 'text-xs',
+  },
+};
+
+// ==================== Component ====================
+
+/**
+ * Unified Stat component for displaying statistics
+ *
+ * @example
+ * // Icon in colored box (StatBadge style)
+ * <Stat
+ *   icon={Hash}
+ *   value={42}
+ *   label="Words"
+ *   iconStyle="box"
+ *   iconBgColor="bg-neo-lime"
+ * />
+ *
+ * @example
+ * // Non-interactive display (StatDisplay style)
+ * <Stat
+ *   value="95%"
+ *   label="Accuracy"
+ *   variant="success"
+ *   interactive={false}
+ * />
+ *
+ * @example
+ * // Card with gradient (StatCard highlight style)
+ * <Stat
+ *   icon={Trophy}
+ *   value={1234}
+ *   label="High Score"
+ *   variant="highlight"
+ *   size="lg"
+ *   iconStyle="above"
+ * />
+ */
+export function Stat({
+  value,
+  label,
+  icon,
+  variant = 'default',
+  size = 'md',
+  iconStyle = icon ? 'above' : 'none',
+  iconBgColor = 'bg-neo-lime',
+  iconColor = 'text-neo-black',
+  interactive = true,
+  subValue,
+  className,
+  onClick,
+  'aria-label': ariaLabel,
+}: StatProps) {
+  const sizeConfig = SIZE_CONFIGS[size];
+  const variantStyle = VARIANT_STYLES[variant];
+
+  // Determine border style based on interactive state
+  const borderStyle = interactive
+    ? 'border-2'  // Solid border for interactive
+    : 'border border-dashed';  // Dashed border for non-interactive
+
+  // Determine shadow based on interactive state
+  const shadowStyle = interactive ? 'shadow-sm' : 'shadow-none';
+
+  // Base wrapper classes
+  const wrapperClasses = cn(
+    'inline-flex flex-col items-center justify-center text-center',
+    'rounded-neo transition-all',
+    borderStyle,
+    shadowStyle,
+    variantStyle.bg,
+    variantStyle.border,
+    sizeConfig.wrapper,
+    interactive && onClick && 'cursor-pointer hover:scale-[1.02] active:scale-[0.98]',
+    !interactive && 'cursor-default select-none',
+    className
+  );
+
+  // Render icon based on style
+  const renderIcon = () => {
+    if (iconStyle === 'none' || !icon) return null;
+
+    // Check if icon is already a React element
+    const isReactElement = React.isValidElement(icon);
+
+    // Check if icon is a component (function or object with $$typeof - handles forwardRef)
+    const isIconComponent = typeof icon === 'function' ||
+      (typeof icon === 'object' && icon !== null && '$$typeof' in icon);
+
+    const IconComponent = isIconComponent && !isReactElement ? icon as React.ElementType : null;
+
+    if (iconStyle === 'box') {
+      // Icon in colored container (StatBadge style)
+      return (
+        <div className={cn('flex justify-center', size === 'sm' ? 'mb-0.5' : 'mb-0.5 sm:mb-1')}>
+          <div
+            className={cn(
+              'rounded border border-neo-black flex items-center justify-center',
+              iconBgColor,
+              sizeConfig.iconContainer
+            )}
+          >
+            {IconComponent ? (
+              <IconComponent className={cn(iconColor, sizeConfig.iconSize)} />
+            ) : isReactElement ? (
+              icon
+            ) : (
+              <span className={cn(iconColor, sizeConfig.iconSize)}>{icon as React.ReactNode}</span>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // Icon above value (StatDisplay/StatCard style)
+    return (
+      <div className="text-slate-400 dark:text-slate-500 mb-1" aria-hidden="true">
+        {IconComponent ? (
+          <IconComponent className={sizeConfig.iconSize} />
+        ) : (
+          icon as React.ReactNode
+        )}
+      </div>
+    );
+  };
+
+  // Accessibility label
+  const accessibilityLabel = ariaLabel || `${label}: ${value}${subValue ? ` (${subValue})` : ''}`;
+
+  return (
+    <div
+      className={wrapperClasses}
+      onClick={onClick}
+      role="status"
+      aria-label={accessibilityLabel}
+    >
+      {renderIcon()}
+
+      {/* Value */}
+      <div
+        className={cn(
+          'font-black',
+          variant === 'highlight' || variant === 'accent' || variant === 'success'
+            ? variantStyle.text
+            : 'text-slate-900 dark:text-slate-100',
+          sizeConfig.value
+        )}
+      >
+        {value}
+      </div>
+
+      {/* Label */}
+      <div
+        className={cn(
+          'font-bold uppercase tracking-wide',
+          'text-slate-500 dark:text-slate-400',
+          sizeConfig.label
+        )}
+      >
+        {label}
+      </div>
+
+      {/* Optional sub-value */}
+      {subValue && (
+        <div
+          className={cn(
+            'text-slate-400 dark:text-slate-500',
+            sizeConfig.subValue
+          )}
+        >
+          {subValue}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default Stat;

@@ -225,7 +225,7 @@ const StreakProtection: React.FC<StreakProtectionProps> = memo(({
                 <div className="flex items-center gap-1">
                   {Array.from({ length: Math.min(freezesAvailable, 5) }).map((_, i) => (
                     <div
-                      key={i}
+                      key={`freeze-${i}`}
                       className="w-4 h-4 rounded-full bg-neo-cyan border border-neo-black"
                     />
                   ))}

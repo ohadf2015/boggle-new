@@ -82,7 +82,7 @@ export default function ChainChallenge({
         >
           <span className="text-xs font-black text-neo-pink uppercase tracking-wider">
             <Link2 className="w-4 h-4 inline me-2" />
-            {t('buzz.type.chain') || 'WORD CHAIN'}
+            {t('buzz.type.chain')}
           </span>
         </motion.div>
 
@@ -158,10 +158,10 @@ export default function ChainChallenge({
           className="space-y-1"
         >
           <p className="text-sm text-slate-400">
-            {t('buzz.chain.instruction') || 'Find the connecting word!'}
+            {t('buzz.chain.instruction')}
           </p>
           <p className="text-xs text-slate-500">
-            {t('buzz.chain.compoundHint') || 'Forms a compound word with BOTH neighbors'}
+            {t('buzz.chain.compoundHint')}
           </p>
         </motion.div>
       </div>
@@ -174,7 +174,7 @@ export default function ChainChallenge({
           className="px-4 py-3 bg-neo-cyan/10 border-2 border-neo-cyan/30 rounded-lg"
         >
           <div className="text-xs text-neo-cyan font-bold uppercase mb-1">
-            {t('buzz.hint') || 'HINT'}
+            {t('buzz.hint')}
           </div>
           <p className="text-white text-sm">{challenge.hint}</p>
         </motion.div>
@@ -193,7 +193,7 @@ export default function ChainChallenge({
           value={userAnswer}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          placeholder={t('buzz.yourAnswer') || 'YOUR ANSWER'}
+          placeholder={t('buzz.yourAnswer')}
           className={`
             w-full px-6 py-4 text-2xl font-black text-center text-white
             bg-slate-800 border-3 rounded-xl outline-none
@@ -253,7 +253,7 @@ export default function ChainChallenge({
           `}
         >
           <Check className="w-6 h-6 me-2" />
-          {t('buzz.submit') || 'SUBMIT'}
+          {t('buzz.submit')}
         </Button>
       </motion.div>
 

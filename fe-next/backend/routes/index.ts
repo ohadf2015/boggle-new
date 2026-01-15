@@ -12,11 +12,11 @@ import healthRoutes from './health';
 import dailyChallengeRoutes from './dailyChallenge';
 import dictionaryRoutes from './dictionary';
  
-const {
+import {
   apiRateLimiter,
   strictRateLimiter,
   getApiRateLimitStats,
-} = require('../utils/apiRateLimiter');
+} from '../utils/rateLimiter';
 
 interface RateLimiterOptions {
   maxRequests?: number;

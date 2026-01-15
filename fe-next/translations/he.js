@@ -125,6 +125,7 @@ const he = {
     "share": "שתף",
     "minutes": "דק׳",
     "advancedSettings": "עוד אפשרויות",
+    "settings": "הגדרות",
     "tapToDismiss": "הקש לסגירה",
     "tapToClose": "הקש להמשיך",
     "tapToContinue": "הקש להמשיך 👆",
@@ -166,7 +167,7 @@ const he = {
     "reconnecting": "מתחבר מחדש...",
     "disconnected": "החיבור נפל",
     "attempt": "ניסיון",
-    "checkConnection": "בדוק את חיבור האינטרנט",
+    "checkConnection": "נראה שאתה לא מחובר!",
     "retry": "נסה שוב",
     "retryNow": "נסה עכשיו"
   },
@@ -370,8 +371,8 @@ const he = {
   },
   "error": {
     "subscriptionFailed": "ההרשמה נכשלה. אנא נסה שוב.",
-    "generic": "משהו השתבש",
-    "notAuthenticated": "התחבר כדי להמשיך"
+    "generic": "אופס, זה לא עבד!",
+    "notAuthenticated": "התחבר כדי להמשיך לשחק!"
   },
   "difficulty": {
     "easy": "קל",
@@ -490,7 +491,7 @@ const he = {
       "usernameHint": "2-20 תווים",
       "avatarLabel": "אווטאר",
       "avatarHint": "בחר אווטאר שייצג אותך",
-      "avatarRequired": "יש לבחור אווטאר כדי להמשיך",
+      "avatarRequired": "בחרו אווטאר להצטרפות לקרב!",
       "usingProfileAvatar": "אווטאר פרופיל",
       "usingGameAvatar": "אווטאר משחק",
       "tapToChange": "לחץ לשינוי",
@@ -619,6 +620,16 @@ const he = {
     "presetPartyDesc": "2 דק' מצב מסיבה",
     "presetChallenge": "אתגר",
     "presetChallengeDesc": "3 דק' מצב קשה",
+    "presetFastDetails": "מושלם לסיבובים מהירים! התחרו נגד השעון במשחק מהיר. מעולה לחימום או כשאין הרבה זמן.",
+    "presetPartyDetails": "חוויית המסיבה הקלאסית! משחק מאוזן עם מספיק זמן למצוא מילים מעולות תוך שמירה על האנרגיה. אידיאלי לקבוצות.",
+    "presetChallengeDetails": "לציידי המילים הרציניים! לוח גדול יותר אומר יותר שילובי מילים ותחרות קשה יותר. הוכיחו שאתם אלופי המילים!",
+    "presetDrawerTimer": "טיימר",
+    "presetDrawerBoard": "גודל לוח",
+    "presetDrawerMinWord": "אורך מילה מינימלי",
+    "presetDrawerUseMode": "השתמש במצב זה",
+    "presetDrawerBoardMedium": "7×7 (בינוני)",
+    "presetDrawerBoardHard": "9×9 (קשה)",
+    "presetDrawerLetters": "אותיות",
     "difficultyTooltipGrid": "גודל הלוח משפיע על הקושי",
     "difficultyTooltipTimer": "יותר זמן = יותר מילים"
   },
@@ -737,7 +748,7 @@ const he = {
     "noPlayersYet": "אין שחקנים עדיין",
     "wordTooShort": "מילה קצרה מדי! (מינימום 2 אותיות)",
     "wordTooShortMin": "מילה קצרה מדי! (מינימום ${min} אותיות)",
-    "errorOccurred": "אירעה שגיאה",
+    "errorOccurred": "אופס! נסו שוב",
     "tooFast": "לאט! שולח מהר מדי",
     "me": "אני",
     "noWordsYet": "לא נמצאו מילים עדיין",
@@ -803,7 +814,8 @@ const he = {
       "demoWord": "שמש",
       "demoHint": "חברו אותיות סמוכות",
       "demoSuccess": "מצוין!",
-      "demoComplete": "הבנת! עכשיו את/ה יודע/ת לשחק."
+      "demoComplete": "הבנת! עכשיו את/ה יודע/ת לשחק.",
+      "startHere": "התחילו כאן"
     },
     "name": {
       "placeholder": "הכניסו שם",
@@ -818,7 +830,13 @@ const he = {
     },
     "quickTips": {
       "title": "טיפים מקצוענים",
-      "subtitle": "השאר תלמדו בזמן המשחק"
+      "subtitle": "השאר תלמדו בזמן המשחק",
+      "tip1Title": "החליקו אותיות",
+      "tip1Text": "גררו על אותיות סמוכות ליצירת מילים",
+      "tip2Title": "ארוך = טוב יותר",
+      "tip2Text": "מילים ארוכות מקנות הרבה יותר נקודות",
+      "tip3Title": "מהירות חשובה",
+      "tip3Text": "מציאות מהירות בונות קומבו לניקוד בונוס"
     },
     "training": {
       "title": "מצב אימון",
@@ -2113,6 +2131,12 @@ const he = {
     "needHint": "צריכ/ה רמז?",
     "botWords": "מילים שנמצאו",
     "beatYourRecord": "שברת את השיא שלך!",
+    "soloVsBots": "יחיד נגד בוטים",
+    "soloVsBotsDesc": "התחרו נגד יריבי AI ברמות קושי שונות",
+    "practiceMode": "אימון",
+    "practiceModeDesc": "ללא טיימר - למדו וחקרו בקצב שלכם",
+    "challengeMode": "אתגר",
+    "challengeModeDesc": "שברו את השיאים האישיים ועקבו אחר ההתקדמות",
     "preset": {
       "customGame": "משחק מותאם אישית",
       "quick": "מהיר",
@@ -2278,6 +2302,7 @@ const he = {
     "download": "שמור כתמונה",
     "downloadImage": "שמור תמונה לשיתוף",
     "playingAs": "משחק בתור",
+    "keepPlaying": "חזרו מחר לפאזל חדש!",
     "guestPlayer": "שחקן אורח",
     "enterName": "הכנס את שמך",
     "characters": "תווים",
@@ -2448,7 +2473,7 @@ const he = {
       "noInternet": "אין חיבור. בדקו את האינטרנט."
     },
     "alreadyPlayed": "כבר שיחקת היום! חזרו מחר.",
-    "badge": "חדש 🔥",
+    "badge": "BETA",
     "betaPreview": "גרסת ביתא ✨",
     "breaking": "חדשות חמות",
     "tapToCelebrate": "לחצו לחגוג",
@@ -2544,6 +2569,7 @@ const he = {
       "avgEfficiency": "יעילות ממוצעת",
       "challengeTitle": "אתגר מחבר!",
       "attempts": "ניסיונות",
+      "attemptsUsed": "ניסיונות שבוצעו",
       "beatTheirScore": "האם תוכלו לנצח אותם?",
       "tryAnotherLanguage": "נסו שפה אחרת",
       "playDifferentLanguage": "שחקו את הפאזל היומי בשפה אחרת",

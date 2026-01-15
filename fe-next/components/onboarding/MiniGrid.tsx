@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowDown, ArrowUp, ArrowLeft, ArrowRight, ArrowDownLeft, ArrowDownRight, ArrowUpLeft, ArrowUpRight, type LucideIcon } from 'lucide-react';
+import { ArrowDown, ArrowUp, ArrowLeft, ArrowRight, ArrowDownLeft, ArrowDownRight, ArrowUpLeft, ArrowUpRight, Hand, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { WordPathTrail } from '@/components/animations/WordPathTrail';
@@ -548,8 +548,19 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                   backgroundColor: ['rgb(255,107,107)', 'rgb(255,230,230)', 'rgb(255,107,107)'],
                 };
               }
-              if (isHint && !isSelected) {
-                // Pulse animation for hint cell
+              // First cell gets extra prominent yellow pulse
+              if (isHint && !isSelected && selectedCells.length === 0) {
+                return {
+                  scale: [1, 1.08, 1],
+                  boxShadow: [
+                    '0 0 30px rgba(255,225,53,0.8), 0 0 60px rgba(255,225,53,0.5)',
+                    '0 0 50px rgba(255,225,53,1), 0 0 80px rgba(255,225,53,0.7)',
+                    '0 0 30px rgba(255,225,53,0.8), 0 0 60px rgba(255,225,53,0.5)',
+                  ],
+                };
+              }
+              // Subsequent hint cells get lime pulse
+              if (isHint && !isSelected && selectedCells.length > 0) {
                 return {
                   scale: [1, 1.05, 1],
                   boxShadow: [
@@ -586,8 +597,10 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                   isSelected
                     ? 'bg-neo-lime shadow-hard-sm scale-95'
                     : 'letter-tile-gradient-cream shadow-hard-sm sm:shadow-hard',
-                  // Enhanced glow for hint cell - bright lime green
-                  isHint && !isSelected && 'ring-4 ring-neo-lime shadow-[0_0_20px_rgba(132,204,22,0.6),0_0_40px_rgba(132,204,22,0.3)]',
+                  // Extra prominent glow for FIRST cell - bright yellow to grab attention
+                  isHint && !isSelected && selectedCells.length === 0 && 'ring-4 ring-neo-yellow bg-neo-yellow/20 shadow-[0_0_30px_rgba(255,225,53,0.8),0_0_60px_rgba(255,225,53,0.5)]',
+                  // Enhanced glow for subsequent hint cells - bright lime green
+                  isHint && !isSelected && selectedCells.length > 0 && 'ring-4 ring-neo-lime shadow-[0_0_20px_rgba(132,204,22,0.6),0_0_40px_rgba(132,204,22,0.3)]',
                   // Red border flash for wrong cell
                   isShaking && 'border-neo-red'
                 )}
@@ -614,9 +627,40 @@ const MiniGrid: React.FC<MiniGridProps> = ({
                   )}
                 </AnimatePresence>
 
-                {/* Animated arrow pointing at hint cell */}
+                {/* START HERE indicator for first cell */}
                 <AnimatePresence>
-                  {isHint && !isSelected && ArrowIcon && (
+                  {isHint && !isSelected && selectedCells.length === 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{
+                        opacity: 1,
+                        scale: [1, 1.05, 1],
+                      }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      transition={{
+                        scale: {
+                          duration: 1.2,
+                          repeat: Infinity,
+                          ease: 'easeInOut'
+                        }
+                      }}
+                      className="absolute -top-12 sm:-top-14 left-1/2 -translate-x-1/2 z-10 whitespace-nowrap"
+                    >
+                      <div className="bg-neo-yellow text-neo-black border-3 border-neo-black rounded-neo px-3 py-1.5 sm:px-4 sm:py-2 shadow-hard flex items-center gap-1.5">
+                        <Hand className="w-4 h-4 sm:w-5 sm:h-5 animate-bounce" strokeWidth={2.5} />
+                        <span className="font-black text-xs sm:text-sm uppercase tracking-wide">
+                          {t('onboarding.welcome.startHere') || 'Start Here'}
+                        </span>
+                      </div>
+                      {/* Arrow pointing down to the cell */}
+                      <div className="absolute left-1/2 -translate-x-1/2 -bottom-2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-neo-black" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Animated arrow pointing at hint cell (for non-first cells) */}
+                <AnimatePresence>
+                  {isHint && !isSelected && selectedCells.length > 0 && ArrowIcon && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{

@@ -184,9 +184,19 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     return finalScores.find(p => p.username === username);
   }, [finalScores, username]);
 
+  // Memoize current player's valid words - used in multiple places
+  const currentPlayerValidWords = useMemo(() => {
+    return currentPlayerData?.allWords?.filter(w => w.validated && w.score > 0) || [];
+  }, [currentPlayerData]);
+
+  // Memoize other players list (excluding current user)
+  const otherPlayers = useMemo(() => {
+    return sortedScores.filter(p => p.username !== username);
+  }, [sortedScores, username]);
+
   // Use actual player rank for styling (1st=gold, 2nd=silver, 3rd=bronze, 4+=purple encouraging)
   // BUT if player has 0 score, treat them as non-winner (rank 4+)
-  const hasZeroScore = currentPlayerData?.score === 0 || (currentPlayerData?.allWords?.filter(w => w.validated && w.score > 0).length || 0) === 0;
+  const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
   const bannerRank = hasZeroScore ? 4 : (currentPlayerRank >= 1 ? currentPlayerRank : 1);
   const isCurrentUserInBanner = bannerPlayer?.username === username;
 
@@ -196,14 +206,13 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       const currentPlayerData = finalScores.find(p => p.username === username);
 
       if (currentPlayerData) {
-        const validWords = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0) || [];
-        const longestValidWord = validWords.reduce<string | undefined>((longest, w) =>
+        const longestValidWord = currentPlayerValidWords.reduce<string | undefined>((longest, w) =>
           w.word.length > (longest?.length || 0) ? w.word : longest, undefined
         );
 
         updateGuestStatsAfterGame({
           score: typeof currentPlayerData.score === 'number' ? currentPlayerData.score : 0,
-          wordCount: validWords.length,
+          wordCount: currentPlayerValidWords.length,
           longestWord: longestValidWord ?? undefined,
           isWinner: isCurrentUserWinner,
           achievements: (currentPlayerData.achievements || achievements || []).map(a =>
@@ -213,7 +222,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         hasUpdatedStatsRef.current = true;
       }
     }
-  }, [isAuthenticated, finalScores, username, isCurrentUserWinner, achievements]);
+  }, [isAuthenticated, finalScores, username, isCurrentUserWinner, achievements, currentPlayerValidWords]);
 
   // Use unified coin context
   const { refreshCoins } = useCoinContext();
@@ -978,7 +987,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     <div className="space-y-3">
       {/* Compact Celebration Banner */}
       {bannerPlayer && (
-        <ResultsWinnerBanner winner={bannerPlayer} isCurrentUserWinner={isCurrentUserInBanner} rank={bannerRank} />
+        <ResultsWinnerBanner winner={bannerPlayer} isCurrentUserWinner={isCurrentUserInBanner} rank={bannerRank} totalPlayers={sortedScores.length} />
       )}
 
       {/* Near-Miss Notifications - Motivate "one more game" */}
@@ -994,10 +1003,10 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       {/* Compact Stats Row - Using shared component */}
       {currentPlayerData && currentPlayerRank > 0 && (
         <CompactResultsStats
-          wordCount={currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0}
+          wordCount={currentPlayerValidWords.length}
           accuracy={(() => {
             const total = currentPlayerData.allWords?.length || 0;
-            const valid = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0;
+            const valid = currentPlayerValidWords.length;
             return total > 0 ? Math.round((valid / total) * 100) : 0;
           })()}
           archetype={currentPlayerArchetype}
@@ -1075,27 +1084,16 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               )}
             </div>
 
-            {/* Secondary Actions Row */}
-            <div className="flex gap-2">
-              {/* Share Button */}
-              {currentPlayerData && gameCode && !hasZeroScore && (currentPlayerData.score || 0) >= 10 && (
-                <button
-                  onClick={() => setMobileActiveTab('details')}
-                  className="flex-1 bg-neo-pink text-white font-bold text-sm px-4 py-2.5 uppercase border-2 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-1"
-                >
-                  <Share2 className="w-4 h-4" />
-                  {t('results.share') || 'Share'}
-                </button>
-              )}
-              {/* Exit Button */}
+            {/* Share Button - Exit button is in header */}
+            {currentPlayerData && gameCode && !hasZeroScore && (currentPlayerData.score || 0) >= 10 && (
               <button
-                onClick={handleExitRoom}
-                className="flex-1 bg-neo-red text-neo-cream font-bold text-sm px-4 py-2.5 uppercase border-2 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-1"
+                onClick={() => setMobileActiveTab('details')}
+                className="w-full bg-neo-pink text-white font-bold text-sm px-4 py-2.5 uppercase border-2 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-1"
               >
-                <DoorOpen className="w-4 h-4" />
-                {t('results.leaveRoom')}
+                <Share2 className="w-4 h-4" />
+                {t('results.share') || 'Share'}
               </button>
-            </div>
+            )}
           </>
         )
       )}
@@ -1152,7 +1150,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           isWinner={isCurrentUserWinner}
           username={username}
           score={currentPlayerData.score || 0}
-          wordCount={currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0}
+          wordCount={currentPlayerValidWords.length}
           achievements={currentPlayerData.achievements || achievements || []}
           gameCode={gameCode}
           streakDays={isCurrentUserWinner ? currentStreak : 0}
@@ -1166,19 +1164,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
       )}
 
       {/* Other Players */}
-      {sortedScores.filter(p => p.username !== username).length > 0 && (
+      {otherPlayers.length > 0 && (
         <CollapsibleSection
           title={t('results.otherPlayers') || 'Other Players'}
           icon={<Users className="w-4 h-4" />}
-          badge={sortedScores.filter(p => p.username !== username).length}
+          badge={otherPlayers.length}
           defaultExpanded={false}
           variant="tertiary"
           className="shadow-hard"
         >
           <div className="space-y-2">
-            {sortedScores
-              .filter(player => player.username !== username)
-              .map((player) => {
+            {otherPlayers.map((player) => {
                 const originalIndex = sortedScores.findIndex(p => p.username === player.username);
                 return (
                   <ResultsPlayerCard
@@ -1290,7 +1286,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           <div className="flex-1 min-w-0 max-w-xl space-y-4">
             {/* Celebration Banner */}
             {bannerPlayer && (
-              <ResultsWinnerBanner winner={bannerPlayer} isCurrentUserWinner={isCurrentUserInBanner} rank={bannerRank} />
+              <ResultsWinnerBanner winner={bannerPlayer} isCurrentUserWinner={isCurrentUserInBanner} rank={bannerRank} totalPlayers={sortedScores.length} />
             )}
 
             {/* Near-Miss Notifications - Motivate "one more game" */}
@@ -1305,10 +1301,10 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             {/* Compact Stats Row - Using shared component */}
             {currentPlayerData && currentPlayerRank > 0 && (
               <CompactResultsStats
-                wordCount={currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0}
+                wordCount={currentPlayerValidWords.length}
                 accuracy={(() => {
                   const total = currentPlayerData.allWords?.length || 0;
-                  const valid = currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0;
+                  const valid = currentPlayerValidWords.length;
                   return total > 0 ? Math.round((valid / total) * 100) : 0;
                 })()}
                 archetype={currentPlayerArchetype}
@@ -1395,25 +1391,16 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                     )}
                   </div>
 
-                  {/* Secondary Actions */}
-                  <div className="flex gap-2">
-                    {currentPlayerData && gameCode && !hasZeroScore && (currentPlayerData.score || 0) >= 10 && (
-                      <button
-                        onClick={() => {/* Scroll to share section */ }}
-                        className="flex-1 bg-neo-pink text-white font-bold text-sm px-4 py-2.5 uppercase border-2 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-1"
-                      >
-                        <Share2 className="w-4 h-4" />
-                        {t('results.share') || 'Share'}
-                      </button>
-                    )}
+                  {/* Share Button - Exit button is in top bar */}
+                  {currentPlayerData && gameCode && !hasZeroScore && (currentPlayerData.score || 0) >= 10 && (
                     <button
-                      onClick={handleExitRoom}
-                      className="flex-1 bg-neo-red text-neo-cream font-bold text-sm px-4 py-2.5 uppercase border-2 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-1"
+                      onClick={() => {/* Scroll to share section */ }}
+                      className="w-full bg-neo-pink text-white font-bold text-sm px-4 py-2.5 uppercase border-2 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-1"
                     >
-                      <DoorOpen className="w-4 h-4" />
-                      {t('results.leaveRoom')}
+                      <Share2 className="w-4 h-4" />
+                      {t('results.share') || 'Share'}
                     </button>
-                  </div>
+                  )}
                 </>
               )
             )}
@@ -1455,7 +1442,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                 isWinner={isCurrentUserWinner}
                 username={username}
                 score={currentPlayerData.score || 0}
-                wordCount={currentPlayerData.allWords?.filter(w => w.validated && w.score > 0).length || 0}
+                wordCount={currentPlayerValidWords.length}
                 achievements={currentPlayerData.achievements || achievements || []}
                 gameCode={gameCode}
                 streakDays={isCurrentUserWinner ? currentStreak : 0}
@@ -1469,19 +1456,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
             )}
 
             {/* Other Players */}
-            {sortedScores.filter(p => p.username !== username).length > 0 && (
+            {otherPlayers.length > 0 && (
               <CollapsibleSection
                 title={t('results.otherPlayers') || 'Other Players'}
                 icon={<Users className="w-4 h-4" />}
-                badge={sortedScores.filter(p => p.username !== username).length}
+                badge={otherPlayers.length}
                 defaultExpanded={false}
                 variant="tertiary"
                 className="shadow-hard"
               >
                 <div className="space-y-2">
-                  {sortedScores
-                    .filter(player => player.username !== username)
-                    .map((player) => {
+                  {otherPlayers.map((player) => {
                       const originalIndex = sortedScores.findIndex(p => p.username === player.username);
                       return (
                         <ResultsPlayerCard

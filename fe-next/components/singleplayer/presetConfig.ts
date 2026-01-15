@@ -5,7 +5,7 @@
 
 import type { DifficultyLevel } from '@/shared/types/game';
 import type { SinglePlayerMode } from './SinglePlayerView';
-import { Zap, Target, Flame, Calendar, Users, BookOpen, Trophy, Timer, type LucideIcon } from 'lucide-react';
+import { Zap, Target, Flame, Users, BookOpen, Trophy, Timer, type LucideIcon } from 'lucide-react';
 
 export interface PresetSettings {
   difficulty: DifficultyLevel;
@@ -86,29 +86,12 @@ export const PRESETS: PresetConfig[] = [
     },
     modes: ['solo-bots', 'practice', 'challenge'],
   },
-  // Daily Challenge - Special preset
-  {
-    id: 'daily',
-    nameKey: 'daily.badge',
-    descKey: 'daily.bannerSubtitle',
-    Icon: Calendar,
-    color: 'from-neo-pink via-neo-lime to-neo-cyan',
-    bgColor: 'bg-gradient-to-r from-neo-pink via-neo-lime to-neo-cyan',
-    settings: {
-      difficulty: 'MEDIUM',
-      timerSeconds: 120,
-      bots: 0,
-      botDifficulty: 'medium',
-      minWordLength: 2, // Always accept 2-letter words (especially important for Japanese)
-    },
-    modes: ['daily'],
-  },
 ];
 
 /**
  * Mode-specific presets for the custom game flow
  */
-export const MODE_PRESETS: Record<Exclude<SinglePlayerMode, 'daily'>, PresetConfig[]> = {
+export const MODE_PRESETS: Record<SinglePlayerMode, PresetConfig[]> = {
   'solo-bots': [
     {
       id: 'friendly',
@@ -268,9 +251,6 @@ export const MODE_PRESETS: Record<Exclude<SinglePlayerMode, 'daily'>, PresetConf
  * Get presets available for a specific mode
  */
 export function getPresetsForMode(mode: SinglePlayerMode): PresetConfig[] {
-  if (mode === 'daily') {
-    return PRESETS.filter(p => p.modes.includes('daily'));
-  }
   return MODE_PRESETS[mode] || [];
 }
 

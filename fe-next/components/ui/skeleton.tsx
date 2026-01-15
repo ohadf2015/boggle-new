@@ -114,7 +114,7 @@ export const NeoSkeletonText = memo(function NeoSkeletonText({
     >
       {Array.from({ length: lines }).map((_, i) => (
         <NeoSkeleton
-          key={i}
+          key={`text-line-${i}`}
           variant="text"
           height={16}
           width={i === lines - 1 ? '75%' : '100%'}
@@ -245,7 +245,7 @@ export const NeoSkeletonLeaderboard = memo(function NeoSkeletonLeaderboard({
       aria-label="Loading leaderboard"
     >
       {Array.from({ length: rows }).map((_, i) => (
-        <NeoSkeletonLeaderboardRow key={i} />
+        <NeoSkeletonLeaderboardRow key={`lb-row-${i}`} />
       ))}
     </div>
   );
@@ -271,7 +271,7 @@ export const NeoSkeletonWordList = memo(function NeoSkeletonWordList({
       aria-label="Loading words"
     >
       {widths.map((width, i) => (
-        <NeoSkeleton key={i} width={width} height={32} bordered />
+        <NeoSkeleton key={`word-${i}`} width={width} height={32} bordered />
       ))}
     </div>
   );
@@ -303,7 +303,7 @@ export const NeoSkeletonGrid = memo(function NeoSkeletonGrid({
       aria-busy="true"
     >
       {Array.from({ length: items }).map((_, i) => (
-        <NeoSkeleton key={i} width="100%" height={itemHeight} bordered />
+        <NeoSkeleton key={`grid-item-${i}`} width="100%" height={itemHeight} bordered />
       ))}
     </div>
   );

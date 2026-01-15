@@ -99,9 +99,9 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           </button>
         </motion.div>
 
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col px-3 lg:px-4 py-3 min-h-0 gap-4 overflow-hidden">
-          {/* Hero: Quick Play Button */}
+        {/* Main Content - no scroll on this container */}
+        <div className="flex-1 flex flex-col px-3 lg:px-4 py-3 min-h-0 gap-3">
+          {/* Hero: Quick Play Button - fixed size */}
           {onQuickPlay && (
             <motion.div
               initial={{ y: -10, opacity: 0 }}
@@ -118,7 +118,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             </motion.div>
           )}
 
-          {/* Divider with "or join a room" */}
+          {/* Divider with "or join a room" - fixed size */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -132,9 +132,9 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             <div className="flex-1 h-px bg-slate-600" />
           </motion.div>
 
-          {/* Room List Section */}
-          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-            {/* Room List Header */}
+          {/* Room List Section - takes remaining space, scrolls internally */}
+          <div className="flex-1 flex flex-col min-h-0">
+            {/* Room List Header - fixed size */}
             <motion.div
               initial={{ y: -10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -164,8 +164,8 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               </button>
             </motion.div>
 
-            {/* Room List - Scrollable */}
-            <div className="flex-1 overflow-y-auto min-h-0">
+            {/* Room List - Only this scrolls */}
+            <div className="flex-1 overflow-y-auto min-h-0 overscroll-contain">
               {roomsLoading && activeRooms.length === 0 ? (
                 <div className="h-24 flex items-center justify-center">
                   <NeoLoader variant="mascot-letters" size="sm" />
@@ -175,7 +175,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.25 }}
-                  className="flex flex-col gap-2"
+                  className="flex flex-col gap-2 pb-2"
                 >
                   {activeRooms.map((room, index) => (
                     <motion.button
@@ -219,35 +219,38 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                   <p className="text-sm font-bold text-neo-cream/80 mb-1">
                     {t('multiplayerFlow.roomList.noRooms')}
                   </p>
-                  <p className="text-xs text-slate-400 mb-4">
+                  <p className="text-xs text-slate-400">
                     {t('multiplayerFlow.roomList.beFirst')}
                   </p>
                 </motion.div>
               )}
             </div>
-
-            {/* Create Room Button - Subtle at bottom */}
-            <motion.div
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="flex-shrink-0 pt-3"
-            >
-              <Button
-                variant="outline"
-                onClick={onCreateRoom}
-                className="w-full py-3 text-sm font-bold uppercase border-2 border-slate-600 bg-slate-700/30 hover:bg-neo-lime/20 hover:border-neo-lime/50 text-neo-cream"
-              >
-                <Plus className="w-4 h-4 me-2" />
-                {t('multiplayerFlow.roomList.createButton')}
-              </Button>
-            </motion.div>
           </div>
+
+          {/* Create Room Button - Fixed at bottom, always visible */}
+          <motion.div
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="flex-shrink-0 pb-safe"
+          >
+            <Button
+              variant="outline"
+              onClick={onCreateRoom}
+              className="w-full py-3 text-sm font-bold uppercase border-2 border-slate-600 bg-slate-700/30 hover:bg-neo-lime/20 hover:border-neo-lime/50 text-neo-cream"
+            >
+              <Plus className="w-4 h-4 me-2" />
+              {t('multiplayerFlow.roomList.createButton')}
+            </Button>
+          </motion.div>
         </div>
 
         {/* How to Play Dialog */}
         <Dialog open={showHowToPlay} onOpenChange={setShowHowToPlay}>
-          <DialogContent noDescription className="max-w-3xl max-h-[90vh] overflow-hidden p-0">
+          <DialogContent
+            noDescription
+            className="max-w-2xl max-h-[90vh] overflow-hidden p-0 bg-neo-navy border-slate-600"
+          >
             <DialogHeader className="sr-only">
               <DialogTitle>{t('landing.tutorial')}</DialogTitle>
             </DialogHeader>

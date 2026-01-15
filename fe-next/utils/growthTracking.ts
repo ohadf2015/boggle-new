@@ -7,6 +7,10 @@ import logger from '@/utils/logger';
 import { getStoredUtmData } from './utmCapture';
 import { getGuestSessionId, getGuestName } from './guestManager';
 import { trackEvent as trackGA4Event } from '@/components/GoogleAnalytics';
+import {
+  getJsonFromLocalStorage,
+  saveJsonToLocalStorage,
+} from '@/utils/storageHelpers';
 
 // Growth event types for tracking viral loops and engagement
 export type GrowthEvent =
@@ -167,17 +171,13 @@ const storeEventLocally = (event: GrowthEvent, data: GrowthEventData): void => {
 
   if (!keyEvents.includes(event)) return;
 
-  try {
-    const storageKey = 'lexiclash_growth_events';
-    const existing = JSON.parse(localStorage.getItem(storageKey) || '[]');
-    existing.push({ event, data, timestamp: Date.now() });
+  const storageKey = 'lexiclash_growth_events';
+  const existing = getJsonFromLocalStorage<Array<{ event: GrowthEvent; data: GrowthEventData; timestamp: number }>>(storageKey, []);
+  existing.push({ event, data, timestamp: Date.now() });
 
-    // Keep only last 100 events
-    const trimmed = existing.slice(-100);
-    localStorage.setItem(storageKey, JSON.stringify(trimmed));
-  } catch {
-    // Storage full or unavailable
-  }
+  // Keep only last 100 events
+  const trimmed = existing.slice(-100);
+  saveJsonToLocalStorage(storageKey, trimmed);
 };
 
 /** Share method type for tracking */
@@ -279,35 +279,34 @@ export const getGrowthMetricsSummary = (): {
     return { totalShares: 0, totalAchievements: 0, avgStreakDays: 0, conversionEvents: 0 };
   }
 
-  try {
-    const events = JSON.parse(localStorage.getItem('lexiclash_growth_events') || '[]');
+  const events = getJsonFromLocalStorage<Array<{ event: string; data: { streakDays?: number } }>>(
+    'lexiclash_growth_events',
+    []
+  );
 
-    const shareEvents = events.filter((e: { event: string }) =>
-      ['share_whatsapp_clicked', 'share_link_copied'].includes(e.event)
-    );
+  const shareEvents = events.filter((e) =>
+    ['share_whatsapp_clicked', 'share_link_copied'].includes(e.event)
+  );
 
-    const achievementEvents = events.filter((e: { event: string }) => e.event === 'achievement_earned');
+  const achievementEvents = events.filter((e) => e.event === 'achievement_earned');
 
-    const streakEvents = events.filter((e: { event: string }) => e.event === 'streak_milestone');
+  const streakEvents = events.filter((e) => e.event === 'streak_milestone');
 
-    const conversionEvents = events.filter((e: { event: string }) =>
-      ['signup_completed', 'first_win_signup_completed'].includes(e.event)
-    );
+  const conversionEvents = events.filter((e) =>
+    ['signup_completed', 'first_win_signup_completed'].includes(e.event)
+  );
 
-    const avgStreak =
-      streakEvents.length > 0
-        ? streakEvents.reduce((sum: number, e: { data: { streakDays?: number } }) => sum + (e.data?.streakDays || 0), 0) / streakEvents.length
-        : 0;
+  const avgStreak =
+    streakEvents.length > 0
+      ? streakEvents.reduce((sum, e) => sum + (e.data?.streakDays || 0), 0) / streakEvents.length
+      : 0;
 
-    return {
-      totalShares: shareEvents.length,
-      totalAchievements: achievementEvents.length,
-      avgStreakDays: Math.round(avgStreak),
-      conversionEvents: conversionEvents.length,
-    };
-  } catch {
-    return { totalShares: 0, totalAchievements: 0, avgStreakDays: 0, conversionEvents: 0 };
-  }
+  return {
+    totalShares: shareEvents.length,
+    totalAchievements: achievementEvents.length,
+    avgStreakDays: Math.round(avgStreak),
+    conversionEvents: conversionEvents.length,
+  };
 };
 
 /**

@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowRight, Lightbulb, Sparkles, TrendingUp, Zap } from 'lucide-react';
+import { X, ArrowRight, Lightbulb, TrendingUp, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -14,6 +14,10 @@ import SpotOnChallenge from './challenges/SpotOnChallenge';
 import TrioChallenge from './challenges/TrioChallenge';
 import WordleChallenge from './challenges/WordleChallenge';
 import AnswerFeedbackModal from './AnswerFeedbackModal';
+import { normalizeWord } from '@/shared/utils/wordNormalization';
+import type { Language } from '@/shared/types/game';
+import { useSwipeGesture } from '@/hooks/useSwipeGesture';
+import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 
 interface BuzzGameScreenProps {
   challengeData: {
@@ -54,7 +58,7 @@ export default function BuzzGameScreen({
   onComplete,
   onQuit,
 }: BuzzGameScreenProps) {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const { playWordAcceptedSound, playErrorSound } = useSoundEffects();
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -78,6 +82,16 @@ export default function BuzzGameScreen({
   } | null>(null);
   const [pendingNextAction, setPendingNextAction] = useState<'next' | 'complete' | null>(null);
 
+  // Navigation guard - prevent accidental back navigation during game
+  useNavigationGuard({
+    enabled: true, // Component only exists during active gameplay
+    message: t('buzz.quitConfirm'),
+    onNavigationAttempt: () => {
+      setShowQuitConfirm(true);
+      return false;
+    },
+  });
+
   const currentChallenge = challengeData.challenges[currentIndex];
   const isLastChallenge = currentIndex === challengeData.challenges.length - 1;
 
@@ -90,8 +104,10 @@ export default function BuzzGameScreen({
   // Handle answer submission
   const handleAnswer = useCallback(
     (userAnswer: string) => {
-      const correct =
-        userAnswer.toLowerCase().trim() === currentChallenge.answer.toLowerCase().trim();
+      // Normalize answers for language-specific comparison (e.g., Hebrew final letters)
+      const normalizedUserAnswer = normalizeWord(userAnswer.trim(), challengeData.language as Language);
+      const normalizedCorrectAnswer = normalizeWord(currentChallenge.answer.trim(), challengeData.language as Language);
+      const correct = normalizedUserAnswer === normalizedCorrectAnswer;
       const timeTaken = Math.floor((Date.now() - challengeStartTime) / 1000);
 
       // Play sound
@@ -134,6 +150,7 @@ export default function BuzzGameScreen({
       isLastChallenge,
       showHint,
       challengeStartTime,
+      challengeData.language,
       playWordAcceptedSound,
       playErrorSound,
     ]
@@ -164,6 +181,14 @@ export default function BuzzGameScreen({
   const handleSkip = useCallback(() => {
     handleAnswer(''); // Submit empty answer
   }, [handleAnswer]);
+
+  // Swipe gesture for mobile navigation (swipe left to skip in LTR, swipe right to skip in RTL)
+  const swipeHandlers = useSwipeGesture({
+    onSwipeLeft: handleSkip,
+    isRtl: dir === 'rtl',
+    threshold: 75,
+    enableHaptic: true,
+  });
 
   // Handle quit
   const handleQuitClick = useCallback(() => {
@@ -227,7 +252,7 @@ export default function BuzzGameScreen({
           className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-none active:translate-x-0.5 active:translate-y-0.5 font-bold transition-all"
         >
           <X className="w-4 h-4 me-1" />
-          {t('common.quit') || 'QUIT'}
+          {t('common.quit')}
         </Button>
 
         {/* Animated Score Display */}
@@ -245,52 +270,24 @@ export default function BuzzGameScreen({
                 {score}
               </span>
               <span className="text-xs font-bold text-neo-yellow/70 uppercase">
-                {t('common.pts') || 'PTS'}
+                {t('common.pts')}
               </span>
             </div>
           </div>
         </motion.div>
       </div>
 
-      {/* Progress Section */}
-      <div className="mb-4 relative z-10">
-        {/* Challenge counter and type */}
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-300 font-bold">
-              {(() => {
-                const template = t('buzz.challenge');
-                if (template && template.includes('{number}')) {
-                  return template
-                    .replace('{number}', String(currentIndex + 1))
-                    .replace('{total}', String(challengeData.challenges.length));
-                }
-                return `Challenge ${currentIndex + 1} of ${challengeData.challenges.length}`;
-              })()}
-            </span>
-          </div>
-          <motion.span
-            key={currentChallenge.type}
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="px-2.5 py-1 bg-neo-cyan/20 border border-neo-cyan/40 rounded-neo text-xs text-neo-cyan font-black uppercase tracking-wide"
-          >
-            {(() => {
-              const typeKey = `buzz.type.${currentChallenge.type}`;
-              return t(typeKey) || currentChallenge.type;
-            })()}
-          </motion.span>
-        </div>
-
-        {/* Segmented Progress Bar */}
-        <div className="flex gap-1">
+      {/* Combined Progress & Topic Section - Compact Layout */}
+      <div className="mb-2 relative z-10">
+        {/* Segmented Progress Bar (thin) */}
+        <div className="flex gap-1 mb-2">
           {challengeData.challenges.map((_, i) => (
             <motion.div
               key={i}
               initial={i === currentIndex ? { scale: 0.8 } : {}}
               animate={i === currentIndex ? { scale: 1 } : {}}
               className={`
-                h-2 flex-1 rounded-full transition-colors duration-300
+                h-1.5 flex-1 rounded-full transition-colors duration-300
                 ${
                   i < currentIndex
                     ? 'bg-neo-lime'
@@ -302,42 +299,44 @@ export default function BuzzGameScreen({
             />
           ))}
         </div>
+
+        {/* Info Row: Counter + Topic + Type - All in one line */}
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-xs text-slate-400 font-bold shrink-0">
+            {currentIndex + 1}/{challengeData.challenges.length}
+          </span>
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentChallenge.trendTopic}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="flex items-center gap-1.5 px-2 py-1 bg-slate-900/60 rounded-neo border border-slate-700 min-w-0"
+            >
+              <TrendingUp className="w-3 h-3 text-neo-cyan shrink-0" />
+              <span className="text-xs font-bold text-white truncate">
+                {currentChallenge.trendTopic}
+              </span>
+            </motion.div>
+          </AnimatePresence>
+
+          <motion.span
+            key={currentChallenge.type}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="px-2 py-0.5 bg-neo-cyan/15 border border-neo-cyan/30 rounded text-[10px] text-neo-cyan font-black uppercase shrink-0"
+          >
+            {t(`buzz.type.${currentChallenge.type}`) || currentChallenge.type}
+          </motion.span>
+        </div>
       </div>
 
-      {/* Trending Topic Badge - Animated */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentChallenge.trendTopic}
-          initial={{ opacity: 0, y: -20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 20, scale: 0.95 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-          className="mb-4 flex items-center justify-center relative z-10"
-        >
-          <div className="relative inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900/80 rounded-neo-lg border-2 border-slate-600 shadow-hard-sm">
-            {/* Decorative glow */}
-            <div className="absolute inset-0 bg-neo-cyan/5 rounded-neo-lg blur-sm" />
-
-            <div className="relative flex items-center gap-2">
-              <div className="p-1 bg-neo-cyan/20 rounded-neo">
-                <TrendingUp className="w-4 h-4 text-neo-cyan" />
-              </div>
-              <span className="text-sm font-bold text-white">
-                {(() => {
-                  const template = t('buzz.topicIs');
-                  if (template && template.includes('{topic}')) {
-                    return template.replace('{topic}', currentChallenge.trendTopic);
-                  }
-                  return `Topic: ${currentChallenge.trendTopic}`;
-                })()}
-              </span>
-            </div>
-          </div>
-        </motion.div>
-      </AnimatePresence>
-
-      {/* Challenge Container */}
-      <div className="flex-1 flex flex-col items-center justify-center relative z-10">
+      {/* Challenge Container - with swipe gesture support for mobile */}
+      <div
+        className="flex-1 flex flex-col items-center justify-center relative z-10"
+        {...swipeHandlers}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
@@ -352,8 +351,8 @@ export default function BuzzGameScreen({
         </AnimatePresence>
       </div>
 
-      {/* Bottom actions */}
-      <div className="mt-4 space-y-2 relative z-10">
+      {/* Bottom actions - Compact */}
+      <div className="mt-2 space-y-1.5 relative z-10">
         {/* Hint button */}
         {currentChallenge.hint && !showHint && (
           <motion.div
@@ -363,12 +362,12 @@ export default function BuzzGameScreen({
             <Button
               onClick={() => setShowHint(true)}
               variant="ghost"
-              className="w-full py-3 border-2 border-slate-600 hover:border-neo-purple hover:bg-neo-purple/10 rounded-neo transition-all"
+              className="w-full py-2 border-2 border-slate-600 hover:border-neo-purple hover:bg-neo-purple/10 rounded-neo transition-all"
             >
               <Lightbulb className="w-4 h-4 me-2 text-neo-purple" />
-              <span className="font-bold">{t('buzz.hint') || 'Show Hint'}</span>
+              <span className="font-bold text-sm">{t('buzz.hint')}</span>
               <span className="ms-2 text-xs text-slate-400">
-                (-5 {t('common.pts') || 'PTS'})
+                (-5 {t('common.pts')})
               </span>
             </Button>
           </motion.div>
@@ -378,16 +377,16 @@ export default function BuzzGameScreen({
         <Button
           onClick={handleSkip}
           variant="outline"
-          className="w-full py-3 bg-slate-900/80 border-2 border-slate-600 hover:border-neo-pink hover:bg-neo-pink/10 rounded-neo font-bold transition-all"
+          className="w-full py-2 bg-slate-900/80 border-2 border-slate-600 hover:border-neo-pink hover:bg-neo-pink/10 rounded-neo font-bold text-sm text-slate-200 hover:text-white transition-all"
         >
           {isLastChallenge ? (
             <>
-              {t('buzz.finish') || 'FINISH'}
+              {t('buzz.finish')}
               <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
             </>
           ) : (
             <>
-              {t('buzz.skip') || 'SKIP CHALLENGE'}
+              {t('buzz.skip')}
               <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
             </>
           )}
@@ -398,13 +397,10 @@ export default function BuzzGameScreen({
       <ConfirmationDialog
         open={showQuitConfirm}
         onOpenChange={setShowQuitConfirm}
-        title={t('buzz.quitConfirmTitle') || 'Quit Daily Buzz?'}
-        description={
-          t('buzz.quitConfirm') ||
-          "Your progress will be saved, but incomplete challenges won't count toward your score."
-        }
-        confirmText={t('daily.imSure') || "I'm Sure"}
-        cancelText={t('common.cancel') || 'Cancel'}
+        title={t('buzz.quitConfirmTitle')}
+        description={t('buzz.quitConfirm')}
+        confirmText={t('daily.imSure')}
+        cancelText={t('common.cancel')}
         onConfirm={handleConfirmQuit}
         variant="danger"
       />

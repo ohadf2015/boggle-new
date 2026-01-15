@@ -103,8 +103,8 @@ export default function AnswerFeedbackModal({
                 `}
               >
                 {isCorrect
-                  ? t('buzz.feedback.correct') || 'CORRECT!'
-                  : t('buzz.feedback.incorrect') || 'INCORRECT'}
+                  ? t('buzz.feedback.correct')
+                  : t('buzz.feedback.incorrect')}
               </h3>
 
               {/* Points */}
@@ -114,14 +114,14 @@ export default function AnswerFeedbackModal({
                   ${isCorrect ? 'text-neo-yellow' : 'text-slate-400'}
                 `}
               >
-                +{points} {t('common.pts') || 'PTS'}
+                +{points} {t('common.pts')}
               </div>
 
               {/* Correct Answer (always show for incorrect, show for correct too) */}
               {!isCorrect && (
                 <div className="mt-4 p-3 bg-black/30 rounded-lg border border-slate-600">
                   <div className="text-xs text-slate-400 uppercase font-bold mb-1">
-                    {t('buzz.feedback.answerWas') || 'The answer was:'}
+                    {t('buzz.feedback.answerWas')}
                   </div>
                   <div className="text-2xl font-black text-white uppercase">
                     {correctAnswer}
@@ -133,7 +133,7 @@ export default function AnswerFeedbackModal({
               {!isCorrect && userAnswer && (
                 <div className="text-sm text-slate-400">
                   <span className="font-medium">
-                    {t('buzz.results.yourAnswer') || 'Your answer:'}
+                    {t('buzz.results.yourAnswer')}
                   </span>{' '}
                   <span className="text-red-300 line-through">{userAnswer}</span>
                 </div>

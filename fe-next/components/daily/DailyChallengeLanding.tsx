@@ -9,6 +9,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { hasPlayedToday } from '@/utils/dailyChallenge/storage';
 import { getGuestFingerprint } from '@/utils/guestManager';
 import { getSecondsUntilNextDaily, formatCountdown } from '@/utils/dailyChallenge';
+import { useTiltEffect } from '@/hooks/useTiltEffect';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import type { Language } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -182,39 +184,70 @@ export function DailyChallengeLanding({
       animate={{ opacity: 1 }}
       className="flex-1 flex flex-col items-center justify-center px-3 py-4 sm:p-6 max-w-2xl mx-auto w-full"
     >
-      {/* Urgency Countdown Banner */}
+      {/* Premium Countdown Banner with glow */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="mb-3 sm:mb-4"
+        initial={{ opacity: 0, scale: 0.9, y: -20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+        className="mb-4 sm:mb-6 relative"
       >
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-neo-navy-light border-2 border-neo-lime/40 rounded-neo shadow-hard-sm">
-          <Clock className="w-4 h-4 text-neo-lime animate-pulse" />
-          <span className="text-xs sm:text-sm font-bold text-neo-lime/80">
-            {t('daily.nextPuzzleIn')}:
+        {/* Animated glow ring behind */}
+        <motion.div
+          className="absolute -inset-2 rounded-2xl blur-md -z-10"
+          animate={{
+            opacity: [0.3, 0.5, 0.3],
+            scale: [1, 1.02, 1],
+          }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ background: 'radial-gradient(circle, rgba(191,255,0,0.3) 0%, transparent 70%)' }}
+        />
+        <div className="inline-flex items-center gap-3 px-5 py-3 bg-neo-navy-light/90 backdrop-blur-sm border-3 border-neo-lime/50 rounded-xl shadow-hard">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+          >
+            <Clock className="w-5 h-5 text-neo-lime" />
+          </motion.div>
+          <span className="text-xs sm:text-sm font-bold text-neo-lime/90 uppercase tracking-wide">
+            {t('daily.nextPuzzleIn')}
           </span>
-          <span className="text-sm sm:text-base font-black text-neo-lime tabular-nums min-w-[5em]">
+          <motion.span
+            className="text-lg sm:text-xl font-black text-neo-lime tabular-nums min-w-[6em] text-center"
+            animate={{ textShadow: ['0 0 10px rgba(191,255,0,0.5)', '0 0 20px rgba(191,255,0,0.8)', '0 0 10px rgba(191,255,0,0.5)'] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
             {countdown}
-          </span>
+          </motion.span>
         </div>
       </motion.div>
 
-      {/* Compact Header */}
+      {/* Enhanced Header with gradient */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-4 sm:mb-6"
+        transition={{ delay: 0.1 }}
+        className="text-center mb-5 sm:mb-8"
       >
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-neo-display font-black text-neo-lime">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-neo-display font-black bg-gradient-to-r from-neo-lime via-neo-cyan to-neo-lime bg-clip-text text-transparent bg-[length:200%_auto] animate-[gradient-flow_4s_ease_infinite]">
           {t('daily.chooseQuest')}
         </h1>
-        <p className="text-slate-400 text-sm sm:text-base mt-1">
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="text-slate-400 text-sm sm:text-base mt-2"
+        >
           {t('daily.chooseChallengeHint')}
-        </p>
+        </motion.p>
       </motion.div>
 
-      {/* Challenge Cards - Compact Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
+      {/* Challenge Cards - Premium Grid */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.15 }}
+        className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 w-full"
+      >
         {/* Word Hunt Card - TIMED */}
         <CompactChallengeCard
           icon={<Timer className="w-8 h-8 sm:w-10 sm:h-10" />}
@@ -232,7 +265,7 @@ export function DailyChallengeLanding({
                 ? t('common.loading')
                 : t('daily.play')
           }
-          delay={0.1}
+          delay={0.2}
         />
 
         {/* Daily Buzz Card - NO TIMER */}
@@ -240,7 +273,7 @@ export function DailyChallengeLanding({
           icon={<Hourglass className="w-8 h-8 sm:w-10 sm:h-10" />}
           title={t('buzz.title')}
           tagline={status.buzz === 'unavailable'
-            ? t('buzz.unavailableTagline') || 'Not available for this language yet'
+            ? t('buzz.unavailableTagline')
             : t('buzz.tagline')
           }
           color="yellow"
@@ -255,43 +288,61 @@ export function DailyChallengeLanding({
               : status.buzz === 'loading'
                 ? t('common.loading')
                 : status.buzz === 'unavailable'
-                  ? t('buzz.requestChallenge') || 'Request Challenge'
+                  ? t('buzz.requestChallenge')
                   : t('daily.play')
           }
-          delay={0.2}
+          delay={0.3}
           previewImageUrl={buzzPreview.imageUrl}
           previewImageAlt={buzzPreview.trendingSummary}
           onRequestChallenge={handleRequestChallenge}
           requestState={requestState}
         />
-      </div>
+      </motion.div>
 
       {/* Browse Past Buzz Challenges */}
       {onShowBuzzHistory && (
         <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          whileHover={{ scale: 1.02 }}
           onClick={onShowBuzzHistory}
-          className="mt-3 text-sm text-slate-400 hover:text-neo-pink transition-colors underline underline-offset-2"
+          className="mt-4 text-sm text-slate-400 hover:text-neo-pink transition-colors underline underline-offset-4 decoration-slate-600 hover:decoration-neo-pink"
         >
-          {t('buzz.history.browse') || 'Browse past Daily Buzz challenges'}
+          {t('buzz.history.browse')}
         </motion.button>
       )}
 
-      {/* Daily Double Achievement - Compact */}
+      {/* Daily Double Achievement - Premium Badge */}
       {bothCompleted && (
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ type: 'spring', delay: 0.3 }}
-          className="mt-4 px-4 py-2 bg-neo-lime/10 border-2 border-neo-lime rounded-xl"
+          initial={{ scale: 0, rotate: -10 }}
+          animate={{ scale: 1, rotate: 0 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.4 }}
+          className="mt-5 relative"
         >
-          <div className="flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-neo-lime" />
-            <span className="font-black text-neo-lime text-sm">
-              {t('achievement.dailyDouble.name')}
-            </span>
+          {/* Glow effect */}
+          <motion.div
+            className="absolute -inset-2 rounded-2xl blur-lg -z-10"
+            animate={{
+              opacity: [0.4, 0.7, 0.4],
+              scale: [1, 1.05, 1],
+            }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            style={{ background: 'radial-gradient(circle, rgba(191,255,0,0.4) 0%, transparent 70%)' }}
+          />
+          <div className="px-5 py-3 bg-neo-navy-light/90 backdrop-blur-sm border-3 border-neo-lime rounded-xl shadow-hard">
+            <div className="flex items-center gap-3">
+              <motion.div
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <Trophy className="w-6 h-6 text-neo-lime drop-shadow-[0_0_8px_rgba(191,255,0,0.6)]" />
+              </motion.div>
+              <span className="font-black text-neo-lime text-base tracking-wide uppercase">
+                {t('achievement.dailyDouble.name')}
+              </span>
+            </div>
           </div>
         </motion.div>
       )}
@@ -341,6 +392,25 @@ function CompactChallengeCard({
 }: CompactChallengeCardProps) {
   const { t } = useLanguage();
   const [imageError, setImageError] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
+
+  // 3D tilt effect for premium game feel
+  const { ref, style: tiltStyle, handlers: tiltHandlers } = useTiltEffect<HTMLDivElement>({
+    maxTilt: 12,
+    hoverScale: 1.04,
+    perspective: 800,
+  });
+
+  // Combined hover handlers
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    tiltHandlers.onMouseEnter();
+  };
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    tiltHandlers.onMouseLeave();
+  };
 
   // Show image only if URL exists and hasn't errored
   const showImage = previewImageUrl && !imageError;
@@ -351,13 +421,15 @@ function CompactChallengeCard({
       bg: 'bg-neo-orange',
       text: 'text-neo-orange',
       iconBg: 'bg-neo-orange/20',
-      glow: 'hover:shadow-[0_0_20px_rgba(255,107,53,0.3)]',
+      glowColor: 'rgba(255, 107, 53, 0.4)',
+      borderGlow: 'neo-orange',
     },
     yellow: {
-      bg: 'bg-neo-yellow',
-      text: 'text-neo-yellow',
-      iconBg: 'bg-neo-yellow/20',
-      glow: 'hover:shadow-[0_0_20px_rgba(255,225,53,0.3)]',
+      bg: 'bg-neo-cyan',
+      text: 'text-neo-cyan',
+      iconBg: 'bg-neo-cyan/20',
+      glowColor: 'rgba(0, 255, 255, 0.4)',
+      borderGlow: 'neo-cyan',
     },
   };
 
@@ -372,139 +444,223 @@ function CompactChallengeCard({
     }
   };
 
+  const showEffects = enableComplexAnimations && !prefersReducedMotion;
+
   return (
-    <motion.button
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay }}
-      onClick={handleClick}
-      disabled={status === 'loading' || requestState === 'loading'}
-      className={cn(
-        'relative w-full bg-slate-900/90 rounded-xl border-3 border-neo-black p-4 sm:p-5',
-        'shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all duration-200',
-        'flex flex-col items-center text-center cursor-pointer',
-        'disabled:opacity-50 disabled:cursor-not-allowed',
-        styles.glow,
-        status === 'done' && 'opacity-80',
-        isUnavailable && 'opacity-60'
-      )}
+      transition={{ delay, type: 'spring', stiffness: 300, damping: 25 }}
+      className="relative"
     >
-      {/* Status Badge - Top Right */}
-      <div className="absolute top-2 end-2">
-        {status === 'done' ? (
-          <span className="text-xs font-bold bg-neo-lime/20 text-neo-lime px-2 py-0.5 rounded-full border border-neo-lime/40">
-            ✓
-          </span>
-        ) : isUnavailable ? (
-          <span className="text-xs font-bold bg-slate-700/50 text-slate-400 px-2 py-0.5 rounded-full border border-slate-600/40">
-            {t('buzz.notAvailable') || 'Not Available'}
-          </span>
-        ) : badge ? (
-          <span className="text-xs font-bold bg-neo-pink/20 text-neo-pink px-2 py-0.5 rounded-full border border-neo-pink/30">
-            {badge}
-          </span>
-        ) : null}
-      </div>
+      {/* Animated glow effect for new challenges */}
+      {status === 'new' && showEffects && (
+        <motion.div
+          className="absolute -inset-1 rounded-2xl opacity-60 blur-md -z-10"
+          animate={{
+            boxShadow: [
+              `0 0 20px ${styles.glowColor}`,
+              `0 0 40px ${styles.glowColor}`,
+              `0 0 20px ${styles.glowColor}`,
+            ],
+          }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ background: `linear-gradient(135deg, ${styles.glowColor}, transparent)` }}
+        />
+      )}
 
-      {/* Time Mode Badge - Prominent at top */}
       <div
+        ref={ref}
+        onClick={handleClick}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onMouseMove={tiltHandlers.onMouseMove}
+        onTouchStart={tiltHandlers.onTouchStart}
+        onTouchMove={tiltHandlers.onTouchMove}
+        onTouchEnd={tiltHandlers.onTouchEnd}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => e.key === 'Enter' && handleClick()}
         className={cn(
-          'flex items-center gap-1.5 px-3 py-1.5 rounded-full mb-3',
-          'border-2 font-bold text-sm uppercase tracking-wide',
-          timeMode === 'timed'
-            ? 'bg-neo-orange/20 border-neo-orange text-neo-orange'
-            : 'bg-neo-cyan/20 border-neo-cyan text-neo-cyan'
+          'relative w-full bg-slate-900/95 rounded-xl border-3 border-neo-black p-4 sm:p-5',
+          'shadow-hard transition-shadow duration-200',
+          'flex flex-col items-center text-center cursor-pointer',
+          'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime',
+          (status === 'loading' || requestState === 'loading') && 'opacity-50 cursor-not-allowed',
+          status === 'done' && 'opacity-85',
+          isUnavailable && 'opacity-60'
         )}
+        style={{
+          ...tiltStyle,
+          boxShadow: isHovered && !isUnavailable
+            ? `0 0 30px ${styles.glowColor}, 6px 6px 0px black`
+            : undefined,
+        }}
       >
-        {timeMode === 'timed' ? (
-          <Timer className="w-4 h-4" />
-        ) : (
-          <Hourglass className="w-4 h-4" />
+        {/* Decorative corner accents */}
+        {showEffects && (
+          <>
+            <motion.div
+              className="absolute top-0 end-0 w-12 h-12 pointer-events-none overflow-hidden rounded-tr-xl"
+              animate={isHovered ? { scale: 1.2, opacity: 0.15 } : { scale: 1, opacity: 0.08 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="absolute -top-6 -end-6 w-12 h-12 bg-white/20 rotate-45" />
+            </motion.div>
+            <motion.div
+              className="absolute bottom-0 start-0 w-8 h-8 pointer-events-none overflow-hidden rounded-bl-xl"
+              animate={isHovered ? { scale: 1.3, opacity: 0.12 } : { scale: 1, opacity: 0.06 }}
+              transition={{ duration: 0.3, delay: 0.05 }}
+            >
+              <div className="absolute -bottom-4 -start-4 w-8 h-8 bg-white/20 rotate-45" />
+            </motion.div>
+          </>
         )}
-        <span>{timeModeLabel}</span>
-      </div>
 
-      {/* Preview Image or Icon */}
-      {showImage ? (
-        <div className="relative w-full aspect-square max-h-48 sm:max-h-56 rounded-xl overflow-hidden mb-3 border-3 border-neo-black shadow-hard">
-          <Image
-            src={previewImageUrl}
-            alt={previewImageAlt || title}
-            fill
-            sizes="(max-width: 640px) 100vw, 50vw"
-            className="object-cover"
-            onError={() => setImageError(true)}
-            priority
-          />
-          {/* Neo-brutalist corner accents */}
-          <div className="absolute top-0 start-0 w-6 h-6 bg-neo-yellow border-e-2 border-b-2 border-neo-black" />
-          <div className="absolute bottom-0 end-0 w-6 h-6 bg-neo-pink border-s-2 border-t-2 border-neo-black" />
-          {/* Subtle gradient for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent" />
+        {/* Status Badge - Top Right */}
+        <div className="absolute top-2 end-2 z-10">
+          {status === 'done' ? (
+            <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="text-xs font-bold bg-neo-lime/20 text-neo-lime px-2 py-0.5 rounded-full border border-neo-lime/40"
+            >
+              ✓
+            </motion.span>
+          ) : isUnavailable ? (
+            <span className="text-xs font-bold bg-slate-700/50 text-slate-400 px-2 py-0.5 rounded-full border border-slate-600/40">
+              {t('buzz.notAvailable')}
+            </span>
+          ) : badge ? (
+            <motion.span
+              animate={showEffects ? { scale: [1, 1.05, 1] } : {}}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="text-xs font-bold bg-neo-pink/20 text-neo-pink px-2 py-0.5 rounded-full border border-neo-pink/30"
+            >
+              {badge}
+            </motion.span>
+          ) : null}
         </div>
-      ) : (
-        <div
+
+        {/* Time Mode Badge - Prominent at top */}
+        <motion.div
+          whileHover={showEffects ? { scale: 1.05 } : {}}
           className={cn(
-            'flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-xl mb-3',
-            styles.iconBg,
-            styles.text
+            'flex items-center gap-1.5 px-3 py-1.5 rounded-full mb-3',
+            'border-2 font-bold text-sm uppercase tracking-wide',
+            timeMode === 'timed'
+              ? 'bg-neo-orange/20 border-neo-orange text-neo-orange'
+              : 'bg-neo-cyan/20 border-neo-cyan text-neo-cyan'
           )}
         >
-          {icon}
-        </div>
-      )}
-
-      {/* Title */}
-      <h2 className={cn('text-xl sm:text-2xl font-neo-display font-black mb-1', styles.text)}>
-        {title}
-      </h2>
-
-      {/* Tagline */}
-      <p className="text-xs sm:text-sm text-slate-400 mb-4 line-clamp-2 px-2">
-        {tagline}
-      </p>
-
-      {/* Play/Request Button */}
-      {isUnavailable ? (
-        <div
-          className={cn(
-            'w-full py-2.5 sm:py-3 text-sm sm:text-base font-black uppercase rounded-lg',
-            'flex items-center justify-center gap-2',
-            requestState === 'sent'
-              ? 'bg-neo-lime/20 text-neo-lime border-2 border-neo-lime'
-              : 'bg-slate-700 text-slate-200 border-2 border-slate-600',
-            'shadow-hard-sm transition-all'
-          )}
-        >
-          {requestState === 'loading' ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              {t('common.loading') || 'Loading...'}
-            </>
-          ) : requestState === 'sent' ? (
-            <>
-              <Check className="w-4 h-4" />
-              {t('buzz.requestSent') || 'Request Sent!'}
-            </>
+          {timeMode === 'timed' ? (
+            <Timer className="w-4 h-4" />
           ) : (
-            <>
-              <Bell className="w-4 h-4" />
-              {t('buzz.requestChallenge') || 'Request Challenge'}
-            </>
+            <Hourglass className="w-4 h-4" />
           )}
-        </div>
-      ) : (
-        <div
-          className={cn(
-            'w-full py-2.5 sm:py-3 text-sm sm:text-base font-black uppercase rounded-lg',
-            styles.bg,
-            'text-neo-black border-2 border-neo-black shadow-hard-sm',
-            'group-hover:shadow-hard transition-all'
-          )}
-        >
-          {buttonText}
-        </div>
-      )}
-    </motion.button>
+          <span>{timeModeLabel}</span>
+        </motion.div>
+
+        {/* Preview Image or Icon */}
+        {showImage ? (
+          <div className="relative w-full aspect-square max-h-48 sm:max-h-56 rounded-xl overflow-hidden mb-3 border-3 border-neo-black shadow-hard">
+            <Image
+              src={previewImageUrl}
+              alt={previewImageAlt || title}
+              fill
+              sizes="(max-width: 640px) 100vw, 50vw"
+              className="object-cover"
+              onError={() => setImageError(true)}
+              priority
+            />
+            {/* Neo-brutalist corner accents */}
+            <div className="absolute top-0 start-0 w-6 h-6 bg-neo-cyan border-e-2 border-b-2 border-neo-black" />
+            <div className="absolute bottom-0 end-0 w-6 h-6 bg-neo-pink border-s-2 border-t-2 border-neo-black" />
+            {/* Subtle gradient for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent" />
+          </div>
+        ) : (
+          <motion.div
+            whileHover={showEffects ? { scale: 1.1, rotate: 5 } : {}}
+            transition={{ type: 'spring', stiffness: 400 }}
+            className={cn(
+              'flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-xl mb-3',
+              'border-2 border-neo-black shadow-hard-sm',
+              styles.iconBg,
+              styles.text
+            )}
+          >
+            {icon}
+          </motion.div>
+        )}
+
+        {/* Title */}
+        <h2 className={cn('text-xl sm:text-2xl font-neo-display font-black mb-1', styles.text)}>
+          {title}
+        </h2>
+
+        {/* Tagline */}
+        <p className="text-xs sm:text-sm text-slate-400 mb-4 line-clamp-2 px-2">
+          {tagline}
+        </p>
+
+        {/* Play/Request Button with shine effect */}
+        {isUnavailable ? (
+          <div
+            className={cn(
+              'w-full py-2.5 sm:py-3 text-sm sm:text-base font-black uppercase rounded-lg',
+              'flex items-center justify-center gap-2',
+              requestState === 'sent'
+                ? 'bg-neo-lime/20 text-neo-lime border-2 border-neo-lime'
+                : 'bg-slate-700 text-slate-200 border-2 border-slate-600',
+              'shadow-hard-sm transition-all'
+            )}
+          >
+            {requestState === 'loading' ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                {t('common.loading')}
+              </>
+            ) : requestState === 'sent' ? (
+              <>
+                <Check className="w-4 h-4" />
+                {t('buzz.requestSent')}
+              </>
+            ) : (
+              <>
+                <Bell className="w-4 h-4" />
+                {t('buzz.requestChallenge')}
+              </>
+            )}
+          </div>
+        ) : (
+          <div
+            className={cn(
+              'relative w-full py-2.5 sm:py-3 text-sm sm:text-base font-black uppercase rounded-lg overflow-hidden',
+              styles.bg,
+              'text-neo-black border-2 border-neo-black shadow-hard-sm',
+              'transition-all'
+            )}
+          >
+            {buttonText}
+            {/* Shine sweep effect */}
+            {showEffects && (
+              <motion.div
+                className="absolute inset-0 pointer-events-none"
+                initial={{ opacity: 0 }}
+                animate={isHovered ? { opacity: 1 } : { opacity: 0 }}
+              >
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                  initial={{ x: '-100%' }}
+                  animate={isHovered ? { x: '200%' } : { x: '-100%' }}
+                  transition={{ duration: 0.6, ease: 'easeOut' }}
+                />
+              </motion.div>
+            )}
+          </div>
+        )}
+      </div>
+    </motion.div>
   );
 }

@@ -23,6 +23,7 @@ interface ResultsWinnerBannerProps {
   winner: WinnerData | PlayerResult | null;
   isCurrentUserWinner: boolean;
   rank?: number; // 1 = 1st place (default), 2 = 2nd place, 3 = 3rd place
+  totalPlayers?: number; // Total number of players in the game (for "X of Y" display)
   // Single player mode support
   variant?: 'ranking' | 'highScore' | 'newRecord' | 'completion';
   customMessage?: string; // Override the rank message
@@ -88,6 +89,7 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
   winner,
   isCurrentUserWinner,
   rank = 1,
+  totalPlayers,
   variant = 'ranking',
   customMessage,
   customAnnouncement,
@@ -181,8 +183,12 @@ const ResultsWinnerBanner: React.FC<ResultsWinnerBannerProps> = ({
     if (rank === 1) return t('results.winnerAnnouncement');
     if (rank === 2) return t('results.silverMedalist') || 'Silver Medalist';
     if (rank === 3) return t('results.bronzeMedalist') || 'Bronze Medalist';
-    // For 4th+ place, show placement explicitly
-    return t('results.yourPlace', { rank }) || `You finished ${getOrdinalSuffix(rank)}`;
+    // For 4th+ place, show placement explicitly (e.g., "5 of 8")
+    if (totalPlayers) {
+      return t('results.yourPlace', { place: rank, total: totalPlayers }) || `You finished ${getOrdinalSuffix(rank)}`;
+    }
+    // Fallback if totalPlayers not provided
+    return `You finished ${getOrdinalSuffix(rank)}`;
   };
 
   if (!winner) return null;

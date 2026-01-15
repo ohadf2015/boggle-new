@@ -16,7 +16,7 @@ import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { useMouseParallax } from '@/hooks/useTiltEffect';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
-import { InteractiveMascotWithEntrance } from '@/components/ui/InteractiveMascot';
+import { IdleMascotWithEntrance } from '@/components/ui/IdleMascot';
 import ModeCard from './ModeCard';
 import TutorialPrompt from './TutorialPrompt';
 import Header from '@/components/Header';
@@ -39,8 +39,8 @@ const HeroMascot = memo(function HeroMascot({ isMobilePortrait = false }: HeroMa
   if (isMobilePortrait) {
     return (
       <div className="relative mx-auto mb-0">
-        <InteractiveMascotWithEntrance
-          variant="happy"
+        <IdleMascotWithEntrance
+          baseVariant="happy"
           size="sm"
           enableHover={false}
           enableClick
@@ -58,8 +58,8 @@ const HeroMascot = memo(function HeroMascot({ isMobilePortrait = false }: HeroMa
     <div className="relative mx-auto mb-1">
       {/* sm (64px) on small screens */}
       <div className="block sm:hidden">
-        <InteractiveMascotWithEntrance
-          variant="happy"
+        <IdleMascotWithEntrance
+          baseVariant="happy"
           size="sm"
           enableHover
           enableClick
@@ -72,8 +72,8 @@ const HeroMascot = memo(function HeroMascot({ isMobilePortrait = false }: HeroMa
       </div>
       {/* md (96px) on tablet */}
       <div className="hidden sm:block lg:hidden">
-        <InteractiveMascotWithEntrance
-          variant="happy"
+        <IdleMascotWithEntrance
+          baseVariant="happy"
           size="md"
           enableHover
           enableClick
@@ -86,8 +86,8 @@ const HeroMascot = memo(function HeroMascot({ isMobilePortrait = false }: HeroMa
       </div>
       {/* lg (128px) on desktop */}
       <div className="hidden lg:block">
-        <InteractiveMascotWithEntrance
-          variant="happy"
+        <IdleMascotWithEntrance
+          baseVariant="happy"
           size="lg"
           enableHover
           enableClick

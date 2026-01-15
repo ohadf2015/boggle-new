@@ -9,6 +9,7 @@ import {
   type EarthquakeConfig,
   type TriggerEarthquakePayload,
 } from '@/shared/types/earthquake';
+import { useSafeTimeout, useSafeInterval } from './useSafeTimeout';
 
 /**
  * useEarthquakeFireRound
@@ -62,9 +63,11 @@ export function useEarthquakeFireRound(
   // Refs
   const earthquakeTriggeredRef = useRef(false);
   const triggerTimeRef = useRef<number | null>(null);
-  const fireRoundTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const warningTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const shakeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Timer hooks (replaces manual timer refs)
+  const warningTimeout = useSafeTimeout();
+  const shakeTimeout = useSafeTimeout();
+  const fireRoundInterval = useSafeInterval();
 
   // Reset refs when game session changes (new game started)
   useEffect(() => {
@@ -75,10 +78,11 @@ export function useEarthquakeFireRound(
     setFireRoundRemaining(0);
 
     // Clear any pending timers from previous session
-    if (warningTimeoutRef.current) clearTimeout(warningTimeoutRef.current);
-    if (shakeTimeoutRef.current) clearTimeout(shakeTimeoutRef.current);
-    if (fireRoundTimerRef.current) clearInterval(fireRoundTimerRef.current);
-  }, [gameSessionId]);
+    warningTimeout.clear();
+    shakeTimeout.clear();
+    fireRoundInterval.stop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameSessionId /* Timer hooks intentionally excluded - they're stable */]);
 
   // Calculate trigger time (random time in last 24% of game, but at least 20 sec before end)
   useEffect(() => {
@@ -134,12 +138,12 @@ export function useEarthquakeFireRound(
     onEarthquakeStart?.();
     onTimerPause?.(); // Pause game timer during warning
 
-    warningTimeoutRef.current = setTimeout(() => {
+    warningTimeout.set(() => {
       // Phase 2: SHAKING (1 second)
       setEarthquakeState('shaking');
       onEarthquakeShake?.();
 
-      shakeTimeoutRef.current = setTimeout(() => {
+      shakeTimeout.set(() => {
         // Phase 3: FIRE ROUND (15 seconds)
         const { grid, embeddedWords } = generateNewGrid();
         onGridRegenerate?.(grid, embeddedWords);
@@ -154,14 +158,12 @@ export function useEarthquakeFireRound(
 
         // Start fire round countdown
         let remaining = config.fireRoundDurationSeconds;
-        fireRoundTimerRef.current = setInterval(() => {
+        fireRoundInterval.start(() => {
           remaining -= 1;
           setFireRoundRemaining(remaining);
 
           if (remaining <= 0) {
-            if (fireRoundTimerRef.current) {
-              clearInterval(fireRoundTimerRef.current);
-            }
+            fireRoundInterval.stop();
             setEarthquakeState('idle');
             setFireRoundActive(false);
             setFireRoundRemaining(0);
@@ -170,6 +172,7 @@ export function useEarthquakeFireRound(
         }, 1000);
       }, config.shakeDurationMs);
     }, config.warningDurationMs);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     config,
     generateNewGrid,
@@ -180,6 +183,7 @@ export function useEarthquakeFireRound(
     onFireRoundEnd,
     onTimerPause,
     onTimerResume,
+    // Timer hooks intentionally excluded - they're stable references
   ]);
 
   // Trigger earthquake sequence
@@ -218,15 +222,6 @@ export function useEarthquakeFireRound(
       triggerEarthquake();
     }
   }, [enabled, currentTimeSeconds, triggerEarthquake]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (warningTimeoutRef.current) clearTimeout(warningTimeoutRef.current);
-      if (shakeTimeoutRef.current) clearTimeout(shakeTimeoutRef.current);
-      if (fireRoundTimerRef.current) clearInterval(fireRoundTimerRef.current);
-    };
-  }, []);
 
   // Get score multiplier (2x during fire round, 1x otherwise)
   const getScoreMultiplier = useCallback((): number => {

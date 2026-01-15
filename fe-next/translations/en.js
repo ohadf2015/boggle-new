@@ -127,6 +127,7 @@ const en = {
     "share": "Share",
     "minutes": "min",
     "advancedSettings": "More Options",
+    "settings": "Settings",
     "tapToDismiss": "Tap to close",
     "tapToClose": "Tap to continue",
     "tapToContinue": "Tap to continue",
@@ -166,7 +167,7 @@ const en = {
     "reconnecting": "Reconnecting...",
     "disconnected": "Connection Lost",
     "attempt": "Attempt",
-    "checkConnection": "Check your internet connection",
+    "checkConnection": "Looks like you're offline!",
     "retry": "Retry connection",
     "retryNow": "Retry Now"
   },
@@ -370,8 +371,8 @@ const en = {
   },
   "error": {
     "subscriptionFailed": "Subscription failed. Please try again.",
-    "generic": "Something went wrong",
-    "notAuthenticated": "Please sign in to continue"
+    "generic": "Oops, that didn't work!",
+    "notAuthenticated": "Sign in to keep playing!"
   },
   "difficulty": {
     "easy": "Easy",
@@ -492,7 +493,7 @@ const en = {
       "usernameHint": "2-20 characters",
       "avatarLabel": "Avatar",
       "avatarHint": "Pick an avatar to represent you",
-      "avatarRequired": "Please select an avatar to continue",
+      "avatarRequired": "Pick an avatar to join the battle!",
       "usingProfileAvatar": "Profile avatar",
       "usingGameAvatar": "Game avatar",
       "tapToChange": "Tap to change",
@@ -612,6 +613,16 @@ const en = {
     "presetPartyDesc": "2 min party mode",
     "presetChallenge": "Challenge",
     "presetChallengeDesc": "3 min hard mode",
+    "presetFastDetails": "Perfect for quick rounds! Race against the clock in a fast-paced game. Great for warming up or squeezing in a game when you're short on time.",
+    "presetPartyDetails": "The classic party experience! Balanced gameplay with enough time to find great words while keeping the energy high. Ideal for groups.",
+    "presetChallengeDetails": "For serious word hunters! Larger board means more word combinations and tougher competition. Prove you're the ultimate word master!",
+    "presetDrawerTimer": "Timer",
+    "presetDrawerBoard": "Board Size",
+    "presetDrawerMinWord": "Min Word Length",
+    "presetDrawerUseMode": "Use This Mode",
+    "presetDrawerBoardMedium": "7×7 (Medium)",
+    "presetDrawerBoardHard": "9×9 (Hard)",
+    "presetDrawerLetters": "letters",
     "difficultyTooltipGrid": "Grid size affects difficulty",
     "difficultyTooltipTimer": "Longer time = more words found"
   },
@@ -731,7 +742,7 @@ const en = {
     "noPlayersYet": "No players yet",
     "wordTooShort": "Word too short! (min 2 letters)",
     "wordTooShortMin": "Word too short! (min ${min} letters)",
-    "errorOccurred": "An error occurred",
+    "errorOccurred": "Oops! Try again",
     "tooFast": "Slow down! Submitting too fast",
     "me": "Me",
     "noWordsYet": "No words found yet",
@@ -796,7 +807,8 @@ const en = {
       "demoWord": "CAT",
       "demoHint": "Connect touching letters",
       "demoSuccess": "Perfect!",
-      "demoComplete": "You got it! Now you know how to play."
+      "demoComplete": "You got it! Now you know how to play.",
+      "startHere": "Start Here"
     },
     "name": {
       "placeholder": "Enter name",
@@ -811,7 +823,13 @@ const en = {
     },
     "quickTips": {
       "title": "Quick Tips",
-      "subtitle": "Learn the rest by playing"
+      "subtitle": "Learn the rest by playing",
+      "tip1Title": "Swipe Letters",
+      "tip1Text": "Drag across adjacent letters to form words",
+      "tip2Title": "Longer = Better",
+      "tip2Text": "Longer words score exponentially more points",
+      "tip3Title": "Speed Matters",
+      "tip3Text": "Quick finds build combos for bonus points"
     },
     "training": {
       "title": "Training Mode",
@@ -2106,6 +2124,12 @@ const en = {
     "needHint": "Need a hint?",
     "botWords": "Words",
     "beatYourRecord": "New record!",
+    "soloVsBots": "Solo vs Bots",
+    "soloVsBotsDesc": "Compete against AI opponents of varying difficulty levels",
+    "practiceMode": "Practice",
+    "practiceModeDesc": "No timer - learn and explore at your own pace",
+    "challengeMode": "Challenge",
+    "challengeModeDesc": "Beat your personal records and track improvement",
     "preset": {
       "customGame": "Custom Game Setup",
       "quick": "Quick",
@@ -2265,6 +2289,7 @@ const en = {
     "download": "Save Image",
     "downloadImage": "Save Image",
     "playingAs": "Playing as",
+    "keepPlaying": "Come back tomorrow for a new puzzle!",
     "guestPlayer": "Guest",
     "enterName": "Your name",
     "characters": "chars",
@@ -2375,7 +2400,7 @@ const en = {
     "title": "Daily Buzz",
     "tagline": "Word challenges from today's trends",
     "subtitle": "What's buzzing today?",
-    "badge": "NEW",
+    "badge": "BETA",
     "betaPreview": "BETA",
     "breaking": "BREAKING",
     "tapToCelebrate": "Tap to celebrate",
@@ -2537,6 +2562,7 @@ const en = {
       "avgEfficiency": "Avg Efficiency",
       "challengeTitle": "Challenge from a friend!",
       "attempts": "attempts",
+      "attemptsUsed": "attempts used",
       "beatTheirScore": "Can you beat their score?",
       "tryAnotherLanguage": "Try Another Language",
       "playDifferentLanguage": "Play today's puzzle in a different language",
