@@ -69,35 +69,29 @@ jest.mock('../../fonts', () => ({
 }));
 
 describe('LocaleLayout Hydration', () => {
-    it('should not cause hydration mismatch with AdSense script', async () => {
+    it('should render without hydration mismatch', async () => {
         const LocaleLayout = (await import('../layout')).default;
 
         // Spy on console.error to catch React hydration warnings
         const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
 
         const params = Promise.resolve({ locale: 'en' });
-        render(
+        const { container } = render(
             await LocaleLayout({
                 children: <div>Test Content</div>,
                 params,
             })
         );
 
-        // Check that body contains script tags (Next.js Script renders in body)
-        const scripts = document.querySelectorAll('script');
+        // Verify content is rendered
+        expect(container.textContent).toContain('Test Content');
 
-        // Verify AdSense script is present and properly configured
+        // Verify no AdSense script is present (was removed for policy compliance)
+        const scripts = document.querySelectorAll('script');
         const adsenseScript = Array.from(scripts).find(s =>
             s.getAttribute('src')?.includes('adsbygoogle.js')
         );
-
-        expect(adsenseScript).toBeDefined();
-        if (adsenseScript) {
-            // Next.js Script component uses strategy, not defer attribute
-            expect(adsenseScript.getAttribute('data-strategy')).toBe('afterInteractive');
-            expect(adsenseScript.getAttribute('src')).toContain('adsbygoogle.js');
-            expect(adsenseScript.getAttribute('crossOrigin')).toBe('anonymous');
-        }
+        expect(adsenseScript).toBeUndefined();
 
         // Check for hydration errors
         const hydrationErrors = consoleError.mock.calls.filter(call =>

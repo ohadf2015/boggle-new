@@ -2,8 +2,6 @@
 
 import { useState, useCallback } from 'react';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
-import { useIMAVideoAds } from '@/components/ads/IMAVideoAdsProvider';
-import { useGoogleAds } from '@/components/ads/GoogleAdsProvider';
 import { useCoinContext } from '@/contexts/CoinContext';
 
 export type AdStatus = 'idle' | 'loading' | 'showing' | 'completed' | 'error';
@@ -35,9 +33,7 @@ interface UseRewardedAdReturn {
  *
  * Priority order:
  * 1. CrazyGames SDK - when running on CrazyGames platform
- * 2. Google IMA SDK - rewarded video ads (requires Ad Manager)
- * 3. Google AdSense - display ad fallback (requires AdSense)
- * 4. Simulation fallback - for development/testing
+ * 2. Simulation fallback - for development/testing
  *
  * @example
  * ```tsx
@@ -60,17 +56,13 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
 
   // Ad platform hooks
   const crazyGames = useCrazyGames();
-  const imaVideoAds = useIMAVideoAds();
-  const googleAds = useGoogleAds();
 
   // Determine which ad platform to use (priority order)
   const shouldUseCrazyGames = crazyGames.isAvailable && crazyGames.isOnCrazyGamesPlatform;
-  const shouldUseIMAVideoAds = !shouldUseCrazyGames && imaVideoAds.isAvailable;
-  const shouldUseGoogleAds = !shouldUseCrazyGames && !shouldUseIMAVideoAds && googleAds.isAvailable;
-  const shouldUseSimulation = !shouldUseCrazyGames && !shouldUseIMAVideoAds && !shouldUseGoogleAds;
+  const shouldUseSimulation = !shouldUseCrazyGames;
 
   // Ad is available if any platform is ready
-  const isAdAvailable = shouldUseCrazyGames || shouldUseIMAVideoAds || shouldUseGoogleAds || shouldUseSimulation;
+  const isAdAvailable = shouldUseCrazyGames || shouldUseSimulation;
 
   const rewardAmount = rewards.WATCH_AD;
 
@@ -83,13 +75,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     setError(null);
 
     // Determine platform for logging
-    const platform = shouldUseCrazyGames
-      ? 'crazygames'
-      : shouldUseIMAVideoAds
-        ? 'ima-sdk'
-        : shouldUseGoogleAds
-          ? 'adsense'
-          : 'simulation';
+    const platform = shouldUseCrazyGames ? 'crazygames' : 'simulation';
 
     // Award coins helper - uses unified CoinContext for auth/guest sync
     const awardCoinsAndNotify = async () => {
@@ -128,36 +114,8 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
           handleAdError(errorMsg || 'Ad failed to load');
         },
       });
-    } else if (shouldUseIMAVideoAds) {
-      // Priority 2: Google IMA SDK for rewarded video ads
-      imaVideoAds.showRewardedAd({
-        onAdStarted: () => {
-          setStatus('showing');
-          onAdStarted?.();
-        },
-        onAdComplete: () => {
-          awardCoinsAndNotify();
-        },
-        onAdError: (errorMsg: string) => {
-          handleAdError(errorMsg || 'Ad failed to load');
-        },
-      });
-    } else if (shouldUseGoogleAds) {
-      // Priority 3: Google AdSense display ads (fallback)
-      googleAds.showRewardedAd({
-        onAdStarted: () => {
-          setStatus('showing');
-          onAdStarted?.();
-        },
-        onAdComplete: () => {
-          awardCoinsAndNotify();
-        },
-        onAdError: (errorMsg: string) => {
-          handleAdError(errorMsg || 'Ad failed to load');
-        },
-      });
     } else {
-      // Priority 4: Simulation fallback for development/testing
+      // Priority 2: Simulation fallback for development/testing
       // This allows testing the flow without real ads
       console.log('[RewardedAd] Using simulation mode - no real ads configured');
       setStatus('showing');
@@ -168,7 +126,7 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
         awardCoinsAndNotify();
       }, 3000);
     }
-  }, [status, shouldUseCrazyGames, shouldUseIMAVideoAds, shouldUseGoogleAds, crazyGames, imaVideoAds, googleAds, rewardAmount, onRewardEarned, onAdError, onAdStarted, awardWatchedAd]);
+  }, [status, shouldUseCrazyGames, crazyGames, rewardAmount, onRewardEarned, onAdError, onAdStarted, awardWatchedAd]);
 
   return {
     status,

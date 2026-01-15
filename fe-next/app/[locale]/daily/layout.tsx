@@ -89,7 +89,7 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
     '@id': `https://www.lexiclash.live${localePath}/daily#webpage`,
     url: `https://www.lexiclash.live${localePath}/daily`,
     name: 'Daily Challenge - LexiClash',
-    description: 'Play the LexiClash Daily Challenge! Same puzzle for everyone worldwide each day. Share your results like Wordle.',
+    description: 'Play two daily challenges: Word Hunt Survival (word search puzzle) and Daily Buzz (trending topic word game). Same puzzles for everyone worldwide. Share results like Wordle!',
     isPartOf: {
       '@id': 'https://www.lexiclash.live/#website',
     },
@@ -101,6 +101,32 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
     },
   };
 
+  // ItemList schema for the two daily challenge modes
+  const challengeListSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    '@id': `https://www.lexiclash.live${localePath}/daily#challenges`,
+    name: 'Daily Word Challenges',
+    description: 'Two unique daily word challenges updated every day',
+    numberOfItems: 2,
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Word Hunt Survival',
+        description: 'Classic word search puzzle with 10 attempts to find the target word. Same board worldwide each day. Share emoji results like Wordle!',
+        url: `https://www.lexiclash.live${localePath}/daily`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Daily Buzz',
+        description: 'Trending topic word challenge using AI-generated puzzles based on current events and popular topics. Find words related to today\'s buzz!',
+        url: `https://www.lexiclash.live${localePath}/daily`,
+      },
+    ],
+  };
+
   // Event schema for Daily Challenge - recurring daily event (like Wordle)
   // This helps search engines understand the time-sensitive nature of the content
   const today = new Date();
@@ -108,12 +134,48 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
   tomorrow.setDate(tomorrow.getDate() + 1);
   tomorrow.setHours(0, 0, 0, 0);
 
-  const eventSchema = {
+  // Event schema for Word Hunt Survival - daily recurring event
+  const wordHuntEventSchema = {
     '@context': 'https://schema.org',
     '@type': 'Event',
-    '@id': `https://www.lexiclash.live${localePath}/daily#event`,
-    name: 'LexiClash Daily Word Challenge',
-    description: 'Daily word puzzle challenge - same board for everyone worldwide. New puzzle every day at midnight UTC. Share your emoji results like Wordle!',
+    '@id': `https://www.lexiclash.live${localePath}/daily#wordhunt-event`,
+    name: 'Word Hunt Survival - Daily Challenge',
+    description: 'Daily word search puzzle with 10 attempts to find the hidden word. Same board for everyone worldwide. New puzzle every day at midnight UTC. Share emoji results like Wordle!',
+    startDate: today.toISOString().split('T')[0],
+    endDate: tomorrow.toISOString().split('T')[0],
+    eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
+    location: {
+      '@type': 'VirtualLocation',
+      url: `https://www.lexiclash.live${localePath}/daily`,
+    },
+    organizer: {
+      '@id': 'https://www.lexiclash.live/#organization',
+    },
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
+      url: `https://www.lexiclash.live${localePath}/daily`,
+      validFrom: today.toISOString().split('T')[0],
+    },
+    performer: {
+      '@type': 'Organization',
+      name: 'LexiClash',
+    },
+    image: 'https://www.lexiclash.live/og-image-en.jpg',
+    isAccessibleForFree: true,
+    inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
+  };
+
+  // Event schema for Daily Buzz - AI-powered trending topic challenge
+  const buzzEventSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    '@id': `https://www.lexiclash.live${localePath}/daily#buzz-event`,
+    name: 'Daily Buzz - Trending Topic Word Challenge',
+    description: 'AI-generated word puzzle based on trending topics and current events. Find words related to today\'s buzz! New topic every day. Play past challenges anytime.',
     startDate: today.toISOString().split('T')[0],
     endDate: tomorrow.toISOString().split('T')[0],
     eventStatus: 'https://schema.org/EventScheduled',
@@ -146,7 +208,15 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, webPageSchema, eventSchema]) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            breadcrumbSchema,
+            webPageSchema,
+            challengeListSchema,
+            wordHuntEventSchema,
+            buzzEventSchema,
+          ]),
+        }}
       />
       {children}
     </>

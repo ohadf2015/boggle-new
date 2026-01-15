@@ -12,8 +12,6 @@ import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
 import { CoinProvider } from '@/contexts/CoinContext';
 import { MotionConfigProvider } from '@/components/motion/MotionConfigProvider';
 import { CrazyGamesProvider } from '@/components/CrazyGamesSDK';
-import { IMAVideoAdsProvider } from '@/components/ads/IMAVideoAdsProvider';
-import { GoogleAdsProvider } from '@/components/ads/GoogleAdsProvider';
 import { SocketProvider } from '@/utils/SocketContext';
 import { GameStateProvider } from '@/contexts/GameStateContext';
 import { SocketEventBusProvider } from '@/contexts/SocketEventBusContext';
@@ -186,9 +184,7 @@ export function Providers({ children, lang }: ProvidersProps) {
                 <ThemeProvider>
                     <LanguageProvider initialLanguage={lang}>
                         <CrazyGamesProvider>
-                            <IMAVideoAdsProvider>
-                                <GoogleAdsProvider>
-                                    <SocketProvider>
+                            <SocketProvider>
                                 <GameStateProvider>
                                     <SocketEventBusProvider>
                                         <AudioProviders>
@@ -202,9 +198,7 @@ export function Providers({ children, lang }: ProvidersProps) {
                                         </AudioProviders>
                                     </SocketEventBusProvider>
                                 </GameStateProvider>
-                                </SocketProvider>
-                                </GoogleAdsProvider>
-                            </IMAVideoAdsProvider>
+                            </SocketProvider>
                         </CrazyGamesProvider>
                     </LanguageProvider>
                 </ThemeProvider>
