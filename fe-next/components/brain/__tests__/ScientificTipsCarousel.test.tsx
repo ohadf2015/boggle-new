@@ -1,17 +1,20 @@
 /**
  * ScientificTipsCarousel Tests
  *
- * Tests for RTL arrow direction and dot indicators
+ * Tests for RTL arrow direction, dot indicators, and research citations
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 // Mock framer-motion before imports
 jest.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+    div: ({ children, className, custom, variants, initial, animate, exit, transition, layoutId, ...props }: any) => (
       <div className={className} {...props}>{children}</div>
+    ),
+    span: ({ children, className, layoutId, transition, ...props }: any) => (
+      <span className={className} {...props}>{children}</span>
     ),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -98,16 +101,116 @@ describe('ScientificTipsCarousel', () => {
       });
     });
 
-    it('renders dots with proper sizing classes - smaller circles for better appearance', () => {
+    it('renders dots with proper sizing classes', () => {
       const { container } = render(<ScientificTipsCarousel />);
 
       const dots = container.querySelectorAll('button.rounded-full');
       dots.forEach((dot) => {
         const className = dot.className;
-        // Should have smaller width and height classes (w-1.5 h-1.5 = 6px)
-        expect(className).toMatch(/w-1\.5/);
-        expect(className).toMatch(/h-1\.5/);
+        // Should have width and height classes (w-2 h-2 = 8px)
+        expect(className).toMatch(/w-2/);
+        expect(className).toMatch(/h-2/);
       });
+    });
+  });
+
+  describe('research citations', () => {
+    it('displays research-backed badge in header', () => {
+      render(<ScientificTipsCarousel />);
+
+      // Check for the research-backed badge translation key
+      expect(screen.getByText('brain.researchBacked')).toBeInTheDocument();
+    });
+
+    it('renders source label for citations', () => {
+      render(<ScientificTipsCarousel />);
+
+      // Check for source label translation key
+      expect(screen.getByText('brain.sourceLabel')).toBeInTheDocument();
+    });
+
+    it('renders external link button for source', () => {
+      const { container } = render(<ScientificTipsCarousel />);
+
+      // Find the external link anchor tag
+      const externalLink = container.querySelector('a[target="_blank"]');
+      expect(externalLink).toBeInTheDocument();
+      expect(externalLink).toHaveAttribute('rel', 'noopener noreferrer');
+    });
+
+    it('displays tip content with translation key', () => {
+      render(<ScientificTipsCarousel />);
+
+      // Check for tip1 translation key (first tip shown by default)
+      expect(screen.getByText('brain.tips.tip1')).toBeInTheDocument();
+    });
+
+    it('displays source citation with translation key', () => {
+      render(<ScientificTipsCarousel />);
+
+      // Check for source1 translation key (first source shown by default)
+      expect(screen.getByText('brain.tips.source1')).toBeInTheDocument();
+    });
+  });
+
+  describe('navigation functionality', () => {
+    it('navigates to next tip when clicking next button', () => {
+      render(<ScientificTipsCarousel />);
+
+      // Find next button by aria-label
+      const nextButton = screen.getByLabelText('common.next');
+      fireEvent.click(nextButton);
+
+      // After clicking next, tip2 should be displayed
+      expect(screen.getByText('brain.tips.tip2')).toBeInTheDocument();
+    });
+
+    it('navigates to previous tip when clicking previous button', () => {
+      render(<ScientificTipsCarousel />);
+
+      // First go to tip2
+      const nextButton = screen.getByLabelText('common.next');
+      fireEvent.click(nextButton);
+
+      // Then go back to tip1
+      const prevButton = screen.getByLabelText('common.previous');
+      fireEvent.click(prevButton);
+
+      expect(screen.getByText('brain.tips.tip1')).toBeInTheDocument();
+    });
+
+    it('navigates to specific tip when clicking dot indicator', () => {
+      render(<ScientificTipsCarousel />);
+
+      // Click on third dot (tip3)
+      const dots = screen.getAllByLabelText(/Go to tip/);
+      fireEvent.click(dots[2]); // Index 2 = tip3
+
+      expect(screen.getByText('brain.tips.tip3')).toBeInTheDocument();
+    });
+
+    it('wraps around when navigating past last tip', () => {
+      render(<ScientificTipsCarousel />);
+
+      // Go to last tip (tip5)
+      const dots = screen.getAllByLabelText(/Go to tip/);
+      fireEvent.click(dots[4]); // Index 4 = tip5
+
+      // Then click next to wrap to tip1
+      const nextButton = screen.getByLabelText('common.next');
+      fireEvent.click(nextButton);
+
+      expect(screen.getByText('brain.tips.tip1')).toBeInTheDocument();
+    });
+  });
+
+  describe('progress bar', () => {
+    it('renders progress bar at bottom of carousel', () => {
+      const { container } = render(<ScientificTipsCarousel />);
+
+      // Find the progress bar container (h-1 class)
+      const progressBar = container.querySelector('.h-1');
+      expect(progressBar).toBeInTheDocument();
     });
   });
 });

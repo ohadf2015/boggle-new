@@ -12,7 +12,15 @@ jest.mock('@/utils/ThemeContext', () => ({
 // Mock framer-motion to avoid matchMedia issues
 jest.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    div: ({ children, ...props }: any) => {
+      // Filter out framer-motion specific props
+      const { custom, variants, initial, animate, exit, transition, layoutId, ...htmlProps } = props;
+      return <div {...htmlProps}>{children}</div>;
+    },
+    span: ({ children, ...props }: any) => {
+      const { layoutId, transition, ...htmlProps } = props;
+      return <span {...htmlProps}>{children}</span>;
+    },
   },
   AnimatePresence: ({ children }: any) => children,
 }));
@@ -49,7 +57,7 @@ describe('ScientificTipsCarousel - RTL Arrow Direction', () => {
     // After clicking previous from index 0, should be at index 4 (wrap around)
     const dots = screen.getAllByLabelText(/Go to tip/i);
     // The 5th dot (index 4) should be active
-    expect(dots[4]).toHaveClass('scale-125');
+    expect(dots[4]).toHaveClass('scale-150');
   });
 
   it('should navigate to previous tip when LEFT arrow is clicked in RTL (arrows flip visually, not semantically)', () => {
@@ -66,7 +74,7 @@ describe('ScientificTipsCarousel - RTL Arrow Direction', () => {
 
     const dots = screen.getAllByLabelText(/Go to tip/i);
     // Should wrap to index 4
-    expect(dots[4]).toHaveClass('scale-125');
+    expect(dots[4]).toHaveClass('scale-150');
   });
 
   it('should navigate to next tip when RIGHT arrow is clicked in RTL', () => {
@@ -80,7 +88,7 @@ describe('ScientificTipsCarousel - RTL Arrow Direction', () => {
     fireEvent.click(rightVisualButton);
 
     const dots = screen.getAllByLabelText(/Go to tip/i);
-    expect(dots[1]).toHaveClass('scale-125');
+    expect(dots[1]).toHaveClass('scale-150');
   });
 
   it('should have consistent navigation behavior in LTR and RTL', () => {
@@ -92,7 +100,7 @@ describe('ScientificTipsCarousel - RTL Arrow Direction', () => {
 
     fireEvent.click(leftButton);
     let dots = screen.getAllByLabelText(/Go to tip/i);
-    const ltrPreviousIndex = dots.findIndex(dot => dot.classList.contains('scale-125'));
+    const ltrPreviousIndex = dots.findIndex(dot => dot.classList.contains('scale-150'));
     unmount1();
 
     // Test RTL - fresh render
@@ -103,7 +111,7 @@ describe('ScientificTipsCarousel - RTL Arrow Direction', () => {
 
     fireEvent.click(leftButton);
     dots = screen.getAllByLabelText(/Go to tip/i);
-    const rtlPreviousIndex = dots.findIndex(dot => dot.classList.contains('scale-125'));
+    const rtlPreviousIndex = dots.findIndex(dot => dot.classList.contains('scale-150'));
 
     // Both should navigate to the same semantic position (previous)
     expect(ltrPreviousIndex).toBe(rtlPreviousIndex);

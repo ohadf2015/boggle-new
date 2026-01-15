@@ -70,9 +70,9 @@ export function MobileDrawer({
                   variant="ghost"
                   size="icon"
                   onClick={onClose}
-                  className="h-8 w-8 border-2"
+                  className="h-8 w-8 border-2 border-neo-black text-neo-black hover:bg-neo-black/10"
                 >
-                  <X />
+                  <X className="text-neo-black" />
                 </Button>
               </div>
             )}

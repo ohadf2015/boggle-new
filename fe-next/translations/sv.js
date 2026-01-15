@@ -3102,12 +3102,19 @@ const sv = {
       "master": "Mästare"
     },
     "tips": {
-      "tip1": "Arbetsminneskapaciteten kan öka med 15% med bara 2 veckors daglig ordspelsträning.",
-      "tip2": "Bearbetningshastigheten når sin topp med konsekvent daglig träning - din hjärna bildar snabbare nervbanor.",
-      "tip3": "Att hitta sällsynta ord aktiverar djupare ordförrådsåterhämtning - en viktig kognitiv färdighet.",
-      "tip4": "Att upprätthålla kombos tränar uthållig uppmärksamhet - avgörande för fokus i vardagen.",
-      "tip5": "Att växla mellan ordlängder bygger kognitiv flexibilitet - mental anpassningsförmåga."
-    }
+      "tip1": "En studie på 51 vuxna visade att kognitiv träning förbättrade uppmärksamhetsväxlingen med 15% på bara 3 veckor.",
+      "tip2": "Duke Universitys forskning visade att ordpussel överträffade digitala hjärnspel i att bromsa minnesförsämring över 78 veckor.",
+      "tip3": "En studie från 2025 visade att hjärnträning ökade acetylkolinproduktionen med 2,3% - 'uppmärksamhetskemikalien' för minne.",
+      "tip4": "Metaanalys av 16 studier bekräftar att kognitiv träning visar betydande förbättringar i arbetsminne och bearbetningshastighet.",
+      "tip5": "45% av demensrisken kommer från modifierbara faktorer - regelbundna mentala utmaningar bygger kognitiv reserv.",
+      "source1": "NIH: Kognitiv funktion hos friska personer",
+      "source2": "Duke University Medical School",
+      "source3": "NBC News: Hjärnkemiforskning",
+      "source4": "NIH: Hjärnträning metaanalys",
+      "source5": "National Geographic: Hjärnhälsa"
+    },
+    "researchBacked": "Forskningsbaserat",
+    "sourceLabel": "Källa"
   },
   "levelUp": {
     "title": "Nivå Upp!",

@@ -273,7 +273,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="max-w-xl mx-auto space-y-4 px-2 xs:px-4"
+        className="max-w-xl mx-auto space-y-4 px-2 xs:px-4 min-h-[calc(100vh-12rem)] flex flex-col justify-center"
       >
         {/* Header */}
         <div className="relative flex items-center justify-center mb-2">

@@ -165,7 +165,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
 
   // Render Lobby Tab (Settings + Players combined)
   const renderLobbyContent = () => (
-    <div className="flex flex-col h-full p-3 gap-3 overflow-y-auto">
+    <div className="flex flex-col h-full p-3 gap-3 overflow-y-auto min-h-0">
       {/* Quick Presets */}
       <div className="flex gap-2">
         {(Object.keys(GAME_PRESETS) as PresetKey[]).map((key) => {
@@ -211,8 +211,8 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
         </label>
       </div>
 
-      {/* Players Section - constrained height to keep Start button visible */}
-      <div className="min-h-0 max-h-[35vh] bg-slate-700/30 rounded-neo border border-slate-600 overflow-hidden flex flex-col">
+      {/* Players Section - flex-1 to take remaining space, constrained by parent */}
+      <div className="flex-1 min-h-0 bg-slate-700/30 rounded-neo border border-slate-600 overflow-hidden flex flex-col">
         <div className="flex items-center gap-2 px-2 py-1.5 border-b border-slate-600/50 flex-shrink-0">
           <Users className="w-4 h-4 text-neo-pink" />
           <span className="text-xs font-bold uppercase text-neo-cream">

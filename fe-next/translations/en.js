@@ -3105,12 +3105,19 @@ const en = {
       "master": "Master"
     },
     "tips": {
-      "tip1": "Working memory capacity can increase 15% with just 2 weeks of daily word game practice.",
-      "tip2": "Processing speed peaks with consistent daily practice - your brain forms faster neural pathways.",
-      "tip3": "Finding rare words activates deeper vocabulary retrieval - a key cognitive skill.",
-      "tip4": "Maintaining combos trains sustained attention - crucial for real-world focus.",
-      "tip5": "Switching between word lengths builds cognitive flexibility - mental adaptability."
-    }
+      "tip1": "A study of 51 adults showed cognitive training improved attention-switching speed by 15% in just 3 weeks of practice.",
+      "tip2": "Duke University research found word puzzles outperformed digital brain games in slowing memory decline over 78 weeks.",
+      "tip3": "A 2025 study showed brain training boosted acetylcholine production by 2.3% - the 'pay attention' chemical for memory.",
+      "tip4": "Meta-analysis of 16 studies confirms cognitive training shows significant improvements in working memory and processing speed.",
+      "tip5": "45% of dementia risk comes from modifiable factors - regular mental challenges build cognitive reserve.",
+      "source1": "NIH: Cognitive Function in Healthy Subjects",
+      "source2": "Duke University Medical School",
+      "source3": "NBC News: Brain Chemistry Research",
+      "source4": "NIH: Brain Training Meta-Analysis",
+      "source5": "National Geographic: Brain Health"
+    },
+    "researchBacked": "Research-Backed",
+    "sourceLabel": "Source"
   },
   "levelUp": {
     "title": "Level Up!",

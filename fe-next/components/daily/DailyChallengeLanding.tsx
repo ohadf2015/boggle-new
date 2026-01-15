@@ -182,18 +182,18 @@ export function DailyChallengeLanding({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="flex-1 flex flex-col items-center justify-center px-3 py-4 sm:p-6 max-w-2xl mx-auto w-full"
+      className="flex-1 flex flex-col items-center justify-center px-2 py-2 sm:px-4 sm:py-4 max-w-2xl mx-auto w-full"
     >
-      {/* Premium Countdown Banner with glow */}
+      {/* Compact Countdown Banner with glow */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.9, y: -20 }}
+        initial={{ opacity: 0, scale: 0.9, y: -10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-        className="mb-4 sm:mb-6 relative"
+        className="mb-2 sm:mb-4 relative"
       >
         {/* Animated glow ring behind */}
         <motion.div
-          className="absolute -inset-2 rounded-2xl blur-md -z-10"
+          className="absolute -inset-1 sm:-inset-2 rounded-xl sm:rounded-2xl blur-md -z-10"
           animate={{
             opacity: [0.3, 0.5, 0.3],
             scale: [1, 1.02, 1],
@@ -201,18 +201,18 @@ export function DailyChallengeLanding({
           transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           style={{ background: 'radial-gradient(circle, rgba(191,255,0,0.3) 0%, transparent 70%)' }}
         />
-        <div className="inline-flex items-center gap-3 px-5 py-3 bg-neo-navy-light/90 backdrop-blur-sm border-3 border-neo-lime/50 rounded-xl shadow-hard">
+        <div className="inline-flex items-center gap-2 sm:gap-3 px-3 py-2 sm:px-5 sm:py-3 bg-neo-navy-light/90 backdrop-blur-sm border-2 sm:border-3 border-neo-lime/50 rounded-lg sm:rounded-xl shadow-hard">
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
           >
-            <Clock className="w-5 h-5 text-neo-lime" />
+            <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-neo-lime" />
           </motion.div>
-          <span className="text-xs sm:text-sm font-bold text-neo-lime/90 uppercase tracking-wide">
+          <span className="text-[10px] sm:text-xs font-bold text-neo-lime/90 uppercase tracking-wide hidden xs:inline">
             {t('daily.nextPuzzleIn')}
           </span>
           <motion.span
-            className="text-lg sm:text-xl font-black text-neo-lime tabular-nums min-w-[6em] text-center"
+            className="text-base sm:text-xl font-black text-neo-lime tabular-nums min-w-[5em] sm:min-w-[6em] text-center"
             animate={{ textShadow: ['0 0 10px rgba(191,255,0,0.5)', '0 0 20px rgba(191,255,0,0.8)', '0 0 10px rgba(191,255,0,0.5)'] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
@@ -221,28 +221,28 @@ export function DailyChallengeLanding({
         </div>
       </motion.div>
 
-      {/* Enhanced Header with gradient */}
+      {/* Enhanced Header with gradient - more compact on mobile */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="text-center mb-5 sm:mb-8"
+        className="text-center mb-3 sm:mb-6"
       >
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-neo-display font-black bg-gradient-to-r from-neo-lime via-neo-cyan to-neo-lime bg-clip-text text-transparent bg-[length:200%_auto] animate-[gradient-flow_4s_ease_infinite]">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-neo-display font-black bg-gradient-to-r from-neo-lime via-neo-cyan to-neo-lime bg-clip-text text-transparent bg-[length:200%_auto] animate-[gradient-flow_4s_ease_infinite]">
           {t('daily.chooseQuest')}
         </h1>
       </motion.div>
 
-      {/* Challenge Cards - Premium Grid */}
+      {/* Challenge Cards - Premium Grid - tighter on mobile */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.15 }}
-        className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 w-full"
+        className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full"
       >
         {/* Word Hunt Card - TIMED */}
         <CompactChallengeCard
-          icon={<Timer className="w-8 h-8 sm:w-10 sm:h-10" />}
+          icon={<Timer className="w-7 h-7 sm:w-10 sm:h-10" />}
           title={t('daily.wordHunt.title')}
           tagline={t('daily.wordHunt.desc')}
           color="orange"
@@ -251,6 +251,7 @@ export function DailyChallengeLanding({
           timeMode="timed"
           timeModeLabel={t('daily.timed90Seconds')}
           customPreview="word-hunt-grid"
+          currentLanguage={currentLanguage}
           buttonText={
             status.wordHunt === 'done'
               ? t('daily.viewResults')
@@ -343,16 +344,27 @@ export function DailyChallengeLanding({
   );
 }
 
-// Mini Letter Grid Preview for Word Hunt
-const PREVIEW_LETTERS = ['W', 'O', 'R', 'D', 'H', 'U', 'N', 'T', '!'];
-const HIGHLIGHT_PATH = [0, 1, 2, 3]; // W-O-R-D swipe path
+// Language-specific preview letters for Word Hunt mini grid
+// Each forms a meaningful word path when swiped in the preview
+const PREVIEW_LETTERS_BY_LANG: Record<Language, string[]> = {
+  en: ['W', 'O', 'R', 'D', 'H', 'U', 'N', 'T', '!'], // WORD swipe
+  he: ['מ', 'י', 'ל', 'ה', 'ש', 'ח', 'ק', '!', '★'], // מילה (word) swipe
+  sv: ['O', 'R', 'D', 'J', 'A', 'K', 'T', '!', '★'], // ORD (word) swipe
+  ja: ['言', '葉', '探', '索', 'ゲ', 'ー', 'ム', '!', '★'], // 言葉 (word) swipe
+  es: ['P', 'A', 'L', 'A', 'B', 'R', 'A', 'S', '!'], // PALA swipe (from PALABRAS)
+  fr: ['M', 'O', 'T', 'S', 'J', 'E', 'U', '!', '★'], // MOTS (words) swipe
+  de: ['W', 'O', 'R', 'T', 'S', 'P', 'I', 'E', 'L'], // WORT (word) swipe
+};
+const HIGHLIGHT_PATH = [0, 1, 2, 3]; // First 4 letters form the word
 
-function WordHuntMiniGrid({ isHovered }: { isHovered: boolean }) {
+function WordHuntMiniGrid({ isHovered, language }: { isHovered: boolean; language: Language }) {
+  const letters = PREVIEW_LETTERS_BY_LANG[language] || PREVIEW_LETTERS_BY_LANG.en;
+
   return (
-    <div className="relative w-full aspect-square max-h-48 sm:max-h-56 rounded-xl overflow-hidden mb-3 border-3 border-neo-black shadow-hard bg-slate-900/90">
-      {/* Grid container */}
-      <div className="absolute inset-2 grid grid-cols-3 gap-1.5 sm:gap-2">
-        {PREVIEW_LETTERS.map((letter, idx) => {
+    <div className="relative w-full aspect-square max-h-32 sm:max-h-44 rounded-xl overflow-hidden mb-2 sm:mb-3 border-3 border-neo-black shadow-hard bg-neo-cream">
+      {/* Grid container - white background like in-game */}
+      <div className="absolute inset-1.5 sm:inset-2 grid grid-cols-3 gap-1 sm:gap-1.5">
+        {letters.map((letter, idx) => {
           const isInPath = HIGHLIGHT_PATH.includes(idx);
           const pathIndex = HIGHLIGHT_PATH.indexOf(idx);
 
@@ -360,11 +372,11 @@ function WordHuntMiniGrid({ isHovered }: { isHovered: boolean }) {
             <motion.div
               key={idx}
               className={cn(
-                'flex items-center justify-center rounded-lg border-2 border-neo-black font-neo-display font-black',
-                'text-lg sm:text-2xl shadow-hard-sm transition-colors duration-200',
+                'flex items-center justify-center rounded-md sm:rounded-lg border-2 border-neo-black/30 font-neo-display font-black',
+                'text-sm sm:text-xl shadow-sm transition-colors duration-200',
                 isInPath && isHovered
                   ? 'bg-neo-orange text-neo-black border-neo-orange'
-                  : 'bg-slate-800 text-neo-white/90'
+                  : 'letter-tile-gradient text-neo-black'
               )}
               initial={false}
               animate={
@@ -404,8 +416,8 @@ function WordHuntMiniGrid({ isHovered }: { isHovered: boolean }) {
       )}
 
       {/* Neo-brutalist corner accents */}
-      <div className="absolute top-0 start-0 w-6 h-6 bg-neo-orange border-e-2 border-b-2 border-neo-black" />
-      <div className="absolute bottom-0 end-0 w-6 h-6 bg-neo-yellow border-s-2 border-t-2 border-neo-black" />
+      <div className="absolute top-0 start-0 w-5 h-5 sm:w-6 sm:h-6 bg-neo-orange border-e-2 border-b-2 border-neo-black" />
+      <div className="absolute bottom-0 end-0 w-5 h-5 sm:w-6 sm:h-6 bg-neo-yellow border-s-2 border-t-2 border-neo-black" />
     </div>
   );
 }
@@ -425,6 +437,8 @@ interface CompactChallengeCardProps {
   delay?: number;
   /** Custom preview element (e.g., mini letter grid) */
   customPreview?: 'word-hunt-grid';
+  /** Current language for language-aware previews */
+  currentLanguage?: Language;
   /** AI-generated preview image URL for visual appeal */
   previewImageUrl?: string;
   /** Alt text for the preview image */
@@ -448,6 +462,7 @@ function CompactChallengeCard({
   badge,
   delay = 0,
   customPreview,
+  currentLanguage = 'en',
   previewImageUrl,
   previewImageAlt,
   onRequestChallenge,
@@ -545,7 +560,7 @@ function CompactChallengeCard({
         tabIndex={0}
         onKeyDown={(e) => e.key === 'Enter' && handleClick()}
         className={cn(
-          'relative w-full bg-slate-900/95 rounded-xl border-3 border-neo-black p-4 sm:p-5',
+          'relative w-full bg-slate-900/95 rounded-xl border-3 border-neo-black p-3 sm:p-4',
           'shadow-hard transition-shadow duration-200',
           'flex flex-col items-center text-center cursor-pointer',
           'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime',
@@ -605,30 +620,30 @@ function CompactChallengeCard({
           ) : null}
         </div>
 
-        {/* Time Mode Badge - Prominent at top */}
+        {/* Time Mode Badge - Prominent at top, compact on mobile */}
         <motion.div
           whileHover={showEffects ? { scale: 1.05 } : {}}
           className={cn(
-            'flex items-center gap-1.5 px-3 py-1.5 rounded-full mb-3',
-            'border-2 font-bold text-sm uppercase tracking-wide',
+            'flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full mb-2 sm:mb-3',
+            'border-2 font-bold text-xs sm:text-sm uppercase tracking-wide',
             timeMode === 'timed'
               ? 'bg-neo-orange/20 border-neo-orange text-neo-orange'
               : 'bg-neo-cyan/20 border-neo-cyan text-neo-cyan'
           )}
         >
           {timeMode === 'timed' ? (
-            <Timer className="w-4 h-4" />
+            <Timer className="w-3 h-3 sm:w-4 sm:h-4" />
           ) : (
-            <Hourglass className="w-4 h-4" />
+            <Hourglass className="w-3 h-3 sm:w-4 sm:h-4" />
           )}
           <span>{timeModeLabel}</span>
         </motion.div>
 
         {/* Preview: Custom Grid, Image, or Icon */}
         {customPreview === 'word-hunt-grid' ? (
-          <WordHuntMiniGrid isHovered={isHovered} />
+          <WordHuntMiniGrid isHovered={isHovered} language={currentLanguage} />
         ) : showImage ? (
-          <div className="relative w-full aspect-square max-h-48 sm:max-h-56 rounded-xl overflow-hidden mb-3 border-3 border-neo-black shadow-hard">
+          <div className="relative w-full aspect-square max-h-32 sm:max-h-44 rounded-xl overflow-hidden mb-2 sm:mb-3 border-3 border-neo-black shadow-hard">
             <Image
               src={previewImageUrl}
               alt={previewImageAlt || title}
@@ -639,8 +654,8 @@ function CompactChallengeCard({
               priority
             />
             {/* Neo-brutalist corner accents */}
-            <div className="absolute top-0 start-0 w-6 h-6 bg-neo-cyan border-e-2 border-b-2 border-neo-black" />
-            <div className="absolute bottom-0 end-0 w-6 h-6 bg-neo-pink border-s-2 border-t-2 border-neo-black" />
+            <div className="absolute top-0 start-0 w-5 h-5 sm:w-6 sm:h-6 bg-neo-cyan border-e-2 border-b-2 border-neo-black" />
+            <div className="absolute bottom-0 end-0 w-5 h-5 sm:w-6 sm:h-6 bg-neo-pink border-s-2 border-t-2 border-neo-black" />
             {/* Subtle gradient for text readability */}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent" />
           </div>
@@ -649,7 +664,7 @@ function CompactChallengeCard({
             whileHover={showEffects ? { scale: 1.1, rotate: 5 } : {}}
             transition={{ type: 'spring', stiffness: 400 }}
             className={cn(
-              'flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-xl mb-3',
+              'flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl mb-2 sm:mb-3',
               'border-2 border-neo-black shadow-hard-sm',
               styles.iconBg,
               styles.text
@@ -660,12 +675,12 @@ function CompactChallengeCard({
         )}
 
         {/* Title */}
-        <h2 className={cn('text-xl sm:text-2xl font-neo-display font-black mb-1', styles.text)}>
+        <h2 className={cn('text-lg sm:text-xl font-neo-display font-black mb-0.5 sm:mb-1', styles.text)}>
           {title}
         </h2>
 
         {/* Tagline */}
-        <p className="text-xs sm:text-sm text-slate-400 mb-4 line-clamp-2 px-2">
+        <p className="text-[11px] sm:text-sm text-slate-400 mb-2 sm:mb-3 line-clamp-2 px-1 sm:px-2">
           {tagline}
         </p>
 
@@ -673,7 +688,7 @@ function CompactChallengeCard({
         {isUnavailable ? (
           <div
             className={cn(
-              'w-full py-2.5 sm:py-3 text-sm sm:text-base font-black uppercase rounded-lg',
+              'w-full py-2 sm:py-2.5 text-xs sm:text-sm font-black uppercase rounded-lg',
               'flex items-center justify-center gap-2',
               requestState === 'sent'
                 ? 'bg-neo-lime/20 text-neo-lime border-2 border-neo-lime'
@@ -701,7 +716,7 @@ function CompactChallengeCard({
         ) : (
           <div
             className={cn(
-              'relative w-full py-2.5 sm:py-3 text-sm sm:text-base font-black uppercase rounded-lg overflow-hidden',
+              'relative w-full py-2 sm:py-2.5 text-xs sm:text-sm font-black uppercase rounded-lg overflow-hidden',
               styles.bg,
               'text-neo-black border-2 border-neo-black shadow-hard-sm',
               'transition-all'
