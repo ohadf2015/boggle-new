@@ -56,7 +56,7 @@ export function MobileDrawer({
             className={cn(
               'mobile-drawer',
               heightClasses[height],
-              'overflow-hidden flex flex-col z-[60]',
+              'overflow-hidden flex flex-col z-[60] fixed inset-x-0 bottom-0 bg-neo-cream rounded-t-2xl border-t-4 border-x-4 border-neo-black',
               className
             )}
           >

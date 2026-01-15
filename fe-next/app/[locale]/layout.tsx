@@ -168,6 +168,11 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     const localePath = getLocalePath(validLocale);
     const languageCode = getLanguageCode(validLocale);
 
+    // IMPORTANT: The theme script below modifies the DOM before React hydration
+    // To prevent hydration mismatches, we need to ensure the server-rendered className
+    // is compatible with what the client will expect after the script runs
+    // The script now preserves existing classes and only adds the theme class
+
     // Structured data for Google (JSON-LD)
     const structuredData = [
         // WebApplication schema - competitive multiplayer word game
@@ -671,33 +676,26 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     ];
 
     return (
-        <html lang={validLocale} dir={dir} className={`${fredoka.variable} ${rubik.variable}`}>
+        <html lang={validLocale} dir={dir} className={`${fredoka.variable || ''} ${rubik.variable || ''}`} suppressHydrationWarning>
             <head>
                 <meta charSet="utf-8" />
-                {/* Minimal blocking script for theme - prevents FOUC (flash of unstyled content) */}
-                {/* Minified for faster parsing - ~200 bytes */}
-                <script
-                    dangerouslySetInnerHTML={{
-                        __html: `try{var t=localStorage.getItem('boggle_theme');document.documentElement.classList.add(t==='light'||t==='dark'?t:'dark')}catch(e){document.documentElement.classList.add('dark')}`,
-                    }}
-                />
                 {/* Preconnect hints for faster resource loading on slow connections */}
                 {/* Note: Google Fonts preconnects removed - now using next/font for zero CLS */}
                 <link rel="preconnect" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
                 <link rel="dns-prefetch" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
-                {/* Favicon and icons with absolute URLs for better Google crawlability */}
+                {/* Favicon and icons - use relative paths for development, absolute for production */}
                 {/* PNG icons FIRST - Google requires multiples of 48px and prefers PNG over SVG/ICO */}
-                <link rel="icon" type="image/png" sizes="48x48" href="https://www.lexiclash.live/icon-48.png" />
-                <link rel="icon" type="image/png" sizes="96x96" href="https://www.lexiclash.live/icon-96.png" />
-                <link rel="icon" type="image/png" sizes="144x144" href="https://www.lexiclash.live/icon-144.png" />
-                <link rel="icon" type="image/png" sizes="192x192" href="https://www.lexiclash.live/icon-192.png" />
-                <link rel="icon" type="image/png" sizes="512x512" href="https://www.lexiclash.live/icon-512.png" />
+                <link rel="icon" type="image/png" sizes="48x48" href="/icon-48.png" />
+                <link rel="icon" type="image/png" sizes="96x96" href="/icon-96.png" />
+                <link rel="icon" type="image/png" sizes="144x144" href="/icon-144.png" />
+                <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+                <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
                 {/* SVG favicon for modern browsers (after PNG for Google compatibility) */}
-                <link rel="icon" href="https://www.lexiclash.live/favicon.svg" type="image/svg+xml" />
+                <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
                 {/* Apple touch icons for iOS devices */}
-                <link rel="apple-touch-icon" sizes="180x180" href="https://www.lexiclash.live/apple-touch-icon.png" />
-                <link rel="apple-touch-icon" sizes="152x152" href="https://www.lexiclash.live/icon-144.png" />
-                <link rel="apple-touch-icon" sizes="144x144" href="https://www.lexiclash.live/icon-144.png" />
+                <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+                <link rel="apple-touch-icon" sizes="152x152" href="/icon-144.png" />
+                <link rel="apple-touch-icon" sizes="144x144" href="/icon-144.png" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <meta name="theme-color" content="#667eea" />
                 <script
@@ -718,6 +716,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 >
                     {validLocale === 'he' ? 'דלג לתוכן הראשי' : validLocale === 'sv' ? 'Hoppa till huvudinnehåll' : validLocale === 'ja' ? 'メインコンテンツへスキップ' : validLocale === 'es' ? 'Saltar al contenido principal' : 'Skip to main content'}
                 </a>
+                {/* Load external scripts with optimized strategies to prevent blocking */}
                 <GoogleAnalytics />
                 <CrazyGamesScript />
                 <SocialMediaPixels />

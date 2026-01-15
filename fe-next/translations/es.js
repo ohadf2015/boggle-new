@@ -1970,7 +1970,12 @@ const es = {
       "getStarted": "¡Empecemos!",
       "ready": "¡Listo!",
       "readyForMultiplayer": "¡Estás listo para multijugador!",
-      "tapForDetails": "Toca para ver detalles"
+      "tapForDetails": "Toca para ver detalles",
+      "firstWord": "Encuentra primera palabra",
+      "diagonal": "Desliza en diagonal",
+      "directionChange": "Cambia de dirección",
+      "targetScore": "Consigue 15 puntos",
+      "fiveWords": "Encuentra 5 palabras"
     },
     "unlock": {
       "title": "Habilidad desbloqueada",

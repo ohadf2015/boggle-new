@@ -1269,7 +1269,12 @@ const en = {
       "getStarted": "Let's get started!",
       "ready": "Ready!",
       "readyForMultiplayer": "You're ready for multiplayer!",
-      "tapForDetails": "Tap for details"
+      "tapForDetails": "Tap for details",
+      "firstWord": "Find First Word",
+      "diagonal": "Swipe Diagonally",
+      "directionChange": "Change Direction",
+      "targetScore": "Score 15 Points",
+      "fiveWords": "Find 5 Words"
     },
     "unlock": {
       "title": "Skill Unlocked!",

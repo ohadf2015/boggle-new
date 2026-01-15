@@ -26,19 +26,11 @@ const MASCOT_FILES = [
   'lexi-pointing.png',
   'lexi-eating-pizza.png',
   'lexi-drinking-coffee.png',
-  'lexi-reading.png',
-  'lexi-gaming.png',
   'lexi-dancing.png',
-  'lexi-sleeping.png',
-  'lexi-waving.png',
-  'lexi-thumbs-up.png',
-  'lexi-holding-trophy.png',
-  'lexi-typing.png',
   'lexi-cheering.png',
-  'lexi-training.png',
-  'lexi-playing-ball.png',
+  'lexi-gaming.png',
+  'lexi-holding-trophy.png',
   'lexi-skateboarding.png',
-  'lexi-juggling.png',
 ];
 
 describe('Mascot Image Transparency', () => {

@@ -931,19 +931,20 @@ const InGameScreen = memo<InGameScreenProps>(({
       <div className="flex flex-col lg:flex-row gap-0 md:gap-2 lg:gap-3 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out h-full max-h-[100dvh]">
 
         {/* Top Bar - Only on mobile, integrated into parent on desktop */}
-        <div className="lg:hidden w-full flex items-center justify-between px-1 flex-shrink-0">
-          <div className="flex items-center gap-2">
+        {/* Compact header matching SinglePlayerGame layout with py-0.5 */}
+        <div className="lg:hidden w-full flex items-center justify-between px-1 py-0.5 flex-shrink-0">
+          <div className="flex items-center gap-1.5">
             {onExitRoom && (
-              <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} className="relative z-50" />
+              <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} className="relative z-50 !min-h-[40px] !border-2" />
             )}
             {onShowTutorial && (
               <motion.button
                 onClick={onShowTutorial}
                 whileTap={{ scale: 0.95 }}
-                className="w-9 h-9 bg-neo-pink/90 border-2 border-neo-black rounded-full shadow-hard flex items-center justify-center"
+                className="w-8 h-8 bg-neo-pink/90 border-2 border-neo-black rounded-full shadow-hard-sm flex items-center justify-center"
                 aria-label={t('help.viewTutorial') || 'View Tutorial'}
               >
-                <HelpCircle className="w-4 h-4 text-neo-cream" />
+                <HelpCircle className="w-3.5 h-3.5 text-neo-cream" />
               </motion.button>
             )}
           </div>
@@ -1026,9 +1027,9 @@ const InGameScreen = memo<InGameScreenProps>(({
 
         {/* Center Column: Timer, Score, Grid */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden max-h-full">
-          {/* Stats row - Mobile: tight layout like single player; Desktop: absolute positioning */}
+          {/* Stats row - Mobile: horizontal layout matching SinglePlayerGame (Combo | Timer | Score) */}
           {remainingTime !== null && (
-            <div ref={gameStatsRef} className="relative flex w-full items-center justify-between lg:justify-center flex-shrink-0 px-1 md:px-2 lg:px-0 gap-0 overflow-visible" role="status" aria-label="Game status">
+            <div ref={gameStatsRef} className="flex w-full items-center justify-between px-1 md:px-2 gap-0" role="status" aria-label="Game status">
               {/* Exit + Help + Hint - hidden on mobile (shown in top bar), visible on desktop */}
               <div className="absolute left-2 rtl:left-auto rtl:right-2 md:left-4 md:rtl:right-4 top-1/2 -translate-y-1/2 hidden lg:flex items-center gap-2 z-30">
                 {onExitRoom && (
@@ -1067,10 +1068,18 @@ const InGameScreen = memo<InGameScreenProps>(({
                 )}
               </div>
 
-              {/* Left side placeholder - matches single player layout (Combo | Timer | Score) */}
-              <div className="flex-1 flex justify-end pr-1 md:pr-3 pointer-events-none lg:hidden" />
+              {/* Left Side: Combo - matches SinglePlayerGame horizontal layout */}
+              <div className="flex-1 flex justify-end pr-1 md:pr-3 pointer-events-none lg:hidden">
+                <div className="pointer-events-auto">
+                  {isPlaying && comboLevel > 0 ? (
+                    <ComboDisplay comboLevel={comboLevel} compact timeRemaining={comboTimeRemaining} isDanger={comboDanger} />
+                  ) : (
+                    <div className="min-w-[50px] md:min-w-[90px]" aria-hidden="true" />
+                  )}
+                </div>
+              </div>
 
-              {/* Timer (center - always visible and prominent, tighter layout like single player) */}
+              {/* Timer (center) */}
               <motion.div
                 data-tutorial="timer"
                 initial={{ scale: 0, opacity: 0 }}
@@ -1088,59 +1097,88 @@ const InGameScreen = memo<InGameScreenProps>(({
                 </div>
               </motion.div>
 
-              {/* Combo + Score - Mobile: flex-1 like single player; Desktop: absolutely positioned */}
+              {/* Right Side: Score - matches SinglePlayerGame horizontal layout */}
               {isPlaying && (
-                <div className={`
-                  flex-1 flex flex-col items-end rtl:items-start gap-0.5 md:gap-2 z-30
-                  lg:flex-none lg:absolute lg:right-4 lg:rtl:right-auto lg:rtl:left-4 lg:top-1/2 lg:-translate-y-1/2
-                  pl-1 md:pl-3 pointer-events-none lg:pointer-events-auto lg:pl-0
-                `}>
-                  {/* Combo container - fixed height to prevent layout shift */}
-                  <div className="h-[24px] md:h-[32px] flex items-center justify-end rtl:justify-start">
+                <div className="flex-1 flex justify-start pl-1 md:pl-3 pointer-events-none lg:hidden">
+                  <div className="pointer-events-auto">
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px] overflow-hidden"
+                      style={{
+                        background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
+                      }}
+                    >
+                      <div className="text-center">
+                        <motion.div
+                          key={playerData.score}
+                          initial={{ scale: 1.3 }}
+                          animate={{ scale: 1 }}
+                          className="font-black text-neo-black leading-tight text-lg md:text-2xl"
+                          style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
+                        >
+                          {playerData.score}
+                        </motion.div>
+                        <div className="font-bold uppercase tracking-wider text-neo-black/80 text-[9px] md:text-xs">
+                          {t('common.score') || 'Score'}
+                        </div>
+                      </div>
+                      {/* Rank badge */}
+                      {playerData.rank && playerData.rank > 0 && leaderboard.length > 1 && (
+                        <div className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-4 h-4 md:w-6 md:h-6 bg-neo-pink text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-[8px] md:text-xs font-black shadow-hard-sm">
+                          #{playerData.rank}
+                        </div>
+                      )}
+                    </motion.div>
+                  </div>
+                </div>
+              )}
+
+              {/* Desktop: Combo + Score absolutely positioned on right */}
+              {isPlaying && (
+                <div className="hidden lg:flex lg:flex-col lg:items-end lg:gap-2 lg:absolute lg:right-4 rtl:lg:right-auto rtl:lg:left-4 lg:top-1/2 lg:-translate-y-1/2 z-30">
+                  {/* Combo */}
+                  <div className="h-[32px] flex items-center justify-end">
                     {comboLevel > 0 ? (
                       <ComboDisplay comboLevel={comboLevel} compact timeRemaining={comboTimeRemaining} isDanger={comboDanger} />
                     ) : (
-                      /* Subtle hint - hidden on very small screens to save space */
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 0.5 }}
-                        className="hidden sm:block text-[8px] md:text-[10px] text-neo-cream/40 text-right rtl:text-left leading-tight max-w-[70px]"
+                        className="text-[10px] text-neo-cream/40 text-right leading-tight max-w-[70px]"
                       >
                         <span className="text-neo-cyan/60">⚡</span> {t('game.comboHint') || 'Find words fast!'}
                       </motion.div>
                     )}
                   </div>
-
-                  {/* Score - compact on mobile to prevent overflow - Premium gradient */}
+                  {/* Score */}
                   <motion.div
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px] pointer-events-auto overflow-hidden"
+                    className="relative border-3 border-neo-black rounded-neo shadow-hard-lg px-4 py-1.5 min-w-[90px] overflow-hidden"
                     style={{
                       background: 'linear-gradient(135deg, #BFFF00 0%, #9AFF00 50%, #FFE135 100%)',
                     }}
                     whileHover={{ scale: 1.05 }}
                   >
-                    {/* Subtle shine effect on score card */}
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_3s_ease-in-out_infinite]" />
                     <div className="text-center">
                       <motion.div
                         key={playerData.score}
                         initial={{ scale: 1.3 }}
                         animate={{ scale: 1 }}
-                        className="text-base md:text-2xl lg:text-3xl font-black text-neo-black leading-tight"
+                        className="text-3xl font-black text-neo-black leading-tight"
                         style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
                       >
                         {playerData.score}
                       </motion.div>
-                      <div className="text-[8px] md:text-xs lg:text-sm font-bold uppercase tracking-wider text-neo-black flex items-center justify-center gap-0.5">
+                      <div className="text-sm font-bold uppercase tracking-wider text-neo-black flex items-center justify-center gap-0.5">
                         {t('common.score') || 'Score'}
-                        <span className="hidden md:inline"><ScoreBreakdownTooltip t={t} minWordLength={minWordLength} /></span>
+                        <ScoreBreakdownTooltip t={t} minWordLength={minWordLength} />
                       </div>
                     </div>
-                    {/* Rank badge - smaller on mobile */}
                     {playerData.rank && playerData.rank > 0 && (
-                      <div className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-4 h-4 md:w-6 md:h-6 bg-neo-pink text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-[8px] md:text-xs font-black shadow-hard-sm">
+                      <div className="absolute -top-1.5 -right-1.5 rtl:-right-auto rtl:-left-1.5 w-6 h-6 bg-neo-pink text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-xs font-black shadow-hard-sm">
                         #{playerData.rank}
                       </div>
                     )}

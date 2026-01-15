@@ -249,6 +249,131 @@ describe('Game Flow Integration', () => {
   });
 });
 
+describe('Room Auto-Close', () => {
+  let env;
+
+  beforeEach(() => {
+    env = createTestEnvironment();
+  });
+
+  afterEach(() => {
+    env.cleanup();
+  });
+
+  test('room auto-closes when last player (host) leaves in waiting state', async () => {
+    const { gameExists } = require('../../modules/gameStateManager');
+    const hostSocket = env.createSocket();
+    const gameData = env.createGameData();
+
+    // Create game as host
+    await hostSocket.receiveEvent('createGame', gameData);
+    expect(gameExists(gameData.gameCode)).toBe(true);
+
+    hostSocket.clearTracking();
+
+    // Host leaves the room (use hostUsername, not username)
+    await hostSocket.receiveEvent('leaveRoom', {
+      gameCode: gameData.gameCode,
+      username: gameData.hostUsername,
+    });
+
+    // Room should be auto-closed
+    expect(gameExists(gameData.gameCode)).toBe(false);
+    expect(hostSocket.getEmittedEvents()).toContainEvent('leftRoom');
+  });
+
+  test('room auto-closes when last player leaves after others left', async () => {
+    const { gameExists } = require('../../modules/gameStateManager');
+    const hostSocket = env.createSocket();
+    const playerSocket = env.createSocket();
+    const gameData = env.createGameData();
+
+    // Create game as host
+    await hostSocket.receiveEvent('createGame', gameData);
+
+    // Player joins
+    await playerSocket.receiveEvent('join',
+      env.createJoinData(gameData.gameCode, { username: 'Player1' })
+    );
+
+    expect(gameExists(gameData.gameCode)).toBe(true);
+
+    // Player leaves
+    await playerSocket.receiveEvent('leaveRoom', {
+      gameCode: gameData.gameCode,
+      username: 'Player1',
+    });
+
+    // Room should still exist (host is still there)
+    expect(gameExists(gameData.gameCode)).toBe(true);
+
+    hostSocket.clearTracking();
+
+    // Host leaves - should auto-close since they're the last player
+    await hostSocket.receiveEvent('leaveRoom', {
+      gameCode: gameData.gameCode,
+      username: gameData.hostUsername,
+    });
+
+    // Room should be auto-closed
+    expect(gameExists(gameData.gameCode)).toBe(false);
+  });
+
+  test('room auto-closes when host (only player) disconnects', async () => {
+    const { gameExists } = require('../../modules/gameStateManager');
+    const hostSocket = env.createSocket();
+    const gameData = env.createGameData();
+
+    // Create game as host
+    await hostSocket.receiveEvent('createGame', gameData);
+    expect(gameExists(gameData.gameCode)).toBe(true);
+
+    hostSocket.clearTracking();
+
+    // Host disconnects (simulates browser close, network issue, etc.)
+    await hostSocket.disconnect();
+
+    // Room should be auto-closed immediately since host was the only player
+    expect(gameExists(gameData.gameCode)).toBe(false);
+  });
+
+  test('room auto-closes when last non-host player disconnects', async () => {
+    const { gameExists, getGame } = require('../../modules/gameStateManager');
+    const hostSocket = env.createSocket();
+    const playerSocket = env.createSocket();
+    const gameData = env.createGameData();
+
+    // Create game as host
+    await hostSocket.receiveEvent('createGame', gameData);
+
+    // Player joins
+    await playerSocket.receiveEvent('join',
+      env.createJoinData(gameData.gameCode, { username: 'Player1' })
+    );
+
+    expect(gameExists(gameData.gameCode)).toBe(true);
+
+    // Host leaves explicitly (should transfer host to Player1)
+    await hostSocket.receiveEvent('leaveRoom', {
+      gameCode: gameData.gameCode,
+      username: gameData.hostUsername,
+    });
+
+    // Room should still exist (Player1 is now host)
+    expect(gameExists(gameData.gameCode)).toBe(true);
+    const game = getGame(gameData.gameCode);
+    expect(game?.hostUsername).toBe('Player1');
+
+    playerSocket.clearTracking();
+
+    // Player1 (now host) disconnects
+    await playerSocket.disconnect();
+
+    // Room should be auto-closed since Player1 was the only player
+    expect(gameExists(gameData.gameCode)).toBe(false);
+  });
+});
+
 describe('Multi-Player Scenarios', () => {
   let env;
 

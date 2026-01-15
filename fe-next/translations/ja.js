@@ -1266,7 +1266,12 @@ const ja = {
       "getStarted": "始めよう！",
       "ready": "準備完了！",
       "readyForMultiplayer": "マルチプレイヤーの準備ができました！",
-      "tapForDetails": "タップして詳細を見る"
+      "tapForDetails": "タップして詳細を見る",
+      "firstWord": "最初の単語を見つける",
+      "diagonal": "斜めにスワイプ",
+      "directionChange": "方向を変える",
+      "targetScore": "15点獲得",
+      "fiveWords": "5単語見つける"
     },
     "unlock": {
       "title": "スキルをアンロック",

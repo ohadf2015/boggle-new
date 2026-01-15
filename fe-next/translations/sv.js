@@ -1266,7 +1266,12 @@ const sv = {
       "getStarted": "Nu börjar vi!",
       "ready": "Redo!",
       "readyForMultiplayer": "Du är redo för multiplayer!",
-      "tapForDetails": "Tryck för detaljer"
+      "tapForDetails": "Tryck för detaljer",
+      "firstWord": "Hitta första ordet",
+      "diagonal": "Svep diagonalt",
+      "directionChange": "Byt riktning",
+      "targetScore": "Få 15 poäng",
+      "fiveWords": "Hitta 5 ord"
     },
     "unlock": {
       "title": "Färdighet upplåst",

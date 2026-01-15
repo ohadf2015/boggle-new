@@ -95,12 +95,14 @@ class MockSocket extends EventEmitter {
   }
 
   /**
-   * Disconnect the socket
-   * @param {boolean} close - Whether to close the connection
+   * Disconnect the socket and trigger disconnect handlers
+   * @param {boolean} close - Whether this is a transport close (true) or client disconnect (false)
    */
   disconnect(close = false) {
     this.connected = false;
-    this.emit('disconnect', close ? 'transport close' : 'client namespace disconnect');
+    const reason = close ? 'transport close' : 'client namespace disconnect';
+    // Trigger registered disconnect handlers (use receiveEvent to call actual handlers)
+    this.receiveEvent('disconnect', reason);
   }
 
   // ==========================================

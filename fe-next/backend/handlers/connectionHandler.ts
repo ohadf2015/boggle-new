@@ -93,7 +93,14 @@ function handleHostDisconnect(io: Server, socket: Socket, game: Game, gameCode: 
     game.reconnectionTimeout = null;
   }
 
-  // Check if room is now empty (no other players)
+  // Mark host as disconnected BEFORE checking if room is empty
+  // This ensures isRoomEmpty correctly counts the disconnecting host as inactive
+  if (game.users[username]) {
+    game.users[username].disconnected = true;
+    game.users[username].disconnectedAt = Date.now();
+  }
+
+  // Check if room is now empty (no other active players)
   if (isRoomEmpty(gameCode)) {
     logger.info('SOCKET', `Room ${gameCode} is empty after host ${username} disconnected - closing immediately`);
     timerManager.clearGameTimer(gameCode);

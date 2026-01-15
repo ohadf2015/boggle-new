@@ -1276,7 +1276,12 @@ const he = {
       "getStarted": "בוא נתחיל!",
       "ready": "מוכן!",
       "readyForMultiplayer": "מוכן לרב משתתפים!",
-      "tapForDetails": "הקש לפרטים"
+      "tapForDetails": "הקש לפרטים",
+      "firstWord": "מצא מילה ראשונה",
+      "diagonal": "החלק באלכסון",
+      "directionChange": "שנה כיוון",
+      "targetScore": "השג 15 נקודות",
+      "fiveWords": "מצא 5 מילים"
     },
     "unlock": {
       "title": "מיומנות נפתחה",
