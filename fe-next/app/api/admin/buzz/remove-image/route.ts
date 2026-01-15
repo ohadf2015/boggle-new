@@ -10,6 +10,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { createClient } from '@supabase/supabase-js';
 
+// Database operations can take time (especially with Supabase on slow connections)
+// Default Next.js timeout is 10s which can cause timeouts
+export const maxDuration = 60;
+
 const SUPPORTED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'];
 
 interface RemoveImageRequestBody {

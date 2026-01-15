@@ -344,10 +344,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     void awardCoins();
   }, [awardGameCompletion, results.playerScore, results.gameSessionId, playerRank, allParticipants.length]);
 
-  // Record win for streak tracking (solo-bots mode only, when player wins)
+  // Record win for streak tracking (competitive modes: solo-bots and challenge, when player wins)
   useEffect(() => {
     if (hasRecordedWinRef.current) return;
-    if (mode !== 'solo-bots') return; // Only track wins in competitive mode
+    // Track wins in competitive modes (solo-bots and challenge), but not practice
+    if (mode === 'practice') return;
     if (!isWinner) return; // Only record actual wins
 
     hasRecordedWinRef.current = true;
@@ -701,8 +702,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         />
       </div>
 
-      {/* Rewards Summary - Shows win streak prominently for winners */}
-      {mode === 'solo-bots' && winStreakData && winStreakData.currentStreak > 0 && (
+      {/* Rewards Summary - Shows win streak prominently for winners in competitive modes */}
+      {mode !== 'practice' && winStreakData && winStreakData.currentStreak > 0 && (
         <RewardsSummary
           coinReward={coinReward}
           isAuthenticated={isAuthenticated}
@@ -979,8 +980,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               showConfetti={shouldShowConfetti}
             />
 
-            {/* Rewards Summary - Shows win streak prominently for winners */}
-            {mode === 'solo-bots' && winStreakData && winStreakData.currentStreak > 0 && (
+            {/* Rewards Summary - Shows win streak prominently for winners in competitive modes */}
+            {mode !== 'practice' && winStreakData && winStreakData.currentStreak > 0 && (
               <RewardsSummary
                 coinReward={coinReward}
                 isAuthenticated={isAuthenticated}

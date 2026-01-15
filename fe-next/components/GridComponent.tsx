@@ -51,6 +51,8 @@ interface GridComponentProps {
   onSingleTapDetected?: (cell: { row: number; col: number; letter: string }) => void;
   /** Language for keyboard input validation */
   language?: Language;
+  /** Disable grid's built-in letter key input - allows external keyboard input hook to handle typing */
+  disableLetterKeyInput?: boolean;
 }
 
 /**
@@ -96,6 +98,7 @@ const GridComponent = memo<GridComponentProps>(({
   eliminatedLetters,
   onSingleTapDetected,
   language = 'en',
+  disableLetterKeyInput = false,
 }) => {
   const [reduceMotion, setReduceMotion] = useState(false);
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
@@ -160,6 +163,7 @@ const GridComponent = memo<GridComponentProps>(({
     fireRoundActive,
     onSingleTapDetected,
     language,
+    disableLetterKeyInput,
   });
 
   // Calculate the word being formed from selected cells

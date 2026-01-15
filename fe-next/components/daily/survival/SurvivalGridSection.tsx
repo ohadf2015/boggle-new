@@ -45,6 +45,7 @@ export const SurvivalGridSection: React.FC<SurvivalGridSectionProps> = ({
           comboLevel={0}
           eliminatedLetters={eliminatedLetters}
           highlightedPath={highlightedPath}
+          disableLetterKeyInput={true}
         />
       </div>
 

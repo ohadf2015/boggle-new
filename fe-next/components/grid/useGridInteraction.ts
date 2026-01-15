@@ -37,6 +37,8 @@ interface UseGridInteractionProps {
   /** Callback when user taps a single cell without dragging (for tap-to-drag tutorial) */
   onSingleTapDetected?: (cell: { row: number; col: number; letter: string }) => void;
   language?: Language;
+  /** Disable letter key input handling - allows external keyboard input hook to take over */
+  disableLetterKeyInput?: boolean;
 }
 
 interface UseGridInteractionReturn {
@@ -87,6 +89,7 @@ export function useGridInteraction({
   fireRoundActive = false,
   onSingleTapDetected,
   language = 'en',
+  disableLetterKeyInput = false,
 }: UseGridInteractionProps): UseGridInteractionReturn {
   const [internalSelectedCells, setInternalSelectedCells] = useState<SelectedCell[]>([]);
   const [fadingCells, setFadingCells] = useState<GridPosition[]>([]);
@@ -1013,6 +1016,11 @@ export function useGridInteraction({
         // Only auto-select if explicitly in keyboard mode or no active touch/drag in progress
         // This prevents interrupting user's swipe gestures
         if (e.key.length === 1 && /[a-zA-Z]/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+          // If external keyboard input is enabled, let that handle it instead
+          if (disableLetterKeyInput) {
+            return;
+          }
+
           // Don't auto-select if user is actively dragging/touching (would interrupt swipe)
           if (isTouchingRef.current || isDraggingRef.current) {
             return; // Let the swipe continue, ignore keyboard input
@@ -1080,7 +1088,7 @@ export function useGridInteraction({
       // Haptic feedback for navigation
       if (window.navigator?.vibrate) window.navigator.vibrate(10);
     }
-  }, [interactive, grid, focusedCell, selectedCells, comboLevel, onWordSubmit, onPathSubmit, startSequentialFadeOut, setSelectedCells, isAdjacentCell, fireRoundActive, language]);
+  }, [interactive, grid, focusedCell, selectedCells, comboLevel, onWordSubmit, onPathSubmit, startSequentialFadeOut, setSelectedCells, isAdjacentCell, fireRoundActive, language, disableLetterKeyInput]);
 
   // Reset keyboard mode on touch/mouse interaction
   useEffect(() => {

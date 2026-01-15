@@ -44,6 +44,7 @@ import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 const PlayerArchetypeBadge = dynamic(() => import('@/components/results/PlayerArchetypeBadge'), { ssr: false });
 const CompactResultsStats = dynamic(() => import('@/components/results/CompactResultsStats'), { ssr: false });
+const RewardsSummary = dynamic(() => import('@/components/results/RewardsSummary'), { ssr: false });
 import { cn } from '@/lib/utils';
 import { addGameToHistory } from '@/utils/gameHistoryManager';
 import { awardGameCoins } from '@/utils/coinManager';
@@ -87,6 +88,14 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   const hasSavedCognitiveScoreRef = useRef<boolean>(false);
   // previousStreak needs to be state since it's used in render
   const [previousStreak, setPreviousStreak] = useState<number>(0);
+
+  // Win streak data for rewards summary display
+  const [winStreakData, setWinStreakData] = useState<{
+    currentStreak: number;
+    bestStreak: number;
+    isNewMilestone: boolean;
+    previousStreak: number;
+  } | null>(null);
 
   // Word feedback state for crowd-sourced word validation (self-healing system)
   const [showWordFeedback, setShowWordFeedback] = useState<boolean>(false);
@@ -355,16 +364,29 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
     // Record win and update streak
     if (isCurrentUserWinner) {
-      setPreviousStreak(currentStreak);
+      const prevStreak = currentStreak;
+      setPreviousStreak(prevStreak);
       recordWin();
 
       // Track streak milestones
-      const newStreak = currentStreak + 1;
+      const newStreak = prevStreak + 1;
       trackStreakMilestone(newStreak);
+
+      // Calculate if this is a new milestone (streak tier change)
+      const tierThresholds = [3, 7, 14, 30];
+      const isNewMilestone = tierThresholds.some(t => newStreak === t);
+
+      // Update win streak data for display
+      setWinStreakData({
+        currentStreak: newStreak,
+        bestStreak: Math.max(bestStreak, newStreak),
+        isNewMilestone,
+        previousStreak: prevStreak,
+      });
     }
 
     hasTrackedGameRef.current = true;
-  }, [currentPlayerData, isCurrentUserWinner, currentStreak, recordWin]);
+  }, [currentPlayerData, isCurrentUserWinner, currentStreak, bestStreak, recordWin]);
 
   // Add game to history for the performance chart (runs for all users)
   useEffect(() => {
@@ -1000,6 +1022,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         />
       )}
 
+      {/* Rewards Summary - Shows win streak prominently for winners */}
+      {winStreakData && winStreakData.currentStreak > 0 && (
+        <RewardsSummary
+          coinReward={null}
+          isAuthenticated={isAuthenticated}
+          winStreak={winStreakData}
+          achievementsUnlocked={currentPlayerData?.achievements?.length || 0}
+          isWinner={isCurrentUserWinner}
+        />
+      )}
+
       {/* Compact Stats Row - Using shared component */}
       {currentPlayerData && currentPlayerRank > 0 && (
         <CompactResultsStats
@@ -1295,6 +1328,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                 nearMisses={nearMisses}
                 t={t}
                 onPlayAgain={isHost ? handleStartGame : handleMarkReady}
+              />
+            )}
+
+            {/* Rewards Summary - Shows win streak prominently for winners */}
+            {winStreakData && winStreakData.currentStreak > 0 && (
+              <RewardsSummary
+                coinReward={null}
+                isAuthenticated={isAuthenticated}
+                winStreak={winStreakData}
+                achievementsUnlocked={currentPlayerData?.achievements?.length || 0}
+                isWinner={isCurrentUserWinner}
               />
             )}
 

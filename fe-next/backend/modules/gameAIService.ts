@@ -307,6 +307,7 @@ function isRetryableError(error: unknown): boolean {
     message.includes('timeout') ||
     message.includes('rate limit') ||
     message.includes('truncated') ||
+    message.includes('html error page') ||
     message.includes('429') ||
     message.includes('503') ||
     message.includes('unavailable') ||
@@ -704,6 +705,15 @@ export class GameAIService {
    * Parse and validate AI response for single word validation
    */
   parseValidationResponse(text: string, word: string): ParsedValidation {
+    // Detect HTML error pages early (before attempting JSON parse)
+    if (text.trimStart().startsWith('<!DOCTYPE') || text.trimStart().startsWith('<html')) {
+      logger.warn('AI_SERVICE', `Received HTML error page instead of JSON for "${word}". This indicates a network issue, authentication failure, or service unavailability.`);
+      // Throw retryable error to trigger exponential backoff retry
+      const error = new Error('HTML error page received from Vertex AI - network, authentication, or service issue');
+      error.name = 'HTMLResponseError';
+      throw error;
+    }
+
     // Strip markdown code blocks if present
     let cleanText = text;
     const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);

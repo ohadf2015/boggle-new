@@ -132,19 +132,19 @@ function buildImagePrompt(
   // Build a concrete visual scene from the trend
   const visualScene = buildVisualScene(topic, category);
 
-  return `Create a MODERN, EDITORIAL illustration for a Google Trends-powered word game.
+  return `Create a MODERN STYLIZED illustration for a Google Trends-powered word game.
 
 SUBJECT: ${visualScene}
 
-=== CRITICAL: GOOGLE TRENDS EDITORIAL STYLE ===
+=== CRITICAL: MODERN STYLIZED ILLUSTRATION STYLE ===
 
-ART STYLE - "TRENDING NEWS INFOGRAPHIC":
-- Bold, modern vector illustration style
-- Clean geometric shapes with confident lines
-- Stylized but recognizable subjects (NOT realistic, NOT chibi/kawaii)
-- Dynamic composition suggesting movement and momentum
-- Think: The Economist illustrations, Bloomberg graphics, Kurzgesagt, editorial infographics
-- Professional yet playful - sophisticated but accessible
+ART STYLE - "CONTEMPORARY ILLUSTRATION WITH CHARACTER":
+- **Modern 2.5D style** with depth but not full 3D rendering (think modern app illustrations, editorial graphics)
+- Friendly, appealing designs with personality and charm - **subtle kawaii elements allowed**
+- Soft gradients, gentle shading, and dimensional feel (NOT completely flat)
+- Rounded, friendly shapes with some depth and character
+- Think: Modern app illustrations (Headspace, Duolingo), contemporary editorial art, stylized character design
+- Professional illustration quality - polished, warm, and approachable
 
 GOOGLE TRENDS VISUAL ELEMENTS (MUST INCLUDE):
 - Prominent UPWARD TRENDING ARROW somewhere in composition (the iconic Google Trends rising line)
@@ -152,48 +152,55 @@ GOOGLE TRENDS VISUAL ELEMENTS (MUST INCLUDE):
 - Search-inspired elements: magnifying glass motif, data visualization hints
 - Sense of "what's hot right now" - dynamic, current, buzzing energy
 
-COLOR PALETTE (Google Trends + Neo-Brutalist):
-- PRIMARY: Google Blue (#4285F4) - trust and data
-- SECONDARY: Google Green (#34A853) - growth and trending up
-- ACCENT 1: Neo Yellow (#FFE135) - energy and attention
-- ACCENT 2: Coral (#FF6B35) - warmth and excitement
-- BACKGROUND: Dark navy (#1a1a2e) or deep purple gradient
-- Bold color blocking with high contrast
+COLOR PALETTE (Modern Illustration + Google Trends):
+- PRIMARY: Google Blue (#4285F4) - trust and clarity
+- SECONDARY: Google Green (#34A853) - growth and freshness
+- ACCENT 1: Warm Yellow (#FFD700) - energy and positivity
+- ACCENT 2: Soft Coral (#FF8C69) - warmth and friendliness
+- BACKGROUND: Gentle gradients with subtle depth (pastels allowed for approachability)
+- Soft shading with 2.5D depth - some dimensional lighting without full 3D rendering
 
 VISUAL REQUIREMENTS:
-- Central subject representing the trending topic (50-60% of frame)
+- Central subject representing the trending topic (60-70% of frame)
 - MANDATORY: Rising trend line or arrow integrated into design
-- Clean, bold silhouettes - easily readable at small sizes
-- Subtle data/graph elements in background (dots, grid lines, chart hints)
-- Dynamic angles suggesting upward momentum
+- 2.5D style with gentle depth and layering (NOT fully flat, NOT heavy 3D)
+- Soft focus on background elements for depth
+- Dynamic composition suggesting upward momentum and energy
 
 ILLUSTRATION GUIDELINES:
-- If showing people: stylized editorial figures (NOT cute/chibi)
-- If showing objects: bold iconic representations
-- If showing concepts: clever visual metaphors
-- Strong focal point with supporting trending elements
+- If showing people/characters: Modern stylized proportions - friendly and approachable (subtle kawaii OK, but NOT chibi/super-deformed)
+- If showing objects: Stylized with soft shading and gentle dimensionality
+- If showing concepts: Creative visual metaphors with contemporary illustration style
+- Warm, optimistic mood with charm and personality
 
 MOOD: ${mood}, DYNAMIC, CURRENT, NEWSWORTHY
 
 ABSOLUTE CONSTRAINTS (CRITICAL - DO NOT VIOLATE):
 - NO text, NO words, NO letters, NO numbers anywhere in the image
-- NO kawaii/chibi/cute anime style - FORBIDDEN
-- NO Chinese cute aesthetic (萌え/moe style)
-- NO realistic photography style
-- NO children's book illustration style
-- NO cartoon character faces or mascots
-- ONLY sophisticated editorial vector art
-- Think: Business magazine, not children's media
+- **ABSOLUTELY NO chibi style** - NO super-deformed characters, NO bobblehead proportions
+- **ABSOLUTELY NO heavy anime aesthetic** - NO manga-style linework, NO anime cel-shading, NO moe (萌え) exaggeration
+- **Subtle kawaii elements are ALLOWED** - Friendly, approachable character design is fine
+- **NO overly exaggerated anime proportions** - Avoid huge eyes (50%+ of face), tiny mouths, extreme stylization
+- NO realistic photography style - MUST be stylized illustration
+- **Modern 2.5D illustration style** - Think contemporary app design, NOT full 3D rendering
+- Characters should have balanced, friendly proportions (neither Western realistic NOR Japanese chibi)
 - Keep it family-friendly and universally appealing
-- Must feel like "trending news" not "children's sticker"
 
-STYLE ENFORCEMENT:
-This is a Google Trends editorial piece for adults, not entertainment for children.
-Reference: The Economist, Bloomberg Businessweek, Wired magazine covers.
-NOT: Kawaii stickers, anime characters, or cute mascots.
+STYLE ENFORCEMENT - MODERN ILLUSTRATION:
+This is a contemporary stylized illustration with personality and charm.
+✅ CORRECT REFERENCE: Headspace app illustrations, Duolingo characters, modern editorial graphics, stylized infographics
+✅ SUBTLE KAWAII OK: Friendly round shapes, gentle expressions, soft pastel accents
+❌ FORBIDDEN: Chibi/super-deformed style, heavy anime linework, extreme anime proportions
 
-OUTPUT: Square 1024×1024px professional editorial illustration
-The final image should feel like a premium news app thumbnail - immediately communicating "this is trending right now" with sophistication and authority.`;
+SPECIFIC STYLE RULES:
+- Eyes: Friendly and expressive but proportional (NOT taking up half the face)
+- Face: Balanced stylized proportions - neither hyper-realistic nor chibi
+- Colors: Soft gradients with gentle depth, pastels allowed for warmth
+- Style: 2.5D modern illustration with layering, NOT flat cel-shading OR heavy 3D
+- Expression: Warm and charming with personality, subtle emotion
+
+OUTPUT: Square 1024×1024px modern stylized illustration
+The final image should look like premium app illustration or contemporary editorial graphic - friendly, approachable, with gentle depth and charm.`;
 }
 
 /**
@@ -334,39 +341,39 @@ function buildVisualScene(topic: string, category: string): string {
     return 'Share/repost pattern forming exponential trend curve, viral spread visualization, Google Trends upward arrow prominent, modern infographic aesthetic';
   }
 
-  // Anime/Manga/Gaming - MUST avoid kawaii style
+  // Anime/Manga/Gaming - Modern stylized, NOT chibi
   if (lowercaseTopic.includes('anime') || lowercaseTopic.includes('manga') || lowercaseTopic.includes('kawaii')) {
-    return 'Bold geometric representation of Japanese pop culture with editorial magazine style (NOT cute/chibi - use sophisticated vector art), rising popularity trend line, Google Trends gradient, data visualization dots in background';
+    return 'Modern stylized representation of Japanese pop culture using contemporary illustration style - use books, screens, or abstract symbols (NOT chibi anime characters). Friendly, approachable design with subtle kawaii charm is fine. Rising popularity trend line integrated into scene, Google Trends gradient, 2.5D layered composition with soft depth';
   }
 
-  // Music/Artists - editorial concert poster style
+  // Music/Artists - Modern illustration concert style
   if (lowercaseTopic.includes('music') || lowercaseTopic.includes('artist') || lowercaseTopic.includes('singer') || lowercaseTopic.includes('band')) {
-    return 'Bold concert poster aesthetic with stylized musical elements, sound wave forming upward trend, stage silhouette with dramatic lighting, editorial illustration (think Saul Bass, not cute cartoons)';
+    return 'Modern stylized concert scene with friendly illustrated musical instruments, soft layered sound waves forming upward trend, warm stage lighting with gentle gradients, contemporary app illustration aesthetic (think Headspace or Spotify graphics)';
   }
 
-  // Fashion/Style - sophisticated editorial
+  // Fashion/Style - Contemporary fashion illustration
   if (lowercaseTopic.includes('fashion') || lowercaseTopic.includes('style') || lowercaseTopic.includes('designer')) {
-    return 'Sophisticated fashion editorial illustration with bold geometric garment silhouettes, trending style indicators as data visualization, runway as rising trend line, Vogue-level sophistication';
+    return 'Contemporary fashion illustration with stylized fabric elements and soft shading, trending style indicators integrated into scene, runway as rising trend line with 2.5D perspective, modern editorial illustration quality with approachable charm';
   }
 
-  // Food/Restaurant - culinary editorial
+  // Food/Restaurant - Modern culinary illustration
   if (lowercaseTopic.includes('food') || lowercaseTopic.includes('restaurant') || lowercaseTopic.includes('recipe') || lowercaseTopic.includes('chef')) {
-    return 'Bold culinary editorial style with geometric food icons, ingredient patterns forming data visualization, rising popularity shown as ascending steam/aroma lines, modern food magazine aesthetic';
+    return 'Modern culinary illustration with appetizing food styling and soft gradients, ingredient elements forming data visualization, rising popularity shown as ascending steam with gentle layering, contemporary food app aesthetic (think food delivery apps)';
   }
 
-  // Travel/Tourism - editorial travel magazine
+  // Travel/Tourism - Modern travel illustration
   if (lowercaseTopic.includes('travel') || lowercaseTopic.includes('tourism') || lowercaseTopic.includes('destination') || lowercaseTopic.includes('vacation')) {
-    return 'Editorial travel magazine illustration with iconic landmark silhouettes, journey path forming upward trend line, map elements as data visualization, sophisticated wanderlust aesthetic';
+    return 'Modern travel illustration with stylized landmark silhouettes, journey path forming upward trend line through layered scene, atmospheric depth with soft gradients, contemporary wanderlust aesthetic (think modern travel apps or Airbnb graphics)';
   }
 
-  // Science/Research - academic infographic
+  // Science/Research - Modern science illustration
   if (lowercaseTopic.includes('science') || lowercaseTopic.includes('research') || lowercaseTopic.includes('study') || lowercaseTopic.includes('discovery')) {
-    return 'Scientific infographic style with bold molecular/atomic patterns, research data as rising trend visualization, laboratory equipment as geometric icons, Nature/Science journal aesthetic';
+    return 'Modern scientific illustration with stylized molecular/atomic patterns, research data as rising trend visualization with gentle depth, laboratory equipment as friendly illustrated icons, contemporary science communication aesthetic (think Kurzgesagt style)';
   }
 
-  // Default: Topic-specific with STRONG editorial constraints
-  // This fallback must be EXTREMELY specific to prevent kawaii/chibi interpretation
-  return `EDITORIAL INFOGRAPHIC STYLE ONLY (absolutely NO cute/kawaii/chibi aesthetic): Bold, sophisticated vector illustration of "${topic}" using geometric shapes and clean lines. Central subject (60% of frame) with prominent upward trending arrow integrated into composition. Google Trends blue-to-green gradient (#4285F4 to #34A853). Data visualization elements (dots, lines, grid) in background. Style references: The Economist magazine illustrations, Bloomberg graphics, Kurzgesagt editorial style. Professional, modern, newsworthy - think premium news app thumbnail, NOT children's sticker or anime character.`;
+  // Default: Topic-specific with modern 2.5D illustration style
+  // This fallback must be specific to prevent chibi but allow subtle kawaii charm
+  return `MODERN 2.5D ILLUSTRATION STYLE (absolutely NO chibi/super-deformed aesthetic - subtle kawaii OK): Contemporary stylized representation of "${topic}" with gentle depth, soft shading, and layered composition. Central subject (70% of frame) with prominent upward trending arrow integrated into design. Google Trends blue-to-green gradient (#4285F4 to #34A853) used in accents or background. Soft atmospheric depth with gentle gradients. Style references: Headspace app illustrations, Duolingo characters, modern editorial graphics, contemporary infographics. Professional illustration quality with friendly, approachable mood - think premium app design or modern editorial, NOT chibi characters or heavy anime style. Balanced proportions with charm and personality.`;
 }
 
 /**

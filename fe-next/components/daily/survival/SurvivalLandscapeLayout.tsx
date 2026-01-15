@@ -190,6 +190,7 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
               comboLevel={0}
               eliminatedLetters={eliminatedLetters}
               highlightedPath={highlightedPath}
+              disableLetterKeyInput={true}
             />
           </div>
         </div>
