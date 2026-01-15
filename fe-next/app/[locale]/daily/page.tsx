@@ -23,7 +23,8 @@ interface PageParams {
 }
 
 // Loading fallback component using unified PageLoader
-const LoadingFallback = () => <PageLoader text="Loading Daily Challenge..." />;
+// nested=true ensures it fills parent flex container instead of using fixed 100dvh height
+const LoadingFallback = () => <PageLoader text="Loading Daily Challenge..." nested />;
 
 // Dynamic import for code splitting (client component)
 const DailyChallengeRouter = dynamicImport(() => import('@/components/daily/DailyChallengeRouter'), {

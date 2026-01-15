@@ -90,4 +90,32 @@ describe('PageLoader', () => {
     const loader = screen.getByTestId('neo-loader');
     expect(loader).toHaveAttribute('data-variant', 'letters');
   });
+
+  describe('nested mode (for Suspense fallbacks)', () => {
+    it('should use flex-1 instead of screen-fit when nested=true', () => {
+      const { container } = render(<PageLoader nested />);
+
+      const wrapper = container.firstChild as HTMLElement;
+      expect(wrapper).toHaveClass('flex-1');
+      expect(wrapper).not.toHaveClass('screen-fit');
+      expect(wrapper).toHaveClass('flex');
+      expect(wrapper).toHaveClass('items-center');
+      expect(wrapper).toHaveClass('justify-center');
+    });
+
+    it('should use min-h-0 to allow flex shrinking when nested', () => {
+      const { container } = render(<PageLoader nested />);
+
+      const wrapper = container.firstChild as HTMLElement;
+      expect(wrapper).toHaveClass('min-h-0');
+    });
+
+    it('should still center content when nested', () => {
+      const { container } = render(<PageLoader nested />);
+
+      const wrapper = container.firstChild as HTMLElement;
+      expect(wrapper).toHaveClass('items-center');
+      expect(wrapper).toHaveClass('justify-center');
+    });
+  });
 });

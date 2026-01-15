@@ -13,6 +13,12 @@ interface PageLoaderProps {
   text?: string;
   /** Mascot variant when using mascot or mascot-letters mode */
   mascotVariant?: MascotVariant;
+  /**
+   * When true, uses flex-1 instead of screen-fit (100dvh).
+   * Use nested=true for Suspense fallbacks inside page content.
+   * Use nested=false (default) for loading.tsx files.
+   */
+  nested?: boolean;
 }
 
 /**
@@ -34,9 +40,15 @@ export const PageLoader = memo(function PageLoader({
   size = 'lg',
   text,
   mascotVariant = 'thinking',
+  nested = false,
 }: PageLoaderProps) {
+  // Use flex-1 for nested Suspense fallbacks, screen-fit for full-page loading.tsx
+  const containerClass = nested
+    ? 'flex-1 min-h-0 flex items-center justify-center bg-neo-navy'
+    : 'screen-fit flex items-center justify-center bg-neo-navy';
+
   return (
-    <div className="screen-fit flex items-center justify-center bg-neo-navy" data-testid="page-loader">
+    <div className={containerClass} data-testid="page-loader">
       <NeoLoader
         variant={variant}
         size={size}
