@@ -161,7 +161,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   const isEarthquakeShaking = earthquakeState === 'shaking';
 
   return (
-    <div className="h-[100dvh] bg-neo-navy flex flex-col overflow-hidden relative">
+    <div className="h-full bg-neo-navy flex flex-col overflow-hidden relative">
       {/* Top Right Controls: Help + Fullscreen */}
       <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
         {/* Tutorial Help Button */}
@@ -207,47 +207,15 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         )}
       </AnimatePresence>
 
-      {/* Game Header with Timer - Hidden in fullscreen (but show compact timer) */}
-      <AnimatePresence>
-        {!isFullscreen && (
-          <motion.div
-            initial={{ y: -50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -50, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          >
-            <TvGameHeader
-              remainingTime={remainingTime}
-              timerValue={timerValue}
-              fireRoundActive={fireRoundActive}
-              fireRoundRemaining={fireRoundRemaining}
-              earthquakeState={earthquakeState}
-              t={t}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Compact Timer for Fullscreen Mode */}
-      <AnimatePresence>
-        {isFullscreen && remainingTime !== null && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            className="absolute top-4 left-4 z-50 bg-neo-black/90 text-neo-cream px-4 py-2 rounded-neo border-2 border-neo-cream/30 shadow-hard-sm"
-          >
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-black tabular-nums">
-                {Math.floor(remainingTime / 60)}:{String(remainingTime % 60).padStart(2, '0')}
-              </span>
-              {fireRoundActive && (
-                <span className="text-neo-orange animate-pulse">🔥</span>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Game Header with Timer - Always visible */}
+      <TvGameHeader
+        remainingTime={remainingTime}
+        timerValue={timerValue}
+        fireRoundActive={fireRoundActive}
+        fireRoundRemaining={fireRoundRemaining}
+        earthquakeState={earthquakeState}
+        t={t}
+      />
 
       {/* Main Content: Grid + Leaderboard (50/50) */}
       <div className={`flex-1 min-h-0 flex flex-col md:flex-row gap-2 md:gap-4 mx-auto w-full ${isFullscreen ? 'p-4' : 'p-2 md:p-4 max-w-[2000px]'}`}>

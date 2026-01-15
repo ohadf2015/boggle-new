@@ -175,15 +175,25 @@ ILLUSTRATION GUIDELINES:
 
 MOOD: ${mood}, DYNAMIC, CURRENT, NEWSWORTHY
 
-ABSOLUTE CONSTRAINTS:
-- NO text, NO words, NO letters, NO numbers anywhere
-- NO kawaii/chibi style - this is editorial, not cute
+ABSOLUTE CONSTRAINTS (CRITICAL - DO NOT VIOLATE):
+- NO text, NO words, NO letters, NO numbers anywhere in the image
+- NO kawaii/chibi/cute anime style - FORBIDDEN
+- NO Chinese cute aesthetic (萌え/moe style)
 - NO realistic photography style
+- NO children's book illustration style
+- NO cartoon character faces or mascots
+- ONLY sophisticated editorial vector art
+- Think: Business magazine, not children's media
 - Keep it family-friendly and universally appealing
 - Must feel like "trending news" not "children's sticker"
 
-OUTPUT: Square 1024×1024px illustration
-The final image should feel like a premium news app thumbnail - immediately communicating "this is trending right now".`;
+STYLE ENFORCEMENT:
+This is a Google Trends editorial piece for adults, not entertainment for children.
+Reference: The Economist, Bloomberg Businessweek, Wired magazine covers.
+NOT: Kawaii stickers, anime characters, or cute mascots.
+
+OUTPUT: Square 1024×1024px professional editorial illustration
+The final image should feel like a premium news app thumbnail - immediately communicating "this is trending right now" with sophistication and authority.`;
 }
 
 /**
@@ -315,17 +325,48 @@ function buildVisualScene(topic: string, category: string): string {
 
   // General/News - editorial news style
   if (lowercaseTopic.includes('breaking') || lowercaseTopic.includes('news')) {
-    return 'Breaking news burst with interest spike visualization, media icons as bold silhouettes, attention trend rising dramatically';
+    return 'Breaking news burst with interest spike visualization, media icons as bold silhouettes, attention trend rising dramatically, editorial infographic style';
   }
   if (lowercaseTopic.includes('celebrity') || lowercaseTopic.includes('star')) {
-    return 'Star silhouette with fame/interest trend rising, spotlight beams as data rays, red carpet leading upward';
+    return 'Star silhouette with fame/interest trend rising, spotlight beams as data rays, red carpet leading upward, sophisticated editorial style';
   }
   if (lowercaseTopic.includes('viral') || lowercaseTopic.includes('trending')) {
-    return 'Share/repost pattern forming exponential trend curve, viral spread visualization, Google Trends upward arrow prominent';
+    return 'Share/repost pattern forming exponential trend curve, viral spread visualization, Google Trends upward arrow prominent, modern infographic aesthetic';
   }
 
-  // Default: Topic-specific with trending elements
-  return `Bold stylized representation of "${topic}" with prominent upward trending arrow, Google Trends blue-to-green gradient, data visualization elements in background, modern editorial infographic style`;
+  // Anime/Manga/Gaming - MUST avoid kawaii style
+  if (lowercaseTopic.includes('anime') || lowercaseTopic.includes('manga') || lowercaseTopic.includes('kawaii')) {
+    return 'Bold geometric representation of Japanese pop culture with editorial magazine style (NOT cute/chibi - use sophisticated vector art), rising popularity trend line, Google Trends gradient, data visualization dots in background';
+  }
+
+  // Music/Artists - editorial concert poster style
+  if (lowercaseTopic.includes('music') || lowercaseTopic.includes('artist') || lowercaseTopic.includes('singer') || lowercaseTopic.includes('band')) {
+    return 'Bold concert poster aesthetic with stylized musical elements, sound wave forming upward trend, stage silhouette with dramatic lighting, editorial illustration (think Saul Bass, not cute cartoons)';
+  }
+
+  // Fashion/Style - sophisticated editorial
+  if (lowercaseTopic.includes('fashion') || lowercaseTopic.includes('style') || lowercaseTopic.includes('designer')) {
+    return 'Sophisticated fashion editorial illustration with bold geometric garment silhouettes, trending style indicators as data visualization, runway as rising trend line, Vogue-level sophistication';
+  }
+
+  // Food/Restaurant - culinary editorial
+  if (lowercaseTopic.includes('food') || lowercaseTopic.includes('restaurant') || lowercaseTopic.includes('recipe') || lowercaseTopic.includes('chef')) {
+    return 'Bold culinary editorial style with geometric food icons, ingredient patterns forming data visualization, rising popularity shown as ascending steam/aroma lines, modern food magazine aesthetic';
+  }
+
+  // Travel/Tourism - editorial travel magazine
+  if (lowercaseTopic.includes('travel') || lowercaseTopic.includes('tourism') || lowercaseTopic.includes('destination') || lowercaseTopic.includes('vacation')) {
+    return 'Editorial travel magazine illustration with iconic landmark silhouettes, journey path forming upward trend line, map elements as data visualization, sophisticated wanderlust aesthetic';
+  }
+
+  // Science/Research - academic infographic
+  if (lowercaseTopic.includes('science') || lowercaseTopic.includes('research') || lowercaseTopic.includes('study') || lowercaseTopic.includes('discovery')) {
+    return 'Scientific infographic style with bold molecular/atomic patterns, research data as rising trend visualization, laboratory equipment as geometric icons, Nature/Science journal aesthetic';
+  }
+
+  // Default: Topic-specific with STRONG editorial constraints
+  // This fallback must be EXTREMELY specific to prevent kawaii/chibi interpretation
+  return `EDITORIAL INFOGRAPHIC STYLE ONLY (absolutely NO cute/kawaii/chibi aesthetic): Bold, sophisticated vector illustration of "${topic}" using geometric shapes and clean lines. Central subject (60% of frame) with prominent upward trending arrow integrated into composition. Google Trends blue-to-green gradient (#4285F4 to #34A853). Data visualization elements (dots, lines, grid) in background. Style references: The Economist magazine illustrations, Bloomberg graphics, Kurzgesagt editorial style. Professional, modern, newsworthy - think premium news app thumbnail, NOT children's sticker or anime character.`;
 }
 
 /**

@@ -560,6 +560,42 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     }, 200);
   }, [socket, gameCode, username]);
 
+  // Handle logo click exit request
+  // Use refs to access latest values without re-registering the event listener
+  const gameActiveRef = useRef(gameActive);
+  const confirmExitRoomRef = useRef(confirmExitRoom);
+
+  useEffect(() => {
+    gameActiveRef.current = gameActive;
+    confirmExitRoomRef.current = confirmExitRoom;
+  });
+
+  useEffect(() => {
+    const handleRoomExitRequest = (event: CustomEvent) => {
+      const { gameCode: requestedCode, username: requestedUsername, source } = event.detail;
+
+      // Verify the request is for this game session
+      if (requestedCode === gameCode && requestedUsername === username) {
+        logger.log(`[PLAYER] Room exit requested from ${source}`);
+
+        // If game is not active (waiting state), auto-exit without confirmation
+        if (!gameActiveRef.current) {
+          logger.log('[PLAYER] Auto-exiting from waiting state');
+          confirmExitRoomRef.current();
+        } else {
+          // Game is active - show confirmation modal
+          logger.log('[PLAYER] Showing exit confirmation for active game');
+          setShowExitConfirm(true);
+        }
+      }
+    };
+
+    window.addEventListener('requestRoomExit', handleRoomExitRequest as EventListener);
+    return () => {
+      window.removeEventListener('requestRoomExit', handleRoomExitRequest as EventListener);
+    };
+  }, [gameCode, username]);
+
   // Word submission handler - adds word with pending validation state
   // Uses WordDetail type from GameStateContext
   const handleWordSubmit = useCallback((formedWord: string) => {
@@ -610,7 +646,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     // Don't render PlayerWaitingView underneath to avoid double loaders
     if (showStartAnimation) {
       return (
-        <div className="h-[100dvh] bg-neo-navy flex items-center justify-center overflow-hidden">
+        <div className="h-full bg-neo-navy flex items-center justify-center overflow-hidden">
           <GoRipplesAnimation onComplete={() => setShowStartAnimation(false)} />
         </div>
       );

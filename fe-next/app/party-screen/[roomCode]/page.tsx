@@ -171,7 +171,7 @@ export default function PartyScreen() {
   };
 
   return (
-    <div className="h-dvh w-full bg-neo-navy text-neo-cream overflow-hidden flex flex-col">
+    <div className="w-full bg-neo-navy text-neo-cream overflow-hidden flex flex-col">
       {/* Halftone texture */}
       <div
         className="fixed inset-0 pointer-events-none opacity-[0.04]"

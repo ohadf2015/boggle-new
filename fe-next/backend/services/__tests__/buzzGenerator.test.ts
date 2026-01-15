@@ -387,6 +387,149 @@ describe('Daily Buzz Generator - Hebrew without cached trends', () => {
 // require complex dynamic import mocking that conflicts with existing Supabase mock setup.
 // These functions are tested through E2E integration tests instead.
 
+describe('Sports riddle constraint validation', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    // Mock environment variables
+    process.env.GOOGLE_CREDENTIALS_JSON = JSON.stringify({
+      project_id: 'test-project',
+      private_key: 'test-key',
+      client_email: 'test@test.com',
+    });
+    process.env.GOOGLE_CLOUD_LOCATION = 'us-central1';
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key';
+
+    // Mock getTrendsFromDbCache to return null (no cached trends)
+    (serpApiClient.getTrendsFromDbCache as jest.Mock).mockResolvedValue(null);
+
+    // Mock fetchGoogleTrends to return sample trends
+    (serpApiClient.fetchGoogleTrends as jest.Mock).mockResolvedValue([
+      {
+        query: 'technology',
+        search_volume: 500000,
+        active: true,
+        categories: [{ id: 5, name: 'Science & Technology' }],
+        trend_breakdown: ['Tech news'],
+      },
+      {
+        query: 'sports',
+        search_volume: 200000,
+        active: true,
+        categories: [{ id: 7, name: 'Sports' }],
+        trend_breakdown: ['Sports news'],
+      },
+      {
+        query: 'music',
+        search_volume: 150000,
+        active: true,
+        categories: [{ id: 3, name: 'Entertainment' }],
+        trend_breakdown: ['Music news'],
+      },
+    ]);
+  });
+
+  it('should filter out extra sports riddles beyond the first one', async () => {
+    // AI returns multiple sports-related riddles - only first should be kept
+    mockGenerateContent.mockResolvedValueOnce({
+      response: {
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify({
+                    date: '2026-01-14',
+                    language: 'en',
+                    trending_summary: 'Tech & Sports',
+                    challenges: [
+                      {
+                        type: 'anagram',
+                        trend_topic: 'technology',
+                        prompt: 'Unscramble: CHEYT',
+                        answer: 'TECHY',
+                        hint: 'Tech savvy',
+                        difficulty: 'easy',
+                        trending_context: 'Tech trends',
+                      },
+                      {
+                        type: 'riddle',
+                        trend_topic: 'Basketball Championship',
+                        prompt: 'I fly without wings in a court of dreams',
+                        answer: 'DUNK',
+                        hint: 'Score two points',
+                        difficulty: 'medium',
+                        trending_context: 'NBA championship playoffs',
+                      },
+                      {
+                        type: 'riddle',
+                        trend_topic: 'Soccer World Cup',
+                        prompt: 'I score goals but am not a player',
+                        answer: 'BALL',
+                        hint: 'Round object',
+                        difficulty: 'easy',
+                        trending_context: 'World Cup soccer match',
+                      },
+                      {
+                        type: 'fill_blank',
+                        trend_topic: 'music',
+                        prompt: 'Complete: MUS_C',
+                        answer: 'MUSIC',
+                        hint: 'Sound art',
+                        difficulty: 'easy',
+                        trending_context: 'Music trending',
+                      },
+                      {
+                        type: 'definition_match',
+                        trend_topic: 'technology',
+                        prompt: 'A device for computing',
+                        answer: 'COMPUTER',
+                        options: ['COMPUTER', 'PHONE', 'TABLET', 'WATCH'],
+                        hint: 'Desktop or laptop',
+                        difficulty: 'easy',
+                        trending_context: 'Tech news',
+                      },
+                      {
+                        type: 'word_chain',
+                        trend_topic: 'music',
+                        prompt: 'SONG → ? → TUNE',
+                        answer: 'MELODY',
+                        hint: 'Musical sequence',
+                        difficulty: 'medium',
+                        trending_context: 'Music chain',
+                      },
+                    ],
+                  }),
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    const today = new Date();
+    const result = await generateDailyBuzz(today, 'en');
+
+    // Count sports-related riddles in the result
+    const sportsRiddles = result.challenges.filter(c => {
+      if (c.type !== 'riddle') return false;
+      const topic = c.trend_topic?.toLowerCase() ?? '';
+      const prompt = c.prompt?.toLowerCase() ?? '';
+      const context = c.trending_context?.toLowerCase() ?? '';
+      const sportsKeywords = ['basketball', 'soccer', 'football', 'championship', 'world cup', 'nba', 'match', 'player', 'goal'];
+      return sportsKeywords.some(kw => topic.includes(kw) || prompt.includes(kw) || context.includes(kw));
+    });
+
+    // Should have at most 1 sports riddle
+    expect(sportsRiddles.length).toBeLessThanOrEqual(1);
+
+    // Should still have at least 5 valid challenges total
+    expect(result.challenges.length).toBeGreaterThanOrEqual(5);
+  });
+});
+
 describe('Wordle challenge validation', () => {
   beforeEach(() => {
     jest.clearAllMocks();

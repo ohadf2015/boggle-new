@@ -78,7 +78,22 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     }, [language]);
 
     // Memoized navigation handler - use router for client-side navigation with locale
+    // If player is in an active game, trigger exit flow instead of navigating
     const handleLogoClick = useCallback(() => {
+        // Check if player is in an active multiplayer room
+        const gameCode = sessionStorage.getItem('gameCode');
+        const username = sessionStorage.getItem('username');
+
+        if (gameCode && username) {
+            // Player is in a room - trigger exit flow
+            // Dispatch custom event that PlayerView/HostView can listen to
+            window.dispatchEvent(new CustomEvent('requestRoomExit', {
+                detail: { gameCode, username, source: 'logo' }
+            }));
+            return;
+        }
+
+        // No active session - navigate normally
         router.push(`/${language}`);
     }, [language, router]);
 

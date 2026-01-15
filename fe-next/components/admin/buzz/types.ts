@@ -26,6 +26,10 @@ export interface DailyBuzzDataAdmin {
   trending_summary: string;
   challenges: BuzzChallengeAdmin[];
   trending_topics: TrendingTopicAdmin[];
+  // Image fields (nullable - can be removed by admin)
+  image_url?: string | null;
+  image_prompt?: string | null;
+  image_category?: string | null;
 }
 
 export interface PromptExample {

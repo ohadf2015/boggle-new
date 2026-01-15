@@ -255,6 +255,40 @@ const HostView: React.FC<HostViewProps> = memo(({
     },
   });
 
+  // Handle logo click exit request
+  // Use refs to access latest values without re-registering the event listener
+  const runtimeRef = useRef(runtime);
+  const actionsRef = useRef(actions);
+  const stateRef = useRef(state);
+
+  useEffect(() => {
+    runtimeRef.current = runtime;
+    actionsRef.current = actions;
+    stateRef.current = state;
+  });
+
+  useEffect(() => {
+    const handleRoomExitRequest = (event: CustomEvent) => {
+      const { gameCode: requestedCode, username: requestedUsername, source } = event.detail;
+
+      // Verify the request is for this game session
+      if (requestedCode === gameCode && requestedUsername === username) {
+        // If game hasn't started (waiting state), auto-exit without confirmation
+        if (!runtimeRef.current.gameStarted) {
+          actionsRef.current.confirmExitRoom();
+        } else {
+          // Game is active - show confirmation modal
+          stateRef.current.setShowExitConfirm(true);
+        }
+      }
+    };
+
+    window.addEventListener('requestRoomExit', handleRoomExitRequest as EventListener);
+    return () => {
+      window.removeEventListener('requestRoomExit', handleRoomExitRequest as EventListener);
+    };
+  }, [gameCode, username]);
+
   // Earthquake/Fire Round feature for multiplayer (only for triggering, state managed via socket events)
   useEarthquakeFireRound({
     enabled: runtime.gameStarted && !runtime.waitingForResults,
@@ -316,7 +350,7 @@ const HostView: React.FC<HostViewProps> = memo(({
   }, [runtime.showStartAnimation, runtime.gameStarted, hasActiveGameData, runtime.waitingForResults, setIsInGame]);
 
   return (
-    <div className="h-[100dvh] overflow-hidden bg-neo-navy">
+    <div className="h-full overflow-hidden bg-neo-navy">
       {/* GO Animation */}
       {runtime.showStartAnimation && (
         <GoRipplesAnimation onComplete={() => state.setShowStartAnimation(false)} />

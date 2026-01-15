@@ -1142,7 +1142,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     const validWordCount = foundWords.filter(fw => fw.isValid === true).length;
 
     return (
-      <div className="relative flex items-center justify-center w-full h-full min-h-screen max-h-[100dvh] overflow-hidden bg-slate-900 text-white">
+      <div className="relative flex items-center justify-center w-full h-full min-h-screen overflow-hidden bg-slate-900 text-white">
         {/* Earthquake Warning Overlay */}
         <EarthquakeWarning
           isVisible={earthquakeState === 'warning'}
@@ -1512,7 +1512,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   }
 
   return (
-    <div className="relative flex-1 flex flex-col overflow-hidden max-h-[100dvh]">
+    <div className="relative flex-1 flex flex-col overflow-hidden">
       {/* Earthquake Warning Overlay */}
       <EarthquakeWarning
         isVisible={earthquakeState === 'warning'}

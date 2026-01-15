@@ -800,7 +800,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   // Landscape mode layout - 2-column: winner/actions left, player cards right
   if (isLandscape) {
     return (
-      <div className="flex h-dvh w-full overflow-hidden bg-neo-cream text-neo-black p-3 gap-3">
+      <div className="flex w-full overflow-hidden bg-neo-cream text-neo-black p-3 gap-3">
         {/* Left column: Winner Banner + Action Buttons (Hero Area) */}
         <div className="w-[55%] flex flex-col items-center justify-center gap-4 p-4 border-2 border-neo-black rounded-neo bg-white/50 shadow-hard-sm">
           {/* Winner Banner - prominent */}

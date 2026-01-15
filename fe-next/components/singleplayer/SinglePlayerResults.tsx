@@ -478,7 +478,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   // getRankIcon returns React elements - kept local as it's component-specific
   const getRankIcon = (rank: number) => {
-    if (rank === 1) return <Trophy className="text-neo-lime text-xl" />;
+    if (rank === 1) return <Trophy className="text-tier-gold text-xl" />;
     if (rank === 2) return <Medal className="text-slate-500 dark:text-slate-300 text-xl" />;
     if (rank === 3) return <Medal className="text-amber-600 text-xl" />;
     return <span className="text-neo-black/70 dark:text-white/70 font-bold">#{rank}</span>;
@@ -501,7 +501,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             (results.playerScore === 0 || validWordCount === 0)
               ? 'bg-neo-cream dark:bg-slate-700'
               : (isWinner || results.isNewHighScore)
-                ? 'bg-gradient-to-r from-neo-lime to-yellow-300'
+                ? 'bg-gradient-to-r from-tier-gold to-yellow-300'
                 : 'bg-neo-cream dark:bg-slate-700'
           )}>
             <div className="flex items-center justify-center gap-2">
@@ -530,7 +530,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
           {/* Score display - compact */}
           <div className="flex items-center gap-4">
-            <div className="bg-neo-lime border-2 border-neo-black rounded-neo px-4 py-2 text-center shadow-hard-sm">
+            <div className="bg-tier-gold border-2 border-neo-black rounded-neo px-4 py-2 text-center shadow-hard-sm">
               <div className="text-2xl font-black text-neo-black">{results.playerScore}</div>
               <div className="text-[10px] sm:text-xs font-bold uppercase text-neo-black/70">{t('common.score') || 'Score'}</div>
             </div>

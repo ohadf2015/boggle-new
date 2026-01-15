@@ -79,7 +79,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   }, []);
 
   return (
-    <div className="h-[100dvh] flex flex-col bg-neo-navy overflow-hidden">
+    <div className="h-full flex flex-col bg-neo-navy overflow-hidden lg:max-w-2xl lg:mx-auto">
       {/* Compact Header */}
       <header className="flex-shrink-0 px-3 py-2 bg-slate-800/95 border-b-3 border-neo-black">
         <div className="flex items-center justify-between gap-2">

@@ -43,10 +43,10 @@ const RANK_STYLES: Record<number, {
   trophyShadowColor: string;
 }> = {
   1: {
-    bgClass: 'bg-gradient-to-br from-amber-400 via-yellow-400 to-amber-500',
-    textClass: 'text-neo-black', // Dark text on light amber background
+    bgClass: 'bg-gradient-to-br from-tier-gold via-yellow-300 to-tier-gold',
+    textClass: 'text-neo-black', // Dark text on light gold background
     iconBgClass: 'bg-neo-cream',
-    iconTextClass: 'text-amber-500',
+    iconTextClass: 'text-tier-gold',
     messageBgClass: 'bg-neo-pink',
     messageTextClass: 'text-neo-cream',
     nameShadowColor: 'var(--neo-cyan)',

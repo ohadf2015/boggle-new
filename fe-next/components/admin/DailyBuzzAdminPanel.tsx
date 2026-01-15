@@ -13,6 +13,8 @@ import {
   RefreshCw,
   ChevronDown,
   ChevronUp,
+  ImageOff,
+  Trash2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NeoLoader } from '@/components/ui/NeoLoader';
@@ -98,6 +100,11 @@ export default function DailyBuzzAdminPanel() {
   const [typeFeedback, setTypeFeedback] = useState('');
   const [isRegeneratingType, setIsRegeneratingType] = useState(false);
   const [typeRegenerateError, setTypeRegenerateError] = useState<string | null>(null);
+
+  // Image removal state
+  const [removeImageDialogOpen, setRemoveImageDialogOpen] = useState(false);
+  const [isRemovingImage, setIsRemovingImage] = useState(false);
+  const [removeImageError, setRemoveImageError] = useState<string | null>(null);
 
   // Success message state
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -235,6 +242,55 @@ export default function DailyBuzzAdminPanel() {
     setSuccessMessage(message);
     setTimeout(() => setSuccessMessage(null), 5000);
   }, []);
+
+  // Handle removing the image for current challenge
+  const handleRemoveImage = async () => {
+    if (!challengeData) return;
+
+    setIsRemovingImage(true);
+    setRemoveImageError(null);
+
+    try {
+      const { data: { session } } = await getSession();
+      if (!session?.access_token) {
+        throw new Error('No active session');
+      }
+
+      const response = await fetch('/api/admin/buzz/remove-image', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          date: challengeData.puzzle_date,
+          language: challengeData.language,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to remove image');
+      }
+
+      // Update local state to reflect image removal
+      setChallengeData({
+        ...challengeData,
+        image_url: null,
+        image_prompt: null,
+        image_category: null,
+      });
+
+      setRemoveImageDialogOpen(false);
+      setSuccessMessage(`Image removed for ${challengeData.language.toUpperCase()} on ${challengeData.puzzle_date}`);
+      setTimeout(() => setSuccessMessage(null), 5000);
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Failed to remove image';
+      setRemoveImageError(errorMsg);
+    } finally {
+      setIsRemovingImage(false);
+    }
+  };
 
   const handleGenerate = async () => {
     setIsGenerating(true);
@@ -603,6 +659,46 @@ export default function DailyBuzzAdminPanel() {
                     {challengeData.challenges.length} challenges
                   </div>
 
+                  {/* Image Section */}
+                  <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-slate-400">Hero Image</span>
+                      {challengeData.image_url && (
+                        <button
+                          onClick={() => {
+                            setRemoveImageDialogOpen(true);
+                            setRemoveImageError(null);
+                          }}
+                          className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 text-xs font-medium transition-colors"
+                          title="Remove image"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                    {challengeData.image_url ? (
+                      <div className="space-y-2">
+                        <img
+                          src={challengeData.image_url}
+                          alt={challengeData.trending_summary || 'Daily Buzz Hero'}
+                          className="w-full max-w-sm rounded-lg border-2 border-slate-600"
+                        />
+                        {challengeData.image_prompt && (
+                          <div className="text-xs text-slate-500">
+                            <span className="text-slate-400">Prompt: </span>
+                            {challengeData.image_prompt}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-slate-500 text-sm">
+                        <ImageOff className="w-4 h-4" />
+                        No image set for this language
+                      </div>
+                    )}
+                  </div>
+
                   {challengeData.challenges.map((challenge, index) => (
                     <div
                       key={index}
@@ -799,6 +895,80 @@ export default function DailyBuzzAdminPanel() {
                 <>
                   <RefreshCw className="w-4 h-4" />
                   Regenerate All {selectedType.replace(/_/g, ' ')}
+                </>
+              )}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Remove Image Confirmation Dialog */}
+      <Dialog open={removeImageDialogOpen} onOpenChange={setRemoveImageDialogOpen}>
+        <DialogContent className="sm:max-w-md" noDescription>
+          <DialogHeader customBg="bg-red-900/50 border-b border-red-500/30">
+            <DialogTitle className="flex items-center justify-center gap-2 text-red-400">
+              <Trash2 className="w-5 h-5" />
+              Remove Image
+            </DialogTitle>
+          </DialogHeader>
+          <DialogBody className="space-y-4">
+            {challengeData && (
+              <>
+                <p className="text-slate-300 text-center">
+                  Are you sure you want to remove the hero image for{' '}
+                  <span className="font-bold text-neo-yellow">{challengeData.language.toUpperCase()}</span>
+                  {' '}on{' '}
+                  <span className="font-bold text-neo-cyan">{challengeData.puzzle_date}</span>?
+                </p>
+                <p className="text-sm text-slate-500 text-center">
+                  This action cannot be undone. The challenge will display without an image until a new one is generated.
+                </p>
+
+                {/* Preview of image being removed */}
+                {challengeData.image_url && (
+                  <div className="flex justify-center">
+                    <img
+                      src={challengeData.image_url}
+                      alt="Image to be removed"
+                      className="max-w-[200px] rounded-lg border-2 border-red-500/50 opacity-75"
+                    />
+                  </div>
+                )}
+
+                {/* Error display */}
+                {removeImageError && (
+                  <div className="p-3 bg-red-900/30 border border-red-500 rounded-lg">
+                    <p className="text-sm text-red-400">{removeImageError}</p>
+                  </div>
+                )}
+              </>
+            )}
+          </DialogBody>
+          <DialogFooter>
+            <button
+              onClick={() => {
+                setRemoveImageDialogOpen(false);
+                setRemoveImageError(null);
+              }}
+              disabled={isRemovingImage}
+              className="px-4 py-2 rounded-lg border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:border-slate-400 disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleRemoveImage}
+              disabled={isRemovingImage}
+              className="px-4 py-2 rounded-lg bg-red-500 text-white font-bold border-2 border-red-700 shadow-hard-sm hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              {isRemovingImage ? (
+                <>
+                  <NeoLoader variant="dots" size="sm" />
+                  Removing...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4" />
+                  Remove Image
                 </>
               )}
             </button>

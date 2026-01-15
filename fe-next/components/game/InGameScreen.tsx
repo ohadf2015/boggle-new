@@ -675,7 +675,7 @@ const InGameScreen = memo<InGameScreenProps>(({
         )}
 
         {/* Full-screen landscape container - grid prevents side-panel overlap */}
-        <div className="relative w-full h-screen max-h-[100dvh] overflow-hidden bg-slate-900 text-white landscape-full-height">
+        <div className="relative w-full h-screen overflow-hidden bg-slate-900 text-white landscape-full-height">
           <div
             className="grid w-full h-full grid-rows-[1fr_auto] items-center"
             style={{
@@ -928,7 +928,7 @@ const InGameScreen = memo<InGameScreenProps>(({
         />
       )}
 
-      <div className="flex flex-col lg:flex-row gap-0 md:gap-2 lg:gap-3 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out h-full max-h-[100dvh]">
+      <div className="flex flex-col lg:flex-row gap-0 md:gap-2 lg:gap-3 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out h-full">
 
         {/* Top Bar - Only on mobile, integrated into parent on desktop */}
         {/* Compact header matching SinglePlayerGame layout with py-0.5 */}

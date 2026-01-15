@@ -90,7 +90,7 @@ const TodayParticipantRow = memo<{
       return 'bg-gradient-to-r from-neo-cyan/40 to-neo-cyan/20 border-neo-cyan shadow-[0_0_12px_rgba(0,255,255,0.3)] ring-2 ring-neo-cyan/60';
     }
     if (rank === 1) {
-      return 'bg-gradient-to-r from-amber-100 to-yellow-50 dark:from-amber-900/40 dark:to-yellow-900/20 border-amber-400 dark:border-amber-500';
+      return 'bg-gradient-to-r from-tier-gold/20 to-yellow-50 dark:from-tier-gold/40 dark:to-yellow-900/20 border-tier-gold dark:border-tier-gold';
     }
     if (rank === 2) {
       return 'bg-gradient-to-r from-slate-100 to-gray-50 dark:from-slate-700/60 dark:to-slate-800/40 border-slate-400 dark:border-slate-400';
@@ -103,7 +103,7 @@ const TodayParticipantRow = memo<{
 
   // Rank badge colors
   const getRankBadgeColors = () => {
-    if (rank === 1) return 'bg-gradient-to-br from-amber-400 to-yellow-500 text-amber-900 border-amber-600';
+    if (rank === 1) return 'bg-gradient-to-br from-tier-gold to-yellow-400 text-amber-900 border-tier-gold-border';
     if (rank === 2) return 'bg-gradient-to-br from-slate-300 to-gray-400 text-slate-800 border-slate-500';
     if (rank === 3) return 'bg-gradient-to-br from-orange-400 to-amber-500 text-orange-900 border-orange-600';
     return 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-500';
@@ -162,7 +162,7 @@ const TodayParticipantRow = memo<{
             </span>
           )}
           {rank === 1 && (
-            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0 animate-pulse" />
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-tier-gold shrink-0 animate-pulse" />
           )}
         </div>
         <div className="text-xs sm:text-sm flex items-center gap-2 mt-0.5">
@@ -214,7 +214,7 @@ const AllTimeParticipantRow = memo<{
       return 'bg-gradient-to-r from-neo-cyan/40 to-neo-cyan/20 border-neo-cyan shadow-[0_0_12px_rgba(0,255,255,0.3)] ring-2 ring-neo-cyan/60';
     }
     if (rank === 1) {
-      return 'bg-gradient-to-r from-amber-100 to-yellow-50 dark:from-amber-900/40 dark:to-yellow-900/20 border-amber-400 dark:border-amber-500';
+      return 'bg-gradient-to-r from-tier-gold/20 to-yellow-50 dark:from-tier-gold/40 dark:to-yellow-900/20 border-tier-gold dark:border-tier-gold';
     }
     if (rank === 2) {
       return 'bg-gradient-to-r from-slate-100 to-gray-50 dark:from-slate-700/60 dark:to-slate-800/40 border-slate-400 dark:border-slate-400';
@@ -227,7 +227,7 @@ const AllTimeParticipantRow = memo<{
 
   // Rank badge colors
   const getRankBadgeColors = () => {
-    if (rank === 1) return 'bg-gradient-to-br from-amber-400 to-yellow-500 text-amber-900 border-amber-600';
+    if (rank === 1) return 'bg-gradient-to-br from-tier-gold to-yellow-400 text-amber-900 border-tier-gold-border';
     if (rank === 2) return 'bg-gradient-to-br from-slate-300 to-gray-400 text-slate-800 border-slate-500';
     if (rank === 3) return 'bg-gradient-to-br from-orange-400 to-amber-500 text-orange-900 border-orange-600';
     return 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-500';

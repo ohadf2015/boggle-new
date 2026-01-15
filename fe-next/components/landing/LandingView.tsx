@@ -231,7 +231,6 @@ const LandingView: React.FC = () => {
       className={cn(
         'flex flex-col bg-gray-100 dark:bg-neo-navy relative overflow-hidden page-content-safe',
         isLandscape && 'landscape-full-height',
-        isMobilePortrait && 'h-[100dvh] max-h-[100dvh]',
         !isLandscape && !isMobilePortrait && 'h-full'
       )}
       {...pullToRefreshHandlers}
@@ -372,8 +371,6 @@ const LandingView: React.FC = () => {
                   'bg-gradient-to-br from-neo-pink to-pink-400',
                   'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
                   'transition-all min-h-[100px] sm:min-h-[120px]',
-                  isMobilePortrait && 'max-h-[30dvh]',
-                  isLandscape && 'max-h-[70dvh]',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                 )}
                 aria-label={`${t('landing.multiplayer') || 'Multiplayer'} - ${t('landing.multiplayerDesc') || 'Compete with friends'}`}
@@ -405,8 +402,6 @@ const LandingView: React.FC = () => {
                   'bg-gradient-to-br from-neo-cyan to-cyan-400',
                   'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
                   'transition-all min-h-[100px] sm:min-h-[120px]',
-                  isMobilePortrait && 'max-h-[30dvh]',
-                  isLandscape && 'max-h-[70dvh]',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                 )}
                 aria-label={`${t('landing.singlePlayer') || 'Single Player'} - ${t('landing.singlePlayerDesc') || 'Practice at your own pace'}`}
@@ -431,8 +426,6 @@ const LandingView: React.FC = () => {
                   'bg-gradient-to-br from-neo-purple to-purple-400',
                   'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
                   'transition-all min-h-[80px] sm:min-h-[100px]',
-                  isMobilePortrait && 'max-h-[20dvh]',
-                  isLandscape && 'max-h-[50dvh]',
                   'cursor-wait'
                 )}
                 aria-label={`${t('landing.brainTraining') || 'Brain Training'} - Loading`}
@@ -458,8 +451,6 @@ const LandingView: React.FC = () => {
                     'bg-gradient-to-br from-neo-purple to-purple-400',
                     'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
                     'transition-all min-h-[80px] sm:min-h-[100px]',
-                    isMobilePortrait && 'max-h-[20dvh]',
-                    isLandscape && 'max-h-[50dvh]',
                     'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                   )}
                   aria-label={`${t('landing.brainTraining') || 'Brain Training'} - ${t('landing.brainTrainingDesc') || 'Track cognitive growth'}`}
@@ -476,8 +467,6 @@ const LandingView: React.FC = () => {
                   'bg-gradient-to-br from-neo-purple to-purple-400 grayscale',
                   'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
                   'transition-all min-h-[80px] sm:min-h-[100px]',
-                  isMobilePortrait && 'max-h-[20dvh]',
-                  isLandscape && 'max-h-[50dvh]',
                   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
                 )}
                 whileHover={{ scale: 1.02 }}

@@ -466,11 +466,11 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
             </div>
           </motion.div>
 
-          {/* Room List - Takes remaining space on desktop */}
+          {/* Room List - Max width constraint on desktop */}
           <motion.div
             initial={{ x: 30, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="w-full lg:flex-1 lg:min-w-0"
+            className="w-full lg:max-w-2xl"
           >
             <RoomList
               activeRooms={activeRooms}

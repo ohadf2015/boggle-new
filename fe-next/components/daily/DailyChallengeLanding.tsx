@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, useMemo, type ReactNode } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Trophy, Timer, Hourglass, Bell, Check, Loader2, Clock } from 'lucide-react';
@@ -22,8 +22,14 @@ interface DailyChallengeLandingProps {
 }
 
 interface ChallengeStatus {
-  wordHunt: 'new' | 'done' | 'loading';
-  buzz: 'new' | 'done' | 'loading' | 'unavailable';
+  wordHunt: 'new' | 'done';
+  buzz: 'new' | 'done' | 'unavailable';
+}
+
+// Separate loading states for status checks (shouldn't block card rendering)
+interface LoadingState {
+  wordHunt: boolean;
+  buzz: boolean;
 }
 
 interface BuzzPreviewData {
@@ -44,9 +50,15 @@ export function DailyChallengeLanding({
 }: DailyChallengeLandingProps) {
   const { t } = useLanguage();
   const { user } = useAuth();
+  // Status is set once API calls complete - cards render immediately without waiting
   const [status, setStatus] = useState<ChallengeStatus>({
-    wordHunt: 'loading',
-    buzz: 'loading',
+    wordHunt: 'new',
+    buzz: 'new',
+  });
+  // Separate loading state for status checks - only affects status badge, not whole card
+  const [loadingStatus, setLoadingStatus] = useState<LoadingState>({
+    wordHunt: true,
+    buzz: true,
   });
   const [buzzPreview, setBuzzPreview] = useState<BuzzPreviewData>({});
   const [requestState, setRequestState] = useState<'idle' | 'loading' | 'sent'>('idle');
@@ -65,9 +77,20 @@ export function DailyChallengeLanding({
   }, []);
 
   // Check completion status for both challenges and fetch buzz preview
+  // Status checks happen in the background - cards render immediately
   useEffect(() => {
-    const checkStatus = async () => {
+    // Reset loading states when language changes
+    setLoadingStatus({ wordHunt: true, buzz: true });
+
+    // Word Hunt status check - synchronous local storage check
+    const checkWordHunt = () => {
       const wordHuntPlayed = hasPlayedToday(currentLanguage);
+      setStatus(prev => ({ ...prev, wordHunt: wordHuntPlayed ? 'done' : 'new' }));
+      setLoadingStatus(prev => ({ ...prev, wordHunt: false }));
+    };
+
+    // Buzz status check - async API calls
+    const checkBuzzStatus = async () => {
       const today = new Date().toISOString().split('T')[0];
 
       // First check if buzz challenge is available for this language
@@ -86,11 +109,9 @@ export function DailyChallengeLanding({
 
       // If not available, set status and skip further checks
       if (!buzzAvailable) {
-        setStatus({
-          wordHunt: wordHuntPlayed ? 'done' : 'new',
-          buzz: 'unavailable',
-        });
+        setStatus(prev => ({ ...prev, buzz: 'unavailable' }));
         setBuzzPreview({ available: false });
+        setLoadingStatus(prev => ({ ...prev, buzz: false }));
         return;
       }
 
@@ -120,7 +141,7 @@ export function DailyChallengeLanding({
         console.error('Failed to check buzz status:', err);
       }
 
-      // Fetch buzz preview data for image display
+      // Fetch buzz preview data for image display (separate from status)
       try {
         const buzzResponse = await fetch(`/api/buzz/${today}/${currentLanguage}`);
         if (buzzResponse.ok) {
@@ -137,13 +158,14 @@ export function DailyChallengeLanding({
         console.error('Failed to fetch buzz preview:', err);
       }
 
-      setStatus({
-        wordHunt: wordHuntPlayed ? 'done' : 'new',
-        buzz: buzzPlayed ? 'done' : 'new',
-      });
+      setStatus(prev => ({ ...prev, buzz: buzzPlayed ? 'done' : 'new' }));
+      setLoadingStatus(prev => ({ ...prev, buzz: false }));
     };
 
-    checkStatus();
+    // Check Word Hunt immediately (local storage is sync)
+    checkWordHunt();
+    // Check Buzz status in background
+    checkBuzzStatus();
     // Reset request state when language changes
     setRequestState('idle');
   }, [currentLanguage, user?.id]);
@@ -247,6 +269,7 @@ export function DailyChallengeLanding({
           tagline={t('daily.wordHunt.desc')}
           color="orange"
           status={status.wordHunt}
+          isLoadingStatus={loadingStatus.wordHunt}
           onPlay={onSelectWordHunt}
           timeMode="timed"
           timeModeLabel={t('daily.timed90Seconds')}
@@ -255,9 +278,7 @@ export function DailyChallengeLanding({
           buttonText={
             status.wordHunt === 'done'
               ? t('daily.viewResults')
-              : status.wordHunt === 'loading'
-                ? t('common.loading')
-                : t('daily.play')
+              : t('daily.play')
           }
           delay={0.2}
         />
@@ -272,6 +293,7 @@ export function DailyChallengeLanding({
           }
           color="yellow"
           status={status.buzz}
+          isLoadingStatus={loadingStatus.buzz}
           onPlay={onSelectBuzz}
           timeMode="relaxed"
           timeModeLabel={t('daily.takeYourTime')}
@@ -279,11 +301,9 @@ export function DailyChallengeLanding({
           buttonText={
             status.buzz === 'done'
               ? t('daily.viewResults')
-              : status.buzz === 'loading'
-                ? t('common.loading')
-                : status.buzz === 'unavailable'
-                  ? t('buzz.requestChallenge')
-                  : t('daily.play')
+              : status.buzz === 'unavailable'
+                ? t('buzz.requestChallenge')
+                : t('daily.play')
           }
           delay={0.3}
           previewImageUrl={buzzPreview.imageUrl}
@@ -428,7 +448,9 @@ interface CompactChallengeCardProps {
   title: string;
   tagline: string;
   color: 'orange' | 'yellow';
-  status: 'new' | 'done' | 'loading' | 'unavailable';
+  status: 'new' | 'done' | 'unavailable';
+  /** Whether status is still being determined (only affects status badge) */
+  isLoadingStatus?: boolean;
   onPlay: () => void;
   buttonText: string;
   timeMode: 'timed' | 'relaxed';
@@ -455,6 +477,7 @@ function CompactChallengeCard({
   tagline,
   color,
   status,
+  isLoadingStatus = false,
   onPlay,
   buttonText,
   timeMode,
@@ -493,6 +516,34 @@ function CompactChallengeCard({
   // Show image only if URL exists and hasn't errored
   const showImage = previewImageUrl && !imageError;
   const isUnavailable = status === 'unavailable';
+
+  // Memoize image element to prevent flashing on parent re-renders
+  const imageElement = useMemo(() => {
+    if (!showImage) return null;
+
+    return (
+      <div
+        key={previewImageUrl}
+        className="relative w-full aspect-square max-h-32 sm:max-h-44 rounded-xl overflow-hidden mb-2 sm:mb-3 border-3 border-neo-black shadow-hard"
+      >
+        <Image
+          src={previewImageUrl}
+          alt={previewImageAlt || title}
+          fill
+          sizes="(max-width: 640px) 100vw, 50vw"
+          className="object-cover"
+          onError={() => setImageError(true)}
+          priority
+          unoptimized
+        />
+        {/* Neo-brutalist corner accents */}
+        <div className="absolute top-0 start-0 w-5 h-5 sm:w-6 sm:h-6 bg-neo-cyan border-e-2 border-b-2 border-neo-black" />
+        <div className="absolute bottom-0 end-0 w-5 h-5 sm:w-6 sm:h-6 bg-neo-pink border-s-2 border-t-2 border-neo-black" />
+        {/* Subtle gradient for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent" />
+      </div>
+    );
+  }, [previewImageUrl, previewImageAlt, title, showImage]);
 
   const colorStyles = {
     orange: {
@@ -564,7 +615,7 @@ function CompactChallengeCard({
           'shadow-hard transition-shadow duration-200',
           'flex flex-col items-center text-center cursor-pointer',
           'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime',
-          (status === 'loading' || requestState === 'loading') && 'opacity-50 cursor-not-allowed',
+          requestState === 'loading' && 'opacity-50 cursor-not-allowed',
           status === 'done' && 'opacity-85',
           isUnavailable && 'opacity-60'
         )}
@@ -597,7 +648,12 @@ function CompactChallengeCard({
 
         {/* Status Badge - Top Right */}
         <div className="absolute top-2 end-2 z-10">
-          {status === 'done' ? (
+          {isLoadingStatus ? (
+            // Show subtle loading indicator while checking status
+            <span className="text-xs font-bold bg-slate-700/50 text-slate-400 px-2 py-0.5 rounded-full border border-slate-600/40">
+              <Loader2 className="w-3 h-3 animate-spin inline" />
+            </span>
+          ) : status === 'done' ? (
             <motion.span
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -642,23 +698,8 @@ function CompactChallengeCard({
         {/* Preview: Custom Grid, Image, or Icon */}
         {customPreview === 'word-hunt-grid' ? (
           <WordHuntMiniGrid isHovered={isHovered} language={currentLanguage} />
-        ) : showImage ? (
-          <div className="relative w-full aspect-square max-h-32 sm:max-h-44 rounded-xl overflow-hidden mb-2 sm:mb-3 border-3 border-neo-black shadow-hard">
-            <Image
-              src={previewImageUrl}
-              alt={previewImageAlt || title}
-              fill
-              sizes="(max-width: 640px) 100vw, 50vw"
-              className="object-cover"
-              onError={() => setImageError(true)}
-              priority
-            />
-            {/* Neo-brutalist corner accents */}
-            <div className="absolute top-0 start-0 w-5 h-5 sm:w-6 sm:h-6 bg-neo-cyan border-e-2 border-b-2 border-neo-black" />
-            <div className="absolute bottom-0 end-0 w-5 h-5 sm:w-6 sm:h-6 bg-neo-pink border-s-2 border-t-2 border-neo-black" />
-            {/* Subtle gradient for text readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent" />
-          </div>
+        ) : imageElement ? (
+          imageElement
         ) : (
           <motion.div
             whileHover={showEffects ? { scale: 1.1, rotate: 5 } : {}}
