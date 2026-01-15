@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 import {
   Play,
   Check,
@@ -679,11 +680,14 @@ export default function DailyBuzzAdminPanel() {
                     </div>
                     {challengeData.image_url ? (
                       <div className="space-y-2">
-                        <img
-                          src={challengeData.image_url}
-                          alt={challengeData.trending_summary || 'Daily Buzz Hero'}
-                          className="w-full max-w-sm rounded-lg border-2 border-slate-600"
-                        />
+                        <div className="relative w-full max-w-sm aspect-[4/3]">
+                          <Image
+                            src={challengeData.image_url}
+                            alt={challengeData.trending_summary || 'Daily Buzz Hero'}
+                            fill
+                            className="rounded-lg border-2 border-slate-600 object-cover"
+                          />
+                        </div>
                         {challengeData.image_prompt && (
                           <div className="text-xs text-slate-500">
                             <span className="text-slate-400">Prompt: </span>
@@ -927,11 +931,14 @@ export default function DailyBuzzAdminPanel() {
                 {/* Preview of image being removed */}
                 {challengeData.image_url && (
                   <div className="flex justify-center">
-                    <img
-                      src={challengeData.image_url}
-                      alt="Image to be removed"
-                      className="max-w-[200px] rounded-lg border-2 border-red-500/50 opacity-75"
-                    />
+                    <div className="relative w-[200px] aspect-[4/3]">
+                      <Image
+                        src={challengeData.image_url}
+                        alt="Image to be removed"
+                        fill
+                        className="rounded-lg border-2 border-red-500/50 opacity-75 object-cover"
+                      />
+                    </div>
                   </div>
                 )}
 
