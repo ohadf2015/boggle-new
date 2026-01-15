@@ -143,7 +143,7 @@ export const GameSettingsPanel = memo<GameSettingsPanelProps>(({
   const playerDataOnly = players.filter((p): p is PlayerData => typeof p !== 'string');
 
   return (
-    <Card className="flex-1 p-3 sm:p-4 bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
+    <Card className="flex-1 p-3 sm:p-4 bg-neo-navy/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
       <h3 className="text-sm font-black uppercase text-neo-cream mb-3 flex items-center gap-2">
         <Settings className="text-neo-cyan text-xs" />
         {t('hostView.gameSettings')}

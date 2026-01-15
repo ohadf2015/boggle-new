@@ -38,7 +38,7 @@ export const PlayersListPanel = memo<PlayersListPanelProps>(({
   t,
 }) => {
   return (
-    <Card className="lg:w-[350px] h-auto p-3 sm:p-4 md:p-6 flex flex-col bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
+    <Card className="lg:w-[350px] h-auto p-3 sm:p-4 md:p-6 flex flex-col bg-neo-navy/95 text-neo-white border-4 border-neo-black shadow-hard-lg">
       <h3 className="text-base font-bold uppercase text-neo-cream/80 mb-3 flex items-center gap-2 flex-shrink-0">
         <Users className="text-neo-pink/80" />
         {t('hostView.playersJoined')} ({players.length})

@@ -420,7 +420,7 @@ export default function BuzzGameScreen({
         className="flex-1 flex flex-col items-center justify-center relative z-10"
         {...swipeHandlers}
       >
-        {/* Left Arrow Hint (show if not first challenge) */}
+        {/* Previous Challenge Arrow (show if not first challenge) */}
         {currentIndex > 0 && (
           <motion.button
             initial={{ opacity: 0, x: -10 }}
@@ -431,11 +431,17 @@ export default function BuzzGameScreen({
             className="absolute start-2 top-1/2 -translate-y-1/2 p-2 bg-slate-800/80 border-2 border-slate-600 rounded-full hover:border-neo-cyan transition-colors z-20"
             aria-label={t('buzz.prevChallenge')}
           >
-            <ChevronLeft className="w-6 h-6 text-slate-300" />
+            {/* In RTL, previous is on the right (start) and should point right (→)
+                In LTR, previous is on the left (start) and should point left (←) */}
+            {dir === 'rtl' ? (
+              <ChevronRight className="w-6 h-6 text-slate-300" />
+            ) : (
+              <ChevronLeft className="w-6 h-6 text-slate-300" />
+            )}
           </motion.button>
         )}
 
-        {/* Right Arrow Hint (show if not last challenge) */}
+        {/* Next Challenge Arrow (show if not last challenge) */}
         {currentIndex < challengeData.challenges.length - 1 && (
           <motion.button
             initial={{ opacity: 0, x: 10 }}
@@ -446,7 +452,13 @@ export default function BuzzGameScreen({
             className="absolute end-2 top-1/2 -translate-y-1/2 p-2 bg-slate-800/80 border-2 border-slate-600 rounded-full hover:border-neo-cyan transition-colors z-20"
             aria-label={t('buzz.nextChallenge')}
           >
-            <ChevronRight className="w-6 h-6 text-slate-300" />
+            {/* In RTL, next is on the left (end) and should point left (←)
+                In LTR, next is on the right (end) and should point right (→) */}
+            {dir === 'rtl' ? (
+              <ChevronLeft className="w-6 h-6 text-slate-300" />
+            ) : (
+              <ChevronRight className="w-6 h-6 text-slate-300" />
+            )}
           </motion.button>
         )}
 

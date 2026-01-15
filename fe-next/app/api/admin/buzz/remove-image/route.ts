@@ -81,7 +81,8 @@ export async function DELETE(request: NextRequest): Promise<NextResponse> {
     const region = regionMap[language] || 'US';
 
     // Update the challenge to remove the image
-    const { data, error } = await supabase
+    // Note: No .select() needed - we don't use the returned data, just verify success
+    const { error } = await supabase
       .from('daily_buzz_challenges')
       .update({
         image_url: null,
@@ -90,9 +91,7 @@ export async function DELETE(request: NextRequest): Promise<NextResponse> {
       })
       .eq('puzzle_date', date)
       .eq('language', language)
-      .eq('region', region)
-      .select()
-      .single();
+      .eq('region', region);
 
     if (error) {
       if (error.code === 'PGRST116') {
@@ -109,7 +108,6 @@ export async function DELETE(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({
       success: true,
       message: `Image removed successfully for ${language} on ${date}`,
-      data,
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';

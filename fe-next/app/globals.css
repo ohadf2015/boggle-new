@@ -310,12 +310,14 @@ body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  /* Neo-brutalist background with halftone dots and retro grid */
-  background-color: #0f172a;
+  /* Neo-brutalist background with halftone dots and retro grid - consistent across entire app */
+  background-color: var(--neo-navy);
   background-image:
     var(--halftone-pattern),
     var(--retro-grid-pattern);
   background-size: 20px 20px, 60px 60px;
+  /* Ensure background extends to full viewport */
+  min-height: 100dvh;
 }
 
 * {

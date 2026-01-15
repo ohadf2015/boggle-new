@@ -126,7 +126,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
           <button
             onClick={onBack}
             disabled={isSubmitting}
-            className="absolute start-4 flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] min-w-[44px] rounded-neo border-3 border-neo-black dark:border-slate-600 bg-neo-cream dark:bg-slate-700 shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all text-neo-black dark:text-neo-white text-sm font-bold disabled:opacity-50"
+            className="absolute start-4 flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] min-w-[44px] rounded-neo border-3 border-neo-black dark:border-neo-black/50 bg-neo-cream dark:bg-neo-navy shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all text-neo-black dark:text-neo-white text-sm font-bold disabled:opacity-50"
           >
             <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back') || 'Back'}</span>
@@ -138,8 +138,8 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
             </h1>
             {/* Progress indicator */}
             <div className="flex items-center justify-center gap-2 mt-2">
-              <div className="w-3 h-3 rounded-full bg-neo-cyan border-2 border-neo-black dark:border-slate-300" />
-              <div className="w-3 h-3 rounded-full bg-neo-cyan border-2 border-neo-black dark:border-slate-300" />
+              <div className="w-3 h-3 rounded-full bg-neo-cyan border-2 border-neo-black dark:border-neo-white/30" />
+              <div className="w-3 h-3 rounded-full bg-neo-cyan border-2 border-neo-black dark:border-neo-white/30" />
               <span className="text-xs text-neo-black/60 dark:text-slate-400 ms-2">
                 {t('multiplayerFlow.joinForm.progress') || 'Step 2 of 2'}
               </span>
@@ -155,7 +155,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
             transition={{ delay: 0.1 }}
             className="w-full max-w-md"
           >
-            <Card className="border-3 border-neo-black dark:border-slate-600 shadow-hard">
+            <Card className="border-3 border-neo-black dark:border-neo-black/50 shadow-hard">
               <CardContent className="p-6 sm:p-8">
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {/* Profile Badge */}
@@ -197,7 +197,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                         aria-invalid={showGameCodeError ? 'true' : undefined}
                         aria-describedby={showGameCodeError ? 'game-code-error' : 'game-code-hint'}
                         className={cn(
-                          "h-14 text-xl text-center font-mono font-bold tracking-widest uppercase pr-14 bg-slate-100 dark:bg-slate-700/50 border-slate-200 dark:border-slate-600 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-500",
+                          "h-14 text-xl text-center font-mono font-bold tracking-widest uppercase pr-14 bg-neo-navy/30 dark:bg-neo-navy/50 border-neo-white/20 dark:border-neo-black/50 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-gray-500",
                           getValidationClasses(
                             gameCodeError ? 'invalid' : gameCodeValidation.state,
                             showGameCodeError ? "border-red-500 bg-red-900/30 focus-visible:ring-red-500" : ""
@@ -249,7 +249,7 @@ const JoinRoomForm: React.FC<JoinRoomFormProps> = ({
                       </button>
                     </div>
 
-                    <div className="max-h-[180px] overflow-y-auto rounded-neo border-2 border-neo-cream/30 dark:border-slate-600 bg-slate-50 dark:bg-slate-800/50">
+                    <div className="max-h-[180px] overflow-y-auto rounded-neo border-2 border-neo-cream/30 dark:border-neo-black/50 bg-neo-navy/20 dark:bg-neo-navy/50">
                       {roomsLoading ? (
                         <div className="p-4 text-center">
                           <NeoLoader variant="dots" size="sm" className="mx-auto" />

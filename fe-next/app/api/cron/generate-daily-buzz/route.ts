@@ -70,20 +70,39 @@ export async function GET(request: NextRequest) {
     const today = new Date();
     const enabledLanguages = getBuzzEnabledLanguages();
     console.log(`[Cron] Enabled languages: ${enabledLanguages.join(', ')}`);
-    const results: Record<string, { success: boolean; error?: string }> = {};
+    console.log('[Cron] Starting parallel generation for all languages...');
 
-    // Generate challenges only for enabled languages
-    for (const language of enabledLanguages) {
+    // Generate challenges for all languages IN PARALLEL
+    // This reduces total time from ~120s (sequential) to ~30-40s (parallel)
+    const generationPromises = enabledLanguages.map(async (language) => {
       try {
         console.log(`[Cron] Generating buzz for ${language}...`);
         await generateDailyBuzz(today, language);
-        results[language] = { success: true };
         console.log(`[Cron] ✅ Generated buzz for ${language}`);
+        return { language, success: true };
       } catch (err: any) {
         console.error(`[Cron] ❌ Failed to generate buzz for ${language}:`, err);
-        results[language] = { success: false, error: err.message };
+        return { language, success: false, error: err.message };
       }
-    }
+    });
+
+    // Wait for all generations to complete (or fail)
+    const generationResults = await Promise.allSettled(generationPromises);
+
+    // Convert to results object
+    const results: Record<string, { success: boolean; error?: string }> = {};
+    generationResults.forEach((result) => {
+      if (result.status === 'fulfilled') {
+        results[result.value.language] = {
+          success: result.value.success,
+          error: result.value.error,
+        };
+      } else {
+        // Promise was rejected (shouldn't happen since we catch errors, but defensive)
+        const lang = enabledLanguages[generationResults.indexOf(result)] || 'unknown';
+        results[lang] = { success: false, error: result.reason.message };
+      }
+    });
 
     // Check if all succeeded
     const allSuccess = Object.values(results).every((r) => r.success);

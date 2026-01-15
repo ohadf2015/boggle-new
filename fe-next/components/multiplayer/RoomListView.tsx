@@ -80,7 +80,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         >
           <Link
             href="/"
-            className="flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] min-w-[44px] rounded-neo border-2 border-slate-600 bg-slate-700/50 shadow-hard-sm hover:bg-slate-600/50 transition-all text-neo-cream text-sm font-bold"
+            className="flex items-center justify-center gap-2 px-3 py-2 min-h-[44px] min-w-[44px] rounded-neo border-2 border-neo-black/50 bg-neo-navy/50 shadow-hard-sm hover:bg-neo-black/30/50 transition-all text-neo-cream text-sm font-bold"
           >
             <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
             <span className="hidden sm:inline">{t('common.back')}</span>
@@ -92,7 +92,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
           <button
             onClick={() => setShowHowToPlay(true)}
-            className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo border-2 border-slate-600 bg-slate-700/50 hover:bg-neo-purple/30 transition-all"
+            className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo border-2 border-neo-black/50 bg-neo-navy/50 hover:bg-neo-purple/30 transition-all"
             aria-label={t('landing.tutorial')}
           >
             <HelpCircle className="w-5 h-5 text-neo-cream" />
@@ -125,11 +125,11 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             transition={{ delay: 0.15 }}
             className="flex items-center gap-3 flex-shrink-0"
           >
-            <div className="flex-1 h-px bg-slate-600" />
+            <div className="flex-1 h-px bg-neo-black/30" />
             <span className="text-sm text-slate-400 font-medium uppercase">
               {t('multiplayerFlow.roomList.orJoinRoom') || 'or join a room'}
             </span>
-            <div className="flex-1 h-px bg-slate-600" />
+            <div className="flex-1 h-px bg-neo-black/30" />
           </motion.div>
 
           {/* Room List Section - takes remaining space, scrolls internally */}
@@ -153,7 +153,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               <button
                 onClick={onRefreshRooms}
                 disabled={roomsLoading}
-                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo border-2 border-neo-black bg-slate-700/50 shadow-hard-sm hover:shadow-hard hover:bg-neo-cyan/20 hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all disabled:opacity-50"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo border-2 border-neo-black bg-neo-navy/50 shadow-hard-sm hover:shadow-hard hover:bg-neo-cyan/20 hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed transition-all disabled:opacity-50"
                 aria-label={t('common.refresh')}
               >
                 {roomsLoading ? (
@@ -186,7 +186,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                       onClick={() => onRoomClick(room)}
                       whileHover={{ scale: 1.02, x: -2 }}
                       whileTap={{ scale: 0.98 }}
-                      className="flex items-center gap-3 p-3 rounded-neo border-2 border-neo-black bg-slate-700/60 shadow-hard-sm hover:shadow-hard hover:bg-neo-cyan/15 hover:border-neo-cyan transition-all text-left group"
+                      className="flex items-center gap-3 p-3 rounded-neo border-2 border-neo-black bg-neo-navy/60 shadow-hard-sm hover:shadow-hard hover:bg-neo-cyan/15 hover:border-neo-cyan transition-all text-left group"
                     >
                       <span className="text-xl">
                         {LANGUAGE_FLAGS[room.language] || '🎮'}
@@ -213,7 +213,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                   transition={{ delay: 0.25 }}
                   className="flex flex-col items-center justify-center text-center py-6"
                 >
-                  <div className="w-14 h-14 rounded-neo bg-slate-700/70 border-2 border-neo-black shadow-hard flex items-center justify-center mb-3">
+                  <div className="w-14 h-14 rounded-neo bg-neo-navy/70 border-2 border-neo-black shadow-hard flex items-center justify-center mb-3">
                     <Users className="w-7 h-7 text-neo-cyan" />
                   </div>
                   <p className="text-sm font-bold text-neo-cream/80 mb-1">
@@ -237,7 +237,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             <Button
               variant="outline"
               onClick={onCreateRoom}
-              className="w-full py-3 text-sm font-bold uppercase border-2 border-slate-600 bg-slate-700/30 hover:bg-neo-lime/20 hover:border-neo-lime/50 text-neo-cream"
+              className="w-full py-3 text-sm font-bold uppercase border-2 border-neo-black/50 bg-neo-navy/30 hover:bg-neo-lime/20 hover:border-neo-lime/50 text-neo-cream"
             >
               <Plus className="w-4 h-4 me-2" />
               {t('multiplayerFlow.roomList.createButton')}
@@ -249,7 +249,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         <Dialog open={showHowToPlay} onOpenChange={setShowHowToPlay}>
           <DialogContent
             noDescription
-            className="max-w-2xl max-h-[90vh] overflow-hidden p-0 bg-neo-navy border-slate-600"
+            className="max-w-2xl max-h-[90vh] overflow-hidden p-0 bg-neo-navy border-neo-black/50"
           >
             <DialogHeader className="sr-only">
               <DialogTitle>{t('landing.tutorial')}</DialogTitle>

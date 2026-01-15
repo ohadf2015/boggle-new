@@ -71,7 +71,7 @@ export const RoomCodeSection = memo<RoomCodeSectionProps>(({
 
   return (
     <>
-      <Card className="bg-slate-800/95 text-neo-white px-2 py-1.5 sm:px-3 sm:py-2 border-2 border-neo-black shadow-hard">
+      <Card className="bg-neo-navy/95 text-neo-white px-2 py-1.5 sm:px-3 sm:py-2 border-2 border-neo-black shadow-hard">
         <div className="flex items-center justify-between gap-2">
           {/* Room Code and Language */}
           <div className="flex items-center gap-2">

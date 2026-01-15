@@ -12,6 +12,7 @@ import { getSession } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { LiveMonitor } from '@/components/admin/LiveMonitor';
 import { TodayGamesHistory } from '@/components/admin/TodayGamesHistory';
+import { GamesDiagnostic } from '@/components/admin/GamesDiagnostic';
 import { EmailTestPanel } from '@/components/admin/EmailTestPanel';
 import { PullToRefreshWrapper } from '@/components/ui/PullToRefreshWrapper';
 import { isMobileDevice } from '@/utils/mobileAccessibility';
@@ -187,6 +188,11 @@ export default function AdminPage() {
 
         {/* Today's Games History */}
         <TodayGamesHistory authToken={authToken} />
+
+        {/* Database Diagnostic Tools */}
+        <div className="mt-8 bg-slate-800/50 rounded-neo border-neo border-black p-4">
+          <GamesDiagnostic authToken={authToken} />
+        </div>
 
         {/* Email Testing Section */}
         <div id="email-testing" className="mt-8">

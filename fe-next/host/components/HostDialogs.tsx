@@ -35,7 +35,7 @@ export const QRCodeDialog: React.FC<QRCodeDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent noDescription className="sm:max-w-md bg-white text-neo-black dark:bg-slate-800 dark:text-white border-cyan-500/30">
+      <DialogContent noDescription className="sm:max-w-md bg-white text-neo-black dark:bg-neo-navy dark:text-white border-cyan-500/30">
         <DialogHeader>
           <DialogTitle className="text-center text-cyan-600 dark:text-cyan-300 flex items-center justify-center gap-2">
             <QrCode />
@@ -144,7 +144,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent noDescription className="max-w-2xl max-h-[85vh] flex flex-col bg-slate-900 text-white border-cyan-500/40">
+      <DialogContent noDescription className="max-w-2xl max-h-[85vh] flex flex-col bg-neo-navy text-white border-cyan-500/40">
         <DialogHeader className="flex-shrink-0 pb-2">
           <DialogTitle className="text-center text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
             {t('hostView.validation')}
@@ -175,7 +175,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                           ? "bg-orange-900/40 border-orange-500/50 opacity-50 cursor-not-allowed"
                           : isValid
                             ? "bg-gradient-to-br from-cyan-600/80 to-teal-600/80 border-cyan-400/60 hover:border-cyan-300 shadow-lg shadow-cyan-500/20"
-                            : "bg-slate-800/80 border-slate-600/50 hover:border-slate-500"
+                            : "bg-neo-navy/80 border-neo-black/50/50 hover:border-neo-black/40"
                       )}
                     >
                       <span className={cn(
@@ -434,7 +434,7 @@ export const ExitConfirmDialog: React.FC<ExitConfirmDialogProps> = ({
   t
 }): React.ReactElement => (
   <AlertDialog open={open} onOpenChange={onOpenChange}>
-    <AlertDialogContent className="bg-white text-neo-black dark:bg-slate-800 dark:text-white border-red-500/30">
+    <AlertDialogContent className="bg-white text-neo-black dark:bg-neo-navy dark:text-white border-red-500/30">
       <AlertDialogHeader>
         <AlertDialogTitle className="text-slate-900 dark:text-white">
           {t('hostView.confirmExit')}
@@ -444,7 +444,7 @@ export const ExitConfirmDialog: React.FC<ExitConfirmDialogProps> = ({
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel className="bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white border-slate-300 dark:border-slate-600">
+        <AlertDialogCancel className="bg-neo-navy/30 dark:bg-neo-navy text-slate-900 dark:text-white border-neo-white/30 dark:border-neo-black/50">
           {t('common.cancel')}
         </AlertDialogCancel>
         <AlertDialogAction
@@ -474,7 +474,7 @@ export const CancelTournamentDialog: React.FC<CancelTournamentDialogProps> = ({
   t
 }): React.ReactElement => (
   <AlertDialog open={open} onOpenChange={onOpenChange}>
-    <AlertDialogContent className="bg-white text-neo-black dark:bg-slate-800 dark:text-white border-red-500/30">
+    <AlertDialogContent className="bg-white text-neo-black dark:bg-neo-navy dark:text-white border-red-500/30">
       <AlertDialogHeader>
         <AlertDialogTitle className="text-slate-900 dark:text-white">
           {t('hostView.confirmCancelTournament') || 'Cancel Tournament?'}
@@ -484,7 +484,7 @@ export const CancelTournamentDialog: React.FC<CancelTournamentDialogProps> = ({
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel className="bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white border-slate-300 dark:border-slate-600">
+        <AlertDialogCancel className="bg-neo-navy/30 dark:bg-neo-navy text-slate-900 dark:text-white border-neo-white/30 dark:border-neo-black/50">
           {t('common.cancel')}
         </AlertDialogCancel>
         <AlertDialogAction

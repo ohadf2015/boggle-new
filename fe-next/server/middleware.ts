@@ -123,20 +123,46 @@ function cacheHeaders(): RequestHandler {
 
 /**
  * Request timeout middleware
+ *
+ * IMPORTANT: Next.js App Router routes (app/api/*) have their own timeout
+ * configuration via `export const maxDuration`. We should NOT apply Express
+ * timeout to these routes to avoid conflicts.
+ *
+ * Routes excluded from Express timeout:
+ * - /api/admin/buzz/* - Next.js routes with maxDuration (60-70s)
+ * - /api/cron/* - Next.js routes with maxDuration (120s+)
  */
 function requestTimeout(): RequestHandler {
   const timeout = parseInt(process.env.REQUEST_TIMEOUT_MS || '30000', 10);
-  
+
+  // Next.js App Router routes that handle their own timeouts via maxDuration
+  const NEXTJS_ROUTES_WITH_MAX_DURATION = [
+    '/api/admin/buzz/',
+    '/api/cron/',
+  ];
+
   return (req: Request, res: Response, next: NextFunction): void => {
+    // Skip timeout for Next.js routes with maxDuration
+    const isNextJsRoute = NEXTJS_ROUTES_WITH_MAX_DURATION.some(route =>
+      req.path.startsWith(route)
+    );
+
+    if (isNextJsRoute) {
+      // Let Next.js handle timeout via maxDuration
+      next();
+      return;
+    }
+
+    // Apply Express timeout for non-Next.js routes
     const timer = setTimeout(() => {
       if (!res.headersSent) {
         res.status(408).json({ error: 'Request timeout' });
       }
     }, timeout);
-    
+
     res.on('finish', () => clearTimeout(timer));
     res.on('close', () => clearTimeout(timer));
-    
+
     next();
   };
 }

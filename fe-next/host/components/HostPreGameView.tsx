@@ -184,7 +184,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
                 "flex-1 flex flex-col items-center gap-0.5 p-2 rounded-neo font-bold transition-all border-2 relative",
                 isSelected
                   ? `${colors[key]} text-neo-black shadow-none`
-                  : "bg-slate-700 border-slate-600 text-neo-cream shadow-hard-sm"
+                  : "bg-neo-navy/60 border-neo-black/50 text-neo-cream shadow-hard-sm"
               )}
             >
               {isSelected && (
@@ -199,7 +199,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
       </div>
 
       {/* TV Mode Toggle */}
-      <div className="flex items-center gap-2 p-2 bg-slate-700/50 rounded-neo border border-slate-600">
+      <div className="flex items-center gap-2 p-2 bg-neo-navy/40 rounded-neo border border-neo-black/50">
         <Monitor className="w-4 h-4 text-neo-cream/80" />
         <Checkbox
           id="broadcastMode"
@@ -212,8 +212,8 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
       </div>
 
       {/* Players Section - flex-1 to take remaining space, constrained by parent */}
-      <div className="flex-1 min-h-0 bg-slate-700/30 rounded-neo border border-slate-600 overflow-hidden flex flex-col">
-        <div className="flex items-center gap-2 px-2 py-1.5 border-b border-slate-600/50 flex-shrink-0">
+      <div className="flex-1 min-h-0 bg-neo-navy/30 rounded-neo border border-neo-black/50 overflow-hidden flex flex-col">
+        <div className="flex items-center gap-2 px-2 py-1.5 border-b border-neo-black/30 flex-shrink-0">
           <Users className="w-4 h-4 text-neo-pink" />
           <span className="text-xs font-bold uppercase text-neo-cream">
             {t('hostView.playersJoined')} ({playersReady.length})
@@ -303,7 +303,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
   return (
     <div className="h-full flex flex-col bg-neo-navy overflow-hidden lg:max-w-2xl lg:mx-auto">
       {/* Header - Compact */}
-      <header className="flex-shrink-0 px-3 py-2 bg-slate-800/95 border-b-3 border-neo-black">
+      <header className="flex-shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black">
         <div className="flex items-center justify-between gap-2">
           {/* Room Code */}
           <motion.button
@@ -316,7 +316,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
           </motion.button>
 
           {/* Timer Display */}
-          <div className="flex items-center gap-1 px-2 py-1 bg-slate-700/50 rounded border border-slate-600">
+          <div className="flex items-center gap-1 px-2 py-1 bg-neo-navy/50 rounded border border-neo-black/50">
             <Clock className="w-3 h-3 text-neo-cyan" />
             <span className="text-sm font-bold text-neo-cream">{timerValue}min</span>
           </div>
@@ -329,7 +329,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
       </header>
 
       {/* Main Content - 2 Tabs */}
-      <main className="flex-1 min-h-0 overflow-hidden bg-slate-800/95">
+      <main className="flex-1 min-h-0 overflow-hidden bg-neo-navy/95">
         <AnimatePresence mode="wait">
           {mobileTab === 'lobby' && (
             <motion.div key="lobby" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full">
@@ -345,7 +345,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
       </main>
 
       {/* Start Game Button - Fixed at bottom */}
-      <div className="flex-shrink-0 px-3 py-2 bg-slate-900/98 border-t-3 border-neo-black">
+      <div className="flex-shrink-0 px-3 py-2 bg-neo-navy/98 border-t-3 border-neo-black">
         <Button
           onClick={onStartGame}
           disabled={!timerValue || playersReady.length === 0 || tournamentCreating}
@@ -358,14 +358,14 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
       </div>
 
       {/* Bottom Tab Bar - 2 Tabs */}
-      <nav className="flex-shrink-0 bg-slate-900/98 border-t border-slate-700 pb-[env(safe-area-inset-bottom)]">
+      <nav className="flex-shrink-0 bg-neo-navy/98 border-t border-neo-black/50 pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center h-12">
           {/* Lobby Tab */}
           <button
             onClick={() => setMobileTab('lobby')}
             className={cn(
               'flex-1 flex flex-col items-center justify-center h-full transition-all',
-              mobileTab === 'lobby' ? 'text-neo-yellow bg-slate-800/50' : 'text-neo-white/60'
+              mobileTab === 'lobby' ? 'text-neo-yellow bg-neo-navy-light/50' : 'text-neo-white/60'
             )}
           >
             <div className="relative">
@@ -384,7 +384,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
             onClick={() => { setMobileTab('chat'); setUnreadChatCount(0); }}
             className={cn(
               'flex-1 flex flex-col items-center justify-center h-full transition-all',
-              mobileTab === 'chat' ? 'text-neo-yellow bg-slate-800/50' : 'text-neo-white/60'
+              mobileTab === 'chat' ? 'text-neo-yellow bg-neo-navy-light/50' : 'text-neo-white/60'
             )}
           >
             <div className="relative">
