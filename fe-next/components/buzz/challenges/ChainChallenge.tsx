@@ -34,9 +34,11 @@ export default function ChainChallenge({
   const inputRef = useRef<HTMLInputElement>(null);
   const isRTL = language === 'he';
 
-  // Parse chain words from prompt (format: "WORD1 → WORD2 → ?")
+  // Parse chain words from prompt (format: "WORD1 → ??? → WORD2")
+  // Backend sends: "WORD1 → ??? → WORD2" where ??? is the mystery word
+  // We need to extract the known words and filter out the ??? placeholder
   const chainParts = challenge.prompt.split(/\s*[→➜>]\s*/);
-  const chainWords = chainParts.slice(0, -1); // All except the "?"
+  const chainWords = chainParts.filter(part => part.trim() && !part.match(/^\?+$/)); // Filter out empty and ??? parts
 
   // Focus input on mount
   useEffect(() => {
@@ -75,17 +77,6 @@ export default function ChainChallenge({
     <div className="space-y-5">
       {/* Challenge Title */}
       <div className="text-center">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-block px-4 py-2 bg-neo-pink/10 rounded-lg border border-neo-pink/30 mb-4"
-        >
-          <span className="text-xs font-black text-neo-pink uppercase tracking-wider">
-            <Link2 className="w-4 h-4 inline me-2" />
-            {t('buzz.type.chain')}
-          </span>
-        </motion.div>
-
         {/* Visual Chain Display */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -94,35 +85,36 @@ export default function ChainChallenge({
           className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-4"
           dir={isRTL ? 'rtl' : 'ltr'}
         >
-          {chainWords.map((word, index) => (
-            <React.Fragment key={index}>
+          {/* First word */}
+          {chainWords[0] && (
+            <>
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.15 + index * 0.1 }}
+                transition={{ delay: 0.15 }}
                 className="px-4 py-2 bg-neo-pink/20 border-2 border-neo-pink/50 rounded-lg"
               >
                 <span className="text-lg sm:text-xl font-black text-neo-pink">
-                  {word.trim()}
+                  {chainWords[0].trim()}
                 </span>
               </motion.div>
 
-              {/* Arrow between words */}
+              {/* Arrow after first word */}
               <motion.div
                 initial={{ opacity: 0, scale: 0 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2 + index * 0.1 }}
+                transition={{ delay: 0.2 }}
               >
                 <ArrowRight className="w-5 h-5 text-neo-pink/50" />
               </motion.div>
-            </React.Fragment>
-          ))}
+            </>
+          )}
 
-          {/* Mystery word placeholder */}
+          {/* Mystery word placeholder (in the middle) */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.15 + chainWords.length * 0.1 }}
+            transition={{ delay: 0.25 }}
             className="px-4 py-2 bg-slate-800 border-2 border-dashed border-neo-pink/50 rounded-lg min-w-[80px]"
           >
             <AnimatePresence mode="wait">
@@ -148,6 +140,31 @@ export default function ChainChallenge({
               )}
             </AnimatePresence>
           </motion.div>
+
+          {/* Second word (if exists) */}
+          {chainWords[1] && (
+            <>
+              {/* Arrow before second word */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 }}
+              >
+                <ArrowRight className="w-5 h-5 text-neo-pink/50" />
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.35 }}
+                className="px-4 py-2 bg-neo-pink/20 border-2 border-neo-pink/50 rounded-lg"
+              >
+                <span className="text-lg sm:text-xl font-black text-neo-pink">
+                  {chainWords[1].trim()}
+                </span>
+              </motion.div>
+            </>
+          )}
         </motion.div>
 
         {/* Instruction with compound word hint */}

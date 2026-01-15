@@ -987,6 +987,8 @@ const he = {
   "nextStep": {
     "backToLobby": "חזרה ללובי",
     "letsGo": "יאללה!",
+    "challengeBots": "אתגר בוטים",
+    "challengeBotsDesc": "בחן את כישוריך נגד יריבי AI",
     "challengeBotsAgain": "שחק שוב!",
     "challengeBotsAgainDesc": "התחל משחק חדש עם בוטים"
   },
@@ -1665,6 +1667,12 @@ const he = {
       "dayStreak": "ימי רצף",
       "atRiskWarning": "ללא חשבון, אתה עלול לאבד את הרצף!",
       "benefitsTitle": "הירשם כדי:",
+      "benefits": {
+        "protectStreak": "להגן על הרצף שלך",
+        "syncDevices": "לסנכרן בין מכשירים",
+        "trackStats": "לעקוב אחר הסטטיסטיקות שלך",
+        "allTimeLeaderboard": "להצטרף לטבלת המובילים לכל הזמנים"
+      },
       "autoSaveNote": "התוצאה שלך תישמר אוטומטית לאחר ההרשמה",
       "maybeLater": "אולי אחר כך"
     },
@@ -1711,7 +1719,8 @@ const he = {
       "skipHover": "(לקסי יהיה עצוב, אבל בסדר...)",
       "mascotTooltip": "לחץ עליי!",
       "funnyMessages": {
-        "dontLeaveHanging": "היי! אל תשאיר אותי כך! הירשם ובוא נטפס יחד בטבלת המובילים!"
+        "dontLeaveHanging": "היי! אל תשאיר אותי כך! הירשם ובוא נטפס יחד בטבלת המובילים!",
+        "joinWordNerds": "הצטרף לחבורת חובבי המילים! זה יותר כיף כשאתה שומר את ההתקדמות שלך!"
       }
     },
     "callback": {
@@ -2194,6 +2203,8 @@ const he = {
     "reviewSettings": "סקירה והתחלה",
     "stepMode": "מצב",
     "stepDifficulty": "קושי",
+    "stepSettings": "הגדרות",
+    "stepStart": "התחל",
     "stepOf": "שלב {current} מתוך {total}",
     "gameSettings": "הגדרות משחק"
   },
@@ -2436,6 +2447,8 @@ const he = {
     "hint": "רמז?",
     "skip": "דלג",
     "submit": "שלח",
+    "prevChallenge": "אתגר קודם",
+    "nextChallenge": "אתגר הבא",
     "preview": {
       "title": "נושאי היום",
       "subtitle": "מה טרנדי עכשיו",

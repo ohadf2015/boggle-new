@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowRight, Lightbulb, TrendingUp, Zap } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Lightbulb, TrendingUp, Zap, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -71,6 +71,13 @@ export default function BuzzGameScreen({
   const [startTime] = useState(() => Date.now());
   const [challengeStartTime, setChallengeStartTime] = useState(() => Date.now());
 
+  // Draft answers for bidirectional navigation
+  const [draftAnswers, setDraftAnswers] = useState<Map<number, string>>(new Map());
+  // Track which challenges used hints
+  const [hintsUsed, setHintsUsed] = useState<Set<number>>(new Set());
+  // Track answered challenges
+  const answeredChallenges = useMemo(() => new Set(answers.map(a => a.challengeIndex)), [answers]);
+
   // Feedback modal state
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackData, setFeedbackData] = useState<{
@@ -95,15 +102,23 @@ export default function BuzzGameScreen({
   const currentChallenge = challengeData.challenges[currentIndex];
   const isLastChallenge = currentIndex === challengeData.challenges.length - 1;
 
-  // Reset hint and challenge start time when moving to next challenge
+  // Restore hint state when navigating to a challenge
   useEffect(() => {
-    setShowHint(false);
-    setChallengeStartTime(Date.now());
-  }, [currentIndex]);
+    setShowHint(hintsUsed.has(currentIndex));
+    // Only reset timer if this challenge hasn't been answered yet
+    if (!answeredChallenges.has(currentIndex)) {
+      setChallengeStartTime(Date.now());
+    }
+  }, [currentIndex, hintsUsed, answeredChallenges]);
 
   // Handle answer submission
   const handleAnswer = useCallback(
     (userAnswer: string) => {
+      // Don't re-submit if already answered
+      if (answeredChallenges.has(currentIndex)) {
+        return;
+      }
+
       // Normalize answers for language-specific comparison (e.g., Hebrew final letters)
       const normalizedUserAnswer = normalizeWord(userAnswer.trim(), challengeData.language as Language);
       const normalizedCorrectAnswer = normalizeWord(currentChallenge.answer.trim(), challengeData.language as Language);
@@ -133,7 +148,14 @@ export default function BuzzGameScreen({
       };
       setAnswers((prev) => [...prev, answerRecord]);
 
-      // Show feedback modal instead of immediately moving to next
+      // Clear draft answer for this challenge
+      setDraftAnswers((prev) => {
+        const next = new Map(prev);
+        next.delete(currentIndex);
+        return next;
+      });
+
+      // Show feedback modal
       setFeedbackData({
         isCorrect: correct,
         correctAnswer: currentChallenge.answer,
@@ -142,27 +164,32 @@ export default function BuzzGameScreen({
         trendingContext: currentChallenge.trendingContext,
       });
       setShowFeedback(true);
-      setPendingNextAction(isLastChallenge ? 'complete' : 'next');
+
+      // Check if all challenges are answered
+      const allAnswered = answers.length + 1 === challengeData.challenges.length;
+      setPendingNextAction(allAnswered ? 'complete' : null);
     },
     [
       currentChallenge,
       currentIndex,
-      isLastChallenge,
       showHint,
       challengeStartTime,
       challengeData.language,
+      challengeData.challenges.length,
       playWordAcceptedSound,
       playErrorSound,
+      answeredChallenges,
+      answers.length,
     ]
   );
 
-  // Handle feedback modal close - proceed to next challenge or complete
+  // Handle feedback modal close
   const handleFeedbackClose = useCallback(() => {
     setShowFeedback(false);
     setFeedbackData(null);
 
     if (pendingNextAction === 'complete') {
-      // Complete the game
+      // Complete the game - all challenges answered
       const totalTime = Math.floor((Date.now() - startTime) / 1000);
       onComplete({
         challengeId: challengeData.id,
@@ -170,25 +197,60 @@ export default function BuzzGameScreen({
         challengesSolved: answers,
         completionTimeSeconds: totalTime,
       });
-    } else if (pendingNextAction === 'next') {
-      // Move to next challenge
-      setCurrentIndex((prev) => prev + 1);
     }
+    // Don't auto-navigate - let user swipe to next challenge
     setPendingNextAction(null);
   }, [pendingNextAction, startTime, challengeData.id, score, answers, onComplete]);
 
-  // Handle skip challenge
-  const handleSkip = useCallback(() => {
-    handleAnswer(''); // Submit empty answer
-  }, [handleAnswer]);
+  // Handle navigation to previous challenge
+  const handlePrevChallenge = useCallback(() => {
+    if (currentIndex > 0) {
+      setCurrentIndex((prev) => prev - 1);
+    }
+  }, [currentIndex]);
 
-  // Swipe gesture for mobile navigation (swipe left to skip in LTR, swipe right to skip in RTL)
+  // Handle navigation to next challenge
+  const handleNextChallenge = useCallback(() => {
+    if (currentIndex < challengeData.challenges.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+    }
+  }, [currentIndex, challengeData.challenges.length]);
+
+  // Bidirectional swipe gesture for mobile navigation
   const swipeHandlers = useSwipeGesture({
-    onSwipeLeft: handleSkip,
+    onSwipeLeft: dir === 'rtl' ? handlePrevChallenge : handleNextChallenge,
+    onSwipeRight: dir === 'rtl' ? handleNextChallenge : handlePrevChallenge,
     isRtl: dir === 'rtl',
     threshold: 75,
     enableHaptic: true,
   });
+
+  // Handle hint click
+  const handleHintClick = useCallback(() => {
+    setShowHint(true);
+    setHintsUsed((prev) => new Set(prev).add(currentIndex));
+  }, [currentIndex]);
+
+  // Handle finish - submit all answers
+  const handleFinish = useCallback(() => {
+    const totalTime = Math.floor((Date.now() - startTime) / 1000);
+    // Fill in empty answers for unanswered challenges
+    const allAnswers = challengeData.challenges.map((_, idx) => {
+      const existing = answers.find(a => a.challengeIndex === idx);
+      return existing || {
+        challengeIndex: idx,
+        userAnswer: '',
+        correct: false,
+        timeTakenSeconds: 0,
+      };
+    });
+    onComplete({
+      challengeId: challengeData.id,
+      score: score,
+      challengesSolved: allAnswers,
+      completionTimeSeconds: totalTime,
+    });
+  }, [startTime, challengeData.id, challengeData.challenges, score, answers, onComplete]);
 
   // Handle quit
   const handleQuitClick = useCallback(() => {
@@ -279,25 +341,36 @@ export default function BuzzGameScreen({
 
       {/* Combined Progress & Topic Section - Compact Layout */}
       <div className="mb-2 relative z-10">
-        {/* Segmented Progress Bar (thin) */}
+        {/* Segmented Progress Bar (thin) - shows answered status */}
         <div className="flex gap-1 mb-2">
-          {challengeData.challenges.map((_, i) => (
-            <motion.div
-              key={i}
-              initial={i === currentIndex ? { scale: 0.8 } : {}}
-              animate={i === currentIndex ? { scale: 1 } : {}}
-              className={`
-                h-1.5 flex-1 rounded-full transition-colors duration-300
-                ${
-                  i < currentIndex
-                    ? 'bg-neo-lime'
-                    : i === currentIndex
-                      ? 'bg-neo-yellow'
-                      : 'bg-slate-700'
-                }
-              `}
-            />
-          ))}
+          {challengeData.challenges.map((_, i) => {
+            const isAnswered = answeredChallenges.has(i);
+            const isCurrent = i === currentIndex;
+            return (
+              <motion.div
+                key={i}
+                initial={isCurrent ? { scale: 0.8 } : {}}
+                animate={isCurrent ? { scale: 1 } : {}}
+                className={`
+                  h-1.5 flex-1 rounded-full transition-colors duration-300 relative
+                  ${
+                    isAnswered
+                      ? 'bg-neo-lime'
+                      : isCurrent
+                        ? 'bg-neo-yellow'
+                        : 'bg-slate-700'
+                  }
+                `}
+              >
+                {/* Checkmark for answered challenges */}
+                {isAnswered && !isCurrent && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <Check className="w-3 h-3 text-neo-lime" />
+                  </div>
+                )}
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Info Row: Counter + Topic + Type - All in one line */}
@@ -337,6 +410,36 @@ export default function BuzzGameScreen({
         className="flex-1 flex flex-col items-center justify-center relative z-10"
         {...swipeHandlers}
       >
+        {/* Left Arrow Hint (show if not first challenge) */}
+        {currentIndex > 0 && (
+          <motion.button
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 0.5, x: 0 }}
+            exit={{ opacity: 0, x: -10 }}
+            whileHover={{ opacity: 1, scale: 1.1 }}
+            onClick={handlePrevChallenge}
+            className="absolute start-2 top-1/2 -translate-y-1/2 p-2 bg-slate-800/80 border-2 border-slate-600 rounded-full hover:border-neo-cyan transition-colors z-20"
+            aria-label={t('buzz.prevChallenge')}
+          >
+            <ChevronLeft className="w-6 h-6 text-slate-300" />
+          </motion.button>
+        )}
+
+        {/* Right Arrow Hint (show if not last challenge) */}
+        {currentIndex < challengeData.challenges.length - 1 && (
+          <motion.button
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 0.5, x: 0 }}
+            exit={{ opacity: 0, x: 10 }}
+            whileHover={{ opacity: 1, scale: 1.1 }}
+            onClick={handleNextChallenge}
+            className="absolute end-2 top-1/2 -translate-y-1/2 p-2 bg-slate-800/80 border-2 border-slate-600 rounded-full hover:border-neo-cyan transition-colors z-20"
+            aria-label={t('buzz.nextChallenge')}
+          >
+            <ChevronRight className="w-6 h-6 text-slate-300" />
+          </motion.button>
+        )}
+
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
@@ -353,14 +456,14 @@ export default function BuzzGameScreen({
 
       {/* Bottom actions - Compact */}
       <div className="mt-2 space-y-1.5 relative z-10">
-        {/* Hint button */}
-        {currentChallenge.hint && !showHint && (
+        {/* Hint button - only show if challenge not answered */}
+        {currentChallenge.hint && !showHint && !answeredChallenges.has(currentIndex) && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
           >
             <Button
-              onClick={() => setShowHint(true)}
+              onClick={handleHintClick}
               variant="ghost"
               className="w-full py-2 border-2 border-slate-600 hover:border-neo-purple hover:bg-neo-purple/10 rounded-neo transition-all"
             >
@@ -373,24 +476,21 @@ export default function BuzzGameScreen({
           </motion.div>
         )}
 
-        {/* Skip button */}
-        <Button
-          onClick={handleSkip}
-          variant="outline"
-          className="w-full py-2 bg-slate-900/80 border-2 border-slate-600 hover:border-neo-pink hover:bg-neo-pink/10 rounded-neo font-bold text-sm text-slate-200 hover:text-white transition-all"
-        >
-          {isLastChallenge ? (
-            <>
+        {/* Finish button - only show when all challenges answered */}
+        {answeredChallenges.size === challengeData.challenges.length && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            <Button
+              onClick={handleFinish}
+              className="w-full py-3 bg-neo-lime text-neo-black border-3 border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed rounded-neo font-black text-base uppercase transition-all"
+            >
+              <Check className="w-5 h-5 me-2" />
               {t('buzz.finish')}
-              <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
-            </>
-          ) : (
-            <>
-              {t('buzz.skip')}
-              <ArrowRight className="w-4 h-4 ms-2 rtl:rotate-180" />
-            </>
-          )}
-        </Button>
+            </Button>
+          </motion.div>
+        )}
       </div>
 
       {/* Quit Confirmation Dialog */}

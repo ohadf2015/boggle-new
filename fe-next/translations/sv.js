@@ -977,6 +977,8 @@ const sv = {
   "nextStep": {
     "backToLobby": "Tillbaka till Lobbyn",
     "letsGo": "Kör!",
+    "challengeBots": "Utmana Bottar",
+    "challengeBotsDesc": "Testa dina färdigheter mot AI-motståndare",
     "challengeBotsAgain": "Spela igen!",
     "challengeBotsAgainDesc": "Starta en ny match med bottar"
   },
@@ -1655,6 +1657,12 @@ const sv = {
       "dayStreak": "Dagars svit",
       "atRiskWarning": "Utan ett konto kan du förlora din svit!",
       "benefitsTitle": "Registrera dig för att:",
+      "benefits": {
+        "protectStreak": "Skydda din svit",
+        "syncDevices": "Synkronisera mellan enheter",
+        "trackStats": "Följa din statistik",
+        "allTimeLeaderboard": "Gå med i topplistan för alla tider"
+      },
       "autoSaveNote": "Ditt resultat sparas automatiskt efter registrering",
       "maybeLater": "Kanske senare"
     },
@@ -1701,7 +1709,8 @@ const sv = {
       "skipHover": "(Lexi blir ledsen, men okej...)",
       "mascotTooltip": "Klicka på mig!",
       "funnyMessages": {
-        "dontLeaveHanging": "Hej! Lämna mig inte hängande! Registrera dig så klättrar vi på topplistan tillsammans!"
+        "dontLeaveHanging": "Hej! Lämna mig inte hängande! Registrera dig så klättrar vi på topplistan tillsammans!",
+        "joinWordNerds": "Gå med i ordnördarna! Det är roligare när du sparar din framsteg!"
       }
     },
     "callback": {
@@ -2184,6 +2193,8 @@ const sv = {
     "reviewSettings": "Granska & Starta",
     "stepMode": "Läge",
     "stepDifficulty": "Svårighetsgrad",
+    "stepSettings": "Inställningar",
+    "stepStart": "Starta",
     "stepOf": "Steg {current} av {total}",
     "gameSettings": "Spelinställningar"
   },
@@ -2470,6 +2481,8 @@ const sv = {
     "hint": "LEDTRÅD?",
     "skip": "HOPPA",
     "submit": "SKICKA",
+    "prevChallenge": "Föregående utmaning",
+    "nextChallenge": "Nästa utmaning",
     "results": {
       "title": "KLART!",
       "perfect": "🔥 PERFEKT POÄNG!",

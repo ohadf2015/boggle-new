@@ -81,17 +81,6 @@ export default function TrioChallenge({
     <div className="space-y-5">
       {/* Challenge Title */}
       <div className="text-center">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-block px-4 py-2 bg-neo-lime/10 rounded-lg border border-neo-lime/30 mb-4"
-        >
-          <span className="text-xs font-black text-neo-lime uppercase tracking-wider">
-            <Sparkles className="w-4 h-4 inline me-2" />
-            {t('buzz.type.trio')}
-          </span>
-        </motion.div>
-
         {/* Topic Cards in Triangle Formation */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}

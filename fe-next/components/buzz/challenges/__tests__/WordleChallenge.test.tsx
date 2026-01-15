@@ -168,7 +168,7 @@ describe('WordleChallenge', () => {
     expect(
       screen.getByText('Related to trending topic: Movies')
     ).toBeInTheDocument();
-    expect(screen.getByText('WORDLE')).toBeInTheDocument();
+    // Type tag removed - now displayed in parent BuzzGameScreen header
   });
 
   it('shows hint when showHint is true', () => {

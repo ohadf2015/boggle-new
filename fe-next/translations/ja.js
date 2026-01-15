@@ -977,6 +977,8 @@ const ja = {
   "nextStep": {
     "backToLobby": "ロビーに戻る",
     "letsGo": "レッツゴー!",
+    "challengeBots": "ボットに挑戦",
+    "challengeBotsDesc": "AIの対戦相手とスキルを試す",
     "challengeBotsAgain": "もう一度！",
     "challengeBotsAgainDesc": "ボットと新しいゲームを開始"
   },
@@ -1655,6 +1657,12 @@ const ja = {
       "dayStreak": "日連続",
       "atRiskWarning": "アカウントがないと連続記録を失う可能性があります！",
       "benefitsTitle": "登録すると：",
+      "benefits": {
+        "protectStreak": "連続記録を保護",
+        "syncDevices": "デバイス間で同期",
+        "trackStats": "統計を追跡",
+        "allTimeLeaderboard": "全期間リーダーボードに参加"
+      },
       "autoSaveNote": "登録後、結果は自動的に保存されます",
       "maybeLater": "また今度"
     },
@@ -1701,7 +1709,8 @@ const ja = {
       "skipHover": "（レクシーは悲しむけど、いいよ...）",
       "mascotTooltip": "クリックして！",
       "funnyMessages": {
-        "dontLeaveHanging": "ねえ！置いていかないで！登録して一緒にリーダーボードを登ろう！"
+        "dontLeaveHanging": "ねえ！置いていかないで！登録して一緒にリーダーボードを登ろう！",
+        "joinWordNerds": "ワードナードに参加！進捗を保存するともっと楽しいよ！"
       }
     },
     "callback": {
@@ -2184,6 +2193,8 @@ const ja = {
     "reviewSettings": "確認してスタート",
     "stepMode": "モード",
     "stepDifficulty": "難易度",
+    "stepSettings": "設定",
+    "stepStart": "スタート",
     "stepOf": "ステップ {current} / {total}",
     "gameSettings": "ゲーム設定"
   },
@@ -2470,6 +2481,8 @@ const ja = {
     "hint": "ヒント?",
     "skip": "スキップ",
     "submit": "送信",
+    "prevChallenge": "前のチャレンジ",
+    "nextChallenge": "次のチャレンジ",
     "results": {
       "title": "クリア！",
       "perfect": "パーフェクトスコア！",

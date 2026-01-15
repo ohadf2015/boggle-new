@@ -923,6 +923,8 @@ const es = {
   "nextStep": {
     "backToLobby": "Volver al Lobby",
     "letsGo": "¡Vamos!",
+    "challengeBots": "Desafiar Bots",
+    "challengeBotsDesc": "Pon a prueba tus habilidades contra oponentes IA",
     "challengeBotsAgain": "¡Jugar otra vez!",
     "challengeBotsAgainDesc": "Inicia una nueva partida con bots"
   },
@@ -1475,6 +1477,12 @@ const es = {
       "dayStreak": "Días de racha",
       "atRiskWarning": "¡Sin una cuenta, podrías perder tu racha!",
       "benefitsTitle": "Regístrate para:",
+      "benefits": {
+        "protectStreak": "Proteger tu racha",
+        "syncDevices": "Sincronizar entre dispositivos",
+        "trackStats": "Seguir tus estadísticas",
+        "allTimeLeaderboard": "Unirte a la clasificación de todos los tiempos"
+      },
       "autoSaveNote": "Tu resultado se guardará automáticamente después de registrarte",
       "maybeLater": "Quizás después"
     },
@@ -1521,7 +1529,8 @@ const es = {
       "skipHover": "(Lexi estará triste, pero está bien...)",
       "mascotTooltip": "¡Haz clic!",
       "funnyMessages": {
-        "dontLeaveHanging": "¡Oye! ¡No me dejes colgado! ¡Regístrate y subamos juntos en la tabla!"
+        "dontLeaveHanging": "¡Oye! ¡No me dejes colgado! ¡Regístrate y subamos juntos en la tabla!",
+        "joinWordNerds": "¡Únete a los nerds de las palabras! ¡Es más divertido cuando guardas tu progreso!"
       }
     },
     "callback": {
@@ -2181,6 +2190,8 @@ const es = {
     "reviewSettings": "Revisar e Iniciar",
     "stepMode": "Modo",
     "stepDifficulty": "Dificultad",
+    "stepSettings": "Configuración",
+    "stepStart": "Iniciar",
     "stepOf": "Paso {current} de {total}",
     "gameSettings": "Configuración del Juego"
   },
@@ -2423,6 +2434,8 @@ const es = {
     "hint": "¿PISTA?",
     "skip": "SALTAR",
     "submit": "ENVIAR",
+    "prevChallenge": "Desafío anterior",
+    "nextChallenge": "Siguiente desafío",
     "results": {
       "title": "¡BUZZ COMPLETO!",
       "trending": "Trends de hoy:",

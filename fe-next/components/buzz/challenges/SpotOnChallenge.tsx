@@ -42,17 +42,6 @@ export default function SpotOnChallenge({
     <div className="space-y-6">
       {/* Challenge Title */}
       <div className="text-center">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-block px-4 py-2 bg-neo-cyan/10 rounded-lg border border-neo-cyan/30 mb-3"
-        >
-          <span className="text-xs font-black text-neo-cyan uppercase tracking-wider">
-            <Target className="w-4 h-4 inline me-2" />
-            {t('buzz.type.spotOn')}
-          </span>
-        </motion.div>
-
         <motion.h2
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}

@@ -35,8 +35,12 @@ function useContainerDimensions() {
     const checkDimensions = () => {
       if (containerRef.current) {
         const { clientWidth, clientHeight } = containerRef.current;
+        // Only mark as ready if dimensions are valid (> 0 and not -1)
         if (clientWidth > 0 && clientHeight > 0) {
           setIsReady(true);
+        } else {
+          // Reset to false if dimensions become invalid
+          setIsReady(false);
         }
       }
     };
@@ -53,9 +57,13 @@ function useContainerDimensions() {
       observer.observe(containerRef.current);
     }
 
+    // Add polling as fallback for edge cases
+    const pollInterval = setInterval(checkDimensions, 100);
+
     return () => {
       cancelAnimationFrame(frameId);
       observer.disconnect();
+      clearInterval(pollInterval);
     };
   }, []);
 

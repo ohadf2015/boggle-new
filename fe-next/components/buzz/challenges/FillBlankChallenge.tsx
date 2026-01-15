@@ -18,6 +18,16 @@ interface FillBlankChallengeProps {
 }
 
 /**
+ * Strip the trailing "(N letters)" pattern from the prompt
+ * This is added by the backend for validation but shouldn't be shown to players
+ * Example: "Fill in the _ _ _ _ (4 letters)" → "Fill in the _ _ _ _"
+ */
+function stripLetterCount(prompt: string): string {
+  // Match pattern like "(3 letters)" or "(10 letters)" at the end of the string
+  return prompt.replace(/\s*\(\d+\s+letters\)\s*$/i, '').trim();
+}
+
+/**
  * FillBlankChallenge - Fill in the blank challenge with individual letter boxes
  * User completes a trending phrase by filling in the missing word letter by letter
  */
@@ -33,6 +43,9 @@ export default function FillBlankChallenge({
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
   const isRTL = language === 'he';
+
+  // Strip letter count from prompt for display
+  const displayPrompt = stripLetterCount(challenge.prompt);
 
   // Focus the first box on mount only
   useEffect(() => {
@@ -128,16 +141,6 @@ export default function FillBlankChallenge({
     <div className="space-y-6">
       {/* Challenge Title */}
       <div className="text-center">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-block px-4 py-2 bg-neo-yellow/10 rounded-lg border border-neo-yellow/30 mb-3"
-        >
-          <span className="text-xs font-black text-neo-yellow uppercase tracking-wider">
-            <FileText className="w-4 h-4 inline me-2" />
-            {t('buzz.type.fillBlank')}
-          </span>
-        </motion.div>
 
         <motion.h2
           initial={{ opacity: 0, scale: 0.95 }}
@@ -145,7 +148,7 @@ export default function FillBlankChallenge({
           transition={{ delay: 0.1 }}
           className="text-xl md:text-2xl font-black text-white mb-2 leading-relaxed"
         >
-          {challenge.prompt}
+          {displayPrompt}
         </motion.h2>
 
         {/* Letter count indicator */}

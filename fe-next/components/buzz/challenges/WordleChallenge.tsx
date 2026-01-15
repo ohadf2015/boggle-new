@@ -309,17 +309,6 @@ export default function WordleChallenge({
     <div className="space-y-4">
       {/* Challenge Title */}
       <div className="text-center">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="inline-block px-4 py-2 bg-purple-500/10 rounded-lg border border-purple-500/30 mb-3"
-        >
-          <span className="text-xs font-black text-purple-400 uppercase tracking-wider">
-            <Grid3X3 className="w-4 h-4 inline me-2" />
-            {t('buzz.type.wordle')}
-          </span>
-        </motion.div>
-
         <motion.h2
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}

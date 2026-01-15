@@ -980,6 +980,8 @@ const en = {
   "nextStep": {
     "backToLobby": "Back to Lobby",
     "letsGo": "Let's Go!",
+    "challengeBots": "Challenge Bots",
+    "challengeBotsDesc": "Test your skills against AI opponents",
     "challengeBotsAgain": "Play Again!",
     "challengeBotsAgainDesc": "Start a new game with bots"
   },
@@ -1658,6 +1660,12 @@ const en = {
       "dayStreak": "Day Streak",
       "atRiskWarning": "Your streak might not survive without an account!",
       "benefitsTitle": "Sign up to:",
+      "benefits": {
+        "protectStreak": "Protect your streak",
+        "syncDevices": "Sync across devices",
+        "trackStats": "Track your stats",
+        "allTimeLeaderboard": "Join all-time leaderboard"
+      },
       "autoSaveNote": "Auto-saved after signup",
       "maybeLater": "Later"
     },
@@ -1704,7 +1712,8 @@ const en = {
       "skipHover": "(Lexi will be sad, but okay...)",
       "mascotTooltip": "Click me!",
       "funnyMessages": {
-        "dontLeaveHanging": "Hey! Don't leave me hanging! Sign up and let's climb that leaderboard together!"
+        "dontLeaveHanging": "Hey! Don't leave me hanging! Sign up and let's climb that leaderboard together!",
+        "joinWordNerds": "Join the word nerds! It's more fun when you're saving your progress!"
       }
     },
     "callback": {
@@ -2187,6 +2196,8 @@ const en = {
     "reviewSettings": "Review & Start",
     "stepMode": "Mode",
     "stepDifficulty": "Difficulty",
+    "stepSettings": "Settings",
+    "stepStart": "Start",
     "stepOf": "Step {current} of {total}",
     "gameSettings": "Game Settings"
   },
@@ -2467,6 +2478,8 @@ const en = {
     "hint": "HINT?",
     "skip": "SKIP",
     "submit": "SUBMIT",
+    "prevChallenge": "Previous challenge",
+    "nextChallenge": "Next challenge",
     "results": {
       "title": "BUZZ COMPLETE",
       "perfect": "FLAWLESS! 💯",
