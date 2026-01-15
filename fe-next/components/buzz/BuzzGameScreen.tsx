@@ -263,6 +263,16 @@ export default function BuzzGameScreen({
 
   // Render challenge component based on type
   const renderChallenge = () => {
+    // Defensive check - should never happen but prevents crashes
+    if (!currentChallenge) {
+      return (
+        <div className="text-center p-8">
+          <div className="text-4xl mb-4">🤔</div>
+          <p className="text-slate-400 font-bold">{t('buzz.noChallenge')}</p>
+        </div>
+      );
+    }
+
     const props = {
       challenge: currentChallenge,
       onAnswer: handleAnswer,

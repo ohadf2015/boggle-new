@@ -63,7 +63,7 @@ global.fetch = mockFetch;
 function renderWithProviders(ui: React.ReactElement) {
   return render(
     <AuthProvider>
-      <LanguageProvider initialLocale="en">
+      <LanguageProvider initialLanguage="en">
         {ui}
       </LanguageProvider>
     </AuthProvider>

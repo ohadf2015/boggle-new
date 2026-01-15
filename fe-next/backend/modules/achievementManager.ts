@@ -99,7 +99,7 @@ interface GameWithAchievements extends Game {
  * Get localized achievements based on locale
  */
 export function getLocalizedAchievements(locale: string = 'he'): Record<string, Achievement> {
-  const supportedLocale = ['he', 'en', 'sv', 'ja'].includes(locale) ? locale : 'he';
+  const supportedLocale = ['he', 'en', 'sv', 'ja', 'es'].includes(locale) ? locale : 'he';
   const t = translations[supportedLocale].achievements;
 
   const achievements: Record<string, Achievement> = {};

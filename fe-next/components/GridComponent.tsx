@@ -823,7 +823,19 @@ const GridComponent = memo<GridComponentProps>(({
                     </>
                   )}
 
-                  {cell}
+                  {/* Letter text - positioned above all effects with relative z-index */}
+                  <span
+                    className="relative z-10 pointer-events-none select-none"
+                    style={{
+                      textShadow: isSelected
+                        ? comboColors.isRainbow || comboLevel >= 5
+                          ? '0 2px 4px rgba(0,0,0,0.3)'
+                          : '0 1px 2px rgba(0,0,0,0.2)'
+                        : 'none',
+                    }}
+                  >
+                    {cell}
+                  </span>
 
                   {/* Path order indicator for highlighted cells */}
                   {isHighlighted && highlightedOrder !== undefined && (

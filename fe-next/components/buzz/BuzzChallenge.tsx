@@ -85,7 +85,7 @@ export default function BuzzChallenge({ language, onBack, date }: BuzzChallengeP
         }
 
         const data = await response.json();
-        if (data.success && data.data) {
+        if (data.success && data.data && data.data.challenges?.length > 0) {
           setChallengeData(data.data);
 
           // Check if already played this challenge

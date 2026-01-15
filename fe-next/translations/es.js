@@ -2499,6 +2499,7 @@ const es = {
     "viewResults": "VER RESULTADOS",
     "yourAnswer": "TU RESPUESTA",
     "yourScore": "TU PUNTAJE",
+    "noChallenge": "No hay desafío disponible",
     "notAvailable": "No Disponible",
     "unavailableTagline": "Aún no disponible para este idioma",
     "requestChallenge": "Solicitar Desafío",

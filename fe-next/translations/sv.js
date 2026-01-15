@@ -2457,6 +2457,7 @@ const sv = {
     "viewResults": "VISA RESULTAT",
     "yourAnswer": "DITT SVAR",
     "yourScore": "DIN POÄNG",
+    "noChallenge": "Ingen utmaning tillgänglig",
     "type": {
       "scrambled": "BLANDAD",
       "fillBlank": "FYLL I",

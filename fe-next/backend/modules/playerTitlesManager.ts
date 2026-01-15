@@ -61,7 +61,7 @@ export function calculatePlayerTitles(
     return {};
   }
 
-  const supportedLocale = ['he', 'en', 'sv', 'ja'].includes(locale) ? locale : 'he';
+  const supportedLocale = ['he', 'en', 'sv', 'ja', 'es'].includes(locale) ? locale : 'he';
   const titleTranslations = translations[supportedLocale]?.playerTitles;
 
   // If playerTitles translations are missing, return empty (graceful degradation)

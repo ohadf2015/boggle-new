@@ -68,8 +68,8 @@ jest.mock('@/host/components/tv-broadcast/TvNotificationQueue', () => ({
 const mockT = (key: string) => key;
 
 const mockGrid: LetterGrid = [
-  [{ letter: 'A', points: 1 }, { letter: 'B', points: 2 }],
-  [{ letter: 'C', points: 3 }, { letter: 'D', points: 4 }],
+  ['A', 'B'],
+  ['C', 'D'],
 ];
 
 const defaultProps = {

@@ -31,7 +31,8 @@ const languages: LanguageItem[] = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
   { code: 'he', name: 'עברית', flag: '🇮🇱' },
   { code: 'sv', name: 'Svenska', flag: '🇸🇪' },
-  { code: 'ja', name: '日本語', flag: '🇯🇵' }
+  { code: 'ja', name: '日本語', flag: '🇯🇵' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' }
 ];
 
 interface AuthButtonProps {

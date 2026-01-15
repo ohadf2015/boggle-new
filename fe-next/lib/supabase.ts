@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import logger from '@/utils/logger';
 import type { ProfileData, RankedProgress } from '@/contexts/auth/authTypes';
 import { broadcastSignedOut } from '@/utils/crossTabAuthSync';
+import { locales } from './i18n';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -28,7 +29,6 @@ export const supabase: SupabaseClient | null = supabaseUrl && supabaseAnonKey
 function getCurrentLocale(): string | null {
   if (typeof window === 'undefined') return null;
   const pathSegments = window.location.pathname.split('/').filter(Boolean);
-  const locales = ['he', 'en', 'sv', 'ja'];
   const firstSegment = pathSegments[0];
   if (firstSegment && locales.includes(firstSegment)) {
     return firstSegment;

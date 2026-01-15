@@ -37,8 +37,8 @@ describe('MultiplayerLobby - Room List Max Width', () => {
     setHostUsername: jest.fn(),
     error: '',
     activeRooms: [
-      { gameCode: 'ROOM1', roomName: 'Room 1', playerCount: 2, language: 'en', hostUsername: 'host1' },
-      { gameCode: 'ROOM2', roomName: 'Room 2', playerCount: 3, language: 'en', hostUsername: 'host2' },
+      { gameCode: 'ROOM1', roomName: 'Room 1', playerCount: 2, language: 'en' as const, hostUsername: 'host1', gameState: 'waiting' as const, isRanked: false, createdAt: Date.now() },
+      { gameCode: 'ROOM2', roomName: 'Room 2', playerCount: 3, language: 'en' as const, hostUsername: 'host2', gameState: 'waiting' as const, isRanked: false, createdAt: Date.now() },
     ],
     refreshRooms: jest.fn(),
     roomsLoading: false,

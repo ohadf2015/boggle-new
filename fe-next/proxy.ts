@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
-const VALID_LOCALES = ['en', 'he', 'sv', 'ja'] as const;
+const VALID_LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
 const DEFAULT_LOCALE = 'en';
 
 /**

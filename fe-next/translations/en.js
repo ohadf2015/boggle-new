@@ -2433,6 +2433,7 @@ const en = {
     "total": "Total",
     "yourAnswer": "Your answer...",
     "yourScore": "Your Score",
+    "noChallenge": "No challenge available",
     "searches": "searches",
     "quitConfirm": "Your progress will be lost!",
     "quitConfirmTitle": "Quit Daily Buzz?",

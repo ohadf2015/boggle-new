@@ -2512,6 +2512,7 @@ const he = {
     "viewResults": "צפה בתוצאות",
     "yourAnswer": "התשובה שלך",
     "yourScore": "הניקוד שלך",
+    "noChallenge": "אין אתגר זמין",
     "notAvailable": "לא זמין",
     "unavailableTagline": "עדיין לא זמין בשפה זו",
     "requestChallenge": "בקש אתגר",

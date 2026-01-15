@@ -2439,6 +2439,7 @@ const ja = {
     "topicIs": "今日のトピック",
     "yourAnswer": "あなたの答え",
     "yourScore": "あなたのスコア",
+    "noChallenge": "利用可能なチャレンジがありません",
     "total": "合計",
     "finish": "完了",
     "quitConfirmTitle": "デイリーバズを終了？",
