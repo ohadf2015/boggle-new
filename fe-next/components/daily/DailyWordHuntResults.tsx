@@ -236,6 +236,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         language={language}
         puzzleNumber={puzzleNumber}
         countdown={countdown}
+        lifeRemaining={result.lifeRemaining || 0}
+        wordsDiscovered={result.wordsDiscovered?.length || 0}
         t={t}
       />
 

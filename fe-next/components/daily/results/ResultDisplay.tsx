@@ -29,12 +29,12 @@ export interface ResultDisplayProps {
   t: (key: string) => string;
 }
 
-/** Score tier colors with glow effect */
+/** Score tier colors with glow effect and border for ring animation */
 function getScoreStyles(score: number) {
-  if (score >= 800) return { color: 'text-neo-lime', glow: '0 0 40px rgba(191, 255, 0, 0.4)' };
-  if (score >= 600) return { color: 'text-neo-yellow', glow: '0 0 40px rgba(255, 225, 53, 0.4)' };
-  if (score >= 400) return { color: 'text-neo-orange', glow: '0 0 40px rgba(255, 107, 53, 0.4)' };
-  return { color: 'text-neo-pink', glow: '0 0 40px rgba(255, 20, 147, 0.4)' };
+  if (score >= 800) return { color: 'text-neo-lime', glow: '0 0 40px rgba(191, 255, 0, 0.4)', border: 'border-neo-lime/20' };
+  if (score >= 600) return { color: 'text-neo-yellow', glow: '0 0 40px rgba(255, 225, 53, 0.4)', border: 'border-neo-yellow/20' };
+  if (score >= 400) return { color: 'text-neo-orange', glow: '0 0 40px rgba(255, 107, 53, 0.4)', border: 'border-neo-orange/20' };
+  return { color: 'text-neo-pink', glow: '0 0 40px rgba(255, 20, 147, 0.4)', border: 'border-neo-pink/20' };
 }
 
 export const ResultDisplay: React.FC<ResultDisplayProps> = ({
@@ -93,18 +93,27 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
         {/* Main Content */}
         <div className="px-5 py-6 text-center">
           {solved ? (
-            /* WIN STATE - Clean score display */
+            /* WIN STATE - Clean score display with animated ring */
             <motion.div
               onClick={handleTapCelebrate}
-              className="cursor-pointer select-none"
+              className="cursor-pointer select-none relative"
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
             >
+              {/* Decorative animated ring */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none -top-2">
+                <div
+                  className={`w-36 h-36 sm:w-44 sm:h-44 rounded-full border-4 ${styles.border} animate-ping`}
+                  style={{ animationDuration: '2s' }}
+                />
+              </div>
+
               {/* Score */}
               <motion.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 20 }}
+                className="relative"
               >
                 <div
                   className={`text-[5rem] sm:text-[6rem] font-black ${styles.color} leading-none tracking-tight`}

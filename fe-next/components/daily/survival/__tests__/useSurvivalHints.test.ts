@@ -278,6 +278,47 @@ describe('useSurvivalHints', () => {
     });
   });
 
+  describe('auto-hint final letter protection', () => {
+    it('should never auto-reveal the final letter - player must guess it', () => {
+      // For a 5-letter word, should be able to reveal at most 4 letters
+      const { result } = renderHook(() => useSurvivalHints(defaultProps));
+
+      // Reveal letters one by one
+      for (let i = 0; i < 10; i++) {
+        act(() => { result.current[1].autoRevealLetter(); });
+      }
+
+      // Should have revealed exactly 4 letters (leaving 1 for the player)
+      expect(result.current[0].revealedLetters.size).toBe(4);
+
+      // canRevealLetter should now be false
+      const nextClue = result.current[1].getNextAffordableClue(100);
+      expect(nextClue?.id).not.toBe('reveal_letter');
+    });
+
+    it('should leave exactly 1 unrevealed letter for any word length', () => {
+      // Test with 3-letter word
+      const { result: result3 } = renderHook(() =>
+        useSurvivalHints({ ...defaultProps, targetWord: 'CAT' })
+      );
+
+      for (let i = 0; i < 10; i++) {
+        act(() => { result3.current[1].autoRevealLetter(); });
+      }
+      expect(result3.current[0].revealedLetters.size).toBe(2); // 3-1 = 2
+
+      // Test with 6-letter word
+      const { result: result6 } = renderHook(() =>
+        useSurvivalHints({ ...defaultProps, targetWord: 'BANANA' })
+      );
+
+      for (let i = 0; i < 10; i++) {
+        act(() => { result6.current[1].autoRevealLetter(); });
+      }
+      expect(result6.current[0].revealedLetters.size).toBe(5); // 6-1 = 5
+    });
+  });
+
   describe('integration: multiple token spending', () => {
     it('should allow buying multiple reveals before moving to next tier', () => {
       const { result } = renderHook(() => useSurvivalHints(defaultProps));

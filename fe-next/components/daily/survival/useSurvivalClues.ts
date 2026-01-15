@@ -15,6 +15,8 @@ export interface ClueState {
   accumulatedClues: Map<number, AccumulatedClue>;
   knownLetters: Set<string>;
   isClueGaining: boolean;
+  /** True when all positions of the target word have green clues (player knows the word) */
+  allPositionsRevealed: boolean;
 }
 
 export interface ClueActions {
@@ -276,10 +278,28 @@ export function useSurvivalClues({
     }
   }, [clueContainerRef]);
 
+  /**
+   * Check if all positions of the target word have green clues.
+   * When true, the player knows the complete word and game should auto-win.
+   */
+  const allPositionsRevealed = useMemo(() => {
+    if (!normalizedTarget || normalizedTarget.length === 0) return false;
+
+    // Check that every position has a green clue
+    for (let i = 0; i < normalizedTarget.length; i++) {
+      const clue = accumulatedClues.get(i);
+      if (!clue || clue.type !== 'green') {
+        return false;
+      }
+    }
+    return true;
+  }, [normalizedTarget, accumulatedClues]);
+
   const state: ClueState = {
     accumulatedClues,
     knownLetters,
     isClueGaining,
+    allPositionsRevealed,
   };
 
   const actions: ClueActions = {

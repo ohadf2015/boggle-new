@@ -249,6 +249,16 @@ export function useSurvivalGameLogic({
     }
   }, [state.lifePoints]);
 
+  // Auto-win when player discovers all green clues
+  // This triggers when the player knows the full word through gameplay
+  // (NOT from auto-hints, which never reveal the final letter)
+  useEffect(() => {
+    if (clueState.allPositionsRevealed && !gameOverRef.current) {
+      // Player figured out the word - auto-win!
+      handleGameOverRef.current?.(true);
+    }
+  }, [clueState.allPositionsRevealed]);
+
   // Dictionary validation
   const validateWordInDictionary = useCallback(async (word: string): Promise<boolean> => {
     try {
