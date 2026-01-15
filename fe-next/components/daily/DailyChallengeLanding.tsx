@@ -231,14 +231,6 @@ export function DailyChallengeLanding({
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-neo-display font-black bg-gradient-to-r from-neo-lime via-neo-cyan to-neo-lime bg-clip-text text-transparent bg-[length:200%_auto] animate-[gradient-flow_4s_ease_infinite]">
           {t('daily.chooseQuest')}
         </h1>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="text-slate-400 text-sm sm:text-base mt-2"
-        >
-          {t('daily.chooseChallengeHint')}
-        </motion.p>
       </motion.div>
 
       {/* Challenge Cards - Premium Grid */}
@@ -258,6 +250,7 @@ export function DailyChallengeLanding({
           onPlay={onSelectWordHunt}
           timeMode="timed"
           timeModeLabel={t('daily.timed90Seconds')}
+          customPreview="word-hunt-grid"
           buttonText={
             status.wordHunt === 'done'
               ? t('daily.viewResults')
@@ -350,6 +343,73 @@ export function DailyChallengeLanding({
   );
 }
 
+// Mini Letter Grid Preview for Word Hunt
+const PREVIEW_LETTERS = ['W', 'O', 'R', 'D', 'H', 'U', 'N', 'T', '!'];
+const HIGHLIGHT_PATH = [0, 1, 2, 3]; // W-O-R-D swipe path
+
+function WordHuntMiniGrid({ isHovered }: { isHovered: boolean }) {
+  return (
+    <div className="relative w-full aspect-square max-h-48 sm:max-h-56 rounded-xl overflow-hidden mb-3 border-3 border-neo-black shadow-hard bg-slate-900/90">
+      {/* Grid container */}
+      <div className="absolute inset-2 grid grid-cols-3 gap-1.5 sm:gap-2">
+        {PREVIEW_LETTERS.map((letter, idx) => {
+          const isInPath = HIGHLIGHT_PATH.includes(idx);
+          const pathIndex = HIGHLIGHT_PATH.indexOf(idx);
+
+          return (
+            <motion.div
+              key={idx}
+              className={cn(
+                'flex items-center justify-center rounded-lg border-2 border-neo-black font-neo-display font-black',
+                'text-lg sm:text-2xl shadow-hard-sm transition-colors duration-200',
+                isInPath && isHovered
+                  ? 'bg-neo-orange text-neo-black border-neo-orange'
+                  : 'bg-slate-800 text-neo-white/90'
+              )}
+              initial={false}
+              animate={
+                isInPath && isHovered
+                  ? {
+                      scale: [1, 1.1, 1],
+                      transition: { delay: pathIndex * 0.1, duration: 0.3 },
+                    }
+                  : { scale: 1 }
+              }
+            >
+              {letter}
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Animated swipe line when hovered */}
+      {isHovered && (
+        <svg
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+        >
+          <motion.path
+            d="M 17,17 L 50,17 L 83,17 L 83,50"
+            fill="none"
+            stroke="rgba(255,107,53,0.8)"
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+          />
+        </svg>
+      )}
+
+      {/* Neo-brutalist corner accents */}
+      <div className="absolute top-0 start-0 w-6 h-6 bg-neo-orange border-e-2 border-b-2 border-neo-black" />
+      <div className="absolute bottom-0 end-0 w-6 h-6 bg-neo-yellow border-s-2 border-t-2 border-neo-black" />
+    </div>
+  );
+}
+
 // Compact Challenge Card Component
 interface CompactChallengeCardProps {
   icon: ReactNode;
@@ -363,6 +423,8 @@ interface CompactChallengeCardProps {
   timeModeLabel: string;
   badge?: string;
   delay?: number;
+  /** Custom preview element (e.g., mini letter grid) */
+  customPreview?: 'word-hunt-grid';
   /** AI-generated preview image URL for visual appeal */
   previewImageUrl?: string;
   /** Alt text for the preview image */
@@ -385,6 +447,7 @@ function CompactChallengeCard({
   timeModeLabel,
   badge,
   delay = 0,
+  customPreview,
   previewImageUrl,
   previewImageAlt,
   onRequestChallenge,
@@ -561,8 +624,10 @@ function CompactChallengeCard({
           <span>{timeModeLabel}</span>
         </motion.div>
 
-        {/* Preview Image or Icon */}
-        {showImage ? (
+        {/* Preview: Custom Grid, Image, or Icon */}
+        {customPreview === 'word-hunt-grid' ? (
+          <WordHuntMiniGrid isHovered={isHovered} />
+        ) : showImage ? (
           <div className="relative w-full aspect-square max-h-48 sm:max-h-56 rounded-xl overflow-hidden mb-3 border-3 border-neo-black shadow-hard">
             <Image
               src={previewImageUrl}

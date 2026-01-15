@@ -2972,6 +2972,8 @@ const ja = {
     "currentScores": "現在のスコア",
     "activitiesAnalyzed": "アクティビティ",
     "toNextTier": "まで",
+    "pointsToGo": "pt差",
+    "maxTierReached": "最高ランク!",
     "newBadge": "新着!",
     "firstGameComplete": "認知ベースライン確立！",
     "baselineEstablished": "認知プロフィールの準備ができました。もっとゲームをプレイして改善を追跡しましょう！",

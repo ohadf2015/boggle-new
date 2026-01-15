@@ -676,7 +676,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     ];
 
     return (
-        <html lang={validLocale} dir={dir} className={`${fredoka.variable || ''} ${rubik.variable || ''}`} suppressHydrationWarning>
+        <html lang={validLocale} dir={dir} className={`dark ${fredoka.variable || ''} ${rubik.variable || ''}`} suppressHydrationWarning>
             <head>
                 <meta charSet="utf-8" />
                 {/* Preconnect hints for faster resource loading on slow connections */}

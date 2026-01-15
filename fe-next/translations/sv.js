@@ -2973,6 +2973,8 @@ const sv = {
     "currentScores": "Nuvarande poäng",
     "activitiesAnalyzed": "Aktiviteter",
     "toNextTier": "till",
+    "pointsToGo": "p kvar",
+    "maxTierReached": "Max nivå!",
     "newBadge": "NYT!",
     "firstGameComplete": "Kognitiv baslinje etablerad!",
     "baselineEstablished": "Din kognitiva profil är klar. Spela fler spel för att följa din förbättring!",

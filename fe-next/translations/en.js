@@ -2984,6 +2984,8 @@ const en = {
     "currentScores": "Current Scores",
     "activitiesAnalyzed": "Activities",
     "toNextTier": "to",
+    "pointsToGo": "pts to go",
+    "maxTierReached": "Max Tier!",
     "newBadge": "NEW!",
     "firstGameComplete": "Cognitive Baseline Established!",
     "baselineEstablished": "Your cognitive profile is ready. Play more games to track your improvement!",

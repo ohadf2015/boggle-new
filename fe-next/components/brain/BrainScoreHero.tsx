@@ -194,23 +194,58 @@ export default function BrainScoreHero({
                 'text-xs font-medium',
                 isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
               )}>
-                {tierProgress}% {t('brain.toNextTier')} {t(`brain.tiers.${nextTier}`)}
+                {t(`brain.tiers.${nextTier}`)}
               </span>
             </div>
           )}
         </div>
 
-        {/* Progress Bar - more visible with dynamic colors */}
-        <div className={cn(
-          'h-4 rounded-full border-2 border-neo-black overflow-hidden',
-          isDarkMode ? 'bg-slate-900' : 'bg-gray-300'
-        )}>
-          <motion.div
-            className={cn('h-full', progressBarGradient)}
-            initial={{ width: 0 }}
-            animate={{ width: `${tierProgress}%` }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          />
+        {/* Progress Bar with score markers */}
+        <div className="relative">
+          <div className={cn(
+            'h-5 rounded-full border-2 border-neo-black overflow-hidden',
+            isDarkMode ? 'bg-slate-900' : 'bg-gray-300'
+          )}>
+            <motion.div
+              className={cn('h-full', progressBarGradient)}
+              initial={{ width: 0 }}
+              animate={{ width: `${tierProgress}%` }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            />
+          </div>
+          {/* Score markers showing current → next tier threshold */}
+          {nextTier && (
+            <div className="flex justify-between mt-1">
+              <span className={cn(
+                'text-xs font-bold',
+                isDarkMode ? 'text-neo-white' : 'text-neo-black'
+              )}>
+                {score}
+              </span>
+              <span className={cn(
+                'text-xs font-medium px-2 py-0.5 rounded-full',
+                isDarkMode ? 'bg-slate-700 text-neo-lime' : 'bg-gray-200 text-neo-purple'
+              )}>
+                {tierConfig.max + 1 - score} {t('brain.pointsToGo')}
+              </span>
+              <span className={cn(
+                'text-xs font-bold',
+                isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+              )}>
+                {tierConfig.max + 1}
+              </span>
+            </div>
+          )}
+          {!nextTier && (
+            <div className="flex justify-center mt-1">
+              <span className={cn(
+                'text-xs font-bold px-2 py-0.5 rounded-full',
+                'bg-neo-lime text-neo-black'
+              )}>
+                {t('brain.maxTierReached')}
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>

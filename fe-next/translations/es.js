@@ -2969,6 +2969,8 @@ const es = {
     "currentScores": "Puntuaciones actuales",
     "activitiesAnalyzed": "Actividades",
     "toNextTier": "para",
+    "pointsToGo": "pts restantes",
+    "maxTierReached": "¡Nivel máximo!",
     "newBadge": "¡NUEVO!",
     "firstGameComplete": "¡Base Cognitiva Establecida!",
     "baselineEstablished": "Tu perfil cognitivo está listo. ¡Juega más partidas para seguir tu progreso!",

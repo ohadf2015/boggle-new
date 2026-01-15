@@ -2974,6 +2974,8 @@ const he = {
     "currentScores": "ציונים נוכחיים",
     "activitiesAnalyzed": "פעילויות",
     "toNextTier": "ל",
+    "pointsToGo": "נק' נשארו",
+    "maxTierReached": "דרגה מקסימלית!",
     "newBadge": "חדש!",
     "firstGameComplete": "קו הבסיס הקוגניטיבי הוקם!",
     "baselineEstablished": "הפרופיל הקוגניטיבי שלך מוכן. שחק עוד משחקים כדי לעקוב אחר השיפור שלך!",

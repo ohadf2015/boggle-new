@@ -16,6 +16,8 @@ jest.mock('@/contexts/LanguageContext', () => ({
         'brain.tiers.intermediate': 'Intermediate',
         'brain.toNextTier': 'to',
         'brain.tiers.advanced': 'Advanced',
+        'brain.pointsToGo': 'pts to go',
+        'brain.maxTierReached': 'Max Tier!',
         'common.share': 'Share',
       };
       return translations[key] || key;
@@ -97,6 +99,43 @@ describe('BrainScoreHero UI Fixes', () => {
 
       // Should use darker background (slate-900) for more contrast in dark mode
       expect(progressBar?.className).toMatch(/bg-slate-900/);
+    });
+  });
+
+  describe('Points to next tier display', () => {
+    it('should show current score under progress bar', () => {
+      render(<BrainScoreHero {...defaultProps} />);
+
+      // Current score should be displayed as a marker under the progress bar
+      expect(screen.getAllByText('47').length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('should show points needed to reach next tier', () => {
+      render(<BrainScoreHero {...defaultProps} />);
+
+      // For intermediate tier (max 59), with score 47, should show "13 pts to go"
+      // tierConfig.max + 1 - score = 59 + 1 - 47 = 13
+      expect(screen.getByText(/13.*pts to go/)).toBeInTheDocument();
+    });
+
+    it('should show next tier threshold score', () => {
+      render(<BrainScoreHero {...defaultProps} />);
+
+      // Should show 60 (next tier threshold: max of current tier + 1)
+      expect(screen.getByText('60')).toBeInTheDocument();
+    });
+
+    it('should show max tier message when at master level', () => {
+      const masterProps = {
+        ...defaultProps,
+        score: 95,
+        tier: 'master' as const,
+        tierProgress: 50,
+      };
+      render(<BrainScoreHero {...masterProps} />);
+
+      // Should show max tier message instead of points to go
+      expect(screen.getByText('Max Tier!')).toBeInTheDocument();
     });
   });
 });
