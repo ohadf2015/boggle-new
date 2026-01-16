@@ -17,7 +17,7 @@ export default function BuzzChallengeWrapper() {
   const date = searchParams.get('date') || undefined;
 
   const handleBack = () => {
-    router.push('/daily');
+    router.push(`/${language}/daily`);
   };
 
   return (

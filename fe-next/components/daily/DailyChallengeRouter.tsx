@@ -19,11 +19,11 @@ export default function DailyChallengeRouter() {
   const [showBuzzHistory, setShowBuzzHistory] = useState(false);
 
   const handleSelectWordHunt = () => {
-    router.push('/daily/word-hunt');
+    router.push(`/${language}/daily/word-hunt`);
   };
 
   const handleSelectBuzz = () => {
-    router.push('/daily/buzz');
+    router.push(`/${language}/daily/buzz`);
   };
 
   const handleShowBuzzHistory = () => {
@@ -32,7 +32,7 @@ export default function DailyChallengeRouter() {
 
   const handleSelectPastBuzz = (date: string) => {
     setShowBuzzHistory(false);
-    router.push(`/daily/buzz?date=${date}`);
+    router.push(`/${language}/daily/buzz?date=${date}`);
   };
 
   return (

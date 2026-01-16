@@ -126,8 +126,8 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
 
   // Handle quit
   const handleQuit = useCallback(() => {
-    router.push('/');
-  }, [router]);
+    router.push(`/${language}`);
+  }, [router, language]);
 
   // Handle play again
   const handlePlayAgain = useCallback(() => {
@@ -168,7 +168,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
             {error}
           </p>
           <Button
-            onClick={() => router.push('/')}
+            onClick={() => router.push(`/${language}`)}
             className="w-full bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo shadow-hard-md hover:shadow-hard-lg hover:-translate-y-1 transition-all font-bold"
           >
             {language === 'he' ? 'חזרה לדף הבית' : 'Back to Home'}
