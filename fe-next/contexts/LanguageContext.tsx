@@ -115,14 +115,8 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
             return;
         }
 
-        // Check for location-detected locale from middleware
-        const detectedLocale = getCookieLocale('boggle_detected_locale');
-        if (detectedLocale && detectedLocale !== currentLang) {
-            setLanguageState(detectedLocale);
-            return;
-        }
-
         // Use browser language as fallback
+        // Location-based detection removed to respect user preferences
         const browserLang = getBrowserLanguage();
         if (browserLang && browserLang !== currentLang) {
             setLanguageState(browserLang);
