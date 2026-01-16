@@ -2440,6 +2440,7 @@ const sv = {
     "quitConfirm": "Dina framsteg sparas, men ofullständiga utmaningar räknas inte i din poäng.",
     "quitConfirmTitle": "Avsluta Daily Buzz?",
     "searches": "sökningar",
+    "challengeTrend": "I dagens pussel",
     "topicIs": "Ämne: {topic}",
     "total": "TOTALT",
     "trio": {
@@ -2481,6 +2482,8 @@ const sv = {
     "correct": "RÄTT!",
     "hint": "LEDTRÅD?",
     "skip": "HOPPA",
+    "back": "TILLBAKA",
+    "swipeToNavigate": "Svep för att navigera",
     "submit": "SKICKA",
     "prevChallenge": "Föregående utmaning",
     "nextChallenge": "Nästa utmaning",
