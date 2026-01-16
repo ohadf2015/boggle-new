@@ -52,12 +52,13 @@ export function isSocialCrawler(userAgent: string): boolean {
 
 /**
  * Determine locale from request
- * Priority: cookie > IP geolocation > x-country-code header > Accept-Language
+ * Priority: cookie > Accept-Language > default
+ * Location-based detection removed to respect user preferences
  * @param req - Express request object
  * @returns Locale code
  */
 export function determineLocale(req: GeoRequest): string {
-  // Priority 1: Cookie preference
+  // Priority 1: Cookie preference (explicit user selection)
   const cookies = req.headers.cookie;
   const cookieLocale = cookies?.split(';')
     .find(c => c.trim().startsWith('boggle_language='))
@@ -67,18 +68,7 @@ export function determineLocale(req: GeoRequest): string {
     return cookieLocale;
   }
 
-  // Priority 2: IP Geolocation
-  if (req.geoData?.countryCode && COUNTRY_TO_LOCALE[req.geoData.countryCode]) {
-    return COUNTRY_TO_LOCALE[req.geoData.countryCode];
-  }
-
-  // Priority 3: x-country-code header
-  const countryHeader = req.headers['x-country-code'] as string | undefined;
-  if (countryHeader && COUNTRY_TO_LOCALE[countryHeader]) {
-    return COUNTRY_TO_LOCALE[countryHeader];
-  }
-
-  // Priority 4: Accept-Language header
+  // Priority 2: Accept-Language header (browser preference)
   const acceptLanguage = req.headers['accept-language'];
   if (acceptLanguage) {
     const browserLang = acceptLanguage.split(',')[0].split('-')[0].toLowerCase();
@@ -87,6 +77,7 @@ export function determineLocale(req: GeoRequest): string {
     }
   }
 
+  // Priority 3: Default locale
   return DEFAULT_LOCALE;
 }
 
