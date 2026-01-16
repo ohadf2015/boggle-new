@@ -64,7 +64,7 @@ export default function AnswerFeedbackModal({
             onClick={(e) => e.stopPropagation()}
             className={`
               w-[90%] max-w-sm p-6 mx-4 rounded-xl border-3 border-neo-black shadow-hard-lg
-              ${isCorrect ? 'bg-emerald-900/95' : 'bg-red-900/95'}
+              ${isCorrect ? 'bg-emerald-600' : 'bg-red-600'}
             `}
           >
             {/* Result Icon */}
