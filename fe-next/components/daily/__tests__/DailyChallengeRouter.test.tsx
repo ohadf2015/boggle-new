@@ -1,6 +1,14 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import DailyChallengeRouter from '../DailyChallengeRouter';
+
+// Mock useRouter
+const mockPush = jest.fn();
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+}));
 
 // Mock dependencies
 jest.mock('@/contexts/LanguageContext', () => ({
@@ -13,29 +21,27 @@ jest.mock('@/contexts/LanguageContext', () => ({
 jest.mock('../DailyChallengeLanding', () => ({
   DailyChallengeLanding: ({
     onSelectWordHunt,
-    onSelectBuzz
+    onSelectBuzz,
+    onShowBuzzHistory,
   }: {
     onSelectWordHunt: () => void;
     onSelectBuzz: () => void;
+    onShowBuzzHistory: () => void;
   }) => (
     <div data-testid="daily-challenge-landing">
       <button onClick={onSelectWordHunt} data-testid="select-word-hunt">Select Word Hunt</button>
       <button onClick={onSelectBuzz} data-testid="select-buzz">Select Buzz</button>
+      <button onClick={onShowBuzzHistory} data-testid="show-buzz-history">Show History</button>
     </div>
   ),
 }));
 
-jest.mock('../DailyChallenge', () => ({
+jest.mock('../../buzz/BuzzHistoryList', () => ({
   __esModule: true,
-  default: () => <div data-testid="daily-challenge-game">Word Hunt Game</div>,
-}));
-
-jest.mock('../../buzz/BuzzChallenge', () => ({
-  __esModule: true,
-  default: ({ onBack }: { onBack: () => void }) => (
-    <div data-testid="buzz-challenge">
-      Buzz Challenge
-      <button onClick={onBack} data-testid="buzz-back">Back</button>
+  default: ({ onSelectDate, onClose }: { onSelectDate: (date: string) => void; onClose: () => void }) => (
+    <div data-testid="buzz-history-list">
+      <button onClick={() => onSelectDate('2024-01-15')} data-testid="select-past-buzz">Select Past Buzz</button>
+      <button onClick={onClose} data-testid="close-history">Close</button>
     </div>
   ),
 }));
@@ -55,6 +61,7 @@ jest.mock('framer-motion', () => ({
 describe('DailyChallengeRouter - All Users See Landing Page', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockPush.mockClear();
   });
 
   test('all users see the landing page with dual challenge selection', () => {
@@ -63,11 +70,9 @@ describe('DailyChallengeRouter - All Users See Landing Page', () => {
     // All users should see the landing page with challenge selection
     expect(screen.getByTestId('daily-challenge-landing')).toBeInTheDocument();
     expect(screen.getByTestId('header')).toBeInTheDocument();
-    expect(screen.queryByTestId('daily-challenge-game')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('buzz-challenge')).not.toBeInTheDocument();
   });
 
-  test('selecting Word Hunt navigates to Word Hunt game', async () => {
+  test('selecting Word Hunt navigates to Word Hunt page', () => {
     render(<DailyChallengeRouter />);
 
     // Start on landing
@@ -76,15 +81,11 @@ describe('DailyChallengeRouter - All Users See Landing Page', () => {
     // Select Word Hunt
     fireEvent.click(screen.getByTestId('select-word-hunt'));
 
-    // Should navigate to Word Hunt game
-    await waitFor(() => {
-      expect(screen.getByTestId('daily-challenge-game')).toBeInTheDocument();
-    });
-    expect(screen.queryByTestId('daily-challenge-landing')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('header')).not.toBeInTheDocument();
+    // Should navigate to Word Hunt page
+    expect(mockPush).toHaveBeenCalledWith('/en/daily/word-hunt');
   });
 
-  test('selecting Buzz navigates to Buzz challenge', async () => {
+  test('selecting Buzz navigates to Buzz page', () => {
     render(<DailyChallengeRouter />);
 
     // Start on landing
@@ -93,29 +94,51 @@ describe('DailyChallengeRouter - All Users See Landing Page', () => {
     // Select Buzz
     fireEvent.click(screen.getByTestId('select-buzz'));
 
-    // Should navigate to Buzz challenge
-    await waitFor(() => {
-      expect(screen.getByTestId('buzz-challenge')).toBeInTheDocument();
-    });
-    expect(screen.queryByTestId('daily-challenge-landing')).not.toBeInTheDocument();
+    // Should navigate to Buzz page
+    expect(mockPush).toHaveBeenCalledWith('/en/daily/buzz');
   });
 
-  test('back button from Buzz returns to landing page', async () => {
+  test('showing buzz history opens modal', () => {
     render(<DailyChallengeRouter />);
 
-    // Navigate to Buzz
-    fireEvent.click(screen.getByTestId('select-buzz'));
-    await waitFor(() => {
-      expect(screen.getByTestId('buzz-challenge')).toBeInTheDocument();
-    });
+    // No history modal initially
+    expect(screen.queryByTestId('buzz-history-list')).not.toBeInTheDocument();
 
-    // Click back
-    fireEvent.click(screen.getByTestId('buzz-back'));
+    // Show history
+    fireEvent.click(screen.getByTestId('show-buzz-history'));
 
-    // Should return to landing
-    await waitFor(() => {
-      expect(screen.getByTestId('daily-challenge-landing')).toBeInTheDocument();
-    });
-    expect(screen.queryByTestId('buzz-challenge')).not.toBeInTheDocument();
+    // History modal should appear
+    expect(screen.getByTestId('buzz-history-list')).toBeInTheDocument();
+  });
+
+  test('selecting past buzz navigates to buzz page with date query', () => {
+    render(<DailyChallengeRouter />);
+
+    // Show history
+    fireEvent.click(screen.getByTestId('show-buzz-history'));
+    expect(screen.getByTestId('buzz-history-list')).toBeInTheDocument();
+
+    // Select past buzz
+    fireEvent.click(screen.getByTestId('select-past-buzz'));
+
+    // Should navigate to buzz page with date query
+    expect(mockPush).toHaveBeenCalledWith('/en/daily/buzz?date=2024-01-15');
+
+    // History modal should close
+    expect(screen.queryByTestId('buzz-history-list')).not.toBeInTheDocument();
+  });
+
+  test('closing buzz history modal hides it', () => {
+    render(<DailyChallengeRouter />);
+
+    // Show history
+    fireEvent.click(screen.getByTestId('show-buzz-history'));
+    expect(screen.getByTestId('buzz-history-list')).toBeInTheDocument();
+
+    // Close history
+    fireEvent.click(screen.getByTestId('close-history'));
+
+    // History modal should disappear
+    expect(screen.queryByTestId('buzz-history-list')).not.toBeInTheDocument();
   });
 });
