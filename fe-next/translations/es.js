@@ -2433,6 +2433,8 @@ const es = {
     "correct": "¡ESO!",
     "hint": "¿PISTA?",
     "skip": "SALTAR",
+    "back": "ATRÁS",
+    "swipeToNavigate": "Desliza para navegar",
     "submit": "ENVIAR",
     "prevChallenge": "Desafío anterior",
     "nextChallenge": "Siguiente desafío",
@@ -2482,6 +2484,7 @@ const es = {
     "quitConfirm": "¿Seguro que quieres salir? Perderás tu progreso.",
     "quitConfirmTitle": "¿Abandonar Daily Buzz?",
     "searches": "búsquedas",
+    "challengeTrend": "En los retos de hoy",
     "topicIs": "El topic es: {topic}",
     "total": "TOTAL",
     "trio": {

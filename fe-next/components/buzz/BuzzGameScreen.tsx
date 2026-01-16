@@ -420,47 +420,6 @@ export default function BuzzGameScreen({
         className="flex-1 flex flex-col items-center justify-center relative z-10"
         {...swipeHandlers}
       >
-        {/* Previous Challenge Arrow (show if not first challenge) */}
-        {currentIndex > 0 && (
-          <motion.button
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 0.5, x: 0 }}
-            exit={{ opacity: 0, x: -10 }}
-            whileHover={{ opacity: 1, scale: 1.1 }}
-            onClick={handlePrevChallenge}
-            className="absolute start-2 top-1/2 -translate-y-1/2 p-2 bg-slate-800/80 border-2 border-slate-600 rounded-full hover:border-neo-cyan transition-colors z-20"
-            aria-label={t('buzz.prevChallenge')}
-          >
-            {/* In RTL, previous is on the right (start) and should point right (→)
-                In LTR, previous is on the left (start) and should point left (←) */}
-            {dir === 'rtl' ? (
-              <ChevronRight className="w-6 h-6 text-slate-300" />
-            ) : (
-              <ChevronLeft className="w-6 h-6 text-slate-300" />
-            )}
-          </motion.button>
-        )}
-
-        {/* Next Challenge Arrow (show if not last challenge) */}
-        {currentIndex < challengeData.challenges.length - 1 && (
-          <motion.button
-            initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: 0.5, x: 0 }}
-            exit={{ opacity: 0, x: 10 }}
-            whileHover={{ opacity: 1, scale: 1.1 }}
-            onClick={handleNextChallenge}
-            className="absolute end-2 top-1/2 -translate-y-1/2 p-2 bg-slate-800/80 border-2 border-slate-600 rounded-full hover:border-neo-cyan transition-colors z-20"
-            aria-label={t('buzz.nextChallenge')}
-          >
-            {/* In RTL, next is on the left (end) and should point left (←)
-                In LTR, next is on the right (end) and should point right (→) */}
-            {dir === 'rtl' ? (
-              <ChevronLeft className="w-6 h-6 text-slate-300" />
-            ) : (
-              <ChevronRight className="w-6 h-6 text-slate-300" />
-            )}
-          </motion.button>
-        )}
 
         <AnimatePresence mode="wait">
           <motion.div
@@ -478,6 +437,70 @@ export default function BuzzGameScreen({
 
       {/* Bottom actions - Compact */}
       <div className="mt-2 space-y-1.5 relative z-10">
+        {/* Navigation Controls */}
+        <div className="space-y-2">
+          {/* Desktop Navigation - Back/Skip Buttons */}
+          <div className="hidden sm:flex items-center justify-between gap-2">
+            <Button
+              onClick={handlePrevChallenge}
+              disabled={currentIndex === 0}
+              variant="outline"
+              className="flex-1 py-2 border-2 border-slate-600 hover:border-neo-cyan hover:bg-neo-cyan/10 rounded-neo transition-all disabled:opacity-30 disabled:cursor-not-allowed font-bold"
+            >
+              {dir === 'rtl' ? (
+                <ChevronRight className="w-4 h-4 me-1" />
+              ) : (
+                <ChevronLeft className="w-4 h-4 me-1" />
+              )}
+              {t('buzz.back')}
+            </Button>
+            <Button
+              onClick={handleNextChallenge}
+              disabled={currentIndex === challengeData.challenges.length - 1}
+              variant="outline"
+              className="flex-1 py-2 border-2 border-slate-600 hover:border-neo-cyan hover:bg-neo-cyan/10 rounded-neo transition-all disabled:opacity-30 disabled:cursor-not-allowed font-bold"
+            >
+              {t('buzz.skip')}
+              {dir === 'rtl' ? (
+                <ChevronLeft className="w-4 h-4 ms-1" />
+              ) : (
+                <ChevronRight className="w-4 h-4 ms-1" />
+              )}
+            </Button>
+          </div>
+
+          {/* Mobile Navigation - Swipe Indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="sm:hidden flex items-center justify-center gap-2 py-2 text-slate-400"
+          >
+            <motion.div
+              animate={{ x: dir === 'rtl' ? [0, 5, 0] : [0, -5, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
+            >
+              {dir === 'rtl' ? (
+                <ChevronRight className="w-4 h-4" />
+              ) : (
+                <ChevronLeft className="w-4 h-4" />
+              )}
+            </motion.div>
+            <span className="text-xs font-bold uppercase">
+              {t('buzz.swipeToNavigate')}
+            </span>
+            <motion.div
+              animate={{ x: dir === 'rtl' ? [0, -5, 0] : [0, 5, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
+            >
+              {dir === 'rtl' ? (
+                <ChevronLeft className="w-4 h-4" />
+              ) : (
+                <ChevronRight className="w-4 h-4" />
+              )}
+            </motion.div>
+          </motion.div>
+        </div>
+
         {/* Hint button - only show if challenge not answered */}
         {currentChallenge.hint && !showHint && !answeredChallenges.has(currentIndex) && (
           <motion.div

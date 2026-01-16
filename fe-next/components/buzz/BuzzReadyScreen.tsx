@@ -45,6 +45,17 @@ export default function BuzzReadyScreen({
 
   const isRTL = language === 'he';
 
+  // Extract unique trending topics from the actual challenges
+  const challengeTrends = React.useMemo(() => {
+    const trendSet = new Set<string>();
+    challengeData.challenges.forEach(challenge => {
+      if (challenge.trendTopic) {
+        trendSet.add(challenge.trendTopic);
+      }
+    });
+    return Array.from(trendSet).slice(0, 3);
+  }, [challengeData.challenges]);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -191,7 +202,7 @@ export default function BuzzReadyScreen({
           </div>
 
           <div className="grid grid-cols-1 gap-2">
-            {challengeData.trendingTopics.slice(0, 3).map((topic, i) => (
+            {challengeTrends.map((trendTopic, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, x: isRTL ? 30 : -30 }}
@@ -202,21 +213,18 @@ export default function BuzzReadyScreen({
                 {/* Topic icon with glow effect */}
                 <div className="relative">
                   <div className="text-2xl transition-transform group-hover:scale-110">
-                    {getCategoryIcon(topic.query)}
+                    {getCategoryIcon(trendTopic)}
                   </div>
                   <div className="absolute inset-0 bg-neo-yellow/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
 
                 <div className="flex-1 min-w-0">
                   <div className="font-bold text-white truncate group-hover:text-neo-yellow transition-colors">
-                    {topic.query}
+                    {trendTopic}
                   </div>
-                  {topic.volume && (
-                    <div className="flex items-center gap-1 text-xs text-slate-400">
-                      <Zap className="w-3 h-3 text-neo-orange" />
-                      {formatVolume(topic.volume)} {t('buzz.searches')}
-                    </div>
-                  )}
+                  <div className="text-xs text-slate-400 mt-0.5">
+                    {t('buzz.challengeTrend')}
+                  </div>
                 </div>
 
                 {/* Rank indicator */}
