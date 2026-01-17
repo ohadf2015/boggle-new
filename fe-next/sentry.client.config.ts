@@ -70,9 +70,11 @@ Sentry.init({
     /from module \d+/i,
     /^Uncaught \(in promise\)/,
     /^Unhandled \(rejection\)/,
-    // AdSense errors (external library)
+    // AdSense errors/warnings (external library)
     "no_div",
     /adsbygoogle/i,
+    "AdSense head tag doesn't support data-nscript attribute",
+    /adsense.*data-nscript/i,
   ],
 
   denyUrls: [

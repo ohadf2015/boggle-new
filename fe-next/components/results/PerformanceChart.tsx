@@ -29,18 +29,18 @@ import {
  */
 function useContainerDimensions() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isReady, setIsReady] = useState(false);
+  const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
 
   useEffect(() => {
     const checkDimensions = () => {
       if (containerRef.current) {
         const { clientWidth, clientHeight } = containerRef.current;
-        // Only mark as ready if dimensions are valid (> 0 and not -1)
-        if (clientWidth > 0 && clientHeight > 0) {
-          setIsReady(true);
+        // Only mark as ready if dimensions are valid (>= 100 for minimum usable chart)
+        if (clientWidth >= 100 && clientHeight >= 100) {
+          setDimensions({ width: clientWidth, height: clientHeight });
         } else {
-          // Reset to false if dimensions become invalid
-          setIsReady(false);
+          // Reset if dimensions become too small
+          setDimensions(null);
         }
       }
     };
@@ -57,8 +57,8 @@ function useContainerDimensions() {
       observer.observe(containerRef.current);
     }
 
-    // Add polling as fallback for edge cases
-    const pollInterval = setInterval(checkDimensions, 100);
+    // Add polling as fallback for edge cases (reduced frequency)
+    const pollInterval = setInterval(checkDimensions, 250);
 
     return () => {
       cancelAnimationFrame(frameId);
@@ -67,7 +67,7 @@ function useContainerDimensions() {
     };
   }, []);
 
-  return { containerRef, isReady };
+  return { containerRef, dimensions, isReady: dimensions !== null };
 }
 
 interface PerformanceChartProps {
@@ -289,7 +289,7 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
   const [isClient, setIsClient] = useState(false);
 
   // Track container dimensions to prevent Recharts rendering with invalid size
-  const { containerRef, isReady } = useContainerDimensions();
+  const { containerRef, dimensions, isReady } = useContainerDimensions();
 
   // Load data on client side only (localStorage)
   useEffect(() => {
@@ -513,8 +513,8 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
 
         {/* Chart - only render ResponsiveContainer when dimensions are valid */}
         <div ref={containerRef} className={cn('w-full', compact ? 'h-32 min-h-[8rem]' : 'h-48 min-h-[12rem]')}>
-          {isReady ? (
-          <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100}>
+          {isReady && dimensions ? (
+          <ResponsiveContainer width={dimensions.width} height={dimensions.height} minWidth={100} minHeight={100}>
             <LineChart
               data={chartData}
               margin={{ top: 10, right: 10, left: 0, bottom: 5 }}

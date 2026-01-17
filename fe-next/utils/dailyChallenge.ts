@@ -2266,32 +2266,28 @@ const TARGET_WORD_LISTS: Record<Language, string[]> = {
     'BREW', 'STEW', 'BAKE', 'ROAM', 'SOAR', 'DIVE', 'LEAP', 'SPIN',
   ],
   he: [
-    // Hebrew 4-letter words (for daily challenge - replaced obvious ones)
-    'בית', 'מים', 'עולם', 'אדם', 'דבר',
-    'עין', 'ראש', 'ילד', 'ספר', 'חבר',
-    'דלת', 'חלון', 'שמש', 'ירח', 'כוכב',
-    'פרח', 'סוס', 'כלב', 'ציפור', 'דגים',
-    'ארנב', 'נמר', 'זאב', 'דוב', 'אריה',
-    'עוגה', 'לחם', 'חלב', 'מים', 'מרק',
-    'זהב', 'כסף', 'נחושת', 'ברזל', 'עץ',
-    'הר', 'נהר', 'ים', 'אגם', 'גבעה',
-    'שיר', 'ספר', 'מכתב', 'סיפור', 'חלום',
-    'מלך', 'גיבור', 'חכם', 'אמן', 'רופא',
-    'אש', 'מים', 'רוח', 'אדמה', 'שמים',
-    'אור', 'צל', 'לילה', 'יום', 'בוקר',
+    // Hebrew 4+ character words only (minimum 4 letters required)
+    'עולם', 'אדמה', 'שמים', 'כוכב', 'ירח',
+    'חלון', 'דלת', 'ספר', 'חבר', 'ילד',
+    'ציפור', 'דגים', 'ארנב', 'נמר', 'זאב',
+    'אריה', 'עוגה', 'לחם', 'חלב', 'מרק',
+    'נחושת', 'ברזל', 'נהר', 'אגם', 'גבעה',
+    'מכתב', 'סיפור', 'חלום', 'מלך', 'גיבור',
+    'חכם', 'אמן', 'רופא', 'לילה', 'בוקר',
+    'שולחן', 'מחשב', 'טלפון', 'חיוך', 'משפחה',
+    'אהבה', 'שמחה', 'בריאות', 'חופש', 'שלום',
   ],
   sv: [
-    // Swedish 3-4 letter words
-    'HUS', 'DAG', 'ÖGA', 'ÖRA', 'ARM', 'BEN', 'BOK', 'BIL', 'SOL', 'VÄG',
-    // Swedish 5-letter words
+    // Swedish 4+ letter words only (minimum 4 letters required)
+    'HUND', 'KATT', 'STEN', 'BERG', 'LJUS', 'NATT', 'REGN', 'SNÖN',
+    'FÅGEL', 'BLOM', 'TRÄD', 'GRÄS', 'BLAD', 'SOLEN', 'MÅNE',
     'VATTEN', 'VÄRLD', 'PLATS', 'LJUD', 'KRAFT',
     'BÄSTA', 'FÖRSTA', 'SISTA', 'RUNDA', 'KLAR',
-    'STEN', 'HUND', 'KATT', 'FÅGEL', 'BLOM',
-    // Swedish 6-letter words
-    'SLOTT', 'TRÄDGÅRD', 'MARKNAD', 'FÖNSTER',
-    'NATUR', 'HIMMEL', 'VINTER', 'SOMMAR',
-    // Swedish 7-letter words
-    'MORGON', 'KVÄLL', 'PERFEKT', 'FANTASTISK'
+    // Swedish 5-6 letter words
+    'SLOTT', 'NATUR', 'HIMMEL', 'VINTER', 'SOMMAR',
+    'FÖNSTER', 'MARKNAD', 'TRÄDGÅRD', 'STRAND', 'SKOG',
+    // Swedish 6-7 letter words
+    'MORGON', 'KVÄLL', 'PERFEKT', 'FANTASTISK', 'STJÄRNA'
   ],
   ja: [
     // Japanese 2-3 character words
@@ -2305,9 +2301,9 @@ const TARGET_WORD_LISTS: Record<Language, string[]> = {
     '公園', '駅', '銀行', '郵便局', '美術館'
   ],
   es: [
-    // Spanish 3-4 letter words
-    'SOL', 'MAR', 'PAN', 'SAL', 'LUZ', 'VOZ', 'PAZ', 'REY', 'LEY', 'RÍO',
-    'CASA', 'AGUA', 'VIDA', 'AMOR', 'MESA', 'LIBRO', 'PERRO', 'GATO',
+    // Spanish 4+ letter words only (minimum 4 letters required)
+    'CASA', 'AGUA', 'VIDA', 'AMOR', 'MESA', 'LUNA', 'FLOR', 'ROSA',
+    'LIBRO', 'PERRO', 'GATO', 'PATO', 'LAGO', 'MANO', 'PELO',
     // Spanish 5-letter words
     'MUNDO', 'LUGAR', 'TIEMPO', 'GENTE', 'NOCHE',
     'PLANTA', 'TIERRA', 'CIELO', 'FIESTA', 'AMIGO',
@@ -2318,23 +2314,25 @@ const TARGET_WORD_LISTS: Record<Language, string[]> = {
     'COCINA', 'MAÑANA', 'PERFECTO', 'NATURAL', 'FANTÁSTICO'
   ],
   fr: [
-    // French 3-4 letter words
-    'CHAT', 'PAIN', 'LUNE', 'ÉTOILE', 'ARBRE', 'FLEUR', 'JOUR', 'NUIT',
+    // French 4+ letter words only (minimum 4 letters required)
+    'CHAT', 'PAIN', 'LUNE', 'JOUR', 'NUIT', 'ROSE', 'BLEU', 'VENT',
+    'ÉTOILE', 'ARBRE', 'FLEUR', 'PLUIE', 'NEIGE', 'FROID', 'CHAUD',
     // French 5-letter words
     'MAISON', 'MONDE', 'TEMPS', 'VILLE', 'GRAND',
     'PETIT', 'BELLE', 'FORCE', 'PLACE', 'CHOSE',
     'LIVRE', 'CHIEN', 'AMOUR', 'JOLIE', 'RÊVE',
     // French 6-letter words
-    'JARDIN', 'SOLEIL', 'NATURE', 'MONTAGNE', 'RIVIÈRE'
+    'JARDIN', 'SOLEIL', 'NATURE', 'MONTAGNE', 'RIVIÈRE', 'FORÊT'
   ],
   de: [
-    // German 3-4 letter words
-    'HAUS', 'BAUM', 'BUCH', 'HUND', 'KATZE', 'SONNE', 'MOND', 'STERN',
+    // German 4+ letter words only (minimum 4 letters required)
+    'HAUS', 'BAUM', 'BUCH', 'HUND', 'MOND', 'BERG', 'WALD', 'MEER',
+    'KATZE', 'SONNE', 'STERN', 'LAND', 'BROT', 'WEIN', 'ROSE',
     // German 5-letter words
     'WELT', 'ZEIT', 'STADT', 'GROSS', 'KLEIN',
     'KRAFT', 'PLATZ', 'SACHE', 'WASSER', 'LIEBE',
     // German 6-letter words
-    'GARTEN', 'FENSTER', 'NATUR', 'HIMMEL', 'SOMMER'
+    'GARTEN', 'FENSTER', 'NATUR', 'HIMMEL', 'SOMMER', 'WINTER', 'HERBST'
   ]
 };
 

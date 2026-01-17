@@ -1,14 +1,17 @@
 import cron, { ScheduledTask } from 'node-cron';
 import { generateDailyBuzz } from './buzzGenerator';
+import { populateWikipediaWords } from './wikipediaWordPopulator';
+import type { Language } from '@/shared/types/game';
 
 /**
  * Daily Buzz Cron Scheduler
  *
- * Runs daily at 00:00 UTC to generate challenges for all 5 languages
+ * Runs daily at 00:00 UTC to generate challenges for all supported languages
+ * Wikipedia word population runs at 23:55 UTC (5 minutes before)
  * Works with Railway, Heroku, or any Node.js hosting
  */
 
-const LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+const LANGUAGES: readonly Language[] = ['en', 'he', 'sv', 'ja', 'es', 'fr', 'de'] as const;
 
 export function startDailyBuzzCron() {
   // Run every day at 00:00 UTC (midnight)
@@ -95,4 +98,80 @@ export async function triggerDailyBuzzGeneration(
 export function stopDailyBuzzCron(task: ScheduledTask) {
   task.stop();
   console.log('🛑 Daily Buzz cron scheduler stopped');
+}
+
+/**
+ * Start Wikipedia word population cron
+ * Runs at 23:55 UTC daily (5 minutes before Daily Buzz generation)
+ */
+export function startWikipediaWordCron() {
+  const task = cron.schedule('55 23 * * *', async () => {
+    console.log('📚 [CRON] Starting Wikipedia word population...');
+    const startTime = Date.now();
+
+    const results: Record<string, { success: boolean; wordsFound?: number; error?: string }> = {};
+
+    for (const language of LANGUAGES) {
+      try {
+        console.log(`📖 [CRON] Fetching Wikipedia words for ${language}...`);
+        const result = await populateWikipediaWords(new Date(), language);
+        results[language] = { success: true, wordsFound: result.wordsFound };
+        console.log(`✅ [CRON] ${language}: ${result.wordsFound} words found`);
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+        console.error(`❌ [CRON] ${language} failed:`, errorMsg);
+        results[language] = { success: false, error: errorMsg };
+      }
+    }
+
+    const duration = Date.now() - startTime;
+    console.log(`✨ [CRON] Wikipedia word population complete in ${duration}ms`);
+    console.log(`📊 [CRON] Results:`, JSON.stringify(results, null, 2));
+  }, {
+    timezone: 'UTC',
+  });
+
+  console.log('✅ Wikipedia word cron scheduler started (runs daily at 23:55 UTC)');
+
+  return task;
+}
+
+/**
+ * Manual trigger for Wikipedia word population
+ * Used by admin dashboard
+ */
+export async function triggerWikipediaWordPopulation(
+  date?: Date,
+  language?: Language
+): Promise<{ success: boolean; results: Record<string, { success: boolean; wordsFound?: number; error?: string }> }> {
+  console.log('🎯 [MANUAL] Starting manual Wikipedia word population...');
+  const startTime = Date.now();
+  const targetDate = date || new Date();
+  const targetLanguages = language ? [language] : LANGUAGES;
+
+  const results: Record<string, { success: boolean; wordsFound?: number; error?: string }> = {};
+
+  for (const lang of targetLanguages) {
+    try {
+      console.log(`📖 [MANUAL] Fetching Wikipedia words for ${lang}...`);
+      const result = await populateWikipediaWords(targetDate, lang);
+      results[lang] = { success: true, wordsFound: result.wordsFound };
+      console.log(`✅ [MANUAL] ${lang}: ${result.wordsFound} words found`);
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+      console.error(`❌ [MANUAL] ${lang} failed:`, errorMsg);
+      results[lang] = { success: false, error: errorMsg };
+    }
+  }
+
+  const duration = Date.now() - startTime;
+  const allSuccess = Object.values(results).every(r => r.success);
+
+  console.log(`✨ [MANUAL] Population complete in ${duration}ms`);
+  console.log(`📊 [MANUAL] Results:`, JSON.stringify(results, null, 2));
+
+  return {
+    success: allSuccess,
+    results,
+  };
 }

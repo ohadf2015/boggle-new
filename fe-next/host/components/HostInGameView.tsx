@@ -115,6 +115,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
       const presenceStatus = typeof player === 'object' ? player.presenceStatus : 'active' as PresenceStatus;
       const isWindowFocused = typeof player === 'object' ? player.isWindowFocused : true;
       const isBot = typeof player === 'object' ? player.isBot : false;
+      const disconnected = typeof player === 'object' ? player.disconnected : false;
 
       return {
         username: playerUsername,
@@ -125,6 +126,7 @@ const HostInGameView: React.FC<HostInGameViewProps> = ({
         presenceStatus,
         isWindowFocused,
         isBot,
+        disconnected,
       };
     }).sort((a, b) => b.score - a.score);
   }, [playersReady, playerScores, playerWordCounts]);

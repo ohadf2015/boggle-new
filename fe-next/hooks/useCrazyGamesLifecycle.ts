@@ -1,7 +1,44 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+
+// Default thresholds for happyTime trigger
+const DEFAULT_SCORE_THRESHOLD = 100;
+const DEFAULT_COMBO_THRESHOLD = 5;
+const DEFAULT_WORDS_THRESHOLD = 10;
+
+/**
+ * Configurable thresholds for triggering CrazyGames happyTime
+ */
+interface HappyTimeThresholds {
+  /** Score threshold to trigger happyTime (default: 100) */
+  score?: number;
+  /** Combo threshold to trigger happyTime (default: 5) */
+  combo?: number;
+  /** Words found threshold to trigger happyTime (default: 10) */
+  wordsFound?: number;
+}
+
+/**
+ * Configuration options for the CrazyGames lifecycle hook
+ */
+interface CrazyGamesLifecycleConfig {
+  /** Configurable thresholds for happyTime triggers */
+  thresholds?: HappyTimeThresholds;
+  /** Callback when gameplay starts */
+  onGameplayStart?: () => void;
+  /** Callback when gameplay stops */
+  onGameplayStop?: () => void;
+  /** Callback when happyTime is triggered */
+  onHappyTime?: () => void;
+  /** Whether to auto-pause game timer during ads (default: false) */
+  pauseOnAd?: boolean;
+  /** Callback when ad starts (for pausing game) */
+  onAdStart?: () => void;
+  /** Callback when ad ends (for resuming game) */
+  onAdEnd?: () => void;
+}
 
 interface CrazyGamesLifecycleOptions {
   /** Whether the game is currently active/playing */
@@ -14,11 +51,26 @@ interface CrazyGamesLifecycleOptions {
   score?: number;
   /** Maximum combo achieved (triggers happyTime at high combos) */
   maxCombo?: number;
+  /** Number of words found (triggers happyTime at threshold) */
+  wordsFound?: number;
+  /** Configuration options */
+  config?: CrazyGamesLifecycleConfig;
 }
 
-// Score thresholds for happyTime trigger
-const HAPPY_TIME_SCORE_THRESHOLD = 100;
-const HAPPY_TIME_COMBO_THRESHOLD = 5;
+interface CrazyGamesLifecycleReturn {
+  /** Whether CrazyGames SDK is available */
+  isAvailable: boolean;
+  /** Whether on CrazyGames platform */
+  isOnCrazyGamesPlatform: boolean;
+  /** Whether gameplay has been started */
+  hasStarted: boolean;
+  /** Whether gameplay has ended */
+  hasEnded: boolean;
+  /** Manually trigger happyTime (if not already triggered) */
+  triggerHappyTime: () => void;
+  /** Show a midgame ad with pause/resume callbacks */
+  showMidgameAd: () => void;
+}
 
 /**
  * Hook to manage CrazyGames SDK lifecycle events automatically.
@@ -26,16 +78,28 @@ const HAPPY_TIME_COMBO_THRESHOLD = 5;
  * Handles:
  * - gameplayStart() when game becomes active
  * - gameplayStop() when game ends or component unmounts
- * - happyTime() when player wins, hits score threshold, or achieves high combo
+ * - happyTime() when player wins, hits score/combo/words threshold
  *
  * @example
  * ```tsx
- * useCrazyGamesLifecycle({
+ * const { isAvailable, triggerHappyTime, showMidgameAd } = useCrazyGamesLifecycle({
  *   isGameActive: gameActive && !isPaused,
  *   isGameOver: isGameOver,
  *   isWinner: finalScore > targetScore,
  *   score: currentScore,
  *   maxCombo: combo.maxCombo,
+ *   wordsFound: wordsFoundCount,
+ *   config: {
+ *     thresholds: {
+ *       score: 150,      // Custom score threshold
+ *       combo: 7,        // Custom combo threshold
+ *       wordsFound: 15,  // Custom words threshold
+ *     },
+ *     onHappyTime: () => console.log('Player is happy!'),
+ *     pauseOnAd: true,
+ *     onAdStart: () => pauseGameTimer(),
+ *     onAdEnd: () => resumeGameTimer(),
+ *   },
  * });
  * ```
  */
@@ -45,8 +109,32 @@ export function useCrazyGamesLifecycle({
   isWinner = false,
   score = 0,
   maxCombo = 0,
-}: CrazyGamesLifecycleOptions): void {
-  const { gameplayStart, gameplayStop, happyTime, isAvailable } = useCrazyGames();
+  wordsFound = 0,
+  config = {},
+}: CrazyGamesLifecycleOptions): CrazyGamesLifecycleReturn {
+  const {
+    gameplayStart,
+    gameplayStop,
+    happyTime,
+    showMidgameAd: sdkShowMidgameAd,
+    isAvailable,
+    isOnCrazyGamesPlatform,
+  } = useCrazyGames();
+
+  const {
+    thresholds = {},
+    onGameplayStart,
+    onGameplayStop,
+    onHappyTime,
+    pauseOnAd = false,
+    onAdStart,
+    onAdEnd,
+  } = config;
+
+  // Merge thresholds with defaults
+  const scoreThreshold = thresholds.score ?? DEFAULT_SCORE_THRESHOLD;
+  const comboThreshold = thresholds.combo ?? DEFAULT_COMBO_THRESHOLD;
+  const wordsThreshold = thresholds.wordsFound ?? DEFAULT_WORDS_THRESHOLD;
 
   // Track if we've triggered events to prevent duplicates
   const hasStartedRef = useRef(false);
@@ -54,6 +142,45 @@ export function useCrazyGamesLifecycle({
   const hasTriggeredHappyTimeRef = useRef(false);
   const lastScoreRef = useRef(0);
   const lastMaxComboRef = useRef(0);
+  const lastWordsFoundRef = useRef(0);
+
+  // Trigger happyTime with callback support
+  const triggerHappyTimeInternal = useCallback(() => {
+    if (!hasTriggeredHappyTimeRef.current) {
+      hasTriggeredHappyTimeRef.current = true;
+      happyTime();
+      onHappyTime?.();
+    }
+  }, [happyTime, onHappyTime]);
+
+  // Manual happyTime trigger exposed to consumers
+  const triggerHappyTime = useCallback(() => {
+    triggerHappyTimeInternal();
+  }, [triggerHappyTimeInternal]);
+
+  // Show midgame ad with pause/resume callbacks
+  const showMidgameAd = useCallback(() => {
+    if (!isAvailable) return;
+
+    sdkShowMidgameAd({
+      adStarted: () => {
+        if (pauseOnAd) {
+          onAdStart?.();
+        }
+      },
+      adFinished: () => {
+        if (pauseOnAd) {
+          onAdEnd?.();
+        }
+      },
+      adError: () => {
+        // Resume even on error
+        if (pauseOnAd) {
+          onAdEnd?.();
+        }
+      },
+    });
+  }, [isAvailable, sdkShowMidgameAd, pauseOnAd, onAdStart, onAdEnd]);
 
   // Handle gameplay start
   useEffect(() => {
@@ -62,59 +189,77 @@ export function useCrazyGamesLifecycle({
       hasEndedRef.current = false;
       hasTriggeredHappyTimeRef.current = false;
       gameplayStart();
+      onGameplayStart?.();
     }
-  }, [isGameActive, isGameOver, gameplayStart]);
+  }, [isGameActive, isGameOver, gameplayStart, onGameplayStart]);
 
   // Handle gameplay end
   useEffect(() => {
     if (isGameOver && hasStartedRef.current && !hasEndedRef.current) {
       hasEndedRef.current = true;
       gameplayStop();
+      onGameplayStop?.();
     }
-  }, [isGameOver, gameplayStop]);
+  }, [isGameOver, gameplayStop, onGameplayStop]);
 
   // Handle happyTime for winner
   useEffect(() => {
-    if (isWinner && !hasTriggeredHappyTimeRef.current) {
-      hasTriggeredHappyTimeRef.current = true;
-      happyTime();
+    if (isWinner) {
+      triggerHappyTimeInternal();
     }
-  }, [isWinner, happyTime]);
+  }, [isWinner, triggerHappyTimeInternal]);
 
   // Handle happyTime for score threshold
   useEffect(() => {
     if (
-      score >= HAPPY_TIME_SCORE_THRESHOLD &&
-      lastScoreRef.current < HAPPY_TIME_SCORE_THRESHOLD &&
-      !hasTriggeredHappyTimeRef.current
+      score >= scoreThreshold &&
+      lastScoreRef.current < scoreThreshold
     ) {
-      hasTriggeredHappyTimeRef.current = true;
-      happyTime();
+      triggerHappyTimeInternal();
     }
     lastScoreRef.current = score;
-  }, [score, happyTime]);
+  }, [score, scoreThreshold, triggerHappyTimeInternal]);
 
   // Handle happyTime for combo threshold
   useEffect(() => {
     if (
-      maxCombo >= HAPPY_TIME_COMBO_THRESHOLD &&
-      lastMaxComboRef.current < HAPPY_TIME_COMBO_THRESHOLD &&
-      !hasTriggeredHappyTimeRef.current
+      maxCombo >= comboThreshold &&
+      lastMaxComboRef.current < comboThreshold
     ) {
-      hasTriggeredHappyTimeRef.current = true;
-      happyTime();
+      triggerHappyTimeInternal();
     }
     lastMaxComboRef.current = maxCombo;
-  }, [maxCombo, happyTime]);
+  }, [maxCombo, comboThreshold, triggerHappyTimeInternal]);
+
+  // Handle happyTime for words found threshold
+  useEffect(() => {
+    if (
+      wordsFound >= wordsThreshold &&
+      lastWordsFoundRef.current < wordsThreshold
+    ) {
+      triggerHappyTimeInternal();
+    }
+    lastWordsFoundRef.current = wordsFound;
+  }, [wordsFound, wordsThreshold, triggerHappyTimeInternal]);
 
   // Cleanup on unmount - ensure gameplayStop is called
   useEffect(() => {
     return () => {
       if (hasStartedRef.current && !hasEndedRef.current) {
         gameplayStop();
+        onGameplayStop?.();
       }
     };
-  }, [gameplayStop]);
+  }, [gameplayStop, onGameplayStop]);
+
+  return {
+    isAvailable,
+    isOnCrazyGamesPlatform,
+    hasStarted: hasStartedRef.current,
+    hasEnded: hasEndedRef.current,
+    triggerHappyTime,
+    showMidgameAd,
+  };
 }
 
 export default useCrazyGamesLifecycle;
