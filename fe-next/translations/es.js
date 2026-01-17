@@ -12,9 +12,9 @@ const es = {
     "description": "¡Compite contra amigos en emocionantes batallas de palabras en tiempo real! LexiClash es un juego de palabras multijugador rápido donde cada segundo cuenta. Encuentra palabras, supera a tus oponentes y sube en la clasificación. Perfecto para fiestas, noches de juegos y competiciones amistosas. ¡Juega gratis en 5 idiomas - sin descargas!",
     "keywords": "juego de palabras multijugador, juego de palabras en tiempo real, batalla de palabras online, juego de palabras para fiestas, juego de palabras competitivo, boggle online, juego de vocabulario, juego de aprendizaje de idiomas, juego online gratis",
     "ogTitle": "LexiClash - Juego de Palabras Multijugador Rápido | Compite en Tiempo Real",
-    "ogDescription": "¡Compite contra amigos en emocionantes batallas de palabras en tiempo real! Encuentra palabras rápido, supera a tus oponentes, sube en la clasificación. ¡Juega gratis en 5 idiomas!",
+    "ogDescription": "🎮 ¡Compite contra amigos en emocionantes batallas de palabras en tiempo real! ⚡ Encuentra palabras rápido, supera a tus oponentes, sube en la clasificación 🔥 ¡Juega gratis ahora!",
     "twitterTitle": "LexiClash - Juego de Palabras Multijugador Rápido",
-    "twitterDescription": "¡Compite en batallas de palabras en tiempo real! Encuentra palabras, supera oponentes y sube en la clasificación.",
+    "twitterDescription": "🎮 ¡Batallas de palabras en tiempo real! Encuentra palabras, supera oponentes ⚡ Perfecto para fiestas 🔥 ¡Juega gratis!",
     "locale": "es_ES",
     "language": "Spanish",
     "leaderboard": {
@@ -2073,6 +2073,7 @@ const es = {
     "kofiTooltip": "Apoya el desarrollo de LexiClash"
   },
   "landing": {
+    "playingNow": "Jugando Ahora",
     "welcomeTitle": "¿Listos para jugar?",
     "welcomeSubtitle": "¡Elige tu desafío!",
     "singlePlayer": "Un Jugador",
@@ -2394,6 +2395,7 @@ const es = {
     "takeYourTime": "Sin Límite",
     "play": "JUGAR AHORA",
     "viewResults": "VER RESULTADOS",
+    "solved": "Resuelto",
 "wordHunt": {
       "title": "Caza Palabras",
       "subtitle": "Modo Supervivencia",
@@ -2401,6 +2403,17 @@ const es = {
       "feature1": "90 segundos",
       "feature2": "Sistema de combos",
       "feature3": "Tabla global"
+    },
+    "nextChallenge": {
+      "wordHuntTitle": "⚡ ¡Te Espera Word Hunt Diario!",
+      "wordHuntDesc": "¡Prueba tu velocidad! Encuentra la palabra objetivo lo más rápido posible.",
+      "wordHuntCTA": "Jugar Word Hunt",
+      "buzzTitle": "🔥 ¡Desafío Buzz Diario!",
+      "buzzDesc": "¡Temas de tendencia! Resuelve rompecabezas de palabras generados por IA.",
+      "buzzCTA": "Probar Daily Buzz",
+      "multiplayerTitle": "🎮 ¿Listo para Más?",
+      "multiplayerDesc": "¡Desafía amigos o lucha contra bots en tiempo real!",
+      "multiplayerCTA": "Jugar Multijugador"
     },
     "errorWordTooShort": "La palabra debe tener al menos {min} letras",
     "errorWordTooLong": "La palabra debe tener máximo {max} letras",

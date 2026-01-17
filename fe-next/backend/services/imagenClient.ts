@@ -15,6 +15,7 @@ interface ImageGenerationResult {
   prompt: string;
   category: string;
   cost: number;
+  altText: string; // SEO-friendly alt text for the image
 }
 
 interface CachedImage {
@@ -177,6 +178,9 @@ MOOD: ${mood}, DYNAMIC, CURRENT, NEWSWORTHY
 
 ABSOLUTE CONSTRAINTS (CRITICAL - DO NOT VIOLATE):
 - NO text, NO words, NO letters, NO numbers anywhere in the image
+- **NO HEX COLOR CODES** (e.g., #FFD700, #4285F4) - NO color values visible
+- **NO RGB/HSL values** (e.g., rgb(255,215,0)) - NO technical notation
+- **NO alphanumeric strings or codes** - NO visible UI elements with text
 - **ABSOLUTELY NO chibi style** - NO super-deformed characters, NO bobblehead proportions
 - **ABSOLUTELY NO heavy anime aesthetic** - NO manga-style linework, NO anime cel-shading, NO moe (萌え) exaggeration
 - **Subtle kawaii elements are ALLOWED** - Friendly, approachable character design is fine
@@ -510,11 +514,15 @@ export async function generateChallengeImage(
 
       console.log(`[IMAGEN] Image generated and uploaded: ${imageUrl}`);
 
+      // Generate SEO-friendly alt text
+      const altText = `Trending topic: ${trendingTopic} - Google Trends visualization in ${category} category`;
+
       return {
         url: imageUrl,
         prompt,
         category,
         cost: IMAGEN_4_COST,
+        altText,
       };
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -566,10 +574,36 @@ async function postProcessImage(
       brightness: 1.05,
     });
 
-    // 5. Compress to WebP for efficiency
-    return enhanced
-      .webp({ quality: 90 })
+    // 5. Compress to WebP with aggressive optimization
+    // Quality 80 is visually identical to 90 but 40-50% smaller
+    // effort: 6 (max) for best compression at the cost of encoding time
+    const compressed = await enhanced
+      .webp({
+        quality: 80,
+        effort: 6, // Max compression effort (0-6)
+        lossless: false,
+      })
       .toBuffer();
+
+    // 6. Check file size and re-compress if needed (target: <200KB)
+    const fileSizeKB = compressed.length / 1024;
+    console.log(`[IMAGEN] Compressed image size: ${fileSizeKB.toFixed(1)}KB`);
+
+    if (fileSizeKB > 200) {
+      console.log(`[IMAGEN] Image exceeds 200KB, applying additional compression`);
+      // Further reduce quality to hit target
+      const targetQuality = Math.max(60, Math.floor(80 * (200 / fileSizeKB)));
+      return sharp(withTexture)
+        .modulate({ saturation: 1.2, brightness: 1.05 })
+        .webp({
+          quality: targetQuality,
+          effort: 6,
+          lossless: false,
+        })
+        .toBuffer();
+    }
+
+    return compressed;
   } catch (error: any) {
     console.error('[IMAGEN] Error post-processing image:', error.message);
     // Return original if post-processing fails

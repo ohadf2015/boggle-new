@@ -12,9 +12,9 @@ const sv = {
     "description": "Tävla mot vänner i spännande ordstrider i realtid! LexiClash är ett snabbt multiplayer-ordspel där varje sekund räknas. Hitta ord, överträffa motståndarna och klättra på topplistan. Perfekt för fester, spelkvällar och vänskaplig tävling. Också bra för att bygga ordförråd medan du har kul! Spela gratis på 5 språk - ingen nedladdning krävs.",
     "keywords": "multiplayer ordspel, realtids ordspel, online ordstrid, festspel, tävlings ordspel, snabbt ordspel, ordpussel multiplayer, alias spel, kahoot alternativ, familjespelkväll, festspel, teambuilding, ordtävling, live ordspel, ordrace, ordförrådsspel, gratis onlinespel",
     "ogTitle": "LexiClash - Snabbt Multiplayer Ordspel | Tävla i Realtid",
-    "ogDescription": "Tävla mot vänner i spännande ordstrider i realtid! Hitta ord snabbt, överträffa motståndarna, klättra på topplistan. Perfekt för fester och spelkvällar. Spela gratis på 5 språk!",
+    "ogDescription": "🎮 Tävla mot vänner i spännande ordstrider i realtid! ⚡ Hitta ord snabbt, överträffa motståndarna, klättra på topplistan 🔥 Perfekt för fester och spelkvällar. Spela gratis!",
     "twitterTitle": "LexiClash - Snabbt Multiplayer Ordspel | Tävla i Realtid",
-    "twitterDescription": "Tävla mot vänner i spännande ordstrider i realtid! Hitta ord snabbt, överträffa motståndarna, klättra på topplistan. Perfekt för fester och spelkvällar. Spela gratis på 5 språk!",
+    "twitterDescription": "🎮 Tävla i ordstrider mot vänner! Hitta ord snabbt, överträffa motståndarna ⚡ Perfekt för fester 🔥 Spela gratis nu!",
     "locale": "sv_SE",
     "language": "Swedish",
     "leaderboard": {
@@ -2076,6 +2076,7 @@ const sv = {
     "kofiTooltip": "Stöd LexiClash-utveckling"
   },
   "landing": {
+    "playingNow": "Spelar Nu",
     "welcomeTitle": "Redo att spela?",
     "welcomeSubtitle": "Välj din utmaning!",
     "singlePlayer": "Enspelarläge",
@@ -2267,6 +2268,7 @@ const sv = {
     "takeYourTime": "Ingen Timer",
     "play": "SPELA NU",
     "viewResults": "VISA RESULTAT",
+    "solved": "Löst",
 "wordHunt": {
       "title": "Ordjakt",
       "subtitle": "Överlevnadsläge",
@@ -2406,7 +2408,18 @@ const sv = {
       "returnNote": "Efter träningen kommer du automatiskt tillbaka till daglig utmaning!",
       "startTraining": "Starta träning",
       "skipToDaily": "Hoppa över, jag klarar mig",
-      "redirecting": "På väg till daglig utmaning..."
+      "redirecting": "På väg till daglig utmaning...",
+    "nextChallenge": {
+      "wordHuntTitle": "⚡ Daglig Word Hunt Väntar!",
+      "wordHuntDesc": "Testa din hastighet! Hitta målord så snabbt du kan.",
+      "wordHuntCTA": "Spela Word Hunt",
+      "buzzTitle": "🔥 Daglig Buzz-utmaning!",
+      "buzzDesc": "Trendiga ämnen! Lös AI-genererade ordpussel.",
+      "buzzCTA": "Prova Daily Buzz",
+      "multiplayerTitle": "🎮 Redo för Mer?",
+      "multiplayerDesc": "Utmana vänner eller slåss mot bottar i realtid!",
+      "multiplayerCTA": "Spela Multiplayer"
+    }
     }
   },
   "buzz": {

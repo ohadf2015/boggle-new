@@ -5,8 +5,8 @@
       "en": 2596,
       "he": 2596,
       "sv": 2596,
-      "ja": 2595,
-      "es": 2595
+      "ja": 2596,
+      "es": 2596
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
@@ -63,12 +63,8 @@
   "missingByLanguage": {
     "he": [],
     "sv": [],
-    "ja": [
-      "buzz.error.noOptions"
-    ],
-    "es": [
-      "buzz.error.noOptions"
-    ]
+    "ja": [],
+    "es": []
   },
   "keysNotInEnglish": {
     "he": [],

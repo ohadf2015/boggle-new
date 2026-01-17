@@ -382,8 +382,30 @@ function WordHuntMiniGrid({ isHovered, language }: { isHovered: boolean; languag
 
   return (
     <div className="relative w-full aspect-square max-h-32 sm:max-h-44 rounded-xl overflow-hidden mb-2 sm:mb-3 border-3 border-neo-black shadow-hard bg-neo-cream">
-      {/* Grid container - white background like in-game */}
-      <div className="absolute inset-1.5 sm:inset-2 grid grid-cols-3 gap-1 sm:gap-1.5">
+      {/* Animated swipe line - renders BEHIND the grid (z-0) */}
+      {isHovered && (
+        <svg
+          className="absolute inset-1.5 sm:inset-2 w-[calc(100%-12px)] sm:w-[calc(100%-16px)] h-[calc(100%-12px)] sm:h-[calc(100%-16px)] pointer-events-none z-0"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="xMidYMid meet"
+        >
+          {/* Path connects centers of tiles: (17,17) → (50,17) → (83,17) → (83,50) */}
+          <motion.path
+            d="M 17,17 L 50,17 L 83,17 L 83,50"
+            fill="none"
+            stroke="rgba(255,107,53,0.9)"
+            strokeWidth="6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            initial={{ pathLength: 0, opacity: 0 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+          />
+        </svg>
+      )}
+
+      {/* Grid container - renders ON TOP of the swipe line (z-10) */}
+      <div className="absolute inset-1.5 sm:inset-2 grid grid-cols-3 gap-1 sm:gap-1.5 z-10">
         {letters.map((letter, idx) => {
           const isInPath = HIGHLIGHT_PATH.includes(idx);
           const pathIndex = HIGHLIGHT_PATH.indexOf(idx);
@@ -414,30 +436,9 @@ function WordHuntMiniGrid({ isHovered, language }: { isHovered: boolean; languag
         })}
       </div>
 
-      {/* Animated swipe line when hovered */}
-      {isHovered && (
-        <svg
-          className="absolute inset-0 w-full h-full pointer-events-none"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-        >
-          <motion.path
-            d="M 17,17 L 50,17 L 83,17 L 83,50"
-            fill="none"
-            stroke="rgba(255,107,53,0.8)"
-            strokeWidth="4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ pathLength: 1, opacity: 1 }}
-            transition={{ duration: 0.6, ease: 'easeOut' }}
-          />
-        </svg>
-      )}
-
-      {/* Neo-brutalist corner accents */}
-      <div className="absolute top-0 start-0 w-5 h-5 sm:w-6 sm:h-6 bg-neo-orange border-e-2 border-b-2 border-neo-black" />
-      <div className="absolute bottom-0 end-0 w-5 h-5 sm:w-6 sm:h-6 bg-neo-yellow border-s-2 border-t-2 border-neo-black" />
+      {/* Neo-brutalist corner accents - highest z-index */}
+      <div className="absolute top-0 start-0 w-5 h-5 sm:w-6 sm:h-6 bg-neo-orange border-e-2 border-b-2 border-neo-black z-20" />
+      <div className="absolute bottom-0 end-0 w-5 h-5 sm:w-6 sm:h-6 bg-neo-yellow border-s-2 border-t-2 border-neo-black z-20" />
     </div>
   );
 }
@@ -654,13 +655,30 @@ function CompactChallengeCard({
               <Loader2 className="w-3 h-3 animate-spin inline" />
             </span>
           ) : status === 'done' ? (
-            <motion.span
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="text-xs font-bold bg-neo-lime/20 text-neo-lime px-2 py-0.5 rounded-full border border-neo-lime/40"
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+              className="relative"
             >
-              ✓
-            </motion.span>
+              {/* Glow effect behind badge */}
+              <motion.div
+                className="absolute -inset-1 rounded-full blur-sm -z-10"
+                animate={{
+                  opacity: [0.4, 0.7, 0.4],
+                  scale: [1, 1.1, 1],
+                }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                style={{ background: 'rgba(191, 255, 0, 0.5)' }}
+              />
+              <span
+                className="flex items-center gap-1 text-xs sm:text-sm font-bold bg-neo-lime text-neo-black px-2 py-1 sm:px-2.5 sm:py-1 rounded-full border-2 border-neo-black shadow-hard-sm"
+                data-testid="solved-badge"
+              >
+                <Check className="w-3 h-3 sm:w-4 sm:h-4" strokeWidth={3} />
+                <span className="hidden xs:inline">{t('daily.solved')}</span>
+              </span>
+            </motion.div>
           ) : isUnavailable ? (
             <span className="text-xs font-bold bg-slate-700/50 text-slate-400 px-2 py-0.5 rounded-full border border-slate-600/40">
               {t('buzz.notAvailable')}

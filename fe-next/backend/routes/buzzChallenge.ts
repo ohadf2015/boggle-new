@@ -97,6 +97,17 @@ function mapChallengeType(backendType: string): string {
  * Transform database response (snake_case) to frontend format (camelCase)
  * Only transforms top-level keys that the frontend expects
  */
+interface SocialPlatformContent {
+  text: string;
+  hashtags: string[];
+}
+
+interface SocialContentResponse {
+  x: SocialPlatformContent;
+  instagram: SocialPlatformContent;
+  tiktok: SocialPlatformContent;
+}
+
 interface BuzzApiResponse {
   id?: number;
   puzzleDate: string;
@@ -118,9 +129,24 @@ interface BuzzApiResponse {
     options?: string[];
   }>;
   imageUrl?: string;
+  socialContent?: SocialContentResponse;
 }
 
 function transformBuzzResponse(dbData: Record<string, unknown>): BuzzApiResponse {
+  // Transform social_content from snake_case to camelCase structure
+  let socialContent: SocialContentResponse | undefined;
+  const sc = dbData.social_content as Record<string, unknown> | null | undefined;
+  if (sc && sc.x && sc.instagram && sc.tiktok) {
+    const xData = sc.x as Record<string, unknown>;
+    const instagramData = sc.instagram as Record<string, unknown>;
+    const tiktokData = sc.tiktok as Record<string, unknown>;
+    socialContent = {
+      x: { text: xData.text as string, hashtags: xData.hashtags as string[] },
+      instagram: { text: instagramData.text as string, hashtags: instagramData.hashtags as string[] },
+      tiktok: { text: tiktokData.text as string, hashtags: tiktokData.hashtags as string[] },
+    };
+  }
+
   return {
     id: dbData.id as number | undefined,
     puzzleDate: dbData.puzzle_date as string,
@@ -142,6 +168,7 @@ function transformBuzzResponse(dbData: Record<string, unknown>): BuzzApiResponse
       options: challenge.options as string[] | undefined,
     })),
     imageUrl: dbData.image_url as string | undefined,
+    socialContent,
   };
 }
 

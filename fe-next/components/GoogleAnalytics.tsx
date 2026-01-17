@@ -138,6 +138,59 @@ export const gameEvents = {
       to_language: to,
     });
   },
+
+  /** Track Daily Challenge participation */
+  dailyChallengePlay: (challengeType: 'word_hunt' | 'buzz', score: number, difficulty?: string) => {
+    trackEvent('daily_challenge_played', {
+      challenge_type: challengeType,
+      score: score,
+      difficulty: difficulty || 'normal',
+    });
+  },
+
+  /** Track achievement milestones (e.g., "Earned 25 achievements") */
+  achievementMilestone: (tier: string, totalCount: number) => {
+    trackEvent('achievement_milestone', {
+      tier: tier, // 'bronze', 'silver', 'gold', etc.
+      total_achievements: totalCount,
+    });
+  },
+
+  /** Track referral completion */
+  referralComplete: (rewardXp: number, referredPlayerId?: string) => {
+    trackEvent('referral_completed', {
+      reward_xp: rewardXp,
+      referred_player: referredPlayerId || 'unknown',
+    });
+  },
+
+  /** Track PWA install success */
+  pwaInstalled: () => {
+    trackEvent('pwa_installed', {
+      timestamp: new Date().toISOString(),
+    });
+  },
+
+  /** Track profile customization (avatar, title, etc.) */
+  profileCustomize: (customizationType: 'avatar' | 'title' | 'banner', value: string) => {
+    trackEvent('profile_customized', {
+      customization_type: customizationType,
+      value: value,
+    });
+  },
+
+  /** Track leaderboard rank milestones */
+  leaderboardMilestone: (rank: number, category: 'daily' | 'weekly' | 'all_time') => {
+    trackEvent('leaderboard_milestone', {
+      rank: rank,
+      category: category,
+    });
+  },
+
+  /** Generic event tracking for custom events */
+  trackEvent: (eventName: string, params: Record<string, string | number | boolean>) => {
+    trackEvent(eventName, params);
+  },
 };
 
 export default GoogleAnalytics;

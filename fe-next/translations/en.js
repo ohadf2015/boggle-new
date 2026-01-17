@@ -12,9 +12,9 @@ const en = {
     "description": "Play the best free multiplayer word game online! LexiClash combines Boggle-style gameplay with real-time competition. Race friends to find words, build combos, and climb leaderboards. Perfect Wordle alternative for groups. No download - play instantly in 5 languages. Great for parties, team building, and family game nights!",
     "keywords": "free word game online, multiplayer word game, boggle online free, wordle multiplayer, scrabble alternative online, word game with friends, real-time word battle, party word game, ruzzle alternative, word hunt game, competitive word game, best word game app, online boggle with friends, word puzzle multiplayer, family word game, team building word game, kahoot alternative word game, ESL word game, vocabulary builder game, brain training word game, word race game online, free browser game no download",
     "ogTitle": "LexiClash - Free Multiplayer Word Game | Better Than Boggle & Wordle",
-    "ogDescription": "The best free word game for groups! Race friends in real-time word battles. Like Boggle meets Wordle - but multiplayer. No download, play instantly. Perfect for parties!",
+    "ogDescription": "🎮 The best free word game for groups! Race friends in real-time word battles ⚡ Like Boggle meets Wordle - but multiplayer 🔥 No download, play instantly. Perfect for parties!",
     "twitterTitle": "LexiClash - Free Multiplayer Word Game | Play With Friends Online",
-    "twitterDescription": "Challenge friends to real-time word battles! 🎮 Find words fast, build combos, climb leaderboards. Free to play, no download needed. Try now!",
+    "twitterDescription": "Challenge friends to real-time word battles! 🎮 Find words fast, build combos, climb leaderboards. Free to play, no download. Try now! 🔥",
     "locale": "en_US",
     "language": "English",
     "leaderboard": {
@@ -2079,6 +2079,7 @@ const en = {
     "kofiTooltip": "Support LexiClash development"
   },
   "landing": {
+    "playingNow": "Playing Now",
     "welcomeTitle": "Ready to Play?",
     "welcomeSubtitle": "Pick your challenge!",
     "singlePlayer": "Solo",
@@ -2264,6 +2265,7 @@ const en = {
     "takeYourTime": "No Timer",
     "play": "PLAY",
     "viewResults": "VIEW RESULTS",
+    "solved": "Solved",
     "puzzleNumber": "Daily #{number}",
     "playButton": "Play",
     "nextPuzzleIn": "Next in",
@@ -2410,6 +2412,17 @@ const en = {
       "feature1": "90 seconds",
       "feature2": "Combo system",
       "feature3": "Global leaderboard"
+    },
+    "nextChallenge": {
+      "wordHuntTitle": "⚡ Daily Word Hunt Awaits!",
+      "wordHuntDesc": "Test your speed! Find the target word as fast as you can.",
+      "wordHuntCTA": "Play Word Hunt",
+      "buzzTitle": "🔥 Daily Buzz Challenge!",
+      "buzzDesc": "Trending topics! Solve AI-generated word puzzles.",
+      "buzzCTA": "Try Daily Buzz",
+      "multiplayerTitle": "🎮 Ready for More?",
+      "multiplayerDesc": "Challenge friends or battle bots in real-time!",
+      "multiplayerCTA": "Play Multiplayer"
     }
   },
   "buzz": {

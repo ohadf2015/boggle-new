@@ -229,13 +229,13 @@ export const wordAIValidatingToast = (word: string, options: WordAIValidatingOpt
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               className="text-2xl flex items-center justify-center"
             >
-              <Bot className="text-neo-cream" />
+              <Bot className="text-neo-black" />
             </motion.span>
             <div className="flex flex-col">
-              <span dir="auto" className="font-black uppercase tracking-wide text-neo-cream">
+              <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
                 {applyHebrewFinalLetters(word)}
               </span>
-              <span dir="auto" className="text-xs font-bold text-neo-cream/80 uppercase">
+              <span dir="auto" className="text-xs font-bold text-neo-black/70 uppercase">
                 {options.aiValidatingLabel || 'AI checking...'}
               </span>
             </div>

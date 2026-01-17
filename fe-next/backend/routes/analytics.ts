@@ -115,4 +115,49 @@ router.post('/track', async (req: TrackRequest, res: Response): Promise<void> =>
   }
 });
 
+/**
+ * GET /api/analytics/active-players
+ * Get count of active players (for social proof widget)
+ */
+router.get('/active-players', async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!isSupabaseConfigured()) {
+      res.json({ count: 0, error: 'Analytics service not available' });
+      return;
+    }
+
+    const supabase = getSupabase();
+
+    // Count unique sessions in the last 5 minutes
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+
+    const { count, error } = await supabase
+      .from('analytics_events')
+      .select('session_id', { count: 'exact', head: true })
+      .gte('created_at', fiveMinutesAgo)
+      .not('session_id', 'is', null);
+
+    if (error) {
+      logger.error('ANALYTICS_API', `Active players count error: ${error.message}`);
+      res.json({ count: 0, error: error.message });
+      return;
+    }
+
+    // Add a multiplier for better social proof (active sessions * ~2.5 = estimated active players)
+    const estimatedPlayers = Math.max(0, (count || 0) * 2.5);
+
+    // Round to nearest 10 for cleaner display
+    const roundedCount = Math.round(estimatedPlayers / 10) * 10;
+
+    res.json({
+      count: roundedCount,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('ANALYTICS_API', `Active players count error: ${err.message}`);
+    res.json({ count: 0, error: 'Failed to get active players count' });
+  }
+});
+
 export default router;

@@ -25,6 +25,17 @@ interface BuzzChallenge {
   options?: string[]; // For multiple choice challenges
 }
 
+interface SocialPlatformContent {
+  text: string;
+  hashtags: string[];
+}
+
+interface SocialContent {
+  x: SocialPlatformContent;
+  instagram: SocialPlatformContent;
+  tiktok: SocialPlatformContent;
+}
+
 interface DailyBuzzData {
   puzzle_date: string;
   language: string;
@@ -37,7 +48,9 @@ interface DailyBuzzData {
   image_url: string | null;
   image_prompt: string | null;
   image_category: string | null;
+  image_alt_text: string | null;
   image_generation_cost_usd: number;
+  social_content: SocialContent | null;
 }
 
 // Language to region mapping
@@ -179,19 +192,23 @@ export async function generateDailyBuzz(
   }
 
   // Step 3: Generate challenges with Claude Opus
-  const challenges = await generateChallengesWithAI(filteredTrends, language, region);
+  const { challenges, selectedTrends, social_content } = await generateChallengesWithAI(filteredTrends, language, region);
 
   // Step 4: Validate challenges (basic sanity checks, no dictionary validation)
   const validatedChallenges = validateChallenges(challenges, language);
 
   // Step 5: Generate hero image (feature flag checked inside)
+  // Use one of the selectedTrends that were actually used for challenges
   let imageUrl: string | null = null;
   let imagePrompt: string | null = null;
   let imageCategory: string | null = null;
+  let imageAltText: string | null = null;
   let imageCost = 0;
 
   try {
-    const topTrend = filteredTrends[0];
+    // Use the first selected trend (which was actually used in challenges)
+    // instead of filteredTrends[0] (which might not be used in any challenge)
+    const topTrend = selectedTrends[0];
     imageCategory = categorizeTopic(topTrend.query);
 
     // Check if feature is enabled (admin-only initially)
@@ -201,6 +218,8 @@ export async function generateDailyBuzz(
       const cachedImage = await checkImageCache(topTrend.query);
       if (cachedImage) {
         imageUrl = cachedImage.url;
+        // Generate alt text for cached image
+        imageAltText = `Trending topic: ${topTrend.query} - Google Trends visualization in ${imageCategory} category`;
         console.log(`[BUZZ] Using cached image for: ${topTrend.query}`);
       } else {
         // Generate new image
@@ -211,6 +230,7 @@ export async function generateDailyBuzz(
         );
         imageUrl = imageResult.url;
         imagePrompt = imageResult.prompt;
+        imageAltText = imageResult.altText;
         imageCost = imageResult.cost;
         console.log(`[BUZZ] Generated new image for: ${topTrend.query}`);
       }
@@ -234,7 +254,9 @@ export async function generateDailyBuzz(
     image_url: imageUrl,
     image_prompt: imagePrompt,
     image_category: imageCategory,
+    image_alt_text: imageAltText,
     image_generation_cost_usd: imageCost,
+    social_content: social_content,
   };
 
   await storeDailyBuzz(buzzData);
@@ -376,7 +398,7 @@ async function generateChallengesWithAI(
   trends: TrendingTopic[],
   language: string,
   region: string
-): Promise<BuzzChallenge[]> {
+): Promise<{ challenges: BuzzChallenge[]; selectedTrends: TrendingTopic[]; social_content: SocialContent | null }> {
   const credentials = getVertexAICredentials();
 
   // Initialize Vertex AI client with explicit credentials (required for Railway/serverless deployment)
@@ -395,6 +417,9 @@ async function generateChallengesWithAI(
   const model = vertexAI.getGenerativeModel({
     model: GEMINI_MODEL,
   });
+
+  // Select trends for challenges (needed for both prompt and image generation)
+  const selectedTrends = selectTrendsForChallenge(trends);
 
   const prompt = await buildAIPrompt(trends, language, region);
 
@@ -441,9 +466,9 @@ async function generateChallengesWithAI(
       throw new Error('No response text from Gemini');
     }
 
-    const challenges = parseAIResponse(responseText);
+    const { challenges, social_content } = parseAIResponse(responseText);
 
-    return challenges;
+    return { challenges, selectedTrends, social_content };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('[BUZZ] AI generation failed:', errorMessage);
@@ -1037,7 +1062,21 @@ ${langExamples}
       "difficulty": "easy|medium|hard",
       "trending_context": "[1 punchy sentence: why this matters TODAY - be human about it]"
     }
-  ]
+  ],
+  "social_content": {
+    "x": {
+      "text": "[Max 280 chars - punchy hook + trending topic reference + CTA]",
+      "hashtags": ["LexiClash", "WordGame", "DailyChallenge"]
+    },
+    "instagram": {
+      "text": "[Engaging caption 150-300 chars with trending topic hook + CTA to play]",
+      "hashtags": ["LexiClash", "WordGame", "DailyChallenge", "BrainGames", "WordPuzzle", "TrendingNow"]
+    },
+    "tiktok": {
+      "text": "[Short hook max 150 chars - trending reference + urgency]",
+      "hashtags": ["LexiClash", "WordGame", "DailyChallenge", "BrainTok"]
+    }
+  }
 }
 
 **trending_summary Examples by Language**:
@@ -1046,6 +1085,45 @@ ${langExamples}
 - Swedish: "Lagom Kaos" / "Veckans Snackis" / "Typiskt Tisdag"
 - Japanese: "今日もカオス" / "バズってる話題" / "トレンド祭り"
 - Spanish: "Día de Locos" / "Tendencias Picantes 🌶️" / "El Mundo Anda Loco"
+
+---
+
+## 📱 SOCIAL MEDIA POSTS
+
+Generate ready-to-post content for each platform in **${language}**. Each post should:
+- Hook readers with today's trending topic (the TOP trend from the list)
+- Tease the word challenges without spoilers
+- Include a call-to-action to play
+- Use platform-appropriate tone and format
+- Be written in the TARGET LANGUAGE (${language === 'he' ? 'Hebrew' : language === 'sv' ? 'Swedish' : language === 'ja' ? 'Japanese' : language === 'es' ? 'Spanish' : 'English'})
+
+### X (Twitter) - Max 280 characters TOTAL (including hashtags)
+- Punchy hook referencing the top trending topic
+- Tease the challenge without spoiling answers
+- "Play now" or "Try today's challenge" CTA
+- 2-3 relevant hashtags (mixed trending + game-related)
+- Example (EN): "Everyone's talking about [TREND] 🔥 Can you crack today's word challenges? 💪 Play now: lexiclash.com #LexiClash #[TrendHashtag]"
+
+### Instagram - Caption (150-300 chars) + hashtags
+- Engaging opening line with trending topic hook
+- Brief tease about today's challenges
+- CTA to play (link in bio mention)
+- 8-12 relevant hashtags (mix of trending, word game, brain game tags)
+- Example (EN): "Today's trending: [TREND] 💬 We turned it into word puzzles! Can you solve them all? 🧩 Link in bio 👆"
+
+### TikTok - Short caption (max 150 chars) + hashtags
+- Ultra-short, attention-grabbing hook
+- Trending topic reference
+- Urgency or exclusivity angle ("only 1 chance daily!")
+- 4-6 trending/relevant hashtags
+- Example (EN): "[TREND] is blowing up 🔥 Test your word skills NOW 👉 #LexiClash"
+
+**Language-specific social tone**:
+${language === 'he' ? '- Hebrew: Direct, use slang (יאללה, אחלה), be a bit חוצפן' : ''}
+${language === 'sv' ? '- Swedish: Lagom enthusiasm, understated humor, no overselling' : ''}
+${language === 'ja' ? '- Japanese: Use trendy expressions, emoji-friendly, playful but polite' : ''}
+${language === 'es' ? '- Spanish: Warm and expressive, use colloquial phrases, light humor' : ''}
+${language === 'en' ? '- English: Casual, witty, pop culture aware, conversational' : ''}
 
 ---
 
@@ -1061,6 +1139,7 @@ Before outputting, verify each challenge:
 - [ ] **Share Test**: Would someone screenshot this to send to a friend?
 - [ ] **Cringe Test**: Read each prompt aloud—does it sound natural or robotic?
 - [ ] **Native Speaker Test**: Would a ${language === 'he' ? 'Israeli' : language === 'sv' ? 'Swede' : language === 'ja' ? 'Japanese person' : language === 'es' ? 'Spanish speaker' : 'native speaker'} say this?
+- [ ] **Social Content Test**: Are all social posts in ${language}? Do they reference the top trend? Are character limits respected?
 
 Return ONLY the JSON object. Make every challenge feel fresh, clever, and connected to TODAY—like it was written by a witty friend, not a corporate chatbot.`;
 
@@ -1239,10 +1318,15 @@ function normalizeBlankSizes(challenges: BuzzChallenge[]): BuzzChallenge[] {
   });
 }
 
+interface ParsedAIResponse {
+  challenges: BuzzChallenge[];
+  social_content: SocialContent | null;
+}
+
 /**
- * Parse AI response into structured challenges
+ * Parse AI response into structured challenges and social content
  */
-function parseAIResponse(responseText: string): BuzzChallenge[] {
+function parseAIResponse(responseText: string): ParsedAIResponse {
   // Remove markdown code blocks if present
   let jsonText = responseText.trim();
   if (jsonText.startsWith('```')) {
@@ -1250,7 +1334,7 @@ function parseAIResponse(responseText: string): BuzzChallenge[] {
   }
 
   // First attempt: direct parse
-  let parsed: { challenges?: BuzzChallenge[] };
+  let parsed: { challenges?: BuzzChallenge[]; social_content?: SocialContent };
   try {
     parsed = JSON.parse(jsonText);
   } catch (firstError: unknown) {
@@ -1301,7 +1385,33 @@ function parseAIResponse(responseText: string): BuzzChallenge[] {
   // Normalize fill_blank challenges to have correct blank sizes
   const normalizedChallenges = normalizeBlankSizes(validChallenges);
 
-  return normalizedChallenges;
+  // Extract and validate social content (optional - don't fail if missing)
+  let socialContent: SocialContent | null = null;
+  if (parsed.social_content) {
+    const sc = parsed.social_content;
+    // Validate structure - must have all three platforms with text and hashtags
+    if (
+      sc.x?.text && Array.isArray(sc.x?.hashtags) &&
+      sc.instagram?.text && Array.isArray(sc.instagram?.hashtags) &&
+      sc.tiktok?.text && Array.isArray(sc.tiktok?.hashtags)
+    ) {
+      socialContent = {
+        x: { text: sc.x.text, hashtags: sc.x.hashtags },
+        instagram: { text: sc.instagram.text, hashtags: sc.instagram.hashtags },
+        tiktok: { text: sc.tiktok.text, hashtags: sc.tiktok.hashtags },
+      };
+      console.log('[BUZZ] Social content parsed successfully');
+    } else {
+      console.warn('[BUZZ] Social content structure invalid, skipping');
+    }
+  } else {
+    console.warn('[BUZZ] No social content in AI response');
+  }
+
+  return {
+    challenges: normalizedChallenges,
+    social_content: socialContent,
+  };
 }
 
 // Common brand names and proper nouns to filter out (case-insensitive)
@@ -1555,7 +1665,9 @@ async function storeDailyBuzz(buzzData: DailyBuzzData): Promise<void> {
         image_url: buzzData.image_url,
         image_prompt: buzzData.image_prompt,
         image_category: buzzData.image_category,
+        image_alt_text: buzzData.image_alt_text,
         image_generation_cost_usd: buzzData.image_generation_cost_usd,
+        social_content: buzzData.social_content,
       },
       {
         onConflict: 'puzzle_date,language,region',

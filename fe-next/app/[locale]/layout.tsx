@@ -79,13 +79,13 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
     const seo = translations[validLocale]?.seo || translations.he.seo;
     const localePath = getLocalePath(validLocale);
 
-    // Use locale-specific OG image
+    // Use locale-specific OG image (WebP format for faster loading)
     const ogImageMap: Record<string, string> = {
-        he: 'https://www.lexiclash.live/og-image-he.jpg',
-        en: 'https://www.lexiclash.live/og-image-en.jpg',
-        sv: 'https://www.lexiclash.live/og-image-sv.jpg',
-        ja: 'https://www.lexiclash.live/og-image-ja.jpg',
-        es: 'https://www.lexiclash.live/og-image-es.jpg',
+        he: 'https://www.lexiclash.live/og-image-he.webp',
+        en: 'https://www.lexiclash.live/og-image-en.webp',
+        sv: 'https://www.lexiclash.live/og-image-sv.webp',
+        ja: 'https://www.lexiclash.live/og-image-ja.webp',
+        es: 'https://www.lexiclash.live/og-image-es.webp',
     };
     const ogImageAltMap: Record<string, string> = {
         he: 'לקסי קלאש - משחק מילים מרובה משתתפים',
@@ -208,11 +208,11 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             url: `https://www.lexiclash.live${localePath}`,
             image: {
                 '@type': 'ImageObject',
-                url: 'https://www.lexiclash.live/og-image-en.jpg',
+                url: 'https://www.lexiclash.live/og-image-en.webp',
                 width: 1200,
                 height: 630,
             },
-            screenshot: 'https://www.lexiclash.live/og-image-en.jpg',
+            screenshot: 'https://www.lexiclash.live/og-image-en.webp',
             inLanguage: [languageCode, 'he', 'en', 'sv', 'ja', 'es'],
             availableLanguage: [
                 { '@type': 'Language', name: 'English', alternateName: 'en' },
@@ -277,7 +277,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             url: 'https://www.lexiclash.live',
             logo: {
                 '@type': 'ImageObject',
-                url: 'https://www.lexiclash.live/og-image-en.jpg',
+                url: 'https://www.lexiclash.live/og-image-en.webp',
                 width: 1200,
                 height: 630,
             },
@@ -329,7 +329,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             },
             primaryImageOfPage: {
                 '@type': 'ImageObject',
-                url: 'https://www.lexiclash.live/og-image-en.jpg',
+                url: 'https://www.lexiclash.live/og-image-en.webp',
             },
             mainContentOfPage: {
                 '@type': 'WebPageElement',

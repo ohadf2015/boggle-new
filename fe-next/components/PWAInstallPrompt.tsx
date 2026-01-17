@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { gameEvents } from '@/components/GoogleAnalytics';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -57,6 +58,8 @@ export function PWAInstallPrompt() {
     window.addEventListener('appinstalled', () => {
       setShowPrompt(false);
       setDeferredPrompt(null);
+      // Track PWA installation in GA4
+      gameEvents.pwaInstalled();
     });
 
     return () => {

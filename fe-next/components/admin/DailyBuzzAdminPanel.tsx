@@ -16,6 +16,8 @@ import {
   ChevronUp,
   ImageOff,
   Trash2,
+  Copy,
+  Share2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NeoLoader } from '@/components/ui/NeoLoader';
@@ -109,6 +111,9 @@ export default function DailyBuzzAdminPanel() {
 
   // Success message state
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Social content copy state
+  const [copiedPlatform, setCopiedPlatform] = useState<string | null>(null);
 
   const languages = [
     { code: 'all', label: 'All Languages' },
@@ -379,6 +384,23 @@ export default function DailyBuzzAdminPanel() {
       default:
         return 'bg-slate-700 text-slate-400';
     }
+  };
+
+  // Copy social content to clipboard
+  const handleCopySocialContent = async (platform: string, content: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedPlatform(platform);
+      setTimeout(() => setCopiedPlatform(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  // Format social content for display (text + hashtags)
+  const formatSocialPost = (text: string, hashtags: string[]): string => {
+    const hashtagStr = hashtags.map(h => h.startsWith('#') ? h : `#${h}`).join(' ');
+    return `${text}\n\n${hashtagStr}`;
   };
 
   return (
@@ -699,6 +721,136 @@ export default function DailyBuzzAdminPanel() {
                       <div className="flex items-center gap-2 text-slate-500 text-sm">
                         <ImageOff className="w-4 h-4" />
                         No image set for this language
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Social Content Section */}
+                  <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Share2 className="w-4 h-4 text-neo-pink" />
+                      <span className="text-sm font-medium text-slate-400">Social Media Posts</span>
+                    </div>
+                    {challengeData.social_content ? (
+                      <div className="space-y-4">
+                        {/* X (Twitter) */}
+                        <div className="bg-slate-800/50 rounded-lg p-3">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
+                              <span className="text-lg">𝕏</span> X (Twitter)
+                            </span>
+                            <button
+                              onClick={() => handleCopySocialContent(
+                                'x',
+                                formatSocialPost(challengeData.social_content!.x.text, challengeData.social_content!.x.hashtags)
+                              )}
+                              className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
+                                copiedPlatform === 'x'
+                                  ? 'bg-green-500/20 text-green-400'
+                                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                              }`}
+                            >
+                              {copiedPlatform === 'x' ? (
+                                <>
+                                  <Check className="w-3 h-3" />
+                                  Copied!
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3 h-3" />
+                                  Copy
+                                </>
+                              )}
+                            </button>
+                          </div>
+                          <p className="text-sm text-white whitespace-pre-wrap">{challengeData.social_content.x.text}</p>
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {challengeData.social_content.x.hashtags.map((tag, i) => (
+                              <span key={i} className="text-xs text-neo-cyan">#{tag}</span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Instagram */}
+                        <div className="bg-slate-800/50 rounded-lg p-3">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
+                              <span className="text-lg">📸</span> Instagram
+                            </span>
+                            <button
+                              onClick={() => handleCopySocialContent(
+                                'instagram',
+                                formatSocialPost(challengeData.social_content!.instagram.text, challengeData.social_content!.instagram.hashtags)
+                              )}
+                              className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
+                                copiedPlatform === 'instagram'
+                                  ? 'bg-green-500/20 text-green-400'
+                                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                              }`}
+                            >
+                              {copiedPlatform === 'instagram' ? (
+                                <>
+                                  <Check className="w-3 h-3" />
+                                  Copied!
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3 h-3" />
+                                  Copy
+                                </>
+                              )}
+                            </button>
+                          </div>
+                          <p className="text-sm text-white whitespace-pre-wrap">{challengeData.social_content.instagram.text}</p>
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {challengeData.social_content.instagram.hashtags.map((tag, i) => (
+                              <span key={i} className="text-xs text-neo-pink">#{tag}</span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* TikTok */}
+                        <div className="bg-slate-800/50 rounded-lg p-3">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
+                              <span className="text-lg">🎵</span> TikTok
+                            </span>
+                            <button
+                              onClick={() => handleCopySocialContent(
+                                'tiktok',
+                                formatSocialPost(challengeData.social_content!.tiktok.text, challengeData.social_content!.tiktok.hashtags)
+                              )}
+                              className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors ${
+                                copiedPlatform === 'tiktok'
+                                  ? 'bg-green-500/20 text-green-400'
+                                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                              }`}
+                            >
+                              {copiedPlatform === 'tiktok' ? (
+                                <>
+                                  <Check className="w-3 h-3" />
+                                  Copied!
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3 h-3" />
+                                  Copy
+                                </>
+                              )}
+                            </button>
+                          </div>
+                          <p className="text-sm text-white whitespace-pre-wrap">{challengeData.social_content.tiktok.text}</p>
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {challengeData.social_content.tiktok.hashtags.map((tag, i) => (
+                              <span key={i} className="text-xs text-neo-orange">#{tag}</span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-slate-500 text-sm">
+                        <Share2 className="w-4 h-4" />
+                        No social content generated. Regenerate challenges to create social posts.
                       </div>
                     )}
                   </div>

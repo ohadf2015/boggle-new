@@ -120,6 +120,12 @@
 - **Resource Cleanup**: Close connections, clear timers
 - **Modular Code**: NEVER create files > 500 lines. Split into logical units and modules (hooks, utils, sub-components). Each file should have a single responsibility
 - **Accessibility**: Follow WCAG 2.1 AA standards
+- **Image Optimization**: Daily Buzz images MUST:
+  - Use WebP format with quality 80 (not 90) and effort 6
+  - Target file size <200KB (re-compress if needed)
+  - Include SEO-friendly alt text describing the trending topic
+  - Use trends selected for challenges (not all filtered trends)
+  - Prevent hex codes/technical notation in AI prompts
 - **ALWAYS refer to CLAUDE.md before making changes**
 - **ALWAYS VERIFY BUILD AND TESTS PASS AFTER CHANGES**
 - **ALWAYS RUN LINT (`npm run lint`) after writing new code and fix any issues**
