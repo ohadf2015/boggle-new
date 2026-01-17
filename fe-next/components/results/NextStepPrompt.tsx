@@ -3,7 +3,7 @@
 import React, { memo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Bot, Users, Brain, ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
+import { Bot, Users, Brain, ArrowLeft, ArrowRight, Sparkles, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -80,12 +80,12 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
         };
       case 'solo-bots':
         return {
-          titleKey: 'nextStep.challengeBotsAgain',
-          descKey: 'nextStep.challengeBotsAgainDesc',
-          href: `/${language}/singleplayer?preset=bots`,
-          icon: <Bot className="w-6 h-6 sm:w-7 sm:h-7" />,
-          gradient: 'from-neo-cyan to-neo-cyan-dark',
-          iconBg: 'bg-neo-navy text-neo-cyan',
+          titleKey: 'nextStep.tryDailyChallenge',
+          descKey: 'nextStep.tryDailyChallengeDesc',
+          href: `/${language}/daily`,
+          icon: <Trophy className="w-6 h-6 sm:w-7 sm:h-7" />,
+          gradient: 'from-amber-400 to-amber-600',
+          iconBg: 'bg-neo-navy text-amber-400',
         };
       case 'daily':
         return {

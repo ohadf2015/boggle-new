@@ -980,13 +980,7 @@ const ja = {
     "challengeBots": "ボットに挑戦",
     "challengeBotsDesc": "AIの対戦相手とスキルを試す",
     "challengeBotsAgain": "もう一度！",
-    "challengeBotsAgainDesc": "ボットと新しいゲームを開始",
-    "tryDailyChallenge": "デイリーチャレンジに挑戦",
-    "tryDailyChallengeDesc": "世界中で同じパズル - グローバルに競い合おう！",
-    "goMultiplayer": "マルチプレイヤーへ",
-    "goMultiplayerDesc": "リアルプレイヤーとライブワードバトルに挑戦",
-    "brainTraining": "脳トレーニング",
-    "brainTrainingDesc": "集中トレーニングで認知能力を向上"
+    "challengeBotsAgainDesc": "ボットと新しいゲームを開始"
   },
   "player": {
     "new": "NEW"
@@ -3329,69 +3323,6 @@ const ja = {
       "of": "/",
       "lastUpdated": "最終更新"
     }
-  },
-  "gift": {
-    "rewards": "報酬",
-    "youHaveGifts": "ギフトが届いています！",
-    "youReceived": "ギフトを受け取りました！",
-    "from": "送信者",
-    "claim": "報酬を受け取る",
-    "claimed": "受け取り済み！",
-    "claiming": "受け取り中...",
-    "xpReward": "{amount} XP",
-    "coinReward": "{amount} コイン",
-    "coins": "コイン",
-    "topPlayerLine": "あなたはトッププレイヤーの一人です！",
-    "feedbackLine": "あなたの声を聞かせてください！",
-    "thankYouLine": "特別な感謝を込めて！",
-    "customLine": "あなたへの特別なメッセージです！",
-    "claimError": "ギフトの受け取りに失敗しました。もう一度お試しください。"
-  },
-  "adminGifts": {
-    "title": "プレイヤーギフト",
-    "sendGift": "ギフトを送る",
-    "selectPlayers": "プレイヤーを選択",
-    "chooseTemplate": "テンプレートを選択",
-    "writeMessage": "メッセージを書く",
-    "setRewards": "報酬を設定",
-    "preview": "プレビュー＆送信",
-    "send": "ギフトを送る",
-    "sending": "送信中...",
-    "sent": "ギフトを送信しました！",
-    "history": "ギフト履歴",
-    "searchPlayers": "プレイヤーを検索...",
-    "noPlayersSelected": "プレイヤーが選択されていません",
-    "selectAtLeast": "少なくとも1人のプレイヤーを選択してください",
-    "playerSelected": "人のプレイヤーを選択",
-    "playersSelected": "人のプレイヤーを選択",
-    "messageTitle": "メッセージタイトル",
-    "messageTitlePlaceholder": "タイトルを入力してください",
-    "messageBody": "メッセージ",
-    "messageBodyPlaceholder": "パーソナライズされたメッセージを書く...",
-    "xpAmount": "XP量",
-    "coinAmount": "コイン量",
-    "rewardPresets": "クイックプリセット",
-    "presetSmall": "小",
-    "presetMedium": "中",
-    "presetLarge": "大",
-    "template": {
-      "topPlayer": "トッププレイヤー認定",
-      "topPlayerDesc": "プレイヤーの優れたパフォーマンスを称える",
-      "feedback": "フィードバックリクエスト",
-      "feedbackDesc": "プレイヤーにフィードバックと提案を求める",
-      "thankYou": "ありがとう",
-      "thankYouDesc": "プレイヤーへの感謝を表す",
-      "custom": "カスタムメッセージ",
-      "customDesc": "独自のパーソナライズされたメッセージを書く"
-    },
-    "previewTitle": "ギフトのプレビュー",
-    "previewRecipients": "受信者",
-    "previewRewards": "報酬",
-    "confirmSend": "確認して送信",
-    "sendSuccess": "ギフトが正常に送信されました！",
-    "sendError": "ギフトの送信に失敗しました。もう一度お試しください。",
-    "step": "ステップ",
-    "of": "/"
   }
 };
 

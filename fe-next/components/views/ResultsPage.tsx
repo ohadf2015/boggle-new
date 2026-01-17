@@ -134,7 +134,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   const [mobileActiveTab, setMobileActiveTab] = useState<MobileTab>('results');
 
   // Win streak tracking
-  const { currentStreak, bestStreak, recordWin } = useWinStreak();
+  const { currentStreak, bestStreak, lastWinDate, recordWin } = useWinStreak();
 
   // Cognitive scoring hook
   const { saveCognitiveScore, isSaving: isSavingCognitiveScore } = useSaveCognitiveScore();
@@ -364,17 +364,22 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
     // Record win and update streak
     if (isCurrentUserWinner) {
+      // Check if already won today (streak won't increment in this case)
+      const alreadyWonToday = lastWinDate &&
+        new Date(lastWinDate).toDateString() === new Date().toDateString();
+
       const prevStreak = currentStreak;
       setPreviousStreak(prevStreak);
       recordWin();
 
-      // Track streak milestones
-      const newStreak = prevStreak + 1;
+      // Calculate the actual new streak value
+      // If already won today, streak stays the same; otherwise it increments
+      const newStreak = alreadyWonToday ? currentStreak : prevStreak + 1;
       trackStreakMilestone(newStreak);
 
       // Calculate if this is a new milestone (streak tier change)
       const tierThresholds = [3, 7, 14, 30];
-      const isNewMilestone = tierThresholds.some(t => newStreak === t);
+      const isNewMilestone = !alreadyWonToday && tierThresholds.some(t => newStreak === t);
 
       // Update win streak data for display
       setWinStreakData({
@@ -386,7 +391,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     }
 
     hasTrackedGameRef.current = true;
-  }, [currentPlayerData, isCurrentUserWinner, currentStreak, bestStreak, recordWin]);
+  }, [currentPlayerData, isCurrentUserWinner, currentStreak, bestStreak, lastWinDate, recordWin]);
 
   // Add game to history for the performance chart (runs for all users)
   useEffect(() => {
@@ -1030,6 +1035,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           winStreak={winStreakData}
           achievementsUnlocked={currentPlayerData?.achievements?.length || 0}
           isWinner={isCurrentUserWinner}
+          onAchievementsClick={() => setMobileActiveTab('details')}
         />
       )}
 
@@ -1339,6 +1345,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                 winStreak={winStreakData}
                 achievementsUnlocked={currentPlayerData?.achievements?.length || 0}
                 isWinner={isCurrentUserWinner}
+                onAchievementsClick={() => setMobileActiveTab('details')}
               />
             )}
 

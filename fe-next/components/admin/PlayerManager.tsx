@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Search, User, Calendar, Trophy, Gamepad2,
-  MoreVertical, ChevronLeft, ChevronRight
+  MoreVertical, ChevronLeft, ChevronRight, Gift
 } from 'lucide-react';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,7 @@ import {
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { PlayerGiftDialog } from './gift/PlayerGiftDialog';
 
 interface Player {
   id: string;
@@ -48,6 +49,15 @@ export function PlayerManager({ authToken }: { authToken: string }) {
   const [sortOrder, setSortOrder] = useState<'asc'|'desc'>('desc');
   const [limit, setLimit] = useState(20);
   const [offset, setOffset] = useState(0);
+
+  // Gift dialog state
+  const [giftDialogOpen, setGiftDialogOpen] = useState(false);
+  const [selectedPlayerForGift, setSelectedPlayerForGift] = useState<string | undefined>(undefined);
+
+  const handleOpenGiftDialog = (playerId?: string) => {
+    setSelectedPlayerForGift(playerId);
+    setGiftDialogOpen(true);
+  };
 
   const fetchPlayers = useCallback(async () => {
     try {
@@ -191,6 +201,17 @@ export function PlayerManager({ authToken }: { authToken: string }) {
                       <span className="text-xs text-slate-400 uppercase">MMR</span>
                       <span className="font-mono font-bold text-amber-500">{player.ranked_mmr}</span>
                     </div>
+                    <div className="flex flex-col items-center sm:items-end">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleOpenGiftDialog(player.id)}
+                        className="text-amber-600 border-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                      >
+                        <Gift className="w-4 h-4 mr-1" />
+                        Gift
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -225,6 +246,15 @@ export function PlayerManager({ authToken }: { authToken: string }) {
           </div>
         </div>
       )}
+
+      {/* Gift Dialog */}
+      <PlayerGiftDialog
+        open={giftDialogOpen}
+        onOpenChange={setGiftDialogOpen}
+        authToken={authToken}
+        initialPlayerId={selectedPlayerForGift}
+        onSuccess={() => setSelectedPlayerForGift(undefined)}
+      />
     </div>
   );
 }

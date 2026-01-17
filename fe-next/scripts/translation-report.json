@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 2183,
+    "totalKeysInCode": 2193,
     "keyCountByLanguage": {
-      "en": 2596,
-      "he": 2596,
-      "sv": 2596,
-      "ja": 2596,
-      "es": 2596
+      "en": 2606,
+      "he": 2606,
+      "sv": 2606,
+      "ja": 2606,
+      "es": 2606
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
@@ -62,14 +62,54 @@
   "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [],
-    "sv": [],
-    "ja": [],
+    "sv": [
+      "daily.nextChallenge.wordHuntTitle",
+      "daily.nextChallenge.wordHuntDesc",
+      "daily.nextChallenge.wordHuntCTA",
+      "daily.nextChallenge.buzzTitle",
+      "daily.nextChallenge.buzzDesc",
+      "daily.nextChallenge.buzzCTA",
+      "daily.nextChallenge.multiplayerTitle",
+      "daily.nextChallenge.multiplayerDesc",
+      "daily.nextChallenge.multiplayerCTA"
+    ],
+    "ja": [
+      "daily.nextChallenge.wordHuntTitle",
+      "daily.nextChallenge.wordHuntDesc",
+      "daily.nextChallenge.wordHuntCTA",
+      "daily.nextChallenge.buzzTitle",
+      "daily.nextChallenge.buzzDesc",
+      "daily.nextChallenge.buzzCTA",
+      "daily.nextChallenge.multiplayerTitle",
+      "daily.nextChallenge.multiplayerDesc",
+      "daily.nextChallenge.multiplayerCTA"
+    ],
     "es": []
   },
   "keysNotInEnglish": {
     "he": [],
-    "sv": [],
-    "ja": [],
+    "sv": [
+      "daily.trainingSuggestion.nextChallenge.wordHuntTitle",
+      "daily.trainingSuggestion.nextChallenge.wordHuntDesc",
+      "daily.trainingSuggestion.nextChallenge.wordHuntCTA",
+      "daily.trainingSuggestion.nextChallenge.buzzTitle",
+      "daily.trainingSuggestion.nextChallenge.buzzDesc",
+      "daily.trainingSuggestion.nextChallenge.buzzCTA",
+      "daily.trainingSuggestion.nextChallenge.multiplayerTitle",
+      "daily.trainingSuggestion.nextChallenge.multiplayerDesc",
+      "daily.trainingSuggestion.nextChallenge.multiplayerCTA"
+    ],
+    "ja": [
+      "daily.trainingSuggestion.nextChallenge.wordHuntTitle",
+      "daily.trainingSuggestion.nextChallenge.wordHuntDesc",
+      "daily.trainingSuggestion.nextChallenge.wordHuntCTA",
+      "daily.trainingSuggestion.nextChallenge.buzzTitle",
+      "daily.trainingSuggestion.nextChallenge.buzzDesc",
+      "daily.trainingSuggestion.nextChallenge.buzzCTA",
+      "daily.trainingSuggestion.nextChallenge.multiplayerTitle",
+      "daily.trainingSuggestion.nextChallenge.multiplayerDesc",
+      "daily.trainingSuggestion.nextChallenge.multiplayerCTA"
+    ],
     "es": []
   }
 }

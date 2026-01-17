@@ -6,6 +6,7 @@
 import type { Application, Request, Response, Router } from 'express';
 import adminRoutes from './admin';
 import leaderboardRoutes from './leaderboard';
+import singlePlayerLeaderboardRoutes from './singlePlayerLeaderboard';
 import analyticsRoutes from './analytics';
 import geolocationRoutes from './geolocation';
 import healthRoutes from './health';
@@ -37,6 +38,7 @@ function registerRoutes(app: Application): void {
 
   // Public API routes
   app.use('/api/leaderboard', leaderboardRoutes);
+  app.use('/api/single-player', singlePlayerLeaderboardRoutes);
   app.use('/api/geolocation', geolocationRoutes);
   app.use('/api/analytics', analyticsRoutes);
   app.use('/api/daily-challenge', dailyChallengeRoutes);
@@ -57,6 +59,7 @@ export {
   registerRoutes,
   adminRoutes,
   leaderboardRoutes,
+  singlePlayerLeaderboardRoutes,
   analyticsRoutes,
   geolocationRoutes,
   healthRoutes,

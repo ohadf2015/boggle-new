@@ -26,7 +26,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
-import { updateGuestStatsAfterGame, getGuestStats } from '@/utils/guestManager';
+import { updateGuestStatsAfterGame, getGuestStats, getGuestName, getGuestSessionId } from '@/utils/guestManager';
 import { logGameStart, logGameEnd, formatWordsForLogging } from '@/utils/gameLogger';
 import { getPointColor, getTextColor } from '@/components/results/utils';
 // WordObject type used by useResultsData
@@ -98,6 +98,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   // Refs to prevent duplicate stat updates
   const hasUpdatedStatsRef = useRef(false);
+  const hasSyncedLeaderboardRef = useRef(false);
   const hasAddedToHistoryRef = useRef(false);
   const hasLoggedGameSessionRef = useRef(false);
   const hasAwardedCoinsRef = useRef(false);
@@ -112,6 +113,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const {
     currentStreak,
     bestStreak,
+    lastWinDate,
     recordWin,
   } = useWinStreak();
   const [winStreakData, setWinStreakData] = useState<{
@@ -213,6 +215,59 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
     hasUpdatedStatsRef.current = true;
   }, [isAuthenticated, results, isWinner, totalComboBonus, totalFireRoundBonus, playerArchetype]);
+
+  // Sync guest scores to leaderboard (for guests only, after stats update)
+  useEffect(() => {
+    if (isAuthenticated || hasSyncedLeaderboardRef.current) return;
+    if (!hasUpdatedStatsRef.current) return; // Wait for stats update first
+
+    const syncToLeaderboard = async () => {
+      try {
+        // Get guest fingerprint (session ID)
+        const guestFingerprint = getGuestSessionId();
+        if (!guestFingerprint) {
+          console.warn('[SinglePlayerResults] No guest fingerprint available for leaderboard sync');
+          return;
+        }
+
+        // Get guest name and avatar
+        const guestName = getGuestName() || 'Guest';
+        const validWords = results.playerWordData?.filter(w => w.isValid) || [];
+        const longestWord = validWords.reduce<string | undefined>(
+          (longest, w) => (w.word.length > (longest?.length || 0) ? w.word : longest),
+          undefined
+        );
+
+        // Sync to leaderboard via API
+        const response = await fetch('/api/single-player/sync-score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            guestFingerprint,
+            score: results.playerScore,
+            wordCount: validWords.length,
+            longestWord,
+            username: guestName,
+            avatarEmoji: '🎮', // Default avatar for guests
+            avatarColor: '#6366f1',
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Leaderboard sync failed: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('[SinglePlayerResults] Leaderboard synced:', result);
+      } catch (error) {
+        console.error('[SinglePlayerResults] Failed to sync leaderboard:', error);
+        // Non-critical failure - don't block user experience
+      }
+    };
+
+    syncToLeaderboard();
+    hasSyncedLeaderboardRef.current = true;
+  }, [isAuthenticated, results, hasUpdatedStatsRef]);
 
   // Save achievements to profile for authenticated users
   useEffect(() => {
@@ -353,16 +408,21 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
     hasRecordedWinRef.current = true;
 
+    // Check if already won today (streak won't increment in this case)
+    const alreadyWonToday = lastWinDate &&
+      new Date(lastWinDate).toDateString() === new Date().toDateString();
+
     // Store previous streak before recording
     const previousStreak = currentStreak;
 
-    // Record the win
+    // Record the win (handles same-day logic internally)
     recordWin();
 
-    // Calculate if this is a new milestone (streak tier change)
-    const newStreak = previousStreak + 1;
+    // Calculate the actual new streak value
+    // If already won today, streak stays the same; otherwise it increments
+    const newStreak = alreadyWonToday ? currentStreak : previousStreak + 1;
     const tierThresholds = [3, 7, 14, 30];
-    const isNewMilestone = tierThresholds.some(t => newStreak === t);
+    const isNewMilestone = !alreadyWonToday && tierThresholds.some(t => newStreak === t);
 
     // Update win streak data for display
     setWinStreakData({
@@ -371,7 +431,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       isNewMilestone,
       previousStreak,
     });
-  }, [mode, isWinner, currentStreak, bestStreak, recordWin]);
+  }, [mode, isWinner, currentStreak, bestStreak, lastWinDate, recordWin]);
 
   // Save cognitive scores for brain training (authenticated users only)
   useEffect(() => {
@@ -710,6 +770,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           winStreak={winStreakData}
           achievementsUnlocked={results.achievements?.length || 0}
           isWinner={isWinner}
+          onAchievementsClick={() => setMobileActiveTab('details')}
         />
       )}
 
@@ -988,6 +1049,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 winStreak={winStreakData}
                 achievementsUnlocked={results.achievements?.length || 0}
                 isWinner={isWinner}
+                onAchievementsClick={() => setMobileActiveTab('details')}
               />
             )}
 

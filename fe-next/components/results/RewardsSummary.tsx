@@ -25,6 +25,8 @@ export interface RewardsSummaryProps {
   achievementsUnlocked?: number;
   /** Whether player won the game */
   isWinner?: boolean;
+  /** Callback when achievements section is clicked (e.g., to navigate to details tab) */
+  onAchievementsClick?: () => void;
   /** Additional className */
   className?: string;
 }
@@ -46,6 +48,7 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
   winStreak,
   achievementsUnlocked = 0,
   isWinner = false,
+  onAchievementsClick,
   className,
 }) => {
   const { t } = useLanguage();
@@ -217,7 +220,14 @@ const RewardsSummary: React.FC<RewardsSummaryProps> = memo(({
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.3 }}
-                className="flex items-center justify-between p-3 rounded-neo border-2 bg-neo-pink/20 border-neo-pink/50"
+                onClick={onAchievementsClick}
+                role={onAchievementsClick ? 'button' : undefined}
+                tabIndex={onAchievementsClick ? 0 : undefined}
+                onKeyDown={onAchievementsClick ? (e) => e.key === 'Enter' && onAchievementsClick() : undefined}
+                className={cn(
+                  "flex items-center justify-between p-3 rounded-neo border-2 bg-neo-pink/20 border-neo-pink/50",
+                  onAchievementsClick && "cursor-pointer hover:bg-neo-pink/30 active:scale-[0.98] transition-all"
+                )}
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-neo bg-neo-pink flex items-center justify-center border-2 border-neo-black">

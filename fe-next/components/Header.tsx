@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BarChart3, Menu, X, Settings, BookOpen, Trophy, ScrollText, Shield, Coffee, User } from 'lucide-react';
+import { BarChart3, Menu, X, Settings, BookOpen, Trophy, ScrollText, Shield, Coffee, User, Gift } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -11,6 +11,9 @@ import AuthButton from './auth/AuthButton';
 import MusicControls from './MusicControls';
 import { CoinBalance } from './CoinBalance';
 import AuthModal from './auth/AuthModal';
+import { GiftNotificationBadge } from './gift/GiftNotificationBadge';
+import { AdminGiftModal } from './gift/AdminGiftModal';
+import { useUnclaimedGifts } from '@/hooks/useUnclaimedGifts';
 
 /**
  * Header Props
@@ -30,6 +33,33 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [mounted, setMounted] = useState(false);
     const mobileMenuRef = useRef<HTMLDivElement>(null);
+
+    // Gift notification state
+    const { unclaimedCount, gifts, refresh: refreshGifts, claimGift } = useUnclaimedGifts();
+    const [showGiftModal, setShowGiftModal] = useState(false);
+    const [selectedGift, setSelectedGift] = useState<typeof gifts[0] | null>(null);
+
+    // Handle opening gift modal with oldest unclaimed gift
+    const handleOpenGiftModal = useCallback(() => {
+        const unclaimedGift = gifts.find(g => !g.claimed);
+        if (unclaimedGift) {
+            setSelectedGift(unclaimedGift);
+            setShowGiftModal(true);
+        }
+    }, [gifts]);
+
+    // Handle claiming a gift
+    const handleClaimGift = useCallback(async (giftId: string) => {
+        await claimGift(giftId);
+        // Refresh to get next unclaimed gift
+        await refreshGifts();
+    }, [claimGift, refreshGifts]);
+
+    // Handle dismissing gift modal
+    const handleDismissGiftModal = useCallback(() => {
+        setShowGiftModal(false);
+        setSelectedGift(null);
+    }, []);
 
     // Track client-side mounting for portal
     useEffect(() => {
@@ -244,6 +274,27 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         </Link>
                     )}
 
+                    {/* Gift Notification Button - only show for authenticated users with unclaimed gifts */}
+                    {isAuthenticated && unclaimedCount > 0 && (
+                        <button
+                            onClick={handleOpenGiftModal}
+                            className={cn(
+                                "relative flex items-center justify-center",
+                                "w-10 h-10",
+                                "bg-gradient-to-br from-amber-400 to-amber-500 text-neo-black",
+                                "border-2 border-neo-black",
+                                "rounded-neo shadow-hard-sm",
+                                "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:from-amber-500 hover:to-amber-600",
+                                "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+                                "transition-all duration-100"
+                            )}
+                            aria-label={t('gift.youHaveGifts') || `You have ${unclaimedCount} unclaimed gift${unclaimedCount !== 1 ? 's' : ''}`}
+                        >
+                            <Gift size={20} />
+                            <GiftNotificationBadge count={unclaimedCount} />
+                        </button>
+                    )}
+
                     <MusicControls />
                     <AuthButton />
                 </div>
@@ -358,6 +409,37 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                         {t('profile.viewProfile') || 'View Profile'}
                                                     </span>
                                                 </Link>
+                                            </div>
+
+                                            {/* Divider */}
+                                            <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
+                                        </>
+                                    )}
+
+                                    {/* Gift Notification - shown for authenticated users with unclaimed gifts */}
+                                    {isAuthenticated && unclaimedCount > 0 && (
+                                        <>
+                                            <div className="flex flex-col gap-2">
+                                                <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
+                                                    {t('gift.rewards') || 'Rewards'}
+                                                </span>
+                                                <button
+                                                    onClick={() => {
+                                                        setShowMobileMenu(false);
+                                                        handleOpenGiftModal();
+                                                    }}
+                                                    className={cn(
+                                                        "relative flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                        "bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-neo-black",
+                                                        "shadow-hard-sm hover:shadow-hard"
+                                                    )}
+                                                >
+                                                    <span className="flex items-center justify-center w-7 h-7 rounded-md bg-white/30 border-2 border-neo-black text-neo-black">
+                                                        <Gift className="w-4 h-4" />
+                                                    </span>
+                                                    <span>{t('gift.youHaveGifts') || `You have ${unclaimedCount} gift${unclaimedCount !== 1 ? 's' : ''}`}</span>
+                                                    <GiftNotificationBadge count={unclaimedCount} className="relative top-0 right-0" />
+                                                </button>
                                             </div>
 
                                             {/* Divider */}
@@ -529,6 +611,14 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 onClose={() => setShowAuthModal(false)}
                 showGuestStats={true}
                 initialMode={authModalMode}
+            />
+
+            {/* Admin Gift Modal - Shows unclaimed gifts with luxury animation */}
+            <AdminGiftModal
+                gift={selectedGift}
+                show={showGiftModal}
+                onClaim={handleClaimGift}
+                onDismiss={handleDismissGiftModal}
             />
         </header>
     );

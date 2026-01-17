@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -16,6 +16,7 @@ import LandscapeIndicator from '@/components/LandscapeIndicator';
 import HowToPlay from '@/components/HowToPlay';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import QuickPlayButton from './QuickPlayButton';
+import { hasPlayedAnyGame } from '@/utils/playerProgressStorage';
 
 interface RoomListViewProps {
   activeRooms: ActiveRoom[];
@@ -42,6 +43,14 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 }) => {
   const { t, dir } = useLanguage();
   const [showHowToPlay, setShowHowToPlay] = useState(false);
+
+  // Auto-show HowToPlay modal for first-time players
+  useEffect(() => {
+    const isFirstTime = !hasPlayedAnyGame();
+    if (isFirstTime) {
+      setShowHowToPlay(true);
+    }
+  }, []);
 
   const { pullToRefreshHandlers, pullState } = usePullToRefresh({
     onRefresh: async () => {
