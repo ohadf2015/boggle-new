@@ -32,6 +32,12 @@ jest.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
+        'nextStep.challengeBots': 'Challenge the Bots!',
+        'nextStep.challengeBotsDesc': 'Test your skills against AI opponents',
+        'nextStep.tryDailyChallenge': 'Try Daily Challenge',
+        'nextStep.tryDailyChallengeDesc': 'Same puzzle for everyone worldwide - compete globally!',
+        'nextStep.goMultiplayer': 'Go Multiplayer!',
+        'nextStep.goMultiplayerDesc': 'Compete with real players',
         'nextStep.brainTraining': 'Train Your Brain',
         'nextStep.brainTrainingDesc': 'Track your cognitive growth',
         'nextStep.letsGo': "Let's Go!",
@@ -136,7 +142,7 @@ describe('NextStepPrompt - Session Cleanup on Navigation', () => {
   describe('Session cleanup for all navigation modes', () => {
     const testCases = [
       { mode: 'practice' as const, expectedHref: '/en/singleplayer?preset=bots' },
-      { mode: 'solo-bots' as const, expectedHref: '/en/singleplayer?preset=bots' },
+      { mode: 'solo-bots' as const, expectedHref: '/en/daily' },
       { mode: 'daily' as const, expectedHref: '/en/multiplayer' },
       { mode: 'multiplayer-bots' as const, expectedHref: '/en/brain' },
     ];

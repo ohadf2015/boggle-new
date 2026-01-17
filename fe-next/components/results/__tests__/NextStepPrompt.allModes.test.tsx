@@ -3,7 +3,7 @@
  *
  * This test ensures that ALL next step navigation paths work correctly:
  * - Practice → Challenge Bots (singleplayer?preset=bots)
- * - Solo-Bots → Challenge Bots Again (singleplayer?preset=bots)
+ * - Solo-Bots → Try Daily Challenge (daily)
  * - Daily → Go Multiplayer (multiplayer)
  * - Multiplayer-Bots → Train Your Brain (brain)
  *
@@ -39,10 +39,8 @@ jest.mock('@/contexts/LanguageContext', () => ({
       const translations: Record<string, string> = {
         'nextStep.challengeBots': 'Challenge the Bots!',
         'nextStep.challengeBotsDesc': 'Test your skills against AI opponents',
-        'nextStep.challengeBotsAgain': 'Play Again!',
-        'nextStep.challengeBotsAgainDesc': 'Start a new game with bots',
-        'nextStep.dailyChallenge': 'Daily Challenge',
-        'nextStep.dailyChallengeDesc': 'Same puzzle as everyone worldwide',
+        'nextStep.tryDailyChallenge': 'Try Daily Challenge',
+        'nextStep.tryDailyChallengeDesc': 'Same puzzle for everyone worldwide - compete globally!',
         'nextStep.goMultiplayer': 'Go Multiplayer!',
         'nextStep.goMultiplayerDesc': 'Compete with real players',
         'nextStep.brainTraining': 'Train Your Brain',
@@ -112,11 +110,11 @@ describe('NextStepPrompt - All Navigation Modes', () => {
     });
   });
 
-  describe('Solo-Bots Mode → Challenge Bots Again', () => {
+  describe('Solo-Bots Mode → Try Daily Challenge', () => {
     const testVariants = ['desktop', 'mobile', 'landscape'] as const;
 
     testVariants.forEach((variant) => {
-      it(`should clear session and navigate to /en/singleplayer?preset=bots (${variant})`, async () => {
+      it(`should clear session and navigate to /en/daily (${variant})`, async () => {
         const user = userEvent.setup();
 
         render(
@@ -130,13 +128,13 @@ describe('NextStepPrompt - All Navigation Modes', () => {
         // Find and click the navigation button
         const navButton = variant === 'desktop'
           ? screen.getByRole('button', { name: /let's go/i })
-          : screen.getByText('Play Again!');
+          : screen.getByText('Try Daily Challenge');
 
         await user.click(navButton);
 
         // Verify session was cleared BEFORE navigation
         expect(mockClearSession).toHaveBeenCalledTimes(1);
-        expect(mockRouterPush).toHaveBeenCalledWith('/en/singleplayer?preset=bots');
+        expect(mockRouterPush).toHaveBeenCalledWith('/en/daily');
 
         // Verify correct order
         const clearCallOrder = mockClearSession.mock.invocationCallOrder[0];
@@ -158,7 +156,7 @@ describe('NextStepPrompt - All Navigation Modes', () => {
         />
       );
 
-      const navButton = screen.getByText('Play Again!');
+      const navButton = screen.getByText('Try Daily Challenge');
       await user.click(navButton);
 
       // Should call onAction, not clear session or navigate

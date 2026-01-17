@@ -130,7 +130,7 @@ describe('NextStepPrompt Integration - ResultsPage Context', () => {
   it('should generate correct hrefs for all modes', async () => {
     const testCases = [
       { mode: 'practice' as const, expectedHref: '/en/singleplayer?preset=bots' },
-      { mode: 'solo-bots' as const, expectedHref: '/en/singleplayer?preset=bots' },
+      { mode: 'solo-bots' as const, expectedHref: '/en/daily' },
       { mode: 'daily' as const, expectedHref: '/en/multiplayer' },
       { mode: 'multiplayer-bots' as const, expectedHref: '/en/brain' },
     ];

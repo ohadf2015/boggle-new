@@ -21,10 +21,8 @@ jest.mock('@/contexts/LanguageContext', () => ({
     const translations: Record<string, string> = {
       'nextStep.challengeBots': 'Challenge the Bots!',
       'nextStep.challengeBotsDesc': 'Test your skills against AI opponents',
-      'nextStep.challengeBotsAgain': 'Play Again!',
-      'nextStep.challengeBotsAgainDesc': 'Start a new game with bots',
-      'nextStep.dailyChallenge': 'Daily Challenge',
-      'nextStep.dailyChallengeDesc': 'Same puzzle as everyone worldwide',
+      'nextStep.tryDailyChallenge': 'Try Daily Challenge',
+      'nextStep.tryDailyChallengeDesc': 'Same puzzle for everyone worldwide - compete globally!',
       'nextStep.goMultiplayer': 'Go Multiplayer!',
       'nextStep.goMultiplayerDesc': 'Compete with real players',
       'nextStep.brainTraining': 'Train Your Brain',
@@ -74,7 +72,7 @@ describe('NextStepPrompt', () => {
   });
 
   describe('Solo-Bots Mode', () => {
-    it('renders Play Again CTA for solo-bots mode', () => {
+    it('renders Try Daily Challenge CTA for solo-bots mode', () => {
       render(
         <NextStepPrompt
           currentMode="solo-bots"
@@ -82,8 +80,8 @@ describe('NextStepPrompt', () => {
         />
       );
 
-      expect(screen.getByText('Play Again!')).toBeInTheDocument();
-      expect(screen.getByText('Start a new game with bots')).toBeInTheDocument();
+      expect(screen.getByText('Try Daily Challenge')).toBeInTheDocument();
+      expect(screen.getByText('Same puzzle for everyone worldwide - compete globally!')).toBeInTheDocument();
     });
 
     it('calls onAction callback when provided instead of navigating', async () => {

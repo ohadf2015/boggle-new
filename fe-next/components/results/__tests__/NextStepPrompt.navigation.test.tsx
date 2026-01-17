@@ -25,10 +25,8 @@ jest.mock('@/contexts/LanguageContext', () => ({
       const translations: Record<string, string> = {
         'nextStep.challengeBots': 'Challenge the Bots!',
         'nextStep.challengeBotsDesc': 'Test your skills against AI opponents',
-        'nextStep.challengeBotsAgain': 'Play Again!',
-        'nextStep.challengeBotsAgainDesc': 'Start a new game with bots',
-        'nextStep.dailyChallenge': 'Daily Challenge',
-        'nextStep.dailyChallengeDesc': 'Same puzzle as everyone worldwide',
+        'nextStep.tryDailyChallenge': 'Try Daily Challenge',
+        'nextStep.tryDailyChallengeDesc': 'Same puzzle for everyone worldwide - compete globally!',
         'nextStep.goMultiplayer': 'Go Multiplayer!',
         'nextStep.goMultiplayerDesc': 'Compete with real players',
         'nextStep.brainTraining': 'Train Your Brain',
@@ -94,10 +92,10 @@ describe('NextStepPrompt Navigation', () => {
       );
 
       // Click specifically on the title text inside the button
-      const titleElement = screen.getByText('Play Again!');
+      const titleElement = screen.getByText('Try Daily Challenge');
       await user.click(titleElement);
 
-      expect(mockRouterPush).toHaveBeenCalledWith('/en/singleplayer?preset=bots');
+      expect(mockRouterPush).toHaveBeenCalledWith('/en/daily');
     });
 
     it('should call onAction instead of navigating when provided', async () => {
@@ -113,7 +111,7 @@ describe('NextStepPrompt Navigation', () => {
         />
       );
 
-      const titleElement = screen.getByText('Play Again!');
+      const titleElement = screen.getByText('Try Daily Challenge');
       await user.click(titleElement);
 
       // Should call onAction, not navigate
@@ -182,7 +180,7 @@ describe('NextStepPrompt Navigation', () => {
   describe('All modes navigate correctly', () => {
     const testCases = [
       { mode: 'practice' as const, expectedHref: '/en/singleplayer?preset=bots', titleText: 'Challenge the Bots!' },
-      { mode: 'solo-bots' as const, expectedHref: '/en/singleplayer?preset=bots', titleText: 'Play Again!' },
+      { mode: 'solo-bots' as const, expectedHref: '/en/daily', titleText: 'Try Daily Challenge' },
       { mode: 'daily' as const, expectedHref: '/en/multiplayer', titleText: 'Go Multiplayer!' },
       { mode: 'multiplayer-bots' as const, expectedHref: '/en/brain', titleText: 'Train Your Brain' },
     ];
