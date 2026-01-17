@@ -7,7 +7,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 
 const STORAGE_KEY = 'boggle_landscape_dismissed';
 
-// TEMPORARILY DISABLED: Feature flag to disable landscape mode recommendation
+// Feature flag to enable landscape mode recommendation (disabled for now)
 const FEATURE_ENABLED = false;
 
 interface LandscapeIndicatorProps {
@@ -19,7 +19,7 @@ interface LandscapeIndicatorProps {
  * LandscapeIndicator - Neo-Brutalist banner prompting users to rotate their device
  * Only shows on mobile portrait screens, dismissible with "don't show again" option
  *
- * TEMPORARILY DISABLED: Landscape mode recommendation is disabled until the feature is more stable.
+ * Shows on active game pages (/singleplayer, /multiplayer in-game) after a 2-second delay.
  */
 const LandscapeIndicator = memo<LandscapeIndicatorProps>(({ className = '' }) => {
   // All hooks must be called unconditionally, even if component is disabled
@@ -113,8 +113,7 @@ const LandscapeIndicator = memo<LandscapeIndicatorProps>(({ className = '' }) =>
     setIsVisible(false);
   }, []);
 
-  // TEMPORARILY DISABLED: Don't recommend landscape mode until it's more stable
-  // TODO: Re-enable once landscape mode is fully tested and stable
+  // Return null if feature is disabled via feature flag
   if (!FEATURE_ENABLED) {
     return null;
   }

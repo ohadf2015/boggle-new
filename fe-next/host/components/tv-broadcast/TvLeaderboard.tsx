@@ -4,7 +4,7 @@ import React, { memo, useMemo, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import TvPlayerCard from './TvPlayerCard';
-import type { Avatar as AvatarType } from '@/shared/types/game';
+import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 
 interface LeaderboardEntry {
   username: string;
@@ -12,6 +12,9 @@ interface LeaderboardEntry {
   wordCount: number;
   avatar?: AvatarType | null;
   isHost?: boolean;
+  isBot?: boolean;
+  presenceStatus?: PresenceStatus;
+  disconnected?: boolean;
 }
 
 interface PlayerComboData {
@@ -94,6 +97,9 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
             rank={index + 1}
             comboLevel={playerCombos[player.username]?.level || 0}
             isHost={player.username === hostUsername || player.isHost}
+            isBot={player.isBot}
+            presenceStatus={player.presenceStatus}
+            disconnected={player.disconnected}
             index={index}
             t={t}
           />
@@ -145,6 +151,9 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
                   rank={virtualRow.index + 1}
                   comboLevel={playerCombos[player.username]?.level || 0}
                   isHost={player.username === hostUsername || player.isHost}
+                  isBot={player.isBot}
+                  presenceStatus={player.presenceStatus}
+                  disconnected={player.disconnected}
                   index={virtualRow.index}
                   t={t}
                 />

@@ -2,9 +2,9 @@
 
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
-import { Flame, Crown, Medal, Award } from 'lucide-react';
+import { Flame, Crown, Medal, Award, WifiOff, Clock } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
-import type { Avatar as AvatarType } from '@/shared/types/game';
+import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 import { cn } from '../../../lib/utils';
 
 interface TvPlayerCardProps {
@@ -15,6 +15,9 @@ interface TvPlayerCardProps {
   rank: number;
   comboLevel?: number;
   isHost?: boolean;
+  isBot?: boolean;
+  presenceStatus?: PresenceStatus;
+  disconnected?: boolean;
   index: number;
   t: (path: string, params?: Record<string, string | number>) => string;
 }
@@ -56,11 +59,15 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
   rank,
   comboLevel = 0,
   isHost = false,
+  isBot = false,
+  presenceStatus = 'active',
+  disconnected = false,
   index,
   t,
 }) => {
   const rankConfig = RANK_CONFIGS[rank as keyof typeof RANK_CONFIGS];
   const isTopThree = rank <= 3;
+  const isAway = disconnected || presenceStatus === 'afk' || presenceStatus === 'idle';
 
   return (
     <motion.div
@@ -94,14 +101,37 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
           profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
           avatarImage={avatar?.avatarImage}
           size="lg"
-          className="border-2 border-neo-black"
+          className={cn(
+            "border-2 border-neo-black",
+            isAway && !isBot && "opacity-50"
+          )}
         />
-        {isHost && (
+        {isHost && !isAway && (
           <div
             className="absolute -top-1 -right-1 bg-neo-purple text-neo-cream text-[10px] font-bold px-1 rounded border border-neo-black"
             aria-label={t('tvBroadcast.hostBadge')}
           >
             {t('tvBroadcast.host')}
+          </div>
+        )}
+        {/* Disconnected indicator */}
+        {disconnected && !isBot && (
+          <div
+            className="absolute -top-1 -right-1 bg-neo-red text-neo-cream p-1 rounded-full border border-neo-black"
+            aria-label={t('common.playerDisconnected') || 'Disconnected'}
+            title={t('common.playerDisconnected') || 'Disconnected'}
+          >
+            <WifiOff className="w-3 h-3" />
+          </div>
+        )}
+        {/* AFK/Idle indicator (only show if not disconnected) */}
+        {!disconnected && presenceStatus === 'afk' && !isBot && (
+          <div
+            className="absolute -top-1 -right-1 bg-neo-orange text-neo-black p-1 rounded-full border border-neo-black"
+            aria-label={t('common.playerAFK') || 'Away'}
+            title={t('common.playerAFK') || 'Away'}
+          >
+            <Clock className="w-3 h-3" />
           </div>
         )}
       </div>

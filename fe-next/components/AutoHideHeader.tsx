@@ -1,6 +1,7 @@
 'use client';
 
 import Header from './Header';
+import { useTvFullscreenListener } from '@/hooks/useTvFullscreenListener';
 
 interface AutoHideHeaderProps {
   className?: string;
@@ -11,11 +12,22 @@ interface AutoHideHeaderProps {
 /**
  * AutoHideHeader - Header wrapper component
  *
- * The header is always visible. In landscape mode it uses static positioning
- * (handled by the Header component's landscape:static class).
+ * The header is always visible except in fullscreen mode (TV broadcast).
+ * In landscape mode it uses static positioning (handled by the Header component's landscape:static class).
  */
 export function AutoHideHeader({ className, onVisibilityChange }: AutoHideHeaderProps) {
-  // Always visible - notify parent
+  // Listen for TV fullscreen mode to hide the header
+  const isTvFullscreen = useTvFullscreenListener();
+
+  // Hide header in fullscreen mode
+  if (isTvFullscreen) {
+    if (onVisibilityChange) {
+      onVisibilityChange(false);
+    }
+    return null;
+  }
+
+  // Notify parent that header is visible
   if (onVisibilityChange) {
     onVisibilityChange(true);
   }

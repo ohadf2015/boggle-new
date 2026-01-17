@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import nextDynamic from 'next/dynamic';
 import { translations } from '@/translations';
 import { Providers } from '../providers';
-import Footer from '@/components/Footer';
+import AutoHideFooter from '@/components/AutoHideFooter';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import { CrazyGamesScript } from '@/components/CrazyGamesSDK';
 import SocialMediaPixels from '@/components/SocialMediaPixels';
@@ -723,11 +723,11 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <WebVitalsReporter />
                 <ServiceWorkerRegistration />
                 <Providers lang={validLocale}>
-                    <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
-                        <main id="main-content" className="screen-fit-content relative z-10" tabIndex={-1}>
+                    <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden h-full">
+                        <main id="main-content" className="flex-1 flex flex-col min-h-0 h-full relative z-10" tabIndex={-1}>
                             {children}
                         </main>
-                        <Footer className="hidden sm:block relative z-10" />
+                        <AutoHideFooter className="hidden sm:block relative z-10 flex-shrink-0" />
                     </div>
                     <PWAInstallPrompt />
                     <EmailCaptureModal />

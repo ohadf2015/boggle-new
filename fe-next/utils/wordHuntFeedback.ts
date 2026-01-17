@@ -7,6 +7,7 @@
 
 import type { Language } from '@/types';
 import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
+import { findWordPath } from '@/utils/wordPathFinder';
 
 export type FeedbackType = 'green' | 'yellow' | 'gray';
 
@@ -187,14 +188,34 @@ export function getLetterKnowledge(
 
 /**
  * Validate that a word can be formed on the Boggle board
- * This is a placeholder - the actual validation should use the board's path-finding logic
+ * Uses DFS path-finding to verify the word can be traced through adjacent cells
  *
  * @param word - Word to validate
- * @param grid - The letter grid
- * @returns true if word can be formed on board
+ * @param grid - The letter grid (2D array of letters)
+ * @param language - Language for normalization (defaults to 'en')
+ * @returns true if word can be formed on board using adjacent cells
+ *
+ * @example
+ * ```typescript
+ * const grid = [
+ *   ['C', 'A', 'T'],
+ *   ['D', 'O', 'G'],
+ *   ['X', 'Y', 'Z']
+ * ];
+ * canFormWordOnBoard('CAT', grid); // true - C→A→T are adjacent
+ * canFormWordOnBoard('COG', grid); // false - C and O are not adjacent
+ * ```
  */
-export function canFormWordOnBoard(word: string, grid: string[][]): boolean {
-  // TODO: Integrate with existing board path-finding logic from GridComponent
-  // For now, return true - actual validation will be done by the game component
-  return true;
+export function canFormWordOnBoard(
+  word: string,
+  grid: string[][],
+  language: Language = 'en'
+): boolean {
+  // Handle edge cases
+  if (!word || word.length === 0) return false;
+  if (!grid || grid.length === 0 || !grid[0] || grid[0].length === 0) return false;
+
+  // Use the existing path-finding algorithm
+  const path = findWordPath(word, grid, language);
+  return path !== null;
 }

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Medal, Bot, BarChart3, Crown, Award, Hash, TrendingUp } from 'lucide-react';
+import { Trophy, Medal, Bot, BarChart3, Crown, Award, Hash, TrendingUp, Globe } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import PlayerInsights from '@/components/results/PlayerInsights';
 import PlayerArchetypeBadge from '@/components/results/PlayerArchetypeBadge';
@@ -84,6 +84,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const { awardGameCompletion } = useCoinContext();
   const isLandscape = useMobileLandscape();
   const [showSignupModal, setShowSignupModal] = useState(false);
+  const [globalRank, setGlobalRank] = useState<number | null>(null);
+  const hasFetchedGlobalRankRef = useRef(false);
 
   // Map SinglePlayerMode to NextStepMode for progression prompts
   // 'practice' -> suggests bots, 'solo-bots'/'challenge' -> suggests daily
@@ -268,6 +270,37 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     syncToLeaderboard();
     hasSyncedLeaderboardRef.current = true;
   }, [isAuthenticated, results, hasUpdatedStatsRef]);
+
+  // Fetch global rank after leaderboard sync (for guests only)
+  useEffect(() => {
+    if (isAuthenticated || hasFetchedGlobalRankRef.current) return;
+    if (!hasSyncedLeaderboardRef.current) return; // Wait for leaderboard sync first
+
+    const fetchGlobalRank = async () => {
+      try {
+        const guestFingerprint = getGuestSessionId();
+        if (!guestFingerprint) return;
+
+        const response = await fetch(`/api/single-player/stats/${encodeURIComponent(guestFingerprint)}`);
+
+        if (!response.ok) {
+          console.warn('[SinglePlayerResults] Failed to fetch global rank:', response.status);
+          return;
+        }
+
+        const data = await response.json();
+        if (data.rank) {
+          setGlobalRank(data.rank);
+          console.log('[SinglePlayerResults] Global rank fetched:', data.rank);
+        }
+      } catch (error) {
+        console.error('[SinglePlayerResults] Failed to fetch global rank:', error);
+      }
+    };
+
+    fetchGlobalRank();
+    hasFetchedGlobalRankRef.current = true;
+  }, [isAuthenticated, hasSyncedLeaderboardRef]);
 
   // Save achievements to profile for authenticated users
   useEffect(() => {
@@ -785,6 +818,24 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         currentScore={results.playerScore}
       />
 
+      {/* Global Rank Badge - shows player's position on the global leaderboard */}
+      {globalRank && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3 }}
+          className="flex items-center justify-center"
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-cyan/50 bg-neo-cyan/10">
+            <Globe className="w-4 h-4 text-neo-cyan" />
+            <span className="text-sm font-bold text-neo-white">
+              {t('leaderboard.globalRank') || 'Global Rank'}:
+            </span>
+            <span className="text-lg font-black text-neo-cyan">#{globalRank}</span>
+          </div>
+        </motion.div>
+      )}
+
       {/* Bonus Badges */}
       <BonusBadgesRow
         comboBonus={totalComboBonus}
@@ -1063,6 +1114,24 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               brainPointsReward={brainPointsReward}
               currentScore={results.playerScore}
             />
+
+            {/* Global Rank Badge - shows player's position on the global leaderboard */}
+            {globalRank && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 }}
+                className="flex items-center justify-center"
+              >
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-neo border-2 border-neo-cyan/50 bg-neo-cyan/10">
+                  <Globe className="w-4 h-4 text-neo-cyan" />
+                  <span className="text-sm font-bold text-neo-white">
+                    {t('leaderboard.globalRank') || 'Global Rank'}:
+                  </span>
+                  <span className="text-lg font-black text-neo-cyan">#{globalRank}</span>
+                </div>
+              </motion.div>
+            )}
 
             {/* Bonus Badges */}
             <BonusBadgesRow comboBonus={totalComboBonus} fireRoundBonus={totalFireRoundBonus} />

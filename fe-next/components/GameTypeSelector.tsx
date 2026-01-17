@@ -1,6 +1,6 @@
 import { useCallback, memo } from 'react';
 import { motion } from 'framer-motion';
-import { Gamepad2, Trophy, Minus, Plus, Lock } from 'lucide-react';
+import { Gamepad2, Trophy, Minus, Plus } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useLanguage } from '../contexts/LanguageContext';
 
@@ -44,7 +44,7 @@ const GameTypeSelector = memo<GameTypeSelectorProps>(({
   }, [setTournamentRounds, tournamentRounds]);
 
   const isRegularSelected = gameType === 'regular';
-  const isTournamentLocked = true; // Tournament is coming soon
+  const isTournamentSelected = gameType === 'tournament';
 
   return (
     <div className="space-y-2">
@@ -74,21 +74,23 @@ const GameTypeSelector = memo<GameTypeSelectorProps>(({
           {t('hostView.regularGame') || 'Regular'}
         </motion.button>
 
-        {/* Tournament Button (Locked) */}
+        {/* Tournament Button */}
         <motion.button
           type="button"
           role="radio"
-          aria-checked={!isRegularSelected && !isTournamentLocked}
-          disabled={isTournamentLocked}
-          onClick={() => handleSelectGameType('tournament', isTournamentLocked)}
+          aria-checked={isTournamentSelected}
+          onClick={() => handleSelectGameType('tournament')}
+          whileHover={{ x: -1, y: -1 }}
+          whileTap={{ x: 1, y: 1 }}
           className={cn(
             "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-neo border-3 border-neo-black transition-all duration-100 font-bold text-sm",
-            "bg-neo-gray/60 text-neo-cream/90 opacity-70 cursor-not-allowed"
+            isTournamentSelected
+              ? "bg-neo-orange text-neo-black shadow-none translate-x-[2px] translate-y-[2px]"
+              : "bg-neo-cream text-neo-black shadow-hard-sm hover:shadow-hard"
           )}
         >
           <Trophy className="text-sm" aria-hidden="true" />
           {t('hostView.tournament') || 'Tournament'}
-          <Lock className="text-xs" aria-hidden="true" />
         </motion.button>
       </div>
 

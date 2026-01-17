@@ -54,6 +54,7 @@ export interface LiveLeaderboardEntry {
 export interface ExtendedLeaderboardPlayer extends LiveLeaderboardEntry {
   presenceStatus?: PresenceStatus;
   isWindowFocused?: boolean;
+  disconnected?: boolean;
 }
 
 // ==================== Tournament Types ====================

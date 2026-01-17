@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Settings, Play, Crown, Bot, Book, Trophy, Target } from 'lucide-react';
+import { ArrowLeft, Settings, Play, Crown, Bot, Book, Trophy, Target, Medal } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { type PresetConfig, getDefaultPreset, getPresetById } from './presetConfig';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import LandscapeIndicator from '@/components/LandscapeIndicator';
+import { LeaderboardModal } from './LeaderboardModal';
 import type { SinglePlayerMode } from './SinglePlayerView';
 
 interface ChallengeInfo {
@@ -71,6 +72,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
 }) => {
   const { t, dir } = useLanguage();
   const isLandscape = useMobileLandscape();
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   // Get the default (middle) preset for a mode and start game directly
   const handleModeSelect = (mode: Exclude<SinglePlayerMode, 'daily'>) => {
@@ -154,6 +156,14 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
               <h1 className="text-xl font-black uppercase text-neo-white flex-1">
                 {t('landing.singlePlayer') || 'Single Player'}
               </h1>
+              {/* Leaderboard button */}
+              <button
+                onClick={() => setShowLeaderboard(true)}
+                className="w-12 h-12 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-neo border-3 border-neo-lime bg-neo-lime/20 shadow-hard hover:shadow-hard-lg hover:bg-neo-lime/30 transition-all"
+                aria-label={t('leaderboard.title') || 'Global Leaderboard'}
+              >
+                <Medal className="w-5 h-5 text-neo-lime" />
+              </button>
             </div>
 
             {/* Quick Play Button - Primary CTA */}
@@ -260,6 +270,12 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
             </motion.div>
           </div>
         </div>
+
+        {/* Global Leaderboard Modal */}
+        <LeaderboardModal
+          open={showLeaderboard}
+          onOpenChange={setShowLeaderboard}
+        />
       </>
     );
   }
@@ -287,6 +303,14 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           <h1 className="text-2xl sm:text-3xl font-black uppercase text-center text-neo-black dark:text-neo-white">
             {t('landing.singlePlayer') || 'Single Player'}
           </h1>
+          {/* Leaderboard button */}
+          <button
+            onClick={() => setShowLeaderboard(true)}
+            className="absolute end-0 flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-lime dark:border-neo-lime/60 bg-neo-lime/20 dark:bg-neo-lime/10 shadow-hard hover:shadow-hard-lg hover:bg-neo-lime/30 transition-all min-h-[44px] min-w-[44px]"
+            aria-label={t('leaderboard.title') || 'Global Leaderboard'}
+          >
+            <Medal className="w-5 h-5 text-neo-lime" />
+          </button>
         </div>
 
         {/* QUICK PLAY - Primary CTA for new players */}
@@ -400,6 +424,12 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           </button>
         </motion.div>
       </motion.div>
+
+      {/* Global Leaderboard Modal */}
+      <LeaderboardModal
+        open={showLeaderboard}
+        onOpenChange={setShowLeaderboard}
+      />
     </>
   );
 };
