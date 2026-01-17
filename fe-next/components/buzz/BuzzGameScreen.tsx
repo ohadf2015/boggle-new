@@ -197,10 +197,14 @@ export default function BuzzGameScreen({
         challengesSolved: answers,
         completionTimeSeconds: totalTime,
       });
+    } else {
+      // Auto-advance to next challenge if not the last one
+      if (currentIndex < challengeData.challenges.length - 1) {
+        setCurrentIndex((prev) => prev + 1);
+      }
     }
-    // Don't auto-navigate - let user swipe to next challenge
     setPendingNextAction(null);
-  }, [pendingNextAction, startTime, challengeData.id, score, answers, onComplete]);
+  }, [pendingNextAction, startTime, challengeData.id, challengeData.challenges.length, score, answers, onComplete, currentIndex]);
 
   // Handle navigation to previous challenge
   const handlePrevChallenge = useCallback(() => {
@@ -217,9 +221,11 @@ export default function BuzzGameScreen({
   }, [currentIndex, challengeData.challenges.length]);
 
   // Bidirectional swipe gesture for mobile navigation
+  // NOTE: useSwipeGesture already handles RTL reversal internally when isRtl=true,
+  // so we map left->next and right->prev as if in LTR mode. The hook will reverse them for RTL.
   const swipeHandlers = useSwipeGesture({
-    onSwipeLeft: dir === 'rtl' ? handlePrevChallenge : handleNextChallenge,
-    onSwipeRight: dir === 'rtl' ? handleNextChallenge : handlePrevChallenge,
+    onSwipeLeft: handleNextChallenge,  // Swipe left = go forward/next
+    onSwipeRight: handlePrevChallenge,  // Swipe right = go backward/previous
     isRtl: dir === 'rtl',
     threshold: 75,
     enableHaptic: true,

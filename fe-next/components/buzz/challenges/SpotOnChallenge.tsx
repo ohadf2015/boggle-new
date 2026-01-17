@@ -38,6 +38,28 @@ export default function SpotOnChallenge({
 
   const options = challenge.options || [];
 
+  // Defensive check: If no options provided, show error state
+  if (options.length === 0) {
+    return (
+      <div className="space-y-6 text-center">
+        <div className="text-4xl mb-4">⚠️</div>
+        <h2 className="text-2xl font-black text-neo-red">
+          {t('buzz.error.noOptions')}
+        </h2>
+        <p className="text-slate-400">
+          {challenge.prompt}
+        </p>
+        <Button
+          onClick={() => onAnswer('')}
+          variant="outline"
+          className="mt-4"
+        >
+          {t('buzz.skip')}
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Challenge Title */}

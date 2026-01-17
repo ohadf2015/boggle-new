@@ -2506,7 +2506,8 @@ const en = {
       "title": "Oops!",
       "loading": "Loading today's buzz...",
       "failed": "Couldn't load buzz. Try again?",
-      "noInternet": "No connection. Check your internet."
+      "noInternet": "No connection. Check your internet.",
+      "noOptions": "No options available"
     },
     "alreadyPlayed": "Already played today! Come back tomorrow.",
     "notAvailable": "Not Available",

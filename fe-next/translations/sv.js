@@ -2424,7 +2424,8 @@ const sv = {
       "title": "Ajdå!",
       "loading": "Laddar dagens buzz...",
       "failed": "Kunde inte ladda. Försök igen?",
-      "noInternet": "Ingen anslutning. Kolla din internetanslutning."
+      "noInternet": "Ingen anslutning. Kolla din internetanslutning.",
+      "noOptions": "Inga alternativ tillgängliga"
     },
     "fillTheBlank": "Fyll i luckan",
     "finish": "KLART",
