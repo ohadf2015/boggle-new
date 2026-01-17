@@ -363,7 +363,7 @@ describe('AdminGiftModal', () => {
 
     it('disables claim button while claiming', async () => {
       // Make onClaim return a pending promise
-      const slowClaim = jest.fn(() => new Promise(() => {}));
+      const slowClaim = jest.fn((_giftId: string): Promise<void> => new Promise(() => {}));
 
       render(
         <AdminGiftModal
