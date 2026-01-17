@@ -1,12 +1,12 @@
 {
   "summary": {
-    "totalKeysInCode": 2193,
+    "totalKeysInCode": 2203,
     "keyCountByLanguage": {
-      "en": 2606,
-      "he": 2606,
-      "sv": 2606,
-      "ja": 2606,
-      "es": 2606
+      "en": 2669,
+      "he": 2669,
+      "sv": 2663,
+      "ja": 2669,
+      "es": 2669
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
@@ -63,6 +63,12 @@
   "missingByLanguage": {
     "he": [],
     "sv": [
+      "nextStep.tryDailyChallenge",
+      "nextStep.tryDailyChallengeDesc",
+      "nextStep.goMultiplayer",
+      "nextStep.goMultiplayerDesc",
+      "nextStep.brainTraining",
+      "nextStep.brainTrainingDesc",
       "daily.nextChallenge.wordHuntTitle",
       "daily.nextChallenge.wordHuntDesc",
       "daily.nextChallenge.wordHuntCTA",

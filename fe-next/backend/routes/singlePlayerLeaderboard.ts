@@ -48,11 +48,11 @@ router.post('/sync-score', async (req: Request, res: Response): Promise<void> =>
 
     const supabase = getSupabase();
 
-    // Check if guest already has a leaderboard entry
+    // Check if guest already has a single-player leaderboard entry
     const { data: existing, error: fetchError } = await supabase
-      .from('leaderboard')
-      .select('player_id, total_score, games_played')
-      .eq('player_id', guestFingerprint)
+      .from('single_player_leaderboard')
+      .select('guest_fingerprint, total_score, games_played, best_score')
+      .eq('guest_fingerprint', guestFingerprint)
       .single();
 
     if (fetchError && fetchError.code !== 'PGRST116') {
@@ -62,20 +62,24 @@ router.post('/sync-score', async (req: Request, res: Response): Promise<void> =>
 
     let updatedScore: number;
     let updatedGames: number;
+    let bestScore: number;
 
     if (existing) {
       // Update existing entry - increment total_score and games_played
       updatedScore = existing.total_score + score;
       updatedGames = existing.games_played + 1;
+      bestScore = Math.max(existing.best_score || 0, score);
 
       const { error: updateError } = await supabase
-        .from('leaderboard')
+        .from('single_player_leaderboard')
         .update({
           total_score: updatedScore,
           games_played: updatedGames,
+          best_score: bestScore,
+          longest_word: longestWord || existing.longest_word,
           updated_at: new Date().toISOString(),
         })
-        .eq('player_id', guestFingerprint);
+        .eq('guest_fingerprint', guestFingerprint);
 
       if (updateError) {
         throw new Error(`Update error: ${updateError.message}`);
@@ -86,18 +90,19 @@ router.post('/sync-score', async (req: Request, res: Response): Promise<void> =>
       // Create new entry for guest
       updatedScore = score;
       updatedGames = 1;
+      bestScore = score;
 
       const { error: insertError } = await supabase
-        .from('leaderboard')
+        .from('single_player_leaderboard')
         .insert({
-          player_id: guestFingerprint,
+          guest_fingerprint: guestFingerprint,
           username,
           avatar_emoji: avatarEmoji,
           avatar_color: avatarColor,
           total_score: updatedScore,
           games_played: updatedGames,
-          games_won: 0,
-          ranked_mmr: 0,
+          best_score: bestScore,
+          longest_word: longestWord,
         });
 
       if (insertError) {
@@ -116,6 +121,122 @@ router.post('/sync-score', async (req: Request, res: Response): Promise<void> =>
     const err = error as Error;
     logger.error('LEADERBOARD_SYNC', `Failed to sync score: ${err.message}`);
     res.status(500).json({ error: 'Failed to sync score to leaderboard' });
+  }
+});
+
+/**
+ * GET /api/single-player/leaderboard
+ * Get top single-player scores
+ */
+router.get('/leaderboard', async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!isSupabaseConfigured()) {
+      res.status(503).json({ error: 'Leaderboard service not available' });
+      return;
+    }
+
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 50));
+    const supabase = getSupabase();
+
+    const { data: leaderboard, error } = await supabase
+      .from('single_player_leaderboard')
+      .select('guest_fingerprint, username, avatar_emoji, avatar_color, total_score, games_played, best_score, longest_word, updated_at')
+      .gt('games_played', 0)
+      .order('total_score', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      throw new Error(`Fetch error: ${error.message}`);
+    }
+
+    // Add rank position
+    interface LeaderboardEntry {
+      guest_fingerprint: string;
+      username: string;
+      avatar_emoji: string;
+      avatar_color: string;
+      total_score: number;
+      games_played: number;
+      best_score: number;
+      longest_word: string | null;
+      updated_at: string;
+    }
+    const rankedLeaderboard = (leaderboard || []).map((entry: LeaderboardEntry, index: number) => ({
+      ...entry,
+      rank: index + 1,
+    }));
+
+    res.json({
+      leaderboard: rankedLeaderboard,
+      count: rankedLeaderboard.length,
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('LEADERBOARD_SYNC', `Failed to fetch leaderboard: ${err.message}`);
+    res.status(500).json({ error: 'Failed to fetch leaderboard' });
+  }
+});
+
+/**
+ * GET /api/single-player/stats/:fingerprint
+ * Get a specific guest's stats
+ */
+router.get('/stats/:fingerprint', async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!isSupabaseConfigured()) {
+      res.status(503).json({ error: 'Leaderboard service not available' });
+      return;
+    }
+
+    const { fingerprint } = req.params;
+    if (!fingerprint) {
+      res.status(400).json({ error: 'Fingerprint is required' });
+      return;
+    }
+
+    const supabase = getSupabase();
+
+    const { data: stats, error } = await supabase
+      .from('single_player_leaderboard')
+      .select('*')
+      .eq('guest_fingerprint', fingerprint)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      throw new Error(`Fetch error: ${error.message}`);
+    }
+
+    if (!stats) {
+      res.json({
+        exists: false,
+        totalScore: 0,
+        gamesPlayed: 0,
+        bestScore: 0,
+      });
+      return;
+    }
+
+    // Get rank
+    const { count } = await supabase
+      .from('single_player_leaderboard')
+      .select('*', { count: 'exact', head: true })
+      .gt('total_score', stats.total_score);
+
+    res.json({
+      exists: true,
+      totalScore: stats.total_score,
+      gamesPlayed: stats.games_played,
+      bestScore: stats.best_score,
+      longestWord: stats.longest_word,
+      username: stats.username,
+      avatarEmoji: stats.avatar_emoji,
+      avatarColor: stats.avatar_color,
+      rank: (count || 0) + 1,
+    });
+  } catch (error) {
+    const err = error as Error;
+    logger.error('LEADERBOARD_SYNC', `Failed to fetch stats: ${err.message}`);
+    res.status(500).json({ error: 'Failed to fetch stats' });
   }
 });
 
