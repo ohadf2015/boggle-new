@@ -2460,7 +2460,8 @@ const es = {
       "title": "¡Ups!",
       "loading": "Cargando el buzz de hoy...",
       "failed": "No se pudo cargar. ¿Intentar de nuevo?",
-      "noInternet": "Sin conexión. Revisa tu internet."
+      "noInternet": "Sin conexión. Revisa tu internet.",
+      "noOptions": "No hay opciones disponibles"
     },
     "alreadyPlayed": "¡Ya jugaste hoy! Vuelve mañana.",
     "badge": "BETA",

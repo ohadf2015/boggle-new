@@ -2,13 +2,13 @@
   "summary": {
     "totalKeysInCode": 2183,
     "keyCountByLanguage": {
-      "en": 2595,
-      "he": 2595,
-      "sv": 2595,
+      "en": 2596,
+      "he": 2596,
+      "sv": 2596,
       "ja": 2595,
       "es": 2595
     },
-    "missingFromEnglish": 1,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 3,
@@ -59,22 +59,16 @@
     "ja": [],
     "es": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "buzz.error.noOptions",
-      "usages": [
-        {
-          "file": "components/buzz/challenges/SpotOnChallenge.tsx",
-          "line": 47
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [],
     "sv": [],
-    "ja": [],
-    "es": []
+    "ja": [
+      "buzz.error.noOptions"
+    ],
+    "es": [
+      "buzz.error.noOptions"
+    ]
   },
   "keysNotInEnglish": {
     "he": [],
