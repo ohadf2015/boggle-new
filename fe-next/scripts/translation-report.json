@@ -1,19 +1,19 @@
 {
   "summary": {
-    "totalKeysInCode": 2216,
+    "totalKeysInCode": 2243,
     "keyCountByLanguage": {
-      "en": 2682,
-      "he": 2682,
-      "sv": 2676,
-      "ja": 2682,
-      "es": 2682
+      "en": 2743,
+      "he": 2743,
+      "sv": 2737,
+      "ja": 2743,
+      "es": 2743
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 3,
       "fallbackUsages": 0,
-      "variableKeys": 1
+      "variableKeys": 3
     }
   },
   "runtimeRisks": {
@@ -48,6 +48,22 @@
         "file": "components/auth/shared/BenefitsList.tsx",
         "line": 42,
         "context": "{t(titleKey)}",
+        "type": "variable_key"
+      },
+      {
+        "pattern": "t(fallbackKey)",
+        "variable": "fallbackKey",
+        "file": "utils/errorMessageMap.ts",
+        "line": 148,
+        "context": "return t(fallbackKey);",
+        "type": "variable_key"
+      },
+      {
+        "pattern": "t(fallbackKey)",
+        "variable": "fallbackKey",
+        "file": "utils/errorMessageMap.ts",
+        "line": 171,
+        "context": "return t(fallbackKey);",
         "type": "variable_key"
       }
     ]

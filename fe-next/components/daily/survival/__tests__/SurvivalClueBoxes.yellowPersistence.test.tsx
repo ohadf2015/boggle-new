@@ -14,7 +14,7 @@ import type { AccumulatedClue } from '../types';
 
 describe('SurvivalClueBoxes - Yellow Letter Persistence', () => {
   const defaultProps = {
-    currentHint: { level: 0, hint: '_ _ _ _ _', revealed: 0 },
+    currentHint: { level: 0, hint: '_ _ _ _ _', revealed: 0, unlockCost: 0 },
     targetWord: 'APPLE',
     attempts: [],
     accumulatedClues: new Map<number, AccumulatedClue>(),

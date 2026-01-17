@@ -1,40 +1,26 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
-
-// Define props interface for motion mock
-interface MotionDivProps extends React.HTMLAttributes<HTMLDivElement> {
-  'data-testid'?: string;
-  drag?: string | boolean;
-  dragConstraints?: object;
-  dragElastic?: number;
-  onDragEnd?: () => void;
-  initial?: object;
-  animate?: object;
-  exit?: object;
-  transition?: object;
-  whileHover?: object;
-  whileTap?: object;
-}
+import type { Language } from '@/types';
 
 // Mock framer-motion to prevent animation issues in tests
 jest.mock('framer-motion', () => {
-  const React = require('react');
+  const ReactModule = require('react');
 
-  const MockMotionDiv = React.forwardRef<HTMLDivElement, MotionDivProps>(
-    function MockMotionDiv(props: MotionDivProps, ref: React.ForwardedRef<HTMLDivElement>) {
+  const MockMotionDiv = ReactModule.forwardRef(
+    function MockMotionDiv(props: Record<string, unknown>, ref: React.ForwardedRef<HTMLDivElement>) {
       const { children, className, 'data-testid': testId, drag, dragConstraints, dragElastic, onDragEnd, initial, animate, exit, transition, whileHover, whileTap, ...rest } = props;
       // Filter out framer-motion specific props
       void drag; void dragConstraints; void dragElastic; void onDragEnd;
       void initial; void animate; void exit; void transition; void whileHover; void whileTap;
-      return React.createElement('div', { ref, className, 'data-testid': testId, ...rest }, children);
+      return ReactModule.createElement('div', { ref, className, 'data-testid': testId, ...rest }, children);
     }
   );
 
-  const MockMotionButton = React.forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
-    function MockMotionButton(props: React.ButtonHTMLAttributes<HTMLButtonElement>, ref: React.ForwardedRef<HTMLButtonElement>) {
+  const MockMotionButton = ReactModule.forwardRef(
+    function MockMotionButton(props: Record<string, unknown>, ref: React.ForwardedRef<HTMLButtonElement>) {
       const { children, className, ...rest } = props;
-      return React.createElement('button', { ref, className, ...rest }, children);
+      return ReactModule.createElement('button', { ref, className, ...rest }, children);
     }
   );
 
@@ -57,7 +43,7 @@ jest.mock('../onboarding/MiniGrid', () => {
 // Import after mocks
 import HowToPlay from '../HowToPlay';
 
-const renderWithLanguage = (ui: React.ReactElement, locale = 'en') => {
+const renderWithLanguage = (ui: React.ReactElement, locale: Language = 'en') => {
   return render(
     <LanguageProvider initialLanguage={locale}>{ui}</LanguageProvider>
   );
