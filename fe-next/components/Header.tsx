@@ -61,6 +61,39 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
         setSelectedGift(null);
     }, []);
 
+    // Auto-show gift modal after 3 seconds when user has unclaimed gifts
+    // Only show once per session (track via sessionStorage)
+    useEffect(() => {
+        const AUTO_SHOW_KEY = 'lexiclash_gift_auto_shown';
+
+        // Don't auto-show if already shown this session
+        if (typeof window !== 'undefined' && sessionStorage.getItem(AUTO_SHOW_KEY)) {
+            return;
+        }
+
+        // Don't auto-show if no gifts or already showing
+        if (gifts.length === 0 || showGiftModal) {
+            return;
+        }
+
+        const unclaimedGift = gifts.find(g => !g.claimed);
+        if (!unclaimedGift) {
+            return;
+        }
+
+        // Auto-show after 3 seconds
+        const timer = setTimeout(() => {
+            setSelectedGift(unclaimedGift);
+            setShowGiftModal(true);
+            // Mark as shown for this session
+            if (typeof window !== 'undefined') {
+                sessionStorage.setItem(AUTO_SHOW_KEY, 'true');
+            }
+        }, 3000);
+
+        return () => clearTimeout(timer);
+    }, [gifts, showGiftModal]);
+
     // Track client-side mounting for portal
     useEffect(() => {
         setMounted(true);

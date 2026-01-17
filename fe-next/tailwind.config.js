@@ -33,6 +33,17 @@ module.exports = {
       'lg': '1024px',
       'xl': '1280px',
       '2xl': '1536px',
+      // CrazyGames platform-specific breakpoints
+      'cg-mobile': '800px',    // CrazyGames mobile landscape minimum
+      'cg-min': '821px',       // CrazyGames desktop minimum (non-fullscreen)
+      'cg-tablet': '1080px',   // CrazyGames tablet landscape
+      // TV/Large display breakpoints
+      'tv': '1920px',          // Standard 1080p TV/monitor
+      'tv-4k': '3840px',       // 4K displays
+      // Height-based breakpoints (for landscape detection)
+      'tall': { 'raw': '(min-height: 800px)' },
+      'short': { 'raw': '(max-height: 600px)' },
+      'desktop-tall': { 'raw': '(min-width: 1024px) and (min-height: 700px)' },
     },
     extend: {
       colors: {

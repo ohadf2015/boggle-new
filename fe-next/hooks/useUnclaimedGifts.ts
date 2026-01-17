@@ -184,10 +184,18 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
     await fetchGifts();
   }, [fetchGifts]);
 
-  // Initial fetch
+  // Initial fetch - when count is loaded and > 0, also fetch full gifts
   useEffect(() => {
     fetchUnclaimedCount();
   }, [fetchUnclaimedCount]);
+
+  // When unclaimed count > 0 and gifts array is empty, fetch full gifts
+  // This ensures gifts are available when user clicks the gift button
+  useEffect(() => {
+    if (unclaimedCount > 0 && gifts.length === 0 && !loading) {
+      fetchGifts();
+    }
+  }, [unclaimedCount, gifts.length, loading, fetchGifts]);
 
   // Poll for new gifts every 5 minutes
   useEffect(() => {

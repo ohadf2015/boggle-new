@@ -33,6 +33,16 @@ export interface GiftFormData {
   xpAmount: number;
   coinAmount: number;
   imageUrl?: string;
+  badgeId?: string;
+}
+
+export interface BadgeOption {
+  id: string;
+  name_key: string;
+  icon: string;
+  image_url: string | null;
+  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+  description_key?: string;
 }
 
 export interface GiftMessage {

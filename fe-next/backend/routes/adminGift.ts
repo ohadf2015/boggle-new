@@ -60,6 +60,7 @@ const sendGiftSchema = z.object({
   xpAmount: z.number().int().min(0).max(10000).default(0),
   coinAmount: z.number().int().min(0).max(10000).default(0),
   imageUrl: z.string().url().max(500).optional().nullable(),
+  badgeId: z.string().max(100).optional().nullable(),
 });
 
 // ==================== Middleware ====================
@@ -139,7 +140,7 @@ router.post('/send', async (req: AdminRequest, res: Response): Promise<void> => 
       return;
     }
 
-    const { recipientIds, title, message, templateType, xpAmount, coinAmount, imageUrl } = validation.data;
+    const { recipientIds, title, message, templateType, xpAmount, coinAmount, imageUrl, badgeId } = validation.data;
 
     if (!adminUser) {
       res.status(401).json({ error: 'Not authenticated', requestId });
@@ -182,6 +183,7 @@ router.post('/send', async (req: AdminRequest, res: Response): Promise<void> => 
       image_url: imageUrl || null,
       xp_amount: xpAmount,
       coin_amount: coinAmount,
+      badge_id: badgeId || null,
     }));
 
     const { data: insertedGifts, error: insertError } = await supabase
@@ -202,6 +204,7 @@ router.post('/send', async (req: AdminRequest, res: Response): Promise<void> => 
       recipientCount: recipientIds.length,
       xpAmount,
       coinAmount,
+      badgeId: badgeId || null,
       templateType: templateType || 'custom',
       requestId,
     }));

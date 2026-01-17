@@ -1,0 +1,436 @@
+/**
+ * Wikipedia Word Processor
+ * Validates and ranks words extracted from Wikipedia for daily challenges
+ */
+
+import type { Language } from '@/shared/types/game';
+
+// Minimum word lengths by language
+const MIN_WORD_LENGTH: Record<Language, number> = {
+  en: 4,
+  he: 4,
+  sv: 4,
+  ja: 2, // Japanese kanji compounds are typically 2-4 characters
+  es: 4,
+  fr: 4,
+  de: 4
+};
+
+// Maximum word lengths by language
+const MAX_WORD_LENGTH: Record<Language, number> = {
+  en: 8,
+  he: 8,
+  sv: 8,
+  ja: 4,
+  es: 8,
+  fr: 8,
+  de: 8
+};
+
+// Character set validators by language
+const CHARACTER_VALIDATORS: Record<Language, RegExp> = {
+  en: /^[A-Z]+$/,
+  he: /^[\u0590-\u05FF]+$/,
+  sv: /^[A-ZÅÄÖ]+$/,
+  ja: /^[\u4E00-\u9FAF\u3040-\u309F\u30A0-\u30FF]+$/,
+  es: /^[A-ZÁÉÍÓÚÜÑ]+$/,
+  fr: /^[A-ZÀÂÇÉÈÊËÎÏÔÙÛÜŸŒÆ]+$/,
+  de: /^[A-ZÄÖÜẞ]+$/
+};
+
+// Overused/common words to penalize (reduces interestingness score)
+const OVERUSED_WORDS: Record<Language, Set<string>> = {
+  en: new Set([
+    'TREE', 'BOOK', 'DOOR', 'HAND', 'FOOT', 'HEAD', 'FACE', 'ROCK', 'SAND',
+    'BIRD', 'FISH', 'STAR', 'MOON', 'RAIN', 'WIND', 'SNOW', 'BOAT', 'GAME',
+    'KING', 'TIME', 'YEAR', 'LIFE', 'WORK', 'PART', 'WORD', 'FACT', 'SIDE'
+  ]),
+  he: new Set([
+    'בית', 'מים', 'אדם', 'דבר', 'עולם', 'יום', 'שנה', 'עבודה'
+  ]),
+  sv: new Set([
+    'HUS', 'DAG', 'ÅR', 'TID', 'MAN', 'BARN', 'LAND'
+  ]),
+  ja: new Set([
+    '日本', '東京', '時間', '仕事'
+  ]),
+  es: new Set([
+    'CASA', 'AGUA', 'VIDA', 'AMOR', 'TIEMPO', 'MUNDO'
+  ]),
+  fr: new Set([
+    'MAISON', 'MONDE', 'TEMPS', 'JOUR', 'NUIT'
+  ]),
+  de: new Set([
+    'HAUS', 'ZEIT', 'JAHR', 'WELT', 'LAND'
+  ])
+};
+
+/**
+ * Result of word validation
+ */
+export interface WordValidationResult {
+  valid: boolean;
+  reason: string;
+  word: string;
+  normalizedWord: string;
+}
+
+/**
+ * Ranked word with interestingness score
+ */
+export interface RankedWord {
+  word: string;
+  score: number;
+  source: string;
+  url?: string;
+}
+
+/**
+ * Validate a word for use in the daily challenge
+ *
+ * @param word - Word to validate
+ * @param language - Language code
+ * @returns Validation result
+ */
+export function validateGameWord(
+  word: string,
+  language: Language
+): WordValidationResult {
+  // Normalize the word
+  const normalizedWord = normalizeWord(word, language);
+
+  // Check minimum length
+  const minLength = MIN_WORD_LENGTH[language];
+  if (normalizedWord.length < minLength) {
+    return {
+      valid: false,
+      reason: `Word must be at least ${minLength} characters`,
+      word,
+      normalizedWord
+    };
+  }
+
+  // Check maximum length
+  const maxLength = MAX_WORD_LENGTH[language];
+  if (normalizedWord.length > maxLength) {
+    return {
+      valid: false,
+      reason: `Word must be at most ${maxLength} characters`,
+      word,
+      normalizedWord
+    };
+  }
+
+  // Check character set
+  const validator = CHARACTER_VALIDATORS[language];
+  if (!validator.test(normalizedWord)) {
+    return {
+      valid: false,
+      reason: 'Word contains invalid characters',
+      word,
+      normalizedWord
+    };
+  }
+
+  // Check for spaces, hyphens, apostrophes (must be single word)
+  if (/[\s\-']/.test(word)) {
+    return {
+      valid: false,
+      reason: 'Word must be a single word without spaces or hyphens',
+      word,
+      normalizedWord
+    };
+  }
+
+  // Check for numbers
+  if (/\d/.test(word)) {
+    return {
+      valid: false,
+      reason: 'Word must not contain numbers',
+      word,
+      normalizedWord
+    };
+  }
+
+  return {
+    valid: true,
+    reason: 'Valid',
+    word,
+    normalizedWord
+  };
+}
+
+/**
+ * Normalize a word for the target language
+ * Converts to uppercase for Latin alphabets, handles special characters
+ *
+ * @param word - Word to normalize
+ * @param language - Language code
+ * @returns Normalized word
+ */
+export function normalizeWord(word: string, language: Language): string {
+  if (language === 'ja') {
+    // Japanese words stay as-is
+    return word.trim();
+  }
+
+  if (language === 'he') {
+    // Hebrew: Normalize final letters to regular forms
+    // Final letters: ך→כ, ם→מ, ן→נ, ף→פ, ץ→צ
+    return word
+      .trim()
+      .replace(/ך/g, 'כ')
+      .replace(/ם/g, 'מ')
+      .replace(/ן/g, 'נ')
+      .replace(/ף/g, 'פ')
+      .replace(/ץ/g, 'צ');
+  }
+
+  // Latin alphabet languages: uppercase and trim
+  return word.trim().toUpperCase();
+}
+
+/**
+ * Calculate interestingness score for a word
+ * Higher scores indicate more interesting/unique words
+ *
+ * @param word - Word to score
+ * @param language - Language code
+ * @param source - Source of the word (tfa, mostread, onthisday)
+ * @returns Score from 0-100
+ */
+export function calculateInterestingnessScore(
+  word: string,
+  language: Language,
+  source: string
+): number {
+  let score = 50; // Base score
+
+  const normalizedWord = normalizeWord(word, language);
+
+  // Source bonus: Featured articles are more curated
+  const sourceBonus: Record<string, number> = {
+    tfa: 20,       // Today's Featured Article - highest quality
+    mostread: 10,  // Popular articles - topical
+    onthisday: 15, // Historical - interesting but varied
+    random: 5      // Random - lower confidence
+  };
+  score += sourceBonus[source] || 0;
+
+  // Character variety bonus: More unique characters = more interesting
+  const uniqueChars = new Set(normalizedWord.split('')).size;
+  const varietyRatio = uniqueChars / normalizedWord.length;
+  score += Math.round(varietyRatio * 15); // Up to +15 points
+
+  // Length bonus: Slightly longer words are often more interesting
+  if (language !== 'ja') {
+    if (normalizedWord.length >= 6) score += 5;
+    if (normalizedWord.length >= 7) score += 5;
+  }
+
+  // Overused penalty: Common words are less interesting
+  const overused = OVERUSED_WORDS[language];
+  if (overused.has(normalizedWord)) {
+    score -= 25;
+  }
+
+  // Double letter penalty (less interesting): BOOK, TREE, etc.
+  const hasDoubleLetters = /(.)\1/.test(normalizedWord);
+  if (hasDoubleLetters) {
+    score -= 5;
+  }
+
+  // Ensure score is within bounds
+  return Math.max(0, Math.min(100, score));
+}
+
+/**
+ * Rank candidate words by interestingness
+ *
+ * @param candidates - Array of candidate words with source info
+ * @param language - Language code
+ * @returns Sorted array of ranked words (highest score first)
+ */
+export function rankWordsByInterest(
+  candidates: Array<{ word: string; source: string; url?: string }>,
+  language: Language
+): RankedWord[] {
+  const ranked: RankedWord[] = [];
+  const seenWords = new Set<string>();
+
+  for (const candidate of candidates) {
+    const validation = validateGameWord(candidate.word, language);
+
+    if (!validation.valid) {
+      continue;
+    }
+
+    // Skip duplicates (case-insensitive)
+    const normalizedWord = validation.normalizedWord;
+    if (seenWords.has(normalizedWord)) {
+      continue;
+    }
+    seenWords.add(normalizedWord);
+
+    const score = calculateInterestingnessScore(
+      candidate.word,
+      language,
+      candidate.source
+    );
+
+    ranked.push({
+      word: normalizedWord,
+      score,
+      source: candidate.source,
+      url: candidate.url
+    });
+  }
+
+  // Sort by score descending
+  ranked.sort((a, b) => b.score - a.score);
+
+  return ranked;
+}
+
+/**
+ * Select the best word from ranked candidates
+ *
+ * @param rankedWords - Array of ranked words
+ * @param excludeWords - Words to exclude (e.g., recently used)
+ * @returns Best word or null if none available
+ */
+export function selectBestWord(
+  rankedWords: RankedWord[],
+  excludeWords: Set<string> = new Set()
+): RankedWord | null {
+  for (const word of rankedWords) {
+    if (!excludeWords.has(word.word)) {
+      return word;
+    }
+  }
+  return null;
+}
+
+/**
+ * Get recently used words to avoid repetition
+ *
+ * @param language - Language code
+ * @param days - Number of days to look back
+ * @returns Set of recently used words
+ */
+export async function getRecentlyUsedWords(
+  language: Language,
+  days: number = 30
+): Promise<Set<string>> {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+
+    const { data, error } = await supabase
+      .from('daily_target_words')
+      .select('target_word')
+      .eq('language', language)
+      .gte('puzzle_date', cutoffDate.toISOString().split('T')[0]);
+
+    if (error) {
+      console.error('[WordProcessor] Error fetching recent words:', error.message);
+      return new Set();
+    }
+
+    return new Set((data || []).map(d => normalizeWord(d.target_word, language)));
+
+  } catch (error) {
+    console.error('[WordProcessor] Error fetching recent words:', error);
+    return new Set();
+  }
+}
+
+/**
+ * Validate a word using AI service (for words not in dictionary)
+ * This is an async check that calls the AI validation service
+ *
+ * @param word - Word to validate
+ * @param language - Language code
+ * @returns Whether the word is valid
+ */
+export async function validateWordWithAI(
+  word: string,
+  language: Language
+): Promise<{ valid: boolean; reason: string }> {
+  try {
+    // Dynamic import to avoid circular dependencies
+    const { gameAIService } = await import('@/lib/ai-service');
+
+    // First try database-only check (fast)
+    const dbResult = await gameAIService.checkDatabaseOnly(word, language);
+    if (dbResult.source === 'database' && dbResult.isValid) {
+      return {
+        valid: true,
+        reason: 'Dictionary validated'
+      };
+    }
+
+    // If not in database, validate with AI and save if valid
+    const result = await gameAIService.validateAndSaveWord(word, language);
+
+    return {
+      valid: result.isValid,
+      reason: result.reason || (result.isValid ? 'AI validated' : 'AI rejected')
+    };
+
+  } catch (error) {
+    console.error('[WordProcessor] AI validation error:', error);
+    // Default to invalid on error to be safe
+    return {
+      valid: false,
+      reason: 'AI validation unavailable'
+    };
+  }
+}
+
+/**
+ * Update validation status of a word candidate in database
+ */
+export async function updateWordValidationStatus(
+  language: Language,
+  word: string,
+  fetchDate: string,
+  status: 'valid' | 'invalid',
+  score?: number
+): Promise<void> {
+  try {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const updateData: Record<string, unknown> = {
+      validation_status: status
+    };
+
+    if (score !== undefined) {
+      updateData.interestingness_score = score;
+    }
+
+    const { error } = await supabase
+      .from('wikipedia_word_candidates')
+      .update(updateData)
+      .eq('language', language)
+      .eq('word', word)
+      .eq('fetch_date', fetchDate);
+
+    if (error) {
+      console.error('[WordProcessor] Error updating validation status:', error.message);
+    }
+
+  } catch (error) {
+    console.error('[WordProcessor] Error updating validation status:', error);
+  }
+}

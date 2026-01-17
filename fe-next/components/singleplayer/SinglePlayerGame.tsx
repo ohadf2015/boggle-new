@@ -21,6 +21,7 @@ import { useComboSystem } from '@/hooks/useComboSystem';
 import { useGameTimer } from '@/hooks/useGameTimer';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
 import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import { useDesktopLayout } from '@/hooks/useDesktopLayout';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
@@ -49,6 +50,7 @@ import type { SinglePlayerGameState, SinglePlayerResultsData, BotOpponent } from
 import type { LetterGrid } from '@/shared/types/game';
 import { NeoLoader } from '@/components/ui/NeoLoader';
 import { useBotSimulation, useSpamDetection } from './game/hooks';
+import { DesktopStatsPanel, DesktopWordList } from './desktop';
 import { getComboBonus as calculateComboBonus } from '@/shared/utils/scoring';
 
 interface SinglePlayerGameProps {
@@ -93,6 +95,9 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   // Use shared hook for consistent landscape detection across multiplayer and single player
   // Only triggers on mobile devices (height <= 600px) to prevent desktop from using landscape layout
   const isLandscape = useMobileLandscape();
+
+  // Desktop layout detection - enables 3-column layout on larger screens
+  const { isDesktop, isTv } = useDesktopLayout();
   const [grid, setGrid] = useState<LetterGrid | null>(null);
   const [foundWords, setFoundWords] = useState<FoundWord[]>([]);
   const [score, setScore] = useState(0);
@@ -737,17 +742,35 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
       // Generate a unique session ID for this game (used for vote tracking)
       const gameSessionId = crypto.randomUUID();
 
-      // Collect bot words for validation modal
-      // Get all unique bot words that are actual words (not fallback format like "word5")
+      // Collect words for validation modal (community voting)
+      // 1. Bot words that are actual dictionary words (not fallback format like "word5")
       const allBotWords = settings.bots.flatMap(bot => {
         const words = botWordsRef.current[bot.id] || [];
         return words.filter(word => !word.match(/^word\d+$/)); // Filter out fallback format
       });
-      // Dedupe and limit to reasonable number for validation
-      const uniqueBotWords = [...new Set(allBotWords)];
+
+      // 2. Player's invalid/pending words (non-dictionary words they submitted)
+      // These need community voting to potentially be added to the dictionary
+      const playerPendingWords = finalWords
+        .filter(w => !w.isValid)
+        .map(w => w.word);
+
+      // Combine both sources: bot words (to validate dictionary quality) + player words (to expand dictionary)
+      const combinedWordsForValidation = [...new Set([...allBotWords, ...playerPendingWords])];
+
       // Randomly select up to 5 words for validation to avoid overwhelming the user
-      const shuffledBotWords = uniqueBotWords.sort(() => Math.random() - 0.5);
-      const botWordsForValidation = shuffledBotWords.slice(0, 5);
+      const shuffledWords = combinedWordsForValidation.sort(() => Math.random() - 0.5);
+      const botWordsForValidation = shuffledWords.slice(0, 5);
+
+      // Log for debugging community word collection
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[SinglePlayerGame] Words for validation:', {
+          botWords: allBotWords.length,
+          playerPendingWords: playerPendingWords.length,
+          combined: combinedWordsForValidation.length,
+          selected: botWordsForValidation.length,
+        });
+      }
 
       const results: SinglePlayerResultsData = {
         playerScore: finalScore,
@@ -1052,10 +1075,12 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     isTypingModeRef.current = keyboardInput.isTypingMode;
   }, [keyboardInput.isTypingMode]);
 
-  // Keyboard shortcuts for landscape mode
+  // Keyboard shortcuts for landscape AND desktop/TV modes
   // Note: Must be after keyboardInput hook to check typing mode
   useEffect(() => {
-    if (!isLandscape || isGameOver) return;
+    // Enable keyboard shortcuts in landscape, desktop, or TV modes
+    const hasKeyboardLayout = isLandscape || isDesktop || isTv;
+    if (!hasKeyboardLayout || isGameOver) return;
 
     const handleKeyPress = (e: KeyboardEvent) => {
       // Don't trigger if user is typing in an input
@@ -1081,7 +1106,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [isLandscape, isGameOver, score, settings.mode, onQuit]);
+  }, [isLandscape, isDesktop, isTv, isGameOver, score, settings.mode, onQuit]);
 
   // Calculate revealable word count
   const revealableWordCount = React.useMemo(() => {
@@ -1504,6 +1529,254 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
         </AdaptiveAnimatePresence>
 
         {/* Screen reader status announcements */}
+        <div className="sr-only" role="status" aria-live="polite">
+          {isPaused && (t('singlePlayer.gamePaused') || 'Game paused')}
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop layout - 3-column design with sidebars
+  // Used on desktop (1024px+) and TV (1920px+) displays
+  if (isDesktop || isTv) {
+    const validWordCount = foundWords.filter(fw => fw.isValid === true).length;
+
+    return (
+      <div className="relative flex h-full min-h-screen w-full overflow-hidden bg-neo-navy">
+        {/* Earthquake Warning Overlay */}
+        <EarthquakeWarning isVisible={earthquakeState === 'warning'} />
+
+        {/* Fire Round Indicator */}
+        <FireRoundIndicator
+          isActive={fireRoundActive}
+          remainingSeconds={fireRoundRemaining}
+        />
+
+        {/* Word Validation Loading Overlay */}
+        <AdaptiveAnimatePresence>
+          {isValidatingWords && (
+            <AdaptiveMotion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 z-50 flex items-center justify-center bg-neo-navy/90 backdrop-blur-sm"
+            >
+              <div className="flex flex-col items-center gap-4 p-6 bg-neo-cream border-4 border-neo-black rounded-neo shadow-hard-lg text-neo-black">
+                <NeoLoader variant="dots" size="md" text={t('singlePlayer.verifyingWords') || 'Verifying words...'} />
+              </div>
+            </AdaptiveMotion.div>
+          )}
+        </AdaptiveAnimatePresence>
+
+        {/* Achievement Progress Tracker */}
+        <AchievementProgressTracker
+          validWordCount={validWordCount}
+          comboLevel={combo.comboLevel}
+          maxCombo={combo.maxCombo}
+          wordLengths={foundWords.filter(fw => fw.isValid === true).map(fw => fw.word.length)}
+          timeSinceStart={settings.timerSeconds - timer.remainingTime}
+          gameDuration={settings.timerSeconds}
+          earnedAchievements={[]}
+          isGameOver={isGameOver}
+        />
+
+        {/* 3-Column Desktop Layout */}
+        <div
+          className="flex w-full h-full gap-4 p-4"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: isTv ? '320px 1fr 320px' : '280px 1fr 280px',
+            gridTemplateRows: '1fr',
+          }}
+        >
+          {/* Left Sidebar - Stats Panel */}
+          <div className="h-full overflow-hidden">
+            <DesktopStatsPanel
+              score={score}
+              remainingTime={timer.remainingTime}
+              totalTime={settings.timerSeconds}
+              comboLevel={combo.comboLevel}
+              maxCombo={combo.maxCombo}
+              wordsFound={validWordCount}
+              totalBoardWords={totalBoardWords}
+              targetHighScore={settings.mode === 'challenge' ? targetHighScore : null}
+              isPracticeMode={settings.mode === 'practice'}
+              comboCoinReward={comboCoinReward}
+              onCoinAnimationComplete={() => setComboCoinReward(null)}
+              t={t}
+            />
+          </div>
+
+          {/* Center - Game Area */}
+          <div className="flex flex-col items-center justify-center h-full min-w-0 gap-3">
+            {/* Header with Quit Button */}
+            <div className="flex items-center justify-between w-full px-2">
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleQuitRequest}
+                className="border-2 border-neo-black shadow-hard-sm hover:shadow-hard active:shadow-none font-bold"
+              >
+                <ArrowLeft className="me-2 rtl:rotate-180" />
+                {t('common.quit') || 'Quit'}
+              </Button>
+
+              {settings.mode === 'practice' ? (
+                <Button
+                  variant="accent"
+                  onClick={handleFinishPractice}
+                  className="min-h-[44px] min-w-[80px] text-sm font-bold"
+                >
+                  {t('singlePlayer.finish') || 'Finish'}
+                </Button>
+              ) : (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setIsPaused(!isPaused)}
+                >
+                  {isPaused ? <Play /> : <Pause />}
+                </Button>
+              )}
+            </div>
+
+            {/* Word Forming Area */}
+            <div className="flex items-center justify-center">
+              <WordFormingArea
+                word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
+                letterCount={keyboardInput.isTypingMode ? keyboardInput.typedWord.length : letterCount}
+                feedback={currentFeedback}
+                compact={false}
+              />
+            </div>
+
+            {/* Game Grid - centered with aspect ratio maintained */}
+            <div
+              className="flex-1 flex items-center justify-center w-full min-h-0"
+              style={{ maxHeight: 'calc(100vh - 200px)' }}
+            >
+              <div className="aspect-square h-full max-w-full">
+                <GridComponent
+                  grid={grid}
+                  interactive={!isPaused}
+                  onWordSubmit={handleWordSubmit}
+                  onPathSubmit={handlePathSubmit}
+                  onWordChange={handleWordChange}
+                  hideWordPreview
+                  hideComboIndicator={true}
+                  comboLevel={combo.comboLevel}
+                  largeText
+                  fireRoundActive={fireRoundActive}
+                  earthquakeShaking={earthquakeState === 'shaking'}
+                  highlightedPath={
+                    shouldShowKeyboardTrails(keyboardInput.isTypingMode, lastWordFoundTimeRef.current, undefined)
+                      ? keyboardInput.highlightedCells
+                      : firstPlayTutorial.tutorialPath
+                        ? firstPlayTutorial.tutorialPath.map(p => ({ row: p.row, col: p.col }))
+                        : revealState.highlightedPath
+                  }
+                  language={settings.language}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Right Sidebar - Word List */}
+          <div className="h-full overflow-hidden">
+            <DesktopWordList
+              foundWords={foundWords}
+              showOnlyValid={true}
+              maxVisible={isTv ? 20 : 15}
+              t={t}
+            />
+          </div>
+        </div>
+
+        {/* Hint Prompt - shows after player hasn't found a word for a while */}
+        <AdaptiveAnimatePresence>
+          {showHintPrompt && !isPaused && !isGameOver && timer.remainingTime > 0 && revealableWordCount > 0 && (
+            <AdaptiveMotion.div
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40"
+            >
+              <AdaptiveMotion.button
+                onClick={async () => {
+                  setShowHintPrompt(false);
+                  await handleReveal();
+                }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                animate={{
+                  scale: [1, 1.02, 1],
+                  boxShadow: [
+                    '6px 6px 0px rgb(var(--neo-black))',
+                    '8px 8px 0px rgb(var(--neo-black))',
+                    '6px 6px 0px rgb(var(--neo-black))'
+                  ]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'easeInOut'
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-neo-pink border-3 border-neo-black text-white hover:bg-neo-pink rounded-neo font-bold text-sm shadow-hard-sm"
+              >
+                <Eye className="w-4 h-4" />
+                <span>{t('singlePlayer.needHint')}</span>
+              </AdaptiveMotion.button>
+            </AdaptiveMotion.div>
+          )}
+        </AdaptiveAnimatePresence>
+
+        {/* Direction Guidance Tooltip */}
+        <DirectionGuidanceTooltip
+          isVisible={directionGuidance.showDirectionGuidance}
+          onDismiss={directionGuidance.dismissDirectionGuidance}
+          t={t}
+        />
+
+        {/* Keyboard Input Hint */}
+        {!isPaused && !isGameOver && (
+          <KeyboardHintTooltip
+            delaySeconds={10}
+            desktopOnly={true}
+            t={t}
+          />
+        )}
+
+        {/* Training Hints - practice mode only */}
+        {settings.mode === 'practice' && (
+          <TrainingHints
+            currentHint={trainingAnalysisCurrentHint}
+            onDismiss={trainingAnalysisDismissHint}
+            trainingComplete={trainingAnalysisHasPassed}
+            otherTooltipVisible={directionGuidance.showDirectionGuidance}
+          />
+        )}
+
+        {/* Skill Unlock Toast */}
+        {settings.mode === 'practice' && (
+          <SkillUnlockToast
+            skillId={trainingJustUnlocked}
+            onDismiss={trainingClearJustUnlocked}
+          />
+        )}
+
+        {/* Quit Confirmation Dialog */}
+        <ConfirmationDialog
+          open={showQuitConfirm}
+          onOpenChange={setShowQuitConfirm}
+          title={t('singlePlayer.quitConfirmTitle') || 'Quit Game?'}
+          description={t('singlePlayer.quitConfirmMessage') || 'You will lose your current progress. Are you sure you want to quit?'}
+          confirmText={t('common.quit') || 'Quit'}
+          cancelText={t('common.cancel') || 'Cancel'}
+          onConfirm={onQuit}
+          variant="danger"
+        />
+
+        {/* Screen reader status */}
         <div className="sr-only" role="status" aria-live="polite">
           {isPaused && (t('singlePlayer.gamePaused') || 'Game paused')}
         </div>

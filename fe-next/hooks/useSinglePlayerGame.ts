@@ -882,13 +882,35 @@ export function useSinglePlayerGame({
 
       const gameSessionId = crypto.randomUUID();
 
+      // Collect words for validation modal (community voting)
+      // 1. Bot words that are actual dictionary words (not fallback format like "word5")
       const allBotWords = settings.bots.flatMap(bot => {
         const words = botWordsRef.current[bot.id] || [];
         return words.filter(word => !word.match(/^word\d+$/));
       });
-      const uniqueBotWords = [...new Set(allBotWords)];
-      const shuffledBotWords = uniqueBotWords.sort(() => Math.random() - 0.5);
-      const botWordsForValidation = shuffledBotWords.slice(0, 5);
+
+      // 2. Player's invalid/pending words (non-dictionary words they submitted)
+      // These need community voting to potentially be added to the dictionary
+      const playerPendingWords = finalWords
+        .filter(w => !w.isValid)
+        .map(w => w.word);
+
+      // Combine both sources: bot words (to validate dictionary quality) + player words (to expand dictionary)
+      const combinedWordsForValidation = [...new Set([...allBotWords, ...playerPendingWords])];
+
+      // Randomly select up to 5 words for validation
+      const shuffledWords = combinedWordsForValidation.sort(() => Math.random() - 0.5);
+      const botWordsForValidation = shuffledWords.slice(0, 5);
+
+      // Log for debugging community word collection
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[useSinglePlayerGame] Words for validation:', {
+          botWords: allBotWords.length,
+          playerPendingWords: playerPendingWords.length,
+          combined: combinedWordsForValidation.length,
+          selected: botWordsForValidation.length,
+        });
+      }
 
       const results: SinglePlayerResultsData = {
         playerScore: finalScore,

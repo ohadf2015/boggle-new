@@ -22,18 +22,18 @@ import { useLanguage } from '@/contexts/LanguageContext';
  */
 function useContainerDimensions() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isReady, setIsReady] = useState(false);
+  const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
 
   useEffect(() => {
     const checkDimensions = () => {
       if (containerRef.current) {
         const { clientWidth, clientHeight } = containerRef.current;
-        // Only mark as ready if dimensions are valid (> 0 and not -1)
-        if (clientWidth > 0 && clientHeight > 0) {
-          setIsReady(true);
+        // Only mark as ready if dimensions are valid (>= 100 for minimum usable chart)
+        if (clientWidth >= 100 && clientHeight >= 100) {
+          setDimensions({ width: clientWidth, height: clientHeight });
         } else {
-          // Reset to false if dimensions become invalid
-          setIsReady(false);
+          // Reset if dimensions become too small
+          setDimensions(null);
         }
       }
     };
@@ -50,8 +50,8 @@ function useContainerDimensions() {
       observer.observe(containerRef.current);
     }
 
-    // Add polling as fallback for edge cases
-    const pollInterval = setInterval(checkDimensions, 100);
+    // Add polling as fallback for edge cases (reduced frequency)
+    const pollInterval = setInterval(checkDimensions, 250);
 
     return () => {
       cancelAnimationFrame(frameId);
@@ -60,7 +60,7 @@ function useContainerDimensions() {
     };
   }, []);
 
-  return { containerRef, isReady };
+  return { containerRef, dimensions, isReady: dimensions !== null };
 }
 
 interface CognitiveRadarChartProps {
@@ -102,7 +102,7 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
   const isDarkMode = theme === 'dark';
 
   // Track container dimensions to prevent Recharts rendering with invalid size
-  const { containerRef, isReady } = useContainerDimensions();
+  const { containerRef, dimensions, isReady } = useContainerDimensions();
 
   // Transform data for recharts
   const chartData = [
@@ -184,8 +184,8 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
 
       {/* Radar Chart */}
       <div ref={containerRef} className="relative z-10 w-full h-[280px] sm:h-[320px] min-h-[280px]">
-        {isReady ? (
-        <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100}>
+        {isReady && dimensions ? (
+        <ResponsiveContainer width={dimensions.width} height={dimensions.height} minWidth={100} minHeight={100}>
           <RadarChart data={chartData}>
             <defs>
               <linearGradient id="radarGradient" x1="0" y1="0" x2="0" y2="1">

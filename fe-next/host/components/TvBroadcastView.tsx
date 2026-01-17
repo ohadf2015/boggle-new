@@ -14,6 +14,7 @@ import { useTvPlayerCombos } from '../hooks/useTvPlayerCombos';
 import { useTvNotifications } from '../hooks/useTvNotifications';
 import { useTvSounds } from '../hooks/useTvSounds';
 import { useTvFullscreen } from '../hooks/useTvFullscreen';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import type { Language, LetterGrid, Avatar as AvatarType } from '@/shared/types/game';
 import type { EarthquakeState } from '@/shared/types/earthquake';
 
@@ -88,10 +89,16 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   fireRoundActive = false,
   fireRoundRemaining = 0,
 }) => {
-  // Fullscreen mode
+  // CrazyGames platform detection - fullscreen is managed by CrazyGames, not us
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
+
+  // Fullscreen mode - disabled on CrazyGames (they handle fullscreen)
   const { isFullscreen, toggleFullscreen, isSupported: isFullscreenSupported } = useTvFullscreen({
-    enabled: true,
+    enabled: !isOnCrazyGamesPlatform, // Disable on CrazyGames
   });
+
+  // Show fullscreen button only when: supported AND not on CrazyGames platform
+  const showFullscreenButton = isFullscreenSupported && !isOnCrazyGamesPlatform;
 
   // Tutorial state - show on first visit
   const [showTutorial, setShowTutorial] = useState(false);
@@ -167,8 +174,8 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         {/* Tutorial Help Button */}
         <TvHelpButton onClick={handleShowTutorial} t={t} />
 
-        {/* Fullscreen Toggle Button */}
-        {isFullscreenSupported && (
+        {/* Fullscreen Toggle Button - Hidden on CrazyGames (they manage fullscreen) */}
+        {showFullscreenButton && (
           <motion.button
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}

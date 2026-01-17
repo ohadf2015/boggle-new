@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { Send, ArrowLeft, ArrowRight, Gift, Sparkles, Coins } from 'lucide-react';
+import Image from 'next/image';
+import { Send, ArrowLeft, ArrowRight, Gift, Sparkles, Coins, Award } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,7 @@ import toast from 'react-hot-toast';
 import { PlayerSelector } from './PlayerSelector';
 import { GiftTemplateSelector } from './GiftTemplateSelector';
 import { RewardAmountInput } from './RewardAmountInput';
+import { BadgeSelector } from './BadgeSelector';
 import {
   GIFT_TEMPLATES,
   MAX_MESSAGE_LENGTH,
@@ -26,6 +28,7 @@ import {
   type GiftTemplateType,
   type GiftTemplate,
   type GiftFormData,
+  type BadgeOption,
 } from './types';
 
 interface PlayerGiftDialogProps {
@@ -36,9 +39,9 @@ interface PlayerGiftDialogProps {
   onSuccess?: () => void;
 }
 
-type Step = 'players' | 'template' | 'message' | 'rewards' | 'preview';
+type Step = 'players' | 'template' | 'message' | 'rewards' | 'badge' | 'preview';
 
-const STEPS: Step[] = ['players', 'template', 'message', 'rewards', 'preview'];
+const STEPS: Step[] = ['players', 'template', 'message', 'rewards', 'badge', 'preview'];
 
 export function PlayerGiftDialog({
   open,
@@ -57,6 +60,8 @@ export function PlayerGiftDialog({
   const [message, setMessage] = useState('');
   const [xpAmount, setXpAmount] = useState(0);
   const [coinAmount, setCoinAmount] = useState(0);
+  const [selectedBadgeId, setSelectedBadgeId] = useState<string | null>(null);
+  const [selectedBadge, setSelectedBadge] = useState<BadgeOption | null>(null);
 
   const currentStepIndex = STEPS.indexOf(currentStep);
 
@@ -94,6 +99,8 @@ export function PlayerGiftDialog({
         return title.trim().length > 0 && message.trim().length > 0;
       case 'rewards':
         return xpAmount >= 0 && coinAmount >= 0;
+      case 'badge':
+        return true; // Badge is optional
       case 'preview':
         return true;
       default:
@@ -114,6 +121,7 @@ export function PlayerGiftDialog({
         templateType,
         xpAmount,
         coinAmount,
+        badgeId: selectedBadgeId || undefined,
       };
 
       const response = await fetch('/api/admin/gift/send', {
@@ -140,6 +148,8 @@ export function PlayerGiftDialog({
       setMessage('');
       setXpAmount(0);
       setCoinAmount(0);
+      setSelectedBadgeId(null);
+      setSelectedBadge(null);
       setCurrentStep('players');
 
       onOpenChange(false);
@@ -224,6 +234,23 @@ export function PlayerGiftDialog({
           </div>
         );
 
+      case 'badge':
+        return (
+          <div className="space-y-4">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Optionally attach a unique badge to this gift. The badge will be added to the player&apos;s collection when they claim the gift.
+            </p>
+            <BadgeSelector
+              authToken={authToken}
+              selectedBadgeId={selectedBadgeId}
+              onSelect={(badgeId, badge) => {
+                setSelectedBadgeId(badgeId);
+                setSelectedBadge(badge || null);
+              }}
+            />
+          </div>
+        );
+
       case 'preview':
         return (
           <div className="space-y-4">
@@ -244,10 +271,10 @@ export function PlayerGiftDialog({
                 </p>
 
                 {/* Rewards */}
-                {(xpAmount > 0 || coinAmount > 0) && (
+                {(xpAmount > 0 || coinAmount > 0 || selectedBadge) && (
                   <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
                     <p className="text-xs text-slate-500 mb-2">Rewards:</p>
-                    <div className="flex gap-4">
+                    <div className="flex flex-wrap gap-4">
                       {xpAmount > 0 && (
                         <div className="flex items-center gap-1.5 text-purple-600 dark:text-purple-400">
                           <Sparkles className="w-4 h-4" />
@@ -260,6 +287,25 @@ export function PlayerGiftDialog({
                           <Coins className="w-4 h-4" />
                           <span className="font-bold">{coinAmount.toLocaleString()}</span>
                           <span className="text-xs">Coins</span>
+                        </div>
+                      )}
+                      {selectedBadge && (
+                        <div className="flex items-center gap-1.5 text-cyan-600 dark:text-cyan-400">
+                          {selectedBadge.image_url ? (
+                            <Image
+                              src={selectedBadge.image_url}
+                              alt={selectedBadge.name_key.split('.').pop()?.replace(/_/g, ' ') || 'Badge'}
+                              width={20}
+                              height={20}
+                              className="object-contain"
+                            />
+                          ) : (
+                            <Award className="w-4 h-4" />
+                          )}
+                          <span className="font-bold capitalize">
+                            {selectedBadge.name_key.split('.').pop()?.replace(/_/g, ' ')}
+                          </span>
+                          <span className="text-xs capitalize">({selectedBadge.rarity})</span>
                         </div>
                       )}
                     </div>
@@ -290,6 +336,8 @@ export function PlayerGiftDialog({
         return 'Write Message';
       case 'rewards':
         return 'Set Rewards';
+      case 'badge':
+        return 'Attach Badge';
       case 'preview':
         return 'Preview & Send';
       default:
