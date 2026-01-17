@@ -2136,6 +2136,7 @@ const ja = {
     "signInToUnlock": "ログインして解除",
     "openRooms": "部屋が開放中",
     "playersLive": "プレイ中",
+    "playingNow": "プレイ中",
     "tutorial": "チュートリアル"
   },
   "modeDiscovery": {

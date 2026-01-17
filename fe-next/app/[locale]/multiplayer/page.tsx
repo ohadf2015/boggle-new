@@ -1423,7 +1423,7 @@ export default function MultiplayerPage(): React.JSX.Element {
 
       <AutoHideHeader />
       <ErrorBoundary>
-        <div id="main-content" tabIndex={-1}>
+        <div id="main-content" tabIndex={-1} className='w-full'>
           {renderView()}
         </div>
       </ErrorBoundary>

@@ -8,8 +8,10 @@
  */
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Eye, Trophy, BarChart3 } from 'lucide-react';
+import { CoinSpendAnimation } from '@/components/animations/CoinSpendAnimation';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -83,6 +85,16 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [countryCodeReady, setCountryCodeReady] = useState(false);
   const [inlineSignupDismissed, setInlineSignupDismissed] = useState(false);
   const [showCreatePuzzle, setShowCreatePuzzle] = useState(false);
+  const [showSpendAnimation, setShowSpendAnimation] = useState(false);
+  const [spendAnimationPosition, setSpendAnimationPosition] = useState({ x: 0, y: 0 });
+  const [spendAnimationAmount, setSpendAnimationAmount] = useState(0);
+
+  // Handle spend animation trigger
+  const handleSpendStart = useCallback((position: { x: number; y: number }, amount: number) => {
+    setSpendAnimationPosition(position);
+    setSpendAnimationAmount(amount);
+    setShowSpendAnimation(true);
+  }, []);
 
   // Derived values
   const streakMilestone = getStreakMilestone(result.streakDays);
@@ -267,6 +279,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         onRetry={coinActions.handleRetryChallenge}
         canAffordRetry={coinActions.canAffordRetry}
         retryCost={coinActions.retryCost}
+        currentCoins={coinActions.currentCoins}
         onWhatsApp={shareHandlers.handleWhatsApp}
         onTwitter={shareHandlers.handleTwitter}
         onTelegram={shareHandlers.handleTelegram}
@@ -307,6 +320,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
                 gradientFrom="from-neo-pink"
                 gradientTo="to-neo-pink"
                 onClick={coinActions.handleRevealTargetWord}
+                onSpendStart={(pos) => handleSpendStart(pos, coinActions.revealCost)}
                 t={t}
               />
             </div>
@@ -464,6 +478,17 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         onClose={() => setShowCreatePuzzle(false)}
         language={language}
       />
+
+      {/* Spend animation portal */}
+      {typeof document !== 'undefined' && showSpendAnimation && createPortal(
+        <CoinSpendAnimation
+          trigger={showSpendAnimation}
+          position={spendAnimationPosition}
+          amount={spendAnimationAmount}
+          onComplete={() => setShowSpendAnimation(false)}
+        />,
+        document.body
+      )}
     </motion.div>
   );
 };

@@ -1542,7 +1542,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     const validWordCount = foundWords.filter(fw => fw.isValid === true).length;
 
     return (
-      <div className="relative flex h-full min-h-screen w-full overflow-hidden bg-neo-navy">
+      <div className="game-view-container relative flex h-full w-full bg-neo-navy">
         {/* Earthquake Warning Overlay */}
         <EarthquakeWarning isVisible={earthquakeState === 'warning'} />
 
@@ -1582,7 +1582,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
 
         {/* 3-Column Desktop Layout */}
         <div
-          className="flex w-full h-full gap-4 p-4"
+          className="flex w-full h-full max-h-full gap-4 p-4 overflow-hidden"
           style={{
             display: 'grid',
             gridTemplateColumns: isTv ? '320px 1fr 320px' : '280px 1fr 280px',
@@ -1590,7 +1590,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           }}
         >
           {/* Left Sidebar - Stats Panel */}
-          <div className="h-full overflow-hidden">
+          <div className="desktop-stats-panel h-full overflow-hidden">
             <DesktopStatsPanel
               score={score}
               remainingTime={timer.remainingTime}
@@ -1608,7 +1608,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           </div>
 
           {/* Center - Game Area */}
-          <div className="flex flex-col items-center justify-center h-full min-w-0 gap-3">
+          <div className="flex flex-col items-center justify-center h-full min-w-0 min-h-0 gap-3">
             {/* Header with Quit Button */}
             <div className="flex items-center justify-between w-full px-2">
               <Button
@@ -1651,11 +1651,8 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
             </div>
 
             {/* Game Grid - centered with aspect ratio maintained */}
-            <div
-              className="flex-1 flex items-center justify-center w-full min-h-0"
-              style={{ maxHeight: 'calc(100vh - 200px)' }}
-            >
-              <div className="aspect-square h-full max-w-full">
+            <div className="flex-1 flex items-center justify-center w-full min-h-0 max-h-full">
+              <div className="desktop-grid-container aspect-square h-full max-w-full">
                 <GridComponent
                   grid={grid}
                   interactive={!isPaused}
@@ -1682,7 +1679,7 @@ const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
           </div>
 
           {/* Right Sidebar - Word List */}
-          <div className="h-full overflow-hidden">
+          <div className="desktop-words-panel h-full overflow-hidden">
             <DesktopWordList
               foundWords={foundWords}
               showOnlyValid={true}

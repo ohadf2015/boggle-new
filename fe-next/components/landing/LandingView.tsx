@@ -377,7 +377,17 @@ const LandingView: React.FC = () => {
               >
                 <Users className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
                 <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.multiplayer') || 'Multiplayer'}</span>
-                {!isMobilePortrait && (
+                {/* Player count badge - only show when there are active players */}
+                {liveRoomStats.activePlayers > 0 && (
+                  <div className="flex items-center gap-1 bg-neo-lime px-2 py-0.5 rounded-neo border border-neo-black shadow-hard-xs text-xs font-bold">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-black opacity-75" />
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-neo-black" />
+                    </span>
+                    {liveRoomStats.activePlayers} {t('landing.playingNow') || 'playing'}
+                  </div>
+                )}
+                {!isMobilePortrait && liveRoomStats.activePlayers === 0 && (
                   <div className="flex gap-2 text-xs" aria-hidden="true">
                     <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><LayoutGrid className="inline w-3 h-3 mr-1" />Rooms</span>
                     <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Crown className="inline w-3 h-3 mr-1" />Host</span>
@@ -523,6 +533,10 @@ const LandingView: React.FC = () => {
                   totalPlayers: liveRoomStats.totalPlayers,
                   roomsLabel: t('landing.openRooms') || 'open rooms',
                   playersLabel: t('landing.playersLive') || 'playing now',
+                }}
+                playerCount={{
+                  count: liveRoomStats.activePlayers,
+                  label: t('landing.playingNow') || 'playing',
                 }}
               />
               <ModeCard

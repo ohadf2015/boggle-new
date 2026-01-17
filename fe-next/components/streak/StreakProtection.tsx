@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { Button } from '@/components/ui/button';
+import { CoinBalanceBadge } from '@/components/ui/CoinBalanceBadge';
 import {
   useWinStreak,
   STREAK_RECOVERY_COST,
@@ -189,22 +190,30 @@ const StreakProtection: React.FC<StreakProtectionProps> = memo(({
                   {(t('streak.recoverDesc') || 'Your {count}-day streak can be restored!')
                     .replace('{count}', String(recoverableStreak))}
                 </p>
-                <Button
-                  onClick={handleRecoverStreak}
-                  disabled={!canAffordRecovery || isRecovering}
-                  className={cn(
-                    'w-full font-black uppercase text-sm',
-                    canAffordRecovery
-                      ? 'bg-neo-purple hover:bg-neo-purple/90 text-white'
-                      : 'bg-slate-600 text-slate-400 cursor-not-allowed'
-                  )}
-                >
-                  <Coins className="w-4 h-4 me-2" />
-                  {isRecovering
-                    ? (t('common.processing') || 'Processing...')
-                    : (t('streak.recoverFor') || 'Recover for {cost} coins')
-                        .replace('{cost}', String(STREAK_RECOVERY_COST))}
-                </Button>
+                <div className="relative">
+                  <Button
+                    onClick={handleRecoverStreak}
+                    disabled={!canAffordRecovery || isRecovering}
+                    className={cn(
+                      'w-full font-black uppercase text-sm',
+                      canAffordRecovery
+                        ? 'bg-neo-purple hover:bg-neo-purple/90 text-white'
+                        : 'bg-slate-600 text-slate-400 cursor-not-allowed'
+                    )}
+                  >
+                    <Coins className="w-4 h-4 me-2" />
+                    {isRecovering
+                      ? (t('common.processing') || 'Processing...')
+                      : (t('streak.recoverFor') || 'Recover for {cost} coins')
+                          .replace('{cost}', String(STREAK_RECOVERY_COST))}
+                  </Button>
+                  <CoinBalanceBadge
+                    balance={coins}
+                    size="sm"
+                    canAfford={canAffordRecovery}
+                    className="absolute -top-2 end-2"
+                  />
+                </div>
                 {!canAffordRecovery && (
                   <p className="text-xs text-neo-red/70 mt-1 text-center">
                     {t('coins.notEnough') || 'Not enough coins'}

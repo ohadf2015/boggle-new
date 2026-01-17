@@ -17,6 +17,11 @@ export interface LiveBadgeProps {
   playersLabel: string;
 }
 
+interface PlayerCountProps {
+  count: number;
+  label: string;
+}
+
 interface ModeCardProps {
   title: string;
   description: string;
@@ -25,6 +30,8 @@ interface ModeCardProps {
   variant: 'cyan' | 'pink' | 'purple' | 'orange';
   className?: string;
   liveBadge?: LiveBadgeProps;
+  /** Simple player count indicator - shows "X playing now" style badge */
+  playerCount?: PlayerCountProps;
   /** Secondary cards are smaller and less prominent */
   secondary?: boolean;
   /** Shows lock icon and prevents navigation - for features requiring auth */
@@ -49,6 +56,7 @@ const ModeCard: React.FC<ModeCardProps> = ({
   variant,
   className,
   liveBadge,
+  playerCount,
   secondary = false,
   locked = false,
   loading = false,
@@ -268,6 +276,29 @@ const ModeCard: React.FC<ModeCardProps> = ({
               {liveBadge.totalPlayers} {liveBadge.playersLabel}
             </span>
           )}
+        </div>
+      )}
+
+      {/* Simple Player Count Badge - shows when there are players */}
+      {/* Only render when: (1) no liveBadge, or (2) liveBadge thresholds not met */}
+      {/* This ensures small player counts are still shown */}
+      {playerCount && playerCount.count > 0 &&
+        (!liveBadge || (liveBadge.openRooms <= 5 && liveBadge.totalPlayers <= 5)) && (
+        <div
+          className="inline-flex items-center bg-neo-lime text-neo-black font-bold rounded-neo border-2 border-neo-black shadow-hard-sm"
+          style={{
+            gap: 'clamp(0.25rem, 1cqw, 0.5rem)',
+            padding: 'clamp(0.25rem, 1cqw, 0.375rem) clamp(0.5rem, 2cqw, 0.75rem)',
+            fontSize: secondary ? 'clamp(0.625rem, 2.5cqw, 0.75rem)' : 'clamp(0.75rem, 3cqw, 0.875rem)',
+          }}
+        >
+          {/* Animated pulse dot for live indicator */}
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-neo-black opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-black" />
+          </span>
+          <Users style={{ width: 'clamp(0.75rem, 3cqw, 1rem)', height: 'clamp(0.75rem, 3cqw, 1rem)' }} />
+          {playerCount.count} {playerCount.label}
         </div>
       )}
       {/* Premium animated effects */}

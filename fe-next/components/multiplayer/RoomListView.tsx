@@ -254,16 +254,16 @@ const RoomListView: React.FC<RoomListViewProps> = ({
           </motion.div>
         </div>
 
-        {/* How to Play Dialog */}
+        {/* How to Play Dialog - Compact for mobile */}
         <Dialog open={showHowToPlay} onOpenChange={setShowHowToPlay}>
           <DialogContent
             noDescription
-            className="max-w-2xl max-h-[90vh] overflow-hidden p-0 bg-neo-navy border-neo-black/50"
+            className="max-w-md sm:max-w-lg max-h-[85vh] overflow-hidden p-0 bg-neo-navy border-neo-black/50"
           >
             <DialogHeader className="sr-only">
               <DialogTitle>{t('landing.tutorial')}</DialogTitle>
             </DialogHeader>
-            <div className="overflow-y-auto max-h-[85vh]">
+            <div className="overflow-y-auto max-h-[80vh]">
               <HowToPlay onClose={() => setShowHowToPlay(false)} />
             </div>
           </DialogContent>

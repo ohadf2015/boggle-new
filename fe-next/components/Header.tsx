@@ -28,7 +28,7 @@ interface HeaderProps {
  */
 const Header = memo<HeaderProps>(({ className = '' }) => {
     const { t, language, currentFlag } = useLanguage();
-    const { isAuthenticated, isAdmin, profile } = useAuth();
+    const { isAuthenticated, isAdmin, profile, refreshProfile } = useAuth();
     const router = useRouter();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -51,15 +51,28 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     // Handle claiming a gift
     const handleClaimGift = useCallback(async (giftId: string) => {
         await claimGift(giftId);
-        // Refresh to get next unclaimed gift
-        await refreshGifts();
-    }, [claimGift, refreshGifts]);
+        // Refresh to get updated gift list and profile (for updated XP/coins)
+        await Promise.all([
+            refreshGifts(),
+            refreshProfile(),
+        ]);
+    }, [claimGift, refreshGifts, refreshProfile]);
 
-    // Handle dismissing gift modal
+    // Handle dismissing gift modal - show next unclaimed gift if available
     const handleDismissGiftModal = useCallback(() => {
-        setShowGiftModal(false);
-        setSelectedGift(null);
-    }, []);
+        // Find the next unclaimed gift (excluding the currently selected one)
+        const nextUnclaimedGift = gifts.find(g => !g.claimed && g.id !== selectedGift?.id);
+
+        if (nextUnclaimedGift) {
+            // Show the next unclaimed gift
+            setSelectedGift(nextUnclaimedGift);
+            // Modal stays open, just updates the gift
+        } else {
+            // No more unclaimed gifts, close the modal
+            setShowGiftModal(false);
+            setSelectedGift(null);
+        }
+    }, [gifts, selectedGift?.id]);
 
     // Auto-show gift modal after 3 seconds when user has unclaimed gifts
     // Only show once per session (track via sessionStorage)

@@ -2139,6 +2139,7 @@ const en = {
     "signInToUnlock": "Sign in to unlock",
     "openRooms": "rooms",
     "playersLive": "live",
+    "playingNow": "playing",
     "tutorial": "Tutorial"
   },
   "modeDiscovery": {

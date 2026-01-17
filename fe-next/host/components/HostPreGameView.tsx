@@ -301,7 +301,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
   );
 
   return (
-    <div className="h-full flex flex-col bg-neo-navy overflow-hidden lg:max-w-2xl lg:mx-auto">
+    <div className="h-full flex flex-col bg-neo-navy lg:max-w-2xl lg:mx-auto">
       {/* Header - Compact */}
       <header className="flex-shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black">
         <div className="flex items-center justify-between gap-2">
@@ -344,8 +344,8 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
         </AnimatePresence>
       </main>
 
-      {/* Start Game Button - Fixed at bottom */}
-      <div className="flex-shrink-0 px-3 py-2 bg-neo-navy/98 border-t-3 border-neo-black">
+      {/* Start Game Button - Fixed at bottom, mobile only */}
+      <div className="flex-shrink-0 px-3 py-2 bg-neo-navy/98 border-t-3 border-neo-black lg:hidden">
         <Button
           onClick={onStartGame}
           disabled={!timerValue || playersReady.length === 0 || tournamentCreating}
@@ -357,8 +357,8 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
         </Button>
       </div>
 
-      {/* Bottom Tab Bar - 2 Tabs */}
-      <nav className="flex-shrink-0 bg-neo-navy/98 border-t border-neo-black/50 pb-[env(safe-area-inset-bottom)]">
+      {/* Bottom Tab Bar - 2 Tabs, mobile only */}
+      <nav className="flex-shrink-0 bg-neo-navy/98 border-t border-neo-black/50 pb-[env(safe-area-inset-bottom)] lg:hidden">
         <div className="flex items-center h-12">
           {/* Lobby Tab */}
           <button

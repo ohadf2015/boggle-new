@@ -112,8 +112,7 @@ function startGameTimer(io: Server, gameCode: string, timerSeconds: number): voi
   // Clear any existing timer
   timerManager.clearGameTimer(gameCode);
 
-  // OPTIMIZATION: Track last broadcast time to reduce socket messages
-  let lastBroadcastTime = timerSeconds;
+  // Track last broadcast second to avoid duplicate broadcasts
   let lastBroadcastSecond = timerSeconds;
 
   // Create interval for time updates
@@ -126,22 +125,14 @@ function startGameTimer(io: Server, gameCode: string, timerSeconds: number): voi
     // Update remaining time in game state for late joiners
     updateGame(gameCode, { remainingTime });
 
-    // Smart broadcasting to reduce network overhead
-    // Only broadcast when the displayed second changes
+    // Broadcast every second for accurate client timer display
+    // Previous "smart broadcasting" (every 10s) caused player timers to stutter
     const secondChanged = remainingTime !== lastBroadcastSecond;
-    const shouldBroadcast = secondChanged && (
-      remainingTime <= 10 ||
-      remainingTime <= 0 ||
-      (lastBroadcastTime - remainingTime >= 10) ||
-      remainingTime === 60 || remainingTime === 30
-    );
-
-    if (shouldBroadcast) {
+    if (secondChanged) {
       broadcastToRoom(io, getGameRoom(gameCode), 'timeUpdate', {
         remainingTime,
         gameSessionId: game.gameSessionId
       });
-      lastBroadcastTime = remainingTime;
     }
     lastBroadcastSecond = remainingTime;
 

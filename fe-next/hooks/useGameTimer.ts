@@ -238,21 +238,29 @@ export function useGameTimer(options: UseGameTimerOptions): GameTimerReturn {
 
   /**
    * Set remaining time manually (e.g., sync from server)
+   * Syncs the timer state while maintaining smooth animation loop
    */
   const setTime = useCallback((time: number) => {
     const clampedTime = Math.max(0, time);
 
-    // Reset timestamp tracking to match the new time
-    // CRITICAL: If timer is running, reset to current time instead of null
-    // Setting to null would break the animation loop (tick early-exits on null)
+    // Skip if time hasn't changed
+    if (remainingTimeRef.current === clampedTime) {
+      return;
+    }
+
+    // Update displayed time
+    setRemainingTime(clampedTime);
+    remainingTimeRef.current = clampedTime;
+    lastDisplayedSecondRef.current = clampedTime;
+
+    // Reset accumulated time to match the new time
+    // This ensures the animation loop calculates correctly
+    accumulatedTimeRef.current = initialTime - clampedTime;
+
+    // Reset the start timestamp so elapsed calculation starts fresh
     if (startTimestampRef.current !== null) {
       startTimestampRef.current = performance.now();
     }
-    accumulatedTimeRef.current = initialTime - clampedTime;
-    lastDisplayedSecondRef.current = clampedTime;
-
-    setRemainingTime(clampedTime);
-    remainingTimeRef.current = clampedTime;
   }, [initialTime]);
 
   // Cleanup on unmount

@@ -9,6 +9,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Share2, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { CoinBalanceBadge } from '@/components/ui/CoinBalanceBadge';
 import { cn } from '@/lib/utils';
 
 export interface ShareSectionProps {
@@ -17,6 +18,7 @@ export interface ShareSectionProps {
   onRetry: () => void;
   canAffordRetry: boolean;
   retryCost: number;
+  currentCoins: number;
   onWhatsApp: () => void;
   onTwitter: () => void;
   onTelegram: () => void;
@@ -33,6 +35,7 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
   onRetry,
   canAffordRetry,
   retryCost,
+  currentCoins,
   t,
 }) => (
   <motion.div
@@ -44,20 +47,28 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
     {/* Failed players: Retry is primary, Share is secondary */}
     {!solved ? (
       <>
-        <Button
-          onClick={onRetry}
-          disabled={!canAffordRetry}
-          className={cn(
-            "w-full py-3.5 text-lg font-black uppercase border-3 rounded-neo transition-all",
-            canAffordRetry
-              ? "bg-gradient-to-r from-amber-400 to-orange-500 text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5"
-              : "bg-gray-400 text-gray-600 border-neo-black cursor-not-allowed shadow-hard"
-          )}
-        >
-          <RotateCcw className="mr-2 w-5 h-5" />
-          {t('wordHunt.results.retry') || 'Retry'}
-          <span className="ms-2 text-sm opacity-70">({retryCost}🪙)</span>
-        </Button>
+        <div className="relative">
+          <Button
+            onClick={onRetry}
+            disabled={!canAffordRetry}
+            className={cn(
+              "w-full py-3.5 text-lg font-black uppercase border-3 rounded-neo transition-all",
+              canAffordRetry
+                ? "bg-gradient-to-r from-amber-400 to-orange-500 text-neo-black border-neo-black shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5"
+                : "bg-gray-400 text-gray-600 border-neo-black cursor-not-allowed shadow-hard"
+            )}
+          >
+            <RotateCcw className="mr-2 w-5 h-5" />
+            {t('wordHunt.results.retry') || 'Retry'}
+            <span className="ms-2 text-sm opacity-70">({retryCost}🪙)</span>
+          </Button>
+          <CoinBalanceBadge
+            balance={currentCoins}
+            size="sm"
+            canAfford={canAffordRetry}
+            className="absolute -top-2 end-2"
+          />
+        </div>
         <Button
           onClick={onShare}
           variant="ghost"

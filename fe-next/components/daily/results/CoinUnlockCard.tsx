@@ -5,7 +5,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -19,6 +19,8 @@ export interface CoinUnlockCardProps {
   gradientFrom: string;
   gradientTo: string;
   onClick: () => void;
+  /** Optional callback when spend starts - receives position for animation */
+  onSpendStart?: (position: { x: number; y: number }) => void;
   t: (key: string) => string;
 }
 
@@ -31,12 +33,30 @@ export const CoinUnlockCard: React.FC<CoinUnlockCardProps> = ({
   gradientFrom,
   gradientTo,
   onClick,
+  onSpendStart,
   t,
 }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
   const canAffordAction = currentCoins >= cost;
+
+  const handleClick = useCallback(() => {
+    if (!canAffordAction) return;
+
+    // Trigger spend animation if callback provided
+    if (onSpendStart && cardRef.current) {
+      const rect = cardRef.current.getBoundingClientRect();
+      onSpendStart({
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+      });
+    }
+
+    onClick();
+  }, [canAffordAction, onClick, onSpendStart]);
 
   return (
     <motion.div
+      ref={cardRef}
       whileHover={canAffordAction ? { scale: 1.02, y: -2 } : {}}
       whileTap={canAffordAction ? { scale: 0.98 } : {}}
       className={cn(
@@ -45,7 +65,7 @@ export const CoinUnlockCard: React.FC<CoinUnlockCardProps> = ({
           ? `bg-gradient-to-br ${gradientFrom} ${gradientTo} cursor-pointer hover:shadow-hard-lg`
           : "bg-gray-700"
       )}
-      onClick={canAffordAction ? onClick : undefined}
+      onClick={handleClick}
     >
       {/* Cost badge */}
       <div className="absolute top-2 end-2 flex items-center gap-1 px-2.5 py-1 bg-neo-lime rounded-full border-2 border-neo-black shadow-hard-sm text-neo-black">

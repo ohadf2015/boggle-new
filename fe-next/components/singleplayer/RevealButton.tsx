@@ -5,11 +5,13 @@
  * - Additional reveals cost 15 coins
  */
 
-import React, { memo, useState, useEffect, useCallback } from 'react';
+import React, { memo, useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, Star, Coins } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NeoLoader } from '@/components/ui/NeoLoader';
+import { CoinSpendAnimation } from '@/components/animations/CoinSpendAnimation';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { COIN_COSTS, FREE_REVEALS_PER_GAME } from '@/utils/coinManager';
 import type { PathCell } from '@/utils/wordPathFinder';
@@ -32,6 +34,9 @@ const RevealButton = memo<RevealButtonProps>(({
   t,
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
+  const [showSpendAnimation, setShowSpendAnimation] = useState(false);
+  const [spendAnimationPosition, setSpendAnimationPosition] = useState({ x: 0, y: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const { coins, spendCoins, canAfford } = useCoinContext();
 
   const freeRevealsRemaining = Math.max(0, FREE_REVEALS_PER_GAME - revealsUsed);
@@ -46,10 +51,21 @@ const RevealButton = memo<RevealButtonProps>(({
   const handleClick = async () => {
     if (isDisabled) return;
 
-    // If not free, spend coins first
+    // If not free, spend coins first and show animation
     if (!isFreeReveal) {
+      // Get button position for animation
+      if (buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect();
+        setSpendAnimationPosition({
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2,
+        });
+        setShowSpendAnimation(true);
+      }
+
       const success = await spendCoins(revealCost, 'Word Reveal', { wordLength: '5+' });
       if (!success) {
+        setShowSpendAnimation(false);
         return; // Failed to spend coins
       }
     }
@@ -105,6 +121,7 @@ const RevealButton = memo<RevealButtonProps>(({
     >
       {/* Reveal Button */}
       <Button
+        ref={buttonRef}
         variant="outline"
         size="sm"
         onClick={handleClick}
@@ -186,6 +203,17 @@ const RevealButton = memo<RevealButtonProps>(({
             <span>{coins}</span>
           </div>
         </div>
+      )}
+
+      {/* Spend animation portal */}
+      {typeof document !== 'undefined' && showSpendAnimation && createPortal(
+        <CoinSpendAnimation
+          trigger={showSpendAnimation}
+          position={spendAnimationPosition}
+          amount={revealCost}
+          onComplete={() => setShowSpendAnimation(false)}
+        />,
+        document.body
       )}
     </div>
   );

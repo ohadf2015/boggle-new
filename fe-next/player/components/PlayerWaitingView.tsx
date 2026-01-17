@@ -79,9 +79,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   }, []);
 
   return (
-    <div className="h-full flex flex-col bg-neo-navy overflow-hidden lg:max-w-2xl lg:mx-auto">
+    <div className="h-full flex flex-col bg-neo-navy lg:max-w-2xl lg:mx-auto">
       {/* Compact Header */}
-      <header className="flex-shrink-0 px-3 py-2 bg-slate-800/95 border-b-3 border-neo-black">
+      <header className="flex-shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black">
         <div className="flex items-center justify-between gap-2">
           {/* Room Code - Clickable */}
           <motion.button
@@ -117,7 +117,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 min-h-0 overflow-hidden bg-slate-800/95">
+      <main className="flex-1 min-h-0 overflow-hidden bg-neo-navy/95">
         <AnimatePresence mode="wait">
           {mobileTab === 'players' ? (
             <motion.div
@@ -128,8 +128,8 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
               className="h-full flex flex-col p-3"
             >
               {/* Players List */}
-              <div className="flex-1 min-h-0 bg-slate-700/30 rounded-neo border border-slate-600 overflow-hidden flex flex-col">
-                <div className="flex items-center gap-2 px-2 py-1.5 border-b border-slate-600/50 flex-shrink-0">
+              <div className="flex-1 min-h-0 bg-neo-navy/30 rounded-neo border border-neo-black/50 overflow-hidden flex flex-col">
+                <div className="flex items-center gap-2 px-2 py-1.5 border-b border-neo-black/30 flex-shrink-0">
                   <Users className="w-4 h-4 text-neo-pink" />
                   <span className="text-xs font-bold uppercase text-neo-cream">
                     {t('hostView.playersJoined')} ({playersReady.length})
@@ -202,15 +202,15 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
         </AnimatePresence>
       </main>
 
-      {/* Bottom Tab Bar - 2 Tabs */}
-      <nav className="flex-shrink-0 bg-slate-900/98 border-t-3 border-neo-black pb-[env(safe-area-inset-bottom)]">
+      {/* Bottom Tab Bar - 2 Tabs, mobile only */}
+      <nav className="flex-shrink-0 bg-neo-navy/98 border-t border-neo-black/50 pb-[env(safe-area-inset-bottom)] lg:hidden">
         <div className="flex items-center h-12">
           {/* Players Tab */}
           <button
             onClick={() => setMobileTab('players')}
             className={cn(
               'flex-1 flex flex-col items-center justify-center h-full transition-all',
-              mobileTab === 'players' ? 'text-neo-yellow bg-slate-800/50' : 'text-neo-white/60'
+              mobileTab === 'players' ? 'text-neo-yellow bg-neo-navy-light/50' : 'text-neo-white/60'
             )}
           >
             <div className="relative">
@@ -229,7 +229,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             onClick={handleChatTab}
             className={cn(
               'flex-1 flex flex-col items-center justify-center h-full transition-all',
-              mobileTab === 'chat' ? 'text-neo-yellow bg-slate-800/50' : 'text-neo-white/60'
+              mobileTab === 'chat' ? 'text-neo-yellow bg-neo-navy-light/50' : 'text-neo-white/60'
             )}
           >
             <div className="relative">

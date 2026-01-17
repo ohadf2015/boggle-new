@@ -2130,6 +2130,7 @@ const sv = {
     "signInToUnlock": "Logga in för att låsa upp",
     "openRooms": "öppna rum",
     "playersLive": "spelar nu",
+    "playingNow": "spelar",
     "tutorial": "Handledning"
   },
   "modeDiscovery": {

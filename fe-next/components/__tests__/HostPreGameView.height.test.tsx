@@ -121,7 +121,9 @@ describe('HostPreGameView Height Constraint', () => {
     expect(rootDiv.className).toContain('flex');
     expect(rootDiv.className).toContain('flex-col');
 
-    // Should have overflow hidden to contain content
-    expect(rootDiv.className).toContain('overflow-hidden');
+    // Note: overflow-hidden was intentionally removed from root container
+    // (see bug fix c79cbc70ab2846c98f15bc7c2a00c2e9) - inner containers
+    // handle overflow with overflow-y-auto instead
+    expect(rootDiv.className).not.toContain('overflow-hidden');
   });
 });

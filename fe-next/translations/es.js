@@ -2133,6 +2133,7 @@ const es = {
     "signInToUnlock": "Inicia sesión para desbloquear",
     "openRooms": "salas abiertas",
     "playersLive": "jugando ahora",
+    "playingNow": "jugando",
     "tutorial": "Tutorial"
   },
   "modeDiscovery": {

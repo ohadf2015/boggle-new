@@ -1980,9 +1980,24 @@ body {
    with scroll only when content overflows.
    ==================================== */
 
-/* Full-screen flex container - content stays within viewport */
+/* Full-screen flex container - scrollable when content overflows */
+/* This is the default for pages that may have content exceeding viewport */
 .screen-fit {
-  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100svh; /* Small viewport height for better mobile support */
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Full-screen flex container - LOCKED (no scroll) */
+/* Use for game views that MUST fit within viewport without scrolling */
+.screen-fit-locked {
+  height: 100vh;
+  height: 100svh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -1999,15 +2014,38 @@ body {
 
 /* Screen-fit with header offset (when header takes fixed space) */
 .screen-fit-with-header {
-  height: calc(100dvh - var(--header-height, 60px));
+  height: calc(100vh - var(--header-height, 60px));
+  height: calc(100svh - var(--header-height, 60px));
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
+/* Game view container - scroll-free, fills viewport exactly */
+/* Use for in-game screens that should never scroll */
+.game-view-container {
+  height: 100vh;
+  height: 100svh;
+  max-height: 100vh;
+  max-height: 100svh;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* CrazyGames-specific game view optimizations */
+body.crazygames-embed .game-view-container,
+.crazygames-embed .game-view-container {
+  /* Use 100% instead of dvh when in iframe to prevent issues */
+  height: 100%;
+  max-height: 100%;
+}
+
 /* Alternative: max-height constraint with scroll */
 .max-screen {
-  max-height: 100dvh;
+  max-height: 100vh;
+  max-height: 100svh;
   overflow-y: auto;
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
@@ -2015,26 +2053,29 @@ body {
 
 /* For pages that need to fill screen but allow scroll */
 .fill-screen-scroll {
-  min-height: 100dvh;
-  max-height: 100dvh;
+  min-height: 100vh;
+  min-height: 100svh;
   overflow-y: auto;
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
 }
 
 /* Scrollbar styling for screen-fit containers */
+.screen-fit::-webkit-scrollbar,
 .screen-fit-content::-webkit-scrollbar,
 .max-screen::-webkit-scrollbar,
 .fill-screen-scroll::-webkit-scrollbar {
   width: 6px;
 }
 
+.screen-fit::-webkit-scrollbar-track,
 .screen-fit-content::-webkit-scrollbar-track,
 .max-screen::-webkit-scrollbar-track,
 .fill-screen-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
 
+.screen-fit::-webkit-scrollbar-thumb,
 .screen-fit-content::-webkit-scrollbar-thumb,
 .max-screen::-webkit-scrollbar-thumb,
 .fill-screen-scroll::-webkit-scrollbar-thumb {
@@ -2042,6 +2083,7 @@ body {
   border-radius: 3px;
 }
 
+.screen-fit::-webkit-scrollbar-thumb:hover,
 .screen-fit-content::-webkit-scrollbar-thumb:hover,
 .max-screen::-webkit-scrollbar-thumb:hover,
 .fill-screen-scroll::-webkit-scrollbar-thumb:hover {
@@ -2241,6 +2283,48 @@ body.crazygames-embed {
   user-select: none;
   -webkit-touch-callout: none;
   touch-action: manipulation;
+}
+
+/* CrazyGames desktop optimization - minimum 821x462 viewport */
+/* Targets "tweener" screens: larger than mobile but smaller than full desktop */
+@media (min-width: 821px) and (min-height: 462px) and (max-width: 1023px) {
+  body.crazygames-embed .game-board-frame,
+  .crazygames-embed .game-board-frame {
+    /* Optimized sizing for CrazyGames iframe constraints */
+    width: min(calc(100dvh - 100px), calc(100vw - 420px), 55vmin);
+    height: min(calc(100dvh - 100px), calc(100vw - 420px), 55vmin);
+    max-height: calc(100dvh - 100px);
+    padding: 10px;
+  }
+}
+
+/* CrazyGames small desktop - compact sidebars */
+@media (min-width: 821px) and (min-height: 462px) and (max-width: 1199px) {
+  body.crazygames-embed .desktop-stats-panel,
+  .crazygames-embed .desktop-stats-panel {
+    /* Narrower sidebars for smaller CrazyGames viewports */
+    max-width: 200px;
+    min-width: 180px;
+  }
+
+  body.crazygames-embed .desktop-words-panel,
+  .crazygames-embed .desktop-words-panel {
+    /* Narrower sidebars for smaller CrazyGames viewports */
+    max-width: 220px;
+    min-width: 180px;
+  }
+}
+
+/* CrazyGames very small viewport - ultra compact mode */
+@media (max-height: 550px) and (min-width: 821px) {
+  body.crazygames-embed .game-board-frame,
+  .crazygames-embed .game-board-frame {
+    /* Maximize grid on very short screens */
+    width: min(calc(100dvh - 80px), calc(100vw - 380px), 50vmin);
+    height: min(calc(100dvh - 80px), calc(100vw - 380px), 50vmin);
+    max-height: calc(100dvh - 80px);
+    padding: 8px;
+  }
 }
 
 /* Scrollable areas - allow vertical scroll only */
@@ -3283,6 +3367,23 @@ html.reduce-motion *::after {
 
 .tv-grid-container .game-board-frame {
   /* Override the vmin-based sizing with container-relative sizing */
+  width: 100% !important;
+  height: 100% !important;
+  max-width: min(100%, 100cqh) !important;
+  max-height: min(100%, 100cqw) !important;
+  aspect-ratio: 1 / 1 !important;
+  margin: 0 auto;
+}
+
+/* ==================== Desktop Layout Grid Container ==================== */
+/* Override game-board-frame sizing when inside desktop 3-column layout */
+.desktop-grid-container {
+  /* Container queries for responsive sizing within flex/grid layout */
+  container-type: size;
+}
+
+.desktop-grid-container .game-board-frame {
+  /* Override viewport-based sizing with container-relative sizing */
   width: 100% !important;
   height: 100% !important;
   max-width: min(100%, 100cqh) !important;

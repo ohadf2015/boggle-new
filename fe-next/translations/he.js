@@ -2146,6 +2146,7 @@ const he = {
     "signInToUnlock": "התחבר כדי לפתוח",
     "openRooms": "חדרים פתוחים",
     "playersLive": "משחקים עכשיו",
+    "playingNow": "משחקים",
     "tutorial": "מדריך"
   },
   "modeDiscovery": {

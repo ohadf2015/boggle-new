@@ -89,6 +89,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
               targetWord={targetWord}
               accumulatedClues={accumulatedClues}
               revealedLetters={revealedLetters}
+              attempts={attempts}
             />
           )}
         </AnimatePresence>
@@ -170,6 +171,7 @@ interface HintBoxesProps {
   targetWord: string;
   accumulatedClues: Map<number, AccumulatedClue>;
   revealedLetters: Set<number>;
+  attempts: { word: string; feedback: LetterFeedback[]; timestamp: number }[];
 }
 
 const HintBoxes: React.FC<HintBoxesProps> = ({
@@ -177,9 +179,35 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
   targetWord,
   accumulatedClues,
   revealedLetters,
+  attempts,
 }) => {
   const hintChars = currentHint.hint.split(' ').filter(c => c !== '');
   const wordLength = hintChars.length;
+
+  // Compute persisted letters from attempts (most recent yellow/green at each position)
+  // Priority: green > yellow (from most recent to oldest attempt)
+  const persistedLetters = React.useMemo(() => {
+    const result = new Map<number, { letter: string; type: 'green' | 'yellow' }>();
+
+    // Process attempts in order (older to newer) so newer overwrites older
+    for (const attempt of attempts) {
+      for (const fb of attempt.feedback) {
+        if (fb.feedback === 'green') {
+          // Green always wins at this position
+          result.set(fb.position, { letter: fb.letter.toUpperCase(), type: 'green' });
+        } else if (fb.feedback === 'yellow') {
+          // Yellow only sets if no green exists at this position yet
+          const existing = result.get(fb.position);
+          if (!existing || existing.type !== 'green') {
+            result.set(fb.position, { letter: fb.letter.toUpperCase(), type: 'yellow' });
+          }
+        }
+        // Gray letters don't persist
+      }
+    }
+
+    return result;
+  }, [attempts]);
   const sizeClass = wordLength <= 4
     ? "w-11 h-11 sm:w-12 sm:h-12 text-lg sm:text-xl"
     : wordLength <= 6
@@ -199,29 +227,42 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
     >
       {hintChars.map((char, idx) => {
         const accumulatedClue = accumulatedClues.get(idx);
+        const persistedLetter = persistedLetters.get(idx);
         const isHintRevealed = char !== '_';
         const isShopRevealed = revealedLetters.has(idx);
 
         let displayChar: string;
         let bgClass: string;
+        let clueType: 'green' | 'yellow' | null = null;
 
+        // Priority: green from accumulatedClues > shop revealed > hint revealed > persisted letter > unknown
         if (accumulatedClue) {
           displayChar = accumulatedClue.letter;
+          clueType = accumulatedClue.type;
           bgClass = accumulatedClue.type === 'green'
             ? "bg-green-500 border-green-700 text-neo-black"
             : "bg-yellow-500 border-yellow-600 text-neo-black";
         } else if (isShopRevealed) {
           displayChar = targetWord[idx]?.toUpperCase() || '?';
+          clueType = 'green';
           bgClass = "bg-green-500 border-green-700 text-neo-black";
         } else if (isHintRevealed) {
           displayChar = char;
+          clueType = 'green';
           bgClass = "bg-green-500 border-green-700 text-neo-black";
+        } else if (persistedLetter) {
+          // Show persisted yellow letter from previous guesses
+          displayChar = persistedLetter.letter;
+          clueType = persistedLetter.type;
+          bgClass = persistedLetter.type === 'green'
+            ? "bg-green-500 border-green-700 text-neo-black"
+            : "bg-yellow-500 border-yellow-600 text-neo-black";
         } else {
           displayChar = '?';
           bgClass = "bg-neo-black border-neo-black text-white";
         }
 
-        const isRevealed = !!accumulatedClue || isHintRevealed || isShopRevealed;
+        const isRevealed = !!accumulatedClue || isHintRevealed || isShopRevealed || !!persistedLetter;
 
         return (
           <motion.div
@@ -233,8 +274,8 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
               "flex items-center justify-center border-2 rounded-neo font-bold shadow-hard",
               sizeClass,
               bgClass,
-              isRevealed && accumulatedClue?.type === 'green' && "ring-1 ring-green-300/50",
-              isRevealed && accumulatedClue?.type === 'yellow' && "ring-1 ring-yellow-300/50"
+              isRevealed && clueType === 'green' && "ring-1 ring-green-300/50",
+              isRevealed && clueType === 'yellow' && "ring-1 ring-yellow-300/50"
             )}
           >
             {displayChar}

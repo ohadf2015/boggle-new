@@ -723,8 +723,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <WebVitalsReporter />
                 <ServiceWorkerRegistration />
                 <Providers lang={validLocale}>
-                    <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden h-full">
-                        <main id="main-content" className="flex-1 flex flex-col min-h-0 h-full relative z-10" tabIndex={-1}>
+                    <div className="flex-1 flex flex-col min-h-0 relative h-full">
+                        <main id="main-content" className="flex-1 flex flex-col min-h-0 relative z-10" tabIndex={-1}>
                             {children}
                         </main>
                         <AutoHideFooter className="hidden sm:block relative z-10 flex-shrink-0" />

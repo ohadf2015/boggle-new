@@ -13,6 +13,7 @@ import {
   triggerGameOverCelebration,
   showGameCompleteToast,
 } from '@/shared/utils/gameEventUtils';
+import { createEarthquakeSocketHandlers } from '@/shared/utils/earthquakeSocketHandlers';
 import logger from '@/utils/logger';
 import type { StartGameBroadcast, XpGainedPayload, LevelUpPayload } from '@/shared/types/socket';
 
@@ -135,6 +136,17 @@ export function useHostGameEvents({
     const handler = createRoomClosedDueToInactivityHandler(socket, username, t, intentionalExitRef);
     handler(data);
   }, [socket, username, t, intentionalExitRef]);
+
+  // Memoized earthquake handlers using shared utility
+  const earthquakeHandlers = useMemo(() => createEarthquakeSocketHandlers({
+    setEarthquakeState,
+    setFireRoundActive,
+    setFireRoundRemaining,
+    setTableData,
+    tableDataRef,
+    gameSessionIdRef,
+    role: 'HOST',
+  }), [setEarthquakeState, setFireRoundActive, setFireRoundRemaining, setTableData]);
 
   useEffect(() => {
     if (!socket) return;
@@ -275,64 +287,6 @@ export function useHostGameEvents({
       setLevelUpData(null);
     };
 
-    // Earthquake/Fire Round event handlers
-    const handleEarthquakeWarning = (data: any) => {
-      if (data.gameSessionId !== undefined && data.gameSessionId !== gameSessionIdRef.current) {
-        logger.log('[HOST] Ignoring stale earthquakeWarning from old session');
-        return;
-      }
-      logger.log('[HOST] Earthquake warning received');
-      setEarthquakeState('warning');
-    };
-
-    const handleEarthquakeShake = (data: any) => {
-      if (data.gameSessionId !== undefined && data.gameSessionId !== gameSessionIdRef.current) {
-        logger.log('[HOST] Ignoring stale earthquakeShake from old session');
-        return;
-      }
-      logger.log('[HOST] Earthquake shake received');
-      setEarthquakeState('shaking');
-    };
-
-    const handleFireRoundStart = (data: any) => {
-      if (data.gameSessionId !== undefined && data.gameSessionId !== gameSessionIdRef.current) {
-        logger.log('[HOST] Ignoring stale fireRoundStart from old session');
-        return;
-      }
-      logger.log('[HOST] Fire round started - grid:', data.grid);
-
-      // Update grid with new fire round grid
-      if (data.grid) {
-        setTableData(data.grid);
-        tableDataRef.current = data.grid;
-      }
-
-      setEarthquakeState('fire-round');
-      setFireRoundActive(true);
-      setFireRoundRemaining(data.duration || 15);
-
-      // Start countdown
-      let remaining = data.duration || 15;
-      const countdownInterval = setInterval(() => {
-        remaining -= 1;
-        setFireRoundRemaining(remaining);
-        if (remaining <= 0) {
-          clearInterval(countdownInterval);
-        }
-      }, 1000);
-    };
-
-    const handleFireRoundEnd = (data: any) => {
-      if (data.gameSessionId !== undefined && data.gameSessionId !== gameSessionIdRef.current) {
-        logger.log('[HOST] Ignoring stale fireRoundEnd from old session');
-        return;
-      }
-      logger.log('[HOST] Fire round ended');
-      setEarthquakeState('idle');
-      setFireRoundActive(false);
-      setFireRoundRemaining(0);
-    };
-
     // Register listeners
     socket.on('startGame', handleStartGame);
     socket.on('timeUpdate', handleTimeUpdate);
@@ -340,10 +294,11 @@ export function useHostGameEvents({
     socket.on('validationComplete', handleValidationComplete);
     socket.on('resetGame', handleResetGame);
     socket.on('roomClosedDueToInactivity', handleRoomClosedDueToInactivity);
-    socket.on('earthquakeWarning', handleEarthquakeWarning);
-    socket.on('earthquakeShake', handleEarthquakeShake);
-    socket.on('fireRoundStart', handleFireRoundStart);
-    socket.on('fireRoundEnd', handleFireRoundEnd);
+    // Earthquake handlers from shared utility
+    socket.on('earthquakeWarning', earthquakeHandlers.handleEarthquakeWarning);
+    socket.on('earthquakeShake', earthquakeHandlers.handleEarthquakeShake);
+    socket.on('fireRoundStart', earthquakeHandlers.handleFireRoundStart);
+    socket.on('fireRoundEnd', earthquakeHandlers.handleFireRoundEnd);
 
     return () => {
       socket.off('startGame', handleStartGame);
@@ -352,10 +307,12 @@ export function useHostGameEvents({
       socket.off('validationComplete', handleValidationComplete);
       socket.off('resetGame', handleResetGame);
       socket.off('roomClosedDueToInactivity', handleRoomClosedDueToInactivity);
-      socket.off('earthquakeWarning', handleEarthquakeWarning);
-      socket.off('earthquakeShake', handleEarthquakeShake);
-      socket.off('fireRoundStart', handleFireRoundStart);
-      socket.off('fireRoundEnd', handleFireRoundEnd);
+      // Earthquake handlers cleanup
+      socket.off('earthquakeWarning', earthquakeHandlers.handleEarthquakeWarning);
+      socket.off('earthquakeShake', earthquakeHandlers.handleEarthquakeShake);
+      socket.off('fireRoundStart', earthquakeHandlers.handleFireRoundStart);
+      socket.off('fireRoundEnd', earthquakeHandlers.handleFireRoundEnd);
+      earthquakeHandlers.cleanup();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -378,11 +335,9 @@ export function useHostGameEvents({
     setShufflingGrid,
     setXpGainedData,
     setLevelUpData,
-    setEarthquakeState,
-    setFireRoundActive,
-    setFireRoundRemaining,
     resetComboState,
     handleRoomClosedDueToInactivity,
+    earthquakeHandlers,
     onGameStart,
   ]); // hostPlaying accessed via hostPlayingRef for event handlers
 
