@@ -300,7 +300,9 @@ const es = {
     "dark": "Oscuro",
     "light": "Claro",
     "support": "Soporte y Feedback",
-    "contactDescription": "Preguntas, sugerencias, o solo saludar!"
+    "contactDescription": "Preguntas, sugerencias, o solo saludar!",
+    "changeLanguage": "Cambiar idioma",
+    "moreSettings": "Más ajustes"
   },
   "share": {
     "linkCopied": "¡Link copiado! 🔗",
@@ -1574,7 +1576,10 @@ const es = {
       "mascotTooltip": "¡Haz clic!",
       "funnyMessages": {
         "dontLeaveHanging": "¡Oye! ¡No me dejes colgado! ¡Regístrate y subamos juntos en la tabla!",
-        "joinWordNerds": "¡Únete a los nerds de las palabras! ¡Es más divertido cuando guardas tu progreso!"
+        "joinWordNerds": "¡Únete a los nerds de las palabras! ¡Es más divertido cuando guardas tu progreso!",
+        "scoresTooGood": "¡Tus puntuaciones son demasiado buenas para desaparecer! ¡Guárdalas para siempre!",
+        "streakProtector": "¡Protege tu racha! ¡Regístrate antes de que desaparezca!",
+        "makeMomProud": "¡Haz que mamá esté orgullosa - muestra tus habilidades de palabras en la tabla!"
       }
     },
     "callback": {
@@ -2549,6 +2554,9 @@ const es = {
       "noOptions": "No hay opciones disponibles"
     },
     "alreadyPlayed": "¡Ya jugaste hoy! Vuelve mañana.",
+    "challengeCompleted": "Reto completado",
+    "lockedYourAnswer": "Tu respuesta",
+    "lockedCorrectAnswer": "Respuesta correcta",
     "badge": "BETA",
     "betaPreview": "✨ BETA",
     "breaking": "ÚLTIMA HORA",

@@ -512,9 +512,9 @@ const PerformanceChart: React.FC<PerformanceChartProps> = ({
         )}
 
         {/* Chart - only render ResponsiveContainer when dimensions are valid */}
-        <div ref={containerRef} className={cn('w-full', compact ? 'h-32 min-h-[8rem]' : 'h-48 min-h-[12rem]')}>
+        <div ref={containerRef} className={cn('w-full min-w-[100px]', compact ? 'h-32 min-h-[8rem]' : 'h-48 min-h-[12rem]')}>
           {isReady && dimensions ? (
-          <ResponsiveContainer width={dimensions.width} height={dimensions.height} minWidth={100} minHeight={100}>
+          <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100}>
             <LineChart
               data={chartData}
               margin={{ top: 10, right: 10, left: 0, bottom: 5 }}

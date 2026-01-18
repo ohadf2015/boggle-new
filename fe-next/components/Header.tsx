@@ -14,6 +14,7 @@ import AuthModal from './auth/AuthModal';
 import { GiftNotificationBadge } from './gift/GiftNotificationBadge';
 import { AdminGiftModal } from './gift/AdminGiftModal';
 import { useUnclaimedGifts } from '@/hooks/useUnclaimedGifts';
+import { QuickLanguageSwitcher } from './QuickLanguageSwitcher';
 
 /**
  * Header Props
@@ -344,6 +345,27 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         </button>
                     )}
 
+                    {/* Settings Link - visible for ALL users (guests and authenticated) */}
+                    <Link
+                        href={`/${language}/settings`}
+                        className={cn(
+                            "flex items-center justify-center",
+                            "w-10 h-10",
+                            "bg-neo-cream text-neo-black",
+                            "border-2 border-neo-black",
+                            "rounded-neo shadow-hard-sm",
+                            "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-cyan/30",
+                            "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+                            "transition-all duration-100"
+                        )}
+                        aria-label={t('settings.title') || 'Settings'}
+                    >
+                        <Settings size={20} />
+                    </Link>
+
+                    {/* Quick Language Switcher - visible for ALL users */}
+                    <QuickLanguageSwitcher compact />
+
                     <MusicControls />
                     <AuthButton />
                 </div>
@@ -512,11 +534,23 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                     {/* Divider */}
                                     <div className="h-0.5 bg-neo-black/20 dark:bg-slate-600 rounded-full" />
 
-                                    {/* Settings Link - consolidated settings (language, theme, sound) */}
+                                    {/* Settings Section - Language quick-switch + full settings link */}
                                     <div className="flex flex-col gap-2">
                                         <span className="text-xs font-bold text-neo-black/80 dark:text-slate-300 uppercase tracking-wide">
                                             {t('settings.title') || 'Settings'}
                                         </span>
+
+                                        {/* Quick Language Switcher - for fast language changes */}
+                                        <div className="flex items-center gap-3 px-4 py-3 rounded-neo border-2 border-neo-black dark:border-slate-500 bg-white dark:bg-slate-700">
+                                            <span className="text-sm font-bold text-neo-black dark:text-white">
+                                                {t('settings.language') || 'Language'}
+                                            </span>
+                                            <div className="ms-auto">
+                                                <QuickLanguageSwitcher showLabel />
+                                            </div>
+                                        </div>
+
+                                        {/* Full Settings Link - for theme, sound, accessibility */}
                                         <Link
                                             href={`/${language}/settings`}
                                             onClick={() => setShowMobileMenu(false)}
@@ -527,8 +561,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                             )}
                                         >
                                             <Settings className="w-5 h-5" />
-                                            <span>{t('settings.languageThemeSound') || 'Language, Theme & Sound'}</span>
-                                            <span className="ms-auto text-lg">{currentFlag}</span>
+                                            <span>{t('settings.moreSettings') || 'More Settings'}</span>
                                         </Link>
                                     </div>
 

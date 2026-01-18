@@ -381,7 +381,7 @@ function WordHuntMiniGrid({ isHovered, language }: { isHovered: boolean; languag
   const letters = PREVIEW_LETTERS_BY_LANG[language] || PREVIEW_LETTERS_BY_LANG.en;
 
   return (
-    <div className="relative w-full aspect-square max-h-32 sm:max-h-44 rounded-xl overflow-hidden mb-2 sm:mb-3 border-3 border-neo-black shadow-hard bg-neo-cream">
+    <div className="relative w-full h-full rounded-xl overflow-hidden border-3 border-neo-black shadow-hard bg-neo-cream">
       {/* Animated swipe line - renders BEHIND the grid (z-0) */}
       {isHovered && (
         <svg
@@ -525,7 +525,7 @@ function CompactChallengeCard({
     return (
       <div
         key={previewImageUrl}
-        className="relative w-full aspect-square max-h-32 sm:max-h-44 rounded-xl overflow-hidden mb-2 sm:mb-3 border-3 border-neo-black shadow-hard"
+        className="relative w-full h-full rounded-xl overflow-hidden border-3 border-neo-black shadow-hard"
       >
         <Image
           src={previewImageUrl}
@@ -713,25 +713,27 @@ function CompactChallengeCard({
           <span>{timeModeLabel}</span>
         </motion.div>
 
-        {/* Preview: Custom Grid, Image, or Icon */}
-        {customPreview === 'word-hunt-grid' ? (
-          <WordHuntMiniGrid isHovered={isHovered} language={currentLanguage} />
-        ) : imageElement ? (
-          imageElement
-        ) : (
-          <motion.div
-            whileHover={showEffects ? { scale: 1.1, rotate: 5 } : {}}
-            transition={{ type: 'spring', stiffness: 400 }}
-            className={cn(
-              'flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl mb-2 sm:mb-3',
-              'border-2 border-neo-black shadow-hard-sm',
-              styles.iconBg,
-              styles.text
-            )}
-          >
-            {icon}
-          </motion.div>
-        )}
+        {/* Preview: Custom Grid, Image, or Icon - fixed height container for consistent card heights */}
+        <div className="w-full h-32 sm:h-44 flex items-center justify-center mb-2 sm:mb-3">
+          {customPreview === 'word-hunt-grid' ? (
+            <WordHuntMiniGrid isHovered={isHovered} language={currentLanguage} />
+          ) : imageElement ? (
+            imageElement
+          ) : (
+            <motion.div
+              whileHover={showEffects ? { scale: 1.1, rotate: 5 } : {}}
+              transition={{ type: 'spring', stiffness: 400 }}
+              className={cn(
+                'flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl',
+                'border-2 border-neo-black shadow-hard-sm',
+                styles.iconBg,
+                styles.text
+              )}
+            >
+              {icon}
+            </motion.div>
+          )}
+        </div>
 
         {/* Title */}
         <h2 className={cn('text-lg sm:text-xl font-neo-display font-black mb-0.5 sm:mb-1', styles.text)}>

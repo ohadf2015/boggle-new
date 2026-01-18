@@ -2,7 +2,7 @@
  * Shared types for Daily Buzz Admin components
  */
 
-export type RegenerableField = 'prompt' | 'answer' | 'hint' | 'options' | 'all';
+export type RegenerableField = 'prompt' | 'answer' | 'hint' | 'options' | 'image' | 'all';
 
 export interface BuzzChallengeAdmin {
   type: string;
@@ -91,4 +91,5 @@ export const FIELD_LABELS: Record<RegenerableField, string> = {
   answer: 'Answer',
   hint: 'Hint',
   options: 'Options',
+  image: 'Image Only',
 };

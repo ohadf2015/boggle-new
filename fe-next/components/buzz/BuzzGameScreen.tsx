@@ -14,6 +14,7 @@ import SpotOnChallenge from './challenges/SpotOnChallenge';
 import TrioChallenge from './challenges/TrioChallenge';
 import WordleChallenge from './challenges/WordleChallenge';
 import AnswerFeedbackModal from './AnswerFeedbackModal';
+import CompletedChallengeOverlay from './challenges/CompletedChallengeOverlay';
 import { normalizeWord } from '@/shared/utils/wordNormalization';
 import type { Language } from '@/shared/types/game';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
@@ -267,6 +268,13 @@ export default function BuzzGameScreen({
     onQuit();
   }, [onQuit]);
 
+  // Get the answer record for the current challenge (if it exists)
+  const currentAnswer = useMemo(
+    () => answers.find((a) => a.challengeIndex === currentIndex),
+    [answers, currentIndex]
+  );
+  const isCurrentChallengeAnswered = answeredChallenges.has(currentIndex);
+
   // Render challenge component based on type
   const renderChallenge = () => {
     // Defensive check - should never happen but prevents crashes
@@ -285,22 +293,45 @@ export default function BuzzGameScreen({
       showHint,
     };
 
-    switch (currentChallenge.type) {
-      case 'scrambled':
-        return <ScrambledChallenge {...props} />;
-      case 'fillBlank':
-        return <FillBlankChallenge {...props} />;
-      case 'chain':
-        return <ChainChallenge {...props} />;
-      case 'spotOn':
-        return <SpotOnChallenge {...props} />;
-      case 'trio':
-        return <TrioChallenge {...props} />;
-      case 'wordle':
-        return <WordleChallenge {...props} />;
-      default:
-        return <div>Unknown challenge type</div>;
+    // Render the challenge with locked overlay if already answered
+    const challengeComponent = (() => {
+      switch (currentChallenge.type) {
+        case 'scrambled':
+          return <ScrambledChallenge {...props} />;
+        case 'fillBlank':
+          return <FillBlankChallenge {...props} />;
+        case 'chain':
+          return <ChainChallenge {...props} />;
+        case 'spotOn':
+          return <SpotOnChallenge {...props} />;
+        case 'trio':
+          return <TrioChallenge {...props} />;
+        case 'wordle':
+          return <WordleChallenge {...props} />;
+        default:
+          return <div>Unknown challenge type</div>;
+      }
+    })();
+
+    // If this challenge is already answered, show the locked overlay
+    if (isCurrentChallengeAnswered && currentAnswer) {
+      return (
+        <div className="relative">
+          {/* Render the challenge in the background (blurred/dimmed) */}
+          <div className="opacity-20 pointer-events-none select-none">
+            {challengeComponent}
+          </div>
+          {/* Overlay showing completion status */}
+          <CompletedChallengeOverlay
+            correctAnswer={currentChallenge.answer}
+            userAnswer={currentAnswer.userAnswer}
+            wasCorrect={currentAnswer.correct}
+          />
+        </div>
+      );
     }
+
+    return challengeComponent;
   };
 
   return (

@@ -183,9 +183,9 @@ export default function CognitiveRadarChart({ domains }: CognitiveRadarChartProp
       </div>
 
       {/* Radar Chart */}
-      <div ref={containerRef} className="relative z-10 w-full h-[280px] sm:h-[320px] min-h-[280px]">
+      <div ref={containerRef} className="relative z-10 w-full h-[280px] sm:h-[320px] min-h-[280px] min-w-[100px]">
         {isReady && dimensions ? (
-        <ResponsiveContainer width={dimensions.width} height={dimensions.height} minWidth={100} minHeight={100}>
+        <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100}>
           <RadarChart data={chartData}>
             <defs>
               <linearGradient id="radarGradient" x1="0" y1="0" x2="0" y2="1">

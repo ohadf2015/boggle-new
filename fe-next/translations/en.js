@@ -300,7 +300,9 @@ const en = {
     "dark": "Dark",
     "light": "Light",
     "support": "Support & Feedback",
-    "contactDescription": "Questions, feedback, or just say hi!"
+    "contactDescription": "Questions, feedback, or just say hi!",
+    "changeLanguage": "Change Language",
+    "moreSettings": "More Settings"
   },
   "share": {
     "linkCopied": "Link copied! 🔗",
@@ -1761,7 +1763,10 @@ const en = {
       "mascotTooltip": "Click me!",
       "funnyMessages": {
         "dontLeaveHanging": "Hey! Don't leave me hanging! Sign up and let's climb that leaderboard together!",
-        "joinWordNerds": "Join the word nerds! It's more fun when you're saving your progress!"
+        "joinWordNerds": "Join the word nerds! It's more fun when you're saving your progress!",
+        "scoresTooGood": "Your scores are too good to disappear! Save them forever!",
+        "streakProtector": "Protect that streak! Sign up before it vanishes into thin air!",
+        "makeMomProud": "Make your mom proud - show off your word skills on the leaderboard!"
       }
     },
     "callback": {
@@ -2595,6 +2600,9 @@ const en = {
       "noOptions": "No options available"
     },
     "alreadyPlayed": "Already played today! Come back tomorrow.",
+    "challengeCompleted": "Challenge completed",
+    "lockedYourAnswer": "Your answer",
+    "lockedCorrectAnswer": "Correct answer",
     "notAvailable": "Not Available",
     "unavailableTagline": "Not available for this language yet",
     "requestChallenge": "Request Challenge",

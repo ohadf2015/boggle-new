@@ -109,6 +109,10 @@ export default function DailyBuzzAdminPanel() {
   const [isRemovingImage, setIsRemovingImage] = useState(false);
   const [removeImageError, setRemoveImageError] = useState<string | null>(null);
 
+  // Image regeneration state
+  const [isRegeneratingImage, setIsRegeneratingImage] = useState(false);
+  const [regenerateImageError, setRegenerateImageError] = useState<string | null>(null);
+
   // Success message state
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -295,6 +299,68 @@ export default function DailyBuzzAdminPanel() {
       setRemoveImageError(errorMsg);
     } finally {
       setIsRemovingImage(false);
+    }
+  };
+
+  // Handle regenerating just the image for current challenge
+  const handleRegenerateImage = async () => {
+    if (!challengeData) return;
+
+    setIsRegeneratingImage(true);
+    setRegenerateImageError(null);
+
+    try {
+      const { data: { session } } = await getSession();
+      if (!session?.access_token) {
+        throw new Error('No active session');
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), REGENERATE_TIMEOUT_MS);
+
+      const response = await fetch('/api/admin/buzz/regenerate-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          date: challengeData.puzzle_date,
+          language: challengeData.language,
+        }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to regenerate image');
+      }
+
+      const data = await response.json();
+
+      // Update local state with new image
+      setChallengeData({
+        ...challengeData,
+        image_url: data.data.image_url,
+        image_prompt: data.data.image_prompt,
+        image_category: data.data.image_category,
+      });
+
+      setSuccessMessage(`Image regenerated for ${challengeData.language.toUpperCase()} on ${challengeData.puzzle_date}`);
+      setTimeout(() => setSuccessMessage(null), 5000);
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        setRegenerateImageError(
+          'Request timed out after 80 seconds. The AI model may be overloaded. Please try again in a few minutes.'
+        );
+      } else {
+        const errorMsg = error instanceof Error ? error.message : 'Failed to regenerate image';
+        setRegenerateImageError(errorMsg);
+      }
+    } finally {
+      setIsRegeneratingImage(false);
     }
   };
 
@@ -686,20 +752,49 @@ export default function DailyBuzzAdminPanel() {
                   <div className="bg-slate-900/50 border border-slate-700 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-slate-400">Hero Image</span>
-                      {challengeData.image_url && (
+                      <div className="flex items-center gap-2">
+                        {/* Regenerate Image Button */}
                         <button
-                          onClick={() => {
-                            setRemoveImageDialogOpen(true);
-                            setRemoveImageError(null);
-                          }}
-                          className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 text-xs font-medium transition-colors"
-                          title="Remove image"
+                          onClick={handleRegenerateImage}
+                          disabled={isRegeneratingImage}
+                          className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-neo-cyan/50 text-neo-cyan hover:bg-neo-cyan/10 text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Regenerate image"
                         >
-                          <Trash2 className="w-3 h-3" />
-                          Remove
+                          {isRegeneratingImage ? (
+                            <>
+                              <NeoLoader variant="dots" size="sm" />
+                              Generating...
+                            </>
+                          ) : (
+                            <>
+                              <RefreshCw className="w-3 h-3" />
+                              Regenerate
+                            </>
+                          )}
                         </button>
-                      )}
+                        {/* Remove Image Button */}
+                        {challengeData.image_url && (
+                          <button
+                            onClick={() => {
+                              setRemoveImageDialogOpen(true);
+                              setRemoveImageError(null);
+                            }}
+                            disabled={isRegeneratingImage}
+                            className="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-red-500/50 text-red-400 hover:bg-red-500/10 text-xs font-medium transition-colors disabled:opacity-50"
+                            title="Remove image"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            Remove
+                          </button>
+                        )}
+                      </div>
                     </div>
+                    {/* Regenerate image error */}
+                    {regenerateImageError && (
+                      <div className="p-2 mb-2 bg-red-900/30 border border-red-500 rounded-lg">
+                        <p className="text-xs text-red-400">{regenerateImageError}</p>
+                      </div>
+                    )}
                     {challengeData.image_url ? (
                       <div className="space-y-2">
                         <div className="relative w-full max-w-sm aspect-[4/3]">

@@ -300,7 +300,9 @@ const sv = {
     "dark": "Mörkt",
     "light": "Ljust",
     "support": "Support & Feedback",
-    "contactDescription": "Frågor, feedback, eller bara säg hej!"
+    "contactDescription": "Frågor, feedback, eller bara säg hej!",
+    "changeLanguage": "Byt språk",
+    "moreSettings": "Fler inställningar"
   },
   "share": {
     "linkCopied": "Länk kopierad! 🔗",
@@ -1752,7 +1754,10 @@ const sv = {
       "mascotTooltip": "Klicka på mig!",
       "funnyMessages": {
         "dontLeaveHanging": "Hej! Lämna mig inte hängande! Registrera dig så klättrar vi på topplistan tillsammans!",
-        "joinWordNerds": "Gå med i ordnördarna! Det är roligare när du sparar din framsteg!"
+        "joinWordNerds": "Gå med i ordnördarna! Det är roligare när du sparar din framsteg!",
+        "scoresTooGood": "Dina poäng är för bra för att försvinna! Spara dem för alltid!",
+        "streakProtector": "Skydda din streak! Registrera dig innan den försvinner!",
+        "makeMomProud": "Gör mamma stolt - visa upp dina ordkunskaper på topplistan!"
       }
     },
     "callback": {
@@ -2586,6 +2591,9 @@ const sv = {
       "text": "Daily Buzz: {topic} | {score}/100 | Klarar du det? 🔥"
     },
     "alreadyPlayed": "Redan spelat idag! Kom tillbaka imorgon.",
+    "challengeCompleted": "Utmaning avklarad",
+    "lockedYourAnswer": "Ditt svar",
+    "lockedCorrectAnswer": "Rätt svar",
     "notAvailable": "Ej tillgängligt",
     "unavailableTagline": "Inte tillgängligt för detta språk ännu",
     "requestChallenge": "Begär utmaning",

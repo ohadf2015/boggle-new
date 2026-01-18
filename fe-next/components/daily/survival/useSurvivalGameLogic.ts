@@ -292,10 +292,12 @@ export function useSurvivalGameLogic({
     lifeDrainInterval.stop();
 
     const attemptsToUse = finalAttempts || state.attempts;
+    // Only count target attempts (not discovery attempts) for attemptsUsed
+    const targetAttemptsCount = attemptsToUse.filter(a => !a.isDiscovery).length;
 
     const result: SurvivalGameResult = {
       solved: won,
-      attemptsUsed: attemptsToUse.length,
+      attemptsUsed: targetAttemptsCount,
       targetWord,
       attempts: attemptsToUse,
       wordsDiscovered: state.discoveredWords,
@@ -306,7 +308,7 @@ export function useSurvivalGameLogic({
       efficiencyScore: calculateEfficiencyScore(
         state.lifePoints,
         state.clueTokens,
-        attemptsToUse.length,
+        targetAttemptsCount,
         state.discoveredWords.length,
         won
       ),
@@ -329,7 +331,7 @@ export function useSurvivalGameLogic({
         durationSeconds,
         completed: true,
         targetFound: won,
-        attemptsUsed: attemptsToUse.length,
+        attemptsUsed: targetAttemptsCount,
         lifeRemaining: state.lifePoints,
         lifeGained: state.discoveredWords.reduce((sum, w) => sum + w.lifeGained, 0),
         tokensEarned: state.clueTokens + hintState.tokensSpent,

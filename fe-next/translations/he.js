@@ -300,7 +300,9 @@ const he = {
     "dark": "כהה",
     "light": "בהיר",
     "support": "תמיכה ומשוב",
-    "contactDescription": "שאלות, משוב, או סתם להגיד שלום!"
+    "contactDescription": "שאלות, משוב, או סתם להגיד שלום!",
+    "changeLanguage": "החלף שפה",
+    "moreSettings": "הגדרות נוספות"
   },
   "share": {
     "linkCopied": "הקישור הועתק! 🔗",
@@ -1768,7 +1770,10 @@ const he = {
       "mascotTooltip": "לחץ עליי!",
       "funnyMessages": {
         "dontLeaveHanging": "היי! אל תשאיר אותי כך! הירשם ובוא נטפס יחד בטבלת המובילים!",
-        "joinWordNerds": "הצטרף לחבורת חובבי המילים! זה יותר כיף כשאתה שומר את ההתקדמות שלך!"
+        "joinWordNerds": "הצטרף לחבורת חובבי המילים! זה יותר כיף כשאתה שומר את ההתקדמות שלך!",
+        "scoresTooGood": "הניקוד שלך טוב מדי כדי להיעלם! שמור אותו לנצח!",
+        "streakProtector": "הגן על הרצף שלך! הירשם לפני שהוא נעלם!",
+        "makeMomProud": "תעשה לאמא נחת - הראה את כישורי המילים שלך בטבלת המובילים!"
       }
     },
     "callback": {
@@ -2579,6 +2584,9 @@ const he = {
       "noOptions": "אין אפשרויות זמינות"
     },
     "alreadyPlayed": "כבר שיחקת היום! חזרו מחר.",
+    "challengeCompleted": "האתגר הושלם",
+    "lockedYourAnswer": "התשובה שלך",
+    "lockedCorrectAnswer": "התשובה הנכונה",
     "badge": "BETA",
     "betaPreview": "גרסת ביתא ✨",
     "breaking": "חדשות חמות",

@@ -300,7 +300,9 @@ const ja = {
     "dark": "ダーク",
     "light": "ライト",
     "support": "サポート＆フィードバック",
-    "contactDescription": "質問、フィードバック、またはご挨拶!"
+    "contactDescription": "質問、フィードバック、またはご挨拶!",
+    "changeLanguage": "言語を変更",
+    "moreSettings": "その他の設定"
   },
   "share": {
     "linkCopied": "リンクコピー完了！🔗",
@@ -1758,7 +1760,10 @@ const ja = {
       "mascotTooltip": "クリックして！",
       "funnyMessages": {
         "dontLeaveHanging": "ねえ！置いていかないで！登録して一緒にリーダーボードを登ろう！",
-        "joinWordNerds": "ワードナードに参加！進捗を保存するともっと楽しいよ！"
+        "joinWordNerds": "ワードナードに参加！進捗を保存するともっと楽しいよ！",
+        "scoresTooGood": "あなたのスコアは消えるには良すぎる！永遠に保存しよう！",
+        "streakProtector": "連続記録を守ろう！消える前に登録して！",
+        "makeMomProud": "お母さんを喜ばせよう - リーダーボードで言葉の才能を見せつけて！"
       }
     },
     "callback": {
@@ -2592,6 +2597,9 @@ const ja = {
       "text": "デイリーバズ: {topic} | {score}/100 | 挑戦する？🔥"
     },
     "alreadyPlayed": "今日はもうプレイしました！明日また来てください。",
+    "challengeCompleted": "チャレンジ完了",
+    "lockedYourAnswer": "あなたの回答",
+    "lockedCorrectAnswer": "正解",
     "notAvailable": "利用不可",
     "unavailableTagline": "この言語ではまだ利用できません",
     "requestChallenge": "チャレンジをリクエスト",

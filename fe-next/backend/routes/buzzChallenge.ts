@@ -173,61 +173,11 @@ function transformBuzzResponse(dbData: Record<string, unknown>): BuzzApiResponse
 }
 
 /**
- * GET /buzz/:date/:language
- * Fetch daily buzz challenge for a specific date and language
- */
-router.get(
-  '/buzz/:date/:language',
-  async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { date, language } = req.params;
-
-      // Validate date format (YYYY-MM-DD)
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-        res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
-        return;
-      }
-
-      // Validate language
-      const supportedLanguages = ['en', 'he', 'sv', 'ja', 'es'];
-      if (!supportedLanguages.includes(language)) {
-        res
-          .status(400)
-          .json({ error: 'Unsupported language. Use: en, he, sv, ja, or es' });
-        return;
-      }
-
-      // Get challenge from database
-      let challenge = await getDailyBuzz(date, language);
-
-      // If not found, generate it (for manual requests or testing)
-      if (!challenge) {
-        console.log(`[BUZZ] Challenge not found, generating for ${date} (${language})`);
-        challenge = await generateDailyBuzz(new Date(date), language);
-      }
-
-      // Transform snake_case database response to camelCase for frontend
-      const transformedData = transformBuzzResponse(challenge as unknown as Record<string, unknown>);
-
-      res.json({
-        success: true,
-        data: transformedData,
-      });
-    } catch (error: any) {
-      console.error('[BUZZ] Error fetching challenge:', error.message);
-      if (res.headersSent) return;
-      res.status(500).json({
-        success: false,
-        error: 'Failed to fetch daily challenge',
-      });
-    }
-  }
-);
-
-/**
  * GET /buzz/history/:language
  * Fetch list of available past buzz challenges for a language (SEO-friendly)
  * Returns a list of dates with challenges, sorted newest first
+ * NOTE: This route MUST be defined before /buzz/:date/:language to prevent
+ * "history" from being matched as a date parameter
  */
 router.get(
   '/buzz/history/:language',
@@ -281,6 +231,58 @@ router.get(
       console.error('[BUZZ] Error fetching history:', errorMessage);
       if (res.headersSent) return;
       res.status(500).json({ error: 'Failed to fetch challenge history' });
+    }
+  }
+);
+
+/**
+ * GET /buzz/:date/:language
+ * Fetch daily buzz challenge for a specific date and language
+ */
+router.get(
+  '/buzz/:date/:language',
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { date, language } = req.params;
+
+      // Validate date format (YYYY-MM-DD)
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        res.status(400).json({ error: 'Invalid date format. Use YYYY-MM-DD' });
+        return;
+      }
+
+      // Validate language
+      const supportedLanguages = ['en', 'he', 'sv', 'ja', 'es'];
+      if (!supportedLanguages.includes(language)) {
+        res
+          .status(400)
+          .json({ error: 'Unsupported language. Use: en, he, sv, ja, or es' });
+        return;
+      }
+
+      // Get challenge from database
+      let challenge = await getDailyBuzz(date, language);
+
+      // If not found, generate it (for manual requests or testing)
+      if (!challenge) {
+        console.log(`[BUZZ] Challenge not found, generating for ${date} (${language})`);
+        challenge = await generateDailyBuzz(new Date(date), language);
+      }
+
+      // Transform snake_case database response to camelCase for frontend
+      const transformedData = transformBuzzResponse(challenge as unknown as Record<string, unknown>);
+
+      res.json({
+        success: true,
+        data: transformedData,
+      });
+    } catch (error: any) {
+      console.error('[BUZZ] Error fetching challenge:', error.message);
+      if (res.headersSent) return;
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch daily challenge',
+      });
     }
   }
 );
