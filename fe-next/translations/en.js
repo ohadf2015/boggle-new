@@ -713,6 +713,9 @@ const en = {
   },
   "tvResults": {
     "title": "WE HAVE A WINNER!",
+    "champion": "Champion",
+    "runnerUp": "Runner Up",
+    "bronze": "3rd Place",
     "wordsFound": "Total Words",
     "longestWord": "Biggest Word",
     "firstStrike": "First Strike",
@@ -835,6 +838,10 @@ const en = {
     "skip": "Skip",
     "letsPlay": "Let's Play!",
     "timingHint": "First 10 seconds matter most!",
+    "step1Title": "Swipe Letters",
+    "step1Text": "Drag across connected letters to form words.",
+    "step2Title": "Score Points",
+    "step2Text": "Longer words = way more points. Find unique words!",
     "welcome": {
       "title": "Welcome to LexiClash!",
       "subtitle": "Swipe. Spell. Dominate.",

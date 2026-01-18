@@ -106,7 +106,13 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
       setUnclaimedCount(data.count || 0);
       setCachedCount(data.count || 0);
     } catch (err) {
-      console.error('Error fetching unclaimed gifts:', err);
+      // Network errors are common on mobile - use warn instead of error to reduce noise
+      const isNetworkError = err instanceof TypeError && err.message.includes('fetch');
+      if (isNetworkError) {
+        console.warn('[Gifts] Network error fetching unclaimed count - will retry on next poll');
+      } else {
+        console.error('[Gifts] Error fetching unclaimed gifts:', err);
+      }
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
@@ -142,7 +148,13 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
       setUnclaimedCount(unclaimed);
       setCachedCount(unclaimed);
     } catch (err) {
-      console.error('Error fetching gifts:', err);
+      // Network errors are common on mobile - use warn instead of error to reduce noise
+      const isNetworkError = err instanceof TypeError && err.message.includes('fetch');
+      if (isNetworkError) {
+        console.warn('[Gifts] Network error fetching gifts - will retry on refresh');
+      } else {
+        console.error('[Gifts] Error fetching gifts:', err);
+      }
       setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);

@@ -143,6 +143,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         accumulatedClues={state.accumulatedClues}
         revealedLetters={state.revealedLetters}
         gameDir={actions.gameDir}
+        latestAttemptFeedback={state.latestAttemptFeedback}
+        showFeedbackOverlay={state.showFeedbackOverlay}
+        knownLetters={state.knownLetters}
+        skipAnimations={skipAnimations}
         showQuitConfirm={state.showQuitConfirm}
         onQuitClick={() => actions.setShowQuitConfirm(true)}
         onQuitConfirm={handleQuitConfirm}
@@ -160,12 +164,13 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   }
 
   // Portrait layout
+  // pt-3 ensures game header doesn't overlap with the sticky app header on mobile
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex-1 flex flex-col p-2 sm:p-4 overflow-hidden pb-safe"
+      className="flex-1 flex flex-col p-2 sm:p-4 overflow-hidden pb-safe pt-3 sm:pt-2"
       style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))' }}
     >
       {/* Top bar */}

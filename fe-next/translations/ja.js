@@ -710,6 +710,9 @@ const ja = {
   },
   "tvResults": {
     "title": "勝者誕生!",
+    "champion": "チャンピオン",
+    "runnerUp": "準優勝",
+    "bronze": "3位",
     "wordsFound": "単語総数",
     "longestWord": "最大単語",
     "firstStrike": "ファーストストライク",
@@ -831,6 +834,10 @@ const ja = {
     "header": "クイックスタートガイド",
     "skip": "スキップ",
     "letsPlay": "プレイ開始！",
+    "step1Title": "文字をスワイプ",
+    "step1Text": "つながった文字をドラッグして単語を作ろう。",
+    "step2Title": "ポイントを獲得",
+    "step2Text": "長い単語 = もっとポイント。ユニークな単語を見つけよう！",
     "welcome": {
       "title": "LexiClashへようこそ！",
       "subtitle": "文字をスワイプ。単語を作る。制覇する。",

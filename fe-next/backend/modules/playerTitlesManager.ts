@@ -138,6 +138,11 @@ export function calculatePlayerTitles(
 
   // Helper to assign a title if not already taken
   const assignTitle = (username: string, titleKey: string): boolean => {
+    // Double-check titleTranslations exists (defensive check for edge cases)
+    if (!titleTranslations || typeof titleTranslations !== 'object') {
+      console.warn(`[TITLES] titleTranslations is invalid when assigning ${titleKey}`);
+      return false;
+    }
     const titleData = titleTranslations[titleKey];
     if (!titleData || usedTitles.has(titleKey) || assignedTitles[username]) {
       return false;

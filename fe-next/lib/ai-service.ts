@@ -394,8 +394,13 @@ class GameAIService {
    */
   private isRetryableError(error: unknown): boolean {
     if (error instanceof Error) {
+      const errorName = error.name?.toLowerCase() || '';
       const message = error.message.toLowerCase();
       return (
+        // Named errors we explicitly throw
+        errorName === 'htmlresponseerror' ||
+        errorName === 'truncatedresponseerror' ||
+        // Message-based detection
         message.includes('network') ||
         message.includes('timeout') ||
         message.includes('rate limit') ||
@@ -407,7 +412,8 @@ class GameAIService {
         message.includes('unexpected token') ||
         message.includes('<!doctype') ||
         message.includes('is not valid json') ||
-        message.includes('syntaxerror')
+        message.includes('syntaxerror') ||
+        message.includes('html instead of json')
       );
     }
     return false;
@@ -684,6 +690,14 @@ Respond with ONLY valid JSON (no markdown):
 
       // Strip markdown code blocks if present (```json ... ``` or ``` ... ```)
       text = text.replace(/```(?:json)?\s*/gi, '').replace(/```\s*/g, '').trim();
+
+      // Check if response is HTML (error page) instead of JSON
+      if (text.startsWith('<!DOCTYPE') || text.startsWith('<html') || text.includes('<!DOCTYPE html>')) {
+        console.error(`[GameAIService] Received HTML instead of JSON for word "${word}"`);
+        const error = new Error('AI returned HTML instead of JSON (possible rate limit or auth error)');
+        error.name = 'HTMLResponseError';
+        throw error;
+      }
 
       // Extract JSON from response
       let jsonMatch = text.match(/\{[\s\S]*\}/);

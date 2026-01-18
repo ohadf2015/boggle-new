@@ -710,6 +710,9 @@ const sv = {
   },
   "tvResults": {
     "title": "VI HAR EN VINNARE!",
+    "champion": "Mästare",
+    "runnerUp": "Tvåa",
+    "bronze": "Trea",
     "wordsFound": "Totalt Ord",
     "longestWord": "Största Ordet",
     "firstStrike": "Första Träff",
@@ -832,6 +835,10 @@ const sv = {
     "skip": "Hoppa över",
     "letsPlay": "Nu kör vi!",
     "timingHint": "De första 10 sekunderna är avgörande!",
+    "step1Title": "Svep Bokstäver",
+    "step1Text": "Dra över sammankopplade bokstäver för att bilda ord.",
+    "step2Title": "Få Poäng",
+    "step2Text": "Längre ord = fler poäng. Hitta unika ord!",
     "welcome": {
       "title": "Välkommen till LexiClash!",
       "subtitle": "Svep bokstäver. Bilda ord. Dominera.",

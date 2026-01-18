@@ -16,6 +16,22 @@ import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type { AccumulatedClue, TargetAttempt } from './types';
 import { MAX_ATTEMPTS } from './constants';
 
+export interface LandscapeClueBoxesProps {
+  currentHint: HintLevel;
+  targetWord: string;
+  accumulatedClues: Map<number, AccumulatedClue>;
+  revealedLetters: Set<number>;
+  attempts: TargetAttempt[];
+  isProtected: boolean;
+  gameDir: 'ltr' | 'rtl';
+  // Feedback overlay props
+  latestAttemptFeedback: LetterFeedback[] | null;
+  showFeedbackOverlay: boolean;
+  knownLetters: Set<string>;
+  skipAnimations?: boolean;
+  t: (key: string) => string;
+}
+
 export interface SurvivalLandscapeLayoutProps {
   // Grid props
   grid: LetterGrid;
@@ -42,6 +58,11 @@ export interface SurvivalLandscapeLayoutProps {
   accumulatedClues: Map<number, AccumulatedClue>;
   revealedLetters: Set<number>;
   gameDir: 'ltr' | 'rtl';
+  // Feedback overlay props
+  latestAttemptFeedback: LetterFeedback[] | null;
+  showFeedbackOverlay: boolean;
+  knownLetters: Set<string>;
+  skipAnimations?: boolean;
 
   // Dialog/quit props
   showQuitConfirm: boolean;
@@ -94,6 +115,11 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
   accumulatedClues,
   revealedLetters,
   gameDir,
+  // Feedback overlay props
+  latestAttemptFeedback,
+  showFeedbackOverlay,
+  knownLetters,
+  skipAnimations = false,
 
   // Dialog/quit props
   showQuitConfirm,
@@ -173,6 +199,11 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
             attempts={attempts}
             isProtected={isProtected}
             gameDir={gameDir}
+            latestAttemptFeedback={latestAttemptFeedback}
+            showFeedbackOverlay={showFeedbackOverlay}
+            knownLetters={knownLetters}
+            skipAnimations={skipAnimations}
+            t={t}
           />
         )}
 
@@ -296,57 +327,64 @@ interface RightPanelProps {
   t: (key: string) => string;
 }
 
+/**
+ * Get subtle gradient class based on score for landscape panel
+ */
+function getLandscapeScoreGradient(score: number): string {
+  if (score < 75) return 'from-amber-400 to-orange-400';
+  if (score < 175) return 'from-neo-yellow to-neo-orange';
+  if (score < 300) return 'from-neo-lime-light to-neo-yellow';
+  return 'from-neo-lime to-neo-cyan-light';
+}
+
 const RightPanel: React.FC<RightPanelProps> = ({
   liveScore,
   lastScoreIncrement,
   isScoreAnimating,
   t,
-}) => (
-  <div className="absolute right-3 top-1/2 -translate-y-1/2 z-20 landscape-side-panel">
-    <div className="landscape-panel flex flex-col items-center gap-4">
-      {/* Live Score Display */}
-      <motion.div
-        className="flex flex-col items-center px-4 py-3 bg-neo-yellow border-neo border-neo-black rounded-neo shadow-hard-sm"
-        animate={isScoreAnimating ? { scale: [1, 1.15, 1] } : { scale: 1 }}
-        transition={{
-          duration: 0.4,
-          type: 'spring',
-          damping: 15,
-          stiffness: 300,
-        }}
-      >
-        <div className="landscape-stat-label text-neo-black mb-1">
-          {t('wordHunt.survival.accumulatedScore') || 'SCORE'}
-        </div>
-        <div className="landscape-stat-primary text-neo-black font-black">
-          {Math.max(0, Math.round(liveScore))}
-        </div>
+}) => {
+  const gradientClass = getLandscapeScoreGradient(liveScore);
 
-        {/* Last increment badge */}
-        {lastScoreIncrement !== null && lastScoreIncrement > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="text-[10px] font-bold text-green-600"
-          >
-            +{Math.round(lastScoreIncrement)}
-          </motion.div>
-        )}
-      </motion.div>
+  return (
+    <div className="absolute right-3 top-1/2 -translate-y-1/2 z-20 landscape-side-panel">
+      <div className="landscape-panel flex flex-col items-center gap-4">
+        {/* Live Score Display */}
+        <motion.div
+          className={cn(
+            "flex flex-col items-center px-4 py-3 bg-gradient-to-br border-neo border-neo-black rounded-neo shadow-hard-sm",
+            gradientClass
+          )}
+          animate={isScoreAnimating ? { scale: [1, 1.15, 1] } : { scale: 1 }}
+          transition={{
+            duration: 0.4,
+            type: 'spring',
+            damping: 15,
+            stiffness: 300,
+          }}
+        >
+          <div className="landscape-stat-label text-neo-black mb-1">
+            {t('wordHunt.survival.accumulatedScore') || 'SCORE'}
+          </div>
+          <div className="landscape-stat-primary text-neo-black font-black">
+            {Math.max(0, Math.round(liveScore))}
+          </div>
+
+          {/* Last increment badge */}
+          {lastScoreIncrement !== null && lastScoreIncrement > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="text-[10px] font-bold text-green-600"
+            >
+              +{Math.round(lastScoreIncrement)}
+            </motion.div>
+          )}
+        </motion.div>
+      </div>
     </div>
-  </div>
-);
-
-interface LandscapeClueBoxesProps {
-  currentHint: HintLevel;
-  targetWord: string;
-  accumulatedClues: Map<number, AccumulatedClue>;
-  revealedLetters: Set<number>;
-  attempts: TargetAttempt[];
-  isProtected: boolean;
-  gameDir: 'ltr' | 'rtl';
-}
+  );
+};
 
 const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
   currentHint,
@@ -356,6 +394,11 @@ const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
   attempts,
   isProtected,
   gameDir,
+  latestAttemptFeedback,
+  showFeedbackOverlay,
+  knownLetters,
+  skipAnimations = false,
+  t,
 }) => {
   const hintChars = currentHint.hint.split(' ').filter(c => c !== '');
   const wordLength = hintChars.length;
@@ -391,58 +434,128 @@ const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
   }, [attempts]);
 
   return (
-    <div
-      dir={gameDir}
-      className={cn(
-        "flex justify-center flex-wrap gap-1.5 mb-2 p-2 rounded-neo bg-neo-navy/30 border-2 border-neo-black/20",
-        isProtected && "blur-xl select-none"
-      )}
-    >
-      {hintChars.map((char, idx) => {
-        const accumulatedClue = accumulatedClues.get(idx);
-        const persistedLetter = persistedLetters.get(idx);
-        const isHintRevealed = char !== '_';
-        const isShopRevealed = revealedLetters.has(idx);
+    <div className="flex flex-col">
+      <div
+        dir={gameDir}
+        className={cn(
+          "flex justify-center flex-wrap gap-1.5 mb-2 p-2 rounded-neo bg-neo-navy/30 border-2 border-neo-black/20",
+          isProtected && "blur-xl select-none"
+        )}
+      >
+        <AnimatePresence mode="sync">
+          {showFeedbackOverlay && latestAttemptFeedback ? (
+            // Feedback overlay - shows letter feedback after a guess
+            <motion.div
+              key="feedback-overlay"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.3 }}
+              className="flex justify-center flex-wrap gap-1.5"
+            >
+              {latestAttemptFeedback.map((letterFb, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={skipAnimations ? { opacity: 0 } : { rotateX: 90, opacity: 0 }}
+                  animate={skipAnimations ? { opacity: 1 } : { rotateX: 0, opacity: 1 }}
+                  transition={skipAnimations ? {
+                    delay: idx * 0.03,
+                    duration: 0.15
+                  } : {
+                    delay: idx * 0.1,
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 20
+                  }}
+                  className={cn(
+                    "flex items-center justify-center border-2 rounded-neo font-bold shadow-hard-sm text-white",
+                    sizeClass,
+                    letterFb.feedback === 'green' && "bg-green-500 border-green-700 ring-1 ring-green-300/50",
+                    letterFb.feedback === 'yellow' && "bg-yellow-500 border-yellow-600 text-neo-black ring-1 ring-yellow-300/50",
+                    letterFb.feedback === 'gray' && "bg-gray-400 border-gray-500"
+                  )}
+                >
+                  {letterFb.letter}
+                </motion.div>
+              ))}
+            </motion.div>
+          ) : (
+            // Hint boxes - shows persisted letters
+            <motion.div
+              key="hint-boxes"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.3 }}
+              className="flex justify-center flex-wrap gap-1.5"
+            >
+              {hintChars.map((char, idx) => {
+                const accumulatedClue = accumulatedClues.get(idx);
+                const persistedLetter = persistedLetters.get(idx);
+                const isHintRevealed = char !== '_';
+                const isShopRevealed = revealedLetters.has(idx);
 
-        let displayChar: string;
-        let bgClass: string;
+                let displayChar: string;
+                let bgClass: string;
 
-        // Priority: green from accumulatedClues > shop revealed > hint revealed > persisted letter > unknown
-        if (accumulatedClue) {
-          displayChar = accumulatedClue.letter;
-          bgClass = accumulatedClue.type === 'green'
-            ? "bg-green-500 border-green-700 text-white"
-            : "bg-yellow-500 border-yellow-600 text-neo-black";
-        } else if (isShopRevealed) {
-          displayChar = targetWord[idx]?.toUpperCase() || '?';
-          bgClass = "bg-green-500 border-green-700 text-white";
-        } else if (isHintRevealed) {
-          displayChar = char.toUpperCase();
-          bgClass = "bg-neo-pink border-neo-pink text-white";
-        } else if (persistedLetter) {
-          // Show persisted yellow/green letter from previous guesses
-          displayChar = persistedLetter.letter;
-          bgClass = persistedLetter.type === 'green'
-            ? "bg-green-500 border-green-700 text-white"
-            : "bg-yellow-500 border-yellow-600 text-neo-black";
-        } else {
-          displayChar = '';
-          bgClass = "bg-neo-black border-neo-black";
-        }
+                // Priority: green from accumulatedClues > shop revealed > hint revealed > persisted letter > unknown
+                if (accumulatedClue) {
+                  displayChar = accumulatedClue.letter;
+                  bgClass = accumulatedClue.type === 'green'
+                    ? "bg-green-500 border-green-700 text-white"
+                    : "bg-yellow-500 border-yellow-600 text-neo-black";
+                } else if (isShopRevealed) {
+                  displayChar = targetWord[idx]?.toUpperCase() || '?';
+                  bgClass = "bg-green-500 border-green-700 text-white";
+                } else if (isHintRevealed) {
+                  displayChar = char.toUpperCase();
+                  bgClass = "bg-neo-pink border-neo-pink text-white";
+                } else if (persistedLetter) {
+                  // Show persisted yellow/green letter from previous guesses
+                  displayChar = persistedLetter.letter;
+                  bgClass = persistedLetter.type === 'green'
+                    ? "bg-green-500 border-green-700 text-white"
+                    : "bg-yellow-500 border-yellow-600 text-neo-black";
+                } else {
+                  displayChar = '';
+                  bgClass = "bg-neo-black border-neo-black";
+                }
 
-        return (
-          <div
-            key={idx}
-            className={cn(
-              "flex items-center justify-center border-2 rounded-neo font-bold shadow-hard-sm",
-              sizeClass,
-              bgClass
-            )}
-          >
-            {displayChar}
+                return (
+                  <div
+                    key={idx}
+                    className={cn(
+                      "flex items-center justify-center border-2 rounded-neo font-bold shadow-hard-sm",
+                      sizeClass,
+                      bgClass
+                    )}
+                  >
+                    {displayChar}
+                  </div>
+                );
+              })}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+      {/* Known letters indicator for landscape */}
+      {!showFeedbackOverlay && knownLetters.size > 0 && (
+        <div className="flex items-center justify-center gap-1 text-[9px] mb-1">
+          <span className="text-yellow-400 font-medium">
+            {t('wordHunt.survival.knownLetters') || 'Wrong spot:'}
+          </span>
+          <div className="flex gap-0.5">
+            {Array.from(knownLetters).map((letter) => (
+              <span
+                key={letter}
+                className="w-4 h-4 flex items-center justify-center bg-yellow-500 border border-yellow-600 rounded text-neo-black font-bold text-[8px]"
+              >
+                {letter}
+              </span>
+            ))}
           </div>
-        );
-      })}
+        </div>
+      )}
     </div>
   );
 };

@@ -83,6 +83,12 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
 
   // Handle game completion
   const handleGameComplete = useCallback(async (result: SurvivalGameResult) => {
+    // Defensive validation - ensure result has required fields
+    if (!result || typeof result !== 'object') {
+      console.error('[CustomPuzzle] Invalid game result received');
+      return;
+    }
+
     setGameResult(result);
     setPhase('results');
 
@@ -90,16 +96,21 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
 
     // Submit attempt to server
     try {
+      // Safely get wordsDiscovered count with fallback
+      const wordsDiscoveredCount = Array.isArray(result.wordsDiscovered)
+        ? result.wordsDiscovered.length
+        : 0;
+
       const submitResponse = await fetch(`/api/custom-puzzle/${puzzleCode}/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           displayName,
           guestFingerprint: user ? null : fingerprint,
-          solved: result.solved,
-          attemptsUsed: result.attemptsUsed,
-          wordsDiscovered: result.wordsDiscovered?.length || 0,
-          lifeRemaining: result.lifeRemaining,
+          solved: result.solved ?? false,
+          attemptsUsed: result.attemptsUsed ?? 0,
+          wordsDiscovered: wordsDiscoveredCount,
+          lifeRemaining: result.lifeRemaining ?? 0,
         }),
       });
 

@@ -707,6 +707,9 @@ const es = {
   },
   "tvResults": {
     "title": "¡TENEMOS UN GANADOR!",
+    "champion": "Campeón",
+    "runnerUp": "Segundo Lugar",
+    "bronze": "Tercer Lugar",
     "wordsFound": "Total de Palabras",
     "longestWord": "Palabra Más Grande",
     "firstStrike": "Primera Jugada",
@@ -1865,6 +1868,10 @@ const es = {
     "skip": "Omitir",
     "letsPlay": "¡A Jugar!",
     "timingHint": "¡La velocidad da combos!",
+    "step1Title": "Desliza Letras",
+    "step1Text": "Arrastra sobre letras conectadas para formar palabras.",
+    "step2Title": "Gana Puntos",
+    "step2Text": "Palabras más largas = más puntos. ¡Encuentra palabras únicas!",
     "welcome": {
       "title": "¡Bienvenido a LexiClash!",
       "subtitle": "Desliza letras. Forma palabras. Domina.",

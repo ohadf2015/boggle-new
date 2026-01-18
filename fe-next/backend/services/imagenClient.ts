@@ -122,22 +122,39 @@ async function getSupabaseClient() {
  * Build editorial-style image prompt that shows trending topics
  * Uses Google Trends visual language with modern illustration style
  * Combines trending indicators with topic-relevant imagery
+ *
+ * @param topic - The trending topic to visualize
+ * @param category - Category for mood selection (sports, finance, etc.)
+ * @param language - Target language code (used for future localization)
  */
 function buildImagePrompt(
   topic: string,
   category: string,
-  _language: string
+  language: string
 ): string {
   const mood = MOOD_MAP[category] || MOOD_MAP.general;
 
   // Build a concrete visual scene from the trend
   const visualScene = buildVisualScene(topic, category);
 
+  // Log language for debugging (will be used for future localization)
+  console.log(`[IMAGEN] Building prompt for language: ${language}, topic: ${topic}`);
+
   return `Create a MODERN STYLIZED illustration for a Google Trends-powered word game.
 
 SUBJECT: ${visualScene}
 
-=== CRITICAL: MODERN STYLIZED ILLUSTRATION STYLE ===
+=== CRITICAL: ABSOLUTELY NO TEXT IN ANY LANGUAGE ===
+
+**ZERO TEXT POLICY - THIS IS THE MOST IMPORTANT RULE:**
+- ABSOLUTELY NO text, words, letters, numbers, or characters in ANY language
+- NO English text, NO Hebrew text (אבג), NO Japanese text (あいう/漢字), NO Swedish text, NO Spanish text
+- NO signs, labels, banners, headlines, captions, watermarks, or UI elements with text
+- NO partial words, abbreviations, or letter-like shapes that could be mistaken for text
+- The image must be 100% PURELY VISUAL with zero readable content
+- If you're unsure whether something looks like text, DO NOT include it
+
+=== MODERN STYLIZED ILLUSTRATION STYLE ===
 
 ART STYLE - "CONTEMPORARY ILLUSTRATION WITH CHARACTER":
 - **Modern 2.5D style** with depth but not full 3D rendering (think modern app illustrations, editorial graphics)
@@ -149,15 +166,15 @@ ART STYLE - "CONTEMPORARY ILLUSTRATION WITH CHARACTER":
 
 GOOGLE TRENDS VISUAL ELEMENTS (MUST INCLUDE):
 - Prominent UPWARD TRENDING ARROW somewhere in composition (the iconic Google Trends rising line)
-- Google Trends gradient: Blue (#4285F4) transitioning to Green (#34A853)
+- Google Trends gradient: Blue transitioning to Green (use the colors, do NOT show hex codes)
 - Search-inspired elements: magnifying glass motif, data visualization hints
 - Sense of "what's hot right now" - dynamic, current, buzzing energy
 
 COLOR PALETTE (Modern Illustration + Google Trends):
-- PRIMARY: Google Blue (#4285F4) - trust and clarity
-- SECONDARY: Google Green (#34A853) - growth and freshness
-- ACCENT 1: Warm Yellow (#FFD700) - energy and positivity
-- ACCENT 2: Soft Coral (#FF8C69) - warmth and friendliness
+- PRIMARY: Google Blue - trust and clarity
+- SECONDARY: Google Green - growth and freshness
+- ACCENT 1: Warm Yellow - energy and positivity
+- ACCENT 2: Soft Coral - warmth and friendliness
 - BACKGROUND: Gentle gradients with subtle depth (pastels allowed for approachability)
 - Soft shading with 2.5D depth - some dimensional lighting without full 3D rendering
 
@@ -177,10 +194,11 @@ ILLUSTRATION GUIDELINES:
 MOOD: ${mood}, DYNAMIC, CURRENT, NEWSWORTHY
 
 ABSOLUTE CONSTRAINTS (CRITICAL - DO NOT VIOLATE):
-- NO text, NO words, NO letters, NO numbers anywhere in the image
-- **NO HEX COLOR CODES** (e.g., #FFD700, #4285F4) - NO color values visible
-- **NO RGB/HSL values** (e.g., rgb(255,215,0)) - NO technical notation
+- **ZERO TEXT** - No text, words, letters, numbers, or characters in ANY language (English, Hebrew, Japanese, Swedish, Spanish, or any other)
+- **NO HEX COLOR CODES** visible in the image - NO color values like #FFD700 or #4285F4
+- **NO RGB/HSL values** visible - NO technical notation like rgb(255,215,0)
 - **NO alphanumeric strings or codes** - NO visible UI elements with text
+- **NO signs, labels, or banners** - Even decorative text is forbidden
 - **ABSOLUTELY NO chibi style** - NO super-deformed characters, NO bobblehead proportions
 - **ABSOLUTELY NO heavy anime aesthetic** - NO manga-style linework, NO anime cel-shading, NO moe (萌え) exaggeration
 - **Subtle kawaii elements are ALLOWED** - Friendly, approachable character design is fine
@@ -195,6 +213,7 @@ This is a contemporary stylized illustration with personality and charm.
 ✅ CORRECT REFERENCE: Headspace app illustrations, Duolingo characters, modern editorial graphics, stylized infographics
 ✅ SUBTLE KAWAII OK: Friendly round shapes, gentle expressions, soft pastel accents
 ❌ FORBIDDEN: Chibi/super-deformed style, heavy anime linework, extreme anime proportions
+❌ FORBIDDEN: Any text, letters, words, or numbers in any language
 
 SPECIFIC STYLE RULES:
 - Eyes: Friendly and expressive but proportional (NOT taking up half the face)
@@ -203,8 +222,8 @@ SPECIFIC STYLE RULES:
 - Style: 2.5D modern illustration with layering, NOT flat cel-shading OR heavy 3D
 - Expression: Warm and charming with personality, subtle emotion
 
-OUTPUT: Square 1024×1024px modern stylized illustration
-The final image should look like premium app illustration or contemporary editorial graphic - friendly, approachable, with gentle depth and charm.`;
+OUTPUT: Square 1024×1024px modern stylized illustration with ZERO TEXT
+The final image should look like premium app illustration or contemporary editorial graphic - friendly, approachable, with gentle depth and charm. Contains absolutely no readable text in any language.`;
 }
 
 /**

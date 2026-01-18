@@ -354,6 +354,7 @@ export function useSurvivalGameLogic({
 
     // Pass language to enable Hebrew final letter normalization
     const feedback = getLetterFeedback(word, target, language);
+
     const newAttempt: TargetAttempt = {
       word,
       feedback,

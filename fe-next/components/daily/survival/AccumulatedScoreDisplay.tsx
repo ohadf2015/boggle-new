@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -13,8 +13,62 @@ export interface AccumulatedScoreDisplayProps {
 }
 
 /**
+ * Score tier thresholds for subtle color coding
+ * Thresholds based on typical word hunt scoring patterns
+ * Colors are muted to avoid distraction during gameplay
+ */
+const SCORE_TIERS = {
+  LOW: 75,       // 0-74: Needs improvement
+  MEDIUM: 175,   // 75-174: Average
+  GOOD: 300,     // 175-299: Good
+  // 300+: Excellent
+} as const;
+
+/**
+ * Get subtle color classes based on score
+ * Uses muted tones to provide feedback without distraction
+ */
+function getScoreColorClasses(score: number): {
+  gradient: string;
+  iconColor: string;
+  textColor: string;
+} {
+  if (score < SCORE_TIERS.LOW) {
+    // Low score - muted warm tone (not alarming red)
+    return {
+      gradient: 'from-amber-400 to-orange-400',
+      iconColor: 'text-neo-black/80',
+      textColor: 'text-neo-black',
+    };
+  }
+  if (score < SCORE_TIERS.MEDIUM) {
+    // Medium score - standard yellow/orange (original style)
+    return {
+      gradient: 'from-neo-yellow to-neo-orange',
+      iconColor: 'text-neo-black/80',
+      textColor: 'text-neo-black',
+    };
+  }
+  if (score < SCORE_TIERS.GOOD) {
+    // Good score - subtle lime tint
+    return {
+      gradient: 'from-neo-lime-light to-neo-yellow',
+      iconColor: 'text-neo-black/80',
+      textColor: 'text-neo-black',
+    };
+  }
+  // Excellent score - subtle cyan/lime
+  return {
+    gradient: 'from-neo-lime to-neo-cyan-light',
+    iconColor: 'text-neo-black/80',
+    textColor: 'text-neo-black',
+  };
+}
+
+/**
  * Accumulated Score Display Component
  * Shows live-updating score with neo-brutalist styling and pop animations
+ * Colors dynamically change based on score performance
  */
 export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = ({
   currentScore,
@@ -22,6 +76,9 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
   isAnimating,
   t,
 }) => {
+  // Memoize color classes to prevent recalculation on every render
+  const scoreColors = useMemo(() => getScoreColorClasses(currentScore), [currentScore]);
+
   return (
     <div className="relative">
       {/* Score Container */}
@@ -29,7 +86,8 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
         className={cn(
           'relative flex flex-col items-center gap-0.5',
           'px-3 py-1.5',
-          'bg-gradient-to-br from-neo-yellow to-neo-orange',
+          'bg-gradient-to-br',
+          scoreColors.gradient,
           'border-neo-thick border-neo-black',
           'rounded-neo',
           'shadow-hard',
@@ -45,8 +103,11 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
       >
         {/* Label */}
         <div className="flex items-center gap-1">
-          <TrendingUp className="w-3 h-3 text-neo-black" />
-          <span className="text-[8px] @[80px]:text-[9px] @[100px]:text-[10px] font-bold text-neo-black uppercase tracking-wide font-neo-body">
+          <TrendingUp className={cn('w-3 h-3', scoreColors.iconColor)} />
+          <span className={cn(
+            'text-[8px] @[80px]:text-[9px] @[100px]:text-[10px] font-bold uppercase tracking-wide font-neo-body',
+            scoreColors.textColor
+          )}>
             {t('wordHunt.survival.accumulatedScore') || 'Score'}
           </span>
         </div>
@@ -57,7 +118,10 @@ export const AccumulatedScoreDisplay: React.FC<AccumulatedScoreDisplayProps> = (
             key={currentScore}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-2xl @[80px]:text-3xl @[120px]:text-4xl font-black text-neo-black font-neo-display"
+            className={cn(
+              'text-2xl @[80px]:text-3xl @[120px]:text-4xl font-black font-neo-display',
+              scoreColors.textColor
+            )}
           >
             {Math.max(0, Math.round(currentScore))}
           </motion.div>
