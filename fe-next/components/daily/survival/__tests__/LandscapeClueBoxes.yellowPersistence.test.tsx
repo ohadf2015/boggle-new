@@ -87,7 +87,7 @@ const TestLandscapeClueBoxes: React.FC<LandscapeClueBoxesTestProps> = ({
             ? 'bg-green-500'
             : 'bg-yellow-500';
         } else {
-          displayChar = '';
+          displayChar = '?';
           bgClass = 'bg-neo-black';
         }
 
@@ -116,13 +116,13 @@ describe('LandscapeClueBoxes - Yellow Letter Persistence', () => {
     attempts: [],
   };
 
-  it('should show empty for all positions when no clues exist', () => {
+  it('should show "?" for all positions when no clues exist', () => {
     render(<TestLandscapeClueBoxes {...defaultProps} />);
 
-    // All 5 boxes should be empty (no character)
+    // All 5 boxes should show "?" (consistent with portrait mode)
     for (let i = 0; i < 5; i++) {
       const box = screen.getByTestId(`clue-box-${i}`);
-      expect(box).toHaveTextContent('');
+      expect(box).toHaveTextContent('?');
     }
   });
 
@@ -248,10 +248,10 @@ describe('LandscapeClueBoxes - Yellow Letter Persistence', () => {
       />
     );
 
-    // All positions should still show empty (gray doesn't persist)
+    // All positions should still show "?" (gray doesn't persist, unknown shows "?")
     for (let i = 0; i < 5; i++) {
       const box = screen.getByTestId(`clue-box-${i}`);
-      expect(box).toHaveTextContent('');
+      expect(box).toHaveTextContent('?');
     }
   });
 });

@@ -517,8 +517,8 @@ const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
                     ? "bg-green-500 border-green-700 text-white"
                     : "bg-yellow-500 border-yellow-600 text-neo-black";
                 } else {
-                  displayChar = '';
-                  bgClass = "bg-neo-black border-neo-black";
+                  displayChar = '?';
+                  bgClass = "bg-neo-black border-neo-black text-white";
                 }
 
                 return (
