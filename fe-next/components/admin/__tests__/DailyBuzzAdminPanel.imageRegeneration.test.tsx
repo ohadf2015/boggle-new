@@ -35,8 +35,8 @@ describe('DailyBuzzAdminPanel Image Regeneration', () => {
   const mockChallengeData: DailyBuzzDataAdmin = {
     puzzle_date: '2025-01-18',
     language: 'en',
-    region: 'US',
     trending_summary: 'Tech & Politics',
+    trending_topics: [{ query: 'AI Summit', search_volume: 10000 }],
     challenges: [
       {
         type: 'riddle',

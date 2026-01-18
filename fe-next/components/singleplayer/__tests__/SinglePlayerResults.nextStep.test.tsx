@@ -185,12 +185,15 @@ describe('SinglePlayerResults NextStep navigation bug', () => {
 
   const baseResults = {
     playerScore: 100,
-    playerWordData: [{ word: 'test', isValid: true, score: 3 }],
-    botScores: [{ name: 'Bot1', score: 80 }],
+    playerWords: ['test'],
+    playerWordData: [{ word: 'test', isValid: true, score: 3, timestamp: Date.now(), timeSinceStart: 5 }],
+    botScores: [{ name: 'Bot1', score: 80, words: ['word'] }],
     grid: [['T', 'E'], ['S', 'T']],
     gameDuration: 120,
-    language: 'en',
+    language: 'en' as const,
     gameSessionId: 'test-session-123',
+    allPossibleWords: ['test', 'set', 'tet'],
+    isNewHighScore: false,
   };
 
   beforeEach(() => {
