@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Gamepad2, Play, Star, Zap, Trophy } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogFooter } from './ui/dialog';
@@ -36,19 +36,18 @@ interface FeatureItem {
 
 /**
  * NewPlayerWelcome - Welcome modal for first-time players
- * Shows a friendly welcome with option to view the tutorial
+ * Shows a friendly welcome with option to view the tutorial.
+ * Modal is shown once per user and persisted across sessions.
  */
 const NewPlayerWelcome: React.FC<NewPlayerWelcomeProps> = ({
   isOpen,
   onClose,
 }): React.ReactElement => {
   const { t, dir } = useLanguage();
-  const [dontShowAgain, setDontShowAgain] = useState<boolean>(false);
 
-  const handlePlay = (): void => {
-    if (dontShowAgain) {
-      markTutorialSeen();
-    }
+  // Always mark as seen when modal closes to ensure show-once behavior
+  const handleClose = (): void => {
+    markTutorialSeen();
     onClose();
   };
 
@@ -60,7 +59,7 @@ const NewPlayerWelcome: React.FC<NewPlayerWelcomeProps> = ({
   ];
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent noDescription className="max-w-sm" dir={dir}>
         <DialogHeader className="bg-neo-cyan text-neo-black p-2 sm:p-3">
           <DialogTitle className="flex items-center justify-center gap-2 text-base sm:text-lg">
@@ -89,24 +88,11 @@ const NewPlayerWelcome: React.FC<NewPlayerWelcomeProps> = ({
               </motion.div>
             ))}
           </div>
-
-          {/* Don't show again */}
-          <label className="flex items-center justify-center gap-2 cursor-pointer pt-1">
-            <input
-              type="checkbox"
-              checked={dontShowAgain}
-              onChange={(e) => setDontShowAgain(e.target.checked)}
-              className="w-4 h-4 rounded border-2 border-neo-black accent-neo-pink"
-            />
-            <span className="text-xs text-neo-black/70">
-              {t('howToPlay.newPlayer.dontShowAgain') || "Don't show again"}
-            </span>
-          </label>
         </DialogBody>
 
         <DialogFooter className="px-3 sm:px-4 pb-3">
           <Button
-            onClick={handlePlay}
+            onClick={handleClose}
             className="w-full bg-neo-lime hover:bg-neo-lime/90 text-neo-black font-bold border-3 border-neo-black shadow-hard py-2"
           >
             <Play className="w-4 h-4 me-2" />

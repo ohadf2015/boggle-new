@@ -123,6 +123,7 @@ const en = {
     "points": "pts",
     "pts": "pts",
     "quit": "Quit",
+    "word": "word",
     "words": "words",
     "wordsFound": "Words",
     "you": "You",
@@ -2113,7 +2114,10 @@ const en = {
     "witty5": "Sounds legit... or does it?",
     "witty6": "Is \"{word}\" a stroke of genius or madness?",
     "witty7": "{player} swears this is a real word!",
-    "witty8": "The dictionary committee awaits your verdict on \"{word}\""
+    "witty8": "The dictionary committee awaits your verdict on \"{word}\"",
+    "helpBuildDictionary": "Help Build Our Dictionary!",
+    "validateWordsDescription": "Vote on words to help improve the game dictionary.",
+    "startVoting": "Vote Now"
   },
   "footer": {
     "aboutGame": "About the Game",

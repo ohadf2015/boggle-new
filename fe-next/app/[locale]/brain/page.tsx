@@ -79,9 +79,14 @@ export default function BrainTrainingPage() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const { brainScore, recentGameScores, drillProgress, brainScoreHistory, isLoading, error, refresh } = useBrainScore();
 
-  // State for first game celebration
+  // State for first game celebration - persisted to localStorage for show-once behavior
+  const FIRST_GAME_CELEBRATION_KEY = 'lexiclash_brain_first_game_celebration_shown';
   const [showCelebration, setShowCelebration] = useState(false);
-  const [hasShownCelebration, setHasShownCelebration] = useState(false);
+  const [hasShownCelebration, setHasShownCelebration] = useState(() => {
+    // Initialize from localStorage to persist across sessions
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem(FIRST_GAME_CELEBRATION_KEY) === 'true';
+  });
 
   // State for auth modal
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -89,12 +94,16 @@ export default function BrainTrainingPage() {
   // State for share modal
   const [showShareCard, setShowShareCard] = useState(false);
 
-  // Show celebration modal for first game (only once per session)
+  // Show celebration modal for first game (only once ever, persisted across sessions)
   useEffect(() => {
     if (brainScore && brainScore.gamesAnalyzed === 1 && !hasShownCelebration) {
       const timer = setTimeout(() => {
         setShowCelebration(true);
         setHasShownCelebration(true);
+        // Persist to localStorage so it doesn't show again on page refresh
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(FIRST_GAME_CELEBRATION_KEY, 'true');
+        }
       }, 500); // Small delay for dramatic effect
       return () => clearTimeout(timer);
     }
@@ -148,7 +157,7 @@ export default function BrainTrainingPage() {
   if (error) {
     return (
       <div className={cn(
-        'h-full flex flex-col page-content-safe',
+        'h-full flex flex-col page-content-safe overflow-y-auto',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
         <AutoHideHeader />
@@ -201,7 +210,7 @@ export default function BrainTrainingPage() {
   if (!isAuthenticated) {
     return (
       <div className={cn(
-        'h-full flex flex-col page-content-safe',
+        'h-full flex flex-col page-content-safe overflow-y-auto',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
         <AutoHideHeader />
@@ -261,7 +270,7 @@ export default function BrainTrainingPage() {
   if (!brainScore) {
     return (
       <div className={cn(
-        'h-full flex flex-col page-content-safe',
+        'h-full flex flex-col page-content-safe overflow-y-auto',
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
         <AutoHideHeader />
@@ -316,7 +325,7 @@ export default function BrainTrainingPage() {
   // Main dashboard with real data
   return (
     <div className={cn(
-      'h-full flex flex-col page-content-safe', // Extra padding for bottom nav
+      'h-full flex flex-col page-content-safe overflow-y-auto', // Extra padding for bottom nav
       isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
     )}>
       <AutoHideHeader />

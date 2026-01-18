@@ -121,6 +121,7 @@ const es = {
     "points": "pts",
     "pts": "PTS",
     "quit": "Salir",
+    "word": "palabra",
     "words": "palabras",
     "wordsFound": "Palabras",
     "you": "Tú",
@@ -2107,7 +2108,10 @@ const es = {
     "witty5": "Suena legítimo... ¿o no?",
     "witty6": "¿Es \"{word}\" genialidad o locura?",
     "witty7": "¡{player} jura que es una palabra real!",
-    "witty8": "El comité del diccionario espera tu veredicto sobre \"{word}\""
+    "witty8": "El comité del diccionario espera tu veredicto sobre \"{word}\"",
+    "helpBuildDictionary": "¡Ayuda a construir nuestro diccionario!",
+    "validateWordsDescription": "Vota palabras para mejorar el diccionario del juego.",
+    "startVoting": "Votar ahora"
   },
   "footer": {
     "aboutGame": "Sobre el Juego",

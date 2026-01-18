@@ -244,9 +244,10 @@ const HostView: React.FC<HostViewProps> = memo(({
   const { runtime, settings, players, tournament, animation, ui, hostPlaying: hostPlayingState, combo } = state;
 
   // Navigation guard - prevent accidental navigation during active game
-  // Only enable when the host is actively playing (not spectating)
+  // Enable for ALL hosts when game is running, whether playing or spectating
+  // Hosts in spectator/broadcast mode still need confirmation before leaving
   useNavigationGuard({
-    enabled: runtime.gameStarted && settings.hostPlaying,
+    enabled: runtime.gameStarted,
     message: t('playerView.exitWarning'),
     onNavigationAttempt: () => {
       // Show the exit confirmation dialog

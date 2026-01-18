@@ -120,6 +120,7 @@ const ja = {
     "score": "スコア",
     "points": "pt",
     "quit": "終了",
+    "word": "単語",
     "words": "単語",
     "wordsFound": "単語",
     "you": "あなた",
@@ -2110,7 +2111,10 @@ const ja = {
     "witty5": "本当っぽい...本当？",
     "witty6": "「{word}」は天才か狂気か？",
     "witty7": "{player}が本当の言葉だと断言！",
-    "witty8": "「{word}」についてあなたの判定を待っています"
+    "witty8": "「{word}」についてあなたの判定を待っています",
+    "helpBuildDictionary": "辞書作りを手伝って！",
+    "validateWordsDescription": "単語に投票してゲーム辞書を改善しよう。",
+    "startVoting": "今すぐ投票"
   },
   "footer": {
     "aboutGame": "ゲームについて",

@@ -90,27 +90,25 @@ describe('ScientificTipsCarousel', () => {
       });
     });
 
-    it('dots have aspect-square for circular appearance', () => {
+    it('dots have fixed height for consistent appearance', () => {
       const { container } = render(<ScientificTipsCarousel />);
 
       const dots = container.querySelectorAll('button.rounded-full');
       dots.forEach((dot) => {
         const className = dot.className;
-        // Should maintain aspect ratio with aspect-square
-        expect(className).toMatch(/aspect-square/);
+        // All dots should have h-3 for consistent height
+        expect(className).toMatch(/h-3/);
       });
     });
 
-    it('renders dots with proper sizing classes', () => {
+    it('renders dots with proper sizing classes (w-3 inactive, w-6 active)', () => {
       const { container } = render(<ScientificTipsCarousel />);
 
       const dots = container.querySelectorAll('button.rounded-full');
-      dots.forEach((dot) => {
-        const className = dot.className;
-        // Should have width and height classes (w-2 h-2 = 8px)
-        expect(className).toMatch(/w-2/);
-        expect(className).toMatch(/h-2/);
-      });
+      // First dot is active by default
+      expect(dots[0].className).toMatch(/w-6/);
+      // Other dots are inactive
+      expect(dots[1].className).toMatch(/w-3/);
     });
   });
 

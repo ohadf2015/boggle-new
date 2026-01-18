@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Medal, Bot, BarChart3, Crown, Award, Hash, TrendingUp, Globe } from 'lucide-react';
+import { Trophy, Medal, Bot, BarChart3, Crown, Award, Hash, TrendingUp, Globe, Book, X } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import PlayerInsights from '@/components/results/PlayerInsights';
 import PlayerArchetypeBadge from '@/components/results/PlayerArchetypeBadge';
@@ -93,6 +93,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   const [wordValidationQueue, setWordValidationQueue] = useState<string[]>([]);
   const [showTrainingAnalysis, setShowTrainingAnalysis] = useState(false);
   const [showWordValidation, setShowWordValidation] = useState(false);
+  const [showWordValidationPrompt, setShowWordValidationPrompt] = useState(false);
 
   // Mobile tab navigation state - Consolidated to 2 tabs for reduced cognitive load
   type MobileTab = 'results' | 'details';
@@ -531,20 +532,29 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   }, [isAuthenticated, user, authLoading]);
 
 
-  // Show word validation modal after game results load
-  // Limit to 2 words to avoid overwhelming the user with modals
+  // Show word validation prompt after delay - requires user interaction to show modal
+  // Waits 5 seconds, then shows a prompt. User must click to see the validation modal.
   useEffect(() => {
     const wordsForValidation = results.botWordsForValidation;
     if (!wordsForValidation || wordsForValidation.length === 0) {
       return;
     }
+    // Prepare the queue immediately but don't show modal yet
+    const limitedQueue = wordsForValidation.slice(0, 2);
+    setWordValidationQueue(limitedQueue);
+
+    // Show prompt after 5 seconds delay - user must click to see modal
     const timer = setTimeout(() => {
-      const limitedQueue = wordsForValidation.slice(0, 2);
-      setWordValidationQueue(limitedQueue);
-      setShowWordValidation(true);
-    }, 1500); // 1.5s delay so results render first
+      setShowWordValidationPrompt(true);
+    }, 5000);
     return () => clearTimeout(timer);
   }, [results.botWordsForValidation]);
+
+  // Handle user clicking the word validation prompt
+  const handleWordValidationPromptClick = useCallback(() => {
+    setShowWordValidationPrompt(false);
+    setShowWordValidation(true);
+  }, []);
 
 
   // Handle word validation votes
@@ -1314,6 +1324,62 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       </div>
 
       {/* Modals - Outside both mobile and desktop views */}
+      {/* Word validation prompt - appears after 5 seconds, requires user click */}
+      <AnimatePresence>
+        {showWordValidationPrompt && wordValidationQueue.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            className="fixed bottom-20 md:bottom-8 inset-x-4 md:left-auto md:right-4 md:max-w-sm z-50"
+            data-testid="word-validation-prompt"
+          >
+            <div className="bg-neo-lime border-3 border-neo-black rounded-neo shadow-hard-lg p-4 relative">
+              {/* Dismiss button */}
+              <button
+                onClick={() => setShowWordValidationPrompt(false)}
+                className="absolute top-2 end-2 p-1 text-neo-black/60 hover:text-neo-black transition-colors"
+                aria-label={t('common.close') || 'Close'}
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 bg-neo-pink p-2 rounded-neo border-2 border-neo-black">
+                  <Book className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-black text-neo-black text-sm uppercase">
+                    {t('wordFeedback.helpBuildDictionary') || 'Help Build Our Dictionary!'}
+                  </h3>
+                  <p className="text-xs text-neo-black/70 mt-1">
+                    {t('wordFeedback.validateWordsDescription') || 'Vote on words to help improve the game dictionary.'}
+                  </p>
+                  <button
+                    onClick={handleWordValidationPromptClick}
+                    className="
+                      mt-3 w-full
+                      bg-neo-pink text-white
+                      border-2 border-neo-black
+                      rounded-neo
+                      shadow-hard-sm
+                      px-4 py-2
+                      font-bold text-xs uppercase
+                      hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard
+                      active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed
+                      transition-all duration-150
+                    "
+                  >
+                    {t('wordFeedback.startVoting') || 'Vote Now'} ({wordValidationQueue.length} {wordValidationQueue.length === 1 ? (t('common.word') || 'word') : (t('common.words') || 'words')})
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Word validation modal */}
       {showWordValidation && wordValidationQueue.length > 0 && (
         <WordFeedbackModal

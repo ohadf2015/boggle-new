@@ -12,7 +12,8 @@ import SwipeTipTooltip from '@/components/game/SwipeTipTooltip';
 import { AutoClueNotification } from './AutoClueNotification';
 import type { LetterGrid } from '@/types';
 import type { HintLevel } from '@/utils/aiHintGenerator';
-import type { AccumulatedClue } from './types';
+import type { LetterFeedback } from '@/utils/wordHuntFeedback';
+import type { AccumulatedClue, TargetAttempt } from './types';
 import { MAX_ATTEMPTS } from './constants';
 
 export interface SurvivalLandscapeLayoutProps {
@@ -28,7 +29,7 @@ export interface SurvivalLandscapeLayoutProps {
   // Life props
   lifePoints: number;
   isLifeGaining: boolean;
-  attempts: { word: string; timestamp: number }[];
+  attempts: TargetAttempt[];
 
   // Score props (replaces token props)
   liveScore: number;
@@ -169,6 +170,7 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
             targetWord={targetWord}
             accumulatedClues={accumulatedClues}
             revealedLetters={revealedLetters}
+            attempts={attempts}
             isProtected={isProtected}
             gameDir={gameDir}
           />
@@ -341,6 +343,7 @@ interface LandscapeClueBoxesProps {
   targetWord: string;
   accumulatedClues: Map<number, AccumulatedClue>;
   revealedLetters: Set<number>;
+  attempts: TargetAttempt[];
   isProtected: boolean;
   gameDir: 'ltr' | 'rtl';
 }
@@ -350,6 +353,7 @@ const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
   targetWord,
   accumulatedClues,
   revealedLetters,
+  attempts,
   isProtected,
   gameDir,
 }) => {
@@ -361,6 +365,31 @@ const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
       ? "w-8 h-8 text-sm"
       : "w-7 h-7 text-xs";
 
+  // Compute persisted letters from attempts (most recent yellow/green at each position)
+  // Priority: green > yellow (from most recent to oldest attempt)
+  const persistedLetters = React.useMemo(() => {
+    const result = new Map<number, { letter: string; type: 'green' | 'yellow' }>();
+
+    // Process attempts in order (older to newer) so newer overwrites older
+    for (const attempt of attempts) {
+      for (const fb of attempt.feedback) {
+        if (fb.feedback === 'green') {
+          // Green always wins at this position
+          result.set(fb.position, { letter: fb.letter.toUpperCase(), type: 'green' });
+        } else if (fb.feedback === 'yellow') {
+          // Yellow only sets if no green exists at this position yet
+          const existing = result.get(fb.position);
+          if (!existing || existing.type !== 'green') {
+            result.set(fb.position, { letter: fb.letter.toUpperCase(), type: 'yellow' });
+          }
+        }
+        // Gray letters don't persist
+      }
+    }
+
+    return result;
+  }, [attempts]);
+
   return (
     <div
       dir={gameDir}
@@ -371,12 +400,14 @@ const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
     >
       {hintChars.map((char, idx) => {
         const accumulatedClue = accumulatedClues.get(idx);
+        const persistedLetter = persistedLetters.get(idx);
         const isHintRevealed = char !== '_';
         const isShopRevealed = revealedLetters.has(idx);
 
         let displayChar: string;
         let bgClass: string;
 
+        // Priority: green from accumulatedClues > shop revealed > hint revealed > persisted letter > unknown
         if (accumulatedClue) {
           displayChar = accumulatedClue.letter;
           bgClass = accumulatedClue.type === 'green'
@@ -388,6 +419,12 @@ const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
         } else if (isHintRevealed) {
           displayChar = char.toUpperCase();
           bgClass = "bg-neo-pink border-neo-pink text-white";
+        } else if (persistedLetter) {
+          // Show persisted yellow/green letter from previous guesses
+          displayChar = persistedLetter.letter;
+          bgClass = persistedLetter.type === 'green'
+            ? "bg-green-500 border-green-700 text-white"
+            : "bg-yellow-500 border-yellow-600 text-neo-black";
         } else {
           displayChar = '';
           bgClass = "bg-neo-black border-neo-black";

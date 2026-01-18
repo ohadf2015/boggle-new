@@ -277,34 +277,26 @@ export default function ScientificTipsCarousel() {
             )} />
           </button>
 
-          {/* Progress dots with animation */}
-          <div className="flex items-center justify-center gap-2.5">
+          {/* Progress dots with fixed width container */}
+          <div className="flex items-center justify-center gap-2 w-[100px]">
             {TIPS.map((tip, index) => (
               <button
                 key={tip.id}
                 onClick={() => goToIndex(index)}
                 aria-label={`Go to tip ${index + 1}`}
                 className={cn(
-                  'relative w-2 h-2 shrink-0 aspect-square rounded-full border border-neo-black transition-all duration-300',
+                  'relative shrink-0 rounded-full border-2 border-neo-black transition-all duration-300',
                   index === activeIndex
                     ? cn(
-                        'scale-150',
-                        isDarkMode ? 'bg-neo-lime shadow-[0_0_8px_rgba(163,230,53,0.5)]' : 'bg-neo-purple shadow-[0_0_8px_rgba(147,51,234,0.3)]'
+                        'w-6 h-3',
+                        isDarkMode ? 'bg-neo-lime shadow-hard-sm' : 'bg-neo-purple shadow-hard-sm'
                       )
                     : cn(
-                        'hover:scale-125',
-                        isDarkMode ? 'bg-slate-600 hover:bg-slate-500' : 'bg-slate-300 hover:bg-slate-400'
+                        'w-3 h-3 hover:opacity-80',
+                        isDarkMode ? 'bg-slate-600' : 'bg-slate-300'
                       )
                 )}
-              >
-                {index === activeIndex && (
-                  <motion.span
-                    layoutId="activeDot"
-                    className="absolute inset-0 rounded-full border-2 border-neo-black"
-                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                  />
-                )}
-              </button>
+              />
             ))}
           </div>
 

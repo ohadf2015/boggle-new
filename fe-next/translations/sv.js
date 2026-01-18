@@ -118,6 +118,7 @@ const sv = {
     "points": "pts",
     "pts": "P",
     "quit": "Avsluta",
+    "word": "ord",
     "words": "ord",
     "wordsFound": "Ord",
     "you": "Du",
@@ -2104,7 +2105,10 @@ const sv = {
     "witty5": "Låter legit... eller?",
     "witty6": "Är \"{word}\" genialiskt eller galet?",
     "witty7": "{player} svär på att detta är ett riktigt ord!",
-    "witty8": "Ordlistan väntar på din dom om \"{word}\""
+    "witty8": "Ordlistan väntar på din dom om \"{word}\"",
+    "helpBuildDictionary": "Hjälp oss bygga ordboken!",
+    "validateWordsDescription": "Rösta på ord för att förbättra spelordboken.",
+    "startVoting": "Rösta nu"
   },
   "footer": {
     "aboutGame": "Om Spelet",
