@@ -215,6 +215,7 @@ router.get(
       });
     } catch (error: any) {
       console.error('[BUZZ] Error fetching challenge:', error.message);
+      if (res.headersSent) return;
       res.status(500).json({
         success: false,
         error: 'Failed to fetch daily challenge',
@@ -278,6 +279,7 @@ router.get(
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error('[BUZZ] Error fetching history:', errorMessage);
+      if (res.headersSent) return;
       res.status(500).json({ error: 'Failed to fetch challenge history' });
     }
   }
@@ -379,6 +381,7 @@ router.post('/buzz/submit', async (req: Request, res: Response): Promise<void> =
     });
   } catch (error: any) {
     console.error('[BUZZ] Error submitting challenge:', error.message);
+    if (res.headersSent) return;
     res.status(500).json({
       success: false,
       error: 'Failed to submit challenge',
@@ -443,6 +446,7 @@ router.get(
       });
     } catch (error: any) {
       console.error('[BUZZ] Error fetching leaderboard:', error.message);
+      if (res.headersSent) return;
       res.status(500).json({
         success: false,
         error: 'Failed to fetch leaderboard',
@@ -517,6 +521,7 @@ router.get(
       });
     } catch (error: any) {
       console.error('[BUZZ] Error fetching stats:', error.message);
+      if (res.headersSent) return;
       res.status(500).json({
         success: false,
         error: 'Failed to fetch stats',
@@ -597,6 +602,7 @@ router.get(
       });
     } catch (error: any) {
       console.error('[BUZZ] Error checking play status:', error.message);
+      if (res.headersSent) return;
       res.status(500).json({
         success: false,
         error: 'Failed to check play status',
@@ -643,6 +649,7 @@ router.get(
       });
     } catch (error: any) {
       console.error('[BUZZ] Error fetching streak:', error.message);
+      if (res.headersSent) return;
       res.status(500).json({
         success: false,
         error: 'Failed to fetch streak',
@@ -689,6 +696,7 @@ router.get(
       });
     } catch (error: any) {
       console.error('[BUZZ] Error fetching preview:', error.message);
+      if (res.headersSent) return;
       res.status(500).json({
         success: false,
         error: 'Failed to fetch preview',
@@ -791,6 +799,7 @@ router.post(
     } catch (error: unknown) {
       const err = error as Error;
       logger.error('BUZZ_REQUEST', `Error processing request: ${err.message}`);
+      if (res.headersSent) return;
       res.status(500).json({ error: 'Failed to process request' });
     }
   }
@@ -825,6 +834,7 @@ router.get(
     } catch (error: unknown) {
       const err = error as Error;
       logger.error('BUZZ', `Error checking availability: ${err.message}`);
+      if (res.headersSent) return;
       res.status(500).json({ error: 'Failed to check availability' });
     }
   }
@@ -879,6 +889,7 @@ router.post(
       });
     } catch (error: any) {
       console.error('[BUZZ] Error generating challenge:', error.message);
+      if (res.headersSent) return;
       res.status(500).json({
         success: false,
         error: 'Failed to generate challenge',
@@ -907,6 +918,7 @@ router.get(
       });
     } catch (error: any) {
       console.error('[BUZZ] Error fetching trends:', error.message);
+      if (res.headersSent) return;
       res.status(500).json({
         success: false,
         error: 'Failed to fetch trends',

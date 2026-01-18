@@ -62,6 +62,17 @@ const REGION_MAP: Record<string, string> = {
   es: 'ES',
 };
 
+// Minimum answer length by language (Japanese kanji compounds are typically 2-4 characters)
+const MIN_ANSWER_LENGTH: Record<string, number> = {
+  en: 3,
+  he: 3,
+  sv: 3,
+  ja: 2,  // Japanese kanji compounds are shorter than Western words
+  es: 3,
+};
+
+const MAX_ANSWER_LENGTH = 15;
+
 // Vertex AI Gemini configuration (using existing project credentials)
 // Using most advanced model for high-quality puzzle generation
 const GEMINI_MODEL = process.env.VERTEX_AI_MODEL || 'gemini-2.5-pro';
@@ -1445,8 +1456,10 @@ const WORDLE_WORD_LENGTH = 5;
  */
 function validateChallenges(
   challenges: BuzzChallenge[],
-  _language: string
+  language: string
 ): BuzzChallenge[] {
+  const minLength = MIN_ANSWER_LENGTH[language] || 3;
+
   const validatedChallenges = challenges.filter((challenge) => {
     const answer = challenge.answer;
 
@@ -1463,9 +1476,9 @@ function validateChallenges(
         return false;
       }
     } else {
-      // Check word length for non-wordle challenges (3-15 letters)
-      if (answer.length < 3 || answer.length > 15) {
-        console.warn(`[BUZZ] Word length invalid: ${answer} (${answer.length} letters)`);
+      // Check word length for non-wordle challenges (language-specific minimum)
+      if (answer.length < minLength || answer.length > MAX_ANSWER_LENGTH) {
+        console.warn(`[BUZZ] Word length invalid: ${answer} (${answer.length} letters, min ${minLength} for ${language})`);
         return false;
       }
     }
@@ -1515,9 +1528,10 @@ function validateChallenges(
  */
 function validateSingleChallenge(
   challenge: BuzzChallenge,
-  _language: string
+  language: string
 ): boolean {
   const answer = challenge.answer;
+  const minLength = MIN_ANSWER_LENGTH[language] || 3;
 
   // Filter out brand names and proper nouns
   if (isBrandOrProperNoun(answer)) {
@@ -1532,9 +1546,9 @@ function validateSingleChallenge(
       return false;
     }
   } else {
-    // Check word length for non-wordle challenges (3-15 letters)
-    if (answer.length < 3 || answer.length > 15) {
-      console.warn(`[BUZZ] Word length invalid: ${answer} (${answer.length} letters)`);
+    // Check word length for non-wordle challenges (language-specific minimum)
+    if (answer.length < minLength || answer.length > MAX_ANSWER_LENGTH) {
+      console.warn(`[BUZZ] Word length invalid: ${answer} (${answer.length} letters, min ${minLength} for ${language})`);
       return false;
     }
   }

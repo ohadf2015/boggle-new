@@ -1030,3 +1030,265 @@ describe('generateDailyBuzz with deleteBeforeRegenerate option', () => {
     expect(result.challenges.length).toBeGreaterThanOrEqual(5);
   });
 });
+
+describe('Japanese 2-letter word validation', () => {
+  // Trends must have query.length >= 3 to pass filterTrends()
+  // Using longer topic names but answers can still be 2 characters
+  const japaneseTrends = [
+    {
+      query: '地震速報',  // 4 chars - earthquake alert
+      search_volume: 500000,
+      active: true,
+      categories: [{ id: 1, name: 'News' }],
+      trend_breakdown: ['Earthquake news'],
+    },
+    {
+      query: '東京タワー',  // 5 chars - Tokyo Tower
+      search_volume: 300000,
+      active: true,
+      categories: [{ id: 3, name: 'Travel' }],
+      trend_breakdown: ['Tokyo news'],
+    },
+    {
+      query: '花火大会',  // 4 chars - Fireworks festival
+      search_volume: 200000,
+      active: true,
+      categories: [{ id: 5, name: 'Events' }],
+      trend_breakdown: ['Fireworks festival'],
+    },
+  ];
+
+  const englishTrends = [
+    {
+      query: 'technology',
+      search_volume: 500000,
+      active: true,
+      categories: [{ id: 5, name: 'Science & Technology' }],
+      trend_breakdown: ['Tech news'],
+    },
+    {
+      query: 'sports',
+      search_volume: 200000,
+      active: true,
+      categories: [{ id: 7, name: 'Sports' }],
+      trend_breakdown: ['Sports news'],
+    },
+    {
+      query: 'music',
+      search_volume: 150000,
+      active: true,
+      categories: [{ id: 3, name: 'Entertainment' }],
+      trend_breakdown: ['Music news'],
+    },
+  ];
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    // Mock environment variables
+    process.env.GOOGLE_CREDENTIALS_JSON = JSON.stringify({
+      project_id: 'test-project',
+      private_key: 'test-key',
+      client_email: 'test@test.com',
+    });
+    process.env.GOOGLE_CLOUD_LOCATION = 'us-central1';
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key';
+
+    // Mock getTrendsFromDbCache to return null (will use fetchGoogleTrends)
+    (serpApiClient.getTrendsFromDbCache as jest.Mock).mockResolvedValue(null);
+
+    // Mock fetchGoogleTrends - dynamically return based on region
+    (serpApiClient.fetchGoogleTrends as jest.Mock).mockImplementation((region: string) => {
+      if (region === 'JP') {
+        return Promise.resolve(japaneseTrends);
+      }
+      return Promise.resolve(englishTrends);
+    });
+  });
+
+  it('should accept 2-letter Japanese answers (kanji compounds)', async () => {
+    // AI returns challenges with valid 2-letter Japanese answers
+    mockGenerateContent.mockResolvedValueOnce({
+      response: {
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify({
+                    date: '2026-01-14',
+                    language: 'ja',
+                    trending_summary: '地震速報・東京タワー・花火大会',
+                    challenges: [
+                      {
+                        type: 'anagram',
+                        trend_topic: '地震速報',
+                        prompt: 'れゆ を並べ替え',
+                        answer: 'ゆれ', // 2-letter hiragana word (shaking/trembling)
+                        hint: '揺れる',
+                        difficulty: 'easy',
+                        trending_context: '地震のニュース',
+                      },
+                      {
+                        type: 'fill_blank',
+                        trend_topic: '東京タワー',
+                        prompt: '___の街 (2文字)',
+                        answer: '東京', // 2-letter kanji compound
+                        hint: '日本の首都',
+                        difficulty: 'easy',
+                        trending_context: '東京のイベント',
+                      },
+                      {
+                        type: 'definition_match',
+                        trend_topic: '花火大会',
+                        prompt: '夏の風物詩',
+                        answer: '花火', // 2-letter kanji compound
+                        options: ['花火', '祭り', '浴衣', '夏休み'],
+                        hint: '夜空に咲く',
+                        difficulty: 'medium',
+                        trending_context: '花火大会',
+                      },
+                      {
+                        type: 'riddle',
+                        trend_topic: '地震速報',
+                        prompt: '地面が動く現象',
+                        answer: '地震', // 2-letter kanji compound
+                        hint: '揺れる',
+                        difficulty: 'medium',
+                        trending_context: '地震速報',
+                      },
+                      {
+                        type: 'anagram',
+                        trend_topic: '東京タワー',
+                        prompt: 'うきょと を並べ替え',
+                        answer: 'とうきょう', // 4-letter hiragana
+                        hint: '首都',
+                        difficulty: 'easy',
+                        trending_context: '東京の天気',
+                      },
+                    ],
+                  }),
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    const today = new Date();
+    const result = await generateDailyBuzz(today, 'ja');
+
+    // Should have at least 5 challenges (all should pass validation)
+    expect(result).toBeDefined();
+    expect(result.challenges.length).toBeGreaterThanOrEqual(5);
+
+    // 2-letter Japanese answers should be included
+    const twoLetterChallenges = result.challenges.filter(c => c.answer.length === 2);
+    expect(twoLetterChallenges.length).toBeGreaterThan(0);
+
+    // Verify specific 2-letter words are present
+    const answers = result.challenges.map(c => c.answer);
+    expect(answers).toContain('ゆれ');
+    expect(answers).toContain('東京');
+    expect(answers).toContain('花火');
+    expect(answers).toContain('地震');
+  });
+
+  it('should still reject 2-letter English answers', async () => {
+    // AI returns a challenge with invalid 2-letter English answer
+    mockGenerateContent.mockResolvedValueOnce({
+      response: {
+        candidates: [
+          {
+            content: {
+              parts: [
+                {
+                  text: JSON.stringify({
+                    date: '2026-01-14',
+                    language: 'en',
+                    trending_summary: 'Tech & Sports',
+                    challenges: [
+                      {
+                        type: 'anagram',
+                        trend_topic: 'technology',
+                        prompt: 'Unscramble: TI',
+                        answer: 'IT', // 2 letters - should be rejected for English!
+                        hint: 'Information tech',
+                        difficulty: 'easy',
+                        trending_context: 'Tech trends',
+                      },
+                      {
+                        type: 'fill_blank',
+                        trend_topic: 'sports',
+                        prompt: 'The team scored a _____ (4 letters)',
+                        answer: 'GOAL',
+                        hint: 'Point in soccer',
+                        difficulty: 'easy',
+                        trending_context: 'Sports news',
+                      },
+                      {
+                        type: 'riddle',
+                        trend_topic: 'music',
+                        prompt: 'I have keys but no locks',
+                        answer: 'PIANO',
+                        hint: 'Musical instrument',
+                        difficulty: 'medium',
+                        trending_context: 'Music trending',
+                      },
+                      {
+                        type: 'definition_match',
+                        trend_topic: 'technology',
+                        prompt: 'A device for computing',
+                        answer: 'COMPUTER',
+                        options: ['COMPUTER', 'PHONE', 'TABLET', 'WATCH'],
+                        hint: 'Desktop or laptop',
+                        difficulty: 'easy',
+                        trending_context: 'Tech news',
+                      },
+                      {
+                        type: 'word_chain',
+                        trend_topic: 'sports',
+                        prompt: 'BALL → ? → NET',
+                        answer: 'GAME',
+                        hint: 'Competition',
+                        difficulty: 'medium',
+                        trending_context: 'Sports chain',
+                      },
+                      {
+                        type: 'anagram',
+                        trend_topic: 'technology',
+                        prompt: 'Unscramble: IGDLA',
+                        answer: 'ALGID',
+                        hint: 'Cold',
+                        difficulty: 'hard',
+                        trending_context: 'Tech trends',
+                      },
+                    ],
+                  }),
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    const today = new Date();
+    const result = await generateDailyBuzz(today, 'en');
+
+    // Should have at least 5 challenges (IT should be filtered out)
+    expect(result).toBeDefined();
+    expect(result.challenges.length).toBeGreaterThanOrEqual(5);
+
+    // The 2-letter English word "IT" should NOT be included
+    const answers = result.challenges.map(c => c.answer);
+    expect(answers).not.toContain('IT');
+
+    // All English answers should be at least 3 letters
+    for (const challenge of result.challenges) {
+      expect(challenge.answer.length).toBeGreaterThanOrEqual(3);
+    }
+  });
+});

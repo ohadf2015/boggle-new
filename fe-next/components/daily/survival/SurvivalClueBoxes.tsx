@@ -47,7 +47,6 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
   return (
     <motion.div
       ref={ref}
-      key={`clue-container-${attempts.length}`}
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
@@ -77,7 +76,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
 
       {/* Black boxes for target word OR Letter Feedback Overlay */}
       <div dir={gameDir} className="flex justify-center flex-wrap gap-2 sm:gap-2.5 px-2">
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="sync">
           {showFeedbackOverlay && latestAttemptFeedback ? (
             <FeedbackOverlay
               feedback={latestAttemptFeedback}
@@ -97,7 +96,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
 
       {/* Legend / Known letters indicator */}
       <div className="min-h-[40px] sm:min-h-[44px] flex flex-col justify-center">
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="sync">
           {showFeedbackOverlay && latestAttemptFeedback ? (
             <FeedbackLegend t={t} />
           ) : (
