@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PlayerArchetypeBadge from './PlayerArchetypeBadge';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
-import { getChartData, calculateTrend, type GameHistoryEntry, type PerformanceTrend } from '@/utils/gameHistoryManager';
+import { getChartData, type GameHistoryEntry, type PerformanceTrend } from '@/utils/gameHistoryManager';
 import type { CoinReward, CoinRewardMode } from './CoinRewardDisplay';
 import type { BrainPointsReward } from './BrainPointsDisplay';
 
@@ -124,7 +124,6 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
 }) => {
   const { t } = useLanguage();
   const [chartData, setChartData] = useState<GameHistoryEntry[]>([]);
-  const [trend, setTrend] = useState<PerformanceTrend | null>(null);
   const [isClient, setIsClient] = useState(false);
 
   // Load chart data on client side
@@ -132,13 +131,57 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
     setIsClient(true);
     const data = getChartData(8); // Get last 8 games for sparkline
     setChartData(data);
-    setTrend(calculateTrend());
   }, []);
 
-  // Extract scores for sparkline
+  // Extract scores for sparkline, ensuring currentScore is always included as the last point.
+  // This fixes a race condition where the current game may not be in history yet
+  // when this component mounts.
   const sparklineScores = useMemo(() => {
-    return chartData.map(d => d.score);
-  }, [chartData]);
+    const historicalScores = chartData.map(d => d.score);
+
+    // If no current score provided, just use historical data
+    if (currentScore === undefined) {
+      return historicalScores;
+    }
+
+    // If current score already matches the last historical score, don't duplicate
+    const lastHistoricalScore = historicalScores[historicalScores.length - 1];
+    if (lastHistoricalScore === currentScore) {
+      return historicalScores;
+    }
+
+    // Append current score to ensure sparkline ends with the current game
+    return [...historicalScores, currentScore];
+  }, [chartData, currentScore]);
+
+  // Calculate visual trend based on actual sparkline data (not storage)
+  // This ensures the trend indicator matches what the user sees in the sparkline
+  const visualTrend = useMemo((): PerformanceTrend | null => {
+    if (sparklineScores.length < 2) return null;
+
+    // Compare last score (current game) to average of previous scores
+    const lastScore = sparklineScores[sparklineScores.length - 1];
+    const previousScores = sparklineScores.slice(0, -1);
+    const previousAvg = previousScores.reduce((a, b) => a + b, 0) / previousScores.length;
+
+    // Determine direction based on current vs previous average
+    let direction: 'up' | 'down' | 'stable' = 'stable';
+    const percentChange = previousAvg > 0
+      ? ((lastScore - previousAvg) / previousAvg) * 100
+      : 0;
+
+    if (percentChange > 10) direction = 'up';
+    else if (percentChange < -10) direction = 'down';
+
+    return {
+      direction,
+      percentChange: Math.round(percentChange),
+      averageScore: Math.round(previousAvg),
+      bestScore: Math.max(...sparklineScores),
+      totalGames: sparklineScores.length,
+      recentAverage: lastScore,
+    };
+  }, [sparklineScores]);
 
   // Check if we have coin/brain rewards to show
   const hasCoinReward = coinReward && coinReward.awarded > 0;
@@ -259,31 +302,31 @@ const CompactResultsStats: React.FC<CompactResultsStatsProps> = memo(({
               <MiniSparkline
                 data={sparklineScores}
                 currentScore={currentScore}
-                trend={trend}
+                trend={visualTrend}
                 width={70}
                 height={32}
               />
-              {trend && (
+              {visualTrend && (
                 <div className="flex items-center gap-1">
                   <div className={cn(
                     'w-5 h-5',
-                    trend.direction === 'up' && 'text-neo-lime',
-                    trend.direction === 'down' && 'text-neo-red',
-                    trend.direction === 'stable' && 'text-neo-cyan'
+                    visualTrend.direction === 'up' && 'text-neo-lime',
+                    visualTrend.direction === 'down' && 'text-neo-red',
+                    visualTrend.direction === 'stable' && 'text-neo-cyan'
                   )}>
-                    {trend.direction === 'up' && <TrendingUp className="w-5 h-5" />}
-                    {trend.direction === 'down' && <TrendingDown className="w-5 h-5" />}
-                    {trend.direction === 'stable' && <Minus className="w-5 h-5" />}
+                    {visualTrend.direction === 'up' && <TrendingUp className="w-5 h-5" />}
+                    {visualTrend.direction === 'down' && <TrendingDown className="w-5 h-5" />}
+                    {visualTrend.direction === 'stable' && <Minus className="w-5 h-5" />}
                   </div>
                   <span className={cn(
                     'text-xs font-bold',
-                    trend.direction === 'up' && 'text-neo-lime',
-                    trend.direction === 'down' && 'text-neo-red',
-                    trend.direction === 'stable' && 'text-white/60'
+                    visualTrend.direction === 'up' && 'text-neo-lime',
+                    visualTrend.direction === 'down' && 'text-neo-red',
+                    visualTrend.direction === 'stable' && 'text-white/60'
                   )}>
-                    {trend.direction === 'up' && (t('chart.improving') || 'Improving')}
-                    {trend.direction === 'down' && (t('chart.declining') || 'Declining')}
-                    {trend.direction === 'stable' && (t('chart.stable') || 'Stable')}
+                    {visualTrend.direction === 'up' && (t('chart.improving') || 'Improving')}
+                    {visualTrend.direction === 'down' && (t('chart.declining') || 'Declining')}
+                    {visualTrend.direction === 'stable' && (t('chart.stable') || 'Stable')}
                   </span>
                 </div>
               )}

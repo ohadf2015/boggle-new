@@ -726,7 +726,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
           <NextStepPrompt
             currentMode={nextStepMode}
             onBackToLobby={onBackToLobby}
-            onAction={nextStepMode === 'solo-bots' ? _onQuickRematch : undefined}
             variant="landscape"
             className="mt-auto"
           />
@@ -869,7 +868,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       <NextStepPrompt
         currentMode={nextStepMode}
         onBackToLobby={onBackToLobby}
-        onAction={nextStepMode === 'solo-bots' ? _onQuickRematch : undefined}
         variant="mobile"
       />
     </div>
@@ -1174,7 +1172,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               <NextStepPrompt
                 currentMode={nextStepMode}
                 onBackToLobby={onBackToLobby}
-                onAction={nextStepMode === 'solo-bots' ? _onQuickRematch : undefined}
                 variant="desktop"
               />
             </div>

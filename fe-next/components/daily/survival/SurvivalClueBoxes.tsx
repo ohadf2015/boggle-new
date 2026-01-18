@@ -86,6 +86,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
           {showFeedbackOverlay && latestAttemptFeedback ? (
             <FeedbackOverlay
               feedback={latestAttemptFeedback}
+              targetWordLength={targetWord.length}
               skipAnimations={skipAnimations}
             />
           ) : (
@@ -118,13 +119,46 @@ SurvivalClueBoxes.displayName = 'SurvivalClueBoxes';
 
 // Sub-components
 
+/**
+ * Normalizes feedback array to match target word length.
+ * - If submitted word is shorter: pads with placeholder feedback
+ * - If submitted word is longer: truncates to target length
+ */
+function normalizeToTargetLength(
+  feedback: LetterFeedback[],
+  targetLength: number
+): LetterFeedback[] {
+  if (feedback.length === targetLength) {
+    return feedback;
+  }
+
+  if (feedback.length > targetLength) {
+    // Truncate to target length
+    return feedback.slice(0, targetLength);
+  }
+
+  // Pad with placeholder feedback for remaining positions
+  const normalized = [...feedback];
+  for (let i = feedback.length; i < targetLength; i++) {
+    normalized.push({
+      letter: '?',
+      feedback: 'gray',
+      position: i,
+    });
+  }
+  return normalized;
+}
+
 interface FeedbackOverlayProps {
   feedback: LetterFeedback[];
+  targetWordLength: number;
   skipAnimations: boolean;
 }
 
-const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, skipAnimations }) => {
-  const wordLength = feedback.length;
+const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordLength, skipAnimations }) => {
+  // Normalize feedback to match target word length
+  const normalizedFeedback = normalizeToTargetLength(feedback, targetWordLength);
+  const wordLength = normalizedFeedback.length;
   const sizeClass = wordLength <= 4
     ? "w-11 h-11 sm:w-12 sm:h-12 text-lg sm:text-xl"
     : wordLength <= 6
@@ -142,7 +176,7 @@ const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, skipAnimati
       transition={{ duration: 0.3 }}
       className="flex justify-center flex-wrap gap-2 sm:gap-2.5"
     >
-      {feedback.map((letterFb, idx) => (
+      {normalizedFeedback.map((letterFb, idx) => (
         <motion.div
           key={idx}
           initial={skipAnimations ? { opacity: 0 } : { rotateX: 90, opacity: 0 }}

@@ -985,19 +985,6 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           variant="default"
         />
 
-        {/* Word Feedback Modal */}
-        <WordFeedbackModal
-          isOpen={showWordFeedback && wordToVote !== null}
-          word={wordToVote?.word || ''}
-          submittedBy={wordToVote?.submittedBy || ''}
-          submitterAvatar={wordToVote?.submitterAvatar ?? undefined}
-          voteInfo={wordToVote?.voteInfo}
-          wordQueue={wordQueue.map(w => ({ ...w, submitterAvatar: w.submitterAvatar ?? undefined }))}
-          timeoutSeconds={wordToVote?.timeoutSeconds || 15}
-          onVote={handleVote}
-          onSkip={handleFeedbackSkip}
-          onTimeout={handleFeedbackSkip}
-        />
       </div>
     );
   }

@@ -386,6 +386,36 @@ const RightPanel: React.FC<RightPanelProps> = ({
   );
 };
 
+/**
+ * Normalizes feedback array to match target word length.
+ * - If submitted word is shorter: pads with placeholder feedback
+ * - If submitted word is longer: truncates to target length
+ */
+function normalizeToTargetLength(
+  feedback: LetterFeedback[],
+  targetLength: number
+): LetterFeedback[] {
+  if (feedback.length === targetLength) {
+    return feedback;
+  }
+
+  if (feedback.length > targetLength) {
+    // Truncate to target length
+    return feedback.slice(0, targetLength);
+  }
+
+  // Pad with placeholder feedback for remaining positions
+  const normalized = [...feedback];
+  for (let i = feedback.length; i < targetLength; i++) {
+    normalized.push({
+      letter: '?',
+      feedback: 'gray',
+      position: i,
+    });
+  }
+  return normalized;
+}
+
 const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
   currentHint,
   targetWord,
@@ -445,15 +475,19 @@ const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
         <AnimatePresence mode="sync">
           {showFeedbackOverlay && latestAttemptFeedback ? (
             // Feedback overlay - shows letter feedback after a guess
-            <motion.div
-              key="feedback-overlay"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.3 }}
-              className="flex justify-center flex-wrap gap-1.5"
-            >
-              {latestAttemptFeedback.map((letterFb, idx) => (
+            // Normalize to target word length so boxes always match
+            (() => {
+              const normalizedFeedback = normalizeToTargetLength(latestAttemptFeedback, targetWord.length);
+              return (
+                <motion.div
+                  key="feedback-overlay"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex justify-center flex-wrap gap-1.5"
+                >
+                  {normalizedFeedback.map((letterFb, idx) => (
                 <motion.div
                   key={idx}
                   initial={skipAnimations ? { opacity: 0 } : { rotateX: 90, opacity: 0 }}
@@ -475,10 +509,12 @@ const LandscapeClueBoxes: React.FC<LandscapeClueBoxesProps> = ({
                     letterFb.feedback === 'gray' && "bg-gray-400 border-gray-500"
                   )}
                 >
-                  {letterFb.letter}
-                </motion.div>
-              ))}
-            </motion.div>
+                    {letterFb.letter}
+                  </motion.div>
+                ))}
+              </motion.div>
+              );
+            })()
           ) : (
             // Hint boxes - shows persisted letters
             <motion.div

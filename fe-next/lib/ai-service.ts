@@ -646,7 +646,19 @@ Respond with ONLY valid JSON (no markdown):
 {"isValid": boolean, "reason": "brief ${languageName} explanation", "confidence": number}`;
 
     try {
-      const result = await this.model.generateContent(prompt);
+      let result;
+      try {
+        result = await this.model.generateContent(prompt);
+      } catch (sdkError) {
+        // Catch SyntaxError from SDK when Vertex AI returns HTML (rate limit page)
+        // The SDK tries to parse JSON but gets HTML like "<!DOCTYPE html>..."
+        if (sdkError instanceof SyntaxError) {
+          const htmlError = new Error(`AI returned HTML instead of JSON (possible rate limit): ${sdkError.message}`);
+          htmlError.name = 'HTMLResponseError';
+          throw htmlError;
+        }
+        throw sdkError;
+      }
       const response = result.response;
       const candidate = response.candidates?.[0];
       

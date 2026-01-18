@@ -113,6 +113,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         image_url: imageResult.url,
         image_prompt: imageResult.prompt,
         image_category: imageResult.category,
+        image_alt_text: imageResult.altText,
         updated_at: new Date().toISOString(),
       })
       .eq('puzzle_date', date)
@@ -131,6 +132,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         image_url: imageResult.url,
         image_prompt: imageResult.prompt,
         image_category: imageResult.category,
+        image_alt_text: imageResult.altText,
         cost: imageResult.cost,
       },
     });

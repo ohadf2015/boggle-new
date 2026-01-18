@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/dialog';
 import { getSession } from '@/lib/supabase';
 import RegenerationDialog from './buzz/RegenerationDialog';
+import PromptTemplateEditor from './buzz/PromptTemplateEditor';
 import type { DailyBuzzDataAdmin } from './buzz/types';
 
 // Client-side timeout matches server maxDuration (120s) with buffer
@@ -92,6 +93,9 @@ export default function DailyBuzzAdminPanel() {
   const [loadingChallenges, setLoadingChallenges] = useState(false);
   const [showChallenges, setShowChallenges] = useState(false);
   const [viewLanguage, setViewLanguage] = useState<string>('en');
+
+  // Prompt template editor state
+  const [showTemplates, setShowTemplates] = useState(false);
 
   // Edit dialog state (single challenge) - uses new RegenerationDialog component
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -346,6 +350,7 @@ export default function DailyBuzzAdminPanel() {
         image_url: data.data.image_url,
         image_prompt: data.data.image_prompt,
         image_category: data.data.image_category,
+        image_alt_text: data.data.image_alt_text,
       });
 
       setSuccessMessage(`Image regenerated for ${challengeData.language.toUpperCase()} on ${challengeData.puzzle_date}`);
@@ -798,10 +803,13 @@ export default function DailyBuzzAdminPanel() {
                     {challengeData.image_url ? (
                       <div className="space-y-2">
                         <div className="relative w-full max-w-sm aspect-[4/3]">
+                          {/* key forces re-render when URL changes, unoptimized bypasses Next.js cache */}
                           <Image
+                            key={challengeData.image_url}
                             src={challengeData.image_url}
                             alt={challengeData.trending_summary || 'Daily Buzz Hero'}
                             fill
+                            unoptimized
                             className="rounded-lg border-2 border-slate-600 object-cover"
                           />
                         </div>
@@ -1039,6 +1047,40 @@ export default function DailyBuzzAdminPanel() {
             View Statistics (API)
           </a>
         </div>
+      </div>
+
+      {/* Prompt Templates Section */}
+      <div className="bg-slate-800/50 border-2 border-slate-700 rounded-xl p-6 space-y-4">
+        <button
+          onClick={() => setShowTemplates(!showTemplates)}
+          className="w-full flex items-center justify-between"
+        >
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <Edit2 className="w-5 h-5 text-neo-yellow" />
+            Prompt Templates
+          </h2>
+          {showTemplates ? (
+            <ChevronUp className="w-5 h-5 text-slate-400" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-slate-400" />
+          )}
+        </button>
+        <p className="text-sm text-slate-400">
+          Customize the AI prompts used to generate riddles, images, and social content
+        </p>
+
+        <AnimatePresence>
+          {showTemplates && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <PromptTemplateEditor />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Edit Challenge Dialog - uses new multi-step RegenerationDialog */}

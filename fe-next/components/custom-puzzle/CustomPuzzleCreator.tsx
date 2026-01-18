@@ -151,6 +151,11 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
     if (!selectedWord || !generatedGrid) return;
 
     try {
+      // Safely get wordsDiscovered count with fallback
+      const wordsDiscoveredCount = Array.isArray(result.wordsDiscovered)
+        ? result.wordsDiscovered.length
+        : 0;
+
       const response = await fetch('/api/custom-puzzle/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -160,10 +165,10 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
           grid: generatedGrid,
           displayName,
           guestFingerprint: user ? null : fingerprint,
-          creatorSolved: result.solved,
-          creatorAttemptsUsed: result.attemptsUsed,
-          creatorWordsDiscovered: result.wordsDiscovered.length,
-          creatorLifeRemaining: result.lifeRemaining,
+          creatorSolved: result.solved ?? false,
+          creatorAttemptsUsed: result.attemptsUsed ?? 0,
+          creatorWordsDiscovered: wordsDiscoveredCount,
+          creatorLifeRemaining: result.lifeRemaining ?? 0,
         }),
       });
 

@@ -58,12 +58,15 @@ export {
  *
  * This is the main function to call after a game ends.
  * Takes raw game data and returns scores for all 5 domains.
+ *
+ * Returns null for idle games (no words found) to indicate "no data"
+ * - this prevents idle games from penalizing the player's rolling average
  */
 export function calculateGameCognitiveScores(
   input: GameCognitiveInput,
   userId: string,
   gameSessionId?: string
-): GameCognitiveScore {
+): GameCognitiveScore | null {
   const {
     wordsFound,
     gameDurationSeconds,
@@ -74,6 +77,12 @@ export function calculateGameCognitiveScores(
     rareWordCount,
     legendaryWordCount,
   } = input;
+
+  // Idle game - return null to indicate no data (neutral)
+  // This prevents idle games from penalizing the player's rolling average
+  if (wordsFound === 0) {
+    return null;
+  }
 
   // Calculate each domain score
   const processingSpeed = calculateProcessingSpeed({

@@ -143,13 +143,26 @@ export function calculatePlayerTitles(
       console.warn(`[TITLES] titleTranslations is invalid when assigning ${titleKey}`);
       return false;
     }
-    const titleData = titleTranslations[titleKey];
+
+    // Safe property access - handle case where titleKey doesn't exist in translations
+    const titleData =
+      Object.prototype.hasOwnProperty.call(titleTranslations, titleKey)
+        ? titleTranslations[titleKey]
+        : undefined;
+
     if (!titleData || usedTitles.has(titleKey) || assignedTitles[username]) {
       return false;
     }
+
+    // Validate titleData has required properties
+    if (typeof titleData !== 'object' || !titleData.name) {
+      console.warn(`[TITLES] Invalid title data for ${titleKey}:`, titleData);
+      return false;
+    }
+
     assignedTitles[username] = {
       titleKey,
-      title: titleData
+      title: titleData,
     };
     usedTitles.add(titleKey);
     return true;

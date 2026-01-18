@@ -122,6 +122,11 @@ export function useSaveCognitiveScore() {
         input.gameSessionId
       );
 
+      if (!gameScores) {
+        console.log('[useSaveCognitiveScore] No scores calculated (insufficient data)');
+        return null;
+      }
+
       console.log('[useSaveCognitiveScore] Calculated scores:', {
         processingSpeed: gameScores.processingSpeed,
         workingMemory: gameScores.workingMemory,

@@ -104,11 +104,24 @@ export function hasPlayedWordHuntToday(language: Language): boolean {
 
 /**
  * Get the stored Word Hunt result for today (if exists)
+ * Returns null if the stored result has invalid data (e.g., attemptsUsed outside 1-10)
  */
 export function getTodaysWordHuntResult(language: Language): StoredWordHuntResult | null {
   const today = getDailyChallengeDate();
   const key = `${WORD_HUNT_STORAGE_KEY}_${language}_${today}`;
-  return getJsonFromLocalStorage<StoredWordHuntResult | null>(key, null);
+  const stored = getJsonFromLocalStorage<StoredWordHuntResult | null>(key, null);
+
+  // Validate attemptsUsed is within valid range (1-10)
+  // Old/corrupted data may have invalid values that cause sync errors
+  if (stored?.result) {
+    const { attemptsUsed } = stored.result;
+    if (attemptsUsed !== undefined && (attemptsUsed < 1 || attemptsUsed > 10)) {
+      console.warn('[Storage] Invalid attemptsUsed:', attemptsUsed, '- discarding stale data');
+      return null;
+    }
+  }
+
+  return stored;
 }
 
 /**
@@ -182,6 +195,7 @@ export function markWordHuntResultSubmitted(language: Language): boolean {
 
 /**
  * Get all stored Word Hunt results (for history)
+ * Filters out invalid results (e.g., attemptsUsed outside 1-10 range)
  */
 export function getAllWordHuntResults(language: Language): StoredWordHuntResult[] {
   if (typeof window === 'undefined') return [];
@@ -193,9 +207,15 @@ export function getAllWordHuntResults(language: Language): StoredWordHuntResult[
   for (let i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
     if (key && key.startsWith(prefix)) {
-      const result = getJsonFromLocalStorage<StoredWordHuntResult | null>(key, null);
-      if (result) {
-        results.push(result);
+      const stored = getJsonFromLocalStorage<StoredWordHuntResult | null>(key, null);
+      // Validate attemptsUsed is within valid range (1-10)
+      if (stored?.result) {
+        const { attemptsUsed } = stored.result;
+        if (attemptsUsed !== undefined && (attemptsUsed < 1 || attemptsUsed > 10)) {
+          console.warn('[Storage] Skipping invalid result for', key, '- attemptsUsed:', attemptsUsed);
+          continue;
+        }
+        results.push(stored);
       }
     }
   }
