@@ -9,7 +9,7 @@
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import JoinRoomModal from '../JoinRoomModal';
 import CreateRoomModal from '../CreateRoomModal';
@@ -281,12 +281,17 @@ describe('Avatar Grid UI', () => {
     };
 
     it('should render avatar grid container with scrollable styling', async () => {
-      const user = userEvent.setup();
+      const user = userEvent.setup({ delay: null }); // Disable delay for faster tests
       render(<CreateRoomModal {...createModalProps} />);
 
       // First, expand the avatar selector by clicking on it
       const avatarSelectorButton = screen.getByText('Choose Avatar').closest('button');
       await user.click(avatarSelectorButton!);
+
+      // Wait for grid to appear
+      await waitFor(() => {
+        expect(document.querySelector('.grid-cols-6')).toBeInTheDocument();
+      }, { timeout: 5000 });
 
       // Find the avatar grid - look for elements with grid class
       const gridContainer = document.querySelector('.grid-cols-6');

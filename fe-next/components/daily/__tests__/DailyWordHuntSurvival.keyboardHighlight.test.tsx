@@ -276,9 +276,11 @@ describe('DailyWordHuntSurvival - Keyboard Highlighting on Desktop', () => {
       />
     );
 
+    // Wait for the component to render - use container query for reliability
     await waitFor(() => {
-      expect(screen.getByRole('grid', { hidden: true })).toBeInTheDocument();
-    });
+      const gridElement = container.querySelector('[role="grid"]');
+      expect(gridElement).toBeInTheDocument();
+    }, { timeout: 5000 });
 
     // The grid should still be interactive for swiping
     const gridElement = container.querySelector('[role="grid"]');

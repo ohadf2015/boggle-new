@@ -105,7 +105,7 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import WordleChallenge from '../WordleChallenge';
@@ -312,7 +312,7 @@ describe('WordleChallenge', () => {
   });
 
   it('does not submit guess on Enter when less than 5 letters', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null }); // Disable delay for faster tests
 
     render(
       <LanguageProvider>
@@ -324,9 +324,18 @@ describe('WordleChallenge', () => {
       </LanguageProvider>
     );
 
-    await user.keyboard('HEL{Enter}');
+    // Type less than 5 letters
+    await user.keyboard('HEL');
 
-    // Should still be on first row, no submission
+    // Wait for cells to update
+    await waitFor(() => {
+      expect(screen.getAllByTestId(/^wordle-cell-0-/)[0]).toHaveTextContent('H');
+    });
+
+    // Press Enter
+    await user.keyboard('{Enter}');
+
+    // Should still be on first row, no submission - check cells
     const cells = screen.getAllByTestId(/^wordle-cell-0-/);
     expect(cells[0]).toHaveTextContent('H');
     expect(cells[1]).toHaveTextContent('E');
@@ -335,7 +344,7 @@ describe('WordleChallenge', () => {
   });
 
   it('calls onAnswer when correct word is guessed', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null }); // Disable delay for faster tests
 
     render(
       <LanguageProvider>
@@ -347,9 +356,22 @@ describe('WordleChallenge', () => {
       </LanguageProvider>
     );
 
-    await user.keyboard('OSCAR{Enter}');
+    // Type the correct answer
+    await user.keyboard('OSCAR');
 
-    expect(mockOnAnswer).toHaveBeenCalledWith('OSCAR');
+    // Wait for all letters to be typed
+    await waitFor(() => {
+      const cells = screen.getAllByTestId(/^wordle-cell-0-/);
+      expect(cells[4]).toHaveTextContent('R');
+    });
+
+    // Press Enter to submit
+    await user.keyboard('{Enter}');
+
+    // Wait for onAnswer to be called
+    await waitFor(() => {
+      expect(mockOnAnswer).toHaveBeenCalledWith('OSCAR');
+    });
   });
 
   it('calls onAnswer with last guess when 6 attempts exhausted', async () => {

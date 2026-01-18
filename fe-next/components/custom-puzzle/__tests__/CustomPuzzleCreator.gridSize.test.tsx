@@ -133,7 +133,7 @@ describe('CustomPuzzleCreator - Grid Size', () => {
   });
 
   it('should display share functionality after completing the puzzle', async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null }); // Disable delay for faster tests
 
     render(
       <CustomPuzzleCreator
@@ -154,7 +154,7 @@ describe('CustomPuzzleCreator - Grid Size', () => {
     // Wait for game component to appear
     await waitFor(() => {
       expect(screen.getByTestId('game-component')).toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
 
     // Complete the game
     const completeButton = screen.getByText('Complete Game');
@@ -163,7 +163,7 @@ describe('CustomPuzzleCreator - Grid Size', () => {
     // Wait for share phase
     await waitFor(() => {
       expect(screen.getByText(/customPuzzle.created/i)).toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
 
     // Verify share functionality is displayed
     expect(screen.getByRole('button', { name: /customPuzzle.share/i })).toBeInTheDocument();

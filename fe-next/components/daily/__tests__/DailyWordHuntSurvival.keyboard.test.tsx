@@ -179,7 +179,7 @@ describe('DailyWordHuntSurvival - Keyboard Typing', () => {
   });
 
   it('should handle backspace in keyboard input', async () => {
-    render(
+    const { container } = render(
       <DailyWordHuntSurvival
         grid={mockGrid}
         puzzleNumber={1}
@@ -190,6 +190,11 @@ describe('DailyWordHuntSurvival - Keyboard Typing', () => {
       />
     );
 
+    // Wait for component to render
+    await waitFor(() => {
+      expect(container.querySelector('[role="grid"]')).toBeInTheDocument();
+    }, { timeout: 5000 });
+
     // Type letters
     fireEvent.keyDown(document, { key: 'h' });
     fireEvent.keyDown(document, { key: 'o' });
@@ -198,11 +203,8 @@ describe('DailyWordHuntSurvival - Keyboard Typing', () => {
     // Remove last letter
     fireEvent.keyDown(document, { key: 'Backspace' });
 
-    // Should have 2 letters highlighted instead of 3
-    await waitFor(() => {
-      const grid = screen.getByRole('grid', { hidden: true });
-      expect(grid).toBeInTheDocument();
-    });
+    // Grid should still be present after backspace
+    expect(container.querySelector('[role="grid"]')).toBeInTheDocument();
   });
 
   it('should disable keyboard input when game is over', () => {

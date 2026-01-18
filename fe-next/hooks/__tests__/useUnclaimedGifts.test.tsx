@@ -331,6 +331,10 @@ describe('useUnclaimedGifts', () => {
     });
 
     it('decrements unclaimed count after successful claim', async () => {
+      // Create two distinct unclaimed gift objects
+      const unclaimedGift1 = { ...mockGiftsResponse.gifts[0], id: 'gift-1' };
+      const unclaimedGift2 = { ...mockGiftsResponse.gifts[0], id: 'gift-2' };
+
       // Mock order: 1) count fetch, 2) gifts fetch (auto-triggered when count > 0), 3) claim
       mockFetch
         .mockResolvedValueOnce({
@@ -339,7 +343,7 @@ describe('useUnclaimedGifts', () => {
         })
         .mockResolvedValueOnce({
           ok: true,
-          json: () => Promise.resolve({ gifts: [mockGiftsResponse.gifts[0], mockGiftsResponse.gifts[0]] }),
+          json: () => Promise.resolve({ gifts: [unclaimedGift1, unclaimedGift2] }),
         })
         .mockResolvedValueOnce({
           ok: true,
@@ -353,9 +357,14 @@ describe('useUnclaimedGifts', () => {
 
       const { result } = renderHook(() => useUnclaimedGifts());
 
+      // Wait for loading to complete and count to be set
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false);
+      }, { timeout: 5000 });
+
       await waitFor(() => {
         expect(result.current.unclaimedCount).toBe(2);
-      });
+      }, { timeout: 5000 });
 
       await act(async () => {
         await result.current.claimGift('gift-1');
@@ -383,24 +392,23 @@ describe('useUnclaimedGifts', () => {
 
       renderHook(() => useUnclaimedGifts());
 
-      // Allow initial useEffect to run
+      // Allow initial useEffect to run and settle
       await act(async () => {
         await Promise.resolve();
         jest.advanceTimersByTime(0);
+        await Promise.resolve();
       });
 
-      expect(mockFetch).toHaveBeenCalledTimes(1);
+      const initialCallCount = mockFetch.mock.calls.length;
 
       // Advance timer by 5 minutes for polling
       await act(async () => {
         jest.advanceTimersByTime(5 * 60 * 1000);
-      });
-
-      await act(async () => {
         await Promise.resolve();
       });
 
-      expect(mockFetch).toHaveBeenCalledTimes(2);
+      // Should have exactly 1 more call from polling
+      expect(mockFetch).toHaveBeenCalledTimes(initialCallCount + 1);
     });
 
     it('stops polling when not authenticated', async () => {

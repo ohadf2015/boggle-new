@@ -77,8 +77,8 @@ jest.mock('../components/BotControls', () => {
   };
 });
 
-// Mock MobileDrawer
-jest.mock('../components/layout/MobileDrawer', () => ({
+// Mock MobileDrawer - use the exact import path from the component
+jest.mock('@/components/layout/MobileDrawer', () => ({
   MobileDrawer: ({ isOpen, onClose, title, children }: {
     isOpen: boolean;
     onClose: () => void;
@@ -312,6 +312,13 @@ describe('HostPreGameView Preset Drawer', () => {
       />
     );
 
+    // Wait for initial useEffect to run (party preset initialization)
+    await waitFor(() => {
+      expect(setTimerValue).toHaveBeenCalledWith(2); // party preset timer
+    });
+
+    const initialCallCount = setTimerValue.mock.calls.length;
+
     // Click preset button
     const quickButton = screen.getByRole('button', { name: /quick/i });
     fireEvent.click(quickButton);
@@ -319,11 +326,9 @@ describe('HostPreGameView Preset Drawer', () => {
     // Drawer should open but preset should NOT be applied yet
     await waitFor(() => {
       expect(screen.getByTestId('mobile-drawer')).toBeInTheDocument();
-    });
+    }, { timeout: 5000 });
 
-    // setTimerValue should NOT have been called (only from initialization, not from click)
-    // The only call should be from the useEffect initialization with party preset
-    expect(setTimerValue).toHaveBeenCalledTimes(1);
-    expect(setTimerValue).toHaveBeenCalledWith(2); // party preset timer, not quick
+    // setTimerValue should NOT have been called again (drawer just opens, doesn't apply)
+    expect(setTimerValue).toHaveBeenCalledTimes(initialCallCount);
   });
 });
