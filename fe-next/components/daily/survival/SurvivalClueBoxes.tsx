@@ -5,13 +5,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
 import type { HintLevel } from '@/utils/aiHintGenerator';
-import type { AccumulatedClue } from './types';
+import type { AccumulatedClue, TargetAttempt } from './types';
 import { MAX_ATTEMPTS } from './constants';
 
 export interface SurvivalClueBoxesProps {
   currentHint: HintLevel | null;
   targetWord: string;
-  attempts: { word: string; feedback: LetterFeedback[]; timestamp: number }[];
+  attempts: TargetAttempt[];
   accumulatedClues: Map<number, AccumulatedClue>;
   revealedLetters: Set<number>;
   knownLetters: Set<string>;
@@ -60,19 +60,25 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
         isProtected && "blur-xl select-none"
       )}
     >
-      {/* Tries counter */}
-      <div className="text-center mb-2">
-        <span className={cn(
-          "text-xl sm:text-2xl font-black",
-          MAX_ATTEMPTS - attempts.length <= 2
-            ? "text-red-600 dark:text-red-400"
-            : MAX_ATTEMPTS - attempts.length <= 4
-              ? "text-yellow-600 dark:text-yellow-400"
-              : "text-gray-700 dark:text-gray-300"
-        )}>
-          {MAX_ATTEMPTS - attempts.length}/{MAX_ATTEMPTS} {t('wordHunt.survival.triesLeft') || 'tries left'}
-        </span>
-      </div>
+      {/* Tries counter - only count non-discovery attempts */}
+      {(() => {
+        const targetAttempts = attempts.filter(a => !a.isDiscovery).length;
+        const triesRemaining = MAX_ATTEMPTS - targetAttempts;
+        return (
+          <div className="text-center mb-2">
+            <span className={cn(
+              "text-xl sm:text-2xl font-black",
+              triesRemaining <= 2
+                ? "text-red-600 dark:text-red-400"
+                : triesRemaining <= 4
+                  ? "text-yellow-600 dark:text-yellow-400"
+                  : "text-gray-700 dark:text-gray-300"
+            )}>
+              {triesRemaining}/{MAX_ATTEMPTS} {t('wordHunt.survival.triesLeft') || 'tries left'}
+            </span>
+          </div>
+        );
+      })()}
 
       {/* Black boxes for target word OR Letter Feedback Overlay */}
       <div dir={gameDir} className="flex justify-center flex-wrap gap-2 sm:gap-2.5 px-2">
@@ -170,7 +176,7 @@ interface HintBoxesProps {
   targetWord: string;
   accumulatedClues: Map<number, AccumulatedClue>;
   revealedLetters: Set<number>;
-  attempts: { word: string; feedback: LetterFeedback[]; timestamp: number }[];
+  attempts: TargetAttempt[];
 }
 
 const HintBoxes: React.FC<HintBoxesProps> = ({

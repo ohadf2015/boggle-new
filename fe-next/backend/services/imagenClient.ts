@@ -144,11 +144,10 @@ function buildImagePrompt(
 
 SUBJECT: ${visualScene}
 
-=== CRITICAL: ABSOLUTELY NO TEXT IN ANY LANGUAGE ===
+=== CRITICAL: ABSOLUTELY NO TEXT ===
 
 **ZERO TEXT POLICY - THIS IS THE MOST IMPORTANT RULE:**
-- ABSOLUTELY NO text, words, letters, numbers, or characters in ANY language
-- NO English text, NO Hebrew text (אבג), NO Japanese text (あいう/漢字), NO Swedish text, NO Spanish text
+- ABSOLUTELY NO text, words, letters, numbers, or characters in any language
 - NO signs, labels, banners, headlines, captions, watermarks, or UI elements with text
 - NO partial words, abbreviations, or letter-like shapes that could be mistaken for text
 - The image must be 100% PURELY VISUAL with zero readable content
@@ -396,7 +395,7 @@ function buildVisualScene(topic: string, category: string): string {
 
   // Default: Topic-specific with modern 2.5D illustration style
   // This fallback must be specific to prevent chibi but allow subtle kawaii charm
-  return `MODERN 2.5D ILLUSTRATION STYLE (absolutely NO chibi/super-deformed aesthetic - subtle kawaii OK): Contemporary stylized representation of "${topic}" with gentle depth, soft shading, and layered composition. Central subject (70% of frame) with prominent upward trending arrow integrated into design. Google Trends blue-to-green gradient (#4285F4 to #34A853) used in accents or background. Soft atmospheric depth with gentle gradients. Style references: Headspace app illustrations, Duolingo characters, modern editorial graphics, contemporary infographics. Professional illustration quality with friendly, approachable mood - think premium app design or modern editorial, NOT chibi characters or heavy anime style. Balanced proportions with charm and personality.`;
+  return `MODERN 2.5D ILLUSTRATION STYLE (absolutely NO chibi/super-deformed aesthetic - subtle kawaii OK): Contemporary stylized representation of "${topic}" with gentle depth, soft shading, and layered composition. Central subject (70% of frame) with prominent upward trending arrow integrated into design. Google Trends gradient using Google Blue transitioning to Google Green in accents or background. Soft atmospheric depth with gentle gradients. Style references: Headspace app illustrations, Duolingo characters, modern editorial graphics, contemporary infographics. Professional illustration quality with friendly, approachable mood - think premium app design or modern editorial, NOT chibi characters or heavy anime style. Balanced proportions with charm and personality.`;
 }
 
 /**

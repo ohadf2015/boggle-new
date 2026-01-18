@@ -163,7 +163,7 @@ export const SurvivalLandscapeLayout: React.FC<SurvivalLandscapeLayoutProps> = (
         lifePoints={lifePoints}
         isGameOver={isGameOver}
         isLifeGaining={isLifeGaining}
-        attemptsCount={attempts.length}
+        attemptsCount={attempts.filter(a => !a.isDiscovery).length}
         t={t}
       />
 

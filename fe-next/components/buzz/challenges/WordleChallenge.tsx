@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Grid3X3, Delete } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
 
 type LetterState = 'correct' | 'present' | 'absent' | 'empty' | 'tbd';
 
@@ -85,13 +86,27 @@ function isValidLetter(char: string, language: string): boolean {
 }
 
 /**
+ * Normalize a letter for comparison based on language
+ * For Hebrew: converts final form letters to regular form
+ */
+function normalizeLetterForComparison(letter: string, language: string): string {
+  if (language === 'he') {
+    return normalizeHebrewLetter(letter);
+  }
+  return letter.toUpperCase();
+}
+
+/**
  * Calculate letter states for a guess compared to the answer
  * Handles duplicate letters correctly using two-pass algorithm
+ * For Hebrew: normalizes final form letters (ם,ן,ך,ף,ץ) to regular form for comparison
  */
-function getLetterStates(guess: string, answer: string): LetterState[] {
+function getLetterStates(guess: string, answer: string, language: string): LetterState[] {
   const result: LetterState[] = new Array(WORD_LENGTH).fill('absent');
-  const answerChars = answer.toUpperCase().split('');
-  const guessChars = guess.toUpperCase().split('');
+
+  // Normalize both guess and answer for comparison
+  const answerChars = answer.split('').map(c => normalizeLetterForComparison(c, language));
+  const guessChars = guess.split('').map(c => normalizeLetterForComparison(c, language));
   const remaining: (string | null)[] = [...answerChars];
 
   // First pass: mark correct positions (green)
@@ -149,8 +164,8 @@ export default function WordleChallenge({
           const newGuesses = [...guesses, currentGuess];
           setGuesses(newGuesses);
 
-          // Calculate letter states for keyboard
-          const states = getLetterStates(currentGuess, challenge.answer);
+          // Calculate letter states for keyboard (normalize Hebrew final forms)
+          const states = getLetterStates(currentGuess, challenge.answer, language);
           const newKeyboardStates = { ...keyboardStates };
           currentGuess.split('').forEach((letter, i) => {
             const currentState = newKeyboardStates[letter];
@@ -170,8 +185,10 @@ export default function WordleChallenge({
           });
           setKeyboardStates(newKeyboardStates);
 
-          // Check win/lose
-          if (currentGuess.toUpperCase() === challenge.answer.toUpperCase()) {
+          // Check win/lose (normalize Hebrew final forms for comparison)
+          const normalizedGuess = currentGuess.split('').map(c => normalizeLetterForComparison(c, language)).join('');
+          const normalizedAnswer = challenge.answer.split('').map(c => normalizeLetterForComparison(c, language)).join('');
+          if (normalizedGuess === normalizedAnswer) {
             setGameStatus('won');
             onAnswer(currentGuess);
           } else if (newGuesses.length >= MAX_ATTEMPTS) {
@@ -259,7 +276,7 @@ export default function WordleChallenge({
     const isSubmittedRow = rowIndex < currentRow;
     const guess = isSubmittedRow ? guesses[rowIndex] : isCurrentRow ? currentGuess : '';
     const states: LetterState[] = isSubmittedRow
-      ? getLetterStates(guess, challenge.answer)
+      ? getLetterStates(guess, challenge.answer, language)
       : new Array(WORD_LENGTH).fill(isCurrentRow ? 'tbd' : 'empty');
 
     return (

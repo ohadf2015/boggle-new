@@ -218,4 +218,163 @@ describe('SurvivalClueBoxes - Yellow Letter Persistence', () => {
     const yellowBox = screen.getByText('P').closest('div');
     expect(yellowBox).toHaveClass('bg-yellow-500');
   });
+
+  // Tests for different-length word discovery attempts
+  describe('Different-length word discovery feedback', () => {
+    it('should show yellow letter from shorter word discovery in boxes', () => {
+      // User discovered "CAT" (3 letters) against 5-letter target "APPLE"
+      // "A" at position 1 in CAT matches "A" at position 0 in APPLE → could be yellow at position 1
+      // But more importantly, if T is in the target, it should show yellow
+      const attempts = [
+        {
+          word: 'PAT', // 3-letter word against 5-letter target
+          feedback: [
+            { letter: 'P', position: 0, feedback: 'yellow' as const }, // P is in APPLE
+            { letter: 'A', position: 1, feedback: 'yellow' as const }, // A is in APPLE but not at pos 1
+            { letter: 'T', position: 2, feedback: 'gray' as const },   // T not in APPLE
+          ],
+          timestamp: Date.now(),
+          isDiscovery: true, // Different length = discovery
+        },
+      ];
+
+      render(
+        <SurvivalClueBoxes
+          {...defaultProps}
+          attempts={attempts}
+          showFeedbackOverlay={false}
+        />
+      );
+
+      // Position 0 should show 'P' (yellow from discovery)
+      expect(screen.getByText('P')).toBeInTheDocument();
+      // Position 1 should show 'A' (yellow from discovery)
+      expect(screen.getByText('A')).toBeInTheDocument();
+      // Other positions (2, 3, 4) should show "?"
+      const questionMarks = screen.getAllByText('?');
+      expect(questionMarks).toHaveLength(3);
+    });
+
+    it('should NOT count discovery attempts toward tries remaining', () => {
+      // Discovery attempts (isDiscovery: true) should not reduce the tries counter
+      const attempts = [
+        {
+          word: 'PAT',
+          feedback: [
+            { letter: 'P', position: 0, feedback: 'yellow' as const },
+            { letter: 'A', position: 1, feedback: 'gray' as const },
+            { letter: 'T', position: 2, feedback: 'gray' as const },
+          ],
+          timestamp: Date.now(),
+          isDiscovery: true,
+        },
+        {
+          word: 'CAT',
+          feedback: [
+            { letter: 'C', position: 0, feedback: 'gray' as const },
+            { letter: 'A', position: 1, feedback: 'gray' as const },
+            { letter: 'T', position: 2, feedback: 'gray' as const },
+          ],
+          timestamp: Date.now(),
+          isDiscovery: true,
+        },
+      ];
+
+      render(
+        <SurvivalClueBoxes
+          {...defaultProps}
+          attempts={attempts}
+          showFeedbackOverlay={false}
+        />
+      );
+
+      // Should still show 10/10 tries left (discoveries don't count)
+      expect(screen.getByText(/10\/10/)).toBeInTheDocument();
+    });
+
+    it('should count only non-discovery attempts toward tries remaining', () => {
+      const attempts = [
+        {
+          word: 'PAT',
+          feedback: [
+            { letter: 'P', position: 0, feedback: 'yellow' as const },
+            { letter: 'A', position: 1, feedback: 'gray' as const },
+            { letter: 'T', position: 2, feedback: 'gray' as const },
+          ],
+          timestamp: Date.now() - 2000,
+          isDiscovery: true, // Discovery - doesn't count
+        },
+        {
+          word: 'MAPLE',
+          feedback: [
+            { letter: 'M', position: 0, feedback: 'gray' as const },
+            { letter: 'A', position: 1, feedback: 'yellow' as const },
+            { letter: 'P', position: 2, feedback: 'yellow' as const },
+            { letter: 'L', position: 3, feedback: 'yellow' as const },
+            { letter: 'E', position: 4, feedback: 'green' as const },
+          ],
+          timestamp: Date.now() - 1000,
+          isDiscovery: false, // Target attempt - counts
+        },
+        {
+          word: 'GRAPE',
+          feedback: [
+            { letter: 'G', position: 0, feedback: 'gray' as const },
+            { letter: 'R', position: 1, feedback: 'gray' as const },
+            { letter: 'A', position: 2, feedback: 'yellow' as const },
+            { letter: 'P', position: 3, feedback: 'yellow' as const },
+            { letter: 'E', position: 4, feedback: 'green' as const },
+          ],
+          timestamp: Date.now(),
+          // No isDiscovery field = defaults to false (target attempt)
+        },
+      ];
+
+      render(
+        <SurvivalClueBoxes
+          {...defaultProps}
+          attempts={attempts}
+          showFeedbackOverlay={false}
+        />
+      );
+
+      // Should show 8/10 tries left (2 target attempts, 1 discovery ignored)
+      expect(screen.getByText(/8\/10/)).toBeInTheDocument();
+    });
+
+    it('should replace yellow from discovery with green from target attempt', () => {
+      // First: discover "AT" with yellow A at position 1
+      // Then: guess "APPLE" with green A at position 0
+      // The green A should win at position 0
+      const attempts = [
+        {
+          word: 'AT',
+          feedback: [
+            { letter: 'A', position: 0, feedback: 'yellow' as const }, // A in wrong spot
+            { letter: 'T', position: 1, feedback: 'gray' as const },
+          ],
+          timestamp: Date.now() - 1000,
+          isDiscovery: true,
+        },
+      ];
+
+      // Green clue from a target attempt (or hint)
+      const accumulatedClues = new Map<number, AccumulatedClue>([
+        [0, { letter: 'A', type: 'green' }],
+      ]);
+
+      render(
+        <SurvivalClueBoxes
+          {...defaultProps}
+          attempts={attempts}
+          accumulatedClues={accumulatedClues}
+          showFeedbackOverlay={false}
+        />
+      );
+
+      // Position 0 should show 'A' with green styling (green beats yellow)
+      const greenBox = screen.getByText('A').closest('div');
+      expect(greenBox).toHaveClass('bg-green-500');
+    });
+  });
 });

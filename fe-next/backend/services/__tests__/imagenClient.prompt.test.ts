@@ -181,5 +181,70 @@ describe('Imagen Client - Prompt Quality', () => {
       expect(fallback).toContain('Headspace');
       expect(fallback).toContain('Duolingo');
     });
+
+    it('should NOT contain hex color codes in fallback (use color names instead)', () => {
+      const buildVisualMatch = imagenClientSource.match(
+        /function buildVisualScene[\s\S]*?^}/m
+      );
+      expect(buildVisualMatch).toBeTruthy();
+
+      const buildVisualFunction = buildVisualMatch![0];
+      const fallbackMatch = buildVisualFunction.match(/return `MODERN 2\.5D.*?`/s);
+      expect(fallbackMatch).toBeTruthy();
+
+      const fallback = fallbackMatch![0];
+
+      // Fallback should NOT contain hex codes - use color names instead
+      expect(fallback).not.toMatch(/#[0-9A-Fa-f]{6}/);
+    });
+  });
+
+  describe('Language Handling in Prompt', () => {
+    it('should NOT list languages NOT to use (negative list)', () => {
+      // Find the buildImagePrompt function
+      const buildPromptMatch = imagenClientSource.match(
+        /function buildImagePrompt[\s\S]*?^}/m
+      );
+      expect(buildPromptMatch).toBeTruthy();
+
+      const buildPromptFunction = buildPromptMatch![0];
+
+      // Should NOT say "NO Hebrew text", "NO Japanese text", etc.
+      // The prompt should only specify the language TO use, not list languages NOT to use
+      expect(buildPromptFunction).not.toContain('NO Hebrew text');
+      expect(buildPromptFunction).not.toContain('NO Japanese text');
+      expect(buildPromptFunction).not.toContain('NO Swedish text');
+      expect(buildPromptFunction).not.toContain('NO Spanish text');
+    });
+
+    it('should use color names and tones instead of hex codes in COLOR PALETTE section', () => {
+      // Find the COLOR PALETTE section in buildImagePrompt
+      const colorPaletteMatch = imagenClientSource.match(
+        /COLOR PALETTE[\s\S]*?VISUAL REQUIREMENTS/
+      );
+      expect(colorPaletteMatch).toBeTruthy();
+
+      const colorSection = colorPaletteMatch![0];
+
+      // Should NOT contain hex codes in the color palette section
+      expect(colorSection).not.toMatch(/#[0-9A-Fa-f]{6}/);
+
+      // Should use descriptive color names instead
+      expect(colorSection).toContain('Blue');
+      expect(colorSection).toContain('Green');
+    });
+
+    it('should not include hex codes in Google Trends visual elements section', () => {
+      // Find the Google Trends visual elements section
+      const trendsMatch = imagenClientSource.match(
+        /GOOGLE TRENDS VISUAL ELEMENTS[\s\S]*?COLOR PALETTE/
+      );
+      expect(trendsMatch).toBeTruthy();
+
+      const trendsSection = trendsMatch![0];
+
+      // Should NOT contain hex codes
+      expect(trendsSection).not.toMatch(/#[0-9A-Fa-f]{6}/);
+    });
   });
 });

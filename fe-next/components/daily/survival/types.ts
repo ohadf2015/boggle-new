@@ -34,6 +34,12 @@ export interface TargetAttempt {
   word: string;
   feedback: LetterFeedback[];
   timestamp: number;
+  /**
+   * If true, this is a "discovery feedback" from a different-length word.
+   * Discovery attempts don't count toward the "tries left" counter and
+   * don't apply the wrong-guess penalty (they have their own discovery rewards/penalties).
+   */
+  isDiscovery?: boolean;
 }
 
 /**

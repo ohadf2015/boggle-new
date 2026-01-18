@@ -189,6 +189,7 @@ export function useSurvivalGameLogic({
   const handleGameOverRef = useRef<((won: boolean, finalAttempts?: TargetAttempt[]) => void) | null>(null);
   const handleTargetAttemptRef = useRef<((word: string, target: string) => void) | null>(null);
   const handleWordDiscoveryRef = useRef<((word: string) => void) | null>(null);
+  const handleDiscoveryFeedbackRef = useRef<((word: string, target: string) => void) | null>(null);
 
   // Enable sound effects
   useEffect(() => {
@@ -387,12 +388,53 @@ export function useSurvivalGameLogic({
     // Wrong guess - penalize
     dispatch({ type: 'ADJUST_LIFE', payload: { delta: -INVALID_WORD_PENALTY } });
 
-    // Check if out of attempts
-    if (newAttempts.length >= MAX_ATTEMPTS) {
+    // Check if out of attempts (only count non-discovery attempts)
+    const targetAttemptCount = newAttempts.filter(a => !a.isDiscovery).length;
+    if (targetAttemptCount >= MAX_ATTEMPTS) {
       feedbackTimeout.clear();
       handleGameOverRef.current?.(false, newAttempts);
     }
   }, [state.attempts, playWordAcceptedSound, t, showToast, clueActions, language, feedbackTimeout]);
+
+  // Handle discovery feedback (for different-length words)
+  // This shows feedback overlay and persists yellow/green letters without counting as a "try"
+  const handleDiscoveryFeedback = useCallback((word: string, target: string) => {
+    // Skip if word is too short for meaningful feedback
+    if (word.length < 2) return;
+
+    // Pass language to enable Hebrew final letter normalization
+    const feedback = getLetterFeedback(word, target, language);
+
+    // Only add to attempts if there's at least one non-gray feedback
+    // (i.e., the word contains at least one letter from the target)
+    const hasRelevantFeedback = feedback.some(fb => fb.feedback !== 'gray');
+    if (!hasRelevantFeedback) return;
+
+    const newAttempt: TargetAttempt = {
+      word,
+      feedback,
+      timestamp: Date.now(),
+      isDiscovery: true, // Mark as discovery - won't count toward tries
+    };
+
+    dispatch({ type: 'ADD_ATTEMPT', payload: { attempt: newAttempt } });
+
+    // Update clues from feedback (adds greens to accumulatedClues, yellows to knownLetters)
+    const newAttempts = [...state.attempts, newAttempt];
+    clueActions.updateCluesFromFeedback(feedback, newAttempts);
+
+    // Show feedback overlay
+    feedbackTimeout.clear();
+    dispatch({ type: 'SET_FEEDBACK_OVERLAY', payload: { show: true, feedback } });
+
+    feedbackTimeout.set(() => {
+      dispatch({ type: 'SET_FEEDBACK_OVERLAY', payload: { show: false } });
+    }, FEEDBACK_OVERLAY_DURATION);
+
+    // No win check (different length can't be the target)
+    // No life penalty (discovery has its own rewards/penalties)
+    // No max attempts check (discoveries don't count as tries)
+  }, [state.attempts, clueActions, language, feedbackTimeout]);
 
   // Handle word discovery
   const handleWordDiscovery = useCallback(async (word: string) => {
@@ -485,7 +527,10 @@ export function useSurvivalGameLogic({
         showToast('not-on-board', t('wordHunt.feedback.notFormablePenalty') || `Not on board -${INVALID_WORD_PENALTY}`);
       }
     } else {
+      // Different length word - process as discovery AND show feedback
       handleWordDiscoveryRef.current?.(displayWord);
+      // Also compute and show feedback so yellow/green letters persist in boxes
+      handleDiscoveryFeedbackRef.current?.(displayWord, targetWord.toUpperCase());
     }
   }, [state.isGameOver, state.attempts, targetWord, grid, language, showToast, t]);
 
@@ -561,6 +606,10 @@ export function useSurvivalGameLogic({
   useEffect(() => {
     handleWordDiscoveryRef.current = handleWordDiscovery;
   }, [handleWordDiscovery]);
+
+  useEffect(() => {
+    handleDiscoveryFeedbackRef.current = handleDiscoveryFeedback;
+  }, [handleDiscoveryFeedback]);
 
   // UI state setters using dispatch
   const setShowShop = useCallback((show: boolean) => {
