@@ -35,6 +35,14 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
 }));
 
+// Mock RoomChat component since it requires LanguageProvider
+jest.mock('../../components/RoomChat', () => ({
+  __esModule: true,
+  default: ({ className }: { className?: string }) => (
+    <div data-testid="room-chat-mock" className={className}>Mock RoomChat</div>
+  ),
+}));
+
 const mockT = (key: string) => key;
 
 const defaultProps = {

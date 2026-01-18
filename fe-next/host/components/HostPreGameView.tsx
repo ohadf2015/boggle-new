@@ -301,7 +301,7 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
   );
 
   return (
-    <div className="h-full flex flex-col bg-neo-navy lg:max-w-2xl lg:mx-auto">
+    <div className="h-full flex flex-col bg-neo-navy lg:max-w-5xl lg:mx-auto">
       {/* Header - Compact */}
       <header className="flex-shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black">
         <div className="flex items-center justify-between gap-2">
@@ -328,20 +328,53 @@ const HostPreGameView: React.FC<HostPreGameViewProps> = ({
         </div>
       </header>
 
-      {/* Main Content - 2 Tabs */}
+      {/* Main Content - Desktop: Side-by-side, Mobile: Tabs */}
       <main className="flex-1 min-h-0 overflow-hidden bg-neo-navy/95">
-        <AnimatePresence mode="wait">
-          {mobileTab === 'lobby' && (
-            <motion.div key="lobby" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full">
-              {renderLobbyContent()}
-            </motion.div>
-          )}
-          {mobileTab === 'chat' && (
-            <motion.div key="chat" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full">
-              {renderChatContent()}
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Desktop Layout: Side-by-side lobby and chat */}
+        <div className="hidden lg:flex h-full gap-4 p-4">
+          {/* Left: Lobby Content */}
+          <div className="flex-1 min-w-0 flex flex-col">
+            {renderLobbyContent()}
+            {/* Desktop Start Button */}
+            <div className="flex-shrink-0 pt-3">
+              <Button
+                onClick={onStartGame}
+                disabled={!timerValue || playersReady.length === 0 || tournamentCreating}
+                className="w-full h-12 text-base bg-neo-lime text-neo-black font-black uppercase border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed active:translate-y-0.5 disabled:opacity-50 transition-all"
+              >
+                {tournamentCreating ? t('hostView.creatingTournament') : (
+                  <>🎮 {t('hostView.startGame')} {playersReady.length > 0 && <span className="ml-1 opacity-70">({playersReady.length})</span>}</>
+                )}
+              </Button>
+            </div>
+          </div>
+          {/* Right: Chat Content */}
+          <div data-testid="desktop-chat-area" className="w-80 flex-shrink-0 bg-neo-navy/30 rounded-neo border border-neo-black/50 overflow-hidden">
+            <RoomChat
+              username="Host"
+              isHost={true}
+              gameCode={gameCode}
+              className="h-full"
+              onNewMessage={() => {}}
+            />
+          </div>
+        </div>
+
+        {/* Mobile Layout: Tab-based navigation */}
+        <div className="lg:hidden h-full">
+          <AnimatePresence mode="wait">
+            {mobileTab === 'lobby' && (
+              <motion.div key="lobby" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full">
+                {renderLobbyContent()}
+              </motion.div>
+            )}
+            {mobileTab === 'chat' && (
+              <motion.div key="chat" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full">
+                {renderChatContent()}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </main>
 
       {/* Start Game Button - Fixed at bottom, mobile only */}

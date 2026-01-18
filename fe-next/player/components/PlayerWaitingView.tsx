@@ -78,8 +78,63 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
     setUnreadChat(0);
   }, []);
 
+  // Render players list content
+  const renderPlayersContent = () => (
+    <div className="flex-1 min-h-0 bg-neo-navy/30 rounded-neo border border-neo-black/50 overflow-hidden flex flex-col">
+      <div className="flex items-center gap-2 px-2 py-1.5 border-b border-neo-black/30 flex-shrink-0">
+        <Users className="w-4 h-4 text-neo-pink" />
+        <span className="text-xs font-bold uppercase text-neo-cream">
+          {t('hostView.playersJoined')} ({playersReady.length})
+        </span>
+      </div>
+      <div className="flex-1 min-h-0 overflow-y-auto p-2 space-y-1">
+        <AnimatePresence>
+          {playersReady.map((player, index) => {
+            const name = typeof player === 'string' ? player : player.username;
+            const avatar = typeof player === 'object' ? player.avatar : null;
+            const isHostPlayer = typeof player === 'object' ? player.isHost : false;
+            const presence = typeof player === 'object' ? player.presenceStatus : 'active' as PresenceStatus;
+            const isBot = typeof player === 'object' ? player.isBot : false;
+            const isMe = name === username;
+
+            return (
+              <motion.div
+                key={name}
+                initial={{ x: -10, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 10, opacity: 0 }}
+                transition={{ delay: index * 0.02 }}
+                className="flex items-center justify-between px-2 py-1.5 rounded bg-white/5"
+              >
+                <div className="flex items-center gap-2">
+                  <Avatar
+                    profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
+                    avatarImage={avatar?.avatarImage}
+                    size="sm"
+                  />
+                  <span className="font-medium text-neo-cream text-sm truncate max-w-[140px]">
+                    {name}
+                  </span>
+                  {isHostPlayer && <Crown className="w-3 h-3 text-neo-yellow" />}
+                  {isBot && <Bot className="w-3 h-3 text-neo-cyan" />}
+                  {isMe && <span className="text-[9px] text-neo-cream/50">({t('playerView.me')})</span>}
+                </div>
+                {!isMe && !isBot && <PresenceIndicator status={presence} size="sm" />}
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+        {playersReady.length === 0 && (
+          <p className="text-xs text-center text-neo-cream/50 py-4">
+            {t('hostView.waitingForPlayers')}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="h-full flex flex-col bg-neo-navy lg:max-w-2xl lg:mx-auto">
+    <div className="h-full flex flex-col bg-neo-navy lg:max-w-5xl lg:mx-auto">
       {/* Compact Header */}
       <header className="flex-shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black">
         <div className="flex items-center justify-between gap-2">
@@ -116,90 +171,60 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
         </motion.div>
       </header>
 
-      {/* Main Content */}
+      {/* Main Content - Desktop: Side-by-side, Mobile: Tabs */}
       <main className="flex-1 min-h-0 overflow-hidden bg-neo-navy/95">
-        <AnimatePresence mode="wait">
-          {mobileTab === 'players' ? (
-            <motion.div
-              key="players"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="h-full flex flex-col p-3"
-            >
-              {/* Players List */}
-              <div className="flex-1 min-h-0 bg-neo-navy/30 rounded-neo border border-neo-black/50 overflow-hidden flex flex-col">
-                <div className="flex items-center gap-2 px-2 py-1.5 border-b border-neo-black/30 flex-shrink-0">
-                  <Users className="w-4 h-4 text-neo-pink" />
-                  <span className="text-xs font-bold uppercase text-neo-cream">
-                    {t('hostView.playersJoined')} ({playersReady.length})
-                  </span>
-                </div>
-                <div className="flex-1 min-h-0 overflow-y-auto p-2 space-y-1">
-                  <AnimatePresence>
-                    {playersReady.map((player, index) => {
-                      const name = typeof player === 'string' ? player : player.username;
-                      const avatar = typeof player === 'object' ? player.avatar : null;
-                      const isHostPlayer = typeof player === 'object' ? player.isHost : false;
-                      const presence = typeof player === 'object' ? player.presenceStatus : 'active' as PresenceStatus;
-                      const isBot = typeof player === 'object' ? player.isBot : false;
-                      const isMe = name === username;
+        {/* Desktop Layout: Side-by-side players and chat */}
+        <div className="hidden lg:flex h-full gap-4 p-4">
+          {/* Left: Players List */}
+          <div data-testid="desktop-players-section" className="flex-1 min-w-0 flex flex-col p-3">
+            {renderPlayersContent()}
+          </div>
+          {/* Right: Chat Content */}
+          <div data-testid="desktop-chat-area" className="w-80 flex-shrink-0 bg-neo-navy/30 rounded-neo border border-neo-black/50 overflow-hidden">
+            <RoomChat
+              username={username}
+              isHost={false}
+              gameCode={gameCode}
+              className="h-full"
+              onNewMessage={() => {}}
+            />
+          </div>
+        </div>
 
-                      return (
-                        <motion.div
-                          key={name}
-                          initial={{ x: -10, opacity: 0 }}
-                          animate={{ x: 0, opacity: 1 }}
-                          exit={{ x: 10, opacity: 0 }}
-                          transition={{ delay: index * 0.02 }}
-                          className="flex items-center justify-between px-2 py-1.5 rounded bg-white/5"
-                        >
-                          <div className="flex items-center gap-2">
-                            <Avatar
-                              profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
-                              avatarImage={avatar?.avatarImage}
-                              size="sm"
-                            />
-                            <span className="font-medium text-neo-cream text-sm truncate max-w-[140px]">
-                              {name}
-                            </span>
-                            {isHostPlayer && <Crown className="w-3 h-3 text-neo-yellow" />}
-                            {isBot && <Bot className="w-3 h-3 text-neo-cyan" />}
-                            {isMe && <span className="text-[9px] text-neo-cream/50">({t('playerView.me')})</span>}
-                          </div>
-                          {!isMe && !isBot && <PresenceIndicator status={presence} size="sm" />}
-                        </motion.div>
-                      );
-                    })}
-                  </AnimatePresence>
-                  {playersReady.length === 0 && (
-                    <p className="text-xs text-center text-neo-cream/50 py-4">
-                      {t('hostView.waitingForPlayers')}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="chat"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="h-full p-3"
-            >
-              <RoomChat
-                username={username}
-                isHost={false}
-                gameCode={gameCode}
-                className="h-full"
-                onNewMessage={() => {
-                  if (mobileTab !== 'chat') setUnreadChat(prev => prev + 1);
-                }}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Mobile Layout: Tab-based navigation */}
+        <div className="lg:hidden h-full">
+          <AnimatePresence mode="wait">
+            {mobileTab === 'players' ? (
+              <motion.div
+                key="players"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="h-full flex flex-col p-3"
+              >
+                {renderPlayersContent()}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="chat"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="h-full p-3"
+              >
+                <RoomChat
+                  username={username}
+                  isHost={false}
+                  gameCode={gameCode}
+                  className="h-full"
+                  onNewMessage={() => {
+                    if (mobileTab !== 'chat') setUnreadChat(prev => prev + 1);
+                  }}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </main>
 
       {/* Bottom Tab Bar - 2 Tabs, mobile only */}

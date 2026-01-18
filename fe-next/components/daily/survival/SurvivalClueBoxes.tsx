@@ -189,12 +189,22 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
   const hintChars = currentHint.hint.split(' ').filter(c => c !== '');
   const wordLength = hintChars.length;
 
+  // Count how many times each letter appears in the target word
+  const targetLetterCounts = React.useMemo(() => {
+    const counts = new Map<string, number>();
+    targetWord.toUpperCase().split('').forEach(letter => {
+      counts.set(letter, (counts.get(letter) || 0) + 1);
+    });
+    return counts;
+  }, [targetWord]);
+
   // Compute persisted letters from attempts (most recent yellow/green at each position)
   // Priority: green > yellow (from most recent to oldest attempt)
+  // IMPORTANT: Yellow letters are REMOVED when all occurrences of that letter are found as green
   const persistedLetters = React.useMemo(() => {
     const result = new Map<number, { letter: string; type: 'green' | 'yellow' }>();
 
-    // Process attempts in order (older to newer) so newer overwrites older
+    // First pass: collect all green and yellow letters
     for (const attempt of attempts) {
       for (const fb of attempt.feedback) {
         if (fb.feedback === 'green') {
@@ -211,8 +221,36 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
       }
     }
 
+    // Second pass: count green occurrences of each letter
+    const greenLetterCounts = new Map<string, number>();
+    result.forEach((entry) => {
+      if (entry.type === 'green') {
+        const letter = entry.letter;
+        greenLetterCounts.set(letter, (greenLetterCounts.get(letter) || 0) + 1);
+      }
+    });
+
+    // Third pass: remove yellow letters where all occurrences are now found as green
+    // A yellow letter at position X means "this letter exists but not at position X"
+    // If we've found ALL occurrences of that letter as green elsewhere, the yellow is obsolete
+    const positionsToRemove: number[] = [];
+    result.forEach((entry, position) => {
+      if (entry.type === 'yellow') {
+        const letter = entry.letter;
+        const targetCount = targetLetterCounts.get(letter) || 0;
+        const greenCount = greenLetterCounts.get(letter) || 0;
+        // If all occurrences of this letter are accounted for by green clues, remove yellow
+        if (greenCount >= targetCount) {
+          positionsToRemove.push(position);
+        }
+      }
+    });
+
+    // Remove the obsolete yellow entries
+    positionsToRemove.forEach(pos => result.delete(pos));
+
     return result;
-  }, [attempts]);
+  }, [attempts, targetLetterCounts]);
   const sizeClass = wordLength <= 4
     ? "w-11 h-11 sm:w-12 sm:h-12 text-lg sm:text-xl"
     : wordLength <= 6

@@ -175,8 +175,9 @@ describe('HostPreGameView Preset Drawer', () => {
     expect(screen.queryByTestId('mobile-drawer')).not.toBeInTheDocument();
 
     // Click the Party preset button (contains "Party" text)
-    const partyButton = screen.getByRole('button', { name: /party/i });
-    fireEvent.click(partyButton);
+    // Note: There are now two layouts (desktop + mobile), so we use getAllByRole and take the first
+    const partyButtons = screen.getAllByRole('button', { name: /party/i });
+    fireEvent.click(partyButtons[0]);
 
     // Drawer should now be visible
     await waitFor(() => {
@@ -188,8 +189,9 @@ describe('HostPreGameView Preset Drawer', () => {
     render(<HostPreGameView {...defaultProps} />);
 
     // Click the Quick preset
-    const quickButton = screen.getByRole('button', { name: /quick/i });
-    fireEvent.click(quickButton);
+    // Note: There are now two layouts (desktop + mobile), so we use getAllByRole and take the first
+    const quickButtons = screen.getAllByRole('button', { name: /quick/i });
+    fireEvent.click(quickButtons[0]);
 
     await waitFor(() => {
       expect(screen.getByTestId('drawer-title')).toHaveTextContent('Quick');
@@ -200,8 +202,9 @@ describe('HostPreGameView Preset Drawer', () => {
     render(<HostPreGameView {...defaultProps} />);
 
     // Click the Challenge preset
-    const challengeButton = screen.getByRole('button', { name: /challenge/i });
-    fireEvent.click(challengeButton);
+    // Note: There are now two layouts (desktop + mobile), so we use getAllByRole and take the first
+    const challengeButtons = screen.getAllByRole('button', { name: /challenge/i });
+    fireEvent.click(challengeButtons[0]);
 
     await waitFor(() => {
       // Should show detailed description
@@ -232,8 +235,9 @@ describe('HostPreGameView Preset Drawer', () => {
     );
 
     // Open the Quick preset drawer
-    const quickButton = screen.getByRole('button', { name: /quick/i });
-    fireEvent.click(quickButton);
+    // Note: There are now two layouts (desktop + mobile), so we use getAllByRole and take the first
+    const quickButtons = screen.getAllByRole('button', { name: /quick/i });
+    fireEvent.click(quickButtons[0]);
 
     await waitFor(() => {
       expect(screen.getByTestId('mobile-drawer')).toBeInTheDocument();
@@ -258,8 +262,9 @@ describe('HostPreGameView Preset Drawer', () => {
     render(<HostPreGameView {...defaultProps} />);
 
     // Open drawer
-    const partyButton = screen.getByRole('button', { name: /party/i });
-    fireEvent.click(partyButton);
+    // Note: There are now two layouts (desktop + mobile), so we use getAllByRole and take the first
+    const partyButtons = screen.getAllByRole('button', { name: /party/i });
+    fireEvent.click(partyButtons[0]);
 
     await waitFor(() => {
       expect(screen.getByTestId('mobile-drawer')).toBeInTheDocument();
@@ -279,8 +284,9 @@ describe('HostPreGameView Preset Drawer', () => {
     render(<HostPreGameView {...defaultProps} />);
 
     // Test Party preset (MEDIUM = 7×7)
-    const partyButton = screen.getByRole('button', { name: /party/i });
-    fireEvent.click(partyButton);
+    // Note: There are now two layouts (desktop + mobile), so we use getAllByRole and take the first
+    const partyButtons = screen.getAllByRole('button', { name: /party/i });
+    fireEvent.click(partyButtons[0]);
 
     await waitFor(() => {
       expect(screen.getByText('7×7 (Medium)')).toBeInTheDocument();
@@ -294,8 +300,9 @@ describe('HostPreGameView Preset Drawer', () => {
       expect(screen.queryByTestId('mobile-drawer')).not.toBeInTheDocument();
     });
 
-    const challengeButton = screen.getByRole('button', { name: /challenge/i });
-    fireEvent.click(challengeButton);
+    // Note: There are now two layouts (desktop + mobile), so we use getAllByRole and take the first
+    const challengeButtons = screen.getAllByRole('button', { name: /challenge/i });
+    fireEvent.click(challengeButtons[0]);
 
     await waitFor(() => {
       expect(screen.getByText('9×9 (Hard)')).toBeInTheDocument();
@@ -320,8 +327,9 @@ describe('HostPreGameView Preset Drawer', () => {
     const initialCallCount = setTimerValue.mock.calls.length;
 
     // Click preset button
-    const quickButton = screen.getByRole('button', { name: /quick/i });
-    fireEvent.click(quickButton);
+    // Note: There are now two layouts (desktop + mobile), so we use getAllByRole and take the first
+    const quickButtons = screen.getAllByRole('button', { name: /quick/i });
+    fireEvent.click(quickButtons[0]);
 
     // Drawer should open but preset should NOT be applied yet
     await waitFor(() => {

@@ -35,6 +35,14 @@ jest.mock('../../hooks/usePullToRefresh', () => ({
   }),
 }));
 
+// Mock RoomChat component since it requires LanguageProvider
+jest.mock('../../components/RoomChat', () => ({
+  __esModule: true,
+  default: ({ className }: { className?: string }) => (
+    <div data-testid="room-chat-mock" className={className}>Mock RoomChat</div>
+  ),
+}));
+
 // Test: Multiplayer screens should have reasonable max-width constraints on desktop
 // This prevents content from stretching too wide on large screens
 

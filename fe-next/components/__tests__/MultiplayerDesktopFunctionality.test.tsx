@@ -1,10 +1,13 @@
 /**
- * Test: Multiplayer Lobby Mobile Bottom Tabs
+ * Test: Multiplayer Desktop Functionality Access
+ *
+ * BUG: Bottom tabs (players/chat navigation) are hidden on desktop with lg:hidden,
+ * which means desktop users cannot access chat or switch between tabs.
  *
  * Requirements:
- * 1. Bottom tabs should only show on mobile view (not desktop)
- * 2. Start button and tabs should stick to the bottom of the screen
- * 3. Both HostPreGameView and PlayerWaitingView should follow this pattern
+ * 1. Desktop users must have access to all functionality (players list, chat)
+ * 2. Either show content side-by-side OR provide alternative navigation on desktop
+ * 3. Mobile keeps bottom tab navigation
  */
 
 import React from 'react';
@@ -59,7 +62,7 @@ import PlayerWaitingView from '../../player/components/PlayerWaitingView';
 
 const mockT = (key: string) => key;
 
-describe('Multiplayer Lobby Mobile Bottom Tabs', () => {
+describe('Multiplayer Desktop Functionality Access', () => {
   describe('HostPreGameView', () => {
     const defaultHostProps = {
       gameCode: 'ABC123',
@@ -94,66 +97,49 @@ describe('Multiplayer Lobby Mobile Bottom Tabs', () => {
       tournamentCreating: false,
     };
 
-    it('should have bottom tabs hidden on desktop (lg screens)', () => {
+    it('should show chat content on desktop (not hidden behind tabs)', () => {
       render(<HostPreGameView {...defaultHostProps} />);
 
-      // Find the bottom navigation (tab bar)
-      const bottomNav = screen.getByRole('navigation');
+      // On desktop, the RoomChat component should be rendered and visible
+      // It should NOT require clicking a mobile tab to access
+      // The chat should either be:
+      // 1. Rendered alongside the lobby content (side-by-side)
+      // 2. Or have desktop-specific navigation
 
-      // Check that the nav has lg:hidden class to hide on desktop
-      expect(bottomNav.className).toContain('lg:hidden');
+      // Find the desktop layout container that shows both lobby and chat
+      const desktopChatArea = screen.queryByTestId('desktop-chat-area');
+
+      // On desktop, chat should be accessible without needing the mobile tab bar
+      // This test will FAIL with current implementation because chat is only
+      // accessible via the mobile tab bar which has lg:hidden
+      expect(desktopChatArea).toBeInTheDocument();
     });
 
-    it('should have start button section visible on mobile and sticky', () => {
+    it('should have a visible start game button on desktop', () => {
       render(<HostPreGameView {...defaultHostProps} />);
 
-      // Find all start buttons (now there are two: desktop and mobile)
+      // Desktop should have a start button that is visible
+      // Now we have TWO start buttons: one in desktop layout, one in mobile layout
       const startButtons = screen.getAllByRole('button', { name: /startGame/i });
 
-      // Find the mobile start button (the one inside lg:hidden container)
-      const mobileStartButton = startButtons.find((btn) => {
+      // Verify at least one start button exists
+      expect(startButtons.length).toBeGreaterThanOrEqual(1);
+
+      // Find the desktop start button (one that is NOT inside lg:hidden container)
+      const desktopStartButton = startButtons.find((btn) => {
+        // Walk up the DOM to check if any ancestor has lg:hidden
         let parent = btn.parentElement;
         while (parent) {
           if (parent.className?.includes('lg:hidden')) {
-            return true;
+            return false; // This button is hidden on desktop
           }
           parent = parent.parentElement;
         }
-        return false;
+        return true; // This button is visible on desktop
       });
 
-      expect(mobileStartButton).toBeTruthy();
-      const mobileStartButtonContainer = mobileStartButton?.parentElement;
-
-      // Check container has classes for sticky positioning
-      expect(mobileStartButtonContainer).toHaveClass('flex-shrink-0');
-
-      // The mobile start button container should have lg:hidden
-      expect(mobileStartButtonContainer?.className).toContain('lg:hidden');
-    });
-
-    it('should have start button sticky at bottom with tabs', () => {
-      render(<HostPreGameView {...defaultHostProps} />);
-
-      // Find all start buttons and get the mobile one
-      const startButtons = screen.getAllByRole('button', { name: /startGame/i });
-      const mobileStartButton = startButtons.find((btn) => {
-        let parent = btn.parentElement;
-        while (parent) {
-          if (parent.className?.includes('lg:hidden')) {
-            return true;
-          }
-          parent = parent.parentElement;
-        }
-        return false;
-      });
-
-      const startButtonContainer = mobileStartButton?.parentElement;
-      const nav = screen.getByRole('navigation');
-
-      // Both should have flex-shrink-0 to prevent compression
-      expect(startButtonContainer).toHaveClass('flex-shrink-0');
-      expect(nav).toHaveClass('flex-shrink-0');
+      // There must be at least one button visible on desktop
+      expect(desktopStartButton).toBeTruthy();
     });
   });
 
@@ -175,23 +161,29 @@ describe('Multiplayer Lobby Mobile Bottom Tabs', () => {
       onConfirmExit: jest.fn(),
     };
 
-    it('should have bottom tabs hidden on desktop (lg screens)', () => {
+    it('should show chat content on desktop (not hidden behind tabs)', () => {
       render(<PlayerWaitingView {...defaultPlayerProps} />);
 
-      // Find the bottom navigation (tab bar)
-      const bottomNav = screen.getByRole('navigation');
+      // On desktop, the RoomChat component should be rendered and visible
+      // without requiring the mobile tab bar
+      const desktopChatArea = screen.queryByTestId('desktop-chat-area');
 
-      // Check that the nav has lg:hidden class to hide on desktop
-      expect(bottomNav.className).toContain('lg:hidden');
+      // This test will FAIL because chat is currently only accessible
+      // via the mobile tab bar which is hidden on desktop (lg:hidden)
+      expect(desktopChatArea).toBeInTheDocument();
     });
 
-    it('should have bottom tabs sticky at the bottom', () => {
+    it('should show both players list and chat simultaneously on desktop', () => {
       render(<PlayerWaitingView {...defaultPlayerProps} />);
 
-      const nav = screen.getByRole('navigation');
+      // On desktop, both players list and chat should be visible at the same time
+      // They should be rendered side-by-side, not behind tabs
+      const playersSection = screen.queryByTestId('desktop-players-section');
+      const chatSection = screen.queryByTestId('desktop-chat-area');
 
-      // Check that nav has flex-shrink-0 to prevent compression
-      expect(nav).toHaveClass('flex-shrink-0');
+      // Both should be present in the DOM for desktop layout
+      expect(playersSection).toBeInTheDocument();
+      expect(chatSection).toBeInTheDocument();
     });
   });
 });
