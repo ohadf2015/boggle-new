@@ -27,8 +27,10 @@ export interface AdminAuthResult {
  */
 export async function verifyAdminAuth(request: NextRequest): Promise<AdminAuthResult> {
   const authHeader = request.headers.get('authorization');
+  const startTime = Date.now();
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    console.log('[AdminAuth] Missing or invalid authorization header');
     return {
       success: false,
       error: 'Missing authorization header',
@@ -53,6 +55,7 @@ export async function verifyAdminAuth(request: NextRequest): Promise<AdminAuthRe
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
+      console.log('[AdminAuth] Invalid token or auth error:', authError?.message || 'No user');
       return {
         success: false,
         error: 'Invalid token',
@@ -68,6 +71,7 @@ export async function verifyAdminAuth(request: NextRequest): Promise<AdminAuthRe
       .single();
 
     if (profileError || !profile?.is_admin) {
+      console.log('[AdminAuth] User not admin:', user.email, 'profileError:', profileError?.message);
       return {
         success: false,
         error: 'Admin access required',
@@ -77,6 +81,9 @@ export async function verifyAdminAuth(request: NextRequest): Promise<AdminAuthRe
         ),
       };
     }
+
+    const authDuration = Date.now() - startTime;
+    console.log(`[AdminAuth] Auth successful for ${user.email} in ${authDuration}ms`);
 
     return {
       success: true,
@@ -88,6 +95,7 @@ export async function verifyAdminAuth(request: NextRequest): Promise<AdminAuthRe
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('[AdminAuth] Exception during auth:', errorMessage);
     return {
       success: false,
       error: errorMessage,

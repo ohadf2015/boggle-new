@@ -223,6 +223,14 @@ export function useWikipediaCandidates({
   );
 
   const triggerPopulation = useCallback(async (): Promise<boolean> => {
+    // Client-side timeout (55s) - slightly less than server's maxDuration (60s)
+    // This ensures we get a proper error message instead of browser hanging
+    const CLIENT_TIMEOUT_MS = 55000;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, CLIENT_TIMEOUT_MS);
+
     try {
       const {
         data: { session },
@@ -232,6 +240,8 @@ export function useWikipediaCandidates({
         setError('Not authenticated');
         return false;
       }
+
+      console.log('[Wikipedia] Triggering population for', language);
 
       const response = await fetch('/api/admin/wikipedia-words', {
         method: 'POST',
@@ -244,6 +254,7 @@ export function useWikipediaCandidates({
           language,
           date: new Date().toISOString().split('T')[0],
         }),
+        signal: controller.signal,
       });
 
       if (!response.ok) {
@@ -251,12 +262,21 @@ export function useWikipediaCandidates({
         throw new Error(data.error || 'Failed to trigger population');
       }
 
+      console.log('[Wikipedia] Population completed successfully');
+
       // Refresh after population
       await fetchCandidates();
       return true;
     } catch (err) {
+      // Handle abort (timeout) specifically
+      if (err instanceof Error && err.name === 'AbortError') {
+        setError('Request timed out. The Wikipedia API may be slow or unreachable. Check server logs for details.');
+        return false;
+      }
       setError(err instanceof Error ? err.message : 'Failed to trigger population');
       return false;
+    } finally {
+      clearTimeout(timeoutId);
     }
   }, [supabase, language, fetchCandidates]);
 
