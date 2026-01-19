@@ -136,13 +136,16 @@ describe('TvBroadcastView Layout Issues', () => {
 
     const rootDiv = container.firstChild as HTMLElement;
 
-    // Check root has proper height constraint - uses h-full to fit within parent container
-    expect(rootDiv).toHaveClass('h-full');
+    // Check root uses flex-1 to fill parent flex container
+    expect(rootDiv).toHaveClass('flex-1');
+    expect(rootDiv).toHaveClass('min-h-0'); // Prevents overflow in flex containers
     expect(rootDiv).toHaveClass('overflow-hidden');
 
-    // Main content should use flex-1 and min-h-0 to prevent overflow
-    const mainContent = container.querySelector('.flex-1.min-h-0');
+    // Main content should use CSS Grid layout (grid instead of flex)
+    const mainContent = container.querySelector('.grid.grid-cols-1.md\\:grid-cols-2');
     expect(mainContent).toBeInTheDocument();
+    expect(mainContent).toHaveClass('flex-1');
+    expect(mainContent).toHaveClass('min-h-0');
 
     // Check responsive padding (smaller on mobile, larger on desktop)
     expect(mainContent).toHaveClass('p-2');
@@ -152,12 +155,12 @@ describe('TvBroadcastView Layout Issues', () => {
     expect(mainContent).toHaveClass('gap-2');
     expect(mainContent).toHaveClass('md:gap-4');
 
-    // Check that flex layout is properly configured (check classes, not computed styles in JSDOM)
+    // Check that root flex layout is properly configured
     expect(rootDiv).toHaveClass('flex');
     expect(rootDiv).toHaveClass('flex-col');
   });
 
-  it('should properly handle fullscreen layout with hidden headers', () => {
+  it('should properly handle fullscreen layout', () => {
     const { useTvFullscreen } = require('@/host/hooks/useTvFullscreen');
     useTvFullscreen.mockReturnValueOnce({
       isFullscreen: true,
@@ -169,26 +172,31 @@ describe('TvBroadcastView Layout Issues', () => {
 
     const { container } = render(<TvBroadcastView {...mockProps} />);
 
-    // In fullscreen, join bar should not be rendered (AnimatePresence exit)
-    // But game header with timer should still be visible
-    // This test verifies the layout still works when join bar is hidden
+    // Note: Join bar is now always visible (changed in refactor)
+    // Game header with timer is still visible
     const rootDiv = container.firstChild as HTMLElement;
-    expect(rootDiv).toHaveClass('h-full');
+    expect(rootDiv).toHaveClass('flex-1');
+    expect(rootDiv).toHaveClass('min-h-0');
 
-    // The main content area should expand to fill available space
-    const mainContent = container.querySelector('.flex-1.min-h-0');
+    // The main content area should expand to fill available space using CSS Grid
+    const mainContent = container.querySelector('.grid.grid-cols-1.md\\:grid-cols-2');
     expect(mainContent).toBeInTheDocument();
+    expect(mainContent).toHaveClass('flex-1');
+    expect(mainContent).toHaveClass('min-h-0');
   });
 
   it('should maintain proper aspect ratio for grid cells', () => {
     const { container } = render(<TvBroadcastView {...mockProps} />);
 
-    // Grid container should have proper constraints
-    // The issue: grid overflows when not calculated correctly
-    const gridContainer = container.querySelector('.flex-1.min-h-0.flex.items-center.justify-center');
+    // Grid container now uses min-h for mobile, not flex-1
+    // On desktop (md:), it uses min-h-0
+    const gridContainer = container.querySelector('.min-h-\\[200px\\].md\\:min-h-0.flex.items-center.justify-center');
     expect(gridContainer).toBeInTheDocument();
 
     // Should have overflow-hidden to prevent content from spilling
     expect(gridContainer).toHaveClass('overflow-hidden');
+
+    // Verify it's a grid cell child (not using flex-1 anymore)
+    expect(gridContainer).toHaveClass('min-h-[200px]');
   });
 });

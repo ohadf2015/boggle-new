@@ -132,9 +132,10 @@ describe('TvBroadcastView - Responsive Layout', () => {
     const grid = screen.getByTestId('tv-grid').parentElement;
     const leaderboard = screen.getByTestId('tv-leaderboard').parentElement;
 
-    // Both should have h-full to fill grid cells and proper min-height for mobile
-    expect(grid).toHaveClass('h-full');
-    expect(leaderboard).toHaveClass('h-full');
+    // Grid uses min-h-[200px] for mobile, leaderboard uses min-h-[150px]
+    // On desktop (md:), both use min-h-0 to fill CSS Grid cells
+    expect(grid).toHaveClass('min-h-[200px]');
+    expect(leaderboard).toHaveClass('min-h-[150px]');
 
     // Both should have overflow-hidden to prevent content from escaping
     expect(grid).toHaveClass('overflow-hidden');
@@ -144,10 +145,11 @@ describe('TvBroadcastView - Responsive Layout', () => {
   it('should constrain content within parent container', () => {
     const { container } = render(<TvBroadcastView {...defaultProps} />);
 
-    // Root should use h-full to fill parent container (nested component pattern)
+    // Root uses flex-1 to fill parent flex container (better than h-full)
     const root = container.firstChild as HTMLElement;
     expect(root).toHaveClass('flex', 'flex-col');
-    expect(root).toHaveClass('h-full');
+    expect(root).toHaveClass('flex-1');
+    expect(root).toHaveClass('min-h-0'); // Prevents overflow in flex containers
 
     // Join bar and game header should NOT have fixed heights that overflow
     const joinBar = screen.getByTestId('tv-join-bar');
@@ -158,7 +160,7 @@ describe('TvBroadcastView - Responsive Layout', () => {
 });
 
 describe('TvBroadcastView - Fullscreen Behavior', () => {
-  it('should hide join bar (header) in fullscreen mode', () => {
+  it('should keep join bar visible even in fullscreen mode', () => {
     const { useTvFullscreen } = require('@/host/hooks/useTvFullscreen');
     (useTvFullscreen as jest.Mock).mockReturnValue({
       isFullscreen: true,
@@ -170,8 +172,8 @@ describe('TvBroadcastView - Fullscreen Behavior', () => {
 
     render(<TvBroadcastView {...defaultProps} />);
 
-    // Join bar should NOT be visible in fullscreen
-    expect(screen.queryByTestId('tv-join-bar')).not.toBeInTheDocument();
+    // Join bar is now always visible (changed in refactor for better UX)
+    expect(screen.getByTestId('tv-join-bar')).toBeInTheDocument();
   });
 
   it('should keep timer visible in fullscreen mode', () => {

@@ -80,7 +80,8 @@ def process_frame(
 
 def clean_edges(img: Image.Image, threshold: int = 10) -> Image.Image:
     """
-    Clean up semi-transparent pixels at edges for smoother appearance.
+    Clean up edge artifacts while preserving the main subject.
+    Removes only truly transparent pixels and very dark shadow remnants.
     """
     pixels = img.load()
     width, height = img.size
@@ -88,13 +89,18 @@ def clean_edges(img: Image.Image, threshold: int = 10) -> Image.Image:
     for y in range(height):
         for x in range(width):
             r, g, b, a = pixels[x, y]
-            # Remove very faint pixels (likely artifacts)
+
+            # Remove only very transparent pixels (likely background)
             if a < threshold:
                 pixels[x, y] = (0, 0, 0, 0)
-            # Make semi-transparent pixels more opaque (avoid halos)
-            elif a < 200 and a > threshold:
-                # Strengthen alpha slightly
-                pixels[x, y] = (r, g, b, min(a + 30, 255))
+                continue
+
+            # Only remove very dark pixels that are also quite transparent
+            # (likely shadow artifacts, not part of the character)
+            brightness = (r + g + b) / 3
+            if brightness < 30 and a < 100:  # Very dark AND very transparent
+                pixels[x, y] = (0, 0, 0, 0)
+                continue
 
     return img
 
@@ -238,9 +244,9 @@ def main():
     
     parser.add_argument('input', type=str, help='Input GIF file or directory')
     parser.add_argument('output', type=str, nargs='?', help='Output GIF file')
-    parser.add_argument('--model', type=str, default='isnet-general-use',
-                       choices=['u2net', 'u2netp', 'isnet-general-use', 'silueta'],
-                       help='AI model (isnet-general-use best for cartoons)')
+    parser.add_argument('--model', type=str, default='isnet-anime',
+                       choices=['u2net', 'u2netp', 'isnet-general-use', 'isnet-anime', 'silueta'],
+                       help='AI model (isnet-anime best for cartoon characters)')
     parser.add_argument('--test-frame', type=int, metavar='N',
                        help='Test single frame N for quality check')
     parser.add_argument('--batch', action='store_true',
