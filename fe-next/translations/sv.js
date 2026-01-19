@@ -125,6 +125,7 @@ const sv = {
     "quickRematch": "Returmatch",
     "attempts": "Försök",
     "share": "Dela",
+    "bot": "Bot",
     "minutes": "min",
     "advancedSettings": "Fler alternativ",
     "settings": "Inställningar",
@@ -166,7 +167,10 @@ const sv = {
     "offline": "offline",
     "online": "online",
     "sending": "Skickar...",
-    "clear": "Rensa"
+    "clear": "Rensa",
+    "player": "Spelare",
+    "clearSearch": "Rensa sökning",
+    "opensInNewTab": "öppnas i ny flik"
   },
   "connection": {
     "reconnecting": "Återansluter...",
@@ -319,6 +323,8 @@ const sv = {
     "copyLink": "Kopiera",
     "whatsapp": "WhatsApp",
     "more": "Mer",
+    "title": "Gå med i mitt LexiClash-spel!",
+    "text": "Gå med i mitt spel med kod: {{code}}",
     "inviteTitle": "Ordkrig pågår! 🎮",
     "shareVictory": "Skryt!",
     "scanToJoin": "Skanna för action",
@@ -564,9 +570,12 @@ const sv = {
     "waitingForPlayers": "Väntar...",
     "startGame": "Starta",
     "roomCode": "Kod",
+    "host": "Värd",
+    "inviteFriends": "Bjud in vänner att spela!",
     "playersJoined": "Spelare",
     "gameSettings": "Inställningar",
     "quickSetup": "Förval",
+    "selectPreset": "Spelläge",
     "min": "min",
     "timer": "Timer",
     "difficulty": "Svårighetsgrad",
@@ -595,7 +604,9 @@ const sv = {
     "hostPlays": "Jag vill spela",
     "broadcastModeTitle": "TV/Projektorläge",
     "broadcastModeDescription": "Visa spelet på stor skärm medan du tittar på (du spelar inte)",
+    "broadcastModeDesc": "Värd tittar, spelar inte",
     "broadcastModeHint": "Perfekt för 4+ spelare! Aktivera för att visa på TV",
+    "scanOrShare": "Skanna QR-kod eller dela länk",
     "broadcastSuggestion": "Har du 4+ spelare? Prova TV-läge för att visa spelet på stor skärm!",
     "advancedSettings": "Avancerade inställningar",
     "roomClosedInactivity": "Rummet stängt på grund av inaktivitet",
@@ -824,6 +835,7 @@ const sv = {
     "fullHouse": "Fullsatt! Låt striden börja!"
   },
   "roomCode": {
+    "title": "Rumskod",
     "label": "Rumskod",
     "inviteFriends": "Bjud in vänner med kod:",
     "tapToCopy": "Tryck för att kopiera",
@@ -1663,6 +1675,8 @@ const sv = {
     "termsLink": "Användarvillkor",
     "andText": "och",
     "privacyLink": "Integritetspolicy",
+    "showPassword": "Visa lösenord",
+    "hidePassword": "Dölj lösenord",
     "upgradePrompt": "Logga in för att spara din framsteg och tävla på topplistan!",
     "firstWin": {
       "title": "Grattis till din första vinst!",
@@ -2988,7 +3002,10 @@ const sv = {
     "timezone": "Din tidszon",
     "timezoneDesc": "Vi pingar dig kl. 8 - kaffe ingår ej",
     "saved": "Inställningar sparade!",
-    "unsubscribeInfo": "Du kan alltid avprenumerera via länken i våra mail"
+    "unsubscribeInfo": "Du kan alltid avprenumerera via länken i våra mail",
+    "enableNotifications": "Aktivera aviseringar",
+    "disableNotifications": "Inaktivera aviseringar",
+    "selectTimezone": "Välj din tidszon"
   },
   "unsubscribe": {
     "processing": "Jobbar på det...",
@@ -3284,6 +3301,15 @@ const sv = {
     "accessRequired": "Adminbehörighet krävs",
     "accessDenied": "Du behöver administratörsbehörighet för att komma åt denna sida.",
     "welcome": "Välkommen,",
+    "nav": {
+      "players": "Spelare",
+      "dictionary": "Ordbok",
+      "dailyChallenge": "Daglig Utmaning",
+      "wikipediaWords": "Wikipedia-ord",
+      "dailyBuzz": "Dagligt Buzz",
+      "webVitals": "Webbprestanda",
+      "email": "E-post"
+    },
     "live": {
       "subtitle": "Spelövervakning i realtid",
       "live": "Live",

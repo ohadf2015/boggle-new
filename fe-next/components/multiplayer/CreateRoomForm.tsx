@@ -199,7 +199,7 @@ const CreateRoomForm: React.FC<CreateRoomFormProps> = ({
         </div>
 
         {/* Sticky Create Button - always visible at bottom */}
-        <div className="flex-shrink-0 px-4 sm:px-6 pb-6 pt-2 bg-gradient-to-t from-slate-100 via-slate-100 to-transparent dark:from-neo-navy dark:via-neo-navy dark:to-transparent">
+        <div className="flex-shrink-0 px-4 sm:px-6 pb-6 pt-2 bg-slate-100 dark:bg-neo-navy">
           <div className="w-full max-w-md mx-auto">
             <Button
               type="submit"

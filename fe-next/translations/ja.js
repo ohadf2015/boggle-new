@@ -127,6 +127,7 @@ const ja = {
     "quickRematch": "リマッチ",
     "attempts": "試行",
     "share": "共有",
+    "bot": "ボット",
     "minutes": "分",
     "advancedSettings": "その他",
     "settings": "設定",
@@ -166,7 +167,10 @@ const ja = {
     "skip": "スキップ",
     "done": "完了",
     "clear": "クリア",
-    "pts": "pt"
+    "pts": "pt",
+    "player": "プレイヤー",
+    "clearSearch": "検索をクリア",
+    "opensInNewTab": "新しいタブで開きます"
   },
   "connection": {
     "reconnecting": "戻しています...",
@@ -319,6 +323,8 @@ const ja = {
     "copyLink": "コピー",
     "whatsapp": "WhatsApp",
     "more": "その他",
+    "title": "私のLexiClashゲームに参加して！",
+    "text": "コード {{code}} でゲームに参加しよう",
     "inviteTitle": "ワード戦争開始！🎮",
     "shareVictory": "自慢しよう！",
     "scanToJoin": "スキャンでアクション",
@@ -564,9 +570,12 @@ const ja = {
     "waitingForPlayers": "待機中...",
     "startGame": "開始",
     "roomCode": "コード",
+    "host": "ホスト",
+    "inviteFriends": "友達を招待してプレイ！",
     "playersJoined": "プレイヤー",
     "gameSettings": "設定",
     "quickSetup": "プリセット",
+    "selectPreset": "ゲームモード",
     "min": "分",
     "timer": "タイマー",
     "difficulty": "難易度",
@@ -595,7 +604,9 @@ const ja = {
     "hostPlays": "プレイしたい",
     "broadcastModeTitle": "テレビ/プロジェクターモード",
     "broadcastModeDescription": "大画面でゲームを表示しながら観戦します（プレイしません）",
+    "broadcastModeDesc": "ホストは観戦のみ",
     "broadcastModeHint": "4人以上のプレイヤーに最適！テレビに表示するには有効にしてください",
+    "scanOrShare": "QRコードをスキャンまたはリンクを共有",
     "broadcastSuggestion": "4人以上のプレイヤーがいますか？テレビモードで大画面に表示してみましょう！",
     "advancedSettings": "詳細設定",
     "roomClosedInactivity": "非アクティブのためルームが閉じられました",
@@ -824,6 +835,7 @@ const ja = {
     "fullHouse": "満員御礼！バトル開始！"
   },
   "roomCode": {
+    "title": "ルームコード",
     "label": "ルームコード",
     "inviteFriends": "コードで友達を招待:",
     "tapToCopy": "タップしてコピー",
@@ -1669,6 +1681,8 @@ const ja = {
     "termsLink": "利用規約",
     "andText": "と",
     "privacyLink": "プライバシーポリシー",
+    "showPassword": "パスワードを表示",
+    "hidePassword": "パスワードを隠す",
     "upgradePrompt": "ログインして進捗を保存し、リーダーボードで競いましょう!",
     "firstWin": {
       "title": "初勝利おめでとうございます!",
@@ -2994,7 +3008,10 @@ const ja = {
     "timezone": "タイムゾーン",
     "timezoneDesc": "朝8時にお届け - コーヒーは各自で",
     "saved": "設定完了！",
-    "unsubscribeInfo": "いつでもメール内のリンクから配信停止できます"
+    "unsubscribeInfo": "いつでもメール内のリンクから配信停止できます",
+    "enableNotifications": "通知を有効にする",
+    "disableNotifications": "通知を無効にする",
+    "selectTimezone": "タイムゾーンを選択"
   },
   "unsubscribe": {
     "processing": "作業中...",
@@ -3357,6 +3374,15 @@ const ja = {
     "accessRequired": "管理者アクセスが必要です",
     "accessDenied": "このページにアクセスするには管理者権限が必要です。",
     "welcome": "ようこそ、",
+    "nav": {
+      "players": "プレイヤー",
+      "dictionary": "辞書",
+      "dailyChallenge": "デイリーチャレンジ",
+      "wikipediaWords": "Wikipedia単語",
+      "dailyBuzz": "デイリーバズ",
+      "webVitals": "Webパフォーマンス",
+      "email": "メール"
+    },
     "live": {
       "subtitle": "リアルタイムゲーム監視",
       "live": "ライブ",

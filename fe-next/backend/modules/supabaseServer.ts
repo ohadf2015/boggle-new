@@ -1096,15 +1096,16 @@ export async function incrementBotWordUsage(word: string, language: string): Pro
 
 /**
  * Update MMR for ranked game participants
+ * Uses batch RPC to update all participants in a single database call
  */
 export async function updateRankedMmr(participants: RankedParticipant[]): Promise<void> {
   const client = getSupabase();
-  if (!client) return;
+  if (!client || participants.length === 0) return;
 
-  // Simple MMR calculation
+  // Calculate MMR changes for all participants
   const totalPlayers = participants.length;
 
-  for (const participant of participants) {
+  const participantUpdates = participants.map(participant => {
     let mmrChange = 0;
 
     if (participant.placement === 1) {
@@ -1121,17 +1122,26 @@ export async function updateRankedMmr(participants: RankedParticipant[]): Promis
     const newMmr = Math.max(0, currentMmr + mmrChange);
     const peakMmr = participant.peakMmr || currentMmr;
 
-    try {
-      await client
-        .from('profiles')
-        .update({
-          ranked_mmr: newMmr,
-          peak_mmr: Math.max(newMmr, peakMmr)
-        })
-        .eq('id', participant.playerId);
-    } catch (error) {
-      logger.error('SUPABASE', `Error updating MMR for ${participant.playerId}`, error);
+    return {
+      player_id: participant.playerId,
+      new_mmr: newMmr,
+      new_peak_mmr: Math.max(newMmr, peakMmr)
+    };
+  });
+
+  try {
+    // Single batch update instead of N individual queries
+    const { data, error } = await client.rpc('batch_update_ranked_mmr', {
+      p_participants: participantUpdates
+    });
+
+    if (error) {
+      logger.error('SUPABASE', `Error in batch MMR update: ${error.message}`);
+    } else {
+      logger.debug('SUPABASE', `Batch updated MMR for ${data} participants`);
     }
+  } catch (error) {
+    logger.error('SUPABASE', 'Error calling batch_update_ranked_mmr RPC', error);
   }
 }
 

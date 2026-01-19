@@ -6,6 +6,8 @@ import { motion } from 'framer-motion';
 import { Target, Flame, Check, Clock, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { useTiltEffect } from '@/hooks/useTiltEffect';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import {
   getDailyChallengeDate,
   getPuzzleNumber,
@@ -39,6 +41,28 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   const [streak, setStreak] = useState<number>(0);
   const [puzzleNumber, setPuzzleNumber] = useState<number>(0);
   const [isClient, setIsClient] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
+
+  // 3D tilt effect - slightly reduced values for smaller banner
+  const { ref: tiltRef, style: tiltStyle, handlers: tiltHandlers } = useTiltEffect<HTMLDivElement>({
+    maxTilt: 12,
+    hoverScale: 1.04,
+    perspective: 800,
+  });
+
+  // Combined handlers for hover state tracking
+  const combinedHandlers = {
+    ...tiltHandlers,
+    onMouseEnter: () => {
+      setIsHovered(true);
+      tiltHandlers.onMouseEnter();
+    },
+    onMouseLeave: () => {
+      setIsHovered(false);
+      tiltHandlers.onMouseLeave();
+    },
+  };
 
   // Initialize state on client
   useEffect(() => {
@@ -128,14 +152,12 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
 
   return (
     <Link href={`/${language}/daily`} className="block w-full group">
-      <motion.div
+      <div
+        ref={tiltRef}
         className={cn(
           // Base card styles matching ModeCard
-          "relative w-full rounded-neo border-3 border-neo-black shadow-hard transition-all cursor-pointer overflow-hidden",
-          // Hover/active effects matching ModeCard
-          isRTL
-            ? 'hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[-4px_4px_0px_black]'
-            : 'hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_black]',
+          "relative w-full rounded-neo border-3 border-neo-black shadow-hard-lg transition-shadow cursor-pointer overflow-hidden",
+          // Active effects matching ModeCard
           isRTL
             ? 'active:translate-x-[-1px] active:translate-y-[1px]'
             : 'active:translate-x-[1px] active:translate-y-[1px]',
@@ -144,13 +166,17 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
           hasPlayed
             ? "bg-gradient-to-r from-neo-lime via-lime-400 to-neo-lime"
             : "bg-gradient-to-r from-neo-lime via-lime-300 to-yellow-300",
-          // Pulsing glow when not played to attract attention
-          !hasPlayed && "ring-2 ring-neo-lime-dark/60 ring-offset-2 ring-offset-transparent",
           compact ? "p-2" : "p-2 sm:p-3",
           className
         )}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        style={{
+          // Hover glow effect - lime color to match gradient
+          boxShadow: isHovered
+            ? `0 0 25px rgba(191, 255, 0, 0.5), 0 0 50px rgba(191, 255, 0, 0.3), 6px 6px 0px rgb(var(--neo-black))`
+            : undefined,
+          ...tiltStyle,
+        }}
+        {...combinedHandlers}
       >
         {/* Animated sparkles for unplayed state */}
         {!hasPlayed && (
@@ -246,7 +272,39 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
             </motion.div>
           )}
         </div>
-      </motion.div>
+
+        {/* Premium animated effects - matching ModeCard */}
+        {enableComplexAnimations && !prefersReducedMotion && (
+          <>
+            {/* Shine effect on hover */}
+            <motion.div
+              className="absolute inset-0 pointer-events-none overflow-hidden rounded-neo"
+              initial={false}
+              animate={isHovered ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                initial={{ x: '-100%' }}
+                animate={isHovered ? { x: '200%' } : { x: '-100%' }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+              />
+            </motion.div>
+
+            {/* Decorative corner accent */}
+            <motion.div
+              className="absolute top-0 right-0 w-12 h-12 pointer-events-none overflow-hidden rounded-neo"
+              initial={false}
+            >
+              <motion.div
+                className="absolute -top-6 -right-6 w-12 h-12 bg-white/10 rotate-45"
+                animate={isHovered ? { scale: 1.2, opacity: 0.15 } : { scale: 1, opacity: 0.08 }}
+                transition={{ duration: 0.3 }}
+              />
+            </motion.div>
+          </>
+        )}
+      </div>
     </Link>
   );
 };

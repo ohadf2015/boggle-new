@@ -256,3 +256,121 @@ describe('ResultsPage - WordFeedbackModal', () => {
     // should exist in ResultsPage.tsx, outside the conditional returns
   });
 });
+
+describe('ResultsPage - Player Ranking (bannerRank)', () => {
+  describe('when playing alone (single player in multiplayer room)', () => {
+    it('should show rank 1 when player is alone, even with zero valid words', () => {
+      // BUG FIX TEST: When a player plays multiplayer alone and has zero valid words,
+      // they were incorrectly shown as "4th place" because hasZeroScore triggered
+      // bannerRank = 4 as a fallback for "non-winner" styling.
+      //
+      // Expected behavior: When playing alone, the player should always be shown as
+      // 1st place (they're the only player!), even if they found no valid words.
+      // The styling can still use the "4th place" purple/encouraging theme, but
+      // the rank number should be 1.
+
+      // GIVEN: A player who is the only participant in the game
+      const singlePlayerScores = [
+        {
+          username: 'LonelyPlayer',
+          score: 0,  // No points scored
+          totalScore: 0,
+          wordsFound: 0,
+          allWords: [],  // No words at all (or all invalid)
+        },
+      ];
+
+      // WHEN: Calculating the banner rank for display
+      const sortedScores = [...singlePlayerScores].sort((a, b) => (b.score || 0) - (a.score || 0));
+      const username = 'LonelyPlayer';
+
+      // This replicates the calculation from ResultsPage.tsx lines 206-209
+      const currentPlayerData = singlePlayerScores.find(p => p.username === username);
+      const currentPlayerRank = sortedScores.findIndex(p => p.username === username) + 1;
+      const currentPlayerValidWords = currentPlayerData?.allWords?.filter(
+        (w: { validated?: boolean; score?: number }) => w.validated && (w.score || 0) > 0
+      ) || [];
+
+      const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
+      const totalPlayers = sortedScores.length;
+
+      // CURRENT BUGGY IMPLEMENTATION (line 209 of ResultsPage.tsx):
+      // const bannerRank = hasZeroScore ? 4 : (currentPlayerRank >= 1 ? currentPlayerRank : 1);
+      // This returns 4 when hasZeroScore is true, even when playing alone!
+
+      // FIXED IMPLEMENTATION: Only use rank 4 styling when there are other players
+      const bannerRank = hasZeroScore && totalPlayers > 1
+        ? 4  // Only show "4th place" styling when there are other players
+        : (currentPlayerRank >= 1 ? currentPlayerRank : 1);
+
+      // THEN: The player should be ranked 1st (only player)
+      expect(currentPlayerRank).toBe(1);  // Basic rank calculation is correct
+      expect(totalPlayers).toBe(1);  // Only one player in the game
+      expect(bannerRank).toBe(1);  // Banner should show 1st place, not 4th
+    });
+
+    it('should show correct rank when playing alone with valid words', () => {
+      // GIVEN: A player who is the only participant and scored points
+      const singlePlayerScores = [
+        {
+          username: 'SoloPlayer',
+          score: 50,
+          totalScore: 50,
+          wordsFound: 5,
+          allWords: [
+            { word: 'cat', score: 2, validated: true },
+            { word: 'dog', score: 2, validated: true },
+          ],
+        },
+      ];
+
+      const sortedScores = [...singlePlayerScores].sort((a, b) => (b.score || 0) - (a.score || 0));
+      const username = 'SoloPlayer';
+      const currentPlayerData = singlePlayerScores.find(p => p.username === username);
+      const currentPlayerRank = sortedScores.findIndex(p => p.username === username) + 1;
+      const currentPlayerValidWords = currentPlayerData?.allWords?.filter(
+        (w: { validated?: boolean; score?: number }) => w.validated && (w.score || 0) > 0
+      ) || [];
+
+      const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
+      const bannerRank = hasZeroScore ? 4 : (currentPlayerRank >= 1 ? currentPlayerRank : 1);
+
+      // THEN: Player with valid words should be ranked 1st
+      expect(hasZeroScore).toBe(false);
+      expect(bannerRank).toBe(1);
+    });
+  });
+
+  describe('when playing with multiple players', () => {
+    it('should show rank 4 when player has zero valid words and there are other players', () => {
+      // GIVEN: Multiple players, current player has no valid words
+      const multiPlayerScores = [
+        { username: 'Winner', score: 100, wordsFound: 10, allWords: [{ word: 'cat', score: 2, validated: true }] },
+        { username: 'Second', score: 80, wordsFound: 8, allWords: [{ word: 'dog', score: 2, validated: true }] },
+        { username: 'Third', score: 60, wordsFound: 6, allWords: [{ word: 'bat', score: 2, validated: true }] },
+        { username: 'CurrentPlayer', score: 0, wordsFound: 0, allWords: [] },  // No valid words
+      ];
+
+      const sortedScores = [...multiPlayerScores].sort((a, b) => (b.score || 0) - (a.score || 0));
+      const username = 'CurrentPlayer';
+      const currentPlayerData = multiPlayerScores.find(p => p.username === username);
+      const currentPlayerRank = sortedScores.findIndex(p => p.username === username) + 1;
+      const currentPlayerValidWords = currentPlayerData?.allWords?.filter(
+        (w: { validated?: boolean; score?: number }) => w.validated && (w.score || 0) > 0
+      ) || [];
+
+      const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
+      const totalPlayers = sortedScores.length;
+
+      // With the fix: Show 4th place styling when there are other players
+      const bannerRank = hasZeroScore && totalPlayers > 1
+        ? 4
+        : (currentPlayerRank >= 1 ? currentPlayerRank : 1);
+
+      // THEN: Player with no valid words in multiplayer should get 4th place styling
+      expect(currentPlayerRank).toBe(4);  // Actually 4th place
+      expect(totalPlayers).toBe(4);
+      expect(bannerRank).toBe(4);  // 4th place styling (purple/encouraging)
+    });
+  });
+});

@@ -158,9 +158,14 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
 
   // Submit result to backend when completing a new challenge
   useEffect(() => {
-    // For authenticated users, wait for profile. For guests, proceed without waiting for guestPlayer
-    // We can use fallback values if guestPlayer hasn't loaded yet
-    const canSubmit = isNewCompletion && result && guestFingerprint && (isAuthenticated ? !!profile : true);
+    // For authenticated users: only need profile (NOT guestFingerprint)
+    // For guests: need guestFingerprint (but not guestPlayer - we use fallback values)
+    // BUG FIX: Previously required guestFingerprint for ALL users, blocking authenticated submissions
+    const canSubmit = isNewCompletion && result && (
+      isAuthenticated
+        ? !!profile  // Authenticated: just need profile
+        : !!guestFingerprint  // Guest: need fingerprint
+    );
 
     if (canSubmit) {
       const submitResult = async () => {

@@ -30,19 +30,24 @@ describe('Daily Buzz Admin Auth', () => {
   });
 
   it('should verify admin panel passes auth token not secret', async () => {
-    // Read admin panel file
+    // Read admin panel hooks (authorization logic was extracted during simplification)
     const fs = require('fs');
     const path = require('path');
+
+    // Check the main panel file doesn't use ADMIN_SECRET
     const panelPath = path.join(
       process.cwd(),
       'components/admin/DailyBuzzAdminPanel.tsx'
     );
     const panelContent = fs.readFileSync(panelPath, 'utf-8');
-
-    // Should NOT prompt for ADMIN_SECRET
     expect(panelContent).not.toContain("prompt('Enter ADMIN_SECRET:");
 
-    // Should use authorization header with proper token
-    expect(panelContent).toContain('Authorization');
+    // Check the buzz generation hook uses Authorization header
+    const hookPath = path.join(
+      process.cwd(),
+      'components/admin/buzz/hooks/useBuzzGeneration.ts'
+    );
+    const hookContent = fs.readFileSync(hookPath, 'utf-8');
+    expect(hookContent).toContain('Authorization');
   });
 });

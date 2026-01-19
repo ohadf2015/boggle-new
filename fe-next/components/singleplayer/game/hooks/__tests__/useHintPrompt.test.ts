@@ -1,0 +1,196 @@
+import { renderHook, act } from '@testing-library/react';
+import { useHintPrompt } from '../useHintPrompt';
+
+describe('useHintPrompt', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  describe('initial state', () => {
+    it('should not show hint prompt initially', () => {
+      const { result } = renderHook(() =>
+        useHintPrompt({
+          isPaused: false,
+          isGameOver: false,
+          hasGrid: true,
+        })
+      );
+
+      expect(result.current.showHintPrompt).toBe(false);
+    });
+
+    it('should initialize lastWordFoundTimeRef', () => {
+      const { result } = renderHook(() =>
+        useHintPrompt({
+          isPaused: false,
+          isGameOver: false,
+          hasGrid: true,
+        })
+      );
+
+      // After first interval check, the ref should be initialized
+      act(() => {
+        jest.advanceTimersByTime(5000);
+      });
+
+      expect(result.current.lastWordFoundTimeRef.current).toBeGreaterThan(0);
+    });
+  });
+
+  describe('hint prompt timing', () => {
+    it('should show hint prompt after 15 seconds of inactivity', () => {
+      const { result } = renderHook(() =>
+        useHintPrompt({
+          isPaused: false,
+          isGameOver: false,
+          hasGrid: true,
+        })
+      );
+
+      expect(result.current.showHintPrompt).toBe(false);
+
+      // Advance time past the 15 second threshold
+      act(() => {
+        jest.advanceTimersByTime(20000);
+      });
+
+      expect(result.current.showHintPrompt).toBe(true);
+    });
+
+    it('should not show hint prompt if game is paused', () => {
+      const { result } = renderHook(() =>
+        useHintPrompt({
+          isPaused: true,
+          isGameOver: false,
+          hasGrid: true,
+        })
+      );
+
+      act(() => {
+        jest.advanceTimersByTime(20000);
+      });
+
+      expect(result.current.showHintPrompt).toBe(false);
+    });
+
+    it('should not show hint prompt if game is over', () => {
+      const { result } = renderHook(() =>
+        useHintPrompt({
+          isPaused: false,
+          isGameOver: true,
+          hasGrid: true,
+        })
+      );
+
+      act(() => {
+        jest.advanceTimersByTime(20000);
+      });
+
+      expect(result.current.showHintPrompt).toBe(false);
+    });
+
+    it('should not show hint prompt if no grid', () => {
+      const { result } = renderHook(() =>
+        useHintPrompt({
+          isPaused: false,
+          isGameOver: false,
+          hasGrid: false,
+        })
+      );
+
+      act(() => {
+        jest.advanceTimersByTime(20000);
+      });
+
+      expect(result.current.showHintPrompt).toBe(false);
+    });
+  });
+
+  describe('dismissHintPrompt', () => {
+    it('should hide hint prompt when dismissed', () => {
+      const { result } = renderHook(() =>
+        useHintPrompt({
+          isPaused: false,
+          isGameOver: false,
+          hasGrid: true,
+        })
+      );
+
+      // Show the prompt
+      act(() => {
+        jest.advanceTimersByTime(20000);
+      });
+      expect(result.current.showHintPrompt).toBe(true);
+
+      // Dismiss it
+      act(() => {
+        result.current.dismissHintPrompt();
+      });
+
+      expect(result.current.showHintPrompt).toBe(false);
+    });
+  });
+
+  describe('resetInactivityTimer', () => {
+    it('should reset timer and hide prompt when word is found', () => {
+      const { result } = renderHook(() =>
+        useHintPrompt({
+          isPaused: false,
+          isGameOver: false,
+          hasGrid: true,
+        })
+      );
+
+      // Show the prompt
+      act(() => {
+        jest.advanceTimersByTime(20000);
+      });
+      expect(result.current.showHintPrompt).toBe(true);
+
+      // Reset (simulating finding a word)
+      act(() => {
+        result.current.resetInactivityTimer();
+      });
+
+      expect(result.current.showHintPrompt).toBe(false);
+    });
+
+    it('should prevent prompt from showing again after reset until timeout', () => {
+      const { result } = renderHook(() =>
+        useHintPrompt({
+          isPaused: false,
+          isGameOver: false,
+          hasGrid: true,
+        })
+      );
+
+      // Wait some time
+      act(() => {
+        jest.advanceTimersByTime(10000);
+      });
+
+      // Reset (player found a word)
+      act(() => {
+        result.current.resetInactivityTimer();
+      });
+
+      // Wait less than 15 seconds
+      act(() => {
+        jest.advanceTimersByTime(10000);
+      });
+
+      expect(result.current.showHintPrompt).toBe(false);
+
+      // Wait past the threshold
+      act(() => {
+        jest.advanceTimersByTime(10000);
+      });
+
+      expect(result.current.showHintPrompt).toBe(true);
+    });
+  });
+});

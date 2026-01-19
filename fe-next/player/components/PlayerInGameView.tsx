@@ -191,7 +191,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Show placeholder if no grid
   if (!effectiveGrid) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4 flex items-center justify-center">
+      <div className="min-h-dvh bg-neo-cream dark:bg-neo-navy p-4 flex items-center justify-center">
         <div className="w-full max-w-2xl aspect-square grid grid-cols-4 gap-3 p-4">
           {Array.from({ length: 16 }).map((_, i) => (
             <div
@@ -206,10 +206,10 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   }
 
   return (
-    <div className="h-screen overflow-hidden bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-0 md:p-4 flex flex-col transition-colors duration-300">
+    <div className="h-dvh overflow-hidden bg-neo-cream dark:bg-neo-navy p-0 md:p-4 flex flex-col transition-colors duration-300">
 
       {/* Top Bar - Desktop only */}
-      <div className="hidden lg:flex w-full max-w-7xl mx-auto items-center justify-between mb-1 pt-24">
+      <div className="hidden lg:flex w-full max-w-7xl mx-auto items-center justify-between mb-1 pt-2">
         <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} className="relative z-[60]" />
 
         {/* Hint Button - Single Player Mode Only */}
@@ -292,7 +292,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
       <Dialog open={showTournamentStandings} onOpenChange={setShowTournamentStandings}>
         <DialogContent noDescription className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white text-neo-black dark:bg-slate-800 dark:text-white border-purple-500/30">
           <DialogHeader>
-            <DialogTitle className="text-center text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400">
+            <DialogTitle className="text-center text-2xl font-black text-neo-pink dark:text-neo-pink">
               {tournamentData?.status === 'completed' ? t('hostView.tournamentComplete') : t('hostView.tournamentStandings')}
             </DialogTitle>
           </DialogHeader>
@@ -307,7 +307,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
           <DialogFooter className="sm:justify-center">
             <Button
               onClick={handleCloseTournamentStandings}
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+              className="w-full bg-neo-pink text-neo-cream font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed"
             >
               {t('common.close')}
             </Button>
@@ -332,7 +332,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={onConfirmExit}
-              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+              className="bg-neo-red text-neo-cream font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed"
             >
               {t('common.confirm')}
             </AlertDialogAction>

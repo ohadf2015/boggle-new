@@ -1,0 +1,85 @@
+// index.ts - Barrel exports for Redis module
+
+// Types
+export type {
+  CircuitBreakerState,
+  GameDataInput,
+  GameStateData,
+  LockResult,
+  RedisClient,
+  RedisHealth,
+  RedisMetrics,
+  TournamentDataInput,
+  TournamentStateData,
+  WordApprovalData,
+} from './types';
+
+// Configuration
+export { formatBytes, getTTLWithJitter, TTL_CONFIG } from './config';
+
+// Key helpers
+export { KEY_PATTERNS, KEYS } from './keys';
+
+// Circuit Breaker
+export { CircuitBreaker, circuitBreaker } from './circuitBreaker';
+
+// Connection management
+export {
+  closeRedis,
+  createPubSubClients,
+  getRedisClient,
+  getRedisHealth,
+  getRedisMetrics,
+  healthCheck,
+  initRedis,
+  isRedisAvailable,
+} from './connection';
+
+// Game state operations
+export {
+  deleteGameState,
+  getAllGameCodes,
+  getGameState,
+  saveGameState,
+} from './gameState';
+
+// Tournament operations
+export {
+  deleteTournamentState,
+  getAllTournamentIds,
+  getTournamentState,
+  saveTournamentState,
+} from './tournament';
+
+// Word approval tracking
+export {
+  getApprovedWords,
+  getWordApprovalStatus,
+  incrementWordApproval,
+} from './wordApproval';
+
+// Leaderboard caching
+export {
+  cacheLeaderboardTop100,
+  cacheUserRank,
+  getCachedLeaderboardTop100,
+  getCachedUserRank,
+  invalidateLeaderboardCaches,
+} from './leaderboard';
+
+// Daily puzzle caching
+export {
+  cacheDailyLeaderboard,
+  cacheDailyPuzzle,
+  getCachedDailyLeaderboard,
+  getCachedDailyPuzzle,
+} from './dailyPuzzle';
+
+// Distributed locking
+export {
+  acquireGameLock,
+  extendGameLock,
+  getGameLockHolder,
+  releaseGameLock,
+  withGameLock,
+} from './locking';

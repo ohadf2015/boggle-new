@@ -28,7 +28,7 @@ const ExitRoomButton: React.FC<ExitRoomButtonProps> = ({ onClick, label, classNa
         active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
         font-black transition-all ${className}`}
     >
-      <DoorOpen className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 me-2" />
+      <DoorOpen className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 me-2" aria-hidden="true" />
       {label}
     </Button>
   );

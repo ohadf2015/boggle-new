@@ -6,7 +6,6 @@ import { Providers } from '../providers';
 import AutoHideFooter from '@/components/AutoHideFooter';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import { CrazyGamesScript } from '@/components/CrazyGamesSDK';
-import SocialMediaPixels from '@/components/SocialMediaPixels';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
 import PWAInstallPrompt from '@/components/PWAInstallPrompt';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
@@ -719,7 +718,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 {/* Load external scripts with optimized strategies to prevent blocking */}
                 <GoogleAnalytics />
                 <CrazyGamesScript />
-                <SocialMediaPixels />
                 <WebVitalsReporter />
                 <ServiceWorkerRegistration />
                 <Providers lang={validLocale}>

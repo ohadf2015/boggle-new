@@ -1,0 +1,283 @@
+'use client';
+
+import { useState, useCallback, useEffect } from 'react';
+import { createClient } from '@/utils/supabase/client';
+import type { Language } from '@/types';
+import {
+  getDefaultDateRange,
+  type WikipediaWordCandidate,
+  type WikipediaWordsStats,
+  type ValidationStatus,
+} from '../types';
+
+interface UseWikipediaCandidatesOptions {
+  language: Language;
+  status: 'all' | ValidationStatus;
+  dateRange: { start: string; end: string };
+  searchQuery: string;
+}
+
+interface UseWikipediaCandidatesResult {
+  candidates: WikipediaWordCandidate[];
+  stats: WikipediaWordsStats;
+  loading: boolean;
+  error: string | null;
+  refresh: () => Promise<void>;
+  updateStatus: (id: string, status: ValidationStatus) => Promise<boolean>;
+  deleteCandidate: (id: string) => Promise<boolean>;
+  bulkUpdateStatus: (ids: string[], status: ValidationStatus) => Promise<boolean>;
+  bulkDelete: (ids: string[]) => Promise<boolean>;
+  triggerPopulation: () => Promise<boolean>;
+  clearError: () => void;
+}
+
+export function useWikipediaCandidates({
+  language,
+  status,
+  dateRange,
+  searchQuery,
+}: UseWikipediaCandidatesOptions): UseWikipediaCandidatesResult {
+  const [candidates, setCandidates] = useState<WikipediaWordCandidate[]>([]);
+  const [stats, setStats] = useState<WikipediaWordsStats>({
+    total: 0,
+    pending: 0,
+    valid: 0,
+    invalid: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const supabase = createClient();
+
+  const fetchCandidates = useCallback(async (): Promise<void> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      let query = supabase
+        .from('wikipedia_word_candidates')
+        .select('*')
+        .eq('language', language)
+        .gte('fetch_date', dateRange.start)
+        .lte('fetch_date', dateRange.end)
+        .order('interestingness_score', { ascending: false });
+
+      if (status !== 'all') {
+        query = query.eq('validation_status', status);
+      }
+
+      if (searchQuery.trim()) {
+        query = query.ilike('word', `%${searchQuery.trim()}%`);
+      }
+
+      const { data, error: fetchError } = await query;
+
+      if (fetchError) {
+        throw fetchError;
+      }
+
+      setCandidates(data || []);
+
+      // Calculate stats
+      const allData = data || [];
+      const statsData: WikipediaWordsStats = {
+        total: allData.length,
+        pending: allData.filter((c) => c.validation_status === 'pending').length,
+        valid: allData.filter((c) => c.validation_status === 'valid').length,
+        invalid: allData.filter((c) => c.validation_status === 'invalid').length,
+      };
+      setStats(statsData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch candidates');
+    } finally {
+      setLoading(false);
+    }
+  }, [supabase, language, status, dateRange.start, dateRange.end, searchQuery]);
+
+  useEffect(() => {
+    fetchCandidates();
+  }, [fetchCandidates]);
+
+  const updateStatus = useCallback(
+    async (id: string, newStatus: ValidationStatus): Promise<boolean> => {
+      try {
+        const { error: updateError } = await supabase
+          .from('wikipedia_word_candidates')
+          .update({ validation_status: newStatus })
+          .eq('id', id);
+
+        if (updateError) {
+          throw updateError;
+        }
+
+        // Update local state
+        setCandidates((prev) =>
+          prev.map((c) => (c.id === id ? { ...c, validation_status: newStatus } : c))
+        );
+
+        // Update stats
+        setStats((prev) => {
+          const candidate = candidates.find((c) => c.id === id);
+          if (!candidate) return prev;
+
+          const oldStatus = candidate.validation_status;
+          return {
+            ...prev,
+            [oldStatus]: prev[oldStatus] - 1,
+            [newStatus]: prev[newStatus] + 1,
+          };
+        });
+
+        return true;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to update status');
+        return false;
+      }
+    },
+    [supabase, candidates]
+  );
+
+  const deleteCandidate = useCallback(
+    async (id: string): Promise<boolean> => {
+      try {
+        const { error: deleteError } = await supabase
+          .from('wikipedia_word_candidates')
+          .delete()
+          .eq('id', id);
+
+        if (deleteError) {
+          throw deleteError;
+        }
+
+        // Update local state
+        const deletedCandidate = candidates.find((c) => c.id === id);
+        setCandidates((prev) => prev.filter((c) => c.id !== id));
+
+        // Update stats
+        if (deletedCandidate) {
+          setStats((prev) => ({
+            ...prev,
+            total: prev.total - 1,
+            [deletedCandidate.validation_status]:
+              prev[deletedCandidate.validation_status] - 1,
+          }));
+        }
+
+        return true;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to delete candidate');
+        return false;
+      }
+    },
+    [supabase, candidates]
+  );
+
+  const bulkUpdateStatus = useCallback(
+    async (ids: string[], newStatus: ValidationStatus): Promise<boolean> => {
+      if (ids.length === 0) return true;
+
+      try {
+        const { error: updateError } = await supabase
+          .from('wikipedia_word_candidates')
+          .update({ validation_status: newStatus })
+          .in('id', ids);
+
+        if (updateError) {
+          throw updateError;
+        }
+
+        // Refresh to get accurate data
+        await fetchCandidates();
+        return true;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to bulk update');
+        return false;
+      }
+    },
+    [supabase, fetchCandidates]
+  );
+
+  const bulkDelete = useCallback(
+    async (ids: string[]): Promise<boolean> => {
+      if (ids.length === 0) return true;
+
+      try {
+        const { error: deleteError } = await supabase
+          .from('wikipedia_word_candidates')
+          .delete()
+          .in('id', ids);
+
+        if (deleteError) {
+          throw deleteError;
+        }
+
+        // Refresh to get accurate data
+        await fetchCandidates();
+        return true;
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to bulk delete');
+        return false;
+      }
+    },
+    [supabase, fetchCandidates]
+  );
+
+  const triggerPopulation = useCallback(async (): Promise<boolean> => {
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        setError('Not authenticated');
+        return false;
+      }
+
+      const response = await fetch('/api/admin/wikipedia-words', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          action: 'populate',
+          language,
+          date: new Date().toISOString().split('T')[0],
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to trigger population');
+      }
+
+      // Refresh after population
+      await fetchCandidates();
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to trigger population');
+      return false;
+    }
+  }, [supabase, language, fetchCandidates]);
+
+  const clearError = useCallback((): void => {
+    setError(null);
+  }, []);
+
+  return {
+    candidates,
+    stats,
+    loading,
+    error,
+    refresh: fetchCandidates,
+    updateStatus,
+    deleteCandidate,
+    bulkUpdateStatus,
+    bulkDelete,
+    triggerPopulation,
+    clearError,
+  };
+}
+
+// Re-export for convenience
+export { getDefaultDateRange };

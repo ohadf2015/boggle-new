@@ -107,6 +107,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               target="_blank"
               rel="noopener noreferrer"
               title={t('support.kofiTooltip')}
+              aria-label={`${t('support.kofiFooter')} (${t('common.opensInNewTab') || 'opens in new tab'})`}
               className="
                 min-h-[44px] px-2 inline-flex items-center gap-1.5
                 text-sm font-bold uppercase tracking-wide
@@ -116,8 +117,9 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
                 group
               "
             >
-              <KofiIcon className="text-base group-hover:animate-bounce" />
+              <KofiIcon className="text-base group-hover:animate-bounce" aria-hidden="true" />
               <span>{t('support.kofiFooter')}</span>
+              <span className="sr-only">({t('common.opensInNewTab') || 'opens in new tab'})</span>
             </a>
           </nav>
         </div>

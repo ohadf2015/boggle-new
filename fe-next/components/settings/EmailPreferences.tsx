@@ -220,13 +220,15 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
           onClick={handleToggleSubscription}
           disabled={isSaving}
           className={cn(
-            'relative w-14 h-8 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2',
+            'relative w-14 h-8 rounded-full transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
             dailyEmailSubscribed
               ? 'bg-neo-lime'
               : isDarkMode ? 'bg-slate-600' : 'bg-gray-300',
             isSaving && 'opacity-50 cursor-not-allowed'
           )}
-          aria-label={dailyEmailSubscribed ? 'Disable notifications' : 'Enable notifications'}
+          role="switch"
+          aria-checked={dailyEmailSubscribed}
+          aria-label={dailyEmailSubscribed ? (t('emailPreferences.disableNotifications') || 'Disable notifications') : (t('emailPreferences.enableNotifications') || 'Enable notifications')}
         >
           <span
             className={cn(
@@ -273,8 +275,9 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
             value={timezone}
             onChange={handleTimezoneChange}
             disabled={isSaving}
+            aria-label={t('emailPreferences.selectTimezone') || 'Select your timezone'}
             className={cn(
-              'w-full px-4 py-2 rounded-lg border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-neo-cyan',
+              'w-full px-4 py-2 rounded-lg border-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
               isDarkMode
                 ? 'bg-slate-800 border-slate-600 text-white'
                 : 'bg-white border-gray-300 text-gray-900',

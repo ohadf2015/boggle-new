@@ -1,6 +1,13 @@
 /**
  * Single Player Game Module
- * Components and hooks for the single player game experience
+ * Exports hooks, components, and types for the single player game
  */
 
+// Hooks
 export * from './hooks';
+
+// Components
+export * from './components';
+
+// Types
+export * from './types';

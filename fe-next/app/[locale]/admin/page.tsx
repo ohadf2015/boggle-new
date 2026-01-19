@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, Shield, Users, BookOpen, Calendar, Activity, Sparkles, Mail } from 'lucide-react';
+import { ArrowLeft, Shield, Users, BookOpen, Calendar, Activity, Sparkles, Mail, Globe } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -125,7 +125,7 @@ export default function AdminPage() {
           >
             <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
               <Users className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
-              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">Players</span>
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.players')}</span>
             </CardContent>
           </Card>
 
@@ -135,7 +135,7 @@ export default function AdminPage() {
           >
             <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
               <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-green-500" />
-              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">Dictionary</span>
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.dictionary')}</span>
             </CardContent>
           </Card>
 
@@ -145,7 +145,17 @@ export default function AdminPage() {
           >
             <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
               <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-amber-500" />
-              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">Daily Challenge</span>
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.dailyChallenge')}</span>
+            </CardContent>
+          </Card>
+
+          <Card
+            className="hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+            onClick={() => router.push(`/${language}/admin/wikipedia-words`)}
+          >
+            <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
+              <Globe className="w-6 h-6 sm:w-8 sm:h-8 text-teal-500" />
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.wikipediaWords')}</span>
             </CardContent>
           </Card>
 
@@ -155,7 +165,7 @@ export default function AdminPage() {
           >
             <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
               <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-pink-500" />
-              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">Daily Buzz</span>
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.dailyBuzz')}</span>
             </CardContent>
           </Card>
 
@@ -165,7 +175,7 @@ export default function AdminPage() {
           >
             <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
               <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" />
-              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">Web Vitals</span>
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.webVitals')}</span>
             </CardContent>
           </Card>
 
@@ -178,7 +188,7 @@ export default function AdminPage() {
           >
             <CardContent className="p-3 sm:p-6 flex flex-col items-center justify-center text-center gap-2">
               <Mail className="w-6 h-6 sm:w-8 sm:h-8 text-neo-pink" />
-              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">Email</span>
+              <span className="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-200">{t('admin.nav.email')}</span>
             </CardContent>
           </Card>
         </div>

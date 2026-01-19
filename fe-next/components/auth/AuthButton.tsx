@@ -241,7 +241,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
               "bg-white hover:bg-neo-cyan/50"
             )}
           >
-            <Users size={14} className="text-neo-black" />
+            <Users size={14} className="text-neo-black" aria-hidden="true" />
             <span className="text-neo-black">{t('friends.title') || 'Friends'}</span>
           </button>
 
@@ -253,7 +253,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
               "bg-white hover:bg-neo-cyan/50"
             )}
           >
-            {isDarkMode ? <Sun size={14} className="text-yellow-500" /> : <Moon size={14} className="text-slate-600" />}
+            {isDarkMode ? <Sun size={14} className="text-yellow-500" aria-hidden="true" /> : <Moon size={14} className="text-slate-600" aria-hidden="true" />}
             <span className="text-neo-black">{isDarkMode ? (t('common.lightMode') || 'Light Mode') : (t('common.darkMode') || 'Dark Mode')}</span>
           </button>
 
@@ -269,7 +269,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
             {isSigningOut ? (
               <NeoLoader variant="dots" size="sm" />
             ) : (
-              <LogOut size={14} />
+              <LogOut size={14} aria-hidden="true" />
             )}
             <span>{t('auth.signOut') || 'Sign Out'}</span>
           </button>
@@ -516,6 +516,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                         .map((lang) => (
                           <Button
                             key={lang.code}
+                            role="menuitem"
                             variant="ghost"
                             onClick={() => {
                               setLanguage(lang.code);
@@ -528,7 +529,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                                 : 'text-gray-700 hover:bg-gray-50 hover:text-gray-700'
                             )}
                           >
-                            <span className="text-lg">{lang.flag}</span>
+                            <span className="text-lg" aria-hidden="true">{lang.flag}</span>
                             <span>{lang.name}</span>
                           </Button>
                         ))}
@@ -659,7 +660,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                   "bg-neo-cyan shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard"
                 )}
               >
-                <User size={14} className="text-neo-black" />
+                <User size={14} className="text-neo-black" aria-hidden="true" />
                 <span className="text-neo-black">{t('auth.signIn') || 'Sign In'}</span>
               </button>
 
@@ -670,7 +671,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                   "bg-neo-pink text-white shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard"
                 )}
               >
-                <User size={14} />
+                <User size={14} aria-hidden="true" />
                 <span>{t('auth.signUp') || 'Sign Up'}</span>
               </button>
             </>
@@ -684,7 +685,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
               "bg-white hover:bg-neo-cyan/50"
             )}
           >
-            {isDarkMode ? <Sun size={14} className="text-yellow-500" /> : <Moon size={14} className="text-slate-600" />}
+            {isDarkMode ? <Sun size={14} className="text-yellow-500" aria-hidden="true" /> : <Moon size={14} className="text-slate-600" aria-hidden="true" />}
             <span className="text-neo-black">{isDarkMode ? (t('common.lightMode') || 'Light Mode') : (t('common.darkMode') || 'Dark Mode')}</span>
           </button>
         </div>

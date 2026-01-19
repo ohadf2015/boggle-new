@@ -204,9 +204,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   }, [sortedScores, username]);
 
   // Use actual player rank for styling (1st=gold, 2nd=silver, 3rd=bronze, 4+=purple encouraging)
-  // BUT if player has 0 score, treat them as non-winner (rank 4+)
+  // BUT if player has 0 score AND there are other players, treat them as non-winner (rank 4+)
+  // When playing alone (only 1 player), always show actual rank (1st) even with zero score
   const hasZeroScore = currentPlayerData?.score === 0 || currentPlayerValidWords.length === 0;
-  const bannerRank = hasZeroScore ? 4 : (currentPlayerRank >= 1 ? currentPlayerRank : 1);
+  const totalPlayers = sortedScores.length;
+  const bannerRank = hasZeroScore && totalPlayers > 1 ? 4 : (currentPlayerRank >= 1 ? currentPlayerRank : 1);
   const isCurrentUserInBanner = bannerPlayer?.username === username;
 
   // Update guest stats when results load (only once)

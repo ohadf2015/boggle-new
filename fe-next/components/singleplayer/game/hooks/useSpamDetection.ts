@@ -19,7 +19,7 @@ interface UseSpamDetectionOptions {
   cooldownDurationMs?: number;
 }
 
-interface UseSpamDetectionReturn {
+export interface UseSpamDetectionReturn {
   /**
    * Check if submission is allowed based on spam detection
    * Returns { allowed: true } or { allowed: false, remainingCooldown, isWarning }

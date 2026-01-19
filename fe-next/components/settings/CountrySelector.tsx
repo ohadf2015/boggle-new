@@ -204,11 +204,13 @@ export function CountrySelector({
               <input
                 ref={inputRef}
                 type="text"
+                role="searchbox"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder={t('profile.searchCountry') || 'Search...'}
+                placeholder={t('profile.searchCountry') || 'Search…'}
                 className={cn(
-                  'w-full pl-8 pr-8 py-2 text-sm rounded-md border outline-none',
+                  'w-full pl-8 pr-8 py-2 text-sm rounded-md border',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
                   isDarkMode
                     ? 'bg-slate-700 border-slate-600 text-white placeholder:text-gray-500 focus:border-cyan-500'
                     : 'bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-cyan-500'
@@ -218,12 +220,14 @@ export function CountrySelector({
                 <button
                   type="button"
                   onClick={() => setSearch('')}
+                  aria-label={t('common.clearSearch') || 'Clear search'}
                   className={cn(
                     'absolute right-2 rtl:right-auto rtl:left-2 top-1/2 -translate-y-1/2',
+                    'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 rounded',
                     isDarkMode ? 'text-gray-500 hover:text-gray-400' : 'text-gray-400 hover:text-gray-500'
                   )}
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4" aria-hidden="true" />
                 </button>
               )}
             </div>

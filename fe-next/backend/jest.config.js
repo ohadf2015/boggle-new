@@ -20,7 +20,9 @@ module.exports = {
   // Module paths
   moduleNameMapper: {
     '^@backend/(.*)$': '<rootDir>/$1',
-    '^@/(.*)$': '<rootDir>/../$1'
+    '^@/(.*)$': '<rootDir>/../$1',
+    // Handle .js extensions in TypeScript imports (ESM style)
+    '^(\\.{1,2}/.*)\\.js$': '$1'
   },
 
   // Transform TypeScript files using ts-jest with ESM support

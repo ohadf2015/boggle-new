@@ -128,6 +128,7 @@ const es = {
     "quickRematch": "Revancha",
     "attempts": "Intentos",
     "share": "Compartir",
+    "bot": "Bot",
     "minutes": "min",
     "advancedSettings": "Más Opciones",
     "settings": "Configuración",
@@ -166,7 +167,10 @@ const es = {
     "later": "Después",
     "skip": "Omitir",
     "done": "Listo",
-    "clear": "Limpiar"
+    "clear": "Limpiar",
+    "player": "Jugador",
+    "clearSearch": "Limpiar búsqueda",
+    "opensInNewTab": "se abre en nueva pestaña"
   },
   "connection": {
     "reconnecting": "Te regresamos...",
@@ -319,6 +323,8 @@ const es = {
     "copyLink": "Copiar",
     "whatsapp": "WhatsApp",
     "more": "Más",
+    "title": "¡Únete a mi juego de LexiClash!",
+    "text": "Únete a mi juego con código: {{code}}",
     "inviteTitle": "¡Guerra de palabras ON! 🎮",
     "shareVictory": "¡Presume!",
     "scanToJoin": "Escanea para la acción",
@@ -561,9 +567,12 @@ const es = {
     "waitingForPlayers": "Esperando...",
     "startGame": "Iniciar",
     "roomCode": "Código",
+    "host": "Anfitrión",
+    "inviteFriends": "¡Invita amigos a jugar!",
     "playersJoined": "Jugadores",
     "gameSettings": "Configuración",
     "quickSetup": "Presets",
+    "selectPreset": "Modo de Juego",
     "min": "min",
     "timer": "Tiempo",
     "difficulty": "Dificultad",
@@ -592,7 +601,9 @@ const es = {
     "hostPlays": "Jugar",
     "broadcastModeTitle": "Modo TV/Proyector",
     "broadcastModeDescription": "Muestra el juego en pantalla grande mientras observas (no jugarás)",
+    "broadcastModeDesc": "El anfitrión observa, no juega",
     "broadcastModeHint": "¡Perfecto para 4+ jugadores! Activa para mostrar en TV",
+    "scanOrShare": "Escanea el código QR o comparte el enlace",
     "broadcastSuggestion": "¿4+ jugadores? ¡Prueba el Modo TV para mostrar el juego en pantalla grande!",
     "advancedSettings": "Avanzado",
     "roomClosedInactivity": "Cerrada por inactividad",
@@ -821,6 +832,7 @@ const es = {
     "fullHouse": "¡Casa llena! ¡Que comience la batalla!"
   },
   "roomCode": {
+    "title": "Código de Sala",
     "label": "Código de Sala",
     "code": "Código",
     "inviteFriends": "Invita amigos con el código:",
@@ -1485,6 +1497,8 @@ const es = {
     "termsLink": "Términos de Servicio",
     "andText": "y",
     "privacyLink": "Política de Privacidad",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña",
     "upgradePrompt": "¡Inicia sesión para guardar tu progreso y competir en la clasificación!",
     "firstWin": {
       "title": "¡Felicitaciones por Tu Primera Victoria!",
@@ -2991,7 +3005,10 @@ const es = {
     "timezone": "Tu zona horaria",
     "timezoneDesc": "Te avisamos a las 8 AM - el café lo pones tú",
     "saved": "¡Preferencias guardadas!",
-    "unsubscribeInfo": "Puedes cancelar en cualquier momento desde nuestros correos"
+    "unsubscribeInfo": "Puedes cancelar en cualquier momento desde nuestros correos",
+    "enableNotifications": "Activar notificaciones",
+    "disableNotifications": "Desactivar notificaciones",
+    "selectTimezone": "Selecciona tu zona horaria"
   },
   "unsubscribe": {
     "processing": "Trabajando...",
@@ -3287,6 +3304,15 @@ const es = {
     "accessRequired": "Acceso de Administrador Requerido",
     "accessDenied": "Necesitas privilegios de administrador para acceder a esta página.",
     "welcome": "Bienvenido,",
+    "nav": {
+      "players": "Jugadores",
+      "dictionary": "Diccionario",
+      "dailyChallenge": "Desafío Diario",
+      "wikipediaWords": "Palabras Wikipedia",
+      "dailyBuzz": "Buzz Diario",
+      "webVitals": "Rendimiento Web",
+      "email": "Correo"
+    },
     "live": {
       "subtitle": "Monitoreo de juegos en tiempo real",
       "live": "En vivo",

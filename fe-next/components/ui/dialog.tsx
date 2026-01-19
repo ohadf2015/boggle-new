@@ -41,12 +41,17 @@ interface DialogContentProps extends React.ComponentPropsWithoutRef<typeof Dialo
    * This adds aria-describedby={undefined} to explicitly mark the dialog as not needing description.
    */
   noDescription?: boolean;
+  /**
+   * Accessible label for the close button. Defaults to "Close".
+   * Pass a translated string for i18n support.
+   */
+  closeButtonLabel?: string;
 }
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   DialogContentProps
->(({ className, children, hideCloseButton, noDescription, ...props }, ref) => (
+>(({ className, children, hideCloseButton, noDescription, closeButtonLabel = "Close", ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -106,8 +111,8 @@ const DialogContent = React.forwardRef<
             z-10
           "
         >
-          <X className="h-5 w-5 sm:h-6 sm:w-6 stroke-[3]" />
-          <span className="sr-only">Close</span>
+          <X className="h-5 w-5 sm:h-6 sm:w-6 stroke-[3]" aria-hidden="true" />
+          <span className="sr-only">{closeButtonLabel}</span>
         </DialogPrimitive.Close>
       )}
     </DialogPrimitive.Content>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
 
@@ -18,6 +18,14 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
   const [isFadingOut, setIsFadingOut] = useState(false);
   const { playCountdownBeep } = useSoundEffects();
 
+  // Store onComplete in a ref to avoid timer reset when parent re-renders
+  // This fixes the bug where countdown gets stuck at 3 due to parent re-renders
+  // (e.g., from socket timeUpdate events) creating new callback references
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
+
   // Play beep for each countdown number
   useEffect(() => {
     if (count > 0) {
@@ -25,7 +33,7 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
     }
   }, [count, playCountdownBeep]);
 
-  // Countdown logic
+  // Countdown logic - uses ref for onComplete to avoid dependency on callback reference
   useEffect(() => {
     if (count > 0) {
       const timer = setTimeout(() => setCount(count - 1), 1000);
@@ -38,7 +46,7 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
 
       const completeTimer = setTimeout(() => {
         setIsVisible(false);
-        onComplete?.();
+        onCompleteRef.current?.();
       }, 1000);
 
       return () => {
@@ -47,7 +55,7 @@ const GoRipplesAnimation: React.FC<GoRipplesAnimationProps> = ({ onComplete, t }
       };
     }
     return undefined;
-  }, [count, onComplete]);
+  }, [count]);
 
   if (!isVisible) return null;
 

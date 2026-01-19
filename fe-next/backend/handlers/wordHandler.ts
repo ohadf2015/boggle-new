@@ -334,8 +334,19 @@ function registerWordHandlers(io: Server, socket: Socket): void {
 
     } catch (error: unknown) {
       const err = error as Error;
-      logger.error('SOCKET', 'Error in submitWord handler', err);
-      emitError(socket, 'An error occurred while processing your word');
+      const gameCode = getGameBySocketId(socket.id);
+      const username = getUsernameBySocketId(socket.id);
+      // Log detailed error context for debugging
+      logger.error('SOCKET', 'Error in submitWord handler', {
+        error: err.message,
+        stack: err.stack,
+        gameCode,
+        username,
+        socketId: socket.id,
+      });
+      emitError(socket, ErrorCodes.WORD_PROCESSING_ERROR, {
+        correlationId: `${gameCode}-${Date.now()}`,
+      });
     }
   });
 

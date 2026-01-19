@@ -72,7 +72,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
 
       <div
         dir={dir}
-        className="screen-fit bg-gradient-to-b from-transparent via-neo-navy-light to-transparent relative overflow-hidden flex flex-col lg:max-w-2xl lg:mx-auto"
+        className="screen-fit bg-neo-navy relative overflow-hidden flex flex-col lg:max-w-2xl lg:mx-auto"
         {...pullToRefreshHandlers}
       >
         <PullToRefreshIndicator

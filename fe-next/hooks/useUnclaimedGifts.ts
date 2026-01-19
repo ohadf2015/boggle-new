@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface GiftMessage {
@@ -43,6 +43,10 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
   const [gifts, setGifts] = useState<GiftMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Track locally claimed gift IDs to preserve claimed status during refresh
+  // This handles eventual consistency - API may return stale claimed status
+  const locallyClaimedIdsRef = useRef<Set<string>>(new Set());
 
   // Check cached count
   const getCachedCount = useCallback((): number | null => {
@@ -120,6 +124,7 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
   }, [isAuthenticated, getCachedCount, setCachedCount]);
 
   // Fetch full gift list
+  // Preserves locally claimed gifts to handle eventual consistency with API
   const fetchGifts = useCallback(async () => {
     if (!isAuthenticated) {
       setGifts([]);
@@ -141,10 +146,22 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
       }
 
       const data = await response.json();
-      setGifts(data.gifts || []);
+      const fetchedGifts: GiftMessage[] = data.gifts || [];
 
-      // Update unclaimed count from actual list
-      const unclaimed = (data.gifts || []).filter((g: GiftMessage) => !g.claimed).length;
+      // Merge fetched gifts with locally claimed status
+      // This handles eventual consistency - API may return stale claimed status
+      const mergedGifts = fetchedGifts.map(fetchedGift => {
+        // If we locally marked this gift as claimed, preserve that status
+        if (locallyClaimedIdsRef.current.has(fetchedGift.id)) {
+          return { ...fetchedGift, claimed: true, claimed_at: fetchedGift.claimed_at || new Date().toISOString() };
+        }
+        return fetchedGift;
+      });
+
+      setGifts(mergedGifts);
+
+      // Calculate unclaimed count, respecting locally claimed gifts
+      const unclaimed = mergedGifts.filter(g => !g.claimed).length;
       setUnclaimedCount(unclaimed);
       setCachedCount(unclaimed);
     } catch (err) {
@@ -173,6 +190,10 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
     }
 
     const result = await response.json();
+
+    // Track this gift as locally claimed to preserve status during refresh
+    // This handles eventual consistency - API may return stale claimed status
+    locallyClaimedIdsRef.current.add(giftId);
 
     // Update local state
     setGifts(prev => prev.map(g =>

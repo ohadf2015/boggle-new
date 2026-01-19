@@ -3,7 +3,8 @@
  * Shared interfaces for authentication context
  */
 
-import type { User } from '@supabase/supabase-js';
+import type { User, Session } from '@supabase/supabase-js';
+import type { Dispatch, SetStateAction } from 'react';
 
 export interface ProfileData {
   id: string;
@@ -111,4 +112,53 @@ export interface AuthContextValue {
     updates: Partial<ProfileData>
   ) => Promise<{ data: ProfileData | null; error: { message: string } | null }>;
   refreshProfile: () => Promise<void>;
+}
+
+/**
+ * Internal state setters shared between auth hooks
+ */
+export interface AuthStateSetters {
+  setUser: Dispatch<SetStateAction<User | null>>;
+  setProfile: Dispatch<SetStateAction<ProfileData | null>>;
+  setRankedProgress: Dispatch<SetStateAction<RankedProgress | null>>;
+  setLoading: Dispatch<SetStateAction<boolean>>;
+  setIsSupabaseEnabled: Dispatch<SetStateAction<boolean>>;
+}
+
+/**
+ * Core auth state returned by useAuthState hook
+ */
+export interface AuthState {
+  user: User | null;
+  profile: ProfileData | null;
+  rankedProgress: RankedProgress | null;
+  loading: boolean;
+  isSupabaseEnabled: boolean;
+  userIdRef: React.MutableRefObject<string | null>;
+  lastVisibleTimeRef: React.MutableRefObject<number>;
+  setters: AuthStateSetters;
+}
+
+/**
+ * Profile management actions
+ */
+export interface ProfileManagementActions {
+  fetchUserData: (userId: string, userMetadata?: Record<string, unknown>) => Promise<void>;
+  setupProfile: (
+    username: string,
+    avatarEmoji?: string,
+    avatarColor?: string
+  ) => Promise<{ data: ProfileData | null; error: { message: string } | null }>;
+  updateUserProfile: (
+    updates: Partial<ProfileData>
+  ) => Promise<{ data: ProfileData | null; error: { message: string } | null }>;
+  refreshProfile: () => Promise<void>;
+}
+
+/**
+ * Session data with user for auth operations
+ */
+export interface SessionWithUser {
+  session: Session | null;
+  user?: User;
 }

@@ -127,13 +127,16 @@ const HintButton = memo<HintButtonProps>(({
           >
             <div
               id="hint-content"
-              role="tooltip"
+              role="status"
+              aria-live="polite"
               className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg p-4 shadow-hard-lg pointer-events-auto"
               onClick={onClearHint}
+              onKeyDown={(e) => e.key === 'Escape' && onClearHint()}
+              tabIndex={0}
             >
               {/* Header */}
               <div className="flex items-center gap-2 mb-2">
-                <Lightbulb className="w-5 h-5 text-neo-lime" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />
+                <Lightbulb className="w-5 h-5 text-neo-lime" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} aria-hidden="true" />
                 <span className="font-black text-neo-black uppercase text-sm">
                   {t('hints.hint') || 'Hint'}
                 </span>

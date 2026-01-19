@@ -2,7 +2,7 @@
  * InGameScreen Types
  */
 
-import type { ReactNode } from 'react';
+import type { ReactNode, MutableRefObject } from 'react';
 import type { Socket } from 'socket.io-client';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type {
@@ -37,7 +37,7 @@ export interface InGameScreenProps {
   username: string;
   gameCode: string;
   isHost?: boolean;
-  isPlaying?: boolean; // For host: whether they're actively playing or spectating
+  isPlaying?: boolean;
   t: (path: string, params?: Record<string, string | number>) => string;
   dir?: 'rtl' | 'ltr';
   socket: Socket | null;
@@ -45,13 +45,17 @@ export interface InGameScreenProps {
   // Game state
   letterGrid: LetterGrid;
   remainingTime: number | null;
-  timerValue?: number; // Timer duration in minutes
+  timerValue?: number;
   gameActive?: boolean;
   showStartAnimation?: boolean;
   gameLanguage?: Language | null;
   minWordLength?: number;
   comboLevel?: number;
-  comboLevelRef?: React.MutableRefObject<number>;
+  comboLevelRef?: MutableRefObject<number>;
+  /** Time remaining for combo as percentage (0-100), null when no active combo */
+  comboTimeRemaining?: number | null;
+  /** Whether combo timer is in danger zone (<30% remaining) */
+  comboDanger?: boolean;
 
   // Player data
   foundWords?: FoundWord[] | string[];
@@ -82,7 +86,18 @@ export interface InGameScreenProps {
 
   // Board theme (date-themed words indicator)
   boardTheme?: BoardTheme | null;
+
+  // Player experience - used to determine inactivity threshold for keyboard trails
+  totalGamesPlayed?: number;
+
+  // Tutorial callback - opens onboarding tutorial
+  onShowTutorial?: () => void;
 }
+
+/**
+ * Translation function type
+ */
+export type TranslationFn = (path: string, params?: Record<string, string | number>) => string;
 
 /**
  * State for earthquake effect
@@ -93,3 +108,12 @@ export type EarthquakeState = 'idle' | 'warning' | 'shaking' | 'fire-round';
  * Mobile tab options for bottom navigation
  */
 export type MobileTab = 'words' | 'leaderboard';
+
+/**
+ * Position of a tapped cell on the grid
+ */
+export interface TappedCellPosition {
+  row: number;
+  col: number;
+  letter: string;
+}

@@ -112,6 +112,7 @@ export const ErrorCodes = {
   SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
   DATABASE_ERROR: 'DATABASE_ERROR',
   REDIS_ERROR: 'REDIS_ERROR',
+  WORD_PROCESSING_ERROR: 'WORD_PROCESSING_ERROR',
 } as const;
 
 export type ErrorCode = typeof ErrorCodes[keyof typeof ErrorCodes];
@@ -305,6 +306,11 @@ export const ErrorRegistry: Record<string, ErrorRegistryEntry> = {
   [ErrorCodes.REDIS_ERROR]: {
     message: 'Cache operation failed',
     severity: ErrorSeverity.HIGH,
+    httpStatus: 500
+  },
+  [ErrorCodes.WORD_PROCESSING_ERROR]: {
+    message: 'An error occurred while processing your word',
+    severity: ErrorSeverity.MEDIUM,
     httpStatus: 500
   },
 };

@@ -568,18 +568,18 @@ export const DailyWordManager: React.FC = () => {
                             if (e.key === 'Escape') setEditingDate(null);
                           }}
                         />
-                        <button onClick={() => handleSaveSingleWord(item.puzzle_date)} className="p-1 text-green-600 hover:text-green-700"><Check className="w-4 h-4" /></button>
-                        <button onClick={() => setEditingDate(null)} className="p-1 text-red-500 hover:text-red-700"><X className="w-4 h-4" /></button>
+                        <button onClick={() => handleSaveSingleWord(item.puzzle_date)} aria-label="Save word" className="p-1 text-green-600 hover:text-green-700 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500"><Check className="w-4 h-4" aria-hidden="true" /></button>
+                        <button onClick={() => setEditingDate(null)} aria-label="Cancel edit" className="p-1 text-red-500 hover:text-red-700 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"><X className="w-4 h-4" aria-hidden="true" /></button>
                       </div>
                     ) : (
                       <div className="flex justify-between items-center group min-h-[28px]">
                          <span className="font-bold font-mono text-lg">{activeWord}</span>
-                         <button 
+                         <button
                            onClick={() => handleEditWord(item.puzzle_date, activeWord)}
-                           className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 dark:hover:bg-slate-600 rounded text-gray-500"
-                           title="Edit word"
+                           className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-200 dark:hover:bg-slate-600 rounded text-gray-500 focus:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+                           aria-label="Edit word"
                          >
-                           <Edit className="w-4 h-4" />
+                           <Edit className="w-4 h-4" aria-hidden="true" />
                          </button>
                       </div>
                     )}

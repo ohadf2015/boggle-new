@@ -99,12 +99,23 @@ const MusicControls: React.FC = memo(() => {
 
   const handleMouseEnter = useCallback(() => setShowSlider(true), []);
   const handleMouseLeave = useCallback(() => setShowSlider(false), []);
+  const handleFocus = useCallback(() => setShowSlider(true), []);
+  const handleBlur = useCallback((e: React.FocusEvent) => {
+    // Only close if focus leaves the entire dropdown/button group
+    const relatedTarget = e.relatedTarget as HTMLElement | null;
+    const currentTarget = e.currentTarget as HTMLElement;
+    if (!currentTarget.contains(relatedTarget)) {
+      setShowSlider(false);
+    }
+  }, []);
 
   return (
     <div
       className="relative"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
       role="group"
       aria-label={t('music.controls') || 'Music controls'}
     >

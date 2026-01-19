@@ -6,11 +6,28 @@
  */
 
 import { useMemo } from 'react';
-import { calculatePlayerInsights, WordData } from '@/utils/gameInsights';
+import { calculatePlayerInsights, type PlayerInsights, type WordData } from '@/utils/gameInsights';
 import { categorizeWords, calculateWordStats } from '@/components/results/utils';
 import { calculateAllPlayerArchetypes, getMissedWords, type PlayerArchetype } from '@/utils/playerArchetypes';
 import type { WordObject } from '@/components/results/types';
 import type { SinglePlayerResultsData, PlayerWordData } from '../SinglePlayerView';
+
+// Re-export types for consumers
+export type { PlayerInsights };
+
+/** Type alias for word grouping by point values */
+export type WordsByPoints = Record<number, WordObject[]>;
+
+/** Type alias for invalid word display */
+export type InvalidWord = WordObject;
+
+/** Missed word that player could have found */
+export interface MissedWord {
+  word: string;
+  score: number;
+  foundBy: string[];
+  path?: { row: number; col: number }[];
+}
 
 export interface BotWordDetail {
   name: string;

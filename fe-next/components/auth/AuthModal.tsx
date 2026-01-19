@@ -420,15 +420,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                   <div>
                     <input
                       type="email"
+                      autoComplete="email"
                       value={email}
                       onChange={(e) => handleEmailChange(e.target.value)}
                       placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
                       className={cn(
-                        'w-full px-4 py-3 rounded-xl border-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all',
+                        'w-full px-4 py-3 rounded-xl border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 transition-colors',
                         isDarkMode ? 'bg-slate-700 text-white placeholder-gray-400' : 'bg-gray-50 text-gray-900 placeholder-gray-400',
                         emailError ? 'border-red-500' : (isDarkMode ? 'border-slate-600' : 'border-gray-200')
                       )}
                       disabled={isAnyLoading}
+                      spellCheck={false}
                     />
                     {emailError && (
                       <p className="mt-1 text-xs text-red-500">{emailError}</p>
@@ -440,11 +442,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                     <div className="relative">
                       <input
                         type={showPassword ? 'text' : 'password'}
+                        autoComplete={authMode === 'signup' ? 'new-password' : 'current-password'}
                         value={password}
                         onChange={(e) => handlePasswordChange(e.target.value)}
                         placeholder={t('auth.inlineSignup.passwordPlaceholder') || 'Password (8+ characters)'}
                         className={cn(
-                          'w-full px-4 py-3 pr-12 rounded-xl border-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all',
+                          'w-full px-4 py-3 pr-12 rounded-xl border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 transition-colors',
                           isDarkMode ? 'bg-slate-700 text-white placeholder-gray-400' : 'bg-gray-50 text-gray-900 placeholder-gray-400',
                           passwordError ? 'border-red-500' : (isDarkMode ? 'border-slate-600' : 'border-gray-200')
                         )}
@@ -453,12 +456,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? (t('auth.hidePassword') || 'Hide password') : (t('auth.showPassword') || 'Show password')}
                         className={cn(
-                          'absolute right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 transition-colors',
+                          'absolute right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 transition-colors rounded',
+                          'focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
                           isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'
                         )}
                       >
-                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        {showPassword ? <EyeOff className="w-5 h-5" aria-hidden="true" /> : <Eye className="w-5 h-5" aria-hidden="true" />}
                       </button>
                     </div>
                     {passwordError && (

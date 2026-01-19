@@ -92,6 +92,7 @@ export default async function ProfileLayout({ children, params }: ProfileLayoutP
   };
 
   // ProfilePage schema - identifies this as a profile page subordinate to the main site
+  // mainEntity is required by Google for ProfilePage schema
   const profilePageSchema = {
     '@context': 'https://schema.org',
     '@type': 'ProfilePage',
@@ -104,6 +105,14 @@ export default async function ProfileLayout({ children, params }: ProfileLayoutP
     },
     breadcrumb: {
       '@id': `https://www.lexiclash.live${localePath}/profile#breadcrumb`,
+    },
+    // Generic Person entity - actual user data is loaded client-side
+    // This satisfies Google's requirement for mainEntity on ProfilePage
+    mainEntity: {
+      '@type': 'Person',
+      '@id': `https://www.lexiclash.live${localePath}/profile#person`,
+      name: 'LexiClash Player',
+      description: 'A LexiClash multiplayer word game player profile',
     },
   };
 

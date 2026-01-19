@@ -53,10 +53,16 @@ export {
   PENDING_DAILY_RESULT_KEY,
   FIRST_COMPLETION_KEY,
   WINNER_ONBOARDING_KEY,
+  GAME_LANGUAGE_KEY,
+  TRAINING_GATEWAY_SEEN_KEY,
+  KEEP_PLAYING_DISMISSED_KEY,
   LENGTH_EMOJI,
   getWordLengthEmoji,
   WORD_FREQUENCY_TIERS,
   MIN_SAME_LENGTH_WORDS,
+  getWordHuntTutorialKey,
+  getWordHuntResultKey,
+  getDailyCoinAwardKey,
 } from './constants';
 
 // PRNG

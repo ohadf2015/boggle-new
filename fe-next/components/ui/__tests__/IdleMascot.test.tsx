@@ -50,13 +50,14 @@ describe('IdleMascot', () => {
     expect(mascot).toBeInTheDocument();
     expect(mascot).toHaveAttribute('data-variant', 'happy');
 
-    // Verify default timing values are passed (2-5s initial delay, 8-20s interval)
+    // Verify default timing values are passed (8-15s initial delay, 45-90s interval)
+    // These are longer intervals to reduce image change frequency
     expect(mockUseRandomMascotActivity).toHaveBeenCalledWith(
       expect.objectContaining({
-        initialDelayMin: 2000,
-        initialDelayMax: 5000,
-        minInterval: 8000,
-        maxInterval: 20000,
+        initialDelayMin: 8000,
+        initialDelayMax: 15000,
+        minInterval: 45000,
+        maxInterval: 90000,
         cycleBaseVariants: true,
       })
     );

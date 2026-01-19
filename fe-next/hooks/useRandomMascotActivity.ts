@@ -36,13 +36,13 @@ interface UseRandomMascotActivityOptions {
   baseVariants?: MascotVariant[];
   /** List of activities to randomly choose from */
   activities?: ActivityVariant[];
-  /** Min delay before first activity in ms (default: 2000 = 2s) */
+  /** Min delay before first activity in ms (default: 8000 = 8s) */
   initialDelayMin?: number;
-  /** Max delay before first activity in ms (default: 5000 = 5s) */
+  /** Max delay before first activity in ms (default: 15000 = 15s) */
   initialDelayMax?: number;
-  /** Min interval between subsequent activities in ms (default: 10000 = 10s) */
+  /** Min interval between subsequent activities in ms (default: 45000 = 45s) */
   minInterval?: number;
-  /** Max interval between subsequent activities in ms (default: 30000 = 30s) */
+  /** Max interval between subsequent activities in ms (default: 90000 = 90s) */
   maxInterval?: number;
   /** How long to show activity before returning to base in ms (default: 4000 = 4s) */
   activityDuration?: number;
@@ -90,10 +90,10 @@ export function useRandomMascotActivity({
   baseVariant,
   baseVariants,
   activities = DEFAULT_IDLE_ACTIVITIES,
-  initialDelayMin = 2000,
-  initialDelayMax = 5000,
-  minInterval = 10000,
-  maxInterval = 30000,
+  initialDelayMin = 8000,
+  initialDelayMax = 15000,
+  minInterval = 45000,
+  maxInterval = 90000,
   activityDuration = 4000,
   enabled = true,
   cycleBaseVariants = false,

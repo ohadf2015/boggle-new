@@ -22,7 +22,7 @@ jest.mock('../../utils/SocketContext', () => ({
   }),
 }));
 
-// Mock framer-motion
+// Mock framer-motion with all motion element types used by components
 jest.mock('framer-motion', () => ({
   motion: {
     div: ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
@@ -30,6 +30,9 @@ jest.mock('framer-motion', () => ({
     ),
     button: ({ children, className, ...props }: React.HTMLAttributes<HTMLButtonElement>) => (
       <button className={className} {...props}>{children}</button>
+    ),
+    span: ({ children, className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
+      <span className={className} {...props}>{children}</span>
     ),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -55,6 +58,12 @@ jest.mock('../../components/RoomChat', () => ({
   default: ({ className }: { className?: string }) => (
     <div data-testid="room-chat-mock" className={className}>Mock RoomChat</div>
   ),
+}));
+
+// Mock BotControls component since it requires LanguageProvider
+jest.mock('../../components/BotControls', () => ({
+  __esModule: true,
+  default: () => <div data-testid="bot-controls-mock">Mock BotControls</div>,
 }));
 
 import HostPreGameView from '../../host/components/HostPreGameView';

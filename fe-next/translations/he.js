@@ -128,6 +128,7 @@ const he = {
     "quickRematch": "עוד סיבוב",
     "attempts": "ניסיונות",
     "share": "שתף",
+    "bot": "בוט",
     "minutes": "דק׳",
     "advancedSettings": "עוד אפשרויות",
     "settings": "הגדרות",
@@ -166,7 +167,10 @@ const he = {
     "later": "אחר כך",
     "skip": "דלג",
     "done": "סיום",
-    "clear": "נקה"
+    "clear": "נקה",
+    "player": "שחקן",
+    "clearSearch": "נקה חיפוש",
+    "opensInNewTab": "נפתח בלשונית חדשה"
   },
   "connection": {
     "reconnecting": "מתחבר מחדש...",
@@ -319,6 +323,8 @@ const he = {
     "copyLink": "העתק",
     "whatsapp": "וואטסאפ",
     "more": "עוד",
+    "title": "הצטרפו למשחק LexiClash שלי!",
+    "text": "הצטרפו למשחק עם הקוד: {{code}}",
     "inviteTitle": "מלחמת מילים ON! 🎮",
     "shareVictory": "תתגאו!",
     "scanToJoin": "סרקו להצטרפות לפעולה",
@@ -574,9 +580,12 @@ const he = {
     "waitingForPlayers": "ממתין...",
     "startGame": "התחל",
     "roomCode": "קוד",
+    "host": "מארח",
+    "inviteFriends": "הזמינו חברים לשחק!",
     "playersJoined": "שחקנים",
     "gameSettings": "הגדרות",
     "quickSetup": "תבניות",
+    "selectPreset": "מצב משחק",
     "min": "דק׳",
     "timer": "טיימר",
     "difficulty": "רמת קושי",
@@ -605,7 +614,9 @@ const he = {
     "hostPlays": "אני רוצה לשדר",
     "broadcastModeTitle": "מצב טלוויזיה/מקרן",
     "broadcastModeDescription": "הצג את המשחק על מסך גדול בזמן שאתה צופה (לא תשחק)",
+    "broadcastModeDesc": "המארח צופה, לא משחק",
     "broadcastModeHint": "מושלם ל-4+ שחקנים! הפעל כדי להציג על טלוויזיה",
+    "scanOrShare": "סרוק קוד QR או שתף קישור",
     "broadcastSuggestion": "יש 4+ שחקנים? נסה מצב טלוויזיה להצגת המשחק על מסך גדול!",
     "advancedSettings": "הגדרות מתקדמות",
     "roomClosedInactivity": "החדר נסגר עקב חוסר פעילות",
@@ -834,6 +845,7 @@ const he = {
     "fullHouse": "בית מלא! שהקרב יתחיל!"
   },
   "roomCode": {
+    "title": "קוד חדר",
     "label": "קוד חדר",
     "code": "קוד:",
     "inviteFriends": "הזמינו חברים עם הקוד:",
@@ -1679,6 +1691,8 @@ const he = {
     "termsLink": "תנאי השימוש",
     "andText": "ול",
     "privacyLink": "מדיניות הפרטיות",
+    "showPassword": "הצג סיסמה",
+    "hidePassword": "הסתר סיסמה",
     "upgradePrompt": "התחבר כדי לשמור את ההתקדמות שלך ולהתחרות בטבלת המובילים!",
     "firstWin": {
       "title": "מזל טוב על הניצחון הראשון!",
@@ -2995,7 +3009,10 @@ const he = {
     "timezone": "אזור הזמן שלך",
     "timezoneDesc": "נעיר אותך ב-8 בבוקר - קפה לא כלול",
     "saved": "ההעדפות נשמרו!",
-    "unsubscribeInfo": "תמיד אפשר לבטל דרך כל מייל שנשלח"
+    "unsubscribeInfo": "תמיד אפשר לבטל דרך כל מייל שנשלח",
+    "enableNotifications": "הפעל התראות",
+    "disableNotifications": "כבה התראות",
+    "selectTimezone": "בחר אזור זמן"
   },
   "unsubscribe": {
     "processing": "עובד על זה...",
@@ -3291,6 +3308,15 @@ const he = {
     "accessRequired": "נדרשת הרשאת מנהל",
     "accessDenied": "יש צורך בהרשאות מנהל כדי לגשת לעמוד זה.",
     "welcome": "שלום,",
+    "nav": {
+      "players": "שחקנים",
+      "dictionary": "מילון",
+      "dailyChallenge": "אתגר יומי",
+      "wikipediaWords": "מילות ויקיפדיה",
+      "dailyBuzz": "באזז יומי",
+      "webVitals": "ביצועי אתר",
+      "email": "אימייל"
+    },
     "live": {
       "subtitle": "מעקב משחקים בזמן אמת",
       "live": "חי",

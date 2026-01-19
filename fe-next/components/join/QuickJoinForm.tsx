@@ -63,7 +63,7 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
               <div className="p-4 bg-neo-cyan text-neo-black rounded-neo border-3 border-neo-black shadow-hard-sm rotate-3">
-                <Gamepad2 size={48} className="text-neo-black" />
+                <Gamepad2 size={48} className="text-neo-black" aria-hidden="true" />
               </div>
             </div>
             <CardTitle className="text-2xl sm:text-3xl font-black uppercase text-neo-cream tracking-tight">
@@ -231,13 +231,13 @@ const JoinButton: React.FC<JoinButtonProps> = ({ isJoining, disabled, onClick, t
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             className="mr-3 inline-block"
           >
-            <RefreshCw size={24} />
+            <RefreshCw size={24} aria-hidden="true" />
           </motion.span>
           {t('joinView.joining')}
         </>
       ) : (
         <>
-          <Gamepad2 className="mr-3" size={24} />
+          <Gamepad2 className="mr-3" size={24} aria-hidden="true" />
           {t('joinView.joinGame')}
         </>
       )}

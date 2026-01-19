@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence, type TargetAndTransition } from 'framer-motion';
-import { memo, useState, useCallback, useMemo } from 'react';
+import { memo, useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { MASCOT_IMAGES, MascotVariant } from './Mascot';
@@ -371,6 +371,38 @@ function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
  *   tooltip="Click me!"
  * />
  */
+/**
+ * Preload all mascot images once globally
+ * This ensures images are cached in browser before they're needed
+ */
+const preloadedImages = new Set<string>();
+let preloadPromise: Promise<void> | null = null;
+
+function preloadAllMascotImages(): Promise<void> {
+  if (preloadPromise) return preloadPromise;
+
+  preloadPromise = Promise.all(
+    Object.values(MASCOT_IMAGES).map((src) => {
+      if (preloadedImages.has(src)) return Promise.resolve();
+
+      return new Promise<void>((resolve) => {
+        const img = new window.Image();
+        img.onload = () => {
+          preloadedImages.add(src);
+          resolve();
+        };
+        img.onerror = () => {
+          preloadedImages.add(src); // Mark as attempted
+          resolve();
+        };
+        img.src = src;
+      });
+    })
+  ).then(() => undefined);
+
+  return preloadPromise;
+}
+
 export const InteractiveMascot = memo(function InteractiveMascot({
   variant,
   size = 'md',
@@ -394,6 +426,15 @@ export const InteractiveMascot = memo(function InteractiveMascot({
   const [isHovered, setIsHovered] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const hasPreloadedRef = useRef(false);
+
+  // Preload all mascot images once on first mount (globally cached)
+  useEffect(() => {
+    if (!hasPreloadedRef.current) {
+      hasPreloadedRef.current = true;
+      preloadAllMascotImages();
+    }
+  }, []);
 
   const shouldAnimate = animated && !prefersReducedMotion && enableComplexAnimations;
   const isInteractive = (enableHover || enableClick) && !prefersReducedMotion;

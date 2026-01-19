@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BarChart3, Menu, X, Settings, BookOpen, Trophy, ScrollText, Shield, Coffee, User, Gift } from 'lucide-react';
+import { BarChart3, Menu, X, Settings, BookOpen, Trophy, ScrollText, Shield, Coffee, User, Gift, Accessibility } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -107,6 +107,15 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
 
         return () => clearTimeout(timer);
     }, [gifts, showGiftModal]);
+
+    // Dispatch event when gift modal opens/closes to allow games to pause
+    // This enables timer pause during gift modal display
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        window.dispatchEvent(new CustomEvent('giftModalStateChange', {
+            detail: { isOpen: showGiftModal }
+        }));
+    }, [showGiftModal]);
 
     // Track client-side mounting for portal
     useEffect(() => {
@@ -232,6 +241,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         viewBox="0 0 24 32"
                         fill="none"
                         style={{ transform: 'rotate(-15deg)' }}
+                        aria-hidden="true"
                     >
                         <path
                             d="M14 2L4 18h7l-3 12 13-18h-8l5-10H14z"
@@ -276,6 +286,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         viewBox="0 0 24 32"
                         fill="none"
                         style={{ transform: 'rotate(15deg)' }}
+                        aria-hidden="true"
                     >
                         <path
                             d="M14 2L4 18h7l-3 12 13-18h-8l5-10H14z"
@@ -344,6 +355,24 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             <GiftNotificationBadge count={unclaimedCount} />
                         </button>
                     )}
+
+                    {/* Accessibility Quick Access - visible for ALL users */}
+                    <Link
+                        href={`/${language}/settings#accessibility`}
+                        className={cn(
+                            "flex items-center justify-center",
+                            "w-10 h-10",
+                            "bg-neo-purple/20 text-neo-purple dark:text-neo-purple-light",
+                            "border-2 border-neo-black",
+                            "rounded-neo shadow-hard-sm",
+                            "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-purple/40",
+                            "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
+                            "transition-all duration-100"
+                        )}
+                        aria-label={t('settings.accessibility') || 'Accessibility Settings'}
+                    >
+                        <Accessibility size={20} />
+                    </Link>
 
                     {/* Settings Link - visible for ALL users (guests and authenticated) */}
                     <Link
@@ -506,7 +535,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                     )}
                                                 >
                                                     <span className="flex items-center justify-center w-7 h-7 rounded-md bg-white/30 border-2 border-neo-black text-neo-black">
-                                                        <Gift className="w-4 h-4" />
+                                                        <Gift className="w-4 h-4" aria-hidden="true" />
                                                     </span>
                                                     <span>{t('gift.youHaveGifts') || `You have ${unclaimedCount} gift${unclaimedCount !== 1 ? 's' : ''}`}</span>
                                                     <GiftNotificationBadge count={unclaimedCount} className="relative top-0 right-0" />
@@ -549,6 +578,22 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 <QuickLanguageSwitcher showLabel />
                                             </div>
                                         </div>
+
+                                        {/* Accessibility Quick Access */}
+                                        <Link
+                                            href={`/${language}/settings#accessibility`}
+                                            onClick={() => setShowMobileMenu(false)}
+                                            className={cn(
+                                                "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                "bg-neo-purple/20 dark:bg-neo-purple/30 hover:bg-neo-purple/40 dark:hover:bg-neo-purple/50 text-neo-black dark:text-white",
+                                                "shadow-hard-sm hover:shadow-hard"
+                                            )}
+                                        >
+                                            <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-purple/30 border-2 border-neo-black text-neo-purple dark:text-neo-purple-light">
+                                                <Accessibility className="w-4 h-4" aria-hidden="true" />
+                                            </span>
+                                            <span>{t('settings.accessibility') || 'Accessibility'}</span>
+                                        </Link>
 
                                         {/* Full Settings Link - for theme, sound, accessibility */}
                                         <Link
@@ -615,7 +660,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 )}
                                             >
                                                 <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cyan border-2 border-neo-black text-neo-black">
-                                                    <BookOpen className="w-4 h-4" />
+                                                    <BookOpen className="w-4 h-4" aria-hidden="true" />
                                                 </span>
                                                 <span>{t('footer.aboutGame') || 'About the Game'}</span>
                                             </Link>
@@ -629,7 +674,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 )}
                                             >
                                                 <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-lime border-2 border-neo-black text-neo-black">
-                                                    <Trophy className="w-4 h-4" />
+                                                    <Trophy className="w-4 h-4" aria-hidden="true" />
                                                 </span>
                                                 <span>{t('footer.leaderboard') || 'Leaderboard'}</span>
                                             </Link>
@@ -643,7 +688,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 )}
                                             >
                                                 <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cream border-2 border-neo-black text-neo-black">
-                                                    <ScrollText className="w-4 h-4" />
+                                                    <ScrollText className="w-4 h-4" aria-hidden="true" />
                                                 </span>
                                                 <span>{t('legal.termsOfService')}</span>
                                             </Link>
@@ -657,7 +702,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 )}
                                             >
                                                 <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-pink-light border-2 border-neo-black">
-                                                    <Shield className="w-4 h-4 text-neo-black" />
+                                                    <Shield className="w-4 h-4 text-neo-black" aria-hidden="true" />
                                                 </span>
                                                 <span>{t('legal.privacyPolicy')}</span>
                                             </Link>
@@ -666,6 +711,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 onClick={() => setShowMobileMenu(false)}
+                                                aria-label={`${t('support.kofiFooter')} (${t('common.opensInNewTab') || 'opens in new tab'})`}
                                                 className={cn(
                                                     "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
                                                     "bg-neo-pink/20 dark:bg-slate-700 hover:bg-neo-pink/40 dark:hover:bg-slate-600 text-neo-black dark:text-white",
@@ -673,9 +719,10 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 )}
                                             >
                                                 <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-pink border-2 border-neo-black text-white">
-                                                    <Coffee className="w-4 h-4" />
+                                                    <Coffee className="w-4 h-4" aria-hidden="true" />
                                                 </span>
                                                 <span>{t('support.kofiFooter')}</span>
+                                                <span className="sr-only">({t('common.opensInNewTab') || 'opens in new tab'})</span>
                                             </a>
                                         </div>
                                     </div>

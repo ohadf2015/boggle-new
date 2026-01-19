@@ -224,7 +224,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
         {/* Landscape mode suggestion banner */}
         <LandscapeIndicator />
 
-        <div dir={dir} className="flex h-screen w-full overflow-hidden bg-neo-navy text-white p-3 gap-4 landscape-full-height">
+        <div dir={dir} className="flex h-dvh w-full overflow-hidden bg-neo-navy text-white p-3 gap-4 landscape-full-height">
         {/* Left column: Form */}
         <div className="w-[45%] flex flex-col gap-3 overflow-y-auto">
           {/* Header with back + title */}
@@ -232,6 +232,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
             <Link
               href="/"
               className="w-12 h-12 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg transition-all"
+              aria-label={t('common.back') || 'Back'}
             >
               <ArrowLeft className="text-sm text-neo-black rtl:rotate-180" />
             </Link>
@@ -346,7 +347,7 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
       {/* Landscape mode suggestion banner */}
       <LandscapeIndicator />
 
-      <div dir={dir} className="min-h-screen bg-neo-navy flex flex-col">
+      <div dir={dir} className="min-h-dvh bg-neo-navy flex flex-col">
       <div className="w-[94%] max-w-7xl mx-auto py-3 sm:py-4 flex-1 flex flex-col min-h-0">
         {/* Compact Header: back button + title inline with premium gradient accent */}
         <motion.div
@@ -357,12 +358,13 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
           <Link
             href="/"
             className="flex items-center justify-center w-10 h-10 rounded-neo border-3 border-neo-black bg-neo-cream shadow-hard hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed transition-all text-neo-black"
+            aria-label={t('common.back') || 'Back'}
           >
             <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
           </Link>
           <div className="flex-1">
             <h1 className="text-xl sm:text-2xl font-black uppercase text-neo-white flex items-center gap-2">
-              <span className="inline-block w-3 h-6 bg-gradient-to-b from-neo-pink to-neo-pink-dark rounded-sm" />
+              <span className="inline-block w-3 h-6 bg-neo-pink rounded-sm" />
               {t('landing.multiplayer') || 'Multiplayer'}
             </h1>
             <p className="text-neo-white/60 text-xs sm:text-sm font-medium mt-0.5">
@@ -383,9 +385,9 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
             animate={{ x: 0, opacity: 1 }}
             className="w-full lg:w-[45%] lg:max-w-md flex flex-col"
           >
-            <div className="rounded-neo-lg border-4 border-neo-black bg-gradient-to-b from-slate-800 to-slate-900 shadow-hard-lg p-4 flex flex-col h-full relative overflow-hidden">
+            <div className="rounded-neo-lg border-4 border-neo-black bg-slate-800 shadow-hard-lg p-4 flex flex-col h-full relative overflow-hidden">
               {/* Decorative top accent bar */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-neo-pink via-neo-lime to-neo-cyan" />
+              <div className="absolute top-0 left-0 right-0 h-1 bg-neo-pink" />
               {/* Mode Selector - direct, no header wrapper */}
               <ModeSelector mode={mode} onModeChange={handleModeChange} />
 

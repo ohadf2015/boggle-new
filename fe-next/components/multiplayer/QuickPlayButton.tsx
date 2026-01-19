@@ -63,7 +63,7 @@ const QuickPlayButton: React.FC<QuickPlayButtonProps> = ({
         isHero && [
           'w-full py-5 px-6',
           'text-xl lg:text-2xl',
-          'bg-gradient-to-r from-neo-cyan via-neo-lime to-neo-cyan',
+          'bg-neo-lime',
           'text-neo-black',
         ],
         // Compact variant styles
@@ -76,10 +76,10 @@ const QuickPlayButton: React.FC<QuickPlayButtonProps> = ({
         className
       )}
     >
-      {/* Animated background shimmer */}
-      {isHero && !isLoading && !disabled && (
+      {/* Animated background shimmer - removed per UI skills (no decorative animations) */}
+      {false && isHero && !isLoading && !disabled && (
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+          className="absolute inset-0 bg-neo-lime-dark/30"
           initial={{ x: '-100%' }}
           animate={{ x: '100%' }}
           transition={{

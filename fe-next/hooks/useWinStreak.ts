@@ -194,6 +194,8 @@ const saveStreakData = (data: Partial<WinStreakData>): void => {
 export const useWinStreak = () => {
   // Initialize with default data to avoid hydration mismatch
   const [streakData, setStreakData] = useState<WinStreakData>(DEFAULT_STREAK_DATA);
+  // Track whether data has been loaded from localStorage
+  const [isLoaded, setIsLoaded] = useState(false);
 
   // Load streak data from localStorage after mount
   useEffect(() => {
@@ -206,6 +208,7 @@ export const useWinStreak = () => {
     }
 
     setStreakData(data);
+    setIsLoaded(true);
   }, []);
 
   /**
@@ -388,6 +391,8 @@ export const useWinStreak = () => {
 
   return {
     ...streakData,
+    /** Whether localStorage data has been loaded (use to avoid race conditions) */
+    isLoaded,
     recordWin,
     applyStreakFreeze,
     recoverStreak,

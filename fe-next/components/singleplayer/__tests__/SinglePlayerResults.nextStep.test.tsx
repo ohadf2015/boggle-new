@@ -157,7 +157,7 @@ jest.mock('@/components/training', () => ({
   TrainingAnalysisModal: () => null,
 }));
 
-// Mock useResultsData
+// Mock useResultsData and extracted hooks
 jest.mock('../results', () => ({
   useResultsData: () => ({
     allParticipants: [
@@ -176,6 +176,38 @@ jest.mock('../results', () => ({
     playerArchetype: null,
     missedWords: [],
   }),
+  useGuestStatsSync: () => ({ hasUpdatedStats: true }),
+  useLeaderboardSync: () => ({ globalRank: null, hasSyncedLeaderboard: false }),
+  useGameHistory: () => {},
+  useGameSessionLogging: () => {},
+  useCoinRewards: () => ({ coinReward: null }),
+  useWinStreakTracking: () => ({ winStreakData: null }),
+  useCognitiveScoring: () => ({ brainPointsReward: null }),
+  useSignupPrompt: () => ({ showSignupModal: false, setShowSignupModal: jest.fn() }),
+  useAchievementsSave: () => {},
+  useWordValidation: () => ({
+    wordValidationQueue: [],
+    showWordValidation: false,
+    setShowWordValidation: jest.fn(),
+    handleWordVote: jest.fn(),
+  }),
+  useBannerConfig: () => ({
+    variant: 'ranking',
+    message: undefined,
+    announcement: '#1 of 2',
+  }),
+  // Component exports
+  GlobalRankBadge: () => null,
+  RankingsSection: () => null,
+  LandscapeBanner: () => null,
+  LandscapeWordsSection: () => null,
+  ScoreDisplay: () => null,
+  PerformanceSection: () => null,
+  YourWordsSection: () => null,
+  AchievementsSection: () => null,
+  BotWordsSection: () => null,
+  MobileResultsTab: () => null,
+  MobileDetailsTab: () => null,
 }));
 
 describe('SinglePlayerResults NextStep navigation bug', () => {
@@ -201,7 +233,7 @@ describe('SinglePlayerResults NextStep navigation bug', () => {
     mockRouterPush.mockClear();
   });
 
-  it('should navigate to /daily when clicking "Try Daily Challenge" in bot game results, NOT trigger quick rematch', async () => {
+  it('should navigate to /daily when clicking next step prompt in bot game results, NOT trigger quick rematch', async () => {
     const user = userEvent.setup();
 
     render(
@@ -214,18 +246,17 @@ describe('SinglePlayerResults NextStep navigation bug', () => {
       />
     );
 
-    // Find the "Try Daily Challenge" button in mobile view
-    // There are multiple elements with this text (mobile and desktop), get the first (mobile)
-    const dailyChallengeButtons = screen.getAllByText('Try Daily Challenge');
-    await user.click(dailyChallengeButtons[0]);
+    // In desktop variant, "Try Daily Challenge" is a non-interactive h3 text
+    // The clickable element is the "Let's Go!" button
+    const letsGoButtons = screen.getAllByText("Let's Go!");
+    await user.click(letsGoButtons[0]);
 
-    // BUG: Currently this incorrectly calls onQuickRematch instead of navigating to /daily
-    // The fix should make it navigate to /en/daily
+    // Should navigate to daily challenge, NOT call onQuickRematch
     expect(mockRouterPush).toHaveBeenCalledWith('/en/daily');
     expect(mockOnQuickRematch).not.toHaveBeenCalled();
   });
 
-  it('should NOT call onQuickRematch when clicking the next step prompt to try daily challenge', async () => {
+  it('should not use onPlayAgain or onQuickRematch callbacks (navigation is handled by NextStepPrompt)', async () => {
     const user = userEvent.setup();
 
     render(
@@ -238,14 +269,13 @@ describe('SinglePlayerResults NextStep navigation bug', () => {
       />
     );
 
-    // Click "Let's Go!" button which should navigate to daily challenge
-    // There are multiple (mobile and desktop views), get the first
+    // Click the "Let's Go!" button to navigate
     const letsGoButtons = screen.getAllByText("Let's Go!");
     await user.click(letsGoButtons[0]);
 
-    // BUG: Currently this calls onQuickRematch
-    // After fix: should navigate and NOT call onQuickRematch
+    // After code simplification, SinglePlayerResults no longer uses onPlayAgain or onQuickRematch
+    // Navigation is handled by NextStepPrompt component using router.push
+    expect(mockOnPlayAgain).not.toHaveBeenCalled();
     expect(mockOnQuickRematch).not.toHaveBeenCalled();
-    expect(mockRouterPush).toHaveBeenCalledWith('/en/daily');
   });
 });

@@ -46,7 +46,7 @@ export const QRCodeDialog: React.FC<QRCodeDialogProps> = ({
           <div className="p-6 bg-white rounded-lg shadow-md">
             <QRCodeSVG value={getJoinUrl(gameCode)} size={250} level="H" />
           </div>
-          <h4 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">{gameCode}</h4>
+          <h4 className="text-3xl font-black text-neo-cyan">{gameCode}</h4>
           <p className="text-sm text-center text-slate-500 dark:text-slate-300">
             {t('hostView.scanQr')} {gameCode}
           </p>
@@ -57,7 +57,7 @@ export const QRCodeDialog: React.FC<QRCodeDialogProps> = ({
         <DialogFooter>
           <Button
             onClick={handleClose}
-            className="w-full bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 hover:shadow-[0_0_15px_rgba(6,182,212,0.5)]"
+            className="w-full bg-neo-cyan text-neo-black font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed"
           >
             {t('hostView.close')}
           </Button>
@@ -146,7 +146,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent noDescription className="max-w-2xl max-h-[85vh] flex flex-col bg-neo-navy text-white border-cyan-500/40">
         <DialogHeader className="flex-shrink-0 pb-2">
-          <DialogTitle className="text-center text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
+          <DialogTitle className="text-center text-2xl font-black text-neo-cyan">
             {t('hostView.validation')}
           </DialogTitle>
         </DialogHeader>
@@ -170,12 +170,12 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
                       onClick={() => handleToggleWord(item.word, isDuplicate)}
                       disabled={isDuplicate}
                       className={cn(
-                        "p-3 rounded-lg text-center transition-all border-2 cursor-pointer",
+                        "p-3 rounded-neo text-center transition-all border-3 border-neo-black cursor-pointer",
                         isDuplicate
-                          ? "bg-orange-900/40 border-orange-500/50 opacity-50 cursor-not-allowed"
+                          ? "bg-neo-orange/40 opacity-50 cursor-not-allowed"
                           : isValid
-                            ? "bg-gradient-to-br from-cyan-600/80 to-teal-600/80 border-cyan-400/60 hover:border-cyan-300 shadow-lg shadow-cyan-500/20"
-                            : "bg-neo-navy/80 border-neo-black/50/50 hover:border-neo-black/40"
+                            ? "bg-neo-cyan shadow-hard hover:shadow-hard-lg"
+                            : "bg-neo-navy/80 hover:bg-neo-navy/60"
                       )}
                     >
                       <span className={cn(
@@ -210,7 +210,7 @@ export const ValidationModal: React.FC<ValidationModalProps> = ({
         <DialogFooter className="flex-shrink-0 pt-3 border-t border-cyan-500/30">
           <Button
             onClick={onSubmit}
-            className="w-full h-12 text-lg font-bold bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 text-white"
+            className="w-full h-12 text-lg font-black uppercase bg-neo-lime text-neo-black border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed"
           >
             {t('hostView.submitValidation')}
           </Button>
@@ -282,12 +282,12 @@ export const FinalScoresModal: React.FC<FinalScoresModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent noDescription className="max-w-5xl max-h-[90vh] overflow-auto bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+      <DialogContent noDescription className="max-w-5xl max-h-[90vh] overflow-auto bg-neo-cream dark:bg-neo-navy border-4 border-neo-black shadow-hard-lg">
         <DialogHeader>
-          <DialogTitle className="text-center text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center justify-center gap-3">
-            <Trophy className="text-yellow-500" />
+          <DialogTitle className="text-center text-3xl sm:text-4xl font-black text-neo-black dark:text-neo-yellow flex items-center justify-center gap-3">
+            <Trophy className="text-neo-orange dark:text-neo-yellow" />
             {tournamentData ? t('hostView.tournamentRound') + ' ' + tournamentData.currentRound : t('hostView.finalScores')}
-            <Trophy className="text-yellow-500" />
+            <Trophy className="text-neo-orange dark:text-neo-yellow" />
           </DialogTitle>
         </DialogHeader>
 
@@ -449,7 +449,7 @@ export const ExitConfirmDialog: React.FC<ExitConfirmDialogProps> = ({
         </AlertDialogCancel>
         <AlertDialogAction
           onClick={onConfirm}
-          className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+          className="bg-neo-red text-neo-cream font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed"
         >
           {t('common.confirm')}
         </AlertDialogAction>
@@ -489,7 +489,7 @@ export const CancelTournamentDialog: React.FC<CancelTournamentDialogProps> = ({
         </AlertDialogCancel>
         <AlertDialogAction
           onClick={onConfirm}
-          className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+          className="bg-neo-red text-neo-cream font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed"
         >
           {t('common.confirm')}
         </AlertDialogAction>
