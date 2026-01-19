@@ -60,7 +60,8 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     }, [claimGift, refreshGifts, refreshProfile]);
 
     // Handle dismissing gift modal - show next unclaimed gift if available
-    const handleDismissGiftModal = useCallback(() => {
+    // Also persist dismissal to database to prevent auto-showing in future sessions
+    const handleDismissGiftModal = useCallback(async () => {
         // Find the next unclaimed gift (excluding the currently selected one)
         const nextUnclaimedGift = gifts.find(g => !g.claimed && g.id !== selectedGift?.id);
 
@@ -72,16 +73,27 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
             // No more unclaimed gifts, close the modal
             setShowGiftModal(false);
             setSelectedGift(null);
+
+            // Persist dismissal to database (fire-and-forget)
+            // This prevents auto-showing the modal in future sessions
+            try {
+                await fetch('/api/player/gifts/dismiss-modal', {
+                    method: 'POST',
+                });
+                // Refresh profile to get updated gift_modal_dismissed_at
+                await refreshProfile();
+            } catch (error) {
+                console.error('Failed to persist gift modal dismissal:', error);
+                // Non-critical error - don't block user experience
+            }
         }
-    }, [gifts, selectedGift?.id]);
+    }, [gifts, selectedGift?.id, refreshProfile]);
 
     // Auto-show gift modal after 3 seconds when user has unclaimed gifts
-    // Only show once per session (track via sessionStorage)
+    // Check database to see if user has previously dismissed the modal
     useEffect(() => {
-        const AUTO_SHOW_KEY = 'lexiclash_gift_auto_shown';
-
-        // Don't auto-show if already shown this session
-        if (typeof window !== 'undefined' && sessionStorage.getItem(AUTO_SHOW_KEY)) {
+        // Don't auto-show if user has previously dismissed the modal (persisted in DB)
+        if (profile?.gift_modal_dismissed_at) {
             return;
         }
 
@@ -99,14 +111,10 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
         const timer = setTimeout(() => {
             setSelectedGift(unclaimedGift);
             setShowGiftModal(true);
-            // Mark as shown for this session
-            if (typeof window !== 'undefined') {
-                sessionStorage.setItem(AUTO_SHOW_KEY, 'true');
-            }
         }, 3000);
 
         return () => clearTimeout(timer);
-    }, [gifts, showGiftModal]);
+    }, [gifts, showGiftModal, profile?.gift_modal_dismissed_at]);
 
     // Dispatch event when gift modal opens/closes to allow games to pause
     // This enables timer pause during gift modal display

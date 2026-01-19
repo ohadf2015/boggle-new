@@ -1271,7 +1271,12 @@ export default function MultiplayerPage(): React.JSX.Element {
     import('@/utils/multiplayerProgressStorage').then(({ recordGameCompleted }) => {
       recordGameCompleted();
     });
-  }, []);
+    // Refresh profile to sync updated stats (wins, score, etc.) from the backend
+    // This ensures the profile stats displayed in the UI reflect the game results
+    if (isAuthenticated && refreshProfile) {
+      refreshProfile();
+    }
+  }, [isAuthenticated, refreshProfile]);
 
   // Calculate and store game duration when results are first shown
   // This ensures the duration remains stable even if gameStartTime/pendingGameStart are reset

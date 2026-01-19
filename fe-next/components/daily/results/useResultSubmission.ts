@@ -57,12 +57,17 @@ export function useResultSubmission({
       !isNewCompletion && storedResult && storedResult.submittedToServer === false;
 
     // Wait for country code to be fetched (with timeout fallback)
+    // For authenticated users: only need profile (NOT guestFingerprint)
+    // For guests: need guestFingerprint (but not profile)
+    // BUG FIX: Previously required guestFingerprint for ALL users, blocking authenticated submissions
     const canSubmit =
       (isNewCompletion || needsRetrySubmission) &&
       result &&
-      guestFingerprint &&
       countryCodeReady &&
-      (isAuthenticated ? !!profile : true);
+      (isAuthenticated
+        ? !!profile  // Authenticated: just need profile
+        : !!guestFingerprint  // Guest: need fingerprint
+      );
 
     // Debug logging for submission conditions
     console.log('[WordHunt Submit Check]', {

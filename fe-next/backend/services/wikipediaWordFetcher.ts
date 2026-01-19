@@ -11,9 +11,13 @@ import type { Language } from '@/shared/types/game';
 // Wikipedia API User-Agent (required by Wikimedia guidelines)
 const WIKIPEDIA_USER_AGENT = 'LexiClash/1.0 (https://lexiclash.com; contact@lexiclash.com)';
 
-// Rate limiting: 100ms between requests (conservative)
-const RATE_LIMIT_DELAY_MS = 100;
+// Rate limiting: 50ms between requests (Wikimedia allows ~200 req/s for identified clients)
+const RATE_LIMIT_DELAY_MS = 50;
 let lastRequestTime = 0;
+
+// Retry configuration for resilience
+const MAX_RETRIES = 2;
+const RETRY_DELAY_MS = 500;
 
 // Cache configuration
 const CACHE_TTL = 86400; // 24 hours in seconds
@@ -73,6 +77,46 @@ async function enforceRateLimit(): Promise<void> {
 }
 
 /**
+ * Fetch with retry logic for resilience
+ */
+async function fetchWithRetry<T>(
+  url: string,
+  timeout: number,
+  retries: number = MAX_RETRIES
+): Promise<T> {
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      await enforceRateLimit();
+      const response = await axios.get<T>(url, {
+        headers: {
+          'User-Agent': WIKIPEDIA_USER_AGENT,
+          'Accept': 'application/json'
+        },
+        timeout
+      });
+      return response.data;
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+
+      // Don't retry on 404 (content doesn't exist)
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
+        throw error;
+      }
+
+      // Retry on network errors or timeouts
+      if (attempt < retries) {
+        console.log(`[Wikipedia] Retry ${attempt + 1}/${retries} after error: ${lastError.message}`);
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS * (attempt + 1)));
+      }
+    }
+  }
+
+  throw lastError || new Error('Failed after retries');
+}
+
+/**
  * Fetch today's featured content from Wikipedia for a specific language
  *
  * @param language - Language code (en, he, sv, ja, es, fr, de)
@@ -97,8 +141,6 @@ export async function fetchFeaturedContent(
       }
     }
 
-    await enforceRateLimit();
-
     console.log(`[Wikipedia] Fetching featured content for ${language} on ${dateStr}...`);
     const startTime = Date.now();
 
@@ -107,23 +149,17 @@ export async function fetchFeaturedContent(
     const [year, month, day] = dateStr.split('-');
     const url = `https://api.wikimedia.org/feed/v1/wikipedia/${language}/featured/${year}/${month}/${day}`;
 
-    const response = await axios.get<WikipediaFeaturedContent>(url, {
-      headers: {
-        'User-Agent': WIKIPEDIA_USER_AGENT,
-        'Accept': 'application/json'
-      },
-      timeout: 10000
-    });
+    const data = await fetchWithRetry<WikipediaFeaturedContent>(url, 10000);
 
     const apiResponseTime = Date.now() - startTime;
     console.log(`[Wikipedia] Fetched featured content for ${language} in ${apiResponseTime}ms`);
 
     // Cache in Redis for 24 hours
-    if (redis && response.data) {
-      await redis.setex(cacheKey, CACHE_TTL, JSON.stringify(response.data));
+    if (redis && data) {
+      await redis.setex(cacheKey, CACHE_TTL, JSON.stringify(data));
     }
 
-    return response.data;
+    return data;
 
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -151,14 +187,11 @@ export async function fetchRandomArticles(
   language: Language,
   count: number = 5
 ): Promise<WikipediaRandomArticle[]> {
-  const articles: WikipediaRandomArticle[] = [];
+  const url = `https://${language}.wikipedia.org/api/rest_v1/page/random/summary`;
 
-  for (let i = 0; i < count; i++) {
+  // Fetch articles in parallel for better performance
+  const fetchPromises = Array.from({ length: count }, async () => {
     try {
-      await enforceRateLimit();
-
-      const url = `https://${language}.wikipedia.org/api/rest_v1/page/random/summary`;
-
       const response = await axios.get<WikipediaRandomArticle>(url, {
         headers: {
           'User-Agent': WIKIPEDIA_USER_AGENT,
@@ -166,18 +199,20 @@ export async function fetchRandomArticles(
         },
         timeout: 5000
       });
-
-      if (response.data?.title) {
-        articles.push(response.data);
-      }
-
+      return response.data;
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       console.error(`[Wikipedia] Error fetching random article for ${language}:`, errorMessage);
+      return null;
     }
-  }
+  });
 
-  return articles;
+  const results = await Promise.allSettled(fetchPromises);
+
+  return results
+    .filter((r): r is PromiseFulfilledResult<WikipediaRandomArticle | null> => r.status === 'fulfilled')
+    .map(r => r.value)
+    .filter((article): article is WikipediaRandomArticle => article !== null && !!article.title);
 }
 
 /**

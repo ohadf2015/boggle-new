@@ -15,6 +15,9 @@ import {
 import { triggerWikipediaWordPopulation } from '@/backend/services/cronScheduler';
 import type { Language } from '@/shared/types/game';
 
+// Allow 60 seconds for Wikipedia API calls + AI scoring
+export const maxDuration = 60;
+
 const SUPPORTED_LANGUAGES: Language[] = ['en', 'he', 'sv', 'ja', 'es', 'fr', 'de'];
 
 export async function GET(request: NextRequest): Promise<NextResponse> {

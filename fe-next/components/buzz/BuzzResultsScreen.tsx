@@ -49,6 +49,9 @@ interface BuzzResultsScreenProps {
  * BuzzResultsScreen - Shows completion results with share functionality
  * Includes per-challenge breakdown with correct answers and explanations
  */
+/** Maximum displayable score - matches the "/100" shown in UI */
+const MAX_DISPLAY_SCORE = 100;
+
 export default function BuzzResultsScreen({
   challengeData,
   resultData,
@@ -60,6 +63,10 @@ export default function BuzzResultsScreen({
   const correctCount = resultData.challengesSolved.filter((c) => c.correct).length;
   const totalChallenges = resultData.challengesSolved.length;
   const isPerfect = correctCount === totalChallenges;
+
+  // Cap displayed score at MAX_DISPLAY_SCORE to match the "/100" shown in UI
+  // This prevents confusing displays like "120/100" when there are >5 challenges
+  const displayedScore = Math.min(resultData.score, MAX_DISPLAY_SCORE);
 
   // Fire confetti on mount if score > 0
   useEffect(() => {
@@ -103,16 +110,16 @@ export default function BuzzResultsScreen({
     }
   }, [resultData.score, isPerfect]);
 
-  // Generate shareable text
+  // Generate shareable text (use capped score for consistency with display)
   const shareText = (() => {
     const icon = language === 'he' ? '🔥📰' : '📰🔥';
     const template = t('buzz.share.text');
     if (template && template.includes('{')) {
       return template
         .replace('{topic}', challengeData.trendingSummary)
-        .replace('{score}', String(resultData.score));
+        .replace('{score}', String(displayedScore));
     }
-    return `${icon} Daily Buzz: ${challengeData.trendingSummary} | ${resultData.score}/100 | Beat this? 🔥`;
+    return `${icon} Daily Buzz: ${challengeData.trendingSummary} | ${displayedScore}/100 | Beat this? 🔥`;
   })();
 
   // Handle copy to clipboard
@@ -144,8 +151,8 @@ export default function BuzzResultsScreen({
   // State for collapsible challenge review
   const [isReviewExpanded, setIsReviewExpanded] = useState(true);
 
-  // Calculate score percentage for visual feedback
-  const scorePercentage = resultData.score;
+  // Use capped score for visual feedback color determination
+  const scorePercentage = displayedScore;
 
   // Static class mappings for Tailwind to detect at compile time
   // Dynamic class names like `text-${color}` are NOT included in build output
@@ -246,7 +253,7 @@ export default function BuzzResultsScreen({
                   textShadow: `0 0 40px var(${scoreColorStyles.cssVar})`,
                 }}
               >
-                {resultData.score}
+                {displayedScore}
               </motion.div>
               <div className="text-slate-400 text-lg font-bold mt-1">/100</div>
             </div>

@@ -826,10 +826,81 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     return () => observer.disconnect();
   }, []);
 
+  // Overlay modals that should render regardless of orientation
+  // These are rendered BEFORE the conditional returns to ensure they appear in both landscape and portrait modes
+  // This fixes the bug where modals would only appear after switching from landscape to portrait
+  const overlayModals = (
+    <>
+      {/* Word Feedback Modal - Self-healing dictionary validation */}
+      <WordFeedbackModal
+        isOpen={showWordFeedback && wordToVote !== null}
+        word={wordToVote?.word || ''}
+        submittedBy={wordToVote?.submittedBy || ''}
+        submitterAvatar={wordToVote?.submitterAvatar ?? undefined}
+        voteInfo={wordToVote?.voteInfo}
+        wordQueue={wordQueue.map(w => ({
+          ...w,
+          submitterAvatar: w.submitterAvatar ?? undefined
+        }))}
+        timeoutSeconds={wordToVote?.timeoutSeconds || 15}
+        onVote={handleVote}
+        onSkip={handleFeedbackSkip}
+        onTimeout={handleFeedbackSkip}
+      />
+
+      {/* Mystery Reward Popup - Variable ratio reward system */}
+      <MysteryRewardPopup
+        reward={mysteryReward}
+        isOpen={showMysteryReward}
+        onClose={handleMysteryRewardClose}
+        t={t}
+      />
+
+      {/* Referral Milestone Popup - Notify when friend hits milestone */}
+      <ReferralMilestonePopup
+        milestone={referralMilestone}
+        isOpen={showReferralMilestone}
+        onClose={handleReferralMilestoneClose}
+      />
+
+      {/* Epic Level Up Celebration - Full-screen GSAP animation */}
+      {levelUpData && (
+        <LevelUpCelebration
+          level={levelUpData.newLevel}
+          show={showLevelUpCelebration}
+          onDismiss={() => setShowLevelUpCelebration(false)}
+          autoDismissAfter={5000}
+          rewards={{
+            unlocks: levelUpData.newTitles,
+          }}
+        />
+      )}
+
+      {/* Sign Up Prompt for Guests (non-winners) - Hidden on CrazyGames */}
+      {!shouldHideExternalLogin() && (
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          showGuestStats={true}
+        />
+      )}
+
+      {/* Celebratory First Win Signup Prompt - Hidden on CrazyGames */}
+      {!shouldHideExternalLogin() && (
+        <FirstWinSignupModal
+          isOpen={showFirstWinModal}
+          onClose={() => setShowFirstWinModal(false)}
+        />
+      )}
+    </>
+  );
+
   // Landscape mode layout - 2-column: winner/actions left, player cards right
   if (isLandscape) {
     return (
-      <div className="flex w-full overflow-hidden bg-neo-cream text-neo-black p-3 gap-3">
+      <>
+        {overlayModals}
+        <div className="flex w-full overflow-hidden bg-neo-cream text-neo-black p-3 gap-3">
         {/* Left column: Winner Banner + Action Buttons (Hero Area) */}
         <div className="w-[55%] flex flex-col items-center justify-center gap-4 p-4 border-2 border-neo-black rounded-neo bg-white/50 shadow-hard-sm">
           {/* Winner Banner - prominent */}
@@ -988,6 +1059,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         />
 
       </div>
+      </>
     );
   }
 
@@ -1256,15 +1328,17 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
   );
 
   return (
-    <div className="screen-fit lg:min-h-full lg:h-auto bg-neo-navy transition-colors duration-300 relative">
-      {/* Neo-brutalist halftone dot pattern overlay */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-10 dark:opacity-[0.08]"
-        style={{
-          backgroundImage: `radial-gradient(circle, var(--neo-black) 1px, transparent 1px)`,
-          backgroundSize: '8px 8px',
-        }}
-      />
+    <>
+      {overlayModals}
+      <div className="screen-fit lg:min-h-full lg:h-auto bg-neo-navy transition-colors duration-300 relative">
+        {/* Neo-brutalist halftone dot pattern overlay */}
+        <div
+          className="fixed inset-0 pointer-events-none opacity-10 dark:opacity-[0.08]"
+          style={{
+            backgroundImage: `radial-gradient(circle, var(--neo-black) 1px, transparent 1px)`,
+            backgroundSize: '8px 8px',
+          }}
+        />
 
       {/* MOBILE VIEW - Tab-based layout (hidden on lg+) */}
       <div className="md:hidden flex flex-col h-full">
@@ -1577,69 +1651,8 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         variant="default"
       />
 
-      {/* Sign Up Prompt for Guests (non-winners) - Hidden on CrazyGames */}
-      {!shouldHideExternalLogin() && (
-        <AuthModal
-          isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
-          showGuestStats={true}
-        />
-      )}
-
-      {/* Celebratory First Win Signup Prompt - Hidden on CrazyGames */}
-      {!shouldHideExternalLogin() && (
-        <FirstWinSignupModal
-          isOpen={showFirstWinModal}
-          onClose={() => setShowFirstWinModal(false)}
-        />
-      )}
-
-      {/* Word Feedback Modal - Self-healing dictionary validation */}
-      <WordFeedbackModal
-        isOpen={showWordFeedback && wordToVote !== null}
-        word={wordToVote?.word || ''}
-        submittedBy={wordToVote?.submittedBy || ''}
-        submitterAvatar={wordToVote?.submitterAvatar ?? undefined}
-        voteInfo={wordToVote?.voteInfo}
-        wordQueue={wordQueue.map(w => ({
-          ...w,
-          submitterAvatar: w.submitterAvatar ?? undefined
-        }))}
-        timeoutSeconds={wordToVote?.timeoutSeconds || 15}
-        onVote={handleVote}
-        onSkip={handleFeedbackSkip}
-        onTimeout={handleFeedbackSkip}
-      />
-
-      {/* Mystery Reward Popup - Variable ratio reward system */}
-      <MysteryRewardPopup
-        reward={mysteryReward}
-        isOpen={showMysteryReward}
-        onClose={handleMysteryRewardClose}
-        t={t}
-      />
-
-      {/* Referral Milestone Popup - Notify when friend hits milestone */}
-      <ReferralMilestonePopup
-        milestone={referralMilestone}
-        isOpen={showReferralMilestone}
-        onClose={handleReferralMilestoneClose}
-      />
-
-      {/* Epic Level Up Celebration - Full-screen GSAP animation */}
-      {levelUpData && (
-        <LevelUpCelebration
-          level={levelUpData.newLevel}
-          show={showLevelUpCelebration}
-          onDismiss={() => setShowLevelUpCelebration(false)}
-          autoDismissAfter={5000}
-          rewards={{
-            unlocks: levelUpData.newTitles,
-          }}
-        />
-      )}
-
-    </div>
+      </div>
+    </>
   );
 };
 

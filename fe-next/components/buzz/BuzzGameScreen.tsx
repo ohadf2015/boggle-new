@@ -50,6 +50,9 @@ interface BuzzGameScreenProps {
   onQuit: () => void;
 }
 
+// Maximum score achievable in Daily Buzz - displayed as "score/100"
+const MAX_SCORE = 100;
+
 /**
  * BuzzGameScreen - Main gameplay component for Daily Buzz
  * Renders challenge types dynamically and tracks progress
@@ -138,7 +141,7 @@ export default function BuzzGameScreen({
       const hintPenalty = showHint ? 5 : 0;
       const points = correct ? basePoints - hintPenalty : 0;
 
-      setScore((prev) => prev + points);
+      setScore((prev) => Math.min(MAX_SCORE, prev + points));
 
       // Record answer
       const answerRecord = {

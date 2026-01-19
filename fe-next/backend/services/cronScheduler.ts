@@ -111,16 +111,27 @@ export function startWikipediaWordCron() {
 
     const results: Record<string, { success: boolean; wordsFound?: number; error?: string }> = {};
 
-    for (const language of LANGUAGES) {
+    // Process languages in parallel for better performance
+    const populationPromises = LANGUAGES.map(async (language) => {
       try {
         console.log(`📖 [CRON] Fetching Wikipedia words for ${language}...`);
         const result = await populateWikipediaWords(new Date(), language);
-        results[language] = { success: true, wordsFound: result.wordsFound };
         console.log(`✅ [CRON] ${language}: ${result.wordsFound} words found`);
+        return { language, success: true, wordsFound: result.wordsFound };
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : 'Unknown error';
         console.error(`❌ [CRON] ${language} failed:`, errorMsg);
-        results[language] = { success: false, error: errorMsg };
+        return { language, success: false, error: errorMsg };
+      }
+    });
+
+    const settledResults = await Promise.allSettled(populationPromises);
+
+    // Collect results from all promises
+    for (const result of settledResults) {
+      if (result.status === 'fulfilled') {
+        const { language, success, wordsFound, error } = result.value;
+        results[language] = { success, wordsFound, error };
       }
     }
 
@@ -151,16 +162,27 @@ export async function triggerWikipediaWordPopulation(
 
   const results: Record<string, { success: boolean; wordsFound?: number; error?: string }> = {};
 
-  for (const lang of targetLanguages) {
+  // Process languages in parallel for better performance
+  const populationPromises = targetLanguages.map(async (lang) => {
     try {
       console.log(`📖 [MANUAL] Fetching Wikipedia words for ${lang}...`);
       const result = await populateWikipediaWords(targetDate, lang);
-      results[lang] = { success: true, wordsFound: result.wordsFound };
       console.log(`✅ [MANUAL] ${lang}: ${result.wordsFound} words found`);
+      return { lang, success: true, wordsFound: result.wordsFound };
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Unknown error';
       console.error(`❌ [MANUAL] ${lang} failed:`, errorMsg);
-      results[lang] = { success: false, error: errorMsg };
+      return { lang, success: false, error: errorMsg };
+    }
+  });
+
+  const settledResults = await Promise.allSettled(populationPromises);
+
+  // Collect results from all promises
+  for (const result of settledResults) {
+    if (result.status === 'fulfilled') {
+      const { lang, success, wordsFound, error } = result.value;
+      results[lang] = { success, wordsFound, error };
     }
   }
 

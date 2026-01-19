@@ -7,6 +7,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { NavigationProvider } from '@/contexts/NavigationContext';
 
 jest.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
@@ -170,9 +171,11 @@ const mockLetterGrid = [
 ];
 
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <LanguageProvider>
-    {children}
-  </LanguageProvider>
+  <NavigationProvider>
+    <LanguageProvider>
+      {children}
+    </LanguageProvider>
+  </NavigationProvider>
 );
 
 describe('ResultsPage - Score Sorting', () => {
@@ -254,6 +257,73 @@ describe('ResultsPage - WordFeedbackModal', () => {
     expect(true).toBe(true); // Placeholder - full render test requires more setup
     // The actual fix is verified by code inspection: only ONE WordFeedbackModal
     // should exist in ResultsPage.tsx, outside the conditional returns
+  });
+
+  it('should render WordFeedbackModal in landscape mode (BUG FIX)', async () => {
+    // BUG: WordFeedbackModal was NOT rendered in landscape mode because the
+    // landscape return (early return at line ~830) exits before reaching the modal
+    // at line ~1598. This caused:
+    // 1. Modal state to be set when socket event arrives
+    // 2. Modal NOT displayed (no DOM element in landscape)
+    // 3. When user switches to portrait, modal suddenly appears
+    // 4. Potentially appears "multiple times" due to orientation changes
+    //
+    // FIX: Move WordFeedbackModal BEFORE the landscape conditional return
+    // so it renders in ALL orientations.
+    //
+    // This test verifies the structural fix by code inspection:
+    // The WordFeedbackModal should be rendered BEFORE line 830 (the landscape early return)
+    // so it appears in both landscape and portrait modes.
+
+    // Read the source file and verify WordFeedbackModal position
+    const fs = require('fs');
+    const path = require('path');
+    const sourceFile = path.join(__dirname, '../views/ResultsPage.tsx');
+    const source = fs.readFileSync(sourceFile, 'utf-8');
+
+    // Find the line number of the landscape early return
+    const lines = source.split('\n');
+    let landscapeReturnLine = -1;
+    let wordFeedbackModalLine = -1;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      // Find the landscape return: "if (isLandscape) {" followed by "return ("
+      if (line.includes('if (isLandscape)') && lines[i + 1]?.includes('return (')) {
+        landscapeReturnLine = i + 1; // The return line
+      }
+      // Find the WordFeedbackModal render
+      if (line.includes('<WordFeedbackModal') && !line.includes('mock') && !line.includes('import')) {
+        wordFeedbackModalLine = i;
+      }
+    }
+
+    // The modal should be rendered BEFORE the landscape early return
+    // OR after the landscape block closes but before the main return (which is also acceptable)
+    // Key insight: if modal is AFTER the landscape return, it won't render in landscape mode
+
+    // For the fix to be correct, the modal should be in a position where it renders
+    // regardless of the landscape conditional. This means:
+    // 1. Before the landscape check, OR
+    // 2. In both the landscape return AND the portrait return
+
+    // Current bug: modal is only in portrait return (after landscapeReturnLine)
+    // Fix: move modal before landscapeReturnLine
+
+    // Note: This test documents the expected behavior but doesn't enforce it yet
+    // because modifying mocks for a full render test is complex.
+    // The fix is verified by code review and manual testing.
+
+    expect(landscapeReturnLine).toBeGreaterThan(0);
+    expect(wordFeedbackModalLine).toBeGreaterThan(0);
+
+    // After the fix, WordFeedbackModal should be BEFORE landscapeReturnLine
+    // For now, this test documents that it's currently AFTER (the bug)
+    // When fixed, change this assertion to: expect(wordFeedbackModalLine).toBeLessThan(landscapeReturnLine);
+
+    // FIX APPLIED: Modal should be BEFORE landscape return so it renders in both modes
+    // If this test fails, the modal was moved after the landscape return (regression)
+    expect(wordFeedbackModalLine).toBeLessThan(landscapeReturnLine);
   });
 });
 
