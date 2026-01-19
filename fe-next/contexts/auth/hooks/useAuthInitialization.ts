@@ -226,6 +226,7 @@ export function useAuthInitialization({
   }, [
     userIdRef,
     lastVisibleTimeRef,
+    setters,
     setUser,
     setProfile,
     setRankedProgress,
