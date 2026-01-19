@@ -21,11 +21,15 @@ export const maxDuration = 60;
 const SUPPORTED_LANGUAGES: Language[] = ['en', 'he', 'sv', 'ja', 'es', 'fr', 'de'];
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
+  console.log('[Admin Wikipedia] GET request received');
+
   // Verify admin authentication
   const authResult = await verifyAdminAuth(request);
   if (!authResult.success) {
+    console.log('[Admin Wikipedia] GET auth failed:', authResult.error);
     return authResult.response!;
   }
+  console.log('[Admin Wikipedia] GET auth passed for user:', authResult.user?.email);
 
   const { searchParams } = new URL(request.url);
   const date = searchParams.get('date') || new Date().toISOString().split('T')[0];
@@ -70,15 +74,21 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 }
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
+  console.log('[Admin Wikipedia] POST request received');
+  const startTime = Date.now();
+
   // Verify admin authentication
   const authResult = await verifyAdminAuth(request);
   if (!authResult.success) {
+    console.log('[Admin Wikipedia] POST auth failed:', authResult.error);
     return authResult.response!;
   }
+  console.log('[Admin Wikipedia] POST auth passed for user:', authResult.user?.email);
 
   try {
     const body = await request.json();
     const { action, date, language, word, candidateId, status } = body;
+    console.log('[Admin Wikipedia] POST action:', action, 'language:', language, 'date:', date);
 
     // Validate language
     if (language && !SUPPORTED_LANGUAGES.includes(language as Language)) {
@@ -121,10 +131,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
       case 'populate': {
         // Trigger Wikipedia word population
+        console.log('[Admin Wikipedia] Starting population trigger...');
         const targetDate = date ? new Date(date) : new Date();
         const targetLanguage = language as Language | undefined;
 
         const result = await triggerWikipediaWordPopulation(targetDate, targetLanguage);
+
+        const duration = Date.now() - startTime;
+        console.log(`[Admin Wikipedia] Population completed in ${duration}ms, success:`, result.success);
 
         return NextResponse.json({
           success: result.success,

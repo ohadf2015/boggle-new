@@ -22,6 +22,7 @@ const RETRY_DELAY_MS = 500;
 // Cache configuration
 const CACHE_TTL = 86400; // 24 hours in seconds
 const REDIS_PREFIX = 'wiki:';
+const REDIS_TIMEOUT_MS = 2000; // 2 second timeout for Redis operations
 
 /**
  * Stopwords by language - common words that should be filtered out when extracting from text
@@ -192,12 +193,22 @@ export async function fetchFeaturedContent(
   const redis = getRedisClient();
 
   try {
-    // Check Redis cache first
+    // Check Redis cache first (with timeout to prevent hanging)
     if (redis) {
-      const cached = await redis.get(cacheKey);
-      if (cached) {
-        console.log(`[Wikipedia] Using cached featured content for ${language} from ${dateStr}`);
-        return JSON.parse(cached);
+      try {
+        const cached = await Promise.race([
+          redis.get(cacheKey),
+          new Promise<null>((_, reject) =>
+            setTimeout(() => reject(new Error('Redis cache check timeout')), REDIS_TIMEOUT_MS)
+          )
+        ]);
+        if (cached) {
+          console.log(`[Wikipedia] Using cached featured content for ${language} from ${dateStr}`);
+          return JSON.parse(cached);
+        }
+      } catch (cacheError) {
+        // Log but continue without cache - don't let Redis issues block Wikipedia fetch
+        console.warn(`[Wikipedia] Redis cache check failed for ${language}:`, cacheError instanceof Error ? cacheError.message : 'Unknown error');
       }
     }
 
@@ -214,9 +225,19 @@ export async function fetchFeaturedContent(
     const apiResponseTime = Date.now() - startTime;
     console.log(`[Wikipedia] Fetched featured content for ${language} in ${apiResponseTime}ms`);
 
-    // Cache in Redis for 24 hours
+    // Cache in Redis for 24 hours (with timeout to prevent hanging)
     if (redis && data) {
-      await redis.setex(cacheKey, CACHE_TTL, JSON.stringify(data));
+      try {
+        await Promise.race([
+          redis.setex(cacheKey, CACHE_TTL, JSON.stringify(data)),
+          new Promise<void>((_, reject) =>
+            setTimeout(() => reject(new Error('Redis cache write timeout')), REDIS_TIMEOUT_MS)
+          )
+        ]);
+      } catch (cacheWriteError) {
+        // Log but don't fail - data was fetched successfully
+        console.warn(`[Wikipedia] Redis cache write failed for ${language}:`, cacheWriteError instanceof Error ? cacheWriteError.message : 'Unknown error');
+      }
     }
 
     return data;
