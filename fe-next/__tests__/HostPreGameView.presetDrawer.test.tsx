@@ -25,6 +25,10 @@ jest.mock('framer-motion', () => ({
       const { initial, animate, exit, transition, whileTap, whileHover, ...validProps } = props;
       return <button {...validProps}>{children}</button>;
     },
+    span: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
+      const { initial, animate, exit, transition, whileTap, whileHover, ...validProps } = props;
+      return <span {...validProps}>{children}</span>;
+    },
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));
@@ -175,9 +179,10 @@ describe('HostPreGameView Preset Drawer', () => {
     expect(screen.queryByTestId('mobile-drawer')).not.toBeInTheDocument();
 
     // Click the Party preset button (contains "Party" text)
-    // Note: There are now two layouts (desktop + mobile), so we use getAllByRole and take the first
+    // Note: There are now two layouts (desktop + mobile). Desktop buttons directly apply presets,
+    // while mobile buttons open the drawer. The mobile button is the second one.
     const partyButtons = screen.getAllByRole('button', { name: /party/i });
-    fireEvent.click(partyButtons[0]);
+    fireEvent.click(partyButtons[1]); // Use mobile button (second)
 
     // Drawer should now be visible
     await waitFor(() => {
@@ -189,9 +194,10 @@ describe('HostPreGameView Preset Drawer', () => {
     render(<HostPreGameView {...defaultProps} />);
 
     // Click the Quick preset
-    // Note: There are now two layouts (desktop + mobile), so we use getAllByRole and take the first
+    // Note: There are now two layouts (desktop + mobile). Desktop buttons directly apply presets,
+    // while mobile buttons open the drawer. The mobile button is the second one.
     const quickButtons = screen.getAllByRole('button', { name: /quick/i });
-    fireEvent.click(quickButtons[0]);
+    fireEvent.click(quickButtons[1]); // Use mobile button (second)
 
     await waitFor(() => {
       expect(screen.getByTestId('drawer-title')).toHaveTextContent('Quick');
@@ -202,9 +208,10 @@ describe('HostPreGameView Preset Drawer', () => {
     render(<HostPreGameView {...defaultProps} />);
 
     // Click the Challenge preset
-    // Note: There are now two layouts (desktop + mobile), so we use getAllByRole and take the first
+    // Note: There are now two layouts (desktop + mobile). Desktop buttons directly apply presets,
+    // while mobile buttons open the drawer. The mobile button is the second one.
     const challengeButtons = screen.getAllByRole('button', { name: /challenge/i });
-    fireEvent.click(challengeButtons[0]);
+    fireEvent.click(challengeButtons[1]); // Use mobile button (second)
 
     await waitFor(() => {
       // Should show detailed description
@@ -235,9 +242,10 @@ describe('HostPreGameView Preset Drawer', () => {
     );
 
     // Open the Quick preset drawer
-    // Note: There are now two layouts (desktop + mobile), so we use getAllByRole and take the first
+    // Note: There are now two layouts (desktop + mobile). Desktop buttons directly apply presets,
+    // while mobile buttons open the drawer. The mobile button is the second one.
     const quickButtons = screen.getAllByRole('button', { name: /quick/i });
-    fireEvent.click(quickButtons[0]);
+    fireEvent.click(quickButtons[1]); // Use mobile button (second)
 
     await waitFor(() => {
       expect(screen.getByTestId('mobile-drawer')).toBeInTheDocument();
@@ -262,9 +270,10 @@ describe('HostPreGameView Preset Drawer', () => {
     render(<HostPreGameView {...defaultProps} />);
 
     // Open drawer
-    // Note: There are now two layouts (desktop + mobile), so we use getAllByRole and take the first
+    // Note: There are now two layouts (desktop + mobile). Desktop buttons directly apply presets,
+    // while mobile buttons open the drawer. The mobile button is the second one.
     const partyButtons = screen.getAllByRole('button', { name: /party/i });
-    fireEvent.click(partyButtons[0]);
+    fireEvent.click(partyButtons[1]); // Use mobile button (second)
 
     await waitFor(() => {
       expect(screen.getByTestId('mobile-drawer')).toBeInTheDocument();
@@ -284,9 +293,10 @@ describe('HostPreGameView Preset Drawer', () => {
     render(<HostPreGameView {...defaultProps} />);
 
     // Test Party preset (MEDIUM = 7×7)
-    // Note: There are now two layouts (desktop + mobile), so we use getAllByRole and take the first
+    // Note: There are now two layouts (desktop + mobile). Desktop buttons directly apply presets,
+    // while mobile buttons open the drawer. The mobile button is the second one.
     const partyButtons = screen.getAllByRole('button', { name: /party/i });
-    fireEvent.click(partyButtons[0]);
+    fireEvent.click(partyButtons[1]); // Use mobile button (second)
 
     await waitFor(() => {
       expect(screen.getByText('7×7 (Medium)')).toBeInTheDocument();
@@ -300,9 +310,10 @@ describe('HostPreGameView Preset Drawer', () => {
       expect(screen.queryByTestId('mobile-drawer')).not.toBeInTheDocument();
     });
 
-    // Note: There are now two layouts (desktop + mobile), so we use getAllByRole and take the first
+    // Note: There are now two layouts (desktop + mobile). Desktop buttons directly apply presets,
+    // while mobile buttons open the drawer. The mobile button is the second one.
     const challengeButtons = screen.getAllByRole('button', { name: /challenge/i });
-    fireEvent.click(challengeButtons[0]);
+    fireEvent.click(challengeButtons[1]); // Use mobile button (second)
 
     await waitFor(() => {
       expect(screen.getByText('9×9 (Hard)')).toBeInTheDocument();
@@ -327,9 +338,10 @@ describe('HostPreGameView Preset Drawer', () => {
     const initialCallCount = setTimerValue.mock.calls.length;
 
     // Click preset button
-    // Note: There are now two layouts (desktop + mobile), so we use getAllByRole and take the first
+    // Note: There are now two layouts (desktop + mobile). Desktop buttons directly apply presets,
+    // while mobile buttons open the drawer. The mobile button is the second one.
     const quickButtons = screen.getAllByRole('button', { name: /quick/i });
-    fireEvent.click(quickButtons[0]);
+    fireEvent.click(quickButtons[1]); // Use mobile button (second)
 
     // Drawer should open but preset should NOT be applied yet
     await waitFor(() => {

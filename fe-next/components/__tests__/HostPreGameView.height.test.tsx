@@ -31,6 +31,7 @@ jest.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <div {...props}>{children}</div>,
     button: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <button {...props}>{children}</button>,
+    span: ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => <span {...props}>{children}</span>,
   },
   AnimatePresence: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
 }));
@@ -41,6 +42,12 @@ jest.mock('../../components/RoomChat', () => ({
   default: ({ className }: { className?: string }) => (
     <div data-testid="room-chat-mock" className={className}>Mock RoomChat</div>
   ),
+}));
+
+// Mock BotControls component since it requires LanguageProvider
+jest.mock('../../components/BotControls', () => ({
+  __esModule: true,
+  default: () => <div data-testid="bot-controls-mock">Mock BotControls</div>,
 }));
 
 const mockT = (key: string) => key;
