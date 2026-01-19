@@ -10,7 +10,7 @@ import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { triggerHaptic } from '@/utils/hapticFeedback';
-import { markGatewaySkipped } from '@/utils/trainingProgressStorage';
+import { markGatewaySkipped, markGatewaySeen } from '@/utils/trainingProgressStorage';
 
 interface TrainingGatewayModalProps {
   isOpen: boolean;
@@ -49,9 +49,11 @@ const TrainingGatewayModal: React.FC<TrainingGatewayModalProps> = ({
   // State for "don't show again" checkbox
   const [dontShowAgain, setDontShowAgain] = useState(false);
 
-  // Trigger haptic when modal opens
+  // Mark gateway as seen and trigger haptic when modal opens
+  // This prevents the infinite loop where closing the modal causes it to reopen
   useEffect(() => {
     if (isOpen) {
+      markGatewaySeen();
       triggerHaptic('light');
     }
   }, [isOpen]);

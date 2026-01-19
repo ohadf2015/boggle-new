@@ -24,13 +24,73 @@ const CACHE_TTL = 86400; // 24 hours in seconds
 const REDIS_PREFIX = 'wiki:';
 
 /**
+ * Stopwords by language - common words that should be filtered out when extracting from text
+ * These are words that appear frequently but don't make interesting game words
+ */
+const STOPWORDS: Record<string, Set<string>> = {
+  en: new Set([
+    'THE', 'AND', 'FOR', 'ARE', 'BUT', 'NOT', 'YOU', 'ALL', 'CAN', 'HER', 'WAS', 'ONE', 'OUR',
+    'OUT', 'HIS', 'HAS', 'HAD', 'ITS', 'SAY', 'SHE', 'TWO', 'WAY', 'WHO', 'DID', 'GET', 'HIM',
+    'HOW', 'MAN', 'NEW', 'NOW', 'OLD', 'SEE', 'WAY', 'BOY', 'DAY', 'ANY', 'MAY', 'OWN',
+    'BEEN', 'CALL', 'COME', 'COULD', 'EACH', 'FIND', 'FROM', 'HAVE', 'INTO', 'JUST', 'KNOW',
+    'LIKE', 'LONG', 'LOOK', 'MADE', 'MAKE', 'MANY', 'MORE', 'MOST', 'MUCH', 'MUST', 'NAME',
+    'ONLY', 'OVER', 'PART', 'SAID', 'SAME', 'SOME', 'SUCH', 'TAKE', 'THAN', 'THAT', 'THEM',
+    'THEN', 'THERE', 'THESE', 'THEY', 'THIS', 'TIME', 'UPON', 'VERY', 'WANT', 'WELL', 'WENT',
+    'WERE', 'WHAT', 'WHEN', 'WHERE', 'WHICH', 'WHILE', 'WITH', 'WORD', 'WORK', 'WOULD', 'YEAR',
+    'YOUR', 'ALSO', 'BACK', 'BEING', 'BOTH', 'FIRST', 'GOOD', 'GREAT', 'THEIR', 'AFTER',
+    'ABOUT', 'BEFORE', 'BETWEEN', 'DOES', 'DOWN', 'EVEN', 'HERE', 'HIGH', 'LAST', 'LEFT',
+    'LIFE', 'LITTLE', 'LIVE', 'PLACE', 'POINT', 'RIGHT', 'SHOW', 'STILL', 'UNDER', 'WORLD',
+    'AMERICAN', 'KNOWN', 'YEARS', 'SINCE', 'LATER', 'DURING', 'EARLY', 'OFTEN', 'THROUGH'
+  ]),
+  he: new Set([
+    'של', 'את', 'על', 'עם', 'הוא', 'היא', 'הם', 'הן', 'זה', 'זאת', 'אלה', 'אלו',
+    'כל', 'גם', 'עוד', 'רק', 'או', 'כי', 'אם', 'לא', 'כן', 'אך', 'אבל', 'מאוד',
+    'כמו', 'יותר', 'פחות', 'בין', 'לפני', 'אחרי', 'תחת', 'מעל', 'ליד', 'סביב'
+  ]),
+  sv: new Set([
+    'OCH', 'ATT', 'DET', 'SOM', 'HAR', 'MED', 'AV', 'FÖR', 'VAR', 'TILL', 'INTE', 'KAN',
+    'OM', 'ETT', 'MEN', 'HAN', 'HON', 'DE', 'VI', 'NI', 'DEM', 'SÅ', 'NU', 'NÄR', 'HUR',
+    'VARA', 'HADE', 'SKULLE', 'KUNDE', 'FINNS', 'FRÅN', 'EFTER', 'UNDER', 'ÖVER', 'OCKSÅ'
+  ]),
+  ja: new Set([
+    'これ', 'それ', 'あれ', 'この', 'その', 'あの', 'ここ', 'そこ', 'あそこ',
+    'こちら', 'どこ', 'だれ', 'なに', 'なん', 'ある', 'いる', 'する', 'なる'
+  ]),
+  es: new Set([
+    'QUE', 'DE', 'EN', 'UN', 'SER', 'SE', 'NO', 'HABER', 'POR', 'CON', 'SU', 'PARA',
+    'COMO', 'ESTAR', 'TENER', 'LE', 'LO', 'TODO', 'PERO', 'MÁS', 'HACER', 'PODER',
+    'ESO', 'ESTE', 'DECIR', 'ELLA', 'ENTRE', 'CUANDO', 'MUY', 'SIN', 'SOBRE', 'TAMBIÉN',
+    'DESPUÉS', 'ANTES', 'OTRO', 'CADA', 'MISMO', 'DESDE', 'DONDE', 'QUIEN', 'DURANTE'
+  ]),
+  fr: new Set([
+    'QUE', 'LES', 'DES', 'EST', 'UN', 'UNE', 'DANS', 'QUI', 'NE', 'SUR', 'SE', 'PAS',
+    'PLUS', 'PAR', 'CE', 'IL', 'ELLE', 'SON', 'DEUX', 'SI', 'MAIS', 'NOUS', 'COMME',
+    'OU', 'LEUR', 'BIEN', 'ALORS', 'CES', 'SANS', 'ÊTRE', 'FAIT', 'ONT', 'ÉTÉ',
+    'CETTE', 'TOUT', 'PEUT', 'APRÈS', 'AUSSI', 'AUTRE', 'ENTRE', 'QUAND', 'MÊME'
+  ]),
+  de: new Set([
+    'UND', 'DER', 'DIE', 'DEN', 'DEM', 'DAS', 'EIN', 'EINE', 'EINER', 'EINEM', 'EINEN',
+    'IST', 'SIND', 'WAR', 'WAREN', 'HAT', 'HABEN', 'WIRD', 'WERDEN', 'KANN', 'KÖNNEN',
+    'MIT', 'ALS', 'FÜR', 'AUF', 'NICHT', 'VON', 'SIE', 'BEI', 'AUCH', 'NACH', 'VOR',
+    'ÜBER', 'ABER', 'ODER', 'WENN', 'NOCH', 'DURCH', 'NUR', 'SEIN', 'IHRE', 'IHREN'
+  ])
+};
+
+/**
  * Featured article from Wikipedia
+ * Includes fields from the Wikimedia REST API response
  */
 export interface WikipediaFeaturedArticle {
   title: string;
   displaytitle?: string;
   extract?: string;
   description?: string;
+  normalizedtitle?: string;
+  titles?: {
+    canonical?: string;
+    normalized?: string;
+    display?: string;
+  };
   content_urls?: {
     desktop?: { page?: string };
     mobile?: { page?: string };
@@ -217,6 +277,7 @@ export async function fetchRandomArticles(
 
 /**
  * Extract candidate words from Wikipedia featured content
+ * Now extracts from titles, extracts (summaries), and descriptions
  *
  * @param content - Featured content from Wikipedia
  * @param language - Language code for filtering
@@ -227,41 +288,39 @@ export function extractWordsFromFeaturedContent(
   language: Language
 ): Array<{ word: string; source: string; url?: string }> {
   const candidates: Array<{ word: string; source: string; url?: string }> = [];
+  const seenWords = new Set<string>();
 
-  // Extract from Today's Featured Article
-  if (content.tfa?.title) {
-    const words = extractWordsFromTitle(content.tfa.title, language);
-    const url = content.tfa.content_urls?.desktop?.page;
-    words.forEach(word => {
-      candidates.push({ word, source: 'tfa', url });
-    });
+  // Helper to add unique candidates
+  const addCandidates = (newCandidates: Array<{ word: string; source: string; url?: string }>) => {
+    for (const candidate of newCandidates) {
+      if (!seenWords.has(candidate.word)) {
+        seenWords.add(candidate.word);
+        candidates.push(candidate);
+      }
+    }
+  };
+
+  // Extract from Today's Featured Article (highest quality)
+  if (content.tfa) {
+    const tfaCandidates = extractWordsFromArticle(content.tfa, language, 'tfa');
+    addCandidates(tfaCandidates);
   }
 
-  // Extract from Most Read articles
+  // Extract from Most Read articles (trending/popular)
   if (content.mostread?.articles) {
     for (const article of content.mostread.articles.slice(0, 10)) {
-      if (article.title) {
-        const words = extractWordsFromTitle(article.title, language);
-        const url = article.content_urls?.desktop?.page;
-        words.forEach(word => {
-          candidates.push({ word, source: 'mostread', url });
-        });
-      }
+      const mostreadCandidates = extractWordsFromArticle(article, language, 'mostread');
+      addCandidates(mostreadCandidates);
     }
   }
 
-  // Extract from On This Day events
+  // Extract from On This Day events (historical interest)
   if (content.onthisday) {
     for (const event of content.onthisday.slice(0, 5)) {
       if (event.pages) {
         for (const page of event.pages.slice(0, 3)) {
-          if (page.title) {
-            const words = extractWordsFromTitle(page.title, language);
-            const url = page.content_urls?.desktop?.page;
-            words.forEach(word => {
-              candidates.push({ word, source: 'onthisday', url });
-            });
-          }
+          const onthisdayCandidates = extractWordsFromArticle(page, language, 'onthisday');
+          addCandidates(onthisdayCandidates);
         }
       }
     }
@@ -274,15 +333,19 @@ export function extractWordsFromFeaturedContent(
  * Extract valid single words from an article title
  * Handles multi-word titles by splitting and filtering
  *
- * @param title - Article title
+ * @param title - Article title (may have underscores from URL format)
  * @param language - Language code for character validation
  * @returns Array of valid single words
  */
 function extractWordsFromTitle(title: string, language: Language): string[] {
   const words: string[] = [];
 
+  // Replace underscores with spaces (Wikipedia URL format)
   // Remove parenthetical content like "(film)" or "(disambiguation)"
-  const cleanedTitle = title.replace(/\s*\([^)]*\)\s*/g, '').trim();
+  const cleanedTitle = title
+    .replace(/_/g, ' ')
+    .replace(/\s*\([^)]*\)\s*/g, '')
+    .trim();
 
   if (language === 'ja') {
     // Japanese: Keep the whole title if it's a valid length (2-4 characters)
@@ -350,6 +413,144 @@ function isValidJapaneseWord(word: string): boolean {
   if (!word || word.length < 2 || word.length > 4) return false;
   // Kanji: \u4E00-\u9FAF, Hiragana: \u3040-\u309F, Katakana: \u30A0-\u30FF
   return /^[\u4E00-\u9FAF\u3040-\u309F\u30A0-\u30FF]+$/.test(word);
+}
+
+/**
+ * Check if a word is a stopword for the given language
+ * Stopwords are common words that should be filtered out
+ */
+export function isStopword(word: string, language: Language): boolean {
+  const stopwords = STOPWORDS[language] || STOPWORDS.en;
+  return stopwords.has(word.toUpperCase());
+}
+
+/**
+ * Get the normalized title from a Wikipedia article
+ * Falls back to title with underscores replaced by spaces
+ */
+function getNormalizedTitle(article: WikipediaFeaturedArticle): string {
+  return article.titles?.normalized ||
+         article.normalizedtitle ||
+         article.title?.replace(/_/g, ' ') ||
+         '';
+}
+
+/**
+ * Extract valid words from a text string (extract, description, etc.)
+ * Filters out stopwords and validates word format
+ *
+ * @param text - Text to extract words from
+ * @param language - Language code for filtering
+ * @param maxWords - Maximum number of words to return
+ * @returns Array of valid words
+ */
+export function extractWordsFromText(
+  text: string,
+  language: Language,
+  maxWords: number = 10
+): string[] {
+  if (!text) return [];
+
+  const words: string[] = [];
+  const seenWords = new Set<string>();
+
+  // Split text into words and clean up
+  const rawWords = text.split(/\s+/);
+
+  for (const rawWord of rawWords) {
+    if (words.length >= maxWords) break;
+
+    // Remove punctuation and clean the word
+    const cleaned = rawWord
+      .replace(/[.,!?;:'"()\[\]{}]/g, '')
+      .replace(/['']s$/i, '')
+      .trim();
+
+    if (!cleaned) continue;
+
+    // Language-specific validation and normalization
+    let normalizedWord: string;
+
+    if (language === 'ja') {
+      // Japanese: Validate character set
+      if (!isValidJapaneseWord(cleaned)) continue;
+      normalizedWord = cleaned;
+    } else if (language === 'he') {
+      // Hebrew: Validate character set
+      if (!isValidHebrewWord(cleaned)) continue;
+      normalizedWord = cleaned;
+    } else {
+      // Latin languages: Validate and uppercase
+      if (!isValidLatinWord(cleaned, language)) continue;
+      if (cleaned.length < 4 || cleaned.length > 8) continue;
+      normalizedWord = cleaned.toUpperCase();
+    }
+
+    // Skip stopwords
+    if (isStopword(normalizedWord, language)) continue;
+
+    // Skip duplicates
+    if (seenWords.has(normalizedWord)) continue;
+    seenWords.add(normalizedWord);
+
+    words.push(normalizedWord);
+  }
+
+  return words;
+}
+
+/**
+ * Extract words from a Wikipedia article (title, extract, and description)
+ *
+ * @param article - Wikipedia article object
+ * @param language - Language code for filtering
+ * @param source - Source identifier (tfa, mostread, onthisday)
+ * @returns Array of candidate words with source info
+ */
+function extractWordsFromArticle(
+  article: WikipediaFeaturedArticle,
+  language: Language,
+  source: string
+): Array<{ word: string; source: string; url?: string }> {
+  const candidates: Array<{ word: string; source: string; url?: string }> = [];
+  const url = article.content_urls?.desktop?.page;
+  const seenWords = new Set<string>();
+
+  // 1. Extract from normalized title (highest priority)
+  const title = getNormalizedTitle(article);
+  if (title) {
+    const titleWords = extractWordsFromTitle(title, language);
+    for (const word of titleWords) {
+      if (!seenWords.has(word)) {
+        seenWords.add(word);
+        candidates.push({ word, source: `${source}_title`, url });
+      }
+    }
+  }
+
+  // 2. Extract from extract (article summary) - many good words here
+  if (article.extract) {
+    const extractWords = extractWordsFromText(article.extract, language, 5);
+    for (const word of extractWords) {
+      if (!seenWords.has(word)) {
+        seenWords.add(word);
+        candidates.push({ word, source: `${source}_extract`, url });
+      }
+    }
+  }
+
+  // 3. Extract from description (short context words)
+  if (article.description) {
+    const descWords = extractWordsFromText(article.description, language, 3);
+    for (const word of descWords) {
+      if (!seenWords.has(word)) {
+        seenWords.add(word);
+        candidates.push({ word, source: `${source}_desc`, url });
+      }
+    }
+  }
+
+  return candidates;
 }
 
 /**

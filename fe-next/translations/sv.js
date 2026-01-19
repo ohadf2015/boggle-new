@@ -3521,7 +3521,10 @@ const sv = {
     "feedbackLine": "Din åsikt är viktig för oss!",
     "thankYouLine": "Ett särskilt tack från oss!",
     "customLine": "Ett meddelande bara för dig!",
-    "claimError": "Kunde inte hämta gåvan. Försök igen."
+    "claimError": "Kunde inte hämta gåvan. Försök igen.",
+    "badge": "Märke",
+    "newTotal": "Ny total",
+    "currentBalance": "Nuvarande"
   },
   "adminGifts": {
     "title": "Spelargåvor",

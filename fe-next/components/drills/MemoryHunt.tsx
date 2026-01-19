@@ -602,19 +602,24 @@ export default function MemoryHunt({
                 className="w-full"
               />
 
-              {/* Feedback overlay */}
+              {/* Feedback overlay - bright colors for visibility */}
               <AnimatePresence>
                 {lastFeedback && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.5 }}
-                    className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-neo"
+                    className={cn(
+                      "absolute inset-0 flex items-center justify-center rounded-neo",
+                      lastFeedback === 'correct'
+                        ? "bg-neo-green/90"
+                        : "bg-neo-red/90"
+                    )}
                   >
                     {lastFeedback === 'correct' ? (
-                      <CheckCircle2 className="w-20 h-20 text-neo-green" />
+                      <CheckCircle2 className="w-20 h-20 text-white drop-shadow-lg" />
                     ) : (
-                      <XCircle className="w-20 h-20 text-neo-red" />
+                      <XCircle className="w-20 h-20 text-white drop-shadow-lg" />
                     )}
                   </motion.div>
                 )}
@@ -632,15 +637,16 @@ export default function MemoryHunt({
               )}>
                 {t('brain.drills.memory-hunt.remaining')}: {remainingWords.length}
               </p>
-              <div className="flex flex-wrap gap-2 justify-center">
+              {/* min-h prevents layout shift when words are revealed */}
+              <div className="flex flex-wrap gap-2 justify-center min-h-[40px]">
                 {targetWords.map((tw, i) => (
                   <span
                     key={i}
                     className={cn(
-                      'px-3 py-1.5 rounded-neo border-2 border-neo-black text-base font-bold',
+                      'px-3 py-1.5 rounded-neo border-2 border-neo-black text-base font-bold min-w-[5ch] text-center',
                       tw.found
                         ? 'bg-neo-green/30 text-neo-green line-through'
-                        : isDarkMode ? 'bg-slate-700 text-neo-white/50' : 'bg-gray-200 text-neo-black/50'
+                        : isDarkMode ? 'bg-slate-700 text-gray-300' : 'bg-gray-200 text-gray-600'
                     )}
                   >
                     {tw.found ? tw.word : '???'}

@@ -3,6 +3,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
+interface BadgeInfo {
+  id: string;
+  name_key: string;
+  icon: string;
+  image_url: string | null;
+  rarity: string;
+}
+
 interface GiftMessage {
   id: string;
   title: string;
@@ -10,6 +18,8 @@ interface GiftMessage {
   template_type: string | null;
   xp_amount: number;
   coin_amount: number;
+  badge_id?: string | null;
+  badge?: BadgeInfo | null;
   claimed: boolean;
   claimed_at: string | null;
   created_at: string;

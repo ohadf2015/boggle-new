@@ -22,7 +22,31 @@ let mockStreakData = {
   isLoaded: false,
 };
 
-const mockRecordWin = jest.fn();
+// Create a function that computes the mock result based on current state
+function computeRecordWinResult() {
+  const previousStreak = mockStreakData.currentStreak;
+  const alreadyWonToday = mockStreakData.lastWinDate &&
+    new Date(mockStreakData.lastWinDate).toDateString() === new Date().toDateString();
+
+  let newStreak: number;
+  if (alreadyWonToday) {
+    newStreak = mockStreakData.currentStreak;
+  } else if (mockStreakData.isStreakActive && !mockStreakData.streakBroken) {
+    newStreak = mockStreakData.currentStreak + 1;
+  } else {
+    newStreak = 1;
+  }
+
+  return {
+    newStreak,
+    bestStreak: Math.max(newStreak, mockStreakData.bestStreak),
+    previousStreak,
+    alreadyWonToday: !!alreadyWonToday,
+  };
+}
+
+// Track what recordWin should return based on current mock state
+const mockRecordWin = jest.fn().mockImplementation(computeRecordWinResult);
 
 jest.mock('@/hooks/useWinStreak', () => ({
   useWinStreak: () => ({
@@ -74,6 +98,8 @@ describe('useWinStreakTracking', () => {
       recoveryTimeRemaining: null,
       isLoaded: false,
     };
+    // Restore mock implementation after clearAllMocks
+    mockRecordWin.mockImplementation(computeRecordWinResult);
   });
 
   describe('streak continuation bug fix', () => {

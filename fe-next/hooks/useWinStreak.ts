@@ -14,6 +14,25 @@ const FREEZE_LAST_AWARDED_KEY = 'lexiclash_freeze_last_awarded';
 const BROKEN_STREAK_KEY = 'lexiclash_broken_streak';
 const BROKEN_STREAK_DATE_KEY = 'lexiclash_broken_streak_date';
 
+/**
+ * Debug helper to log raw localStorage state
+ * Only runs in development mode
+ */
+const debugLogLocalStorage = (context: string): void => {
+  if (typeof window === 'undefined' || process.env.NODE_ENV !== 'development') return;
+
+  console.log(`[WinStreak] ${context} - Raw localStorage state:`, {
+    [STREAK_KEY]: localStorage.getItem(STREAK_KEY),
+    [STREAK_DATE_KEY]: localStorage.getItem(STREAK_DATE_KEY),
+    [BEST_STREAK_KEY]: localStorage.getItem(BEST_STREAK_KEY),
+    [TOTAL_WINS_KEY]: localStorage.getItem(TOTAL_WINS_KEY),
+    [BROKEN_STREAK_KEY]: localStorage.getItem(BROKEN_STREAK_KEY),
+    [BROKEN_STREAK_DATE_KEY]: localStorage.getItem(BROKEN_STREAK_DATE_KEY),
+    currentTime: new Date().toISOString(),
+    currentTimeLocal: new Date().toString(),
+  });
+};
+
 /** Cost in coins to recover a broken streak */
 export const STREAK_RECOVERY_COST = 500;
 /** Number of free freezes awarded per week */
@@ -85,6 +104,8 @@ const getStoredStreakData = (): WinStreakData => {
     return DEFAULT_STREAK_DATA;
   }
 
+  debugLogLocalStorage('getStoredStreakData called');
+
   const currentStreak = parseInt(localStorage.getItem(STREAK_KEY) || '0', 10);
   const bestStreak = parseInt(localStorage.getItem(BEST_STREAK_KEY) || '0', 10);
   const totalWins = parseInt(localStorage.getItem(TOTAL_WINS_KEY) || '0', 10);
@@ -135,11 +156,25 @@ const getStoredStreakData = (): WinStreakData => {
   if (lastWinDate) {
     const lastDate = new Date(lastWinDate);
     const today = new Date();
+    const yesterdayCheck = isYesterday(lastDate);
+    const sameDayCheck = isSameDay(lastDate, today);
 
-    if (isSameDay(lastDate, today)) {
+    // Debug logging for streak status calculation
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[WinStreak] getStoredStreakData date check', {
+        lastWinDate,
+        lastDateLocal: lastDate.toDateString(),
+        todayLocal: today.toDateString(),
+        isSameDay: sameDayCheck,
+        isYesterday: yesterdayCheck,
+        currentStreak,
+      });
+    }
+
+    if (sameDayCheck) {
       // Won today - streak is active
       isStreakActive = true;
-    } else if (isYesterday(lastDate)) {
+    } else if (yesterdayCheck) {
       // Won yesterday - streak is active but needs a win today to continue
       isStreakActive = true;
     } else {
@@ -151,6 +186,9 @@ const getStoredStreakData = (): WinStreakData => {
         localStorage.setItem(BROKEN_STREAK_DATE_KEY, new Date().toISOString());
         recoverableStreak = currentStreak;
         recoveryTimeRemaining = RECOVERY_WINDOW_HOURS * 60 * 60 * 1000;
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[WinStreak] Streak broken - gap > 1 day since last win');
+        }
       }
     }
   }
@@ -201,8 +239,23 @@ export const useWinStreak = () => {
   useEffect(() => {
     const data = getStoredStreakData();
 
+    // Debug logging for initial load
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[WinStreak] Initial load from localStorage', {
+        currentStreak: data.currentStreak,
+        bestStreak: data.bestStreak,
+        lastWinDate: data.lastWinDate,
+        isStreakActive: data.isStreakActive,
+        streakBroken: data.streakBroken,
+        recoverableStreak: data.recoverableStreak,
+      });
+    }
+
     // If streak was broken, reset it
     if (data.streakBroken) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[WinStreak] Streak detected as broken, resetting currentStreak to 0');
+      }
       saveStreakData({ currentStreak: 0 });
       data.currentStreak = 0;
     }
@@ -212,11 +265,38 @@ export const useWinStreak = () => {
   }, []);
 
   /**
-   * Record a new win
+   * Result of recording a win
    */
-  const recordWin = useCallback(() => {
+  interface RecordWinResult {
+    /** The new streak value after recording the win */
+    newStreak: number;
+    /** The best streak value */
+    bestStreak: number;
+    /** The previous streak value (before this win) */
+    previousStreak: number;
+    /** Whether the user had already won today (streak wasn't incremented) */
+    alreadyWonToday: boolean;
+  }
+
+  /**
+   * Record a new win
+   * Returns the new streak data for display purposes
+   */
+  const recordWin = useCallback((): RecordWinResult => {
     const today = new Date().toISOString();
     const currentData = getStoredStreakData();
+    const previousStreak = currentData.currentStreak;
+
+    // Debug logging for streak diagnosis
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[WinStreak] recordWin called', {
+        today,
+        lastWinDate: currentData.lastWinDate,
+        currentStreak: currentData.currentStreak,
+        isStreakActive: currentData.isStreakActive,
+        streakBroken: currentData.streakBroken,
+      });
+    }
 
     // Check if already won today
     if (currentData.lastWinDate) {
@@ -228,7 +308,15 @@ export const useWinStreak = () => {
         const newTotalWins = currentData.totalWins + 1;
         saveStreakData({ totalWins: newTotalWins });
         setStreakData(prev => ({ ...prev, totalWins: newTotalWins }));
-        return;
+        if (process.env.NODE_ENV === 'development') {
+          console.log('[WinStreak] Already won today, incrementing totalWins only');
+        }
+        return {
+          newStreak: currentData.currentStreak,
+          bestStreak: currentData.bestStreak,
+          previousStreak,
+          alreadyWonToday: true,
+        };
       }
     }
 
@@ -238,9 +326,15 @@ export const useWinStreak = () => {
     if (currentData.isStreakActive && !currentData.streakBroken) {
       // Continuing streak
       newStreak = currentData.currentStreak + 1;
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[WinStreak] Continuing streak:', currentData.currentStreak, '→', newStreak);
+      }
     } else {
       // Starting new streak
       newStreak = 1;
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[WinStreak] Starting new streak (isStreakActive:', currentData.isStreakActive, ', streakBroken:', currentData.streakBroken, ')');
+      }
     }
 
     const newBestStreak = Math.max(newStreak, currentData.bestStreak);
@@ -263,7 +357,15 @@ export const useWinStreak = () => {
     };
 
     saveStreakData(newData);
+    debugLogLocalStorage('After saveStreakData in recordWin');
     setStreakData(newData);
+
+    return {
+      newStreak,
+      bestStreak: newBestStreak,
+      previousStreak,
+      alreadyWonToday: false,
+    };
   }, []);
 
   /**

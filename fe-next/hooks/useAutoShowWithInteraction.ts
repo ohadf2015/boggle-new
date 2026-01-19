@@ -15,6 +15,12 @@ interface UseAutoShowWithInteractionOptions {
    * 2. User has interacted with the page
    */
   onTrigger: () => void;
+  /**
+   * If true, only trigger once per component lifecycle, even if enabled toggles.
+   * This prevents re-triggering when parent components re-render.
+   * Default: true
+   */
+  triggerOnce?: boolean;
 }
 
 /**
@@ -38,31 +44,43 @@ export function useAutoShowWithInteraction({
   enabled,
   delayMs,
   onTrigger,
+  triggerOnce = true,
 }: UseAutoShowWithInteractionOptions): void {
   const hasTriggeredRef = useRef(false);
   const delayPassedRef = useRef(false);
   const userInteractedRef = useRef(false);
+  // Persistent ref that survives enabled state changes - prevents popup loop bug
+  const hasEverTriggeredRef = useRef(false);
 
   // Check if both conditions are met and trigger
   const checkAndTrigger = useCallback(() => {
+    // If triggerOnce is enabled and we've already triggered, don't trigger again
+    if (triggerOnce && hasEverTriggeredRef.current) {
+      return;
+    }
+
     if (
       !hasTriggeredRef.current &&
       delayPassedRef.current &&
       userInteractedRef.current
     ) {
       hasTriggeredRef.current = true;
+      hasEverTriggeredRef.current = true;
       onTrigger();
     }
-  }, [onTrigger]);
+  }, [onTrigger, triggerOnce]);
 
-  // Reset state when enabled changes
+  // Reset state when enabled changes (but NOT hasEverTriggeredRef when triggerOnce is true)
   useEffect(() => {
     if (!enabled) {
-      hasTriggeredRef.current = false;
+      // Only reset hasTriggeredRef if triggerOnce is false
+      if (!triggerOnce) {
+        hasTriggeredRef.current = false;
+      }
       delayPassedRef.current = false;
       userInteractedRef.current = false;
     }
-  }, [enabled]);
+  }, [enabled, triggerOnce]);
 
   // Set up delay timer
   useEffect(() => {

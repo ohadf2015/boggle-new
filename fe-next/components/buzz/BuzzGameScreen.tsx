@@ -91,7 +91,11 @@ export default function BuzzGameScreen({
     points: number;
     trendingContext?: string;
   } | null>(null);
-  const [pendingNextAction, setPendingNextAction] = useState<'next' | 'complete' | null>(null);
+  // Store pending completion data to avoid stale state issues
+  const [pendingCompletionData, setPendingCompletionData] = useState<{
+    answers: Array<{ challengeIndex: number; userAnswer: string; correct: boolean; timeTakenSeconds: number }>;
+    score: number;
+  } | null>(null);
 
   // Navigation guard - prevent accidental back navigation during game
   useNavigationGuard({
@@ -169,9 +173,14 @@ export default function BuzzGameScreen({
       });
       setShowFeedback(true);
 
-      // Check if all challenges are answered
+      // Check if all challenges are answered - store completion data to avoid stale state
       const allAnswered = answers.length + 1 === challengeData.challenges.length;
-      setPendingNextAction(allAnswered ? 'complete' : null);
+      if (allAnswered) {
+        // Store the complete answers array AND the updated score now while we have accurate values
+        const updatedAnswers = [...answers, answerRecord];
+        const updatedScore = Math.min(MAX_SCORE, score + points);
+        setPendingCompletionData({ answers: updatedAnswers, score: updatedScore });
+      }
     },
     [
       currentChallenge,
@@ -183,7 +192,8 @@ export default function BuzzGameScreen({
       playWordAcceptedSound,
       playErrorSound,
       answeredChallenges,
-      answers.length,
+      answers,
+      score,
     ]
   );
 
@@ -192,23 +202,23 @@ export default function BuzzGameScreen({
     setShowFeedback(false);
     setFeedbackData(null);
 
-    if (pendingNextAction === 'complete') {
-      // Complete the game - all challenges answered
+    if (pendingCompletionData) {
+      // Complete the game - use stored data to avoid stale state issues
       const totalTime = Math.floor((Date.now() - startTime) / 1000);
       onComplete({
         challengeId: challengeData.id,
-        score: score,
-        challengesSolved: answers,
+        score: pendingCompletionData.score,
+        challengesSolved: pendingCompletionData.answers,
         completionTimeSeconds: totalTime,
       });
+      setPendingCompletionData(null);
     } else {
       // Auto-advance to next challenge if not the last one
       if (currentIndex < challengeData.challenges.length - 1) {
         setCurrentIndex((prev) => prev + 1);
       }
     }
-    setPendingNextAction(null);
-  }, [pendingNextAction, startTime, challengeData.id, challengeData.challenges.length, score, answers, onComplete, currentIndex]);
+  }, [pendingCompletionData, startTime, challengeData.id, challengeData.challenges.length, onComplete, currentIndex]);
 
   // Handle navigation to previous challenge
   const handlePrevChallenge = useCallback(() => {
