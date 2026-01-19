@@ -1610,11 +1610,69 @@ const es = {
     "copyright": "© 2025 LexiClash Ltd. Todos los derechos reservados.",
     "index": {
       "title": "Información Legal",
-      "intro": "Revisa nuestros documentos legales para entender tus derechos."
+      "intro": "Revisa nuestros documentos legales para entender tus derechos y cómo protegemos tus datos cuando usas LexiClash.",
+      "termsDescription": "Reglas y directrices para usar LexiClash",
+      "privacyDescription": "Cómo recopilamos, usamos y protegemos tus datos"
     },
     "terms": {
       "title": "Términos de Servicio",
-      "intro": "Estos Términos de Servicio rigen su uso de LexiClash."
+      "intro": "Bienvenido a LexiClash. Estos Términos de Servicio rigen tu uso de nuestra plataforma de juego de palabras multijugador en lexiclash.live.",
+      "acceptance": {
+        "title": "1. Aceptación de los Términos",
+        "content": "Al acceder o usar LexiClash, aceptas estar sujeto a estos Términos de Servicio y nuestra Política de Privacidad. Si no aceptas estos términos, por favor no uses nuestro servicio. Nos reservamos el derecho de modificar estos términos en cualquier momento, y tu uso continuado constituye la aceptación de cualquier cambio."
+      },
+      "service": {
+        "title": "2. Descripción del Servicio",
+        "content": "LexiClash es una plataforma de juego de palabras multijugador que permite a los usuarios jugar juegos de búsqueda de palabras en tiempo real con otros jugadores. El servicio incluye modos de un solo jugador, salas multijugador, desafíos diarios, tablas de clasificación y funciones relacionadas. Nos reservamos el derecho de modificar, suspender o descontinuar cualquier aspecto del servicio en cualquier momento."
+      },
+      "accounts": {
+        "title": "3. Cuentas de Usuario",
+        "content": "Puedes crear una cuenta usando autenticación de Google o Discord. Eres responsable de mantener la confidencialidad de tu cuenta y de todas las actividades que ocurran bajo tu cuenta. Debes tener al menos 13 años para crear una cuenta. Aceptas proporcionar información precisa y actualizarla según sea necesario."
+      },
+      "conduct": {
+        "title": "4. Conducta del Usuario",
+        "content": "Aceptas no: usar el servicio para ningún propósito ilegal; acosar, abusar o dañar a otros usuarios; hacer trampa, usar bots o explotar errores para obtener ventajas injustas; hacerte pasar por otros o tergiversar tu afiliación; interferir con o interrumpir el servicio; intentar obtener acceso no autorizado a cualquier parte del servicio; o participar en cualquier actividad que pueda dañar, deshabilitar o perjudicar el servicio."
+      },
+      "contentLicense": {
+        "title": "5. Licencia de Contenido de Usuario",
+        "content": "Al enviar contenido a LexiClash (como información de perfil, datos de juego o comentarios), nos otorgas una licencia no exclusiva, mundial, libre de regalías para usar, reproducir, modificar y mostrar dicho contenido en relación con proporcionar y mejorar el servicio. Conservas la propiedad de tu contenido pero aceptas que podemos usar datos anonimizados y agregados para análisis y mejora del servicio."
+      },
+      "intellectualProperty": {
+        "title": "6. Propiedad Intelectual",
+        "content": "LexiClash y su contenido original, características y funcionalidad son propiedad de LexiClash Ltd y están protegidos por leyes internacionales de derechos de autor, marcas registradas y otras leyes de propiedad intelectual. Nuestras marcas registradas e imagen comercial no pueden ser usadas en conexión con ningún producto o servicio sin nuestro consentimiento previo por escrito."
+      },
+      "disclaimers": {
+        "title": "7. Descargos de Responsabilidad",
+        "content": "El servicio se proporciona \"tal cual\" y \"según disponibilidad\" sin garantías de ningún tipo, ya sean expresas o implícitas. No garantizamos que el servicio será ininterrumpido, seguro o libre de errores. Renunciamos a todas las garantías, incluyendo pero no limitado a comerciabilidad, idoneidad para un propósito particular y no infracción."
+      },
+      "liability": {
+        "title": "8. Limitación de Responsabilidad",
+        "content": "En la máxima medida permitida por la ley, LexiClash Ltd no será responsable de ningún daño indirecto, incidental, especial, consecuente o punitivo, incluyendo pero no limitado a pérdida de ganancias, datos o buena voluntad, que surjan de tu uso o incapacidad de usar el servicio. Nuestra responsabilidad total no excederá el monto que nos hayas pagado en los últimos doce meses."
+      },
+      "indemnification": {
+        "title": "9. Indemnización",
+        "content": "Aceptas defender, indemnizar y mantener indemne a LexiClash Ltd y a sus directivos, directores, empleados y agentes de cualquier reclamo, daño, pérdida o gasto (incluyendo honorarios razonables de abogados) que surjan de tu uso del servicio, tu violación de estos términos o tu violación de cualquier derecho de otro."
+      },
+      "termination": {
+        "title": "10. Terminación",
+        "content": "Podemos terminar o suspender tu cuenta y acceso al servicio inmediatamente, sin previo aviso, por conducta que creamos que viola estos términos o es perjudicial para otros usuarios, nosotros o terceros. Al terminar, tu derecho a usar el servicio cesará inmediatamente. También puedes eliminar tu cuenta en cualquier momento a través de la configuración de tu perfil."
+      },
+      "modifications": {
+        "title": "11. Modificaciones a los Términos",
+        "content": "Nos reservamos el derecho de modificar estos términos en cualquier momento. Proporcionaremos aviso de cambios significativos publicando los nuevos términos en esta página con una fecha de vigencia actualizada. Tu uso continuado del servicio después de cualquier cambio constituye tu aceptación de los nuevos términos."
+      },
+      "governingLaw": {
+        "title": "12. Ley Aplicable",
+        "content": "Estos Términos de Servicio se regirán e interpretarán de acuerdo con las leyes del Estado de Israel, sin tener en cuenta sus disposiciones sobre conflictos de leyes. Cualquier acción legal o procedimiento que surja de estos términos se presentará exclusivamente en los tribunales ubicados en Israel."
+      },
+      "disputes": {
+        "title": "13. Resolución de Disputas",
+        "content": "Cualquier disputa que surja de o se relacione con estos términos o el servicio primero se intentará resolver mediante negociación de buena fe. Si la negociación falla, las disputas se resolverán mediante arbitraje vinculante de acuerdo con las leyes de arbitraje israelíes, a menos que tengas derecho a presentar reclamaciones en un tribunal de reclamaciones menores."
+      },
+      "severability": {
+        "title": "14. Divisibilidad",
+        "content": "Si alguna disposición de estos términos se considera inaplicable o inválida, esa disposición se limitará o eliminará en la medida mínima necesaria para que estos términos permanezcan en plena vigencia y efecto. El incumplimiento de cualquier derecho o disposición de estos términos no se considerará una renuncia a dicho derecho o disposición."
+      }
     },
     "privacy": {
       "title": "Política de Privacidad",

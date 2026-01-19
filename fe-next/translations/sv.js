@@ -2043,11 +2043,69 @@ const sv = {
     "copyright": "© 2025 LexiClash Ltd. Alla rättigheter förbehållna.",
     "index": {
       "title": "Juridisk information",
-      "intro": "Granska våra juridiska dokument för att förstå dina rättigheter och hur vi skyddar dina data när du använder LexiClash."
+      "intro": "Granska våra juridiska dokument för att förstå dina rättigheter och hur vi skyddar dina data när du använder LexiClash.",
+      "termsDescription": "Regler och riktlinjer för användning av LexiClash",
+      "privacyDescription": "Hur vi samlar in, använder och skyddar dina data"
     },
     "terms": {
       "title": "Användarvillkor",
-      "intro": "Välkommen till LexiClash. Dessa användarvillkor reglerar din användning av vår multiplayer-ordspelsplattform på lexiclash.live."
+      "intro": "Välkommen till LexiClash. Dessa användarvillkor reglerar din användning av vår multiplayer-ordspelsplattform på lexiclash.live.",
+      "acceptance": {
+        "title": "1. Godkännande av villkor",
+        "content": "Genom att få tillgång till eller använda LexiClash accepterar du att vara bunden av dessa användarvillkor och vår integritetspolicy. Om du inte accepterar dessa villkor, använd inte vår tjänst. Vi förbehåller oss rätten att ändra dessa villkor när som helst, och din fortsatta användning utgör godkännande av eventuella ändringar."
+      },
+      "service": {
+        "title": "2. Beskrivning av tjänsten",
+        "content": "LexiClash är en multiplayer-ordspelsplattform som låter användare spela ordletningsspel i realtid med andra spelare. Tjänsten inkluderar enspelarlägen, multiplayerrum, dagliga utmaningar, topplistor och relaterade funktioner. Vi förbehåller oss rätten att ändra, avbryta eller avsluta vilken aspekt av tjänsten som helst när som helst."
+      },
+      "accounts": {
+        "title": "3. Användarkonton",
+        "content": "Du kan skapa ett konto med Google- eller Discord-autentisering. Du är ansvarig för att hålla ditt konto konfidentiellt och för alla aktiviteter som sker under ditt konto. Du måste vara minst 13 år gammal för att skapa ett konto. Du samtycker till att ge korrekt information och uppdatera den vid behov."
+      },
+      "conduct": {
+        "title": "4. Användaruppförande",
+        "content": "Du samtycker till att inte: använda tjänsten för olagliga ändamål; trakassera, missbruka eller skada andra användare; fuska, använda bots eller utnyttja buggar för att få orättvisa fördelar; utge dig för att vara andra eller felaktigt representera din tillhörighet; störa eller avbryta tjänsten; försöka få obehörig åtkomst till någon del av tjänsten; eller delta i någon aktivitet som kan skada, inaktivera eller försämra tjänsten."
+      },
+      "contentLicense": {
+        "title": "5. Licens för användarinnehåll",
+        "content": "Genom att skicka in innehåll till LexiClash (såsom profilinformation, speldata eller feedback), ger du oss en icke-exklusiv, världsomspännande, royaltyfri licens att använda, reproducera, modifiera och visa sådant innehåll i samband med att tillhandahålla och förbättra tjänsten. Du behåller äganderätten till ditt innehåll men samtycker till att vi får använda anonymiserad och aggregerad data för analys och tjänstförbättring."
+      },
+      "intellectualProperty": {
+        "title": "6. Immateriella rättigheter",
+        "content": "LexiClash och dess originalinnehåll, funktioner och funktionalitet ägs av LexiClash Ltd och skyddas av internationella upphovsrätts-, varumärkes- och andra immaterialrättslagar. Våra varumärken och varumärkesbild får inte användas i samband med någon produkt eller tjänst utan vårt föregående skriftliga samtycke."
+      },
+      "disclaimers": {
+        "title": "7. Ansvarsfriskrivningar",
+        "content": "Tjänsten tillhandahålls \"i befintligt skick\" och \"efter tillgänglighet\" utan garantier av något slag, varken uttryckliga eller underförstådda. Vi garanterar inte att tjänsten kommer att vara oavbruten, säker eller felfri. Vi friskriver oss från alla garantier, inklusive men inte begränsat till säljbarhet, lämplighet för ett visst ändamål och icke-intrång."
+      },
+      "liability": {
+        "title": "8. Ansvarsbegränsning",
+        "content": "I den utsträckning som tillåts enligt lag ska LexiClash Ltd inte vara ansvarigt för några indirekta, tillfälliga, speciella, följd- eller straffskador, inklusive men inte begränsat till förlust av vinster, data eller goodwill, som uppstår från din användning av eller oförmåga att använda tjänsten. Vårt totala ansvar ska inte överstiga det belopp du betalat oss under de senaste tolv månaderna."
+      },
+      "indemnification": {
+        "title": "9. Skadeersättning",
+        "content": "Du samtycker till att försvara, ersätta och hålla LexiClash Ltd och dess tjänstemän, direktörer, anställda och agenter skadeslösa från alla anspråk, skador, förluster eller utgifter (inklusive rimliga advokatkostnader) som uppstår från din användning av tjänsten, din överträdelse av dessa villkor eller din kränkning av andras rättigheter."
+      },
+      "termination": {
+        "title": "10. Uppsägning",
+        "content": "Vi kan säga upp eller stänga av ditt konto och tillgång till tjänsten omedelbart, utan föregående meddelande, för beteende som vi anser bryter mot dessa villkor eller är skadligt för andra användare, oss eller tredje parter. Vid uppsägning upphör din rätt att använda tjänsten omedelbart. Du kan också radera ditt konto när som helst via dina profilinställningar."
+      },
+      "modifications": {
+        "title": "11. Ändringar av villkor",
+        "content": "Vi förbehåller oss rätten att ändra dessa villkor när som helst. Vi kommer att meddela om betydande ändringar genom att publicera de nya villkoren på denna sida med ett uppdaterat giltighetsdatum. Din fortsatta användning av tjänsten efter eventuella ändringar utgör ditt godkännande av de nya villkoren."
+      },
+      "governingLaw": {
+        "title": "12. Tillämplig lag",
+        "content": "Dessa användarvillkor ska styras av och tolkas i enlighet med lagarna i staten Israel, utan hänsyn till dess lagkonfliktsbestämmelser. Alla rättsliga åtgärder eller förfaranden som uppstår ur dessa villkor ska väckas uteslutande i domstolarna i Israel."
+      },
+      "disputes": {
+        "title": "13. Tvistlösning",
+        "content": "Alla tvister som uppstår från eller relaterar till dessa villkor eller tjänsten ska först försöka lösas genom förhandling i god tro. Om förhandlingen misslyckas ska tvister lösas genom bindande skiljedom i enlighet med israelisk skiljedomslag, såvida du inte har rätt att väcka talan i småmålsdomstol."
+      },
+      "severability": {
+        "title": "14. Avskiljbarhet",
+        "content": "Om någon bestämmelse i dessa villkor befinns vara ogiltig eller ogenomförbar, ska den bestämmelsen begränsas eller elimineras i minsta nödvändiga omfattning så att dessa villkor i övrigt förblir i full kraft och verkan. Underlåtenhet att genomdriva någon rättighet eller bestämmelse i dessa villkor ska inte anses vara ett avstående från sådan rättighet eller bestämmelse."
+      }
     },
     "privacy": {
       "title": "Integritetspolicy",
