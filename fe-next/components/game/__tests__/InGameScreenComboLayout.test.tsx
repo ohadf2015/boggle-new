@@ -75,6 +75,8 @@ import CircularTimer from '../../CircularTimer';
 /**
  * Component that mimics the NEW stats layout from InGameScreen
  * - Mobile: Combo in dedicated row above stats (centered, lg:hidden)
+ *   - Container is ALWAYS present with fixed height to prevent layout shift
+ *   - ComboDisplay returns null internally for level 0
  * - Desktop: Combo absolutely positioned on right (hidden lg:flex, z-30)
  * - Timer centered in stats row with z-20
  */
@@ -92,11 +94,11 @@ const FixedStatsRowTestComponent = ({
       data-testid="stats-section"
       className="flex flex-col gap-1"
     >
-      {/* Combo row - mobile only, centered */}
-      {showCombo && comboLevel > 0 && (
+      {/* Combo row - mobile only, centered. Container always present to prevent layout shift */}
+      {showCombo && (
         <div
           data-testid="combo-row-mobile"
-          className="flex lg:hidden justify-center items-center min-h-[40px]"
+          className="flex lg:hidden justify-center items-center h-[40px]"
         >
           <ComboDisplay comboLevel={comboLevel} compact />
         </div>
@@ -169,17 +171,21 @@ describe('InGameScreen Combo Layout', () => {
       expect(comboRow).toHaveClass('justify-center');
     });
 
-    it('combo row has minimum height for adequate spacing', () => {
+    it('combo row has fixed height to prevent layout shifts', () => {
       render(<FixedStatsRowTestComponent comboLevel={3} />);
 
       const comboRow = screen.getByTestId('combo-row-mobile');
-      expect(comboRow).toHaveClass('min-h-[40px]');
+      expect(comboRow).toHaveClass('h-[40px]');
     });
 
-    it('hides combo row when combo level is 0', () => {
+    it('combo row container remains visible when combo level is 0 (prevents layout shift)', () => {
       render(<FixedStatsRowTestComponent comboLevel={0} />);
 
-      expect(screen.queryByTestId('combo-row-mobile')).not.toBeInTheDocument();
+      // Container is always present to prevent layout shift
+      const comboRow = screen.getByTestId('combo-row-mobile');
+      expect(comboRow).toBeInTheDocument();
+      // But content is empty (ComboDisplay returns null for level 0)
+      expect(comboRow).not.toHaveTextContent(/Combo/);
     });
   });
 

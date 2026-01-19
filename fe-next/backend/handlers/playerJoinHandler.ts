@@ -410,6 +410,8 @@ async function handleExistingAuthConnectionJoin(io: Server, socket: Socket, auth
     if (!isSameSocket) {
       const oldSocket = getSocketById(io, existingConnection.socketId);
       if (oldSocket && oldSocket.connected) {
+        // Old socket is still connected - this is a multi-tab session takeover
+        // Use existing username to prevent duplicates
         oldSocket.data = oldSocket.data || {};
         oldSocket.data.migrating = true;
         safeEmit(oldSocket, 'sessionTakenOver', {
@@ -419,10 +421,21 @@ async function handleExistingAuthConnectionJoin(io: Server, socket: Socket, auth
         setTimeout(() => {
           if (oldSocket.connected) disconnectSocket(oldSocket, true);
         }, 100);
+
+        logger.info('SOCKET', `Auth user ${authUserId} reconnecting to same game ${gameCode}, using existing username: ${existingConnection.username}`);
+        return {
+          handled: true,
+          existingUsername: existingConnection.username,
+          isHost: existingConnection.isHost
+        };
       }
+      // Old socket is NOT connected - user is rejoining fresh via invite link
+      // Allow them to use their new username/avatar choice
+      logger.info('SOCKET', `Auth user ${authUserId} rejoining game ${gameCode} with fresh connection (old socket disconnected), allowing new username: ${username}`);
+      return { handled: false };
     }
-    // Return existing username to prevent creating duplicate user
-    logger.info('SOCKET', `Auth user ${authUserId} reconnecting to same game ${gameCode}, using existing username: ${existingConnection.username}`);
+    // Same socket reconnecting - use existing username
+    logger.info('SOCKET', `Auth user ${authUserId} reconnecting to same game ${gameCode} (same socket), using existing username: ${existingConnection.username}`);
     return {
       handled: true,
       existingUsername: existingConnection.username,

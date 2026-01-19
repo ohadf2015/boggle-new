@@ -215,10 +215,10 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               role="status"
               aria-label="Game status"
             >
-              {/* Combo row - mobile only, centered */}
-              {isPlaying && comboLevel > 0 && (
+              {/* Combo row - mobile only, centered. Container always present to prevent layout shift */}
+              {isPlaying && (
                 <div
-                  className="flex lg:hidden justify-center items-center min-h-[40px]"
+                  className="flex lg:hidden justify-center items-center h-[40px]"
                   data-testid="combo-row-mobile"
                 >
                   <ComboDisplay

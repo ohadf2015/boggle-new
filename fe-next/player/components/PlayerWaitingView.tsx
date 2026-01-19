@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Crown, Bot, MessageCircle, Copy, Check, LogOut } from 'lucide-react';
+import { Users, Crown, Bot, MessageCircle, Share2, LogOut } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import toast from 'react-hot-toast';
 import { Button } from '../../components/ui/button';
@@ -12,6 +12,7 @@ import Avatar from '../../components/Avatar';
 import RoomChat from '../../components/RoomChat';
 import PresenceIndicator from '../../components/PresenceIndicator';
 import { getJoinUrl } from '../../utils/share';
+import { useNativeShare } from '../../hooks/useNativeShare';
 import { cn } from '../../lib/utils';
 import type { Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
 
@@ -57,20 +58,18 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   onConfirmExit,
 }): React.ReactElement => {
   const [mobileTab, setMobileTab] = useState<MobileTab>('players');
-  const [codeCopied, setCodeCopied] = useState(false);
   const [unreadChat, setUnreadChat] = useState(0);
+  const { nativeShare } = useNativeShare();
 
-  // Copy room code
-  const handleCopyCode = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(gameCode);
-      setCodeCopied(true);
-      toast.success(t('roomCode.copied') || 'Copied!', { duration: 1500, icon: '📋' });
-      setTimeout(() => setCodeCopied(false), 2000);
-    } catch {
-      toast.error(t('common.error'));
-    }
-  }, [gameCode, t]);
+  // Share room using native share API
+  const handleShare = useCallback(async () => {
+    const joinUrl = getJoinUrl(gameCode, 'native-share');
+    await nativeShare({
+      title: t('share.inviteTitle'),
+      text: t('share.inviteMessage'),
+      url: joinUrl,
+    });
+  }, [gameCode, t, nativeShare]);
 
   // Handle chat tab with unread reset
   const handleChatTab = useCallback(() => {
@@ -134,19 +133,23 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   );
 
   return (
-    <div className="h-full flex flex-col bg-neo-navy lg:max-w-5xl lg:mx-auto">
+    <div className="h-dvh flex flex-col bg-neo-navy lg:max-w-5xl lg:mx-auto">
       {/* Compact Header */}
       <header className="flex-shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black">
         <div className="flex items-center justify-between gap-2">
-          {/* Room Code - Clickable */}
-          <motion.button
-            onClick={handleCopyCode}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 px-3 py-1.5 bg-neo-navy/60 hover:bg-neo-navy/80 rounded-neo border-2 border-neo-black shadow-hard-sm transition-all"
-          >
+          {/* Room Code with Share Button */}
+          <div className="flex items-center gap-2">
             <span className="text-lg font-black tracking-wider text-neo-lime">{gameCode}</span>
-            {codeCopied ? <Check className="w-4 h-4 text-neo-lime" /> : <Copy className="w-4 h-4 text-neo-cream/50" />}
-          </motion.button>
+            <motion.button
+              onClick={handleShare}
+              whileTap={{ scale: 0.95 }}
+              aria-label={t('share.buttonLabel') || 'Share'}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-neo-yellow text-neo-black font-bold text-sm rounded-neo border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 active:shadow-none active:translate-y-0 transition-all"
+            >
+              <Share2 className="w-4 h-4" />
+              <span className="hidden sm:inline">{t('share.buttonLabel')}</span>
+            </motion.button>
+          </div>
 
           {/* Exit Button */}
           <Button

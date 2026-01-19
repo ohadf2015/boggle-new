@@ -448,9 +448,11 @@ export default function MultiplayerPage(): React.JSX.Element {
               return;
             }
             if (savedSession.isHost) {
+              // Fallback for roomName: use saved value, or generate from hostname
+              const reconnectRoomName = savedSession.roomName || `${savedSession.hostUsername || savedSession.username} Room`;
               socketInstance.emit('createGame', {
                 gameCode: savedSession.gameCode,
-                roomName: savedSession.roomName,
+                roomName: reconnectRoomName,
                 language: savedSession.language || language,
                 hostUsername: savedSession.hostUsername || savedSession.username,
                 ...authContext,
@@ -551,7 +553,8 @@ export default function MultiplayerPage(): React.JSX.Element {
         gameCode: data.gameCode || gameCode,
         username: joinedUsername,
         isHost: data.isHost,
-        roomName: data.isHost ? roomName : '',
+        // Use server response roomName first (reliable), then local state as fallback
+        roomName: data.roomName || roomName || '',
         hostUsername: data.isHost ? joinedUsername : undefined,
         language: data.language || roomLanguage,
       });
@@ -1008,14 +1011,17 @@ export default function MultiplayerPage(): React.JSX.Element {
       const authContext = await getAuthContext();
 
       if (savedSession.isHost) {
-        if (!savedSession.roomName || !savedSession.hostUsername) {
+        // hostUsername is required for reconnection
+        if (!savedSession.hostUsername) {
           clearSession();
           setAttemptingReconnect(false);
           return;
         }
+        // Fallback for roomName: use saved value, or generate from hostname
+        const reconnectRoomName = savedSession.roomName || `${savedSession.hostUsername} Room`;
         socket.emit('createGame', {
           gameCode: savedSession.gameCode,
-          roomName: savedSession.roomName,
+          roomName: reconnectRoomName,
           hostUsername: savedSession.hostUsername,
           language: savedSession.language || language,
           ...authContext,

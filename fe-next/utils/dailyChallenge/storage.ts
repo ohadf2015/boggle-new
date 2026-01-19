@@ -135,6 +135,15 @@ export function saveWordHuntResult(result: WordHuntResult, isAuthenticated: bool
     return { currentStreak: 0, longestStreak: 0, lastPlayedDate: null, totalDailiesCompleted: 0 };
   }
 
+  // Validate attemptsUsed before saving - prevent storing invalid data
+  // Valid range is 1-10 (must have at least 1 attempt to complete a puzzle)
+  const { attemptsUsed } = result;
+  if (attemptsUsed < 1 || attemptsUsed > 10) {
+    console.error('[Storage] Refusing to save invalid Word Hunt result - attemptsUsed:', attemptsUsed, '(must be 1-10)');
+    // Return empty streak without saving - this prevents corrupted data from being stored
+    return { currentStreak: 0, longestStreak: 0, lastPlayedDate: null, totalDailiesCompleted: 0 };
+  }
+
   const today = result.puzzleDate || getDailyChallengeDate();
   const key = `${WORD_HUNT_STORAGE_KEY}_${result.language}_${today}`;
 
