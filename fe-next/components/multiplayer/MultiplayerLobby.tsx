@@ -4,13 +4,10 @@ import React, { useState, useCallback, useEffect, useRef, FormEvent } from 'reac
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Crown, User, ArrowLeft } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import { getJoinUrl } from '@/utils/share';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { validateUsername, validateRoomName, validateGameCode, sanitizeInput } from '@/utils/validation';
 import { useValidation } from '@/hooks/useValidation';
@@ -78,7 +75,6 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
   const { t, language, dir } = useLanguage();
   const isLandscape = useMobileLandscape();
   const [mode, setMode] = useState<JoinMode>('join');
-  const [showQR, setShowQR] = useState(false);
   const [usernameError, setUsernameError] = useState(false);
   const [roomNameError, setRoomNameError] = useState(false);
   const [hostUsernameError, setHostUsernameError] = useState(false);
@@ -490,27 +486,6 @@ const MultiplayerLobby: React.FC<MultiplayerLobbyProps> = ({
         </div>
       </div>
 
-      {/* QR Code Dialog */}
-      <Dialog open={showQR} onOpenChange={setShowQR}>
-        <DialogContent noDescription>
-          <DialogHeader>
-            <DialogTitle>{t('share.qrCodeTitle') || 'Scan to Join'}</DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col items-center gap-4 py-4">
-            <div className="bg-white text-neo-black p-4 rounded-neo border-3 border-neo-black">
-              <QRCodeSVG
-                value={getJoinUrl(gameCode)}
-                size={200}
-                level="M"
-              />
-            </div>
-            <p className="text-center text-sm text-neo-black/75">
-              {t('joinView.scanToJoin') || 'Scan the code to join or use code'}{' '}
-              <span className="font-mono font-bold">{gameCode}</span>
-            </p>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
     </>
   );

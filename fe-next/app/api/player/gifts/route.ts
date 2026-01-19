@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { captureApiError } from '@/utils/sentry';
 
+interface BadgeInfo {
+  id: string;
+  name_key: string;
+  icon: string;
+  image_url: string | null;
+  rarity: string;
+}
+
 interface GiftMessage {
   id: string;
   title: string;
@@ -10,6 +18,8 @@ interface GiftMessage {
   image_url: string | null;
   xp_amount: number;
   coin_amount: number;
+  badge_id: string | null;
+  badge?: BadgeInfo | null;
   claimed: boolean;
   claimed_at: string | null;
   created_at: string;
@@ -46,6 +56,8 @@ export async function GET() {
         image_url,
         xp_amount,
         coin_amount,
+        badge_id,
+        badge:collectible_items!admin_gift_messages_badge_id_fkey(id, name_key, icon, image_url, rarity),
         claimed,
         claimed_at,
         created_at,
@@ -65,14 +77,27 @@ export async function GET() {
       return NextResponse.json({ error: 'Failed to fetch gifts' }, { status: 500 });
     }
 
-    // Transform the sender field from array to single object
-    const transformedGifts: GiftMessage[] = (gifts || []).map((gift) => ({
-      ...gift,
+    // Transform the sender and badge fields from array to single object
+    const transformedGifts: GiftMessage[] = (gifts || []).map((gift) => {
       // Supabase returns foreign key joins as arrays, extract first element
-      sender: Array.isArray(gift.sender) && gift.sender.length > 0
+      const sender = Array.isArray(gift.sender) && gift.sender.length > 0
         ? gift.sender[0]
-        : undefined,
-    }));
+        : undefined;
+
+      // Badge is also a foreign key join - extract first element if array
+      let badge: BadgeInfo | null = null;
+      if (Array.isArray(gift.badge) && gift.badge.length > 0) {
+        badge = gift.badge[0] as BadgeInfo;
+      } else if (gift.badge && !Array.isArray(gift.badge)) {
+        badge = gift.badge as BadgeInfo;
+      }
+
+      return {
+        ...gift,
+        sender,
+        badge,
+      };
+    });
 
     return NextResponse.json({
       success: true,

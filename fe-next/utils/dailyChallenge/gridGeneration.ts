@@ -469,13 +469,18 @@ function findWordPathInPartialGrid(
 /**
  * Check if a word can be formed on the grid using adjacent cells
  * Uses DFS to find a valid path for the word
+ *
+ * NOTE: For Hebrew words, final letters (ך, ם, ן, ף, ץ) are normalized to
+ * their regular forms before searching, since grids store regular forms only.
  */
 export function isWordOnGrid(word: string, grid: LetterGrid): boolean {
   if (!grid || grid.length === 0 || !word) return false;
 
   const rows = grid.length;
   const cols = grid[0].length;
-  const wordUpper = word.toUpperCase();
+  // Normalize Hebrew final letters to regular forms, then uppercase
+  // This ensures "כוכבים" (with final ם) matches grid cells with "מ"
+  const wordNormalized = normalizeHebrewFinalLetters(word).toUpperCase();
 
   // 8 directions for adjacent cells
   const directions = [
@@ -490,7 +495,7 @@ export function isWordOnGrid(word: string, grid: LetterGrid): boolean {
   ];
 
   function dfs(row: number, col: number, index: number, visited: Set<string>): boolean {
-    if (index === wordUpper.length) return true;
+    if (index === wordNormalized.length) return true;
     if (row < 0 || row >= rows || col < 0 || col >= cols) return false;
 
     const key = `${row},${col}`;
@@ -498,7 +503,7 @@ export function isWordOnGrid(word: string, grid: LetterGrid): boolean {
 
     // Normalize grid cell for comparison
     const cellLetter = grid[row][col].toUpperCase();
-    if (cellLetter !== wordUpper[index]) return false;
+    if (cellLetter !== wordNormalized[index]) return false;
 
     visited.add(key);
 
@@ -515,7 +520,7 @@ export function isWordOnGrid(word: string, grid: LetterGrid): boolean {
   // Try starting from each cell
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
-      if (grid[r][c].toUpperCase() === wordUpper[0]) {
+      if (grid[r][c].toUpperCase() === wordNormalized[0]) {
         if (dfs(r, c, 0, new Set())) {
           return true;
         }

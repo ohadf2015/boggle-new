@@ -105,6 +105,22 @@ export function useResultsData(
   const playerRank = allParticipants.findIndex(p => p.isPlayer) + 1;
   const isWinner = playerRank === 1;
 
+  // Debug logging for win streak diagnosis
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[ResultsData] Player rank calculation', {
+      playerScore: results.playerScore,
+      botScores: results.botScores.map(b => ({ name: b.name, score: b.score })),
+      allParticipantsSorted: allParticipants.map((p, i) => ({
+        rank: i + 1,
+        name: p.name,
+        score: p.score,
+        isPlayer: p.isPlayer,
+      })),
+      playerRank,
+      isWinner,
+    });
+  }
+
   // Convert PlayerWordData to WordObject format for shared utilities
   const wordObjects = useMemo((): WordObject[] => {
     if (!results.playerWordData?.length) return [];

@@ -39,6 +39,8 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     const { unclaimedCount, gifts, refresh: refreshGifts, claimGift } = useUnclaimedGifts();
     const [showGiftModal, setShowGiftModal] = useState(false);
     const [selectedGift, setSelectedGift] = useState<typeof gifts[0] | null>(null);
+    // Track which gift IDs have been auto-shown this session to prevent re-showing
+    const autoShownGiftIdsRef = useRef<Set<string>>(new Set());
 
     // Handle opening gift modal with oldest unclaimed gift
     const handleOpenGiftModal = useCallback(() => {
@@ -90,26 +92,48 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
     }, [gifts, selectedGift?.id, refreshProfile]);
 
     // Auto-show gift modal after 3 seconds when user has unclaimed gifts
-    // Check database to see if user has previously dismissed the modal
+    // - Tracks which gifts have been auto-shown this session to prevent re-showing
+    // - Compares gift creation date with dismissal timestamp to allow NEW gifts to auto-show
     useEffect(() => {
-        // Don't auto-show if user has previously dismissed the modal (persisted in DB)
-        if (profile?.gift_modal_dismissed_at) {
+        // Don't auto-show if already showing
+        if (showGiftModal) {
             return;
         }
 
-        // Don't auto-show if no gifts or already showing
-        if (gifts.length === 0 || showGiftModal) {
+        // Don't auto-show if no gifts
+        if (gifts.length === 0) {
             return;
         }
 
-        const unclaimedGift = gifts.find(g => !g.claimed);
-        if (!unclaimedGift) {
+        // Find unclaimed gifts that:
+        // 1. Haven't been auto-shown this session
+        // 2. Were created AFTER the last dismissal (or dismissal is null)
+        const dismissedAt = profile?.gift_modal_dismissed_at
+            ? new Date(profile.gift_modal_dismissed_at).getTime()
+            : 0;
+
+        const eligibleGift = gifts.find(g => {
+            if (g.claimed) return false;
+            // Skip if already auto-shown this session
+            if (autoShownGiftIdsRef.current.has(g.id)) return false;
+            // If dismissal timestamp exists, only show gifts created AFTER dismissal
+            if (dismissedAt > 0) {
+                const giftCreatedAt = new Date(g.created_at).getTime();
+                return giftCreatedAt > dismissedAt;
+            }
+            // No dismissal, show any unclaimed gift
+            return true;
+        });
+
+        if (!eligibleGift) {
             return;
         }
 
         // Auto-show after 3 seconds
         const timer = setTimeout(() => {
-            setSelectedGift(unclaimedGift);
+            // Mark this gift as auto-shown this session
+            autoShownGiftIdsRef.current.add(eligibleGift.id);
+            setSelectedGift(eligibleGift);
             setShowGiftModal(true);
         }, 3000);
 
@@ -491,7 +515,8 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                     </button>
                                 </div>
 
-                                <div className="flex flex-col gap-4 p-4">
+                                {/* Menu content with consistent spacing */}
+                                <div className="flex flex-col gap-3 p-4">
                                     {/* Coin Balance - shown for authenticated users */}
                                     {isAuthenticated && profile && (
                                         <>
@@ -613,7 +638,9 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 "shadow-hard-sm hover:shadow-hard"
                                             )}
                                         >
-                                            <Settings className="w-5 h-5" />
+                                            <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cyan/50 border-2 border-neo-black text-neo-black dark:text-white">
+                                                <Settings className="w-4 h-4" aria-hidden="true" />
+                                            </span>
                                             <span>{t('settings.moreSettings') || 'More Settings'}</span>
                                         </Link>
                                     </div>
@@ -756,6 +783,8 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                 show={showGiftModal}
                 onClaim={handleClaimGift}
                 onDismiss={handleDismissGiftModal}
+                currentXp={profile?.total_xp || 0}
+                currentCoins={profile?.total_coins || 0}
             />
         </header>
     );

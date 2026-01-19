@@ -3,13 +3,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
-import { Gift, Sparkles, Coins, Crown, X } from 'lucide-react';
+import { Gift, Sparkles, Coins, Crown, X, Award } from 'lucide-react';
+import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { Button } from '@/components/ui/button';
 import { NeoLoader } from '@/components/ui/NeoLoader';
+
+interface BadgeInfo {
+  id: string;
+  name_key: string;
+  icon: string;
+  image_url: string | null;
+  rarity: string;
+}
 
 interface GiftData {
   id: string;
@@ -18,6 +27,8 @@ interface GiftData {
   template_type: string | null;
   xp_amount: number;
   coin_amount: number;
+  badge_id?: string | null;
+  badge?: BadgeInfo | null;
   sender?: {
     username: string;
     display_name: string | null;
@@ -29,6 +40,8 @@ interface AdminGiftModalProps {
   show: boolean;
   onClaim: (giftId: string) => Promise<void>;
   onDismiss: () => void;
+  currentXp?: number;
+  currentCoins?: number;
   className?: string;
 }
 
@@ -47,6 +60,8 @@ export function AdminGiftModal({
   show,
   onClaim,
   onDismiss,
+  currentXp = 0,
+  currentCoins = 0,
   className,
 }: AdminGiftModalProps) {
   const { t } = useLanguage();
@@ -55,9 +70,32 @@ export function AdminGiftModal({
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const [phase, setPhase] = useState<'entrance' | 'reveal' | 'ready' | 'claiming' | 'done'>('entrance');
   const [claiming, setClaiming] = useState(false);
+  // Track XP/coins at start to show before/after
+  const [startXp, setStartXp] = useState(currentXp);
+  const [startCoins, setStartCoins] = useState(currentCoins);
 
   // VIP gold/purple color scheme
   const vipColors = ['#FFD700', '#FFA500', '#9333EA', '#FFE135', '#F59E0B'];
+
+  // Helper to format badge name from name_key
+  const formatBadgeName = (nameKey: string): string => {
+    // Extract last part of key (e.g., "collectible.badge.guardian_of_words" -> "guardian_of_words")
+    const lastPart = nameKey.split('.').pop() || nameKey;
+    // Convert to title case and replace underscores with spaces
+    return lastPart
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
+  // Rarity color mapping
+  const rarityColors: Record<string, { border: string; bg: string; text: string }> = {
+    common: { border: 'border-gray-400', bg: 'bg-gray-500/20', text: 'text-gray-300' },
+    uncommon: { border: 'border-green-400', bg: 'bg-green-500/20', text: 'text-green-300' },
+    rare: { border: 'border-blue-400', bg: 'bg-blue-500/20', text: 'text-blue-300' },
+    epic: { border: 'border-purple-400', bg: 'bg-purple-500/20', text: 'text-purple-300' },
+    legendary: { border: 'border-amber-400', bg: 'bg-gradient-to-br from-amber-500/30 to-orange-500/30', text: 'text-amber-300' },
+  };
 
   // GSAP Timeline Animation
   useEffect(() => {
@@ -142,8 +180,12 @@ export function AdminGiftModal({
     if (!show) {
       setPhase('entrance');
       setClaiming(false);
+    } else {
+      // Capture starting XP/coins when modal opens
+      setStartXp(currentXp);
+      setStartCoins(currentCoins);
     }
-  }, [show]);
+  }, [show, currentXp, currentCoins]);
 
   const handleClaim = async () => {
     if (!gift || claiming) return;
@@ -305,38 +347,125 @@ export function AdminGiftModal({
 
               {/* Rewards Section */}
               {(gift.xp_amount > 0 || gift.coin_amount > 0) && (
-                <div className="gift-rewards flex justify-center gap-6 mb-6 p-4 bg-white/5 rounded-lg border border-white/10">
-                  {gift.xp_amount > 0 && (
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 bg-purple-500/20 rounded-lg">
-                        <Sparkles className="w-5 h-5 text-purple-400" />
-                      </div>
-                      <div className="text-left">
-                        <div className="text-2xl font-bold text-purple-400 font-mono">
-                          +{gift.xp_amount.toLocaleString()}
+                <div className="gift-rewards mb-6 p-4 bg-white/5 rounded-lg border border-white/10">
+                  <div className="flex justify-center gap-6">
+                    {gift.xp_amount > 0 && (
+                      <div className="flex items-center gap-2">
+                        <div className="p-2 bg-purple-500/20 rounded-lg">
+                          <Sparkles className="w-5 h-5 text-purple-400" />
                         </div>
-                        <div className="text-xs text-purple-300/70 uppercase tracking-wide">
-                          XP
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  {gift.coin_amount > 0 && (
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 bg-amber-500/20 rounded-lg">
-                        <Coins className="w-5 h-5 text-amber-400" />
-                      </div>
-                      <div className="text-left">
-                        <div className="text-2xl font-bold text-amber-400 font-mono">
-                          +{gift.coin_amount.toLocaleString()}
-                        </div>
-                        <div className="text-xs text-amber-300/70 uppercase tracking-wide">
-                          {t('gift.coins') || 'Coins'}
+                        <div className="text-left">
+                          <div className="text-2xl font-bold text-purple-400 font-mono">
+                            +{gift.xp_amount.toLocaleString()}
+                          </div>
+                          <div className="text-xs text-purple-300/70 uppercase tracking-wide">
+                            XP
+                          </div>
                         </div>
                       </div>
+                    )}
+                    {gift.coin_amount > 0 && (
+                      <div className="flex items-center gap-2">
+                        <div className="p-2 bg-amber-500/20 rounded-lg">
+                          <Coins className="w-5 h-5 text-amber-400" />
+                        </div>
+                        <div className="text-left">
+                          <div className="text-2xl font-bold text-amber-400 font-mono">
+                            +{gift.coin_amount.toLocaleString()}
+                          </div>
+                          <div className="text-xs text-amber-300/70 uppercase tracking-wide">
+                            {t('gift.coins') || 'Coins'}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Before/After Balance Display */}
+                  {phase === 'done' ? (
+                    <motion.div
+                      className="mt-3 pt-3 border-t border-white/10 flex justify-center gap-6 text-xs"
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      {gift.xp_amount > 0 && (
+                        <div className="text-purple-300/80">
+                          <span className="text-white/50">{t('gift.newTotal') || 'New total'}:</span>{' '}
+                          <span className="font-bold">{(startXp + gift.xp_amount).toLocaleString()} XP</span>
+                        </div>
+                      )}
+                      {gift.coin_amount > 0 && (
+                        <div className="text-amber-300/80">
+                          <span className="text-white/50">{t('gift.newTotal') || 'New total'}:</span>{' '}
+                          <span className="font-bold">{(startCoins + gift.coin_amount).toLocaleString()} {t('gift.coins') || 'Coins'}</span>
+                        </div>
+                      )}
+                    </motion.div>
+                  ) : (
+                    <div className="mt-3 pt-3 border-t border-white/10 flex justify-center gap-6 text-xs text-white/40">
+                      {gift.xp_amount > 0 && (
+                        <div>
+                          <span>{t('gift.currentBalance') || 'Current'}:</span>{' '}
+                          <span className="font-mono">{startXp.toLocaleString()} XP</span>
+                        </div>
+                      )}
+                      {gift.coin_amount > 0 && (
+                        <div>
+                          <span>{t('gift.currentBalance') || 'Current'}:</span>{' '}
+                          <span className="font-mono">{startCoins.toLocaleString()} {t('gift.coins') || 'Coins'}</span>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
+              )}
+
+              {/* Badge Section */}
+              {gift.badge && (
+                <motion.div
+                  className="gift-badge mb-6 p-4 bg-white/5 rounded-lg border border-white/10"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <div className="flex items-center justify-center gap-3">
+                    <div className={cn(
+                      'relative w-14 h-14 rounded-lg flex items-center justify-center border-2 overflow-hidden',
+                      rarityColors[gift.badge.rarity]?.border || 'border-gray-400',
+                      rarityColors[gift.badge.rarity]?.bg || 'bg-gray-500/20'
+                    )}>
+                      {gift.badge.image_url ? (
+                        <Image
+                          src={gift.badge.image_url}
+                          alt={formatBadgeName(gift.badge.name_key)}
+                          width={48}
+                          height={48}
+                          className="object-contain"
+                        />
+                      ) : (
+                        <span className="text-3xl">{gift.badge.icon || '🏅'}</span>
+                      )}
+                    </div>
+                    <div className="text-left">
+                      <div className="flex items-center gap-2">
+                        <Award className={cn(
+                          'w-4 h-4',
+                          rarityColors[gift.badge.rarity]?.text || 'text-gray-300'
+                        )} />
+                        <span className={cn(
+                          'text-xs uppercase tracking-wide font-semibold',
+                          rarityColors[gift.badge.rarity]?.text || 'text-gray-300'
+                        )}>
+                          {t(`rarity.${gift.badge.rarity}`) || gift.badge.rarity} {t('gift.badge') || 'Badge'}
+                        </span>
+                      </div>
+                      <p className="text-white font-bold text-lg">
+                        {t(gift.badge.name_key) || formatBadgeName(gift.badge.name_key)}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
               )}
 
               {/* Claim Button */}

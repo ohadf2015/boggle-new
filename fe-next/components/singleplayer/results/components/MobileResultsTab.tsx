@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { ArrowLeft } from 'lucide-react';
 import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
 import Top3Leaderboard, { type LeaderboardParticipant } from '@/components/results/Top3Leaderboard';
 import CompactResultsStats from '@/components/results/CompactResultsStats';
@@ -72,6 +73,15 @@ export function MobileResultsTab({
 }: MobileResultsTabProps): React.ReactElement {
   return (
     <div className="space-y-3">
+      {/* Top back button - visible immediately without scrolling */}
+      <button
+        onClick={onBackToLobby}
+        className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-white/80 hover:text-white border border-white/30 hover:border-white/50 rounded-neo transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
+        {t('nextStep.backToLobby') || 'Back to Lobby'}
+      </button>
+
       <div className="relative">
         <ResultsWinnerBanner
           winner={{ username: t('common.you') || 'You', score: results.playerScore }}

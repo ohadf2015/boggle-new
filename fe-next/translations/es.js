@@ -3524,7 +3524,10 @@ const es = {
     "feedbackLine": "¡Tu opinión es importante para nosotros!",
     "thankYouLine": "¡Un agradecimiento especial de nuestra parte!",
     "customLine": "¡Un mensaje especial para ti!",
-    "claimError": "No se pudo reclamar el regalo. Inténtalo de nuevo."
+    "claimError": "No se pudo reclamar el regalo. Inténtalo de nuevo.",
+    "badge": "Insignia",
+    "newTotal": "Nuevo total",
+    "currentBalance": "Actual"
   },
   "adminGifts": {
     "title": "Regalos de jugadores",

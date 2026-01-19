@@ -3528,7 +3528,10 @@ const he = {
     "feedbackLine": "הקול שלך חשוב לנו!",
     "thankYouLine": "תודה מיוחדת מאיתנו!",
     "customLine": "הודעה במיוחד עבורך!",
-    "claimError": "לא הצלחנו לאסוף את המתנה. נסה שוב."
+    "claimError": "לא הצלחנו לאסוף את המתנה. נסה שוב.",
+    "badge": "תג",
+    "newTotal": "סה״כ חדש",
+    "currentBalance": "נוכחי"
   },
   "adminGifts": {
     "title": "מתנות לשחקנים",

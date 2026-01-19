@@ -3527,7 +3527,10 @@ const ja = {
     "feedbackLine": "あなたの声を聞かせてください！",
     "thankYouLine": "特別な感謝を込めて！",
     "customLine": "あなたへの特別なメッセージです！",
-    "claimError": "ギフトの受け取りに失敗しました。もう一度お試しください。"
+    "claimError": "ギフトの受け取りに失敗しました。もう一度お試しください。",
+    "badge": "バッジ",
+    "newTotal": "新しい合計",
+    "currentBalance": "現在"
   },
   "adminGifts": {
     "title": "プレイヤーギフト",

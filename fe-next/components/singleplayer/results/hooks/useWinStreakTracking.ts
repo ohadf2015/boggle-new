@@ -55,33 +55,53 @@ export function useWinStreakTracking({
 
     if (hasRecordedWinRef.current) return;
     // Track wins in competitive modes (solo-bots and challenge), but not practice
-    if (mode === 'practice') return;
-    if (!isWinner) return; // Only record actual wins
+    if (mode === 'practice') {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[WinStreakTracking] Skipping - practice mode');
+      }
+      return;
+    }
+    if (!isWinner) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[WinStreakTracking] Skipping - not a winner (isWinner:', isWinner, ')');
+      }
+      return; // Only record actual wins
+    }
 
     hasRecordedWinRef.current = true;
 
-    // Check if already won today (streak won't increment in this case)
-    const alreadyWonToday = lastWinDate &&
-      new Date(lastWinDate).toDateString() === new Date().toDateString();
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[WinStreakTracking] Recording win', {
+        mode,
+        isWinner,
+        currentStreakFromHook: currentStreak,
+        lastWinDate,
+      });
+    }
 
-    // Store previous streak before recording
-    const previousStreak = currentStreak;
+    // Record the win and get the authoritative streak data
+    // This ensures we use the same calculated values that were saved to localStorage
+    const result = recordWin();
 
-    // Record the win (handles same-day logic internally)
-    recordWin();
-
-    // Calculate the actual new streak value
-    // If already won today, streak stays the same; otherwise it increments
-    const newStreak = alreadyWonToday ? currentStreak : previousStreak + 1;
     const tierThresholds = [3, 7, 14, 30];
-    const isNewMilestone = !alreadyWonToday && tierThresholds.some(t => newStreak === t);
+    const isNewMilestone = !result.alreadyWonToday && tierThresholds.some(t => result.newStreak === t);
 
-    // Update win streak data for display
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[WinStreakTracking] Win recorded with result', {
+        previousStreak: result.previousStreak,
+        newStreak: result.newStreak,
+        bestStreak: result.bestStreak,
+        alreadyWonToday: result.alreadyWonToday,
+        isNewMilestone,
+      });
+    }
+
+    // Update win streak data for display using the authoritative values from recordWin()
     setWinStreakData({
-      currentStreak: newStreak,
-      bestStreak: Math.max(bestStreak, newStreak),
+      currentStreak: result.newStreak,
+      bestStreak: result.bestStreak,
       isNewMilestone,
-      previousStreak,
+      previousStreak: result.previousStreak,
     });
   }, [mode, isWinner, currentStreak, bestStreak, lastWinDate, isLoaded, recordWin]);
 

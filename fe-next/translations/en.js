@@ -3530,7 +3530,10 @@ const en = {
     "feedbackLine": "Your voice matters to us!",
     "thankYouLine": "A special thank you from us!",
     "customLine": "A message just for you!",
-    "claimError": "Failed to claim gift. Please try again."
+    "claimError": "Failed to claim gift. Please try again.",
+    "badge": "Badge",
+    "newTotal": "New total",
+    "currentBalance": "Current"
   },
   "adminGifts": {
     "title": "Player Gifts",

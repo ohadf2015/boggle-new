@@ -256,10 +256,7 @@ export default function RareGems({
           </div>
         </div>
 
-        <div className={cn(
-          'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
-          'bg-neo-green text-neo-black'
-        )}>
+        <div className="px-3 py-1 rounded-neo border-2 border-neo-black font-bold bg-neo-lime text-neo-black">
           {score} {t('brain.drills.points')}
         </div>
       </div>
@@ -290,7 +287,7 @@ export default function RareGems({
             animate={{ opacity: 1, scale: 1 }}
             className="text-center space-y-6"
           >
-            <BookOpen className="w-20 h-20 mx-auto text-neo-green" />
+            <Gem className="w-20 h-20 mx-auto text-neo-purple" />
             <h2 className={cn(
               'text-2xl font-black',
               isDarkMode ? 'text-neo-white' : 'text-neo-black'
@@ -314,7 +311,7 @@ export default function RareGems({
             <motion.button
               whileTap={{ scale: 0.95 }}
               onClick={startGame}
-              className="px-8 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold text-lg uppercase bg-neo-green text-neo-black"
+              className="px-8 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold text-lg uppercase bg-neo-purple text-white"
             >
               {t('brain.drills.start')}
             </motion.button>
@@ -538,10 +535,7 @@ export default function RareGems({
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setPhase('ready')}
-                className={cn(
-                  'flex items-center gap-2 px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase',
-                  isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-white text-neo-black'
-                )}
+                className="flex items-center gap-2 px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase bg-neo-purple text-white"
               >
                 <RotateCcw className="w-5 h-5" />
                 {t('brain.drills.playAgain')}
@@ -550,7 +544,7 @@ export default function RareGems({
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={onExit}
-                  className="px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase bg-neo-green text-neo-black"
+                  className="px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase bg-neo-lime text-neo-black"
                 >
                   {t('brain.drills.exit')}
                 </motion.button>
