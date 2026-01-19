@@ -6,8 +6,7 @@
  */
 
 import { render, screen } from '@testing-library/react';
-import { getMascotImagePath, isGifVariant, GIF_VARIANTS, MascotVariant } from '../Mascot';
-import { Mascot, MascotWithEntrance } from '../Mascot';
+import { getMascotImagePath, isGifVariant, GIF_VARIANTS, MascotVariant, Mascot, MascotWithEntrance } from '../Mascot';
 import InteractiveMascot from '../InteractiveMascot';
 import IdleMascot from '../IdleMascot';
 
