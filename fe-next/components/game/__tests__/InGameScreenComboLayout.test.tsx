@@ -1,9 +1,9 @@
 /**
  * InGameScreen Combo Layout Tests
  *
- * Tests that the combo display is positioned correctly relative to the timer
- * on mobile devices - specifically that combo is on the right side and
- * doesn't cause the timer to shift/move.
+ * Tests that the combo display is positioned correctly relative to the timer:
+ * - Mobile: Combo appears in dedicated row above timer (centered)
+ * - Desktop: Combo positioned absolutely on the right side
  */
 
 import React from 'react';
@@ -73,10 +73,10 @@ import ComboDisplay from '../ComboDisplay';
 import CircularTimer from '../../CircularTimer';
 
 /**
- * Component that mimics the FIXED stats row layout from InGameScreen
- * - uses relative positioning with timer centered and combo absolutely positioned on right
- * - combo has z-30 (higher than timer's z-20) to render ABOVE timer
- * - uses pointer-events-none on container with pointer-events-auto on interactive children
+ * Component that mimics the NEW stats layout from InGameScreen
+ * - Mobile: Combo in dedicated row above stats (centered, lg:hidden)
+ * - Desktop: Combo absolutely positioned on right (hidden lg:flex, z-30)
+ * - Timer centered in stats row with z-20
  */
 const FixedStatsRowTestComponent = ({
   comboLevel,
@@ -89,38 +89,101 @@ const FixedStatsRowTestComponent = ({
 }) => {
   return (
     <div
-      data-testid="stats-row"
-      className="relative flex items-center justify-center"
+      data-testid="stats-section"
+      className="flex flex-col gap-1"
     >
-      {/* Timer (center - always visible and prominent) */}
-      <div data-testid="timer-wrapper" className="relative z-20 flex-shrink-0">
-        <CircularTimer remainingTime={60} totalTime={180} size="xs" />
-      </div>
-
-      {/* Combo + Score - positioned absolutely on the right to not shift timer */}
-      {/* z-30 ensures combo renders ABOVE timer (z-20), not behind it */}
-      {/* pointer-events-none prevents blocking timer, pointer-events-auto on children restores interactivity */}
-      {showCombo && (
+      {/* Combo row - mobile only, centered */}
+      {showCombo && comboLevel > 0 && (
         <div
-          data-testid="combo-score-wrapper"
-          className="absolute right-0 rtl:right-auto rtl:left-0 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 md:gap-2 z-30 pointer-events-none"
+          data-testid="combo-row-mobile"
+          className="flex lg:hidden justify-center items-center min-h-[40px]"
         >
           <ComboDisplay comboLevel={comboLevel} compact />
+        </div>
+      )}
+
+      {/* Stats row - Timer + Score */}
+      <div
+        data-testid="stats-row"
+        className="flex w-full items-center justify-between relative"
+      >
+        {/* Timer (center) */}
+        <div data-testid="timer-wrapper" className="relative z-20 shrink-0">
+          <CircularTimer remainingTime={60} totalTime={180} size="xs" />
+        </div>
+
+        {/* Score (right side on mobile) */}
+        <div className="flex-1 flex justify-start pl-2 lg:hidden">
           <div
-            data-testid="score-display"
-            className="px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] pointer-events-auto"
+            data-testid="score-display-mobile"
+            className="px-1.5 py-0.5 min-w-[50px]"
           >
-            <div className="text-lg md:text-2xl font-black">{score}</div>
+            <div className="text-lg font-black">{score}</div>
             <div className="text-xs font-bold uppercase">Score</div>
           </div>
         </div>
-      )}
+
+        {/* Desktop: Combo + Score - absolutely positioned on right */}
+        {showCombo && (
+          <div
+            data-testid="combo-desktop"
+            className="hidden lg:flex lg:absolute lg:right-4 rtl:lg:right-auto rtl:lg:left-4 lg:top-1/2 lg:-translate-y-1/2 z-30 flex-col items-end gap-2"
+          >
+            <div className="h-[32px] flex items-center justify-end">
+              {comboLevel > 0 && <ComboDisplay comboLevel={comboLevel} compact />}
+            </div>
+            <div
+              data-testid="score-display-desktop"
+              className="px-4 py-1.5 min-w-[90px]"
+            >
+              <div className="text-2xl font-black">{score}</div>
+              <div className="text-xs font-bold uppercase">Score</div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
 describe('InGameScreen Combo Layout', () => {
-  describe('fixed layout: combo positioned absolutely on right side', () => {
+  describe('mobile layout: combo in dedicated row above stats', () => {
+    it('stats section uses vertical stacking for mobile', () => {
+      render(<FixedStatsRowTestComponent comboLevel={3} />);
+
+      const statsSection = screen.getByTestId('stats-section');
+      expect(statsSection).toHaveClass('flex-col');
+    });
+
+    it('combo row exists and is hidden on desktop', () => {
+      render(<FixedStatsRowTestComponent comboLevel={3} />);
+
+      const comboRow = screen.getByTestId('combo-row-mobile');
+      expect(comboRow).toHaveClass('lg:hidden');
+    });
+
+    it('combo row is centered horizontally', () => {
+      render(<FixedStatsRowTestComponent comboLevel={3} />);
+
+      const comboRow = screen.getByTestId('combo-row-mobile');
+      expect(comboRow).toHaveClass('justify-center');
+    });
+
+    it('combo row has minimum height for adequate spacing', () => {
+      render(<FixedStatsRowTestComponent comboLevel={3} />);
+
+      const comboRow = screen.getByTestId('combo-row-mobile');
+      expect(comboRow).toHaveClass('min-h-[40px]');
+    });
+
+    it('hides combo row when combo level is 0', () => {
+      render(<FixedStatsRowTestComponent comboLevel={0} />);
+
+      expect(screen.queryByTestId('combo-row-mobile')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('desktop layout: combo positioned absolutely on right side', () => {
     it('stats row has relative positioning to anchor absolute children', () => {
       render(<FixedStatsRowTestComponent comboLevel={3} />);
 
@@ -128,34 +191,35 @@ describe('InGameScreen Combo Layout', () => {
       expect(statsRow).toHaveClass('relative');
     });
 
-    it('timer has flex-shrink-0 to maintain fixed size', () => {
+    it('desktop combo wrapper is hidden on mobile, shown on desktop', () => {
       render(<FixedStatsRowTestComponent comboLevel={3} />);
 
-      const timerWrapper = screen.getByTestId('timer-wrapper');
-      expect(timerWrapper).toHaveClass('flex-shrink-0');
+      const comboDesktop = screen.getByTestId('combo-desktop');
+      expect(comboDesktop).toHaveClass('hidden');
+      expect(comboDesktop).toHaveClass('lg:flex');
     });
 
-    it('combo wrapper is positioned absolutely on the right', () => {
+    it('desktop combo is positioned absolutely on the right', () => {
       render(<FixedStatsRowTestComponent comboLevel={3} />);
 
-      const comboWrapper = screen.getByTestId('combo-score-wrapper');
-      expect(comboWrapper).toHaveClass('absolute');
-      expect(comboWrapper).toHaveClass('right-0');
+      const comboDesktop = screen.getByTestId('combo-desktop');
+      expect(comboDesktop).toHaveClass('lg:absolute');
+      expect(comboDesktop).toHaveClass('lg:right-4');
     });
 
-    it('combo wrapper has RTL support with left positioning', () => {
+    it('desktop combo has RTL support with left positioning', () => {
       render(<FixedStatsRowTestComponent comboLevel={3} />);
 
-      const comboWrapper = screen.getByTestId('combo-score-wrapper');
-      expect(comboWrapper.className).toMatch(/rtl:left-0/);
+      const comboDesktop = screen.getByTestId('combo-desktop');
+      expect(comboDesktop.className).toMatch(/rtl:lg:left-4/);
     });
 
-    it('combo wrapper is vertically centered', () => {
+    it('desktop combo is vertically centered', () => {
       render(<FixedStatsRowTestComponent comboLevel={3} />);
 
-      const comboWrapper = screen.getByTestId('combo-score-wrapper');
-      expect(comboWrapper).toHaveClass('top-1/2');
-      expect(comboWrapper).toHaveClass('-translate-y-1/2');
+      const comboDesktop = screen.getByTestId('combo-desktop');
+      expect(comboDesktop).toHaveClass('lg:top-1/2');
+      expect(comboDesktop).toHaveClass('lg:-translate-y-1/2');
     });
   });
 
@@ -170,76 +234,57 @@ describe('InGameScreen Combo Layout', () => {
     it('shows combo when level is 1 or higher', () => {
       render(<FixedStatsRowTestComponent comboLevel={1} />);
 
-      expect(screen.getByText(/Combo/)).toBeInTheDocument();
+      // Mobile combo row should contain combo text
+      const comboRow = screen.getByTestId('combo-row-mobile');
+      expect(comboRow).toHaveTextContent(/Combo/);
     });
 
     it('shows x2 combo text for level 2', () => {
       render(<FixedStatsRowTestComponent comboLevel={2} />);
 
-      expect(screen.getByText(/x2/)).toBeInTheDocument();
+      // Mobile combo row should contain x2
+      const comboRow = screen.getByTestId('combo-row-mobile');
+      expect(comboRow).toHaveTextContent(/x2/);
     });
   });
 
-  describe('mobile layout constraints', () => {
-    it('combo has compact styling with fixed width', () => {
-      render(<FixedStatsRowTestComponent comboLevel={3} />);
-
-      // ComboDisplay in compact mode should have fixed width to prevent layout shifts
-      const comboContainer = screen.getByText(/Combo/).closest('div[class*="w-"]');
-      expect(comboContainer).toHaveClass('w-[100px]');
-    });
-
-    it('combo does not have negative positioning that could overlap timer', () => {
-      render(<FixedStatsRowTestComponent comboLevel={5} />);
-
-      const comboWrapper = screen.getByTestId('combo-score-wrapper');
-
-      // Check no negative left positioning
-      expect(comboWrapper.className).not.toMatch(/-left-\d/);
-      expect(comboWrapper.className).not.toMatch(/-right-\d/);
-    });
-
-    it('timer stays centered when combo appears/disappears', () => {
-      const { rerender } = render(<FixedStatsRowTestComponent comboLevel={0} />);
-
-      // Timer should be centered (stats row uses justify-center)
-      const statsRow = screen.getByTestId('stats-row');
-      expect(statsRow).toHaveClass('justify-center');
-
-      // Rerender with combo visible
-      rerender(<FixedStatsRowTestComponent comboLevel={3} />);
-
-      // Timer should still be centered - stats row hasn't changed
-      expect(statsRow).toHaveClass('justify-center');
-    });
-  });
-
-  describe('z-index layering - combo must render ABOVE timer', () => {
-    it('combo wrapper has higher z-index than timer to prevent rendering behind it', () => {
+  describe('timer constraints', () => {
+    it('timer has flex-shrink-0 to maintain fixed size', () => {
       render(<FixedStatsRowTestComponent comboLevel={3} />);
 
       const timerWrapper = screen.getByTestId('timer-wrapper');
-      const comboWrapper = screen.getByTestId('combo-score-wrapper');
+      expect(timerWrapper).toHaveClass('shrink-0');
+    });
 
-      // Timer has z-20, combo MUST have z-30 or higher to render above
+    it('timer has z-20 for proper layering', () => {
+      render(<FixedStatsRowTestComponent comboLevel={3} />);
+
+      const timerWrapper = screen.getByTestId('timer-wrapper');
       expect(timerWrapper).toHaveClass('z-20');
-      expect(comboWrapper).toHaveClass('z-30');
     });
+  });
 
-    it('combo container uses pointer-events-none to prevent blocking timer interactions', () => {
+  describe('z-index layering - desktop combo above timer', () => {
+    it('desktop combo wrapper has higher z-index than timer', () => {
       render(<FixedStatsRowTestComponent comboLevel={3} />);
 
-      const comboWrapper = screen.getByTestId('combo-score-wrapper');
-      // Combo should not block pointer events from reaching elements below
-      expect(comboWrapper).toHaveClass('pointer-events-none');
-    });
+      const timerWrapper = screen.getByTestId('timer-wrapper');
+      const comboDesktop = screen.getByTestId('combo-desktop');
 
-    it('combo inner elements restore pointer-events for interactivity', () => {
+      // Timer has z-20, desktop combo MUST have z-30 or higher
+      expect(timerWrapper).toHaveClass('z-20');
+      expect(comboDesktop).toHaveClass('z-30');
+    });
+  });
+
+  describe('compact styling', () => {
+    it('combo has compact styling with fixed width', () => {
       render(<FixedStatsRowTestComponent comboLevel={3} />);
 
-      const scoreDisplay = screen.getByTestId('score-display');
-      // Score display should be interactive
-      expect(scoreDisplay).toHaveClass('pointer-events-auto');
+      // Both mobile and desktop combos use compact mode with fixed width
+      const comboRow = screen.getByTestId('combo-row-mobile');
+      const comboContainer = comboRow.querySelector('div[class*="w-"]');
+      expect(comboContainer).toHaveClass('w-[100px]');
     });
   });
 });

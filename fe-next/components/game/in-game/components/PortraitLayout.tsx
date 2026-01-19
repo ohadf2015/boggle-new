@@ -207,106 +207,111 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
         {/* Center Column: Timer, Score, Grid */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden max-h-full">
-          {/* Stats row */}
+          {/* Stats section with vertical stacking on mobile */}
           {remainingTime !== null && (
             <div
               ref={gameStatsRef}
-              className="flex w-full items-center justify-between px-1 md:px-2 gap-0"
+              className="flex flex-col gap-1 w-full px-1 md:px-2"
               role="status"
               aria-label="Game status"
             >
-              {/* Desktop header */}
-              <GameHeader
-                onExitRoom={onExitRoom}
-                onShowTutorial={onShowTutorial}
-                hints={hints}
-                gameActive={gameActive}
-                t={t}
-                variant="desktop"
-              />
+              {/* Combo row - mobile only, centered */}
+              {isPlaying && comboLevel > 0 && (
+                <div
+                  className="flex lg:hidden justify-center items-center min-h-[40px]"
+                  data-testid="combo-row-mobile"
+                >
+                  <ComboDisplay
+                    comboLevel={comboLevel}
+                    compact
+                    timeRemaining={comboTimeRemaining}
+                    isDanger={comboDanger}
+                  />
+                </div>
+              )}
 
-              {/* Left Side: Combo (mobile) */}
-              <div className="flex-1 flex justify-end pr-1 md:pr-3 pointer-events-none lg:hidden">
-                <div className="pointer-events-auto">
-                  {isPlaying && comboLevel > 0 ? (
-                    <ComboDisplay
-                      comboLevel={comboLevel}
-                      compact
-                      timeRemaining={comboTimeRemaining}
-                      isDanger={comboDanger}
-                    />
-                  ) : (
-                    <div className="min-w-[50px] md:min-w-[90px]" aria-hidden="true" />
-                  )}
-                </div>
-              </div>
+              {/* Stats row - Timer + Score (mobile) or Timer only (desktop) */}
+              <div className="flex w-full items-center justify-between relative">
+                {/* Desktop header */}
+                <GameHeader
+                  onExitRoom={onExitRoom}
+                  onShowTutorial={onShowTutorial}
+                  hints={hints}
+                  gameActive={gameActive}
+                  t={t}
+                  variant="desktop"
+                />
 
-              {/* Timer (center) */}
-              <motion.div
-                data-tutorial="timer"
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="relative z-20 shrink-0"
-              >
-                <div className="hidden lg:block">
-                  <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="lg" />
-                </div>
-                <div className="hidden md:block lg:hidden">
-                  <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" />
-                </div>
-                <div className="md:hidden">
-                  <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="xs" />
-                </div>
-              </motion.div>
+                {/* Timer (center) */}
+                <motion.div
+                  data-tutorial="timer"
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="relative z-20 shrink-0"
+                >
+                  <div className="hidden lg:block">
+                    <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="lg" />
+                  </div>
+                  <div className="hidden md:block lg:hidden">
+                    <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="md" />
+                  </div>
+                  <div className="md:hidden">
+                    <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="xs" />
+                  </div>
+                </motion.div>
 
-              {/* Right Side: Score (mobile) */}
-              {isPlaying && (
-                <div className="flex-1 flex justify-start pl-1 md:pl-3 pointer-events-none lg:hidden">
-                  <div className="pointer-events-auto">
+                {/* Right Side: Score (mobile) */}
+                {isPlaying && (
+                  <div className="flex-1 flex justify-start pl-1 md:pl-3 pointer-events-none lg:hidden">
+                    <div className="pointer-events-auto">
+                      <ScoreDisplay
+                        score={playerScore}
+                        rank={playerRank}
+                        leaderboardSize={leaderboard.length}
+                        minWordLength={minWordLength}
+                        t={t}
+                        variant="mobile"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Desktop: Combo + Score */}
+                {isPlaying && (
+                  <div
+                    className="hidden lg:flex lg:flex-col lg:items-end lg:gap-2 lg:absolute lg:right-4 rtl:lg:right-auto rtl:lg:left-4 lg:top-1/2 lg:-translate-y-1/2 z-30"
+                    data-testid="combo-desktop"
+                  >
+                    <div className="h-[32px] flex items-center justify-end">
+                      {comboLevel > 0 ? (
+                        <ComboDisplay
+                          comboLevel={comboLevel}
+                          compact
+                          timeRemaining={comboTimeRemaining}
+                          isDanger={comboDanger}
+                        />
+                      ) : (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 0.5 }}
+                          className="text-[10px] text-neo-cream/40 text-right leading-tight max-w-[70px]"
+                        >
+                          <span className="text-neo-cyan/60">⚡</span>{' '}
+                          {t('game.comboHint') || 'Find words fast!'}
+                        </motion.div>
+                      )}
+                    </div>
                     <ScoreDisplay
                       score={playerScore}
                       rank={playerRank}
                       leaderboardSize={leaderboard.length}
                       minWordLength={minWordLength}
                       t={t}
-                      variant="mobile"
+                      variant="desktop"
                     />
                   </div>
-                </div>
-              )}
-
-              {/* Desktop: Combo + Score */}
-              {isPlaying && (
-                <div className="hidden lg:flex lg:flex-col lg:items-end lg:gap-2 lg:absolute lg:right-4 rtl:lg:right-auto rtl:lg:left-4 lg:top-1/2 lg:-translate-y-1/2 z-30">
-                  <div className="h-[32px] flex items-center justify-end">
-                    {comboLevel > 0 ? (
-                      <ComboDisplay
-                        comboLevel={comboLevel}
-                        compact
-                        timeRemaining={comboTimeRemaining}
-                        isDanger={comboDanger}
-                      />
-                    ) : (
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 0.5 }}
-                        className="text-[10px] text-neo-cream/40 text-right leading-tight max-w-[70px]"
-                      >
-                        <span className="text-neo-cyan/60">⚡</span>{' '}
-                        {t('game.comboHint') || 'Find words fast!'}
-                      </motion.div>
-                    )}
-                  </div>
-                  <ScoreDisplay
-                    score={playerScore}
-                    rank={playerRank}
-                    leaderboardSize={leaderboard.length}
-                    minWordLength={minWordLength}
-                    t={t}
-                    variant="desktop"
-                  />
-                </div>
-              )}
+                )}
+              </div>
             </div>
           )}
 
