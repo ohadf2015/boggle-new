@@ -4,7 +4,7 @@ import { motion, AnimatePresence, type TargetAndTransition } from 'framer-motion
 import { memo, useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
-import { MASCOT_IMAGES, MascotVariant } from './Mascot';
+import { MASCOT_IMAGES, MascotVariant, getMascotImagePath, isGifVariant } from './Mascot';
 
 /**
  * Mood-based variants (emotional states) - these use fallback images
@@ -214,10 +214,11 @@ export interface InteractiveMascotProps {
 /**
  * Get the actual image source for a variant
  * Activity variants now have dedicated images, mood variants use fallbacks
+ * GIF variants use animated GIFs, others use PNGs
  */
 function getImageSource(variant: ExtendedMascotVariant): string {
   const baseVariant = getBaseVariant(variant);
-  return MASCOT_IMAGES[baseVariant];
+  return getMascotImagePath(baseVariant);
 }
 
 /**
@@ -451,6 +452,8 @@ export const InteractiveMascot = memo(function InteractiveMascot({
   }, [variant, isHovered, isClicked, enableHover, hoverVariant, clickVariant]);
 
   const imageSrc = getImageSource(currentVariant);
+  const baseVariant = useMemo(() => getBaseVariant(currentVariant), [currentVariant]);
+  const isGif = isGifVariant(baseVariant);
   const altText = alt || ariaLabel || `Lexi mascot - ${currentVariant}`;
   const idleAnimation = useMemo(() => getIdleAnimation(currentVariant), [currentVariant]);
 
@@ -525,6 +528,7 @@ export const InteractiveMascot = memo(function InteractiveMascot({
                 height={SIZE_PIXELS[size]}
                 className="object-contain drop-shadow-lg"
                 priority={priority}
+                unoptimized={isGif}
               />
             </motion.div>
           </AnimatePresence>

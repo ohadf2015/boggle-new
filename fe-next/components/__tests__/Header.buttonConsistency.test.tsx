@@ -87,7 +87,7 @@ describe('Header Button Consistency', () => {
             language: 'en' as const,
             currentFlag: '🇺🇸',
             setLanguage: jest.fn(),
-            supportedLanguages: [],
+            dir: 'ltr' as const,
         });
 
         mockUseAuth.mockReturnValue({
@@ -100,7 +100,15 @@ describe('Header Button Consistency', () => {
             } as any,
             refreshProfile: jest.fn(),
             user: null,
-            signOut: jest.fn(),
+            loading: false,
+            isSupabaseEnabled: true,
+            isGuest: false,
+            canPlayRanked: true,
+            gamesUntilRanked: 0,
+            needsProfileCustomization: false,
+            setupProfile: jest.fn(),
+            updateProfile: jest.fn(),
+            rankedProgress: null,
         });
 
         mockUseUnclaimedGifts.mockReturnValue({
@@ -112,6 +120,8 @@ describe('Header Button Consistency', () => {
                     created_at: new Date().toISOString(),
                 },
             ] as any,
+            loading: false,
+            error: null,
             refresh: jest.fn(),
             claimGift: jest.fn(),
         });
