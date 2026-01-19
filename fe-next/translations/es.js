@@ -676,6 +676,7 @@ const es = {
     "live": "EN VIVO",
     "waitingForGame": "Esperando el juego...",
     "noPlayersYet": "Sin jugadores aún",
+    "waitingForPlayers": "Esperando a que se unan jugadores...",
     "earthquake": "¡TERREMOTO!",
     "fireRound": "RONDA DE FUEGO",
     "twoXPoints": "2X PUNTOS",

@@ -117,24 +117,24 @@ beforeEach(() => {
 });
 
 describe('TvBroadcastView - Responsive Layout', () => {
-  it('should render main content area with proper flex constraints', () => {
+  it('should render main content area with proper grid layout', () => {
     const { container } = render(<TvBroadcastView {...defaultProps} />);
 
-    // Find the main content container (Grid + Leaderboard)
-    const mainContent = container.querySelector('.flex-1.min-h-0.flex');
+    // Find the main content container (Grid + Leaderboard) - uses CSS Grid now
+    const mainContent = container.querySelector('.flex-1.min-h-0.grid');
     expect(mainContent).toBeInTheDocument();
-    expect(mainContent).toHaveClass('flex-1', 'min-h-0');
+    expect(mainContent).toHaveClass('flex-1', 'min-h-0', 'grid');
   });
 
-  it('should have grid and leaderboard each taking flex-1 with proper overflow handling', () => {
+  it('should have grid and leaderboard with proper overflow handling', () => {
     render(<TvBroadcastView {...defaultProps} />);
 
     const grid = screen.getByTestId('tv-grid').parentElement;
     const leaderboard = screen.getByTestId('tv-leaderboard').parentElement;
 
-    // Both should have flex-1 to split 50/50
-    expect(grid).toHaveClass('flex-1', 'min-h-0');
-    expect(leaderboard).toHaveClass('flex-1', 'min-h-0');
+    // Both should have h-full to fill grid cells and proper min-height for mobile
+    expect(grid).toHaveClass('h-full');
+    expect(leaderboard).toHaveClass('h-full');
 
     // Both should have overflow-hidden to prevent content from escaping
     expect(grid).toHaveClass('overflow-hidden');

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Clock, Copy, Check, Monitor, Zap, PartyPopper, Trophy } from 'lucide-react';
+import { Check, Monitor, Zap, PartyPopper, Trophy } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
 import { GAME_PRESETS, type PresetKey } from '../PresetSelector';
 
@@ -17,14 +17,6 @@ export interface SettingsPanelProps {
   tvMode: boolean;
   /** Callback when TV mode is toggled */
   onTvModeToggle: () => void;
-  /** Current timer value in minutes */
-  timerValue: number;
-  /** Room code */
-  gameCode: string;
-  /** Callback when copy code button is clicked */
-  onCopyCode: () => void;
-  /** Whether code was just copied */
-  codeCopied?: boolean;
   /** Translation function */
   t: (path: string, params?: Record<string, string | number>) => string;
 }
@@ -50,19 +42,15 @@ const PRESET_COLORS: Record<PresetKey, { bg: string; border: string; text: strin
  *
  * Features:
  * - Large preset cards with icons and descriptions
- * - Room code with copy button
- * - Timer display
  * - TV mode toggle
+ *
+ * Note: Room code and timer are displayed elsewhere (InviteCard and header)
  */
 export function SettingsPanel({
   selectedPreset,
   onPresetClick,
   tvMode,
   onTvModeToggle,
-  timerValue,
-  gameCode,
-  onCopyCode,
-  codeCopied = false,
   t,
 }: SettingsPanelProps): React.ReactElement {
   const presetKeys = Object.keys(GAME_PRESETS) as PresetKey[];
@@ -72,35 +60,6 @@ export function SettingsPanel({
       data-testid="settings-panel"
       className="flex flex-col gap-4"
     >
-      {/* Room Code Card */}
-      <div className="relative rounded-neo-lg border-4 border-neo-black bg-slate-800 shadow-hard overflow-hidden">
-        {/* Decorative top accent */}
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-neo-lime via-neo-cyan to-neo-pink" />
-
-        <div className="p-4 pt-5">
-          <div className="flex items-center justify-between gap-2">
-            <div>
-              <p className="text-xs font-bold uppercase text-neo-cream/60 mb-1">
-                {t('roomCode.title') || 'Room Code'}
-              </p>
-              <p className="text-2xl font-black tracking-wider text-neo-lime">{gameCode}</p>
-            </div>
-            <motion.button
-              data-testid="copy-code-button"
-              onClick={onCopyCode}
-              whileTap={{ scale: 0.95 }}
-              className="p-3 rounded-neo bg-neo-navy/60 hover:bg-neo-navy border-2 border-neo-black shadow-hard-sm transition-colors"
-            >
-              {codeCopied ? (
-                <Check className="w-5 h-5 text-neo-lime" />
-              ) : (
-                <Copy className="w-5 h-5 text-neo-cream/70" />
-              )}
-            </motion.button>
-          </div>
-        </div>
-      </div>
-
       {/* Presets Section */}
       <div className="relative rounded-neo-lg border-4 border-neo-black bg-slate-800 shadow-hard overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-neo-pink via-neo-yellow to-neo-cyan" />
@@ -156,19 +115,6 @@ export function SettingsPanel({
               );
             })}
           </div>
-        </div>
-      </div>
-
-      {/* Timer Display */}
-      <div className="flex items-center gap-3 p-3 rounded-neo bg-neo-navy/40 border-2 border-neo-black/50">
-        <Clock className="w-5 h-5 text-neo-cyan" />
-        <div className="flex-1">
-          <p className="text-xs font-bold uppercase text-neo-cream/60">
-            {t('hostView.timer') || 'Timer'}
-          </p>
-          <p className="text-lg font-black text-neo-cream">
-            {timerValue} {t('common.minutes') || 'min'}
-          </p>
         </div>
       </div>
 

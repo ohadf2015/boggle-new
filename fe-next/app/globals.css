@@ -1984,7 +1984,8 @@ body {
 /* This is the default for pages that may have content exceeding viewport */
 .screen-fit {
   min-height: 100vh;
-  min-height: 100svh; /* Small viewport height for better mobile support */
+  min-height: 100svh; /* Small viewport height fallback */
+  min-height: 100dvh; /* Dynamic viewport height - adapts to browser UI */
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -1998,6 +1999,7 @@ body {
 .screen-fit-locked {
   height: 100vh;
   height: 100svh;
+  height: 100dvh; /* Dynamic viewport height - adapts to browser UI */
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -2016,6 +2018,7 @@ body {
 .screen-fit-with-header {
   height: calc(100vh - var(--header-height, 60px));
   height: calc(100svh - var(--header-height, 60px));
+  height: calc(100dvh - var(--header-height, 60px)); /* Dynamic viewport height */
   display: flex;
   flex-direction: column;
   overflow: hidden;

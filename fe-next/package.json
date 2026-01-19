@@ -30,7 +30,11 @@
     "db:migrate": "node supabase/migrations/run-migrations.js",
     "db:migrate:check": "node -e \"require('./supabase/migrations/run-migrations.js')\" --dry-run",
     "postbuild": "npm run db:migrate || echo 'Migration skipped (missing service key)'",
+    "setup:supabase": "bash scripts/setup-supabase-key.sh",
+    "grant-dev-admin": "node scripts/grant-dev-admin.js",
     "check:translations": "node scripts/find-missing-translations.js",
+    "test:wikipedia": "tsx scripts/test-wikipedia-flow.ts",
+    "test:wikipedia:production": "tsx scripts/verify-production-wikipedia.ts",
     "prepare": "husky"
   },
   "dependencies": {

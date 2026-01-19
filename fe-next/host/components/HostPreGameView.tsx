@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Users, Crown, Bot, Monitor, LogOut, Copy, Check, ChevronDown } from 'lucide-react';
+import { Clock, Users, Crown, Bot, Monitor, LogOut, ChevronDown } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Checkbox } from '../../components/ui/checkbox';
 import Avatar from '../../components/Avatar';
@@ -12,7 +12,6 @@ import BotControls from '../../components/BotControls';
 import { useCrazyGamesInvite } from '../../hooks/useCrazyGamesInvite';
 import { cn } from '../../lib/utils';
 import { useSocket } from '../../utils/SocketContext';
-import toast from 'react-hot-toast';
 
 import { PresetSelector, GAME_PRESETS, type PresetKey } from './pre-game/PresetSelector';
 import { StartButton } from './pre-game/StartButton';
@@ -21,7 +20,6 @@ import { PresetInfoDrawer } from './pre-game/PresetInfoDrawer';
 import {
   DesktopLobbyLayout,
   SettingsPanel,
-  GamePreviewCard,
   InviteCard,
   EnhancedPlayerList,
 } from './pre-game/desktop';
@@ -101,7 +99,6 @@ function HostPreGameView({
   const [hasInitialized, setHasInitialized] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>('lobby');
   const [unreadChatCount, setUnreadChatCount] = useState(0);
-  const [codeCopied, setCodeCopied] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [presetInfoOpen, setPresetInfoOpen] = useState<PresetKey | null>(null);
 
@@ -140,18 +137,6 @@ function HostPreGameView({
     },
     [setTimerValue, setDifficulty, setMinWordLength, setTimerDirection]
   );
-
-  // Copy room code
-  const handleCopyCode = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(gameCode);
-      setCodeCopied(true);
-      toast.success(t('roomCode.copied') || 'Copied!', { duration: 1500, icon: '📋' });
-      setTimeout(() => setCodeCopied(false), 2000);
-    } catch {
-      toast.error(t('common.error'));
-    }
-  }, [gameCode, t]);
 
   // Handle preset drawer selection
   const handleSelectAndApplyPreset = useCallback(
@@ -303,29 +288,18 @@ function HostPreGameView({
   );
 
   return (
-    <div className="h-full flex flex-col bg-neo-navy lg:max-w-5xl lg:mx-auto">
-      {/* Header */}
+    <div className="flex-1 flex flex-col min-h-0 bg-neo-navy lg:max-w-5xl lg:mx-auto">
+      {/* Header - Compact: Timer + Exit only (room code in InviteCard) */}
       <header className="flex-shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black">
         <div className="flex items-center justify-between gap-2">
-          {/* Room Code */}
-          <motion.button
-            onClick={handleCopyCode}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 px-3 py-1.5 bg-neo-navy/60 hover:bg-neo-navy/80 rounded-neo border-2 border-neo-black shadow-hard-sm transition-all"
-          >
-            <span className="text-lg font-black tracking-wider text-neo-lime">{gameCode}</span>
-            {codeCopied ? (
-              <Check className="w-4 h-4 text-neo-lime" />
-            ) : (
-              <Copy className="w-4 h-4 text-neo-cream/50" />
-            )}
-          </motion.button>
-
           {/* Timer Display */}
-          <div className="flex items-center gap-1 px-2 py-1 bg-neo-navy/50 rounded border border-neo-black/50">
-            <Clock className="w-3 h-3 text-neo-cyan" />
-            <span className="text-sm font-bold text-neo-cream">{timerValue}min</span>
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-neo-navy/50 rounded-neo border border-neo-black/50">
+            <Clock className="w-4 h-4 text-neo-cyan" />
+            <span className="text-sm font-bold text-neo-cream">{timerValue} {t('common.minutes') || 'min'}</span>
           </div>
+
+          {/* Spacer */}
+          <div className="flex-1" />
 
           {/* Exit Button */}
           <Button
@@ -351,10 +325,6 @@ function HostPreGameView({
                   onPresetClick={handleSelectAndApplyPreset}
                   tvMode={!hostPlaying}
                   onTvModeToggle={() => setHostPlaying(!hostPlaying)}
-                  timerValue={timerValue}
-                  gameCode={gameCode}
-                  onCopyCode={handleCopyCode}
-                  codeCopied={codeCopied}
                   t={t}
                 />
                 <BotControls
@@ -367,20 +337,20 @@ function HostPreGameView({
             }
             centerContent={
               <>
-                <GamePreviewCard
-                  playerCount={playersReady.length}
-                  t={t}
-                />
-                <InviteCard
-                  gameCode={gameCode}
-                  t={t}
-                />
+                {/* Start Button - Most prominent, at top */}
                 <StartButton
                   onStartGame={onStartGame}
                   disabled={isStartDisabled}
                   tournamentCreating={tournamentCreating}
                   playerCount={playersReady.length}
                   t={t}
+                  className="max-w-md"
+                />
+                {/* Invite Card - Sharing is secondary action */}
+                <InviteCard
+                  gameCode={gameCode}
+                  t={t}
+                  compact
                 />
               </>
             }

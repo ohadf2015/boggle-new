@@ -682,6 +682,7 @@ const en = {
     "live": "LIVE",
     "waitingForGame": "Waiting for game...",
     "noPlayersYet": "No players yet",
+    "waitingForPlayers": "Waiting for players to join...",
     "earthquake": "EARTHQUAKE!",
     "fireRound": "FIRE ROUND",
     "twoXPoints": "2X POINTS",

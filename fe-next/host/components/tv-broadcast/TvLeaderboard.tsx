@@ -70,8 +70,9 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
 
   if (sortedPlayers.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-neo-black/50 font-bold text-lg">{t('tvBroadcast.noPlayersYet')}</p>
+      <div className="flex flex-col items-center justify-center h-full w-full p-4">
+        <p className="text-neo-black/50 font-bold text-lg md:text-xl text-center">{t('tvBroadcast.noPlayersYet')}</p>
+        <p className="text-neo-black/30 text-sm mt-2 text-center">{t('tvBroadcast.waitingForPlayers') || 'Waiting for players to join...'}</p>
       </div>
     );
   }

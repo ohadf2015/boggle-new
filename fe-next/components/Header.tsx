@@ -355,7 +355,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 "flex items-center justify-center",
                                 "w-10 h-10",
                                 "bg-neo-cream text-neo-black",
-                                "border-2 border-neo-black",
+                                "border-3 border-neo-black",
                                 "rounded-neo shadow-hard-sm",
                                 "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-cyan/30",
                                 "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
@@ -375,7 +375,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                 "relative flex items-center justify-center",
                                 "w-10 h-10",
                                 "bg-gradient-to-br from-amber-400 to-amber-500 text-neo-black",
-                                "border-2 border-neo-black",
+                                "border-3 border-neo-black",
                                 "rounded-neo shadow-hard-sm",
                                 "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:from-amber-500 hover:to-amber-600",
                                 "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
@@ -395,7 +395,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             "flex items-center justify-center",
                             "w-10 h-10",
                             "bg-neo-purple/20 text-neo-purple dark:text-neo-purple-light",
-                            "border-2 border-neo-black",
+                            "border-3 border-neo-black",
                             "rounded-neo shadow-hard-sm",
                             "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-purple/40",
                             "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
@@ -413,7 +413,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             "flex items-center justify-center",
                             "w-10 h-10",
                             "bg-neo-cream text-neo-black",
-                            "border-2 border-neo-black",
+                            "border-3 border-neo-black",
                             "rounded-neo shadow-hard-sm",
                             "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard hover:bg-neo-cyan/30",
                             "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
@@ -443,7 +443,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                             "flex items-center justify-center flex-shrink-0",
                             "w-11 h-11 min-w-[44px] min-h-[44px]",
                             "bg-neo-cream text-neo-black",
-                            "border-2 border-neo-black",
+                            "border-3 border-neo-black",
                             "rounded-neo shadow-hard-sm",
                             "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
                             "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
@@ -504,7 +504,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                             "flex items-center justify-center",
                                             "min-w-[48px] min-h-[48px] w-12 h-12",
                                             "bg-white dark:bg-slate-700 text-neo-black dark:text-white",
-                                            "border-2 border-neo-black dark:border-slate-500",
+                                            "border-3 border-neo-black dark:border-slate-500",
                                             "rounded-neo shadow-hard-sm",
                                             "active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
                                             "transition-all duration-100"
@@ -528,7 +528,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                     href={`/${language}/profile`}
                                                     onClick={() => setShowMobileMenu(false)}
                                                     className={cn(
-                                                        "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                        "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
                                                         "bg-white dark:bg-slate-700 hover:bg-neo-lime/30 dark:hover:bg-slate-600 text-neo-black dark:text-white",
                                                         "shadow-hard-sm hover:shadow-hard"
                                                     )}
@@ -562,12 +562,12 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                         handleOpenGiftModal();
                                                     }}
                                                     className={cn(
-                                                        "relative flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                        "relative flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
                                                         "bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-neo-black",
                                                         "shadow-hard-sm hover:shadow-hard"
                                                     )}
                                                 >
-                                                    <span className="flex items-center justify-center w-7 h-7 rounded-md bg-white/30 border-2 border-neo-black text-neo-black">
+                                                    <span className="flex items-center justify-center w-7 h-7 rounded-md bg-white/30 border-3 border-neo-black text-neo-black">
                                                         <Gift className="w-4 h-4" aria-hidden="true" />
                                                     </span>
                                                     <span>{t('gift.youHaveGifts') || `You have ${unclaimedCount} gift${unclaimedCount !== 1 ? 's' : ''}`}</span>
@@ -603,7 +603,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                         </span>
 
                                         {/* Quick Language Switcher - for fast language changes */}
-                                        <div className="flex items-center gap-3 px-4 py-3 rounded-neo border-2 border-neo-black dark:border-slate-500 bg-white dark:bg-slate-700">
+                                        <div className="flex items-center gap-3 px-4 py-3 rounded-neo border-3 border-neo-black dark:border-slate-500 bg-white dark:bg-slate-700">
                                             <span className="text-sm font-bold text-neo-black dark:text-white">
                                                 {t('settings.language') || 'Language'}
                                             </span>
@@ -617,12 +617,12 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                             href={`/${language}/settings#accessibility`}
                                             onClick={() => setShowMobileMenu(false)}
                                             className={cn(
-                                                "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
                                                 "bg-neo-purple/20 dark:bg-neo-purple/30 hover:bg-neo-purple/40 dark:hover:bg-neo-purple/50 text-neo-black dark:text-white",
                                                 "shadow-hard-sm hover:shadow-hard"
                                             )}
                                         >
-                                            <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-purple/30 border-2 border-neo-black text-neo-purple dark:text-neo-purple-light">
+                                            <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-purple/30 border-3 border-neo-black text-neo-purple dark:text-neo-purple-light">
                                                 <Accessibility className="w-4 h-4" aria-hidden="true" />
                                             </span>
                                             <span>{t('settings.accessibility') || 'Accessibility'}</span>
@@ -633,12 +633,12 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                             href={`/${language}/settings`}
                                             onClick={() => setShowMobileMenu(false)}
                                             className={cn(
-                                                "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
                                                 "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
                                                 "shadow-hard-sm hover:shadow-hard"
                                             )}
                                         >
-                                            <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cyan/50 border-2 border-neo-black text-neo-black dark:text-white">
+                                            <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cyan/50 border-3 border-neo-black text-neo-black dark:text-white">
                                                 <Settings className="w-4 h-4" aria-hidden="true" />
                                             </span>
                                             <span>{t('settings.moreSettings') || 'More Settings'}</span>
@@ -663,7 +663,7 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                     flex items-center justify-center
                                                     min-w-[48px] min-h-[48px] w-12 h-12
                                                     bg-neo-pink text-white
-                                                    border-2 border-neo-black
+                                                    border-3 border-neo-black
                                                     rounded-neo shadow-hard-sm
                                                     active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
                                                     transition-all duration-100
@@ -689,12 +689,12 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 href={`/${language}/rules`}
                                                 onClick={() => setShowMobileMenu(false)}
                                                 className={cn(
-                                                    "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                    "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
                                                     "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
                                                     "shadow-hard-sm hover:shadow-hard"
                                                 )}
                                             >
-                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cyan border-2 border-neo-black text-neo-black">
+                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cyan border-3 border-neo-black text-neo-black">
                                                     <BookOpen className="w-4 h-4" aria-hidden="true" />
                                                 </span>
                                                 <span>{t('footer.aboutGame') || 'About the Game'}</span>
@@ -703,12 +703,12 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 href={`/${language}/leaderboard`}
                                                 onClick={() => setShowMobileMenu(false)}
                                                 className={cn(
-                                                    "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                    "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
                                                     "bg-white dark:bg-slate-700 hover:bg-neo-cyan/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
                                                     "shadow-hard-sm hover:shadow-hard"
                                                 )}
                                             >
-                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-lime border-2 border-neo-black text-neo-black">
+                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-lime border-3 border-neo-black text-neo-black">
                                                     <Trophy className="w-4 h-4" aria-hidden="true" />
                                                 </span>
                                                 <span>{t('footer.leaderboard') || 'Leaderboard'}</span>
@@ -717,12 +717,12 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 href={`/${language}/legal/terms`}
                                                 onClick={() => setShowMobileMenu(false)}
                                                 className={cn(
-                                                    "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                    "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
                                                     "bg-white dark:bg-slate-700 hover:bg-neo-lime/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
                                                     "shadow-hard-sm hover:shadow-hard"
                                                 )}
                                             >
-                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cream border-2 border-neo-black text-neo-black">
+                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-cream border-3 border-neo-black text-neo-black">
                                                     <ScrollText className="w-4 h-4" aria-hidden="true" />
                                                 </span>
                                                 <span>{t('legal.termsOfService')}</span>
@@ -731,12 +731,12 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 href={`/${language}/legal/privacy`}
                                                 onClick={() => setShowMobileMenu(false)}
                                                 className={cn(
-                                                    "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                    "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
                                                     "bg-white dark:bg-slate-700 hover:bg-neo-lime/50 dark:hover:bg-slate-600 text-neo-black dark:text-white",
                                                     "shadow-hard-sm hover:shadow-hard"
                                                 )}
                                             >
-                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-pink-light border-2 border-neo-black">
+                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-pink-light border-3 border-neo-black">
                                                     <Shield className="w-4 h-4 text-neo-black" aria-hidden="true" />
                                                 </span>
                                                 <span>{t('legal.privacyPolicy')}</span>
@@ -748,12 +748,12 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                                                 onClick={() => setShowMobileMenu(false)}
                                                 aria-label={`${t('support.kofiFooter')} (${t('common.opensInNewTab') || 'opens in new tab'})`}
                                                 className={cn(
-                                                    "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-2 border-neo-black dark:border-slate-500 transition-all w-full",
+                                                    "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo border-3 border-neo-black dark:border-slate-500 transition-all w-full",
                                                     "bg-neo-pink/20 dark:bg-slate-700 hover:bg-neo-pink/40 dark:hover:bg-slate-600 text-neo-black dark:text-white",
                                                     "shadow-hard-sm hover:shadow-hard"
                                                 )}
                                             >
-                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-pink border-2 border-neo-black text-white">
+                                                <span className="flex items-center justify-center w-7 h-7 rounded-md bg-neo-pink border-3 border-neo-black text-white">
                                                     <Coffee className="w-4 h-4" aria-hidden="true" />
                                                 </span>
                                                 <span>{t('support.kofiFooter')}</span>

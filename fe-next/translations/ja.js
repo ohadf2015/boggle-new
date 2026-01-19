@@ -679,6 +679,7 @@ const ja = {
     "live": "ライブ",
     "waitingForGame": "ゲーム待機中...",
     "noPlayersYet": "まだプレイヤーがいません",
+    "waitingForPlayers": "プレイヤーの参加を待っています...",
     "earthquake": "地震!",
     "fireRound": "ファイアラウンド",
     "twoXPoints": "2倍ポイント",

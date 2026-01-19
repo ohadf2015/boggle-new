@@ -17,6 +17,8 @@ export interface InviteCardProps {
   t: (path: string, params?: Record<string, string | number>) => string;
   /** Additional className */
   className?: string;
+  /** Compact horizontal layout with smaller QR */
+  compact?: boolean;
 }
 
 // ==================== Component ====================
@@ -25,15 +27,17 @@ export interface InviteCardProps {
  * Invite card with QR code and share options
  *
  * Features:
- * - Large QR code for easy scanning
+ * - QR code for easy scanning (smaller in compact mode)
  * - Room code display
  * - Copy link button
  * - Share via native share API (if available)
+ * - Compact horizontal layout option for space-constrained views
  */
 export function InviteCard({
   gameCode,
   t,
   className,
+  compact = false,
 }: InviteCardProps): React.ReactElement {
   const [linkCopied, setLinkCopied] = useState(false);
   const joinUrl = getJoinUrl(gameCode);
@@ -70,6 +74,95 @@ export function InviteCard({
     }
   }, [gameCode, joinUrl, t, handleCopyLink]);
 
+  // Compact horizontal layout
+  if (compact) {
+    return (
+      <div
+        data-testid="invite-card"
+        className={cn(
+          'relative rounded-neo-lg border-4 border-neo-black overflow-hidden w-full max-w-md',
+          'bg-gradient-to-br from-neo-pink/20 via-slate-800 to-neo-cyan/20',
+          'shadow-hard',
+          className
+        )}
+      >
+        {/* Decorative accent */}
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-neo-cyan via-neo-lime to-neo-pink" />
+
+        <div className="p-4 pt-5">
+          {/* Horizontal layout: QR + Content */}
+          <div className="flex items-center gap-4">
+            {/* QR Code - smaller in compact mode */}
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="flex-shrink-0 p-2 bg-white rounded-neo border-3 border-neo-black shadow-hard-sm"
+            >
+              <QRCodeSVG
+                value={joinUrl}
+                size={100}
+                level="H"
+                includeMargin={false}
+                bgColor="#ffffff"
+                fgColor="#000000"
+              />
+            </motion.div>
+
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              {/* Room Code */}
+              <div className="mb-3">
+                <p className="text-xs font-bold uppercase text-neo-cream/60 mb-0.5">
+                  {t('roomCode.title') || 'Room Code'}
+                </p>
+                <p className="text-2xl font-black tracking-wider text-neo-lime">{gameCode}</p>
+              </div>
+
+              {/* Share Buttons */}
+              <div className="flex gap-2">
+                <motion.button
+                  data-testid="copy-link-button"
+                  onClick={handleCopyLink}
+                  whileTap={{ scale: 0.95 }}
+                  className={cn(
+                    'flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-neo border-2 border-neo-black text-sm font-bold transition-all',
+                    linkCopied
+                      ? 'bg-neo-lime text-neo-black shadow-none'
+                      : 'bg-neo-navy hover:bg-neo-navy-light text-neo-cream shadow-hard-sm'
+                  )}
+                >
+                  {linkCopied ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      <span>{t('common.copied') || 'Copied!'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <LinkIcon className="w-4 h-4" />
+                      <span>{t('roomCode.copyLink') || 'Copy Link'}</span>
+                    </>
+                  )}
+                </motion.button>
+
+                {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
+                  <motion.button
+                    data-testid="native-share-button"
+                    onClick={handleNativeShare}
+                    whileTap={{ scale: 0.95 }}
+                    className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-cyan text-neo-black font-bold shadow-hard-sm hover:shadow-none transition-all"
+                  >
+                    <Share2 className="w-4 h-4" />
+                  </motion.button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Standard vertical layout
   return (
     <div
       data-testid="invite-card"

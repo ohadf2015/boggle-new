@@ -30,6 +30,8 @@ const customJestConfig = {
     '<rootDir>/contexts/**/*.test.{ts,tsx}',
     '<rootDir>/utils/**/*.test.{ts,tsx}',
     '<rootDir>/app/**/*.test.{ts,tsx}',
+    '<rootDir>/host/**/*.test.{ts,tsx}',
+    '<rootDir>/player/**/*.test.{ts,tsx}',
     '<rootDir>/__tests__/**/*.test.{ts,tsx}',
   ],
 
