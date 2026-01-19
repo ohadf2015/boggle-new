@@ -108,15 +108,14 @@ describe('DailyChallengeResults score submission', () => {
     wordCount: 15,
     wordsByLength: { '3': 5, '4': 5, '5': 3, '6': 2 },
     timeSeconds: 120,
-    grid: [['A', 'B'], ['C', 'D']],
-    targetWord: 'TEST',
+    streakDays: 5,
   };
 
   const mockStreak: DailyStreak = {
     currentStreak: 5,
     longestStreak: 10,
     lastPlayedDate: '2025-01-18',
-    totalPlays: 50,
+    totalDailiesCompleted: 50,
   };
 
   const mockT = (key: string): string => key;
