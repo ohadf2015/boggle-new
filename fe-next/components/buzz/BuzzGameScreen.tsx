@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronLeft, ChevronRight, Lightbulb, TrendingUp, Zap, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -93,6 +93,7 @@ export default function BuzzGameScreen({
     points: number;
     trendingContext?: string;
   } | null>(null);
+
   // Store pending completion data to avoid stale state issues
   const [pendingCompletionData, setPendingCompletionData] = useState<{
     answers: Array<{ challengeIndex: number; userAnswer: string; correct: boolean; timeTakenSeconds: number }>;
@@ -319,19 +320,21 @@ export default function BuzzGameScreen({
     // Render the challenge with locked overlay if already answered
     // Add key prop to force remount when challenge changes
     const challengeComponent = (() => {
+      // Use answer in key to ensure complete remount when challenge changes
+      const uniqueKey = `${currentIndex}-${currentChallenge.answer}`;
       switch (currentChallenge.type) {
         case 'scrambled':
-          return <ScrambledChallenge key={currentIndex} {...props} />;
+          return <ScrambledChallenge key={uniqueKey} {...props} />;
         case 'fillBlank':
-          return <FillBlankChallenge key={currentIndex} {...props} />;
+          return <FillBlankChallenge key={uniqueKey} {...props} />;
         case 'chain':
-          return <ChainChallenge key={currentIndex} {...props} />;
+          return <ChainChallenge key={uniqueKey} {...props} />;
         case 'spotOn':
-          return <SpotOnChallenge key={currentIndex} {...props} />;
+          return <SpotOnChallenge key={uniqueKey} {...props} />;
         case 'trio':
-          return <TrioChallenge key={currentIndex} {...props} />;
+          return <TrioChallenge key={uniqueKey} {...props} />;
         case 'wordle':
-          return <WordleChallenge key={currentIndex} {...props} />;
+          return <WordleChallenge key={uniqueKey} {...props} />;
         default:
           return <div>Unknown challenge type</div>;
       }
@@ -490,6 +493,7 @@ export default function BuzzGameScreen({
             exit={{ opacity: 0, x: -60, scale: 0.98 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             className="w-full max-w-2xl"
+            data-testid="current-challenge"
           >
             {renderChallenge()}
           </motion.div>

@@ -46,18 +46,6 @@ export default function FillBlankChallenge({
   const firstLetter = showFirstLetterHint ? challenge.answer[0].toUpperCase() : '';
   // Remaining letters for user to fill
   const remainingLength = showFirstLetterHint ? answerLength - 1 : answerLength;
-
-  // Debug logging for tests
-  if (process.env.NODE_ENV === 'test') {
-    console.log('[FillBlankChallenge] Render:', {
-      answer: challenge.answer,
-      answerLength,
-      hasAlternatives,
-      alternativesArray: challenge.alternatives,
-      showFirstLetterHint,
-      remainingLength,
-    });
-  }
   const [letters, setLetters] = useState<string[]>(Array(remainingLength).fill(''));
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -71,12 +59,14 @@ export default function FillBlankChallenge({
   useEffect(() => {
     setLetters(Array(remainingLength).fill(''));
     setActiveIndex(0);
+    // Reset inputRefs array to match new length (critical for proper rendering)
+    inputRefs.current.length = remainingLength;
     // Focus the first box
     const timer = setTimeout(() => {
       inputRefs.current[0]?.focus();
     }, 100);
     return () => clearTimeout(timer);
-  }, [challenge.answer, remainingLength]);
+  }, [challenge.answer, remainingLength, showFirstLetterHint]);
 
   // Handle letter input
   const handleLetterChange = useCallback((index: number, value: string) => {

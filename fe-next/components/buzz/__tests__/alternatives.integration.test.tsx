@@ -43,6 +43,16 @@ jest.mock('@/utils/confettiUtils', () => ({
   fireConfetti: jest.fn(),
 }));
 
+// Mock framer-motion to remove animation delays
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    h2: ({ children, ...props }: any) => <h2 {...props}>{children}</h2>,
+    span: ({ children, ...props }: any) => <span {...props}>{children}</span>,
+  },
+  AnimatePresence: ({ children }: any) => <>{children}</>,
+}));
+
 // Mock AnswerFeedbackModal to immediately call onClose (bypasses setTimeout timing issues in tests)
 jest.mock('../AnswerFeedbackModal', () => {
   return function MockAnswerFeedbackModal({
@@ -72,14 +82,20 @@ jest.mock('../AnswerFeedbackModal', () => {
       onCloseRef.current = onClose;
     }, [onClose]);
 
+    // Track if we've already called onClose for this open
+    const calledRef = React.useRef(false);
+
     React.useEffect(() => {
-      if (isOpen) {
-        console.log('[MockModal] Modal opened, calling onClose immediately');
-        // Call onClose immediately (synchronously causes issues, so use queueMicrotask)
-        queueMicrotask(() => {
-          console.log('[MockModal] Calling onClose now');
+      if (isOpen && !calledRef.current) {
+        calledRef.current = true;
+        // Use setTimeout with longer delay to ensure React finishes all state updates
+        const timer = setTimeout(() => {
           onCloseRef.current();
-        });
+        }, 200);
+        return () => clearTimeout(timer);
+      } else if (!isOpen) {
+        // Reset when modal closes
+        calledRef.current = false;
       }
     }, [isOpen]); // Only depend on isOpen, not onClose
 
@@ -317,11 +333,17 @@ describe('Alternative Answers Integration', () => {
         expect(screen.getByText(/correct/i)).toBeInTheDocument();
       });
 
-      // Mock modal closes immediately (50ms), wait for Challenge 2 to render
+      // Wait for modal to close and challenge to advance
+      await waitFor(() => {
+        expect(screen.queryByText(/correct/i)).not.toBeInTheDocument();
+        expect(screen.getByText(/2.*\/.*3/)).toBeInTheDocument(); // Progress: 2/3
+      }, { timeout: 3000 });
+
+      // Challenge 2: PARK (4-letter word with alternatives, so 4 inputs)
       await waitFor(() => {
         inputs = screen.getAllByRole('textbox');
-        expect(inputs).toHaveLength(4); // Challenge 2: PARK (4-letter word with alternatives)
-      });
+        expect(inputs).toHaveLength(4);
+      }, { timeout: 3000 });
       fireEvent.change(inputs[0], { target: { value: 'P' } });
       fireEvent.change(inputs[1], { target: { value: 'A' } });
       fireEvent.change(inputs[2], { target: { value: 'R' } });
@@ -334,11 +356,17 @@ describe('Alternative Answers Integration', () => {
         expect(screen.getByText(/correct/i)).toBeInTheDocument();
       });
 
-      // Mock modal closes immediately, wait for Challenge 3: HELLO
+      // Wait for modal to close and challenge to advance
+      await waitFor(() => {
+        expect(screen.queryByText(/correct/i)).not.toBeInTheDocument();
+        expect(screen.getByText(/3.*\/.*3/)).toBeInTheDocument(); // Progress: 3/3
+      }, { timeout: 3000 });
+
+      // Challenge 3: HELLO (5-letter word, no alternatives, so first letter shown + 4 inputs)
       await waitFor(() => {
         inputs = screen.getAllByRole('textbox');
-        expect(inputs).toHaveLength(4); // 5-letter word - 1 pre-filled = 4 inputs (no alternatives)
-      });
+        expect(inputs).toHaveLength(4);
+      }, { timeout: 3000 });
       fireEvent.change(inputs[0], { target: { value: 'E' } });
       fireEvent.change(inputs[1], { target: { value: 'L' } });
       fireEvent.change(inputs[2], { target: { value: 'L' } });
@@ -526,11 +554,17 @@ describe('Alternative Answers Integration', () => {
         expect(screen.getByText(/correct/i)).toBeInTheDocument();
       });
 
-      // Mock modal closes immediately, wait for Challenge 2: STOP
+      // Wait for modal to close and challenge to advance
+      await waitFor(() => {
+        expect(screen.queryByText(/correct/i)).not.toBeInTheDocument();
+        expect(screen.getByText(/2.*\/.*3/)).toBeInTheDocument(); // Progress: 2/3
+      }, { timeout: 3000 });
+
+      // Challenge 2: PARK/STOP (4-letter word with alternatives, so 4 inputs)
       await waitFor(() => {
         inputs = screen.getAllByRole('textbox');
-        expect(inputs).toHaveLength(4); // 4-letter word, full input when alternatives exist
-      });
+        expect(inputs).toHaveLength(4);
+      }, { timeout: 3000 });
       fireEvent.change(inputs[0], { target: { value: 'S' } });
       fireEvent.change(inputs[1], { target: { value: 'T' } });
       fireEvent.change(inputs[2], { target: { value: 'O' } });
@@ -542,16 +576,17 @@ describe('Alternative Answers Integration', () => {
         expect(screen.getByText(/correct/i)).toBeInTheDocument();
       });
 
-      // Wait for modal to disappear completely (auto-close + exit animation)
+      // Wait for modal to close and challenge to advance
       await waitFor(() => {
         expect(screen.queryByText(/correct/i)).not.toBeInTheDocument();
+        expect(screen.getByText(/3.*\/.*3/)).toBeInTheDocument(); // Progress: 3/3
       }, { timeout: 3000 });
 
-      // Challenge 3: Use main answer "HELLO" - NO alternatives, so first letter H is pre-filled, fill E-L-L-O
+      // Challenge 3: HELLO (5-letter word, no alternatives, so first letter shown + 4 inputs)
       await waitFor(() => {
         inputs = screen.getAllByRole('textbox');
-        expect(inputs).toHaveLength(4); // 5-letter word - 1 pre-filled = 4 inputs (no alternatives)
-      });
+        expect(inputs).toHaveLength(4);
+      }, { timeout: 3000 });
       fireEvent.change(inputs[0], { target: { value: 'E' } });
       fireEvent.change(inputs[1], { target: { value: 'L' } });
       fireEvent.change(inputs[2], { target: { value: 'L' } });
