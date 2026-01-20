@@ -46,6 +46,18 @@ export default function FillBlankChallenge({
   const firstLetter = showFirstLetterHint ? challenge.answer[0].toUpperCase() : '';
   // Remaining letters for user to fill
   const remainingLength = showFirstLetterHint ? answerLength - 1 : answerLength;
+
+  // Debug logging for tests
+  if (process.env.NODE_ENV === 'test') {
+    console.log('[FillBlankChallenge] Render:', {
+      answer: challenge.answer,
+      answerLength,
+      hasAlternatives,
+      alternativesArray: challenge.alternatives,
+      showFirstLetterHint,
+      remainingLength,
+    });
+  }
   const [letters, setLetters] = useState<string[]>(Array(remainingLength).fill(''));
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -55,14 +67,16 @@ export default function FillBlankChallenge({
   // Strip letter count from prompt for display
   const displayPrompt = stripLetterCount(challenge.prompt);
 
-  // Focus the first box on mount only
+  // Reset state when challenge changes
   useEffect(() => {
-    // Small delay to ensure DOM is ready
+    setLetters(Array(remainingLength).fill(''));
+    setActiveIndex(0);
+    // Focus the first box
     const timer = setTimeout(() => {
       inputRefs.current[0]?.focus();
     }, 100);
     return () => clearTimeout(timer);
-  }, []);
+  }, [challenge.answer, remainingLength]);
 
   // Handle letter input
   const handleLetterChange = useCallback((index: number, value: string) => {
@@ -393,7 +407,7 @@ export default function FillBlankChallenge({
       >
         <motion.div
           initial={{ width: 0 }}
-          animate={{ width: `${(filledCount / answerLength) * 100}%` }}
+          animate={{ width: `${(filledCount / remainingLength) * 100}%` }}
           transition={{ duration: 0.3 }}
           className={`h-full ${isComplete ? 'bg-neo-lime' : 'bg-neo-yellow'}`}
         />

@@ -317,20 +317,21 @@ export default function BuzzGameScreen({
     };
 
     // Render the challenge with locked overlay if already answered
+    // Add key prop to force remount when challenge changes
     const challengeComponent = (() => {
       switch (currentChallenge.type) {
         case 'scrambled':
-          return <ScrambledChallenge {...props} />;
+          return <ScrambledChallenge key={currentIndex} {...props} />;
         case 'fillBlank':
-          return <FillBlankChallenge {...props} />;
+          return <FillBlankChallenge key={currentIndex} {...props} />;
         case 'chain':
-          return <ChainChallenge {...props} />;
+          return <ChainChallenge key={currentIndex} {...props} />;
         case 'spotOn':
-          return <SpotOnChallenge {...props} />;
+          return <SpotOnChallenge key={currentIndex} {...props} />;
         case 'trio':
-          return <TrioChallenge {...props} />;
+          return <TrioChallenge key={currentIndex} {...props} />;
         case 'wordle':
-          return <WordleChallenge {...props} />;
+          return <WordleChallenge key={currentIndex} {...props} />;
         default:
           return <div>Unknown challenge type</div>;
       }

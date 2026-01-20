@@ -65,6 +65,12 @@ jest.mock('../AnswerFeedbackModal', () => {
     autoCloseMs?: number;
   }) {
     const { formatValidAnswers } = require('@/utils/buzz/answerValidation');
+    const onCloseRef = React.useRef(onClose);
+
+    // Keep ref updated but don't trigger useEffect
+    React.useEffect(() => {
+      onCloseRef.current = onClose;
+    }, [onClose]);
 
     React.useEffect(() => {
       if (isOpen) {
@@ -72,10 +78,10 @@ jest.mock('../AnswerFeedbackModal', () => {
         // Call onClose immediately (synchronously causes issues, so use queueMicrotask)
         queueMicrotask(() => {
           console.log('[MockModal] Calling onClose now');
-          onClose();
+          onCloseRef.current();
         });
       }
-    }, [isOpen, onClose]);
+    }, [isOpen]); // Only depend on isOpen, not onClose
 
     if (!isOpen) return null;
 
