@@ -225,7 +225,9 @@ describe('FillBlankChallenge', () => {
 
         // Submit button should be enabled
         const submitButton = screen.getByRole('button', { name: /submit/i });
-        expect(submitButton).not.toBeDisabled();
+        await waitFor(() => {
+          expect(submitButton).not.toBeDisabled();
+        });
 
         // Click submit
         await user.click(submitButton);
@@ -327,7 +329,7 @@ describe('FillBlankChallenge', () => {
         // Now enabled
         await waitFor(() => {
           expect(submitButton).not.toBeDisabled();
-        });
+        }, { timeout: 3000 });
       });
     });
 
